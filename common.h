@@ -124,6 +124,13 @@ struct sail_image
     int source_solor_space;
 };
 
+/* Options to modify reading operations. */
+struct sail_read_options
+{
+    /* Modify output pixel format. */
+    int pixel_format;
+};
+
 /*
  * File functions.
  */

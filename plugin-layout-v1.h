@@ -67,11 +67,14 @@ int sail_plugin_features(void);
  */
 
 /*
- * Initializes decoding the file.
+ * Initializes decoding the file using the specified options (or NULL to use defaults).
+ *
+ * Default decoding options:
+ *   - Pixels are converted to RGBA8888 format.
  *
  * Returns 0 on success or errno on error.
  */
-int sail_plugin_read_init(struct sail_file *file);
+int sail_plugin_read_init(struct sail_file *file, struct sail_read_options *read_options);
 
 /*
  * Seeks to the next frame. The frame is NOT immediately read. Use sail_plugin_read_next_pass() +
