@@ -64,7 +64,7 @@ enum SailColorSpace {
 
 /* Image properties. */
 enum SailImageProperties {
-    SAIL_IMAGE_FLIPPED_VERTICALLY   = 1 << 0,
+    SAIL_IMAGE_FLIPPED_VERTICALLY = 1 << 0,
 
     /* Not to be used. Resize the enum for future elements. */
     SAIL_IMAGE_PROPERTY_RESIZE_ENUM_TO_INT = MAX_INT
