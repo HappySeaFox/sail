@@ -71,7 +71,7 @@ int sail_plugin_features(void);
  *
  * Returns 0 on success or errno on error.
  */
-int sail_plugin_read_init(sail_file *file);
+int sail_plugin_read_init(struct sail_file *file);
 
 /*
  * Seeks to the next frame. The frame is NOT immediately read. Use sail_plugin_read_next_pass() +
@@ -80,14 +80,14 @@ int sail_plugin_read_init(sail_file *file);
  *
  * Returns 0 on success or errno on error.
  */
-int sail_plugin_read_seek_next_frame(sail_file *file, sail_image **image);
+int sail_plugin_read_seek_next_frame(struct sail_file *file, struct sail_image **image);
 
 /*
  * Seeks to the next pass if the specified image is interlaced. Does nothing otherwise.
  *
  * Returns 0 on success or errno on error.
  */
-int sail_plugin_read_seek_next_pass(sail_file *file, sail_image *image);
+int sail_plugin_read_seek_next_pass(struct sail_file *file, struct sail_image *image);
 
 /*
  * Reads a scan line of the current image in the current pass. The specified scan line
@@ -95,7 +95,7 @@ int sail_plugin_read_seek_next_pass(sail_file *file, sail_image *image);
  *
  * Returns 0 on success or errno on error.
  */
-int sail_plugin_read_scanline(sail_file *file, sail_image *image, void *scanline);
+int sail_plugin_read_scanline(struct sail_file *file, struct sail_image *image, void *scanline);
 
 /*
  * Finilizes reading operation. No more readings are possible after calling this function.
@@ -103,7 +103,7 @@ int sail_plugin_read_scanline(sail_file *file, sail_image *image, void *scanline
  *
  * Returns 0 on success or errno on error.
  */
-int sail_plugin_read_finish(sail_file *file, sail_image *image);
+int sail_plugin_read_finish(struct sail_file *file, struct sail_image *image);
 
 /*
  * Encoding functions.

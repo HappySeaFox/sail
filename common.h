@@ -108,13 +108,13 @@ struct sail_image
  *
  * Returns 0 on success or errno on error.
  */
-int sail_file_open(const char *filepath, int flags, sail_file **file);
+int sail_file_open(const char *filepath, int flags, struct sail_file **file);
 
 /*
  * Closes the specified file. Does nothing if the file is already closed.
  * The "file" pointer MUST NOT be used after calling this function.
  */
-void sail_file_close(sail_file *file);
+void sail_file_close(struct sail_file *file);
 
 /*
  * Image functions.
@@ -124,6 +124,6 @@ void sail_file_close(sail_file *file);
  * Destroys the specified image and all its internal allocated memory buffers.
  * The "image" pointer MUST NOT be used after calling this function.
  */
-void sail_image_destroy(sail_image *image);
+void sail_image_destroy(struct sail_image *image);
 
 #endif
