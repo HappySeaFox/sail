@@ -1,6 +1,6 @@
-/*  This file is part of SAIL (http://ksquirrel.sf.net)
+/*  This file is part of SAIL (https://github.com/sailor-keg/sail)
 
-    Copyright (c) 2020 Dmitry Baryshev <ksquirrel@tut.by>
+    Copyright (c) 2020 Dmitry Baryshev <dmitrymq@gmail.com>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
