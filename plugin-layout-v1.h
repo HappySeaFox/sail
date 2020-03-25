@@ -11,6 +11,10 @@
 NOT TO BE INCLUDED
 
 /*
+ * Plugin-related functions.
+ */
+
+/*
  * The loader will use the plugin's layout version to correctly handle the plugin. Unsupported
  * plugin layout versions will be reported.
  *
@@ -59,11 +63,15 @@ const char* sail_plugin_magic(void);
 int sail_plugin_features(void);
 
 /*
- * Starts decoding the specified image file. The assigned file MUST be closed later with sail_file_close().
+ * Decoding functions.
+ */
+
+/*
+ * Initializes decoding the file.
  *
  * Returns 0 on success or errno on error.
  */
-int sail_plugin_read_open(const char *filepath, int flags, sail_file **file);
+int sail_plugin_read_init(sail_file *file);
 
 /*
  * Seeks to the next frame. The frame is NOT immediately read. Use sail_plugin_read_next_pass() +
@@ -72,18 +80,31 @@ int sail_plugin_read_open(const char *filepath, int flags, sail_file **file);
  *
  * Returns 0 on success or errno on error.
  */
-int sail_plugin_read_next_frame(sail_file *file, sail_image **image);
+int sail_plugin_read_seek_next_frame(sail_file *file, sail_image **image);
 
 /*
  * Seeks to the next pass if the specified image is interlaced. Does nothing otherwise.
  *
  * Returns 0 on success or errno on error.
  */
-int sail_plugin_read_next_pass(sail_file *file, sail_image *image);
+int sail_plugin_read_seek_next_pass(sail_file *file, sail_image *image);
 
 /*
- * Read a scan line of the current image in the current pass.
+ * Reads a scan line of the current image in the current pass. The specified scan line
+ * must be large enough.
  *
  * Returns 0 on success or errno on error.
  */
 int sail_plugin_read_scanline(sail_file *file, sail_image *image, void *scanline);
+
+/*
+ * Finilizes reading operation. No more readings are possible after calling this function.
+ * This function doesn't close the file. Use sail_file_close() for that.
+ *
+ * Returns 0 on success or errno on error.
+ */
+int sail_plugin_read_finish(sail_file *file, sail_image *image);
+
+/*
+ * Encoding functions.
+ */

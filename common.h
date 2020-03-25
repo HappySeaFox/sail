@@ -5,7 +5,7 @@
 #include <stdbool.h>
 
 /*
- * Common data structures
+ * Common data structures and functions used across SAIL, both in libsail and in image plugins.
  */
 
 /* Pixel format */
@@ -103,7 +103,16 @@ struct sail_image
  */
 
 /*
+ * Opens the specified image file using the specified file flags. The assigned file MUST be closed later
+ * with sail_file_close().
+ *
+ * Returns 0 on success or errno on error.
+ */
+int sail_file_open(const char *filepath, int flags, sail_file **file);
+
+/*
  * Closes the specified file. Does nothing if the file is already closed.
+ * The "file" pointer MUST NOT be used after calling this function.
  */
 void sail_file_close(sail_file *file);
 
@@ -113,6 +122,7 @@ void sail_file_close(sail_file *file);
 
 /*
  * Destroys the specified image and all its internal allocated memory buffers.
+ * The "image" pointer MUST NOT be used after calling this function.
  */
 void sail_image_destroy(sail_image *image);
 
