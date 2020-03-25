@@ -42,6 +42,26 @@ enum SailPixelFormat {
     SAIL_PIXEL_FORMAT_RESIZE_ENUM_TO_INT = MAX_INT
 };
 
+/*
+ * Color space. SAIL doesn't provide color space conversion capabilities.
+ * This enum is used to provide a source color space for a user. Image data
+ * is always converted to RGB color space.
+ */
+enum SailColorSpace {
+
+    /* Unknown color space. */
+    SAIL_COLOR_SPACE_UNKNOWN,
+
+    SAIL_COLOR_SPACE_GRAYSCALE,
+    SAIL_COLOR_SPACE_RGB,
+    SAIL_COLOR_SPACE_YCBCR,
+    SAIL_COLOR_SPACE_CMYK,
+    SAIL_COLOR_SPACE_YCCK,
+
+    /* Not to be used. Resize the enum for future elements. */
+    SAIL_COLOR_SPACE_RESIZE_ENUM_TO_INT = MAX_INT
+};
+
 /* Image properties. */
 enum SailImageProperties {
     SAIL_IMAGE_FLIPPED_VERTICALLY   = 1 << 0,
@@ -82,7 +102,7 @@ struct sail_image
     /* Number of passes in this image */
     int passes;
 
-    /* Is the image an animation */
+    /* Is the image a frame in an animation */
     bool animated;
 
     /* Delay in milliseconds if the image is a frame in an animation */
@@ -96,6 +116,12 @@ struct sail_image
 
     /* Size of the palette data in bytes */
     int palette_size;
+
+    /* Image source pixel format. See SailPixelFormat. */
+    int source_pixel_format;
+
+    /* Image source color space. See SailColorSpace. */
+    int source_solor_space;
 };
 
 /*
