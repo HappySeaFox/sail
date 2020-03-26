@@ -12,7 +12,7 @@ int sail_file_open(const char *filepath, int flags, struct sail_file **file) {
 
     *file = (struct sail_file *)malloc(sizeof(struct sail_file));
 
-    (*file)->fd = 0;
+    (*file)->fptr = NULL;
     (*file)->pimpl = NULL;
     (*file)->pimpl_destroy = NULL;
 

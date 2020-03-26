@@ -3,6 +3,7 @@
 
 #include <limits.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 /*
  * Common data structures and functions used across SAIL, both in libsail and in image plugins.
@@ -76,7 +77,7 @@ enum SailImageProperties {
 struct sail_file {
 
     /* File descriptor */
-    int fd;
+    FILE *fptr;
 
     /* Plugin-specific data */
     void *pimpl;
