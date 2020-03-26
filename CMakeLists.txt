@@ -5,6 +5,7 @@ set(CMAKE_C_STANDARD 99)
 
 project(SAIL VERSION 1.0.0
              DESCRIPTION "Squirrel Abstract Image Libraries"
+             HOMEPAGE_URL "https://github.com/sailor-keg/sail"
              LANGUAGES C)
 
 add_subdirectory(src/libsail-common)
