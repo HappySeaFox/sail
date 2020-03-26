@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "common.h"
+#include "config.h"
 
 /*
  * File functions.
