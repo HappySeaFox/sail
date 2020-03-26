@@ -35,7 +35,6 @@ int sail_file_open(const char *filepath, const char *mode, struct sail_file **fi
 
     (*file)->fptr = fptr;
     (*file)->pimpl = NULL;
-    (*file)->pimpl_destroy = NULL;
 
     return 0;
 }
@@ -48,10 +47,6 @@ void sail_file_close(struct sail_file *file) {
 
     if (file->fptr != NULL) {
         fclose(file->fptr);
-    }
-
-    if (file->pimpl_destroy != NULL) {
-        file->pimpl_destroy(file->pimpl);
     }
 
     free(file);

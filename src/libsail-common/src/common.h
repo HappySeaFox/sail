@@ -79,11 +79,8 @@ struct sail_file {
     /* File descriptor */
     FILE *fptr;
 
-    /* Plugin-specific data */
+    /* Plugin-specific data. MUST be destroyed in every plugin upon reading or writing finialization. */
     void *pimpl;
-
-    /* Plugin-specific data deleter */
-    void (*pimpl_destroy)(void *);
 };
 
 /*
