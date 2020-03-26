@@ -78,7 +78,7 @@ int sail_plugin_read_init(struct sail_file *file, struct sail_read_options *read
 
 /*
  * Seeks to the next frame. The frame is NOT immediately read. Use sail_plugin_read_next_pass() +
- * sail_plugin_read_scanline() to actually read the frame. The assigned image MUST be closed later
+ * sail_plugin_read_scanline() to actually read the frame. The assigned image MUST be destroyed later
  * with sail_image_destroy().
  *
  * Returns 0 on success or errno on error.
@@ -111,3 +111,44 @@ int sail_plugin_read_finish(struct sail_file *file, struct sail_image *image);
 /*
  * Encoding functions.
  */
+
+/*
+ * Initializes encoding the file using the specified options (or NULL to use defaults).
+ *
+ * Default encoding options:
+ *   - Pixels are converted to RGBA8888 format.
+ *
+ * Returns 0 on success or errno on error.
+ */
+int sail_plugin_write_init(struct sail_file *file, struct sail_write_options *read_options);
+
+/*
+ * Seeks to a next frame before writing it. The frame is NOT immediately written. Use sail_plugin_write_next_pass() +
+ * sail_plugin_write_scanline() to actually write a frame. The assigned image MUST be destroyed later
+ * with sail_image_destroy().
+ *
+ * Returns 0 on success or errno on error.
+ */
+int sail_plugin_write_seek_next_frame(struct sail_file *file, struct sail_image **image);
+
+/*
+ * Seeks to a next pass before writing it if the specified image is interlaced. Does nothing otherwise.
+ *
+ * Returns 0 on success or errno on error.
+ */
+int sail_plugin_write_seek_next_pass(struct sail_file *file, struct sail_image *image);
+
+/*
+ * Writes a scan line of the current image in the current pass.
+ *
+ * Returns 0 on success or errno on error.
+ */
+int sail_plugin_write_scanline(struct sail_file *file, struct sail_image *image, void *scanline);
+
+/*
+ * Finilizes writing operation. No more writings are possible after calling this function.
+ * This function doesn't close the file. Use sail_file_close() for that.
+ *
+ * Returns 0 on success or errno on error.
+ */
+int sail_plugin_write_finish(struct sail_file *file, struct sail_image *image);

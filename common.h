@@ -99,7 +99,7 @@ struct sail_image
     /* Image pixel format. See SailPixelFormat. */
     int pixel_format;
 
-    /* Number of passes in this image */
+    /* Number of passes needed to read or write an entire image frame */
     int passes;
 
     /* Is the image a frame in an animation */
@@ -126,6 +126,13 @@ struct sail_image
 
 /* Options to modify reading operations. */
 struct sail_read_options
+{
+    /* Modify output pixel format. */
+    int pixel_format;
+};
+
+/* Options to modify writing operations. */
+struct sail_write_options
 {
     /* Modify output pixel format. */
     int pixel_format;
