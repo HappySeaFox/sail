@@ -1,34 +1,52 @@
+#include "config.h"
+
+#include <errno.h>
 #include <setjmp.h>
+#include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <jpeglib.h>
 
-void text(void)
-{
-    jpeg_create_decompress(NULL);
-}
+#include "common.h"
+#include "plugin.h"
 
-#if 0
+/*
+ * Plugin-specific data types.
+ */
+struct my_error_context {
 
-struct my_error_mgr
-{
     struct jpeg_error_mgr pub;
     jmp_buf setjmp_buffer;
 };
 
-typedef struct my_error_mgr * my_error_ptr;
+typedef struct my_error_context * my_error_context_ptr;
 
 METHODDEF(void) my_error_exit(j_common_ptr cinfo)
 {
-    my_error_ptr myerr;
+    my_error_context_ptr myerr;
 
-    myerr = (my_error_ptr) cinfo->err;
+    myerr = (my_error_context_ptr)cinfo->err;
 
-    (*cinfo->err->output_message) (cinfo);
+    (*cinfo->err->output_message)(cinfo);
 
     longjmp(myerr->setjmp_buffer, 1);
 }
 
+/*
+ * Plugin-specific PIMPL.
+ */
+struct pimpl {
+
+    struct jpeg_decompress_struct decompress_context;
+    struct my_error_context error_context;
+    JSAMPARRAY buffer;
+    bool zerror;
+};
+
+/*
+ * Plugin interface.
+ */
 int sail_plugin_layout_version(void) {
 
     return 1;
@@ -61,31 +79,28 @@ const char* sail_plugin_magic(void) {
 
 int sail_plugin_features(void) {
 
-    /* TODO */
-/*
-    o->readable = true;
-    o->canbemultiple = false;
-    o->writestatic = true;
-    o->writeanimated = false;
-*/
-    return 0;
+    return SAIL_PLUGIN_FEATURE_READ_STATIC | SAIL_PLUGIN_FEATURE_WRITE_STATIC;
 }
 
 int sail_plugin_read_init(struct sail_file *file, struct sail_read_options *read_options) {
 
-    zerror = false;
+    struct pimpl *pimpl = (struct pimpl *)malloc(sizeof(struct pimpl));
 
-    fptr = fopen(file.c_str(), "rb");
+    if (pimpl == NULL) {
+        return ENOMEM;
+    }
 
-    if(!fptr)
-        return SQE_R_NOFILE;
+    file->pimpl = pimpl;
 
-    currentImage = -1;
+    pimpl->zerror = false;
 
-    finfo.animated = false;
+    // TODO
+    //currentImage = -1;
 
-    return SQE_OK;
+    return 0;
 }
+
+#if 0
 
 s32 fmt_codec::read_next()
 {
@@ -96,38 +111,38 @@ s32 fmt_codec::read_next()
 
     fmt_image image;
 
-    cinfo.err = jpeg_std_error(&jerr.pub);
-    jerr.pub.error_exit = my_error_exit;
+    decompress_context.err = jpeg_std_error(&error_context.pub);
+    error_context.pub.error_exit = my_error_exit;
 
-    if(setjmp(jerr.setjmp_buffer)) 
+    if(setjmp(error_context.setjmp_buffer)) 
     {
         zerror = true;
 	return SQE_R_BADFILE;
     }
 
-    jpeg_create_decompress(&cinfo);
-    jpeg_stdio_src(&cinfo, fptr);
-    jpeg_save_markers(&cinfo, JPEG_COM, 0xffff);
-    jpeg_read_header(&cinfo, TRUE);
+    jpeg_create_decompress(&decompress_context);
+    jpeg_stdio_src(&decompress_context, fptr);
+    jpeg_save_markers(&decompress_context, JPEG_COM, 0xffff);
+    jpeg_read_header(&decompress_context, TRUE);
 
-    if(cinfo.jpeg_color_space == JCS_GRAYSCALE)
+    if(decompress_context.jpeg_color_space == JCS_GRAYSCALE)
     {
-        cinfo.out_color_space = JCS_RGB;
-	cinfo.desired_number_of_colors = 256;
-	cinfo.quantize_colors = FALSE;
-	cinfo.two_pass_quantize = FALSE;
+        decompress_context.out_color_space = JCS_RGB;
+	decompress_context.desired_number_of_colors = 256;
+	decompress_context.quantize_colors = FALSE;
+	decompress_context.two_pass_quantize = FALSE;
     }
 
-    jpeg_start_decompress(&cinfo);
+    jpeg_start_decompress(&decompress_context);
 
-    image.w = cinfo.output_width;
-    image.h = cinfo.output_height;
+    image.w = decompress_context.output_width;
+    image.h = decompress_context.output_height;
     
-    buffer = (*cinfo.mem->alloc_sarray)((j_common_ptr)&cinfo, JPOOL_IMAGE, cinfo.output_width * cinfo.output_components, 1);
+    buffer = (*decompress_context.mem->alloc_sarray)((j_common_ptr)&decompress_context, JPOOL_IMAGE, decompress_context.output_width * decompress_context.output_components, 1);
 
     std::string type;
 
-    switch(cinfo.jpeg_color_space)
+    switch(decompress_context.jpeg_color_space)
     {
 	case JCS_GRAYSCALE: type =  "Grayscale"; image.bpp = 8;  break;
 	case JCS_RGB:       type =  "RGB";       image.bpp = 24; break;
@@ -142,7 +157,7 @@ s32 fmt_codec::read_next()
     image.compression = "JPEG";
     image.colorspace = type;
 
-    jpeg_saved_marker_ptr it = cinfo.marker_list;
+    jpeg_saved_marker_ptr it = decompress_context.marker_list;
 
     while(it)
     {
@@ -179,13 +194,13 @@ s32 fmt_codec::read_scanline(RGBA *scan)
     fmt_image *im = image(currentImage);
     fmt_utils::fillAlpha(scan, im->w);
 
-    if(zerror || setjmp(jerr.setjmp_buffer)) 
+    if(zerror || setjmp(error_context.setjmp_buffer)) 
     {
         zerror = true;
 	return SQE_R_BADFILE;
     }
 
-    (void)jpeg_read_scanlines(&cinfo, buffer, 1);
+    (void)jpeg_read_scanlines(&decompress_context, buffer, 1);
 
     for(s32 i = 0;i < im->w;i++)
 	memcpy(scan+i, buffer[0] + i*3, 3);
@@ -195,8 +210,8 @@ s32 fmt_codec::read_scanline(RGBA *scan)
 
 void fmt_codec::read_close()
 {
-    jpeg_abort_decompress(&cinfo);
-    jpeg_destroy_decompress(&cinfo);
+    jpeg_abort_decompress(&decompress_context);
+    jpeg_destroy_decompress(&decompress_context);
 
     if(fptr)
         fclose(fptr);
@@ -230,22 +245,22 @@ s32 fmt_codec::write_init(const std::string &file, const fmt_image &image, const
     if(!m_fptr)
         return SQE_W_NOFILE;
 
-    m_cinfo.err = jpeg_std_error(&m_jerr);
+    decompress_context.err = jpeg_std_error(&error_context);
 
-    jpeg_create_compress(&m_cinfo);
+    jpeg_create_compress(&decompress_context);
 
-    jpeg_stdio_dest(&m_cinfo, m_fptr);
+    jpeg_stdio_dest(&decompress_context, m_fptr);
 
-    m_cinfo.image_width = image.w;
-    m_cinfo.image_height = image.h;
-    m_cinfo.input_components = 3;
-    m_cinfo.in_color_space = JCS_RGB;
+    decompress_context.image_width = image.w;
+    decompress_context.image_height = image.h;
+    decompress_context.input_components = 3;
+    decompress_context.in_color_space = JCS_RGB;
 
-    jpeg_set_defaults(&m_cinfo);
+    jpeg_set_defaults(&decompress_context);
 
-    jpeg_set_quality(&m_cinfo, 100-opt.compression_level, true);
+    jpeg_set_quality(&decompress_context, 100-opt.compression_level, true);
 
-    jpeg_start_compress(&m_cinfo, true);
+    jpeg_start_compress(&decompress_context, true);
 
     return SQE_OK;
 }
@@ -269,20 +284,20 @@ s32 fmt_codec::write_scanline(RGBA *scan)
         memcpy(sr+s, scan+s, sizeof(RGB));
     }
 
-    row_pointer = (JSAMPLE *)sr;
+    JSAMPROW row_pointer = (JSAMPLE *)sr;
 
-    (void)jpeg_write_scanlines(&m_cinfo, &row_pointer, 1);
+    (void)jpeg_write_scanlines(&decompress_context, &row_pointer, 1);
 
     return SQE_OK;
 }
 
 void fmt_codec::write_close()
 {
-    jpeg_finish_compress(&m_cinfo);
+    jpeg_finish_compress(&decompress_context);
 
     fclose(m_fptr);
 
-    jpeg_destroy_compress(&m_cinfo);
+    jpeg_destroy_compress(&decompress_context=);
 }
 
 std::string fmt_codec::extension(const s32 /*bpp*/)
