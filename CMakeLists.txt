@@ -31,4 +31,4 @@ include_directories("${PROJECT_BINARY_DIR}/include")
 #
 add_subdirectory(src/libsail-common)
 #add_subdirectory(src/libsail)
-#add_subdirectory(src/sail-plugins)
+add_subdirectory(src/sail-plugins)
