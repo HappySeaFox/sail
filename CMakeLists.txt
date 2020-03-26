@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.2)
 
 project(SAIL VERSION 1.0.0
              DESCRIPTION "Squirrel Abstract Image Libraries"
-             HOMEPAGE_URL "https://github.com/sailor-keg/sail"
              LANGUAGES C)
 
 set(BUILD_SHARED_LIBS ON)
