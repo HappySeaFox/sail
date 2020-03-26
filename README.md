@@ -1,1 +1,1 @@
-# SAIL: Squirrel Advanced Image Libraries
+# SAIL: Squirrel Abstract Image Libraries
