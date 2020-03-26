@@ -144,12 +144,12 @@ struct sail_write_options {
  */
 
 /*
- * Opens the specified image file using the specified file flags. The assigned file MUST be closed later
+ * Opens the specified image file using the specified mode (as in fopen). The assigned file MUST be closed later
  * with sail_file_close().
  *
  * Returns 0 on success or errno on error.
  */
-int sail_file_open(const char *filepath, int flags, struct sail_file **file);
+int sail_file_open(const char *filepath, const char *mode, struct sail_file **file);
 
 /*
  * Closes the specified file. Does nothing if the file is already closed.

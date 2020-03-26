@@ -1,18 +1,39 @@
+#include "config.h"
+
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifdef SAIL_PLATFORM_WIN32
+    /* _fsopen() */
+    #include <share.h>
+#endif
+
 #include "common.h"
-#include "config.h"
 
 /*
  * File functions.
  */
 
-int sail_file_open(const char *filepath, int flags, struct sail_file **file) {
+int sail_file_open(const char *filepath, const char *mode, struct sail_file **file) {
+
+    /* Try to open the file first */
+    FILE *fptr;
+
+#ifdef SAIL_PLATFORM_WIN32
+    fptr = _fsopen(filepath, mode, _SH_DENYWR);
+#else
+    /* Fallback to a regular fopen() */
+    fptr = fopen(filepath, mode);
+#endif
+
+    if (fptr == NULL) {
+        return errno;
+    }
 
     *file = (struct sail_file *)malloc(sizeof(struct sail_file));
 
-    (*file)->fptr = NULL;
+    (*file)->fptr = fptr;
     (*file)->pimpl = NULL;
     (*file)->pimpl_destroy = NULL;
 
@@ -20,6 +41,20 @@ int sail_file_open(const char *filepath, int flags, struct sail_file **file) {
 }
 
 void sail_file_close(struct sail_file *file) {
+
+    if (file == NULL) {
+        return;
+    }
+
+    if (file->fptr != NULL) {
+        fclose(file->fptr);
+    }
+
+    if (file->pimpl_destroy != NULL) {
+        file->pimpl_destroy(file->pimpl);
+    }
+
+    free(file);
 }
 
 /*
@@ -27,4 +62,14 @@ void sail_file_close(struct sail_file *file) {
  */
 
 void sail_image_destroy(struct sail_image *image) {
+
+    if (image == NULL) {
+        return;
+    }
+
+    if (image->palette != NULL) {
+        free(image->palette);
+    }
+
+    free(image);
 }
