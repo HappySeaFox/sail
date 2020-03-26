@@ -7,7 +7,9 @@
 
 #define SAIL_VERSION "@PROJECT_VERSION@"
 
-#cmakedefine SAIL_PLATFORM_UNIX
-#cmakedefine SAIL_PLATFORM_WIN32
+#cmakedefine SAIL_UNIX
+#cmakedefine SAIL_WIN32
+#cmakedefine SAIL_MINGW
+#cmakedefine SAIL_CYGWIN
 
 #endif

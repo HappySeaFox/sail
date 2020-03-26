@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef SAIL_PLATFORM_WIN32
+#ifdef SAIL_WIN32
     /* _fsopen() */
     #include <share.h>
 #endif
@@ -20,7 +20,7 @@ int sail_file_open(const char *filepath, const char *mode, struct sail_file **fi
     /* Try to open the file first */
     FILE *fptr;
 
-#ifdef SAIL_PLATFORM_WIN32
+#ifdef SAIL_WIN32
     fptr = _fsopen(filepath, mode, _SH_DENYWR);
 #else
     /* Fallback to a regular fopen() */

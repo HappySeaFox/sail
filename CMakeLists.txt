@@ -13,9 +13,16 @@ set(CMAKE_C_EXTENSIONS OFF)
 # Platform definitions used in config.h
 #
 if(WIN32)
-    set(SAIL_PLATFORM_WIN32 ON)
-elseif(UNIX)
-    set(SAIL_PLATFORM_UNIX ON)
+    set(SAIL_WIN32 ON)
+endif()
+if(UNIX)
+    set(SAIL_UNIX ON)
+endif()
+if(MINGW)
+    set(SAIL_MINGW ON)
+endif()
+if(CYGWIN)
+    set(SAIL_CYGWIN ON)
 endif()
 
 # Common required packages
