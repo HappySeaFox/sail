@@ -39,7 +39,7 @@ enum SailPixelFormat {
     SAIL_PIXEL_FORMAT_ARGB8888,
 
     /* Not to be used. Resize the enum for future elements. */
-    SAIL_PIXEL_FORMAT_RESIZE_ENUM_TO_INT = MAX_INT
+    SAIL_PIXEL_FORMAT_RESIZE_ENUM_TO_INT = INT_MAX
 };
 
 /*
@@ -59,7 +59,7 @@ enum SailColorSpace {
     SAIL_COLOR_SPACE_YCCK,
 
     /* Not to be used. Resize the enum for future elements. */
-    SAIL_COLOR_SPACE_RESIZE_ENUM_TO_INT = MAX_INT
+    SAIL_COLOR_SPACE_RESIZE_ENUM_TO_INT = INT_MAX
 };
 
 /* Image properties. */
@@ -67,14 +67,14 @@ enum SailImageProperties {
     SAIL_IMAGE_FLIPPED_VERTICALLY = 1 << 0,
 
     /* Not to be used. Resize the enum for future elements. */
-    SAIL_IMAGE_PROPERTY_RESIZE_ENUM_TO_INT = MAX_INT
+    SAIL_IMAGE_PROPERTY_RESIZE_ENUM_TO_INT = INT_MAX
 };
 
 /*
  * A structure representing a file object.
  */
-struct sail_file
-{
+struct sail_file {
+
     /* File descriptor */
     int fd;
 
@@ -88,8 +88,8 @@ struct sail_file
 /*
  * A structure representing an image.
  */
-struct sail_image
-{
+struct sail_image {
+
     /* Image width */
     int width;
 
@@ -125,15 +125,15 @@ struct sail_image
 };
 
 /* Options to modify reading operations. */
-struct sail_read_options
-{
+struct sail_read_options {
+
     /* Modify output pixel format. */
     int pixel_format;
 };
 
 /* Options to modify writing operations. */
-struct sail_write_options
-{
+struct sail_write_options {
+
     /* Modify output pixel format. */
     int pixel_format;
 };

@@ -20,7 +20,7 @@ enum SailPluginFeatures {
     SAIL_PLUGIN_FEATURE_WRITE_METAINFO   = 1 << 7,
 
     /* Not to be used. Resize the enum for future elements. */
-    SAIL_PLUGIN_FEATURE_RESIZE_ENUM_TO_INT = MAX_INT
+    SAIL_PLUGIN_FEATURE_RESIZE_ENUM_TO_INT = INT_MAX
 };
 
 /*
