@@ -7,7 +7,7 @@ set_target_properties(jpeg PROPERTIES PREFIX "")
 
 # Include sail-common headers
 #
-target_include_directories(jpeg INTERFACE sail-common-headers)
+target_link_libraries(jpeg PRIVATE sail-common-headers)
 
 # JPEG external dependency
 #
