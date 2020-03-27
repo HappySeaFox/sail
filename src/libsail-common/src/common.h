@@ -119,7 +119,7 @@ struct sail_image {
     int source_pixel_format;
 
     /* Image source color space. See SailColorSpace. */
-    int source_solor_space;
+    int source_color_space;
 };
 
 /* Options to modify reading operations. */
