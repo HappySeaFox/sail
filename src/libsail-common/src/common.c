@@ -70,14 +70,14 @@ int sail_image_alloc(struct sail_image **image) {
 
     (*image)->width                = 0;
     (*image)->height               = 0;
-    (*image)->pixel_format         = SAIL_PIXEL_FORMAT_UNSUPPORTED;
+    (*image)->pixel_format         = SAIL_PIXEL_FORMAT_UNKNOWN;
     (*image)->passes               = 0;
     (*image)->animated             = false;
     (*image)->delay                = 0;
-    (*image)->palette_pixel_format = SAIL_PIXEL_FORMAT_UNSUPPORTED;
+    (*image)->palette_pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;
     (*image)->palette              = NULL;
     (*image)->palette_size         = 0;
-    (*image)->source_pixel_format  = SAIL_PIXEL_FORMAT_UNSUPPORTED;
+    (*image)->source_pixel_format  = SAIL_PIXEL_FORMAT_UNKNOWN;
     (*image)->source_solor_space   = SAIL_COLOR_SPACE_UNKNOWN;
 
     return 0;
