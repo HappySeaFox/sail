@@ -100,64 +100,72 @@ int sail_plugin_read_init(struct sail_file *file, struct sail_read_options *read
     return 0;
 }
 
+int sail_plugin_read_seek_next_frame(struct sail_file *file, struct sail_image **image) {
+
+    struct pimpl *pimpl = (struct pimpl *)file->pimpl;
+
+    if (pimpl == NULL) {
+        return ENOMEM;
+    }
+
+    int res;
+
+    if((res = sail_image_alloc(image)) != 0) {
+        return res;
+    }
+
+    // TODO
+    //currentImage++;
+
+    //if(currentImage) {
+    //    return EIO;
+    //}
+
+    pimpl->decompress_context.err = jpeg_std_error(&pimpl->error_context.pub);
+    pimpl->error_context.pub.error_exit = my_error_exit;
+
+    if (setjmp(pimpl->error_context.setjmp_buffer)) {
+        pimpl->zerror = true;
+        return EIO;
+    }
+
+    jpeg_create_decompress(&pimpl->decompress_context);
+    jpeg_stdio_src(&pimpl->decompress_context, file->fptr);
+    jpeg_save_markers(&pimpl->decompress_context, JPEG_COM, 0xffff);
+    jpeg_read_header(&pimpl->decompress_context, TRUE);
+
+    if (pimpl->decompress_context.jpeg_color_space == JCS_GRAYSCALE) {
+        pimpl->decompress_context.out_color_space = JCS_RGB;
+        pimpl->decompress_context.desired_number_of_colors = 256;
+        pimpl->decompress_context.quantize_colors = FALSE;
+        pimpl->decompress_context.two_pass_quantize = FALSE;
+    }
+
+    jpeg_start_decompress(&pimpl->decompress_context);
+
+    (*image)->width = pimpl->decompress_context.output_width;
+    (*image)->height = pimpl->decompress_context.output_height;
+
+    pimpl->buffer = (*pimpl->decompress_context.mem->alloc_sarray)((j_common_ptr)&pimpl->decompress_context,
+                                                                    JPOOL_IMAGE,
+                                                                    pimpl->decompress_context.output_width * pimpl->decompress_context.output_components,
+                                                                    1);
+
+    switch (pimpl->decompress_context.jpeg_color_space) {
+        case JCS_GRAYSCALE: (*image)->source_color_space = SAIL_COLOR_SPACE_GRAYSCALE; break;
+        case JCS_RGB:       (*image)->source_color_space = SAIL_COLOR_SPACE_RGB;       break;
+        case JCS_YCbCr:     (*image)->source_color_space = SAIL_COLOR_SPACE_YCBCR;     break;
+        case JCS_CMYK:      (*image)->source_color_space = SAIL_COLOR_SPACE_CMYK;      break;
+        case JCS_YCCK:      (*image)->source_color_space = SAIL_COLOR_SPACE_YCCK;      break;
+    }
+
+    return 0;
+}
+
 #if 0
+    //image.compression = "JPEG";
 
-s32 fmt_codec::read_next()
-{
-    currentImage++;
-    
-    if(currentImage)
-	return SQE_NOTOK;
-
-    fmt_image image;
-
-    decompress_context.err = jpeg_std_error(&error_context.pub);
-    error_context.pub.error_exit = my_error_exit;
-
-    if(setjmp(error_context.setjmp_buffer)) 
-    {
-        zerror = true;
-	return SQE_R_BADFILE;
-    }
-
-    jpeg_create_decompress(&decompress_context);
-    jpeg_stdio_src(&decompress_context, fptr);
-    jpeg_save_markers(&decompress_context, JPEG_COM, 0xffff);
-    jpeg_read_header(&decompress_context, TRUE);
-
-    if(decompress_context.jpeg_color_space == JCS_GRAYSCALE)
-    {
-        decompress_context.out_color_space = JCS_RGB;
-	decompress_context.desired_number_of_colors = 256;
-	decompress_context.quantize_colors = FALSE;
-	decompress_context.two_pass_quantize = FALSE;
-    }
-
-    jpeg_start_decompress(&decompress_context);
-
-    image.w = decompress_context.output_width;
-    image.h = decompress_context.output_height;
-    
-    buffer = (*decompress_context.mem->alloc_sarray)((j_common_ptr)&decompress_context, JPOOL_IMAGE, decompress_context.output_width * decompress_context.output_components, 1);
-
-    std::string type;
-
-    switch(decompress_context.jpeg_color_space)
-    {
-	case JCS_GRAYSCALE: type =  "Grayscale"; image.bpp = 8;  break;
-	case JCS_RGB:       type =  "RGB";       image.bpp = 24; break;
-	case JCS_YCbCr:     type =  "YUV";       image.bpp = 24; break;
-	case JCS_CMYK:      type =  "CMYK";      image.bpp = 32; break;
-	case JCS_YCCK:      type =  "YCCK";      image.bpp = 32; break;
-
-	default:
-	    type = "Unknown";
-    }
-
-    image.compression = "JPEG";
-    image.colorspace = type;
-
-    jpeg_saved_marker_ptr it = decompress_context.marker_list;
+    jpeg_saved_marker_ptr it = pimpl->decompress_context.marker_list;
 
     while(it)
     {
