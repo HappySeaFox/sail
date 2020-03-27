@@ -33,6 +33,10 @@ int sail_file_open(const char *filepath, const char *mode, struct sail_file **fi
 
     *file = (struct sail_file *)malloc(sizeof(struct sail_file));
 
+    if (*file == NULL) {
+        return ENOMEM;
+    }
+
     (*file)->fptr = fptr;
     (*file)->pimpl = NULL;
 
@@ -55,6 +59,29 @@ void sail_file_close(struct sail_file *file) {
 /*
  * Image functions.
  */
+
+int sail_image_alloc(struct sail_image **image) {
+
+    *image = (struct sail_image *)malloc(sizeof(struct sail_image));
+
+    if (*image == NULL) {
+        return ENOMEM;
+    }
+
+    (*image)->width                = 0;
+    (*image)->height               = 0;
+    (*image)->pixel_format         = SAIL_PIXEL_FORMAT_UNSUPPORTED;
+    (*image)->passes               = 0;
+    (*image)->animated             = false;
+    (*image)->delay                = 0;
+    (*image)->palette_pixel_format = SAIL_PIXEL_FORMAT_UNSUPPORTED;
+    (*image)->palette              = NULL;
+    (*image)->palette_size         = 0;
+    (*image)->source_pixel_format  = SAIL_PIXEL_FORMAT_UNSUPPORTED;
+    (*image)->source_solor_space   = SAIL_COLOR_SPACE_UNKNOWN;
+
+    return 0;
+}
 
 void sail_image_destroy(struct sail_image *image) {
 

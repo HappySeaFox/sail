@@ -159,6 +159,13 @@ void sail_file_close(struct sail_file *file);
  */
 
 /*
+ * Allocates a nw image. The assigned image MUST be destroyed later with sail_image_destroy().
+ *
+ * Returns 0 on success or errno on error.
+ */
+int sail_image_alloc(struct sail_image **image);
+
+/*
  * Destroys the specified image and all its internal allocated memory buffers.
  * The "image" pointer MUST NOT be used after calling this function.
  */
