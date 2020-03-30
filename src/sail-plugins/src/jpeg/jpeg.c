@@ -20,7 +20,7 @@
  */
 struct my_error_context {
 
-    struct jpeg_error_mgr pub;
+    struct jpeg_error_mgr jpeg_error_mgr;
     jmp_buf setjmp_buffer;
 };
 
@@ -111,8 +111,8 @@ int SAIL_EXPORT sail_plugin_read_init(struct sail_file *file, struct sail_read_o
         pimpl->read_options = *read_options;
     }
 
-    pimpl->decompress_context.err = jpeg_std_error(&pimpl->error_context.pub);
-    pimpl->error_context.pub.error_exit = my_error_exit;
+    pimpl->decompress_context.err = jpeg_std_error(&pimpl->error_context.jpeg_error_mgr);
+    pimpl->error_context.jpeg_error_mgr.error_exit = my_error_exit;
 
     if (setjmp(pimpl->error_context.setjmp_buffer) != 0) {
         pimpl->zerror = true;
