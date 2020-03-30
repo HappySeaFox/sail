@@ -177,6 +177,10 @@ int SAIL_EXPORT sail_plugin_read_seek_next_frame(struct sail_file *file, struct 
                                                                         pimpl->decompress_context.output_components,
                                                                     1);
 
+    if (pimpl->buffer == NULL) {
+        return ENOMEM;
+    }
+
     switch (pimpl->decompress_context.jpeg_color_space) {
 
         case JCS_GRAYSCALE: (*image)->source_pixel_format = SAIL_PIXEL_FORMAT_GRAYSCALE; break;
