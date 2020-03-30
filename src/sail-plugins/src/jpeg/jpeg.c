@@ -138,7 +138,7 @@ int SAIL_EXPORT sail_plugin_read_seek_next_frame(struct sail_file *file, struct 
     jpeg_save_markers(&pimpl->decompress_context, JPEG_COM, 0xffff);
     jpeg_read_header(&pimpl->decompress_context, TRUE);
 
-    if (pimpl->decompress_context.jpeg_color_space == JCS_GRAYSCALE) {
+    if (pimpl->decompress_context.jpeg_color_space != JCS_RGB) {
         pimpl->decompress_context.out_color_space = JCS_RGB;
         pimpl->decompress_context.desired_number_of_colors = 256;
         pimpl->decompress_context.quantize_colors = FALSE;
@@ -156,11 +156,27 @@ int SAIL_EXPORT sail_plugin_read_seek_next_frame(struct sail_file *file, struct 
                                                                     1);
 
     switch (pimpl->decompress_context.jpeg_color_space) {
+
         case JCS_GRAYSCALE: (*image)->source_pixel_format = SAIL_PIXEL_FORMAT_GRAYSCALE; break;
+
+        case JCS_EXT_RGB:
         case JCS_RGB:       (*image)->source_pixel_format = SAIL_PIXEL_FORMAT_RGB;       break;
+
         case JCS_YCbCr:     (*image)->source_pixel_format = SAIL_PIXEL_FORMAT_YCBCR;     break;
         case JCS_CMYK:      (*image)->source_pixel_format = SAIL_PIXEL_FORMAT_CMYK;      break;
         case JCS_YCCK:      (*image)->source_pixel_format = SAIL_PIXEL_FORMAT_YCCK;      break;
+        case JCS_EXT_RGBX:  (*image)->source_pixel_format = SAIL_PIXEL_FORMAT_RGBX;      break;
+        case JCS_EXT_BGR:   (*image)->source_pixel_format = SAIL_PIXEL_FORMAT_BGR;       break;
+        case JCS_EXT_BGRX:  (*image)->source_pixel_format = SAIL_PIXEL_FORMAT_BGRX;      break;
+        case JCS_EXT_XBGR:  (*image)->source_pixel_format = SAIL_PIXEL_FORMAT_XBGR;      break;
+        case JCS_EXT_XRGB:  (*image)->source_pixel_format = SAIL_PIXEL_FORMAT_ARGB;      break;
+        case JCS_EXT_RGBA:  (*image)->source_pixel_format = SAIL_PIXEL_FORMAT_RGBA;      break;
+        case JCS_EXT_BGRA:  (*image)->source_pixel_format = SAIL_PIXEL_FORMAT_BGRA;      break;
+        case JCS_EXT_ABGR:  (*image)->source_pixel_format = SAIL_PIXEL_FORMAT_ABGR;      break;
+        case JCS_EXT_ARGB:  (*image)->source_pixel_format = SAIL_PIXEL_FORMAT_ARGB;      break;
+        case JCS_RGB565:    (*image)->source_pixel_format = SAIL_PIXEL_FORMAT_RGB565;    break;
+
+        default:            (*image)->source_pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;   break;
     }
 
     return 0;
