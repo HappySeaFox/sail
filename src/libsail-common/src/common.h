@@ -75,6 +75,8 @@ struct sail_file {
     void *pimpl;
 };
 
+struct sail_meta_entry_node;
+
 /*
  * A structure representing an image.
  */
@@ -106,6 +108,9 @@ struct sail_image {
 
     /* Size of the palette data in bytes */
     int palette_size;
+
+    /* Image meta information. See sail_meta_entry_node. */
+    struct sail_meta_entry_node *meta_entry_node;
 
     /* Image source pixel format. See SailPixelFormat. */
     int source_pixel_format;
