@@ -17,7 +17,8 @@ int sail_strdup_length(char *input, int length, char **output) {
         return 0;
     }
 
-    const int len = length < 0 ? (int)strlen(input) : length;
+    const int input_len = strlen(input);
+    const int len = (length < 0 || length > input_len) ? input_len : length;
 
     *output = (char *)malloc(len+1);
 
