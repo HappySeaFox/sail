@@ -86,6 +86,8 @@ int SAIL_EXPORT sail_plugin_features(void) {
 
 int SAIL_EXPORT sail_plugin_read_init(struct sail_file *file, struct sail_read_options *read_options) {
 
+    (void)read_options;
+
     struct pimpl *pimpl = (struct pimpl *)malloc(sizeof(struct pimpl));
 
     if (pimpl == NULL) {
