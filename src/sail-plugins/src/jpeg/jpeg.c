@@ -26,8 +26,8 @@ struct my_error_context {
 
 typedef struct my_error_context * my_error_context_ptr;
 
-static void my_error_exit(j_common_ptr cinfo)
-{
+static void my_error_exit(j_common_ptr cinfo) {
+
     my_error_context_ptr myerr;
 
     myerr = (my_error_context_ptr)cinfo->err;
@@ -84,10 +84,16 @@ const char* SAIL_EXPORT sail_plugin_magic(void) {
 
 int SAIL_EXPORT sail_plugin_features(void) {
 
-    return SAIL_PLUGIN_FEATURE_READ_STATIC | SAIL_PLUGIN_FEATURE_WRITE_STATIC;
+    return SAIL_PLUGIN_FEATURE_READ_STATIC    |
+            SAIL_PLUGIN_FEATURE_READ_METAINFO |
+            SAIL_PLUGIN_FEATURE_WRITE_STATIC;
 }
 
 int SAIL_EXPORT sail_plugin_read_init(struct sail_file *file, struct sail_read_options *read_options) {
+
+    if (file == NULL) {
+        return EINVAL;
+    }
 
     struct pimpl *pimpl = (struct pimpl *)malloc(sizeof(struct pimpl));
 
@@ -105,6 +111,32 @@ int SAIL_EXPORT sail_plugin_read_init(struct sail_file *file, struct sail_read_o
         pimpl->read_options = *read_options;
     }
 
+    pimpl->decompress_context.err = jpeg_std_error(&pimpl->error_context.pub);
+    pimpl->error_context.pub.error_exit = my_error_exit;
+
+    if (setjmp(pimpl->error_context.setjmp_buffer) != 0) {
+        pimpl->zerror = true;
+        return EIO;
+    }
+
+    jpeg_create_decompress(&pimpl->decompress_context);
+    jpeg_stdio_src(&pimpl->decompress_context, file->fptr);
+
+    if (pimpl->read_options.meta_info) {
+        jpeg_save_markers(&pimpl->decompress_context, JPEG_COM, 0xffff);
+    }
+
+    jpeg_read_header(&pimpl->decompress_context, TRUE);
+
+    if (pimpl->decompress_context.jpeg_color_space != JCS_RGB) {
+        pimpl->decompress_context.out_color_space = JCS_RGB;
+        pimpl->decompress_context.desired_number_of_colors = 256;
+        pimpl->decompress_context.quantize_colors = FALSE;
+        pimpl->decompress_context.two_pass_quantize = FALSE;
+    }
+
+    jpeg_start_decompress(&pimpl->decompress_context);
+
     // TODO
     //currentImage = -1;
 
@@ -112,6 +144,10 @@ int SAIL_EXPORT sail_plugin_read_init(struct sail_file *file, struct sail_read_o
 }
 
 int SAIL_EXPORT sail_plugin_read_seek_next_frame(struct sail_file *file, struct sail_image **image) {
+
+    if (file == NULL) {
+        return EINVAL;
+    }
 
     struct pimpl *pimpl = (struct pimpl *)file->pimpl;
 
@@ -131,28 +167,6 @@ int SAIL_EXPORT sail_plugin_read_seek_next_frame(struct sail_file *file, struct 
     //if(currentImage) {
     //    return EIO;
     //}
-
-    pimpl->decompress_context.err = jpeg_std_error(&pimpl->error_context.pub);
-    pimpl->error_context.pub.error_exit = my_error_exit;
-
-    if (setjmp(pimpl->error_context.setjmp_buffer)) {
-        pimpl->zerror = true;
-        return EIO;
-    }
-
-    jpeg_create_decompress(&pimpl->decompress_context);
-    jpeg_stdio_src(&pimpl->decompress_context, file->fptr);
-    jpeg_save_markers(&pimpl->decompress_context, JPEG_COM, 0xffff);
-    jpeg_read_header(&pimpl->decompress_context, TRUE);
-
-    if (pimpl->decompress_context.jpeg_color_space != JCS_RGB) {
-        pimpl->decompress_context.out_color_space = JCS_RGB;
-        pimpl->decompress_context.desired_number_of_colors = 256;
-        pimpl->decompress_context.quantize_colors = FALSE;
-        pimpl->decompress_context.two_pass_quantize = FALSE;
-    }
-
-    jpeg_start_decompress(&pimpl->decompress_context);
 
     (*image)->width = pimpl->decompress_context.output_width;
     (*image)->height = pimpl->decompress_context.output_height;
@@ -224,7 +238,10 @@ int SAIL_EXPORT sail_plugin_read_seek_next_frame(struct sail_file *file, struct 
 
 int SAIL_EXPORT sail_plugin_read_seek_next_pass(struct sail_file *file, struct sail_image *image) {
 
-    (void)file;
+    if (file == NULL) {
+        return EINVAL;
+    }
+
     (void)image;
 
     return 0;
