@@ -25,7 +25,7 @@ enum SailPixelFormat {
     /* Unknown pixel format that cannot be parsed. */
     SAIL_PIXEL_FORMAT_UNKNOWN,
 
-    /* 
+    /*
      * Don't manipulate the output image data. Copy it as is from the source file.
      * The caller will handle the returned pixel data manually.
      */
