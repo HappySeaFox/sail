@@ -5,9 +5,9 @@ add_library(jpeg MODULE
 #
 set_target_properties(jpeg PROPERTIES PREFIX "")
 
-# Include sail-common headers
+# Depend on sail-common
 #
-target_link_libraries(jpeg PRIVATE sail-common-headers)
+target_link_libraries(jpeg PRIVATE sail-common)
 
 # JPEG external dependency
 #
