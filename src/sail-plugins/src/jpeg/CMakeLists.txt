@@ -11,9 +11,7 @@ target_link_libraries(jpeg PRIVATE sail-common)
 
 # JPEG external dependency
 #
-pkg_check_modules(JPEG REQUIRED IMPORTED_TARGET libjpeg)
-
-target_compile_options(jpeg PRIVATE ${JPEG_CFLAGS})
-target_compile_options(jpeg PRIVATE ${JPEG_CFLAGS_OTHER})
-target_include_directories(jpeg PRIVATE ${JPEG_INCLUDE_DIRS})
-target_link_libraries(jpeg PRIVATE PkgConfig::JPEG)
+target_compile_options(jpeg PRIVATE ${libjpeg_CFLAGS})
+target_compile_options(jpeg PRIVATE ${libjpeg_CFLAGS_OTHER})
+target_include_directories(jpeg PRIVATE ${libjpeg_INCLUDE_DIRS})
+target_link_libraries(jpeg PRIVATE PkgConfig::libjpeg)
