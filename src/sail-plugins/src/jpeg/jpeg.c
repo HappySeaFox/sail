@@ -170,6 +170,7 @@ int SAIL_EXPORT sail_plugin_read_seek_next_frame(struct sail_file *file, struct 
 
     (*image)->width = pimpl->decompress_context.output_width;
     (*image)->height = pimpl->decompress_context.output_height;
+    (*image)->passes = 1;
 
     pimpl->buffer = (*pimpl->decompress_context.mem->alloc_sarray)((j_common_ptr)&pimpl->decompress_context,
                                                                     JPOOL_IMAGE,
@@ -277,7 +278,7 @@ int SAIL_EXPORT sail_plugin_read_scanline(struct sail_file *file, struct sail_im
     (void)jpeg_read_scanlines(&pimpl->decompress_context, pimpl->buffer, 1);
 
     for(int i = 0; i < image->width; i++) {
-        memcpy(*scanline+i, pimpl->buffer[0] + i*color_components, color_components);
+        memcpy(*scanline+i*color_components, pimpl->buffer[0] + i*color_components, color_components);
     }
 
     return 0;
