@@ -15,6 +15,20 @@
  * File functions.
  */
 
+static int sail_file_alloc(struct sail_file **file) {
+
+    *file = (struct sail_file *)malloc(sizeof(struct sail_file));
+
+    if (*file == NULL) {
+        return ENOMEM;
+    }
+
+    (*file)->fptr = NULL;
+    (*file)->pimpl = NULL;
+
+    return 0;
+}
+
 int sail_file_open(const char *filepath, const char *mode, struct sail_file **file) {
 
     /* Try to open the file first */
@@ -31,14 +45,13 @@ int sail_file_open(const char *filepath, const char *mode, struct sail_file **fi
         return errno;
     }
 
-    *file = (struct sail_file *)malloc(sizeof(struct sail_file));
+    int res;
 
-    if (*file == NULL) {
-        return ENOMEM;
+    if ((res = sail_file_alloc(file)) != 0) {
+        return res;
     }
 
     (*file)->fptr = fptr;
-    (*file)->pimpl = NULL;
 
     return 0;
 }
