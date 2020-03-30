@@ -298,8 +298,6 @@ int SAIL_EXPORT sail_plugin_read_finish(struct sail_file *file, struct sail_imag
     jpeg_abort_decompress(&pimpl->decompress_context);
     jpeg_destroy_decompress(&pimpl->decompress_context);
 
-    sail_file_close(file);
-
     return 0;
 }
 

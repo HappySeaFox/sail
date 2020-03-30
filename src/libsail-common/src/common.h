@@ -138,18 +138,18 @@ struct sail_write_options {
  */
 
 /*
- * Opens the specified image file using the specified mode (as in fopen). The assigned file MUST be closed later
- * with sail_file_close().
+ * Opens the specified image file using the specified mode (as in fopen). The assigned file MUST be destroyed later
+ * with sail_file_destroy().
  *
  * Returns 0 on success or errno on error.
  */
-int SAIL_EXPORT sail_file_open(const char *filepath, const char *mode, struct sail_file **file);
+int SAIL_EXPORT sail_file_alloc(const char *filepath, const char *mode, struct sail_file **file);
 
 /*
- * Closes the specified file. Does nothing if the file is already closed.
+ * Closes the specified file and destroys all its internal memory buffers. Does nothing if the file is already closed.
  * The "file" pointer MUST NOT be used anymore after calling this function.
  */
-void SAIL_EXPORT sail_file_close(struct sail_file *file);
+void SAIL_EXPORT sail_file_destroy(struct sail_file *file);
 
 /*
  * Image functions.

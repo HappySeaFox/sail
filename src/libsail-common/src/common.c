@@ -16,7 +16,7 @@
  * File functions.
  */
 
-static int sail_file_alloc(struct sail_file **file) {
+static int sail_file_alloc_private(struct sail_file **file) {
 
     *file = (struct sail_file *)malloc(sizeof(struct sail_file));
 
@@ -30,7 +30,7 @@ static int sail_file_alloc(struct sail_file **file) {
     return 0;
 }
 
-int sail_file_open(const char *filepath, const char *mode, struct sail_file **file) {
+int sail_file_alloc(const char *filepath, const char *mode, struct sail_file **file) {
 
     /* Try to open the file first */
     FILE *fptr;
@@ -48,7 +48,7 @@ int sail_file_open(const char *filepath, const char *mode, struct sail_file **fi
 
     int res;
 
-    if ((res = sail_file_alloc(file)) != 0) {
+    if ((res = sail_file_alloc_private(file)) != 0) {
         return res;
     }
 
@@ -57,7 +57,7 @@ int sail_file_open(const char *filepath, const char *mode, struct sail_file **fi
     return 0;
 }
 
-void sail_file_close(struct sail_file *file) {
+void sail_file_destroy(struct sail_file *file) {
 
     if (file == NULL) {
         return;
