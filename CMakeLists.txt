@@ -4,13 +4,26 @@ project(SAIL VERSION 0.9.0
              DESCRIPTION "Squirrel Abstract Image Libraries"
              LANGUAGES C)
 
-# Common setup
+# Enable shared libs by default
 #
 set(BUILD_SHARED_LIBS ON)
+
+# Enable strict C99
+#
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_EXTENSIONS OFF)
 
+# Internal flag used to export symbols
+#
 add_definitions(-DSAIL_BUILD)
+
+# Enable more warnings
+#
+if (CMAKE_COMPILER_IS_GNUCC)
+    add_compile_options(-Wall -Wextra)
+elseif (MSVC)
+    add_compile_options(/W4)
+endif()
 
 # Platform definitions used in config.h
 #
