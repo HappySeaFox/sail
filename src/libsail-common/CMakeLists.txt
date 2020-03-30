@@ -1,6 +1,7 @@
 add_library(sail-common
                 src/common.c
-                src/meta_entry_node.c)
+                src/meta_entry_node.c
+                src/utils.c)
 
 set_target_properties(sail-common PROPERTIES
                                   VERSION "0.5.0"
