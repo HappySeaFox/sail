@@ -91,7 +91,6 @@ int sail_image_alloc(struct sail_image **image) {
     (*image)->palette              = NULL;
     (*image)->palette_size         = 0;
     (*image)->source_pixel_format  = SAIL_PIXEL_FORMAT_UNKNOWN;
-    (*image)->source_color_space   = SAIL_COLOR_SPACE_UNKNOWN;
 
     return 0;
 }

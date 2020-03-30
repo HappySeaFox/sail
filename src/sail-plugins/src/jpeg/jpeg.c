@@ -156,11 +156,11 @@ int SAIL_EXPORT sail_plugin_read_seek_next_frame(struct sail_file *file, struct 
                                                                     1);
 
     switch (pimpl->decompress_context.jpeg_color_space) {
-        case JCS_GRAYSCALE: (*image)->source_color_space = SAIL_COLOR_SPACE_GRAYSCALE; break;
-        case JCS_RGB:       (*image)->source_color_space = SAIL_COLOR_SPACE_RGB;       break;
-        case JCS_YCbCr:     (*image)->source_color_space = SAIL_COLOR_SPACE_YCBCR;     break;
-        case JCS_CMYK:      (*image)->source_color_space = SAIL_COLOR_SPACE_CMYK;      break;
-        case JCS_YCCK:      (*image)->source_color_space = SAIL_COLOR_SPACE_YCCK;      break;
+        case JCS_GRAYSCALE: (*image)->source_pixel_format = SAIL_PIXEL_FORMAT_GRAYSCALE; break;
+        case JCS_RGB:       (*image)->source_pixel_format = SAIL_PIXEL_FORMAT_RGB;       break;
+        case JCS_YCbCr:     (*image)->source_pixel_format = SAIL_PIXEL_FORMAT_YCBCR;     break;
+        case JCS_CMYK:      (*image)->source_pixel_format = SAIL_PIXEL_FORMAT_CMYK;      break;
+        case JCS_YCCK:      (*image)->source_pixel_format = SAIL_PIXEL_FORMAT_YCCK;      break;
     }
 
     return 0;

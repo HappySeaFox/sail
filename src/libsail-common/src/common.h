@@ -22,7 +22,7 @@ extern "C" {
 /* Pixel format */
 enum SailPixelFormat {
 
-    /* Unknown pixel format that cannot be parsed. */
+    /* Unknown pixel format that cannot be parsed by SAIL. */
     SAIL_PIXEL_FORMAT_UNKNOWN,
 
     /*
@@ -31,56 +31,28 @@ enum SailPixelFormat {
      */
     SAIL_PIXEL_FORMAT_SOURCE,
 
-    SAIL_PIXEL_FORMAT_MONO_BE,
-    SAIL_PIXEL_FORMAT_MONO_LE,
+    SAIL_PIXEL_FORMAT_MONO,
 
-    SAIL_PIXEL_FORMAT_GRAYSCALE8,
-    SAIL_PIXEL_FORMAT_GRAYSCALE16,
-    SAIL_PIXEL_FORMAT_INDEXED8,
+    SAIL_PIXEL_FORMAT_GRAYSCALE,
+    SAIL_PIXEL_FORMAT_INDEXED,
 
-    SAIL_PIXEL_FORMAT_BGR30,
-    SAIL_PIXEL_FORMAT_RGB16,
-    SAIL_PIXEL_FORMAT_RGB30,
-    SAIL_PIXEL_FORMAT_RGB32,
-    SAIL_PIXEL_FORMAT_RGB444,
-    SAIL_PIXEL_FORMAT_RGB555,
-    SAIL_PIXEL_FORMAT_RGB666,
-    SAIL_PIXEL_FORMAT_RGB888,
-    SAIL_PIXEL_FORMAT_RGBA8888,
-    SAIL_PIXEL_FORMAT_ARGB8888,
+    SAIL_PIXEL_FORMAT_YCBCR,
+    SAIL_PIXEL_FORMAT_CMYK,
+    SAIL_PIXEL_FORMAT_YCCK,
+    SAIL_PIXEL_FORMAT_RGB,
+    SAIL_PIXEL_FORMAT_RGBX,
+    SAIL_PIXEL_FORMAT_BGR,
+    SAIL_PIXEL_FORMAT_BGRX,
+    SAIL_PIXEL_FORMAT_XRGB,
+    SAIL_PIXEL_FORMAT_XBGR,
+    SAIL_PIXEL_FORMAT_RGBA,
+    SAIL_PIXEL_FORMAT_BGRA,
+    SAIL_PIXEL_FORMAT_ARGB,
+    SAIL_PIXEL_FORMAT_ABGR,
+    SAIL_PIXEL_FORMAT_RGB565,
 
     /* Not to be used. Resize the enum for future elements. */
     SAIL_PIXEL_FORMAT_RESIZE_ENUM_TO_INT = INT_MAX
-};
-
-/*
- * Color space. SAIL doesn't provide color space conversion capabilities.
- * This enum is used to provide a source color space for a user. Image data
- * is always converted to RGB color space.
- */
-enum SailColorSpace {
-
-    /* Unknown color space. */
-    SAIL_COLOR_SPACE_UNKNOWN,
-
-    SAIL_COLOR_SPACE_GRAYSCALE,
-    SAIL_COLOR_SPACE_YCBCR,
-    SAIL_COLOR_SPACE_CMYK,
-    SAIL_COLOR_SPACE_YCCK,
-    SAIL_COLOR_SPACE_RGB,
-    SAIL_COLOR_SPACE_RGBX,
-    SAIL_COLOR_SPACE_BGR,
-    SAIL_COLOR_SPACE_BGRX,
-    SAIL_COLOR_SPACE_XRGB,
-    SAIL_COLOR_SPACE_XBGR,
-    SAIL_COLOR_SPACE_RGBA,
-    SAIL_COLOR_SPACE_BGRA,
-    SAIL_COLOR_SPACE_ARGB,
-    SAIL_COLOR_SPACE_ABGR,
-    SAIL_COLOR_SPACE_RGB565,
-
-    /* Not to be used. Resize the enum for future elements. */
-    SAIL_COLOR_SPACE_RESIZE_ENUM_TO_INT = INT_MAX
 };
 
 /* Image properties. */
@@ -137,9 +109,6 @@ struct sail_image {
 
     /* Image source pixel format. See SailPixelFormat. */
     int source_pixel_format;
-
-    /* Image source color space. See SailColorSpace. */
-    int source_color_space;
 };
 
 /* Options to modify reading operations. */
