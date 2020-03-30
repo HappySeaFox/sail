@@ -25,6 +25,18 @@ elseif (MSVC)
     add_compile_options(/W4)
 endif()
 
+# Disable undefined symbols
+#
+if (CMAKE_COMPILER_IS_GNUCC)
+    if (BUILD_SHARED_LIBS)
+        set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--no-undefined")
+    else()
+        set(CMAKE_STATIC_LINKER_FLAGS "-Wl,--no-undefined")
+    endif()
+
+    set(CMAKE_MODULE_LINKER_FLAGS "-Wl,--no-undefined")
+endif()
+
 # Platform definitions used in config.h
 #
 if (WIN32)
