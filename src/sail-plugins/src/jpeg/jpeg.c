@@ -26,7 +26,7 @@ struct my_error_context {
 
 typedef struct my_error_context * my_error_context_ptr;
 
-METHODDEF(void) my_error_exit(j_common_ptr cinfo)
+static void my_error_exit(j_common_ptr cinfo)
 {
     my_error_context_ptr myerr;
 
