@@ -147,7 +147,7 @@ int SAIL_EXPORT sail_file_open(const char *filepath, const char *mode, struct sa
 
 /*
  * Closes the specified file. Does nothing if the file is already closed.
- * The "file" pointer MUST NOT be used after calling this function.
+ * The "file" pointer MUST NOT be used anymore after calling this function.
  */
 void SAIL_EXPORT sail_file_close(struct sail_file *file);
 

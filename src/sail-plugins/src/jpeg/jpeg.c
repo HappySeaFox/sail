@@ -243,47 +243,67 @@ int SAIL_EXPORT sail_plugin_read_seek_next_frame(struct sail_file *file, struct 
 
 int SAIL_EXPORT sail_plugin_read_seek_next_pass(struct sail_file *file, struct sail_image *image) {
 
-    if (file == NULL) {
+    if (file == NULL || image == NULL) {
         return EINVAL;
     }
 
-    (void)image;
+    return 0;
+}
+
+int SAIL_EXPORT sail_plugin_read_scanline(struct sail_file *file, struct sail_image *image, unsigned char **scanline) {
+
+    if (file == NULL || image == NULL) {
+        return EINVAL;
+    }
+
+    struct pimpl *pimpl = (struct pimpl *)file->pimpl;
+
+    if (pimpl == NULL) {
+        return ENOMEM;
+    }
+
+    if(pimpl->zerror) {
+        return EIO;
+    }
+
+    const int color_components = pimpl->decompress_context.output_components;
+
+    *scanline = (unsigned char *)malloc(image->width * color_components);
+
+    if (*scanline == NULL) {
+        return ENOMEM;
+    }
+
+    (void)jpeg_read_scanlines(&pimpl->decompress_context, pimpl->buffer, 1);
+
+    for(int i = 0; i < image->width; i++) {
+        memcpy(*scanline+i, pimpl->buffer[0] + i*color_components, color_components);
+    }
+
+    return 0;
+}
+
+int SAIL_EXPORT sail_plugin_read_finish(struct sail_file *file, struct sail_image *image) {
+
+    if (file == NULL || image == NULL) {
+        return EINVAL;
+    }
+
+    struct pimpl *pimpl = (struct pimpl *)file->pimpl;
+
+    if (pimpl == NULL) {
+        return ENOMEM;
+    }
+
+    jpeg_abort_decompress(&pimpl->decompress_context);
+    jpeg_destroy_decompress(&pimpl->decompress_context);
+
+    sail_file_close(file);
 
     return 0;
 }
 
 #if 0
-s32 fmt_codec::read_scanline(RGBA *scan)
-{
-    fmt_image *im = image(currentImage);
-    fmt_utils::fillAlpha(scan, im->w);
-
-    if(zerror || setjmp(error_context.setjmp_buffer)) 
-    {
-        zerror = true;
-	return SQE_R_BADFILE;
-    }
-
-    (void)jpeg_read_scanlines(&decompress_context, buffer, 1);
-
-    for(s32 i = 0;i < im->w;i++)
-	memcpy(scan+i, buffer[0] + i*3, 3);
-
-    return SQE_OK;
-}
-
-void fmt_codec::read_close()
-{
-    jpeg_abort_decompress(&decompress_context);
-    jpeg_destroy_decompress(&decompress_context);
-
-    if(fptr)
-        fclose(fptr);
-
-    finfo.meta.clear();
-    finfo.image.clear();
-}
-
 void fmt_codec::getwriteoptions(fmt_writeoptionsabs *opt)
 {
     opt->interlaced = false;
