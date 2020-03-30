@@ -173,7 +173,8 @@ int SAIL_EXPORT sail_plugin_read_seek_next_frame(struct sail_file *file, struct 
 
     pimpl->buffer = (*pimpl->decompress_context.mem->alloc_sarray)((j_common_ptr)&pimpl->decompress_context,
                                                                     JPOOL_IMAGE,
-                                                                    pimpl->decompress_context.output_width * pimpl->decompress_context.output_components,
+                                                                    pimpl->decompress_context.output_width *
+                                                                        pimpl->decompress_context.output_components,
                                                                     1);
 
     switch (pimpl->decompress_context.jpeg_color_space) {
