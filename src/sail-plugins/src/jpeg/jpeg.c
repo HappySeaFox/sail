@@ -13,6 +13,7 @@
 #include "export.h"
 #include "meta_entry_node.h"
 #include "plugin.h"
+#include "utils.h"
 
 /*
  * Plugin-specific data types.
@@ -192,10 +193,17 @@ int SAIL_EXPORT sail_plugin_read_seek_next_frame(struct sail_file *file, struct 
 
         while(it) {
             if(it->marker == JPEG_COM) {
-
                 struct sail_meta_entry_node *meta_entry_node;
 
                 if ((res = sail_alloc_meta_entry_node(&meta_entry_node)) != 0) {
+                    return res;
+                }
+
+                if ((res = sail_strdup("Comment", &meta_entry_node->key)) != 0) {
+                    return res;
+                }
+
+                if ((res = sail_strdup_length((char *)it->data, it->data_length, &meta_entry_node->value)) != 0) {
                     return res;
                 }
 
@@ -205,17 +213,6 @@ int SAIL_EXPORT sail_plugin_read_seek_next_frame(struct sail_file *file, struct 
                     last_meta_entry_node->next = meta_entry_node;
                     last_meta_entry_node = meta_entry_node;
                 }
-
-                last_meta_entry_node->key = "Comment";
-
-                last_meta_entry_node->value = (char *)malloc(it->data_length+1);
-
-                if (last_meta_entry_node->value == NULL) {
-                    return ENOMEM;
-                }
-
-                memcpy(last_meta_entry_node->value, it->data, it->data_length);
-                last_meta_entry_node->value[it->data_length] = '\0';
             }
 
             it = it->next;
