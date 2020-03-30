@@ -222,12 +222,15 @@ int SAIL_EXPORT sail_plugin_read_seek_next_frame(struct sail_file *file, struct 
     return 0;
 }
 
-#if 0
-s32 fmt_codec::read_next_pass()
-{
-    return SQE_OK;
+int SAIL_EXPORT sail_plugin_read_seek_next_pass(struct sail_file *file, struct sail_image *image) {
+
+    (void)file;
+    (void)image;
+
+    return 0;
 }
-	
+
+#if 0
 s32 fmt_codec::read_scanline(RGBA *scan)
 {
     fmt_image *im = image(currentImage);
