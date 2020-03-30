@@ -116,6 +116,9 @@ struct sail_read_options {
 
     /* Modify output pixel format. */
     int pixel_format;
+
+    /* Read any supported meta-info from the file. For example, JPEG comments. */
+    bool meta_info;
 };
 
 /* Options to modify writing operations. */
@@ -159,6 +162,11 @@ int SAIL_EXPORT sail_image_alloc(struct sail_image **image);
  * The "image" pointer MUST NOT be used after calling this function.
  */
 void SAIL_EXPORT sail_image_destroy(struct sail_image *image);
+
+/*
+ * Returns default read options.
+ */
+struct sail_read_options SAIL_EXPORT sail_default_read_options();
 
 /* extern "C" */
 #ifdef __cplusplus

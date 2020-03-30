@@ -44,6 +44,7 @@ struct pimpl {
     struct my_error_context error_context;
     JSAMPARRAY buffer;
     bool zerror;
+    struct sail_read_options read_options;
 };
 
 /*
@@ -86,8 +87,6 @@ int SAIL_EXPORT sail_plugin_features(void) {
 
 int SAIL_EXPORT sail_plugin_read_init(struct sail_file *file, struct sail_read_options *read_options) {
 
-    (void)read_options;
-
     struct pimpl *pimpl = (struct pimpl *)malloc(sizeof(struct pimpl));
 
     if (pimpl == NULL) {
@@ -97,6 +96,12 @@ int SAIL_EXPORT sail_plugin_read_init(struct sail_file *file, struct sail_read_o
     file->pimpl = pimpl;
 
     pimpl->zerror = false;
+
+    if (read_options == NULL) {
+        pimpl->read_options = sail_default_read_options();
+    } else {
+        pimpl->read_options = *read_options;
+    }
 
     // TODO
     //currentImage = -1;
@@ -179,39 +184,36 @@ int SAIL_EXPORT sail_plugin_read_seek_next_frame(struct sail_file *file, struct 
         default:            (*image)->source_pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;   break;
     }
 
+    if (pimpl->read_options.meta_info) {
+/*
+    jpeg_saved_marker_ptr it = pimpl->decompress_context.marker_list;
+
+    while(it) {
+        if(it->marker == JPEG_COM) {
+            fmt_metaentry mt;
+
+            mt.group = "Comment";
+            s8 data[it->data_length+1];
+            memcpy(data, it->data, it->data_length);
+            data[it->data_length] = '\0';
+            mt.data = data;
+
+            addmeta(mt);
+
+            break;
+        }
+
+        it = it->next;
+    }
+
+    finfo.image.push_back(image);
+*/
+    }
+
     return 0;
 }
 
 #if 0
-    //image.compression = "JPEG";
-
-    jpeg_saved_marker_ptr it = pimpl->decompress_context.marker_list;
-
-    while(it)
-    {
-	if(it->marker == JPEG_COM)
-	{
-            fmt_metaentry mt;
-
-	    mt.group = "Comment";
-	    s8 data[it->data_length+1];
-	    memcpy(data, it->data, it->data_length);
-	    data[it->data_length] = '\0';
-	    mt.data = data;
-
-	    addmeta(mt);
-
-    	    break;
-	}
-
-	it = it->next;
-    }
-
-    finfo.image.push_back(image);
-
-    return SQE_OK;
-}
-
 s32 fmt_codec::read_next_pass()
 {
     return SQE_OK;
