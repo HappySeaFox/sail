@@ -34,6 +34,12 @@ int SAIL_EXPORT sail_alloc_meta_entry_node(struct sail_meta_entry_node **meta_en
  */
 void SAIL_EXPORT sail_destroy_meta_entry_node(struct sail_meta_entry_node *meta_entry_node);
 
+/*
+ * Destroys the specified meta entry node and all its internal allocated memory buffers.
+ * Repeats the destruction procedure recursively for the stored next pointer.
+ */
+void SAIL_EXPORT sail_destroy_meta_entry_node_chain(struct sail_meta_entry_node *meta_entry_node);
+
 /* extern "C" */
 #ifdef __cplusplus
 }

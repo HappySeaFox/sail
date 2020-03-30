@@ -10,6 +10,7 @@
 #endif
 
 #include "common.h"
+#include "meta_entry_node.h"
 
 /*
  * File functions.
@@ -105,6 +106,8 @@ void sail_image_destroy(struct sail_image *image) {
     if (image->palette != NULL) {
         free(image->palette);
     }
+
+    sail_destroy_meta_entry_node_chain(image->meta_entry_node);
 
     free(image);
 }

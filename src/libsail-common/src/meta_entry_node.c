@@ -35,3 +35,14 @@ void sail_destroy_meta_entry_node(struct sail_meta_entry_node *meta_entry_node) 
 
     free(meta_entry_node);
 }
+
+void sail_destroy_meta_entry_node_chain(struct sail_meta_entry_node *meta_entry_node) {
+
+    while (meta_entry_node != NULL) {
+        struct sail_meta_entry_node *meta_entry_node_next = meta_entry_node->next;
+
+        sail_destroy_meta_entry_node(meta_entry_node);
+
+        meta_entry_node = meta_entry_node_next;
+    }
+}
