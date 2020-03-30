@@ -5,13 +5,14 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <jpeglib.h>
 
 #include "common.h"
 #include "export.h"
+#include "meta_entry_node.h"
 #include "plugin.h"
-
 
 /*
  * Plugin-specific data types.
@@ -185,29 +186,40 @@ int SAIL_EXPORT sail_plugin_read_seek_next_frame(struct sail_file *file, struct 
     }
 
     if (pimpl->read_options.meta_info) {
-/*
-    jpeg_saved_marker_ptr it = pimpl->decompress_context.marker_list;
 
-    while(it) {
-        if(it->marker == JPEG_COM) {
-            fmt_metaentry mt;
+        jpeg_saved_marker_ptr it = pimpl->decompress_context.marker_list;
+        struct sail_meta_entry_node *last_meta_entry_node;
 
-            mt.group = "Comment";
-            s8 data[it->data_length+1];
-            memcpy(data, it->data, it->data_length);
-            data[it->data_length] = '\0';
-            mt.data = data;
+        while(it) {
+            if(it->marker == JPEG_COM) {
 
-            addmeta(mt);
+                struct sail_meta_entry_node *meta_entry_node;
 
-            break;
+                if ((res = sail_alloc_meta_entry_node(&meta_entry_node)) != 0) {
+                    return res;
+                }
+
+                if ((*image)->meta_entry_node == NULL) {
+                    (*image)->meta_entry_node = last_meta_entry_node = meta_entry_node;
+                } else {
+                    last_meta_entry_node->next = meta_entry_node;
+                    last_meta_entry_node = meta_entry_node;
+                }
+
+                last_meta_entry_node->key = "Comment";
+
+                last_meta_entry_node->value = (char *)malloc(it->data_length+1);
+
+                if (last_meta_entry_node->value == NULL) {
+                    return ENOMEM;
+                }
+
+                memcpy(last_meta_entry_node->value, it->data, it->data_length);
+                last_meta_entry_node->value[it->data_length] = '\0';
+            }
+
+            it = it->next;
         }
-
-        it = it->next;
-    }
-
-    finfo.image.push_back(image);
-*/
     }
 
     return 0;
