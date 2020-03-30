@@ -27,16 +27,13 @@ endif()
 
 # Platform definitions used in config.h
 #
-if(WIN32)
+if (WIN32)
     set(SAIL_WIN32 ON)
-endif()
-if(UNIX)
+elseif (UNIX)
     set(SAIL_UNIX ON)
-endif()
-if(MINGW)
+elseif (MINGW)
     set(SAIL_MINGW ON)
-endif()
-if(CYGWIN)
+elseif(CYGWIN)
     set(SAIL_CYGWIN ON)
 endif()
 
