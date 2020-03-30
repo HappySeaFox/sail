@@ -9,7 +9,9 @@
 #include <jpeglib.h>
 
 #include "common.h"
+#include "export.h"
 #include "plugin.h"
+
 
 /*
  * Plugin-specific data types.
@@ -47,42 +49,42 @@ struct pimpl {
 /*
  * Plugin interface.
  */
-int sail_plugin_layout_version(void) {
+int SAIL_EXPORT sail_plugin_layout_version(void) {
 
     return 1;
 }
 
-const char* sail_plugin_version(void) {
+const char* SAIL_EXPORT sail_plugin_version(void) {
 
     return "1.3.4.1";
 }
 
-const char* sail_plugin_description(void) {
+const char* SAIL_EXPORT sail_plugin_description(void) {
 
     return "JPEG compressed";
 }
 
-const char* sail_plugin_extensions(void) {
+const char* SAIL_EXPORT sail_plugin_extensions(void) {
 
     return "jpg;jpeg;jpe";
 }
 
-const char* sail_plugin_mime_types(void) {
+const char* SAIL_EXPORT sail_plugin_mime_types(void) {
 
     return "image/jpeg";
 }
 
-const char* sail_plugin_magic(void) {
+const char* SAIL_EXPORT sail_plugin_magic(void) {
 
     return "\x00FF\x00D8\x00FF";
 }
 
-int sail_plugin_features(void) {
+int SAIL_EXPORT sail_plugin_features(void) {
 
     return SAIL_PLUGIN_FEATURE_READ_STATIC | SAIL_PLUGIN_FEATURE_WRITE_STATIC;
 }
 
-int sail_plugin_read_init(struct sail_file *file, struct sail_read_options *read_options) {
+int SAIL_EXPORT sail_plugin_read_init(struct sail_file *file, struct sail_read_options *read_options) {
 
     struct pimpl *pimpl = (struct pimpl *)malloc(sizeof(struct pimpl));
 
@@ -100,7 +102,7 @@ int sail_plugin_read_init(struct sail_file *file, struct sail_read_options *read
     return 0;
 }
 
-int sail_plugin_read_seek_next_frame(struct sail_file *file, struct sail_image **image) {
+int SAIL_EXPORT sail_plugin_read_seek_next_frame(struct sail_file *file, struct sail_image **image) {
 
     struct pimpl *pimpl = (struct pimpl *)file->pimpl;
 

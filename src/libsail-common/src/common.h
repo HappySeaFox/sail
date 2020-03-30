@@ -5,6 +5,12 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+#ifdef SAIL_BUILD
+    #include "export.h"
+#else
+    #include <sail/export.h>
+#endif
+
 /*
  * Common data structures and functions used across SAIL, both in libsail and in image plugins.
  */
@@ -146,13 +152,13 @@ struct sail_write_options {
  *
  * Returns 0 on success or errno on error.
  */
-int sail_file_open(const char *filepath, const char *mode, struct sail_file **file);
+int SAIL_EXPORT sail_file_open(const char *filepath, const char *mode, struct sail_file **file);
 
 /*
  * Closes the specified file. Does nothing if the file is already closed.
  * The "file" pointer MUST NOT be used after calling this function.
  */
-void sail_file_close(struct sail_file *file);
+void SAIL_EXPORT sail_file_close(struct sail_file *file);
 
 /*
  * Image functions.
@@ -163,12 +169,12 @@ void sail_file_close(struct sail_file *file);
  *
  * Returns 0 on success or errno on error.
  */
-int sail_image_alloc(struct sail_image **image);
+int SAIL_EXPORT sail_image_alloc(struct sail_image **image);
 
 /*
  * Destroys the specified image and all its internal allocated memory buffers.
  * The "image" pointer MUST NOT be used after calling this function.
  */
-void sail_image_destroy(struct sail_image *image);
+void SAIL_EXPORT sail_image_destroy(struct sail_image *image);
 
 #endif

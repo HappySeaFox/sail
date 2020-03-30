@@ -10,6 +10,8 @@ set(BUILD_SHARED_LIBS ON)
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_EXTENSIONS OFF)
 
+add_definitions(-DSAIL_BUILD)
+
 # Platform definitions used in config.h
 #
 if(WIN32)
