@@ -11,6 +11,10 @@
     #include <sail/export.h>
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
  * Common data structures and functions used across SAIL, both in libsail and in image plugins.
  */
@@ -176,5 +180,10 @@ int SAIL_EXPORT sail_image_alloc(struct sail_image **image);
  * The "image" pointer MUST NOT be used after calling this function.
  */
 void SAIL_EXPORT sail_image_destroy(struct sail_image *image);
+
+/* extern "C" */
+#ifdef __cplusplus
+}
+#endif
 
 #endif
