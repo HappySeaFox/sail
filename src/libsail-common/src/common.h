@@ -200,6 +200,10 @@ int SAIL_EXPORT sail_image_alloc(struct sail_image **image);
 void SAIL_EXPORT sail_image_destroy(struct sail_image *image);
 
 /*
+ * Options functions.
+ */
+
+/*
  * Allocates default read options. The assigned read options MUST be destroyed later
  * with sail_read_options_destroy().
  *
