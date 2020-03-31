@@ -170,6 +170,7 @@ int SAIL_EXPORT sail_plugin_read_seek_next_frame(struct sail_file *file, struct 
 
     (*image)->width = pimpl->decompress_context.output_width;
     (*image)->height = pimpl->decompress_context.output_height;
+    (*image)->pixel_format = SAIL_PIXEL_FORMAT_RGB;
     (*image)->passes = 1;
 
     pimpl->buffer = (*pimpl->decompress_context.mem->alloc_sarray)((j_common_ptr)&pimpl->decompress_context,
