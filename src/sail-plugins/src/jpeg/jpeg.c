@@ -37,6 +37,31 @@ static void my_error_exit(j_common_ptr cinfo) {
     longjmp(myerr->setjmp_buffer, 1);
 }
 
+static int color_space_to_pixel_format(int color_space) {
+    switch (color_space) {
+        case JCS_GRAYSCALE: return SAIL_PIXEL_FORMAT_GRAYSCALE;
+
+        case JCS_EXT_RGB:
+        case JCS_RGB:       return SAIL_PIXEL_FORMAT_RGB;
+
+        case JCS_YCbCr:     return SAIL_PIXEL_FORMAT_YCBCR;
+        case JCS_CMYK:      return SAIL_PIXEL_FORMAT_CMYK;
+        case JCS_YCCK:      return SAIL_PIXEL_FORMAT_YCCK;
+        case JCS_EXT_RGBX:  return SAIL_PIXEL_FORMAT_RGBX;
+        case JCS_EXT_BGR:   return SAIL_PIXEL_FORMAT_BGR;
+        case JCS_EXT_BGRX:  return SAIL_PIXEL_FORMAT_BGRX;
+        case JCS_EXT_XBGR:  return SAIL_PIXEL_FORMAT_XBGR;
+        case JCS_EXT_XRGB:  return SAIL_PIXEL_FORMAT_ARGB;
+        case JCS_EXT_RGBA:  return SAIL_PIXEL_FORMAT_RGBA;
+        case JCS_EXT_BGRA:  return SAIL_PIXEL_FORMAT_BGRA;
+        case JCS_EXT_ABGR:  return SAIL_PIXEL_FORMAT_ABGR;
+        case JCS_EXT_ARGB:  return SAIL_PIXEL_FORMAT_ARGB;
+        case JCS_RGB565:    return SAIL_PIXEL_FORMAT_RGB565;
+
+        default:            return SAIL_PIXEL_FORMAT_UNKNOWN;
+    }
+}
+
 /*
  * Plugin-specific PIMPL.
  */
@@ -173,11 +198,6 @@ int SAIL_EXPORT sail_plugin_read_seek_next_frame(struct sail_file *file, struct 
     //    return EIO;
     //}
 
-    (*image)->width = pimpl->decompress_context.output_width;
-    (*image)->height = pimpl->decompress_context.output_height;
-    (*image)->pixel_format = SAIL_PIXEL_FORMAT_RGB;
-    (*image)->passes = 1;
-
     pimpl->buffer = (*pimpl->decompress_context.mem->alloc_sarray)((j_common_ptr)&pimpl->decompress_context,
                                                                     JPOOL_IMAGE,
                                                                     pimpl->decompress_context.output_width *
@@ -188,29 +208,11 @@ int SAIL_EXPORT sail_plugin_read_seek_next_frame(struct sail_file *file, struct 
         return ENOMEM;
     }
 
-    switch (pimpl->decompress_context.jpeg_color_space) {
-
-        case JCS_GRAYSCALE: (*image)->source_pixel_format = SAIL_PIXEL_FORMAT_GRAYSCALE; break;
-
-        case JCS_EXT_RGB:
-        case JCS_RGB:       (*image)->source_pixel_format = SAIL_PIXEL_FORMAT_RGB;       break;
-
-        case JCS_YCbCr:     (*image)->source_pixel_format = SAIL_PIXEL_FORMAT_YCBCR;     break;
-        case JCS_CMYK:      (*image)->source_pixel_format = SAIL_PIXEL_FORMAT_CMYK;      break;
-        case JCS_YCCK:      (*image)->source_pixel_format = SAIL_PIXEL_FORMAT_YCCK;      break;
-        case JCS_EXT_RGBX:  (*image)->source_pixel_format = SAIL_PIXEL_FORMAT_RGBX;      break;
-        case JCS_EXT_BGR:   (*image)->source_pixel_format = SAIL_PIXEL_FORMAT_BGR;       break;
-        case JCS_EXT_BGRX:  (*image)->source_pixel_format = SAIL_PIXEL_FORMAT_BGRX;      break;
-        case JCS_EXT_XBGR:  (*image)->source_pixel_format = SAIL_PIXEL_FORMAT_XBGR;      break;
-        case JCS_EXT_XRGB:  (*image)->source_pixel_format = SAIL_PIXEL_FORMAT_ARGB;      break;
-        case JCS_EXT_RGBA:  (*image)->source_pixel_format = SAIL_PIXEL_FORMAT_RGBA;      break;
-        case JCS_EXT_BGRA:  (*image)->source_pixel_format = SAIL_PIXEL_FORMAT_BGRA;      break;
-        case JCS_EXT_ABGR:  (*image)->source_pixel_format = SAIL_PIXEL_FORMAT_ABGR;      break;
-        case JCS_EXT_ARGB:  (*image)->source_pixel_format = SAIL_PIXEL_FORMAT_ARGB;      break;
-        case JCS_RGB565:    (*image)->source_pixel_format = SAIL_PIXEL_FORMAT_RGB565;    break;
-
-        default:            (*image)->source_pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;   break;
-    }
+    (*image)->width               = pimpl->decompress_context.output_width;
+    (*image)->height              = pimpl->decompress_context.output_height;
+    (*image)->pixel_format        = SAIL_PIXEL_FORMAT_RGB;
+    (*image)->passes              = 1;
+    (*image)->source_pixel_format = color_space_to_pixel_format(pimpl->decompress_context.jpeg_color_space);
 
     if (pimpl->read_options.options & SAIL_IO_OPTION_META_INFO) {
 
