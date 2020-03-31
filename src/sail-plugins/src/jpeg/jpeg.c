@@ -243,7 +243,7 @@ int SAIL_EXPORT sail_plugin_read_seek_next_frame(struct sail_file *file, struct 
         jpeg_saved_marker_ptr it = pimpl->decompress_context.marker_list;
         struct sail_meta_entry_node *last_meta_entry_node;
 
-        while(it) {
+        while(it != NULL) {
             if(it->marker == JPEG_COM) {
                 struct sail_meta_entry_node *meta_entry_node;
 
