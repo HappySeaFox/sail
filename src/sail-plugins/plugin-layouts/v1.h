@@ -68,10 +68,8 @@ int sail_plugin_features(void);
 
 /*
  * Initializes decoding the specified file using the specified options (or NULL to use defaults).
- *
- * Default decoding options:
- *   - Pixels are converted to RGBA8888 format.
- *   - Meta information is read.
+ * The specified read options will be copied into an internal buffer. For a list of default options
+ * please see sail_read_options_alloc().
  *
  * Returns 0 on success or errno on error.
  */
@@ -126,9 +124,6 @@ int sail_plugin_read_finish(struct sail_file *file, struct sail_image *image);
 
 /*
  * Initializes encoding the file using the specified options (or NULL to use defaults).
- *
- * Default encoding options:
- *   - Pixels are converted to RGBA8888 format.
  *
  * Returns 0 on success or errno on error.
  */
