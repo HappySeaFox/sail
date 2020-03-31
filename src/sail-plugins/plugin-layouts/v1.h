@@ -124,10 +124,12 @@ int sail_plugin_read_finish(struct sail_file *file, struct sail_image *image);
 
 /*
  * Initializes encoding the file using the specified options (or NULL to use defaults).
+ * The specified write options will be copied into an internal buffer. For a list of default options
+ * please see sail_write_options_alloc().
  *
  * Returns 0 on success or errno on error.
  */
-int sail_plugin_write_init(struct sail_file *file, struct sail_write_options *read_options);
+int sail_plugin_write_init(struct sail_file *file, struct sail_write_options *write_options);
 
 /*
  * Seeks to a next frame before writing it. The frame is NOT immediately written. Use sail_plugin_write_seek_next_pass()
