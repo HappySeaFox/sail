@@ -91,7 +91,7 @@ const char* SAIL_EXPORT sail_plugin_description(void) {
 
 const char* SAIL_EXPORT sail_plugin_extensions(void) {
 
-    return "jpg;jpeg;jpe";
+    return "jpg;jpeg;jpe;jif;jfif;jfi";
 }
 
 const char* SAIL_EXPORT sail_plugin_mime_types(void) {
