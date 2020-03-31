@@ -285,7 +285,7 @@ int SAIL_EXPORT sail_plugin_read_seek_next_pass(struct sail_file *file, struct s
 
 int SAIL_EXPORT sail_plugin_read_scan_line(struct sail_file *file, struct sail_image *image, unsigned char *scanline) {
 
-    if (file == NULL || image == NULL) {
+    if (file == NULL || image == NULL || scanline == NULL) {
         return EINVAL;
     }
 
