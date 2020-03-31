@@ -19,7 +19,6 @@
  * Plugin-specific data types.
  */
 struct my_error_context {
-
     struct jpeg_error_mgr jpeg_error_mgr;
     jmp_buf setjmp_buffer;
 };
@@ -27,7 +26,6 @@ struct my_error_context {
 typedef struct my_error_context * my_error_context_ptr;
 
 static void my_error_exit(j_common_ptr cinfo) {
-
     my_error_context_ptr myerr;
 
     myerr = (my_error_context_ptr)cinfo->err;
@@ -66,7 +64,6 @@ static int color_space_to_pixel_format(int color_space) {
  * Plugin-specific PIMPL.
  */
 struct pimpl {
-
     struct jpeg_decompress_struct decompress_context;
     struct my_error_context error_context;
     JSAMPARRAY buffer;
@@ -215,7 +212,6 @@ int SAIL_EXPORT sail_plugin_read_seek_next_frame(struct sail_file *file, struct 
     (*image)->source_pixel_format = color_space_to_pixel_format(pimpl->decompress_context.jpeg_color_space);
 
     if (pimpl->read_options.options & SAIL_IO_OPTION_META_INFO) {
-
         jpeg_saved_marker_ptr it = pimpl->decompress_context.marker_list;
         struct sail_meta_entry_node *last_meta_entry_node;
 
