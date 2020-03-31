@@ -45,7 +45,7 @@ struct pimpl {
     struct jpeg_decompress_struct decompress_context;
     struct my_error_context error_context;
     JSAMPARRAY buffer;
-    bool zerror;
+    bool libjpeg_error;
     struct sail_read_options read_options;
 };
 
@@ -103,7 +103,7 @@ int SAIL_EXPORT sail_plugin_read_init(struct sail_file *file, struct sail_read_o
 
     file->pimpl = pimpl;
 
-    pimpl->zerror = false;
+    pimpl->libjpeg_error = false;
 
     if (read_options == NULL) {
         pimpl->read_options = sail_default_read_options();
@@ -115,7 +115,7 @@ int SAIL_EXPORT sail_plugin_read_init(struct sail_file *file, struct sail_read_o
     pimpl->error_context.jpeg_error_mgr.error_exit = my_error_exit;
 
     if (setjmp(pimpl->error_context.setjmp_buffer) != 0) {
-        pimpl->zerror = true;
+        pimpl->libjpeg_error = true;
         return EIO;
     }
 
@@ -159,6 +159,11 @@ int SAIL_EXPORT sail_plugin_read_seek_next_frame(struct sail_file *file, struct 
 
     if((res = sail_image_alloc(image)) != 0) {
         return res;
+    }
+
+    if (setjmp(pimpl->error_context.setjmp_buffer) != 0) {
+        pimpl->libjpeg_error = true;
+        return EIO;
     }
 
     // TODO
@@ -264,7 +269,12 @@ int SAIL_EXPORT sail_plugin_read_scanline(struct sail_file *file, struct sail_im
         return ENOMEM;
     }
 
-    if(pimpl->zerror) {
+    if (pimpl->libjpeg_error) {
+        return EIO;
+    }
+
+    if (setjmp(pimpl->error_context.setjmp_buffer) != 0) {
+        pimpl->libjpeg_error = true;
         return EIO;
     }
 
@@ -295,6 +305,11 @@ int SAIL_EXPORT sail_plugin_read_finish(struct sail_file *file, struct sail_imag
 
     if (pimpl == NULL) {
         return ENOMEM;
+    }
+
+    if (setjmp(pimpl->error_context.setjmp_buffer) != 0) {
+        pimpl->libjpeg_error = true;
+        return EIO;
     }
 
     jpeg_abort_decompress(&pimpl->decompress_context);
