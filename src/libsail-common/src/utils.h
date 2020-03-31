@@ -26,6 +26,12 @@ int SAIL_EXPORT sail_strdup(char *input, char **output);
  */
 int SAIL_EXPORT sail_strdup_length(char *input, int length, char **output);
 
+/*
+ * Returns a non-NULL string representation of the specified pixel format.
+ * For example: "RGB", "CMYK".
+ */
+const char* SAIL_EXPORT sail_pixel_format_to_string(int pixel_format);
+
 /* extern "C" */
 #ifdef __cplusplus
 }
