@@ -115,6 +115,9 @@ struct sail_image {
     /* Image meta information. See sail_meta_entry_node. */
     struct sail_meta_entry_node *meta_entry_node;
 
+    /* Image properties. See SailImageProperties. */
+    int properties;
+
     /* Image source pixel format. See SailPixelFormat. */
     int source_pixel_format;
 };
