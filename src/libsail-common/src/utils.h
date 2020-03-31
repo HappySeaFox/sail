@@ -20,11 +20,11 @@ int SAIL_EXPORT sail_strdup(char *input, char **output);
 
 /*
  * Duplicates the specified number of bytes of the specified input string and stores
- * a new string in the specified output. If length is -1, the entire string is duplicated.
+ * a new string in the specified output. Length must be greater than 0.
  *
  * Returns 0 on success or errno on error.
  */
-int SAIL_EXPORT sail_strdup_length(char *input, int length, char **output);
+int SAIL_EXPORT sail_strdup_length(char *input, size_t length, char **output);
 
 /*
  * Returns a non-NULL string representation of the specified pixel format.

@@ -8,18 +8,12 @@
 
 int sail_strdup(char *input, char **output) {
 
-    return sail_strdup_length(input, -1, output);
-}
-
-int sail_strdup_length(char *input, int length, char **output) {
-
     if (input == NULL) {
         *output = NULL;
         return 0;
     }
 
-    const int input_len = strlen(input);
-    const int len = (length < 0 || length > input_len) ? input_len : length;
+    const size_t len = strlen(input);
 
     *output = (char *)malloc(len+1);
 
@@ -29,6 +23,29 @@ int sail_strdup_length(char *input, int length, char **output) {
 
     memcpy(*output, input, len);
     (*output)[len] = '\0';
+
+    return 0;
+}
+
+int sail_strdup_length(char *input, size_t length, char **output) {
+
+    if (input == NULL) {
+        *output = NULL;
+        return 0;
+    }
+
+    if (length == 0) {
+        return EINVAL;
+    }
+
+    *output = (char *)malloc(length+1);
+
+    if (*output == NULL) {
+        return errno;
+    }
+
+    memcpy(*output, input, length);
+    (*output)[length] = '\0';
 
     return 0;
 }
