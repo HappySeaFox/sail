@@ -252,10 +252,12 @@ int SAIL_EXPORT sail_plugin_read_seek_next_frame(struct sail_file *file, struct 
                 }
 
                 if ((res = sail_strdup("Comment", &meta_entry_node->key)) != 0) {
+                    sail_destroy_meta_entry_node(meta_entry_node);
                     return res;
                 }
 
                 if ((res = sail_strdup_length((char *)it->data, it->data_length, &meta_entry_node->value)) != 0) {
+                    sail_destroy_meta_entry_node(meta_entry_node);
                     return res;
                 }
 
