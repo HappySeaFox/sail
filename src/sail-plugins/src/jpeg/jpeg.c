@@ -297,9 +297,11 @@ int SAIL_EXPORT sail_plugin_read_scanline(struct sail_file *file, struct sail_im
 
 int SAIL_EXPORT sail_plugin_read_finish(struct sail_file *file, struct sail_image *image) {
 
-    if (file == NULL || image == NULL) {
+    if (file == NULL) {
         return EINVAL;
     }
+
+    (void)image;
 
     struct pimpl *pimpl = (struct pimpl *)file->pimpl;
 
