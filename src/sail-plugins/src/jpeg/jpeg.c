@@ -35,7 +35,7 @@ static void my_error_exit(j_common_ptr cinfo) {
     longjmp(myerr->setjmp_buffer, 1);
 }
 
-static int color_space_to_pixel_format(int color_space) {
+static int color_space_to_pixel_format(J_COLOR_SPACE color_space) {
     switch (color_space) {
         case JCS_GRAYSCALE: return SAIL_PIXEL_FORMAT_GRAYSCALE;
 
@@ -49,7 +49,7 @@ static int color_space_to_pixel_format(int color_space) {
         case JCS_EXT_BGR:   return SAIL_PIXEL_FORMAT_BGR;
         case JCS_EXT_BGRX:  return SAIL_PIXEL_FORMAT_BGRX;
         case JCS_EXT_XBGR:  return SAIL_PIXEL_FORMAT_XBGR;
-        case JCS_EXT_XRGB:  return SAIL_PIXEL_FORMAT_ARGB;
+        case JCS_EXT_XRGB:  return SAIL_PIXEL_FORMAT_XRGB;
         case JCS_EXT_RGBA:  return SAIL_PIXEL_FORMAT_RGBA;
         case JCS_EXT_BGRA:  return SAIL_PIXEL_FORMAT_BGRA;
         case JCS_EXT_ABGR:  return SAIL_PIXEL_FORMAT_ABGR;
@@ -57,6 +57,28 @@ static int color_space_to_pixel_format(int color_space) {
         case JCS_RGB565:    return SAIL_PIXEL_FORMAT_RGB565;
 
         default:            return SAIL_PIXEL_FORMAT_UNKNOWN;
+    }
+}
+
+static J_COLOR_SPACE pixel_format_to_color_space(int pixel_format) {
+    switch (pixel_format) {
+        case SAIL_PIXEL_FORMAT_GRAYSCALE: return JCS_GRAYSCALE;
+        case SAIL_PIXEL_FORMAT_RGB:       return JCS_RGB;
+        case SAIL_PIXEL_FORMAT_YCBCR:     return JCS_YCbCr;
+        case SAIL_PIXEL_FORMAT_CMYK:      return JCS_CMYK;
+        case SAIL_PIXEL_FORMAT_YCCK:      return JCS_YCCK;
+        case SAIL_PIXEL_FORMAT_RGBX:      return JCS_EXT_RGBX;
+        case SAIL_PIXEL_FORMAT_BGR:       return JCS_EXT_BGR;
+        case SAIL_PIXEL_FORMAT_BGRX:      return JCS_EXT_BGRX;
+        case SAIL_PIXEL_FORMAT_XBGR:      return JCS_EXT_XBGR;
+        case SAIL_PIXEL_FORMAT_XRGB:      return JCS_EXT_XRGB;
+        case SAIL_PIXEL_FORMAT_RGBA:      return JCS_EXT_RGBA;
+        case SAIL_PIXEL_FORMAT_BGRA:      return JCS_EXT_BGRA;
+        case SAIL_PIXEL_FORMAT_ABGR:      return JCS_EXT_ABGR;
+        case SAIL_PIXEL_FORMAT_ARGB:      return JCS_EXT_ARGB;
+        case SAIL_PIXEL_FORMAT_RGB565:    return JCS_RGB565;
+
+        default:                          return JCS_UNKNOWN;
     }
 }
 
@@ -150,11 +172,17 @@ int SAIL_EXPORT sail_plugin_read_init(struct sail_file *file, struct sail_read_o
 
     jpeg_read_header(&pimpl->decompress_context, TRUE);
 
-    if (pimpl->decompress_context.jpeg_color_space != JCS_RGB) {
-        pimpl->decompress_context.out_color_space = JCS_RGB;
-        pimpl->decompress_context.desired_number_of_colors = 256;
-        pimpl->decompress_context.quantize_colors = FALSE;
-        pimpl->decompress_context.two_pass_quantize = FALSE;
+    if (pimpl->read_options.pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN) {
+        return EINVAL;
+    }
+
+    if (pimpl->read_options.pixel_format != SAIL_PIXEL_FORMAT_SOURCE) {
+        J_COLOR_SPACE color_space = pixel_format_to_color_space(pimpl->read_options.pixel_format);
+
+        if (pimpl->decompress_context.jpeg_color_space != color_space) {
+            pimpl->decompress_context.out_color_space = color_space;
+            pimpl->decompress_context.quantize_colors = FALSE;
+        }
     }
 
     jpeg_start_decompress(&pimpl->decompress_context);
@@ -286,9 +314,7 @@ int SAIL_EXPORT sail_plugin_read_scanline(struct sail_file *file, struct sail_im
 
     (void)jpeg_read_scanlines(&pimpl->decompress_context, pimpl->buffer, 1);
 
-    for(int i = 0; i < image->width; i++) {
-        memcpy(*scanline+i*color_components, pimpl->buffer[0] + i*color_components, color_components);
-    }
+    memcpy(*scanline, pimpl->buffer[0], image->width * color_components);
 
     return 0;
 }
