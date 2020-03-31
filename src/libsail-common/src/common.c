@@ -122,7 +122,7 @@ struct sail_read_options sail_default_read_options() {
     struct sail_read_options read_options;
 
     read_options.pixel_format = SAIL_PIXEL_FORMAT_RGB;
-    read_options.meta_info = true;
+    read_options.options = SAIL_IO_OPTION_META_INFO;
 
     return read_options;
 }

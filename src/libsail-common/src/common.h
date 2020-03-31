@@ -63,6 +63,15 @@ enum SailImageProperties {
     SAIL_IMAGE_PROPERTY_RESIZE_ENUM_TO_INT = INT_MAX
 };
 
+/* Read or writeoptions. */
+enum SailIoOptions {
+    /* Read or write image meta information like JPEG comments. */
+    SAIL_IO_OPTION_META_INFO = 1 << 0,
+
+    /* Not to be used. Resize the enum for future elements. */
+    SAIL_IO_OPTIONS_RESIZE_ENUM_TO_INT = INT_MAX
+};
+
 /*
  * A structure representing a file object.
  */
@@ -128,8 +137,8 @@ struct sail_read_options {
     /* Modify output pixel format. */
     int pixel_format;
 
-    /* Read any supported meta-info from the file. For example, JPEG comments. */
-    bool meta_info;
+    /* IO manipulation options. See SailIoOptions. */
+    int options;
 };
 
 /* Options to modify writing operations. */
@@ -137,6 +146,9 @@ struct sail_write_options {
 
     /* Modify output pixel format. */
     int pixel_format;
+
+    /* IO manipulation options. See SailIoOptions. */
+    int options;
 };
 
 /*

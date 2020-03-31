@@ -122,7 +122,7 @@ int SAIL_EXPORT sail_plugin_read_init(struct sail_file *file, struct sail_read_o
     jpeg_create_decompress(&pimpl->decompress_context);
     jpeg_stdio_src(&pimpl->decompress_context, file->fptr);
 
-    if (pimpl->read_options.meta_info) {
+    if (pimpl->read_options.options & SAIL_IO_OPTION_META_INFO) {
         jpeg_save_markers(&pimpl->decompress_context, JPEG_COM, 0xffff);
     }
 
@@ -207,7 +207,7 @@ int SAIL_EXPORT sail_plugin_read_seek_next_frame(struct sail_file *file, struct 
         default:            (*image)->source_pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;   break;
     }
 
-    if (pimpl->read_options.meta_info) {
+    if (pimpl->read_options.options & SAIL_IO_OPTION_META_INFO) {
 
         jpeg_saved_marker_ptr it = pimpl->decompress_context.marker_list;
         struct sail_meta_entry_node *last_meta_entry_node;
