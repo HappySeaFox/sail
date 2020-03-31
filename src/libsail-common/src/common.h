@@ -68,10 +68,13 @@ enum SailImageProperties {
  */
 struct sail_file {
 
-    /* File descriptor */
+    /* File descriptor. */
     FILE *fptr;
 
-    /* Plugin-specific data. MUST be destroyed in every plugin upon reading or writing finialization. */
+    /*
+     * Plugin-specific data. A plugin could set pimpl to its plugin-specific data storage and access it
+     * in read or write functions. Will be destroyed automatically in sail_file_destroy().
+     */
     void *pimpl;
 };
 
