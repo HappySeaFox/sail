@@ -65,6 +65,7 @@ enum SailImageProperties {
 
 /* Read or writeoptions. */
 enum SailIoOptions {
+
     /* Read or write image meta information like JPEG comments. */
     SAIL_IO_OPTION_META_INFO = 1 << 0,
 
@@ -186,7 +187,7 @@ void SAIL_EXPORT sail_file_destroy(struct sail_file *file);
  */
 
 /*
- * Allocates a nw image. The assigned image MUST be destroyed later with sail_image_destroy().
+ * Allocates a new image. The assigned image MUST be destroyed later with sail_image_destroy().
  *
  * Returns 0 on success or errno on error.
  */
@@ -199,9 +200,20 @@ int SAIL_EXPORT sail_image_alloc(struct sail_image **image);
 void SAIL_EXPORT sail_image_destroy(struct sail_image *image);
 
 /*
- * Returns default read options.
+ * Allocates default read options. The assigned read options MUST be destroyed later
+ * with sail_read_options_destroy().
+ *
+ * Default read options:
+ *     - pixel format: source
+ *     - options: read meta info
  */
-struct sail_read_options SAIL_EXPORT sail_default_read_options();
+int SAIL_EXPORT sail_read_options_alloc(struct sail_read_options **read_options);
+
+/*
+ * Destroys the specified read options and all its internal allocated memory buffers.
+ * The "read_options" pointer MUST NOT be used after calling this function.
+ */
+void SAIL_EXPORT sail_read_options_destroy(struct sail_read_options *read_options);
 
 /* extern "C" */
 #ifdef __cplusplus
