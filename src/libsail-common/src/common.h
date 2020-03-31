@@ -134,7 +134,13 @@ struct sail_image {
 /* Options to modify reading operations. */
 struct sail_read_options {
 
-    /* Modify output pixel format. */
+    /*
+     * Hint to modify output pixel format. This is just a hint, not an obligation. Plugin (or an underlying codec)
+     * may reject the requested pixel format.
+     *
+     * NOTE: SAIL doesn't provide pixel format conversion capabilities. This hist is passed to an underlying codec
+     * which may reject or ignore it. The actual selected pixel format will be available in sail_image.
+     */
     int pixel_format;
 
     /* IO manipulation options. See SailIoOptions. */
@@ -144,7 +150,13 @@ struct sail_read_options {
 /* Options to modify writing operations. */
 struct sail_write_options {
 
-    /* Modify output pixel format. */
+    /*
+     * Hint to modify output pixel format. This is just a hint, not an obligation. Plugin (or an underlying codec)
+     * may reject the requested pixel format.
+     *
+     * NOTE: SAIL doesn't provide pixel format conversion capabilities. This hist is passed to an underlying codec
+     * which may reject or ignore it.
+     */
     int pixel_format;
 
     /* IO manipulation options. See SailIoOptions. */
