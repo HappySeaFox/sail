@@ -117,7 +117,7 @@ void sail_image_destroy(struct sail_image *image) {
     free(image);
 }
 
-int SAIL_EXPORT sail_read_options_alloc(struct sail_read_options **read_options) {
+int sail_read_options_alloc(struct sail_read_options **read_options) {
 
     *read_options = (struct sail_read_options *)malloc(sizeof(struct sail_read_options));
 
@@ -138,4 +138,27 @@ void sail_read_options_destroy(struct sail_read_options *read_options) {
     }
 
     free(read_options);
+}
+
+int sail_write_options_alloc(struct sail_write_options **write_options) {
+
+    *write_options = (struct sail_write_options *)malloc(sizeof(struct sail_write_options));
+
+    if (*write_options == NULL) {
+        return ENOMEM;
+    }
+
+    (*write_options)->pixel_format = SAIL_PIXEL_FORMAT_SOURCE;
+    (*write_options)->options      = SAIL_IO_OPTION_META_INFO;
+
+    return 0;
+}
+
+void sail_write_options_destroy(struct sail_write_options *write_options) {
+
+    if (write_options == NULL) {
+        return;
+    }
+
+    free(write_options);
 }

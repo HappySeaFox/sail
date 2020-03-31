@@ -215,6 +215,22 @@ int SAIL_EXPORT sail_read_options_alloc(struct sail_read_options **read_options)
  */
 void SAIL_EXPORT sail_read_options_destroy(struct sail_read_options *read_options);
 
+/*
+ * Allocates default write options. The assigned write options MUST be destroyed later
+ * with sail_write_options_destroy().
+ *
+ * Default write options:
+ *     - pixel format: source
+ *     - options: write meta info
+ */
+int SAIL_EXPORT sail_write_options_alloc(struct sail_write_options **write_options);
+
+/*
+ * Destroys the specified write options and all its internal allocated memory buffers.
+ * The "write_options" pointer MUST NOT be used after calling this function.
+ */
+void SAIL_EXPORT sail_write_options_destroy(struct sail_write_options *write_options);
+
 /* extern "C" */
 #ifdef __cplusplus
 }
