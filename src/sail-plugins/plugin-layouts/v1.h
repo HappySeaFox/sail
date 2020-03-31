@@ -96,12 +96,20 @@ int sail_plugin_read_seek_next_frame(struct sail_file *file, struct sail_image *
 int sail_plugin_read_seek_next_pass(struct sail_file *file, struct sail_image *image);
 
 /*
+ * Reads a scan line of the current image in the current pass. The specified scan line must be
+ * allocated by the caller and must be be large enough.
+ *
+ * Returns 0 on success or errno on error.
+ */
+int sail_plugin_read_scan_line(struct sail_file *file, struct sail_image *image, unsigned char *scanline);
+
+/*
  * Reads a scan line of the current image in the current pass. The assigned scan line MUST be freed
  * later with free().
  *
  * Returns 0 on success or errno on error.
  */
-int sail_plugin_read_scan_line(struct sail_file *file, struct sail_image *image, unsigned char **scanline);
+int sail_plugin_read_alloc_scan_line(struct sail_file *file, struct sail_image *image, unsigned char **scanline);
 
 /*
  * Finilizes reading operation. No more readings are possible after calling this function.

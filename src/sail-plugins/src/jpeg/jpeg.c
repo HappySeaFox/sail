@@ -283,7 +283,7 @@ int SAIL_EXPORT sail_plugin_read_seek_next_pass(struct sail_file *file, struct s
     return 0;
 }
 
-int SAIL_EXPORT sail_plugin_read_scan_line(struct sail_file *file, struct sail_image *image, unsigned char **scanline) {
+int SAIL_EXPORT sail_plugin_read_scan_line(struct sail_file *file, struct sail_image *image, unsigned char *scanline) {
 
     if (file == NULL || image == NULL) {
         return EINVAL;
@@ -306,17 +306,34 @@ int SAIL_EXPORT sail_plugin_read_scan_line(struct sail_file *file, struct sail_i
 
     const int color_components = pimpl->decompress_context.output_components;
 
+    (void)jpeg_read_scanlines(&pimpl->decompress_context, pimpl->buffer, 1);
+
+    memcpy(scanline, pimpl->buffer[0], image->width * color_components);
+
+    return 0;
+}
+
+int SAIL_EXPORT sail_plugin_read_alloc_scan_line(struct sail_file *file, struct sail_image *image, unsigned char **scanline) {
+
+    if (file == NULL || image == NULL) {
+        return EINVAL;
+    }
+
+    struct pimpl *pimpl = (struct pimpl *)file->pimpl;
+
+    if (pimpl == NULL) {
+        return ENOMEM;
+    }
+
+    const int color_components = pimpl->decompress_context.output_components;
+
     *scanline = (unsigned char *)malloc(image->width * color_components);
 
     if (*scanline == NULL) {
         return ENOMEM;
     }
 
-    (void)jpeg_read_scanlines(&pimpl->decompress_context, pimpl->buffer, 1);
-
-    memcpy(*scanline, pimpl->buffer[0], image->width * color_components);
-
-    return 0;
+    return sail_plugin_read_scan_line(file, image, *scanline);
 }
 
 int SAIL_EXPORT sail_plugin_read_finish(struct sail_file *file, struct sail_image *image) {
