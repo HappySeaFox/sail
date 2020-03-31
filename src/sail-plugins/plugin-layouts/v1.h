@@ -78,7 +78,9 @@ int sail_plugin_features(void);
 int sail_plugin_read_init(struct sail_file *file, struct sail_read_options *read_options);
 
 /*
- * Seeks to the next frame. The frame is NOT immediately read or parsed by most plugins.
+ * Seeks to the next frame. The frame is NOT immediately read or parsed by most plugins. One could
+ * use this method to quickly detect the image dimensions without parsing the whole file.
+ *
  * Use sail_plugin_read_seek_next_pass() + sail_plugin_read_scanline() to actually read the frame.
  * The assigned image MUST be destroyed later with sail_image_destroy().
  *
