@@ -67,6 +67,10 @@ void sail_file_destroy(struct sail_file *file) {
         fclose(file->fptr);
     }
 
+    if (file->pimpl != NULL) {
+        free(file->pimpl);
+    }
+
     free(file);
 }
 
