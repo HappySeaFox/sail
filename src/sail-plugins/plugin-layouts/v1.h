@@ -56,7 +56,7 @@ const char* sail_plugin_magic(void);
 
 /*
  * Returns combined plugin features. Use the returned value to determine
- * what a plugin can actually do. E.g. decode, encode etc.
+ * what a plugin can actually do. E.g. decode, encode, read meta information etc.
  *
  * See SailPluginFeatures.
  */
@@ -67,26 +67,27 @@ int sail_plugin_features(void);
  */
 
 /*
- * Initializes decoding the file using the specified options (or NULL to use defaults).
+ * Initializes decoding the specified file using the specified options (or NULL to use defaults).
  *
  * Default decoding options:
  *   - Pixels are converted to RGBA8888 format.
+ *   - Meta information is read.
  *
  * Returns 0 on success or errno on error.
  */
 int sail_plugin_read_init(struct sail_file *file, struct sail_read_options *read_options);
 
 /*
- * Seeks to the next frame. The frame is NOT immediately read. Use sail_plugin_read_next_pass() +
- * sail_plugin_read_scanline() to actually read the frame. The assigned image MUST be destroyed later
- * with sail_image_destroy().
+ * Seeks to the next frame. The frame is NOT immediately read or parsed by most plugins.
+ * Use sail_plugin_read_seek_next_pass() + sail_plugin_read_scanline() to actually read the frame.
+ * The assigned image MUST be destroyed later with sail_image_destroy().
  *
  * Returns 0 on success or errno on error.
  */
 int sail_plugin_read_seek_next_frame(struct sail_file *file, struct sail_image **image);
 
 /*
- * Seeks to the next pass if the specified image is interlaced. Does nothing otherwise.
+ * Seeks to the next pass if the specified image has multiple passes. Does nothing otherwise.
  *
  * Returns 0 on success or errno on error.
  */
@@ -102,7 +103,8 @@ int sail_plugin_read_scanline(struct sail_file *file, struct sail_image *image, 
 
 /*
  * Finilizes reading operation. No more readings are possible after calling this function.
- * This function doesn't close the file. Use sail_file_close() for that.
+ * This function doesn't close the file. It just stops decoding. Use sail_file_close()
+ * to actually close the file.
  *
  * Returns 0 on success or errno on error.
  */
@@ -123,8 +125,8 @@ int sail_plugin_read_finish(struct sail_file *file, struct sail_image *image);
 int sail_plugin_write_init(struct sail_file *file, struct sail_write_options *read_options);
 
 /*
- * Seeks to a next frame before writing it. The frame is NOT immediately written. Use sail_plugin_write_next_pass() +
- * sail_plugin_write_scanline() to actually write a frame. The assigned image MUST be destroyed later
+ * Seeks to a next frame before writing it. The frame is NOT immediately written. Use sail_plugin_write_seek_next_pass()
+ * and sail_plugin_write_scanline() to actually write a frame. The assigned image MUST be destroyed later
  * with sail_image_destroy().
  *
  * Returns 0 on success or errno on error.
