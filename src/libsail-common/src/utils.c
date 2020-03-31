@@ -54,6 +54,7 @@ const char* sail_pixel_format_to_string(int pixel_format) {
     switch (pixel_format) {
         case SAIL_PIXEL_FORMAT_UNKNOWN:   return "Unknown";
         case SAIL_PIXEL_FORMAT_SOURCE:    return "Source";
+
         case SAIL_PIXEL_FORMAT_MONO:      return "Mono";
         case SAIL_PIXEL_FORMAT_GRAYSCALE: return "Grayscale";
         case SAIL_PIXEL_FORMAT_INDEXED:   return "Indexed";
@@ -74,4 +75,35 @@ const char* sail_pixel_format_to_string(int pixel_format) {
     }
 
     return "Unknown";
+}
+
+int sail_bits_per_pixel(int pixel_format) {
+    switch (pixel_format) {
+        case SAIL_PIXEL_FORMAT_UNKNOWN:   return 0;
+        case SAIL_PIXEL_FORMAT_SOURCE:    return 0;
+
+        case SAIL_PIXEL_FORMAT_MONO:      return 1;
+
+        case SAIL_PIXEL_FORMAT_GRAYSCALE: return 8;
+        case SAIL_PIXEL_FORMAT_INDEXED:   return 8;
+
+        case SAIL_PIXEL_FORMAT_RGB565:    return 16;
+
+        case SAIL_PIXEL_FORMAT_RGB:       return 24;
+        case SAIL_PIXEL_FORMAT_YCBCR:     return 24;
+        case SAIL_PIXEL_FORMAT_BGR:       return 24;
+
+        case SAIL_PIXEL_FORMAT_CMYK:      return 32;
+        case SAIL_PIXEL_FORMAT_YCCK:      return 32;
+        case SAIL_PIXEL_FORMAT_RGBX:      return 32;
+        case SAIL_PIXEL_FORMAT_BGRX:      return 32;
+        case SAIL_PIXEL_FORMAT_XBGR:      return 32;
+        case SAIL_PIXEL_FORMAT_XRGB:      return 32;
+        case SAIL_PIXEL_FORMAT_RGBA:      return 32;
+        case SAIL_PIXEL_FORMAT_BGRA:      return 32;
+        case SAIL_PIXEL_FORMAT_ABGR:      return 32;
+        case SAIL_PIXEL_FORMAT_ARGB:      return 32;
+    }
+
+    return 0;
 }

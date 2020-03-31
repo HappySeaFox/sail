@@ -32,6 +32,12 @@ int SAIL_EXPORT sail_strdup_length(char *input, size_t length, char **output);
  */
 const char* SAIL_EXPORT sail_pixel_format_to_string(int pixel_format);
 
+/*
+ * Returns a number of bits a pixel in the specified pixel format occupies.
+ * For example, for SAIL_PIXEL_FORMAT_RGB 24 is returned.
+ */
+int SAIL_EXPORT sail_bits_per_pixel(int pixel_format);
+
 /* extern "C" */
 #ifdef __cplusplus
 }
