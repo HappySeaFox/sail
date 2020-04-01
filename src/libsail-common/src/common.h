@@ -107,31 +107,34 @@ struct sail_meta_entry_node;
  */
 struct sail_image {
 
-    /* Image width */
+    /* Image width. */
     int width;
 
-    /* Image height */
+    /* Image height. */
     int height;
+
+    /* Bytes per line. */
+    int bytes_per_line;
 
     /* Image pixel format. See SailPixelFormat. */
     int pixel_format;
 
-    /* Number of passes needed to read or write an entire image frame */
+    /* Number of passes needed to read or write an entire image frame. */
     int passes;
 
-    /* Is the image a frame in an animation */
+    /* Is the image a frame in an animation. */
     bool animated;
 
-    /* Delay in milliseconds if the image is a frame in an animation */
+    /* Delay in milliseconds if the image is a frame in an animation. */
     int delay;
 
-    /* Palette pixel format */
+    /* Palette pixel format. */
     int palette_pixel_format;
 
-    /* Palette if a "source" pixel format was chosen and the image has a palette */
+    /* Palette if a "source" pixel format was chosen and the image has a palette. */
     void *palette;
 
-    /* Size of the palette data in bytes */
+    /* Size of the palette data in bytes. */
     int palette_size;
 
     /* Image meta information. See sail_meta_entry_node. */
@@ -144,7 +147,7 @@ struct sail_image {
     int source_pixel_format;
 };
 
-/* Reading features */
+/* Reading features. */
 struct sail_read_features {
 
     /* A list of supported pixel formats by this plugin. */
@@ -157,7 +160,7 @@ struct sail_read_features {
     int io_options;
 };
 
-/* Writing features */
+/* Writing features. */
 struct sail_write_features {
 
     /* A list of supported pixel formats by this plugin. */

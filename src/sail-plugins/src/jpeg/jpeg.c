@@ -256,10 +256,11 @@ int SAIL_EXPORT sail_plugin_read_seek_next_frame(struct sail_file *file, struct 
     //    return EIO;
     //}
 
+    const int bytes_per_line = pimpl->decompress_context.output_width * pimpl->decompress_context.output_components;
+
     pimpl->buffer = (*pimpl->decompress_context.mem->alloc_sarray)((j_common_ptr)&pimpl->decompress_context,
                                                                     JPOOL_IMAGE,
-                                                                    pimpl->decompress_context.output_width *
-                                                                        pimpl->decompress_context.output_components,
+                                                                    bytes_per_line,
                                                                     1);
 
     if (pimpl->buffer == NULL) {
@@ -268,6 +269,7 @@ int SAIL_EXPORT sail_plugin_read_seek_next_frame(struct sail_file *file, struct 
 
     (*image)->width               = pimpl->decompress_context.output_width;
     (*image)->height              = pimpl->decompress_context.output_height;
+    (*image)->bytes_per_line      = bytes_per_line;
     (*image)->pixel_format        = SAIL_PIXEL_FORMAT_RGB;
     (*image)->passes              = 1;
     (*image)->source_pixel_format = color_space_to_pixel_format(pimpl->decompress_context.jpeg_color_space);

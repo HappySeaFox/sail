@@ -88,6 +88,7 @@ int sail_image_alloc(struct sail_image **image) {
 
     (*image)->width                = 0;
     (*image)->height               = 0;
+    (*image)->bytes_per_line       = 0;
     (*image)->pixel_format         = SAIL_PIXEL_FORMAT_UNKNOWN;
     (*image)->passes               = 0;
     (*image)->animated             = false;
