@@ -63,11 +63,23 @@ enum SailImageProperties {
     SAIL_IMAGE_PROPERTY_RESIZE_ENUM_TO_INT = INT_MAX
 };
 
-/* Read or writeoptions. */
+/* Read or write options. */
 enum SailIoOptions {
 
-    /* Read or write image meta information like JPEG comments. */
-    SAIL_IO_OPTION_META_INFO = 1 << 0,
+    /* Ability to read or write images. */
+    SAIL_IO_OPTION_STATIC     = 1 << 0,
+
+    /* Ability to read or write animated images. */
+    SAIL_IO_OPTION_ANIMATED   = 1 << 1,
+
+    /* Ability to read or write multipaged (not animated) images. */
+    SAIL_IO_OPTION_MULTIPAGED = 1 << 2,
+
+    /* Ability to read or write simple image meta information like JPEG comments. */
+    SAIL_IO_OPTION_META_INFO  = 1 << 3,
+
+    /* Ability to read or write EXIF meta information. */
+    SAIL_IO_OPTION_EXIF       = 1 << 4,
 
     /* Not to be used. Resize the enum for future elements. */
     SAIL_IO_OPTIONS_RESIZE_ENUM_TO_INT = INT_MAX
@@ -130,6 +142,32 @@ struct sail_image {
 
     /* Image source pixel format. See SailPixelFormat. */
     int source_pixel_format;
+};
+
+/* Reading features */
+struct sail_read_features {
+
+    /* A list of supported pixel formats by this plugin. */
+    int *pixel_formats;
+
+    /* The length of pixel_formats. */
+    int pixel_formats_length;
+
+    /* Supported IO manipulation options of reading operations. See SailIoOptions. */
+    int io_options;
+};
+
+/* Writing features */
+struct sail_write_features {
+
+    /* A list of supported pixel formats by this plugin. */
+    int *pixel_formats;
+
+    /* The length of pixel_formats. */
+    int pixel_formats_length;
+
+    /* Supported IO manipulation options of writing operations. See SailIoOptions. */
+    int io_options;
 };
 
 /* Options to modify reading operations. */
@@ -204,6 +242,18 @@ void SAIL_EXPORT sail_image_destroy(struct sail_image *image);
  */
 
 /*
+ * Allocates read features. The assigned read features MUST be destroyed later
+ * with sail_read_features_destroy().
+ */
+int SAIL_EXPORT sail_read_features_alloc(struct sail_read_features **read_features);
+
+/*
+ * Destroys the specified read features and all its internal allocated memory buffers.
+ * The "read_features" pointer MUST NOT be used after calling this function.
+ */
+void SAIL_EXPORT sail_read_features_destroy(struct sail_read_features *read_features);
+
+/*
  * Allocates read options. The assigned read options MUST be destroyed later
  * with sail_read_options_destroy().
  */
@@ -214,6 +264,18 @@ int SAIL_EXPORT sail_read_options_alloc(struct sail_read_options **read_options)
  * The "read_options" pointer MUST NOT be used after calling this function.
  */
 void SAIL_EXPORT sail_read_options_destroy(struct sail_read_options *read_options);
+
+/*
+ * Allocates write features. The assigned write features MUST be destroyed later
+ * with sail_write_features_destroy().
+ */
+int SAIL_EXPORT sail_write_features_alloc(struct sail_write_features **write_features);
+
+/*
+ * Destroys the specified write features and all its internal allocated memory buffers.
+ * The "write_features" pointer MUST NOT be used after calling this function.
+ */
+void SAIL_EXPORT sail_write_features_destroy(struct sail_write_features *write_features);
 
 /*
  * Allocates write options. The assigned write options MUST be destroyed later

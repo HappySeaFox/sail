@@ -133,6 +133,42 @@ int SAIL_EXPORT sail_plugin_features(void) {
             SAIL_PLUGIN_FEATURE_WRITE_STATIC;
 }
 
+int SAIL_EXPORT sail_plugin_read_features(struct sail_read_features **read_features) {
+
+    int res;
+
+    if ((res = sail_read_features_alloc(read_features)) != 0) {
+        return res;
+    }
+
+    (*read_features)->pixel_formats_length = 15;
+    (*read_features)->pixel_formats = (int *)malloc((*read_features)->pixel_formats_length * sizeof(int));
+
+    if ((*read_features)->pixel_formats == NULL) {
+        return ENOMEM;
+    }
+
+    (*read_features)->pixel_formats[0]  = SAIL_PIXEL_FORMAT_GRAYSCALE;
+    (*read_features)->pixel_formats[1]  = SAIL_PIXEL_FORMAT_RGB;
+    (*read_features)->pixel_formats[2]  = SAIL_PIXEL_FORMAT_YCBCR;
+    (*read_features)->pixel_formats[3]  = SAIL_PIXEL_FORMAT_CMYK;
+    (*read_features)->pixel_formats[4]  = SAIL_PIXEL_FORMAT_YCCK;
+    (*read_features)->pixel_formats[5]  = SAIL_PIXEL_FORMAT_RGBX;
+    (*read_features)->pixel_formats[6]  = SAIL_PIXEL_FORMAT_BGR;
+    (*read_features)->pixel_formats[7]  = SAIL_PIXEL_FORMAT_BGRX;
+    (*read_features)->pixel_formats[8]  = SAIL_PIXEL_FORMAT_XBGR;
+    (*read_features)->pixel_formats[9]  = SAIL_PIXEL_FORMAT_XRGB;
+    (*read_features)->pixel_formats[10] = SAIL_PIXEL_FORMAT_RGBA;
+    (*read_features)->pixel_formats[11] = SAIL_PIXEL_FORMAT_BGRA;
+    (*read_features)->pixel_formats[12] = SAIL_PIXEL_FORMAT_ABGR;
+    (*read_features)->pixel_formats[13] = SAIL_PIXEL_FORMAT_ARGB;
+    (*read_features)->pixel_formats[14] = SAIL_PIXEL_FORMAT_RGB565;
+
+    (*read_features)->io_options = SAIL_IO_OPTION_STATIC | SAIL_IO_OPTION_META_INFO;
+
+    return 0;
+}
+
 int SAIL_EXPORT sail_plugin_read_init(struct sail_file *file, struct sail_read_options *read_options) {
 
     if (file == NULL) {

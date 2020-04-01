@@ -55,16 +55,16 @@ const char* sail_plugin_mime_types(void);
 const char* sail_plugin_magic(void);
 
 /*
- * Returns combined plugin features. Use the returned value to determine
- * what a plugin can actually do. E.g. decode, encode, read meta information etc.
- *
- * See SailPluginFeatures.
- */
-int sail_plugin_features(void);
-
-/*
  * Decoding functions.
  */
+
+/*
+ * Assigns possible read features for this plugin. The assigned read features MUST be destroyed later
+ * with sail_read_features_destroy().
+ *
+ * Returns 0 on success or errno on error.
+ */
+int sail_plugin_read_features(struct sail_read_features **read_features);
 
 /*
  * Initializes decoding the specified file using the specified options (or NULL to use defaults).
@@ -121,6 +121,14 @@ int sail_plugin_read_finish(struct sail_file *file, struct sail_image *image);
 /*
  * Encoding functions.
  */
+
+/*
+ * Assigns possible write features for this plugin. The assigned write features MUST be destroyed later
+ * with sail_write_features_destroy().
+ *
+ * Returns 0 on success or errno on error.
+ */
+int sail_plugin_write_features(struct sail_write_features **write_features);
 
 /*
  * Initializes encoding the file using the specified options (or NULL to use defaults).

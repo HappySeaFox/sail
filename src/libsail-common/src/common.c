@@ -117,6 +117,34 @@ void sail_image_destroy(struct sail_image *image) {
     free(image);
 }
 
+int SAIL_EXPORT sail_read_features_alloc(struct sail_read_features **read_features) {
+
+    *read_features = (struct sail_read_features *)malloc(sizeof(struct sail_read_features));
+
+    if (*read_features == NULL) {
+        return ENOMEM;
+    }
+
+    (*read_features)->pixel_formats        = NULL;
+    (*read_features)->pixel_formats_length = 0;
+    (*read_features)->io_options           = 0;
+
+    return 0;
+}
+
+void SAIL_EXPORT sail_read_features_destroy(struct sail_read_features *read_features) {
+
+    if (read_features == NULL) {
+        return;
+    }
+
+    if (read_features->pixel_formats != NULL) {
+        free(read_features->pixel_formats);
+    }
+
+    free(read_features);
+}
+
 int sail_read_options_alloc(struct sail_read_options **read_options) {
 
     *read_options = (struct sail_read_options *)malloc(sizeof(struct sail_read_options));
@@ -138,6 +166,34 @@ void sail_read_options_destroy(struct sail_read_options *read_options) {
     }
 
     free(read_options);
+}
+
+int SAIL_EXPORT sail_write_features_alloc(struct sail_write_features **write_features) {
+
+    *write_features = (struct sail_write_features *)malloc(sizeof(struct sail_write_features));
+
+    if (*write_features == NULL) {
+        return ENOMEM;
+    }
+
+    (*write_features)->pixel_formats        = NULL;
+    (*write_features)->pixel_formats_length = 0;
+    (*write_features)->io_options           = 0;
+
+    return 0;
+}
+
+void SAIL_EXPORT sail_write_features_destroy(struct sail_write_features *write_features) {
+
+    if (write_features == NULL) {
+        return;
+    }
+
+    if (write_features->pixel_formats != NULL) {
+        free(write_features->pixel_formats);
+    }
+
+    free(write_features);
 }
 
 int sail_write_options_alloc(struct sail_write_options **write_options) {
