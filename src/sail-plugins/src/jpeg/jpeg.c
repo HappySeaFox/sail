@@ -12,7 +12,6 @@
 #include "common.h"
 #include "export.h"
 #include "meta_entry_node.h"
-#include "plugin.h"
 #include "utils.h"
 
 /*
@@ -124,13 +123,6 @@ const char* SAIL_EXPORT sail_plugin_mime_types(void) {
 const char* SAIL_EXPORT sail_plugin_magic(void) {
 
     return "\x00FF\x00D8\x00FF";
-}
-
-int SAIL_EXPORT sail_plugin_features(void) {
-
-    return SAIL_PLUGIN_FEATURE_READ_STATIC    |
-            SAIL_PLUGIN_FEATURE_READ_METAINFO |
-            SAIL_PLUGIN_FEATURE_WRITE_STATIC;
 }
 
 int SAIL_EXPORT sail_plugin_read_features(struct sail_read_features **read_features) {
