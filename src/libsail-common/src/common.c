@@ -125,8 +125,8 @@ int sail_read_options_alloc(struct sail_read_options **read_options) {
         return ENOMEM;
     }
 
-    (*read_options)->pixel_format = SAIL_PIXEL_FORMAT_SOURCE;
-    (*read_options)->options      = SAIL_IO_OPTION_META_INFO;
+    (*read_options)->pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;
+    (*read_options)->options      = 0;
 
     return 0;
 }
@@ -148,8 +148,8 @@ int sail_write_options_alloc(struct sail_write_options **write_options) {
         return ENOMEM;
     }
 
-    (*write_options)->pixel_format = SAIL_PIXEL_FORMAT_SOURCE;
-    (*write_options)->options      = SAIL_IO_OPTION_META_INFO;
+    (*write_options)->pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;
+    (*write_options)->options      = 0;
 
     return 0;
 }

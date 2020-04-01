@@ -204,12 +204,8 @@ void SAIL_EXPORT sail_image_destroy(struct sail_image *image);
  */
 
 /*
- * Allocates default read options. The assigned read options MUST be destroyed later
+ * Allocates read options. The assigned read options MUST be destroyed later
  * with sail_read_options_destroy().
- *
- * Default read options:
- *     - pixel format: source
- *     - options: read meta info
  */
 int SAIL_EXPORT sail_read_options_alloc(struct sail_read_options **read_options);
 
@@ -220,12 +216,8 @@ int SAIL_EXPORT sail_read_options_alloc(struct sail_read_options **read_options)
 void SAIL_EXPORT sail_read_options_destroy(struct sail_read_options *read_options);
 
 /*
- * Allocates default write options. The assigned write options MUST be destroyed later
+ * Allocates write options. The assigned write options MUST be destroyed later
  * with sail_write_options_destroy().
- *
- * Default write options:
- *     - pixel format: source
- *     - options: write meta info
  */
 int SAIL_EXPORT sail_write_options_alloc(struct sail_write_options **write_options);
 
