@@ -93,38 +93,8 @@ struct pimpl {
 };
 
 /*
- * Plugin interface.
+ * Decoding functions.
  */
-int SAIL_EXPORT sail_plugin_layout_version(void) {
-
-    return 1;
-}
-
-const char* SAIL_EXPORT sail_plugin_version(void) {
-
-    return "1.3.4.1";
-}
-
-const char* SAIL_EXPORT sail_plugin_description(void) {
-
-    return "JPEG compressed";
-}
-
-const char* SAIL_EXPORT sail_plugin_extensions(void) {
-
-    return "jpg;jpeg;jpe;jif;jfif;jfi";
-}
-
-const char* SAIL_EXPORT sail_plugin_mime_types(void) {
-
-    return "image/jpeg";
-}
-
-const char* SAIL_EXPORT sail_plugin_magic(void) {
-
-    return "\x00FF\x00D8\x00FF";
-}
-
 int SAIL_EXPORT sail_plugin_read_features(struct sail_read_features **read_features) {
 
     int res;
@@ -400,6 +370,9 @@ int SAIL_EXPORT sail_plugin_read_finish(struct sail_file *file, struct sail_imag
     return 0;
 }
 
+/*
+ * Encoding functions.
+ */
 #if 0
 void fmt_codec::getwriteoptions(fmt_writeoptionsabs *opt)
 {

@@ -60,29 +60,41 @@ static int inih_handler(void *data, const char *section, const char *name, const
 
     if (strcmp(name, "layout") == 0) {
         plugin_info->layout = atoi(value);
-    } else if (strcmp(name, "version") == 0) {
-        if ((res = sail_strdup(value, &plugin_info->version)) != 0) {
-            return 0;
-        }
-    } else if (strcmp(name, "description") == 0) {
-        if ((res = sail_strdup(value, &plugin_info->description)) != 0) {
-            return 0;
-        }
-    } else if (strcmp(name, "extensions") == 0) {
-        if ((res = sail_strdup(value, &plugin_info->extensions)) != 0) {
-            return 0;
-        }
-    } else if (strcmp(name, "mime-types") == 0) {
-        if ((res = sail_strdup(value, &plugin_info->mime_types)) != 0) {
-            return 0;
-        }
-    } else if (strcmp(name, "magic") == 0) {
-        if ((res = sail_strdup(value, &plugin_info->magic)) != 0) {
-            return 0;
+        return 1;
+    }
+
+    if (plugin_info->layout == 0) {
+        fprintf(stderr, "SAIL: Plugin layout version is unknown\n");
+        return 0;
+    }
+
+    if (plugin_info->layout == 1) {
+        if (strcmp(name, "version") == 0) {
+            if ((res = sail_strdup(value, &plugin_info->version)) != 0) {
+                return 0;
+            }
+        } else if (strcmp(name, "description") == 0) {
+            if ((res = sail_strdup(value, &plugin_info->description)) != 0) {
+                return 0;
+            }
+        } else if (strcmp(name, "extensions") == 0) {
+            if ((res = sail_strdup(value, &plugin_info->extensions)) != 0) {
+                return 0;
+            }
+        } else if (strcmp(name, "mime-types") == 0) {
+            if ((res = sail_strdup(value, &plugin_info->mime_types)) != 0) {
+                return 0;
+            }
+        } else if (strcmp(name, "magic") == 0) {
+            if ((res = sail_strdup(value, &plugin_info->magic)) != 0) {
+                return 0;
+            }
+        } else {
+            fprintf(stderr, "SAIL: Unsupported plugin configuraton key '%s'\n", name);
+            return 0;  /* error */
         }
     } else {
-        fprintf(stderr, "SAIL: Unsupported plugin configuraton key '%s'\n", name);
-        return 0;  /* error */
+        fprintf(stderr, "SAIL: Unsupported plugin layout version %d\n", plugin_info->layout);
     }
 
     return 1;

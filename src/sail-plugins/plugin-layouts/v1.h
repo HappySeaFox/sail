@@ -11,50 +11,6 @@
 NOT TO BE INCLUDED
 
 /*
- * Plugin-related functions.
- */
-
-/*
- * The loader will use the plugin's layout version to correctly handle the plugin. Unsupported
- * plugin layout versions will be reported.
- *
- * Plugin layout is a list of exported functions. We use plugin layout versions to implement
- * backward compatibility in a simple and maintanable way.
- *
- * This is the only function that is expected to be exported by every plugin. Other exported
- * functions depend on the returned version number.
- */
-int sail_plugin_layout_version(void);
-
-/*
- * Returns a plugin version string. For example: "1.3.4".
- */
-const char* sail_plugin_version(void);
-
-/*
- * Returns a plugin description string. For example: "Windows Bitmap".
- */
-const char* sail_plugin_description(void);
-
-/*
- * Returns a semicolon-separated list of supported file extensions. For example: "bmp" or "bmp;dib".
- */
-const char* sail_plugin_extensions(void);
-
-/*
- * Returns a semicolon-separated list of supported file mime types. For example: "image/x-bmp"
- * or "image/x-bmp;image/x-dib".
- */
-const char* sail_plugin_mime_types(void);
-
-/*
- * Returns a file magic identifier as a regex string. For example: "GIF8[79]a".
- *
- * See https://en.wikipedia.org/wiki/List_of_file_signatures for more.
- */
-const char* sail_plugin_magic(void);
-
-/*
  * Decoding functions.
  */
 
