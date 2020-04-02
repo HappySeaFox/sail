@@ -100,6 +100,8 @@ struct sail_file {
     void *pimpl;
 };
 
+typedef struct sail_file sail_file_t;
+
 struct sail_meta_entry_node;
 
 /*
@@ -147,6 +149,8 @@ struct sail_image {
     int source_pixel_format;
 };
 
+typedef struct sail_image sail_image_t;
+
 /* Reading features. */
 struct sail_read_features {
 
@@ -160,6 +164,8 @@ struct sail_read_features {
     int io_options;
 };
 
+typedef struct sail_read_features sail_read_features_t;
+
 /* Writing features. */
 struct sail_write_features {
 
@@ -172,6 +178,8 @@ struct sail_write_features {
     /* Supported IO manipulation options of writing operations. See SailIoOptions. */
     int io_options;
 };
+
+typedef struct sail_write_features sail_write_features_t;
 
 /* Options to modify reading operations. */
 struct sail_read_options {
@@ -189,6 +197,8 @@ struct sail_read_options {
     int options;
 };
 
+typedef struct sail_read_options sail_read_options_t;
+
 /* Options to modify writing operations. */
 struct sail_write_options {
 
@@ -204,6 +214,8 @@ struct sail_write_options {
     /* IO manipulation options. See SailIoOptions. */
     int options;
 };
+
+typedef struct sail_write_options sail_write_options_t;
 
 /*
  * File functions.
