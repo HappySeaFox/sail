@@ -16,7 +16,7 @@ extern "C" {
  *
  * Returns 0 on success or errno on error.
  */
-int SAIL_EXPORT sail_strdup(char *input, char **output);
+int SAIL_EXPORT sail_strdup(const char *input, char **output);
 
 /*
  * Duplicates the specified number of bytes of the specified input string and stores
@@ -24,7 +24,7 @@ int SAIL_EXPORT sail_strdup(char *input, char **output);
  *
  * Returns 0 on success or errno on error.
  */
-int SAIL_EXPORT sail_strdup_length(char *input, size_t length, char **output);
+int SAIL_EXPORT sail_strdup_length(const char *input, size_t length, char **output);
 
 /*
  * Returns a non-NULL string representation of the specified pixel format.

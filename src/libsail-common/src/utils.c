@@ -6,14 +6,14 @@
 #include "common.h"
 #include "utils.h"
 
-int sail_strdup(char *input, char **output) {
+int sail_strdup(const char *input, char **output) {
 
     if (input == NULL) {
         *output = NULL;
         return 0;
     }
 
-    const size_t len = strlen(input);
+    const size_t len = strlen((char *)input);
 
     *output = (char *)malloc(len+1);
 
@@ -27,7 +27,7 @@ int sail_strdup(char *input, char **output) {
     return 0;
 }
 
-int sail_strdup_length(char *input, size_t length, char **output) {
+int sail_strdup_length(const char *input, size_t length, char **output) {
 
     if (input == NULL) {
         *output = NULL;
