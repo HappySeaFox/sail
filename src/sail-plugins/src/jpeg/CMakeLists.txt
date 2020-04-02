@@ -9,6 +9,10 @@ set_target_properties(jpeg PROPERTIES PREFIX "")
 #
 target_link_libraries(jpeg PRIVATE sail-common)
 
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/jpeg.plugin.info
+                ${CMAKE_CURRENT_BINARY_DIR}/jpeg.plugin.info
+                COPYONLY)
+
 # JPEG external dependency
 #
 target_compile_options(jpeg PRIVATE ${libjpeg_CFLAGS})
