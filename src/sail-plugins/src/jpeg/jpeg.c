@@ -144,13 +144,18 @@ int SAIL_EXPORT sail_plugin_read_init(struct sail_file *file, struct sail_read_o
 
     pimpl->libjpeg_error = false;
 
+    /* Construct default read options. */
     if (read_options == NULL) {
         SAIL_TRY(sail_read_options_alloc(&pimpl->read_options))
+
+        pimpl->read_options->pixel_format = SAIL_PIXEL_FORMAT_RGB;
+        pimpl->read_options->io_options = SAIL_IO_OPTION_STATIC | SAIL_IO_OPTION_META_INFO;
     } else {
         pimpl->read_options = (struct sail_read_options *)malloc(sizeof(struct sail_read_options));
         memcpy(pimpl->read_options, read_options, sizeof(struct sail_read_options));
     }
 
+    /* Error handling setup. */
     pimpl->decompress_context.err = jpeg_std_error(&pimpl->error_context.jpeg_error_mgr);
     pimpl->error_context.jpeg_error_mgr.error_exit = my_error_exit;
 
@@ -159,10 +164,11 @@ int SAIL_EXPORT sail_plugin_read_init(struct sail_file *file, struct sail_read_o
         return EIO;
     }
 
+    /* JPEG setup. */
     jpeg_create_decompress(&pimpl->decompress_context);
     jpeg_stdio_src(&pimpl->decompress_context, file->fptr);
 
-    if (pimpl->read_options->options & SAIL_IO_OPTION_META_INFO) {
+    if (pimpl->read_options->io_options & SAIL_IO_OPTION_META_INFO) {
         jpeg_save_markers(&pimpl->decompress_context, JPEG_COM, 0xffff);
     }
 
@@ -172,15 +178,19 @@ int SAIL_EXPORT sail_plugin_read_init(struct sail_file *file, struct sail_read_o
         return EINVAL;
     }
 
-    if (pimpl->read_options->pixel_format != SAIL_PIXEL_FORMAT_SOURCE) {
-        J_COLOR_SPACE color_space = pixel_format_to_color_space(pimpl->read_options->pixel_format);
+    /* Handle the requested color space. */
+    J_COLOR_SPACE requested_color_space = pixel_format_to_color_space(pimpl->read_options->pixel_format);
 
-        if (pimpl->decompress_context.jpeg_color_space != color_space) {
-            pimpl->decompress_context.out_color_space = color_space;
-            pimpl->decompress_context.quantize_colors = FALSE;
-        }
+    if (pimpl->read_options->pixel_format == SAIL_PIXEL_FORMAT_SOURCE) {
+        pimpl->decompress_context.out_color_space = pimpl->decompress_context.jpeg_color_space;
+    } else {
+        pimpl->decompress_context.out_color_space = requested_color_space;
     }
 
+    /* We don't want colormapped output. */
+    pimpl->decompress_context.quantize_colors = FALSE;
+
+    /* Launch decompression! */
     jpeg_start_decompress(&pimpl->decompress_context);
 
     // TODO
@@ -217,6 +227,7 @@ int SAIL_EXPORT sail_plugin_read_seek_next_frame(struct sail_file *file, struct 
 
     const int bytes_per_line = pimpl->decompress_context.output_width * pimpl->decompress_context.output_components;
 
+    /* Buffer to put scan lines into. libjpeg will automatically free it. */
     pimpl->buffer = (*pimpl->decompress_context.mem->alloc_sarray)((j_common_ptr)&pimpl->decompress_context,
                                                                     JPOOL_IMAGE,
                                                                     bytes_per_line,
@@ -226,14 +237,16 @@ int SAIL_EXPORT sail_plugin_read_seek_next_frame(struct sail_file *file, struct 
         return ENOMEM;
     }
 
+    /* Image properties. */
     (*image)->width               = pimpl->decompress_context.output_width;
     (*image)->height              = pimpl->decompress_context.output_height;
     (*image)->bytes_per_line      = bytes_per_line;
-    (*image)->pixel_format        = SAIL_PIXEL_FORMAT_RGB;
+    (*image)->pixel_format        = color_space_to_pixel_format(pimpl->decompress_context.out_color_space);
     (*image)->passes              = 1;
     (*image)->source_pixel_format = color_space_to_pixel_format(pimpl->decompress_context.jpeg_color_space);
 
-    if (pimpl->read_options->options & SAIL_IO_OPTION_META_INFO) {
+    /* Read meta info. */
+    if (pimpl->read_options->io_options & SAIL_IO_OPTION_META_INFO) {
         jpeg_saved_marker_ptr it = pimpl->decompress_context.marker_list;
         struct sail_meta_entry_node *last_meta_entry_node;
 
