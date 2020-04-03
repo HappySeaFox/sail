@@ -203,11 +203,11 @@ typedef struct sail_write_features sail_write_features_t;
 struct sail_read_options {
 
     /*
-     * Hint to modify output pixel format. This is just a hint, not an obligation. Plugin (or an underlying codec)
-     * may reject the requested pixel format.
+     * Request to modify the output pixel format. Plugin (or an underlying codec) may reject
+     * the requested pixel format.
      *
-     * NOTE: SAIL doesn't provide pixel format conversion capabilities. This hist is passed to an underlying codec
-     * which may reject or ignore it. The actual selected pixel format will be available in sail_image.
+     * NOTE: SAIL doesn't provide pixel format conversion capabilities. This pixel format is passed
+     * to an underlying codec which may reject it with an error.
      */
     int pixel_format;
 
@@ -221,11 +221,11 @@ typedef struct sail_read_options sail_read_options_t;
 struct sail_write_options {
 
     /*
-     * Hint to modify output pixel format. This is just a hint, not an obligation. Plugin (or an underlying codec)
-     * may reject the requested pixel format.
+     * Request to modify the output pixel format. Plugin (or an underlying codec) may reject
+     * the requested pixel format and return an error.
      *
-     * NOTE: SAIL doesn't provide pixel format conversion capabilities. This hist is passed to an underlying codec
-     * which may reject or ignore it.
+     * NOTE: SAIL doesn't provide pixel format conversion capabilities. This pixel format is passed
+     * to an underlying codec which may reject it with an error.
      */
     int pixel_format;
 
