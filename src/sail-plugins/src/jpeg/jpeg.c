@@ -367,6 +367,44 @@ int SAIL_EXPORT sail_plugin_read_finish(struct sail_file *file, struct sail_imag
 /*
  * Encoding functions.
  */
+
+int SAIL_EXPORT sail_plugin_write_features(struct sail_write_features **write_features) {
+
+    SAIL_TRY(sail_write_features_alloc(write_features))
+
+    (*write_features)->pixel_formats_length = 15;
+    (*write_features)->pixel_formats = (int *)malloc((*write_features)->pixel_formats_length * sizeof(int));
+
+    if ((*write_features)->pixel_formats == NULL) {
+        return ENOMEM;
+    }
+
+    (*write_features)->pixel_formats[0]  = SAIL_PIXEL_FORMAT_GRAYSCALE;
+    (*write_features)->pixel_formats[1]  = SAIL_PIXEL_FORMAT_RGB;
+    (*write_features)->pixel_formats[2]  = SAIL_PIXEL_FORMAT_YCBCR;
+    (*write_features)->pixel_formats[3]  = SAIL_PIXEL_FORMAT_CMYK;
+    (*write_features)->pixel_formats[4]  = SAIL_PIXEL_FORMAT_YCCK;
+    (*write_features)->pixel_formats[5]  = SAIL_PIXEL_FORMAT_RGBX;
+    (*write_features)->pixel_formats[6]  = SAIL_PIXEL_FORMAT_BGR;
+    (*write_features)->pixel_formats[7]  = SAIL_PIXEL_FORMAT_BGRX;
+    (*write_features)->pixel_formats[8]  = SAIL_PIXEL_FORMAT_XBGR;
+    (*write_features)->pixel_formats[9]  = SAIL_PIXEL_FORMAT_XRGB;
+    (*write_features)->pixel_formats[10] = SAIL_PIXEL_FORMAT_RGBA;
+    (*write_features)->pixel_formats[11] = SAIL_PIXEL_FORMAT_BGRA;
+    (*write_features)->pixel_formats[12] = SAIL_PIXEL_FORMAT_ABGR;
+    (*write_features)->pixel_formats[13] = SAIL_PIXEL_FORMAT_ARGB;
+    (*write_features)->pixel_formats[14] = SAIL_PIXEL_FORMAT_RGB565;
+
+    (*write_features)->features        = SAIL_PLUGIN_FEATURE_STATIC | SAIL_PLUGIN_FEATURE_META_INFO;
+    (*write_features)->properties      = 0;
+    (*write_features)->passes          = 0;
+    (*write_features)->quality_min     = 0;
+    (*write_features)->quality_max     = 100;
+    (*write_features)->quality_default = 85;
+
+    return 0;
+}
+
 #if 0
 void fmt_codec::getwriteoptions(fmt_writeoptionsabs *opt)
 {
