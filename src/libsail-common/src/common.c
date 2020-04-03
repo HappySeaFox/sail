@@ -10,6 +10,7 @@
 #endif
 
 #include "common.h"
+#include "error.h"
 #include "meta_entry_node.h"
 
 /*
@@ -46,11 +47,7 @@ int sail_alloc_file(const char *filepath, const char *mode, struct sail_file **f
         return errno;
     }
 
-    int res;
-
-    if ((res = sail_alloc_file_private(file)) != 0) {
-        return res;
-    }
+    SAIL_TRY(sail_alloc_file_private(file))
 
     (*file)->fptr = fptr;
 

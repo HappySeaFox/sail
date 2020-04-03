@@ -3,8 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "plugin.h"
+#include "error.h"
 #include "ini.h"
+#include "plugin.h"
 #include "utils.h"
 
 int sail_alloc_plugin_info(struct sail_plugin_info **plugin_info) {
@@ -106,11 +107,7 @@ int sail_plugin_read_info(const char *file, struct sail_plugin_info **plugin_inf
         return EINVAL;
     }
 
-    int res;
-
-    if ((res = sail_alloc_plugin_info(plugin_info)) != 0) {
-        return res;
-    }
+    SAIL_TRY(sail_alloc_plugin_info(plugin_info))
 
     /*
      * Returns 0 on success, line number of first error on parse error (doesn't
