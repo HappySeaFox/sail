@@ -194,7 +194,7 @@ struct sail_read_options {
     int pixel_format;
 
     /* IO manipulation options. See SailIoOptions. */
-    int options;
+    int io_options;
 };
 
 typedef struct sail_read_options sail_read_options_t;
@@ -212,7 +212,7 @@ struct sail_write_options {
     int pixel_format;
 
     /* IO manipulation options. See SailIoOptions. */
-    int options;
+    int io_options;
 };
 
 typedef struct sail_write_options sail_write_options_t;

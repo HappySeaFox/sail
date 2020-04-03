@@ -155,7 +155,7 @@ int sail_read_options_alloc(struct sail_read_options **read_options) {
     }
 
     (*read_options)->pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;
-    (*read_options)->options      = 0;
+    (*read_options)->io_options   = 0;
 
     return 0;
 }
@@ -206,7 +206,7 @@ int sail_write_options_alloc(struct sail_write_options **write_options) {
     }
 
     (*write_options)->pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;
-    (*write_options)->options      = 0;
+    (*write_options)->io_options   = 0;
 
     return 0;
 }
