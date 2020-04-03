@@ -99,6 +99,7 @@ int sail_image_alloc(struct sail_image **image) {
     (*image)->meta_entry_node      = NULL;
     (*image)->properties           = 0;
     (*image)->source_pixel_format  = SAIL_PIXEL_FORMAT_UNKNOWN;
+    (*image)->source_properties    = 0;
 
     return 0;
 }

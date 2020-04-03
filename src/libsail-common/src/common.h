@@ -160,11 +160,14 @@ struct sail_image {
     /* Image meta information. See sail_meta_entry_node. Plugins guarantee that keys and values are non-NULL. */
     struct sail_meta_entry_node *meta_entry_node;
 
-    /* Image properties. See SailImageProperties. */
+    /* Decoded image properties. See SailImageProperties. */
     int properties;
 
     /* Image source pixel format. See SailPixelFormat. */
     int source_pixel_format;
+
+    /* Image source properties. See SailImageProperties. */
+    int source_properties;
 };
 
 typedef struct sail_image sail_image_t;
