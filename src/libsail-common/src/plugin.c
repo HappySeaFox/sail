@@ -7,7 +7,7 @@
 #include "ini.h"
 #include "utils.h"
 
-int sail_plugin_info_alloc(struct sail_plugin_info **plugin_info) {
+int sail_alloc_plugin_info(struct sail_plugin_info **plugin_info) {
 
     *plugin_info = (struct sail_plugin_info *)malloc(sizeof(struct sail_plugin_info));
 
@@ -25,7 +25,7 @@ int sail_plugin_info_alloc(struct sail_plugin_info **plugin_info) {
     return 0;
 }
 
-void sail_plugin_info_destroy(struct sail_plugin_info *plugin_info) {
+void sail_destroy_plugin_info(struct sail_plugin_info *plugin_info) {
 
     if (plugin_info == NULL) {
         return;
@@ -108,7 +108,7 @@ int sail_plugin_read_info(const char *file, struct sail_plugin_info **plugin_inf
 
     int res;
 
-    if ((res = sail_plugin_info_alloc(plugin_info)) != 0) {
+    if ((res = sail_alloc_plugin_info(plugin_info)) != 0) {
         return res;
     }
 
@@ -118,7 +118,7 @@ int sail_plugin_read_info(const char *file, struct sail_plugin_info **plugin_inf
      * error (only when INI_USE_STACK is zero).
      */
     if (ini_parse(file, inih_handler, *plugin_info) != 0) {
-        sail_plugin_info_destroy(*plugin_info);
+        sail_destroy_plugin_info(*plugin_info);
         return EIO;
     }
 

@@ -116,7 +116,7 @@ struct sail_file {
 
     /*
      * Plugin-specific data. A plugin could set pimpl to its plugin-specific data storage and access it
-     * in read or write functions. Will be destroyed automatically in sail_file_destroy().
+     * in read or write functions. Will be destroyed automatically in sail_destroy_file().
      */
     void *pimpl;
 };
@@ -272,34 +272,34 @@ typedef struct sail_write_options sail_write_options_t;
 
 /*
  * Opens the specified image file using the specified mode (as in fopen). The assigned file MUST be destroyed later
- * with sail_file_destroy().
+ * with sail_destroy_file().
  *
  * Returns 0 on success or errno on error.
  */
-int SAIL_EXPORT sail_file_alloc(const char *filepath, const char *mode, struct sail_file **file);
+int SAIL_EXPORT sail_alloc_file(const char *filepath, const char *mode, struct sail_file **file);
 
 /*
  * Closes the specified file and destroys all its internal memory buffers. Does nothing if the file is already closed.
  * The "file" pointer MUST NOT be used anymore after calling this function.
  */
-void SAIL_EXPORT sail_file_destroy(struct sail_file *file);
+void SAIL_EXPORT sail_destroy_file(struct sail_file *file);
 
 /*
  * Image functions.
  */
 
 /*
- * Allocates a new image. The assigned image MUST be destroyed later with sail_image_destroy().
+ * Allocates a new image. The assigned image MUST be destroyed later with sail_destroy_image().
  *
  * Returns 0 on success or errno on error.
  */
-int SAIL_EXPORT sail_image_alloc(struct sail_image **image);
+int SAIL_EXPORT sail_alloc_image(struct sail_image **image);
 
 /*
  * Destroys the specified image and all its internal allocated memory buffers.
  * The "image" pointer MUST NOT be used after calling this function.
  */
-void SAIL_EXPORT sail_image_destroy(struct sail_image *image);
+void SAIL_EXPORT sail_destroy_image(struct sail_image *image);
 
 /*
  * Options functions.
@@ -307,51 +307,51 @@ void SAIL_EXPORT sail_image_destroy(struct sail_image *image);
 
 /*
  * Allocates read features. The assigned read features MUST be destroyed later
- * with sail_read_features_destroy().
+ * with sail_destroy_read_features().
  */
-int SAIL_EXPORT sail_read_features_alloc(struct sail_read_features **read_features);
+int SAIL_EXPORT sail_alloc_read_features(struct sail_read_features **read_features);
 
 /*
  * Destroys the specified read features and all its internal allocated memory buffers.
  * The "read_features" pointer MUST NOT be used after calling this function.
  */
-void SAIL_EXPORT sail_read_features_destroy(struct sail_read_features *read_features);
+void SAIL_EXPORT sail_destroy_read_features(struct sail_read_features *read_features);
 
 /*
  * Allocates read options. The assigned read options MUST be destroyed later
- * with sail_read_options_destroy().
+ * with sail_destroy_read_options().
  */
-int SAIL_EXPORT sail_read_options_alloc(struct sail_read_options **read_options);
+int SAIL_EXPORT sail_alloc_read_options(struct sail_read_options **read_options);
 
 /*
  * Destroys the specified read options and all its internal allocated memory buffers.
  * The "read_options" pointer MUST NOT be used after calling this function.
  */
-void SAIL_EXPORT sail_read_options_destroy(struct sail_read_options *read_options);
+void SAIL_EXPORT sail_destroy_read_options(struct sail_read_options *read_options);
 
 /*
  * Allocates write features. The assigned write features MUST be destroyed later
- * with sail_write_features_destroy().
+ * with sail_destroy_write_features().
  */
-int SAIL_EXPORT sail_write_features_alloc(struct sail_write_features **write_features);
+int SAIL_EXPORT sail_alloc_write_features(struct sail_write_features **write_features);
 
 /*
  * Destroys the specified write features and all its internal allocated memory buffers.
  * The "write_features" pointer MUST NOT be used after calling this function.
  */
-void SAIL_EXPORT sail_write_features_destroy(struct sail_write_features *write_features);
+void SAIL_EXPORT sail_destroy_write_features(struct sail_write_features *write_features);
 
 /*
  * Allocates write options. The assigned write options MUST be destroyed later
- * with sail_write_options_destroy().
+ * with sail_destroy_write_options().
  */
-int SAIL_EXPORT sail_write_options_alloc(struct sail_write_options **write_options);
+int SAIL_EXPORT sail_alloc_write_options(struct sail_write_options **write_options);
 
 /*
  * Destroys the specified write options and all its internal allocated memory buffers.
  * The "write_options" pointer MUST NOT be used after calling this function.
  */
-void SAIL_EXPORT sail_write_options_destroy(struct sail_write_options *write_options);
+void SAIL_EXPORT sail_destroy_write_options(struct sail_write_options *write_options);
 
 /* extern "C" */
 #ifdef __cplusplus

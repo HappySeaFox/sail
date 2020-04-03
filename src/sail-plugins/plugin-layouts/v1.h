@@ -16,7 +16,7 @@ NOT TO BE INCLUDED
 
 /*
  * Assigns possible read features for this plugin. The assigned read features MUST be destroyed later
- * with sail_read_features_destroy().
+ * with sail_destroy_read_features().
  *
  * Returns 0 on success or errno on error.
  */
@@ -37,7 +37,7 @@ int sail_plugin_read_init(struct sail_file *file, struct sail_read_options *read
  * use this method to quickly detect the image dimensions without parsing the whole file or frame.
  *
  * Use sail_plugin_read_seek_next_pass() + sail_plugin_read_scan_line() to actually read the frame.
- * The assigned image MUST be destroyed later with sail_image_destroy().
+ * The assigned image MUST be destroyed later with sail_destroy_image().
  *
  * Returns 0 on success or errno on error.
  */
@@ -82,7 +82,7 @@ int sail_plugin_read_finish(struct sail_file *file, struct sail_image *image);
 
 /*
  * Assigns possible write features for this plugin. The assigned write features MUST be destroyed later
- * with sail_write_features_destroy().
+ * with sail_destroy_write_features().
  *
  * Returns 0 on success or errno on error.
  */
@@ -101,7 +101,7 @@ int sail_plugin_write_init(struct sail_file *file, struct sail_write_options *wr
 /*
  * Seeks to a next frame before writing it. The frame is NOT immediately written. Use sail_plugin_write_seek_next_pass()
  * and sail_plugin_write_scan_line() to actually write a frame. The assigned image MUST be destroyed later
- * with sail_image_destroy().
+ * with sail_destroy_image().
  *
  * Returns 0 on success or errno on error.
  */

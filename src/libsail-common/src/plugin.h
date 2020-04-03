@@ -54,22 +54,22 @@ typedef struct sail_plugin_info sail_plugin_info_t;
 
 /*
  * Allocates a new plugin info object. The assigned plugin info MUST be destroyed later
- * with sail_plugin_info_destroy().
+ * with sail_destroy_plugin_info().
  *
  * Returns 0 on success or errno on error.
  */
-int SAIL_EXPORT sail_plugin_info_alloc(struct sail_plugin_info **plugin_info);
+int SAIL_EXPORT sail_alloc_plugin_info(struct sail_plugin_info **plugin_info);
 
 /*
  * Destroys the specified plugin_info and all its internal allocated memory buffers.
  * The "plugin_info" pointer MUST NOT be used after calling this function.
  */
-void SAIL_EXPORT sail_plugin_info_destroy(struct sail_plugin_info *plugin_info);
+void SAIL_EXPORT sail_destroy_plugin_info(struct sail_plugin_info *plugin_info);
 
 /*
  * Reads SAIL plugin info from the specified file and stores the parsed information into
  * the specified plugin info object. The assigned plugin info MUST be destroyed later
- * with sail_plugin_info_destroy().
+ * with sail_destroy_plugin_info().
  *
  * Returns 0 on success or errno on error.
  */
