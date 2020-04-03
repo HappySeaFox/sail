@@ -57,7 +57,12 @@ enum SailPixelFormat {
 
 /* Image properties. */
 enum SailImageProperties {
+
+    /* Image needs flipping vertically. */
     SAIL_IMAGE_FLIPPED_VERTICALLY = 1 << 0,
+
+    /* Image is interlaced. */
+    SAIL_IMAGE_INTERLACED         = 1 << 1,
 
     /* Not to be used. Resize the enum for future elements. */
     SAIL_IMAGE_PROPERTY_RESIZE_ENUM_TO_INT = INT_MAX
