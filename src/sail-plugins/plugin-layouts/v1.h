@@ -23,17 +23,18 @@ NOT TO BE INCLUDED
 int sail_plugin_read_features(struct sail_read_features **read_features);
 
 /*
- * Initializes decoding the specified file using the specified options (or NULL to use defaults).
- * The specified read options will be copied into an internal buffer. For a list of default options
- * please see sail_read_options_alloc().
+ * Starts decoding the specified file using the specified options (or NULL to use defaults).
+ * The specified read options will be copied into an internal buffer.
+ *
+ * If the specified read options is NULL, plugin-specific defaults will be used.
  *
  * Returns 0 on success or errno on error.
  */
 int sail_plugin_read_init(struct sail_file *file, struct sail_read_options *read_options);
 
 /*
- * Seeks to the next frame. The frame is NOT immediately read or parsed by most plugins. One could
- * use this method to quickly detect the image dimensions without parsing the whole file.
+ * Seeks to the next frame. The frame is NOT immediately read or decoded by most SAIL plugins. One could
+ * use this method to quickly detect the image dimensions without parsing the whole file or frame.
  *
  * Use sail_plugin_read_seek_next_pass() + sail_plugin_read_scan_line() to actually read the frame.
  * The assigned image MUST be destroyed later with sail_image_destroy().
@@ -51,7 +52,8 @@ int sail_plugin_read_seek_next_pass(struct sail_file *file, struct sail_image *i
 
 /*
  * Reads a scan line of the current image in the current pass. The specified scan line must be
- * allocated by the caller and must be be large enough.
+ * allocated by the caller and must be be large enough. Use bytes_per_line field to calculate
+ * the necessary length of a scan line.
  *
  * Returns 0 on success or errno on error.
  */
@@ -87,9 +89,10 @@ int sail_plugin_read_finish(struct sail_file *file, struct sail_image *image);
 int sail_plugin_write_features(struct sail_write_features **write_features);
 
 /*
- * Initializes encoding the file using the specified options (or NULL to use defaults).
- * The specified write options will be copied into an internal buffer. For a list of default options
- * please see sail_write_options_alloc().
+ * Starts encoding the specified file using the specified options (or NULL to use defaults).
+ * The specified write options will be copied into an internal buffer.
+ *
+ * If the specified write options is NULL, plugin-specific defaults will be used.
  *
  * Returns 0 on success or errno on error.
  */
