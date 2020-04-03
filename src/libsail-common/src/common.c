@@ -181,6 +181,11 @@ int SAIL_EXPORT sail_write_features_alloc(struct sail_write_features **write_fea
     (*write_features)->pixel_formats        = NULL;
     (*write_features)->pixel_formats_length = 0;
     (*write_features)->features             = 0;
+    (*write_features)->properties           = 0;
+    (*write_features)->passes               = 0;
+    (*write_features)->quality_min          = 0;
+    (*write_features)->quality_max          = 0;
+    (*write_features)->quality_default      = 0;
 
     return 0;
 }
@@ -208,6 +213,7 @@ int sail_write_options_alloc(struct sail_write_options **write_options) {
 
     (*write_options)->pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;
     (*write_options)->io_options   = 0;
+    (*write_options)->quality      = 0;
 
     return 0;
 }

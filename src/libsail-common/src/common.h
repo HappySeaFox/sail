@@ -59,13 +59,13 @@ enum SailPixelFormat {
 enum SailImageProperties {
 
     /* Image needs flipping vertically. */
-    SAIL_IMAGE_FLIPPED_VERTICALLY = 1 << 0,
+    SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY = 1 << 0,
 
     /* Image is interlaced. */
-    SAIL_IMAGE_INTERLACED         = 1 << 1,
+    SAIL_IMAGE_PROPERTY_INTERLACED         = 1 << 1,
 
     /* Not to be used. Resize the enum for future elements. */
-    SAIL_IMAGE_PROPERTY_RESIZE_ENUM_TO_INT = INT_MAX
+    SAIL_IMAGE_PROPERTIES_RESIZE_ENUM_TO_INT = INT_MAX
 };
 
 /* Plugin features. */
@@ -85,6 +85,9 @@ enum SailPluginFeatures {
 
     /* Ability to read or write EXIF meta information. */
     SAIL_PLUGIN_FEATURE_EXIF       = 1 << 4,
+
+    /* Ability to read or write interlaced images. */
+    SAIL_PLUGIN_FEATURE_INTERLACED = 1 << 5,
 
     /* Not to be used. Resize the enum for future elements. */
     SAIL_PLUGIN_FEATURES_RESIZE_ENUM_TO_INT = INT_MAX
@@ -198,6 +201,24 @@ struct sail_write_features {
 
     /* Supported plugin features of writing operations. See SailPluginFeatures. */
     int features;
+
+    /*
+     * Required image properties. For example, in input image must be flipped by the caller before writing
+     * it with SAIL (or supply scan lines in a reverse order). See SailImageProperties.
+     */
+    int properties;
+
+    /* Number of passes to write an interlaced image. */
+    int passes;
+
+    /* Minimum quality setting. This field is plugin-specific. For example: 0.*/
+    int quality_min;
+
+    /* Maximum quality setting. This field is plugin-specific. For example: 100. */
+    int quality_max;
+
+    /* Default quality setting. For example: 85. */
+    int quality_default;
 };
 
 typedef struct sail_write_features sail_write_features_t;
@@ -234,6 +255,9 @@ struct sail_write_options {
 
     /* IO manipulation options. See SailIoOptions. */
     int io_options;
+
+    /* Requested quality. Must be in the range specified by sail_write_features. */
+    int quality;
 };
 
 typedef struct sail_write_options sail_write_options_t;
