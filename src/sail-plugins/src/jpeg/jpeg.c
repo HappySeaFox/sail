@@ -10,6 +10,7 @@
 #include <jpeglib.h>
 
 #include "common.h"
+#include "error.h"
 #include "export.h"
 #include "meta_entry_node.h"
 #include "utils.h"
@@ -97,11 +98,7 @@ struct pimpl {
  */
 int SAIL_EXPORT sail_plugin_read_features(struct sail_read_features **read_features) {
 
-    int res;
-
-    if ((res = sail_read_features_alloc(read_features)) != 0) {
-        return res;
-    }
+    SAIL_TRY(sail_read_features_alloc(read_features))
 
     (*read_features)->pixel_formats_length = 15;
     (*read_features)->pixel_formats = (int *)malloc((*read_features)->pixel_formats_length * sizeof(int));
@@ -147,12 +144,8 @@ int SAIL_EXPORT sail_plugin_read_init(struct sail_file *file, struct sail_read_o
 
     pimpl->libjpeg_error = false;
 
-    int res;
-
     if (read_options == NULL) {
-        if ((res = sail_read_options_alloc(&pimpl->read_options)) != 0) {
-            return res;
-        }
+        SAIL_TRY(sail_read_options_alloc(&pimpl->read_options))
     } else {
         pimpl->read_options = (struct sail_read_options *)malloc(sizeof(struct sail_read_options));
         memcpy(pimpl->read_options, read_options, sizeof(struct sail_read_options));
@@ -208,11 +201,7 @@ int SAIL_EXPORT sail_plugin_read_seek_next_frame(struct sail_file *file, struct 
         return ENOMEM;
     }
 
-    int res;
-
-    if((res = sail_image_alloc(image)) != 0) {
-        return res;
-    }
+    SAIL_TRY(sail_image_alloc(image))
 
     if (setjmp(pimpl->error_context.setjmp_buffer) != 0) {
         pimpl->libjpeg_error = true;
@@ -252,19 +241,11 @@ int SAIL_EXPORT sail_plugin_read_seek_next_frame(struct sail_file *file, struct 
             if(it->marker == JPEG_COM) {
                 struct sail_meta_entry_node *meta_entry_node;
 
-                if ((res = sail_alloc_meta_entry_node(&meta_entry_node)) != 0) {
-                    return res;
-                }
-
-                if ((res = sail_strdup("Comment", &meta_entry_node->key)) != 0) {
-                    sail_destroy_meta_entry_node(meta_entry_node);
-                    return res;
-                }
-
-                if ((res = sail_strdup_length((char *)it->data, it->data_length, &meta_entry_node->value)) != 0) {
-                    sail_destroy_meta_entry_node(meta_entry_node);
-                    return res;
-                }
+                SAIL_TRY(sail_alloc_meta_entry_node(&meta_entry_node))
+                SAIL_TRY(sail_strdup("Comment", &meta_entry_node->key),
+                            /* cleanup */ sail_destroy_meta_entry_node(meta_entry_node))
+                SAIL_TRY(sail_strdup_length((const char *)it->data, it->data_length, &meta_entry_node->value),
+                            /* cleanup */ sail_destroy_meta_entry_node(meta_entry_node))
 
                 if ((*image)->meta_entry_node == NULL) {
                     (*image)->meta_entry_node = last_meta_entry_node = meta_entry_node;
