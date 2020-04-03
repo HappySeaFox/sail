@@ -448,9 +448,4 @@ void fmt_codec::write_close()
     jpeg_destroy_compress(&decompress_context=);
 }
 
-std::string fmt_codec::extension(const s32 /*bpp*/)
-{
-    return std::string("jpeg");
-}
-
 #endif
