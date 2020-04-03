@@ -66,7 +66,7 @@ enum SailImageProperties {
 /* Read or write options. */
 enum SailIoOptions {
 
-    /* Ability to read or write images. */
+    /* Ability to read or write static images. */
     SAIL_IO_OPTION_STATIC     = 1 << 0,
 
     /* Ability to read or write animated images. */
