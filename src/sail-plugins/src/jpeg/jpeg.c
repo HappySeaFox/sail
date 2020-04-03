@@ -395,12 +395,12 @@ int SAIL_EXPORT sail_plugin_write_features(struct sail_write_features **write_fe
     (*write_features)->pixel_formats[13] = SAIL_PIXEL_FORMAT_ARGB;
     (*write_features)->pixel_formats[14] = SAIL_PIXEL_FORMAT_RGB565;
 
-    (*write_features)->features        = SAIL_PLUGIN_FEATURE_STATIC | SAIL_PLUGIN_FEATURE_META_INFO;
-    (*write_features)->properties      = 0;
-    (*write_features)->passes          = 0;
-    (*write_features)->quality_min     = 0;
-    (*write_features)->quality_max     = 100;
-    (*write_features)->quality_default = 85;
+    (*write_features)->features            = SAIL_PLUGIN_FEATURE_STATIC | SAIL_PLUGIN_FEATURE_META_INFO;
+    (*write_features)->properties          = 0;
+    (*write_features)->passes              = 0;
+    (*write_features)->compression_min     = 0;
+    (*write_features)->compression_max     = 100;
+    (*write_features)->compression_default = 15;
 
     return 0;
 }

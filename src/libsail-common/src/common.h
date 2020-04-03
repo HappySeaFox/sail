@@ -211,14 +211,18 @@ struct sail_write_features {
     /* Number of passes to write an interlaced image. */
     int passes;
 
-    /* Minimum quality setting. This field is plugin-specific. For example: 0.*/
-    int quality_min;
+    /*
+     * Minimum compression value. For lossy codecs more compression means less quality and vice versa.
+     * For loseless codecs more compression means nothing else but a smaller file size. This field is
+     * plugin-specific. For example: 0.
+     */
+    int compression_min;
 
-    /* Maximum quality setting. This field is plugin-specific. For example: 100. */
-    int quality_max;
+    /* Maximum compression value. This field is plugin-specific. For example: 100. */
+    int compression_max;
 
-    /* Default quality setting. For example: 85. */
-    int quality_default;
+    /* Default compression value. For example: 85. */
+    int compression_default;
 };
 
 typedef struct sail_write_features sail_write_features_t;
@@ -256,8 +260,8 @@ struct sail_write_options {
     /* IO manipulation options. See SailIoOptions. */
     int io_options;
 
-    /* Requested quality. Must be in the range specified by sail_write_features. */
-    int quality;
+    /* Requested compression. Must be in the range specified by sail_write_features. */
+    int compression;
 };
 
 typedef struct sail_write_options sail_write_options_t;
