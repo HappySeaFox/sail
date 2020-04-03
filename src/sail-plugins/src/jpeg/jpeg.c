@@ -123,7 +123,7 @@ int SAIL_EXPORT sail_plugin_read_features(struct sail_read_features **read_featu
     (*read_features)->pixel_formats[13] = SAIL_PIXEL_FORMAT_ARGB;
     (*read_features)->pixel_formats[14] = SAIL_PIXEL_FORMAT_RGB565;
 
-    (*read_features)->io_options = SAIL_IO_OPTION_STATIC | SAIL_IO_OPTION_META_INFO;
+    (*read_features)->features = SAIL_PLUGIN_FEATURE_STATIC | SAIL_PLUGIN_FEATURE_META_INFO;
 
     return 0;
 }
@@ -149,7 +149,7 @@ int SAIL_EXPORT sail_plugin_read_init(struct sail_file *file, struct sail_read_o
         SAIL_TRY(sail_read_options_alloc(&pimpl->read_options))
 
         pimpl->read_options->pixel_format = SAIL_PIXEL_FORMAT_RGB;
-        pimpl->read_options->io_options = SAIL_IO_OPTION_STATIC | SAIL_IO_OPTION_META_INFO;
+        pimpl->read_options->io_options = SAIL_IO_OPTION_META_INFO;
     } else {
         pimpl->read_options = (struct sail_read_options *)malloc(sizeof(struct sail_read_options));
         memcpy(pimpl->read_options, read_options, sizeof(struct sail_read_options));

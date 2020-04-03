@@ -128,7 +128,7 @@ int SAIL_EXPORT sail_read_features_alloc(struct sail_read_features **read_featur
 
     (*read_features)->pixel_formats        = NULL;
     (*read_features)->pixel_formats_length = 0;
-    (*read_features)->io_options           = 0;
+    (*read_features)->features             = 0;
 
     return 0;
 }
@@ -179,7 +179,7 @@ int SAIL_EXPORT sail_write_features_alloc(struct sail_write_features **write_fea
 
     (*write_features)->pixel_formats        = NULL;
     (*write_features)->pixel_formats_length = 0;
-    (*write_features)->io_options           = 0;
+    (*write_features)->features             = 0;
 
     return 0;
 }

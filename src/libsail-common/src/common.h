@@ -63,23 +63,36 @@ enum SailImageProperties {
     SAIL_IMAGE_PROPERTY_RESIZE_ENUM_TO_INT = INT_MAX
 };
 
+/* Plugin features. */
+enum SailPluginFeatures {
+
+    /* Ability to read or write static images. */
+    SAIL_PLUGIN_FEATURE_STATIC     = 1 << 0,
+
+    /* Ability to read or write animated images. */
+    SAIL_PLUGIN_FEATURE_ANIMATED   = 1 << 1,
+
+    /* Ability to read or write multipaged (not animated) images. */
+    SAIL_PLUGIN_FEATURE_MULTIPAGED = 1 << 2,
+
+    /* Ability to read or write simple image meta information like JPEG comments. */
+    SAIL_PLUGIN_FEATURE_META_INFO  = 1 << 3,
+
+    /* Ability to read or write EXIF meta information. */
+    SAIL_PLUGIN_FEATURE_EXIF       = 1 << 4,
+
+    /* Not to be used. Resize the enum for future elements. */
+    SAIL_PLUGIN_FEATURES_RESIZE_ENUM_TO_INT = INT_MAX
+};
+
 /* Read or write options. */
 enum SailIoOptions {
 
-    /* Ability to read or write static images. */
-    SAIL_IO_OPTION_STATIC     = 1 << 0,
-
-    /* Ability to read or write animated images. */
-    SAIL_IO_OPTION_ANIMATED   = 1 << 1,
-
-    /* Ability to read or write multipaged (not animated) images. */
-    SAIL_IO_OPTION_MULTIPAGED = 1 << 2,
-
     /* Ability to read or write simple image meta information like JPEG comments. */
-    SAIL_IO_OPTION_META_INFO  = 1 << 3,
+    SAIL_IO_OPTION_META_INFO = 1 << 0,
 
     /* Ability to read or write EXIF meta information. */
-    SAIL_IO_OPTION_EXIF       = 1 << 4,
+    SAIL_IO_OPTION_EXIF      = 1 << 1,
 
     /* Not to be used. Resize the enum for future elements. */
     SAIL_IO_OPTIONS_RESIZE_ENUM_TO_INT = INT_MAX
@@ -160,8 +173,8 @@ struct sail_read_features {
     /* The length of pixel_formats. */
     int pixel_formats_length;
 
-    /* Supported IO manipulation options of reading operations. See SailIoOptions. */
-    int io_options;
+    /* Supported plugin features of reading operations. See SailPluginFeatures. */
+    int features;
 };
 
 typedef struct sail_read_features sail_read_features_t;
@@ -175,8 +188,8 @@ struct sail_write_features {
     /* The length of pixel_formats. */
     int pixel_formats_length;
 
-    /* Supported IO manipulation options of writing operations. See SailIoOptions. */
-    int io_options;
+    /* Supported plugin features of writing operations. See SailPluginFeatures. */
+    int features;
 };
 
 typedef struct sail_write_features sail_write_features_t;
