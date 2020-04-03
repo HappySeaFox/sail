@@ -115,31 +115,31 @@ struct sail_image {
     /* Image height. */
     int height;
 
-    /* Bytes per line. */
+    /* Bytes per line. Plugins will always set this field to a non-zero value. */
     int bytes_per_line;
 
     /* Image pixel format. See SailPixelFormat. */
     int pixel_format;
 
-    /* Number of passes needed to read or write an entire image frame. */
+    /* Number of passes needed to read or write an entire image frame. 1 by default. */
     int passes;
 
     /* Is the image a frame in an animation. */
     bool animated;
 
-    /* Delay in milliseconds if the image is a frame in an animation. */
+    /* Delay in milliseconds if the image is a frame in an animation or 0 otherwise. */
     int delay;
 
     /* Palette pixel format. */
     int palette_pixel_format;
 
-    /* Palette if a "source" pixel format was chosen and the image has a palette. */
+    /* Palette if the image has a palette and the requested pixel format assumes having a palette. */
     void *palette;
 
     /* Size of the palette data in bytes. */
     int palette_size;
 
-    /* Image meta information. See sail_meta_entry_node. Plugins guarantee that keys and values are non_NULL. */
+    /* Image meta information. See sail_meta_entry_node. Plugins guarantee that keys and values are non-NULL. */
     struct sail_meta_entry_node *meta_entry_node;
 
     /* Image properties. See SailImageProperties. */
