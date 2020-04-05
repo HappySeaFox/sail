@@ -398,11 +398,11 @@ int SAIL_EXPORT sail_plugin_write_features_v1(struct sail_write_features **write
     (*write_features)->features                 = SAIL_PLUGIN_FEATURE_STATIC | SAIL_PLUGIN_FEATURE_META_INFO;
     (*write_features)->properties               = 0;
     (*write_features)->passes                   = 0;
+    (*write_features)->compression_types        = NULL;
+    (*write_features)->compression_types_length = 0;
     (*write_features)->compression_min          = 0;
     (*write_features)->compression_max          = 100;
     (*write_features)->compression_default      = 15;
-    (*write_features)->compression_types        = NULL;
-    (*write_features)->compression_types_length = 0;
 
     return 0;
 }

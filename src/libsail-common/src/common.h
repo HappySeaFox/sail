@@ -219,6 +219,20 @@ struct sail_write_features {
     int passes;
 
     /*
+     * A list of supported pixels compression types by this plugin. NULL if no compression types are available.
+     * In most cases plugins mutually exclusive support either compression levels or compression types.
+     *
+     * For example:
+     *
+     *     1. The JPEG plugin supports only compression levels (compression_min, compression_max, compression_default).
+     *     2. The TIFF plugin supports only compression types (RLE or no compression at all).
+     */
+    int *compression_types;
+
+    /* The length of compression_types. */
+    int compression_types_length;
+
+    /*
      * Minimum compression value. For lossy codecs more compression means less quality and vice versa.
      * For loseless codecs more compression means nothing else but a smaller file size. This field is
      * plugin-specific. If compression_min == compression_max == 0, no compression tuning is available.
@@ -234,20 +248,6 @@ struct sail_write_features {
 
     /* Default compression value. For example: 15. */
     int compression_default;
-
-    /*
-     * A list of supported pixels compression types by this plugin. NULL if no compression types are available.
-     * In most cases plugins mutually exclusive support either compression levels or compression types.
-     *
-     * For example:
-     *
-     *     1. The JPEG plugin supports only compression levels (compression_min, compression_max, compression_default).
-     *     2. The TIFF plugin supports only compression types (RLE or no).
-     */
-    int *compression_types;
-
-    /* The length of compression_types. */
-    int compression_types_length;
 };
 
 typedef struct sail_write_features sail_write_features_t;
@@ -285,10 +285,21 @@ struct sail_write_options {
     /* IO manipulation options. See SailIoOptions. */
     int io_options;
 
-    /* Compression type. For example: SAIL_COMPRESSION_RLE. See SailCompression. */
+    /*
+     * Compression type. For example: SAIL_COMPRESSION_RLE. See SailCompression.
+     * In most cases plugins mutually exclusive support either compression levels or compression types.
+     *
+     * For example:
+     *
+     *     1. The JPEG plugin supports only compression levels (compression_min, compression_max, compression_default).
+     *     2. The TIFF plugin supports only compression types (RLE or no compression at all).
+     */
     int compression_type;
 
-    /* Requested compression value. Must be in the range specified by sail_write_features. */
+    /*
+     * Requested compression value. Must be in the range specified by compression_min and compression_max
+     * in sail_write_features.
+     */
     int compression;
 };
 
