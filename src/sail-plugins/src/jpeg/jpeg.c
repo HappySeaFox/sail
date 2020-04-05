@@ -96,7 +96,7 @@ struct pimpl {
 /*
  * Decoding functions.
  */
-int SAIL_EXPORT sail_plugin_read_features(struct sail_read_features **read_features) {
+int SAIL_EXPORT sail_plugin_read_features_v1(struct sail_read_features **read_features) {
 
     SAIL_TRY(sail_alloc_read_features(read_features));
 
@@ -128,7 +128,7 @@ int SAIL_EXPORT sail_plugin_read_features(struct sail_read_features **read_featu
     return 0;
 }
 
-int SAIL_EXPORT sail_plugin_read_init(struct sail_file *file, struct sail_read_options *read_options) {
+int SAIL_EXPORT sail_plugin_read_init_v1(struct sail_file *file, struct sail_read_options *read_options) {
 
     if (file == NULL) {
         return EINVAL;
@@ -199,7 +199,7 @@ int SAIL_EXPORT sail_plugin_read_init(struct sail_file *file, struct sail_read_o
     return 0;
 }
 
-int SAIL_EXPORT sail_plugin_read_seek_next_frame(struct sail_file *file, struct sail_image **image) {
+int SAIL_EXPORT sail_plugin_read_seek_next_frame_v1(struct sail_file *file, struct sail_image **image) {
 
     if (file == NULL) {
         return EINVAL;
@@ -275,7 +275,7 @@ int SAIL_EXPORT sail_plugin_read_seek_next_frame(struct sail_file *file, struct 
     return 0;
 }
 
-int SAIL_EXPORT sail_plugin_read_seek_next_pass(struct sail_file *file, struct sail_image *image) {
+int SAIL_EXPORT sail_plugin_read_seek_next_pass_v1(struct sail_file *file, struct sail_image *image) {
 
     if (file == NULL || image == NULL) {
         return EINVAL;
@@ -284,7 +284,7 @@ int SAIL_EXPORT sail_plugin_read_seek_next_pass(struct sail_file *file, struct s
     return 0;
 }
 
-int SAIL_EXPORT sail_plugin_read_scan_line(struct sail_file *file, struct sail_image *image, unsigned char *scanline) {
+int SAIL_EXPORT sail_plugin_read_scan_line_v1(struct sail_file *file, struct sail_image *image, unsigned char *scanline) {
 
     if (file == NULL || image == NULL || scanline == NULL) {
         return EINVAL;
@@ -314,7 +314,7 @@ int SAIL_EXPORT sail_plugin_read_scan_line(struct sail_file *file, struct sail_i
     return 0;
 }
 
-int SAIL_EXPORT sail_plugin_read_alloc_scan_line(struct sail_file *file, struct sail_image *image, unsigned char **scanline) {
+int SAIL_EXPORT sail_plugin_read_alloc_scan_line_v1(struct sail_file *file, struct sail_image *image, unsigned char **scanline) {
 
     if (file == NULL || image == NULL) {
         return EINVAL;
@@ -334,10 +334,10 @@ int SAIL_EXPORT sail_plugin_read_alloc_scan_line(struct sail_file *file, struct 
         return ENOMEM;
     }
 
-    return sail_plugin_read_scan_line(file, image, *scanline);
+    return sail_plugin_read_scan_line_v1(file, image, *scanline);
 }
 
-int SAIL_EXPORT sail_plugin_read_finish(struct sail_file *file, struct sail_image *image) {
+int SAIL_EXPORT sail_plugin_read_finish_v1(struct sail_file *file, struct sail_image *image) {
 
     if (file == NULL) {
         return EINVAL;
@@ -368,7 +368,7 @@ int SAIL_EXPORT sail_plugin_read_finish(struct sail_file *file, struct sail_imag
  * Encoding functions.
  */
 
-int SAIL_EXPORT sail_plugin_write_features(struct sail_write_features **write_features) {
+int SAIL_EXPORT sail_plugin_write_features_v1(struct sail_write_features **write_features) {
 
     SAIL_TRY(sail_alloc_write_features(write_features));
 
