@@ -87,11 +87,29 @@ static J_COLOR_SPACE pixel_format_to_color_space(int pixel_format) {
  */
 struct pimpl {
     struct jpeg_decompress_struct decompress_context;
+    struct jpeg_compress_struct compress_context;
     struct my_error_context error_context;
     JSAMPARRAY buffer;
     bool libjpeg_error;
     struct sail_read_options *read_options;
+    struct sail_write_options *write_options;
 };
+
+static int alloc_pimpl(struct pimpl **pimpl) {
+
+    *pimpl = (struct pimpl *)malloc(sizeof(struct pimpl));
+
+    if (*pimpl == NULL) {
+        return ENOMEM;
+    }
+
+    (*pimpl)->buffer        = NULL;
+    (*pimpl)->libjpeg_error = false;
+    (*pimpl)->read_options  = NULL;
+    (*pimpl)->write_options = NULL;
+
+    return 0;
+}
 
 /*
  * Decoding functions.
@@ -134,15 +152,11 @@ int SAIL_EXPORT sail_plugin_read_init_v1(struct sail_file *file, struct sail_rea
         return EINVAL;
     }
 
-    struct pimpl *pimpl = (struct pimpl *)malloc(sizeof(struct pimpl));
+    struct pimpl *pimpl;
 
-    if (pimpl == NULL) {
-        return ENOMEM;
-    }
+    SAIL_TRY(alloc_pimpl(&pimpl));
 
     file->pimpl = pimpl;
-
-    pimpl->libjpeg_error = false;
 
     /* Construct default read options. */
     if (read_options == NULL) {
@@ -152,6 +166,11 @@ int SAIL_EXPORT sail_plugin_read_init_v1(struct sail_file *file, struct sail_rea
         pimpl->read_options->io_options = SAIL_IO_OPTION_META_INFO;
     } else {
         pimpl->read_options = (struct sail_read_options *)malloc(sizeof(struct sail_read_options));
+
+        if (pimpl->read_options == NULL) {
+            return ENOMEM;
+        }
+
         memcpy(pimpl->read_options, read_options, sizeof(struct sail_read_options));
     }
 
@@ -172,7 +191,7 @@ int SAIL_EXPORT sail_plugin_read_init_v1(struct sail_file *file, struct sail_rea
         jpeg_save_markers(&pimpl->decompress_context, JPEG_COM, 0xffff);
     }
 
-    jpeg_read_header(&pimpl->decompress_context, TRUE);
+    jpeg_read_header(&pimpl->decompress_context, true);
 
     if (pimpl->read_options->pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN) {
         return EINVAL;
@@ -188,7 +207,7 @@ int SAIL_EXPORT sail_plugin_read_init_v1(struct sail_file *file, struct sail_rea
     }
 
     /* We don't want colormapped output. */
-    pimpl->decompress_context.quantize_colors = FALSE;
+    pimpl->decompress_context.quantize_colors = false;
 
     /* Launch decompression! */
     jpeg_start_decompress(&pimpl->decompress_context);
@@ -407,62 +426,90 @@ int SAIL_EXPORT sail_plugin_write_features_v1(struct sail_write_features **write
     return 0;
 }
 
+int SAIL_EXPORT sail_plugin_write_init_v1(struct sail_file *file, struct sail_write_options *write_options) {
+
+    if (file == NULL) {
+        return EINVAL;
+    }
+
+    struct pimpl *pimpl;
+
+    SAIL_TRY(alloc_pimpl(&pimpl));
+
+    file->pimpl = pimpl;
+
+    /* Construct default write options. */
+    if (write_options == NULL) {
+        SAIL_TRY(sail_alloc_write_options(&pimpl->write_options));
+
+        pimpl->write_options->pixel_format = SAIL_PIXEL_FORMAT_SOURCE;
+        pimpl->write_options->io_options = SAIL_IO_OPTION_META_INFO;
+    } else {
+        pimpl->write_options = (struct sail_write_options *)malloc(sizeof(struct sail_write_options));
+
+        if (pimpl->write_options == NULL) {
+            return ENOMEM;
+        }
+
+        memcpy(pimpl->write_options, write_options, sizeof(struct sail_write_options));
+    }
+
+    /* Error handling setup. */
+    pimpl->compress_context.err = jpeg_std_error(&pimpl->error_context.jpeg_error_mgr);
+    pimpl->error_context.jpeg_error_mgr.error_exit = my_error_exit;
+
+    if (setjmp(pimpl->error_context.setjmp_buffer) != 0) {
+        pimpl->libjpeg_error = true;
+        return EIO;
+    }
+
+    /* JPEG setup. */
+    jpeg_create_compress(&pimpl->compress_context);
+    jpeg_stdio_dest(&pimpl->compress_context, file->fptr);
+
+    return 0;
+}
+
+int SAIL_EXPORT sail_plugin_write_seek_next_frame_v1(struct sail_file *file, struct sail_image *image) {
+
+    if (file == NULL || image == NULL) {
+        return EINVAL;
+    }
+
+    struct pimpl *pimpl = (struct pimpl *)file->pimpl;
+
+    if (pimpl == NULL) {
+        return ENOMEM;
+    }
+
+    if (setjmp(pimpl->error_context.setjmp_buffer) != 0) {
+        pimpl->libjpeg_error = true;
+        return EIO;
+    }
+
+    pimpl->compress_context.image_width = image->width;
+    pimpl->compress_context.image_height = image->height;
+    pimpl->compress_context.input_components = sail_bits_per_pixel(pimpl->write_options->pixel_format) / 8;
+    pimpl->compress_context.in_color_space = pixel_format_to_color_space(pimpl->write_options->pixel_format);
+
+    jpeg_set_defaults(&pimpl->compress_context);
+    jpeg_set_quality(&pimpl->compress_context, 100-pimpl->write_options->compression, true);
+
+    jpeg_start_compress(&pimpl->compress_context, true);
+
+    return 0;
+}
+
+int SAIL_EXPORT sail_plugin_write_seek_next_pass_v1(struct sail_file *file, struct sail_image *image) {
+
+    if (file == NULL || image == NULL) {
+        return EINVAL;
+    }
+
+    return 0;
+}
+
 #if 0
-void fmt_codec::getwriteoptions(fmt_writeoptionsabs *opt)
-{
-    opt->interlaced = false;
-    opt->compression_scheme = CompressionInternal;
-    opt->compression_min = 0;
-    opt->compression_max = 100;
-    opt->compression_def = 25;
-    opt->passes = 1;
-    opt->needflip = false;
-    opt->palette_flags = 0 | fmt_image::pure32;
-}
-
-s32 fmt_codec::write_init(const std::string &file, const fmt_image &image, const fmt_writeoptions &opt)
-{
-    if(!image.w || !image.h || file.empty())
-	return SQE_W_WRONGPARAMS;
-
-    writeimage = image;
-    writeopt = opt;
-
-    m_fptr = fopen(file.c_str(), "wb");
-
-    if(!m_fptr)
-        return SQE_W_NOFILE;
-
-    decompress_context.err = jpeg_std_error(&error_context);
-
-    jpeg_create_compress(&decompress_context);
-
-    jpeg_stdio_dest(&decompress_context, m_fptr);
-
-    decompress_context.image_width = image.w;
-    decompress_context.image_height = image.h;
-    decompress_context.input_components = 3;
-    decompress_context.in_color_space = JCS_RGB;
-
-    jpeg_set_defaults(&decompress_context);
-
-    jpeg_set_quality(&decompress_context, 100-opt.compression_level, true);
-
-    jpeg_start_compress(&decompress_context, true);
-
-    return SQE_OK;
-}
-
-s32 fmt_codec::write_next()
-{
-    return SQE_OK;
-}
-
-s32 fmt_codec::write_next_pass()
-{
-    return SQE_OK;
-}
-
 s32 fmt_codec::write_scanline(RGBA *scan)
 {
     RGB sr[writeimage.w];
