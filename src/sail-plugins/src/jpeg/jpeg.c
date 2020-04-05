@@ -98,7 +98,7 @@ struct pimpl {
  */
 int SAIL_EXPORT sail_plugin_read_features(struct sail_read_features **read_features) {
 
-    SAIL_TRY(sail_alloc_read_features(read_features))
+    SAIL_TRY(sail_alloc_read_features(read_features));
 
     (*read_features)->pixel_formats_length = 15;
     (*read_features)->pixel_formats = (int *)malloc((*read_features)->pixel_formats_length * sizeof(int));
@@ -146,7 +146,7 @@ int SAIL_EXPORT sail_plugin_read_init(struct sail_file *file, struct sail_read_o
 
     /* Construct default read options. */
     if (read_options == NULL) {
-        SAIL_TRY(sail_alloc_read_options(&pimpl->read_options))
+        SAIL_TRY(sail_alloc_read_options(&pimpl->read_options));
 
         pimpl->read_options->pixel_format = SAIL_PIXEL_FORMAT_RGB;
         pimpl->read_options->io_options = SAIL_IO_OPTION_META_INFO;
@@ -211,7 +211,7 @@ int SAIL_EXPORT sail_plugin_read_seek_next_frame(struct sail_file *file, struct 
         return ENOMEM;
     }
 
-    SAIL_TRY(sail_alloc_image(image))
+    SAIL_TRY(sail_alloc_image(image));
 
     if (setjmp(pimpl->error_context.setjmp_buffer) != 0) {
         pimpl->libjpeg_error = true;
@@ -254,11 +254,11 @@ int SAIL_EXPORT sail_plugin_read_seek_next_frame(struct sail_file *file, struct 
             if(it->marker == JPEG_COM) {
                 struct sail_meta_entry_node *meta_entry_node;
 
-                SAIL_TRY(sail_alloc_meta_entry_node(&meta_entry_node))
+                SAIL_TRY(sail_alloc_meta_entry_node(&meta_entry_node));
                 SAIL_TRY(sail_strdup("Comment", &meta_entry_node->key),
-                            /* cleanup */ sail_destroy_meta_entry_node(meta_entry_node))
+                            /* cleanup */ sail_destroy_meta_entry_node(meta_entry_node));
                 SAIL_TRY(sail_strdup_length((const char *)it->data, it->data_length, &meta_entry_node->value),
-                            /* cleanup */ sail_destroy_meta_entry_node(meta_entry_node))
+                            /* cleanup */ sail_destroy_meta_entry_node(meta_entry_node));
 
                 if ((*image)->meta_entry_node == NULL) {
                     (*image)->meta_entry_node = last_meta_entry_node = meta_entry_node;
@@ -370,7 +370,7 @@ int SAIL_EXPORT sail_plugin_read_finish(struct sail_file *file, struct sail_imag
 
 int SAIL_EXPORT sail_plugin_write_features(struct sail_write_features **write_features) {
 
-    SAIL_TRY(sail_alloc_write_features(write_features))
+    SAIL_TRY(sail_alloc_write_features(write_features));
 
     (*write_features)->pixel_formats_length = 15;
     (*write_features)->pixel_formats = (int *)malloc((*write_features)->pixel_formats_length * sizeof(int));

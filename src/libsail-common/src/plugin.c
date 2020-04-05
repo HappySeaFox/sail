@@ -107,7 +107,7 @@ int sail_plugin_read_info(const char *file, struct sail_plugin_info **plugin_inf
         return EINVAL;
     }
 
-    SAIL_TRY(sail_alloc_plugin_info(plugin_info))
+    SAIL_TRY(sail_alloc_plugin_info(plugin_info));
 
     /*
      * Returns 0 on success, line number of first error on parse error (doesn't

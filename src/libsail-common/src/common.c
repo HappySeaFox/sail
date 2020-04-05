@@ -47,7 +47,7 @@ int sail_alloc_file(const char *filepath, const char *mode, struct sail_file **f
         return errno;
     }
 
-    SAIL_TRY(sail_alloc_file_private(file))
+    SAIL_TRY(sail_alloc_file_private(file));
 
     (*file)->fptr = fptr;
 
