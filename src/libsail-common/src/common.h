@@ -68,6 +68,13 @@ enum SailImageProperties {
     SAIL_IMAGE_PROPERTIES_RESIZE_ENUM_TO_INT = INT_MAX
 };
 
+/* Pixels compression types. */
+enum SailCompression {
+
+    /* RLE compression. */
+    SAIL_COMPRESSION_RLE = 1 << 0,
+};
+
 /* Plugin features. */
 enum SailPluginFeatures {
 
@@ -214,19 +221,33 @@ struct sail_write_features {
     /*
      * Minimum compression value. For lossy codecs more compression means less quality and vice versa.
      * For loseless codecs more compression means nothing else but a smaller file size. This field is
-     * plugin-specific. If compression_min == compression_max == 0, no compression is available.
+     * plugin-specific. If compression_min == compression_max == 0, no compression tuning is available.
      * For example: 0.
      */
     int compression_min;
 
     /*
      * Maximum compression value. This field is plugin-specific. If compression_min == compression_max == 0,
-     * no compression is available. For example: 100.
+     * no compression tuning is available. For example: 100.
      */
     int compression_max;
 
     /* Default compression value. For example: 15. */
     int compression_default;
+
+    /*
+     * A list of supported pixels compression types by this plugin. NULL if no compression types are available.
+     * In most cases plugins mutually exclusive support either compression levels or compression types.
+     *
+     * For example:
+     *
+     *     1. The JPEG plugin supports only compression levels (compression_min, compression_max, compression_default).
+     *     2. The TIFF plugin supports only compression types (RLE or no).
+     */
+    int *compression_types;
+
+    /* The length of compression_types. */
+    int compression_types_length;
 };
 
 typedef struct sail_write_features sail_write_features_t;
@@ -264,7 +285,10 @@ struct sail_write_options {
     /* IO manipulation options. See SailIoOptions. */
     int io_options;
 
-    /* Requested compression. Must be in the range specified by sail_write_features. */
+    /* Compression type. For example: SAIL_COMPRESSION_RLE. See SailCompression. */
+    int compression_type;
+
+    /* Requested compression value. Must be in the range specified by sail_write_features. */
     int compression;
 };
 

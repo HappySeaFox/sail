@@ -175,14 +175,16 @@ int SAIL_EXPORT sail_alloc_write_features(struct sail_write_features **write_fea
         return ENOMEM;
     }
 
-    (*write_features)->pixel_formats        = NULL;
-    (*write_features)->pixel_formats_length = 0;
-    (*write_features)->features             = 0;
-    (*write_features)->properties           = 0;
-    (*write_features)->passes               = 0;
-    (*write_features)->compression_min      = 0;
-    (*write_features)->compression_max      = 0;
-    (*write_features)->compression_default  = 0;
+    (*write_features)->pixel_formats            = NULL;
+    (*write_features)->pixel_formats_length     = 0;
+    (*write_features)->features                 = 0;
+    (*write_features)->properties               = 0;
+    (*write_features)->passes                   = 0;
+    (*write_features)->compression_min          = 0;
+    (*write_features)->compression_max          = 0;
+    (*write_features)->compression_default      = 0;
+    (*write_features)->compression_types        = NULL;
+    (*write_features)->compression_types_length = 0;
 
     return 0;
 }
@@ -195,6 +197,10 @@ void SAIL_EXPORT sail_destroy_write_features(struct sail_write_features *write_f
 
     if (write_features->pixel_formats != NULL) {
         free(write_features->pixel_formats);
+    }
+
+    if (write_features->compression_types != NULL) {
+        free(write_features->compression_types);
     }
 
     free(write_features);
