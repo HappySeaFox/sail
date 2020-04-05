@@ -314,7 +314,7 @@ int SAIL_EXPORT sail_plugin_read_scan_line_v1(struct sail_file *file, struct sai
     return 0;
 }
 
-int SAIL_EXPORT sail_plugin_read_alloc_scan_line_v1(struct sail_file *file, struct sail_image *image, unsigned char **scanline) {
+int SAIL_EXPORT sail_plugin_read_scan_line_v2(struct sail_file *file, struct sail_image *image, unsigned char **scanline) {
 
     if (file == NULL || image == NULL) {
         return EINVAL;

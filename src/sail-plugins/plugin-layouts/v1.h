@@ -60,14 +60,6 @@ int sail_plugin_read_seek_next_pass_v1(struct sail_file *file, struct sail_image
 int sail_plugin_read_scan_line_v1(struct sail_file *file, struct sail_image *image, unsigned char *scanline);
 
 /*
- * Reads a scan line of the current image in the current pass. The assigned scan line MUST be freed
- * later with free().
- *
- * Returns 0 on success or errno on error.
- */
-int sail_plugin_read_alloc_scan_line_v1(struct sail_file *file, struct sail_image *image, unsigned char **scanline);
-
-/*
  * Finilizes reading operation. No more readings are possible after calling this function.
  * This function doesn't close the file. It just stops decoding. Use sail_file_close()
  * to actually close the file.
