@@ -18,6 +18,8 @@
 /*
  * Plugin-specific data types.
  */
+static const int COMPRESSION_DEFAULT = 15;
+
 struct my_error_context {
     struct jpeg_error_mgr jpeg_error_mgr;
     jmp_buf setjmp_buffer;
@@ -421,7 +423,7 @@ int SAIL_EXPORT sail_plugin_write_features_v1(struct sail_write_features **write
     (*write_features)->compression_types_length = 0;
     (*write_features)->compression_min          = 0;
     (*write_features)->compression_max          = 100;
-    (*write_features)->compression_default      = 15;
+    (*write_features)->compression_default      = COMPRESSION_DEFAULT;
 
     return 0;
 }
@@ -498,7 +500,10 @@ int SAIL_EXPORT sail_plugin_write_seek_next_frame_v1(struct sail_file *file, str
     pimpl->compress_context.in_color_space = pixel_format_to_color_space(pimpl->write_options->pixel_format);
 
     jpeg_set_defaults(&pimpl->compress_context);
-    jpeg_set_quality(&pimpl->compress_context, 100-pimpl->write_options->compression, true);
+    const int compression = pimpl->write_options->compression == 0
+                            ? COMPRESSION_DEFAULT
+                            : pimpl->write_options->compression;
+    jpeg_set_quality(&pimpl->compress_context, 100-compression, true);
 
     jpeg_start_compress(&pimpl->compress_context, true);
 
@@ -531,7 +536,7 @@ int SAIL_EXPORT sail_plugin_write_seek_next_pass_v1(struct sail_file *file, stru
 
 int SAIL_EXPORT sail_plugin_write_scan_line_v1(struct sail_file *file, struct sail_image *image, void *scanline) {
 
-    if (file == NULL || image == NULL) {
+    if (file == NULL || image == NULL || scanline == NULL) {
         return EINVAL;
     }
 
