@@ -92,12 +92,11 @@ int sail_plugin_write_init_v1(struct sail_file *file, struct sail_write_options 
 
 /*
  * Seeks to a next frame before writing it. The frame is NOT immediately written. Use sail_plugin_write_seek_next_pass()
- * and sail_plugin_write_scan_line() to actually write a frame. The assigned image MUST be destroyed later
- * with sail_destroy_image().
+ * and sail_plugin_write_scan_line() to actually write a frame.
  *
  * Returns 0 on success or errno on error.
  */
-int sail_plugin_write_seek_next_frame_v1(struct sail_file *file, struct sail_image **image);
+int sail_plugin_write_seek_next_frame_v1(struct sail_file *file, struct sail_image *image);
 
 /*
  * Seeks to a next pass before writing it if the specified image is interlaced. Does nothing otherwise.
