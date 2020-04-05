@@ -502,6 +502,21 @@ int SAIL_EXPORT sail_plugin_write_seek_next_frame_v1(struct sail_file *file, str
 
     jpeg_start_compress(&pimpl->compress_context, true);
 
+    /* Write meta info. */
+    if (pimpl->write_options->io_options & SAIL_IO_OPTION_META_INFO && image->meta_entry_node != NULL) {
+
+        struct sail_meta_entry_node *meta_entry_node = image->meta_entry_node;
+
+        while (meta_entry_node != NULL) {
+            jpeg_write_marker(&pimpl->compress_context,
+                                JPEG_COM,
+                                (JOCTET *)meta_entry_node->value,
+                                strlen(meta_entry_node->value));
+
+            meta_entry_node = meta_entry_node->next;
+        }
+    }
+
     return 0;
 }
 
