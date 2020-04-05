@@ -509,30 +509,53 @@ int SAIL_EXPORT sail_plugin_write_seek_next_pass_v1(struct sail_file *file, stru
     return 0;
 }
 
-#if 0
-s32 fmt_codec::write_scanline(RGBA *scan)
-{
-    RGB sr[writeimage.w];
+int SAIL_EXPORT sail_plugin_write_scan_line_v1(struct sail_file *file, struct sail_image *image, void *scanline) {
 
-    for(s32 s = 0;s < writeimage.w;s++)
-    {
-        memcpy(sr+s, scan+s, sizeof(RGB));
+    if (file == NULL || image == NULL) {
+        return EINVAL;
     }
 
-    JSAMPROW row_pointer = (JSAMPLE *)sr;
+    struct pimpl *pimpl = (struct pimpl *)file->pimpl;
 
-    (void)jpeg_write_scanlines(&decompress_context, &row_pointer, 1);
+    if (pimpl == NULL) {
+        return ENOMEM;
+    }
 
-    return SQE_OK;
+    if (pimpl->libjpeg_error) {
+        return EIO;
+    }
+
+    if (setjmp(pimpl->error_context.setjmp_buffer) != 0) {
+        pimpl->libjpeg_error = true;
+        return EIO;
+    }
+
+    JSAMPROW row = (JSAMPROW)scanline;
+
+    jpeg_write_scanlines(&pimpl->compress_context, &row, 1);
+
+    return 0;
 }
 
-void fmt_codec::write_close()
-{
-    jpeg_finish_compress(&decompress_context);
+int SAIL_EXPORT sail_plugin_write_finish_v1(struct sail_file *file, struct sail_image *image) {
 
-    fclose(m_fptr);
+    if (file == NULL || image == NULL) {
+        return EINVAL;
+    }
 
-    jpeg_destroy_compress(&decompress_context=);
+    struct pimpl *pimpl = (struct pimpl *)file->pimpl;
+
+    if (pimpl == NULL) {
+        return ENOMEM;
+    }
+
+    if (setjmp(pimpl->error_context.setjmp_buffer) != 0) {
+        pimpl->libjpeg_error = true;
+        return EIO;
+    }
+
+    jpeg_finish_compress(&pimpl->compress_context);
+    jpeg_destroy_compress(&pimpl->compress_context);
+
+    return 0;
 }
-
-#endif
