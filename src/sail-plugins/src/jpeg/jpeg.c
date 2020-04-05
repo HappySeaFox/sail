@@ -454,6 +454,11 @@ int SAIL_EXPORT sail_plugin_write_init_v1(struct sail_file *file, struct sail_wr
         memcpy(pimpl->write_options, write_options, sizeof(struct sail_write_options));
     }
 
+    if (pimpl->write_options->pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN ||
+            pimpl->write_options->pixel_format == SAIL_PIXEL_FORMAT_SOURCE) {
+        return EINVAL;
+    }
+
     /* Error handling setup. */
     pimpl->compress_context.err = jpeg_std_error(&pimpl->error_context.jpeg_error_mgr);
     pimpl->error_context.jpeg_error_mgr.error_exit = my_error_exit;
@@ -548,6 +553,8 @@ int SAIL_EXPORT sail_plugin_write_finish_v1(struct sail_file *file, struct sail_
     if (pimpl == NULL) {
         return ENOMEM;
     }
+
+    sail_destroy_write_options(pimpl->write_options);
 
     if (setjmp(pimpl->error_context.setjmp_buffer) != 0) {
         pimpl->libjpeg_error = true;
