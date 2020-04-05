@@ -214,14 +214,18 @@ struct sail_write_features {
     /*
      * Minimum compression value. For lossy codecs more compression means less quality and vice versa.
      * For loseless codecs more compression means nothing else but a smaller file size. This field is
-     * plugin-specific. For example: 0.
+     * plugin-specific. If compression_min == compression_max == 0, no compression is available.
+     * For example: 0.
      */
     int compression_min;
 
-    /* Maximum compression value. This field is plugin-specific. For example: 100. */
+    /*
+     * Maximum compression value. This field is plugin-specific. If compression_min == compression_max == 0,
+     * no compression is available. For example: 100.
+     */
     int compression_max;
 
-    /* Default compression value. For example: 85. */
+    /* Default compression value. For example: 15. */
     int compression_default;
 };
 
