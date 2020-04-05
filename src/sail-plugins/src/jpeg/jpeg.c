@@ -284,7 +284,7 @@ int SAIL_EXPORT sail_plugin_read_seek_next_pass_v1(struct sail_file *file, struc
     return 0;
 }
 
-int SAIL_EXPORT sail_plugin_read_scan_line_v1(struct sail_file *file, struct sail_image *image, unsigned char *scanline) {
+int SAIL_EXPORT sail_plugin_read_scan_line_v1(struct sail_file *file, struct sail_image *image, void *scanline) {
 
     if (file == NULL || image == NULL || scanline == NULL) {
         return EINVAL;
@@ -314,7 +314,7 @@ int SAIL_EXPORT sail_plugin_read_scan_line_v1(struct sail_file *file, struct sai
     return 0;
 }
 
-int SAIL_EXPORT sail_plugin_read_scan_line_v2(struct sail_file *file, struct sail_image *image, unsigned char **scanline) {
+int SAIL_EXPORT sail_plugin_read_scan_line_v2(struct sail_file *file, struct sail_image *image, void **scanline) {
 
     if (file == NULL || image == NULL) {
         return EINVAL;
@@ -328,7 +328,7 @@ int SAIL_EXPORT sail_plugin_read_scan_line_v2(struct sail_file *file, struct sai
 
     const int color_components = pimpl->decompress_context.output_components;
 
-    *scanline = (unsigned char *)malloc(image->width * color_components);
+    *scanline = malloc(image->width * color_components);
 
     if (*scanline == NULL) {
         return ENOMEM;

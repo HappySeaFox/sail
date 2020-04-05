@@ -57,7 +57,7 @@ int sail_plugin_read_seek_next_pass_v1(struct sail_file *file, struct sail_image
  *
  * Returns 0 on success or errno on error.
  */
-int sail_plugin_read_scan_line_v1(struct sail_file *file, struct sail_image *image, unsigned char *scanline);
+int sail_plugin_read_scan_line_v1(struct sail_file *file, struct sail_image *image, void *scanline);
 
 /*
  * Finilizes reading operation. No more readings are possible after calling this function.
