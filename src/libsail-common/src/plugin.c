@@ -114,10 +114,18 @@ int sail_plugin_read_info(const char *file, struct sail_plugin_info **plugin_inf
      * stop on first error), -1 on file open error, or -2 on memory allocation
      * error (only when INI_USE_STACK is zero).
      */
-    if (ini_parse(file, inih_handler, *plugin_info) != 0) {
-        sail_destroy_plugin_info(*plugin_info);
-        return EIO;
+    const int code = ini_parse(file, inih_handler, *plugin_info);
+
+    if (code == 0) {
+        return 0;
     }
 
-    return 0;
+    sail_destroy_plugin_info(*plugin_info);
+
+    switch (code) {
+        case -1: return errno;
+        case -2: return ENOMEM;
+
+        default: return SAIL_ERROR_READ_PLUGIN_INFO;
+    }
 }

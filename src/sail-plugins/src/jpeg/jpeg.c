@@ -152,9 +152,7 @@ int SAIL_EXPORT sail_plugin_read_features_v1(struct sail_read_features **read_fe
 
 int SAIL_EXPORT sail_plugin_read_init_v1(struct sail_file *file, struct sail_read_options *read_options) {
 
-    if (file == NULL) {
-        return EINVAL;
-    }
+    SAIL_CHECK_FILE(file);
 
     struct pimpl *pimpl;
 
@@ -224,9 +222,7 @@ int SAIL_EXPORT sail_plugin_read_init_v1(struct sail_file *file, struct sail_rea
 
 int SAIL_EXPORT sail_plugin_read_seek_next_frame_v1(struct sail_file *file, struct sail_image **image) {
 
-    if (file == NULL) {
-        return EINVAL;
-    }
+    SAIL_CHECK_FILE(file);
 
     struct pimpl *pimpl = (struct pimpl *)file->pimpl;
 
@@ -278,10 +274,10 @@ int SAIL_EXPORT sail_plugin_read_seek_next_frame_v1(struct sail_file *file, stru
                 struct sail_meta_entry_node *meta_entry_node;
 
                 SAIL_TRY(sail_alloc_meta_entry_node(&meta_entry_node));
-                SAIL_TRY(sail_strdup("Comment", &meta_entry_node->key),
-                            /* cleanup */ sail_destroy_meta_entry_node(meta_entry_node));
-                SAIL_TRY(sail_strdup_length((const char *)it->data, it->data_length, &meta_entry_node->value),
-                            /* cleanup */ sail_destroy_meta_entry_node(meta_entry_node));
+                SAIL_TRY_OR_CLEANUP(sail_strdup("Comment", &meta_entry_node->key),
+                                    /* cleanup */ sail_destroy_meta_entry_node(meta_entry_node));
+                SAIL_TRY_OR_CLEANUP(sail_strdup_length((const char *)it->data, it->data_length, &meta_entry_node->value),
+                                    /* cleanup */ sail_destroy_meta_entry_node(meta_entry_node));
 
                 if ((*image)->meta_entry_node == NULL) {
                     (*image)->meta_entry_node = last_meta_entry_node = meta_entry_node;
@@ -300,18 +296,17 @@ int SAIL_EXPORT sail_plugin_read_seek_next_frame_v1(struct sail_file *file, stru
 
 int SAIL_EXPORT sail_plugin_read_seek_next_pass_v1(struct sail_file *file, struct sail_image *image) {
 
-    if (file == NULL || image == NULL) {
-        return EINVAL;
-    }
+    SAIL_CHECK_FILE(file);
+    SAIL_CHECK_IMAGE(image);
 
     return 0;
 }
 
 int SAIL_EXPORT sail_plugin_read_scan_line_v1(struct sail_file *file, struct sail_image *image, void *scanline) {
 
-    if (file == NULL || image == NULL || scanline == NULL) {
-        return EINVAL;
-    }
+    SAIL_CHECK_FILE(file);
+    SAIL_CHECK_IMAGE(image);
+    SAIL_CHECK_SCAN_LINE(scanline);
 
     struct pimpl *pimpl = (struct pimpl *)file->pimpl;
 
@@ -339,9 +334,8 @@ int SAIL_EXPORT sail_plugin_read_scan_line_v1(struct sail_file *file, struct sai
 
 int SAIL_EXPORT sail_plugin_read_scan_line_v2(struct sail_file *file, struct sail_image *image, void **scanline) {
 
-    if (file == NULL || image == NULL) {
-        return EINVAL;
-    }
+    SAIL_CHECK_FILE(file);
+    SAIL_CHECK_IMAGE(image);
 
     struct pimpl *pimpl = (struct pimpl *)file->pimpl;
 
@@ -362,11 +356,8 @@ int SAIL_EXPORT sail_plugin_read_scan_line_v2(struct sail_file *file, struct sai
 
 int SAIL_EXPORT sail_plugin_read_finish_v1(struct sail_file *file, struct sail_image *image) {
 
-    if (file == NULL) {
-        return EINVAL;
-    }
-
-    (void)image;
+    SAIL_CHECK_FILE(file);
+    SAIL_CHECK_IMAGE(image);
 
     struct pimpl *pimpl = (struct pimpl *)file->pimpl;
 
@@ -432,9 +423,7 @@ int SAIL_EXPORT sail_plugin_write_features_v1(struct sail_write_features **write
 
 int SAIL_EXPORT sail_plugin_write_init_v1(struct sail_file *file, struct sail_write_options *write_options) {
 
-    if (file == NULL) {
-        return EINVAL;
-    }
+    SAIL_CHECK_FILE(file);
 
     struct pimpl *pimpl;
 
@@ -458,9 +447,14 @@ int SAIL_EXPORT sail_plugin_write_init_v1(struct sail_file *file, struct sail_wr
         memcpy(pimpl->write_options, write_options, sizeof(struct sail_write_options));
     }
 
+    /* Sanity check. */
     if (pimpl->write_options->pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN ||
             pimpl->write_options->pixel_format == SAIL_PIXEL_FORMAT_SOURCE) {
-        return EINVAL;
+        return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+    }
+
+    if (pimpl->write_options->compression_type != 0) {
+        return SAIL_UNSUPPORTED_COMPRESSION_TYPE;
     }
 
     /* Error handling setup. */
@@ -481,9 +475,8 @@ int SAIL_EXPORT sail_plugin_write_init_v1(struct sail_file *file, struct sail_wr
 
 int SAIL_EXPORT sail_plugin_write_seek_next_frame_v1(struct sail_file *file, struct sail_image *image) {
 
-    if (file == NULL || image == NULL) {
-        return EINVAL;
-    }
+    SAIL_CHECK_FILE(file);
+    SAIL_CHECK_IMAGE(image);
 
     struct pimpl *pimpl = (struct pimpl *)file->pimpl;
 
@@ -529,18 +522,17 @@ int SAIL_EXPORT sail_plugin_write_seek_next_frame_v1(struct sail_file *file, str
 
 int SAIL_EXPORT sail_plugin_write_seek_next_pass_v1(struct sail_file *file, struct sail_image *image) {
 
-    if (file == NULL || image == NULL) {
-        return EINVAL;
-    }
+    SAIL_CHECK_FILE(file);
+    SAIL_CHECK_IMAGE(image);
 
     return 0;
 }
 
 int SAIL_EXPORT sail_plugin_write_scan_line_v1(struct sail_file *file, struct sail_image *image, void *scanline) {
 
-    if (file == NULL || image == NULL || scanline == NULL) {
-        return EINVAL;
-    }
+    SAIL_CHECK_FILE(file);
+    SAIL_CHECK_IMAGE(image);
+    SAIL_CHECK_SCAN_LINE(scanline);
 
     struct pimpl *pimpl = (struct pimpl *)file->pimpl;
 
@@ -566,9 +558,8 @@ int SAIL_EXPORT sail_plugin_write_scan_line_v1(struct sail_file *file, struct sa
 
 int SAIL_EXPORT sail_plugin_write_finish_v1(struct sail_file *file, struct sail_image *image) {
 
-    if (file == NULL || image == NULL) {
-        return EINVAL;
-    }
+    SAIL_CHECK_FILE(file);
+    SAIL_CHECK_IMAGE(image);
 
     struct pimpl *pimpl = (struct pimpl *)file->pimpl;
 
