@@ -195,8 +195,8 @@ int SAIL_EXPORT sail_plugin_read_init_v1(struct sail_file *file, struct sail_rea
 
     jpeg_read_header(&pimpl->decompress_context, true);
 
-    if (pimpl->read_options->pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN) {
-        return EINVAL;
+    if (pixel_format_to_color_space(pimpl->read_options->pixel_format) == JCS_UNKNOWN) {
+        return SAIL_UNSUPPORTED_PIXEL_FORMAT;
     }
 
     /* Handle the requested color space. */
@@ -448,8 +448,7 @@ int SAIL_EXPORT sail_plugin_write_init_v1(struct sail_file *file, struct sail_wr
     }
 
     /* Sanity check. */
-    if (pimpl->write_options->pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN ||
-            pimpl->write_options->pixel_format == SAIL_PIXEL_FORMAT_SOURCE) {
+    if (pixel_format_to_color_space(pimpl->write_options->pixel_format) == JCS_UNKNOWN) {
         return SAIL_UNSUPPORTED_PIXEL_FORMAT;
     }
 
