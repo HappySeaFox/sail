@@ -11,9 +11,9 @@ typedef int sail_error_t;
 /*
  * SAIL error codes. TODO.
  */
-#define SAIL_FILE_PTR_NULL                (SAIL_ERROR_THRESHOLD+1)
-#define SAIL_IMAGE_PTR_NULL               (SAIL_ERROR_THRESHOLD+2)
-#define SAIL_SCAN_LINE_PTR_NULL           (SAIL_ERROR_THRESHOLD+3)
+#define SAIL_FILE_NULL_PTR                (SAIL_ERROR_THRESHOLD+1)
+#define SAIL_IMAGE_NULL_PTR               (SAIL_ERROR_THRESHOLD+2)
+#define SAIL_SCAN_LINE_NULL_PTR           (SAIL_ERROR_THRESHOLD+3)
 #define SAIL_INCORRECT_IMAGE_DIMENSIONS   (SAIL_ERROR_THRESHOLD+4)
 #define SAIL_ERROR_READ_PLUGIN_INFO       (SAIL_ERROR_THRESHOLD+5)
 #define SAIL_UNSUPPORTED_PIXEL_FORMAT     (SAIL_ERROR_THRESHOLD+6)
@@ -28,15 +28,15 @@ typedef int sail_error_t;
  */
 #define SAIL_CHECK_FILE(file)      \
     if (file == NULL) {            \
-        return SAIL_FILE_PTR_NULL; \
+        return SAIL_FILE_NULL_PTR; \
     }                              \
     if (file->fptr == NULL) {      \
-        return SAIL_FILE_PTR_NULL; \
+        return SAIL_FILE_NULL_PTR; \
     }
 
 #define SAIL_CHECK_IMAGE(image)                    \
     if (image == NULL) {                           \
-        return SAIL_IMAGE_PTR_NULL;                \
+        return SAIL_IMAGE_NULL_PTR;                \
     }                                              \
     if (image->width <= 0 || image->height <= 0) { \
         return SAIL_INCORRECT_IMAGE_DIMENSIONS;    \
@@ -44,7 +44,7 @@ typedef int sail_error_t;
 
 #define SAIL_CHECK_SCAN_LINE(scan)      \
     if (scan == NULL) {                 \
-        return SAIL_SCAN_LINE_PTR_NULL; \
+        return SAIL_SCAN_LINE_NULL_PTR; \
     }
 
 /*
