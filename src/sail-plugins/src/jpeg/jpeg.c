@@ -493,7 +493,8 @@ sail_error_t SAIL_EXPORT sail_plugin_write_seek_next_frame_v1(struct sail_file *
     pimpl->compress_context.in_color_space = pixel_format_to_color_space(pimpl->write_options->pixel_format);
 
     jpeg_set_defaults(&pimpl->compress_context);
-    const int compression = pimpl->write_options->compression < COMPRESSION_MIN
+    const int compression = (pimpl->write_options->compression < COMPRESSION_MIN ||
+                                pimpl->write_options->compression > COMPRESSION_MAX)
                             ? COMPRESSION_DEFAULT
                             : pimpl->write_options->compression;
     jpeg_set_quality(&pimpl->compress_context, /* to quality */COMPRESSION_MAX-compression, true);
