@@ -1,4 +1,3 @@
-#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -10,7 +9,7 @@ int sail_alloc_meta_entry_node(struct sail_meta_entry_node **meta_entry_node) {
     *meta_entry_node = (struct sail_meta_entry_node *)malloc(sizeof(struct sail_meta_entry_node));
 
     if (*meta_entry_node == NULL) {
-        return ENOMEM;
+        return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
     (*meta_entry_node)->next = NULL;

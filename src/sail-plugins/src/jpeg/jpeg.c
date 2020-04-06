@@ -1,6 +1,5 @@
 #include "config.h"
 
-#include <errno.h>
 #include <setjmp.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -104,7 +103,7 @@ static int alloc_pimpl(struct pimpl **pimpl) {
     *pimpl = (struct pimpl *)malloc(sizeof(struct pimpl));
 
     if (*pimpl == NULL) {
-        return ENOMEM;
+        return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
     (*pimpl)->buffer        = NULL;
@@ -126,7 +125,7 @@ int SAIL_EXPORT sail_plugin_read_features_v1(struct sail_read_features **read_fe
     (*read_features)->pixel_formats = (int *)malloc((*read_features)->pixel_formats_length * sizeof(int));
 
     if ((*read_features)->pixel_formats == NULL) {
-        return ENOMEM;
+        return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
     (*read_features)->pixel_formats[0]  = SAIL_PIXEL_FORMAT_GRAYSCALE;
@@ -170,7 +169,7 @@ int SAIL_EXPORT sail_plugin_read_init_v1(struct sail_file *file, struct sail_rea
         pimpl->read_options = (struct sail_read_options *)malloc(sizeof(struct sail_read_options));
 
         if (pimpl->read_options == NULL) {
-            return ENOMEM;
+            return SAIL_MEMORY_ALLOCATION_FAILED;
         }
 
         memcpy(pimpl->read_options, read_options, sizeof(struct sail_read_options));
@@ -182,7 +181,7 @@ int SAIL_EXPORT sail_plugin_read_init_v1(struct sail_file *file, struct sail_rea
 
     if (setjmp(pimpl->error_context.setjmp_buffer) != 0) {
         pimpl->libjpeg_error = true;
-        return EIO;
+        return SAIL_UNDERLYING_CODEC_ERROR;
     }
 
     /* JPEG setup. */
@@ -227,21 +226,21 @@ int SAIL_EXPORT sail_plugin_read_seek_next_frame_v1(struct sail_file *file, stru
     struct pimpl *pimpl = (struct pimpl *)file->pimpl;
 
     if (pimpl == NULL) {
-        return ENOMEM;
+        return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
     SAIL_TRY(sail_alloc_image(image));
 
     if (setjmp(pimpl->error_context.setjmp_buffer) != 0) {
         pimpl->libjpeg_error = true;
-        return EIO;
+        return SAIL_UNDERLYING_CODEC_ERROR;
     }
 
     // TODO
     //currentImage++;
 
     //if(currentImage) {
-    //    return EIO;
+    //    return SAIL_UNDERLYING_CODEC_ERROR;
     //}
 
     const int bytes_per_line = pimpl->decompress_context.output_width * pimpl->decompress_context.output_components;
@@ -253,7 +252,7 @@ int SAIL_EXPORT sail_plugin_read_seek_next_frame_v1(struct sail_file *file, stru
                                                                     1);
 
     if (pimpl->buffer == NULL) {
-        return ENOMEM;
+        return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
     /* Image properties. */
@@ -311,16 +310,16 @@ int SAIL_EXPORT sail_plugin_read_scan_line_v1(struct sail_file *file, struct sai
     struct pimpl *pimpl = (struct pimpl *)file->pimpl;
 
     if (pimpl == NULL) {
-        return ENOMEM;
+        return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
     if (pimpl->libjpeg_error) {
-        return EIO;
+        return SAIL_UNDERLYING_CODEC_ERROR;
     }
 
     if (setjmp(pimpl->error_context.setjmp_buffer) != 0) {
         pimpl->libjpeg_error = true;
-        return EIO;
+        return SAIL_UNDERLYING_CODEC_ERROR;
     }
 
     const int color_components = pimpl->decompress_context.output_components;
@@ -340,7 +339,7 @@ int SAIL_EXPORT sail_plugin_read_scan_line_v2(struct sail_file *file, struct sai
     struct pimpl *pimpl = (struct pimpl *)file->pimpl;
 
     if (pimpl == NULL) {
-        return ENOMEM;
+        return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
     const int color_components = pimpl->decompress_context.output_components;
@@ -348,7 +347,7 @@ int SAIL_EXPORT sail_plugin_read_scan_line_v2(struct sail_file *file, struct sai
     *scanline = malloc(image->width * color_components);
 
     if (*scanline == NULL) {
-        return ENOMEM;
+        return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
     return sail_plugin_read_scan_line_v1(file, image, *scanline);
@@ -362,14 +361,14 @@ int SAIL_EXPORT sail_plugin_read_finish_v1(struct sail_file *file, struct sail_i
     struct pimpl *pimpl = (struct pimpl *)file->pimpl;
 
     if (pimpl == NULL) {
-        return ENOMEM;
+        return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
     sail_destroy_read_options(pimpl->read_options);
 
     if (setjmp(pimpl->error_context.setjmp_buffer) != 0) {
         pimpl->libjpeg_error = true;
-        return EIO;
+        return SAIL_UNDERLYING_CODEC_ERROR;
     }
 
     jpeg_abort_decompress(&pimpl->decompress_context);
@@ -390,7 +389,7 @@ int SAIL_EXPORT sail_plugin_write_features_v1(struct sail_write_features **write
     (*write_features)->pixel_formats = (int *)malloc((*write_features)->pixel_formats_length * sizeof(int));
 
     if ((*write_features)->pixel_formats == NULL) {
-        return ENOMEM;
+        return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
     (*write_features)->pixel_formats[0]  = SAIL_PIXEL_FORMAT_GRAYSCALE;
@@ -441,7 +440,7 @@ int SAIL_EXPORT sail_plugin_write_init_v1(struct sail_file *file, struct sail_wr
         pimpl->write_options = (struct sail_write_options *)malloc(sizeof(struct sail_write_options));
 
         if (pimpl->write_options == NULL) {
-            return ENOMEM;
+            return SAIL_MEMORY_ALLOCATION_FAILED;
         }
 
         memcpy(pimpl->write_options, write_options, sizeof(struct sail_write_options));
@@ -462,7 +461,7 @@ int SAIL_EXPORT sail_plugin_write_init_v1(struct sail_file *file, struct sail_wr
 
     if (setjmp(pimpl->error_context.setjmp_buffer) != 0) {
         pimpl->libjpeg_error = true;
-        return EIO;
+        return SAIL_UNDERLYING_CODEC_ERROR;
     }
 
     /* JPEG setup. */
@@ -480,12 +479,12 @@ int SAIL_EXPORT sail_plugin_write_seek_next_frame_v1(struct sail_file *file, str
     struct pimpl *pimpl = (struct pimpl *)file->pimpl;
 
     if (pimpl == NULL) {
-        return ENOMEM;
+        return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
     if (setjmp(pimpl->error_context.setjmp_buffer) != 0) {
         pimpl->libjpeg_error = true;
-        return EIO;
+        return SAIL_UNDERLYING_CODEC_ERROR;
     }
 
     pimpl->compress_context.image_width = image->width;
@@ -536,16 +535,16 @@ int SAIL_EXPORT sail_plugin_write_scan_line_v1(struct sail_file *file, struct sa
     struct pimpl *pimpl = (struct pimpl *)file->pimpl;
 
     if (pimpl == NULL) {
-        return ENOMEM;
+        return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
     if (pimpl->libjpeg_error) {
-        return EIO;
+        return SAIL_UNDERLYING_CODEC_ERROR;
     }
 
     if (setjmp(pimpl->error_context.setjmp_buffer) != 0) {
         pimpl->libjpeg_error = true;
-        return EIO;
+        return SAIL_UNDERLYING_CODEC_ERROR;
     }
 
     JSAMPROW row = (JSAMPROW)scanline;
@@ -563,14 +562,14 @@ int SAIL_EXPORT sail_plugin_write_finish_v1(struct sail_file *file, struct sail_
     struct pimpl *pimpl = (struct pimpl *)file->pimpl;
 
     if (pimpl == NULL) {
-        return ENOMEM;
+        return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
     sail_destroy_write_options(pimpl->write_options);
 
     if (setjmp(pimpl->error_context.setjmp_buffer) != 0) {
         pimpl->libjpeg_error = true;
-        return EIO;
+        return SAIL_UNDERLYING_CODEC_ERROR;
     }
 
     jpeg_finish_compress(&pimpl->compress_context);

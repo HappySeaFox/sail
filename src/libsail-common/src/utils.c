@@ -1,9 +1,9 @@
-#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "common.h"
+#include "error.h"
 #include "utils.h"
 
 int sail_strdup(const char *input, char **output) {
@@ -18,7 +18,7 @@ int sail_strdup(const char *input, char **output) {
     *output = (char *)malloc(len+1);
 
     if (*output == NULL) {
-        return errno;
+        return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
     memcpy(*output, input, len);
@@ -35,13 +35,13 @@ int sail_strdup_length(const char *input, size_t length, char **output) {
     }
 
     if (length == 0) {
-        return EINVAL;
+        return SAIL_INVALID_ARGUMENT;
     }
 
     *output = (char *)malloc(length+1);
 
     if (*output == NULL) {
-        return errno;
+        return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
     memcpy(*output, input, length);

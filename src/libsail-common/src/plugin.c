@@ -1,4 +1,3 @@
-#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,7 +12,7 @@ int sail_alloc_plugin_info(struct sail_plugin_info **plugin_info) {
     *plugin_info = (struct sail_plugin_info *)malloc(sizeof(struct sail_plugin_info));
 
     if (*plugin_info == NULL) {
-        return ENOMEM;
+        return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
     (*plugin_info)->layout      = 0;
@@ -104,7 +103,7 @@ static int inih_handler(void *data, const char *section, const char *name, const
 int sail_plugin_read_info(const char *file, struct sail_plugin_info **plugin_info) {
 
     if (file == NULL) {
-        return EINVAL;
+        return SAIL_INVALID_ARGUMENT;
     }
 
     SAIL_TRY(sail_alloc_plugin_info(plugin_info));
@@ -123,8 +122,8 @@ int sail_plugin_read_info(const char *file, struct sail_plugin_info **plugin_inf
     sail_destroy_plugin_info(*plugin_info);
 
     switch (code) {
-        case -1: return errno;
-        case -2: return ENOMEM;
+        case -1: return SAIL_ERROR_READ_PLUGIN_INFO;
+        case -2: return SAIL_MEMORY_ALLOCATION_FAILED;
 
         default: return SAIL_ERROR_READ_PLUGIN_INFO;
     }

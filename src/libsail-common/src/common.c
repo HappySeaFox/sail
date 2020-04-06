@@ -1,6 +1,5 @@
 #include "config.h"
 
-#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -22,7 +21,7 @@ static int sail_alloc_file_private(struct sail_file **file) {
     *file = (struct sail_file *)malloc(sizeof(struct sail_file));
 
     if (*file == NULL) {
-        return ENOMEM;
+        return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
     (*file)->fptr = NULL;
@@ -44,7 +43,7 @@ int sail_alloc_file(const char *filepath, const char *mode, struct sail_file **f
 #endif
 
     if (fptr == NULL) {
-        return errno;
+        return SAIL_FILE_OPEN_ERROR;
     }
 
     SAIL_TRY(sail_alloc_file_private(file));
@@ -80,7 +79,7 @@ int sail_alloc_image(struct sail_image **image) {
     *image = (struct sail_image *)malloc(sizeof(struct sail_image));
 
     if (*image == NULL) {
-        return ENOMEM;
+        return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
     (*image)->width                = 0;
@@ -121,7 +120,7 @@ int SAIL_EXPORT sail_alloc_read_features(struct sail_read_features **read_featur
     *read_features = (struct sail_read_features *)malloc(sizeof(struct sail_read_features));
 
     if (*read_features == NULL) {
-        return ENOMEM;
+        return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
     (*read_features)->pixel_formats        = NULL;
@@ -149,7 +148,7 @@ int sail_alloc_read_options(struct sail_read_options **read_options) {
     *read_options = (struct sail_read_options *)malloc(sizeof(struct sail_read_options));
 
     if (*read_options == NULL) {
-        return ENOMEM;
+        return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
     (*read_options)->pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;
@@ -172,7 +171,7 @@ int SAIL_EXPORT sail_alloc_write_features(struct sail_write_features **write_fea
     *write_features = (struct sail_write_features *)malloc(sizeof(struct sail_write_features));
 
     if (*write_features == NULL) {
-        return ENOMEM;
+        return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
     (*write_features)->pixel_formats            = NULL;
@@ -211,7 +210,7 @@ int sail_alloc_write_options(struct sail_write_options **write_options) {
     *write_options = (struct sail_write_options *)malloc(sizeof(struct sail_write_options));
 
     if (*write_options == NULL) {
-        return ENOMEM;
+        return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
     (*write_options)->pixel_format     = SAIL_PIXEL_FORMAT_UNKNOWN;
