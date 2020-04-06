@@ -20,7 +20,7 @@ NOT TO BE INCLUDED
  * Reads a scan line of the current image in the current pass. Allocates a new scan line. The assigned scan line
  * MUST be freed later with free().
  *
- * Returns 0 on success or errno on error.
+ * Returns 0 on success or sail_error_t on error.
  */
 int sail_plugin_read_scan_line_v1(struct sail_file *file, struct sail_image *image, void **scanline);
 

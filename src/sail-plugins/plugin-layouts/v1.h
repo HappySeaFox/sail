@@ -18,7 +18,7 @@ NOT TO BE INCLUDED
  * Assigns possible read features for this plugin. The assigned read features MUST be destroyed later
  * with sail_destroy_read_features().
  *
- * Returns 0 on success or errno on error.
+ * Returns 0 on success or sail_error_t on error.
  */
 int sail_plugin_read_features_v1(struct sail_read_features **read_features);
 
@@ -28,7 +28,7 @@ int sail_plugin_read_features_v1(struct sail_read_features **read_features);
  *
  * If the specified read options is NULL, plugin-specific defaults will be used.
  *
- * Returns 0 on success or errno on error.
+ * Returns 0 on success or sail_error_t on error.
  */
 int sail_plugin_read_init_v1(struct sail_file *file, struct sail_read_options *read_options);
 
@@ -39,14 +39,14 @@ int sail_plugin_read_init_v1(struct sail_file *file, struct sail_read_options *r
  * Use sail_plugin_read_seek_next_pass() + sail_plugin_read_scan_line() to actually read the frame.
  * The assigned image MUST be destroyed later with sail_destroy_image().
  *
- * Returns 0 on success or errno on error.
+ * Returns 0 on success or sail_error_t on error.
  */
 int sail_plugin_read_seek_next_frame_v1(struct sail_file *file, struct sail_image **image);
 
 /*
  * Seeks to the next pass if the specified image has multiple passes. Does nothing otherwise.
  *
- * Returns 0 on success or errno on error.
+ * Returns 0 on success or sail_error_t on error.
  */
 int sail_plugin_read_seek_next_pass_v1(struct sail_file *file, struct sail_image *image);
 
@@ -55,7 +55,7 @@ int sail_plugin_read_seek_next_pass_v1(struct sail_file *file, struct sail_image
  * allocated by the caller and must be be large enough. Use bytes_per_line field to calculate
  * the necessary length of a scan line.
  *
- * Returns 0 on success or errno on error.
+ * Returns 0 on success or sail_error_t on error.
  */
 int sail_plugin_read_scan_line_v1(struct sail_file *file, struct sail_image *image, void *scanline);
 
@@ -64,7 +64,7 @@ int sail_plugin_read_scan_line_v1(struct sail_file *file, struct sail_image *ima
  * This function doesn't close the file. It just stops decoding. Use sail_file_close()
  * to actually close the file.
  *
- * Returns 0 on success or errno on error.
+ * Returns 0 on success or sail_error_t on error.
  */
 int sail_plugin_read_finish_v1(struct sail_file *file, struct sail_image *image);
 
@@ -76,7 +76,7 @@ int sail_plugin_read_finish_v1(struct sail_file *file, struct sail_image *image)
  * Assigns possible write features for this plugin. The assigned write features MUST be destroyed later
  * with sail_destroy_write_features().
  *
- * Returns 0 on success or errno on error.
+ * Returns 0 on success or sail_error_t on error.
  */
 int sail_plugin_write_features_v1(struct sail_write_features **write_features);
 
@@ -86,7 +86,7 @@ int sail_plugin_write_features_v1(struct sail_write_features **write_features);
  *
  * If the specified write options is NULL, plugin-specific defaults will be used.
  *
- * Returns 0 on success or errno on error.
+ * Returns 0 on success or sail_error_t on error.
  */
 int sail_plugin_write_init_v1(struct sail_file *file, struct sail_write_options *write_options);
 
@@ -94,21 +94,21 @@ int sail_plugin_write_init_v1(struct sail_file *file, struct sail_write_options 
  * Seeks to a next frame before writing it. The frame is NOT immediately written. Use sail_plugin_write_seek_next_pass()
  * and sail_plugin_write_scan_line() to actually write a frame.
  *
- * Returns 0 on success or errno on error.
+ * Returns 0 on success or sail_error_t on error.
  */
 int sail_plugin_write_seek_next_frame_v1(struct sail_file *file, struct sail_image *image);
 
 /*
  * Seeks to a next pass before writing it if the specified image is interlaced. Does nothing otherwise.
  *
- * Returns 0 on success or errno on error.
+ * Returns 0 on success or sail_error_t on error.
  */
 int sail_plugin_write_seek_next_pass_v1(struct sail_file *file, struct sail_image *image);
 
 /*
  * Writes a scan line of the current image in the current pass.
  *
- * Returns 0 on success or errno on error.
+ * Returns 0 on success or sail_error_t on error.
  */
 int sail_plugin_write_scan_line_v1(struct sail_file *file, struct sail_image *image, void *scanline);
 
@@ -116,6 +116,6 @@ int sail_plugin_write_scan_line_v1(struct sail_file *file, struct sail_image *im
  * Finilizes writing operation. No more writings are possible after calling this function.
  * This function doesn't close the file. Use sail_file_close() for that.
  *
- * Returns 0 on success or errno on error.
+ * Returns 0 on success or sail_error_t on error.
  */
 int sail_plugin_write_finish_v1(struct sail_file *file, struct sail_image *image);

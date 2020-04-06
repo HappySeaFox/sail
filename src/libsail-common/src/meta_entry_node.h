@@ -25,7 +25,7 @@ struct sail_meta_entry_node {
 /*
  * Allocates a new meta entry node. The assigned node MUST be destroyed later with sail_destroy_meta_entry_node().
  *
- * Returns 0 on success or errno on error.
+ * Returns 0 on success or sail_error_t on error.
  */
 int SAIL_EXPORT sail_alloc_meta_entry_node(struct sail_meta_entry_node **meta_entry_node);
 

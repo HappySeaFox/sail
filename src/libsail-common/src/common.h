@@ -315,7 +315,7 @@ typedef struct sail_write_options sail_write_options_t;
  * Opens the specified image file using the specified mode (as in fopen). The assigned file MUST be destroyed later
  * with sail_destroy_file().
  *
- * Returns 0 on success or errno on error.
+ * Returns 0 on success or sail_error_t on error.
  */
 int SAIL_EXPORT sail_alloc_file(const char *filepath, const char *mode, struct sail_file **file);
 
@@ -332,7 +332,7 @@ void SAIL_EXPORT sail_destroy_file(struct sail_file *file);
 /*
  * Allocates a new image. The assigned image MUST be destroyed later with sail_destroy_image().
  *
- * Returns 0 on success or errno on error.
+ * Returns 0 on success or sail_error_t on error.
  */
 int SAIL_EXPORT sail_alloc_image(struct sail_image **image);
 
@@ -349,6 +349,8 @@ void SAIL_EXPORT sail_destroy_image(struct sail_image *image);
 /*
  * Allocates read features. The assigned read features MUST be destroyed later
  * with sail_destroy_read_features().
+ *
+ * Returns 0 on success or sail_error_t on error.
  */
 int SAIL_EXPORT sail_alloc_read_features(struct sail_read_features **read_features);
 
@@ -361,6 +363,8 @@ void SAIL_EXPORT sail_destroy_read_features(struct sail_read_features *read_feat
 /*
  * Allocates read options. The assigned read options MUST be destroyed later
  * with sail_destroy_read_options().
+ *
+ * Returns 0 on success or sail_error_t on error.
  */
 int SAIL_EXPORT sail_alloc_read_options(struct sail_read_options **read_options);
 
@@ -373,6 +377,8 @@ void SAIL_EXPORT sail_destroy_read_options(struct sail_read_options *read_option
 /*
  * Allocates write features. The assigned write features MUST be destroyed later
  * with sail_destroy_write_features().
+ *
+ * Returns 0 on success or sail_error_t on error.
  */
 int SAIL_EXPORT sail_alloc_write_features(struct sail_write_features **write_features);
 
@@ -385,6 +391,8 @@ void SAIL_EXPORT sail_destroy_write_features(struct sail_write_features *write_f
 /*
  * Allocates write options. The assigned write options MUST be destroyed later
  * with sail_destroy_write_options().
+ *
+ * Returns 0 on success or sail_error_t on error.
  */
 int SAIL_EXPORT sail_alloc_write_options(struct sail_write_options **write_options);
 
