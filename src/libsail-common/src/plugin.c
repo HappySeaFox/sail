@@ -68,7 +68,7 @@ static int inih_handler(void *data, const char *section, const char *name, const
         return 0;
     }
 
-    if (plugin_info->layout == 1) {
+    if (plugin_info->layout == 1 || plugin_info->layout == 2) {
         if (strcmp(name, "version") == 0) {
             if ((res = sail_strdup(value, &plugin_info->version)) != 0) {
                 return 0;
