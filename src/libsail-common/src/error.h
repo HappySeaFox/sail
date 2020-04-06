@@ -1,27 +1,34 @@
 #ifndef SAIL_ERROR_H
 #define SAIL_ERROR_H
 
-/*
- * Error codes before this threshold are reserved for errno codes.
- */
-#define SAIL_ERROR_THRESHOLD 1024
-
 typedef int sail_error_t;
 
 /*
- * SAIL error codes. TODO.
+ * Common errors.
  */
-#define SAIL_FILE_NULL_PTR                (SAIL_ERROR_THRESHOLD+1)
-#define SAIL_IMAGE_NULL_PTR               (SAIL_ERROR_THRESHOLD+2)
-#define SAIL_SCAN_LINE_NULL_PTR           (SAIL_ERROR_THRESHOLD+3)
-#define SAIL_INCORRECT_IMAGE_DIMENSIONS   (SAIL_ERROR_THRESHOLD+4)
-#define SAIL_ERROR_READ_PLUGIN_INFO       (SAIL_ERROR_THRESHOLD+5)
-#define SAIL_UNSUPPORTED_PIXEL_FORMAT     (SAIL_ERROR_THRESHOLD+6)
-#define SAIL_UNSUPPORTED_COMPRESSION_TYPE (SAIL_ERROR_THRESHOLD+7)
-#define SAIL_MEMORY_ALLOCATION_FAILED     (SAIL_ERROR_THRESHOLD+8)
-#define SAIL_INVALID_ARGUMENT             (SAIL_ERROR_THRESHOLD+9)
-#define SAIL_UNDERLYING_CODEC_ERROR       (SAIL_ERROR_THRESHOLD+10)
-#define SAIL_FILE_OPEN_ERROR              (SAIL_ERROR_THRESHOLD+11)
+#define SAIL_MEMORY_ALLOCATION_FAILED     1
+#define SAIL_FILE_OPEN_ERROR              2
+#define SAIL_INVALID_ARGUMENT             3
+
+/*
+ * Plugins-related errors.
+ */
+#define SAIL_ERROR_READ_PLUGIN_INFO       10
+
+/*
+ * Encoding/decoding common errors.
+ */
+#define SAIL_FILE_NULL_PTR                21
+#define SAIL_IMAGE_NULL_PTR               22
+#define SAIL_SCAN_LINE_NULL_PTR           23
+
+/*
+ * Encoding/decoding specific errors.
+ */
+#define SAIL_INCORRECT_IMAGE_DIMENSIONS   30
+#define SAIL_UNSUPPORTED_PIXEL_FORMAT     31
+#define SAIL_UNSUPPORTED_COMPRESSION_TYPE 32
+#define SAIL_UNDERLYING_CODEC_ERROR       33
 
 /*
  * Helper macros.
