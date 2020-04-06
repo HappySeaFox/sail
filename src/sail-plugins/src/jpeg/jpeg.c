@@ -18,6 +18,8 @@
 /*
  * Plugin-specific data types.
  */
+static const int COMPRESSION_MIN     = 0;
+static const int COMPRESSION_MAX     = 100;
 static const int COMPRESSION_DEFAULT = 15;
 
 struct my_error_context {
@@ -421,8 +423,8 @@ int SAIL_EXPORT sail_plugin_write_features_v1(struct sail_write_features **write
     (*write_features)->passes                   = 0;
     (*write_features)->compression_types        = NULL;
     (*write_features)->compression_types_length = 0;
-    (*write_features)->compression_min          = 0;
-    (*write_features)->compression_max          = 100;
+    (*write_features)->compression_min          = COMPRESSION_MIN;
+    (*write_features)->compression_max          = COMPRESSION_MAX;
     (*write_features)->compression_default      = COMPRESSION_DEFAULT;
 
     return 0;
@@ -500,10 +502,10 @@ int SAIL_EXPORT sail_plugin_write_seek_next_frame_v1(struct sail_file *file, str
     pimpl->compress_context.in_color_space = pixel_format_to_color_space(pimpl->write_options->pixel_format);
 
     jpeg_set_defaults(&pimpl->compress_context);
-    const int compression = pimpl->write_options->compression == 0
+    const int compression = pimpl->write_options->compression < COMPRESSION_MIN
                             ? COMPRESSION_DEFAULT
                             : pimpl->write_options->compression;
-    jpeg_set_quality(&pimpl->compress_context, 100-compression, true);
+    jpeg_set_quality(&pimpl->compress_context, /* to quality */COMPRESSION_MAX-compression, true);
 
     jpeg_start_compress(&pimpl->compress_context, true);
 
