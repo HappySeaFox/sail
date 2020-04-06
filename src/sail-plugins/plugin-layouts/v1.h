@@ -20,7 +20,7 @@ NOT TO BE INCLUDED
  *
  * Returns 0 on success or sail_error_t on error.
  */
-int sail_plugin_read_features_v1(struct sail_read_features **read_features);
+sail_error_t sail_plugin_read_features_v1(struct sail_read_features **read_features);
 
 /*
  * Starts decoding the specified file using the specified options (or NULL to use defaults).
@@ -30,7 +30,7 @@ int sail_plugin_read_features_v1(struct sail_read_features **read_features);
  *
  * Returns 0 on success or sail_error_t on error.
  */
-int sail_plugin_read_init_v1(struct sail_file *file, struct sail_read_options *read_options);
+sail_error_t sail_plugin_read_init_v1(struct sail_file *file, struct sail_read_options *read_options);
 
 /*
  * Seeks to the next frame. The frame is NOT immediately read or decoded by most SAIL plugins. One could
@@ -41,14 +41,14 @@ int sail_plugin_read_init_v1(struct sail_file *file, struct sail_read_options *r
  *
  * Returns 0 on success or sail_error_t on error.
  */
-int sail_plugin_read_seek_next_frame_v1(struct sail_file *file, struct sail_image **image);
+sail_error_t sail_plugin_read_seek_next_frame_v1(struct sail_file *file, struct sail_image **image);
 
 /*
  * Seeks to the next pass if the specified image has multiple passes. Does nothing otherwise.
  *
  * Returns 0 on success or sail_error_t on error.
  */
-int sail_plugin_read_seek_next_pass_v1(struct sail_file *file, struct sail_image *image);
+sail_error_t sail_plugin_read_seek_next_pass_v1(struct sail_file *file, struct sail_image *image);
 
 /*
  * Reads a scan line of the current image in the current pass. The specified scan line must be
@@ -57,7 +57,7 @@ int sail_plugin_read_seek_next_pass_v1(struct sail_file *file, struct sail_image
  *
  * Returns 0 on success or sail_error_t on error.
  */
-int sail_plugin_read_scan_line_v1(struct sail_file *file, struct sail_image *image, void *scanline);
+sail_error_t sail_plugin_read_scan_line_v1(struct sail_file *file, struct sail_image *image, void *scanline);
 
 /*
  * Finilizes reading operation. No more readings are possible after calling this function.
@@ -66,7 +66,7 @@ int sail_plugin_read_scan_line_v1(struct sail_file *file, struct sail_image *ima
  *
  * Returns 0 on success or sail_error_t on error.
  */
-int sail_plugin_read_finish_v1(struct sail_file *file, struct sail_image *image);
+sail_error_t sail_plugin_read_finish_v1(struct sail_file *file, struct sail_image *image);
 
 /*
  * Encoding functions.
@@ -78,7 +78,7 @@ int sail_plugin_read_finish_v1(struct sail_file *file, struct sail_image *image)
  *
  * Returns 0 on success or sail_error_t on error.
  */
-int sail_plugin_write_features_v1(struct sail_write_features **write_features);
+sail_error_t sail_plugin_write_features_v1(struct sail_write_features **write_features);
 
 /*
  * Starts encoding the specified file using the specified options (or NULL to use defaults).
@@ -88,7 +88,7 @@ int sail_plugin_write_features_v1(struct sail_write_features **write_features);
  *
  * Returns 0 on success or sail_error_t on error.
  */
-int sail_plugin_write_init_v1(struct sail_file *file, struct sail_write_options *write_options);
+sail_error_t sail_plugin_write_init_v1(struct sail_file *file, struct sail_write_options *write_options);
 
 /*
  * Seeks to a next frame before writing it. The frame is NOT immediately written. Use sail_plugin_write_seek_next_pass()
@@ -96,21 +96,21 @@ int sail_plugin_write_init_v1(struct sail_file *file, struct sail_write_options 
  *
  * Returns 0 on success or sail_error_t on error.
  */
-int sail_plugin_write_seek_next_frame_v1(struct sail_file *file, struct sail_image *image);
+sail_error_t sail_plugin_write_seek_next_frame_v1(struct sail_file *file, struct sail_image *image);
 
 /*
  * Seeks to a next pass before writing it if the specified image is interlaced. Does nothing otherwise.
  *
  * Returns 0 on success or sail_error_t on error.
  */
-int sail_plugin_write_seek_next_pass_v1(struct sail_file *file, struct sail_image *image);
+sail_error_t sail_plugin_write_seek_next_pass_v1(struct sail_file *file, struct sail_image *image);
 
 /*
  * Writes a scan line of the current image in the current pass.
  *
  * Returns 0 on success or sail_error_t on error.
  */
-int sail_plugin_write_scan_line_v1(struct sail_file *file, struct sail_image *image, void *scanline);
+sail_error_t sail_plugin_write_scan_line_v1(struct sail_file *file, struct sail_image *image, void *scanline);
 
 /*
  * Finilizes writing operation. No more writings are possible after calling this function.
@@ -118,4 +118,4 @@ int sail_plugin_write_scan_line_v1(struct sail_file *file, struct sail_image *im
  *
  * Returns 0 on success or sail_error_t on error.
  */
-int sail_plugin_write_finish_v1(struct sail_file *file, struct sail_image *image);
+sail_error_t sail_plugin_write_finish_v1(struct sail_file *file, struct sail_image *image);

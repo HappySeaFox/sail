@@ -2,8 +2,10 @@
 #define SAIL_META_ENTRY_NODE_H
 
 #ifdef SAIL_BUILD
+    #include "error.h"
     #include "export.h"
 #else
+    #include <sail/error.h>
     #include <sail/export.h>
 #endif
 
@@ -27,7 +29,7 @@ struct sail_meta_entry_node {
  *
  * Returns 0 on success or sail_error_t on error.
  */
-int SAIL_EXPORT sail_alloc_meta_entry_node(struct sail_meta_entry_node **meta_entry_node);
+sail_error_t SAIL_EXPORT sail_alloc_meta_entry_node(struct sail_meta_entry_node **meta_entry_node);
 
 /*
  * Destroys the specified meta entry node and all its internal allocated memory buffers.

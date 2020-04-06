@@ -117,7 +117,7 @@ static int alloc_pimpl(struct pimpl **pimpl) {
 /*
  * Decoding functions.
  */
-int SAIL_EXPORT sail_plugin_read_features_v1(struct sail_read_features **read_features) {
+sail_error_t SAIL_EXPORT sail_plugin_read_features_v1(struct sail_read_features **read_features) {
 
     SAIL_TRY(sail_alloc_read_features(read_features));
 
@@ -149,7 +149,7 @@ int SAIL_EXPORT sail_plugin_read_features_v1(struct sail_read_features **read_fe
     return 0;
 }
 
-int SAIL_EXPORT sail_plugin_read_init_v1(struct sail_file *file, struct sail_read_options *read_options) {
+sail_error_t SAIL_EXPORT sail_plugin_read_init_v1(struct sail_file *file, struct sail_read_options *read_options) {
 
     SAIL_CHECK_FILE(file);
 
@@ -219,7 +219,7 @@ int SAIL_EXPORT sail_plugin_read_init_v1(struct sail_file *file, struct sail_rea
     return 0;
 }
 
-int SAIL_EXPORT sail_plugin_read_seek_next_frame_v1(struct sail_file *file, struct sail_image **image) {
+sail_error_t SAIL_EXPORT sail_plugin_read_seek_next_frame_v1(struct sail_file *file, struct sail_image **image) {
 
     SAIL_CHECK_FILE(file);
 
@@ -293,7 +293,7 @@ int SAIL_EXPORT sail_plugin_read_seek_next_frame_v1(struct sail_file *file, stru
     return 0;
 }
 
-int SAIL_EXPORT sail_plugin_read_seek_next_pass_v1(struct sail_file *file, struct sail_image *image) {
+sail_error_t SAIL_EXPORT sail_plugin_read_seek_next_pass_v1(struct sail_file *file, struct sail_image *image) {
 
     SAIL_CHECK_FILE(file);
     SAIL_CHECK_IMAGE(image);
@@ -301,7 +301,7 @@ int SAIL_EXPORT sail_plugin_read_seek_next_pass_v1(struct sail_file *file, struc
     return 0;
 }
 
-int SAIL_EXPORT sail_plugin_read_scan_line_v1(struct sail_file *file, struct sail_image *image, void *scanline) {
+sail_error_t SAIL_EXPORT sail_plugin_read_scan_line_v1(struct sail_file *file, struct sail_image *image, void *scanline) {
 
     SAIL_CHECK_FILE(file);
     SAIL_CHECK_IMAGE(image);
@@ -331,7 +331,7 @@ int SAIL_EXPORT sail_plugin_read_scan_line_v1(struct sail_file *file, struct sai
     return 0;
 }
 
-int SAIL_EXPORT sail_plugin_read_scan_line_v2(struct sail_file *file, struct sail_image *image, void **scanline) {
+sail_error_t SAIL_EXPORT sail_plugin_read_scan_line_v2(struct sail_file *file, struct sail_image *image, void **scanline) {
 
     SAIL_CHECK_FILE(file);
     SAIL_CHECK_IMAGE(image);
@@ -353,7 +353,7 @@ int SAIL_EXPORT sail_plugin_read_scan_line_v2(struct sail_file *file, struct sai
     return sail_plugin_read_scan_line_v1(file, image, *scanline);
 }
 
-int SAIL_EXPORT sail_plugin_read_finish_v1(struct sail_file *file, struct sail_image *image) {
+sail_error_t SAIL_EXPORT sail_plugin_read_finish_v1(struct sail_file *file, struct sail_image *image) {
 
     SAIL_CHECK_FILE(file);
     SAIL_CHECK_IMAGE(image);
@@ -381,7 +381,7 @@ int SAIL_EXPORT sail_plugin_read_finish_v1(struct sail_file *file, struct sail_i
  * Encoding functions.
  */
 
-int SAIL_EXPORT sail_plugin_write_features_v1(struct sail_write_features **write_features) {
+sail_error_t SAIL_EXPORT sail_plugin_write_features_v1(struct sail_write_features **write_features) {
 
     SAIL_TRY(sail_alloc_write_features(write_features));
 
@@ -420,7 +420,7 @@ int SAIL_EXPORT sail_plugin_write_features_v1(struct sail_write_features **write
     return 0;
 }
 
-int SAIL_EXPORT sail_plugin_write_init_v1(struct sail_file *file, struct sail_write_options *write_options) {
+sail_error_t SAIL_EXPORT sail_plugin_write_init_v1(struct sail_file *file, struct sail_write_options *write_options) {
 
     SAIL_CHECK_FILE(file);
 
@@ -471,7 +471,7 @@ int SAIL_EXPORT sail_plugin_write_init_v1(struct sail_file *file, struct sail_wr
     return 0;
 }
 
-int SAIL_EXPORT sail_plugin_write_seek_next_frame_v1(struct sail_file *file, struct sail_image *image) {
+sail_error_t SAIL_EXPORT sail_plugin_write_seek_next_frame_v1(struct sail_file *file, struct sail_image *image) {
 
     SAIL_CHECK_FILE(file);
     SAIL_CHECK_IMAGE(image);
@@ -518,7 +518,7 @@ int SAIL_EXPORT sail_plugin_write_seek_next_frame_v1(struct sail_file *file, str
     return 0;
 }
 
-int SAIL_EXPORT sail_plugin_write_seek_next_pass_v1(struct sail_file *file, struct sail_image *image) {
+sail_error_t SAIL_EXPORT sail_plugin_write_seek_next_pass_v1(struct sail_file *file, struct sail_image *image) {
 
     SAIL_CHECK_FILE(file);
     SAIL_CHECK_IMAGE(image);
@@ -526,7 +526,7 @@ int SAIL_EXPORT sail_plugin_write_seek_next_pass_v1(struct sail_file *file, stru
     return 0;
 }
 
-int SAIL_EXPORT sail_plugin_write_scan_line_v1(struct sail_file *file, struct sail_image *image, void *scanline) {
+sail_error_t SAIL_EXPORT sail_plugin_write_scan_line_v1(struct sail_file *file, struct sail_image *image, void *scanline) {
 
     SAIL_CHECK_FILE(file);
     SAIL_CHECK_IMAGE(image);
@@ -554,7 +554,7 @@ int SAIL_EXPORT sail_plugin_write_scan_line_v1(struct sail_file *file, struct sa
     return 0;
 }
 
-int SAIL_EXPORT sail_plugin_write_finish_v1(struct sail_file *file, struct sail_image *image) {
+sail_error_t SAIL_EXPORT sail_plugin_write_finish_v1(struct sail_file *file, struct sail_image *image) {
 
     SAIL_CHECK_FILE(file);
     SAIL_CHECK_IMAGE(image);

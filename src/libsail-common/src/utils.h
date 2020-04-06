@@ -2,8 +2,10 @@
 #define SAIL_UTILS_H
 
 #ifdef SAIL_BUILD
+    #include "error.h"
     #include "export.h"
 #else
+    #include <sail/error.h>
     #include <sail/export.h>
 #endif
 
@@ -16,7 +18,7 @@ extern "C" {
  *
  * Returns 0 on success or sail_error_t on error.
  */
-int SAIL_EXPORT sail_strdup(const char *input, char **output);
+sail_error_t SAIL_EXPORT sail_strdup(const char *input, char **output);
 
 /*
  * Duplicates the specified number of bytes of the specified input string and stores
@@ -24,7 +26,7 @@ int SAIL_EXPORT sail_strdup(const char *input, char **output);
  *
  * Returns 0 on success or sail_error_t on error.
  */
-int SAIL_EXPORT sail_strdup_length(const char *input, size_t length, char **output);
+sail_error_t SAIL_EXPORT sail_strdup_length(const char *input, size_t length, char **output);
 
 /*
  * Returns a non-NULL string representation of the specified pixel format.

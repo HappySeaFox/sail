@@ -2,8 +2,10 @@
 #define SAIL_PLUGIN_H
 
 #ifdef SAIL_BUILD
+    #include "error.h"
     #include "export.h"
 #else
+    #include <sail/error.h>
     #include <sail/export.h>
 #endif
 
@@ -58,7 +60,7 @@ typedef struct sail_plugin_info sail_plugin_info_t;
  *
  * Returns 0 on success or sail_error_t on error.
  */
-int SAIL_EXPORT sail_alloc_plugin_info(struct sail_plugin_info **plugin_info);
+sail_error_t SAIL_EXPORT sail_alloc_plugin_info(struct sail_plugin_info **plugin_info);
 
 /*
  * Destroys the specified plugin_info and all its internal allocated memory buffers.
@@ -73,7 +75,7 @@ void SAIL_EXPORT sail_destroy_plugin_info(struct sail_plugin_info *plugin_info);
  *
  * Returns 0 on success or sail_error_t on error.
  */
-int SAIL_EXPORT sail_plugin_read_info(const char *file, struct sail_plugin_info **plugin_info);
+sail_error_t SAIL_EXPORT sail_plugin_read_info(const char *file, struct sail_plugin_info **plugin_info);
 
 /* extern "C" */
 #ifdef __cplusplus

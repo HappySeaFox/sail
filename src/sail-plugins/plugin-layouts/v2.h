@@ -22,7 +22,7 @@ NOT TO BE INCLUDED
  *
  * Returns 0 on success or sail_error_t on error.
  */
-int sail_plugin_read_scan_line_v1(struct sail_file *file, struct sail_image *image, void **scanline);
+sail_error_t sail_plugin_read_scan_line_v1(struct sail_file *file, struct sail_image *image, void **scanline);
 
 /*
  * Encoding functions.

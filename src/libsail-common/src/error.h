@@ -1,6 +1,10 @@
 #ifndef SAIL_ERROR_H
 #define SAIL_ERROR_H
 
+/*
+ * Common error type to return from all SAIL functions.
+ * 0 means success. See the errors below.
+ */
 typedef int sail_error_t;
 
 /*
@@ -13,22 +17,22 @@ typedef int sail_error_t;
 /*
  * Plugins-related errors.
  */
-#define SAIL_ERROR_READ_PLUGIN_INFO       10
+#define SAIL_ERROR_READ_PLUGIN_INFO       20
 
 /*
  * Encoding/decoding common errors.
  */
-#define SAIL_FILE_NULL_PTR                21
-#define SAIL_IMAGE_NULL_PTR               22
-#define SAIL_SCAN_LINE_NULL_PTR           23
+#define SAIL_FILE_NULL_PTR                41
+#define SAIL_IMAGE_NULL_PTR               42
+#define SAIL_SCAN_LINE_NULL_PTR           43
 
 /*
  * Encoding/decoding specific errors.
  */
-#define SAIL_INCORRECT_IMAGE_DIMENSIONS   30
-#define SAIL_UNSUPPORTED_PIXEL_FORMAT     31
-#define SAIL_UNSUPPORTED_COMPRESSION_TYPE 32
-#define SAIL_UNDERLYING_CODEC_ERROR       33
+#define SAIL_INCORRECT_IMAGE_DIMENSIONS   60
+#define SAIL_UNSUPPORTED_PIXEL_FORMAT     61
+#define SAIL_UNSUPPORTED_COMPRESSION_TYPE 62
+#define SAIL_UNDERLYING_CODEC_ERROR       63
 
 /*
  * Helper macros.
