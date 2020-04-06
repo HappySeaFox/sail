@@ -2,6 +2,7 @@ add_library(sail-common
                 src/common.c
                 src/meta_entry_node.c
                 src/ini.c
+                src/log.c
                 src/plugin.c
                 src/utils.c)
 
