@@ -12,27 +12,23 @@ typedef int sail_error_t;
  */
 #define SAIL_MEMORY_ALLOCATION_FAILED     1
 #define SAIL_FILE_OPEN_ERROR              2
-#define SAIL_INVALID_ARGUMENT             3
-
-/*
- * Plugins-related errors.
- */
-#define SAIL_ERROR_READ_PLUGIN_INFO       20
+#define SAIL_FILE_PARSE_ERROR             3
+#define SAIL_INVALID_ARGUMENT             4
 
 /*
  * Encoding/decoding common errors.
  */
-#define SAIL_FILE_NULL_PTR                41
-#define SAIL_IMAGE_NULL_PTR               42
-#define SAIL_SCAN_LINE_NULL_PTR           43
+#define SAIL_FILE_NULL_PTR                21
+#define SAIL_IMAGE_NULL_PTR               22
+#define SAIL_SCAN_LINE_NULL_PTR           23
 
 /*
  * Encoding/decoding specific errors.
  */
-#define SAIL_INCORRECT_IMAGE_DIMENSIONS   60
-#define SAIL_UNSUPPORTED_PIXEL_FORMAT     61
-#define SAIL_UNSUPPORTED_COMPRESSION_TYPE 62
-#define SAIL_UNDERLYING_CODEC_ERROR       63
+#define SAIL_INCORRECT_IMAGE_DIMENSIONS   40
+#define SAIL_UNSUPPORTED_PIXEL_FORMAT     41
+#define SAIL_UNSUPPORTED_COMPRESSION_TYPE 42
+#define SAIL_UNDERLYING_CODEC_ERROR       43
 
 /*
  * Helper macros.

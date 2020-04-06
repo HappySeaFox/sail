@@ -122,9 +122,9 @@ int sail_plugin_read_info(const char *file, struct sail_plugin_info **plugin_inf
     sail_destroy_plugin_info(*plugin_info);
 
     switch (code) {
-        case -1: return SAIL_ERROR_READ_PLUGIN_INFO;
+        case -1: return SAIL_FILE_OPEN_ERROR;
         case -2: return SAIL_MEMORY_ALLOCATION_FAILED;
 
-        default: return SAIL_ERROR_READ_PLUGIN_INFO;
+        default: return SAIL_FILE_PARSE_ERROR;
     }
 }
