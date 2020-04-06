@@ -286,8 +286,10 @@ struct sail_write_options {
     int io_options;
 
     /*
-     * Compression type. For example: SAIL_COMPRESSION_RLE. See SailCompression.
+     * Compression type or 0. For example: SAIL_COMPRESSION_RLE. See SailCompression.
      * In most cases plugins mutually exclusive support either compression levels or compression types.
+     * Use sail_write_features to determine what compression types or values are supported by a particular
+     * plugin.
      *
      * For example:
      *
