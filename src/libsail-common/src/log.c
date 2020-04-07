@@ -1,6 +1,6 @@
 #include "config.h"
 
-#ifndef SAIL_NO_COLOR
+#ifdef SAIL_COLORED_OUTPUT
     #ifdef SAIL_WIN32
         #include <io.h>
         #define SAIL_ISATTY _isatty
@@ -48,7 +48,7 @@ void sail_log(int level, const char *format, ...) {
         case SAIL_LOG_LEVEL_DEBUG:   level_string = "D"; break;
     }
 
-#ifndef SAIL_NO_COLOR
+#ifdef SAIL_COLORED_OUTPUT
     bool is_atty = (SAIL_ISATTY(SAIL_FILENO(fptr)) == 1);
 
     if (is_atty) {
@@ -68,7 +68,7 @@ void sail_log(int level, const char *format, ...) {
     fprintf(fptr, "SAIL: [%s] ", level_string);
     vfprintf(fptr, format, args);
 
-#ifndef SAIL_NO_COLOR
+#ifdef SAIL_COLORED_OUTPUT
     if (is_atty) {
         fprintf(fptr, "%s", SAIL_COLOR_RESET);
     }

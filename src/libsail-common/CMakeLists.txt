@@ -1,4 +1,4 @@
-option(SAIL_NO_COLOR "Disable colored console output" OFF)
+option(SAIL_COLORED_OUTPUT "Enable colored console output" ON)
 
 add_library(sail-common
                 src/common.c
@@ -12,8 +12,8 @@ set_target_properties(sail-common PROPERTIES
                                   VERSION "0.5.0"
                                   SOVERSION 0)
 
-if (SAIL_NO_COLOR)
-    target_compile_definitions(sail-common PRIVATE SAIL_NO_COLOR=1)
+if (SAIL_COLORED_OUTPUT)
+    target_compile_definitions(sail-common PRIVATE SAIL_COLORED_OUTPUT=1)
 endif()
 
 target_compile_definitions(sail-common PRIVATE INI_STOP_ON_FIRST_ERROR=1)
