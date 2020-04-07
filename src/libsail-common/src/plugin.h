@@ -60,13 +60,13 @@ typedef struct sail_plugin_info sail_plugin_info_t;
  *
  * Returns 0 on success or sail_error_t on error.
  */
-sail_error_t SAIL_EXPORT sail_alloc_plugin_info(struct sail_plugin_info **plugin_info);
+SAIL_EXPORT sail_error_t sail_alloc_plugin_info(struct sail_plugin_info **plugin_info);
 
 /*
  * Destroys the specified plugin_info and all its internal allocated memory buffers.
  * The "plugin_info" pointer MUST NOT be used after calling this function.
  */
-void SAIL_EXPORT sail_destroy_plugin_info(struct sail_plugin_info *plugin_info);
+SAIL_EXPORT void sail_destroy_plugin_info(struct sail_plugin_info *plugin_info);
 
 /*
  * Reads SAIL plugin info from the specified file and stores the parsed information into
@@ -75,7 +75,7 @@ void SAIL_EXPORT sail_destroy_plugin_info(struct sail_plugin_info *plugin_info);
  *
  * Returns 0 on success or sail_error_t on error.
  */
-sail_error_t SAIL_EXPORT sail_plugin_read_info(const char *file, struct sail_plugin_info **plugin_info);
+SAIL_EXPORT sail_error_t sail_plugin_read_info(const char *file, struct sail_plugin_info **plugin_info);
 
 /* extern "C" */
 #ifdef __cplusplus

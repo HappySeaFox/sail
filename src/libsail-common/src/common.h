@@ -319,13 +319,13 @@ typedef struct sail_write_options sail_write_options_t;
  *
  * Returns 0 on success or sail_error_t on error.
  */
-sail_error_t SAIL_EXPORT sail_alloc_file(const char *filepath, const char *mode, struct sail_file **file);
+SAIL_EXPORT sail_error_t sail_alloc_file(const char *filepath, const char *mode, struct sail_file **file);
 
 /*
  * Closes the specified file and destroys all its internal memory buffers. Does nothing if the file is already closed.
  * The "file" pointer MUST NOT be used anymore after calling this function.
  */
-void SAIL_EXPORT sail_destroy_file(struct sail_file *file);
+SAIL_EXPORT void sail_destroy_file(struct sail_file *file);
 
 /*
  * Image functions.
@@ -336,13 +336,13 @@ void SAIL_EXPORT sail_destroy_file(struct sail_file *file);
  *
  * Returns 0 on success or sail_error_t on error.
  */
-sail_error_t SAIL_EXPORT sail_alloc_image(struct sail_image **image);
+SAIL_EXPORT sail_error_t sail_alloc_image(struct sail_image **image);
 
 /*
  * Destroys the specified image and all its internal allocated memory buffers.
  * The "image" pointer MUST NOT be used after calling this function.
  */
-void SAIL_EXPORT sail_destroy_image(struct sail_image *image);
+SAIL_EXPORT void sail_destroy_image(struct sail_image *image);
 
 /*
  * Options functions.
@@ -354,13 +354,13 @@ void SAIL_EXPORT sail_destroy_image(struct sail_image *image);
  *
  * Returns 0 on success or sail_error_t on error.
  */
-sail_error_t SAIL_EXPORT sail_alloc_read_features(struct sail_read_features **read_features);
+SAIL_EXPORT sail_error_t sail_alloc_read_features(struct sail_read_features **read_features);
 
 /*
  * Destroys the specified read features and all its internal allocated memory buffers.
  * The "read_features" pointer MUST NOT be used after calling this function.
  */
-void SAIL_EXPORT sail_destroy_read_features(struct sail_read_features *read_features);
+SAIL_EXPORT void sail_destroy_read_features(struct sail_read_features *read_features);
 
 /*
  * Allocates read options. The assigned read options MUST be destroyed later
@@ -368,13 +368,13 @@ void SAIL_EXPORT sail_destroy_read_features(struct sail_read_features *read_feat
  *
  * Returns 0 on success or sail_error_t on error.
  */
-sail_error_t SAIL_EXPORT sail_alloc_read_options(struct sail_read_options **read_options);
+SAIL_EXPORT sail_error_t sail_alloc_read_options(struct sail_read_options **read_options);
 
 /*
  * Destroys the specified read options and all its internal allocated memory buffers.
  * The "read_options" pointer MUST NOT be used after calling this function.
  */
-void SAIL_EXPORT sail_destroy_read_options(struct sail_read_options *read_options);
+SAIL_EXPORT void sail_destroy_read_options(struct sail_read_options *read_options);
 
 /*
  * Allocates write features. The assigned write features MUST be destroyed later
@@ -382,13 +382,13 @@ void SAIL_EXPORT sail_destroy_read_options(struct sail_read_options *read_option
  *
  * Returns 0 on success or sail_error_t on error.
  */
-sail_error_t SAIL_EXPORT sail_alloc_write_features(struct sail_write_features **write_features);
+SAIL_EXPORT sail_error_t sail_alloc_write_features(struct sail_write_features **write_features);
 
 /*
  * Destroys the specified write features and all its internal allocated memory buffers.
  * The "write_features" pointer MUST NOT be used after calling this function.
  */
-void SAIL_EXPORT sail_destroy_write_features(struct sail_write_features *write_features);
+SAIL_EXPORT void sail_destroy_write_features(struct sail_write_features *write_features);
 
 /*
  * Allocates write options. The assigned write options MUST be destroyed later
@@ -396,13 +396,13 @@ void SAIL_EXPORT sail_destroy_write_features(struct sail_write_features *write_f
  *
  * Returns 0 on success or sail_error_t on error.
  */
-sail_error_t SAIL_EXPORT sail_alloc_write_options(struct sail_write_options **write_options);
+SAIL_EXPORT sail_error_t sail_alloc_write_options(struct sail_write_options **write_options);
 
 /*
  * Destroys the specified write options and all its internal allocated memory buffers.
  * The "write_options" pointer MUST NOT be used after calling this function.
  */
-void SAIL_EXPORT sail_destroy_write_options(struct sail_write_options *write_options);
+SAIL_EXPORT void sail_destroy_write_options(struct sail_write_options *write_options);
 
 /* extern "C" */
 #ifdef __cplusplus

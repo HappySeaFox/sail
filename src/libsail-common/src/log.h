@@ -25,7 +25,7 @@ enum SailLogLevel {
     SAIL_LOG_LEVEL_RESIZE_ENUM_TO_INT = INT_MAX
 };
 
-void SAIL_EXPORT sail_log(int level, const char *format, ...);
+SAIL_EXPORT void sail_log(int level, const char *format, ...);
 
 /*
  * Log an error message.

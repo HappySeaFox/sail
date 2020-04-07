@@ -29,18 +29,18 @@ struct sail_meta_entry_node {
  *
  * Returns 0 on success or sail_error_t on error.
  */
-sail_error_t SAIL_EXPORT sail_alloc_meta_entry_node(struct sail_meta_entry_node **meta_entry_node);
+SAIL_EXPORT sail_error_t sail_alloc_meta_entry_node(struct sail_meta_entry_node **meta_entry_node);
 
 /*
  * Destroys the specified meta entry node and all its internal allocated memory buffers.
  */
-void SAIL_EXPORT sail_destroy_meta_entry_node(struct sail_meta_entry_node *meta_entry_node);
+SAIL_EXPORT void sail_destroy_meta_entry_node(struct sail_meta_entry_node *meta_entry_node);
 
 /*
  * Destroys the specified meta entry node and all its internal allocated memory buffers.
  * Repeats the destruction procedure recursively for the stored next pointer.
  */
-void SAIL_EXPORT sail_destroy_meta_entry_node_chain(struct sail_meta_entry_node *meta_entry_node);
+SAIL_EXPORT void sail_destroy_meta_entry_node_chain(struct sail_meta_entry_node *meta_entry_node);
 
 /* extern "C" */
 #ifdef __cplusplus
