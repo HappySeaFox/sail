@@ -1,3 +1,5 @@
+option(SAIL_NO_COLOR "Disable colored console output" OFF)
+
 add_library(sail-common
                 src/common.c
                 src/meta_entry_node.c
@@ -9,6 +11,10 @@ add_library(sail-common
 set_target_properties(sail-common PROPERTIES
                                   VERSION "0.5.0"
                                   SOVERSION 0)
+
+if (SAIL_NO_COLOR)
+    target_compile_definitions(sail-common PRIVATE SAIL_NO_COLOR=1)
+endif()
 
 target_compile_definitions(sail-common PRIVATE INI_STOP_ON_FIRST_ERROR=1)
 

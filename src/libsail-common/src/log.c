@@ -1,14 +1,16 @@
 #include "config.h"
 
-#ifdef SAIL_WIN32
-    #include <io.h>
-    #define SAIL_ISATTY _isatty
-    #define SAIL_FILENO _fileno
-#else
-    #define _POSIX_SOURCE
-    #include <unistd.h>
-    #define SAIL_ISATTY isatty
-    #define SAIL_FILENO fileno
+#ifndef SAIL_NO_COLOR
+    #ifdef SAIL_WIN32
+        #include <io.h>
+        #define SAIL_ISATTY _isatty
+        #define SAIL_FILENO _fileno
+    #else
+        #define _POSIX_SOURCE
+        #include <unistd.h>
+        #define SAIL_ISATTY isatty
+        #define SAIL_FILENO fileno
+    #endif
 #endif
 
 #include <stdarg.h>
@@ -35,7 +37,6 @@
 void sail_log(int level, const char *format, ...) {
 
     FILE *fptr = stderr;
-    bool is_atty = (SAIL_ISATTY(SAIL_FILENO(fptr)) == 1);
 
     const char *level_string = NULL;
 
@@ -47,6 +48,9 @@ void sail_log(int level, const char *format, ...) {
         case SAIL_LOG_LEVEL_DEBUG:   level_string = "D"; break;
     }
 
+#ifndef SAIL_NO_COLOR
+    bool is_atty = (SAIL_ISATTY(SAIL_FILENO(fptr)) == 1);
+
     if (is_atty) {
         switch (level) {
             case SAIL_LOG_LEVEL_ERROR:   fprintf(fptr, "%s", SAIL_COLOR_BOLD_RED);    break;
@@ -56,6 +60,7 @@ void sail_log(int level, const char *format, ...) {
             case SAIL_LOG_LEVEL_DEBUG:   fprintf(fptr, "%s", SAIL_COLOR_BOLD_BLUE);   break;
         }
     }
+#endif
 
     va_list(args);
     va_start(args, format);
@@ -63,7 +68,9 @@ void sail_log(int level, const char *format, ...) {
     fprintf(fptr, "SAIL: [%s] ", level_string);
     vfprintf(fptr, format, args);
 
+#ifndef SAIL_NO_COLOR
     if (is_atty) {
         fprintf(fptr, "%s", SAIL_COLOR_RESET);
     }
+#endif
 }
