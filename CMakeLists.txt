@@ -51,6 +51,11 @@ endif()
 
 # Common required packages
 #
+if (WIN32)
+    set(PKG_CONFIG_EXECUTABLE "${PROJECT_SOURCE_DIR}/extra/pkg-config.exe")
+    set(ENV{PKG_CONFIG_PATH} "${PROJECT_SOURCE_DIR}/extra/B/lib/pkgconfig")
+endif()
+
 find_package(PkgConfig REQUIRED)
 
 # Common configuration file
