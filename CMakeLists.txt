@@ -17,12 +17,16 @@ set(CMAKE_C_EXTENSIONS OFF)
 #
 add_definitions(-DSAIL_BUILD)
 
-# Enable more warnings
+# Enable as many warnings as possible
 #
-if (CMAKE_COMPILER_IS_GNUCC)
-    add_compile_options(-Wall -Wextra)
-elseif (MSVC)
-    add_compile_options(/W4)
+if(MSVC)
+    if(CMAKE_C_FLAGS MATCHES "/W[0-4]")
+        string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+    else()
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W4")
+    endif()
+elseif(CMAKE_COMPILER_IS_GNUCC)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -pedantic")
 endif()
 
 # Disable undefined symbols
