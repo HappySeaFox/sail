@@ -11,6 +11,7 @@
 #include "common.h"
 #include "error.h"
 #include "export.h"
+#include "log.h"
 #include "meta_entry_node.h"
 #include "utils.h"
 
@@ -27,6 +28,14 @@ struct my_error_context {
 };
 
 typedef struct my_error_context * my_error_context_ptr;
+
+static void my_output_message(j_common_ptr cinfo) {
+    char buffer[JMSG_LENGTH_MAX];
+
+    (*cinfo->err->format_message)(cinfo, buffer);
+
+    SAIL_LOG_ERROR("%s\n", buffer);
+}
 
 static void my_error_exit(j_common_ptr cinfo) {
     my_error_context_ptr myerr = (my_error_context_ptr)cinfo->err;
@@ -176,6 +185,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_init_v1(struct sail_file *file, struct
     /* Error handling setup. */
     pimpl->decompress_context.err = jpeg_std_error(&pimpl->error_context.jpeg_error_mgr);
     pimpl->error_context.jpeg_error_mgr.error_exit = my_error_exit;
+    pimpl->error_context.jpeg_error_mgr.output_message = my_output_message;
 
     if (setjmp(pimpl->error_context.setjmp_buffer) != 0) {
         pimpl->libjpeg_error = true;
