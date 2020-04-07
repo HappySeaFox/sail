@@ -1,0 +1,22 @@
+#!/bin/sh -e
+
+cd "$(dirname "$0")"
+
+# extra libs
+libjpeg="libjpeg-turbo-2.0.4"
+
+# Where all built libs and headers will be installed
+export B="$PWD/B"
+rm -rf "$B"
+
+# Add current dir to PATH to enable pkg-config, nasm etc.
+export PATH=$PATH:$PWD
+
+cd "$libjpeg"
+rm -rf build
+mkdir build
+cd build
+
+cmake -DCMAKE_CONFIGURATION_TYPES=Debug -DENABLE_SHARED=ON -DENABLE_STATIC=OFF -DWITH_TURBOJPEG=OFF -DCMAKE_INSTALL_PREFIX="$B" ..
+cmake --build .
+cmake --install .
