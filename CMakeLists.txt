@@ -72,3 +72,43 @@ include_directories("${PROJECT_BINARY_DIR}/include")
 add_subdirectory(src/libsail-common)
 #add_subdirectory(src/libsail)
 add_subdirectory(src/sail-plugins)
+
+# Print configuration statistics
+#
+
+# Split the disabled plugins by groups of 4 (a very bruteforce way)
+#
+string(REGEX REPLACE "([A-Z]+);([A-Z]+);([A-Z]+);([A-Z]+)(;?)" "\\1 \\2 \\3 \\4\\5"
+        DISABLED_CONDITIONAL_PLUGINS "${DISABLED_CONDITIONAL_PLUGINS}")
+string(REGEX REPLACE ";([A-Z]+);([A-Z]+);([A-Z]+)$" ";\\1 \\2 \\3"
+        DISABLED_CONDITIONAL_PLUGINS "${DISABLED_CONDITIONAL_PLUGINS}")
+string(REGEX REPLACE ";([A-Z]+);([A-Z]+)$" ";\\1 \\2"
+        DISABLED_CONDITIONAL_PLUGINS "${DISABLED_CONDITIONAL_PLUGINS}")
+
+list(LENGTH DISABLED_CONDITIONAL_PLUGINS INDEX)
+math(EXPR INDEX ${INDEX}-1)
+
+if (INDEX GREATER_EQUAL 0)
+    list(GET DISABLED_CONDITIONAL_PLUGINS 0 FIRST_LINE)
+endif()
+
+message("")
+message("***************************************")
+message("*")
+message("* Configuration statistics: ")
+message("*")
+message("* Colored output:               ${SAIL_COLORED_OUTPUT}")
+message("* Enabled plugins:              ${PLUGINS}")
+message("* Enabled conditional plugins:  ${ENABLED_CONDITIONAL_PLUGINS}")
+message("* Disabled conditional plugins: ${FIRST_LINE}")
+
+if (INDEX GREATER 0)
+    foreach(i RANGE 1 ${INDEX})
+        list(GET DISABLED_CONDITIONAL_PLUGINS ${i} LINE)
+        message("*                               ${LINE}")
+    endforeach()
+endif()
+
+message("*")
+message("***************************************")
+message("")

@@ -1,5 +1,9 @@
 option(SAIL_COLORED_OUTPUT "Enable colored console output" ON)
 
+# Export options to the parent cmake file to print statistics
+#
+set(SAIL_COLORED_OUTPUT ${SAIL_COLORED_OUTPUT} PARENT_SCOPE)
+
 add_library(sail-common
                 src/common.c
                 src/meta_entry_node.c

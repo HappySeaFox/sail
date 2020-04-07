@@ -4,6 +4,10 @@ set(PLUGINS "")
 
 list(SORT PLUGINS)
 
+# Export plugins to the parent cmake file to print statistics
+#
+set(PLUGINS ${PLUGINS} PARENT_SCOPE)
+
 # Conditional plugins that require external dependencies like libjpeg
 #
 set(CONDITIONAL_PLUGINS jpeg)
@@ -67,11 +71,10 @@ endforeach()
 
 # Modify the lists for displaying
 #
-string(REPLACE ";" " " ENABLED_CONDITIONAL_PLUGINS "${ENABLED_CONDITIONAL_PLUGINS}")
-string(REPLACE ";" " " DISABLED_CONDITIONAL_PLUGINS "${DISABLED_CONDITIONAL_PLUGINS}")
-
 string(TOUPPER "${ENABLED_CONDITIONAL_PLUGINS}" ENABLED_CONDITIONAL_PLUGINS)
 string(TOUPPER "${DISABLED_CONDITIONAL_PLUGINS}" DISABLED_CONDITIONAL_PLUGINS)
 
-message("Enabled conditional plugins: ${ENABLED_CONDITIONAL_PLUGINS}")
-message("Disabled conditional plugins: ${DISABLED_CONDITIONAL_PLUGINS}")
+# Export plugins to the parent cmake file to print statistics
+#
+set(ENABLED_CONDITIONAL_PLUGINS ${ENABLED_CONDITIONAL_PLUGINS} PARENT_SCOPE)
+set(DISABLED_CONDITIONAL_PLUGINS ${DISABLED_CONDITIONAL_PLUGINS} PARENT_SCOPE)
