@@ -484,12 +484,18 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v1(struct sail_file *
     SAIL_CHECK_FILE(file);
     SAIL_CHECK_IMAGE(image);
 
+    /* Sanity check. */
+    if (pixel_format_to_color_space(image->pixel_format) == JCS_UNKNOWN) {
+        return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+    }
+
     struct pimpl *pimpl = (struct pimpl *)file->pimpl;
 
     if (pimpl == NULL) {
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
+    /* Error handling setup. */
     if (setjmp(pimpl->error_context.setjmp_buffer) != 0) {
         pimpl->libjpeg_error = true;
         return SAIL_UNDERLYING_CODEC_ERROR;
@@ -497,10 +503,12 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v1(struct sail_file *
 
     pimpl->compress_context.image_width = image->width;
     pimpl->compress_context.image_height = image->height;
-    pimpl->compress_context.input_components = sail_bits_per_pixel(pimpl->write_options->pixel_format) / 8;
-    pimpl->compress_context.in_color_space = pixel_format_to_color_space(pimpl->write_options->pixel_format);
+    pimpl->compress_context.input_components = sail_bits_per_pixel(image->pixel_format) / 8;
+    pimpl->compress_context.in_color_space = pixel_format_to_color_space(image->pixel_format);
 
     jpeg_set_defaults(&pimpl->compress_context);
+    jpeg_set_colorspace(&pimpl->compress_context, pixel_format_to_color_space(pimpl->write_options->pixel_format));
+
     const int compression = (pimpl->write_options->compression < COMPRESSION_MIN ||
                                 pimpl->write_options->compression > COMPRESSION_MAX)
                             ? COMPRESSION_DEFAULT
