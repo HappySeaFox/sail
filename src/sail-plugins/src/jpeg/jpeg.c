@@ -527,7 +527,7 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v1(struct sail_file *
             jpeg_write_marker(&pimpl->compress_context,
                                 JPEG_COM,
                                 (JOCTET *)meta_entry_node->value,
-                                strlen(meta_entry_node->value));
+                                (unsigned int)strlen(meta_entry_node->value));
 
             meta_entry_node = meta_entry_node->next;
         }
