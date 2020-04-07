@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.6)
 
 project(SAIL VERSION 0.9.0
              DESCRIPTION "Squirrel Abstract Image Libraries"
