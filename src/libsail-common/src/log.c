@@ -1,3 +1,5 @@
+#include "config.h"
+
 #ifdef SAIL_WIN32
     #include <io.h>
     #define SAIL_ISATTY _isatty
@@ -13,29 +15,24 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#include "config.h"
 #include "log.h"
 
-#ifdef SAIL_UNIX
-    #include <unistd.h>
+/* ANSI terminal color escapes. */
+#define SAIL_COLOR_RED          "\033[0;31m"
+#define SAIL_COLOR_BOLD_RED     "\033[1;31m"
+#define SAIL_COLOR_GREEN        "\033[0;32m"
+#define SAIL_COLOR_BOLD_GREEN   "\033[1;32m"
+#define SAIL_COLOR_YELLOW       "\033[0;33m"
+#define SAIL_COLOR_BOLD_YELLOW  "\033[1;33m"
+#define SAIL_COLOR_BLUE         "\033[0;34m"
+#define SAIL_COLOR_BOLD_BLUE    "\033[1;34m"
+#define SAIL_COLOR_MAGENTA      "\033[0;35m"
+#define SAIL_COLOR_BOLD_MAGENTA "\033[1;35m"
+#define SAIL_COLOR_CYAN         "\033[0;36m"
+#define SAIL_COLOR_BOLD_CYAN    "\033[1;36m"
+#define SAIL_COLOR_RESET        "\033[0m"
 
-    /* UNIX terminal color escapes. */
-    #define SAIL_COLOR_RED          "\033[0;31m"
-    #define SAIL_COLOR_BOLD_RED     "\033[1;31m"
-    #define SAIL_COLOR_GREEN        "\033[0;32m"
-    #define SAIL_COLOR_BOLD_GREEN   "\033[1;32m"
-    #define SAIL_COLOR_YELLOW       "\033[0;33m"
-    #define SAIL_COLOR_BOLD_YELLOW  "\033[1;33m"
-    #define SAIL_COLOR_BLUE         "\033[0;34m"
-    #define SAIL_COLOR_BOLD_BLUE    "\033[1;34m"
-    #define SAIL_COLOR_MAGENTA      "\033[0;35m"
-    #define SAIL_COLOR_BOLD_MAGENTA "\033[1;35m"
-    #define SAIL_COLOR_CYAN         "\033[0;36m"
-    #define SAIL_COLOR_BOLD_CYAN    "\033[1;36m"
-    #define SAIL_COLOR_RESET        "\033[0m"
-#endif
-
-void SAIL_EXPORT sail_log(int level, const char *format, ...) {
+void sail_log(int level, const char *format, ...) {
 
     FILE *fptr = stderr;
     bool is_atty = (SAIL_ISATTY(SAIL_FILENO(fptr)) == 1);
@@ -50,7 +47,6 @@ void SAIL_EXPORT sail_log(int level, const char *format, ...) {
         case SAIL_LOG_LEVEL_DEBUG:   level_string = "D"; break;
     }
 
-#ifdef SAIL_UNIX
     if (is_atty) {
         switch (level) {
             case SAIL_LOG_LEVEL_ERROR:   fprintf(fptr, "%s", SAIL_COLOR_BOLD_RED);    break;
@@ -60,7 +56,6 @@ void SAIL_EXPORT sail_log(int level, const char *format, ...) {
             case SAIL_LOG_LEVEL_DEBUG:   fprintf(fptr, "%s", SAIL_COLOR_BOLD_BLUE);   break;
         }
     }
-#endif
 
     va_list(args);
     va_start(args, format);
@@ -68,9 +63,7 @@ void SAIL_EXPORT sail_log(int level, const char *format, ...) {
     fprintf(fptr, "SAIL: [%s] ", level_string);
     vfprintf(fptr, format, args);
 
-#ifdef SAIL_UNIX
     if (is_atty) {
         fprintf(fptr, "%s", SAIL_COLOR_RESET);
     }
-#endif
 }
