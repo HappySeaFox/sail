@@ -466,6 +466,7 @@ SAIL_EXPORT sail_error_t sail_plugin_write_init_v1(struct sail_file *file, struc
     /* Error handling setup. */
     pimpl->compress_context.err = jpeg_std_error(&pimpl->error_context.jpeg_error_mgr);
     pimpl->error_context.jpeg_error_mgr.error_exit = my_error_exit;
+    pimpl->error_context.jpeg_error_mgr.output_message = my_output_message;
 
     if (setjmp(pimpl->error_context.setjmp_buffer) != 0) {
         pimpl->libjpeg_error = true;
