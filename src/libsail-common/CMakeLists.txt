@@ -18,6 +18,7 @@ add_library(sail-common
 #
 set(PUBLIC_HEADERS "")
 list(APPEND PUBLIC_HEADERS "src/common.h")
+list(APPEND PUBLIC_HEADERS "src/error.h")
 list(APPEND PUBLIC_HEADERS "src/export.h")
 list(APPEND PUBLIC_HEADERS "src/meta_entry_node.h")
 list(APPEND PUBLIC_HEADERS "src/log.h")
