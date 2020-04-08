@@ -64,7 +64,8 @@ find_package(PkgConfig REQUIRED)
 
 # Common configuration file
 #
-configure_file("${PROJECT_SOURCE_DIR}/config.h.in" "${PROJECT_BINARY_DIR}/include/config.h")
+set(SAIL_INSTALL_PATH "${CMAKE_INSTALL_PREFIX}")
+configure_file("${PROJECT_SOURCE_DIR}/config.h.in" "${PROJECT_BINARY_DIR}/include/config.h" @ONLY)
 include_directories("${PROJECT_BINARY_DIR}/include")
 
 # Configure subdirs
