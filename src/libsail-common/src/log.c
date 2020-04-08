@@ -36,10 +36,15 @@
 #define SAIL_COLOR_BOLD_CYAN    "\033[1;36m"
 #define SAIL_COLOR_RESET        "\033[0m"
 
-static bool ansiColorsSupported(FILE *fptr) {
+#define SAIL_LOG_FPTR stderr
+#define SAIL_LOG_STD_HANDLE STD_ERROR_HANDLE
+
+static bool check_ansi_colors_supported(void) {
+
+    bool result = false;
 
 #ifdef SAIL_COLORED_OUTPUT
-    bool is_atty = (SAIL_ISATTY(SAIL_FILENO(fptr)) == 1);
+    bool is_atty = (SAIL_ISATTY(SAIL_FILENO(SAIL_LOG_FPTR)) != 0);
 
     if (is_atty) {
         /*
@@ -48,22 +53,28 @@ static bool ansiColorsSupported(FILE *fptr) {
          * See https://docs.microsoft.com/ru-ru/windows/win32/sysinfo/targeting-your-application-at-windows-8-1
          */
         #ifdef SAIL_WIN32
-            return IsWindows10OrGreater();
+            if (IsWindows10OrGreater()) {
+                HANDLE stderrHandle = GetStdHandle(SAIL_LOG_STD_HANDLE);
+                DWORD consoleMode;
+
+                if (GetConsoleMode(stderrHandle, &consoleMode)) {
+                    consoleMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+
+                    if (SetConsoleMode(stderrHandle, consoleMode)) {
+                        result = true;
+                    }
+                }
+            }
         #else
-            return true;
+            result = true;
         #endif
-    } else {
-        return false;
     }
-#else
-    (void)fptr;
-    return false;
 #endif
+
+    return result;
 }
 
 void sail_log(int level, const char *format, ...) {
-
-    FILE *fptr = stderr;
 
     const char *level_string = NULL;
 
@@ -75,23 +86,25 @@ void sail_log(int level, const char *format, ...) {
         case SAIL_LOG_LEVEL_DEBUG:   level_string = "D"; break;
     }
 
-    if (ansiColorsSupported(fptr)) {
+    bool ansi_colors_supported = check_ansi_colors_supported();
+
+    if (ansi_colors_supported) {
         switch (level) {
-            case SAIL_LOG_LEVEL_ERROR:   fprintf(fptr, "%s", SAIL_COLOR_BOLD_RED);    break;
-            case SAIL_LOG_LEVEL_WARNING: fprintf(fptr, "%s", SAIL_COLOR_BOLD_YELLOW); break;
-            case SAIL_LOG_LEVEL_INFO:    fprintf(fptr, "%s", SAIL_COLOR_BOLD_CYAN);   break;
-            case SAIL_LOG_LEVEL_MESSAGE:                                              break;
-            case SAIL_LOG_LEVEL_DEBUG:   fprintf(fptr, "%s", SAIL_COLOR_BOLD_BLUE);   break;
+            case SAIL_LOG_LEVEL_ERROR:   fprintf(SAIL_LOG_FPTR, "%s", SAIL_COLOR_BOLD_RED);    break;
+            case SAIL_LOG_LEVEL_WARNING: fprintf(SAIL_LOG_FPTR, "%s", SAIL_COLOR_BOLD_YELLOW); break;
+            case SAIL_LOG_LEVEL_INFO:    fprintf(SAIL_LOG_FPTR, "%s", SAIL_COLOR_BOLD_CYAN);   break;
+            case SAIL_LOG_LEVEL_MESSAGE:                                                       break;
+            case SAIL_LOG_LEVEL_DEBUG:   fprintf(SAIL_LOG_FPTR, "%s", SAIL_COLOR_BOLD_BLUE);   break;
         }
     }
 
     va_list(args);
     va_start(args, format);
 
-    fprintf(fptr, "SAIL: [%s] ", level_string);
-    vfprintf(fptr, format, args);
+    fprintf(SAIL_LOG_FPTR, "SAIL: [%s] ", level_string);
+    vfprintf(SAIL_LOG_FPTR, format, args);
 
-    if (ansiColorsSupported(fptr)) {
-        fprintf(fptr, "%s", SAIL_COLOR_RESET);
+    if (ansi_colors_supported) {
+        fprintf(SAIL_LOG_FPTR, "%s", SAIL_COLOR_RESET);
     }
 }
