@@ -72,14 +72,14 @@ find_package(PkgConfig REQUIRED)
 
 # Common configuration file
 #
-set(SAIL_INSTALL_PATH "${CMAKE_INSTALL_PREFIX}")
+set(SAIL_PLUGINS_PATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/sail/plugins")
 configure_file("${PROJECT_SOURCE_DIR}/config.h.in" "${PROJECT_BINARY_DIR}/include/config.h" @ONLY)
 include_directories("${PROJECT_BINARY_DIR}/include")
 
 # Configure subdirs
 #
 add_subdirectory(src/libsail-common)
-#add_subdirectory(src/libsail)
+add_subdirectory(src/libsail)
 add_subdirectory(src/sail-plugins)
 
 # Installation
