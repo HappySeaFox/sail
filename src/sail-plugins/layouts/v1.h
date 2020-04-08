@@ -7,6 +7,11 @@
  * It's intedened to be used as a reference how plugins V1 are organized. It's also could
  * be used by plugins' developers to compile their plugins directly into a testing application
  * to simplify debugging.
+ *
+ * Layout files must be included in reverse order like that:
+ *
+ * #include "v2.h"
+ * #include "v1.h"
  */
 
 #include <sail/error.h>

@@ -9,6 +9,11 @@
  * to simplify debugging.
  *
  * V2 inherits all the functions from V1.
+ *
+ * Layout files must be included in reverse order like that:
+ *
+ * #include "v2.h"
+ * #include "v1.h"
  */
 
 #include <sail/error.h>
