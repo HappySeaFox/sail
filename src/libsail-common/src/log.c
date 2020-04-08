@@ -3,6 +3,8 @@
 #ifdef SAIL_COLORED_OUTPUT
     #ifdef SAIL_WIN32
         #include <io.h>
+        #include <windows.h>
+        #include <versionhelpers.h>
         #define SAIL_ISATTY _isatty
         #define SAIL_FILENO _fileno
     #else
@@ -34,6 +36,27 @@
 #define SAIL_COLOR_BOLD_CYAN    "\033[1;36m"
 #define SAIL_COLOR_RESET        "\033[0m"
 
+static bool ansiColorsSupported(FILE *fptr) {
+
+#ifdef SAIL_COLORED_OUTPUT
+    bool is_atty = (SAIL_ISATTY(SAIL_FILENO(fptr)) == 1);
+
+    if (is_atty) {
+        /*
+         * This requires the application to target Windows 8.1 or later. Otherwise it always returns false.
+         *
+         * See https://docs.microsoft.com/ru-ru/windows/win32/sysinfo/targeting-your-application-at-windows-8-1
+         */
+        return IsWindows10OrGreater();
+    } else {
+        return false;
+    }
+#else
+    (void)fptr;
+    return false;
+#endif
+}
+
 void sail_log(int level, const char *format, ...) {
 
     FILE *fptr = stderr;
@@ -48,10 +71,7 @@ void sail_log(int level, const char *format, ...) {
         case SAIL_LOG_LEVEL_DEBUG:   level_string = "D"; break;
     }
 
-#ifdef SAIL_COLORED_OUTPUT
-    bool is_atty = (SAIL_ISATTY(SAIL_FILENO(fptr)) == 1);
-
-    if (is_atty) {
+    if (ansiColorsSupported(fptr)) {
         switch (level) {
             case SAIL_LOG_LEVEL_ERROR:   fprintf(fptr, "%s", SAIL_COLOR_BOLD_RED);    break;
             case SAIL_LOG_LEVEL_WARNING: fprintf(fptr, "%s", SAIL_COLOR_BOLD_YELLOW); break;
@@ -60,7 +80,6 @@ void sail_log(int level, const char *format, ...) {
             case SAIL_LOG_LEVEL_DEBUG:   fprintf(fptr, "%s", SAIL_COLOR_BOLD_BLUE);   break;
         }
     }
-#endif
 
     va_list(args);
     va_start(args, format);
@@ -68,9 +87,7 @@ void sail_log(int level, const char *format, ...) {
     fprintf(fptr, "SAIL: [%s] ", level_string);
     vfprintf(fptr, format, args);
 
-#ifdef SAIL_COLORED_OUTPUT
-    if (is_atty) {
+    if (ansiColorsSupported(fptr)) {
         fprintf(fptr, "%s", SAIL_COLOR_RESET);
     }
-#endif
 }
