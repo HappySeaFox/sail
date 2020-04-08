@@ -77,6 +77,10 @@ add_subdirectory(src/sail-plugins)
 #
 install(FILES "${PROJECT_BINARY_DIR}/include/config.h" DESTINATION include/sail)
 
+if (WIN32)
+    install(DIRECTORY "${PROJECT_SOURCE_DIR}/extra/B/bin/" DESTINATION lib/sail/plugins/lib)
+endif()
+
 # Print configuration statistics
 #
 message("")
