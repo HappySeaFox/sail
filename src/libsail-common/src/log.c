@@ -47,7 +47,11 @@ static bool ansiColorsSupported(FILE *fptr) {
          *
          * See https://docs.microsoft.com/ru-ru/windows/win32/sysinfo/targeting-your-application-at-windows-8-1
          */
-        return IsWindows10OrGreater();
+        #ifdef SAIL_WIN32
+            return IsWindows10OrGreater();
+        #else
+            return true;
+        #endif
     } else {
         return false;
     }
