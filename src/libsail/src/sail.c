@@ -6,6 +6,7 @@
 #include <string.h>
 
 #ifdef SAIL_WIN32
+    #include <windows.h>
 #else
     #include <sys/types.h>
     #include <dirent.h>
@@ -25,6 +26,23 @@ sail_error_t sail_init(struct sail_context **context) {
     }
 
 #ifdef SAIL_WIN32
+    WIN32_FIND_DATA data;
+    HANDLE hFind = FindFirstFile(SAIL_PLUGINS_PATH "\\*", &data);
+
+    if (hFind == INVALID_HANDLE_VALUE) {
+        SAIL_LOG_ERROR("Failed to list files in '%s'. Error: %d", SAIL_PLUGINS_PATH, GetLastError());
+        return SAIL_DIR_OPEN_ERROR;
+    }
+
+    do {
+        printf("%s\n", data.cFileName);
+    } while (FindNextFile(hFind, &data));
+
+    if (GetLastError() != ERROR_NO_MORE_FILES) {
+        SAIL_LOG_ERROR("Failed to list files in '%s'. Error: %d. Some plugins may be ignored", SAIL_PLUGINS_PATH, GetLastError());
+    }
+
+    FindClose(hFind);
 #else
     DIR *d = opendir(SAIL_PLUGINS_PATH);
 

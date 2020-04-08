@@ -12,8 +12,9 @@ typedef int sail_error_t;
  */
 #define SAIL_MEMORY_ALLOCATION_FAILED     1
 #define SAIL_FILE_OPEN_ERROR              2
-#define SAIL_FILE_PARSE_ERROR             3
-#define SAIL_INVALID_ARGUMENT             4
+#define SAIL_DIR_OPEN_ERROR               3
+#define SAIL_FILE_PARSE_ERROR             4
+#define SAIL_INVALID_ARGUMENT             5
 
 /*
  * Encoding/decoding common errors.
