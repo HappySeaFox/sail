@@ -73,6 +73,10 @@ add_subdirectory(src/libsail-common)
 #add_subdirectory(src/libsail)
 add_subdirectory(src/sail-plugins)
 
+# Installation
+#
+install(FILES "${PROJECT_BINARY_DIR}/include/config.h" DESTINATION include/sail)
+
 # Print configuration statistics
 #
 message("")
