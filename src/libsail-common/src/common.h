@@ -105,10 +105,10 @@ enum SailPluginFeatures {
 /* Read or write options. */
 enum SailIoOptions {
 
-    /* Ability to read or write simple image meta information like JPEG comments. */
+    /* Instruction to read or write simple image meta information like JPEG comments. */
     SAIL_IO_OPTION_META_INFO = 1 << 0,
 
-    /* Ability to read or write EXIF meta information. */
+    /* Instruction to read or write EXIF meta information. */
     SAIL_IO_OPTION_EXIF      = 1 << 1,
 
     /* Not to be used. Resize the enum for future elements. */
