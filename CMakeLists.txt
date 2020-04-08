@@ -6,6 +6,16 @@ project(SAIL VERSION 0.9.0
 
 include(GNUInstallDirs)
 
+# Sanity checks
+#
+string(FIND "${CMAKE_INSTALL_PREFIX}" " " SPACE_INDEX)
+if (SPACE_INDEX GREATER_EQUAL 0)
+    message(FATAL_ERROR "The current CMAKE_INSTALL_PREFIX contains spaces: '${CMAKE_INSTALL_PREFIX}'. \
+The generated pkg-config files will also have spaces in paths. Pkg-config doesn't support that \
+and will fail to generate CFLAGS and LIBS for client applications. Please use a different CMAKE_INSTALL_PREFIX \
+without spaces.")
+endif()
+
 # TODO Move to a Debian patch
 # Set arch-specific include/lib dirs
 #
