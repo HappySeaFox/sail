@@ -78,7 +78,13 @@ add_subdirectory(src/sail-plugins)
 install(FILES "${PROJECT_BINARY_DIR}/include/config.h" DESTINATION include/sail)
 
 if (WIN32)
-    install(DIRECTORY "${PROJECT_SOURCE_DIR}/extra/B/bin/" DESTINATION lib/sail/plugins/lib)
+    if (EXISTS "${PROJECT_SOURCE_DIR}/extra/B/bin")
+        install(DIRECTORY "${PROJECT_SOURCE_DIR}/extra/B/bin/" DESTINATION lib/sail/plugins/lib)
+    endif()
+else()
+    if (EXISTS "${PROJECT_SOURCE_DIR}/extra/B/lib")
+        install(DIRECTORY "${PROJECT_SOURCE_DIR}/extra/B/lib/" DESTINATION lib/sail/plugins/lib)
+    endif()
 endif()
 
 # Print configuration statistics
