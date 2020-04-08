@@ -135,56 +135,137 @@ typedef struct sail_file sail_file_t;
 struct sail_meta_entry_node;
 
 /*
- * A structure representing an image.
+ * A structure representing an image. Fields set when reading images are marked with READ.
+ * Fields that must be set by a caller when writing images are marked with WRITE.
  */
 struct sail_image {
 
-    /* Image width. */
+    /*
+     * Image width.
+     *
+     * READ:  Set by SAIL to a positive image width in pixels.
+     * WRITE: Must be set by a caller to a positive image width in pixels.
+     */
     int width;
 
-    /* Image height. */
+    /*
+     * Image height.
+     *
+     * READ:  Set by SAIL to a positive image height in pixels.
+     * WRITE: Must be set by a caller to a positive image height in pixels.
+     */
     int height;
 
-    /* Bytes per line. Plugins will always set this field to a non-zero value. */
+    /*
+     * Bytes per line. Some image formats (like BMP) pad rows of pixels to some boundary.
+     *
+     * READ:  Set by SAIL to a positive length of a row of pixels in bytes.
+     * WRITE: Ignored.
+     */
     int bytes_per_line;
 
-    /* Image pixel format. See SailPixelFormat. */
+    /*
+     * Image pixel format. See SailPixelFormat.
+     *
+     * READ:  Set by SAIL to a valid output image pixel format.
+     * WRITE: Must be set by a caller to a valid input image pixel format.
+     */
     int pixel_format;
 
-    /* Number of passes needed to read or write an entire image frame. 1 by default. */
+    /*
+     * Number of passes needed to read or write an entire image frame. 1 by default.
+     *
+     * READ:  Set by SAIL to a positive number of passes needed to read an image. For example, interlaced PNGs
+     *        have 8 passes.
+     * WRITE: Ignored. Use sail_write_features.passes to determine the actual number of passes needed to write
+     *        an interlaced image.
+     */
     int passes;
 
-    /* Is the image a frame in an animation. */
+    /*
+     * Is the image a frame in an animation.
+     *
+     * READ:  Set by SAIL to true if the image is a frame in an animation.
+     * WRITE: Ignored.
+     */
     bool animated;
 
-    /* Delay in milliseconds if the image is a frame in an animation or 0 otherwise. */
+    /*
+     * Delay in milliseconds if the image is a frame in an animation or 0 otherwise.
+     *
+     * READ:  Set by SAIL to a non-negative number of milliseconds.
+     * WRITE: Must be set by a caller to a non-negative number of milliseconds.
+     */
     int delay;
 
-    /* Palette pixel format. */
+    /*
+     * Palette pixel format.
+     *
+     * READ:  Set by SAIL to a valid palette pixel format if the image is indexed (palette is not NULL).
+     * WRITE: Must be set by a caller to a valid palette pixel format if the image is indexed
+     *        (palette is not NULL).
+     */
     int palette_pixel_format;
 
-    /* Palette if the image has a palette and the requested pixel format assumes having a palette. */
+    /*
+     * Palette if the image has a palette and the requested pixel format assumes having a palette.
+     * Destroyed by sail_image_destroy().
+     *
+     * READ:  Set by SAIL to a valid pixel array if the image is indexed.
+     * WRITE: Must be set allocated and set by a caller to a valid pixel array if the image is indexed.
+     */
     void *palette;
 
-    /* Size of the palette data in bytes. */
+    /*
+     * Size of the palette data in bytes.
+     *
+     * READ:  Set by SAIL to a valid palette size in bytes if the image is indexed or to 0.
+     * WRITE: Must be set by a caller to a valid palette size in bytes if the image is indexed.
+     */
     int palette_size;
 
-    /* Image meta information. See sail_meta_entry_node. Plugins guarantee that keys and values are non-NULL. */
+    /*
+     * Image meta information. See sail_meta_entry_node. Plugins guarantee that keys and values are non-NULL.
+     * Destroyed by sail_image_destroy().
+     *
+     * READ:  Set by SAIL to a valid linked list with simple meta information (like JPEG comments) or to NULL.
+     * WRITE: Must be set allocated and set by a caller to a valid linked list with simple meta information
+     *        like JPEG comments if the image have it.
+     */
     struct sail_meta_entry_node *meta_entry_node;
 
-    /* Decoded image properties. See SailImageProperties. */
+    /*
+     * Decoded image properties. See SailImageProperties.
+     *
+     * READ:  Set by SAIL to a valid image properties. For example, some image formats store images flipped.
+     *        A caller must use this field to manipulate the output image accordingly (e.g. flip back etc.).
+     * WRITE: Ignored.
+     */
     int properties;
 
-    /* Image source pixel format. See SailPixelFormat. */
+    /*
+     * Image source pixel format. See SailPixelFormat.
+     *
+     * READ:  Set by SAIL to a valid source image pixel format before converting it to a requested pixel format
+     *        with sail_read_options.pixel_format.
+     * WRITE: Ignored.
+     */
     int source_pixel_format;
 
-    /* Image source properties. See SailImageProperties. */
+    /*
+     * Image source properties. See SailImageProperties.
+     *
+     * READ:  Set by SAIL to a valid source image properties or to 0.
+     * WRITE: Ignored.
+     */
     int source_properties;
 };
 
 typedef struct sail_image sail_image_t;
 
-/* Reading features. */
+/*
+ * Read features. Use this structure to determine what a plugin can actually read.
+ */
 struct sail_read_features {
 
     /* A list of supported pixel formats by this plugin. */
@@ -199,7 +280,9 @@ struct sail_read_features {
 
 typedef struct sail_read_features sail_read_features_t;
 
-/* Writing features. */
+/*
+ * Write features. Use this structure to determine what a plugin can actually write.
+ */
 struct sail_write_features {
 
     /* A list of supported pixel formats by this plugin. */
@@ -212,17 +295,17 @@ struct sail_write_features {
     int features;
 
     /*
-     * Required image properties. For example, in input image must be flipped by the caller before writing
+     * Required image properties. For example, in input image must be flipped by a caller before writing
      * it with SAIL (or supply scan lines in a reverse order). See SailImageProperties.
      */
     int properties;
 
-    /* Number of passes to write an interlaced image. */
+    /* Number of passes to write an interlaced image or 0. */
     int passes;
 
     /*
      * A list of supported pixels compression types by this plugin. NULL if no compression types are available.
-     * In most cases plugins mutually exclusive support either compression levels or compression types.
+     * In most cases plugins support compression levels or compression types, but not both.
      *
      * For example:
      *
