@@ -30,8 +30,8 @@ rm -rf build
 mkdir build
 cd build
 
-cmake -A x64 -DCMAKE_BUILD_TYPE=Release -DENABLE_SHARED=ON -DENABLE_STATIC=OFF -DWITH_TURBOJPEG=OFF -DCMAKE_INSTALL_PREFIX="$B" ..
-cmake --build .
+cmake -A x64 -DENABLE_SHARED=ON -DENABLE_STATIC=OFF -DWITH_TURBOJPEG=OFF -DCMAKE_INSTALL_PREFIX="$B" ..
+cmake --build . --config Release
 
 # install
 install -D -m 644 jconfig.h     "$B/include/jconfig.h"
@@ -41,8 +41,8 @@ install -D -m 644 ../jpeglib.h  "$B/include/jpeglib.h"
 
 install -D -m 644 pkgscripts/libjpeg.pc  "$B/lib/pkgconfig/libjpeg.pc"
 
-install -D -m 644 Debug/jpeg62.dll "$B/bin/jpeg62.dll"
-install -D -m 644 Debug/jpeg.lib   "$B/lib/jpeg.lib"
+install -D -m 644 Release/jpeg62.dll "$B/bin/jpeg62.dll"
+install -D -m 644 Release/jpeg.lib   "$B/lib/jpeg.lib"
 
 echo
 echo Success
