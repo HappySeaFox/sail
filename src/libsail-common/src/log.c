@@ -36,7 +36,7 @@
 #define SAIL_COLOR_BOLD_CYAN    "\033[1;36m"
 #define SAIL_COLOR_RESET        "\033[0m"
 
-#define SAIL_LOG_FPTR stderr
+#define SAIL_LOG_FPTR       stderr
 #define SAIL_LOG_STD_HANDLE STD_ERROR_HANDLE
 
 static bool check_ansi_colors_supported(void) {
