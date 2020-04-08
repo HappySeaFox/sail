@@ -14,7 +14,7 @@ add_library(sail-common
                 src/plugin.c
                 src/utils.c)
 
-# Build a list of publiuc headers to install
+# Build a list of public headers to install
 #
 set(PUBLIC_HEADERS "")
 list(APPEND PUBLIC_HEADERS "src/common.h")
