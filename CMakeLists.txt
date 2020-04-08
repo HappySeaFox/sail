@@ -4,6 +4,8 @@ project(SAIL VERSION 0.9.0
              DESCRIPTION "Squirrel Abstract Image Libraries"
              LANGUAGES C)
 
+include(GNUInstallDirs)
+
 # Enable shared libs by default
 #
 set(BUILD_SHARED_LIBS ON)

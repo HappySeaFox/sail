@@ -37,6 +37,13 @@ endif()
 target_compile_definitions(sail-common PRIVATE INI_STOP_ON_FIRST_ERROR=1)
 target_include_directories(sail-common PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
+# pkg-config integration
+#
+get_target_property(VERSION sail-common VERSION)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/pkgconfig/libsail-common.pc.in"
+                "${CMAKE_CURRENT_BINARY_DIR}/libsail-common.pc" @ONLY)
+
 # Installation
 #
 install(TARGETS sail-common LIBRARY DESTINATION lib PUBLIC_HEADER DESTINATION include/sail)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/libsail-common.pc" DESTINATION lib/pkgconfig)

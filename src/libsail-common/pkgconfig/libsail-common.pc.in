@@ -1,0 +1,10 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=@CMAKE_INSTALL_PREFIX@
+libdir=@CMAKE_INSTALL_FULL_LIBDIR@
+includedir=@CMAKE_INSTALL_FULL_INCLUDEDIR@
+
+Name: libsail-common
+Description: SAIL common libraries and headers
+Version: @VERSION@
+Libs: -L${libdir} -lsail-common
+Cflags: -I${includedir}
