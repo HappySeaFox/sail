@@ -22,5 +22,5 @@ target_link_libraries(jpeg PRIVATE PkgConfig::libjpeg)
 
 # Installation
 #
-install(TARGETS jpeg DESTINATION lib/sail/plugins)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/jpeg.plugin.info DESTINATION lib/sail/plugins)
+install(TARGETS jpeg DESTINATION "${CMAKE_INSTALL_LIBDIR}/sail/plugins")
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/jpeg.plugin.info DESTINATION "${CMAKE_INSTALL_LIBDIR}/sail/plugins")

@@ -45,5 +45,6 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/pkgconfig/libsail-common.pc.in"
 
 # Installation
 #
-install(TARGETS sail-common LIBRARY DESTINATION lib PUBLIC_HEADER DESTINATION include/sail)
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/libsail-common.pc" DESTINATION lib/pkgconfig)
+install(TARGETS sail-common LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+        PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/sail")
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/libsail-common.pc" DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")

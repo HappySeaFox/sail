@@ -6,6 +6,12 @@ project(SAIL VERSION 0.9.0
 
 include(GNUInstallDirs)
 
+# TODO Move to a Debian patch
+# Set arch-specific include/lib dirs
+#
+#set(CMAKE_INSTALL_INCLUDEDIR "include/${CMAKE_LIBRARY_ARCHITECTURE}")
+#set(CMAKE_INSTALL_LIBDIR "lib/${CMAKE_LIBRARY_ARCHITECTURE}")
+
 # Enable shared libs by default
 #
 set(BUILD_SHARED_LIBS ON)
@@ -98,6 +104,8 @@ message("*")
 message("* Configuration statistics: ")
 message("*")
 message("* Install prefix:               ${CMAKE_INSTALL_PREFIX}")
+message("* LIBDIR:                       ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
+message("* INCLUDEDIR:                   ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}")
 message("*")
 message("* Colored output:               ${SAIL_COLORED_OUTPUT}")
 message("* Enabled plugins:              ${PLUGINS}")
