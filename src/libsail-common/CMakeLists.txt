@@ -1,6 +1,6 @@
 # Options
 #
-option(SAIL_COLORED_OUTPUT "Enable colored console output" ON)
+option(SAIL_COLORED_OUTPUT "Enable colored console output on supported platforms" ON)
 
 # Export options to the parent cmake file to print statistics
 #
