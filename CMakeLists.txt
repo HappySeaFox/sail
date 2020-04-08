@@ -108,6 +108,10 @@ endif()
 
 # Print configuration statistics
 #
+
+if (SAIL_COLORED_OUTPUT)
+    set(SAIL_COLORED_OUTPUT_CLARIFY " (on Windows >= 10 and Unix)")
+endif()
 message("")
 message("***************************************")
 message("*")
@@ -117,7 +121,7 @@ message("* Install prefix:               ${CMAKE_INSTALL_PREFIX}")
 message("* LIBDIR:                       ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 message("* INCLUDEDIR:                   ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}")
 message("*")
-message("* Colored output:               ${SAIL_COLORED_OUTPUT}")
+message("* Colored output:               ${SAIL_COLORED_OUTPUT}${SAIL_COLORED_OUTPUT_CLARIFY}")
 message("* Enabled plugins:              ${PLUGINS}")
 message("* Enabled conditional plugins:  ${ENABLED_CONDITIONAL_PLUGINS}")
 message("* Disabled conditional plugins: ${DISABLED_CONDITIONAL_PLUGINS}")
