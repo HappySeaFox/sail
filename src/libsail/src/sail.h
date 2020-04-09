@@ -13,10 +13,14 @@
 extern "C" {
 #endif
 
+struct sail_plugin_info_node;
+
 struct sail_context {
 
-    int nop;
+    struct sail_plugin_info_node *plugin_info_node;
 };
+
+typedef struct sail_context sail_context_t;
 
 /*
  * Initializes SAIL. This is the main entry point to start working with SAIL.

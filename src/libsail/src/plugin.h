@@ -55,10 +55,16 @@ typedef struct sail_plugin_info sail_plugin_info_t;
  */
 struct sail_plugin_info_node {
 
+    /* Plugin information. */
     struct sail_plugin_info *plugin_info;
+
+    /* Full path to the plugin. */
+    char *path;
 
     struct sail_plugin_info_node *next;
 };
+
+typedef struct sail_plugin_info_node sail_plugin_info_node_t;
 
 /*
  * Plugin info functions.

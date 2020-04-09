@@ -113,6 +113,7 @@ sail_error_t sail_alloc_plugin_info_node(struct sail_plugin_info_node **plugin_i
     }
 
     (*plugin_info_node)->plugin_info = NULL;
+    (*plugin_info_node)->path        = NULL;
     (*plugin_info_node)->next        = NULL;
 
     return 0;
@@ -124,8 +125,10 @@ void sail_destroy_plugin_info_node(struct sail_plugin_info_node *plugin_info_nod
         return;
     }
 
-    if (plugin_info_node->plugin_info != NULL) {
-        free(plugin_info_node->plugin_info);
+    sail_destroy_plugin_info(plugin_info_node->plugin_info);
+
+    if (plugin_info_node->path != NULL) {
+        free(plugin_info_node->path);
     }
 
     free(plugin_info_node);
