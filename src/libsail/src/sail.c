@@ -25,15 +25,17 @@
 static char* build_full_path(const char *name) {
 
     /* +2 : NULL and '/' characters. */
-    char *full_path = (char *)(malloc(strlen(SAIL_PLUGINS_PATH) + strlen(name) + 2));
+    size_t full_path_length = strlen(SAIL_PLUGINS_PATH) + strlen(name) + 2;
+
+    char *full_path = (char *)malloc(full_path_length);
 
     if (full_path == NULL) {
         return NULL;
     }
 
-    strcpy(full_path, SAIL_PLUGINS_PATH);
-    strcat(full_path, "/");
-    strcat(full_path, name);
+    strcpy_s(full_path, full_path_length, SAIL_PLUGINS_PATH);
+    strcat_s(full_path, full_path_length, "/");
+    strcat_s(full_path, full_path_length, name);
 
     return full_path;
 }
