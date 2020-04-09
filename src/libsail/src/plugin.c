@@ -102,6 +102,44 @@ static int inih_handler(void *data, const char *section, const char *name, const
     return 1;
 }
 
+sail_error_t sail_alloc_plugin_info_node(struct sail_plugin_info_node **plugin_info_node) {
+
+    *plugin_info_node = (struct sail_plugin_info_node *)malloc(sizeof(struct sail_plugin_info_node));
+
+    if (*plugin_info_node == NULL) {
+        return SAIL_MEMORY_ALLOCATION_FAILED;
+    }
+
+    (*plugin_info_node)->plugin_info = NULL;
+    (*plugin_info_node)->next        = NULL;
+
+    return 0;
+}
+
+void sail_destroy_plugin_info_node(struct sail_plugin_info_node *plugin_info_node) {
+
+    if (plugin_info_node == NULL) {
+        return;
+    }
+
+    if (plugin_info_node->plugin_info != NULL) {
+        free(plugin_info_node->plugin_info);
+    }
+
+    free(plugin_info_node);
+}
+
+void sail_destroy_plugin_info_node_chain(struct sail_plugin_info_node *plugin_info_node) {
+
+    while (plugin_info_node != NULL) {
+        struct sail_plugin_info_node *plugin_info_node_next = plugin_info_node->next;
+
+        sail_destroy_plugin_info_node(plugin_info_node);
+
+        plugin_info_node = plugin_info_node_next;
+    }
+}
+
 int sail_plugin_read_info(const char *file, struct sail_plugin_info **plugin_info) {
 
     if (file == NULL) {

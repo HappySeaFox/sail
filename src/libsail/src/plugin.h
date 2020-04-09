@@ -14,7 +14,7 @@ extern "C" {
 #endif
 
 /*
- * A structure representing an image.
+ * A structure representing plugin information.
  */
 struct sail_plugin_info {
 
@@ -51,6 +51,16 @@ struct sail_plugin_info {
 typedef struct sail_plugin_info sail_plugin_info_t;
 
 /*
+ * A structure representing a plugin information linked list.
+ */
+struct sail_plugin_info_node {
+
+    struct sail_plugin_info *plugin_info;
+
+    struct sail_plugin_info_node *next;
+};
+
+/*
  * Plugin info functions.
  */
 
@@ -67,6 +77,24 @@ SAIL_EXPORT sail_error_t sail_alloc_plugin_info(struct sail_plugin_info **plugin
  * The "plugin_info" pointer MUST NOT be used after calling this function.
  */
 SAIL_EXPORT void sail_destroy_plugin_info(struct sail_plugin_info *plugin_info);
+
+/*
+ * Allocates a new plugin info node. The assigned node MUST be destroyed later with sail_destroy_plugin_info_node().
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_alloc_plugin_info_node(struct sail_plugin_info_node **plugin_info_node);
+
+/*
+ * Destroys the specified plugin info node and all its internal allocated memory buffers.
+ */
+SAIL_EXPORT void sail_destroy_plugin_info_node(struct sail_plugin_info_node *plugin_info_node);
+
+/*
+ * Destroys the specified plugin info node and all its internal allocated memory buffers.
+ * Repeats the destruction procedure recursively for the stored next pointer.
+ */
+SAIL_EXPORT void sail_destroy_plugin_info_node_chain(struct sail_plugin_info_node *plugin_info_node);
 
 /*
  * Reads SAIL plugin info from the specified file and stores the parsed information into
