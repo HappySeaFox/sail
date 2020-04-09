@@ -26,9 +26,9 @@ endif()
 #
 set(BUILD_SHARED_LIBS ON)
 
-# Enable strict C99
+# Enable strict C11
 #
-set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_EXTENSIONS OFF)
 
 # Internal flag used to export symbols
