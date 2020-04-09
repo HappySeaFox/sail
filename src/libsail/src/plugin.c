@@ -4,6 +4,7 @@
 
 /* libsail-common */
 #include "error.h"
+#include "log.h"
 #include "utils.h"
 
 #include "ini.h"
@@ -66,7 +67,7 @@ static int inih_handler(void *data, const char *section, const char *name, const
     }
 
     if (plugin_info->layout == 0) {
-        fprintf(stderr, "SAIL: Plugin layout version is unknown\n");
+        SAIL_LOG_ERROR("Plugin layout version is unknown\n");
         return 0;
     }
 
@@ -92,11 +93,11 @@ static int inih_handler(void *data, const char *section, const char *name, const
                 return 0;
             }
         } else {
-            fprintf(stderr, "SAIL: Unsupported plugin configuraton key '%s'\n", name);
+            SAIL_LOG_ERROR("Unsupported plugin configuraton key '%s'\n", name);
             return 0;  /* error */
         }
     } else {
-        fprintf(stderr, "SAIL: Unsupported plugin layout version %d\n", plugin_info->layout);
+        SAIL_LOG_ERROR("Unsupported plugin layout version %d\n", plugin_info->layout);
     }
 
     return 1;
