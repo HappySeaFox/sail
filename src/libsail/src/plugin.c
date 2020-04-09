@@ -2,10 +2,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* libsail-common */
 #include "error.h"
+#include "utils.h"
+
 #include "ini.h"
 #include "plugin.h"
-#include "utils.h"
 
 int sail_alloc_plugin_info(struct sail_plugin_info **plugin_info) {
 

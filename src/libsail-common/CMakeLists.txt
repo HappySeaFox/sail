@@ -9,9 +9,7 @@ set(SAIL_COLORED_OUTPUT ${SAIL_COLORED_OUTPUT} PARENT_SCOPE)
 add_library(sail-common
                 src/common.c
                 src/meta_entry_node.c
-                src/ini.c
                 src/log.c
-                src/plugin.c
                 src/utils.c)
 
 # Build a list of public headers to install
@@ -22,7 +20,6 @@ list(APPEND PUBLIC_HEADERS "src/error.h")
 list(APPEND PUBLIC_HEADERS "src/export.h")
 list(APPEND PUBLIC_HEADERS "src/meta_entry_node.h")
 list(APPEND PUBLIC_HEADERS "src/log.h")
-list(APPEND PUBLIC_HEADERS "src/plugin.h")
 list(APPEND PUBLIC_HEADERS "src/utils.h")
 
 set_target_properties(sail-common PROPERTIES
@@ -35,7 +32,6 @@ set_target_properties(sail-common PROPERTIES
 if (SAIL_COLORED_OUTPUT)
     target_compile_definitions(sail-common PRIVATE SAIL_COLORED_OUTPUT=1)
 endif()
-target_compile_definitions(sail-common PRIVATE INI_STOP_ON_FIRST_ERROR=1)
 target_include_directories(sail-common PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 # pkg-config integration
