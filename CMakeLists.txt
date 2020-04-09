@@ -83,6 +83,10 @@ find_package(PkgConfig REQUIRED)
 # Common configuration file
 #
 set(SAIL_PLUGINS_PATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/sail/plugins")
+execute_process(COMMAND git rev-parse --short HEAD
+                RESULT_VARIABLE SAIL_GIT_HASH_RESULT
+                OUTPUT_VARIABLE SAIL_GIT_HASH
+                OUTPUT_STRIP_TRAILING_WHITESPACE)
 configure_file("${PROJECT_SOURCE_DIR}/config.h.in" "${PROJECT_BINARY_DIR}/include/config.h" @ONLY)
 include_directories("${PROJECT_BINARY_DIR}/include")
 
@@ -116,6 +120,9 @@ message("")
 message("***************************************")
 message("*")
 message("* Configuration statistics: ")
+message("*")
+message("* SAIL version:                 ${PROJECT_VERSION}")
+message("* SAIL git hash:                ${SAIL_GIT_HASH}")
 message("*")
 message("* Install prefix:               ${CMAKE_INSTALL_PREFIX}")
 message("* LIBDIR:                       ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")

@@ -9,6 +9,8 @@
 
 #cmakedefine SAIL_PLUGINS_PATH "@SAIL_PLUGINS_PATH@"
 
+#cmakedefine SAIL_GIT_HASH "@SAIL_GIT_HASH@"
+
 #cmakedefine SAIL_UNIX
 #cmakedefine SAIL_WIN32
 #cmakedefine SAIL_MINGW
