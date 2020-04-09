@@ -22,6 +22,10 @@
 #include "plugin.h"
 #include "sail.h"
 
+/*
+ * libsail private functions.
+ */
+
 static char* build_full_path(const char *name) {
 
     /* +2 : NULL and '/' characters. */
@@ -35,7 +39,7 @@ static char* build_full_path(const char *name) {
 
 #ifdef SAIL_WIN32
     strcpy_s(full_path, full_path_length, SAIL_PLUGINS_PATH);
-    strcat_s(full_path, full_path_length, "/");
+    strcat_s(full_path, full_path_length, "\\");
     strcat_s(full_path, full_path_length, name);
 #else
     strcpy(full_path, SAIL_PLUGINS_PATH);
@@ -45,6 +49,73 @@ static char* build_full_path(const char *name) {
 
     return full_path;
 }
+
+static sail_error_t build_plugin_full_path(struct sail_context *context,
+                                            struct sail_plugin_info_node **last_plugin_info_node,
+                                            char *plugin_info_full_path) {
+
+    /* Build "/path/jpeg.so" from "/path/jpeg.plugin.info". */
+    char *plugin_info_part = strstr(plugin_info_full_path, ".plugin.info");
+
+    if (plugin_info_part == NULL) {
+        free(plugin_info_full_path);
+        return SAIL_MEMORY_ALLOCATION_FAILED;
+    }
+
+    /* The length of "/path/jpeg". */
+    size_t plugin_full_path_length = strlen(plugin_info_full_path) - strlen(plugin_info_part);
+    char *plugin_full_path;
+
+#ifdef SAIL_WIN32
+    static const char * const LIB_SUFFIX = "dll";
+#else
+    static const char * const LIB_SUFFIX = "so";
+#endif
+
+    /* The resulting string will be "/path/jpeg.plu" (on Windows) or "/path/jpeg.pl". */
+    SAIL_TRY_OR_CLEANUP(sail_strdup_length(plugin_info_full_path,
+                                           plugin_full_path_length + strlen(LIB_SUFFIX) + 1, &plugin_full_path),
+                        free(plugin_info_full_path));
+
+#ifdef SAIL_WIN32
+    /* Overwrite the end of the path with "dll". */
+    strcpy_s(plugin_full_path + plugin_full_path_length + 1, strlen(LIB_SUFFIX) + 1, LIB_SUFFIX);
+#else
+    /* Overwrite the end of the path with "so". */
+    strcpy(plugin_full_path + plugin_full_path_length + 1, LIB_SUFFIX);
+#endif
+
+    /* Parse plugin info. */
+    struct sail_plugin_info_node *plugin_info_node;
+    SAIL_TRY_OR_CLEANUP(sail_alloc_plugin_info_node(&plugin_info_node),
+                        free(plugin_full_path),
+                        free(plugin_info_full_path));
+
+    struct sail_plugin_info *plugin_info;
+    SAIL_TRY_OR_CLEANUP(sail_plugin_read_info(plugin_info_full_path, &plugin_info),
+                        sail_destroy_plugin_info_node(plugin_info_node),
+                        free(plugin_full_path),
+                        free(plugin_info_full_path));
+
+    free(plugin_info_full_path);
+
+    /* Save the parsed plugin info into the SAIL context. */
+    plugin_info_node->plugin_info = plugin_info;
+    plugin_info_node->path = plugin_full_path;
+
+    if (context->plugin_info_node == NULL) {
+        context->plugin_info_node = *last_plugin_info_node = plugin_info_node;
+    } else {
+        (*last_plugin_info_node)->next = plugin_info_node;
+        *last_plugin_info_node = plugin_info_node;
+    }
+
+    return 0;
+}
+
+/*
+ * libsail public functions.
+ */
 
 sail_error_t sail_init(struct sail_context **context) {
 
@@ -56,9 +127,11 @@ sail_error_t sail_init(struct sail_context **context) {
 
     (*context)->plugin_info_node = NULL;
 
+    struct sail_plugin_info_node *last_plugin_info_node;
+
 #ifdef SAIL_WIN32
     WIN32_FIND_DATA data;
-    HANDLE hFind = FindFirstFile(SAIL_PLUGINS_PATH "\\*", &data);
+    HANDLE hFind = FindFirstFile(SAIL_PLUGINS_PATH "\\*.plugin.info", &data);
 
     if (hFind == INVALID_HANDLE_VALUE) {
         SAIL_LOG_ERROR("Failed to list files in '%s'. Error: %d", SAIL_PLUGINS_PATH, GetLastError());
@@ -66,7 +139,18 @@ sail_error_t sail_init(struct sail_context **context) {
     }
 
     do {
-        printf("%s\n", data.cFileName);
+        /* Build a full path. */
+        char *full_path = build_full_path(data.cFileName);
+
+        if (full_path == NULL) {
+            FindClose(hFind);
+            return SAIL_MEMORY_ALLOCATION_FAILED;
+        }
+
+        /* Ignore errors and try to load as much as possible. */
+        if (build_plugin_full_path(*context, &last_plugin_info_node, full_path) != 0) {
+            continue;
+        }
     } while (FindNextFile(hFind, &data));
 
     if (GetLastError() != ERROR_NO_MORE_FILES) {
@@ -81,8 +165,6 @@ sail_error_t sail_init(struct sail_context **context) {
         SAIL_LOG_ERROR("Failed to list files in '%s': %s", SAIL_PLUGINS_PATH, strerror(errno));
         return SAIL_DIR_OPEN_ERROR;
     }
-
-    struct sail_plugin_info_node *last_plugin_info_node;
 
     struct dirent *dir;
 
@@ -105,54 +187,9 @@ sail_error_t sail_init(struct sail_context **context) {
             continue;
         }
 
-        /* Build "/path/jpeg.so" from "/path/jpeg.plugin.info". */
-        char *plugin_info_part = strstr(full_path, ".plugin.info");
-
-        if (plugin_info_part == NULL) {
-            free(full_path);
+        /* Ignore errors and try to load as much as possible. */
+        if (build_plugin_full_path(*context, &last_plugin_info_node, full_path) != 0) {
             continue;
-        }
-
-        /* Use a different pointer just to make its name more clear. */
-        char *plugin_info_full_path = full_path;
-
-        /* The length of "/path/jpeg". */
-        int plugin_full_path_length = strlen(plugin_info_full_path) - strlen(plugin_info_part);
-        char *plugin_full_path;
-
-        /* +3: to append ".so" later. The resulting string will be "/path/jpeg.pl". */
-        SAIL_TRY_OR_CLEANUP(sail_strdup_length(plugin_info_full_path, plugin_full_path_length+3, &plugin_full_path),
-                            free(plugin_info_full_path),
-                            closedir(d));
-
-        /* Overwrite the end of the path with "so". */
-        strcpy(plugin_full_path+plugin_full_path_length+1, "so");
-
-        /* Parse plugin info. */
-        struct sail_plugin_info_node *plugin_info_node;
-        SAIL_TRY_OR_CLEANUP(sail_alloc_plugin_info_node(&plugin_info_node),
-                            free(plugin_full_path),
-                            free(plugin_info_full_path),
-                            closedir(d));
-
-        struct sail_plugin_info *plugin_info;
-        SAIL_TRY_OR_CLEANUP(sail_plugin_read_info(plugin_info_full_path, &plugin_info),
-                            sail_destroy_plugin_info_node(plugin_info_node),
-                            free(plugin_full_path),
-                            free(plugin_info_full_path),
-                            closedir(d));
-
-        free(plugin_info_full_path);
-
-        /* Save the parsed plugin info into the SAIL context. */
-        plugin_info_node->plugin_info = plugin_info;
-        plugin_info_node->path = plugin_full_path;
-
-        if ((*context)->plugin_info_node == NULL) {
-            (*context)->plugin_info_node = last_plugin_info_node = plugin_info_node;
-        } else {
-            last_plugin_info_node->next = plugin_info_node;
-            last_plugin_info_node = plugin_info_node;
         }
     }
 
