@@ -83,6 +83,11 @@ find_package(PkgConfig REQUIRED)
 # Common configuration file
 #
 set(SAIL_PLUGINS_PATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/sail/plugins")
+if (WIN32)
+    string(REPLACE "/" "\\\\" SAIL_PLUGINS_PATH_FOR_C "${SAIL_PLUGINS_PATH}")
+else()
+    set(SAIL_PLUGINS_PATH_FOR_C "${SAIL_PLUGINS_PATH}")
+endif()
 execute_process(COMMAND git rev-parse --short HEAD
                 RESULT_VARIABLE SAIL_GIT_HASH_RESULT
                 OUTPUT_VARIABLE SAIL_GIT_HASH
