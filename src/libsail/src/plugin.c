@@ -98,6 +98,7 @@ static int inih_handler(void *data, const char *section, const char *name, const
         }
     } else {
         SAIL_LOG_ERROR("Unsupported plugin layout version %d\n", plugin_info->layout);
+        return 0;
     }
 
     return 1;
