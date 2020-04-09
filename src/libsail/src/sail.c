@@ -33,9 +33,15 @@ static char* build_full_path(const char *name) {
         return NULL;
     }
 
+#ifdef SAIL_WIN32
     strcpy_s(full_path, full_path_length, SAIL_PLUGINS_PATH);
     strcat_s(full_path, full_path_length, "/");
     strcat_s(full_path, full_path_length, name);
+#else
+    strcpy(full_path, SAIL_PLUGINS_PATH);
+    strcat(full_path, "/");
+    strcat(full_path, name);
+#endif
 
     return full_path;
 }
