@@ -26,28 +26,28 @@
  * libsail private functions.
  */
 
-static char* build_full_path(const char *name) {
+static sail_error_t build_full_path(const char *name, char **full_path) {
 
     /* +2 : NULL and '/' characters. */
     size_t full_path_length = strlen(SAIL_PLUGINS_PATH) + strlen(name) + 2;
 
-    char *full_path = (char *)malloc(full_path_length);
+    *full_path = (char *)malloc(full_path_length);
 
-    if (full_path == NULL) {
-        return NULL;
+    if (*full_path == NULL) {
+        return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
 #ifdef SAIL_WIN32
-    strcpy_s(full_path, full_path_length, SAIL_PLUGINS_PATH);
-    strcat_s(full_path, full_path_length, "\\");
-    strcat_s(full_path, full_path_length, name);
+    strcpy_s(*full_path, full_path_length, SAIL_PLUGINS_PATH);
+    strcat_s(*full_path, full_path_length, "\\");
+    strcat_s(*full_path, full_path_length, name);
 #else
-    strcpy(full_path, SAIL_PLUGINS_PATH);
-    strcat(full_path, "/");
-    strcat(full_path, name);
+    strcpy(*full_path, SAIL_PLUGINS_PATH);
+    strcat(*full_path, "/");
+    strcat(*full_path, name);
 #endif
 
-    return full_path;
+    return 0;
 }
 
 static sail_error_t build_plugin_full_path(struct sail_context *context,
@@ -58,7 +58,6 @@ static sail_error_t build_plugin_full_path(struct sail_context *context,
     char *plugin_info_part = strstr(plugin_info_full_path, ".plugin.info");
 
     if (plugin_info_part == NULL) {
-        free(plugin_info_full_path);
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
@@ -73,9 +72,8 @@ static sail_error_t build_plugin_full_path(struct sail_context *context,
 #endif
 
     /* The resulting string will be "/path/jpeg.plu" (on Windows) or "/path/jpeg.pl". */
-    SAIL_TRY_OR_CLEANUP(sail_strdup_length(plugin_info_full_path,
-                                           plugin_full_path_length + strlen(LIB_SUFFIX) + 1, &plugin_full_path),
-                        free(plugin_info_full_path));
+    SAIL_TRY(sail_strdup_length(plugin_info_full_path,
+                                plugin_full_path_length + strlen(LIB_SUFFIX) + 1, &plugin_full_path));
 
 #ifdef SAIL_WIN32
     /* Overwrite the end of the path with "dll". */
@@ -88,16 +86,12 @@ static sail_error_t build_plugin_full_path(struct sail_context *context,
     /* Parse plugin info. */
     struct sail_plugin_info_node *plugin_info_node;
     SAIL_TRY_OR_CLEANUP(sail_alloc_plugin_info_node(&plugin_info_node),
-                        free(plugin_full_path),
-                        free(plugin_info_full_path));
+                        free(plugin_full_path));
 
     struct sail_plugin_info *plugin_info;
     SAIL_TRY_OR_CLEANUP(sail_plugin_read_info(plugin_info_full_path, &plugin_info),
                         sail_destroy_plugin_info_node(plugin_info_node),
-                        free(plugin_full_path),
-                        free(plugin_info_full_path));
-
-    free(plugin_info_full_path);
+                        free(plugin_full_path));
 
     /* Save the parsed plugin info into the SAIL context. */
     plugin_info_node->plugin_info = plugin_info;
@@ -140,17 +134,16 @@ sail_error_t sail_init(struct sail_context **context) {
 
     do {
         /* Build a full path. */
-        char *full_path = build_full_path(data.cFileName);
-
-        if (full_path == NULL) {
-            FindClose(hFind);
-            return SAIL_MEMORY_ALLOCATION_FAILED;
-        }
+        char *full_path;
 
         /* Ignore errors and try to load as much as possible. */
-        if (build_plugin_full_path(*context, &last_plugin_info_node, full_path) != 0) {
+        if (build_full_path(data.cFileName, &full_path) != 0) {
             continue;
         }
+
+        build_plugin_full_path(*context, &last_plugin_info_node, full_path);
+
+        free(full_path);
     } while (FindNextFile(hFind, &data));
 
     if (GetLastError() != ERROR_NO_MORE_FILES) {
@@ -169,12 +162,13 @@ sail_error_t sail_init(struct sail_context **context) {
     struct dirent *dir;
 
     while ((dir = readdir(d)) != NULL) {
-        /* Build a full path. */
-        char *full_path = build_full_path(dir->d_name);
 
-        if (full_path == NULL) {
-            closedir(d);
-            return SAIL_MEMORY_ALLOCATION_FAILED;
+        /* Build a full path. */
+        char *full_path;
+
+        /* Ignore errors and try to load as much as possible. */
+        if (build_full_path(dir->d_name, &full_path) != 0) {
+            continue;
         }
 
         /* Handle files only. */
@@ -182,15 +176,11 @@ sail_error_t sail_init(struct sail_context **context) {
         stat(full_path, &full_path_stat);
         bool is_file = S_ISREG(full_path_stat.st_mode);
 
-        if (!is_file) {
-            free(full_path);
-            continue;
+        if (is_file) {
+            build_plugin_full_path(*context, &last_plugin_info_node, full_path);
         }
 
-        /* Ignore errors and try to load as much as possible. */
-        if (build_plugin_full_path(*context, &last_plugin_info_node, full_path) != 0) {
-            continue;
-        }
+        free(full_path);
     }
 
     closedir(d);
