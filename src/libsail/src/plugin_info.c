@@ -17,7 +17,7 @@
  * Private functions.
  */
 
-static int alloc_string_node(struct sail_string_node **string_node) {
+static sail_error_t alloc_string_node(struct sail_string_node **string_node) {
 
     *string_node = (struct sail_string_node *)malloc(sizeof(struct sail_string_node));
 
@@ -55,6 +55,35 @@ static void destroy_string_node_chain(struct sail_string_node *string_node) {
     }
 }
 
+static sail_error_t split_into_string_node_chain(const char *value, struct sail_string_node **target_string_node) {
+
+    struct sail_string_node *last_string_node = NULL;
+
+    while (*(value += strspn(value, ";")) != '\0') {
+        size_t length = strcspn(value, ";");
+
+        struct sail_string_node *extension_node;
+
+        SAIL_TRY(alloc_string_node(&extension_node));
+
+        SAIL_TRY_OR_CLEANUP(sail_strdup_length(value, length, &extension_node->value),
+                            /* cleanup */ destroy_string_node(extension_node));
+
+        sail_to_lower(extension_node->value);
+
+        if (*target_string_node == NULL) {
+            *target_string_node = last_string_node = extension_node;
+        } else {
+            last_string_node->next = extension_node;
+            last_string_node = extension_node;
+        }
+
+        value += length;
+    }
+
+    return 0;
+}
+
 static int inih_handler(void *data, const char *section, const char *name, const char *value) {
 
     (void)section;
@@ -89,60 +118,12 @@ static int inih_handler(void *data, const char *section, const char *name, const
                 return 0;
             }
         } else if (strcmp(name, "extensions") == 0) {
-            struct sail_string_node *last_extension_node = NULL;
-
-            while (*(value += strspn(value, ";")) != '\0') {
-                size_t length = strcspn(value, ";");
-
-                struct sail_string_node *extension_node;
-
-                if (alloc_string_node(&extension_node) != 0) {
-                    return 0;
-                }
-
-                if (sail_strdup_length(value, length, &extension_node->value) != 0) {
-                    destroy_string_node(extension_node);
-                    return 0;
-                }
-
-                sail_to_lower(extension_node->value);
-
-                if (plugin_info->extension_node == NULL) {
-                    plugin_info->extension_node = last_extension_node = extension_node;
-                } else {
-                    last_extension_node->next = extension_node;
-                    last_extension_node = extension_node;
-                }
-
-                value += length;
+            if (split_into_string_node_chain(value, &plugin_info->extension_node) != 0) {
+                return 0;
             }
         } else if (strcmp(name, "mime-types") == 0) {
-            struct sail_string_node *last_mime_type_node = NULL;
-
-            while (*(value += strspn(value, ";")) != '\0') {
-                size_t length = strcspn(value, ";");
-
-                struct sail_string_node *mime_type_node;
-
-                if (alloc_string_node(&mime_type_node) != 0) {
-                    return 0;
-                }
-
-                if (sail_strdup_length(value, length, &mime_type_node->value) != 0) {
-                    destroy_string_node(mime_type_node);
-                    return 0;
-                }
-
-                sail_to_lower(mime_type_node->value);
-
-                if (plugin_info->mime_type_node == NULL) {
-                    plugin_info->mime_type_node = last_mime_type_node = mime_type_node;
-                } else {
-                    last_mime_type_node->next = mime_type_node;
-                    last_mime_type_node = mime_type_node;
-                }
-
-                value += length;
+            if (split_into_string_node_chain(value, &plugin_info->mime_type_node) != 0) {
+                return 0;
             }
         } else if (strcmp(name, "magic") == 0) {
             if ((res = sail_strdup(value, &plugin_info->magic)) != 0) {
