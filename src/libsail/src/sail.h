@@ -49,14 +49,14 @@ SAIL_EXPORT sail_error_t sail_init(struct sail_context **context);
 SAIL_EXPORT void sail_finish(struct sail_context *context);
 
 /*
- * Finds and returns a first plugin info object that supports the specified file extension.
+ * Finds and returns a first plugin info object that supports the specified file extension. For example: "jpg".
  *
  * Returns a plugin info pointer or NULL.
  */
 SAIL_EXPORT struct sail_plugin_info* sail_plugin_info_by_extension(struct sail_context *context, const char *extension);
 
 /*
- * Finds and returns a first plugin info object that supports the specified MIME type.
+ * Finds and returns a first plugin info object that supports the specified MIME type. For example: "image/jpeg".
  *
  * Returns a plugin info pointer or NULL.
  */
