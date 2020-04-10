@@ -42,13 +42,6 @@ struct sail_plugin_info {
     /* A linked list of supported mime types. For example: "image/jpeg". */
     struct sail_string_node *mime_type_node;
 
-    /*
-     * Magic identifier as a regex string. For example: "GIF8[79]a".
-     *
-     * See https://en.wikipedia.org/wiki/List_of_file_signatures for more.
-     */
-    char *magic;
-
     /* Full path to the plugin. */
     char *path;
 };

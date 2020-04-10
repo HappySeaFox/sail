@@ -125,10 +125,6 @@ static int inih_handler(void *data, const char *section, const char *name, const
             if (split_into_string_node_chain(value, &plugin_info->mime_type_node) != 0) {
                 return 0;
             }
-        } else if (strcmp(name, "magic") == 0) {
-            if ((res = sail_strdup(value, &plugin_info->magic)) != 0) {
-                return 0;
-            }
         } else {
             SAIL_LOG_ERROR("Unsupported plugin configuraton key '%s'", name);
             return 0;  /* error */
@@ -158,7 +154,6 @@ int sail_alloc_plugin_info(struct sail_plugin_info **plugin_info) {
     (*plugin_info)->description    = NULL;
     (*plugin_info)->extension_node = NULL;
     (*plugin_info)->mime_type_node = NULL;
-    (*plugin_info)->magic          = NULL;
     (*plugin_info)->path           = NULL;
 
     return 0;
@@ -180,9 +175,6 @@ void sail_destroy_plugin_info(struct sail_plugin_info *plugin_info) {
     destroy_string_node_chain(plugin_info->extension_node);
     destroy_string_node_chain(plugin_info->mime_type_node);
 
-    if (plugin_info->magic != NULL) {
-        free(plugin_info->magic);
-    }
     if (plugin_info->path != NULL) {
         free(plugin_info->path);
     }
