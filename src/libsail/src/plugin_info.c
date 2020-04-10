@@ -1,6 +1,5 @@
 #include "config.h"
 
-#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -56,19 +55,6 @@ static void destroy_string_node_chain(struct sail_string_node *string_node) {
     }
 }
 
-static void to_lower(char *str) {
-
-    if (str == NULL) {
-        return;
-    }
-
-    size_t length = strlen(str);
-
-    for (size_t i = 0; i < length; i++) {
-        str[i] = (char)tolower(str[i]);
-    }
-}
-
 static int inih_handler(void *data, const char *section, const char *name, const char *value) {
 
     (void)section;
@@ -119,7 +105,7 @@ static int inih_handler(void *data, const char *section, const char *name, const
                     return 0;
                 }
 
-                to_lower(extension_node->value);
+                sail_to_lower(extension_node->value);
 
                 if (plugin_info->extension_node == NULL) {
                     plugin_info->extension_node = last_extension_node = extension_node;
@@ -147,7 +133,7 @@ static int inih_handler(void *data, const char *section, const char *name, const
                     return 0;
                 }
 
-                to_lower(mime_type_node->value);
+                sail_to_lower(mime_type_node->value);
 
                 if (plugin_info->mime_type_node == NULL) {
                     plugin_info->mime_type_node = last_mime_type_node = mime_type_node;

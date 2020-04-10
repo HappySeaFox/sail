@@ -40,6 +40,11 @@ SAIL_EXPORT const char* sail_pixel_format_to_string(int pixel_format);
  */
 SAIL_EXPORT int sail_bits_per_pixel(int pixel_format);
 
+/*
+ * Converts the specified string to a lower case.
+ */
+SAIL_EXPORT void sail_to_lower(char *str);
+
 /* extern "C" */
 #ifdef __cplusplus
 }

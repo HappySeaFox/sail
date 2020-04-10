@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -106,4 +107,17 @@ int sail_bits_per_pixel(int pixel_format) {
     }
 
     return 0;
+}
+
+void sail_to_lower(char *str) {
+
+    if (str == NULL) {
+        return;
+    }
+
+    size_t length = strlen(str);
+
+    for (size_t i = 0; i < length; i++) {
+        str[i] = (char)tolower(str[i]);
+    }
 }

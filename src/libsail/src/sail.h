@@ -25,6 +25,7 @@ extern "C" {
 #endif
 
 struct sail_plugin_info_node;
+struct sail_plugin_info;
 
 struct sail_context {
 
@@ -46,6 +47,13 @@ SAIL_EXPORT sail_error_t sail_init(struct sail_context **context);
  * memory buffers. The context MUST NOT be used anymore after calling this function.
  */
 SAIL_EXPORT void sail_finish(struct sail_context *context);
+
+/*
+ * Finds and returns a first plugin info object that supports the specified file extension.
+ *
+ * Returns a plugin info pointer or NULL.
+ */
+SAIL_EXPORT struct sail_plugin_info* sail_plugin_info_by_extension(struct sail_context *context, const char *extension);
 
 /* extern "C" */
 #ifdef __cplusplus

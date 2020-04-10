@@ -20,6 +20,7 @@
 #include "utils.h"
 
 #include "plugin_info.h"
+#include "string_node.h"
 #include "sail.h"
 
 /*
@@ -198,4 +199,40 @@ void sail_finish(struct sail_context *context) {
     sail_destroy_plugin_info_node_chain(context->plugin_info_node);
 
     free(context);
+}
+
+struct sail_plugin_info* sail_plugin_info_by_extension(struct sail_context *context, const char *extension) {
+
+    if (context == NULL || extension == NULL) {
+        return NULL;
+    }
+
+    char *extension_copy;
+
+    if (sail_strdup(extension, &extension_copy) != 0) {
+        return NULL;
+    }
+
+    /* Will compare in lower case. */
+    sail_to_lower(extension_copy);
+
+    struct sail_plugin_info_node *node = context->plugin_info_node;
+
+    while (node != NULL) {
+
+        struct sail_string_node *string_node = node->plugin_info->extension_node;
+
+        while (string_node != NULL) {
+
+            if (strcmp(string_node->value, extension) == 0) {
+                return node->plugin_info;
+            }
+
+            string_node = string_node->next;
+        }
+
+        node = node->next;
+    }
+
+    return NULL;
 }
