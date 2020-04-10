@@ -13,6 +13,8 @@
 extern "C" {
 #endif
 
+struct sail_plugin_info;
+
 struct sail_read_features;
 struct sail_read_options;
 struct sail_write_features;
@@ -56,6 +58,9 @@ typedef struct {
  */
 struct sail_plugin {
 
+    /* Layout version. */
+    int layout;
+
     /* System-specific library handle. */
     void *handle;
 
@@ -69,12 +74,12 @@ struct sail_plugin {
 typedef struct sail_plugin sail_plugin_t;
 
 /*
- * Loads the specified plugin file and saves its handle and exported interfaces into the specified plugin
+ * Loads the specified plugin by its info and saves its handle and exported interfaces into the specified plugin
  * instance. The assigned plugin MUST be destroyed later with sail_destroy_plugin().
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_alloc_plugin(const char *path, struct sail_plugin **plugin);
+SAIL_EXPORT sail_error_t sail_alloc_plugin(struct sail_plugin_info *plugin_info, struct sail_plugin **plugin);
 
 /*
  * Destroys the specified plugin and all its internal memory buffers.

@@ -13,11 +13,12 @@
 #include "error.h"
 #include "log.h"
 
+#include "plugin_info.h"
 #include "plugin.h"
 
-int sail_alloc_plugin(const char *path, struct sail_plugin **plugin) {
+int sail_alloc_plugin(struct sail_plugin_info *plugin_info, struct sail_plugin **plugin) {
 
-    if (path == NULL) {
+    if (plugin_info == NULL || plugin_info->path == NULL) {
         return SAIL_INVALID_ARGUMENT;
     }
 
@@ -27,14 +28,15 @@ int sail_alloc_plugin(const char *path, struct sail_plugin **plugin) {
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
+    (*plugin)->layout = plugin_info->layout;
     (*plugin)->handle = NULL;
 
 #ifdef SAIL_WIN32
 #else
-    void *handle = dlopen(path, RTLD_LAZY | RTLD_LOCAL);
+    void *handle = dlopen(plugin_info->path, RTLD_LAZY | RTLD_LOCAL);
 
     if (handle == NULL) {
-        SAIL_LOG_ERROR("Failed to load '%s': %s", path, dlerror());
+        SAIL_LOG_ERROR("Failed to load '%s': %s", plugin_info->path, dlerror());
         sail_destroy_plugin(*plugin);
         return SAIL_PLUGIN_LOAD_ERROR;
     }
