@@ -79,11 +79,17 @@ static int inih_handler(void *data, const char *section, const char *name, const
 
     if (strcmp(name, "layout") == 0) {
         plugin_info->layout = atoi(value);
+
+        if (plugin_info->layout < 1) {
+            SAIL_LOG_ERROR("Failed to convert '%s' to a plugin layout version", value);
+            return 0;
+        }
+
         return 1;
     }
 
     if (plugin_info->layout == 0) {
-        SAIL_LOG_ERROR("Plugin layout version is unknown\n");
+        SAIL_LOG_ERROR("Plugin layout version is unset. Make sure a plugin layout version is the very first key in the plugin info file");
         return 0;
     }
 
@@ -157,11 +163,11 @@ static int inih_handler(void *data, const char *section, const char *name, const
                 return 0;
             }
         } else {
-            SAIL_LOG_ERROR("Unsupported plugin configuraton key '%s'\n", name);
+            SAIL_LOG_ERROR("Unsupported plugin configuraton key '%s'", name);
             return 0;  /* error */
         }
     } else {
-        SAIL_LOG_ERROR("Unsupported plugin layout version %d\n", plugin_info->layout);
+        SAIL_LOG_ERROR("Unsupported plugin layout version %d", plugin_info->layout);
         return 0;
     }
 

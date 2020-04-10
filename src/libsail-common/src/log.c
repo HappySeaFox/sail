@@ -107,4 +107,6 @@ void sail_log(int level, const char *format, ...) {
     if (ansi_colors_supported) {
         fprintf(SAIL_LOG_FPTR, "%s", SAIL_COLOR_RESET);
     }
+
+    fprintf(SAIL_LOG_FPTR, "\n");
 }

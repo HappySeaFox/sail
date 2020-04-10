@@ -34,7 +34,7 @@ static void my_output_message(j_common_ptr cinfo) {
 
     (*cinfo->err->format_message)(cinfo, buffer);
 
-    SAIL_LOG_ERROR("%s\n", buffer);
+    SAIL_LOG_ERROR("%s", buffer);
 }
 
 static void my_error_exit(j_common_ptr cinfo) {
