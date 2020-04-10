@@ -65,7 +65,7 @@ static void to_lower(char *str) {
     size_t length = strlen(str);
 
     for (size_t i = 0; i < length; i++) {
-        str[i] = tolower(str[i]);
+        str[i] = (char)tolower(str[i]);
     }
 }
 
@@ -103,7 +103,7 @@ static int inih_handler(void *data, const char *section, const char *name, const
                 return 0;
             }
         } else if (strcmp(name, "extensions") == 0) {
-            struct sail_string_node *last_extension_node;
+            struct sail_string_node *last_extension_node = NULL;
 
             while (*(value += strspn(value, ";")) != '\0') {
                 size_t length = strcspn(value, ";");
@@ -131,7 +131,7 @@ static int inih_handler(void *data, const char *section, const char *name, const
                 value += length;
             }
         } else if (strcmp(name, "mime-types") == 0) {
-            struct sail_string_node *last_mime_type_node;
+            struct sail_string_node *last_mime_type_node = NULL;
 
             while (*(value += strspn(value, ";")) != '\0') {
                 size_t length = strcspn(value, ";");
