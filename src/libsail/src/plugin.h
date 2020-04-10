@@ -13,13 +13,7 @@
 extern "C" {
 #endif
 
-struct sail_plugin_extension_node {
-
-    char *extension;
-    struct sail_plugin_extension_node *next;
-};
-
-typedef struct sail_plugin_extension_node sail_plugin_extension_node_t;
+struct sail_string_node;
 
 /*
  * A structure representing plugin information.
@@ -42,11 +36,11 @@ struct sail_plugin_info {
     /* Plugin description. For example: "JPEG image". */
     char *description;
 
-    /* A linked list of supported file extensions. For example: jpg, jpeg. */
-    struct sail_plugin_extension_node *extension_node;
+    /* A linked list of supported file extensions. For example: "jpg", "jpeg". */
+    struct sail_string_node *extension_node;
 
-    /* Semicolon-separated list of supported file mime types. For example: "image/jpeg". */
-    char *mime_types;
+    /* A linked list of supported mime types. For example: "image/jpeg". */
+    struct sail_string_node *mime_type_node;
 
     /*
      * Magic identifier as a regex string. For example: "GIF8[79]a".

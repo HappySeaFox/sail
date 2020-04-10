@@ -8,6 +8,7 @@ add_library(sail
 set(PUBLIC_HEADERS "")
 list(APPEND PUBLIC_HEADERS "src/plugin.h")
 list(APPEND PUBLIC_HEADERS "src/sail.h")
+list(APPEND PUBLIC_HEADERS "src/string_node.h")
 
 set_target_properties(sail PROPERTIES
                            VERSION "0.5.0"
