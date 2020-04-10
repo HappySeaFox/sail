@@ -55,6 +55,13 @@ SAIL_EXPORT void sail_finish(struct sail_context *context);
  */
 SAIL_EXPORT struct sail_plugin_info* sail_plugin_info_by_extension(struct sail_context *context, const char *extension);
 
+/*
+ * Finds and returns a first plugin info object that supports the specified MIME type.
+ *
+ * Returns a plugin info pointer or NULL.
+ */
+SAIL_EXPORT struct sail_plugin_info* sail_plugin_info_by_mime_type(struct sail_context *context, const char *mime_type);
+
 /* extern "C" */
 #ifdef __cplusplus
 }
