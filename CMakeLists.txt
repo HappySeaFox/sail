@@ -31,13 +31,13 @@ set(BUILD_SHARED_LIBS ON)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_EXTENSIONS OFF)
 
-# Internal flag used to export symbols
+# Internal flag used to include SAIL headers locally with "header.h" or <sail/header.h> otherwise
 #
 add_definitions(-DSAIL_BUILD)
 
 # Enable as many warnings as possible
 #
-if(MSVC)
+if (MSVC)
     if(CMAKE_C_FLAGS MATCHES "/W[0-4]")
         string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
     else()
@@ -45,6 +45,14 @@ if(MSVC)
     endif()
 elseif(CMAKE_COMPILER_IS_GNUCC)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -pedantic")
+endif()
+
+# Thread local flag used with static variables
+#
+if (MSVC)
+    set(SAIL_THREAD_LOCAL "__declspec(thread)")
+else()
+    set(SAIL_THREAD_LOCAL "_Thread_local")
 endif()
 
 # Disable undefined symbols

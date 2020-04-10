@@ -37,13 +37,21 @@
 #define SAIL_COLOR_RESET        "\033[0m"
 
 #define SAIL_LOG_FPTR       stderr
-#define SAIL_LOG_STD_HANDLE STD_ERROR_HANDLE
+#define SAIL_LOG_STD_HANDLE STD_ERROR_HANDLE /* for Windows */
 
 static bool check_ansi_colors_supported(void) {
 
-    bool result = false;
+    SAIL_THREAD_LOCAL static bool ansi_colors_supported_called = false;
+    SAIL_THREAD_LOCAL static bool ansi_colors_supported = false;
+
+    if (ansi_colors_supported_called) {
+        return ansi_colors_supported;
+    }
+
+    ansi_colors_supported_called = true;
 
 #ifdef SAIL_COLORED_OUTPUT
+
     bool is_atty = (SAIL_ISATTY(SAIL_FILENO(SAIL_LOG_FPTR)) != 0);
 
     if (is_atty) {
@@ -61,17 +69,17 @@ static bool check_ansi_colors_supported(void) {
                     consoleMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
 
                     if (SetConsoleMode(stderrHandle, consoleMode)) {
-                        result = true;
+                        ansi_colors_supported = true;
                     }
                 }
             }
         #else
-            result = true;
+            ansi_colors_supported = true;
         #endif
     }
 #endif
 
-    return result;
+    return ansi_colors_supported;
 }
 
 void sail_log(int level, const char *format, ...) {
