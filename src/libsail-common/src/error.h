@@ -32,6 +32,11 @@ typedef int sail_error_t;
 #define SAIL_UNDERLYING_CODEC_ERROR       43
 
 /*
+ * Plugins-specific errors.
+ */
+#define SAIL_PLUGIN_LOAD_ERROR            60
+
+/*
  * Helper macros.
  */
 #define SAIL_CHECK_FILE(file)      \

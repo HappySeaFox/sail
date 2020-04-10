@@ -1,12 +1,14 @@
 add_library(sail
                 src/ini.c
                 src/plugin_info.c
+                src/plugin.c
                 src/sail.c)
 
 # Build a list of public headers to install
 #
 set(PUBLIC_HEADERS "")
 list(APPEND PUBLIC_HEADERS "src/plugin_info.h")
+list(APPEND PUBLIC_HEADERS "src/plugin.h")
 list(APPEND PUBLIC_HEADERS "src/sail.h")
 list(APPEND PUBLIC_HEADERS "src/string_node.h")
 
@@ -20,6 +22,7 @@ set_target_properties(sail PROPERTIES
 target_include_directories(sail PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_compile_definitions(sail PRIVATE INI_STOP_ON_FIRST_ERROR=1)
 target_link_libraries(sail PUBLIC sail-common)
+target_link_libraries(sail PRIVATE dl)
 
 # pkg-config integration
 #
