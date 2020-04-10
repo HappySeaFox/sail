@@ -48,6 +48,9 @@ struct sail_plugin_info {
      * See https://en.wikipedia.org/wiki/List_of_file_signatures for more.
      */
     char *magic;
+
+    /* Full path to the plugin. */
+    char *path;
 };
 
 typedef struct sail_plugin_info sail_plugin_info_t;
@@ -59,9 +62,6 @@ struct sail_plugin_info_node {
 
     /* Plugin information. */
     struct sail_plugin_info *plugin_info;
-
-    /* Full path to the plugin. */
-    char *path;
 
     struct sail_plugin_info_node *next;
 };

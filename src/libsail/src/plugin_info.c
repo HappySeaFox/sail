@@ -192,6 +192,7 @@ int sail_alloc_plugin_info(struct sail_plugin_info **plugin_info) {
     (*plugin_info)->extension_node  = NULL;
     (*plugin_info)->mime_type_node  = NULL;
     (*plugin_info)->magic           = NULL;
+    (*plugin_info)->path            = NULL;
 
     return 0;
 }
@@ -215,6 +216,9 @@ void sail_destroy_plugin_info(struct sail_plugin_info *plugin_info) {
     if (plugin_info->magic != NULL) {
         free(plugin_info->magic);
     }
+    if (plugin_info->path != NULL) {
+        free(plugin_info->path);
+    }
 
     free(plugin_info);
 }
@@ -228,7 +232,6 @@ sail_error_t sail_alloc_plugin_info_node(struct sail_plugin_info_node **plugin_i
     }
 
     (*plugin_info_node)->plugin_info = NULL;
-    (*plugin_info_node)->path        = NULL;
     (*plugin_info_node)->next        = NULL;
 
     return 0;
@@ -241,10 +244,6 @@ void sail_destroy_plugin_info_node(struct sail_plugin_info_node *plugin_info_nod
     }
 
     sail_destroy_plugin_info(plugin_info_node->plugin_info);
-
-    if (plugin_info_node->path != NULL) {
-        free(plugin_info_node->path);
-    }
 
     free(plugin_info_node);
 }

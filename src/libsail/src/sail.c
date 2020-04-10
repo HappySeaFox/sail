@@ -95,7 +95,7 @@ static sail_error_t build_plugin_full_path(struct sail_context *context,
 
     /* Save the parsed plugin info into the SAIL context. */
     plugin_info_node->plugin_info = plugin_info;
-    plugin_info_node->path = plugin_full_path;
+    plugin_info->path = plugin_full_path;
 
     if (context->plugin_info_node == NULL) {
         context->plugin_info_node = *last_plugin_info_node = plugin_info_node;
