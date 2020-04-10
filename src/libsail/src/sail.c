@@ -23,7 +23,7 @@
 #include "sail.h"
 
 /*
- * libsail private functions.
+ * Private functions.
  */
 
 static sail_error_t build_full_path(const char *name, char **full_path) {
@@ -108,7 +108,7 @@ static sail_error_t build_plugin_full_path(struct sail_context *context,
 }
 
 /*
- * libsail public functions.
+ * Public functions.
  */
 
 sail_error_t sail_init(struct sail_context **context) {
