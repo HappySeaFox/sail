@@ -172,13 +172,13 @@ int sail_alloc_plugin_info(struct sail_plugin_info **plugin_info) {
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
-    (*plugin_info)->layout          = 0;
-    (*plugin_info)->version         = NULL;
-    (*plugin_info)->description     = NULL;
-    (*plugin_info)->extension_node  = NULL;
-    (*plugin_info)->mime_type_node  = NULL;
-    (*plugin_info)->magic           = NULL;
-    (*plugin_info)->path            = NULL;
+    (*plugin_info)->layout         = 0;
+    (*plugin_info)->version        = NULL;
+    (*plugin_info)->description    = NULL;
+    (*plugin_info)->extension_node = NULL;
+    (*plugin_info)->mime_type_node = NULL;
+    (*plugin_info)->magic          = NULL;
+    (*plugin_info)->path           = NULL;
 
     return 0;
 }
