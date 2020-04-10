@@ -52,7 +52,10 @@ void sail_destroy_plugin(struct sail_plugin *plugin) {
     }
 
     if (plugin->handle != NULL) {
+#ifdef SAIL_WIN32
+#else
         dlclose(plugin->handle);
+#endif
     }
 
     free(plugin);
