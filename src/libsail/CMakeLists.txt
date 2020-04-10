@@ -22,7 +22,10 @@ set_target_properties(sail PROPERTIES
 target_include_directories(sail PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_compile_definitions(sail PRIVATE INI_STOP_ON_FIRST_ERROR=1)
 target_link_libraries(sail PUBLIC sail-common)
-target_link_libraries(sail PRIVATE dl)
+
+if (UNIX)
+    target_link_libraries(sail PRIVATE dl)
+endif()
 
 # pkg-config integration
 #
