@@ -1,3 +1,6 @@
+#include "config.h"
+
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,47 +13,59 @@
 #include "ini.h"
 #include "plugin.h"
 
-int sail_alloc_plugin_info(struct sail_plugin_info **plugin_info) {
+/*
+ * Private functions.
+ */
 
-    *plugin_info = (struct sail_plugin_info *)malloc(sizeof(struct sail_plugin_info));
+static int alloc_plugin_extension_node(struct sail_plugin_extension_node **plugin_extension_node) {
 
-    if (*plugin_info == NULL) {
+    *plugin_extension_node = (struct sail_plugin_extension_node *)malloc(sizeof(struct sail_plugin_extension_node));
+
+    if (*plugin_extension_node == NULL) {
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
-    (*plugin_info)->layout      = 0;
-    (*plugin_info)->version     = NULL;
-    (*plugin_info)->description = NULL;
-    (*plugin_info)->extensions  = NULL;
-    (*plugin_info)->mime_types  = NULL;
-    (*plugin_info)->magic       = NULL;
+    (*plugin_extension_node)->extension = NULL;
+    (*plugin_extension_node)->next      = NULL;
 
     return 0;
 }
 
-void sail_destroy_plugin_info(struct sail_plugin_info *plugin_info) {
+static void destroy_plugin_extension_node(struct sail_plugin_extension_node *plugin_extension_node) {
 
-    if (plugin_info == NULL) {
+    if (plugin_extension_node == NULL) {
         return;
     }
 
-    if (plugin_info->version != NULL) {
-        free(plugin_info->version);
-    }
-    if (plugin_info->description != NULL) {
-        free(plugin_info->description);
-    }
-    if (plugin_info->extensions != NULL) {
-        free(plugin_info->extensions);
-    }
-    if (plugin_info->mime_types != NULL) {
-        free(plugin_info->mime_types);
-    }
-    if (plugin_info->magic != NULL) {
-        free(plugin_info->magic);
+    if (plugin_extension_node->extension != NULL) {
+        free(plugin_extension_node->extension);
     }
 
-    free(plugin_info);
+    free(plugin_extension_node);
+}
+
+static void destroy_plugin_extension_node_chain(struct sail_plugin_extension_node *plugin_extension_node) {
+
+    while (plugin_extension_node != NULL) {
+        struct sail_plugin_extension_node *plugin_extension_node_next = plugin_extension_node->next;
+
+        destroy_plugin_extension_node(plugin_extension_node);
+
+        plugin_extension_node = plugin_extension_node_next;
+    }
+}
+
+static void to_lower(char *str) {
+
+    if (str == NULL) {
+        return;
+    }
+
+    size_t length = strlen(str);
+
+    for (size_t i = 0; i < length; i++) {
+        str[i] = tolower(str[i]);
+    }
 }
 
 static int inih_handler(void *data, const char *section, const char *name, const char *value) {
@@ -81,8 +96,32 @@ static int inih_handler(void *data, const char *section, const char *name, const
                 return 0;
             }
         } else if (strcmp(name, "extensions") == 0) {
-            if ((res = sail_strdup(value, &plugin_info->extensions)) != 0) {
-                return 0;
+            struct sail_plugin_extension_node *last_extension_node;
+
+            while (*(value += strspn(value, ";")) != '\0') {
+                size_t length = strcspn(value, ";");
+
+                struct sail_plugin_extension_node *extension_node;
+
+                if (alloc_plugin_extension_node(&extension_node) != 0) {
+                    return 0;
+                }
+
+                if (sail_strdup_length(value, length, &extension_node->extension) != 0) {
+                    destroy_plugin_extension_node(extension_node);
+                    return 0;
+                }
+
+                to_lower(extension_node->extension);
+
+                if (plugin_info->extension_node == NULL) {
+                    plugin_info->extension_node = last_extension_node = extension_node;
+                } else {
+                    last_extension_node->next = extension_node;
+                    last_extension_node = extension_node;
+                }
+
+                value += length;
             }
         } else if (strcmp(name, "mime-types") == 0) {
             if ((res = sail_strdup(value, &plugin_info->mime_types)) != 0) {
@@ -102,6 +141,53 @@ static int inih_handler(void *data, const char *section, const char *name, const
     }
 
     return 1;
+}
+
+/*
+ * Public functions.
+ */
+
+int sail_alloc_plugin_info(struct sail_plugin_info **plugin_info) {
+
+    *plugin_info = (struct sail_plugin_info *)malloc(sizeof(struct sail_plugin_info));
+
+    if (*plugin_info == NULL) {
+        return SAIL_MEMORY_ALLOCATION_FAILED;
+    }
+
+    (*plugin_info)->layout          = 0;
+    (*plugin_info)->version         = NULL;
+    (*plugin_info)->description     = NULL;
+    (*plugin_info)->extension_node  = NULL;
+    (*plugin_info)->mime_types      = NULL;
+    (*plugin_info)->magic           = NULL;
+
+    return 0;
+}
+
+void sail_destroy_plugin_info(struct sail_plugin_info *plugin_info) {
+
+    if (plugin_info == NULL) {
+        return;
+    }
+
+    if (plugin_info->version != NULL) {
+        free(plugin_info->version);
+    }
+    if (plugin_info->description != NULL) {
+        free(plugin_info->description);
+    }
+
+    destroy_plugin_extension_node_chain(plugin_info->extension_node);
+
+    if (plugin_info->mime_types != NULL) {
+        free(plugin_info->mime_types);
+    }
+    if (plugin_info->magic != NULL) {
+        free(plugin_info->magic);
+    }
+
+    free(plugin_info);
 }
 
 sail_error_t sail_alloc_plugin_info_node(struct sail_plugin_info_node **plugin_info_node) {
