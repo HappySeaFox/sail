@@ -222,7 +222,7 @@ struct sail_plugin_info* sail_plugin_info_by_extension(struct sail_context *cont
         struct sail_string_node *string_node = node->plugin_info->extension_node;
 
         while (string_node != NULL) {
-            if (strcmp(string_node->value, extension) == 0) {
+            if (strcmp(string_node->value, extension_copy) == 0) {
                 free(extension_copy);
                 return node->plugin_info;
             }
@@ -258,7 +258,7 @@ struct sail_plugin_info* sail_plugin_info_by_mime_type(struct sail_context *cont
         struct sail_string_node *string_node = node->plugin_info->mime_type_node;
 
         while (string_node != NULL) {
-            if (strcmp(string_node->value, mime_type) == 0) {
+            if (strcmp(string_node->value, mime_type_copy) == 0) {
                 free(mime_type_copy);
                 return node->plugin_info;
             }
