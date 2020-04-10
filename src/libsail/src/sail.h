@@ -5,8 +5,19 @@
     #include "error.h"
     #include "export.h"
 #else
+    /* Universal include. */
+
+    /* libsail-common. */
+    #include <sail/common.h>
     #include <sail/error.h>
     #include <sail/export.h>
+    #include <sail/meta_entry_node.h>
+    #include <sail/log.h>
+    #include <sail/utils.h>
+
+    /* libsail. */
+    #include <sail/plugin.h>
+    #include <sail/string_node.h>
 #endif
 
 #ifdef __cplusplus
