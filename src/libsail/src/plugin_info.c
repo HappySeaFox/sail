@@ -11,7 +11,7 @@
 #include "utils.h"
 
 #include "ini.h"
-#include "plugin.h"
+#include "plugin_info.h"
 #include "string_node.h"
 
 /*

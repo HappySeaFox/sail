@@ -19,7 +19,7 @@
 #include "log.h"
 #include "utils.h"
 
-#include "plugin.h"
+#include "plugin_info.h"
 #include "sail.h"
 
 /*

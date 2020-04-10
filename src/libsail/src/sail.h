@@ -16,7 +16,7 @@
     #include <sail/utils.h>
 
     /* libsail. */
-    #include <sail/plugin.h>
+    #include <sail/plugin_info.h>
     #include <sail/string_node.h>
 #endif
 

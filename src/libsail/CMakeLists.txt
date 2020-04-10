@@ -1,12 +1,12 @@
 add_library(sail
                 src/ini.c
-                src/plugin.c
+                src/plugin_info.c
                 src/sail.c)
 
 # Build a list of public headers to install
 #
 set(PUBLIC_HEADERS "")
-list(APPEND PUBLIC_HEADERS "src/plugin.h")
+list(APPEND PUBLIC_HEADERS "src/plugin_info.h")
 list(APPEND PUBLIC_HEADERS "src/sail.h")
 list(APPEND PUBLIC_HEADERS "src/string_node.h")
 

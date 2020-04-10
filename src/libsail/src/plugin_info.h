@@ -1,5 +1,5 @@
-#ifndef SAIL_PLUGIN_H
-#define SAIL_PLUGIN_H
+#ifndef SAIL_PLUGIN_INFO_H
+#define SAIL_PLUGIN_INFO_H
 
 #ifdef SAIL_BUILD
     #include "error.h"
