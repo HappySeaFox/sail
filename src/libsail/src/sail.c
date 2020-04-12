@@ -274,6 +274,10 @@ sail_error_t sail_plugin_info_by_mime_type(const struct sail_context *context, c
 
 sail_error_t sail_load_plugin(struct sail_context *context, const struct sail_plugin_info *plugin_info, const struct sail_plugin **plugin) {
 
+    if (context == NULL || plugin_info == NULL) {
+        return SAIL_INVALID_ARGUMENT;
+    }
+
     /* Find the plugin in the cache. */
     struct sail_plugin_info_node *node = context->plugin_info_node;
 
@@ -302,6 +306,33 @@ sail_error_t sail_load_plugin(struct sail_context *context, const struct sail_pl
 
     *plugin = local_plugin;
     node->plugin = local_plugin;
+
+    return 0;
+}
+
+sail_error_t sail_unload_plugins(struct sail_context *context) {
+
+    if (context == NULL) {
+        return SAIL_INVALID_ARGUMENT;
+    }
+
+    SAIL_LOG_DEBUG("Unloading cached plugins");
+
+    struct sail_plugin_info_node *node = context->plugin_info_node;
+    int counter = 0;
+
+    while (node != NULL) {
+        if (node->plugin != NULL) {
+            sail_destroy_plugin(node->plugin);
+            counter++;
+        }
+
+        node->plugin = NULL;
+
+        node = node->next;
+    }
+
+    SAIL_LOG_DEBUG("Unloaded plugins: %d", counter);
 
     return 0;
 }

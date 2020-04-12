@@ -68,11 +68,20 @@ SAIL_EXPORT sail_error_t sail_plugin_info_by_mime_type(const struct sail_context
 
 /*
  * Loads the plugin addressed by the specified plugin info. The assigned plugin object MUST NOT be destroyed.
- * It's a pointer to an internal data structure.
+ * It's a pointer to an internal data structure. Caches the loaded plugin in the internal storage, so a subsequent
+ * call with the same plugin info just returns the cached plugin pointer.
  *
  * Returns 0 on success or sail_error_t on error.
  */
 SAIL_EXPORT sail_error_t sail_load_plugin(struct sail_context *context, const struct sail_plugin_info *plugin_info, const struct sail_plugin **plugin);
+
+/*
+ * Unloads all loaded plugins from the cache to release memory occupied by them. Use it if you don't want
+ * to de-initialize SAIL with sail_finish(), but want just to release some memory.
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_unload_plugins(struct sail_context *context);
 
 /* extern "C" */
 #ifdef __cplusplus
