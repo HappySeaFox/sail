@@ -201,17 +201,15 @@ void sail_finish(struct sail_context *context) {
     free(context);
 }
 
-struct sail_plugin_info* sail_plugin_info_by_extension(struct sail_context *context, const char *extension) {
+sail_error_t sail_plugin_info_by_extension(struct sail_context *context, const char *extension, const struct sail_plugin_info **plugin_info) {
 
     if (context == NULL || extension == NULL) {
-        return NULL;
+        return SAIL_INVALID_ARGUMENT;
     }
 
     char *extension_copy;
 
-    if (sail_strdup(extension, &extension_copy) != 0) {
-        return NULL;
-    }
+    SAIL_TRY(sail_strdup(extension, &extension_copy));
 
     /* Will compare in lower case. */
     sail_to_lower(extension_copy);
@@ -224,7 +222,8 @@ struct sail_plugin_info* sail_plugin_info_by_extension(struct sail_context *cont
         while (string_node != NULL) {
             if (strcmp(string_node->value, extension_copy) == 0) {
                 free(extension_copy);
-                return node->plugin_info;
+                *plugin_info = node->plugin_info;
+                return 0;
             }
 
             string_node = string_node->next;
@@ -234,20 +233,18 @@ struct sail_plugin_info* sail_plugin_info_by_extension(struct sail_context *cont
     }
 
     free(extension_copy);
-    return NULL;
+    return SAIL_PLUGIN_NOT_FOUND;
 }
 
-struct sail_plugin_info* sail_plugin_info_by_mime_type(struct sail_context *context, const char *mime_type) {
+sail_error_t sail_plugin_info_by_mime_type(struct sail_context *context, const char *mime_type, const struct sail_plugin_info **plugin_info) {
 
     if (context == NULL || mime_type == NULL) {
-        return NULL;
+        return SAIL_INVALID_ARGUMENT;
     }
 
     char *mime_type_copy;
 
-    if (sail_strdup(mime_type, &mime_type_copy) != 0) {
-        return NULL;
-    }
+    SAIL_TRY(sail_strdup(mime_type, &mime_type_copy));
 
     /* Will compare in lower case. */
     sail_to_lower(mime_type_copy);
@@ -260,7 +257,8 @@ struct sail_plugin_info* sail_plugin_info_by_mime_type(struct sail_context *cont
         while (string_node != NULL) {
             if (strcmp(string_node->value, mime_type_copy) == 0) {
                 free(mime_type_copy);
-                return node->plugin_info;
+                *plugin_info = node->plugin_info;
+                return 0;
             }
 
             string_node = string_node->next;
@@ -270,5 +268,5 @@ struct sail_plugin_info* sail_plugin_info_by_mime_type(struct sail_context *cont
     }
 
     free(mime_type_copy);
-    return NULL;
+    return SAIL_PLUGIN_NOT_FOUND;
 }

@@ -50,18 +50,20 @@ SAIL_EXPORT sail_error_t sail_init(struct sail_context **context);
 SAIL_EXPORT void sail_finish(struct sail_context *context);
 
 /*
- * Finds and returns a first plugin info object that supports the specified file extension. For example: "jpg".
+ * Finds a first plugin info object that supports the specified file extension. For example: "jpg".
+ * The assigned plugin info MUST NOT be destroyed. It's a pointer to an internal data structure.
  *
- * Returns a plugin info pointer or NULL.
+ * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT struct sail_plugin_info* sail_plugin_info_by_extension(struct sail_context *context, const char *extension);
+SAIL_EXPORT sail_error_t sail_plugin_info_by_extension(struct sail_context *context, const char *extension, const struct sail_plugin_info **plugin_info);
 
 /*
- * Finds and returns a first plugin info object that supports the specified MIME type. For example: "image/jpeg".
+ * Finds a first plugin info object that supports the specified mime type. For example: "image/jpeg".
+ * The assigned plugin info MUST NOT be destroyed. It's a pointer to an internal data structure.
  *
- * Returns a plugin info pointer or NULL.
+ * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT struct sail_plugin_info* sail_plugin_info_by_mime_type(struct sail_context *context, const char *mime_type);
+SAIL_EXPORT sail_error_t sail_plugin_info_by_mime_type(struct sail_context *context, const char *mime_type, const struct sail_plugin_info **plugin_info);
 
 /* extern "C" */
 #ifdef __cplusplus

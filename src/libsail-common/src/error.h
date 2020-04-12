@@ -35,6 +35,7 @@ typedef int sail_error_t;
  * Plugins-specific errors.
  */
 #define SAIL_PLUGIN_LOAD_ERROR            60
+#define SAIL_PLUGIN_NOT_FOUND             61
 
 /*
  * Helper macros.
