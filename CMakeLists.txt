@@ -16,6 +16,10 @@ and will fail to generate CFLAGS and LIBS for client applications. Please use a 
 without spaces.")
 endif()
 
+# Options
+#
+option(SAIL_DEV "Enable developer mode. Be more strict when compiling source code, for example." OFF)
+
 # TODO Move to a Debian patch
 # Set arch-specific include/lib dirs
 #
@@ -44,7 +48,11 @@ if (MSVC)
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W4")
     endif()
 elseif(CMAKE_COMPILER_IS_GNUCC)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -pedantic")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra")
+
+    if (SAIL_DEV)
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic")
+    endif()
 endif()
 
 # Thread local flag used with static variables
@@ -136,6 +144,7 @@ message("* Configuration statistics: ")
 message("*")
 message("* SAIL version:                 ${PROJECT_VERSION}")
 message("* SAIL git hash:                ${SAIL_GIT_HASH}")
+message("* Developer mode:               ${SAIL_DEV}")
 message("*")
 message("* Install prefix:               ${CMAKE_INSTALL_PREFIX}")
 message("* LIBDIR:                       ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
