@@ -63,10 +63,7 @@ void sail_destroy_file(struct sail_file *file) {
         fclose(file->fptr);
     }
 
-    if (file->pimpl != NULL) {
-        free(file->pimpl);
-    }
-
+    free(file->pimpl);
     free(file);
 }
 
@@ -106,9 +103,7 @@ void sail_destroy_image(struct sail_image *image) {
         return;
     }
 
-    if (image->palette != NULL) {
-        free(image->palette);
-    }
+    free(image->palette);
 
     sail_destroy_meta_entry_node_chain(image->meta_entry_node);
 
@@ -138,14 +133,8 @@ void sail_destroy_read_features(struct sail_read_features *read_features) {
         return;
     }
 
-    if (read_features->input_pixel_formats != NULL) {
-        free(read_features->input_pixel_formats);
-    }
-
-    if (read_features->output_pixel_formats != NULL) {
-        free(read_features->output_pixel_formats);
-    }
-
+    free(read_features->input_pixel_formats);
+    free(read_features->output_pixel_formats);
     free(read_features);
 }
 
@@ -202,18 +191,9 @@ void sail_destroy_write_features(struct sail_write_features *write_features) {
         return;
     }
 
-    if (write_features->input_pixel_formats != NULL) {
-        free(write_features->input_pixel_formats);
-    }
-
-    if (write_features->output_pixel_formats != NULL) {
-        free(write_features->output_pixel_formats);
-    }
-
-    if (write_features->compression_types != NULL) {
-        free(write_features->compression_types);
-    }
-
+    free(write_features->input_pixel_formats);
+    free(write_features->output_pixel_formats);
+    free(write_features->compression_types);
     free(write_features);
 }
 

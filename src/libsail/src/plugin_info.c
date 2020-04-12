@@ -37,10 +37,7 @@ static void destroy_string_node(struct sail_string_node *string_node) {
         return;
     }
 
-    if (string_node->value != NULL) {
-        free(string_node->value);
-    }
-
+    free(string_node->value);
     free(string_node);
 }
 
@@ -165,20 +162,13 @@ void sail_destroy_plugin_info(struct sail_plugin_info *plugin_info) {
         return;
     }
 
-    if (plugin_info->version != NULL) {
-        free(plugin_info->version);
-    }
-    if (plugin_info->description != NULL) {
-        free(plugin_info->description);
-    }
+    free(plugin_info->version);
+    free(plugin_info->description);
 
     destroy_string_node_chain(plugin_info->extension_node);
     destroy_string_node_chain(plugin_info->mime_type_node);
 
-    if (plugin_info->path != NULL) {
-        free(plugin_info->path);
-    }
-
+    free(plugin_info->path);
     free(plugin_info);
 }
 

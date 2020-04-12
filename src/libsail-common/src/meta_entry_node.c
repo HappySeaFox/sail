@@ -25,14 +25,8 @@ void sail_destroy_meta_entry_node(struct sail_meta_entry_node *meta_entry_node) 
         return;
     }
 
-    if (meta_entry_node->key != NULL) {
-        free(meta_entry_node->key);
-    }
-
-    if (meta_entry_node->value != NULL) {
-        free(meta_entry_node->value);
-    }
-
+    free(meta_entry_node->key);
+    free(meta_entry_node->value);
     free(meta_entry_node);
 }
 
