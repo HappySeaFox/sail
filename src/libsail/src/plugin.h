@@ -100,7 +100,7 @@ typedef struct sail_plugin sail_plugin_t;
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_alloc_plugin(struct sail_plugin_info *plugin_info, struct sail_plugin **plugin);
+SAIL_EXPORT sail_error_t sail_alloc_plugin(const struct sail_plugin_info *plugin_info, struct sail_plugin **plugin);
 
 /*
  * Destroys the specified plugin and all its internal memory buffers.
