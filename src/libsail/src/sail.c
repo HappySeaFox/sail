@@ -201,7 +201,7 @@ void sail_finish(struct sail_context *context) {
     free(context);
 }
 
-sail_error_t sail_plugin_info_by_extension(struct sail_context *context, const char *extension, const struct sail_plugin_info **plugin_info) {
+sail_error_t sail_plugin_info_by_extension(const struct sail_context *context, const char *extension, const struct sail_plugin_info **plugin_info) {
 
     if (context == NULL || extension == NULL) {
         return SAIL_INVALID_ARGUMENT;
@@ -236,7 +236,7 @@ sail_error_t sail_plugin_info_by_extension(struct sail_context *context, const c
     return SAIL_PLUGIN_NOT_FOUND;
 }
 
-sail_error_t sail_plugin_info_by_mime_type(struct sail_context *context, const char *mime_type, const struct sail_plugin_info **plugin_info) {
+sail_error_t sail_plugin_info_by_mime_type(const struct sail_context *context, const char *mime_type, const struct sail_plugin_info **plugin_info) {
 
     if (context == NULL || mime_type == NULL) {
         return SAIL_INVALID_ARGUMENT;

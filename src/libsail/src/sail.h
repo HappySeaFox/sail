@@ -55,7 +55,7 @@ SAIL_EXPORT void sail_finish(struct sail_context *context);
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_info_by_extension(struct sail_context *context, const char *extension, const struct sail_plugin_info **plugin_info);
+SAIL_EXPORT sail_error_t sail_plugin_info_by_extension(const struct sail_context *context, const char *extension, const struct sail_plugin_info **plugin_info);
 
 /*
  * Finds a first plugin info object that supports the specified mime type. For example: "image/jpeg".
@@ -63,7 +63,7 @@ SAIL_EXPORT sail_error_t sail_plugin_info_by_extension(struct sail_context *cont
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_info_by_mime_type(struct sail_context *context, const char *mime_type, const struct sail_plugin_info **plugin_info);
+SAIL_EXPORT sail_error_t sail_plugin_info_by_mime_type(const struct sail_context *context, const char *mime_type, const struct sail_plugin_info **plugin_info);
 
 /* extern "C" */
 #ifdef __cplusplus
