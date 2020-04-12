@@ -9,6 +9,7 @@
 
     /* libsail-common. */
     #include <sail/common.h>
+    #include <sail/config.h>
     #include <sail/error.h>
     #include <sail/export.h>
     #include <sail/meta_entry_node.h>
