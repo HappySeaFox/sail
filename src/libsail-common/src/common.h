@@ -166,8 +166,11 @@ struct sail_image {
     /*
      * Image pixel format. See SailPixelFormat.
      *
-     * READ:  Set by SAIL to a valid output image pixel format.
-     * WRITE: Must be set by a caller to a valid input image pixel format.
+     * READ:  Set by SAIL to a valid output image pixel format. The list of supported output pixel formats
+     *        by this plugin could be obtained from sail_read_features.input_pixel_formats.
+     * WRITE: Must be set by a caller to a valid input image pixel format. Pixels in this format will be supplied
+     *        to the plugin by a caller later. The list of supported input pixel formats by this plugin
+     *        could be obtained from sail_write_features.output_pixel_formats.
      */
     int pixel_format;
 
@@ -267,11 +270,30 @@ typedef struct sail_image sail_image_t;
  */
 struct sail_read_features {
 
-    /* A list of supported pixel formats by this plugin. */
-    int *pixel_formats;
+    /*
+     * A list of supported pixel formats that can be read by this plugin.
+     * One of these values will be stored in sail_image.source_pixel_format.
+     *
+     * For example: CMYK, YCBCR, RGB.
+     */
+    int *input_pixel_formats;
 
-    /* The length of pixel_formats. */
-    int pixel_formats_length;
+    /* The length of input_pixel_formats. */
+    int input_pixel_formats_length;
+
+    /*
+     * A list of supported pixel formats that can be outputted by this plugin. SOURCE pixel format
+     * is always stored in the array.
+     *
+     * It's not guaranteed that every input pixel format from input_pixel_formats could be converted
+     * to an output pixel format from output_pixel_formats. Some could be converted and some not.
+     *
+     * For example: SOURCE, RGB.
+     */
+    int *output_pixel_formats;
+
+    /* The length of output_pixel_formats. */
+    int output_pixel_formats_length;
 
     /* Supported plugin features of reading operations. See SailPluginFeatures. */
     int features;
@@ -284,11 +306,29 @@ typedef struct sail_read_features sail_read_features_t;
  */
 struct sail_write_features {
 
-    /* A list of supported pixel formats by this plugin. */
-    int *pixel_formats;
+    /*
+     * A list of supported input pixel formats that can be passed to this plugin from a caller.
+     * One of these values could be specified in sail_image.pixel_format.
+     *
+     * For example: CMYK, YCBCR, RGB.
+     */
+    int *input_pixel_formats;
 
-    /* The length of pixel_formats. */
-    int pixel_formats_length;
+    /* The length of input_pixel_formats. */
+    int input_pixel_formats_length;
+
+    /*
+     * A list of supported pixel formats that can be outputted by this plugin to a file.
+     *
+     * It's not guaranteed that every input pixel format from input_pixel_formats could be converted
+     * to an output pixel format from output_pixel_formats. Some could be converted and some not.
+     *
+     * For example: CMYK, YCBCR, RGB.
+     */
+    int *output_pixel_formats;
+
+    /* The length of output_pixel_formats. */
+    int output_pixel_formats_length;
 
     /* Supported plugin features of writing operations. See SailPluginFeatures. */
     int features;

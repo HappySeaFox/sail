@@ -123,9 +123,11 @@ int sail_alloc_read_features(struct sail_read_features **read_features) {
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
-    (*read_features)->pixel_formats        = NULL;
-    (*read_features)->pixel_formats_length = 0;
-    (*read_features)->features             = 0;
+    (*read_features)->input_pixel_formats         = NULL;
+    (*read_features)->input_pixel_formats_length  = 0;
+    (*read_features)->output_pixel_formats        = NULL;
+    (*read_features)->output_pixel_formats_length = 0;
+    (*read_features)->features                    = 0;
 
     return 0;
 }
@@ -136,8 +138,12 @@ void sail_destroy_read_features(struct sail_read_features *read_features) {
         return;
     }
 
-    if (read_features->pixel_formats != NULL) {
-        free(read_features->pixel_formats);
+    if (read_features->input_pixel_formats != NULL) {
+        free(read_features->input_pixel_formats);
+    }
+
+    if (read_features->output_pixel_formats != NULL) {
+        free(read_features->output_pixel_formats);
     }
 
     free(read_features);
@@ -174,16 +180,18 @@ int sail_alloc_write_features(struct sail_write_features **write_features) {
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
-    (*write_features)->pixel_formats            = NULL;
-    (*write_features)->pixel_formats_length     = 0;
-    (*write_features)->features                 = 0;
-    (*write_features)->properties               = 0;
-    (*write_features)->passes                   = 0;
-    (*write_features)->compression_types        = NULL;
-    (*write_features)->compression_types_length = 0;
-    (*write_features)->compression_min          = 0;
-    (*write_features)->compression_max          = 0;
-    (*write_features)->compression_default      = 0;
+    (*write_features)->input_pixel_formats         = NULL;
+    (*write_features)->input_pixel_formats_length  = 0;
+    (*write_features)->output_pixel_formats        = NULL;
+    (*write_features)->output_pixel_formats_length = 0;
+    (*write_features)->features                    = 0;
+    (*write_features)->properties                  = 0;
+    (*write_features)->passes                      = 0;
+    (*write_features)->compression_types           = NULL;
+    (*write_features)->compression_types_length    = 0;
+    (*write_features)->compression_min             = 0;
+    (*write_features)->compression_max             = 0;
+    (*write_features)->compression_default         = 0;
 
     return 0;
 }
@@ -194,8 +202,12 @@ void sail_destroy_write_features(struct sail_write_features *write_features) {
         return;
     }
 
-    if (write_features->pixel_formats != NULL) {
-        free(write_features->pixel_formats);
+    if (write_features->input_pixel_formats != NULL) {
+        free(write_features->input_pixel_formats);
+    }
+
+    if (write_features->output_pixel_formats != NULL) {
+        free(write_features->output_pixel_formats);
     }
 
     if (write_features->compression_types != NULL) {

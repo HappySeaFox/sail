@@ -128,28 +128,41 @@ SAIL_EXPORT sail_error_t sail_plugin_read_features_v1(struct sail_read_features 
 
     SAIL_TRY(sail_alloc_read_features(read_features));
 
-    (*read_features)->pixel_formats_length = 15;
-    (*read_features)->pixel_formats = (int *)malloc((*read_features)->pixel_formats_length * sizeof(int));
+    (*read_features)->input_pixel_formats_length = 5;
+    (*read_features)->input_pixel_formats = (int *)malloc((*read_features)->input_pixel_formats_length * sizeof(int));
 
-    if ((*read_features)->pixel_formats == NULL) {
+    if ((*read_features)->input_pixel_formats == NULL) {
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
-    (*read_features)->pixel_formats[0]  = SAIL_PIXEL_FORMAT_GRAYSCALE;
-    (*read_features)->pixel_formats[1]  = SAIL_PIXEL_FORMAT_RGB;
-    (*read_features)->pixel_formats[2]  = SAIL_PIXEL_FORMAT_YCBCR;
-    (*read_features)->pixel_formats[3]  = SAIL_PIXEL_FORMAT_CMYK;
-    (*read_features)->pixel_formats[4]  = SAIL_PIXEL_FORMAT_YCCK;
-    (*read_features)->pixel_formats[5]  = SAIL_PIXEL_FORMAT_RGBX;
-    (*read_features)->pixel_formats[6]  = SAIL_PIXEL_FORMAT_BGR;
-    (*read_features)->pixel_formats[7]  = SAIL_PIXEL_FORMAT_BGRX;
-    (*read_features)->pixel_formats[8]  = SAIL_PIXEL_FORMAT_XBGR;
-    (*read_features)->pixel_formats[9]  = SAIL_PIXEL_FORMAT_XRGB;
-    (*read_features)->pixel_formats[10] = SAIL_PIXEL_FORMAT_RGBA;
-    (*read_features)->pixel_formats[11] = SAIL_PIXEL_FORMAT_BGRA;
-    (*read_features)->pixel_formats[12] = SAIL_PIXEL_FORMAT_ABGR;
-    (*read_features)->pixel_formats[13] = SAIL_PIXEL_FORMAT_ARGB;
-    (*read_features)->pixel_formats[14] = SAIL_PIXEL_FORMAT_RGB565;
+    (*read_features)->input_pixel_formats[0] = SAIL_PIXEL_FORMAT_GRAYSCALE;
+    (*read_features)->input_pixel_formats[1] = SAIL_PIXEL_FORMAT_RGB;
+    (*read_features)->input_pixel_formats[2] = SAIL_PIXEL_FORMAT_YCBCR;
+    (*read_features)->input_pixel_formats[3] = SAIL_PIXEL_FORMAT_CMYK;
+    (*read_features)->input_pixel_formats[4] = SAIL_PIXEL_FORMAT_YCCK;
+
+    (*read_features)->output_pixel_formats_length = 15;
+    (*read_features)->output_pixel_formats = (int *)malloc((*read_features)->output_pixel_formats_length * sizeof(int));
+
+    if ((*read_features)->output_pixel_formats == NULL) {
+        return SAIL_MEMORY_ALLOCATION_FAILED;
+    }
+
+    (*read_features)->output_pixel_formats[0]  = SAIL_PIXEL_FORMAT_GRAYSCALE;
+    (*read_features)->output_pixel_formats[1]  = SAIL_PIXEL_FORMAT_RGB;
+    (*read_features)->output_pixel_formats[2]  = SAIL_PIXEL_FORMAT_YCBCR;
+    (*read_features)->output_pixel_formats[3]  = SAIL_PIXEL_FORMAT_CMYK;
+    (*read_features)->output_pixel_formats[4]  = SAIL_PIXEL_FORMAT_YCCK;
+    (*read_features)->output_pixel_formats[5]  = SAIL_PIXEL_FORMAT_RGBX;
+    (*read_features)->output_pixel_formats[6]  = SAIL_PIXEL_FORMAT_BGR;
+    (*read_features)->output_pixel_formats[7]  = SAIL_PIXEL_FORMAT_BGRX;
+    (*read_features)->output_pixel_formats[8]  = SAIL_PIXEL_FORMAT_XBGR;
+    (*read_features)->output_pixel_formats[9]  = SAIL_PIXEL_FORMAT_XRGB;
+    (*read_features)->output_pixel_formats[10] = SAIL_PIXEL_FORMAT_RGBA;
+    (*read_features)->output_pixel_formats[11] = SAIL_PIXEL_FORMAT_BGRA;
+    (*read_features)->output_pixel_formats[12] = SAIL_PIXEL_FORMAT_ABGR;
+    (*read_features)->output_pixel_formats[13] = SAIL_PIXEL_FORMAT_ARGB;
+    (*read_features)->output_pixel_formats[14] = SAIL_PIXEL_FORMAT_RGB565;
 
     (*read_features)->features = SAIL_PLUGIN_FEATURE_STATIC | SAIL_PLUGIN_FEATURE_META_INFO;
 
@@ -393,28 +406,41 @@ SAIL_EXPORT sail_error_t sail_plugin_write_features_v1(struct sail_write_feature
 
     SAIL_TRY(sail_alloc_write_features(write_features));
 
-    (*write_features)->pixel_formats_length = 15;
-    (*write_features)->pixel_formats = (int *)malloc((*write_features)->pixel_formats_length * sizeof(int));
+    (*write_features)->input_pixel_formats_length = 15;
+    (*write_features)->input_pixel_formats = (int *)malloc((*write_features)->input_pixel_formats_length * sizeof(int));
 
-    if ((*write_features)->pixel_formats == NULL) {
+    if ((*write_features)->input_pixel_formats == NULL) {
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
-    (*write_features)->pixel_formats[0]  = SAIL_PIXEL_FORMAT_GRAYSCALE;
-    (*write_features)->pixel_formats[1]  = SAIL_PIXEL_FORMAT_RGB;
-    (*write_features)->pixel_formats[2]  = SAIL_PIXEL_FORMAT_YCBCR;
-    (*write_features)->pixel_formats[3]  = SAIL_PIXEL_FORMAT_CMYK;
-    (*write_features)->pixel_formats[4]  = SAIL_PIXEL_FORMAT_YCCK;
-    (*write_features)->pixel_formats[5]  = SAIL_PIXEL_FORMAT_RGBX;
-    (*write_features)->pixel_formats[6]  = SAIL_PIXEL_FORMAT_BGR;
-    (*write_features)->pixel_formats[7]  = SAIL_PIXEL_FORMAT_BGRX;
-    (*write_features)->pixel_formats[8]  = SAIL_PIXEL_FORMAT_XBGR;
-    (*write_features)->pixel_formats[9]  = SAIL_PIXEL_FORMAT_XRGB;
-    (*write_features)->pixel_formats[10] = SAIL_PIXEL_FORMAT_RGBA;
-    (*write_features)->pixel_formats[11] = SAIL_PIXEL_FORMAT_BGRA;
-    (*write_features)->pixel_formats[12] = SAIL_PIXEL_FORMAT_ABGR;
-    (*write_features)->pixel_formats[13] = SAIL_PIXEL_FORMAT_ARGB;
-    (*write_features)->pixel_formats[14] = SAIL_PIXEL_FORMAT_RGB565;
+    (*write_features)->input_pixel_formats[0]  = SAIL_PIXEL_FORMAT_GRAYSCALE;
+    (*write_features)->input_pixel_formats[1]  = SAIL_PIXEL_FORMAT_RGB;
+    (*write_features)->input_pixel_formats[2]  = SAIL_PIXEL_FORMAT_YCBCR;
+    (*write_features)->input_pixel_formats[3]  = SAIL_PIXEL_FORMAT_CMYK;
+    (*write_features)->input_pixel_formats[4]  = SAIL_PIXEL_FORMAT_YCCK;
+    (*write_features)->input_pixel_formats[5]  = SAIL_PIXEL_FORMAT_RGBX;
+    (*write_features)->input_pixel_formats[6]  = SAIL_PIXEL_FORMAT_BGR;
+    (*write_features)->input_pixel_formats[7]  = SAIL_PIXEL_FORMAT_BGRX;
+    (*write_features)->input_pixel_formats[8]  = SAIL_PIXEL_FORMAT_XBGR;
+    (*write_features)->input_pixel_formats[9]  = SAIL_PIXEL_FORMAT_XRGB;
+    (*write_features)->input_pixel_formats[10] = SAIL_PIXEL_FORMAT_RGBA;
+    (*write_features)->input_pixel_formats[11] = SAIL_PIXEL_FORMAT_BGRA;
+    (*write_features)->input_pixel_formats[12] = SAIL_PIXEL_FORMAT_ABGR;
+    (*write_features)->input_pixel_formats[13] = SAIL_PIXEL_FORMAT_ARGB;
+    (*write_features)->input_pixel_formats[14] = SAIL_PIXEL_FORMAT_RGB565;
+
+    (*write_features)->output_pixel_formats_length = 5;
+    (*write_features)->output_pixel_formats = (int *)malloc((*write_features)->output_pixel_formats_length * sizeof(int));
+
+    if ((*write_features)->output_pixel_formats == NULL) {
+        return SAIL_MEMORY_ALLOCATION_FAILED;
+    }
+
+    (*write_features)->output_pixel_formats[0] = SAIL_PIXEL_FORMAT_GRAYSCALE;
+    (*write_features)->output_pixel_formats[1] = SAIL_PIXEL_FORMAT_RGB;
+    (*write_features)->output_pixel_formats[2] = SAIL_PIXEL_FORMAT_YCBCR;
+    (*write_features)->output_pixel_formats[3] = SAIL_PIXEL_FORMAT_CMYK;
+    (*write_features)->output_pixel_formats[4] = SAIL_PIXEL_FORMAT_YCCK;
 
     (*write_features)->features                 = SAIL_PLUGIN_FEATURE_STATIC | SAIL_PLUGIN_FEATURE_META_INFO;
     (*write_features)->properties               = 0;
