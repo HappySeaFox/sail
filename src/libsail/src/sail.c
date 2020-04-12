@@ -28,10 +28,10 @@
  * Private functions.
  */
 
-static sail_error_t build_full_path(const char *name, char **full_path) {
+static sail_error_t build_full_path(const char *sail_plugins_path, const char *name, char **full_path) {
 
     /* +2 : NULL and '/' characters. */
-    size_t full_path_length = strlen(SAIL_PLUGINS_PATH) + strlen(name) + 2;
+    size_t full_path_length = strlen(sail_plugins_path) + strlen(name) + 2;
 
     *full_path = (char *)malloc(full_path_length);
 
@@ -40,11 +40,11 @@ static sail_error_t build_full_path(const char *name, char **full_path) {
     }
 
 #ifdef SAIL_WIN32
-    strcpy_s(*full_path, full_path_length, SAIL_PLUGINS_PATH);
+    strcpy_s(*full_path, full_path_length, sail_plugins_path);
     strcat_s(*full_path, full_path_length, "\\");
     strcat_s(*full_path, full_path_length, name);
 #else
-    strcpy(*full_path, SAIL_PLUGINS_PATH);
+    strcpy(*full_path, sail_plugins_path);
     strcat(*full_path, "/");
     strcat(*full_path, name);
 #endif
@@ -139,7 +139,7 @@ sail_error_t sail_init(struct sail_context **context) {
         char *full_path;
 
         /* Ignore errors and try to load as much as possible. */
-        if (build_full_path(data.cFileName, &full_path) != 0) {
+        if (build_full_path(SAIL_PLUGINS_PATH, data.cFileName, &full_path) != 0) {
             continue;
         }
 
@@ -169,7 +169,7 @@ sail_error_t sail_init(struct sail_context **context) {
         char *full_path;
 
         /* Ignore errors and try to load as much as possible. */
-        if (build_full_path(dir->d_name, &full_path) != 0) {
+        if (build_full_path(SAIL_PLUGINS_PATH, dir->d_name, &full_path) != 0) {
             continue;
         }
 
