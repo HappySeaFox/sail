@@ -15,6 +15,8 @@ extern "C" {
 
 struct sail_string_node;
 
+struct sail_plugin;
+
 /*
  * A structure representing plugin information.
  */
@@ -55,6 +57,9 @@ struct sail_plugin_info_node {
 
     /* Plugin information. */
     struct sail_plugin_info *plugin_info;
+
+    /* Plugin instance. */
+    struct sail_plugin *plugin;
 
     struct sail_plugin_info_node *next;
 };

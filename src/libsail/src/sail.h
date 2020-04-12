@@ -66,6 +66,14 @@ SAIL_EXPORT sail_error_t sail_plugin_info_by_extension(const struct sail_context
  */
 SAIL_EXPORT sail_error_t sail_plugin_info_by_mime_type(const struct sail_context *context, const char *mime_type, const struct sail_plugin_info **plugin_info);
 
+/*
+ * Loads the plugin addressed by the specified plugin info. The assigned plugin object MUST NOT be destroyed.
+ * It's a pointer to an internal data structure.
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_load_plugin(struct sail_context *context, const struct sail_plugin_info *plugin_info, const struct sail_plugin **plugin);
+
 /* extern "C" */
 #ifdef __cplusplus
 }

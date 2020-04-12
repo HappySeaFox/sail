@@ -34,6 +34,8 @@ int sail_alloc_plugin(const struct sail_plugin_info *plugin_info, struct sail_pl
 
 #ifdef SAIL_WIN32
 #else
+    SAIL_LOG_DEBUG("Loading plugin '%s'", plugin_info->path);
+
     void *handle = dlopen(plugin_info->path, RTLD_LAZY | RTLD_LOCAL);
 
     if (handle == NULL) {

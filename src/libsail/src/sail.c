@@ -20,6 +20,7 @@
 #include "utils.h"
 
 #include "plugin_info.h"
+#include "plugin.h"
 #include "string_node.h"
 #include "sail.h"
 
@@ -269,4 +270,38 @@ sail_error_t sail_plugin_info_by_mime_type(const struct sail_context *context, c
 
     free(mime_type_copy);
     return SAIL_PLUGIN_NOT_FOUND;
+}
+
+sail_error_t sail_load_plugin(struct sail_context *context, const struct sail_plugin_info *plugin_info, const struct sail_plugin **plugin) {
+
+    /* Find the plugin in the cache. */
+    struct sail_plugin_info_node *node = context->plugin_info_node;
+
+    while (node != NULL) {
+        if (node->plugin_info == plugin_info) {
+            if (node->plugin != NULL) {
+                *plugin = node->plugin;
+                return 0;
+            }
+
+            break;
+        }
+
+        node = node->next;
+    }
+
+    /* Something weird. The pointer to the plugin info is not found the cache. */
+    if (node == NULL) {
+        return SAIL_PLUGIN_NOT_FOUND;
+    }
+
+    struct sail_plugin *local_plugin;
+
+    /* Plugin is not loaded. Let's load it. */
+    SAIL_TRY(sail_alloc_plugin(plugin_info, &local_plugin));
+
+    *plugin = local_plugin;
+    node->plugin = local_plugin;
+
+    return 0;
 }

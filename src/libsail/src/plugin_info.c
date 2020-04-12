@@ -11,6 +11,7 @@
 
 #include "ini.h"
 #include "plugin_info.h"
+#include "plugin.h"
 #include "string_node.h"
 
 /*
@@ -181,6 +182,7 @@ sail_error_t sail_alloc_plugin_info_node(struct sail_plugin_info_node **plugin_i
     }
 
     (*plugin_info_node)->plugin_info = NULL;
+    (*plugin_info_node)->plugin      = NULL;
     (*plugin_info_node)->next        = NULL;
 
     return 0;
@@ -193,6 +195,7 @@ void sail_destroy_plugin_info_node(struct sail_plugin_info_node *plugin_info_nod
     }
 
     sail_destroy_plugin_info(plugin_info_node->plugin_info);
+    sail_destroy_plugin(plugin_info_node->plugin);
 
     free(plugin_info_node);
 }
@@ -217,9 +220,11 @@ int sail_plugin_read_info(const char *file, struct sail_plugin_info **plugin_inf
     SAIL_TRY(sail_alloc_plugin_info(plugin_info));
 
     /*
-     * Returns 0 on success, line number of first error on parse error (doesn't
-     * stop on first error), -1 on file open error, or -2 on memory allocation
-     * error (only when INI_USE_STACK is zero).
+     * Returns:
+     *  - 0 on success
+     *  - line number of first error on parse error
+     *  - -1 on file open error
+     *  - -2 on memory allocation error (only when INI_USE_STACK is zero).
      */
     const int code = ini_parse(file, inih_handler, *plugin_info);
 
