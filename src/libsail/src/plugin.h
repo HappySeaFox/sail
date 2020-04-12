@@ -33,16 +33,16 @@ typedef sail_error_t (*sail_plugin_read_finish_v1_t)(struct sail_file *file, str
 /* V2 declarations. */
 typedef sail_error_t (*sail_plugin_read_scan_line_v2_t)(struct sail_file *file, struct sail_image *image, void **scanline);
 
-typedef struct {
+struct sail_plugin_layout_v1 {
     sail_plugin_read_features_v1_t        sail_plugin_read_features_v1;
     sail_plugin_read_init_v1_t            sail_plugin_read_init_v1;
     sail_plugin_read_seek_next_frame_v1_t sail_plugin_read_seek_next_frame_v1;
     sail_plugin_read_seek_next_pass_v1_t  sail_plugin_read_seek_next_pass_v1;
     sail_plugin_read_scan_line_v1_t       sail_plugin_read_scan_line_v1;
     sail_plugin_read_finish_v1_t          sail_plugin_read_finish_v1;
-} v1;
+};
 
-typedef struct {
+struct sail_plugin_layout_v2 {
     sail_plugin_read_features_v1_t        sail_plugin_read_features_v1;
     sail_plugin_read_init_v1_t            sail_plugin_read_init_v1;
     sail_plugin_read_seek_next_frame_v1_t sail_plugin_read_seek_next_frame_v1;
@@ -51,7 +51,7 @@ typedef struct {
     sail_plugin_read_finish_v1_t          sail_plugin_read_finish_v1;
 
     sail_plugin_read_scan_line_v2_t sail_plugin_read_scan_line_v2;
-} v2;
+};
 
 /*
  * SAIL plugin.
@@ -66,9 +66,9 @@ struct sail_plugin {
 
     /* Plugin interface. */
     union {
-        v1 v1;
-        v2 v2;
-    };
+        struct sail_plugin_layout_v1 v1;
+        struct sail_plugin_layout_v2 v2;
+    } interface;
 };
 
 typedef struct sail_plugin sail_plugin_t;
