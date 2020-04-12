@@ -28,8 +28,9 @@ int sail_alloc_plugin(struct sail_plugin_info *plugin_info, struct sail_plugin *
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
-    (*plugin)->layout = plugin_info->layout;
-    (*plugin)->handle = NULL;
+    (*plugin)->layout       = plugin_info->layout;
+    (*plugin)->handle       = NULL;
+    (*plugin)->interface.v1 = NULL;
 
 #ifdef SAIL_WIN32
 #else
@@ -58,6 +59,14 @@ void sail_destroy_plugin(struct sail_plugin *plugin) {
 #else
         dlclose(plugin->handle);
 #endif
+    }
+
+    switch (plugin->layout) {
+        case 1: free(plugin->interface.v1); break;
+        case 2: free(plugin->interface.v2); break;
+
+        default:
+            SAIL_LOG_WARNING("Don't know how to destroy plugin interface version %d", plugin->layout);
     }
 
     free(plugin);

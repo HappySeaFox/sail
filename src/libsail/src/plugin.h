@@ -66,8 +66,8 @@ struct sail_plugin {
 
     /* Plugin interface. */
     union {
-        struct sail_plugin_layout_v1 v1;
-        struct sail_plugin_layout_v2 v2;
+        struct sail_plugin_layout_v1 *v1;
+        struct sail_plugin_layout_v2 *v2;
     } interface;
 };
 
