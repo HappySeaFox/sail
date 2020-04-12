@@ -30,6 +30,13 @@ typedef sail_error_t (*sail_plugin_read_seek_next_pass_v1_t)(struct sail_file *f
 typedef sail_error_t (*sail_plugin_read_scan_line_v1_t)(struct sail_file *file, struct sail_image *image, void *scanline);
 typedef sail_error_t (*sail_plugin_read_finish_v1_t)(struct sail_file *file, struct sail_image *image);
 
+typedef sail_error_t (*sail_plugin_write_features_v1_t)(struct sail_write_features **write_features);
+typedef sail_error_t (*sail_plugin_write_init_v1_t)(struct sail_file *file, struct sail_write_options *write_options);
+typedef sail_error_t (*sail_plugin_write_seek_next_frame_v1_t)(struct sail_file *file, struct sail_image *image);
+typedef sail_error_t (*sail_plugin_write_seek_next_pass_v1_t)(struct sail_file *file, struct sail_image *image);
+typedef sail_error_t (*sail_plugin_write_scan_line_v1_t)(struct sail_file *file, struct sail_image *image, void *scanline);
+typedef sail_error_t (*sail_plugin_write_finish_v1_t)(struct sail_file *file, struct sail_image *image);
+
 /* V2 declarations. */
 typedef sail_error_t (*sail_plugin_read_scan_line_v2_t)(struct sail_file *file, struct sail_image *image, void **scanline);
 
@@ -40,6 +47,13 @@ struct sail_plugin_layout_v1 {
     sail_plugin_read_seek_next_pass_v1_t  sail_plugin_read_seek_next_pass_v1;
     sail_plugin_read_scan_line_v1_t       sail_plugin_read_scan_line_v1;
     sail_plugin_read_finish_v1_t          sail_plugin_read_finish_v1;
+
+    sail_plugin_write_features_v1_t        sail_plugin_write_features_v1;
+    sail_plugin_write_init_v1_t            sail_plugin_write_init_v1;
+    sail_plugin_write_seek_next_frame_v1_t sail_plugin_write_seek_next_frame_v1;
+    sail_plugin_write_seek_next_pass_v1_t  sail_plugin_write_seek_next_pass_v1;
+    sail_plugin_write_scan_line_v1_t       sail_plugin_write_scan_line_v1;
+    sail_plugin_write_finish_v1_t          sail_plugin_write_finish_v1;
 };
 
 struct sail_plugin_layout_v2 {
@@ -50,7 +64,14 @@ struct sail_plugin_layout_v2 {
     sail_plugin_read_scan_line_v1_t       sail_plugin_read_scan_line_v1;
     sail_plugin_read_finish_v1_t          sail_plugin_read_finish_v1;
 
-    sail_plugin_read_scan_line_v2_t sail_plugin_read_scan_line_v2;
+    sail_plugin_write_features_v1_t        sail_plugin_write_features_v1;
+    sail_plugin_write_init_v1_t            sail_plugin_write_init_v1;
+    sail_plugin_write_seek_next_frame_v1_t sail_plugin_write_seek_next_frame_v1;
+    sail_plugin_write_seek_next_pass_v1_t  sail_plugin_write_seek_next_pass_v1;
+    sail_plugin_write_scan_line_v1_t       sail_plugin_write_scan_line_v1;
+    sail_plugin_write_finish_v1_t          sail_plugin_write_finish_v1;
+
+    sail_plugin_read_scan_line_v2_t       sail_plugin_read_scan_line_v2;
 };
 
 /*
