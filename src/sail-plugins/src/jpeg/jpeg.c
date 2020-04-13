@@ -121,6 +121,8 @@ struct pimpl {
     bool libjpeg_error;
     struct sail_read_options *read_options;
     struct sail_write_options *write_options;
+    bool frame_read;
+    bool frame_written;
 };
 
 static int alloc_pimpl(struct pimpl **pimpl) {
@@ -135,6 +137,8 @@ static int alloc_pimpl(struct pimpl **pimpl) {
     (*pimpl)->libjpeg_error = false;
     (*pimpl)->read_options  = NULL;
     (*pimpl)->write_options = NULL;
+    (*pimpl)->frame_read    = false;
+    (*pimpl)->frame_written = false;
 
     return 0;
 }
@@ -252,9 +256,6 @@ SAIL_EXPORT sail_error_t sail_plugin_read_init_v1(struct sail_file *file, struct
     /* Launch decompression! */
     jpeg_start_decompress(&pimpl->decompress_context);
 
-    // TODO
-    //currentImage = -1;
-
     return 0;
 }
 
@@ -268,19 +269,17 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v1(struct sail_file *f
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
+    if (pimpl->frame_read) {
+        return SAIL_NO_MORE_FRAMES;
+    }
+
+    pimpl->frame_read = true;
     SAIL_TRY(sail_alloc_image(image));
 
     if (setjmp(pimpl->error_context.setjmp_buffer) != 0) {
         pimpl->libjpeg_error = true;
         return SAIL_UNDERLYING_CODEC_ERROR;
     }
-
-    // TODO
-    //currentImage++;
-
-    //if(currentImage) {
-    //    return SAIL_UNDERLYING_CODEC_ERROR;
-    //}
 
     const int bytes_per_line = pimpl->decompress_context.output_width * pimpl->decompress_context.output_components;
 
@@ -539,6 +538,12 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v1(struct sail_file *
     if (pimpl == NULL) {
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
+
+    if (pimpl->frame_written) {
+        return SAIL_NO_MORE_FRAMES;
+    }
+
+    pimpl->frame_written = true;
 
     /* Error handling setup. */
     if (setjmp(pimpl->error_context.setjmp_buffer) != 0) {
