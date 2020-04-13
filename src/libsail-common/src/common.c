@@ -136,11 +136,12 @@ int sail_alloc_read_features(struct sail_read_features **read_features) {
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
-    (*read_features)->input_pixel_formats         = NULL;
-    (*read_features)->input_pixel_formats_length  = 0;
-    (*read_features)->output_pixel_formats        = NULL;
-    (*read_features)->output_pixel_formats_length = 0;
-    (*read_features)->features                    = 0;
+    (*read_features)->input_pixel_formats           = NULL;
+    (*read_features)->input_pixel_formats_length    = 0;
+    (*read_features)->output_pixel_formats          = NULL;
+    (*read_features)->output_pixel_formats_length   = 0;
+    (*read_features)->preferred_output_pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;
+    (*read_features)->features                      = 0;
 
     return 0;
 }
@@ -187,18 +188,19 @@ int sail_alloc_write_features(struct sail_write_features **write_features) {
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
-    (*write_features)->input_pixel_formats         = NULL;
-    (*write_features)->input_pixel_formats_length  = 0;
-    (*write_features)->output_pixel_formats        = NULL;
-    (*write_features)->output_pixel_formats_length = 0;
-    (*write_features)->features                    = 0;
-    (*write_features)->properties                  = 0;
-    (*write_features)->passes                      = 0;
-    (*write_features)->compression_types           = NULL;
-    (*write_features)->compression_types_length    = 0;
-    (*write_features)->compression_min             = 0;
-    (*write_features)->compression_max             = 0;
-    (*write_features)->compression_default         = 0;
+    (*write_features)->input_pixel_formats           = NULL;
+    (*write_features)->input_pixel_formats_length    = 0;
+    (*write_features)->output_pixel_formats          = NULL;
+    (*write_features)->output_pixel_formats_length   = 0;
+    (*write_features)->preferred_output_pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;
+    (*write_features)->features                      = 0;
+    (*write_features)->properties                    = 0;
+    (*write_features)->passes                        = 0;
+    (*write_features)->compression_types             = NULL;
+    (*write_features)->compression_types_length      = 0;
+    (*write_features)->compression_min               = 0;
+    (*write_features)->compression_max               = 0;
+    (*write_features)->compression_default           = 0;
 
     return 0;
 }

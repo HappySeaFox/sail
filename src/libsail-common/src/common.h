@@ -313,6 +313,9 @@ struct sail_read_features {
     /* The length of output_pixel_formats. */
     int output_pixel_formats_length;
 
+    /* Output_pixel format to use by default. */
+    int preferred_output_pixel_format;
+
     /* Supported plugin features of reading operations. See SailPluginFeatures. */
     int features;
 };
@@ -347,6 +350,9 @@ struct sail_write_features {
 
     /* The length of output_pixel_formats. */
     int output_pixel_formats_length;
+
+    /* Output_pixel format to use by default. */
+    int preferred_output_pixel_format;
 
     /* Supported plugin features of writing operations. See SailPluginFeatures. */
     int features;

@@ -186,6 +186,8 @@ SAIL_EXPORT sail_error_t sail_plugin_read_features_v1(struct sail_read_features 
     (*read_features)->output_pixel_formats[13] = SAIL_PIXEL_FORMAT_ARGB;
     (*read_features)->output_pixel_formats[14] = SAIL_PIXEL_FORMAT_RGB565;
 
+    (*read_features)->preferred_output_pixel_format = SAIL_PIXEL_FORMAT_RGB;
+
     (*read_features)->features = SAIL_PLUGIN_FEATURE_STATIC | SAIL_PLUGIN_FEATURE_META_INFO;
 
     return 0;
@@ -458,6 +460,8 @@ SAIL_EXPORT sail_error_t sail_plugin_write_features_v1(struct sail_write_feature
     (*write_features)->output_pixel_formats[2] = SAIL_PIXEL_FORMAT_YCBCR;
     (*write_features)->output_pixel_formats[3] = SAIL_PIXEL_FORMAT_CMYK;
     (*write_features)->output_pixel_formats[4] = SAIL_PIXEL_FORMAT_YCCK;
+
+    (*write_features)->preferred_output_pixel_format = SAIL_PIXEL_FORMAT_YCBCR;
 
     (*write_features)->features                 = SAIL_PLUGIN_FEATURE_STATIC | SAIL_PLUGIN_FEATURE_META_INFO;
     (*write_features)->properties               = 0;
