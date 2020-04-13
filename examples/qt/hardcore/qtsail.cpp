@@ -132,7 +132,16 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 
         delete [] image_bits;
 
-        plugin->iface.v2->read_finish_v1(file);
+        switch (plugin->layout) {
+            case 1: {
+                plugin->iface.v1->read_finish_v1(file);
+                break;
+            }
+            case 2: {
+                plugin->iface.v2->read_finish_v1(file);
+                break;
+            }
+        }
 
         sail_destroy_read_features(read_features);
         read_features = nullptr;
@@ -152,9 +161,21 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     // Read the image file
     //
 
-    // Determine the read features of the plugin: what the plugin can actually read?
-    //
-    SAIL_TRY(plugin->iface.v2->read_features_v1(&read_features));
+    switch (plugin->layout) {
+        case 1: {
+            // Determine the read features of the plugin: what the plugin can actually read?
+            //
+            SAIL_TRY(plugin->iface.v1->read_features_v1(&read_features));
+            break;
+        }
+        case 2: {
+            SAIL_TRY(plugin->iface.v2->read_features_v1(&read_features));
+            break;
+        }
+        default: {
+            return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
+        }
+    }
 
     SAIL_TRY(sail_alloc_file_for_reading(path.toLocal8Bit(), &file));
 
@@ -167,13 +188,22 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     //
     read_options->pixel_format = SAIL_PIXEL_FORMAT_RGB;
 
-    // Start reading
-    //
-    SAIL_TRY(plugin->iface.v2->read_init_v1(file, read_options));
-
-    // Seek to the next frame if any
-    //
-    SAIL_TRY(plugin->iface.v2->read_seek_next_frame_v1(file, &image));
+    switch (plugin->layout) {
+        case 1: {
+            // Start reading
+            //
+            SAIL_TRY(plugin->iface.v1->read_init_v1(file, read_options));
+            // Seek to the next frame if any
+            //
+            SAIL_TRY(plugin->iface.v1->read_seek_next_frame_v1(file, &image));
+            break;
+        }
+        case 2: {
+            SAIL_TRY(plugin->iface.v2->read_init_v1(file, read_options));
+            SAIL_TRY(plugin->iface.v2->read_seek_next_frame_v1(file, &image));
+            break;
+        }
+    }
 
     // Allocate image bits. Assume full-color images so divide by 8.
     //
@@ -189,11 +219,26 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 
     // Actual read. Pass by pass, line by line.
     //
-    for (int pass = 0; pass < image->passes; pass++) {
-        SAIL_TRY(plugin->iface.v2->read_seek_next_pass_v1(file, image));
+    switch (plugin->layout) {
+        case 1: {
+            for (int pass = 0; pass < image->passes; pass++) {
+                SAIL_TRY(plugin->iface.v1->read_seek_next_pass_v1(file, image));
 
-        for (int j = 0; j < image->height; j++) {
-            SAIL_TRY(plugin->iface.v2->read_scan_line_v1(file, image, image_bits + j * image->width * bytes_per_pixel));
+                for (int j = 0; j < image->height; j++) {
+                    SAIL_TRY(plugin->iface.v1->read_scan_line_v1(file, image, image_bits + j * image->width * bytes_per_pixel));
+                }
+            }
+            break;
+        }
+        case 2: {
+            for (int pass = 0; pass < image->passes; pass++) {
+                SAIL_TRY(plugin->iface.v2->read_seek_next_pass_v1(file, image));
+
+                for (int j = 0; j < image->height; j++) {
+                    SAIL_TRY(plugin->iface.v2->read_scan_line_v1(file, image, image_bits + j * image->width * bytes_per_pixel));
+                }
+            }
+            break;
         }
     }
 
