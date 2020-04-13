@@ -58,28 +58,62 @@ typedef int sail_error_t;
 #define SAIL_UNSUPPORTED_PLUGIN_LAYOUT    62
 
 /*
+ * libsail errors.
+ */
+#define SAIL_CONTEXT_NULL_PTR             80
+#define SAIL_PATH_NULL_PTR                81
+#define SAIL_PLUGIN_INFO_NULL_PTR         82
+
+/*
  * Helper macros.
  */
 #define SAIL_CHECK_FILE(file)      \
+do {                               \
     if (file == NULL) {            \
         return SAIL_FILE_NULL_PTR; \
     }                              \
     if (file->fptr == NULL) {      \
         return SAIL_FILE_NULL_PTR; \
-    }
+    }                              \
+} while(0)
 
 #define SAIL_CHECK_IMAGE(image)                    \
+do {                                               \
     if (image == NULL) {                           \
         return SAIL_IMAGE_NULL_PTR;                \
     }                                              \
     if (image->width <= 0 || image->height <= 0) { \
         return SAIL_INCORRECT_IMAGE_DIMENSIONS;    \
-    }
+    }                                              \
+} while(0)
 
 #define SAIL_CHECK_SCAN_LINE(scan)      \
+do {                                    \
     if (scan == NULL) {                 \
         return SAIL_SCAN_LINE_NULL_PTR; \
-    }
+    }                                   \
+} while(0)
+
+#define SAIL_CHECK_CONTEXT(context)   \
+do {                                  \
+    if (context == NULL) {            \
+        return SAIL_CONTEXT_NULL_PTR; \
+    }                                 \
+} while(0)
+
+#define SAIL_CHECK_PATH(path)      \
+do {                               \
+    if (path == NULL) {            \
+        return SAIL_PATH_NULL_PTR; \
+    }                              \
+} while(0)
+
+#define SAIL_CHECK_PLUGIN_INFO(plugin_info) \
+do {                                        \
+    if (plugin_info == NULL) {              \
+        return SAIL_PLUGIN_INFO_NULL_PTR;   \
+    }                                       \
+} while(0)
 
 /*
  * Try to execute the specified SAIL function. If it fails, return the error code.
