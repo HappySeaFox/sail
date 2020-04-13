@@ -218,7 +218,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     return 0;
 }
 
-sail_error_t QtSail::saveImage(const QString &path)
+sail_error_t QtSail::saveImage(const QString &path, QImage *qimage)
 {
     const struct sail_plugin_info *plugin_info;
 
@@ -275,8 +275,8 @@ sail_error_t QtSail::saveImage(const QString &path)
 
     SAIL_TRY(sail_alloc_image(&image));
 
-    image->width = d->qimage.width();
-    image->height = d->qimage.height();
+    image->width = qimage->width();
+    image->height = qimage->height();
     image->pixel_format = SAIL_PIXEL_FORMAT_RGB;
     image->passes = 1;
 
@@ -302,7 +302,7 @@ sail_error_t QtSail::saveImage(const QString &path)
         SAIL_TRY(plugin->iface.v2->write_seek_next_pass_v1(file, image));
 
         for (int j = 0; j < image->height; j++) {
-            SAIL_TRY(plugin->iface.v2->write_scan_line_v1(file, image, d->qimage.bits() + j * bytes_per_line));
+            SAIL_TRY(plugin->iface.v2->write_scan_line_v1(file, image, qimage->bits() + j * bytes_per_line));
         }
     }
 
@@ -430,7 +430,7 @@ void QtSail::onSave()
 
     int res;
 
-    if ((res = saveImage(path)) == 0) {
+    if ((res = saveImage(path, &d->qimage)) == 0) {
         onFit(d->ui->checkFit->isChecked());
         d->ui->labelCounter->setText(QStringLiteral("1/1"));
     } else {
