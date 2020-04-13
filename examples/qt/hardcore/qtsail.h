@@ -4,6 +4,8 @@
 #include <QWidget>
 #include <QScopedPointer>
 
+#include <sail/error.h>
+
 class QImage;
 
 struct sail_plugin_info;
@@ -17,9 +19,9 @@ public:
     ~QtSail();
 
 private:
-    int loadImage(const QString &path, QImage *qimage);
-    int saveImage(const QString &path);
-    int pluginInfo(struct sail_plugin_info *plugin_info);
+    sail_error_t loadImage(const QString &path, QImage *qimage);
+    sail_error_t saveImage(const QString &path);
+    sail_error_t pluginInfo(struct sail_plugin_info *plugin_info);
     void loadFileFromDir();
 
 private: // slots
