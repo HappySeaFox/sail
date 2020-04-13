@@ -95,7 +95,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v1(struct sail_file *file, s
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_read_finish_v1(struct sail_file *file, struct sail_image *image);
+SAIL_EXPORT sail_error_t sail_plugin_read_finish_v1(struct sail_file *file);
 
 /*
  * Encoding functions.
@@ -147,7 +147,7 @@ SAIL_EXPORT sail_error_t sail_plugin_write_scan_line_v1(struct sail_file *file, 
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_write_finish_v1(struct sail_file *file, struct sail_image *image);
+SAIL_EXPORT sail_error_t sail_plugin_write_finish_v1(struct sail_file *file);
 
 /* extern "C" */
 #ifdef __cplusplus

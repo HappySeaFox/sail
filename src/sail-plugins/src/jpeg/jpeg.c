@@ -391,10 +391,9 @@ SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v2(struct sail_file *file, s
     return sail_plugin_read_scan_line_v1(file, image, *scanline);
 }
 
-SAIL_EXPORT sail_error_t sail_plugin_read_finish_v1(struct sail_file *file, struct sail_image *image) {
+SAIL_EXPORT sail_error_t sail_plugin_read_finish_v1(struct sail_file *file) {
 
     SAIL_CHECK_FILE(file);
-    SAIL_CHECK_IMAGE(image);
 
     struct pimpl *pimpl = (struct pimpl *)file->pimpl;
 
@@ -624,10 +623,9 @@ SAIL_EXPORT sail_error_t sail_plugin_write_scan_line_v1(struct sail_file *file, 
     return 0;
 }
 
-SAIL_EXPORT sail_error_t sail_plugin_write_finish_v1(struct sail_file *file, struct sail_image *image) {
+SAIL_EXPORT sail_error_t sail_plugin_write_finish_v1(struct sail_file *file) {
 
     SAIL_CHECK_FILE(file);
-    SAIL_CHECK_IMAGE(image);
 
     struct pimpl *pimpl = (struct pimpl *)file->pimpl;
 

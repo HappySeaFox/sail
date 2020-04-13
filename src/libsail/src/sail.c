@@ -425,7 +425,7 @@ sail_error_t sail_probe_image(const char *path, struct sail_context *context, co
                                 /* cleanup */ sail_destroy_file(file));
             SAIL_TRY_OR_CLEANUP(plugin->iface.v1->read_seek_next_frame_v1(file, image),
                                 /* cleanup */ sail_destroy_file(file));
-            SAIL_TRY_OR_CLEANUP(plugin->iface.v1->read_finish_v1(file, *image),
+            SAIL_TRY_OR_CLEANUP(plugin->iface.v1->read_finish_v1(file),
                                 /* cleanup */ sail_destroy_file(file));
             break;
         }
@@ -435,7 +435,7 @@ sail_error_t sail_probe_image(const char *path, struct sail_context *context, co
                                 /* cleanup */ sail_destroy_file(file));
             SAIL_TRY_OR_CLEANUP(plugin->iface.v2->read_seek_next_frame_v1(file, image),
                                 /* cleanup */ sail_destroy_file(file));
-            SAIL_TRY_OR_CLEANUP(plugin->iface.v2->read_finish_v1(file, *image),
+            SAIL_TRY_OR_CLEANUP(plugin->iface.v2->read_finish_v1(file),
                                 /* cleanup */ sail_destroy_file(file));
             break;
         }
