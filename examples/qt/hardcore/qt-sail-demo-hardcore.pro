@@ -6,6 +6,7 @@ TEMPLATE = app
 TARGET = qt-sail-demo-hardcore
 
 CONFIG += warn_on c++11 strict_c++ link_pkgconfig
+CONFIG -= embed_manifest_exe
 QT += widgets
 
 PKGCONFIG += libsail libsail-common
