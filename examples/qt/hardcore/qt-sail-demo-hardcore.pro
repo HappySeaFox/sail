@@ -15,7 +15,7 @@ SOURCES += main.cpp qtsail.cpp
 FORMS   += qtsail.ui
 
 win32 {
-    RC_FILE = qtsail.manifest
+    RC_FILE = qtsail.rc
 }
 
 # Default SAIL installation on Windows
