@@ -173,93 +173,47 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     return 0;
 }
 
+static int qImageFormatToSailPixelFormat(QImage::Format format) {
+    switch (format) {
+        case QImage::Format_Mono:       return SAIL_PIXEL_FORMAT_MONO;
+        case QImage::Format_Grayscale8: return SAIL_PIXEL_FORMAT_GRAYSCALE;
+        case QImage::Format_Indexed8:   return SAIL_PIXEL_FORMAT_INDEXED;
+        case QImage::Format_RGB888:     return SAIL_PIXEL_FORMAT_RGB;
+        case QImage::Format_RGBX8888:   return SAIL_PIXEL_FORMAT_RGBX;
+        case QImage::Format_RGBA8888:   return SAIL_PIXEL_FORMAT_RGBA;
+        case QImage::Format_ARGB32:     return SAIL_PIXEL_FORMAT_ARGB;
+
+        default: return SAIL_PIXEL_FORMAT_UNKNOWN;
+    }
+}
+
 sail_error_t QtSail::saveImage(const QString &path, QImage *qimage)
 {
-    const struct sail_plugin_info *plugin_info;
-
-    SAIL_TRY(sail_plugin_info_by_extension(d->context, QFileInfo(path).suffix().toLocal8Bit(), &plugin_info));
-
-    // Load the specified codec
-    //
     qint64 v = QDateTime::currentMSecsSinceEpoch();
 
-    const struct sail_plugin *plugin;
+    void *pimpl;
 
-    SAIL_TRY(sail_load_plugin(d->context, plugin_info, &plugin));
-
-    sail_file *file = nullptr;
-    sail_image *image = nullptr;
-    sail_write_features *write_features = nullptr;
-    sail_write_options *write_options = nullptr;
+    struct sail_image *image = nullptr;
 
     auto cleanup_func = [&] {
-        SAIL_LOG_DEBUG("Write clean up");
-
-        plugin->v2->write_finish_v2(file);
-
-        sail_destroy_write_features(write_features);
-        write_features = nullptr;
-
-        sail_destroy_write_options(write_options);
-        write_options = nullptr;
+        SAIL_LOG_DEBUG("Read clean up");
 
         sail_destroy_image(image);
-        image = NULL;
-
-        sail_destroy_file(file);
-        file = NULL;
+        image = nullptr;
     };
-
-    CleanUp<decltype(cleanup_func)> cleanUp(cleanup_func);
-
-    // Write the image file.
-    //
-
-    // Determine the write features of the plugin: what the plugin can actually write?
-    //
-    SAIL_TRY(plugin->v2->write_features_v2(&write_features));
-
-    SAIL_TRY(sail_alloc_file_for_writing(path.toLocal8Bit(), &file));
-
-    // Allocate new write options and copy defaults from the write features
-    // (preferred output pixel format etc.)
-    //
-    SAIL_TRY(sail_alloc_write_options_from_features(write_features, &write_options));
-
-    SAIL_TRY(plugin->v2->write_init_v2(file, write_options));
 
     SAIL_TRY(sail_alloc_image(&image));
 
     image->width = qimage->width();
     image->height = qimage->height();
-    image->pixel_format = SAIL_PIXEL_FORMAT_RGB;
+    image->pixel_format = qImageFormatToSailPixelFormat(qimage->format());
     image->passes = 1;
 
-    // Assume pixel formats aligned to 8 bits.
-    const int bytes_per_line = image->width * (sail_bits_per_pixel(image->pixel_format) / 8);
+    CleanUp<decltype(cleanup_func)> cleanUp(cleanup_func);
 
-    struct sail_meta_entry_node *meta_entry_node;
-
-    SAIL_TRY(sail_alloc_meta_entry_node(&meta_entry_node));
-    SAIL_TRY(sail_strdup("Comment", &meta_entry_node->key));
-    SAIL_TRY(sail_strdup("JPEG KOOL COMMENT", &meta_entry_node->value));
-
-    image->meta_entry_node = meta_entry_node;
-
-    SAIL_LOG_DEBUG("Image size: %dx%d", image->width, image->height);
-    SAIL_LOG_DEBUG("Output pixel format: %s", sail_pixel_format_to_string(write_options->pixel_format));
-
-    SAIL_TRY(plugin->v2->write_seek_next_frame_v2(file, image));
-
-    // Actual write. Pass by pass, line by line.
-    //
-    for (int pass = 0; pass < image->passes; pass++) {
-        SAIL_TRY(plugin->v2->write_seek_next_pass_v2(file, image));
-
-        for (int j = 0; j < image->height; j++) {
-            SAIL_TRY(plugin->v2->write_scan_line_v2(file, image, qimage->bits() + j * bytes_per_line));
-        }
-    }
+    SAIL_TRY(sail_start_writing(path.toLocal8Bit(), d->context, &pimpl));
+    SAIL_TRY(sail_write_next_frame(pimpl, image, qimage->bits()));
+    SAIL_TRY(sail_stop_writing(pimpl));
 
     SAIL_LOG_INFO("Saved in %lld ms.", QDateTime::currentMSecsSinceEpoch() - v);
 
