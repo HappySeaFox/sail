@@ -207,8 +207,19 @@ SAIL_EXPORT sail_error_t sail_plugin_read_init_v1(struct sail_file *file, struct
     if (read_options == NULL) {
         SAIL_TRY(sail_alloc_read_options(&pimpl->read_options));
 
-        pimpl->read_options->pixel_format = SAIL_PIXEL_FORMAT_RGB;
-        pimpl->read_options->io_options = SAIL_IO_OPTION_META_INFO;
+        /* Copy options from read features. */
+        struct sail_read_features *read_features;
+
+        SAIL_TRY(sail_plugin_read_features_v1(&read_features));
+
+        pimpl->read_options->pixel_format = read_features->preferred_output_pixel_format;
+        pimpl->read_options->io_options = 0;
+
+        if (read_features->features & SAIL_PLUGIN_FEATURE_META_INFO) {
+            pimpl->read_options->io_options |= SAIL_IO_OPTION_META_INFO;
+        }
+
+        sail_destroy_read_features(read_features);
     } else {
         pimpl->read_options = (struct sail_read_options *)malloc(sizeof(struct sail_read_options));
 
