@@ -241,3 +241,27 @@ void sail_destroy_write_options(struct sail_write_options *write_options) {
 
     free(write_options);
 }
+
+sail_error_t sail_read_options_from_features(const struct sail_read_features *read_features, struct sail_read_options *read_options) {
+
+    SAIL_CHECK_READ_FEATURES(read_features);
+    SAIL_CHECK_READ_OPTIONS(read_options);
+
+    read_options->pixel_format = read_features->preferred_output_pixel_format;
+    read_options->io_options = 0;
+
+    if (read_features->features & SAIL_PLUGIN_FEATURE_META_INFO) {
+        read_options->io_options |= SAIL_IO_OPTION_META_INFO;
+    }
+
+    return 0;
+}
+
+sail_error_t sail_alloc_read_options_from_features(const struct sail_read_features *read_features, struct sail_read_options **read_options) {
+
+    SAIL_TRY(sail_alloc_read_options(read_options));
+    SAIL_TRY_OR_CLEANUP(sail_read_options_from_features(read_features, *read_options),
+                        /* cleanup */ sail_destroy_read_options(*read_options));
+
+    return 0;
+}

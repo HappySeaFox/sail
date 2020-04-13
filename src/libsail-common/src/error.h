@@ -40,6 +40,8 @@ typedef int sail_error_t;
 #define SAIL_FILE_NULL_PTR                21
 #define SAIL_IMAGE_NULL_PTR               22
 #define SAIL_SCAN_LINE_NULL_PTR           23
+#define SAIL_READ_FEATURES_NULL_PTR       24
+#define SAIL_READ_OPTIONS_NULL_PTR        25
 
 /*
  * Encoding/decoding specific errors.
@@ -92,6 +94,20 @@ do {                                    \
     if (scan == NULL) {                 \
         return SAIL_SCAN_LINE_NULL_PTR; \
     }                                   \
+} while(0)
+
+#define SAIL_CHECK_READ_FEATURES(read_features) \
+do {                                            \
+    if (read_features == NULL) {                \
+        return SAIL_READ_FEATURES_NULL_PTR;     \
+    }                                           \
+} while(0)
+
+#define SAIL_CHECK_READ_OPTIONS(read_options) \
+do {                                          \
+    if (read_options == NULL) {               \
+        return SAIL_READ_OPTIONS_NULL_PTR;    \
+    }                                         \
 } while(0)
 
 #define SAIL_CHECK_CONTEXT(context)   \

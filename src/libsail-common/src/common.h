@@ -550,6 +550,21 @@ SAIL_EXPORT sail_error_t sail_alloc_write_options(struct sail_write_options **wr
  */
 SAIL_EXPORT void sail_destroy_write_options(struct sail_write_options *write_options);
 
+/*
+ * Builds default read options from read features.
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_read_options_from_features(const struct sail_read_features *read_features, struct sail_read_options *read_options);
+
+/*
+ * Allocates and builds default read options from read features. The assigned read options MUST be destroyed later
+ * with sail_destroy_read_options().
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_alloc_read_options_from_features(const struct sail_read_features *read_features, struct sail_read_options **read_options);
+
 /* extern "C" */
 #ifdef __cplusplus
 }
