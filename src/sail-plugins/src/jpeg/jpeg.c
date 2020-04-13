@@ -467,14 +467,15 @@ SAIL_EXPORT sail_error_t sail_plugin_write_features_v1(struct sail_write_feature
 
     (*write_features)->preferred_output_pixel_format = SAIL_PIXEL_FORMAT_YCBCR;
 
-    (*write_features)->features                 = SAIL_PLUGIN_FEATURE_STATIC | SAIL_PLUGIN_FEATURE_META_INFO;
-    (*write_features)->properties               = 0;
-    (*write_features)->passes                   = 0;
-    (*write_features)->compression_types        = NULL;
-    (*write_features)->compression_types_length = 0;
-    (*write_features)->compression_min          = COMPRESSION_MIN;
-    (*write_features)->compression_max          = COMPRESSION_MAX;
-    (*write_features)->compression_default      = COMPRESSION_DEFAULT;
+    (*write_features)->features                   = SAIL_PLUGIN_FEATURE_STATIC | SAIL_PLUGIN_FEATURE_META_INFO;
+    (*write_features)->properties                 = 0;
+    (*write_features)->passes                     = 0;
+    (*write_features)->compression_types          = NULL;
+    (*write_features)->compression_types_length   = 0;
+    (*write_features)->preferred_compression_type = 0;
+    (*write_features)->compression_min            = COMPRESSION_MIN;
+    (*write_features)->compression_max            = COMPRESSION_MAX;
+    (*write_features)->compression_default        = COMPRESSION_DEFAULT;
 
     return 0;
 }
@@ -491,10 +492,14 @@ SAIL_EXPORT sail_error_t sail_plugin_write_init_v1(struct sail_file *file, struc
 
     /* Construct default write options. */
     if (write_options == NULL) {
-        SAIL_TRY(sail_alloc_write_options(&pimpl->write_options));
+        /* Copy options from write features. */
+        struct sail_write_features *write_features;
 
-        pimpl->write_options->pixel_format = SAIL_PIXEL_FORMAT_SOURCE;
-        pimpl->write_options->io_options = SAIL_IO_OPTION_META_INFO;
+        SAIL_TRY(sail_plugin_write_features_v1(&write_features));
+        SAIL_TRY_OR_CLEANUP(sail_alloc_write_options_from_features(write_features, &pimpl->write_options),
+                            sail_destroy_write_features(write_features));
+
+        sail_destroy_write_features(write_features);
     } else {
         pimpl->write_options = (struct sail_write_options *)malloc(sizeof(struct sail_write_options));
 

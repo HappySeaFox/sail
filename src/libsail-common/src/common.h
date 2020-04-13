@@ -380,6 +380,9 @@ struct sail_write_features {
     /* The length of compression_types. */
     int compression_types_length;
 
+    /* Preferred compression typed used by default. */
+    int preferred_compression_type;
+
     /*
      * Minimum compression value. For lossy codecs more compression means less quality and vice versa.
      * For loseless codecs more compression means nothing else but a smaller file size. This field is
@@ -564,6 +567,21 @@ SAIL_EXPORT sail_error_t sail_read_options_from_features(const struct sail_read_
  * Returns 0 on success or sail_error_t on error.
  */
 SAIL_EXPORT sail_error_t sail_alloc_read_options_from_features(const struct sail_read_features *read_features, struct sail_read_options **read_options);
+
+/*
+ * Builds default write options from write features.
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_write_options_from_features(const struct sail_write_features *write_features, struct sail_write_options *write_options);
+
+/*
+ * Allocates and builds default write options from write features. The assigned write options MUST be destroyed later
+ * with sail_destroy_write_options().
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_alloc_write_options_from_features(const struct sail_write_features *write_features, struct sail_write_options **write_options);
 
 /* extern "C" */
 #ifdef __cplusplus

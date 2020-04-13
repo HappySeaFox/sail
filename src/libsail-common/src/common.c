@@ -198,6 +198,7 @@ int sail_alloc_write_features(struct sail_write_features **write_features) {
     (*write_features)->passes                        = 0;
     (*write_features)->compression_types             = NULL;
     (*write_features)->compression_types_length      = 0;
+    (*write_features)->preferred_compression_type    = 0;
     (*write_features)->compression_min               = 0;
     (*write_features)->compression_max               = 0;
     (*write_features)->compression_default           = 0;
@@ -262,6 +263,37 @@ sail_error_t sail_alloc_read_options_from_features(const struct sail_read_featur
     SAIL_TRY(sail_alloc_read_options(read_options));
     SAIL_TRY_OR_CLEANUP(sail_read_options_from_features(read_features, *read_options),
                         /* cleanup */ sail_destroy_read_options(*read_options));
+
+    return 0;
+}
+
+sail_error_t sail_write_options_from_features(const struct sail_write_features *write_features, struct sail_write_options *write_options) {
+
+    SAIL_CHECK_WRITE_FEATURES(write_features);
+    SAIL_CHECK_WRITE_OPTIONS(write_options);
+
+    write_options->pixel_format = write_features->preferred_output_pixel_format;
+    write_options->io_options = 0;
+
+    if (write_features->features & SAIL_PLUGIN_FEATURE_META_INFO) {
+        write_options->io_options |= SAIL_IO_OPTION_META_INFO;
+    }
+
+    /* Compression levels are not supported. */
+    if (write_features->compression_min == write_features->compression_max) {
+        write_options->compression_type = write_features->preferred_compression_type;
+    } else {
+        write_options->compression = write_features->compression_default;
+    }
+
+    return 0;
+}
+
+sail_error_t sail_alloc_write_options_from_features(const struct sail_write_features *write_features, struct sail_write_options **write_options) {
+
+    SAIL_TRY(sail_alloc_write_options(write_options));
+    SAIL_TRY_OR_CLEANUP(sail_write_options_from_features(write_features, *write_options),
+                        /* cleanup */ sail_destroy_write_options(*write_options));
 
     return 0;
 }
