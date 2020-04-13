@@ -90,7 +90,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v1(struct sail_file *file, s
 
 /*
  * Finilizes reading operation. No more readings are possible after calling this function.
- * This function doesn't close the file. It just stops decoding. Use sail_file_close()
+ * This function doesn't close the file. It just stops decoding. Use sail_destroy_file()
  * to actually close the file.
  *
  * Returns 0 on success or sail_error_t on error.
@@ -143,7 +143,7 @@ SAIL_EXPORT sail_error_t sail_plugin_write_scan_line_v1(struct sail_file *file, 
 
 /*
  * Finilizes writing operation. No more writings are possible after calling this function.
- * This function doesn't close the file. Use sail_file_close() for that.
+ * This function doesn't close the file. Use sail_destroy_file() for that.
  *
  * Returns 0 on success or sail_error_t on error.
  */
