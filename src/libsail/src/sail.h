@@ -112,6 +112,43 @@ SAIL_EXPORT sail_error_t sail_unload_plugins(struct sail_context *context);
  */
 SAIL_EXPORT sail_error_t sail_probe_image(const char *path, struct sail_context *context, const struct sail_plugin_info **plugin_info, struct sail_image **image);
 
+/*
+ * Starts reading the specified image. The assigned plugin info MUST NOT be destroyed.
+ * It's a pointer to an internal data structure. If you don't need it, just pass NULL.
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_start_reading(const char *path, struct sail_context *context, const struct sail_plugin_info **plugin_info, void **pimpl);
+
+/*
+ * Continues reading the image started by sail_start_reading(). The assigned image MUST be destroyed later
+ * with sail_image_destroy(). The assigned image bits MUST be destroyed later with free().
+ *
+ * It's important to continue calling this function until it returns SAIL_NO_MORE_FRAMES (or other error)
+ * to read all frames stored in the image to ensure it frees all internal memory buffers.
+ *
+ * If you don't want to continue reading frames after the last call to sail_read_next_frame() succeeds,
+ * call sail_stop_reading() to stop reading and to free all internal memory buffers.
+ *
+ * If this function fails, it calls sail_stop_reading() automatically to clean all internal memory buffers.
+ * A subsequent call to sail_stop_reading() by a caller will lead to a crash.
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_read_next_frame(void *pimpl, struct sail_image **image, void **image_bits);
+
+/*
+ * Stops reading started by sail_start_reading(). Call this function ONLY when the last call to
+ * sail_read_next_frame() succeeds, and you'd like to stop reading frames even though some frames
+ * are still hypothetically available.
+ *
+ * When the last call to sail_read_next_frame() returns an error, a subsequent call to sail_stop_reading()
+ * will lead to a crash.
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_stop_reading(void *pimpl);
+
 /* extern "C" */
 #ifdef __cplusplus
 }

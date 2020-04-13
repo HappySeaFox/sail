@@ -399,8 +399,8 @@ sail_error_t sail_unload_plugins(struct sail_context *context) {
 
 sail_error_t sail_probe_image(const char *path, struct sail_context *context, const struct sail_plugin_info **plugin_info, struct sail_image **image) {
 
-    SAIL_CHECK_CONTEXT_PTR(context);
     SAIL_CHECK_PATH_PTR(path);
+    SAIL_CHECK_CONTEXT_PTR(context);
 
     const char *dot = strrchr(path, '.');
 
@@ -416,7 +416,7 @@ sail_error_t sail_probe_image(const char *path, struct sail_context *context, co
 
     struct sail_file *file;
 
-    SAIL_TRY(sail_alloc_file(path, "rb", &file));
+    SAIL_TRY(sail_alloc_file_for_reading(path, &file));
 
     switch (plugin->layout) {
 
@@ -445,6 +445,184 @@ sail_error_t sail_probe_image(const char *path, struct sail_context *context, co
             return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
         }
     }
+
+    return 0;
+}
+
+struct hidden_pimpl {
+
+    struct sail_file *file;
+    const struct sail_plugin *plugin;
+};
+
+static void destroy_hidden_pimpl(struct hidden_pimpl *pimpl) {
+
+    if (pimpl == NULL) {
+        return;
+    }
+
+    sail_destroy_file(pimpl->file);
+
+    free(pimpl);
+}
+
+sail_error_t sail_start_reading(const char *path, struct sail_context *context, const struct sail_plugin_info **plugin_info, void **pimpl) {
+
+    SAIL_CHECK_PATH_PTR(path);
+    SAIL_CHECK_CONTEXT_PTR(context);
+
+    const char *dot = strrchr(path, '.');
+
+    if (dot == NULL) {
+        return SAIL_INVALID_ARGUMENT;
+    }
+
+    struct hidden_pimpl *pmpl = (struct hidden_pimpl *)malloc(sizeof(struct hidden_pimpl));
+
+    if (pmpl == NULL) {
+        return SAIL_MEMORY_ALLOCATION_FAILED;
+    }
+
+    pmpl->file   = NULL;
+    pmpl->plugin = NULL;
+
+    *pimpl = pmpl;
+
+    const struct sail_plugin_info *plugin_info_noop;
+    const struct sail_plugin_info **plugin_info_local = plugin_info == NULL ? &plugin_info_noop : plugin_info;
+
+    SAIL_TRY_OR_CLEANUP(sail_plugin_info_by_extension(context, dot + 1, plugin_info_local),
+                        /* cleanup */ destroy_hidden_pimpl(pmpl));
+    SAIL_TRY_OR_CLEANUP(sail_load_plugin(context, *plugin_info_local, &pmpl->plugin),
+                        /* cleanup */ destroy_hidden_pimpl(pmpl));
+    SAIL_TRY_OR_CLEANUP(sail_alloc_file_for_reading(path, &pmpl->file),
+                        /* cleanup */ destroy_hidden_pimpl(pmpl));
+
+    switch (pmpl->plugin->layout) {
+
+        case 1: {
+            SAIL_TRY_OR_CLEANUP(pmpl->plugin->iface.v1->read_init_v1(pmpl->file, NULL),
+                                /* cleanup */ destroy_hidden_pimpl(pmpl));
+            break;
+        }
+
+        case 2: {
+            SAIL_TRY_OR_CLEANUP(pmpl->plugin->iface.v2->read_init_v1(pmpl->file, NULL),
+                                /* cleanup */ destroy_hidden_pimpl(pmpl));
+            break;
+        }
+
+        default: {
+            destroy_hidden_pimpl(pmpl);
+            return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
+        }
+    }
+
+    return 0;
+}
+
+sail_error_t sail_read_next_frame(void *pimpl, struct sail_image **image, void **image_bits) {
+
+    SAIL_CHECK_PTR(pimpl);
+
+    struct hidden_pimpl *pmpl = (struct hidden_pimpl *)pimpl;
+
+    SAIL_CHECK_FILE(pmpl->file);
+    SAIL_CHECK_PLUGIN_PTR(pmpl->plugin);
+
+    struct sail_file *file = pmpl->file;
+    const struct sail_plugin *plugin = pmpl->plugin;
+
+    switch (plugin->layout) {
+
+        case 1: {
+            SAIL_TRY_OR_CLEANUP(plugin->iface.v1->read_seek_next_frame_v1(file, image),
+                                /* cleanup */ sail_stop_reading(pimpl));
+            *image_bits = malloc((*image)->bytes_per_line * (*image)->height);
+
+            if (*image_bits == NULL) {
+                destroy_hidden_pimpl(pmpl);
+                return SAIL_MEMORY_ALLOCATION_FAILED;
+            }
+
+            for (int pass = 0; pass < (*image)->passes; pass++) {
+                SAIL_TRY_OR_CLEANUP(plugin->iface.v1->read_seek_next_pass_v1(file, *image),
+                                    /* cleanup */ sail_stop_reading(pimpl));
+
+                for (int j = 0; j < (*image)->height; j++) {
+                    SAIL_TRY_OR_CLEANUP(plugin->iface.v1->read_scan_line_v1(file, *image, ((char *)*image_bits) + j * (*image)->bytes_per_line),
+                                        /* cleanup */ sail_stop_reading(pimpl));
+                }
+            }
+
+            break;
+        }
+
+        case 2: {
+            SAIL_TRY_OR_CLEANUP(plugin->iface.v2->read_seek_next_frame_v1(file, image),
+                                /* cleanup */ sail_stop_reading(pimpl));
+            *image_bits = malloc((*image)->bytes_per_line * (*image)->height);
+
+            if (*image_bits == NULL) {
+                destroy_hidden_pimpl(pmpl);
+                return SAIL_MEMORY_ALLOCATION_FAILED;
+            }
+
+            for (int pass = 0; pass < (*image)->passes; pass++) {
+                SAIL_TRY_OR_CLEANUP(plugin->iface.v2->read_seek_next_pass_v1(file, *image),
+                                    /* cleanup */ sail_stop_reading(pimpl));
+
+                for (int j = 0; j < (*image)->height; j++) {
+                    SAIL_TRY_OR_CLEANUP(plugin->iface.v2->read_scan_line_v1(file, *image, ((char *)*image_bits) + j * (*image)->bytes_per_line),
+                                        /* cleanup */ sail_stop_reading(pimpl));
+                }
+            }
+
+            break;
+        }
+
+        default: {
+            destroy_hidden_pimpl(pmpl);
+            return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
+        }
+    }
+
+    return 0;
+}
+
+sail_error_t sail_stop_reading(void *pimpl) {
+
+    SAIL_CHECK_PTR(pimpl);
+
+    struct hidden_pimpl *pmpl = (struct hidden_pimpl *)pimpl;
+
+    SAIL_CHECK_FILE(pmpl->file);
+    SAIL_CHECK_PLUGIN_PTR(pmpl->plugin);
+
+    struct sail_file *file = pmpl->file;
+    const struct sail_plugin *plugin = pmpl->plugin;
+
+    switch (plugin->layout) {
+
+        case 1: {
+            SAIL_TRY_OR_CLEANUP(plugin->iface.v1->read_finish_v1(file),
+                                /* cleanup */ destroy_hidden_pimpl(pmpl));
+            break;
+        }
+
+        case 2: {
+            SAIL_TRY_OR_CLEANUP(plugin->iface.v2->read_finish_v1(file),
+                                /* cleanup */ destroy_hidden_pimpl(pmpl));
+            break;
+        }
+
+        default: {
+            destroy_hidden_pimpl(pmpl);
+            return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
+        }
+    }
+
+    destroy_hidden_pimpl(pmpl);
 
     return 0;
 }

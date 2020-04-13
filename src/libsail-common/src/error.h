@@ -69,6 +69,7 @@ typedef int sail_error_t;
 #define SAIL_CONTEXT_NULL_PTR             80
 #define SAIL_PATH_NULL_PTR                81
 #define SAIL_PLUGIN_INFO_NULL_PTR         82
+#define SAIL_PLUGIN_NULL_PTR              83
 
 /*
  * Helper macros.
@@ -115,6 +116,7 @@ do {                              \
 #define SAIL_CHECK_CONTEXT_PTR(context)               SAIL_CHECK_PTR2(context,        SAIL_CONTEXT_NULL_PTR)
 #define SAIL_CHECK_PATH_PTR(path)                     SAIL_CHECK_PTR2(path,           SAIL_PATH_NULL_PTR)
 #define SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info)       SAIL_CHECK_PTR2(plugin_info,    SAIL_PLUGIN_INFO_NULL_PTR)
+#define SAIL_CHECK_PLUGIN_PTR(plugin)                 SAIL_CHECK_PTR2(plugin,         SAIL_PLUGIN_NULL_PTR)
 #define SAIL_CHECK_PIMPL_PTR(pimpl)                   SAIL_CHECK_PTR2(pimpl,          SAIL_PIMPL_NULL_PTR)
 
 /*
