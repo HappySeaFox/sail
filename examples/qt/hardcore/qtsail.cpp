@@ -116,7 +116,7 @@ int QtSail::pluginInfo(struct sail_plugin_info *plugin_info)
     SAIL_LOG_DEBUG("SAIL plugin description: %s", plugin_info->description);
     SAIL_LOG_DEBUG("SAIL plugin path: %s", plugin_info->path);
 
-    struct sail_string_node *node = plugin_info->extension_node;
+    const struct sail_string_node *node = plugin_info->extension_node;
 
     while (node != nullptr) {
         SAIL_LOG_DEBUG("SAIL extension '%s'", node->value);
@@ -376,15 +376,11 @@ int QtSail::saveImage(const QString &path)
 
 void QtSail::onOpenFile()
 {
-    static QString lastDir;
-
-    const QString path = QFileDialog::getOpenFileName(this, tr("Select a file"), lastDir);
+    const QString path = QFileDialog::getOpenFileName(this, tr("Select a file"));
 
     if (path.isEmpty()) {
         return;
     }
-
-    lastDir = QFileInfo(path).absolutePath();
 
     d->files.clear();
 
@@ -396,15 +392,11 @@ void QtSail::onOpenFile()
 
 void QtSail::onOpenDir()
 {
-    static QString lastDir;
-
-    const QString path = QFileDialog::getExistingDirectory(this, tr("Select a file"), lastDir);
+    const QString path = QFileDialog::getExistingDirectory(this, tr("Select a file"));
 
     if (path.isEmpty()) {
         return;
     }
-
-    lastDir = QFileInfo(path).absolutePath();
 
     d->files = QDir(path).entryInfoList(QStringList() << QStringLiteral("*.*"),
                                         QDir::Files,
@@ -415,15 +407,11 @@ void QtSail::onOpenDir()
 
 void QtSail::onProbe()
 {
-    static QString lastDir;
-
-    const QString path = QFileDialog::getOpenFileName(this, tr("Select a file"), lastDir);
+    const QString path = QFileDialog::getOpenFileName(this, tr("Select a file"));
 
     if (path.isEmpty()) {
         return;
     }
-
-    lastDir = QFileInfo(path).absolutePath();
 
     const qint64 v = QDateTime::currentMSecsSinceEpoch();
 
@@ -453,15 +441,11 @@ void QtSail::onProbe()
 
 void QtSail::onSave()
 {
-    static QString lastDir;
-
-    const QString path = QFileDialog::getSaveFileName(this, tr("Select a file"), lastDir);
+    const QString path = QFileDialog::getSaveFileName(this, tr("Select a file"));
 
     if (path.isEmpty()) {
         return;
     }
-
-    lastDir = QFileInfo(path).absolutePath();
 
     if (saveImage(path) != 0) {
         return;
