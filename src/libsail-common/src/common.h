@@ -229,7 +229,7 @@ struct sail_image {
 
     /*
      * Palette if the image has a palette and the requested pixel format assumes having a palette.
-     * Destroyed by sail_image_destroy().
+     * Destroyed by sail_destroy_image().
      *
      * READ:  Set by SAIL to a valid pixel array if the image is indexed.
      * WRITE: Must be set allocated and set by a caller to a valid pixel array if the image is indexed.
@@ -246,7 +246,7 @@ struct sail_image {
 
     /*
      * Image meta information. See sail_meta_entry_node. Plugins guarantee that keys and values are non-NULL.
-     * Destroyed by sail_image_destroy().
+     * Destroyed by sail_destroy_image().
      *
      * READ:  Set by SAIL to a valid linked list with simple meta information (like JPEG comments) or to NULL.
      * WRITE: Must be set allocated and set by a caller to a valid linked list with simple meta information
