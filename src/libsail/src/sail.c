@@ -34,6 +34,8 @@
 #endif
 
 /* sail-common */
+#include "common.h"
+#include "error.h"
 #include "log.h"
 #include "utils.h"
 
@@ -261,7 +263,9 @@ void sail_finish(struct sail_context *context) {
 
 sail_error_t sail_plugin_info_by_extension(const struct sail_context *context, const char *extension, const struct sail_plugin_info **plugin_info) {
 
-    if (context == NULL || extension == NULL) {
+    SAIL_CHECK_CONTEXT(context);
+
+    if (extension == NULL) {
         return SAIL_INVALID_ARGUMENT;
     }
 
@@ -296,7 +300,9 @@ sail_error_t sail_plugin_info_by_extension(const struct sail_context *context, c
 
 sail_error_t sail_plugin_info_by_mime_type(const struct sail_context *context, const char *mime_type, const struct sail_plugin_info **plugin_info) {
 
-    if (context == NULL || mime_type == NULL) {
+    SAIL_CHECK_CONTEXT(context);
+
+    if (mime_type == NULL) {
         return SAIL_INVALID_ARGUMENT;
     }
 
@@ -331,9 +337,8 @@ sail_error_t sail_plugin_info_by_mime_type(const struct sail_context *context, c
 
 sail_error_t sail_load_plugin(struct sail_context *context, const struct sail_plugin_info *plugin_info, const struct sail_plugin **plugin) {
 
-    if (context == NULL || plugin_info == NULL) {
-        return SAIL_INVALID_ARGUMENT;
-    }
+    SAIL_CHECK_CONTEXT(context);
+    SAIL_CHECK_PLUGIN_INFO(plugin_info);
 
     /* Find the plugin in the cache. */
     struct sail_plugin_info_node *node = context->plugin_info_node;
@@ -369,9 +374,7 @@ sail_error_t sail_load_plugin(struct sail_context *context, const struct sail_pl
 
 sail_error_t sail_unload_plugins(struct sail_context *context) {
 
-    if (context == NULL) {
-        return SAIL_INVALID_ARGUMENT;
-    }
+    SAIL_CHECK_CONTEXT(context);
 
     SAIL_LOG_DEBUG("Unloading cached plugins");
 
@@ -390,6 +393,58 @@ sail_error_t sail_unload_plugins(struct sail_context *context) {
     }
 
     SAIL_LOG_DEBUG("Unloaded plugins: %d", counter);
+
+    return 0;
+}
+
+sail_error_t sail_probe_image(const char *path, struct sail_context *context, const struct sail_plugin_info **plugin_info, struct sail_image **image) {
+
+    SAIL_CHECK_CONTEXT(context);
+    SAIL_CHECK_PATH(path);
+
+    const char *dot = strrchr(path, '.');
+
+    if (dot == NULL) {
+        return SAIL_INVALID_ARGUMENT;
+    }
+
+    SAIL_TRY(sail_plugin_info_by_extension(context, dot + 1, plugin_info));
+
+    const struct sail_plugin *plugin;
+
+    SAIL_TRY(sail_load_plugin(context, *plugin_info, &plugin));
+
+    struct sail_file *file;
+
+    SAIL_TRY(sail_alloc_file(path, "rb", &file));
+
+    switch (plugin->layout) {
+
+        case 1: {
+            SAIL_TRY_OR_CLEANUP(plugin->iface.v1->read_init_v1(file, NULL),
+                                /* cleanup */ sail_destroy_file(file));
+            SAIL_TRY_OR_CLEANUP(plugin->iface.v1->read_seek_next_frame_v1(file, image),
+                                /* cleanup */ sail_destroy_file(file));
+            SAIL_TRY_OR_CLEANUP(plugin->iface.v1->read_finish_v1(file, *image),
+                                /* cleanup */ sail_destroy_file(file));
+            break;
+        }
+
+        case 2: {
+            SAIL_TRY_OR_CLEANUP(plugin->iface.v2->read_init_v1(file, NULL),
+                                /* cleanup */ sail_destroy_file(file));
+            SAIL_TRY_OR_CLEANUP(plugin->iface.v2->read_seek_next_frame_v1(file, image),
+                                /* cleanup */ sail_destroy_file(file));
+            SAIL_TRY_OR_CLEANUP(plugin->iface.v2->read_finish_v1(file, *image),
+                                /* cleanup */ sail_destroy_file(file));
+            break;
+        }
+
+        default: {
+            sail_destroy_file(file);
+            return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
+        }
+    }
 
     return 0;
 }

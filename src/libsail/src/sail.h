@@ -101,6 +101,17 @@ SAIL_EXPORT sail_error_t sail_load_plugin(struct sail_context *context, const st
  */
 SAIL_EXPORT sail_error_t sail_unload_plugins(struct sail_context *context);
 
+/*
+ * Loads the specified image and returns its properties. The assigned image MUST be destroyed later
+ * with sail_destroy_image(). The assigned plugin info MUST NOT be destroyed. It's a pointer to an internal
+ * data structure.
+ *
+ * Most plugins DO NOT read the whole image data. This is why this function is pretty fast.
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_probe_image(const char *path, struct sail_context *context, const struct sail_plugin_info **plugin_info, struct sail_image **image);
+
 /* extern "C" */
 #ifdef __cplusplus
 }
