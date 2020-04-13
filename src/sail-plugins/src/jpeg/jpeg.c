@@ -271,9 +271,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v1(struct sail_file *f
 
     struct pimpl *pimpl = (struct pimpl *)file->pimpl;
 
-    if (pimpl == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
+    SAIL_CHECK_PIMPL(pimpl);
 
     if (pimpl->frame_read) {
         return SAIL_NO_MORE_FRAMES;
@@ -353,9 +351,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v1(struct sail_file *file, s
 
     struct pimpl *pimpl = (struct pimpl *)file->pimpl;
 
-    if (pimpl == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
+    SAIL_CHECK_PIMPL(pimpl);
 
     if (pimpl->libjpeg_error) {
         return SAIL_UNDERLYING_CODEC_ERROR;
@@ -382,9 +378,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v2(struct sail_file *file, s
 
     struct pimpl *pimpl = (struct pimpl *)file->pimpl;
 
-    if (pimpl == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
+    SAIL_CHECK_PIMPL(pimpl);
 
     const int color_components = pimpl->decompress_context.output_components;
 
@@ -548,9 +542,7 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v1(struct sail_file *
 
     struct pimpl *pimpl = (struct pimpl *)file->pimpl;
 
-    if (pimpl == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
+    SAIL_CHECK_PIMPL(pimpl);
 
     if (pimpl->frame_written) {
         return SAIL_NO_MORE_FRAMES;
@@ -614,9 +606,7 @@ SAIL_EXPORT sail_error_t sail_plugin_write_scan_line_v1(struct sail_file *file, 
 
     struct pimpl *pimpl = (struct pimpl *)file->pimpl;
 
-    if (pimpl == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
+    SAIL_CHECK_PIMPL(pimpl);
 
     if (pimpl->libjpeg_error) {
         return SAIL_UNDERLYING_CODEC_ERROR;
@@ -641,9 +631,7 @@ SAIL_EXPORT sail_error_t sail_plugin_write_finish_v1(struct sail_file *file, str
 
     struct pimpl *pimpl = (struct pimpl *)file->pimpl;
 
-    if (pimpl == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
+    SAIL_CHECK_PIMPL(pimpl);
 
     sail_destroy_write_options(pimpl->write_options);
 

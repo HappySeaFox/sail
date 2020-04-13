@@ -38,13 +38,14 @@ typedef int sail_error_t;
  * Encoding/decoding common errors.
  */
 #define SAIL_NULL_PTR                     20
-#define SAIL_FILE_NULL_PTR                21
-#define SAIL_IMAGE_NULL_PTR               22
-#define SAIL_SCAN_LINE_NULL_PTR           23
-#define SAIL_READ_FEATURES_NULL_PTR       24
-#define SAIL_READ_OPTIONS_NULL_PTR        25
-#define SAIL_WRITE_FEATURES_NULL_PTR      26
-#define SAIL_WRITE_OPTIONS_NULL_PTR       27
+#define SAIL_PIMPL_NULL_PTR               21
+#define SAIL_FILE_NULL_PTR                22
+#define SAIL_IMAGE_NULL_PTR               23
+#define SAIL_SCAN_LINE_NULL_PTR           24
+#define SAIL_READ_FEATURES_NULL_PTR       25
+#define SAIL_READ_OPTIONS_NULL_PTR        26
+#define SAIL_WRITE_FEATURES_NULL_PTR      27
+#define SAIL_WRITE_OPTIONS_NULL_PTR       28
 
 /*
  * Encoding/decoding specific errors.
@@ -114,6 +115,7 @@ do {                              \
 #define SAIL_CHECK_CONTEXT(context)               SAIL_CHECK_PTR2(context,        SAIL_CONTEXT_NULL_PTR)
 #define SAIL_CHECK_PATH(path)                     SAIL_CHECK_PTR2(path,           SAIL_PATH_NULL_PTR)
 #define SAIL_CHECK_PLUGIN_INFO(plugin_info)       SAIL_CHECK_PTR2(plugin_info,    SAIL_PLUGIN_INFO_NULL_PTR)
+#define SAIL_CHECK_PIMPL(pimpl)                   SAIL_CHECK_PTR2(pimpl,          SAIL_PIMPL_NULL_PTR)
 
 /*
  * Try to execute the specified SAIL function. If it fails, return the error code.
