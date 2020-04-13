@@ -37,13 +37,14 @@ typedef int sail_error_t;
 /*
  * Encoding/decoding common errors.
  */
+#define SAIL_NULL_PTR                     20
 #define SAIL_FILE_NULL_PTR                21
 #define SAIL_IMAGE_NULL_PTR               22
 #define SAIL_SCAN_LINE_NULL_PTR           23
 #define SAIL_READ_FEATURES_NULL_PTR       24
 #define SAIL_READ_OPTIONS_NULL_PTR        25
-#define SAIL_WRITE_FEATURES_NULL_PTR       26
-#define SAIL_WRITE_OPTIONS_NULL_PTR        27
+#define SAIL_WRITE_FEATURES_NULL_PTR      26
+#define SAIL_WRITE_OPTIONS_NULL_PTR       27
 
 /*
  * Encoding/decoding specific errors.
@@ -91,61 +92,28 @@ do {                                               \
     }                                              \
 } while(0)
 
-#define SAIL_CHECK_SCAN_LINE(scan)      \
-do {                                    \
-    if (scan == NULL) {                 \
-        return SAIL_SCAN_LINE_NULL_PTR; \
-    }                                   \
+#define SAIL_CHECK_PTR(ptr)   \
+do {                          \
+    if (ptr == NULL) {        \
+        return SAIL_NULL_PTR; \
+    }                         \
 } while(0)
 
-#define SAIL_CHECK_READ_FEATURES(read_features) \
-do {                                            \
-    if (read_features == NULL) {                \
-        return SAIL_READ_FEATURES_NULL_PTR;     \
-    }                                           \
+#define SAIL_CHECK_PTR2(ptr, ret) \
+do {                              \
+    if (ptr == NULL) {            \
+        return ret;               \
+    }                             \
 } while(0)
 
-#define SAIL_CHECK_READ_OPTIONS(read_options) \
-do {                                          \
-    if (read_options == NULL) {               \
-        return SAIL_READ_OPTIONS_NULL_PTR;    \
-    }                                         \
-} while(0)
-
-#define SAIL_CHECK_WRITE_FEATURES(write_features) \
-do {                                              \
-    if (write_features == NULL) {                 \
-        return SAIL_WRITE_FEATURES_NULL_PTR;      \
-    }                                             \
-} while(0)
-
-#define SAIL_CHECK_WRITE_OPTIONS(write_options) \
-do {                                            \
-    if (write_options == NULL) {                \
-        return SAIL_WRITE_OPTIONS_NULL_PTR;     \
-    }                                           \
-} while(0)
-
-#define SAIL_CHECK_CONTEXT(context)   \
-do {                                  \
-    if (context == NULL) {            \
-        return SAIL_CONTEXT_NULL_PTR; \
-    }                                 \
-} while(0)
-
-#define SAIL_CHECK_PATH(path)      \
-do {                               \
-    if (path == NULL) {            \
-        return SAIL_PATH_NULL_PTR; \
-    }                              \
-} while(0)
-
-#define SAIL_CHECK_PLUGIN_INFO(plugin_info) \
-do {                                        \
-    if (plugin_info == NULL) {              \
-        return SAIL_PLUGIN_INFO_NULL_PTR;   \
-    }                                       \
-} while(0)
+#define SAIL_CHECK_SCAN_LINE(scan)                SAIL_CHECK_PTR2(scan,           SAIL_SCAN_LINE_NULL_PTR)
+#define SAIL_CHECK_READ_FEATURES(read_features)   SAIL_CHECK_PTR2(read_features,  SAIL_READ_FEATURES_NULL_PTR)
+#define SAIL_CHECK_READ_OPTIONS(read_options)     SAIL_CHECK_PTR2(read_options,   SAIL_READ_OPTIONS_NULL_PTR)
+#define SAIL_CHECK_WRITE_FEATURES(write_features) SAIL_CHECK_PTR2(write_features, SAIL_WRITE_FEATURES_NULL_PTR)
+#define SAIL_CHECK_WRITE_OPTIONS(write_options)   SAIL_CHECK_PTR2(write_options,  SAIL_WRITE_FEATURES_NULL_PTR)
+#define SAIL_CHECK_CONTEXT(context)               SAIL_CHECK_PTR2(context,        SAIL_CONTEXT_NULL_PTR)
+#define SAIL_CHECK_PATH(path)                     SAIL_CHECK_PTR2(path,           SAIL_PATH_NULL_PTR)
+#define SAIL_CHECK_PLUGIN_INFO(plugin_info)       SAIL_CHECK_PTR2(plugin_info,    SAIL_PLUGIN_INFO_NULL_PTR)
 
 /*
  * Try to execute the specified SAIL function. If it fails, return the error code.
