@@ -263,7 +263,7 @@ void sail_finish(struct sail_context *context) {
 
 sail_error_t sail_plugin_info_by_extension(const struct sail_context *context, const char *extension, const struct sail_plugin_info **plugin_info) {
 
-    SAIL_CHECK_CONTEXT(context);
+    SAIL_CHECK_CONTEXT_PTR(context);
 
     if (extension == NULL) {
         return SAIL_INVALID_ARGUMENT;
@@ -300,7 +300,7 @@ sail_error_t sail_plugin_info_by_extension(const struct sail_context *context, c
 
 sail_error_t sail_plugin_info_by_mime_type(const struct sail_context *context, const char *mime_type, const struct sail_plugin_info **plugin_info) {
 
-    SAIL_CHECK_CONTEXT(context);
+    SAIL_CHECK_CONTEXT_PTR(context);
 
     if (mime_type == NULL) {
         return SAIL_INVALID_ARGUMENT;
@@ -337,8 +337,8 @@ sail_error_t sail_plugin_info_by_mime_type(const struct sail_context *context, c
 
 sail_error_t sail_load_plugin(struct sail_context *context, const struct sail_plugin_info *plugin_info, const struct sail_plugin **plugin) {
 
-    SAIL_CHECK_CONTEXT(context);
-    SAIL_CHECK_PLUGIN_INFO(plugin_info);
+    SAIL_CHECK_CONTEXT_PTR(context);
+    SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
 
     /* Find the plugin in the cache. */
     struct sail_plugin_info_node *node = context->plugin_info_node;
@@ -374,7 +374,7 @@ sail_error_t sail_load_plugin(struct sail_context *context, const struct sail_pl
 
 sail_error_t sail_unload_plugins(struct sail_context *context) {
 
-    SAIL_CHECK_CONTEXT(context);
+    SAIL_CHECK_CONTEXT_PTR(context);
 
     SAIL_LOG_DEBUG("Unloading cached plugins");
 
@@ -399,8 +399,8 @@ sail_error_t sail_unload_plugins(struct sail_context *context) {
 
 sail_error_t sail_probe_image(const char *path, struct sail_context *context, const struct sail_plugin_info **plugin_info, struct sail_image **image) {
 
-    SAIL_CHECK_CONTEXT(context);
-    SAIL_CHECK_PATH(path);
+    SAIL_CHECK_CONTEXT_PTR(context);
+    SAIL_CHECK_PATH_PTR(path);
 
     const char *dot = strrchr(path, '.');
 

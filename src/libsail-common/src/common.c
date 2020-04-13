@@ -245,8 +245,8 @@ void sail_destroy_write_options(struct sail_write_options *write_options) {
 
 sail_error_t sail_read_options_from_features(const struct sail_read_features *read_features, struct sail_read_options *read_options) {
 
-    SAIL_CHECK_READ_FEATURES(read_features);
-    SAIL_CHECK_READ_OPTIONS(read_options);
+    SAIL_CHECK_READ_FEATURES_PTR(read_features);
+    SAIL_CHECK_READ_OPTIONS_PTR(read_options);
 
     read_options->pixel_format = read_features->preferred_output_pixel_format;
     read_options->io_options = 0;
@@ -269,8 +269,8 @@ sail_error_t sail_alloc_read_options_from_features(const struct sail_read_featur
 
 sail_error_t sail_write_options_from_features(const struct sail_write_features *write_features, struct sail_write_options *write_options) {
 
-    SAIL_CHECK_WRITE_FEATURES(write_features);
-    SAIL_CHECK_WRITE_OPTIONS(write_options);
+    SAIL_CHECK_WRITE_FEATURES_PTR(write_features);
+    SAIL_CHECK_WRITE_OPTIONS_PTR(write_options);
 
     write_options->pixel_format = write_features->preferred_output_pixel_format;
     write_options->io_options = 0;

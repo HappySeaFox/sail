@@ -107,15 +107,15 @@ do {                              \
     }                             \
 } while(0)
 
-#define SAIL_CHECK_SCAN_LINE(scan)                SAIL_CHECK_PTR2(scan,           SAIL_SCAN_LINE_NULL_PTR)
-#define SAIL_CHECK_READ_FEATURES(read_features)   SAIL_CHECK_PTR2(read_features,  SAIL_READ_FEATURES_NULL_PTR)
-#define SAIL_CHECK_READ_OPTIONS(read_options)     SAIL_CHECK_PTR2(read_options,   SAIL_READ_OPTIONS_NULL_PTR)
-#define SAIL_CHECK_WRITE_FEATURES(write_features) SAIL_CHECK_PTR2(write_features, SAIL_WRITE_FEATURES_NULL_PTR)
-#define SAIL_CHECK_WRITE_OPTIONS(write_options)   SAIL_CHECK_PTR2(write_options,  SAIL_WRITE_FEATURES_NULL_PTR)
-#define SAIL_CHECK_CONTEXT(context)               SAIL_CHECK_PTR2(context,        SAIL_CONTEXT_NULL_PTR)
-#define SAIL_CHECK_PATH(path)                     SAIL_CHECK_PTR2(path,           SAIL_PATH_NULL_PTR)
-#define SAIL_CHECK_PLUGIN_INFO(plugin_info)       SAIL_CHECK_PTR2(plugin_info,    SAIL_PLUGIN_INFO_NULL_PTR)
-#define SAIL_CHECK_PIMPL(pimpl)                   SAIL_CHECK_PTR2(pimpl,          SAIL_PIMPL_NULL_PTR)
+#define SAIL_CHECK_SCAN_LINE_PTR(scan)                SAIL_CHECK_PTR2(scan,           SAIL_SCAN_LINE_NULL_PTR)
+#define SAIL_CHECK_READ_FEATURES_PTR(read_features)   SAIL_CHECK_PTR2(read_features,  SAIL_READ_FEATURES_NULL_PTR)
+#define SAIL_CHECK_READ_OPTIONS_PTR(read_options)     SAIL_CHECK_PTR2(read_options,   SAIL_READ_OPTIONS_NULL_PTR)
+#define SAIL_CHECK_WRITE_FEATURES_PTR(write_features) SAIL_CHECK_PTR2(write_features, SAIL_WRITE_FEATURES_NULL_PTR)
+#define SAIL_CHECK_WRITE_OPTIONS_PTR(write_options)   SAIL_CHECK_PTR2(write_options,  SAIL_WRITE_FEATURES_NULL_PTR)
+#define SAIL_CHECK_CONTEXT_PTR(context)               SAIL_CHECK_PTR2(context,        SAIL_CONTEXT_NULL_PTR)
+#define SAIL_CHECK_PATH_PTR(path)                     SAIL_CHECK_PTR2(path,           SAIL_PATH_NULL_PTR)
+#define SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info)       SAIL_CHECK_PTR2(plugin_info,    SAIL_PLUGIN_INFO_NULL_PTR)
+#define SAIL_CHECK_PIMPL_PTR(pimpl)                   SAIL_CHECK_PTR2(pimpl,          SAIL_PIMPL_NULL_PTR)
 
 /*
  * Try to execute the specified SAIL function. If it fails, return the error code.

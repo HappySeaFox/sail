@@ -271,7 +271,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v1(struct sail_file *f
 
     struct pimpl *pimpl = (struct pimpl *)file->pimpl;
 
-    SAIL_CHECK_PIMPL(pimpl);
+    SAIL_CHECK_PIMPL_PTR(pimpl);
 
     if (pimpl->frame_read) {
         return SAIL_NO_MORE_FRAMES;
@@ -347,11 +347,11 @@ SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v1(struct sail_file *file, s
 
     SAIL_CHECK_FILE(file);
     SAIL_CHECK_IMAGE(image);
-    SAIL_CHECK_SCAN_LINE(scanline);
+    SAIL_CHECK_SCAN_LINE_PTR(scanline);
 
     struct pimpl *pimpl = (struct pimpl *)file->pimpl;
 
-    SAIL_CHECK_PIMPL(pimpl);
+    SAIL_CHECK_PIMPL_PTR(pimpl);
 
     if (pimpl->libjpeg_error) {
         return SAIL_UNDERLYING_CODEC_ERROR;
@@ -378,7 +378,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v2(struct sail_file *file, s
 
     struct pimpl *pimpl = (struct pimpl *)file->pimpl;
 
-    SAIL_CHECK_PIMPL(pimpl);
+    SAIL_CHECK_PIMPL_PTR(pimpl);
 
     const int color_components = pimpl->decompress_context.output_components;
 
@@ -542,7 +542,7 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v1(struct sail_file *
 
     struct pimpl *pimpl = (struct pimpl *)file->pimpl;
 
-    SAIL_CHECK_PIMPL(pimpl);
+    SAIL_CHECK_PIMPL_PTR(pimpl);
 
     if (pimpl->frame_written) {
         return SAIL_NO_MORE_FRAMES;
@@ -602,11 +602,11 @@ SAIL_EXPORT sail_error_t sail_plugin_write_scan_line_v1(struct sail_file *file, 
 
     SAIL_CHECK_FILE(file);
     SAIL_CHECK_IMAGE(image);
-    SAIL_CHECK_SCAN_LINE(scanline);
+    SAIL_CHECK_SCAN_LINE_PTR(scanline);
 
     struct pimpl *pimpl = (struct pimpl *)file->pimpl;
 
-    SAIL_CHECK_PIMPL(pimpl);
+    SAIL_CHECK_PIMPL_PTR(pimpl);
 
     if (pimpl->libjpeg_error) {
         return SAIL_UNDERLYING_CODEC_ERROR;
@@ -631,7 +631,7 @@ SAIL_EXPORT sail_error_t sail_plugin_write_finish_v1(struct sail_file *file, str
 
     struct pimpl *pimpl = (struct pimpl *)file->pimpl;
 
-    SAIL_CHECK_PIMPL(pimpl);
+    SAIL_CHECK_PIMPL_PTR(pimpl);
 
     sail_destroy_write_options(pimpl->write_options);
 
