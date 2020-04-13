@@ -163,6 +163,10 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     //
     SAIL_TRY(sail_alloc_read_options_from_features(read_features, &read_options));
 
+    // Force RGB888
+    //
+    read_options->pixel_format = SAIL_PIXEL_FORMAT_RGB;
+
     // Start reading
     //
     SAIL_TRY(plugin->iface.v2->read_init_v1(file, read_options));
