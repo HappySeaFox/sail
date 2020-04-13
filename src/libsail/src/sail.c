@@ -446,6 +446,8 @@ sail_error_t sail_probe_image(const char *path, struct sail_context *context, co
         }
     }
 
+    sail_destroy_file(file);
+
     return 0;
 }
 
