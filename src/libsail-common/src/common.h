@@ -471,6 +471,22 @@ typedef struct sail_write_options sail_write_options_t;
 SAIL_EXPORT sail_error_t sail_alloc_file(const char *filepath, const char *mode, struct sail_file **file);
 
 /*
+ * Opens the specified image file for reading. The assigned file MUST be destroyed later
+ * with sail_destroy_file().
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_alloc_file_for_reading(const char *filepath, struct sail_file **file);
+
+/*
+ * Opens the specified image file for writiing. The assigned file MUST be destroyed later
+ * with sail_destroy_file().
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_alloc_file_for_writing(const char *filepath, struct sail_file **file);
+
+/*
  * Closes the specified file and destroys all its internal memory buffers. Does nothing if the file is already closed.
  * The file MUST NOT be used anymore after calling this function.
  */

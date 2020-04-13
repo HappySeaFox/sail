@@ -71,6 +71,20 @@ int sail_alloc_file(const char *filepath, const char *mode, struct sail_file **f
     return 0;
 }
 
+sail_error_t sail_alloc_file_for_reading(const char *filepath, struct sail_file **file) {
+
+    SAIL_TRY(sail_alloc_file(filepath, "rb", file));
+
+    return 0;
+}
+
+sail_error_t sail_alloc_file_for_writing(const char *filepath, struct sail_file **file) {
+
+    SAIL_TRY(sail_alloc_file(filepath, "wb", file));
+
+    return 0;
+}
+
 void sail_destroy_file(struct sail_file *file) {
 
     if (file == NULL) {
