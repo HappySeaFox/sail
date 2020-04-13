@@ -46,6 +46,17 @@
  * Private functions.
  */
 
+static const char* plugins_path(void) {
+
+    char *env = getenv("SAIL_PLUGINS_PATH");
+
+    if (env == NULL) {
+        return SAIL_PLUGINS_PATH;
+    } else {
+        return env;
+    }
+}
+
 static sail_error_t build_full_path(const char *sail_plugins_path, const char *name, char **full_path) {
 
     /* +2 : NULL and '/' characters. */
@@ -144,11 +155,25 @@ sail_error_t sail_init(struct sail_context **context) {
     struct sail_plugin_info_node *last_plugin_info_node;
 
 #ifdef SAIL_WIN32
+    const char *plugs_path = plugins_path();
+    const char *plugs_info_mask = "\\*.plugin.info";
+
+    int plugs_path_with_mask_length = strlen(plugs_path) + strlen(plugs_info_mask) + 1;
+    char *plugs_path_with_mask = (char *)malloc(plugs_path_with_mask_length);
+
+    if (plugs_path_with_mask == NULL) {
+        return SAIL_MEMORY_ALLOCATION_FAILED;
+    }
+
+    strcpy_s(plugs_path_with_mask, plugs_path_with_mask_length, plugs_path);
+    strcat_s(plugs_path_with_mask, plugs_path_with_mask_length, plugs_info_mask);
+
     WIN32_FIND_DATA data;
-    HANDLE hFind = FindFirstFile(SAIL_PLUGINS_PATH "\\*.plugin.info", &data);
+    HANDLE hFind = FindFirstFile(plugs_path_with_mask, &data);
 
     if (hFind == INVALID_HANDLE_VALUE) {
-        SAIL_LOG_ERROR("Failed to list files in '%s'. Error: %d", SAIL_PLUGINS_PATH, GetLastError());
+        SAIL_LOG_ERROR("Failed to list files in '%s'. Error: %d", plugs_path, GetLastError());
+        free(plugs_path_with_mask);
         return SAIL_DIR_OPEN_ERROR;
     }
 
@@ -157,7 +182,7 @@ sail_error_t sail_init(struct sail_context **context) {
         char *full_path;
 
         /* Ignore errors and try to load as much as possible. */
-        if (build_full_path(SAIL_PLUGINS_PATH, data.cFileName, &full_path) != 0) {
+        if (build_full_path(plugs_path, data.cFileName, &full_path) != 0) {
             continue;
         }
 
@@ -167,15 +192,17 @@ sail_error_t sail_init(struct sail_context **context) {
     } while (FindNextFile(hFind, &data));
 
     if (GetLastError() != ERROR_NO_MORE_FILES) {
-        SAIL_LOG_ERROR("Failed to list files in '%s'. Error: %d. Some plugins may be ignored", SAIL_PLUGINS_PATH, GetLastError());
+        SAIL_LOG_ERROR("Failed to list files in '%s'. Error: %d. Some plugins may be ignored", plugs_path, GetLastError());
     }
 
+    free(plugs_path_with_mask);
     FindClose(hFind);
 #else
-    DIR *d = opendir(SAIL_PLUGINS_PATH);
+    const char *plugs_path = plugins_path();
+    DIR *d = opendir(plugs_path);
 
     if (d == NULL) {
-        SAIL_LOG_ERROR("Failed to list files in '%s': %s", SAIL_PLUGINS_PATH, strerror(errno));
+        SAIL_LOG_ERROR("Failed to list files in '%s': %s", plugs_path, strerror(errno));
         return SAIL_DIR_OPEN_ERROR;
     }
 
@@ -187,7 +214,7 @@ sail_error_t sail_init(struct sail_context **context) {
         char *full_path;
 
         /* Ignore errors and try to load as much as possible. */
-        if (build_full_path(SAIL_PLUGINS_PATH, dir->d_name, &full_path) != 0) {
+        if (build_full_path(plugs_path, dir->d_name, &full_path) != 0) {
             continue;
         }
 
