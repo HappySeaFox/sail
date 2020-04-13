@@ -50,8 +50,6 @@ private:
     T m_func;
 };
 
-////////////////////////////////////
-
 QtSail::QtSail(QWidget *parent)
     : QWidget(parent)
     , d(new Private)
@@ -348,9 +346,37 @@ void QtSail::loadFileFromDir()
     }
 }
 
+QStringList QtSail::filters() const
+{
+    QStringList filters;
+    sail_plugin_info_node *plugin_info_node = d->context->plugin_info_node;
+
+    while (plugin_info_node != nullptr) {
+        QStringList masks;
+
+        sail_string_node *extension_node = plugin_info_node->plugin_info->extension_node;
+
+        while (extension_node != nullptr) {
+            masks.append(QStringLiteral("*.%1").arg(extension_node->value));
+            extension_node = extension_node->next;
+        }
+
+        filters.append(QStringLiteral("%1 (%2)")
+                       .arg(plugin_info_node->plugin_info->description)
+                       .arg(masks.join(QStringLiteral(" "))));
+
+        plugin_info_node = plugin_info_node->next;
+    }
+
+    return filters;
+}
+
 void QtSail::onOpenFile()
 {
-    const QString path = QFileDialog::getOpenFileName(this, tr("Select a file"));
+    const QString path = QFileDialog::getOpenFileName(this,
+                                                      tr("Select a file"),
+                                                      QString(),
+                                                      filters().join(QStringLiteral(";;")));
 
     if (path.isEmpty()) {
         return;
@@ -422,7 +448,10 @@ void QtSail::onProbe()
 
 void QtSail::onSave()
 {
-    const QString path = QFileDialog::getSaveFileName(this, tr("Select a file"));
+    const QString path = QFileDialog::getSaveFileName(this,
+                                                      tr("Select a file"),
+                                                      QString(),
+                                                      filters().join(QStringLiteral(";;")));
 
     if (path.isEmpty()) {
         return;

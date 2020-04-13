@@ -23,6 +23,7 @@ private:
     sail_error_t saveImage(const QString &path, QImage *qimage);
     sail_error_t pluginInfo(struct sail_plugin_info *plugin_info);
     void loadFileFromDir();
+    QStringList filters() const;
 
 private: // slots
     void onOpenFile();
