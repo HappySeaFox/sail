@@ -314,7 +314,10 @@ int QtSail::saveImage(const QString &path)
 
     CleanUp<decltype(cleanup_func)> cleanUp(cleanup_func);
 
-    // write the image file
+    // Write the image file.
+    //
+
+    // Determine the write features of the plugin: what the plugin can actually write?
     //
     SAIL_TRY_OR_CLEANUP(plugin->iface.v2->write_features_v1(&write_features),
                 QMessageBox::critical(this, tr("Error"), tr("Failed to obtain plugin write features. Error: %1").arg(res)));
@@ -322,12 +325,11 @@ int QtSail::saveImage(const QString &path)
     SAIL_TRY_OR_CLEANUP(sail_alloc_file_for_writing(path.toLocal8Bit(), &file),
         QMessageBox::critical(this, tr("Error"), tr("Failed to open the specified file. Error: %1").arg(res)));
 
-    SAIL_TRY_OR_CLEANUP(sail_alloc_write_options(&write_options),
+    // Allocate new write options and copy defaults from the write features
+    // (preferred output pixel format etc.)
+    //
+    SAIL_TRY_OR_CLEANUP(sail_alloc_write_options_from_features(write_features, &write_options),
         QMessageBox::critical(this, tr("Error"), tr("Failed to allocate write options. Error: %1").arg(res)));
-
-    write_options->pixel_format = write_features->preferred_output_pixel_format;
-    write_options->io_options = SAIL_IO_OPTION_META_INFO;
-    write_options->compression = -10;
 
     SAIL_TRY_OR_CLEANUP(plugin->iface.v2->write_init_v1(file, write_options),
         QMessageBox::critical(this, tr("Error"), tr("Failed to start writeing the specified file. Error: %1").arg(res)));
@@ -357,7 +359,7 @@ int QtSail::saveImage(const QString &path)
     SAIL_TRY_OR_CLEANUP(plugin->iface.v2->write_seek_next_frame_v1(file, image),
         QMessageBox::critical(this, tr("Error"), tr("Failed to seek to the next frame. Error: %1").arg(res)));
 
-    // Actual write
+    // Actual write. Pass by pass, line by line.
     //
     for (int pass = 0; pass < image->passes; pass++) {
         SAIL_TRY_OR_CLEANUP(plugin->iface.v2->write_seek_next_pass_v1(file, image),
