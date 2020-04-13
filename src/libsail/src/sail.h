@@ -149,6 +149,27 @@ SAIL_EXPORT sail_error_t sail_read_next_frame(void *pimpl, struct sail_image **i
  */
 SAIL_EXPORT sail_error_t sail_stop_reading(void *pimpl);
 
+/*
+ * Starts writing into the specified image file.
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_start_writing(const char *path, struct sail_context *context, void **pimpl);
+
+/*
+ * Continues writing the image started by sail_start_writing().
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_write_next_frame(void *pimpl, struct sail_image *image, void *image_bits);
+
+/*
+ * Stops writing started by sail_start_writing().
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_stop_writing(void *pimpl);
+
 /* extern "C" */
 #ifdef __cplusplus
 }

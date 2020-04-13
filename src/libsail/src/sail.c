@@ -521,7 +521,7 @@ sail_error_t sail_read_next_frame(void *pimpl, struct sail_image **image, void *
             SAIL_TRY_OR_CLEANUP(plugin->v2->read_seek_next_pass_v2(file, *image),
                                 /* cleanup */ sail_stop_reading(pimpl));
 
-                for (int j = 0; j < (*image)->height; j++) {
+            for (int j = 0; j < (*image)->height; j++) {
                 SAIL_TRY_OR_CLEANUP(plugin->v2->read_scan_line_v2(file, *image, ((char *)*image_bits) + j * (*image)->bytes_per_line),
                                     /* cleanup */ sail_stop_reading(pimpl));
             }
@@ -548,6 +548,108 @@ sail_error_t sail_stop_reading(void *pimpl) {
 
     if (plugin->layout == SAIL_PLUGIN_LAYOUT_V2) {
         SAIL_TRY_OR_CLEANUP(plugin->v2->read_finish_v2(file),
+                            /* cleanup */ destroy_hidden_pimpl(pmpl));
+    } else {
+        destroy_hidden_pimpl(pmpl);
+        return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
+    }
+
+    destroy_hidden_pimpl(pmpl);
+
+    return 0;
+}
+
+sail_error_t sail_start_writing(const char *path, struct sail_context *context, void **pimpl) {
+
+    SAIL_CHECK_PATH_PTR(path);
+    SAIL_CHECK_CONTEXT_PTR(context);
+
+    const char *dot = strrchr(path, '.');
+
+    if (dot == NULL) {
+        return SAIL_INVALID_ARGUMENT;
+    }
+
+    struct hidden_pimpl *pmpl = (struct hidden_pimpl *)malloc(sizeof(struct hidden_pimpl));
+
+    if (pmpl == NULL) {
+        return SAIL_MEMORY_ALLOCATION_FAILED;
+    }
+
+    pmpl->file   = NULL;
+    pmpl->plugin = NULL;
+
+    *pimpl = pmpl;
+
+    const struct sail_plugin_info *plugin_info;
+
+    SAIL_TRY_OR_CLEANUP(sail_plugin_info_by_extension(context, dot + 1, &plugin_info),
+                        /* cleanup */ destroy_hidden_pimpl(pmpl));
+    SAIL_TRY_OR_CLEANUP(sail_load_plugin(context, plugin_info, &pmpl->plugin),
+                        /* cleanup */ destroy_hidden_pimpl(pmpl));
+    SAIL_TRY_OR_CLEANUP(sail_alloc_file_for_writing(path, &pmpl->file),
+                        /* cleanup */ destroy_hidden_pimpl(pmpl));
+
+    if (pmpl->plugin->layout == SAIL_PLUGIN_LAYOUT_V2) {
+        SAIL_TRY_OR_CLEANUP(pmpl->plugin->v2->write_init_v2(pmpl->file, NULL),
+                            /* cleanup */ destroy_hidden_pimpl(pmpl));
+    } else {
+        destroy_hidden_pimpl(pmpl);
+        return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
+    }
+
+    return 0;
+}
+
+sail_error_t sail_write_next_frame(void *pimpl, struct sail_image *image, void *image_bits) {
+
+    SAIL_CHECK_PTR(pimpl);
+
+    struct hidden_pimpl *pmpl = (struct hidden_pimpl *)pimpl;
+
+    SAIL_CHECK_FILE(pmpl->file);
+    SAIL_CHECK_PLUGIN_PTR(pmpl->plugin);
+
+    struct sail_file *file = pmpl->file;
+    const struct sail_plugin *plugin = pmpl->plugin;
+
+    const int bytes_per_line = image->width * ((sail_bits_per_pixel(image->pixel_format) + 8) / 8);
+
+    if (plugin->layout == SAIL_PLUGIN_LAYOUT_V2) {
+        SAIL_TRY_OR_CLEANUP(plugin->v2->write_seek_next_frame_v2(file, image),
+                            /* cleanup */ sail_stop_writing(pimpl));
+
+        for (int pass = 0; pass < image->passes; pass++) {
+            SAIL_TRY_OR_CLEANUP(plugin->v2->write_seek_next_pass_v2(file, image),
+                                /* cleanup */ sail_stop_writing(pimpl));
+
+            for (int j = 0; j < image->height; j++) {
+                SAIL_TRY_OR_CLEANUP(plugin->v2->write_scan_line_v2(file, image, ((char *)image_bits) + j * bytes_per_line),
+                                    /* cleanup */ sail_stop_writing(pimpl));
+            }
+        }
+    } else {
+        destroy_hidden_pimpl(pmpl);
+        return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
+    }
+
+    return 0;
+}
+
+sail_error_t sail_stop_writing(void *pimpl) {
+
+    SAIL_CHECK_PTR(pimpl);
+
+    struct hidden_pimpl *pmpl = (struct hidden_pimpl *)pimpl;
+
+    SAIL_CHECK_FILE(pmpl->file);
+    SAIL_CHECK_PLUGIN_PTR(pmpl->plugin);
+
+    struct sail_file *file = pmpl->file;
+    const struct sail_plugin *plugin = pmpl->plugin;
+
+    if (plugin->layout == SAIL_PLUGIN_LAYOUT_V2) {
+        SAIL_TRY_OR_CLEANUP(plugin->v2->write_finish_v2(file),
                             /* cleanup */ destroy_hidden_pimpl(pmpl));
     } else {
         destroy_hidden_pimpl(pmpl);
