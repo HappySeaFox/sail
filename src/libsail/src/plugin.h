@@ -107,7 +107,7 @@ struct sail_plugin {
     union {
         struct sail_plugin_layout_v1 *v1;
         struct sail_plugin_layout_v2 *v2;
-    } inter_face;
+    } iface;
 };
 
 typedef struct sail_plugin sail_plugin_t;

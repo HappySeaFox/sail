@@ -47,9 +47,9 @@ int sail_alloc_plugin(const struct sail_plugin_info *plugin_info, struct sail_pl
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
-    (*plugin)->layout        = plugin_info->layout;
-    (*plugin)->handle        = NULL;
-    (*plugin)->inter_face.v1 = NULL;
+    (*plugin)->layout   = plugin_info->layout;
+    (*plugin)->handle   = NULL;
+    (*plugin)->iface.v1 = NULL;
 
     SAIL_LOG_DEBUG("Loading plugin '%s'", plugin_info->path);
 
@@ -82,39 +82,39 @@ int sail_alloc_plugin(const struct sail_plugin_info *plugin_info, struct sail_pl
 #endif
 
     if ((*plugin)->layout == 1) {
-        (*plugin)->inter_face.v1 = (struct sail_plugin_layout_v1 *)malloc(sizeof(struct sail_plugin_layout_v1));
+        (*plugin)->iface.v1 = (struct sail_plugin_layout_v1 *)malloc(sizeof(struct sail_plugin_layout_v1));
 
-        (*plugin)->inter_face.v1->read_features_v1        = (sail_plugin_read_features_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_read_features_v1");
-        (*plugin)->inter_face.v1->read_init_v1            = (sail_plugin_read_init_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_read_init_v1");
-        (*plugin)->inter_face.v1->read_seek_next_frame_v1 = (sail_plugin_read_seek_next_frame_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_read_seek_next_frame_v1");
-        (*plugin)->inter_face.v1->read_seek_next_pass_v1  = (sail_plugin_read_seek_next_pass_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_read_seek_next_pass_v1");
-        (*plugin)->inter_face.v1->read_scan_line_v1       = (sail_plugin_read_scan_line_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_read_scan_line_v1");
-        (*plugin)->inter_face.v1->read_finish_v1          = (sail_plugin_read_finish_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_read_finish_v1");
+        (*plugin)->iface.v1->read_features_v1        = (sail_plugin_read_features_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_read_features_v1");
+        (*plugin)->iface.v1->read_init_v1            = (sail_plugin_read_init_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_read_init_v1");
+        (*plugin)->iface.v1->read_seek_next_frame_v1 = (sail_plugin_read_seek_next_frame_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_read_seek_next_frame_v1");
+        (*plugin)->iface.v1->read_seek_next_pass_v1  = (sail_plugin_read_seek_next_pass_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_read_seek_next_pass_v1");
+        (*plugin)->iface.v1->read_scan_line_v1       = (sail_plugin_read_scan_line_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_read_scan_line_v1");
+        (*plugin)->iface.v1->read_finish_v1          = (sail_plugin_read_finish_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_read_finish_v1");
 
-        (*plugin)->inter_face.v1->write_features_v1        = (sail_plugin_write_features_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_write_features_v1");
-        (*plugin)->inter_face.v1->write_init_v1            = (sail_plugin_write_init_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_write_init_v1");
-        (*plugin)->inter_face.v1->write_seek_next_frame_v1 = (sail_plugin_write_seek_next_frame_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_write_seek_next_frame_v1");
-        (*plugin)->inter_face.v1->write_seek_next_pass_v1  = (sail_plugin_write_seek_next_pass_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_write_seek_next_pass_v1");
-        (*plugin)->inter_face.v1->write_scan_line_v1       = (sail_plugin_write_scan_line_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_write_scan_line_v1");
-        (*plugin)->inter_face.v1->write_finish_v1          = (sail_plugin_write_finish_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_write_finish_v1");
+        (*plugin)->iface.v1->write_features_v1        = (sail_plugin_write_features_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_write_features_v1");
+        (*plugin)->iface.v1->write_init_v1            = (sail_plugin_write_init_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_write_init_v1");
+        (*plugin)->iface.v1->write_seek_next_frame_v1 = (sail_plugin_write_seek_next_frame_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_write_seek_next_frame_v1");
+        (*plugin)->iface.v1->write_seek_next_pass_v1  = (sail_plugin_write_seek_next_pass_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_write_seek_next_pass_v1");
+        (*plugin)->iface.v1->write_scan_line_v1       = (sail_plugin_write_scan_line_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_write_scan_line_v1");
+        (*plugin)->iface.v1->write_finish_v1          = (sail_plugin_write_finish_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_write_finish_v1");
     } else if ((*plugin)->layout == 2) {
-        (*plugin)->inter_face.v2 = (struct sail_plugin_layout_v2 *)malloc(sizeof(struct sail_plugin_layout_v2));
+        (*plugin)->iface.v2 = (struct sail_plugin_layout_v2 *)malloc(sizeof(struct sail_plugin_layout_v2));
 
-        (*plugin)->inter_face.v2->read_features_v1        = (sail_plugin_read_features_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_read_features_v1");
-        (*plugin)->inter_face.v2->read_init_v1            = (sail_plugin_read_init_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_read_init_v1");
-        (*plugin)->inter_face.v2->read_seek_next_frame_v1 = (sail_plugin_read_seek_next_frame_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_read_seek_next_frame_v1");
-        (*plugin)->inter_face.v2->read_seek_next_pass_v1  = (sail_plugin_read_seek_next_pass_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_read_seek_next_pass_v1");
-        (*plugin)->inter_face.v2->read_scan_line_v1       = (sail_plugin_read_scan_line_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_read_scan_line_v1");
-        (*plugin)->inter_face.v2->read_finish_v1          = (sail_plugin_read_finish_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_read_finish_v1");
+        (*plugin)->iface.v2->read_features_v1        = (sail_plugin_read_features_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_read_features_v1");
+        (*plugin)->iface.v2->read_init_v1            = (sail_plugin_read_init_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_read_init_v1");
+        (*plugin)->iface.v2->read_seek_next_frame_v1 = (sail_plugin_read_seek_next_frame_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_read_seek_next_frame_v1");
+        (*plugin)->iface.v2->read_seek_next_pass_v1  = (sail_plugin_read_seek_next_pass_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_read_seek_next_pass_v1");
+        (*plugin)->iface.v2->read_scan_line_v1       = (sail_plugin_read_scan_line_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_read_scan_line_v1");
+        (*plugin)->iface.v2->read_finish_v1          = (sail_plugin_read_finish_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_read_finish_v1");
 
-        (*plugin)->inter_face.v2->read_scan_line_v2       = (sail_plugin_read_scan_line_v2_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_read_scan_line_v2");
+        (*plugin)->iface.v2->read_scan_line_v2       = (sail_plugin_read_scan_line_v2_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_read_scan_line_v2");
 
-        (*plugin)->inter_face.v2->write_features_v1        = (sail_plugin_write_features_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_write_features_v1");
-        (*plugin)->inter_face.v2->write_init_v1            = (sail_plugin_write_init_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_write_init_v1");
-        (*plugin)->inter_face.v2->write_seek_next_frame_v1 = (sail_plugin_write_seek_next_frame_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_write_seek_next_frame_v1");
-        (*plugin)->inter_face.v2->write_seek_next_pass_v1  = (sail_plugin_write_seek_next_pass_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_write_seek_next_pass_v1");
-        (*plugin)->inter_face.v2->write_scan_line_v1       = (sail_plugin_write_scan_line_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_write_scan_line_v1");
-        (*plugin)->inter_face.v2->write_finish_v1          = (sail_plugin_write_finish_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_write_finish_v1");
+        (*plugin)->iface.v2->write_features_v1        = (sail_plugin_write_features_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_write_features_v1");
+        (*plugin)->iface.v2->write_init_v1            = (sail_plugin_write_init_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_write_init_v1");
+        (*plugin)->iface.v2->write_seek_next_frame_v1 = (sail_plugin_write_seek_next_frame_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_write_seek_next_frame_v1");
+        (*plugin)->iface.v2->write_seek_next_pass_v1  = (sail_plugin_write_seek_next_pass_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_write_seek_next_pass_v1");
+        (*plugin)->iface.v2->write_scan_line_v1       = (sail_plugin_write_scan_line_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_write_scan_line_v1");
+        (*plugin)->iface.v2->write_finish_v1          = (sail_plugin_write_finish_v1_t)SAIL_RESOLVE((*plugin)->handle, "sail_plugin_write_finish_v1");
     } else {
         return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
     }
@@ -137,8 +137,8 @@ void sail_destroy_plugin(struct sail_plugin *plugin) {
     }
 
     switch (plugin->layout) {
-        case 1: free(plugin->inter_face.v1); break;
-        case 2: free(plugin->inter_face.v2); break;
+        case 1: free(plugin->iface.v1); break;
+        case 2: free(plugin->iface.v2); break;
 
         default:
             SAIL_LOG_WARNING("Don't know how to destroy plugin interface version %d", plugin->layout);
