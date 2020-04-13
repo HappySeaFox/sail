@@ -1,4 +1,5 @@
 #include <QDateTime>
+#include <QDebug>
 #include <QDir>
 #include <QFileDialog>
 #include <QFileInfo>
@@ -11,7 +12,6 @@
 #include <sail/sail.h>
 
 //#include <sail/layouts/v2.h>
-//#include <sail/layouts/v1.h>
 
 #include "qtsail.h"
 #include "ui_qtsail.h"
@@ -195,7 +195,7 @@ sail_error_t QtSail::saveImage(const QString &path, QImage *qimage)
     auto cleanup_func = [&] {
         SAIL_LOG_DEBUG("Write clean up");
 
-        plugin->iface.v2->write_finish_v1(file);
+        plugin->v2->write_finish_v2(file);
 
         sail_destroy_write_features(write_features);
         write_features = nullptr;
@@ -217,7 +217,7 @@ sail_error_t QtSail::saveImage(const QString &path, QImage *qimage)
 
     // Determine the write features of the plugin: what the plugin can actually write?
     //
-    SAIL_TRY(plugin->iface.v2->write_features_v1(&write_features));
+    SAIL_TRY(plugin->v2->write_features_v2(&write_features));
 
     SAIL_TRY(sail_alloc_file_for_writing(path.toLocal8Bit(), &file));
 
@@ -226,7 +226,7 @@ sail_error_t QtSail::saveImage(const QString &path, QImage *qimage)
     //
     SAIL_TRY(sail_alloc_write_options_from_features(write_features, &write_options));
 
-    SAIL_TRY(plugin->iface.v2->write_init_v1(file, write_options));
+    SAIL_TRY(plugin->v2->write_init_v2(file, write_options));
 
     SAIL_TRY(sail_alloc_image(&image));
 
@@ -249,15 +249,15 @@ sail_error_t QtSail::saveImage(const QString &path, QImage *qimage)
     SAIL_LOG_DEBUG("Image size: %dx%d", image->width, image->height);
     SAIL_LOG_DEBUG("Output pixel format: %s", sail_pixel_format_to_string(write_options->pixel_format));
 
-    SAIL_TRY(plugin->iface.v2->write_seek_next_frame_v1(file, image));
+    SAIL_TRY(plugin->v2->write_seek_next_frame_v2(file, image));
 
     // Actual write. Pass by pass, line by line.
     //
     for (int pass = 0; pass < image->passes; pass++) {
-        SAIL_TRY(plugin->iface.v2->write_seek_next_pass_v1(file, image));
+        SAIL_TRY(plugin->v2->write_seek_next_pass_v2(file, image));
 
         for (int j = 0; j < image->height; j++) {
-            SAIL_TRY(plugin->iface.v2->write_scan_line_v1(file, image, qimage->bits() + j * bytes_per_line));
+            SAIL_TRY(plugin->v2->write_scan_line_v2(file, image, qimage->bits() + j * bytes_per_line));
         }
     }
 

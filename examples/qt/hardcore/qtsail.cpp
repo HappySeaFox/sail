@@ -1,4 +1,5 @@
 #include <QDateTime>
+#include <QDebug>
 #include <QDir>
 #include <QFileDialog>
 #include <QFileInfo>
@@ -11,7 +12,6 @@
 #include <sail/sail.h>
 
 //#include <sail/layouts/v2.h>
-//#include <sail/layouts/v1.h>
 
 #include "qtsail.h"
 #include "ui_qtsail.h"
@@ -132,15 +132,8 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 
         delete [] image_bits;
 
-        switch (plugin->layout) {
-            case 1: {
-                plugin->iface.v1->read_finish_v1(file);
-                break;
-            }
-            case 2: {
-                plugin->iface.v2->read_finish_v1(file);
-                break;
-            }
+        if (plugin->layout == SAIL_PLUGIN_LAYOUT_V2) {
+            plugin->v2->read_finish_v2(file);
         }
 
         sail_destroy_read_features(read_features);
@@ -161,22 +154,11 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     // Read the image file
     //
 
-    switch (plugin->layout) {
-        case 1: {
-            // Determine the read features of the plugin: what the plugin can actually read?
-            //
-            SAIL_TRY(plugin->iface.v1->read_features_v1(&read_features));
-            break;
-        }
-        case 2: {
-            SAIL_TRY(plugin->iface.v2->read_features_v1(&read_features));
-            break;
-        }
-        default: {
-            return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
-        }
+    if (plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
+        return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
     }
 
+    SAIL_TRY(plugin->v2->read_features_v2(&read_features));
     SAIL_TRY(sail_alloc_file_for_reading(path.toLocal8Bit(), &file));
 
     // Allocate new read options and copy defaults from the read features
@@ -188,22 +170,8 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     //
     read_options->pixel_format = SAIL_PIXEL_FORMAT_RGB;
 
-    switch (plugin->layout) {
-        case 1: {
-            // Start reading
-            //
-            SAIL_TRY(plugin->iface.v1->read_init_v1(file, read_options));
-            // Seek to the next frame if any
-            //
-            SAIL_TRY(plugin->iface.v1->read_seek_next_frame_v1(file, &image));
-            break;
-        }
-        case 2: {
-            SAIL_TRY(plugin->iface.v2->read_init_v1(file, read_options));
-            SAIL_TRY(plugin->iface.v2->read_seek_next_frame_v1(file, &image));
-            break;
-        }
-    }
+    SAIL_TRY(plugin->v2->read_init_v2(file, read_options));
+    SAIL_TRY(plugin->v2->read_seek_next_frame_v2(file, &image));
 
     // Allocate image bits. Assume full-color images so divide by 8.
     //
@@ -219,26 +187,11 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 
     // Actual read. Pass by pass, line by line.
     //
-    switch (plugin->layout) {
-        case 1: {
-            for (int pass = 0; pass < image->passes; pass++) {
-                SAIL_TRY(plugin->iface.v1->read_seek_next_pass_v1(file, image));
+    for (int pass = 0; pass < image->passes; pass++) {
+        SAIL_TRY(plugin->v2->read_seek_next_pass_v2(file, image));
 
-                for (int j = 0; j < image->height; j++) {
-                    SAIL_TRY(plugin->iface.v1->read_scan_line_v1(file, image, image_bits + j * image->width * bytes_per_pixel));
-                }
-            }
-            break;
-        }
-        case 2: {
-            for (int pass = 0; pass < image->passes; pass++) {
-                SAIL_TRY(plugin->iface.v2->read_seek_next_pass_v1(file, image));
-
-                for (int j = 0; j < image->height; j++) {
-                    SAIL_TRY(plugin->iface.v2->read_scan_line_v1(file, image, image_bits + j * image->width * bytes_per_pixel));
-                }
-            }
-            break;
+        for (int j = 0; j < image->height; j++) {
+            SAIL_TRY(plugin->v2->read_scan_line_v2(file, image, image_bits + j * image->width * bytes_per_pixel));
         }
     }
 
@@ -287,7 +240,7 @@ sail_error_t QtSail::saveImage(const QString &path, QImage *qimage)
     auto cleanup_func = [&] {
         SAIL_LOG_DEBUG("Write clean up");
 
-        plugin->iface.v2->write_finish_v1(file);
+        plugin->v2->write_finish_v2(file);
 
         sail_destroy_write_features(write_features);
         write_features = nullptr;
@@ -307,9 +260,13 @@ sail_error_t QtSail::saveImage(const QString &path, QImage *qimage)
     // Write the image file.
     //
 
+    if (plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
+        return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
+    }
+
     // Determine the write features of the plugin: what the plugin can actually write?
     //
-    SAIL_TRY(plugin->iface.v2->write_features_v1(&write_features));
+    SAIL_TRY(plugin->v2->write_features_v2(&write_features));
 
     SAIL_TRY(sail_alloc_file_for_writing(path.toLocal8Bit(), &file));
 
@@ -318,7 +275,7 @@ sail_error_t QtSail::saveImage(const QString &path, QImage *qimage)
     //
     SAIL_TRY(sail_alloc_write_options_from_features(write_features, &write_options));
 
-    SAIL_TRY(plugin->iface.v2->write_init_v1(file, write_options));
+    SAIL_TRY(plugin->v2->write_init_v2(file, write_options));
 
     SAIL_TRY(sail_alloc_image(&image));
 
@@ -341,15 +298,15 @@ sail_error_t QtSail::saveImage(const QString &path, QImage *qimage)
     SAIL_LOG_DEBUG("Image size: %dx%d", image->width, image->height);
     SAIL_LOG_DEBUG("Output pixel format: %s", sail_pixel_format_to_string(write_options->pixel_format));
 
-    SAIL_TRY(plugin->iface.v2->write_seek_next_frame_v1(file, image));
+    SAIL_TRY(plugin->v2->write_seek_next_frame_v2(file, image));
 
     // Actual write. Pass by pass, line by line.
     //
     for (int pass = 0; pass < image->passes; pass++) {
-        SAIL_TRY(plugin->iface.v2->write_seek_next_pass_v1(file, image));
+        SAIL_TRY(plugin->v2->write_seek_next_pass_v2(file, image));
 
         for (int j = 0; j < image->height; j++) {
-            SAIL_TRY(plugin->iface.v2->write_scan_line_v1(file, image, qimage->bits() + j * bytes_per_line));
+            SAIL_TRY(plugin->v2->write_scan_line_v2(file, image, qimage->bits() + j * bytes_per_line));
         }
     }
 

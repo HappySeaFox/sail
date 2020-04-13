@@ -111,8 +111,13 @@ static int inih_handler(void *data, const char *section, const char *name, const
     if (strcmp(name, "layout") == 0) {
         plugin_info->layout = atoi(value);
 
-        if (plugin_info->layout < 1) {
+        if (plugin_info->layout == 1) {
             SAIL_LOG_ERROR("Failed to convert '%s' to a plugin layout version", value);
+            return 0;
+        }
+
+        if (plugin_info->layout != SAIL_PLUGIN_LAYOUT_V2) {
+            SAIL_LOG_ERROR("Unsupported plugin layout version %d", plugin_info->layout);
             return 0;
         }
 
