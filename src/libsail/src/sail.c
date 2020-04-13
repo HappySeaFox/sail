@@ -48,11 +48,23 @@
 
 static const char* plugins_path(void) {
 
+#ifdef SAIL_WIN32
+    SAIL_THREAD_LOCAL static char *env = NULL;
+    SAIL_THREAD_LOCAL static bool plugins_path_called = false;
+
+    if (!plugins_path_called) {
+        plugins_path_called = true;
+        _dupenv_s(&env, NULL, "SAIL_PLUGINS_PATH");
+    }
+#else
     char *env = getenv("SAIL_PLUGINS_PATH");
+#endif
 
     if (env == NULL) {
+        SAIL_LOG_DEBUG("SAIL_PLUGINS_PATH environment variable is not set. Loading plugins from %s", SAIL_PLUGINS_PATH);
         return SAIL_PLUGINS_PATH;
     } else {
+        SAIL_LOG_DEBUG("SAIL_PLUGINS_PATH environment variable is set. Loading plugins from %s", env);
         return env;
     }
 }
@@ -158,7 +170,7 @@ sail_error_t sail_init(struct sail_context **context) {
     const char *plugs_path = plugins_path();
     const char *plugs_info_mask = "\\*.plugin.info";
 
-    int plugs_path_with_mask_length = strlen(plugs_path) + strlen(plugs_info_mask) + 1;
+    size_t plugs_path_with_mask_length = strlen(plugs_path) + strlen(plugs_info_mask) + 1;
     char *plugs_path_with_mask = (char *)malloc(plugs_path_with_mask_length);
 
     if (plugs_path_with_mask == NULL) {
