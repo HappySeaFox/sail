@@ -531,7 +531,10 @@ sail_error_t sail_read_next_frame(void *pimpl, struct sail_image **image, void *
 
 sail_error_t sail_stop_reading(void *pimpl) {
 
-    SAIL_CHECK_PTR(pimpl);
+    /* No an error. */
+    if(pimpl == NULL) {
+        return 0;
+    }
 
     struct hidden_pimpl *pmpl = (struct hidden_pimpl *)pimpl;
 
@@ -630,7 +633,10 @@ sail_error_t sail_write_next_frame(void *pimpl, struct sail_image *image, void *
 
 sail_error_t sail_stop_writing(void *pimpl) {
 
-    SAIL_CHECK_PTR(pimpl);
+    /* No an error. */
+    if(pimpl == NULL) {
+        return 0;
+    }
 
     struct hidden_pimpl *pmpl = (struct hidden_pimpl *)pimpl;
 
