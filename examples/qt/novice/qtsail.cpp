@@ -220,30 +220,6 @@ sail_error_t QtSail::saveImage(const QString &path, QImage *qimage)
     return 0;
 }
 
-sail_error_t QtSail::pluginInfo(struct sail_plugin_info *plugin_info)
-{
-    SAIL_LOG_DEBUG("SAIL plugin layout version: %d", plugin_info->layout);
-    SAIL_LOG_DEBUG("SAIL plugin version: %s", plugin_info->version);
-    SAIL_LOG_DEBUG("SAIL plugin description: %s", plugin_info->description);
-    SAIL_LOG_DEBUG("SAIL plugin path: %s", plugin_info->path);
-
-    const struct sail_string_node *node = plugin_info->extension_node;
-
-    while (node != nullptr) {
-        SAIL_LOG_DEBUG("SAIL extension '%s'", node->value);
-        node = node->next;
-    }
-
-    node = plugin_info->mime_type_node;
-
-    while (node != nullptr) {
-        SAIL_LOG_DEBUG("SAIL mime type '%s'", node->value);
-        node = node->next;
-    }
-
-    return 0;
-}
-
 void QtSail::loadFileFromDir()
 {
     if (d->currentFile < 0 || d->currentFile >= d->files.size()) {

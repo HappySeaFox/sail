@@ -21,7 +21,7 @@ public:
 private:
     sail_error_t loadImage(const QString &path, QImage *qimage);
     sail_error_t saveImage(const QString &path, QImage *qimage);
-    sail_error_t pluginInfo(struct sail_plugin_info *plugin_info);
+    sail_error_t pluginInfo(const sail_plugin_info *plugin_info) const;
     void loadFileFromDir();
     QStringList filters() const;
 

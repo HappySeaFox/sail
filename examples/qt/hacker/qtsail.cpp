@@ -120,6 +120,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     const struct sail_plugin *plugin;
 
     SAIL_TRY(sail_load_plugin(d->context, plugin_info, &plugin));
+    pluginInfo(plugin_info);
 
     sail_file *file = nullptr;
     sail_image *image = nullptr;
@@ -230,6 +231,7 @@ sail_error_t QtSail::saveImage(const QString &path, QImage *qimage)
     const struct sail_plugin *plugin;
 
     SAIL_TRY(sail_load_plugin(d->context, plugin_info, &plugin));
+    pluginInfo(plugin_info);
 
     sail_file *file = nullptr;
     sail_image *image = nullptr;
@@ -313,7 +315,7 @@ sail_error_t QtSail::saveImage(const QString &path, QImage *qimage)
     return 0;
 }
 
-sail_error_t QtSail::pluginInfo(struct sail_plugin_info *plugin_info)
+sail_error_t QtSail::pluginInfo(const struct sail_plugin_info *plugin_info) const
 {
     SAIL_LOG_DEBUG("SAIL plugin layout version: %d", plugin_info->layout);
     SAIL_LOG_DEBUG("SAIL plugin version: %s", plugin_info->version);
@@ -435,6 +437,8 @@ void QtSail::onProbe()
         QMessageBox::critical(this, tr("Error"), tr("Failed to probe the image. Error: %1").arg(res));
         return;
     }
+
+    pluginInfo(plugin_info);
 
     QMessageBox::information(this,
                              tr("File info"),
