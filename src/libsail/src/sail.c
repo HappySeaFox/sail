@@ -408,11 +408,14 @@ sail_error_t sail_probe_image(const char *path, struct sail_context *context, co
         return SAIL_INVALID_ARGUMENT;
     }
 
-    SAIL_TRY(sail_plugin_info_by_extension(context, dot + 1, plugin_info));
+    const struct sail_plugin_info *plugin_info_noop;
+    const struct sail_plugin_info **plugin_info_local = plugin_info == NULL ? &plugin_info_noop : plugin_info;
+
+    SAIL_TRY(sail_plugin_info_by_extension(context, dot + 1, plugin_info_local));
 
     const struct sail_plugin *plugin;
 
-    SAIL_TRY(sail_load_plugin(context, *plugin_info, &plugin));
+    SAIL_TRY(sail_load_plugin(context, *plugin_info_local, &plugin));
 
     struct sail_file *file;
 

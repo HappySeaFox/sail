@@ -104,7 +104,7 @@ SAIL_EXPORT sail_error_t sail_unload_plugins(struct sail_context *context);
 /*
  * Loads the specified image and returns its properties. The assigned image MUST be destroyed later
  * with sail_destroy_image(). The assigned plugin info MUST NOT be destroyed. It's a pointer to an internal
- * data structure.
+ * data structure. If you don't need it, just pass NULL.
  *
  * Most plugins DO NOT read the whole image data. This is why this function is pretty fast.
  *
