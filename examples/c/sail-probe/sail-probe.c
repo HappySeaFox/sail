@@ -70,14 +70,10 @@ static uint64_t now() {
 #endif
 }
 
-static sail_error_t probe(const char *path) {
-
-    struct sail_context *context;
+static sail_error_t probe(const char *path, struct sail_context *context) {
 
     /* Time counter. */
     const uint64_t start_time = now();
-
-    SAIL_TRY(sail_init(&context));
 
     struct sail_image *image;
     const struct sail_plugin_info *plugin_info;
@@ -92,8 +88,7 @@ static sail_error_t probe(const char *path) {
     printf("\n");
 
     printf("Size          : %dx%d\n", image->width, image->height);
-    printf("Source color  : %s\n", sail_pixel_format_to_string(image->source_pixel_format));
-    printf("Output color  : %s\n", sail_pixel_format_to_string(image->pixel_format));
+    printf("Color         : %s\n", sail_pixel_format_to_string(image->source_pixel_format));
 
     struct sail_meta_entry_node *node = image->meta_entry_node;
 
@@ -102,8 +97,6 @@ static sail_error_t probe(const char *path) {
     }
 
     sail_destroy_image(image);
-
-    sail_finish(context);
 
     return 0;
 }
@@ -115,7 +108,13 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    SAIL_TRY(probe(argv[1]));
+    struct sail_context *context;
+
+    SAIL_TRY(sail_init(&context));
+
+    SAIL_TRY(probe(argv[1], context));
+
+    sail_finish(context);
 
     return 0;
 }
