@@ -112,6 +112,7 @@ static sail_error_t probe(const char *path, struct sail_context *context) {
 int main(int argc, char *argv[]) {
 
     if (argc < 2) {
+        fprintf(stderr, "sail-probe: Quickly retrieve image info.\n\n");
         fprintf(stderr, "Usage: %s <PATH TO IMAGE>\n", argv[0]);
         return 1;
     }
