@@ -91,13 +91,7 @@ QtSail::QtSail(QWidget *parent)
         }
     });
 
-    SAIL_LOG_INFO("Init");
-    sail_init(&d->context);
-
-    if (d->context == nullptr || d->context->plugin_info_node == nullptr) {
-        qCritical("Failed to load plugin info");
-        return;
-    }
+    init();
 }
 
 QtSail::~QtSail()
@@ -105,6 +99,15 @@ QtSail::~QtSail()
     SAIL_LOG_INFO("Finish");
     sail_finish(d->context);
     d->context = nullptr;
+}
+
+sail_error_t QtSail::init()
+{
+    SAIL_LOG_INFO("Init");
+    SAIL_TRY_OR_CLEANUP(sail_init(&d->context),
+                        /* cleanup */ QMessageBox::critical(this, tr("Error"), tr("Failed to init SAIL")),
+                                      ::exit(1));
+    return 0;
 }
 
 static QImage::Format sailPixelFormatToQImageFormat(int pixel_format) {

@@ -91,13 +91,16 @@ QtSail::QtSail(QWidget *parent)
         }
     });
 
-    SAIL_LOG_INFO("Init");
-    sail_init(&d->context);
+    init();
+}
 
-    if (d->context == nullptr || d->context->plugin_info_node == nullptr) {
-        qCritical("Failed to load plugin info");
-        return;
-    }
+sail_error_t QtSail::init()
+{
+    SAIL_LOG_INFO("Init");
+    SAIL_TRY_OR_CLEANUP(sail_init(&d->context),
+                        /* cleanup */ QMessageBox::critical(this, tr("Error"), tr("Failed to init SAIL")),
+                                      ::exit(1));
+    return 0;
 }
 
 QtSail::~QtSail()
