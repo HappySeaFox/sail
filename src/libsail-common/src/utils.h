@@ -63,6 +63,25 @@ SAIL_EXPORT int sail_bits_per_pixel(int pixel_format);
  */
 SAIL_EXPORT void sail_to_lower(char *str);
 
+/*
+ * Calculates bytes per line.
+ *
+ * For example:
+ *   - 12 pixels * 1 bits per pixel / 8 + 1 ==
+ *     12 * 1/8 + 1                         ==
+ *     12 * 0.125 + 1                       ==
+ *     1.5 + 1                              ==
+ *     2.5                                  ==
+ *     2 bytes per line
+ *
+ *   - 12 pixels * 16 bits per pixel / 8 + 0 ==
+ *     12 * 16/8 + 0                         ==
+ *     12 * 2 + 0                            ==
+ *     24 + 0                                ==
+ *     24 bytes per line
+ */
+SAIL_EXPORT int sail_bytes_per_line(int width, int pixel_format);
+
 /* extern "C" */
 #ifdef __cplusplus
 }

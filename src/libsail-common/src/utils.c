@@ -139,3 +139,12 @@ void sail_to_lower(char *str) {
         str[i] = (char)tolower(str[i]);
     }
 }
+
+int sail_bytes_per_line(int width, int pixel_format) {
+
+    const int bits_per_pixel = sail_bits_per_pixel(pixel_format);
+
+    const int add = bits_per_pixel % 8 == 0 ? 0 : 1;
+
+    return (int)(((double)width * bits_per_pixel / 8) + add);
+}
