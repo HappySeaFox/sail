@@ -89,7 +89,7 @@ static sail_error_t probe(const char *path, struct sail_context *context) {
     SAIL_TRY(sail_probe_image(path, context, &plugin_info, &image));
 
     printf("File          : %s\n", path);
-    printf("Probed time   : %ld ms.\n", (unsigned long)(now() - start_time));
+    printf("Probe time    : %ld ms.\n", (unsigned long)(now() - start_time));
     printf("Codec         : %s\n", plugin_info->description);
     printf("Codec version : %s\n", plugin_info->version);
 
