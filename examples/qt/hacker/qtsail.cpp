@@ -175,11 +175,10 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 
     // Allocate image bits. Assume full-color images so divide by 8.
     //
-    const int bytes_per_pixel = sail_bits_per_pixel(image->pixel_format) / 8;
     const QImage::Format qimage_format = QImage::Format_RGB888;
-    const int scan_length = image->width * bytes_per_pixel;
+    const int bytes_per_line = sail_bytes_per_line(image->width, image->pixel_format);
 
-    image_bits = new uchar[scan_length * image->height];
+    image_bits = new uchar[bytes_per_line * image->height];
 
     if (image_bits == nullptr) {
         return SAIL_MEMORY_ALLOCATION_FAILED;
@@ -191,13 +190,13 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
         SAIL_TRY(plugin->v2->read_seek_next_pass_v2(file, image));
 
         for (int j = 0; j < image->height; j++) {
-            SAIL_TRY(plugin->v2->read_scan_line_v2(file, image, image_bits + j * image->width * bytes_per_pixel));
+            SAIL_TRY(plugin->v2->read_scan_line_v2(file, image, image_bits + j * bytes_per_line));
         }
     }
 
     SAIL_LOG_INFO("Loaded in %lld ms.", QDateTime::currentMSecsSinceEpoch() - v);
 
-    *qimage = QImage(image_bits, image->width, image->height, scan_length, qimage_format).copy();
+    *qimage = QImage(image_bits, image->width, image->height, bytes_per_line, qimage_format).copy();
 
     QString meta;
     struct sail_meta_entry_node *node = image->meta_entry_node;
@@ -284,8 +283,7 @@ sail_error_t QtSail::saveImage(const QString &path, QImage *qimage)
     image->pixel_format = SAIL_PIXEL_FORMAT_RGB;
     image->passes = 1;
 
-    // Assume pixel formats aligned to 8 bits.
-    const int bytes_per_line = image->width * (sail_bits_per_pixel(image->pixel_format) / 8);
+    const int bytes_per_line = sail_bytes_per_line(image->width, image->pixel_format);
 
     struct sail_meta_entry_node *meta_entry_node;
 
