@@ -1,5 +1,3 @@
-# Add a plugin
-#
 add_executable(sail-probe sail-probe.c)
 
 # Depend on sail
