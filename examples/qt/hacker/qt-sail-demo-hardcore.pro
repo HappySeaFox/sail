@@ -3,7 +3,7 @@
 }
 
 TEMPLATE = app
-TARGET = qt-sail-demo-hardcore
+TARGET = qt-sail-demo-hacker
 
 CONFIG += warn_on c++11 strict_c++ link_pkgconfig
 CONFIG -= embed_manifest_exe
