@@ -80,6 +80,9 @@ static uint64_t now() {
 
 static sail_error_t probe(const char *path, struct sail_context *context) {
 
+    SAIL_CHECK_PATH_PTR(path);
+    SAIL_CHECK_CONTEXT_PTR(context);
+
     /* Time counter. */
     const uint64_t start_time = now();
 
