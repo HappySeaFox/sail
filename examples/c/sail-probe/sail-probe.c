@@ -1,10 +1,18 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdint.h>
 
-#undef SAIL_BUILD
-#include <sail/sail.h>
+/* libsail-common. */
+#include "config.h"
+#include "common.h"
+#include "meta_entry_node.h"
+#include "plugin_info.h"
+#include "utils.h"
+
+#include "sail.h"
 
 #ifdef SAIL_WIN32
+    #include <windows.h>
 #else
     #include <errno.h>
     #include <sys/time.h>
@@ -14,6 +22,28 @@
 static uint64_t now() {
 
 #ifdef SAIL_WIN32
+    SAIL_THREAD_LOCAL static bool initialized = false;
+    SAIL_THREAD_LOCAL static double frequency = 0;
+
+    LARGE_INTEGER li;
+
+    if (!initialized) {
+        initialized = true;
+
+        if (!QueryPerformanceFrequency(&li)) {
+            fprintf(stderr, "Failed to get the current time. Error: %d\n", GetLastError());
+            return 0;
+        }
+
+        frequency = (double)li.QuadPart / 1000;
+    }
+
+    if (!QueryPerformanceCounter(&li)) {
+        fprintf(stderr, "Failed to get the current time. Error: %d\n", GetLastError());
+        return 0;
+    }
+
+    return (uint64_t)((double)li.QuadPart / frequency);
 #else
     struct timeval tv;
 
