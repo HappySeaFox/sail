@@ -6,6 +6,11 @@ project(SAIL VERSION 0.9.0
 
 include(GNUInstallDirs)
 
+# Our own cmake scripts
+#
+set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
+include(sail_plugin)
+
 # Sanity checks
 #
 string(FIND "${CMAKE_INSTALL_PREFIX}" " " SPACE_INDEX)
