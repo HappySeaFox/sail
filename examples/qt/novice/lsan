@@ -1,3 +1,0 @@
-#!/bin/sh -e
-
-export LSAN_OPTIONS=suppressions=asan.supp

@@ -1,4 +1,0 @@
-leak:libGLX_mesa
-leak:libfontconfig
-leak:libQt5
-leak:libdbus
