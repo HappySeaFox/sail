@@ -596,7 +596,6 @@ sail_error_t sail_start_writing(const char *path, struct sail_context *context, 
     if (pmpl->plugin->layout == SAIL_PLUGIN_LAYOUT_V2) {
         SAIL_TRY(pmpl->plugin->v2->write_init_v2(pmpl->file, NULL));
     } else {
-        destroy_hidden_pimpl(pmpl);
         return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
     }
 
@@ -628,7 +627,6 @@ sail_error_t sail_write_next_frame(void *pimpl, struct sail_image *image, void *
             }
         }
     } else {
-        destroy_hidden_pimpl(pmpl);
         return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
     }
 
