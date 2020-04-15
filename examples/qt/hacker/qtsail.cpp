@@ -193,7 +193,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     SAIL_TRY(plugin->v2->read_init_v2(file, read_options));
     SAIL_TRY(plugin->v2->read_seek_next_frame_v2(file, &image));
 
-    // Allocate image bits. Assume full-color images so divide by 8.
+    // Allocate image bits.
     //
     const QImage::Format qimage_format = QImage::Format_RGB888;
     const int bytes_per_line = sail_bytes_per_line(image->width, image->pixel_format);
