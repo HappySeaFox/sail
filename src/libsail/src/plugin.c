@@ -29,6 +29,7 @@
 #endif
 
 /* libsail-common */
+#include "common.h"
 #include "error.h"
 #include "log.h"
 
@@ -126,4 +127,30 @@ void sail_destroy_plugin(struct sail_plugin *plugin) {
     }
 
     free(plugin);
+}
+
+sail_error_t sail_plugin_read_features(const struct sail_plugin *plugin, struct sail_read_features **read_features) {
+
+    SAIL_CHECK_PLUGIN_PTR(plugin);
+
+    if (plugin->layout == SAIL_PLUGIN_LAYOUT_V2) {
+        SAIL_TRY(plugin->v2->read_features_v2(read_features));
+    } else {
+        return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
+    }
+
+    return 0;
+}
+
+sail_error_t sail_plugin_write_features(const struct sail_plugin *plugin, struct sail_write_features **write_features) {
+
+    SAIL_CHECK_PLUGIN_PTR(plugin);
+
+    if (plugin->layout == SAIL_PLUGIN_LAYOUT_V2) {
+        SAIL_TRY(plugin->v2->write_features_v2(write_features));
+    } else {
+        return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
+    }
+
+    return 0;
 }

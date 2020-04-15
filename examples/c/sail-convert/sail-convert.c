@@ -30,9 +30,10 @@
 #include "common.h"
 #include "log.h"
 #include "meta_entry_node.h"
-#include "plugin_info.h"
 #include "utils.h"
 
+#include "plugin_info.h"
+#include "plugin.h"
 #include "sail.h"
 
 static sail_error_t convert(const char *input, const char *output, struct sail_context *context) {
@@ -59,13 +60,33 @@ static sail_error_t convert(const char *input, const char *output, struct sail_c
     /* Write the image. */
     SAIL_LOG_INFO("Output file: %s", output);
 
-    SAIL_TRY(sail_start_writing(output, context, &plugin_info/* or NULL */, &pimpl));
+    const char *dot = strrchr(output, '.');
+
+    if (dot == NULL) {
+        return SAIL_INVALID_ARGUMENT;
+    }
+
+    SAIL_TRY(sail_plugin_info_by_extension(context, dot+1, &plugin_info));
     SAIL_LOG_INFO("Output codec: %s", plugin_info->description);
+
+    const struct sail_plugin *plugin;
+    SAIL_TRY(sail_load_plugin(context, plugin_info, &plugin));
+
+    struct sail_write_features *write_features;
+    SAIL_TRY(sail_plugin_write_features(plugin, &write_features));
+
+    struct sail_write_options *write_options;
+    SAIL_TRY(sail_alloc_write_options_from_features(write_features, &write_options));
+
+    SAIL_TRY(sail_start_writing_with_plugin(output, context, plugin, write_options/* or NULL */, &pimpl));
 
     SAIL_TRY(sail_write_next_frame(pimpl, image, image_bits));
     SAIL_TRY(sail_stop_writing(pimpl));
 
+    /* Clean up. */
     free(image_bits);
+    sail_destroy_write_features(write_features);
+    sail_destroy_write_options(write_options);
     sail_destroy_image(image);
 
     SAIL_LOG_INFO("Success");

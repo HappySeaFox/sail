@@ -455,6 +455,44 @@ static void destroy_hidden_pimpl(struct hidden_pimpl *pimpl) {
     free(pimpl);
 }
 
+sail_error_t sail_start_reading_with_plugin(const char *path, struct sail_context *context, const struct sail_plugin *plugin,
+                                            struct sail_read_options *read_options, void **pimpl) {
+    SAIL_CHECK_PTR(pimpl);
+
+    *pimpl = NULL;
+
+    SAIL_CHECK_PATH_PTR(path);
+    SAIL_CHECK_CONTEXT_PTR(context);
+    SAIL_CHECK_PLUGIN_PTR(plugin);
+
+    const char *dot = strrchr(path, '.');
+
+    if (dot == NULL) {
+        return SAIL_INVALID_ARGUMENT;
+    }
+
+    struct hidden_pimpl *pmpl = (struct hidden_pimpl *)malloc(sizeof(struct hidden_pimpl));
+
+    if (pmpl == NULL) {
+        return SAIL_MEMORY_ALLOCATION_FAILED;
+    }
+
+    pmpl->file   = NULL;
+    pmpl->plugin = plugin;
+
+    *pimpl = pmpl;
+
+    SAIL_TRY(sail_alloc_file_for_reading(path, &pmpl->file));
+
+    if (pmpl->plugin->layout == SAIL_PLUGIN_LAYOUT_V2) {
+        SAIL_TRY(pmpl->plugin->v2->read_init_v2(pmpl->file, read_options));
+    } else {
+        return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
+    }
+
+    return 0;
+}
+
 sail_error_t sail_start_reading(const char *path, struct sail_context *context, const struct sail_plugin_info **plugin_info, void **pimpl) {
 
     SAIL_CHECK_PTR(pimpl);
@@ -556,6 +594,44 @@ sail_error_t sail_stop_reading(void *pimpl) {
     }
 
     destroy_hidden_pimpl(pmpl);
+
+    return 0;
+}
+
+sail_error_t sail_start_writing_with_plugin(const char *path, struct sail_context *context, const struct sail_plugin *plugin,
+                                                        struct sail_write_options *write_options, void **pimpl) {
+    SAIL_CHECK_PTR(pimpl);
+
+    *pimpl = NULL;
+
+    SAIL_CHECK_PATH_PTR(path);
+    SAIL_CHECK_CONTEXT_PTR(context);
+    SAIL_CHECK_PLUGIN_PTR(plugin);
+
+    const char *dot = strrchr(path, '.');
+
+    if (dot == NULL) {
+        return SAIL_INVALID_ARGUMENT;
+    }
+
+    struct hidden_pimpl *pmpl = (struct hidden_pimpl *)malloc(sizeof(struct hidden_pimpl));
+
+    if (pmpl == NULL) {
+        return SAIL_MEMORY_ALLOCATION_FAILED;
+    }
+
+    pmpl->file   = NULL;
+    pmpl->plugin = plugin;
+
+    *pimpl = pmpl;
+
+    SAIL_TRY(sail_alloc_file_for_writing(path, &pmpl->file));
+
+    if (pmpl->plugin->layout == SAIL_PLUGIN_LAYOUT_V2) {
+        SAIL_TRY(pmpl->plugin->v2->write_init_v2(pmpl->file, write_options));
+    } else {
+        return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
+    }
 
     return 0;
 }
