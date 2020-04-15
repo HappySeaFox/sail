@@ -456,7 +456,7 @@ static void destroy_hidden_pimpl(struct hidden_pimpl *pimpl) {
 }
 
 sail_error_t sail_start_reading_with_plugin(const char *path, struct sail_context *context, const struct sail_plugin *plugin,
-                                            struct sail_read_options *read_options, void **pimpl) {
+                                            const struct sail_read_options *read_options, void **pimpl) {
     SAIL_CHECK_PTR(pimpl);
 
     *pimpl = NULL;
@@ -599,7 +599,7 @@ sail_error_t sail_stop_reading(void *pimpl) {
 }
 
 sail_error_t sail_start_writing_with_plugin(const char *path, struct sail_context *context, const struct sail_plugin *plugin,
-                                                        struct sail_write_options *write_options, void **pimpl) {
+                                            const struct sail_write_options *write_options, void **pimpl) {
     SAIL_CHECK_PTR(pimpl);
 
     *pimpl = NULL;
@@ -678,7 +678,7 @@ sail_error_t sail_start_writing(const char *path, struct sail_context *context, 
     return 0;
 }
 
-sail_error_t sail_write_next_frame(void *pimpl, struct sail_image *image, void *image_bits) {
+sail_error_t sail_write_next_frame(void *pimpl, const struct sail_image *image, const void *image_bits) {
 
     SAIL_CHECK_PTR(pimpl);
 

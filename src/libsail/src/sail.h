@@ -137,7 +137,7 @@ SAIL_EXPORT sail_error_t sail_probe_image(const char *path, struct sail_context 
  * Returns 0 on success or sail_error_t on error.
  */
 SAIL_EXPORT sail_error_t sail_start_reading_with_plugin(const char *path, struct sail_context *context, const struct sail_plugin *plugin,
-                                                        struct sail_read_options *read_options, void **pimpl);
+                                                        const struct sail_read_options *read_options, void **pimpl);
 
 /*
  * Starts reading the specified image. The assigned plugin info MUST NOT be destroyed.
@@ -200,7 +200,7 @@ SAIL_EXPORT sail_error_t sail_stop_reading(void *pimpl);
  * Returns 0 on success or sail_error_t on error.
  */
 SAIL_EXPORT sail_error_t sail_start_writing_with_plugin(const char *path, struct sail_context *context, const struct sail_plugin *plugin,
-                                                        struct sail_write_options *write_options, void **pimpl);
+                                                        const struct sail_write_options *write_options, void **pimpl);
 
 /*
  * Starts writing into the specified image file. The assigned plugin info MUST NOT be destroyed.
@@ -229,7 +229,7 @@ SAIL_EXPORT sail_error_t sail_start_writing(const char *path, struct sail_contex
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_write_next_frame(void *pimpl, struct sail_image *image, void *image_bits);
+SAIL_EXPORT sail_error_t sail_write_next_frame(void *pimpl, const struct sail_image *image, const void *image_bits);
 
 /*
  * Stops writing started by sail_start_writing().
