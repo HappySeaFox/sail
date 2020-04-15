@@ -36,7 +36,6 @@
 
     /* libsail. */
     #include <sail/plugin_info.h>
-    #include <sail/plugin.h>
     #include <sail/string_node.h>
 #endif
 
@@ -46,6 +45,7 @@ extern "C" {
 
 struct sail_plugin_info_node;
 struct sail_plugin_info;
+struct sail_plugin;
 
 struct sail_context {
 
@@ -100,6 +100,18 @@ SAIL_EXPORT sail_error_t sail_load_plugin(struct sail_context *context, const st
  * Returns 0 on success or sail_error_t on error.
  */
 SAIL_EXPORT sail_error_t sail_unload_plugins(struct sail_context *context);
+
+/*
+ * Reads plugin read features from the specified plugin. The assigned read features MUST be destroyed
+ * later with sail_destroy_read_features().
+ */
+SAIL_EXPORT sail_error_t sail_plugin_read_features(const struct sail_plugin *plugin, struct sail_read_features **read_features);
+
+/*
+ * Reads plugin write features from the specified plugin. The assigned write features MUST be destroyed
+ * later with sail_destroy_write_features().
+ */
+SAIL_EXPORT sail_error_t sail_plugin_write_features(const struct sail_plugin *plugin, struct sail_write_features **write_features);
 
 /*
  * Loads the specified image and returns its properties. The assigned image MUST be destroyed later
