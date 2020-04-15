@@ -106,19 +106,31 @@ SAIL_EXPORT sail_error_t sail_unload_plugins(struct sail_context *context);
  * with sail_destroy_image(). The assigned plugin info MUST NOT be destroyed. It's a pointer to an internal
  * data structure. If you don't need it, just pass NULL.
  *
- * Most plugins DO NOT read the whole image data. This is why this function is pretty fast.
+ * This function is pretty fast as it doesn't decode whole image data for most image formats.
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_probe_image(const char *path, struct sail_context *context, const struct sail_plugin_info **plugin_info, struct sail_image **image);
+SAIL_EXPORT sail_error_t sail_probe_image(const char *path, struct sail_context *context,
+                                            const struct sail_plugin_info **plugin_info, struct sail_image **image);
 
 /*
  * Starts reading the specified image. The assigned plugin info MUST NOT be destroyed.
  * It's a pointer to an internal data structure. If you don't need it, just pass NULL.
  *
+ * PIMPL explanation: Pass the address of a local void* pointer. SAIL will store an internal state
+ * in it and destroy it in sail_stop_reading. For example:
+ *
+ * void *pimpl;
+ * sail_start_reading(..., &pimpl);
+ * sail_read_next_frame(pimpl, ...);
+ * sail_stop_reading(pimpl);
+ *
+ * Typical usage: sail_start_reading -> sail_read_next_frame -> sail_stop_reading
+ *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_start_reading(const char *path, struct sail_context *context, const struct sail_plugin_info **plugin_info, void **pimpl);
+SAIL_EXPORT sail_error_t sail_start_reading(const char *path, struct sail_context *context,
+                                            const struct sail_plugin_info **plugin_info, void **pimpl);
 
 /*
  * Continues reading the image started by sail_start_reading(). The assigned image MUST be destroyed later
@@ -136,11 +148,23 @@ SAIL_EXPORT sail_error_t sail_read_next_frame(void *pimpl, struct sail_image **i
 SAIL_EXPORT sail_error_t sail_stop_reading(void *pimpl);
 
 /*
- * Starts writing into the specified image file.
+ * Starts writing into the specified image file. The assigned plugin info MUST NOT be destroyed.
+ * It's a pointer to an internal data structure. If you don't need it, just pass NULL.
+ *
+ * PIMPL explanation: Pass the address of a local void* pointer. SAIL will store an internal state
+ * in it and destroy it in sail_stop_writing. For example:
+ *
+ * void *pimpl;
+ * sail_start_writing(..., &pimpl);
+ * sail_write_next_frame(pimpl, ...);
+ * sail_stop_writing(pimpl);
+ *
+ * Typical usage: sail_start_writing -> sail_write_next_frame -> sail_stop_writing
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_start_writing(const char *path, struct sail_context *context, void **pimpl);
+SAIL_EXPORT sail_error_t sail_start_writing(const char *path, struct sail_context *context,
+                                            const struct sail_plugin_info **plugin_info, void **pimpl);
 
 /*
  * Continues writing the image started by sail_start_writing().

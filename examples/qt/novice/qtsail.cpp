@@ -216,6 +216,7 @@ sail_error_t QtSail::saveImage(const QString &path, QImage *qimage)
 {
     qint64 v = QDateTime::currentMSecsSinceEpoch();
 
+    const struct sail_plugin_info *plugin_info;
     void *pimpl;
 
     struct sail_image *image = nullptr;
@@ -236,7 +237,7 @@ sail_error_t QtSail::saveImage(const QString &path, QImage *qimage)
 
     CleanUp<decltype(cleanup_func)> cleanUp(cleanup_func);
 
-    SAIL_TRY(sail_start_writing(path.toLocal8Bit(), d->context, &pimpl));
+    SAIL_TRY(sail_start_writing(path.toLocal8Bit(), d->context, &plugin_info/* or NULL */, &pimpl));
     SAIL_TRY(sail_write_next_frame(pimpl, image, qimage->bits()));
     SAIL_TRY(sail_stop_writing(pimpl));
 

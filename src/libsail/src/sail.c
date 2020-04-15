@@ -560,7 +560,7 @@ sail_error_t sail_stop_reading(void *pimpl) {
     return 0;
 }
 
-sail_error_t sail_start_writing(const char *path, struct sail_context *context, void **pimpl) {
+sail_error_t sail_start_writing(const char *path, struct sail_context *context, const struct sail_plugin_info **plugin_info, void **pimpl) {
 
     SAIL_CHECK_PTR(pimpl);
 
@@ -586,10 +586,11 @@ sail_error_t sail_start_writing(const char *path, struct sail_context *context, 
 
     *pimpl = pmpl;
 
-    const struct sail_plugin_info *plugin_info;
+    const struct sail_plugin_info *plugin_info_noop;
+    const struct sail_plugin_info **plugin_info_local = plugin_info == NULL ? &plugin_info_noop : plugin_info;
 
-    SAIL_TRY(sail_plugin_info_by_extension(context, dot + 1, &plugin_info));
-    SAIL_TRY(sail_load_plugin(context, plugin_info, &pmpl->plugin));
+    SAIL_TRY(sail_plugin_info_by_extension(context, dot + 1, plugin_info_local));
+    SAIL_TRY(sail_load_plugin(context, *plugin_info_local, &pmpl->plugin));
     SAIL_TRY(sail_alloc_file_for_writing(path, &pmpl->file));
 
     if (pmpl->plugin->layout == SAIL_PLUGIN_LAYOUT_V2) {
