@@ -62,11 +62,9 @@ elseif(CMAKE_COMPILER_IS_GNUCC)
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic")
 
+        # Enable ASAN
+        #
         set(SAIL_ASAN "-fsanitize=address,leak")
-
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${SAIL_ASAN}")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SAIL_ASAN}")
-        set(CMAKE_MODULE_EXE_FLAGS "${SAIL_ASAN}")
     endif()
 endif()
 
