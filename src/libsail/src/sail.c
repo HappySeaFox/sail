@@ -36,6 +36,7 @@
 /* sail-common */
 #include "common.h"
 #include "error.h"
+#include "file.h"
 #include "log.h"
 #include "utils.h"
 

@@ -28,6 +28,7 @@
 
 #include "common.h"
 #include "error.h"
+#include "file.h"
 #include "export.h"
 #include "log.h"
 #include "meta_entry_node.h"

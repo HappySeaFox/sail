@@ -21,83 +21,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef SAIL_WIN32
-    /* _fsopen() */
-    #include <share.h>
-#endif
-
 #include "common.h"
 #include "log.h"
 #include "meta_entry_node.h"
-
-/*
- * File functions.
- */
-
-static int sail_alloc_file_private(struct sail_file **file) {
-
-    *file = (struct sail_file *)malloc(sizeof(struct sail_file));
-
-    if (*file == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
-
-    (*file)->fptr = NULL;
-    (*file)->pimpl = NULL;
-
-    return 0;
-}
-
-int sail_alloc_file(const char *filepath, const char *mode, struct sail_file **file) {
-
-    /* Try to open the file first */
-    FILE *fptr;
-
-#ifdef SAIL_WIN32
-    fptr = _fsopen(filepath, mode, _SH_DENYWR);
-#else
-    /* Fallback to a regular fopen() */
-    fptr = fopen(filepath, mode);
-#endif
-
-    if (fptr == NULL) {
-        return SAIL_FILE_OPEN_ERROR;
-    }
-
-    SAIL_TRY(sail_alloc_file_private(file));
-
-    (*file)->fptr = fptr;
-
-    return 0;
-}
-
-sail_error_t sail_alloc_file_for_reading(const char *filepath, struct sail_file **file) {
-
-    SAIL_TRY(sail_alloc_file(filepath, "rb", file));
-
-    return 0;
-}
-
-sail_error_t sail_alloc_file_for_writing(const char *filepath, struct sail_file **file) {
-
-    SAIL_TRY(sail_alloc_file(filepath, "wb", file));
-
-    return 0;
-}
-
-void sail_destroy_file(struct sail_file *file) {
-
-    if (file == NULL) {
-        return;
-    }
-
-    if (file->fptr != NULL) {
-        fclose(file->fptr);
-    }
-
-    free(file->pimpl);
-    free(file);
-}
 
 /*
  * Image functions.
