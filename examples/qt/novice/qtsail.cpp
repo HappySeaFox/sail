@@ -127,7 +127,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     qint64 v = QDateTime::currentMSecsSinceEpoch();
 
     const struct sail_plugin_info *plugin_info;
-    void *pimpl;
+    void *pimpl = nullptr;
 
     struct sail_image *image = nullptr;
     uchar *image_bits = nullptr;
@@ -137,8 +137,8 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 
         free(image_bits);
 
+        sail_stop_reading(pimpl);
         sail_destroy_image(image);
-        image = nullptr;
     };
 
     CleanUp<decltype(cleanup_func)> cleanUp(cleanup_func);
@@ -146,6 +146,8 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     SAIL_TRY(sail_start_reading(path.toLocal8Bit(), d->context, &plugin_info/* or NULL */, &pimpl));
     SAIL_TRY(sail_read_next_frame(pimpl, &image, (void **)&image_bits));
     SAIL_TRY(sail_stop_reading(pimpl));
+
+    pimpl = nullptr;
 
     SAIL_LOG_INFO("Loaded in %lld ms.", QDateTime::currentMSecsSinceEpoch() - v);
 
@@ -193,13 +195,14 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
     qint64 v = QDateTime::currentMSecsSinceEpoch();
 
     const struct sail_plugin_info *plugin_info;
-    void *pimpl;
+    void *pimpl = nullptr;
 
     struct sail_image *image = nullptr;
 
     auto cleanup_func = [&] {
         SAIL_LOG_DEBUG("Read clean up");
 
+        sail_stop_writing(pimpl);
         sail_destroy_image(image);
         image = nullptr;
     };
@@ -216,6 +219,8 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
     SAIL_TRY(sail_start_writing(path.toLocal8Bit(), d->context, &plugin_info/* or NULL */, &pimpl));
     SAIL_TRY(sail_write_next_frame(pimpl, image, qimage.bits()));
     SAIL_TRY(sail_stop_writing(pimpl));
+
+    pimpl = nullptr;
 
     SAIL_LOG_INFO("Saved in %lld ms.", QDateTime::currentMSecsSinceEpoch() - v);
 
