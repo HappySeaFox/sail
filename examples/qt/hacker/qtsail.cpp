@@ -79,6 +79,7 @@ QtSail::QtSail(QWidget *parent)
 {
     d->ui.reset(new Ui::QtSail);
     d->ui->setupUi(this);
+
     QLabel *l = new QLabel;
     l->setAlignment(Qt::AlignCenter);
     d->ui->scrollArea->setWidget(l);
@@ -86,7 +87,7 @@ QtSail::QtSail(QWidget *parent)
     connect(d->ui->pushOpen,     &QPushButton::clicked, this, &QtSail::onOpenFile);
     connect(d->ui->pushOpenDir,  &QPushButton::clicked, this, &QtSail::onOpenDir);
     connect(d->ui->pushProbe,    &QPushButton::clicked, this, &QtSail::onProbe);
-    connect(d->ui->pushSave   ,  &QPushButton::clicked, this, &QtSail::onSave);
+    connect(d->ui->pushSave,     &QPushButton::clicked, this, &QtSail::onSave);
     connect(d->ui->pushPrevious, &QPushButton::clicked, this, &QtSail::onPrevious);
     connect(d->ui->pushNext,     &QPushButton::clicked, this, &QtSail::onNext);
     connect(d->ui->pushFirst,    &QPushButton::clicked, this, &QtSail::onFirst);
@@ -135,16 +136,18 @@ QtSail::~QtSail()
 
 sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 {
-    const struct sail_plugin_info *plugin_info;
+    // Time counter.
+    //
+    const qint64 startTime = QDateTime::currentMSecsSinceEpoch();
 
+    // Find the codec info by a file extension.
+    //
+    const struct sail_plugin_info *plugin_info;
     SAIL_TRY(sail_plugin_info_by_extension(d->context, QFileInfo(path).suffix().toLocal8Bit(), &plugin_info));
 
-    // Load the specified codec
+    // Load the found codec.
     //
-    qint64 v = QDateTime::currentMSecsSinceEpoch();
-
     const struct sail_plugin *plugin;
-
     SAIL_TRY(sail_load_plugin(d->context, plugin_info, &plugin));
     pluginInfo(plugin_info);
 
@@ -171,26 +174,33 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 
     CleanUp<decltype(cleanup_func)> cleanUp(cleanup_func);
 
-    // Read the image file
-    //
-
     if (plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
         return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
     }
 
-    SAIL_TRY(plugin->v2->read_features_v2(&read_features));
+    // Create a new I/O file object.
+    //
     SAIL_TRY(sail_alloc_file_for_reading(path.toLocal8Bit(), &file));
 
+    // Determine the read features of the plugin: what the plugin can actually read?
+    //
+    SAIL_TRY(plugin->v2->read_features_v2(&read_features));
+
     // Allocate new read options and copy defaults from the read features
-    // (preferred output pixel format etc.)
+    // (preferred output pixel format etc.).
     //
     SAIL_TRY(sail_alloc_read_options_from_features(read_features, &read_options));
 
-    // Force RGB888
+    // Force RGB888 output format.
     //
     read_options->pixel_format = SAIL_PIXEL_FORMAT_RGB;
 
+    // Initialize reading with our options.
+    //
     SAIL_TRY(plugin->v2->read_init_v2(file, read_options));
+
+    // Seek to the next image frame in the file.
+    //
     SAIL_TRY(plugin->v2->read_seek_next_frame_v2(file, &image));
 
     // Allocate image bits.
@@ -214,7 +224,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
         }
     }
 
-    SAIL_LOG_INFO("Loaded in %lld ms.", QDateTime::currentMSecsSinceEpoch() - v);
+    SAIL_LOG_INFO("Loaded in %lld ms.", QDateTime::currentMSecsSinceEpoch() - startTime);
 
     *qimage = QImage(image_bits, image->width, image->height, bytes_per_line, qimage_format).copy();
 
@@ -239,16 +249,14 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 
 sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
 {
-    const struct sail_plugin_info *plugin_info;
+    // Time counter.
+    //
+    const qint64 startTime = QDateTime::currentMSecsSinceEpoch();
 
+    const struct sail_plugin_info *plugin_info;
     SAIL_TRY(sail_plugin_info_by_extension(d->context, QFileInfo(path).suffix().toLocal8Bit(), &plugin_info));
 
-    // Load the specified codec
-    //
-    qint64 v = QDateTime::currentMSecsSinceEpoch();
-
     const struct sail_plugin *plugin;
-
     SAIL_TRY(sail_load_plugin(d->context, plugin_info, &plugin));
     pluginInfo(plugin_info);
 
@@ -270,13 +278,12 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
 
     CleanUp<decltype(cleanup_func)> cleanUp(cleanup_func);
 
-    // Write the image file.
-    //
-
     if (plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
         return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
     }
 
+    // Create a new I/O file object.
+    //
     SAIL_TRY(sail_alloc_file_for_writing(path.toLocal8Bit(), &file));
 
     // Determine the write features of the plugin: what the plugin can actually write?
@@ -284,11 +291,11 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
     SAIL_TRY(plugin->v2->write_features_v2(&write_features));
 
     // Allocate new write options and copy defaults from the write features
-    // (preferred output pixel format etc.)
+    // (preferred output pixel format etc.).
     //
     SAIL_TRY(sail_alloc_write_options_from_features(write_features, &write_options));
 
-    // Ask a user to provide his/her preferred output options
+    // Ask the user to provide his/her preferred output options.
     //
     WriteOptions writeOptions(QString::fromUtf8(plugin_info->description), write_features, this);
 
@@ -297,17 +304,23 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
         write_options->compression = writeOptions.compression();
     }
 
+    // Initialize writing with our options.
+    //
     SAIL_TRY(plugin->v2->write_init_v2(file, write_options));
 
+    // Create a new image to be passed into the SAIL writing functions.
+    //
     SAIL_TRY(sail_alloc_image(&image));
 
     image->width = qimage.width();
     image->height = qimage.height();
     image->pixel_format = SAIL_PIXEL_FORMAT_RGB;
-    image->passes = 1;
 
+    const int passes = 1;
     const int bytes_per_line = sail_bytes_per_line(image->width, image->pixel_format);
 
+    // Save some meta info...
+    //
     struct sail_meta_entry_node *meta_entry_node;
 
     SAIL_TRY(sail_alloc_meta_entry_node(&meta_entry_node));
@@ -319,11 +332,13 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
     SAIL_LOG_DEBUG("Image size: %dx%d", image->width, image->height);
     SAIL_LOG_DEBUG("Output pixel format: %s", sail_pixel_format_to_string(write_options->pixel_format));
 
+    // Seek to the next image frame in the file.
+    //
     SAIL_TRY(plugin->v2->write_seek_next_frame_v2(file, image));
 
     // Actual write. Pass by pass, line by line.
     //
-    for (int pass = 0; pass < image->passes; pass++) {
+    for (int pass = 0; pass < passes; pass++) {
         SAIL_TRY(plugin->v2->write_seek_next_pass_v2(file, image));
 
         for (int j = 0; j < image->height; j++) {
@@ -331,7 +346,7 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
         }
     }
 
-    SAIL_LOG_INFO("Saved in %lld ms.", QDateTime::currentMSecsSinceEpoch() - v);
+    SAIL_LOG_INFO("Saved in %lld ms.", QDateTime::currentMSecsSinceEpoch() - startTime);
 
     return 0;
 }
