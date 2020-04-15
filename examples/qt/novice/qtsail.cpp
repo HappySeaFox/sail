@@ -79,10 +79,10 @@ QtSail::QtSail(QWidget *parent)
     l->setAlignment(Qt::AlignCenter);
     d->ui->scrollArea->setWidget(l);
 
-    connect(d->ui->pushOpen,     &QPushButton::clicked, this, &QtSail::onOpenFile);
-    connect(d->ui->pushProbe,    &QPushButton::clicked, this, &QtSail::onProbe);
-    connect(d->ui->pushSave   ,  &QPushButton::clicked, this, &QtSail::onSave);
-    connect(d->ui->checkFit,     &QCheckBox::toggled,   this, &QtSail::onFit);
+    connect(d->ui->pushOpen,  &QPushButton::clicked, this, &QtSail::onOpenFile);
+    connect(d->ui->pushProbe, &QPushButton::clicked, this, &QtSail::onProbe);
+    connect(d->ui->pushSave,  &QPushButton::clicked, this, &QtSail::onSave);
+    connect(d->ui->checkFit,  &QCheckBox::toggled,   this, &QtSail::onFit);
 
     d->ui->pushOpen->setShortcut(QKeySequence::Open);
     d->ui->pushOpen->setToolTip(d->ui->pushOpen->shortcut().toString());
@@ -157,20 +157,12 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
                      image->bytes_per_line,
                      sailPixelFormatToQImageFormat(image->pixel_format)).copy();
 
-    QString meta;
-    struct sail_meta_entry_node *node = image->meta_entry_node;
-
-    if (node != nullptr) {
-        meta = tr("%1: %2").arg(node->key).arg(node->value);
-    }
-
-    d->ui->labelStatus->setText(tr("%1  [%2x%3]  [%4 -> %5]  %6")
+    d->ui->labelStatus->setText(tr("%1  [%2x%3]  [%4 -> %5]")
                                 .arg(QFileInfo(path).fileName())
                                 .arg(image->width)
                                 .arg(image->height)
                                 .arg(sail_pixel_format_to_string(image->source_pixel_format))
                                 .arg(sail_pixel_format_to_string(image->pixel_format))
-                                .arg(meta)
                                 );
 
     return 0;
@@ -211,7 +203,6 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
     image->width = qimage.width();
     image->height = qimage.height();
     image->pixel_format = qImageFormatToSailPixelFormat(qimage.format());
-    image->passes = 1;
 
     CleanUp<decltype(cleanup_func)> cleanUp(cleanup_func);
 
