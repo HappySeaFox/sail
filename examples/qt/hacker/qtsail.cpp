@@ -191,7 +191,15 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     //
     SAIL_TRY(sail_read_next_frame(pimpl, &image, (void **)&image_bits));
 
-    // Allocate image bits.
+    // Finish reading.
+    //
+    SAIL_TRY(sail_stop_reading(pimpl));
+
+    // Reset the pointer so the cleanup function will not double-free it.
+    //
+    pimpl = nullptr;
+
+    // Convert to QImage.
     //
     const QImage::Format qimage_format = QImage::Format_RGB888;
 
@@ -283,20 +291,30 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
 
     // Save some meta info...
     //
-    struct sail_meta_entry_node *meta_entry_node;
+    if (write_options->io_options & SAIL_IO_OPTION_META_INFO) {
+        struct sail_meta_entry_node *meta_entry_node;
 
-    SAIL_TRY(sail_alloc_meta_entry_node(&meta_entry_node));
-    SAIL_TRY(sail_strdup("Comment", &meta_entry_node->key));
-    SAIL_TRY(sail_strdup("JPEG KOOL COMMENT", &meta_entry_node->value));
+        SAIL_TRY(sail_alloc_meta_entry_node(&meta_entry_node));
+        SAIL_TRY(sail_strdup("Comment", &meta_entry_node->key));
+        SAIL_TRY(sail_strdup("SAIL demo comment", &meta_entry_node->value));
 
-    image->meta_entry_node = meta_entry_node;
+        image->meta_entry_node = meta_entry_node;
+    }
 
     SAIL_LOG_DEBUG("Image size: %dx%d", image->width, image->height);
     SAIL_LOG_DEBUG("Output pixel format: %s", sail_pixel_format_to_string(write_options->pixel_format));
 
-    // Seek to the next image frame in the file.
+    // Seek and write the next image frame into the file.
     //
     SAIL_TRY(sail_write_next_frame(pimpl, image, qimage.bits()));
+
+    // Finish writing.
+    //
+    SAIL_TRY(sail_stop_writing(pimpl));
+
+    // Reset the pointer so the cleanup function will not double-free it.
+    //
+    pimpl = nullptr;
 
     SAIL_LOG_INFO("Saved in %lld ms.", QDateTime::currentMSecsSinceEpoch() - startTime);
 
