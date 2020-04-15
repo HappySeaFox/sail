@@ -288,7 +288,7 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
     //
     SAIL_TRY(sail_alloc_write_options_from_features(write_features, &write_options));
 
-    // Ask a user to provide his/her preferred outpit options
+    // Ask a user to provide his/her preferred output options
     //
     WriteOptions writeOptions(QString::fromUtf8(plugin_info->description), write_features, this);
 
