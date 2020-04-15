@@ -21,6 +21,7 @@
 
 #include <limits.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 #ifdef SAIL_BUILD
     #include "error.h"
