@@ -36,6 +36,7 @@
 //#include <sail/layouts/v2.h>
 
 #include "qtsail.h"
+#include "writeoptions.h"
 #include "ui_qtsail.h"
 
 // PIMPL
@@ -290,16 +291,25 @@ sail_error_t QtSail::saveImage(const QString &path, QImage *qimage)
         return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
     }
 
+    SAIL_TRY(sail_alloc_file_for_writing(path.toLocal8Bit(), &file));
+
     // Determine the write features of the plugin: what the plugin can actually write?
     //
     SAIL_TRY(plugin->v2->write_features_v2(&write_features));
-
-    SAIL_TRY(sail_alloc_file_for_writing(path.toLocal8Bit(), &file));
 
     // Allocate new write options and copy defaults from the write features
     // (preferred output pixel format etc.)
     //
     SAIL_TRY(sail_alloc_write_options_from_features(write_features, &write_options));
+
+    // Ask a user to provide his/her preferred outpit options
+    //
+    WriteOptions writeOptions(QString::fromUtf8(plugin_info->description), write_features, this);
+
+    if (writeOptions.exec() == QDialog::Accepted) {
+        write_options->pixel_format = writeOptions.pixelFormat();
+        write_options->compression = writeOptions.compression();
+    }
 
     SAIL_TRY(plugin->v2->write_init_v2(file, write_options));
 
@@ -504,7 +514,12 @@ void QtSail::onSave()
 
     if (QMessageBox::question(this, tr("Open file"), tr("%1 has been saved succesfully. Open the saved file?")
                               .arg(QDir::toNativeSeparators(path))) == QMessageBox::Yes) {
-        if (!loadImage(path, &d->qimage)) {
+        if ((res = loadImage(path, &d->qimage)) == 0) {
+            onFit(d->ui->checkFit->isChecked());
+        } else {
+            QMessageBox::critical(this, tr("Error"), tr("Failed to load '%1'. Error: %2.")
+                                  .arg(path)
+                                  .arg(res));
             return;
         }
     }

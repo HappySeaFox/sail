@@ -11,9 +11,12 @@ QT += widgets
 
 PKGCONFIG += libsail libsail-common
 
-HEADERS += qtsail.h
-SOURCES += main.cpp qtsail.cpp
-FORMS   += qtsail.ui
+HEADERS += qtsail.h \
+    writeoptions.h
+SOURCES += main.cpp qtsail.cpp \
+    writeoptions.cpp
+FORMS   += qtsail.ui \
+    writeoptions.ui
 
 win32 {
     RC_FILE = qtsail.rc
