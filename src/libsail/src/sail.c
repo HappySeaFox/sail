@@ -689,13 +689,28 @@ sail_error_t sail_write_next_frame(void *pimpl, const struct sail_image *image, 
 
     struct sail_file *file = pmpl->file;
     const struct sail_plugin *plugin = pmpl->plugin;
+    int passes;
+
+    /* Detect the number of passes needed to write an interlaced image. */
+    if (image->properties & SAIL_IMAGE_PROPERTY_INTERLACED) {
+        struct sail_write_features *write_features;
+        SAIL_TRY(sail_plugin_write_features(plugin, &write_features));
+        passes = write_features->passes;
+        sail_destroy_write_features(write_features);
+
+        if (passes < 1) {
+            return SAIL_INTERLACED_UNSUPPORTED;
+        }
+    } else {
+        passes = 1;
+    }
 
     const int bytes_per_line = sail_bytes_per_line(image->width, image->pixel_format);
 
     if (plugin->layout == SAIL_PLUGIN_LAYOUT_V2) {
         SAIL_TRY(plugin->v2->write_seek_next_frame_v2(file, image));
 
-        for (int pass = 0; pass < image->passes; pass++) {
+        for (int pass = 0; pass < passes; pass++) {
             SAIL_TRY(plugin->v2->write_seek_next_pass_v2(file, image));
 
             for (int j = 0; j < image->height; j++) {

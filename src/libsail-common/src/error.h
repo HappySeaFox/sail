@@ -55,6 +55,7 @@ typedef int sail_error_t;
 #define SAIL_UNSUPPORTED_COMPRESSION_TYPE 42
 #define SAIL_UNDERLYING_CODEC_ERROR       43
 #define SAIL_NO_MORE_FRAMES               44
+#define SAIL_INTERLACED_UNSUPPORTED       45
 
 /*
  * Plugins-specific errors.
