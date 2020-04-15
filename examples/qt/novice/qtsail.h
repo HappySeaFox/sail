@@ -44,18 +44,12 @@ private:
     sail_error_t init();
     sail_error_t loadImage(const QString &path, QImage *qimage);
     sail_error_t saveImage(const QString &path, QImage *qimage);
-    void loadFileFromDir();
     QStringList filters() const;
 
 private: // slots
     void onOpenFile();
-    void onOpenDir();
     void onProbe();
     void onSave();
-    void onPrevious();
-    void onNext();
-    void onFirst();
-    void onLast();
     void onFit(bool fit);
 
 private:

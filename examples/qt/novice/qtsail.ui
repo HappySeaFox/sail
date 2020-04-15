@@ -24,13 +24,6 @@
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="pushOpenDir">
-       <property name="text">
-        <string>Open directory...</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QToolButton" name="pushProbe">
        <property name="text">
         <string>Probe file...</string>
@@ -41,34 +34,6 @@
       <widget class="QToolButton" name="pushSave">
        <property name="text">
         <string>Save image...</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="pushFirst">
-       <property name="text">
-        <string>First</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="pushPrevious">
-       <property name="text">
-        <string>Previous</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="pushNext">
-       <property name="text">
-        <string>Next</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="pushLast">
-       <property name="text">
-        <string>Last</string>
        </property>
       </widget>
      </item>
@@ -94,19 +59,6 @@
         </size>
        </property>
       </spacer>
-     </item>
-     <item>
-      <widget class="QLabel" name="labelCounter">
-       <property name="font">
-        <font>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>0/0</string>
-       </property>
-      </widget>
      </item>
     </layout>
    </item>
@@ -151,13 +103,8 @@
  <tabstops>
   <tabstop>scrollArea</tabstop>
   <tabstop>pushOpen</tabstop>
-  <tabstop>pushOpenDir</tabstop>
   <tabstop>pushProbe</tabstop>
   <tabstop>pushSave</tabstop>
-  <tabstop>pushFirst</tabstop>
-  <tabstop>pushPrevious</tabstop>
-  <tabstop>pushNext</tabstop>
-  <tabstop>pushLast</tabstop>
   <tabstop>checkFit</tabstop>
  </tabstops>
  <resources/>
