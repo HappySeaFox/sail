@@ -36,7 +36,7 @@
 #include "plugin.h"
 #include "sail.h"
 
-static sail_error_t convert(const char *input, const char *output, struct sail_context *context) {
+static sail_error_t convert(const char *input, const char *output, struct sail_context *context, int compression) {
 
     SAIL_CHECK_PATH_PTR(input);
     SAIL_CHECK_PATH_PTR(output);
@@ -77,6 +77,10 @@ static sail_error_t convert(const char *input, const char *output, struct sail_c
 
     struct sail_write_options *write_options;
     SAIL_TRY(sail_alloc_write_options_from_features(write_features, &write_options));
+
+    /* Apply our tuning. */
+    SAIL_LOG_INFO("Compression: %d%s", compression, compression == -1 ? " (default)" : "");
+    write_options->compression = compression;
 
     SAIL_TRY(sail_start_writing_with_plugin(output, context, plugin, write_options/* or NULL */, &pimpl));
 
@@ -124,11 +128,33 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+    /* -1: default compression will be selected. */
+    int compression = -1;
+
+    /* Start parsing CLI options from the third argument. */
+    int i = 3;
+
+    while (i < argc) {
+        if (strcmp(argv[i], "-c") == 0 || strcmp(argv[i], "--compression") == 0) {
+            if (i == argc-1) {
+                fprintf(stderr, "Error: Missing compression value.\n");
+                return 1;
+            }
+
+            compression = atoi(argv[i+1]);
+            i += 2;
+            continue;
+        }
+
+        fprintf(stderr, "Error: Unrecognized option '%s'.\n", argv[i]);
+        return 1;
+    }
+
     struct sail_context *context;
 
     SAIL_TRY(sail_init(&context));
 
-    SAIL_TRY(convert(argv[1], argv[2], context));
+    SAIL_TRY(convert(argv[1], argv[2], context, compression));
 
     sail_finish(context);
 
