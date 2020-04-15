@@ -572,8 +572,8 @@ sail_error_t sail_read_next_frame(void *pimpl, struct sail_image **image, void *
 
 sail_error_t sail_stop_reading(void *pimpl) {
 
-    /* No an error. */
-    if(pimpl == NULL) {
+    /* Not an error. */
+    if (pimpl == NULL) {
         return 0;
     }
 
@@ -711,8 +711,8 @@ sail_error_t sail_write_next_frame(void *pimpl, const struct sail_image *image, 
 
 sail_error_t sail_stop_writing(void *pimpl) {
 
-    /* No an error. */
-    if(pimpl == NULL) {
+    /* Not an error. */
+    if (pimpl == NULL) {
         return 0;
     }
 
