@@ -204,7 +204,6 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
 
         sail_stop_writing(pimpl);
         sail_destroy_image(image);
-        image = nullptr;
     };
 
     SAIL_TRY(sail_alloc_image(&image));

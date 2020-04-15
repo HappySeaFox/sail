@@ -164,16 +164,9 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
         }
 
         sail_destroy_read_features(read_features);
-        read_features = nullptr;
-
         sail_destroy_read_options(read_options);
-        read_options = nullptr;
-
         sail_destroy_image(image);
-        image = nullptr;
-
         sail_destroy_file(file);
-        file = nullptr;
     };
 
     CleanUp<decltype(cleanup_func)> cleanUp(cleanup_func);
@@ -270,16 +263,9 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
         plugin->v2->write_finish_v2(file);
 
         sail_destroy_write_features(write_features);
-        write_features = nullptr;
-
         sail_destroy_write_options(write_options);
-        write_options = nullptr;
-
         sail_destroy_image(image);
-        image = NULL;
-
         sail_destroy_file(file);
-        file = NULL;
     };
 
     CleanUp<decltype(cleanup_func)> cleanUp(cleanup_func);
