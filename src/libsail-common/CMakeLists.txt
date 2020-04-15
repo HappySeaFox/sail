@@ -35,14 +35,7 @@ if (SAIL_COLORED_OUTPUT)
 endif()
 target_include_directories(sail-common PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-# pkg-config integration
-#
-get_target_property(VERSION sail-common VERSION)
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/pkgconfig/libsail-common.pc.in"
-                "${CMAKE_CURRENT_BINARY_DIR}/libsail-common.pc" @ONLY)
-
 # Installation
 #
 install(TARGETS sail-common LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
         PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/sail")
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/libsail-common.pc" DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")

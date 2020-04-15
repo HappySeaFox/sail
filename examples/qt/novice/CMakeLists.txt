@@ -41,12 +41,6 @@ endif()
 # Add SAIL dependency
 #
 pkg_check_modules(SAIL IMPORTED_TARGET REQUIRED libsail)
-pkg_check_modules(SAIL_COMMON IMPORTED_TARGET REQUIRED libsail-common)
-
-target_compile_options(qt-sail-demo-novice     PRIVATE "${SAIL_COMMON_CFLAGS}")
-target_include_directories(qt-sail-demo-novice PRIVATE "${SAIL_COMMON_INCLUDE_DIRS}")
-target_link_libraries(qt-sail-demo-novice      PkgConfig::SAIL_COMMON)
-
 target_compile_options(qt-sail-demo-novice     PRIVATE "${SAIL_CFLAGS}")
 target_include_directories(qt-sail-demo-novice PRIVATE "${SAIL_INCLUDE_DIRS}")
 target_link_libraries(qt-sail-demo-novice      PkgConfig::SAIL)
