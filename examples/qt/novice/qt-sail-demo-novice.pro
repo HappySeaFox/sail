@@ -28,7 +28,7 @@ win32 {
 # Enable address sanitizer (requires GCC >= 4.8)
 #
 *-g++ {
-    OPT=-fsanitize=address,leak,undefined,shift,shift-exponent,shift-base,integer-divide-by-zero,unreachable,vla-bound,null,signed-integer-overflow,bounds-strict,alignment,object-size,float-divide-by-zero,float-cast-overflow,nonnull-attribute,returns-nonnull-attribute,bool,enum,vptr
+    OPT=-fsanitize=address,leak
     QMAKE_CXX_FLAGS += $$OPT
     QMAKE_LFLAGS += $$OPT
 
