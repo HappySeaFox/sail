@@ -121,9 +121,11 @@ SAIL_EXPORT sail_error_t sail_probe_image(const char *path, struct sail_context 
  * in it and destroy it in sail_stop_reading. For example:
  *
  * void *pimpl;
- * sail_start_reading(..., &pimpl);
- * sail_read_next_frame(pimpl, ...);
- * sail_stop_reading(pimpl);
+ * SAIL_TRY_OR_CLEANUP(sail_start_reading(..., &pimpl),
+ *                     sail_stop_reading(pimpl));
+ * SAIL_TRY_OR_CLEANUP(sail_read_next_frame(pimpl, ...),
+ *                     sail_stop_reading(pimpl));
+ * SAIL_TRY(sail_stop_reading(pimpl));
  *
  * Typical usage: sail_start_reading -> sail_read_next_frame -> sail_stop_reading
  *
@@ -155,9 +157,11 @@ SAIL_EXPORT sail_error_t sail_stop_reading(void *pimpl);
  * in it and destroy it in sail_stop_writing. For example:
  *
  * void *pimpl;
- * sail_start_writing(..., &pimpl);
- * sail_write_next_frame(pimpl, ...);
- * sail_stop_writing(pimpl);
+ * SAIL_TRY_OR_CLEANUP(sail_start_writing(..., &pimpl),
+ *                     sail_stop_writing(pimpl));
+ * SAIL_TRY_OR_CLEANUP(sail_write_next_frame(pimpl, ...),
+ *                     sail_stop_writing(pimpl));
+ * SAIL_TRY(sail_stop_writing(pimpl));
  *
  * Typical usage: sail_start_writing -> sail_write_next_frame -> sail_stop_writing
  *
