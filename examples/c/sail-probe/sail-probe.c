@@ -112,12 +112,29 @@ static sail_error_t probe(const char *path, struct sail_context *context) {
     return 0;
 }
 
+static void help(char *app) {
+
+    fprintf(stderr, "sail-probe: Quickly retrieve image info.\n\n");
+    fprintf(stderr, "Usage: %s <PATH TO IMAGE>\n", app);
+    fprintf(stderr, "       %s [-v | --version]\n", app);
+    fprintf(stderr, "       %s [-h | --help]\n", app);
+}
+
 int main(int argc, char *argv[]) {
 
     if (argc != 2) {
-        fprintf(stderr, "sail-probe: Quickly retrieve image info.\n\n");
-        fprintf(stderr, "Usage: %s <PATH TO IMAGE>\n", argv[0]);
+        help(argv[0]);
         return 1;
+    }
+
+    if (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0) {
+        help(argv[0]);
+        return 0;
+    }
+
+    if (strcmp(argv[1], "-v") == 0 || strcmp(argv[1], "--version") == 0) {
+        fprintf(stderr, "sail-probe 1.0\n");
+        return 0;
     }
 
     struct sail_context *context;
