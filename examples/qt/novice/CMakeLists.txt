@@ -34,17 +34,22 @@ add_executable(qt-sail-demo-novice
 # Enable ASAN
 #
 if (SAIL_ASAN)
-    target_compile_options(qt-sail-demo-novice PRIVATE "${SAIL_ASAN}")
-    target_link_libraries(qt-sail-demo-novice PRIVATE "${SAIL_ASAN}")
+    target_compile_options(qt-sail-demo-novice "${SAIL_ASAN}")
+    target_link_libraries(qt-sail-demo-novice "${SAIL_ASAN}")
 endif()
 
 # Add SAIL dependency
 #
-pkg_check_modules(SAIL REQUIRED libsail)
-pkg_check_modules(SAIL_COMMON REQUIRED libsail-common)
+pkg_check_modules(SAIL IMPORTED_TARGET REQUIRED libsail)
+pkg_check_modules(SAIL_COMMON IMPORTED_TARGET REQUIRED libsail-common)
 
-target_link_libraries(qt-sail-demo-novice "${SAIL_COMMON_LIBRARIES}")
-target_link_libraries(qt-sail-demo-novice "${SAIL_LIBRARIES}")
+target_compile_options(qt-sail-demo-novice     PRIVATE "${SAIL_COMMON_CFLAGS}")
+target_include_directories(qt-sail-demo-novice PRIVATE "${SAIL_COMMON_INCLUDE_DIRS}")
+target_link_libraries(qt-sail-demo-novice      PkgConfig::SAIL_COMMON)
+
+target_compile_options(qt-sail-demo-novice     PRIVATE "${SAIL_CFLAGS}")
+target_include_directories(qt-sail-demo-novice PRIVATE "${SAIL_INCLUDE_DIRS}")
+target_link_libraries(qt-sail-demo-novice      PkgConfig::SAIL)
 
 # Add Qt5 dependency
 #
