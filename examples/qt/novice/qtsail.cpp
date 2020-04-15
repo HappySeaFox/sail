@@ -188,7 +188,7 @@ static int qImageFormatToSailPixelFormat(QImage::Format format) {
     }
 }
 
-sail_error_t QtSail::saveImage(const QString &path, QImage *qimage)
+sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
 {
     qint64 v = QDateTime::currentMSecsSinceEpoch();
 
@@ -206,15 +206,15 @@ sail_error_t QtSail::saveImage(const QString &path, QImage *qimage)
 
     SAIL_TRY(sail_alloc_image(&image));
 
-    image->width = qimage->width();
-    image->height = qimage->height();
-    image->pixel_format = qImageFormatToSailPixelFormat(qimage->format());
+    image->width = qimage.width();
+    image->height = qimage.height();
+    image->pixel_format = qImageFormatToSailPixelFormat(qimage.format());
     image->passes = 1;
 
     CleanUp<decltype(cleanup_func)> cleanUp(cleanup_func);
 
     SAIL_TRY(sail_start_writing(path.toLocal8Bit(), d->context, &plugin_info/* or NULL */, &pimpl));
-    SAIL_TRY(sail_write_next_frame(pimpl, image, qimage->bits()));
+    SAIL_TRY(sail_write_next_frame(pimpl, image, qimage.bits()));
     SAIL_TRY(sail_stop_writing(pimpl));
 
     SAIL_LOG_INFO("Saved in %lld ms.", QDateTime::currentMSecsSinceEpoch() - v);
@@ -258,7 +258,7 @@ void QtSail::onOpenFile()
         return;
     }
 
-    int res;
+    sail_error_t res;
 
     if ((res = loadImage(path, &d->qimage)) == 0) {
         onFit(d->ui->checkFit->isChecked());
@@ -283,7 +283,7 @@ void QtSail::onProbe()
     // Probe
     sail_image *image;
     const struct sail_plugin_info *plugin_info;
-    int res;
+    sail_error_t res;
 
     if ((res = sail_probe_image(path.toLocal8Bit(), d->context, &plugin_info, &image)) != 0) {
         QMessageBox::critical(this, tr("Error"), tr("Failed to probe the image. Error: %1").arg(res));
@@ -315,11 +315,9 @@ void QtSail::onSave()
         return;
     }
 
-    int res;
+    sail_error_t res;
 
-    if ((res = saveImage(path, &d->qimage)) == 0) {
-        onFit(d->ui->checkFit->isChecked());
-    } else {
+    if ((res = saveImage(path, d->qimage)) != 0) {
         QMessageBox::critical(this, tr("Error"), tr("Failed to save '%1'. Error: %2.")
                               .arg(path)
                               .arg(res));
@@ -328,7 +326,12 @@ void QtSail::onSave()
 
     if (QMessageBox::question(this, tr("Open file"), tr("%1 has been saved succesfully. Open the saved file?")
                               .arg(QDir::toNativeSeparators(path))) == QMessageBox::Yes) {
-        if (!loadImage(path, &d->qimage)) {
+        if ((res = loadImage(path, &d->qimage)) == 0) {
+            onFit(d->ui->checkFit->isChecked());
+        } else {
+            QMessageBox::critical(this, tr("Error"), tr("Failed to load '%1'. Error: %2.")
+                                  .arg(path)
+                                  .arg(res));
             return;
         }
     }

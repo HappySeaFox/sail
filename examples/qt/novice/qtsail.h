@@ -43,7 +43,7 @@ public:
 private:
     sail_error_t init();
     sail_error_t loadImage(const QString &path, QImage *qimage);
-    sail_error_t saveImage(const QString &path, QImage *qimage);
+    sail_error_t saveImage(const QString &path, const QImage &qimage);
     QStringList filters() const;
 
 private: // slots

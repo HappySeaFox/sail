@@ -244,7 +244,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     return 0;
 }
 
-sail_error_t QtSail::saveImage(const QString &path, QImage *qimage)
+sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
 {
     const struct sail_plugin_info *plugin_info;
 
@@ -315,8 +315,8 @@ sail_error_t QtSail::saveImage(const QString &path, QImage *qimage)
 
     SAIL_TRY(sail_alloc_image(&image));
 
-    image->width = qimage->width();
-    image->height = qimage->height();
+    image->width = qimage.width();
+    image->height = qimage.height();
     image->pixel_format = SAIL_PIXEL_FORMAT_RGB;
     image->passes = 1;
 
@@ -341,7 +341,7 @@ sail_error_t QtSail::saveImage(const QString &path, QImage *qimage)
         SAIL_TRY(plugin->v2->write_seek_next_pass_v2(file, image));
 
         for (int j = 0; j < image->height; j++) {
-            SAIL_TRY(plugin->v2->write_scan_line_v2(file, image, qimage->bits() + j * bytes_per_line));
+            SAIL_TRY(plugin->v2->write_scan_line_v2(file, image, qimage.bits() + j * bytes_per_line));
         }
     }
 
@@ -425,7 +425,7 @@ void QtSail::onOpenFile()
 
     d->files.clear();
 
-    int res;
+    sail_error_t res;
 
     if ((res = loadImage(path, &d->qimage)) == 0) {
         onFit(d->ui->checkFit->isChecked());
@@ -466,7 +466,7 @@ void QtSail::onProbe()
     // Probe
     sail_image *image;
     const struct sail_plugin_info *plugin_info;
-    int res;
+    sail_error_t res;
 
     if ((res = sail_probe_image(path.toLocal8Bit(), d->context, &plugin_info, &image)) != 0) {
         QMessageBox::critical(this, tr("Error"), tr("Failed to probe the image. Error: %1").arg(res));
@@ -500,12 +500,9 @@ void QtSail::onSave()
         return;
     }
 
-    int res;
+    sail_error_t res;
 
-    if ((res = saveImage(path, &d->qimage)) == 0) {
-        onFit(d->ui->checkFit->isChecked());
-        d->ui->labelCounter->setText(QStringLiteral("1/1"));
-    } else {
+    if ((res = saveImage(path, d->qimage)) != 0) {
         QMessageBox::critical(this, tr("Error"), tr("Failed to save '%1'. Error: %2.")
                               .arg(path)
                               .arg(res));
