@@ -124,7 +124,7 @@ static QImage::Format sailPixelFormatToQImageFormat(int pixel_format) {
 
 sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 {
-    qint64 v = QDateTime::currentMSecsSinceEpoch();
+    qint64 startTime = QDateTime::currentMSecsSinceEpoch();
 
     const struct sail_plugin_info *plugin_info;
     void *pimpl = nullptr;
@@ -149,7 +149,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 
     pimpl = nullptr;
 
-    SAIL_LOG_INFO("Loaded in %lld ms.", QDateTime::currentMSecsSinceEpoch() - v);
+    SAIL_LOG_INFO("Loaded in %lld ms.", QDateTime::currentMSecsSinceEpoch() - startTime);
 
     *qimage = QImage(image_bits,
                      image->width,
@@ -184,7 +184,7 @@ static int qImageFormatToSailPixelFormat(QImage::Format format) {
 
 sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
 {
-    qint64 v = QDateTime::currentMSecsSinceEpoch();
+    qint64 startTime = QDateTime::currentMSecsSinceEpoch();
 
     const struct sail_plugin_info *plugin_info;
     void *pimpl = nullptr;
@@ -192,7 +192,7 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
     struct sail_image *image = nullptr;
 
     auto cleanup_func = [&] {
-        SAIL_LOG_DEBUG("Read clean up");
+        SAIL_LOG_DEBUG("Write clean up");
 
         sail_stop_writing(pimpl);
         sail_destroy_image(image);
@@ -212,7 +212,7 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
 
     pimpl = nullptr;
 
-    SAIL_LOG_INFO("Saved in %lld ms.", QDateTime::currentMSecsSinceEpoch() - v);
+    SAIL_LOG_INFO("Saved in %lld ms.", QDateTime::currentMSecsSinceEpoch() - startTime);
 
     return 0;
 }
