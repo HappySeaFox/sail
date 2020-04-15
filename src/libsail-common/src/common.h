@@ -488,8 +488,8 @@ SAIL_EXPORT sail_error_t sail_alloc_file_for_reading(const char *filepath, struc
 SAIL_EXPORT sail_error_t sail_alloc_file_for_writing(const char *filepath, struct sail_file **file);
 
 /*
- * Closes the specified file and destroys all its internal memory buffers. Does nothing if the file is already closed.
- * The file MUST NOT be used anymore after calling this function.
+ * Closes the specified file and destroys all its internal memory buffers. The file MUST NOT be used anymore
+ * after calling this function. Does nothing if the file is NULL.
  */
 SAIL_EXPORT void sail_destroy_file(struct sail_file *file);
 
@@ -505,8 +505,8 @@ SAIL_EXPORT void sail_destroy_file(struct sail_file *file);
 SAIL_EXPORT sail_error_t sail_alloc_image(struct sail_image **image);
 
 /*
- * Destroys the specified image and all its internal allocated memory buffers.
- * The image MUST NOT be used after calling this function.
+ * Destroys the specified image and all its internal allocated memory buffers. The image MUST NOT be used anymore
+ * after calling this function. Does nothing if the image is NULL.
  */
 SAIL_EXPORT void sail_destroy_image(struct sail_image *image);
 
@@ -523,8 +523,8 @@ SAIL_EXPORT void sail_destroy_image(struct sail_image *image);
 SAIL_EXPORT sail_error_t sail_alloc_read_features(struct sail_read_features **read_features);
 
 /*
- * Destroys the specified read features and all its internal allocated memory buffers.
- * The read features MUST NOT be used after calling this function.
+ * Destroys the specified read features and all its internal allocated memory buffers. The read features
+ * MUST NOT be used anymore after calling this function. Does nothing if the read features is NULL.
  */
 SAIL_EXPORT void sail_destroy_read_features(struct sail_read_features *read_features);
 
@@ -537,8 +537,8 @@ SAIL_EXPORT void sail_destroy_read_features(struct sail_read_features *read_feat
 SAIL_EXPORT sail_error_t sail_alloc_read_options(struct sail_read_options **read_options);
 
 /*
- * Destroys the specified read options and all its internal allocated memory buffers.
- * The read options MUST NOT be used after calling this function.
+ * Destroys the specified read options and all its internal allocated memory buffers. The read options
+ * MUST NOT be used anymore after calling this function. Does nothing if the read options is NULL.
  */
 SAIL_EXPORT void sail_destroy_read_options(struct sail_read_options *read_options);
 
@@ -551,8 +551,8 @@ SAIL_EXPORT void sail_destroy_read_options(struct sail_read_options *read_option
 SAIL_EXPORT sail_error_t sail_alloc_write_features(struct sail_write_features **write_features);
 
 /*
- * Destroys the specified write features and all its internal allocated memory buffers.
- * The write features MUST NOT be used after calling this function.
+ * Destroys the specified write features and all its internal allocated memory buffers. The write features
+ * MUST NOT be used anymore after calling this function. Does nothing if the write features is NULL.
  */
 SAIL_EXPORT void sail_destroy_write_features(struct sail_write_features *write_features);
 
@@ -565,8 +565,8 @@ SAIL_EXPORT void sail_destroy_write_features(struct sail_write_features *write_f
 SAIL_EXPORT sail_error_t sail_alloc_write_options(struct sail_write_options **write_options);
 
 /*
- * Destroys the specified write options and all its internal allocated memory buffers.
- * The write options MUST NOT be used after calling this function.
+ * Destroys the specified write options and all its internal allocated memory buffers. The write options
+ * MUST NOT be used anymore after calling this function. Does nothing if the write options is NULL.
  */
 SAIL_EXPORT void sail_destroy_write_options(struct sail_write_options *write_options);
 

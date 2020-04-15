@@ -170,7 +170,7 @@ SAIL_EXPORT sail_error_t sail_start_reading(const char *path, struct sail_contex
 SAIL_EXPORT sail_error_t sail_read_next_frame(void *pimpl, struct sail_image **image, void **image_bits);
 
 /*
- * Stops reading started by sail_start_reading().
+ * Stops reading started by sail_start_reading(). Does nothing if the pimpl is NULL.
  *
  * Returns 0 on success or sail_error_t on error.
  */
@@ -232,7 +232,7 @@ SAIL_EXPORT sail_error_t sail_start_writing(const char *path, struct sail_contex
 SAIL_EXPORT sail_error_t sail_write_next_frame(void *pimpl, const struct sail_image *image, const void *image_bits);
 
 /*
- * Stops writing started by sail_start_writing().
+ * Stops writing started by sail_start_writing(). Does nothing if the pimpl is NULL.
  *
  * Returns 0 on success or sail_error_t on error.
  */

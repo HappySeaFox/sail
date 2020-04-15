@@ -104,8 +104,8 @@ typedef struct sail_plugin sail_plugin_t;
 SAIL_EXPORT sail_error_t sail_alloc_plugin(const struct sail_plugin_info *plugin_info, struct sail_plugin **plugin);
 
 /*
- * Destroys the specified plugin and all its internal memory buffers.
- * The plugin MUST NOT be used anymore after calling this function.
+ * Destroys the specified plugin and all its internal memory buffers. The plugin MUST NOT be used anymore
+ * after calling this function. Does nothing if the plugin is NULL.
  */
 SAIL_EXPORT void sail_destroy_plugin(struct sail_plugin *plugin);
 
