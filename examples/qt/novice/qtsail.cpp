@@ -147,6 +147,8 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     SAIL_TRY(sail_read_next_frame(pimpl, &image, (void **)&image_bits));
     SAIL_TRY(sail_stop_reading(pimpl));
 
+    // Reset the pointer so the cleanup function will not double-free it.
+    //
     pimpl = nullptr;
 
     SAIL_LOG_INFO("Loaded in %lld ms.", QDateTime::currentMSecsSinceEpoch() - startTime);
@@ -210,6 +212,8 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
     SAIL_TRY(sail_write_next_frame(pimpl, image, qimage.bits()));
     SAIL_TRY(sail_stop_writing(pimpl));
 
+    // Reset the pointer so the cleanup function will not double-free it.
+    //
     pimpl = nullptr;
 
     SAIL_LOG_INFO("Saved in %lld ms.", QDateTime::currentMSecsSinceEpoch() - startTime);
