@@ -367,7 +367,7 @@ void QtSail::loadFileFromDir()
 QStringList QtSail::filters() const
 {
     QStringList filters;
-    sail_plugin_info_node *plugin_info_node = d->context->plugin_info_node;
+    const sail_plugin_info_node *plugin_info_node = sail_plugin_info_list(d->context);
 
     while (plugin_info_node != nullptr) {
         QStringList masks;

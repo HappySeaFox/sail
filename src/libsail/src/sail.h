@@ -43,16 +43,10 @@
 extern "C" {
 #endif
 
+struct sail_context;
 struct sail_plugin_info_node;
 struct sail_plugin_info;
 struct sail_plugin;
-
-struct sail_context {
-
-    struct sail_plugin_info_node *plugin_info_node;
-};
-
-typedef struct sail_context sail_context_t;
 
 /*
  * Initializes SAIL. This is the main entry point to start working with SAIL.
@@ -67,6 +61,11 @@ SAIL_EXPORT sail_error_t sail_init(struct sail_context **context);
  * memory buffers. The context MUST NOT be used anymore after calling this function.
  */
 SAIL_EXPORT void sail_finish(struct sail_context *context);
+
+/*
+ * Returns a linked list of found plugin info nodes.
+ */
+SAIL_EXPORT const struct sail_plugin_info_node* sail_plugin_info_list(const struct sail_context *context);
 
 /*
  * Finds a first plugin info object that supports the specified file extension. For example: "jpg".

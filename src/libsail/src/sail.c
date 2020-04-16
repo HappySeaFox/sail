@@ -42,6 +42,7 @@
 #include "log.h"
 #include "utils.h"
 
+#include "context.h"
 #include "plugin_info.h"
 #include "plugin.h"
 #include "string_node.h"
@@ -320,6 +321,11 @@ void sail_finish(struct sail_context *context) {
     sail_destroy_plugin_info_node_chain(context->plugin_info_node);
 
     free(context);
+}
+
+const struct sail_plugin_info_node* sail_plugin_info_list(const struct sail_context *context) {
+
+    return context->plugin_info_node;
 }
 
 sail_error_t sail_plugin_info_by_extension(const struct sail_context *context, const char *extension, const struct sail_plugin_info **plugin_info) {
