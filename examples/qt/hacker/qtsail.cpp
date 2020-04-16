@@ -373,7 +373,8 @@ QStringList QtSail::filters() const
             extension_node = extension_node->next;
         }
 
-        filters.append(QStringLiteral("%1 (%2)")
+        filters.append(QStringLiteral("%1: %2 (%3)")
+                       .arg(plugin_info_node->plugin_info->name)
                        .arg(plugin_info_node->plugin_info->description)
                        .arg(masks.join(QStringLiteral(" "))));
 
