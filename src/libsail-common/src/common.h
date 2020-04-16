@@ -273,10 +273,25 @@ typedef struct sail_image sail_image_t;
 struct sail_read_features {
 
     /*
-     * A list of supported pixel formats that can be read by this plugin.
-     * One of these values will be stored in sail_image.source_pixel_format.
+     * A list of supported pixel formats that can be read by this plugin. One of these values
+     * will be stored in sail_image.source_pixel_format. See SailPixelFormat.
      *
      * For example: CMYK, YCBCR, RGB.
+     *
+     * NOTE: SAIL doesn't provide pixel format conversion capabilities. Let's take a look at an hypothetical example:
+     *
+     * A hypothetical SAIL plugin supports input YCBCR images and it's able to output RGB pixel data from them.
+     * Additionally, it supports input CMYK images and it's able to output YCCK pixel data from them.
+     * So the full conversion table with all possible input/output variants looks like that:
+     *
+     * [ Read from file ] YCBCR => RGB  [ Output to memory ]
+     * [ Read from file ] CMYK  => YCCK [ Output to memory ]
+     *
+     * sail_read_features.input_pixel_formats will contain YCBCR and CMYK pixel formats.
+     * sail_read_features.output_pixel_formats will contain RGB and YCCK pixel formats.
+     *
+     * However, if you try to read an YCBCR image and output YCCK pixels, the codec will return
+     * an error.
      */
     int *input_pixel_formats;
 
@@ -284,13 +299,17 @@ struct sail_read_features {
     int input_pixel_formats_length;
 
     /*
-     * A list of supported pixel formats that can be outputted by this plugin. SOURCE pixel format
-     * is always stored in the array.
+     * A list of supported pixel formats that can be outputted by this plugin.
      *
      * It's not guaranteed that every input pixel format in input_pixel_formats could be converted
      * to every output pixel format in output_pixel_formats. Some could be converted and some not.
+     * See the comments above.
      *
-     * For example: SOURCE, RGB.
+     * If the array contains SAIL_PIXEL_FORMAT_SOURCE, then the codec is able to output raw pixel data.
+     * It's a caller's responsibility to convert it to a suitable format then. Refer to sail_image.pixel_format
+     * to detect the actual pixel format of the raw data in this case.
+     *
+     * For example: SOURCE, RGB, YCCK.
      */
     int *output_pixel_formats;
 
@@ -313,9 +332,24 @@ struct sail_write_features {
 
     /*
      * A list of supported input pixel formats that can be passed to this plugin from a caller.
-     * One of these values could be specified in sail_image.pixel_format.
+     * One of these values could be specified in sail_image.pixel_format. See SailPixelFormat.
      *
      * For example: CMYK, YCBCR, RGB.
+     *
+     * NOTE: SAIL doesn't provide pixel format conversion capabilities. Let's take a look at an hypothetical example:
+     *
+     * A hypothetical SAIL plugin supports input RGB pixel data and it's able to output YCBCR files from it.
+     * Additionally, it supports input YCCK pixel data and it's able to output CMYK files from it.
+     * So the full conversion table with all possible input/output variants looks like that:
+     *
+     * [ Read from memory ] RGB   => YCBCR [ Output to file ]
+     * [ Read from memory ] YCCK  => CMYK  [ Output to file ]
+     *
+     * sail_write_features.input_pixel_formats will contain RGB and YCCK pixel formats.
+     * sail_write_features.output_pixel_formats will contain YCBCR and CMYK pixel formats.
+     *
+     * However, if you try to write a YCBCR file from YCCK pixel data, the codec will return
+     * an error.
      */
     int *input_pixel_formats;
 
