@@ -5,6 +5,10 @@ cmake_minimum_required(VERSION 3.6.0)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Option to ensable ASAN on supported platforms
+#
+option(SAIL_ASAN "Enable ASAN on supported platforms." ON)
+
 project(qt-sail-demo-hacker)
 
 set(CMAKE_AUTOMOC ON)
@@ -36,8 +40,12 @@ add_executable(qt-sail-demo-hacker
 # Enable ASAN
 #
 if (SAIL_ASAN)
-    target_compile_options(qt-sail-demo-hacker PRIVATE "${SAIL_ASAN}")
-    target_link_libraries(qt-sail-demo-hacker PRIVATE "${SAIL_ASAN}")
+    if (CMAKE_COMPILER_IS_GNUCC)
+        target_compile_options(qt-sail-demo-hacker PRIVATE "-fsanitize=address,leak")
+        target_link_libraries(qt-sail-demo-hacker "-fsanitize=address,leak")
+    else()
+        message("ASAN is not supported on this platform.")
+    endif()
 endif()
 
 # Add SAIL dependency
