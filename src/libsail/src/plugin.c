@@ -38,9 +38,8 @@
 
 int sail_alloc_plugin(const struct sail_plugin_info *plugin_info, struct sail_plugin **plugin) {
 
-    if (plugin_info == NULL || plugin_info->path == NULL) {
-        return SAIL_INVALID_ARGUMENT;
-    }
+    SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
+    SAIL_CHECK_PATH_PTR(plugin_info->path);
 
     *plugin = (struct sail_plugin *)malloc(sizeof(struct sail_plugin));
 
