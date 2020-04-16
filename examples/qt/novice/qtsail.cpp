@@ -116,7 +116,6 @@ static QImage::Format sailPixelFormatToQImageFormat(int pixel_format) {
         case SAIL_PIXEL_FORMAT_RGB:       return QImage::Format_RGB888;
         case SAIL_PIXEL_FORMAT_RGBX:      return QImage::Format_RGBX8888;
         case SAIL_PIXEL_FORMAT_RGBA:      return QImage::Format_RGBA8888;
-        case SAIL_PIXEL_FORMAT_ARGB:      return QImage::Format_ARGB32;
 
         default: return QImage::Format_Invalid;
     }
@@ -178,7 +177,6 @@ static int qImageFormatToSailPixelFormat(QImage::Format format) {
         case QImage::Format_RGB888:     return SAIL_PIXEL_FORMAT_RGB;
         case QImage::Format_RGBX8888:   return SAIL_PIXEL_FORMAT_RGBX;
         case QImage::Format_RGBA8888:   return SAIL_PIXEL_FORMAT_RGBA;
-        case QImage::Format_ARGB32:     return SAIL_PIXEL_FORMAT_ARGB;
 
         default: return SAIL_PIXEL_FORMAT_UNKNOWN;
     }

@@ -33,6 +33,8 @@ add_executable(qt-sail-demo-hacker
                 main.cpp
                 qtsail.cpp
                 qtsail.ui
+                readoptions.cpp
+                readoptions.ui
                 writeoptions.cpp
                 writeoptions.ui
                 "${RC_FILE}")
