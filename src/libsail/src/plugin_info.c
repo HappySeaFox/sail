@@ -134,6 +134,10 @@ static int inih_handler(void *data, const char *section, const char *name, const
             if ((res = sail_strdup(value, &plugin_info->version)) != 0) {
                 return 0;
             }
+        } else if (strcmp(name, "name") == 0) {
+            if ((res = sail_strdup(value, &plugin_info->name)) != 0) {
+                return 0;
+            }
         } else if (strcmp(name, "description") == 0) {
             if ((res = sail_strdup(value, &plugin_info->description)) != 0) {
                 return 0;
@@ -172,6 +176,7 @@ int sail_alloc_plugin_info(struct sail_plugin_info **plugin_info) {
 
     (*plugin_info)->layout         = 0;
     (*plugin_info)->version        = NULL;
+    (*plugin_info)->name           = NULL;
     (*plugin_info)->description    = NULL;
     (*plugin_info)->extension_node = NULL;
     (*plugin_info)->mime_type_node = NULL;
@@ -187,6 +192,7 @@ void sail_destroy_plugin_info(struct sail_plugin_info *plugin_info) {
     }
 
     free(plugin_info->version);
+    free(plugin_info->name);
     free(plugin_info->description);
 
     destroy_string_node_chain(plugin_info->extension_node);

@@ -53,7 +53,10 @@ struct sail_plugin_info {
     /* Plugin version. For example: "1.5.2". */
     char *version;
 
-    /* Plugin description. For example: "JPEG image". */
+    /* Short plugin name in upper case. For example: "JPEG". */
+    char *name;
+
+    /* Plugin description. For example: "Joint Photographic Experts Group". */
     char *description;
 
     /* A linked list of supported file extensions. For example: "jpg", "jpeg". */
