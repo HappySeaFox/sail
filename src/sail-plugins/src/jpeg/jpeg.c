@@ -246,14 +246,15 @@ SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_file *file, const 
     jpeg_read_header(&pimpl->decompress_context, true);
 
     /* Handle the requested color space. */
-    J_COLOR_SPACE requested_color_space = pixel_format_to_color_space(pimpl->read_options->pixel_format);
-
     if (pimpl->read_options->pixel_format == SAIL_PIXEL_FORMAT_SOURCE) {
         pimpl->decompress_context.out_color_space = pimpl->decompress_context.jpeg_color_space;
     } else {
+        J_COLOR_SPACE requested_color_space = pixel_format_to_color_space(pimpl->read_options->pixel_format);
+
         if (requested_color_space == JCS_UNKNOWN) {
             return SAIL_UNSUPPORTED_PIXEL_FORMAT;
         }
+
         pimpl->decompress_context.out_color_space = requested_color_space;
     }
 
