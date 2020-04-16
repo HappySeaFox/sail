@@ -166,6 +166,9 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
         sail_destroy_read_features(read_features);
         sail_destroy_read_options(read_options);
         sail_destroy_image(image);
+
+        /* Optional: unload all plugins to free up some memory. */
+        sail_unload_plugins(d->context);
     };
 
     CleanUp<decltype(cleanup_func)> cleanUp(cleanup_func);
@@ -255,6 +258,9 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
         sail_destroy_write_features(write_features);
         sail_destroy_write_options(write_options);
         sail_destroy_image(image);
+
+        /* Optional: unload all plugins to free up some memory. */
+        sail_unload_plugins(d->context);
     };
 
     CleanUp<decltype(cleanup_func)> cleanUp(cleanup_func);
