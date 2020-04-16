@@ -115,6 +115,10 @@ set(SAIL_PLUGINS_PATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/sail/plug
 if (WIN32)
     string(REPLACE "/" "\\\\" SAIL_PLUGINS_PATH "${SAIL_PLUGINS_PATH}")
 endif()
+set(SAIL_ICONS_PATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/sail/icons")
+if (WIN32)
+    string(REPLACE "/" "\\\\" SAIL_ICONS_PATH "${SAIL_ICONS_PATH}")
+endif()
 execute_process(COMMAND git rev-parse --short HEAD
                 RESULT_VARIABLE SAIL_GIT_HASH_RESULT
                 OUTPUT_VARIABLE SAIL_GIT_HASH
@@ -144,6 +148,8 @@ else()
     endif()
 endif()
 
+install(DIRECTORY "${PROJECT_SOURCE_DIR}/icons/" DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/sail/icons")
+
 # Print configuration statistics
 #
 
@@ -162,6 +168,7 @@ message("*")
 message("* Install prefix:               ${CMAKE_INSTALL_PREFIX}")
 message("* LIBDIR:                       ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 message("* INCLUDEDIR:                   ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}")
+message("* DATADIR:                      ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}")
 message("*")
 message("* Colored output:               ${SAIL_COLORED_OUTPUT}${SAIL_COLORED_OUTPUT_CLARIFY}")
 message("* Enabled plugins:              ${PLUGINS}")
