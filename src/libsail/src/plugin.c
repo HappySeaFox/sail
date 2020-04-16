@@ -78,8 +78,12 @@ int sail_alloc_plugin(const struct sail_plugin_info *plugin_info, struct sail_pl
 
 #ifdef SAIL_WIN32
     #define SAIL_RESOLVE_FUNC GetProcAddress
+    #define SAIL_RESOLVE_LOG_ERROR(symbol) \
+        SAIL_LOG_ERROR("Failed to resolve '%s' in '%s'. Error: %d", #symbol, plugin_info->path, GetLastError())
 #else
     #define SAIL_RESOLVE_FUNC dlsym
+    #define SAIL_RESOLVE_LOG_ERROR(symbol) \
+        SAIL_LOG_ERROR("Failed to resolve '%s' in '%s': %s", #symbol, plugin_info->path, dlerror())
 #endif
 
     #define SAIL_RESOLVE(target, handle, symbol)                 \
@@ -87,8 +91,7 @@ int sail_alloc_plugin(const struct sail_plugin_info *plugin_info, struct sail_pl
         target = (symbol##_t)SAIL_RESOLVE_FUNC(handle, #symbol); \
                                                                  \
         if (target == NULL) {                                    \
-            SAIL_LOG_ERROR("Failed to resolve '%s' in '%s'",     \
-                            #symbol, plugin_info->path);         \
+            SAIL_RESOLVE_LOG_ERROR(symbol);                      \
             sail_destroy_plugin(*plugin);                        \
             return SAIL_PLUGIN_SYMBOL_RESOLVE_FAILED;            \
         }                                                        \
