@@ -23,6 +23,7 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QDir>
+#include <QElapsedTimer>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QImage>
@@ -152,7 +153,8 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 {
     // Time counter.
     //
-    const qint64 startTime = QDateTime::currentMSecsSinceEpoch();
+    QElapsedTimer elapsed;
+    elapsed.start();
 
     // Find the codec info by a file extension.
     //
@@ -196,6 +198,8 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     //
     SAIL_TRY(sail_alloc_read_options_from_features(read_features, &read_options));
 
+    const qint64 beforeDialog = elapsed.elapsed();
+
     // Ask the user to provide his/her preferred output options.
     //
     ReadOptions readOptions(QString::fromUtf8(plugin_info->description), read_features, this);
@@ -207,6 +211,8 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
         //
         read_options->pixel_format = SAIL_PIXEL_FORMAT_RGB;
     }
+
+    elapsed.restart();
 
     // Initialize reading with our options.
     //
@@ -232,7 +238,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     //
     pimpl = nullptr;
 
-    SAIL_LOG_INFO("Loaded in %lld ms.", QDateTime::currentMSecsSinceEpoch() - startTime);
+    SAIL_LOG_INFO("Loaded in %lld ms.", elapsed.elapsed() + beforeDialog);
 
     // Convert to QImage.
     //
@@ -278,7 +284,8 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
 {
     // Time counter.
     //
-    const qint64 startTime = QDateTime::currentMSecsSinceEpoch();
+    QElapsedTimer elapsed;
+    elapsed.start();
 
     const struct sail_plugin_info *plugin_info;
     SAIL_TRY(sail_plugin_info_by_extension(d->context, QFileInfo(path).suffix().toLocal8Bit(), &plugin_info));
@@ -315,6 +322,8 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
     //
     SAIL_TRY(sail_alloc_write_options_from_features(write_features, &write_options));
 
+    const qint64 beforeDialog = elapsed.elapsed();
+
     // Ask the user to provide his/her preferred output options.
     //
     WriteOptions writeOptions(QString::fromUtf8(plugin_info->description), write_features, this);
@@ -323,6 +332,8 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
         write_options->pixel_format = writeOptions.pixelFormat();
         write_options->compression = writeOptions.compression();
     }
+
+    elapsed.restart();
 
     // Initialize writing with our options.
     //
@@ -367,7 +378,7 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
     //
     pimpl = nullptr;
 
-    SAIL_LOG_INFO("Saved in %lld ms.", QDateTime::currentMSecsSinceEpoch() - startTime);
+    SAIL_LOG_INFO("Saved in %lld ms.", elapsed.elapsed() + beforeDialog);
 
     return 0;
 }
@@ -484,7 +495,8 @@ void QtSail::onProbe()
         return;
     }
 
-    const qint64 v = QDateTime::currentMSecsSinceEpoch();
+    QElapsedTimer elapsed;
+    elapsed.start();
 
     // Probe
     sail_image *image;
@@ -501,7 +513,7 @@ void QtSail::onProbe()
     QMessageBox::information(this,
                              tr("File info"),
                              tr("Probed in: %1 ms.\nCodec: %2\nSize: %3x%4\nSource pixel format: %5\nOutput pixel format: %6")
-                                .arg(QDateTime::currentMSecsSinceEpoch() - v)
+                                .arg(elapsed.elapsed())
                                 .arg(plugin_info->description)
                                 .arg(image->width)
                                 .arg(image->height)
