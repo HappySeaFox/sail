@@ -19,6 +19,8 @@
 #ifndef SAIL_UTILS_H
 #define SAIL_UTILS_H
 
+#include <wchar.h>
+
 #ifdef SAIL_BUILD
     #include "error.h"
     #include "export.h"
