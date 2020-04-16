@@ -49,8 +49,23 @@ SAIL_EXPORT sail_error_t sail_strdup_length(const char *input, size_t length, ch
 /*
  * Concatenates 'num' number of strings together and puts the result into the specified output string.
  * The assigned output string MUST be destroyed later with free().
+ *
+ * Returns 0 on success or sail_error_t on error.
  */
 SAIL_EXPORT sail_error_t sail_concat(char **output, int num, ...);
+
+/*
+ * Converts the specified string to a lower case.
+ */
+SAIL_EXPORT void sail_to_lower(char *str);
+
+/*
+ * Converts the specified char* string into a wchar_t* string.
+ * The assigned output string MUST be destroyed later with free().
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_to_wchar(const char *input, wchar_t **output);
 
 /*
  * Returns a non-NULL string representation of the specified pixel format.
@@ -63,11 +78,6 @@ SAIL_EXPORT const char* sail_pixel_format_to_string(int pixel_format);
  * For example, for SAIL_PIXEL_FORMAT_RGB 24 is returned.
  */
 SAIL_EXPORT int sail_bits_per_pixel(int pixel_format);
-
-/*
- * Converts the specified string to a lower case.
- */
-SAIL_EXPORT void sail_to_lower(char *str);
 
 /*
  * Calculates bytes per line.

@@ -125,6 +125,49 @@ sail_error_t sail_concat(char **output, int num, ...) {
     return 0;
 }
 
+void sail_to_lower(char *str) {
+
+    if (str == NULL) {
+        return;
+    }
+
+    size_t length = strlen(str);
+
+    for (size_t i = 0; i < length; i++) {
+        str[i] = (char)tolower(str[i]);
+    }
+}
+
+sail_error_t sail_to_wchar(const char *input, wchar_t **output) {
+
+    SAIL_CHECK_PTR(input);
+    SAIL_CHECK_PTR(output);
+
+    size_t length = strlen(input);
+
+    *output = (wchar_t *)malloc((length+1) * sizeof(wchar_t));
+
+    if (*output == NULL) {
+        return SAIL_MEMORY_ALLOCATION_FAILED;
+    }
+
+#ifdef SAIL_WIN32
+    size_t ret;
+
+    if (mbstowcs_s(&ret, *output, length+1, input, length) != 0) {
+        free(*output);
+        return SAIL_INVALID_ARGUMENT;
+    }
+#else
+    if (mbstowcs(*output, input, length) == (size_t)-1) {
+        free(*output);
+        return SAIL_INVALID_ARGUMENT;
+    }
+#endif
+
+    return 0;
+}
+
 const char* sail_pixel_format_to_string(int pixel_format) {
     switch (pixel_format) {
         case SAIL_PIXEL_FORMAT_UNKNOWN:   return "Unknown";
@@ -181,19 +224,6 @@ int sail_bits_per_pixel(int pixel_format) {
     }
 
     return 0;
-}
-
-void sail_to_lower(char *str) {
-
-    if (str == NULL) {
-        return;
-    }
-
-    size_t length = strlen(str);
-
-    for (size_t i = 0; i < length; i++) {
-        str[i] = (char)tolower(str[i]);
-    }
 }
 
 int sail_bytes_per_line(int width, int pixel_format) {
