@@ -240,11 +240,9 @@ void sail_destroy_plugin_info_node_chain(struct sail_plugin_info_node *plugin_in
     }
 }
 
-int sail_plugin_read_info(const char *file, struct sail_plugin_info **plugin_info) {
+int sail_plugin_read_info(const char *path, struct sail_plugin_info **plugin_info) {
 
-    if (file == NULL) {
-        return SAIL_INVALID_ARGUMENT;
-    }
+    SAIL_CHECK_PATH_PTR(path);
 
     SAIL_TRY(sail_alloc_plugin_info(plugin_info));
 
@@ -255,7 +253,7 @@ int sail_plugin_read_info(const char *file, struct sail_plugin_info **plugin_inf
      *  - -1 on file open error
      *  - -2 on memory allocation error (only when INI_USE_STACK is zero).
      */
-    const int code = ini_parse(file, inih_handler, *plugin_info);
+    const int code = ini_parse(path, inih_handler, *plugin_info);
 
     if (code == 0) {
         return 0;

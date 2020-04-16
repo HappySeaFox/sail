@@ -130,7 +130,7 @@ SAIL_EXPORT void sail_destroy_plugin_info_node_chain(struct sail_plugin_info_nod
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_read_info(const char *file, struct sail_plugin_info **plugin_info);
+SAIL_EXPORT sail_error_t sail_plugin_read_info(const char *path, struct sail_plugin_info **plugin_info);
 
 /* extern "C" */
 #ifdef __cplusplus
