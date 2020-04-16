@@ -18,6 +18,8 @@
 
 #include "config.h"
 
+#define _POSIX_C_SOURCE 200112L /* setenv */
+
 #include <errno.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -51,46 +53,92 @@
 
 static const char* plugins_path(void) {
 
-#ifdef SAIL_WIN32
-    SAIL_THREAD_LOCAL static char *env = NULL;
     SAIL_THREAD_LOCAL static bool plugins_path_called = false;
+    SAIL_THREAD_LOCAL static char *env = NULL;
 
-    if (!plugins_path_called) {
-        plugins_path_called = true;
-        _dupenv_s(&env, NULL, "SAIL_PLUGINS_PATH");
+    if (plugins_path_called) {
+        return env;
     }
+
+    plugins_path_called = true;
+
+#ifdef SAIL_WIN32
+    _dupenv_s(&env, NULL, "SAIL_PLUGINS_PATH");
 #else
-    char *env = getenv("SAIL_PLUGINS_PATH");
+    env = getenv("SAIL_PLUGINS_PATH");
 #endif
 
     if (env == NULL) {
         SAIL_LOG_DEBUG("SAIL_PLUGINS_PATH environment variable is not set. Loading plugins from %s", SAIL_PLUGINS_PATH);
-        return SAIL_PLUGINS_PATH;
+        env = SAIL_PLUGINS_PATH;
     } else {
         SAIL_LOG_DEBUG("SAIL_PLUGINS_PATH environment variable is set. Loading plugins from %s", env);
-        return env;
     }
+
+    return env;
+}
+
+/* Add "/lib" to SAIL plugins path. */
+static sail_error_t update_lib_path(void) {
+
+    SAIL_THREAD_LOCAL static bool update_lib_path_called = false;
+
+    if (update_lib_path_called) {
+        return 0;
+    }
+
+    update_lib_path_called = true;
+
+    /* Build a full path to the SAIL plugins path + "/lib". */
+    const char *plugs_path = plugins_path();
+
+#ifdef SAIL_WIN32
+    char *full_path_to_lib;
+    SAIL_TRY(sail_concat(&full_path_to_lib, 2, plugs_path, "\\lib"));
+
+    if (!SetDllDirectory(full_path_to_lib)) {
+        SAIL_LOG_ERROR("Failed to update library search path. Error: %d", GetLastError());
+        free(full_path_to_lib);
+        return SAIL_ENV_UPDATE_FAILED;
+    }
+
+    free(full_path_to_lib);
+#else
+    char *full_path_to_lib;
+    SAIL_TRY(sail_concat(&full_path_to_lib, 2, plugs_path, "/lib"));
+
+    char *combined_ld_library_path;
+    char *env = getenv("LD_LIBRARY_PATH");
+
+    if (env == NULL) {
+        SAIL_TRY_OR_CLEANUP(sail_strdup(full_path_to_lib, &combined_ld_library_path),
+                            free(full_path_to_lib));
+    } else {
+        SAIL_TRY_OR_CLEANUP(sail_concat(&combined_ld_library_path, 3, env, ":", full_path_to_lib),
+                            free(full_path_to_lib));
+    }
+
+    free(full_path_to_lib);
+    SAIL_LOG_DEBUG("Set LD_LIBRARY_PATH to '%s'", combined_ld_library_path);
+
+    if (setenv("LD_LIBRARY_PATH", combined_ld_library_path, true) != 0) {
+        SAIL_LOG_ERROR("Failed to update library search path: %s", strerror(errno));
+        free(combined_ld_library_path);
+        return SAIL_ENV_UPDATE_FAILED;
+    }
+
+    free(combined_ld_library_path);
+#endif
+
+    return 0;
 }
 
 static sail_error_t build_full_path(const char *sail_plugins_path, const char *name, char **full_path) {
 
-    /* +2 : NULL and '/' characters. */
-    size_t full_path_length = strlen(sail_plugins_path) + strlen(name) + 2;
-
-    *full_path = (char *)malloc(full_path_length);
-
-    if (*full_path == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
-
 #ifdef SAIL_WIN32
-    strcpy_s(*full_path, full_path_length, sail_plugins_path);
-    strcat_s(*full_path, full_path_length, "\\");
-    strcat_s(*full_path, full_path_length, name);
+    SAIL_TRY(sail_concat(full_path, 3, sail_plugins_path, "\\", name));
 #else
-    strcpy(*full_path, sail_plugins_path);
-    strcat(*full_path, "/");
-    strcat(*full_path, name);
+    SAIL_TRY(sail_concat(full_path, 3, sail_plugins_path, "/", name));
 #endif
 
     return 0;
@@ -98,7 +146,7 @@ static sail_error_t build_full_path(const char *sail_plugins_path, const char *n
 
 static sail_error_t build_plugin_full_path(struct sail_context *context,
                                             struct sail_plugin_info_node **last_plugin_info_node,
-                                            char *plugin_info_full_path) {
+                                            const char *plugin_info_full_path) {
 
     /* Build "/path/jpeg.so" from "/path/jpeg.plugin.info". */
     char *plugin_info_part = strstr(plugin_info_full_path, ".plugin.info");
@@ -168,6 +216,8 @@ sail_error_t sail_init(struct sail_context **context) {
     }
 
     (*context)->plugin_info_node = NULL;
+
+    SAIL_TRY(update_lib_path());
 
     struct sail_plugin_info_node *last_plugin_info_node;
 

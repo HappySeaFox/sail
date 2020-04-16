@@ -72,6 +72,7 @@ typedef int sail_error_t;
 #define SAIL_PATH_NULL_PTR                81
 #define SAIL_PLUGIN_INFO_NULL_PTR         82
 #define SAIL_PLUGIN_NULL_PTR              83
+#define SAIL_ENV_UPDATE_FAILED            84
 
 /*
  * Helper macros.
