@@ -287,8 +287,8 @@ struct sail_read_features {
      * A list of supported pixel formats that can be outputted by this plugin. SOURCE pixel format
      * is always stored in the array.
      *
-     * It's not guaranteed that every input pixel format from input_pixel_formats could be converted
-     * to an output pixel format from output_pixel_formats. Some could be converted and some not.
+     * It's not guaranteed that every input pixel format in input_pixel_formats could be converted
+     * to every output pixel format in output_pixel_formats. Some could be converted and some not.
      *
      * For example: SOURCE, RGB.
      */
@@ -325,8 +325,8 @@ struct sail_write_features {
     /*
      * A list of supported pixel formats that can be outputted by this plugin to a file.
      *
-     * It's not guaranteed that every input pixel format from input_pixel_formats could be converted
-     * to an output pixel format from output_pixel_formats. Some could be converted and some not.
+     * It's not guaranteed that every input pixel format in input_pixel_formats could be converted
+     * to every output pixel format in output_pixel_formats. Some could be converted and some not.
      *
      * For example: CMYK, YCBCR, RGB.
      */
