@@ -64,7 +64,13 @@ int sail_alloc_file(const char *path, const char *mode, struct sail_file **file)
 #endif
 
     if (fptr == NULL) {
+#ifdef SAIL_WIN32
+        char buffer[80];
+        strerror_s(buffer, sizeof(buffer), errno);
+        SAIL_LOG_ERROR("Failed to open '%s': %s", path, buffer);
+#else
         SAIL_LOG_ERROR("Failed to open '%s': %s", path, strerror(errno));
+#endif
         return SAIL_FILE_OPEN_ERROR;
     }
 
