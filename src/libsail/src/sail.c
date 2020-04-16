@@ -500,9 +500,7 @@ sail_error_t sail_start_reading_with_plugin(const char *path, struct sail_contex
 
     struct hidden_pimpl *pmpl = (struct hidden_pimpl *)malloc(sizeof(struct hidden_pimpl));
 
-    if (pmpl == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
+    SAIL_CHECK_PIMPL_PTR(pmpl);
 
     pmpl->file   = NULL;
     pmpl->plugin = plugin;
@@ -537,9 +535,7 @@ sail_error_t sail_start_reading(const char *path, struct sail_context *context, 
 
     struct hidden_pimpl *pmpl = (struct hidden_pimpl *)malloc(sizeof(struct hidden_pimpl));
 
-    if (pmpl == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
+    SAIL_CHECK_PIMPL_PTR(pmpl);
 
     pmpl->file   = NULL;
     pmpl->plugin = NULL;
@@ -643,9 +639,7 @@ sail_error_t sail_start_writing_with_plugin(const char *path, struct sail_contex
 
     struct hidden_pimpl *pmpl = (struct hidden_pimpl *)malloc(sizeof(struct hidden_pimpl));
 
-    if (pmpl == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
+    SAIL_CHECK_PIMPL_PTR(pmpl);
 
     pmpl->file   = NULL;
     pmpl->plugin = plugin;
@@ -680,9 +674,7 @@ sail_error_t sail_start_writing(const char *path, struct sail_context *context, 
 
     struct hidden_pimpl *pmpl = (struct hidden_pimpl *)malloc(sizeof(struct hidden_pimpl));
 
-    if (pmpl == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
+    SAIL_CHECK_PIMPL_PTR(pmpl);
 
     pmpl->file   = NULL;
     pmpl->plugin = NULL;

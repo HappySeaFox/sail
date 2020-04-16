@@ -58,7 +58,7 @@ typedef struct sail_file sail_file_t;
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_alloc_file(const char *filepath, const char *mode, struct sail_file **file);
+SAIL_EXPORT sail_error_t sail_alloc_file(const char *path, const char *mode, struct sail_file **file);
 
 /*
  * Opens the specified image file for reading. The assigned file MUST be destroyed later
@@ -66,7 +66,7 @@ SAIL_EXPORT sail_error_t sail_alloc_file(const char *filepath, const char *mode,
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_alloc_file_for_reading(const char *filepath, struct sail_file **file);
+SAIL_EXPORT sail_error_t sail_alloc_file_for_reading(const char *path, struct sail_file **file);
 
 /*
  * Opens the specified image file for writiing. The assigned file MUST be destroyed later
@@ -74,7 +74,7 @@ SAIL_EXPORT sail_error_t sail_alloc_file_for_reading(const char *filepath, struc
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_alloc_file_for_writing(const char *filepath, struct sail_file **file);
+SAIL_EXPORT sail_error_t sail_alloc_file_for_writing(const char *path, struct sail_file **file);
 
 /*
  * Closes the specified file and destroys all its internal memory buffers. The file MUST NOT be used anymore

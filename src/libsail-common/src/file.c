@@ -18,8 +18,10 @@
 
 #include "config.h"
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #ifdef SAIL_WIN32
     /* _fsopen() */
@@ -47,19 +49,22 @@ static int sail_alloc_file_private(struct sail_file **file) {
     return 0;
 }
 
-int sail_alloc_file(const char *filepath, const char *mode, struct sail_file **file) {
+int sail_alloc_file(const char *path, const char *mode, struct sail_file **file) {
+
+    SAIL_CHECK_PATH_PTR(path);
 
     /* Try to open the file first */
     FILE *fptr;
 
 #ifdef SAIL_WIN32
-    fptr = _fsopen(filepath, mode, _SH_DENYWR);
+    fptr = _fsopen(path, mode, _SH_DENYWR);
 #else
     /* Fallback to a regular fopen() */
-    fptr = fopen(filepath, mode);
+    fptr = fopen(path, mode);
 #endif
 
     if (fptr == NULL) {
+        SAIL_LOG_ERROR("Failed to open '%s': %s", path, strerror(errno));
         return SAIL_FILE_OPEN_ERROR;
     }
 
@@ -70,16 +75,16 @@ int sail_alloc_file(const char *filepath, const char *mode, struct sail_file **f
     return 0;
 }
 
-sail_error_t sail_alloc_file_for_reading(const char *filepath, struct sail_file **file) {
+sail_error_t sail_alloc_file_for_reading(const char *path, struct sail_file **file) {
 
-    SAIL_TRY(sail_alloc_file(filepath, "rb", file));
+    SAIL_TRY(sail_alloc_file(path, "rb", file));
 
     return 0;
 }
 
-sail_error_t sail_alloc_file_for_writing(const char *filepath, struct sail_file **file) {
+sail_error_t sail_alloc_file_for_writing(const char *path, struct sail_file **file) {
 
-    SAIL_TRY(sail_alloc_file(filepath, "wb", file));
+    SAIL_TRY(sail_alloc_file(path, "wb", file));
 
     return 0;
 }
