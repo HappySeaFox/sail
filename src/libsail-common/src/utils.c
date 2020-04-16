@@ -16,10 +16,17 @@
     along with this library. If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include "config.h"
+
 #include <ctype.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifdef SAIL_WIN32
+    #include <windows.h>
+#endif
 
 #include "common.h"
 #include "error.h"
@@ -65,6 +72,55 @@ int sail_strdup_length(const char *input, size_t length, char **output) {
 
     memcpy(*output, input, length);
     (*output)[length] = '\0';
+
+    return 0;
+}
+
+sail_error_t sail_concat(char **output, int num, ...) {
+
+    if (num < 1) {
+        return SAIL_INVALID_ARGUMENT;
+    }
+
+    SAIL_CHECK_PTR(output);
+
+    va_list args;
+
+    /* Calculate the necessary string length. */
+    va_start(args, num);
+    const char *arg;
+    size_t length = 1; /* for NULL */
+    int counter = num;
+
+    while (counter--) {
+        arg = va_arg(args, const char *);
+        length += strlen(arg);
+    }
+
+    va_end(args);
+
+    *output = (char *)malloc(length);
+
+    if (*output == NULL) {
+        return SAIL_MEMORY_ALLOCATION_FAILED;
+    }
+
+    (*output)[0] = '\0';
+
+    /* Concat strings */
+    counter = num;
+    va_start(args, num);
+
+    while (counter--) {
+        arg = va_arg(args, const char *);
+#ifdef SAIL_WIN32
+        strcat_s(*output, length, arg);
+#else
+        strcat(*output, arg);
+#endif
+    }
+
+    va_end(args);
 
     return 0;
 }
