@@ -77,28 +77,41 @@ int sail_alloc_plugin(const struct sail_plugin_info *plugin_info, struct sail_pl
 #endif
 
 #ifdef SAIL_WIN32
-    #define SAIL_RESOLVE GetProcAddress
+    #define SAIL_RESOLVE_FUNC GetProcAddress
 #else
-    #define SAIL_RESOLVE dlsym
+    #define SAIL_RESOLVE_FUNC dlsym
 #endif
+
+    #define SAIL_RESOLVE(target, handle, symbol)                 \
+    do {                                                         \
+        target = (symbol##_t)SAIL_RESOLVE_FUNC(handle, #symbol); \
+                                                                 \
+        if (target == NULL) {                                    \
+            SAIL_LOG_ERROR("Failed to resolve '%s' in '%s'",     \
+                            #symbol, plugin_info->path);         \
+            sail_destroy_plugin(*plugin);                        \
+            return SAIL_PLUGIN_SYMBOL_RESOLVE_FAILED;            \
+        }                                                        \
+    }                                                            \
+    while(0)
 
     if ((*plugin)->layout == SAIL_PLUGIN_LAYOUT_V2) {
         (*plugin)->v2 = (struct sail_plugin_layout_v2 *)malloc(sizeof(struct sail_plugin_layout_v2));
 
-        (*plugin)->v2->read_features_v2        = (sail_plugin_read_features_v2_t)       SAIL_RESOLVE(handle, "sail_plugin_read_features_v2");
-        (*plugin)->v2->read_init_v2            = (sail_plugin_read_init_v2_t)           SAIL_RESOLVE(handle, "sail_plugin_read_init_v2");
-        (*plugin)->v2->read_seek_next_frame_v2 = (sail_plugin_read_seek_next_frame_v2_t)SAIL_RESOLVE(handle, "sail_plugin_read_seek_next_frame_v2");
-        (*plugin)->v2->read_seek_next_pass_v2  = (sail_plugin_read_seek_next_pass_v2_t) SAIL_RESOLVE(handle, "sail_plugin_read_seek_next_pass_v2");
-        (*plugin)->v2->read_scan_line_v2       = (sail_plugin_read_scan_line_v2_t)      SAIL_RESOLVE(handle, "sail_plugin_read_scan_line_v2");
-        (*plugin)->v2->read_alloc_scan_line_v2 = (sail_plugin_read_alloc_scan_line_v2_t)SAIL_RESOLVE(handle, "sail_plugin_read_alloc_scan_line_v2");
-        (*plugin)->v2->read_finish_v2          = (sail_plugin_read_finish_v2_t)         SAIL_RESOLVE(handle, "sail_plugin_read_finish_v2");
+        SAIL_RESOLVE((*plugin)->v2->read_features_v2,        handle, sail_plugin_read_features_v2);
+        SAIL_RESOLVE((*plugin)->v2->read_init_v2,            handle, sail_plugin_read_init_v2);
+        SAIL_RESOLVE((*plugin)->v2->read_seek_next_frame_v2, handle, sail_plugin_read_seek_next_frame_v2);
+        SAIL_RESOLVE((*plugin)->v2->read_seek_next_pass_v2,  handle, sail_plugin_read_seek_next_pass_v2);
+        SAIL_RESOLVE((*plugin)->v2->read_scan_line_v2,       handle, sail_plugin_read_scan_line_v2);
+        SAIL_RESOLVE((*plugin)->v2->read_alloc_scan_line_v2, handle, sail_plugin_read_alloc_scan_line_v2);
+        SAIL_RESOLVE((*plugin)->v2->read_finish_v2,          handle, sail_plugin_read_finish_v2);
 
-        (*plugin)->v2->write_features_v2        = (sail_plugin_write_features_v2_t)       SAIL_RESOLVE(handle, "sail_plugin_write_features_v2");
-        (*plugin)->v2->write_init_v2            = (sail_plugin_write_init_v2_t)           SAIL_RESOLVE(handle, "sail_plugin_write_init_v2");
-        (*plugin)->v2->write_seek_next_frame_v2 = (sail_plugin_write_seek_next_frame_v2_t)SAIL_RESOLVE(handle, "sail_plugin_write_seek_next_frame_v2");
-        (*plugin)->v2->write_seek_next_pass_v2  = (sail_plugin_write_seek_next_pass_v2_t) SAIL_RESOLVE(handle, "sail_plugin_write_seek_next_pass_v2");
-        (*plugin)->v2->write_scan_line_v2       = (sail_plugin_write_scan_line_v2_t)      SAIL_RESOLVE(handle, "sail_plugin_write_scan_line_v2");
-        (*plugin)->v2->write_finish_v2          = (sail_plugin_write_finish_v2_t)         SAIL_RESOLVE(handle, "sail_plugin_write_finish_v2");
+        SAIL_RESOLVE((*plugin)->v2->write_features_v2,        handle, sail_plugin_write_features_v2);
+        SAIL_RESOLVE((*plugin)->v2->write_init_v2,            handle, sail_plugin_write_init_v2);
+        SAIL_RESOLVE((*plugin)->v2->write_seek_next_frame_v2, handle, sail_plugin_write_seek_next_frame_v2);
+        SAIL_RESOLVE((*plugin)->v2->write_seek_next_pass_v2,  handle, sail_plugin_write_seek_next_pass_v2);
+        SAIL_RESOLVE((*plugin)->v2->write_scan_line_v2,       handle, sail_plugin_write_scan_line_v2);
+        SAIL_RESOLVE((*plugin)->v2->write_finish_v2,          handle, sail_plugin_write_finish_v2);
     } else {
         return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
     }

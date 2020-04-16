@@ -63,6 +63,7 @@ typedef int sail_error_t;
 #define SAIL_PLUGIN_LOAD_ERROR            60
 #define SAIL_PLUGIN_NOT_FOUND             61
 #define SAIL_UNSUPPORTED_PLUGIN_LAYOUT    62
+#define SAIL_PLUGIN_SYMBOL_RESOLVE_FAILED 63
 
 /*
  * libsail errors.
