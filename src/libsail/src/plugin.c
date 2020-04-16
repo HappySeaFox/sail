@@ -54,7 +54,7 @@ int sail_alloc_plugin(const struct sail_plugin_info *plugin_info, struct sail_pl
     SAIL_LOG_DEBUG("Loading plugin '%s'", plugin_info->path);
 
 #ifdef SAIL_WIN32
-    HMODULE handle = LoadLibrary(plugin_info->path);
+    HMODULE handle = LoadLibraryEx(plugin_info->path, NULL, LOAD_LIBRARY_SEARCH_USER_DIRS);
 
     if (handle == NULL) {
         SAIL_LOG_ERROR("Failed to load '%s'. Error: %d", plugin_info->path, GetLastError());

@@ -78,7 +78,7 @@ static const char* plugins_path(void) {
     return env;
 }
 
-/* Add "/lib" to SAIL plugins path. */
+/* Add "sail/plugins/lib" to the DLL/SO search path. */
 static sail_error_t update_lib_path(void) {
 
     SAIL_THREAD_LOCAL static bool update_lib_path_called = false;
@@ -96,12 +96,20 @@ static sail_error_t update_lib_path(void) {
     char *full_path_to_lib;
     SAIL_TRY(sail_concat(&full_path_to_lib, 2, plugs_path, "\\lib"));
 
-    if (!SetDllDirectory(full_path_to_lib)) {
+    SAIL_LOG_DEBUG("Set DLL directory to '%s'", full_path_to_lib);
+
+    wchar_t *full_path_to_lib_w;
+    SAIL_TRY_OR_CLEANUP(sail_to_wchar(full_path_to_lib, &full_path_to_lib_w),
+                        free(full_path_to_lib));
+
+    if (!AddDllDirectory(full_path_to_lib_w)) {
         SAIL_LOG_ERROR("Failed to update library search path. Error: %d", GetLastError());
+        free(full_path_to_lib_w);
         free(full_path_to_lib);
         return SAIL_ENV_UPDATE_FAILED;
     }
 
+    free(full_path_to_lib_w);
     free(full_path_to_lib);
 #else
     char *full_path_to_lib;
