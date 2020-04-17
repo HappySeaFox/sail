@@ -43,6 +43,7 @@
 #include "utils.h"
 
 #include "context.h"
+#include "plugin_info_private.h"
 #include "plugin_info.h"
 #include "plugin.h"
 #include "string_node.h"

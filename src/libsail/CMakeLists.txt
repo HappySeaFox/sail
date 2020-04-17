@@ -1,6 +1,6 @@
 add_library(sail
                 src/ini.c
-                src/plugin_info.c
+                src/plugin_info_private.c
                 src/plugin.c
                 src/sail.c)
 
