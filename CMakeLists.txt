@@ -123,7 +123,7 @@ execute_process(COMMAND git rev-parse --short HEAD
                 RESULT_VARIABLE SAIL_GIT_HASH_RESULT
                 OUTPUT_VARIABLE SAIL_GIT_HASH
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
-configure_file("${PROJECT_SOURCE_DIR}/config.h.in" "${PROJECT_BINARY_DIR}/include/config.h" @ONLY)
+configure_file("${PROJECT_SOURCE_DIR}/src/config.h.in" "${PROJECT_BINARY_DIR}/include/config.h" @ONLY)
 include_directories("${PROJECT_BINARY_DIR}/include")
 
 # Configure subdirs
