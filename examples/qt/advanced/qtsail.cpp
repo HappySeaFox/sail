@@ -221,7 +221,7 @@ QStringList QtSail::filters() const
     while (plugin_info_node != nullptr) {
         QStringList masks;
 
-        sail_string_node *extension_node = plugin_info_node->plugin_info->extension_node;
+        const sail_string_node *extension_node = plugin_info_node->plugin_info->extension_node;
 
         while (extension_node != nullptr) {
             masks.append(QStringLiteral("*.%1").arg(extension_node->value));
