@@ -278,7 +278,8 @@ struct sail_read_features {
      *
      * For example: CMYK, YCBCR, RGB.
      *
-     * NOTE: SAIL doesn't provide pixel format conversion capabilities. Let's take a look at an hypothetical example:
+     * NOTE: Some input pixel formats might not map to some output pixel formats.
+     *       Let's take a look at an hypothetical example:
      *
      * A hypothetical SAIL plugin supports input YCBCR images and it's able to output RGB pixel data from them.
      * Additionally, it supports input CMYK images and it's able to output YCCK pixel data from them.
@@ -336,7 +337,8 @@ struct sail_write_features {
      *
      * For example: CMYK, YCBCR, RGB.
      *
-     * NOTE: SAIL doesn't provide pixel format conversion capabilities. Let's take a look at an hypothetical example:
+     * NOTE: Some input pixel formats might not map to some output pixel formats.
+     *       Let's take a look at an hypothetical example:
      *
      * A hypothetical SAIL plugin supports input RGB pixel data and it's able to output YCBCR files from it.
      * Additionally, it supports input YCCK pixel data and it's able to output CMYK files from it.
@@ -428,8 +430,8 @@ struct sail_read_options {
      * Request to modify the output pixel format. Plugin (or an underlying codec) may reject
      * the requested pixel format.
      *
-     * NOTE: SAIL doesn't provide pixel format conversion capabilities. This pixel format is passed
-     * to an underlying codec which may reject it with an error.
+     * NOTE: Some input pixel formats might not map to some output pixel formats.
+     *       SAIL returns an error in this case.
      */
     int pixel_format;
 
@@ -446,8 +448,8 @@ struct sail_write_options {
      * Request to modify the output pixel format. Plugin (or an underlying codec) may reject
      * the requested pixel format and return an error.
      *
-     * NOTE: SAIL doesn't provide pixel format conversion capabilities. This pixel format is passed
-     * to an underlying codec which may reject it with an error.
+     * NOTE: Some input pixel formats might not map to some output pixel formats.
+     *       SAIL returns an error in this case.
      */
     int pixel_format;
 
