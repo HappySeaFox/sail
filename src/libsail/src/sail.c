@@ -709,11 +709,14 @@ sail_error_t sail_stop_reading(void *pimpl) {
 
     struct hidden_pimpl *pmpl = (struct hidden_pimpl *)pimpl;
 
-    SAIL_CHECK_FILE(pmpl->file);
-    SAIL_CHECK_PLUGIN_PTR(pmpl->plugin);
-
     struct sail_file *file = pmpl->file;
     const struct sail_plugin *plugin = pmpl->plugin;
+
+    /* Not an error. */
+    if (plugin == NULL) {
+        destroy_hidden_pimpl(pmpl);
+        return 0;
+    }
 
     if (plugin->layout == SAIL_PLUGIN_LAYOUT_V2) {
         SAIL_TRY_OR_CLEANUP(plugin->v2->read_finish_v2(file),
@@ -859,11 +862,14 @@ sail_error_t sail_stop_writing(void *pimpl) {
 
     struct hidden_pimpl *pmpl = (struct hidden_pimpl *)pimpl;
 
-    SAIL_CHECK_FILE(pmpl->file);
-    SAIL_CHECK_PLUGIN_PTR(pmpl->plugin);
-
     struct sail_file *file = pmpl->file;
     const struct sail_plugin *plugin = pmpl->plugin;
+
+    /* Not an error. */
+    if (plugin == NULL) {
+        destroy_hidden_pimpl(pmpl);
+        return 0;
+    }
 
     if (plugin->layout == SAIL_PLUGIN_LAYOUT_V2) {
         SAIL_TRY_OR_CLEANUP(plugin->v2->write_finish_v2(file),
