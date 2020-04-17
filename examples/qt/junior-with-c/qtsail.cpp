@@ -76,14 +76,12 @@ QtSail::QtSail(QWidget *parent)
 
 QtSail::~QtSail()
 {
-    SAIL_LOG_INFO("Finish");
     sail_finish(d->context);
     d->context = nullptr;
 }
 
 sail_error_t QtSail::init()
 {
-    SAIL_LOG_INFO("Init");
     SAIL_TRY_OR_CLEANUP(sail_init(&d->context),
                         /* cleanup */ QMessageBox::critical(this, tr("Error"), tr("Failed to init SAIL")),
                                       ::exit(1));
