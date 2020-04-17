@@ -9,7 +9,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 #
 option(SAIL_ASAN "Enable ASAN on supported platforms." ON)
 
-project(qt-sail-demo-junior)
+project(qt-sail-demo-junior-with-c)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -29,7 +29,7 @@ if (WIN32)
     set(CMAKE_EXE_LINKER_FLAGS "/MANIFEST:NO")
 endif()
 
-add_executable(qt-sail-demo-junior
+add_executable(qt-sail-demo-junior-with-c
                 main.cpp
                 qtsail.cpp
                 qtsail.ui
@@ -39,8 +39,8 @@ add_executable(qt-sail-demo-junior
 #
 if (SAIL_ASAN)
     if (CMAKE_COMPILER_IS_GNUCC)
-        target_compile_options(qt-sail-demo-junior PRIVATE "-fsanitize=address,leak")
-        target_link_libraries(qt-sail-demo-junior "-fsanitize=address,leak")
+        target_compile_options(qt-sail-demo-junior-with-c PRIVATE "-fsanitize=address,leak")
+        target_link_libraries(qt-sail-demo-junior-with-c "-fsanitize=address,leak")
     else()
         message("ASAN is not supported on this platform.")
     endif()
@@ -49,11 +49,11 @@ endif()
 # Add SAIL dependency
 #
 pkg_check_modules(SAIL IMPORTED_TARGET REQUIRED libsail)
-target_compile_options(qt-sail-demo-junior     PRIVATE "${SAIL_CFLAGS}")
-target_include_directories(qt-sail-demo-junior PRIVATE "${SAIL_INCLUDE_DIRS}")
-target_link_libraries(qt-sail-demo-junior      PkgConfig::SAIL)
+target_compile_options(qt-sail-demo-junior-with-c     PRIVATE "${SAIL_CFLAGS}")
+target_include_directories(qt-sail-demo-junior-with-c PRIVATE "${SAIL_INCLUDE_DIRS}")
+target_link_libraries(qt-sail-demo-junior-with-c      PkgConfig::SAIL)
 
 # Add Qt5 dependency
 #
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
-target_link_libraries(qt-sail-demo-junior Qt5::Widgets)
+target_link_libraries(qt-sail-demo-junior-with-c Qt5::Widgets)
