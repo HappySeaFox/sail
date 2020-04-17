@@ -216,6 +216,8 @@ static sail_error_t build_plugin_full_path(struct sail_context *context,
 
 sail_error_t sail_init(struct sail_context **context) {
 
+    SAIL_LOG_INFO("Init");
+
     SAIL_CHECK_CONTEXT_PTR(context);
 
     *context = (struct sail_context *)malloc(sizeof(struct sail_context));
@@ -313,6 +315,8 @@ sail_error_t sail_init(struct sail_context **context) {
 }
 
 void sail_finish(struct sail_context *context) {
+
+    SAIL_LOG_INFO("Finish");
 
     if (context == NULL) {
         return;
