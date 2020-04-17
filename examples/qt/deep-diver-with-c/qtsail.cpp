@@ -212,6 +212,12 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
         read_options->pixel_format = SAIL_PIXEL_FORMAT_RGB;
     }
 
+    QImage::Format qimageFormat = sailPixelFormatToQImageFormat(read_options->pixel_format);
+
+    if (qimageFormat == QImage::Format_Invalid) {
+        return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+    }
+
     elapsed.restart();
 
     // Initialize reading with our options.
@@ -221,14 +227,6 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     // Seek and read the next image frame in the file.
     //
     SAIL_TRY(sail_read_next_frame(pimpl, &image, (void **)&image_bits));
-
-    // Error check.
-    //
-    QImage::Format qimageFormat = sailPixelFormatToQImageFormat(image->pixel_format);
-
-    if (qimageFormat == QImage::Format_Invalid) {
-        return SAIL_UNSUPPORTED_PIXEL_FORMAT;
-    }
 
     // Finish reading.
     //
