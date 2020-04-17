@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.6)
 
 project(SAIL VERSION 0.9.0
              DESCRIPTION "Squirrel Abstract Image Libraries"
-             LANGUAGES C)
+             LANGUAGES C CXX)
 
 include(GNUInstallDirs)
 
@@ -133,6 +133,7 @@ add_subdirectory(src/libsail)
 add_subdirectory(src/sail-plugins)
 add_subdirectory(examples/c/sail-convert)
 add_subdirectory(examples/c/sail-probe)
+add_subdirectory(bindings/c++)
 
 # Installation
 #
