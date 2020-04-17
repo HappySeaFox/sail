@@ -237,17 +237,7 @@ void QtSail::onSave()
         return;
     }
 
-    if (QMessageBox::question(this, tr("Open file"), tr("%1 has been saved succesfully. Open the saved file?")
-                              .arg(QDir::toNativeSeparators(path))) == QMessageBox::Yes) {
-        if ((res = loadImage(path, &d->qimage)) == 0) {
-            onFit(d->ui->checkFit->isChecked());
-        } else {
-            QMessageBox::critical(this, tr("Error"), tr("Failed to load '%1'. Error: %2.")
-                                  .arg(path)
-                                  .arg(res));
-            return;
-        }
-    }
+    QMessageBox::information(this, tr("Success"), tr("%1 has been saved succesfully.").arg(path));
 }
 
 void QtSail::onFit(bool fit)
