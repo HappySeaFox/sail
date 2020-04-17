@@ -20,6 +20,8 @@
     SOFTWARE.
 */
 
+#include <cstdlib>
+
 #include <QDateTime>
 #include <QDebug>
 #include <QDir>
