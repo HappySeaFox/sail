@@ -21,10 +21,6 @@
 // libsail-common.
 #include "error.h"
 
-// libsail.
-#include "context.h"
-#include "sail.h"
-
 #include "plugin_info-c++.h"
 
 namespace sail
