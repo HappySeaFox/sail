@@ -59,17 +59,27 @@ SAIL_EXPORT sail_error_t sail_init(struct sail_context **context);
 /*
  * Finilizes working with the specified SAIL context. Frees the context and all its internal
  * memory buffers. The context MUST NOT be used anymore after calling this function.
+ * Does nothing if context is NULL.
  */
 SAIL_EXPORT void sail_finish(struct sail_context *context);
 
 /*
- * Returns a linked list of found plugin info nodes.
+ * Returns a linked list of found plugin info nodes. Use it to determine the list of possible
+ * image formats, file extensions, and mime types that could be hypothetically read or written by SAIL.
+ *
+ * Returns a pointer to the first plugin info node or NULL when no SAIL plugins were found.
+ * Use sail_plugin_info_node.next to iterate.
  */
 SAIL_EXPORT const struct sail_plugin_info_node* sail_plugin_info_list(const struct sail_context *context);
 
 /*
  * Finds a first plugin info object that supports the specified file extension. For example: "jpg".
  * The assigned plugin info MUST NOT be destroyed. It's a pointer to an internal data structure.
+ *
+ * Typical usage: sail_plugin_info_by_extension() -> sail_load_plugin() -> sail_start_reading_with_plugin() ->
+ *                sail_read_next_frame() -> sail_stop_reading().
+ * Or:            sail_plugin_info_by_extension() -> sail_load_plugin() -> sail_start_writing_with_plugin() ->
+ *                sail_write_next_frame() -> sail_stop_writing().
  *
  * Returns 0 on success or sail_error_t on error.
  */
@@ -78,6 +88,11 @@ SAIL_EXPORT sail_error_t sail_plugin_info_by_extension(const struct sail_context
 /*
  * Finds a first plugin info object that supports the specified mime type. For example: "image/jpeg".
  * The assigned plugin info MUST NOT be destroyed. It's a pointer to an internal data structure.
+ *
+ * Typical usage: sail_plugin_info_by_mime_type() -> sail_load_plugin() -> sail_start_reading_with_plugin() ->
+ *                sail_read_next_frame() -> sail_stop_reading().
+ * Or:            sail_plugin_info_by_mime_type() -> sail_load_plugin() -> sail_start_writing_with_plugin() ->
+ *                sail_write_next_frame() -> sail_stop_writing().
  *
  * Returns 0 on success or sail_error_t on error.
  */
@@ -88,13 +103,21 @@ SAIL_EXPORT sail_error_t sail_plugin_info_by_mime_type(const struct sail_context
  * It's a pointer to an internal data structure. Caches the loaded plugin in the internal storage, so a subsequent
  * call with the same plugin info just returns the cached plugin pointer.
  *
+ * Typical usage: sail_plugin_info_by_extension() -> sail_load_plugin() -> sail_start_reading_with_plugin() ->
+ *                sail_read_next_frame() -> sail_stop_reading().
+ * Or:            sail_plugin_info_by_extension() -> sail_load_plugin() -> sail_start_writing_with_plugin() ->
+ *                sail_write_next_frame() -> sail_stop_writing().
+ *
  * Returns 0 on success or sail_error_t on error.
  */
 SAIL_EXPORT sail_error_t sail_load_plugin(struct sail_context *context, const struct sail_plugin_info *plugin_info, const struct sail_plugin **plugin);
 
 /*
  * Unloads all loaded plugins from the cache to release memory occupied by them. Use it if you don't want
- * to de-initialize SAIL with sail_finish(), but want just to release some memory.
+ * to de-initialize SAIL with sail_finish(), but want to just release some memory. Subsequent attempts
+ * to read or write images will reload SAIL plugins from disk.
+ *
+ * Typical usage: this is a standalone function that could be called at any time.
  *
  * Returns 0 on success or sail_error_t on error.
  */
@@ -119,11 +142,13 @@ SAIL_EXPORT sail_error_t sail_plugin_read_features(const struct sail_plugin *plu
 SAIL_EXPORT sail_error_t sail_plugin_write_features(const struct sail_plugin *plugin, struct sail_write_features **write_features);
 
 /*
- * Loads the specified image and returns its properties. The assigned image MUST be destroyed later
+ * Loads the specified image and returns its properties and pixel data. The assigned image MUST be destroyed later
  * with sail_destroy_image(). The assigned plugin info MUST NOT be destroyed. It's a pointer to an internal
  * data structure. If you don't need it, just pass NULL.
  *
  * This function is pretty fast as it doesn't decode whole image data for most image formats.
+ *
+ * Typical usage: this is a standalone function that could be called at any time.
  *
  * Returns 0 on success or sail_error_t on error.
  */
@@ -179,7 +204,7 @@ SAIL_EXPORT sail_error_t sail_start_reading(const char *path, struct sail_contex
                                             const struct sail_plugin_info **plugin_info, void **pimpl);
 
 /*
- * Continues reading the image started by sail_start_reading() or sail_start_reading_with_plugin().
+ * Continues reading the file started by sail_start_reading() or sail_start_reading_with_plugin().
  * The assigned image MUST be destroyed later with sail_image_destroy(). The assigned image bits
  * MUST be destroyed later with free().
  *
@@ -189,7 +214,7 @@ SAIL_EXPORT sail_error_t sail_start_reading(const char *path, struct sail_contex
 SAIL_EXPORT sail_error_t sail_read_next_frame(void *pimpl, struct sail_image **image, void **image_bits);
 
 /*
- * Stops reading started by sail_start_reading() or sail_start_reading_with_plugin().
+ * Stops reading the file started by sail_start_reading() or sail_start_reading_with_plugin().
  * Does nothing if the pimpl is NULL.
  *
  * Returns 0 on success or sail_error_t on error.
@@ -197,8 +222,8 @@ SAIL_EXPORT sail_error_t sail_read_next_frame(void *pimpl, struct sail_image **i
 SAIL_EXPORT sail_error_t sail_stop_reading(void *pimpl);
 
 /*
- * Starts writing the specified image with the specified plugin and write options. If you don't need specific write options,
- * just pass NULL. Plugin-specific defaults will be used in this case.
+ * Starts writing the specified image file with the specified plugin and write options. If you don't need
+ * specific write options, just pass NULL. Plugin-specific defaults will be used in this case.
  *
  * Typical usage: sail_plugin_info_by_extension() -> sail_load_plugin() -> sail_start_writing_with_plugin() ->
  *                sail_write_next_frame() -> sail_stop_writing().
@@ -245,14 +270,14 @@ SAIL_EXPORT sail_error_t sail_start_writing(const char *path, struct sail_contex
                                             const struct sail_plugin_info **plugin_info, void **pimpl);
 
 /*
- * Continues writing the image started by sail_start_writing() or sail_start_writing_with_plugin().
+ * Continues writing the file started by sail_start_writing() or sail_start_writing_with_plugin().
  *
  * Returns 0 on success or sail_error_t on error.
  */
 SAIL_EXPORT sail_error_t sail_write_next_frame(void *pimpl, const struct sail_image *image, const void *image_bits);
 
 /*
- * Stops writing started by sail_start_writing() or sail_start_writing_with_plugin.
+ * Stops writing the file started by sail_start_writing() or sail_start_writing_with_plugin().
  * Does nothing if the pimpl is NULL.
  *
  * Returns 0 on success or sail_error_t on error.
