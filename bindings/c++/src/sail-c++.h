@@ -44,6 +44,10 @@ public:
     context();
     ~context();
 
+    /*
+     * Returns true if SAIL was initialized successfully. Using SAIL when this
+     * function returns false has no sense as most methods will return errors.
+     */
     bool is_valid() const;
 
     std::vector<plugin_info> plugin_info_list() const;
