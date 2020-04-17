@@ -31,30 +31,34 @@
 #include <string>
 #include <vector>
 
+struct sail_plugin_info;
+
 namespace sail
 {
 
 /*
- * A C++ anemic interface to struct sail_plugin_info.
+ * A C++ interface to struct sail_plugin_info.
  */
 class SAIL_EXPORT plugin_info
 {
 public:
     plugin_info();
+    plugin_info(const sail_plugin_info *pi);
     plugin_info(const plugin_info &pi);
     ~plugin_info();
-
-    plugin_info& with_version(const std::string &version);
-    plugin_info& with_name(const std::string &name);
-    plugin_info& with_description(const std::string &description);
-    plugin_info& with_extensions(const std::vector<std::string> &extensions);
-    plugin_info& with_mime_types(const std::vector<std::string> &mime_types);
 
     std::string version() const;
     std::string name() const;
     std::string description() const;
     std::vector<std::string> extensions() const;
     std::vector<std::string> mime_types() const;
+
+private:
+    plugin_info& with_version(const std::string &version);
+    plugin_info& with_name(const std::string &name);
+    plugin_info& with_description(const std::string &description);
+    plugin_info& with_extensions(const std::vector<std::string> &extensions);
+    plugin_info& with_mime_types(const std::vector<std::string> &mime_types);
 
 private:
     class pimpl;

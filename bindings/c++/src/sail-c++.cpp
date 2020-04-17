@@ -25,7 +25,6 @@
 #include "context.h"
 #include "plugin_info.h"
 #include "sail.h"
-#include "string_node.h"
 
 #include "plugin_info-c++.h"
 #include "sail-c++.h"
@@ -62,34 +61,7 @@ std::vector<plugin_info> context::plugin_info_list() const
     const sail_plugin_info_node *plugin_info_node = sail_plugin_info_list(d->context);
 
     while (plugin_info_node != nullptr) {
-        plugin_info pi;
-
-        std::vector<std::string> extensions;
-        std::vector<std::string> mime_types;
-
-        const sail_string_node *extension_node = plugin_info_node->plugin_info->extension_node;
-
-        while (extension_node != nullptr) {
-            extensions.push_back(extension_node->value);
-            extension_node = extension_node->next;
-        }
-
-        const sail_string_node *mime_type_node = plugin_info_node->plugin_info->mime_type_node;
-
-        while (mime_type_node != nullptr) {
-            mime_types.push_back(mime_type_node->value);
-            mime_type_node = mime_type_node->next;
-        }
-
-        pi
-            .with_version(plugin_info_node->plugin_info->version)
-            .with_name(plugin_info_node->plugin_info->name)
-            .with_description(plugin_info_node->plugin_info->description)
-            .with_extensions(extensions)
-            .with_mime_types(mime_types);
-
-        list.push_back(pi);
-
+        list.push_back(plugin_info(plugin_info_node->plugin_info));
         plugin_info_node = plugin_info_node->next;
     }
 
