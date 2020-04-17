@@ -142,7 +142,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_features(const struct sail_plugin *plu
 SAIL_EXPORT sail_error_t sail_plugin_write_features(const struct sail_plugin *plugin, struct sail_write_features **write_features);
 
 /*
- * Loads the specified image and returns its properties and pixel data. The assigned image MUST be destroyed later
+ * Loads the specified image and returns its properties without pixel data. The assigned image MUST be destroyed later
  * with sail_destroy_image(). The assigned plugin info MUST NOT be destroyed. It's a pointer to an internal
  * data structure. If you don't need it, just pass NULL.
  *
@@ -154,6 +154,29 @@ SAIL_EXPORT sail_error_t sail_plugin_write_features(const struct sail_plugin *pl
  */
 SAIL_EXPORT sail_error_t sail_probe_image(const char *path, struct sail_context *context,
                                             const struct sail_plugin_info **plugin_info, struct sail_image **image);
+
+/*
+ * Loads the specified image file and returns its properties and pixel data. The assigned image MUST be destroyed later
+ * with sail_destroy_image(). The assigned plugin info MUST NOT be destroyed. It's a pointer to an internal
+ * data structure. If you don't need it, just pass NULL. The assigned pixel data MUST be destroyed later free().
+ *
+ * Typical usage: this is a standalone function that could be called at any time.
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_read(const char *path, struct sail_context *context, struct sail_image **image, void **image_bits,
+                                    const struct sail_plugin_info **plugin_info);
+
+/*
+ * Writes the specified image file its pixel data into the fle. The assigned plugin info MUST NOT be destroyed.
+ * It's a pointer to an internal data structure. If you don't need it, just pass NULL.
+ *
+ * Typical usage: this is a standalone function that could be called at any time.
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_write(const char *path, struct sail_context *context, const struct sail_image *image, const void *image_bits,
+                                    const struct sail_plugin_info **plugin_info);
 
 /*
  * Starts reading the specified image with the specified plugin and read options. If you don't need specific read options,

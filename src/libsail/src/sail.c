@@ -531,6 +531,47 @@ sail_error_t sail_probe_image(const char *path, struct sail_context *context, co
     return 0;
 }
 
+sail_error_t sail_read(const char *path, struct sail_context *context, struct sail_image **image, void **image_bits,
+                        const struct sail_plugin_info **plugin_info) {
+
+    SAIL_CHECK_PATH_PTR(path);
+    SAIL_CHECK_CONTEXT_PTR(context);
+    SAIL_CHECK_IMAGE_PTR(image);
+    SAIL_CHECK_PTR(image_bits);
+
+    void *pimpl = NULL;
+    *image_bits = NULL;
+
+    SAIL_TRY_OR_CLEANUP(sail_start_reading(path, context, plugin_info, &pimpl),
+                        sail_stop_reading(pimpl));
+    SAIL_TRY_OR_CLEANUP(sail_read_next_frame(pimpl, image, image_bits),
+                        free(image_bits),
+                        sail_stop_reading(pimpl));
+    SAIL_TRY_OR_CLEANUP(sail_stop_reading(pimpl),
+                        free(image_bits));
+
+    return 0;
+}
+
+sail_error_t sail_write(const char *path, struct sail_context *context, const struct sail_image *image, const void *image_bits,
+                        const struct sail_plugin_info **plugin_info) {
+
+    SAIL_CHECK_PATH_PTR(path);
+    SAIL_CHECK_CONTEXT_PTR(context);
+    SAIL_CHECK_IMAGE(image);
+    SAIL_CHECK_PTR(image_bits);
+
+    void *pimpl = NULL;
+
+    SAIL_TRY_OR_CLEANUP(sail_start_writing(path, context, plugin_info, &pimpl),
+                        sail_stop_writing(pimpl));
+    SAIL_TRY_OR_CLEANUP(sail_write_next_frame(pimpl, image, image_bits),
+                        sail_stop_writing(pimpl));
+    SAIL_TRY(sail_stop_writing(pimpl));
+
+    return 0;
+}
+
 struct hidden_pimpl {
 
     struct sail_file *file;
