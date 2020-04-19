@@ -61,6 +61,8 @@ private:
         code                                               \
     };                                                     \
     sail::scope_cleanup<decltype(lambda)> scp_ext(lambda); \
-    (void)scp_ext;
+do {                                                       \
+    (void)scp_ext;                                         \
+} while(0)
 
 #endif
