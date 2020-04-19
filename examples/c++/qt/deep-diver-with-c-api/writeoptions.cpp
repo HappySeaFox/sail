@@ -70,7 +70,6 @@ WriteOptions::WriteOptions(const QString &codecDescription, const sail_write_fea
         d->ui->sliderCompression->setValue(write_features->compression_default);
         d->ui->labelCompressionValue->setNum(d->ui->sliderCompression->value());
 
-        //connect(d->ui->sliderCompression, &QSlider::valueChanged, d->ui->labelCompressionValue, &QLabel::setNum);
         connect(d->ui->sliderCompression, &QSlider::valueChanged, [&](int value) {
             d->ui->labelCompressionValue->setNum(value);
         });
