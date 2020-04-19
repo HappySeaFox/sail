@@ -52,6 +52,8 @@ public:
 
     bool is_valid() const;
 
+    sail_error_t to_sail_image(sail_image **image) const;
+
     int width() const;
     int height() const;
     int bytes_per_line() const;
@@ -81,7 +83,7 @@ public:
     image& with_properties(int properties);
     image& with_source_pixel_format(int source_pixel_format);
     image& with_source_properties(int source_properties);
-    image& with_bits(void *bits, int bits_size);
+    image& with_bits(const void *bits, int bits_size);
 
 private:
     class pimpl;

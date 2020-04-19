@@ -26,6 +26,7 @@
 #include "error.h"
 #include "meta_entry_node.h"
 #include "log.h"
+#include "utils.h"
 
 // libsail.
 #include "context.h"
@@ -144,6 +145,70 @@ image::~image()
 bool image::is_valid() const
 {
     return d->width > 0 && d->height > 0;
+}
+
+sail_error_t image::to_sail_image(sail_image **image) const
+{
+    SAIL_CHECK_IMAGE_PTR(image);
+
+    // Resulting meta entries
+    sail_meta_entry_node *image_meta_entry_node = nullptr;
+
+    sail_meta_entry_node *last_meta_entry_node;
+    auto it = d->meta_entries.begin();
+
+    while (it != d->meta_entries.end()) {
+        sail_meta_entry_node *meta_entry_node;
+
+        SAIL_TRY(sail_alloc_meta_entry_node(&meta_entry_node));
+        SAIL_TRY_OR_CLEANUP(sail_strdup(it->first.c_str(), &meta_entry_node->key),
+                            sail_destroy_meta_entry_node(meta_entry_node),
+                            sail_destroy_meta_entry_node_chain(image_meta_entry_node));
+        SAIL_TRY_OR_CLEANUP(sail_strdup(it->second.c_str(), &meta_entry_node->value),
+                            sail_destroy_meta_entry_node(meta_entry_node),
+                            sail_destroy_meta_entry_node_chain(image_meta_entry_node));
+
+        if (image_meta_entry_node == nullptr) {
+            image_meta_entry_node = last_meta_entry_node = meta_entry_node;
+        } else {
+            last_meta_entry_node->next = meta_entry_node;
+            last_meta_entry_node = meta_entry_node;
+        }
+
+        ++it;
+    }
+
+    SAIL_TRY(sail_alloc_image(image));
+
+    (*image)->width                = d->width;
+    (*image)->height               = d->height;
+    (*image)->bytes_per_line       = d->bytes_per_line;
+    (*image)->pixel_format         = d->pixel_format;
+    (*image)->passes               = d->passes;
+    (*image)->animated             = d->animated;
+    (*image)->delay                = d->delay;
+
+    if (d->palette != nullptr && d->palette_size > 0) {
+        (*image)->palette = malloc(d->palette_size);
+
+        if ((*image)->palette == NULL) {
+            sail_destroy_image(*image);
+            return SAIL_MEMORY_ALLOCATION_FAILED;
+        }
+
+        memcpy((*image)->palette, d->palette, d->palette_size);
+
+        (*image)->palette              = d->palette;
+        (*image)->palette_size         = d->palette_size;
+        (*image)->palette_pixel_format = d->palette_pixel_format;
+    }
+
+    (*image)->meta_entry_node      = image_meta_entry_node;
+    (*image)->properties           = d->properties;
+    (*image)->source_pixel_format  = d->source_pixel_format;
+    (*image)->source_properties    = d->source_properties;
+
+    return 0;
 }
 
 int image::width() const
@@ -319,7 +384,7 @@ image& image::with_source_properties(int source_properties)
     return *this;
 }
 
-image& image::with_bits(void *bits, int bits_size)
+image& image::with_bits(const void *bits, int bits_size)
 {
     free(d->bits);
 
@@ -327,6 +392,7 @@ image& image::with_bits(void *bits, int bits_size)
     d->bits_size = 0;
 
     if (bits == nullptr || bits_size < 1) {
+        SAIL_LOG_ERROR("Not copying invalid bits. Bits pointer: %p, bits size: %d", bits, bits_size);
         return *this;
     }
 

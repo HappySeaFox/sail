@@ -39,6 +39,7 @@
 #include <sail/context-c++.h>
 #include <sail/plugin_info-c++.h>
 #include <sail/image_reader-c++.h>
+#include <sail/image_writer-c++.h>
 #include <sail/image-c++.h>
 
 //#include <sail/layouts/v2.h>
@@ -152,23 +153,17 @@ static int qImageFormatToSailPixelFormat(QImage::Format format) {
 
 sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
 {
-/*
-    struct sail_image *image = nullptr;
-    SAIL_TRY(sail_alloc_image(&image));
+    sail::image_writer writer(&d->context);
+    sail::image image;
 
-    image->width = qimage.width();
-    image->height = qimage.height();
-    image->pixel_format = qImageFormatToSailPixelFormat(qimage.format());
+    image.with_width(qimage.width())
+         .with_height(qimage.height())
+         .with_pixel_format(qImageFormatToSailPixelFormat(qimage.format()))
+         .with_bytes_per_line(sail_bytes_per_line(image.width(), image.pixel_format()))
+         .with_bits(qimage.bits(), image.bytes_per_line() * image.height());
 
-    SAIL_TRY_OR_CLEANUP(sail_write(path.toLocal8Bit(),
-                        d->context,
-                        image,
-                        reinterpret_cast<const void *>(qimage.bits()),
-                        nullptr),
-                        sail_destroy_image(image));
+    SAIL_TRY(writer.write(path.toLocal8Bit(), &image));
 
-    sail_destroy_image(image);
-*/
     return 0;
 }
 
