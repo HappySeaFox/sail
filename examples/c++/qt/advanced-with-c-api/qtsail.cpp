@@ -105,12 +105,11 @@ static QImage::Format sailPixelFormatToQImageFormat(int pixel_format) {
 
 sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 {
-    const struct sail_plugin_info *plugin_info;
     void *pimpl = nullptr;
     struct sail_image *image = nullptr;
     uchar *image_bits = nullptr;
 
-    SAIL_TRY_OR_CLEANUP(loadImageLowLevel(path, &plugin_info, &pimpl, &image, &image_bits),
+    SAIL_TRY_OR_CLEANUP(loadImageImpl(path, &pimpl, &image, &image_bits),
                         /* cleanup */ free(image_bits),
                                       sail_stop_reading(pimpl),
                                       sail_destroy_image(image));
@@ -135,10 +134,11 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     return 0;
 }
 
-sail_error_t QtSail::loadImageLowLevel(const QString &path, const sail_plugin_info **plugin_info, void **pimpl,
-                                       sail_image **image, uchar **image_bits)
+sail_error_t QtSail::loadImageImpl(const QString &path, void **pimpl, sail_image **image, uchar **image_bits)
 {
-    SAIL_TRY(sail_start_reading(path.toLocal8Bit(), d->context, plugin_info/* or nullptr */, pimpl));
+    const struct sail_plugin_info *plugin_info;
+
+    SAIL_TRY(sail_start_reading(path.toLocal8Bit(), d->context, &plugin_info/* or nullptr */, pimpl));
     SAIL_TRY(sail_read_next_frame(*pimpl, image, (void **)image_bits));
     SAIL_TRY(sail_stop_reading(*pimpl));
 
@@ -162,7 +162,6 @@ static int qImageFormatToSailPixelFormat(QImage::Format format) {
 
 sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
 {
-    const struct sail_plugin_info *plugin_info;
     void *pimpl = nullptr;
 
     struct sail_image *image = nullptr;
@@ -173,7 +172,7 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
     image->pixel_format = qImageFormatToSailPixelFormat(qimage.format());
     image->bytes_per_line = sail_bytes_per_line(image->width, image->pixel_format);
 
-    SAIL_TRY_OR_CLEANUP(saveImageLowLevel(path, &plugin_info, &pimpl, image, qimage.bits()),
+    SAIL_TRY_OR_CLEANUP(saveImageImpl(path, &pimpl, image, qimage.bits()),
                         /* cleanup */ sail_stop_writing(pimpl),
                                       sail_destroy_image(image));
 
@@ -182,11 +181,12 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
     return 0;
 }
 
-sail_error_t QtSail::saveImageLowLevel(const QString &path, const sail_plugin_info **plugin_info,
-                                       void **pimpl, const sail_image *image, const uchar *image_bits)
+sail_error_t QtSail::saveImageImpl(const QString &path,
+                                   void **pimpl, const sail_image *image, const uchar *image_bits)
 {
+    const struct sail_plugin_info *plugin_info;
 
-    SAIL_TRY(sail_start_writing(path.toLocal8Bit(), d->context, plugin_info/* or nullptr */, pimpl));
+    SAIL_TRY(sail_start_writing(path.toLocal8Bit(), d->context, &plugin_info/* or nullptr */, pimpl));
     SAIL_TRY(sail_write_next_frame(*pimpl, image, image_bits));
     SAIL_TRY(sail_stop_writing(*pimpl));
 
