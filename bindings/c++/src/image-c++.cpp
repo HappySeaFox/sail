@@ -186,7 +186,7 @@ int image::palette_pixel_format() const
     return d->palette_pixel_format;
 }
 
-void *image::palette() const
+void* image::palette() const
 {
     return d->palette;
 }
@@ -216,7 +216,7 @@ int image::source_properties() const
     return d->source_properties;
 }
 
-void *image::bits() const
+void* image::bits() const
 {
     return d->bits;
 }

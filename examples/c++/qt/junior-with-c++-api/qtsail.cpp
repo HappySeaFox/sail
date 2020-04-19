@@ -35,8 +35,11 @@
 
 #include <sail/sail.h>
 
+#include <sail/at_scope_exit-c++.h>
+#include <sail/context-c++.h>
 #include <sail/plugin_info-c++.h>
-#include <sail/sail-c++.h>
+#include <sail/image_reader-c++.h>
+#include <sail/image-c++.h>
 
 //#include <sail/layouts/v2.h>
 
@@ -106,34 +109,31 @@ static QImage::Format sailPixelFormatToQImageFormat(int pixel_format) {
 
 sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 {
-/*
-    struct sail_image *image = nullptr;
-    uchar *image_bits = nullptr;
+    sail::image_reader reader(&d->context);
+    sail::image *simage = nullptr;
 
-    SAIL_TRY_OR_CLEANUP(sail_read(path.toLocal8Bit(),
-                       d->context,
-                       &image,
-                       reinterpret_cast<void **>(&image_bits),
-                       nullptr),
-                            free(image_bits),
-                            sail_destroy_image(image));
-
-    // Construct QImage from the read image bits.
+    // Auto cleanup when the method exits.
     //
-    *qimage = QImage(image_bits,
-                     image->width,
-                     image->height,
-                     image->bytes_per_line,
-                     sailPixelFormatToQImageFormat(image->pixel_format)).copy();
+    SAIL_AT_SCOPE_EXIT (
+        delete simage;
+    );
+
+    SAIL_TRY(reader.read(path.toLocal8Bit(), &simage));
+
+    // Construct QImage from the read image.
+    //
+    *qimage = QImage(reinterpret_cast<uchar *>(simage->bits()),
+                     simage->width(),
+                     simage->height(),
+                     simage->bytes_per_line(),
+                     sailPixelFormatToQImageFormat(simage->pixel_format())).copy();
 
     d->ui->labelStatus->setText(tr("%1  [%2x%3]")
                                 .arg(QFileInfo(path).fileName())
-                                .arg(image->width)
-                                .arg(image->height)
+                                .arg(simage->width())
+                                .arg(simage->height())
                                 );
-    free(image_bits);
-    sail_destroy_image(image);
-*/
+
     return 0;
 }
 

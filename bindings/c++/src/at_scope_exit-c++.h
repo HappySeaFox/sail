@@ -16,50 +16,36 @@
     along with this library. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef SAIL_SAIL_CPP_H
-#define SAIL_SAIL_CPP_H
-
-#ifdef SAIL_BUILD
-    #include "error.h"
-    #include "export.h"
-#else
-    #include <sail/error.h>
-    #include <sail/export.h>
-#endif
-
-#include <memory>
-#include <vector>
+#ifndef SAIL_AT_SCOPE_EXIT_CPP_H
+#define SAIL_AT_SCOPE_EXIT_CPP_H
 
 namespace sail
 {
 
-class plugin_info;
-
-/*
- * A C++ interface to struct sail_context.
- */
-class SAIL_EXPORT context
+template<typename F>
+class scope_cleanup
 {
 public:
-    context();
-    ~context();
-
-    /*
-     * Returns true if SAIL was initialized successfully. Using SAIL when this
-     * function returns false has no sense as most methods will return errors.
-     */
-    bool is_valid() const;
-
-    std::vector<plugin_info> plugin_info_list() const;
+    scope_cleanup(F f)
+        : m_f(f)
+    {
+    }
+    ~scope_cleanup()
+    {
+        m_f();
+    }
 
 private:
-    sail_error_t init();
-
-private:
-    class pimpl;
-    const std::unique_ptr<pimpl> d;
+    F m_f;
 };
 
 }
+
+#define SAIL_AT_SCOPE_EXIT(code)                           \
+    auto lambda = [&] {                                    \
+        code                                               \
+    };                                                     \
+    sail::scope_cleanup<decltype(lambda)> scp_ext(lambda); \
+    (void)scp_ext;
 
 #endif

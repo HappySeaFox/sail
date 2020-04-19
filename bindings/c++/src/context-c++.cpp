@@ -26,8 +26,8 @@
 #include "plugin_info.h"
 #include "sail.h"
 
+#include "context-c++.h"
 #include "plugin_info-c++.h"
-#include "sail-c++.h"
 
 namespace sail
 {
@@ -66,6 +66,11 @@ std::vector<plugin_info> context::plugin_info_list() const
     }
 
     return list;
+}
+
+sail_context* context::to_sail_context() const
+{
+    return d->context;
 }
 
 sail_error_t context::init()

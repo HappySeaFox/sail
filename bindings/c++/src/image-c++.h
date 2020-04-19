@@ -60,13 +60,13 @@ public:
     bool animated() const;
     int delay() const;
     int palette_pixel_format() const;
-    void *palette() const;
+    void* palette() const;
     int palette_size() const;
     std::map<std::string, std::string> meta_entries() const;
     int properties() const;
     int source_pixel_format() const;
     int source_properties() const;
-    void *bits() const;
+    void* bits() const;
     int bits_size() const;
 
     image& with_width(int width);
