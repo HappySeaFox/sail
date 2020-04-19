@@ -115,8 +115,8 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
                        &image,
                        reinterpret_cast<void **>(&image_bits),
                        nullptr),
-                       free(image_bits),
-                       sail_destroy_image(image));
+                            free(image_bits),
+                            sail_destroy_image(image));
 
     // Construct QImage from the read image bits.
     //

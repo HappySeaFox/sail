@@ -9,7 +9,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 #
 option(SAIL_ASAN "Enable ASAN on supported platforms." ON)
 
-project(qt-sail-demo-junior-with-c++)
+project(deep-diver-with-c-api)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -29,18 +29,22 @@ if (WIN32)
     set(CMAKE_EXE_LINKER_FLAGS "/MANIFEST:NO")
 endif()
 
-add_executable(qt-sail-demo-junior-with-c++
+add_executable(deep-diver-with-c-api
                 main.cpp
                 qtsail.cpp
                 qtsail.ui
+                readoptions.cpp
+                readoptions.ui
+                writeoptions.cpp
+                writeoptions.ui
                 "${RC_FILE}")
 
 # Enable ASAN
 #
 if (SAIL_ASAN)
     if (CMAKE_COMPILER_IS_GNUCC)
-        target_compile_options(qt-sail-demo-junior-with-c++ PRIVATE "-fsanitize=address,leak")
-        target_link_libraries(qt-sail-demo-junior-with-c++ "-fsanitize=address,leak")
+        target_compile_options(deep-diver-with-c-api PRIVATE "-fsanitize=address,leak")
+        target_link_libraries(deep-diver-with-c-api "-fsanitize=address,leak")
     else()
         message("ASAN is not supported on this platform.")
     endif()
@@ -48,12 +52,12 @@ endif()
 
 # Add SAIL dependency
 #
-pkg_check_modules(SAIL_CXX IMPORTED_TARGET REQUIRED libsail-c++)
-target_compile_options(qt-sail-demo-junior-with-c++     PRIVATE "${SAIL_CXX_CFLAGS}")
-target_include_directories(qt-sail-demo-junior-with-c++ PRIVATE "${SAIL_CXX_INCLUDE_DIRS}")
-target_link_libraries(qt-sail-demo-junior-with-c++      PkgConfig::SAIL_CXX)
+pkg_check_modules(SAIL IMPORTED_TARGET REQUIRED libsail)
+target_compile_options(deep-diver-with-c-api     PRIVATE "${SAIL_CFLAGS}")
+target_include_directories(deep-diver-with-c-api PRIVATE "${SAIL_INCLUDE_DIRS}")
+target_link_libraries(deep-diver-with-c-api      PkgConfig::SAIL)
 
 # Add Qt5 dependency
 #
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
-target_link_libraries(qt-sail-demo-junior-with-c++ Qt5::Widgets)
+target_link_libraries(deep-diver-with-c-api Qt5::Widgets)

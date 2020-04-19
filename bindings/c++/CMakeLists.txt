@@ -1,4 +1,5 @@
 add_library(sail-c++
+                src/image-c++.cpp
                 src/plugin_info-c++.cpp
                 src/sail-c++.cpp)
 
