@@ -161,7 +161,8 @@ struct sail_image {
      * Bytes per line. Some image formats (like BMP) pad rows of pixels to some boundary.
      *
      * READ:  Set by SAIL to a positive length of a row of pixels in bytes.
-     * WRITE: Ignored.
+     * WRITE: Must be set by a caller to a positive number of bytes per line. A caller could set
+     *        it to sail_bytes_per_line() if scan lines do not need padding to a certain booundary.
      */
     int bytes_per_line;
 

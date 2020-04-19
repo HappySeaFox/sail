@@ -56,6 +56,7 @@ typedef int sail_error_t;
 #define SAIL_UNDERLYING_CODEC_ERROR       43
 #define SAIL_NO_MORE_FRAMES               44
 #define SAIL_INTERLACED_UNSUPPORTED       45
+#define SAIL_INCORRECT_BYTES_PER_LINE     46
 
 /*
  * Plugins-specific errors.
@@ -94,6 +95,9 @@ do {                                               \
     }                                              \
     if (image->width <= 0 || image->height <= 0) { \
         return SAIL_INCORRECT_IMAGE_DIMENSIONS;    \
+    }                                              \
+    if (image->bytes_per_line <= 0) {              \
+        return SAIL_INCORRECT_BYTES_PER_LINE;      \
     }                                              \
 } while(0)
 
