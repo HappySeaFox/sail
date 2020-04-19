@@ -53,25 +53,6 @@ public:
     sail_context *context = nullptr;
 };
 
-// Auto cleanup at scope exit
-//
-template<typename T>
-class CleanUp
-{
-public:
-    CleanUp(T func)
-        : m_func(func)
-    {}
-
-    ~CleanUp()
-    {
-        m_func();
-    }
-
-private:
-    T m_func;
-};
-
 QtSail::QtSail(QWidget *parent)
     : QWidget(parent)
     , d(new Private)
@@ -126,28 +107,13 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 {
     const struct sail_plugin_info *plugin_info;
     void *pimpl = nullptr;
-
     struct sail_image *image = nullptr;
     uchar *image_bits = nullptr;
 
-    auto cleanup_func = [&] {
-        SAIL_LOG_DEBUG("Read clean up");
-
-        free(image_bits);
-
-        sail_stop_reading(pimpl);
-        sail_destroy_image(image);
-    };
-
-    CleanUp<decltype(cleanup_func)> cleanUp(cleanup_func);
-
-    SAIL_TRY(sail_start_reading(path.toLocal8Bit(), d->context, &plugin_info/* or NULL */, &pimpl));
-    SAIL_TRY(sail_read_next_frame(pimpl, &image, (void **)&image_bits));
-    SAIL_TRY(sail_stop_reading(pimpl));
-
-    // Reset the pointer so the cleanup function will not double-free it.
-    //
-    pimpl = nullptr;
+    SAIL_TRY_OR_CLEANUP(loadImageLowLevel(path, &plugin_info, &pimpl, &image, &image_bits),
+                        /* cleanup */ free(image_bits),
+                                      sail_stop_reading(pimpl),
+                                      sail_destroy_image(image));
 
     *qimage = QImage(image_bits,
                      image->width,
@@ -163,7 +129,22 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
                                 .arg(sail_pixel_format_to_string(image->pixel_format))
                                 );
 
+    free(image_bits);
+    sail_destroy_image(image);
+
     return 0;
+}
+
+sail_error_t QtSail::loadImageLowLevel(const QString &path, const sail_plugin_info **plugin_info, void **pimpl,
+                                       sail_image **image, uchar **image_bits)
+{
+    SAIL_TRY(sail_start_reading(path.toLocal8Bit(), d->context, plugin_info/* or nullptr */, pimpl));
+    SAIL_TRY(sail_read_next_frame(*pimpl, image, (void **)image_bits));
+    SAIL_TRY(sail_stop_reading(*pimpl));
+
+    // Reset the pointer so the cleanup function will not double-free it.
+    //
+    *pimpl = nullptr;
 }
 
 static int qImageFormatToSailPixelFormat(QImage::Format format) {
@@ -185,14 +166,6 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
     void *pimpl = nullptr;
 
     struct sail_image *image = nullptr;
-
-    auto cleanup_func = [&] {
-        SAIL_LOG_DEBUG("Write clean up");
-
-        sail_stop_writing(pimpl);
-        sail_destroy_image(image);
-    };
-
     SAIL_TRY(sail_alloc_image(&image));
 
     image->width = qimage.width();
@@ -200,15 +173,26 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
     image->pixel_format = qImageFormatToSailPixelFormat(qimage.format());
     image->bytes_per_line = sail_bytes_per_line(image->width, image->pixel_format);
 
-    CleanUp<decltype(cleanup_func)> cleanUp(cleanup_func);
+    SAIL_TRY_OR_CLEANUP(saveImageLowLevel(path, &plugin_info, &pimpl, image, qimage.bits()),
+                        /* cleanup */ sail_stop_writing(pimpl),
+                                      sail_destroy_image(image));
 
-    SAIL_TRY(sail_start_writing(path.toLocal8Bit(), d->context, &plugin_info/* or NULL */, &pimpl));
-    SAIL_TRY(sail_write_next_frame(pimpl, image, qimage.bits()));
-    SAIL_TRY(sail_stop_writing(pimpl));
+    sail_destroy_image(image);
+
+    return 0;
+}
+
+sail_error_t QtSail::saveImageLowLevel(const QString &path, const sail_plugin_info **plugin_info,
+                                       void **pimpl, const sail_image *image, const uchar *image_bits)
+{
+
+    SAIL_TRY(sail_start_writing(path.toLocal8Bit(), d->context, plugin_info/* or nullptr */, pimpl));
+    SAIL_TRY(sail_write_next_frame(*pimpl, image, image_bits));
+    SAIL_TRY(sail_stop_writing(*pimpl));
 
     // Reset the pointer so the cleanup function will not double-free it.
     //
-    pimpl = nullptr;
+    *pimpl = nullptr;
 
     return 0;
 }
