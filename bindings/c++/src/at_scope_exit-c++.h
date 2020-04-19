@@ -41,6 +41,18 @@ private:
 
 }
 
+/*
+ * Executes the specified code when the scope exits. This macro could be used to perform
+ * complex cleanup procedures.
+ *
+ * For example:
+ *
+ *    SAIL_AT_SCOPE_EXIT (
+ *        delete image;
+ *        delete data;
+ *    );
+ *
+ */
 #define SAIL_AT_SCOPE_EXIT(code)                           \
     auto lambda = [&] {                                    \
         code                                               \
