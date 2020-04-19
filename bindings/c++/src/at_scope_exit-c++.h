@@ -52,6 +52,9 @@ private:
  *        delete data;
  *    );
  *
+ *    SAIL_TRY(...);
+ *    SAIL_TRY(...);
+ *    SAIL_TRY(...);
  */
 #define SAIL_AT_SCOPE_EXIT(code)                           \
     auto lambda = [&] {                                    \
