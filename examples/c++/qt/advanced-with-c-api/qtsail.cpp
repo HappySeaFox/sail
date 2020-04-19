@@ -25,6 +25,7 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QDir>
+#include <QElapsedTimer>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QImage>
@@ -268,7 +269,8 @@ void QtSail::onProbe()
         return;
     }
 
-    const qint64 v = QDateTime::currentMSecsSinceEpoch();
+    QElapsedTimer elapsedTimer;
+    elapsedTimer.start();
 
     // Probe
     sail_image *image;
@@ -283,7 +285,7 @@ void QtSail::onProbe()
     QMessageBox::information(this,
                              tr("File info"),
                              tr("Probed in: %1 ms.\nCodec: %2\nSize: %3x%4\nSource pixel format: %5\nOutput pixel format: %6")
-                                .arg(QDateTime::currentMSecsSinceEpoch() - v)
+                                .arg(elapsedTimer.elapsed())
                                 .arg(plugin_info->description)
                                 .arg(image->width)
                                 .arg(image->height)
