@@ -43,6 +43,8 @@ class SAIL_EXPORT plugin_info
 {
 public:
     plugin_info();
+    // Makes a deep copy of the specified plugin info
+    //
     plugin_info(const sail_plugin_info *pi);
     plugin_info(const plugin_info &pi);
     ~plugin_info();
