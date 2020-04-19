@@ -63,6 +63,11 @@ image_reader::~image_reader()
 {
 }
 
+bool image_reader::is_valid() const
+{
+    return d->ctx != nullptr && d->ctx->is_valid();
+}
+
 sail_error_t image_reader::read(const char *path, image **simage, const sail_plugin_info **plugin_info)
 {
     SAIL_CHECK_PATH_PTR(path);
