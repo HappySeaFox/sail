@@ -596,7 +596,7 @@ static void destroy_hidden_pimpl(struct hidden_pimpl *pimpl) {
 
 sail_error_t sail_start_reading_with_plugin(const char *path, struct sail_context *context, const struct sail_plugin *plugin,
                                             const struct sail_read_options *read_options, void **pimpl) {
-    SAIL_CHECK_PTR(pimpl);
+    SAIL_CHECK_PIMPL_PTR(pimpl);
 
     *pimpl = NULL;
 
@@ -632,7 +632,7 @@ sail_error_t sail_start_reading_with_plugin(const char *path, struct sail_contex
 
 sail_error_t sail_start_reading(const char *path, struct sail_context *context, const struct sail_plugin_info **plugin_info, void **pimpl) {
 
-    SAIL_CHECK_PTR(pimpl);
+    SAIL_CHECK_PIMPL_PTR(pimpl);
 
     *pimpl = NULL;
 
@@ -672,7 +672,7 @@ sail_error_t sail_start_reading(const char *path, struct sail_context *context, 
 
 sail_error_t sail_read_next_frame(void *pimpl, struct sail_image **image, void **image_bits) {
 
-    SAIL_CHECK_PTR(pimpl);
+    SAIL_CHECK_PIMPL_PTR(pimpl);
 
     struct hidden_pimpl *pmpl = (struct hidden_pimpl *)pimpl;
 
@@ -738,7 +738,7 @@ sail_error_t sail_stop_reading(void *pimpl) {
 
 sail_error_t sail_start_writing_with_plugin(const char *path, struct sail_context *context, const struct sail_plugin *plugin,
                                             const struct sail_write_options *write_options, void **pimpl) {
-    SAIL_CHECK_PTR(pimpl);
+    SAIL_CHECK_PIMPL_PTR(pimpl);
 
     *pimpl = NULL;
 
@@ -774,7 +774,7 @@ sail_error_t sail_start_writing_with_plugin(const char *path, struct sail_contex
 
 sail_error_t sail_start_writing(const char *path, struct sail_context *context, const struct sail_plugin_info **plugin_info, void **pimpl) {
 
-    SAIL_CHECK_PTR(pimpl);
+    SAIL_CHECK_PIMPL_PTR(pimpl);
 
     *pimpl = NULL;
 
@@ -814,7 +814,7 @@ sail_error_t sail_start_writing(const char *path, struct sail_context *context, 
 
 sail_error_t sail_write_next_frame(void *pimpl, const struct sail_image *image, const void *image_bits) {
 
-    SAIL_CHECK_PTR(pimpl);
+    SAIL_CHECK_PIMPL_PTR(pimpl);
 
     struct hidden_pimpl *pmpl = (struct hidden_pimpl *)pimpl;
 
