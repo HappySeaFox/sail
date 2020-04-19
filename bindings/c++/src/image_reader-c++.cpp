@@ -54,6 +54,9 @@ public:
 image_reader::image_reader(context *ctx)
     : d(new pimpl(ctx))
 {
+    if (ctx == nullptr) {
+        SAIL_LOG_ERROR("NULL pointer has been passed to image_reader()");
+    }
 }
 
 image_reader::~image_reader()
