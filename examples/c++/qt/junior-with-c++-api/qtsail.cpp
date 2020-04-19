@@ -110,28 +110,28 @@ static QImage::Format sailPixelFormatToQImageFormat(int pixel_format) {
 sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 {
     sail::image_reader reader(&d->context);
-    sail::image *simage = nullptr;
+    sail::image *image = nullptr;
 
     // Auto cleanup when the method exits.
     //
     SAIL_AT_SCOPE_EXIT (
-        delete simage;
+        delete image;
     );
 
-    SAIL_TRY(reader.read(path.toLocal8Bit(), &simage));
+    SAIL_TRY(reader.read(path.toLocal8Bit(), &image));
 
     // Construct QImage from the read image.
     //
-    *qimage = QImage(reinterpret_cast<uchar *>(simage->bits()),
-                     simage->width(),
-                     simage->height(),
-                     simage->bytes_per_line(),
-                     sailPixelFormatToQImageFormat(simage->pixel_format())).copy();
+    *qimage = QImage(reinterpret_cast<uchar *>(image->bits()),
+                     image->width(),
+                     image->height(),
+                     image->bytes_per_line(),
+                     sailPixelFormatToQImageFormat(image->pixel_format())).copy();
 
     d->ui->labelStatus->setText(tr("%1  [%2x%3]")
                                 .arg(QFileInfo(path).fileName())
-                                .arg(simage->width())
-                                .arg(simage->height())
+                                .arg(image->width())
+                                .arg(image->height())
                                 );
 
     return 0;
