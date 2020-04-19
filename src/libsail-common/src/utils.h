@@ -29,6 +29,8 @@
     #include <sail/export.h>
 #endif
 
+struct sail_image;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -99,6 +101,12 @@ SAIL_EXPORT int sail_bits_per_pixel(int pixel_format);
  *     24 bytes per line
  */
 SAIL_EXPORT int sail_bytes_per_line(int width, int pixel_format);
+
+
+/*
+ * Calculates bytes per image. It's effectively bytes per line * image height.
+ */
+SAIL_EXPORT int sail_bytes_per_image(const struct sail_image *image);
 
 /* extern "C" */
 #ifdef __cplusplus

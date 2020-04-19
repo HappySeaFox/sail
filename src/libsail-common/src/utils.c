@@ -234,3 +234,10 @@ int sail_bytes_per_line(int width, int pixel_format) {
 
     return (int)(((double)width * bits_per_pixel / 8) + add);
 }
+
+int sail_bytes_per_image(const struct sail_image *image) {
+
+    SAIL_CHECK_IMAGE(image);
+
+    return sail_bytes_per_line(image->width, image->pixel_format) * image->height;
+}
