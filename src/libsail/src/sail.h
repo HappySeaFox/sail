@@ -185,9 +185,7 @@ SAIL_EXPORT sail_error_t sail_write(const char *path, struct sail_context *conte
  * Typical usage: sail_plugin_info_by_extension() -> sail_load_plugin() -> sail_start_reading_with_plugin() ->
  *                sail_read_next_frame() -> sail_stop_reading().
  *
- * PIMPL explanation: Pass the address of a local void* pointer. SAIL will store an internal state
- * in it and destroy it in sail_stop_reading. Pimpls must be used per image. DO NOT use the same pimpl
- * to read multiple images in the same time. For example:
+ * For example:
  *
  * SAIL_TRY(sail_plugin_info_by_extension(...));
  * SAIL_TRY(sail_load_plugin(...));
@@ -200,6 +198,10 @@ SAIL_EXPORT sail_error_t sail_write(const char *path, struct sail_context *conte
  *                     sail_stop_reading(pimpl));
  * SAIL_TRY(sail_stop_reading(pimpl));
  *
+ * PIMPL explanation: Pass the address of a local void* pointer. SAIL will store an internal state
+ * in it and destroy it in sail_stop_reading. Pimpls must be used per image. DO NOT use the same pimpl
+ * to read multiple images in the same time.
+ *
  * Returns 0 on success or sail_error_t on error.
  */
 SAIL_EXPORT sail_error_t sail_start_reading_with_plugin(const char *path, struct sail_context *context, const struct sail_plugin *plugin,
@@ -211,9 +213,7 @@ SAIL_EXPORT sail_error_t sail_start_reading_with_plugin(const char *path, struct
  *
  * Typical usage: sail_start_reading() -> sail_read_next_frame() -> sail_stop_reading().
  *
- * PIMPL explanation: Pass the address of a local void* pointer. SAIL will store an internal state
- * in it and destroy it in sail_stop_reading. Pimpls must be used per image. DO NOT use the same pimpl
- * to read multiple images in the same time. For example:
+ * For example:
  *
  * void *pimpl = NULL;
  *
@@ -222,6 +222,10 @@ SAIL_EXPORT sail_error_t sail_start_reading_with_plugin(const char *path, struct
  * SAIL_TRY_OR_CLEANUP(sail_read_next_frame(pimpl, ...),
  *                     sail_stop_reading(pimpl));
  * SAIL_TRY(sail_stop_reading(pimpl));
+ *
+ * PIMPL explanation: Pass the address of a local void* pointer. SAIL will store an internal state
+ * in it and destroy it in sail_stop_reading. Pimpls must be used per image. DO NOT use the same pimpl
+ * to read multiple images in the same time.
  *
  * Returns 0 on success or sail_error_t on error.
  */
@@ -253,9 +257,7 @@ SAIL_EXPORT sail_error_t sail_stop_reading(void *pimpl);
  * Typical usage: sail_plugin_info_by_extension() -> sail_load_plugin() -> sail_start_writing_with_plugin() ->
  *                sail_write_next_frame() -> sail_stop_writing().
  *
- * PIMPL explanation: Pass the address of a local void* pointer. SAIL will store an internal state
- * in it and destroy it in sail_stop_writing. Pimpls must be used per image. DO NOT use the same pimpl
- * to write multiple images in the same time. For example:
+ * For example:
  *
  * SAIL_TRY(sail_plugin_info_by_extension(...));
  * SAIL_TRY(sail_load_plugin(...));
@@ -268,6 +270,10 @@ SAIL_EXPORT sail_error_t sail_stop_reading(void *pimpl);
  *                     sail_stop_writing(pimpl));
  * SAIL_TRY(sail_stop_writing(pimpl));
  *
+ * PIMPL explanation: Pass the address of a local void* pointer. SAIL will store an internal state
+ * in it and destroy it in sail_stop_writing. Pimpls must be used per image. DO NOT use the same pimpl
+ * to write multiple images in the same time.
+ *
  * Returns 0 on success or sail_error_t on error.
  */
 SAIL_EXPORT sail_error_t sail_start_writing_with_plugin(const char *path, struct sail_context *context, const struct sail_plugin *plugin,
@@ -279,9 +285,7 @@ SAIL_EXPORT sail_error_t sail_start_writing_with_plugin(const char *path, struct
  *
  * Typical usage: sail_start_writing() -> sail_write_next_frame() -> sail_stop_writing().
  *
- * PIMPL explanation: Pass the address of a local void* pointer. SAIL will store an internal state
- * in it and destroy it in sail_stop_writing. Pimpls must be used per image. DO NOT use the same pimpl
- * to write multiple images in the same time. For example:
+ * For example:
  *
  * void *pimpl = NULL;
  *
@@ -290,6 +294,10 @@ SAIL_EXPORT sail_error_t sail_start_writing_with_plugin(const char *path, struct
  * SAIL_TRY_OR_CLEANUP(sail_write_next_frame(pimpl, ...),
  *                     sail_stop_writing(pimpl));
  * SAIL_TRY(sail_stop_writing(pimpl));
+ *
+ * PIMPL explanation: Pass the address of a local void* pointer. SAIL will store an internal state
+ * in it and destroy it in sail_stop_writing. Pimpls must be used per image. DO NOT use the same pimpl
+ * to write multiple images in the same time.
  *
  * Returns 0 on success or sail_error_t on error.
  */
