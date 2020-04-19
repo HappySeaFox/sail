@@ -45,11 +45,11 @@ WriteOptions::WriteOptions(const QString &codecDescription, const sail_write_fea
     d->ui->labelCodec->setText(codecDescription);
 
     if (write_features->output_pixel_formats_length == 0) {
-        d->ui->labelColor->setText(tr("Color selection is not available"));
+        d->ui->labelColor->setText(tr("Output color selection is not available"));
         d->ui->labelColor->setEnabled(false);
         d->ui->comboColor->setEnabled(false);
     } else {
-        d->ui->labelColor->setText(tr("Color:"));
+        d->ui->labelColor->setText(tr("Output color:"));
 
         for (int i = 0; i < write_features->output_pixel_formats_length; i++) {
             d->ui->comboColor->addItem(sail_pixel_format_to_string(write_features->output_pixel_formats[i]),

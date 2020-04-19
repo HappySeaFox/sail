@@ -53,9 +53,6 @@ public:
     QImage qimage;
 
     sail_context *context = nullptr;
-
-    QFileInfoList files;
-    int currentFile;
 };
 
 // Auto cleanup at scope exit
@@ -88,36 +85,15 @@ QtSail::QtSail(QWidget *parent)
     l->setAlignment(Qt::AlignCenter);
     d->ui->scrollArea->setWidget(l);
 
-    connect(d->ui->pushOpen,     &QPushButton::clicked, this, &QtSail::onOpenFile);
-    connect(d->ui->pushOpenDir,  &QPushButton::clicked, this, &QtSail::onOpenDir);
-    connect(d->ui->pushProbe,    &QPushButton::clicked, this, &QtSail::onProbe);
-    connect(d->ui->pushSave,     &QPushButton::clicked, this, &QtSail::onSave);
-    connect(d->ui->pushPrevious, &QPushButton::clicked, this, &QtSail::onPrevious);
-    connect(d->ui->pushNext,     &QPushButton::clicked, this, &QtSail::onNext);
-    connect(d->ui->pushFirst,    &QPushButton::clicked, this, &QtSail::onFirst);
-    connect(d->ui->pushLast,     &QPushButton::clicked, this, &QtSail::onLast);
-    connect(d->ui->checkFit,     &QCheckBox::toggled,   this, &QtSail::onFit);
+    connect(d->ui->pushOpen,  &QPushButton::clicked, this, &QtSail::onOpenFile);
+    connect(d->ui->pushProbe, &QPushButton::clicked, this, &QtSail::onProbe);
+    connect(d->ui->pushSave,  &QPushButton::clicked, this, &QtSail::onSave);
+    connect(d->ui->checkFit,  &QCheckBox::toggled,   this, &QtSail::onFit);
 
     d->ui->pushOpen->setShortcut(QKeySequence::Open);
     d->ui->pushOpen->setToolTip(d->ui->pushOpen->shortcut().toString());
     d->ui->pushSave->setShortcut(QKeySequence::Save);
     d->ui->pushSave->setToolTip(d->ui->pushSave->shortcut().toString());
-    d->ui->pushPrevious->setShortcut(Qt::Key_Backspace);
-    d->ui->pushPrevious->setToolTip(d->ui->pushPrevious->shortcut().toString());
-    d->ui->pushNext->setShortcut(Qt::Key_Space);
-    d->ui->pushNext->setToolTip(d->ui->pushNext->shortcut().toString());
-    d->ui->pushFirst->setShortcut(Qt::Key_Home);
-    d->ui->pushFirst->setToolTip(d->ui->pushFirst->shortcut().toString());
-    d->ui->pushLast->setShortcut(Qt::Key_End);
-    d->ui->pushLast->setToolTip(d->ui->pushLast->shortcut().toString());
-
-    connect(new QShortcut(Qt::Key_F, this), &QShortcut::activated, this, [&]{
-        if (isFullScreen()) {
-            showNormal();
-        } else {
-            showFullScreen();
-        }
-    });
 
     init();
 }
@@ -406,19 +382,6 @@ sail_error_t QtSail::pluginInfo(const struct sail_plugin_info *plugin_info) cons
     return 0;
 }
 
-void QtSail::loadFileFromDir()
-{
-    if (d->currentFile < 0 || d->currentFile >= d->files.size()) {
-        return;
-    }
-
-    d->ui->labelCounter->setText(tr("%1/%2").arg(d->currentFile+1).arg(d->files.size()));
-
-    if (loadImage(d->files[d->currentFile].absoluteFilePath(), &d->qimage) == 0) {
-        onFit(d->ui->checkFit->isChecked());
-    }
-}
-
 QStringList QtSail::filters() const
 {
     QStringList filters;
@@ -456,34 +419,16 @@ void QtSail::onOpenFile()
         return;
     }
 
-    d->files.clear();
-
     sail_error_t res;
 
     if ((res = loadImage(path, &d->qimage)) == 0) {
         onFit(d->ui->checkFit->isChecked());
-        d->ui->labelCounter->setText(QStringLiteral("1/1"));
     } else {
         QMessageBox::critical(this, tr("Error"), tr("Failed to load '%1'. Error: %2.")
                               .arg(path)
                               .arg(res));
         return;
     }
-}
-
-void QtSail::onOpenDir()
-{
-    const QString path = QFileDialog::getExistingDirectory(this, tr("Select a file"));
-
-    if (path.isEmpty()) {
-        return;
-    }
-
-    d->files = QDir(path).entryInfoList(QStringList() << QStringLiteral("*.*"),
-                                        QDir::Files,
-                                        QDir::Name);
-    d->currentFile = 0;
-    loadFileFromDir();
 }
 
 void QtSail::onProbe()
@@ -554,30 +499,6 @@ void QtSail::onSave()
             return;
         }
     }
-}
-
-void QtSail::onPrevious()
-{
-    d->currentFile--;
-    loadFileFromDir();
-}
-
-void QtSail::onNext()
-{
-    d->currentFile++;
-    loadFileFromDir();
-}
-
-void QtSail::onFirst()
-{
-    d->currentFile = 0;
-    loadFileFromDir();
-}
-
-void QtSail::onLast()
-{
-    d->currentFile = d->files.size()-1;
-    loadFileFromDir();
 }
 
 void QtSail::onFit(bool fit)
