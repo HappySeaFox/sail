@@ -34,6 +34,7 @@
 #include "at_scope_exit-c++.h"
 #include "context-c++.h"
 #include "image_writer-c++.h"
+#include "image-c++.h"
 #include "plugin_info-c++.h"
 
 namespace sail

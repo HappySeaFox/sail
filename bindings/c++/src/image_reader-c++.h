@@ -22,17 +22,16 @@
 #ifdef SAIL_BUILD
     #include "error.h"
     #include "export.h"
-    #include "image-c++.h"
 #else
     #include <sail/error.h>
     #include <sail/export.h>
-    #include <sail/image-c++.h>
 #endif
 
 namespace sail
 {
 
 class context;
+class image;
 class plugin_info;
 
 /*
