@@ -29,15 +29,14 @@
     #include <sail/image-c++.h>
 #endif
 
-struct sail_plugin_info;
-
 namespace sail
 {
 
 class context;
+class plugin_info;
 
 /*
- * A C++ interface to struct sail_image.
+ * A C++ interface to the SAIL image reading functions.
  */
 class SAIL_EXPORT image_reader
 {
@@ -47,7 +46,10 @@ public:
 
     bool is_valid() const;
 
-    sail_error_t read(const char *path, image **simage, const sail_plugin_info **plugin_info = nullptr);
+    /*
+     * An interface to sail_read(). See sail_read() for more.
+     */
+    sail_error_t read(const char *path, image **simage, plugin_info **splugin_info = nullptr);
 
 private:
     class pimpl;
