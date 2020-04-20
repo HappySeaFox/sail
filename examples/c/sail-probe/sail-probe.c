@@ -90,7 +90,7 @@ static sail_error_t probe(const char *path, struct sail_context *context) {
     struct sail_image *image;
     const struct sail_plugin_info *plugin_info;
 
-    SAIL_TRY(sail_probe_image(path, context, &plugin_info, &image));
+    SAIL_TRY(sail_probe(path, context, &plugin_info, &image));
 
     printf("File          : %s\n", path);
     printf("Probe time    : %ld ms.\n", (unsigned long)(now() - start_time));

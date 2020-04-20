@@ -82,10 +82,10 @@ sail_error_t image_reader::probe(const std::string &path, image **simage, plugin
         sail_destroy_image(sail_image);
     );
 
-    SAIL_TRY(sail_probe_image(path.c_str(),
-                              d->ctx->to_sail_context(),
-                              &sail_plugin_info,
-                              &sail_image));
+    SAIL_TRY(sail_probe(path.c_str(),
+                        d->ctx->to_sail_context(),
+                        &sail_plugin_info,
+                        &sail_image));
 
     *simage = new image(sail_image);
 
