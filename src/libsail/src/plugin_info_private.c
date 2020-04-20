@@ -127,7 +127,7 @@ static sail_error_t parse_serialized_ints(const char *value, int **target, int *
             return SAIL_MEMORY_ALLOCATION_FAILED;
         }
 
-        struct sail_string_node *node = string_node;
+        node = string_node;
         int i = 0;
 
         while (node != NULL) {
