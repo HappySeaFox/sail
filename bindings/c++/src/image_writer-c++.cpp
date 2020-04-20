@@ -70,6 +70,13 @@ bool image_writer::is_valid() const
     return d->ctx != nullptr && d->ctx->is_valid();
 }
 
+sail_error_t image_writer::write(const std::string &path, const image *simage, plugin_info **splugin_info)
+{
+    SAIL_TRY(write(path.c_str(), simage, splugin_info));
+
+    return 0;
+}
+
 sail_error_t image_writer::write(const char *path, const image *simage, plugin_info **splugin_info)
 {
     SAIL_CHECK_PATH_PTR(path);
@@ -103,9 +110,18 @@ sail_error_t image_writer::write(const char *path, const image *simage, plugin_i
 
 sail_error_t image_writer::start_writing(const std::string &path, plugin_info **splugin_info)
 {
+    SAIL_TRY(start_writing(path.c_str(), splugin_info));
+
+    return 0;
+}
+
+sail_error_t image_writer::start_writing(const char *path, plugin_info **splugin_info)
+{
+    SAIL_CHECK_PATH_PTR(path);
+
     const sail_plugin_info *sail_plugin_info = nullptr;
 
-    SAIL_TRY(sail_start_writing(path.c_str(), d->ctx->to_sail_context(), &sail_plugin_info, &d->pmpl));
+    SAIL_TRY(sail_start_writing(path, d->ctx->to_sail_context(), &sail_plugin_info, &d->pmpl));
 
     if (splugin_info != nullptr) {
         *splugin_info = new plugin_info(sail_plugin_info);

@@ -50,12 +50,14 @@ public:
     /*
      * An interface to sail_write(). See sail_write() for more.
      */
+    sail_error_t write(const std::string &path, const image *simage, plugin_info **splugin_info = nullptr);
     sail_error_t write(const char *path, const image *simage, plugin_info **splugin_info = nullptr);
 
     /*
      * An interface to sail_start_writing(). See sail_start_writing() for more.
      */
     sail_error_t start_writing(const std::string &path, plugin_info **splugin_info = nullptr);
+    sail_error_t start_writing(const char *path, plugin_info **splugin_info = nullptr);
 
     /*
      * An interface to sail_write_next_frame(). See sail_write_next_frame() for more.
