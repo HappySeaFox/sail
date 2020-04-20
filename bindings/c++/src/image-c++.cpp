@@ -140,6 +140,7 @@ image::image(const image &img)
 
 image::~image()
 {
+    delete d;
 }
 
 bool image::is_valid() const

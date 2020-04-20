@@ -28,7 +28,6 @@
 #endif
 
 #include <map>
-#include <memory>
 #include <string>
 #include <vector>
 
@@ -87,7 +86,7 @@ public:
 
 private:
     class pimpl;
-    const std::unique_ptr<pimpl> d;
+    pimpl * const d;
 };
 
 }

@@ -90,6 +90,7 @@ plugin_info::plugin_info(const sail_plugin_info *pi)
 
 plugin_info::~plugin_info()
 {
+    delete d;
 }
 
 std::string plugin_info::version() const

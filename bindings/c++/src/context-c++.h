@@ -27,7 +27,6 @@
     #include <sail/export.h>
 #endif
 
-#include <memory>
 #include <vector>
 
 struct sail_context;
@@ -61,7 +60,7 @@ private:
 
 private:
     class pimpl;
-    const std::unique_ptr<pimpl> d;
+    pimpl * const d;
 };
 
 }

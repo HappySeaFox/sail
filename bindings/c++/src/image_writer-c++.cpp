@@ -61,6 +61,7 @@ image_writer::image_writer(context *ctx)
 
 image_writer::~image_writer()
 {
+    delete d;
 }
 
 bool image_writer::is_valid() const

@@ -47,6 +47,7 @@ context::context()
 context::~context()
 {
     sail_finish(d->context);
+    delete d;
 }
 
 bool context::is_valid() const

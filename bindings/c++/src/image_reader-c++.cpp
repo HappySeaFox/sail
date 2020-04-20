@@ -61,6 +61,7 @@ image_reader::image_reader(context *ctx)
 
 image_reader::~image_reader()
 {
+    delete d;
 }
 
 bool image_reader::is_valid() const
