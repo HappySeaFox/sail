@@ -69,6 +69,13 @@ std::vector<plugin_info> context::plugin_info_list() const
     return list;
 }
 
+sail_error_t context::unload_plugins()
+{
+    SAIL_TRY(sail_unload_plugins(d->context));
+
+    return 0;
+}
+
 sail_context* context::to_sail_context() const
 {
     return d->context;

@@ -53,6 +53,8 @@ public:
 
     std::vector<plugin_info> plugin_info_list() const;
 
+    sail_error_t unload_plugins();
+
     sail_context* to_sail_context() const;
 
 private:
