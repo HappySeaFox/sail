@@ -79,20 +79,20 @@ static sail_error_t split_into_string_node_chain(const char *value, struct sail_
     while (*(value += strspn(value, ";")) != '\0') {
         size_t length = strcspn(value, ";");
 
-        struct sail_string_node *extension_node;
+        struct sail_string_node *string_node;
 
-        SAIL_TRY(alloc_string_node(&extension_node));
+        SAIL_TRY(alloc_string_node(&string_node));
 
-        SAIL_TRY_OR_CLEANUP(sail_strdup_length(value, length, &extension_node->value),
-                            /* cleanup */ destroy_string_node(extension_node));
+        SAIL_TRY_OR_CLEANUP(sail_strdup_length(value, length, &string_node->value),
+                            /* cleanup */ destroy_string_node(string_node));
 
-        sail_to_lower(extension_node->value);
+        sail_to_lower(string_node->value);
 
         if (*target_string_node == NULL) {
-            *target_string_node = last_string_node = extension_node;
+            *target_string_node = last_string_node = string_node;
         } else {
-            last_string_node->next = extension_node;
-            last_string_node = extension_node;
+            last_string_node->next = string_node;
+            last_string_node = string_node;
         }
 
         value += length;
