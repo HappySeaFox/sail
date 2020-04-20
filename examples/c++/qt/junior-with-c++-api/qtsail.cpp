@@ -34,13 +34,7 @@
 #include <QShortcut>
 
 #include <sail/sail.h>
-
-#include <sail/at_scope_exit-c++.h>
-#include <sail/context-c++.h>
-#include <sail/plugin_info-c++.h>
-#include <sail/image_reader-c++.h>
-#include <sail/image_writer-c++.h>
-#include <sail/image-c++.h>
+#include <sail/sail-c++.h>
 
 //#include <sail/layouts/v2.h>
 

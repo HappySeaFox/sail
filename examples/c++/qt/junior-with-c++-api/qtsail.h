@@ -30,8 +30,6 @@
 
 class QImage;
 
-struct sail_plugin_info;
-
 class QtSail : public QWidget
 {
     Q_OBJECT

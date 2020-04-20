@@ -16,54 +16,16 @@
     along with this library. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef SAIL_CONTEXT_CPP_H
-#define SAIL_CONTEXT_CPP_H
+#ifndef SAIL_SAIL_CPP_H
+#define SAIL_SAIL_CPP_H
 
-#ifdef SAIL_BUILD
-    #include "error.h"
-    #include "export.h"
-#else
-    #include <sail/error.h>
-    #include <sail/export.h>
-#endif
-
-#include <memory>
-#include <vector>
-
-struct sail_context;
-
-namespace sail
-{
-
-class plugin_info;
-
-/*
- * A C++ interface to struct sail_context.
- */
-class SAIL_EXPORT context
-{
-public:
-    context();
-    ~context();
-
-    /*
-     * Returns true if SAIL was initialized successfully. Using SAIL when this
-     * function returns false has no sense as most methods will return errors.
-     */
-    bool is_valid() const;
-
-    std::vector<plugin_info> plugin_info_list() const;
-
-    sail_context* to_sail_context() const;
-
-private:
-    sail_error_t init();
-
-private:
-    class pimpl;
-    const std::unique_ptr<pimpl> d;
-};
-
-}
+// Universal include
+//
+#include <sail/at_scope_exit-c++.h>
+#include <sail/context-c++.h>
+#include <sail/plugin_info-c++.h>
+#include <sail/image_reader-c++.h>
+#include <sail/image_writer-c++.h>
+#include <sail/image-c++.h>
 
 #endif
