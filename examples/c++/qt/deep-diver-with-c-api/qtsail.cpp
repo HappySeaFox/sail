@@ -116,11 +116,11 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     void *pimpl = nullptr;
 
     SAIL_TRY_OR_CLEANUP(loadImageImpl(path, &read_features, &read_options, &pimpl, &image, &image_bits),
-                        free(image_bits),
-                        sail_stop_reading(pimpl),
-                        sail_destroy_read_features(read_features),
-                        sail_destroy_read_options(read_options),
-                        sail_destroy_image(image));
+                        /* cleanup */ free(image_bits),
+                                      sail_stop_reading(pimpl),
+                                      sail_destroy_read_features(read_features),
+                                      sail_destroy_read_options(read_options),
+                                      sail_destroy_image(image));
 
     QImage::Format qimageFormat = sailPixelFormatToQImageFormat(read_options->pixel_format);
 
