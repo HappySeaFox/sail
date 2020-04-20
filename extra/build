@@ -2,7 +2,9 @@
 
 cd "$(dirname "$0")"
 
-# extra libs
+######################
+#  Extra libs paths  #
+######################
 libjpeg="libjpeg-turbo-2.0.4"
 
 # Where all built libs and headers will be installed
