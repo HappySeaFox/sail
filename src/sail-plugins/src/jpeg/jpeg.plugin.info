@@ -1,8 +1,28 @@
 # JPEG plugin information
 #
+[plugin]
 layout=2
 version=1.3.4.1
 name=JPEG
 description=Joint Photographic Experts Group
 extensions=jpg;jpeg;jpe;jif;jfif;jfi
 mime-types=image/jpeg
+
+[read-features]
+input-pixel-formats=GRAYSCALE;RGB;YCBCR;CMYK;YCCK
+output-pixel-formats=SOURCE;GRAYSCALE;RGB;YCBCR;CMYK;YCCK;RGBX;BGR;BGRX;XBGR;XRGB;RGBA;BGRA;ABGR;ARGB;RGB565
+preferred-output-pixel-format=RGB
+features=STATIC;META-INFO
+
+[write-features]
+input-pixel-formats=GRAYSCALE;RGB;YCBCR;CMYK;YCCK;RGBX;BGR;BGRX;XBGR;XRGB;RGBA;BGRA;ABGR;ARGB;RGB565
+output-pixel-formats=GRAYSCALE;RGB;YCBCR;CMYK;YCCK
+preferred-output-pixel-format=YCBCR
+features=STATIC;META-INFO
+properties=
+passes=0
+compression-types=
+preferred-compression-type=
+compression-min=0
+compression-max=100
+compression-default=15

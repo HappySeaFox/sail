@@ -72,24 +72,20 @@ static sail_error_t convert(const char *input, const char *output, struct sail_c
     const struct sail_plugin *plugin;
     SAIL_TRY(sail_load_plugin(context, plugin_info, &plugin));
 
-    struct sail_write_features *write_features;
-    SAIL_TRY(sail_plugin_write_features(plugin, &write_features));
-
     struct sail_write_options *write_options;
-    SAIL_TRY(sail_alloc_write_options_from_features(write_features, &write_options));
+    SAIL_TRY(sail_alloc_write_options_from_features(plugin_info->write_features, &write_options));
 
     /* Apply our tuning. */
     SAIL_LOG_INFO("Compression: %d%s", compression, compression == -1 ? " (default)" : "");
     write_options->compression = compression;
 
-    SAIL_TRY(sail_start_writing_with_plugin(output, context, plugin, write_options/* or NULL */, &pimpl));
+    SAIL_TRY(sail_start_writing_with_plugin(output, context, plugin_info, plugin, write_options/* or NULL */, &pimpl));
 
     SAIL_TRY(sail_write_next_frame(pimpl, image, image_bits));
     SAIL_TRY(sail_stop_writing(pimpl));
 
     /* Clean up. */
     free(image_bits);
-    sail_destroy_write_features(write_features);
     sail_destroy_write_options(write_options);
     sail_destroy_image(image);
 

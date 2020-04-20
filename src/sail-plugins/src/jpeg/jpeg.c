@@ -147,57 +147,11 @@ static int alloc_pimpl(struct pimpl **pimpl) {
 /*
  * Decoding functions.
  */
-SAIL_EXPORT sail_error_t sail_plugin_read_features_v2(struct sail_read_features **read_features) {
-
-    SAIL_TRY(sail_alloc_read_features(read_features));
-
-    (*read_features)->input_pixel_formats_length = 5;
-    (*read_features)->input_pixel_formats = (int *)malloc((*read_features)->input_pixel_formats_length * sizeof(int));
-
-    if ((*read_features)->input_pixel_formats == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
-
-    (*read_features)->input_pixel_formats[0] = SAIL_PIXEL_FORMAT_GRAYSCALE;
-    (*read_features)->input_pixel_formats[1] = SAIL_PIXEL_FORMAT_RGB;
-    (*read_features)->input_pixel_formats[2] = SAIL_PIXEL_FORMAT_YCBCR;
-    (*read_features)->input_pixel_formats[3] = SAIL_PIXEL_FORMAT_CMYK;
-    (*read_features)->input_pixel_formats[4] = SAIL_PIXEL_FORMAT_YCCK;
-
-    (*read_features)->output_pixel_formats_length = 16;
-    (*read_features)->output_pixel_formats = (int *)malloc((*read_features)->output_pixel_formats_length * sizeof(int));
-
-    if ((*read_features)->output_pixel_formats == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
-
-    (*read_features)->output_pixel_formats[0]  = SAIL_PIXEL_FORMAT_SOURCE;
-    (*read_features)->output_pixel_formats[1]  = SAIL_PIXEL_FORMAT_GRAYSCALE;
-    (*read_features)->output_pixel_formats[2]  = SAIL_PIXEL_FORMAT_RGB;
-    (*read_features)->output_pixel_formats[3]  = SAIL_PIXEL_FORMAT_YCBCR;
-    (*read_features)->output_pixel_formats[4]  = SAIL_PIXEL_FORMAT_CMYK;
-    (*read_features)->output_pixel_formats[5]  = SAIL_PIXEL_FORMAT_YCCK;
-    (*read_features)->output_pixel_formats[6]  = SAIL_PIXEL_FORMAT_RGBX;
-    (*read_features)->output_pixel_formats[7]  = SAIL_PIXEL_FORMAT_BGR;
-    (*read_features)->output_pixel_formats[8]  = SAIL_PIXEL_FORMAT_BGRX;
-    (*read_features)->output_pixel_formats[9]  = SAIL_PIXEL_FORMAT_XBGR;
-    (*read_features)->output_pixel_formats[10] = SAIL_PIXEL_FORMAT_XRGB;
-    (*read_features)->output_pixel_formats[11] = SAIL_PIXEL_FORMAT_RGBA;
-    (*read_features)->output_pixel_formats[12] = SAIL_PIXEL_FORMAT_BGRA;
-    (*read_features)->output_pixel_formats[13] = SAIL_PIXEL_FORMAT_ABGR;
-    (*read_features)->output_pixel_formats[14] = SAIL_PIXEL_FORMAT_ARGB;
-    (*read_features)->output_pixel_formats[15] = SAIL_PIXEL_FORMAT_RGB565;
-
-    (*read_features)->preferred_output_pixel_format = SAIL_PIXEL_FORMAT_RGB;
-
-    (*read_features)->features = SAIL_PLUGIN_FEATURE_STATIC | SAIL_PLUGIN_FEATURE_META_INFO;
-
-    return 0;
-}
 
 SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_file *file, const struct sail_read_options *read_options) {
 
     SAIL_CHECK_FILE(file);
+    SAIL_CHECK_READ_OPTIONS_PTR(read_options);
 
     struct pimpl *pimpl;
 
@@ -205,25 +159,14 @@ SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_file *file, const 
 
     file->pimpl = pimpl;
 
-    /* Construct default read options. */
-    if (read_options == NULL) {
-        /* Copy options from read features. */
-        struct sail_read_features *read_features;
+    /* Deep copy read options. */
+    pimpl->read_options = (struct sail_read_options *)malloc(sizeof(struct sail_read_options));
 
-        SAIL_TRY(sail_plugin_read_features_v2(&read_features));
-        SAIL_TRY_OR_CLEANUP(sail_alloc_read_options_from_features(read_features, &pimpl->read_options),
-                            sail_destroy_read_features(read_features));
-
-        sail_destroy_read_features(read_features);
-    } else {
-        pimpl->read_options = (struct sail_read_options *)malloc(sizeof(struct sail_read_options));
-
-        if (pimpl->read_options == NULL) {
-            return SAIL_MEMORY_ALLOCATION_FAILED;
-        }
-
-        memcpy(pimpl->read_options, read_options, sizeof(struct sail_read_options));
+    if (pimpl->read_options == NULL) {
+        return SAIL_MEMORY_ALLOCATION_FAILED;
     }
+
+    memcpy(pimpl->read_options, read_options, sizeof(struct sail_read_options));
 
     /* Error handling setup. */
     pimpl->decompress_context.err = jpeg_std_error(&pimpl->error_context.jpeg_error_mgr);
@@ -420,64 +363,10 @@ SAIL_EXPORT sail_error_t sail_plugin_read_finish_v2(struct sail_file *file) {
  * Encoding functions.
  */
 
-SAIL_EXPORT sail_error_t sail_plugin_write_features_v2(struct sail_write_features **write_features) {
-
-    SAIL_TRY(sail_alloc_write_features(write_features));
-
-    (*write_features)->input_pixel_formats_length = 15;
-    (*write_features)->input_pixel_formats = (int *)malloc((*write_features)->input_pixel_formats_length * sizeof(int));
-
-    if ((*write_features)->input_pixel_formats == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
-
-    (*write_features)->input_pixel_formats[0]  = SAIL_PIXEL_FORMAT_GRAYSCALE;
-    (*write_features)->input_pixel_formats[1]  = SAIL_PIXEL_FORMAT_RGB;
-    (*write_features)->input_pixel_formats[2]  = SAIL_PIXEL_FORMAT_YCBCR;
-    (*write_features)->input_pixel_formats[3]  = SAIL_PIXEL_FORMAT_CMYK;
-    (*write_features)->input_pixel_formats[4]  = SAIL_PIXEL_FORMAT_YCCK;
-    (*write_features)->input_pixel_formats[5]  = SAIL_PIXEL_FORMAT_RGBX;
-    (*write_features)->input_pixel_formats[6]  = SAIL_PIXEL_FORMAT_BGR;
-    (*write_features)->input_pixel_formats[7]  = SAIL_PIXEL_FORMAT_BGRX;
-    (*write_features)->input_pixel_formats[8]  = SAIL_PIXEL_FORMAT_XBGR;
-    (*write_features)->input_pixel_formats[9]  = SAIL_PIXEL_FORMAT_XRGB;
-    (*write_features)->input_pixel_formats[10] = SAIL_PIXEL_FORMAT_RGBA;
-    (*write_features)->input_pixel_formats[11] = SAIL_PIXEL_FORMAT_BGRA;
-    (*write_features)->input_pixel_formats[12] = SAIL_PIXEL_FORMAT_ABGR;
-    (*write_features)->input_pixel_formats[13] = SAIL_PIXEL_FORMAT_ARGB;
-    (*write_features)->input_pixel_formats[14] = SAIL_PIXEL_FORMAT_RGB565;
-
-    (*write_features)->output_pixel_formats_length = 5;
-    (*write_features)->output_pixel_formats = (int *)malloc((*write_features)->output_pixel_formats_length * sizeof(int));
-
-    if ((*write_features)->output_pixel_formats == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
-
-    (*write_features)->output_pixel_formats[0] = SAIL_PIXEL_FORMAT_GRAYSCALE;
-    (*write_features)->output_pixel_formats[1] = SAIL_PIXEL_FORMAT_RGB;
-    (*write_features)->output_pixel_formats[2] = SAIL_PIXEL_FORMAT_YCBCR;
-    (*write_features)->output_pixel_formats[3] = SAIL_PIXEL_FORMAT_CMYK;
-    (*write_features)->output_pixel_formats[4] = SAIL_PIXEL_FORMAT_YCCK;
-
-    (*write_features)->preferred_output_pixel_format = SAIL_PIXEL_FORMAT_YCBCR;
-
-    (*write_features)->features                   = SAIL_PLUGIN_FEATURE_STATIC | SAIL_PLUGIN_FEATURE_META_INFO;
-    (*write_features)->properties                 = 0;
-    (*write_features)->passes                     = 0;
-    (*write_features)->compression_types          = NULL;
-    (*write_features)->compression_types_length   = 0;
-    (*write_features)->preferred_compression_type = 0;
-    (*write_features)->compression_min            = COMPRESSION_MIN;
-    (*write_features)->compression_max            = COMPRESSION_MAX;
-    (*write_features)->compression_default        = COMPRESSION_DEFAULT;
-
-    return 0;
-}
-
 SAIL_EXPORT sail_error_t sail_plugin_write_init_v2(struct sail_file *file, const struct sail_write_options *write_options) {
 
     SAIL_CHECK_FILE(file);
+    SAIL_CHECK_WRITE_OPTIONS_PTR(write_options);
 
     struct pimpl *pimpl;
 
@@ -485,25 +374,14 @@ SAIL_EXPORT sail_error_t sail_plugin_write_init_v2(struct sail_file *file, const
 
     file->pimpl = pimpl;
 
-    /* Construct default write options. */
-    if (write_options == NULL) {
-        /* Copy options from write features. */
-        struct sail_write_features *write_features;
+    /* Deep copy write options. */
+    pimpl->write_options = (struct sail_write_options *)malloc(sizeof(struct sail_write_options));
 
-        SAIL_TRY(sail_plugin_write_features_v2(&write_features));
-        SAIL_TRY_OR_CLEANUP(sail_alloc_write_options_from_features(write_features, &pimpl->write_options),
-                            sail_destroy_write_features(write_features));
-
-        sail_destroy_write_features(write_features);
-    } else {
-        pimpl->write_options = (struct sail_write_options *)malloc(sizeof(struct sail_write_options));
-
-        if (pimpl->write_options == NULL) {
-            return SAIL_MEMORY_ALLOCATION_FAILED;
-        }
-
-        memcpy(pimpl->write_options, write_options, sizeof(struct sail_write_options));
+    if (pimpl->write_options == NULL) {
+        return SAIL_MEMORY_ALLOCATION_FAILED;
     }
+
+    memcpy(pimpl->write_options, write_options, sizeof(struct sail_write_options));
 
     /* Sanity check. */
     if (pixel_format_to_color_space(pimpl->write_options->pixel_format) == JCS_UNKNOWN) {

@@ -46,7 +46,6 @@ struct sail_file;
 struct sail_image;
 
 /* V2 declarations. */
-typedef sail_error_t (*sail_plugin_read_features_v2_t)(struct sail_read_features **read_features);
 typedef sail_error_t (*sail_plugin_read_init_v2_t)(struct sail_file *file, const struct sail_read_options *read_options);
 typedef sail_error_t (*sail_plugin_read_seek_next_frame_v2_t)(struct sail_file *file, struct sail_image **image);
 typedef sail_error_t (*sail_plugin_read_seek_next_pass_v2_t)(struct sail_file *file, const struct sail_image *image);
@@ -54,7 +53,6 @@ typedef sail_error_t (*sail_plugin_read_scan_line_v2_t)(struct sail_file *file, 
 typedef sail_error_t (*sail_plugin_read_alloc_scan_line_v2_t)(struct sail_file *file, const struct sail_image *image, void **scanline);
 typedef sail_error_t (*sail_plugin_read_finish_v2_t)(struct sail_file *file);
 
-typedef sail_error_t (*sail_plugin_write_features_v2_t)(struct sail_write_features **write_features);
 typedef sail_error_t (*sail_plugin_write_init_v2_t)(struct sail_file *file, const struct sail_write_options *write_options);
 typedef sail_error_t (*sail_plugin_write_seek_next_frame_v2_t)(struct sail_file *file, const struct sail_image *image);
 typedef sail_error_t (*sail_plugin_write_seek_next_pass_v2_t)(struct sail_file *file, const struct sail_image *image);
@@ -62,7 +60,6 @@ typedef sail_error_t (*sail_plugin_write_scan_line_v2_t)(struct sail_file *file,
 typedef sail_error_t (*sail_plugin_write_finish_v2_t)(struct sail_file *file);
 
 struct sail_plugin_layout_v2 {
-    sail_plugin_read_features_v2_t        read_features_v2;
     sail_plugin_read_init_v2_t            read_init_v2;
     sail_plugin_read_seek_next_frame_v2_t read_seek_next_frame_v2;
     sail_plugin_read_seek_next_pass_v2_t  read_seek_next_pass_v2;
@@ -70,7 +67,6 @@ struct sail_plugin_layout_v2 {
     sail_plugin_read_alloc_scan_line_v2_t read_alloc_scan_line_v2;
     sail_plugin_read_finish_v2_t          read_finish_v2;
 
-    sail_plugin_write_features_v2_t        write_features_v2;
     sail_plugin_write_init_v2_t            write_init_v2;
     sail_plugin_write_seek_next_frame_v2_t write_seek_next_frame_v2;
     sail_plugin_write_seek_next_pass_v2_t  write_seek_next_pass_v2;

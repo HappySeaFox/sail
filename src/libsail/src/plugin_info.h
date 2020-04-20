@@ -21,6 +21,9 @@
 
 struct sail_string_node;
 
+struct sail_read_features;
+struct sail_write_features;
+
 struct sail_plugin;
 
 /*
@@ -55,6 +58,9 @@ struct sail_plugin_info {
 
     /* Full path to the plugin. */
     char *path;
+
+    struct sail_read_features *read_features;
+    struct sail_write_features *write_features;
 };
 
 typedef struct sail_plugin_info sail_plugin_info_t;

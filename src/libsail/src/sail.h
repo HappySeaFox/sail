@@ -124,24 +124,6 @@ SAIL_EXPORT sail_error_t sail_load_plugin(struct sail_context *context, const st
 SAIL_EXPORT sail_error_t sail_unload_plugins(struct sail_context *context);
 
 /*
- * Reads plugin read features from the specified plugin. The assigned read features MUST be destroyed
- * later with sail_destroy_read_features(). You can build sail_read_options based on the read features
- * either manually of with sail_alloc_read_options_from_features().
- *
- * Returns 0 on success or sail_error_t on error.
- */
-SAIL_EXPORT sail_error_t sail_plugin_read_features(const struct sail_plugin *plugin, struct sail_read_features **read_features);
-
-/*
- * Reads plugin write features from the specified plugin. The assigned write features MUST be destroyed
- * later with sail_destroy_write_features(). You can build sail_write_options based on the write features
- * either manually of with sail_alloc_write_options_from_features().
- *
- * Returns 0 on success or sail_error_t on error.
- */
-SAIL_EXPORT sail_error_t sail_plugin_write_features(const struct sail_plugin *plugin, struct sail_write_features **write_features);
-
-/*
  * Loads the specified image and returns its properties without pixel data. The assigned image MUST be destroyed later
  * with sail_destroy_image(). The assigned plugin info MUST NOT be destroyed. It's a pointer to an internal
  * data structure. If you don't need it, just pass NULL.
@@ -204,8 +186,9 @@ SAIL_EXPORT sail_error_t sail_write(const char *path, struct sail_context *conte
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_start_reading_with_plugin(const char *path, struct sail_context *context, const struct sail_plugin *plugin,
-                                                        const struct sail_read_options *read_options, void **pimpl);
+SAIL_EXPORT sail_error_t sail_start_reading_with_plugin(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info,
+                                                        const struct sail_plugin *plugin, const struct sail_read_options *read_options,
+                                                        void **pimpl);
 
 /*
  * Starts reading the specified image. The assigned plugin info MUST NOT be destroyed.
@@ -276,8 +259,9 @@ SAIL_EXPORT sail_error_t sail_stop_reading(void *pimpl);
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_start_writing_with_plugin(const char *path, struct sail_context *context, const struct sail_plugin *plugin,
-                                                        const struct sail_write_options *write_options, void **pimpl);
+SAIL_EXPORT sail_error_t sail_start_writing_with_plugin(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info,
+                                                        const struct sail_plugin *plugin, const struct sail_write_options *write_options,
+                                                        void **pimpl);
 
 /*
  * Starts writing into the specified image file. The assigned plugin info MUST NOT be destroyed.

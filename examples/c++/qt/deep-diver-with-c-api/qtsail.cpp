@@ -108,17 +108,15 @@ static QImage::Format sailPixelFormatToQImageFormat(int pixel_format) {
 
 sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 {
-    sail_read_features *read_features = nullptr;
     sail_read_options *read_options = nullptr;
 
     sail_image *image = nullptr;
     uchar *image_bits = nullptr;
     void *pimpl = nullptr;
 
-    SAIL_TRY_OR_CLEANUP(loadImageImpl(path, &read_features, &read_options, &pimpl, &image, &image_bits),
+    SAIL_TRY_OR_CLEANUP(loadImageImpl(path, &read_options, &pimpl, &image, &image_bits),
                         /* cleanup */ free(image_bits),
                                       sail_stop_reading(pimpl),
-                                      sail_destroy_read_features(read_features),
                                       sail_destroy_read_options(read_options),
                                       sail_destroy_image(image));
 
@@ -150,7 +148,6 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 
     free(image_bits);
 
-    sail_destroy_read_features(read_features);
     sail_destroy_read_options(read_options);
     sail_destroy_image(image);
 
@@ -160,8 +157,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     return 0;
 }
 
-sail_error_t QtSail::loadImageImpl(const QString &path, sail_read_features **read_features,
-                                   sail_read_options **read_options, void **pimpl,
+sail_error_t QtSail::loadImageImpl(const QString &path, sail_read_options **read_options, void **pimpl,
                                    sail_image **image, uchar **image_bits)
 {
     // Time counter.
@@ -180,20 +176,16 @@ sail_error_t QtSail::loadImageImpl(const QString &path, sail_read_features **rea
     SAIL_TRY(sail_load_plugin(d->context, plugin_info, &plugin));
     pluginInfo(plugin_info);
 
-    // Determine the read features of the plugin: what the plugin can actually read?
-    //
-    SAIL_TRY(sail_plugin_read_features(plugin, read_features));
-
     // Allocate new read options and copy defaults from the read features
     // (preferred output pixel format etc.).
     //
-    SAIL_TRY(sail_alloc_read_options_from_features(*read_features, read_options));
+    SAIL_TRY(sail_alloc_read_options_from_features(plugin_info->read_features, read_options));
 
     const qint64 beforeDialog = elapsed.elapsed();
 
     // Ask the user to provide his/her preferred output options.
     //
-    ReadOptions readOptions(QString::fromUtf8(plugin_info->description), *read_features, this);
+    ReadOptions readOptions(QString::fromUtf8(plugin_info->description), plugin_info->read_features, this);
 
     if (readOptions.exec() == QDialog::Accepted) {
         (*read_options)->pixel_format = readOptions.pixelFormat();
@@ -213,7 +205,7 @@ sail_error_t QtSail::loadImageImpl(const QString &path, sail_read_features **rea
 
     // Initialize reading with our options.
     //
-    SAIL_TRY(sail_start_reading_with_plugin(path.toLocal8Bit(), d->context, plugin, *read_options, pimpl));
+    SAIL_TRY(sail_start_reading_with_plugin(path.toLocal8Bit(), d->context, plugin_info, plugin, *read_options, pimpl));
 
     // Seek and read the next image frame in the file.
     //
@@ -242,7 +234,6 @@ static int qImageFormatToSailPixelFormat(QImage::Format format) {
 sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
 {
     sail_image *image = nullptr;
-    sail_write_features *write_features = nullptr;
     sail_write_options *write_options = nullptr;
     void *pimpl = nullptr;
 
@@ -260,13 +251,11 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
         return SAIL_UNSUPPORTED_PIXEL_FORMAT;
     }
 
-    SAIL_TRY_OR_CLEANUP(saveImageImpl(path, &write_features, &write_options, &pimpl, image, qimage.bits()),
+    SAIL_TRY_OR_CLEANUP(saveImageImpl(path, &write_options, &pimpl, image, qimage.bits()),
                         /* cleanup */ sail_stop_writing(pimpl),
-                                      sail_destroy_write_features(write_features),
                                       sail_destroy_write_options(write_options),
                                       sail_destroy_image(image));
 
-    sail_destroy_write_features(write_features);
     sail_destroy_write_options(write_options);
     sail_destroy_image(image);
 
@@ -276,8 +265,7 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
     return 0;
 }
 
-sail_error_t QtSail::saveImageImpl(const QString &path, sail_write_features **write_features,
-                                   sail_write_options **write_options, void **pimpl,
+sail_error_t QtSail::saveImageImpl(const QString &path, sail_write_options **write_options, void **pimpl,
                                    sail_image *image, const uchar *image_bits)
 {
     // Time counter.
@@ -292,20 +280,16 @@ sail_error_t QtSail::saveImageImpl(const QString &path, sail_write_features **wr
     SAIL_TRY(sail_load_plugin(d->context, plugin_info, &plugin));
     pluginInfo(plugin_info);
 
-    // Determine the write features of the plugin: what the plugin can actually write?
-    //
-    SAIL_TRY(sail_plugin_write_features(plugin, write_features));
-
     // Allocate new write options and copy defaults from the write features
     // (preferred output pixel format etc.).
     //
-    SAIL_TRY(sail_alloc_write_options_from_features(*write_features, write_options));
+    SAIL_TRY(sail_alloc_write_options_from_features(plugin_info->write_features, write_options));
 
     const qint64 beforeDialog = elapsed.elapsed();
 
     // Ask the user to provide his/her preferred output options.
     //
-    WriteOptions writeOptions(QString::fromUtf8(plugin_info->description), *write_features, this);
+    WriteOptions writeOptions(QString::fromUtf8(plugin_info->description), plugin_info->write_features, this);
 
     if (writeOptions.exec() == QDialog::Accepted) {
         (*write_options)->pixel_format = writeOptions.pixelFormat();
@@ -316,7 +300,7 @@ sail_error_t QtSail::saveImageImpl(const QString &path, sail_write_features **wr
 
     // Initialize writing with our options.
     //
-    SAIL_TRY(sail_start_writing_with_plugin(path.toLocal8Bit(), d->context, plugin, *write_options, pimpl));
+    SAIL_TRY(sail_start_writing_with_plugin(path.toLocal8Bit(), d->context, plugin_info, plugin, *write_options, pimpl));
 
     // Save some meta info...
     //
