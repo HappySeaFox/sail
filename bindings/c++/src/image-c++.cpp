@@ -154,7 +154,7 @@ sail_error_t image::to_sail_image(sail_image **image) const
     // Resulting meta entries
     sail_meta_entry_node *image_meta_entry_node = nullptr;
 
-    sail_meta_entry_node *last_meta_entry_node;
+    sail_meta_entry_node *last_meta_entry_node = nullptr;
     auto it = d->meta_entries.begin();
 
     while (it != d->meta_entries.end()) {
