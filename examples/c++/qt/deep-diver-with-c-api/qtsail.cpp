@@ -122,11 +122,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
                                       sail_destroy_read_options(read_options),
                                       sail_destroy_image(image));
 
-    QImage::Format qimageFormat = sailPixelFormatToQImageFormat(read_options->pixel_format);
-
-    if (qimageFormat == QImage::Format_Invalid) {
-        return SAIL_UNSUPPORTED_PIXEL_FORMAT;
-    }
+    const QImage::Format qimageFormat = sailPixelFormatToQImageFormat(read_options->pixel_format);
 
     // Convert to QImage.
     //
@@ -205,6 +201,12 @@ sail_error_t QtSail::loadImageImpl(const QString &path, sail_read_features **rea
         // Force RGB888 output format.
         //
         (*read_options)->pixel_format = SAIL_PIXEL_FORMAT_RGB;
+    }
+
+    const QImage::Format qimageFormat = sailPixelFormatToQImageFormat((*read_options)->pixel_format);
+
+    if (qimageFormat == QImage::Format_Invalid) {
+        return SAIL_UNSUPPORTED_PIXEL_FORMAT;
     }
 
     elapsed.restart();
