@@ -216,6 +216,8 @@ sail_error_t QtSail::loadImageImpl(const QString &path, sail_read_options **read
     SAIL_TRY(sail_stop_reading(*pimpl));
 
     SAIL_LOG_INFO("Loaded in %lld ms.", elapsed.elapsed() + beforeDialog);
+
+    return 0;
 }
 
 static int qImageFormatToSailPixelFormat(QImage::Format format) {
