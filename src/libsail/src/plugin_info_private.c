@@ -370,9 +370,54 @@ void sail_destroy_plugin_info_node_chain(struct sail_plugin_info_node *plugin_in
     }
 }
 
+static sail_error_t check_plugin_info(const char *path, const struct sail_plugin_info *plugin_info) {
+
+    const struct sail_read_features *read_features = plugin_info->read_features;
+    const struct sail_write_features *write_features = plugin_info->write_features;
+
+    /* Check read features. */
+    if (read_features->input_pixel_formats_length == 0 && read_features->output_pixel_formats_length != 0) {
+        SAIL_LOG_ERROR("The plugin '%s' is not able to read anything, but output pixel formats are specified", path);
+        return SAIL_INCOMPLETE_PLUGIN_INFO;
+    }
+
+    if (read_features->input_pixel_formats_length != 0 && read_features->output_pixel_formats_length == 0) {
+        SAIL_LOG_ERROR("The plugin '%s' is able to read images, but output pixel formats are not specified", path);
+        return SAIL_INCOMPLETE_PLUGIN_INFO;
+    }
+
+    if ((read_features->features & SAIL_PLUGIN_FEATURE_STATIC ||
+            read_features->features & SAIL_PLUGIN_FEATURE_ANIMATED ||
+            read_features->features & SAIL_PLUGIN_FEATURE_MULTIPAGED) && read_features->input_pixel_formats_length == 0) {
+        SAIL_LOG_ERROR("The plugin '%s' is able to read images, but input pixel formats are not specified", path);
+        return SAIL_INCOMPLETE_PLUGIN_INFO;
+    }
+
+    /* Check write features. */
+    if (write_features->input_pixel_formats_length == 0 && write_features->output_pixel_formats_length != 0) {
+        SAIL_LOG_ERROR("The plugin '%s' is not able to write anything, but output pixel formats are specified", path);
+        return SAIL_INCOMPLETE_PLUGIN_INFO;
+    }
+
+    if (write_features->input_pixel_formats_length != 0 && write_features->output_pixel_formats_length == 0) {
+        SAIL_LOG_ERROR("The plugin '%s' is able to write images, but output pixel formats are not specified", path);
+        return SAIL_INCOMPLETE_PLUGIN_INFO;
+    }
+
+    if ((write_features->features & SAIL_PLUGIN_FEATURE_STATIC ||
+            write_features->features & SAIL_PLUGIN_FEATURE_ANIMATED ||
+            write_features->features & SAIL_PLUGIN_FEATURE_MULTIPAGED) && write_features->output_pixel_formats_length == 0) {
+        SAIL_LOG_ERROR("The plugin '%s' is able to write images, but output pixel formats are not specified", path);
+        return SAIL_INCOMPLETE_PLUGIN_INFO;
+    }
+
+    return 0;
+}
+
 int sail_plugin_read_info(const char *path, struct sail_plugin_info **plugin_info) {
 
     SAIL_CHECK_PATH_PTR(path);
+    SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
 
     SAIL_TRY(sail_alloc_plugin_info(plugin_info));
     SAIL_TRY_OR_CLEANUP(sail_alloc_read_features(&(*plugin_info)->read_features),
@@ -395,33 +440,9 @@ int sail_plugin_read_info(const char *path, struct sail_plugin_info **plugin_inf
         return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
     }
 
-    if ((*plugin_info)->read_features->input_pixel_formats_length == 0 &&
-            (*plugin_info)->read_features->output_pixel_formats_length != 0) {
-        SAIL_LOG_ERROR("The plugin '%s' is not able to read anything, but an output pixel format is specified in the same time", path);
-        sail_destroy_plugin_info(*plugin_info);
-        return SAIL_INCOMPLETE_PLUGIN_INFO;
-    }
-
-    if ((*plugin_info)->read_features->input_pixel_formats_length != 0 &&
-            (*plugin_info)->read_features->output_pixel_formats_length == 0) {
-        SAIL_LOG_ERROR("The plugin '%s' is able to read images, but an output pixel format is not specified", path);
-        sail_destroy_plugin_info(*plugin_info);
-        return SAIL_INCOMPLETE_PLUGIN_INFO;
-    }
-
-    if ((*plugin_info)->write_features->input_pixel_formats_length == 0 &&
-            (*plugin_info)->write_features->output_pixel_formats_length != 0) {
-        SAIL_LOG_ERROR("The plugin '%s' is not able to write anything, but an output pixel format is specified in the same time", path);
-        sail_destroy_plugin_info(*plugin_info);
-        return SAIL_INCOMPLETE_PLUGIN_INFO;
-    }
-
-    if ((*plugin_info)->write_features->input_pixel_formats_length != 0 &&
-            (*plugin_info)->write_features->output_pixel_formats_length == 0) {
-        SAIL_LOG_ERROR("The plugin '%s' is able to write images, but an output pixel format is not specified", path);
-        sail_destroy_plugin_info(*plugin_info);
-        return SAIL_INCOMPLETE_PLUGIN_INFO;
-    }
+    /* Paranoid error checks. */
+    SAIL_TRY_OR_CLEANUP(check_plugin_info(path, *plugin_info),
+                        /* cleanup */ sail_destroy_plugin_info(*plugin_info));
 
     /* Success. */
     if (code == 0) {
