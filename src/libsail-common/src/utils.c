@@ -30,6 +30,7 @@
 
 #include "common.h"
 #include "error.h"
+#include "log.h"
 #include "utils.h"
 
 int sail_strdup(const char *input, char **output) {
@@ -170,12 +171,12 @@ sail_error_t sail_to_wchar(const char *input, wchar_t **output) {
 
 const char* sail_pixel_format_to_string(int pixel_format) {
     switch (pixel_format) {
-        case SAIL_PIXEL_FORMAT_UNKNOWN:   return "Unknown";
-        case SAIL_PIXEL_FORMAT_SOURCE:    return "Source";
+        case SAIL_PIXEL_FORMAT_UNKNOWN:   return "UNKNOWN";
+        case SAIL_PIXEL_FORMAT_SOURCE:    return "SOURCE";
 
-        case SAIL_PIXEL_FORMAT_MONO:      return "Mono";
-        case SAIL_PIXEL_FORMAT_GRAYSCALE: return "Grayscale";
-        case SAIL_PIXEL_FORMAT_INDEXED:   return "Indexed";
+        case SAIL_PIXEL_FORMAT_MONO:      return "MONO";
+        case SAIL_PIXEL_FORMAT_GRAYSCALE: return "GRAYSCALE";
+        case SAIL_PIXEL_FORMAT_INDEXED:   return "INDEXED";
         case SAIL_PIXEL_FORMAT_RGB:       return "RGB";
         case SAIL_PIXEL_FORMAT_YCBCR:     return "YCbCr";
         case SAIL_PIXEL_FORMAT_CMYK:      return "CMYK";
@@ -192,7 +193,165 @@ const char* sail_pixel_format_to_string(int pixel_format) {
         case SAIL_PIXEL_FORMAT_RGB565:    return "RGB565";
     }
 
-    return "Unknown";
+    SAIL_LOG_ERROR("Unsupported pixel format: #%d", pixel_format);
+    return "UNKNOWN";
+}
+
+int sail_pixel_format_from_string(const char *str) {
+
+    if (str == NULL) {
+        SAIL_LOG_ERROR("Pixel format in string representation is NULL");
+        return SAIL_PIXEL_FORMAT_UNKNOWN;
+    }
+
+    if (strlen(str) == 0) {
+        return SAIL_PIXEL_FORMAT_UNKNOWN;
+    }
+
+    if (strcmp(str, "UNKNOWN") == 0) {
+        return SAIL_PIXEL_FORMAT_UNKNOWN;
+    } else if (strcmp(str, "SOURCE") == 0) {
+        return SAIL_PIXEL_FORMAT_SOURCE;
+    } else if (strcmp(str, "MONO") == 0) {
+        return SAIL_PIXEL_FORMAT_MONO;
+    } else if (strcmp(str, "GRAYSCALE") == 0) {
+        return SAIL_PIXEL_FORMAT_GRAYSCALE;
+    } else if (strcmp(str, "INDEXED") == 0) {
+        return SAIL_PIXEL_FORMAT_INDEXED;
+    } else if (strcmp(str, "RGB") == 0) {
+        return SAIL_PIXEL_FORMAT_RGB;
+    } else if (strcmp(str, "YCBCR") == 0) {
+        return SAIL_PIXEL_FORMAT_YCBCR;
+    } else if (strcmp(str, "CMYK") == 0) {
+        return SAIL_PIXEL_FORMAT_CMYK;
+    } else if (strcmp(str, "YCCK") == 0) {
+        return SAIL_PIXEL_FORMAT_YCCK;
+    } else if (strcmp(str, "RGBX") == 0) {
+        return SAIL_PIXEL_FORMAT_RGBX;
+    } else if (strcmp(str, "BGR") == 0) {
+        return SAIL_PIXEL_FORMAT_BGR;
+    } else if (strcmp(str, "BGRX") == 0) {
+        return SAIL_PIXEL_FORMAT_BGRX;
+    } else if (strcmp(str, "XBGR") == 0) {
+        return SAIL_PIXEL_FORMAT_XBGR;
+    } else if (strcmp(str, "XRGB") == 0) {
+        return SAIL_PIXEL_FORMAT_XRGB;
+    } else if (strcmp(str, "RGBA") == 0) {
+        return SAIL_PIXEL_FORMAT_RGBA;
+    } else if (strcmp(str, "BGRA") == 0) {
+        return SAIL_PIXEL_FORMAT_BGRA;
+    } else if (strcmp(str, "ABGR") == 0) {
+        return SAIL_PIXEL_FORMAT_ABGR;
+    } else if (strcmp(str, "ARGB") == 0) {
+        return SAIL_PIXEL_FORMAT_ARGB;
+    } else if (strcmp(str, "RGB565") == 0) {
+        return SAIL_PIXEL_FORMAT_RGB565;
+    }
+
+    SAIL_LOG_ERROR("Unsupported pixel format in string representation: '%s'", str);
+    return SAIL_PIXEL_FORMAT_UNKNOWN;
+}
+
+const char* sail_image_property_to_string(int image_property) {
+    switch (image_property) {
+        case SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY: return "FLIPPED-VERTICALLY";
+        case SAIL_IMAGE_PROPERTY_INTERLACED:         return "INTERLACED";
+    }
+
+    SAIL_LOG_ERROR("Unsupported image property: #%d", image_property);
+    return "";
+}
+
+int sail_image_property_from_string(const char *str) {
+
+    if (str == NULL) {
+        SAIL_LOG_ERROR("Image property in string representation is NULL");
+        return 0;
+    }
+
+    if (strlen(str) == 0) {
+        return 0;
+    }
+
+    if (strcmp(str, "FLIPPED-VERTICALLY") == 0) {
+        return SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY;
+    } else if (strcmp(str, "INTERLACED") == 0) {
+        return SAIL_IMAGE_PROPERTY_INTERLACED;
+    }
+
+    SAIL_LOG_ERROR("Unsupported image property in string representation: '%s'", str);
+    return 0;
+}
+
+const char* sail_compression_type_to_string(int compression) {
+    switch (compression) {
+        case SAIL_COMPRESSION_RLE: return "RLE";
+    }
+
+    SAIL_LOG_ERROR("Unsupported compression: #%d", compression);
+    return "";
+}
+
+int sail_compression_type_from_string(const char *str) {
+
+    if (str == NULL) {
+        SAIL_LOG_ERROR("Compression in string representation is NULL");
+        return 0;
+    }
+
+    if (strlen(str) == 0) {
+        return 0;
+    }
+
+    if (strcmp(str, "RLE") == 0) {
+        return SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY;
+    }
+
+    SAIL_LOG_ERROR("Unsupported compression in string representation: '%s'", str);
+    return 0;
+}
+
+const char* sail_plugin_feature_to_string(int plugin_feature) {
+    switch (plugin_feature) {
+        case SAIL_PLUGIN_FEATURE_STATIC:     return "STATIC";
+        case SAIL_PLUGIN_FEATURE_ANIMATED:   return "ANIMATED";
+        case SAIL_PLUGIN_FEATURE_MULTIPAGED: return "MULTIPAGED";
+        case SAIL_PLUGIN_FEATURE_META_INFO:  return "META-INFO";
+        case SAIL_PLUGIN_FEATURE_EXIF:       return "EXIF";
+        case SAIL_PLUGIN_FEATURE_INTERLACED: return "INTERLACED";
+    }
+
+    SAIL_LOG_ERROR("Unsupported plugin feature: #%d", plugin_feature);
+    return "";
+}
+
+int sail_plugin_feature_from_string(const char *str) {
+
+    if (str == NULL) {
+        SAIL_LOG_ERROR("Plugin feature in string representation is NULL");
+        return 0;
+    }
+
+    if (strlen(str) == 0) {
+        return 0;
+    }
+
+    if (strcmp(str, "STATIC") == 0) {
+        return SAIL_PLUGIN_FEATURE_STATIC;
+    } else if (strcmp(str, "ANIMATED") == 0) {
+        return SAIL_PLUGIN_FEATURE_ANIMATED;
+    } else if (strcmp(str, "MULTIPAGED") == 0) {
+        return SAIL_PLUGIN_FEATURE_MULTIPAGED;
+    } else if (strcmp(str, "META-INFO") == 0) {
+        return SAIL_PLUGIN_FEATURE_META_INFO;
+    } else if (strcmp(str, "EXIF") == 0) {
+        return SAIL_PLUGIN_FEATURE_EXIF;
+    } else if (strcmp(str, "INTERLACED") == 0) {
+        return SAIL_PLUGIN_FEATURE_INTERLACED;
+    }
+
+    SAIL_LOG_ERROR("Unsupported plugin feature in string representation: '%s'", str);
+    return 0;
 }
 
 int sail_bits_per_pixel(int pixel_format) {

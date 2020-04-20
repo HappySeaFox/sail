@@ -89,7 +89,7 @@ enum SailImageProperties {
 };
 
 /* Pixels compression types. */
-enum SailCompression {
+enum SailCompressionTypes {
 
     /* RLE compression. */
     SAIL_COMPRESSION_RLE = 1 << 0,
@@ -458,7 +458,7 @@ struct sail_write_options {
     int io_options;
 
     /*
-     * Compression type or 0. For example: SAIL_COMPRESSION_RLE. See SailCompression.
+     * Compression type or 0. For example: SAIL_COMPRESSION_RLE. See SailCompressionTypes.
      * In most cases plugins mutually exclusive support either compression levels or compression types.
      * Use sail_write_features to determine what compression types or values are supported by a particular
      * plugin.

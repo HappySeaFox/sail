@@ -73,9 +73,51 @@ SAIL_EXPORT sail_error_t sail_to_wchar(const char *input, wchar_t **output);
 
 /*
  * Returns a non-NULL string representation of the specified pixel format.
- * For example: "RGB", "CMYK".
+ * For example: "RGB".
  */
 SAIL_EXPORT const char* sail_pixel_format_to_string(int pixel_format);
+
+/*
+ * Returns pixel format from string representation.
+ * For example: SAIL_PIXEL_FORMAT_SOURCE is returned for "SOURCE".
+ */
+SAIL_EXPORT int sail_pixel_format_from_string(const char *str);
+
+/*
+ * Returns a non-NULL string representation of the specified image property. See SailImageProperties.
+ * For example: "FLIPPED-VERTICALLY".
+ */
+SAIL_EXPORT const char* sail_image_property_to_string(int image_property);
+
+/*
+ * Returns image property from string representation or 0. See SailImageProperties.
+ * For example: SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY is returned for "FLIPPED-VERTICALLY".
+ */
+SAIL_EXPORT int sail_image_property_from_string(const char *str);
+
+/*
+ * Returns a non-NULL string representation of the specified compression type. See SailCompressionTypes.
+ * For example: "RLE".
+ */
+SAIL_EXPORT const char* sail_compression_type_to_string(int compression);
+
+/*
+ * Returns compression from string representation or 0. See SailCompressionTypes.
+ * For example: SAIL_COMPRESSION_RLE is returned for "RLE".
+ */
+SAIL_EXPORT int sail_compression_type_from_string(const char *str);
+
+/*
+ * Returns a non-NULL string representation of the specified plugin feature. See SailPluginFeatures.
+ * For example: "STATIC".
+ */
+SAIL_EXPORT const char* sail_plugin_feature_to_string(int plugin_feature);
+
+/*
+ * Returns plugin feature from string representation or 0. See SailPluginFeatures.
+ * For example: SAIL_PLUGIN_FEATURE_STATIC is returned for "STATIC".
+ */
+SAIL_EXPORT int sail_plugin_feature_from_string(const char *str);
 
 /*
  * Returns a number of bits a pixel in the specified pixel format occupies.
