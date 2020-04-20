@@ -121,17 +121,14 @@ sail_error_t image_writer::start_writing(const std::string &path, plugin_info **
 sail_error_t image_writer::write_next_frame(const image *simage)
 {
     sail_image *image = nullptr;
-    SAIL_TRY(sail_alloc_image(&image));
 
-    image->width = simage->width();
-    image->height = simage->height();
-    image->pixel_format = simage->pixel_format();
-    image->bytes_per_line = sail_bytes_per_line(simage->width(), simage->pixel_format());
+    SAIL_AT_SCOPE_EXIT (
+        sail_destroy_image(image);
+    );
 
-    SAIL_TRY_OR_CLEANUP(sail_write_next_frame(d->pmpl, image, simage->bits()),
-                        /* cleanup */ sail_destroy_image(image));
+    SAIL_TRY(simage->to_sail_image(&image));
 
-    sail_destroy_image(image);
+    SAIL_TRY(sail_write_next_frame(d->pmpl, image, simage->bits()));
 
     return 0;
 }
