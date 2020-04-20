@@ -40,7 +40,7 @@
 namespace sail
 {
 
-class image_reader::pimpl
+class SAIL_HIDDEN image_reader::pimpl
 {
 public:
     pimpl(context *_ctx)

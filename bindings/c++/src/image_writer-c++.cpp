@@ -40,7 +40,7 @@
 namespace sail
 {
 
-class image_writer::pimpl
+class SAIL_HIDDEN image_writer::pimpl
 {
 public:
     pimpl(context *_ctx)

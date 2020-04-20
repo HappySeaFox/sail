@@ -31,7 +31,7 @@
 namespace sail
 {
 
-class plugin_info::pimpl
+class SAIL_HIDDEN plugin_info::pimpl
 {
 public:
     std::string version;

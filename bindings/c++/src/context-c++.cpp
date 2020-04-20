@@ -32,7 +32,7 @@
 namespace sail
 {
 
-class context::pimpl
+class SAIL_HIDDEN context::pimpl
 {
 public:
     sail_context *context = nullptr;

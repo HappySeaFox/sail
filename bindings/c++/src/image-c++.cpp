@@ -39,7 +39,7 @@
 namespace sail
 {
 
-class image::pimpl
+class SAIL_HIDDEN image::pimpl
 {
 public:
     pimpl()
