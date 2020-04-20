@@ -49,6 +49,7 @@ public:
     }
 
     context *ctx;
+    void *pmpl;
 };
 
 image_writer::image_writer(context *ctx)
@@ -96,6 +97,50 @@ sail_error_t image_writer::write(const char *path, const image *simage, plugin_i
             return SAIL_MEMORY_ALLOCATION_FAILED;
         }
     }
+
+    return 0;
+}
+
+sail_error_t image_writer::start_writing(const std::string &path, plugin_info **splugin_info)
+{
+    const sail_plugin_info *sail_plugin_info = nullptr;
+
+    SAIL_TRY(sail_start_writing(path.c_str(), d->ctx->to_sail_context(), &sail_plugin_info, &d->pmpl));
+
+    if (splugin_info != nullptr) {
+        *splugin_info = new plugin_info(sail_plugin_info);
+
+        if (*splugin_info == nullptr) {
+            return SAIL_MEMORY_ALLOCATION_FAILED;
+        }
+    }
+
+    return 0;
+}
+
+sail_error_t image_writer::write_next_frame(const image *simage)
+{
+    sail_image *image = nullptr;
+    SAIL_TRY(sail_alloc_image(&image));
+
+    image->width = simage->width();
+    image->height = simage->height();
+    image->pixel_format = simage->pixel_format();
+    image->bytes_per_line = sail_bytes_per_line(simage->width(), simage->pixel_format());
+
+    SAIL_TRY_OR_CLEANUP(sail_write_next_frame(d->pmpl, image, simage->bits()),
+                        /* cleanup */ sail_destroy_image(image));
+
+    sail_destroy_image(image);
+
+    return 0;
+}
+
+sail_error_t image_writer::stop_writing()
+{
+    SAIL_TRY(sail_stop_writing(d->pmpl));
+
+    d->pmpl = nullptr;
 
     return 0;
 }

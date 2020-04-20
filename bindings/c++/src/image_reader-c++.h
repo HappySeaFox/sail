@@ -27,6 +27,8 @@
     #include <sail/export.h>
 #endif
 
+#include <string>
+
 namespace sail
 {
 
@@ -46,9 +48,29 @@ public:
     bool is_valid() const;
 
     /*
+     * An interface to sail_probe(). See sail_probe() for more.
+     */
+    sail_error_t probe(const std::string &path, image **simage, plugin_info **splugin_info = nullptr);
+
+    /*
      * An interface to sail_read(). See sail_read() for more.
      */
-    sail_error_t read(const char *path, image **simage, plugin_info **splugin_info = nullptr);
+    sail_error_t read(const std::string &path, image **simage, plugin_info **splugin_info = nullptr);
+
+    /*
+     * An interface to sail_start_reading(). See sail_start_reading() for more.
+     */
+    sail_error_t start_reading(const std::string &path, plugin_info **splugin_info = nullptr);
+
+    /*
+     * An interface to sail_read_next_frame(). See sail_read_next_frame() for more.
+     */
+    sail_error_t read_next_frame(image **simage);
+
+    /*
+     * An interface to sail_stop_reading(). See sail_stop_reading() for more.
+     */
+    sail_error_t stop_reading();
 
 private:
     class pimpl;

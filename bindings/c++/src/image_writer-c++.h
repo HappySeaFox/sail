@@ -27,6 +27,8 @@
     #include <sail/export.h>
 #endif
 
+#include <string>
+
 namespace sail
 {
 
@@ -49,6 +51,21 @@ public:
      * An interface to sail_write(). See sail_write() for more.
      */
     sail_error_t write(const char *path, const image *simage, plugin_info **splugin_info = nullptr);
+
+    /*
+     * An interface to sail_start_writing(). See sail_start_writing() for more.
+     */
+    sail_error_t start_writing(const std::string &path, plugin_info **splugin_info = nullptr);
+
+    /*
+     * An interface to sail_write_next_frame(). See sail_write_next_frame() for more.
+     */
+    sail_error_t write_next_frame(const image *simage);
+
+    /*
+     * An interface to sail_stop_writing(). See sail_stop_writing() for more.
+     */
+    sail_error_t stop_writing();
 
 private:
     class pimpl;
