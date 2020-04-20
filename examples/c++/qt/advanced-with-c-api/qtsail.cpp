@@ -141,10 +141,6 @@ sail_error_t QtSail::loadImageImpl(const QString &path, void **pimpl, sail_image
     SAIL_TRY(sail_start_reading(path.toLocal8Bit(), d->context, &plugin_info/* or nullptr */, pimpl));
     SAIL_TRY(sail_read_next_frame(*pimpl, image, (void **)image_bits));
     SAIL_TRY(sail_stop_reading(*pimpl));
-
-    // Reset the pointer so the cleanup function will not double-free it.
-    //
-    *pimpl = nullptr;
 }
 
 static int qImageFormatToSailPixelFormat(QImage::Format format) {
@@ -189,10 +185,6 @@ sail_error_t QtSail::saveImageImpl(const QString &path,
     SAIL_TRY(sail_start_writing(path.toLocal8Bit(), d->context, &plugin_info/* or nullptr */, pimpl));
     SAIL_TRY(sail_write_next_frame(*pimpl, image, image_bits));
     SAIL_TRY(sail_stop_writing(*pimpl));
-
-    // Reset the pointer so the cleanup function will not double-free it.
-    //
-    *pimpl = nullptr;
 
     return 0;
 }

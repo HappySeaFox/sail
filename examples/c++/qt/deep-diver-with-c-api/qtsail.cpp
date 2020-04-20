@@ -221,10 +221,6 @@ sail_error_t QtSail::loadImageImpl(const QString &path, sail_read_features **rea
     //
     SAIL_TRY(sail_stop_reading(*pimpl));
 
-    // Reset the pointer so the cleanup function will not double-free it.
-    //
-    *pimpl = nullptr;
-
     SAIL_LOG_INFO("Loaded in %lld ms.", elapsed.elapsed() + beforeDialog);
 }
 
@@ -342,10 +338,6 @@ sail_error_t QtSail::saveImageImpl(const QString &path, sail_write_features **wr
     // Finish writing.
     //
     SAIL_TRY(sail_stop_writing(*pimpl));
-
-    // Reset the pointer so the cleanup function will not double-free it.
-    //
-    *pimpl = nullptr;
 
     SAIL_LOG_INFO("Saved in %lld ms.", elapsed.elapsed() + beforeDialog);
 
