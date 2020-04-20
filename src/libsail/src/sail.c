@@ -469,7 +469,7 @@ sail_error_t sail_unload_plugins(struct sail_context *context) {
     return 0;
 }
 
-sail_error_t sail_probe(const char *path, struct sail_context *context, const struct sail_plugin_info **plugin_info, struct sail_image **image) {
+sail_error_t sail_probe(const char *path, struct sail_context *context, struct sail_image **image, const struct sail_plugin_info **plugin_info) {
 
     SAIL_CHECK_PATH_PTR(path);
     SAIL_CHECK_CONTEXT_PTR(context);

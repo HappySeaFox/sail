@@ -135,7 +135,7 @@ SAIL_EXPORT sail_error_t sail_unload_plugins(struct sail_context *context);
  * Returns 0 on success or sail_error_t on error.
  */
 SAIL_EXPORT sail_error_t sail_probe(const char *path, struct sail_context *context,
-                                    const struct sail_plugin_info **plugin_info, struct sail_image **image);
+                                    struct sail_image **image, const struct sail_plugin_info **plugin_info);
 
 /*
  * Loads the specified image file and returns its properties and pixel data. The assigned image MUST be destroyed later

@@ -421,7 +421,7 @@ void QtSail::onProbe()
     const struct sail_plugin_info *plugin_info;
     sail_error_t res;
 
-    if ((res = sail_probe(path.toLocal8Bit(), d->context, &plugin_info, &image)) != 0) {
+    if ((res = sail_probe(path.toLocal8Bit(), d->context, &image, &plugin_info)) != 0) {
         QMessageBox::critical(this, tr("Error"), tr("Failed to probe the image. Error: %1").arg(res));
         return;
     }
