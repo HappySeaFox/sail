@@ -59,6 +59,9 @@ public:
     sail_error_t plugin_info_by_extension(const std::string &suffix, plugin_info **splugin_info) const;
     sail_error_t plugin_info_by_extension(const char *suffix, plugin_info **splugin_info) const;
 
+    sail_error_t plugin_info_by_mime_type(const std::string &mime_type, plugin_info **splugin_info) const;
+    sail_error_t plugin_info_by_mime_type(const char *mime_type, plugin_info **splugin_info) const;
+
     sail_context* to_sail_context() const;
 
 private:

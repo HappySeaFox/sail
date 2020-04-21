@@ -97,6 +97,27 @@ sail_error_t context::plugin_info_by_extension(const char *suffix, plugin_info *
     return 0;
 }
 
+sail_error_t context::plugin_info_by_mime_type(const std::string &mime_type, plugin_info **splugin_info) const
+{
+    SAIL_TRY(plugin_info_by_extension(mime_type.c_str(), splugin_info));
+
+    return 0;
+}
+
+sail_error_t context::plugin_info_by_mime_type(const char *mime_type, plugin_info **splugin_info) const
+{
+    const struct sail_plugin_info *sail_plugin_info;
+    SAIL_TRY(sail_plugin_info_by_mime_type(d->context, mime_type, &sail_plugin_info));
+
+    *splugin_info = new plugin_info(sail_plugin_info);
+
+    if (*splugin_info == nullptr) {
+        return SAIL_MEMORY_ALLOCATION_FAILED;
+    }
+
+    return 0;
+}
+
 sail_context* context::to_sail_context() const
 {
     return d->context;
