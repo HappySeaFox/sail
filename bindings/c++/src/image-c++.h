@@ -67,8 +67,10 @@ public:
     int properties() const;
     int source_pixel_format() const;
     int source_properties() const;
-    void* bits() const;
+    void* bits();
+    const void* bits() const;
     int bits_size() const;
+    const void* shallow_bits() const;
 
     image& with_width(int width);
     image& with_height(int height);
@@ -82,7 +84,14 @@ public:
     image& with_properties(int properties);
     image& with_source_pixel_format(int source_pixel_format);
     image& with_source_properties(int source_properties);
+
+    // Deep copy
+    //
     image& with_bits(const void *bits, int bits_size);
+
+    // Shallow copy
+    //
+    image& with_shallow_bits(const void *bits);
 
 private:
     class pimpl;

@@ -158,7 +158,7 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
          .with_height(qimage.height())
          .with_pixel_format(qImageFormatToSailPixelFormat(qimage.format()))
          .with_bytes_per_line(sail_bytes_per_line(image.width(), image.pixel_format()))
-         .with_bits(qimage.bits(), image.bytes_per_line() * image.height());
+         .with_shallow_bits(qimage.bits());
 
     SAIL_TRY(writer.start_writing(path.toLocal8Bit().constData()));
     SAIL_TRY(writer.write_next_frame(&image));

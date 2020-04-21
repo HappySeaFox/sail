@@ -58,6 +58,7 @@ public:
         , source_properties(0)
         , bits(nullptr)
         , bits_size(0)
+        , shallow_bits(nullptr)
     {}
 
     ~pimpl()
@@ -82,6 +83,7 @@ public:
     int source_properties;
     void *bits;
     int bits_size;
+    const void *shallow_bits;
 };
 
 image::image()
@@ -282,7 +284,12 @@ int image::source_properties() const
     return d->source_properties;
 }
 
-void* image::bits() const
+void* image::bits()
+{
+    return d->bits;
+}
+
+const void* image::bits() const
 {
     return d->bits;
 }
@@ -290,6 +297,11 @@ void* image::bits() const
 int image::bits_size() const
 {
     return d->bits_size;
+}
+
+const void* image::shallow_bits() const
+{
+    return d->shallow_bits;
 }
 
 image& image::with_width(int width)
@@ -389,8 +401,9 @@ image& image::with_bits(const void *bits, int bits_size)
 {
     free(d->bits);
 
-    d->bits = nullptr;
-    d->bits_size = 0;
+    d->bits         = nullptr;
+    d->bits_size    = 0;
+    d->shallow_bits = nullptr;
 
     if (bits == nullptr || bits_size < 1) {
         SAIL_LOG_ERROR("Not copying invalid bits. Bits pointer: %p, bits size: %d", bits, bits_size);
@@ -405,6 +418,23 @@ image& image::with_bits(const void *bits, int bits_size)
     }
 
     memcpy(d->bits, bits, bits_size);
+
+    return *this;
+}
+
+image& image::with_shallow_bits(const void *bits)
+{
+    free(d->bits);
+
+    d->bits = nullptr;
+    d->bits_size = 0;
+
+    if (bits == nullptr ) {
+        SAIL_LOG_ERROR("Not assigning invalid bits. Bits pointer: %p", bits);
+        return *this;
+    }
+
+    d->shallow_bits = bits;
 
     return *this;
 }

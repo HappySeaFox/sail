@@ -144,7 +144,9 @@ sail_error_t image_writer::write_next_frame(const image *simage)
 
     SAIL_TRY(simage->to_sail_image(&image));
 
-    SAIL_TRY(sail_write_next_frame(d->pmpl, image, simage->bits()));
+    const void *bits = simage->bits() ? simage->bits() : simage->shallow_bits();
+
+    SAIL_TRY(sail_write_next_frame(d->pmpl, image, bits));
 
     return 0;
 }
