@@ -76,17 +76,17 @@ sail_error_t context::unload_plugins()
     return 0;
 }
 
-sail_error_t context::plugin_by_extension(const std::string &suffix, plugin_info **splugin_info, const plugin **splugin) const
+sail_error_t context::plugin_info_by_extension(const std::string &suffix, plugin_info **splugin_info) const
 {
-    SAIL_TRY(plugin_by_extension(suffix.c_str(), splugin_info, splugin));
+    SAIL_TRY(plugin_info_by_extension(suffix.c_str(), splugin_info));
 
     return 0;
 }
 
-sail_error_t context::plugin_by_extension(const char *suffix, plugin_info **splugin_info, const plugin **splugin) const
+sail_error_t context::plugin_info_by_extension(const char *suffix, plugin_info **splugin_info) const
 {
     const struct sail_plugin_info *sail_plugin_info;
-    SAIL_TRY(sail_plugin_by_extension(d->context, suffix, &sail_plugin_info, splugin));
+    SAIL_TRY(sail_plugin_info_by_extension(d->context, suffix, &sail_plugin_info));
 
     *splugin_info = new plugin_info(sail_plugin_info);
 
@@ -97,17 +97,17 @@ sail_error_t context::plugin_by_extension(const char *suffix, plugin_info **splu
     return 0;
 }
 
-sail_error_t context::plugin_by_mime_type(const std::string &mime_type, plugin_info **splugin_info, const plugin **splugin) const
+sail_error_t context::plugin_info_by_mime_type(const std::string &mime_type, plugin_info **splugin_info) const
 {
-    SAIL_TRY(plugin_by_extension(mime_type.c_str(), splugin_info, splugin));
+    SAIL_TRY(plugin_info_by_extension(mime_type.c_str(), splugin_info));
 
     return 0;
 }
 
-sail_error_t context::plugin_by_mime_type(const char *mime_type, plugin_info **splugin_info, const plugin **splugin) const
+sail_error_t context::plugin_info_by_mime_type(const char *mime_type, plugin_info **splugin_info) const
 {
     const struct sail_plugin_info *sail_plugin_info;
-    SAIL_TRY(sail_plugin_by_mime_type(d->context, mime_type, &sail_plugin_info, splugin));
+    SAIL_TRY(sail_plugin_info_by_mime_type(d->context, mime_type, &sail_plugin_info));
 
     *splugin_info = new plugin_info(sail_plugin_info);
 

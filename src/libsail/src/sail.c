@@ -352,13 +352,46 @@ static sail_error_t load_plugin(struct sail_plugin_info_node *node) {
     return 0;
 }
 
-sail_error_t sail_plugin_by_extension(const struct sail_context *context, const char *extension, const struct sail_plugin_info **plugin_info,
-                                        const struct sail_plugin **plugin) {
+static sail_error_t load_plugin_by_plugin_info(struct sail_context *context, const struct sail_plugin_info *plugin_info, const struct sail_plugin **plugin) {
+
+    SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
+    SAIL_CHECK_PLUGIN_PTR(plugin);
+
+    /* Find the plugin in the cache. */
+    struct sail_plugin_info_node *node = context->plugin_info_node;
+    struct sail_plugin_info_node *found_node = NULL;
+
+    while (node != NULL) {
+        if (node->plugin_info == plugin_info) {
+            if (node->plugin != NULL) {
+                *plugin = node->plugin;
+                return 0;
+            }
+
+            found_node = node;
+            break;
+        }
+
+        node = node->next;
+    }
+
+    /* Something weird. The pointer to the plugin info is not found the cache. */
+    if (found_node == NULL) {
+        return SAIL_PLUGIN_NOT_FOUND;
+    }
+
+    SAIL_TRY(load_plugin(found_node));
+
+    *plugin = found_node->plugin;
+
+    return 0;
+}
+
+sail_error_t sail_plugin_info_by_extension(const struct sail_context *context, const char *extension, const struct sail_plugin_info **plugin_info) {
 
     SAIL_CHECK_CONTEXT_PTR(context);
     SAIL_CHECK_PTR(extension);
     SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
-    SAIL_CHECK_PLUGIN_PTR(plugin);
 
     char *extension_copy;
 
@@ -376,8 +409,6 @@ sail_error_t sail_plugin_by_extension(const struct sail_context *context, const 
             if (strcmp(string_node->value, extension_copy) == 0) {
                 free(extension_copy);
                 *plugin_info = node->plugin_info;
-                SAIL_TRY(load_plugin(node));
-                *plugin = node->plugin;
                 return 0;
             }
 
@@ -391,13 +422,11 @@ sail_error_t sail_plugin_by_extension(const struct sail_context *context, const 
     return SAIL_PLUGIN_NOT_FOUND;
 }
 
-sail_error_t sail_plugin_by_mime_type(const struct sail_context *context, const char *mime_type, const struct sail_plugin_info **plugin_info,
-                                        const struct sail_plugin **plugin) {
+sail_error_t sail_plugin_info_by_mime_type(const struct sail_context *context, const char *mime_type, const struct sail_plugin_info **plugin_info) {
 
     SAIL_CHECK_CONTEXT_PTR(context);
     SAIL_CHECK_PTR(mime_type);
     SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
-    SAIL_CHECK_PLUGIN_PTR(plugin);
 
     char *mime_type_copy;
 
@@ -415,8 +444,6 @@ sail_error_t sail_plugin_by_mime_type(const struct sail_context *context, const 
             if (strcmp(string_node->value, mime_type_copy) == 0) {
                 free(mime_type_copy);
                 *plugin_info = node->plugin_info;
-                SAIL_TRY(load_plugin(node));
-                *plugin = node->plugin;
                 return 0;
             }
 
@@ -468,9 +495,12 @@ sail_error_t sail_probe(const char *path, struct sail_context *context, struct s
 
     const struct sail_plugin_info *plugin_info_noop;
     const struct sail_plugin_info **plugin_info_local = plugin_info == NULL ? &plugin_info_noop : plugin_info;
+
+    SAIL_TRY(sail_plugin_info_by_extension(context, dot + 1, plugin_info_local));
+
     const struct sail_plugin *plugin;
 
-    SAIL_TRY(sail_plugin_by_extension(context, dot + 1, plugin_info_local, &plugin));
+    SAIL_TRY(load_plugin_by_plugin_info(context, *plugin_info_local, &plugin));
 
     struct sail_file *file;
 
@@ -560,16 +590,14 @@ static void destroy_hidden_pimpl(struct hidden_pimpl *pimpl) {
     free(pimpl);
 }
 
-sail_error_t sail_start_reading_with_plugin(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info,
-                                            const struct sail_plugin *plugin, const struct sail_read_options *read_options,
-                                            void **pimpl) {
+sail_error_t sail_start_reading_with_options(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info,
+                                             const struct sail_read_options *read_options, void **pimpl) {
     SAIL_CHECK_PIMPL_PTR(pimpl);
 
     *pimpl = NULL;
 
     SAIL_CHECK_PATH_PTR(path);
     SAIL_CHECK_CONTEXT_PTR(context);
-    SAIL_CHECK_PLUGIN_PTR(plugin);
 
     const char *dot = strrchr(path, '.');
 
@@ -580,6 +608,9 @@ sail_error_t sail_start_reading_with_plugin(const char *path, struct sail_contex
     struct hidden_pimpl *pmpl = (struct hidden_pimpl *)malloc(sizeof(struct hidden_pimpl));
 
     SAIL_CHECK_PIMPL_PTR(pmpl);
+
+    const struct sail_plugin *plugin;
+    SAIL_TRY(load_plugin_by_plugin_info(context, plugin_info, &plugin));
 
     pmpl->file        = NULL;
     pmpl->plugin_info = plugin_info;
@@ -633,7 +664,8 @@ sail_error_t sail_start_reading(const char *path, struct sail_context *context, 
 
     *pimpl = pmpl;
 
-    SAIL_TRY(sail_plugin_by_extension(context, dot + 1, &pmpl->plugin_info, &pmpl->plugin));
+    SAIL_TRY(sail_plugin_info_by_extension(context, dot + 1, &pmpl->plugin_info));
+    SAIL_TRY(load_plugin_by_plugin_info(context, pmpl->plugin_info, &pmpl->plugin));
     SAIL_TRY(sail_alloc_file_for_reading(path, &pmpl->file));
 
     if (plugin_info != NULL) {
@@ -721,16 +753,14 @@ sail_error_t sail_stop_reading(void *pimpl) {
     return 0;
 }
 
-sail_error_t sail_start_writing_with_plugin(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info,
-                                            const struct sail_plugin *plugin, const struct sail_write_options *write_options,
-                                            void **pimpl) {
+sail_error_t sail_start_writing_with_options(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info,
+                                             const struct sail_write_options *write_options, void **pimpl) {
     SAIL_CHECK_PIMPL_PTR(pimpl);
 
     *pimpl = NULL;
 
     SAIL_CHECK_PATH_PTR(path);
     SAIL_CHECK_CONTEXT_PTR(context);
-    SAIL_CHECK_PLUGIN_PTR(plugin);
 
     const char *dot = strrchr(path, '.');
 
@@ -741,6 +771,9 @@ sail_error_t sail_start_writing_with_plugin(const char *path, struct sail_contex
     struct hidden_pimpl *pmpl = (struct hidden_pimpl *)malloc(sizeof(struct hidden_pimpl));
 
     SAIL_CHECK_PIMPL_PTR(pmpl);
+
+    const struct sail_plugin *plugin;
+    SAIL_TRY(load_plugin_by_plugin_info(context, plugin_info, &plugin));
 
     pmpl->file        = NULL;
     pmpl->plugin_info = plugin_info;
@@ -794,7 +827,8 @@ sail_error_t sail_start_writing(const char *path, struct sail_context *context, 
 
     *pimpl = pmpl;
 
-    SAIL_TRY(sail_plugin_by_extension(context, dot + 1, &pmpl->plugin_info, &pmpl->plugin));
+    SAIL_TRY(sail_plugin_info_by_extension(context, dot + 1, &pmpl->plugin_info));
+    SAIL_TRY(load_plugin_by_plugin_info(context, pmpl->plugin_info, &pmpl->plugin));
     SAIL_TRY(sail_alloc_file_for_writing(path, &pmpl->file));
 
     if (plugin_info != NULL) {
