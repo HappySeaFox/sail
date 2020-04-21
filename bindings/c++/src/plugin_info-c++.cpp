@@ -208,7 +208,7 @@ plugin_info& plugin_info::with_write_features(const sail::write_features &write_
     return *this;
 }
 
-const sail_plugin_info* plugin_info::to_sail_plugin_info() const
+const sail_plugin_info* plugin_info::sail_plugin_info_c() const
 {
     return d->sail_plugin_info_c;
 }

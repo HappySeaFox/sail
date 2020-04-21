@@ -75,7 +75,7 @@ private:
     plugin_info& with_read_features(const sail::read_features &read_features);
     plugin_info& with_write_features(const sail::write_features &write_features);
 
-    const sail_plugin_info* to_sail_plugin_info() const;
+    const sail_plugin_info* sail_plugin_info_c() const;
 
 private:
     class pimpl;

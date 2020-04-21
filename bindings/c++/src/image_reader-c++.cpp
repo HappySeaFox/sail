@@ -161,7 +161,7 @@ sail_error_t image_reader::start_reading(const char *path, const plugin_info *sp
 {
     SAIL_CHECK_PATH_PTR(path);
 
-    const sail_plugin_info *sail_plugin_info = splugin_info == nullptr ? nullptr : splugin_info->to_sail_plugin_info();
+    const sail_plugin_info *sail_plugin_info = splugin_info == nullptr ? nullptr : splugin_info->sail_plugin_info_c();
 
     SAIL_TRY(sail_start_reading(path, d->ctx->sail_context_c(), sail_plugin_info, &d->pmpl));
 
@@ -179,7 +179,7 @@ sail_error_t image_reader::start_reading(const char *path, const plugin_info *sp
 {
     SAIL_CHECK_PATH_PTR(path);
 
-    const sail_plugin_info *sail_plugin_info = splugin_info == nullptr ? nullptr : splugin_info->to_sail_plugin_info();
+    const sail_plugin_info *sail_plugin_info = splugin_info == nullptr ? nullptr : splugin_info->sail_plugin_info_c();
     sail_read_options *sail_read_options = nullptr;
 
     SAIL_AT_SCOPE_EXIT (
