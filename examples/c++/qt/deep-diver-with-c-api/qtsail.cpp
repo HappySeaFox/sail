@@ -168,12 +168,9 @@ sail_error_t QtSail::loadImageImpl(const QString &path, sail_read_options **read
     // Find the codec info by a file extension.
     //
     const struct sail_plugin_info *plugin_info;
-    SAIL_TRY(sail_plugin_info_by_extension(d->context, QFileInfo(path).suffix().toLocal8Bit(), &plugin_info));
-
-    // Load the found codec.
-    //
     const struct sail_plugin *plugin;
-    SAIL_TRY(sail_load_plugin(d->context, plugin_info, &plugin));
+    SAIL_TRY(sail_plugin_by_extension(d->context, QFileInfo(path).suffix().toLocal8Bit(), &plugin_info, &plugin));
+
     pluginInfo(plugin_info);
 
     // Allocate new read options and copy defaults from the read features
@@ -276,10 +273,9 @@ sail_error_t QtSail::saveImageImpl(const QString &path, sail_write_options **wri
     elapsed.start();
 
     const struct sail_plugin_info *plugin_info;
-    SAIL_TRY(sail_plugin_info_by_extension(d->context, QFileInfo(path).suffix().toLocal8Bit(), &plugin_info));
-
     const struct sail_plugin *plugin;
-    SAIL_TRY(sail_load_plugin(d->context, plugin_info, &plugin));
+    SAIL_TRY(sail_plugin_by_extension(d->context, QFileInfo(path).suffix().toLocal8Bit(), &plugin_info, &plugin));
+
     pluginInfo(plugin_info);
 
     // Allocate new write options and copy defaults from the write features

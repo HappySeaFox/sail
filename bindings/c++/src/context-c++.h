@@ -35,6 +35,8 @@ struct sail_context;
 namespace sail
 {
 
+using plugin = sail_plugin;
+
 class plugin_info;
 
 /*
@@ -56,11 +58,11 @@ public:
 
     sail_error_t unload_plugins();
 
-    sail_error_t plugin_info_by_extension(const std::string &suffix, plugin_info **splugin_info) const;
-    sail_error_t plugin_info_by_extension(const char *suffix, plugin_info **splugin_info) const;
+    sail_error_t plugin_by_extension(const std::string &suffix, plugin_info **splugin_info, const plugin **splugin) const;
+    sail_error_t plugin_by_extension(const char *suffix, plugin_info **splugin_info, const plugin **splugin) const;
 
-    sail_error_t plugin_info_by_mime_type(const std::string &mime_type, plugin_info **splugin_info) const;
-    sail_error_t plugin_info_by_mime_type(const char *mime_type, plugin_info **splugin_info) const;
+    sail_error_t plugin_by_mime_type(const std::string &mime_type, plugin_info **splugin_info, const plugin **splugin) const;
+    sail_error_t plugin_by_mime_type(const char *mime_type, plugin_info **splugin_info, const plugin **splugin) const;
 
     sail_context* to_sail_context() const;
 

@@ -73,44 +73,38 @@ SAIL_EXPORT void sail_finish(struct sail_context *context);
 SAIL_EXPORT const struct sail_plugin_info_node* sail_plugin_info_list(const struct sail_context *context);
 
 /*
- * Finds a first plugin info object that supports the specified file extension. For example: "jpg".
- * The assigned plugin info MUST NOT be destroyed. It's a pointer to an internal data structure.
+ * Finds a first plugin info object and a plugin instance that supports the specified file extension.
+ * For example: "jpg".
  *
- * Typical usage: sail_plugin_info_by_extension() -> sail_load_plugin() -> sail_start_reading_with_plugin() ->
- *                sail_read_next_frame() -> sail_stop_reading().
- * Or:            sail_plugin_info_by_extension() -> sail_load_plugin() -> sail_start_writing_with_plugin() ->
- *                sail_write_next_frame() -> sail_stop_writing().
+ * The assigned plugin info MUST NOT be destroyed. It's a pointer to an internal data structure.
+ * The assigned plugin MUST NOT be destroyed. It's a pointer to an internal data structure.
+ *
+ * Typical usage: sail_plugin_by_extension() -> sail_start_reading_with_plugin() -> sail_read_next_frame() ->
+ *                sail_stop_reading().
+ * Or:            sail_plugin_by_extension() -> sail_start_writing_with_plugin() -> sail_write_next_frame() ->
+ *                sail_stop_writing().
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_info_by_extension(const struct sail_context *context, const char *extension, const struct sail_plugin_info **plugin_info);
+SAIL_EXPORT sail_error_t sail_plugin_by_extension(const struct sail_context *context, const char *extension, const struct sail_plugin_info **plugin_info,
+                                                    const struct sail_plugin **plugin);
 
 /*
- * Finds a first plugin info object that supports the specified mime type. For example: "image/jpeg".
+ * Finds a first plugin info object and a plugin instance that supports the specified mime type.
+ * For example: "image/jpeg".
+ *
  * The assigned plugin info MUST NOT be destroyed. It's a pointer to an internal data structure.
+ * The assigned plugin MUST NOT be destroyed. It's a pointer to an internal data structure.
  *
- * Typical usage: sail_plugin_info_by_mime_type() -> sail_load_plugin() -> sail_start_reading_with_plugin() ->
- *                sail_read_next_frame() -> sail_stop_reading().
- * Or:            sail_plugin_info_by_mime_type() -> sail_load_plugin() -> sail_start_writing_with_plugin() ->
- *                sail_write_next_frame() -> sail_stop_writing().
- *
- * Returns 0 on success or sail_error_t on error.
- */
-SAIL_EXPORT sail_error_t sail_plugin_info_by_mime_type(const struct sail_context *context, const char *mime_type, const struct sail_plugin_info **plugin_info);
-
-/*
- * Loads the plugin addressed by the specified plugin info. The assigned plugin object MUST NOT be destroyed.
- * It's a pointer to an internal data structure. Caches the loaded plugin in the internal storage, so a subsequent
- * call with the same plugin info just returns the cached plugin pointer.
- *
- * Typical usage: sail_plugin_info_by_extension() -> sail_load_plugin() -> sail_start_reading_with_plugin() ->
- *                sail_read_next_frame() -> sail_stop_reading().
- * Or:            sail_plugin_info_by_extension() -> sail_load_plugin() -> sail_start_writing_with_plugin() ->
- *                sail_write_next_frame() -> sail_stop_writing().
+ * Typical usage: sail_plugin_by_mime_type() -> sail_start_reading_with_plugin() -> sail_read_next_frame() ->
+ *                sail_stop_reading().
+ * Or:            sail_plugin_by_mime_type() -> sail_start_writing_with_plugin() -> sail_write_next_frame() ->
+ *                sail_stop_writing().
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_load_plugin(struct sail_context *context, const struct sail_plugin_info *plugin_info, const struct sail_plugin **plugin);
+SAIL_EXPORT sail_error_t sail_plugin_by_mime_type(const struct sail_context *context, const char *mime_type, const struct sail_plugin_info **plugin_info,
+                                                    const struct sail_plugin **plugin);
 
 /*
  * Unloads all loaded plugins from the cache to release memory occupied by them. Use it if you don't want
@@ -164,13 +158,12 @@ SAIL_EXPORT sail_error_t sail_write(const char *path, struct sail_context *conte
  * Starts reading the specified image with the specified plugin and read options. If you don't need specific read options,
  * just pass NULL. Plugin-specific defaults will be used in this case.
  *
- * Typical usage: sail_plugin_info_by_extension() -> sail_load_plugin() -> sail_start_reading_with_plugin() ->
- *                sail_read_next_frame() -> sail_stop_reading().
+ * Typical usage: sail_plugin_by_extension() -> sail_start_reading_with_plugin() -> sail_read_next_frame() ->
+ *                sail_stop_reading().
  *
  * For example:
  *
- * SAIL_TRY(sail_plugin_info_by_extension(...));
- * SAIL_TRY(sail_load_plugin(...));
+ * SAIL_TRY(sail_plugin_by_extension(...));
  *
  * void *pimpl = NULL;
  *
@@ -237,13 +230,12 @@ SAIL_EXPORT sail_error_t sail_stop_reading(void *pimpl);
  * Starts writing the specified image file with the specified plugin and write options. If you don't need
  * specific write options, just pass NULL. Plugin-specific defaults will be used in this case.
  *
- * Typical usage: sail_plugin_info_by_extension() -> sail_load_plugin() -> sail_start_writing_with_plugin() ->
- *                sail_write_next_frame() -> sail_stop_writing().
+ * Typical usage: sail_plugin_by_extension() -> sail_start_writing_with_plugin() -> sail_write_next_frame() ->
+ *                sail_stop_writing().
  *
  * For example:
  *
- * SAIL_TRY(sail_plugin_info_by_extension(...));
- * SAIL_TRY(sail_load_plugin(...));
+ * SAIL_TRY(sail_plugin_by_extension(...));
  *
  * void *pimpl = NULL;
  *

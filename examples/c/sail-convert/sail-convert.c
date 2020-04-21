@@ -43,6 +43,7 @@ static sail_error_t convert(const char *input, const char *output, struct sail_c
     SAIL_CHECK_CONTEXT_PTR(context);
 
     const struct sail_plugin_info *plugin_info;
+    const struct sail_plugin *plugin;
     void *pimpl;
 
     struct sail_image *image;
@@ -66,11 +67,8 @@ static sail_error_t convert(const char *input, const char *output, struct sail_c
         return SAIL_INVALID_ARGUMENT;
     }
 
-    SAIL_TRY(sail_plugin_info_by_extension(context, dot+1, &plugin_info));
+    SAIL_TRY(sail_plugin_by_extension(context, dot+1, &plugin_info, &plugin));
     SAIL_LOG_INFO("Output codec: %s", plugin_info->description);
-
-    const struct sail_plugin *plugin;
-    SAIL_TRY(sail_load_plugin(context, plugin_info, &plugin));
 
     struct sail_write_options *write_options;
     SAIL_TRY(sail_alloc_write_options_from_features(plugin_info->write_features, &write_options));
