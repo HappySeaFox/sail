@@ -411,6 +411,7 @@ sail_error_t sail_load_plugin(struct sail_context *context, const struct sail_pl
 
     SAIL_CHECK_CONTEXT_PTR(context);
     SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
+    SAIL_CHECK_PLUGIN_PTR(plugin);
 
     /* Find the plugin in the cache. */
     struct sail_plugin_info_node *node = context->plugin_info_node;
