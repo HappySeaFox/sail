@@ -78,7 +78,7 @@ SAIL_EXPORT const struct sail_plugin_info_node* sail_plugin_info_list(const stru
  *
  * Typical usage: sail_plugin_info_by_extension() -> sail_start_reading_with_options() -> sail_read_next_frame() ->
  *                sail_stop_reading().
- * Or:            sail_plugin_by_extension() -> sail_start_writing_with_options() -> sail_write_next_frame() ->
+ * Or:            sail_plugin_info_by_extension() -> sail_start_writing_with_options() -> sail_write_next_frame() ->
  *                sail_stop_writing().
  *
  * Returns 0 on success or sail_error_t on error.
@@ -93,7 +93,7 @@ SAIL_EXPORT sail_error_t sail_plugin_info_by_extension(const struct sail_context
  *
  * Typical usage: sail_plugin_info_by_mime_type() -> sail_start_reading_with_options() -> sail_read_next_frame() ->
  *                sail_stop_reading().
- * Or:            sail_plugin_by_mime_type() -> sail_start_writing_with_options() -> sail_write_next_frame() ->
+ * Or:            sail_plugin_info_by_mime_type() -> sail_start_writing_with_options() -> sail_write_next_frame() ->
  *                sail_stop_writing().
  *
  * Returns 0 on success or sail_error_t on error.
@@ -153,12 +153,12 @@ SAIL_EXPORT sail_error_t sail_write(const char *path, struct sail_context *conte
  * Starts reading the specified image with the specified plugin and read options. If you don't need specific read options,
  * just pass NULL. Plugin-specific defaults will be used in this case.
  *
- * Typical usage: sail_plugin_by_extension() -> sail_start_reading_with_options() -> sail_read_next_frame() ->
+ * Typical usage: sail_plugin_info_by_extension() -> sail_start_reading_with_options() -> sail_read_next_frame() ->
  *                sail_stop_reading().
  *
  * For example:
  *
- * SAIL_TRY(sail_plugin_by_extension(...));
+ * SAIL_TRY(sail_plugin_info_by_extension(...));
  *
  * void *pimpl = NULL;
  *
@@ -224,12 +224,12 @@ SAIL_EXPORT sail_error_t sail_stop_reading(void *pimpl);
  * Starts writing the specified image file with the specified plugin and write options. If you don't need
  * specific write options, just pass NULL. Plugin-specific defaults will be used in this case.
  *
- * Typical usage: sail_plugin_by_extension() -> sail_start_writing_with_options() -> sail_write_next_frame() ->
+ * Typical usage: sail_plugin_info_by_extension() -> sail_start_writing_with_options() -> sail_write_next_frame() ->
  *                sail_stop_writing().
  *
  * For example:
  *
- * SAIL_TRY(sail_plugin_by_extension(...));
+ * SAIL_TRY(sail_plugin_info_by_extension(...));
  *
  * void *pimpl = NULL;
  *
