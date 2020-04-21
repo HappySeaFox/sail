@@ -39,6 +39,8 @@ namespace sail
  */
 class SAIL_EXPORT write_options
 {
+    friend class image_writer;
+
 public:
     write_options();
     // Makes a deep copy of the specified write options
@@ -57,6 +59,9 @@ public:
     write_options& with_io_options(int io_options);
     write_options& with_compression_type(int compression_type);
     write_options& with_compression(int compression);
+
+private:
+    sail_error_t to_sail_write_options(sail_write_options **write_options) const;
 
 private:
     class pimpl;
