@@ -597,12 +597,6 @@ sail_error_t sail_start_reading_with_options(const char *path, struct sail_conte
     SAIL_CHECK_PATH_PTR(path);
     SAIL_CHECK_CONTEXT_PTR(context);
 
-    const char *dot = strrchr(path, '.');
-
-    if (dot == NULL) {
-        return SAIL_INVALID_ARGUMENT;
-    }
-
     struct hidden_pimpl *pmpl = (struct hidden_pimpl *)malloc(sizeof(struct hidden_pimpl));
 
     SAIL_CHECK_PIMPL_PTR(pmpl);
@@ -614,6 +608,12 @@ sail_error_t sail_start_reading_with_options(const char *path, struct sail_conte
     *pimpl = pmpl;
 
     if (plugin_info == NULL) {
+        const char *dot = strrchr(path, '.');
+
+        if (dot == NULL) {
+            return SAIL_INVALID_ARGUMENT;
+        }
+
         SAIL_TRY(sail_plugin_info_by_extension(context, dot + 1, &pmpl->plugin_info));
     } else {
         pmpl->plugin_info = plugin_info;
@@ -723,12 +723,6 @@ sail_error_t sail_start_writing_with_options(const char *path, struct sail_conte
     SAIL_CHECK_PATH_PTR(path);
     SAIL_CHECK_CONTEXT_PTR(context);
 
-    const char *dot = strrchr(path, '.');
-
-    if (dot == NULL) {
-        return SAIL_INVALID_ARGUMENT;
-    }
-
     struct hidden_pimpl *pmpl = (struct hidden_pimpl *)malloc(sizeof(struct hidden_pimpl));
 
     SAIL_CHECK_PIMPL_PTR(pmpl);
@@ -740,6 +734,12 @@ sail_error_t sail_start_writing_with_options(const char *path, struct sail_conte
     *pimpl = pmpl;
 
     if (plugin_info == NULL) {
+        const char *dot = strrchr(path, '.');
+
+        if (dot == NULL) {
+            return SAIL_INVALID_ARGUMENT;
+        }
+
         SAIL_TRY(sail_plugin_info_by_extension(context, dot + 1, &pmpl->plugin_info));
     } else {
         pmpl->plugin_info = plugin_info;
