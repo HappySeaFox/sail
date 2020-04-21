@@ -72,9 +72,10 @@ typedef int sail_error_t;
  */
 #define SAIL_CONTEXT_NULL_PTR             80
 #define SAIL_PATH_NULL_PTR                81
-#define SAIL_PLUGIN_INFO_NULL_PTR         82
-#define SAIL_PLUGIN_NULL_PTR              83
-#define SAIL_ENV_UPDATE_FAILED            84
+#define SAIL_EXTENSION_NULL_PTR           82
+#define SAIL_PLUGIN_INFO_NULL_PTR         83
+#define SAIL_PLUGIN_NULL_PTR              84
+#define SAIL_ENV_UPDATE_FAILED            85
 
 /*
  * Helper macros.
@@ -123,6 +124,7 @@ do {                              \
 #define SAIL_CHECK_WRITE_OPTIONS_PTR(write_options)   SAIL_CHECK_PTR2(write_options,  SAIL_WRITE_FEATURES_NULL_PTR)
 #define SAIL_CHECK_CONTEXT_PTR(context)               SAIL_CHECK_PTR2(context,        SAIL_CONTEXT_NULL_PTR)
 #define SAIL_CHECK_PATH_PTR(path)                     SAIL_CHECK_PTR2(path,           SAIL_PATH_NULL_PTR)
+#define SAIL_CHECK_EXTENSION_PTR(extension)           SAIL_CHECK_PTR2(extension,      SAIL_EXTENSION_NULL_PTR)
 #define SAIL_CHECK_IMAGE_PTR(image)                   SAIL_CHECK_PTR2(image,          SAIL_IMAGE_NULL_PTR)
 #define SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info)       SAIL_CHECK_PTR2(plugin_info,    SAIL_PLUGIN_INFO_NULL_PTR)
 #define SAIL_CHECK_PLUGIN_PTR(plugin)                 SAIL_CHECK_PTR2(plugin,         SAIL_PLUGIN_NULL_PTR)

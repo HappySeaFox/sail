@@ -76,6 +76,27 @@ sail_error_t context::unload_plugins()
     return 0;
 }
 
+sail_error_t context::plugin_info_from_path(const std::string &path, plugin_info **splugin_info) const
+{
+    SAIL_TRY(plugin_info_from_path(path.c_str(), splugin_info));
+
+    return 0;
+}
+
+sail_error_t context::plugin_info_from_path(const char *path, plugin_info **splugin_info) const
+{
+    const struct sail_plugin_info *sail_plugin_info;
+    SAIL_TRY(sail_plugin_info_from_path(path, d->context, &sail_plugin_info));
+
+    *splugin_info = new plugin_info(sail_plugin_info);
+
+    if (*splugin_info == nullptr) {
+        return SAIL_MEMORY_ALLOCATION_FAILED;
+    }
+
+    return 0;
+}
+
 sail_error_t context::plugin_info_from_extension(const std::string &suffix, plugin_info **splugin_info) const
 {
     SAIL_TRY(plugin_info_from_extension(suffix.c_str(), splugin_info));
@@ -86,7 +107,7 @@ sail_error_t context::plugin_info_from_extension(const std::string &suffix, plug
 sail_error_t context::plugin_info_from_extension(const char *suffix, plugin_info **splugin_info) const
 {
     const struct sail_plugin_info *sail_plugin_info;
-    SAIL_TRY(sail_plugin_info_from_extension(d->context, suffix, &sail_plugin_info));
+    SAIL_TRY(sail_plugin_info_from_extension(suffix, d->context, &sail_plugin_info));
 
     *splugin_info = new plugin_info(sail_plugin_info);
 
@@ -99,7 +120,7 @@ sail_error_t context::plugin_info_from_extension(const char *suffix, plugin_info
 
 sail_error_t context::plugin_info_from_mime_type(const std::string &mime_type, plugin_info **splugin_info) const
 {
-    SAIL_TRY(plugin_info_from_extension(mime_type.c_str(), splugin_info));
+    SAIL_TRY(plugin_info_from_mime_type(mime_type.c_str(), splugin_info));
 
     return 0;
 }

@@ -72,6 +72,22 @@ SAIL_EXPORT void sail_finish(struct sail_context *context);
 SAIL_EXPORT const struct sail_plugin_info_node* sail_plugin_info_list(const struct sail_context *context);
 
 /*
+ * Finds a first plugin info object that supports reading or writing the specified file path by its file extension.
+ * For example: "/test.jpg". The path might not exist.
+ *
+ * The assigned plugin info MUST NOT be destroyed. It's a pointer to an internal data structure.
+ *
+ * Typical usage: sail_plugin_info_from_path() -> sail_start_reading_with_options() -> sail_read_next_frame() ->
+ *                sail_stop_reading().
+ * Or:            sail_plugin_info_from_path() -> sail_start_writing_with_options() -> sail_read_next_frame() ->
+ *                sail_stop_writing().
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_plugin_info_from_path(const char *path, const struct sail_context *context,
+                                                    const struct sail_plugin_info **plugin_info);
+
+/*
  * Finds a first plugin info object that supports the specified file extension. For example: "jpg".
  *
  * The assigned plugin info MUST NOT be destroyed. It's a pointer to an internal data structure.
@@ -83,7 +99,7 @@ SAIL_EXPORT const struct sail_plugin_info_node* sail_plugin_info_list(const stru
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_info_from_extension(const struct sail_context *context, const char *extension,
+SAIL_EXPORT sail_error_t sail_plugin_info_from_extension(const char *extension, const struct sail_context *context,
                                                          const struct sail_plugin_info **plugin_info);
 
 /*

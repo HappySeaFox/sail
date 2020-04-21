@@ -387,10 +387,27 @@ static sail_error_t load_plugin_by_plugin_info(struct sail_context *context, con
     return 0;
 }
 
-sail_error_t sail_plugin_info_from_extension(const struct sail_context *context, const char *extension, const struct sail_plugin_info **plugin_info) {
+sail_error_t sail_plugin_info_from_path(const char *path, const struct sail_context *context, const struct sail_plugin_info **plugin_info) {
 
+    SAIL_CHECK_PATH_PTR(path);
     SAIL_CHECK_CONTEXT_PTR(context);
-    SAIL_CHECK_PTR(extension);
+    SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
+
+    const char *dot = strrchr(path, '.');
+
+    if (dot == NULL || *(dot+1) == '\0') {
+        return SAIL_INVALID_ARGUMENT;
+    }
+
+    SAIL_TRY(sail_plugin_info_from_extension(dot+1, context, plugin_info));
+
+    return 0;
+}
+
+sail_error_t sail_plugin_info_from_extension(const char *extension, const struct sail_context *context, const struct sail_plugin_info **plugin_info) {
+
+    SAIL_CHECK_EXTENSION_PTR(extension);
+    SAIL_CHECK_CONTEXT_PTR(context);
     SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
 
     char *extension_copy;
@@ -487,16 +504,10 @@ sail_error_t sail_probe(const char *path, struct sail_context *context, struct s
     SAIL_CHECK_PATH_PTR(path);
     SAIL_CHECK_CONTEXT_PTR(context);
 
-    const char *dot = strrchr(path, '.');
-
-    if (dot == NULL) {
-        return SAIL_INVALID_ARGUMENT;
-    }
-
     const struct sail_plugin_info *plugin_info_noop;
     const struct sail_plugin_info **plugin_info_local = plugin_info == NULL ? &plugin_info_noop : plugin_info;
 
-    SAIL_TRY(sail_plugin_info_from_extension(context, dot + 1, plugin_info_local));
+    SAIL_TRY(sail_plugin_info_from_path(path, context, plugin_info_local));
 
     const struct sail_plugin *plugin;
 
@@ -608,13 +619,7 @@ sail_error_t sail_start_reading_with_options(const char *path, struct sail_conte
     *pimpl = pmpl;
 
     if (plugin_info == NULL) {
-        const char *dot = strrchr(path, '.');
-
-        if (dot == NULL) {
-            return SAIL_INVALID_ARGUMENT;
-        }
-
-        SAIL_TRY(sail_plugin_info_from_extension(context, dot + 1, &pmpl->plugin_info));
+        SAIL_TRY(sail_plugin_info_from_path(path, context, &pmpl->plugin_info));
     } else {
         pmpl->plugin_info = plugin_info;
     }
@@ -734,13 +739,7 @@ sail_error_t sail_start_writing_with_options(const char *path, struct sail_conte
     *pimpl = pmpl;
 
     if (plugin_info == NULL) {
-        const char *dot = strrchr(path, '.');
-
-        if (dot == NULL) {
-            return SAIL_INVALID_ARGUMENT;
-        }
-
-        SAIL_TRY(sail_plugin_info_from_extension(context, dot + 1, &pmpl->plugin_info));
+        SAIL_TRY(sail_plugin_info_from_path(path, context, &pmpl->plugin_info));
     } else {
         pmpl->plugin_info = plugin_info;
     }

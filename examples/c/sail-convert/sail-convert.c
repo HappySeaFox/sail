@@ -51,13 +51,7 @@ static sail_error_t convert(const char *input, const char *output, struct sail_c
     /* Read the image. */
     SAIL_LOG_INFO("Input file: %s", input);
 
-    const char *dot = strrchr(input, '.');
-
-    if (dot == NULL) {
-        return SAIL_INVALID_ARGUMENT;
-    }
-
-    SAIL_TRY(sail_plugin_info_from_extension(context, dot+1, &plugin_info));
+    SAIL_TRY(sail_plugin_info_from_path(input, context, &plugin_info));
     SAIL_LOG_INFO("Input codec: %s", plugin_info->description);
 
     SAIL_TRY(sail_start_reading(input, context, plugin_info, &pimpl));
@@ -68,13 +62,7 @@ static sail_error_t convert(const char *input, const char *output, struct sail_c
     /* Write the image. */
     SAIL_LOG_INFO("Output file: %s", output);
 
-    dot = strrchr(output, '.');
-
-    if (dot == NULL) {
-        return SAIL_INVALID_ARGUMENT;
-    }
-
-    SAIL_TRY(sail_plugin_info_from_extension(context, dot+1, &plugin_info));
+    SAIL_TRY(sail_plugin_info_from_path(output, context, &plugin_info));
     SAIL_LOG_INFO("Outpu codec: %s", plugin_info->description);
 
     struct sail_write_options *write_options;
