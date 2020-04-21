@@ -109,35 +109,47 @@ image::image(const sail_image *im)
     }
 
     with_width(im->width)
-    .with_height(im->height)
-    .with_bytes_per_line(im->bytes_per_line)
-    .with_pixel_format(im->pixel_format)
-    .with_passes(im->passes)
-    .with_animated(im->animated)
-    .with_delay(im->delay)
-    .with_palette(im->palette, im->palette_size, im->palette_pixel_format)
-    .with_meta_entries(meta_entries)
-    .with_properties(im->properties)
-    .with_source_pixel_format(im->source_pixel_format)
-    .with_source_properties(im->source_properties);
+        .with_height(im->height)
+        .with_bytes_per_line(im->bytes_per_line)
+        .with_pixel_format(im->pixel_format)
+        .with_passes(im->passes)
+        .with_animated(im->animated)
+        .with_delay(im->delay)
+        .with_palette(im->palette, im->palette_size, im->palette_pixel_format)
+        .with_meta_entries(meta_entries)
+        .with_properties(im->properties)
+        .with_source_pixel_format(im->source_pixel_format)
+        .with_source_properties(im->source_properties);
 }
 
 image::image(const image &img)
     : image()
 {
+    *this = img;
+}
+
+image& image::operator=(const image &img)
+{
     with_width(img.width())
-    .with_height(img.height())
-    .with_bytes_per_line(img.bytes_per_line())
-    .with_pixel_format(img.pixel_format())
-    .with_passes(img.passes())
-    .with_animated(img.animated())
-    .with_delay(img.delay())
-    .with_palette(img.palette(), img.palette_size(), img.palette_pixel_format())
-    .with_meta_entries(meta_entries())
-    .with_properties(img.properties())
-    .with_source_pixel_format(img.source_pixel_format())
-    .with_source_properties(img.source_properties())
-    .with_bits(img.bits(), img.bits_size());
+        .with_height(img.height())
+        .with_bytes_per_line(img.bytes_per_line())
+        .with_pixel_format(img.pixel_format())
+        .with_passes(img.passes())
+        .with_animated(img.animated())
+        .with_delay(img.delay())
+        .with_palette(img.palette(), img.palette_size(), img.palette_pixel_format())
+        .with_meta_entries(meta_entries())
+        .with_properties(img.properties())
+        .with_source_pixel_format(img.source_pixel_format())
+        .with_source_properties(img.source_properties());
+
+    if (img.shallow_bits()) {
+        with_shallow_bits(img.shallow_bits());
+    } else {
+        with_bits(img.bits(), img.bits_size());
+    }
+
+    return *this;
 }
 
 image::~image()

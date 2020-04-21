@@ -47,6 +47,7 @@ public:
     //
     image(const sail_image *im);
     image(const image &image);
+    image& operator=(const image &image);
     ~image();
 
     bool is_valid() const;

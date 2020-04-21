@@ -19,6 +19,7 @@
 #include "config.h"
 
 // libsail-common.
+#include "common.h"
 #include "error.h"
 #include "log.h"
 
@@ -39,21 +40,13 @@ public:
     std::string description;
     std::vector<std::string> extensions;
     std::vector<std::string> mime_types;
+    sail::read_features read_features;
+    sail::write_features write_features;
 };
 
 plugin_info::plugin_info()
     : d(new pimpl)
 {
-}
-
-plugin_info::plugin_info(const plugin_info &pi)
-    : plugin_info()
-{
-    with_version(pi.version())
-    .with_name(pi.name())
-    .with_description(pi.description())
-    .with_extensions(pi.extensions())
-    .with_mime_types(pi.mime_types());
 }
 
 plugin_info::plugin_info(const sail_plugin_info *pi)
@@ -82,10 +75,31 @@ plugin_info::plugin_info(const sail_plugin_info *pi)
     }
 
     with_version(pi->version)
-    .with_name(pi->name)
-    .with_description(pi->description)
-    .with_extensions(extensions)
-    .with_mime_types(mime_types);
+        .with_name(pi->name)
+        .with_description(pi->description)
+        .with_extensions(extensions)
+        .with_mime_types(mime_types)
+        .with_read_features(pi->read_features)
+        .with_write_features(pi->write_features);
+}
+
+plugin_info::plugin_info(const plugin_info &pi)
+    : plugin_info()
+{
+    *this = pi;
+}
+
+plugin_info& plugin_info::operator=(const plugin_info &pi)
+{
+    with_version(pi.version())
+        .with_name(pi.name())
+        .with_description(pi.description())
+        .with_extensions(pi.extensions())
+        .with_mime_types(pi.mime_types())
+        .with_read_features(pi.read_features())
+        .with_write_features(pi.write_features());
+
+    return *this;
 }
 
 plugin_info::~plugin_info()
@@ -118,6 +132,16 @@ std::vector<std::string> plugin_info::mime_types() const
     return d->mime_types;
 }
 
+read_features plugin_info::read_features() const
+{
+    return d->read_features;
+}
+
+write_features plugin_info::write_features() const
+{
+    return d->write_features;
+}
+
 plugin_info& plugin_info::with_version(const std::string &version)
 {
     d->version = version;
@@ -145,6 +169,18 @@ plugin_info& plugin_info::with_extensions(const std::vector<std::string> &extens
 plugin_info& plugin_info::with_mime_types(const std::vector<std::string> &mime_types)
 {
     d->mime_types = mime_types;
+    return *this;
+}
+
+plugin_info& plugin_info::with_read_features(const sail::read_features &read_features)
+{
+    d->read_features = read_features;
+    return *this;
+}
+
+plugin_info& plugin_info::with_write_features(const sail::write_features &write_features)
+{
+    d->write_features = write_features;
     return *this;
 }
 

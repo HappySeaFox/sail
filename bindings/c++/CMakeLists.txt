@@ -3,18 +3,22 @@ add_library(sail-c++
                 src/image_reader-c++.cpp
                 src/image_writer-c++.cpp
                 src/image-c++.cpp
-                src/plugin_info-c++.cpp)
+                src/plugin_info-c++.cpp
+                src/read_features-c++.cpp
+                src/write_features-c++.cpp)
 
 # Build a list of public headers to install
 #
 set(PUBLIC_HEADERS "")
 list(APPEND PUBLIC_HEADERS "src/at_scope_exit-c++.h")
 list(APPEND PUBLIC_HEADERS "src/context-c++.h")
-list(APPEND PUBLIC_HEADERS "src/plugin_info-c++.h")
-list(APPEND PUBLIC_HEADERS "src/sail-c++.h")
 list(APPEND PUBLIC_HEADERS "src/image_reader-c++.h")
 list(APPEND PUBLIC_HEADERS "src/image_writer-c++.h")
 list(APPEND PUBLIC_HEADERS "src/image-c++.h")
+list(APPEND PUBLIC_HEADERS "src/plugin_info-c++.h")
+list(APPEND PUBLIC_HEADERS "src/read_features-c++.h")
+list(APPEND PUBLIC_HEADERS "src/sail-c++.h")
+list(APPEND PUBLIC_HEADERS "src/write_features-c++.h")
 
 set_target_properties(sail-c++ PROPERTIES
                                VERSION "0.3.1"

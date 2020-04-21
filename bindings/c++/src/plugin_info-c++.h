@@ -22,12 +22,15 @@
 #ifdef SAIL_BUILD
     #include "error.h"
     #include "export.h"
+    #include "read_features-c++.h"
+    #include "write_features-c++.h"
 #else
     #include <sail/error.h>
     #include <sail/export.h>
+    #include <sail/read_features-c++.h>
+    #include <sail/write_features-c++.h>
 #endif
 
-#include <memory>
 #include <string>
 #include <vector>
 
@@ -47,6 +50,7 @@ public:
     //
     plugin_info(const sail_plugin_info *pi);
     plugin_info(const plugin_info &pi);
+    plugin_info& operator=(const plugin_info &pi);
     ~plugin_info();
 
     std::string version() const;
@@ -54,6 +58,8 @@ public:
     std::string description() const;
     std::vector<std::string> extensions() const;
     std::vector<std::string> mime_types() const;
+    sail::read_features read_features() const;
+    sail::write_features write_features() const;
 
 private:
     plugin_info& with_version(const std::string &version);
@@ -61,6 +67,8 @@ private:
     plugin_info& with_description(const std::string &description);
     plugin_info& with_extensions(const std::vector<std::string> &extensions);
     plugin_info& with_mime_types(const std::vector<std::string> &mime_types);
+    plugin_info& with_read_features(const sail::read_features &read_features);
+    plugin_info& with_write_features(const sail::write_features &write_features);
 
 private:
     class pimpl;
