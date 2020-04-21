@@ -118,16 +118,16 @@ sail_error_t context::plugin_by_mime_type(const char *mime_type, plugin_info **s
     return 0;
 }
 
-sail_context* context::to_sail_context() const
-{
-    return d->context;
-}
-
 sail_error_t context::init()
 {
     SAIL_TRY(sail_init(&d->context));
 
     return 0;
+}
+
+sail_context* context::to_sail_context() const
+{
+    return d->context;
 }
 
 }

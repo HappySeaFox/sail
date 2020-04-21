@@ -44,6 +44,9 @@ class plugin_info;
  */
 class SAIL_EXPORT context
 {
+    friend class image_reader;
+    friend class image_writer;
+
 public:
     context();
     ~context();
@@ -64,10 +67,10 @@ public:
     sail_error_t plugin_by_mime_type(const std::string &mime_type, plugin_info **splugin_info, const plugin **splugin) const;
     sail_error_t plugin_by_mime_type(const char *mime_type, plugin_info **splugin_info, const plugin **splugin) const;
 
-    sail_context* to_sail_context() const;
-
 private:
     sail_error_t init();
+
+    sail_context* to_sail_context() const;
 
 private:
     class pimpl;

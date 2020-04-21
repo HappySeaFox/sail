@@ -35,6 +35,12 @@ namespace sail
 class SAIL_HIDDEN plugin_info::pimpl
 {
 public:
+    pimpl()
+        : plugin_info(nullptr)
+    {}
+
+    const sail_plugin_info *plugin_info;
+
     std::string version;
     std::string name;
     std::string description;
@@ -56,6 +62,8 @@ plugin_info::plugin_info(const sail_plugin_info *pi)
         SAIL_LOG_ERROR("NULL pointer has been passed to sail::plugin_info()");
         return;
     }
+
+    d->plugin_info = pi;
 
     std::vector<std::string> extensions;
     std::vector<std::string> mime_types;
@@ -182,6 +190,11 @@ plugin_info& plugin_info::with_write_features(const sail::write_features &write_
 {
     d->write_features = write_features;
     return *this;
+}
+
+const sail_plugin_info* plugin_info::to_sail_plugin_info() const
+{
+    return d->plugin_info;
 }
 
 }

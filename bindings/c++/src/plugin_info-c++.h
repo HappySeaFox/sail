@@ -44,6 +44,9 @@ namespace sail
  */
 class SAIL_EXPORT plugin_info
 {
+    friend class image_reader;
+    friend class image_writer;
+
 public:
     plugin_info();
     // Makes a deep copy of the specified plugin info
@@ -69,6 +72,8 @@ private:
     plugin_info& with_mime_types(const std::vector<std::string> &mime_types);
     plugin_info& with_read_features(const sail::read_features &read_features);
     plugin_info& with_write_features(const sail::write_features &write_features);
+
+    const sail_plugin_info* to_sail_plugin_info() const;
 
 private:
     class pimpl;
