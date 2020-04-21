@@ -217,7 +217,7 @@ static sail_error_t build_plugin_full_path(struct sail_context *context,
 
 sail_error_t sail_init(struct sail_context **context) {
 
-    SAIL_LOG_INFO("Init");
+    SAIL_LOG_INFO("Version %s-%s", SAIL_VERSION_STRING, SAIL_GIT_HASH);
 
     SAIL_CHECK_CONTEXT_PTR(context);
 
