@@ -77,9 +77,9 @@ SAIL_EXPORT const struct sail_plugin_info_node* sail_plugin_info_list(const stru
  *
  * The assigned plugin info MUST NOT be destroyed. It's a pointer to an internal data structure.
  *
- * Typical usage: sail_plugin_info_from_path() -> sail_start_reading_with_options() -> sail_read_next_frame() ->
+ * Typical usage: sail_plugin_info_from_path() -> sail_start_reading() -> sail_read_next_frame() ->
  *                sail_stop_reading().
- * Or:            sail_plugin_info_from_path() -> sail_start_writing_with_options() -> sail_read_next_frame() ->
+ * Or:            sail_plugin_info_from_path() -> sail_start_writing() -> sail_read_next_frame() ->
  *                sail_stop_writing().
  *
  * Returns 0 on success or sail_error_t on error.
@@ -92,9 +92,9 @@ SAIL_EXPORT sail_error_t sail_plugin_info_from_path(const char *path, const stru
  *
  * The assigned plugin info MUST NOT be destroyed. It's a pointer to an internal data structure.
  *
- * Typical usage: sail_plugin_info_from_extension() -> sail_start_reading_with_options() -> sail_read_next_frame() ->
+ * Typical usage: sail_plugin_info_from_extension() -> sail_start_reading() -> sail_read_next_frame() ->
  *                sail_stop_reading().
- * Or:            sail_plugin_info_from_extension() -> sail_start_writing_with_options() -> sail_read_next_frame() ->
+ * Or:            sail_plugin_info_from_extension() -> sail_start_writing() -> sail_read_next_frame() ->
  *                sail_stop_writing().
  *
  * Returns 0 on success or sail_error_t on error.
@@ -107,9 +107,9 @@ SAIL_EXPORT sail_error_t sail_plugin_info_from_extension(const char *extension, 
  *
  * The assigned plugin info MUST NOT be destroyed. It's a pointer to an internal data structure.
  *
- * Typical usage: sail_plugin_info_from_mime_type() -> sail_start_reading_with_options() -> sail_read_next_frame() ->
+ * Typical usage: sail_plugin_info_from_mime_type() -> sail_start_reading() -> sail_read_next_frame() ->
  *                sail_stop_reading().
- * Or:            sail_plugin_info_from_mime_type() -> sail_start_writing_with_options() -> sail_read_next_frame() ->
+ * Or:            sail_plugin_info_from_mime_type() -> sail_start_writing() -> sail_read_next_frame() ->
  *                sail_stop_writing().
  *
  * Returns 0 on success or sail_error_t on error.
