@@ -102,4 +102,16 @@ read_options& read_options::with_io_options(int io_options)
     return *this;
 }
 
+sail_error_t read_options::to_sail_read_options(sail_read_options **read_options) const
+{
+    SAIL_CHECK_READ_OPTIONS_PTR(read_options);
+
+    SAIL_TRY(sail_alloc_read_options(read_options));
+
+    (*read_options)->pixel_format = d->pixel_format;
+    (*read_options)->io_options   = d->io_options;
+
+    return 0;
+}
+
 }

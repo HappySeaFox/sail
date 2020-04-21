@@ -39,6 +39,8 @@ namespace sail
  */
 class SAIL_EXPORT read_options
 {
+    friend class image_reader;
+
 public:
     read_options();
     // Makes a deep copy of the specified read options
@@ -53,6 +55,9 @@ public:
 
     read_options& with_pixel_format(int pixel_format);
     read_options& with_io_options(int io_options);
+
+private:
+    sail_error_t to_sail_read_options(sail_read_options **read_options) const;
 
 private:
     class pimpl;
