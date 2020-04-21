@@ -39,14 +39,6 @@ extern "C" {
  */
 
 /*
- * Assigns possible read features for this plugin. The assigned read features MUST be destroyed later
- * with sail_destroy_read_features().
- *
- * Returns 0 on success or sail_error_t on error.
- */
-SAIL_EXPORT sail_error_t sail_plugin_read_features_v2(struct sail_read_features **read_features);
-
-/*
  * Starts decoding the specified file using the specified options (or NULL to use defaults).
  * The specified read options will be copied into an internal buffer.
  *
@@ -103,14 +95,6 @@ SAIL_EXPORT sail_error_t sail_plugin_read_finish_v2(struct sail_file *file);
 /*
  * Encoding functions.
  */
-
-/*
- * Assigns possible write features for this plugin. The assigned write features MUST be destroyed later
- * with sail_destroy_write_features().
- *
- * Returns 0 on success or sail_error_t on error.
- */
-SAIL_EXPORT sail_error_t sail_plugin_write_features_v2(struct sail_write_features **write_features);
 
 /*
  * Starts encoding the specified file using the specified options (or NULL to use defaults).
