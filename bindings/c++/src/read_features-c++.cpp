@@ -27,7 +27,9 @@
 #include "plugin_info.h"
 #include "string_node.h"
 
+#include "at_scope_exit-c++.h"
 #include "read_features-c++.h"
+#include "read_options-c++.h"
 
 namespace sail
 {
@@ -36,9 +38,12 @@ class SAIL_HIDDEN read_features::pimpl
 {
 public:
     pimpl()
-        : preferred_output_pixel_format(SAIL_PIXEL_FORMAT_UNKNOWN)
+        : sail_read_features_c(nullptr)
+        , preferred_output_pixel_format(SAIL_PIXEL_FORMAT_UNKNOWN)
         , features(0)
     {}
+
+    const sail_read_features *sail_read_features_c;
 
     std::vector<int> input_pixel_formats;
     std::vector<int> output_pixel_formats;
@@ -58,6 +63,8 @@ read_features::read_features(const sail_read_features *rf)
         SAIL_LOG_ERROR("NULL pointer has been passed to sail::read_features()");
         return;
     }
+
+    d->sail_read_features_c = rf;
 
     std::vector<int> input_pixel_formats;
 
@@ -93,6 +100,8 @@ read_features::read_features(const read_features &rf)
 
 read_features& read_features::operator=(const read_features &rf)
 {
+    d->sail_read_features_c = rf.d->sail_read_features_c;
+
     with_input_pixel_formats(rf.input_pixel_formats())
         .with_output_pixel_formats(rf.output_pixel_formats())
         .with_preferred_output_pixel_format(rf.preferred_output_pixel_format())
@@ -126,6 +135,25 @@ int read_features::features() const
     return d->features;
 }
 
+sail_error_t read_features::to_read_options(read_options **sread_options) const
+{
+    sail_read_options *sail_read_options = nullptr;
+
+    SAIL_AT_SCOPE_EXIT (
+        sail_destroy_read_options(sail_read_options);
+    );
+
+    SAIL_TRY(sail_alloc_read_options_from_features(d->sail_read_features_c, &sail_read_options));
+
+    *sread_options = new read_options(sail_read_options);
+
+    if (*sread_options == nullptr) {
+        return SAIL_MEMORY_ALLOCATION_FAILED;
+    }
+
+    return 0;
+}
+
 read_features& read_features::with_input_pixel_formats(const std::vector<int> &input_pixel_formats)
 {
     d->input_pixel_formats = input_pixel_formats;
@@ -148,6 +176,11 @@ read_features& read_features::with_features(int features)
 {
     d->features = features;
     return *this;
+}
+
+const sail_read_features* read_features::to_sail_read_features() const
+{
+    return d->sail_read_features_c;
 }
 
 }

@@ -34,6 +34,8 @@ struct sail_write_features;
 namespace sail
 {
 
+class write_options;
+
 /*
  * A C++ interface to struct sail_write_features.
  */
@@ -60,6 +62,8 @@ public:
     int compression_max() const;
     int compression_default() const;
 
+    sail_error_t to_write_options(write_options **swrite_options) const;
+
 private:
     write_features& with_input_pixel_formats(const std::vector<int> &input_pixel_formats);
     write_features& with_output_pixel_formats(const std::vector<int> &output_pixel_formats);
@@ -72,6 +76,8 @@ private:
     write_features& with_compression_min(int compression_min);
     write_features& with_compression_max(int compression_max);
     write_features& with_compression_default(int compression_default);
+
+    const sail_write_features* to_sail_write_features() const;
 
 private:
     class pimpl;

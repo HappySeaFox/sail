@@ -27,7 +27,9 @@
 #include "plugin_info.h"
 #include "string_node.h"
 
+#include "at_scope_exit-c++.h"
 #include "write_features-c++.h"
+#include "write_options-c++.h"
 
 namespace sail
 {
@@ -36,7 +38,8 @@ class SAIL_HIDDEN write_features::pimpl
 {
 public:
     pimpl()
-        : preferred_output_pixel_format(SAIL_PIXEL_FORMAT_UNKNOWN)
+        : sail_write_features_c(nullptr)
+        , preferred_output_pixel_format(SAIL_PIXEL_FORMAT_UNKNOWN)
         , features(0)
         , properties(0)
         , passes(0)
@@ -45,6 +48,8 @@ public:
         , compression_max(0)
         , compression_default(0)
     {}
+
+    const sail_write_features *sail_write_features_c;
 
     std::vector<int> input_pixel_formats;
     std::vector<int> output_pixel_formats;
@@ -71,6 +76,8 @@ write_features::write_features(const sail_write_features *wf)
         SAIL_LOG_ERROR("NULL pointer has been passed to sail::write_features()");
         return;
     }
+
+    d->sail_write_features_c = wf;
 
     std::vector<int> input_pixel_formats;
 
@@ -123,6 +130,8 @@ write_features::write_features(const write_features &wf)
 
 write_features& write_features::operator=(const write_features &wf)
 {
+    d->sail_write_features_c = wf.d->sail_write_features_c;
+
     with_input_pixel_formats(wf.input_pixel_formats())
         .with_output_pixel_formats(wf.output_pixel_formats())
         .with_preferred_output_pixel_format(wf.preferred_output_pixel_format())
@@ -191,6 +200,25 @@ int write_features::compression_default() const
     return d->compression_default;
 }
 
+sail_error_t write_features::to_write_options(write_options **swrite_options) const
+{
+    sail_write_options *sail_write_options = nullptr;
+
+    SAIL_AT_SCOPE_EXIT (
+        sail_destroy_write_options(sail_write_options);
+    );
+
+    SAIL_TRY(sail_alloc_write_options_from_features(d->sail_write_features_c, &sail_write_options));
+
+    *swrite_options = new write_options(sail_write_options);
+
+    if (*swrite_options == nullptr) {
+        return SAIL_MEMORY_ALLOCATION_FAILED;
+    }
+
+    return 0;
+}
+
 write_features& write_features::with_input_pixel_formats(const std::vector<int> &input_pixel_formats)
 {
     d->input_pixel_formats = input_pixel_formats;
@@ -255,6 +283,11 @@ write_features& write_features::with_compression_default(int compression_default
 {
     d->compression_default = compression_default;
     return *this;
+}
+
+const sail_write_features* write_features::to_sail_write_features() const
+{
+    return d->sail_write_features_c;
 }
 
 }
