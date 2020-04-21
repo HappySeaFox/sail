@@ -76,6 +76,27 @@ sail_error_t context::unload_plugins()
     return 0;
 }
 
+sail_error_t context::plugin_info_by_extension(const std::string &suffix, plugin_info **splugin_info) const
+{
+    SAIL_TRY(plugin_info_by_extension(suffix.c_str(), splugin_info));
+
+    return 0;
+}
+
+sail_error_t context::plugin_info_by_extension(const char *suffix, plugin_info **splugin_info) const
+{
+    const struct sail_plugin_info *sail_plugin_info;
+    SAIL_TRY(sail_plugin_info_by_extension(d->context, suffix, &sail_plugin_info));
+
+    *splugin_info = new plugin_info(sail_plugin_info);
+
+    if (*splugin_info == nullptr) {
+        return SAIL_MEMORY_ALLOCATION_FAILED;
+    }
+
+    return 0;
+}
+
 sail_context* context::to_sail_context() const
 {
     return d->context;
