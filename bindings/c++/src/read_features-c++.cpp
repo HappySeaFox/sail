@@ -137,6 +137,9 @@ int read_features::features() const
 
 sail_error_t read_features::to_read_options(read_options **sread_options) const
 {
+    SAIL_CHECK_READ_FEATURES_PTR(d->sail_read_features_c);
+    SAIL_CHECK_READ_OPTIONS_PTR(sread_options);
+
     sail_read_options *sail_read_options = nullptr;
 
     SAIL_AT_SCOPE_EXIT (

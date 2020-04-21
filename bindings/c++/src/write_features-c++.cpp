@@ -202,6 +202,9 @@ int write_features::compression_default() const
 
 sail_error_t write_features::to_write_options(write_options **swrite_options) const
 {
+    SAIL_CHECK_WRITE_FEATURES_PTR(d->sail_write_features_c);
+    SAIL_CHECK_WRITE_OPTIONS_PTR(swrite_options);
+
     sail_write_options *sail_write_options = nullptr;
 
     SAIL_AT_SCOPE_EXIT (
