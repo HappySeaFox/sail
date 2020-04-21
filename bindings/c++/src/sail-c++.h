@@ -28,6 +28,8 @@
 #include <sail/image-c++.h>
 #include <sail/plugin_info-c++.h>
 #include <sail/read_features-c++.h>
+#include <sail/read_options-c++.h>
 #include <sail/write_features-c++.h>
+#include <sail/write_options-c++.h>
 
 #endif
