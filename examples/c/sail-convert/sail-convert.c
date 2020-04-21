@@ -57,7 +57,7 @@ static sail_error_t convert(const char *input, const char *output, struct sail_c
         return SAIL_INVALID_ARGUMENT;
     }
 
-    SAIL_TRY(sail_plugin_info_by_extension(context, dot+1, &plugin_info));
+    SAIL_TRY(sail_plugin_info_from_extension(context, dot+1, &plugin_info));
     SAIL_LOG_INFO("Input codec: %s", plugin_info->description);
 
     SAIL_TRY(sail_start_reading(input, context, plugin_info, &pimpl));
@@ -74,7 +74,7 @@ static sail_error_t convert(const char *input, const char *output, struct sail_c
         return SAIL_INVALID_ARGUMENT;
     }
 
-    SAIL_TRY(sail_plugin_info_by_extension(context, dot+1, &plugin_info));
+    SAIL_TRY(sail_plugin_info_from_extension(context, dot+1, &plugin_info));
     SAIL_LOG_INFO("Outpu codec: %s", plugin_info->description);
 
     struct sail_write_options *write_options;

@@ -136,9 +136,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 
 sail_error_t QtSail::loadImageImpl(const QString &path, void **pimpl, sail_image **image, uchar **image_bits)
 {
-    const struct sail_plugin_info *plugin_info;
-
-    SAIL_TRY(sail_start_reading(path.toLocal8Bit(), d->context, &plugin_info/* or nullptr */, pimpl));
+    SAIL_TRY(sail_start_reading(path.toLocal8Bit(), d->context, nullptr, pimpl));
     SAIL_TRY(sail_read_next_frame(*pimpl, image, (void **)image_bits));
     SAIL_TRY(sail_stop_reading(*pimpl));
 }
@@ -180,9 +178,7 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
 sail_error_t QtSail::saveImageImpl(const QString &path,
                                    void **pimpl, const sail_image *image, const uchar *image_bits)
 {
-    const struct sail_plugin_info *plugin_info;
-
-    SAIL_TRY(sail_start_writing(path.toLocal8Bit(), d->context, &plugin_info/* or nullptr */, pimpl));
+    SAIL_TRY(sail_start_writing(path.toLocal8Bit(), d->context, nullptr, pimpl));
     SAIL_TRY(sail_write_next_frame(*pimpl, image, image_bits));
     SAIL_TRY(sail_stop_writing(*pimpl));
 

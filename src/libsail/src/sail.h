@@ -76,30 +76,30 @@ SAIL_EXPORT const struct sail_plugin_info_node* sail_plugin_info_list(const stru
  *
  * The assigned plugin info MUST NOT be destroyed. It's a pointer to an internal data structure.
  *
- * Typical usage: sail_plugin_info_by_extension() -> sail_start_reading_with_options() -> sail_read_next_frame() ->
+ * Typical usage: sail_plugin_info_from_extension() -> sail_start_reading_with_options() -> sail_read_next_frame() ->
  *                sail_stop_reading().
- * Or:            sail_plugin_info_by_extension() -> sail_start_writing_with_options() -> sail_read_next_frame() ->
+ * Or:            sail_plugin_info_from_extension() -> sail_start_writing_with_options() -> sail_read_next_frame() ->
  *                sail_stop_writing().
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_info_by_extension(const struct sail_context *context, const char *extension,
-                                                        const struct sail_plugin_info **plugin_info);
+SAIL_EXPORT sail_error_t sail_plugin_info_from_extension(const struct sail_context *context, const char *extension,
+                                                         const struct sail_plugin_info **plugin_info);
 
 /*
  * Finds a first plugin info object that supports the specified mime type. For example: "image/jpeg".
  *
  * The assigned plugin info MUST NOT be destroyed. It's a pointer to an internal data structure.
  *
- * Typical usage: sail_plugin_info_by_mime_type() -> sail_start_reading_with_options() -> sail_read_next_frame() ->
+ * Typical usage: sail_plugin_info_from_mime_type() -> sail_start_reading_with_options() -> sail_read_next_frame() ->
  *                sail_stop_reading().
- * Or:            sail_plugin_info_by_mime_type() -> sail_start_writing_with_options() -> sail_read_next_frame() ->
+ * Or:            sail_plugin_info_from_mime_type() -> sail_start_writing_with_options() -> sail_read_next_frame() ->
  *                sail_stop_writing().
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_info_by_mime_type(const struct sail_context *context, const char *mime_type,
-                                                        const struct sail_plugin_info **plugin_info);
+SAIL_EXPORT sail_error_t sail_plugin_info_from_mime_type(const struct sail_context *context, const char *mime_type,
+                                                         const struct sail_plugin_info **plugin_info);
 
 /*
  * Unloads all loaded plugins from the cache to release memory occupied by them. Use it if you don't want
@@ -150,7 +150,7 @@ SAIL_EXPORT sail_error_t sail_write(const char *path, struct sail_context *conte
  * to start reading with a specific codec. If not, just pass NULL.
  *
  * Typical usage: sail_start_reading_with_options() -> sail_read_next_frame() -> sail_stop_reading().
- * Or:            sail_plugin_info_by_extension() -> sail_start_reading_with_options() -> sail_read_next_frame() ->
+ * Or:            sail_plugin_info_from_extension() -> sail_start_reading_with_options() -> sail_read_next_frame() ->
  *                sail_stop_reading().
  *
  * For example:
@@ -177,7 +177,7 @@ SAIL_EXPORT sail_error_t sail_start_reading_with_options(const char *path, struc
  * to start reading with a specific codec. If not, just pass NULL.
  *
  * Typical usage: sail_start_reading() -> sail_read_next_frame() -> sail_stop_reading().
- * Or:            sail_plugin_info_by_extension() -> sail_start_reading() -> sail_read_next_frame() ->
+ * Or:            sail_plugin_info_from_extension() -> sail_start_reading() -> sail_read_next_frame() ->
  *                sail_stop_reading().
  *
  * For example:
@@ -221,7 +221,7 @@ SAIL_EXPORT sail_error_t sail_stop_reading(void *pimpl);
  * to start writing with a specific codec. If not, just pass NULL.
  *
  * Typical usage: sail_start_writing_with_options() -> sail_read_next_frame() -> sail_stop_writing().
- * Or:            sail_plugin_info_by_extension() -> sail_start_writing_with_options() -> sail_read_next_frame() ->
+ * Or:            sail_plugin_info_from_extension() -> sail_start_writing_with_options() -> sail_read_next_frame() ->
  *                sail_stop_writing().
  *
  * For example:
@@ -248,7 +248,7 @@ SAIL_EXPORT sail_error_t sail_start_writing_with_options(const char *path, struc
  * to start writing with a specific codec. If not, just pass NULL.
  *
  * Typical usage: sail_start_writing() -> sail_read_next_frame() -> sail_stop_writing().
- * Or:            sail_plugin_info_by_extension() -> sail_start_writing() -> sail_read_next_frame() ->
+ * Or:            sail_plugin_info_from_extension() -> sail_start_writing() -> sail_read_next_frame() ->
  *                sail_stop_writing().
  *
  * For example:
