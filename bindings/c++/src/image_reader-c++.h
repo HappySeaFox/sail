@@ -35,6 +35,7 @@ namespace sail
 class context;
 class image;
 class plugin_info;
+class read_options;
 
 /*
  * A C++ interface to the SAIL image reading functions.
@@ -56,14 +57,20 @@ public:
     /*
      * An interface to sail_read(). See sail_read() for more.
      */
-    sail_error_t read(const std::string &path, image **simage, plugin_info **splugin_info = nullptr);
-    sail_error_t read(const char *path, image **simage, plugin_info **splugin_info = nullptr);
+    sail_error_t read(const std::string &path, image **simage);
+    sail_error_t read(const char *path, image **simage);
 
     /*
      * An interface to sail_start_reading(). See sail_start_reading() for more.
      */
-    sail_error_t start_reading(const std::string &path, plugin_info **splugin_info = nullptr);
-    sail_error_t start_reading(const char *path, plugin_info **splugin_info = nullptr);
+    sail_error_t start_reading(const std::string &path, const plugin_info *splugin_info = nullptr);
+    sail_error_t start_reading(const char *path, const plugin_info *splugin_info = nullptr);
+
+    /*
+     * An interface to sail_start_reading_with_options(). See sail_start_reading_with_options() for more.
+     */
+    sail_error_t start_reading(const std::string &path, const plugin_info *splugin_info, const read_options &sread_options);
+    sail_error_t start_reading(const char *path, const plugin_info *splugin_info, const read_options &sread_options);
 
     /*
      * An interface to sail_read_next_frame(). See sail_read_next_frame() for more.

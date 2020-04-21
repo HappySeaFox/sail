@@ -36,6 +36,7 @@
 #include "image_reader-c++.h"
 #include "image-c++.h"
 #include "plugin_info-c++.h"
+#include "read_options-c++.h"
 
 namespace sail
 {
@@ -113,19 +114,18 @@ sail_error_t image_reader::probe(const char *path, image **simage, plugin_info *
     return 0;
 }
 
-sail_error_t image_reader::read(const std::string &path, image **simage, plugin_info **splugin_info)
+sail_error_t image_reader::read(const std::string &path, image **simage)
 {
-    SAIL_TRY(read(path.c_str(), simage, splugin_info));
+    SAIL_TRY(read(path.c_str(), simage));
 
     return 0;
 }
 
-sail_error_t image_reader::read(const char *path, image **simage, plugin_info **splugin_info)
+sail_error_t image_reader::read(const char *path, image **simage)
 {
     SAIL_CHECK_PATH_PTR(path);
     SAIL_CHECK_IMAGE_PTR(simage);
 
-    const sail_plugin_info *sail_plugin_info = nullptr;
     sail_image *sail_image = nullptr;
     void *image_bits = nullptr;
 
@@ -137,8 +137,7 @@ sail_error_t image_reader::read(const char *path, image **simage, plugin_info **
     SAIL_TRY(sail_read(path,
                        d->ctx->to_sail_context(),
                        &sail_image,
-                       &image_bits,
-                       &sail_plugin_info));
+                       &image_bits));
 
     *simage = new image(sail_image);
 
@@ -146,42 +145,49 @@ sail_error_t image_reader::read(const char *path, image **simage, plugin_info **
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
-    if (splugin_info != nullptr) {
-        *splugin_info = new plugin_info(sail_plugin_info);
-
-        if (*splugin_info == nullptr) {
-            delete *simage;
-            return SAIL_MEMORY_ALLOCATION_FAILED;
-        }
-    }
-
     (*simage)->with_bits(image_bits, sail_bytes_per_image(sail_image));
 
     return 0;
 }
 
-sail_error_t image_reader::start_reading(const std::string &path, plugin_info **splugin_info)
+sail_error_t image_reader::start_reading(const std::string &path, const plugin_info *splugin_info)
 {
     SAIL_TRY(start_reading(path.c_str(), splugin_info));
 
     return 0;
 }
 
-sail_error_t image_reader::start_reading(const char *path, plugin_info **splugin_info)
+sail_error_t image_reader::start_reading(const char *path, const plugin_info *splugin_info)
 {
     SAIL_CHECK_PATH_PTR(path);
 
-    const sail_plugin_info *sail_plugin_info = nullptr;
+    const sail_plugin_info *sail_plugin_info = splugin_info == nullptr ? nullptr : splugin_info->to_sail_plugin_info();
 
-    SAIL_TRY(sail_start_reading(path, d->ctx->to_sail_context(), &sail_plugin_info, &d->pmpl));
+    SAIL_TRY(sail_start_reading(path, d->ctx->to_sail_context(), sail_plugin_info, &d->pmpl));
 
-    if (splugin_info != nullptr) {
-        *splugin_info = new plugin_info(sail_plugin_info);
+    return 0;
+}
 
-        if (*splugin_info == nullptr) {
-            return SAIL_MEMORY_ALLOCATION_FAILED;
-        }
-    }
+sail_error_t image_reader::start_reading(const std::string &path, const plugin_info *splugin_info, const read_options &sread_options)
+{
+    SAIL_TRY(start_reading(path.c_str(), splugin_info, sread_options));
+
+    return 0;
+}
+
+sail_error_t image_reader::start_reading(const char *path, const plugin_info *splugin_info, const read_options &sread_options)
+{
+    SAIL_CHECK_PATH_PTR(path);
+
+    const sail_plugin_info *sail_plugin_info = splugin_info == nullptr ? nullptr : splugin_info->to_sail_plugin_info();
+    sail_read_options *sail_read_options = nullptr;
+
+    SAIL_AT_SCOPE_EXIT (
+        sail_destroy_read_options(sail_read_options);
+    );
+
+    SAIL_TRY(sread_options.to_sail_read_options(&sail_read_options));
+    SAIL_TRY(sail_start_reading_with_options(path, d->ctx->to_sail_context(), sail_plugin_info, sail_read_options, &d->pmpl));
 
     return 0;
 }

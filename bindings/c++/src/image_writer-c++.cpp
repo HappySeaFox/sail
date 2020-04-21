@@ -70,19 +70,18 @@ bool image_writer::is_valid() const
     return d->ctx != nullptr && d->ctx->is_valid();
 }
 
-sail_error_t image_writer::write(const std::string &path, const image *simage, plugin_info **splugin_info)
+sail_error_t image_writer::write(const std::string &path, const image *simage)
 {
-    SAIL_TRY(write(path.c_str(), simage, splugin_info));
+    SAIL_TRY(write(path.c_str(), simage));
 
     return 0;
 }
 
-sail_error_t image_writer::write(const char *path, const image *simage, plugin_info **splugin_info)
+sail_error_t image_writer::write(const char *path, const image *simage)
 {
     SAIL_CHECK_PATH_PTR(path);
     SAIL_CHECK_IMAGE_PTR(simage);
 
-    const sail_plugin_info *sail_plugin_info = nullptr;
     sail_image *sail_image = nullptr;
 
     SAIL_AT_SCOPE_EXIT (
@@ -94,42 +93,25 @@ sail_error_t image_writer::write(const char *path, const image *simage, plugin_i
     SAIL_TRY(sail_write(path,
                         d->ctx->to_sail_context(),
                         sail_image,
-                        simage->bits(),
-                        &sail_plugin_info));
-
-    if (splugin_info != nullptr) {
-        *splugin_info = new plugin_info(sail_plugin_info);
-
-        if (*splugin_info == nullptr) {
-            return SAIL_MEMORY_ALLOCATION_FAILED;
-        }
-    }
+                        simage->bits()));
 
     return 0;
 }
 
-sail_error_t image_writer::start_writing(const std::string &path, plugin_info **splugin_info)
+sail_error_t image_writer::start_writing(const std::string &path, const plugin_info *splugin_info)
 {
     SAIL_TRY(start_writing(path.c_str(), splugin_info));
 
     return 0;
 }
 
-sail_error_t image_writer::start_writing(const char *path, plugin_info **splugin_info)
+sail_error_t image_writer::start_writing(const char *path, const plugin_info *splugin_info)
 {
     SAIL_CHECK_PATH_PTR(path);
 
-    const sail_plugin_info *sail_plugin_info = nullptr;
+    const sail_plugin_info *sail_plugin_info = splugin_info == nullptr ? nullptr : splugin_info->to_sail_plugin_info();
 
-    SAIL_TRY(sail_start_writing(path, d->ctx->to_sail_context(), &sail_plugin_info, &d->pmpl));
-
-    if (splugin_info != nullptr) {
-        *splugin_info = new plugin_info(sail_plugin_info);
-
-        if (*splugin_info == nullptr) {
-            return SAIL_MEMORY_ALLOCATION_FAILED;
-        }
-    }
+    SAIL_TRY(sail_start_writing(path, d->ctx->to_sail_context(), sail_plugin_info, &d->pmpl));
 
     return 0;
 }
