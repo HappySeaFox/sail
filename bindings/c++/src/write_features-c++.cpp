@@ -285,7 +285,7 @@ write_features& write_features::with_compression_default(int compression_default
     return *this;
 }
 
-const sail_write_features* write_features::to_sail_write_features() const
+const sail_write_features* write_features::sail_write_features_c() const
 {
     return d->sail_write_features_c;
 }

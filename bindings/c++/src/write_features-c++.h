@@ -77,7 +77,7 @@ private:
     write_features& with_compression_max(int compression_max);
     write_features& with_compression_default(int compression_default);
 
-    const sail_write_features* to_sail_write_features() const;
+    const sail_write_features* sail_write_features_c() const;
 
 private:
     class pimpl;

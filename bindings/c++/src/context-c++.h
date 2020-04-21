@@ -68,7 +68,7 @@ public:
 private:
     sail_error_t init();
 
-    sail_context* to_sail_context() const;
+    sail_context* sail_context_c() const;
 
 private:
     class pimpl;

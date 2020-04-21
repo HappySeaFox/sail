@@ -92,7 +92,7 @@ sail_error_t image_reader::probe(const char *path, image **simage, plugin_info *
     );
 
     SAIL_TRY(sail_probe(path,
-                        d->ctx->to_sail_context(),
+                        d->ctx->sail_context_c(),
                         &sail_image,
                         &sail_plugin_info));
 
@@ -135,7 +135,7 @@ sail_error_t image_reader::read(const char *path, image **simage)
     );
 
     SAIL_TRY(sail_read(path,
-                       d->ctx->to_sail_context(),
+                       d->ctx->sail_context_c(),
                        &sail_image,
                        &image_bits));
 
@@ -163,7 +163,7 @@ sail_error_t image_reader::start_reading(const char *path, const plugin_info *sp
 
     const sail_plugin_info *sail_plugin_info = splugin_info == nullptr ? nullptr : splugin_info->to_sail_plugin_info();
 
-    SAIL_TRY(sail_start_reading(path, d->ctx->to_sail_context(), sail_plugin_info, &d->pmpl));
+    SAIL_TRY(sail_start_reading(path, d->ctx->sail_context_c(), sail_plugin_info, &d->pmpl));
 
     return 0;
 }
@@ -187,7 +187,7 @@ sail_error_t image_reader::start_reading(const char *path, const plugin_info *sp
     );
 
     SAIL_TRY(sread_options.to_sail_read_options(&sail_read_options));
-    SAIL_TRY(sail_start_reading_with_options(path, d->ctx->to_sail_context(), sail_plugin_info, sail_read_options, &d->pmpl));
+    SAIL_TRY(sail_start_reading_with_options(path, d->ctx->sail_context_c(), sail_plugin_info, sail_read_options, &d->pmpl));
 
     return 0;
 }

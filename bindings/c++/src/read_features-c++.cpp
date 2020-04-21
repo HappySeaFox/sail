@@ -178,7 +178,7 @@ read_features& read_features::with_features(int features)
     return *this;
 }
 
-const sail_read_features* read_features::to_sail_read_features() const
+const sail_read_features* read_features::sail_read_features_c() const
 {
     return d->sail_read_features_c;
 }

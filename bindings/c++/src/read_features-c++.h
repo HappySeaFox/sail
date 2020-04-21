@@ -63,7 +63,7 @@ private:
     read_features& with_preferred_output_pixel_format(int preferred_output_pixel_format);
     read_features& with_features(int features);
 
-    const sail_read_features* to_sail_read_features() const;
+    const sail_read_features* sail_read_features_c() const;
 
 private:
     class pimpl;

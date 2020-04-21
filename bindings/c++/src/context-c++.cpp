@@ -125,7 +125,7 @@ sail_error_t context::init()
     return 0;
 }
 
-sail_context* context::to_sail_context() const
+sail_context* context::sail_context_c() const
 {
     return d->context;
 }

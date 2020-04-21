@@ -91,7 +91,7 @@ sail_error_t image_writer::write(const char *path, const image *simage)
     SAIL_TRY(simage->to_sail_image(&sail_image));
 
     SAIL_TRY(sail_write(path,
-                        d->ctx->to_sail_context(),
+                        d->ctx->sail_context_c(),
                         sail_image,
                         simage->bits()));
 
@@ -111,7 +111,7 @@ sail_error_t image_writer::start_writing(const char *path, const plugin_info *sp
 
     const sail_plugin_info *sail_plugin_info = splugin_info == nullptr ? nullptr : splugin_info->to_sail_plugin_info();
 
-    SAIL_TRY(sail_start_writing(path, d->ctx->to_sail_context(), sail_plugin_info, &d->pmpl));
+    SAIL_TRY(sail_start_writing(path, d->ctx->sail_context_c(), sail_plugin_info, &d->pmpl));
 
     return 0;
 }
