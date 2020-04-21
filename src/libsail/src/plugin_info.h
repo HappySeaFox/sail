@@ -31,6 +31,9 @@ struct sail_plugin;
  */
 struct sail_plugin_info {
 
+    /* Full path to the plugin. */
+    char *path;
+
     /*
      * The plugin loader will use the plugin's layout version to correctly handle the plugin. Unsupported
      * plugin layout versions will be reported. This field must be the very first key in a plugin information
@@ -56,10 +59,10 @@ struct sail_plugin_info {
     /* A linked list of supported mime types. For example: "image/jpeg". */
     struct sail_string_node *mime_type_node;
 
-    /* Full path to the plugin. */
-    char *path;
-
+    /* Read features of the plugin. */
     struct sail_read_features *read_features;
+
+    /* Write features of the plugin. */
     struct sail_write_features *write_features;
 };
 
