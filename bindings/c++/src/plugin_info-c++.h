@@ -56,6 +56,7 @@ public:
     plugin_info& operator=(const plugin_info &pi);
     ~plugin_info();
 
+    std::string path() const;
     std::string version() const;
     std::string name() const;
     std::string description() const;
@@ -65,6 +66,7 @@ public:
     sail::write_features write_features() const;
 
 private:
+    plugin_info& with_path(const std::string &path);
     plugin_info& with_version(const std::string &version);
     plugin_info& with_name(const std::string &name);
     plugin_info& with_description(const std::string &description);

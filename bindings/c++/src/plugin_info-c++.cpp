@@ -36,11 +36,12 @@ class SAIL_HIDDEN plugin_info::pimpl
 {
 public:
     pimpl()
-        : plugin_info(nullptr)
+        : sail_plugin_info_c(nullptr)
     {}
 
-    const sail_plugin_info *plugin_info;
+    const sail_plugin_info *sail_plugin_info_c;
 
+    std::string path;
     std::string version;
     std::string name;
     std::string description;
@@ -63,7 +64,7 @@ plugin_info::plugin_info(const sail_plugin_info *pi)
         return;
     }
 
-    d->plugin_info = pi;
+    d->sail_plugin_info_c = pi;
 
     std::vector<std::string> extensions;
     std::vector<std::string> mime_types;
@@ -82,7 +83,8 @@ plugin_info::plugin_info(const sail_plugin_info *pi)
         mime_type_node = mime_type_node->next;
     }
 
-    with_version(pi->version)
+    with_path(pi->path)
+        .with_version(pi->version)
         .with_name(pi->name)
         .with_description(pi->description)
         .with_extensions(extensions)
@@ -99,7 +101,10 @@ plugin_info::plugin_info(const plugin_info &pi)
 
 plugin_info& plugin_info::operator=(const plugin_info &pi)
 {
-    with_version(pi.version())
+    d->sail_plugin_info_c = pi.d->sail_plugin_info_c;
+
+    with_path(pi.path())
+        .with_version(pi.version())
         .with_name(pi.name())
         .with_description(pi.description())
         .with_extensions(pi.extensions())
@@ -113,6 +118,11 @@ plugin_info& plugin_info::operator=(const plugin_info &pi)
 plugin_info::~plugin_info()
 {
     delete d;
+}
+
+std::string plugin_info::path() const
+{
+    return d->path;
 }
 
 std::string plugin_info::version() const
@@ -148,6 +158,12 @@ read_features plugin_info::read_features() const
 write_features plugin_info::write_features() const
 {
     return d->write_features;
+}
+
+plugin_info& plugin_info::with_path(const std::string &path)
+{
+    d->path = path;
+    return *this;
 }
 
 plugin_info& plugin_info::with_version(const std::string &version)
@@ -194,7 +210,7 @@ plugin_info& plugin_info::with_write_features(const sail::write_features &write_
 
 const sail_plugin_info* plugin_info::to_sail_plugin_info() const
 {
-    return d->plugin_info;
+    return d->sail_plugin_info_c;
 }
 
 }
