@@ -19,22 +19,20 @@
 #ifndef SAIL_SAIL_H
 #define SAIL_SAIL_H
 
+/* Universal libsail include. */
+
 #ifdef SAIL_BUILD
-    #include "error.h"
-    #include "export.h"
+    #include "sail-common.h"
+
+    #include "context.h"
+    #include "ini.h"
+    #include "plugin.h"
+    #include "plugin_info.h"
+    #include "plugin_info_private.h"
+    #include "string_node.h"
 #else
-    /* Universal include. */
+    #include <sail/sail-common.h>
 
-    /* libsail-common. */
-    #include <sail/common.h>
-    #include <sail/config.h>
-    #include <sail/error.h>
-    #include <sail/export.h>
-    #include <sail/meta_entry_node.h>
-    #include <sail/log.h>
-    #include <sail/utils.h>
-
-    /* libsail. */
     #include <sail/plugin_info.h>
     #include <sail/string_node.h>
 #endif

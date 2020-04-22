@@ -25,13 +25,7 @@
 #include <stdint.h>
 #include <string.h>
 
-/* libsail-common. */
-#include "config.h"
-#include "common.h"
-#include "meta_entry_node.h"
-#include "plugin_info.h"
-#include "utils.h"
-
+#include "sail-common.h"
 #include "sail.h"
 
 #ifdef SAIL_WIN32

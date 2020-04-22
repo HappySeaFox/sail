@@ -28,13 +28,8 @@
     #include <dlfcn.h>
 #endif
 
-/* libsail-common */
-#include "common.h"
-#include "error.h"
-#include "log.h"
-
-#include "plugin_info.h"
-#include "plugin.h"
+#include "sail-common.h"
+#include "sail.h"
 
 int sail_alloc_plugin(const struct sail_plugin_info *plugin_info, struct sail_plugin **plugin) {
 

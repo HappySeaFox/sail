@@ -28,10 +28,7 @@
     #include <windows.h>
 #endif
 
-#include "common.h"
-#include "error.h"
-#include "log.h"
-#include "utils.h"
+#include "sail-common.h"
 
 int sail_strdup(const char *input, char **output) {
 

@@ -16,8 +16,6 @@
     along with this library. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "config.h"
-
 #include <setjmp.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -26,13 +24,7 @@
 
 #include <jpeglib.h>
 
-#include "common.h"
-#include "error.h"
-#include "file.h"
-#include "export.h"
-#include "log.h"
-#include "meta_entry_node.h"
-#include "utils.h"
+#include "sail-common.h"
 
 /*
  * Plugin-specific data types.

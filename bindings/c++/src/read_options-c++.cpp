@@ -16,18 +16,9 @@
     along with this library. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "config.h"
-
-// libsail-common.
-#include "common.h"
-#include "error.h"
-#include "log.h"
-
-// libsail.
-#include "plugin_info.h"
-#include "string_node.h"
-
-#include "read_options-c++.h"
+#include "sail-common.h"
+#include "sail.h"
+#include "sail-c++.h"
 
 namespace sail
 {

@@ -16,27 +16,12 @@
     along with this library. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "config.h"
-
 #include <cstdlib>
 #include <cstring>
 
-// libsail-common.
-#include "common.h"
-#include "error.h"
-#include "log.h"
-#include "utils.h"
-
-// libsail.
-#include "plugin_info.h"
+#include "sail-common.h"
 #include "sail.h"
-
-#include "at_scope_exit-c++.h"
-#include "context-c++.h"
-#include "image_reader-c++.h"
-#include "image-c++.h"
-#include "plugin_info-c++.h"
-#include "read_options-c++.h"
+#include "sail-c++.h"
 
 namespace sail
 {

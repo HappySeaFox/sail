@@ -16,23 +16,12 @@
     along with this library. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "config.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-/* libsail-common */
-#include "common.h"
-#include "error.h"
-#include "log.h"
-#include "utils.h"
-
-#include "ini.h"
-#include "plugin_info_private.h"
-#include "plugin_info.h"
-#include "plugin.h"
-#include "string_node.h"
+#include "sail-common.h"
+#include "sail.h"
 
 /*
  * Private functions.

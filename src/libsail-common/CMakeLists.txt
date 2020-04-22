@@ -7,11 +7,15 @@ option(SAIL_COLORED_OUTPUT "Enable colored console output on supported platforms
 set(SAIL_COLORED_OUTPUT ${SAIL_COLORED_OUTPUT} PARENT_SCOPE)
 
 add_library(sail-common
-                src/common.c
                 src/file.c
+                src/image.c
                 src/meta_entry_node.c
                 src/log.c
-                src/utils.c)
+                src/read_features.c
+                src/read_options.c
+                src/utils.c
+                src/write_features.c
+                src/write_options.c)
 
 # Build a list of public headers to install
 #
@@ -19,9 +23,15 @@ set(PUBLIC_HEADERS "")
 list(APPEND PUBLIC_HEADERS "src/common.h")
 list(APPEND PUBLIC_HEADERS "src/error.h")
 list(APPEND PUBLIC_HEADERS "src/export.h")
+list(APPEND PUBLIC_HEADERS "src/image.h")
 list(APPEND PUBLIC_HEADERS "src/meta_entry_node.h")
+list(APPEND PUBLIC_HEADERS "src/read_features.h")
+list(APPEND PUBLIC_HEADERS "src/read_options.h")
 list(APPEND PUBLIC_HEADERS "src/log.h")
+list(APPEND PUBLIC_HEADERS "src/sail-common.h")
 list(APPEND PUBLIC_HEADERS "src/utils.h")
+list(APPEND PUBLIC_HEADERS "src/write_features.h")
+list(APPEND PUBLIC_HEADERS "src/write_options.h")
 
 set_target_properties(sail-common PROPERTIES
                                   VERSION "0.5.0"

@@ -25,15 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* libsail-common. */
-#include "config.h"
-#include "common.h"
-#include "log.h"
-#include "meta_entry_node.h"
-#include "utils.h"
-
-#include "plugin_info.h"
-#include "plugin.h"
+#include "sail-common.h"
 #include "sail.h"
 
 static sail_error_t convert(const char *input, const char *output, struct sail_context *context, int compression) {

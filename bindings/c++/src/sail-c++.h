@@ -21,15 +21,28 @@
 
 // Universal include
 //
-#include <sail/at_scope_exit-c++.h>
-#include <sail/context-c++.h>
-#include <sail/image_reader-c++.h>
-#include <sail/image_writer-c++.h>
-#include <sail/image-c++.h>
-#include <sail/plugin_info-c++.h>
-#include <sail/read_features-c++.h>
-#include <sail/read_options-c++.h>
-#include <sail/write_features-c++.h>
-#include <sail/write_options-c++.h>
+#ifdef SAIL_BUILD
+    #include "at_scope_exit-c++.h"
+    #include "context-c++.h"
+    #include "image-c++.h"
+    #include "image_reader-c++.h"
+    #include "image_writer-c++.h"
+    #include "plugin_info-c++.h"
+    #include "read_features-c++.h"
+    #include "read_options-c++.h"
+    #include "write_features-c++.h"
+    #include "write_options-c++.h"
+#else
+    #include <sail/at_scope_exit-c++.h>
+    #include <sail/context-c++.h>
+    #include <sail/image-c++.h>
+    #include <sail/image_reader-c++.h>
+    #include <sail/image_writer-c++.h>
+    #include <sail/plugin_info-c++.h>
+    #include <sail/read_features-c++.h>
+    #include <sail/read_options-c++.h>
+    #include <sail/write_features-c++.h>
+    #include <sail/write_options-c++.h>
+#endif
 
 #endif

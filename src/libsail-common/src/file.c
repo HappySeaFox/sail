@@ -28,12 +28,7 @@
     #include <share.h>
 #endif
 
-#include "file.h"
-#include "log.h"
-
-/*
- * File functions.
- */
+#include "sail-common.h"
 
 static int sail_alloc_file_private(struct sail_file **file) {
 

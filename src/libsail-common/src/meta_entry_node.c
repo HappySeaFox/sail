@@ -19,8 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "error.h"
-#include "meta_entry_node.h"
+#include "sail-common.h"
 
 int sail_alloc_meta_entry_node(struct sail_meta_entry_node **meta_entry_node) {
 

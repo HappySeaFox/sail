@@ -33,6 +33,7 @@
 #include <QPushButton>
 #include <QShortcut>
 
+#include <sail/sail-common.h>
 #include <sail/sail.h>
 #include <sail/sail-c++.h>
 
