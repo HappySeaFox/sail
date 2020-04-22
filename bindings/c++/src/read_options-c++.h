@@ -50,10 +50,10 @@ public:
     read_options& operator=(const read_options &ro);
     ~read_options();
 
-    int pixel_format() const;
+    int output_pixel_format() const;
     int io_options() const;
 
-    read_options& with_pixel_format(int pixel_format);
+    read_options& with_output_pixel_format(int output_pixel_format);
     read_options& with_io_options(int io_options);
 
 private:

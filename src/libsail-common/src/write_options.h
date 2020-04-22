@@ -38,12 +38,12 @@ struct sail_write_options {
 
     /*
      * Request to modify the output pixel format. Plugin (or an underlying codec) may reject
-     * the requested pixel format and return an error.
+     * the requested pixel format with an error.
      *
      * NOTE: Some input pixel formats might not map to some output pixel formats.
      *       SAIL returns an error in this case.
      */
-    int pixel_format;
+    int output_pixel_format;
 
     /* IO manipulation options. See SailIoOptions. */
     int io_options;

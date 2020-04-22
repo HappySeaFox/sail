@@ -29,10 +29,10 @@ int sail_alloc_write_options(struct sail_write_options **write_options) {
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
-    (*write_options)->pixel_format     = SAIL_PIXEL_FORMAT_UNKNOWN;
-    (*write_options)->io_options       = 0;
-    (*write_options)->compression_type = 0;
-    (*write_options)->compression      = 0;
+    (*write_options)->output_pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;
+    (*write_options)->io_options          = 0;
+    (*write_options)->compression_type    = 0;
+    (*write_options)->compression         = 0;
 
     return 0;
 }
@@ -51,7 +51,7 @@ sail_error_t sail_write_options_from_features(const struct sail_write_features *
     SAIL_CHECK_WRITE_FEATURES_PTR(write_features);
     SAIL_CHECK_WRITE_OPTIONS_PTR(write_options);
 
-    write_options->pixel_format = write_features->preferred_output_pixel_format;
+    write_options->output_pixel_format = write_features->preferred_output_pixel_format;
     write_options->io_options = 0;
 
     if (write_features->features & SAIL_PLUGIN_FEATURE_META_INFO) {

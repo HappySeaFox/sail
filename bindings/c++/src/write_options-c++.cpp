@@ -27,13 +27,13 @@ class SAIL_HIDDEN write_options::pimpl
 {
 public:
     pimpl()
-        : pixel_format(SAIL_PIXEL_FORMAT_UNKNOWN)
+        : output_pixel_format(SAIL_PIXEL_FORMAT_UNKNOWN)
         , io_options(0)
         , compression_type(0)
         , compression(0)
     {}
 
-    int pixel_format;
+    int output_pixel_format;
     int io_options;
     int compression_type;
     int compression;
@@ -52,7 +52,7 @@ write_options::write_options(const sail_write_options *wo)
         return;
     }
 
-    with_pixel_format(wo->pixel_format)
+    with_output_pixel_format(wo->output_pixel_format)
         .with_io_options(wo->io_options)
         .with_compression_type(wo->compression_type)
         .with_compression(wo->compression);
@@ -66,7 +66,7 @@ write_options::write_options(const write_options &wo)
 
 write_options& write_options::operator=(const write_options &wo)
 {
-    with_pixel_format(wo.pixel_format())
+    with_output_pixel_format(wo.output_pixel_format())
         .with_io_options(wo.io_options())
         .with_compression_type(wo.compression_type())
         .with_compression(wo.compression());
@@ -79,9 +79,9 @@ write_options::~write_options()
     delete d;
 }
 
-int write_options::pixel_format() const
+int write_options::output_pixel_format() const
 {
-    return d->pixel_format;
+    return d->output_pixel_format;
 }
 
 int write_options::io_options() const
@@ -99,9 +99,9 @@ int write_options::compression() const
     return d->compression;
 }
 
-write_options& write_options::with_pixel_format(int pixel_format)
+write_options& write_options::with_output_pixel_format(int output_pixel_format)
 {
-    d->pixel_format = pixel_format;
+    d->output_pixel_format = output_pixel_format;
     return *this;
 }
 
@@ -129,10 +129,10 @@ sail_error_t write_options::to_sail_write_options(sail_write_options **write_opt
 
     SAIL_TRY(sail_alloc_write_options(write_options));
 
-    (*write_options)->pixel_format     = d->pixel_format;
-    (*write_options)->io_options       = d->io_options;
-    (*write_options)->compression_type = d->compression_type;
-    (*write_options)->compression      = d->compression;
+    (*write_options)->output_pixel_format = d->output_pixel_format;
+    (*write_options)->io_options          = d->io_options;
+    (*write_options)->compression_type    = d->compression_type;
+    (*write_options)->compression         = d->compression;
 
     return 0;
 }

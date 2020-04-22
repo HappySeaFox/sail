@@ -181,10 +181,10 @@ SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_file *file, const 
     jpeg_read_header(&pimpl->decompress_context, true);
 
     /* Handle the requested color space. */
-    if (pimpl->read_options->pixel_format == SAIL_PIXEL_FORMAT_SOURCE) {
+    if (pimpl->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_SOURCE) {
         pimpl->decompress_context.out_color_space = pimpl->decompress_context.jpeg_color_space;
     } else {
-        J_COLOR_SPACE requested_color_space = pixel_format_to_color_space(pimpl->read_options->pixel_format);
+        J_COLOR_SPACE requested_color_space = pixel_format_to_color_space(pimpl->read_options->output_pixel_format);
 
         if (requested_color_space == JCS_UNKNOWN) {
             return SAIL_UNSUPPORTED_PIXEL_FORMAT;
@@ -376,7 +376,7 @@ SAIL_EXPORT sail_error_t sail_plugin_write_init_v2(struct sail_file *file, const
     memcpy(pimpl->write_options, write_options, sizeof(struct sail_write_options));
 
     /* Sanity check. */
-    if (pixel_format_to_color_space(pimpl->write_options->pixel_format) == JCS_UNKNOWN) {
+    if (pixel_format_to_color_space(pimpl->write_options->output_pixel_format) == JCS_UNKNOWN) {
         return SAIL_UNSUPPORTED_PIXEL_FORMAT;
     }
 
@@ -436,7 +436,7 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v2(struct sail_file *
     pimpl->compress_context.in_color_space = pixel_format_to_color_space(image->pixel_format);
 
     jpeg_set_defaults(&pimpl->compress_context);
-    jpeg_set_colorspace(&pimpl->compress_context, pixel_format_to_color_space(pimpl->write_options->pixel_format));
+    jpeg_set_colorspace(&pimpl->compress_context, pixel_format_to_color_space(pimpl->write_options->output_pixel_format));
 
     const int compression = (pimpl->write_options->compression < COMPRESSION_MIN ||
                                 pimpl->write_options->compression > COMPRESSION_MAX)

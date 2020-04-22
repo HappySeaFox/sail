@@ -27,11 +27,11 @@ class SAIL_HIDDEN read_options::pimpl
 {
 public:
     pimpl()
-        : pixel_format(SAIL_PIXEL_FORMAT_UNKNOWN)
+        : output_pixel_format(SAIL_PIXEL_FORMAT_UNKNOWN)
         , io_options(0)
     {}
 
-    int pixel_format;
+    int output_pixel_format;
     int io_options;
 };
 
@@ -48,7 +48,7 @@ read_options::read_options(const sail_read_options *ro)
         return;
     }
 
-    with_pixel_format(ro->pixel_format)
+    with_output_pixel_format(ro->output_pixel_format)
         .with_io_options(ro->io_options);
 }
 
@@ -60,7 +60,7 @@ read_options::read_options(const read_options &ro)
 
 read_options& read_options::operator=(const read_options &ro)
 {
-    with_pixel_format(ro.pixel_format())
+    with_output_pixel_format(ro.output_pixel_format())
         .with_io_options(ro.io_options());
 
     return *this;
@@ -71,9 +71,9 @@ read_options::~read_options()
     delete d;
 }
 
-int read_options::pixel_format() const
+int read_options::output_pixel_format() const
 {
-    return d->pixel_format;
+    return d->output_pixel_format;
 }
 
 int read_options::io_options() const
@@ -81,9 +81,9 @@ int read_options::io_options() const
     return d->io_options;
 }
 
-read_options& read_options::with_pixel_format(int pixel_format)
+read_options& read_options::with_output_pixel_format(int output_pixel_format)
 {
-    d->pixel_format = pixel_format;
+    d->output_pixel_format = output_pixel_format;
     return *this;
 }
 
@@ -99,8 +99,8 @@ sail_error_t read_options::to_sail_read_options(sail_read_options **read_options
 
     SAIL_TRY(sail_alloc_read_options(read_options));
 
-    (*read_options)->pixel_format = d->pixel_format;
-    (*read_options)->io_options   = d->io_options;
+    (*read_options)->output_pixel_format = d->output_pixel_format;
+    (*read_options)->io_options          = d->io_options;
 
     return 0;
 }

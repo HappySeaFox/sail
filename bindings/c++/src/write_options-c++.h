@@ -50,12 +50,12 @@ public:
     write_options& operator=(const write_options &ro);
     ~write_options();
 
-    int pixel_format() const;
+    int output_pixel_format() const;
     int io_options() const;
     int compression_type() const;
     int compression() const;
 
-    write_options& with_pixel_format(int pixel_format);
+    write_options& with_output_pixel_format(int output_pixel_format);
     write_options& with_io_options(int io_options);
     write_options& with_compression_type(int compression_type);
     write_options& with_compression(int compression);

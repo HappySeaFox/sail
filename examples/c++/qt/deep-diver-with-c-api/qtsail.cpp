@@ -122,7 +122,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
                                       sail_destroy_read_options(read_options),
                                       sail_destroy_image(image));
 
-    const QImage::Format qimageFormat = sailPixelFormatToQImageFormat(read_options->pixel_format);
+    const QImage::Format qimageFormat = sailPixelFormatToQImageFormat(read_options->output_pixel_format);
 
     // Convert to QImage.
     //
