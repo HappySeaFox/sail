@@ -186,10 +186,6 @@ sail_error_t QtSail::loadImageImpl(const QString &path, sail_read_options **read
 
     if (readOptions.exec() == QDialog::Accepted) {
         (*read_options)->pixel_format = readOptions.pixelFormat();
-    } else {
-        // Force RGB888 output format.
-        //
-        (*read_options)->pixel_format = SAIL_PIXEL_FORMAT_RGB;
     }
 
     const QImage::Format qimageFormat = sailPixelFormatToQImageFormat((*read_options)->pixel_format);
