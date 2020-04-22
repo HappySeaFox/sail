@@ -26,6 +26,8 @@
 #include <QDialog>
 #include <QScopedPointer>
 
+#include <sail/error.h>
+
 struct sail_read_features;
 
 class ReadOptions : public QDialog
@@ -39,6 +41,9 @@ public:
     ~ReadOptions();
 
     int pixelFormat() const;
+
+private:
+    sail_error_t init(const sail_read_features *read_features);
 
 private:
     class Private;

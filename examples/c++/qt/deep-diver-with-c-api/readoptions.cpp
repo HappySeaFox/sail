@@ -44,20 +44,7 @@ ReadOptions::ReadOptions(const QString &codecDescription, const sail_read_featur
 
     d->ui->labelCodec->setText(codecDescription);
 
-    if (read_features->output_pixel_formats_length == 0) {
-        d->ui->labelColor->setText(tr("Output color selection is not available"));
-        d->ui->labelColor->setEnabled(false);
-        d->ui->comboColor->setEnabled(false);
-    } else {
-        d->ui->labelColor->setText(tr("Output color:"));
-
-        for (int i = 0; i < read_features->output_pixel_formats_length; i++) {
-            d->ui->comboColor->addItem(sail_pixel_format_to_string(read_features->output_pixel_formats[i]),
-                                       /* user data */read_features->output_pixel_formats[i]);
-        }
-
-        d->ui->comboColor->setCurrentText(sail_pixel_format_to_string(read_features->preferred_output_pixel_format));
-    }
+    init(read_features);
 }
 
 ReadOptions::~ReadOptions()
@@ -67,4 +54,29 @@ ReadOptions::~ReadOptions()
 int ReadOptions::pixelFormat() const
 {
     return d->ui->comboColor->currentData().toInt();
+}
+
+sail_error_t ReadOptions::init(const sail_read_features *read_features)
+{
+    if (read_features->output_pixel_formats_length == 0) {
+        d->ui->labelColor->setText(tr("Output color selection is not available"));
+        d->ui->labelColor->setEnabled(false);
+        d->ui->comboColor->setEnabled(false);
+    } else {
+        d->ui->labelColor->setText(tr("Output color:"));
+
+        const char *output_pixel_format_str;
+
+        for (int i = 0; i < read_features->output_pixel_formats_length; i++) {
+            SAIL_TRY(sail_pixel_format_to_string(read_features->output_pixel_formats[i], &output_pixel_format_str));
+
+            d->ui->comboColor->addItem(output_pixel_format_str,
+                                       /* user data */ read_features->output_pixel_formats[i]);
+        }
+
+        SAIL_TRY(sail_pixel_format_to_string(read_features->preferred_output_pixel_format, &output_pixel_format_str));
+        d->ui->comboColor->setCurrentText(output_pixel_format_str);
+    }
+
+    return 0;
 }

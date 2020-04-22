@@ -50,7 +50,7 @@ private:
 
 private: // slots
     void onOpenFile();
-    void onProbe();
+    sail_error_t onProbe();
     void onSave();
     void onFit(bool fit);
 

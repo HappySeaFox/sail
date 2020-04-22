@@ -46,6 +46,7 @@ typedef int sail_error_t;
 #define SAIL_READ_OPTIONS_NULL_PTR        26
 #define SAIL_WRITE_FEATURES_NULL_PTR      27
 #define SAIL_WRITE_OPTIONS_NULL_PTR       28
+#define SAIL_STRING_NULL_PTR              29
 
 /*
  * Encoding/decoding specific errors.
@@ -57,6 +58,7 @@ typedef int sail_error_t;
 #define SAIL_NO_MORE_FRAMES               44
 #define SAIL_INTERLACED_UNSUPPORTED       45
 #define SAIL_INCORRECT_BYTES_PER_LINE     46
+#define SAIL_UNSUPPORTED_IMAGE_PROPERTY   47
 
 /*
  * Plugins-specific errors.
@@ -66,6 +68,7 @@ typedef int sail_error_t;
 #define SAIL_UNSUPPORTED_PLUGIN_LAYOUT    62
 #define SAIL_PLUGIN_SYMBOL_RESOLVE_FAILED 63
 #define SAIL_INCOMPLETE_PLUGIN_INFO       64
+#define SAIL_UNSUPPORTED_PLUGIN_FEATURE   65
 
 /*
  * libsail errors.
@@ -129,6 +132,7 @@ do {                              \
 #define SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info)       SAIL_CHECK_PTR2(plugin_info,    SAIL_PLUGIN_INFO_NULL_PTR)
 #define SAIL_CHECK_PLUGIN_PTR(plugin)                 SAIL_CHECK_PTR2(plugin,         SAIL_PLUGIN_NULL_PTR)
 #define SAIL_CHECK_PIMPL_PTR(pimpl)                   SAIL_CHECK_PTR2(pimpl,          SAIL_PIMPL_NULL_PTR)
+#define SAIL_CHECK_STRING_PTR(str)                    SAIL_CHECK_PTR2(str,            SAIL_STRING_NULL_PTR)
 
 /*
  * Try to execute the specified SAIL function. If it fails, return the error code.

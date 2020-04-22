@@ -166,188 +166,200 @@ sail_error_t sail_to_wchar(const char *input, wchar_t **output) {
     return 0;
 }
 
-const char* sail_pixel_format_to_string(int pixel_format) {
-    switch (pixel_format) {
-        case SAIL_PIXEL_FORMAT_UNKNOWN:   return "UNKNOWN";
-        case SAIL_PIXEL_FORMAT_SOURCE:    return "SOURCE";
+sail_error_t sail_pixel_format_to_string(int pixel_format, const char **result) {
 
-        case SAIL_PIXEL_FORMAT_MONO:      return "MONO";
-        case SAIL_PIXEL_FORMAT_GRAYSCALE: return "GRAYSCALE";
-        case SAIL_PIXEL_FORMAT_INDEXED:   return "INDEXED";
-        case SAIL_PIXEL_FORMAT_RGB:       return "RGB";
-        case SAIL_PIXEL_FORMAT_YCBCR:     return "YCbCr";
-        case SAIL_PIXEL_FORMAT_CMYK:      return "CMYK";
-        case SAIL_PIXEL_FORMAT_YCCK:      return "YCCK";
-        case SAIL_PIXEL_FORMAT_RGBX:      return "RGBX";
-        case SAIL_PIXEL_FORMAT_BGR:       return "BGR";
-        case SAIL_PIXEL_FORMAT_BGRX:      return "BGRX";
-        case SAIL_PIXEL_FORMAT_XBGR:      return "XBGR";
-        case SAIL_PIXEL_FORMAT_XRGB:      return "XRGB";
-        case SAIL_PIXEL_FORMAT_RGBA:      return "RGBA";
-        case SAIL_PIXEL_FORMAT_BGRA:      return "BGRA";
-        case SAIL_PIXEL_FORMAT_ABGR:      return "ABGR";
-        case SAIL_PIXEL_FORMAT_ARGB:      return "ARGB";
-        case SAIL_PIXEL_FORMAT_RGB565:    return "RGB565";
+    SAIL_CHECK_STRING_PTR(result);
+
+    switch (pixel_format) {
+        case SAIL_PIXEL_FORMAT_UNKNOWN:   *result = "UNKNOWN";   break;
+        case SAIL_PIXEL_FORMAT_SOURCE:    *result = "SOURCE";    break;
+
+        case SAIL_PIXEL_FORMAT_MONO:      *result = "MONO";      break;
+        case SAIL_PIXEL_FORMAT_GRAYSCALE: *result = "GRAYSCALE"; break;
+        case SAIL_PIXEL_FORMAT_INDEXED:   *result = "INDEXED";   break;
+        case SAIL_PIXEL_FORMAT_RGB:       *result = "RGB";       break;
+        case SAIL_PIXEL_FORMAT_YCBCR:     *result = "YCbCr";     break;
+        case SAIL_PIXEL_FORMAT_CMYK:      *result = "CMYK";      break;
+        case SAIL_PIXEL_FORMAT_YCCK:      *result = "YCCK";      break;
+        case SAIL_PIXEL_FORMAT_RGBX:      *result = "RGBX";      break;
+        case SAIL_PIXEL_FORMAT_BGR:       *result = "BGR";       break;
+        case SAIL_PIXEL_FORMAT_BGRX:      *result = "BGRX";      break;
+        case SAIL_PIXEL_FORMAT_XBGR:      *result = "XBGR";      break;
+        case SAIL_PIXEL_FORMAT_XRGB:      *result = "XRGB";      break;
+        case SAIL_PIXEL_FORMAT_RGBA:      *result = "RGBA";      break;
+        case SAIL_PIXEL_FORMAT_BGRA:      *result = "BGRA";      break;
+        case SAIL_PIXEL_FORMAT_ABGR:      *result = "ABGR";      break;
+        case SAIL_PIXEL_FORMAT_ARGB:      *result = "ARGB";      break;
+        case SAIL_PIXEL_FORMAT_RGB565:    *result = "RGB565";    break;
+
+        default: return SAIL_UNSUPPORTED_PIXEL_FORMAT;
     }
 
-    SAIL_LOG_ERROR("Unsupported pixel format: #%d", pixel_format);
-    return "UNKNOWN";
+    return 0;
 }
 
-int sail_pixel_format_from_string(const char *str) {
+sail_error_t sail_pixel_format_from_string(const char *str, int *result) {
 
-    if (str == NULL) {
-        SAIL_LOG_ERROR("Pixel format in string representation is NULL");
-        return SAIL_PIXEL_FORMAT_UNKNOWN;
-    }
+    SAIL_CHECK_STRING_PTR(str);
+    SAIL_CHECK_PTR(result);
 
     if (strlen(str) == 0) {
-        return SAIL_PIXEL_FORMAT_UNKNOWN;
+        return SAIL_UNSUPPORTED_PIXEL_FORMAT;
     }
 
     if (strcmp(str, "UNKNOWN") == 0) {
-        return SAIL_PIXEL_FORMAT_UNKNOWN;
+        *result = SAIL_PIXEL_FORMAT_UNKNOWN;
     } else if (strcmp(str, "SOURCE") == 0) {
-        return SAIL_PIXEL_FORMAT_SOURCE;
+        *result = SAIL_PIXEL_FORMAT_SOURCE;
     } else if (strcmp(str, "MONO") == 0) {
-        return SAIL_PIXEL_FORMAT_MONO;
+        *result = SAIL_PIXEL_FORMAT_MONO;
     } else if (strcmp(str, "GRAYSCALE") == 0) {
-        return SAIL_PIXEL_FORMAT_GRAYSCALE;
+        *result = SAIL_PIXEL_FORMAT_GRAYSCALE;
     } else if (strcmp(str, "INDEXED") == 0) {
-        return SAIL_PIXEL_FORMAT_INDEXED;
+        *result = SAIL_PIXEL_FORMAT_INDEXED;
     } else if (strcmp(str, "RGB") == 0) {
-        return SAIL_PIXEL_FORMAT_RGB;
+        *result = SAIL_PIXEL_FORMAT_RGB;
     } else if (strcmp(str, "YCBCR") == 0) {
-        return SAIL_PIXEL_FORMAT_YCBCR;
+        *result = SAIL_PIXEL_FORMAT_YCBCR;
     } else if (strcmp(str, "CMYK") == 0) {
-        return SAIL_PIXEL_FORMAT_CMYK;
+        *result = SAIL_PIXEL_FORMAT_CMYK;
     } else if (strcmp(str, "YCCK") == 0) {
-        return SAIL_PIXEL_FORMAT_YCCK;
+        *result = SAIL_PIXEL_FORMAT_YCCK;
     } else if (strcmp(str, "RGBX") == 0) {
-        return SAIL_PIXEL_FORMAT_RGBX;
+        *result = SAIL_PIXEL_FORMAT_RGBX;
     } else if (strcmp(str, "BGR") == 0) {
-        return SAIL_PIXEL_FORMAT_BGR;
+        *result = SAIL_PIXEL_FORMAT_BGR;
     } else if (strcmp(str, "BGRX") == 0) {
-        return SAIL_PIXEL_FORMAT_BGRX;
+        *result = SAIL_PIXEL_FORMAT_BGRX;
     } else if (strcmp(str, "XBGR") == 0) {
-        return SAIL_PIXEL_FORMAT_XBGR;
+        *result = SAIL_PIXEL_FORMAT_XBGR;
     } else if (strcmp(str, "XRGB") == 0) {
-        return SAIL_PIXEL_FORMAT_XRGB;
+        *result = SAIL_PIXEL_FORMAT_XRGB;
     } else if (strcmp(str, "RGBA") == 0) {
-        return SAIL_PIXEL_FORMAT_RGBA;
+        *result = SAIL_PIXEL_FORMAT_RGBA;
     } else if (strcmp(str, "BGRA") == 0) {
-        return SAIL_PIXEL_FORMAT_BGRA;
+        *result = SAIL_PIXEL_FORMAT_BGRA;
     } else if (strcmp(str, "ABGR") == 0) {
-        return SAIL_PIXEL_FORMAT_ABGR;
+        *result = SAIL_PIXEL_FORMAT_ABGR;
     } else if (strcmp(str, "ARGB") == 0) {
-        return SAIL_PIXEL_FORMAT_ARGB;
+        *result = SAIL_PIXEL_FORMAT_ARGB;
     } else if (strcmp(str, "RGB565") == 0) {
-        return SAIL_PIXEL_FORMAT_RGB565;
+        *result = SAIL_PIXEL_FORMAT_RGB565;
+    } else {
+        return SAIL_UNSUPPORTED_PIXEL_FORMAT;
     }
 
-    SAIL_LOG_ERROR("Unsupported pixel format in string representation: '%s'", str);
-    return SAIL_PIXEL_FORMAT_UNKNOWN;
+    return 0;
 }
 
-const char* sail_image_property_to_string(int image_property) {
+sail_error_t sail_image_property_to_string(int image_property, const char **result) {
+
+    SAIL_CHECK_STRING_PTR(result);
+
     switch (image_property) {
-        case SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY: return "FLIPPED-VERTICALLY";
-        case SAIL_IMAGE_PROPERTY_INTERLACED:         return "INTERLACED";
+        case SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY: *result = "FLIPPED-VERTICALLY"; break;
+        case SAIL_IMAGE_PROPERTY_INTERLACED:         *result = "INTERLACED";         break;
+
+        default: return SAIL_UNSUPPORTED_IMAGE_PROPERTY;
     }
 
-    SAIL_LOG_ERROR("Unsupported image property: #%d", image_property);
-    return "";
+    return 0;
 }
 
-int sail_image_property_from_string(const char *str) {
+sail_error_t sail_image_property_from_string(const char *str, int *result) {
 
-    if (str == NULL) {
-        SAIL_LOG_ERROR("Image property in string representation is NULL");
-        return 0;
-    }
+    SAIL_CHECK_STRING_PTR(str);
+    SAIL_CHECK_PTR(result);
 
     if (strlen(str) == 0) {
-        return 0;
+        return SAIL_UNSUPPORTED_IMAGE_PROPERTY;
     }
 
     if (strcmp(str, "FLIPPED-VERTICALLY") == 0) {
-        return SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY;
+        *result = SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY;
     } else if (strcmp(str, "INTERLACED") == 0) {
-        return SAIL_IMAGE_PROPERTY_INTERLACED;
+        *result = SAIL_IMAGE_PROPERTY_INTERLACED;
+    } else {
+        return SAIL_UNSUPPORTED_IMAGE_PROPERTY;
     }
 
-    SAIL_LOG_ERROR("Unsupported image property in string representation: '%s'", str);
     return 0;
 }
 
-const char* sail_compression_type_to_string(int compression) {
+sail_error_t sail_compression_type_to_string(int compression, const char **result) {
+
+    SAIL_CHECK_STRING_PTR(result);
+
     switch (compression) {
-        case SAIL_COMPRESSION_RLE: return "RLE";
+        case SAIL_COMPRESSION_RLE: *result = "RLE"; break;
+
+        default: return SAIL_UNSUPPORTED_COMPRESSION_TYPE;
     }
 
-    SAIL_LOG_ERROR("Unsupported compression: #%d", compression);
-    return "";
+    return 0;
 }
 
-int sail_compression_type_from_string(const char *str) {
+sail_error_t sail_compression_type_from_string(const char *str, int *result) {
 
-    if (str == NULL) {
-        SAIL_LOG_ERROR("Compression in string representation is NULL");
-        return 0;
-    }
+    SAIL_CHECK_STRING_PTR(str);
+    SAIL_CHECK_PTR(result);
 
     if (strlen(str) == 0) {
-        return 0;
+        return SAIL_UNSUPPORTED_COMPRESSION_TYPE;
     }
 
     if (strcmp(str, "RLE") == 0) {
-        return SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY;
+        *result = SAIL_COMPRESSION_RLE;
+    } else {
+        return SAIL_UNSUPPORTED_COMPRESSION_TYPE;
     }
 
-    SAIL_LOG_ERROR("Unsupported compression in string representation: '%s'", str);
     return 0;
 }
 
-const char* sail_plugin_feature_to_string(int plugin_feature) {
+sail_error_t sail_plugin_feature_to_string(int plugin_feature, const char **result) {
+
+    SAIL_CHECK_STRING_PTR(result);
+
     switch (plugin_feature) {
-        case SAIL_PLUGIN_FEATURE_STATIC:     return "STATIC";
-        case SAIL_PLUGIN_FEATURE_ANIMATED:   return "ANIMATED";
-        case SAIL_PLUGIN_FEATURE_MULTIPAGED: return "MULTIPAGED";
-        case SAIL_PLUGIN_FEATURE_META_INFO:  return "META-INFO";
-        case SAIL_PLUGIN_FEATURE_EXIF:       return "EXIF";
-        case SAIL_PLUGIN_FEATURE_INTERLACED: return "INTERLACED";
+        case SAIL_PLUGIN_FEATURE_STATIC:     *result = "STATIC";     break;
+        case SAIL_PLUGIN_FEATURE_ANIMATED:   *result = "ANIMATED";   break;
+        case SAIL_PLUGIN_FEATURE_MULTIPAGED: *result = "MULTIPAGED"; break;
+        case SAIL_PLUGIN_FEATURE_META_INFO:  *result = "META-INFO";  break;
+        case SAIL_PLUGIN_FEATURE_EXIF:       *result = "EXIF";       break;
+        case SAIL_PLUGIN_FEATURE_INTERLACED: *result = "INTERLACED"; break;
+
+        default: return SAIL_UNSUPPORTED_PLUGIN_FEATURE;
     }
 
-    SAIL_LOG_ERROR("Unsupported plugin feature: #%d", plugin_feature);
-    return "";
+    return 0;
 }
 
-int sail_plugin_feature_from_string(const char *str) {
+sail_error_t sail_plugin_feature_from_string(const char *str, int *result) {
 
-    if (str == NULL) {
-        SAIL_LOG_ERROR("Plugin feature in string representation is NULL");
-        return 0;
-    }
+    SAIL_CHECK_STRING_PTR(str);
+    SAIL_CHECK_PTR(result);
 
     if (strlen(str) == 0) {
-        return 0;
+        return SAIL_UNSUPPORTED_PLUGIN_FEATURE;
     }
 
     if (strcmp(str, "STATIC") == 0) {
-        return SAIL_PLUGIN_FEATURE_STATIC;
+        *result = SAIL_PLUGIN_FEATURE_STATIC;
     } else if (strcmp(str, "ANIMATED") == 0) {
-        return SAIL_PLUGIN_FEATURE_ANIMATED;
+        *result = SAIL_PLUGIN_FEATURE_ANIMATED;
     } else if (strcmp(str, "MULTIPAGED") == 0) {
-        return SAIL_PLUGIN_FEATURE_MULTIPAGED;
+        *result = SAIL_PLUGIN_FEATURE_MULTIPAGED;
     } else if (strcmp(str, "META-INFO") == 0) {
-        return SAIL_PLUGIN_FEATURE_META_INFO;
+        *result = SAIL_PLUGIN_FEATURE_META_INFO;
     } else if (strcmp(str, "EXIF") == 0) {
-        return SAIL_PLUGIN_FEATURE_EXIF;
+        *result = SAIL_PLUGIN_FEATURE_EXIF;
     } else if (strcmp(str, "INTERLACED") == 0) {
-        return SAIL_PLUGIN_FEATURE_INTERLACED;
+        *result = SAIL_PLUGIN_FEATURE_INTERLACED;
+    } else {
+        return SAIL_UNSUPPORTED_PLUGIN_FEATURE;
     }
 
-    SAIL_LOG_ERROR("Unsupported plugin feature in string representation: '%s'", str);
     return 0;
 }
 
@@ -356,33 +368,35 @@ sail_error_t sail_bits_per_pixel(int pixel_format, int *result) {
     SAIL_CHECK_PTR(result);
 
     switch (pixel_format) {
-        case SAIL_PIXEL_FORMAT_UNKNOWN:   *result = 0; return 0;
-        case SAIL_PIXEL_FORMAT_SOURCE:    *result = 0; return 0;
+        case SAIL_PIXEL_FORMAT_UNKNOWN:   *result = 0;  break;
+        case SAIL_PIXEL_FORMAT_SOURCE:    *result = 0;  break;
 
-        case SAIL_PIXEL_FORMAT_MONO:      *result = 1; return 0;
+        case SAIL_PIXEL_FORMAT_MONO:      *result = 1;  break;
 
-        case SAIL_PIXEL_FORMAT_GRAYSCALE: *result = 8; return 0;
-        case SAIL_PIXEL_FORMAT_INDEXED:   *result = 8; return 0;
+        case SAIL_PIXEL_FORMAT_GRAYSCALE: *result = 8;  break;
+        case SAIL_PIXEL_FORMAT_INDEXED:   *result = 8;  break;
 
-        case SAIL_PIXEL_FORMAT_RGB565:    *result = 16; return 0;
+        case SAIL_PIXEL_FORMAT_RGB565:    *result = 16; break;
 
-        case SAIL_PIXEL_FORMAT_RGB:       *result = 24; return 0;
-        case SAIL_PIXEL_FORMAT_YCBCR:     *result = 24; return 0;
-        case SAIL_PIXEL_FORMAT_BGR:       *result = 24; return 0;
+        case SAIL_PIXEL_FORMAT_RGB:       *result = 24; break;
+        case SAIL_PIXEL_FORMAT_YCBCR:     *result = 24; break;
+        case SAIL_PIXEL_FORMAT_BGR:       *result = 24; break;
 
-        case SAIL_PIXEL_FORMAT_CMYK:      *result = 32; return 0;
-        case SAIL_PIXEL_FORMAT_YCCK:      *result = 32; return 0;
-        case SAIL_PIXEL_FORMAT_RGBX:      *result = 32; return 0;
-        case SAIL_PIXEL_FORMAT_BGRX:      *result = 32; return 0;
-        case SAIL_PIXEL_FORMAT_XBGR:      *result = 32; return 0;
-        case SAIL_PIXEL_FORMAT_XRGB:      *result = 32; return 0;
-        case SAIL_PIXEL_FORMAT_RGBA:      *result = 32; return 0;
-        case SAIL_PIXEL_FORMAT_BGRA:      *result = 32; return 0;
-        case SAIL_PIXEL_FORMAT_ABGR:      *result = 32; return 0;
-        case SAIL_PIXEL_FORMAT_ARGB:      *result = 32; return 0;
+        case SAIL_PIXEL_FORMAT_CMYK:      *result = 32; break;
+        case SAIL_PIXEL_FORMAT_YCCK:      *result = 32; break;
+        case SAIL_PIXEL_FORMAT_RGBX:      *result = 32; break;
+        case SAIL_PIXEL_FORMAT_BGRX:      *result = 32; break;
+        case SAIL_PIXEL_FORMAT_XBGR:      *result = 32; break;
+        case SAIL_PIXEL_FORMAT_XRGB:      *result = 32; break;
+        case SAIL_PIXEL_FORMAT_RGBA:      *result = 32; break;
+        case SAIL_PIXEL_FORMAT_BGRA:      *result = 32; break;
+        case SAIL_PIXEL_FORMAT_ABGR:      *result = 32; break;
+        case SAIL_PIXEL_FORMAT_ARGB:      *result = 32; break;
+
+        default: return SAIL_UNSUPPORTED_PIXEL_FORMAT;
     }
 
-    return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+    return 0;
 }
 
 sail_error_t sail_bytes_per_line(const struct sail_image *image, int *result) {

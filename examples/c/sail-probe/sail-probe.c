@@ -94,7 +94,9 @@ static sail_error_t probe(const char *path, struct sail_context *context) {
     printf("\n");
 
     printf("Size          : %dx%d\n", image->width, image->height);
-    printf("Color         : %s\n", sail_pixel_format_to_string(image->source_pixel_format));
+    const char *pixel_format_str;
+    SAIL_TRY(sail_pixel_format_to_string(image->source_pixel_format, &pixel_format_str));
+    printf("Color         : %s\n", pixel_format_str);
 
     struct sail_meta_entry_node *node = image->meta_entry_node;
 

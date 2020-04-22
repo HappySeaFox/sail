@@ -139,12 +139,18 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
         meta = tr("%1: %2").arg(node->key).arg(node->value);
     }
 
+    const char *source_pixel_format_str;
+    const char *pixel_format_str;
+
+    SAIL_TRY(sail_pixel_format_to_string(image->source_pixel_format, &source_pixel_format_str));
+    SAIL_TRY(sail_pixel_format_to_string(image->pixel_format, &pixel_format_str));
+
     d->ui->labelStatus->setText(tr("%1  [%2x%3]  [%4 -> %5]  %6")
                                 .arg(QFileInfo(path).fileName())
                                 .arg(image->width)
                                 .arg(image->height)
-                                .arg(sail_pixel_format_to_string(image->source_pixel_format))
-                                .arg(sail_pixel_format_to_string(image->pixel_format))
+                                .arg(source_pixel_format_str)
+                                .arg(pixel_format_str)
                                 .arg(meta)
                                 );
 
@@ -310,8 +316,11 @@ sail_error_t QtSail::saveImageImpl(const QString &path, sail_write_options **wri
         image->meta_entry_node = meta_entry_node;
     }
 
+    const char *pixel_format_str;
+    SAIL_TRY(sail_pixel_format_to_string((*write_options)->pixel_format, &pixel_format_str));
+
     SAIL_LOG_DEBUG("Image size: %dx%d", image->width, image->height);
-    SAIL_LOG_DEBUG("Output pixel format: %s", sail_pixel_format_to_string((*write_options)->pixel_format));
+    SAIL_LOG_DEBUG("Output pixel format: %s", pixel_format_str);
 
     // Seek and write the next image frame into the file.
     //
@@ -399,12 +408,12 @@ void QtSail::onOpenFile()
     }
 }
 
-void QtSail::onProbe()
+sail_error_t QtSail::onProbe()
 {
     const QString path = QFileDialog::getOpenFileName(this, tr("Select a file"));
 
     if (path.isEmpty()) {
-        return;
+        return 0;
     }
 
     QElapsedTimer elapsed;
@@ -417,10 +426,16 @@ void QtSail::onProbe()
 
     if ((res = sail_probe(path.toLocal8Bit(), d->context, &image, &plugin_info)) != 0) {
         QMessageBox::critical(this, tr("Error"), tr("Failed to probe the image. Error: %1").arg(res));
-        return;
+        return res;
     }
 
     pluginInfo(plugin_info);
+
+    const char *source_pixel_format_str;
+    const char *pixel_format_str;
+
+    SAIL_TRY(sail_pixel_format_to_string(image->source_pixel_format, &source_pixel_format_str));
+    SAIL_TRY(sail_pixel_format_to_string(image->pixel_format, &pixel_format_str));
 
     QMessageBox::information(this,
                              tr("File info"),
@@ -429,11 +444,13 @@ void QtSail::onProbe()
                                 .arg(plugin_info->description)
                                 .arg(image->width)
                                 .arg(image->height)
-                                .arg(sail_pixel_format_to_string(image->source_pixel_format))
-                                .arg(sail_pixel_format_to_string(image->pixel_format))
+                                .arg(source_pixel_format_str)
+                                .arg(pixel_format_str)
                              );
 
     sail_destroy_image(image);
+
+    return 0;
 }
 
 void QtSail::onSave()

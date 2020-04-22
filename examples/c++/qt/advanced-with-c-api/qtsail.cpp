@@ -121,12 +121,18 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
                      image->bytes_per_line,
                      sailPixelFormatToQImageFormat(image->pixel_format)).copy();
 
+    const char *source_pixel_format_str;
+    const char *pixel_format_str;
+
+    SAIL_TRY(sail_pixel_format_to_string(image->source_pixel_format, &source_pixel_format_str));
+    SAIL_TRY(sail_pixel_format_to_string(image->pixel_format, &pixel_format_str));
+
     d->ui->labelStatus->setText(tr("%1  [%2x%3]  [%4 -> %5]")
                                 .arg(QFileInfo(path).fileName())
                                 .arg(image->width)
                                 .arg(image->height)
-                                .arg(sail_pixel_format_to_string(image->source_pixel_format))
-                                .arg(sail_pixel_format_to_string(image->pixel_format))
+                                .arg(source_pixel_format_str)
+                                .arg(pixel_format_str)
                                 );
 
     free(image_bits);
@@ -234,12 +240,12 @@ void QtSail::onOpenFile()
     }
 }
 
-void QtSail::onProbe()
+sail_error_t QtSail::onProbe()
 {
     const QString path = QFileDialog::getOpenFileName(this, tr("Select a file"));
 
     if (path.isEmpty()) {
-        return;
+        return 0;
     }
 
     QElapsedTimer elapsedTimer;
@@ -252,8 +258,14 @@ void QtSail::onProbe()
 
     if ((res = sail_probe(path.toLocal8Bit(), d->context, &image, &plugin_info)) != 0) {
         QMessageBox::critical(this, tr("Error"), tr("Failed to probe the image. Error: %1").arg(res));
-        return;
+        return res;
     }
+
+    const char *source_pixel_format_str;
+    const char *pixel_format_str;
+
+    SAIL_TRY(sail_pixel_format_to_string(image->source_pixel_format, &source_pixel_format_str));
+    SAIL_TRY(sail_pixel_format_to_string(image->pixel_format, &pixel_format_str));
 
     QMessageBox::information(this,
                              tr("File info"),
@@ -262,8 +274,8 @@ void QtSail::onProbe()
                                 .arg(plugin_info->description)
                                 .arg(image->width)
                                 .arg(image->height)
-                                .arg(sail_pixel_format_to_string(image->source_pixel_format))
-                                .arg(sail_pixel_format_to_string(image->pixel_format))
+                                .arg(source_pixel_format_str)
+                                .arg(pixel_format_str)
                              );
 
     sail_destroy_image(image);

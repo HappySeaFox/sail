@@ -44,6 +44,25 @@ WriteOptions::WriteOptions(const QString &codecDescription, const sail_write_fea
 
     d->ui->labelCodec->setText(codecDescription);
 
+    init(write_features);
+}
+
+WriteOptions::~WriteOptions()
+{
+}
+
+int WriteOptions::pixelFormat() const
+{
+    return d->ui->comboColor->currentData().toInt();
+}
+
+int WriteOptions::compression() const
+{
+    return d->ui->sliderCompression->isEnabled() ? d->ui->sliderCompression->value() : -1;
+}
+
+sail_error_t WriteOptions::init(const sail_write_features *write_features)
+{
     if (write_features->output_pixel_formats_length == 0) {
         d->ui->labelColor->setText(tr("Output color selection is not available"));
         d->ui->labelColor->setEnabled(false);
@@ -51,12 +70,17 @@ WriteOptions::WriteOptions(const QString &codecDescription, const sail_write_fea
     } else {
         d->ui->labelColor->setText(tr("Output color:"));
 
+        const char *output_pixel_format_str;
+
         for (int i = 0; i < write_features->output_pixel_formats_length; i++) {
-            d->ui->comboColor->addItem(sail_pixel_format_to_string(write_features->output_pixel_formats[i]),
-                                       /* user data */write_features->output_pixel_formats[i]);
+            SAIL_TRY(sail_pixel_format_to_string(write_features->output_pixel_formats[i], &output_pixel_format_str));
+
+            d->ui->comboColor->addItem(output_pixel_format_str,
+                                       /* user data */ write_features->output_pixel_formats[i]);
         }
 
-        d->ui->comboColor->setCurrentText(sail_pixel_format_to_string(write_features->preferred_output_pixel_format));
+        SAIL_TRY(sail_pixel_format_to_string(write_features->preferred_output_pixel_format, &output_pixel_format_str));
+        d->ui->comboColor->setCurrentText(output_pixel_format_str);
     }
 
     if (write_features->compression_min == 0 && write_features->compression_max == 0) {
@@ -74,18 +98,4 @@ WriteOptions::WriteOptions(const QString &codecDescription, const sail_write_fea
             d->ui->labelCompressionValue->setNum(value);
         });
     }
-}
-
-WriteOptions::~WriteOptions()
-{
-}
-
-int WriteOptions::pixelFormat() const
-{
-    return d->ui->comboColor->currentData().toInt();
-}
-
-int WriteOptions::compression() const
-{
-    return d->ui->sliderCompression->isEnabled() ? d->ui->sliderCompression->value() : -1;
 }

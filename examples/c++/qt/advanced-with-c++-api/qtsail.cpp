@@ -125,12 +125,18 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
                      image->bytes_per_line(),
                      sailPixelFormatToQImageFormat(image->pixel_format())).copy();
 
+    const char *source_pixel_format_str;
+    const char *pixel_format_str;
+
+    SAIL_TRY(sail_pixel_format_to_string(image->source_pixel_format(), &source_pixel_format_str));
+    SAIL_TRY(sail_pixel_format_to_string(image->pixel_format(), &pixel_format_str));
+
     d->ui->labelStatus->setText(tr("%1  [%2x%3]  [%4 -> %5]")
                                 .arg(QFileInfo(path).fileName())
                                 .arg(image->width())
                                 .arg(image->height())
-                                .arg(sail_pixel_format_to_string(image->source_pixel_format()))
-                                .arg(sail_pixel_format_to_string(image->pixel_format()))
+                                .arg(source_pixel_format_str)
+                                .arg(pixel_format_str)
                                 );
 
     return 0;
@@ -154,14 +160,15 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
     sail::image_writer writer(&d->context);
     sail::image image;
 
-    int bytes_per_line;
-    SAIL_TRY(sail::image::bytes_per_line(image, &bytes_per_line));
-
     image.with_width(qimage.width())
          .with_height(qimage.height())
          .with_pixel_format(qImageFormatToSailPixelFormat(qimage.format()))
-         .with_bytes_per_line(bytes_per_line)
          .with_shallow_bits(qimage.bits());
+
+    int bytes_per_line;
+    SAIL_TRY(sail::image::bytes_per_line(image, &bytes_per_line));
+
+    image.with_bytes_per_line(bytes_per_line);
 
     SAIL_TRY(writer.start_writing(path.toLocal8Bit().constData()));
     SAIL_TRY(writer.write_next_frame(&image));
@@ -215,12 +222,12 @@ void QtSail::onOpenFile()
     }
 }
 
-void QtSail::onProbe()
+sail_error_t QtSail::onProbe()
 {
     const QString path = QFileDialog::getOpenFileName(this, tr("Select a file"));
 
     if (path.isEmpty()) {
-        return;
+        return 0;
     }
 
     QElapsedTimer elapsedTimer;
@@ -241,8 +248,14 @@ void QtSail::onProbe()
 
     if ((res = reader.probe(path.toLocal8Bit().constData(), &image, &plugin_info)) != 0) {
         QMessageBox::critical(this, tr("Error"), tr("Failed to probe the image. Error: %1").arg(res));
-        return;
+        return res;
     }
+
+    const char *source_pixel_format_str;
+    const char *pixel_format_str;
+
+    SAIL_TRY(sail_pixel_format_to_string(image->source_pixel_format(), &source_pixel_format_str));
+    SAIL_TRY(sail_pixel_format_to_string(image->pixel_format(), &pixel_format_str));
 
     QMessageBox::information(this,
                              tr("File info"),
@@ -251,9 +264,11 @@ void QtSail::onProbe()
                                 .arg(plugin_info->description().c_str())
                                 .arg(image->width())
                                 .arg(image->height())
-                                .arg(sail_pixel_format_to_string(image->source_pixel_format()))
-                                .arg(sail_pixel_format_to_string(image->pixel_format()))
+                                .arg(source_pixel_format_str)
+                                .arg(pixel_format_str)
                              );
+
+    return 0;
 }
 
 void QtSail::onSave()
