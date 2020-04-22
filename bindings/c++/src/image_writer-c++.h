@@ -35,6 +35,7 @@ namespace sail
 class context;
 class image;
 class plugin_info;
+class write_options;
 
 /*
  * A C++ interface to the SAIL image writing functions.
@@ -58,6 +59,12 @@ public:
      */
     sail_error_t start_writing(const std::string &path, const plugin_info *splugin_info = nullptr);
     sail_error_t start_writing(const char *path, const plugin_info *splugin_info = nullptr);
+
+    /*
+     * An interface to sail_start_writing_with_options(). See sail_start_writing_with_options() for more.
+     */
+    sail_error_t start_writing(const std::string &path, const plugin_info *splugin_info, const write_options &swrite_options);
+    sail_error_t start_writing(const char *path, const plugin_info *splugin_info, const write_options &swrite_options);
 
     /*
      * An interface to sail_write_next_frame(). See sail_write_next_frame() for more.

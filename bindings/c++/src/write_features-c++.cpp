@@ -124,7 +124,14 @@ write_features& write_features::operator=(const write_features &wf)
     with_input_pixel_formats(wf.input_pixel_formats())
         .with_output_pixel_formats(wf.output_pixel_formats())
         .with_preferred_output_pixel_format(wf.preferred_output_pixel_format())
-        .with_features(wf.features());
+        .with_features(wf.features())
+        .with_properties(wf.properties())
+        .with_passes(wf.passes())
+        .with_compression_types(compression_types())
+        .with_preferred_compression_type(wf.preferred_compression_type())
+        .with_compression_min(wf.compression_min())
+        .with_compression_max(wf.compression_max())
+        .with_compression_default(wf.compression_default());
 
     return *this;
 }

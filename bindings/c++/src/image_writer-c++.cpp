@@ -104,6 +104,30 @@ sail_error_t image_writer::start_writing(const char *path, const plugin_info *sp
     return 0;
 }
 
+sail_error_t image_writer::start_writing(const std::string &path, const plugin_info *splugin_info, const write_options &swrite_options)
+{
+    SAIL_TRY(start_writing(path.c_str(), splugin_info, swrite_options));
+
+    return 0;
+}
+
+sail_error_t image_writer::start_writing(const char *path, const plugin_info *splugin_info, const write_options &swrite_options)
+{
+    SAIL_CHECK_PATH_PTR(path);
+
+    const sail_plugin_info *sail_plugin_info = splugin_info == nullptr ? nullptr : splugin_info->sail_plugin_info_c();
+    sail_write_options *sail_write_options = nullptr;
+
+    SAIL_AT_SCOPE_EXIT (
+        sail_destroy_write_options(sail_write_options);
+    );
+
+    SAIL_TRY(swrite_options.to_sail_write_options(&sail_write_options));
+    SAIL_TRY(sail_start_writing_with_options(path, d->ctx->sail_context_c(), sail_plugin_info, sail_write_options, &d->pmpl));
+
+    return 0;
+}
+
 sail_error_t image_writer::write_next_frame(const image *simage)
 {
     sail_image *image = nullptr;
