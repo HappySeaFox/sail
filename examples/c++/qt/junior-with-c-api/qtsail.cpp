@@ -110,8 +110,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     SAIL_TRY_OR_CLEANUP(sail_read(path.toLocal8Bit(),
                        d->context,
                        &image,
-                       reinterpret_cast<void **>(&image_bits),
-                       nullptr),
+                       reinterpret_cast<void **>(&image_bits)),
                        /* cleanup */ free(image_bits),
                                      sail_destroy_image(image));
 
@@ -160,8 +159,7 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
     SAIL_TRY_OR_CLEANUP(sail_write(path.toLocal8Bit(),
                         d->context,
                         image,
-                        reinterpret_cast<const void *>(qimage.bits()),
-                        nullptr),
+                        reinterpret_cast<const void *>(qimage.bits())),
                         /* cleanup */ sail_destroy_image(image));
 
     sail_destroy_image(image);
