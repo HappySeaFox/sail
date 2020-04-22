@@ -120,13 +120,14 @@ SAIL_EXPORT const char* sail_plugin_feature_to_string(int plugin_feature);
 SAIL_EXPORT int sail_plugin_feature_from_string(const char *str);
 
 /*
- * Returns a number of bits a pixel in the specified pixel format occupies.
- * For example, for SAIL_PIXEL_FORMAT_RGB 24 is returned.
+ * Calculates a number of bits per pixel in the specified pixel format.
+ * For example, for SAIL_PIXEL_FORMAT_RGB 24 is assigned.
  */
-SAIL_EXPORT int sail_bits_per_pixel(int pixel_format);
+SAIL_EXPORT sail_error_t sail_bits_per_pixel(int pixel_format, int *result);
 
 /*
- * Calculates bytes per line.
+ * Calculates a number of bytes per line needed to hold a scan line without padding.
+ * 'width' and 'pixel_format' fields are used to calculate a result.
  *
  * For example:
  *   - 12 pixels * 1 bits per pixel / 8 + 1 ==
@@ -142,13 +143,14 @@ SAIL_EXPORT int sail_bits_per_pixel(int pixel_format);
  *     24 + 0                                ==
  *     24 bytes per line
  */
-SAIL_EXPORT int sail_bytes_per_line(int width, int pixel_format);
+SAIL_EXPORT sail_error_t sail_bytes_per_line(const struct sail_image *image, int *result);
 
 
 /*
- * Calculates bytes per image. It's effectively bytes per line * image height.
+ * Calculates a number of bytes needed to hold an entire image in memory without padding.
+ * It's effectively bytes per line * image height.
  */
-SAIL_EXPORT int sail_bytes_per_image(const struct sail_image *image);
+SAIL_EXPORT sail_error_t sail_bytes_per_image(const struct sail_image *image, int *result);
 
 /* extern "C" */
 #ifdef __cplusplus

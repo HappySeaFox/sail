@@ -427,9 +427,12 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v2(struct sail_file *
         return SAIL_UNDERLYING_CODEC_ERROR;
     }
 
+    int bits_per_pixel;
+    SAIL_TRY(sail_bits_per_pixel(image->pixel_format, &bits_per_pixel));
+
     pimpl->compress_context.image_width = image->width;
     pimpl->compress_context.image_height = image->height;
-    pimpl->compress_context.input_components = sail_bits_per_pixel(image->pixel_format) / 8;
+    pimpl->compress_context.input_components = bits_per_pixel / 8;
     pimpl->compress_context.in_color_space = pixel_format_to_color_space(image->pixel_format);
 
     jpeg_set_defaults(&pimpl->compress_context);

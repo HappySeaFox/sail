@@ -54,6 +54,8 @@ public:
 
     sail_error_t to_sail_image(sail_image **image) const;
 
+    static sail_error_t bytes_per_line(const image &simage, int *result);
+
     int width() const;
     int height() const;
     int bytes_per_line() const;

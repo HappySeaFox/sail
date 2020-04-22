@@ -114,8 +114,9 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     sail_image *image = nullptr;
     uchar *image_bits = nullptr;
     void *pimpl = nullptr;
+    int bytes_per_line;
 
-    SAIL_TRY_OR_CLEANUP(loadImageImpl(path, &read_options, &pimpl, &image, &image_bits),
+    SAIL_TRY_OR_CLEANUP(loadImageImpl(path, &read_options, &pimpl, &image, &image_bits, &bytes_per_line),
                         /* cleanup */ free(image_bits),
                                       sail_stop_reading(pimpl),
                                       sail_destroy_read_options(read_options),
@@ -128,7 +129,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     *qimage = QImage(image_bits,
                      image->width,
                      image->height,
-                     sail_bytes_per_line(image->width, image->pixel_format),
+                     bytes_per_line,
                      qimageFormat).copy();
 
     QString meta;
@@ -159,7 +160,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 }
 
 sail_error_t QtSail::loadImageImpl(const QString &path, sail_read_options **read_options, void **pimpl,
-                                   sail_image **image, uchar **image_bits)
+                                   sail_image **image, uchar **image_bits, int *bytes_per_line)
 {
     // Time counter.
     //
@@ -208,6 +209,8 @@ sail_error_t QtSail::loadImageImpl(const QString &path, sail_read_options **read
     //
     SAIL_TRY(sail_stop_reading(*pimpl));
 
+    SAIL_TRY(sail_bytes_per_line(*image, bytes_per_line));
+
     SAIL_LOG_INFO("Loaded in %lld ms.", elapsed.elapsed() + beforeDialog);
 
     return 0;
@@ -239,7 +242,7 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
     image->width = qimage.width();
     image->height = qimage.height();
     image->pixel_format = qImageFormatToSailPixelFormat(qimage.format());
-    image->bytes_per_line = sail_bytes_per_line(image->width, image->pixel_format);
+    SAIL_TRY(sail_bytes_per_line(image, &image->bytes_per_line));
 
     if (image->pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN) {
         sail_destroy_image(image);

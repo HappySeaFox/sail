@@ -787,7 +787,8 @@ sail_error_t sail_write_next_frame(void *pimpl, const struct sail_image *image, 
         passes = 1;
     }
 
-    const int bytes_per_line = sail_bytes_per_line(image->width, image->pixel_format);
+    int bytes_per_line;
+    SAIL_TRY(sail_bytes_per_line(image, &bytes_per_line));
 
     if (plugin->layout == SAIL_PLUGIN_LAYOUT_V2) {
         SAIL_TRY(plugin->v2->write_seek_next_frame_v2(file, image));

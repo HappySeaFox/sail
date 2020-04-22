@@ -351,49 +351,64 @@ int sail_plugin_feature_from_string(const char *str) {
     return 0;
 }
 
-int sail_bits_per_pixel(int pixel_format) {
+sail_error_t sail_bits_per_pixel(int pixel_format, int *result) {
+
+    SAIL_CHECK_PTR(result);
+
     switch (pixel_format) {
-        case SAIL_PIXEL_FORMAT_UNKNOWN:   return 0;
-        case SAIL_PIXEL_FORMAT_SOURCE:    return 0;
+        case SAIL_PIXEL_FORMAT_UNKNOWN:   *result = 0; return 0;
+        case SAIL_PIXEL_FORMAT_SOURCE:    *result = 0; return 0;
 
-        case SAIL_PIXEL_FORMAT_MONO:      return 1;
+        case SAIL_PIXEL_FORMAT_MONO:      *result = 1; return 0;
 
-        case SAIL_PIXEL_FORMAT_GRAYSCALE: return 8;
-        case SAIL_PIXEL_FORMAT_INDEXED:   return 8;
+        case SAIL_PIXEL_FORMAT_GRAYSCALE: *result = 8; return 0;
+        case SAIL_PIXEL_FORMAT_INDEXED:   *result = 8; return 0;
 
-        case SAIL_PIXEL_FORMAT_RGB565:    return 16;
+        case SAIL_PIXEL_FORMAT_RGB565:    *result = 16; return 0;
 
-        case SAIL_PIXEL_FORMAT_RGB:       return 24;
-        case SAIL_PIXEL_FORMAT_YCBCR:     return 24;
-        case SAIL_PIXEL_FORMAT_BGR:       return 24;
+        case SAIL_PIXEL_FORMAT_RGB:       *result = 24; return 0;
+        case SAIL_PIXEL_FORMAT_YCBCR:     *result = 24; return 0;
+        case SAIL_PIXEL_FORMAT_BGR:       *result = 24; return 0;
 
-        case SAIL_PIXEL_FORMAT_CMYK:      return 32;
-        case SAIL_PIXEL_FORMAT_YCCK:      return 32;
-        case SAIL_PIXEL_FORMAT_RGBX:      return 32;
-        case SAIL_PIXEL_FORMAT_BGRX:      return 32;
-        case SAIL_PIXEL_FORMAT_XBGR:      return 32;
-        case SAIL_PIXEL_FORMAT_XRGB:      return 32;
-        case SAIL_PIXEL_FORMAT_RGBA:      return 32;
-        case SAIL_PIXEL_FORMAT_BGRA:      return 32;
-        case SAIL_PIXEL_FORMAT_ABGR:      return 32;
-        case SAIL_PIXEL_FORMAT_ARGB:      return 32;
+        case SAIL_PIXEL_FORMAT_CMYK:      *result = 32; return 0;
+        case SAIL_PIXEL_FORMAT_YCCK:      *result = 32; return 0;
+        case SAIL_PIXEL_FORMAT_RGBX:      *result = 32; return 0;
+        case SAIL_PIXEL_FORMAT_BGRX:      *result = 32; return 0;
+        case SAIL_PIXEL_FORMAT_XBGR:      *result = 32; return 0;
+        case SAIL_PIXEL_FORMAT_XRGB:      *result = 32; return 0;
+        case SAIL_PIXEL_FORMAT_RGBA:      *result = 32; return 0;
+        case SAIL_PIXEL_FORMAT_BGRA:      *result = 32; return 0;
+        case SAIL_PIXEL_FORMAT_ABGR:      *result = 32; return 0;
+        case SAIL_PIXEL_FORMAT_ARGB:      *result = 32; return 0;
     }
+
+    return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+}
+
+sail_error_t sail_bytes_per_line(const struct sail_image *image, int *result) {
+
+    SAIL_CHECK_IMAGE_PTR(image);
+    SAIL_CHECK_PTR(result);
+
+    int bits_per_pixel;
+    SAIL_TRY(sail_bits_per_pixel(image->pixel_format, &bits_per_pixel));
+
+    const int add = bits_per_pixel % 8 == 0 ? 0 : 1;
+
+    *result = (int)(((double)image->width * bits_per_pixel / 8) + add);
 
     return 0;
 }
 
-int sail_bytes_per_line(int width, int pixel_format) {
+sail_error_t sail_bytes_per_image(const struct sail_image *image, int *result) {
 
-    const int bits_per_pixel = sail_bits_per_pixel(pixel_format);
+    SAIL_CHECK_IMAGE_PTR(image);
+    SAIL_CHECK_PTR(result);
 
-    const int add = bits_per_pixel % 8 == 0 ? 0 : 1;
+    int bytes_per_line;
+    SAIL_TRY(sail_bytes_per_line(image, &bytes_per_line));
 
-    return (int)(((double)width * bits_per_pixel / 8) + add);
-}
+    *result = bytes_per_line * image->height;
 
-int sail_bytes_per_image(const struct sail_image *image) {
-
-    SAIL_CHECK_IMAGE(image);
-
-    return sail_bytes_per_line(image->width, image->pixel_format) * image->height;
+    return 0;
 }

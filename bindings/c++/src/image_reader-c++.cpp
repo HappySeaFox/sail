@@ -130,7 +130,10 @@ sail_error_t image_reader::read(const char *path, image **simage)
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
-    (*simage)->with_bits(image_bits, sail_bytes_per_image(sail_image));
+    int bytes_per_image;
+    SAIL_TRY(sail_bytes_per_image(sail_image, &bytes_per_image));
+
+    (*simage)->with_bits(image_bits, bytes_per_image);
 
     return 0;
 }
@@ -197,7 +200,10 @@ sail_error_t image_reader::read_next_frame(image **simage)
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
-    (*simage)->with_bits(image_bits, sail_bytes_per_image(sail_image));
+    int bytes_per_image;
+    SAIL_TRY(sail_bytes_per_image(sail_image, &bytes_per_image));
+
+    (*simage)->with_bits(image_bits, bytes_per_image);
 
     return 0;
 }
