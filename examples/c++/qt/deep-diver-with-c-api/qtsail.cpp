@@ -192,10 +192,10 @@ sail_error_t QtSail::loadImageImpl(const QString &path, sail_read_options **read
     ReadOptions readOptions(QString::fromUtf8(plugin_info->description), plugin_info->read_features, this);
 
     if (readOptions.exec() == QDialog::Accepted) {
-        (*read_options)->pixel_format = readOptions.pixelFormat();
+        (*read_options)->output_pixel_format = readOptions.pixelFormat();
     }
 
-    const QImage::Format qimageFormat = sailPixelFormatToQImageFormat((*read_options)->pixel_format);
+    const QImage::Format qimageFormat = sailPixelFormatToQImageFormat((*read_options)->output_pixel_format);
 
     if (qimageFormat == QImage::Format_Invalid) {
         return SAIL_UNSUPPORTED_PIXEL_FORMAT;
@@ -294,7 +294,7 @@ sail_error_t QtSail::saveImageImpl(const QString &path, sail_write_options **wri
     WriteOptions writeOptions(QString::fromUtf8(plugin_info->description), plugin_info->write_features, this);
 
     if (writeOptions.exec() == QDialog::Accepted) {
-        (*write_options)->pixel_format = writeOptions.pixelFormat();
+        (*write_options)->output_pixel_format = writeOptions.pixelFormat();
         (*write_options)->compression = writeOptions.compression();
     }
 
@@ -317,7 +317,7 @@ sail_error_t QtSail::saveImageImpl(const QString &path, sail_write_options **wri
     }
 
     const char *pixel_format_str;
-    SAIL_TRY(sail_pixel_format_to_string((*write_options)->pixel_format, &pixel_format_str));
+    SAIL_TRY(sail_pixel_format_to_string((*write_options)->output_pixel_format, &pixel_format_str));
 
     SAIL_LOG_DEBUG("Image size: %dx%d", image->width, image->height);
     SAIL_LOG_DEBUG("Output pixel format: %s", pixel_format_str);
