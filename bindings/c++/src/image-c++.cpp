@@ -338,6 +338,14 @@ image& image::with_bytes_per_line(int bytes_per_line)
     return *this;
 }
 
+image& image::with_bytes_per_line_auto()
+{
+    int bytes_per_line = 0;
+    image::bytes_per_line(*this, &bytes_per_line);
+
+    return with_bytes_per_line(bytes_per_line);
+}
+
 image& image::with_pixel_format(int pixel_format)
 {
     d->pixel_format = pixel_format;

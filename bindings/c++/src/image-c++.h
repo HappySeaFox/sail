@@ -78,6 +78,7 @@ public:
     image& with_width(int width);
     image& with_height(int height);
     image& with_bytes_per_line(int bytes_per_line);
+    image& with_bytes_per_line_auto();
     image& with_pixel_format(int pixel_format);
     image& with_passes(int passes);
     image& with_animated(bool animated);
