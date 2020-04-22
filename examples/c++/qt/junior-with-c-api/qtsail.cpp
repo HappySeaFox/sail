@@ -65,7 +65,6 @@ QtSail::QtSail(QWidget *parent)
 
     connect(d->ui->pushOpen,  &QPushButton::clicked, this, &QtSail::onOpenFile);
     connect(d->ui->pushSave,  &QPushButton::clicked, this, &QtSail::onSave);
-    connect(d->ui->checkFit,  &QCheckBox::toggled,   this, &QtSail::onFit);
 
     d->ui->pushOpen->setShortcut(QKeySequence::Open);
     d->ui->pushOpen->setToolTip(d->ui->pushOpen->shortcut().toString());
@@ -206,7 +205,7 @@ void QtSail::onOpenFile()
     sail_error_t res;
 
     if ((res = loadImage(path, &d->qimage)) == 0) {
-        onFit(d->ui->checkFit->isChecked());
+        fit();
     } else {
         QMessageBox::critical(this, tr("Error"), tr("Failed to load '%1'. Error: %2.")
                               .arg(path)
@@ -238,19 +237,15 @@ void QtSail::onSave()
     QMessageBox::information(this, tr("Success"), tr("%1 has been saved succesfully.").arg(path));
 }
 
-void QtSail::onFit(bool fit)
+void QtSail::fit()
 {
     QPixmap pixmap;
 
-    if (fit) {
-        if (d->qimage.width() > d->ui->scrollArea->viewport()->width() ||
-                d->qimage.height() > d->ui->scrollArea->viewport()->height()) {
-            pixmap = QPixmap::fromImage(d->qimage.scaled(d->ui->scrollArea->viewport()->size(),
-                                                         Qt::KeepAspectRatio,
-                                                         Qt::SmoothTransformation));
-        } else {
-            pixmap =  QPixmap::fromImage(d->qimage);
-        }
+    if (d->qimage.width() > d->ui->scrollArea->viewport()->width() ||
+            d->qimage.height() > d->ui->scrollArea->viewport()->height()) {
+        pixmap = QPixmap::fromImage(d->qimage.scaled(d->ui->scrollArea->viewport()->size(),
+                                                     Qt::KeepAspectRatio,
+                                                     Qt::SmoothTransformation));
     } else {
         pixmap =  QPixmap::fromImage(d->qimage);
     }

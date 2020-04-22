@@ -49,7 +49,9 @@ private:
 private: // slots
     void onOpenFile();
     void onSave();
-    void onFit(bool fit);
+
+private:
+    void fit();
 
 private:
     class Private;

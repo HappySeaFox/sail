@@ -31,16 +31,6 @@
       </widget>
      </item>
      <item>
-      <widget class="QCheckBox" name="checkFit">
-       <property name="text">
-        <string>Fit large</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -97,7 +87,6 @@
   <tabstop>scrollArea</tabstop>
   <tabstop>pushOpen</tabstop>
   <tabstop>pushSave</tabstop>
-  <tabstop>checkFit</tabstop>
  </tabstops>
  <resources/>
  <connections/>
