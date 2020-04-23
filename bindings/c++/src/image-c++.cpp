@@ -78,37 +78,6 @@ image::image()
 {
 }
 
-image::image(const sail_image *im)
-    : image()
-{
-    if (im == nullptr) {
-        SAIL_LOG_ERROR("NULL pointer has been passed to sail::image()");
-        return;
-    }
-
-    std::map<std::string, std::string> meta_entries;
-
-    sail_meta_entry_node *node = im->meta_entry_node;
-
-    while (node != nullptr) {
-        meta_entries.insert({ node->key, node->value });
-        node = node->next;
-    }
-
-    with_width(im->width)
-        .with_height(im->height)
-        .with_bytes_per_line(im->bytes_per_line)
-        .with_pixel_format(im->pixel_format)
-        .with_passes(im->passes)
-        .with_animated(im->animated)
-        .with_delay(im->delay)
-        .with_palette(im->palette, im->palette_size, im->palette_pixel_format)
-        .with_meta_entries(meta_entries)
-        .with_properties(im->properties)
-        .with_source_pixel_format(im->source_pixel_format)
-        .with_source_properties(im->source_properties);
-}
-
 image::image(const image &img)
     : image()
 {
@@ -149,7 +118,7 @@ bool image::is_valid() const
     return d->width > 0 && d->height > 0;
 }
 
-sail_error_t image::to_sail_image(sail_image **image) const
+sail_error_t image::to_sail_image(sail_image *image) const
 {
     SAIL_CHECK_IMAGE_PTR(image);
 
@@ -180,35 +149,32 @@ sail_error_t image::to_sail_image(sail_image **image) const
         ++it;
     }
 
-    SAIL_TRY(sail_alloc_image(image));
-
-    (*image)->width                = d->width;
-    (*image)->height               = d->height;
-    (*image)->bytes_per_line       = d->bytes_per_line;
-    (*image)->pixel_format         = d->pixel_format;
-    (*image)->passes               = d->passes;
-    (*image)->animated             = d->animated;
-    (*image)->delay                = d->delay;
+    image->width          = d->width;
+    image->height         = d->height;
+    image->bytes_per_line = d->bytes_per_line;
+    image->pixel_format   = d->pixel_format;
+    image->passes         = d->passes;
+    image->animated       = d->animated;
+    image->delay          = d->delay;
 
     if (d->palette != nullptr && d->palette_size > 0) {
-        (*image)->palette = malloc(d->palette_size);
+        image->palette = malloc(d->palette_size);
 
-        if ((*image)->palette == NULL) {
-            sail_destroy_image(*image);
+        if (image->palette == nullptr) {
             return SAIL_MEMORY_ALLOCATION_FAILED;
         }
 
-        memcpy((*image)->palette, d->palette, d->palette_size);
+        memcpy(image->palette, d->palette, d->palette_size);
 
-        (*image)->palette              = d->palette;
-        (*image)->palette_size         = d->palette_size;
-        (*image)->palette_pixel_format = d->palette_pixel_format;
+        image->palette              = d->palette;
+        image->palette_size         = d->palette_size;
+        image->palette_pixel_format = d->palette_pixel_format;
     }
 
-    (*image)->meta_entry_node      = image_meta_entry_node;
-    (*image)->properties           = d->properties;
-    (*image)->source_pixel_format  = d->source_pixel_format;
-    (*image)->source_properties    = d->source_properties;
+    image->meta_entry_node     = image_meta_entry_node;
+    image->properties          = d->properties;
+    image->source_pixel_format = d->source_pixel_format;
+    image->source_properties   = d->source_properties;
 
     return 0;
 }
@@ -430,7 +396,6 @@ image& image::with_bits(const void *bits, int bits_size)
     d->shallow_bits = nullptr;
 
     if (bits == nullptr || bits_size < 1) {
-        SAIL_LOG_ERROR("Not copying invalid bits. Bits pointer: %p, bits size: %d", bits, bits_size);
         return *this;
     }
 
@@ -461,6 +426,43 @@ image& image::with_shallow_bits(const void *bits)
     d->shallow_bits = bits;
 
     return *this;
+}
+
+image::image(const sail_image *im, const void *bits, int bits_size)
+    : image()
+{
+    if (im == nullptr) {
+        SAIL_LOG_ERROR("NULL pointer has been passed to sail::image()");
+        return;
+    }
+
+    std::map<std::string, std::string> meta_entries;
+
+    sail_meta_entry_node *node = im->meta_entry_node;
+
+    while (node != nullptr) {
+        meta_entries.insert({ node->key, node->value });
+        node = node->next;
+    }
+
+    with_width(im->width)
+        .with_height(im->height)
+        .with_bytes_per_line(im->bytes_per_line)
+        .with_pixel_format(im->pixel_format)
+        .with_passes(im->passes)
+        .with_animated(im->animated)
+        .with_delay(im->delay)
+        .with_palette(im->palette, im->palette_size, im->palette_pixel_format)
+        .with_meta_entries(meta_entries)
+        .with_properties(im->properties)
+        .with_source_pixel_format(im->source_pixel_format)
+        .with_source_properties(im->source_properties)
+        .with_bits(bits, bits_size);
+}
+
+image::image(const sail_image *im)
+    : image(im, nullptr, 0)
+{
 }
 
 }

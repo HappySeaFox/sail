@@ -41,18 +41,17 @@ class plugin_info;
  */
 class SAIL_EXPORT image
 {
+    friend class image_reader;
+
 public:
     image();
-    // Makes a deep copy of the specified image
-    //
-    image(const sail_image *im);
     image(const image &image);
     image& operator=(const image &image);
     ~image();
 
     bool is_valid() const;
 
-    sail_error_t to_sail_image(sail_image **image) const;
+    sail_error_t to_sail_image(sail_image *image) const;
 
     static sail_error_t bytes_per_line(const image &simage, int *result);
 
@@ -96,6 +95,12 @@ public:
     // Shallow copy
     //
     image& with_shallow_bits(const void *bits);
+
+private:
+    // Makes a deep copy of the specified image and the bits
+    //
+    image(const sail_image *im, const void *bits, int bits_size);
+    image(const sail_image *im);
 
 private:
     class pimpl;

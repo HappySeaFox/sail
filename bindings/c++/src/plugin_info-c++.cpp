@@ -42,6 +42,11 @@ public:
     sail::write_features write_features;
 };
 
+plugin_info::plugin_info()
+    : d(new pimpl)
+{
+}
+
 plugin_info::plugin_info(const plugin_info &pi)
     : plugin_info()
 {
@@ -107,11 +112,6 @@ read_features plugin_info::read_features() const
 write_features plugin_info::write_features() const
 {
     return d->write_features;
-}
-
-plugin_info::plugin_info()
-    : d(new pimpl)
-{
 }
 
 plugin_info::plugin_info(const sail_plugin_info *pi)

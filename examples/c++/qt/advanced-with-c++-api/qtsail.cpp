@@ -107,34 +107,28 @@ static QImage::Format sailPixelFormatToQImageFormat(int pixel_format) {
 sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 {
     sail::image_reader reader(&d->context);
-    sail::image *image = nullptr;
-
-    // Auto cleanup when the method exits.
-    //
-    SAIL_AT_SCOPE_EXIT (
-        delete image;
-    );
+    sail::image image;
 
     SAIL_TRY(reader.start_reading(path.toLocal8Bit().constData()));
     SAIL_TRY(reader.read_next_frame(&image));
     SAIL_TRY(reader.stop_reading());
 
-    *qimage = QImage(reinterpret_cast<const uchar *>(image->bits()),
-                     image->width(),
-                     image->height(),
-                     image->bytes_per_line(),
-                     sailPixelFormatToQImageFormat(image->pixel_format())).copy();
+    *qimage = QImage(reinterpret_cast<const uchar *>(image.bits()),
+                     image.width(),
+                     image.height(),
+                     image.bytes_per_line(),
+                     sailPixelFormatToQImageFormat(image.pixel_format())).copy();
 
     const char *source_pixel_format_str;
     const char *pixel_format_str;
 
-    SAIL_TRY(sail_pixel_format_to_string(image->source_pixel_format(), &source_pixel_format_str));
-    SAIL_TRY(sail_pixel_format_to_string(image->pixel_format(), &pixel_format_str));
+    SAIL_TRY(sail_pixel_format_to_string(image.source_pixel_format(), &source_pixel_format_str));
+    SAIL_TRY(sail_pixel_format_to_string(image.pixel_format(), &pixel_format_str));
 
     d->ui->labelStatus->setText(tr("%1  [%2x%3]  [%4 -> %5]")
                                 .arg(QFileInfo(path).fileName())
-                                .arg(image->width())
-                                .arg(image->height())
+                                .arg(image.width())
+                                .arg(image.height())
                                 .arg(source_pixel_format_str)
                                 .arg(pixel_format_str)
                                 );
@@ -167,7 +161,7 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
          .with_shallow_bits(qimage.bits());
 
     SAIL_TRY(writer.start_writing(path.toLocal8Bit().constData()));
-    SAIL_TRY(writer.write_next_frame(&image));
+    SAIL_TRY(writer.write_next_frame(image));
     SAIL_TRY(writer.stop_writing());
 
     return 0;
@@ -230,15 +224,8 @@ sail_error_t QtSail::onProbe()
     elapsedTimer.start();
 
     sail::image_reader reader(&d->context);
-    sail::image *image = nullptr;
-    sail::plugin_info *plugin_info = nullptr;
-
-    // Auto cleanup when the method exits.
-    //
-    SAIL_AT_SCOPE_EXIT (
-        delete image;
-        delete plugin_info;
-    );
+    sail::image image;
+    sail::plugin_info plugin_info;
 
     sail_error_t res;
 
@@ -250,16 +237,16 @@ sail_error_t QtSail::onProbe()
     const char *source_pixel_format_str;
     const char *pixel_format_str;
 
-    SAIL_TRY(sail_pixel_format_to_string(image->source_pixel_format(), &source_pixel_format_str));
-    SAIL_TRY(sail_pixel_format_to_string(image->pixel_format(), &pixel_format_str));
+    SAIL_TRY(sail_pixel_format_to_string(image.source_pixel_format(), &source_pixel_format_str));
+    SAIL_TRY(sail_pixel_format_to_string(image.pixel_format(), &pixel_format_str));
 
     QMessageBox::information(this,
                              tr("File info"),
                              tr("Probed in: %1 ms.\nCodec: %2\nSize: %3x%4\nSource pixel format: %5\nOutput pixel format: %6")
                                 .arg(elapsedTimer.elapsed())
-                                .arg(plugin_info->description().c_str())
-                                .arg(image->width())
-                                .arg(image->height())
+                                .arg(plugin_info.description().c_str())
+                                .arg(image.width())
+                                .arg(image.height())
                                 .arg(source_pixel_format_str)
                                 .arg(pixel_format_str)
                              );

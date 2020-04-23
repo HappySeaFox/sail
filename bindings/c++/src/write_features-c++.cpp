@@ -138,7 +138,7 @@ int write_features::compression_default() const
     return d->compression_default;
 }
 
-sail_error_t write_features::to_write_options(write_options **swrite_options) const
+sail_error_t write_features::to_write_options(write_options *swrite_options) const
 {
     SAIL_CHECK_WRITE_FEATURES_PTR(d->sail_write_features_c);
     SAIL_CHECK_WRITE_OPTIONS_PTR(swrite_options);
@@ -151,11 +151,7 @@ sail_error_t write_features::to_write_options(write_options **swrite_options) co
 
     SAIL_TRY(sail_alloc_write_options_from_features(d->sail_write_features_c, &sail_write_options));
 
-    *swrite_options = new write_options(sail_write_options);
-
-    if (*swrite_options == nullptr) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
+    *swrite_options = write_options(sail_write_options);
 
     return 0;
 }

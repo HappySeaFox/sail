@@ -56,91 +56,108 @@ bool image_writer::is_valid() const
     return d->ctx != nullptr && d->ctx->is_valid();
 }
 
-sail_error_t image_writer::write(const std::string &path, const image *simage)
+sail_error_t image_writer::write(const std::string &path, const image &simage)
 {
     SAIL_TRY(write(path.c_str(), simage));
 
     return 0;
 }
 
-sail_error_t image_writer::write(const char *path, const image *simage)
+sail_error_t image_writer::write(const char *path, const image &simage)
 {
     SAIL_CHECK_PATH_PTR(path);
-    SAIL_CHECK_IMAGE_PTR(simage);
 
-    sail_image *sail_image = nullptr;
+    sail_image sail_image;
+    SAIL_TRY(simage.to_sail_image(&sail_image));
 
-    SAIL_AT_SCOPE_EXIT (
-        sail_destroy_image(sail_image);
-    );
-
-    SAIL_TRY(simage->to_sail_image(&sail_image));
-
-    const void *bits = simage->bits() ? simage->bits() : simage->shallow_bits();
+    const void *bits = simage.bits() ? simage.bits() : simage.shallow_bits();
 
     SAIL_TRY(sail_write(path,
                         d->ctx->sail_context_c(),
-                        sail_image,
+                        &sail_image,
                         bits));
 
     return 0;
 }
 
-sail_error_t image_writer::start_writing(const std::string &path, const plugin_info *splugin_info)
+sail_error_t image_writer::start_writing(const std::string &path)
+{
+    SAIL_TRY(start_writing(path.c_str()));
+
+    return 0;
+}
+
+sail_error_t image_writer::start_writing(const char *path)
+{
+    SAIL_CHECK_PATH_PTR(path);
+
+    SAIL_TRY(sail_start_writing(path, d->ctx->sail_context_c(), nullptr, &d->pmpl));
+
+    return 0;
+}
+
+sail_error_t image_writer::start_writing(const std::string &path, const plugin_info &splugin_info)
 {
     SAIL_TRY(start_writing(path.c_str(), splugin_info));
 
     return 0;
 }
 
-sail_error_t image_writer::start_writing(const char *path, const plugin_info *splugin_info)
+sail_error_t image_writer::start_writing(const char *path, const plugin_info &splugin_info)
 {
     SAIL_CHECK_PATH_PTR(path);
 
-    const sail_plugin_info *sail_plugin_info = splugin_info == nullptr ? nullptr : splugin_info->sail_plugin_info_c();
-
-    SAIL_TRY(sail_start_writing(path, d->ctx->sail_context_c(), sail_plugin_info, &d->pmpl));
+    SAIL_TRY(sail_start_writing(path, d->ctx->sail_context_c(), splugin_info.sail_plugin_info_c(), &d->pmpl));
 
     return 0;
 }
 
-sail_error_t image_writer::start_writing(const std::string &path, const plugin_info *splugin_info, const write_options &swrite_options)
+sail_error_t image_writer::start_writing(const std::string &path, const write_options &swrite_options)
+{
+    SAIL_TRY(start_writing(path.c_str(), swrite_options));
+
+    return 0;
+}
+
+sail_error_t image_writer::start_writing(const char *path, const write_options &swrite_options)
+{
+    SAIL_CHECK_PATH_PTR(path);
+
+    sail_write_options sail_write_options;
+    SAIL_TRY(swrite_options.to_sail_write_options(&sail_write_options));
+
+    SAIL_TRY(sail_start_writing_with_options(path, d->ctx->sail_context_c(), nullptr, &sail_write_options, &d->pmpl));
+
+    return 0;
+}
+
+sail_error_t image_writer::start_writing(const std::string &path, const plugin_info &splugin_info, const write_options &swrite_options)
 {
     SAIL_TRY(start_writing(path.c_str(), splugin_info, swrite_options));
 
     return 0;
 }
 
-sail_error_t image_writer::start_writing(const char *path, const plugin_info *splugin_info, const write_options &swrite_options)
+sail_error_t image_writer::start_writing(const char *path, const plugin_info &splugin_info, const write_options &swrite_options)
 {
     SAIL_CHECK_PATH_PTR(path);
 
-    const sail_plugin_info *sail_plugin_info = splugin_info == nullptr ? nullptr : splugin_info->sail_plugin_info_c();
-    sail_write_options *sail_write_options = nullptr;
-
-    SAIL_AT_SCOPE_EXIT (
-        sail_destroy_write_options(sail_write_options);
-    );
-
+    sail_write_options sail_write_options;
     SAIL_TRY(swrite_options.to_sail_write_options(&sail_write_options));
-    SAIL_TRY(sail_start_writing_with_options(path, d->ctx->sail_context_c(), sail_plugin_info, sail_write_options, &d->pmpl));
+
+    SAIL_TRY(sail_start_writing_with_options(path, d->ctx->sail_context_c(), splugin_info.sail_plugin_info_c(), &sail_write_options, &d->pmpl));
 
     return 0;
 }
 
-sail_error_t image_writer::write_next_frame(const image *simage)
+sail_error_t image_writer::write_next_frame(const image &simage)
 {
-    sail_image *image = nullptr;
+    sail_image image;
+    SAIL_TRY(simage.to_sail_image(&image));
 
-    SAIL_AT_SCOPE_EXIT (
-        sail_destroy_image(image);
-    );
+    const void *bits = simage.bits() ? simage.bits() : simage.shallow_bits();
 
-    SAIL_TRY(simage->to_sail_image(&image));
-
-    const void *bits = simage->bits() ? simage->bits() : simage->shallow_bits();
-
-    SAIL_TRY(sail_write_next_frame(d->pmpl, image, bits));
+    SAIL_TRY(sail_write_next_frame(d->pmpl, &image, bits));
 
     return 0;
 }

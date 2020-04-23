@@ -51,25 +51,37 @@ public:
     /*
      * An interface to sail_write(). See sail_write() for more.
      */
-    sail_error_t write(const std::string &path, const image *simage);
-    sail_error_t write(const char *path, const image *simage);
+    sail_error_t write(const std::string &path, const image &simage);
+    sail_error_t write(const char *path, const image &simage);
 
     /*
      * An interface to sail_start_writing(). See sail_start_writing() for more.
      */
-    sail_error_t start_writing(const std::string &path, const plugin_info *splugin_info = nullptr);
-    sail_error_t start_writing(const char *path, const plugin_info *splugin_info = nullptr);
+    sail_error_t start_writing(const std::string &path);
+    sail_error_t start_writing(const char *path);
+
+    /*
+     * An interface to sail_start_writing(). See sail_start_writing() for more.
+     */
+    sail_error_t start_writing(const std::string &path, const plugin_info &splugin_info);
+    sail_error_t start_writing(const char *path, const plugin_info &splugin_info);
 
     /*
      * An interface to sail_start_writing_with_options(). See sail_start_writing_with_options() for more.
      */
-    sail_error_t start_writing(const std::string &path, const plugin_info *splugin_info, const write_options &swrite_options);
-    sail_error_t start_writing(const char *path, const plugin_info *splugin_info, const write_options &swrite_options);
+    sail_error_t start_writing(const std::string &path, const write_options &swrite_options);
+    sail_error_t start_writing(const char *path, const write_options &swrite_options);
+
+    /*
+     * An interface to sail_start_writing_with_options(). See sail_start_writing_with_options() for more.
+     */
+    sail_error_t start_writing(const std::string &path, const plugin_info &splugin_info, const write_options &swrite_options);
+    sail_error_t start_writing(const char *path, const plugin_info &splugin_info, const write_options &swrite_options);
 
     /*
      * An interface to sail_write_next_frame(). See sail_write_next_frame() for more.
      */
-    sail_error_t write_next_frame(const image *simage);
+    sail_error_t write_next_frame(const image &simage);
 
     /*
      * An interface to sail_stop_writing(). See sail_stop_writing() for more.

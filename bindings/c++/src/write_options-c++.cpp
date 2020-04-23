@@ -123,16 +123,14 @@ write_options& write_options::with_compression(int compression)
     return *this;
 }
 
-sail_error_t write_options::to_sail_write_options(sail_write_options **write_options) const
+sail_error_t write_options::to_sail_write_options(sail_write_options *write_options) const
 {
     SAIL_CHECK_WRITE_OPTIONS_PTR(write_options);
 
-    SAIL_TRY(sail_alloc_write_options(write_options));
-
-    (*write_options)->output_pixel_format = d->output_pixel_format;
-    (*write_options)->io_options          = d->io_options;
-    (*write_options)->compression_type    = d->compression_type;
-    (*write_options)->compression         = d->compression;
+    write_options->output_pixel_format = d->output_pixel_format;
+    write_options->io_options          = d->io_options;
+    write_options->compression_type    = d->compression_type;
+    write_options->compression         = d->compression;
 
     return 0;
 }

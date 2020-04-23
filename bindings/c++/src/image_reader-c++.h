@@ -51,31 +51,43 @@ public:
     /*
      * An interface to sail_probe(). See sail_probe() for more.
      */
-    sail_error_t probe(const std::string &path, image **simage, plugin_info **splugin_info = nullptr);
-    sail_error_t probe(const char *path, image **simage, plugin_info **splugin_info = nullptr);
+    sail_error_t probe(const std::string &path, image *simage, plugin_info *splugin_info = nullptr);
+    sail_error_t probe(const char *path, image *simage, plugin_info *splugin_info = nullptr);
 
     /*
      * An interface to sail_read(). See sail_read() for more.
      */
-    sail_error_t read(const std::string &path, image **simage);
-    sail_error_t read(const char *path, image **simage);
+    sail_error_t read(const std::string &path, image *simage);
+    sail_error_t read(const char *path, image *simage);
 
     /*
      * An interface to sail_start_reading(). See sail_start_reading() for more.
      */
-    sail_error_t start_reading(const std::string &path, const plugin_info *splugin_info = nullptr);
-    sail_error_t start_reading(const char *path, const plugin_info *splugin_info = nullptr);
+    sail_error_t start_reading(const std::string &path);
+    sail_error_t start_reading(const char *path);
+
+    /*
+     * An interface to sail_start_reading(). See sail_start_reading() for more.
+     */
+    sail_error_t start_reading(const std::string &path, const plugin_info &splugin_info);
+    sail_error_t start_reading(const char *path, const plugin_info &splugin_info);
 
     /*
      * An interface to sail_start_reading_with_options(). See sail_start_reading_with_options() for more.
      */
-    sail_error_t start_reading(const std::string &path, const plugin_info *splugin_info, const read_options &sread_options);
-    sail_error_t start_reading(const char *path, const plugin_info *splugin_info, const read_options &sread_options);
+    sail_error_t start_reading(const std::string &path, const read_options &sread_options);
+    sail_error_t start_reading(const char *path, const read_options &sread_options);
+
+    /*
+     * An interface to sail_start_reading_with_options(). See sail_start_reading_with_options() for more.
+     */
+    sail_error_t start_reading(const std::string &path, const plugin_info &splugin_info, const read_options &sread_options);
+    sail_error_t start_reading(const char *path, const plugin_info &splugin_info, const read_options &sread_options);
 
     /*
      * An interface to sail_read_next_frame(). See sail_read_next_frame() for more.
      */
-    sail_error_t read_next_frame(image **simage);
+    sail_error_t read_next_frame(image *simage);
 
     /*
      * An interface to sail_stop_reading(). See sail_stop_reading() for more.

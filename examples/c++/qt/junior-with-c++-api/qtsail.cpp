@@ -105,28 +105,22 @@ static QImage::Format sailPixelFormatToQImageFormat(int pixel_format) {
 sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 {
     sail::image_reader reader(&d->context);
-    sail::image *image = nullptr;
-
-    // Auto cleanup when the method exits.
-    //
-    SAIL_AT_SCOPE_EXIT (
-        delete image;
-    );
+    sail::image image;
 
     SAIL_TRY(reader.read(path.toLocal8Bit(), &image));
 
     // Construct QImage from the read image.
     //
-    *qimage = QImage(reinterpret_cast<uchar *>(image->bits()),
-                     image->width(),
-                     image->height(),
-                     image->bytes_per_line(),
-                     sailPixelFormatToQImageFormat(image->pixel_format())).copy();
+    *qimage = QImage(reinterpret_cast<uchar *>(image.bits()),
+                     image.width(),
+                     image.height(),
+                     image.bytes_per_line(),
+                     sailPixelFormatToQImageFormat(image.pixel_format())).copy();
 
     d->ui->labelStatus->setText(tr("%1  [%2x%3]")
                                 .arg(QFileInfo(path).fileName())
-                                .arg(image->width())
-                                .arg(image->height())
+                                .arg(image.width())
+                                .arg(image.height())
                                 );
 
     return 0;
@@ -156,7 +150,7 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
          .with_bytes_per_line_auto()
          .with_shallow_bits(qimage.bits());
 
-    SAIL_TRY(writer.write(path.toLocal8Bit(), &image));
+    SAIL_TRY(writer.write(path.toLocal8Bit(), image));
 
     return 0;
 }

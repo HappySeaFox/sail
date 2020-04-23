@@ -63,7 +63,7 @@ public:
     write_options& with_compression(int compression);
 
 private:
-    sail_error_t to_sail_write_options(sail_write_options **write_options) const;
+    sail_error_t to_sail_write_options(sail_write_options *write_options) const;
 
 private:
     class pimpl;

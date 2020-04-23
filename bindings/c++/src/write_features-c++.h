@@ -60,7 +60,7 @@ public:
     int compression_max() const;
     int compression_default() const;
 
-    sail_error_t to_write_options(write_options **swrite_options) const;
+    sail_error_t to_write_options(write_options *swrite_options) const;
 
 private:
     write_features();

@@ -83,7 +83,7 @@ int read_features::features() const
     return d->features;
 }
 
-sail_error_t read_features::to_read_options(read_options **sread_options) const
+sail_error_t read_features::to_read_options(read_options *sread_options) const
 {
     SAIL_CHECK_READ_FEATURES_PTR(d->sail_read_features_c);
     SAIL_CHECK_READ_OPTIONS_PTR(sread_options);
@@ -96,11 +96,7 @@ sail_error_t read_features::to_read_options(read_options **sread_options) const
 
     SAIL_TRY(sail_alloc_read_options_from_features(d->sail_read_features_c, &sail_read_options));
 
-    *sread_options = new read_options(sail_read_options);
-
-    if (*sread_options == nullptr) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
+    *sread_options = read_options(sail_read_options);
 
     return 0;
 }
