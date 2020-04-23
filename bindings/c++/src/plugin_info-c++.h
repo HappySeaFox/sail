@@ -54,6 +54,9 @@ public:
     plugin_info& operator=(const plugin_info &pi);
     ~plugin_info();
 
+    static sail_error_t plugin_feature_to_string(int plugin_feature, const char **result);
+    static sail_error_t plugin_feature_from_string(const char *str, int *result);
+
     std::string path() const;
     std::string version() const;
     std::string name() const;
