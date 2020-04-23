@@ -233,7 +233,7 @@ See [http://ksquirrel.sourceforge.net](http://ksquirrel.sourceforge.net).
 
 ## 0.2.8.1 2004-05-19
 
-- added lost in 0.2.8 license file
+- added back the license file lost in 0.2.8
 - added missing link rules for libjpeg, libpng, libtiff
 
 ## 0.2.8 2004-05-15
