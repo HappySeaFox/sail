@@ -47,6 +47,12 @@ class SAIL_EXPORT context
 
 public:
     context();
+
+    /*
+     * When context gets destroyed, all plugin info objects, read and write
+     * features get invalidated. Using them when the context doesn't exist
+     * anymore may lead to a crash.
+     */
     ~context();
 
     /*
