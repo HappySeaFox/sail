@@ -179,84 +179,6 @@ sail_error_t image::to_sail_image(sail_image *image) const
     return 0;
 }
 
-sail_error_t image::bits_per_pixel(int pixel_format, int *result)
-{
-    SAIL_TRY(sail_bits_per_pixel(pixel_format, result));
-
-    return 0;
-}
-
-sail_error_t image::bytes_per_line(const image &simage, int *result)
-{
-    SAIL_CHECK_PTR(result);
-
-    sail_image sail_image;
-
-    sail_image.width        = simage.width();
-    sail_image.pixel_format = simage.pixel_format();
-
-    SAIL_TRY(sail_bytes_per_line(&sail_image, result));
-
-    return 0;
-}
-
-sail_error_t image::bytes_per_image(const image &simage, int *result)
-{
-    SAIL_CHECK_PTR(result);
-
-    sail_image sail_image;
-
-    sail_image.width        = simage.width();
-    sail_image.height       = simage.height();
-    sail_image.pixel_format = simage.pixel_format();
-
-    SAIL_TRY(sail_bytes_per_image(&sail_image, result));
-
-    return 0;
-}
-
-sail_error_t image::pixel_format_to_string(int pixel_format, const char **result)
-{
-    SAIL_TRY(sail_pixel_format_to_string(pixel_format, result));
-
-    return 0;
-}
-
-sail_error_t image::pixel_format_from_string(const char *str, int *result)
-{
-    SAIL_TRY(sail_pixel_format_from_string(str, result));
-
-    return 0;
-}
-
-sail_error_t image::image_property_to_string(int image_property, const char **result)
-{
-    SAIL_TRY(sail_image_property_to_string(image_property, result));
-
-    return 0;
-}
-
-sail_error_t image::image_property_from_string(const char *str, int *result)
-{
-    SAIL_TRY(sail_image_property_from_string(str, result));
-
-    return 0;
-}
-
-sail_error_t image::compression_type_to_string(int compression, const char **result)
-{
-    SAIL_TRY(sail_compression_type_to_string(compression, result));
-
-    return 0;
-}
-
-sail_error_t image::compression_type_from_string(const char *str, int *result)
-{
-    SAIL_TRY(sail_compression_type_from_string(str, result));
-
-    return 0;
-}
-
 int image::width() const
 {
     return d->width;
@@ -457,6 +379,84 @@ image& image::with_shallow_bits(const void *bits)
     d->shallow_bits = bits;
 
     return *this;
+}
+
+sail_error_t image::bits_per_pixel(int pixel_format, int *result)
+{
+    SAIL_TRY(sail_bits_per_pixel(pixel_format, result));
+
+    return 0;
+}
+
+sail_error_t image::bytes_per_line(const image &simage, int *result)
+{
+    SAIL_CHECK_PTR(result);
+
+    sail_image sail_image;
+
+    sail_image.width        = simage.width();
+    sail_image.pixel_format = simage.pixel_format();
+
+    SAIL_TRY(sail_bytes_per_line(&sail_image, result));
+
+    return 0;
+}
+
+sail_error_t image::bytes_per_image(const image &simage, int *result)
+{
+    SAIL_CHECK_PTR(result);
+
+    sail_image sail_image;
+
+    sail_image.width        = simage.width();
+    sail_image.height       = simage.height();
+    sail_image.pixel_format = simage.pixel_format();
+
+    SAIL_TRY(sail_bytes_per_image(&sail_image, result));
+
+    return 0;
+}
+
+sail_error_t image::pixel_format_to_string(int pixel_format, const char **result)
+{
+    SAIL_TRY(sail_pixel_format_to_string(pixel_format, result));
+
+    return 0;
+}
+
+sail_error_t image::pixel_format_from_string(const char *str, int *result)
+{
+    SAIL_TRY(sail_pixel_format_from_string(str, result));
+
+    return 0;
+}
+
+sail_error_t image::image_property_to_string(int image_property, const char **result)
+{
+    SAIL_TRY(sail_image_property_to_string(image_property, result));
+
+    return 0;
+}
+
+sail_error_t image::image_property_from_string(const char *str, int *result)
+{
+    SAIL_TRY(sail_image_property_from_string(str, result));
+
+    return 0;
+}
+
+sail_error_t image::compression_type_to_string(int compression, const char **result)
+{
+    SAIL_TRY(sail_compression_type_to_string(compression, result));
+
+    return 0;
+}
+
+sail_error_t image::compression_type_from_string(const char *str, int *result)
+{
+    SAIL_TRY(sail_compression_type_from_string(str, result));
+
+    return 0;
 }
 
 image::image(const sail_image *im, const void *bits, int bits_size)

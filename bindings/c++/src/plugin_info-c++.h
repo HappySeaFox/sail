@@ -54,9 +54,6 @@ public:
     plugin_info& operator=(const plugin_info &pi);
     ~plugin_info();
 
-    static sail_error_t plugin_feature_to_string(int plugin_feature, const char **result);
-    static sail_error_t plugin_feature_from_string(const char *str, int *result);
-
     std::string path() const;
     std::string version() const;
     std::string name() const;
@@ -65,6 +62,9 @@ public:
     std::vector<std::string> mime_types() const;
     sail::read_features read_features() const;
     sail::write_features write_features() const;
+
+    static sail_error_t plugin_feature_to_string(int plugin_feature, const char **result);
+    static sail_error_t plugin_feature_from_string(const char *str, int *result);
 
 private:
     /*

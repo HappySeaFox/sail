@@ -74,20 +74,6 @@ plugin_info::~plugin_info()
     delete d;
 }
 
-sail_error_t plugin_info::plugin_feature_to_string(int plugin_feature, const char **result)
-{
-    SAIL_TRY(sail_plugin_feature_to_string(plugin_feature, result));
-
-    return 0;
-}
-
-sail_error_t plugin_info::plugin_feature_from_string(const char *str, int *result)
-{
-    SAIL_TRY(sail_plugin_feature_from_string(str, result));
-
-    return 0;
-}
-
 std::string plugin_info::path() const
 {
     return d->path;
@@ -126,6 +112,20 @@ read_features plugin_info::read_features() const
 write_features plugin_info::write_features() const
 {
     return d->write_features;
+}
+
+sail_error_t plugin_info::plugin_feature_to_string(int plugin_feature, const char **result)
+{
+    SAIL_TRY(sail_plugin_feature_to_string(plugin_feature, result));
+
+    return 0;
+}
+
+sail_error_t plugin_info::plugin_feature_from_string(const char *str, int *result)
+{
+    SAIL_TRY(sail_plugin_feature_from_string(str, result));
+
+    return 0;
 }
 
 plugin_info::plugin_info(const sail_plugin_info *pi)
