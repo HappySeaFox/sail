@@ -270,8 +270,9 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
     // Save some meta info...
     //
     if (write_options.io_options() & SAIL_IO_OPTION_META_INFO) {
-        std::map<std::string, std::string> meta_entries;
-        meta_entries.insert({"Comment", "SAIL demo comment"});
+        std::map<std::string, std::string> meta_entries {
+            { "Comment", "SAIL demo comment" }
+        };
         image.with_meta_entries(meta_entries);
     }
 
