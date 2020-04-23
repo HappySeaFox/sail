@@ -76,6 +76,8 @@ sail_error_t context::plugin_info_from_path(const std::string &path, plugin_info
 
 sail_error_t context::plugin_info_from_path(const char *path, plugin_info **splugin_info) const
 {
+    SAIL_CHECK_PLUGIN_INFO_PTR(splugin_info);
+
     const struct sail_plugin_info *sail_plugin_info;
     SAIL_TRY(sail_plugin_info_from_path(path, d->context, &sail_plugin_info));
 
@@ -97,6 +99,8 @@ sail_error_t context::plugin_info_from_extension(const std::string &suffix, plug
 
 sail_error_t context::plugin_info_from_extension(const char *suffix, plugin_info **splugin_info) const
 {
+    SAIL_CHECK_PLUGIN_INFO_PTR(splugin_info);
+
     const struct sail_plugin_info *sail_plugin_info;
     SAIL_TRY(sail_plugin_info_from_extension(suffix, d->context, &sail_plugin_info));
 
@@ -118,6 +122,8 @@ sail_error_t context::plugin_info_from_mime_type(const std::string &mime_type, p
 
 sail_error_t context::plugin_info_from_mime_type(const char *mime_type, plugin_info **splugin_info) const
 {
+    SAIL_CHECK_PLUGIN_INFO_PTR(splugin_info);
+
     const struct sail_plugin_info *sail_plugin_info;
     SAIL_TRY(sail_plugin_info_from_mime_type(d->context, mime_type, &sail_plugin_info));
 
