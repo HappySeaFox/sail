@@ -262,4 +262,5 @@ See [http://ksquirrel.sourceforge.net](http://ksquirrel.sourceforge.net).
 
 ## 0.0.0 2003-11-06
 
-- first ideas about KSquirrel published at [linux.org.ru](https://www.linux.org.ru/forum/development/421774) (in Russian)
+- started active development
+- first ideas about KSquirrel were published at [linux.org.ru](https://www.linux.org.ru/forum/development/421774) (in Russian)
