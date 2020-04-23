@@ -87,14 +87,9 @@ public:
     image& with_bytes_per_line(int bytes_per_line);
     image& with_bytes_per_line_auto();
     image& with_pixel_format(int pixel_format);
-    image& with_passes(int passes);
-    image& with_animated(bool animated);
     image& with_delay(int delay);
     image& with_palette(void *palette, int palette_size, int palette_pixel_format);
     image& with_meta_entries(const std::map<std::string, std::string> &meta_entries);
-    image& with_properties(int properties);
-    image& with_source_pixel_format(int source_pixel_format);
-    image& with_source_properties(int source_properties);
 
     // Deep copy
     //
@@ -109,6 +104,12 @@ private:
     //
     image(const sail_image *im, const void *bits, int bits_size);
     image(const sail_image *im);
+
+    image& with_passes(int passes);
+    image& with_animated(bool animated);
+    image& with_properties(int properties);
+    image& with_source_pixel_format(int source_pixel_format);
+    image& with_source_properties(int source_properties);
 
 private:
     class pimpl;

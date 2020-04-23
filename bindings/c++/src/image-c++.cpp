@@ -379,18 +379,6 @@ image& image::with_pixel_format(int pixel_format)
     return *this;
 }
 
-image& image::with_passes(int passes)
-{
-    d->passes = passes;
-    return *this;
-}
-
-image& image::with_animated(bool animated)
-{
-    d->animated = animated;
-    return *this;
-}
-
 image& image::with_delay(int delay)
 {
     d->delay = delay;
@@ -427,24 +415,6 @@ image& image::with_palette(void *palette, int palette_size, int palette_pixel_fo
 image& image::with_meta_entries(const std::map<std::string, std::string> &meta_entries)
 {
     d->meta_entries = meta_entries;
-    return *this;
-}
-
-image& image::with_properties(int properties)
-{
-    d->properties = properties;
-    return *this;
-}
-
-image& image::with_source_pixel_format(int source_pixel_format)
-{
-    d->source_pixel_format = source_pixel_format;
-    return *this;
-}
-
-image& image::with_source_properties(int source_properties)
-{
-    d->source_properties = source_properties;
     return *this;
 }
 
@@ -524,6 +494,36 @@ image::image(const sail_image *im, const void *bits, int bits_size)
 image::image(const sail_image *im)
     : image(im, nullptr, 0)
 {
+}
+
+image& image::with_passes(int passes)
+{
+    d->passes = passes;
+    return *this;
+}
+
+image& image::with_animated(bool animated)
+{
+    d->animated = animated;
+    return *this;
+}
+
+image& image::with_properties(int properties)
+{
+    d->properties = properties;
+    return *this;
+}
+
+image& image::with_source_pixel_format(int source_pixel_format)
+{
+    d->source_pixel_format = source_pixel_format;
+    return *this;
+}
+
+image& image::with_source_properties(int source_properties)
+{
+    d->source_properties = source_properties;
+    return *this;
 }
 
 }
