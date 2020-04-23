@@ -188,10 +188,22 @@ sail_error_t image::bytes_per_line(const image &simage, int *result)
     sail_image.width        = simage.width();
     sail_image.pixel_format = simage.pixel_format();
 
-    int bytes_per_line;
-    SAIL_TRY(sail_bytes_per_line(&sail_image, &bytes_per_line));
+    SAIL_TRY(sail_bytes_per_line(&sail_image, result));
 
-    *result = bytes_per_line;
+    return 0;
+}
+
+sail_error_t image::bytes_per_image(const image &simage, int *result)
+{
+    SAIL_CHECK_PTR(result);
+
+    sail_image sail_image;
+
+    sail_image.width        = simage.width();
+    sail_image.height       = simage.height();
+    sail_image.pixel_format = simage.pixel_format();
+
+    SAIL_TRY(sail_bytes_per_image(&sail_image, result));
 
     return 0;
 }
