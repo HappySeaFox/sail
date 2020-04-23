@@ -195,7 +195,8 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
                                 .arg(meta)
                                 );
 
-    /* Optional: unload all plugins to free up some memory. */
+    // Optional: unload all plugins to free up some memory.
+    //
     d->context.unload_plugins();
 
     return 0;
@@ -290,7 +291,8 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
 
     SAIL_LOG_INFO("Saved in %lld ms.", elapsed.elapsed() + beforeDialog);
 
-    /* Optional: unload all plugins to free up some memory. */
+    // Optional: unload all plugins to free up some memory.
+    //
     d->context.unload_plugins();
 
     return 0;
