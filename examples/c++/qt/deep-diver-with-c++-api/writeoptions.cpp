@@ -73,13 +73,13 @@ sail_error_t WriteOptions::init(const sail::write_features &write_features)
         const char *output_pixel_format_str;
 
         for (int output_pixel_format : write_features.output_pixel_formats()) {
-            SAIL_TRY(sail_pixel_format_to_string(output_pixel_format, &output_pixel_format_str));
+            SAIL_TRY(sail::image::pixel_format_to_string(output_pixel_format, &output_pixel_format_str));
 
             d->ui->comboColor->addItem(output_pixel_format_str,
                                        /* user data */ output_pixel_format);
         }
 
-        SAIL_TRY(sail_pixel_format_to_string(write_features.preferred_output_pixel_format(), &output_pixel_format_str));
+        SAIL_TRY(sail::image::pixel_format_to_string(write_features.preferred_output_pixel_format(), &output_pixel_format_str));
         d->ui->comboColor->setCurrentText(output_pixel_format_str);
     }
 

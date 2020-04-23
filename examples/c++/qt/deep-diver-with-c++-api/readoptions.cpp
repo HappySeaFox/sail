@@ -68,13 +68,13 @@ sail_error_t ReadOptions::init(const sail::read_features &read_features)
         const char *output_pixel_format_str;
 
         for (int output_pixel_format : read_features.output_pixel_formats()) {
-            SAIL_TRY(sail_pixel_format_to_string(output_pixel_format, &output_pixel_format_str));
+            SAIL_TRY(sail::image::pixel_format_to_string(output_pixel_format, &output_pixel_format_str));
 
             d->ui->comboColor->addItem(output_pixel_format_str,
                                        /* user data */ output_pixel_format);
         }
 
-        SAIL_TRY(sail_pixel_format_to_string(read_features.preferred_output_pixel_format(), &output_pixel_format_str));
+        SAIL_TRY(sail::image::pixel_format_to_string(read_features.preferred_output_pixel_format(), &output_pixel_format_str));
         d->ui->comboColor->setCurrentText(output_pixel_format_str);
     }
 

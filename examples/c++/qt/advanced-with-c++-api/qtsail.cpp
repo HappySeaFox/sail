@@ -122,8 +122,8 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     const char *source_pixel_format_str;
     const char *pixel_format_str;
 
-    SAIL_TRY(sail_pixel_format_to_string(image.source_pixel_format(), &source_pixel_format_str));
-    SAIL_TRY(sail_pixel_format_to_string(image.pixel_format(), &pixel_format_str));
+    SAIL_TRY(sail::image::pixel_format_to_string(image.source_pixel_format(), &source_pixel_format_str));
+    SAIL_TRY(sail::image::pixel_format_to_string(image.pixel_format(), &pixel_format_str));
 
     d->ui->labelStatus->setText(tr("%1  [%2x%3]  [%4 -> %5]")
                                 .arg(QFileInfo(path).fileName())
@@ -237,8 +237,8 @@ sail_error_t QtSail::onProbe()
     const char *source_pixel_format_str;
     const char *pixel_format_str;
 
-    SAIL_TRY(sail_pixel_format_to_string(image.source_pixel_format(), &source_pixel_format_str));
-    SAIL_TRY(sail_pixel_format_to_string(image.pixel_format(), &pixel_format_str));
+    SAIL_TRY(sail::image::pixel_format_to_string(image.source_pixel_format(), &source_pixel_format_str));
+    SAIL_TRY(sail::image::pixel_format_to_string(image.pixel_format(), &pixel_format_str));
 
     QMessageBox::information(this,
                              tr("File info"),

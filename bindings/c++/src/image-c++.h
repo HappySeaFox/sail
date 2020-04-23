@@ -53,8 +53,15 @@ public:
 
     sail_error_t to_sail_image(sail_image *image) const;
 
+    static sail_error_t bits_per_pixel(int pixel_format, int *result);
     static sail_error_t bytes_per_line(const image &simage, int *result);
     static sail_error_t bytes_per_image(const image &simage, int *result);
+    static sail_error_t pixel_format_to_string(int pixel_format, const char **result);
+    static sail_error_t pixel_format_from_string(const char *str, int *result);
+    static sail_error_t image_property_to_string(int image_property, const char **result);
+    static sail_error_t image_property_from_string(const char *str, int *result);
+    static sail_error_t compression_type_to_string(int compression, const char **result);
+    static sail_error_t compression_type_from_string(const char *str, int *result);
 
     int width() const;
     int height() const;
