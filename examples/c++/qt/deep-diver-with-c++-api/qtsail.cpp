@@ -372,43 +372,54 @@ void QtSail::onOpenFile()
     }
 }
 
-void QtSail::onProbe()
+sail_error_t QtSail::onProbe()
 {
-#if 0
     const QString path = QFileDialog::getOpenFileName(this, tr("Select a file"));
 
     if (path.isEmpty()) {
-        return;
+        return 0;
     }
 
     QElapsedTimer elapsed;
     elapsed.start();
 
     // Probe
-    sail_image *image;
-    const struct sail_plugin_info *plugin_info;
-    sail_error_t res;
+    sail::image *image = nullptr;
+    sail::plugin_info *plugin_info = nullptr;
 
-    if ((res = sail_probe(path.toLocal8Bit(), d->context, &image, &plugin_info)) != 0) {
+    SAIL_AT_SCOPE_EXIT (
+        delete image;
+        delete plugin_info;
+    );
+
+    sail_error_t res;
+    sail::image_reader reader(&d->context);
+
+    if ((res = reader.probe(path.toLocal8Bit(), &image, &plugin_info)) != 0) {
         QMessageBox::critical(this, tr("Error"), tr("Failed to probe the image. Error: %1").arg(res));
-        return;
+        return res;
     }
 
     pluginInfo(plugin_info);
+
+    const char *source_pixel_format_str;
+    const char *pixel_format_str;
+
+    SAIL_TRY(sail_pixel_format_to_string(image->source_pixel_format(), &source_pixel_format_str));
+    SAIL_TRY(sail_pixel_format_to_string(image->pixel_format(), &pixel_format_str));
 
     QMessageBox::information(this,
                              tr("File info"),
                              tr("Probed in: %1 ms.\nCodec: %2\nSize: %3x%4\nSource pixel format: %5\nOutput pixel format: %6")
                                 .arg(elapsed.elapsed())
-                                .arg(plugin_info->description)
-                                .arg(image->width)
-                                .arg(image->height)
-                                .arg(sail_pixel_format_to_string(image->source_pixel_format))
-                                .arg(sail_pixel_format_to_string(image->pixel_format))
+                                .arg(plugin_info->description().c_str())
+                                .arg(image->width())
+                                .arg(image->height())
+                                .arg(source_pixel_format_str)
+                                .arg(pixel_format_str)
                              );
 
-    sail_destroy_image(image);
-#endif
+    return 0;
 }
 
 void QtSail::onSave()
