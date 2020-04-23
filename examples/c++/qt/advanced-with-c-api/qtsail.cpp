@@ -110,10 +110,13 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     struct sail_image *image = nullptr;
     uchar *image_bits = nullptr;
 
-    SAIL_TRY_OR_CLEANUP(loadImageImpl(path, &pimpl, &image, &image_bits),
-                        /* cleanup */ free(image_bits),
-                                      sail_stop_reading(pimpl),
-                                      sail_destroy_image(image));
+    /*
+     * WARNING: Memory cleanup on error is not implemented in this demo. Please don't forget
+     * to free memory (pointers, image bits etc.) on error in a real application.
+     */
+    SAIL_TRY(sail_start_reading(path.toLocal8Bit(), d->context, nullptr, &pimpl));
+    SAIL_TRY(sail_read_next_frame(pimpl, &image, (void **)&image_bits));
+    SAIL_TRY(sail_stop_reading(pimpl));
 
     *qimage = QImage(image_bits,
                      image->width,
@@ -141,13 +144,6 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     return 0;
 }
 
-sail_error_t QtSail::loadImageImpl(const QString &path, void **pimpl, sail_image **image, uchar **image_bits)
-{
-    SAIL_TRY(sail_start_reading(path.toLocal8Bit(), d->context, nullptr, pimpl));
-    SAIL_TRY(sail_read_next_frame(*pimpl, image, (void **)image_bits));
-    SAIL_TRY(sail_stop_reading(*pimpl));
-}
-
 static int qImageFormatToSailPixelFormat(QImage::Format format) {
     switch (format) {
         case QImage::Format_Mono:       return SAIL_PIXEL_FORMAT_MONO;
@@ -173,21 +169,15 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
     image->pixel_format = qImageFormatToSailPixelFormat(qimage.format());
     SAIL_TRY(sail_bytes_per_line(image, &image->bytes_per_line));
 
-    SAIL_TRY_OR_CLEANUP(saveImageImpl(path, &pimpl, image, qimage.bits()),
-                        /* cleanup */ sail_stop_writing(pimpl),
-                                      sail_destroy_image(image));
+    /*
+     * WARNING: Memory cleanup on error is not implemented in this demo. Please don't forget
+     * to free memory (pointers, image bits etc.) on error in a real application.
+     */
+    SAIL_TRY(sail_start_writing(path.toLocal8Bit(), d->context, nullptr, &pimpl));
+    SAIL_TRY(sail_write_next_frame(pimpl, image, qimage.bits()));
+    SAIL_TRY(sail_stop_writing(pimpl));
 
     sail_destroy_image(image);
-
-    return 0;
-}
-
-sail_error_t QtSail::saveImageImpl(const QString &path,
-                                   void **pimpl, const sail_image *image, const uchar *image_bits)
-{
-    SAIL_TRY(sail_start_writing(path.toLocal8Bit(), d->context, nullptr, pimpl));
-    SAIL_TRY(sail_write_next_frame(*pimpl, image, image_bits));
-    SAIL_TRY(sail_stop_writing(*pimpl));
 
     return 0;
 }

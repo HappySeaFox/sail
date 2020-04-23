@@ -106,12 +106,14 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     struct sail_image *image = nullptr;
     uchar *image_bits = nullptr;
 
-    SAIL_TRY_OR_CLEANUP(sail_read(path.toLocal8Bit(),
+    /*
+     * WARNING: Memory cleanup on error is not implemented in this demo. Please don't forget
+     * to free memory (pointers, image bits etc.) on error in a real application.
+     */
+    SAIL_TRY(sail_read(path.toLocal8Bit(),
                        d->context,
                        &image,
-                       reinterpret_cast<void **>(&image_bits)),
-                       /* cleanup */ free(image_bits),
-                                     sail_destroy_image(image));
+                       reinterpret_cast<void **>(&image_bits)));
 
     // Construct QImage from the read image bits.
     //
@@ -155,11 +157,14 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
     image->pixel_format = qImageFormatToSailPixelFormat(qimage.format());
     SAIL_TRY(sail_bytes_per_line(image, &image->bytes_per_line));
 
-    SAIL_TRY_OR_CLEANUP(sail_write(path.toLocal8Bit(),
+    /*
+     * WARNING: Memory cleanup on error is not implemented in this demo. Please don't forget
+     * to free memory (pointers, image bits etc.) on error in a real application.
+     */
+    SAIL_TRY(sail_write(path.toLocal8Bit(),
                         d->context,
                         image,
-                        reinterpret_cast<const void *>(qimage.bits())),
-                        /* cleanup */ sail_destroy_image(image));
+                        reinterpret_cast<const void *>(qimage.bits())));
 
     sail_destroy_image(image);
 

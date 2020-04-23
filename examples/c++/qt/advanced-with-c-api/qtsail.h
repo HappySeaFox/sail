@@ -43,9 +43,7 @@ public:
 private:
     sail_error_t init();
     sail_error_t loadImage(const QString &path, QImage *qimage);
-    sail_error_t loadImageImpl(const QString &path, void **pimpl, sail_image **image, uchar **image_bits);
     sail_error_t saveImage(const QString &path, const QImage &qimage);
-    sail_error_t saveImageImpl(const QString &path, void **pimpl, const sail_image *image, const uchar *image_bits);
     QStringList filters() const;
 
 private: // slots
