@@ -8,6 +8,9 @@ See [http://ksquirrel.sourceforge.net](http://ksquirrel.sourceforge.net).
 ## 0.9.0 XXXX-XX-XX
 
 - first public release
+- added C rich client API to read and write images
+- added C++ rich client API to read and write images
+- plugins interfaces are now hidden. Always use the client APIs to read or write images
 
 # ksquirel-libs (until 0.8.0)
 
