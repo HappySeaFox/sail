@@ -43,8 +43,10 @@ class SAIL_EXPORT read_options
 
 public:
     read_options();
-    // Makes a deep copy of the specified read options
-    //
+    /*
+     * Makes a deep copy of the specified read options and stores the pointer for further use.
+     * When the SAIL context gets uninitialized, the pointer becomes dangling.
+     */
     read_options(const sail_read_options *ro);
     read_options(const read_options &ro);
     read_options& operator=(const read_options &ro);

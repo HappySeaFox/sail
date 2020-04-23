@@ -53,64 +53,6 @@ public:
     int compression_default;
 };
 
-write_features::write_features()
-    : d(new pimpl)
-{
-}
-
-write_features::write_features(const sail_write_features *wf)
-    : write_features()
-{
-    if (wf == nullptr) {
-        SAIL_LOG_ERROR("NULL pointer has been passed to sail::write_features()");
-        return;
-    }
-
-    d->sail_write_features_c = wf;
-
-    std::vector<int> input_pixel_formats;
-
-    if (wf->input_pixel_formats != nullptr && wf->input_pixel_formats_length > 0) {
-        input_pixel_formats.reserve(wf->input_pixel_formats_length);
-
-        for (int i = 0; i < wf->input_pixel_formats_length; i++) {
-            input_pixel_formats.push_back(wf->input_pixel_formats[i]);
-        }
-    }
-
-    std::vector<int> output_pixel_formats;
-
-    if (wf->output_pixel_formats != nullptr && wf->output_pixel_formats_length > 0) {
-        output_pixel_formats.reserve(wf->output_pixel_formats_length);
-
-        for (int i = 0; i < wf->output_pixel_formats_length; i++) {
-            output_pixel_formats.push_back(wf->output_pixel_formats[i]);
-        }
-    }
-
-    std::vector<int> compression_types;
-
-    if (wf->compression_types != nullptr && wf->compression_types_length > 0) {
-        compression_types.reserve(wf->compression_types_length);
-
-        for (int i = 0; i < wf->compression_types_length; i++) {
-            compression_types.push_back(wf->compression_types[i]);
-        }
-    }
-
-    with_input_pixel_formats(input_pixel_formats)
-        .with_output_pixel_formats(output_pixel_formats)
-        .with_preferred_output_pixel_format(wf->preferred_output_pixel_format)
-        .with_features(wf->features)
-        .with_properties(wf->properties)
-        .with_passes(wf->passes)
-        .with_compression_types(compression_types)
-        .with_preferred_compression_type(wf->preferred_compression_type)
-        .with_compression_min(wf->compression_min)
-        .with_compression_max(wf->compression_max)
-        .with_compression_default(wf->compression_default);
-}
-
 write_features::write_features(const write_features &wf)
     : write_features()
 {
@@ -216,6 +158,64 @@ sail_error_t write_features::to_write_options(write_options **swrite_options) co
     }
 
     return 0;
+}
+
+write_features::write_features()
+    : d(new pimpl)
+{
+}
+
+write_features::write_features(const sail_write_features *wf)
+    : write_features()
+{
+    if (wf == nullptr) {
+        SAIL_LOG_ERROR("NULL pointer has been passed to sail::write_features()");
+        return;
+    }
+
+    d->sail_write_features_c = wf;
+
+    std::vector<int> input_pixel_formats;
+
+    if (wf->input_pixel_formats != nullptr && wf->input_pixel_formats_length > 0) {
+        input_pixel_formats.reserve(wf->input_pixel_formats_length);
+
+        for (int i = 0; i < wf->input_pixel_formats_length; i++) {
+            input_pixel_formats.push_back(wf->input_pixel_formats[i]);
+        }
+    }
+
+    std::vector<int> output_pixel_formats;
+
+    if (wf->output_pixel_formats != nullptr && wf->output_pixel_formats_length > 0) {
+        output_pixel_formats.reserve(wf->output_pixel_formats_length);
+
+        for (int i = 0; i < wf->output_pixel_formats_length; i++) {
+            output_pixel_formats.push_back(wf->output_pixel_formats[i]);
+        }
+    }
+
+    std::vector<int> compression_types;
+
+    if (wf->compression_types != nullptr && wf->compression_types_length > 0) {
+        compression_types.reserve(wf->compression_types_length);
+
+        for (int i = 0; i < wf->compression_types_length; i++) {
+            compression_types.push_back(wf->compression_types[i]);
+        }
+    }
+
+    with_input_pixel_formats(input_pixel_formats)
+        .with_output_pixel_formats(output_pixel_formats)
+        .with_preferred_output_pixel_format(wf->preferred_output_pixel_format)
+        .with_features(wf->features)
+        .with_properties(wf->properties)
+        .with_passes(wf->passes)
+        .with_compression_types(compression_types)
+        .with_preferred_compression_type(wf->preferred_compression_type)
+        .with_compression_min(wf->compression_min)
+        .with_compression_max(wf->compression_max)
+        .with_compression_default(wf->compression_default);
 }
 
 write_features& write_features::with_input_pixel_formats(const std::vector<int> &input_pixel_formats)

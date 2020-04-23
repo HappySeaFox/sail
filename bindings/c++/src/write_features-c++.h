@@ -41,11 +41,9 @@ class write_options;
  */
 class SAIL_EXPORT write_features
 {
+    friend class plugin_info;
+
 public:
-    write_features();
-    // Makes a deep copy of the specified write features
-    //
-    write_features(const sail_write_features *wf);
     write_features(const write_features &wf);
     write_features& operator=(const write_features &wf);
     ~write_features();
@@ -65,6 +63,13 @@ public:
     sail_error_t to_write_options(write_options **swrite_options) const;
 
 private:
+    write_features();
+    /*
+     * Makes a deep copy of the specified write features and stores the pointer for further use.
+     * When the SAIL context gets uninitialized, the pointer becomes dangling.
+     */
+    write_features(const sail_write_features *wf);
+
     write_features& with_input_pixel_formats(const std::vector<int> &input_pixel_formats);
     write_features& with_output_pixel_formats(const std::vector<int> &output_pixel_formats);
     write_features& with_preferred_output_pixel_format(int preferred_output_pixel_format);

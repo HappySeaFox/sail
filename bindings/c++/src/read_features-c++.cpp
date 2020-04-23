@@ -40,47 +40,6 @@ public:
     int features;
 };
 
-read_features::read_features()
-    : d(new pimpl)
-{
-}
-
-read_features::read_features(const sail_read_features *rf)
-    : read_features()
-{
-    if (rf == nullptr) {
-        SAIL_LOG_ERROR("NULL pointer has been passed to sail::read_features()");
-        return;
-    }
-
-    d->sail_read_features_c = rf;
-
-    std::vector<int> input_pixel_formats;
-
-    if (rf->input_pixel_formats != nullptr && rf->input_pixel_formats_length > 0) {
-        input_pixel_formats.reserve(rf->input_pixel_formats_length);
-
-        for (int i = 0; i < rf->input_pixel_formats_length; i++) {
-            input_pixel_formats.push_back(rf->input_pixel_formats[i]);
-        }
-    }
-
-    std::vector<int> output_pixel_formats;
-
-    if (rf->output_pixel_formats != nullptr && rf->output_pixel_formats_length > 0) {
-        output_pixel_formats.reserve(rf->output_pixel_formats_length);
-
-        for (int i = 0; i < rf->output_pixel_formats_length; i++) {
-            output_pixel_formats.push_back(rf->output_pixel_formats[i]);
-        }
-    }
-
-    with_input_pixel_formats(input_pixel_formats)
-        .with_output_pixel_formats(output_pixel_formats)
-        .with_preferred_output_pixel_format(rf->preferred_output_pixel_format)
-        .with_features(rf->features);
-}
-
 read_features::read_features(const read_features &rf)
     : read_features()
 {
@@ -144,6 +103,47 @@ sail_error_t read_features::to_read_options(read_options **sread_options) const
     }
 
     return 0;
+}
+
+read_features::read_features()
+    : d(new pimpl)
+{
+}
+
+read_features::read_features(const sail_read_features *rf)
+    : read_features()
+{
+    if (rf == nullptr) {
+        SAIL_LOG_ERROR("NULL pointer has been passed to sail::read_features()");
+        return;
+    }
+
+    d->sail_read_features_c = rf;
+
+    std::vector<int> input_pixel_formats;
+
+    if (rf->input_pixel_formats != nullptr && rf->input_pixel_formats_length > 0) {
+        input_pixel_formats.reserve(rf->input_pixel_formats_length);
+
+        for (int i = 0; i < rf->input_pixel_formats_length; i++) {
+            input_pixel_formats.push_back(rf->input_pixel_formats[i]);
+        }
+    }
+
+    std::vector<int> output_pixel_formats;
+
+    if (rf->output_pixel_formats != nullptr && rf->output_pixel_formats_length > 0) {
+        output_pixel_formats.reserve(rf->output_pixel_formats_length);
+
+        for (int i = 0; i < rf->output_pixel_formats_length; i++) {
+            output_pixel_formats.push_back(rf->output_pixel_formats[i]);
+        }
+    }
+
+    with_input_pixel_formats(input_pixel_formats)
+        .with_output_pixel_formats(output_pixel_formats)
+        .with_preferred_output_pixel_format(rf->preferred_output_pixel_format)
+        .with_features(rf->features);
 }
 
 read_features& read_features::with_input_pixel_formats(const std::vector<int> &input_pixel_formats)

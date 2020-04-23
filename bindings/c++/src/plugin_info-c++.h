@@ -44,14 +44,11 @@ namespace sail
  */
 class SAIL_EXPORT plugin_info
 {
+    friend class context;
     friend class image_reader;
     friend class image_writer;
 
 public:
-    plugin_info();
-    // Makes a deep copy of the specified plugin info
-    //
-    plugin_info(const sail_plugin_info *pi);
     plugin_info(const plugin_info &pi);
     plugin_info& operator=(const plugin_info &pi);
     ~plugin_info();
@@ -66,6 +63,13 @@ public:
     sail::write_features write_features() const;
 
 private:
+    plugin_info();
+    /*
+     * Makes a deep copy of the specified plugin info and stores the pointer for further use.
+     * When the SAIL context gets uninitialized, the pointer becomes dangling.
+     */
+    plugin_info(const sail_plugin_info *pi);
+
     plugin_info& with_path(const std::string &path);
     plugin_info& with_version(const std::string &version);
     plugin_info& with_name(const std::string &name);

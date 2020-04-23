@@ -43,8 +43,10 @@ class SAIL_EXPORT write_options
 
 public:
     write_options();
-    // Makes a deep copy of the specified write options
-    //
+    /*
+     * Makes a deep copy of the specified write options and stores the pointer for further use.
+     * When the SAIL context gets uninitialized, the pointer becomes dangling.
+     */
     write_options(const sail_write_options *ro);
     write_options(const write_options &ro);
     write_options& operator=(const write_options &ro);

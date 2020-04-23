@@ -41,11 +41,9 @@ class read_options;
  */
 class SAIL_EXPORT read_features
 {
+    friend class plugin_info;
+
 public:
-    read_features();
-    // Makes a deep copy of the specified read features
-    //
-    read_features(const sail_read_features *rf);
     read_features(const read_features &rf);
     read_features& operator=(const read_features &rf);
     ~read_features();
@@ -58,6 +56,13 @@ public:
     sail_error_t to_read_options(read_options **sread_options) const;
 
 private:
+    read_features();
+    /*
+     * Makes a deep copy of the specified read features and stores the pointer for further use.
+     * When the SAIL context gets uninitialized, the pointer becomes dangling.
+     */
+    read_features(const sail_read_features *rf);
+
     read_features& with_input_pixel_formats(const std::vector<int> &input_pixel_formats);
     read_features& with_output_pixel_formats(const std::vector<int> &output_pixel_formats);
     read_features& with_preferred_output_pixel_format(int preferred_output_pixel_format);
