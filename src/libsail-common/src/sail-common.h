@@ -28,7 +28,7 @@
     #include "error.h"
     #include "export.h"
     #include "image.h"
-    #include "io.h"
+    #include "io_common.h"
     #include "io_file.h"
     #include "io_private.h"
     #include "log.h"

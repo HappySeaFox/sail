@@ -16,8 +16,8 @@
     along with this library. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef SAIL_IO_H
-#define SAIL_IO_H
+#ifndef SAIL_IO_COMMON_H
+#define SAIL_IO_COMMON_H
 
 #ifdef SAIL_BUILD
     #include "error.h"
