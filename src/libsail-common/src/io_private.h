@@ -20,7 +20,7 @@
 #define SAIL_IO_PRIVATE_H
 
 /*
- * A structure representing an input/output abstraction. Use sail_io_from_file() and brothers to
+ * A structure representing an input/output abstraction. Use sail_alloc_io_read_file() and brothers to
  * allocate I/O objects.
  */
 struct sail_io {
@@ -32,7 +32,7 @@ struct sail_io {
 
     /*
      * Plugin-specific data. A plugin could set pimpl to its plugin-specific data storage and access it
-     * in read or write functions. Will be destroyed automatically in sail_destroy_file().
+     * in its read or write functions. Will be destroyed automatically in sail_destroy_io().
      */
     void *pimpl;
 
