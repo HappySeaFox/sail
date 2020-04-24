@@ -34,7 +34,7 @@
  * Private functions.
  */
 
-static int sail_alloc_io(struct sail_io **io) {
+static sail_error_t sail_alloc_io(struct sail_io **io) {
 
     *io = (struct sail_io *)malloc(sizeof(struct sail_io));
 
@@ -117,5 +117,6 @@ void sail_destroy_io(struct sail_io *io) {
         }
     }
 
+    free(io->pimpl);
     free(io);
 }

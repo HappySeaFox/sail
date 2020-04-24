@@ -146,7 +146,6 @@ SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_io *io, const stru
     SAIL_CHECK_READ_OPTIONS_PTR(read_options);
 
     struct pimpl *pimpl;
-
     SAIL_TRY(alloc_pimpl(&pimpl));
 
     io->pimpl = pimpl;
