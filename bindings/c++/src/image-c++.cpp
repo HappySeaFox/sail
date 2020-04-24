@@ -99,7 +99,7 @@ image& image::operator=(const image &img)
         .with_source_pixel_format(img.source_pixel_format())
         .with_source_properties(img.source_properties());
 
-    if (img.shallow_bits()) {
+    if (img.shallow_bits() != nullptr) {
         with_shallow_bits(img.shallow_bits());
     } else {
         with_bits(img.bits(), img.bits_size());
@@ -352,10 +352,11 @@ image& image::with_bits(const void *bits, int bits_size)
         return *this;
     }
 
-    d->bits = malloc(bits_size);
+    d->bits_size = bits_size;
+    d->bits = malloc(d->bits_size);
 
     if (d->bits == nullptr) {
-        SAIL_LOG_ERROR("Memory allocation failed of bits size %d", bits_size);
+        SAIL_LOG_ERROR("Memory allocation failed of bits size %d", d->bits_size);
         return *this;
     }
 
