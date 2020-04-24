@@ -19,6 +19,7 @@
 #include "config.h"
 
 #include <ctype.h>
+#include <errno.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -423,6 +424,21 @@ sail_error_t sail_bytes_per_image(const struct sail_image *image, int *result) {
     SAIL_TRY(sail_bytes_per_line(image, &bytes_per_line));
 
     *result = bytes_per_line * image->height;
+
+    return 0;
+}
+
+sail_error_t sail_print_errno(const char *format) {
+
+    SAIL_CHECK_STRING_PTR(format);
+
+#ifdef SAIL_WIN32
+    char buffer[80];
+    strerror_s(buffer, sizeof(buffer), errno);
+    SAIL_LOG_ERROR(format, buffer);
+#else
+    SAIL_LOG_ERROR(format, strerror(errno));
+#endif
 
     return 0;
 }

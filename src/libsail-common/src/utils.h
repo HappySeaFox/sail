@@ -74,54 +74,72 @@ SAIL_EXPORT sail_error_t sail_to_wchar(const char *input, wchar_t **output);
 /*
  * Assigns a non-NULL string representation of the specified pixel format. The assigned string
  * MUST NOT be destroyed. For example: "RGB".
+ *
+ * Returns 0 on success or sail_error_t on error.
  */
 SAIL_EXPORT sail_error_t sail_pixel_format_to_string(int pixel_format, const char **result);
 
 /*
  * Assigns pixel format from string representation.
  * For example: SAIL_PIXEL_FORMAT_SOURCE is returned for "SOURCE".
+ *
+ * Returns 0 on success or sail_error_t on error.
  */
 SAIL_EXPORT sail_error_t sail_pixel_format_from_string(const char *str, int *result);
 
 /*
  * Assigns a non-NULL string representation of the specified image property. See SailImageProperties.
  * The assigned string MUST NOT be destroyed. For example: "FLIPPED-VERTICALLY".
+ *
+ * Returns 0 on success or sail_error_t on error.
  */
 SAIL_EXPORT sail_error_t sail_image_property_to_string(int image_property, const char **result);
 
 /*
  * Assigns image property from string representation or 0. See SailImageProperties.
  * For example: SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY is returned for "FLIPPED-VERTICALLY".
+ *
+ * Returns 0 on success or sail_error_t on error.
  */
 SAIL_EXPORT sail_error_t sail_image_property_from_string(const char *str, int *result);
 
 /*
  * Assigns a non-NULL string representation of the specified compression type. See SailCompressionTypes.
  * The assigned string MUST NOT be destroyed. For example: "RLE".
+ *
+ * Returns 0 on success or sail_error_t on error.
  */
 SAIL_EXPORT sail_error_t sail_compression_type_to_string(int compression, const char **result);
 
 /*
  * Assigns compression from string representation or 0. See SailCompressionTypes.
  * For example: SAIL_COMPRESSION_RLE is returned for "RLE".
+ *
+ * Returns 0 on success or sail_error_t on error.
  */
 SAIL_EXPORT sail_error_t sail_compression_type_from_string(const char *str, int *result);
 
 /*
  * Assigns a non-NULL string representation of the specified plugin feature. See SailPluginFeatures.
  * The assigned string MUST NOT be destroyed. For example: "STATIC".
+ *
+ * Returns 0 on success or sail_error_t on error.
  */
 SAIL_EXPORT sail_error_t sail_plugin_feature_to_string(int plugin_feature, const char **result);
 
 /*
  * Assigns plugin feature from string representation or 0. See SailPluginFeatures.
  * For example: SAIL_PLUGIN_FEATURE_STATIC is returned for "STATIC".
+ *
+ * Returns 0 on success or sail_error_t on error.
  */
 SAIL_EXPORT sail_error_t sail_plugin_feature_from_string(const char *str, int *result);
 
 /*
  * Calculates a number of bits per pixel in the specified pixel format.
  * For example, for SAIL_PIXEL_FORMAT_RGB 24 is assigned.
+ *
+ * Returns 0 on success or sail_error_t on error.
  */
 SAIL_EXPORT sail_error_t sail_bits_per_pixel(int pixel_format, int *result);
 
@@ -142,15 +160,25 @@ SAIL_EXPORT sail_error_t sail_bits_per_pixel(int pixel_format, int *result);
  *     12 * 2 + 0                            ==
  *     24 + 0                                ==
  *     24 bytes per line
+ *
+ * Returns 0 on success or sail_error_t on error.
  */
 SAIL_EXPORT sail_error_t sail_bytes_per_line(const struct sail_image *image, int *result);
-
 
 /*
  * Calculates a number of bytes needed to hold an entire image in memory without padding.
  * It's effectively bytes per line * image height.
+ *
+ * Returns 0 on success or sail_error_t on error.
  */
 SAIL_EXPORT sail_error_t sail_bytes_per_image(const struct sail_image *image, int *result);
+
+/*
+ * Prints the recent errno value with SAIL_LOG_ERROR(). The specified format must include '%s'.
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_print_errno(const char *format);
 
 /* extern "C" */
 #ifdef __cplusplus
