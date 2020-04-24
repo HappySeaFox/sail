@@ -30,23 +30,33 @@
 
 #include "sail-common.h"
 
-static int sail_alloc_file_private(struct sail_file **file) {
+/*
+ * Private functions.
+ */
 
-    *file = (struct sail_file *)malloc(sizeof(struct sail_file));
+static int sail_alloc_io(struct sail_io **io) {
 
-    if (*file == NULL) {
+    *io = (struct sail_io *)malloc(sizeof(struct sail_io));
+
+    if (*io == NULL) {
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
-    (*file)->fptr = NULL;
-    (*file)->pimpl = NULL;
+    (*io)->stream = NULL;
+    (*io)->pimpl  = NULL;
+    (*io)->read   = NULL;
+    (*io)->seek   = NULL;
+    (*io)->tell   = NULL;
+    (*io)->write  = NULL;
+    (*io)->close  = NULL;
 
     return 0;
 }
 
-int sail_alloc_file(const char *path, const char *mode, struct sail_file **file) {
+static sail_error_t sail_alloc_io_file(const char *path, const char *mode, struct sail_io **io) {
 
     SAIL_CHECK_PATH_PTR(path);
+    SAIL_CHECK_IO_PTR(io);
 
     /* Try to open the file first */
     FILE *fptr;
@@ -59,47 +69,52 @@ int sail_alloc_file(const char *path, const char *mode, struct sail_file **file)
 #endif
 
     if (fptr == NULL) {
-#ifdef SAIL_WIN32
-        char buffer[80];
-        strerror_s(buffer, sizeof(buffer), errno);
-        SAIL_LOG_ERROR("Failed to open '%s': %s", path, buffer);
-#else
-        SAIL_LOG_ERROR("Failed to open '%s': %s", path, strerror(errno));
-#endif
+        sail_print_errno("Failed to open the specified file: %s");
         return SAIL_FILE_OPEN_ERROR;
     }
 
-    SAIL_TRY(sail_alloc_file_private(file));
+    SAIL_TRY_OR_CLEANUP(sail_alloc_io(io),
+                        /* cleanup */ fclose(fptr));
 
-    (*file)->fptr = fptr;
+    (*io)->stream = fptr;
 
-    return 0;
-}
-
-sail_error_t sail_alloc_file_for_reading(const char *path, struct sail_file **file) {
-
-    SAIL_TRY(sail_alloc_file(path, "rb", file));
-
-    return 0;
-}
-
-sail_error_t sail_alloc_file_for_writing(const char *path, struct sail_file **file) {
-
-    SAIL_TRY(sail_alloc_file(path, "wb", file));
+    (*io)->read  = sail_io_file_read;
+    (*io)->seek  = sail_io_file_seek;
+    (*io)->tell  = sail_io_file_tell;
+    (*io)->write = sail_io_file_write;
+    (*io)->close = sail_io_file_close;
 
     return 0;
 }
 
-void sail_destroy_file(struct sail_file *file) {
 
-    if (file == NULL) {
+/*
+ * Public functions.
+ */
+
+sail_error_t sail_alloc_io_read_file(const char *path, struct sail_io **io) {
+
+    SAIL_TRY(sail_alloc_io_file(path, "rb", io));
+
+    return 0;
+}
+
+sail_error_t sail_alloc_io_write_file(const char *path, struct sail_io **io) {
+
+    SAIL_TRY(sail_alloc_io_file(path, "wb", io));
+
+    return 0;
+}
+
+void sail_destroy_io(struct sail_io *io) {
+
+    if (io == NULL) {
         return;
     }
 
-    if (file->fptr != NULL) {
-        fclose(file->fptr);
+    if (io->close != NULL) {
+        io->close(io->stream);
     }
 
-    free(file->pimpl);
-    free(file);
+    free(io);
 }

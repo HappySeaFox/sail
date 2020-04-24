@@ -39,14 +39,14 @@ extern "C" {
  */
 
 /*
- * Starts decoding the specified file using the specified options (or NULL to use defaults).
+ * Starts decoding the specified io stream using the specified options (or NULL to use defaults).
  * The specified read options will be copied into an internal buffer.
  *
  * If the specified read options is NULL, plugin-specific defaults will be used.
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_file *file, const struct sail_read_options *read_options);
+SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_io *io, const struct sail_read_options *read_options);
 
 /*
  * Seeks to the next frame. The frame is NOT immediately read or decoded by most SAIL plugins. One could
@@ -57,14 +57,14 @@ SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_file *file, const 
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(struct sail_file *file, struct sail_image **image);
+SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(struct sail_io *io, struct sail_image **image);
 
 /*
  * Seeks to the next pass if the specified image has multiple passes. Does nothing otherwise.
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_pass_v2(struct sail_file *file, const struct sail_image *image);
+SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_pass_v2(struct sail_io *io, const struct sail_image *image);
 
 /*
  * Reads a scan line of the current image in the current pass. The specified scan line must be
@@ -73,7 +73,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_pass_v2(struct sail_file *fi
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v2(struct sail_file *file, const struct sail_image *image, void *scanline);
+SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v2(struct sail_io *io, const struct sail_image *image, void *scanline);
 
 /*
  * Reads a scan line of the current image in the current pass. Allocates a new scan line. The assigned scan line
@@ -81,30 +81,30 @@ SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v2(struct sail_file *file, c
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_read_alloc_scan_line_v2(struct sail_file *file, const struct sail_image *image, void **scanline);
+SAIL_EXPORT sail_error_t sail_plugin_read_alloc_scan_line_v2(struct sail_io *io, const struct sail_image *image, void **scanline);
 
 /*
  * Finilizes reading operation. No more readings are possible after calling this function.
- * This function doesn't close the file. It just stops decoding. Use sail_destroy_file()
- * to actually close the file.
+ * This function doesn't close the io stream. It just stops decoding. Use io->close() or sail_destroy_io()
+ * to actually close the io stream.
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_read_finish_v2(struct sail_file *file);
+SAIL_EXPORT sail_error_t sail_plugin_read_finish_v2(struct sail_io *io);
 
 /*
  * Encoding functions.
  */
 
 /*
- * Starts encoding the specified file using the specified options (or NULL to use defaults).
+ * Starts encoding the specified io stream using the specified options (or NULL to use defaults).
  * The specified write options will be copied into an internal buffer.
  *
  * If the specified write options is NULL, plugin-specific defaults will be used.
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_write_init_v2(struct sail_file *file, const struct sail_write_options *write_options);
+SAIL_EXPORT sail_error_t sail_plugin_write_init_v2(struct sail_io *io, const struct sail_write_options *write_options);
 
 /*
  * Seeks to a next frame before writing it. The frame is NOT immediately written. Use sail_plugin_write_seek_next_pass()
@@ -112,29 +112,30 @@ SAIL_EXPORT sail_error_t sail_plugin_write_init_v2(struct sail_file *file, const
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v2(struct sail_file *file, const struct sail_image *image);
+SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v2(struct sail_io *io, const struct sail_image *image);
 
 /*
  * Seeks to a next pass before writing it if the specified image is interlaced. Does nothing otherwise.
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_pass_v2(struct sail_file *file, const struct sail_image *image);
+SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_pass_v2(struct sail_io *io, const struct sail_image *image);
 
 /*
  * Writes a scan line of the current image in the current pass.
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_write_scan_line_v2(struct sail_file *file, const struct sail_image *image, const void *scanline);
+SAIL_EXPORT sail_error_t sail_plugin_write_scan_line_v2(struct sail_io *io, const struct sail_image *image, const void *scanline);
 
 /*
  * Finilizes writing operation. No more writings are possible after calling this function.
- * This function doesn't close the file. Use sail_destroy_file() for that.
+ * This function doesn't close the io stream. Use io->close() or sail_destroy_io() to actually
+ * close the io stream.
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_write_finish_v2(struct sail_file *file);
+SAIL_EXPORT sail_error_t sail_plugin_write_finish_v2(struct sail_io *io);
 
 
 /* extern "C" */

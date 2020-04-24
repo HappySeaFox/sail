@@ -33,20 +33,28 @@ typedef int sail_error_t;
 #define SAIL_DIR_OPEN_ERROR               3
 #define SAIL_FILE_PARSE_ERROR             4
 #define SAIL_INVALID_ARGUMENT             5
+#define SAIL_IO_READ_ERROR                6
+#define SAIL_IO_WRITE_ERROR               7
+#define SAIL_IO_SEEK_ERROR                8
+#define SAIL_IO_TELL_ERROR                9
+#define SAIL_IO_CLOSE_ERROR               10
 
 /*
  * Encoding/decoding common errors.
  */
 #define SAIL_NULL_PTR                     20
 #define SAIL_PIMPL_NULL_PTR               21
-#define SAIL_FILE_NULL_PTR                22
-#define SAIL_IMAGE_NULL_PTR               23
-#define SAIL_SCAN_LINE_NULL_PTR           24
-#define SAIL_READ_FEATURES_NULL_PTR       25
-#define SAIL_READ_OPTIONS_NULL_PTR        26
-#define SAIL_WRITE_FEATURES_NULL_PTR      27
-#define SAIL_WRITE_OPTIONS_NULL_PTR       28
-#define SAIL_STRING_NULL_PTR              29
+#define SAIL_IMAGE_NULL_PTR               22
+#define SAIL_SCAN_LINE_NULL_PTR           23
+#define SAIL_READ_FEATURES_NULL_PTR       24
+#define SAIL_READ_OPTIONS_NULL_PTR        25
+#define SAIL_WRITE_FEATURES_NULL_PTR      26
+#define SAIL_WRITE_OPTIONS_NULL_PTR       27
+#define SAIL_STRING_NULL_PTR              28
+#define SAIL_IO_NULL_PTR                  29
+#define SAIL_STREAM_NULL_PTR              30
+#define SAIL_BUFFER_NULL_PTR              31
+#define SAIL_INVALID_IO                   32
 
 /*
  * Encoding/decoding specific errors.
@@ -83,14 +91,18 @@ typedef int sail_error_t;
 /*
  * Helper macros.
  */
-#define SAIL_CHECK_FILE(file)      \
-do {                               \
-    if (file == NULL) {            \
-        return SAIL_FILE_NULL_PTR; \
-    }                              \
-    if (file->fptr == NULL) {      \
-        return SAIL_FILE_NULL_PTR; \
-    }                              \
+#define SAIL_CHECK_IO(io)        \
+do {                             \
+    if (io == NULL) {            \
+        return SAIL_IO_NULL_PTR; \
+    }                            \
+    if (io->read == NULL      || \
+            io->seek == NULL  || \
+            io->tell == NULL  || \
+            io->write == NULL || \
+            io->close == NULL) { \
+        return SAIL_INVALID_IO;  \
+    }                            \
 } while(0)
 
 #define SAIL_CHECK_IMAGE(image)                    \
@@ -133,6 +145,9 @@ do {                              \
 #define SAIL_CHECK_PLUGIN_PTR(plugin)                 SAIL_CHECK_PTR2(plugin,         SAIL_PLUGIN_NULL_PTR)
 #define SAIL_CHECK_PIMPL_PTR(pimpl)                   SAIL_CHECK_PTR2(pimpl,          SAIL_PIMPL_NULL_PTR)
 #define SAIL_CHECK_STRING_PTR(str)                    SAIL_CHECK_PTR2(str,            SAIL_STRING_NULL_PTR)
+#define SAIL_CHECK_IO_PTR(io)                         SAIL_CHECK_PTR2(io,             SAIL_IO_NULL_PTR)
+#define SAIL_CHECK_STREAM_PTR(stream)                 SAIL_CHECK_PTR2(stream,         SAIL_STREAM_NULL_PTR)
+#define SAIL_CHECK_BUFFER_PTR(buffer)                 SAIL_CHECK_PTR2(buffer,         SAIL_BUFFER_NULL_PTR)
 
 /*
  * Try to execute the specified SAIL function. If it fails, return the error code.

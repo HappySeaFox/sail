@@ -27,8 +27,10 @@
     #include "common.h"
     #include "error.h"
     #include "export.h"
-    #include "file.h"
     #include "image.h"
+    #include "io.h"
+    #include "io_file.h"
+    #include "io_private.h"
     #include "log.h"
     #include "meta_entry_node.h"
     #include "read_features.h"
@@ -43,6 +45,7 @@
     #include <sail/error.h>
     #include <sail/export.h>
     #include <sail/image.h>
+    #include <sail/io.h>
     #include <sail/log.h>
     #include <sail/meta_entry_node.h>
     #include <sail/read_features.h>

@@ -140,16 +140,16 @@ static int alloc_pimpl(struct pimpl **pimpl) {
  * Decoding functions.
  */
 
-SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_file *file, const struct sail_read_options *read_options) {
+SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_io *io, const struct sail_read_options *read_options) {
 
-    SAIL_CHECK_FILE(file);
+    SAIL_CHECK_IO(io);
     SAIL_CHECK_READ_OPTIONS_PTR(read_options);
 
     struct pimpl *pimpl;
 
     SAIL_TRY(alloc_pimpl(&pimpl));
 
-    file->pimpl = pimpl;
+    io->pimpl = pimpl;
 
     /* Deep copy read options. */
     pimpl->read_options = (struct sail_read_options *)malloc(sizeof(struct sail_read_options));
@@ -172,7 +172,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_file *file, const 
 
     /* JPEG setup. */
     jpeg_create_decompress(&pimpl->decompress_context);
-    jpeg_stdio_src(&pimpl->decompress_context, file->fptr);
+    jpeg_stdio_src(&pimpl->decompress_context, (FILE *)io->stream);
 
     if (pimpl->read_options->io_options & SAIL_IO_OPTION_META_INFO) {
         jpeg_save_markers(&pimpl->decompress_context, JPEG_COM, 0xffff);
@@ -202,11 +202,11 @@ SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_file *file, const 
     return 0;
 }
 
-SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(struct sail_file *file, struct sail_image **image) {
+SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(struct sail_io *io, struct sail_image **image) {
 
-    SAIL_CHECK_FILE(file);
+    SAIL_CHECK_IO(io);
 
-    struct pimpl *pimpl = (struct pimpl *)file->pimpl;
+    struct pimpl *pimpl = (struct pimpl *)io->pimpl;
 
     SAIL_CHECK_PIMPL_PTR(pimpl);
 
@@ -272,21 +272,21 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(struct sail_file *f
     return 0;
 }
 
-SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_pass_v2(struct sail_file *file, const struct sail_image *image) {
+SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_pass_v2(struct sail_io *io, const struct sail_image *image) {
 
-    SAIL_CHECK_FILE(file);
+    SAIL_CHECK_IO(io);
     SAIL_CHECK_IMAGE(image);
 
     return 0;
 }
 
-SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v2(struct sail_file *file, const struct sail_image *image, void *scanline) {
+SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v2(struct sail_io *io, const struct sail_image *image, void *scanline) {
 
-    SAIL_CHECK_FILE(file);
+    SAIL_CHECK_IO(io);
     SAIL_CHECK_IMAGE(image);
     SAIL_CHECK_SCAN_LINE_PTR(scanline);
 
-    struct pimpl *pimpl = (struct pimpl *)file->pimpl;
+    struct pimpl *pimpl = (struct pimpl *)io->pimpl;
 
     SAIL_CHECK_PIMPL_PTR(pimpl);
 
@@ -308,12 +308,12 @@ SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v2(struct sail_file *file, c
     return 0;
 }
 
-SAIL_EXPORT sail_error_t sail_plugin_read_alloc_scan_line_v2(struct sail_file *file, const struct sail_image *image, void **scanline) {
+SAIL_EXPORT sail_error_t sail_plugin_read_alloc_scan_line_v2(struct sail_io *io, const struct sail_image *image, void **scanline) {
 
-    SAIL_CHECK_FILE(file);
+    SAIL_CHECK_IO(io);
     SAIL_CHECK_IMAGE(image);
 
-    struct pimpl *pimpl = (struct pimpl *)file->pimpl;
+    struct pimpl *pimpl = (struct pimpl *)io->pimpl;
 
     SAIL_CHECK_PIMPL_PTR(pimpl);
 
@@ -325,14 +325,14 @@ SAIL_EXPORT sail_error_t sail_plugin_read_alloc_scan_line_v2(struct sail_file *f
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
-    return sail_plugin_read_scan_line_v2(file, image, *scanline);
+    return sail_plugin_read_scan_line_v2(io, image, *scanline);
 }
 
-SAIL_EXPORT sail_error_t sail_plugin_read_finish_v2(struct sail_file *file) {
+SAIL_EXPORT sail_error_t sail_plugin_read_finish_v2(struct sail_io *io) {
 
-    SAIL_CHECK_FILE(file);
+    SAIL_CHECK_IO(io);
 
-    struct pimpl *pimpl = (struct pimpl *)file->pimpl;
+    struct pimpl *pimpl = (struct pimpl *)io->pimpl;
 
     if (pimpl == NULL) {
         return SAIL_MEMORY_ALLOCATION_FAILED;
@@ -355,16 +355,16 @@ SAIL_EXPORT sail_error_t sail_plugin_read_finish_v2(struct sail_file *file) {
  * Encoding functions.
  */
 
-SAIL_EXPORT sail_error_t sail_plugin_write_init_v2(struct sail_file *file, const struct sail_write_options *write_options) {
+SAIL_EXPORT sail_error_t sail_plugin_write_init_v2(struct sail_io *io, const struct sail_write_options *write_options) {
 
-    SAIL_CHECK_FILE(file);
+    SAIL_CHECK_IO(io);
     SAIL_CHECK_WRITE_OPTIONS_PTR(write_options);
 
     struct pimpl *pimpl;
 
     SAIL_TRY(alloc_pimpl(&pimpl));
 
-    file->pimpl = pimpl;
+    io->pimpl = pimpl;
 
     /* Deep copy write options. */
     pimpl->write_options = (struct sail_write_options *)malloc(sizeof(struct sail_write_options));
@@ -396,14 +396,14 @@ SAIL_EXPORT sail_error_t sail_plugin_write_init_v2(struct sail_file *file, const
 
     /* JPEG setup. */
     jpeg_create_compress(&pimpl->compress_context);
-    jpeg_stdio_dest(&pimpl->compress_context, file->fptr);
+    jpeg_stdio_dest(&pimpl->compress_context, (FILE *)io->stream);
 
     return 0;
 }
 
-SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v2(struct sail_file *file, const struct sail_image *image) {
+SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v2(struct sail_io *io, const struct sail_image *image) {
 
-    SAIL_CHECK_FILE(file);
+    SAIL_CHECK_IO(io);
     SAIL_CHECK_IMAGE(image);
 
     /* Sanity check. */
@@ -411,7 +411,7 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v2(struct sail_file *
         return SAIL_UNSUPPORTED_PIXEL_FORMAT;
     }
 
-    struct pimpl *pimpl = (struct pimpl *)file->pimpl;
+    struct pimpl *pimpl = (struct pimpl *)io->pimpl;
 
     SAIL_CHECK_PIMPL_PTR(pimpl);
 
@@ -464,21 +464,21 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v2(struct sail_file *
     return 0;
 }
 
-SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_pass_v2(struct sail_file *file, const struct sail_image *image) {
+SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_pass_v2(struct sail_io *io, const struct sail_image *image) {
 
-    SAIL_CHECK_FILE(file);
+    SAIL_CHECK_IO(io);
     SAIL_CHECK_IMAGE(image);
 
     return 0;
 }
 
-SAIL_EXPORT sail_error_t sail_plugin_write_scan_line_v2(struct sail_file *file, const struct sail_image *image, const void *scanline) {
+SAIL_EXPORT sail_error_t sail_plugin_write_scan_line_v2(struct sail_io *io, const struct sail_image *image, const void *scanline) {
 
-    SAIL_CHECK_FILE(file);
+    SAIL_CHECK_IO(io);
     SAIL_CHECK_IMAGE(image);
     SAIL_CHECK_SCAN_LINE_PTR(scanline);
 
-    struct pimpl *pimpl = (struct pimpl *)file->pimpl;
+    struct pimpl *pimpl = (struct pimpl *)io->pimpl;
 
     SAIL_CHECK_PIMPL_PTR(pimpl);
 
@@ -498,11 +498,11 @@ SAIL_EXPORT sail_error_t sail_plugin_write_scan_line_v2(struct sail_file *file, 
     return 0;
 }
 
-SAIL_EXPORT sail_error_t sail_plugin_write_finish_v2(struct sail_file *file) {
+SAIL_EXPORT sail_error_t sail_plugin_write_finish_v2(struct sail_io *io) {
 
-    SAIL_CHECK_FILE(file);
+    SAIL_CHECK_IO(io);
 
-    struct pimpl *pimpl = (struct pimpl *)file->pimpl;
+    struct pimpl *pimpl = (struct pimpl *)io->pimpl;
 
     SAIL_CHECK_PIMPL_PTR(pimpl);
 
