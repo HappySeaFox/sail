@@ -243,7 +243,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(struct sail_io *io,
     /* Read meta info. */
     if (pimpl->read_options->io_options & SAIL_IO_OPTION_META_INFO) {
         jpeg_saved_marker_ptr it = pimpl->decompress_context.marker_list;
-        struct sail_meta_entry_node *last_meta_entry_node;
+        struct sail_meta_entry_node *last_meta_entry_node = NULL;
 
         while(it != NULL) {
             if(it->marker == JPEG_COM) {

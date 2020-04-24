@@ -190,6 +190,8 @@ static sail_error_t build_plugin_full_path(struct sail_context *context,
     plugin_info_node->plugin_info = plugin_info;
     plugin_info->path = plugin_full_path;
 
+    *last_plugin_info_node = NULL;
+
     if (context->plugin_info_node == NULL) {
         context->plugin_info_node = *last_plugin_info_node = plugin_info_node;
     } else {
