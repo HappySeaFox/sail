@@ -400,7 +400,6 @@ sail_error_t sail_plugin_info_from_extension(const char *extension, const struct
     SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
 
     char *extension_copy;
-
     SAIL_TRY(sail_strdup(extension, &extension_copy));
 
     /* Will compare in lower case. */
@@ -435,7 +434,6 @@ sail_error_t sail_plugin_info_from_mime_type(const struct sail_context *context,
     SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
 
     char *mime_type_copy;
-
     SAIL_TRY(sail_strdup(mime_type, &mime_type_copy));
 
     /* Will compare in lower case. */
@@ -499,11 +497,9 @@ sail_error_t sail_probe(const char *path, struct sail_context *context, struct s
     SAIL_TRY(sail_plugin_info_from_path(path, context, plugin_info_local));
 
     const struct sail_plugin *plugin;
-
     SAIL_TRY(load_plugin_by_plugin_info(context, *plugin_info_local, &plugin));
 
     struct sail_io *io;
-
     SAIL_TRY(sail_alloc_io_read_file(path, &io));
 
     if (plugin->layout == SAIL_PLUGIN_LAYOUT_V2) {

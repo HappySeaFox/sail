@@ -207,7 +207,6 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(struct sail_io *io,
     SAIL_CHECK_IO(io);
 
     struct pimpl *pimpl = (struct pimpl *)io->pimpl;
-
     SAIL_CHECK_PIMPL_PTR(pimpl);
 
     if (pimpl->frame_read) {
@@ -287,7 +286,6 @@ SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v2(struct sail_io *io, const
     SAIL_CHECK_SCAN_LINE_PTR(scanline);
 
     struct pimpl *pimpl = (struct pimpl *)io->pimpl;
-
     SAIL_CHECK_PIMPL_PTR(pimpl);
 
     if (pimpl->libjpeg_error) {
@@ -314,7 +312,6 @@ SAIL_EXPORT sail_error_t sail_plugin_read_alloc_scan_line_v2(struct sail_io *io,
     SAIL_CHECK_IMAGE(image);
 
     struct pimpl *pimpl = (struct pimpl *)io->pimpl;
-
     SAIL_CHECK_PIMPL_PTR(pimpl);
 
     const int color_components = pimpl->decompress_context.output_components;
@@ -333,10 +330,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_finish_v2(struct sail_io *io) {
     SAIL_CHECK_IO(io);
 
     struct pimpl *pimpl = (struct pimpl *)io->pimpl;
-
-    if (pimpl == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
+    SAIL_CHECK_PIMPL_PTR(pimpl);
 
     sail_destroy_read_options(pimpl->read_options);
 
@@ -412,7 +406,6 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v2(struct sail_io *io
     }
 
     struct pimpl *pimpl = (struct pimpl *)io->pimpl;
-
     SAIL_CHECK_PIMPL_PTR(pimpl);
 
     if (pimpl->frame_written) {
@@ -479,7 +472,6 @@ SAIL_EXPORT sail_error_t sail_plugin_write_scan_line_v2(struct sail_io *io, cons
     SAIL_CHECK_SCAN_LINE_PTR(scanline);
 
     struct pimpl *pimpl = (struct pimpl *)io->pimpl;
-
     SAIL_CHECK_PIMPL_PTR(pimpl);
 
     if (pimpl->libjpeg_error) {
@@ -503,7 +495,6 @@ SAIL_EXPORT sail_error_t sail_plugin_write_finish_v2(struct sail_io *io) {
     SAIL_CHECK_IO(io);
 
     struct pimpl *pimpl = (struct pimpl *)io->pimpl;
-
     SAIL_CHECK_PIMPL_PTR(pimpl);
 
     sail_destroy_write_options(pimpl->write_options);

@@ -87,7 +87,6 @@ static sail_error_t sail_alloc_io_file(const char *path, const char *mode, struc
     return 0;
 }
 
-
 /*
  * Public functions.
  */
@@ -112,8 +111,10 @@ void sail_destroy_io(struct sail_io *io) {
         return;
     }
 
-    if (io->close != NULL) {
-        io->close(io->stream);
+    if (io->close != NULL && io->stream != NULL) {
+        if (io->close(io->stream) != 0) {
+            sail_print_errno("Failed to close the I/O stream: %s");
+        }
     }
 
     free(io);
