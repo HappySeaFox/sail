@@ -67,14 +67,20 @@ sail_error_t image_writer::write(const char *path, const image &simage)
 {
     SAIL_CHECK_PATH_PTR(path);
 
-    sail_image sail_image;
-    SAIL_TRY(simage.to_sail_image(&sail_image));
+    sail_image *sail_image;
+    SAIL_TRY(sail_alloc_image(&sail_image));
+
+    SAIL_AT_SCOPE_EXIT (
+        sail_destroy_image(sail_image);
+    );
+
+    SAIL_TRY(simage.to_sail_image(sail_image));
 
     const void *bits = simage.bits() ? simage.bits() : simage.shallow_bits();
 
     SAIL_TRY(sail_write(path,
                         d->ctx->sail_context_c(),
-                        &sail_image,
+                        sail_image,
                         bits));
 
     return 0;
@@ -152,12 +158,18 @@ sail_error_t image_writer::start_writing(const char *path, const plugin_info &sp
 
 sail_error_t image_writer::write_next_frame(const image &simage)
 {
-    sail_image image;
-    SAIL_TRY(simage.to_sail_image(&image));
+    sail_image *sail_image;
+    SAIL_TRY(sail_alloc_image(&sail_image));
+
+    SAIL_AT_SCOPE_EXIT (
+        sail_destroy_image(sail_image);
+    );
+
+    SAIL_TRY(simage.to_sail_image(sail_image));
 
     const void *bits = simage.bits() ? simage.bits() : simage.shallow_bits();
 
-    SAIL_TRY(sail_write_next_frame(d->pmpl, &image, bits));
+    SAIL_TRY(sail_write_next_frame(d->pmpl, sail_image, bits));
 
     return 0;
 }
