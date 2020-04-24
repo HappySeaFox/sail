@@ -226,6 +226,8 @@ SAIL_EXPORT sail_error_t sail_read_next_frame(void *pimpl, struct sail_image **i
  * Stops reading the file started by sail_start_reading() or sail_start_reading_with_options().
  * Does nothing if the pimpl is NULL.
  *
+ * It's essential to always stop reading to free memory resources. Avoiding doing so will lead to memory leaks.
+ *
  * Returns 0 on success or sail_error_t on error.
  */
 SAIL_EXPORT sail_error_t sail_stop_reading(void *pimpl);
@@ -293,6 +295,8 @@ SAIL_EXPORT sail_error_t sail_write_next_frame(void *pimpl, const struct sail_im
 /*
  * Stops writing the file started by sail_start_writing() or sail_start_writing_with_options().
  * Does nothing if the pimpl is NULL.
+ *
+ * It's essential to always stop writing to free memory resources. Avoiding doing so will lead to memory leaks.
  *
  * Returns 0 on success or sail_error_t on error.
  */
