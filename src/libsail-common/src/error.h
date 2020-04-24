@@ -38,6 +38,7 @@ typedef int sail_error_t;
 #define SAIL_IO_SEEK_ERROR                8
 #define SAIL_IO_TELL_ERROR                9
 #define SAIL_IO_CLOSE_ERROR               10
+#define SAIL_IO_EOF                       11
 
 /*
  * Encoding/decoding common errors.
