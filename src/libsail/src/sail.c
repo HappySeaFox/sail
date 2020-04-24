@@ -501,26 +501,27 @@ sail_error_t sail_probe(const char *path, struct sail_context *context, struct s
     const struct sail_plugin *plugin;
     SAIL_TRY(load_plugin_by_plugin_info(context, *plugin_info_local, &plugin));
 
+    if (plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
+        return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
+    }
+
     struct sail_io *io;
     SAIL_TRY(sail_alloc_io_read_file(path, &io));
 
-    if (plugin->layout == SAIL_PLUGIN_LAYOUT_V2) {
-        struct sail_read_options *read_options_local = NULL;
+    struct sail_read_options *read_options_local = NULL;
 
-        SAIL_TRY_OR_CLEANUP(sail_alloc_read_options_from_features((*plugin_info_local)->read_features, &read_options_local),
-                            /* cleanup */ sail_destroy_read_options(read_options_local));
-        SAIL_TRY_OR_CLEANUP(plugin->v2->read_init_v2(io, read_options_local),
-                            /* cleanup */ sail_destroy_read_options(read_options_local),
-                                          sail_destroy_io(io));
-        sail_destroy_read_options(read_options_local);
-        SAIL_TRY_OR_CLEANUP(plugin->v2->read_seek_next_frame_v2(io, image),
-                            /* cleanup */ sail_destroy_io(io));
-        SAIL_TRY_OR_CLEANUP(plugin->v2->read_finish_v2(io),
-                            /* cleanup */ sail_destroy_io(io));
-    } else {
-        sail_destroy_io(io);
-        return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
-    }
+    SAIL_TRY_OR_CLEANUP(sail_alloc_read_options_from_features((*plugin_info_local)->read_features, &read_options_local),
+                        /* cleanup */ sail_destroy_read_options(read_options_local));
+    SAIL_TRY_OR_CLEANUP(plugin->v2->read_init_v2(io, read_options_local),
+                        /* cleanup */ sail_destroy_read_options(read_options_local),
+                                      sail_destroy_io(io));
+
+    sail_destroy_read_options(read_options_local);
+
+    SAIL_TRY_OR_CLEANUP(plugin->v2->read_seek_next_frame_v2(io, image),
+                        /* cleanup */ sail_destroy_io(io));
+    SAIL_TRY_OR_CLEANUP(plugin->v2->read_finish_v2(io),
+                        /* cleanup */ sail_destroy_io(io));
 
     sail_destroy_io(io);
 
@@ -612,22 +613,23 @@ sail_error_t sail_start_reading_with_options(const char *path, struct sail_conte
     }
 
     SAIL_TRY(load_plugin_by_plugin_info(context, pmpl->plugin_info, &pmpl->plugin));
+
+    if (pmpl->plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
+        return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
+    }
+
     SAIL_TRY(sail_alloc_io_read_file(path, &pmpl->io));
 
-    if (pmpl->plugin->layout == SAIL_PLUGIN_LAYOUT_V2) {
-        if (read_options == NULL) {
-            struct sail_read_options *read_options_local = NULL;
+    if (read_options == NULL) {
+        struct sail_read_options *read_options_local = NULL;
 
-            SAIL_TRY_OR_CLEANUP(sail_alloc_read_options_from_features(pmpl->plugin_info->read_features, &read_options_local),
-                                /* cleanup */ sail_destroy_read_options(read_options_local));
-            SAIL_TRY_OR_CLEANUP(pmpl->plugin->v2->read_init_v2(pmpl->io, read_options_local),
-                                /* cleanup */ sail_destroy_read_options(read_options_local));
-            sail_destroy_read_options(read_options_local);
-        } else {
-            SAIL_TRY(pmpl->plugin->v2->read_init_v2(pmpl->io, read_options));
-        }
+        SAIL_TRY_OR_CLEANUP(sail_alloc_read_options_from_features(pmpl->plugin_info->read_features, &read_options_local),
+                            /* cleanup */ sail_destroy_read_options(read_options_local));
+        SAIL_TRY_OR_CLEANUP(pmpl->plugin->v2->read_init_v2(pmpl->io, read_options_local),
+                            /* cleanup */ sail_destroy_read_options(read_options_local));
+        sail_destroy_read_options(read_options_local);
     } else {
-        return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
+        SAIL_TRY(pmpl->plugin->v2->read_init_v2(pmpl->io, read_options));
     }
 
     return 0;
@@ -652,24 +654,24 @@ sail_error_t sail_read_next_frame(void *pimpl, struct sail_image **image, void *
     struct sail_io *io = pmpl->io;
     const struct sail_plugin *plugin = pmpl->plugin;
 
-    if (plugin->layout == SAIL_PLUGIN_LAYOUT_V2) {
-        SAIL_TRY(plugin->v2->read_seek_next_frame_v2(io, image));
-
-        *image_bits = malloc((*image)->bytes_per_line * (*image)->height);
-
-        if (*image_bits == NULL) {
-            return SAIL_MEMORY_ALLOCATION_FAILED;
-        }
-
-        for (int pass = 0; pass < (*image)->passes; pass++) {
-            SAIL_TRY(plugin->v2->read_seek_next_pass_v2(io, *image));
-
-            for (int j = 0; j < (*image)->height; j++) {
-                SAIL_TRY(plugin->v2->read_scan_line_v2(io, *image, ((char *)*image_bits) + j * (*image)->bytes_per_line));
-            }
-        }
-    } else {
+    if (plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
         return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
+    }
+
+    SAIL_TRY(plugin->v2->read_seek_next_frame_v2(io, image));
+
+    *image_bits = malloc((*image)->bytes_per_line * (*image)->height);
+
+    if (*image_bits == NULL) {
+        return SAIL_MEMORY_ALLOCATION_FAILED;
+    }
+
+    for (int pass = 0; pass < (*image)->passes; pass++) {
+        SAIL_TRY(plugin->v2->read_seek_next_pass_v2(io, *image));
+
+        for (int j = 0; j < (*image)->height; j++) {
+            SAIL_TRY(plugin->v2->read_scan_line_v2(io, *image, ((char *)*image_bits) + j * (*image)->bytes_per_line));
+        }
     }
 
     return 0;
@@ -693,13 +695,13 @@ sail_error_t sail_stop_reading(void *pimpl) {
         return 0;
     }
 
-    if (plugin->layout == SAIL_PLUGIN_LAYOUT_V2) {
-        SAIL_TRY_OR_CLEANUP(plugin->v2->read_finish_v2(io),
-                            /* cleanup */ destroy_hidden_pimpl(pmpl));
-    } else {
+    if (plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
         destroy_hidden_pimpl(pmpl);
         return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
     }
+
+    SAIL_TRY_OR_CLEANUP(plugin->v2->read_finish_v2(io),
+                        /* cleanup */ destroy_hidden_pimpl(pmpl));
 
     destroy_hidden_pimpl(pmpl);
 
@@ -732,22 +734,23 @@ sail_error_t sail_start_writing_with_options(const char *path, struct sail_conte
     }
 
     SAIL_TRY(load_plugin_by_plugin_info(context, pmpl->plugin_info, &pmpl->plugin));
+
+    if (pmpl->plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
+        return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
+    }
+
     SAIL_TRY(sail_alloc_io_write_file(path, &pmpl->io));
 
-    if (pmpl->plugin->layout == SAIL_PLUGIN_LAYOUT_V2) {
-        if (write_options == NULL) {
-            struct sail_write_options *write_options_local = NULL;
+    if (write_options == NULL) {
+        struct sail_write_options *write_options_local = NULL;
 
-            SAIL_TRY_OR_CLEANUP(sail_alloc_write_options_from_features(pmpl->plugin_info->write_features, &write_options_local),
-                                /* cleanup */ sail_destroy_write_options(write_options_local));
-            SAIL_TRY_OR_CLEANUP(pmpl->plugin->v2->write_init_v2(pmpl->io, write_options_local),
-                                /* cleanup */ sail_destroy_write_options(write_options_local));
-            sail_destroy_write_options(write_options_local);
-        } else {
-            SAIL_TRY(pmpl->plugin->v2->write_init_v2(pmpl->io, write_options));
-        }
+        SAIL_TRY_OR_CLEANUP(sail_alloc_write_options_from_features(pmpl->plugin_info->write_features, &write_options_local),
+                            /* cleanup */ sail_destroy_write_options(write_options_local));
+        SAIL_TRY_OR_CLEANUP(pmpl->plugin->v2->write_init_v2(pmpl->io, write_options_local),
+                            /* cleanup */ sail_destroy_write_options(write_options_local));
+        sail_destroy_write_options(write_options_local);
     } else {
-        return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
+        SAIL_TRY(pmpl->plugin->v2->write_init_v2(pmpl->io, write_options));
     }
 
     return 0;
@@ -772,9 +775,13 @@ sail_error_t sail_write_next_frame(void *pimpl, const struct sail_image *image, 
     struct sail_io *io = pmpl->io;
     const struct sail_plugin_info *plugin_info = pmpl->plugin_info;
     const struct sail_plugin *plugin = pmpl->plugin;
-    int passes;
+
+    if (plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
+        return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
+    }
 
     /* Detect the number of passes needed to write an interlaced image. */
+    int passes;
     if (image->properties & SAIL_IMAGE_PROPERTY_INTERLACED) {
         passes = plugin_info->write_features->passes;
 
@@ -788,18 +795,14 @@ sail_error_t sail_write_next_frame(void *pimpl, const struct sail_image *image, 
     int bytes_per_line;
     SAIL_TRY(sail_bytes_per_line(image, &bytes_per_line));
 
-    if (plugin->layout == SAIL_PLUGIN_LAYOUT_V2) {
-        SAIL_TRY(plugin->v2->write_seek_next_frame_v2(io, image));
+    SAIL_TRY(plugin->v2->write_seek_next_frame_v2(io, image));
 
-        for (int pass = 0; pass < passes; pass++) {
-            SAIL_TRY(plugin->v2->write_seek_next_pass_v2(io, image));
+    for (int pass = 0; pass < passes; pass++) {
+        SAIL_TRY(plugin->v2->write_seek_next_pass_v2(io, image));
 
-            for (int j = 0; j < image->height; j++) {
-                SAIL_TRY(plugin->v2->write_scan_line_v2(io, image, ((char *)image_bits) + j * bytes_per_line));
-            }
+        for (int j = 0; j < image->height; j++) {
+            SAIL_TRY(plugin->v2->write_scan_line_v2(io, image, ((char *)image_bits) + j * bytes_per_line));
         }
-    } else {
-        return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
     }
 
     return 0;
@@ -823,13 +826,13 @@ sail_error_t sail_stop_writing(void *pimpl) {
         return 0;
     }
 
-    if (plugin->layout == SAIL_PLUGIN_LAYOUT_V2) {
-        SAIL_TRY_OR_CLEANUP(plugin->v2->write_finish_v2(io),
-                            /* cleanup */ destroy_hidden_pimpl(pmpl));
-    } else {
+    if (plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
         destroy_hidden_pimpl(pmpl);
         return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
     }
+
+    SAIL_TRY_OR_CLEANUP(plugin->v2->write_finish_v2(io),
+                        /* cleanup */ destroy_hidden_pimpl(pmpl));
 
     destroy_hidden_pimpl(pmpl);
 
