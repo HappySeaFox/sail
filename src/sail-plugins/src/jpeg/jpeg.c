@@ -27,6 +27,7 @@
 #include "sail-common.h"
 
 #include "helpers.h"
+#include "io_dest.h"
 #include "io_src.h"
 
 /*
@@ -324,7 +325,7 @@ SAIL_EXPORT sail_error_t sail_plugin_write_init_v2(struct sail_io *io, const str
 
     /* JPEG setup. */
     jpeg_create_compress(&pimpl->compress_context);
-    jpeg_stdio_dest(&pimpl->compress_context, (FILE *)io->stream);
+    jpeg_sail_io_dest(&pimpl->compress_context, io);
 
     return 0;
 }

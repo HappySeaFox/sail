@@ -32,7 +32,7 @@
  * Initialize source --- called by jpeg_read_header
  * before any data is actually read.
  */
-void init_source(j_decompress_ptr cinfo)
+static void init_source(j_decompress_ptr cinfo)
 {
     struct sail_jpeg_source_mgr *src = (struct sail_jpeg_source_mgr *)cinfo->src;
 
@@ -75,7 +75,7 @@ void init_source(j_decompress_ptr cinfo)
  * Data beyond this point must be rescanned after resumption, so move it to
  * the front of the buffer rather than discarding it.
  */
-boolean fill_input_buffer(j_decompress_ptr cinfo)
+static boolean fill_input_buffer(j_decompress_ptr cinfo)
 {
     struct sail_jpeg_source_mgr *src = (struct sail_jpeg_source_mgr *)cinfo->src;
     size_t nbytes;
@@ -111,7 +111,7 @@ boolean fill_input_buffer(j_decompress_ptr cinfo)
  * Arranging for additional bytes to be discarded before reloading the input
  * buffer is the application writer's problem.
  */
-void skip_input_data(j_decompress_ptr cinfo, long num_bytes)
+static void skip_input_data(j_decompress_ptr cinfo, long num_bytes)
 {
     struct jpeg_source_mgr *src = cinfo->src;
 
@@ -149,12 +149,17 @@ void skip_input_data(j_decompress_ptr cinfo, long num_bytes)
  * application must deal with any cleanup that should happen even
  * for error exit.
  */
-void term_source(j_decompress_ptr cinfo)
+static void term_source(j_decompress_ptr cinfo)
 {
     /* no work necessary here */
     (void)cinfo;
 }
 
+/*
+ * Prepare for input from a SAIL I/O stream.
+ * The caller must have already opened the stream, and is responsible
+ * for closing it after finishing decompression.
+ */
 void jpeg_sail_io_src(j_decompress_ptr cinfo, struct sail_io *io) {
 
     struct sail_jpeg_source_mgr *src;

@@ -16,8 +16,8 @@
     along with this library. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef SAIL_JPEG_IO_SRC_H
-#define SAIL_JPEG_IO_SRC_H
+#ifndef SAIL_JPEG_IO_DEST_H
+#define SAIL_JPEG_IO_DEST_H
 
 #include <jpeglib.h>
 
@@ -25,17 +25,13 @@
 
 struct sail_io;
 
-/*
- * Expanded data source object for input.
- */
-struct sail_jpeg_source_mgr {
-    struct jpeg_source_mgr pub;   /* public fields */
+struct sail_jpeg_destination_mgr {
+    struct jpeg_destination_mgr pub; /* public fields */
 
-    struct sail_io *io;           /* source stream */
-    JOCTET *buffer;               /* start of buffer */
-    boolean start_of_file;        /* have we gotten any data yet? */
+    struct sail_io *io;                /* target stream */
+    JOCTET *buffer;             /* start of buffer */
 };
 
-SAIL_HIDDEN void jpeg_sail_io_src(j_decompress_ptr cinfo, struct sail_io *io);
+SAIL_HIDDEN void jpeg_sail_io_dest(j_compress_ptr cinfo, struct sail_io *io);
 
 #endif
