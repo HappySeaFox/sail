@@ -48,6 +48,7 @@ static sail_error_t sail_alloc_io(struct sail_io **io) {
     (*io)->seek   = NULL;
     (*io)->tell   = NULL;
     (*io)->write  = NULL;
+    (*io)->flush  = NULL;
     (*io)->close  = NULL;
 
     return 0;
@@ -82,6 +83,7 @@ static sail_error_t sail_alloc_io_file(const char *path, const char *mode, struc
     (*io)->seek  = sail_io_file_seek;
     (*io)->tell  = sail_io_file_tell;
     (*io)->write = sail_io_file_write;
+    (*io)->flush = sail_io_file_flush;
     (*io)->close = sail_io_file_close;
 
     return 0;

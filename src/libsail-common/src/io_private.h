@@ -67,6 +67,14 @@ struct sail_io {
     sail_error_t (*write)(void *stream, const void *buf, size_t object_size, size_t objects_count);
 
     /*
+     * Flushes buffers of the underlying I/O object. Has no effect if the underlying I/O object
+     * is opened for reading.
+     *
+     * Returns 0 on success or sail_error_t on error.
+     */
+    sail_error_t (*flush)(void *stream);
+
+    /*
      * Closes the underlying I/O object.
      *
      * Returns 0 on success or sail_error_t on error.

@@ -85,6 +85,20 @@ sail_error_t sail_io_file_write(void *stream, const void *buf, size_t object_siz
     return 0;
 }
 
+sail_error_t sail_io_file_flush(void *stream) {
+
+    SAIL_CHECK_STREAM_PTR(stream);
+
+    FILE *fptr = (FILE *)stream;
+
+    if (fflush(fptr) != 0) {
+        sail_print_errno("Failed to flush file buffers: %s");
+        return SAIL_IO_FLUSH_ERROR;
+    }
+
+    return 0;
+}
+
 sail_error_t sail_io_file_close(void *stream) {
 
     SAIL_CHECK_STREAM_PTR(stream);
