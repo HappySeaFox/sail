@@ -43,6 +43,7 @@ class read_options;
 class SAIL_EXPORT image_reader
 {
 public:
+    image_reader();
     image_reader(context *ctx);
     ~image_reader();
 

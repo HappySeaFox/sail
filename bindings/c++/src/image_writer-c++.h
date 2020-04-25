@@ -43,6 +43,7 @@ class write_options;
 class SAIL_EXPORT image_writer
 {
 public:
+    image_writer();
     image_writer(context *ctx);
     ~image_writer();
 

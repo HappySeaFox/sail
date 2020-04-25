@@ -29,26 +29,40 @@ namespace sail
 class SAIL_HIDDEN image_reader::pimpl
 {
 public:
-    pimpl(context *_ctx)
-        : ctx(_ctx)
-        , pmpl(nullptr)
+    pimpl()
+        : pmpl(nullptr)
     {
     }
 
     context *ctx;
+    bool own_context;
     void *pmpl;
 };
 
-image_reader::image_reader(context *ctx)
-    : d(new pimpl(ctx))
+image_reader::image_reader()
+    : d(new pimpl)
 {
-    if (ctx == nullptr) {
+    d->ctx = new context;
+    d->own_context = true;
+}
+
+image_reader::image_reader(context *ctx)
+    : d(new pimpl)
+{
+    d->ctx = ctx;
+    d->own_context = false;
+
+    if (d->ctx == nullptr) {
         SAIL_LOG_ERROR("NULL pointer has been passed to image_reader()");
     }
 }
 
 image_reader::~image_reader()
 {
+    if (d->own_context) {
+        delete d->ctx;
+    }
+
     delete d;
 }
 
