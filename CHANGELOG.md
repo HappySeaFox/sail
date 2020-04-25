@@ -1,6 +1,6 @@
 # Changelog
 
-SAIL is a fork of ksquirrel-libs which was a set of C++ image codecs for KSquirrel.
+SAIL (Squirrel Abstract Image Libraries) is a fork of ksquirrel-libs which was a set of C++ image codecs for KSquirrel.
 See [http://ksquirrel.sourceforge.net](http://ksquirrel.sourceforge.net).
 
 # SAIL (since 0.9.0)
