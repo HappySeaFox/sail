@@ -20,6 +20,9 @@
 #define SAIL_IO_PRIVATE_H
 
 #include <stdbool.h>
+#include <stdio.h>
+
+#include "error.h"
 
 /*
  * A structure representing an input/output abstraction. Use sail_alloc_io_read_file() and brothers to
