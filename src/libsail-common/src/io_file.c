@@ -68,17 +68,15 @@ sail_error_t sail_io_file_tell(void *stream, long *offset) {
     return 0;
 }
 
-sail_error_t sail_io_file_write(void *stream, const void *buf, size_t object_size, size_t objects_count) {
+sail_error_t sail_io_file_write(void *stream, const void *buf, size_t object_size, size_t objects_count, size_t *written_objects_count) {
 
     SAIL_CHECK_STREAM_PTR(stream);
     SAIL_CHECK_BUFFER_PTR(buf);
+    SAIL_CHECK_RESULT_PTR(written_objects_count);
 
     FILE *fptr = (FILE *)stream;
 
-    if (fwrite(buf, object_size, objects_count, fptr) < objects_count) {
-        SAIL_LOG_ERROR("Failed to write to the file");
-        return SAIL_IO_WRITE_ERROR;
-    }
+    *written_objects_count = fwrite(buf, object_size, objects_count, fptr);
 
     return 0;
 }

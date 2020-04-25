@@ -34,7 +34,7 @@ SAIL_HIDDEN sail_error_t sail_io_file_seek(void *stream, long offset, int whence
 
 SAIL_HIDDEN sail_error_t sail_io_file_tell(void *stream, long *offset);
 
-SAIL_HIDDEN sail_error_t sail_io_file_write(void *stream, const void *buf, size_t object_size, size_t objects_count);
+SAIL_HIDDEN sail_error_t sail_io_file_write(void *stream, const void *buf, size_t object_size, size_t objects_count, size_t *written_objects_count);
 
 SAIL_HIDDEN sail_error_t sail_io_file_flush(void *stream);
 
