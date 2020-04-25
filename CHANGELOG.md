@@ -12,7 +12,7 @@ See [http://ksquirrel.sourceforge.net](http://ksquirrel.sourceforge.net).
 - added C++ rich client API to read and write images
 - plugins interfaces are now hidden. Always use the client APIs to read or write images
 
-# ksquirel-libs (until 0.8.0)
+# ksquirrel-libs (until 0.8.0)
 
 ## 0.8.0 2007-12-08
 
@@ -99,7 +99,7 @@ See [http://ksquirrel.sourceforge.net](http://ksquirrel.sourceforge.net).
 
 - MAC, MSP, IFF, and UTAH codecs are disabled as buggy (use --enable-devel to enable them)
 - ksquirrel-libs now installs a development library and header files
-- ksquirel-libs now must be installed before KSquirrel
+- ksquirrel-libs now must be installed before KSquirrel
 - updated documentation
 
 ## 0.6.0 2005-12-10
