@@ -26,86 +26,21 @@
 
 #include "sail-common.h"
 
+#include "helpers.h"
+#include "io_src.h"
+
 /*
  * Plugin-specific data types.
  */
+
 static const int COMPRESSION_MIN     = 0;
 static const int COMPRESSION_MAX     = 100;
 static const int COMPRESSION_DEFAULT = 15;
 
-struct my_error_context {
-    struct jpeg_error_mgr jpeg_error_mgr;
-    jmp_buf setjmp_buffer;
-};
-
-typedef struct my_error_context * my_error_context_ptr;
-
-static void my_output_message(j_common_ptr cinfo) {
-    char buffer[JMSG_LENGTH_MAX];
-
-    (*cinfo->err->format_message)(cinfo, buffer);
-
-    SAIL_LOG_ERROR("JPEG: %s", buffer);
-}
-
-static void my_error_exit(j_common_ptr cinfo) {
-    my_error_context_ptr myerr = (my_error_context_ptr)cinfo->err;
-
-    (*cinfo->err->output_message)(cinfo);
-
-    longjmp(myerr->setjmp_buffer, 1);
-}
-
-static int color_space_to_pixel_format(J_COLOR_SPACE color_space) {
-    switch (color_space) {
-        case JCS_GRAYSCALE: return SAIL_PIXEL_FORMAT_GRAYSCALE;
-
-        case JCS_EXT_RGB:
-        case JCS_RGB:       return SAIL_PIXEL_FORMAT_RGB;
-
-        case JCS_YCbCr:     return SAIL_PIXEL_FORMAT_YCBCR;
-        case JCS_CMYK:      return SAIL_PIXEL_FORMAT_CMYK;
-        case JCS_YCCK:      return SAIL_PIXEL_FORMAT_YCCK;
-        case JCS_EXT_RGBX:  return SAIL_PIXEL_FORMAT_RGBX;
-        case JCS_EXT_BGR:   return SAIL_PIXEL_FORMAT_BGR;
-        case JCS_EXT_BGRX:  return SAIL_PIXEL_FORMAT_BGRX;
-        case JCS_EXT_XBGR:  return SAIL_PIXEL_FORMAT_XBGR;
-        case JCS_EXT_XRGB:  return SAIL_PIXEL_FORMAT_XRGB;
-        case JCS_EXT_RGBA:  return SAIL_PIXEL_FORMAT_RGBA;
-        case JCS_EXT_BGRA:  return SAIL_PIXEL_FORMAT_BGRA;
-        case JCS_EXT_ABGR:  return SAIL_PIXEL_FORMAT_ABGR;
-        case JCS_EXT_ARGB:  return SAIL_PIXEL_FORMAT_ARGB;
-        case JCS_RGB565:    return SAIL_PIXEL_FORMAT_RGB565;
-
-        default:            return SAIL_PIXEL_FORMAT_UNKNOWN;
-    }
-}
-
-static J_COLOR_SPACE pixel_format_to_color_space(int pixel_format) {
-    switch (pixel_format) {
-        case SAIL_PIXEL_FORMAT_GRAYSCALE: return JCS_GRAYSCALE;
-        case SAIL_PIXEL_FORMAT_RGB:       return JCS_RGB;
-        case SAIL_PIXEL_FORMAT_YCBCR:     return JCS_YCbCr;
-        case SAIL_PIXEL_FORMAT_CMYK:      return JCS_CMYK;
-        case SAIL_PIXEL_FORMAT_YCCK:      return JCS_YCCK;
-        case SAIL_PIXEL_FORMAT_RGBX:      return JCS_EXT_RGBX;
-        case SAIL_PIXEL_FORMAT_BGR:       return JCS_EXT_BGR;
-        case SAIL_PIXEL_FORMAT_BGRX:      return JCS_EXT_BGRX;
-        case SAIL_PIXEL_FORMAT_XBGR:      return JCS_EXT_XBGR;
-        case SAIL_PIXEL_FORMAT_XRGB:      return JCS_EXT_XRGB;
-        case SAIL_PIXEL_FORMAT_RGBA:      return JCS_EXT_RGBA;
-        case SAIL_PIXEL_FORMAT_BGRA:      return JCS_EXT_BGRA;
-        case SAIL_PIXEL_FORMAT_ABGR:      return JCS_EXT_ABGR;
-        case SAIL_PIXEL_FORMAT_ARGB:      return JCS_EXT_ARGB;
-        case SAIL_PIXEL_FORMAT_RGB565:    return JCS_RGB565;
-
-        default:                          return JCS_UNKNOWN;
-    }
-}
-
 /*
  * Plugin-specific PIMPL.
  */
+
 struct pimpl {
     struct jpeg_decompress_struct decompress_context;
     struct jpeg_compress_struct compress_context;
@@ -171,7 +106,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_io *io, const stru
 
     /* JPEG setup. */
     jpeg_create_decompress(&pimpl->decompress_context);
-    jpeg_stdio_src(&pimpl->decompress_context, (FILE *)io->stream);
+    jpeg_sail_io_src(&pimpl->decompress_context, io);
 
     if (pimpl->read_options->io_options & SAIL_IO_OPTION_META_INFO) {
         jpeg_save_markers(&pimpl->decompress_context, JPEG_COM, 0xffff);
