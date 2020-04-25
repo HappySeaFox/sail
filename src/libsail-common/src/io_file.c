@@ -24,17 +24,15 @@
 
 #include "sail-common.h"
 
-sail_error_t sail_io_file_read(void *stream, void *buf, size_t object_size, size_t objects_count) {
+sail_error_t sail_io_file_read(void *stream, void *buf, size_t object_size, size_t objects_count, size_t *read_objects_count) {
 
     SAIL_CHECK_STREAM_PTR(stream);
     SAIL_CHECK_BUFFER_PTR(buf);
+    SAIL_CHECK_RESULT_PTR(read_objects_count);
 
     FILE *fptr = (FILE *)stream;
 
-    if (fread(buf, object_size, objects_count, fptr) < objects_count) {
-        SAIL_LOG_ERROR("Failed to read from the file: %s", feof(fptr) ? "end of file" : "unknown error");
-        return feof(fptr) ? SAIL_IO_EOF : SAIL_IO_READ_ERROR;
-    }
+    *read_objects_count = fread(buf, object_size, objects_count, fptr);
 
     return 0;
 }

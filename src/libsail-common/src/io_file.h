@@ -28,7 +28,7 @@
  * File I/O implementation.
  */
 
-SAIL_HIDDEN sail_error_t sail_io_file_read(void *stream, void *buf, size_t object_size, size_t objects_count);
+SAIL_HIDDEN sail_error_t sail_io_file_read(void *stream, void *buf, size_t object_size, size_t objects_count, size_t *read_objects_count);
 
 SAIL_HIDDEN sail_error_t sail_io_file_seek(void *stream, long offset, int whence);
 

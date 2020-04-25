@@ -37,11 +37,12 @@ struct sail_io {
     void *pimpl;
 
     /*
-     * Reads from the underlying I/O object into the specified buffer.
+     * Reads from the underlying I/O object into the specified buffer. Assigns the number of objects
+     * actually read to read_objects_count.
      *
      * Returns 0 on success or sail_error_t on error.
      */
-    sail_error_t (*read)(void *stream, void *buf, size_t object_size, size_t objects_count);
+    sail_error_t (*read)(void *stream, void *buf, size_t object_size, size_t objects_count, size_t *read_objects_count);
 
     /*
      * Sets the I/O position in the underlying I/O object.
