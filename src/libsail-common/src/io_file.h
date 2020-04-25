@@ -19,6 +19,7 @@
 #ifndef SAIL_IO_FILE_H
 #define SAIL_IO_FILE_H
 
+#include <stdbool.h>
 #include <stdio.h>
 
 #include "error.h"
@@ -39,5 +40,7 @@ SAIL_HIDDEN sail_error_t sail_io_file_write(void *stream, const void *buf, size_
 SAIL_HIDDEN sail_error_t sail_io_file_flush(void *stream);
 
 SAIL_HIDDEN sail_error_t sail_io_file_close(void *stream);
+
+SAIL_HIDDEN sail_error_t sail_io_file_eof(void *stream, bool *result);
 
 #endif

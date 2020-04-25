@@ -19,6 +19,8 @@
 #ifndef SAIL_IO_PRIVATE_H
 #define SAIL_IO_PRIVATE_H
 
+#include <stdbool.h>
+
 /*
  * A structure representing an input/output abstraction. Use sail_alloc_io_read_file() and brothers to
  * allocate I/O objects.
@@ -82,6 +84,13 @@ struct sail_io {
      * Returns 0 on success or sail_error_t on error.
      */
     sail_error_t (*close)(void *stream);
+
+    /*
+     * Assigns true to the specified result if the underlying I/O object reached the end-of-file indicator.
+     *
+     * Returns 0 on success or sail_error_t on error.
+     */
+    sail_error_t (*eof)(void *stream, bool *result);
 };
 
 typedef struct sail_io sail_io_t;

@@ -108,3 +108,15 @@ sail_error_t sail_io_file_close(void *stream) {
 
     return 0;
 }
+
+sail_error_t sail_io_file_eof(void *stream, bool *result) {
+
+    SAIL_CHECK_STREAM_PTR(stream);
+    SAIL_CHECK_RESULT_PTR(result);
+
+    FILE *fptr = (FILE *)stream;
+
+    *result = feof(fptr);
+
+    return 0;
+}
