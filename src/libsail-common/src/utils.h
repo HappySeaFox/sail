@@ -19,6 +19,7 @@
 #ifndef SAIL_UTILS_H
 #define SAIL_UTILS_H
 
+#include <stdint.h>
 #include <wchar.h>
 
 #ifdef SAIL_BUILD
@@ -179,6 +180,13 @@ SAIL_EXPORT sail_error_t sail_bytes_per_image(const struct sail_image *image, in
  * Returns 0 on success or sail_error_t on error.
  */
 SAIL_EXPORT sail_error_t sail_print_errno(const char *format);
+
+/*
+ * Assigns the current number of milliseconds since Epoch.
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_now(uint64_t *result);
 
 /* extern "C" */
 #ifdef __cplusplus

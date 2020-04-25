@@ -27,6 +27,9 @@
 
 #ifdef SAIL_WIN32
     #include <windows.h>
+#else
+    #include <errno.h>
+    #include <sys/time.h>
 #endif
 
 #include "sail-common.h"
@@ -202,7 +205,7 @@ sail_error_t sail_pixel_format_to_string(int pixel_format, const char **result) 
 sail_error_t sail_pixel_format_from_string(const char *str, int *result) {
 
     SAIL_CHECK_STRING_PTR(str);
-    SAIL_CHECK_PTR(result);
+    SAIL_CHECK_RESULT_PTR(result);
 
     if (strlen(str) == 0) {
         return SAIL_UNSUPPORTED_PIXEL_FORMAT;
@@ -270,7 +273,7 @@ sail_error_t sail_image_property_to_string(int image_property, const char **resu
 sail_error_t sail_image_property_from_string(const char *str, int *result) {
 
     SAIL_CHECK_STRING_PTR(str);
-    SAIL_CHECK_PTR(result);
+    SAIL_CHECK_RESULT_PTR(result);
 
     if (strlen(str) == 0) {
         return SAIL_UNSUPPORTED_IMAGE_PROPERTY;
@@ -303,7 +306,7 @@ sail_error_t sail_compression_type_to_string(int compression, const char **resul
 sail_error_t sail_compression_type_from_string(const char *str, int *result) {
 
     SAIL_CHECK_STRING_PTR(str);
-    SAIL_CHECK_PTR(result);
+    SAIL_CHECK_RESULT_PTR(result);
 
     if (strlen(str) == 0) {
         return SAIL_UNSUPPORTED_COMPRESSION_TYPE;
@@ -339,7 +342,7 @@ sail_error_t sail_plugin_feature_to_string(int plugin_feature, const char **resu
 sail_error_t sail_plugin_feature_from_string(const char *str, int *result) {
 
     SAIL_CHECK_STRING_PTR(str);
-    SAIL_CHECK_PTR(result);
+    SAIL_CHECK_RESULT_PTR(result);
 
     if (strlen(str) == 0) {
         return SAIL_UNSUPPORTED_PLUGIN_FEATURE;
@@ -366,7 +369,7 @@ sail_error_t sail_plugin_feature_from_string(const char *str, int *result) {
 
 sail_error_t sail_bits_per_pixel(int pixel_format, int *result) {
 
-    SAIL_CHECK_PTR(result);
+    SAIL_CHECK_RESULT_PTR(result);
 
     switch (pixel_format) {
         case SAIL_PIXEL_FORMAT_UNKNOWN:   *result = 0;  break;
@@ -403,7 +406,7 @@ sail_error_t sail_bits_per_pixel(int pixel_format, int *result) {
 sail_error_t sail_bytes_per_line(const struct sail_image *image, int *result) {
 
     SAIL_CHECK_IMAGE_PTR(image);
-    SAIL_CHECK_PTR(result);
+    SAIL_CHECK_RESULT_PTR(result);
 
     int bits_per_pixel;
     SAIL_TRY(sail_bits_per_pixel(image->pixel_format, &bits_per_pixel));
@@ -418,7 +421,7 @@ sail_error_t sail_bytes_per_line(const struct sail_image *image, int *result) {
 sail_error_t sail_bytes_per_image(const struct sail_image *image, int *result) {
 
     SAIL_CHECK_IMAGE_PTR(image);
-    SAIL_CHECK_PTR(result);
+    SAIL_CHECK_RESULT_PTR(result);
 
     int bytes_per_line;
     SAIL_TRY(sail_bytes_per_line(image, &bytes_per_line));
@@ -438,6 +441,47 @@ sail_error_t sail_print_errno(const char *format) {
     SAIL_LOG_ERROR(format, buffer);
 #else
     SAIL_LOG_ERROR(format, strerror(errno));
+#endif
+
+    return 0;
+}
+
+sail_error_t sail_now(uint64_t *result) {
+
+    SAIL_CHECK_RESULT_PTR(result);
+
+#ifdef SAIL_WIN32
+    SAIL_THREAD_LOCAL static bool initialized = false;
+    SAIL_THREAD_LOCAL static double frequency = 0;
+
+    LARGE_INTEGER li;
+
+    if (!initialized) {
+        initialized = true;
+
+        if (!QueryPerformanceFrequency(&li)) {
+            SAIL_LOG_ERROR("Failed to get the current time. Error: %d", GetLastError());
+            return SAIL_INVALID_ARGUMENT;
+        }
+
+        frequency = (double)li.QuadPart / 1000;
+    }
+
+    if (!QueryPerformanceCounter(&li)) {
+        SAIL_LOG_ERROR("Failed to get the current time. Error: %d", GetLastError());
+        return SAIL_INVALID_ARGUMENT;
+    }
+
+    *result = (uint64_t)((double)li.QuadPart / frequency);
+#else
+    struct timeval tv;
+
+    if (gettimeofday(&tv, NULL) != 0) {
+        sail_print_errno("Failed to get the current time: %s");
+        return 0;
+    }
+
+    *result = (uint64_t)tv.tv_sec * 1000 + (uint64_t)tv.tv_usec / 1000;
 #endif
 
     return 0;

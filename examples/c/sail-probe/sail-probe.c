@@ -22,56 +22,10 @@
 
 #include <stdbool.h>
 #include <stdio.h>
-#include <stdint.h>
 #include <string.h>
 
 #include "sail-common.h"
 #include "sail.h"
-
-#ifdef SAIL_WIN32
-    #include <windows.h>
-#else
-    #include <errno.h>
-    #include <sys/time.h>
-    #include <string.h>
-#endif
-
-static uint64_t now() {
-
-#ifdef SAIL_WIN32
-    SAIL_THREAD_LOCAL static bool initialized = false;
-    SAIL_THREAD_LOCAL static double frequency = 0;
-
-    LARGE_INTEGER li;
-
-    if (!initialized) {
-        initialized = true;
-
-        if (!QueryPerformanceFrequency(&li)) {
-            fprintf(stderr, "Failed to get the current time. Error: %d\n", GetLastError());
-            return 0;
-        }
-
-        frequency = (double)li.QuadPart / 1000;
-    }
-
-    if (!QueryPerformanceCounter(&li)) {
-        fprintf(stderr, "Failed to get the current time. Error: %d\n", GetLastError());
-        return 0;
-    }
-
-    return (uint64_t)((double)li.QuadPart / frequency);
-#else
-    struct timeval tv;
-
-    if (gettimeofday(&tv, NULL) != 0) {
-        fprintf(stderr, "Failed to get the current time: %s\n", strerror(errno));
-        return 0;
-    }
-
-    return (uint64_t)tv.tv_sec * 1000 + (uint64_t)tv.tv_usec / 1000;
-#endif
-}
 
 static sail_error_t probe(const char *path, struct sail_context *context) {
 
@@ -79,15 +33,19 @@ static sail_error_t probe(const char *path, struct sail_context *context) {
     SAIL_CHECK_CONTEXT_PTR(context);
 
     /* Time counter. */
-    const uint64_t start_time = now();
+    uint64_t start_time;
+    SAIL_TRY(sail_now(&start_time));
 
     struct sail_image *image;
     const struct sail_plugin_info *plugin_info;
 
     SAIL_TRY(sail_probe(path, context, &image, &plugin_info));
 
+    uint64_t end_time;
+    SAIL_TRY(sail_now(&end_time));
+
     printf("File          : %s\n", path);
-    printf("Probe time    : %ld ms.\n", (unsigned long)(now() - start_time));
+    printf("Probe time    : %ld ms.\n", (unsigned long)(end_time - start_time));
     printf("Codec         : %s [%s]\n", plugin_info->name, plugin_info->description);
     printf("Codec version : %s\n", plugin_info->version);
     printf("Size          : %dx%d\n", image->width, image->height);
