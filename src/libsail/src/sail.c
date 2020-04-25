@@ -208,6 +208,10 @@ static sail_error_t build_plugin_full_path(struct sail_context *context,
 
 sail_error_t sail_init(struct sail_context **context) {
 
+    /* Time counter. */
+    uint64_t start_time;
+    SAIL_TRY(sail_now(&start_time));
+
     SAIL_LOG_INFO("Version %s-%s", SAIL_VERSION_STRING, SAIL_GIT_HASH);
 
     SAIL_CHECK_CONTEXT_PTR(context);
@@ -302,6 +306,11 @@ sail_error_t sail_init(struct sail_context **context) {
 
     closedir(d);
 #endif
+
+    uint64_t end_time;
+    SAIL_TRY(sail_now(&end_time));
+
+    SAIL_LOG_DEBUG("Initialized in %lld ms.", (unsigned long)(end_time - start_time));
 
     return 0;
 }
