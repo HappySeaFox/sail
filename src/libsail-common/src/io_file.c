@@ -20,11 +20,21 @@
 
 #include <errno.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+
+#ifdef SAIL_WIN32
+    /* _fsopen() */
+    #include <share.h>
+#endif
 
 #include "sail-common.h"
 
-sail_error_t sail_io_file_read(void *stream, void *buf, size_t object_size, size_t objects_count, size_t *read_objects_count) {
+/*
+ * Private functions.
+ */
+
+static sail_error_t sail_io_file_read(void *stream, void *buf, size_t object_size, size_t objects_count, size_t *read_objects_count) {
 
     SAIL_CHECK_STREAM_PTR(stream);
     SAIL_CHECK_BUFFER_PTR(buf);
@@ -37,7 +47,7 @@ sail_error_t sail_io_file_read(void *stream, void *buf, size_t object_size, size
     return 0;
 }
 
-sail_error_t sail_io_file_seek(void *stream, long offset, int whence) {
+static sail_error_t sail_io_file_seek(void *stream, long offset, int whence) {
 
     SAIL_CHECK_STREAM_PTR(stream);
 
@@ -51,7 +61,7 @@ sail_error_t sail_io_file_seek(void *stream, long offset, int whence) {
     return 0;
 }
 
-sail_error_t sail_io_file_tell(void *stream, long *offset) {
+static sail_error_t sail_io_file_tell(void *stream, long *offset) {
 
     SAIL_CHECK_STREAM_PTR(stream);
     SAIL_CHECK_PTR(offset);
@@ -68,7 +78,7 @@ sail_error_t sail_io_file_tell(void *stream, long *offset) {
     return 0;
 }
 
-sail_error_t sail_io_file_write(void *stream, const void *buf, size_t object_size, size_t objects_count, size_t *written_objects_count) {
+static sail_error_t sail_io_file_write(void *stream, const void *buf, size_t object_size, size_t objects_count, size_t *written_objects_count) {
 
     SAIL_CHECK_STREAM_PTR(stream);
     SAIL_CHECK_BUFFER_PTR(buf);
@@ -81,7 +91,7 @@ sail_error_t sail_io_file_write(void *stream, const void *buf, size_t object_siz
     return 0;
 }
 
-sail_error_t sail_io_file_flush(void *stream) {
+static sail_error_t sail_io_file_flush(void *stream) {
 
     SAIL_CHECK_STREAM_PTR(stream);
 
@@ -95,7 +105,7 @@ sail_error_t sail_io_file_flush(void *stream) {
     return 0;
 }
 
-sail_error_t sail_io_file_close(void *stream) {
+static sail_error_t sail_io_file_close(void *stream) {
 
     SAIL_CHECK_STREAM_PTR(stream);
 
@@ -109,7 +119,7 @@ sail_error_t sail_io_file_close(void *stream) {
     return 0;
 }
 
-sail_error_t sail_io_file_eof(void *stream, bool *result) {
+static sail_error_t sail_io_file_eof(void *stream, bool *result) {
 
     SAIL_CHECK_STREAM_PTR(stream);
     SAIL_CHECK_RESULT_PTR(result);
@@ -117,6 +127,60 @@ sail_error_t sail_io_file_eof(void *stream, bool *result) {
     FILE *fptr = (FILE *)stream;
 
     *result = feof(fptr);
+
+    return 0;
+}
+
+static sail_error_t sail_alloc_io_file(const char *path, const char *mode, struct sail_io **io) {
+
+    SAIL_CHECK_PATH_PTR(path);
+    SAIL_CHECK_IO_PTR(io);
+
+    /* Try to open the file first */
+    FILE *fptr;
+
+#ifdef SAIL_WIN32
+    fptr = _fsopen(path, mode, _SH_DENYWR);
+#else
+    /* Fallback to a regular fopen() */
+    fptr = fopen(path, mode);
+#endif
+
+    if (fptr == NULL) {
+        sail_print_errno("Failed to open the specified file: %s");
+        return SAIL_FILE_OPEN_ERROR;
+    }
+
+    SAIL_TRY_OR_CLEANUP(sail_alloc_io(io),
+                        /* cleanup */ fclose(fptr));
+
+    (*io)->stream = fptr;
+
+    (*io)->read  = sail_io_file_read;
+    (*io)->seek  = sail_io_file_seek;
+    (*io)->tell  = sail_io_file_tell;
+    (*io)->write = sail_io_file_write;
+    (*io)->flush = sail_io_file_flush;
+    (*io)->close = sail_io_file_close;
+    (*io)->eof   = sail_io_file_eof;
+
+    return 0;
+}
+
+/*
+ * Public functions.
+ */
+
+sail_error_t sail_alloc_io_read_file(const char *path, struct sail_io **io) {
+
+    SAIL_TRY(sail_alloc_io_file(path, "rb", io));
+
+    return 0;
+}
+
+sail_error_t sail_alloc_io_write_file(const char *path, struct sail_io **io) {
+
+    SAIL_TRY(sail_alloc_io_file(path, "wb", io));
 
     return 0;
 }

@@ -46,6 +46,7 @@
     #include <sail/export.h>
     #include <sail/image.h>
     #include <sail/io_common.h>
+    #include <sail/io_file.h>
     #include <sail/log.h>
     #include <sail/meta_entry_node.h>
     #include <sail/read_features.h>

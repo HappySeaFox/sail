@@ -8,8 +8,9 @@ set(SAIL_COLORED_OUTPUT ${SAIL_COLORED_OUTPUT} PARENT_SCOPE)
 
 add_library(sail-common
                 src/image.c
-                src/io.c
+                src/io_common.c
                 src/io_file.c
+                src/io_private.c
                 src/meta_entry_node.c
                 src/log.c
                 src/read_features.c
@@ -26,6 +27,7 @@ list(APPEND PUBLIC_HEADERS "src/error.h")
 list(APPEND PUBLIC_HEADERS "src/export.h")
 list(APPEND PUBLIC_HEADERS "src/image.h")
 list(APPEND PUBLIC_HEADERS "src/io_common.h")
+list(APPEND PUBLIC_HEADERS "src/io_file.h")
 list(APPEND PUBLIC_HEADERS "src/meta_entry_node.h")
 list(APPEND PUBLIC_HEADERS "src/read_features.h")
 list(APPEND PUBLIC_HEADERS "src/read_options.h")

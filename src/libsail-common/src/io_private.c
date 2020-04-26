@@ -16,33 +16,29 @@
     along with this library. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef SAIL_IO_COMMON_H
-#define SAIL_IO_COMMON_H
+#include "config.h"
 
-#ifdef SAIL_BUILD
-    #include "error.h"
-    #include "export.h"
-#else
-    #include <sail/error.h>
-    #include <sail/export.h>
-#endif
+#include <stdlib.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "sail-common.h"
 
-struct sail_io;
+sail_error_t sail_alloc_io(struct sail_io **io) {
 
-/*
- * Closes and destroys the specified io object and all its internal allocated memory buffers.
- * The io object MUST NOT be used anymore after calling this function. Does nothing
- * if the io object is NULL.
- */
-SAIL_EXPORT void sail_destroy_io(struct sail_io *io);
+    *io = (struct sail_io *)malloc(sizeof(struct sail_io));
 
-/* extern "C" */
-#ifdef __cplusplus
+    if (*io == NULL) {
+        return SAIL_MEMORY_ALLOCATION_FAILED;
+    }
+
+    (*io)->stream = NULL;
+    (*io)->pimpl  = NULL;
+    (*io)->read   = NULL;
+    (*io)->seek   = NULL;
+    (*io)->tell   = NULL;
+    (*io)->write  = NULL;
+    (*io)->flush  = NULL;
+    (*io)->close  = NULL;
+    (*io)->eof    = NULL;
+
+    return 0;
 }
-#endif
-
-#endif

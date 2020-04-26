@@ -22,25 +22,39 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#include "error.h"
-#include "export.h"
+#ifdef SAIL_BUILD
+    #include "error.h"
+    #include "export.h"
+#else
+    #include <sail/error.h>
+    #include <sail/export.h>
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+struct sail_io;
 
 /*
- * File I/O implementation.
+ * Opens the specified image file for reading and allocates a new io object for it.
+ * The assigned io object MUST be destroyed later with sail_destroy_io().
+ *
+ * Returns 0 on success or sail_error_t on error.
  */
+SAIL_EXPORT sail_error_t sail_alloc_io_read_file(const char *path, struct sail_io **io);
 
-SAIL_HIDDEN sail_error_t sail_io_file_read(void *stream, void *buf, size_t object_size, size_t objects_count, size_t *read_objects_count);
+/*
+ * Opens the specified image file for writing and allocates a new io object for it.
+ * The assigned io object MUST be destroyed later with sail_destroy_io().
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_alloc_io_write_file(const char *path, struct sail_io **io);
 
-SAIL_HIDDEN sail_error_t sail_io_file_seek(void *stream, long offset, int whence);
-
-SAIL_HIDDEN sail_error_t sail_io_file_tell(void *stream, long *offset);
-
-SAIL_HIDDEN sail_error_t sail_io_file_write(void *stream, const void *buf, size_t object_size, size_t objects_count, size_t *written_objects_count);
-
-SAIL_HIDDEN sail_error_t sail_io_file_flush(void *stream);
-
-SAIL_HIDDEN sail_error_t sail_io_file_close(void *stream);
-
-SAIL_HIDDEN sail_error_t sail_io_file_eof(void *stream, bool *result);
+/* extern "C" */
+#ifdef __cplusplus
+}
+#endif
 
 #endif
