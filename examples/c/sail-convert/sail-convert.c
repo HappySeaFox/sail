@@ -55,7 +55,7 @@ static sail_error_t convert(const char *input, const char *output, struct sail_c
     SAIL_LOG_INFO("Output file: %s", output);
 
     SAIL_TRY(sail_plugin_info_from_path(output, context, &plugin_info));
-    SAIL_LOG_INFO("Outpu codec: %s", plugin_info->description);
+    SAIL_LOG_INFO("Output codec: %s", plugin_info->description);
 
     struct sail_write_options *write_options;
     SAIL_TRY(sail_alloc_write_options_from_features(plugin_info->write_features, &write_options));
