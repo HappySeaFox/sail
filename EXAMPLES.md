@@ -4,7 +4,7 @@ SAIL provides 3 levels of APIs depending on your needs. Let's have a look at the
 
 ### 1. `junior` "I just want to load this damn image"
 
-**C**
+**C:**
 ```C
 struct sail_image *image;
 unsigned char *image_bits;
@@ -28,7 +28,7 @@ free(image_bits);
 sail_destroy_image(image);
 ```
 
-**C++**
+**C++:**
 ```C++
 sail::image_reader reader;
 sail::image image;
@@ -44,7 +44,7 @@ SAIL_TRY(reader.read(path, &image));
 
 ### 2. `advanced` "I want to load this damn image and have more control"
 
-**C**
+**C:**
 ```C
 sail_context *context = NULL;
 
@@ -98,7 +98,7 @@ free(image_bits);
 sail_destroy_image(image);
 ```
 
-**C++**
+**C++:**
 ```C++
 // Create a new SAIL context.
 // You can re-use the same context for multiple readings or writings.
@@ -139,10 +139,10 @@ SAIL_TRY(reader.stop_reading());
 
 ### 3. `deep diver` "I want to load this damn image and have comprehensive control"
 
-**C**
+**C:**
 ```C
 ```
 
-**C++**
+**C++:**
 ```C++
 ```
