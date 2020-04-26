@@ -37,16 +37,16 @@ extern "C" {
 struct sail_io;
 
 /*
- * Opens the specified image file for reading and allocates a new io object for it.
- * The assigned io object MUST be destroyed later with sail_destroy_io().
+ * Opens the specified image file for reading and allocates a new I/O object for it.
+ * The assigned I/O object MUST be destroyed later with sail_destroy_io().
  *
  * Returns 0 on success or sail_error_t on error.
  */
 SAIL_EXPORT sail_error_t sail_alloc_io_read_file(const char *path, struct sail_io **io);
 
 /*
- * Opens the specified image file for writing and allocates a new io object for it.
- * The assigned io object MUST be destroyed later with sail_destroy_io().
+ * Opens the specified image file for writing and allocates a new I/O object for it.
+ * The assigned I/O object MUST be destroyed later with sail_destroy_io().
  *
  * Returns 0 on success or sail_error_t on error.
  */

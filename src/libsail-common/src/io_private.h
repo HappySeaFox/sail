@@ -99,7 +99,7 @@ struct sail_io {
 typedef struct sail_io sail_io_t;
 
 /*
- * Allocates a new I/O objects. The assigned I/O object MUST be destroyed later with sail_destroy_io().
+ * Allocates a new I/O object. The assigned I/O object MUST be destroyed later with sail_destroy_io().
  *
  * Returns 0 on success or sail_error_t on error.
  */

@@ -34,9 +34,9 @@ extern "C" {
 struct sail_io;
 
 /*
- * Closes and destroys the specified io object and all its internal allocated memory buffers.
- * The io object MUST NOT be used anymore after calling this function. Does nothing
- * if the io object is NULL.
+ * Closes and destroys the specified I/O object and all its internal allocated memory buffers.
+ * The I/O object MUST NOT be used anymore after calling this function. Does nothing
+ * if the I/O object is NULL.
  */
 SAIL_EXPORT void sail_destroy_io(struct sail_io *io);
 
