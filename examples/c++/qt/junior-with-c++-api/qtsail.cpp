@@ -50,8 +50,6 @@ public:
     QScopedPointer<Ui::QtSail> ui;
 
     QImage qimage;
-
-    sail::context context;
 };
 
 QtSail::QtSail(QWidget *parent)
@@ -71,22 +69,10 @@ QtSail::QtSail(QWidget *parent)
     d->ui->pushOpen->setToolTip(d->ui->pushOpen->shortcut().toString());
     d->ui->pushSave->setShortcut(QKeySequence::Save);
     d->ui->pushSave->setToolTip(d->ui->pushSave->shortcut().toString());
-
-    init();
 }
 
 QtSail::~QtSail()
 {
-}
-
-sail_error_t QtSail::init()
-{
-    if (!d->context.is_valid()) {
-        QMessageBox::critical(this, tr("Error"), tr("Failed to init SAIL"));
-        ::exit(1);
-    }
-
-    return 0;
 }
 
 static QImage::Format sailPixelFormatToQImageFormat(int pixel_format) {
@@ -104,7 +90,7 @@ static QImage::Format sailPixelFormatToQImageFormat(int pixel_format) {
 
 sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 {
-    sail::image_reader reader(&d->context);
+    sail::image_reader reader;
     sail::image image;
 
     SAIL_TRY(reader.read(path.toLocal8Bit(), &image));
@@ -141,7 +127,7 @@ static int qImageFormatToSailPixelFormat(QImage::Format format) {
 
 sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
 {
-    sail::image_writer writer(&d->context);
+    sail::image_writer writer;
     sail::image image;
 
     image.with_width(qimage.width())
@@ -157,7 +143,11 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
 
 QStringList QtSail::filters() const
 {
-    const std::vector<sail::plugin_info> plugin_info_list = d->context.plugin_info_list();
+    // Allocate a local context
+    //
+    sail::context context;
+
+    const std::vector<sail::plugin_info> plugin_info_list = context.plugin_info_list();
     QStringList filters;
 
     for (const sail::plugin_info &plugin_info : plugin_info_list) {

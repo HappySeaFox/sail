@@ -94,7 +94,6 @@ sail_error_t image_writer::write(const char *path, const image &simage)
     const void *bits = simage.bits() ? simage.bits() : simage.shallow_bits();
 
     SAIL_TRY(sail_write(path,
-                        d->ctx->sail_context_c(),
                         sail_image,
                         bits));
 

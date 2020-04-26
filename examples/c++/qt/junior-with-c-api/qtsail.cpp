@@ -49,8 +49,6 @@ public:
     QScopedPointer<Ui::QtSail> ui;
 
     QImage qimage;
-
-    sail_context *context = nullptr;
 };
 
 QtSail::QtSail(QWidget *parent)
@@ -70,22 +68,10 @@ QtSail::QtSail(QWidget *parent)
     d->ui->pushOpen->setToolTip(d->ui->pushOpen->shortcut().toString());
     d->ui->pushSave->setShortcut(QKeySequence::Save);
     d->ui->pushSave->setToolTip(d->ui->pushSave->shortcut().toString());
-
-    init();
 }
 
 QtSail::~QtSail()
 {
-    sail_finish(d->context);
-    d->context = nullptr;
-}
-
-sail_error_t QtSail::init()
-{
-    SAIL_TRY_OR_CLEANUP(sail_init(&d->context),
-                        /* cleanup */ QMessageBox::critical(this, tr("Error"), tr("Failed to init SAIL")),
-                                      ::exit(1));
-    return 0;
 }
 
 static QImage::Format sailPixelFormatToQImageFormat(int pixel_format) {
@@ -111,7 +97,6 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
      * to free memory (pointers, image bits etc.) on error in a real application.
      */
     SAIL_TRY(sail_read(path.toLocal8Bit(),
-                       d->context,
                        &image,
                        reinterpret_cast<void **>(&image_bits)));
 
@@ -162,7 +147,6 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
      * to free memory (pointers, image bits etc.) on error in a real application.
      */
     SAIL_TRY(sail_write(path.toLocal8Bit(),
-                        d->context,
                         image,
                         reinterpret_cast<const void *>(qimage.bits())));
 
@@ -173,8 +157,16 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
 
 QStringList QtSail::filters() const
 {
+    // Allocate a local context
+    //
+    sail_context *context;
+
+    if (sail_init(&context) != 0) {
+        return QStringList();
+    }
+
     QStringList filters;
-    const sail_plugin_info_node *plugin_info_node = sail_plugin_info_list(d->context);
+    const sail_plugin_info_node *plugin_info_node = sail_plugin_info_list(context);
 
     while (plugin_info_node != nullptr) {
         QStringList masks;
@@ -192,6 +184,8 @@ QStringList QtSail::filters() const
 
         plugin_info_node = plugin_info_node->next;
     }
+
+    sail_finish(context);
 
     return filters;
 }
