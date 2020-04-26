@@ -109,8 +109,29 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     sail::image_reader reader(&d->context);
     sail::image image;
 
+    /*
+     * It's essential to ALWAYS stop reading to free memory resources.
+     * Avoiding doing so will lead to memory leaks. This code gets executed
+     * when the outer scope exits.
+     */
+    SAIL_AT_SCOPE_EXIT (
+        reader.stop_reading();
+    );
+
+    /*
+     * Starts reading the specified file.
+     * The subsequent calls to read_next_frame() will output pixels
+     * in a plugin-specific preferred pixel format.
+     */
     SAIL_TRY(reader.start_reading(path.toLocal8Bit().constData()));
-    SAIL_TRY(reader.read_next_frame(&image));
+
+    /*
+     * Read just a single frame. It's possible to read more frame if any. Just continue
+     * reading frames until sail_read_next_frame() returns 0. If no more frames are available,
+     * it returns SAIL_NO_MORE_FRAMES.
+     */
+    SAIL_TRY_OR_CLEANUP(reader.read_next_frame(&image));
+
     SAIL_TRY(reader.stop_reading());
 
     *qimage = QImage(reinterpret_cast<const uchar *>(image.bits()),
@@ -153,6 +174,14 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
 {
     sail::image_writer writer(&d->context);
     sail::image image;
+
+    /*
+     * It's essential to ALWAYS stop writing to free memory resources.
+     * Avoiding doing so will lead to memory leaks.
+     */
+    SAIL_AT_SCOPE_EXIT (
+        writer.stop_writing();
+    );
 
     image.with_width(qimage.width())
          .with_height(qimage.height())

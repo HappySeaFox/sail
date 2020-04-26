@@ -111,12 +111,32 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     uchar *image_bits = nullptr;
 
     /*
-     * WARNING: Memory cleanup on error is not implemented in this demo. Please don't forget
-     * to free memory (pointers, image bits etc.) on error in a real application.
+     * Starts reading the specified file.
+     * The subsequent calls to sail_read_next_frame() will output pixels
+     * in a plugin-specific preferred pixel format.
      */
-    SAIL_TRY(sail_start_reading(path.toLocal8Bit(), d->context, nullptr, &pimpl));
-    SAIL_TRY(sail_read_next_frame(pimpl, &image, (void **)&image_bits));
-    SAIL_TRY(sail_stop_reading(pimpl));
+    SAIL_TRY_OR_CLEANUP(sail_start_reading(path.toLocal8Bit(), d->context, NULL, &pimpl),
+                        /* cleanup */ sail_stop_reading(pimpl),
+                                      free(image_bits),
+                                      sail_destroy_image(image));
+
+    /*
+     * Read just a single frame. It's possible to read more frame if any. Just continue
+     * reading frames until sail_read_next_frame() returns 0. If no more frames are available,
+     * it returns SAIL_NO_MORE_FRAMES.
+     */
+    SAIL_TRY_OR_CLEANUP(sail_read_next_frame(pimpl, &image, (void **)&image_bits),
+                        /* cleanup */ sail_stop_reading(pimpl),
+                                      free(image_bits),
+                                      sail_destroy_image(image));
+
+    /*
+     * It's essential to ALWAYS stop reading to free memory resources.
+     * Avoiding doing so will lead to memory leaks.
+     */
+    SAIL_TRY_OR_CLEANUP(sail_stop_reading(pimpl),
+             /* cleanup */ free(image_bits),
+                           sail_destroy_image(image));
 
     *qimage = QImage(image_bits,
                      image->width,
@@ -124,11 +144,13 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
                      image->bytes_per_line,
                      sailPixelFormatToQImageFormat(image->pixel_format)).copy();
 
-    const char *source_pixel_format_str;
-    const char *pixel_format_str;
+    free(image_bits);
 
-    SAIL_TRY(sail_pixel_format_to_string(image->source_pixel_format, &source_pixel_format_str));
-    SAIL_TRY(sail_pixel_format_to_string(image->pixel_format, &pixel_format_str));
+    const char *source_pixel_format_str = NULL;
+    const char *pixel_format_str = NULL;
+
+    sail_pixel_format_to_string(image->source_pixel_format, &source_pixel_format_str);
+    sail_pixel_format_to_string(image->pixel_format, &pixel_format_str);
 
     d->ui->labelStatus->setText(tr("%1  [%2x%3]  [%4 -> %5]")
                                 .arg(QFileInfo(path).fileName())
@@ -138,7 +160,6 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
                                 .arg(pixel_format_str)
                                 );
 
-    free(image_bits);
     sail_destroy_image(image);
 
     return 0;
@@ -167,15 +188,15 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
     image->width = qimage.width();
     image->height = qimage.height();
     image->pixel_format = qImageFormatToSailPixelFormat(qimage.format());
-    SAIL_TRY(sail_bytes_per_line(image, &image->bytes_per_line));
+    SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(image, &image->bytes_per_line),
+                        /* cleanup */ sail_destroy_image(image));
 
-    /*
-     * WARNING: Memory cleanup on error is not implemented in this demo. Please don't forget
-     * to free memory (pointers, image bits etc.) on error in a real application.
-     */
-    SAIL_TRY(sail_start_writing(path.toLocal8Bit(), d->context, nullptr, &pimpl));
-    SAIL_TRY(sail_write_next_frame(pimpl, image, qimage.bits()));
-    SAIL_TRY(sail_stop_writing(pimpl));
+    SAIL_TRY_OR_CLEANUP(sail_start_writing(path.toLocal8Bit(), d->context, nullptr, &pimpl),
+                        /* cleanup */ sail_destroy_image(image));
+    SAIL_TRY_OR_CLEANUP(sail_write_next_frame(pimpl, image, qimage.bits()),
+                        /* cleanup */ sail_destroy_image(image));
+    SAIL_TRY_OR_CLEANUP(sail_stop_writing(pimpl),
+                        /* cleanup */ sail_destroy_image(image));
 
     sail_destroy_image(image);
 
@@ -269,6 +290,8 @@ sail_error_t QtSail::onProbe()
                              );
 
     sail_destroy_image(image);
+
+    return 0;
 }
 
 void QtSail::onSave()
