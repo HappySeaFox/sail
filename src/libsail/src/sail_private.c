@@ -75,3 +75,17 @@ sail_error_t load_plugin_by_plugin_info(struct sail_context *context, const stru
 
     return 0;
 }
+
+void destroy_hidden_state(struct hidden_state *state) {
+
+    if (state == NULL) {
+        return;
+    }
+
+    sail_destroy_io(state->io);
+
+    /* This state must be freed and zeroed by plugins. We free it just in case to avoid memory leaks. */
+    free(state->state);
+
+    free(state);
+}

@@ -28,13 +28,28 @@
 #endif
 
 struct sail_context;
+struct sail_io;
 struct sail_plugin_info;
 struct sail_plugin_info_node;
 struct sail_plugin;
+
+struct SAIL_HIDDEN hidden_state {
+
+    struct sail_io *io;
+
+    /* Local state passed to plugin reading and writing functions. */
+    void *state;
+
+    /* Pointers to internal data structures so no need to free these. */
+    const struct sail_plugin_info *plugin_info;
+    const struct sail_plugin *plugin;
+};
 
 SAIL_HIDDEN sail_error_t load_plugin(struct sail_plugin_info_node *node);
 
 SAIL_HIDDEN sail_error_t load_plugin_by_plugin_info(struct sail_context *context, const struct sail_plugin_info *plugin_info,
                                                     const struct sail_plugin **plugin);
+
+SAIL_HIDDEN void destroy_hidden_state(struct hidden_state *state);
 
 #endif
