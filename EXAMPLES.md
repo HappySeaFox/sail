@@ -2,7 +2,9 @@
 
 SAIL provides 3 levels of APIs depending on your needs. Let's have a look at them.
 
-### 1. `junior` "I just want to load this damn image"
+### 1. `junior`
+
+**Purpose:** read a single image frame in a one-line manner.
 
 **C:**
 ```C
@@ -42,7 +44,9 @@ SAIL_TRY(reader.read(path, &image));
 // image->pixel_format(), and image->bits() for that.
 ```
 
-### 2. `advanced` "I want to load this damn image and have more control"
+### 2. `advanced`
+
+**Purpose:** read a single or multiple image frames.
 
 **C:**
 ```C
@@ -145,7 +149,10 @@ SAIL_TRY(reader.stop_reading());
 // image->pixel_format(), and image->bits() for that.
 ```
 
-### 3. `deep diver` "I want to load this damn image and have comprehensive control"
+### 3. `deep diver`
+
+**Purpose:** read a single or multiple image frames. Possibly specify a concrete plugin to use.
+             Possibly specify a desired pixel format to output.
 
 **C:**
 ```C
@@ -248,7 +255,7 @@ if (node != NULL) {
 }
 
 /*
- * Handle the image bits here.
+ * Handle the image RGB bits here.
  * Use image->width, image->height, image->bytes_per_line,
  * and image->pixel_format for that.
  */

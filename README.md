@@ -22,7 +22,7 @@ Currently SAIL supports Windows and Linux platforms.
 
 SAIL provides 3 levels of APIs depending on your needs. Let's have a quick look at them.
 
-### 1. `junior` "I just want to load this damn image"
+### 1. `junior` "I just want to load this damn JPEG"
 
 **C:**
 ```C
@@ -60,15 +60,14 @@ SAIL_TRY(reader.read(path, &image));
 // Handle the image and its bits here.
 // Use image->width(), image->height(), image->bytes_per_line(),
 // image->pixel_format(), and image->bits() for that.
-
 ```
 
 It's pretty easy, isn't it? :smile: See [EXAMPLES](EXAMPLES.md) for more.
 
-### 2. `advanced` "I want to load this damn image and have more control"
+### 2. `advanced` "I want to load this damn animated GIF"
 
 See [EXAMPLES](EXAMPLES.md) for more.
 
-### 3. `deep diver` "I want to load this damn image and have comprehensive control"
+### 3. `deep diver` "I want to load this damn possibly miulti-paged image and have comprehensive control over selected plugins and output pixel formats"
 
 See [EXAMPLES](EXAMPLES.md) for more.
