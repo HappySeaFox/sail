@@ -29,10 +29,13 @@
     #include "plugin.h"
     #include "plugin_info.h"
     #include "plugin_info_private.h"
+    #include "sail_junior.h"
+    #include "sail_private.h"
     #include "string_node.h"
 #else
     #include <sail/sail-common.h>
 
+    #include <sail/sail_junior.h>
     #include <sail/plugin_info.h>
     #include <sail/string_node.h>
 #endif
@@ -141,39 +144,6 @@ SAIL_EXPORT sail_error_t sail_plugin_info_from_mime_type(const struct sail_conte
  * Returns 0 on success or sail_error_t on error.
  */
 SAIL_EXPORT sail_error_t sail_unload_plugins(struct sail_context *context);
-
-/*
- * Loads the specified image and returns its properties without pixel data. The assigned image MUST be destroyed later
- * with sail_destroy_image(). The assigned plugin info MUST NOT be destroyed. It's a pointer to an internal
- * data structure. If you don't need it, just pass NULL.
- *
- * This function is pretty fast as it doesn't decode whole image data for most image formats.
- *
- * Typical usage: this is a standalone function that could be called at any time.
- *
- * Returns 0 on success or sail_error_t on error.
- */
-SAIL_EXPORT sail_error_t sail_probe(const char *path, struct sail_context *context,
-                                    struct sail_image **image, const struct sail_plugin_info **plugin_info);
-
-/*
- * Loads the specified image file and returns its properties and pixel data. The assigned image MUST be destroyed later
- * with sail_destroy_image(). The assigned pixel data MUST be destroyed later with free().
- *
- * Typical usage: this is a standalone function that could be called at any time.
- *
- * Returns 0 on success or sail_error_t on error.
- */
-SAIL_EXPORT sail_error_t sail_read(const char *path, struct sail_image **image, void **image_bits);
-
-/*
- * Writes the specified image file its pixel data into the file.
- *
- * Typical usage: this is a standalone function that could be called at any time.
- *
- * Returns 0 on success or sail_error_t on error.
- */
-SAIL_EXPORT sail_error_t sail_write(const char *path, const struct sail_image *image, const void *image_bits);
 
 /*
  * Starts reading the specified I/O stream with the specified read options. If you don't need specific read options,
