@@ -59,6 +59,8 @@ image_reader::image_reader(context *ctx)
 
 image_reader::~image_reader()
 {
+    stop_reading();
+
     if (d->own_context) {
         delete d->ctx;
     }

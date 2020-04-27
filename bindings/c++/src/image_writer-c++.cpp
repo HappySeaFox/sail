@@ -59,6 +59,8 @@ image_writer::image_writer(context *ctx)
 
 image_writer::~image_writer()
 {
+    stop_writing();
+
     if (d->own_context) {
         delete d->ctx;
     }
