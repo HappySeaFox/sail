@@ -1,7 +1,7 @@
 # SAIL: Squirrel Abstract Image Libraries
 
 SAIL is a small and lightweight cross-platform library aimed to provide lightweight as well as complex APIs
-to decode and encode images in different formats.
+to decode and encode images in different formats. :sailboat:
 
 ## Features
 
