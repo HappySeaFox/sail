@@ -89,8 +89,8 @@ static QImage::Format sailPixelFormatToQImageFormat(int pixel_format) {
 
 sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 {
-    struct sail_image *image = nullptr;
-    uchar *image_bits = nullptr;
+    struct sail_image *image;
+    uchar *image_bits;
 
     /*
      * sail_read() reads the image and outputs pixels in a plugin-specific preferred pixel format.
