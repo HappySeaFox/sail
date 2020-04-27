@@ -18,6 +18,8 @@
 
 #include "config.h"
 
+#include <stdlib.h>
+
 #include "sail-common.h"
 #include "sail.h"
 
