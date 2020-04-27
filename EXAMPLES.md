@@ -162,8 +162,8 @@ SAIL_TRY(reader.stop_reading());
 
 ### 3. `deep diver`
 
-**Purpose:** read a single or multiple image frames. Possibly specify a concrete plugin to use.
-             Possibly specify a desired pixel format to output.
+**Purpose:** read a single or multiple image frames. Possibly specify a concrete plugin to use
+             (e.g. to load an image file with no extension). Possibly specify a desired pixel format to output.
 
 #### C:
 ```C
