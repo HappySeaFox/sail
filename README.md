@@ -14,6 +14,10 @@ to decode and encode images in different formats. :sailboat:
 - Image formats are supported by dynamically loaded codecs (plugins).
 - Easily extensible with new image formats for those who want to implement a specific codec for his/her needs.
 
+## Supported platforms
+
+Currently SAIL supports Windows and Linux platforms.
+
 ## APIs overview
 
 SAIL provides 3 levels of APIs depending on your needs. Let's have a quick look at them.
