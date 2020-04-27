@@ -30,13 +30,13 @@ class SAIL_HIDDEN image_reader::pimpl
 {
 public:
     pimpl()
-        : pmpl(nullptr)
+        : state(nullptr)
     {
     }
 
     context *ctx;
     bool own_context;
-    void *pmpl;
+    void *state;
 };
 
 image_reader::image_reader()
@@ -147,7 +147,7 @@ sail_error_t image_reader::start_reading(const char *path)
 {
     SAIL_CHECK_PATH_PTR(path);
 
-    SAIL_TRY(sail_start_reading(path, d->ctx->sail_context_c(), nullptr, &d->pmpl));
+    SAIL_TRY(sail_start_reading(path, d->ctx->sail_context_c(), nullptr, &d->state));
 
     return 0;
 }
@@ -163,7 +163,7 @@ sail_error_t image_reader::start_reading(const char *path, const plugin_info &sp
 {
     SAIL_CHECK_PATH_PTR(path);
 
-    SAIL_TRY(sail_start_reading(path, d->ctx->sail_context_c(), splugin_info.sail_plugin_info_c(), &d->pmpl));
+    SAIL_TRY(sail_start_reading(path, d->ctx->sail_context_c(), splugin_info.sail_plugin_info_c(), &d->state));
 
     return 0;
 }
@@ -182,7 +182,7 @@ sail_error_t image_reader::start_reading(const char *path, const plugin_info &sp
     sail_read_options sail_read_options;
     SAIL_TRY(sread_options.to_sail_read_options(&sail_read_options));
 
-    SAIL_TRY(sail_start_reading_with_options(path, d->ctx->sail_context_c(), splugin_info.sail_plugin_info_c(), &sail_read_options, &d->pmpl));
+    SAIL_TRY(sail_start_reading_with_options(path, d->ctx->sail_context_c(), splugin_info.sail_plugin_info_c(), &sail_read_options, &d->state));
 
     return 0;
 }
@@ -199,7 +199,7 @@ sail_error_t image_reader::read_next_frame(image *simage)
         free(image_bits);
     );
 
-    SAIL_TRY(sail_read_next_frame(d->pmpl, &sail_image, (void **)&image_bits));
+    SAIL_TRY(sail_read_next_frame(d->state, &sail_image, (void **)&image_bits));
 
     *simage = image(sail_image);
 
@@ -213,9 +213,9 @@ sail_error_t image_reader::read_next_frame(image *simage)
 
 sail_error_t image_reader::stop_reading()
 {
-    SAIL_TRY(sail_stop_reading(d->pmpl));
+    SAIL_TRY(sail_stop_reading(d->state));
 
-    d->pmpl = nullptr;
+    d->state = nullptr;
 
     return 0;
 }

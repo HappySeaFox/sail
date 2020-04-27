@@ -553,15 +553,15 @@ sail_error_t sail_read(const char *path, struct sail_image **image, void **image
 
     SAIL_CHECK_CONTEXT_PTR(context);
 
-    void *pimpl = NULL;
+    void *state = NULL;
     *image_bits = NULL;
 
-    SAIL_TRY_OR_CLEANUP(sail_start_reading(path, context, NULL /* plugin info */, &pimpl),
-                        sail_stop_reading(pimpl));
-    SAIL_TRY_OR_CLEANUP(sail_read_next_frame(pimpl, image, image_bits),
+    SAIL_TRY_OR_CLEANUP(sail_start_reading(path, context, NULL /* plugin info */, &state),
+                        sail_stop_reading(state));
+    SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, image, image_bits),
                         free(image_bits),
-                        sail_stop_reading(pimpl));
-    SAIL_TRY_OR_CLEANUP(sail_stop_reading(pimpl),
+                        sail_stop_reading(state));
+    SAIL_TRY_OR_CLEANUP(sail_stop_reading(state),
                         free(image_bits));
 
     return 0;
@@ -583,18 +583,18 @@ sail_error_t sail_write(const char *path, const struct sail_image *image, const 
 
     SAIL_CHECK_CONTEXT_PTR(context);
 
-    void *pimpl = NULL;
+    void *state = NULL;
 
-    SAIL_TRY_OR_CLEANUP(sail_start_writing(path, context, NULL /* plugin info */, &pimpl),
-                        sail_stop_writing(pimpl));
-    SAIL_TRY_OR_CLEANUP(sail_write_next_frame(pimpl, image, image_bits),
-                        sail_stop_writing(pimpl));
-    SAIL_TRY(sail_stop_writing(pimpl));
+    SAIL_TRY_OR_CLEANUP(sail_start_writing(path, context, NULL /* plugin info */, &state),
+                        sail_stop_writing(state));
+    SAIL_TRY_OR_CLEANUP(sail_write_next_frame(state, image, image_bits),
+                        sail_stop_writing(state));
+    SAIL_TRY(sail_stop_writing(state));
 
     return 0;
 }
 
-struct hidden_pimpl {
+struct hidden_state {
 
     struct sail_io *io;
 
@@ -603,83 +603,83 @@ struct hidden_pimpl {
     const struct sail_plugin *plugin;
 };
 
-static void destroy_hidden_pimpl(struct hidden_pimpl *pimpl) {
+static void destroy_hidden_state(struct hidden_state *state) {
 
-    if (pimpl == NULL) {
+    if (state == NULL) {
         return;
     }
 
-    sail_destroy_io(pimpl->io);
+    sail_destroy_io(state->io);
 
-    free(pimpl);
+    free(state);
 }
 
 sail_error_t sail_start_reading_with_options(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info,
-                                             const struct sail_read_options *read_options, void **pimpl) {
-    SAIL_CHECK_PIMPL_PTR(pimpl);
+                                             const struct sail_read_options *read_options, void **state) {
+    SAIL_CHECK_STATE_PTR(state);
 
-    *pimpl = NULL;
+    *state = NULL;
 
     SAIL_CHECK_PATH_PTR(path);
     SAIL_CHECK_CONTEXT_PTR(context);
 
-    struct hidden_pimpl *pmpl = (struct hidden_pimpl *)malloc(sizeof(struct hidden_pimpl));
+    struct hidden_state *state_of_mind = (struct hidden_state *)malloc(sizeof(struct hidden_state));
 
-    SAIL_CHECK_PIMPL_PTR(pmpl);
+    SAIL_CHECK_STATE_PTR(state_of_mind);
 
-    pmpl->io          = NULL;
-    pmpl->plugin_info = NULL;
-    pmpl->plugin      = NULL;
+    state_of_mind->io          = NULL;
+    state_of_mind->plugin_info = NULL;
+    state_of_mind->plugin      = NULL;
 
-    *pimpl = pmpl;
+    *state = state_of_mind;
 
     if (plugin_info == NULL) {
-        SAIL_TRY(sail_plugin_info_from_path(path, context, &pmpl->plugin_info));
+        SAIL_TRY(sail_plugin_info_from_path(path, context, &state_of_mind->plugin_info));
     } else {
-        pmpl->plugin_info = plugin_info;
+        state_of_mind->plugin_info = plugin_info;
     }
 
-    SAIL_TRY(load_plugin_by_plugin_info(context, pmpl->plugin_info, &pmpl->plugin));
+    SAIL_TRY(load_plugin_by_plugin_info(context, state_of_mind->plugin_info, &state_of_mind->plugin));
 
-    if (pmpl->plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
+    if (state_of_mind->plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
         return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
     }
 
-    SAIL_TRY(sail_alloc_io_read_file(path, &pmpl->io));
+    SAIL_TRY(sail_alloc_io_read_file(path, &state_of_mind->io));
 
     if (read_options == NULL) {
         struct sail_read_options *read_options_local = NULL;
 
-        SAIL_TRY_OR_CLEANUP(sail_alloc_read_options_from_features(pmpl->plugin_info->read_features, &read_options_local),
+        SAIL_TRY_OR_CLEANUP(sail_alloc_read_options_from_features(state_of_mind->plugin_info->read_features, &read_options_local),
                             /* cleanup */ sail_destroy_read_options(read_options_local));
-        SAIL_TRY_OR_CLEANUP(pmpl->plugin->v2->read_init_v2(pmpl->io, read_options_local),
+        SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v2->read_init_v2(state_of_mind->io, read_options_local),
                             /* cleanup */ sail_destroy_read_options(read_options_local));
         sail_destroy_read_options(read_options_local);
     } else {
-        SAIL_TRY(pmpl->plugin->v2->read_init_v2(pmpl->io, read_options));
+        SAIL_TRY(state_of_mind->plugin->v2->read_init_v2(state_of_mind->io, read_options));
     }
 
     return 0;
 }
 
-sail_error_t sail_start_reading(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info, void **pimpl) {
+sail_error_t sail_start_reading(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info, void **state) {
 
-    SAIL_TRY(sail_start_reading_with_options(path, context, plugin_info, NULL, pimpl));
+    SAIL_TRY(sail_start_reading_with_options(path, context, plugin_info, NULL, state));
 
     return 0;
 }
 
-sail_error_t sail_read_next_frame(void *pimpl, struct sail_image **image, void **image_bits) {
+sail_error_t sail_read_next_frame(void *state, struct sail_image **image, void **image_bits) {
 
-    SAIL_CHECK_PIMPL_PTR(pimpl);
+    SAIL_CHECK_STATE_PTR(state);
 
-    struct hidden_pimpl *pmpl = (struct hidden_pimpl *)pimpl;
+    struct hidden_state *state_of_mind = (struct hidden_state *)state;
 
-    SAIL_CHECK_IO(pmpl->io);
-    SAIL_CHECK_PLUGIN_PTR(pmpl->plugin);
+    SAIL_CHECK_IO(state_of_mind->io);
+    SAIL_CHECK_PLUGIN_PTR(state_of_mind->plugin);
 
-    struct sail_io *io = pmpl->io;
-    const struct sail_plugin *plugin = pmpl->plugin;
+    struct sail_io *io = state_of_mind->io;
+    const struct sail_plugin *plugin = state_of_mind->plugin;
 
     if (plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
         return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
@@ -704,104 +704,104 @@ sail_error_t sail_read_next_frame(void *pimpl, struct sail_image **image, void *
     return 0;
 }
 
-sail_error_t sail_stop_reading(void *pimpl) {
+sail_error_t sail_stop_reading(void *state) {
 
     /* Not an error. */
-    if (pimpl == NULL) {
+    if (state == NULL) {
         return 0;
     }
 
-    struct hidden_pimpl *pmpl = (struct hidden_pimpl *)pimpl;
+    struct hidden_state *state_of_mind = (struct hidden_state *)state;
 
-    struct sail_io *io = pmpl->io;
-    const struct sail_plugin *plugin = pmpl->plugin;
+    struct sail_io *io = state_of_mind->io;
+    const struct sail_plugin *plugin = state_of_mind->plugin;
 
     /* Not an error. */
     if (plugin == NULL) {
-        destroy_hidden_pimpl(pmpl);
+        destroy_hidden_state(state_of_mind);
         return 0;
     }
 
     if (plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
-        destroy_hidden_pimpl(pmpl);
+        destroy_hidden_state(state_of_mind);
         return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
     }
 
     SAIL_TRY_OR_CLEANUP(plugin->v2->read_finish_v2(io),
-                        /* cleanup */ destroy_hidden_pimpl(pmpl));
+                        /* cleanup */ destroy_hidden_state(state_of_mind));
 
-    destroy_hidden_pimpl(pmpl);
+    destroy_hidden_state(state_of_mind);
 
     return 0;
 }
 
 sail_error_t sail_start_writing_with_options(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info,
-                                             const struct sail_write_options *write_options, void **pimpl) {
-    SAIL_CHECK_PIMPL_PTR(pimpl);
+                                             const struct sail_write_options *write_options, void **state) {
+    SAIL_CHECK_STATE_PTR(state);
 
-    *pimpl = NULL;
+    *state = NULL;
 
     SAIL_CHECK_PATH_PTR(path);
     SAIL_CHECK_CONTEXT_PTR(context);
 
-    struct hidden_pimpl *pmpl = (struct hidden_pimpl *)malloc(sizeof(struct hidden_pimpl));
+    struct hidden_state *state_of_mind = (struct hidden_state *)malloc(sizeof(struct hidden_state));
 
-    SAIL_CHECK_PIMPL_PTR(pmpl);
+    SAIL_CHECK_STATE_PTR(state_of_mind);
 
-    pmpl->io          = NULL;
-    pmpl->plugin_info = NULL;
-    pmpl->plugin      = NULL;
+    state_of_mind->io          = NULL;
+    state_of_mind->plugin_info = NULL;
+    state_of_mind->plugin      = NULL;
 
-    *pimpl = pmpl;
+    *state = state_of_mind;
 
     if (plugin_info == NULL) {
-        SAIL_TRY(sail_plugin_info_from_path(path, context, &pmpl->plugin_info));
+        SAIL_TRY(sail_plugin_info_from_path(path, context, &state_of_mind->plugin_info));
     } else {
-        pmpl->plugin_info = plugin_info;
+        state_of_mind->plugin_info = plugin_info;
     }
 
-    SAIL_TRY(load_plugin_by_plugin_info(context, pmpl->plugin_info, &pmpl->plugin));
+    SAIL_TRY(load_plugin_by_plugin_info(context, state_of_mind->plugin_info, &state_of_mind->plugin));
 
-    if (pmpl->plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
+    if (state_of_mind->plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
         return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
     }
 
-    SAIL_TRY(sail_alloc_io_write_file(path, &pmpl->io));
+    SAIL_TRY(sail_alloc_io_write_file(path, &state_of_mind->io));
 
     if (write_options == NULL) {
         struct sail_write_options *write_options_local = NULL;
 
-        SAIL_TRY_OR_CLEANUP(sail_alloc_write_options_from_features(pmpl->plugin_info->write_features, &write_options_local),
+        SAIL_TRY_OR_CLEANUP(sail_alloc_write_options_from_features(state_of_mind->plugin_info->write_features, &write_options_local),
                             /* cleanup */ sail_destroy_write_options(write_options_local));
-        SAIL_TRY_OR_CLEANUP(pmpl->plugin->v2->write_init_v2(pmpl->io, write_options_local),
+        SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v2->write_init_v2(state_of_mind->io, write_options_local),
                             /* cleanup */ sail_destroy_write_options(write_options_local));
         sail_destroy_write_options(write_options_local);
     } else {
-        SAIL_TRY(pmpl->plugin->v2->write_init_v2(pmpl->io, write_options));
+        SAIL_TRY(state_of_mind->plugin->v2->write_init_v2(state_of_mind->io, write_options));
     }
 
     return 0;
 }
 
-sail_error_t sail_start_writing(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info, void **pimpl) {
+sail_error_t sail_start_writing(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info, void **state) {
 
-    SAIL_TRY(sail_start_writing_with_options(path, context, plugin_info, NULL, pimpl));
+    SAIL_TRY(sail_start_writing_with_options(path, context, plugin_info, NULL, state));
 
     return 0;
 }
 
-sail_error_t sail_write_next_frame(void *pimpl, const struct sail_image *image, const void *image_bits) {
+sail_error_t sail_write_next_frame(void *state, const struct sail_image *image, const void *image_bits) {
 
-    SAIL_CHECK_PIMPL_PTR(pimpl);
+    SAIL_CHECK_STATE_PTR(state);
 
-    struct hidden_pimpl *pmpl = (struct hidden_pimpl *)pimpl;
+    struct hidden_state *state_of_mind = (struct hidden_state *)state;
 
-    SAIL_CHECK_IO(pmpl->io);
-    SAIL_CHECK_PLUGIN_PTR(pmpl->plugin);
+    SAIL_CHECK_IO(state_of_mind->io);
+    SAIL_CHECK_PLUGIN_PTR(state_of_mind->plugin);
 
-    struct sail_io *io = pmpl->io;
-    const struct sail_plugin_info *plugin_info = pmpl->plugin_info;
-    const struct sail_plugin *plugin = pmpl->plugin;
+    struct sail_io *io = state_of_mind->io;
+    const struct sail_plugin_info *plugin_info = state_of_mind->plugin_info;
+    const struct sail_plugin *plugin = state_of_mind->plugin;
 
     if (plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
         return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
@@ -835,33 +835,33 @@ sail_error_t sail_write_next_frame(void *pimpl, const struct sail_image *image, 
     return 0;
 }
 
-sail_error_t sail_stop_writing(void *pimpl) {
+sail_error_t sail_stop_writing(void *state) {
 
     /* Not an error. */
-    if (pimpl == NULL) {
+    if (state == NULL) {
         return 0;
     }
 
-    struct hidden_pimpl *pmpl = (struct hidden_pimpl *)pimpl;
+    struct hidden_state *state_of_mind = (struct hidden_state *)state;
 
-    struct sail_io *io = pmpl->io;
-    const struct sail_plugin *plugin = pmpl->plugin;
+    struct sail_io *io = state_of_mind->io;
+    const struct sail_plugin *plugin = state_of_mind->plugin;
 
     /* Not an error. */
     if (plugin == NULL) {
-        destroy_hidden_pimpl(pmpl);
+        destroy_hidden_state(state_of_mind);
         return 0;
     }
 
     if (plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
-        destroy_hidden_pimpl(pmpl);
+        destroy_hidden_state(state_of_mind);
         return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
     }
 
     SAIL_TRY_OR_CLEANUP(plugin->v2->write_finish_v2(io),
-                        /* cleanup */ destroy_hidden_pimpl(pmpl));
+                        /* cleanup */ destroy_hidden_state(state_of_mind));
 
-    destroy_hidden_pimpl(pmpl);
+    destroy_hidden_state(state_of_mind);
 
     return 0;
 }

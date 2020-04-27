@@ -36,10 +36,10 @@ struct sail_io {
     void *stream;
 
     /*
-     * Plugin-specific data. A plugin could set pimpl to its plugin-specific data storage and access it
+     * Plugin-specific data. A plugin could set state to its plugin-specific data storage and access it
      * in its read or write functions. Will be destroyed automatically in sail_destroy_io().
      */
-    void *pimpl;
+    void *state;
 
     /*
      * Reads from the underlying I/O object into the specified buffer. Assigns the number of objects

@@ -45,7 +45,7 @@ typedef int sail_error_t;
  * Encoding/decoding common errors.
  */
 #define SAIL_NULL_PTR                     20
-#define SAIL_PIMPL_NULL_PTR               21
+#define SAIL_STATE_NULL_PTR               21
 #define SAIL_IMAGE_NULL_PTR               22
 #define SAIL_SCAN_LINE_NULL_PTR           23
 #define SAIL_READ_FEATURES_NULL_PTR       24
@@ -146,7 +146,7 @@ do {                              \
 #define SAIL_CHECK_IMAGE_PTR(image)                   SAIL_CHECK_PTR2(image,          SAIL_IMAGE_NULL_PTR)
 #define SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info)       SAIL_CHECK_PTR2(plugin_info,    SAIL_PLUGIN_INFO_NULL_PTR)
 #define SAIL_CHECK_PLUGIN_PTR(plugin)                 SAIL_CHECK_PTR2(plugin,         SAIL_PLUGIN_NULL_PTR)
-#define SAIL_CHECK_PIMPL_PTR(pimpl)                   SAIL_CHECK_PTR2(pimpl,          SAIL_PIMPL_NULL_PTR)
+#define SAIL_CHECK_STATE_PTR(state)                   SAIL_CHECK_PTR2(state,          SAIL_STATE_NULL_PTR)
 #define SAIL_CHECK_STRING_PTR(str)                    SAIL_CHECK_PTR2(str,            SAIL_STRING_NULL_PTR)
 #define SAIL_CHECK_IO_PTR(io)                         SAIL_CHECK_PTR2(io,             SAIL_IO_NULL_PTR)
 #define SAIL_CHECK_STREAM_PTR(stream)                 SAIL_CHECK_PTR2(stream,         SAIL_STREAM_NULL_PTR)

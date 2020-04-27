@@ -30,13 +30,13 @@ class SAIL_HIDDEN image_writer::pimpl
 {
 public:
     pimpl()
-        : pmpl(nullptr)
+        : state(nullptr)
     {
     }
 
     context *ctx;
     bool own_context;
-    void *pmpl;
+    void *state;
 };
 
 image_writer::image_writer()
@@ -111,7 +111,7 @@ sail_error_t image_writer::start_writing(const char *path)
 {
     SAIL_CHECK_PATH_PTR(path);
 
-    SAIL_TRY(sail_start_writing(path, d->ctx->sail_context_c(), nullptr, &d->pmpl));
+    SAIL_TRY(sail_start_writing(path, d->ctx->sail_context_c(), nullptr, &d->state));
 
     return 0;
 }
@@ -127,7 +127,7 @@ sail_error_t image_writer::start_writing(const char *path, const plugin_info &sp
 {
     SAIL_CHECK_PATH_PTR(path);
 
-    SAIL_TRY(sail_start_writing(path, d->ctx->sail_context_c(), splugin_info.sail_plugin_info_c(), &d->pmpl));
+    SAIL_TRY(sail_start_writing(path, d->ctx->sail_context_c(), splugin_info.sail_plugin_info_c(), &d->state));
 
     return 0;
 }
@@ -146,7 +146,7 @@ sail_error_t image_writer::start_writing(const char *path, const write_options &
     sail_write_options sail_write_options;
     SAIL_TRY(swrite_options.to_sail_write_options(&sail_write_options));
 
-    SAIL_TRY(sail_start_writing_with_options(path, d->ctx->sail_context_c(), nullptr, &sail_write_options, &d->pmpl));
+    SAIL_TRY(sail_start_writing_with_options(path, d->ctx->sail_context_c(), nullptr, &sail_write_options, &d->state));
 
     return 0;
 }
@@ -165,7 +165,7 @@ sail_error_t image_writer::start_writing(const char *path, const plugin_info &sp
     sail_write_options sail_write_options;
     SAIL_TRY(swrite_options.to_sail_write_options(&sail_write_options));
 
-    SAIL_TRY(sail_start_writing_with_options(path, d->ctx->sail_context_c(), splugin_info.sail_plugin_info_c(), &sail_write_options, &d->pmpl));
+    SAIL_TRY(sail_start_writing_with_options(path, d->ctx->sail_context_c(), splugin_info.sail_plugin_info_c(), &sail_write_options, &d->state));
 
     return 0;
 }
@@ -183,16 +183,16 @@ sail_error_t image_writer::write_next_frame(const image &simage)
 
     const void *bits = simage.bits() ? simage.bits() : simage.shallow_bits();
 
-    SAIL_TRY(sail_write_next_frame(d->pmpl, sail_image, bits));
+    SAIL_TRY(sail_write_next_frame(d->state, sail_image, bits));
 
     return 0;
 }
 
 sail_error_t image_writer::stop_writing()
 {
-    SAIL_TRY(sail_stop_writing(d->pmpl));
+    SAIL_TRY(sail_stop_writing(d->state));
 
-    d->pmpl = nullptr;
+    d->state = nullptr;
 
     return 0;
 }

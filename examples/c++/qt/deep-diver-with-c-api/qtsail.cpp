@@ -117,7 +117,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 
     sail_image *image = nullptr;
     uchar *image_bits = nullptr;
-    void *pimpl = nullptr;
+    void *state = nullptr;
 
     // Time counter.
     //
@@ -156,15 +156,15 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 
     // Initialize reading with our options.
     //
-    SAIL_TRY(sail_start_reading_with_options(path.toLocal8Bit(), d->context, plugin_info, read_options, &pimpl));
+    SAIL_TRY(sail_start_reading_with_options(path.toLocal8Bit(), d->context, plugin_info, read_options, &state));
 
     // Seek and read the next image frame in the file.
     //
-    SAIL_TRY(sail_read_next_frame(pimpl, &image, reinterpret_cast<void **>(&image_bits)));
+    SAIL_TRY(sail_read_next_frame(state, &image, reinterpret_cast<void **>(&image_bits)));
 
     // Finish reading.
     //
-    SAIL_TRY(sail_stop_reading(pimpl));
+    SAIL_TRY(sail_stop_reading(state));
 
     // Bytes per line is needed for QImage.
     //
@@ -236,7 +236,7 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
 
     sail_image *image = nullptr;
     sail_write_options *write_options = nullptr;
-    void *pimpl = nullptr;
+    void *state = nullptr;
 
     // Create a new image to be passed into the SAIL writing functions.
     //
@@ -282,7 +282,7 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
 
     // Initialize writing with our options.
     //
-    SAIL_TRY(sail_start_writing_with_options(path.toLocal8Bit(), d->context, plugin_info, write_options, &pimpl));
+    SAIL_TRY(sail_start_writing_with_options(path.toLocal8Bit(), d->context, plugin_info, write_options, &state));
 
     // Save some meta info...
     //
@@ -304,11 +304,11 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
 
     // Seek and write the next image frame into the file.
     //
-    SAIL_TRY(sail_write_next_frame(pimpl, image, qimage.bits()));
+    SAIL_TRY(sail_write_next_frame(state, image, qimage.bits()));
 
     // Finish writing.
     //
-    SAIL_TRY(sail_stop_writing(pimpl));
+    SAIL_TRY(sail_stop_writing(state));
 
     SAIL_LOG_INFO("Saved in %lld ms.", elapsed.elapsed() + beforeDialog);
 

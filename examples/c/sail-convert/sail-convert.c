@@ -35,7 +35,7 @@ static sail_error_t convert(const char *input, const char *output, struct sail_c
     SAIL_CHECK_CONTEXT_PTR(context);
 
     const struct sail_plugin_info *plugin_info;
-    void *pimpl;
+    void *state;
 
     struct sail_image *image;
     void *image_bits;
@@ -46,10 +46,10 @@ static sail_error_t convert(const char *input, const char *output, struct sail_c
     SAIL_TRY(sail_plugin_info_from_path(input, context, &plugin_info));
     SAIL_LOG_INFO("Input codec: %s", plugin_info->description);
 
-    SAIL_TRY(sail_start_reading(input, context, plugin_info, &pimpl));
+    SAIL_TRY(sail_start_reading(input, context, plugin_info, &state));
 
-    SAIL_TRY(sail_read_next_frame(pimpl, &image, &image_bits));
-    SAIL_TRY(sail_stop_reading(pimpl));
+    SAIL_TRY(sail_read_next_frame(state, &image, &image_bits));
+    SAIL_TRY(sail_stop_reading(state));
 
     /* Write the image. */
     SAIL_LOG_INFO("Output file: %s", output);
@@ -64,9 +64,9 @@ static sail_error_t convert(const char *input, const char *output, struct sail_c
     SAIL_LOG_INFO("Compression: %d%s", compression, compression == -1 ? " (default)" : "");
     write_options->compression = compression;
 
-    SAIL_TRY(sail_start_writing_with_options(output, context, plugin_info, write_options, &pimpl));
-    SAIL_TRY(sail_write_next_frame(pimpl, image, image_bits));
-    SAIL_TRY(sail_stop_writing(pimpl));
+    SAIL_TRY(sail_start_writing_with_options(output, context, plugin_info, write_options, &state));
+    SAIL_TRY(sail_write_next_frame(state, image, image_bits));
+    SAIL_TRY(sail_stop_writing(state));
 
     /* Clean up. */
     free(image_bits);

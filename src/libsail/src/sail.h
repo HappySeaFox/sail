@@ -169,22 +169,22 @@ SAIL_EXPORT sail_error_t sail_write(const char *path, const struct sail_image *i
  *
  * For example:
  *
- * void *pimpl = NULL;
+ * void *state = NULL;
  *
- * SAIL_TRY_OR_CLEANUP(sail_start_reading_with_options(..., &pimpl),
- *                     sail_stop_reading(pimpl));
- * SAIL_TRY_OR_CLEANUP(sail_read_next_frame(pimpl, ...),
- *                     sail_stop_reading(pimpl));
- * SAIL_TRY(sail_stop_reading(pimpl));
+ * SAIL_TRY_OR_CLEANUP(sail_start_reading_with_options(..., &state),
+ *                     sail_stop_reading(state));
+ * SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, ...),
+ *                     sail_stop_reading(state));
+ * SAIL_TRY(sail_stop_reading(state));
  *
- * PIMPL explanation: Pass the address of a local void* pointer. SAIL will store an internal state
- * in it and destroy it in sail_stop_reading. Pimpls must be used per image. DO NOT use the same pimpl
+ * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
+ * in it and destroy it in sail_stop_reading. States must be used per image. DO NOT use the same state
  * to read multiple images in the same time.
  *
  * Returns 0 on success or sail_error_t on error.
  */
 SAIL_EXPORT sail_error_t sail_start_reading_with_options(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info,
-                                                         const struct sail_read_options *read_options, void **pimpl);
+                                                         const struct sail_read_options *read_options, void **state);
 
 /*
  * Starts reading the specified image. Pass a particular plugin info if you'd like
@@ -196,21 +196,21 @@ SAIL_EXPORT sail_error_t sail_start_reading_with_options(const char *path, struc
  *
  * For example:
  *
- * void *pimpl = NULL;
+ * void *state = NULL;
  *
- * SAIL_TRY_OR_CLEANUP(sail_start_reading(..., &pimpl),
- *                     sail_stop_reading(pimpl));
- * SAIL_TRY_OR_CLEANUP(sail_read_next_frame(pimpl, ...),
- *                     sail_stop_reading(pimpl));
- * SAIL_TRY(sail_stop_reading(pimpl));
+ * SAIL_TRY_OR_CLEANUP(sail_start_reading(..., &state),
+ *                     sail_stop_reading(state));
+ * SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, ...),
+ *                     sail_stop_reading(state));
+ * SAIL_TRY(sail_stop_reading(state));
  *
- * PIMPL explanation: Pass the address of a local void* pointer. SAIL will store an internal state
- * in it and destroy it in sail_stop_reading. Pimpls must be used per image. DO NOT use the same pimpl
+ * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
+ * in it and destroy it in sail_stop_reading. States must be used per image. DO NOT use the same state
  * to read multiple images in the same time.
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_start_reading(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info, void **pimpl);
+SAIL_EXPORT sail_error_t sail_start_reading(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info, void **state);
 
 /*
  * Continues reading the file started by sail_start_reading() or sail_start_reading_with_options().
@@ -220,17 +220,17 @@ SAIL_EXPORT sail_error_t sail_start_reading(const char *path, struct sail_contex
  * Returns 0 on success or sail_error_t on error.
  * Returns SAIL_NO_MORE_FRAMES when no more frames are available.
  */
-SAIL_EXPORT sail_error_t sail_read_next_frame(void *pimpl, struct sail_image **image, void **image_bits);
+SAIL_EXPORT sail_error_t sail_read_next_frame(void *state, struct sail_image **image, void **image_bits);
 
 /*
  * Stops reading the file started by sail_start_reading() or sail_start_reading_with_options().
- * Does nothing if the pimpl is NULL.
+ * Does nothing if the state is NULL.
  *
  * It's essential to always stop reading to free memory resources. Avoiding doing so will lead to memory leaks.
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_stop_reading(void *pimpl);
+SAIL_EXPORT sail_error_t sail_stop_reading(void *state);
 
 /*
  * Starts writing the specified image file with the specified write options. Pass a particular plugin info if you'd like
@@ -242,22 +242,22 @@ SAIL_EXPORT sail_error_t sail_stop_reading(void *pimpl);
  *
  * For example:
  *
- * void *pimpl = NULL;
+ * void *state = NULL;
  *
- * SAIL_TRY_OR_CLEANUP(sail_start_writing_with_options(..., &pimpl),
- *                     sail_stop_writing(pimpl));
- * SAIL_TRY_OR_CLEANUP(sail_write_next_frame(pimpl, ...),
- *                     sail_stop_writing(pimpl));
- * SAIL_TRY(sail_stop_writing(pimpl));
+ * SAIL_TRY_OR_CLEANUP(sail_start_writing_with_options(..., &state),
+ *                     sail_stop_writing(state));
+ * SAIL_TRY_OR_CLEANUP(sail_write_next_frame(state, ...),
+ *                     sail_stop_writing(state));
+ * SAIL_TRY(sail_stop_writing(state));
  *
- * PIMPL explanation: Pass the address of a local void* pointer. SAIL will store an internal state
- * in it and destroy it in sail_stop_writing. Pimpls must be used per image. DO NOT use the same pimpl
+ * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
+ * in it and destroy it in sail_stop_writing. States must be used per image. DO NOT use the same state
  * to write multiple images in the same time.
  *
  * Returns 0 on success or sail_error_t on error.
  */
 SAIL_EXPORT sail_error_t sail_start_writing_with_options(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info,
-                                                         const struct sail_write_options *write_options, void **pimpl);
+                                                         const struct sail_write_options *write_options, void **state);
 
 /*
  * Starts writing into the specified image file. Pass a particular plugin info if you'd like
@@ -269,38 +269,38 @@ SAIL_EXPORT sail_error_t sail_start_writing_with_options(const char *path, struc
  *
  * For example:
  *
- * void *pimpl = NULL;
+ * void *state = NULL;
  *
- * SAIL_TRY_OR_CLEANUP(sail_start_writing(..., &pimpl),
- *                     sail_stop_writing(pimpl));
- * SAIL_TRY_OR_CLEANUP(sail_write_next_frame(pimpl, ...),
- *                     sail_stop_writing(pimpl));
- * SAIL_TRY(sail_stop_writing(pimpl));
+ * SAIL_TRY_OR_CLEANUP(sail_start_writing(..., &state),
+ *                     sail_stop_writing(state));
+ * SAIL_TRY_OR_CLEANUP(sail_write_next_frame(state, ...),
+ *                     sail_stop_writing(state));
+ * SAIL_TRY(sail_stop_writing(state));
  *
- * PIMPL explanation: Pass the address of a local void* pointer. SAIL will store an internal state
- * in it and destroy it in sail_stop_writing. Pimpls must be used per image. DO NOT use the same pimpl
+ * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
+ * in it and destroy it in sail_stop_writing. States must be used per image. DO NOT use the same state
  * to write multiple images in the same time.
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_start_writing(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info, void **pimpl);
+SAIL_EXPORT sail_error_t sail_start_writing(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info, void **state);
 
 /*
  * Continues writing the file started by sail_start_writing() or sail_start_writing_with_options().
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_write_next_frame(void *pimpl, const struct sail_image *image, const void *image_bits);
+SAIL_EXPORT sail_error_t sail_write_next_frame(void *state, const struct sail_image *image, const void *image_bits);
 
 /*
  * Stops writing the file started by sail_start_writing() or sail_start_writing_with_options().
- * Does nothing if the pimpl is NULL.
+ * Does nothing if the state is NULL.
  *
  * It's essential to always stop writing to free memory resources. Avoiding doing so will lead to memory leaks.
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_stop_writing(void *pimpl);
+SAIL_EXPORT sail_error_t sail_stop_writing(void *state);
 
 /* extern "C" */
 #ifdef __cplusplus

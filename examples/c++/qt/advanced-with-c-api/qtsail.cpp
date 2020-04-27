@@ -106,7 +106,7 @@ static QImage::Format sailPixelFormatToQImageFormat(int pixel_format) {
 
 sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 {
-    void *pimpl = nullptr;
+    void *state = nullptr;
     struct sail_image *image = nullptr;
     uchar *image_bits = nullptr;
 
@@ -115,8 +115,8 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
      * The subsequent calls to sail_read_next_frame() will output pixels
      * in a plugin-specific preferred pixel format.
      */
-    SAIL_TRY_OR_CLEANUP(sail_start_reading(path.toLocal8Bit(), d->context, NULL, &pimpl),
-                        /* cleanup */ sail_stop_reading(pimpl),
+    SAIL_TRY_OR_CLEANUP(sail_start_reading(path.toLocal8Bit(), d->context, NULL, &state),
+                        /* cleanup */ sail_stop_reading(state),
                                       free(image_bits),
                                       sail_destroy_image(image));
 
@@ -125,8 +125,8 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
      * reading frames until sail_read_next_frame() returns 0. If no more frames are available,
      * it returns SAIL_NO_MORE_FRAMES.
      */
-    SAIL_TRY_OR_CLEANUP(sail_read_next_frame(pimpl, &image, (void **)&image_bits),
-                        /* cleanup */ sail_stop_reading(pimpl),
+    SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, &image, (void **)&image_bits),
+                        /* cleanup */ sail_stop_reading(state),
                                       free(image_bits),
                                       sail_destroy_image(image));
 
@@ -134,7 +134,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
      * It's essential to ALWAYS stop reading to free memory resources.
      * Avoiding doing so will lead to memory leaks.
      */
-    SAIL_TRY_OR_CLEANUP(sail_stop_reading(pimpl),
+    SAIL_TRY_OR_CLEANUP(sail_stop_reading(state),
              /* cleanup */ free(image_bits),
                            sail_destroy_image(image));
 
@@ -180,7 +180,7 @@ static int qImageFormatToSailPixelFormat(QImage::Format format) {
 
 sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
 {
-    void *pimpl = nullptr;
+    void *state = nullptr;
 
     struct sail_image *image = nullptr;
     SAIL_TRY(sail_alloc_image(&image));
@@ -191,11 +191,11 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
     SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(image, &image->bytes_per_line),
                         /* cleanup */ sail_destroy_image(image));
 
-    SAIL_TRY_OR_CLEANUP(sail_start_writing(path.toLocal8Bit(), d->context, nullptr, &pimpl),
+    SAIL_TRY_OR_CLEANUP(sail_start_writing(path.toLocal8Bit(), d->context, nullptr, &state),
                         /* cleanup */ sail_destroy_image(image));
-    SAIL_TRY_OR_CLEANUP(sail_write_next_frame(pimpl, image, qimage.bits()),
+    SAIL_TRY_OR_CLEANUP(sail_write_next_frame(state, image, qimage.bits()),
                         /* cleanup */ sail_destroy_image(image));
-    SAIL_TRY_OR_CLEANUP(sail_stop_writing(pimpl),
+    SAIL_TRY_OR_CLEANUP(sail_stop_writing(state),
                         /* cleanup */ sail_destroy_image(image));
 
     sail_destroy_image(image);

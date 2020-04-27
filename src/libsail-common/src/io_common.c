@@ -34,6 +34,6 @@ void sail_destroy_io(struct sail_io *io) {
         }
     }
 
-    free(io->pimpl);
+    free(io->state);
     free(io);
 }
