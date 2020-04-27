@@ -562,12 +562,16 @@ sail_error_t sail_read(const char *path, struct sail_image **image, void **image
     *image_bits = NULL;
 
     SAIL_TRY_OR_CLEANUP(sail_start_reading(path, context, NULL /* plugin info */, &state),
-                        sail_stop_reading(state));
+                        /* cleanup */ sail_stop_reading(state));
+
     SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, image, image_bits),
-                        free(image_bits),
-                        sail_stop_reading(state));
+                        /* cleanup */ sail_stop_reading(state),
+                                      free(image_bits),
+                                      sail_destroy_image(*image));
+
     SAIL_TRY_OR_CLEANUP(sail_stop_reading(state),
-                        free(image_bits));
+                        /* cleanup */ free(image_bits),
+                                      sail_destroy_image(*image));
 
     return 0;
 }
@@ -592,8 +596,10 @@ sail_error_t sail_write(const char *path, const struct sail_image *image, const 
 
     SAIL_TRY_OR_CLEANUP(sail_start_writing(path, context, NULL /* plugin info */, &state),
                         sail_stop_writing(state));
+
     SAIL_TRY_OR_CLEANUP(sail_write_next_frame(state, image, image_bits),
                         sail_stop_writing(state));
+
     SAIL_TRY(sail_stop_writing(state));
 
     return 0;
