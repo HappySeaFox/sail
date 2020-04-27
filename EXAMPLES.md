@@ -55,8 +55,9 @@ SAIL_TRY(sail_init(&context));
 
 /*
  * A local void pointer is needed for SAIL to save a state in it.
+ * Always set the initial state to NULL in C or nullptr in C++.
  */
-void *pimpl = NULL;
+void *state = NULL;
 struct sail_image *image = NULL;
 unsigned char *image_bits = NULL;
 
@@ -65,8 +66,8 @@ unsigned char *image_bits = NULL;
  * The subsequent calls to sail_read_next_frame() will output pixels
  * in a plugin-specific preferred pixel format.
  */
-SAIL_TRY_OR_CLEANUP(sail_start_reading(path.toLocal8Bit(), d->context, NULL, &pimpl),
-                    /* cleanup */ sail_stop_reading(pimpl),
+SAIL_TRY_OR_CLEANUP(sail_start_reading(path.toLocal8Bit(), d->context, NULL, &state),
+                    /* cleanup */ sail_stop_reading(state),
                                   free(image_bits),
                                   sail_destroy_image(image));
 
@@ -75,8 +76,8 @@ SAIL_TRY_OR_CLEANUP(sail_start_reading(path.toLocal8Bit(), d->context, NULL, &pi
  * reading frames until sail_read_next_frame() returns 0. If no more frames are available,
  * it returns SAIL_NO_MORE_FRAMES.
  */
-SAIL_TRY_OR_CLEANUP(sail_read_next_frame(pimpl, &image, (void **)&image_bits),
-                    /* cleanup */ sail_stop_reading(pimpl),
+SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, &image, (void **)&image_bits),
+                    /* cleanup */ sail_stop_reading(state),
                                   free(image_bits),
                                   sail_destroy_image(image));
 
@@ -84,7 +85,7 @@ SAIL_TRY_OR_CLEANUP(sail_read_next_frame(pimpl, &image, (void **)&image_bits),
  * It's essential to ALWAYS stop reading to free memory resources.
  * Avoiding doing so will lead to memory leaks.
  */
-SAIL_TRY_OR_CLEANUP(sail_stop_reading(pimpl),
+SAIL_TRY_OR_CLEANUP(sail_stop_reading(state),
          /* cleanup */ free(image_bits),
                        sail_destroy_image(image));
 
