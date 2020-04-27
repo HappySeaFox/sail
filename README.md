@@ -24,7 +24,7 @@ SAIL provides 3 levels of APIs depending on your needs. Let's have a quick look 
 
 ### 1. `junior` "I just want to load this damn JPEG"
 
-**C:**
+#### C:
 ```C
 struct sail_image *image;
 unsigned char *image_bits;
@@ -48,7 +48,7 @@ free(image_bits);
 sail_destroy_image(image);
 ```
 
-**C++:**
+#### C++:
 ```C++
 sail::image_reader reader;
 sail::image image;
