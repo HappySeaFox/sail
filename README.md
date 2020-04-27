@@ -7,6 +7,7 @@ to decode and encode images in different formats. :sailboat:
 
 - easy-to-use C and C++ interfaces.
 - 3 levels of APIs depending on your needs: `junior`, `advanced`, and `deep diver`. See [EXAMPLES](EXAMPLES.md) for more.
+- I/O abstraction for deep divers.
 - Reading and writing images in numerous plugin-specific pixel formats. For example, the JPEG plugin
   is able to read `RGB` and `YCbCr` images and output them to memory as `Grayscale` pixels and vice versa.
 - Reading images and outputting them to memory in source pixel format without conversion for those who want
