@@ -205,6 +205,7 @@ if (read_options->output_pixel_format != SAIL_PIXEL_FORMAT_RGB) {
      * The plugin doesn't support outputting RGB pixels.
      */
     if (!foundRgb) {
+        sail_destroy_read_options(read_options);
         return SAIL_UNSUPPORTED_PIXEL_FORMAT;
     }
 
