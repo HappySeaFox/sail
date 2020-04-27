@@ -6,7 +6,7 @@ SAIL provides 3 levels of APIs depending on your needs. Let's have a look at the
 
 **Purpose:** read a single image frame in a one-line manner.
 
-**C:**
+#### C:
 ```C
 struct sail_image *image;
 unsigned char *image_bits;
@@ -30,7 +30,7 @@ free(image_bits);
 sail_destroy_image(image);
 ```
 
-**C++:**
+#### C++:
 ```C++
 sail::image_reader reader;
 sail::image image;
@@ -48,7 +48,7 @@ SAIL_TRY(reader.read(path, &image));
 
 **Purpose:** read a single or multiple image frames.
 
-**C:**
+#### C:
 ```C
 struct sail_context *context = NULL;
 
@@ -111,7 +111,7 @@ sail_finish(context);
 context = NULL;
 ```
 
-**C++:**
+#### C++:
 ```C++
 // Initialize SAIL context. You could cache the context as a class member and re-use it multiple times.
 //
@@ -154,7 +154,7 @@ SAIL_TRY(reader.stop_reading());
 **Purpose:** read a single or multiple image frames. Possibly specify a concrete plugin to use.
              Possibly specify a desired pixel format to output.
 
-**C:**
+#### C:
 ```C
 struct sail_context *context = NULL;
 
@@ -280,7 +280,7 @@ sail_finish(context);
 context = NULL;
 ```
 
-**C++:**
+#### C++:
 ```C++
 // Initialize SAIL context. You could cache the context as a class member and re-use it multiple times.
 //
