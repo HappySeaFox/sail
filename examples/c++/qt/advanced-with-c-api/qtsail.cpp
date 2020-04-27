@@ -106,6 +106,9 @@ static QImage::Format sailPixelFormatToQImageFormat(int pixel_format) {
 
 sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 {
+    /*
+     * Always set the initial state to NULL in C or nullptr in C++.
+     */
     void *state = nullptr;
     struct sail_image *image = nullptr;
     uchar *image_bits = nullptr;
@@ -180,6 +183,9 @@ static int qImageFormatToSailPixelFormat(QImage::Format format) {
 
 sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
 {
+    /*
+     * Always set the initial state to NULL in C or nullptr in C++.
+     */
     void *state = nullptr;
 
     struct sail_image *image = nullptr;

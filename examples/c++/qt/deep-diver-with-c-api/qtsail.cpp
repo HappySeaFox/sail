@@ -117,6 +117,9 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 
     sail_image *image = nullptr;
     uchar *image_bits = nullptr;
+
+    // Always set the initial state to NULL in C or nullptr in C++.
+    //
     void *state = nullptr;
 
     // Time counter.
@@ -236,6 +239,9 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
 
     sail_image *image = nullptr;
     sail_write_options *write_options = nullptr;
+
+    // Always set the initial state to NULL in C or nullptr in C++.
+    //
     void *state = nullptr;
 
     // Create a new image to be passed into the SAIL writing functions.
