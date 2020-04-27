@@ -240,6 +240,34 @@ SAIL_EXPORT sail_error_t sail_start_reading_file_with_options(const char *path, 
                                                               const struct sail_read_options *read_options, void **state);
 
 /*
+ * Starts reading the specified I/O stream.
+ *
+ * Typical usage: sail_alloc_io_read_file()         ->
+ *                sail_plugin_info_from_extension() ->
+ *                sail_start_reading_io()           ->
+ *                sail_read_next_frame()            ->
+ *                sail_stop_reading().
+ *
+ * For example:
+ *
+ * void *state = NULL;
+ *
+ * SAIL_TRY_OR_CLEANUP(sail_start_reading_io(..., &state),
+ *                     sail_stop_reading(state));
+ * SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, ...),
+ *                     sail_stop_reading(state));
+ * SAIL_TRY(sail_stop_reading(state));
+ *
+ * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
+ * in it and destroy it in sail_stop_reading. States must be used per image. DO NOT use the same state
+ * to read multiple images in the same time.
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_start_reading_io(struct sail_io *io, struct sail_context *context,
+                                               const struct sail_plugin_info *plugin_info, void **state);
+
+/*
  * Starts reading the specified image file. Pass a particular plugin info if you'd like
  * to start reading with a specific codec. If not, just pass NULL.
  *
