@@ -1,4 +1,4 @@
-/*  This file is part of SAIL (https://github.com/sailor-keg/sail)
+/*  This file is part of SAIL (https://github.com/smoked-herring/sail)
 
     Copyright (c) 2020 Dmitry Baryshev <dmitrymq@gmail.com>
 
