@@ -234,6 +234,8 @@ sail_destroy_read_options(read_options);
  * Read just a single frame. It's possible to read more frames if any. Just continue
  * reading frames till sail_read_next_frame() returns 0. If no more frames are available,
  * it returns SAIL_NO_MORE_FRAMES.
+ *
+ * sail_read_next_frame() outputs pixels in the requested pixel format (RGB).
  */
 SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state,
                                          &image,
@@ -280,4 +282,61 @@ context = NULL;
 
 **C++:**
 ```C++
+// Initialize SAIL context. You could cache the context as a class member and re-use it multiple times.
+//
+sail::context context;
+sail::image_reader reader(&context);
+
+// Find the codec info by a file extension.
+//
+sail::plugin_info plugin_info;
+SAIL_TRY(context.plugin_info_from_path(path, &plugin_info));
+
+// Allocate new read options and copy defaults from the read features
+// (preferred output pixel format etc.).
+//
+sail::read_options read_options;
+SAIL_TRY(plugin_info.read_features().to_read_options(&read_options));
+
+// Let's request RGB pixels only.
+//
+if (read_options.output_pixel_format() != SAIL_PIXEL_FORMAT_RGB) {
+    const std::vector<int> output_pixel_formats = plugin_info.read_features().output_pixel_formats();
+
+    // The plugin doesn't support outputting RGB pixels.
+    //
+    if (std::find(output_pixel_formats.begin(), output_pixel_formats.end(), SAIL_PIXEL_FORMAT_RGB) == output_pixel_formats.end()) {
+        return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+    }
+
+    // Request the plugin to output RGB pixels.
+    //
+    read_options.with_output_pixel_format(SAIL_PIXEL_FORMAT_RGB);
+}
+
+// Initialize reading with our options.
+//
+SAIL_TRY(reader.start_reading(path.toLocal8Bit(), plugin_info, read_options));
+
+// Read just a single frame. It's possible to read more frames if any. Just continue
+// reading frames till read_next_frame() returns 0. If no more frames are available,
+// it returns SAIL_NO_MORE_FRAMES.
+//
+// read_next_frame() outputs pixels in the requested pixel format (RGB).
+//
+sail::image image;
+SAIL_TRY(reader.read_next_frame(&image));
+
+// Finish reading.
+//
+SAIL_TRY(reader.stop_reading());
+
+// Print the image meta information if any (JPEG comments etc.).
+//
+const std::map<std::string, std::string> meta_entries = image.meta_entries();
+
+if (!meta_entries.empty()) {
+    const std::pair<std::string, std::string> first_pair = *meta_entries.begin();
+    SAIL_LOG_DEBUG("%s: %s", first_pair.first.c_str(), first_pair.second.c_str());
+}
 ```
