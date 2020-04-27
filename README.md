@@ -3,11 +3,18 @@
 SAIL is a small and lightweight cross-platform library aimed to provide lightweight as well as complex APIs
 to decode and encode images in different formats. :sailboat:
 
+Author: Dmitry Baryshev.
+
 ## Target audience
 
-- Game developers
-- Image viewers
-- Anyone who needs loading or saving images in different image formats
+- Game developers.
+- Image viewers.
+- Anyone who needs loading or saving images in different image formats.
+
+## License
+
+- libsail-common, libsail, C++ bindings, and plugins are under LGPLv3+.
+- Examples are under the MIT license.
 
 ## Features
 
