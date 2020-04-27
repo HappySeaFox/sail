@@ -42,7 +42,7 @@ static const int COMPRESSION_DEFAULT = 15;
  * Plugin-specific state.
  */
 
-struct state {
+struct jpeg_state {
     struct jpeg_decompress_struct decompress_context;
     struct jpeg_compress_struct compress_context;
     struct my_error_context error_context;
@@ -54,20 +54,20 @@ struct state {
     bool frame_written;
 };
 
-static int alloc_state(struct state **state) {
+static int alloc_jpeg_state(struct jpeg_state **jpeg_state) {
 
-    *state = (struct state *)malloc(sizeof(struct state));
+    *jpeg_state = (struct jpeg_state *)malloc(sizeof(struct jpeg_state));
 
-    if (*state == NULL) {
+    if (*jpeg_state == NULL) {
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
-    (*state)->buffer        = NULL;
-    (*state)->libjpeg_error = false;
-    (*state)->read_options  = NULL;
-    (*state)->write_options = NULL;
-    (*state)->frame_read    = false;
-    (*state)->frame_written = false;
+    (*jpeg_state)->buffer        = NULL;
+    (*jpeg_state)->libjpeg_error = false;
+    (*jpeg_state)->read_options  = NULL;
+    (*jpeg_state)->write_options = NULL;
+    (*jpeg_state)->frame_read    = false;
+    (*jpeg_state)->frame_written = false;
 
     return 0;
 }
@@ -76,109 +76,113 @@ static int alloc_state(struct state **state) {
  * Decoding functions.
  */
 
-SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_io *io, const struct sail_read_options *read_options) {
+SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_io *io, const struct sail_read_options *read_options, void **state) {
 
     SAIL_CHECK_IO(io);
     SAIL_CHECK_READ_OPTIONS_PTR(read_options);
+    SAIL_CHECK_STATE_PTR(state);
 
-    struct state *state;
-    SAIL_TRY(alloc_state(&state));
+    *state = NULL;
 
-    io->state = state;
+    struct jpeg_state *jpeg_state;
+    SAIL_TRY(alloc_jpeg_state(&jpeg_state));
+
+    *state = jpeg_state;
 
     /* Deep copy read options. */
-    state->read_options = (struct sail_read_options *)malloc(sizeof(struct sail_read_options));
+    jpeg_state->read_options = (struct sail_read_options *)malloc(sizeof(struct sail_read_options));
 
-    if (state->read_options == NULL) {
+    if (jpeg_state->read_options == NULL) {
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
-    memcpy(state->read_options, read_options, sizeof(struct sail_read_options));
+    memcpy(jpeg_state->read_options, read_options, sizeof(struct sail_read_options));
 
     /* Error handling setup. */
-    state->decompress_context.err = jpeg_std_error(&state->error_context.jpeg_error_mgr);
-    state->error_context.jpeg_error_mgr.error_exit = my_error_exit;
-    state->error_context.jpeg_error_mgr.output_message = my_output_message;
+    jpeg_state->decompress_context.err = jpeg_std_error(&jpeg_state->error_context.jpeg_error_mgr);
+    jpeg_state->error_context.jpeg_error_mgr.error_exit = my_error_exit;
+    jpeg_state->error_context.jpeg_error_mgr.output_message = my_output_message;
 
-    if (setjmp(state->error_context.setjmp_buffer) != 0) {
-        state->libjpeg_error = true;
+    if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0) {
+        jpeg_state->libjpeg_error = true;
         return SAIL_UNDERLYING_CODEC_ERROR;
     }
 
     /* JPEG setup. */
-    jpeg_create_decompress(&state->decompress_context);
-    jpeg_sail_io_src(&state->decompress_context, io);
+    jpeg_create_decompress(&jpeg_state->decompress_context);
+    jpeg_sail_io_src(&jpeg_state->decompress_context, io);
 
-    if (state->read_options->io_options & SAIL_IO_OPTION_META_INFO) {
-        jpeg_save_markers(&state->decompress_context, JPEG_COM, 0xffff);
+    if (jpeg_state->read_options->io_options & SAIL_IO_OPTION_META_INFO) {
+        jpeg_save_markers(&jpeg_state->decompress_context, JPEG_COM, 0xffff);
     }
 
-    jpeg_read_header(&state->decompress_context, true);
+    jpeg_read_header(&jpeg_state->decompress_context, true);
 
     /* Handle the requested color space. */
-    if (state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_SOURCE) {
-        state->decompress_context.out_color_space = state->decompress_context.jpeg_color_space;
+    if (jpeg_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_SOURCE) {
+        jpeg_state->decompress_context.out_color_space = jpeg_state->decompress_context.jpeg_color_space;
     } else {
-        J_COLOR_SPACE requested_color_space = pixel_format_to_color_space(state->read_options->output_pixel_format);
+        J_COLOR_SPACE requested_color_space = pixel_format_to_color_space(jpeg_state->read_options->output_pixel_format);
 
         if (requested_color_space == JCS_UNKNOWN) {
             return SAIL_UNSUPPORTED_PIXEL_FORMAT;
         }
 
-        state->decompress_context.out_color_space = requested_color_space;
+        jpeg_state->decompress_context.out_color_space = requested_color_space;
     }
 
     /* We don't want colormapped output. */
-    state->decompress_context.quantize_colors = false;
+    jpeg_state->decompress_context.quantize_colors = false;
 
     /* Launch decompression! */
-    jpeg_start_decompress(&state->decompress_context);
+    jpeg_start_decompress(&jpeg_state->decompress_context);
 
     return 0;
 }
 
-SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(struct sail_io *io, struct sail_image **image) {
+SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct sail_io *io, struct sail_image **image) {
 
+    SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IO(io);
 
-    struct state *state = (struct state *)io->state;
-    SAIL_CHECK_STATE_PTR(state);
+    struct jpeg_state *jpeg_state = (struct jpeg_state *)state;
+    SAIL_CHECK_STATE_PTR(jpeg_state);
 
-    if (state->frame_read) {
+    if (jpeg_state->frame_read) {
         return SAIL_NO_MORE_FRAMES;
     }
 
-    state->frame_read = true;
+    jpeg_state->frame_read = true;
     SAIL_TRY(sail_alloc_image(image));
 
-    if (setjmp(state->error_context.setjmp_buffer) != 0) {
-        state->libjpeg_error = true;
+    if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0) {
+        jpeg_state->libjpeg_error = true;
         return SAIL_UNDERLYING_CODEC_ERROR;
     }
 
-    const int bytes_per_line = state->decompress_context.output_width * state->decompress_context.output_components;
+    const int bytes_per_line = jpeg_state->decompress_context.output_width * jpeg_state->decompress_context.output_components;
 
     /* Buffer to put scan lines into. libjpeg will automatically free it. */
-    state->buffer = (*state->decompress_context.mem->alloc_sarray)((j_common_ptr)&state->decompress_context,
+    jpeg_state->buffer = (*jpeg_state->decompress_context.mem->alloc_sarray)((j_common_ptr)&jpeg_state->decompress_context,
                                                                     JPOOL_IMAGE,
                                                                     bytes_per_line,
                                                                     1);
 
-    if (state->buffer == NULL) {
+    if (jpeg_state->buffer == NULL) {
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
     /* Image properties. */
-    (*image)->width               = state->decompress_context.output_width;
-    (*image)->height              = state->decompress_context.output_height;
+    (*image)->width               = jpeg_state->decompress_context.output_width;
+    (*image)->height              = jpeg_state->decompress_context.output_height;
     (*image)->bytes_per_line      = bytes_per_line;
-    (*image)->pixel_format        = color_space_to_pixel_format(state->decompress_context.out_color_space);
+    (*image)->pixel_format        = color_space_to_pixel_format(jpeg_state->decompress_context.out_color_space);
     (*image)->passes              = 1;
-    (*image)->source_pixel_format = color_space_to_pixel_format(state->decompress_context.jpeg_color_space);
+    (*image)->source_pixel_format = color_space_to_pixel_format(jpeg_state->decompress_context.jpeg_color_space);
 
     /* Read meta info. */
-    if (state->read_options->io_options & SAIL_IO_OPTION_META_INFO) {
-        jpeg_saved_marker_ptr it = state->decompress_context.marker_list;
+    if (jpeg_state->read_options->io_options & SAIL_IO_OPTION_META_INFO) {
+        jpeg_saved_marker_ptr it = jpeg_state->decompress_context.marker_list;
         struct sail_meta_entry_node *last_meta_entry_node = NULL;
 
         while(it != NULL) {
@@ -206,50 +210,53 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(struct sail_io *io,
     return 0;
 }
 
-SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_pass_v2(struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_pass_v2(void *state, struct sail_io *io, const struct sail_image *image) {
 
+    SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IO(io);
     SAIL_CHECK_IMAGE(image);
 
     return 0;
 }
 
-SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v2(struct sail_io *io, const struct sail_image *image, void *scanline) {
+SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v2(void *state, struct sail_io *io, const struct sail_image *image, void *scanline) {
 
+    SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IO(io);
     SAIL_CHECK_IMAGE(image);
     SAIL_CHECK_SCAN_LINE_PTR(scanline);
 
-    struct state *state = (struct state *)io->state;
-    SAIL_CHECK_STATE_PTR(state);
+    struct jpeg_state *jpeg_state = (struct jpeg_state *)state;
+    SAIL_CHECK_STATE_PTR(jpeg_state);
 
-    if (state->libjpeg_error) {
+    if (jpeg_state->libjpeg_error) {
         return SAIL_UNDERLYING_CODEC_ERROR;
     }
 
-    if (setjmp(state->error_context.setjmp_buffer) != 0) {
-        state->libjpeg_error = true;
+    if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0) {
+        jpeg_state->libjpeg_error = true;
         return SAIL_UNDERLYING_CODEC_ERROR;
     }
 
-    const int color_components = state->decompress_context.output_components;
+    const int color_components = jpeg_state->decompress_context.output_components;
 
-    (void)jpeg_read_scanlines(&state->decompress_context, state->buffer, 1);
+    (void)jpeg_read_scanlines(&jpeg_state->decompress_context, jpeg_state->buffer, 1);
 
-    memcpy(scanline, state->buffer[0], image->width * color_components);
+    memcpy(scanline, jpeg_state->buffer[0], image->width * color_components);
 
     return 0;
 }
 
-SAIL_EXPORT sail_error_t sail_plugin_read_alloc_scan_line_v2(struct sail_io *io, const struct sail_image *image, void **scanline) {
+SAIL_EXPORT sail_error_t sail_plugin_read_alloc_scan_line_v2(void *state, struct sail_io *io, const struct sail_image *image, void **scanline) {
 
+    SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IO(io);
     SAIL_CHECK_IMAGE(image);
 
-    struct state *state = (struct state *)io->state;
-    SAIL_CHECK_STATE_PTR(state);
+    struct jpeg_state *jpeg_state = (struct jpeg_state *)state;
+    SAIL_CHECK_STATE_PTR(jpeg_state);
 
-    const int color_components = state->decompress_context.output_components;
+    const int color_components = jpeg_state->decompress_context.output_components;
 
     *scanline = malloc(image->width * color_components);
 
@@ -257,25 +264,31 @@ SAIL_EXPORT sail_error_t sail_plugin_read_alloc_scan_line_v2(struct sail_io *io,
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
-    return sail_plugin_read_scan_line_v2(io, image, *scanline);
+    return sail_plugin_read_scan_line_v2(state, io, image, *scanline);
 }
 
-SAIL_EXPORT sail_error_t sail_plugin_read_finish_v2(struct sail_io *io) {
+SAIL_EXPORT sail_error_t sail_plugin_read_finish_v2(void **state, struct sail_io *io) {
 
+    SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IO(io);
 
-    struct state *state = (struct state *)io->state;
-    SAIL_CHECK_STATE_PTR(state);
+    struct jpeg_state *jpeg_state = (struct jpeg_state *)(*state);
+    SAIL_CHECK_STATE_PTR(jpeg_state);
 
-    sail_destroy_read_options(state->read_options);
+    /* The subsequent calls to finish() will expectedly fail in the above line. */
+    *state = NULL;
 
-    if (setjmp(state->error_context.setjmp_buffer) != 0) {
-        state->libjpeg_error = true;
+    sail_destroy_read_options(jpeg_state->read_options);
+
+    if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0) {
+        free(jpeg_state);
         return SAIL_UNDERLYING_CODEC_ERROR;
     }
 
-    jpeg_abort_decompress(&state->decompress_context);
-    jpeg_destroy_decompress(&state->decompress_context);
+    jpeg_abort_decompress(&jpeg_state->decompress_context);
+    jpeg_destroy_decompress(&jpeg_state->decompress_context);
+
+    free(jpeg_state);
 
     return 0;
 }
@@ -284,54 +297,57 @@ SAIL_EXPORT sail_error_t sail_plugin_read_finish_v2(struct sail_io *io) {
  * Encoding functions.
  */
 
-SAIL_EXPORT sail_error_t sail_plugin_write_init_v2(struct sail_io *io, const struct sail_write_options *write_options) {
+SAIL_EXPORT sail_error_t sail_plugin_write_init_v2(struct sail_io *io, const struct sail_write_options *write_options, void **state) {
 
     SAIL_CHECK_IO(io);
     SAIL_CHECK_WRITE_OPTIONS_PTR(write_options);
+    SAIL_CHECK_STATE_PTR(state);
 
-    struct state *state;
+    *state = NULL;
 
-    SAIL_TRY(alloc_state(&state));
+    struct jpeg_state *jpeg_state;
+    SAIL_TRY(alloc_jpeg_state(&jpeg_state));
 
-    io->state = state;
+    *state = jpeg_state;
 
     /* Deep copy write options. */
-    state->write_options = (struct sail_write_options *)malloc(sizeof(struct sail_write_options));
+    jpeg_state->write_options = (struct sail_write_options *)malloc(sizeof(struct sail_write_options));
 
-    if (state->write_options == NULL) {
+    if (jpeg_state->write_options == NULL) {
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
-    memcpy(state->write_options, write_options, sizeof(struct sail_write_options));
+    memcpy(jpeg_state->write_options, write_options, sizeof(struct sail_write_options));
 
     /* Sanity check. */
-    if (pixel_format_to_color_space(state->write_options->output_pixel_format) == JCS_UNKNOWN) {
+    if (pixel_format_to_color_space(jpeg_state->write_options->output_pixel_format) == JCS_UNKNOWN) {
         return SAIL_UNSUPPORTED_PIXEL_FORMAT;
     }
 
-    if (state->write_options->compression_type != 0) {
+    if (jpeg_state->write_options->compression_type != 0) {
         return SAIL_UNSUPPORTED_COMPRESSION_TYPE;
     }
 
     /* Error handling setup. */
-    state->compress_context.err = jpeg_std_error(&state->error_context.jpeg_error_mgr);
-    state->error_context.jpeg_error_mgr.error_exit = my_error_exit;
-    state->error_context.jpeg_error_mgr.output_message = my_output_message;
+    jpeg_state->compress_context.err = jpeg_std_error(&jpeg_state->error_context.jpeg_error_mgr);
+    jpeg_state->error_context.jpeg_error_mgr.error_exit = my_error_exit;
+    jpeg_state->error_context.jpeg_error_mgr.output_message = my_output_message;
 
-    if (setjmp(state->error_context.setjmp_buffer) != 0) {
-        state->libjpeg_error = true;
+    if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0) {
+        jpeg_state->libjpeg_error = true;
         return SAIL_UNDERLYING_CODEC_ERROR;
     }
 
     /* JPEG setup. */
-    jpeg_create_compress(&state->compress_context);
-    jpeg_sail_io_dest(&state->compress_context, io);
+    jpeg_create_compress(&jpeg_state->compress_context);
+    jpeg_sail_io_dest(&jpeg_state->compress_context, io);
 
     return 0;
 }
 
-SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v2(struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v2(void *state, struct sail_io *io, const struct sail_image *image) {
 
+    SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IO(io);
     SAIL_CHECK_IMAGE(image);
 
@@ -340,47 +356,47 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v2(struct sail_io *io
         return SAIL_UNSUPPORTED_PIXEL_FORMAT;
     }
 
-    struct state *state = (struct state *)io->state;
-    SAIL_CHECK_STATE_PTR(state);
+    struct jpeg_state *jpeg_state = (struct jpeg_state *)state;
+    SAIL_CHECK_STATE_PTR(jpeg_state);
 
-    if (state->frame_written) {
+    if (jpeg_state->frame_written) {
         return SAIL_NO_MORE_FRAMES;
     }
 
-    state->frame_written = true;
+    jpeg_state->frame_written = true;
 
     /* Error handling setup. */
-    if (setjmp(state->error_context.setjmp_buffer) != 0) {
-        state->libjpeg_error = true;
+    if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0) {
+        jpeg_state->libjpeg_error = true;
         return SAIL_UNDERLYING_CODEC_ERROR;
     }
 
     int bits_per_pixel;
     SAIL_TRY(sail_bits_per_pixel(image->pixel_format, &bits_per_pixel));
 
-    state->compress_context.image_width = image->width;
-    state->compress_context.image_height = image->height;
-    state->compress_context.input_components = bits_per_pixel / 8;
-    state->compress_context.in_color_space = pixel_format_to_color_space(image->pixel_format);
+    jpeg_state->compress_context.image_width = image->width;
+    jpeg_state->compress_context.image_height = image->height;
+    jpeg_state->compress_context.input_components = bits_per_pixel / 8;
+    jpeg_state->compress_context.in_color_space = pixel_format_to_color_space(image->pixel_format);
 
-    jpeg_set_defaults(&state->compress_context);
-    jpeg_set_colorspace(&state->compress_context, pixel_format_to_color_space(state->write_options->output_pixel_format));
+    jpeg_set_defaults(&jpeg_state->compress_context);
+    jpeg_set_colorspace(&jpeg_state->compress_context, pixel_format_to_color_space(jpeg_state->write_options->output_pixel_format));
 
-    const int compression = (state->write_options->compression < COMPRESSION_MIN ||
-                                state->write_options->compression > COMPRESSION_MAX)
+    const int compression = (jpeg_state->write_options->compression < COMPRESSION_MIN ||
+                                jpeg_state->write_options->compression > COMPRESSION_MAX)
                             ? COMPRESSION_DEFAULT
-                            : state->write_options->compression;
-    jpeg_set_quality(&state->compress_context, /* to quality */COMPRESSION_MAX-compression, true);
+                            : jpeg_state->write_options->compression;
+    jpeg_set_quality(&jpeg_state->compress_context, /* to quality */COMPRESSION_MAX-compression, true);
 
-    jpeg_start_compress(&state->compress_context, true);
+    jpeg_start_compress(&jpeg_state->compress_context, true);
 
     /* Write meta info. */
-    if (state->write_options->io_options & SAIL_IO_OPTION_META_INFO && image->meta_entry_node != NULL) {
+    if (jpeg_state->write_options->io_options & SAIL_IO_OPTION_META_INFO && image->meta_entry_node != NULL) {
 
         struct sail_meta_entry_node *meta_entry_node = image->meta_entry_node;
 
         while (meta_entry_node != NULL) {
-            jpeg_write_marker(&state->compress_context,
+            jpeg_write_marker(&jpeg_state->compress_context,
                                 JPEG_COM,
                                 (JOCTET *)meta_entry_node->value,
                                 (unsigned int)strlen(meta_entry_node->value));
@@ -392,55 +408,63 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v2(struct sail_io *io
     return 0;
 }
 
-SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_pass_v2(struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_pass_v2(void *state, struct sail_io *io, const struct sail_image *image) {
 
+    SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IO(io);
     SAIL_CHECK_IMAGE(image);
 
     return 0;
 }
 
-SAIL_EXPORT sail_error_t sail_plugin_write_scan_line_v2(struct sail_io *io, const struct sail_image *image, const void *scanline) {
+SAIL_EXPORT sail_error_t sail_plugin_write_scan_line_v2(void *state, struct sail_io *io, const struct sail_image *image, const void *scanline) {
 
+    SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IO(io);
     SAIL_CHECK_IMAGE(image);
     SAIL_CHECK_SCAN_LINE_PTR(scanline);
 
-    struct state *state = (struct state *)io->state;
-    SAIL_CHECK_STATE_PTR(state);
+    struct jpeg_state *jpeg_state = (struct jpeg_state *)state;
+    SAIL_CHECK_STATE_PTR(jpeg_state);
 
-    if (state->libjpeg_error) {
+    if (jpeg_state->libjpeg_error) {
         return SAIL_UNDERLYING_CODEC_ERROR;
     }
 
-    if (setjmp(state->error_context.setjmp_buffer) != 0) {
-        state->libjpeg_error = true;
+    if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0) {
+        jpeg_state->libjpeg_error = true;
         return SAIL_UNDERLYING_CODEC_ERROR;
     }
 
     JSAMPROW row = (JSAMPROW)scanline;
 
-    jpeg_write_scanlines(&state->compress_context, &row, 1);
+    jpeg_write_scanlines(&jpeg_state->compress_context, &row, 1);
 
     return 0;
 }
 
-SAIL_EXPORT sail_error_t sail_plugin_write_finish_v2(struct sail_io *io) {
+SAIL_EXPORT sail_error_t sail_plugin_write_finish_v2(void **state, struct sail_io *io) {
 
+    SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IO(io);
 
-    struct state *state = (struct state *)io->state;
-    SAIL_CHECK_STATE_PTR(state);
+    struct jpeg_state *jpeg_state = (struct jpeg_state *)(*state);
+    SAIL_CHECK_STATE_PTR(jpeg_state);
 
-    sail_destroy_write_options(state->write_options);
+    /* The subsequent calls to finish() will expectedly fail in the above line. */
+    *state = NULL;
 
-    if (setjmp(state->error_context.setjmp_buffer) != 0) {
-        state->libjpeg_error = true;
+    sail_destroy_write_options(jpeg_state->write_options);
+
+    if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0) {
+        free(jpeg_state);
         return SAIL_UNDERLYING_CODEC_ERROR;
     }
 
-    jpeg_finish_compress(&state->compress_context);
-    jpeg_destroy_compress(&state->compress_context);
+    jpeg_finish_compress(&jpeg_state->compress_context);
+    jpeg_destroy_compress(&jpeg_state->compress_context);
+
+    free(jpeg_state);
 
     return 0;
 }

@@ -46,18 +46,18 @@ struct sail_image;
 struct sail_io;
 
 /* V2 declarations. */
-typedef sail_error_t (*sail_plugin_read_init_v2_t)(struct sail_io *io, const struct sail_read_options *read_options);
-typedef sail_error_t (*sail_plugin_read_seek_next_frame_v2_t)(struct sail_io *io, struct sail_image **image);
-typedef sail_error_t (*sail_plugin_read_seek_next_pass_v2_t)(struct sail_io *io, const struct sail_image *image);
-typedef sail_error_t (*sail_plugin_read_scan_line_v2_t)(struct sail_io *io, const struct sail_image *image, void *scanline);
-typedef sail_error_t (*sail_plugin_read_alloc_scan_line_v2_t)(struct sail_io *io, const struct sail_image *image, void **scanline);
-typedef sail_error_t (*sail_plugin_read_finish_v2_t)(struct sail_io *io);
+typedef sail_error_t (*sail_plugin_read_init_v2_t)           (struct sail_io *io, const struct sail_read_options *read_options, void **state);
+typedef sail_error_t (*sail_plugin_read_seek_next_frame_v2_t)(void *state, struct sail_io *io, struct sail_image **image);
+typedef sail_error_t (*sail_plugin_read_seek_next_pass_v2_t) (void *state, struct sail_io *io, const struct sail_image *image);
+typedef sail_error_t (*sail_plugin_read_scan_line_v2_t)      (void *state, struct sail_io *io, const struct sail_image *image, void *scanline);
+typedef sail_error_t (*sail_plugin_read_alloc_scan_line_v2_t)(void *state, struct sail_io *io, const struct sail_image *image, void **scanline);
+typedef sail_error_t (*sail_plugin_read_finish_v2_t)         (void **state, struct sail_io *io);
 
-typedef sail_error_t (*sail_plugin_write_init_v2_t)(struct sail_io *io, const struct sail_write_options *write_options);
-typedef sail_error_t (*sail_plugin_write_seek_next_frame_v2_t)(struct sail_io *io, const struct sail_image *image);
-typedef sail_error_t (*sail_plugin_write_seek_next_pass_v2_t)(struct sail_io *io, const struct sail_image *image);
-typedef sail_error_t (*sail_plugin_write_scan_line_v2_t)(struct sail_io *io, const struct sail_image *image, const void *scanline);
-typedef sail_error_t (*sail_plugin_write_finish_v2_t)(struct sail_io *io);
+typedef sail_error_t (*sail_plugin_write_init_v2_t)           (struct sail_io *io, const struct sail_write_options *write_options, void **state);
+typedef sail_error_t (*sail_plugin_write_seek_next_frame_v2_t)(void *state, struct sail_io *io, const struct sail_image *image);
+typedef sail_error_t (*sail_plugin_write_seek_next_pass_v2_t) (void *state, struct sail_io *io, const struct sail_image *image);
+typedef sail_error_t (*sail_plugin_write_scan_line_v2_t)      (void *state, struct sail_io *io, const struct sail_image *image, const void *scanline);
+typedef sail_error_t (*sail_plugin_write_finish_v2_t)         (void **state, struct sail_io *io);
 
 struct sail_plugin_layout_v2 {
     sail_plugin_read_init_v2_t            read_init_v2;

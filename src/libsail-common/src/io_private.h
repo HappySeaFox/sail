@@ -36,12 +36,6 @@ struct sail_io {
     void *stream;
 
     /*
-     * Plugin-specific data. A plugin could set state to its plugin-specific data storage and access it
-     * in its read or write functions. Will be destroyed automatically in sail_destroy_io().
-     */
-    void *state;
-
-    /*
      * Reads from the underlying I/O object into the specified buffer. Assigns the number of objects
      * actually read to read_objects_count.
      *

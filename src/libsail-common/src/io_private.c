@@ -31,7 +31,6 @@ sail_error_t sail_alloc_io(struct sail_io **io) {
     }
 
     (*io)->stream = NULL;
-    (*io)->state  = NULL;
     (*io)->read   = NULL;
     (*io)->seek   = NULL;
     (*io)->tell   = NULL;

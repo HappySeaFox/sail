@@ -40,13 +40,17 @@ extern "C" {
 
 /*
  * Starts decoding the specified io stream using the specified options (or NULL to use defaults).
- * The specified read options will be copied into an internal buffer.
+ * The specified read options will be deep copied into an internal buffer.
  *
  * If the specified read options is NULL, plugin-specific defaults will be used.
  *
+ * STATE explanation: Pass the address of a local void* pointer. Plugins will store an internal state
+ * in it and destroy it in sail_plugin_read_finish_vx(). States must be used per image. DO NOT use the same state
+ * to read multiple images in the same time.
+ *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_io *io, const struct sail_read_options *read_options);
+SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_io *io, const struct sail_read_options *read_options, void **state);
 
 /*
  * Seeks to the next frame. The frame is NOT immediately read or decoded by most SAIL plugins. One could
@@ -57,14 +61,14 @@ SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_io *io, const stru
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(struct sail_io *io, struct sail_image **image);
+SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct sail_io *io, struct sail_image **image);
 
 /*
  * Seeks to the next pass if the specified image has multiple passes. Does nothing otherwise.
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_pass_v2(struct sail_io *io, const struct sail_image *image);
+SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_pass_v2(void *state, struct sail_io *io, const struct sail_image *image);
 
 /*
  * Reads a scan line of the current image in the current pass. The specified scan line must be
@@ -73,7 +77,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_pass_v2(struct sail_io *io, 
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v2(struct sail_io *io, const struct sail_image *image, void *scanline);
+SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v2(void *state, struct sail_io *io, const struct sail_image *image, void *scanline);
 
 /*
  * Reads a scan line of the current image in the current pass. Allocates a new scan line. The assigned scan line
@@ -81,7 +85,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v2(struct sail_io *io, const
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_read_alloc_scan_line_v2(struct sail_io *io, const struct sail_image *image, void **scanline);
+SAIL_EXPORT sail_error_t sail_plugin_read_alloc_scan_line_v2(void *state, struct sail_io *io, const struct sail_image *image, void **scanline);
 
 /*
  * Finilizes reading operation. No more readings are possible after calling this function.
@@ -90,7 +94,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_alloc_scan_line_v2(struct sail_io *io,
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_read_finish_v2(struct sail_io *io);
+SAIL_EXPORT sail_error_t sail_plugin_read_finish_v2(void **state, struct sail_io *io);
 
 /*
  * Encoding functions.
@@ -98,13 +102,17 @@ SAIL_EXPORT sail_error_t sail_plugin_read_finish_v2(struct sail_io *io);
 
 /*
  * Starts encoding the specified io stream using the specified options (or NULL to use defaults).
- * The specified write options will be copied into an internal buffer.
+ * The specified write options will be deep copied into an internal buffer.
  *
  * If the specified write options is NULL, plugin-specific defaults will be used.
  *
+ * STATE explanation: Pass the address of a local void* pointer. Plugins will store an internal state
+ * in it and destroy it in sail_plugin_write_finish_vx(). States must be used per image. DO NOT use the same state
+ * to write multiple images in the same time.
+ *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_write_init_v2(struct sail_io *io, const struct sail_write_options *write_options);
+SAIL_EXPORT sail_error_t sail_plugin_write_init_v2(struct sail_io *io, const struct sail_write_options *write_options, void **state);
 
 /*
  * Seeks to a next frame before writing it. The frame is NOT immediately written. Use sail_plugin_write_seek_next_pass()
@@ -112,21 +120,21 @@ SAIL_EXPORT sail_error_t sail_plugin_write_init_v2(struct sail_io *io, const str
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v2(struct sail_io *io, const struct sail_image *image);
+SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v2(void *state, struct sail_io *io, const struct sail_image *image);
 
 /*
  * Seeks to a next pass before writing it if the specified image is interlaced. Does nothing otherwise.
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_pass_v2(struct sail_io *io, const struct sail_image *image);
+SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_pass_v2(void *state, struct sail_io *io, const struct sail_image *image);
 
 /*
  * Writes a scan line of the current image in the current pass.
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_write_scan_line_v2(struct sail_io *io, const struct sail_image *image, const void *scanline);
+SAIL_EXPORT sail_error_t sail_plugin_write_scan_line_v2(void *state, struct sail_io *io, const struct sail_image *image, const void *scanline);
 
 /*
  * Finilizes writing operation. No more writings are possible after calling this function.
@@ -135,7 +143,7 @@ SAIL_EXPORT sail_error_t sail_plugin_write_scan_line_v2(struct sail_io *io, cons
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_write_finish_v2(struct sail_io *io);
+SAIL_EXPORT sail_error_t sail_plugin_write_finish_v2(void **state, struct sail_io *io);
 
 
 /* extern "C" */

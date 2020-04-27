@@ -518,18 +518,23 @@ sail_error_t sail_probe(const char *path, struct sail_context *context, struct s
     SAIL_TRY(sail_alloc_io_read_file(path, &io));
 
     struct sail_read_options *read_options_local = NULL;
+    void *state = NULL;
 
     SAIL_TRY_OR_CLEANUP(sail_alloc_read_options_from_features((*plugin_info_local)->read_features, &read_options_local),
-                        /* cleanup */ sail_destroy_read_options(read_options_local));
-    SAIL_TRY_OR_CLEANUP(plugin->v2->read_init_v2(io, read_options_local),
                         /* cleanup */ sail_destroy_read_options(read_options_local),
+                                      sail_destroy_io(io));
+
+    SAIL_TRY_OR_CLEANUP(plugin->v2->read_init_v2(io, read_options_local, &state),
+                        /* cleanup */ plugin->v2->read_finish_v2(&state, io),
+                                      sail_destroy_read_options(read_options_local),
                                       sail_destroy_io(io));
 
     sail_destroy_read_options(read_options_local);
 
-    SAIL_TRY_OR_CLEANUP(plugin->v2->read_seek_next_frame_v2(io, image),
-                        /* cleanup */ sail_destroy_io(io));
-    SAIL_TRY_OR_CLEANUP(plugin->v2->read_finish_v2(io),
+    SAIL_TRY_OR_CLEANUP(plugin->v2->read_seek_next_frame_v2(state, io, image),
+                        /* cleanup */ plugin->v2->read_finish_v2(&state, io),
+                                      sail_destroy_io(io));
+    SAIL_TRY_OR_CLEANUP(plugin->v2->read_finish_v2(&state, io),
                         /* cleanup */ sail_destroy_io(io));
 
     sail_destroy_io(io);
@@ -594,9 +599,12 @@ sail_error_t sail_write(const char *path, const struct sail_image *image, const 
     return 0;
 }
 
-struct hidden_state {
+struct SAIL_HIDDEN hidden_state {
 
     struct sail_io *io;
+
+    /* Local state passed to plugin reading and writing functions. */
+    void *state;
 
     /* Pointers to internal data structures so no need to free these. */
     const struct sail_plugin_info *plugin_info;
@@ -611,13 +619,15 @@ static void destroy_hidden_state(struct hidden_state *state) {
 
     sail_destroy_io(state->io);
 
+    /* This state must be freed and zeroed by plugins. We free it just in case to avoid memory leaks. */
+    free(state->state);
+
     free(state);
 }
 
 sail_error_t sail_start_reading_with_options(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info,
                                              const struct sail_read_options *read_options, void **state) {
     SAIL_CHECK_STATE_PTR(state);
-
     *state = NULL;
 
     SAIL_CHECK_PATH_PTR(path);
@@ -628,6 +638,7 @@ sail_error_t sail_start_reading_with_options(const char *path, struct sail_conte
     SAIL_CHECK_STATE_PTR(state_of_mind);
 
     state_of_mind->io          = NULL;
+    state_of_mind->state       = NULL;
     state_of_mind->plugin_info = NULL;
     state_of_mind->plugin      = NULL;
 
@@ -652,11 +663,11 @@ sail_error_t sail_start_reading_with_options(const char *path, struct sail_conte
 
         SAIL_TRY_OR_CLEANUP(sail_alloc_read_options_from_features(state_of_mind->plugin_info->read_features, &read_options_local),
                             /* cleanup */ sail_destroy_read_options(read_options_local));
-        SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v2->read_init_v2(state_of_mind->io, read_options_local),
+        SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v2->read_init_v2(state_of_mind->io, read_options_local, &state_of_mind->state),
                             /* cleanup */ sail_destroy_read_options(read_options_local));
         sail_destroy_read_options(read_options_local);
     } else {
-        SAIL_TRY(state_of_mind->plugin->v2->read_init_v2(state_of_mind->io, read_options));
+        SAIL_TRY(state_of_mind->plugin->v2->read_init_v2(state_of_mind->io, read_options, &state_of_mind->state));
     }
 
     return 0;
@@ -676,16 +687,14 @@ sail_error_t sail_read_next_frame(void *state, struct sail_image **image, void *
     struct hidden_state *state_of_mind = (struct hidden_state *)state;
 
     SAIL_CHECK_IO(state_of_mind->io);
+    SAIL_CHECK_STATE_PTR(state_of_mind->state);
     SAIL_CHECK_PLUGIN_PTR(state_of_mind->plugin);
 
-    struct sail_io *io = state_of_mind->io;
-    const struct sail_plugin *plugin = state_of_mind->plugin;
-
-    if (plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
+    if (state_of_mind->plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
         return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
     }
 
-    SAIL_TRY(plugin->v2->read_seek_next_frame_v2(io, image));
+    SAIL_TRY(state_of_mind->plugin->v2->read_seek_next_frame_v2(state_of_mind->state, state_of_mind->io, image));
 
     *image_bits = malloc((*image)->bytes_per_line * (*image)->height);
 
@@ -694,10 +703,13 @@ sail_error_t sail_read_next_frame(void *state, struct sail_image **image, void *
     }
 
     for (int pass = 0; pass < (*image)->passes; pass++) {
-        SAIL_TRY(plugin->v2->read_seek_next_pass_v2(io, *image));
+        SAIL_TRY(state_of_mind->plugin->v2->read_seek_next_pass_v2(state_of_mind->state, state_of_mind->io, *image));
 
         for (int j = 0; j < (*image)->height; j++) {
-            SAIL_TRY(plugin->v2->read_scan_line_v2(io, *image, ((char *)*image_bits) + j * (*image)->bytes_per_line));
+            SAIL_TRY(state_of_mind->plugin->v2->read_scan_line_v2(state_of_mind->state,
+                                                                    state_of_mind->io,
+                                                                    *image,
+                                                                    ((char *)*image_bits) + j * (*image)->bytes_per_line));
         }
     }
 
@@ -713,21 +725,18 @@ sail_error_t sail_stop_reading(void *state) {
 
     struct hidden_state *state_of_mind = (struct hidden_state *)state;
 
-    struct sail_io *io = state_of_mind->io;
-    const struct sail_plugin *plugin = state_of_mind->plugin;
-
     /* Not an error. */
-    if (plugin == NULL) {
+    if (state_of_mind->plugin == NULL) {
         destroy_hidden_state(state_of_mind);
         return 0;
     }
 
-    if (plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
+    if (state_of_mind->plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
         destroy_hidden_state(state_of_mind);
         return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
     }
 
-    SAIL_TRY_OR_CLEANUP(plugin->v2->read_finish_v2(io),
+    SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v2->read_finish_v2(&state_of_mind->state, state_of_mind->io),
                         /* cleanup */ destroy_hidden_state(state_of_mind));
 
     destroy_hidden_state(state_of_mind);
@@ -737,8 +746,8 @@ sail_error_t sail_stop_reading(void *state) {
 
 sail_error_t sail_start_writing_with_options(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info,
                                              const struct sail_write_options *write_options, void **state) {
-    SAIL_CHECK_STATE_PTR(state);
 
+    SAIL_CHECK_STATE_PTR(state);
     *state = NULL;
 
     SAIL_CHECK_PATH_PTR(path);
@@ -749,6 +758,7 @@ sail_error_t sail_start_writing_with_options(const char *path, struct sail_conte
     SAIL_CHECK_STATE_PTR(state_of_mind);
 
     state_of_mind->io          = NULL;
+    state_of_mind->state       = NULL;
     state_of_mind->plugin_info = NULL;
     state_of_mind->plugin      = NULL;
 
@@ -773,11 +783,11 @@ sail_error_t sail_start_writing_with_options(const char *path, struct sail_conte
 
         SAIL_TRY_OR_CLEANUP(sail_alloc_write_options_from_features(state_of_mind->plugin_info->write_features, &write_options_local),
                             /* cleanup */ sail_destroy_write_options(write_options_local));
-        SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v2->write_init_v2(state_of_mind->io, write_options_local),
+        SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v2->write_init_v2(state_of_mind->io, write_options_local, &state_of_mind->state),
                             /* cleanup */ sail_destroy_write_options(write_options_local));
         sail_destroy_write_options(write_options_local);
     } else {
-        SAIL_TRY(state_of_mind->plugin->v2->write_init_v2(state_of_mind->io, write_options));
+        SAIL_TRY(state_of_mind->plugin->v2->write_init_v2(state_of_mind->io, write_options, &state_of_mind->state));
     }
 
     return 0;
@@ -797,20 +807,18 @@ sail_error_t sail_write_next_frame(void *state, const struct sail_image *image, 
     struct hidden_state *state_of_mind = (struct hidden_state *)state;
 
     SAIL_CHECK_IO(state_of_mind->io);
+    SAIL_CHECK_STATE_PTR(state_of_mind->state);
+    SAIL_CHECK_PLUGIN_INFO_PTR(state_of_mind->plugin_info);
     SAIL_CHECK_PLUGIN_PTR(state_of_mind->plugin);
 
-    struct sail_io *io = state_of_mind->io;
-    const struct sail_plugin_info *plugin_info = state_of_mind->plugin_info;
-    const struct sail_plugin *plugin = state_of_mind->plugin;
-
-    if (plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
+    if (state_of_mind->plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
         return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
     }
 
     /* Detect the number of passes needed to write an interlaced image. */
     int passes;
     if (image->properties & SAIL_IMAGE_PROPERTY_INTERLACED) {
-        passes = plugin_info->write_features->passes;
+        passes = state_of_mind->plugin_info->write_features->passes;
 
         if (passes < 1) {
             return SAIL_INTERLACED_UNSUPPORTED;
@@ -822,13 +830,16 @@ sail_error_t sail_write_next_frame(void *state, const struct sail_image *image, 
     int bytes_per_line;
     SAIL_TRY(sail_bytes_per_line(image, &bytes_per_line));
 
-    SAIL_TRY(plugin->v2->write_seek_next_frame_v2(io, image));
+    SAIL_TRY(state_of_mind->plugin->v2->write_seek_next_frame_v2(state_of_mind->state, state_of_mind->io, image));
 
     for (int pass = 0; pass < passes; pass++) {
-        SAIL_TRY(plugin->v2->write_seek_next_pass_v2(io, image));
+        SAIL_TRY(state_of_mind->plugin->v2->write_seek_next_pass_v2(state_of_mind->state, state_of_mind->io, image));
 
         for (int j = 0; j < image->height; j++) {
-            SAIL_TRY(plugin->v2->write_scan_line_v2(io, image, ((char *)image_bits) + j * bytes_per_line));
+            SAIL_TRY(state_of_mind->plugin->v2->write_scan_line_v2(state_of_mind->state,
+                                                                    state_of_mind->io,
+                                                                    image,
+                                                                    ((char *)image_bits) + j * bytes_per_line));
         }
     }
 
@@ -844,21 +855,18 @@ sail_error_t sail_stop_writing(void *state) {
 
     struct hidden_state *state_of_mind = (struct hidden_state *)state;
 
-    struct sail_io *io = state_of_mind->io;
-    const struct sail_plugin *plugin = state_of_mind->plugin;
-
     /* Not an error. */
-    if (plugin == NULL) {
+    if (state_of_mind->plugin == NULL) {
         destroy_hidden_state(state_of_mind);
         return 0;
     }
 
-    if (plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
+    if (state_of_mind->plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
         destroy_hidden_state(state_of_mind);
         return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
     }
 
-    SAIL_TRY_OR_CLEANUP(plugin->v2->write_finish_v2(io),
+    SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v2->write_finish_v2(&state_of_mind->state, state_of_mind->io),
                         /* cleanup */ destroy_hidden_state(state_of_mind));
 
     destroy_hidden_state(state_of_mind);
