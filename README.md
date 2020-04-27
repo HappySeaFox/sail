@@ -11,11 +11,6 @@ Author: Dmitry Baryshev.
 - Image viewers.
 - Anyone who needs loading or saving images in different image formats.
 
-## License
-
-- libsail-common, libsail, C++ bindings, and plugins are under LGPLv3+.
-- Examples are under the MIT license.
-
 ## Features
 
 - easy-to-use C and C++ interfaces.
@@ -31,6 +26,11 @@ Author: Dmitry Baryshev.
 ## Supported platforms
 
 Currently SAIL supports Windows and Linux platforms.
+
+## License
+
+- libsail-common, libsail, C++ bindings, and plugins are under LGPLv3+.
+- Examples are under the MIT license.
 
 ## APIs overview
 
