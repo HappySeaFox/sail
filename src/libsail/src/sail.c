@@ -631,38 +631,31 @@ static void destroy_hidden_state(struct hidden_state *state) {
     free(state);
 }
 
-sail_error_t sail_start_reading_file_with_options(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info,
-                                                  const struct sail_read_options *read_options, void **state) {
+SAIL_EXPORT sail_error_t sail_start_reading_io_with_options(struct sail_io *io, struct sail_context *context, const struct sail_plugin_info *plugin_info,
+                                                            const struct sail_read_options *read_options, void **state) {
+
     SAIL_CHECK_STATE_PTR(state);
     *state = NULL;
 
-    SAIL_CHECK_PATH_PTR(path);
+    SAIL_CHECK_IO_PTR(io);
     SAIL_CHECK_CONTEXT_PTR(context);
+    SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
 
     struct hidden_state *state_of_mind = (struct hidden_state *)malloc(sizeof(struct hidden_state));
-
     SAIL_CHECK_STATE_PTR(state_of_mind);
 
-    state_of_mind->io          = NULL;
+    state_of_mind->io          = io;
     state_of_mind->state       = NULL;
-    state_of_mind->plugin_info = NULL;
+    state_of_mind->plugin_info = plugin_info;
     state_of_mind->plugin      = NULL;
 
     *state = state_of_mind;
-
-    if (plugin_info == NULL) {
-        SAIL_TRY(sail_plugin_info_from_path(path, context, &state_of_mind->plugin_info));
-    } else {
-        state_of_mind->plugin_info = plugin_info;
-    }
 
     SAIL_TRY(load_plugin_by_plugin_info(context, state_of_mind->plugin_info, &state_of_mind->plugin));
 
     if (state_of_mind->plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
         return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
     }
-
-    SAIL_TRY(sail_alloc_io_read_file(path, &state_of_mind->io));
 
     if (read_options == NULL) {
         struct sail_read_options *read_options_local = NULL;
@@ -675,6 +668,29 @@ sail_error_t sail_start_reading_file_with_options(const char *path, struct sail_
     } else {
         SAIL_TRY(state_of_mind->plugin->v2->read_init_v2(state_of_mind->io, read_options, &state_of_mind->state));
     }
+
+    return 0;
+}
+
+sail_error_t sail_start_reading_file_with_options(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info,
+                                                  const struct sail_read_options *read_options, void **state) {
+
+    SAIL_CHECK_PATH_PTR(path);
+    SAIL_CHECK_CONTEXT_PTR(context);
+
+    const struct sail_plugin_info *plugin_info_local;
+
+    if (plugin_info == NULL) {
+        SAIL_TRY(sail_plugin_info_from_path(path, context, &plugin_info_local));
+    } else {
+        plugin_info_local = plugin_info;
+    }
+
+    struct sail_io *io;
+    SAIL_TRY(sail_alloc_io_read_file(path, &io));
+
+    SAIL_TRY_OR_CLEANUP(sail_start_reading_io_with_options(io, context, plugin_info_local, read_options, state),
+                        /* cleanup */ sail_destroy_io(io));
 
     return 0;
 }
@@ -750,39 +766,31 @@ sail_error_t sail_stop_reading(void *state) {
     return 0;
 }
 
-sail_error_t sail_start_writing_file_with_options(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info,
+sail_error_t sail_start_writing_io_with_options(struct sail_io *io, struct sail_context *context, const struct sail_plugin_info *plugin_info,
                                                   const struct sail_write_options *write_options, void **state) {
 
     SAIL_CHECK_STATE_PTR(state);
     *state = NULL;
 
-    SAIL_CHECK_PATH_PTR(path);
+    SAIL_CHECK_IO_PTR(io);
     SAIL_CHECK_CONTEXT_PTR(context);
+    SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
 
     struct hidden_state *state_of_mind = (struct hidden_state *)malloc(sizeof(struct hidden_state));
-
     SAIL_CHECK_STATE_PTR(state_of_mind);
 
-    state_of_mind->io          = NULL;
+    state_of_mind->io          = io;
     state_of_mind->state       = NULL;
-    state_of_mind->plugin_info = NULL;
+    state_of_mind->plugin_info = plugin_info;
     state_of_mind->plugin      = NULL;
 
     *state = state_of_mind;
-
-    if (plugin_info == NULL) {
-        SAIL_TRY(sail_plugin_info_from_path(path, context, &state_of_mind->plugin_info));
-    } else {
-        state_of_mind->plugin_info = plugin_info;
-    }
 
     SAIL_TRY(load_plugin_by_plugin_info(context, state_of_mind->plugin_info, &state_of_mind->plugin));
 
     if (state_of_mind->plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
         return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
     }
-
-    SAIL_TRY(sail_alloc_io_write_file(path, &state_of_mind->io));
 
     if (write_options == NULL) {
         struct sail_write_options *write_options_local = NULL;
@@ -795,6 +803,29 @@ sail_error_t sail_start_writing_file_with_options(const char *path, struct sail_
     } else {
         SAIL_TRY(state_of_mind->plugin->v2->write_init_v2(state_of_mind->io, write_options, &state_of_mind->state));
     }
+
+    return 0;
+}
+
+sail_error_t sail_start_writing_file_with_options(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info,
+                                                  const struct sail_write_options *write_options, void **state) {
+
+    SAIL_CHECK_PATH_PTR(path);
+    SAIL_CHECK_CONTEXT_PTR(context);
+
+    const struct sail_plugin_info *plugin_info_local;
+
+    if (plugin_info == NULL) {
+        SAIL_TRY(sail_plugin_info_from_path(path, context, &plugin_info_local));
+    } else {
+        plugin_info_local = plugin_info;
+    }
+
+    struct sail_io *io;
+    SAIL_TRY(sail_alloc_io_write_file(path, &io));
+
+    SAIL_TRY_OR_CLEANUP(sail_start_writing_io_with_options(io, context, plugin_info_local, write_options, state),
+                        /* cleanup */ sail_destroy_io(io));
 
     return 0;
 }
