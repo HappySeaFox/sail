@@ -108,35 +108,34 @@ static QImage::Format sailPixelFormatToQImageFormat(int pixel_format) {
 
 sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 {
-    /*
-     * WARNING: Memory cleanup on error is not implemented in this demo. Please don't forget
-     * to free memory (pointers, image bits etc.) on error in a real application.
-     */
-
     sail_read_options *read_options = nullptr;
 
     sail_image *image = nullptr;
     uchar *image_bits = nullptr;
 
-    // Always set the initial state to NULL in C or nullptr in C++.
-    //
+    /*
+     * Always set the initial state to NULL in C or nullptr in C++.
+     */
     void *state = nullptr;
 
-    // Time counter.
-    //
+    /*
+     *  Time counter.
+     */
     QElapsedTimer elapsed;
     elapsed.start();
 
-    // Find the codec info by a file extension.
-    //
+    /*
+     * Find the codec info by a file extension.
+     */
     const struct sail_plugin_info *plugin_info;
     SAIL_TRY(sail_plugin_info_from_path(path.toLocal8Bit(), d->context, &plugin_info));
 
     pluginInfo(plugin_info);
 
-    // Allocate new read options and copy defaults from the read features
-    // (preferred output pixel format etc.).
-    //
+    /*
+     * Allocate new read options and copy defaults from the plugin-specific read features
+     * (preferred output pixel format etc.).
+     */
     SAIL_TRY(sail_alloc_read_options_from_features(plugin_info->read_features, &read_options));
 
     const qint64 beforeDialog = elapsed.elapsed();
@@ -149,35 +148,55 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
         read_options->output_pixel_format = readOptions.pixelFormat();
     }
 
+    elapsed.restart();
+
     const QImage::Format qimageFormat = sailPixelFormatToQImageFormat(read_options->output_pixel_format);
 
     if (qimageFormat == QImage::Format_Invalid) {
         return SAIL_UNSUPPORTED_PIXEL_FORMAT;
     }
 
-    elapsed.restart();
+    /*
+     * Initialize reading with our options. The options will be deep copied.
+     */
+    SAIL_TRY_OR_CLEANUP(sail_start_reading_with_options(path.toLocal8Bit(),
+                                                        d->context,
+                                                        plugin_info,
+                                                        read_options,
+                                                        &state),
+                        /* cleanup */ sail_destroy_read_options(read_options));
 
-    // Initialize reading with our options.
-    //
-    SAIL_TRY(sail_start_reading_with_options(path.toLocal8Bit(), d->context, plugin_info, read_options, &state));
+    /*
+     * Our read options are not needed anymore.
+     */
+    sail_destroy_read_options(read_options);
 
-    // Seek and read the next image frame in the file.
-    //
-    SAIL_TRY(sail_read_next_frame(state, &image, reinterpret_cast<void **>(&image_bits)));
+    /*
+     * Read the next available image frame in the file.
+     */
+    SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state,
+                                             &image,
+                                             (void **)&image_bits),
+                        /* cleanup */ sail_destroy_image(image));
 
-    // Finish reading.
-    //
-    SAIL_TRY(sail_stop_reading(state));
+    /*
+     * Finish reading.
+     */
+    SAIL_TRY_OR_CLEANUP(sail_stop_reading(state),
+                        /* cleanup */ sail_destroy_image(image));
 
-    // Bytes per line is needed for QImage.
-    //
+    /*
+     * Bytes per line is needed for QImage.
+     */
     int bytes_per_line;
-    SAIL_TRY(sail_bytes_per_line(image, &bytes_per_line));
+    SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(image, &bytes_per_line),
+                         /* cleanup */ sail_destroy_image(image));
 
     SAIL_LOG_INFO("Loaded in %lld ms.", elapsed.elapsed() + beforeDialog);
 
-    // Convert to QImage.
-    //
+    /*
+     * Convert to QImage.
+     */
     *qimage = QImage(image_bits,
                      image->width,
                      image->height,
@@ -194,8 +213,8 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     const char *source_pixel_format_str;
     const char *pixel_format_str;
 
-    SAIL_TRY(sail_pixel_format_to_string(image->source_pixel_format, &source_pixel_format_str));
-    SAIL_TRY(sail_pixel_format_to_string(image->pixel_format, &pixel_format_str));
+    sail_pixel_format_to_string(image->source_pixel_format, &source_pixel_format_str);
+    sail_pixel_format_to_string(image->pixel_format, &pixel_format_str);
 
     d->ui->labelStatus->setText(tr("%1  [%2x%3]  [%4 -> %5]  %6")
                                 .arg(QFileInfo(path).fileName())
@@ -207,8 +226,6 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
                                 );
 
     free(image_bits);
-
-    sail_destroy_read_options(read_options);
     sail_destroy_image(image);
 
     /* Optional: unload all plugins to free up some memory. */

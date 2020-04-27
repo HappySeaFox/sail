@@ -124,8 +124,8 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
                                       sail_destroy_image(image));
 
     /*
-     * Read just a single frame. It's possible to read more frame if any. Just continue
-     * reading frames until sail_read_next_frame() returns 0. If no more frames are available,
+     * Read just a single frame. It's possible to read more frames if any. Just continue
+     * reading frames till sail_read_next_frame() returns 0. If no more frames are available,
      * it returns SAIL_NO_MORE_FRAMES.
      */
     SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, &image, (void **)&image_bits),

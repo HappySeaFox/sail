@@ -126,11 +126,13 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     SAIL_TRY(reader.start_reading(path.toLocal8Bit().constData()));
 
     /*
-     * Read just a single frame. It's possible to read more frame if any. Just continue
-     * reading frames until sail_read_next_frame() returns 0. If no more frames are available,
+     * Read just a single frame. It's possible to read more frames if any. Just continue
+     * reading frames till read_next_frame() returns 0. If no more frames are available,
      * it returns SAIL_NO_MORE_FRAMES.
+     *
+     * read_next_frame() outputs pixels in a plugin-specific preferred pixel format.
      */
-    SAIL_TRY_OR_CLEANUP(reader.read_next_frame(&image));
+    SAIL_TRY(reader.read_next_frame(&image));
 
     SAIL_TRY(reader.stop_reading());
 
