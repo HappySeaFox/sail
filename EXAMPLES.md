@@ -180,7 +180,7 @@ SAIL_TRY(sail_init(&context));
 
 struct sail_read_options *read_options = NULL;
 struct sail_image *image = NULL;
-uchar *image_bits = NULL;
+unsigned char *image_bits = NULL;
 
 /*
  * Always set the initial state to NULL in C or nullptr in C++.
