@@ -98,4 +98,6 @@ sail_error_t WriteOptions::init(const sail::write_features &write_features)
             d->ui->labelCompressionValue->setNum(value);
         });
     }
+
+    return 0;
 }
