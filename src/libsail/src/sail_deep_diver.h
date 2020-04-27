@@ -33,7 +33,6 @@ extern "C" {
 
 struct sail_context;
 struct sail_io;
-struct sail_plugin_info_node;
 struct sail_plugin_info;
 
 /*
