@@ -316,7 +316,7 @@ if (read_options.output_pixel_format() != SAIL_PIXEL_FORMAT_RGB) {
 
 // Initialize reading with our options.
 //
-SAIL_TRY(reader.start_reading(path.toLocal8Bit(), plugin_info, read_options));
+SAIL_TRY(reader.start_reading(path, plugin_info, read_options));
 
 // Read just a single frame. It's possible to read more frames if any. Just continue
 // reading frames till read_next_frame() returns 0. If no more frames are available,
