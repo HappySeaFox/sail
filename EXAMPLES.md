@@ -46,10 +46,11 @@ SAIL_TRY(reader.read(path, &image));
 
 **C:**
 ```C
-sail_context *context = NULL;
+struct sail_context *context = NULL;
 
 /*
- * Initialize SAIL context. Needed only once.
+ * Initialize SAIL context. You could cache the context and re-use it multiple times.
+ * When it's not needed anymore, call sail_finish(context).
  */
 SAIL_TRY(sail_init(&context));
 
@@ -66,14 +67,14 @@ unsigned char *image_bits = NULL;
  * The subsequent calls to sail_read_next_frame() will output pixels
  * in a plugin-specific preferred pixel format.
  */
-SAIL_TRY_OR_CLEANUP(sail_start_reading(path.toLocal8Bit(), d->context, NULL, &state),
+SAIL_TRY_OR_CLEANUP(sail_start_reading(path, context, NULL, &state),
                     /* cleanup */ sail_stop_reading(state),
                                   free(image_bits),
                                   sail_destroy_image(image));
 
 /*
- * Read just a single frame. It's possible to read more frame if any. Just continue
- * reading frames until sail_read_next_frame() returns 0. If no more frames are available,
+ * Read just a single frame. It's possible to read more frames if any. Just continue
+ * reading frames till sail_read_next_frame() returns 0. If no more frames are available,
  * it returns SAIL_NO_MORE_FRAMES.
  */
 SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, &image, (void **)&image_bits),
@@ -97,12 +98,18 @@ SAIL_TRY_OR_CLEANUP(sail_stop_reading(state),
 
 free(image_bits);
 sail_destroy_image(image);
+
+/*
+ * If you have no plans to re-use the same context in the future, finish working with this context
+ * and unload all loaded plugins attached to it.
+ */
+sail_finish(context);
+context = NULL;
 ```
 
 **C++:**
 ```C++
-// Create a new SAIL context.
-// You can re-use the same context for multiple readings or writings.
+// Initialize SAIL context. You could cache the context as a class member and re-use it multiple times.
 //
 sail::context context;
 
@@ -121,15 +128,15 @@ SAIL_AT_SCOPE_EXIT (
 // The subsequent calls to read_next_frame() will output pixels in a plugin-specific
 // preferred pixel format.
 //
-SAIL_TRY(reader.start_reading(path.toLocal8Bit().constData()));
+SAIL_TRY(reader.start_reading(path));
 
-// Read just a single frame. It's possible to read more frame if any. Just continue
-// reading frames until sail_read_next_frame() returns 0. If no more frames are available,
+// Read just a single frame. It's possible to read more frames if any. Just continue
+// reading frames till read_next_frame() returns 0. If no more frames are available,
 // it returns SAIL_NO_MORE_FRAMES.
 //
 // read_next_frame() outputs pixels in a plugin-specific preferred pixel format.
 //
-SAIL_TRY_OR_CLEANUP(reader.read_next_frame(&image));
+SAIL_TRY(reader.read_next_frame(&image));
 
 SAIL_TRY(reader.stop_reading());
 
@@ -142,6 +149,125 @@ SAIL_TRY(reader.stop_reading());
 
 **C:**
 ```C
+struct sail_context *context = NULL;
+
+/*
+ * Initialize SAIL context. You could cache the context and re-use it multiple times.
+ * When it's not needed anymore, call sail_finish(context).
+ */
+SAIL_TRY(sail_init(&context));
+
+struct sail_read_options *read_options = NULL;
+struct sail_image *image = NULL;
+uchar *image_bits = NULL;
+
+/*
+ * Always set the initial state to NULL in C or nullptr in C++.
+ */
+void *state = NULL;
+
+/*
+ * Find the codec info by a file extension.
+ */
+const struct sail_plugin_info *plugin_info;
+SAIL_TRY(sail_plugin_info_from_path(path, context, &plugin_info));
+
+/*
+ * Allocate new read options and copy defaults from the plugin-specific read features
+ * (preferred output pixel format etc.).
+ */
+SAIL_TRY(sail_alloc_read_options_from_features(plugin_info->read_features, &read_options));
+
+/*
+ * Let's request RGB pixels only.
+ */
+if (read_options->output_pixel_format != SAIL_PIXEL_FORMAT_RGB) {
+    bool foundRgb = false;
+
+    /*
+     * Check if the plugin supports outputting RGB pixels.
+     */
+    for (int i = 0; i < plugin_info->read_features->output_pixel_formats_length; i++) {
+        if (plugin_info->read_features->output_pixel_formats[i] == SAIL_PIXEL_FORMAT_RGB) {
+            foundRgb = true;
+            break;
+        }
+    }
+
+    /*
+     * The plugin doesn't support outputting RGB pixels.
+     */
+    if (!foundRgb) {
+        return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+    }
+
+    /*
+     * Request the plugin to output RGB pixels.
+     */
+    read_options->output_pixel_format = SAIL_PIXEL_FORMAT_RGB;
+}
+
+/*
+ * Initialize reading with our options. The options will be deep copied.
+ */
+SAIL_TRY_OR_CLEANUP(sail_start_reading_with_options(path,
+                                                    context,
+                                                    plugin_info,
+                                                    read_options,
+                                                    &state),
+                    /* cleanup */ sail_destroy_read_options(read_options));
+
+/*
+ * Our read options are not needed anymore.
+ */
+sail_destroy_read_options(read_options);
+
+/*
+ * Read just a single frame. It's possible to read more frames if any. Just continue
+ * reading frames till sail_read_next_frame() returns 0. If no more frames are available,
+ * it returns SAIL_NO_MORE_FRAMES.
+ */
+SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state,
+                                         &image,
+                                         (void **)&image_bits),
+                    /* cleanup */ sail_destroy_image(image));
+
+/*
+ * Finish reading.
+ */
+SAIL_TRY_OR_CLEANUP(sail_stop_reading(state),
+                    /* cleanup */ sail_destroy_image(image));
+
+/*
+ * Print the image meta information if any (JPEG comments etc.).
+ */
+struct sail_meta_entry_node *node = image->meta_entry_node;
+
+if (node != NULL) {
+    SAIL_LOG_DEBUG("%s: %s", node->key, node->value);
+}
+
+/*
+ * Handle the image bits here.
+ * Use image->width, image->height, image->bytes_per_line,
+ * and image->pixel_format for that.
+ */
+
+free(image_bits);
+sail_destroy_image(image);
+
+/*
+ * Optional: unload all plugins to free up some memory if you plan to re-use the same context
+ * in the future.
+ */
+sail_unload_plugins(context);
+
+/*
+ * If you have no plans to re-use the same context in the future, finish working with this context
+ * and unload all loaded plugins attached to it.
+ */
+sail_finish(context);
+context = NULL;
 ```
 
 **C++:**
