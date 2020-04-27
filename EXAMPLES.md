@@ -25,11 +25,9 @@ unsigned char *image_bits;
 /*
  * sail_read() reads the image and outputs pixels in a plugin-specific preferred pixel format.
  */
-SAIL_TRY_OR_CLEANUP(sail_read(path,
-                              &image,
-                              reinterpret_cast<void **>(&image_bits)),
-                    /* cleanup */ free(image_bits),
-                                  sail_destroy_image(image));
+SAIL_TRY(sail_read(path,
+                   &image,
+                   reinterpret_cast<void **>(&image_bits)));
 
 /*
  * Handle the image bits here.

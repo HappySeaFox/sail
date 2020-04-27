@@ -95,11 +95,9 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     /*
      * sail_read() reads the image and outputs pixels in a plugin-specific preferred pixel format.
      */
-    SAIL_TRY_OR_CLEANUP(sail_read(path.toLocal8Bit(),
-                                  &image,
-                                  reinterpret_cast<void **>(&image_bits)),
-                        /* cleanup */ free(image_bits),
-                                      sail_destroy_image(image));
+    SAIL_TRY(sail_read(path.toLocal8Bit(),
+                       &image,
+                       reinterpret_cast<void **>(&image_bits)));
 
     // Construct QImage from the read image bits.
     //
