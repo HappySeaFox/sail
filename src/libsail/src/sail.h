@@ -75,7 +75,7 @@ SAIL_EXPORT const struct sail_plugin_info_node* sail_plugin_info_list(const stru
  *
  * The assigned plugin info MUST NOT be destroyed. It's a pointer to an internal data structure.
  *
- * Typical usage: sail_plugin_info_from_path() -> sail_start_reading() -> sail_read_next_frame() ->
+ * Typical usage: sail_plugin_info_from_path() -> sail_start_reading_file() -> sail_read_next_frame() ->
  *                sail_stop_reading().
  * Or:            sail_plugin_info_from_path() -> sail_start_writing() -> sail_read_next_frame() ->
  *                sail_stop_writing().
@@ -90,7 +90,7 @@ SAIL_EXPORT sail_error_t sail_plugin_info_from_path(const char *path, const stru
  *
  * The assigned plugin info MUST NOT be destroyed. It's a pointer to an internal data structure.
  *
- * Typical usage: sail_plugin_info_from_extension() -> sail_start_reading() -> sail_read_next_frame() ->
+ * Typical usage: sail_plugin_info_from_extension() -> sail_start_reading_file() -> sail_read_next_frame() ->
  *                sail_stop_reading().
  * Or:            sail_plugin_info_from_extension() -> sail_start_writing() -> sail_read_next_frame() ->
  *                sail_stop_writing().
@@ -105,7 +105,7 @@ SAIL_EXPORT sail_error_t sail_plugin_info_from_extension(const char *extension, 
  *
  * The assigned plugin info MUST NOT be destroyed. It's a pointer to an internal data structure.
  *
- * Typical usage: sail_plugin_info_from_mime_type() -> sail_start_reading() -> sail_read_next_frame() ->
+ * Typical usage: sail_plugin_info_from_mime_type() -> sail_start_reading_file() -> sail_read_next_frame() ->
  *                sail_stop_reading().
  * Or:            sail_plugin_info_from_mime_type() -> sail_start_writing() -> sail_read_next_frame() ->
  *                sail_stop_writing().
@@ -163,15 +163,15 @@ SAIL_EXPORT sail_error_t sail_write(const char *path, const struct sail_image *i
  * Starts reading the specified image with the specified read options. Pass a particular plugin info if you'd like
  * to start reading with a specific codec. If not, just pass NULL.
  *
- * Typical usage: sail_start_reading_with_options() -> sail_read_next_frame() -> sail_stop_reading().
- * Or:            sail_plugin_info_from_extension() -> sail_start_reading_with_options() -> sail_read_next_frame() ->
+ * Typical usage: sail_start_reading_file_with_options() -> sail_read_next_frame() -> sail_stop_reading().
+ * Or:            sail_plugin_info_from_extension() -> sail_start_reading_file_with_options() -> sail_read_next_frame() ->
  *                sail_stop_reading().
  *
  * For example:
  *
  * void *state = NULL;
  *
- * SAIL_TRY_OR_CLEANUP(sail_start_reading_with_options(..., &state),
+ * SAIL_TRY_OR_CLEANUP(sail_start_reading_file_with_options(..., &state),
  *                     sail_stop_reading(state));
  * SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, ...),
  *                     sail_stop_reading(state));
@@ -183,22 +183,22 @@ SAIL_EXPORT sail_error_t sail_write(const char *path, const struct sail_image *i
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_start_reading_with_options(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info,
-                                                         const struct sail_read_options *read_options, void **state);
+SAIL_EXPORT sail_error_t sail_start_reading_file_with_options(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info,
+                                                              const struct sail_read_options *read_options, void **state);
 
 /*
  * Starts reading the specified image. Pass a particular plugin info if you'd like
  * to start reading with a specific codec. If not, just pass NULL.
  *
- * Typical usage: sail_start_reading() -> sail_read_next_frame() -> sail_stop_reading().
- * Or:            sail_plugin_info_from_extension() -> sail_start_reading() -> sail_read_next_frame() ->
+ * Typical usage: sail_start_reading_file() -> sail_read_next_frame() -> sail_stop_reading().
+ * Or:            sail_plugin_info_from_extension() -> sail_start_reading_file() -> sail_read_next_frame() ->
  *                sail_stop_reading().
  *
  * For example:
  *
  * void *state = NULL;
  *
- * SAIL_TRY_OR_CLEANUP(sail_start_reading(..., &state),
+ * SAIL_TRY_OR_CLEANUP(sail_start_reading_file(..., &state),
  *                     sail_stop_reading(state));
  * SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, ...),
  *                     sail_stop_reading(state));
@@ -210,10 +210,10 @@ SAIL_EXPORT sail_error_t sail_start_reading_with_options(const char *path, struc
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_start_reading(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info, void **state);
+SAIL_EXPORT sail_error_t sail_start_reading_file(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info, void **state);
 
 /*
- * Continues reading the file started by sail_start_reading() or sail_start_reading_with_options().
+ * Continues reading the file started by sail_start_reading_file() and brothers.
  * The assigned image MUST be destroyed later with sail_image_destroy(). The assigned image bits
  * MUST be destroyed later with free().
  *
@@ -223,7 +223,7 @@ SAIL_EXPORT sail_error_t sail_start_reading(const char *path, struct sail_contex
 SAIL_EXPORT sail_error_t sail_read_next_frame(void *state, struct sail_image **image, void **image_bits);
 
 /*
- * Stops reading the file started by sail_start_reading() or sail_start_reading_with_options().
+ * Stops reading the file started by sail_start_reading_file() and brothers.
  * Does nothing if the state is NULL.
  *
  * It's essential to always stop reading to free memory resources. Avoiding doing so will lead to memory leaks.
@@ -256,8 +256,8 @@ SAIL_EXPORT sail_error_t sail_stop_reading(void *state);
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_start_writing_with_options(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info,
-                                                         const struct sail_write_options *write_options, void **state);
+SAIL_EXPORT sail_error_t sail_start_writing_file_with_options(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info,
+                                                              const struct sail_write_options *write_options, void **state);
 
 /*
  * Starts writing into the specified image file. Pass a particular plugin info if you'd like
@@ -283,17 +283,17 @@ SAIL_EXPORT sail_error_t sail_start_writing_with_options(const char *path, struc
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_start_writing(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info, void **state);
+SAIL_EXPORT sail_error_t sail_start_writing_file(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info, void **state);
 
 /*
- * Continues writing the file started by sail_start_writing() or sail_start_writing_with_options().
+ * Continues writing the file started by sail_start_writing_file() and brothers.
  *
  * Returns 0 on success or sail_error_t on error.
  */
 SAIL_EXPORT sail_error_t sail_write_next_frame(void *state, const struct sail_image *image, const void *image_bits);
 
 /*
- * Stops writing the file started by sail_start_writing() or sail_start_writing_with_options().
+ * Stops writing the file started by sail_start_writing_file() and brothers.
  * Does nothing if the state is NULL.
  *
  * It's essential to always stop writing to free memory resources. Avoiding doing so will lead to memory leaks.

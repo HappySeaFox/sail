@@ -85,7 +85,7 @@ unsigned char *image_bits = NULL;
  * The subsequent calls to sail_read_next_frame() will output pixels
  * in a plugin-specific preferred pixel format.
  */
-SAIL_TRY_OR_CLEANUP(sail_start_reading(path, context, NULL, &state),
+SAIL_TRY_OR_CLEANUP(sail_start_reading_file(path, context, NULL, &state),
                     /* cleanup */ sail_stop_reading(state),
                                   free(image_bits),
                                   sail_destroy_image(image));
@@ -232,11 +232,11 @@ if (read_options->output_pixel_format != SAIL_PIXEL_FORMAT_RGB) {
 /*
  * Initialize reading with our options. The options will be deep copied.
  */
-SAIL_TRY_OR_CLEANUP(sail_start_reading_with_options(path,
-                                                    context,
-                                                    plugin_info,
-                                                    read_options,
-                                                    &state),
+SAIL_TRY_OR_CLEANUP(sail_start_reading_file_with_options(path,
+                                                         context,
+                                                         plugin_info,
+                                                         read_options,
+                                                         &state),
                     /* cleanup */ sail_destroy_read_options(read_options));
 
 /*

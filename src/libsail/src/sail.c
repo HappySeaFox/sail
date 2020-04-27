@@ -561,7 +561,7 @@ sail_error_t sail_read(const char *path, struct sail_image **image, void **image
     void *state = NULL;
     *image_bits = NULL;
 
-    SAIL_TRY_OR_CLEANUP(sail_start_reading(path, context, NULL /* plugin info */, &state),
+    SAIL_TRY_OR_CLEANUP(sail_start_reading_file(path, context, NULL /* plugin info */, &state),
                         /* cleanup */ sail_stop_reading(state));
 
     SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, image, image_bits),
@@ -594,7 +594,7 @@ sail_error_t sail_write(const char *path, const struct sail_image *image, const 
 
     void *state = NULL;
 
-    SAIL_TRY_OR_CLEANUP(sail_start_writing(path, context, NULL /* plugin info */, &state),
+    SAIL_TRY_OR_CLEANUP(sail_start_writing_file(path, context, NULL /* plugin info */, &state),
                         sail_stop_writing(state));
 
     SAIL_TRY_OR_CLEANUP(sail_write_next_frame(state, image, image_bits),
@@ -631,8 +631,8 @@ static void destroy_hidden_state(struct hidden_state *state) {
     free(state);
 }
 
-sail_error_t sail_start_reading_with_options(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info,
-                                             const struct sail_read_options *read_options, void **state) {
+sail_error_t sail_start_reading_file_with_options(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info,
+                                                  const struct sail_read_options *read_options, void **state) {
     SAIL_CHECK_STATE_PTR(state);
     *state = NULL;
 
@@ -679,9 +679,9 @@ sail_error_t sail_start_reading_with_options(const char *path, struct sail_conte
     return 0;
 }
 
-sail_error_t sail_start_reading(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info, void **state) {
+sail_error_t sail_start_reading_file(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info, void **state) {
 
-    SAIL_TRY(sail_start_reading_with_options(path, context, plugin_info, NULL, state));
+    SAIL_TRY(sail_start_reading_file_with_options(path, context, plugin_info, NULL, state));
 
     return 0;
 }
@@ -750,8 +750,8 @@ sail_error_t sail_stop_reading(void *state) {
     return 0;
 }
 
-sail_error_t sail_start_writing_with_options(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info,
-                                             const struct sail_write_options *write_options, void **state) {
+sail_error_t sail_start_writing_file_with_options(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info,
+                                                  const struct sail_write_options *write_options, void **state) {
 
     SAIL_CHECK_STATE_PTR(state);
     *state = NULL;
@@ -799,9 +799,9 @@ sail_error_t sail_start_writing_with_options(const char *path, struct sail_conte
     return 0;
 }
 
-sail_error_t sail_start_writing(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info, void **state) {
+sail_error_t sail_start_writing_file(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info, void **state) {
 
-    SAIL_TRY(sail_start_writing_with_options(path, context, plugin_info, NULL, state));
+    SAIL_TRY(sail_start_writing_file_with_options(path, context, plugin_info, NULL, state));
 
     return 0;
 }

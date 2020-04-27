@@ -113,7 +113,7 @@ sail_error_t image_writer::start_writing(const char *path)
 {
     SAIL_CHECK_PATH_PTR(path);
 
-    SAIL_TRY(sail_start_writing(path, d->ctx->sail_context_c(), nullptr, &d->state));
+    SAIL_TRY(sail_start_writing_file(path, d->ctx->sail_context_c(), nullptr, &d->state));
 
     return 0;
 }
@@ -129,7 +129,7 @@ sail_error_t image_writer::start_writing(const char *path, const plugin_info &sp
 {
     SAIL_CHECK_PATH_PTR(path);
 
-    SAIL_TRY(sail_start_writing(path, d->ctx->sail_context_c(), splugin_info.sail_plugin_info_c(), &d->state));
+    SAIL_TRY(sail_start_writing_file(path, d->ctx->sail_context_c(), splugin_info.sail_plugin_info_c(), &d->state));
 
     return 0;
 }
@@ -148,7 +148,7 @@ sail_error_t image_writer::start_writing(const char *path, const write_options &
     sail_write_options sail_write_options;
     SAIL_TRY(swrite_options.to_sail_write_options(&sail_write_options));
 
-    SAIL_TRY(sail_start_writing_with_options(path, d->ctx->sail_context_c(), nullptr, &sail_write_options, &d->state));
+    SAIL_TRY(sail_start_writing_file_with_options(path, d->ctx->sail_context_c(), nullptr, &sail_write_options, &d->state));
 
     return 0;
 }
@@ -167,7 +167,7 @@ sail_error_t image_writer::start_writing(const char *path, const plugin_info &sp
     sail_write_options sail_write_options;
     SAIL_TRY(swrite_options.to_sail_write_options(&sail_write_options));
 
-    SAIL_TRY(sail_start_writing_with_options(path, d->ctx->sail_context_c(), splugin_info.sail_plugin_info_c(), &sail_write_options, &d->state));
+    SAIL_TRY(sail_start_writing_file_with_options(path, d->ctx->sail_context_c(), splugin_info.sail_plugin_info_c(), &sail_write_options, &d->state));
 
     return 0;
 }

@@ -118,7 +118,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
      * The subsequent calls to sail_read_next_frame() will output pixels
      * in a plugin-specific preferred pixel format.
      */
-    SAIL_TRY_OR_CLEANUP(sail_start_reading(path.toLocal8Bit(), d->context, NULL, &state),
+    SAIL_TRY_OR_CLEANUP(sail_start_reading_file(path.toLocal8Bit(), d->context, NULL, &state),
                         /* cleanup */ sail_stop_reading(state),
                                       free(image_bits),
                                       sail_destroy_image(image));
@@ -197,7 +197,7 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
     SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(image, &image->bytes_per_line),
                         /* cleanup */ sail_destroy_image(image));
 
-    SAIL_TRY_OR_CLEANUP(sail_start_writing(path.toLocal8Bit(), d->context, nullptr, &state),
+    SAIL_TRY_OR_CLEANUP(sail_start_writing_file(path.toLocal8Bit(), d->context, nullptr, &state),
                         /* cleanup */ sail_destroy_image(image));
     SAIL_TRY_OR_CLEANUP(sail_write_next_frame(state, image, qimage.bits()),
                         /* cleanup */ sail_destroy_image(image));

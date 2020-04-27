@@ -46,7 +46,7 @@ static sail_error_t convert(const char *input, const char *output, struct sail_c
     SAIL_TRY(sail_plugin_info_from_path(input, context, &plugin_info));
     SAIL_LOG_INFO("Input codec: %s", plugin_info->description);
 
-    SAIL_TRY(sail_start_reading(input, context, plugin_info, &state));
+    SAIL_TRY(sail_start_reading_file(input, context, plugin_info, &state));
 
     SAIL_TRY(sail_read_next_frame(state, &image, &image_bits));
     SAIL_TRY(sail_stop_reading(state));
@@ -64,7 +64,7 @@ static sail_error_t convert(const char *input, const char *output, struct sail_c
     SAIL_LOG_INFO("Compression: %d%s", compression, compression == -1 ? " (default)" : "");
     write_options->compression = compression;
 
-    SAIL_TRY(sail_start_writing_with_options(output, context, plugin_info, write_options, &state));
+    SAIL_TRY(sail_start_writing_file_with_options(output, context, plugin_info, write_options, &state));
     SAIL_TRY(sail_write_next_frame(state, image, image_bits));
     SAIL_TRY(sail_stop_writing(state));
 

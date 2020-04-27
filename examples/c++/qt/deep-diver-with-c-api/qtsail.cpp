@@ -159,11 +159,11 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     /*
      * Initialize reading with our options. The options will be deep copied.
      */
-    SAIL_TRY_OR_CLEANUP(sail_start_reading_with_options(path.toLocal8Bit(),
-                                                        d->context,
-                                                        plugin_info,
-                                                        read_options,
-                                                        &state),
+    SAIL_TRY_OR_CLEANUP(sail_start_reading_file_with_options(path.toLocal8Bit(),
+                                                             d->context,
+                                                             plugin_info,
+                                                             read_options,
+                                                             &state),
                         /* cleanup */ sail_destroy_read_options(read_options));
 
     /*
@@ -305,7 +305,7 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
 
     // Initialize writing with our options.
     //
-    SAIL_TRY(sail_start_writing_with_options(path.toLocal8Bit(), d->context, plugin_info, write_options, &state));
+    SAIL_TRY(sail_start_writing_file_with_options(path.toLocal8Bit(), d->context, plugin_info, write_options, &state));
 
     // Save some meta info...
     //
