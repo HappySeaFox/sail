@@ -26,8 +26,8 @@ struct sail_image *image;
 unsigned char *image_bits;
 
 /*
- * sail_read() reads the image and outputs pixels in a plugin-specific preferred pixel format.
- * Usually it's something generic like RGB.
+ * sail_read() reads the image and outputs pixels in RGB pixel format for image formats
+ * without transparency support and RGBA otherwise.
  */
 SAIL_TRY(sail_read(path,
                    &image,
@@ -48,8 +48,8 @@ sail_destroy_image(image);
 sail::image_reader reader;
 sail::image image;
 
-// read() reads the image and outputs pixels in a plugin-specific preferred pixel format.
-// Usually it's something generic like RGB.
+// read() reads the image and outputs pixels in RGB pixel format for image formats
+// without transparency support and RGBA otherwise.
 //
 SAIL_TRY(reader.read(path, &image));
 
@@ -82,8 +82,8 @@ unsigned char *image_bits = NULL;
 
 /*
  * Starts reading the specified file.
- * The subsequent calls to sail_read_next_frame() will output pixels
- * in a plugin-specific preferred pixel format.
+ * The subsequent calls to sail_read_next_frame() will output pixels in RGB pixel format for image formats
+ * without transparency support and RGBA otherwise.
  */
 SAIL_TRY_OR_CLEANUP(sail_start_reading_file(path, context, NULL, &state),
                     /* cleanup */ sail_stop_reading(state),
@@ -143,8 +143,8 @@ SAIL_AT_SCOPE_EXIT (
 );
 
 // Starts reading the specified file.
-// The subsequent calls to read_next_frame() will output pixels in a plugin-specific
-// preferred pixel format.
+// The subsequent calls to read_next_frame() will output pixels in RGB pixel format for image formats
+// without transparency support and RGBA otherwise.
 //
 SAIL_TRY(reader.start_reading(path));
 
@@ -152,7 +152,8 @@ SAIL_TRY(reader.start_reading(path));
 // reading frames till read_next_frame() returns 0. If no more frames are available,
 // it returns SAIL_NO_MORE_FRAMES.
 //
-// read_next_frame() outputs pixels in a plugin-specific preferred pixel format.
+// read_next_frame() outputs pixels in RGB pixel format for image formats
+// without transparency support and RGBA otherwise.
 //
 SAIL_TRY(reader.read_next_frame(&image));
 

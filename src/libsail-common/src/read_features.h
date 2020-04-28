@@ -81,7 +81,10 @@ struct sail_read_features {
     /* The length of output_pixel_formats. */
     int output_pixel_formats_length;
 
-    /* Output_pixel format to use by default. */
+    /*
+     * Output pixel format to use by default when no specific output pixel format was requested by user.
+     * It's always RGB for image formats without transparency support and RGBA otherwise.
+     */
     int preferred_output_pixel_format;
 
     /* Supported plugin features of reading operations. See SailPluginFeatures. */

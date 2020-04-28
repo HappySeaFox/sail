@@ -76,7 +76,9 @@ struct sail_write_features {
     /* The length of output_pixel_formats. */
     int output_pixel_formats_length;
 
-    /* Output_pixel format to use by default. */
+    /*
+     * Output pixel format to use by default when no specific output pixel format was requested by user.
+     */
     int preferred_output_pixel_format;
 
     /* Supported plugin features of writing operations. See SailPluginFeatures. */
@@ -105,7 +107,7 @@ struct sail_write_features {
     /* The length of compression_types. */
     int compression_types_length;
 
-    /* Preferred compression typed used by default. */
+    /* Preferred compression type to use by default. */
     int preferred_compression_type;
 
     /*

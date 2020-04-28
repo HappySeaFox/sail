@@ -50,8 +50,8 @@ struct sail_image *image;
 unsigned char *image_bits;
 
 /*
- * sail_read() reads the image and outputs pixels in a plugin-specific preferred pixel format.
- * Usually it's something generic like RGB.
+ * sail_read() reads the image and outputs pixels in RGB pixel format for image formats
+ * without transparency support and RGBA otherwise.
  */
 SAIL_TRY(sail_read(path,
                    &image,
@@ -72,8 +72,8 @@ sail_destroy_image(image);
 sail::image_reader reader;
 sail::image image;
 
-// read() reads the image and outputs pixels in a plugin-specific preferred pixel format.
-// Usually it's something generic like RGB.
+// read() reads the image and outputs pixels in RGB pixel format for image formats
+// without transparency support and RGBA otherwise.
 //
 SAIL_TRY(reader.read(path, &image));
 
