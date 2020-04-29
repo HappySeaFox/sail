@@ -29,6 +29,9 @@
     #include <sail/export.h>
 #endif
 
+/*
+ * No-op callbacks that just return SAIL_NOT_IMPLEMENTED.
+ */
 SAIL_HIDDEN sail_error_t io_noop_read(void *stream, void *buf, size_t object_size, size_t objects_count, size_t *read_objects_count);
 SAIL_HIDDEN sail_error_t io_noop_seek(void *stream, long offset, int whence);
 SAIL_HIDDEN sail_error_t io_noop_tell(void *stream, long *offset);
