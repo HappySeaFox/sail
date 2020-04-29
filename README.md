@@ -19,6 +19,8 @@ Author: Dmitry Baryshev.
 - easy-to-use C and C++ interfaces.
 - 4 levels of APIs depending on your needs: `junior`, `advanced`, `deep diver`, and `technical diver`.
   See [EXAMPLES](EXAMPLES.md) for more.
+- Reading images from file and memory.
+- Writing images to file and memory.
 - I/O abstraction for technical divers.
 - Image formats are supported by dynamically loaded codecs (plugins).
 - It's guaranteed that every plugin is able to read and output to memory pixels in `RGB` and `RGBA` formats.
