@@ -86,8 +86,8 @@ unsigned char *image_bits = NULL;
 
 /*
  * Starts reading the specified file.
- * The subsequent calls to sail_read_next_frame() will output pixels in RGB pixel format for image formats
- * without transparency support and RGBA otherwise.
+ * The subsequent calls to sail_read_next_frame() will output pixels in RGB pixel format
+ * for image formats without transparency support and RGBA otherwise.
  */
 SAIL_TRY_OR_CLEANUP(sail_start_reading_file(path, context, NULL, &state),
                     /* cleanup */ sail_stop_reading(state),
@@ -120,8 +120,8 @@ free(image_bits);
 sail_destroy_image(image);
 
 /*
- * If you have no plans to re-use the same context in the future, finish working with this context
- * and unload all loaded plugins attached to it.
+ * If you have no plans to re-use the same context in the future, finish working with this
+ * context and unload all loaded plugins attached to it.
  */
 sail_finish(context);
 context = NULL;
@@ -129,7 +129,8 @@ context = NULL;
 
 #### C++:
 ```C++
-// Initialize SAIL context. You could cache the context as a class member and re-use it multiple times.
+// Initialize SAIL context. You could cache the context as a class member and re-use it
+// multiple times.
 //
 sail::context context;
 
@@ -145,8 +146,8 @@ SAIL_AT_SCOPE_EXIT (
 );
 
 // Starts reading the specified file.
-// The subsequent calls to read_next_frame() will output pixels in RGB pixel format for image formats
-// without transparency support and RGBA otherwise.
+// The subsequent calls to read_next_frame() will output pixels in RGB pixel format
+// for image formats without transparency support and RGBA otherwise.
 //
 SAIL_TRY(reader.start_reading(path));
 
@@ -176,9 +177,9 @@ SAIL_TRY(reader.stop_reading());
 struct sail_context *context = NULL;
 
 /*
- * Initialize SAIL context and preload all plugins. Plugins are lazy-loaded when SAIL_FLAG_PRELOAD_PLUGINS
- * is not specified. You could cache the context and re-use it multiple times. When it's not needed anymore,
- * call sail_finish(context).
+ * Initialize SAIL context and preload all plugins. Plugins are lazy-loaded when
+ * SAIL_FLAG_PRELOAD_PLUGINS is not specified. You could cache the context and re-use it
+ * multiple times. When it's not needed anymore, call sail_finish(context).
  */
 SAIL_TRY(sail_init_with_flags(&context, SAIL_FLAG_PRELOAD_PLUGINS));
 
@@ -293,14 +294,14 @@ free(image_bits);
 sail_destroy_image(image);
 
 /*
- * Optional: unload all plugins to free up some memory if you plan to re-use the same context
- * in the future.
+ * Optional: unload all plugins to free up some memory if you plan to re-use the same
+ * context in the future.
  */
 sail_unload_plugins(context);
 
 /*
- * If you have no plans to re-use the same context in the future, finish working with this context
- * and unload all loaded plugins attached to it.
+ * If you have no plans to re-use the same context in the future, finish working with
+ * this context and unload all loaded plugins attached to it.
  */
 sail_finish(context);
 context = NULL;
@@ -308,8 +309,9 @@ context = NULL;
 
 #### C++:
 ```C++
-// Initialize SAIL context and preload all plugins. Plugins are lazy-loaded when SAIL_FLAG_PRELOAD_PLUGINS
-// is not specified. You could cache the context and re-use it multiple times.
+// Initialize SAIL context and preload all plugins. Plugins are lazy-loaded when
+// SAIL_FLAG_PRELOAD_PLUGINS is not specified. You could cache the context
+// and re-use it multiple times.
 //
 sail::context context(SAIL_FLAG_PRELOAD_PLUGINS);
 sail::image_reader reader(&context);
@@ -387,9 +389,9 @@ and call `sail_start_reading_io_with_options()`.
 struct sail_context *context = NULL;
 
 /*
- * Initialize SAIL context and preload all plugins. Plugins are lazy-loaded when SAIL_FLAG_PRELOAD_PLUGINS
- * is not specified. You could cache the context and re-use it multiple times. When it's not needed anymore,
- * call sail_finish(context).
+ * Initialize SAIL context and preload all plugins. Plugins are lazy-loaded when
+ * SAIL_FLAG_PRELOAD_PLUGINS is not specified. You could cache the context and re-use it
+ * multiple times. When it's not needed anymore, call sail_finish(context).
  */
 SAIL_TRY(sail_init_with_flags(&context, SAIL_FLAG_PRELOAD_PLUGINS));
 
@@ -418,8 +420,8 @@ SAIL_TRY(sail_alloc_io(&io));
  * Save a pointer to our data source. It will be passed back to the callback functions below.
  * You can free the data source in the close() callback.
  *
- * WARNING: If you don't call sail_stop_reading(), the close() callback is never called. Please
- *          make sure you always call sail_stop_reading().
+ * WARNING: If you don't call sail_stop_reading(), the close() callback is never called.
+ *          Please make sure you always call sail_stop_reading().
  */
 io->stream = my_data_source_pointer;
 
@@ -439,7 +441,8 @@ io->eof   = io_my_data_source_eof;
  * Allocate new read options and copy defaults from the plugin-specific read features
  * (preferred output pixel format etc.).
  */
-SAIL_TRY_OR_CLEANUP(sail_alloc_read_options_from_features(plugin_info->read_features, &read_options),
+SAIL_TRY_OR_CLEANUP(sail_alloc_read_options_from_features(plugin_info->read_features,
+                                                          &read_options),
                     /* cleanup */ sail_destroy_io(io));
 
 /*
@@ -537,8 +540,8 @@ sail_destroy_image(image);
 sail_unload_plugins(context);
 
 /*
- * If you have no plans to re-use the same context in the future, finish working with this context
- * and unload all loaded plugins attached to it.
+ * If you have no plans to re-use the same context in the future, finish working with this
+ * context and unload all loaded plugins attached to it.
  */
 sail_finish(context);
 context = NULL;
@@ -546,8 +549,9 @@ context = NULL;
 
 #### C++:
 ```C++
-// Initialize SAIL context and preload all plugins. Plugins are lazy-loaded when SAIL_FLAG_PRELOAD_PLUGINS
-// is not specified. You could cache the context and re-use it multiple times.
+// Initialize SAIL context and preload all plugins. Plugins are lazy-loaded when
+// SAIL_FLAG_PRELOAD_PLUGINS is not specified. You could cache the context and re-use
+// it multiple times.
 //
 sail::context context(SAIL_FLAG_PRELOAD_PLUGINS);
 sail::image_reader reader(&context);
@@ -566,8 +570,8 @@ sail::io io;
  * Save a pointer to our data source. It will be passed back to the callback functions below.
  * You can free the data source in the close() callback.
  *
- * WARNING: If you don't call reader.stop_reading(), the close() callback is never called. Please
- *          make sure you always call reader.stop_reading().
+ * WARNING: If you don't call reader.stop_reading(), the close() callback is never called.
+ *          Please make sure you always call reader.stop_reading().
  */
 io.with_stream(my_data_source_pointer);
 
