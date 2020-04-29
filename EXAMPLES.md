@@ -332,7 +332,8 @@ if (read_options.output_pixel_format() != SAIL_PIXEL_FORMAT_RGB) {
 
     // The plugin doesn't support outputting RGB pixels.
     //
-    if (std::find(output_pixel_formats.begin(), output_pixel_formats.end(), SAIL_PIXEL_FORMAT_RGB) == output_pixel_formats.end()) {
+    if (std::find(output_pixel_formats.begin(), output_pixel_formats.end(), SAIL_PIXEL_FORMAT_RGB) ==
+            output_pixel_formats.end()) {
         return SAIL_UNSUPPORTED_PIXEL_FORMAT;
     }
 
@@ -595,7 +596,8 @@ if (read_options.output_pixel_format() != SAIL_PIXEL_FORMAT_RGB) {
 
     // The plugin doesn't support outputting RGB pixels.
     //
-    if (std::find(output_pixel_formats.begin(), output_pixel_formats.end(), SAIL_PIXEL_FORMAT_RGB) == output_pixel_formats.end()) {
+    if (std::find(output_pixel_formats.begin(), output_pixel_formats.end(), SAIL_PIXEL_FORMAT_RGB) ==
+            output_pixel_formats.end()) {
         return SAIL_UNSUPPORTED_PIXEL_FORMAT;
     }
 
