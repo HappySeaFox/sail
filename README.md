@@ -89,6 +89,6 @@ It's pretty easy, isn't it? :smile: See [EXAMPLES](EXAMPLES.md) for more.
 
 See [EXAMPLES](EXAMPLES.md) for more.
 
-### 3. `deep diver` "I want to load this damn possibly multi-paged image and have comprehensive control over selected plugins and output pixel formats"
+### 3. `deep diver` "I want to load this damn possibly multi-paged image from memory and have comprehensive control over selected plugins and output pixel formats"
 
 See [EXAMPLES](EXAMPLES.md) for more.
