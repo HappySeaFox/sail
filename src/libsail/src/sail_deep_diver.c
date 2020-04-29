@@ -117,6 +117,14 @@ static sail_error_t sail_start_writing_io_with_options_impl(struct sail_io *io, 
  * Public functions.
  */
 
+sail_error_t sail_start_reading_io(struct sail_io *io, struct sail_context *context,
+                                   const struct sail_plugin_info *plugin_info, void **state) {
+
+    SAIL_TRY(sail_start_reading_io_with_options(io, context, plugin_info, NULL, state));
+
+    return 0;
+}
+
 sail_error_t sail_start_reading_io_with_options(struct sail_io *io, struct sail_context *context,
                                                 const struct sail_plugin_info *plugin_info,
                                                 const struct sail_read_options *read_options, void **state) {
@@ -150,10 +158,10 @@ sail_error_t sail_start_reading_file_with_options(const char *path, struct sail_
     return 0;
 }
 
-sail_error_t sail_start_reading_io(struct sail_io *io, struct sail_context *context,
+sail_error_t sail_start_writing_io(struct sail_io *io, struct sail_context *context,
                                    const struct sail_plugin_info *plugin_info, void **state) {
 
-    SAIL_TRY(sail_start_reading_io_with_options(io, context, plugin_info, NULL, state));
+    SAIL_TRY(sail_start_writing_io_with_options(io, context, plugin_info, NULL, state));
 
     return 0;
 }
@@ -187,14 +195,6 @@ sail_error_t sail_start_writing_file_with_options(const char *path, struct sail_
 
     SAIL_TRY_OR_CLEANUP(sail_start_writing_io_with_options_impl(io, true, context, plugin_info_local, write_options, state),
                         /* cleanup */ sail_destroy_io(io));
-
-    return 0;
-}
-
-sail_error_t sail_start_writing_io(struct sail_io *io, struct sail_context *context,
-                                   const struct sail_plugin_info *plugin_info, void **state) {
-
-    SAIL_TRY(sail_start_writing_io_with_options(io, context, plugin_info, NULL, state));
 
     return 0;
 }
