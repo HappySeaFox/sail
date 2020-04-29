@@ -31,6 +31,10 @@ Author: Dmitry Baryshev.
 - color management functions (applying ICC profiles etc.).
 - EXIF rotation.
 
+## Image formats supported
+
+- JPEG (requires `libjpeg-turbo`)
+
 ## Supported platforms
 
 Currently SAIL supports Windows and Linux platforms.
