@@ -19,6 +19,8 @@
 #ifndef SAIL_SAIL_PRIVATE_H
 #define SAIL_SAIL_PRIVATE_H
 
+#include <stdbool.h>
+
 #ifdef SAIL_BUILD
     #include "error.h"
     #include "export.h"
@@ -36,6 +38,7 @@ struct sail_plugin;
 struct SAIL_HIDDEN hidden_state {
 
     struct sail_io *io;
+    bool own_io;
 
     /* Local state passed to plugin reading and writing functions. */
     void *state;

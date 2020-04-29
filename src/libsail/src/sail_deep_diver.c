@@ -23,7 +23,11 @@
 #include "sail-common.h"
 #include "sail.h"
 
-SAIL_EXPORT sail_error_t sail_start_reading_io_with_options(struct sail_io *io, struct sail_context *context,
+/*
+ * Private functions.
+ */
+
+static sail_error_t sail_start_reading_io_with_options_impl(struct sail_io *io, bool own_io, struct sail_context *context,
                                                             const struct sail_plugin_info *plugin_info,
                                                             const struct sail_read_options *read_options, void **state) {
 
@@ -38,6 +42,7 @@ SAIL_EXPORT sail_error_t sail_start_reading_io_with_options(struct sail_io *io, 
     SAIL_CHECK_STATE_PTR(state_of_mind);
 
     state_of_mind->io          = io;
+    state_of_mind->own_io      = own_io;
     state_of_mind->state       = NULL;
     state_of_mind->plugin_info = plugin_info;
     state_of_mind->plugin      = NULL;
@@ -65,41 +70,9 @@ SAIL_EXPORT sail_error_t sail_start_reading_io_with_options(struct sail_io *io, 
     return 0;
 }
 
-sail_error_t sail_start_reading_file_with_options(const char *path, struct sail_context *context,
-                                                  const struct sail_plugin_info *plugin_info,
-                                                  const struct sail_read_options *read_options, void **state) {
-
-    SAIL_CHECK_PATH_PTR(path);
-    SAIL_CHECK_CONTEXT_PTR(context);
-
-    const struct sail_plugin_info *plugin_info_local;
-
-    if (plugin_info == NULL) {
-        SAIL_TRY(sail_plugin_info_from_path(path, context, &plugin_info_local));
-    } else {
-        plugin_info_local = plugin_info;
-    }
-
-    struct sail_io *io;
-    SAIL_TRY(sail_alloc_io_read_file(path, &io));
-
-    SAIL_TRY_OR_CLEANUP(sail_start_reading_io_with_options(io, context, plugin_info_local, read_options, state),
-                        /* cleanup */ sail_destroy_io(io));
-
-    return 0;
-}
-
-sail_error_t sail_start_reading_io(struct sail_io *io, struct sail_context *context,
-                                   const struct sail_plugin_info *plugin_info, void **state) {
-
-    SAIL_TRY(sail_start_reading_io_with_options(io, context, plugin_info, NULL, state));
-
-    return 0;
-}
-
-sail_error_t sail_start_writing_io_with_options(struct sail_io *io, struct sail_context *context,
-                                                const struct sail_plugin_info *plugin_info,
-                                                const struct sail_write_options *write_options, void **state) {
+static sail_error_t sail_start_writing_io_with_options_impl(struct sail_io *io, bool own_io, struct sail_context *context,
+                                                            const struct sail_plugin_info *plugin_info,
+                                                            const struct sail_write_options *write_options, void **state) {
 
     SAIL_CHECK_STATE_PTR(state);
     *state = NULL;
@@ -112,6 +85,7 @@ sail_error_t sail_start_writing_io_with_options(struct sail_io *io, struct sail_
     SAIL_CHECK_STATE_PTR(state_of_mind);
 
     state_of_mind->io          = io;
+    state_of_mind->own_io      = own_io;
     state_of_mind->state       = NULL;
     state_of_mind->plugin_info = plugin_info;
     state_of_mind->plugin      = NULL;
@@ -139,6 +113,60 @@ sail_error_t sail_start_writing_io_with_options(struct sail_io *io, struct sail_
     return 0;
 }
 
+/*
+ * Public functions.
+ */
+
+sail_error_t sail_start_reading_io_with_options(struct sail_io *io, struct sail_context *context,
+                                                const struct sail_plugin_info *plugin_info,
+                                                const struct sail_read_options *read_options, void **state) {
+
+    SAIL_TRY(sail_start_reading_io_with_options_impl(io, false, context, plugin_info, read_options, state));
+
+    return 0;
+}
+
+sail_error_t sail_start_reading_file_with_options(const char *path, struct sail_context *context,
+                                                  const struct sail_plugin_info *plugin_info,
+                                                  const struct sail_read_options *read_options, void **state) {
+
+    SAIL_CHECK_PATH_PTR(path);
+    SAIL_CHECK_CONTEXT_PTR(context);
+
+    const struct sail_plugin_info *plugin_info_local;
+
+    if (plugin_info == NULL) {
+        SAIL_TRY(sail_plugin_info_from_path(path, context, &plugin_info_local));
+    } else {
+        plugin_info_local = plugin_info;
+    }
+
+    struct sail_io *io;
+    SAIL_TRY(sail_alloc_io_read_file(path, &io));
+
+    SAIL_TRY_OR_CLEANUP(sail_start_reading_io_with_options_impl(io, true, context, plugin_info_local, read_options, state),
+                        /* cleanup */ sail_destroy_io(io));
+
+    return 0;
+}
+
+sail_error_t sail_start_reading_io(struct sail_io *io, struct sail_context *context,
+                                   const struct sail_plugin_info *plugin_info, void **state) {
+
+    SAIL_TRY(sail_start_reading_io_with_options(io, context, plugin_info, NULL, state));
+
+    return 0;
+}
+
+sail_error_t sail_start_writing_io_with_options(struct sail_io *io, struct sail_context *context,
+                                                const struct sail_plugin_info *plugin_info,
+                                                const struct sail_write_options *write_options, void **state) {
+
+    SAIL_TRY(sail_start_writing_io_with_options_impl(io, false, context, plugin_info, write_options, state));
+
+    return 0;
+}
+
 sail_error_t sail_start_writing_file_with_options(const char *path, struct sail_context *context,
                                                   const struct sail_plugin_info *plugin_info,
                                                   const struct sail_write_options *write_options, void **state) {
@@ -157,7 +185,7 @@ sail_error_t sail_start_writing_file_with_options(const char *path, struct sail_
     struct sail_io *io;
     SAIL_TRY(sail_alloc_io_write_file(path, &io));
 
-    SAIL_TRY_OR_CLEANUP(sail_start_writing_io_with_options(io, context, plugin_info_local, write_options, state),
+    SAIL_TRY_OR_CLEANUP(sail_start_writing_io_with_options_impl(io, true, context, plugin_info_local, write_options, state),
                         /* cleanup */ sail_destroy_io(io));
 
     return 0;

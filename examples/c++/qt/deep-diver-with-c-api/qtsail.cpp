@@ -156,6 +156,9 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
         return SAIL_UNSUPPORTED_PIXEL_FORMAT;
     }
 
+    /*
+     * Allocate a new I/O stream to read from the file.
+     */
     struct sail_io *io;
     SAIL_TRY(sail_alloc_io_read_file(path.toLocal8Bit(), &io));
 
@@ -167,7 +170,8 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
                                                            plugin_info,
                                                            read_options,
                                                            &state),
-                        /* cleanup */ sail_destroy_read_options(read_options));
+                        /* cleanup */ sail_destroy_read_options(read_options),
+                                      sail_destroy_io(io));
 
     /*
      * Our read options are not needed anymore.
@@ -180,14 +184,18 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state,
                                              &image,
                                              (void **)&image_bits),
-                        /* cleanup */ sail_stop_reading(state));
+                        /* cleanup */ sail_stop_reading(state),
+                                      sail_destroy_io(io));
 
     /*
      * Finish reading.
      */
     SAIL_TRY_OR_CLEANUP(sail_stop_reading(state),
                         /* cleanup */ free(image_bits),
-                                      sail_destroy_image(image));
+                                      sail_destroy_image(image),
+                                      sail_destroy_io(io));
+
+    sail_destroy_io(io);
 
     /*
      * Bytes per line is needed for QImage.

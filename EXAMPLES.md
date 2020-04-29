@@ -230,14 +230,21 @@ if (read_options->output_pixel_format != SAIL_PIXEL_FORMAT_RGB) {
 }
 
 /*
+ * Allocate a new I/O stream to read from the file.
+ */
+struct sail_io *io;
+SAIL_TRY(sail_alloc_io_read_file(path, &io));
+
+/*
  * Initialize reading with our options. The options will be deep copied.
  */
-SAIL_TRY_OR_CLEANUP(sail_start_reading_file_with_options(path,
-                                                         context,
-                                                         plugin_info,
-                                                         read_options,
-                                                         &state),
-                    /* cleanup */ sail_destroy_read_options(read_options));
+SAIL_TRY_OR_CLEANUP(sail_start_reading_io_with_options(path,
+                                                       context,
+                                                       plugin_info,
+                                                       read_options,
+                                                       &state),
+                    /* cleanup */ sail_destroy_read_options(read_options),
+                                  sail_destroy_io(io));
 
 /*
  * Our read options are not needed anymore.
@@ -254,14 +261,18 @@ sail_destroy_read_options(read_options);
 SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state,
                                          &image,
                                          (void **)&image_bits),
-                    /* cleanup */ sail_stop_reading(state));
+                    /* cleanup */ sail_stop_reading(state),
+                                  sail_destroy_io(io));
 
 /*
  * Finish reading.
  */
 SAIL_TRY_OR_CLEANUP(sail_stop_reading(state),
                     /* cleanup */ free(image_bits),
-                                  sail_destroy_image(image));
+                                  sail_destroy_image(image),
+                                  sail_destroy_io(io));
+
+sail_destroy_io(io);
 
 /*
  * Print the image meta information if any (JPEG comments etc.).

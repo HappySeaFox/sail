@@ -84,7 +84,9 @@ void destroy_hidden_state(struct hidden_state *state) {
         return;
     }
 
-    sail_destroy_io(state->io);
+    if (state->own_io) {
+        sail_destroy_io(state->io);
+    }
 
     /* This state must be freed and zeroed by plugins. We free it just in case to avoid memory leaks. */
     free(state->state);
