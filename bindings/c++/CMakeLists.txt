@@ -3,6 +3,7 @@ add_library(sail-c++
                 src/image_reader-c++.cpp
                 src/image_writer-c++.cpp
                 src/image-c++.cpp
+                src/io_common-c++.cpp
                 src/plugin_info-c++.cpp
                 src/read_features-c++.cpp
                 src/read_options-c++.cpp
@@ -16,6 +17,7 @@ list(APPEND PUBLIC_HEADERS "src/at_scope_exit-c++.h")
 list(APPEND PUBLIC_HEADERS "src/context-c++.h")
 list(APPEND PUBLIC_HEADERS "src/image_reader-c++.h")
 list(APPEND PUBLIC_HEADERS "src/image_writer-c++.h")
+list(APPEND PUBLIC_HEADERS "src/io_common-c++.h")
 list(APPEND PUBLIC_HEADERS "src/image-c++.h")
 list(APPEND PUBLIC_HEADERS "src/plugin_info-c++.h")
 list(APPEND PUBLIC_HEADERS "src/read_features-c++.h")
