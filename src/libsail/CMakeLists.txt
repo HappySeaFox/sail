@@ -1,11 +1,11 @@
 add_library(sail
                 src/ini.c
-                src/plugin_info_private.c
                 src/plugin.c
+                src/plugin_info_private.c
                 src/sail.c
-                src/sail_junior.c
                 src/sail_advanced.c
                 src/sail_deep_diver.c
+                src/sail_junior.c
                 src/sail_private.c)
 
 # Build a list of public headers to install
@@ -13,9 +13,9 @@ add_library(sail
 set(PUBLIC_HEADERS "")
 list(APPEND PUBLIC_HEADERS "src/plugin_info.h")
 list(APPEND PUBLIC_HEADERS "src/sail.h")
-list(APPEND PUBLIC_HEADERS "src/sail_junior.h")
 list(APPEND PUBLIC_HEADERS "src/sail_advanced.h")
 list(APPEND PUBLIC_HEADERS "src/sail_deep_diver.h")
+list(APPEND PUBLIC_HEADERS "src/sail_junior.h")
 list(APPEND PUBLIC_HEADERS "src/string_node.h")
 
 set_target_properties(sail PROPERTIES
