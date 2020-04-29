@@ -144,7 +144,26 @@ static sail_error_t io_mem_write(void *stream, const void *buf, size_t object_si
     SAIL_CHECK_BUFFER_PTR(buf);
     SAIL_CHECK_RESULT_PTR(written_objects_count);
 
-    return SAIL_NOT_IMPLEMENTED;
+    struct mem_io_write_stream *mem_io_write_stream = (struct mem_io_write_stream *)stream;
+    struct mem_io_buffer_info *mem_io_buffer_info = &mem_io_write_stream->mem_io_buffer_info;
+
+    *written_objects_count = 0;
+
+    if (mem_io_buffer_info->pos >= mem_io_buffer_info->buffer_length) {
+        return SAIL_IO_EOF;
+    }
+
+    while (mem_io_buffer_info->pos <= mem_io_buffer_info->buffer_length - object_size && objects_count > 0) {
+        memcpy((char *)mem_io_write_stream->buffer + mem_io_buffer_info->pos, buf, object_size);
+
+        buf = (char *)buf + object_size;
+        mem_io_buffer_info->pos += (unsigned long)object_size;
+
+        (*written_objects_count)++;
+        objects_count--;
+    }
+
+    return 0;
 }
 
 static sail_error_t io_mem_flush(void *stream) {
