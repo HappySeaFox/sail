@@ -37,6 +37,7 @@ public:
     context *ctx;
     bool own_context;
     void *state;
+    sail_io sail_io;
 };
 
 image_reader::image_reader()
@@ -184,7 +185,77 @@ sail_error_t image_reader::start_reading(const char *path, const plugin_info &sp
     sail_read_options sail_read_options;
     SAIL_TRY(sread_options.to_sail_read_options(&sail_read_options));
 
-    SAIL_TRY(sail_start_reading_file_with_options(path, d->ctx->sail_context_c(), splugin_info.sail_plugin_info_c(), &sail_read_options, &d->state));
+    SAIL_TRY(sail_start_reading_file_with_options(path,
+                                                  d->ctx->sail_context_c(),
+                                                  splugin_info.sail_plugin_info_c(),
+                                                  &sail_read_options,
+                                                  &d->state));
+
+    return 0;
+}
+
+sail_error_t image_reader::start_reading(const void *buffer, long buffer_length, const plugin_info &splugin_info)
+{
+    SAIL_CHECK_BUFFER_PTR(buffer);
+
+    SAIL_TRY(sail_start_reading_mem_with_options(buffer,
+                                                 buffer_length,
+                                                 d->ctx->sail_context_c(),
+                                                 splugin_info.sail_plugin_info_c(),
+                                                 NULL,
+                                                 &d->state));
+
+    return 0;
+}
+
+sail_error_t image_reader::start_reading(const void *buffer, long buffer_length, const plugin_info &splugin_info, const read_options &sread_options)
+{
+    SAIL_CHECK_BUFFER_PTR(buffer);
+
+    sail_read_options sail_read_options;
+    SAIL_TRY(sread_options.to_sail_read_options(&sail_read_options));
+
+    SAIL_TRY(sail_start_reading_mem_with_options(buffer,
+                                                 buffer_length,
+                                                 d->ctx->sail_context_c(),
+                                                 splugin_info.sail_plugin_info_c(),
+                                                 &sail_read_options,
+                                                 &d->state));
+
+    return 0;
+}
+
+sail_error_t image_reader::start_reading(const io &sio, const plugin_info &splugin_info)
+{
+    SAIL_TRY(sio.to_sail_io(&d->sail_io));
+
+    sail_io *sail_io = &d->sail_io;
+    SAIL_CHECK_IO(sail_io);
+
+    SAIL_TRY(sail_start_reading_io_with_options(&d->sail_io,
+                                                d->ctx->sail_context_c(),
+                                                splugin_info.sail_plugin_info_c(),
+                                                NULL,
+                                                &d->state));
+
+    return 0;
+}
+
+sail_error_t image_reader::start_reading(const io &sio, const plugin_info &splugin_info, const read_options &sread_options)
+{
+    SAIL_TRY(sio.to_sail_io(&d->sail_io));
+
+    sail_io *sail_io = &d->sail_io;
+    SAIL_CHECK_IO(sail_io);
+
+    sail_read_options sail_read_options;
+    SAIL_TRY(sread_options.to_sail_read_options(&sail_read_options));
+
+    SAIL_TRY(sail_start_reading_io_with_options(&d->sail_io,
+                                                d->ctx->sail_context_c(),
+                                                splugin_info.sail_plugin_info_c(),
+                                                &sail_read_options,
+                                                &d->state));
 
     return 0;
 }

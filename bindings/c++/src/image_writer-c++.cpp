@@ -37,6 +37,7 @@ public:
     context *ctx;
     bool own_context;
     void *state;
+    sail_io sail_io;
 };
 
 image_writer::image_writer()
@@ -168,6 +169,72 @@ sail_error_t image_writer::start_writing(const char *path, const plugin_info &sp
     SAIL_TRY(swrite_options.to_sail_write_options(&sail_write_options));
 
     SAIL_TRY(sail_start_writing_file_with_options(path, d->ctx->sail_context_c(), splugin_info.sail_plugin_info_c(), &sail_write_options, &d->state));
+
+    return 0;
+}
+
+sail_error_t image_writer::start_writing(void *buffer, long buffer_length, const plugin_info &splugin_info)
+{
+    SAIL_CHECK_BUFFER_PTR(buffer);
+
+    SAIL_TRY(sail_start_writing_mem_with_options(buffer,
+                                                 buffer_length,
+                                                 d->ctx->sail_context_c(),
+                                                 splugin_info.sail_plugin_info_c(),
+                                                 NULL,
+                                                 &d->state));
+
+    return 0;
+}
+
+sail_error_t image_writer::start_writing(void *buffer, long buffer_length, const plugin_info &splugin_info, const write_options &swrite_options)
+{
+    SAIL_CHECK_BUFFER_PTR(buffer);
+
+    sail_write_options sail_write_options;
+    SAIL_TRY(swrite_options.to_sail_write_options(&sail_write_options));
+
+    SAIL_TRY(sail_start_writing_mem_with_options(buffer,
+                                                 buffer_length,
+                                                 d->ctx->sail_context_c(),
+                                                 splugin_info.sail_plugin_info_c(),
+                                                 &sail_write_options,
+                                                 &d->state));
+
+    return 0;
+}
+
+sail_error_t image_writer::start_writing(const io &sio, const plugin_info &splugin_info)
+{
+    SAIL_TRY(sio.to_sail_io(&d->sail_io));
+
+    sail_io *sail_io = &d->sail_io;
+    SAIL_CHECK_IO(sail_io);
+
+    SAIL_TRY(sail_start_writing_io_with_options(&d->sail_io,
+                                                d->ctx->sail_context_c(),
+                                                splugin_info.sail_plugin_info_c(),
+                                                NULL,
+                                                &d->state));
+
+    return 0;
+}
+
+sail_error_t image_writer::start_writing(const io &sio, const plugin_info &splugin_info, const write_options &swrite_options)
+{
+    SAIL_TRY(sio.to_sail_io(&d->sail_io));
+
+    sail_io *sail_io = &d->sail_io;
+    SAIL_CHECK_IO(sail_io);
+
+    sail_write_options sail_write_options;
+    SAIL_TRY(swrite_options.to_sail_write_options(&sail_write_options));
+
+    SAIL_TRY(sail_start_writing_io_with_options(&d->sail_io,
+                                                d->ctx->sail_context_c(),
+                                                splugin_info.sail_plugin_info_c(),
+                                                &sail_write_options,
+                                                &d->state));
 
     return 0;
 }
