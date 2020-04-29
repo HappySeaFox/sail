@@ -83,8 +83,8 @@ public:
     /*
      * An interface to sail_start_writing_mem(). See sail_start_writing_mem() for more.
      */
-    sail_error_t start_writing(void *buffer, long buffer_length, const plugin_info &splugin_info);
-    sail_error_t start_writing(void *buffer, long buffer_length, const plugin_info &splugin_info, const write_options &swrite_options);
+    sail_error_t start_writing(void *buffer, unsigned long buffer_length, const plugin_info &splugin_info);
+    sail_error_t start_writing(void *buffer, unsigned long buffer_length, const plugin_info &splugin_info, const write_options &swrite_options);
 
     /*
      * An interface to sail_start_writing_io(). See sail_start_writing_io() for more.

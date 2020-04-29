@@ -89,8 +89,8 @@ public:
     /*
      * An interface to sail_start_reading_mem(). See sail_start_reading_mem() for more.
      */
-    sail_error_t start_reading(const void *buffer, long buffer_length, const plugin_info &splugin_info);
-    sail_error_t start_reading(const void *buffer, long buffer_length, const plugin_info &splugin_info, const read_options &sread_options);
+    sail_error_t start_reading(const void *buffer, unsigned long buffer_length, const plugin_info &splugin_info);
+    sail_error_t start_reading(const void *buffer, unsigned long buffer_length, const plugin_info &splugin_info, const read_options &sread_options);
 
     /*
      * An interface to sail_start_reading_io(). See sail_start_reading_io() for more.

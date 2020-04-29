@@ -173,7 +173,7 @@ sail_error_t image_writer::start_writing(const char *path, const plugin_info &sp
     return 0;
 }
 
-sail_error_t image_writer::start_writing(void *buffer, long buffer_length, const plugin_info &splugin_info)
+sail_error_t image_writer::start_writing(void *buffer, unsigned long buffer_length, const plugin_info &splugin_info)
 {
     SAIL_CHECK_BUFFER_PTR(buffer);
 
@@ -187,7 +187,7 @@ sail_error_t image_writer::start_writing(void *buffer, long buffer_length, const
     return 0;
 }
 
-sail_error_t image_writer::start_writing(void *buffer, long buffer_length, const plugin_info &splugin_info, const write_options &swrite_options)
+sail_error_t image_writer::start_writing(void *buffer, unsigned long buffer_length, const plugin_info &splugin_info, const write_options &swrite_options)
 {
     SAIL_CHECK_BUFFER_PTR(buffer);
 

@@ -106,7 +106,7 @@ static sail_error_t assign_io_callbacks(struct sail_io *io) {
  * Public functions.
  */
 
-sail_error_t sail_alloc_io_read_mem(const void *buffer, long buffer_length, struct sail_io **io) {
+sail_error_t sail_alloc_io_read_mem(const void *buffer, unsigned long buffer_length, struct sail_io **io) {
 
     SAIL_CHECK_BUFFER_PTR(buffer);
     SAIL_CHECK_IO_PTR(io);
@@ -120,7 +120,7 @@ sail_error_t sail_alloc_io_read_mem(const void *buffer, long buffer_length, stru
     return 0;
 }
 
-sail_error_t sail_alloc_io_write_mem(void *buffer, long buffer_length, struct sail_io **io) {
+sail_error_t sail_alloc_io_write_mem(void *buffer, unsigned long buffer_length, struct sail_io **io) {
 
     SAIL_CHECK_BUFFER_PTR(buffer);
     SAIL_CHECK_IO_PTR(io);

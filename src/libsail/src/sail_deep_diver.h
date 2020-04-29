@@ -133,7 +133,7 @@ SAIL_EXPORT sail_error_t sail_start_reading_file_with_options(const char *path, 
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_start_reading_mem_with_options(const void *buffer, long buffer_length, struct sail_context *context,
+SAIL_EXPORT sail_error_t sail_start_reading_mem_with_options(const void *buffer, unsigned long buffer_length, struct sail_context *context,
                                                              const struct sail_plugin_info *plugin_info,
                                                              const struct sail_read_options *read_options, void **state);
 
@@ -239,7 +239,7 @@ SAIL_EXPORT sail_error_t sail_start_writing_file_with_options(const char *path, 
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_start_writing_mem_with_options(void *buffer, long buffer_length, struct sail_context *context,
+SAIL_EXPORT sail_error_t sail_start_writing_mem_with_options(void *buffer, unsigned long buffer_length, struct sail_context *context,
                                                              const struct sail_plugin_info *plugin_info,
                                                              const struct sail_write_options *write_options, void **state);
 
