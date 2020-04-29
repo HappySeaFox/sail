@@ -26,6 +26,8 @@
 
     #include "context.h"
     #include "ini.h"
+    #include "io_file.h"
+    #include "io_mem.h"
     #include "plugin.h"
     #include "plugin_info.h"
     #include "plugin_info_private.h"

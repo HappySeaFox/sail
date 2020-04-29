@@ -9,8 +9,6 @@ set(SAIL_COLORED_OUTPUT ${SAIL_COLORED_OUTPUT} PARENT_SCOPE)
 add_library(sail-common
                 src/image.c
                 src/io_common.c
-                src/io_file.c
-                src/io_mem.c
                 src/log.c
                 src/meta_entry_node.c
                 src/read_features.c

@@ -29,8 +29,6 @@
     #include "export.h"
     #include "image.h"
     #include "io_common.h"
-    #include "io_file.h"
-    #include "io_mem.h"
     #include "log.h"
     #include "meta_entry_node.h"
     #include "read_features.h"
