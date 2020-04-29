@@ -19,8 +19,8 @@ Author: Dmitry Baryshev.
   out of images manually. For example, one may want to work with raw `CMYK` pixels in a printing image.
   :warning: Some plugins might not support outputting source pixels.
 - easy-to-use C and C++ interfaces.
-- 3 levels of APIs depending on your needs: `junior`, `advanced`, and `deep diver`. See [EXAMPLES](EXAMPLES.md) for more.
-- I/O abstraction for deep divers.
+- 4 levels of APIs depending on your needs: `junior`, `advanced`, `deep diver`, and `technical diver`. See [EXAMPLES](EXAMPLES.md) for more.
+- I/O abstraction for technical divers.
 - Image formats are supported by dynamically loaded codecs (plugins).
 - Easily extensible with new image formats for those who want to implement a specific codec for his/her needs.
 
@@ -91,5 +91,9 @@ It's pretty easy, isn't it? :smile: See [EXAMPLES](EXAMPLES.md) for more.
 See [EXAMPLES](EXAMPLES.md) for more.
 
 ### 3. `deep diver` "I want to load this damn possibly multi-paged image from memory and have comprehensive control over selected plugins and output pixel formats"
+
+See [EXAMPLES](EXAMPLES.md) for more.
+
+### 4. `technical diver` "I want everything above and my custom I/O source"
 
 See [EXAMPLES](EXAMPLES.md) for more.

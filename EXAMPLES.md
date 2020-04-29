@@ -1,16 +1,20 @@
 Table of Contents
 =================
 
-* [APIs overview](#apis-overview)
-  * [1\. junior](#1-junior)
-    * [C:](#c)
-    * [C\+\+:](#c-1)
-  * [2\. advanced](#2-advanced)
-    * [C:](#c-2)
-    * [C\+\+:](#c-3)
-  * [3\. deep diver](#3-deep-diver)
-    * [C:](#c-4)
-    * [C\+\+:](#c-5)
+* [Table of Contents](#table-of-contents)
+  * [APIs overview](#apis-overview)
+    * [1\. junior](#1-junior)
+      * [C:](#c)
+      * [C\+\+:](#c-1)
+    * [2\. advanced](#2-advanced)
+      * [C:](#c-2)
+      * [C\+\+:](#c-3)
+    * [3\. deep diver](#3-deep-diver)
+      * [C:](#c-4)
+      * [C\+\+:](#c-5)
+    * [4\. technical diver](#4-technical-diver)
+      * [C:](#c-6)
+      * [C\+\+:](#c-7)
 
 ## APIs overview
 
@@ -230,21 +234,14 @@ if (read_options->output_pixel_format != SAIL_PIXEL_FORMAT_RGB) {
 }
 
 /*
- * Allocate a new I/O stream to read from the file.
- */
-struct sail_io *io;
-SAIL_TRY(sail_alloc_io_read_file(path, &io));
-
-/*
  * Initialize reading with our options. The options will be deep copied.
  */
-SAIL_TRY_OR_CLEANUP(sail_start_reading_io_with_options(path,
-                                                       context,
-                                                       plugin_info,
-                                                       read_options,
-                                                       &state),
-                    /* cleanup */ sail_destroy_read_options(read_options),
-                                  sail_destroy_io(io));
+SAIL_TRY_OR_CLEANUP(sail_start_reading_file_with_options(path,
+                                                         context,
+                                                         plugin_info,
+                                                         read_options,
+                                                         &state),
+                    /* cleanup */ sail_destroy_read_options(read_options));
 
 /*
  * Our read options are not needed anymore.
@@ -261,18 +258,14 @@ sail_destroy_read_options(read_options);
 SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state,
                                          &image,
                                          (void **)&image_bits),
-                    /* cleanup */ sail_stop_reading(state),
-                                  sail_destroy_io(io));
+                    /* cleanup */ sail_stop_reading(state));
 
 /*
  * Finish reading.
  */
 SAIL_TRY_OR_CLEANUP(sail_stop_reading(state),
                     /* cleanup */ free(image_bits),
-                                  sail_destroy_image(image),
-                                  sail_destroy_io(io));
-
-sail_destroy_io(io);
+                                  sail_destroy_image(image));
 
 /*
  * Print the image meta information if any (JPEG comments etc.).
@@ -366,4 +359,178 @@ if (!meta_entries.empty()) {
     const std::pair<std::string, std::string> first_pair = *meta_entries.begin();
     SAIL_LOG_DEBUG("%s: %s", first_pair.first.c_str(), first_pair.second.c_str());
 }
+```
+
+### 4. `technical diver`
+
+**Purpose:** Comprehensive control provided for deep divers plus a custom I/O source.
+
+#### C:
+
+Instead of using `sail_start_reading_file_with_options()` in the `deep diver` example create your own I/O stream
+and call `sail_start_reading_io_with_options()`:
+
+```C
+struct sail_context *context = NULL;
+
+/*
+ * Initialize SAIL context and preload all plugins. Plugins are lazy-loaded when SAIL_FLAG_PRELOAD_PLUGINS
+ * is not specified. You could cache the context and re-use it multiple times. When it's not needed anymore,
+ * call sail_finish(context).
+ */
+SAIL_TRY(sail_init_with_flags(&context, SAIL_FLAG_PRELOAD_PLUGINS));
+
+struct sail_read_options *read_options = NULL;
+struct sail_image *image = NULL;
+unsigned char *image_bits = NULL;
+
+/*
+ * Always set the initial state to NULL in C or nullptr in C++.
+ */
+void *state = NULL;
+
+/*
+ * Find the codec to read JPEGs.
+ */
+const struct sail_plugin_info *plugin_info;
+SAIL_TRY(sail_plugin_info_from_extension("JPEG", context, &plugin_info));
+
+/*
+ * Create our custom I/O source.
+ */
+struct sail_io *io;
+SAIL_TRY(sail_alloc_io(&io));
+
+/*
+ * Save a pointer to our data source. It will be passed back to the callback functions below.
+ * You can free the data source in the close() callback.
+ *
+ * WARNING: If you don't call sail_stop_reading(), the close() callback is never called. Please
+ *          make sure you always call sail_stop_reading().
+ */
+io->stream = my_source;
+
+/*
+ * Setup reading, seeking, flushing etc. callbacks for our custom I/O source.
+ * All of them must be set.
+ */
+io->read  = io_my_data_source_read;
+io->seek  = io_my_data_source_seek;
+io->tell  = io_my_data_source_tell;
+io->write = io_my_data_source_write;
+io->flush = io_my_data_source_flush;
+io->close = io_my_data_source_close;
+io->eof   = io_my_data_source_eof;
+
+/*
+ * Allocate new read options and copy defaults from the plugin-specific read features
+ * (preferred output pixel format etc.).
+ */
+SAIL_TRY_OR_CLEANUP(sail_alloc_read_options_from_features(plugin_info->read_features, &read_options),
+                    /* cleanup */ sail_destroy_io(io));
+
+/*
+ * Let's request RGB pixels only.
+ */
+if (read_options->output_pixel_format != SAIL_PIXEL_FORMAT_RGB) {
+    bool foundRgb = false;
+
+    /*
+     * Check if the plugin supports outputting RGB pixels.
+     */
+    for (int i = 0; i < plugin_info->read_features->output_pixel_formats_length; i++) {
+        if (plugin_info->read_features->output_pixel_formats[i] == SAIL_PIXEL_FORMAT_RGB) {
+            foundRgb = true;
+            break;
+        }
+    }
+
+    /*
+     * The plugin doesn't support outputting RGB pixels.
+     */
+    if (!foundRgb) {
+        sail_destroy_read_options(read_options);
+        sail_destroy_io(io);
+        return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+    }
+
+    /*
+     * Request the plugin to output RGB pixels.
+     */
+    read_options->output_pixel_format = SAIL_PIXEL_FORMAT_RGB;
+}
+
+/*
+ * Initialize reading with our options. The options will be deep copied.
+ */
+SAIL_TRY_OR_CLEANUP(sail_start_reading_io_with_options(path,
+                                                       context,
+                                                       plugin_info,
+                                                       read_options,
+                                                       &state),
+                    /* cleanup */ sail_destroy_read_options(read_options),
+                                  sail_destroy_io(io));
+
+/*
+ * Our read options are not needed anymore.
+ */
+sail_destroy_read_options(read_options);
+
+/*
+ * Read just a single frame. It's possible to read more frames if any. Just continue
+ * reading frames till sail_read_next_frame() returns 0. If no more frames are available,
+ * it returns SAIL_NO_MORE_FRAMES.
+ *
+ * sail_read_next_frame() outputs pixels in the requested pixel format (RGB).
+ */
+SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state,
+                                         &image,
+                                         (void **)&image_bits),
+                    /* cleanup */ sail_stop_reading(state),
+                                  sail_destroy_io(io));
+
+/*
+ * Finish reading.
+ */
+SAIL_TRY_OR_CLEANUP(sail_stop_reading(state),
+                    /* cleanup */ free(image_bits),
+                                  sail_destroy_image(image),
+                                  sail_destroy_io(io));
+
+sail_destroy_io(io);
+
+/*
+ * Print the image meta information if any (JPEG comments etc.).
+ */
+struct sail_meta_entry_node *node = image->meta_entry_node;
+
+if (node != NULL) {
+    SAIL_LOG_DEBUG("%s: %s", node->key, node->value);
+}
+
+/*
+ * Handle the image RGB bits here.
+ * Use image->width, image->height, image->bytes_per_line,
+ * and image->pixel_format for that.
+ */
+
+free(image_bits);
+sail_destroy_image(image);
+
+/*
+ * Optional: unload all plugins to free up some memory if you plan to re-use the same context
+ * in the future.
+ */
+sail_unload_plugins(context);
+
+/*
+ * If you have no plans to re-use the same context in the future, finish working with this context
+ * and unload all loaded plugins attached to it.
+ */
+sail_finish(context);
+context = NULL;
+```
+
+#### C++:
+```C++
 ```
