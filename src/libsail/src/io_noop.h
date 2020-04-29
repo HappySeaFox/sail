@@ -19,6 +19,7 @@
 #ifndef SAIL_IO_NOOP_H
 #define SAIL_IO_NOOP_H
 
+#include <stdbool.h>
 #include <stdio.h>
 
 #ifdef SAIL_BUILD
