@@ -39,7 +39,7 @@ struct sail_io;
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_alloc_io_read_mem(const void *buffer, unsigned long buffer_length, struct sail_io **io);
+SAIL_HIDDEN sail_error_t sail_alloc_io_read_mem(const void *buffer, unsigned long buffer_length, struct sail_io **io);
 
 /*
  * Opens the specified memory buffer for writing and allocates a new I/O object for it.
@@ -47,7 +47,7 @@ SAIL_EXPORT sail_error_t sail_alloc_io_read_mem(const void *buffer, unsigned lon
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_alloc_io_write_mem(void *buffer, unsigned long buffer_length, struct sail_io **io);
+SAIL_HIDDEN sail_error_t sail_alloc_io_write_mem(void *buffer, unsigned long buffer_length, struct sail_io **io);
 
 /* extern "C" */
 #ifdef __cplusplus
