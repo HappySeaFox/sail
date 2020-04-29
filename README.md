@@ -3,6 +3,9 @@
 SAIL is a fast and lightweight cross-platform library aimed to provide lightweight as well as complex APIs
 to decode and encode images in different formats. :sailboat:
 
+SAIL is a fork of ksquirrel-libs which was a set of C++ image codecs for KSquirrel image viewer.
+See [http://ksquirrel.sourceforge.net](http://ksquirrel.sourceforge.net).
+
 Author: Dmitry Baryshev.
 
 ## Target audience
