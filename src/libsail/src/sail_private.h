@@ -35,7 +35,7 @@ struct sail_plugin_info;
 struct sail_plugin_info_node;
 struct sail_plugin;
 
-struct SAIL_HIDDEN hidden_state {
+struct hidden_state {
 
     struct sail_io *io;
     bool own_io;
