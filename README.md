@@ -12,7 +12,7 @@ Author: Dmitry Baryshev.
 
 - Game developers.
 - Image viewers.
-- Anyone who needs loading or saving images in different image formats.
+- Anyone who needs loading or saving images in different image formats and having lightweight and comprehensive API for that.
 
 ## Features overview
 
