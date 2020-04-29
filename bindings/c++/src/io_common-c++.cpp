@@ -36,7 +36,7 @@ public:
 
     void empty_sail_io();
 
-    sail_io sail_io;
+    struct sail_io sail_io;
 };
 
 void io::pimpl::empty_sail_io()
