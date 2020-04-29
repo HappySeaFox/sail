@@ -18,7 +18,7 @@ Table of Contents
 
 ## APIs overview
 
-SAIL provides 3 levels of APIs depending on your needs. Let's have a look at them.
+SAIL provides 4 levels of APIs depending on your needs. Let's have a look at them.
 
 ### 1. `junior`
 
