@@ -33,7 +33,7 @@ Author: Dmitry Baryshev.
 
 ## Image formats supported
 
-- JPEG (requires `libjpeg-turbo`)
+- JPEG (reading and writing, requires `libjpeg-turbo`)
 
 ## Supported platforms
 
