@@ -63,19 +63,21 @@ static sail_error_t io_file_seek(void *stream, long offset, int whence) {
     return 0;
 }
 
-static sail_error_t io_file_tell(void *stream, long *offset) {
+static sail_error_t io_file_tell(void *stream, unsigned long *offset) {
 
     SAIL_CHECK_STREAM_PTR(stream);
     SAIL_CHECK_PTR(offset);
 
     FILE *fptr = (FILE *)stream;
 
-    *offset = ftell(fptr);
+    long offset_local = ftell(fptr);
 
-    if (*offset < 0) {
+    if (offset_local < 0) {
         sail_print_errno("Failed to get the current I/O position: %s");
         return SAIL_IO_TELL_ERROR;
     }
+
+    *offset = offset_local;
 
     return 0;
 }

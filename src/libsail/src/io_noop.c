@@ -41,7 +41,7 @@ sail_error_t io_noop_seek(void *stream, long offset, int whence) {
     return SAIL_NOT_IMPLEMENTED;
 }
 
-sail_error_t io_noop_tell(void *stream, long *offset) {
+sail_error_t io_noop_tell(void *stream, unsigned long *offset) {
 
     (void)stream;
     (void)offset;
