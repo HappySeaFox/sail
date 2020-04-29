@@ -475,7 +475,7 @@ if (read_options->output_pixel_format != SAIL_PIXEL_FORMAT_RGB) {
 /*
  * Initialize reading with our options. The options will be deep copied.
  */
-SAIL_TRY_OR_CLEANUP(sail_start_reading_io_with_options(path,
+SAIL_TRY_OR_CLEANUP(sail_start_reading_io_with_options(io,
                                                        context,
                                                        plugin_info,
                                                        read_options,
