@@ -48,6 +48,18 @@ static sail_error_t io_file_read(void *stream, void *buf, size_t object_size, si
     return 0;
 }
 
+static sail_error_t io_file_read_noop(void *stream, void *buf, size_t object_size, size_t objects_count, size_t *read_objects_count) {
+
+    SAIL_CHECK_STREAM_PTR(stream);
+    SAIL_CHECK_BUFFER_PTR(buf);
+    SAIL_CHECK_RESULT_PTR(read_objects_count);
+
+    (void)object_size;
+    (void)objects_count;
+
+    return SAIL_NOT_IMPLEMENTED;
+}
+
 static sail_error_t io_file_seek(void *stream, long offset, int whence) {
 
     SAIL_CHECK_STREAM_PTR(stream);
@@ -92,6 +104,18 @@ static sail_error_t io_file_write(void *stream, const void *buf, size_t object_s
     return 0;
 }
 
+static sail_error_t io_file_write_noop(void *stream, const void *buf, size_t object_size, size_t objects_count, size_t *written_objects_count) {
+
+    SAIL_CHECK_STREAM_PTR(stream);
+    SAIL_CHECK_BUFFER_PTR(buf);
+    SAIL_CHECK_RESULT_PTR(written_objects_count);
+
+    (void)object_size;
+    (void)objects_count;
+
+    return SAIL_NOT_IMPLEMENTED;
+}
+
 static sail_error_t io_file_flush(void *stream) {
 
     SAIL_CHECK_STREAM_PTR(stream);
@@ -104,6 +128,13 @@ static sail_error_t io_file_flush(void *stream) {
     }
 
     return 0;
+}
+
+static sail_error_t io_file_flush_noop(void *stream) {
+
+    SAIL_CHECK_STREAM_PTR(stream);
+
+    return SAIL_NOT_IMPLEMENTED;
 }
 
 static sail_error_t io_file_close(void *stream) {
@@ -135,6 +166,7 @@ static sail_error_t io_file_eof(void *stream, bool *result) {
 static sail_error_t alloc_io_file(const char *path, const char *mode, struct sail_io **io) {
 
     SAIL_CHECK_PATH_PTR(path);
+    SAIL_CHECK_PTR(mode);
     SAIL_CHECK_IO_PTR(io);
 
     /* Try to open the file first */
@@ -157,14 +189,6 @@ static sail_error_t alloc_io_file(const char *path, const char *mode, struct sai
 
     (*io)->stream = fptr;
 
-    (*io)->read  = io_file_read;
-    (*io)->seek  = io_file_seek;
-    (*io)->tell  = io_file_tell;
-    (*io)->write = io_file_write;
-    (*io)->flush = io_file_flush;
-    (*io)->close = io_file_close;
-    (*io)->eof   = io_file_eof;
-
     return 0;
 }
 
@@ -176,12 +200,28 @@ sail_error_t sail_alloc_io_read_file(const char *path, struct sail_io **io) {
 
     SAIL_TRY(alloc_io_file(path, "rb", io));
 
+    (*io)->read  = io_file_read;
+    (*io)->seek  = io_file_seek;
+    (*io)->tell  = io_file_tell;
+    (*io)->write = io_file_write_noop;
+    (*io)->flush = io_file_flush_noop;
+    (*io)->close = io_file_close;
+    (*io)->eof   = io_file_eof;
+
     return 0;
 }
 
 sail_error_t sail_alloc_io_write_file(const char *path, struct sail_io **io) {
 
     SAIL_TRY(alloc_io_file(path, "wb", io));
+
+    (*io)->read  = io_file_read_noop;
+    (*io)->seek  = io_file_seek;
+    (*io)->tell  = io_file_tell;
+    (*io)->write = io_file_write;
+    (*io)->flush = io_file_flush;
+    (*io)->close = io_file_close;
+    (*io)->eof   = io_file_eof;
 
     return 0;
 }
