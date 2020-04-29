@@ -312,7 +312,7 @@ sail::image_reader reader(&context);
 sail::plugin_info plugin_info;
 SAIL_TRY(context.plugin_info_from_path(path, &plugin_info));
 
-// Allocate new read options and copy defaults from the read features
+// Instantiate new read options and copy defaults from the read features
 // (preferred output pixel format etc.).
 //
 sail::read_options read_options;
@@ -408,7 +408,7 @@ SAIL_TRY(sail_alloc_io(&io));
  * WARNING: If you don't call sail_stop_reading(), the close() callback is never called. Please
  *          make sure you always call sail_stop_reading().
  */
-io->stream = my_source;
+io->stream = my_data_source_pointer;
 
 /*
  * Setup reading, seeking, flushing etc. callbacks for our custom I/O source.
@@ -533,4 +533,88 @@ context = NULL;
 
 #### C++:
 ```C++
+// Initialize SAIL context and preload all plugins. Plugins are lazy-loaded when SAIL_FLAG_PRELOAD_PLUGINS
+// is not specified. You could cache the context and re-use it multiple times.
+//
+sail::context context(SAIL_FLAG_PRELOAD_PLUGINS);
+sail::image_reader reader(&context);
+
+// Find the codec info by a file extension.
+//
+sail::plugin_info plugin_info;
+SAIL_TRY(context.plugin_info_from_path(path, &plugin_info));
+
+/*
+ * Create our custom I/O source.
+ */
+sail::io io;
+
+/*
+ * Save a pointer to our data source. It will be passed back to the callback functions below.
+ * You can free the data source in the close() callback.
+ *
+ * WARNING: If you don't call reader.stop_reading(), the close() callback is never called. Please
+ *          make sure you always call reader.stop_reading().
+ */
+io.with_stream(my_data_source_pointer);
+
+/*
+ * Setup reading, seeking, flushing etc. callbacks for our custom I/O source.
+ * All of them must be set.
+ */
+io.with_read(io_my_data_source_read)
+  .with_seek(io_my_data_source_seek)
+  .with_tell(io_my_data_source_tell)
+  .with_write(io_my_data_source_write)
+  .with_flush(io_my_data_source_flush)
+  .with_close(io_my_data_source_close)
+  .with_eof(io_my_data_source_eof);
+
+// Instantiate new read options and copy defaults from the read features
+// (preferred output pixel format etc.).
+//
+sail::read_options read_options;
+SAIL_TRY(plugin_info.read_features().to_read_options(&read_options));
+
+// Let's request RGB pixels only.
+//
+if (read_options.output_pixel_format() != SAIL_PIXEL_FORMAT_RGB) {
+    const std::vector<int> output_pixel_formats = plugin_info.read_features().output_pixel_formats();
+
+    // The plugin doesn't support outputting RGB pixels.
+    //
+    if (std::find(output_pixel_formats.begin(), output_pixel_formats.end(), SAIL_PIXEL_FORMAT_RGB) == output_pixel_formats.end()) {
+        return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+    }
+
+    // Request the plugin to output RGB pixels.
+    //
+    read_options.with_output_pixel_format(SAIL_PIXEL_FORMAT_RGB);
+}
+
+// Initialize reading with our I/O stream and options.
+//
+SAIL_TRY(reader.start_reading(io, plugin_info, read_options));
+
+// Read just a single frame. It's possible to read more frames if any. Just continue
+// reading frames till read_next_frame() returns 0. If no more frames are available,
+// it returns SAIL_NO_MORE_FRAMES.
+//
+// read_next_frame() outputs pixels in the requested pixel format (RGB).
+//
+sail::image image;
+SAIL_TRY(reader.read_next_frame(&image));
+
+// Finish reading.
+//
+SAIL_TRY(reader.stop_reading());
+
+// Print the image meta information if any (JPEG comments etc.).
+//
+const std::map<std::string, std::string> meta_entries = image.meta_entries();
+
+if (!meta_entries.empty()) {
+    const std::pair<std::string, std::string> first_pair = *meta_entries.begin();
+    SAIL_LOG_DEBUG("%s: %s", first_pair.first.c_str(), first_pair.second.c_str());
+}
 ```
