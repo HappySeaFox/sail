@@ -38,6 +38,9 @@ struct sail_plugin_info;
  * Starts reading the specified image file. Pass a particular plugin info if you'd like
  * to start reading with a specific codec. If not, just pass NULL.
  *
+ * The subsequent calls to sail_read_next_frame() output pixels in RGB pixel format for image formats
+ * without transparency support and RGBA otherwise.
+ *
  * Typical usage: sail_start_reading_file() ->
  *                sail_read_next_frame()    ->
  *                sail_stop_reading().
@@ -89,6 +92,9 @@ SAIL_EXPORT sail_error_t sail_stop_reading(void *state);
 /*
  * Starts writing into the specified image file. Pass a particular plugin info if you'd like
  * to start writing with a specific codec. If not, just pass NULL.
+ *
+ * The subsequent calls to sail_write_next_frame() output pixels in pixel format as specified
+ * in sail_write_features.preferred_output_pixel_format.
  *
  * Typical usage: sail_start_writing()    ->
  *                sail_write_next_frame() ->

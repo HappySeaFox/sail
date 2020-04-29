@@ -39,6 +39,9 @@ struct sail_plugin_info;
  * Starts reading the specified I/O stream with the specified read options. If you don't need specific read options,
  * just pass NULL. Plugin-specific defaults will be used in this case. Read options are deep copied.
  *
+ * If read options is NULL, the subsequent calls to sail_read_next_frame() output pixels in RGB pixel format
+ * for image formats without transparency support and RGBA otherwise.
+ *
  * Typical usage: sail_alloc_io_read_file()            ->
  *                sail_plugin_info_from_extension()    ->
  *                sail_start_reading_io_with_options() ->
@@ -69,6 +72,9 @@ SAIL_EXPORT sail_error_t sail_start_reading_io_with_options(struct sail_io *io, 
  * Starts reading the specified image file with the specified read options. Pass a particular plugin info if you'd like
  * to start reading with a specific codec. If not, just pass NULL. If you don't need specific read options,
  * just pass NULL. Plugin-specific defaults will be used in this case. Read options are deep copied.
+ *
+ * If read options is NULL, the subsequent calls to sail_read_next_frame() output pixels in RGB pixel format
+ * for image formats without transparency support and RGBA otherwise.
  *
  * Typical usage: sail_start_reading_file_with_options() ->
  *                sail_read_next_frame()                 ->
@@ -102,6 +108,8 @@ SAIL_EXPORT sail_error_t sail_start_reading_file_with_options(const char *path, 
 /*
  * Starts reading the specified I/O stream.
  *
+ * Outputs pixels in RGB pixel format for image formats without transparency support and RGBA otherwise.
+ *
  * Typical usage: sail_alloc_io_read_file()         ->
  *                sail_plugin_info_from_extension() ->
  *                sail_start_reading_io()           ->
@@ -130,6 +138,9 @@ SAIL_EXPORT sail_error_t sail_start_reading_io(struct sail_io *io, struct sail_c
 /*
  * Starts writing the specified I/O stream with the specified write options. If you don't need specific write options,
  * just pass NULL. Plugin-specific defaults will be used in this case. Write options are deep copied.
+ *
+ * If write options is NULL, the subsequent calls to sail_write_next_frame() output pixels in pixel format
+ * as specified in sail_write_features.preferred_output_pixel_format.
  *
  * Typical usage: sail_start_writing_with_options() ->
  *                sail_write_next_frame()           ->
@@ -165,6 +176,9 @@ SAIL_EXPORT sail_error_t sail_start_writing_io_with_options(struct sail_io *io, 
  * to start writing with a specific codec. If not, just pass NULL. If you don't need specific write options,
  * just pass NULL. Plugin-specific defaults will be used in this case. Write options are deep copied.
  *
+ * If write options is NULL, the subsequent calls to sail_write_next_frame() output pixels in pixel format
+ * as specified in sail_write_features.preferred_output_pixel_format.
+ *
  * Typical usage: sail_start_writing_with_options() ->
  *                sail_write_next_frame()           ->
  *                sail_stop_writing().
@@ -196,6 +210,9 @@ SAIL_EXPORT sail_error_t sail_start_writing_file_with_options(const char *path, 
 
 /*
  * Starts writing into the specified I/O stream.
+ *
+ * The subsequent calls to sail_write_next_frame() output pixels in pixel format as specified
+ * in sail_write_features.preferred_output_pixel_format.
  *
  * Typical usage: sail_alloc_io_write_file()        ->
  *                sail_plugin_info_from_extension() ->
