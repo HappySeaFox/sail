@@ -49,17 +49,22 @@ sail_error_t sail_read_next_frame(void *state, struct sail_image **image, void *
     *image_bits = malloc((*image)->bytes_per_line * (*image)->height);
 
     if (*image_bits == NULL) {
+        sail_destroy_image(*image);
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
     for (int pass = 0; pass < (*image)->passes; pass++) {
-        SAIL_TRY(state_of_mind->plugin->v2->read_seek_next_pass_v2(state_of_mind->state, state_of_mind->io, *image));
+        SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v2->read_seek_next_pass_v2(state_of_mind->state, state_of_mind->io, *image),
+                            /* cleanup */ free(*image_bits),
+                                          sail_destroy_image(*image));
 
         for (int j = 0; j < (*image)->height; j++) {
-            SAIL_TRY(state_of_mind->plugin->v2->read_scan_line_v2(state_of_mind->state,
-                                                                    state_of_mind->io,
-                                                                    *image,
-                                                                    ((char *)*image_bits) + j * (*image)->bytes_per_line));
+            SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v2->read_scan_line_v2(state_of_mind->state,
+                                                                             state_of_mind->io,
+                                                                             *image,
+                                                                             ((char *)*image_bits) + j * (*image)->bytes_per_line),
+                                /* cleanup */ free(*image_bits),
+                                              sail_destroy_image(*image));
         }
     }
 
