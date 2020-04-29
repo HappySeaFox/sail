@@ -129,9 +129,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
      * it returns SAIL_NO_MORE_FRAMES.
      */
     SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, &image, (void **)&image_bits),
-                        /* cleanup */ sail_stop_reading(state),
-                                      free(image_bits),
-                                      sail_destroy_image(image));
+                        /* cleanup */ sail_stop_reading(state));
 
     /*
      * It's essential to ALWAYS stop reading to free memory resources.

@@ -96,9 +96,7 @@ SAIL_TRY_OR_CLEANUP(sail_start_reading_file(path, context, NULL, &state),
  * it returns SAIL_NO_MORE_FRAMES.
  */
 SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, &image, (void **)&image_bits),
-                    /* cleanup */ sail_stop_reading(state),
-                                  free(image_bits),
-                                  sail_destroy_image(image));
+                    /* cleanup */ sail_stop_reading(state));
 
 /*
  * It's essential to ALWAYS stop reading to free memory resources.
@@ -256,13 +254,14 @@ sail_destroy_read_options(read_options);
 SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state,
                                          &image,
                                          (void **)&image_bits),
-                    /* cleanup */ sail_destroy_image(image));
+                    /* cleanup */ sail_stop_reading(state));
 
 /*
  * Finish reading.
  */
 SAIL_TRY_OR_CLEANUP(sail_stop_reading(state),
-                    /* cleanup */ sail_destroy_image(image));
+                    /* cleanup */ free(image_bits),
+                                  sail_destroy_image(image));
 
 /*
  * Print the image meta information if any (JPEG comments etc.).

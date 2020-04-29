@@ -156,14 +156,17 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
         return SAIL_UNSUPPORTED_PIXEL_FORMAT;
     }
 
+    struct sail_io *io;
+    SAIL_TRY(sail_alloc_io_read_file(path.toLocal8Bit(), &io));
+
     /*
      * Initialize reading with our options. The options will be deep copied.
      */
-    SAIL_TRY_OR_CLEANUP(sail_start_reading_file_with_options(path.toLocal8Bit(),
-                                                             d->context,
-                                                             plugin_info,
-                                                             read_options,
-                                                             &state),
+    SAIL_TRY_OR_CLEANUP(sail_start_reading_io_with_options(io,
+                                                           d->context,
+                                                           plugin_info,
+                                                           read_options,
+                                                           &state),
                         /* cleanup */ sail_destroy_read_options(read_options));
 
     /*
@@ -177,20 +180,22 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state,
                                              &image,
                                              (void **)&image_bits),
-                        /* cleanup */ sail_destroy_image(image));
+                        /* cleanup */ sail_stop_reading(state));
 
     /*
      * Finish reading.
      */
     SAIL_TRY_OR_CLEANUP(sail_stop_reading(state),
-                        /* cleanup */ sail_destroy_image(image));
+                        /* cleanup */ free(image_bits),
+                                      sail_destroy_image(image));
 
     /*
      * Bytes per line is needed for QImage.
      */
     int bytes_per_line;
     SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(image, &bytes_per_line),
-                         /* cleanup */ sail_destroy_image(image));
+                         /* cleanup */ free(image_bits),
+                                       sail_destroy_image(image));
 
     SAIL_LOG_INFO("Loaded in %lld ms.", elapsed.elapsed() + beforeDialog);
 
