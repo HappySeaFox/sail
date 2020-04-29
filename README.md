@@ -28,6 +28,7 @@ Author: Dmitry Baryshev.
 
 - image editing capabilities (filtering, distortion, scaling etc.).
 - color space conversion functions.
+- EXIF rotation.
 
 ## Supported platforms
 
