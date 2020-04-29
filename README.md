@@ -16,15 +16,16 @@ Author: Dmitry Baryshev.
 
 ## Features overview
 
+- easy-to-use C and C++ interfaces.
+- 4 levels of APIs depending on your needs: `junior`, `advanced`, `deep diver`, and `technical diver`. See [EXAMPLES](EXAMPLES.md) for more.
+- I/O abstraction for technical divers.
+- Image formats are supported by dynamically loaded codecs (plugins).
+- It's guaranteed that every plugin is able to read and output to memory pixels in RGB and RGBA formats.
 - Reading and writing images in numerous plugin-specific pixel formats. For example, the JPEG plugin
   is able to read `RGB` and `YCbCr` images and output them to memory as `Grayscale` pixels and vice versa.
 - Reading images and outputting them to memory in source (raw) pixel format for those who want to kick the hell
   out of images manually. For example, one may want to work with raw `CMYK` pixels in a printing image.
   :warning: Some plugins might not support outputting source pixels.
-- easy-to-use C and C++ interfaces.
-- 4 levels of APIs depending on your needs: `junior`, `advanced`, `deep diver`, and `technical diver`. See [EXAMPLES](EXAMPLES.md) for more.
-- I/O abstraction for technical divers.
-- Image formats are supported by dynamically loaded codecs (plugins).
 - Easily extensible with new image formats for those who want to implement a specific codec for his/her needs.
 
 ## Features NOT provided
