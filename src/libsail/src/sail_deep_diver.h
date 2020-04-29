@@ -78,16 +78,6 @@ SAIL_EXPORT sail_error_t sail_start_reading_io(struct sail_io *io, struct sail_c
  *                sail_read_next_frame()               ->
  *                sail_stop_reading().
  *
- * For example:
- *
- * void *state = NULL;
- *
- * SAIL_TRY_OR_CLEANUP(sail_start_reading_io_with_options(..., &state),
- *                     sail_stop_reading(state));
- * SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, ...),
- *                     sail_stop_reading(state));
- * SAIL_TRY(sail_stop_reading(state));
- *
  * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
  * in it and destroy it in sail_stop_reading. States must be used per image. DO NOT use the same state
  * to read multiple images in the same time.
@@ -114,16 +104,6 @@ SAIL_EXPORT sail_error_t sail_start_reading_io_with_options(struct sail_io *io, 
  *                sail_start_reading_file_with_options() ->
  *                sail_read_next_frame()                 ->
  *                sail_stop_reading().
- *
- * For example:
- *
- * void *state = NULL;
- *
- * SAIL_TRY_OR_CLEANUP(sail_start_reading_file_with_options(..., &state),
- *                     sail_stop_reading(state));
- * SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, ...),
- *                     sail_stop_reading(state));
- * SAIL_TRY(sail_stop_reading(state));
  *
  * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
  * in it and destroy it in sail_stop_reading. States must be used per image. DO NOT use the same state
@@ -182,16 +162,6 @@ SAIL_EXPORT sail_error_t sail_start_writing_io(struct sail_io *io, struct sail_c
  *                sail_write_next_frame()           ->
  *                sail_stop_writing().
  *
- * For example:
- *
- * void *state = NULL;
- *
- * SAIL_TRY_OR_CLEANUP(sail_start_writing_with_options(..., &state),
- *                     sail_stop_writing(state));
- * SAIL_TRY_OR_CLEANUP(sail_write_next_frame(state, ...),
- *                     sail_stop_writing(state));
- * SAIL_TRY(sail_stop_writing(state));
- *
  * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
  * in it and destroy it in sail_stop_writing. States must be used per image. DO NOT use the same state
  * to write multiple images in the same time.
@@ -218,16 +188,6 @@ SAIL_EXPORT sail_error_t sail_start_writing_io_with_options(struct sail_io *io, 
  *                sail_start_writing_with_options() ->
  *                sail_write_next_frame()           ->
  *                sail_stop_writing().
- *
- * For example:
- *
- * void *state = NULL;
- *
- * SAIL_TRY_OR_CLEANUP(sail_start_writing_with_options(..., &state),
- *                     sail_stop_writing(state));
- * SAIL_TRY_OR_CLEANUP(sail_write_next_frame(state, ...),
- *                     sail_stop_writing(state));
- * SAIL_TRY(sail_stop_writing(state));
  *
  * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
  * in it and destroy it in sail_stop_writing. States must be used per image. DO NOT use the same state
