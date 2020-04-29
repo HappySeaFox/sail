@@ -2,6 +2,7 @@ add_library(sail
                 src/ini.c
                 src/io_file.c
                 src/io_mem.c
+                src/io_noop.c
                 src/plugin.c
                 src/plugin_info_private.c
                 src/sail.c
