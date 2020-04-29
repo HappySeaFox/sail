@@ -368,7 +368,7 @@ if (!meta_entries.empty()) {
 #### C:
 
 Instead of using `sail_start_reading_file_with_options()` in the `deep diver` example create your own I/O stream
-and call `sail_start_reading_io_with_options()`:
+and call `sail_start_reading_io_with_options()`.
 
 ```C
 struct sail_context *context = NULL;
