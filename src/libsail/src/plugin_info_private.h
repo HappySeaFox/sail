@@ -44,31 +44,31 @@ struct sail_plugin_info;
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_alloc_plugin_info(struct sail_plugin_info **plugin_info);
+SAIL_HIDDEN sail_error_t sail_alloc_plugin_info(struct sail_plugin_info **plugin_info);
 
 /*
  * Destroys the specified plugin_info and all its internal allocated memory buffers.
  * The "plugin_info" pointer MUST NOT be used after calling this function.
  */
-SAIL_EXPORT void sail_destroy_plugin_info(struct sail_plugin_info *plugin_info);
+SAIL_HIDDEN void sail_destroy_plugin_info(struct sail_plugin_info *plugin_info);
 
 /*
  * Allocates a new plugin info node. The assigned node MUST be destroyed later with sail_destroy_plugin_info_node().
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_alloc_plugin_info_node(struct sail_plugin_info_node **plugin_info_node);
+SAIL_HIDDEN sail_error_t sail_alloc_plugin_info_node(struct sail_plugin_info_node **plugin_info_node);
 
 /*
  * Destroys the specified plugin info node and all its internal allocated memory buffers.
  */
-SAIL_EXPORT void sail_destroy_plugin_info_node(struct sail_plugin_info_node *plugin_info_node);
+SAIL_HIDDEN void sail_destroy_plugin_info_node(struct sail_plugin_info_node *plugin_info_node);
 
 /*
  * Destroys the specified plugin info node and all its internal allocated memory buffers.
  * Repeats the destruction procedure recursively for the stored next pointer.
  */
-SAIL_EXPORT void sail_destroy_plugin_info_node_chain(struct sail_plugin_info_node *plugin_info_node);
+SAIL_HIDDEN void sail_destroy_plugin_info_node_chain(struct sail_plugin_info_node *plugin_info_node);
 
 /*
  * Reads SAIL plugin info from the specified file and stores the parsed information into
@@ -77,7 +77,7 @@ SAIL_EXPORT void sail_destroy_plugin_info_node_chain(struct sail_plugin_info_nod
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_read_info(const char *path, struct sail_plugin_info **plugin_info);
+SAIL_HIDDEN sail_error_t sail_plugin_read_info(const char *path, struct sail_plugin_info **plugin_info);
 
 /* extern "C" */
 #ifdef __cplusplus

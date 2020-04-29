@@ -202,11 +202,7 @@ static sail_error_t build_plugin_full_path(struct sail_context *context,
     return 0;
 }
 
-/*
- * Public functions.
- */
-
-sail_error_t sail_init(struct sail_context **context) {
+static sail_error_t sail_init_impl(struct sail_context **context, int flags) {
 
     /* Time counter. */
     uint64_t start_time;
@@ -310,7 +306,39 @@ sail_error_t sail_init(struct sail_context **context) {
     uint64_t end_time;
     SAIL_TRY(sail_now(&end_time));
 
+    if (flags & SAIL_FLAG_PRELOAD_PLUGINS) {
+        SAIL_LOG_DEBUG("Preloading plugins");
+
+        struct sail_plugin_info_node *plugin_info_node = (*context)->plugin_info_node;
+
+        while (plugin_info_node != NULL) {
+            const struct sail_plugin *plugin;
+
+            SAIL_TRY(load_plugin_by_plugin_info(*context, plugin_info_node->plugin_info, &plugin));
+
+            plugin_info_node = plugin_info_node->next;
+        }
+    }
+
     SAIL_LOG_DEBUG("Initialized in %lld ms.", (unsigned long)(end_time - start_time));
+
+    return 0;
+}
+
+/*
+ * Public functions.
+ */
+
+sail_error_t sail_init(struct sail_context **context) {
+
+    SAIL_TRY(sail_init_impl(context, 0));
+
+    return 0;
+}
+
+sail_error_t sail_init_with_flags(struct sail_context **context, int flags) {
+
+    SAIL_TRY(sail_init_impl(context, flags));
 
     return 0;
 }

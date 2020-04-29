@@ -174,10 +174,11 @@ SAIL_TRY(reader.stop_reading());
 struct sail_context *context = NULL;
 
 /*
- * Initialize SAIL context. You could cache the context and re-use it multiple times.
- * When it's not needed anymore, call sail_finish(context).
+ * Initialize SAIL context and preload all plugins. Plugins are lazy-loaded when SAIL_FLAG_PRELOAD_PLUGINS
+ * is not specified. You could cache the context and re-use it multiple times. When it's not needed anymore,
+ * call sail_finish(context).
  */
-SAIL_TRY(sail_init(&context));
+SAIL_TRY(sail_init_with_flags(&context, SAIL_FLAG_PRELOAD_PLUGINS));
 
 struct sail_read_options *read_options = NULL;
 struct sail_image *image = NULL;
@@ -297,9 +298,10 @@ context = NULL;
 
 #### C++:
 ```C++
-// Initialize SAIL context. You could cache the context as a class member and re-use it multiple times.
+// Initialize SAIL context and preload all plugins. Plugins are lazy-loaded when SAIL_FLAG_PRELOAD_PLUGINS
+// is not specified. You could cache the context and re-use it multiple times.
 //
-sail::context context;
+sail::context context(SAIL_FLAG_PRELOAD_PLUGINS);
 sail::image_reader reader(&context);
 
 // Find the codec info by a file extension.

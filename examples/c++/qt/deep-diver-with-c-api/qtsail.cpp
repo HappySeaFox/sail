@@ -81,7 +81,7 @@ QtSail::QtSail(QWidget *parent)
 
 sail_error_t QtSail::init()
 {
-    SAIL_TRY_OR_CLEANUP(sail_init(&d->context),
+    SAIL_TRY_OR_CLEANUP(sail_init_with_flags(&d->context, SAIL_FLAG_PRELOAD_PLUGINS),
                         /* cleanup */ QMessageBox::critical(this, tr("Error"), tr("Failed to init SAIL")),
                                       ::exit(1));
     return 0;

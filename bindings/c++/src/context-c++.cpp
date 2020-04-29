@@ -32,7 +32,13 @@ public:
 context::context()
     : d(new pimpl)
 {
-    init();
+    init(0);
+}
+
+context::context(int flags)
+    : d(new pimpl)
+{
+    init(flags);
 }
 
 context::~context()
@@ -124,9 +130,9 @@ sail_error_t context::plugin_info_from_mime_type(const char *mime_type, plugin_i
     return 0;
 }
 
-sail_error_t context::init()
+sail_error_t context::init(int flags)
 {
-    SAIL_TRY(sail_init(&d->context));
+    SAIL_TRY(sail_init_with_flags(&d->context, flags));
 
     return 0;
 }

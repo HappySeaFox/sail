@@ -47,6 +47,7 @@ class SAIL_EXPORT context
 
 public:
     context();
+    context(int flags);
 
     /*
      * When context gets destroyed, all plugin info objects, read and write
@@ -75,7 +76,7 @@ public:
     sail_error_t plugin_info_from_mime_type(const char *mime_type, plugin_info *splugin_info) const;
 
 private:
-    sail_error_t init();
+    sail_error_t init(int flags);
 
     sail_context* sail_context_c() const;
 

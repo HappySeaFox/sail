@@ -53,12 +53,31 @@ struct sail_plugin_info_node;
 struct sail_plugin_info;
 
 /*
- * Initializes SAIL. This is the main entry point to start working with SAIL.
+ * Flags to control SAIL behavior.
+ */
+enum SailInitFlags {
+
+    /*
+     * Preload all plugins in sail_init_with_flags(). Plugins are lazy-loaded by default.
+     */
+    SAIL_FLAG_PRELOAD_PLUGINS = 1 << 0,
+};
+
+/*
+ * Initializes SAIL with default flags. This is the main entry point to start working with SAIL.
  * Builds a list of available SAIL plugins.
  *
  * Returns 0 on success or sail_error_t on error.
  */
 SAIL_EXPORT sail_error_t sail_init(struct sail_context **context);
+
+/*
+ * Initializes SAIL with the specific flags. This is the main entry point to start working with SAIL.
+ * Builds a list of available SAIL plugins. See SailInitFlags.
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_init_with_flags(struct sail_context **context, int flags);
 
 /*
  * Finilizes working with the specified SAIL context. Frees the context and all its internal

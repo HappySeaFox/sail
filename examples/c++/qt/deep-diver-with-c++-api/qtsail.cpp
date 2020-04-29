@@ -49,6 +49,10 @@
 class Q_DECL_HIDDEN QtSail::Private
 {
 public:
+    Private()
+        : context(SAIL_FLAG_PRELOAD_PLUGINS)
+    {}
+
     QScopedPointer<Ui::QtSail> ui;
 
     QImage qimage;
