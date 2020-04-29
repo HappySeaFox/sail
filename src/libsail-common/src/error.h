@@ -104,7 +104,9 @@ do {                             \
             io->seek == NULL  || \
             io->tell == NULL  || \
             io->write == NULL || \
-            io->close == NULL) { \
+            io->flush == NULL || \
+            io->close == NULL || \
+            io->eof == NULL) {   \
         return SAIL_INVALID_IO;  \
     }                            \
 } while(0)
