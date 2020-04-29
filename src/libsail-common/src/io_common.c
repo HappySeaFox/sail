@@ -22,6 +22,28 @@
 
 #include "sail-common.h"
 
+sail_error_t sail_alloc_io(struct sail_io **io) {
+
+    SAIL_CHECK_IO_PTR(io);
+
+    *io = (struct sail_io *)malloc(sizeof(struct sail_io));
+
+    if (*io == NULL) {
+        return SAIL_MEMORY_ALLOCATION_FAILED;
+    }
+
+    (*io)->stream = NULL;
+    (*io)->read   = NULL;
+    (*io)->seek   = NULL;
+    (*io)->tell   = NULL;
+    (*io)->write  = NULL;
+    (*io)->flush  = NULL;
+    (*io)->close  = NULL;
+    (*io)->eof    = NULL;
+
+    return 0;
+}
+
 void sail_destroy_io(struct sail_io *io) {
 
     if (io == NULL) {

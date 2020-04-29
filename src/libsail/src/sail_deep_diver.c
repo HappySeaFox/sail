@@ -158,6 +158,23 @@ sail_error_t sail_start_reading_file_with_options(const char *path, struct sail_
     return 0;
 }
 
+sail_error_t sail_start_reading_mem_with_options(const void *buffer, long buffer_length, struct sail_context *context,
+                                                 const struct sail_plugin_info *plugin_info,
+                                                 const struct sail_read_options *read_options, void **state) {
+
+    SAIL_CHECK_BUFFER_PTR(buffer);
+    SAIL_CHECK_CONTEXT_PTR(context);
+    SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
+
+    struct sail_io *io;
+    SAIL_TRY(sail_alloc_io_read_mem(buffer, buffer_length, &io));
+
+    SAIL_TRY_OR_CLEANUP(sail_start_reading_io_with_options_impl(io, true, context, plugin_info, read_options, state),
+                        /* cleanup */ sail_destroy_io(io));
+
+    return 0;
+}
+
 sail_error_t sail_start_writing_io(struct sail_io *io, struct sail_context *context,
                                    const struct sail_plugin_info *plugin_info, void **state) {
 
@@ -194,6 +211,22 @@ sail_error_t sail_start_writing_file_with_options(const char *path, struct sail_
     SAIL_TRY(sail_alloc_io_write_file(path, &io));
 
     SAIL_TRY_OR_CLEANUP(sail_start_writing_io_with_options_impl(io, true, context, plugin_info_local, write_options, state),
+                        /* cleanup */ sail_destroy_io(io));
+
+    return 0;
+}
+
+sail_error_t sail_start_writing_mem_with_options(void *buffer, long buffer_length, struct sail_context *context,
+                                                 const struct sail_plugin_info *plugin_info,
+                                                 const struct sail_write_options *write_options, void **state) {
+    SAIL_CHECK_BUFFER_PTR(buffer);
+    SAIL_CHECK_CONTEXT_PTR(context);
+    SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
+
+    struct sail_io *io;
+    SAIL_TRY(sail_alloc_io_write_mem(buffer, buffer_length, &io));
+
+    SAIL_TRY_OR_CLEANUP(sail_start_writing_io_with_options_impl(io, true, context, plugin_info, write_options, state),
                         /* cleanup */ sail_destroy_io(io));
 
     return 0;

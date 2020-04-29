@@ -16,43 +16,42 @@
     along with this library. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef SAIL_SAIL_COMMON_H
-#define SAIL_SAIL_COMMON_H
-
-/* Universal libsail-common include. */
+#ifndef SAIL_IO_MEM_H
+#define SAIL_IO_MEM_H
 
 #ifdef SAIL_BUILD
-    #include "config.h"
-
-    #include "common.h"
     #include "error.h"
     #include "export.h"
-    #include "image.h"
-    #include "io_common.h"
-    #include "io_file.h"
-    #include "io_mem.h"
-    #include "log.h"
-    #include "meta_entry_node.h"
-    #include "read_features.h"
-    #include "read_options.h"
-    #include "utils.h"
-    #include "write_features.h"
-    #include "write_options.h"
 #else
-    #include <sail/config.h>
-
-    #include <sail/common.h>
     #include <sail/error.h>
     #include <sail/export.h>
-    #include <sail/image.h>
-    #include <sail/io_common.h>
-    #include <sail/log.h>
-    #include <sail/meta_entry_node.h>
-    #include <sail/read_features.h>
-    #include <sail/read_options.h>
-    #include <sail/utils.h>
-    #include <sail/write_features.h>
-    #include <sail/write_options.h>
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+struct sail_io;
+
+/*
+ * Opens the specified memory buffer for reading and allocates a new I/O object for it.
+ * The assigned I/O object MUST be destroyed later with sail_destroy_io().
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_alloc_io_read_mem(const void *buffer, long buffer_length, struct sail_io **io);
+
+/*
+ * Opens the specified memory buffer for writing and allocates a new I/O object for it.
+ * The assigned I/O object MUST be destroyed later with sail_destroy_io().
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_alloc_io_write_mem(void *buffer, long buffer_length, struct sail_io **io);
+
+/* extern "C" */
+#ifdef __cplusplus
+}
 #endif
 
 #endif

@@ -116,6 +116,28 @@ SAIL_EXPORT sail_error_t sail_start_reading_file_with_options(const char *path, 
                                                               const struct sail_read_options *read_options, void **state);
 
 /*
+ * Starts reading the specified memory buffer with the specified read options. If you don't need specific read options,
+ * just pass NULL. Plugin-specific defaults will be used in this case. Read options are deep copied.
+ *
+ * If read options is NULL, the subsequent calls to sail_read_next_frame() output pixels in RGB pixel format
+ * for image formats without transparency support and RGBA otherwise.
+ *
+ * Typical usage: sail_plugin_info_from_extension()     ->
+ *                sail_start_reading_mem_with_options() ->
+ *                sail_read_next_frame()                ->
+ *                sail_stop_reading().
+ *
+ * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
+ * in it and destroy it in sail_stop_reading. States must be used per image. DO NOT use the same state
+ * to read multiple images in the same time.
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_start_reading_mem_with_options(const void *buffer, long buffer_length, struct sail_context *context,
+                                                             const struct sail_plugin_info *plugin_info,
+                                                             const struct sail_read_options *read_options, void **state);
+
+/*
  * Starts writing into the specified I/O stream.
  *
  * The subsequent calls to sail_write_next_frame() output pixels in pixel format as specified
@@ -131,7 +153,7 @@ SAIL_EXPORT sail_error_t sail_start_reading_file_with_options(const char *path, 
  *
  * void *state = NULL;
  *
- * SAIL_TRY_OR_CLEANUP(sail_start_writing(..., &state),
+ * SAIL_TRY_OR_CLEANUP(sail_start_writing_io(..., &state),
  *                     sail_stop_writing(state));
  * SAIL_TRY_OR_CLEANUP(sail_write_next_frame(state, ...),
  *                     sail_stop_writing(state));
@@ -153,13 +175,13 @@ SAIL_EXPORT sail_error_t sail_start_writing_io(struct sail_io *io, struct sail_c
  * If write options is NULL, the subsequent calls to sail_write_next_frame() output pixels in pixel format
  * as specified in sail_write_features.preferred_output_pixel_format.
  *
- * Typical usage: sail_start_writing_with_options() ->
- *                sail_write_next_frame()           ->
+ * Typical usage: sail_start_writing_io_with_options() ->
+ *                sail_write_next_frame()              ->
  *                sail_stop_writing().
  *
- * Or:            sail_plugin_info_from_extension() ->
- *                sail_start_writing_with_options() ->
- *                sail_write_next_frame()           ->
+ * Or:            sail_plugin_info_from_extension()    ->
+ *                sail_start_writing_io_with_options() ->
+ *                sail_write_next_frame()              ->
  *                sail_stop_writing().
  *
  * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
@@ -180,13 +202,13 @@ SAIL_EXPORT sail_error_t sail_start_writing_io_with_options(struct sail_io *io, 
  * If write options is NULL, the subsequent calls to sail_write_next_frame() output pixels in pixel format
  * as specified in sail_write_features.preferred_output_pixel_format.
  *
- * Typical usage: sail_start_writing_with_options() ->
- *                sail_write_next_frame()           ->
+ * Typical usage: sail_start_writing_file_with_options() ->
+ *                sail_write_next_frame()                ->
  *                sail_stop_writing().
  *
- * Or:            sail_plugin_info_from_extension() ->
- *                sail_start_writing_with_options() ->
- *                sail_write_next_frame()           ->
+ * Or:            sail_plugin_info_from_extension()      ->
+ *                sail_start_writing_file_with_options() ->
+ *                sail_write_next_frame()                ->
  *                sail_stop_writing().
  *
  * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
@@ -198,6 +220,28 @@ SAIL_EXPORT sail_error_t sail_start_writing_io_with_options(struct sail_io *io, 
 SAIL_EXPORT sail_error_t sail_start_writing_file_with_options(const char *path, struct sail_context *context,
                                                               const struct sail_plugin_info *plugin_info,
                                                               const struct sail_write_options *write_options, void **state);
+
+/*
+ * Starts writing the specified memory buffer with the specified write options. If you don't need specific write options,
+ * just pass NULL. Plugin-specific defaults will be used in this case. Write options are deep copied.
+ *
+ * If write options is NULL, the subsequent calls to sail_write_next_frame() output pixels in pixel format
+ * as specified in sail_write_features.preferred_output_pixel_format.
+ *
+ * Typical usage: sail_plugin_info_from_extension()     ->
+ *                sail_start_writing_mem_with_options() ->
+ *                sail_write_next_frame()               ->
+ *                sail_stop_writing().
+ *
+ * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
+ * in it and destroy it in sail_stop_writing. States must be used per image. DO NOT use the same state
+ * to write multiple images in the same time.
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_start_writing_mem_with_options(void *buffer, long buffer_length, struct sail_context *context,
+                                                             const struct sail_plugin_info *plugin_info,
+                                                             const struct sail_write_options *write_options, void **state);
 
 /* extern "C" */
 #ifdef __cplusplus

@@ -19,9 +19,6 @@
 #ifndef SAIL_IO_FILE_H
 #define SAIL_IO_FILE_H
 
-#include <stdbool.h>
-#include <stdio.h>
-
 #ifdef SAIL_BUILD
     #include "error.h"
     #include "export.h"
