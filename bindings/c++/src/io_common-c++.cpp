@@ -29,8 +29,27 @@ namespace sail
 class SAIL_HIDDEN io::pimpl
 {
 public:
+    pimpl()
+    {
+        empty_sail_io();
+    }
+
+    void empty_sail_io();
+
     sail_io sail_io;
 };
+
+void io::pimpl::empty_sail_io()
+{
+    sail_io.stream = nullptr;
+    sail_io.read   = nullptr;
+    sail_io.seek   = nullptr;
+    sail_io.tell   = nullptr;
+    sail_io.write  = nullptr;
+    sail_io.flush  = nullptr;
+    sail_io.close  = nullptr;
+    sail_io.eof    = nullptr;
+}
 
 io::io()
     : d(new pimpl)
