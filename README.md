@@ -46,7 +46,7 @@ Currently SAIL supports Windows and Linux platforms.
 
 ## APIs overview
 
-SAIL provides 3 levels of APIs depending on your needs. Let's have a quick look at them.
+SAIL provides 4 levels of APIs depending on your needs. Let's have a quick look at them.
 
 ### 1. `junior` "I just want to load this damn JPEG"
 
