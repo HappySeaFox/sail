@@ -119,8 +119,12 @@ SAIL_EXPORT sail_error_t sail_alloc_io(struct sail_io **io);
 
 /*
  * Closes and destroys the specified I/O object and all its internal allocated memory buffers.
- * The I/O object MUST NOT be used anymore after calling this function. Does nothing
- * if the I/O object is NULL.
+ * The I/O object MUST NOT be used anymore after calling this function.
+ *
+ * Note for technical divers: sail_destroy_io() DOES NOT destroy the underlying I/O stream.
+ *                            It must be destroyed (if necessary) in the sail_io.close callback.
+ *
+ * Does nothing if the I/O object is NULL.
  */
 SAIL_EXPORT void sail_destroy_io(struct sail_io *io);
 
