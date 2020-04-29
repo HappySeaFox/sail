@@ -156,14 +156,24 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
         return SAIL_UNSUPPORTED_PIXEL_FORMAT;
     }
 
+    QFile file(path);
+
+    if (!file.open(QIODevice::ReadOnly)) {
+        QMessageBox::critical(this, tr("Error"), tr("Failed to open the file: %1").arg(file.errorString()));
+        return SAIL_IO_EOF;
+    }
+
+    const QByteArray buf = file.readAll();
+
     /*
      * Initialize reading with our options. The options will be deep copied.
      */
-    SAIL_TRY_OR_CLEANUP(sail_start_reading_file_with_options(path.toLocal8Bit(),
-                                                             d->context,
-                                                             plugin_info,
-                                                             read_options,
-                                                             &state),
+    SAIL_TRY_OR_CLEANUP(sail_start_reading_mem_with_options(buf,
+                                                            buf.length(),
+                                                            d->context,
+                                                            plugin_info,
+                                                            read_options,
+                                                            &state),
                         /* cleanup */ sail_destroy_read_options(read_options));
 
     /*
@@ -249,7 +259,7 @@ static int qImageFormatToSailPixelFormat(QImage::Format format) {
     }
 }
 
-sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
+sail_error_t QtSail::saveImage(const QImage &qimage, void *buffer, unsigned long buffer_length)
 {
     /*
      * WARNING: Memory cleanup on error is not implemented in this demo. Please don't forget
@@ -283,7 +293,7 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
     elapsed.start();
 
     const struct sail_plugin_info *plugin_info;
-    SAIL_TRY(sail_plugin_info_from_path(path.toLocal8Bit(), d->context, &plugin_info));
+    SAIL_TRY(sail_plugin_info_from_extension("JPEG", d->context, &plugin_info));
 
     pluginInfo(plugin_info);
 
@@ -307,7 +317,12 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
 
     // Initialize writing with our options.
     //
-    SAIL_TRY(sail_start_writing_file_with_options(path.toLocal8Bit(), d->context, plugin_info, write_options, &state));
+    SAIL_TRY(sail_start_writing_mem_with_options(buffer,
+                                                  buffer_length,
+                                                  d->context,
+                                                  plugin_info,
+                                                  write_options,
+                                                  &state));
 
     // Save some meta info...
     //
@@ -466,35 +481,24 @@ sail_error_t QtSail::onProbe()
 
 void QtSail::onSave()
 {
-    const QString path = QFileDialog::getSaveFileName(this,
-                                                      tr("Select a file"),
-                                                      QString(),
-                                                      filters().join(QStringLiteral(";;")));
-
-    if (path.isEmpty()) {
-        return;
-    }
-
     sail_error_t res;
 
-    if ((res = saveImage(path, d->qimage)) != 0) {
-        QMessageBox::critical(this, tr("Error"), tr("Failed to save '%1'. Error: %2.")
-                              .arg(path)
+    /*
+     * Allocate 10 Mb.
+     */
+    unsigned long buffer_length = 10*1024*1024;
+    char *buffer = new char [buffer_length];
+
+    if ((res = saveImage(d->qimage, buffer, buffer_length)) != 0) {
+        delete [] buffer;
+        QMessageBox::critical(this, tr("Error"), tr("Failed to save to memory buffer. Error: %1.")
                               .arg(res));
         return;
     }
 
-    if (QMessageBox::question(this, tr("Open file"), tr("%1 has been saved succesfully. Open the saved file?")
-                              .arg(QDir::toNativeSeparators(path))) == QMessageBox::Yes) {
-        if ((res = loadImage(path, &d->qimage)) == 0) {
-            onFit(d->ui->checkFit->isChecked());
-        } else {
-            QMessageBox::critical(this, tr("Error"), tr("Failed to load '%1'. Error: %2.")
-                                  .arg(path)
-                                  .arg(res));
-            return;
-        }
-    }
+    QMessageBox::information(this, tr("Success"), tr("The image has been saved into a memory buffer."));
+
+    delete [] buffer;
 }
 
 void QtSail::onFit(bool fit)

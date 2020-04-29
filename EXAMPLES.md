@@ -168,8 +168,8 @@ SAIL_TRY(reader.stop_reading());
 
 ### 3. `deep diver`
 
-**Purpose:** read a single or multiple image frames. Possibly specify a concrete plugin to use
-             (e.g. to load an image file with no extension). Possibly specify a desired pixel format to output.
+**Purpose:** read a single JPEG image from memory. Specify a concrete plugin to use.
+             Possibly specify a desired pixel format to output.
 
 #### C:
 ```C
@@ -192,10 +192,10 @@ unsigned char *image_bits = NULL;
 void *state = NULL;
 
 /*
- * Find the codec info by a file extension.
+ * Find the codec to read JPEGs.
  */
 const struct sail_plugin_info *plugin_info;
-SAIL_TRY(sail_plugin_info_from_path(path, context, &plugin_info));
+SAIL_TRY(sail_plugin_info_from_extension("JPEG", context, &plugin_info));
 
 /*
  * Allocate new read options and copy defaults from the plugin-specific read features
@@ -234,13 +234,20 @@ if (read_options->output_pixel_format != SAIL_PIXEL_FORMAT_RGB) {
 }
 
 /*
- * Initialize reading with our options. The options will be deep copied.
+ * Obtain an image data in a buffer: read it from a file etc.
  */
-SAIL_TRY_OR_CLEANUP(sail_start_reading_file_with_options(path,
-                                                         context,
-                                                         plugin_info,
-                                                         read_options,
-                                                         &state),
+void *buffer = ...
+unsigned long buffer_length = ...
+
+/*
+ * Initialize reading from memory with our options. The options will be deep copied.
+ */
+SAIL_TRY_OR_CLEANUP(sail_start_reading_mem_with_options(buffer,
+                                                        buffer_length,
+                                                        context,
+                                                        plugin_info,
+                                                        read_options,
+                                                        &state),
                     /* cleanup */ sail_destroy_read_options(read_options));
 
 /*
@@ -307,10 +314,10 @@ context = NULL;
 sail::context context(SAIL_FLAG_PRELOAD_PLUGINS);
 sail::image_reader reader(&context);
 
-// Find the codec info by a file extension.
+// Find the codec to read JPEGs.
 //
 sail::plugin_info plugin_info;
-SAIL_TRY(context.plugin_info_from_path(path, &plugin_info));
+SAIL_TRY(context.plugin_info_from_extension("JPEG", &plugin_info));
 
 // Instantiate new read options and copy defaults from the read features
 // (preferred output pixel format etc.).
@@ -334,9 +341,14 @@ if (read_options.output_pixel_format() != SAIL_PIXEL_FORMAT_RGB) {
     read_options.with_output_pixel_format(SAIL_PIXEL_FORMAT_RGB);
 }
 
-// Initialize reading with our options.
+// Obtain an image data in a buffer: read it from a file etc.
 //
-SAIL_TRY(reader.start_reading(path, plugin_info, read_options));
+void *buffer = ...
+unsigned long buffer_length = ...
+
+// Initialize reading from memory with our options. The options will be deep copied.
+//
+SAIL_TRY(reader.start_reading(buffer, buffer_length, plugin_info, read_options));
 
 // Read just a single frame. It's possible to read more frames if any. Just continue
 // reading frames till read_next_frame() returns 0. If no more frames are available,

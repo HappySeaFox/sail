@@ -150,9 +150,18 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 
     elapsed.restart();
 
+    QFile file(path);
+
+    if (!file.open(QIODevice::ReadOnly)) {
+        QMessageBox::critical(this, tr("Error"), tr("Failed to open the file: %1").arg(file.errorString()));
+        return SAIL_IO_EOF;
+    }
+
+    const QByteArray buf = file.readAll();
+
     // Initialize reading with our options.
     //
-    SAIL_TRY(reader.start_reading(path.toLocal8Bit(), plugin_info, read_options));
+    SAIL_TRY(reader.start_reading(buf, buf.length(), plugin_info, read_options));
 
     // Seek and read the next image frame in the file.
     //
@@ -219,7 +228,7 @@ static int qImageFormatToSailPixelFormat(QImage::Format format) {
     }
 }
 
-sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
+sail_error_t QtSail::saveImage(const QImage &qimage, void *buffer, unsigned long buffer_length)
 {
     sail::image_writer writer(&d->context);
 
@@ -242,7 +251,7 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
     elapsed.start();
 
     sail::plugin_info plugin_info;
-    SAIL_TRY(d->context.plugin_info_from_path(path.toLocal8Bit(), &plugin_info));
+    SAIL_TRY(d->context.plugin_info_from_extension("JPEG", &plugin_info));
     pluginInfo(plugin_info);
 
     // Allocate new write options and copy defaults from the write features
@@ -269,7 +278,7 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
 
     // Initialize writing with our options.
     //
-    SAIL_TRY(writer.start_writing(path.toLocal8Bit(), plugin_info, write_options));
+    SAIL_TRY(writer.start_writing(buffer, buffer_length, plugin_info, write_options));
 
     // Save some meta info...
     //
@@ -416,35 +425,24 @@ sail_error_t QtSail::onProbe()
 
 void QtSail::onSave()
 {
-    const QString path = QFileDialog::getSaveFileName(this,
-                                                      tr("Select a file"),
-                                                      QString(),
-                                                      filters().join(QStringLiteral(";;")));
-
-    if (path.isEmpty()) {
-        return;
-    }
-
     sail_error_t res;
 
-    if ((res = saveImage(path, d->qimage)) != 0) {
-        QMessageBox::critical(this, tr("Error"), tr("Failed to save '%1'. Error: %2.")
-                              .arg(path)
+    /*
+     * Allocate 10 Mb.
+     */
+    unsigned long buffer_length = 10*1024*1024;
+    char *buffer = new char [buffer_length];
+
+    if ((res = saveImage(d->qimage, buffer, buffer_length)) != 0) {
+        delete [] buffer;
+        QMessageBox::critical(this, tr("Error"), tr("Failed to save to memory buffer. Error: %1.")
                               .arg(res));
         return;
     }
 
-    if (QMessageBox::question(this, tr("Open file"), tr("%1 has been saved succesfully. Open the saved file?")
-                              .arg(QDir::toNativeSeparators(path))) == QMessageBox::Yes) {
-        if ((res = loadImage(path, &d->qimage)) == 0) {
-            onFit(d->ui->checkFit->isChecked());
-        } else {
-            QMessageBox::critical(this, tr("Error"), tr("Failed to load '%1'. Error: %2.")
-                                  .arg(path)
-                                  .arg(res));
-            return;
-        }
-    }
+    QMessageBox::information(this, tr("Success"), tr("The image has been saved into a memory buffer."));
+
+    delete [] buffer;
 }
 
 void QtSail::onFit(bool fit)
