@@ -19,6 +19,9 @@
 #ifndef SAIL_PLUGIN_INFO_CPP_H
 #define SAIL_PLUGIN_INFO_CPP_H
 
+#include <string>
+#include <vector>
+
 #ifdef SAIL_BUILD
     #include "error.h"
     #include "export.h"
@@ -30,9 +33,6 @@
     #include <sail/read_features-c++.h>
     #include <sail/write_features-c++.h>
 #endif
-
-#include <string>
-#include <vector>
 
 struct sail_plugin_info;
 

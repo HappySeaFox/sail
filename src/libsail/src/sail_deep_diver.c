@@ -47,7 +47,7 @@ sail_error_t sail_start_reading_file_with_options(const char *path, struct sail_
     return 0;
 }
 
-sail_error_t sail_start_reading_mem_with_options(const void *buffer, unsigned long buffer_length, struct sail_context *context,
+sail_error_t sail_start_reading_mem_with_options(const void *buffer, size_t buffer_length, struct sail_context *context,
                                                  const struct sail_plugin_info *plugin_info,
                                                  const struct sail_read_options *read_options, void **state) {
 
@@ -88,7 +88,7 @@ sail_error_t sail_start_writing_file_with_options(const char *path, struct sail_
     return 0;
 }
 
-sail_error_t sail_start_writing_mem_with_options(void *buffer, unsigned long buffer_length, struct sail_context *context,
+sail_error_t sail_start_writing_mem_with_options(void *buffer, size_t buffer_length, struct sail_context *context,
                                                  const struct sail_plugin_info *plugin_info,
                                                  const struct sail_write_options *write_options, void **state) {
     SAIL_CHECK_BUFFER_PTR(buffer);
@@ -104,7 +104,7 @@ sail_error_t sail_start_writing_mem_with_options(void *buffer, unsigned long buf
     return 0;
 }
 
-sail_error_t sail_stop_writing_with_written(void *state, unsigned long *written) {
+sail_error_t sail_stop_writing_with_written(void *state, size_t *written) {
 
     SAIL_TRY(stop_writing(state, written));
 

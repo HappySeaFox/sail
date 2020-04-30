@@ -27,8 +27,8 @@
 #include "sail.h"
 
 struct mem_io_buffer_info {
-    unsigned long buffer_length;
-    unsigned long pos;
+    size_t buffer_length;
+    size_t pos;
 };
 
 struct mem_io_read_stream {
@@ -64,7 +64,7 @@ static sail_error_t io_mem_read(void *stream, void *buf, size_t object_size, siz
         memcpy(buf, (char *)mem_io_read_stream->buffer + mem_io_buffer_info->pos, object_size);
 
         buf = (char *)buf + object_size;
-        mem_io_buffer_info->pos += (unsigned long)object_size;
+        mem_io_buffer_info->pos += object_size;
 
         (*read_objects_count)++;
         objects_count--;
@@ -86,7 +86,7 @@ static sail_error_t io_mem_seek(void *stream, long offset, int whence) {
                 mem_io_buffer_info->pos = 0;
             }
             /* Cannot seek past buffer. Seek to the EOF. */
-            else if ((unsigned long)offset > mem_io_buffer_info->buffer_length) {
+            else if ((size_t)offset > mem_io_buffer_info->buffer_length) {
                 mem_io_buffer_info->pos = mem_io_buffer_info->buffer_length;
             } else {
                 mem_io_buffer_info->pos = offset;
@@ -96,7 +96,7 @@ static sail_error_t io_mem_seek(void *stream, long offset, int whence) {
 
         case SEEK_CUR: {
             /* Cannot seek to -2. Seek to the beginning. */
-            if (offset < 0 && (unsigned long)(-offset) > mem_io_buffer_info->pos) {
+            if (offset < 0 && (size_t)(-offset) > mem_io_buffer_info->pos) {
                 mem_io_buffer_info->pos = 0;
             }
             /* Cannot seek past buffer. Seek to the EOF. */
@@ -114,7 +114,7 @@ static sail_error_t io_mem_seek(void *stream, long offset, int whence) {
                 mem_io_buffer_info->pos = mem_io_buffer_info->buffer_length;
             }
             /* Cannot seek to -2. Seek to the beginning. */
-            else if (offset < 0 && (unsigned long)(-offset) > mem_io_buffer_info->buffer_length) {
+            else if (offset < 0 && (size_t)(-offset) > mem_io_buffer_info->buffer_length) {
                 mem_io_buffer_info->pos = 0;
             } else {
                 mem_io_buffer_info->pos = mem_io_buffer_info->buffer_length + offset;
@@ -126,7 +126,7 @@ static sail_error_t io_mem_seek(void *stream, long offset, int whence) {
     return 0;
 }
 
-static sail_error_t io_mem_tell(void *stream, unsigned long *offset) {
+static sail_error_t io_mem_tell(void *stream, size_t *offset) {
 
     SAIL_CHECK_STREAM_PTR(stream);
     SAIL_CHECK_PTR(offset);
@@ -157,7 +157,7 @@ static sail_error_t io_mem_write(void *stream, const void *buf, size_t object_si
         memcpy((char *)mem_io_write_stream->buffer + mem_io_buffer_info->pos, buf, object_size);
 
         buf = (char *)buf + object_size;
-        mem_io_buffer_info->pos += (unsigned long)object_size;
+        mem_io_buffer_info->pos += object_size;
 
         (*written_objects_count)++;
         objects_count--;
@@ -196,7 +196,7 @@ static sail_error_t io_mem_eof(void *stream, bool *result) {
  * Public functions.
  */
 
-sail_error_t alloc_io_read_mem(const void *buffer, unsigned long buffer_length, struct sail_io **io) {
+sail_error_t alloc_io_read_mem(const void *buffer, size_t buffer_length, struct sail_io **io) {
 
     SAIL_CHECK_BUFFER_PTR(buffer);
     SAIL_CHECK_IO_PTR(io);
@@ -226,7 +226,7 @@ sail_error_t alloc_io_read_mem(const void *buffer, unsigned long buffer_length, 
     return 0;
 }
 
-sail_error_t alloc_io_write_mem(void *buffer, unsigned long buffer_length, struct sail_io **io) {
+sail_error_t alloc_io_write_mem(void *buffer, size_t buffer_length, struct sail_io **io) {
 
     SAIL_CHECK_BUFFER_PTR(buffer);
     SAIL_CHECK_IO_PTR(io);

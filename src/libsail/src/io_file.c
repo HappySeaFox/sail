@@ -63,7 +63,7 @@ static sail_error_t io_file_seek(void *stream, long offset, int whence) {
     return 0;
 }
 
-static sail_error_t io_file_tell(void *stream, unsigned long *offset) {
+static sail_error_t io_file_tell(void *stream, size_t *offset) {
 
     SAIL_CHECK_STREAM_PTR(stream);
     SAIL_CHECK_PTR(offset);

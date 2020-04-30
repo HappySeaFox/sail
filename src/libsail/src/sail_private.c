@@ -94,7 +94,7 @@ void destroy_hidden_state(struct hidden_state *state) {
     free(state);
 }
 
-sail_error_t stop_writing(void *state, unsigned long *written) {
+sail_error_t stop_writing(void *state, size_t *written) {
 
     if (written != NULL) {
         *written = 0;

@@ -20,6 +20,7 @@
 #define SAIL_SAIL_PRIVATE_H
 
 #include <stdbool.h>
+#include <stddef.h>
 
 #ifdef SAIL_BUILD
     #include "error.h"
@@ -55,6 +56,6 @@ SAIL_HIDDEN sail_error_t load_plugin_by_plugin_info(struct sail_context *context
 
 SAIL_HIDDEN void destroy_hidden_state(struct hidden_state *state);
 
-SAIL_HIDDEN sail_error_t stop_writing(void *state, unsigned long *written);
+SAIL_HIDDEN sail_error_t stop_writing(void *state, size_t *written);
 
 #endif

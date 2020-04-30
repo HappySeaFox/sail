@@ -194,7 +194,7 @@ sail_error_t image_reader::start_reading(const char *path, const plugin_info &sp
     return 0;
 }
 
-sail_error_t image_reader::start_reading(const void *buffer, unsigned long buffer_length, const plugin_info &splugin_info)
+sail_error_t image_reader::start_reading(const void *buffer, size_t buffer_length, const plugin_info &splugin_info)
 {
     SAIL_CHECK_BUFFER_PTR(buffer);
 
@@ -208,7 +208,7 @@ sail_error_t image_reader::start_reading(const void *buffer, unsigned long buffe
     return 0;
 }
 
-sail_error_t image_reader::start_reading(const void *buffer, unsigned long buffer_length, const plugin_info &splugin_info, const read_options &sread_options)
+sail_error_t image_reader::start_reading(const void *buffer, size_t buffer_length, const plugin_info &splugin_info, const read_options &sread_options)
 {
     SAIL_CHECK_BUFFER_PTR(buffer);
 

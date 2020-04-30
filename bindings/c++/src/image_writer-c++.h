@@ -19,6 +19,9 @@
 #ifndef SAIL_IMAGE_WRITER_CPP_H
 #define SAIL_IMAGE_WRITER_CPP_H
 
+#include <cstddef>
+#include <string>
+
 #ifdef SAIL_BUILD
     #include "error.h"
     #include "export.h"
@@ -26,8 +29,6 @@
     #include <sail/error.h>
     #include <sail/export.h>
 #endif
-
-#include <string>
 
 namespace sail
 {
@@ -83,8 +84,8 @@ public:
     /*
      * An interface to sail_start_writing_mem(). See sail_start_writing_mem() for more.
      */
-    sail_error_t start_writing(void *buffer, unsigned long buffer_length, const plugin_info &splugin_info);
-    sail_error_t start_writing(void *buffer, unsigned long buffer_length, const plugin_info &splugin_info, const write_options &swrite_options);
+    sail_error_t start_writing(void *buffer, size_t buffer_length, const plugin_info &splugin_info);
+    sail_error_t start_writing(void *buffer, size_t buffer_length, const plugin_info &splugin_info, const write_options &swrite_options);
 
     /*
      * An interface to sail_start_writing_io(). See sail_start_writing_io() for more.
@@ -105,7 +106,7 @@ public:
     /*
      * An interface to sail_stop_writing_with_written(). See sail_stop_writing_with_written() for more.
      */
-    sail_error_t stop_writing(unsigned long *written);
+    sail_error_t stop_writing(size_t *written);
 
 private:
     class pimpl;

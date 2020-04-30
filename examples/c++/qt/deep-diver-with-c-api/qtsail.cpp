@@ -259,8 +259,8 @@ static int qImageFormatToSailPixelFormat(QImage::Format format) {
     }
 }
 
-sail_error_t QtSail::saveImage(const QImage &qimage, void *buffer, unsigned long buffer_length,
-                               unsigned long *written)
+sail_error_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffer_length,
+                               size_t *written)
 {
     /*
      * WARNING: Memory cleanup on error is not implemented in this demo. Please don't forget
@@ -487,10 +487,10 @@ void QtSail::onSave()
     /*
      * Allocate 10 Mb.
      */
-    unsigned long buffer_length = 10*1024*1024;
+    size_t buffer_length = 10*1024*1024;
     char *buffer = new char [buffer_length];
 
-    unsigned long written;
+    size_t written;
 
     if ((res = saveImage(d->qimage, buffer, buffer_length, &written)) != 0) {
         delete [] buffer;

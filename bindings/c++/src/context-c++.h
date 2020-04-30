@@ -19,6 +19,9 @@
 #ifndef SAIL_CONTEXT_CPP_H
 #define SAIL_CONTEXT_CPP_H
 
+#include <string>
+#include <vector>
+
 #ifdef SAIL_BUILD
     #include "error.h"
     #include "export.h"
@@ -26,9 +29,6 @@
     #include <sail/error.h>
     #include <sail/export.h>
 #endif
-
-#include <string>
-#include <vector>
 
 struct sail_context;
 

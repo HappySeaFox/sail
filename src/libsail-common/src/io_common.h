@@ -20,7 +20,7 @@
 #define SAIL_IO_COMMON_H
 
 #include <stdbool.h>
-#include <stdio.h>
+#include <stddef.h>
 
 #ifdef SAIL_BUILD
     #include "error.h"
@@ -36,7 +36,7 @@ extern "C" {
 
 typedef sail_error_t (*sail_io_read_t)(void *stream, void *buf, size_t object_size, size_t objects_count, size_t *read_objects_count);
 typedef sail_error_t (*sail_io_seek_t)(void *stream, long offset, int whence);
-typedef sail_error_t (*sail_io_tell_t)(void *stream, unsigned long *offset);
+typedef sail_error_t (*sail_io_tell_t)(void *stream, size_t *offset);
 typedef sail_error_t (*sail_io_write_t)(void *stream, const void *buf, size_t object_size, size_t objects_count, size_t *written_objects_count);
 typedef sail_error_t (*sail_io_flush_t)(void *stream);
 typedef sail_error_t (*sail_io_close_t)(void *stream);

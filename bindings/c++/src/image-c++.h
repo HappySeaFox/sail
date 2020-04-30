@@ -19,6 +19,10 @@
 #ifndef SAIL_IMAGE_CPP_H
 #define SAIL_IMAGE_CPP_H
 
+#include <map>
+#include <string>
+#include <vector>
+
 #ifdef SAIL_BUILD
     #include "error.h"
     #include "export.h"
@@ -26,10 +30,6 @@
     #include <sail/error.h>
     #include <sail/export.h>
 #endif
-
-#include <map>
-#include <string>
-#include <vector>
 
 struct sail_image;
 

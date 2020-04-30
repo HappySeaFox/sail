@@ -19,6 +19,8 @@
 #ifndef SAIL_JPEG_IO_DEST_H
 #define SAIL_JPEG_IO_DEST_H
 
+#include <stdio.h>
+
 #include <jpeglib.h>
 
 #include "export.h"

@@ -19,6 +19,8 @@
 #ifndef SAIL_WRITE_OPTIONS_CPP_H
 #define SAIL_WRITE_OPTIONS_CPP_H
 
+#include <vector>
+
 #ifdef SAIL_BUILD
     #include "error.h"
     #include "export.h"
@@ -26,8 +28,6 @@
     #include <sail/error.h>
     #include <sail/export.h>
 #endif
-
-#include <vector>
 
 struct sail_write_options;
 
