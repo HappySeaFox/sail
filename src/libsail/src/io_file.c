@@ -168,7 +168,7 @@ static sail_error_t alloc_io_file(const char *path, const char *mode, struct sai
  * Public functions.
  */
 
-sail_error_t sail_alloc_io_read_file(const char *path, struct sail_io **io) {
+sail_error_t alloc_io_read_file(const char *path, struct sail_io **io) {
 
     SAIL_TRY(alloc_io_file(path, "rb", io));
 
@@ -183,7 +183,7 @@ sail_error_t sail_alloc_io_read_file(const char *path, struct sail_io **io) {
     return 0;
 }
 
-sail_error_t sail_alloc_io_write_file(const char *path, struct sail_io **io) {
+sail_error_t alloc_io_write_file(const char *path, struct sail_io **io) {
 
     SAIL_TRY(alloc_io_file(path, "wb", io));
 

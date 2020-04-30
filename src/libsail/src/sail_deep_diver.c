@@ -150,7 +150,7 @@ sail_error_t sail_start_reading_file_with_options(const char *path, struct sail_
     }
 
     struct sail_io *io;
-    SAIL_TRY(sail_alloc_io_read_file(path, &io));
+    SAIL_TRY(alloc_io_read_file(path, &io));
 
     SAIL_TRY_OR_CLEANUP(sail_start_reading_io_with_options_impl(io, true, context, plugin_info_local, read_options, state),
                         /* cleanup */ sail_destroy_io(io));
@@ -167,7 +167,7 @@ sail_error_t sail_start_reading_mem_with_options(const void *buffer, unsigned lo
     SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
 
     struct sail_io *io;
-    SAIL_TRY(sail_alloc_io_read_mem(buffer, buffer_length, &io));
+    SAIL_TRY(alloc_io_read_mem(buffer, buffer_length, &io));
 
     SAIL_TRY_OR_CLEANUP(sail_start_reading_io_with_options_impl(io, true, context, plugin_info, read_options, state),
                         /* cleanup */ sail_destroy_io(io));
@@ -208,7 +208,7 @@ sail_error_t sail_start_writing_file_with_options(const char *path, struct sail_
     }
 
     struct sail_io *io;
-    SAIL_TRY(sail_alloc_io_write_file(path, &io));
+    SAIL_TRY(alloc_io_write_file(path, &io));
 
     SAIL_TRY_OR_CLEANUP(sail_start_writing_io_with_options_impl(io, true, context, plugin_info_local, write_options, state),
                         /* cleanup */ sail_destroy_io(io));
@@ -224,7 +224,7 @@ sail_error_t sail_start_writing_mem_with_options(void *buffer, unsigned long buf
     SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
 
     struct sail_io *io;
-    SAIL_TRY(sail_alloc_io_write_mem(buffer, buffer_length, &io));
+    SAIL_TRY(alloc_io_write_mem(buffer, buffer_length, &io));
 
     SAIL_TRY_OR_CLEANUP(sail_start_writing_io_with_options_impl(io, true, context, plugin_info, write_options, state),
                         /* cleanup */ sail_destroy_io(io));

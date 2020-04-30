@@ -31,7 +31,7 @@
 #include "sail-common.h"
 #include "sail.h"
 
-int sail_alloc_plugin(const struct sail_plugin_info *plugin_info, struct sail_plugin **plugin) {
+sail_error_t alloc_plugin(const struct sail_plugin_info *plugin_info, struct sail_plugin **plugin) {
 
     SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
     SAIL_CHECK_PATH_PTR(plugin_info->path);
@@ -53,7 +53,7 @@ int sail_alloc_plugin(const struct sail_plugin_info *plugin_info, struct sail_pl
 
     if (handle == NULL) {
         SAIL_LOG_ERROR("Failed to load '%s'. Error: %d", plugin_info->path, GetLastError());
-        sail_destroy_plugin(*plugin);
+        destroy_plugin(*plugin);
         return SAIL_PLUGIN_LOAD_ERROR;
     }
 
@@ -63,7 +63,7 @@ int sail_alloc_plugin(const struct sail_plugin_info *plugin_info, struct sail_pl
 
     if (handle == NULL) {
         SAIL_LOG_ERROR("Failed to load '%s': %s", plugin_info->path, dlerror());
-        sail_destroy_plugin(*plugin);
+        destroy_plugin(*plugin);
         return SAIL_PLUGIN_LOAD_ERROR;
     }
 
@@ -86,7 +86,7 @@ int sail_alloc_plugin(const struct sail_plugin_info *plugin_info, struct sail_pl
                                                                  \
         if (target == NULL) {                                    \
             SAIL_RESOLVE_LOG_ERROR(symbol);                      \
-            sail_destroy_plugin(*plugin);                        \
+            destroy_plugin(*plugin);                             \
             return SAIL_PLUGIN_SYMBOL_RESOLVE_FAILED;            \
         }                                                        \
     }                                                            \
@@ -114,7 +114,7 @@ int sail_alloc_plugin(const struct sail_plugin_info *plugin_info, struct sail_pl
     return 0;
 }
 
-void sail_destroy_plugin(struct sail_plugin *plugin) {
+void destroy_plugin(struct sail_plugin *plugin) {
 
     if (plugin == NULL) {
         return;

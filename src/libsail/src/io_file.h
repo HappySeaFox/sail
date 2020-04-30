@@ -27,10 +27,6 @@
     #include <sail/export.h>
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 struct sail_io;
 
 /*
@@ -39,7 +35,7 @@ struct sail_io;
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_HIDDEN sail_error_t sail_alloc_io_read_file(const char *path, struct sail_io **io);
+SAIL_HIDDEN sail_error_t alloc_io_read_file(const char *path, struct sail_io **io);
 
 /*
  * Opens the specified image file for writing and allocates a new I/O object for it.
@@ -47,11 +43,6 @@ SAIL_HIDDEN sail_error_t sail_alloc_io_read_file(const char *path, struct sail_i
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_HIDDEN sail_error_t sail_alloc_io_write_file(const char *path, struct sail_io **io);
-
-/* extern "C" */
-#ifdef __cplusplus
-}
-#endif
+SAIL_HIDDEN sail_error_t alloc_io_write_file(const char *path, struct sail_io **io);
 
 #endif

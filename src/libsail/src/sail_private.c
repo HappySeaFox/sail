@@ -35,7 +35,7 @@ sail_error_t load_plugin(struct sail_plugin_info_node *node) {
     struct sail_plugin *plugin;
 
     /* Plugin is not loaded. Let's load it. */
-    SAIL_TRY(sail_alloc_plugin(node->plugin_info, &plugin));
+    SAIL_TRY(alloc_plugin(node->plugin_info, &plugin));
 
     node->plugin = plugin;
 

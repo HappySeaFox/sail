@@ -196,7 +196,7 @@ static sail_error_t io_mem_eof(void *stream, bool *result) {
  * Public functions.
  */
 
-sail_error_t sail_alloc_io_read_mem(const void *buffer, unsigned long buffer_length, struct sail_io **io) {
+sail_error_t alloc_io_read_mem(const void *buffer, unsigned long buffer_length, struct sail_io **io) {
 
     SAIL_CHECK_BUFFER_PTR(buffer);
     SAIL_CHECK_IO_PTR(io);
@@ -226,7 +226,7 @@ sail_error_t sail_alloc_io_read_mem(const void *buffer, unsigned long buffer_len
     return 0;
 }
 
-sail_error_t sail_alloc_io_write_mem(void *buffer, unsigned long buffer_length, struct sail_io **io) {
+sail_error_t alloc_io_write_mem(void *buffer, unsigned long buffer_length, struct sail_io **io) {
 
     SAIL_CHECK_BUFFER_PTR(buffer);
     SAIL_CHECK_IO_PTR(io);

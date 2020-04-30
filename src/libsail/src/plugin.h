@@ -27,10 +27,6 @@
     #include <sail/export.h>
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /*
  * Currently supported plugin layout version.
  */
@@ -97,17 +93,12 @@ typedef struct sail_plugin sail_plugin_t;
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_alloc_plugin(const struct sail_plugin_info *plugin_info, struct sail_plugin **plugin);
+SAIL_HIDDEN sail_error_t alloc_plugin(const struct sail_plugin_info *plugin_info, struct sail_plugin **plugin);
 
 /*
  * Destroys the specified plugin and all its internal memory buffers. The plugin MUST NOT be used anymore
  * after calling this function. Does nothing if the plugin is NULL.
  */
-SAIL_EXPORT void sail_destroy_plugin(struct sail_plugin *plugin);
-
-/* extern "C" */
-#ifdef __cplusplus
-}
-#endif
+SAIL_HIDDEN void destroy_plugin(struct sail_plugin *plugin);
 
 #endif

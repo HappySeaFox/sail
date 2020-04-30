@@ -178,12 +178,12 @@ static sail_error_t build_plugin_full_path(struct sail_context *context,
 
     /* Parse plugin info. */
     struct sail_plugin_info_node *plugin_info_node;
-    SAIL_TRY_OR_CLEANUP(sail_alloc_plugin_info_node(&plugin_info_node),
+    SAIL_TRY_OR_CLEANUP(alloc_plugin_info_node(&plugin_info_node),
                         free(plugin_full_path));
 
     struct sail_plugin_info *plugin_info;
-    SAIL_TRY_OR_CLEANUP(sail_plugin_read_info(plugin_info_full_path, &plugin_info),
-                        sail_destroy_plugin_info_node(plugin_info_node),
+    SAIL_TRY_OR_CLEANUP(plugin_read_info(plugin_info_full_path, &plugin_info),
+                        destroy_plugin_info_node(plugin_info_node),
                         free(plugin_full_path));
 
     /* Save the parsed plugin info into the SAIL context. */
@@ -351,7 +351,7 @@ void sail_finish(struct sail_context *context) {
         return;
     }
 
-    sail_destroy_plugin_info_node_chain(context->plugin_info_node);
+    destroy_plugin_info_node_chain(context->plugin_info_node);
 
     free(context);
 }
@@ -457,7 +457,7 @@ sail_error_t sail_unload_plugins(struct sail_context *context) {
 
     while (node != NULL) {
         if (node->plugin != NULL) {
-            sail_destroy_plugin(node->plugin);
+            destroy_plugin(node->plugin);
             counter++;
         }
 

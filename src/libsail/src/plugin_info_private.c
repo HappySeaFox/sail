@@ -302,89 +302,6 @@ static int inih_handler(void *data, const char *section, const char *name, const
     return 1;
 }
 
-/*
- * Public functions.
- */
-
-int sail_alloc_plugin_info(struct sail_plugin_info **plugin_info) {
-
-    *plugin_info = (struct sail_plugin_info *)malloc(sizeof(struct sail_plugin_info));
-
-    if (*plugin_info == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
-
-    (*plugin_info)->path            = NULL;
-    (*plugin_info)->layout          = 0;
-    (*plugin_info)->version         = NULL;
-    (*plugin_info)->name            = NULL;
-    (*plugin_info)->description     = NULL;
-    (*plugin_info)->extension_node  = NULL;
-    (*plugin_info)->mime_type_node  = NULL;
-    (*plugin_info)->read_features   = NULL;
-    (*plugin_info)->write_features  = NULL;
-
-    return 0;
-}
-
-void sail_destroy_plugin_info(struct sail_plugin_info *plugin_info) {
-
-    if (plugin_info == NULL) {
-        return;
-    }
-
-    free(plugin_info->path);
-    free(plugin_info->version);
-    free(plugin_info->name);
-    free(plugin_info->description);
-
-    destroy_string_node_chain(plugin_info->extension_node);
-    destroy_string_node_chain(plugin_info->mime_type_node);
-
-    sail_destroy_read_features(plugin_info->read_features);
-    sail_destroy_write_features(plugin_info->write_features);
-
-    free(plugin_info);
-}
-
-sail_error_t sail_alloc_plugin_info_node(struct sail_plugin_info_node **plugin_info_node) {
-
-    *plugin_info_node = (struct sail_plugin_info_node *)malloc(sizeof(struct sail_plugin_info_node));
-
-    if (*plugin_info_node == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
-
-    (*plugin_info_node)->plugin_info = NULL;
-    (*plugin_info_node)->plugin      = NULL;
-    (*plugin_info_node)->next        = NULL;
-
-    return 0;
-}
-
-void sail_destroy_plugin_info_node(struct sail_plugin_info_node *plugin_info_node) {
-
-    if (plugin_info_node == NULL) {
-        return;
-    }
-
-    sail_destroy_plugin_info(plugin_info_node->plugin_info);
-    sail_destroy_plugin(plugin_info_node->plugin);
-
-    free(plugin_info_node);
-}
-
-void sail_destroy_plugin_info_node_chain(struct sail_plugin_info_node *plugin_info_node) {
-
-    while (plugin_info_node != NULL) {
-        struct sail_plugin_info_node *plugin_info_node_next = plugin_info_node->next;
-
-        sail_destroy_plugin_info_node(plugin_info_node);
-
-        plugin_info_node = plugin_info_node_next;
-    }
-}
-
 static sail_error_t check_plugin_info(const char *path, const struct sail_plugin_info *plugin_info) {
 
     const struct sail_read_features *read_features = plugin_info->read_features;
@@ -429,16 +346,99 @@ static sail_error_t check_plugin_info(const char *path, const struct sail_plugin
     return 0;
 }
 
-int sail_plugin_read_info(const char *path, struct sail_plugin_info **plugin_info) {
+/*
+ * Public functions.
+ */
+
+int sail_alloc_plugin_info(struct sail_plugin_info **plugin_info) {
+
+    *plugin_info = (struct sail_plugin_info *)malloc(sizeof(struct sail_plugin_info));
+
+    if (*plugin_info == NULL) {
+        return SAIL_MEMORY_ALLOCATION_FAILED;
+    }
+
+    (*plugin_info)->path            = NULL;
+    (*plugin_info)->layout          = 0;
+    (*plugin_info)->version         = NULL;
+    (*plugin_info)->name            = NULL;
+    (*plugin_info)->description     = NULL;
+    (*plugin_info)->extension_node  = NULL;
+    (*plugin_info)->mime_type_node  = NULL;
+    (*plugin_info)->read_features   = NULL;
+    (*plugin_info)->write_features  = NULL;
+
+    return 0;
+}
+
+void destroy_plugin_info(struct sail_plugin_info *plugin_info) {
+
+    if (plugin_info == NULL) {
+        return;
+    }
+
+    free(plugin_info->path);
+    free(plugin_info->version);
+    free(plugin_info->name);
+    free(plugin_info->description);
+
+    destroy_string_node_chain(plugin_info->extension_node);
+    destroy_string_node_chain(plugin_info->mime_type_node);
+
+    sail_destroy_read_features(plugin_info->read_features);
+    sail_destroy_write_features(plugin_info->write_features);
+
+    free(plugin_info);
+}
+
+sail_error_t alloc_plugin_info_node(struct sail_plugin_info_node **plugin_info_node) {
+
+    *plugin_info_node = (struct sail_plugin_info_node *)malloc(sizeof(struct sail_plugin_info_node));
+
+    if (*plugin_info_node == NULL) {
+        return SAIL_MEMORY_ALLOCATION_FAILED;
+    }
+
+    (*plugin_info_node)->plugin_info = NULL;
+    (*plugin_info_node)->plugin      = NULL;
+    (*plugin_info_node)->next        = NULL;
+
+    return 0;
+}
+
+void destroy_plugin_info_node(struct sail_plugin_info_node *plugin_info_node) {
+
+    if (plugin_info_node == NULL) {
+        return;
+    }
+
+    destroy_plugin_info(plugin_info_node->plugin_info);
+    destroy_plugin(plugin_info_node->plugin);
+
+    free(plugin_info_node);
+}
+
+void destroy_plugin_info_node_chain(struct sail_plugin_info_node *plugin_info_node) {
+
+    while (plugin_info_node != NULL) {
+        struct sail_plugin_info_node *plugin_info_node_next = plugin_info_node->next;
+
+        destroy_plugin_info_node(plugin_info_node);
+
+        plugin_info_node = plugin_info_node_next;
+    }
+}
+
+sail_error_t plugin_read_info(const char *path, struct sail_plugin_info **plugin_info) {
 
     SAIL_CHECK_PATH_PTR(path);
     SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
 
     SAIL_TRY(sail_alloc_plugin_info(plugin_info));
     SAIL_TRY_OR_CLEANUP(sail_alloc_read_features(&(*plugin_info)->read_features),
-                        sail_destroy_plugin_info(*plugin_info));
+                        destroy_plugin_info(*plugin_info));
     SAIL_TRY_OR_CLEANUP(sail_alloc_write_features(&(*plugin_info)->write_features),
-                        sail_destroy_plugin_info(*plugin_info));
+                        destroy_plugin_info(*plugin_info));
 
     /*
      * Returns:
@@ -451,13 +451,13 @@ int sail_plugin_read_info(const char *path, struct sail_plugin_info **plugin_inf
 
     if ((*plugin_info)->layout != SAIL_PLUGIN_LAYOUT_V2) {
         SAIL_LOG_ERROR("Unsupported plugin layout version %d in '%s'", (*plugin_info)->layout, path);
-        sail_destroy_plugin_info(*plugin_info);
+        destroy_plugin_info(*plugin_info);
         return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
     }
 
     /* Paranoid error checks. */
     SAIL_TRY_OR_CLEANUP(check_plugin_info(path, *plugin_info),
-                        /* cleanup */ sail_destroy_plugin_info(*plugin_info));
+                        /* cleanup */ destroy_plugin_info(*plugin_info));
 
     /* Success. */
     if (code == 0) {
@@ -465,7 +465,7 @@ int sail_plugin_read_info(const char *path, struct sail_plugin_info **plugin_inf
     }
 
     /* Error. */
-    sail_destroy_plugin_info(*plugin_info);
+    destroy_plugin_info(*plugin_info);
 
     switch (code) {
         case -1: return SAIL_FILE_OPEN_ERROR;

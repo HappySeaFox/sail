@@ -41,7 +41,7 @@ sail_error_t sail_probe(const char *path, struct sail_context *context, struct s
     }
 
     struct sail_io *io;
-    SAIL_TRY(sail_alloc_io_read_file(path, &io));
+    SAIL_TRY(alloc_io_read_file(path, &io));
 
     struct sail_read_options *read_options_local = NULL;
     void *state = NULL;
