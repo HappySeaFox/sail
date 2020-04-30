@@ -31,6 +31,8 @@
 #include <string>
 #include <vector>
 
+struct sail_image;
+
 namespace sail
 {
 
