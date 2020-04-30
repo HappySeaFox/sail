@@ -32,18 +32,21 @@
     #include "plugin.h"
     #include "plugin_info.h"
     #include "plugin_info_private.h"
-    #include "sail_private.h"
-    #include "sail_junior.h"
     #include "sail_advanced.h"
     #include "sail_deep_diver.h"
+    #include "sail_junior.h"
+    #include "sail_private.h"
+    #include "sail_technical_diver.h"
+    #include "sail_technical_diver_private.h"
     #include "string_node.h"
 #else
     #include <sail/sail-common.h>
 
-    #include <sail/sail_junior.h>
+    #include <sail/plugin_info.h>
     #include <sail/sail_advanced.h>
     #include <sail/sail_deep_diver.h>
-    #include <sail/plugin_info.h>
+    #include <sail/sail_junior.h>
+    #include <sail/sail_technical_diver.h>
     #include <sail/string_node.h>
 #endif
 

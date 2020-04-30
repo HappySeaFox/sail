@@ -34,59 +34,8 @@ extern "C" {
 struct sail_context;
 struct sail_io;
 struct sail_plugin_info;
-
-/*
- * Starts reading the specified I/O stream.
- *
- * Outputs pixels in RGB pixel format for image formats without transparency support and RGBA otherwise.
- *
- * Typical usage: sail_alloc_io_read_file()         ->
- *                sail_plugin_info_from_extension() ->
- *                sail_start_reading_io()           ->
- *                sail_read_next_frame()            ->
- *                sail_stop_reading().
- *
- * For example:
- *
- * void *state = NULL;
- *
- * SAIL_TRY_OR_CLEANUP(sail_start_reading_io(..., &state),
- *                     sail_stop_reading(state));
- * SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, ...),
- *                     sail_stop_reading(state));
- * SAIL_TRY(sail_stop_reading(state));
- *
- * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
- * in it and destroy it in sail_stop_reading. States must be used per image. DO NOT use the same state
- * to read multiple images in the same time.
- *
- * Returns 0 on success or sail_error_t on error.
- */
-SAIL_EXPORT sail_error_t sail_start_reading_io(struct sail_io *io, struct sail_context *context,
-                                               const struct sail_plugin_info *plugin_info, void **state);
-
-/*
- * Starts reading the specified I/O stream with the specified read options. If you don't need specific read options,
- * just pass NULL. Plugin-specific defaults will be used in this case. Read options are deep copied.
- *
- * If read options is NULL, the subsequent calls to sail_read_next_frame() output pixels in RGB pixel format
- * for image formats without transparency support and RGBA otherwise.
- *
- * Typical usage: sail_alloc_io_read_file()            ->
- *                sail_plugin_info_from_extension()    ->
- *                sail_start_reading_io_with_options() ->
- *                sail_read_next_frame()               ->
- *                sail_stop_reading().
- *
- * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
- * in it and destroy it in sail_stop_reading. States must be used per image. DO NOT use the same state
- * to read multiple images in the same time.
- *
- * Returns 0 on success or sail_error_t on error.
- */
-SAIL_EXPORT sail_error_t sail_start_reading_io_with_options(struct sail_io *io, struct sail_context *context,
-                                                            const struct sail_plugin_info *plugin_info,
-                                                            const struct sail_read_options *read_options, void **state);
+struct sail_read_options;
+struct sail_write_options;
 
 /*
  * Starts reading the specified image file with the specified read options. Pass a particular plugin info if you'd like
@@ -136,63 +85,6 @@ SAIL_EXPORT sail_error_t sail_start_reading_file_with_options(const char *path, 
 SAIL_EXPORT sail_error_t sail_start_reading_mem_with_options(const void *buffer, unsigned long buffer_length, struct sail_context *context,
                                                              const struct sail_plugin_info *plugin_info,
                                                              const struct sail_read_options *read_options, void **state);
-
-/*
- * Starts writing into the specified I/O stream.
- *
- * The subsequent calls to sail_write_next_frame() output pixels in pixel format as specified
- * in sail_write_features.preferred_output_pixel_format.
- *
- * Typical usage: sail_alloc_io_write_file()        ->
- *                sail_plugin_info_from_extension() ->
- *                sail_start_writing()              ->
- *                sail_write_next_frame()           ->
- *                sail_stop_writing().
- *
- * For example:
- *
- * void *state = NULL;
- *
- * SAIL_TRY_OR_CLEANUP(sail_start_writing_io(..., &state),
- *                     sail_stop_writing(state));
- * SAIL_TRY_OR_CLEANUP(sail_write_next_frame(state, ...),
- *                     sail_stop_writing(state));
- * SAIL_TRY(sail_stop_writing(state));
- *
- * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
- * in it and destroy it in sail_stop_writing. States must be used per image. DO NOT use the same state
- * to write multiple images in the same time.
- *
- * Returns 0 on success or sail_error_t on error.
- */
-SAIL_EXPORT sail_error_t sail_start_writing_io(struct sail_io *io, struct sail_context *context,
-                                               const struct sail_plugin_info *plugin_info, void **state);
-
-/*
- * Starts writing the specified I/O stream with the specified write options. If you don't need specific write options,
- * just pass NULL. Plugin-specific defaults will be used in this case. Write options are deep copied.
- *
- * If write options is NULL, the subsequent calls to sail_write_next_frame() output pixels in pixel format
- * as specified in sail_write_features.preferred_output_pixel_format.
- *
- * Typical usage: sail_start_writing_io_with_options() ->
- *                sail_write_next_frame()              ->
- *                sail_stop_writing().
- *
- * Or:            sail_plugin_info_from_extension()    ->
- *                sail_start_writing_io_with_options() ->
- *                sail_write_next_frame()              ->
- *                sail_stop_writing().
- *
- * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
- * in it and destroy it in sail_stop_writing. States must be used per image. DO NOT use the same state
- * to write multiple images in the same time.
- *
- * Returns 0 on success or sail_error_t on error.
- */
-SAIL_EXPORT sail_error_t sail_start_writing_io_with_options(struct sail_io *io, struct sail_context *context,
-                                                            const struct sail_plugin_info *plugin_info,
-                                                            const struct sail_write_options *write_options, void **state);
 
 /*
  * Starts writing the specified image file with the specified write options. Pass a particular plugin info if you'd like
