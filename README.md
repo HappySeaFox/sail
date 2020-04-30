@@ -30,6 +30,7 @@ Author: Dmitry Baryshev.
 - Reading images and outputting them to memory in source (raw) pixel format for those who want to kick the hell
   out of images manually. For example, one may want to work with raw `CMYK` pixels in a printing image.
   :warning: Some plugins might not support outputting source pixels.
+- Reading and writing meta information like JPEG comments.
 - Easily extensible with new image formats for those who want to implement a specific codec for his/her needs.
 
 ## Features NOT provided
