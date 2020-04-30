@@ -39,11 +39,12 @@ namespace sail
 class plugin_info;
 
 /*
- * A C++ interface to struct sail_image.
+ * Image representation with direct access to the pixel data.
  */
 class SAIL_EXPORT image
 {
     friend class image_reader;
+    friend class image_writer;
 
 public:
     image();
@@ -52,8 +53,6 @@ public:
     ~image();
 
     bool is_valid() const;
-
-    sail_error_t to_sail_image(sail_image *image) const;
 
     int width() const;
     int height() const;
@@ -106,6 +105,8 @@ private:
     //
     image(const sail_image *im, const void *bits, int bits_size);
     image(const sail_image *im);
+
+    sail_error_t to_sail_image(sail_image *image) const;
 
     image& with_passes(int passes);
     image& with_animated(bool animated);

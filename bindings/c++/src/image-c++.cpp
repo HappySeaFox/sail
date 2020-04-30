@@ -118,68 +118,6 @@ bool image::is_valid() const
     return d->width > 0 && d->height > 0;
 }
 
-sail_error_t image::to_sail_image(sail_image *image) const
-{
-    SAIL_CHECK_IMAGE_PTR(image);
-
-    // Resulting meta entries
-    sail_meta_entry_node *image_meta_entry_node = nullptr;
-
-    sail_meta_entry_node *last_meta_entry_node = nullptr;
-    auto it = d->meta_entries.begin();
-
-    while (it != d->meta_entries.end()) {
-        sail_meta_entry_node *meta_entry_node;
-
-        SAIL_TRY(sail_alloc_meta_entry_node(&meta_entry_node));
-        SAIL_TRY_OR_CLEANUP(sail_strdup(it->first.c_str(), &meta_entry_node->key),
-                            sail_destroy_meta_entry_node(meta_entry_node),
-                            sail_destroy_meta_entry_node_chain(image_meta_entry_node));
-        SAIL_TRY_OR_CLEANUP(sail_strdup(it->second.c_str(), &meta_entry_node->value),
-                            sail_destroy_meta_entry_node(meta_entry_node),
-                            sail_destroy_meta_entry_node_chain(image_meta_entry_node));
-
-        if (image_meta_entry_node == nullptr) {
-            image_meta_entry_node = last_meta_entry_node = meta_entry_node;
-        } else {
-            last_meta_entry_node->next = meta_entry_node;
-            last_meta_entry_node = meta_entry_node;
-        }
-
-        ++it;
-    }
-
-    image->width          = d->width;
-    image->height         = d->height;
-    image->bytes_per_line = d->bytes_per_line;
-    image->pixel_format   = d->pixel_format;
-    image->passes         = d->passes;
-    image->animated       = d->animated;
-    image->delay          = d->delay;
-
-    if (d->palette != nullptr && d->palette_size > 0) {
-        image->palette = malloc(d->palette_size);
-
-        if (image->palette == nullptr) {
-            sail_destroy_meta_entry_node_chain(image_meta_entry_node);
-            return SAIL_MEMORY_ALLOCATION_FAILED;
-        }
-
-        memcpy(image->palette, d->palette, d->palette_size);
-
-        image->palette              = d->palette;
-        image->palette_size         = d->palette_size;
-        image->palette_pixel_format = d->palette_pixel_format;
-    }
-
-    image->meta_entry_node     = image_meta_entry_node;
-    image->properties          = d->properties;
-    image->source_pixel_format = d->source_pixel_format;
-    image->source_properties   = d->source_properties;
-
-    return 0;
-}
-
 int image::width() const
 {
     return d->width;
@@ -496,6 +434,68 @@ image::image(const sail_image *im, const void *bits, int bits_size)
 image::image(const sail_image *im)
     : image(im, nullptr, 0)
 {
+}
+
+sail_error_t image::to_sail_image(sail_image *image) const
+{
+    SAIL_CHECK_IMAGE_PTR(image);
+
+    // Resulting meta entries
+    sail_meta_entry_node *image_meta_entry_node = nullptr;
+
+    sail_meta_entry_node *last_meta_entry_node = nullptr;
+    auto it = d->meta_entries.begin();
+
+    while (it != d->meta_entries.end()) {
+        sail_meta_entry_node *meta_entry_node;
+
+        SAIL_TRY(sail_alloc_meta_entry_node(&meta_entry_node));
+        SAIL_TRY_OR_CLEANUP(sail_strdup(it->first.c_str(), &meta_entry_node->key),
+                            sail_destroy_meta_entry_node(meta_entry_node),
+                            sail_destroy_meta_entry_node_chain(image_meta_entry_node));
+        SAIL_TRY_OR_CLEANUP(sail_strdup(it->second.c_str(), &meta_entry_node->value),
+                            sail_destroy_meta_entry_node(meta_entry_node),
+                            sail_destroy_meta_entry_node_chain(image_meta_entry_node));
+
+        if (image_meta_entry_node == nullptr) {
+            image_meta_entry_node = last_meta_entry_node = meta_entry_node;
+        } else {
+            last_meta_entry_node->next = meta_entry_node;
+            last_meta_entry_node = meta_entry_node;
+        }
+
+        ++it;
+    }
+
+    image->width          = d->width;
+    image->height         = d->height;
+    image->bytes_per_line = d->bytes_per_line;
+    image->pixel_format   = d->pixel_format;
+    image->passes         = d->passes;
+    image->animated       = d->animated;
+    image->delay          = d->delay;
+
+    if (d->palette != nullptr && d->palette_size > 0) {
+        image->palette = malloc(d->palette_size);
+
+        if (image->palette == nullptr) {
+            sail_destroy_meta_entry_node_chain(image_meta_entry_node);
+            return SAIL_MEMORY_ALLOCATION_FAILED;
+        }
+
+        memcpy(image->palette, d->palette, d->palette_size);
+
+        image->palette              = d->palette;
+        image->palette_size         = d->palette_size;
+        image->palette_pixel_format = d->palette_pixel_format;
+    }
+
+    image->meta_entry_node     = image_meta_entry_node;
+    image->properties          = d->properties;
+    image->source_pixel_format = d->source_pixel_format;
+    image->source_properties   = d->source_properties;
+
+    return 0;
 }
 
 image& image::with_passes(int passes)
