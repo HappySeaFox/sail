@@ -56,7 +56,7 @@ unsigned char *image_bits;
  */
 SAIL_TRY(sail_read(path,
                    &image,
-                   reinterpret_cast<void **>(&image_bits)));
+                   (void **)&image_bits));
 
 /*
  * Handle the image bits here.
