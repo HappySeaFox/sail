@@ -22,6 +22,8 @@
 // Universal include
 //
 #ifdef SAIL_BUILD
+    #include "sail-common.h"
+
     #include "at_scope_exit-c++.h"
     #include "context-c++.h"
     #include "image-c++.h"
@@ -34,6 +36,8 @@
     #include "write_features-c++.h"
     #include "write_options-c++.h"
 #else
+    #include <sail/sail-common.h>
+
     #include <sail/at_scope_exit-c++.h>
     #include <sail/context-c++.h>
     #include <sail/image-c++.h>
