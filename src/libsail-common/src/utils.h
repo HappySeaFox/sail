@@ -81,8 +81,8 @@ SAIL_EXPORT sail_error_t sail_to_wchar(const char *input, wchar_t **output);
 SAIL_EXPORT sail_error_t sail_pixel_format_to_string(int pixel_format, const char **result);
 
 /*
- * Assigns pixel format from string representation.
- * For example: SAIL_PIXEL_FORMAT_SOURCE is returned for "SOURCE".
+ * Assigns pixel format from a string representation.
+ * For example: SAIL_PIXEL_FORMAT_SOURCE is assigned for "SOURCE".
  *
  * Returns 0 on success or sail_error_t on error.
  */
@@ -97,8 +97,8 @@ SAIL_EXPORT sail_error_t sail_pixel_format_from_string(const char *str, int *res
 SAIL_EXPORT sail_error_t sail_image_property_to_string(int image_property, const char **result);
 
 /*
- * Assigns image property from string representation or 0. See SailImageProperties.
- * For example: SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY is returned for "FLIPPED-VERTICALLY".
+ * Assigns image property from a string representation or 0. See SailImageProperties.
+ * For example: SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY is assigned for "FLIPPED-VERTICALLY".
  *
  * Returns 0 on success or sail_error_t on error.
  */
@@ -113,8 +113,8 @@ SAIL_EXPORT sail_error_t sail_image_property_from_string(const char *str, int *r
 SAIL_EXPORT sail_error_t sail_compression_type_to_string(int compression, const char **result);
 
 /*
- * Assigns compression from string representation or 0. See SailCompressionTypes.
- * For example: SAIL_COMPRESSION_RLE is returned for "RLE".
+ * Assigns compression from a string representation or 0. See SailCompressionTypes.
+ * For example: SAIL_COMPRESSION_RLE is assigned for "RLE".
  *
  * Returns 0 on success or sail_error_t on error.
  */
@@ -129,8 +129,8 @@ SAIL_EXPORT sail_error_t sail_compression_type_from_string(const char *str, int 
 SAIL_EXPORT sail_error_t sail_plugin_feature_to_string(int plugin_feature, const char **result);
 
 /*
- * Assigns plugin feature from string representation or 0. See SailPluginFeatures.
- * For example: SAIL_PLUGIN_FEATURE_STATIC is returned for "STATIC".
+ * Assigns plugin feature from a string representation or 0. See SailPluginFeatures.
+ * For example: SAIL_PLUGIN_FEATURE_STATIC is assigned for "STATIC".
  *
  * Returns 0 on success or sail_error_t on error.
  */

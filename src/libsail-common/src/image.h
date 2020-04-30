@@ -117,7 +117,7 @@ struct sail_image {
      * Destroyed by sail_destroy_image().
      *
      * READ:  Set by SAIL to a valid pixel array if the image is indexed.
-     * WRITE: Must be set allocated and set by a caller to a valid pixel array if the image is indexed.
+     * WRITE: Must be allocated and set by a caller to a valid pixel array if the image is indexed.
      */
     void *palette;
 
@@ -134,7 +134,7 @@ struct sail_image {
      * Destroyed by sail_destroy_image().
      *
      * READ:  Set by SAIL to a valid linked list with simple meta information (like JPEG comments) or to NULL.
-     * WRITE: Must be set allocated and set by a caller to a valid linked list with simple meta information
+     * WRITE: Must be allocated and set by a caller to a valid linked list with simple meta information
      *        like JPEG comments if the image have it.
      */
     struct sail_meta_entry_node *meta_entry_node;

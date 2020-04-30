@@ -115,7 +115,7 @@ image::~image()
 
 bool image::is_valid() const
 {
-    return d->width > 0 && d->height > 0;
+    return d->width > 0 && d->height > 0 && d->bytes_per_line > 0 && (d->bits != nullptr || d->shallow_bits != nullptr);
 }
 
 int image::width() const
