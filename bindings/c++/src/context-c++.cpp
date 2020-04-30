@@ -27,18 +27,27 @@ class SAIL_HIDDEN context::pimpl
 {
 public:
     sail_context *context = nullptr;
+    sail_error_t init_result = 0;
 };
 
 context::context()
     : d(new pimpl)
 {
-    init(0);
+    d->init_result = init(0);
+
+    if (d->init_result != 0) {
+        SAIL_LOG_ERROR("Failed to initialize SAIL. Error: %d", d->init_result);
+    }
 }
 
 context::context(int flags)
     : d(new pimpl)
 {
-    init(flags);
+    d->init_result = init(flags);
+
+    if (d->init_result != 0) {
+        SAIL_LOG_ERROR("Failed to initialize SAIL. Error: %d", d->init_result);
+    }
 }
 
 context::~context()
@@ -47,9 +56,9 @@ context::~context()
     delete d;
 }
 
-bool context::is_valid() const
+sail_error_t context::valid() const
 {
-    return d->context != nullptr;
+    return d->init_result;
 }
 
 std::vector<plugin_info> context::plugin_info_list() const

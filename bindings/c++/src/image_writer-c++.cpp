@@ -71,7 +71,7 @@ image_writer::~image_writer()
 
 bool image_writer::is_valid() const
 {
-    return d->ctx != nullptr && d->ctx->is_valid();
+    return d->ctx != nullptr && d->ctx->valid() == 0;
 }
 
 sail_error_t image_writer::write(const std::string &path, const image &simage)

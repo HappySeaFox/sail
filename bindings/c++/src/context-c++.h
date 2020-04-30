@@ -38,7 +38,8 @@ namespace sail
 class plugin_info;
 
 /*
- * A C++ interface to struct sail_context.
+ * Context is a main entry point to start working with SAIL. It enumerates plugin info objects which could be
+ * used later in reading and writing methods.
  */
 class SAIL_EXPORT context
 {
@@ -46,32 +47,100 @@ class SAIL_EXPORT context
     friend class image_writer;
 
 public:
+    /*
+     * Initializes SAIL with default flags. This is a main entry point to start working with SAIL.
+     * Builds a list of available SAIL plugins.
+     */
     context();
+
+    /*
+     * Initializes SAIL with the specific flags. This is an alternative entry point to start working with SAIL.
+     * Builds a list of available SAIL plugins. See SailInitFlags.
+     */
     context(int flags);
 
     /*
-     * When context gets destroyed, all plugin info objects, read and write
-     * features get invalidated. Using them when the context doesn't exist
-     * anymore may lead to a crash.
+     * When context gets destroyed, all plugin info objects, read and write features get invalidated.
+     * Using them when the context doesn't exist anymore may lead to a crash.
      */
     ~context();
 
     /*
-     * Returns true if SAIL was initialized successfully. Using SAIL when this
-     * function returns false has no sense as most methods will return errors.
+     * Returns a context initialization status. Using SAIL when this function returns a non-zero status
+     * has no sense as most methods will return errors.
+     *
+     * Returns 0 on success or sail_error_t on error.
      */
-    bool is_valid() const;
+    sail_error_t valid() const;
 
+    /*
+     * Returns a list of found plugin info objects. Use it to determine the list of possible
+     * image formats, file extensions, and mime types that could be hypothetically read or written by SAIL.
+     */
     std::vector<plugin_info> plugin_info_list() const;
 
+    /*
+     * Unloads all loaded plugins (codecs) to free some memory. Plugin info objects attached
+     * to the context remain untouched.
+     *
+     * Returns 0 on success or sail_error_t on error.
+     */
     sail_error_t unload_plugins();
 
+    /*
+     * Finds a first plugin info object that supports reading or writing the specified file path by its file extension.
+     * The comparison algorithm is case-insensitive. For example: "/test.jpg". The path might not exist.
+     *
+     * Typical usage: context::plugin_info_from_path()   ->
+     *                image_reader::start_reading_file() ->
+     *                image_reader::read_next_frame()    ->
+     *                image_reader::stop_reading().
+     *
+     * Or:            context::plugin_info_from_path() ->
+     *                image_writer::start_writing()    ->
+     *                image_writer::read_next_frame()  ->
+     *                image_writer::stop_writing().
+     *
+     * Returns 0 on success or sail_error_t on error.
+     */
     sail_error_t plugin_info_from_path(const std::string &path, plugin_info *splugin_info) const;
     sail_error_t plugin_info_from_path(const char *path, plugin_info *splugin_info) const;
 
+    /*
+     * Finds a first plugin info object that supports the specified file extension. The comparison
+     * algorithm is case-insensitive. For example: "jpg".
+     *
+     * Typical usage: context::plugin_info_from_extension() ->
+     *                image_reader::start_reading_file()    ->
+     *                image_reader::read_next_frame()       ->
+     *                image_reader::stop_reading().
+     *
+     * Or:            context::plugin_info_from_extension() ->
+     *                image_writer::start_writing()         ->
+     *                image_writer::read_next_frame()       ->
+     *                image_writer::stop_writing().
+     *
+     * Returns 0 on success or sail_error_t on error.
+     */
     sail_error_t plugin_info_from_extension(const std::string &suffix, plugin_info *splugin_info) const;
     sail_error_t plugin_info_from_extension(const char *suffix, plugin_info *splugin_info) const;
 
+    /*
+     * Finds a first plugin info object that supports the specified mime type. The comparison
+     * algorithm is case-insensitive. For example: "image/jpeg".
+     *
+     * Typical usage: context::plugin_info_from_mime_type() ->
+     *                image_reader::start_reading_file()    ->
+     *                image_reader::read_next_frame()       ->
+     *                image_reader::stop_reading().
+     *
+     * Or:            context::plugin_info_from_mime_type() ->
+     *                image_writer::start_writing()         ->
+     *                image_writer::read_next_frame()       ->
+     *                image_writer::stop_writing().
+     *
+     * Returns 0 on success or sail_error_t on error.
+     */
     sail_error_t plugin_info_from_mime_type(const std::string &mime_type, plugin_info *splugin_info) const;
     sail_error_t plugin_info_from_mime_type(const char *mime_type, plugin_info *splugin_info) const;
 
