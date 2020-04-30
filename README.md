@@ -48,6 +48,32 @@ Author: Dmitry Baryshev.
 
 Currently SAIL supports Windows and Linux platforms.
 
+## Architecture overview
+
+SAIL is written in C w/o using any third-party libraries (except for codecs). It also provides bindings to C++.
+
+### SAIL plugins
+
+SAIL plugins is the deepest level. It's a set of standalone dynamically loaded codecs (SO on Linux and DLL on Windows).
+They implement actual decoding and encoding capabilities. End-users never work with plugins directly.
+They always use abstract high-level APIs for that.
+
+### libsail-common
+
+libsail-common holds common data types (images, pixel formats, I/O abstractions etc.) and a small set of functions
+shared between SAIL plugins and the high-level APIs.
+
+## libsail
+
+libsail is a feature-rich high-level API. It provides comprehensive and lightweight interfaces to decode and encode images.
+End-users implementing C applications always work with libsail.
+
+## libsail-c++
+
+libsail-c++ is a C++ binding to libsail. End-users implementing C++ applications may choose
+between libsail and libsail-c++. Using libsail-c++ is always recommended as it's much more simple
+to use in C++ applications.
+
 ## License
 
 - libsail-common, libsail, C++ bindings, and plugins are under LGPLv3+.
