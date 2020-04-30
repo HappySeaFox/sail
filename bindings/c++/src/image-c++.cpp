@@ -315,7 +315,7 @@ image& image::with_palette(void *palette, int palette_size, int palette_pixel_fo
     d->palette_size = 0;
     d->palette_pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;
 
-    if (palette == nullptr || palette_size < 1) {
+    if (palette == nullptr || palette_size <= 0) {
         return *this;
     }
 
@@ -348,7 +348,7 @@ image& image::with_bits(const void *bits, int bits_size)
     d->bits_size    = 0;
     d->shallow_bits = nullptr;
 
-    if (bits == nullptr || bits_size < 1) {
+    if (bits == nullptr || bits_size <= 0) {
         return *this;
     }
 
