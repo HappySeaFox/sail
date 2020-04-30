@@ -56,6 +56,9 @@ SAIL_EXPORT sail_error_t sail_probe(const char *path, struct sail_context *conte
  *
  * Outputs pixels in RGB pixel format for image formats without transparency support and RGBA otherwise.
  *
+ * WARNING: This function allocates a local static context and never destroys it. ASAN will report
+ * memory leaks which is OK.
+ *
  * Typical usage: this is a standalone function that could be called at any time.
  *
  * Returns 0 on success or sail_error_t on error.
@@ -66,6 +69,9 @@ SAIL_EXPORT sail_error_t sail_read(const char *path, struct sail_image **image, 
  * Writes the specified image file its pixel data into the file.
  *
  * Outputs pixels in pixel format as specified in sail_write_features.preferred_output_pixel_format.
+ *
+ * WARNING: This function allocates a local static context and never destroys it. ASAN will report
+ * memory leaks which is OK.
  *
  * Typical usage: this is a standalone function that could be called at any time.
  *
