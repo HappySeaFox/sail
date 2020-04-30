@@ -51,7 +51,8 @@ public:
 private:
     sail_error_t init();
     sail_error_t loadImage(const QString &path, QImage *qimage);
-    sail_error_t saveImage(const QImage &qimage, void *buffer, unsigned long buffer_length);
+    sail_error_t saveImage(const QImage &qimage, void *buffer, unsigned long buffer_length,
+                           unsigned long *written);
     sail_error_t pluginInfo(const sail::plugin_info &plugin_info) const;
     QStringList filters() const;
 

@@ -102,6 +102,11 @@ public:
      */
     sail_error_t stop_writing();
 
+    /*
+     * An interface to sail_stop_writing_with_written(). See sail_stop_writing_with_written() for more.
+     */
+    sail_error_t stop_writing(unsigned long *written);
+
 private:
     class pimpl;
     pimpl * const d;

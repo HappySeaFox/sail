@@ -228,7 +228,8 @@ static int qImageFormatToSailPixelFormat(QImage::Format format) {
     }
 }
 
-sail_error_t QtSail::saveImage(const QImage &qimage, void *buffer, unsigned long buffer_length)
+sail_error_t QtSail::saveImage(const QImage &qimage, void *buffer, unsigned long buffer_length,
+                               unsigned long *written)
 {
     sail::image_writer writer(&d->context);
 
@@ -301,7 +302,7 @@ sail_error_t QtSail::saveImage(const QImage &qimage, void *buffer, unsigned long
 
     // Finish writing.
     //
-    SAIL_TRY(writer.stop_writing());
+    SAIL_TRY(writer.stop_writing(written));
 
     SAIL_LOG_INFO("Saved in %lld ms.", elapsed.elapsed() + beforeDialog);
 
@@ -433,15 +434,23 @@ void QtSail::onSave()
     unsigned long buffer_length = 10*1024*1024;
     char *buffer = new char [buffer_length];
 
-    if ((res = saveImage(d->qimage, buffer, buffer_length)) != 0) {
+    unsigned long written;
+
+    if ((res = saveImage(d->qimage, buffer, buffer_length, &written)) != 0) {
         delete [] buffer;
         QMessageBox::critical(this, tr("Error"), tr("Failed to save to memory buffer. Error: %1.")
                               .arg(res));
         return;
     }
 
-    QMessageBox::information(this, tr("Success"), tr("The image has been saved into a memory buffer."));
+    QMessageBox::information(this,
+                             tr("Success"),
+                             tr("The image has been saved into a memory buffer. Saved bytes: %1")
+                             .arg(written));
 
+    QFile file("D:/test-mem.jpg");
+    file.open(QIODevice::WriteOnly);
+    file.write(buffer, written);
     delete [] buffer;
 }
 

@@ -243,6 +243,17 @@ SAIL_EXPORT sail_error_t sail_start_writing_mem_with_options(void *buffer, unsig
                                                              const struct sail_plugin_info *plugin_info,
                                                              const struct sail_write_options *write_options, void **state);
 
+
+/*
+ * Stops writing the file started by sail_start_writing_file() and brothers. Assings the number of
+ * bytes written. Does nothing if the state is NULL.
+ *
+ * It's essential to always stop writing to free memory resources. Avoiding doing so will lead to memory leaks.
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_stop_writing_with_written(void *state, unsigned long *written);
+
 /* extern "C" */
 #ifdef __cplusplus
 }

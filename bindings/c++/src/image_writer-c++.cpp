@@ -266,4 +266,13 @@ sail_error_t image_writer::stop_writing()
     return 0;
 }
 
+sail_error_t image_writer::stop_writing(unsigned long *written)
+{
+    SAIL_TRY(sail_stop_writing_with_written(d->state, written));
+
+    d->state = nullptr;
+
+    return 0;
+}
+
 }

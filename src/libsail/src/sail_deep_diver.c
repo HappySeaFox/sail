@@ -231,3 +231,23 @@ sail_error_t sail_start_writing_mem_with_options(void *buffer, unsigned long buf
 
     return 0;
 }
+
+sail_error_t sail_stop_writing_with_written(void *state, unsigned long *written) {
+
+    *written = 0;
+
+    /* Not an error. */
+    if (state == NULL) {
+        return 0;
+    }
+
+    struct hidden_state *state_of_mind = (struct hidden_state *)state;
+
+    if (state_of_mind->io != NULL) {
+        state_of_mind->io->tell(state_of_mind->io->stream, written);
+    }
+
+    SAIL_TRY(sail_stop_writing(state));
+
+    return 0;
+}
