@@ -56,7 +56,7 @@ context::~context()
     delete d;
 }
 
-sail_error_t context::valid() const
+sail_error_t context::status() const
 {
     return d->init_result;
 }

@@ -71,7 +71,7 @@ public:
      *
      * Returns 0 on success or sail_error_t on error.
      */
-    sail_error_t valid() const;
+    sail_error_t status() const;
 
     /*
      * Returns a list of found plugin info objects. Use it to determine the list of possible

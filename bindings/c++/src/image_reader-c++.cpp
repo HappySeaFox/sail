@@ -71,7 +71,7 @@ image_reader::~image_reader()
 
 bool image_reader::is_valid() const
 {
-    return d->ctx != nullptr && d->ctx->valid() == 0;
+    return d->ctx != nullptr && d->ctx->status() == 0;
 }
 
 sail_error_t image_reader::probe(const std::string &path, image *simage, plugin_info *splugin_info)
