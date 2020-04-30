@@ -220,7 +220,8 @@ static sail_error_t sail_init_impl(struct sail_context **context, int flags) {
 
     (*context)->plugin_info_node = NULL;
 
-    SAIL_TRY(update_lib_path());
+    SAIL_TRY_OR_CLEANUP(update_lib_path(),
+                        /* cleanup */ free(*context));
 
     struct sail_plugin_info_node *last_plugin_info_node;
 
@@ -232,6 +233,7 @@ static sail_error_t sail_init_impl(struct sail_context **context, int flags) {
     char *plugs_path_with_mask = (char *)malloc(plugs_path_with_mask_length);
 
     if (plugs_path_with_mask == NULL) {
+        free(*context);
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
@@ -244,6 +246,7 @@ static sail_error_t sail_init_impl(struct sail_context **context, int flags) {
     if (hFind == INVALID_HANDLE_VALUE) {
         SAIL_LOG_ERROR("Failed to list files in '%s'. Error: %d", plugs_path, GetLastError());
         free(plugs_path_with_mask);
+        free(*context);
         return SAIL_DIR_OPEN_ERROR;
     }
 
@@ -273,6 +276,7 @@ static sail_error_t sail_init_impl(struct sail_context **context, int flags) {
 
     if (d == NULL) {
         SAIL_LOG_ERROR("Failed to list files in '%s': %s", plugs_path, strerror(errno));
+        free(*context);
         return SAIL_DIR_OPEN_ERROR;
     }
 
@@ -314,7 +318,8 @@ static sail_error_t sail_init_impl(struct sail_context **context, int flags) {
         while (plugin_info_node != NULL) {
             const struct sail_plugin *plugin;
 
-            SAIL_TRY(load_plugin_by_plugin_info(*context, plugin_info_node->plugin_info, &plugin));
+            /* Ignore loading errors on purpose. */
+            load_plugin_by_plugin_info(*context, plugin_info_node->plugin_info, &plugin);
 
             plugin_info_node = plugin_info_node->next;
         }

@@ -70,7 +70,7 @@ enum SailInitFlags {
 };
 
 /*
- * Initializes SAIL with default flags. This is the main entry point to start working with SAIL.
+ * Initializes SAIL with default flags. This is a main entry point to start working with SAIL.
  * Builds a list of available SAIL plugins.
  *
  * Returns 0 on success or sail_error_t on error.
@@ -78,7 +78,7 @@ enum SailInitFlags {
 SAIL_EXPORT sail_error_t sail_init(struct sail_context **context);
 
 /*
- * Initializes SAIL with the specific flags. This is the main entry point to start working with SAIL.
+ * Initializes SAIL with the specific flags. This is an alternative entry point to start working with SAIL.
  * Builds a list of available SAIL plugins. See SailInitFlags.
  *
  * Returns 0 on success or sail_error_t on error.
@@ -123,7 +123,8 @@ SAIL_EXPORT sail_error_t sail_plugin_info_from_path(const char *path, const stru
                                                     const struct sail_plugin_info **plugin_info);
 
 /*
- * Finds a first plugin info object that supports the specified file extension. For example: "jpg".
+ * Finds a first plugin info object that supports the specified file extension. The comparison
+ * algorithm is case-insensitive. For example: "jpg".
  *
  * The assigned plugin info MUST NOT be destroyed. It's a pointer to an internal data structure.
  *
@@ -143,7 +144,8 @@ SAIL_EXPORT sail_error_t sail_plugin_info_from_extension(const char *extension, 
                                                          const struct sail_plugin_info **plugin_info);
 
 /*
- * Finds a first plugin info object that supports the specified mime type. For example: "image/jpeg".
+ * Finds a first plugin info object that supports the specified mime type. The comparison
+ * algorithm is case-insensitive. For example: "image/jpeg".
  *
  * The assigned plugin info MUST NOT be destroyed. It's a pointer to an internal data structure.
  *
