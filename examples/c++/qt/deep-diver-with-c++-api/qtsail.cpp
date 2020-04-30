@@ -448,9 +448,6 @@ void QtSail::onSave()
                              tr("The image has been saved into a memory buffer. Saved bytes: %1")
                              .arg(written));
 
-    QFile file("D:/test-mem.jpg");
-    file.open(QIODevice::WriteOnly);
-    file.write(buffer, written);
     delete [] buffer;
 }
 

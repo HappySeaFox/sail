@@ -93,3 +93,39 @@ void destroy_hidden_state(struct hidden_state *state) {
 
     free(state);
 }
+
+sail_error_t stop_writing(void *state, unsigned long *written) {
+
+    if (written != NULL) {
+        *written = 0;
+    }
+
+    /* Not an error. */
+    if (state == NULL) {
+        return 0;
+    }
+
+    struct hidden_state *state_of_mind = (struct hidden_state *)state;
+
+    /* Not an error. */
+    if (state_of_mind->plugin == NULL) {
+        destroy_hidden_state(state_of_mind);
+        return 0;
+    }
+
+    if (state_of_mind->plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
+        destroy_hidden_state(state_of_mind);
+        return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
+    }
+
+    SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v2->write_finish_v2(&state_of_mind->state, state_of_mind->io),
+                        /* cleanup */ destroy_hidden_state(state_of_mind));
+
+    if (written != NULL) {
+        state_of_mind->io->tell(state_of_mind->io->stream, written);
+    }
+
+    destroy_hidden_state(state_of_mind);
+
+    return 0;
+}

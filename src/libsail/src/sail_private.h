@@ -55,4 +55,6 @@ SAIL_HIDDEN sail_error_t load_plugin_by_plugin_info(struct sail_context *context
 
 SAIL_HIDDEN void destroy_hidden_state(struct hidden_state *state);
 
+SAIL_HIDDEN sail_error_t stop_writing(void *state, unsigned long *written);
+
 #endif

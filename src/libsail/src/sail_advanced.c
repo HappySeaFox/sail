@@ -154,28 +154,7 @@ sail_error_t sail_write_next_frame(void *state, const struct sail_image *image, 
 
 sail_error_t sail_stop_writing(void *state) {
 
-    /* Not an error. */
-    if (state == NULL) {
-        return 0;
-    }
-
-    struct hidden_state *state_of_mind = (struct hidden_state *)state;
-
-    /* Not an error. */
-    if (state_of_mind->plugin == NULL) {
-        destroy_hidden_state(state_of_mind);
-        return 0;
-    }
-
-    if (state_of_mind->plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
-        destroy_hidden_state(state_of_mind);
-        return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
-    }
-
-    SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v2->write_finish_v2(&state_of_mind->state, state_of_mind->io),
-                        /* cleanup */ destroy_hidden_state(state_of_mind));
-
-    destroy_hidden_state(state_of_mind);
+    SAIL_TRY(stop_writing(state, NULL));
 
     return 0;
 }
