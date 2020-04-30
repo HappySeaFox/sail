@@ -161,6 +161,7 @@ sail_error_t image::to_sail_image(sail_image *image) const
         image->palette = malloc(d->palette_size);
 
         if (image->palette == nullptr) {
+            sail_destroy_meta_entry_node_chain(image_meta_entry_node);
             return SAIL_MEMORY_ALLOCATION_FAILED;
         }
 
