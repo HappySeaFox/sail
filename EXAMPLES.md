@@ -2,6 +2,10 @@ Table of Contents
 =================
 
 * [Table of Contents](#table-of-contents)
+  * [Full\-featured applications](#full-featured-applications)
+    * [Written in C](#written-in-c)
+    * [Written in Qt/C\+\+ utilizing SAIL C API](#written-in-qtc-utilizing-sail-c-api)
+    * [Written in Qt/C\+\+ utilizing SAIL C\+\+ API](#written-in-qtc-utilizing-sail-c-api-1)
   * [APIs overview](#apis-overview)
     * [1\. junior](#1-junior)
       * [C:](#c)
@@ -15,6 +19,20 @@ Table of Contents
     * [4\. technical diver](#4-technical-diver)
       * [C:](#c-6)
       * [C\+\+:](#c-7)
+
+## Full-featured applications
+
+### Written in C
+
+See [examples](examples/c).
+
+### Written in Qt/C++ utilizing SAIL C API
+
+See [*-with-c-api examples](examples/c++/qt). Qt is a pretty easy and a very good readable framework. It's easy to adapt them to your needs.
+
+### Written in Qt/C++ utilizing SAIL C++ API
+
+See [*-with-c++-api examples](examples/c++/qt). Qt is a pretty easy and a very good readable framework. It's easy to adapt them to your needs.
 
 ## APIs overview
 
