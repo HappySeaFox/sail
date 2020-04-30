@@ -79,7 +79,7 @@ public:
      *
      * READ:  Set by SAIL to a positive length of a row of pixels in bytes.
      * WRITE: Must be set by a caller to a positive number of bytes per line. A caller could set
-     *        it to image::bytes_per_line_auto() if scan lines do not need padding to a certain booundary.
+     *        it with bytes_per_line_auto() if scan lines do not need padding to a certain booundary.
      */
     int bytes_per_line() const;
 
@@ -87,10 +87,9 @@ public:
      * Returns image pixel format. See SailPixelFormat.
      *
      * READ:  Set by SAIL to a valid output image pixel format. The list of supported output pixel formats
-     *        by this plugin could be obtained from read_features.input_pixel_formats.
-     * WRITE: Must be set by a caller to a valid input image pixel format. Pixels in this format will be supplied
-     *        to the plugin by a caller later. The list of supported input pixel formats by this plugin
-     *        could be obtained from write_features.output_pixel_formats.
+     *        by a certain plugin could be obtained from read_features.input_pixel_formats.
+     * WRITE: Must be set by a caller to a valid input image pixel format. The list of supported input pixel
+     *        formats by a certain plugin could be obtained from write_features.output_pixel_formats.
      */
     int pixel_format() const;
 
@@ -132,7 +131,7 @@ public:
     /*
      * Returns palette data if the image has a palette and the requested pixel format assumes having a palette.
      *
-     * READ:  Set by SAIL to a valid pixel array if the image is indexed.
+     * READ:  Set by SAIL to a valid pixel data if the image is indexed.
      * WRITE: Must be set by a caller to a valid pixel data if the image is indexed.
      */
     void* palette() const;
@@ -146,11 +145,11 @@ public:
     int palette_size() const;
 
     /*
-     * Returns meta information. Plugins guarantee that keys and values are not empty.
+     * Returns image meta information.
      *
      * READ:  Set by SAIL to a valid map with simple meta information (like JPEG comments).
      * WRITE: Must be set by a caller to a valid map with simple meta information
-     *        like JPEG comments if the image have it.
+     *        (like JPEG comments) if necessary.
      */
     std::map<std::string, std::string> meta_entries() const;
 
@@ -181,7 +180,8 @@ public:
     int source_properties() const;
 
     /*
-     * Returns editable deep copied pixel data if any.
+     * Returns editable deep copied pixel data if any. Images can hold deep copied or shallow data,
+     * but not both.
      */
     void* bits();
 
