@@ -83,8 +83,8 @@ QtSail::~QtSail()
 
 sail_error_t QtSail::init()
 {
-    if (!d->context.is_valid()) {
-        QMessageBox::critical(this, tr("Error"), tr("Failed to init SAIL"));
+    if (d->context.valid() != 0) {
+        QMessageBox::critical(this, tr("Error"), tr("Failed to init SAIL. Error: %d").arg(d->context.valid()));
         ::exit(1);
     }
 
