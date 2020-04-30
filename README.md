@@ -93,8 +93,8 @@ sail::image image;
 SAIL_TRY(reader.read(path, &image));
 
 // Handle the image and its bits here.
-// Use image->width(), image->height(), image->bytes_per_line(),
-// image->pixel_format(), and image->bits() for that.
+// Use image.width(), image.height(), image.bytes_per_line(),
+// image.pixel_format(), and image.bits() for that.
 ```
 
 It's pretty easy, isn't it? :smile: See [EXAMPLES](EXAMPLES.md) for more.
