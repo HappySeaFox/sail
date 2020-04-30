@@ -73,6 +73,9 @@ enum SailInitFlags {
  * Initializes SAIL with default flags. This is a main entry point to start working with SAIL.
  * Builds a list of available SAIL plugins.
  *
+ * You could point SAIL to search plugins in a different location by setting SAIL_PLUGINS_PATH
+ * environment variable to a path with SAIL plugins.
+ *
  * Returns 0 on success or sail_error_t on error.
  */
 SAIL_EXPORT sail_error_t sail_init(struct sail_context **context);
@@ -80,6 +83,9 @@ SAIL_EXPORT sail_error_t sail_init(struct sail_context **context);
 /*
  * Initializes SAIL with the specific flags. This is an alternative entry point to start working with SAIL.
  * Builds a list of available SAIL plugins. See SailInitFlags.
+ *
+ * You could point SAIL to search plugins in a different location by setting SAIL_PLUGINS_PATH
+ * environment variable to a path with SAIL plugins.
  *
  * Returns 0 on success or sail_error_t on error.
  */

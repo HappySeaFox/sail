@@ -50,12 +50,18 @@ public:
     /*
      * Initializes SAIL with default flags. This is a main entry point to start working with SAIL.
      * Builds a list of available SAIL plugins.
+     *
+     * You could point SAIL to search plugins in a different location by setting SAIL_PLUGINS_PATH
+     * environment variable to a path with SAIL plugins.
      */
     context();
 
     /*
      * Initializes SAIL with the specific flags. This is an alternative entry point to start working with SAIL.
      * Builds a list of available SAIL plugins. See SailInitFlags.
+     *
+     * You could point SAIL to search plugins in a different location by setting SAIL_PLUGINS_PATH
+     * environment variable to a path with SAIL plugins.
      */
     context(int flags);
 
