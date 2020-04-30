@@ -76,8 +76,8 @@ sail::image image;
 SAIL_TRY(reader.read(path, &image));
 
 // Handle the image and its bits here.
-// Use image->width(), image->height(), image->bytes_per_line(),
-// image->pixel_format(), and image->bits() for that.
+// Use image.width(), image.height(), image.bytes_per_line(),
+// image.pixel_format(), and image.bits() for that.
 ```
 
 ### 2. `advanced`
@@ -181,8 +181,8 @@ SAIL_TRY(reader.read_next_frame(&image));
 SAIL_TRY(reader.stop_reading());
 
 // Handle the image and its bits here.
-// Use image->width(), image->height(), image->bytes_per_line(),
-// image->pixel_format(), and image->bits() for that.
+// Use image.width(), image.height(), image.bytes_per_line(),
+// image.pixel_format(), and image.bits() for that.
 ```
 
 ### 3. `deep diver`
