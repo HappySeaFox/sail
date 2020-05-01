@@ -63,12 +63,12 @@ They always use abstract high-level APIs for that.
 libsail-common holds common data types (images, pixel formats, I/O abstractions etc.) and a small set of functions
 shared between SAIL plugins and the high-level APIs.
 
-## libsail
+### libsail
 
 libsail is a feature-rich high-level API. It provides comprehensive and lightweight interfaces to decode and encode images.
 End-users implementing C applications always work with libsail.
 
-## libsail-c++
+### libsail-c++
 
 libsail-c++ is a C++ binding to libsail. End-users implementing C++ applications may choose
 between libsail and libsail-c++. Using libsail-c++ is always recommended as it's much more simple
