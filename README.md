@@ -42,7 +42,7 @@ Author: Dmitry Baryshev.
 
 ## Image formats supported
 
-- JPEG (reading and writing, requires `libjpeg-turbo`)
+- [JPEG](https://wikipedia.org/wiki/JPEG) (reading and writing, requires `libjpeg-turbo`)
 
 ## Supported platforms
 
@@ -92,7 +92,8 @@ unsigned char *image_bits;
 
 /*
  * sail_read() reads the image and outputs pixels in RGB pixel format for image formats
- * without transparency support and RGBA otherwise.
+ * without transparency support and RGBA otherwise. If you need to control output pixel
+ * formats, consider switching to the deep diver API.
  */
 SAIL_TRY(sail_read(path,
                    &image,
@@ -114,7 +115,8 @@ sail::image_reader reader;
 sail::image image;
 
 // read() reads the image and outputs pixels in RGB pixel format for image formats
-// without transparency support and RGBA otherwise.
+// without transparency support and RGBA otherwise. If you need to control output pixel
+// formats, consider switching to the deep diver API.
 //
 SAIL_TRY(reader.read(path, &image));
 
