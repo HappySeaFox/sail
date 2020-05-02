@@ -40,7 +40,7 @@ Author: Dmitry Baryshev.
 - color management functions (applying ICC profiles etc.).
 - EXIF rotation.
 
-## Image formats supported
+## Supported image formats
 
 - [JPEG](https://wikipedia.org/wiki/JPEG) (reading and writing, requires `libjpeg-turbo`)
 
