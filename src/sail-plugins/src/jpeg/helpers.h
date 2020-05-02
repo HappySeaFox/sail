@@ -20,6 +20,7 @@
 #define SAIL_JPEG_HELPERS_H
 
 #include <setjmp.h>
+#include <stdio.h>
 
 #include <jpeglib.h>
 
