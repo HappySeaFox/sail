@@ -40,7 +40,7 @@ enum SailLogLevel {
     SAIL_LOG_LEVEL_DEBUG,
 
     /* Not to be used. Resize the enum for future elements. */
-    SAIL_LOG_LEVEL_RESIZE_ENUM_TO_INT = INT_MAX
+    SAIL_LOG_LEVEL_RESIZE_ENUM_TO_INT = UINT_MAX
 };
 
 SAIL_EXPORT void sail_log(int level, const char *format, ...);

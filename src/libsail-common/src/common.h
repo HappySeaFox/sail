@@ -65,7 +65,7 @@ enum SailPixelFormat {
     SAIL_PIXEL_FORMAT_RGB565,
 
     /* Not to be used. Resize the enum for future elements. */
-    SAIL_PIXEL_FORMAT_RESIZE_ENUM_TO_INT = INT_MAX
+    SAIL_PIXEL_FORMAT_RESIZE_ENUM_TO_INT = UINT_MAX
 };
 
 /* Image properties. */
@@ -78,7 +78,7 @@ enum SailImageProperties {
     SAIL_IMAGE_PROPERTY_INTERLACED         = 1 << 1,
 
     /* Not to be used. Resize the enum for future elements. */
-    SAIL_IMAGE_PROPERTIES_RESIZE_ENUM_TO_INT = INT_MAX
+    SAIL_IMAGE_PROPERTIES_RESIZE_ENUM_TO_INT = UINT_MAX
 };
 
 /* Pixels compression types. */
@@ -110,7 +110,7 @@ enum SailPluginFeatures {
     SAIL_PLUGIN_FEATURE_INTERLACED = 1 << 5,
 
     /* Not to be used. Resize the enum for future elements. */
-    SAIL_PLUGIN_FEATURES_RESIZE_ENUM_TO_INT = INT_MAX
+    SAIL_PLUGIN_FEATURES_RESIZE_ENUM_TO_INT = UINT_MAX
 };
 
 /* Read or write options. */
@@ -123,7 +123,7 @@ enum SailIoOptions {
     SAIL_IO_OPTION_EXIF      = 1 << 1,
 
     /* Not to be used. Resize the enum for future elements. */
-    SAIL_IO_OPTIONS_RESIZE_ENUM_TO_INT = INT_MAX
+    SAIL_IO_OPTIONS_RESIZE_ENUM_TO_INT = UINT_MAX
 };
 
 #endif
