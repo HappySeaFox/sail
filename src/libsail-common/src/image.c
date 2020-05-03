@@ -29,20 +29,21 @@ int sail_alloc_image(struct sail_image **image) {
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
-    (*image)->width                = 0;
-    (*image)->height               = 0;
-    (*image)->bytes_per_line       = 0;
-    (*image)->pixel_format         = SAIL_PIXEL_FORMAT_UNKNOWN;
-    (*image)->passes               = 0;
-    (*image)->animated             = false;
-    (*image)->delay                = 0;
-    (*image)->palette_pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;
-    (*image)->palette              = NULL;
-    (*image)->palette_size         = 0;
-    (*image)->meta_entry_node      = NULL;
-    (*image)->properties           = 0;
-    (*image)->source_pixel_format  = SAIL_PIXEL_FORMAT_UNKNOWN;
-    (*image)->source_properties    = 0;
+    (*image)->width                   = 0;
+    (*image)->height                  = 0;
+    (*image)->bytes_per_line          = 0;
+    (*image)->pixel_format            = SAIL_PIXEL_FORMAT_UNKNOWN;
+    (*image)->passes                  = 0;
+    (*image)->animated                = false;
+    (*image)->delay                   = 0;
+    (*image)->palette_pixel_format    = SAIL_PIXEL_FORMAT_UNKNOWN;
+    (*image)->palette                 = NULL;
+    (*image)->palette_size            = 0;
+    (*image)->meta_entry_node         = NULL;
+    (*image)->properties              = 0;
+    (*image)->source_pixel_format     = SAIL_PIXEL_FORMAT_UNKNOWN;
+    (*image)->source_properties       = 0;
+    (*image)->source_compression_type = 0;
 
     return 0;
 }

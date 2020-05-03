@@ -62,7 +62,7 @@ struct sail_image {
      *
      * READ:  Set by SAIL to a positive length of a row of pixels in bytes.
      * WRITE: Must be set by a caller to a positive number of bytes per line. A caller could set
-     *        it to sail_bytes_per_line() if scan lines do not need padding to a certain booundary.
+     *        it to sail_bytes_per_line() if scan lines are not padded to a certain booundary.
      */
     int bytes_per_line;
 
@@ -152,7 +152,7 @@ struct sail_image {
      * Image source pixel format. See SailPixelFormat.
      *
      * READ:  Set by SAIL to a valid source image pixel format before converting it to a requested pixel format
-     *        with sail_read_options.pixel_format.
+     *        in sail_read_options.pixel_format.
      * WRITE: Ignored.
      */
     int source_pixel_format;
@@ -164,6 +164,14 @@ struct sail_image {
      * WRITE: Ignored.
      */
     int source_properties;
+
+    /*
+     * Image source compression type. See SailCompressionTypes.
+     *
+     * READ:  Set by SAIL to a valid source image compression type if the image pixels are compressed or to 0.
+     * WRITE: Ignored.
+     */
+    int source_compression_type;
 };
 
 typedef struct sail_image sail_image_t;

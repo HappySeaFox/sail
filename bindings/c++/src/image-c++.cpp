@@ -43,6 +43,7 @@ public:
         , properties(0)
         , source_pixel_format(SAIL_PIXEL_FORMAT_UNKNOWN)
         , source_properties(0)
+        , source_compression_type(0)
         , bits(nullptr)
         , bits_size(0)
         , shallow_bits(nullptr)
@@ -68,6 +69,7 @@ public:
     int properties;
     int source_pixel_format;
     int source_properties;
+    int source_compression_type;
     void *bits;
     int bits_size;
     const void *shallow_bits;
@@ -97,7 +99,8 @@ image& image::operator=(const image &img)
         .with_meta_entries(meta_entries())
         .with_properties(img.properties())
         .with_source_pixel_format(img.source_pixel_format())
-        .with_source_properties(img.source_properties());
+        .with_source_properties(img.source_properties())
+        .with_source_compression_type(img.source_compression_type());
 
     if (img.shallow_bits() != nullptr) {
         with_shallow_bits(img.shallow_bits());
@@ -186,6 +189,11 @@ int image::source_pixel_format() const
 int image::source_properties() const
 {
     return d->source_properties;
+}
+
+int image::source_compression_type() const
+{
+    return d->source_compression_type;
 }
 
 void* image::bits()
@@ -428,6 +436,7 @@ image::image(const sail_image *im, const void *bits, int bits_size)
         .with_properties(im->properties)
         .with_source_pixel_format(im->source_pixel_format)
         .with_source_properties(im->source_properties)
+        .with_source_compression_type(im->source_compression_type)
         .with_bits(bits, bits_size);
 }
 
@@ -490,10 +499,11 @@ sail_error_t image::to_sail_image(sail_image *image) const
         image->palette_pixel_format = d->palette_pixel_format;
     }
 
-    image->meta_entry_node     = image_meta_entry_node;
-    image->properties          = d->properties;
-    image->source_pixel_format = d->source_pixel_format;
-    image->source_properties   = d->source_properties;
+    image->meta_entry_node         = image_meta_entry_node;
+    image->properties              = d->properties;
+    image->source_pixel_format     = d->source_pixel_format;
+    image->source_properties       = d->source_properties;
+    image->source_compression_type = d->source_compression_type;
 
     return 0;
 }
@@ -525,6 +535,12 @@ image& image::with_source_pixel_format(int source_pixel_format)
 image& image::with_source_properties(int source_properties)
 {
     d->source_properties = source_properties;
+    return *this;
+}
+
+image& image::with_source_compression_type(int source_compression_type)
+{
+    d->source_compression_type = source_compression_type;
     return *this;
 }
 

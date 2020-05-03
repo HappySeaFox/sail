@@ -79,7 +79,7 @@ public:
      *
      * READ:  Set by SAIL to a positive length of a row of pixels in bytes.
      * WRITE: Must be set by a caller to a positive number of bytes per line. A caller could set
-     *        it with bytes_per_line_auto() if scan lines do not need padding to a certain booundary.
+     *        it with bytes_per_line_auto() if scan lines are not padded to a certain booundary.
      */
     int bytes_per_line() const;
 
@@ -178,6 +178,14 @@ public:
      * WRITE: Ignored.
      */
     int source_properties() const;
+
+    /*
+     * Image source compression type. See SailCompressionTypes.
+     *
+     * READ:  Set by SAIL to a valid source image compression type if the image pixels are compressed or to 0.
+     * WRITE: Ignored.
+     */
+    int source_compression_type() const;
 
     /*
      * Returns editable deep copied pixel data if any. Images can hold deep copied or shallow data,
@@ -353,6 +361,7 @@ private:
     image& with_properties(int properties);
     image& with_source_pixel_format(int source_pixel_format);
     image& with_source_properties(int source_properties);
+    image& with_source_compression_type(int source_compression_type);
 
 private:
     class pimpl;
