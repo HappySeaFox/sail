@@ -46,7 +46,6 @@ struct jpeg_state {
     struct jpeg_decompress_struct decompress_context;
     struct jpeg_compress_struct compress_context;
     struct my_error_context error_context;
-    JSAMPARRAY buffer;
     bool libjpeg_error;
     struct sail_read_options *read_options;
     struct sail_write_options *write_options;
@@ -62,7 +61,6 @@ static int alloc_jpeg_state(struct jpeg_state **jpeg_state) {
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
-    (*jpeg_state)->buffer        = NULL;
     (*jpeg_state)->libjpeg_error = false;
     (*jpeg_state)->read_options  = NULL;
     (*jpeg_state)->write_options = NULL;
@@ -162,16 +160,6 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
 
     const int bytes_per_line = jpeg_state->decompress_context.output_width * jpeg_state->decompress_context.output_components;
 
-    /* Buffer to put scan lines into. libjpeg will automatically free it. */
-    jpeg_state->buffer = (*jpeg_state->decompress_context.mem->alloc_sarray)((j_common_ptr)&jpeg_state->decompress_context,
-                                                                    JPOOL_IMAGE,
-                                                                    bytes_per_line,
-                                                                    1);
-
-    if (jpeg_state->buffer == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
-
     /* Image properties. */
     (*image)->width               = jpeg_state->decompress_context.output_width;
     (*image)->height              = jpeg_state->decompress_context.output_height;
@@ -238,11 +226,9 @@ SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v2(void *state, struct sail_
         return SAIL_UNDERLYING_CODEC_ERROR;
     }
 
-    const int color_components = jpeg_state->decompress_context.output_components;
+    JSAMPROW row = (JSAMPROW)scanline;
 
-    (void)jpeg_read_scanlines(&jpeg_state->decompress_context, jpeg_state->buffer, 1);
-
-    memcpy(scanline, jpeg_state->buffer[0], image->width * color_components);
+    (void)jpeg_read_scanlines(&jpeg_state->decompress_context, &row, 1);
 
     return 0;
 }
