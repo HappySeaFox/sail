@@ -10,8 +10,8 @@ Author: Dmitry Baryshev.
 
 ## Target audience
 
-- Game developers.
 - Image viewers.
+- Game developers.
 - Anyone who needs loading or saving images in different image formats and having lightweight and comprehensive API for that.
 
 ## Features overview
