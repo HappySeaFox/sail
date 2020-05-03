@@ -27,7 +27,7 @@ Author: Dmitry Baryshev.
   Supporting other output pixel formats is plugin-specific.
 - Reading and writing images in numerous plugin-specific pixel formats. For example, the JPEG plugin
   is able to read `RGB` and `YCbCr` images and output them to memory as `Grayscale` pixels and vice versa.
-- Reading images and outputting them to memory in source (raw) pixel format for those who want to kick the hell
+- Reading images and outputting them to memory in source pixel format for those who want to kick the hell
   out of images manually. For example, one may want to work with raw `CMYK` pixels in a printing image.
   :warning: Some plugins might not support outputting source pixels.
 - Reading and writing meta information like JPEG comments.
