@@ -225,8 +225,11 @@ static sail_error_t sail_init_impl(struct sail_context **context, int flags) {
 
     struct sail_plugin_info_node *last_plugin_info_node;
 
-#ifdef SAIL_WIN32
     const char *plugs_path = plugins_path();
+
+    SAIL_LOG_DEBUG("Loading plugins from '%s'", plugs_path);
+
+#ifdef SAIL_WIN32
     const char *plugs_info_mask = "\\*.plugin.info";
 
     size_t plugs_path_with_mask_length = strlen(plugs_path) + strlen(plugs_info_mask) + 1;
@@ -259,6 +262,8 @@ static sail_error_t sail_init_impl(struct sail_context **context, int flags) {
             continue;
         }
 
+        SAIL_LOG_DEBUG("Found plugin info '%s'", data.cFileName);
+
         build_plugin_full_path(*context, &last_plugin_info_node, full_path);
 
         free(full_path);
@@ -271,7 +276,6 @@ static sail_error_t sail_init_impl(struct sail_context **context, int flags) {
     free(plugs_path_with_mask);
     FindClose(hFind);
 #else
-    const char *plugs_path = plugins_path();
     DIR *d = opendir(plugs_path);
 
     if (d == NULL) {
@@ -298,7 +302,12 @@ static sail_error_t sail_init_impl(struct sail_context **context, int flags) {
         bool is_file = S_ISREG(full_path_stat.st_mode);
 
         if (is_file) {
-            build_plugin_full_path(*context, &last_plugin_info_node, full_path);
+            bool is_plugin_info = strstr(full_path, ".plugin.info") != NULL;
+
+            if (is_plugin_info) {
+                SAIL_LOG_DEBUG("Found plugin info '%s'", dir->d_name);
+                build_plugin_full_path(*context, &last_plugin_info_node, full_path);
+            }
         }
 
         free(full_path);
@@ -374,9 +383,11 @@ sail_error_t sail_plugin_info_from_path(const char *path, const struct sail_cont
 
     const char *dot = strrchr(path, '.');
 
-    if (dot == NULL || *(dot+1) == '\0') {
+    if (dot == NULL || *dot == '\0' || *(dot+1) == '\0') {
         return SAIL_INVALID_ARGUMENT;
     }
+
+    SAIL_LOG_DEBUG("Finding plugin info for path '%s'", path);
 
     SAIL_TRY(sail_plugin_info_from_extension(dot+1, context, plugin_info));
 
@@ -388,6 +399,8 @@ sail_error_t sail_plugin_info_from_extension(const char *extension, const struct
     SAIL_CHECK_EXTENSION_PTR(extension);
     SAIL_CHECK_CONTEXT_PTR(context);
     SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
+
+    SAIL_LOG_DEBUG("Finding plugin info for extension '%s'", extension);
 
     char *extension_copy;
     SAIL_TRY(sail_strdup(extension, &extension_copy));
@@ -404,6 +417,7 @@ sail_error_t sail_plugin_info_from_extension(const char *extension, const struct
             if (strcmp(string_node->value, extension_copy) == 0) {
                 free(extension_copy);
                 *plugin_info = node->plugin_info;
+                SAIL_LOG_DEBUG("Found plugin info: '%s'", (*plugin_info)->name);
                 return 0;
             }
 
@@ -423,6 +437,8 @@ sail_error_t sail_plugin_info_from_mime_type(const struct sail_context *context,
     SAIL_CHECK_PTR(mime_type);
     SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
 
+    SAIL_LOG_DEBUG("Finding plugin info for mime type '%s'", mime_type);
+
     char *mime_type_copy;
     SAIL_TRY(sail_strdup(mime_type, &mime_type_copy));
 
@@ -438,6 +454,7 @@ sail_error_t sail_plugin_info_from_mime_type(const struct sail_context *context,
             if (strcmp(string_node->value, mime_type_copy) == 0) {
                 free(mime_type_copy);
                 *plugin_info = node->plugin_info;
+                SAIL_LOG_DEBUG("Found plugin info: '%s'", (*plugin_info)->name);
                 return 0;
             }
 

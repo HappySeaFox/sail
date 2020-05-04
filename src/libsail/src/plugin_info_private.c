@@ -434,6 +434,8 @@ sail_error_t plugin_read_info(const char *path, struct sail_plugin_info **plugin
     SAIL_CHECK_PATH_PTR(path);
     SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
 
+    SAIL_LOG_DEBUG("Loading plugin info '%s'", path);
+
     SAIL_TRY(sail_alloc_plugin_info(plugin_info));
     SAIL_TRY_OR_CLEANUP(sail_alloc_read_features(&(*plugin_info)->read_features),
                         destroy_plugin_info(*plugin_info));
