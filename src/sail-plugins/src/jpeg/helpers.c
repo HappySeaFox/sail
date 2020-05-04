@@ -43,24 +43,26 @@ void my_error_exit(j_common_ptr cinfo) {
 
 int color_space_to_pixel_format(J_COLOR_SPACE color_space) {
     switch (color_space) {
-        case JCS_GRAYSCALE: return SAIL_PIXEL_FORMAT_GRAYSCALE;
+        case JCS_GRAYSCALE: return SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE;
+
+        case JCS_RGB565:    return SAIL_PIXEL_FORMAT_BPP16_RGB565;
 
         case JCS_EXT_RGB:
-        case JCS_RGB:       return SAIL_PIXEL_FORMAT_RGB;
+        case JCS_RGB:       return SAIL_PIXEL_FORMAT_BPP24_RGB;
+        case JCS_EXT_BGR:   return SAIL_PIXEL_FORMAT_BPP24_BGR;
 
-        case JCS_YCbCr:     return SAIL_PIXEL_FORMAT_YCBCR;
-        case JCS_CMYK:      return SAIL_PIXEL_FORMAT_CMYK;
-        case JCS_YCCK:      return SAIL_PIXEL_FORMAT_YCCK;
-        case JCS_EXT_RGBX:  return SAIL_PIXEL_FORMAT_RGBX;
-        case JCS_EXT_BGR:   return SAIL_PIXEL_FORMAT_BGR;
-        case JCS_EXT_BGRX:  return SAIL_PIXEL_FORMAT_BGRX;
-        case JCS_EXT_XBGR:  return SAIL_PIXEL_FORMAT_XBGR;
-        case JCS_EXT_XRGB:  return SAIL_PIXEL_FORMAT_XRGB;
-        case JCS_EXT_RGBA:  return SAIL_PIXEL_FORMAT_RGBA;
-        case JCS_EXT_BGRA:  return SAIL_PIXEL_FORMAT_BGRA;
-        case JCS_EXT_ABGR:  return SAIL_PIXEL_FORMAT_ABGR;
-        case JCS_EXT_ARGB:  return SAIL_PIXEL_FORMAT_ARGB;
-        case JCS_RGB565:    return SAIL_PIXEL_FORMAT_RGB565;
+        case JCS_EXT_RGBX:  return SAIL_PIXEL_FORMAT_BPP32_RGBX;
+        case JCS_EXT_BGRX:  return SAIL_PIXEL_FORMAT_BPP32_BGRX;
+        case JCS_EXT_XBGR:  return SAIL_PIXEL_FORMAT_BPP32_XBGR;
+        case JCS_EXT_XRGB:  return SAIL_PIXEL_FORMAT_BPP32_XRGB;
+        case JCS_EXT_RGBA:  return SAIL_PIXEL_FORMAT_BPP32_RGBA;
+        case JCS_EXT_BGRA:  return SAIL_PIXEL_FORMAT_BPP32_BGRA;
+        case JCS_EXT_ABGR:  return SAIL_PIXEL_FORMAT_BPP32_ABGR;
+        case JCS_EXT_ARGB:  return SAIL_PIXEL_FORMAT_BPP32_ARGB;
+
+        case JCS_YCbCr:     return SAIL_PIXEL_FORMAT_BPP24_YCBCR;
+        case JCS_CMYK:      return SAIL_PIXEL_FORMAT_BPP32_CMYK;
+        case JCS_YCCK:      return SAIL_PIXEL_FORMAT_BPP32_YCCK;
 
         default:            return SAIL_PIXEL_FORMAT_UNKNOWN;
     }
@@ -68,22 +70,26 @@ int color_space_to_pixel_format(J_COLOR_SPACE color_space) {
 
 J_COLOR_SPACE pixel_format_to_color_space(int pixel_format) {
     switch (pixel_format) {
-        case SAIL_PIXEL_FORMAT_GRAYSCALE: return JCS_GRAYSCALE;
-        case SAIL_PIXEL_FORMAT_RGB:       return JCS_RGB;
-        case SAIL_PIXEL_FORMAT_YCBCR:     return JCS_YCbCr;
-        case SAIL_PIXEL_FORMAT_CMYK:      return JCS_CMYK;
-        case SAIL_PIXEL_FORMAT_YCCK:      return JCS_YCCK;
-        case SAIL_PIXEL_FORMAT_RGBX:      return JCS_EXT_RGBX;
-        case SAIL_PIXEL_FORMAT_BGR:       return JCS_EXT_BGR;
-        case SAIL_PIXEL_FORMAT_BGRX:      return JCS_EXT_BGRX;
-        case SAIL_PIXEL_FORMAT_XBGR:      return JCS_EXT_XBGR;
-        case SAIL_PIXEL_FORMAT_XRGB:      return JCS_EXT_XRGB;
-        case SAIL_PIXEL_FORMAT_RGBA:      return JCS_EXT_RGBA;
-        case SAIL_PIXEL_FORMAT_BGRA:      return JCS_EXT_BGRA;
-        case SAIL_PIXEL_FORMAT_ABGR:      return JCS_EXT_ABGR;
-        case SAIL_PIXEL_FORMAT_ARGB:      return JCS_EXT_ARGB;
-        case SAIL_PIXEL_FORMAT_RGB565:    return JCS_RGB565;
+        case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE:  return JCS_GRAYSCALE;
 
-        default:                          return JCS_UNKNOWN;
+        case SAIL_PIXEL_FORMAT_BPP16_RGB565:    return JCS_RGB565;
+
+        case SAIL_PIXEL_FORMAT_BPP24_RGB:       return JCS_RGB;
+        case SAIL_PIXEL_FORMAT_BPP24_BGR:       return JCS_EXT_BGR;
+
+        case SAIL_PIXEL_FORMAT_BPP32_RGBX:      return JCS_EXT_RGBX;
+        case SAIL_PIXEL_FORMAT_BPP32_BGRX:      return JCS_EXT_BGRX;
+        case SAIL_PIXEL_FORMAT_BPP32_XBGR:      return JCS_EXT_XBGR;
+        case SAIL_PIXEL_FORMAT_BPP32_XRGB:      return JCS_EXT_XRGB;
+        case SAIL_PIXEL_FORMAT_BPP32_RGBA:      return JCS_EXT_RGBA;
+        case SAIL_PIXEL_FORMAT_BPP32_BGRA:      return JCS_EXT_BGRA;
+        case SAIL_PIXEL_FORMAT_BPP32_ABGR:      return JCS_EXT_ABGR;
+        case SAIL_PIXEL_FORMAT_BPP32_ARGB:      return JCS_EXT_ARGB;
+
+        case SAIL_PIXEL_FORMAT_BPP24_YCBCR:     return JCS_YCbCr;
+        case SAIL_PIXEL_FORMAT_BPP32_CMYK:      return JCS_CMYK;
+        case SAIL_PIXEL_FORMAT_BPP32_YCCK:      return JCS_YCCK;
+
+        default:                                return JCS_UNKNOWN;
     }
 }

@@ -39,6 +39,8 @@ add_executable(deep-diver-with-c++-api
                 writeoptions.ui
                 "${RC_FILE}")
 
+target_include_directories(deep-diver-with-c++-api PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/..")
+
 # Enable ASAN
 #
 if (SAIL_ASAN)

@@ -35,6 +35,8 @@ add_executable(junior-with-c-api
                 qtsail.ui
                 "${RC_FILE}")
 
+target_include_directories(junior-with-c-api PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/..")
+
 # Enable ASAN
 #
 if (SAIL_ASAN)

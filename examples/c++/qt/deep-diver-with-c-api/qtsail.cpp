@@ -42,6 +42,7 @@
 #include "readoptions.h"
 #include "writeoptions.h"
 #include "ui_qtsail.h"
+#include "qimage_sail_pixel_formats.h"
 
 // PIMPL
 //
@@ -93,19 +94,6 @@ QtSail::~QtSail()
     d->context = nullptr;
 }
 
-static QImage::Format sailPixelFormatToQImageFormat(int pixel_format) {
-    switch (pixel_format) {
-        case SAIL_PIXEL_FORMAT_MONO:      return QImage::Format_Mono;
-        case SAIL_PIXEL_FORMAT_GRAYSCALE: return QImage::Format_Grayscale8;
-        case SAIL_PIXEL_FORMAT_INDEXED:   return QImage::Format_Indexed8;
-        case SAIL_PIXEL_FORMAT_RGB:       return QImage::Format_RGB888;
-        case SAIL_PIXEL_FORMAT_RGBX:      return QImage::Format_RGBX8888;
-        case SAIL_PIXEL_FORMAT_RGBA:      return QImage::Format_RGBA8888;
-
-        default: return QImage::Format_Invalid;
-    }
-}
-
 sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 {
     sail_read_options *read_options = nullptr;
@@ -150,12 +138,6 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 
     elapsed.restart();
 
-    const QImage::Format qimageFormat = sailPixelFormatToQImageFormat(read_options->output_pixel_format);
-
-    if (qimageFormat == QImage::Format_Invalid) {
-        return SAIL_UNSUPPORTED_PIXEL_FORMAT;
-    }
-
     QFile file(path);
 
     if (!file.open(QIODevice::ReadOnly)) {
@@ -188,6 +170,13 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
                                              &image,
                                              (void **)&image_bits),
                         /* cleanup */ sail_stop_reading(state));
+
+    const QImage::Format qimageFormat = sailPixelFormatToQImageFormat(image->pixel_format);
+
+    if (qimageFormat == QImage::Format_Invalid) {
+        sail_stop_reading(state);
+        return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+    }
 
     /*
      * Finish reading.
@@ -244,19 +233,6 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     sail_unload_plugins(d->context);
 
     return 0;
-}
-
-static int qImageFormatToSailPixelFormat(QImage::Format format) {
-    switch (format) {
-        case QImage::Format_Mono:       return SAIL_PIXEL_FORMAT_MONO;
-        case QImage::Format_Grayscale8: return SAIL_PIXEL_FORMAT_GRAYSCALE;
-        case QImage::Format_Indexed8:   return SAIL_PIXEL_FORMAT_INDEXED;
-        case QImage::Format_RGB888:     return SAIL_PIXEL_FORMAT_RGB;
-        case QImage::Format_RGBX8888:   return SAIL_PIXEL_FORMAT_RGBX;
-        case QImage::Format_RGBA8888:   return SAIL_PIXEL_FORMAT_RGBA;
-
-        default: return SAIL_PIXEL_FORMAT_UNKNOWN;
-    }
 }
 
 sail_error_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffer_length,

@@ -175,31 +175,67 @@ sail_error_t sail_pixel_format_to_string(int pixel_format, const char **result) 
     SAIL_CHECK_STRING_PTR(result);
 
     switch (pixel_format) {
-        case SAIL_PIXEL_FORMAT_UNKNOWN:   *result = "UNKNOWN";   break;
-        case SAIL_PIXEL_FORMAT_SOURCE:    *result = "SOURCE";    break;
+        case SAIL_PIXEL_FORMAT_UNKNOWN:               *result = "UNKNOWN";   return 0;
+        case SAIL_PIXEL_FORMAT_SOURCE:                *result = "SOURCE";    return 0;
 
-        case SAIL_PIXEL_FORMAT_MONO:      *result = "MONO";      break;
-        case SAIL_PIXEL_FORMAT_GRAYSCALE: *result = "GRAYSCALE"; break;
-        case SAIL_PIXEL_FORMAT_INDEXED:   *result = "INDEXED";   break;
-        case SAIL_PIXEL_FORMAT_RGB:       *result = "RGB";       break;
-        case SAIL_PIXEL_FORMAT_YCBCR:     *result = "YCbCr";     break;
-        case SAIL_PIXEL_FORMAT_CMYK:      *result = "CMYK";      break;
-        case SAIL_PIXEL_FORMAT_YCCK:      *result = "YCCK";      break;
-        case SAIL_PIXEL_FORMAT_RGBX:      *result = "RGBX";      break;
-        case SAIL_PIXEL_FORMAT_BGR:       *result = "BGR";       break;
-        case SAIL_PIXEL_FORMAT_BGRX:      *result = "BGRX";      break;
-        case SAIL_PIXEL_FORMAT_XBGR:      *result = "XBGR";      break;
-        case SAIL_PIXEL_FORMAT_XRGB:      *result = "XRGB";      break;
-        case SAIL_PIXEL_FORMAT_RGBA:      *result = "RGBA";      break;
-        case SAIL_PIXEL_FORMAT_BGRA:      *result = "BGRA";      break;
-        case SAIL_PIXEL_FORMAT_ABGR:      *result = "ABGR";      break;
-        case SAIL_PIXEL_FORMAT_ARGB:      *result = "ARGB";      break;
-        case SAIL_PIXEL_FORMAT_RGB565:    *result = "RGB565";    break;
+        case SAIL_PIXEL_FORMAT_BPP1_MONO:             *result = "BPP1-MONO"; return 0;
 
-        default: return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+        case SAIL_PIXEL_FORMAT_BPP1_INDEXED:          *result = "BPP1-INDEXED"; return 0;
+        case SAIL_PIXEL_FORMAT_BPP2_INDEXED:          *result = "BPP2-INDEXED"; return 0;
+        case SAIL_PIXEL_FORMAT_BPP4_INDEXED:          *result = "BPP4-INDEXED"; return 0;
+        case SAIL_PIXEL_FORMAT_BPP8_INDEXED:          *result = "BPP8-INDEXED"; return 0;
+        case SAIL_PIXEL_FORMAT_BPP16_INDEXED:         *result = "BPP16-INDEXED"; return 0;
+
+        case SAIL_PIXEL_FORMAT_BPP2_GRAYSCALE:        *result = "BPP2-GRAYSCALE"; return 0;
+        case SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE:        *result = "BPP4-GRAYSCALE"; return 0;
+        case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE:        *result = "BPP8-GRAYSCALE"; return 0;
+        case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE:       *result = "BPP16-GRAYSCALE"; return 0;
+
+        case SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE_ALPHA:  *result = "BPP4-GRAYSCALE-ALPHA"; return 0;
+        case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE_ALPHA:  *result = "BPP8_GRAYSCALE-ALPHA"; return 0;
+        case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA: *result = "BPP16-GRAYSCALE-ALPHA"; return 0;
+        case SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA: *result = "BPP32-GRAYSCALE-ALPHA"; return 0;
+
+        case SAIL_PIXEL_FORMAT_BPP16_RGB555:          *result = "BPP16-RGB555"; return 0;
+        case SAIL_PIXEL_FORMAT_BPP16_BGR555:          *result = "BPP16-BGR555"; return 0;
+        case SAIL_PIXEL_FORMAT_BPP16_RGB565:          *result = "BPP16-RGB565"; return 0;
+        case SAIL_PIXEL_FORMAT_BPP16_BGR565:          *result = "BPP16-BGR565"; return 0;
+
+        case SAIL_PIXEL_FORMAT_BPP24_RGB:             *result = "BPP24-RGB"; return 0;
+        case SAIL_PIXEL_FORMAT_BPP24_BGR:             *result = "BPP24-BGR"; return 0;
+
+        case SAIL_PIXEL_FORMAT_BPP48_RGB:             *result = "BPP48-RGB"; return 0;
+        case SAIL_PIXEL_FORMAT_BPP48_BGR:             *result = "BPP48-BGR"; return 0;
+
+        case SAIL_PIXEL_FORMAT_BPP32_RGBX:            *result = "BPP32-RGBX"; return 0;
+        case SAIL_PIXEL_FORMAT_BPP32_BGRX:            *result = "BPP32-BGRX"; return 0;
+        case SAIL_PIXEL_FORMAT_BPP32_XRGB:            *result = "BPP32-XRGB"; return 0;
+        case SAIL_PIXEL_FORMAT_BPP32_XBGR:            *result = "BPP32-XBGR"; return 0;
+        case SAIL_PIXEL_FORMAT_BPP32_RGBA:            *result = "BPP32-RGBA"; return 0;
+        case SAIL_PIXEL_FORMAT_BPP32_BGRA:            *result = "BPP32-BGRA"; return 0;
+        case SAIL_PIXEL_FORMAT_BPP32_ARGB:            *result = "BPP32-ARGB"; return 0;
+        case SAIL_PIXEL_FORMAT_BPP32_ABGR:            *result = "BPP32-ABGR"; return 0;
+
+        case SAIL_PIXEL_FORMAT_BPP64_RGBX:            *result = "BPP64-RGBX"; return 0;
+        case SAIL_PIXEL_FORMAT_BPP64_BGRX:            *result = "BPP64-BGRX"; return 0;
+        case SAIL_PIXEL_FORMAT_BPP64_XRGB:            *result = "BPP64-XRGB"; return 0;
+        case SAIL_PIXEL_FORMAT_BPP64_XBGR:            *result = "BPP64-XBGR"; return 0;
+        case SAIL_PIXEL_FORMAT_BPP64_RGBA:            *result = "BPP64-RGBA"; return 0;
+        case SAIL_PIXEL_FORMAT_BPP64_BGRA:            *result = "BPP64-BGRA"; return 0;
+        case SAIL_PIXEL_FORMAT_BPP64_ARGB:            *result = "BPP64-ARGB"; return 0;
+        case SAIL_PIXEL_FORMAT_BPP64_ABGR:            *result = "BPP64-ABGR"; return 0;
+
+        case SAIL_PIXEL_FORMAT_BPP32_CMYK:            *result = "BPP32-CMYK"; return 0;
+        case SAIL_PIXEL_FORMAT_BPP64_CMYK:            *result = "BPP64-CMYK"; return 0;
+
+        case SAIL_PIXEL_FORMAT_BPP24_YCBCR:           *result = "BPP24-YCBCR"; return 0;
+
+        case SAIL_PIXEL_FORMAT_BPP32_YCCK:            *result = "BPP32-YCCK"; return 0;
+
+        /* Don't use 'default:' so a modern compiler warns us about a missing case switch if any. */
     }
 
-    return 0;
+    return SAIL_UNSUPPORTED_PIXEL_FORMAT;
 }
 
 sail_error_t sail_pixel_format_from_string(const char *str, int *result) {
@@ -215,40 +251,90 @@ sail_error_t sail_pixel_format_from_string(const char *str, int *result) {
         *result = SAIL_PIXEL_FORMAT_UNKNOWN;
     } else if (strcmp(str, "SOURCE") == 0) {
         *result = SAIL_PIXEL_FORMAT_SOURCE;
-    } else if (strcmp(str, "MONO") == 0) {
-        *result = SAIL_PIXEL_FORMAT_MONO;
-    } else if (strcmp(str, "GRAYSCALE") == 0) {
-        *result = SAIL_PIXEL_FORMAT_GRAYSCALE;
-    } else if (strcmp(str, "INDEXED") == 0) {
-        *result = SAIL_PIXEL_FORMAT_INDEXED;
-    } else if (strcmp(str, "RGB") == 0) {
-        *result = SAIL_PIXEL_FORMAT_RGB;
-    } else if (strcmp(str, "YCBCR") == 0) {
-        *result = SAIL_PIXEL_FORMAT_YCBCR;
-    } else if (strcmp(str, "CMYK") == 0) {
-        *result = SAIL_PIXEL_FORMAT_CMYK;
-    } else if (strcmp(str, "YCCK") == 0) {
-        *result = SAIL_PIXEL_FORMAT_YCCK;
-    } else if (strcmp(str, "RGBX") == 0) {
-        *result = SAIL_PIXEL_FORMAT_RGBX;
-    } else if (strcmp(str, "BGR") == 0) {
-        *result = SAIL_PIXEL_FORMAT_BGR;
-    } else if (strcmp(str, "BGRX") == 0) {
-        *result = SAIL_PIXEL_FORMAT_BGRX;
-    } else if (strcmp(str, "XBGR") == 0) {
-        *result = SAIL_PIXEL_FORMAT_XBGR;
-    } else if (strcmp(str, "XRGB") == 0) {
-        *result = SAIL_PIXEL_FORMAT_XRGB;
-    } else if (strcmp(str, "RGBA") == 0) {
-        *result = SAIL_PIXEL_FORMAT_RGBA;
-    } else if (strcmp(str, "BGRA") == 0) {
-        *result = SAIL_PIXEL_FORMAT_BGRA;
-    } else if (strcmp(str, "ABGR") == 0) {
-        *result = SAIL_PIXEL_FORMAT_ABGR;
-    } else if (strcmp(str, "ARGB") == 0) {
-        *result = SAIL_PIXEL_FORMAT_ARGB;
-    } else if (strcmp(str, "RGB565") == 0) {
-        *result = SAIL_PIXEL_FORMAT_RGB565;
+    } else if (strcmp(str, "BPP1-MONO") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP1_MONO;
+    } else if (strcmp(str, "BPP1-INDEXED") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP1_INDEXED;
+    } else if (strcmp(str, "BPP2-INDEXED") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP2_INDEXED;
+    } else if (strcmp(str, "BPP4-INDEXED") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP4_INDEXED;
+    } else if (strcmp(str, "BPP8-INDEXED") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP8_INDEXED;
+    } else if (strcmp(str, "BPP16-INDEXED") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP16_INDEXED;
+    } else if (strcmp(str, "BPP2-GRAYSCALE") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP2_GRAYSCALE;
+    } else if (strcmp(str, "BPP4-GRAYSCALE") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE;
+    } else if (strcmp(str, "BPP8-GRAYSCALE") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE;
+    } else if (strcmp(str, "BPP16-GRAYSCALE") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE;
+    } else if (strcmp(str, "BPP4-GRAYSCALE-ALPHA") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE_ALPHA;
+    } else if (strcmp(str, "BPP8_GRAYSCALE-ALPHA") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE_ALPHA;
+    } else if (strcmp(str, "BPP16-GRAYSCALE-ALPHA") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA;
+    } else if (strcmp(str, "BPP32-GRAYSCALE-ALPHA") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA;
+    } else if (strcmp(str, "BPP16-RGB555") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP16_RGB555;
+    } else if (strcmp(str, "BPP16-BGR555") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP16_BGR555;
+    } else if (strcmp(str, "BPP16-RGB565") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP16_RGB565;
+    } else if (strcmp(str, "BPP16-BGR565") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP16_BGR565;
+    } else if (strcmp(str, "BPP24-RGB") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP24_RGB;
+    } else if (strcmp(str, "BPP24-BGR") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP24_BGR;
+    } else if (strcmp(str, "BPP48-RGB") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP48_RGB;
+    } else if (strcmp(str, "BPP48-BGR") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP48_BGR;
+    } else if (strcmp(str, "BPP32-RGBX") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP32_RGBX;
+    } else if (strcmp(str, "BPP32-BGRX") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP32_BGRX;
+    } else if (strcmp(str, "BPP32-XRGB") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP32_XRGB;
+    } else if (strcmp(str, "BPP32-XBGR") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP32_XBGR;
+    } else if (strcmp(str, "BPP32-RGBA") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP32_RGBA;
+    } else if (strcmp(str, "BPP32-BGRA") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP32_BGRA;
+    } else if (strcmp(str, "BPP32-ARGB") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP32_ARGB;
+    } else if (strcmp(str, "BPP32-ABGR") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP32_ABGR;
+    } else if (strcmp(str, "BPP64-RGBX") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP64_RGBX;
+    } else if (strcmp(str, "BPP64-BGRX") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP64_BGRX;
+    } else if (strcmp(str, "BPP64-XRGB") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP64_XRGB;
+    } else if (strcmp(str, "BPP64-XBGR") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP64_XBGR;
+    } else if (strcmp(str, "BPP64-RGBA") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP64_RGBA;
+    } else if (strcmp(str, "BPP64-BGRA") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP64_BGRA;
+    } else if (strcmp(str, "BPP64-ARGB") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP64_ARGB;
+    } else if (strcmp(str, "BPP64-ABGR") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP64_ABGR;
+    } else if (strcmp(str, "BPP32-CMYK") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP32_CMYK;
+    } else if (strcmp(str, "BPP64-CMYK") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP64_CMYK;
+    } else if (strcmp(str, "BPP24-YCBCR") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP24_YCBCR;
+    } else if (strcmp(str, "BPP32-YCCK") == 0) {
+        *result = SAIL_PIXEL_FORMAT_BPP32_YCCK;
     } else {
         return SAIL_UNSUPPORTED_PIXEL_FORMAT;
     }
@@ -375,32 +461,64 @@ sail_error_t sail_bits_per_pixel(int pixel_format, int *result) {
         case SAIL_PIXEL_FORMAT_UNKNOWN:   *result = 0;  break;
         case SAIL_PIXEL_FORMAT_SOURCE:    *result = 0;  break;
 
-        case SAIL_PIXEL_FORMAT_MONO:      *result = 1;  break;
+        case SAIL_PIXEL_FORMAT_BPP1_MONO: *result = 1; return 0;
 
-        case SAIL_PIXEL_FORMAT_GRAYSCALE: *result = 8;  break;
-        case SAIL_PIXEL_FORMAT_INDEXED:   *result = 8;  break;
+        case SAIL_PIXEL_FORMAT_BPP1_INDEXED:  *result = 1; return 0;
+        case SAIL_PIXEL_FORMAT_BPP2_INDEXED:  *result = 2; return 0;
+        case SAIL_PIXEL_FORMAT_BPP4_INDEXED:  *result = 4; return 0;
+        case SAIL_PIXEL_FORMAT_BPP8_INDEXED:  *result = 8; return 0;
+        case SAIL_PIXEL_FORMAT_BPP16_INDEXED: *result = 16; return 0;
 
-        case SAIL_PIXEL_FORMAT_RGB565:    *result = 16; break;
+        case SAIL_PIXEL_FORMAT_BPP2_GRAYSCALE:  *result = 2; return 0;
+        case SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE:  *result = 4; return 0;
+        case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE:  *result = 8; return 0;
+        case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE: *result = 16; return 0;
 
-        case SAIL_PIXEL_FORMAT_RGB:       *result = 24; break;
-        case SAIL_PIXEL_FORMAT_YCBCR:     *result = 24; break;
-        case SAIL_PIXEL_FORMAT_BGR:       *result = 24; break;
+        case SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE_ALPHA:  *result = 4; return 0;
+        case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE_ALPHA:  *result = 8; return 0;
+        case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA: *result = 16; return 0;
+        case SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA: *result = 32; return 0;
 
-        case SAIL_PIXEL_FORMAT_CMYK:      *result = 32; break;
-        case SAIL_PIXEL_FORMAT_YCCK:      *result = 32; break;
-        case SAIL_PIXEL_FORMAT_RGBX:      *result = 32; break;
-        case SAIL_PIXEL_FORMAT_BGRX:      *result = 32; break;
-        case SAIL_PIXEL_FORMAT_XBGR:      *result = 32; break;
-        case SAIL_PIXEL_FORMAT_XRGB:      *result = 32; break;
-        case SAIL_PIXEL_FORMAT_RGBA:      *result = 32; break;
-        case SAIL_PIXEL_FORMAT_BGRA:      *result = 32; break;
-        case SAIL_PIXEL_FORMAT_ABGR:      *result = 32; break;
-        case SAIL_PIXEL_FORMAT_ARGB:      *result = 32; break;
+        case SAIL_PIXEL_FORMAT_BPP16_RGB555:
+        case SAIL_PIXEL_FORMAT_BPP16_BGR555:
+        case SAIL_PIXEL_FORMAT_BPP16_RGB565:
+        case SAIL_PIXEL_FORMAT_BPP16_BGR565: *result = 16; return 0;
 
-        default: return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+        case SAIL_PIXEL_FORMAT_BPP24_RGB:
+        case SAIL_PIXEL_FORMAT_BPP24_BGR: *result = 24; return 0;
+
+        case SAIL_PIXEL_FORMAT_BPP48_RGB:
+        case SAIL_PIXEL_FORMAT_BPP48_BGR: *result = 48; return 0;
+
+        case SAIL_PIXEL_FORMAT_BPP32_RGBX:
+        case SAIL_PIXEL_FORMAT_BPP32_BGRX:
+        case SAIL_PIXEL_FORMAT_BPP32_XRGB:
+        case SAIL_PIXEL_FORMAT_BPP32_XBGR:
+        case SAIL_PIXEL_FORMAT_BPP32_RGBA:
+        case SAIL_PIXEL_FORMAT_BPP32_BGRA:
+        case SAIL_PIXEL_FORMAT_BPP32_ARGB:
+        case SAIL_PIXEL_FORMAT_BPP32_ABGR: *result = 32; return 0;
+
+        case SAIL_PIXEL_FORMAT_BPP64_RGBX:
+        case SAIL_PIXEL_FORMAT_BPP64_BGRX:
+        case SAIL_PIXEL_FORMAT_BPP64_XRGB:
+        case SAIL_PIXEL_FORMAT_BPP64_XBGR:
+        case SAIL_PIXEL_FORMAT_BPP64_RGBA:
+        case SAIL_PIXEL_FORMAT_BPP64_BGRA:
+        case SAIL_PIXEL_FORMAT_BPP64_ARGB:
+        case SAIL_PIXEL_FORMAT_BPP64_ABGR: *result = 64; return 0;
+
+        case SAIL_PIXEL_FORMAT_BPP32_CMYK: *result = 32; return 0;
+        case SAIL_PIXEL_FORMAT_BPP64_CMYK: *result = 64; return 0;
+
+        case SAIL_PIXEL_FORMAT_BPP24_YCBCR: *result = 24; return 0;
+
+        case SAIL_PIXEL_FORMAT_BPP32_YCCK: *result = 32; return 0;
+
+        /* Don't use 'default:' so a modern compiler warns us about a missing case switch if any. */
     }
 
-    return 0;
+    return SAIL_UNSUPPORTED_PIXEL_FORMAT;
 }
 
 sail_error_t sail_bytes_per_line(const struct sail_image *image, int *result) {
