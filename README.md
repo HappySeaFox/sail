@@ -42,7 +42,7 @@ Author: Dmitry Baryshev.
 
 ## Supported image formats
 
-- [JPEG](https://wikipedia.org/wiki/JPEG) (reading and writing, requires `libjpeg-turbo`)
+1. [JPEG](https://wikipedia.org/wiki/JPEG) (reading and writing, requires `libjpeg-turbo`)
 
 ## Supported platforms
 
