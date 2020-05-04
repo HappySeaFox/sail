@@ -387,6 +387,8 @@ sail_error_t sail_plugin_info_from_path(const char *path, const struct sail_cont
         return SAIL_INVALID_ARGUMENT;
     }
 
+    SAIL_LOG_DEBUG("Finding plugin info for path '%s'", path);
+
     SAIL_TRY(sail_plugin_info_from_extension(dot+1, context, plugin_info));
 
     return 0;
@@ -397,6 +399,8 @@ sail_error_t sail_plugin_info_from_extension(const char *extension, const struct
     SAIL_CHECK_EXTENSION_PTR(extension);
     SAIL_CHECK_CONTEXT_PTR(context);
     SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
+
+    SAIL_LOG_DEBUG("Finding plugin info for extension '%s'", extension);
 
     char *extension_copy;
     SAIL_TRY(sail_strdup(extension, &extension_copy));
@@ -413,6 +417,7 @@ sail_error_t sail_plugin_info_from_extension(const char *extension, const struct
             if (strcmp(string_node->value, extension_copy) == 0) {
                 free(extension_copy);
                 *plugin_info = node->plugin_info;
+                SAIL_LOG_DEBUG("Found plugin info: '%s'", (*plugin_info)->name);
                 return 0;
             }
 
@@ -432,6 +437,8 @@ sail_error_t sail_plugin_info_from_mime_type(const struct sail_context *context,
     SAIL_CHECK_PTR(mime_type);
     SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
 
+    SAIL_LOG_DEBUG("Finding plugin info for mime type '%s'", mime_type);
+
     char *mime_type_copy;
     SAIL_TRY(sail_strdup(mime_type, &mime_type_copy));
 
@@ -447,6 +454,7 @@ sail_error_t sail_plugin_info_from_mime_type(const struct sail_context *context,
             if (strcmp(string_node->value, mime_type_copy) == 0) {
                 free(mime_type_copy);
                 *plugin_info = node->plugin_info;
+                SAIL_LOG_DEBUG("Found plugin info: '%s'", (*plugin_info)->name);
                 return 0;
             }
 
