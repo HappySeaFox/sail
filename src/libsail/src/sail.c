@@ -383,7 +383,7 @@ sail_error_t sail_plugin_info_from_path(const char *path, const struct sail_cont
 
     const char *dot = strrchr(path, '.');
 
-    if (dot == NULL || *(dot+1) == '\0') {
+    if (dot == NULL || *dot == '\0' || *(dot+1) == '\0') {
         return SAIL_INVALID_ARGUMENT;
     }
 
