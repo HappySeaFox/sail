@@ -138,6 +138,9 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 
     elapsed.restart();
 
+    /*
+     * Read the whole file into a memory buffer.
+     */
     QFile file(path);
 
     if (!file.open(QIODevice::ReadOnly)) {
