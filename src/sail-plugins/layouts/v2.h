@@ -145,7 +145,6 @@ SAIL_EXPORT sail_error_t sail_plugin_write_scan_line_v2(void *state, struct sail
  */
 SAIL_EXPORT sail_error_t sail_plugin_write_finish_v2(void **state, struct sail_io *io);
 
-
 /* extern "C" */
 #ifdef __cplusplus
 }
