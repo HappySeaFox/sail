@@ -225,8 +225,11 @@ static sail_error_t sail_init_impl(struct sail_context **context, int flags) {
 
     struct sail_plugin_info_node *last_plugin_info_node;
 
-#ifdef SAIL_WIN32
     const char *plugs_path = plugins_path();
+
+    SAIL_LOG_DEBUG("Loading plugins from '%s'", plugs_path);
+
+#ifdef SAIL_WIN32
     const char *plugs_info_mask = "\\*.plugin.info";
 
     size_t plugs_path_with_mask_length = strlen(plugs_path) + strlen(plugs_info_mask) + 1;
@@ -259,6 +262,8 @@ static sail_error_t sail_init_impl(struct sail_context **context, int flags) {
             continue;
         }
 
+        SAIL_LOG_DEBUG("Found plugin info '%s'", data.cFileName);
+
         build_plugin_full_path(*context, &last_plugin_info_node, full_path);
 
         free(full_path);
@@ -271,7 +276,6 @@ static sail_error_t sail_init_impl(struct sail_context **context, int flags) {
     free(plugs_path_with_mask);
     FindClose(hFind);
 #else
-    const char *plugs_path = plugins_path();
     DIR *d = opendir(plugs_path);
 
     if (d == NULL) {
@@ -298,7 +302,12 @@ static sail_error_t sail_init_impl(struct sail_context **context, int flags) {
         bool is_file = S_ISREG(full_path_stat.st_mode);
 
         if (is_file) {
-            build_plugin_full_path(*context, &last_plugin_info_node, full_path);
+            bool is_plugin_info = strstr(full_path, ".plugin.info") != NULL;
+
+            if (is_plugin_info) {
+                SAIL_LOG_DEBUG("Found plugin info '%s'", dir->d_name);
+                build_plugin_full_path(*context, &last_plugin_info_node, full_path);
+            }
         }
 
         free(full_path);
