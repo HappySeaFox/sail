@@ -48,6 +48,10 @@ Author: Dmitry Baryshev.
 
 Currently SAIL supports Windows and Linux platforms.
 
+## Having questions or issues
+
+Opening a GitHub [issue](https://github.com/smoked-herring/sail/issues) is a preferred way of communication and solving problems.
+
 ## Architecture overview
 
 SAIL is written in C w/o using any third-party libraries (except for codecs). It also provides bindings to C++.
