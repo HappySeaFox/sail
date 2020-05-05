@@ -65,21 +65,15 @@ int main(int argc, char *argv[]) {
 
     const bool is_rgba = image->pixel_format == SAIL_PIXEL_FORMAT_BPP32_RGBA;
 
-    /* Setup masks to handle color channels in the image data. */
-    const Uint32 rmask = 0x000000ff;
-    const Uint32 gmask = 0x0000ff00;
-    const Uint32 bmask = 0x00ff0000;
-    const Uint32 amask = is_rgba ? 0 : 0xff000000;
-
     SDL_Surface *surface = SDL_CreateRGBSurfaceFrom(image_bits,
                                                     image->width,
                                                     image->height,
                                                     is_rgba ? 32 : 24,
                                                     bytes_per_line,
-                                                    rmask,
-                                                    gmask,
-                                                    bmask,
-                                                    amask);
+                                                    0x000000ff,
+                                                    0x0000ff00,
+                                                    0x00ff0000,
+                                                    is_rgba ? 0xff000000 : 0);
 
     if (surface == NULL) {
         fprintf(stderr, "Failed to create surface: %s\n", SDL_GetError());
