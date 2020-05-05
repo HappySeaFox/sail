@@ -48,7 +48,7 @@ Author: Dmitry Baryshev.
 
 Currently SAIL supports Windows and Linux platforms.
 
-## Having questions or issues?
+## Have questions or issues?
 
 Opening a GitHub [issue](https://github.com/smoked-herring/sail/issues) is a preferred way of communication and solving problems.
 
