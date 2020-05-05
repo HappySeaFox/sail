@@ -133,6 +133,7 @@ add_subdirectory(src/libsail)
 add_subdirectory(src/sail-plugins)
 add_subdirectory(examples/c/sail-convert)
 add_subdirectory(examples/c/sail-probe)
+add_subdirectory(examples/c/sail-sdl-viewer)
 add_subdirectory(bindings/c++)
 
 # Installation
