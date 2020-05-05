@@ -4,16 +4,9 @@ add_executable(sail-probe sail-probe.c)
 #
 target_link_libraries(sail-probe sail)
 
-# Enable ASAN
+# Enable ASAN if possible
 #
-if (SAIL_ASAN)
-    if (CMAKE_COMPILER_IS_GNUCC)
-        target_compile_options(sail-probe PRIVATE "${SAIL_ASAN}")
-        target_link_libraries(sail-probe "${SAIL_ASAN}")
-    else()
-        message("ASAN is not supported on this platform.")
-    endif()
-endif()
+sail_enable_asan(TARGET sail-probe)
 
 # Installation
 #

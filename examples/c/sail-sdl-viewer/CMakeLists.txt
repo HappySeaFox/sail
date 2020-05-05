@@ -9,13 +9,6 @@ target_link_libraries(sail-sdl-viewer "${SDL2_LIBRARIES}")
 #
 target_link_libraries(sail-sdl-viewer sail)
 
-# Enable ASAN
+# Enable ASAN if possible
 #
-if (SAIL_ASAN)
-    if (CMAKE_COMPILER_IS_GNUCC)
-        target_compile_options(sail-sdl-viewer PRIVATE "${SAIL_ASAN}")
-        target_link_libraries(sail-sdl-viewer "${SAIL_ASAN}")
-    else()
-        message("ASAN is not supported on this platform.")
-    endif()
-endif()
+sail_enable_asan(TARGET sail-sdl-viewer)

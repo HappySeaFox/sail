@@ -2,7 +2,7 @@
 # installation targets, plugin info.
 #
 macro(sail_plugin)
-    cmake_parse_arguments(SAIL_PLUGIN "" "TARGET" "SOURCES;PKGCONFIG" ${ARGN} )
+    cmake_parse_arguments(SAIL_PLUGIN "" "TARGET" "SOURCES;PKGCONFIG" ${ARGN})
 
     # Add a plugin
     #

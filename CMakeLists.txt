@@ -10,6 +10,7 @@ include(GNUInstallDirs)
 #
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 include(sail_plugin)
+include(sail_enable_asan)
 
 # Sanity checks
 #
