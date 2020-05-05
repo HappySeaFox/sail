@@ -81,8 +81,8 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     uchar *image_bits;
 
     /*
-     * sail_read() reads the image and outputs pixels in RGB pixel format for image formats
-     * without transparency support and RGBA otherwise.
+     * sail_read() reads the image and outputs pixels in BPP24-RGB pixel format for image formats
+     * without transparency support and BPP32-RGBA otherwise.
      */
     SAIL_TRY(sail_read(path.toLocal8Bit(),
                        &image,
