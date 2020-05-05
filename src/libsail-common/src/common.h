@@ -43,6 +43,7 @@ enum SailPixelFormat {
 
     /*
      * Copy the source pixels as is without converting them to a different pixel format.
+     * If pixels are compressed with RLE or different compression algorithm, they're still unpacked.
      */
     SAIL_PIXEL_FORMAT_SOURCE,
 
