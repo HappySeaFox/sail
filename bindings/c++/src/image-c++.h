@@ -264,7 +264,7 @@ public:
 
     /*
      * Calculates a number of bits per pixel in the specified pixel format.
-     * For example, for SAIL_PIXEL_FORMAT_RGB 24 is assigned.
+     * For example, for SAIL_PIXEL_FORMAT_BPP24_RGB 24 is assigned.
      *
      * Returns 0 on success or sail_error_t on error.
      */
@@ -302,7 +302,7 @@ public:
 
     /*
      * Assigns a non-NULL string representation of the specified pixel format. The assigned string
-     * MUST NOT be destroyed. For example: "RGB".
+     * MUST NOT be destroyed. For example: "BPP24-RGB".
      *
      * Returns 0 on success or sail_error_t on error.
      */

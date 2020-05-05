@@ -23,7 +23,7 @@ Author: Dmitry Baryshev.
 - Writing images to file and memory.
 - I/O abstraction for technical divers.
 - Image formats are supported by dynamically loaded codecs (plugins).
-- It's guaranteed that every plugin is able to read and output to memory pixels in `RGB` and `RGBA` formats.
+- It's guaranteed that every plugin is able to read and output to memory pixels in `BPP24-RGB` and `BPP32-RGBA` formats.
   Supporting other output pixel formats is plugin-specific.
 - Reading and writing images in numerous plugin-specific pixel formats. For example, the JPEG plugin
   is able to read `RGB` and `YCbCr` images and output them to memory as `Grayscale` pixels and vice versa.
@@ -96,8 +96,8 @@ struct sail_image *image;
 unsigned char *image_bits;
 
 /*
- * sail_read() reads the image and outputs pixels in RGB pixel format for image formats
- * without transparency support and RGBA otherwise. If you need to control output pixel
+ * sail_read() reads the image and outputs pixels in BPP24-RGB pixel format for image formats
+ * without transparency support and BPP32-RGBA otherwise. If you need to control output pixel
  * formats, consider switching to the deep diver API.
  */
 SAIL_TRY(sail_read(path,
@@ -119,8 +119,8 @@ sail_destroy_image(image);
 sail::image_reader reader;
 sail::image image;
 
-// read() reads the image and outputs pixels in RGB pixel format for image formats
-// without transparency support and RGBA otherwise. If you need to control output pixel
+// read() reads the image and outputs pixels in BPP24-RGB pixel format for image formats
+// without transparency support and BPP32-RGBA otherwise. If you need to control output pixel
 // formats, consider switching to the deep diver API.
 //
 SAIL_TRY(reader.read(path, &image));

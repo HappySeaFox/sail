@@ -54,7 +54,7 @@ SAIL_EXPORT sail_error_t sail_probe(const char *path, struct sail_context *conte
  * Loads the specified image file and returns its properties and pixel data. The assigned image MUST be destroyed later
  * with sail_destroy_image(). The assigned pixel data MUST be destroyed later with free().
  *
- * Outputs pixels in RGB pixel format for image formats without transparency support and RGBA otherwise.
+ * Outputs pixels in BPP24-RGB pixel format for image formats without transparency support and BPP32-RGBA otherwise.
  *
  * WARNING: This function allocates a local static context and never destroys it. ASAN will report
  * memory leaks which is OK.

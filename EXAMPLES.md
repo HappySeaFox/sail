@@ -48,8 +48,8 @@ struct sail_image *image;
 unsigned char *image_bits;
 
 /*
- * sail_read() reads the image and outputs pixels in RGB pixel format for image formats
- * without transparency support and RGBA otherwise.
+ * sail_read() reads the image and outputs pixels in BPP24-RGB pixel format for image formats
+ * without transparency support and BPP32-RGBA otherwise.
  *
  * WARNING: This function allocates a local static context and never destroys it. ASAN
  *          will report memory leaks which is OK.
@@ -73,8 +73,8 @@ sail_destroy_image(image);
 sail::image_reader reader;
 sail::image image;
 
-// read() reads the image and outputs pixels in RGB pixel format for image formats
-// without transparency support and RGBA otherwise.
+// read() reads the image and outputs pixels in BPP24-RGB pixel format for image formats
+// without transparency support and BPP32-RGBA otherwise.
 //
 // WARNING: This function allocates a local static context and never destroys it. ASAN
 //          will report memory leaks which is OK.
@@ -110,8 +110,8 @@ unsigned char *image_bits = NULL;
 
 /*
  * Starts reading the specified file.
- * The subsequent calls to sail_read_next_frame() will output pixels in RGB pixel format
- * for image formats without transparency support and RGBA otherwise.
+ * The subsequent calls to sail_read_next_frame() will output pixels in BPP24-RGB pixel format
+ * for image formats without transparency support and BPP32-RGBA otherwise.
  */
 SAIL_TRY_OR_CLEANUP(sail_start_reading_file(path, context, NULL, &state),
                     /* cleanup */ sail_stop_reading(state),
@@ -170,8 +170,8 @@ SAIL_AT_SCOPE_EXIT (
 );
 
 // Starts reading the specified file.
-// The subsequent calls to read_next_frame() will output pixels in RGB pixel format
-// for image formats without transparency support and RGBA otherwise.
+// The subsequent calls to read_next_frame() will output pixels in BPP24-RGB pixel format
+// for image formats without transparency support and BPP32-RGBA otherwise.
 //
 SAIL_TRY(reader.start_reading(path));
 
@@ -179,8 +179,8 @@ SAIL_TRY(reader.start_reading(path));
 // reading frames till read_next_frame() returns 0. If no more frames are available,
 // it returns SAIL_NO_MORE_FRAMES.
 //
-// read_next_frame() outputs pixels in RGB pixel format for image formats
-// without transparency support and RGBA otherwise.
+// read_next_frame() outputs pixels in BPP24-RGB pixel format for image formats
+// without transparency support and BPP32-RGBA otherwise.
 //
 SAIL_TRY(reader.read_next_frame(&image));
 
@@ -229,23 +229,23 @@ SAIL_TRY(sail_plugin_info_from_extension("JPEG", context, &plugin_info));
 SAIL_TRY(sail_alloc_read_options_from_features(plugin_info->read_features, &read_options));
 
 /*
- * Let's request RGB pixels only.
+ * Let's request BPP24-RGB pixels only.
  */
-if (read_options->output_pixel_format != SAIL_PIXEL_FORMAT_RGB) {
+if (read_options->output_pixel_format != SAIL_PIXEL_FORMAT_BPP24_RGB) {
     bool foundRgb = false;
 
     /*
-     * Check if the plugin supports outputting RGB pixels.
+     * Check if the plugin supports outputting BPP24-RGB pixels.
      */
     for (int i = 0; i < plugin_info->read_features->output_pixel_formats_length; i++) {
-        if (plugin_info->read_features->output_pixel_formats[i] == SAIL_PIXEL_FORMAT_RGB) {
+        if (plugin_info->read_features->output_pixel_formats[i] == SAIL_PIXEL_FORMAT_BPP24_RGB) {
             foundRgb = true;
             break;
         }
     }
 
     /*
-     * The plugin doesn't support outputting RGB pixels.
+     * The plugin doesn't support outputting BPP24-RGB pixels.
      */
     if (!foundRgb) {
         sail_destroy_read_options(read_options);
@@ -253,9 +253,9 @@ if (read_options->output_pixel_format != SAIL_PIXEL_FORMAT_RGB) {
     }
 
     /*
-     * Request the plugin to output RGB pixels.
+     * Request the plugin to output BPP24-RGB pixels.
      */
-    read_options->output_pixel_format = SAIL_PIXEL_FORMAT_RGB;
+    read_options->output_pixel_format = SAIL_PIXEL_FORMAT_BPP24_RGB;
 }
 
 /*
@@ -285,7 +285,7 @@ sail_destroy_read_options(read_options);
  * reading frames till sail_read_next_frame() returns 0. If no more frames are available,
  * it returns SAIL_NO_MORE_FRAMES.
  *
- * sail_read_next_frame() outputs pixels in the requested pixel format (RGB).
+ * sail_read_next_frame() outputs pixels in the requested pixel format (BPP24-RGB).
  */
 SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state,
                                          &image,
@@ -309,7 +309,7 @@ if (node != NULL) {
 }
 
 /*
- * Handle the image RGB bits here.
+ * Handle the image BPP24-RGB bits here.
  * Use image->width, image->height, image->bytes_per_line,
  * and image->pixel_format for that.
  */
@@ -351,21 +351,21 @@ SAIL_TRY(context.plugin_info_from_extension("JPEG", &plugin_info));
 sail::read_options read_options;
 SAIL_TRY(plugin_info.read_features().to_read_options(&read_options));
 
-// Let's request RGB pixels only.
+// Let's request BPP24-RGB pixels only.
 //
-if (read_options.output_pixel_format() != SAIL_PIXEL_FORMAT_RGB) {
+if (read_options.output_pixel_format() != SAIL_PIXEL_FORMAT_BPP24_RGB) {
     const std::vector<int> output_pixel_formats = plugin_info.read_features().output_pixel_formats();
 
-    // The plugin doesn't support outputting RGB pixels.
+    // The plugin doesn't support outputting BPP24-RGB pixels.
     //
-    if (std::find(output_pixel_formats.begin(), output_pixel_formats.end(), SAIL_PIXEL_FORMAT_RGB) ==
+    if (std::find(output_pixel_formats.begin(), output_pixel_formats.end(), SAIL_PIXEL_FORMAT_BPP24_RGB) ==
             output_pixel_formats.end()) {
         return SAIL_UNSUPPORTED_PIXEL_FORMAT;
     }
 
-    // Request the plugin to output RGB pixels.
+    // Request the plugin to output BPP24-RGB pixels.
     //
-    read_options.with_output_pixel_format(SAIL_PIXEL_FORMAT_RGB);
+    read_options.with_output_pixel_format(SAIL_PIXEL_FORMAT_BPP24_RGB);
 }
 
 // Obtain an image data in a buffer: read it from a file etc.
@@ -381,7 +381,7 @@ SAIL_TRY(reader.start_reading(buffer, buffer_length, plugin_info, read_options))
 // reading frames till read_next_frame() returns 0. If no more frames are available,
 // it returns SAIL_NO_MORE_FRAMES.
 //
-// read_next_frame() outputs pixels in the requested pixel format (RGB).
+// read_next_frame() outputs pixels in the requested pixel format (BPP24-RGB).
 //
 sail::image image;
 SAIL_TRY(reader.read_next_frame(&image));
@@ -470,23 +470,23 @@ SAIL_TRY_OR_CLEANUP(sail_alloc_read_options_from_features(plugin_info->read_feat
                     /* cleanup */ sail_destroy_io(io));
 
 /*
- * Let's request RGB pixels only.
+ * Let's request BPP24-RGB pixels only.
  */
-if (read_options->output_pixel_format != SAIL_PIXEL_FORMAT_RGB) {
+if (read_options->output_pixel_format != SAIL_PIXEL_FORMAT_BPP24_RGB) {
     bool foundRgb = false;
 
     /*
-     * Check if the plugin supports outputting RGB pixels.
+     * Check if the plugin supports outputting BPP24-RGB pixels.
      */
     for (int i = 0; i < plugin_info->read_features->output_pixel_formats_length; i++) {
-        if (plugin_info->read_features->output_pixel_formats[i] == SAIL_PIXEL_FORMAT_RGB) {
+        if (plugin_info->read_features->output_pixel_formats[i] == SAIL_PIXEL_FORMAT_BPP24_RGB) {
             foundRgb = true;
             break;
         }
     }
 
     /*
-     * The plugin doesn't support outputting RGB pixels.
+     * The plugin doesn't support outputting BPP24-RGB pixels.
      */
     if (!foundRgb) {
         sail_destroy_read_options(read_options);
@@ -495,9 +495,9 @@ if (read_options->output_pixel_format != SAIL_PIXEL_FORMAT_RGB) {
     }
 
     /*
-     * Request the plugin to output RGB pixels.
+     * Request the plugin to output BPP24-RGB pixels.
      */
-    read_options->output_pixel_format = SAIL_PIXEL_FORMAT_RGB;
+    read_options->output_pixel_format = SAIL_PIXEL_FORMAT_BPP24_RGB;
 }
 
 /*
@@ -521,7 +521,7 @@ sail_destroy_read_options(read_options);
  * reading frames till sail_read_next_frame() returns 0. If no more frames are available,
  * it returns SAIL_NO_MORE_FRAMES.
  *
- * sail_read_next_frame() outputs pixels in the requested pixel format (RGB).
+ * sail_read_next_frame() outputs pixels in the requested pixel format (BPP24-RGB).
  */
 SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state,
                                          &image,
@@ -549,7 +549,7 @@ if (node != NULL) {
 }
 
 /*
- * Handle the image RGB bits here.
+ * Handle the image BPP24-RGB bits here.
  * Use image->width, image->height, image->bytes_per_line,
  * and image->pixel_format for that.
  */
@@ -617,21 +617,21 @@ io.with_read(io_my_data_source_read)
 sail::read_options read_options;
 SAIL_TRY(plugin_info.read_features().to_read_options(&read_options));
 
-// Let's request RGB pixels only.
+// Let's request BPP24-RGB pixels only.
 //
-if (read_options.output_pixel_format() != SAIL_PIXEL_FORMAT_RGB) {
+if (read_options.output_pixel_format() != SAIL_PIXEL_FORMAT_BPP24_RGB) {
     const std::vector<int> output_pixel_formats = plugin_info.read_features().output_pixel_formats();
 
-    // The plugin doesn't support outputting RGB pixels.
+    // The plugin doesn't support outputting BPP24-RGB pixels.
     //
-    if (std::find(output_pixel_formats.begin(), output_pixel_formats.end(), SAIL_PIXEL_FORMAT_RGB) ==
+    if (std::find(output_pixel_formats.begin(), output_pixel_formats.end(), SAIL_PIXEL_FORMAT_BPP24_RGB) ==
             output_pixel_formats.end()) {
         return SAIL_UNSUPPORTED_PIXEL_FORMAT;
     }
 
-    // Request the plugin to output RGB pixels.
+    // Request the plugin to output BPP24-RGB pixels.
     //
-    read_options.with_output_pixel_format(SAIL_PIXEL_FORMAT_RGB);
+    read_options.with_output_pixel_format(SAIL_PIXEL_FORMAT_BPP24_RGB);
 }
 
 // Initialize reading with our I/O stream and options.
@@ -642,7 +642,7 @@ SAIL_TRY(reader.start_reading(io, plugin_info, read_options));
 // reading frames till read_next_frame() returns 0. If no more frames are available,
 // it returns SAIL_NO_MORE_FRAMES.
 //
-// read_next_frame() outputs pixels in the requested pixel format (RGB).
+// read_next_frame() outputs pixels in the requested pixel format (BPP24-RGB).
 //
 sail::image image;
 SAIL_TRY(reader.read_next_frame(&image));

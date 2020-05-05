@@ -40,7 +40,7 @@ struct sail_read_features {
      * A list of supported pixel formats that can be read by this plugin. One of these values
      * will be stored in sail_image.source_pixel_format. See SailPixelFormat.
      *
-     * For example: CMYK, YCBCR, RGB.
+     * For example: BPP32-CMYK, BPP24-YCBCR, BPP24-RGB.
      *
      * NOTE: Some input pixel formats might not map to some output pixel formats.
      *       Let's take a look at an hypothetical example:
@@ -71,10 +71,10 @@ struct sail_read_features {
      * See the comments above.
      *
      * If the array contains SAIL_PIXEL_FORMAT_SOURCE, then the codec is able to output raw pixel data.
-     * It's a caller's responsibility to convert it to a suitable format then. Refer to sail_image.pixel_format
-     * to detect the actual pixel format of the raw data in this case.
+     * It's a caller's responsibility to convert it to a suitable pixel format then. Refer to
+     * sail_image.pixel_format to detect the actual pixel format of the raw pixel data in this case.
      *
-     * For example: SOURCE, RGB, YCCK.
+     * For example: SOURCE, BPP24-RGB, BPP32-YCCK.
      */
     int *output_pixel_formats;
 
@@ -83,7 +83,7 @@ struct sail_read_features {
 
     /*
      * Output pixel format to use by default when no specific output pixel format was requested by user.
-     * It's always RGB for image formats without transparency support and RGBA otherwise.
+     * It's always BPP24-RGB for image formats without transparency support and BPP32-RGBA otherwise.
      */
     int preferred_output_pixel_format;
 
