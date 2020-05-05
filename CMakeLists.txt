@@ -128,12 +128,19 @@ include_directories("${PROJECT_BINARY_DIR}/include")
 
 # Configure subdirs
 #
+
+find_package(SDL2)
+set(SAIL_SDL_EXAMPLE OFF)
+
 add_subdirectory(src/libsail-common)
 add_subdirectory(src/libsail)
 add_subdirectory(src/sail-plugins)
 add_subdirectory(examples/c/sail-convert)
 add_subdirectory(examples/c/sail-probe)
-add_subdirectory(examples/c/sail-sdl-viewer)
+if (SDL2_FOUND)
+    set(SAIL_SDL_EXAMPLE ON)
+    add_subdirectory(examples/c/sail-sdl-viewer)
+endif()
 add_subdirectory(bindings/c++)
 
 # Installation
@@ -166,6 +173,7 @@ message("*")
 message("* SAIL version:                 ${PROJECT_VERSION}")
 message("* SAIL git hash:                ${SAIL_GIT_HASH}")
 message("* Developer mode:               ${SAIL_DEV}")
+message("* SDL example:                  ${SAIL_SDL_EXAMPLE}")
 message("*")
 message("* Install prefix:               ${CMAKE_INSTALL_PREFIX}")
 message("* LIBDIR:                       ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")

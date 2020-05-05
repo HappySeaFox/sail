@@ -1,7 +1,3 @@
-# Require SDL2
-#
-find_package(SDL2 REQUIRED)
-
 add_executable(sail-sdl-viewer sail-sdl-viewer.c)
 
 # Add SDL2 dependencies
