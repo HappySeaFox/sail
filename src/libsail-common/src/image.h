@@ -36,7 +36,7 @@ extern "C" {
 struct sail_meta_entry_node;
 
 /*
- * A structure representing an image. Fields set when reading images are marked with READ.
+ * A structure representing an image. Fields set by SAIL when reading images are marked with READ.
  * Fields that must be set by a caller when writing images are marked with WRITE.
  */
 struct sail_image {
