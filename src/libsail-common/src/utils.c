@@ -170,7 +170,7 @@ sail_error_t sail_to_wchar(const char *input, wchar_t **output) {
     return 0;
 }
 
-sail_error_t sail_string_hash(const char *str, unsigned long *hash) {
+sail_error_t sail_string_hash(const char *str, uint64_t *hash) {
 
     SAIL_CHECK_STRING_PTR(str);
     SAIL_CHECK_RESULT_PTR(hash);
@@ -262,7 +262,7 @@ sail_error_t sail_pixel_format_from_string(const char *str, int *result) {
         return SAIL_UNSUPPORTED_PIXEL_FORMAT;
     }
 
-    unsigned long hash;
+    uint64_t hash;
     SAIL_TRY(sail_string_hash(str, &hash));
 
     /*
@@ -273,50 +273,50 @@ sail_error_t sail_pixel_format_from_string(const char *str, int *result) {
      *     2. Use a single ugly looking switch/case.
      */
     switch (hash) {
-        case 229442760833397UL:      *result = SAIL_PIXEL_FORMAT_UNKNOWN;               return 0;
-        case 6952734212790UL:        *result = SAIL_PIXEL_FORMAT_SOURCE;                return 0;
-        case 249836535302445214UL:   *result = SAIL_PIXEL_FORMAT_BPP1_MONO;             return 0;
-        case 13257949335914442470UL: *result = SAIL_PIXEL_FORMAT_BPP1_INDEXED;          return 0;
-        case 13257950742323060711UL: *result = SAIL_PIXEL_FORMAT_BPP2_INDEXED;          return 0;
-        case 13257953555140297193UL: *result = SAIL_PIXEL_FORMAT_BPP4_INDEXED;          return 0;
-        case 13257959180774770157UL: *result = SAIL_PIXEL_FORMAT_BPP8_INDEXED;          return 0;
-        case 13237225848150241308UL: *result = SAIL_PIXEL_FORMAT_BPP16_INDEXED;         return 0;
-        case 12554490103502587777UL: *result = SAIL_PIXEL_FORMAT_BPP2_GRAYSCALE;        return 0;
-        case 12557553261473116675UL: *result = SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE;        return 0;
-        case 12563679577414174471UL: *result = SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE;        return 0;
-        case 8431824423011809526UL:  *result = SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE;       return 0;
-        case 9367569596161118198UL:  *result = SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE_ALPHA;  return 0;
-        case 9512005337741770220UL:  *result = SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE_ALPHA;  return 0;
-        case 3292614999547101481UL:  *result = SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA; return 0;
-        case 5929884054553197927UL:  *result = SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA; return 0;
-        case 13257949683479278997UL: *result = SAIL_PIXEL_FORMAT_BPP16_RGB555;          return 0;
-        case 13257949682853687701UL: *result = SAIL_PIXEL_FORMAT_BPP16_BGR555;          return 0;
-        case 13257949683479279030UL: *result = SAIL_PIXEL_FORMAT_BPP16_RGB565;          return 0;
-        case 13257949682853687734UL: *result = SAIL_PIXEL_FORMAT_BPP16_BGR565;          return 0;
-        case 249836535348735093UL:   *result = SAIL_PIXEL_FORMAT_BPP24_RGB;             return 0;
-        case 249836535348717685UL:   *result = SAIL_PIXEL_FORMAT_BPP24_BGR;             return 0;
-        case 249836535431749563UL:   *result = SAIL_PIXEL_FORMAT_BPP48_RGB;             return 0;
-        case 249836535431732155UL:   *result = SAIL_PIXEL_FORMAT_BPP48_BGR;             return 0;
-        case 8244605667721455340UL:  *result = SAIL_PIXEL_FORMAT_BPP32_RGBX;            return 0;
-        case 8244605667720880876UL:  *result = SAIL_PIXEL_FORMAT_BPP32_BGRX;            return 0;
-        case 8244605667721683084UL:  *result = SAIL_PIXEL_FORMAT_BPP32_XRGB;            return 0;
-        case 8244605667721665676UL:  *result = SAIL_PIXEL_FORMAT_BPP32_XBGR;            return 0;
-        case 8244605667721455317UL:  *result = SAIL_PIXEL_FORMAT_BPP32_RGBA;            return 0;
-        case 8244605667720880853UL:  *result = SAIL_PIXEL_FORMAT_BPP32_BGRA;            return 0;
-        case 8244605667720856533UL:  *result = SAIL_PIXEL_FORMAT_BPP32_ARGB;            return 0;
-        case 8244605667720839125UL:  *result = SAIL_PIXEL_FORMAT_BPP32_ABGR;            return 0;
-        case 8244605671674130033UL:  *result = SAIL_PIXEL_FORMAT_BPP64_RGBX;            return 0;
-        case 8244605671673555569UL:  *result = SAIL_PIXEL_FORMAT_BPP64_BGRX;            return 0;
-        case 8244605671674357777UL:  *result = SAIL_PIXEL_FORMAT_BPP64_XRGB;            return 0;
-        case 8244605671674340369UL:  *result = SAIL_PIXEL_FORMAT_BPP64_XBGR;            return 0;
-        case 8244605671674130010UL:  *result = SAIL_PIXEL_FORMAT_BPP64_RGBA;            return 0;
-        case 8244605671673555546UL:  *result = SAIL_PIXEL_FORMAT_BPP64_BGRA;            return 0;
-        case 8244605671673531226UL:  *result = SAIL_PIXEL_FORMAT_BPP64_ARGB;            return 0;
-        case 8244605671673513818UL:  *result = SAIL_PIXEL_FORMAT_BPP64_ABGR;            return 0;
-        case 8244605667720923565UL:  *result = SAIL_PIXEL_FORMAT_BPP32_CMYK;            return 0;
-        case 8244605671673598258UL:  *result = SAIL_PIXEL_FORMAT_BPP64_CMYK;            return 0;
-        case 13817569962846953645UL: *result = SAIL_PIXEL_FORMAT_BPP24_YCBCR;           return 0;
-        case 8244605667721702563UL:  *result = SAIL_PIXEL_FORMAT_BPP32_YCCK;            return 0;
+        case UINT64_C(229442760833397):      *result = SAIL_PIXEL_FORMAT_UNKNOWN;               return 0;
+        case UINT64_C(6952734212790):        *result = SAIL_PIXEL_FORMAT_SOURCE;                return 0;
+        case UINT64_C(249836535302445214):   *result = SAIL_PIXEL_FORMAT_BPP1_MONO;             return 0;
+        case UINT64_C(13257949335914442470): *result = SAIL_PIXEL_FORMAT_BPP1_INDEXED;          return 0;
+        case UINT64_C(13257950742323060711): *result = SAIL_PIXEL_FORMAT_BPP2_INDEXED;          return 0;
+        case UINT64_C(13257953555140297193): *result = SAIL_PIXEL_FORMAT_BPP4_INDEXED;          return 0;
+        case UINT64_C(13257959180774770157): *result = SAIL_PIXEL_FORMAT_BPP8_INDEXED;          return 0;
+        case UINT64_C(13237225848150241308): *result = SAIL_PIXEL_FORMAT_BPP16_INDEXED;         return 0;
+        case UINT64_C(12554490103502587777): *result = SAIL_PIXEL_FORMAT_BPP2_GRAYSCALE;        return 0;
+        case UINT64_C(12557553261473116675): *result = SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE;        return 0;
+        case UINT64_C(12563679577414174471): *result = SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE;        return 0;
+        case UINT64_C(8431824423011809526):  *result = SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE;       return 0;
+        case UINT64_C(9367569596161118198):  *result = SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE_ALPHA;  return 0;
+        case UINT64_C(9512005337741770220):  *result = SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE_ALPHA;  return 0;
+        case UINT64_C(3292614999547101481):  *result = SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA; return 0;
+        case UINT64_C(5929884054553197927):  *result = SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA; return 0;
+        case UINT64_C(13257949683479278997): *result = SAIL_PIXEL_FORMAT_BPP16_RGB555;          return 0;
+        case UINT64_C(13257949682853687701): *result = SAIL_PIXEL_FORMAT_BPP16_BGR555;          return 0;
+        case UINT64_C(13257949683479279030): *result = SAIL_PIXEL_FORMAT_BPP16_RGB565;          return 0;
+        case UINT64_C(13257949682853687734): *result = SAIL_PIXEL_FORMAT_BPP16_BGR565;          return 0;
+        case UINT64_C(249836535348735093):   *result = SAIL_PIXEL_FORMAT_BPP24_RGB;             return 0;
+        case UINT64_C(249836535348717685):   *result = SAIL_PIXEL_FORMAT_BPP24_BGR;             return 0;
+        case UINT64_C(249836535431749563):   *result = SAIL_PIXEL_FORMAT_BPP48_RGB;             return 0;
+        case UINT64_C(249836535431732155):   *result = SAIL_PIXEL_FORMAT_BPP48_BGR;             return 0;
+        case UINT64_C(8244605667721455340):  *result = SAIL_PIXEL_FORMAT_BPP32_RGBX;            return 0;
+        case UINT64_C(8244605667720880876):  *result = SAIL_PIXEL_FORMAT_BPP32_BGRX;            return 0;
+        case UINT64_C(8244605667721683084):  *result = SAIL_PIXEL_FORMAT_BPP32_XRGB;            return 0;
+        case UINT64_C(8244605667721665676):  *result = SAIL_PIXEL_FORMAT_BPP32_XBGR;            return 0;
+        case UINT64_C(8244605667721455317):  *result = SAIL_PIXEL_FORMAT_BPP32_RGBA;            return 0;
+        case UINT64_C(8244605667720880853):  *result = SAIL_PIXEL_FORMAT_BPP32_BGRA;            return 0;
+        case UINT64_C(8244605667720856533):  *result = SAIL_PIXEL_FORMAT_BPP32_ARGB;            return 0;
+        case UINT64_C(8244605667720839125):  *result = SAIL_PIXEL_FORMAT_BPP32_ABGR;            return 0;
+        case UINT64_C(8244605671674130033):  *result = SAIL_PIXEL_FORMAT_BPP64_RGBX;            return 0;
+        case UINT64_C(8244605671673555569):  *result = SAIL_PIXEL_FORMAT_BPP64_BGRX;            return 0;
+        case UINT64_C(8244605671674357777):  *result = SAIL_PIXEL_FORMAT_BPP64_XRGB;            return 0;
+        case UINT64_C(8244605671674340369):  *result = SAIL_PIXEL_FORMAT_BPP64_XBGR;            return 0;
+        case UINT64_C(8244605671674130010):  *result = SAIL_PIXEL_FORMAT_BPP64_RGBA;            return 0;
+        case UINT64_C(8244605671673555546):  *result = SAIL_PIXEL_FORMAT_BPP64_BGRA;            return 0;
+        case UINT64_C(8244605671673531226):  *result = SAIL_PIXEL_FORMAT_BPP64_ARGB;            return 0;
+        case UINT64_C(8244605671673513818):  *result = SAIL_PIXEL_FORMAT_BPP64_ABGR;            return 0;
+        case UINT64_C(8244605667720923565):  *result = SAIL_PIXEL_FORMAT_BPP32_CMYK;            return 0;
+        case UINT64_C(8244605671673598258):  *result = SAIL_PIXEL_FORMAT_BPP64_CMYK;            return 0;
+        case UINT64_C(13817569962846953645): *result = SAIL_PIXEL_FORMAT_BPP24_YCBCR;           return 0;
+        case UINT64_C(8244605667721702563):  *result = SAIL_PIXEL_FORMAT_BPP32_YCCK;            return 0;
     }
 
     return SAIL_UNSUPPORTED_PIXEL_FORMAT;
@@ -343,12 +343,12 @@ sail_error_t sail_image_property_from_string(const char *str, int *result) {
         return SAIL_UNSUPPORTED_IMAGE_PROPERTY;
     }
 
-    unsigned long hash;
+    uint64_t hash;
     SAIL_TRY(sail_string_hash(str, &hash));
 
     switch (hash) {
-        case 17202465669660106453UL: *result = SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY; return 0;
-        case 8244927930303708800UL:  *result = SAIL_IMAGE_PROPERTY_INTERLACED;         return 0;
+        case UINT64_C(17202465669660106453): *result = SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY; return 0;
+        case UINT64_C(8244927930303708800):  *result = SAIL_IMAGE_PROPERTY_INTERLACED;         return 0;
     }
 
     return SAIL_UNSUPPORTED_IMAGE_PROPERTY;
@@ -374,11 +374,11 @@ sail_error_t sail_compression_type_from_string(const char *str, int *result) {
         return SAIL_UNSUPPORTED_COMPRESSION_TYPE;
     }
 
-    unsigned long hash;
+    uint64_t hash;
     SAIL_TRY(sail_string_hash(str, &hash));
 
     switch (hash) {
-        case 193468872UL: *result = SAIL_COMPRESSION_RLE; return 0;
+        case UINT64_C(193468872): *result = SAIL_COMPRESSION_RLE; return 0;
     }
 
     return SAIL_UNSUPPORTED_COMPRESSION_TYPE;
@@ -409,16 +409,16 @@ sail_error_t sail_plugin_feature_from_string(const char *str, int *result) {
         return SAIL_UNSUPPORTED_PLUGIN_FEATURE;
     }
 
-    unsigned long hash;
+    uint64_t hash;
     SAIL_TRY(sail_string_hash(str, &hash));
 
     switch (hash) {
-        case 6952739426029UL:       *result = SAIL_PLUGIN_FEATURE_STATIC;     return 0;
-        case 7570758658679240UL:    *result = SAIL_PLUGIN_FEATURE_ANIMATED;   return 0;
-        case 8245123099178649521UL: *result = SAIL_PLUGIN_FEATURE_MULTIPAGED; return 0;
-        case 249851542786266181UL:  *result = SAIL_PLUGIN_FEATURE_META_INFO;  return 0;
-        case 6384018865UL:          *result = SAIL_PLUGIN_FEATURE_EXIF;       return 0;
-        case 8244927930303708800UL: *result = SAIL_PLUGIN_FEATURE_INTERLACED; return 0;
+        case UINT64_C(6952739426029):       *result = SAIL_PLUGIN_FEATURE_STATIC;     return 0;
+        case UINT64_C(7570758658679240):    *result = SAIL_PLUGIN_FEATURE_ANIMATED;   return 0;
+        case UINT64_C(8245123099178649521): *result = SAIL_PLUGIN_FEATURE_MULTIPAGED; return 0;
+        case UINT64_C(249851542786266181):  *result = SAIL_PLUGIN_FEATURE_META_INFO;  return 0;
+        case UINT64_C(6384018865):          *result = SAIL_PLUGIN_FEATURE_EXIF;       return 0;
+        case UINT64_C(8244927930303708800): *result = SAIL_PLUGIN_FEATURE_INTERLACED; return 0;
     }
 
     return SAIL_UNSUPPORTED_PLUGIN_FEATURE;

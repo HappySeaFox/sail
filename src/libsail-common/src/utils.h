@@ -78,7 +78,7 @@ SAIL_EXPORT sail_error_t sail_to_wchar(const char *input, wchar_t **output);
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_string_hash(const char *str, unsigned long *hash);
+SAIL_EXPORT sail_error_t sail_string_hash(const char *str, uint64_t *hash);
 
 /*
  * Assigns a non-NULL string representation of the specified pixel format. The assigned string
