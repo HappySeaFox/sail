@@ -11,6 +11,7 @@ include(GNUInstallDirs)
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 include(sail_plugin)
 include(sail_enable_asan)
+include(sail_test)
 
 # Sanity checks
 #
@@ -143,6 +144,7 @@ if (SDL2_FOUND)
     add_subdirectory(examples/c/sail-sdl-viewer)
 endif()
 add_subdirectory(bindings/c++)
+add_subdirectory(test)
 
 # Installation
 #
@@ -162,7 +164,6 @@ install(DIRECTORY "${PROJECT_SOURCE_DIR}/icons/" DESTINATION "${CMAKE_INSTALL_DA
 
 # Print configuration statistics
 #
-
 if (SAIL_COLORED_OUTPUT)
     set(SAIL_COLORED_OUTPUT_CLARIFY " (on Windows >= 10 and Unix)")
 endif()

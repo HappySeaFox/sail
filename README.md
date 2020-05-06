@@ -82,7 +82,7 @@ to use in C++ applications.
 ## License
 
 - libsail-common, libsail, C++ bindings, and plugins are under LGPLv3+.
-- Examples are under the MIT license.
+- Examples and tests are under the MIT license.
 
 ## APIs overview
 
