@@ -170,6 +170,22 @@ sail_error_t sail_to_wchar(const char *input, wchar_t **output) {
     return 0;
 }
 
+sail_error_t sail_string_hash(const char *str, unsigned long *hash) {
+
+    SAIL_CHECK_STRING_PTR(str);
+    SAIL_CHECK_RESULT_PTR(hash);
+
+    const unsigned char *ustr = (const unsigned char *)str;
+
+    *hash = 5381;
+    int c;
+    while ((c = *ustr++) != 0) {
+        *hash = ((*hash << 5) + *hash) + c; /* hash * 33 + c */
+    }
+
+    return 0;
+}
+
 sail_error_t sail_pixel_format_to_string(int pixel_format, const char **result) {
 
     SAIL_CHECK_STRING_PTR(result);

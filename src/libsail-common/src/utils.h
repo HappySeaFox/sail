@@ -73,6 +73,14 @@ SAIL_EXPORT void sail_to_lower(char *str);
 SAIL_EXPORT sail_error_t sail_to_wchar(const char *input, wchar_t **output);
 
 /*
+ * Computes an unique hash of the specified string. It utilizes the djb2 algorithm
+ * proposed by Dan Bernstein.
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_string_hash(const char *str, unsigned long *hash);
+
+/*
  * Assigns a non-NULL string representation of the specified pixel format. The assigned string
  * MUST NOT be destroyed. For example: "RGB".
  *
