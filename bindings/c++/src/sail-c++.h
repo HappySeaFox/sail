@@ -35,6 +35,7 @@
     #include "read_options-c++.h"
     #include "write_features-c++.h"
     #include "write_options-c++.h"
+    #include "utils-c++.h"
 #else
     #include <sail/sail-common.h>
 
@@ -49,6 +50,7 @@
     #include <sail/read_options-c++.h>
     #include <sail/write_features-c++.h>
     #include <sail/write_options-c++.h>
+    #include <sail/utils-c++.h>
 #endif
 
 #endif

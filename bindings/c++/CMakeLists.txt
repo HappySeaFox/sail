@@ -8,7 +8,8 @@ add_library(sail-c++
                 src/read_features-c++.cpp
                 src/read_options-c++.cpp
                 src/write_features-c++.cpp
-                src/write_options-c++.cpp)
+                src/write_options-c++.cpp
+                src/utils-c++.cpp)
 
 # Build a list of public headers to install
 #
@@ -25,6 +26,7 @@ list(APPEND PUBLIC_HEADERS "src/read_options-c++.h")
 list(APPEND PUBLIC_HEADERS "src/sail-c++.h")
 list(APPEND PUBLIC_HEADERS "src/write_features-c++.h")
 list(APPEND PUBLIC_HEADERS "src/write_options-c++.h")
+list(APPEND PUBLIC_HEADERS "src/utils-c++.h")
 
 set_target_properties(sail-c++ PROPERTIES
                                VERSION "0.3.1"
