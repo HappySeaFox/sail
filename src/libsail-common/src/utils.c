@@ -553,6 +553,10 @@ sail_error_t sail_print_errno(const char *format) {
 
     SAIL_CHECK_STRING_PTR(format);
 
+    if (strstr(format, "%s") == NULL) {
+        return SAIL_INVALID_ARGUMENT;
+    }
+
 #ifdef SAIL_WIN32
     char buffer[80];
     strerror_s(buffer, sizeof(buffer), errno);
