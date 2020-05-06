@@ -1,45 +1,47 @@
 # SAIL: Squirrel Abstract Image Libraries
 
-SAIL is a fast and lightweight cross-platform image decoding and encoding library providing multi-leveled APIs
-from one-liners to complex use-cases with custom I/O sources. :sailboat:
+SAIL is a fast and lightweight cross-platform image decoding and encoding library providing multi-leveled APIs,
+from one-liners to complex use cases with custom I/O sources. :sailboat:
 
-SAIL is a fork of ksquirrel-libs which was a set of C++ image codecs for KSquirrel image viewer.
+SAIL is a fork of ksquirrel-libs, which was a set of C++ image codecs for the KSquirrel image viewer.
 See [http://ksquirrel.sourceforge.net](http://ksquirrel.sourceforge.net).
 
-Author: Dmitry Baryshev.
+Author: Dmitry Baryshev
 
 ## Target audience
 
 - Image viewers.
 - Game developers.
-- Anyone who needs loading or saving images in different image formats and having lightweight and comprehensive API for that.
+- Anyone who needs to load or save images in different image formats and who requires
+  a lightweight and comprehensive API for that.
 
 ## Features overview
 
-- easy-to-use C and C++ interfaces.
-- 4 levels of APIs depending on your needs: `junior`, `advanced`, `deep diver`, and `technical diver`.
+- Easy-to-use C and C++ interfaces
+- Four levels of APIs, depending on your needs: `junior`, `advanced`, `deep diver`, and `technical diver`.
   See [EXAMPLES](EXAMPLES.md) for more.
-- Reading images from file and memory.
-- Writing images to file and memory.
-- I/O abstraction for technical divers.
+- Reading images from file and memory
+- Writing images to file and memory
+- I/O abstraction for technical divers
 - Image formats are supported by dynamically loaded codecs (plugins).
-- It's guaranteed that every plugin is able to read and output to memory pixels in `BPP24-RGB` and `BPP32-RGBA` formats.
+- It's guaranteed that every plugin is able to read and output to memory pixels in the `BPP24-RGB`
+  and `BPP32-RGBA` formats.
   Supporting other output pixel formats is plugin-specific.
 - Reading and writing images in numerous plugin-specific pixel formats. For example, the JPEG plugin
-  is able to read `RGB` and `YCbCr` images and output them to memory as `Grayscale` pixels and vice versa.
+  is able to read `RGB` and `YCbCr` images and output them to memory as `Grayscale` pixels, and vice versa.
 - Reading images and outputting them to memory in source pixel format for those who want to kick the hell
-  out of images manually. For example, one may want to work with raw `CMYK` pixels in a printing image.
+  out of images manually. For example, one may want to work with raw `CMYK` pixels in a print image.
   :warning: Some plugins might not support outputting source pixels.
-- Reading and writing meta information like JPEG comments.
-- Easily extensible with new image formats for those who want to implement a specific codec for his/her needs.
+- Read and write meta information like JPEG comments
+- Easily extensible with new image formats for those who want to implement a specific codec for his/her needs
 - Qt, SDL, and pure C examples
 
 ## Features NOT provided
 
-- image editing capabilities (filtering, distortion, scaling etc.).
-- color space conversion functions.
-- color management functions (applying ICC profiles etc.).
-- EXIF rotation.
+- Image editing capabilities (filtering, distortion, scaling, etc.)
+- Color space conversion functions
+- Color management functions (applying ICC profiles etc.)
+- EXIF rotation
 
 ## Supported image formats
 
@@ -47,36 +49,38 @@ Author: Dmitry Baryshev.
 
 ## Supported platforms
 
-Currently SAIL supports Windows and Linux platforms.
+Currently, SAIL supports the Windows and Linux platforms.
 
 ## Have questions or issues?
 
-Opening a GitHub [issue](https://github.com/smoked-herring/sail/issues) is a preferred way of communication and solving problems.
+Opening a GitHub [issue](https://github.com/smoked-herring/sail/issues) is the preferred way
+of communicating and solving problems.
 
 ## Architecture overview
 
-SAIL is written in C w/o using any third-party libraries (except for codecs). It also provides bindings to C++.
+SAIL is written in pure C11 w/o using any third-party libraries (except for codecs). It also provides
+bindings to C++.
 
 ### SAIL plugins
 
-SAIL plugins is the deepest level. It's a set of standalone dynamically loaded codecs (SO on Linux and DLL on Windows).
-They implement actual decoding and encoding capabilities. End-users never work with plugins directly.
-They always use abstract high-level APIs for that.
+SAIL plugins are the deepest level. This is a set of standalone, dynamically loaded codecs (SO on Linux
+and DLL on Windows). They implement actual decoding and encoding capabilities. End-users never work with
+plugins directly. They always use abstract, high-level APIs for that.
 
 ### libsail-common
 
-libsail-common holds common data types (images, pixel formats, I/O abstractions etc.) and a small set of functions
-shared between SAIL plugins and the high-level APIs.
+libsail-common holds common data types (images, pixel formats, I/O abstractions etc.) and a small set
+of functions shared between SAIL plugins and the high-level APIs.
 
 ### libsail
 
-libsail is a feature-rich high-level API. It provides comprehensive and lightweight interfaces to decode and encode images.
-End-users implementing C applications always work with libsail.
+libsail is a feature-rich, high-level API. It provides comprehensive and lightweight interfaces to decode
+and encode images. End-users implementing C applications always work with libsail.
 
 ### libsail-c++
 
 libsail-c++ is a C++ binding to libsail. End-users implementing C++ applications may choose
-between libsail and libsail-c++. Using libsail-c++ is always recommended as it's much more simple
+between libsail and libsail-c++. Using libsail-c++ is always recommended, as it's much more simple
 to use in C++ applications.
 
 ## License
@@ -86,9 +90,9 @@ to use in C++ applications.
 
 ## APIs overview
 
-SAIL provides 4 levels of APIs depending on your needs. Let's have a quick look at them.
+SAIL provides four levels of APIs, depending on your needs. Let's have a quick look at them.
 
-### 1. `junior` "I just want to load this damn JPEG"
+### 1. `Junior` - "I just want to load this damn JPEG."
 
 #### C:
 ```C
@@ -132,14 +136,14 @@ SAIL_TRY(reader.read(path, &image));
 
 It's pretty easy, isn't it? :smile: See [EXAMPLES](EXAMPLES.md) for more.
 
-### 2. `advanced` "I want to load this damn animated GIF"
+### 2. `Advanced` - "I want to load this damn animated GIF."
 
 See [EXAMPLES](EXAMPLES.md) for more.
 
-### 3. `deep diver` "I want to load this damn possibly multi-paged image from memory and have comprehensive control over selected plugins and output pixel formats"
+### 3. `Deep diver` - "I want to load this damn possibly multi-paged image from memory and have comprehensive control over selected plugins and output pixel formats."
 
 See [EXAMPLES](EXAMPLES.md) for more.
 
-### 4. `technical diver` "I want everything above and my custom I/O source"
+### 4. `Technical diver` - "I want everything above and my custom I/O source."
 
 See [EXAMPLES](EXAMPLES.md) for more.
