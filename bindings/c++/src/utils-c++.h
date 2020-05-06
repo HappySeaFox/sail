@@ -32,6 +32,8 @@
 namespace sail
 {
 
+SAIL_EXPORT sail_error_t print_errno(const char *format);
+
 SAIL_EXPORT sail_error_t now(uint64_t *result);
 
 }

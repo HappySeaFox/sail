@@ -22,6 +22,13 @@
 namespace sail
 {
 
+sail_error_t print_errno(const char *format)
+{
+    SAIL_TRY(sail_print_errno(format));
+
+    return 0;
+}
+
 sail_error_t now(uint64_t *result)
 {
     SAIL_TRY(sail_now(result));
