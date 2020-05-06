@@ -54,11 +54,6 @@ int main(int argc, char *argv[]) {
                        &image,
                        (void **)&image_bits));
 
-    if (image->width % 2 != 0 || image->height % 2 != 0) {
-        fprintf(stderr, "Error: Image width and height must be even\n");
-        return 1;
-    }
-
     /* Create an SDL surface from the image data. */
     int bytes_per_line;
     SAIL_TRY(sail_bytes_per_line(image, &bytes_per_line));
