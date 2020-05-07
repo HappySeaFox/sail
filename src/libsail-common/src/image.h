@@ -62,7 +62,7 @@ struct sail_image {
      *
      * READ:  Set by SAIL to a positive length of a row of pixels in bytes.
      * WRITE: Must be set by a caller to a positive number of bytes per line. A caller could set
-     *        it to sail_bytes_per_line() if scan lines are not padded to a certain booundary.
+     *        it to sail_bytes_per_line() if scan lines are not padded to a certain boundary.
      */
     int bytes_per_line;
 
@@ -70,10 +70,10 @@ struct sail_image {
      * Image pixel format. See SailPixelFormat.
      *
      * READ:  Set by SAIL to a valid output image pixel format. The list of supported output pixel formats
-     *        by a certain plugin could be obtained from sail_read_features.input_pixel_formats.
+     *        by a certain plugin can be obtained from sail_read_features.input_pixel_formats.
      * WRITE: Must be set by a caller to a valid input image pixel format. Pixels in this format will be supplied
      *        to the plugin by a caller later. The list of supported input pixel formats by a certain plugin
-     *        could be obtained from sail_write_features.output_pixel_formats.
+     *        can be obtained from sail_write_features.output_pixel_formats.
      */
     int pixel_format;
 
@@ -142,8 +142,8 @@ struct sail_image {
     /*
      * Decoded image properties. See SailImageProperties.
      *
-     * READ:  Set by SAIL to a valid image properties. For example, some image formats store images flipped.
-     *        A caller must use this field to manipulate the output image accordingly (e.g. flip back etc.).
+     * READ:  Set by SAIL to valid image properties. For example, some image formats store images flipped.
+     *        A caller must use this field to manipulate the output image accordingly (e.g., flip back etc.).
      * WRITE: Ignored.
      */
     int properties;
@@ -160,7 +160,7 @@ struct sail_image {
     /*
      * Image source properties. See SailImageProperties.
      *
-     * READ:  Set by SAIL to a valid source image properties or to 0.
+     * READ:  Set by SAIL to valid source image properties or to 0.
      * WRITE: Ignored.
      */
     int source_properties;
@@ -168,7 +168,7 @@ struct sail_image {
     /*
      * Image source compression type. See SailCompressionTypes.
      *
-     * READ:  Set by SAIL to a valid source image compression type if the image pixels are compressed or to 0.
+     * READ:  Set by SAIL to a valid source image compression type or to 0.
      * WRITE: Ignored.
      */
     int source_compression_type;
