@@ -54,7 +54,7 @@ public:
 
     /*
      * Returns true if the image has valid dimensions, bytes-per-line,
-     * and pixel data (deep copied or shallow).
+     * and the pixel data (deep copied or shallow).
      */
     bool is_valid() const;
 
@@ -79,7 +79,7 @@ public:
      *
      * READ:  Set by SAIL to a positive length of a row of pixels in bytes.
      * WRITE: Must be set by a caller to a positive number of bytes per line. A caller could set
-     *        it with bytes_per_line_auto() if scan lines are not padded to a certain booundary.
+     *        it with bytes_per_line_auto() if scan lines are not padded to a certain boundary.
      */
     int bytes_per_line() const;
 
@@ -87,9 +87,9 @@ public:
      * Returns image pixel format. See SailPixelFormat.
      *
      * READ:  Set by SAIL to a valid output image pixel format. The list of supported output pixel formats
-     *        by a certain plugin could be obtained from read_features.input_pixel_formats.
+     *        by a certain plugin can be obtained from read_features.input_pixel_formats.
      * WRITE: Must be set by a caller to a valid input image pixel format. The list of supported input pixel
-     *        formats by a certain plugin could be obtained from write_features.output_pixel_formats.
+     *        formats by a certain plugin can be obtained from write_features.output_pixel_formats.
      */
     int pixel_format() const;
 
@@ -131,8 +131,8 @@ public:
     /*
      * Returns palette data if the image has a palette and the requested pixel format assumes having a palette.
      *
-     * READ:  Set by SAIL to a valid pixel data if the image is indexed.
-     * WRITE: Must be set by a caller to a valid pixel data if the image is indexed.
+     * READ:  Set by SAIL to valid pixel data if the image is indexed.
+     * WRITE: Must be set by a caller to valid pixel data if the image is indexed.
      */
     void* palette() const;
 
@@ -156,7 +156,7 @@ public:
     /*
      * Returns decoded image properties. See SailImageProperties.
      *
-     * READ:  Set by SAIL to a valid image properties. For example, some image formats store images flipped.
+     * READ:  Set by SAIL to valid image properties. For example, some image formats store images flipped.
      *        A caller must use this field to manipulate the output image accordingly (e.g. flip back etc.).
      * WRITE: Ignored.
      */
@@ -174,7 +174,7 @@ public:
     /*
      * Returns image source properties. See SailImageProperties.
      *
-     * READ:  Set by SAIL to a valid source image properties or to 0.
+     * READ:  Set by SAIL to valid source image properties or to 0.
      * WRITE: Ignored.
      */
     int source_properties() const;
@@ -182,7 +182,7 @@ public:
     /*
      * Image source compression type. See SailCompressionTypes.
      *
-     * READ:  Set by SAIL to a valid source image compression type if the image pixels are compressed or to 0.
+     * READ:  Set by SAIL to a valid source image compression type or to 0.
      * WRITE: Ignored.
      */
     int source_compression_type() const;
@@ -205,7 +205,7 @@ public:
     int bits_size() const;
 
     /*
-     * Returns a constant shallow pointer to external pixel data if any. Images can hold deep copied
+     * Returns a constant shallow pointer to the external pixel data if any. Images can hold deep copied
      * or shallow data, but not both.
      */
     const void* shallow_bits() const;
