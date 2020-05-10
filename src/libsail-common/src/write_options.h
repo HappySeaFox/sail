@@ -79,7 +79,7 @@ typedef struct sail_write_options sail_write_options_t;
 SAIL_EXPORT sail_error_t sail_alloc_write_options(struct sail_write_options **write_options);
 
 /*
- * Destroys the specified write options and all its internal allocated memory buffers. The write options
+ * Destroys the specified write options object and all its internal allocated memory buffers. The write options
  * MUST NOT be used anymore after calling this function. Does nothing if the write options is NULL.
  */
 SAIL_EXPORT void sail_destroy_write_options(struct sail_write_options *write_options);

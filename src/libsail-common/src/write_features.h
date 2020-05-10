@@ -139,7 +139,7 @@ typedef struct sail_write_features sail_write_features_t;
 SAIL_EXPORT sail_error_t sail_alloc_write_features(struct sail_write_features **write_features);
 
 /*
- * Destroys the specified write features and all its internal allocated memory buffers. The write features
+ * Destroys the specified write features object and all its internal allocated memory buffers. The write features
  * MUST NOT be used anymore after calling this function. Does nothing if the write features is NULL.
  */
 SAIL_EXPORT void sail_destroy_write_features(struct sail_write_features *write_features);

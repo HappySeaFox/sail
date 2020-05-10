@@ -43,11 +43,11 @@ struct sail_read_features {
      * For example: BPP32-CMYK, BPP24-YCBCR, BPP24-RGB.
      *
      * NOTE: Some input pixel formats might not map to some output pixel formats.
-     *       Let's take a look at an hypothetical example:
+     *       Let's take a look at a hypothetical example:
      *
      * A hypothetical SAIL plugin supports input YCBCR images and it's able to output RGB pixel data from them.
      * Additionally, it supports input CMYK images and it's able to output YCCK pixel data from them.
-     * So the full conversion table with all possible input/output variants looks like that:
+     * So the full conversion table with all possible input/output variants looks like this:
      *
      * [ Read from file ] YCBCR => RGB  [ Output to memory ]
      * [ Read from file ] CMYK  => YCCK [ Output to memory ]
@@ -55,7 +55,7 @@ struct sail_read_features {
      * sail_read_features.input_pixel_formats will contain YCBCR and CMYK pixel formats.
      * sail_read_features.output_pixel_formats will contain RGB and YCCK pixel formats.
      *
-     * However, if you try to read an YCBCR image and output YCCK pixels, the codec will return
+     * However, if you try to read a YCBCR image and output YCCK pixels, the codec will return
      * an error.
      */
     int *input_pixel_formats;
@@ -66,13 +66,13 @@ struct sail_read_features {
     /*
      * A list of supported pixel formats that can be outputted by this plugin.
      *
-     * It's not guaranteed that every input pixel format in input_pixel_formats could be converted
+     * It's not guaranteed that every input pixel format in input_pixel_formats can be converted
      * to every output pixel format in output_pixel_formats. Some could be converted and some not.
      * See the comments above.
      *
      * If the array contains SAIL_PIXEL_FORMAT_SOURCE, then the codec is able to output raw pixel data.
-     * It's a caller's responsibility to convert it to a suitable pixel format then. Refer to
-     * sail_image.pixel_format to detect the actual pixel format of the raw pixel data in this case.
+     * It is a caller's responsibility to convert it to a suitable pixel format. Refer to
+     * sail_image.pixel_format to detect the actual pixel format of the raw pixel data in that case.
      *
      * For example: SOURCE, BPP24-RGB, BPP32-YCCK.
      */
@@ -102,7 +102,7 @@ typedef struct sail_read_features sail_read_features_t;
 SAIL_EXPORT sail_error_t sail_alloc_read_features(struct sail_read_features **read_features);
 
 /*
- * Destroys the specified read features and all its internal allocated memory buffers. The read features
+ * Destroys the specified read features object and all its internal allocated memory buffers. The read features
  * MUST NOT be used anymore after calling this function. Does nothing if the read features is NULL.
  */
 SAIL_EXPORT void sail_destroy_read_features(struct sail_read_features *read_features);

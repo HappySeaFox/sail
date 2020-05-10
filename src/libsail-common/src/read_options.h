@@ -60,7 +60,7 @@ typedef struct sail_read_options sail_read_options_t;
 SAIL_EXPORT sail_error_t sail_alloc_read_options(struct sail_read_options **read_options);
 
 /*
- * Destroys the specified read options and all its internal allocated memory buffers. The read options
+ * Destroys the specified read options object and all its internal allocated memory buffers. The read options
  * MUST NOT be used anymore after calling this function. Does nothing if the read options is NULL.
  */
 SAIL_EXPORT void sail_destroy_read_options(struct sail_read_options *read_options);
