@@ -178,6 +178,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 
     if (qimageFormat == QImage::Format_Invalid) {
         sail_stop_reading(state);
+        sail_destroy_image(image);
         return SAIL_UNSUPPORTED_PIXEL_FORMAT;
     }
 
