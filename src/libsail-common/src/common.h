@@ -48,11 +48,6 @@ enum SailPixelFormat {
     SAIL_PIXEL_FORMAT_SOURCE,
 
     /*
-     * Black and white formats with a predefined palette.
-     */
-    SAIL_PIXEL_FORMAT_BPP1_MONO,
-
-    /*
      * Indexed formats with palette.
      */
     SAIL_PIXEL_FORMAT_BPP1_INDEXED,
@@ -64,6 +59,7 @@ enum SailPixelFormat {
     /*
      * Grayscale formats.
      */
+    SAIL_PIXEL_FORMAT_BPP1_GRAYSCALE,
     SAIL_PIXEL_FORMAT_BPP2_GRAYSCALE,
     SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE,
     SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE,
