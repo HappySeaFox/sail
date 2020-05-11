@@ -23,15 +23,14 @@ Author: Dmitry Baryshev
 - Reading images from file and memory
 - Writing images to file and memory
 - I/O abstraction for technical divers
-- Image formats are supported by dynamically loaded codecs (plugins).
+- Image formats are supported by dynamically loaded codecs (plugins)
 - It's guaranteed that every plugin is able to read and output to memory pixels in the `BPP24-RGB`
-  and `BPP32-RGBA` formats.
-  Supporting other output pixel formats is plugin-specific.
+  and `BPP32-RGBA` formats. Supporting other output pixel formats is plugin-specific
 - Reading and writing images in numerous plugin-specific pixel formats. For example, the JPEG plugin
-  is able to read `RGB` and `YCbCr` images and output them to memory as `Grayscale` pixels, and vice versa.
+  is able to read `RGB` and `YCbCr` images and output them to memory as `Grayscale` pixels, and vice versa
 - Reading images and outputting them to memory in source pixel format for those who want to kick the hell
   out of images manually. For example, one may want to work with raw `CMYK` pixels in a print image.
-  :warning: Some plugins might not support outputting source pixels.
+  :warning: Some plugins might not support outputting source pixels
 - Read and write meta information like JPEG comments
 - Easily extensible with new image formats for those who want to implement a specific codec for his/her needs
 - Qt, SDL, and pure C examples
