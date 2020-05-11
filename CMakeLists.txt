@@ -144,7 +144,7 @@ if (SDL2_FOUND)
     add_subdirectory(examples/c/sail-sdl-viewer)
 endif()
 add_subdirectory(bindings/c++)
-add_subdirectory(test)
+add_subdirectory(tests)
 
 # Installation
 #
