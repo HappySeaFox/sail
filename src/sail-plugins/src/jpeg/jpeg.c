@@ -76,12 +76,13 @@ static sail_error_t alloc_jpeg_state(struct jpeg_state **jpeg_state) {
 
 SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_io *io, const struct sail_read_options *read_options, void **state) {
 
-    SAIL_CHECK_IO(io);
-    SAIL_CHECK_READ_OPTIONS_PTR(read_options);
     SAIL_CHECK_STATE_PTR(state);
-
     *state = NULL;
 
+    SAIL_CHECK_IO(io);
+    SAIL_CHECK_READ_OPTIONS_PTR(read_options);
+
+    /* Allocate a new state. */
     struct jpeg_state *jpeg_state;
     SAIL_TRY(alloc_jpeg_state(&jpeg_state));
 
@@ -259,7 +260,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_finish_v2(void **state, struct sail_io
     struct jpeg_state *jpeg_state = (struct jpeg_state *)(*state);
     SAIL_CHECK_STATE_PTR(jpeg_state);
 
-    /* The subsequent calls to finish() will expectedly fail in the above line. */
+    /* Subsequent calls to finish() will expectedly fail in the above line. */
     *state = NULL;
 
     sail_destroy_read_options(jpeg_state->read_options);
@@ -283,11 +284,11 @@ SAIL_EXPORT sail_error_t sail_plugin_read_finish_v2(void **state, struct sail_io
 
 SAIL_EXPORT sail_error_t sail_plugin_write_init_v2(struct sail_io *io, const struct sail_write_options *write_options, void **state) {
 
+    SAIL_CHECK_STATE_PTR(state);
+    *state = NULL;
+
     SAIL_CHECK_IO(io);
     SAIL_CHECK_WRITE_OPTIONS_PTR(write_options);
-    SAIL_CHECK_STATE_PTR(state);
-
-    *state = NULL;
 
     struct jpeg_state *jpeg_state;
     SAIL_TRY(alloc_jpeg_state(&jpeg_state));
@@ -429,7 +430,7 @@ SAIL_EXPORT sail_error_t sail_plugin_write_finish_v2(void **state, struct sail_i
     struct jpeg_state *jpeg_state = (struct jpeg_state *)(*state);
     SAIL_CHECK_STATE_PTR(jpeg_state);
 
-    /* The subsequent calls to finish() will expectedly fail in the above line. */
+    /* Subsequent calls to finish() will expectedly fail in the above line. */
     *state = NULL;
 
     sail_destroy_write_options(jpeg_state->write_options);
