@@ -18,6 +18,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "sail-common.h"
 
@@ -73,6 +74,22 @@ sail_error_t sail_alloc_write_options_from_features(const struct sail_write_feat
     SAIL_TRY(sail_alloc_write_options(write_options));
     SAIL_TRY_OR_CLEANUP(sail_write_options_from_features(write_features, *write_options),
                         /* cleanup */ sail_destroy_write_options(*write_options));
+
+    return 0;
+}
+
+sail_error_t sail_deep_copy_write_options(const struct sail_write_options *write_options_source, struct sail_write_options **write_options_target) {
+
+    SAIL_CHECK_WRITE_OPTIONS_PTR(write_options_source);
+    SAIL_CHECK_WRITE_OPTIONS_PTR(write_options_target);
+
+    *write_options_target = (struct sail_write_options *)malloc(sizeof(struct sail_write_options));
+
+    if (*write_options_target == NULL) {
+        return SAIL_MEMORY_ALLOCATION_FAILED;
+    }
+
+    memcpy(*write_options_target, write_options_source, sizeof(struct sail_write_options));
 
     return 0;
 }

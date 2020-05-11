@@ -99,6 +99,14 @@ SAIL_EXPORT sail_error_t sail_write_options_from_features(const struct sail_writ
  */
 SAIL_EXPORT sail_error_t sail_alloc_write_options_from_features(const struct sail_write_features *write_features, struct sail_write_options **write_options);
 
+/*
+ * Makes a deep copy of the specified write options object. The assigned write options MUST be destroyed later
+ * with sail_destroy_write_options().
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_deep_copy_write_options(const struct sail_write_options *write_options_source, struct sail_write_options **write_options_target);
+
 /* extern "C" */
 #ifdef __cplusplus
 }

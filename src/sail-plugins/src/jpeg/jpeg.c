@@ -88,13 +88,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_io *io, const stru
     *state = jpeg_state;
 
     /* Deep copy read options. */
-    jpeg_state->read_options = (struct sail_read_options *)malloc(sizeof(struct sail_read_options));
-
-    if (jpeg_state->read_options == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
-
-    memcpy(jpeg_state->read_options, read_options, sizeof(struct sail_read_options));
+    SAIL_TRY(sail_deep_copy_read_options(read_options, &jpeg_state->read_options));
 
     /* Error handling setup. */
     jpeg_state->decompress_context.err = jpeg_std_error(&jpeg_state->error_context.jpeg_error_mgr);
@@ -296,14 +290,8 @@ SAIL_EXPORT sail_error_t sail_plugin_write_init_v2(struct sail_io *io, const str
 
     *state = jpeg_state;
 
-    /* Deep copy write options. */
-    jpeg_state->write_options = (struct sail_write_options *)malloc(sizeof(struct sail_write_options));
-
-    if (jpeg_state->write_options == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
-
-    memcpy(jpeg_state->write_options, write_options, sizeof(struct sail_write_options));
+    /* Deep copy read options. */
+    SAIL_TRY(sail_deep_copy_write_options(write_options, &jpeg_state->write_options));
 
     /* Sanity check. */
     if (pixel_format_to_color_space(jpeg_state->write_options->output_pixel_format) == JCS_UNKNOWN) {

@@ -80,6 +80,14 @@ SAIL_EXPORT sail_error_t sail_read_options_from_features(const struct sail_read_
  */
 SAIL_EXPORT sail_error_t sail_alloc_read_options_from_features(const struct sail_read_features *read_features, struct sail_read_options **read_options);
 
+/*
+ * Makes a deep copy of the specified read options object. The assigned read options MUST be destroyed later
+ * with sail_destroy_read_options().
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_deep_copy_read_options(const struct sail_read_options *read_options_source, struct sail_read_options **read_options_target);
+
 /* extern "C" */
 #ifdef __cplusplus
 }
