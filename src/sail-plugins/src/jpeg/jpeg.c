@@ -149,6 +149,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
 
     if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0) {
         jpeg_state->libjpeg_error = true;
+        sail_destroy_image(*image);
         return SAIL_UNDERLYING_CODEC_ERROR;
     }
 
@@ -171,11 +172,14 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
             if(it->marker == JPEG_COM) {
                 struct sail_meta_entry_node *meta_entry_node;
 
-                SAIL_TRY(sail_alloc_meta_entry_node(&meta_entry_node));
+                SAIL_TRY_OR_CLEANUP(sail_alloc_meta_entry_node(&meta_entry_node),
+                                    /* cleanup */ sail_destroy_image(*image));
                 SAIL_TRY_OR_CLEANUP(sail_strdup("Comment", &meta_entry_node->key),
-                                    /* cleanup */ sail_destroy_meta_entry_node(meta_entry_node));
+                                    /* cleanup */ sail_destroy_meta_entry_node(meta_entry_node),
+                                                  sail_destroy_image(*image));
                 SAIL_TRY_OR_CLEANUP(sail_strdup_length((const char *)it->data, it->data_length, &meta_entry_node->value),
-                                    /* cleanup */ sail_destroy_meta_entry_node(meta_entry_node));
+                                    /* cleanup */ sail_destroy_meta_entry_node(meta_entry_node),
+                                                  sail_destroy_image(*image));
 
                 if ((*image)->meta_entry_node == NULL) {
                     (*image)->meta_entry_node = last_meta_entry_node = meta_entry_node;
