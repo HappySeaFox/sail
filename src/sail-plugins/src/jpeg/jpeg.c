@@ -53,7 +53,7 @@ struct jpeg_state {
     bool frame_written;
 };
 
-static int alloc_jpeg_state(struct jpeg_state **jpeg_state) {
+static sail_error_t alloc_jpeg_state(struct jpeg_state **jpeg_state) {
 
     *jpeg_state = (struct jpeg_state *)malloc(sizeof(struct jpeg_state));
 
