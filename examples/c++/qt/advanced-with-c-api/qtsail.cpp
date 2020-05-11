@@ -167,7 +167,7 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
     image->width = qimage.width();
     image->height = qimage.height();
     image->pixel_format = qImageFormatToSailPixelFormat(qimage.format());
-    SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(image, &image->bytes_per_line),
+    SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(image->width, image->pixel_format, &image->bytes_per_line),
                         /* cleanup */ sail_destroy_image(image));
 
     SAIL_TRY_OR_CLEANUP(sail_start_writing_file(path.toLocal8Bit(), d->context, nullptr, &state),

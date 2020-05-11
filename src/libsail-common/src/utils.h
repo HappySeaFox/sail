@@ -154,7 +154,6 @@ SAIL_EXPORT sail_error_t sail_bits_per_pixel(int pixel_format, int *result);
 
 /*
  * Calculates a number of bytes per line needed to hold a scan line without padding.
- * 'width' and 'pixel_format' fields are used to calculate a result.
  *
  * For example:
  *   - 12 pixels * 1 bits per pixel / 8 + 1 ==
@@ -172,7 +171,7 @@ SAIL_EXPORT sail_error_t sail_bits_per_pixel(int pixel_format, int *result);
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_bytes_per_line(const struct sail_image *image, int *result);
+SAIL_EXPORT sail_error_t sail_bytes_per_line(int width, int pixel_format, int *result);
 
 /*
  * Calculates a number of bytes needed to hold an entire image in memory without padding.

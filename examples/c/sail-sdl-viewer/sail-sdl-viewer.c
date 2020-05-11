@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
 
     /* Create an SDL surface from the image data. */
     int bytes_per_line;
-    SAIL_TRY(sail_bytes_per_line(image, &bytes_per_line));
+    SAIL_TRY(sail_bytes_per_line(image->width, image->pixel_format, &bytes_per_line));
 
     const bool is_rgba = image->pixel_format == SAIL_PIXEL_FORMAT_BPP32_RGBA;
 

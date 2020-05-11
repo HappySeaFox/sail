@@ -134,7 +134,7 @@ sail_error_t sail_write_next_frame(void *state, const struct sail_image *image, 
     }
 
     int bytes_per_line;
-    SAIL_TRY(sail_bytes_per_line(image, &bytes_per_line));
+    SAIL_TRY(sail_bytes_per_line(image->width, image->pixel_format, &bytes_per_line));
 
     SAIL_TRY(state_of_mind->plugin->v2->write_seek_next_frame_v2(state_of_mind->state, state_of_mind->io, image));
 

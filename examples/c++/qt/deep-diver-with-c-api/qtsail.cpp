@@ -193,7 +193,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
      * Bytes per line is needed for QImage.
      */
     int bytes_per_line;
-    SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(image, &bytes_per_line),
+    SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(image->width, image->pixel_format, &bytes_per_line),
                          /* cleanup */ free(image_bits),
                                        sail_destroy_image(image));
 
@@ -261,7 +261,7 @@ sail_error_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffer
     image->width = qimage.width();
     image->height = qimage.height();
     image->pixel_format = qImageFormatToSailPixelFormat(qimage.format());
-    SAIL_TRY(sail_bytes_per_line(image, &image->bytes_per_line));
+    SAIL_TRY(sail_bytes_per_line(image->width, image->pixel_format, &image->bytes_per_line));
 
     if (image->pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN) {
         sail_destroy_image(image);

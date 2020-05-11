@@ -237,7 +237,7 @@ image& image::with_bytes_per_line(int bytes_per_line)
 image& image::with_bytes_per_line_auto()
 {
     int bytes_per_line = 0;
-    image::bytes_per_line(*this, &bytes_per_line);
+    image::bytes_per_line(d->width, d->pixel_format, &bytes_per_line);
 
     return with_bytes_per_line(bytes_per_line);
 }
@@ -336,16 +336,11 @@ sail_error_t image::bits_per_pixel(int pixel_format, int *result)
     return 0;
 }
 
-sail_error_t image::bytes_per_line(const image &simage, int *result)
+sail_error_t image::bytes_per_line(int width, int pixel_format, int *result)
 {
     SAIL_CHECK_PTR(result);
 
-    sail_image sail_image;
-
-    sail_image.width        = simage.width();
-    sail_image.pixel_format = simage.pixel_format();
-
-    SAIL_TRY(sail_bytes_per_line(&sail_image, result));
+    SAIL_TRY(sail_bytes_per_line(width, pixel_format, result));
 
     return 0;
 }
