@@ -35,11 +35,15 @@ inline QImage::Format sailPixelFormatToQImageFormat(int pixel_format) {
         case SAIL_PIXEL_FORMAT_BPP24_RGB:      return QImage::Format_RGB888;
         case SAIL_PIXEL_FORMAT_BPP32_RGBX:     return QImage::Format_RGBX8888;
         case SAIL_PIXEL_FORMAT_BPP32_RGBA:     return QImage::Format_RGBA8888;
+        case SAIL_PIXEL_FORMAT_BPP32_ARGB:     return QImage::Format_ARGB32;
+        case SAIL_PIXEL_FORMAT_BPP32_ABGR:     return QImage::Format_ARGB32;
 
         // Cheat and display a distorted image
         case SAIL_PIXEL_FORMAT_BPP24_YCBCR:    return QImage::Format_RGB888;
         case SAIL_PIXEL_FORMAT_BPP32_CMYK:     return QImage::Format_RGBA8888;
         case SAIL_PIXEL_FORMAT_BPP32_YCCK:     return QImage::Format_RGBA8888;
+        case SAIL_PIXEL_FORMAT_BPP24_BGR:      return QImage::Format_RGB888;
+        case SAIL_PIXEL_FORMAT_BPP32_BGRA:     return QImage::Format_RGBA8888;
 
         default: return QImage::Format_Invalid;
     }
