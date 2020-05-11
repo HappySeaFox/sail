@@ -91,9 +91,7 @@ sail_error_t sail_read(const char *path, struct sail_image **image, void **image
                         /* cleanup */ sail_stop_reading(state));
 
     SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, image, image_bits),
-                        /* cleanup */ sail_stop_reading(state),
-                                      free(image_bits),
-                                      sail_destroy_image(*image));
+                        /* cleanup */ sail_stop_reading(state));
 
     SAIL_TRY_OR_CLEANUP(sail_stop_reading(state),
                         /* cleanup */ free(image_bits),
