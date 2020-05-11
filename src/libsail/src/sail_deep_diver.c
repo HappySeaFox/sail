@@ -41,8 +41,7 @@ sail_error_t sail_start_reading_file_with_options(const char *path, struct sail_
     struct sail_io *io;
     SAIL_TRY(alloc_io_read_file(path, &io));
 
-    SAIL_TRY_OR_CLEANUP(start_reading_io_with_options(io, true, context, plugin_info_local, read_options, state),
-                        /* cleanup */ sail_destroy_io(io));
+    SAIL_TRY(start_reading_io_with_options(io, true, context, plugin_info_local, read_options, state));
 
     return 0;
 }
@@ -58,8 +57,7 @@ sail_error_t sail_start_reading_mem_with_options(const void *buffer, size_t buff
     struct sail_io *io;
     SAIL_TRY(alloc_io_read_mem(buffer, buffer_length, &io));
 
-    SAIL_TRY_OR_CLEANUP(start_reading_io_with_options(io, true, context, plugin_info, read_options, state),
-                        /* cleanup */ sail_destroy_io(io));
+    SAIL_TRY(start_reading_io_with_options(io, true, context, plugin_info, read_options, state));
 
     return 0;
 }
@@ -82,8 +80,8 @@ sail_error_t sail_start_writing_file_with_options(const char *path, struct sail_
     struct sail_io *io;
     SAIL_TRY(alloc_io_write_file(path, &io));
 
-    SAIL_TRY_OR_CLEANUP(start_writing_io_with_options(io, true, context, plugin_info_local, write_options, state),
-                        /* cleanup */ sail_destroy_io(io));
+    /* The I/O object will be destroyed in this function. */
+    SAIL_TRY(start_writing_io_with_options(io, true, context, plugin_info_local, write_options, state));
 
     return 0;
 }
@@ -98,8 +96,8 @@ sail_error_t sail_start_writing_mem_with_options(void *buffer, size_t buffer_len
     struct sail_io *io;
     SAIL_TRY(alloc_io_write_mem(buffer, buffer_length, &io));
 
-    SAIL_TRY_OR_CLEANUP(start_writing_io_with_options(io, true, context, plugin_info, write_options, state),
-                        /* cleanup */ sail_destroy_io(io));
+    /* The I/O object will be destroyed in this function. */
+    SAIL_TRY(start_writing_io_with_options(io, true, context, plugin_info, write_options, state));
 
     return 0;
 }

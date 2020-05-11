@@ -23,6 +23,31 @@
 #include "sail-common.h"
 #include "sail.h"
 
+/*
+ * Private functions.
+ */
+
+static sail_error_t check_io_arguments(struct sail_io *io, struct sail_context *context,
+                                        const struct sail_plugin_info *plugin_info) {
+
+    SAIL_CHECK_IO_PTR(io);
+    SAIL_CHECK_CONTEXT_PTR(context);
+    SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
+
+    return 0;
+}
+
+static sail_error_t check_state_ptr(void *state) {
+
+    SAIL_CHECK_STATE_PTR(state);
+
+    return 0;
+}
+
+/*
+ * Public functions.
+ */
+
 sail_error_t start_reading_io_with_options(struct sail_io *io, bool own_io, struct sail_context *context,
                                            const struct sail_plugin_info *plugin_info,
                                            const struct sail_read_options *read_options, void **state) {
@@ -30,12 +55,12 @@ sail_error_t start_reading_io_with_options(struct sail_io *io, bool own_io, stru
     SAIL_CHECK_STATE_PTR(state);
     *state = NULL;
 
-    SAIL_CHECK_IO_PTR(io);
-    SAIL_CHECK_CONTEXT_PTR(context);
-    SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
+    SAIL_TRY_OR_CLEANUP(check_io_arguments(io, context, plugin_info),
+                        /* cleanup */ if (own_io) sail_destroy_io(io));
 
     struct hidden_state *state_of_mind = (struct hidden_state *)malloc(sizeof(struct hidden_state));
-    SAIL_CHECK_STATE_PTR(state_of_mind);
+    SAIL_TRY_OR_CLEANUP(check_state_ptr(state_of_mind),
+                        /*cleanup */ if (own_io) sail_destroy_io(io));
 
     state_of_mind->io          = io;
     state_of_mind->own_io      = own_io;
@@ -43,11 +68,11 @@ sail_error_t start_reading_io_with_options(struct sail_io *io, bool own_io, stru
     state_of_mind->plugin_info = plugin_info;
     state_of_mind->plugin      = NULL;
 
-    *state = state_of_mind;
-
-    SAIL_TRY(load_plugin_by_plugin_info(context, state_of_mind->plugin_info, &state_of_mind->plugin));
+    SAIL_TRY_OR_CLEANUP(load_plugin_by_plugin_info(context, state_of_mind->plugin_info, &state_of_mind->plugin),
+                        /* cleanup */ destroy_hidden_state(state_of_mind));
 
     if (state_of_mind->plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
+        destroy_hidden_state(state_of_mind);
         return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
     }
 
@@ -55,13 +80,18 @@ sail_error_t start_reading_io_with_options(struct sail_io *io, bool own_io, stru
         struct sail_read_options *read_options_local = NULL;
 
         SAIL_TRY_OR_CLEANUP(sail_alloc_read_options_from_features(state_of_mind->plugin_info->read_features, &read_options_local),
-                            /* cleanup */ sail_destroy_read_options(read_options_local));
+                            /* cleanup */ sail_destroy_read_options(read_options_local),
+                                          destroy_hidden_state(state_of_mind));
         SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v2->read_init_v2(state_of_mind->io, read_options_local, &state_of_mind->state),
-                            /* cleanup */ sail_destroy_read_options(read_options_local));
+                            /* cleanup */ sail_destroy_read_options(read_options_local),
+                                          destroy_hidden_state(state_of_mind));
         sail_destroy_read_options(read_options_local);
     } else {
-        SAIL_TRY(state_of_mind->plugin->v2->read_init_v2(state_of_mind->io, read_options, &state_of_mind->state));
+        SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v2->read_init_v2(state_of_mind->io, read_options, &state_of_mind->state),
+                            /* cleanup */ destroy_hidden_state(state_of_mind));
     }
+
+    *state = state_of_mind;
 
     return 0;
 }
@@ -73,12 +103,12 @@ sail_error_t start_writing_io_with_options(struct sail_io *io, bool own_io, stru
     SAIL_CHECK_STATE_PTR(state);
     *state = NULL;
 
-    SAIL_CHECK_IO_PTR(io);
-    SAIL_CHECK_CONTEXT_PTR(context);
-    SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
+    SAIL_TRY_OR_CLEANUP(check_io_arguments(io, context, plugin_info),
+                        /* cleanup */ if (own_io) sail_destroy_io(io));
 
     struct hidden_state *state_of_mind = (struct hidden_state *)malloc(sizeof(struct hidden_state));
-    SAIL_CHECK_STATE_PTR(state_of_mind);
+    SAIL_TRY_OR_CLEANUP(check_state_ptr(state_of_mind),
+                        /*cleanup */ if (own_io) sail_destroy_io(io));
 
     state_of_mind->io          = io;
     state_of_mind->own_io      = own_io;
@@ -86,11 +116,11 @@ sail_error_t start_writing_io_with_options(struct sail_io *io, bool own_io, stru
     state_of_mind->plugin_info = plugin_info;
     state_of_mind->plugin      = NULL;
 
-    *state = state_of_mind;
-
-    SAIL_TRY(load_plugin_by_plugin_info(context, state_of_mind->plugin_info, &state_of_mind->plugin));
+    SAIL_TRY_OR_CLEANUP(load_plugin_by_plugin_info(context, state_of_mind->plugin_info, &state_of_mind->plugin),
+                        /* cleanup */ destroy_hidden_state(state_of_mind));
 
     if (state_of_mind->plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
+        destroy_hidden_state(state_of_mind);
         return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
     }
 
@@ -98,13 +128,18 @@ sail_error_t start_writing_io_with_options(struct sail_io *io, bool own_io, stru
         struct sail_write_options *write_options_local = NULL;
 
         SAIL_TRY_OR_CLEANUP(sail_alloc_write_options_from_features(state_of_mind->plugin_info->write_features, &write_options_local),
-                            /* cleanup */ sail_destroy_write_options(write_options_local));
+                            /* cleanup */ sail_destroy_write_options(write_options_local),
+                                          destroy_hidden_state(state_of_mind));
         SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v2->write_init_v2(state_of_mind->io, write_options_local, &state_of_mind->state),
-                            /* cleanup */ sail_destroy_write_options(write_options_local));
+                            /* cleanup */ sail_destroy_write_options(write_options_local),
+                                          destroy_hidden_state(state_of_mind));
         sail_destroy_write_options(write_options_local);
     } else {
-        SAIL_TRY(state_of_mind->plugin->v2->write_init_v2(state_of_mind->io, write_options, &state_of_mind->state));
+        SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v2->write_init_v2(state_of_mind->io, write_options, &state_of_mind->state),
+                            /* cleanup */ destroy_hidden_state(state_of_mind));
     }
+
+    *state = state_of_mind;
 
     return 0;
 }
