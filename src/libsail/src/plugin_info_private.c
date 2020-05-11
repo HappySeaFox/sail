@@ -120,8 +120,10 @@ static sail_error_t parse_serialized_ints(const char *value, int **target, int *
         int i = 0;
 
         while (node != NULL) {
+
             SAIL_TRY_OR_CLEANUP(converter(node->value, *target + i),
-                                /* cleanup */ destroy_string_node_chain(string_node));
+                                /* cleanup */ SAIL_LOG_ERROR("Conversion of '%s' failed", node->value),
+                                              destroy_string_node_chain(string_node));
             i++;
             node = node->next;
         }
@@ -149,7 +151,8 @@ static sail_error_t parse_flags(const char *value, int *features, sail_error_t (
     while (node != NULL) {
         int flag;
         SAIL_TRY_OR_CLEANUP(converter(node->value, &flag),
-                            /* cleanup */ destroy_string_node_chain(string_node));
+                            /* cleanup */ SAIL_LOG_ERROR("Conversion of '%s' failed", node->value),
+                                          destroy_string_node_chain(string_node));
         *features |= flag;
         node = node->next;
     }
