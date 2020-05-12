@@ -43,6 +43,7 @@ Author: Dmitry Baryshev
 ## Supported image formats
 
 1. [JPEG](https://wikipedia.org/wiki/JPEG) (reading and writing, requires `libjpeg-turbo`)
+1. [PNG](https://wikipedia.org/wiki/Portable_Network_Graphics) (reading and writing, requires `libpng`)
 
 ## Supported platforms
 
