@@ -10,11 +10,11 @@ set(PLUGINS ${PLUGINS} PARENT_SCOPE)
 
 # Conditional plugins that require external dependencies like libjpeg
 #
-set(CONDITIONAL_PLUGINS jpeg)
+set(CONDITIONAL_PLUGINS jpeg png)
 
 # Actual dependencies. Will use pkg_check_modules() to find them
 #
-set(CONDITIONAL_DEPENDENCIES libjpeg)
+set(CONDITIONAL_DEPENDENCIES libjpeg libpng16)
 
 ################################################################################
 

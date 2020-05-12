@@ -1,0 +1,28 @@
+# PNG plugin information
+#
+[plugin]
+layout=2
+version=1.1.3
+name=PNG
+description=Portable Network Graphics
+extensions=png
+mime-types=image/png
+
+[read-features]
+input-pixel-formats=BPP1-GRAYSCALE;BPP2-GRAYSCALE;BPP4-GRAYSCALE;BPP8-GRAYSCALE;BPP16-GRAYSCALE;BPP8-GRAYSCALE-ALPHA;BPP16-GRAYSCALE-ALPHA;BPP1-INDEXED;BPP2-INDEXED;BPP4-INDEXED;BPP8-INDEXED;BPP24-RGB;BPP48-RGB;BPP32-RGBA;BPP64-RGBA
+output-pixel-formats=SOURCE;BPP24-RGB;BPP24-BGR;BPP32-RGBA;BPP32-BGRA;BPP32-ARGB;BPP32-ABGR
+preferred-output-pixel-format=BPP32-RGBA
+features=STATIC;META-INFO
+
+[write-features]
+input-pixel-formats=BPP8-GRAYSCALE;BPP16-RGB565;BPP24-RGB;BPP24-BGR;BPP32-RGBX;BPP32-BGRX;BPP32-XBGR;BPP32-XRGB;BPP32-RGBA;BPP32-BGRA;BPP32-ABGR;BPP32-ARGB;BPP24-YCBCR;BPP32-CMYK;BPP32-YCCK
+output-pixel-formats=BPP8-GRAYSCALE;BPP24-RGB;BPP24-YCBCR;BPP32-CMYK;BPP32-YCCK
+preferred-output-pixel-format=BPP24-YCBCR
+features=STATIC;META-INFO
+properties=
+passes=0
+compression-types=
+preferred-compression-type=
+compression-min=1
+compression-max=9
+compression-default=6
