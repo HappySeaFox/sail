@@ -150,6 +150,12 @@ struct sail_image {
     int properties;
 
     /*
+     * The only purpose of the following "source" fields is to provide information about
+     * the source image file. They're not supposed to be passed to any reading or writing
+     * functions.
+     */
+
+    /*
      * Image source pixel format. See SailPixelFormat.
      *
      * READ:  Set by SAIL to a valid source image pixel format before converting it to a requested pixel format
