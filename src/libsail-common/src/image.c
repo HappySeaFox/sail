@@ -38,7 +38,7 @@ int sail_alloc_image(struct sail_image **image) {
     (*image)->delay                   = 0;
     (*image)->palette_pixel_format    = SAIL_PIXEL_FORMAT_UNKNOWN;
     (*image)->palette                 = NULL;
-    (*image)->palette_size            = 0;
+    (*image)->palette_color_count     = 0;
     (*image)->meta_entry_node         = NULL;
     (*image)->properties              = 0;
     (*image)->source_pixel_format     = SAIL_PIXEL_FORMAT_UNKNOWN;

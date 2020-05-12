@@ -107,6 +107,7 @@ struct sail_image {
      * Palette pixel format.
      *
      * READ:  Set by SAIL to a valid palette pixel format if the image is indexed (palette is not NULL).
+     *        SAIL guarantee the palette pixel format is byte-aligned.
      * WRITE: Must be set by a caller to a valid palette pixel format if the image is indexed
      *        (palette is not NULL).
      */
@@ -122,12 +123,12 @@ struct sail_image {
     void *palette;
 
     /*
-     * Size of the palette data in bytes.
+     * Number of colors in the palette.
      *
-     * READ:  Set by SAIL to a valid palette size in bytes if the image is indexed or to 0.
-     * WRITE: Must be set by a caller to a valid palette size in bytes if the image is indexed.
+     * READ:  Set by SAIL to a valid number of colors if the image is indexed or to 0.
+     * WRITE: Must be set by a caller to a valid number of colors if the image is indexed.
      */
-    int palette_size;
+    int palette_color_count;
 
     /*
      * Image meta information. See sail_meta_entry_node. Plugins guarantee that keys and values are non-NULL.

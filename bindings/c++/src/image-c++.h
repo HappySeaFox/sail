@@ -137,12 +137,12 @@ public:
     void* palette() const;
 
     /*
-     * Returns size of the palette data in bytes.
+     * Returns the number of colors in the palette.
      *
-     * READ:  Set by SAIL to a valid palette size in bytes if the image is indexed or to 0.
-     * WRITE: Must be set by a caller to a valid palette size in bytes if the image is indexed.
+     * READ:  Set by SAIL to a valid number of colors if the image is indexed or to 0.
+     * WRITE: Must be set by a caller to a valid number of colors if the image is indexed.
      */
-    int palette_size() const;
+    int palette_color_count() const;
 
     /*
      * Returns image meta information.
@@ -244,7 +244,7 @@ public:
     /*
      * Deep copies the specified palette.
      */
-    image& with_palette(void *palette, int palette_size, int palette_pixel_format);
+    image& with_palette(void *palette, int palette_color_count, int palette_pixel_format);
 
     /*
      * Sets new meta entries.

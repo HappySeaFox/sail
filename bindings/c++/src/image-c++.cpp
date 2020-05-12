@@ -39,6 +39,7 @@ public:
         , delay(0)
         , palette_pixel_format(SAIL_PIXEL_FORMAT_UNKNOWN)
         , palette(nullptr)
+        , palette_color_count(0)
         , palette_size(0)
         , properties(0)
         , source_pixel_format(SAIL_PIXEL_FORMAT_UNKNOWN)
@@ -64,6 +65,7 @@ public:
     int delay;
     int palette_pixel_format;
     void *palette;
+    int palette_color_count;
     int palette_size;
     std::map<std::string, std::string> meta_entries;
     int properties;
@@ -95,7 +97,7 @@ image& image::operator=(const image &img)
         .with_passes(img.passes())
         .with_animated(img.animated())
         .with_delay(img.delay())
-        .with_palette(img.palette(), img.palette_size(), img.palette_pixel_format())
+        .with_palette(img.palette(), img.palette_color_count(), img.palette_pixel_format())
         .with_meta_entries(meta_entries())
         .with_properties(img.properties())
         .with_source_pixel_format(img.source_pixel_format())
@@ -166,9 +168,9 @@ void* image::palette() const
     return d->palette;
 }
 
-int image::palette_size() const
+int image::palette_color_count() const
 {
-    return d->palette_size;
+    return d->palette_color_count;
 }
 
 std::map<std::string, std::string> image::meta_entries() const
@@ -254,28 +256,36 @@ image& image::with_delay(int delay)
     return *this;
 }
 
-image& image::with_palette(void *palette, int palette_size, int palette_pixel_format)
+image& image::with_palette(void *palette, int palette_color_count, int palette_pixel_format)
 {
     free(d->palette);
 
     d->palette = nullptr;
+    d->palette_color_count = 0;
     d->palette_size = 0;
     d->palette_pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;
 
-    if (palette == nullptr || palette_size <= 0) {
+    if (palette == nullptr || palette_color_count <= 0) {
         return *this;
     }
 
-    d->palette = malloc(palette_size);
+    int bits_per_pixel;
+    if (sail_bits_per_pixel(palette_pixel_format, &bits_per_pixel) != 0) {
+        SAIL_LOG_ERROR("Failed to calculate the bits per palette pixel format #%d", palette_pixel_format);
+        return *this;
+    }
+
+    d->palette_size = palette_color_count * bits_per_pixel / 8;
+    d->palette = malloc(d->palette_size);
 
     if (d->palette == nullptr) {
-        SAIL_LOG_ERROR("Memory allocation failed of palette size %d", palette_size);
+        SAIL_LOG_ERROR("Memory allocation failed of palette size %d", d->palette_size);
         return *this;
     }
 
-    memcpy(d->palette, palette, palette_size);
+    memcpy(d->palette, palette, d->palette_size);
 
-    d->palette_size         = palette_size;
+    d->palette_color_count  = palette_color_count;
     d->palette_pixel_format = palette_pixel_format;
 
     return *this;
@@ -426,7 +436,7 @@ image::image(const sail_image *im, const void *bits, int bits_size)
         .with_passes(im->passes)
         .with_animated(im->animated)
         .with_delay(im->delay)
-        .with_palette(im->palette, im->palette_size, im->palette_pixel_format)
+        .with_palette(im->palette, im->palette_color_count, im->palette_pixel_format)
         .with_meta_entries(meta_entries)
         .with_properties(im->properties)
         .with_source_pixel_format(im->source_pixel_format)
@@ -479,7 +489,7 @@ sail_error_t image::to_sail_image(sail_image *image) const
     image->animated       = d->animated;
     image->delay          = d->delay;
 
-    if (d->palette != nullptr && d->palette_size > 0) {
+    if (d->palette != nullptr && d->palette_color_count > 0 && d->palette_size > 0) {
         image->palette = malloc(d->palette_size);
 
         if (image->palette == nullptr) {
@@ -490,7 +500,7 @@ sail_error_t image::to_sail_image(sail_image *image) const
         memcpy(image->palette, d->palette, d->palette_size);
 
         image->palette              = d->palette;
-        image->palette_size         = d->palette_size;
+        image->palette_color_count  = d->palette_color_count;
         image->palette_pixel_format = d->palette_pixel_format;
     }
 
