@@ -203,6 +203,8 @@ sail_error_t alloc_io_read_mem(const void *buffer, size_t buffer_length, struct 
     SAIL_CHECK_BUFFER_PTR(buffer);
     SAIL_CHECK_IO_PTR(io);
 
+    SAIL_LOG_DEBUG("Opening memory buffer of size %lu for reading", buffer_length);
+
     SAIL_TRY(sail_alloc_io(io));
 
     struct mem_io_read_stream *mem_io_read_stream = (struct mem_io_read_stream *)malloc(sizeof(struct mem_io_read_stream));
@@ -232,6 +234,8 @@ sail_error_t alloc_io_write_mem(void *buffer, size_t buffer_length, struct sail_
 
     SAIL_CHECK_BUFFER_PTR(buffer);
     SAIL_CHECK_IO_PTR(io);
+
+    SAIL_LOG_DEBUG("Opening memory buffer of size %lu for writing", buffer_length);
 
     SAIL_TRY(sail_alloc_io(io));
 

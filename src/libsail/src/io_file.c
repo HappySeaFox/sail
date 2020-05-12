@@ -141,6 +141,8 @@ static sail_error_t alloc_io_file(const char *path, const char *mode, struct sai
     SAIL_CHECK_PTR(mode);
     SAIL_CHECK_IO_PTR(io);
 
+    SAIL_LOG_DEBUG("Opening file '%s' in '%s' mode", path, mode);
+
     /* Try to open the file first */
     FILE *fptr;
 
