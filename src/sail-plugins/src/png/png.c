@@ -45,7 +45,6 @@ struct png_state {
     png_structp png_ptr;
     png_infop info_ptr;
     int color_type;
-    png_bytep *cur, *prev, *frame;
     int bit_depth;
     int interlace_type;
 
@@ -241,12 +240,16 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
         (*image)->pixel_format = png_state->read_options->output_pixel_format;
     }
 
+    (*image)->passes = png_set_interlace_handling(png_state->png_ptr);
+
     /* Apply requested transformations. */
     png_read_update_info(png_state->png_ptr, png_state->info_ptr);
 
-    /* Image properties. */
-    (*image)->passes              = png_set_interlace_handling(png_state->png_ptr);
     (*image)->source_pixel_format = png_color_type_to_pixel_format(png_state->color_type, png_state->bit_depth);
+
+    if ((*image)->passes > 1) {
+        (*image)->source_properties |= SAIL_IMAGE_PROPERTY_INTERLACED;
+    }
 
     SAIL_TRY_OR_CLEANUP(sail_bytes_per_line((*image)->width, (*image)->pixel_format, &(*image)->bytes_per_line),
                         /* cleanup */ sail_destroy_image(*image));
