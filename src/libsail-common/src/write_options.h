@@ -50,9 +50,8 @@ struct sail_write_options {
 
     /*
      * Compression type or 0. For example: SAIL_COMPRESSION_RLE. See SailCompressionTypes.
-     * In most cases plugins support compression levels or compression types, but not both.
-     * Use sail_write_features to determine what compression types or values are supported by a particular
-     * plugin.
+     * In most cases, plugins support compression levels or compression types, but not both.
+     * Use sail_write_features to determine what compression types or values are supported by a particular plugin.
      *
      * For example:
      *
@@ -79,8 +78,9 @@ typedef struct sail_write_options sail_write_options_t;
 SAIL_EXPORT sail_error_t sail_alloc_write_options(struct sail_write_options **write_options);
 
 /*
- * Destroys the specified write options object and all its internal allocated memory buffers. The write options
- * MUST NOT be used anymore after calling this function. Does nothing if the write options is NULL.
+ * Destroys the specified write options object and all its internal allocated memory buffers.
+ * The write options MUST NOT be used anymore after calling this function. It does nothing
+ * if the write options is NULL.
  */
 SAIL_EXPORT void sail_destroy_write_options(struct sail_write_options *write_options);
 
@@ -92,8 +92,8 @@ SAIL_EXPORT void sail_destroy_write_options(struct sail_write_options *write_opt
 SAIL_EXPORT sail_error_t sail_write_options_from_features(const struct sail_write_features *write_features, struct sail_write_options *write_options);
 
 /*
- * Allocates and builds default write options from write features. The assigned write options MUST be destroyed later
- * with sail_destroy_write_options().
+ * Allocates and builds default write options from write features.
+ * The assigned write options MUST be destroyed later with sail_destroy_write_options().
  *
  * Returns 0 on success or sail_error_t on error.
  */

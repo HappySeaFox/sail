@@ -43,11 +43,11 @@ struct sail_write_features {
      * For example: BPP24-CMYK, BPP24-YCBCR, BPP24-RGB.
      *
      * NOTE: Some input pixel formats might not map to some output pixel formats.
-     *       Let's take a look at an hypothetical example:
+     *       Let's take a look at a hypothetical example:
      *
-     * A hypothetical SAIL plugin supports input RGB pixel data and it's able to output YCBCR files from it.
-     * Additionally, it supports input YCCK pixel data and it's able to output CMYK files from it.
-     * So the full conversion table with all possible input/output variants looks like that:
+     * A hypothetical SAIL plugin supports RGB pixel data input and is able to output YCBCR files.
+     * Additionally, a SAIL plugin supports YCCK pixel data input and is able to output CMYK files.
+     * So, the full conversion table with all possible input/output variants looks like this:
      *
      * [ Read from memory ] RGB   => YCBCR [ Output to file ]
      * [ Read from memory ] YCCK  => CMYK  [ Output to file ]
@@ -55,8 +55,7 @@ struct sail_write_features {
      * sail_write_features.input_pixel_formats will contain RGB and YCCK pixel formats.
      * sail_write_features.output_pixel_formats will contain YCBCR and CMYK pixel formats.
      *
-     * However, if you try to write a YCBCR file from YCCK pixel data, the codec will return
-     * an error.
+     * However, if you try to write a YCBCR file from YCCK pixel data, the codec will return an error.
      */
     int *input_pixel_formats;
 
@@ -64,10 +63,10 @@ struct sail_write_features {
     int input_pixel_formats_length;
 
     /*
-     * A list of supported pixel formats that can be outputted by this plugin to a file.
+     * A list of supported pixel formats that can be output by this plugin to a file.
      *
-     * It's not guaranteed that every input pixel format in input_pixel_formats could be converted
-     * to every output pixel format in output_pixel_formats. Some could be converted and some not.
+     * It is not guaranteed that every input pixel format in input_pixel_formats can be converted
+     * to every output pixel format in output_pixel_formats. Some can be converted and some cannot.
      *
      * For example: BPP32-CMYK, BPP24-YCBCR, BPP24-RGB.
      */
@@ -77,7 +76,7 @@ struct sail_write_features {
     int output_pixel_formats_length;
 
     /*
-     * Output pixel format to use by default when no specific output pixel format was requested by user.
+     * Output pixel format to use by default when no specific output pixel format was requested by the user.
      */
     int preferred_output_pixel_format;
 
@@ -85,7 +84,7 @@ struct sail_write_features {
     int features;
 
     /*
-     * Required image properties. For example, in input image must be flipped by a caller before writing
+     * Required image properties. For example, an input image must be flipped by a caller before writing
      * it with SAIL (or supply scan lines in a reverse order). See SailImageProperties.
      */
     int properties;
@@ -111,8 +110,8 @@ struct sail_write_features {
     int preferred_compression_type;
 
     /*
-     * Minimum compression value. For lossy codecs more compression means less quality and vice versa.
-     * For loseless codecs more compression means nothing else but a smaller file size. This field is
+     * Minimum compression value. For lossy codecs, more compression means less quality and vice versa.
+     * For lossless codecs, more compression means nothing but a smaller file size. This field is
      * plugin-specific. If compression_min == compression_max == 0, no compression tuning is available.
      * For example: 0.
      */
@@ -139,8 +138,8 @@ typedef struct sail_write_features sail_write_features_t;
 SAIL_EXPORT sail_error_t sail_alloc_write_features(struct sail_write_features **write_features);
 
 /*
- * Destroys the specified write features object and all its internal allocated memory buffers. The write features
- * MUST NOT be used anymore after calling this function. Does nothing if the write features is NULL.
+ * Destroys the specified write features object and all its internal allocated memory buffers.
+ * The write features MUST NOT be used after calling this function. It does nothing if the write features is NULL.
  */
 SAIL_EXPORT void sail_destroy_write_features(struct sail_write_features *write_features);
 

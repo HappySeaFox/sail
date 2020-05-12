@@ -73,16 +73,15 @@ SAIL_EXPORT void sail_to_lower(char *str);
 SAIL_EXPORT sail_error_t sail_to_wchar(const char *input, wchar_t **output);
 
 /*
- * Computes an unique hash of the specified string. It utilizes the djb2 algorithm
- * proposed by Dan Bernstein.
+ * Computes a unique hash of the specified string. It utilizes the djb2 algorithm proposed by Dan Bernstein.
  *
  * Returns 0 on success or sail_error_t on error.
  */
 SAIL_EXPORT sail_error_t sail_string_hash(const char *str, uint64_t *hash);
 
 /*
- * Assigns a non-NULL string representation of the specified pixel format. The assigned string
- * MUST NOT be destroyed. For example: "RGB".
+ * Assigns a non-NULL string representation of the specified pixel format.
+ * The assigned string MUST NOT be destroyed. For example: "RGB".
  *
  * Returns 0 on success or sail_error_t on error.
  */
@@ -145,7 +144,7 @@ SAIL_EXPORT sail_error_t sail_plugin_feature_to_string(int plugin_feature, const
 SAIL_EXPORT sail_error_t sail_plugin_feature_from_string(const char *str, int *result);
 
 /*
- * Calculates a number of bits per pixel in the specified pixel format.
+ * Calculates the number of bits per pixel in the specified pixel format.
  * For example, for SAIL_PIXEL_FORMAT_RGB 24 is assigned.
  *
  * Returns 0 on success or sail_error_t on error.
@@ -153,7 +152,7 @@ SAIL_EXPORT sail_error_t sail_plugin_feature_from_string(const char *str, int *r
 SAIL_EXPORT sail_error_t sail_bits_per_pixel(int pixel_format, int *result);
 
 /*
- * Calculates a number of bytes per line needed to hold a scan line without padding.
+ * Calculates the number of bytes per line needed to hold a scan line without padding.
  *
  * For example:
  *   - 12 pixels * 1 bits per pixel / 8 + 1 ==
@@ -174,8 +173,8 @@ SAIL_EXPORT sail_error_t sail_bits_per_pixel(int pixel_format, int *result);
 SAIL_EXPORT sail_error_t sail_bytes_per_line(int width, int pixel_format, int *result);
 
 /*
- * Calculates a number of bytes needed to hold an entire image in memory without padding.
- * It's effectively bytes per line * image height.
+ * Calculates the number of bytes needed to hold an entire image in memory without padding.
+ * It is effectively bytes per line * image height.
  *
  * Returns 0 on success or sail_error_t on error.
  */
