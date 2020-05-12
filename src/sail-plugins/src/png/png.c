@@ -360,13 +360,7 @@ SAIL_EXPORT sail_error_t sail_plugin_write_init_v2(struct sail_io *io, const str
     *state = png_state;
 
     /* Deep copy write options. */
-    png_state->write_options = (struct sail_write_options *)malloc(sizeof(struct sail_write_options));
-
-    if (png_state->write_options == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
-
-    memcpy(png_state->write_options, write_options, sizeof(struct sail_write_options));
+    SAIL_TRY(sail_deep_copy_write_options(write_options, &png_state->write_options));
 
     /* Sanity check. */
     if (pixel_format_to_color_space(png_state->write_options->output_pixel_format) == JCS_UNKNOWN) {
