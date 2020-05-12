@@ -93,3 +93,15 @@ J_COLOR_SPACE pixel_format_to_color_space(int pixel_format) {
         default:                                return JCS_UNKNOWN;
     }
 }
+
+bool jpeg_supported_pixel_format(int pixel_format) {
+    switch (pixel_format) {
+        case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE:
+        case SAIL_PIXEL_FORMAT_BPP24_RGB:
+        case SAIL_PIXEL_FORMAT_BPP24_YCBCR:
+        case SAIL_PIXEL_FORMAT_BPP32_CMYK:
+        case SAIL_PIXEL_FORMAT_BPP32_YCCK: return true;
+
+        default:                           return false;
+    }
+}

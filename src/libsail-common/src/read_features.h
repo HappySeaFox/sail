@@ -64,7 +64,7 @@ struct sail_read_features {
     int input_pixel_formats_length;
 
     /*
-     * A list of supported pixel formats that can be outputted by this plugin.
+     * A list of supported pixel formats that can be output by this plugin.
      *
      * It's not guaranteed that every input pixel format in input_pixel_formats can be converted
      * to every output pixel format in output_pixel_formats. Some could be converted and some not.

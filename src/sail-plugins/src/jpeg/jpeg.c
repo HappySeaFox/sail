@@ -299,8 +299,10 @@ SAIL_EXPORT sail_error_t sail_plugin_write_init_v2(struct sail_io *io, const str
     SAIL_TRY(sail_deep_copy_write_options(write_options, &jpeg_state->write_options));
 
     /* Sanity check. */
-    if (pixel_format_to_color_space(jpeg_state->write_options->output_pixel_format) == JCS_UNKNOWN) {
-        return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+    if (jpeg_state->write_options->output_pixel_format != SAIL_PIXEL_FORMAT_SOURCE) {
+        if (!jpeg_supported_pixel_format(jpeg_state->write_options->output_pixel_format)) {
+            return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+        }
     }
 
     if (jpeg_state->write_options->compression_type != 0) {
@@ -359,7 +361,12 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v2(void *state, struc
     jpeg_state->compress_context.in_color_space = pixel_format_to_color_space(image->pixel_format);
 
     jpeg_set_defaults(&jpeg_state->compress_context);
-    jpeg_set_colorspace(&jpeg_state->compress_context, pixel_format_to_color_space(jpeg_state->write_options->output_pixel_format));
+
+    if (jpeg_state->write_options->output_pixel_format == SAIL_PIXEL_FORMAT_SOURCE) {
+        jpeg_set_colorspace(&jpeg_state->compress_context, pixel_format_to_color_space(image->pixel_format));
+    } else {
+        jpeg_set_colorspace(&jpeg_state->compress_context, pixel_format_to_color_space(jpeg_state->write_options->output_pixel_format));
+    }
 
     const int compression = (jpeg_state->write_options->compression < COMPRESSION_MIN ||
                                 jpeg_state->write_options->compression > COMPRESSION_MAX)

@@ -40,7 +40,10 @@ struct sail_write_features {
      * A list of supported input pixel formats that can be passed to this plugin from a caller.
      * One of these values could be specified in sail_image.pixel_format. See SailPixelFormat.
      *
-     * For example: BPP24-CMYK, BPP24-YCBCR, BPP24-RGB.
+     * If the array contains SAIL_PIXEL_FORMAT_SOURCE, then the codec is able to output raw pixel data
+     * without converting it to a different format.
+     *
+     * For example: SOURCE, BPP24-CMYK, BPP24-YCBCR, BPP24-RGB.
      *
      * NOTE: Some input pixel formats might not map to some output pixel formats.
      *       Let's take a look at a hypothetical example:
