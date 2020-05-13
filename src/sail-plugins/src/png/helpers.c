@@ -236,7 +236,7 @@ sail_error_t write_png_text(png_structp png_ptr, png_infop info_ptr, const struc
     meta_entry_node_local = meta_entry_node;
 
     while (meta_entry_node_local != NULL) {
-        lines[i].compression = PNG_TEXT_COMPRESSION_NONE;
+        lines[i].compression = PNG_TEXT_COMPRESSION_zTXt;
         lines[i].key         = meta_entry_node_local->key;
         lines[i].text        = meta_entry_node_local->value;
 
