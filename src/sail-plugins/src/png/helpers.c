@@ -195,11 +195,6 @@ sail_error_t read_png_text(png_structp png_ptr, png_infop info_ptr, struct sail_
     png_get_text(png_ptr, info_ptr, &lines, &num_text);
 
     for (int i = 0; i < num_text; i++) {
-        /* Allow plain-text only. */
-        if (lines[i].compression != PNG_TEXT_COMPRESSION_NONE) {
-            continue;
-        }
-
         struct sail_meta_entry_node *meta_entry_node;
 
         SAIL_TRY(sail_alloc_meta_entry_node(&meta_entry_node));
