@@ -88,7 +88,49 @@ int png_color_type_to_pixel_format(int color_type, int bit_depth) {
     return SAIL_PIXEL_FORMAT_UNKNOWN;
 }
 
-sail_error_t supported_pixel_format(int pixel_format) {
+sail_error_t pixel_format_to_png_color_type(int pixel_format, int *color_type, int *bit_depth) {
+
+    SAIL_CHECK_PTR(color_type);
+    SAIL_CHECK_PTR(bit_depth);
+
+    switch (pixel_format) {
+        case SAIL_PIXEL_FORMAT_BPP24_RGB:
+        case SAIL_PIXEL_FORMAT_BPP24_BGR: {
+            *color_type = PNG_COLOR_TYPE_RGB;
+            *bit_depth = 8;
+            return 0;
+        }
+
+        case SAIL_PIXEL_FORMAT_BPP48_RGB:
+        case SAIL_PIXEL_FORMAT_BPP48_BGR: {
+            *color_type = PNG_COLOR_TYPE_RGB;
+            *bit_depth = 16;
+            return 0;
+        }
+
+        case SAIL_PIXEL_FORMAT_BPP32_RGBA:
+        case SAIL_PIXEL_FORMAT_BPP32_BGRA:
+        case SAIL_PIXEL_FORMAT_BPP32_ARGB: {
+        case SAIL_PIXEL_FORMAT_BPP32_ABGR:
+            *color_type = PNG_COLOR_TYPE_RGB_ALPHA;
+            *bit_depth = 8;
+            return 0;
+        }
+
+        case SAIL_PIXEL_FORMAT_BPP64_RGBA:
+        case SAIL_PIXEL_FORMAT_BPP64_BGRA:
+        case SAIL_PIXEL_FORMAT_BPP64_ARGB: {
+        case SAIL_PIXEL_FORMAT_BPP64_ABGR:
+            *color_type = PNG_COLOR_TYPE_RGB_ALPHA;
+            *bit_depth = 16;
+            return 0;
+        }
+    }
+
+    return SAIL_PIXEL_FORMAT_UNKNOWN;
+}
+
+sail_error_t supported_read_output_pixel_format(int pixel_format) {
 
     switch (pixel_format) {
         case SAIL_PIXEL_FORMAT_SOURCE:
@@ -98,6 +140,39 @@ sail_error_t supported_pixel_format(int pixel_format) {
         case SAIL_PIXEL_FORMAT_BPP32_BGRA:
         case SAIL_PIXEL_FORMAT_BPP32_ARGB:
         case SAIL_PIXEL_FORMAT_BPP32_ABGR: {
+            return 0;
+        }
+    }
+
+    return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+}
+
+sail_error_t supported_write_input_pixel_format(int pixel_format) {
+
+    switch (pixel_format) {
+        case SAIL_PIXEL_FORMAT_BPP24_RGB:
+        case SAIL_PIXEL_FORMAT_BPP24_BGR:
+        case SAIL_PIXEL_FORMAT_BPP48_RGB:
+        case SAIL_PIXEL_FORMAT_BPP48_BGR:
+        case SAIL_PIXEL_FORMAT_BPP32_RGBA:
+        case SAIL_PIXEL_FORMAT_BPP32_BGRA:
+        case SAIL_PIXEL_FORMAT_BPP32_ARGB:
+        case SAIL_PIXEL_FORMAT_BPP32_ABGR:
+        case SAIL_PIXEL_FORMAT_BPP64_RGBA:
+        case SAIL_PIXEL_FORMAT_BPP64_BGRA:
+        case SAIL_PIXEL_FORMAT_BPP64_ARGB:
+        case SAIL_PIXEL_FORMAT_BPP64_ABGR: {
+            return 0;
+        }
+    }
+
+    return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+}
+
+sail_error_t supported_write_output_pixel_format(int pixel_format) {
+
+    switch (pixel_format) {
+        case SAIL_PIXEL_FORMAT_SOURCE: {
             return 0;
         }
     }
@@ -141,6 +216,40 @@ sail_error_t read_png_text(png_structp png_ptr, png_infop info_ptr, struct sail_
         }
     }
 #endif
+
+    return 0;
+}
+
+sail_error_t write_png_text(png_structp png_ptr, png_infop info_ptr, const struct sail_meta_entry_node *meta_entry_node) {
+
+    SAIL_CHECK_PTR(png_ptr);
+    SAIL_CHECK_PTR(info_ptr);
+
+    /* Count the number of the meta info entries first. It's still O(n). */
+    int count = 0;
+    const struct sail_meta_entry_node *meta_entry_node_local = meta_entry_node;
+
+    while (meta_entry_node_local != NULL) {
+        count++;
+        meta_entry_node_local = meta_entry_node_local->next;
+    }
+
+    png_text lines[count];
+    int i = 0;
+
+    /* Build PNG lines. */
+    meta_entry_node_local = meta_entry_node;
+
+    while (meta_entry_node_local != NULL) {
+        lines[i].compression = PNG_TEXT_COMPRESSION_NONE;
+        lines[i].key         = meta_entry_node_local->key;
+        lines[i].text        = meta_entry_node_local->value;
+
+        i++;
+        meta_entry_node_local = meta_entry_node_local->next;
+    }
+
+    png_set_text(png_ptr, info_ptr, lines, count);
 
     return 0;
 }

@@ -89,7 +89,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_io *io, const stru
     SAIL_CHECK_IO(io);
     SAIL_CHECK_READ_OPTIONS_PTR(read_options);
 
-    SAIL_TRY(supported_pixel_format(read_options->output_pixel_format));
+    SAIL_TRY(supported_read_output_pixel_format(read_options->output_pixel_format));
 
     /* Allocate a new state. */
     struct png_state *png_state;
@@ -248,6 +248,11 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
     (*image)->source_pixel_format = png_color_type_to_pixel_format(png_state->color_type, png_state->bit_depth);
 
     if ((*image)->passes > 1) {
+        /* The image is interlaced, but we are instructed not to read interlaced images. Reset passes to 1. */
+        if ((png_state->read_options->io_options & SAIL_IO_OPTION_INTERLACED) == 0) {
+            (*image)->passes = 1;
+        }
+
         (*image)->source_properties |= SAIL_IMAGE_PROPERTY_INTERLACED;
     }
 
@@ -358,7 +363,6 @@ SAIL_EXPORT sail_error_t sail_plugin_write_init_v2(struct sail_io *io, const str
 
     SAIL_CHECK_IO(io);
     SAIL_CHECK_WRITE_OPTIONS_PTR(write_options);
-#if 0
 
     struct png_state *png_state;
     SAIL_TRY(alloc_png_state(&png_state));
@@ -369,28 +373,30 @@ SAIL_EXPORT sail_error_t sail_plugin_write_init_v2(struct sail_io *io, const str
     SAIL_TRY(sail_deep_copy_write_options(write_options, &png_state->write_options));
 
     /* Sanity check. */
-    if (pixel_format_to_color_space(png_state->write_options->output_pixel_format) == JCS_UNKNOWN) {
-        return SAIL_UNSUPPORTED_PIXEL_FORMAT;
-    }
+    SAIL_TRY(supported_write_output_pixel_format(png_state->write_options->output_pixel_format));
 
     if (png_state->write_options->compression_type != 0) {
         return SAIL_UNSUPPORTED_COMPRESSION_TYPE;
     }
 
-    /* Error handling setup. */
-    png_state->compress_context.err = jpeg_std_error(&png_state->error_context.jpeg_error_mgr);
-    png_state->error_context.jpeg_error_mgr.error_exit = my_error_exit;
-    png_state->error_context.jpeg_error_mgr.output_message = my_output_message;
-
-    if (setjmp(png_state->error_context.setjmp_buffer) != 0) {
+    /* Initialize PNG. */
+    if ((png_state->png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, my_error_fn, my_warning_fn)) == NULL) {
         png_state->libpng_error = true;
         return SAIL_UNDERLYING_CODEC_ERROR;
     }
 
-    /* JPEG setup. */
-    jpeg_create_compress(&png_state->compress_context);
-    jpeg_sail_io_dest(&png_state->compress_context, io);
-#endif
+    if ((png_state->info_ptr = png_create_info_struct(png_state->png_ptr)) == NULL) {
+        png_state->libpng_error = true;
+        return SAIL_UNDERLYING_CODEC_ERROR;
+    }
+
+    /* Error handling setup. */
+    if (setjmp(png_jmpbuf(png_state->png_ptr))) {
+        png_state->libpng_error = true;
+        return SAIL_UNDERLYING_CODEC_ERROR;
+    }
+
+    png_set_write_fn(png_state->png_ptr, io, my_write_fn, my_flush_fn);
 
     return 0;
 }
@@ -401,12 +407,6 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v2(void *state, struc
     SAIL_CHECK_IO(io);
     SAIL_CHECK_IMAGE(image);
 
-#if 0
-    /* Sanity check. */
-    if (pixel_format_to_color_space(image->pixel_format) == JCS_UNKNOWN) {
-        return SAIL_UNSUPPORTED_PIXEL_FORMAT;
-    }
-
     struct png_state *png_state = (struct png_state *)state;
     SAIL_CHECK_STATE_PTR(png_state);
 
@@ -416,46 +416,74 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v2(void *state, struc
 
     png_state->frame_written = true;
 
+    /* Sanity check. */
+    SAIL_TRY(supported_write_input_pixel_format(image->pixel_format));
+
+    /* The image is interlaced, but we are instructed not to write interlaced images. */
+    if ((image->properties & SAIL_IMAGE_PROPERTY_INTERLACED) && (png_state->write_options->io_options & SAIL_IO_OPTION_INTERLACED) == 0) {
+        return SAIL_INTERLACED_UNSUPPORTED;
+    }
+
     /* Error handling setup. */
-    if (setjmp(png_state->error_context.setjmp_buffer) != 0) {
+    if (setjmp(png_jmpbuf(png_state->png_ptr))) {
         png_state->libpng_error = true;
         return SAIL_UNDERLYING_CODEC_ERROR;
     }
 
-    int bits_per_pixel;
-    SAIL_TRY(sail_bits_per_pixel(image->pixel_format, &bits_per_pixel));
+    int color_type;
+    int bit_depth;
+    SAIL_TRY(pixel_format_to_png_color_type(image->pixel_format, &color_type, &bit_depth));
 
-    png_state->compress_context.image_width = image->width;
-    png_state->compress_context.image_height = image->height;
-    png_state->compress_context.input_components = bits_per_pixel / 8;
-    png_state->compress_context.in_color_space = pixel_format_to_color_space(image->pixel_format);
+    /* Write meta info. */
+    if (png_state->write_options->io_options & SAIL_IO_OPTION_META_INFO && image->meta_entry_node != NULL) {
+        SAIL_LOG_DEBUG("PNG: Writing meta info");
+        SAIL_TRY(write_png_text(png_state->png_ptr, png_state->info_ptr, image->meta_entry_node));
+    }
 
-    jpeg_set_defaults(&png_state->compress_context);
-    jpeg_set_colorspace(&png_state->compress_context, pixel_format_to_color_space(png_state->write_options->output_pixel_format));
+    png_set_IHDR(png_state->png_ptr,
+                 png_state->info_ptr,
+                 image->width,
+                 image->height,
+                 bit_depth,
+                 color_type,
+                 (image->properties & SAIL_IMAGE_PROPERTY_INTERLACED) ? PNG_INTERLACE_ADAM7 : PNG_INTERLACE_NONE,
+                 PNG_COMPRESSION_TYPE_BASE,
+                 PNG_FILTER_TYPE_BASE);
 
     const int compression = (png_state->write_options->compression < COMPRESSION_MIN ||
                                 png_state->write_options->compression > COMPRESSION_MAX)
                             ? COMPRESSION_DEFAULT
                             : png_state->write_options->compression;
-    jpeg_set_quality(&png_state->compress_context, /* to quality */COMPRESSION_MAX-compression, true);
 
-    jpeg_start_compress(&png_state->compress_context, true);
+    png_set_compression_level(png_state->png_ptr, compression);
 
-    /* Write meta info. */
-    if (png_state->write_options->io_options & SAIL_IO_OPTION_META_INFO && image->meta_entry_node != NULL) {
+    png_write_info(png_state->png_ptr, png_state->info_ptr);
 
-        struct sail_meta_entry_node *meta_entry_node = image->meta_entry_node;
-
-        while (meta_entry_node != NULL) {
-            jpeg_write_marker(&png_state->compress_context,
-                                JPEG_COM,
-                                (JOCTET *)meta_entry_node->value,
-                                (unsigned int)strlen(meta_entry_node->value));
-
-            meta_entry_node = meta_entry_node->next;
-        }
+    if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP24_BGR      ||
+            image->pixel_format == SAIL_PIXEL_FORMAT_BPP48_BGR  ||
+            image->pixel_format == SAIL_PIXEL_FORMAT_BPP32_BGRA ||
+            image->pixel_format == SAIL_PIXEL_FORMAT_BPP32_ABGR ||
+            image->pixel_format == SAIL_PIXEL_FORMAT_BPP64_BGRA ||
+            image->pixel_format == SAIL_PIXEL_FORMAT_BPP64_ABGR) {
+        png_set_bgr(png_state->png_ptr);
     }
-#endif
+
+    if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP32_ARGB     ||
+            image->pixel_format == SAIL_PIXEL_FORMAT_BPP32_ABGR ||
+            image->pixel_format == SAIL_PIXEL_FORMAT_BPP64_ARGB ||
+            image->pixel_format == SAIL_PIXEL_FORMAT_BPP64_ABGR) {
+        png_set_swap_alpha(png_state->png_ptr);
+    }
+
+    if (image->properties & SAIL_IMAGE_PROPERTY_INTERLACED) {
+        png_set_interlace_handling(png_state->png_ptr);
+    }
+
+    const char *pixel_format_str = NULL;
+    SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(image->pixel_format, &pixel_format_str));
+    SAIL_LOG_DEBUG("PNG: Input pixel format is %s", pixel_format_str);
+    SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(png_state->write_options->output_pixel_format, &pixel_format_str));
+    SAIL_LOG_DEBUG("PNG: Output pixel format is %s", pixel_format_str);
 
     return 0;
 }
@@ -476,7 +504,6 @@ SAIL_EXPORT sail_error_t sail_plugin_write_scan_line_v2(void *state, struct sail
     SAIL_CHECK_IMAGE(image);
     SAIL_CHECK_SCAN_LINE_PTR(scanline);
 
-#if 0
     struct png_state *png_state = (struct png_state *)state;
     SAIL_CHECK_STATE_PTR(png_state);
 
@@ -484,15 +511,15 @@ SAIL_EXPORT sail_error_t sail_plugin_write_scan_line_v2(void *state, struct sail
         return SAIL_UNDERLYING_CODEC_ERROR;
     }
 
-    if (setjmp(png_state->error_context.setjmp_buffer) != 0) {
+    /* Error handling setup. */
+    if (setjmp(png_jmpbuf(png_state->png_ptr))) {
         png_state->libpng_error = true;
         return SAIL_UNDERLYING_CODEC_ERROR;
     }
 
-    JSAMPROW row = (JSAMPROW)scanline;
+    png_bytep row_pointer = (png_bytep)scanline;
 
-    jpeg_write_scanlines(&png_state->compress_context, &row, 1);
-#endif
+    png_write_rows(png_state->png_ptr, &row_pointer, 1);
 
     return 0;
 }
@@ -502,7 +529,6 @@ SAIL_EXPORT sail_error_t sail_plugin_write_finish_v2(void **state, struct sail_i
     SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IO(io);
 
-#if 0
     struct png_state *png_state = (struct png_state *)(*state);
     SAIL_CHECK_STATE_PTR(png_state);
 
@@ -511,16 +537,21 @@ SAIL_EXPORT sail_error_t sail_plugin_write_finish_v2(void **state, struct sail_i
 
     sail_destroy_write_options(png_state->write_options);
 
-    if (setjmp(png_state->error_context.setjmp_buffer) != 0) {
+    /* Error handling setup. */
+    if (setjmp(png_jmpbuf(png_state->png_ptr))) {
         free(png_state);
         return SAIL_UNDERLYING_CODEC_ERROR;
     }
 
-    jpeg_finish_compress(&png_state->compress_context);
-    jpeg_destroy_compress(&png_state->compress_context);
+    if (png_state->png_ptr != NULL && !png_state->libpng_error) {
+        png_write_end(png_state->png_ptr, png_state->info_ptr);
+    }
+
+    if (png_state->png_ptr != NULL) {
+        png_destroy_write_struct(&png_state->png_ptr, &png_state->info_ptr);
+    }
 
     free(png_state);
-#endif
 
     return 0;
 }
