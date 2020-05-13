@@ -59,6 +59,10 @@ sail_error_t sail_write_options_from_features(const struct sail_write_features *
         write_options->io_options |= SAIL_IO_OPTION_META_INFO;
     }
 
+    if (write_features->features & SAIL_PLUGIN_FEATURE_INTERLACED) {
+        write_options->io_options |= SAIL_IO_OPTION_INTERLACED;
+    }
+
     /* Compression levels are not supported. */
     if (write_features->compression_min == write_features->compression_max) {
         write_options->compression_type = write_features->preferred_compression_type;

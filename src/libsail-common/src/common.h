@@ -182,10 +182,13 @@ enum SailPluginFeatures {
 enum SailIoOptions {
 
     /* Instruction to read or write simple image meta information like JPEG comments. */
-    SAIL_IO_OPTION_META_INFO = 1 << 0,
+    SAIL_IO_OPTION_META_INFO  = 1 << 0,
 
     /* Instruction to read or write EXIF meta information. */
-    SAIL_IO_OPTION_EXIF      = 1 << 1,
+    SAIL_IO_OPTION_EXIF       = 1 << 1,
+
+    /* Instruction to read or write interlaced images. */
+    SAIL_IO_OPTION_INTERLACED = 1 << 2,
 
     /* Not to be used. Resize the enum for future elements. */
     _SAIL_IO_OPTIONS_RESIZE_ENUM_TO_INT = UINT_MAX
