@@ -220,28 +220,18 @@ sail_error_t write_png_text(png_structp png_ptr, png_infop info_ptr, const struc
     SAIL_CHECK_PTR(png_ptr);
     SAIL_CHECK_PTR(info_ptr);
 
-    /* Count the number of the meta info entries first. It's still O(n). */
+    /* To avoid allocating arrays for MSVC (which still doesn't support VLAs), allow only 32 text pairs. */
+    png_text lines[32];
     int count = 0;
-    const struct sail_meta_entry_node *meta_entry_node_local = meta_entry_node;
-
-    while (meta_entry_node_local != NULL) {
-        count++;
-        meta_entry_node_local = meta_entry_node_local->next;
-    }
-
-    png_text lines[count];
-    int i = 0;
 
     /* Build PNG lines. */
-    meta_entry_node_local = meta_entry_node;
+    while (meta_entry_node != NULL && count < 32) {
+        lines[count].compression = PNG_TEXT_COMPRESSION_zTXt;
+        lines[count].key         = meta_entry_node->key;
+        lines[count].text        = meta_entry_node->value;
 
-    while (meta_entry_node_local != NULL) {
-        lines[i].compression = PNG_TEXT_COMPRESSION_zTXt;
-        lines[i].key         = meta_entry_node_local->key;
-        lines[i].text        = meta_entry_node_local->value;
-
-        i++;
-        meta_entry_node_local = meta_entry_node_local->next;
+        count++;
+        meta_entry_node = meta_entry_node->next;
     }
 
     png_set_text(png_ptr, info_ptr, lines, count);
