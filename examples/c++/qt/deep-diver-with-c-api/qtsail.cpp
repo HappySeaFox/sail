@@ -52,6 +52,7 @@ public:
     QScopedPointer<Ui::QtSail> ui;
 
     QImage qimage;
+    QString suffix;
 
     sail_context *context = nullptr;
 };
@@ -254,6 +255,8 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
                                 .arg(meta)
                                 );
 
+    d->suffix = QFileInfo(path).suffix();
+
     free(image_bits);
     sail_destroy_image(image);
 
@@ -298,7 +301,7 @@ sail_error_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffer
     elapsed.start();
 
     const struct sail_plugin_info *plugin_info;
-    SAIL_TRY(sail_plugin_info_from_extension("JPEG", d->context, &plugin_info));
+    SAIL_TRY(sail_plugin_info_from_extension(d->suffix.toUtf8(), d->context, &plugin_info));
 
     pluginInfo(plugin_info);
 
