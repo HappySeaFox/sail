@@ -338,16 +338,16 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v2(void *state, struc
     SAIL_CHECK_IO(io);
     SAIL_CHECK_IMAGE(image);
 
-    /* Sanity check. */
-    if (pixel_format_to_color_space(image->pixel_format) == JCS_UNKNOWN) {
-        return SAIL_UNSUPPORTED_PIXEL_FORMAT;
-    }
-
     struct jpeg_state *jpeg_state = (struct jpeg_state *)state;
     SAIL_CHECK_STATE_PTR(jpeg_state);
 
     if (jpeg_state->frame_written) {
         return SAIL_NO_MORE_FRAMES;
+    }
+
+    /* Sanity check. */
+    if (pixel_format_to_color_space(image->pixel_format) == JCS_UNKNOWN) {
+        return SAIL_UNSUPPORTED_PIXEL_FORMAT;
     }
 
     jpeg_state->frame_written = true;
