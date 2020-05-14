@@ -3,7 +3,7 @@ Table of Contents
 
 * [Table of Contents](#table-of-contents)
   * [Full\-featured applications](#full-featured-applications)
-    * [Written in C](#written-in-c)
+    * [Written in pure C and SDL](#written-in-pure-c-and-sdl)
     * [Written in Qt/C\+\+ utilizing SAIL C API](#written-in-qtc-utilizing-sail-c-api)
     * [Written in Qt/C\+\+ utilizing SAIL C\+\+ API](#written-in-qtc-utilizing-sail-c-api-1)
   * [APIs overview](#apis-overview)
@@ -22,7 +22,7 @@ Table of Contents
 
 ## Full-featured applications
 
-### Written in C
+### Written in pure C and SDL
 
 See [examples](examples/c).
 
