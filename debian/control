@@ -8,34 +8,52 @@ Package: libsail-common
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: SAIL common client library
+Description: SAIL is a fast and lightweight cross-platform image decoding
+ and encoding library providing multi-leveled APIs from one-liners
+ to complex use-cases with custom I/O sources.
+ This package provides common low-level SAIL libraries.
 
 Package: libsail-common-dev
 Section: libdevel
 Architecture: any
 Depends: libsail-common (= ${binary:Version}), ${misc:Depends}
-Description: SAIL common client library development files
+Description: SAIL is a fast and lightweight cross-platform image decoding
+ and encoding library providing multi-leveled APIs from one-liners
+ to complex use-cases with custom I/O sources.
+ This package provides common low-level SAIL development headers and libraries.
 
 Package: libsail
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: SAIL high-level client library
+Description: SAIL is a fast and lightweight cross-platform image decoding
+ and encoding library providing multi-leveled APIs from one-liners
+ to complex use-cases with custom I/O sources.
+ This package provides high-level SAIL client libraries.
 
 Package: libsail-dev
 Section: libdevel
 Architecture: any
 Depends: libsail (= ${binary:Version}), ${misc:Depends}
-Description: SAIL high-level client library development files
+Description: SAIL is a fast and lightweight cross-platform image decoding
+ and encoding library providing multi-leveled APIs from one-liners
+ to complex use-cases with custom I/O sources.
+ This package provides high-level SAIL development headers and libraries.
 
 Package: libsail-c++
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: SAIL C++ high-level client library
+Description: SAIL is a fast and lightweight cross-platform image decoding
+ and encoding library providing multi-leveled APIs from one-liners
+ to complex use-cases with custom I/O sources.
+ This package provides high-level SAIL client libraries.
 
 Package: libsail-c++-dev
 Section: libdevel
 Architecture: any
 Depends: libsail-c++ (= ${binary:Version}), ${misc:Depends}
-Description: SAIL C++ high-level client library development files
+Description: SAIL is a fast and lightweight cross-platform image decoding
+ and encoding library providing multi-leveled APIs from one-liners
+ to complex use-cases with custom I/O sources.
+ This package provides high-level SAIL C++ development headers and libraries.
