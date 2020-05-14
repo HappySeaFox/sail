@@ -12,6 +12,7 @@ set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 include(sail_plugin)
 include(sail_enable_asan)
 include(sail_test)
+include(sail_check_build_essential)
 
 # Sanity checks
 #
@@ -21,6 +22,37 @@ if (SPACE_INDEX GREATER_EQUAL 0)
 The generated pkg-config files will also have spaces in paths. Pkg-config doesn't support that \
 and will fail to generate CFLAGS and LIBS for client applications. Please use a different CMAKE_INSTALL_PREFIX \
 without spaces.")
+endif()
+
+# Check for required includes
+#
+sail_check_include(ctype.h)
+sail_check_include(errno.h)
+sail_check_include(limits.h)
+sail_check_include(setjmp.h)
+sail_check_include(stdarg.h)
+sail_check_include(stdbool.h)
+sail_check_include(stddef.h)
+sail_check_include(stdint.h)
+sail_check_include(stdio.h)
+sail_check_include(stdlib.h)
+sail_check_include(string.h)
+sail_check_include(wchar.h)
+
+if (UNIX)
+    sail_check_include(dirent.h)
+    sail_check_include(dlfcn.h)
+    sail_check_include(sys/stat.h)
+    sail_check_include(sys/time.h)
+    sail_check_include(sys/types.h)
+    sail_check_include(unistd.h)
+endif()
+
+if (WIN32)
+    sail_check_include(io.h)
+    sail_check_include(share.h)
+    sail_check_include(versionhelpers.h)
+    sail_check_include(windows.h)
 endif()
 
 # Options
