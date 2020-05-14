@@ -213,3 +213,5 @@ make
 # Install
 ... distro-specific installation
 ```
+
+Debian rules are provided as well.
