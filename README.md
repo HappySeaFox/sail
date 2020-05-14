@@ -150,7 +150,7 @@ See [EXAMPLES](EXAMPLES.md) for more.
 
 ### CMake options overview
 
-- `SAIL_DEV=ON|OFF` - Enable developer mode with pedantic warnings and possible `ASAN` enabled.
+- `SAIL_DEV=ON|OFF` - Enable developer mode with pedantic warnings and possible `ASAN` enabled for examples
 - `SAIL_ONLY_PLUGINS="a;b;c"` - Enable only the plugins specified in this ';'-separated list.
   Plugins with missing dependencies will be disabled regardless this setting
 - `SAIL_EXCEPT_PLUGINS="a;b;c"` - Enable all plugins except the plugins specified in this ';'-separated list.
