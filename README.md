@@ -159,7 +159,7 @@ See [EXAMPLES](EXAMPLES.md) for more.
 
 ### Windows
 
-Open `Git Bash` and execute the following commands:
+Open `Git Bash` (installed along with `git`) and execute the following commands:
 
 ```
 git clone --recursive https://github.com/smoked-herring/sail.git
