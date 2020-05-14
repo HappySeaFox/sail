@@ -1,0 +1,35 @@
+'\" t
+.\"     Title: sail-probe
+.\"    Author: Dmitry Baryshev
+.\"      Date: 05/14/2020
+.\"    Manual: SAIL Manual
+.\"    Source: SAIL
+.\"  Language: English
+.\"
+.TH "SAIL\-PROBE" "1" "05/14/2020" "SAIL" "SAIL Manual"
+.SH "NAME"
+sail-probe \- SAIL-based tool to probe images
+.SH "SYNOPSIS"
+.sp
+\fBsail\-probe\fR \fI<input file>\fR | -h|--help | -v|--version
+.SH "DESCRIPTION"
+.sp
+\fBsail\-probe\fR is used to quickly detect image information like dimensions and pixel format. It doesn't decode
+images, it just fetches their meta information.
+.SH "OPTIONS"
+.PP
+\-v | --version
+.RS 4
+Print the version and exit.
+.RE
+.PP
+\-h | --help
+.RS 4
+Print the help summary and exit.
+.RE
+.SH "EXIT STATUS"
+.sp
+\fBsail\-probe\fR returns 0 on success and a SAIL error code otherwise.
+.SH "COPYRIGHT NOTICE"
+Copyright \(co 2020 Dmitry Baryshev
+

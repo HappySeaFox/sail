@@ -1,0 +1,39 @@
+'\" t
+.\"     Title: sail-convert
+.\"    Author: Dmitry Baryshev
+.\"      Date: 05/14/2020
+.\"    Manual: SAIL Manual
+.\"    Source: SAIL
+.\"  Language: English
+.\"
+.TH "SAIL\-CONVERT" "1" "05/14/2020" "SAIL" "SAIL Manual"
+.SH "NAME"
+sail-convert \- SAIL-based tool to convert between image formats
+.SH "SYNOPSIS"
+.sp
+\fBsail\-convert\fR \fI<input file>\fR \fI<output file>\fR [options] | -h|--help | -v|--version
+.SH "DESCRIPTION"
+.sp
+\fBsail\-convert\fR is used to convert images from one format to another with a simple set of options.
+.SH "OPTIONS"
+.PP
+\-c | --compression <value>
+.RS 4
+Use the specified compression value to write the output image. For example, for JPEGs the value could be in range [0..100].
+.RE
+.PP
+\-v | --version
+.RS 4
+Print the version and exit.
+.RE
+.PP
+\-h | --help
+.RS 4
+Print the help summary and exit.
+.RE
+.SH "EXIT STATUS"
+.sp
+\fBsail\-convert\fR returns 0 on success and a SAIL error code otherwise.
+.SH "COPYRIGHT NOTICE"
+Copyright \(co 2020 Dmitry Baryshev
+
