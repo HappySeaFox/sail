@@ -159,6 +159,14 @@ See [EXAMPLES](EXAMPLES.md) for more.
 
 ### Windows
 
+#### Build requirements
+
+- git
+- cmake 3.6 or later
+- MSVC 2017 or later
+
+#### Build steps
+
 Open `Git Bash` (installed along with `git`) and execute the following commands:
 
 ```
@@ -181,6 +189,16 @@ cmake --build . --config Release --target install
 ```
 
 ### Linux
+
+#### Build requirements
+
+- git
+- cmake 3.6 or later
+- GCC and G++ 7.5 or later
+- standard C/C++ development files installed (usually installed by metapackages like `build-essential`)
+- codec-specific development libraries installed. You can grab the list from `debian/control`
+
+#### Build steps
 
 ```
 git clone --recursive https://github.com/smoked-herring/sail.git
