@@ -7,7 +7,7 @@ Files: debian/*
 Copyright: 2020 Dmitry Baryshev
 License: GPL-3+
 
-Files: src/* bindings/*
+Files: src/*
 Copyright: 2020 Dmitry Baryshev
 License: LGPL-3+
 
