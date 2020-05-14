@@ -220,6 +220,7 @@ sail_error_t write_png_text(png_structp png_ptr, png_infop info_ptr, const struc
     SAIL_CHECK_PTR(png_ptr);
     SAIL_CHECK_PTR(info_ptr);
 
+#ifdef PNG_TEXT_SUPPORTED
     /* To avoid allocating arrays for MSVC (which still doesn't support VLAs), allow only 32 text pairs. */
     png_text lines[32];
     int count = 0;
@@ -235,6 +236,9 @@ sail_error_t write_png_text(png_structp png_ptr, png_infop info_ptr, const struc
     }
 
     png_set_text(png_ptr, info_ptr, lines, count);
+#else
+    (void)meta_entry_node;
+#endif
 
     return 0;
 }
