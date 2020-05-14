@@ -28,6 +28,9 @@ int main(int argc, char **argv)
 {
     QApplication app(argc, argv);
 
+    // You could point SAIL to search codecs (plugins) in a different location
+    //qsetenv("SAIL_PLUGINS_PATH", "/some/other/location");
+
     QtSail qt;
 
     qt.resize(800, 500);
