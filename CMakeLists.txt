@@ -52,6 +52,7 @@ if (WIN32)
     sail_check_include(io.h)
     sail_check_include(share.h)
     sail_check_include(windows.h)
+    sail_check_include("windows.h;versionhelpers.h")
 endif()
 
 # Options
