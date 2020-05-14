@@ -47,7 +47,7 @@ struct sail_image {
      * READ:  Set by SAIL to a positive image width in pixels.
      * WRITE: Must be set by a caller to a positive image width in pixels.
      */
-    int width;
+    unsigned width;
 
     /*
      * Image height.
@@ -55,7 +55,7 @@ struct sail_image {
      * READ:  Set by SAIL to a positive image height in pixels.
      * WRITE: Must be set by a caller to a positive image height in pixels.
      */
-    int height;
+    unsigned height;
 
     /*
      * Bytes per line. Some image formats (like BMP) pad rows of pixels to some boundary.
@@ -64,7 +64,7 @@ struct sail_image {
      * WRITE: Must be set by a caller to a positive number of bytes per line. A caller could set
      *        it to sail_bytes_per_line() if scan lines are not padded to a certain boundary.
      */
-    int bytes_per_line;
+    unsigned bytes_per_line;
 
     /*
      * Image pixel format. See SailPixelFormat.

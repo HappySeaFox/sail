@@ -488,9 +488,9 @@ sail_error_t sail_bits_per_pixel(int pixel_format, int *result) {
     return SAIL_UNSUPPORTED_PIXEL_FORMAT;
 }
 
-sail_error_t sail_bytes_per_line(int width, int pixel_format, int *result) {
+sail_error_t sail_bytes_per_line(unsigned width, int pixel_format, unsigned *result) {
 
-    if (width <= 0) {
+    if (width == 0) {
         return SAIL_INVALID_ARGUMENT;
     }
 
@@ -506,12 +506,12 @@ sail_error_t sail_bytes_per_line(int width, int pixel_format, int *result) {
     return 0;
 }
 
-sail_error_t sail_bytes_per_image(const struct sail_image *image, int *result) {
+sail_error_t sail_bytes_per_image(const struct sail_image *image, unsigned *result) {
 
     SAIL_CHECK_IMAGE_PTR(image);
     SAIL_CHECK_RESULT_PTR(result);
 
-    int bytes_per_line;
+    unsigned bytes_per_line;
     SAIL_TRY(sail_bytes_per_line(image->width, image->pixel_format, &bytes_per_line));
 
     *result = bytes_per_line * image->height;

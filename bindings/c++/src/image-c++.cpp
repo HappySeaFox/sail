@@ -56,9 +56,9 @@ public:
         free(bits);
     }
 
-    int width;
-    int height;
-    int bytes_per_line;
+    unsigned width;
+    unsigned height;
+    unsigned bytes_per_line;
     int pixel_format;
     int passes;
     bool animated;
@@ -73,7 +73,7 @@ public:
     int source_properties;
     int source_compression_type;
     void *bits;
-    int bits_size;
+    unsigned bits_size;
     const void *shallow_bits;
 };
 
@@ -123,17 +123,17 @@ bool image::is_valid() const
     return d->width > 0 && d->height > 0 && d->bytes_per_line > 0 && (d->bits != nullptr || d->shallow_bits != nullptr);
 }
 
-int image::width() const
+unsigned image::width() const
 {
     return d->width;
 }
 
-int image::height() const
+unsigned image::height() const
 {
     return d->height;
 }
 
-int image::bytes_per_line() const
+unsigned image::bytes_per_line() const
 {
     return d->bytes_per_line;
 }
@@ -208,7 +208,7 @@ const void* image::bits() const
     return d->bits;
 }
 
-int image::bits_size() const
+unsigned image::bits_size() const
 {
     return d->bits_size;
 }
@@ -218,19 +218,19 @@ const void* image::shallow_bits() const
     return d->shallow_bits;
 }
 
-image& image::with_width(int width)
+image& image::with_width(unsigned width)
 {
     d->width = width;
     return *this;
 }
 
-image& image::with_height(int height)
+image& image::with_height(unsigned height)
 {
     d->height = height;
     return *this;
 }
 
-image& image::with_bytes_per_line(int bytes_per_line)
+image& image::with_bytes_per_line(unsigned bytes_per_line)
 {
     d->bytes_per_line = bytes_per_line;
     return *this;
@@ -238,7 +238,7 @@ image& image::with_bytes_per_line(int bytes_per_line)
 
 image& image::with_bytes_per_line_auto()
 {
-    int bytes_per_line = 0;
+    unsigned bytes_per_line = 0;
     image::bytes_per_line(d->width, d->pixel_format, &bytes_per_line);
 
     return with_bytes_per_line(bytes_per_line);
@@ -297,7 +297,7 @@ image& image::with_meta_entries(const std::map<std::string, std::string> &meta_e
     return *this;
 }
 
-image& image::with_bits(const void *bits, int bits_size)
+image& image::with_bits(const void *bits, unsigned bits_size)
 {
     free(d->bits);
 
@@ -305,7 +305,7 @@ image& image::with_bits(const void *bits, int bits_size)
     d->bits_size    = 0;
     d->shallow_bits = nullptr;
 
-    if (bits == nullptr || bits_size <= 0) {
+    if (bits == nullptr || bits_size == 0) {
         return *this;
     }
 
@@ -313,7 +313,7 @@ image& image::with_bits(const void *bits, int bits_size)
     d->bits = malloc(d->bits_size);
 
     if (d->bits == nullptr) {
-        SAIL_LOG_ERROR("Memory allocation failed of bits size %d", d->bits_size);
+        SAIL_LOG_ERROR("Memory allocation failed of bits size %u", d->bits_size);
         return *this;
     }
 
@@ -346,7 +346,7 @@ sail_error_t image::bits_per_pixel(int pixel_format, int *result)
     return 0;
 }
 
-sail_error_t image::bytes_per_line(int width, int pixel_format, int *result)
+sail_error_t image::bytes_per_line(unsigned width, int pixel_format, unsigned *result)
 {
     SAIL_CHECK_PTR(result);
 
@@ -355,7 +355,7 @@ sail_error_t image::bytes_per_line(int width, int pixel_format, int *result)
     return 0;
 }
 
-sail_error_t image::bytes_per_image(const image &simage, int *result)
+sail_error_t image::bytes_per_image(const image &simage, unsigned *result)
 {
     SAIL_CHECK_PTR(result);
 
@@ -412,7 +412,7 @@ sail_error_t image::compression_type_from_string(const char *str, int *result)
     return 0;
 }
 
-image::image(const sail_image *im, const void *bits, int bits_size)
+image::image(const sail_image *im, const void *bits, unsigned bits_size)
     : image()
 {
     if (im == nullptr) {

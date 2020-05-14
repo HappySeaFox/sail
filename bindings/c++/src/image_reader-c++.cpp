@@ -131,7 +131,7 @@ sail_error_t image_reader::read(const char *path, image *simage)
                        &sail_image,
                        &image_bits));
 
-    int bytes_per_image;
+    unsigned bytes_per_image;
     SAIL_TRY(sail_bytes_per_image(sail_image, &bytes_per_image));
 
     *simage = image(sail_image, image_bits, bytes_per_image);
@@ -276,7 +276,7 @@ sail_error_t image_reader::read_next_frame(image *simage)
 
     *simage = image(sail_image);
 
-    int bytes_per_image;
+    unsigned bytes_per_image;
     SAIL_TRY(sail_bytes_per_image(sail_image, &bytes_per_image));
 
     simage->with_bits(image_bits, bytes_per_image);

@@ -170,7 +170,7 @@ SAIL_EXPORT sail_error_t sail_bits_per_pixel(int pixel_format, int *result);
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_bytes_per_line(int width, int pixel_format, int *result);
+SAIL_EXPORT sail_error_t sail_bytes_per_line(unsigned width, int pixel_format, unsigned *result);
 
 /*
  * Calculates the number of bytes needed to hold an entire image in memory without padding.
@@ -178,7 +178,7 @@ SAIL_EXPORT sail_error_t sail_bytes_per_line(int width, int pixel_format, int *r
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_bytes_per_image(const struct sail_image *image, int *result);
+SAIL_EXPORT sail_error_t sail_bytes_per_image(const struct sail_image *image, unsigned *result);
 
 /*
  * Prints the recent errno value with SAIL_LOG_ERROR(). The specified format must include '%s'.

@@ -58,7 +58,7 @@ sail_error_t sail_read_next_frame(void *state, struct sail_image **image, void *
                             /* cleanup */ free(*image_bits),
                                           sail_destroy_image(*image));
 
-        for (int j = 0; j < (*image)->height; j++) {
+        for (unsigned j = 0; j < (*image)->height; j++) {
             SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v2->read_scan_line_v2(state_of_mind->state,
                                                                              state_of_mind->io,
                                                                              *image,
@@ -133,7 +133,7 @@ sail_error_t sail_write_next_frame(void *state, const struct sail_image *image, 
         passes = 1;
     }
 
-    int bytes_per_line;
+    unsigned bytes_per_line;
     SAIL_TRY(sail_bytes_per_line(image->width, image->pixel_format, &bytes_per_line));
 
     SAIL_TRY(state_of_mind->plugin->v2->write_seek_next_frame_v2(state_of_mind->state, state_of_mind->io, image));
@@ -141,7 +141,7 @@ sail_error_t sail_write_next_frame(void *state, const struct sail_image *image, 
     for (int pass = 0; pass < passes; pass++) {
         SAIL_TRY(state_of_mind->plugin->v2->write_seek_next_pass_v2(state_of_mind->state, state_of_mind->io, image));
 
-        for (int j = 0; j < image->height; j++) {
+        for (unsigned j = 0; j < image->height; j++) {
             SAIL_TRY(state_of_mind->plugin->v2->write_scan_line_v2(state_of_mind->state,
                                                                     state_of_mind->io,
                                                                     image,

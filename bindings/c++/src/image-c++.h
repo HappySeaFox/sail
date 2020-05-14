@@ -64,7 +64,7 @@ public:
      * READ:  Set by SAIL to a positive image width in pixels.
      * WRITE: Must be set by a caller to a positive image width in pixels.
      */
-    int width() const;
+    unsigned width() const;
 
     /*
      * Returns image height.
@@ -72,7 +72,7 @@ public:
      * READ:  Set by SAIL to a positive image height in pixels.
      * WRITE: Must be set by a caller to a positive image height in pixels.
      */
-    int height() const;
+    unsigned height() const;
 
     /*
      * Returns bytes per line. Some image formats (like BMP) pad rows of pixels to some boundary.
@@ -81,7 +81,7 @@ public:
      * WRITE: Must be set by a caller to a positive number of bytes per line. A caller could set
      *        it with bytes_per_line_auto() if scan lines are not padded to a certain boundary.
      */
-    int bytes_per_line() const;
+    unsigned bytes_per_line() const;
 
     /*
      * Returns image pixel format. See SailPixelFormat.
@@ -202,7 +202,7 @@ public:
     /*
      * Returns the size of deep copied pixel data in bytes.
      */
-    int bits_size() const;
+    unsigned bits_size() const;
 
     /*
      * Returns a constant shallow pointer to the external pixel data if any. Images can hold deep copied
@@ -213,17 +213,17 @@ public:
     /*
      * Sets a new width.
      */
-    image& with_width(int width);
+    image& with_width(unsigned width);
 
     /*
      * Sets a new height.
      */
-    image& with_height(int height);
+    image& with_height(unsigned height);
 
     /*
      * Sets a new bytes-per-line value.
      */
-    image& with_bytes_per_line(int bytes_per_line);
+    image& with_bytes_per_line(unsigned bytes_per_line);
 
     /*
      * Calculates bytes-per-line automatically based on the image width
@@ -254,7 +254,7 @@ public:
     /*
      * Deep copies the specified bits. Resets the pointer to shallow bits previously saved if any.
      */
-    image& with_bits(const void *bits, int bits_size);
+    image& with_bits(const void *bits, unsigned bits_size);
 
     /*
      * Stores the pointer to external data. Frees the previously stored deep-copied bits if any.
@@ -289,7 +289,7 @@ public:
      *
      * Returns 0 on success or sail_error_t on error.
      */
-    static sail_error_t bytes_per_line(int width, int pixel_format, int *result);
+    static sail_error_t bytes_per_line(unsigned width, int pixel_format, unsigned *result);
 
     /*
      * Calculates a number of bytes needed to hold an entire image in memory without padding.
@@ -297,7 +297,7 @@ public:
      *
      * Returns 0 on success or sail_error_t on error.
      */
-    static sail_error_t bytes_per_image(const image &simage, int *result);
+    static sail_error_t bytes_per_image(const image &simage, unsigned *result);
 
     /*
      * Assigns a non-NULL string representation of the specified pixel format. The assigned string
@@ -350,7 +350,7 @@ public:
 private:
     // Makes a deep copy of the specified image and the bits
     //
-    image(const sail_image *im, const void *bits, int bits_size);
+    image(const sail_image *im, const void *bits, unsigned bits_size);
     image(const sail_image *im);
 
     sail_error_t to_sail_image(sail_image *image) const;
