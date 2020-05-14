@@ -1,0 +1,41 @@
+Source: sail
+Priority: optional
+Maintainer: Dmitry Baryshev <dmitrymq@gmail.com>
+Build-Depends: debhelper (>=9), build-essential, libjpeg-dev, libpng-dev
+Standards-Version: 3.9.6
+
+Package: libsail-common
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: SAIL common client library
+
+Package: libsail-common-dev
+Section: libdevel
+Architecture: any
+Depends: libsail-common (= ${binary:Version}), ${misc:Depends}
+Description: SAIL common client library development files
+
+Package: libsail
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: SAIL high-level client library
+
+Package: libsail-dev
+Section: libdevel
+Architecture: any
+Depends: libsail (= ${binary:Version}), ${misc:Depends}
+Description: SAIL high-level client library development files
+
+Package: libsail-c++
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: SAIL C++ high-level client library
+
+Package: libsail-c++-dev
+Section: libdevel
+Architecture: any
+Depends: libsail-c++ (= ${binary:Version}), ${misc:Depends}
+Description: SAIL C++ high-level client library development files

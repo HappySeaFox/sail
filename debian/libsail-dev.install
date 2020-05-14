@@ -1,0 +1,4 @@
+usr/include/sail/sail
+usr/include/sail/layouts
+usr/lib/*/libsail.so
+usr/lib/*/pkgconfig/libsail.pc

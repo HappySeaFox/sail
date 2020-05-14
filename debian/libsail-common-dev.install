@@ -1,0 +1,3 @@
+usr/include/sail/sail-common/
+usr/lib/*/libsail-common.so
+usr/lib/*/pkgconfig/libsail-common.pc
