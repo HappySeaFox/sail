@@ -58,6 +58,10 @@ endif()
 # Options
 #
 option(SAIL_DEV "Enable developer mode. Be more strict when compiling source code, for example." OFF)
+set(SAIL_ONLY_PLUGINS "" CACHE STRING "Enable only the plugins specified in this ';'-separated list. \
+Plugins with missing dependencies will be disabled regardless this setting")
+set(SAIL_EXCEPT_PLUGINS "" CACHE STRING "Enable all plugins except the plugins specified in this ';'-separated list. \
+Plugins with missing dependencies will be disabled regardless this setting")
 
 # TODO Move to a Debian patch
 # Set arch-specific include/lib dirs

@@ -4,10 +4,6 @@ set(PLUGINS "")
 
 list(SORT PLUGINS)
 
-# Export plugins to the parent cmake file to print statistics
-#
-set(PLUGINS ${PLUGINS} PARENT_SCOPE)
-
 # Conditional plugins that require external dependencies like libjpeg
 #
 set(CONDITIONAL_PLUGINS jpeg png)
@@ -18,7 +14,33 @@ set(CONDITIONAL_DEPENDENCIES libjpeg libpng16)
 
 ################################################################################
 
-# Iterate over conditional plugins and enable/disable them
+# Filter out uncoditional plugins
+#
+if (SAIL_ONLY_PLUGINS)
+    set(PLUGINS_ENABLED "")
+
+    foreach (plugin IN LISTS PLUGINS)
+        if ("${plugin}" IN_LIST SAIL_ONLY_PLUGINS)
+            list(APPEND PLUGINS_ENABLED "${plugin}")
+        endif()
+    endforeach()
+
+    set(PLUGINS "${PLUGINS_ENABLED}")
+endif()
+
+if (SAIL_EXCEPT_PLUGINS)
+    set(PLUGINS_ENABLED "")
+
+    foreach (plugin IN LISTS PLUGINS)
+        if (NOT "${plugin}" IN_LIST SAIL_EXCEPT_PLUGINS)
+            list(APPEND PLUGINS_ENABLED "${plugin}")
+        endif()
+    endforeach()
+
+    set(PLUGINS "${PLUGINS_ENABLED}")
+endif()
+
+# Iterate over conditional plugins and enable/disable them based on their dependencies
 #
 list(LENGTH CONDITIONAL_PLUGINS length)
 math(EXPR length ${length}-1)
@@ -29,6 +51,20 @@ set(DISABLED_CONDITIONAL_PLUGINS "")
 foreach(i RANGE ${length})
     list(GET CONDITIONAL_PLUGINS      ${i} plugin)
     list(GET CONDITIONAL_DEPENDENCIES ${i} plugin_dependencies)
+
+    # Check if the user enabled this plugin at all
+    #
+    if (SAIL_ONLY_PLUGINS)
+        if (NOT "${plugin}" IN_LIST SAIL_ONLY_PLUGINS)
+            continue()
+        endif()
+    endif()
+
+    if (SAIL_EXCEPT_PLUGINS)
+        if ("${plugin}" IN_LIST SAIL_EXCEPT_PLUGINS)
+            continue()
+        endif()
+    endif()
 
     # "All dependencies are found" flag
     #
@@ -76,6 +112,7 @@ string(TOUPPER "${DISABLED_CONDITIONAL_PLUGINS}" DISABLED_CONDITIONAL_PLUGINS)
 
 # Export plugins to the parent cmake file to print statistics
 #
+set(PLUGINS ${PLUGINS} PARENT_SCOPE)
 set(ENABLED_CONDITIONAL_PLUGINS ${ENABLED_CONDITIONAL_PLUGINS} PARENT_SCOPE)
 set(DISABLED_CONDITIONAL_PLUGINS ${DISABLED_CONDITIONAL_PLUGINS} PARENT_SCOPE)
 
