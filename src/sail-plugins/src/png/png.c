@@ -307,24 +307,6 @@ SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v2(void *state, struct sail_
     return 0;
 }
 
-SAIL_EXPORT sail_error_t sail_plugin_read_alloc_scan_line_v2(void *state, struct sail_io *io, const struct sail_image *image, void **scanline) {
-
-    SAIL_CHECK_STATE_PTR(state);
-    SAIL_CHECK_IO(io);
-    SAIL_CHECK_IMAGE(image);
-
-    struct png_state *png_state = (struct png_state *)state;
-    SAIL_CHECK_STATE_PTR(png_state);
-
-    *scanline = malloc(image->bytes_per_line);
-
-    if (*scanline == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
-
-    return sail_plugin_read_scan_line_v2(state, io, image, *scanline);
-}
-
 SAIL_EXPORT sail_error_t sail_plugin_read_finish_v2(void **state, struct sail_io *io) {
 
     SAIL_CHECK_STATE_PTR(state);

@@ -99,7 +99,6 @@ sail_error_t alloc_plugin(const struct sail_plugin_info *plugin_info, struct sai
         SAIL_RESOLVE((*plugin)->v2->read_seek_next_frame_v2, handle, sail_plugin_read_seek_next_frame_v2);
         SAIL_RESOLVE((*plugin)->v2->read_seek_next_pass_v2,  handle, sail_plugin_read_seek_next_pass_v2);
         SAIL_RESOLVE((*plugin)->v2->read_scan_line_v2,       handle, sail_plugin_read_scan_line_v2);
-        SAIL_RESOLVE((*plugin)->v2->read_alloc_scan_line_v2, handle, sail_plugin_read_alloc_scan_line_v2);
         SAIL_RESOLVE((*plugin)->v2->read_finish_v2,          handle, sail_plugin_read_finish_v2);
 
         SAIL_RESOLVE((*plugin)->v2->write_init_v2,            handle, sail_plugin_write_init_v2);

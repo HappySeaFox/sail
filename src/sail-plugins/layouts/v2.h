@@ -80,14 +80,6 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_pass_v2(void *state, struct 
 SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v2(void *state, struct sail_io *io, const struct sail_image *image, void *scanline);
 
 /*
- * Reads a scan line of the current image in the current pass. Allocates a new scan line. The assigned scan line
- * MUST be freed later with free().
- *
- * Returns 0 on success or sail_error_t on error.
- */
-SAIL_EXPORT sail_error_t sail_plugin_read_alloc_scan_line_v2(void *state, struct sail_io *io, const struct sail_image *image, void **scanline);
-
-/*
  * Finilizes reading operation. No more readings are possible after calling this function.
  * This function doesn't close the io stream. It just stops decoding. Use io->close() or sail_destroy_io()
  * to actually close the io stream.
