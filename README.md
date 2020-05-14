@@ -145,3 +145,53 @@ See [EXAMPLES](EXAMPLES.md) for more.
 ### 4. `Technical diver` - "I want everything above and my custom I/O source."
 
 See [EXAMPLES](EXAMPLES.md) for more.
+
+## Building
+
+### CMake options overview
+
+- `SAIL_DEV=ON|OFF` - Enable developer mode with pedantic warnings and possible `ASAN` enabled.
+- `SAIL_ONLY_PLUGINS="a;b;c"` - Enable only the plugins specified in this ';'-separated list.
+  Plugins with missing dependencies will be disabled regardless this setting
+- `SAIL_EXCEPT_PLUGINS="a;b;c"` - Enable all plugins except the plugins specified in this ';'-separated list.
+  Plugins with missing dependencies will be disabled regardless this setting
+- `SAIL_COLORED_OUTPUT=ON|OFF` - Enable colored console output on Windows >= 10 and Unix platforms
+
+### Windows
+
+Open `Git Bash` and execute the following commands:
+
+```
+git clone --recursive https://github.com/smoked-herring/sail.git
+cd sail
+
+# Compile third-party dependencies
+cd extra
+./build
+cd ..
+
+# Compile SAIL
+mkdir build
+cd build
+cmake -A x64 -DCMAKE_INSTALL_PREFIX="C:\SAIL" ..
+cmake --build . --config Release
+
+# Install
+cmake --build . --config Release --target install
+```
+
+### Linux
+
+```
+git clone --recursive https://github.com/smoked-herring/sail.git
+cd sail
+
+# Compile SAIL
+mkdir build
+cd build
+cmake ..
+make
+
+# Install
+... distro-specific installation
+```
