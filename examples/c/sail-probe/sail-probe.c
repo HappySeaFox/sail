@@ -55,8 +55,9 @@ static sail_error_t probe(const char *path, struct sail_context *context) {
 
     struct sail_meta_entry_node *node = image->meta_entry_node;
 
-    if (node != NULL) {
+    while (node != NULL) {
         printf("%-14s: %s\n", node->key, node->value);
+        node = node->next;
     }
 
     sail_destroy_image(image);
