@@ -129,7 +129,6 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
     SAIL_CHECK_IO(io);
 
     struct png_state *png_state = (struct png_state *)state;
-    SAIL_CHECK_STATE_PTR(png_state);
 
     if (png_state->frame_read) {
         return SAIL_NO_MORE_FRAMES;
@@ -291,7 +290,6 @@ SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v2(void *state, struct sail_
     SAIL_CHECK_SCAN_LINE_PTR(scanline);
 
     struct png_state *png_state = (struct png_state *)state;
-    SAIL_CHECK_STATE_PTR(png_state);
 
     if (png_state->libpng_error) {
         return SAIL_UNDERLYING_CODEC_ERROR;
@@ -313,7 +311,6 @@ SAIL_EXPORT sail_error_t sail_plugin_read_finish_v2(void **state, struct sail_io
     SAIL_CHECK_IO(io);
 
     struct png_state *png_state = (struct png_state *)(*state);
-    SAIL_CHECK_STATE_PTR(png_state);
 
     /* Subsequent calls to finish() will expectedly fail in the above line. */
     *state = NULL;
@@ -390,7 +387,6 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v2(void *state, struc
     SAIL_CHECK_IMAGE(image);
 
     struct png_state *png_state = (struct png_state *)state;
-    SAIL_CHECK_STATE_PTR(png_state);
 
     if (png_state->frame_written) {
         return SAIL_NO_MORE_FRAMES;
@@ -487,7 +483,6 @@ SAIL_EXPORT sail_error_t sail_plugin_write_scan_line_v2(void *state, struct sail
     SAIL_CHECK_SCAN_LINE_PTR(scanline);
 
     struct png_state *png_state = (struct png_state *)state;
-    SAIL_CHECK_STATE_PTR(png_state);
 
     if (png_state->libpng_error) {
         return SAIL_UNDERLYING_CODEC_ERROR;
@@ -512,7 +507,6 @@ SAIL_EXPORT sail_error_t sail_plugin_write_finish_v2(void **state, struct sail_i
     SAIL_CHECK_IO(io);
 
     struct png_state *png_state = (struct png_state *)(*state);
-    SAIL_CHECK_STATE_PTR(png_state);
 
     /* Subsequent calls to finish() will expectedly fail in the above line. */
     *state = NULL;
