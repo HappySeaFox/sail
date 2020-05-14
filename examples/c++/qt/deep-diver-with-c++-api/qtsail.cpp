@@ -35,7 +35,7 @@
 #include <QShortcut>
 
 #include <sail/sail.h>
-#include <sail/sail-c++.h>
+#include <sail-c++/sail-c++.h>
 
 //#include <sail/layouts/v2.h>
 

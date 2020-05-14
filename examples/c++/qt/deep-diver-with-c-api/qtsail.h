@@ -28,7 +28,7 @@
 #include <QWidget>
 #include <QScopedPointer>
 
-#include <sail/error.h>
+#include <sail-common/error.h>
 
 class QImage;
 

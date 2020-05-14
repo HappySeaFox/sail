@@ -26,7 +26,7 @@
 #include <QDialog>
 #include <QScopedPointer>
 
-#include <sail/error.h>
+#include <sail-common/error.h>
 
 struct sail_read_features;
 

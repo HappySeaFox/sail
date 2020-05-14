@@ -24,9 +24,9 @@
     #include "export.h"
     #include "io_common.h"
 #else
-    #include <sail/error.h>
-    #include <sail/export.h>
-    #include <sail/io_common.h>
+    #include <sail-common/error.h>
+    #include <sail-common/export.h>
+    #include <sail-common/io_common.h>
 #endif
 
 namespace sail

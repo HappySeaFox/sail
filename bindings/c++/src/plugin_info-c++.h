@@ -25,13 +25,15 @@
 #ifdef SAIL_BUILD
     #include "error.h"
     #include "export.h"
+
     #include "read_features-c++.h"
     #include "write_features-c++.h"
 #else
-    #include <sail/error.h>
-    #include <sail/export.h>
-    #include <sail/read_features-c++.h>
-    #include <sail/write_features-c++.h>
+    #include <sail-common/error.h>
+    #include <sail-common/export.h>
+
+    #include <sail-c++/read_features-c++.h>
+    #include <sail-c++/write_features-c++.h>
 #endif
 
 struct sail_plugin_info;

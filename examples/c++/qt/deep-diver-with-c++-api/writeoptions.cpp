@@ -23,8 +23,7 @@
 #include <QLabel>
 #include <QSlider>
 
-#include <sail/sail-common.h>
-#include <sail/sail-c++.h>
+#include <sail-c++/sail-c++.h>
 
 #include "writeoptions.h"
 #include "ui_writeoptions.h"

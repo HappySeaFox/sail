@@ -25,7 +25,7 @@
 
 #include <QImage>
 
-#include <sail/sail-common.h>
+#include <sail-common/sail-common.h>
 
 inline QImage::Format sailPixelFormatToQImageFormat(int pixel_format) {
     switch (pixel_format) {

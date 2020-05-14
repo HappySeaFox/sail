@@ -25,8 +25,8 @@
     #include "error.h"
     #include "export.h"
 #else
-    #include <sail/error.h>
-    #include <sail/export.h>
+    #include <sail-common/error.h>
+    #include <sail-common/export.h>
 #endif
 
 #ifdef __cplusplus

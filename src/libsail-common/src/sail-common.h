@@ -37,20 +37,20 @@
     #include "write_features.h"
     #include "write_options.h"
 #else
-    #include <sail/config.h>
+    #include <sail-common/config.h>
 
-    #include <sail/common.h>
-    #include <sail/error.h>
-    #include <sail/export.h>
-    #include <sail/image.h>
-    #include <sail/io_common.h>
-    #include <sail/log.h>
-    #include <sail/meta_entry_node.h>
-    #include <sail/read_features.h>
-    #include <sail/read_options.h>
-    #include <sail/utils.h>
-    #include <sail/write_features.h>
-    #include <sail/write_options.h>
+    #include <sail-common/common.h>
+    #include <sail-common/error.h>
+    #include <sail-common/export.h>
+    #include <sail-common/image.h>
+    #include <sail-common/io_common.h>
+    #include <sail-common/log.h>
+    #include <sail-common/meta_entry_node.h>
+    #include <sail-common/read_features.h>
+    #include <sail-common/read_options.h>
+    #include <sail-common/utils.h>
+    #include <sail-common/write_features.h>
+    #include <sail-common/write_options.h>
 #endif
 
 #endif

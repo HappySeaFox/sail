@@ -27,8 +27,8 @@
  * to simplify debugging.
  */
 
-#include <sail/error.h>
-#include <sail/export.h>
+#include <sail-common/error.h>
+#include <sail-common/export.h>
 
 #ifdef __cplusplus
 extern "C" {

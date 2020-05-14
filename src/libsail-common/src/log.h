@@ -24,7 +24,7 @@
 #ifdef SAIL_BUILD
     #include "export.h"
 #else
-    #include <sail/export.h>
+    #include <sail-common/export.h>
 #endif
 
 #ifdef __cplusplus

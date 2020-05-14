@@ -40,7 +40,7 @@
     #include "sail_technical_diver_private.h"
     #include "string_node.h"
 #else
-    #include <sail/sail-common.h>
+    #include <sail-common/sail-common.h>
 
     #include <sail/plugin_info.h>
     #include <sail/sail_advanced.h>

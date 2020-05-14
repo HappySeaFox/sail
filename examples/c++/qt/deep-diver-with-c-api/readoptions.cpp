@@ -23,7 +23,6 @@
 #include <QLabel>
 #include <QSlider>
 
-#include <stdio.h>
 #include <sail/sail.h>
 
 #include "readoptions.h"

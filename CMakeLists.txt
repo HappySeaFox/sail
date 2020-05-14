@@ -184,7 +184,7 @@ add_subdirectory(tests)
 
 # Installation
 #
-install(FILES "${PROJECT_BINARY_DIR}/include/config.h" DESTINATION include/sail)
+install(FILES "${PROJECT_BINARY_DIR}/include/config.h" DESTINATION include/sail/sail-common)
 
 if (WIN32)
     if (EXISTS "${PROJECT_SOURCE_DIR}/extra/B/bin")

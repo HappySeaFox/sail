@@ -3,9 +3,8 @@ exec_prefix=@CMAKE_INSTALL_PREFIX@
 libdir=${exec_prefix}/@CMAKE_INSTALL_LIBDIR@
 includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@/sail
 
-Name: libsail
-Description: SAIL client library
+Name: libsail-common
+Description: SAIL common client library
 Version: @VERSION@
-Requires: libsail-common
-Libs: -L${libdir} -lsail
+Libs: -L${libdir} -lsail-common
 Cflags: -I${includedir}

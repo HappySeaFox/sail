@@ -37,20 +37,20 @@
     #include "write_options-c++.h"
     #include "utils-c++.h"
 #else
-    #include <sail/sail-common.h>
+    #include <sail-common/sail-common.h>
 
-    #include <sail/at_scope_exit-c++.h>
-    #include <sail/context-c++.h>
-    #include <sail/image-c++.h>
-    #include <sail/image_reader-c++.h>
-    #include <sail/image_writer-c++.h>
-    #include <sail/io_common-c++.h>
-    #include <sail/plugin_info-c++.h>
-    #include <sail/read_features-c++.h>
-    #include <sail/read_options-c++.h>
-    #include <sail/write_features-c++.h>
-    #include <sail/write_options-c++.h>
-    #include <sail/utils-c++.h>
+    #include <sail-c++/at_scope_exit-c++.h>
+    #include <sail-c++/context-c++.h>
+    #include <sail-c++/image-c++.h>
+    #include <sail-c++/image_reader-c++.h>
+    #include <sail-c++/image_writer-c++.h>
+    #include <sail-c++/io_common-c++.h>
+    #include <sail-c++/plugin_info-c++.h>
+    #include <sail-c++/read_features-c++.h>
+    #include <sail-c++/read_options-c++.h>
+    #include <sail-c++/write_features-c++.h>
+    #include <sail-c++/write_options-c++.h>
+    #include <sail-c++/utils-c++.h>
 #endif
 
 #endif
