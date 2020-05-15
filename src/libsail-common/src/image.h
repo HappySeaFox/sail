@@ -96,7 +96,8 @@ struct sail_image {
     bool animated;
 
     /*
-     * Delay in milliseconds if the image is a frame in an animation or 0 otherwise.
+     * Delay in milliseconds to display the image on the screen if the image is a frame
+     * in an animation or 0 otherwise.
      *
      * READ:  Set by SAIL to a non-negative number of milliseconds.
      * WRITE: Must be set by a caller to a non-negative number of milliseconds.
