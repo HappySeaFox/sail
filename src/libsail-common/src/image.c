@@ -72,7 +72,7 @@ sail_error_t sail_copy_image(struct sail_image *source_image, struct sail_image 
     (*target_image)->width                   = source_image->width;
     (*target_image)->height                  = source_image->height;
     (*target_image)->bytes_per_line          = source_image->bytes_per_line;
-    (*target_image)->pixel_format            = SAIL_PIXEL_FORMAT_UNKNOWN;
+    (*target_image)->pixel_format            = source_image->pixel_format;
     (*target_image)->passes                  = source_image->passes;
     (*target_image)->animated                = source_image->animated;
     (*target_image)->delay                   = source_image->delay;
