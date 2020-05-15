@@ -71,7 +71,8 @@ SAIL_EXPORT void sail_destroy_meta_entry_node_chain(struct sail_meta_entry_node 
 
 /*
  * Makes a deep copy of the specified meta entry node chain. The assigned chain MUST be destroyed
- * later with sail_destroy_meta_entry_node_chain().
+ * later with sail_destroy_meta_entry_node_chain(). If the source chain is NULL, it assigns NULL
+ * to the target chain and returns 0.
  *
  * Returns 0 on success or sail_error_t on error.
  */

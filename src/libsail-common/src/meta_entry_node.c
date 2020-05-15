@@ -75,8 +75,12 @@ void sail_destroy_meta_entry_node_chain(struct sail_meta_entry_node *meta_entry_
 
 sail_error_t sail_copy_meta_entry_node_chain(struct sail_meta_entry_node *source_meta_entry_node, struct sail_meta_entry_node **target_meta_entry_node) {
 
-    SAIL_CHECK_META_ENTRY_NODE_PTR(source_meta_entry_node);
     SAIL_CHECK_META_ENTRY_NODE_PTR(target_meta_entry_node);
+
+    if (source_meta_entry_node == NULL) {
+        *target_meta_entry_node = NULL;
+        return 0;
+    }
 
     *target_meta_entry_node = NULL;
     struct sail_meta_entry_node *meta_entry_node_current = NULL;
