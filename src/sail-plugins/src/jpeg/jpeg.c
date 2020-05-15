@@ -137,6 +137,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
 
     SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IO(io);
+    SAIL_CHECK_IMAGE_PTR(image);
 
     struct jpeg_state *jpeg_state = (struct jpeg_state *)state;
 
