@@ -167,13 +167,10 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 
     // Convert to QImage.
     //
-    unsigned bytes_per_line;
-    SAIL_TRY(sail::image::bytes_per_line(image.width(), image.pixel_format(), &bytes_per_line));
-
     *qimage = QImage(reinterpret_cast<const uchar *>(image.bits()),
                      image.width(),
                      image.height(),
-                     bytes_per_line,
+                     image.bytes_per_line(),
                      qimageFormat).copy();
 
     /*

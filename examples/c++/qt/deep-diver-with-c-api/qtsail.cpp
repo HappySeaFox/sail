@@ -190,14 +190,6 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
                         /* cleanup */ free(image_bits),
                                       sail_destroy_image(image));
 
-    /*
-     * Bytes per line is needed for QImage.
-     */
-    unsigned bytes_per_line;
-    SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(image->width, image->pixel_format, &bytes_per_line),
-                         /* cleanup */ free(image_bits),
-                                       sail_destroy_image(image));
-
     SAIL_LOG_INFO("Loaded in %lld ms.", elapsed.elapsed() + beforeDialog);
 
     /*
@@ -206,7 +198,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     *qimage = QImage(image_bits,
                      image->width,
                      image->height,
-                     bytes_per_line,
+                     image->bytes_per_line,
                      qimageFormat).copy();
 
     /*
