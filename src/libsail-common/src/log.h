@@ -43,32 +43,32 @@ enum SailLogLevel {
     SAIL_LOG_LEVEL_RESIZE_ENUM_TO_INT = UINT_MAX
 };
 
-SAIL_EXPORT void sail_log(int level, const char *format, ...);
+SAIL_EXPORT void sail_log(int level, const char *file, int line, const char *format, ...);
 
 /*
  * Log an error message.
  */
-#define SAIL_LOG_ERROR(...) sail_log(SAIL_LOG_LEVEL_ERROR, __VA_ARGS__)
+#define SAIL_LOG_ERROR(...) sail_log(SAIL_LOG_LEVEL_ERROR, __FILE__, __LINE__, __VA_ARGS__)
 
 /*
  * Log a warning message.
  */
-#define SAIL_LOG_WARNING(...) sail_log(SAIL_LOG_LEVEL_WARNING, __VA_ARGS__)
+#define SAIL_LOG_WARNING(...) sail_log(SAIL_LOG_LEVEL_WARNING, __FILE__, __LINE__, __VA_ARGS__)
 
 /*
  * Log an important information message.
  */
-#define SAIL_LOG_INFO(...) sail_log(SAIL_LOG_LEVEL_INFO, __VA_ARGS__)
+#define SAIL_LOG_INFO(...) sail_log(SAIL_LOG_LEVEL_INFO, __FILE__, __LINE__, __VA_ARGS__)
 
 /*
  * Log a regular message.
  */
-#define SAIL_LOG_MESSAGE(...) sail_log(SAIL_LOG_LEVEL_MESSAGE, __VA_ARGS__)
+#define SAIL_LOG_MESSAGE(...) sail_log(SAIL_LOG_LEVEL_MESSAGE, __FILE__, __LINE__, __VA_ARGS__)
 
 /*
  * Log a debug message.
  */
-#define SAIL_LOG_DEBUG(...) sail_log(SAIL_LOG_LEVEL_DEBUG, __VA_ARGS__)
+#define SAIL_LOG_DEBUG(...) sail_log(SAIL_LOG_LEVEL_DEBUG, __FILE__, __LINE__, __VA_ARGS__)
 
 /* extern "C" */
 #ifdef __cplusplus

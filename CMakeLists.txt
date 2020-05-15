@@ -82,6 +82,10 @@ set(CMAKE_C_EXTENSIONS OFF)
 #
 add_definitions(-DSAIL_BUILD)
 
+if (SAIL_DEV)
+    add_definitions(-DSAIL_DEV)
+endif()
+
 # Enable as many warnings as possible
 #
 if (MSVC)

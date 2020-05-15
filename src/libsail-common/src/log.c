@@ -36,6 +36,7 @@
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "log.h"
 
@@ -100,7 +101,7 @@ static bool check_ansi_colors_supported(void) {
     return ansi_colors_supported;
 }
 
-void sail_log(int level, const char *format, ...) {
+void sail_log(int level, const char *file, int line, const char *format, ...) {
 
     const char *level_string = NULL;
 
@@ -128,6 +129,20 @@ void sail_log(int level, const char *format, ...) {
     va_start(args, format);
 
     fprintf(SAIL_LOG_FPTR, "SAIL: [%s] ", level_string);
+
+#ifdef SAIL_DEV
+#ifdef SAIL_WIN32
+    const char *name = strrchr(file, '\\');
+#else
+    const char *name = strrchr(file, '/');
+#endif
+
+    fprintf(SAIL_LOG_FPTR, "[%s:%d] ", name == NULL ? file : name+1, line);
+#else
+    (void)file;
+    (void)line;
+#endif
+
     vfprintf(SAIL_LOG_FPTR, format, args);
 
     if (ansi_colors_supported) {
