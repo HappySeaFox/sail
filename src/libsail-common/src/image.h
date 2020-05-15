@@ -196,6 +196,13 @@ SAIL_EXPORT sail_error_t sail_alloc_image(struct sail_image **image);
  */
 SAIL_EXPORT void sail_destroy_image(struct sail_image *image);
 
+/*
+ * Makes a deep copy of the specified image. The assigned image MUST be destroyed later with sail_destroy_image().
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_copy_image(struct sail_image *source_image, struct sail_image **target_image);
+
 /* extern "C" */
 #ifdef __cplusplus
 }

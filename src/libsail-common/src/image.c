@@ -18,6 +18,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "sail-common.h"
 
@@ -59,4 +60,55 @@ void sail_destroy_image(struct sail_image *image) {
     sail_destroy_meta_entry_node_chain(image->meta_entry_node);
 
     free(image);
+}
+
+sail_error_t sail_copy_image(struct sail_image *source_image, struct sail_image **target_image) {
+
+    SAIL_CHECK_IMAGE_PTR(source_image);
+    SAIL_CHECK_IMAGE_PTR(target_image);
+
+    SAIL_TRY(sail_alloc_image(target_image));
+
+    (*target_image)->width                   = source_image->width;
+    (*target_image)->height                  = source_image->height;
+    (*target_image)->bytes_per_line          = source_image->bytes_per_line;
+    (*target_image)->pixel_format            = SAIL_PIXEL_FORMAT_UNKNOWN;
+    (*target_image)->passes                  = source_image->passes;
+    (*target_image)->animated                = source_image->animated;
+    (*target_image)->delay                   = source_image->delay;
+    (*target_image)->palette_pixel_format    = source_image->palette_pixel_format;
+    (*target_image)->palette                 = NULL;
+    (*target_image)->palette_color_count     = source_image->palette_color_count;
+
+    if (source_image->palette != NULL) {
+        int bits_per_pixel;
+        SAIL_TRY_OR_CLEANUP(sail_bits_per_pixel(source_image->palette_pixel_format, &bits_per_pixel),
+                            /* cleanup */ sail_destroy_image(*target_image));
+
+        if (bits_per_pixel % 8 != 0) {
+            SAIL_LOG_ERROR("Cannot copy palette that is not byte-aligned");
+            sail_destroy_image(*target_image);
+            return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+        }
+
+        unsigned palette_size = bits_per_pixel / 8 * source_image->palette_color_count;
+        (*target_image)->palette = malloc(palette_size);
+
+        if ((*target_image)->palette == NULL) {
+            sail_destroy_image(*target_image);
+            return SAIL_MEMORY_ALLOCATION_FAILED;
+        }
+
+        memcpy((*target_image)->palette, source_image->palette, palette_size);
+    }
+
+    SAIL_TRY_OR_CLEANUP(sail_copy_meta_entry_node_chain(source_image->meta_entry_node, &(*target_image)->meta_entry_node),
+                        /* cleanup */ sail_destroy_image(*target_image));
+
+    (*target_image)->properties              = source_image->properties;
+    (*target_image)->source_pixel_format     = source_image->source_pixel_format;
+    (*target_image)->source_properties       = source_image->source_properties;
+    (*target_image)->source_compression_type = source_image->source_compression_type;
+
+    return 0;
 }
