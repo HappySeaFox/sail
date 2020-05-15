@@ -268,7 +268,7 @@ public:
      *
      * Returns 0 on success or sail_error_t on error.
      */
-    static sail_error_t bits_per_pixel(int pixel_format, int *result);
+    static sail_error_t bits_per_pixel(int pixel_format, unsigned *result);
 
     /*
      * Calculates a number of bytes per line needed to hold a scan line without padding.

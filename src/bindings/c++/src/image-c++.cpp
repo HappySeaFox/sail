@@ -269,7 +269,7 @@ image& image::with_palette(void *palette, int palette_color_count, int palette_p
         return *this;
     }
 
-    int bits_per_pixel;
+    unsigned bits_per_pixel;
     if (sail_bits_per_pixel(palette_pixel_format, &bits_per_pixel) != 0) {
         SAIL_LOG_ERROR("Failed to calculate the bits per palette pixel format #%d", palette_pixel_format);
         return *this;
@@ -339,7 +339,7 @@ image& image::with_shallow_bits(const void *bits)
     return *this;
 }
 
-sail_error_t image::bits_per_pixel(int pixel_format, int *result)
+sail_error_t image::bits_per_pixel(int pixel_format, unsigned *result)
 {
     SAIL_TRY(sail_bits_per_pixel(pixel_format, result));
 

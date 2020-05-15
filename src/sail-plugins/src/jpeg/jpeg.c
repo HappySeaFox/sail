@@ -334,7 +334,7 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v2(void *state, struc
         return SAIL_UNDERLYING_CODEC_ERROR;
     }
 
-    int bits_per_pixel;
+    unsigned bits_per_pixel;
     SAIL_TRY(sail_bits_per_pixel(image->pixel_format, &bits_per_pixel));
 
     jpeg_state->compress_context.image_width = image->width;

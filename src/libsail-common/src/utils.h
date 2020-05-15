@@ -149,7 +149,7 @@ SAIL_EXPORT sail_error_t sail_plugin_feature_from_string(const char *str, int *r
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_bits_per_pixel(int pixel_format, int *result);
+SAIL_EXPORT sail_error_t sail_bits_per_pixel(int pixel_format, unsigned *result);
 
 /*
  * Calculates the number of bytes per line needed to hold a scan line without padding.

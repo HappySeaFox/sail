@@ -423,7 +423,7 @@ sail_error_t sail_plugin_feature_from_string(const char *str, int *result) {
     return SAIL_UNSUPPORTED_PLUGIN_FEATURE;
 }
 
-sail_error_t sail_bits_per_pixel(int pixel_format, int *result) {
+sail_error_t sail_bits_per_pixel(int pixel_format, unsigned *result) {
 
     SAIL_CHECK_RESULT_PTR(result);
 
@@ -496,7 +496,7 @@ sail_error_t sail_bytes_per_line(unsigned width, int pixel_format, unsigned *res
 
     SAIL_CHECK_RESULT_PTR(result);
 
-    int bits_per_pixel;
+    unsigned bits_per_pixel;
     SAIL_TRY(sail_bits_per_pixel(pixel_format, &bits_per_pixel));
 
     const int add = bits_per_pixel % 8 == 0 ? 0 : 1;

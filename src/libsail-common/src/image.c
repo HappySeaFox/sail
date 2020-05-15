@@ -81,17 +81,11 @@ sail_error_t sail_copy_image(struct sail_image *source_image, struct sail_image 
     (*target_image)->palette_color_count     = source_image->palette_color_count;
 
     if (source_image->palette != NULL) {
-        int bits_per_pixel;
+        unsigned bits_per_pixel;
         SAIL_TRY_OR_CLEANUP(sail_bits_per_pixel(source_image->palette_pixel_format, &bits_per_pixel),
                             /* cleanup */ sail_destroy_image(*target_image));
 
-        if (bits_per_pixel % 8 != 0) {
-            SAIL_LOG_ERROR("Cannot copy palette that is not byte-aligned");
-            sail_destroy_image(*target_image);
-            return SAIL_UNSUPPORTED_PIXEL_FORMAT;
-        }
-
-        unsigned palette_size = bits_per_pixel / 8 * source_image->palette_color_count;
+        unsigned palette_size = source_image->palette_color_count * bits_per_pixel / 8;
         (*target_image)->palette = malloc(palette_size);
 
         if ((*target_image)->palette == NULL) {
