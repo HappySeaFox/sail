@@ -82,7 +82,7 @@ sail_error_t sail_alloc_write_options_from_features(const struct sail_write_feat
     return 0;
 }
 
-sail_error_t sail_deep_copy_write_options(const struct sail_write_options *write_options_source, struct sail_write_options **write_options_target) {
+sail_error_t sail_copy_write_options(const struct sail_write_options *write_options_source, struct sail_write_options **write_options_target) {
 
     SAIL_CHECK_WRITE_OPTIONS_PTR(write_options_source);
     SAIL_CHECK_WRITE_OPTIONS_PTR(write_options_target);

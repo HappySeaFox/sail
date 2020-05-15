@@ -21,7 +21,7 @@
 
 #include "sail-common.h"
 
-int sail_alloc_meta_entry_node(struct sail_meta_entry_node **meta_entry_node) {
+sail_error_t sail_alloc_meta_entry_node(struct sail_meta_entry_node **meta_entry_node) {
 
     *meta_entry_node = (struct sail_meta_entry_node *)malloc(sizeof(struct sail_meta_entry_node));
 
@@ -47,6 +47,21 @@ void sail_destroy_meta_entry_node(struct sail_meta_entry_node *meta_entry_node) 
     free(meta_entry_node);
 }
 
+sail_error_t sail_copy_meta_entry_node(struct sail_meta_entry_node *source_meta_entry_node, struct sail_meta_entry_node **target_meta_entry_node) {
+
+    SAIL_CHECK_META_ENTRY_NODE_PTR(source_meta_entry_node);
+    SAIL_CHECK_META_ENTRY_NODE_PTR(target_meta_entry_node);
+
+    SAIL_TRY(sail_alloc_meta_entry_node(target_meta_entry_node));
+
+    SAIL_TRY_OR_CLEANUP(sail_strdup(source_meta_entry_node->key, &(*target_meta_entry_node)->key),
+                        /* cleanup */ sail_destroy_meta_entry_node(*target_meta_entry_node));
+    SAIL_TRY_OR_CLEANUP(sail_strdup(source_meta_entry_node->value, &(*target_meta_entry_node)->value),
+                        /* cleanup */ sail_destroy_meta_entry_node(*target_meta_entry_node));
+
+    return 0;
+}
+
 void sail_destroy_meta_entry_node_chain(struct sail_meta_entry_node *meta_entry_node) {
 
     while (meta_entry_node != NULL) {
@@ -56,4 +71,32 @@ void sail_destroy_meta_entry_node_chain(struct sail_meta_entry_node *meta_entry_
 
         meta_entry_node = meta_entry_node_next;
     }
+}
+
+sail_error_t sail_copy_meta_entry_node_chain(struct sail_meta_entry_node *source_meta_entry_node, struct sail_meta_entry_node **target_meta_entry_node) {
+
+    SAIL_CHECK_META_ENTRY_NODE_PTR(source_meta_entry_node);
+    SAIL_CHECK_META_ENTRY_NODE_PTR(target_meta_entry_node);
+
+    *target_meta_entry_node = NULL;
+    struct sail_meta_entry_node *meta_entry_node_current = NULL;
+
+    while (source_meta_entry_node != NULL) {
+        struct sail_meta_entry_node *meta_entry_node = NULL;
+
+        SAIL_TRY_OR_CLEANUP(sail_copy_meta_entry_node(source_meta_entry_node, &meta_entry_node),
+                            /* cleanup */sail_destroy_meta_entry_node_chain(*target_meta_entry_node));
+
+        if (*target_meta_entry_node == NULL) {
+            *target_meta_entry_node = meta_entry_node;
+            meta_entry_node_current = *target_meta_entry_node;
+        } else {
+            meta_entry_node_current->next = meta_entry_node;
+            meta_entry_node_current = meta_entry_node_current->next;
+        }
+
+        source_meta_entry_node = source_meta_entry_node->next;
+    }
+
+    return 0;
 }

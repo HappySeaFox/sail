@@ -59,6 +59,7 @@ typedef int sail_error_t;
 #define SAIL_BUFFER_NULL_PTR              31
 #define SAIL_INVALID_IO                   32
 #define SAIL_RESULT_NULL_PTR              33
+#define SAIL_META_ENTRY_NODE_NULL_PTR     34
 
 /*
  * Encoding/decoding specific errors.
@@ -138,23 +139,24 @@ do {                              \
     }                             \
 } while(0)
 
-#define SAIL_CHECK_SCAN_LINE_PTR(scan)                SAIL_CHECK_PTR2(scan,           SAIL_SCAN_LINE_NULL_PTR)
-#define SAIL_CHECK_READ_FEATURES_PTR(read_features)   SAIL_CHECK_PTR2(read_features,  SAIL_READ_FEATURES_NULL_PTR)
-#define SAIL_CHECK_READ_OPTIONS_PTR(read_options)     SAIL_CHECK_PTR2(read_options,   SAIL_READ_OPTIONS_NULL_PTR)
-#define SAIL_CHECK_WRITE_FEATURES_PTR(write_features) SAIL_CHECK_PTR2(write_features, SAIL_WRITE_FEATURES_NULL_PTR)
-#define SAIL_CHECK_WRITE_OPTIONS_PTR(write_options)   SAIL_CHECK_PTR2(write_options,  SAIL_WRITE_FEATURES_NULL_PTR)
-#define SAIL_CHECK_CONTEXT_PTR(context)               SAIL_CHECK_PTR2(context,        SAIL_CONTEXT_NULL_PTR)
-#define SAIL_CHECK_PATH_PTR(path)                     SAIL_CHECK_PTR2(path,           SAIL_PATH_NULL_PTR)
-#define SAIL_CHECK_EXTENSION_PTR(extension)           SAIL_CHECK_PTR2(extension,      SAIL_EXTENSION_NULL_PTR)
-#define SAIL_CHECK_IMAGE_PTR(image)                   SAIL_CHECK_PTR2(image,          SAIL_IMAGE_NULL_PTR)
-#define SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info)       SAIL_CHECK_PTR2(plugin_info,    SAIL_PLUGIN_INFO_NULL_PTR)
-#define SAIL_CHECK_PLUGIN_PTR(plugin)                 SAIL_CHECK_PTR2(plugin,         SAIL_PLUGIN_NULL_PTR)
-#define SAIL_CHECK_STATE_PTR(state)                   SAIL_CHECK_PTR2(state,          SAIL_STATE_NULL_PTR)
-#define SAIL_CHECK_STRING_PTR(str)                    SAIL_CHECK_PTR2(str,            SAIL_STRING_NULL_PTR)
-#define SAIL_CHECK_IO_PTR(io)                         SAIL_CHECK_PTR2(io,             SAIL_IO_NULL_PTR)
-#define SAIL_CHECK_STREAM_PTR(stream)                 SAIL_CHECK_PTR2(stream,         SAIL_STREAM_NULL_PTR)
-#define SAIL_CHECK_BUFFER_PTR(buffer)                 SAIL_CHECK_PTR2(buffer,         SAIL_BUFFER_NULL_PTR)
-#define SAIL_CHECK_RESULT_PTR(result)                 SAIL_CHECK_PTR2(result,         SAIL_RESULT_NULL_PTR)
+#define SAIL_CHECK_SCAN_LINE_PTR(scan)                  SAIL_CHECK_PTR2(scan,            SAIL_SCAN_LINE_NULL_PTR)
+#define SAIL_CHECK_READ_FEATURES_PTR(read_features)     SAIL_CHECK_PTR2(read_features,   SAIL_READ_FEATURES_NULL_PTR)
+#define SAIL_CHECK_READ_OPTIONS_PTR(read_options)       SAIL_CHECK_PTR2(read_options,    SAIL_READ_OPTIONS_NULL_PTR)
+#define SAIL_CHECK_WRITE_FEATURES_PTR(write_features)   SAIL_CHECK_PTR2(write_features,  SAIL_WRITE_FEATURES_NULL_PTR)
+#define SAIL_CHECK_WRITE_OPTIONS_PTR(write_options)     SAIL_CHECK_PTR2(write_options,   SAIL_WRITE_FEATURES_NULL_PTR)
+#define SAIL_CHECK_CONTEXT_PTR(context)                 SAIL_CHECK_PTR2(context,         SAIL_CONTEXT_NULL_PTR)
+#define SAIL_CHECK_PATH_PTR(path)                       SAIL_CHECK_PTR2(path,            SAIL_PATH_NULL_PTR)
+#define SAIL_CHECK_EXTENSION_PTR(extension)             SAIL_CHECK_PTR2(extension,       SAIL_EXTENSION_NULL_PTR)
+#define SAIL_CHECK_IMAGE_PTR(image)                     SAIL_CHECK_PTR2(image,           SAIL_IMAGE_NULL_PTR)
+#define SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info)         SAIL_CHECK_PTR2(plugin_info,     SAIL_PLUGIN_INFO_NULL_PTR)
+#define SAIL_CHECK_PLUGIN_PTR(plugin)                   SAIL_CHECK_PTR2(plugin,          SAIL_PLUGIN_NULL_PTR)
+#define SAIL_CHECK_STATE_PTR(state)                     SAIL_CHECK_PTR2(state,           SAIL_STATE_NULL_PTR)
+#define SAIL_CHECK_STRING_PTR(str)                      SAIL_CHECK_PTR2(str,             SAIL_STRING_NULL_PTR)
+#define SAIL_CHECK_IO_PTR(io)                           SAIL_CHECK_PTR2(io,              SAIL_IO_NULL_PTR)
+#define SAIL_CHECK_STREAM_PTR(stream)                   SAIL_CHECK_PTR2(stream,          SAIL_STREAM_NULL_PTR)
+#define SAIL_CHECK_BUFFER_PTR(buffer)                   SAIL_CHECK_PTR2(buffer,          SAIL_BUFFER_NULL_PTR)
+#define SAIL_CHECK_RESULT_PTR(result)                   SAIL_CHECK_PTR2(result,          SAIL_RESULT_NULL_PTR)
+#define SAIL_CHECK_META_ENTRY_NODE_PTR(meta_entry_node) SAIL_CHECK_PTR2(meta_entry_node, SAIL_META_ENTRY_NODE_NULL_PTR)
 
 /*
  * Try to execute the specified SAIL function. If it fails, return the error code.

@@ -107,7 +107,7 @@ SAIL_EXPORT sail_error_t sail_alloc_write_options_from_features(const struct sai
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_deep_copy_write_options(const struct sail_write_options *write_options_source, struct sail_write_options **write_options_target);
+SAIL_EXPORT sail_error_t sail_copy_write_options(const struct sail_write_options *write_options_source, struct sail_write_options **write_options_target);
 
 /* extern "C" */
 #ifdef __cplusplus

@@ -73,7 +73,7 @@ sail_error_t sail_alloc_read_options_from_features(const struct sail_read_featur
     return 0;
 }
 
-sail_error_t sail_deep_copy_read_options(const struct sail_read_options *read_options_source, struct sail_read_options **read_options_target) {
+sail_error_t sail_copy_read_options(const struct sail_read_options *read_options_source, struct sail_read_options **read_options_target) {
 
     SAIL_CHECK_READ_OPTIONS_PTR(read_options_source);
     SAIL_CHECK_READ_OPTIONS_PTR(read_options_target);

@@ -98,7 +98,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_io *io, const stru
     *state = png_state;
 
     /* Deep copy read options. */
-    SAIL_TRY(sail_deep_copy_read_options(read_options, &png_state->read_options));
+    SAIL_TRY(sail_copy_read_options(read_options, &png_state->read_options));
 
     /* Initialize PNG. */
     if ((png_state->png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, my_error_fn, my_warning_fn)) == NULL) {
@@ -349,7 +349,7 @@ SAIL_EXPORT sail_error_t sail_plugin_write_init_v2(struct sail_io *io, const str
     *state = png_state;
 
     /* Deep copy write options. */
-    SAIL_TRY(sail_deep_copy_write_options(write_options, &png_state->write_options));
+    SAIL_TRY(sail_copy_write_options(write_options, &png_state->write_options));
 
     /* Sanity check. */
     SAIL_TRY(supported_write_output_pixel_format(png_state->write_options->output_pixel_format));

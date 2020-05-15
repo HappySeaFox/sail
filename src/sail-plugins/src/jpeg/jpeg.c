@@ -89,7 +89,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_io *io, const stru
     *state = jpeg_state;
 
     /* Deep copy read options. */
-    SAIL_TRY(sail_deep_copy_read_options(read_options, &jpeg_state->read_options));
+    SAIL_TRY(sail_copy_read_options(read_options, &jpeg_state->read_options));
 
     /* Error handling setup. */
     jpeg_state->decompress_context.err = jpeg_std_error(&jpeg_state->error_context.jpeg_error_mgr);
@@ -279,7 +279,7 @@ SAIL_EXPORT sail_error_t sail_plugin_write_init_v2(struct sail_io *io, const str
     *state = jpeg_state;
 
     /* Deep copy read options. */
-    SAIL_TRY(sail_deep_copy_write_options(write_options, &jpeg_state->write_options));
+    SAIL_TRY(sail_copy_write_options(write_options, &jpeg_state->write_options));
 
     /* Sanity check. */
     if (jpeg_state->write_options->output_pixel_format != SAIL_PIXEL_FORMAT_SOURCE) {
