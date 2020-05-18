@@ -45,6 +45,12 @@ Author: Dmitry Baryshev
 1. [JPEG: Joint Photographic Experts Group](https://wikipedia.org/wiki/JPEG) (reading and writing, requires `libjpeg-turbo`)
 1. [PNG: Portable Network Graphics](https://wikipedia.org/wiki/Portable_Network_Graphics) (reading and writing, requires `libpng`)
 
+## Legacy image formats
+
+I'm very sceptical about adding legacy image formats support into SAIL. However, if you need one, please open a
+GitHub [issue](https://github.com/smoked-herring/sail/issues) with detailed image format description. Pull requests
+are always highly welcomed.
+
 ## Supported platforms
 
 Currently, SAIL supports the Windows and Linux platforms.
