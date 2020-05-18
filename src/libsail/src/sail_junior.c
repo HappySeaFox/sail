@@ -50,6 +50,9 @@ sail_error_t sail_probe(const char *path, struct sail_context *context, struct s
                         /* cleanup */ sail_destroy_read_options(read_options_local),
                                       sail_destroy_io(io));
 
+    /* Leave the pixel data as is. */
+    read_options_local->output_pixel_format = SAIL_PIXEL_FORMAT_SOURCE;
+
     SAIL_TRY_OR_CLEANUP(plugin->v2->read_init_v2(io, read_options_local, &state),
                         /* cleanup */ plugin->v2->read_finish_v2(&state, io),
                                       sail_destroy_read_options(read_options_local),
