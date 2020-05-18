@@ -68,20 +68,4 @@ struct sail_plugin_info {
 
 typedef struct sail_plugin_info sail_plugin_info_t;
 
-/*
- * A structure representing a plugin information linked list.
- */
-struct sail_plugin_info_node {
-
-    /* Plugin information. */
-    struct sail_plugin_info *plugin_info;
-
-    /* Plugin instance. */
-    struct sail_plugin *plugin;
-
-    struct sail_plugin_info_node *next;
-};
-
-typedef struct sail_plugin_info_node sail_plugin_info_node_t;
-
 #endif

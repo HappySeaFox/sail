@@ -31,6 +31,7 @@
     #include "io_noop.h"
     #include "plugin.h"
     #include "plugin_info.h"
+    #include "plugin_info_node.h"
     #include "plugin_info_private.h"
     #include "sail_advanced.h"
     #include "sail_deep_diver.h"
@@ -43,6 +44,7 @@
     #include <sail-common/sail-common.h>
 
     #include <sail/plugin_info.h>
+    #include <sail/plugin_info_node.h>
     #include <sail/sail_advanced.h>
     #include <sail/sail_deep_diver.h>
     #include <sail/sail_junior.h>
