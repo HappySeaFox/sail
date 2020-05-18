@@ -36,10 +36,10 @@ extern "C" {
  */
 struct sail_meta_entry_node {
 
-    struct sail_meta_entry_node *next;
-
     char *key;
     char *value;
+
+    struct sail_meta_entry_node *next;
 };
 
 /*

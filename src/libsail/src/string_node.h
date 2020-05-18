@@ -22,6 +22,7 @@
 struct sail_string_node {
 
     char *value;
+
     struct sail_string_node *next;
 };
 
