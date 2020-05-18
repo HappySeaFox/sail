@@ -29,9 +29,9 @@ sail_error_t sail_alloc_meta_entry_node(struct sail_meta_entry_node **meta_entry
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
-    (*meta_entry_node)->key = NULL;
+    (*meta_entry_node)->key   = NULL;
     (*meta_entry_node)->value = NULL;
-    (*meta_entry_node)->next = NULL;
+    (*meta_entry_node)->next  = NULL;
 
     return 0;
 }
