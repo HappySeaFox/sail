@@ -84,11 +84,13 @@ sail_error_t start_reading_io_with_options(struct sail_io *io, bool own_io, stru
                                           destroy_hidden_state(state_of_mind));
         SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v2->read_init_v2(state_of_mind->io, read_options_local, &state_of_mind->state),
                             /* cleanup */ sail_destroy_read_options(read_options_local),
+                                          state_of_mind->plugin->v2->read_finish_v2(&state_of_mind->state, state_of_mind->io),
                                           destroy_hidden_state(state_of_mind));
         sail_destroy_read_options(read_options_local);
     } else {
         SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v2->read_init_v2(state_of_mind->io, read_options, &state_of_mind->state),
-                            /* cleanup */ destroy_hidden_state(state_of_mind));
+                            /* cleanup */ state_of_mind->plugin->v2->read_finish_v2(&state_of_mind->state, state_of_mind->io),
+                                          destroy_hidden_state(state_of_mind));
     }
 
     *state = state_of_mind;
@@ -132,11 +134,13 @@ sail_error_t start_writing_io_with_options(struct sail_io *io, bool own_io, stru
                                           destroy_hidden_state(state_of_mind));
         SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v2->write_init_v2(state_of_mind->io, write_options_local, &state_of_mind->state),
                             /* cleanup */ sail_destroy_write_options(write_options_local),
+                                          state_of_mind->plugin->v2->write_finish_v2(&state_of_mind->state, state_of_mind->io),
                                           destroy_hidden_state(state_of_mind));
         sail_destroy_write_options(write_options_local);
     } else {
         SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v2->write_init_v2(state_of_mind->io, write_options, &state_of_mind->state),
-                            /* cleanup */ destroy_hidden_state(state_of_mind));
+                            /* cleanup */ state_of_mind->plugin->v2->write_finish_v2(&state_of_mind->state, state_of_mind->io),
+                                          destroy_hidden_state(state_of_mind));
     }
 
     *state = state_of_mind;
