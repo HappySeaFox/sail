@@ -86,16 +86,17 @@ struct sail_plugin {
 typedef struct sail_plugin sail_plugin_t;
 
 /*
- * Loads the specified plugin by its info and saves its handle and exported interfaces into the specified plugin
- * instance. The assigned plugin MUST be destroyed later with sail_destroy_plugin().
+ * Loads the specified plugin by its info and saves its handle and exported interfaces into
+ * the specified plugin instance.
+ * The assigned plugin MUST be destroyed later with sail_destroy_plugin().
  *
  * Returns 0 on success or sail_error_t on error.
  */
 SAIL_HIDDEN sail_error_t alloc_plugin(const struct sail_plugin_info *plugin_info, struct sail_plugin **plugin);
 
 /*
- * Destroys the specified plugin and all its internal memory buffers. The plugin MUST NOT be used anymore
- * after calling this function. Does nothing if the plugin is NULL.
+ * Destroys the specified plugin and all its internal memory buffers.
+ * Does nothing if the plugin is NULL.
  */
 SAIL_HIDDEN void destroy_plugin(struct sail_plugin *plugin);
 

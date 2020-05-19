@@ -75,8 +75,8 @@ enum SailInitFlags {
  * Initializes SAIL with default flags. This is a main entry point to start working with SAIL.
  * Builds a list of available SAIL plugins.
  *
- * You could point SAIL to search plugins in a different location by setting SAIL_PLUGINS_PATH
- * environment variable to a path with SAIL plugins.
+ * You can point SAIL to search plugins in a different location by setting SAIL_PLUGINS_PATH environment
+ * variable to a path with SAIL plugins.
  *
  * Returns 0 on success or sail_error_t on error.
  */
@@ -86,23 +86,22 @@ SAIL_EXPORT sail_error_t sail_init(struct sail_context **context);
  * Initializes SAIL with the specific flags. This is an alternative entry point to start working with SAIL.
  * Builds a list of available SAIL plugins. See SailInitFlags.
  *
- * You could point SAIL to search plugins in a different location by setting SAIL_PLUGINS_PATH
- * environment variable to a path with SAIL plugins.
+ * You can point SAIL to search plugins in a different location by setting SAIL_PLUGINS_PATH environment
+ * variable to a path with SAIL plugins.
  *
  * Returns 0 on success or sail_error_t on error.
  */
 SAIL_EXPORT sail_error_t sail_init_with_flags(struct sail_context **context, int flags);
 
 /*
- * Finilizes working with the specified SAIL context. Frees the context and all its internal
- * memory buffers. The context MUST NOT be used anymore after calling this function.
+ * Finalizes working with the specified SAIL context. Frees the context and all its internal memory buffers.
  * Does nothing if context is NULL.
  */
 SAIL_EXPORT void sail_finish(struct sail_context *context);
 
 /*
- * Returns a linked list of found plugin info nodes. Use it to determine the list of possible
- * image formats, file extensions, and mime types that could be hypothetically read or written by SAIL.
+ * Returns a linked list of found plugin info nodes. Use it to determine the list of possible image formats,
+ * file extensions, and mime types that could be hypothetically read or written by SAIL.
  *
  * Returns a pointer to the first plugin info node or NULL when no SAIL plugins were found.
  * Use sail_plugin_info_node.next to iterate.
@@ -113,7 +112,7 @@ SAIL_EXPORT const struct sail_plugin_info_node* sail_plugin_info_list(const stru
  * Finds a first plugin info object that supports reading or writing the specified file path by its file extension.
  * For example: "/test.jpg". The path might not exist.
  *
- * The assigned plugin info MUST NOT be destroyed. It's a pointer to an internal data structure.
+ * The assigned plugin info MUST NOT be destroyed. It is a pointer to an internal data structure.
  *
  * Typical usage: sail_plugin_info_from_path() ->
  *                sail_start_reading_file()    ->
@@ -131,10 +130,10 @@ SAIL_EXPORT sail_error_t sail_plugin_info_from_path(const char *path, const stru
                                                     const struct sail_plugin_info **plugin_info);
 
 /*
- * Finds a first plugin info object that supports the specified file extension. The comparison
- * algorithm is case-insensitive. For example: "jpg".
+ * Finds a first plugin info object that supports the specified file extension.
+ * The comparison algorithm is case insensitive. For example: "jpg".
  *
- * The assigned plugin info MUST NOT be destroyed. It's a pointer to an internal data structure.
+ * The assigned plugin info MUST NOT be destroyed. It is a pointer to an internal data structure.
  *
  * Typical usage: sail_plugin_info_from_extension() ->
  *                sail_start_reading_file()         ->
@@ -152,10 +151,10 @@ SAIL_EXPORT sail_error_t sail_plugin_info_from_extension(const char *extension, 
                                                          const struct sail_plugin_info **plugin_info);
 
 /*
- * Finds a first plugin info object that supports the specified mime type. The comparison
- * algorithm is case-insensitive. For example: "image/jpeg".
+ * Finds a first plugin info object that supports the specified mime type.
+ * The comparison algorithm is case insensitive. For example: "image/jpeg".
  *
- * The assigned plugin info MUST NOT be destroyed. It's a pointer to an internal data structure.
+ * The assigned plugin info MUST NOT be destroyed. It is a pointer to an internal data structure.
  *
  * Typical usage: sail_plugin_info_from_mime_type() ->
  *                sail_start_reading_file()         ->
@@ -173,11 +172,11 @@ SAIL_EXPORT sail_error_t sail_plugin_info_from_mime_type(const struct sail_conte
                                                          const struct sail_plugin_info **plugin_info);
 
 /*
- * Unloads all loaded plugins from the cache to release memory occupied by them. Use it if you don't want
- * to de-initialize SAIL with sail_finish(), but want to just release some memory. Subsequent attempts
- * to read or write images will reload SAIL plugins from disk.
+ * Unloads all loaded plugins from the cache to release memory occupied by them. Use it if you want
+ * to release some memory but do not want to deinitialize SAIL with sail_finish(). Subsequent attempts
+ * to read or write images will reload necessary SAIL plugins from disk.
  *
- * Typical usage: this is a standalone function that could be called at any time.
+ * Typical usage: This is a standalone function that can be called at any time.
  *
  * Returns 0 on success or sail_error_t on error.
  */

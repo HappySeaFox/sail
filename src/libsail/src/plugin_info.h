@@ -35,12 +35,9 @@ struct sail_plugin_info {
     char *path;
 
     /*
-     * The plugin loader will use the plugin's layout version to correctly handle the plugin. Unsupported
-     * plugin layout versions will be reported. This field must be the very first key in a plugin information
-     * file.
-     *
-     * Plugin layout is a list of exported functions. We use plugin layout versions to implement
-     * backward compatibility in a simple and maintanable way.
+     * The plugin loader will use the plugin's layout version to correctly handle the plugin.
+     * Unsupported plugin layout versions will be reported. This field must be the very first key
+     * in a plugin information file.
      */
     int layout;
 

@@ -37,13 +37,13 @@ struct sail_io;
 struct sail_plugin_info;
 
 /*
- * Loads the specified image and returns its properties without pixel data. The assigned image MUST be destroyed later
- * with sail_destroy_image(). The assigned plugin info MUST NOT be destroyed. It's a pointer to an internal
- * data structure. If you don't need it, just pass NULL.
+ * Loads the specified image and returns its properties without pixel data. The assigned image
+ * MUST be destroyed later with sail_destroy_image(). The assigned plugin info MUST NOT be destroyed
+ * because it is a pointer to an internal data structure. If you don't need it, just pass NULL.
  *
- * This function is pretty fast as it doesn't decode whole image data for most image formats.
+ * This function is pretty fast because it doesn't decode whole image data for most image formats.
  *
- * Typical usage: this is a standalone function that could be called at any time.
+ * Typical usage: This is a standalone function that could be called at any time.
  *
  * Returns 0 on success or sail_error_t on error.
  */
@@ -51,29 +51,31 @@ SAIL_EXPORT sail_error_t sail_probe(const char *path, struct sail_context *conte
                                     struct sail_image **image, const struct sail_plugin_info **plugin_info);
 
 /*
- * Loads the specified image file and returns its properties and pixel data. The assigned image MUST be destroyed later
- * with sail_destroy_image(). The assigned pixel data MUST be destroyed later with free().
+ * Loads the specified image file and returns its properties and pixel data. The assigned image
+ * MUST be destroyed later with sail_destroy_image(). The assigned pixel data MUST be destroyed
+ * later with free().
  *
- * Outputs pixels in BPP24-RGB pixel format for image formats without transparency support and BPP32-RGBA otherwise.
+ * Outputs pixels in BPP24-RGB pixel format for image formats without transparency support
+ * and BPP32-RGBA otherwise.
  *
  * WARNING: This function allocates a local static context and never destroys it. ASAN will report
- * memory leaks which is OK.
+ * memory leaks, which is OK.
  *
- * Typical usage: this is a standalone function that could be called at any time.
+ * Typical usage: This is a standalone function that could be called at any time.
  *
  * Returns 0 on success or sail_error_t on error.
  */
 SAIL_EXPORT sail_error_t sail_read(const char *path, struct sail_image **image, void **image_bits);
 
 /*
- * Writes the specified image file its pixel data into the file.
+ * Writes the pixel data of the specified image file into the file.
  *
  * Outputs pixels in pixel format as specified in sail_write_features.preferred_output_pixel_format.
  *
- * WARNING: This function allocates a local static context and never destroys it. ASAN will report
- * memory leaks which is OK.
+ * WARNING: This function allocates a local static context and never destroys it. ASAN will report memory
+ * leaks, which is OK.
  *
- * Typical usage: this is a standalone function that could be called at any time.
+ * Typical usage: This is a standalone function that could be called at any time.
  *
  * Returns 0 on success or sail_error_t on error.
  */
