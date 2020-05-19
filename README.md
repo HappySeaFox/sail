@@ -19,7 +19,7 @@ Author: Dmitry Baryshev
 
 - Easy-to-use C and C++ interfaces
 - Four levels of APIs, depending on your needs: `junior`, `advanced`, `deep diver`, and `technical diver`.
-  See [EXAMPLES](EXAMPLES.md) for more.
+  See [EXAMPLES](EXAMPLES.md) for more
 - Reading images from file and memory
 - Writing images to file and memory
 - I/O abstraction for technical divers
@@ -27,7 +27,7 @@ Author: Dmitry Baryshev
   and `BPP32-RGBA` formats. Supporting other output pixel formats is plugin-specific
 - Reading operations are always able to output pixels in the **source pixel format**
   for those who want to kick the hell out of images manually. For example, one may want to work with raw
-  `CMYK` pixels in a print image.
+  `CMYK` pixels in a print image
 - Image formats are supported by dynamically loaded codecs (plugins)
 - Read and write meta information like JPEG comments
 - Easily extensible with new image formats for those who want to implement a specific codec for his/her needs
@@ -39,6 +39,12 @@ Author: Dmitry Baryshev
 - Color space conversion functions
 - Color management functions (applying ICC profiles etc.)
 - EXIF rotation
+
+## Differences from other image decoding libraries
+
+- Fast and easy-to-use API providing expected business entities - images, delays, palettes etc.
+- Access to raw pixel data
+- Reading and writing images in multiple pixel formats, not only RGB and friends
 
 ## Supported image formats
 
