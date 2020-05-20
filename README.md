@@ -48,8 +48,10 @@ Author: Dmitry Baryshev
 
 ## Supported image formats
 
-1. [JPEG: Joint Photographic Experts Group](https://wikipedia.org/wiki/JPEG) (reading and writing, requires `libjpeg-turbo`)
-1. [PNG: Portable Network Graphics](https://wikipedia.org/wiki/Portable_Network_Graphics) (reading and writing, requires `libpng`)
+| N  | Image format                                                                           | Operations    | Dependencies  |
+| -- | -------------------------------------------------------------------------------------- | ------------- | ------------- |
+| 1  | [JPEG: Joint Photographic Experts Group](https://wikipedia.org/wiki/JPEG)              | RW            | libjpeg-turbo |
+| 2  | [PNG: Portable Network Graphics](https://wikipedia.org/wiki/Portable_Network_Graphics) | RW            | libpng        |
 
 ## Legacy image formats
 
