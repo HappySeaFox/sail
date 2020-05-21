@@ -167,7 +167,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
     /* Read meta info. */
     if (jpeg_state->read_options->io_options & SAIL_IO_OPTION_META_INFO) {
         jpeg_saved_marker_ptr it = jpeg_state->decompress_context.marker_list;
-        struct sail_meta_entry_node *last_meta_entry_node = NULL;
+        struct sail_meta_entry_node **last_meta_entry_node = &(*image)->meta_entry_node;
 
         while(it != NULL) {
             if(it->marker == JPEG_COM) {
@@ -182,12 +182,8 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
                                     /* cleanup */ sail_destroy_meta_entry_node(meta_entry_node),
                                                   sail_destroy_image(*image));
 
-                if ((*image)->meta_entry_node == NULL) {
-                    (*image)->meta_entry_node = last_meta_entry_node = meta_entry_node;
-                } else {
-                    last_meta_entry_node->next = meta_entry_node;
-                    last_meta_entry_node = meta_entry_node;
-                }
+                *last_meta_entry_node = meta_entry_node;
+                last_meta_entry_node = &meta_entry_node->next;
             }
 
             it = it->next;

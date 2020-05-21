@@ -457,7 +457,7 @@ sail_error_t image::to_sail_image(sail_image *image) const
     // Resulting meta entries
     sail_meta_entry_node *image_meta_entry_node = nullptr;
 
-    sail_meta_entry_node *last_meta_entry_node = nullptr;
+    sail_meta_entry_node **last_meta_entry_node = &image_meta_entry_node;
     auto it = d->meta_entries.begin();
 
     while (it != d->meta_entries.end()) {
@@ -471,12 +471,8 @@ sail_error_t image::to_sail_image(sail_image *image) const
                             sail_destroy_meta_entry_node(meta_entry_node),
                             sail_destroy_meta_entry_node_chain(image_meta_entry_node));
 
-        if (image_meta_entry_node == nullptr) {
-            image_meta_entry_node = last_meta_entry_node = meta_entry_node;
-        } else {
-            last_meta_entry_node->next = meta_entry_node;
-            last_meta_entry_node = meta_entry_node;
-        }
+        *last_meta_entry_node = meta_entry_node;
+        last_meta_entry_node = &meta_entry_node->next;
 
         ++it;
     }

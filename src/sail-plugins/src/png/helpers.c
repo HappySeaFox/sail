@@ -187,7 +187,7 @@ sail_error_t read_png_text(png_structp png_ptr, png_infop info_ptr, struct sail_
     SAIL_CHECK_PTR(target_meta_entry_node);
 
 #ifdef PNG_TEXT_SUPPORTED
-    struct sail_meta_entry_node *last_meta_entry_node = NULL;
+    struct sail_meta_entry_node **last_meta_entry_node = target_meta_entry_node;
 
     png_textp lines;
     int num_text;
@@ -203,12 +203,8 @@ sail_error_t read_png_text(png_structp png_ptr, png_infop info_ptr, struct sail_
         SAIL_TRY_OR_CLEANUP(sail_strdup_length(lines[i].text, strlen(lines[i].text), &meta_entry_node->value),
                             /* cleanup */ sail_destroy_meta_entry_node(meta_entry_node));
 
-        if (*target_meta_entry_node == NULL) {
-            *target_meta_entry_node = last_meta_entry_node = meta_entry_node;
-        } else {
-            last_meta_entry_node->next = meta_entry_node;
-            last_meta_entry_node = meta_entry_node;
-        }
+        *last_meta_entry_node = meta_entry_node;
+        last_meta_entry_node = &meta_entry_node->next;
     }
 #endif
 

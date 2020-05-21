@@ -64,7 +64,7 @@ static void destroy_string_node_chain(struct sail_string_node *string_node) {
 
 static sail_error_t split_into_string_node_chain(const char *value, struct sail_string_node **target_string_node) {
 
-    struct sail_string_node *last_string_node = NULL;
+    struct sail_string_node **last_string_node = target_string_node;
 
     while (*(value += strspn(value, ";")) != '\0') {
         size_t length = strcspn(value, ";");
@@ -76,12 +76,8 @@ static sail_error_t split_into_string_node_chain(const char *value, struct sail_
         SAIL_TRY_OR_CLEANUP(sail_strdup_length(value, length, &string_node->value),
                             /* cleanup */ destroy_string_node(string_node));
 
-        if (*target_string_node == NULL) {
-            *target_string_node = last_string_node = string_node;
-        } else {
-            last_string_node->next = string_node;
-            last_string_node = string_node;
-        }
+        *last_string_node = string_node;
+        last_string_node = &string_node->next;
 
         value += length;
     }
