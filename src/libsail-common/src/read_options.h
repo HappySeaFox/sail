@@ -88,7 +88,7 @@ SAIL_EXPORT sail_error_t sail_alloc_read_options_from_features(const struct sail
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_copy_read_options(const struct sail_read_options *read_options_source, struct sail_read_options **read_options_target);
+SAIL_EXPORT sail_error_t sail_copy_read_options(const struct sail_read_options *source, struct sail_read_options **target);
 
 /* extern "C" */
 #ifdef __cplusplus
