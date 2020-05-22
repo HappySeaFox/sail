@@ -50,6 +50,8 @@ sail_error_t sail_read_options_from_features(const struct sail_read_features *re
     SAIL_CHECK_READ_FEATURES_PTR(read_features);
     SAIL_CHECK_READ_OPTIONS_PTR(read_options);
 
+    read_options->output_pixel_format = read_features->preferred_output_pixel_format;
+
     read_options->io_options = 0;
 
     if (read_features->features & SAIL_PLUGIN_FEATURE_META_INFO) {
