@@ -261,8 +261,9 @@ static sail_error_t sail_init_impl(struct sail_context **context, int flags) {
 
         SAIL_LOG_DEBUG("Found plugin info '%s'", data.cFileName);
 
-        build_plugin_full_path(last_plugin_info_node, full_path);
-        last_plugin_info_node = &(*last_plugin_info_node)->next;
+        if (build_plugin_full_path(last_plugin_info_node, full_path) == 0) {
+            last_plugin_info_node = &(*last_plugin_info_node)->next;
+        }
 
         free(full_path);
     } while (FindNextFile(hFind, &data));
@@ -304,8 +305,9 @@ static sail_error_t sail_init_impl(struct sail_context **context, int flags) {
 
             if (is_plugin_info) {
                 SAIL_LOG_DEBUG("Found plugin info '%s'", dir->d_name);
-                build_plugin_full_path(last_plugin_info_node, full_path);
-                last_plugin_info_node = &(*last_plugin_info_node)->next;
+                if (build_plugin_full_path(last_plugin_info_node, full_path) == 0) {
+                    last_plugin_info_node = &(*last_plugin_info_node)->next;
+                }
             }
         }
 
