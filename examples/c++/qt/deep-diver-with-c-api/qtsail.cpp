@@ -306,7 +306,10 @@ sail_error_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffer
 
     // Ask the user to provide his/her preferred output options.
     //
-    WriteOptions writeOptions(QString::fromUtf8(plugin_info->description), plugin_info->write_features, this);
+    WriteOptions writeOptions(QString::fromUtf8(plugin_info->description),
+                              plugin_info->write_features,
+                              image->pixel_format,
+                              this);
 
     if (writeOptions.exec() == QDialog::Accepted) {
         write_options->output_pixel_format = writeOptions.pixelFormat();

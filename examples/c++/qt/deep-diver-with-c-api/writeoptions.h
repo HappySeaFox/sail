@@ -37,6 +37,7 @@ class WriteOptions : public QDialog
 public:
     explicit WriteOptions(const QString &codecDescription,
                           const sail_write_features *write_features,
+                          int input_pixel_format,
                           QWidget *parent = nullptr);
     ~WriteOptions();
 
@@ -45,7 +46,8 @@ public:
     int compression() const;
 
 private:
-    sail_error_t init(const sail_write_features *write_features);
+    sail_error_t init(const sail_write_features *write_features, int input_pixel_format);
+    void disable();
 
 private:
     class Private;
