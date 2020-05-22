@@ -91,6 +91,8 @@ void destroy_hidden_state(struct hidden_state *state) {
     /* This state must be freed and zeroed by plugins. We free it just in case to avoid memory leaks. */
     free(state->state);
 
+    free(state->write_options);
+
     free(state);
 }
 

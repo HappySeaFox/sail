@@ -121,6 +121,11 @@ sail_error_t sail_write_next_frame(void *state, const struct sail_image *image, 
         return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
     }
 
+    /* Check if we actually able to write the requested pixel format. */
+    SAIL_TRY(allowed_write_output_pixel_format(state_of_mind->plugin_info->write_features,
+                                                image->pixel_format,
+                                                state_of_mind->write_options->output_pixel_format));
+
     /* Detect the number of passes needed to write an interlaced image. */
     int passes;
     if (image->properties & SAIL_IMAGE_PROPERTY_INTERLACED) {

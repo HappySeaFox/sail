@@ -49,6 +49,9 @@ struct hidden_state {
     /* Pointers to internal data structures so no need to free these. */
     const struct sail_plugin_info *plugin_info;
     const struct sail_plugin *plugin;
+
+    /* Saved write options for write operations. Used to check if the supplied pixel format is supported. */
+    struct sail_write_options *write_options;
 };
 
 SAIL_HIDDEN sail_error_t load_plugin(struct sail_plugin_info_node *node);
