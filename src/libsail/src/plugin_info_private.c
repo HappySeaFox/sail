@@ -422,43 +422,42 @@ sail_error_t plugin_read_info(const char *path, struct sail_plugin_info **plugin
      */
     const int code = ini_parse(path, inih_handler, &init_data);
 
-    if ((*plugin_info)->layout != SAIL_PLUGIN_LAYOUT_V2) {
-        SAIL_LOG_ERROR("Unsupported plugin layout version %d in '%s'", (*plugin_info)->layout, path);
-        destroy_plugin_info(*plugin_info);
-        return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
-    }
-
-    /*
-     * We hardcode possible output pixel formats. They're shared across all plugins.
-     */
-    (*plugin_info)->read_features->output_pixel_formats_length = 3;
-    (*plugin_info)->read_features->output_pixel_formats = malloc(3 * sizeof(int));
-
-    if ((*plugin_info)->read_features->output_pixel_formats == NULL) {
-        destroy_plugin_info(*plugin_info);
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
-
-    (*plugin_info)->read_features->output_pixel_formats[0] = SAIL_PIXEL_FORMAT_SOURCE;
-    (*plugin_info)->read_features->output_pixel_formats[1] = SAIL_PIXEL_FORMAT_BPP24_RGB;
-    (*plugin_info)->read_features->output_pixel_formats[2] = SAIL_PIXEL_FORMAT_BPP32_RGBA;
-
-    /* Paranoid error checks. */
-    SAIL_TRY_OR_CLEANUP(check_plugin_info(path, *plugin_info),
-                        /* cleanup */ destroy_plugin_info(*plugin_info));
-
     /* Success. */
     if (code == 0) {
+        if ((*plugin_info)->layout != SAIL_PLUGIN_LAYOUT_V2) {
+            SAIL_LOG_ERROR("Unsupported plugin layout version %d in '%s'", (*plugin_info)->layout, path);
+            destroy_plugin_info(*plugin_info);
+            return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
+        }
+
+        /*
+         * We hardcode possible output pixel formats. They're shared across all plugins.
+         */
+        (*plugin_info)->read_features->output_pixel_formats_length = 3;
+        (*plugin_info)->read_features->output_pixel_formats = malloc(3 * sizeof(int));
+
+        if ((*plugin_info)->read_features->output_pixel_formats == NULL) {
+            destroy_plugin_info(*plugin_info);
+            return SAIL_MEMORY_ALLOCATION_FAILED;
+        }
+
+        (*plugin_info)->read_features->output_pixel_formats[0] = SAIL_PIXEL_FORMAT_SOURCE;
+        (*plugin_info)->read_features->output_pixel_formats[1] = SAIL_PIXEL_FORMAT_BPP24_RGB;
+        (*plugin_info)->read_features->output_pixel_formats[2] = SAIL_PIXEL_FORMAT_BPP32_RGBA;
+
+        /* Paranoid error checks. */
+        SAIL_TRY_OR_CLEANUP(check_plugin_info(path, *plugin_info),
+                            /* cleanup */ destroy_plugin_info(*plugin_info));
+
         return 0;
-    }
+    } else {
+        destroy_plugin_info(*plugin_info);
 
-    /* Error. */
-    destroy_plugin_info(*plugin_info);
+        switch (code) {
+            case -1: return SAIL_FILE_OPEN_ERROR;
+            case -2: return SAIL_MEMORY_ALLOCATION_FAILED;
 
-    switch (code) {
-        case -1: return SAIL_FILE_OPEN_ERROR;
-        case -2: return SAIL_MEMORY_ALLOCATION_FAILED;
-
-        default: return SAIL_FILE_PARSE_ERROR;
+            default: return SAIL_FILE_PARSE_ERROR;
+        }
     }
 }
