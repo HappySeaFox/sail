@@ -217,7 +217,14 @@ static int inih_handler(void *data, const char *section, const char *name, const
             return 0; /* error */
         }
     } else if (strcmp(section, "read-features") == 0) {
-        if (strcmp(name, "preferred-output-pixel-format") == 0) {
+        if (strcmp(name, "output-pixel-formats") == 0) {
+            if (parse_serialized_ints(value, &plugin_info->read_features->output_pixel_formats,
+                                      &plugin_info->read_features->output_pixel_formats_length,
+                                      sail_pixel_format_from_string) != 0) {
+                SAIL_LOG_ERROR("Failed to parse output pixel formats: '%s'", value);
+                return 0;
+            }
+        } else if (strcmp(name, "preferred-output-pixel-format") == 0) {
             if (sail_pixel_format_from_string(value, &plugin_info->read_features->preferred_output_pixel_format) != 0) {
                 SAIL_LOG_ERROR("Failed to parse preferred output pixel format: '%s'", value);
                 return 0;
@@ -429,21 +436,6 @@ sail_error_t plugin_read_info(const char *path, struct sail_plugin_info **plugin
             destroy_plugin_info(*plugin_info);
             return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
         }
-
-        /*
-         * We hardcode possible output pixel formats. They're shared across all plugins.
-         */
-        (*plugin_info)->read_features->output_pixel_formats_length = 3;
-        (*plugin_info)->read_features->output_pixel_formats = malloc(3 * sizeof(int));
-
-        if ((*plugin_info)->read_features->output_pixel_formats == NULL) {
-            destroy_plugin_info(*plugin_info);
-            return SAIL_MEMORY_ALLOCATION_FAILED;
-        }
-
-        (*plugin_info)->read_features->output_pixel_formats[0] = SAIL_PIXEL_FORMAT_SOURCE;
-        (*plugin_info)->read_features->output_pixel_formats[1] = SAIL_PIXEL_FORMAT_BPP24_RGB;
-        (*plugin_info)->read_features->output_pixel_formats[2] = SAIL_PIXEL_FORMAT_BPP32_RGBA;
 
         /* Paranoid error checks. */
         SAIL_TRY_OR_CLEANUP(check_plugin_info(path, *plugin_info),

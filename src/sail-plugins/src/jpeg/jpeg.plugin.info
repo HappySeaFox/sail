@@ -10,6 +10,7 @@ mime-types=image/jpeg
 
 [read-features]
 features=STATIC;META-INFO
+output-pixel-formats=SOURCE;BPP24-RGB;BPP32-RGBA
 preferred-output-pixel-format=BPP24-RGB
 
 #[read-pixel-formats-mapping]
