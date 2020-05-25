@@ -94,16 +94,6 @@ public:
     int pixel_format() const;
 
     /*
-     * Returns number of passes needed to read or write an entire image frame. 1 by default.
-     *
-     * READ:  Set by SAIL to a positive number of passes needed to read an image. For example, interlaced PNGs
-     *        have 8 passes.
-     * WRITE: Ignored. Use write_features.passes to determine the actual number of passes needed to write
-     *        an interlaced image.
-     */
-    int passes() const;
-
-    /*
      * Returns true if the image is a frame in an animation.
      *
      * READ:  Set by SAIL to true if the image is a frame in an animation.
@@ -355,7 +345,6 @@ private:
 
     sail_error_t to_sail_image(sail_image *image) const;
 
-    image& with_passes(int passes);
     image& with_animated(bool animated);
     image& with_properties(int properties);
     image& with_source_pixel_format(int source_pixel_format);

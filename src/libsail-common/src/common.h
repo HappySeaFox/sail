@@ -136,7 +136,11 @@ enum SailImageProperties {
     /* Image needs flipping vertically. */
     SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY = 1 << 0,
 
-    /* Image is interlaced. */
+    /*
+     * Image is interlaced. Only sail_image.source_properties can have this property.
+     * Reading operations never output interlaced images, that's why sail_image.properties
+     * never has it.
+     */
     SAIL_IMAGE_PROPERTY_INTERLACED         = 1 << 1,
 
     /* Not to be used. Resize the enum for future elements. */
@@ -187,7 +191,7 @@ enum SailIoOptions {
     /* Instruction to read or write EXIF meta information. */
     SAIL_IO_OPTION_EXIF       = 1 << 1,
 
-    /* Instruction to read or write interlaced images. */
+    /* Instruction to write interlaced images. Specifying this option for reading operations has no effect. */
     SAIL_IO_OPTION_INTERLACED = 1 << 2,
 
     /* Not to be used. Resize the enum for future elements. */

@@ -34,7 +34,6 @@ public:
         , height(0)
         , bytes_per_line(0)
         , pixel_format(SAIL_PIXEL_FORMAT_UNKNOWN)
-        , passes(0)
         , animated(false)
         , delay(0)
         , palette_pixel_format(SAIL_PIXEL_FORMAT_UNKNOWN)
@@ -60,7 +59,6 @@ public:
     unsigned height;
     unsigned bytes_per_line;
     int pixel_format;
-    int passes;
     bool animated;
     int delay;
     int palette_pixel_format;
@@ -94,7 +92,6 @@ image& image::operator=(const image &img)
         .with_height(img.height())
         .with_bytes_per_line(img.bytes_per_line())
         .with_pixel_format(img.pixel_format())
-        .with_passes(img.passes())
         .with_animated(img.animated())
         .with_delay(img.delay())
         .with_palette(img.palette(), img.palette_color_count(), img.palette_pixel_format())
@@ -141,11 +138,6 @@ unsigned image::bytes_per_line() const
 int image::pixel_format() const
 {
     return d->pixel_format;
-}
-
-int image::passes() const
-{
-    return d->passes;
 }
 
 bool image::animated() const
@@ -433,7 +425,6 @@ image::image(const sail_image *im, const void *bits, unsigned bits_size)
         .with_height(im->height)
         .with_bytes_per_line(im->bytes_per_line)
         .with_pixel_format(im->pixel_format)
-        .with_passes(im->passes)
         .with_animated(im->animated)
         .with_delay(im->delay)
         .with_palette(im->palette, im->palette_color_count, im->palette_pixel_format)
@@ -481,7 +472,6 @@ sail_error_t image::to_sail_image(sail_image *image) const
     image->height         = d->height;
     image->bytes_per_line = d->bytes_per_line;
     image->pixel_format   = d->pixel_format;
-    image->passes         = d->passes;
     image->animated       = d->animated;
     image->delay          = d->delay;
 
@@ -507,12 +497,6 @@ sail_error_t image::to_sail_image(sail_image *image) const
     image->source_compression_type = d->source_compression_type;
 
     return 0;
-}
-
-image& image::with_passes(int passes)
-{
-    d->passes = passes;
-    return *this;
 }
 
 image& image::with_animated(bool animated)

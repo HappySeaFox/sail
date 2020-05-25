@@ -78,14 +78,14 @@ struct sail_image {
     int pixel_format;
 
     /*
-     * Number of passes needed to read or write an entire image frame. 1 by default.
+     * Number of passes needed to read or write an entire image frame if it's interlaced. 1 by default.
      *
-     * READ:  Set by SAIL to a positive number of passes needed to read an image. For example, interlaced PNGs
-     *        have 8 passes.
-     * WRITE: Ignored. Use sail_write_features.passes to determine the actual number of passes needed to write
-     *        an interlaced image.
+     * This field is used internally by SAIL. DO NOT alter its value.
+     *
+     * READ:  N/A.
+     * WRITE: N/A.
      */
-    int passes;
+    int interlaced_passes;
 
     /*
      * Is the image a frame in an animation.
@@ -156,16 +156,17 @@ struct sail_image {
      */
 
     /*
-     * Image source pixel format. See SailPixelFormat.
+     * Source image pixel format. See SailPixelFormat.
      *
-     * READ:  Set by SAIL to a valid source image pixel format before converting it to a requested pixel format
-     *        in sail_read_options.pixel_format.
+     * READ:  Set by SAIL to a valid source image pixel format of the image file before converting it
+     *        to a requested pixel format in sail_read_options.pixel_format.
      * WRITE: Ignored.
      */
     int source_pixel_format;
 
     /*
-     * Image source properties. See SailImageProperties.
+     * Source image properties. Set by SAIL to a valid source image properties of the image file.
+     * For example, it can be interlaced. See SailImageProperties.
      *
      * READ:  Set by SAIL to valid source image properties or to 0.
      * WRITE: Ignored.
@@ -173,7 +174,7 @@ struct sail_image {
     int source_properties;
 
     /*
-     * Image source compression type. See SailCompressionTypes.
+     * Source image compression type. See SailCompressionTypes.
      *
      * READ:  Set by SAIL to a valid source image compression type or to 0.
      * WRITE: Ignored.

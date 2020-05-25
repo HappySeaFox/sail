@@ -43,15 +43,18 @@ struct hidden_state {
     struct sail_io *io;
     bool own_io;
 
+    /*
+     * Write operations save write options to check if the interlaced mode was requested on later stages.
+     * It's also used to check if the supplied pixel format is supported.
+     */
+    struct sail_write_options *write_options;
+
     /* Local state passed to plugin reading and writing functions. */
     void *state;
 
     /* Pointers to internal data structures so no need to free these. */
     const struct sail_plugin_info *plugin_info;
     const struct sail_plugin *plugin;
-
-    /* Saved write options for write operations. Used to check if the supplied pixel format is supported. */
-    struct sail_write_options *write_options;
 };
 
 SAIL_HIDDEN sail_error_t load_plugin(struct sail_plugin_info_node *node);

@@ -34,7 +34,7 @@ int sail_alloc_image(struct sail_image **image) {
     (*image)->height                  = 0;
     (*image)->bytes_per_line          = 0;
     (*image)->pixel_format            = SAIL_PIXEL_FORMAT_UNKNOWN;
-    (*image)->passes                  = 0;
+    (*image)->interlaced_passes       = 0;
     (*image)->animated                = false;
     (*image)->delay                   = 0;
     (*image)->palette_pixel_format    = SAIL_PIXEL_FORMAT_UNKNOWN;
@@ -69,16 +69,16 @@ sail_error_t sail_copy_image(struct sail_image *source_image, struct sail_image 
 
     SAIL_TRY(sail_alloc_image(target_image));
 
-    (*target_image)->width                   = source_image->width;
-    (*target_image)->height                  = source_image->height;
-    (*target_image)->bytes_per_line          = source_image->bytes_per_line;
-    (*target_image)->pixel_format            = source_image->pixel_format;
-    (*target_image)->passes                  = source_image->passes;
-    (*target_image)->animated                = source_image->animated;
-    (*target_image)->delay                   = source_image->delay;
-    (*target_image)->palette_pixel_format    = source_image->palette_pixel_format;
-    (*target_image)->palette                 = NULL;
-    (*target_image)->palette_color_count     = source_image->palette_color_count;
+    (*target_image)->width                = source_image->width;
+    (*target_image)->height               = source_image->height;
+    (*target_image)->bytes_per_line       = source_image->bytes_per_line;
+    (*target_image)->pixel_format         = source_image->pixel_format;
+    (*target_image)->interlaced_passes    = source_image->interlaced_passes;
+    (*target_image)->animated             = source_image->animated;
+    (*target_image)->delay                = source_image->delay;
+    (*target_image)->palette_pixel_format = source_image->palette_pixel_format;
+    (*target_image)->palette              = NULL;
+    (*target_image)->palette_color_count  = source_image->palette_color_count;
 
     if (source_image->palette != NULL) {
         unsigned bits_per_pixel;

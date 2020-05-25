@@ -88,6 +88,8 @@ void destroy_hidden_state(struct hidden_state *state) {
         sail_destroy_io(state->io);
     }
 
+    sail_destroy_write_options(state->write_options);
+
     /* This state must be freed and zeroed by plugins. We free it just in case to avoid memory leaks. */
     free(state->state);
 
@@ -113,11 +115,6 @@ sail_error_t stop_writing(void *state, size_t *written) {
     if (state_of_mind->plugin == NULL) {
         destroy_hidden_state(state_of_mind);
         return 0;
-    }
-
-    if (state_of_mind->plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
-        destroy_hidden_state(state_of_mind);
-        return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
     }
 
     SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v2->write_finish_v2(&state_of_mind->state, state_of_mind->io),

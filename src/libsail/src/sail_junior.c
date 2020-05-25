@@ -36,10 +36,6 @@ sail_error_t sail_probe(const char *path, struct sail_context *context, struct s
     const struct sail_plugin *plugin;
     SAIL_TRY(load_plugin_by_plugin_info(context, *plugin_info_local, &plugin));
 
-    if (plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
-        return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
-    }
-
     struct sail_io *io;
     SAIL_TRY(alloc_io_read_file(path, &io));
 
