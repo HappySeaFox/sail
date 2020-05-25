@@ -53,7 +53,6 @@ public:
     int preferred_output_pixel_format() const;
     int features() const;
     int properties() const;
-    int passes() const;
     std::vector<int> compression_types() const;
     int preferred_compression_type() const;
     int compression_min() const;
@@ -75,7 +74,6 @@ private:
     write_features& with_preferred_output_pixel_format(int preferred_output_pixel_format);
     write_features& with_features(int features);
     write_features& with_properties(int properties);
-    write_features& with_passes(int passes);
     write_features& with_compression_types(const std::vector<int> &compression_types);
     write_features& with_preferred_compression_type(int preferred_compression_type);
     write_features& with_compression_min(int compression_min);

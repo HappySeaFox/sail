@@ -269,8 +269,8 @@ static int inih_handler(void *data, const char *section, const char *name, const
                 SAIL_LOG_ERROR("Failed to parse image properties: '%s'", value);
                 return 0;
             }
-        } else if (strcmp(name, "passes") == 0) {
-            plugin_info->write_features->passes = atoi(value);
+        } else if (strcmp(name, "interlaced-passes") == 0) {
+            plugin_info->write_features->interlaced_passes = atoi(value);
         } else if (strcmp(name, "compression-types") == 0) {
             if (parse_serialized_ints(value, &plugin_info->write_features->compression_types,
                                       &plugin_info->write_features->compression_types_length,

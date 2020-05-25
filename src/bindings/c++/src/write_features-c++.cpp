@@ -31,7 +31,6 @@ public:
         , preferred_output_pixel_format(SAIL_PIXEL_FORMAT_UNKNOWN)
         , features(0)
         , properties(0)
-        , passes(0)
         , preferred_compression_type(0)
         , compression_min(0)
         , compression_max(0)
@@ -45,7 +44,6 @@ public:
     int preferred_output_pixel_format;
     int features;
     int properties;
-    int passes;
     std::vector<int> compression_types;
     int preferred_compression_type;
     int compression_min;
@@ -68,7 +66,6 @@ write_features& write_features::operator=(const write_features &wf)
         .with_preferred_output_pixel_format(wf.preferred_output_pixel_format())
         .with_features(wf.features())
         .with_properties(wf.properties())
-        .with_passes(wf.passes())
         .with_compression_types(compression_types())
         .with_preferred_compression_type(wf.preferred_compression_type())
         .with_compression_min(wf.compression_min())
@@ -106,11 +103,6 @@ int write_features::features() const
 int write_features::properties() const
 {
     return d->properties;
-}
-
-int write_features::passes() const
-{
-    return d->passes;
 }
 
 std::vector<int> write_features::compression_types() const
@@ -206,7 +198,6 @@ write_features::write_features(const sail_write_features *wf)
         .with_preferred_output_pixel_format(wf->preferred_output_pixel_format)
         .with_features(wf->features)
         .with_properties(wf->properties)
-        .with_passes(wf->passes)
         .with_compression_types(compression_types)
         .with_preferred_compression_type(wf->preferred_compression_type)
         .with_compression_min(wf->compression_min)
@@ -241,12 +232,6 @@ write_features& write_features::with_features(int features)
 write_features& write_features::with_properties(int properties)
 {
     d->properties = properties;
-    return *this;
-}
-
-write_features& write_features::with_passes(int passes)
-{
-    d->passes = passes;
     return *this;
 }
 

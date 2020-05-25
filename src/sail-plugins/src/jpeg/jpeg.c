@@ -161,7 +161,6 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
     (*image)->height              = jpeg_state->decompress_context.output_height;
     (*image)->bytes_per_line      = bytes_per_line;
     (*image)->pixel_format        = color_space_to_pixel_format(jpeg_state->decompress_context.out_color_space);
-    (*image)->passes              = 1;
     (*image)->source_pixel_format = color_space_to_pixel_format(jpeg_state->decompress_context.jpeg_color_space);
 
     /* Read meta info. */

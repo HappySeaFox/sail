@@ -36,7 +36,7 @@ int sail_alloc_write_features(struct sail_write_features **write_features) {
     (*write_features)->preferred_output_pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;
     (*write_features)->features                      = 0;
     (*write_features)->properties                    = 0;
-    (*write_features)->passes                        = 0;
+    (*write_features)->interlaced_passes             = 0;
     (*write_features)->compression_types             = NULL;
     (*write_features)->compression_types_length      = 0;
     (*write_features)->preferred_compression_type    = 0;

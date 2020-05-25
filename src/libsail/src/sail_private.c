@@ -88,6 +88,8 @@ void destroy_hidden_state(struct hidden_state *state) {
         sail_destroy_io(state->io);
     }
 
+    sail_destroy_write_options(state->write_options);
+
     /* This state must be freed and zeroed by plugins. We free it just in case to avoid memory leaks. */
     free(state->state);
 

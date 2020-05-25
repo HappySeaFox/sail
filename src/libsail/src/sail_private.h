@@ -35,11 +35,15 @@ struct sail_io;
 struct sail_plugin_info;
 struct sail_plugin_info_node;
 struct sail_plugin;
+struct sail_write_options;
 
 struct hidden_state {
 
     struct sail_io *io;
     bool own_io;
+
+    /* Write operations save write options to check if the interlaced mode was requested on later stages. */
+    struct sail_write_options *write_options;
 
     /* Local state passed to plugin reading and writing functions. */
     void *state;

@@ -93,7 +93,7 @@ struct sail_write_features {
     int properties;
 
     /* Number of passes to write an interlaced image or 0. */
-    int passes;
+    int interlaced_passes;
 
     /*
      * A list of supported pixels compression types by this plugin. NULL if no compression types are available.
