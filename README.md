@@ -65,7 +65,9 @@ Currently, SAIL supports the Windows and Linux platforms.
 
 ## Development status
 
-SAIL is under heavy development. The API can be changed at any time breaking binary compatibility.
+SAIL is under heavy development. The API can be changed at any time breaking binary compatibility. Consider opening a GitHub
+[issue](https://github.com/smoked-herring/sail/issues) if you have feature requests or issue reports. Pull requests
+are highly welcomed as well.
 
 ## Have questions or issues?
 
