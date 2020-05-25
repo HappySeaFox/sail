@@ -113,11 +113,6 @@ sail_error_t stop_writing(void *state, size_t *written) {
         return 0;
     }
 
-    if (state_of_mind->plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
-        destroy_hidden_state(state_of_mind);
-        return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
-    }
-
     SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v2->write_finish_v2(&state_of_mind->state, state_of_mind->io),
                         /* cleanup */ destroy_hidden_state(state_of_mind));
 

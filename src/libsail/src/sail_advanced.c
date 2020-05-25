@@ -40,10 +40,6 @@ sail_error_t sail_read_next_frame(void *state, struct sail_image **image, void *
     SAIL_CHECK_STATE_PTR(state_of_mind->state);
     SAIL_CHECK_PLUGIN_PTR(state_of_mind->plugin);
 
-    if (state_of_mind->plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
-        return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
-    }
-
     SAIL_TRY(state_of_mind->plugin->v2->read_seek_next_frame_v2(state_of_mind->state, state_of_mind->io, image));
 
     *image_bits = malloc((*image)->bytes_per_line * (*image)->height);
@@ -86,11 +82,6 @@ sail_error_t sail_stop_reading(void *state) {
         return 0;
     }
 
-    if (state_of_mind->plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
-        destroy_hidden_state(state_of_mind);
-        return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
-    }
-
     SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v2->read_finish_v2(&state_of_mind->state, state_of_mind->io),
                         /* cleanup */ destroy_hidden_state(state_of_mind));
 
@@ -116,10 +107,6 @@ sail_error_t sail_write_next_frame(void *state, const struct sail_image *image, 
     SAIL_CHECK_STATE_PTR(state_of_mind->state);
     SAIL_CHECK_PLUGIN_INFO_PTR(state_of_mind->plugin_info);
     SAIL_CHECK_PLUGIN_PTR(state_of_mind->plugin);
-
-    if (state_of_mind->plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
-        return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
-    }
 
     /* Detect the number of passes needed to write an interlaced image. */
     int passes;

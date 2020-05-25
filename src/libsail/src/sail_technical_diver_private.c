@@ -71,11 +71,6 @@ sail_error_t start_reading_io_with_options(struct sail_io *io, bool own_io, stru
     SAIL_TRY_OR_CLEANUP(load_plugin_by_plugin_info(context, state_of_mind->plugin_info, &state_of_mind->plugin),
                         /* cleanup */ destroy_hidden_state(state_of_mind));
 
-    if (state_of_mind->plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
-        destroy_hidden_state(state_of_mind);
-        return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
-    }
-
     if (read_options == NULL) {
         struct sail_read_options *read_options_local = NULL;
 
@@ -120,11 +115,6 @@ sail_error_t start_writing_io_with_options(struct sail_io *io, bool own_io, stru
 
     SAIL_TRY_OR_CLEANUP(load_plugin_by_plugin_info(context, state_of_mind->plugin_info, &state_of_mind->plugin),
                         /* cleanup */ destroy_hidden_state(state_of_mind));
-
-    if (state_of_mind->plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
-        destroy_hidden_state(state_of_mind);
-        return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
-    }
 
     if (write_options == NULL) {
         struct sail_write_options *write_options_local = NULL;
