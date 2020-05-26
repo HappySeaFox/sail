@@ -37,13 +37,8 @@ struct sail_write_features;
 struct sail_write_options {
 
     /*
-     * Request to modify the output pixel format. Plugin (or an underlying codec) may reject
-     * the requested pixel format with an error. If the codec supports source pixels
-     * (sail_write_features.output_pixel_formats contains SAIL_PIXEL_FORMAT_SOURCE), one may
-     * set this field to SAIL_PIXEL_FORMAT_SOURCE to copy pixel data as is.
-     *
-     * NOTE: Some input pixel formats might not map to some output pixel formats.
-     *       SAIL returns an error in this case.
+     * Request to modify the output pixel format. The list of possible output pixel formats
+     * can be obtained from sail_write_features.pixel_formats_mapping_node.
      */
     int output_pixel_format;
 
