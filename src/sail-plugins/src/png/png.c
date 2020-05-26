@@ -312,9 +312,11 @@ SAIL_EXPORT sail_error_t sail_plugin_read_finish_v2(void **state, struct sail_io
 
     sail_destroy_read_options(png_state->read_options);
 
-    if (setjmp(png_jmpbuf(png_state->png_ptr))) {
-        free(png_state);
-        return SAIL_UNDERLYING_CODEC_ERROR;
+    if (png_state->png_ptr != NULL) {
+        if (setjmp(png_jmpbuf(png_state->png_ptr))) {
+            free(png_state);
+            return SAIL_UNDERLYING_CODEC_ERROR;
+        }
     }
 
     if (png_state->png_ptr != NULL) {
