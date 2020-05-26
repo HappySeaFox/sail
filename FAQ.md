@@ -7,10 +7,11 @@ Table of Contents
       * [How many image formats do you plan to implement?](#how-many-image-formats-do-you-plan-to-implement)
       * [I have questions, issues, or proposals](#i-have-questions-issues-or-proposals)
       * [What pixel formats SAIL is able to read?](#what-pixel-formats-sail-is-able-to-read)
-      * [What pixel formats SAIL is able to output after reading?](#what-pixel-formats-sail-is-able-to-output-after-reading)
+      * [What pixel formats SAIL is able to output after reading an image file?](#what-pixel-formats-sail-is-able-to-output-after-reading-an-image-file)
       * [What pixel formats SAIL is able to write?](#what-pixel-formats-sail-is-able-to-write)
       * [How can I read an image and output pixels in different formats?](#how-can-i-read-an-image-and-output-pixels-in-different-formats)
       * [Does SAIL support animated and multi-paged images?](#does-sail-support-animated-and-multi-paged-images)
+      * [Does SAIL support reading from memory?](#does-sail-support-reading-from-memory)
       * [Are there any C/C   examples?](#are-there-any-cc-examples)
       * [Are there any bindings to other programming languages?](#are-there-any-bindings-to-other-programming-languages)
 
@@ -45,9 +46,9 @@ Pull requests are always welcomed.
 SAIL codecs (plugins) always try to support as much input pixel formats as possible. The list of
 pixel formats that can be read by SAIL is plugin-specific and is not publicly available.
 
-## What pixel formats SAIL is able to output after reading?
+## What pixel formats SAIL is able to output after reading an image file?
 
-The `SOURCE`, `BPP24-RGB`, and `BPP32-RGBA` output pixel formats are always supported. Some plugins may
+SAIL is always able to output the `SOURCE`, `BPP24-RGB`, and `BPP32-RGBA` pixel formats after reading. Some plugins may
 support even more output pixel formats. Use `sail_plugin_info_from_extension() -> plugin_info -> read_features ->
 output_pixel_formats` to determine the list of supported output pixel formats per plugin.
 
@@ -75,12 +76,20 @@ read_options->output_pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;
 sail_start_reading_file_with_options(...);
 ```
 
-The `SOURCE`, `BPP24-RGB`, and `BPP32-RGBA` output pixel formats are always supported. See [EXAMPLES](EXAMPLES.md) for more.
+The `SOURCE`, `BPP24-RGB`, and `BPP32-RGBA` output pixel formats are always supported.
+See [EXAMPLES](EXAMPLES.md) for more.
 
 ## Does SAIL support animated and multi-paged images?
 
-Yes. Just continue reading the image file until the reading functions return `0`. If no more frames are available,
-the reading functions return `SAIL_NO_MORE_FRAMES`.
+Yes. Just continue reading the image file until the reading functions return `0`.
+If no more frames are available, the reading functions return `SAIL_NO_MORE_FRAMES`.
+
+## Does SAIL support reading from memory?
+
+Yes. SAIL supports reading/writing from/to files and memory. For technical divers,
+it's also possible to use custom I/O sources.
+
+See `sail_start_reading_file()`, `sail_start_reading_mem()`, and `sail_start_reading_io()`.
 
 ## Are there any C/C++ examples?
 
