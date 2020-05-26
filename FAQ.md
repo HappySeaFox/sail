@@ -1,3 +1,19 @@
+Table of Contents
+=================
+
+   * [SAIL Frequently Asked Questions (FAQ)](#sail-frequently-asked-questions-faq)
+      * [How old is SAIL?](#how-old-is-sail)
+      * [Is SAIL cross-platform?](#is-sail-cross-platform)
+      * [How many image formats do you plan to implement?](#how-many-image-formats-do-you-plan-to-implement)
+      * [I have questions, issues, or proposals](#i-have-questions-issues-or-proposals)
+      * [What pixel formats SAIL is able to read?](#what-pixel-formats-sail-is-able-to-read)
+      * [What pixel formats SAIL is able to output after reading?](#what-pixel-formats-sail-is-able-to-output-after-reading)
+      * [What pixel formats SAIL is able to write?](#what-pixel-formats-sail-is-able-to-write)
+      * [How can I read an image and output pixels in different formats?](#how-can-i-read-an-image-and-output-pixels-in-different-formats)
+      * [Does SAIL support animated and multi-paged images?](#does-sail-support-animated-and-multi-paged-images)
+      * [Are there any C/C   examples?](#are-there-any-cc-examples)
+      * [Are there any bindings to other programming languages?](#are-there-any-bindings-to-other-programming-languages)
+
 # SAIL Frequently Asked Questions (FAQ)
 
 ## How old is SAIL?
