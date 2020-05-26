@@ -41,7 +41,7 @@ int sail_strdup(const char *input, char **output) {
         return 0;
     }
 
-    const size_t len = strlen((char *)input);
+    const size_t len = strlen((const char *)input);
 
     *output = (char *)malloc(len+1);
 
@@ -178,7 +178,7 @@ sail_error_t sail_string_hash(const char *str, uint64_t *hash) {
     const unsigned char *ustr = (const unsigned char *)str;
 
     *hash = 5381;
-    int c;
+    unsigned c;
 
     while ((c = *ustr++) != 0) {
         *hash = ((*hash << 5) + *hash) + c; /* hash * 33 + c */
