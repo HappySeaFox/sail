@@ -30,6 +30,13 @@ sail_error_t sail_start_reading_file(const char *path, struct sail_context *cont
     return 0;
 }
 
+sail_error_t sail_start_reading_mem(const void *buffer, size_t buffer_length, struct sail_context *context, const struct sail_plugin_info *plugin_info, void **state) {
+
+    SAIL_TRY(sail_start_reading_mem_with_options(buffer, buffer_length, context, plugin_info, NULL, state));
+
+    return 0;
+}
+
 sail_error_t sail_read_next_frame(void *state, struct sail_image **image, void **image_bits) {
 
     SAIL_CHECK_STATE_PTR(state);
@@ -107,6 +114,13 @@ sail_error_t sail_stop_reading(void *state) {
 sail_error_t sail_start_writing_file(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info, void **state) {
 
     SAIL_TRY(sail_start_writing_file_with_options(path, context, plugin_info, NULL, state));
+
+    return 0;
+}
+
+sail_error_t sail_start_writing_mem(void *buffer, size_t buffer_length, struct sail_context *context, const struct sail_plugin_info *plugin_info, void **state) {
+
+    SAIL_TRY(sail_start_writing_mem_with_options(buffer, buffer_length, context, plugin_info, NULL, state));
 
     return 0;
 }

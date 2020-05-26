@@ -177,12 +177,11 @@ sail_error_t image_writer::start_writing(void *buffer, size_t buffer_length, con
 {
     SAIL_CHECK_BUFFER_PTR(buffer);
 
-    SAIL_TRY(sail_start_writing_mem_with_options(buffer,
-                                                 buffer_length,
-                                                 d->ctx->sail_context_c(),
-                                                 splugin_info.sail_plugin_info_c(),
-                                                 NULL,
-                                                 &d->state));
+    SAIL_TRY(sail_start_writing_mem(buffer,
+                                    buffer_length,
+                                    d->ctx->sail_context_c(),
+                                    splugin_info.sail_plugin_info_c(),
+                                    &d->state));
 
     return 0;
 }
