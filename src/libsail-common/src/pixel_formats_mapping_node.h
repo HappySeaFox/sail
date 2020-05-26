@@ -32,23 +32,32 @@ extern "C" {
 #endif
 
 /*
- * A simple key-pair structure representing meta information like a JPEG comment.
+ * A mapping to describe which pixel formats are accepted as an input for writing operations,
+ * and which pixel formats are allowed to be written from them.
+ *
+ * It's not just a flat list as not every input pixel format maps to every output pixel format.
+ * For example, the JPEG plugin cannot accept YCBCR pixels and output CMYK pixels from them.
+ *
+ * That's why we need a more complex structure.
  */
 struct sail_pixel_formats_mapping_node {
 
     /*
-     * A supported input pixel format that can be read by this plugin. See SailPixelFormat.
+     * A supported input pixel format that can be accepted as input. See SailPixelFormat.
      *
      * For example: BPP24-RGB.
      */
     int input_pixel_format;
 
     /*
-     * A list of supported pixel formats that can be output from the input pixel format by this plugin.
+     * A list of supported pixel formats that can be output from the input pixel format.
      *
-     * If the array contains SAIL_PIXEL_FORMAT_SOURCE, then the codec is able to output raw pixel data.
-     * It is a caller's responsibility to convert it to a suitable pixel format. Refer to
-     * sail_image.pixel_format to detect the actual pixel format of the raw pixel data in that case.
+     * If the array contains the SOURCE pixel format, then the codec is able to output pixel data as is.
+     * It is a caller's responsibility to convert it to a suitable pixel format in this case. Refer to
+     * sail_image.pixel_format to detect the actual pixel format of the pixel data.
+     *
+     * Outputting SOURCE pixels is always supported. Some plugins may provide even more
+     * pixel formats to output.
      *
      * For example: SOURCE, BPP32-RGBA.
      */

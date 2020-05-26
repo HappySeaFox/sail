@@ -39,7 +39,10 @@ struct sail_pixel_formats_mapping_node;
 struct sail_write_features {
 
     /*
-     * A list of supported pixel formats that can be read and output by this plugin.
+     * A mapping of supported pixel formats that can be written by this plugin.
+     *
+     * Outputting SOURCE pixels is always supported. Some plugins may provide even more
+     * pixel formats to output.
      */
     struct sail_pixel_formats_mapping_node *pixel_formats_mapping_node;
 

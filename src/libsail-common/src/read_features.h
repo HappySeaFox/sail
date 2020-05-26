@@ -39,12 +39,9 @@ struct sail_pixel_formats_mapping_node;
 struct sail_read_features {
 
     /*
-     * A list of supported pixel formats that can be output by this plugin. All plugins share the same
-     * output pixel formats:
-     *
-     *   - SAIL_PIXEL_FORMAT_SOURCE
-     *   - SAIL_PIXEL_FORMAT_BPP24_RGB
-     *   - SAIL_PIXEL_FORMAT_BPP32_RGBA
+     * A list of supported pixel formats that can be output by this plugin.
+     * The SOURCE, BPP24-RGB, and BPP32-RGBA output pixel formats are always supported. Some plugins may
+     * provide even more output pixel formats.
      */
     int *output_pixel_formats;
 
@@ -52,7 +49,7 @@ struct sail_read_features {
     int output_pixel_formats_length;
 
     /*
-     * Output pixel format to use by default when no specific output pixel format was requested by user.
+     * Output pixel format to use by default when no specific output pixel format was requested by a user.
      * It's always BPP24-RGB for image formats without transparency support and BPP32-RGBA otherwise.
      */
     int preferred_output_pixel_format;

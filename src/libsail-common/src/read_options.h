@@ -39,6 +39,8 @@ struct sail_read_options {
     /*
      * Request to modify the output pixel format. The list of possible output pixel formats
      * can be obtained from sail_read_features.output_pixel_formats.
+     *
+     * The SOURCE, BPP24-RGB, and BPP32-RGBA output pixel formats are always supported.
      */
     int output_pixel_format;
 
