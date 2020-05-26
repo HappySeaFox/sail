@@ -28,7 +28,6 @@ endif()
 #
 sail_check_include(ctype.h)
 sail_check_include(errno.h)
-sail_check_include(limits.h)
 sail_check_include(setjmp.h)
 sail_check_include(stdarg.h)
 sail_check_include(stdbool.h)
