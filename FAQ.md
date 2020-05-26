@@ -31,7 +31,7 @@ are currently supported. Pull requests to support more platforms are highly welc
 
 ## How many image formats do you plan to implement?
 
-Ksquirrel-libs supported around 50 image formats. I don't plan to port all of them. However,
+Ksquirrel-libs supported around 60 image formats. I don't plan to port all of them. However,
 the most popular image formats will be definitely ported from ksquirrel-libs.
 
 ## I have questions, issues, or proposals
