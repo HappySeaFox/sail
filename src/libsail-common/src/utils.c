@@ -501,7 +501,7 @@ sail_error_t sail_bytes_per_line(unsigned width, int pixel_format, unsigned *res
 
     const int add = bits_per_pixel % 8 == 0 ? 0 : 1;
 
-    *result = (int)(((double)width * bits_per_pixel / 8) + add);
+    *result = (unsigned)(((double)width * bits_per_pixel / 8) + add);
 
     return 0;
 }
