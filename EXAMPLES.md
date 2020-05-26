@@ -90,7 +90,7 @@ SAIL_TRY(reader.read(path, &image));
 
 ### 2. `advanced`
 
-**Purpose:** read a single or multiple image frames.
+**Purpose:** read a single-paged or multi-paged image from a file or memory.
 
 #### C:
 ```C
@@ -195,7 +195,7 @@ SAIL_TRY(reader.stop_reading());
 
 ### 3. `deep diver`
 
-**Purpose:** read a single JPEG image from memory. Specify a concrete plugin to use.
+**Purpose:** read a single-paged or multi-paged image from a file or memory. Specify a concrete plugin to use.
              Possibly specify a desired pixel format to output.
 
 #### C:

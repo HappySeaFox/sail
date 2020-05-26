@@ -3,17 +3,19 @@
 SAIL is a fast and lightweight cross-platform image decoding and encoding library providing multi-leveled APIs,
 from one-liners to complex use cases with custom I/O sources. :sailboat:
 
-SAIL is a fork of ksquirrel-libs, which was a set of C++ image codecs for the KSquirrel image viewer.
-See [http://ksquirrel.sourceforge.net](http://ksquirrel.sourceforge.net).
+SAIL is a rebranded ksquirrel-libs, enchanced and with high-level APIs. Ksquirrel-libs was a set of C++ image codecs
+for the KSquirrel image viewer. See [http://ksquirrel.sourceforge.net](http://ksquirrel.sourceforge.net).
+
+See [FAQ](FAQ.md) for more.
 
 Author: Dmitry Baryshev
 
 ## Target audience
 
-- Image viewers.
-- Game developers.
+- Image viewers
+- Game developers
 - Anyone who needs to load or save images in different image formats and who requires
-  a lightweight and comprehensive API for that.
+  a lightweight and comprehensive API for that
 
 ## Features overview
 
@@ -23,12 +25,11 @@ Author: Dmitry Baryshev
 - Reading images from file and memory
 - Writing images to file and memory
 - I/O abstraction for technical divers
-- Reading operations are always able to output pixels in the `SOURCE`, `BPP24-RGB`,
-  and `BPP32-RGBA` formats. Supporting other output pixel formats is plugin-specific
-- Reading operations are able to output pixels in the **source pixel format**
+- Reading operations are always able to output pixels in the `SOURCE`, `BPP24-RGB`
+  and `BPP32-RGBA` formats. Some plugins may output even more
+- Reading operations are always able to output pixels in the **source pixel format**
   for those who want to kick the hell out of images manually. For example, one may want to work with
   `CMYK` pixels in a print image
-- Image formats are supported by dynamically loaded codecs (plugins)
 - Read and write meta information like JPEG comments
 - Easily extensible with new image formats for those who want to implement a specific codec for his/her needs
 - Qt, SDL, and pure C examples
@@ -48,8 +49,8 @@ Author: Dmitry Baryshev
 
 ## Supported image formats
 
-| N  | Image format                                                                           | Operations    | Dependencies  |
-| -- | -------------------------------------------------------------------------------------- | ------------- | ------------- |
+| N  | Image format                                                                            | Operations    | Dependencies  |
+| -- | --------------------------------------------------------------------------------------- | ------------- | ------------- |
 | 1  | [JPEG (Joint Photographic Experts Group)](https://wikipedia.org/wiki/JPEG)              | RW            | libjpeg-turbo |
 | 2  | [PNG (Portable Network Graphics)](https://wikipedia.org/wiki/Portable_Network_Graphics) | RW            | libpng        |
 
@@ -65,12 +66,16 @@ Currently, SAIL supports the Windows and Linux platforms.
 
 ## Development status
 
-SAIL is under heavy development. The API can be changed at any time breaking binary compatibility.
+SAIL is under heavy development. The API can be changed at any time breaking binary compatibility. Consider opening a GitHub
+[issue](https://github.com/smoked-herring/sail/issues) if you have feature requests or issue reports. Pull requests
+are highly welcomed as well.
 
 ## Have questions or issues?
 
 Opening a GitHub [issue](https://github.com/smoked-herring/sail/issues) is the preferred way
 of communicating and solving problems.
+
+See [FAQ](FAQ.md) for more.
 
 ## Architecture overview
 
@@ -152,11 +157,11 @@ SAIL_TRY(reader.read(path, &image));
 
 It's pretty easy, isn't it? :smile: See [EXAMPLES](EXAMPLES.md) for more.
 
-### 2. `Advanced` - "I want to load this damn animated GIF."
+### 2. `Advanced` - "I want to load this damn animated GIF from memory."
 
 See [EXAMPLES](EXAMPLES.md) for more.
 
-### 3. `Deep diver` - "I want to load this damn possibly multi-paged image from memory and have comprehensive control over selected plugins and output pixel formats."
+### 3. `Deep diver` - "I want to load this damn possibly multi-paged image from memory with options and have control over selected plugins and output pixel formats."
 
 See [EXAMPLES](EXAMPLES.md) for more.
 

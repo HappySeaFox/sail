@@ -70,6 +70,26 @@ SAIL_EXPORT sail_error_t sail_start_reading_file(const char *path, struct sail_c
                                                  const struct sail_plugin_info *plugin_info, void **state);
 
 /*
+ * Starts reading the specified memory buffer.
+ *
+ * The subsequent calls to sail_read_next_frame() output pixels in BPP24-RGB
+ * pixel format for image formats without transparency support and BPP32-RGBA otherwise.
+ *
+ * Typical usage: sail_plugin_info_from_extension() ->
+ *                sail_start_reading_mem()          ->
+ *                sail_read_next_frame()            ->
+ *                sail_stop_reading().
+ *
+ * STATE explanation: Passes the address of a local void* pointer. SAIL will store an internal state
+ * in it and destroy it in sail_stop_reading(). States must be used per image. DO NOT use the same state
+ * to start reading multiple images at the same time.
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_start_reading_mem(const void *buffer, size_t buffer_length, struct sail_context *context,
+                                                const struct sail_plugin_info *plugin_info, void **state);
+
+/*
  * Continues reading the file started by sail_start_reading_file() and brothers. The assigned image
  * MUST be destroyed later with sail_image_destroy(). The assigned image bits MUST be destroyed later
  * with free().
@@ -122,6 +142,26 @@ SAIL_EXPORT sail_error_t sail_stop_reading(void *state);
  */
 SAIL_EXPORT sail_error_t sail_start_writing_file(const char *path, struct sail_context *context,
                                                  const struct sail_plugin_info *plugin_info, void **state);
+
+/*
+ * Starts writing the specified memory buffer.
+ *
+ * The subsequent calls to sail_write_next_frame() output pixels in pixel format
+ * as specified in sail_write_features.preferred_output_pixel_format.
+ *
+ * Typical usage: sail_plugin_info_from_extension() ->
+ *                sail_start_writing_mem()          ->
+ *                sail_write_next_frame()           ->
+ *                sail_stop_writing().
+ *
+ * STATE explanation: Passes the address of a local void* pointer. SAIL will store an internal state
+ * in it and destroy it in sail_stop_writing. States must be used per image. DO NOT use the same state
+ * to start writing multiple images at the same time.
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_start_writing_mem(void *buffer, size_t buffer_length, struct sail_context *context,
+                                                const struct sail_plugin_info *plugin_info, void **state);
 
 /*
  * Continues writing the file started by sail_start_writing_file() and brothers.
