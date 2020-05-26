@@ -105,7 +105,7 @@ static sail_error_t parse_serialized_ints(const char *value, int **target, int *
     }
 
     if (*length > 0) {
-        *target = (int *)malloc(*length * sizeof(int));
+        *target = (int *)malloc((size_t)*length * sizeof(int));
 
         if (*target == NULL) {
             SAIL_LOG_ERROR("Failed to allocate %d integers", *length);
