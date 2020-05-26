@@ -345,11 +345,7 @@ static sail_error_t check_plugin_info(const char *path, const struct sail_plugin
     return 0;
 }
 
-/*
- * Public functions.
- */
-
-int sail_alloc_plugin_info(struct sail_plugin_info **plugin_info) {
+static sail_error_t alloc_plugin_info(struct sail_plugin_info **plugin_info) {
 
     *plugin_info = (struct sail_plugin_info *)malloc(sizeof(struct sail_plugin_info));
 
@@ -370,7 +366,7 @@ int sail_alloc_plugin_info(struct sail_plugin_info **plugin_info) {
     return 0;
 }
 
-void destroy_plugin_info(struct sail_plugin_info *plugin_info) {
+static void destroy_plugin_info(struct sail_plugin_info *plugin_info) {
 
     if (plugin_info == NULL) {
         return;
@@ -389,6 +385,10 @@ void destroy_plugin_info(struct sail_plugin_info *plugin_info) {
 
     free(plugin_info);
 }
+
+/*
+ * Public functions.
+ */
 
 sail_error_t alloc_plugin_info_node(struct sail_plugin_info_node **plugin_info_node) {
 
@@ -435,7 +435,7 @@ sail_error_t plugin_read_info(const char *path, struct sail_plugin_info **plugin
 
     SAIL_LOG_DEBUG("Loading plugin info '%s'", path);
 
-    SAIL_TRY(sail_alloc_plugin_info(plugin_info));
+    SAIL_TRY(alloc_plugin_info(plugin_info));
     SAIL_TRY_OR_CLEANUP(sail_alloc_read_features(&(*plugin_info)->read_features),
                         destroy_plugin_info(*plugin_info));
     SAIL_TRY_OR_CLEANUP(sail_alloc_write_features(&(*plugin_info)->write_features),
