@@ -84,7 +84,7 @@ the reading functions return `SAIL_NO_MORE_FRAMES`.
 
 ## Are there any C/C++ examples?
 
-See [EXAMPLES](EXAMPLES.md) for more.
+Yes. See [EXAMPLES](EXAMPLES.md) for more.
 
 ## Are there any bindings to other programming languages?
 
