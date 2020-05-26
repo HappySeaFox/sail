@@ -23,10 +23,10 @@ Author: Dmitry Baryshev
 - Reading images from file and memory
 - Writing images to file and memory
 - I/O abstraction for technical divers
-- Reading operations are always able to output pixels in the `BPP24-RGB`
+- Reading operations are always able to output pixels in the `SOURCE`, `BPP24-RGB`,
   and `BPP32-RGBA` formats. Supporting other output pixel formats is plugin-specific
-- Reading operations are always able to output pixels in the **source pixel format**
-  for those who want to kick the hell out of images manually. For example, one may want to work with raw
+- Reading operations are able to output pixels in the **source pixel format**
+  for those who want to kick the hell out of images manually. For example, one may want to work with
   `CMYK` pixels in a print image
 - Image formats are supported by dynamically loaded codecs (plugins)
 - Read and write meta information like JPEG comments
