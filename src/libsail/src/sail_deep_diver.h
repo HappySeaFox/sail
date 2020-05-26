@@ -44,7 +44,7 @@ struct sail_write_options;
  * to start reading with a specific codec. If not, just pass NULL. If you do not need specific read options,
  * just pass NULL. Plugin-specific defaults will be used in this case.
  *
- * Read options are deep copied.
+ * The read options are deep copied.
  *
  * If read options is NULL, the subsequent calls to sail_read_next_frame() output pixels in BPP24-RGB
  * pixel format for image formats without transparency support and BPP32-RGBA otherwise.
@@ -72,7 +72,7 @@ SAIL_EXPORT sail_error_t sail_start_reading_file_with_options(const char *path, 
  * Starts reading the specified memory buffer with the specified read options. If you do not need specific read options,
  * just pass NULL. Plugin-specific defaults will be used in this case.
  *
- * Read options are deep copied.
+ * The read options are deep copied.
  *
  * If read options is NULL, the subsequent calls to sail_read_next_frame() output pixels in BPP24-RGB
  * pixel format for image formats without transparency support and BPP32-RGBA otherwise.
@@ -97,7 +97,7 @@ SAIL_EXPORT sail_error_t sail_start_reading_mem_with_options(const void *buffer,
  * to start writing with a specific codec. If not, just pass NULL. If you do not need specific write options,
  * just pass NULL. Plugin-specific defaults will be used in this case.
  *
- * Write options are deep copied.
+ * The write options are deep copied.
  *
  * If write options is NULL, the subsequent calls to sail_write_next_frame() output pixels in pixel format
  * as specified in sail_write_features.preferred_output_pixel_format.
@@ -125,7 +125,7 @@ SAIL_EXPORT sail_error_t sail_start_writing_file_with_options(const char *path, 
  * Starts writing the specified memory buffer with the specified write options. If you do not need specific
  * write options, just pass NULL. Plugin-specific defaults will be used in this case.
  *
- * Write options are deep copied.
+ * The write options are deep copied.
  *
  * If write options is NULL, the subsequent calls to sail_write_next_frame() output pixels in pixel format
  * as specified in sail_write_features.preferred_output_pixel_format.
