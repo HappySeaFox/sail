@@ -45,7 +45,7 @@
 static const char* plugins_path(void) {
 
     SAIL_THREAD_LOCAL static bool plugins_path_called = false;
-    SAIL_THREAD_LOCAL static char *env = NULL;
+    SAIL_THREAD_LOCAL static const char *env = NULL;
 
     if (plugins_path_called) {
         return env;
