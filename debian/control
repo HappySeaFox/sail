@@ -3,6 +3,8 @@ Priority: optional
 Maintainer: Dmitry Baryshev <dmitrymq@gmail.com>
 Build-Depends: debhelper (>=9), build-essential, libjpeg-dev, libpng-dev
 Standards-Version: 3.9.6
+Vcs-Browser: https://github.com/smoked-herring/sail
+Vcs-Git: https://github.com/smoked-herring/sail.git
 
 Package: libsail-common0
 Section: libs
