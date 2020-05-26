@@ -504,9 +504,11 @@ SAIL_EXPORT sail_error_t sail_plugin_write_finish_v2(void **state, struct sail_i
     sail_destroy_write_options(png_state->write_options);
 
     /* Error handling setup. */
-    if (setjmp(png_jmpbuf(png_state->png_ptr))) {
-        free(png_state);
-        return SAIL_UNDERLYING_CODEC_ERROR;
+    if (png_state->png_ptr != NULL) {
+        if (setjmp(png_jmpbuf(png_state->png_ptr))) {
+            free(png_state);
+            return SAIL_UNDERLYING_CODEC_ERROR;
+        }
     }
 
     if (png_state->png_ptr != NULL && !png_state->libpng_error) {
