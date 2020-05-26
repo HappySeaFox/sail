@@ -28,7 +28,6 @@ class SAIL_HIDDEN write_features::pimpl
 public:
     pimpl()
         : sail_write_features_c(nullptr)
-        , preferred_output_pixel_format(SAIL_PIXEL_FORMAT_UNKNOWN)
         , features(0)
         , properties(0)
         , preferred_compression_type(0)
@@ -39,9 +38,7 @@ public:
 
     const sail_write_features *sail_write_features_c;
 
-    std::vector<int> input_pixel_formats;
-    std::vector<int> output_pixel_formats;
-    int preferred_output_pixel_format;
+    std::map<int, std::vector<int>> pixel_formats_mappings;
     int features;
     int properties;
     std::vector<int> compression_types;
@@ -61,9 +58,7 @@ write_features& write_features::operator=(const write_features &wf)
 {
     d->sail_write_features_c = wf.d->sail_write_features_c;
 
-    with_input_pixel_formats(wf.input_pixel_formats())
-        .with_output_pixel_formats(wf.output_pixel_formats())
-        .with_preferred_output_pixel_format(wf.preferred_output_pixel_format())
+    with_pixel_formats_mappings(wf.pixel_formats_mappings())
         .with_features(wf.features())
         .with_properties(wf.properties())
         .with_compression_types(compression_types())
@@ -80,19 +75,9 @@ write_features::~write_features()
     delete d;
 }
 
-std::vector<int> write_features::input_pixel_formats() const
+std::map<int, std::vector<int>> write_features::pixel_formats_mappings() const
 {
-    return d->input_pixel_formats;
-}
-
-std::vector<int> write_features::output_pixel_formats() const
-{
-    return d->output_pixel_formats;
-}
-
-int write_features::preferred_output_pixel_format() const
-{
-    return d->preferred_output_pixel_format;
+    return d->pixel_formats_mappings;
 }
 
 int write_features::features() const
@@ -163,24 +148,20 @@ write_features::write_features(const sail_write_features *wf)
 
     d->sail_write_features_c = wf;
 
-    std::vector<int> input_pixel_formats;
+    std::map<int, std::vector<int>> pixel_formats_mappings;
+    sail_pixel_formats_mapping_node *node = wf->pixel_formats_mapping_node;
 
-    if (wf->input_pixel_formats != nullptr && wf->input_pixel_formats_length > 0) {
-        input_pixel_formats.reserve(wf->input_pixel_formats_length);
+    while (node != nullptr) {
+        std::vector<int> pixel_formats;
+        pixel_formats.reserve(node->output_pixel_formats_length);
 
-        for (int i = 0; i < wf->input_pixel_formats_length; i++) {
-            input_pixel_formats.push_back(wf->input_pixel_formats[i]);
+        for (int i = 0; i < node->output_pixel_formats_length; i++) {
+            pixel_formats.push_back(node->output_pixel_formats[i]);
         }
-    }
 
-    std::vector<int> output_pixel_formats;
+        pixel_formats_mappings[node->input_pixel_format] = pixel_formats;
 
-    if (wf->output_pixel_formats != nullptr && wf->output_pixel_formats_length > 0) {
-        output_pixel_formats.reserve(wf->output_pixel_formats_length);
-
-        for (int i = 0; i < wf->output_pixel_formats_length; i++) {
-            output_pixel_formats.push_back(wf->output_pixel_formats[i]);
-        }
+        node = node->next;
     }
 
     std::vector<int> compression_types;
@@ -193,33 +174,19 @@ write_features::write_features(const sail_write_features *wf)
         }
     }
 
-    with_input_pixel_formats(input_pixel_formats)
-        .with_output_pixel_formats(output_pixel_formats)
-        .with_preferred_output_pixel_format(wf->preferred_output_pixel_format)
+    with_pixel_formats_mappings(pixel_formats_mappings)
         .with_features(wf->features)
         .with_properties(wf->properties)
         .with_compression_types(compression_types)
         .with_preferred_compression_type(wf->preferred_compression_type)
         .with_compression_min(wf->compression_min)
         .with_compression_max(wf->compression_max)
-        .with_compression_default(wf->compression_default);
+            .with_compression_default(wf->compression_default);
 }
 
-write_features& write_features::with_input_pixel_formats(const std::vector<int> &input_pixel_formats)
+write_features &write_features::with_pixel_formats_mappings(const std::map<int, std::vector<int> > &pixel_formats_mappings)
 {
-    d->input_pixel_formats = input_pixel_formats;
-    return *this;
-}
-
-write_features& write_features::with_output_pixel_formats(const std::vector<int> &output_pixel_formats)
-{
-    d->output_pixel_formats = output_pixel_formats;
-    return *this;
-}
-
-write_features& write_features::with_preferred_output_pixel_format(int preferred_output_pixel_format)
-{
-    d->preferred_output_pixel_format = preferred_output_pixel_format;
+    d->pixel_formats_mappings = pixel_formats_mappings;
     return *this;
 }
 
