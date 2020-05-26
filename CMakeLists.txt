@@ -161,7 +161,7 @@ set(SAIL_ICONS_PATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/sail/i
 if (WIN32)
     string(REPLACE "/" "\\\\" SAIL_ICONS_PATH "${SAIL_ICONS_PATH}")
 endif()
-execute_process(COMMAND git rev-parse --short HEAD
+execute_process(COMMAND git -C "${PROJECT_SOURCE_DIR}" rev-parse --short HEAD
                 RESULT_VARIABLE SAIL_GIT_HASH_RESULT
                 OUTPUT_VARIABLE SAIL_GIT_HASH
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
