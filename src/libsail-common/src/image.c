@@ -22,7 +22,7 @@
 
 #include "sail-common.h"
 
-int sail_alloc_image(struct sail_image **image) {
+sail_error_t sail_alloc_image(struct sail_image **image) {
 
     *image = (struct sail_image *)malloc(sizeof(struct sail_image));
 
