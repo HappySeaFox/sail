@@ -259,6 +259,25 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
                             /* cleanup */ sail_destroy_image(*image));
     }
 
+    /* Read ICC profile. */
+    if (png_state->read_options->io_options & SAIL_IO_OPTION_ICC) {
+        SAIL_TRY_OR_CLEANUP(sail_alloc_icc(&(*image)->icc),
+                            /* cleanup */ sail_destroy_image(*image));
+
+        bool ok = png_get_iCCP(png_state->png_ptr,
+                                png_state->info_ptr,
+                                &(*image)->icc->name,
+                                /* compression - not needed */ NULL,
+                                (png_bytepp)&(*image)->icc->data,
+                                &(*image)->icc->data_length) == PNG_INFO_iCCP;
+
+        if (ok) {
+            SAIL_LOG_DEBUG("PNG: ICC profile %u bytes length is found", (*image)->icc->data_length);
+        } else {
+            SAIL_LOG_DEBUG("PNG: ICC profile is not found");
+        }
+    }
+
     const char *pixel_format_str = NULL;
     SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string((*image)->source_pixel_format, &pixel_format_str));
     SAIL_LOG_DEBUG("PNG: Input pixel format is %s", pixel_format_str);
@@ -419,6 +438,18 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v2(void *state, struc
                  (png_state->write_options->io_options & SAIL_IO_OPTION_INTERLACED) ? PNG_INTERLACE_ADAM7 : PNG_INTERLACE_NONE,
                  PNG_COMPRESSION_TYPE_BASE,
                  PNG_FILTER_TYPE_BASE);
+
+    /* Write ICC profile. */
+    if (png_state->write_options->io_options & SAIL_IO_OPTION_ICC && image->icc != NULL) {
+        png_set_iCCP(png_state->png_ptr,
+                        png_state->info_ptr,
+                        image->icc->name,
+                        PNG_COMPRESSION_TYPE_BASE,
+                        (const png_bytep)image->icc->data,
+                        image->icc->data_length);
+
+        SAIL_LOG_DEBUG("PNG: ICC profile has been set");
+    }
 
     const int compression = (png_state->write_options->compression < COMPRESSION_MIN ||
                                 png_state->write_options->compression > COMPRESSION_MAX)
