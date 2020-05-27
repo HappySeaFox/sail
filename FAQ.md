@@ -6,13 +6,15 @@ Table of Contents
       * [Is SAIL cross-platform?](#is-sail-cross-platform)
       * [How many image formats do you plan to implement?](#how-many-image-formats-do-you-plan-to-implement)
       * [I have questions, issues, or proposals](#i-have-questions-issues-or-proposals)
+      * [Does SAIL provide simple one-line APIs?](#does-sail-provide-simple-one-line-apis)
+      * [How can point SAIL to a different plugins location?](#how-can-point-sail-to-a-different-plugins-location)
       * [What pixel formats SAIL is able to read?](#what-pixel-formats-sail-is-able-to-read)
       * [What pixel formats SAIL is able to output after reading an image file?](#what-pixel-formats-sail-is-able-to-output-after-reading-an-image-file)
       * [What pixel formats SAIL is able to write?](#what-pixel-formats-sail-is-able-to-write)
       * [How can I read an image and output pixels in different formats?](#how-can-i-read-an-image-and-output-pixels-in-different-formats)
       * [Does SAIL support animated and multi-paged images?](#does-sail-support-animated-and-multi-paged-images)
       * [Does SAIL support reading from memory?](#does-sail-support-reading-from-memory)
-      * [Are there any C/C   examples?](#are-there-any-cc-examples)
+      * [Are there any C/C++ examples?](#are-there-any-cc-examples)
       * [Are there any bindings to other programming languages?](#are-there-any-bindings-to-other-programming-languages)
 
 # SAIL Frequently Asked Questions (FAQ)
@@ -41,6 +43,15 @@ of communicating and solving problems.
 
 Pull requests are always welcomed.
 
+## Does SAIL provide simple one-line APIs?
+
+Yes. SAIL provides four levels of APIs, depending on your needs: `junior`, `advanced`, `deep diver`, and `technical diver`.
+See [EXAMPLES](EXAMPLES.md) for more.
+
+## How can point SAIL to a different plugins location?
+
+Set `SAIL_PLUGINGS_PATH` environment variable to a desired location.
+
 ## What pixel formats SAIL is able to read?
 
 SAIL codecs (plugins) always try to support as much input pixel formats as possible. The list of
@@ -61,6 +72,22 @@ SAIL codecs (plugins) always try to support as much output pixel formats as poss
 pixel formats that can be written by SAIL is plugin-specific and is publicly available in every
 .plugin.info file. It can be accessed through `sail_plugin_info_from_extension() -> plugin_info -> write_features ->
 pixel_formats_mapping_node`.
+
+`pixel_formats_mapping_node` is a map-like linked list describing what pixel formats SAIL is able to write from
+the given input pixel format. Consider the following structure of `pixel_formats_mapping_node`:
+
+| Input pixel format    | Output pixel formats                      |
+| --------------------- | ----------------------------------------- |
+| `BPP8-GRAYSCALE`      | `SOURCE`                                  |
+| `BPP24-RGB`           | `SOURCE`, `BPP24-YCBCR`, `BPP8-GRAYSCALE` |
+
+The structure above has the following meaning:
+
+1. When a user has an image in `BPP8-GRAYSCALE` format, he/she is able to save it as a `BPP8-GRAYSCALE` (`SOURCE`) image only
+2. When a user has an image in `BPP24-RGB` format, he/she is able to save it as a `BPP24-RGB` (`SOURCE`),
+   `BPP24-YCBCR`, and `BPP8-GRAYSCALE` image
+
+The `SOURCE` output pixel format is always supported.
 
 ## How can I read an image and output pixels in different formats?
 

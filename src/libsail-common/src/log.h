@@ -19,8 +19,6 @@
 #ifndef SAIL_LOG_H
 #define SAIL_LOG_H
 
-#include <limits.h>
-
 #ifdef SAIL_BUILD
     #include "export.h"
 #else
@@ -38,9 +36,6 @@ enum SailLogLevel {
     SAIL_LOG_LEVEL_INFO,
     SAIL_LOG_LEVEL_MESSAGE,
     SAIL_LOG_LEVEL_DEBUG,
-
-    /* Not to be used. Resize the enum for future elements. */
-    SAIL_LOG_LEVEL_RESIZE_ENUM_TO_INT = UINT_MAX
 };
 
 SAIL_EXPORT void sail_log(int level, const char *file, int line, const char *format, ...);

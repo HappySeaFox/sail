@@ -45,10 +45,10 @@ static sail_error_t probe(const char *path, struct sail_context *context) {
     SAIL_TRY(sail_now(&end_time));
 
     printf("File          : %s\n", path);
-    printf("Probe time    : %ld ms.\n", (unsigned long)(end_time - start_time));
+    printf("Probe time    : %lu ms.\n", (unsigned long)(end_time - start_time));
     printf("Codec         : %s [%s]\n", plugin_info->name, plugin_info->description);
     printf("Codec version : %s\n", plugin_info->version);
-    printf("Size          : %dx%d\n", image->width, image->height);
+    printf("Size          : %ux%u\n", image->width, image->height);
     const char *pixel_format_str;
     SAIL_TRY(sail_pixel_format_to_string(image->source_pixel_format, &pixel_format_str));
     printf("Color         : %s\n", pixel_format_str);

@@ -61,7 +61,7 @@ static sail_error_t io_mem_read(void *stream, void *buf, size_t object_size, siz
     }
 
     while (mem_io_buffer_info->pos <= mem_io_buffer_info->buffer_length - object_size && objects_count > 0) {
-        memcpy(buf, (char *)mem_io_read_stream->buffer + mem_io_buffer_info->pos, object_size);
+        memcpy(buf, (const char *)mem_io_read_stream->buffer + mem_io_buffer_info->pos, object_size);
 
         buf = (char *)buf + object_size;
         mem_io_buffer_info->pos += object_size;
@@ -156,7 +156,7 @@ static sail_error_t io_mem_write(void *stream, const void *buf, size_t object_si
     while (mem_io_buffer_info->pos <= mem_io_buffer_info->buffer_length - object_size && objects_count > 0) {
         memcpy((char *)mem_io_write_stream->buffer + mem_io_buffer_info->pos, buf, object_size);
 
-        buf = (char *)buf + object_size;
+        buf = (const char *)buf + object_size;
         mem_io_buffer_info->pos += object_size;
 
         (*written_objects_count)++;

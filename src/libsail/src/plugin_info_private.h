@@ -35,20 +35,6 @@ struct sail_plugin_info;
  */
 
 /*
- * Allocates a new plugin info object. The assigned plugin info MUST be destroyed later
- * with destroy_plugin_info().
- *
- * Returns 0 on success or sail_error_t on error.
- */
-SAIL_HIDDEN sail_error_t alloc_plugin_info(struct sail_plugin_info **plugin_info);
-
-/*
- * Destroys the specified plugin_info and all its internal allocated memory buffers.
- * The "plugin_info" pointer MUST NOT be used after calling this function.
- */
-SAIL_HIDDEN void destroy_plugin_info(struct sail_plugin_info *plugin_info);
-
-/*
  * Allocates a new plugin info node. The assigned node MUST be destroyed later
  * with destroy_plugin_info_node().
  *

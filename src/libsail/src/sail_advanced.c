@@ -165,7 +165,7 @@ sail_error_t sail_write_next_frame(void *state, const struct sail_image *image, 
             SAIL_TRY(state_of_mind->plugin->v2->write_scan_line_v2(state_of_mind->state,
                                                                     state_of_mind->io,
                                                                     image,
-                                                                    ((char *)image_bits) + j * bytes_per_line));
+                                                                    ((const char *)image_bits) + j * bytes_per_line));
         }
     }
 

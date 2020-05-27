@@ -41,7 +41,7 @@ int sail_strdup(const char *input, char **output) {
         return 0;
     }
 
-    const size_t len = strlen((char *)input);
+    const size_t len = strlen((const char *)input);
 
     *output = (char *)malloc(len+1);
 
@@ -178,7 +178,7 @@ sail_error_t sail_string_hash(const char *str, uint64_t *hash) {
     const unsigned char *ustr = (const unsigned char *)str;
 
     *hash = 5381;
-    int c;
+    unsigned c;
 
     while ((c = *ustr++) != 0) {
         *hash = ((*hash << 5) + *hash) + c; /* hash * 33 + c */
@@ -501,7 +501,7 @@ sail_error_t sail_bytes_per_line(unsigned width, int pixel_format, unsigned *res
 
     const int add = bits_per_pixel % 8 == 0 ? 0 : 1;
 
-    *result = (int)(((double)width * bits_per_pixel / 8) + add);
+    *result = (unsigned)(((double)width * bits_per_pixel / 8) + add);
 
     return 0;
 }
