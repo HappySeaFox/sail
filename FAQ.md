@@ -73,6 +73,22 @@ pixel formats that can be written by SAIL is plugin-specific and is publicly ava
 .plugin.info file. It can be accessed through `sail_plugin_info_from_extension() -> plugin_info -> write_features ->
 pixel_formats_mapping_node`.
 
+`pixel_formats_mapping_node` is a map-like linked list describing what pixel formats SAIL is able to write from
+the given input pixel format. Consider the following structure of `pixel_formats_mapping_node`:
+
+| Input pixel format    | Output pixel formats                      |
+| --------------------- | ----------------------------------------- |
+| `BPP8-GRAYSCALE`      | `SOURCE`                                  |
+| `BPP24-RGB`           | `SOURCE`, `BPP24-YCBCR`, `BPP8-GRAYSCALE` |
+
+The structure above has the following meaning:
+
+1. When a user has an image in `BPP8-GRAYSCALE` format, he/she is able to save it as a `BPP8-GRAYSCALE` (`SOURCE`) image only
+2. When a user has an image in `BPP24-RGB` format, he/she is able to save it as a `BPP24-RGB` (`SOURCE`),
+   `BPP24-YCBCR`, and `BPP8-GRAYSCALE` image
+
+The `SOURCE` output pixel format is always supported.
+
 ## How can I read an image and output pixels in different formats?
 
 Use read options for that. For example:
