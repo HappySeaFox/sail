@@ -85,7 +85,7 @@ SAIL_EXPORT sail_error_t sail_string_hash(const char *str, uint64_t *hash);
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_pixel_format_to_string(int pixel_format, const char **result);
+SAIL_EXPORT sail_error_t sail_pixel_format_to_string(enum SailPixelFormat pixel_format, const char **result);
 
 /*
  * Assigns pixel format from a string representation.
@@ -93,7 +93,7 @@ SAIL_EXPORT sail_error_t sail_pixel_format_to_string(int pixel_format, const cha
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_pixel_format_from_string(const char *str, int *result);
+SAIL_EXPORT sail_error_t sail_pixel_format_from_string(const char *str, enum SailPixelFormat *result);
 
 /*
  * Assigns a non-NULL string representation of the specified image property. See SailImageProperties.
@@ -112,20 +112,20 @@ SAIL_EXPORT sail_error_t sail_image_property_to_string(int image_property, const
 SAIL_EXPORT sail_error_t sail_image_property_from_string(const char *str, int *result);
 
 /*
- * Assigns a non-NULL string representation of the specified compression type. See SailCompressionTypes.
+ * Assigns a non-NULL string representation of the specified compression type. See SailCompressionType.
  * The assigned string MUST NOT be destroyed. For example: "RLE".
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_compression_type_to_string(int compression, const char **result);
+SAIL_EXPORT sail_error_t sail_compression_type_to_string(enum SailCompressionType compression, const char **result);
 
 /*
- * Assigns compression from a string representation or 0. See SailCompressionTypes.
+ * Assigns compression from a string representation or 0. See SailCompressionType.
  * For example: SAIL_COMPRESSION_RLE is assigned for "RLE".
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_compression_type_from_string(const char *str, int *result);
+SAIL_EXPORT sail_error_t sail_compression_type_from_string(const char *str, enum SailCompressionType *result);
 
 /*
  * Assigns a non-NULL string representation of the specified plugin feature. See SailPluginFeatures.
@@ -149,7 +149,7 @@ SAIL_EXPORT sail_error_t sail_plugin_feature_from_string(const char *str, int *r
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_bits_per_pixel(int pixel_format, unsigned *result);
+SAIL_EXPORT sail_error_t sail_bits_per_pixel(enum SailPixelFormat pixel_format, unsigned *result);
 
 /*
  * Calculates the number of bytes per line needed to hold a scan line without padding.
@@ -170,7 +170,7 @@ SAIL_EXPORT sail_error_t sail_bits_per_pixel(int pixel_format, unsigned *result)
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_bytes_per_line(unsigned width, int pixel_format, unsigned *result);
+SAIL_EXPORT sail_error_t sail_bytes_per_line(unsigned width, enum SailPixelFormat pixel_format, unsigned *result);
 
 /*
  * Calculates the number of bytes needed to hold an entire image in memory without padding.

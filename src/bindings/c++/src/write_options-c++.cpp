@@ -29,13 +29,13 @@ public:
     pimpl()
         : output_pixel_format(SAIL_PIXEL_FORMAT_UNKNOWN)
         , io_options(0)
-        , compression_type(0)
+        , compression_type(SAIL_COMPRESSION_UNSUPPORTED)
         , compression(0)
     {}
 
-    int output_pixel_format;
+    SailPixelFormat output_pixel_format;
     int io_options;
-    int compression_type;
+    SailCompressionType compression_type;
     int compression;
 };
 
@@ -79,7 +79,7 @@ write_options::~write_options()
     delete d;
 }
 
-int write_options::output_pixel_format() const
+SailPixelFormat write_options::output_pixel_format() const
 {
     return d->output_pixel_format;
 }
@@ -89,7 +89,7 @@ int write_options::io_options() const
     return d->io_options;
 }
 
-int write_options::compression_type() const
+SailCompressionType write_options::compression_type() const
 {
     return d->compression_type;
 }
@@ -99,7 +99,7 @@ int write_options::compression() const
     return d->compression;
 }
 
-write_options& write_options::with_output_pixel_format(int output_pixel_format)
+write_options& write_options::with_output_pixel_format(SailPixelFormat output_pixel_format)
 {
     d->output_pixel_format = output_pixel_format;
     return *this;
@@ -111,7 +111,7 @@ write_options& write_options::with_io_options(int io_options)
     return *this;
 }
 
-write_options& write_options::with_compression_type(int compression_type)
+write_options& write_options::with_compression_type(SailCompressionType compression_type)
 {
     d->compression_type = compression_type;
     return *this;

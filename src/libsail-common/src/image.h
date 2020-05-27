@@ -75,7 +75,7 @@ struct sail_image {
      *        to the plugin by a caller later. The list of supported input pixel formats by a certain plugin
      *        can be obtained from sail_write_features.output_pixel_formats.
      */
-    int pixel_format;
+    enum SailPixelFormat pixel_format;
 
     /*
      * Number of passes needed to read or write an entire image frame if it's interlaced. 1 by default.
@@ -111,7 +111,7 @@ struct sail_image {
      * WRITE: Must be set by a caller to a valid palette pixel format if the image is indexed
      *        (palette is not NULL).
      */
-    int palette_pixel_format;
+    enum SailPixelFormat palette_pixel_format;
 
     /*
      * Palette if the image has a palette and the requested pixel format assumes having a palette.
@@ -162,7 +162,7 @@ struct sail_image {
      *        to a requested pixel format in sail_read_options.pixel_format.
      * WRITE: Ignored.
      */
-    int source_pixel_format;
+    enum SailPixelFormat source_pixel_format;
 
     /*
      * Source image properties. Set by SAIL to a valid source image properties of the image file.
@@ -174,12 +174,12 @@ struct sail_image {
     int source_properties;
 
     /*
-     * Source image compression type. See SailCompressionTypes.
+     * Source image compression type. See SailCompressionType.
      *
-     * READ:  Set by SAIL to a valid source image compression type or to 0.
+     * READ:  Set by SAIL to a valid source image compression type.
      * WRITE: Ignored.
      */
-    int source_compression_type;
+    enum SailCompressionType source_compression_type;
 };
 
 typedef struct sail_image sail_image_t;

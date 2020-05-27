@@ -44,7 +44,7 @@ int sail_alloc_image(struct sail_image **image) {
     (*image)->properties              = 0;
     (*image)->source_pixel_format     = SAIL_PIXEL_FORMAT_UNKNOWN;
     (*image)->source_properties       = 0;
-    (*image)->source_compression_type = 0;
+    (*image)->source_compression_type = SAIL_COMPRESSION_UNSUPPORTED;
 
     return 0;
 }

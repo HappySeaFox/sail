@@ -42,13 +42,13 @@ struct sail_write_options {
      *
      * The SOURCE output pixel format is always supported.
      */
-    int output_pixel_format;
+    enum SailPixelFormat output_pixel_format;
 
     /* IO manipulation options. See SailIoOptions. */
     int io_options;
 
     /*
-     * Compression type or 0. For example: SAIL_COMPRESSION_RLE. See SailCompressionTypes.
+     * Compression type or 0. For example: SAIL_COMPRESSION_RLE. See SailCompressionType.
      * In most cases, plugins support compression levels or compression types, but not both.
      * Use sail_write_features to determine what compression types or values are supported by a particular plugin.
      *
@@ -57,7 +57,7 @@ struct sail_write_options {
      *     1. The JPEG plugin supports only compression levels (compression_min, compression_max, compression_default).
      *     2. The TIFF plugin supports only compression types (RLE or no compression at all).
      */
-    int compression_type;
+    enum SailCompressionType compression_type;
 
     /*
      * Requested compression value. Must be in the range specified by compression_min and compression_max

@@ -91,7 +91,7 @@ public:
      * WRITE: Must be set by a caller to a valid input image pixel format. The list of supported input pixel
      *        formats by a certain plugin can be obtained from write_features.output_pixel_formats.
      */
-    int pixel_format() const;
+    SailPixelFormat pixel_format() const;
 
     /*
      * Returns true if the image is a frame in an animation.
@@ -116,7 +116,7 @@ public:
      * WRITE: Must be set by a caller to a valid palette pixel format if the image is indexed
      *        (palette is not NULL).
      */
-    int palette_pixel_format() const;
+    SailPixelFormat palette_pixel_format() const;
 
     /*
      * Returns palette data if the image has a palette and the requested pixel format assumes having a palette.
@@ -159,7 +159,7 @@ public:
      *        with read_options.pixel_format.
      * WRITE: Ignored.
      */
-    int source_pixel_format() const;
+    SailPixelFormat source_pixel_format() const;
 
     /*
      * Returns image source properties. See SailImageProperties.
@@ -170,12 +170,12 @@ public:
     int source_properties() const;
 
     /*
-     * Image source compression type. See SailCompressionTypes.
+     * Image source compression type. See SailCompressionType.
      *
      * READ:  Set by SAIL to a valid source image compression type or to 0.
      * WRITE: Ignored.
      */
-    int source_compression_type() const;
+    SailCompressionType source_compression_type() const;
 
     /*
      * Returns editable deep copied pixel data if any. Images can hold deep copied or shallow data,
@@ -224,7 +224,7 @@ public:
     /*
      * Sets a new pixel format. See SailPixelFormat.
      */
-    image& with_pixel_format(int pixel_format);
+    image& with_pixel_format(SailPixelFormat pixel_format);
 
     /*
      * Sets a new delay for an animated frame in a sequence.
@@ -234,7 +234,7 @@ public:
     /*
      * Deep copies the specified palette.
      */
-    image& with_palette(void *palette, int palette_color_count, int palette_pixel_format);
+    image& with_palette(void *palette, int palette_color_count, SailPixelFormat palette_pixel_format);
 
     /*
      * Sets new meta entries.
@@ -258,7 +258,7 @@ public:
      *
      * Returns 0 on success or sail_error_t on error.
      */
-    static sail_error_t bits_per_pixel(int pixel_format, unsigned *result);
+    static sail_error_t bits_per_pixel(SailPixelFormat pixel_format, unsigned *result);
 
     /*
      * Calculates a number of bytes per line needed to hold a scan line without padding.
@@ -279,7 +279,7 @@ public:
      *
      * Returns 0 on success or sail_error_t on error.
      */
-    static sail_error_t bytes_per_line(unsigned width, int pixel_format, unsigned *result);
+    static sail_error_t bytes_per_line(unsigned width, SailPixelFormat pixel_format, unsigned *result);
 
     /*
      * Calculates a number of bytes needed to hold an entire image in memory without padding.
@@ -295,7 +295,7 @@ public:
      *
      * Returns 0 on success or sail_error_t on error.
      */
-    static sail_error_t pixel_format_to_string(int pixel_format, const char **result);
+    static sail_error_t pixel_format_to_string(SailPixelFormat pixel_format, const char **result);
 
     /*
      * Assigns pixel format from a string representation.
@@ -303,7 +303,7 @@ public:
      *
      * Returns 0 on success or sail_error_t on error.
      */
-    static sail_error_t pixel_format_from_string(const char *str, int *result);
+    static sail_error_t pixel_format_from_string(const char *str, SailPixelFormat *result);
 
     /*
      * Assigns a non-NULL string representation of the specified image property. See SailImageProperties.
@@ -322,20 +322,20 @@ public:
     static sail_error_t image_property_from_string(const char *str, int *result);
 
     /*
-     * Assigns a non-NULL string representation of the specified compression type. See SailCompressionTypes.
+     * Assigns a non-NULL string representation of the specified compression type. See SailCompressionType.
      * The assigned string MUST NOT be destroyed. For example: "RLE".
      *
      * Returns 0 on success or sail_error_t on error.
      */
-    static sail_error_t compression_type_to_string(int compression, const char **result);
+    static sail_error_t compression_type_to_string(SailCompressionType compression, const char **result);
 
     /*
-     * Assigns compression from a string representation or 0. See SailCompressionTypes.
+     * Assigns compression from a string representation or 0. See SailCompressionType.
      * For example: SAIL_COMPRESSION_RLE is assigned for "RLE".
      *
      * Returns 0 on success or sail_error_t on error.
      */
-    static sail_error_t compression_type_from_string(const char *str, int *result);
+    static sail_error_t compression_type_from_string(const char *str, SailCompressionType *result);
 
 private:
     // Makes a deep copy of the specified image and the bits
@@ -347,9 +347,9 @@ private:
 
     image& with_animated(bool animated);
     image& with_properties(int properties);
-    image& with_source_pixel_format(int source_pixel_format);
+    image& with_source_pixel_format(SailPixelFormat source_pixel_format);
     image& with_source_properties(int source_properties);
-    image& with_source_compression_type(int source_compression_type);
+    image& with_source_compression_type(SailCompressionType source_compression_type);
 
 private:
     class pimpl;

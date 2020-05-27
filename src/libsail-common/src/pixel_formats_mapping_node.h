@@ -47,7 +47,7 @@ struct sail_pixel_formats_mapping_node {
      *
      * For example: BPP24-RGB.
      */
-    int input_pixel_format;
+    enum SailPixelFormat input_pixel_format;
 
     /*
      * A list of supported pixel formats that can be output from the input pixel format.
@@ -61,7 +61,7 @@ struct sail_pixel_formats_mapping_node {
      *
      * For example: SOURCE, BPP32-RGBA.
      */
-    int *output_pixel_formats;
+    enum SailPixelFormat *output_pixel_formats;
 
     /* The length of output_pixel_formats. */
     int output_pixel_formats_length;

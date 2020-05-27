@@ -53,9 +53,9 @@ WriteOptions::~WriteOptions()
 {
 }
 
-int WriteOptions::pixelFormat() const
+SailPixelFormat WriteOptions::pixelFormat() const
 {
-    return d->ui->comboColor->currentData().toInt();
+    return static_cast<SailPixelFormat>(d->ui->comboColor->currentData().toInt());
 }
 
 int WriteOptions::compression() const
@@ -75,10 +75,10 @@ sail_error_t WriteOptions::init(const sail::write_features &write_features, int 
 
     for (const auto &pair : write_features.pixel_formats_mappings()) {
         const int wf_input_pixel_format = pair.first;
-        const std::vector<int> &wf_output_pixel_formats = pair.second;
+        const std::vector<SailPixelFormat> &wf_output_pixel_formats = pair.second;
 
         if (wf_input_pixel_format == input_pixel_format) {
-            for (int output_pixel_format : wf_output_pixel_formats) {
+            for (SailPixelFormat output_pixel_format : wf_output_pixel_formats) {
                 const char *output_pixel_format_str;
 
                 SAIL_TRY(sail::image::pixel_format_to_string(output_pixel_format, &output_pixel_format_str));

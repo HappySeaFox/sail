@@ -43,7 +43,7 @@ struct sail_read_features {
      * The SOURCE, BPP24-RGB, and BPP32-RGBA output pixel formats are always supported. Some plugins may
      * provide even more output pixel formats.
      */
-    int *output_pixel_formats;
+    enum SailPixelFormat *output_pixel_formats;
 
     /* The length of output_pixel_formats. */
     int output_pixel_formats_length;
@@ -52,7 +52,7 @@ struct sail_read_features {
      * Output pixel format to use by default when no specific output pixel format was requested by a user.
      * It's always BPP24-RGB for image formats without transparency support and BPP32-RGBA otherwise.
      */
-    int preferred_output_pixel_format;
+    enum SailPixelFormat preferred_output_pixel_format;
 
     /* Supported features of reading operations. See SailPluginFeatures. */
     int features;

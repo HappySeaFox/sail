@@ -34,6 +34,7 @@ static MunitResult test_pixel_format_to_string(const MunitParameter params[], vo
     const char *result;
 
 #define TEST_SAIL_CONVERSION(e, s)           \
+    result = NULL;                           \
     sail_pixel_format_to_string(e, &result); \
     munit_assert_string_equal(result, s);
 
@@ -102,9 +103,10 @@ static MunitResult test_pixel_format_from_string(const MunitParameter params[], 
     (void)params;
     (void)user_data;
 
-    int result = -1;
+    enum SailPixelFormat result;
 
 #define TEST_SAIL_CONVERSION(s, e)             \
+    result = SAIL_PIXEL_FORMAT_UNKNOWN;        \
     sail_pixel_format_from_string(s, &result); \
     munit_assert(result == e);
 
@@ -218,10 +220,13 @@ static MunitResult test_compression_type_to_string(const MunitParameter params[]
     const char *result;
 
 #define TEST_SAIL_CONVERSION(e, s)               \
+    result = NULL;                               \
     sail_compression_type_to_string(e, &result); \
     munit_assert_string_equal(result, s);
 
-    TEST_SAIL_CONVERSION(SAIL_COMPRESSION_RLE, "RLE");
+    TEST_SAIL_CONVERSION(SAIL_COMPRESSION_UNSUPPORTED, "UNSUPPORTED");
+    TEST_SAIL_CONVERSION(SAIL_COMPRESSION_NO,          "NO");
+    TEST_SAIL_CONVERSION(SAIL_COMPRESSION_RLE,         "RLE");
 
 #undef TEST_SAIL_CONVERSION
 
@@ -232,13 +237,16 @@ static MunitResult test_compression_type_from_string(const MunitParameter params
     (void)params;
     (void)user_data;
 
-    int result = -1;
+    enum SailCompressionType result;
 
 #define TEST_SAIL_CONVERSION(s, e)                 \
+    result = SAIL_COMPRESSION_UNSUPPORTED;         \
     sail_compression_type_from_string(s, &result); \
     munit_assert(result == e);
 
-    TEST_SAIL_CONVERSION("RLE", SAIL_COMPRESSION_RLE);
+    TEST_SAIL_CONVERSION("UNSUPPORTED", SAIL_COMPRESSION_UNSUPPORTED);
+    TEST_SAIL_CONVERSION("NO",          SAIL_COMPRESSION_NO);
+    TEST_SAIL_CONVERSION("RLE",         SAIL_COMPRESSION_RLE);
 
 #undef TEST_SAIL_CONVERSION
 

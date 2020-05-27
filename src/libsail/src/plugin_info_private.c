@@ -85,6 +85,20 @@ static sail_error_t split_into_string_node_chain(const char *value, struct sail_
     return 0;
 }
 
+static sail_error_t pixel_format_from_string(const char *str, int *result) {
+
+    SAIL_TRY(sail_pixel_format_from_string(str, (enum SailPixelFormat*)result));
+
+    return 0;
+}
+
+static sail_error_t compression_type_from_string(const char *str, int *result) {
+
+    SAIL_TRY(sail_compression_type_from_string(str, (enum SailCompressionType*)result));
+
+    return 0;
+}
+
 static sail_error_t parse_serialized_ints(const char *value, int **target, int *length, sail_error_t (*converter)(const char *str, int *result)) {
 
     SAIL_CHECK_PTR(value);
@@ -218,9 +232,9 @@ static int inih_handler(void *data, const char *section, const char *name, const
         }
     } else if (strcmp(section, "read-features") == 0) {
         if (strcmp(name, "output-pixel-formats") == 0) {
-            if (parse_serialized_ints(value, &plugin_info->read_features->output_pixel_formats,
+            if (parse_serialized_ints(value, (int **)&plugin_info->read_features->output_pixel_formats,
                                       &plugin_info->read_features->output_pixel_formats_length,
-                                      sail_pixel_format_from_string) != 0) {
+                                      pixel_format_from_string) != 0) {
                 SAIL_LOG_ERROR("Failed to parse output pixel formats: '%s'", value);
                 return 0;
             }
@@ -252,9 +266,9 @@ static int inih_handler(void *data, const char *section, const char *name, const
         } else if (strcmp(name, "interlaced-passes") == 0) {
             plugin_info->write_features->interlaced_passes = atoi(value);
         } else if (strcmp(name, "compression-types") == 0) {
-            if (parse_serialized_ints(value, &plugin_info->write_features->compression_types,
+            if (parse_serialized_ints(value, (int **)&plugin_info->write_features->compression_types,
                                       &plugin_info->write_features->compression_types_length,
-                                      sail_compression_type_from_string) != 0) {
+                                      compression_type_from_string) != 0) {
                 SAIL_LOG_ERROR("Failed to parse compression types: '%s'", value);
                 return 0;
             }
@@ -288,8 +302,8 @@ static int inih_handler(void *data, const char *section, const char *name, const
             return 0;
         }
 
-        if (parse_serialized_ints(value, &node->output_pixel_formats, &node->output_pixel_formats_length,
-                                    sail_pixel_format_from_string) != 0) {
+        if (parse_serialized_ints(value, (int **)&node->output_pixel_formats, &node->output_pixel_formats_length,
+                                    pixel_format_from_string) != 0) {
             SAIL_LOG_ERROR("Failed to parse mapped write pixel formats: '%s'", value);
             sail_destroy_pixel_formats_mapping_node(node);
             return 0;

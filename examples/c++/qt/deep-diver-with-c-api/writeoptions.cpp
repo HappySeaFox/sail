@@ -50,9 +50,9 @@ WriteOptions::~WriteOptions()
 {
 }
 
-int WriteOptions::pixelFormat() const
+SailPixelFormat WriteOptions::pixelFormat() const
 {
-    return d->ui->comboColor->currentData().toInt();
+    return static_cast<SailPixelFormat>(d->ui->comboColor->currentData().toInt());
 }
 
 int WriteOptions::compression() const

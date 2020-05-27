@@ -59,15 +59,19 @@ struct hidden_state {
 
 SAIL_HIDDEN sail_error_t load_plugin(struct sail_plugin_info_node *node);
 
-SAIL_HIDDEN sail_error_t load_plugin_by_plugin_info(struct sail_context *context, const struct sail_plugin_info *plugin_info,
+SAIL_HIDDEN sail_error_t load_plugin_by_plugin_info(struct sail_context *context,
+                                                    const struct sail_plugin_info *plugin_info,
                                                     const struct sail_plugin **plugin);
 
 SAIL_HIDDEN void destroy_hidden_state(struct hidden_state *state);
 
 SAIL_HIDDEN sail_error_t stop_writing(void *state, size_t *written);
 
-SAIL_HIDDEN sail_error_t allowed_read_output_pixel_format(const struct sail_read_features *read_features, int pixel_format);
+SAIL_HIDDEN sail_error_t allowed_read_output_pixel_format(const struct sail_read_features *read_features,
+                                                            enum SailPixelFormat pixel_format);
 
-SAIL_HIDDEN sail_error_t allowed_write_output_pixel_format(const struct sail_write_features *write_features, int input_pixel_format, int output_pixel_format);
+SAIL_HIDDEN sail_error_t allowed_write_output_pixel_format(const struct sail_write_features *write_features,
+                                                            enum SailPixelFormat input_pixel_format,
+                                                            enum SailPixelFormat output_pixel_format);
 
 #endif

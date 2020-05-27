@@ -67,13 +67,13 @@ struct sail_write_features {
      *     1. The JPEG plugin supports only compression levels (compression_min, compression_max, compression_default).
      *     2. The TIFF plugin supports only compression types (RLE or no compression at all).
      */
-    int *compression_types;
+    enum SailCompressionType *compression_types;
 
     /* The length of compression_types. */
     int compression_types_length;
 
     /* Preferred compression type to use by default. */
-    int preferred_compression_type;
+    enum SailCompressionType preferred_compression_type;
 
     /*
      * Minimum compression value. For lossy codecs, more compression means less quality and vice versa.

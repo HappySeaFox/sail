@@ -42,7 +42,7 @@ struct sail_read_options {
      *
      * The SOURCE, BPP24-RGB, and BPP32-RGBA output pixel formats are always supported.
      */
-    int output_pixel_format;
+    enum SailPixelFormat output_pixel_format;
 
     /* IO manipulation options. See SailIoOptions. */
     int io_options;

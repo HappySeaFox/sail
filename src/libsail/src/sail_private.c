@@ -42,7 +42,8 @@ sail_error_t load_plugin(struct sail_plugin_info_node *node) {
     return 0;
 }
 
-sail_error_t load_plugin_by_plugin_info(struct sail_context *context, const struct sail_plugin_info *plugin_info,
+sail_error_t load_plugin_by_plugin_info(struct sail_context *context,
+                                        const struct sail_plugin_info *plugin_info,
                                         const struct sail_plugin **plugin) {
 
     SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
@@ -127,7 +128,8 @@ sail_error_t stop_writing(void *state, size_t *written) {
     return 0;
 }
 
-sail_error_t allowed_read_output_pixel_format(const struct sail_read_features *read_features, int pixel_format) {
+sail_error_t allowed_read_output_pixel_format(const struct sail_read_features *read_features,
+                                                enum SailPixelFormat pixel_format) {
 
     SAIL_CHECK_READ_FEATURES_PTR(read_features);
 
@@ -140,7 +142,9 @@ sail_error_t allowed_read_output_pixel_format(const struct sail_read_features *r
     return SAIL_UNSUPPORTED_PIXEL_FORMAT;
 }
 
-sail_error_t allowed_write_output_pixel_format(const struct sail_write_features *write_features, int input_pixel_format, int output_pixel_format) {
+sail_error_t allowed_write_output_pixel_format(const struct sail_write_features *write_features,
+                                                enum SailPixelFormat input_pixel_format,
+                                                enum SailPixelFormat output_pixel_format) {
 
     SAIL_CHECK_WRITE_FEATURES_PTR(write_features);
 

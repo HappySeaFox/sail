@@ -27,7 +27,7 @@
 
 #include <sail-common/sail-common.h>
 
-inline QImage::Format sailPixelFormatToQImageFormat(int pixel_format) {
+inline QImage::Format sailPixelFormatToQImageFormat(SailPixelFormat pixel_format) {
     switch (pixel_format) {
         case SAIL_PIXEL_FORMAT_BPP1_GRAYSCALE: return QImage::Format_Mono;
         case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE: return QImage::Format_Grayscale8;
@@ -50,7 +50,7 @@ inline QImage::Format sailPixelFormatToQImageFormat(int pixel_format) {
     }
 }
 
-inline int qImageFormatToSailPixelFormat(QImage::Format format) {
+inline SailPixelFormat qImageFormatToSailPixelFormat(QImage::Format format) {
     switch (format) {
         case QImage::Format_Mono:       return SAIL_PIXEL_FORMAT_BPP1_GRAYSCALE;
         case QImage::Format_Grayscale8: return SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE;

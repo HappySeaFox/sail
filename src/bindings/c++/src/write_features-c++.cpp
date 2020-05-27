@@ -30,7 +30,7 @@ public:
         : sail_write_features_c(nullptr)
         , features(0)
         , properties(0)
-        , preferred_compression_type(0)
+        , preferred_compression_type(SAIL_COMPRESSION_UNSUPPORTED)
         , compression_min(0)
         , compression_max(0)
         , compression_default(0)
@@ -38,11 +38,11 @@ public:
 
     const sail_write_features *sail_write_features_c;
 
-    std::map<int, std::vector<int>> pixel_formats_mappings;
+    std::map<SailPixelFormat, std::vector<SailPixelFormat>> pixel_formats_mappings;
     int features;
     int properties;
-    std::vector<int> compression_types;
-    int preferred_compression_type;
+    std::vector<SailCompressionType> compression_types;
+    SailCompressionType preferred_compression_type;
     int compression_min;
     int compression_max;
     int compression_default;
@@ -75,7 +75,7 @@ write_features::~write_features()
     delete d;
 }
 
-std::map<int, std::vector<int>> write_features::pixel_formats_mappings() const
+std::map<SailPixelFormat, std::vector<SailPixelFormat>> write_features::pixel_formats_mappings() const
 {
     return d->pixel_formats_mappings;
 }
@@ -90,12 +90,12 @@ int write_features::properties() const
     return d->properties;
 }
 
-std::vector<int> write_features::compression_types() const
+std::vector<SailCompressionType> write_features::compression_types() const
 {
     return d->compression_types;
 }
 
-int write_features::preferred_compression_type() const
+SailCompressionType write_features::preferred_compression_type() const
 {
     return d->preferred_compression_type;
 }
@@ -148,11 +148,11 @@ write_features::write_features(const sail_write_features *wf)
 
     d->sail_write_features_c = wf;
 
-    std::map<int, std::vector<int>> pixel_formats_mappings;
+    std::map<SailPixelFormat, std::vector<SailPixelFormat>> pixel_formats_mappings;
     sail_pixel_formats_mapping_node *node = wf->pixel_formats_mapping_node;
 
     while (node != nullptr) {
-        std::vector<int> pixel_formats;
+        std::vector<SailPixelFormat> pixel_formats;
         pixel_formats.reserve(node->output_pixel_formats_length);
 
         for (int i = 0; i < node->output_pixel_formats_length; i++) {
@@ -164,7 +164,7 @@ write_features::write_features(const sail_write_features *wf)
         node = node->next;
     }
 
-    std::vector<int> compression_types;
+    std::vector<SailCompressionType> compression_types;
 
     if (wf->compression_types != nullptr && wf->compression_types_length > 0) {
         compression_types.reserve(wf->compression_types_length);
@@ -184,7 +184,7 @@ write_features::write_features(const sail_write_features *wf)
             .with_compression_default(wf->compression_default);
 }
 
-write_features &write_features::with_pixel_formats_mappings(const std::map<int, std::vector<int> > &pixel_formats_mappings)
+write_features &write_features::with_pixel_formats_mappings(const std::map<SailPixelFormat, std::vector<SailPixelFormat>> &pixel_formats_mappings)
 {
     d->pixel_formats_mappings = pixel_formats_mappings;
     return *this;
@@ -202,13 +202,13 @@ write_features& write_features::with_properties(int properties)
     return *this;
 }
 
-write_features& write_features::with_compression_types(const std::vector<int> &compression_types)
+write_features& write_features::with_compression_types(const std::vector<SailCompressionType> &compression_types)
 {
     d->compression_types = compression_types;
     return *this;
 }
 
-write_features& write_features::with_preferred_compression_type(int preferred_compression_type)
+write_features& write_features::with_preferred_compression_type(SailCompressionType preferred_compression_type)
 {
     d->preferred_compression_type = preferred_compression_type;
     return *this;

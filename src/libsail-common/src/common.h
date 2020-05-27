@@ -140,10 +140,16 @@ enum SailImageProperties {
 };
 
 /* Pixels compression types. */
-enum SailCompressionTypes {
+enum SailCompressionType {
+
+    /* Compression unsupported. */
+    SAIL_COMPRESSION_UNSUPPORTED,
+
+    /* No compression. */
+    SAIL_COMPRESSION_NO,
 
     /* RLE compression. */
-    SAIL_COMPRESSION_RLE = 1 << 0,
+    SAIL_COMPRESSION_RLE,
 };
 
 /* Plugin features. */

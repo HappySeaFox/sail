@@ -187,7 +187,7 @@ sail_error_t sail_string_hash(const char *str, uint64_t *hash) {
     return 0;
 }
 
-sail_error_t sail_pixel_format_to_string(int pixel_format, const char **result) {
+sail_error_t sail_pixel_format_to_string(enum SailPixelFormat pixel_format, const char **result) {
 
     SAIL_CHECK_STRING_PTR(result);
 
@@ -252,7 +252,7 @@ sail_error_t sail_pixel_format_to_string(int pixel_format, const char **result) 
     return SAIL_UNSUPPORTED_PIXEL_FORMAT;
 }
 
-sail_error_t sail_pixel_format_from_string(const char *str, int *result) {
+sail_error_t sail_pixel_format_from_string(const char *str, enum SailPixelFormat *result) {
 
     SAIL_CHECK_STRING_PTR(str);
     SAIL_CHECK_RESULT_PTR(result);
@@ -353,18 +353,20 @@ sail_error_t sail_image_property_from_string(const char *str, int *result) {
     return SAIL_UNSUPPORTED_IMAGE_PROPERTY;
 }
 
-sail_error_t sail_compression_type_to_string(int compression, const char **result) {
+sail_error_t sail_compression_type_to_string(enum SailCompressionType compression, const char **result) {
 
     SAIL_CHECK_STRING_PTR(result);
 
     switch (compression) {
-        case SAIL_COMPRESSION_RLE: *result = "RLE"; return 0;
+        case SAIL_COMPRESSION_UNSUPPORTED: *result = "UNSUPPORTED"; return 0;
+        case SAIL_COMPRESSION_NO:          *result = "NO";          return 0;
+        case SAIL_COMPRESSION_RLE:         *result = "RLE";         return 0;
     }
 
     return SAIL_UNSUPPORTED_COMPRESSION_TYPE;
 }
 
-sail_error_t sail_compression_type_from_string(const char *str, int *result) {
+sail_error_t sail_compression_type_from_string(const char *str, enum SailCompressionType *result) {
 
     SAIL_CHECK_STRING_PTR(str);
     SAIL_CHECK_RESULT_PTR(result);
@@ -377,7 +379,9 @@ sail_error_t sail_compression_type_from_string(const char *str, int *result) {
     SAIL_TRY(sail_string_hash(str, &hash));
 
     switch (hash) {
-        case UINT64_C(193468872): *result = SAIL_COMPRESSION_RLE; return 0;
+        case UINT64_C(13846582888989074574): *result = SAIL_COMPRESSION_UNSUPPORTED; return 0;
+        case UINT64_C(5862562):              *result = SAIL_COMPRESSION_NO;          return 0;
+        case UINT64_C(193468872):            *result = SAIL_COMPRESSION_RLE;         return 0;
     }
 
     return SAIL_UNSUPPORTED_COMPRESSION_TYPE;
@@ -423,7 +427,7 @@ sail_error_t sail_plugin_feature_from_string(const char *str, int *result) {
     return SAIL_UNSUPPORTED_PLUGIN_FEATURE;
 }
 
-sail_error_t sail_bits_per_pixel(int pixel_format, unsigned *result) {
+sail_error_t sail_bits_per_pixel(enum SailPixelFormat pixel_format, unsigned *result) {
 
     SAIL_CHECK_RESULT_PTR(result);
 
@@ -488,7 +492,7 @@ sail_error_t sail_bits_per_pixel(int pixel_format, unsigned *result) {
     return SAIL_UNSUPPORTED_PIXEL_FORMAT;
 }
 
-sail_error_t sail_bytes_per_line(unsigned width, int pixel_format, unsigned *result) {
+sail_error_t sail_bytes_per_line(unsigned width, enum SailPixelFormat pixel_format, unsigned *result) {
 
     if (width == 0) {
         return SAIL_INVALID_ARGUMENT;

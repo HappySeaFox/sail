@@ -43,7 +43,7 @@ public:
         , properties(0)
         , source_pixel_format(SAIL_PIXEL_FORMAT_UNKNOWN)
         , source_properties(0)
-        , source_compression_type(0)
+        , source_compression_type(SAIL_COMPRESSION_UNSUPPORTED)
         , bits(nullptr)
         , bits_size(0)
         , shallow_bits(nullptr)
@@ -58,18 +58,18 @@ public:
     unsigned width;
     unsigned height;
     unsigned bytes_per_line;
-    int pixel_format;
+    SailPixelFormat pixel_format;
     bool animated;
     int delay;
-    int palette_pixel_format;
+    SailPixelFormat palette_pixel_format;
     void *palette;
     int palette_color_count;
     int palette_size;
     std::map<std::string, std::string> meta_entries;
     int properties;
-    int source_pixel_format;
+    SailPixelFormat source_pixel_format;
     int source_properties;
-    int source_compression_type;
+    SailCompressionType source_compression_type;
     void *bits;
     unsigned bits_size;
     const void *shallow_bits;
@@ -135,7 +135,7 @@ unsigned image::bytes_per_line() const
     return d->bytes_per_line;
 }
 
-int image::pixel_format() const
+SailPixelFormat image::pixel_format() const
 {
     return d->pixel_format;
 }
@@ -150,7 +150,7 @@ int image::delay() const
     return d->delay;
 }
 
-int image::palette_pixel_format() const
+SailPixelFormat image::palette_pixel_format() const
 {
     return d->palette_pixel_format;
 }
@@ -175,7 +175,7 @@ int image::properties() const
     return d->properties;
 }
 
-int image::source_pixel_format() const
+SailPixelFormat image::source_pixel_format() const
 {
     return d->source_pixel_format;
 }
@@ -185,7 +185,7 @@ int image::source_properties() const
     return d->source_properties;
 }
 
-int image::source_compression_type() const
+SailCompressionType image::source_compression_type() const
 {
     return d->source_compression_type;
 }
@@ -236,7 +236,7 @@ image& image::with_bytes_per_line_auto()
     return with_bytes_per_line(bytes_per_line);
 }
 
-image& image::with_pixel_format(int pixel_format)
+image& image::with_pixel_format(SailPixelFormat pixel_format)
 {
     d->pixel_format = pixel_format;
     return *this;
@@ -248,7 +248,7 @@ image& image::with_delay(int delay)
     return *this;
 }
 
-image& image::with_palette(void *palette, int palette_color_count, int palette_pixel_format)
+image& image::with_palette(void *palette, int palette_color_count, SailPixelFormat palette_pixel_format)
 {
     free(d->palette);
 
@@ -331,14 +331,14 @@ image& image::with_shallow_bits(const void *bits)
     return *this;
 }
 
-sail_error_t image::bits_per_pixel(int pixel_format, unsigned *result)
+sail_error_t image::bits_per_pixel(SailPixelFormat pixel_format, unsigned *result)
 {
     SAIL_TRY(sail_bits_per_pixel(pixel_format, result));
 
     return 0;
 }
 
-sail_error_t image::bytes_per_line(unsigned width, int pixel_format, unsigned *result)
+sail_error_t image::bytes_per_line(unsigned width, SailPixelFormat pixel_format, unsigned *result)
 {
     SAIL_CHECK_PTR(result);
 
@@ -362,14 +362,14 @@ sail_error_t image::bytes_per_image(const image &simage, unsigned *result)
     return 0;
 }
 
-sail_error_t image::pixel_format_to_string(int pixel_format, const char **result)
+sail_error_t image::pixel_format_to_string(SailPixelFormat pixel_format, const char **result)
 {
     SAIL_TRY(sail_pixel_format_to_string(pixel_format, result));
 
     return 0;
 }
 
-sail_error_t image::pixel_format_from_string(const char *str, int *result)
+sail_error_t image::pixel_format_from_string(const char *str, SailPixelFormat *result)
 {
     SAIL_TRY(sail_pixel_format_from_string(str, result));
 
@@ -390,14 +390,14 @@ sail_error_t image::image_property_from_string(const char *str, int *result)
     return 0;
 }
 
-sail_error_t image::compression_type_to_string(int compression, const char **result)
+sail_error_t image::compression_type_to_string(SailCompressionType compression, const char **result)
 {
     SAIL_TRY(sail_compression_type_to_string(compression, result));
 
     return 0;
 }
 
-sail_error_t image::compression_type_from_string(const char *str, int *result)
+sail_error_t image::compression_type_from_string(const char *str, SailCompressionType *result)
 {
     SAIL_TRY(sail_compression_type_from_string(str, result));
 
@@ -511,7 +511,7 @@ image& image::with_properties(int properties)
     return *this;
 }
 
-image& image::with_source_pixel_format(int source_pixel_format)
+image& image::with_source_pixel_format(SailPixelFormat source_pixel_format)
 {
     d->source_pixel_format = source_pixel_format;
     return *this;
@@ -523,7 +523,7 @@ image& image::with_source_properties(int source_properties)
     return *this;
 }
 
-image& image::with_source_compression_type(int source_compression_type)
+image& image::with_source_compression_type(SailCompressionType source_compression_type)
 {
     d->source_compression_type = source_compression_type;
     return *this;
