@@ -398,6 +398,7 @@ sail_error_t sail_plugin_feature_to_string(int plugin_feature, const char **resu
         case SAIL_PLUGIN_FEATURE_META_INFO:  *result = "META-INFO";  return 0;
         case SAIL_PLUGIN_FEATURE_EXIF:       *result = "EXIF";       return 0;
         case SAIL_PLUGIN_FEATURE_INTERLACED: *result = "INTERLACED"; return 0;
+        case SAIL_PLUGIN_FEATURE_ICC:        *result = "ICC";        return 0;
     }
 
     return SAIL_UNSUPPORTED_PLUGIN_FEATURE;
@@ -422,6 +423,7 @@ sail_error_t sail_plugin_feature_from_string(const char *str, int *result) {
         case UINT64_C(249851542786266181):  *result = SAIL_PLUGIN_FEATURE_META_INFO;  return 0;
         case UINT64_C(6384018865):          *result = SAIL_PLUGIN_FEATURE_EXIF;       return 0;
         case UINT64_C(8244927930303708800): *result = SAIL_PLUGIN_FEATURE_INTERLACED; return 0;
+        case UINT64_C(193458772):           *result = SAIL_PLUGIN_FEATURE_ICC;        return 0;
     }
 
     return SAIL_UNSUPPORTED_PLUGIN_FEATURE;

@@ -62,6 +62,10 @@ sail_error_t sail_read_options_from_features(const struct sail_read_features *re
         read_options->io_options |= SAIL_IO_OPTION_INTERLACED;
     }
 
+    if (read_features->features & SAIL_PLUGIN_FEATURE_ICC) {
+        read_options->io_options |= SAIL_IO_OPTION_ICC;
+    }
+
     return 0;
 }
 
