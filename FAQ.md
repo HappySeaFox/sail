@@ -6,7 +6,7 @@ Table of Contents
       * [Is SAIL cross-platform?](#is-sail-cross-platform)
       * [How many image formats do you plan to implement?](#how-many-image-formats-do-you-plan-to-implement)
       * [I have questions, issues, or proposals](#i-have-questions-issues-or-proposals)
-      * [Does SAIL provide simple one-line APIs? Does SAIL provide complex comprehensive APIs?](#does-sail-provide-simple-one-line-apis-does-sail-provide-complex-comprehensive
+      * [Does SAIL provide simple one-line APIs?](#does-sail-provide-simple-one-line-apis)
       * [What pixel formats SAIL is able to read?](#what-pixel-formats-sail-is-able-to-read)
       * [What pixel formats SAIL is able to output after reading an image file?](#what-pixel-formats-sail-is-able-to-output-after-reading-an-image-file)
       * [What pixel formats SAIL is able to write?](#what-pixel-formats-sail-is-able-to-write)
@@ -42,7 +42,7 @@ of communicating and solving problems.
 
 Pull requests are always welcomed.
 
-## Does SAIL provide simple one-line APIs? Does SAIL provide complex comprehensive APIs?
+## Does SAIL provide simple one-line APIs?
 
 Yes. SAIL provides four levels of APIs, depending on your needs: `junior`, `advanced`, `deep diver`, and `technical diver`.
 See [EXAMPLES](EXAMPLES.md) for more.
