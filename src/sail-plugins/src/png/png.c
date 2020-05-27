@@ -261,19 +261,35 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
 
     /* Read ICC profile. */
     if (png_state->read_options->io_options & SAIL_IO_OPTION_ICC) {
-        SAIL_TRY_OR_CLEANUP(sail_alloc_icc(&(*image)->icc),
-                            /* cleanup */ sail_destroy_image(*image));
-
+        char *name;
         int compression;
+        png_bytep data;
+        unsigned data_length;
+
         bool ok = png_get_iCCP(png_state->png_ptr,
                                 png_state->info_ptr,
-                                &(*image)->icc->name,
+                                &name,
                                 &compression,
-                                (png_bytepp)&(*image)->icc->data,
-                                &(*image)->icc->data_length) == PNG_INFO_iCCP;
+                                &data,
+                                &data_length) == PNG_INFO_iCCP;
 
         if (ok) {
-            SAIL_LOG_DEBUG("PNG: ICC profile %u bytes long is found", (*image)->icc->data_length);
+            SAIL_TRY_OR_CLEANUP(sail_alloc_icc(&(*image)->icc),
+                                /* cleanup */ sail_destroy_image(*image));
+            SAIL_TRY_OR_CLEANUP(sail_strdup(name, &(*image)->icc->name),
+                                /* cleanup */ sail_destroy_image(*image));
+
+            (*image)->icc->data = malloc(data_length);
+
+            if ((*image)->icc->data == NULL) {
+                sail_destroy_image(*image);
+                return SAIL_MEMORY_ALLOCATION_FAILED;
+            }
+
+            memcpy((*image)->icc->data, data, data_length);
+            (*image)->icc->data_length = data_length;
+
+            SAIL_LOG_DEBUG("PNG: Found ICC profile '%s' %u bytes long", name, data_length);
         } else {
             SAIL_LOG_DEBUG("PNG: ICC profile is not found");
         }
