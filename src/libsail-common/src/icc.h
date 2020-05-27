@@ -45,7 +45,7 @@ struct sail_icc {
     void *data;
 
     /* The length of the data. */
-    int data_length;
+    unsigned data_length;
 };
 
 typedef struct sail_icc sail_icc_t;
