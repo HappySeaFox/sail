@@ -264,10 +264,11 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
         SAIL_TRY_OR_CLEANUP(sail_alloc_icc(&(*image)->icc),
                             /* cleanup */ sail_destroy_image(*image));
 
+        int compression;
         bool ok = png_get_iCCP(png_state->png_ptr,
                                 png_state->info_ptr,
                                 &(*image)->icc->name,
-                                /* compression - not needed */ NULL,
+                                &compression,
                                 (png_bytepp)&(*image)->icc->data,
                                 &(*image)->icc->data_length) == PNG_INFO_iCCP;
 
