@@ -273,7 +273,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
                                 &(*image)->icc->data_length) == PNG_INFO_iCCP;
 
         if (ok) {
-            SAIL_LOG_DEBUG("PNG: ICC profile %u bytes length is found", (*image)->icc->data_length);
+            SAIL_LOG_DEBUG("PNG: ICC profile %u bytes long is found", (*image)->icc->data_length);
         } else {
             SAIL_LOG_DEBUG("PNG: ICC profile is not found");
         }
