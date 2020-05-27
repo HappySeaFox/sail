@@ -158,6 +158,11 @@ static sail_error_t parse_flags(const char *value, int *features, sail_error_t (
     return 0;
 }
 
+struct init_data {
+    struct sail_plugin_info *plugin_info;
+    struct sail_pixel_formats_mapping_node **last_mapping_node;
+};
+
 static int inih_handler(void *data, const char *section, const char *name, const char *value) {
 
     /* Silently ignore empty values. */
@@ -165,7 +170,8 @@ static int inih_handler(void *data, const char *section, const char *name, const
         return 1;
     }
 
-    struct sail_plugin_info *plugin_info = (struct sail_plugin_info *)data;
+    struct init_data *init_data = (struct init_data *)data;
+    struct sail_plugin_info *plugin_info = init_data->plugin_info;
 
     int res;
 
@@ -211,14 +217,7 @@ static int inih_handler(void *data, const char *section, const char *name, const
             return 0; /* error */
         }
     } else if (strcmp(section, "read-features") == 0) {
-        if (strcmp(name, "input-pixel-formats") == 0) {
-            if (parse_serialized_ints(value, &plugin_info->read_features->input_pixel_formats,
-                                      &plugin_info->read_features->input_pixel_formats_length,
-                                      sail_pixel_format_from_string) != 0) {
-                SAIL_LOG_ERROR("Failed to parse input pixel formats: '%s'", value);
-                return 0;
-            }
-        } else if (strcmp(name, "output-pixel-formats") == 0) {
+        if (strcmp(name, "output-pixel-formats") == 0) {
             if (parse_serialized_ints(value, &plugin_info->read_features->output_pixel_formats,
                                       &plugin_info->read_features->output_pixel_formats_length,
                                       sail_pixel_format_from_string) != 0) {
@@ -240,26 +239,7 @@ static int inih_handler(void *data, const char *section, const char *name, const
             return 0;
         }
     } else if (strcmp(section, "write-features") == 0) {
-        if (strcmp(name, "input-pixel-formats") == 0) {
-            if (parse_serialized_ints(value, &plugin_info->write_features->input_pixel_formats,
-                                      &plugin_info->write_features->input_pixel_formats_length,
-                                      sail_pixel_format_from_string) != 0) {
-                SAIL_LOG_ERROR("Failed to parse input pixel formats: '%s'", value);
-                return 0;
-            }
-        } else if (strcmp(name, "output-pixel-formats") == 0) {
-            if (parse_serialized_ints(value, &plugin_info->write_features->output_pixel_formats,
-                                      &plugin_info->write_features->output_pixel_formats_length,
-                                      sail_pixel_format_from_string) != 0) {
-                SAIL_LOG_ERROR("Failed to parse output pixel formats: '%s'", value);
-                return 0;
-            }
-        } else if (strcmp(name, "preferred-output-pixel-format") == 0) {
-            if (sail_pixel_format_from_string(value, &plugin_info->write_features->preferred_output_pixel_format) != 0) {
-                SAIL_LOG_ERROR("Failed to parse preferred output pixel format: '%s'", value);
-                return 0;
-            }
-        } else if (strcmp(name, "features") == 0) {
+        if (strcmp(name, "features") == 0) {
             if (parse_flags(value, &plugin_info->write_features->features, sail_plugin_feature_from_string) != 0) {
                 SAIL_LOG_ERROR("Failed to parse plugin features: '%s'", value);
                 return 0;
@@ -293,6 +273,30 @@ static int inih_handler(void *data, const char *section, const char *name, const
             SAIL_LOG_ERROR("Unsupported plugin info key '%s' in [%s]", name, section);
             return 0;
         }
+    } else if (strcmp(section, "write-pixel-formats-mapping") == 0) {
+
+        struct sail_pixel_formats_mapping_node *node;
+
+        if (sail_alloc_pixel_formats_mapping_node(&node) != 0) {
+            SAIL_LOG_ERROR("Failed to allocate a new write mapping node");
+            return 0;
+        }
+
+        if (sail_pixel_format_from_string(name, &node->input_pixel_format) != 0) {
+            SAIL_LOG_ERROR("Failed to parse write pixel format: '%s'", name);
+            sail_destroy_pixel_formats_mapping_node(node);
+            return 0;
+        }
+
+        if (parse_serialized_ints(value, &node->output_pixel_formats, &node->output_pixel_formats_length,
+                                    sail_pixel_format_from_string) != 0) {
+            SAIL_LOG_ERROR("Failed to parse mapped write pixel formats: '%s'", value);
+            sail_destroy_pixel_formats_mapping_node(node);
+            return 0;
+        }
+
+        *(init_data->last_mapping_node) = node;
+        init_data->last_mapping_node = &node->next;
     } else {
         SAIL_LOG_ERROR("Unsupported plugin info section '%s'", section);
         return 0;
@@ -303,42 +307,13 @@ static int inih_handler(void *data, const char *section, const char *name, const
 
 static sail_error_t check_plugin_info(const char *path, const struct sail_plugin_info *plugin_info) {
 
-    const struct sail_read_features *read_features = plugin_info->read_features;
     const struct sail_write_features *write_features = plugin_info->write_features;
 
-    /* Check read features. */
-    if (read_features->input_pixel_formats_length == 0 && read_features->output_pixel_formats_length != 0) {
-        SAIL_LOG_ERROR("The plugin '%s' is not able to read anything, but output pixel formats are specified", path);
-        return SAIL_INCOMPLETE_PLUGIN_INFO;
-    }
-
-    if (read_features->input_pixel_formats_length != 0 && read_features->output_pixel_formats_length == 0) {
-        SAIL_LOG_ERROR("The plugin '%s' is able to read images, but output pixel formats are not specified", path);
-        return SAIL_INCOMPLETE_PLUGIN_INFO;
-    }
-
-    if ((read_features->features & SAIL_PLUGIN_FEATURE_STATIC ||
-            read_features->features & SAIL_PLUGIN_FEATURE_ANIMATED ||
-            read_features->features & SAIL_PLUGIN_FEATURE_MULTIPAGED) && read_features->input_pixel_formats_length == 0) {
-        SAIL_LOG_ERROR("The plugin '%s' is able to read images, but input pixel formats are not specified", path);
-        return SAIL_INCOMPLETE_PLUGIN_INFO;
-    }
-
     /* Check write features. */
-    if (write_features->input_pixel_formats_length == 0 && write_features->output_pixel_formats_length != 0) {
-        SAIL_LOG_ERROR("The plugin '%s' is not able to write anything, but output pixel formats are specified", path);
-        return SAIL_INCOMPLETE_PLUGIN_INFO;
-    }
-
-    if (write_features->input_pixel_formats_length != 0 && write_features->output_pixel_formats_length == 0) {
-        SAIL_LOG_ERROR("The plugin '%s' is able to write images, but output pixel formats are not specified", path);
-        return SAIL_INCOMPLETE_PLUGIN_INFO;
-    }
-
     if ((write_features->features & SAIL_PLUGIN_FEATURE_STATIC ||
             write_features->features & SAIL_PLUGIN_FEATURE_ANIMATED ||
-            write_features->features & SAIL_PLUGIN_FEATURE_MULTIPAGED) && write_features->output_pixel_formats_length == 0) {
-        SAIL_LOG_ERROR("The plugin '%s' is able to write images, but output pixel formats are not specified", path);
+            write_features->features & SAIL_PLUGIN_FEATURE_MULTIPAGED) && write_features->pixel_formats_mapping_node == NULL) {
+        SAIL_LOG_ERROR("The plugin '%s' is able to write images, but output pixel formats mappings are not specified", path);
         return SAIL_INCOMPLETE_PLUGIN_INFO;
     }
 
@@ -441,6 +416,10 @@ sail_error_t plugin_read_info(const char *path, struct sail_plugin_info **plugin
     SAIL_TRY_OR_CLEANUP(sail_alloc_write_features(&(*plugin_info)->write_features),
                         destroy_plugin_info(*plugin_info));
 
+    struct init_data init_data;
+    init_data.plugin_info = *plugin_info;
+    init_data.last_mapping_node = &(*plugin_info)->write_features->pixel_formats_mapping_node;
+
     /*
      * Returns:
      *  - 0 on success
@@ -448,30 +427,29 @@ sail_error_t plugin_read_info(const char *path, struct sail_plugin_info **plugin
      *  - -1 on file open error
      *  - -2 on memory allocation error (only when INI_USE_STACK is zero).
      */
-    const int code = ini_parse(path, inih_handler, *plugin_info);
-
-    if ((*plugin_info)->layout != SAIL_PLUGIN_LAYOUT_V2) {
-        SAIL_LOG_ERROR("Unsupported plugin layout version %d in '%s'", (*plugin_info)->layout, path);
-        destroy_plugin_info(*plugin_info);
-        return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
-    }
-
-    /* Paranoid error checks. */
-    SAIL_TRY_OR_CLEANUP(check_plugin_info(path, *plugin_info),
-                        /* cleanup */ destroy_plugin_info(*plugin_info));
+    const int code = ini_parse(path, inih_handler, &init_data);
 
     /* Success. */
     if (code == 0) {
+        if ((*plugin_info)->layout != SAIL_PLUGIN_LAYOUT_V2) {
+            SAIL_LOG_ERROR("Unsupported plugin layout version %d in '%s'", (*plugin_info)->layout, path);
+            destroy_plugin_info(*plugin_info);
+            return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
+        }
+
+        /* Paranoid error checks. */
+        SAIL_TRY_OR_CLEANUP(check_plugin_info(path, *plugin_info),
+                            /* cleanup */ destroy_plugin_info(*plugin_info));
+
         return 0;
-    }
+    } else {
+        destroy_plugin_info(*plugin_info);
 
-    /* Error. */
-    destroy_plugin_info(*plugin_info);
+        switch (code) {
+            case -1: return SAIL_FILE_OPEN_ERROR;
+            case -2: return SAIL_MEMORY_ALLOCATION_FAILED;
 
-    switch (code) {
-        case -1: return SAIL_FILE_OPEN_ERROR;
-        case -2: return SAIL_MEMORY_ALLOCATION_FAILED;
-
-        default: return SAIL_FILE_PARSE_ERROR;
+            default: return SAIL_FILE_PARSE_ERROR;
+        }
     }
 }

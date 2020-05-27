@@ -126,3 +126,39 @@ sail_error_t stop_writing(void *state, size_t *written) {
 
     return 0;
 }
+
+sail_error_t allowed_read_output_pixel_format(const struct sail_read_features *read_features, int pixel_format) {
+
+    SAIL_CHECK_READ_FEATURES_PTR(read_features);
+
+    for (int i = 0; i < read_features->output_pixel_formats_length; i++) {
+        if (read_features->output_pixel_formats[i] == pixel_format) {
+            return 0;
+        }
+    }
+
+    return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+}
+
+sail_error_t allowed_write_output_pixel_format(const struct sail_write_features *write_features, int input_pixel_format, int output_pixel_format) {
+
+    SAIL_CHECK_WRITE_FEATURES_PTR(write_features);
+
+    const struct sail_pixel_formats_mapping_node *node = write_features->pixel_formats_mapping_node;
+
+    while (node != NULL) {
+        if (node->input_pixel_format == input_pixel_format) {
+            for (int i = 0; i < node->output_pixel_formats_length; i++) {
+                if (node->output_pixel_formats[i] == output_pixel_format) {
+                    return 0;
+                }
+            }
+
+            return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+        }
+
+        node = node->next;
+    }
+
+    return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+}

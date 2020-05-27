@@ -58,6 +58,15 @@ sail_error_t start_reading_io_with_options(struct sail_io *io, bool own_io, stru
     SAIL_TRY_OR_CLEANUP(check_io_arguments(io, context, plugin_info),
                         /* cleanup */ if (own_io) sail_destroy_io(io));
 
+    /*
+     * When read options is not NULL, we need to check if we can actually output the requested pixel format.
+     * When read options is NULL, we use the preferred output pixel format which is always acceptable.
+     */
+    if (read_options != NULL) {
+        SAIL_TRY_OR_CLEANUP(allowed_read_output_pixel_format(plugin_info->read_features, read_options->output_pixel_format),
+                            /* cleanup */ if (own_io) sail_destroy_io(io));
+    }
+
     struct hidden_state *state_of_mind = (struct hidden_state *)malloc(sizeof(struct hidden_state));
     SAIL_TRY_OR_CLEANUP(check_state_ptr(state_of_mind),
                         /*cleanup */ if (own_io) sail_destroy_io(io));
@@ -129,6 +138,7 @@ sail_error_t start_writing_io_with_options(struct sail_io *io, bool own_io, stru
     SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v2->write_init_v2(state_of_mind->io, state_of_mind->write_options, &state_of_mind->state),
                         /* cleanup */ state_of_mind->plugin->v2->write_finish_v2(&state_of_mind->state, state_of_mind->io),
                                       destroy_hidden_state(state_of_mind));
+
     *state = state_of_mind;
 
     return 0;

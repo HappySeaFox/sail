@@ -11,6 +11,7 @@ add_library(sail-common
                 src/io_common.c
                 src/log.c
                 src/meta_entry_node.c
+                src/pixel_formats_mapping_node.c
                 src/read_features.c
                 src/read_options.c
                 src/utils.c
@@ -27,6 +28,7 @@ list(APPEND PUBLIC_HEADERS "src/image.h")
 list(APPEND PUBLIC_HEADERS "src/io_common.h")
 list(APPEND PUBLIC_HEADERS "src/log.h")
 list(APPEND PUBLIC_HEADERS "src/meta_entry_node.h")
+list(APPEND PUBLIC_HEADERS "src/pixel_formats_mapping_node.h")
 list(APPEND PUBLIC_HEADERS "src/read_features.h")
 list(APPEND PUBLIC_HEADERS "src/read_options.h")
 list(APPEND PUBLIC_HEADERS "src/sail-common.h")

@@ -97,3 +97,36 @@ bool jpeg_supported_pixel_format(int pixel_format) {
         default:                           return false;
     }
 }
+
+sail_error_t convert_cmyk(unsigned char *bits_source, unsigned char *bits_target, unsigned width, int target_pixel_format) {
+    unsigned char C, M, Y, K;
+
+    if (target_pixel_format == SAIL_PIXEL_FORMAT_BPP24_RGB) {
+        for (unsigned i = 0; i < width; i++) {
+            C = *bits_source++ / 100.0;
+            M = *bits_source++ / 100.0;
+            Y = *bits_source++ / 100.0;
+            K = *bits_source++ / 100.0;
+
+            *bits_target++ = 255 * (1-C) * (1-K);
+            *bits_target++ = 255 * (1-M) * (1-K);
+            *bits_target++ = 255 * (1-Y) * (1-K);
+        }
+    } else if (target_pixel_format == SAIL_PIXEL_FORMAT_BPP32_RGBA) {
+        for (unsigned i = 0; i < width; i++) {
+            C = *bits_source++ / 100.0;
+            M = *bits_source++ / 100.0;
+            Y = *bits_source++ / 100.0;
+            K = *bits_source++ / 100.0;
+
+            *bits_target++ = 255 * (1-C) * (1-K);
+            *bits_target++ = 255 * (1-M) * (1-K);
+            *bits_target++ = 255 * (1-Y) * (1-K);
+            *bits_target++ = 255;
+        }
+    } else {
+        return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+    }
+
+    return 0;
+}

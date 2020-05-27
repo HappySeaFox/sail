@@ -143,11 +143,11 @@ static sail_error_t build_full_path(const char *sail_plugins_path, const char *n
     return 0;
 }
 
-static sail_error_t build_plugin_full_path(struct sail_plugin_info_node **last_plugin_info_node,
-                                            const char *plugin_info_full_path) {
+static sail_error_t build_plugin_from_plugin_info(const char *plugin_info_full_path,
+                                                    struct sail_plugin_info_node **plugin_info_node) {
 
-    SAIL_CHECK_PLUGIN_INFO_PTR(last_plugin_info_node);
     SAIL_CHECK_PATH_PTR(plugin_info_full_path);
+    SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info_node);
 
     /* Build "/path/jpeg.so" from "/path/jpeg.plugin.info". */
     char *plugin_info_part = strstr(plugin_info_full_path, ".plugin.info");
@@ -179,20 +179,17 @@ static sail_error_t build_plugin_full_path(struct sail_plugin_info_node **last_p
 #endif
 
     /* Parse plugin info. */
-    struct sail_plugin_info_node *plugin_info_node;
-    SAIL_TRY_OR_CLEANUP(alloc_plugin_info_node(&plugin_info_node),
+    SAIL_TRY_OR_CLEANUP(alloc_plugin_info_node(plugin_info_node),
                         free(plugin_full_path));
 
     struct sail_plugin_info *plugin_info;
     SAIL_TRY_OR_CLEANUP(plugin_read_info(plugin_info_full_path, &plugin_info),
-                        destroy_plugin_info_node(plugin_info_node),
+                        destroy_plugin_info_node(*plugin_info_node),
                         free(plugin_full_path));
 
     /* Save the parsed plugin info into the SAIL context. */
-    plugin_info_node->plugin_info = plugin_info;
+    (*plugin_info_node)->plugin_info = plugin_info;
     plugin_info->path = plugin_full_path;
-
-    *last_plugin_info_node = plugin_info_node;
 
     return 0;
 }
@@ -220,11 +217,13 @@ static sail_error_t sail_init_impl(struct sail_context **context, int flags) {
     SAIL_TRY_OR_CLEANUP(update_lib_path(),
                         /* cleanup */ free(*context));
 
-    struct sail_plugin_info_node **last_plugin_info_node = &(*context)->plugin_info_node;
-
     const char *plugs_path = plugins_path();
 
     SAIL_LOG_DEBUG("Loading plugins from '%s'", plugs_path);
+
+    /* Used to load and store plugin info objects. */
+    struct sail_plugin_info_node **last_plugin_info_node = &(*context)->plugin_info_node;
+    struct sail_plugin_info_node *plugin_info_node;
 
 #ifdef SAIL_WIN32
     const char *plugs_info_mask = "\\*.plugin.info";
@@ -261,8 +260,10 @@ static sail_error_t sail_init_impl(struct sail_context **context, int flags) {
 
         SAIL_LOG_DEBUG("Found plugin info '%s'", data.cFileName);
 
-        build_plugin_full_path(last_plugin_info_node, full_path);
-        last_plugin_info_node = &(*last_plugin_info_node)->next;
+        if (build_plugin_from_plugin_info(full_path, &plugin_info_node) == 0) {
+            *last_plugin_info_node = plugin_info_node;
+            last_plugin_info_node = &plugin_info_node->next;
+        }
 
         free(full_path);
     } while (FindNextFile(hFind, &data));
@@ -304,8 +305,11 @@ static sail_error_t sail_init_impl(struct sail_context **context, int flags) {
 
             if (is_plugin_info) {
                 SAIL_LOG_DEBUG("Found plugin info '%s'", dir->d_name);
-                build_plugin_full_path(last_plugin_info_node, full_path);
-                last_plugin_info_node = &(*last_plugin_info_node)->next;
+
+                if (build_plugin_from_plugin_info(full_path, &plugin_info_node) == 0) {
+                    *last_plugin_info_node = plugin_info_node;
+                    last_plugin_info_node = &plugin_info_node->next;
+                }
             }
         }
 
@@ -331,6 +335,17 @@ static sail_error_t sail_init_impl(struct sail_context **context, int flags) {
 
             plugin_info_node = plugin_info_node->next;
         }
+    }
+
+    SAIL_LOG_DEBUG("Enumerated plugins:");
+
+    /* Print the found plugin infos. */
+    struct sail_plugin_info_node *node = (*context)->plugin_info_node;
+    int counter = 1;
+
+    while (node != NULL) {
+        SAIL_LOG_DEBUG("%d. %s [%s] %s", counter++, node->plugin_info->name, node->plugin_info->description, node->plugin_info->version);
+        node = node->next;
     }
 
     SAIL_LOG_DEBUG("Initialized in %lld ms.", (unsigned long)(end_time - start_time));
