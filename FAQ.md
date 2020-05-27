@@ -6,13 +6,14 @@ Table of Contents
       * [Is SAIL cross-platform?](#is-sail-cross-platform)
       * [How many image formats do you plan to implement?](#how-many-image-formats-do-you-plan-to-implement)
       * [I have questions, issues, or proposals](#i-have-questions-issues-or-proposals)
+      * [Does SAIL provide simple one-line APIs? Does SAIL provide complex comprehensive APIs?](#does-sail-provide-simple-one-line-apis-does-sail-provide-complex-comprehensive
       * [What pixel formats SAIL is able to read?](#what-pixel-formats-sail-is-able-to-read)
       * [What pixel formats SAIL is able to output after reading an image file?](#what-pixel-formats-sail-is-able-to-output-after-reading-an-image-file)
       * [What pixel formats SAIL is able to write?](#what-pixel-formats-sail-is-able-to-write)
       * [How can I read an image and output pixels in different formats?](#how-can-i-read-an-image-and-output-pixels-in-different-formats)
       * [Does SAIL support animated and multi-paged images?](#does-sail-support-animated-and-multi-paged-images)
       * [Does SAIL support reading from memory?](#does-sail-support-reading-from-memory)
-      * [Are there any C/C   examples?](#are-there-any-cc-examples)
+      * [Are there any C/C++ examples?](#are-there-any-cc-examples)
       * [Are there any bindings to other programming languages?](#are-there-any-bindings-to-other-programming-languages)
 
 # SAIL Frequently Asked Questions (FAQ)
@@ -40,6 +41,11 @@ Opening a GitHub [issue](https://github.com/smoked-herring/sail/issues) is the p
 of communicating and solving problems.
 
 Pull requests are always welcomed.
+
+## Does SAIL provide simple one-line APIs? Does SAIL provide complex comprehensive APIs?
+
+Yes. SAIL provides four levels of APIs, depending on your needs: `junior`, `advanced`, `deep diver`, and `technical diver`.
+See [EXAMPLES](EXAMPLES.md) for more.
 
 ## What pixel formats SAIL is able to read?
 
