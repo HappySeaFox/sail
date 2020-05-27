@@ -7,6 +7,7 @@ option(SAIL_COLORED_OUTPUT "Enable colored console output on supported platforms
 set(SAIL_COLORED_OUTPUT ${SAIL_COLORED_OUTPUT} PARENT_SCOPE)
 
 add_library(sail-common
+                src/icc.c
                 src/image.c
                 src/io_common.c
                 src/log.c
@@ -24,6 +25,7 @@ set(PUBLIC_HEADERS "")
 list(APPEND PUBLIC_HEADERS "src/common.h")
 list(APPEND PUBLIC_HEADERS "src/error.h")
 list(APPEND PUBLIC_HEADERS "src/export.h")
+list(APPEND PUBLIC_HEADERS "src/icc.h")
 list(APPEND PUBLIC_HEADERS "src/image.h")
 list(APPEND PUBLIC_HEADERS "src/io_common.h")
 list(APPEND PUBLIC_HEADERS "src/log.h")
