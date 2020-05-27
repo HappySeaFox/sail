@@ -225,8 +225,6 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
     /* Read ICC profile. */
 #ifdef HAVE_JPEG_ICC
     if (jpeg_state->read_options->io_options & SAIL_IO_OPTION_ICC) {
-        SAIL_LOG_DEBUG("JPEG: Try to read the ICC profile if any");
-
         if (jpeg_state->extra_scan_line_needed) {
             SAIL_LOG_DEBUG("JPEG: Skipping the ICC profile (if any) as we convert from CMYK");
         } else {
