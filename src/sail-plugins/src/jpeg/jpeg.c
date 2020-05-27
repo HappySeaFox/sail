@@ -114,6 +114,9 @@ SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_io *io, const stru
     if (jpeg_state->read_options->io_options & SAIL_IO_OPTION_META_INFO) {
         jpeg_save_markers(&jpeg_state->decompress_context, JPEG_COM, 0xffff);
     }
+    if (jpeg_state->read_options->io_options & SAIL_IO_OPTION_ICC) {
+        jpeg_save_markers(&jpeg_state->decompress_context, JPEG_APP0 + 2, 0xFFFF);
+    }
 
     jpeg_read_header(&jpeg_state->decompress_context, true);
 
@@ -193,6 +196,8 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
 
     /* Read meta info. */
     if (jpeg_state->read_options->io_options & SAIL_IO_OPTION_META_INFO) {
+        SAIL_LOG_DEBUG("JPEG: Try to read the text comments if any");
+
         jpeg_saved_marker_ptr it = jpeg_state->decompress_context.marker_list;
         struct sail_meta_entry_node **last_meta_entry_node = &(*image)->meta_entry_node;
 
@@ -216,6 +221,26 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
             it = it->next;
         }
     }
+
+    /* Read ICC profile. */
+#ifdef HAVE_JPEG_ICC
+    if (jpeg_state->read_options->io_options & SAIL_IO_OPTION_ICC) {
+        SAIL_LOG_DEBUG("JPEG: Try to read the ICC profile if any");
+
+        if (jpeg_state->extra_scan_line_needed) {
+            SAIL_LOG_DEBUG("JPEG: Skipping the ICC profile (if any) as we convert from CMYK");
+        } else {
+            SAIL_TRY_OR_CLEANUP(sail_alloc_icc(&(*image)->icc),
+                                /* cleanup */ sail_destroy_image(*image));
+
+            SAIL_LOG_DEBUG("JPEG: ICC profile is %sfound",
+                            jpeg_read_icc_profile(&jpeg_state->decompress_context,
+                                                    (JOCTET **)&(*image)->icc->data,
+                                                    &(*image)->icc->data_length)
+                            ? "" : "not ");
+        }
+    }
+#endif
 
     const char *pixel_format_str = NULL;
     SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string((*image)->source_pixel_format, &pixel_format_str));
@@ -403,6 +428,14 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v2(void *state, struc
             meta_entry_node = meta_entry_node->next;
         }
     }
+
+    /* Write ICC profile. */
+#ifdef HAVE_JPEG_ICC
+    if (jpeg_state->write_options->io_options & SAIL_IO_OPTION_ICC && image->icc != NULL) {
+        SAIL_LOG_DEBUG("JPEG: Writing ICC profile");
+        jpeg_write_icc_profile(&jpeg_state->compress_context, image->icc->data, image->icc->data_length);
+    }
+#endif
 
     const char *pixel_format_str = NULL;
     SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(image->pixel_format, &pixel_format_str));
