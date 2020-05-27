@@ -34,6 +34,7 @@ extern "C" {
 #endif
 
 struct sail_meta_entry_node;
+struct sail_icc;
 
 /*
  * A structure representing an image. Fields set by SAIL when reading images are marked with READ.
@@ -180,6 +181,14 @@ struct sail_image {
      * WRITE: Ignored.
      */
     enum SailCompressionType source_compression_type;
+
+    /*
+     * Embedded ICC profile.
+     *
+     * READ:  Set by SAIL to a valid ICC profile if any.
+     * WRITE: Must be allocated and set by a caller to a valid ICC profile if necessary.
+     */
+    struct sail_icc *icc;
 };
 
 typedef struct sail_image sail_image_t;
