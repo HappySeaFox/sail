@@ -5,6 +5,8 @@ project(SAIL VERSION 0.9.0
              LANGUAGES C CXX)
 
 include(GNUInstallDirs)
+include(CheckIncludeFiles)
+include(CheckCSourceCompiles)
 
 # Our own cmake scripts
 #

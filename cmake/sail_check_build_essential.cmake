@@ -1,5 +1,3 @@
-include(CheckIncludeFiles)
-
 # Intended to be included by SAIL.
 #
 macro(sail_check_include)
