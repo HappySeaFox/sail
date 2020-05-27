@@ -400,6 +400,10 @@ if (!meta_entries.empty()) {
     const std::pair<std::string, std::string> first_pair = *meta_entries.begin();
     SAIL_LOG_DEBUG("%s: %s", first_pair.first.c_str(), first_pair.second.c_str());
 }
+
+// Handle the image and its bits here.
+// Use image.width(), image.height(), image.bytes_per_line(),
+// image.pixel_format(), and image.bits() for that.
 ```
 
 ### 4. `technical diver`
@@ -661,4 +665,8 @@ if (!meta_entries.empty()) {
     const std::pair<std::string, std::string> first_pair = *meta_entries.begin();
     SAIL_LOG_DEBUG("%s: %s", first_pair.first.c_str(), first_pair.second.c_str());
 }
+
+// Handle the image and its bits here.
+// Use image.width(), image.height(), image.bytes_per_line(),
+// image.pixel_format(), and image.bits() for that.
 ```

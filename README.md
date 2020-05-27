@@ -161,7 +161,7 @@ It's pretty easy, isn't it? :smile: See [EXAMPLES](EXAMPLES.md) for more.
 
 See [EXAMPLES](EXAMPLES.md) for more.
 
-### 3. `Deep diver` - "I want to load this damn possibly multi-paged image from memory with options and have control over selected plugins and output pixel formats."
+### 3. `Deep diver` - "I want to load this damn animated GIF from memory and have control over selected plugins and output pixel formats."
 
 See [EXAMPLES](EXAMPLES.md) for more.
 
