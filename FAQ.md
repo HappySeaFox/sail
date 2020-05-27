@@ -7,6 +7,7 @@ Table of Contents
       * [How many image formats do you plan to implement?](#how-many-image-formats-do-you-plan-to-implement)
       * [I have questions, issues, or proposals](#i-have-questions-issues-or-proposals)
       * [Does SAIL provide simple one-line APIs?](#does-sail-provide-simple-one-line-apis)
+      * [How can point SAIL to a different plugins location?](#how-can-point-sail-to-a-different-plugins-location)
       * [What pixel formats SAIL is able to read?](#what-pixel-formats-sail-is-able-to-read)
       * [What pixel formats SAIL is able to output after reading an image file?](#what-pixel-formats-sail-is-able-to-output-after-reading-an-image-file)
       * [What pixel formats SAIL is able to write?](#what-pixel-formats-sail-is-able-to-write)
@@ -46,6 +47,10 @@ Pull requests are always welcomed.
 
 Yes. SAIL provides four levels of APIs, depending on your needs: `junior`, `advanced`, `deep diver`, and `technical diver`.
 See [EXAMPLES](EXAMPLES.md) for more.
+
+## How can point SAIL to a different plugins location?
+
+Set `SAIL_PLUGINGS_PATH` environment variable to a desired location.
 
 ## What pixel formats SAIL is able to read?
 
