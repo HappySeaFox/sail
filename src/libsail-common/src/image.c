@@ -62,7 +62,7 @@ void sail_destroy_image(struct sail_image *image) {
     free(image);
 }
 
-sail_error_t sail_copy_image(struct sail_image *source_image, struct sail_image **target_image) {
+sail_error_t sail_copy_image(const struct sail_image *source_image, struct sail_image **target_image) {
 
     SAIL_CHECK_IMAGE_PTR(source_image);
     SAIL_CHECK_IMAGE_PTR(target_image);

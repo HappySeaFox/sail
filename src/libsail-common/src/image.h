@@ -202,7 +202,7 @@ SAIL_EXPORT void sail_destroy_image(struct sail_image *image);
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_copy_image(struct sail_image *source_image, struct sail_image **target_image);
+SAIL_EXPORT sail_error_t sail_copy_image(const struct sail_image *source_image, struct sail_image **target_image);
 
 /* extern "C" */
 #ifdef __cplusplus
