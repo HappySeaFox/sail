@@ -20,60 +20,28 @@
     SOFTWARE.
 */
 
-#ifndef QT_SAIL_H
-#define QT_SAIL_H
-
-#include <cstddef>
-
-#include <QWidget>
-#include <QScopedPointer>
-#include <QVector>
-
-#include <sail-common/error.h>
-
-namespace Ui {
-    class QtSail;
-}
-
-class QImage;
-
-struct sail_context;
-struct sail_image;
-struct sail_plugin_info;
-struct sail_read_options;
-struct sail_write_options;
-
-class QtSail : public QWidget
+QStringList QtSail::filters() const
 {
-    Q_OBJECT
+    QStringList filters;
+    const sail_plugin_info_node *plugin_info_node = sail_plugin_info_list(m_context);
 
-public:
-    QtSail(QWidget *parent = nullptr);
-    ~QtSail();
+    while (plugin_info_node != nullptr) {
+        QStringList masks;
 
-private:
-    sail_error_t init();
-    sail_error_t loadImage(const QString &path, QVector<QImage> *qimages);
-    sail_error_t saveImage(const QImage &qimage, void *buffer, size_t buffer_length,
-                           size_t *written);
-    QStringList filters() const;
+        sail_string_node *extension_node = plugin_info_node->plugin_info->extension_node;
 
-private: // slots
-    void onOpenFile();
-    sail_error_t onProbe();
-    void onSave();
-    void onFit(bool fit);
-    void onPrevious();
-    void onNext();
+        while (extension_node != nullptr) {
+            masks.append(QStringLiteral("*.%1").arg(extension_node->value));
+            extension_node = extension_node->next;
+        }
 
-private:
-    QScopedPointer<Ui::QtSail> m_ui;
+        filters.append(QStringLiteral("%1: %2 (%3)")
+                       .arg(plugin_info_node->plugin_info->name)
+                       .arg(plugin_info_node->plugin_info->description)
+                       .arg(masks.join(QStringLiteral(" "))));
 
-    QVector<QImage> m_qimages;
-    int m_currentIndex = 0;
-    QString m_suffix;
+        plugin_info_node = plugin_info_node->next;
+    }
 
-    sail_context *m_context = nullptr;
-};
-
-#endif
+    return filters;
+}
