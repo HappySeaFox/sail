@@ -23,14 +23,26 @@
 #ifndef QT_SAIL_H
 #define QT_SAIL_H
 
+#include <cstddef>
+
 #include <QWidget>
 #include <QScopedPointer>
+#include <QVector>
 
 #include <sail-common/error.h>
 
+#include <sail-c++/context-c++.h>
+
+namespace Ui {
+    class QtSail;
+}
+
 class QImage;
 
-struct sail_image;
+namespace sail
+{
+class plugin_info;
+}
 
 class QtSail : public QWidget
 {
@@ -42,8 +54,9 @@ public:
 
 private:
     sail_error_t init();
-    sail_error_t loadImage(const QString &path, QImage *qimage);
+    sail_error_t loadImage(const QString &path, QVector<QImage> *qimages);
     sail_error_t saveImage(const QString &path, const QImage &qimage);
+    sail_error_t pluginInfo(const sail::plugin_info &plugin_info) const;
     QStringList filters() const;
 
 private: // slots
@@ -51,10 +64,17 @@ private: // slots
     sail_error_t onProbe();
     void onSave();
     void onFit(bool fit);
+    void onPrevious();
+    void onNext();
 
 private:
-    class Private;
-    const QScopedPointer<Private> d;
+    QScopedPointer<Ui::QtSail> m_ui;
+
+    QVector<QImage> m_qimages;
+    int m_currentIndex = 0;
+    QString m_suffix;
+
+    sail::context m_context;
 };
 
 #endif

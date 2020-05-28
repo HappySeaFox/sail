@@ -60,6 +60,20 @@
        </property>
       </spacer>
      </item>
+     <item>
+      <widget class="QToolButton" name="pushPrevious">
+       <property name="text">
+        <string>Previous frame</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="pushNext">
+       <property name="text">
+        <string>Next frame</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item row="2" column="0">
@@ -91,8 +105,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>737</width>
-        <height>361</height>
+        <width>733</width>
+        <height>353</height>
        </rect>
       </property>
      </widget>
@@ -101,11 +115,13 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>scrollArea</tabstop>
   <tabstop>pushOpen</tabstop>
   <tabstop>pushProbe</tabstop>
   <tabstop>pushSave</tabstop>
   <tabstop>checkFit</tabstop>
+  <tabstop>pushPrevious</tabstop>
+  <tabstop>pushNext</tabstop>
+  <tabstop>scrollArea</tabstop>
  </tabstops>
  <resources/>
  <connections/>

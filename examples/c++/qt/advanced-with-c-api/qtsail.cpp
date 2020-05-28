@@ -42,113 +42,137 @@
 #include "ui_qtsail.h"
 #include "qimage_sail_pixel_formats.h"
 
-// PIMPL
-//
-class Q_DECL_HIDDEN QtSail::Private
-{
-public:
-    QScopedPointer<Ui::QtSail> ui;
-
-    QImage qimage;
-
-    sail_context *context = nullptr;
-};
-
-QtSail::QtSail(QWidget *parent)
-    : QWidget(parent)
-    , d(new Private)
-{
-    d->ui.reset(new Ui::QtSail);
-    d->ui->setupUi(this);
-    QLabel *l = new QLabel;
-    l->setAlignment(Qt::AlignCenter);
-    d->ui->scrollArea->setWidget(l);
-
-    connect(d->ui->pushOpen,  &QPushButton::clicked, this, &QtSail::onOpenFile);
-    connect(d->ui->pushProbe, &QPushButton::clicked, this, &QtSail::onProbe);
-    connect(d->ui->pushSave,  &QPushButton::clicked, this, &QtSail::onSave);
-    connect(d->ui->checkFit,  &QCheckBox::toggled,   this, &QtSail::onFit);
-
-    d->ui->pushOpen->setShortcut(QKeySequence::Open);
-    d->ui->pushOpen->setToolTip(d->ui->pushOpen->shortcut().toString());
-    d->ui->pushSave->setShortcut(QKeySequence::Save);
-    d->ui->pushSave->setToolTip(d->ui->pushSave->shortcut().toString());
-
-    init();
-}
+#include "multi-paged-impl.cpp"
 
 QtSail::~QtSail()
 {
-    sail_finish(d->context);
-    d->context = nullptr;
+    sail_finish(m_context);
+    m_context = nullptr;
 }
 
 sail_error_t QtSail::init()
 {
-    SAIL_TRY_OR_CLEANUP(sail_init(&d->context),
+    SAIL_TRY_OR_CLEANUP(sail_init(&m_context),
                         /* cleanup */ QMessageBox::critical(this, tr("Error"), tr("Failed to init SAIL")),
                                       ::exit(1));
     return 0;
 }
 
-sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
+sail_error_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages)
 {
+    qimages->clear();
+
     /*
      * Always set the initial state to NULL in C or nullptr in C++.
      */
-    void *state = nullptr;
-    struct sail_image *image = nullptr;
-    uchar *image_bits = nullptr;
+    void *state = NULL;
+    struct sail_image *image = NULL;
+    uchar *image_bits = NULL;
+
+    /*
+     * Save this for displaying in the status bar.
+     */
+    SailPixelFormat source_pixel_format;
+    SailPixelFormat pixel_format;
+    unsigned width, height;
 
     /*
      * Starts reading the specified file.
      * The subsequent calls to sail_read_next_frame() will output pixels in BPP24-RGB pixel format for image formats
      * without transparency support and BPP32-RGBA otherwise.
      */
-    SAIL_TRY_OR_CLEANUP(sail_start_reading_file(path.toLocal8Bit(), d->context, NULL, &state),
+    SAIL_TRY_OR_CLEANUP(sail_start_reading_file(path.toLocal8Bit(), m_context, NULL, &state),
                         /* cleanup */ sail_stop_reading(state),
                                       free(image_bits),
                                       sail_destroy_image(image));
 
     /*
-     * Read just a single frame. It's possible to read more frames if any. Just continue
-     * reading frames till sail_read_next_frame() returns 0. If no more frames are available,
-     * it returns SAIL_NO_MORE_FRAMES.
+     * Read all the available image frames in the file.
      */
-    SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, &image, (void **)&image_bits),
-                        /* cleanup */ sail_stop_reading(state));
+    sail_error_t res = 0;
+    while ((res = sail_read_next_frame(state,
+                                       &image,
+                                       (void **)&image_bits)) == 0) {
+
+        const QImage::Format qimageFormat = sailPixelFormatToQImageFormat(image->pixel_format);
+
+        if (qimageFormat == QImage::Format_Invalid) {
+            sail_stop_reading(state);
+            sail_destroy_image(image);
+            free(image_bits);
+            return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+        }
+
+        source_pixel_format = image->source_pixel_format;
+        pixel_format = image->pixel_format;
+        width = image->width;
+        height = image->height;
+
+        /*
+         * Convert to QImage.
+         */
+        QImage qimage = QImage(image_bits,
+                               image->width,
+                               image->height,
+                               image->bytes_per_line,
+                               qimageFormat).copy();
+
+        /*
+         * Apply palette.
+         */
+        if (qimageFormat == QImage::Format_Indexed8) {
+            /*
+             * Assume palette is BPP24-RGB.
+             */
+            if (image->palette_pixel_format != SAIL_PIXEL_FORMAT_BPP24_RGB) {
+                sail_stop_reading(state);
+                sail_destroy_image(image);
+                free(image_bits);
+                return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+            }
+
+            QVector<QRgb> colorTable;
+            unsigned char *palette = reinterpret_cast<unsigned char *>(image->palette);
+
+            for (int i = 0; i < image->palette_color_count; i++) {
+                colorTable.append(qRgb(*palette, *(palette+1), *(palette+2)));
+                palette += 3;
+            }
+
+            qimage.setColorTable(colorTable);
+        }
+
+        qimages->append(qimage);
+
+        sail_destroy_image(image);
+        free(image_bits);
+    }
+
+    if (res != SAIL_NO_MORE_FRAMES) {
+        sail_stop_reading(state);
+        return res;
+    }
+
+    SAIL_LOG_DEBUG("Read images: %d", qimages->size());
 
     /*
-     * It's essential to ALWAYS stop reading to free memory resources.
-     * Avoiding doing so will lead to memory leaks.
+     * Finish reading.
      */
-    SAIL_TRY_OR_CLEANUP(sail_stop_reading(state),
-             /* cleanup */ free(image_bits),
-                           sail_destroy_image(image));
-
-    *qimage = QImage(image_bits,
-                     image->width,
-                     image->height,
-                     image->bytes_per_line,
-                     sailPixelFormatToQImageFormat(image->pixel_format)).copy();
-
-    free(image_bits);
+    SAIL_TRY(sail_stop_reading(state));
 
     const char *source_pixel_format_str = NULL;
     const char *pixel_format_str = NULL;
 
-    sail_pixel_format_to_string(image->source_pixel_format, &source_pixel_format_str);
-    sail_pixel_format_to_string(image->pixel_format, &pixel_format_str);
+    sail_pixel_format_to_string(source_pixel_format, &source_pixel_format_str);
+    sail_pixel_format_to_string(pixel_format, &pixel_format_str);
 
-    d->ui->labelStatus->setText(tr("%1  [%2x%3]  [%4 -> %5]")
+    m_ui->labelStatus->setText(tr("%1  [%2x%3]  [%4 -> %5]")
                                 .arg(QFileInfo(path).fileName())
-                                .arg(image->width)
-                                .arg(image->height)
+                                .arg(width)
+                                .arg(height)
                                 .arg(source_pixel_format_str)
                                 .arg(pixel_format_str)
                                 );
-
-    sail_destroy_image(image);
 
     return 0;
 }
@@ -169,7 +193,7 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
     SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(image->width, image->pixel_format, &image->bytes_per_line),
                         /* cleanup */ sail_destroy_image(image));
 
-    SAIL_TRY_OR_CLEANUP(sail_start_writing_file(path.toLocal8Bit(), d->context, nullptr, &state),
+    SAIL_TRY_OR_CLEANUP(sail_start_writing_file(path.toLocal8Bit(), m_context, nullptr, &state),
                         /* cleanup */ sail_destroy_image(image));
     SAIL_TRY_OR_CLEANUP(sail_write_next_frame(state, image, qimage.bits()),
                         /* cleanup */ sail_destroy_image(image));
@@ -196,8 +220,8 @@ void QtSail::onOpenFile()
 
     sail_error_t res;
 
-    if ((res = loadImage(path, &d->qimage)) == 0) {
-        onFit(d->ui->checkFit->isChecked());
+    if ((res = loadImage(path, &m_qimages)) == 0) {
+        onFit(m_ui->checkFit->isChecked());
     } else {
         QMessageBox::critical(this, tr("Error"), tr("Failed to load '%1'. Error: %2.")
                               .arg(path)
@@ -222,7 +246,7 @@ sail_error_t QtSail::onProbe()
     const struct sail_plugin_info *plugin_info;
     sail_error_t res;
 
-    if ((res = sail_probe(path.toLocal8Bit(), d->context, &image, &plugin_info)) != 0) {
+    if ((res = sail_probe(path.toLocal8Bit(), m_context, &image, &plugin_info)) != 0) {
         QMessageBox::critical(this, tr("Error"), tr("Failed to probe the image. Error: %1").arg(res));
         return res;
     }
@@ -262,7 +286,7 @@ void QtSail::onSave()
 
     sail_error_t res;
 
-    if ((res = saveImage(path, d->qimage)) != 0) {
+    if ((res = saveImage(path, m_qimages.first())) != 0) {
         QMessageBox::critical(this, tr("Error"), tr("Failed to save '%1'. Error: %2.")
                               .arg(path)
                               .arg(res));
@@ -271,8 +295,8 @@ void QtSail::onSave()
 
     if (QMessageBox::question(this, tr("Open file"), tr("%1 has been saved succesfully. Open the saved file?")
                               .arg(QDir::toNativeSeparators(path))) == QMessageBox::Yes) {
-        if ((res = loadImage(path, &d->qimage)) == 0) {
-            onFit(d->ui->checkFit->isChecked());
+        if ((res = loadImage(path, &m_qimages)) == 0) {
+            onFit(m_ui->checkFit->isChecked());
         } else {
             QMessageBox::critical(this, tr("Error"), tr("Failed to load '%1'. Error: %2.")
                                   .arg(path)
@@ -280,24 +304,4 @@ void QtSail::onSave()
             return;
         }
     }
-}
-
-void QtSail::onFit(bool fit)
-{
-    QPixmap pixmap;
-
-    if (fit) {
-        if (d->qimage.width() > d->ui->scrollArea->viewport()->width() ||
-                d->qimage.height() > d->ui->scrollArea->viewport()->height()) {
-            pixmap = QPixmap::fromImage(d->qimage.scaled(d->ui->scrollArea->viewport()->size(),
-                                                         Qt::KeepAspectRatio,
-                                                         Qt::SmoothTransformation));
-        } else {
-            pixmap =  QPixmap::fromImage(d->qimage);
-        }
-    } else {
-        pixmap =  QPixmap::fromImage(d->qimage);
-    }
-
-    qobject_cast<QLabel *>(d->ui->scrollArea->widget())->setPixmap(pixmap);
 }

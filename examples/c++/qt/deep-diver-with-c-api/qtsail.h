@@ -38,10 +38,6 @@ namespace Ui {
 class QImage;
 
 struct sail_context;
-struct sail_image;
-struct sail_plugin_info;
-struct sail_read_options;
-struct sail_write_options;
 
 class QtSail : public QWidget
 {

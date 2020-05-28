@@ -25,12 +25,17 @@
 
 #include <QWidget>
 #include <QScopedPointer>
+#include <QVector>
 
 #include <sail-common/error.h>
 
+namespace Ui {
+    class QtSail;
+}
+
 class QImage;
 
-struct sail_image;
+struct sail_context;
 
 class QtSail : public QWidget
 {
@@ -42,7 +47,7 @@ public:
 
 private:
     sail_error_t init();
-    sail_error_t loadImage(const QString &path, QImage *qimage);
+    sail_error_t loadImage(const QString &path, QVector<QImage> *qimages);
     sail_error_t saveImage(const QString &path, const QImage &qimage);
     QStringList filters() const;
 
@@ -51,10 +56,17 @@ private: // slots
     sail_error_t onProbe();
     void onSave();
     void onFit(bool fit);
+    void onPrevious();
+    void onNext();
 
 private:
-    class Private;
-    const QScopedPointer<Private> d;
+    QScopedPointer<Ui::QtSail> m_ui;
+
+    QVector<QImage> m_qimages;
+    int m_currentIndex = 0;
+    QString m_suffix;
+
+    sail_context *m_context = nullptr;
 };
 
 #endif

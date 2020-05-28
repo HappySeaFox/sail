@@ -39,11 +39,6 @@ namespace Ui {
 
 class QImage;
 
-struct sail_read_options;
-struct sail_write_options;
-struct sail_plugin_info;
-struct sail_image;
-
 namespace sail
 {
 class plugin_info;
