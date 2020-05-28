@@ -7,6 +7,7 @@ project(SAIL VERSION 0.9.0
 include(GNUInstallDirs)
 include(CheckIncludeFiles)
 include(CheckCSourceCompiles)
+include(CMakePushCheckState)
 
 # Our own cmake scripts
 #

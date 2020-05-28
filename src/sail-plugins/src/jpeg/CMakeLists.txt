@@ -1,5 +1,9 @@
 # Check for JPEG ICC functions that were added in libjpeg-turbo-1.5.90
 #
+cmake_push_check_state(RESET)
+set(CMAKE_REQUIRED_INCLUDES "${libjpeg_INCLUDE_DIRS}")
+set(CMAKE_REQUIRED_LIBRARIES PkgConfig::libjpeg)
+
 check_c_source_compiles(
     "
     #include <stdio.h>
@@ -13,6 +17,8 @@ check_c_source_compiles(
     "
     HAVE_JPEG_ICCP
 )
+
+cmake_pop_check_state()
 
 if (HAVE_JPEG_ICCP)
     set(PLUGIN_INFO_FEATURE_ICCP ";ICCP")
