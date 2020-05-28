@@ -181,30 +181,7 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
     return 0;
 }
 
-QStringList QtSail::filters() const
-{
-    QStringList filters;
-    const sail_plugin_info_node *plugin_info_node = sail_plugin_info_list(d->context);
-
-    while (plugin_info_node != nullptr) {
-        QStringList masks;
-
-        const sail_string_node *extension_node = plugin_info_node->plugin_info->extension_node;
-
-        while (extension_node != nullptr) {
-            masks.append(QStringLiteral("*.%1").arg(extension_node->value));
-            extension_node = extension_node->next;
-        }
-
-        filters.append(QStringLiteral("%1 (%2)")
-                       .arg(plugin_info_node->plugin_info->description)
-                       .arg(masks.join(QStringLiteral(" "))));
-
-        plugin_info_node = plugin_info_node->next;
-    }
-
-    return filters;
-}
+#include "filters-impl-c.cpp"
 
 void QtSail::onOpenFile()
 {

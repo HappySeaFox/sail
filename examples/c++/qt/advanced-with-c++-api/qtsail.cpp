@@ -155,27 +155,7 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
     return 0;
 }
 
-QStringList QtSail::filters() const
-{
-    const std::vector<sail::plugin_info> plugin_info_list = d->context.plugin_info_list();
-    QStringList filters;
-
-    for (const sail::plugin_info &plugin_info : plugin_info_list) {
-        QStringList masks;
-
-        const std::vector<std::string> extensions = plugin_info.extensions();
-
-        for (const std::string &extension : extensions) {
-            masks.append(QStringLiteral("*.%1").arg(extension.c_str()));
-        }
-
-        filters.append(QStringLiteral("%1 (%2)")
-                       .arg(plugin_info.description().c_str())
-                       .arg(masks.join(QStringLiteral(" "))));
-    }
-
-    return filters;
-}
+#include "filters-impl-c++.cpp"
 
 void QtSail::onOpenFile()
 {

@@ -45,34 +45,7 @@
 #include "ui_qtsail.h"
 #include "qimage_sail_pixel_formats.h"
 
-QtSail::QtSail(QWidget *parent)
-    : QWidget(parent)
-{
-    m_ui.reset(new Ui::QtSail);
-    m_ui->setupUi(this);
-
-    QLabel *l = new QLabel;
-    l->setAlignment(Qt::AlignCenter);
-    m_ui->scrollArea->setWidget(l);
-
-    connect(m_ui->pushOpen,     &QPushButton::clicked, this, &QtSail::onOpenFile);
-    connect(m_ui->pushProbe,    &QPushButton::clicked, this, &QtSail::onProbe);
-    connect(m_ui->pushSave,     &QPushButton::clicked, this, &QtSail::onSave);
-    connect(m_ui->checkFit,     &QCheckBox::toggled,   this, &QtSail::onFit);
-    connect(m_ui->pushPrevious, &QPushButton::clicked, this, &QtSail::onPrevious);
-    connect(m_ui->pushNext,     &QPushButton::clicked, this, &QtSail::onNext);
-
-    m_ui->pushOpen->setShortcut(QKeySequence::Open);
-    m_ui->pushOpen->setToolTip(m_ui->pushOpen->shortcut().toString());
-    m_ui->pushSave->setShortcut(QKeySequence::Save);
-    m_ui->pushSave->setToolTip(m_ui->pushSave->shortcut().toString());
-    m_ui->pushPrevious->setShortcut(QKeySequence::FindPrevious);
-    m_ui->pushPrevious->setToolTip(m_ui->pushPrevious->shortcut().toString());
-    m_ui->pushNext->setShortcut(QKeySequence::FindNext);
-    m_ui->pushNext->setToolTip(m_ui->pushNext->shortcut().toString());
-
-    init();
-}
+#include "multi-paged-impl.cpp"
 
 sail_error_t QtSail::init()
 {
@@ -431,5 +404,3 @@ void QtSail::onSave()
 
     delete [] buffer;
 }
-
-#include "multi-paged-impl.cpp"
