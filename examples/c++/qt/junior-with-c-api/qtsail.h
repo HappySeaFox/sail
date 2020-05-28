@@ -25,12 +25,13 @@
 
 #include <QWidget>
 #include <QScopedPointer>
+#include <QImage>
 
 #include <sail-common/error.h>
 
-class QImage;
-
-struct sail_plugin_info;
+namespace Ui {
+    class QtSail;
+}
 
 class QtSail : public QWidget
 {
@@ -53,8 +54,9 @@ private:
     void fit();
 
 private:
-    class Private;
-    const QScopedPointer<Private> d;
+    QScopedPointer<Ui::QtSail> m_ui;
+
+    QImage m_qimage;
 };
 
 #endif

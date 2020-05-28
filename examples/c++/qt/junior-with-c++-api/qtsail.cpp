@@ -41,33 +41,22 @@
 #include "ui_qtsail.h"
 #include "qimage_sail_pixel_formats.h"
 
-// PIMPL
-//
-class Q_DECL_HIDDEN QtSail::Private
-{
-public:
-    QScopedPointer<Ui::QtSail> ui;
-
-    QImage qimage;
-};
-
 QtSail::QtSail(QWidget *parent)
     : QWidget(parent)
-    , d(new Private)
 {
-    d->ui.reset(new Ui::QtSail);
-    d->ui->setupUi(this);
+    m_ui.reset(new Ui::QtSail);
+    m_ui->setupUi(this);
     QLabel *l = new QLabel;
     l->setAlignment(Qt::AlignCenter);
-    d->ui->scrollArea->setWidget(l);
+    m_ui->scrollArea->setWidget(l);
 
-    connect(d->ui->pushOpen,  &QPushButton::clicked, this, &QtSail::onOpenFile);
-    connect(d->ui->pushSave,  &QPushButton::clicked, this, &QtSail::onSave);
+    connect(m_ui->pushOpen, &QPushButton::clicked, this, &QtSail::onOpenFile);
+    connect(m_ui->pushSave, &QPushButton::clicked, this, &QtSail::onSave);
 
-    d->ui->pushOpen->setShortcut(QKeySequence::Open);
-    d->ui->pushOpen->setToolTip(d->ui->pushOpen->shortcut().toString());
-    d->ui->pushSave->setShortcut(QKeySequence::Save);
-    d->ui->pushSave->setToolTip(d->ui->pushSave->shortcut().toString());
+    m_ui->pushOpen->setShortcut(QKeySequence::Open);
+    m_ui->pushOpen->setToolTip(m_ui->pushOpen->shortcut().toString());
+    m_ui->pushSave->setShortcut(QKeySequence::Save);
+    m_ui->pushSave->setToolTip(m_ui->pushSave->shortcut().toString());
 }
 
 QtSail::~QtSail()
@@ -92,7 +81,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
                      image.bytes_per_line(),
                      sailPixelFormatToQImageFormat(image.pixel_format())).copy();
 
-    d->ui->labelStatus->setText(tr("%1  [%2x%3]")
+    m_ui->labelStatus->setText(tr("%1  [%2x%3]")
                                 .arg(QFileInfo(path).fileName())
                                 .arg(image.width())
                                 .arg(image.height())
@@ -119,28 +108,7 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
 
 QStringList QtSail::filters() const
 {
-    // Allocate a local context
-    //
-    sail::context context;
-
-    const std::vector<sail::plugin_info> plugin_info_list = context.plugin_info_list();
-    QStringList filters;
-
-    for (const sail::plugin_info &plugin_info : plugin_info_list) {
-        QStringList masks;
-
-        const std::vector<std::string> extensions = plugin_info.extensions();
-
-        for (const std::string &extension : extensions) {
-            masks.append(QStringLiteral("*.%1").arg(extension.c_str()));
-        }
-
-        filters.append(QStringLiteral("%1 (%2)")
-                       .arg(plugin_info.description().c_str())
-                       .arg(masks.join(QStringLiteral(" "))));
-    }
-
-    return filters;
+    return QStringList { QStringLiteral("All Files (*.*)") };
 }
 
 void QtSail::onOpenFile()
@@ -156,7 +124,7 @@ void QtSail::onOpenFile()
 
     sail_error_t res;
 
-    if ((res = loadImage(path, &d->qimage)) == 0) {
+    if ((res = loadImage(path, &m_qimage)) == 0) {
         fit();
     } else {
         QMessageBox::critical(this, tr("Error"), tr("Failed to load '%1'. Error: %2.")
@@ -179,7 +147,7 @@ void QtSail::onSave()
 
     sail_error_t res;
 
-    if ((res = saveImage(path, d->qimage)) != 0) {
+    if ((res = saveImage(path, m_qimage)) != 0) {
         QMessageBox::critical(this, tr("Error"), tr("Failed to save '%1'. Error: %2.")
                               .arg(path)
                               .arg(res));
@@ -193,14 +161,14 @@ void QtSail::fit()
 {
     QPixmap pixmap;
 
-    if (d->qimage.width() > d->ui->scrollArea->viewport()->width() ||
-            d->qimage.height() > d->ui->scrollArea->viewport()->height()) {
-        pixmap = QPixmap::fromImage(d->qimage.scaled(d->ui->scrollArea->viewport()->size(),
+    if (m_qimage.width() > m_ui->scrollArea->viewport()->width() ||
+            m_qimage.height() > m_ui->scrollArea->viewport()->height()) {
+        pixmap = QPixmap::fromImage(m_qimage.scaled(m_ui->scrollArea->viewport()->size(),
                                                      Qt::KeepAspectRatio,
                                                      Qt::SmoothTransformation));
     } else {
-        pixmap =  QPixmap::fromImage(d->qimage);
+        pixmap =  QPixmap::fromImage(m_qimage);
     }
 
-    qobject_cast<QLabel *>(d->ui->scrollArea->widget())->setPixmap(pixmap);
+    qobject_cast<QLabel *>(m_ui->scrollArea->widget())->setPixmap(pixmap);
 }
