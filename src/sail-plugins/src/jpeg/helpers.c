@@ -103,10 +103,10 @@ sail_error_t convert_cmyk(unsigned char *bits_source, unsigned char *bits_target
 
     if (target_pixel_format == SAIL_PIXEL_FORMAT_BPP24_RGB) {
         for (unsigned i = 0; i < width; i++) {
-            C = *bits_source++ / 100.0;
-            M = *bits_source++ / 100.0;
-            Y = *bits_source++ / 100.0;
-            K = *bits_source++ / 100.0;
+            C = (unsigned char)(*bits_source++ / 100.0);
+            M = (unsigned char)(*bits_source++ / 100.0);
+            Y = (unsigned char)(*bits_source++ / 100.0);
+            K = (unsigned char)(*bits_source++ / 100.0);
 
             *bits_target++ = 255 * (1-C) * (1-K);
             *bits_target++ = 255 * (1-M) * (1-K);
@@ -114,10 +114,10 @@ sail_error_t convert_cmyk(unsigned char *bits_source, unsigned char *bits_target
         }
     } else if (target_pixel_format == SAIL_PIXEL_FORMAT_BPP32_RGBA) {
         for (unsigned i = 0; i < width; i++) {
-            C = *bits_source++ / 100.0;
-            M = *bits_source++ / 100.0;
-            Y = *bits_source++ / 100.0;
-            K = *bits_source++ / 100.0;
+            C = (unsigned char)(*bits_source++ / 100.0);
+            M = (unsigned char)(*bits_source++ / 100.0);
+            Y = (unsigned char)(*bits_source++ / 100.0);
+            K = (unsigned char)(*bits_source++ / 100.0);
 
             *bits_target++ = 255 * (1-C) * (1-K);
             *bits_target++ = 255 * (1-M) * (1-K);
