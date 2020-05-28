@@ -114,7 +114,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_io *io, const stru
     if (jpeg_state->read_options->io_options & SAIL_IO_OPTION_META_INFO) {
         jpeg_save_markers(&jpeg_state->decompress_context, JPEG_COM, 0xffff);
     }
-    if (jpeg_state->read_options->io_options & SAIL_IO_OPTION_ICC) {
+    if (jpeg_state->read_options->io_options & SAIL_IO_OPTION_ICCP) {
         jpeg_save_markers(&jpeg_state->decompress_context, JPEG_APP0 + 2, 0xFFFF);
     }
 
@@ -223,18 +223,18 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
     }
 
     /* Read ICC profile. */
-#ifdef HAVE_JPEG_ICC
-    if (jpeg_state->read_options->io_options & SAIL_IO_OPTION_ICC) {
+#ifdef HAVE_JPEG_ICCP
+    if (jpeg_state->read_options->io_options & SAIL_IO_OPTION_ICCP) {
         if (jpeg_state->extra_scan_line_needed) {
             SAIL_LOG_DEBUG("JPEG: Skipping the ICC profile (if any) as we convert from CMYK");
         } else {
-            SAIL_TRY_OR_CLEANUP(sail_alloc_icc(&(*image)->icc),
+            SAIL_TRY_OR_CLEANUP(sail_alloc_iccp(&(*image)->iccp),
                                 /* cleanup */ sail_destroy_image(*image));
 
             SAIL_LOG_DEBUG("JPEG: ICC profile is %sfound",
                             jpeg_read_icc_profile(&jpeg_state->decompress_context,
-                                                    (JOCTET **)&(*image)->icc->data,
-                                                    &(*image)->icc->data_length)
+                                                    (JOCTET **)&(*image)->iccp->data,
+                                                    &(*image)->iccp->data_length)
                             ? "" : "not ");
         }
     }
@@ -428,10 +428,10 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v2(void *state, struc
     }
 
     /* Write ICC profile. */
-#ifdef HAVE_JPEG_ICC
-    if (jpeg_state->write_options->io_options & SAIL_IO_OPTION_ICC && image->icc != NULL) {
+#ifdef HAVE_JPEG_ICCP
+    if (jpeg_state->write_options->io_options & SAIL_IO_OPTION_ICCP && image->iccp != NULL) {
         SAIL_LOG_DEBUG("JPEG: Writing ICC profile");
-        jpeg_write_icc_profile(&jpeg_state->compress_context, image->icc->data, image->icc->data_length);
+        jpeg_write_icc_profile(&jpeg_state->compress_context, image->iccp->data, image->iccp->data_length);
     }
 #endif
 

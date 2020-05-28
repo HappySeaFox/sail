@@ -11,17 +11,17 @@ check_c_source_compiles(
         return 0;
     }
     "
-    HAVE_JPEG_ICC
+    HAVE_JPEG_ICCP
 )
 
-if (HAVE_JPEG_ICC)
-    set(PLUGIN_INFO_FEATURE_ICC ";ICC")
+if (HAVE_JPEG_ICCP)
+    set(PLUGIN_INFO_FEATURE_ICCP ";ICCP")
 endif()
 
 # Common plugin configuration
 #
 sail_plugin(TARGET jpeg SOURCES jpeg.c helpers.c io_dest.c io_src.c PKGCONFIG libjpeg)
 
-if (HAVE_JPEG_ICC)
-    target_compile_definitions(jpeg PRIVATE HAVE_JPEG_ICC)
+if (HAVE_JPEG_ICCP)
+    target_compile_definitions(jpeg PRIVATE HAVE_JPEG_ICCP)
 endif()

@@ -174,7 +174,7 @@ enum SailPluginFeatures {
     SAIL_PLUGIN_FEATURE_INTERLACED = 1 << 5,
 
     /* Ability to read or write embedded ICC profiles. */
-    SAIL_PLUGIN_FEATURE_ICC        = 1 << 6,
+    SAIL_PLUGIN_FEATURE_ICCP       = 1 << 6,
 };
 
 /* Read or write options. */
@@ -190,7 +190,7 @@ enum SailIoOptions {
     SAIL_IO_OPTION_INTERLACED = 1 << 2,
 
     /* Instruction to read or write embedded ICC profile. */
-    SAIL_IO_OPTION_ICC        = 1 << 3,
+    SAIL_IO_OPTION_ICCP       = 1 << 3,
 };
 
 #endif

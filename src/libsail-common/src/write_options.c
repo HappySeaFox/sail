@@ -63,8 +63,8 @@ sail_error_t sail_write_options_from_features(const struct sail_write_features *
         write_options->io_options |= SAIL_IO_OPTION_INTERLACED;
     }
 
-    if (write_features->features & SAIL_PLUGIN_FEATURE_ICC) {
-        write_options->io_options |= SAIL_IO_OPTION_ICC;
+    if (write_features->features & SAIL_PLUGIN_FEATURE_ICCP) {
+        write_options->io_options |= SAIL_IO_OPTION_ICCP;
     }
 
     /* Compression levels are not supported. */

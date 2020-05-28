@@ -9,12 +9,12 @@ extensions=png
 mime-types=image/png
 
 [read-features]
-features=STATIC;META-INFO;INTERLACED;ICC
+features=STATIC;META-INFO;INTERLACED;ICCP
 output-pixel-formats=SOURCE;BPP24-RGB;BPP24-BGR;BPP32-RGBA;BPP32-BGRA;BPP32-ARGB;BPP32-ABGR
 preferred-output-pixel-format=BPP32-RGBA
 
 [write-features]
-features=STATIC;META-INFO;INTERLACED;ICC
+features=STATIC;META-INFO;INTERLACED;ICCP
 properties=
 interlaced-passes=7
 compression-types=

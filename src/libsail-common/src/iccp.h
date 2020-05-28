@@ -16,8 +16,8 @@
     along with this library. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef SAIL_ICC_H
-#define SAIL_ICC_H
+#ifndef SAIL_ICCP_H
+#define SAIL_ICCP_H
 
 #ifdef SAIL_BUILD
     #include "error.h"
@@ -36,7 +36,7 @@ struct sail_meta_entry_node;
 /*
  * A structure representing an ICC profile.
  */
-struct sail_icc {
+struct sail_iccp {
 
     /* Optional ICC profile name. Can be NULL. */
     char *name;
@@ -48,28 +48,28 @@ struct sail_icc {
     unsigned data_length;
 };
 
-typedef struct sail_icc sail_icc_t;
+typedef struct sail_iccp sail_iccp_t;
 
 /*
- * Allocates a new ICC profile. The assigned profile MUST be destroyed later with sail_destroy_icc().
+ * Allocates a new ICC profile. The assigned profile MUST be destroyed later with sail_destroy_iccp().
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_alloc_icc(struct sail_icc **icc);
+SAIL_EXPORT sail_error_t sail_alloc_iccp(struct sail_iccp **iccp);
 
 /*
  * Destroys the specified ICC profile and all its internal allocated memory buffers.
  * Does nothing if the profile is NULL.
  */
-SAIL_EXPORT void sail_destroy_icc(struct sail_icc *icc);
+SAIL_EXPORT void sail_destroy_iccp(struct sail_iccp *iccp);
 
 /*
  * Makes a deep copy of the specified ICC profile. The assigned profile MUST be destroyed later
- * with sail_destroy_icc().
+ * with sail_destroy_iccp().
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_copy_icc(const struct sail_icc *source_icc, struct sail_icc **target_icc);
+SAIL_EXPORT sail_error_t sail_copy_iccp(const struct sail_iccp *source_iccp, struct sail_iccp **target_iccp);
 
 /* extern "C" */
 #ifdef __cplusplus

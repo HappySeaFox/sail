@@ -22,52 +22,52 @@
 
 #include "sail-common.h"
 
-sail_error_t sail_alloc_icc(struct sail_icc **icc) {
+sail_error_t sail_alloc_iccp(struct sail_iccp **iccp) {
 
-    *icc = (struct sail_icc *)malloc(sizeof(struct sail_icc));
+    *iccp = (struct sail_iccp *)malloc(sizeof(struct sail_iccp));
 
-    if (*icc == NULL) {
+    if (*iccp == NULL) {
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
-    (*icc)->name        = NULL;
-    (*icc)->data        = NULL;
-    (*icc)->data_length = 0;
+    (*iccp)->name        = NULL;
+    (*iccp)->data        = NULL;
+    (*iccp)->data_length = 0;
 
     return 0;
 }
 
-void sail_destroy_icc(struct sail_icc *icc) {
+void sail_destroy_iccp(struct sail_iccp *iccp) {
 
-    if (icc == NULL) {
+    if (iccp == NULL) {
         return;
     }
 
-    free(icc->name);
-    free(icc->data);
-    free(icc);
+    free(iccp->name);
+    free(iccp->data);
+    free(iccp);
 }
 
-sail_error_t sail_copy_icc(const struct sail_icc *source_icc, struct sail_icc **target_icc) {
+sail_error_t sail_copy_iccp(const struct sail_iccp *source_iccp, struct sail_iccp **target_iccp) {
 
-    SAIL_CHECK_ICC_PTR(source_icc);
-    SAIL_CHECK_ICC_PTR(target_icc);
+    SAIL_CHECK_ICCP_PTR(source_iccp);
+    SAIL_CHECK_ICCP_PTR(target_iccp);
 
-    SAIL_TRY(sail_alloc_icc(target_icc));
+    SAIL_TRY(sail_alloc_iccp(target_iccp));
 
-    SAIL_TRY_OR_CLEANUP(sail_strdup(source_icc->name, &(*target_icc)->name),
-                        /* cleanup */ sail_destroy_icc(*target_icc));
+    SAIL_TRY_OR_CLEANUP(sail_strdup(source_iccp->name, &(*target_iccp)->name),
+                        /* cleanup */ sail_destroy_iccp(*target_iccp));
 
-    (*target_icc)->data = malloc(source_icc->data_length);
+    (*target_iccp)->data = malloc(source_iccp->data_length);
 
-    if ((*target_icc)->data == NULL) {
-        sail_destroy_icc(*target_icc);
+    if ((*target_iccp)->data == NULL) {
+        sail_destroy_iccp(*target_iccp);
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
-    memcpy((*target_icc)->data, source_icc->data, source_icc->data_length);
+    memcpy((*target_iccp)->data, source_iccp->data, source_iccp->data_length);
 
-    (*target_icc)->data_length = source_icc->data_length;
+    (*target_iccp)->data_length = source_iccp->data_length;
 
     return 0;
 }

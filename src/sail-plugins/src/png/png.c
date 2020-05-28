@@ -260,7 +260,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
     }
 
     /* Read ICC profile. */
-    if (png_state->read_options->io_options & SAIL_IO_OPTION_ICC) {
+    if (png_state->read_options->io_options & SAIL_IO_OPTION_ICCP) {
         char *name;
         int compression;
         png_bytep data;
@@ -274,20 +274,20 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
                                 &data_length) == PNG_INFO_iCCP;
 
         if (ok) {
-            SAIL_TRY_OR_CLEANUP(sail_alloc_icc(&(*image)->icc),
+            SAIL_TRY_OR_CLEANUP(sail_alloc_iccp(&(*image)->iccp),
                                 /* cleanup */ sail_destroy_image(*image));
-            SAIL_TRY_OR_CLEANUP(sail_strdup(name, &(*image)->icc->name),
+            SAIL_TRY_OR_CLEANUP(sail_strdup(name, &(*image)->iccp->name),
                                 /* cleanup */ sail_destroy_image(*image));
 
-            (*image)->icc->data = malloc(data_length);
+            (*image)->iccp->data = malloc(data_length);
 
-            if ((*image)->icc->data == NULL) {
+            if ((*image)->iccp->data == NULL) {
                 sail_destroy_image(*image);
                 return SAIL_MEMORY_ALLOCATION_FAILED;
             }
 
-            memcpy((*image)->icc->data, data, data_length);
-            (*image)->icc->data_length = data_length;
+            memcpy((*image)->iccp->data, data, data_length);
+            (*image)->iccp->data_length = data_length;
 
             SAIL_LOG_DEBUG("PNG: Found ICC profile '%s' %u bytes long", name, data_length);
         } else {
@@ -457,13 +457,13 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v2(void *state, struc
                  PNG_FILTER_TYPE_BASE);
 
     /* Write ICC profile. */
-    if (png_state->write_options->io_options & SAIL_IO_OPTION_ICC && image->icc != NULL) {
+    if (png_state->write_options->io_options & SAIL_IO_OPTION_ICCP && image->iccp != NULL) {
         png_set_iCCP(png_state->png_ptr,
                         png_state->info_ptr,
-                        image->icc->name,
+                        image->iccp->name,
                         PNG_COMPRESSION_TYPE_BASE,
-                        (const png_bytep)image->icc->data,
-                        image->icc->data_length);
+                        (const png_bytep)image->iccp->data,
+                        image->iccp->data_length);
 
         SAIL_LOG_DEBUG("PNG: ICC profile has been set");
     }

@@ -27,7 +27,7 @@
     #include "common.h"
     #include "error.h"
     #include "export.h"
-    #include "icc.h"
+    #include "iccp.h"
     #include "image.h"
     #include "io_common.h"
     #include "log.h"
@@ -44,7 +44,7 @@
     #include <sail-common/common.h>
     #include <sail-common/error.h>
     #include <sail-common/export.h>
-    #include <sail-common/icc.h>
+    #include <sail-common/iccp.h>
     #include <sail-common/image.h>
     #include <sail-common/io_common.h>
     #include <sail-common/log.h>
