@@ -29,10 +29,10 @@ macro(sail_plugin)
     #
     configure_file("${CMAKE_CURRENT_SOURCE_DIR}/${SAIL_PLUGIN_TARGET}.plugin.info"
                    "${CMAKE_CURRENT_BINARY_DIR}/${SAIL_PLUGIN_TARGET}.plugin.info"
-                   COPYONLY)
+                   @ONLY)
     # Installation
     #
     install(TARGETS "${SAIL_PLUGIN_TARGET}" DESTINATION "${CMAKE_INSTALL_LIBDIR}/sail/plugins")
-    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/${SAIL_PLUGIN_TARGET}.plugin.info"
+    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${SAIL_PLUGIN_TARGET}.plugin.info"
             DESTINATION "${CMAKE_INSTALL_LIBDIR}/sail/plugins")
 endmacro()

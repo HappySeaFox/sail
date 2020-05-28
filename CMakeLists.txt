@@ -5,6 +5,8 @@ project(SAIL VERSION 0.9.0
              LANGUAGES C CXX)
 
 include(GNUInstallDirs)
+include(CheckIncludeFiles)
+include(CheckCSourceCompiles)
 
 # Our own cmake scripts
 #
@@ -28,7 +30,6 @@ endif()
 #
 sail_check_include(ctype.h)
 sail_check_include(errno.h)
-sail_check_include(limits.h)
 sail_check_include(setjmp.h)
 sail_check_include(stdarg.h)
 sail_check_include(stdbool.h)
@@ -161,7 +162,7 @@ set(SAIL_ICONS_PATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/sail/i
 if (WIN32)
     string(REPLACE "/" "\\\\" SAIL_ICONS_PATH "${SAIL_ICONS_PATH}")
 endif()
-execute_process(COMMAND git rev-parse --short HEAD
+execute_process(COMMAND git -C "${PROJECT_SOURCE_DIR}" rev-parse --short HEAD
                 RESULT_VARIABLE SAIL_GIT_HASH_RESULT
                 OUTPUT_VARIABLE SAIL_GIT_HASH
                 OUTPUT_STRIP_TRAILING_WHITESPACE)

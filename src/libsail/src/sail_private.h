@@ -35,11 +35,19 @@ struct sail_io;
 struct sail_plugin_info;
 struct sail_plugin_info_node;
 struct sail_plugin;
+struct sail_read_features;
+struct sail_write_features;
 
 struct hidden_state {
 
     struct sail_io *io;
     bool own_io;
+
+    /*
+     * Write operations save write options to check if the interlaced mode was requested on later stages.
+     * It's also used to check if the supplied pixel format is supported.
+     */
+    struct sail_write_options *write_options;
 
     /* Local state passed to plugin reading and writing functions. */
     void *state;
@@ -51,11 +59,19 @@ struct hidden_state {
 
 SAIL_HIDDEN sail_error_t load_plugin(struct sail_plugin_info_node *node);
 
-SAIL_HIDDEN sail_error_t load_plugin_by_plugin_info(struct sail_context *context, const struct sail_plugin_info *plugin_info,
+SAIL_HIDDEN sail_error_t load_plugin_by_plugin_info(struct sail_context *context,
+                                                    const struct sail_plugin_info *plugin_info,
                                                     const struct sail_plugin **plugin);
 
 SAIL_HIDDEN void destroy_hidden_state(struct hidden_state *state);
 
 SAIL_HIDDEN sail_error_t stop_writing(void *state, size_t *written);
+
+SAIL_HIDDEN sail_error_t allowed_read_output_pixel_format(const struct sail_read_features *read_features,
+                                                            enum SailPixelFormat pixel_format);
+
+SAIL_HIDDEN sail_error_t allowed_write_output_pixel_format(const struct sail_write_features *write_features,
+                                                            enum SailPixelFormat input_pixel_format,
+                                                            enum SailPixelFormat output_pixel_format);
 
 #endif

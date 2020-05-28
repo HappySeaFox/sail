@@ -61,7 +61,7 @@ SAIL_EXPORT sail_error_t sail_start_reading_io(struct sail_io *io, struct sail_c
 
 /*
  * Starts reading the specified I/O stream with the specified read options. If you don't need specific read options,
- * just pass NULL. Plugin-specific defaults will be used in this case. Read options are deep copied.
+ * just pass NULL. Plugin-specific defaults will be used in this case. The read options are deep copied.
  *
  * If read options is NULL, the subsequent calls to sail_read_next_frame() output pixels in BPP24-RGB pixel format
  * for image formats without transparency support and BPP32-RGBA otherwise.
@@ -109,7 +109,7 @@ SAIL_EXPORT sail_error_t sail_start_writing_io(struct sail_io *io, struct sail_c
 
 /*
  * Starts writing the specified I/O stream with the specified write options. If you don't need specific write options,
- * just pass NULL. Plugin-specific defaults will be used in this case. Write options are deep copied.
+ * just pass NULL. Plugin-specific defaults will be used in this case. The write options are deep copied.
  *
  * If write options is NULL, the subsequent calls to sail_write_next_frame() output pixels in pixel format
  * as specified in sail_write_features.preferred_output_pixel_format.

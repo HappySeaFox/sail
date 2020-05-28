@@ -40,12 +40,14 @@ struct sail_read_options;
 struct sail_write_options;
 
 /*
- * Starts reading the specified image file with the specified read options. Pass a particular plugin info if you'd like
- * to start reading with a specific codec. If not, just pass NULL. If you don't need specific read options,
- * just pass NULL. Plugin-specific defaults will be used in this case. Read options are deep copied.
+ * Starts reading the specified image file with the specified read options. Pass plugin info if you would like
+ * to start reading with a specific codec. If not, just pass NULL. If you do not need specific read options,
+ * just pass NULL. Plugin-specific defaults will be used in this case.
  *
- * If read options is NULL, the subsequent calls to sail_read_next_frame() output pixels in BPP24-RGB pixel format
- * for image formats without transparency support and BPP32-RGBA otherwise.
+ * The read options are deep copied.
+ *
+ * If read options is NULL, the subsequent calls to sail_read_next_frame() output pixels in BPP24-RGB
+ * pixel format for image formats without transparency support and BPP32-RGBA otherwise.
  *
  * Typical usage: sail_start_reading_file_with_options() ->
  *                sail_read_next_frame()                 ->
@@ -56,9 +58,9 @@ struct sail_write_options;
  *                sail_read_next_frame()                 ->
  *                sail_stop_reading().
  *
- * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
- * in it and destroy it in sail_stop_reading. States must be used per image. DO NOT use the same state
- * to read multiple images in the same time.
+ * STATE explanation: Passes the address of a local void* pointer. SAIL will store an internal state
+ * in it and destroy it in sail_stop_reading(). States must be used per image. DO NOT use the same state
+ * to start reading multiple images at the same time.
  *
  * Returns 0 on success or sail_error_t on error.
  */
@@ -67,20 +69,22 @@ SAIL_EXPORT sail_error_t sail_start_reading_file_with_options(const char *path, 
                                                               const struct sail_read_options *read_options, void **state);
 
 /*
- * Starts reading the specified memory buffer with the specified read options. If you don't need specific read options,
- * just pass NULL. Plugin-specific defaults will be used in this case. Read options are deep copied.
+ * Starts reading the specified memory buffer with the specified read options. If you do not need specific read options,
+ * just pass NULL. Plugin-specific defaults will be used in this case.
  *
- * If read options is NULL, the subsequent calls to sail_read_next_frame() output pixels in BPP24-RGB pixel format
- * for image formats without transparency support and BPP32-RGBA otherwise.
+ * The read options are deep copied.
+ *
+ * If read options is NULL, the subsequent calls to sail_read_next_frame() output pixels in BPP24-RGB
+ * pixel format for image formats without transparency support and BPP32-RGBA otherwise.
  *
  * Typical usage: sail_plugin_info_from_extension()     ->
  *                sail_start_reading_mem_with_options() ->
  *                sail_read_next_frame()                ->
  *                sail_stop_reading().
  *
- * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
- * in it and destroy it in sail_stop_reading. States must be used per image. DO NOT use the same state
- * to read multiple images in the same time.
+ * STATE explanation: Passes the address of a local void* pointer. SAIL will store an internal state
+ * in it and destroy it in sail_stop_reading(). States must be used per image. DO NOT use the same state
+ * to start reading multiple images at the same time.
  *
  * Returns 0 on success or sail_error_t on error.
  */
@@ -89,9 +93,11 @@ SAIL_EXPORT sail_error_t sail_start_reading_mem_with_options(const void *buffer,
                                                              const struct sail_read_options *read_options, void **state);
 
 /*
- * Starts writing the specified image file with the specified write options. Pass a particular plugin info if you'd like
- * to start writing with a specific codec. If not, just pass NULL. If you don't need specific write options,
- * just pass NULL. Plugin-specific defaults will be used in this case. Write options are deep copied.
+ * Starts writing the specified image file with the specified write options. Pass plugin info if you would like
+ * to start writing with a specific codec. If not, just pass NULL. If you do not need specific write options,
+ * just pass NULL. Plugin-specific defaults will be used in this case.
+ *
+ * The write options are deep copied.
  *
  * If write options is NULL, the subsequent calls to sail_write_next_frame() output pixels in pixel format
  * as specified in sail_write_features.preferred_output_pixel_format.
@@ -105,9 +111,9 @@ SAIL_EXPORT sail_error_t sail_start_reading_mem_with_options(const void *buffer,
  *                sail_write_next_frame()                ->
  *                sail_stop_writing().
  *
- * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
- * in it and destroy it in sail_stop_writing. States must be used per image. DO NOT use the same state
- * to write multiple images in the same time.
+ * STATE explanation: Passes the address of a local void* pointer. SAIL will store an internal state
+ * in it and destroy it in sail_stop_writing(). States must be used per image. DO NOT use the same state
+ * to start writing multiple images at the same time.
  *
  * Returns 0 on success or sail_error_t on error.
  */
@@ -116,8 +122,10 @@ SAIL_EXPORT sail_error_t sail_start_writing_file_with_options(const char *path, 
                                                               const struct sail_write_options *write_options, void **state);
 
 /*
- * Starts writing the specified memory buffer with the specified write options. If you don't need specific write options,
- * just pass NULL. Plugin-specific defaults will be used in this case. Write options are deep copied.
+ * Starts writing the specified memory buffer with the specified write options. If you do not need specific
+ * write options, just pass NULL. Plugin-specific defaults will be used in this case.
+ *
+ * The write options are deep copied.
  *
  * If write options is NULL, the subsequent calls to sail_write_next_frame() output pixels in pixel format
  * as specified in sail_write_features.preferred_output_pixel_format.
@@ -127,9 +135,9 @@ SAIL_EXPORT sail_error_t sail_start_writing_file_with_options(const char *path, 
  *                sail_write_next_frame()               ->
  *                sail_stop_writing().
  *
- * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
+ * STATE explanation: Passes the address of a local void* pointer. SAIL will store an internal state
  * in it and destroy it in sail_stop_writing. States must be used per image. DO NOT use the same state
- * to write multiple images in the same time.
+ * to start writing multiple images at the same time.
  *
  * Returns 0 on success or sail_error_t on error.
  */
@@ -139,10 +147,10 @@ SAIL_EXPORT sail_error_t sail_start_writing_mem_with_options(void *buffer, size_
 
 
 /*
- * Stops writing the file started by sail_start_writing_file() and brothers. Assings the number of
- * bytes written. Does nothing if the state is NULL.
+ * Stops writing the file started by sail_start_writing_file() and brothers. Assigns the number of bytes written.
+ * Does nothing if the state is NULL.
  *
- * It's essential to always stop writing to free memory resources. Avoiding doing so will lead to memory leaks.
+ * It is essential to always stop writing to free memory resources. Failure to do so will lead to memory leaks.
  *
  * Returns 0 on success or sail_error_t on error.
  */

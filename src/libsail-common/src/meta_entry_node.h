@@ -36,10 +36,10 @@ extern "C" {
  */
 struct sail_meta_entry_node {
 
-    struct sail_meta_entry_node *next;
-
     char *key;
     char *value;
+
+    struct sail_meta_entry_node *next;
 };
 
 /*
@@ -47,12 +47,12 @@ struct sail_meta_entry_node {
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_alloc_meta_entry_node(struct sail_meta_entry_node **meta_entry_node);
+SAIL_EXPORT sail_error_t sail_alloc_meta_entry_node(struct sail_meta_entry_node **node);
 
 /*
  * Destroys the specified meta entry node and all its internal allocated memory buffers.
  */
-SAIL_EXPORT void sail_destroy_meta_entry_node(struct sail_meta_entry_node *meta_entry_node);
+SAIL_EXPORT void sail_destroy_meta_entry_node(struct sail_meta_entry_node *node);
 
 /*
  * Makes a deep copy of the specified meta entry node. The assigned node MUST be destroyed
@@ -60,14 +60,14 @@ SAIL_EXPORT void sail_destroy_meta_entry_node(struct sail_meta_entry_node *meta_
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_copy_meta_entry_node(struct sail_meta_entry_node *source_meta_entry_node,
-                                                   struct sail_meta_entry_node **target_meta_entry_node);
+SAIL_EXPORT sail_error_t sail_copy_meta_entry_node(struct sail_meta_entry_node *source,
+                                                   struct sail_meta_entry_node **target);
 
 /*
  * Destroys the specified meta entry node and all its internal allocated memory buffers.
  * Repeats the destruction procedure recursively for the stored next pointer.
  */
-SAIL_EXPORT void sail_destroy_meta_entry_node_chain(struct sail_meta_entry_node *meta_entry_node);
+SAIL_EXPORT void sail_destroy_meta_entry_node_chain(struct sail_meta_entry_node *node);
 
 /*
  * Makes a deep copy of the specified meta entry node chain. The assigned chain MUST be destroyed
@@ -76,8 +76,8 @@ SAIL_EXPORT void sail_destroy_meta_entry_node_chain(struct sail_meta_entry_node 
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_copy_meta_entry_node_chain(struct sail_meta_entry_node *source_meta_entry_node,
-                                                         struct sail_meta_entry_node **target_meta_entry_node);
+SAIL_EXPORT sail_error_t sail_copy_meta_entry_node_chain(struct sail_meta_entry_node *source,
+                                                         struct sail_meta_entry_node **target);
 
 /* extern "C" */
 #ifdef __cplusplus

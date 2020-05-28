@@ -26,6 +26,7 @@
 #include <QDialog>
 #include <QScopedPointer>
 
+#include <sail-common/common.h>
 #include <sail-common/error.h>
 
 struct sail_write_features;
@@ -37,15 +38,17 @@ class WriteOptions : public QDialog
 public:
     explicit WriteOptions(const QString &codecDescription,
                           const sail_write_features *write_features,
+                          int input_pixel_format,
                           QWidget *parent = nullptr);
     ~WriteOptions();
 
-    int pixelFormat() const;
+    SailPixelFormat pixelFormat() const;
 
     int compression() const;
 
 private:
-    sail_error_t init(const sail_write_features *write_features);
+    sail_error_t init(const sail_write_features *write_features, int input_pixel_format);
+    void disable();
 
 private:
     class Private;

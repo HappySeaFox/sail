@@ -51,6 +51,10 @@ struct jpeg_state {
     struct sail_write_options *write_options;
     bool frame_read;
     bool frame_written;
+
+    /* Extra scan line used as a buffer when reading CMYK/YCCK images. */
+    bool extra_scan_line_needed;
+    void *extra_scan_line;
 };
 
 static sail_error_t alloc_jpeg_state(struct jpeg_state **jpeg_state) {
@@ -61,11 +65,13 @@ static sail_error_t alloc_jpeg_state(struct jpeg_state **jpeg_state) {
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
-    (*jpeg_state)->libjpeg_error = false;
-    (*jpeg_state)->read_options  = NULL;
-    (*jpeg_state)->write_options = NULL;
-    (*jpeg_state)->frame_read    = false;
-    (*jpeg_state)->frame_written = false;
+    (*jpeg_state)->libjpeg_error          = false;
+    (*jpeg_state)->read_options           = NULL;
+    (*jpeg_state)->write_options          = NULL;
+    (*jpeg_state)->frame_read             = false;
+    (*jpeg_state)->frame_written          = false;
+    (*jpeg_state)->extra_scan_line_needed = false;
+    (*jpeg_state)->extra_scan_line        = NULL;
 
     return 0;
 }
@@ -108,6 +114,9 @@ SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_io *io, const stru
     if (jpeg_state->read_options->io_options & SAIL_IO_OPTION_META_INFO) {
         jpeg_save_markers(&jpeg_state->decompress_context, JPEG_COM, 0xffff);
     }
+    if (jpeg_state->read_options->io_options & SAIL_IO_OPTION_ICCP) {
+        jpeg_save_markers(&jpeg_state->decompress_context, JPEG_APP0 + 2, 0xFFFF);
+    }
 
     jpeg_read_header(&jpeg_state->decompress_context, true);
 
@@ -121,7 +130,13 @@ SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_io *io, const stru
             return SAIL_UNSUPPORTED_PIXEL_FORMAT;
         }
 
-        jpeg_state->decompress_context.out_color_space = requested_color_space;
+        if (jpeg_state->decompress_context.jpeg_color_space == JCS_YCCK || jpeg_state->decompress_context.jpeg_color_space == JCS_CMYK) {
+            SAIL_LOG_DEBUG("JPEG: Requesting to convert to CMYK and only then to RGB/RGBA");
+            jpeg_state->extra_scan_line_needed = true;
+            jpeg_state->decompress_context.out_color_space = JCS_CMYK;
+        } else {
+            jpeg_state->decompress_context.out_color_space = requested_color_space;
+        }
     }
 
     /* We don't want colormapped output. */
@@ -154,20 +169,37 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
         return SAIL_UNDERLYING_CODEC_ERROR;
     }
 
-    const int bytes_per_line = jpeg_state->decompress_context.output_width * jpeg_state->decompress_context.output_components;
-
     /* Image properties. */
+    unsigned bytes_per_line;
+    if (jpeg_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_SOURCE) {
+        bytes_per_line = jpeg_state->decompress_context.output_width * jpeg_state->decompress_context.output_components;
+    } else {
+        SAIL_TRY(sail_bytes_per_line(jpeg_state->decompress_context.output_width,
+                                        jpeg_state->read_options->output_pixel_format,
+                                        &bytes_per_line));
+    }
+
     (*image)->width               = jpeg_state->decompress_context.output_width;
     (*image)->height              = jpeg_state->decompress_context.output_height;
-    (*image)->bytes_per_line      = bytes_per_line;
-    (*image)->pixel_format        = color_space_to_pixel_format(jpeg_state->decompress_context.out_color_space);
-    (*image)->passes              = 1;
+    (*image)->bytes_per_line      = jpeg_state->decompress_context.output_width * (JDIMENSION)jpeg_state->decompress_context.output_components;
+    (*image)->pixel_format        = jpeg_state->read_options->output_pixel_format;
     (*image)->source_pixel_format = color_space_to_pixel_format(jpeg_state->decompress_context.jpeg_color_space);
+
+    /* Extra scan line used as a buffer when reading CMYK/YCCK images. */
+    if (jpeg_state->extra_scan_line_needed) {
+        jpeg_state->extra_scan_line = malloc(bytes_per_line);
+
+        if (jpeg_state->extra_scan_line == NULL) {
+            return SAIL_MEMORY_ALLOCATION_FAILED;
+        }
+    }
 
     /* Read meta info. */
     if (jpeg_state->read_options->io_options & SAIL_IO_OPTION_META_INFO) {
+        SAIL_LOG_DEBUG("JPEG: Try to read the text comments if any");
+
         jpeg_saved_marker_ptr it = jpeg_state->decompress_context.marker_list;
-        struct sail_meta_entry_node *last_meta_entry_node = NULL;
+        struct sail_meta_entry_node **last_meta_entry_node = &(*image)->meta_entry_node;
 
         while(it != NULL) {
             if(it->marker == JPEG_COM) {
@@ -182,17 +214,31 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
                                     /* cleanup */ sail_destroy_meta_entry_node(meta_entry_node),
                                                   sail_destroy_image(*image));
 
-                if ((*image)->meta_entry_node == NULL) {
-                    (*image)->meta_entry_node = last_meta_entry_node = meta_entry_node;
-                } else {
-                    last_meta_entry_node->next = meta_entry_node;
-                    last_meta_entry_node = meta_entry_node;
-                }
+                *last_meta_entry_node = meta_entry_node;
+                last_meta_entry_node = &meta_entry_node->next;
             }
 
             it = it->next;
         }
     }
+
+    /* Read ICC profile. */
+#ifdef HAVE_JPEG_ICCP
+    if (jpeg_state->read_options->io_options & SAIL_IO_OPTION_ICCP) {
+        if (jpeg_state->extra_scan_line_needed) {
+            SAIL_LOG_DEBUG("JPEG: Skipping the ICC profile (if any) as we convert from CMYK");
+        } else {
+            SAIL_TRY_OR_CLEANUP(sail_alloc_iccp(&(*image)->iccp),
+                                /* cleanup */ sail_destroy_image(*image));
+
+            SAIL_LOG_DEBUG("JPEG: ICC profile is %sfound",
+                            jpeg_read_icc_profile(&jpeg_state->decompress_context,
+                                                    (JOCTET **)&(*image)->iccp->data,
+                                                    &(*image)->iccp->data_length)
+                            ? "" : "not ");
+        }
+    }
+#endif
 
     const char *pixel_format_str = NULL;
     SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string((*image)->source_pixel_format, &pixel_format_str));
@@ -230,9 +276,15 @@ SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v2(void *state, struct sail_
         return SAIL_UNDERLYING_CODEC_ERROR;
     }
 
-    JSAMPROW row = (JSAMPROW)scanline;
-
-    (void)jpeg_read_scanlines(&jpeg_state->decompress_context, &row, 1);
+    /* Convert the CMYK image to BPP24-RGB/BPP32-RGBA. */
+    if (jpeg_state->extra_scan_line_needed) {
+        JSAMPROW row = (JSAMPROW)jpeg_state->extra_scan_line;
+        (void)jpeg_read_scanlines(&jpeg_state->decompress_context, &row, 1);
+        SAIL_TRY(convert_cmyk(jpeg_state->extra_scan_line, scanline, image->width, image->pixel_format));
+    } else {
+        JSAMPROW row = (JSAMPROW)scanline;
+        (void)jpeg_read_scanlines(&jpeg_state->decompress_context, &row, 1);
+    }
 
     return 0;
 }
@@ -248,6 +300,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_finish_v2(void **state, struct sail_io
     *state = NULL;
 
     sail_destroy_read_options(jpeg_state->read_options);
+    free(jpeg_state->extra_scan_line);
 
     if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0) {
         free(jpeg_state);
@@ -374,6 +427,14 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v2(void *state, struc
         }
     }
 
+    /* Write ICC profile. */
+#ifdef HAVE_JPEG_ICCP
+    if (jpeg_state->write_options->io_options & SAIL_IO_OPTION_ICCP && image->iccp != NULL) {
+        SAIL_LOG_DEBUG("JPEG: Writing ICC profile");
+        jpeg_write_icc_profile(&jpeg_state->compress_context, image->iccp->data, image->iccp->data_length);
+    }
+#endif
+
     const char *pixel_format_str = NULL;
     SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(image->pixel_format, &pixel_format_str));
     SAIL_LOG_DEBUG("JPEG: Input pixel format is %s", pixel_format_str);
@@ -428,6 +489,7 @@ SAIL_EXPORT sail_error_t sail_plugin_write_finish_v2(void **state, struct sail_i
     *state = NULL;
 
     sail_destroy_write_options(jpeg_state->write_options);
+    free(jpeg_state->extra_scan_line);
 
     if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0) {
         free(jpeg_state);

@@ -17,6 +17,7 @@ add_library(sail
 #
 set(PUBLIC_HEADERS "")
 list(APPEND PUBLIC_HEADERS "src/plugin_info.h")
+list(APPEND PUBLIC_HEADERS "src/plugin_info_node.h")
 list(APPEND PUBLIC_HEADERS "src/sail.h")
 list(APPEND PUBLIC_HEADERS "src/sail_advanced.h")
 list(APPEND PUBLIC_HEADERS "src/sail_deep_diver.h")

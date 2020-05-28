@@ -31,7 +31,7 @@ public:
         , io_options(0)
     {}
 
-    int output_pixel_format;
+    SailPixelFormat output_pixel_format;
     int io_options;
 };
 
@@ -71,7 +71,7 @@ read_options::~read_options()
     delete d;
 }
 
-int read_options::output_pixel_format() const
+SailPixelFormat read_options::output_pixel_format() const
 {
     return d->output_pixel_format;
 }
@@ -81,7 +81,7 @@ int read_options::io_options() const
     return d->io_options;
 }
 
-read_options& read_options::with_output_pixel_format(int output_pixel_format)
+read_options& read_options::with_output_pixel_format(SailPixelFormat output_pixel_format)
 {
     d->output_pixel_format = output_pixel_format;
     return *this;

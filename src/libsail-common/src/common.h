@@ -19,8 +19,6 @@
 #ifndef SAIL_COMMON_H
 #define SAIL_COMMON_H
 
-#include <limits.h>
-
 #ifdef SAIL_BUILD
     #include "error.h"
     #include "export.h"
@@ -125,9 +123,6 @@ enum SailPixelFormat {
      * YCCK formats.
      */
     SAIL_PIXEL_FORMAT_BPP32_YCCK,
-
-    /* Not to be used. Resize the enum for future elements. */
-    _SAIL_PIXEL_FORMAT_RESIZE_ENUM_TO_INT = UINT_MAX
 };
 
 /* Image properties. */
@@ -136,21 +131,25 @@ enum SailImageProperties {
     /* Image needs flipping vertically. */
     SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY = 1 << 0,
 
-    /* Image is interlaced. */
+    /*
+     * Image is interlaced. Only sail_image.source_properties can have this property.
+     * Reading operations never output interlaced images, that's why sail_image.properties
+     * never has it.
+     */
     SAIL_IMAGE_PROPERTY_INTERLACED         = 1 << 1,
-
-    /* Not to be used. Resize the enum for future elements. */
-    _SAIL_IMAGE_PROPERTIES_RESIZE_ENUM_TO_INT = UINT_MAX
 };
 
 /* Pixels compression types. */
-enum SailCompressionTypes {
+enum SailCompressionType {
+
+    /* Compression unsupported. */
+    SAIL_COMPRESSION_UNSUPPORTED,
+
+    /* No compression. */
+    SAIL_COMPRESSION_NO,
 
     /* RLE compression. */
-    SAIL_COMPRESSION_RLE = 1 << 0,
-
-    /* Not to be used. Resize the enum for future elements. */
-    _SAIL_COMPRESSION_TYPES_RESIZE_ENUM_TO_INT = UINT_MAX
+    SAIL_COMPRESSION_RLE,
 };
 
 /* Plugin features. */
@@ -174,8 +173,8 @@ enum SailPluginFeatures {
     /* Ability to read or write interlaced images. */
     SAIL_PLUGIN_FEATURE_INTERLACED = 1 << 5,
 
-    /* Not to be used. Resize the enum for future elements. */
-    _SAIL_PLUGIN_FEATURES_RESIZE_ENUM_TO_INT = UINT_MAX
+    /* Ability to read or write embedded ICC profiles. */
+    SAIL_PLUGIN_FEATURE_ICCP       = 1 << 6,
 };
 
 /* Read or write options. */
@@ -187,11 +186,11 @@ enum SailIoOptions {
     /* Instruction to read or write EXIF meta information. */
     SAIL_IO_OPTION_EXIF       = 1 << 1,
 
-    /* Instruction to read or write interlaced images. */
+    /* Instruction to write interlaced images. Specifying this option for reading operations has no effect. */
     SAIL_IO_OPTION_INTERLACED = 1 << 2,
 
-    /* Not to be used. Resize the enum for future elements. */
-    _SAIL_IO_OPTIONS_RESIZE_ENUM_TO_INT = UINT_MAX
+    /* Instruction to read or write embedded ICC profile. */
+    SAIL_IO_OPTION_ICCP       = 1 << 3,
 };
 
 #endif

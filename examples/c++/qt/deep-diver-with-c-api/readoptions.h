@@ -26,6 +26,7 @@
 #include <QDialog>
 #include <QScopedPointer>
 
+#include <sail-common/common.h>
 #include <sail-common/error.h>
 
 struct sail_read_features;
@@ -40,7 +41,7 @@ public:
                           QWidget *parent = nullptr);
     ~ReadOptions();
 
-    int pixelFormat() const;
+    SailPixelFormat pixelFormat() const;
 
 private:
     sail_error_t init(const sail_read_features *read_features);

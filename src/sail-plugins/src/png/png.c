@@ -239,19 +239,14 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
         (*image)->pixel_format = png_state->read_options->output_pixel_format;
     }
 
-    (*image)->passes = png_set_interlace_handling(png_state->png_ptr);
+    (*image)->interlaced_passes = png_set_interlace_handling(png_state->png_ptr);
 
     /* Apply requested transformations. */
     png_read_update_info(png_state->png_ptr, png_state->info_ptr);
 
     (*image)->source_pixel_format = png_color_type_to_pixel_format(png_state->color_type, png_state->bit_depth);
 
-    if ((*image)->passes > 1) {
-        /* The image is interlaced, but we are instructed not to read interlaced images. Reset passes to 1. */
-        if ((png_state->read_options->io_options & SAIL_IO_OPTION_INTERLACED) == 0) {
-            (*image)->passes = 1;
-        }
-
+    if ((*image)->interlaced_passes > 1) {
         (*image)->source_properties |= SAIL_IMAGE_PROPERTY_INTERLACED;
     }
 
@@ -262,6 +257,42 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
     if (png_state->read_options->io_options & SAIL_IO_OPTION_META_INFO) {
         SAIL_TRY_OR_CLEANUP(read_png_text(png_state->png_ptr, png_state->info_ptr, &(*image)->meta_entry_node),
                             /* cleanup */ sail_destroy_image(*image));
+    }
+
+    /* Read ICC profile. */
+    if (png_state->read_options->io_options & SAIL_IO_OPTION_ICCP) {
+        char *name;
+        int compression;
+        png_bytep data;
+        unsigned data_length;
+
+        bool ok = png_get_iCCP(png_state->png_ptr,
+                                png_state->info_ptr,
+                                &name,
+                                &compression,
+                                &data,
+                                &data_length) == PNG_INFO_iCCP;
+
+        if (ok) {
+            SAIL_TRY_OR_CLEANUP(sail_alloc_iccp(&(*image)->iccp),
+                                /* cleanup */ sail_destroy_image(*image));
+            SAIL_TRY_OR_CLEANUP(sail_strdup(name, &(*image)->iccp->name),
+                                /* cleanup */ sail_destroy_image(*image));
+
+            (*image)->iccp->data = malloc(data_length);
+
+            if ((*image)->iccp->data == NULL) {
+                sail_destroy_image(*image);
+                return SAIL_MEMORY_ALLOCATION_FAILED;
+            }
+
+            memcpy((*image)->iccp->data, data, data_length);
+            (*image)->iccp->data_length = data_length;
+
+            SAIL_LOG_DEBUG("PNG: Found ICC profile '%s' %u bytes long", name, data_length);
+        } else {
+            SAIL_LOG_DEBUG("PNG: ICC profile is not found");
+        }
     }
 
     const char *pixel_format_str = NULL;
@@ -317,9 +348,11 @@ SAIL_EXPORT sail_error_t sail_plugin_read_finish_v2(void **state, struct sail_io
 
     sail_destroy_read_options(png_state->read_options);
 
-    if (setjmp(png_jmpbuf(png_state->png_ptr))) {
-        free(png_state);
-        return SAIL_UNDERLYING_CODEC_ERROR;
+    if (png_state->png_ptr != NULL) {
+        if (setjmp(png_jmpbuf(png_state->png_ptr))) {
+            free(png_state);
+            return SAIL_UNDERLYING_CODEC_ERROR;
+        }
     }
 
     if (png_state->png_ptr != NULL) {
@@ -397,11 +430,6 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v2(void *state, struc
     /* Sanity check. */
     SAIL_TRY(supported_write_input_pixel_format(image->pixel_format));
 
-    /* The image is interlaced, but we are instructed not to write interlaced images. */
-    if ((image->properties & SAIL_IMAGE_PROPERTY_INTERLACED) && (png_state->write_options->io_options & SAIL_IO_OPTION_INTERLACED) == 0) {
-        return SAIL_INTERLACED_UNSUPPORTED;
-    }
-
     /* Error handling setup. */
     if (setjmp(png_jmpbuf(png_state->png_ptr))) {
         png_state->libpng_error = true;
@@ -424,9 +452,21 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v2(void *state, struc
                  image->height,
                  bit_depth,
                  color_type,
-                 (image->properties & SAIL_IMAGE_PROPERTY_INTERLACED) ? PNG_INTERLACE_ADAM7 : PNG_INTERLACE_NONE,
+                 (png_state->write_options->io_options & SAIL_IO_OPTION_INTERLACED) ? PNG_INTERLACE_ADAM7 : PNG_INTERLACE_NONE,
                  PNG_COMPRESSION_TYPE_BASE,
                  PNG_FILTER_TYPE_BASE);
+
+    /* Write ICC profile. */
+    if (png_state->write_options->io_options & SAIL_IO_OPTION_ICCP && image->iccp != NULL) {
+        png_set_iCCP(png_state->png_ptr,
+                        png_state->info_ptr,
+                        image->iccp->name,
+                        PNG_COMPRESSION_TYPE_BASE,
+                        (const png_bytep)image->iccp->data,
+                        image->iccp->data_length);
+
+        SAIL_LOG_DEBUG("PNG: ICC profile has been set");
+    }
 
     const int compression = (png_state->write_options->compression < COMPRESSION_MIN ||
                                 png_state->write_options->compression > COMPRESSION_MAX)
@@ -453,7 +493,7 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v2(void *state, struc
         png_set_swap_alpha(png_state->png_ptr);
     }
 
-    if (image->properties & SAIL_IMAGE_PROPERTY_INTERLACED) {
+    if (png_state->write_options->io_options & SAIL_IO_OPTION_INTERLACED) {
         png_set_interlace_handling(png_state->png_ptr);
     }
 
@@ -514,9 +554,11 @@ SAIL_EXPORT sail_error_t sail_plugin_write_finish_v2(void **state, struct sail_i
     sail_destroy_write_options(png_state->write_options);
 
     /* Error handling setup. */
-    if (setjmp(png_jmpbuf(png_state->png_ptr))) {
-        free(png_state);
-        return SAIL_UNDERLYING_CODEC_ERROR;
+    if (png_state->png_ptr != NULL) {
+        if (setjmp(png_jmpbuf(png_state->png_ptr))) {
+            free(png_state);
+            return SAIL_UNDERLYING_CODEC_ERROR;
+        }
     }
 
     if (png_state->png_ptr != NULL && !png_state->libpng_error) {

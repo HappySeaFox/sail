@@ -19,6 +19,7 @@
 #ifndef SAIL_WRITE_FEATURES_CPP_H
 #define SAIL_WRITE_FEATURES_CPP_H
 
+#include <map>
 #include <vector>
 
 #ifdef SAIL_BUILD
@@ -48,14 +49,11 @@ public:
     write_features& operator=(const write_features &wf);
     ~write_features();
 
-    std::vector<int> input_pixel_formats() const;
-    std::vector<int> output_pixel_formats() const;
-    int preferred_output_pixel_format() const;
+    std::map<SailPixelFormat, std::vector<SailPixelFormat>> pixel_formats_mappings() const;
     int features() const;
     int properties() const;
-    int passes() const;
-    std::vector<int> compression_types() const;
-    int preferred_compression_type() const;
+    std::vector<SailCompressionType> compression_types() const;
+    SailCompressionType preferred_compression_type() const;
     int compression_min() const;
     int compression_max() const;
     int compression_default() const;
@@ -70,14 +68,11 @@ private:
      */
     write_features(const sail_write_features *wf);
 
-    write_features& with_input_pixel_formats(const std::vector<int> &input_pixel_formats);
-    write_features& with_output_pixel_formats(const std::vector<int> &output_pixel_formats);
-    write_features& with_preferred_output_pixel_format(int preferred_output_pixel_format);
+    write_features& with_pixel_formats_mappings(const std::map<SailPixelFormat, std::vector<SailPixelFormat>> &pixel_formats_mappings);
     write_features& with_features(int features);
     write_features& with_properties(int properties);
-    write_features& with_passes(int passes);
-    write_features& with_compression_types(const std::vector<int> &compression_types);
-    write_features& with_preferred_compression_type(int preferred_compression_type);
+    write_features& with_compression_types(const std::vector<SailCompressionType> &compression_types);
+    write_features& with_preferred_compression_type(SailCompressionType preferred_compression_type);
     write_features& with_compression_min(int compression_min);
     write_features& with_compression_max(int compression_max);
     write_features& with_compression_default(int compression_default);

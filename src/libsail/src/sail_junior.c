@@ -36,10 +36,6 @@ sail_error_t sail_probe(const char *path, struct sail_context *context, struct s
     const struct sail_plugin *plugin;
     SAIL_TRY(load_plugin_by_plugin_info(context, *plugin_info_local, &plugin));
 
-    if (plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
-        return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
-    }
-
     struct sail_io *io;
     SAIL_TRY(alloc_io_read_file(path, &io));
 
@@ -49,6 +45,9 @@ sail_error_t sail_probe(const char *path, struct sail_context *context, struct s
     SAIL_TRY_OR_CLEANUP(sail_alloc_read_options_from_features((*plugin_info_local)->read_features, &read_options_local),
                         /* cleanup */ sail_destroy_read_options(read_options_local),
                                       sail_destroy_io(io));
+
+    /* Leave the pixel data as is. */
+    read_options_local->output_pixel_format = SAIL_PIXEL_FORMAT_SOURCE;
 
     SAIL_TRY_OR_CLEANUP(plugin->v2->read_init_v2(io, read_options_local, &state),
                         /* cleanup */ plugin->v2->read_finish_v2(&state, io),

@@ -50,9 +50,9 @@ ReadOptions::~ReadOptions()
 {
 }
 
-int ReadOptions::pixelFormat() const
+SailPixelFormat ReadOptions::pixelFormat() const
 {
-    return d->ui->comboColor->currentData().toInt();
+    return static_cast<SailPixelFormat>(d->ui->comboColor->currentData().toInt());
 }
 
 sail_error_t ReadOptions::init(const sail_read_features *read_features)

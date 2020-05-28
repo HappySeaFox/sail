@@ -35,11 +35,11 @@ struct sail_context;
 struct sail_plugin_info;
 
 /*
- * Starts reading the specified image file. Pass a particular plugin info if you'd like
- * to start reading with a specific codec. If not, just pass NULL.
+ * Starts reading the specified image file. Pass plugin info if you would like to start reading
+ * with a specific codec. If not, just pass NULL.
  *
- * The subsequent calls to sail_read_next_frame() output pixels in BPP24-RGB pixel format for image formats
- * without transparency support and BPP32-RGBA otherwise.
+ * The subsequent calls to sail_read_next_frame() output pixels in BPP24-RGB pixel format for image
+ * formats without transparency support and BPP32-RGBA otherwise.
  *
  * Typical usage: sail_start_reading_file() ->
  *                sail_read_next_frame()    ->
@@ -62,7 +62,7 @@ struct sail_plugin_info;
  *
  * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
  * in it and destroy it in sail_stop_reading. States must be used per image. DO NOT use the same state
- * to read multiple images in the same time.
+ * to start reading multiple images at the same time.
  *
  * Returns 0 on success or sail_error_t on error.
  */
@@ -70,9 +70,29 @@ SAIL_EXPORT sail_error_t sail_start_reading_file(const char *path, struct sail_c
                                                  const struct sail_plugin_info *plugin_info, void **state);
 
 /*
- * Continues reading the file started by sail_start_reading_file() and brothers.
- * The assigned image MUST be destroyed later with sail_image_destroy(). The assigned image bits
- * MUST be destroyed later with free().
+ * Starts reading the specified memory buffer.
+ *
+ * The subsequent calls to sail_read_next_frame() output pixels in BPP24-RGB
+ * pixel format for image formats without transparency support and BPP32-RGBA otherwise.
+ *
+ * Typical usage: sail_plugin_info_from_extension() ->
+ *                sail_start_reading_mem()          ->
+ *                sail_read_next_frame()            ->
+ *                sail_stop_reading().
+ *
+ * STATE explanation: Passes the address of a local void* pointer. SAIL will store an internal state
+ * in it and destroy it in sail_stop_reading(). States must be used per image. DO NOT use the same state
+ * to start reading multiple images at the same time.
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_start_reading_mem(const void *buffer, size_t buffer_length, struct sail_context *context,
+                                                const struct sail_plugin_info *plugin_info, void **state);
+
+/*
+ * Continues reading the file started by sail_start_reading_file() and brothers. The assigned image
+ * MUST be destroyed later with sail_image_destroy(). The assigned image bits MUST be destroyed later
+ * with free().
  *
  * Returns 0 on success or sail_error_t on error.
  * Returns SAIL_NO_MORE_FRAMES when no more frames are available.
@@ -80,18 +100,17 @@ SAIL_EXPORT sail_error_t sail_start_reading_file(const char *path, struct sail_c
 SAIL_EXPORT sail_error_t sail_read_next_frame(void *state, struct sail_image **image, void **image_bits);
 
 /*
- * Stops reading the file started by sail_start_reading_file() and brothers.
- * Does nothing if the state is NULL.
+ * Stops reading the file started by sail_start_reading_file() and brothers. Does nothing if the state is NULL.
  *
- * It's essential to always stop reading to free memory resources. Avoiding doing so will lead to memory leaks.
+ * It is essential to always stop writing to free memory resources. Failure to do so will lead to memory leaks.
  *
  * Returns 0 on success or sail_error_t on error.
  */
 SAIL_EXPORT sail_error_t sail_stop_reading(void *state);
 
 /*
- * Starts writing into the specified image file. Pass a particular plugin info if you'd like
- * to start writing with a specific codec. If not, just pass NULL.
+ * Starts writing into the specified image file. Pass plugin info if you'd like to start writing
+ * with a specific codec. If not, just pass NULL.
  *
  * The subsequent calls to sail_write_next_frame() output pixels in pixel format as specified
  * in sail_write_features.preferred_output_pixel_format.
@@ -117,12 +136,32 @@ SAIL_EXPORT sail_error_t sail_stop_reading(void *state);
  *
  * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
  * in it and destroy it in sail_stop_writing. States must be used per image. DO NOT use the same state
- * to write multiple images in the same time.
+ * to start writing multiple images at the same time.
  *
  * Returns 0 on success or sail_error_t on error.
  */
 SAIL_EXPORT sail_error_t sail_start_writing_file(const char *path, struct sail_context *context,
                                                  const struct sail_plugin_info *plugin_info, void **state);
+
+/*
+ * Starts writing the specified memory buffer.
+ *
+ * The subsequent calls to sail_write_next_frame() output pixels in pixel format
+ * as specified in sail_write_features.preferred_output_pixel_format.
+ *
+ * Typical usage: sail_plugin_info_from_extension() ->
+ *                sail_start_writing_mem()          ->
+ *                sail_write_next_frame()           ->
+ *                sail_stop_writing().
+ *
+ * STATE explanation: Passes the address of a local void* pointer. SAIL will store an internal state
+ * in it and destroy it in sail_stop_writing. States must be used per image. DO NOT use the same state
+ * to start writing multiple images at the same time.
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_start_writing_mem(void *buffer, size_t buffer_length, struct sail_context *context,
+                                                const struct sail_plugin_info *plugin_info, void **state);
 
 /*
  * Continues writing the file started by sail_start_writing_file() and brothers.
@@ -132,10 +171,9 @@ SAIL_EXPORT sail_error_t sail_start_writing_file(const char *path, struct sail_c
 SAIL_EXPORT sail_error_t sail_write_next_frame(void *state, const struct sail_image *image, const void *image_bits);
 
 /*
- * Stops writing the file started by sail_start_writing_file() and brothers.
- * Does nothing if the state is NULL.
+ * Stops writing the file started by sail_start_writing_file() and brothers. Does nothing if the state is NULL.
  *
- * It's essential to always stop writing to free memory resources. Avoiding doing so will lead to memory leaks.
+ * It is essential to always stop writing to free memory resources. Failure to do so will lead to memory leaks.
  *
  * Returns 0 on success or sail_error_t on error.
  */

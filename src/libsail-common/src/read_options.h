@@ -37,15 +37,12 @@ struct sail_read_features;
 struct sail_read_options {
 
     /*
-     * Request to modify the output pixel format. Plugin (or an underlying codec) may reject
-     * the requested pixel format with an error. If the codec supports source pixels
-     * (sail_read_features.output_pixel_formats contains SAIL_PIXEL_FORMAT_SOURCE), one may
-     * set this field to SAIL_PIXEL_FORMAT_SOURCE to copy pixel data as is.
+     * Request to modify the output pixel format. The list of possible output pixel formats
+     * can be obtained from sail_read_features.output_pixel_formats.
      *
-     * NOTE: Some input pixel formats might not map to some output pixel formats.
-     *       SAIL returns an error in this case.
+     * The SOURCE, BPP24-RGB, and BPP32-RGBA output pixel formats are always supported.
      */
-    int output_pixel_format;
+    enum SailPixelFormat output_pixel_format;
 
     /* IO manipulation options. See SailIoOptions. */
     int io_options;
@@ -88,7 +85,7 @@ SAIL_EXPORT sail_error_t sail_alloc_read_options_from_features(const struct sail
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_copy_read_options(const struct sail_read_options *read_options_source, struct sail_read_options **read_options_target);
+SAIL_EXPORT sail_error_t sail_copy_read_options(const struct sail_read_options *source, struct sail_read_options **target);
 
 /* extern "C" */
 #ifdef __cplusplus

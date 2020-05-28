@@ -34,9 +34,8 @@ public:
 
     const sail_read_features *sail_read_features_c;
 
-    std::vector<int> input_pixel_formats;
-    std::vector<int> output_pixel_formats;
-    int preferred_output_pixel_format;
+    std::vector<SailPixelFormat> output_pixel_formats;
+    SailPixelFormat preferred_output_pixel_format;
     int features;
 };
 
@@ -50,8 +49,7 @@ read_features& read_features::operator=(const read_features &rf)
 {
     d->sail_read_features_c = rf.d->sail_read_features_c;
 
-    with_input_pixel_formats(rf.input_pixel_formats())
-        .with_output_pixel_formats(rf.output_pixel_formats())
+    with_output_pixel_formats(rf.output_pixel_formats())
         .with_preferred_output_pixel_format(rf.preferred_output_pixel_format())
         .with_features(rf.features());
 
@@ -63,17 +61,12 @@ read_features::~read_features()
     delete d;
 }
 
-std::vector<int> read_features::input_pixel_formats() const
-{
-    return d->input_pixel_formats;
-}
-
-std::vector<int> read_features::output_pixel_formats() const
+std::vector<SailPixelFormat> read_features::output_pixel_formats() const
 {
     return d->output_pixel_formats;
 }
 
-int read_features::preferred_output_pixel_format() const
+SailPixelFormat read_features::preferred_output_pixel_format() const
 {
     return d->preferred_output_pixel_format;
 }
@@ -116,17 +109,7 @@ read_features::read_features(const sail_read_features *rf)
 
     d->sail_read_features_c = rf;
 
-    std::vector<int> input_pixel_formats;
-
-    if (rf->input_pixel_formats != nullptr && rf->input_pixel_formats_length > 0) {
-        input_pixel_formats.reserve(rf->input_pixel_formats_length);
-
-        for (int i = 0; i < rf->input_pixel_formats_length; i++) {
-            input_pixel_formats.push_back(rf->input_pixel_formats[i]);
-        }
-    }
-
-    std::vector<int> output_pixel_formats;
+    std::vector<SailPixelFormat> output_pixel_formats;
 
     if (rf->output_pixel_formats != nullptr && rf->output_pixel_formats_length > 0) {
         output_pixel_formats.reserve(rf->output_pixel_formats_length);
@@ -136,25 +119,18 @@ read_features::read_features(const sail_read_features *rf)
         }
     }
 
-    with_input_pixel_formats(input_pixel_formats)
-        .with_output_pixel_formats(output_pixel_formats)
+    with_output_pixel_formats(output_pixel_formats)
         .with_preferred_output_pixel_format(rf->preferred_output_pixel_format)
         .with_features(rf->features);
 }
 
-read_features& read_features::with_input_pixel_formats(const std::vector<int> &input_pixel_formats)
-{
-    d->input_pixel_formats = input_pixel_formats;
-    return *this;
-}
-
-read_features& read_features::with_output_pixel_formats(const std::vector<int> &output_pixel_formats)
+read_features& read_features::with_output_pixel_formats(const std::vector<SailPixelFormat> &output_pixel_formats)
 {
     d->output_pixel_formats = output_pixel_formats;
     return *this;
 }
 
-read_features& read_features::with_preferred_output_pixel_format(int preferred_output_pixel_format)
+read_features& read_features::with_preferred_output_pixel_format(SailPixelFormat preferred_output_pixel_format)
 {
     d->preferred_output_pixel_format = preferred_output_pixel_format;
     return *this;

@@ -30,6 +30,13 @@ sail_error_t sail_start_reading_file(const char *path, struct sail_context *cont
     return 0;
 }
 
+sail_error_t sail_start_reading_mem(const void *buffer, size_t buffer_length, struct sail_context *context, const struct sail_plugin_info *plugin_info, void **state) {
+
+    SAIL_TRY(sail_start_reading_mem_with_options(buffer, buffer_length, context, plugin_info, NULL, state));
+
+    return 0;
+}
+
 sail_error_t sail_read_next_frame(void *state, struct sail_image **image, void **image_bits) {
 
     SAIL_CHECK_STATE_PTR(state);
@@ -40,12 +47,22 @@ sail_error_t sail_read_next_frame(void *state, struct sail_image **image, void *
     SAIL_CHECK_STATE_PTR(state_of_mind->state);
     SAIL_CHECK_PLUGIN_PTR(state_of_mind->plugin);
 
-    if (state_of_mind->plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
-        return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
-    }
-
     SAIL_TRY(state_of_mind->plugin->v2->read_seek_next_frame_v2(state_of_mind->state, state_of_mind->io, image));
 
+    /* Detect the number of passes needed to write an interlaced image. */
+    int interlaced_passes;
+    if ((*image)->source_properties & SAIL_IMAGE_PROPERTY_INTERLACED) {
+        interlaced_passes = (*image)->interlaced_passes;
+
+        if (interlaced_passes < 1) {
+            sail_destroy_image(*image);
+            return SAIL_INTERLACED_UNSUPPORTED;
+        }
+    } else {
+        interlaced_passes = 1;
+    }
+
+    /* Allocate pixel data. */
     *image_bits = malloc((*image)->bytes_per_line * (*image)->height);
 
     if (*image_bits == NULL) {
@@ -53,7 +70,7 @@ sail_error_t sail_read_next_frame(void *state, struct sail_image **image, void *
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
-    for (int pass = 0; pass < (*image)->passes; pass++) {
+    for (int pass = 0; pass < interlaced_passes; pass++) {
         SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v2->read_seek_next_pass_v2(state_of_mind->state, state_of_mind->io, *image),
                             /* cleanup */ free(*image_bits),
                                           sail_destroy_image(*image));
@@ -86,11 +103,6 @@ sail_error_t sail_stop_reading(void *state) {
         return 0;
     }
 
-    if (state_of_mind->plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
-        destroy_hidden_state(state_of_mind);
-        return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
-    }
-
     SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v2->read_finish_v2(&state_of_mind->state, state_of_mind->io),
                         /* cleanup */ destroy_hidden_state(state_of_mind));
 
@@ -106,6 +118,13 @@ sail_error_t sail_start_writing_file(const char *path, struct sail_context *cont
     return 0;
 }
 
+sail_error_t sail_start_writing_mem(void *buffer, size_t buffer_length, struct sail_context *context, const struct sail_plugin_info *plugin_info, void **state) {
+
+    SAIL_TRY(sail_start_writing_mem_with_options(buffer, buffer_length, context, plugin_info, NULL, state));
+
+    return 0;
+}
+
 sail_error_t sail_write_next_frame(void *state, const struct sail_image *image, const void *image_bits) {
 
     SAIL_CHECK_STATE_PTR(state);
@@ -117,20 +136,21 @@ sail_error_t sail_write_next_frame(void *state, const struct sail_image *image, 
     SAIL_CHECK_PLUGIN_INFO_PTR(state_of_mind->plugin_info);
     SAIL_CHECK_PLUGIN_PTR(state_of_mind->plugin);
 
-    if (state_of_mind->plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
-        return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
-    }
+    /* Check if we actually able to write the requested pixel format. */
+    SAIL_TRY(allowed_write_output_pixel_format(state_of_mind->plugin_info->write_features,
+                                                image->pixel_format,
+                                                state_of_mind->write_options->output_pixel_format));
 
     /* Detect the number of passes needed to write an interlaced image. */
-    int passes;
-    if (image->properties & SAIL_IMAGE_PROPERTY_INTERLACED) {
-        passes = state_of_mind->plugin_info->write_features->passes;
+    int interlaced_passes;
+    if (state_of_mind->write_options->io_options & SAIL_IO_OPTION_INTERLACED) {
+        interlaced_passes = state_of_mind->plugin_info->write_features->interlaced_passes;
 
-        if (passes < 1) {
+        if (interlaced_passes < 1) {
             return SAIL_INTERLACED_UNSUPPORTED;
         }
     } else {
-        passes = 1;
+        interlaced_passes = 1;
     }
 
     unsigned bytes_per_line;
@@ -138,14 +158,14 @@ sail_error_t sail_write_next_frame(void *state, const struct sail_image *image, 
 
     SAIL_TRY(state_of_mind->plugin->v2->write_seek_next_frame_v2(state_of_mind->state, state_of_mind->io, image));
 
-    for (int pass = 0; pass < passes; pass++) {
+    for (int pass = 0; pass < interlaced_passes; pass++) {
         SAIL_TRY(state_of_mind->plugin->v2->write_seek_next_pass_v2(state_of_mind->state, state_of_mind->io, image));
 
         for (unsigned j = 0; j < image->height; j++) {
             SAIL_TRY(state_of_mind->plugin->v2->write_scan_line_v2(state_of_mind->state,
                                                                     state_of_mind->io,
                                                                     image,
-                                                                    ((char *)image_bits) + j * bytes_per_line));
+                                                                    ((const char *)image_bits) + j * bytes_per_line));
         }
     }
 

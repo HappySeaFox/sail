@@ -31,57 +31,20 @@
 extern "C" {
 #endif
 
+struct sail_pixel_formats_mapping_node;
+
 /*
  * Write features. Use this structure to determine what a plugin can actually write.
  */
 struct sail_write_features {
 
     /*
-     * A list of supported input pixel formats that can be passed to this plugin from a caller.
-     * One of these values could be specified in sail_image.pixel_format. See SailPixelFormat.
+     * A mapping of supported pixel formats that can be written by this plugin.
      *
-     * If the array contains SAIL_PIXEL_FORMAT_SOURCE, then the codec is able to output raw pixel data
-     * without converting it to a different format.
-     *
-     * For example: SOURCE, BPP24-CMYK, BPP24-YCBCR, BPP24-RGB.
-     *
-     * NOTE: Some input pixel formats might not map to some output pixel formats.
-     *       Let's take a look at a hypothetical example:
-     *
-     * A hypothetical SAIL plugin supports RGB pixel data input and is able to output YCBCR files.
-     * Additionally, a SAIL plugin supports YCCK pixel data input and is able to output CMYK files.
-     * So, the full conversion table with all possible input/output variants looks like this:
-     *
-     * [ Read from memory ] RGB   => YCBCR [ Output to file ]
-     * [ Read from memory ] YCCK  => CMYK  [ Output to file ]
-     *
-     * sail_write_features.input_pixel_formats will contain RGB and YCCK pixel formats.
-     * sail_write_features.output_pixel_formats will contain YCBCR and CMYK pixel formats.
-     *
-     * However, if you try to write a YCBCR file from YCCK pixel data, the codec will return an error.
+     * Outputting SOURCE pixels is always supported. Some plugins may provide even more
+     * pixel formats to output.
      */
-    int *input_pixel_formats;
-
-    /* The length of input_pixel_formats. */
-    int input_pixel_formats_length;
-
-    /*
-     * A list of supported pixel formats that can be output by this plugin to a file.
-     *
-     * It is not guaranteed that every input pixel format in input_pixel_formats can be converted
-     * to every output pixel format in output_pixel_formats. Some can be converted and some cannot.
-     *
-     * For example: BPP32-CMYK, BPP24-YCBCR, BPP24-RGB.
-     */
-    int *output_pixel_formats;
-
-    /* The length of output_pixel_formats. */
-    int output_pixel_formats_length;
-
-    /*
-     * Output pixel format to use by default when no specific output pixel format was requested by the user.
-     */
-    int preferred_output_pixel_format;
+    struct sail_pixel_formats_mapping_node *pixel_formats_mapping_node;
 
     /* Supported plugin features of writing operations. See SailPluginFeatures. */
     int features;
@@ -93,7 +56,7 @@ struct sail_write_features {
     int properties;
 
     /* Number of passes to write an interlaced image or 0. */
-    int passes;
+    int interlaced_passes;
 
     /*
      * A list of supported pixels compression types by this plugin. NULL if no compression types are available.
@@ -104,13 +67,13 @@ struct sail_write_features {
      *     1. The JPEG plugin supports only compression levels (compression_min, compression_max, compression_default).
      *     2. The TIFF plugin supports only compression types (RLE or no compression at all).
      */
-    int *compression_types;
+    enum SailCompressionType *compression_types;
 
     /* The length of compression_types. */
     int compression_types_length;
 
     /* Preferred compression type to use by default. */
-    int preferred_compression_type;
+    enum SailCompressionType preferred_compression_type;
 
     /*
      * Minimum compression value. For lossy codecs, more compression means less quality and vice versa.

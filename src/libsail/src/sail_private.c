@@ -42,7 +42,8 @@ sail_error_t load_plugin(struct sail_plugin_info_node *node) {
     return 0;
 }
 
-sail_error_t load_plugin_by_plugin_info(struct sail_context *context, const struct sail_plugin_info *plugin_info,
+sail_error_t load_plugin_by_plugin_info(struct sail_context *context,
+                                        const struct sail_plugin_info *plugin_info,
                                         const struct sail_plugin **plugin) {
 
     SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
@@ -88,6 +89,8 @@ void destroy_hidden_state(struct hidden_state *state) {
         sail_destroy_io(state->io);
     }
 
+    sail_destroy_write_options(state->write_options);
+
     /* This state must be freed and zeroed by plugins. We free it just in case to avoid memory leaks. */
     free(state->state);
 
@@ -113,11 +116,6 @@ sail_error_t stop_writing(void *state, size_t *written) {
         return 0;
     }
 
-    if (state_of_mind->plugin->layout != SAIL_PLUGIN_LAYOUT_V2) {
-        destroy_hidden_state(state_of_mind);
-        return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
-    }
-
     SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v2->write_finish_v2(&state_of_mind->state, state_of_mind->io),
                         /* cleanup */ destroy_hidden_state(state_of_mind));
 
@@ -128,4 +126,43 @@ sail_error_t stop_writing(void *state, size_t *written) {
     destroy_hidden_state(state_of_mind);
 
     return 0;
+}
+
+sail_error_t allowed_read_output_pixel_format(const struct sail_read_features *read_features,
+                                                enum SailPixelFormat pixel_format) {
+
+    SAIL_CHECK_READ_FEATURES_PTR(read_features);
+
+    for (int i = 0; i < read_features->output_pixel_formats_length; i++) {
+        if (read_features->output_pixel_formats[i] == pixel_format) {
+            return 0;
+        }
+    }
+
+    return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+}
+
+sail_error_t allowed_write_output_pixel_format(const struct sail_write_features *write_features,
+                                                enum SailPixelFormat input_pixel_format,
+                                                enum SailPixelFormat output_pixel_format) {
+
+    SAIL_CHECK_WRITE_FEATURES_PTR(write_features);
+
+    const struct sail_pixel_formats_mapping_node *node = write_features->pixel_formats_mapping_node;
+
+    while (node != NULL) {
+        if (node->input_pixel_format == input_pixel_format) {
+            for (int i = 0; i < node->output_pixel_formats_length; i++) {
+                if (node->output_pixel_formats[i] == output_pixel_format) {
+                    return 0;
+                }
+            }
+
+            return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+        }
+
+        node = node->next;
+    }
+
+    return SAIL_UNSUPPORTED_PIXEL_FORMAT;
 }

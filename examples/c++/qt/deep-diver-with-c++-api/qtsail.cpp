@@ -266,6 +266,7 @@ sail_error_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffer
     //
     WriteOptions writeOptions(QString::fromUtf8(plugin_info.description().c_str()),
                               plugin_info.write_features(),
+                              image.pixel_format(),
                               this);
 
     if (writeOptions.exec() == QDialog::Accepted) {

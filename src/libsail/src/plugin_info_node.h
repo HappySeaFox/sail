@@ -16,16 +16,26 @@
     along with this library. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef SAIL_STRING_NODE_H
-#define SAIL_STRING_NODE_H
+#ifndef SAIL_PLUGIN_INFO_NODE_H
+#define SAIL_PLUGIN_INFO_NODE_H
 
-struct sail_string_node {
+struct sail_plugin_info;
+struct sail_plugin;
 
-    char *value;
+/*
+ * A structure representing a plugin information linked list.
+ */
+struct sail_plugin_info_node {
 
-    struct sail_string_node *next;
+    /* Plugin information. */
+    struct sail_plugin_info *plugin_info;
+
+    /* Plugin instance. */
+    struct sail_plugin *plugin;
+
+    struct sail_plugin_info_node *next;
 };
 
-typedef struct sail_string_node sail_string_node_t;
+typedef struct sail_plugin_info_node sail_plugin_info_node_t;
 
 #endif

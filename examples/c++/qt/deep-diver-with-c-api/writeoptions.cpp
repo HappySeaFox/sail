@@ -34,7 +34,7 @@ public:
     QScopedPointer<Ui::WriteOptions> ui;
 };
 
-WriteOptions::WriteOptions(const QString &codecDescription, const sail_write_features *write_features, QWidget *parent)
+WriteOptions::WriteOptions(const QString &codecDescription, const sail_write_features *write_features, int input_pixel_format, QWidget *parent)
     : QDialog(parent)
     , d(new Private)
 {
@@ -43,16 +43,16 @@ WriteOptions::WriteOptions(const QString &codecDescription, const sail_write_fea
 
     d->ui->labelCodec->setText(codecDescription);
 
-    init(write_features);
+    init(write_features, input_pixel_format);
 }
 
 WriteOptions::~WriteOptions()
 {
 }
 
-int WriteOptions::pixelFormat() const
+SailPixelFormat WriteOptions::pixelFormat() const
 {
-    return d->ui->comboColor->currentData().toInt();
+    return static_cast<SailPixelFormat>(d->ui->comboColor->currentData().toInt());
 }
 
 int WriteOptions::compression() const
@@ -60,26 +60,38 @@ int WriteOptions::compression() const
     return d->ui->sliderCompression->isEnabled() ? d->ui->sliderCompression->value() : -1;
 }
 
-sail_error_t WriteOptions::init(const sail_write_features *write_features)
+sail_error_t WriteOptions::init(const sail_write_features *write_features, int input_pixel_format)
 {
-    if (write_features->output_pixel_formats_length == 0) {
-        d->ui->labelColor->setText(tr("Output color selection is not available"));
-        d->ui->labelColor->setEnabled(false);
-        d->ui->comboColor->setEnabled(false);
-    } else {
-        d->ui->labelColor->setText(tr("Output color:"));
+    if (write_features->pixel_formats_mapping_node == nullptr) {
+        disable();
+        return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+    }
+    d->ui->labelColor->setText(tr("Output color:"));
 
-        const char *output_pixel_format_str;
+    sail_pixel_formats_mapping_node *node = write_features->pixel_formats_mapping_node;
+    bool allowedInputPixelFormat = false;
 
-        for (int i = 0; i < write_features->output_pixel_formats_length; i++) {
-            SAIL_TRY(sail_pixel_format_to_string(write_features->output_pixel_formats[i], &output_pixel_format_str));
+    while (node != nullptr) {
+        if (node->input_pixel_format == input_pixel_format) {
+            for (int i = 0; i < node->output_pixel_formats_length; i++) {
+                const char *output_pixel_format_str;
 
-            d->ui->comboColor->addItem(output_pixel_format_str,
-                                       /* user data */ write_features->output_pixel_formats[i]);
+                SAIL_TRY(sail_pixel_format_to_string(node->output_pixel_formats[i], &output_pixel_format_str));
+
+                d->ui->comboColor->addItem(output_pixel_format_str,
+                                           /* user data */ node->output_pixel_formats[i]);
+            }
+
+            allowedInputPixelFormat = true;
+            break;
         }
 
-        SAIL_TRY(sail_pixel_format_to_string(write_features->preferred_output_pixel_format, &output_pixel_format_str));
-        d->ui->comboColor->setCurrentText(output_pixel_format_str);
+        node = node->next;
+    }
+
+    if (!allowedInputPixelFormat) {
+        disable();
+        return SAIL_UNSUPPORTED_PIXEL_FORMAT;
     }
 
     if (write_features->compression_min == 0 && write_features->compression_max == 0) {
@@ -99,4 +111,11 @@ sail_error_t WriteOptions::init(const sail_write_features *write_features)
     }
 
     return 0;
+}
+
+void WriteOptions::disable()
+{
+    d->ui->labelColor->setText(tr("Output color selection is not available"));
+    d->ui->labelColor->setEnabled(false);
+    d->ui->comboColor->setEnabled(false);
 }

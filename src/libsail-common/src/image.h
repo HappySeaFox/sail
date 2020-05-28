@@ -34,6 +34,7 @@ extern "C" {
 #endif
 
 struct sail_meta_entry_node;
+struct sail_iccp;
 
 /*
  * A structure representing an image. Fields set by SAIL when reading images are marked with READ.
@@ -75,17 +76,17 @@ struct sail_image {
      *        to the plugin by a caller later. The list of supported input pixel formats by a certain plugin
      *        can be obtained from sail_write_features.output_pixel_formats.
      */
-    int pixel_format;
+    enum SailPixelFormat pixel_format;
 
     /*
-     * Number of passes needed to read or write an entire image frame. 1 by default.
+     * Number of passes needed to read or write an entire image frame if it's interlaced. 1 by default.
      *
-     * READ:  Set by SAIL to a positive number of passes needed to read an image. For example, interlaced PNGs
-     *        have 8 passes.
-     * WRITE: Ignored. Use sail_write_features.passes to determine the actual number of passes needed to write
-     *        an interlaced image.
+     * This field is used internally by SAIL. DO NOT alter its value.
+     *
+     * READ:  N/A.
+     * WRITE: N/A.
      */
-    int passes;
+    int interlaced_passes;
 
     /*
      * Is the image a frame in an animation.
@@ -112,7 +113,7 @@ struct sail_image {
      * WRITE: Must be set by a caller to a valid palette pixel format if the image is indexed
      *        (palette is not NULL).
      */
-    int palette_pixel_format;
+    enum SailPixelFormat palette_pixel_format;
 
     /*
      * Palette if the image has a palette and the requested pixel format assumes having a palette.
@@ -157,16 +158,17 @@ struct sail_image {
      */
 
     /*
-     * Image source pixel format. See SailPixelFormat.
+     * Source image pixel format. See SailPixelFormat.
      *
-     * READ:  Set by SAIL to a valid source image pixel format before converting it to a requested pixel format
-     *        in sail_read_options.pixel_format.
+     * READ:  Set by SAIL to a valid source image pixel format of the image file before converting it
+     *        to a requested pixel format in sail_read_options.pixel_format.
      * WRITE: Ignored.
      */
-    int source_pixel_format;
+    enum SailPixelFormat source_pixel_format;
 
     /*
-     * Image source properties. See SailImageProperties.
+     * Source image properties. Set by SAIL to a valid source image properties of the image file.
+     * For example, it can be interlaced. See SailImageProperties.
      *
      * READ:  Set by SAIL to valid source image properties or to 0.
      * WRITE: Ignored.
@@ -174,12 +176,23 @@ struct sail_image {
     int source_properties;
 
     /*
-     * Image source compression type. See SailCompressionTypes.
+     * Source image compression type. See SailCompressionType.
      *
-     * READ:  Set by SAIL to a valid source image compression type or to 0.
+     * READ:  Set by SAIL to a valid source image compression type.
      * WRITE: Ignored.
      */
-    int source_compression_type;
+    enum SailCompressionType source_compression_type;
+
+    /*
+     * Embedded ICC profile.
+     *
+     * Note for animated/multi-paged images: only the first image in an animated/multi-paged
+     * sequence has an ICC profile.
+     *
+     * READ:  Set by SAIL to a valid ICC profile if any.
+     * WRITE: Must be allocated and set by a caller to a valid ICC profile if necessary.
+     */
+    struct sail_iccp *iccp;
 };
 
 typedef struct sail_image sail_image_t;
@@ -202,7 +215,7 @@ SAIL_EXPORT void sail_destroy_image(struct sail_image *image);
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_copy_image(struct sail_image *source_image, struct sail_image **target_image);
+SAIL_EXPORT sail_error_t sail_copy_image(const struct sail_image *source_image, struct sail_image **target_image);
 
 /* extern "C" */
 #ifdef __cplusplus
