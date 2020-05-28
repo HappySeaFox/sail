@@ -22,7 +22,7 @@
 
 QStringList QtSail::filters() const
 {
-    QStringList filters;
+    QStringList filters { QStringLiteral("All Files (*.*)") };
     const sail_plugin_info_node *plugin_info_node = sail_plugin_info_list(m_context);
 
     while (plugin_info_node != nullptr) {
