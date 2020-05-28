@@ -183,7 +183,9 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 
     if (!meta_entries.empty()) {
         const std::pair<std::string, std::string> first_pair = *meta_entries.begin();
-        meta = tr("%1: %2").arg(first_pair.first.c_str()).arg(first_pair.second.c_str());
+        meta = tr("%1: %2")
+                .arg(first_pair.first.c_str())
+                .arg(QString(first_pair.second.c_str()).left(24).replace('\n', ' '));
     }
 
     const char *source_pixel_format_str;

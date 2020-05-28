@@ -216,7 +216,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     struct sail_meta_entry_node *node = image->meta_entry_node;
 
     if (node != nullptr) {
-        meta = tr("%1: %2").arg(node->key).arg(node->value);
+        meta = tr("%1: %2").arg(node->key).arg(QString(node->value).left(24).replace('\n', ' '));
     }
 
     const char *source_pixel_format_str;
