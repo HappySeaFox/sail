@@ -54,7 +54,7 @@ static const char* plugins_path(void) {
     plugins_path_called = true;
 
 #ifdef SAIL_WIN32
-    _dupenv_s(&env, NULL, "SAIL_PLUGINS_PATH");
+    _dupenv_s((char **)&env, NULL, "SAIL_PLUGINS_PATH");
 #else
     env = getenv("SAIL_PLUGINS_PATH");
 #endif
@@ -325,7 +325,7 @@ static sail_error_t sail_init_impl(struct sail_context **context, int flags) {
     if (flags & SAIL_FLAG_PRELOAD_PLUGINS) {
         SAIL_LOG_DEBUG("Preloading plugins");
 
-        struct sail_plugin_info_node *plugin_info_node = (*context)->plugin_info_node;
+        plugin_info_node = (*context)->plugin_info_node;
 
         while (plugin_info_node != NULL) {
             const struct sail_plugin *plugin;
