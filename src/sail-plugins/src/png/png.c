@@ -530,7 +530,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v2(void *state, struct sail_
 
 #ifdef PNG_APNG_SUPPORTED
     if (png_state->is_apng) {
-        if (png_state->line >= png_state->next_frame_y_offset && png_state->line < png_state->next_frame_y_offset+png_state->next_frame_height) {
+        if (png_state->line >= png_state->next_frame_y_offset && png_state->line < png_state->next_frame_y_offset+image->height) {
             png_read_row(png_state->png_ptr, (png_bytep)png_state->temp_scanline, NULL);
 
             memcpy(scanline, png_state->prev[png_state->line], png_state->first_image->width * png_state->bytes_per_pixel);
@@ -539,11 +539,11 @@ SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v2(void *state, struct sail_
             if (png_state->current_frame == 1 || png_state->next_frame_blend_op == PNG_BLEND_OP_SOURCE) {
                 memcpy((uint8_t*)scanline + png_state->next_frame_x_offset * png_state->bytes_per_pixel,
                         png_state->temp_scanline, 
-                        png_state->next_frame_width * png_state->bytes_per_pixel);
+                        image->width * png_state->bytes_per_pixel);
             } else { /* PNG_BLEND_OP_OVER */
                 const uint8_t *src = png_state->temp_scanline;
                 uint8_t *dst = (uint8_t*)scanline + png_state->next_frame_x_offset * png_state->bytes_per_pixel;
-                unsigned w = png_state->next_frame_width;
+                unsigned w = image->width;
 
                 while (w--) {
                     const double src_a = *(src+3) / 255.0;
@@ -559,11 +559,11 @@ SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v2(void *state, struct sail_
             if (png_state->next_frame_dispose_op == PNG_DISPOSE_OP_BACKGROUND) {
                 memset(png_state->prev[png_state->line] + png_state->next_frame_x_offset * png_state->bytes_per_pixel,
                         0,
-                        png_state->next_frame_width * png_state->bytes_per_pixel);
+                        image->width * png_state->bytes_per_pixel);
             } else if (png_state->next_frame_dispose_op == PNG_DISPOSE_OP_NONE) {
                 memcpy(png_state->prev[png_state->line] + png_state->next_frame_x_offset * png_state->bytes_per_pixel,
                         scanline,
-                        png_state->next_frame_width * png_state->bytes_per_pixel);
+                        image->width * png_state->bytes_per_pixel);
             } else { /* PNG_DISPOSE_OP_PREVIOUS */
             }
         } else {
