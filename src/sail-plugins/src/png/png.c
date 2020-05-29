@@ -109,11 +109,13 @@ struct png_state {
     png_byte next_frame_dispose_op;
     png_byte next_frame_blend_op;
 
-    png_bytep *cur;
+    bool skipped_hidden;
     png_bytep *prev;
-    png_bytep *frame;
-    int line;
-    void *row_to_skip_hidden;
+    unsigned line;
+    /* Temporary scanline to read into. We need it for blending. */
+    void *temp_scanline;
+    /* Scan line for skipping a first hidden frame. */
+    void *scanline_for_skipping;
 #endif
 };
 
@@ -150,14 +152,13 @@ static int alloc_png_state(struct png_state **png_state) {
     (*png_state)->next_frame_y_offset   = 0;
     (*png_state)->next_frame_delay_num  = 0;
     (*png_state)->next_frame_delay_den  = 0;
-    (*png_state)->next_frame_dispose_op = 0;
-    (*png_state)->next_frame_blend_op   = 0;
+    (*png_state)->next_frame_dispose_op = PNG_DISPOSE_OP_BACKGROUND;
+    (*png_state)->next_frame_blend_op   = PNG_BLEND_OP_SOURCE;
 
-    (*png_state)->cur                   = NULL;
+    (*png_state)->skipped_hidden        = false;
     (*png_state)->prev                  = NULL;
-    (*png_state)->frame                 = NULL;
-    (*png_state)->frame                 = 0;
-    (*png_state)->row_to_skip_hidden    = NULL;
+    (*png_state)->temp_scanline         = NULL;
+    (*png_state)->scanline_for_skipping = NULL;
 #endif
 
     return 0;
@@ -333,10 +334,6 @@ SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_io *io, const stru
         if (!MALLOC_ROWS(&png_state->prev, png_state->first_image->bytes_per_line, png_state->first_image->height)) {
             return SAIL_MEMORY_ALLOCATION_FAILED;
         }
-
-        if (!MALLOC_ROWS(&png_state->cur, png_state->first_image->bytes_per_line, png_state->first_image->height)) {
-            return SAIL_MEMORY_ALLOCATION_FAILED;
-        }
     }
 #else
     png_state->frames = 1;
@@ -386,6 +383,12 @@ SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_io *io, const stru
         }
     }
 
+    png_state->temp_scanline = malloc(png_state->first_image->width * png_state->bytes_per_pixel);
+
+    if (png_state->temp_scanline == NULL) {
+        return SAIL_MEMORY_ALLOCATION_FAILED;
+    }
+
     const char *pixel_format_str = NULL;
     SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(png_state->first_image->source_pixel_format, &pixel_format_str));
     SAIL_LOG_DEBUG("PNG: Input pixel format is %s", pixel_format_str);
@@ -402,6 +405,10 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
     SAIL_CHECK_IMAGE_PTR(image);
 
     struct png_state *png_state = (struct png_state *)state;
+
+    if (png_state->libpng_error) {
+        return SAIL_UNDERLYING_CODEC_ERROR;
+    }
 
     if (png_state->current_frame == png_state->frames) {
         return SAIL_NO_MORE_FRAMES;
@@ -427,105 +434,56 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
         (*image)->animated = true;
 
         /* APNG feature: a hidden frame. */
-        if (png_state->current_frame == 0 && png_get_first_frame_is_hidden(png_state->png_ptr, png_state->info_ptr)) {
+        if (!png_state->skipped_hidden && png_get_first_frame_is_hidden(png_state->png_ptr, png_state->info_ptr)) {
             SAIL_LOG_DEBUG("PNG: Skipping hidden frame");
-            SAIL_TRY(skip_hidden_frame((*image)->bytes_per_line,
-                                       (*image)->height,
+            SAIL_TRY(skip_hidden_frame(png_state->first_image->bytes_per_line,
+                                       png_state->first_image->height,
                                        png_state->png_ptr,
                                        png_state->info_ptr,
-                                       &png_state->row_to_skip_hidden));
+                                       &png_state->scanline_for_skipping));
 
+            png_state->skipped_hidden = true;
             png_state->frames--;
 
             /* We have just a single frame left - continue to reading scan lines. */
             if (png_state->frames == 1) {
                 png_read_frame_head(png_state->png_ptr, png_state->info_ptr);
                 (*image)->animated = false;
-                return 0;
-            } else if(png_state->frames == 0) {
+
+                png_state->next_frame_width  = png_state->first_image->width;
+                png_state->next_frame_height = png_state->first_image->height;
+            } else if (png_state->frames == 0) {
                 return SAIL_NO_MORE_FRAMES;
             }
         } else {
-            if (png_state->next_frame_dispose_op == PNG_DISPOSE_OP_BACKGROUND) {
-                for (unsigned j = png_state->next_frame_y_offset, i = 0; i < png_state->next_frame_height; j++, i++) {
-                    memset(png_state->cur[j] + png_state->next_frame_x_offset * png_state->bytes_per_pixel,
-                            0,
-                            png_state->next_frame_width * png_state->bytes_per_pixel);
-                }
-            } else if(png_state->next_frame_dispose_op == PNG_DISPOSE_OP_PREVIOUS) {
-                for (unsigned i = 0; i < png_state->first_image->height; i++) {
-                    memcpy(png_state->cur[i],
-                            png_state->prev[i],
-                            png_state->next_frame_width * png_state->bytes_per_pixel);
-                }
-            } else { /* PNG_DISPOSE_OP_NONE */
+            png_state->skipped_hidden = true;
+            png_read_frame_head(png_state->png_ptr, png_state->info_ptr);
+
+            if (png_get_valid(png_state->png_ptr, png_state->info_ptr, PNG_INFO_fcTL) != 0) {
+                png_get_next_frame_fcTL(png_state->png_ptr, png_state->info_ptr,
+                                        &png_state->next_frame_width, &png_state->next_frame_height,
+                                        &png_state->next_frame_x_offset, &png_state->next_frame_y_offset,
+                                        &png_state->next_frame_delay_num, &png_state->next_frame_delay_den,
+                                        &png_state->next_frame_dispose_op, &png_state->next_frame_blend_op);
+            } else {
+                png_state->next_frame_width      = (*image)->width;
+                png_state->next_frame_height     = (*image)->height;
+                png_state->next_frame_x_offset   = 0;
+                png_state->next_frame_y_offset   = 0;
+                png_state->next_frame_dispose_op = PNG_DISPOSE_OP_BACKGROUND;
+                png_state->next_frame_blend_op   = PNG_BLEND_OP_SOURCE;
             }
 
-            /* Save the current frame as a previous for future use. */
-            for(unsigned i = 0; i < (*image)->height; i++) {
-                memcpy(png_state->prev[i], png_state->cur[i], (*image)->bytes_per_line);
+            if (png_state->next_frame_width + png_state->next_frame_x_offset > (*image)->width ||
+                    png_state->next_frame_height + png_state->next_frame_y_offset > (*image)->height) {
+                return SAIL_INCORRECT_IMAGE_DIMENSIONS;
             }
-        }
 
-        FREE_ROWS(&png_state->frame, png_state->next_frame_height);
-
-        png_read_frame_head(png_state->png_ptr, png_state->info_ptr);
-
-        if (png_get_valid(png_state->png_ptr, png_state->info_ptr, PNG_INFO_fcTL) != 0) {
-            png_get_next_frame_fcTL(png_state->png_ptr, png_state->info_ptr,
-                                    &png_state->next_frame_width, &png_state->next_frame_height,
-                                    &png_state->next_frame_x_offset, &png_state->next_frame_y_offset,
-                                    &png_state->next_frame_delay_num, &png_state->next_frame_delay_den,
-                                    &png_state->next_frame_dispose_op, &png_state->next_frame_blend_op);
-        } else {
-            png_state->next_frame_width      = (*image)->width;
-            png_state->next_frame_height     = (*image)->height;
-            png_state->next_frame_x_offset   = 0;
-            png_state->next_frame_y_offset   = 0;
-            png_state->next_frame_dispose_op = PNG_DISPOSE_OP_BACKGROUND;
-            png_state->next_frame_blend_op   = PNG_BLEND_OP_SOURCE;
-        }
-
-        if (!png_state->next_frame_delay_den) {
-            png_state->next_frame_delay_den = 100;
-        }
-
-        (*image)->delay = (int)(((double)png_state->next_frame_delay_num / png_state->next_frame_delay_den) * 1000);
-
-        if (png_state->next_frame_width + png_state->next_frame_x_offset > (*image)->width ||
-                png_state->next_frame_height + png_state->next_frame_y_offset > (*image)->height) {
-            return SAIL_INCORRECT_IMAGE_DIMENSIONS;
-        }
-
-        if (!MALLOC_ROWS(&png_state->frame, png_state->next_frame_width * png_state->bytes_per_pixel, png_state->next_frame_height)) {
-            return SAIL_MEMORY_ALLOCATION_FAILED;
-        }
-
-        png_read_image(png_state->png_ptr, png_state->frame);
-
-        /* Copy all pixel values including alpha. */
-        if (png_state->current_frame == 0 || png_state->next_frame_blend_op == PNG_BLEND_OP_SOURCE) {
-            for (unsigned j = png_state->next_frame_y_offset, i = 0; i < png_state->next_frame_height; j++, i++) {
-                memcpy(png_state->cur[j] + png_state->next_frame_x_offset * png_state->bytes_per_pixel,
-                        png_state->frame[i],
-                        png_state->next_frame_width * png_state->bytes_per_pixel);
+            if (!png_state->next_frame_delay_den) {
+                png_state->next_frame_delay_den = 100;
             }
-        } else { /* PNG_BLEND_OP_OVER */
-            for (unsigned j = png_state->next_frame_y_offset, i = 0; i < png_state->next_frame_height; j++, i++) {
-                uint8_t *src = png_state->frame[i];
-                uint8_t *dst = png_state->cur[j] + png_state->next_frame_x_offset * png_state->bytes_per_pixel;
-                unsigned w = png_state->next_frame_width;
 
-                while (w--) {
-                    const double src_a = *(src+3) / 255.0;
-                    const double dst_a = *(dst+3) / 255.0;
-
-                    *dst = (uint8_t)(src_a * (*src) + (1-src_a) * dst_a * (*dst)); src++; dst++;
-                    *dst = (uint8_t)(src_a * (*src) + (1-src_a) * dst_a * (*dst)); src++; dst++;
-                    *dst = (uint8_t)(src_a * (*src) + (1-src_a) * dst_a * (*dst)); src++; dst++;
-                    *dst = (uint8_t)((src_a + (1-src_a) * dst_a) * 255);           src++; dst++;
-                }
-            }
+            (*image)->delay = (int)(((double)png_state->next_frame_delay_num / png_state->next_frame_delay_den) * 1000);
         }
     }
 #endif
@@ -542,6 +500,10 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_pass_v2(void *state, struct 
     SAIL_CHECK_IMAGE(image);
 
     struct png_state *png_state = (struct png_state *)state;
+
+    if (png_state->libpng_error) {
+        return SAIL_UNDERLYING_CODEC_ERROR;
+    }
 
     png_state->line = 0;
 
@@ -567,11 +529,51 @@ SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v2(void *state, struct sail_
     }
 
 #ifdef PNG_APNG_SUPPORTED
-    if (png_state->is_apng && png_state->frames > 1) {
-        memcpy(scanline, png_state->cur[png_state->line++], image->bytes_per_line);
+    if (png_state->is_apng) {
+        if (png_state->line >= png_state->next_frame_y_offset && png_state->line < png_state->next_frame_y_offset+png_state->next_frame_height) {
+            png_read_row(png_state->png_ptr, (png_bytep)png_state->temp_scanline, NULL);
+
+            memcpy(scanline, png_state->prev[png_state->line], png_state->first_image->width * png_state->bytes_per_pixel);
+
+            /* Copy all pixel values including alpha. */
+            if (png_state->current_frame == 1 || png_state->next_frame_blend_op == PNG_BLEND_OP_SOURCE) {
+                memcpy((uint8_t*)scanline + png_state->next_frame_x_offset * png_state->bytes_per_pixel,
+                        png_state->temp_scanline, 
+                        png_state->next_frame_width * png_state->bytes_per_pixel);
+            } else { /* PNG_BLEND_OP_OVER */
+                const uint8_t *src = png_state->temp_scanline;
+                uint8_t *dst = (uint8_t*)scanline + png_state->next_frame_x_offset * png_state->bytes_per_pixel;
+                unsigned w = png_state->next_frame_width;
+
+                while (w--) {
+                    const double src_a = *(src+3) / 255.0;
+                    const double dst_a = *(dst+3) / 255.0;
+
+                    *dst = (uint8_t)(src_a * (*src) + (1-src_a) * dst_a * (*dst)); src++; dst++;
+                    *dst = (uint8_t)(src_a * (*src) + (1-src_a) * dst_a * (*dst)); src++; dst++;
+                    *dst = (uint8_t)(src_a * (*src) + (1-src_a) * dst_a * (*dst)); src++; dst++;
+                    *dst = (uint8_t)((src_a + (1-src_a) * dst_a) * 255);           src++; dst++;
+                }
+            }
+
+            if (png_state->next_frame_dispose_op == PNG_DISPOSE_OP_BACKGROUND) {
+                memset(png_state->prev[png_state->line] + png_state->next_frame_x_offset * png_state->bytes_per_pixel,
+                        0,
+                        png_state->next_frame_width * png_state->bytes_per_pixel);
+            } else if (png_state->next_frame_dispose_op == PNG_DISPOSE_OP_NONE) {
+                memcpy(png_state->prev[png_state->line] + png_state->next_frame_x_offset * png_state->bytes_per_pixel,
+                        scanline,
+                        png_state->next_frame_width * png_state->bytes_per_pixel);
+            } else { /* PNG_DISPOSE_OP_PREVIOUS */
+            }
+        } else {
+            memcpy(scanline, png_state->prev[png_state->line], png_state->first_image->width * png_state->bytes_per_pixel);
+        }
     } else {
         png_read_row(png_state->png_ptr, (png_bytep)scanline, NULL);
     }
+
+    png_state->line++;
 #else
     png_read_row(png_state->png_ptr, (png_bytep)scanline, NULL);
 #endif
@@ -590,11 +592,9 @@ SAIL_EXPORT sail_error_t sail_plugin_read_finish_v2(void **state, struct sail_io
     *state = NULL;
 
 #ifdef PNG_APNG_SUPPORTED
-    free(png_state->row_to_skip_hidden);
-
-    FREE_ROWS(&png_state->frame, png_state->next_frame_height);
+    free(png_state->temp_scanline);
+    free(png_state->scanline_for_skipping);
     FREE_ROWS(&png_state->prev, png_state->first_image->height);
-    FREE_ROWS(&png_state->cur, png_state->first_image->height);
 #endif
 
     sail_destroy_image(png_state->first_image);
