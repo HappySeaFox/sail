@@ -31,7 +31,6 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QPushButton>
-#include <QShortcut>
 
 #include <sail-c++/sail-c++.h>
 
@@ -52,11 +51,6 @@ QtSail::QtSail(QWidget *parent)
 
     connect(m_ui->pushOpen, &QPushButton::clicked, this, &QtSail::onOpenFile);
     connect(m_ui->pushSave, &QPushButton::clicked, this, &QtSail::onSave);
-
-    m_ui->pushOpen->setShortcut(QKeySequence::Open);
-    m_ui->pushOpen->setToolTip(m_ui->pushOpen->shortcut().toString());
-    m_ui->pushSave->setShortcut(QKeySequence::Save);
-    m_ui->pushSave->setToolTip(m_ui->pushSave->shortcut().toString());
 }
 
 QtSail::~QtSail()

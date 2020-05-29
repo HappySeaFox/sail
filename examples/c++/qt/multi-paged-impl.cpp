@@ -43,15 +43,6 @@ QtSail::QtSail(QWidget *parent)
     connect(m_ui->pushPrevious, &QPushButton::clicked, this, &QtSail::onPrevious);
     connect(m_ui->pushNext,     &QPushButton::clicked, this, &QtSail::onNext);
 
-    m_ui->pushOpen->setShortcut(QKeySequence::Open);
-    m_ui->pushOpen->setToolTip(m_ui->pushOpen->shortcut().toString());
-    m_ui->pushSave->setShortcut(QKeySequence::Save);
-    m_ui->pushSave->setToolTip(m_ui->pushSave->shortcut().toString());
-    m_ui->pushPrevious->setShortcut(QKeySequence::FindPrevious);
-    m_ui->pushPrevious->setToolTip(m_ui->pushPrevious->shortcut().toString());
-    m_ui->pushNext->setShortcut(QKeySequence::FindNext);
-    m_ui->pushNext->setToolTip(m_ui->pushNext->shortcut().toString());
-
     init();
 }
 

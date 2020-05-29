@@ -33,7 +33,6 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QPushButton>
-#include <QShortcut>
 #include <QTimer>
 
 #include <sail-c++/sail-c++.h>
