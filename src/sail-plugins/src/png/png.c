@@ -428,6 +428,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
 
         /* APNG feature: a hidden frame. */
         if (png_state->current_frame == 0 && png_get_first_frame_is_hidden(png_state->png_ptr, png_state->info_ptr)) {
+            SAIL_LOG_DEBUG("PNG: Skipping hidden frame");
             SAIL_TRY(skip_hidden_frame((*image)->bytes_per_line,
                                        (*image)->height,
                                        png_state->png_ptr,
@@ -453,7 +454,9 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
                 }
             } else if(png_state->next_frame_dispose_op == PNG_DISPOSE_OP_PREVIOUS) {
                 for (unsigned i = 0; i < png_state->first_image->height; i++) {
-                    memcpy(png_state->cur[i], png_state->prev[i], png_state->first_image->bytes_per_line);
+                    memcpy(png_state->cur[i],
+                            png_state->prev[i],
+                            png_state->next_frame_width * png_state->bytes_per_pixel);
                 }
             } else { /* PNG_DISPOSE_OP_NONE */
             }
@@ -475,10 +478,10 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
                                     &png_state->next_frame_delay_num, &png_state->next_frame_delay_den,
                                     &png_state->next_frame_dispose_op, &png_state->next_frame_blend_op);
         } else {
-            png_state->next_frame_width = (*image)->width;
-            png_state->next_frame_height = (*image)->height;
-            png_state->next_frame_x_offset = 0;
-            png_state->next_frame_y_offset = 0;
+            png_state->next_frame_width      = (*image)->width;
+            png_state->next_frame_height     = (*image)->height;
+            png_state->next_frame_x_offset   = 0;
+            png_state->next_frame_y_offset   = 0;
             png_state->next_frame_dispose_op = PNG_DISPOSE_OP_BACKGROUND;
             png_state->next_frame_blend_op   = PNG_BLEND_OP_SOURCE;
         }
@@ -515,11 +518,12 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
 
                 while (w--) {
                     const double src_a = *(src+3) / 255.0;
+                    const double dst_a = *(dst+3) / 255.0;
 
-                    *dst = (uint8_t)(src_a * (*src) + (1-src_a) * (*dst)); src++; dst++;
-                    *dst = (uint8_t)(src_a * (*src) + (1-src_a) * (*dst)); src++; dst++;
-                    *dst = (uint8_t)(src_a * (*src) + (1-src_a) * (*dst)); src++; dst++;
-                    src++; dst++;
+                    *dst = (uint8_t)(src_a * (*src) + (1-src_a) * dst_a * (*dst)); src++; dst++;
+                    *dst = (uint8_t)(src_a * (*src) + (1-src_a) * dst_a * (*dst)); src++; dst++;
+                    *dst = (uint8_t)(src_a * (*src) + (1-src_a) * dst_a * (*dst)); src++; dst++;
+                    *dst = (uint8_t)((src_a + (1-src_a) * dst_a) * 255);           src++; dst++;
                 }
             }
         }
