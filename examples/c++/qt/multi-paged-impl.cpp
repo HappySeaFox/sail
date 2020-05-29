@@ -30,6 +30,12 @@ QtSail::QtSail(QWidget *parent)
     l->setAlignment(Qt::AlignCenter);
     m_ui->scrollArea->setWidget(l);
 
+    m_animationTimer.reset(new QTimer);
+    m_animationTimer->setSingleShot(true);
+    connect(m_animationTimer.data(), &QTimer::timeout, this, [&]{
+        onNext();
+    });
+
     connect(m_ui->pushOpen,     &QPushButton::clicked, this, &QtSail::onOpenFile);
     connect(m_ui->pushProbe,    &QPushButton::clicked, this, &QtSail::onProbe);
     connect(m_ui->pushSave,     &QPushButton::clicked, this, &QtSail::onSave);
@@ -105,4 +111,19 @@ void QtSail::onNext()
 
     SAIL_LOG_DEBUG("Image index: %d", m_currentIndex);
     onFit(m_ui->checkFit->isChecked());
+
+    if (m_animated) {
+        m_animationTimer->start(m_delays[m_currentIndex]);
+    }
+}
+
+void QtSail::detectAnimated()
+{
+    m_animated = std::find_if(m_delays.begin(), m_delays.end(), [&](int v) {
+        return v > 0;
+    }) != m_delays.end();
+
+    if (m_animated) {
+        m_animationTimer->start(m_delays.first());
+    }
 }

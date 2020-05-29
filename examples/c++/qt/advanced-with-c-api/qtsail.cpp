@@ -20,6 +20,7 @@
     SOFTWARE.
 */
 
+#include <algorithm>
 #include <cstdlib>
 
 #include <QDateTime>
@@ -33,6 +34,7 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QShortcut>
+#include <QTimer>
 
 #include <sail/sail.h>
 
@@ -58,9 +60,10 @@ sail_error_t QtSail::init()
     return 0;
 }
 
-sail_error_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages)
+sail_error_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, QVector<int> *delays)
 {
     qimages->clear();
+    delays->clear();
 
     /*
      * Always set the initial state to NULL in C or nullptr in C++.
@@ -143,6 +146,7 @@ sail_error_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages)
         }
 
         qimages->append(qimage);
+        delays->append(image->delay);
 
         sail_destroy_image(image);
         free(image_bits);
@@ -190,6 +194,7 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
     image->width = qimage.width();
     image->height = qimage.height();
     image->pixel_format = qImageFormatToSailPixelFormat(qimage.format());
+
     SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(image->width, image->pixel_format, &image->bytes_per_line),
                         /* cleanup */ sail_destroy_image(image));
 
@@ -220,8 +225,10 @@ void QtSail::onOpenFile()
 
     sail_error_t res;
 
-    if ((res = loadImage(path, &m_qimages)) == 0) {
+    if ((res = loadImage(path, &m_qimages, &m_delays)) == 0) {
+        m_currentIndex = 0;
         onFit(m_ui->checkFit->isChecked());
+        detectAnimated();
     } else {
         QMessageBox::critical(this, tr("Error"), tr("Failed to load '%1'. Error: %2.")
                               .arg(path)
@@ -295,8 +302,10 @@ void QtSail::onSave()
 
     if (QMessageBox::question(this, tr("Open file"), tr("%1 has been saved succesfully. Open the saved file?")
                               .arg(QDir::toNativeSeparators(path))) == QMessageBox::Yes) {
-        if ((res = loadImage(path, &m_qimages)) == 0) {
+        if ((res = loadImage(path, &m_qimages, &m_delays)) == 0) {
+            m_currentIndex = 0;
             onFit(m_ui->checkFit->isChecked());
+            detectAnimated();
         } else {
             QMessageBox::critical(this, tr("Error"), tr("Failed to load '%1'. Error: %2.")
                                   .arg(path)

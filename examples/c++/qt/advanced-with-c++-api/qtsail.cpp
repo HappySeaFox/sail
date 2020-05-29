@@ -20,6 +20,7 @@
     SOFTWARE.
 */
 
+#include <algorithm>
 #include <cstdlib>
 
 #include <QDateTime>
@@ -33,6 +34,7 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QShortcut>
+#include <QTimer>
 
 #include <sail-c++/sail-c++.h>
 
@@ -58,8 +60,11 @@ sail_error_t QtSail::init()
     return 0;
 }
 
-sail_error_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages)
+sail_error_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, QVector<int> *delays)
 {
+    qimages->clear();
+    delays->clear();
+
     sail::image_reader reader(&m_context);
     sail::image image;
 
@@ -106,6 +111,7 @@ sail_error_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages)
             qimage.setColorTable(colorTable);
         }
 
+        delays->append(image.delay());
         qimages->append(qimage);
     }
 
@@ -167,8 +173,10 @@ void QtSail::onOpenFile()
 
     sail_error_t res;
 
-    if ((res = loadImage(path, &m_qimages)) == 0) {
+    if ((res = loadImage(path, &m_qimages, &m_delays)) == 0) {
+        m_currentIndex = 0;
         onFit(m_ui->checkFit->isChecked());
+        detectAnimated();
     } else {
         QMessageBox::critical(this, tr("Error"), tr("Failed to load '%1'. Error: %2.")
                               .arg(path)
@@ -241,8 +249,10 @@ void QtSail::onSave()
 
     if (QMessageBox::question(this, tr("Open file"), tr("%1 has been saved succesfully. Open the saved file?")
                               .arg(QDir::toNativeSeparators(path))) == QMessageBox::Yes) {
-        if ((res = loadImage(path, &m_qimages)) == 0) {
+        if ((res = loadImage(path, &m_qimages, &m_delays)) == 0) {
+            m_currentIndex = 0;
             onFit(m_ui->checkFit->isChecked());
+            detectAnimated();
         } else {
             QMessageBox::critical(this, tr("Error"), tr("Failed to load '%1'. Error: %2.")
                                   .arg(path)

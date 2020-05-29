@@ -34,6 +34,7 @@ namespace Ui {
 }
 
 class QImage;
+class QTimer;
 
 struct sail_context;
 
@@ -47,9 +48,10 @@ public:
 
 private:
     sail_error_t init();
-    sail_error_t loadImage(const QString &path, QVector<QImage> *qimages);
+    sail_error_t loadImage(const QString &path, QVector<QImage> *qimages, QVector<int> *delays);
     sail_error_t saveImage(const QString &path, const QImage &qimage);
     QStringList filters() const;
+    void detectAnimated();
 
 private: // slots
     void onOpenFile();
@@ -63,6 +65,9 @@ private:
     QScopedPointer<Ui::QtSail> m_ui;
 
     QVector<QImage> m_qimages;
+    QVector<int> m_delays;
+    bool m_animated;
+    QScopedPointer<QTimer> m_animationTimer;
     int m_currentIndex = 0;
     QString m_suffix;
 
