@@ -18,6 +18,7 @@
 
 #include <setjmp.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -41,6 +42,43 @@ static const int COMPRESSION_DEFAULT = 6;
  * Plugin-specific state.
  */
 
+static bool MALLOC_ROWS(png_bytep **A, const int RB, const int H)
+{
+    *A = (png_bytep*)malloc(H * sizeof(png_bytep*));
+
+    if(*A == NULL)
+        return false;
+
+    for(int row = 0; row < H; row++)
+        (*A)[row] = NULL;
+
+    for(int row = 0; row < H; row++)
+    {
+        (*A)[row] = (png_bytep)malloc(RB);
+
+        if((*A)[row] == NULL)
+            return false;
+
+        memset((*A)[row], 0, RB);
+    }
+
+    return true;
+}
+
+static void FREE_ROWS(png_bytep **A, const int H)
+{
+    if (*A != NULL)
+    {
+        for(int i = 0;i < H;i++)
+        {
+            free((*A)[i]);
+        }
+
+        free(*A);
+        *A = NULL;
+    }
+}
+
 struct png_state {
     png_structp png_ptr;
     png_infop info_ptr;
@@ -48,11 +86,35 @@ struct png_state {
     int bit_depth;
     int interlace_type;
 
+    struct sail_image *first_image;
+    struct sail_iccp *iccp;
     bool libpng_error;
     struct sail_read_options *read_options;
     struct sail_write_options *write_options;
-    bool frame_read;
     bool frame_written;
+    int frames;
+    int current_frame;
+
+    /* APNG-specific. */
+#ifdef PNG_APNG_SUPPORTED
+    bool is_apng;
+    unsigned bytes_per_pixel;
+
+    png_uint_32 next_frame_width;
+    png_uint_32 next_frame_height;
+    png_uint_32 next_frame_x_offset;
+    png_uint_32 next_frame_y_offset;
+    png_uint_16 next_frame_delay_num;
+    png_uint_16 next_frame_delay_den;
+    png_byte next_frame_dispose_op;
+    png_byte next_frame_blend_op;
+
+    png_bytep *cur;
+    png_bytep *prev;
+    png_bytep *frame;
+    int line;
+    void *row_to_skip_hidden;
+#endif
 };
 
 static int alloc_png_state(struct png_state **png_state) {
@@ -68,11 +130,35 @@ static int alloc_png_state(struct png_state **png_state) {
     (*png_state)->color_type     = 0;
     (*png_state)->bit_depth      = 0;
     (*png_state)->interlace_type = 0;
+    (*png_state)->first_image    = NULL;
+    (*png_state)->iccp           = NULL;
     (*png_state)->libpng_error   = false;
     (*png_state)->read_options   = NULL;
     (*png_state)->write_options  = NULL;
-    (*png_state)->frame_read     = false;
     (*png_state)->frame_written  = false;
+    (*png_state)->frames         = 0;
+    (*png_state)->current_frame  = 0;
+
+    /* APNG-specific. */
+#ifdef PNG_APNG_SUPPORTED
+    (*png_state)->is_apng               = false;
+    (*png_state)->bytes_per_pixel       = 0;
+
+    (*png_state)->next_frame_width      = 0;
+    (*png_state)->next_frame_height     = 0;
+    (*png_state)->next_frame_x_offset   = 0;
+    (*png_state)->next_frame_y_offset   = 0;
+    (*png_state)->next_frame_delay_num  = 0;
+    (*png_state)->next_frame_delay_den  = 0;
+    (*png_state)->next_frame_dispose_op = 0;
+    (*png_state)->next_frame_blend_op   = 0;
+
+    (*png_state)->cur                   = NULL;
+    (*png_state)->prev                  = NULL;
+    (*png_state)->frame                 = NULL;
+    (*png_state)->frame                 = 0;
+    (*png_state)->row_to_skip_hidden    = NULL;
+#endif
 
     return 0;
 }
@@ -120,33 +206,12 @@ SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_io *io, const stru
     png_set_read_fn(png_state->png_ptr, io, my_read_fn);
     png_read_info(png_state->png_ptr, png_state->info_ptr);
 
-    return 0;
-}
-
-SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct sail_io *io, struct sail_image **image) {
-
-    SAIL_CHECK_STATE_PTR(state);
-    SAIL_CHECK_IO(io);
-
-    struct png_state *png_state = (struct png_state *)state;
-
-    if (png_state->frame_read) {
-        return SAIL_NO_MORE_FRAMES;
-    }
-
-    png_state->frame_read = true;
-    SAIL_TRY(sail_alloc_image(image));
-
-    if (setjmp(png_jmpbuf(png_state->png_ptr))) {
-        png_state->libpng_error = true;
-        sail_destroy_image(*image);
-        return SAIL_UNDERLYING_CODEC_ERROR;
-    }
+    SAIL_TRY(sail_alloc_image(&png_state->first_image));
 
     png_get_IHDR(png_state->png_ptr,
                     png_state->info_ptr,
-                    &(*image)->width,
-                    &(*image)->height,
+                    &png_state->first_image->width,
+                    &png_state->first_image->height,
                     &png_state->bit_depth,
                     &png_state->color_type,
                     &png_state->interlace_type,
@@ -155,7 +220,13 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
 
     /* Transform the PNG stream. */
     if (png_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_SOURCE) {
-        (*image)->pixel_format = png_color_type_to_pixel_format(png_state->color_type, png_state->bit_depth);
+        /* Expand 1, 2, and 4 bpp images to 8 bpp. */
+        if (png_state->color_type == PNG_COLOR_TYPE_GRAY && png_state->bit_depth < 8) {
+            png_set_expand_gray_1_2_4_to_8(png_state->png_ptr);
+            png_state->first_image->pixel_format = SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE;
+        } else {
+            png_state->first_image->pixel_format = png_color_type_to_pixel_format(png_state->color_type, png_state->bit_depth);
+        }
 
         /* Save palette. */
         if (png_state->color_type == PNG_COLOR_TYPE_PALETTE) {
@@ -166,17 +237,16 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
                 png_error(png_state->png_ptr, "The indexed image has no palette");
             }
 
-            /* Always use RGB for palette. */
-            (*image)->palette_pixel_format = SAIL_PIXEL_FORMAT_BPP24_RGB;
-            (*image)->palette_color_count = palette_color_count;
-            (*image)->palette = malloc(palette_color_count * 3);
+            /* Always use RGB palette. */
+            png_state->first_image->palette_pixel_format = SAIL_PIXEL_FORMAT_BPP24_RGB;
+            png_state->first_image->palette_color_count = palette_color_count;
+            png_state->first_image->palette = malloc(palette_color_count * 3);
 
-            if ((*image)->palette == NULL) {
-                sail_destroy_image(*image);
+            if (png_state->first_image->palette == NULL) {
                 return SAIL_MEMORY_ALLOCATION_FAILED;
             }
 
-            unsigned char *palette_ptr = (*image)->palette;
+            unsigned char *palette_ptr = png_state->first_image->palette;
 
             for (int i = 0; i < palette_color_count; i++) {
                 *palette_ptr++ = palette[i].red;
@@ -227,7 +297,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
             png_set_filler(png_state->png_ptr, 0xff, PNG_FILLER_BEFORE);
         }
 
-        if (png_get_valid(png_state->png_ptr, png_state->info_ptr, PNG_INFO_tRNS)) {
+        if (png_get_valid(png_state->png_ptr, png_state->info_ptr, PNG_INFO_tRNS) != 0) {
             png_set_tRNS_to_alpha(png_state->png_ptr);
         }
 
@@ -236,27 +306,51 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
             png_set_strip_alpha(png_state->png_ptr);
         }
 
-        (*image)->pixel_format = png_state->read_options->output_pixel_format;
+        png_state->first_image->pixel_format = png_state->read_options->output_pixel_format;
     }
 
-    (*image)->interlaced_passes = png_set_interlace_handling(png_state->png_ptr);
+    png_state->first_image->interlaced_passes = png_set_interlace_handling(png_state->png_ptr);
+
+    SAIL_TRY(sail_bytes_per_line(png_state->first_image->width,
+                                 png_state->first_image->pixel_format,
+                                 &png_state->first_image->bytes_per_line));
+    unsigned bits_per_pixel;
+    SAIL_TRY(sail_bits_per_pixel(png_state->first_image->pixel_format, &bits_per_pixel));
+    png_state->bytes_per_pixel = bits_per_pixel / 8;
 
     /* Apply requested transformations. */
     png_read_update_info(png_state->png_ptr, png_state->info_ptr);
 
-    (*image)->source_pixel_format = png_color_type_to_pixel_format(png_state->color_type, png_state->bit_depth);
+#ifdef PNG_APNG_SUPPORTED
+    png_state->is_apng = png_get_valid(png_state->png_ptr, png_state->info_ptr, PNG_INFO_acTL) != 0;
+    png_state->frames = png_state->is_apng ? png_get_num_frames(png_state->png_ptr, png_state->info_ptr) : 1;
 
-    if ((*image)->interlaced_passes > 1) {
-        (*image)->source_properties |= SAIL_IMAGE_PROPERTY_INTERLACED;
+    if (png_state->frames == 0) {
+        return SAIL_NO_MORE_FRAMES;
     }
 
-    SAIL_TRY_OR_CLEANUP(sail_bytes_per_line((*image)->width, (*image)->pixel_format, &(*image)->bytes_per_line),
-                        /* cleanup */ sail_destroy_image(*image));
+    if (png_state->is_apng) {
+        if (!MALLOC_ROWS(&png_state->prev, png_state->first_image->bytes_per_line, png_state->first_image->height)) {
+            return SAIL_MEMORY_ALLOCATION_FAILED;
+        }
+
+        if (!MALLOC_ROWS(&png_state->cur, png_state->first_image->bytes_per_line, png_state->first_image->height)) {
+            return SAIL_MEMORY_ALLOCATION_FAILED;
+        }
+    }
+#else
+    png_state->frames = 1;
+#endif
+
+    png_state->first_image->source_pixel_format = png_color_type_to_pixel_format(png_state->color_type, png_state->bit_depth);
+
+    if (png_state->first_image->interlaced_passes > 1) {
+        png_state->first_image->source_properties |= SAIL_IMAGE_PROPERTY_INTERLACED;
+    }
 
     /* Read meta info. */
     if (png_state->read_options->io_options & SAIL_IO_OPTION_META_INFO) {
-        SAIL_TRY_OR_CLEANUP(read_png_text(png_state->png_ptr, png_state->info_ptr, &(*image)->meta_entry_node),
-                            /* cleanup */ sail_destroy_image(*image));
+        SAIL_TRY(read_png_text(png_state->png_ptr, png_state->info_ptr, &png_state->first_image->meta_entry_node));
     }
 
     /* Read ICC profile. */
@@ -274,20 +368,17 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
                                 &data_length) == PNG_INFO_iCCP;
 
         if (ok) {
-            SAIL_TRY_OR_CLEANUP(sail_alloc_iccp(&(*image)->iccp),
-                                /* cleanup */ sail_destroy_image(*image));
-            SAIL_TRY_OR_CLEANUP(sail_strdup(name, &(*image)->iccp->name),
-                                /* cleanup */ sail_destroy_image(*image));
+            SAIL_TRY(sail_alloc_iccp(&png_state->iccp));
+            SAIL_TRY(sail_strdup(name, &png_state->iccp->name));
 
-            (*image)->iccp->data = malloc(data_length);
+            png_state->iccp->data = malloc(data_length);
 
-            if ((*image)->iccp->data == NULL) {
-                sail_destroy_image(*image);
+            if (png_state->iccp->data == NULL) {
                 return SAIL_MEMORY_ALLOCATION_FAILED;
             }
 
-            memcpy((*image)->iccp->data, data, data_length);
-            (*image)->iccp->data_length = data_length;
+            memcpy(png_state->iccp->data, data, data_length);
+            png_state->iccp->data_length = data_length;
 
             SAIL_LOG_DEBUG("PNG: Found ICC profile '%s' %u bytes long", name, data_length);
         } else {
@@ -296,10 +387,146 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
     }
 
     const char *pixel_format_str = NULL;
-    SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string((*image)->source_pixel_format, &pixel_format_str));
+    SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(png_state->first_image->source_pixel_format, &pixel_format_str));
     SAIL_LOG_DEBUG("PNG: Input pixel format is %s", pixel_format_str);
     SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(png_state->read_options->output_pixel_format, &pixel_format_str));
     SAIL_LOG_DEBUG("PNG: Output pixel format is %s", pixel_format_str);
+
+    return 0;
+}
+
+SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct sail_io *io, struct sail_image **image) {
+
+    SAIL_CHECK_STATE_PTR(state);
+    SAIL_CHECK_IO(io);
+    SAIL_CHECK_IMAGE_PTR(image);
+
+    struct png_state *png_state = (struct png_state *)state;
+
+    if (png_state->current_frame == png_state->frames) {
+        return SAIL_NO_MORE_FRAMES;
+    }
+
+    if (setjmp(png_jmpbuf(png_state->png_ptr))) {
+        png_state->libpng_error = true;
+        sail_destroy_image(*image);
+        return SAIL_UNDERLYING_CODEC_ERROR;
+    }
+
+    SAIL_TRY(sail_copy_image(png_state->first_image, image));
+
+    /* Only the first frame can have ICCP (if any). */
+    if (png_state->current_frame == 0) {
+        if (png_state->iccp != NULL) {
+            SAIL_TRY(sail_copy_iccp(png_state->iccp, &(*image)->iccp));
+        }
+    }
+
+#ifdef PNG_APNG_SUPPORTED
+    if (png_state->is_apng) {
+        (*image)->animated = true;
+
+        /* APNG feature: a hidden frame. */
+        if (png_state->current_frame == 0 && png_get_first_frame_is_hidden(png_state->png_ptr, png_state->info_ptr)) {
+            SAIL_TRY(skip_hidden_frame((*image)->bytes_per_line,
+                                       (*image)->height,
+                                       png_state->png_ptr,
+                                       png_state->info_ptr,
+                                       &png_state->row_to_skip_hidden));
+
+            png_state->frames--;
+
+            /* We have just a single frame left - continue to reading scan lines. */
+            if (png_state->frames == 1) {
+                png_read_frame_head(png_state->png_ptr, png_state->info_ptr);
+                (*image)->animated = false;
+                return 0;
+            } else if(png_state->frames == 0) {
+                return SAIL_NO_MORE_FRAMES;
+            }
+        } else {
+            if (png_state->next_frame_dispose_op == PNG_DISPOSE_OP_BACKGROUND) {
+                for (unsigned j = png_state->next_frame_y_offset, i = 0; i < png_state->next_frame_height; j++, i++) {
+                    memset(png_state->cur[j] + png_state->next_frame_x_offset * png_state->bytes_per_pixel,
+                            0,
+                            png_state->next_frame_width * png_state->bytes_per_pixel);
+                }
+            } else if(png_state->next_frame_dispose_op == PNG_DISPOSE_OP_PREVIOUS) {
+                for (unsigned i = 0; i < png_state->first_image->height; i++) {
+                    memcpy(png_state->cur[i], png_state->prev[i], png_state->first_image->bytes_per_line);
+                }
+            } else { /* PNG_DISPOSE_OP_NONE */
+            }
+
+            /* Save the current frame as a previous for future use. */
+            for(unsigned i = 0; i < (*image)->height; i++) {
+                memcpy(png_state->prev[i], png_state->cur[i], (*image)->bytes_per_line);
+            }
+        }
+
+        FREE_ROWS(&png_state->frame, png_state->next_frame_height);
+
+        png_read_frame_head(png_state->png_ptr, png_state->info_ptr);
+
+        if (png_get_valid(png_state->png_ptr, png_state->info_ptr, PNG_INFO_fcTL) != 0) {
+            png_get_next_frame_fcTL(png_state->png_ptr, png_state->info_ptr,
+                                    &png_state->next_frame_width, &png_state->next_frame_height,
+                                    &png_state->next_frame_x_offset, &png_state->next_frame_y_offset,
+                                    &png_state->next_frame_delay_num, &png_state->next_frame_delay_den,
+                                    &png_state->next_frame_dispose_op, &png_state->next_frame_blend_op);
+        } else {
+            png_state->next_frame_width = (*image)->width;
+            png_state->next_frame_height = (*image)->height;
+            png_state->next_frame_x_offset = 0;
+            png_state->next_frame_y_offset = 0;
+            png_state->next_frame_dispose_op = PNG_DISPOSE_OP_BACKGROUND;
+            png_state->next_frame_blend_op   = PNG_BLEND_OP_SOURCE;
+        }
+
+        if (!png_state->next_frame_delay_den) {
+            png_state->next_frame_delay_den = 100;
+        }
+
+        (*image)->delay = (int)(((double)png_state->next_frame_delay_num / png_state->next_frame_delay_den) * 1000);
+
+        if (png_state->next_frame_width + png_state->next_frame_x_offset > (*image)->width ||
+                png_state->next_frame_height + png_state->next_frame_y_offset > (*image)->height) {
+            return SAIL_INCORRECT_IMAGE_DIMENSIONS;
+        }
+
+        if (!MALLOC_ROWS(&png_state->frame, png_state->next_frame_width * png_state->bytes_per_pixel, png_state->next_frame_height)) {
+            return SAIL_MEMORY_ALLOCATION_FAILED;
+        }
+
+        png_read_image(png_state->png_ptr, png_state->frame);
+
+        /* Copy all pixel values including alpha. */
+        if (png_state->current_frame == 0 || png_state->next_frame_blend_op == PNG_BLEND_OP_SOURCE) {
+            for (unsigned j = png_state->next_frame_y_offset, i = 0; i < png_state->next_frame_height; j++, i++) {
+                memcpy(png_state->cur[j] + png_state->next_frame_x_offset * png_state->bytes_per_pixel,
+                        png_state->frame[i],
+                        png_state->next_frame_width * png_state->bytes_per_pixel);
+            }
+        } else { /* PNG_BLEND_OP_OVER */
+            for (unsigned j = png_state->next_frame_y_offset, i = 0; i < png_state->next_frame_height; j++, i++) {
+                uint8_t *src = png_state->frame[i];
+                uint8_t *dst = png_state->cur[j] + png_state->next_frame_x_offset * png_state->bytes_per_pixel;
+                unsigned w = png_state->next_frame_width;
+
+                while (w--) {
+                    const double src_a = *(src+3) / 255.0;
+
+                    *dst = (uint8_t)(src_a * (*src) + (1-src_a) * (*dst)); src++; dst++;
+                    *dst = (uint8_t)(src_a * (*src) + (1-src_a) * (*dst)); src++; dst++;
+                    *dst = (uint8_t)(src_a * (*src) + (1-src_a) * (*dst)); src++; dst++;
+                    src++; dst++;
+                }
+            }
+        }
+    }
+#endif
+
+    png_state->current_frame++;
 
     return 0;
 }
@@ -309,6 +536,10 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_pass_v2(void *state, struct 
     SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IO(io);
     SAIL_CHECK_IMAGE(image);
+
+    struct png_state *png_state = (struct png_state *)state;
+
+    png_state->line = 0;
 
     return 0;
 }
@@ -331,7 +562,15 @@ SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v2(void *state, struct sail_
         return SAIL_UNDERLYING_CODEC_ERROR;
     }
 
+#ifdef PNG_APNG_SUPPORTED
+    if (png_state->is_apng && png_state->frames > 1) {
+        memcpy(scanline, png_state->cur[png_state->line++], image->bytes_per_line);
+    } else {
+        png_read_row(png_state->png_ptr, (png_bytep)scanline, NULL);
+    }
+#else
     png_read_row(png_state->png_ptr, (png_bytep)scanline, NULL);
+#endif
 
     return 0;
 }
@@ -346,6 +585,16 @@ SAIL_EXPORT sail_error_t sail_plugin_read_finish_v2(void **state, struct sail_io
     /* Subsequent calls to finish() will expectedly fail in the above line. */
     *state = NULL;
 
+#ifdef PNG_APNG_SUPPORTED
+    free(png_state->row_to_skip_hidden);
+
+    FREE_ROWS(&png_state->frame, png_state->next_frame_height);
+    FREE_ROWS(&png_state->prev, png_state->first_image->height);
+    FREE_ROWS(&png_state->cur, png_state->first_image->height);
+#endif
+
+    sail_destroy_image(png_state->first_image);
+    sail_destroy_iccp(png_state->iccp);
     sail_destroy_read_options(png_state->read_options);
 
     if (png_state->png_ptr != NULL) {

@@ -16,6 +16,7 @@
     along with this library. If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include <stdlib.h>
 #include <string.h>
 
 #include "sail-common.h"
@@ -235,6 +236,25 @@ sail_error_t write_png_text(png_structp png_ptr, png_infop info_ptr, const struc
 #else
     (void)meta_entry_node;
 #endif
+
+    return 0;
+}
+
+sail_error_t skip_hidden_frame(unsigned bytes_per_line, unsigned height, png_structp png_ptr, png_infop info_ptr, void **row) {
+    *row = malloc(bytes_per_line);
+
+    if (*row == NULL) {
+        return SAIL_MEMORY_ALLOCATION_FAILED;
+    }
+
+    png_read_frame_head(png_ptr, info_ptr);
+
+    for (unsigned i = 0; i < height; i++) {
+        png_read_row(png_ptr, (png_bytep)(*row), NULL);
+    }
+
+    free(*row);
+    *row = NULL;
 
     return 0;
 }

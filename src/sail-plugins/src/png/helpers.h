@@ -47,4 +47,6 @@ SAIL_HIDDEN sail_error_t read_png_text(png_structp png_ptr, png_infop info_ptr, 
 
 SAIL_HIDDEN sail_error_t write_png_text(png_structp png_ptr, png_infop info_ptr, const struct sail_meta_entry_node *meta_entry_node);
 
+SAIL_HIDDEN sail_error_t skip_hidden_frame(unsigned bytes_per_line, unsigned height, png_structp png_ptr, png_infop info_ptr, void **row);
+
 #endif
