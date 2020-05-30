@@ -541,19 +541,11 @@ SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v2(void *state, struct sail_
                         png_state->temp_scanline, 
                         image->width * png_state->bytes_per_pixel);
             } else { /* PNG_BLEND_OP_OVER */
-                const uint8_t *src = png_state->temp_scanline;
-                uint8_t *dst = (uint8_t*)scanline + png_state->next_frame_x_offset * png_state->bytes_per_pixel;
-                unsigned w = image->width;
-
-                while (w--) {
-                    const double src_a = *(src+3) / 255.0;
-                    const double dst_a = *(dst+3) / 255.0;
-
-                    *dst = (uint8_t)(src_a * (*src) + (1-src_a) * dst_a * (*dst)); src++; dst++;
-                    *dst = (uint8_t)(src_a * (*src) + (1-src_a) * dst_a * (*dst)); src++; dst++;
-                    *dst = (uint8_t)(src_a * (*src) + (1-src_a) * dst_a * (*dst)); src++; dst++;
-                    *dst = (uint8_t)((src_a + (1-src_a) * dst_a) * 255);           src++; dst++;
-                }
+                SAIL_TRY(blend_over(png_state->bytes_per_pixel,
+                                    image->width,
+                                    png_state->temp_scanline,
+                                    scanline,
+                                    png_state->next_frame_x_offset * png_state->bytes_per_pixel));
             }
 
             if (png_state->next_frame_dispose_op == PNG_DISPOSE_OP_BACKGROUND) {

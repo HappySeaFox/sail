@@ -16,6 +16,7 @@
     along with this library. If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -255,6 +256,41 @@ sail_error_t skip_hidden_frame(unsigned bytes_per_line, unsigned height, png_str
 
     free(*row);
     *row = NULL;
+
+    return 0;
+}
+
+sail_error_t blend_over(unsigned bytes_per_pixel, unsigned width, const void *src_raw, void *dst_raw, unsigned dst_offset) {
+
+    if (bytes_per_pixel == 4) {
+        const uint8_t *src = src_raw;
+        uint8_t *dst = (uint8_t *)dst_raw + dst_offset;
+
+        while (width--) {
+            const double src_a = *(src+3) / 255.0;
+            const double dst_a = *(dst+3) / 255.0;
+
+            *dst = (uint8_t)(src_a * (*src) + (1-src_a) * dst_a * (*dst)); src++; dst++;
+            *dst = (uint8_t)(src_a * (*src) + (1-src_a) * dst_a * (*dst)); src++; dst++;
+            *dst = (uint8_t)(src_a * (*src) + (1-src_a) * dst_a * (*dst)); src++; dst++;
+            *dst = (uint8_t)((src_a + (1-src_a) * dst_a) * 255);           src++; dst++;
+        }
+    } else if (bytes_per_pixel == 8) {
+        const uint16_t *src = src_raw;
+        uint16_t *dst = (uint16_t *)dst_raw + dst_offset;
+
+        while (width--) {
+            const double src_a = *(src+3) / 65535.0;
+            const double dst_a = *(dst+3) / 65535.0;
+
+            *dst = (uint16_t)(src_a * (*src) + (1-src_a) * dst_a * (*dst)); src++; dst++;
+            *dst = (uint16_t)(src_a * (*src) + (1-src_a) * dst_a * (*dst)); src++; dst++;
+            *dst = (uint16_t)(src_a * (*src) + (1-src_a) * dst_a * (*dst)); src++; dst++;
+            *dst = (uint16_t)((src_a + (1-src_a) * dst_a) * 65535);         src++; dst++;
+        }
+    } else {
+        return SAIL_UNSUPPORTED_BIT_DEPTH;
+    }
 
     return 0;
 }

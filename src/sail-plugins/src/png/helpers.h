@@ -49,4 +49,6 @@ SAIL_HIDDEN sail_error_t write_png_text(png_structp png_ptr, png_infop info_ptr,
 
 SAIL_HIDDEN sail_error_t skip_hidden_frame(unsigned bytes_per_line, unsigned height, png_structp png_ptr, png_infop info_ptr, void **row);
 
+SAIL_HIDDEN sail_error_t blend_over(unsigned bytes_per_pixel, unsigned width, const void *src_raw, void *dst_raw, unsigned dst_offset);
+
 #endif
