@@ -530,10 +530,10 @@ SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v2(void *state, struct sail_
 
 #ifdef PNG_APNG_SUPPORTED
     if (png_state->is_apng) {
+        memcpy(scanline, png_state->prev[png_state->line], png_state->first_image->width * png_state->bytes_per_pixel);
+
         if (png_state->line >= png_state->next_frame_y_offset && png_state->line < png_state->next_frame_y_offset + png_state->next_frame_height) {
             png_read_row(png_state->png_ptr, (png_bytep)png_state->temp_scanline, NULL);
-
-            memcpy(scanline, png_state->prev[png_state->line], png_state->first_image->width * png_state->bytes_per_pixel);
 
             /* Copy all pixel values including alpha. */
             if (png_state->current_frame == 1 || png_state->next_frame_blend_op == PNG_BLEND_OP_SOURCE) {
@@ -560,8 +560,6 @@ SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v2(void *state, struct sail_
                         png_state->next_frame_width * png_state->bytes_per_pixel);
             } else { /* PNG_DISPOSE_OP_PREVIOUS */
             }
-        } else {
-            memcpy(scanline, png_state->prev[png_state->line], png_state->first_image->width * png_state->bytes_per_pixel);
         }
     } else {
         png_read_row(png_state->png_ptr, (png_bytep)scanline, NULL);
