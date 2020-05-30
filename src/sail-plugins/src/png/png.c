@@ -537,9 +537,11 @@ SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v2(void *state, struct sail_
 
             /* Copy all pixel values including alpha. */
             if (png_state->current_frame == 1 || png_state->next_frame_blend_op == PNG_BLEND_OP_SOURCE) {
-                memcpy((uint8_t*)scanline + png_state->next_frame_x_offset * png_state->bytes_per_pixel,
-                        png_state->temp_scanline, 
-                        png_state->next_frame_width * png_state->bytes_per_pixel);
+                SAIL_TRY(blend_source(png_state->bytes_per_pixel,
+                                        scanline,
+                                        png_state->next_frame_x_offset * png_state->bytes_per_pixel,
+                                        png_state->temp_scanline,
+                                        png_state->next_frame_width * png_state->bytes_per_pixel));
             } else { /* PNG_BLEND_OP_OVER */
                 SAIL_TRY(blend_over(png_state->bytes_per_pixel,
                                     png_state->next_frame_width,

@@ -260,6 +260,19 @@ sail_error_t skip_hidden_frame(unsigned bytes_per_line, unsigned height, png_str
     return 0;
 }
 
+sail_error_t blend_source(unsigned bytes_per_pixel, void *dst_raw, unsigned dst_offset, const void *src_raw, unsigned src_length) {
+
+    if (bytes_per_pixel == 4) {
+        memcpy((uint8_t*)dst_raw + dst_offset, src_raw, src_length);
+    } else if (bytes_per_pixel == 8) {
+        memcpy((uint16_t*)dst_raw + dst_offset, src_raw, src_length);
+    } else {
+        return SAIL_UNSUPPORTED_BIT_DEPTH;
+    }
+
+    return 0;
+}
+
 sail_error_t blend_over(unsigned bytes_per_pixel, unsigned width, const void *src_raw, void *dst_raw, unsigned dst_offset) {
 
     if (bytes_per_pixel == 4) {
