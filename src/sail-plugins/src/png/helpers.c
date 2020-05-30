@@ -358,3 +358,42 @@ sail_error_t fetch_iccp(png_structp png_ptr, png_infop info_ptr, struct sail_icc
 
     return 0;
 }
+
+sail_error_t alloc_rows(png_bytep **A, unsigned row_length, unsigned height) {
+
+    *A = (png_bytep*)malloc(height * sizeof(png_bytep*));
+
+    if (*A == NULL) {
+        return SAIL_MEMORY_ALLOCATION_FAILED;
+    }
+
+    for (unsigned row = 0; row < height; row++) {
+        (*A)[row] = NULL;
+    }
+
+    for (unsigned row = 0; row < height; row++) {
+        (*A)[row] = (png_bytep)malloc(row_length);
+
+        if ((*A)[row] == NULL) {
+            return SAIL_MEMORY_ALLOCATION_FAILED;
+        }
+
+        memset((*A)[row], 0, row_length);
+    }
+
+    return 0;
+}
+
+void destroy_rows(png_bytep **A, unsigned height) {
+
+    if (*A == NULL) {
+        return;
+    }
+
+    for (unsigned row = 0; row < height; row++) {
+        free((*A)[row]);
+    }
+
+    free(*A);
+    *A = NULL;
+}

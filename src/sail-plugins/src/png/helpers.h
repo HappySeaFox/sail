@@ -56,4 +56,8 @@ SAIL_HIDDEN sail_error_t blend_over(unsigned bytes_per_pixel, unsigned width, co
 
 SAIL_HIDDEN sail_error_t fetch_iccp(png_structp png_ptr, png_infop info_ptr, struct sail_iccp **iccp);
 
+SAIL_HIDDEN sail_error_t alloc_rows(png_bytep **A, unsigned row_length, unsigned height);
+
+SAIL_HIDDEN void destroy_rows(png_bytep **A, unsigned height);
+
 #endif

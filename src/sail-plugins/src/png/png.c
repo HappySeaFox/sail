@@ -41,44 +41,6 @@ static const int COMPRESSION_DEFAULT = 6;
 /*
  * Plugin-specific state.
  */
-
-static bool MALLOC_ROWS(png_bytep **A, const int RB, const int H)
-{
-    *A = (png_bytep*)malloc(H * sizeof(png_bytep*));
-
-    if(*A == NULL)
-        return false;
-
-    for(int row = 0; row < H; row++)
-        (*A)[row] = NULL;
-
-    for(int row = 0; row < H; row++)
-    {
-        (*A)[row] = (png_bytep)malloc(RB);
-
-        if((*A)[row] == NULL)
-            return false;
-
-        memset((*A)[row], 0, RB);
-    }
-
-    return true;
-}
-
-static void FREE_ROWS(png_bytep **A, const int H)
-{
-    if (*A != NULL)
-    {
-        for(int i = 0;i < H;i++)
-        {
-            free((*A)[i]);
-        }
-
-        free(*A);
-        *A = NULL;
-    }
-}
-
 struct png_state {
     png_structp png_ptr;
     png_infop info_ptr;
@@ -331,9 +293,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_io *io, const stru
     }
 
     if (png_state->is_apng) {
-        if (!MALLOC_ROWS(&png_state->prev, png_state->first_image->bytes_per_line, png_state->first_image->height)) {
-            return SAIL_MEMORY_ALLOCATION_FAILED;
-        }
+        SAIL_TRY(alloc_rows(&png_state->prev, png_state->first_image->bytes_per_line, png_state->first_image->height));
     }
 #else
     png_state->frames = 1;
@@ -558,7 +518,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_finish_v2(void **state, struct sail_io
 #ifdef PNG_APNG_SUPPORTED
     free(png_state->temp_scanline);
     free(png_state->scanline_for_skipping);
-    FREE_ROWS(&png_state->prev, png_state->first_image->height);
+    destroy_rows(&png_state->prev, png_state->first_image->height);
 #endif
 
     sail_destroy_image(png_state->first_image);
