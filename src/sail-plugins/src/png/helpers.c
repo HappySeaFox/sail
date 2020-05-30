@@ -16,6 +16,7 @@
     along with this library. If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -242,6 +243,11 @@ sail_error_t write_png_text(png_structp png_ptr, png_infop info_ptr, const struc
 }
 
 sail_error_t skip_hidden_frame(unsigned bytes_per_line, unsigned height, png_structp png_ptr, png_infop info_ptr, void **row) {
+
+    SAIL_CHECK_PTR(png_ptr);
+    SAIL_CHECK_PTR(info_ptr);
+    SAIL_CHECK_PTR(row);
+
     *row = malloc(bytes_per_line);
 
     if (*row == NULL) {
@@ -262,6 +268,9 @@ sail_error_t skip_hidden_frame(unsigned bytes_per_line, unsigned height, png_str
 
 sail_error_t blend_source(unsigned bytes_per_pixel, void *dst_raw, unsigned dst_offset, const void *src_raw, unsigned src_length) {
 
+    SAIL_CHECK_PTR(dst_raw);
+    SAIL_CHECK_PTR(src_raw);
+
     if (bytes_per_pixel == 4) {
         memcpy((uint8_t*)dst_raw + dst_offset, src_raw, src_length);
     } else if (bytes_per_pixel == 8) {
@@ -274,6 +283,9 @@ sail_error_t blend_source(unsigned bytes_per_pixel, void *dst_raw, unsigned dst_
 }
 
 sail_error_t blend_over(unsigned bytes_per_pixel, unsigned width, const void *src_raw, void *dst_raw, unsigned dst_offset) {
+
+    SAIL_CHECK_PTR(src_raw);
+    SAIL_CHECK_PTR(dst_raw);
 
     if (bytes_per_pixel == 4) {
         const uint8_t *src = src_raw;
@@ -303,6 +315,45 @@ sail_error_t blend_over(unsigned bytes_per_pixel, unsigned width, const void *sr
         }
     } else {
         return SAIL_UNSUPPORTED_BIT_DEPTH;
+    }
+
+    return 0;
+}
+
+sail_error_t fetch_iccp(png_structp png_ptr, png_infop info_ptr, struct sail_iccp **iccp) {
+
+    SAIL_CHECK_PTR(png_ptr);
+    SAIL_CHECK_PTR(info_ptr);
+    SAIL_CHECK_PTR(iccp);
+
+    char *name;
+    int compression;
+    png_bytep data;
+    unsigned data_length;
+
+    bool ok = png_get_iCCP(png_ptr,
+                           info_ptr,
+                           &name,
+                           &compression,
+                           &data,
+                           &data_length) == PNG_INFO_iCCP;
+
+    if (ok) {
+        SAIL_TRY(sail_alloc_iccp(iccp));
+        SAIL_TRY(sail_strdup(name, &(*iccp)->name));
+
+        (*iccp)->data = malloc(data_length);
+
+        if ((*iccp)->data == NULL) {
+            return SAIL_MEMORY_ALLOCATION_FAILED;
+        }
+
+        memcpy((*iccp)->data, data, data_length);
+        (*iccp)->data_length = data_length;
+
+        SAIL_LOG_DEBUG("PNG: Found ICC profile '%s' %u bytes long", name, data_length);
+    } else {
+        SAIL_LOG_DEBUG("PNG: ICC profile is not found");
     }
 
     return 0;

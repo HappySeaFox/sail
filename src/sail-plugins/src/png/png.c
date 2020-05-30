@@ -352,35 +352,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_io *io, const stru
 
     /* Read ICC profile. */
     if (png_state->read_options->io_options & SAIL_IO_OPTION_ICCP) {
-        char *name;
-        int compression;
-        png_bytep data;
-        unsigned data_length;
-
-        bool ok = png_get_iCCP(png_state->png_ptr,
-                                png_state->info_ptr,
-                                &name,
-                                &compression,
-                                &data,
-                                &data_length) == PNG_INFO_iCCP;
-
-        if (ok) {
-            SAIL_TRY(sail_alloc_iccp(&png_state->iccp));
-            SAIL_TRY(sail_strdup(name, &png_state->iccp->name));
-
-            png_state->iccp->data = malloc(data_length);
-
-            if (png_state->iccp->data == NULL) {
-                return SAIL_MEMORY_ALLOCATION_FAILED;
-            }
-
-            memcpy(png_state->iccp->data, data, data_length);
-            png_state->iccp->data_length = data_length;
-
-            SAIL_LOG_DEBUG("PNG: Found ICC profile '%s' %u bytes long", name, data_length);
-        } else {
-            SAIL_LOG_DEBUG("PNG: ICC profile is not found");
-        }
+        SAIL_TRY(fetch_iccp(png_state->png_ptr, png_state->info_ptr, &png_state->iccp));
     }
 
     png_state->temp_scanline = malloc(png_state->first_image->width * png_state->bytes_per_pixel);
