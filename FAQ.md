@@ -4,6 +4,7 @@ Table of Contents
 * [SAIL Frequently Asked Questions (FAQ)](#sail-frequently-asked-questions-faq)
   * [How old is SAIL?](#how-old-is-sail)
   * [Is SAIL cross\-platform?](#is-sail-cross-platform)
+  * [How does SAIL support image formats?](#how-does-sail-support-image-formats)
   * [How many image formats do you plan to implement?](#how-many-image-formats-do-you-plan-to-implement)
   * [I have questions, issues, or proposals](#i-have-questions-issues-or-proposals)
   * [Does SAIL provide simple one\-line APIs?](#does-sail-provide-simple-one-line-apis)
@@ -35,6 +36,11 @@ Technically, SAIL was founded in 2003 making it one of the oldest image decoding
 
 Yes. It's written in pure C11 and is highly portable. However, only the Windows and Linux platforms
 are currently supported. Pull requests to support more platforms are highly welcomed.
+
+## How does SAIL support image formats?
+
+SAIL supports image formats through dynamically loaded SAIL plugins (codecs). End-users never work
+with the plugins directly. They always work with the abstract high-level APIs.
 
 ## How many image formats do you plan to implement?
 
