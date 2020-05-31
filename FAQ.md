@@ -1,21 +1,26 @@
 Table of Contents
 =================
 
-   * [SAIL Frequently Asked Questions (FAQ)](#sail-frequently-asked-questions-faq)
-      * [How old is SAIL?](#how-old-is-sail)
-      * [Is SAIL cross-platform?](#is-sail-cross-platform)
-      * [How many image formats do you plan to implement?](#how-many-image-formats-do-you-plan-to-implement)
-      * [I have questions, issues, or proposals](#i-have-questions-issues-or-proposals)
-      * [Does SAIL provide simple one-line APIs?](#does-sail-provide-simple-one-line-apis)
-      * [How can point SAIL to a different plugins location?](#how-can-point-sail-to-a-different-plugins-location)
-      * [What pixel formats SAIL is able to read?](#what-pixel-formats-sail-is-able-to-read)
-      * [What pixel formats SAIL is able to output after reading an image file?](#what-pixel-formats-sail-is-able-to-output-after-reading-an-image-file)
-      * [What pixel formats SAIL is able to write?](#what-pixel-formats-sail-is-able-to-write)
-      * [How can I read an image and output pixels in different formats?](#how-can-i-read-an-image-and-output-pixels-in-different-formats)
-      * [Does SAIL support animated and multi-paged images?](#does-sail-support-animated-and-multi-paged-images)
-      * [Does SAIL support reading from memory?](#does-sail-support-reading-from-memory)
-      * [Are there any C/C++ examples?](#are-there-any-cc-examples)
-      * [Are there any bindings to other programming languages?](#are-there-any-bindings-to-other-programming-languages)
+* [SAIL Frequently Asked Questions (FAQ)](#sail-frequently-asked-questions-faq)
+  * [How old is SAIL?](#how-old-is-sail)
+  * [Is SAIL cross\-platform?](#is-sail-cross-platform)
+  * [How many image formats do you plan to implement?](#how-many-image-formats-do-you-plan-to-implement)
+  * [I have questions, issues, or proposals](#i-have-questions-issues-or-proposals)
+  * [Does SAIL provide simple one\-line APIs?](#does-sail-provide-simple-one-line-apis)
+  * [How can I point SAIL to a different plugins location?](#how-can-i-point-sail-to-a-different-plugins-location)
+  * [Please describe memory management techniques implemented in SAIL](#please-describe-memory-management-techniques-implemented-in-sail)
+    * [The memory management technique implemented in SAIL](#the-memory-management-technique-implemented-in-sail)
+    * [Convention to call SAIL functions](#convention-to-call-sail-functions)
+    * [Pointers to images, bits, etc\. are always freed on error](#pointers-to-images-bits-etc-are-always-freed-on-error)
+    * [Always set a pointer to state to NULL (C only)](#always-set-a-pointer-to-state-to-null-c-only)
+  * [What pixel formats SAIL is able to read?](#what-pixel-formats-sail-is-able-to-read)
+  * [What pixel formats SAIL is able to output after reading an image file?](#what-pixel-formats-sail-is-able-to-output-after-reading-an-image-file)
+  * [What pixel formats SAIL is able to write?](#what-pixel-formats-sail-is-able-to-write)
+  * [How can I read an image and output pixels in different formats?](#how-can-i-read-an-image-and-output-pixels-in-different-formats)
+  * [Does SAIL support animated and multi\-paged images?](#does-sail-support-animated-and-multi-paged-images)
+  * [Does SAIL support reading from memory?](#does-sail-support-reading-from-memory)
+  * [Are there any C/C\+\+ examples?](#are-there-any-cc-examples)
+  * [Are there any bindings to other programming languages?](#are-there-any-bindings-to-other-programming-languages)
 
 # SAIL Frequently Asked Questions (FAQ)
 
@@ -48,9 +53,63 @@ Pull requests are always welcomed.
 Yes. SAIL provides four levels of APIs, depending on your needs: `junior`, `advanced`, `deep diver`, and `technical diver`.
 See [EXAMPLES](EXAMPLES.md) for more.
 
-## How can point SAIL to a different plugins location?
+## How can I point SAIL to a different plugins location?
 
 Set `SAIL_PLUGINGS_PATH` environment variable to a desired location.
+
+## Please describe memory management techniques implemented in SAIL
+
+### The memory management technique implemented in SAIL
+
+Internally, SAIL always tries to clean up on errors. If you encounter a memory leak on error, please report it.
+
+**C only:** However, if an engineer encounters an error in the middle of reading or writing an image with the `advanced`
+or a deeper API, it's always a responsibility of the engineer to stop reading or writing with
+`sail_stop_reading()` or `sail_stop_writing()`. These functions execute a proper cleanup in the underlying codec.
+If you don't call `sail_stop_reading()` or `sail_stop_writing()` in this situation, be prepared for memory leaks.
+
+**C++ only:** C++ engineers are more lucky. The C++ binding executes the necessary cleanup automatically in this
+situation in `~image_reader()` or `~image_writer()`.
+
+### Convention to call SAIL functions
+
+It's always recommended to use the `SAIL_TRY()` macro to call SAIL functions. It's also always recommended
+to clean up in your code with the `SAIL_TRY_OR_CLEANUP()` macro if you need to.
+
+### Pointers to images, bits, etc. are always freed on error
+
+Pointers that are modified by SAIL functions are always freed on error but may be left set
+to a non-NULL value. SAIL does not reset them to a NULL value on error. For example:
+
+```C
+void *state = NULL;
+struct sail_image *image;
+void *bits;
+
+SAIL_TRY(sail_start_reading_file(..., &state));
+
+/*
+ * SAIL frees the 'image' or error, but doesn't reset its value.
+ * This code sample prints a non-NULL address on error.
+ */
+SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, &image, &bits),
+                    /* cleanup */ printf("%p\n", image),
+                                  sail_stop_reading(state));
+```
+
+### Always set a pointer to state to NULL (C only)
+
+C reading and writing functions require a local void pointer to state. Always set it to NULL before
+reading or writing. For example:
+
+```C
+void *state = NULL;
+
+SAIL_TRY(sail_start_reading_file(..., &state));
+
+SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, ...),
+                    /* cleanup */ sail_stop_reading(state));
+```
 
 ## What pixel formats SAIL is able to read?
 
