@@ -51,11 +51,11 @@ Author: Dmitry Baryshev
 
 ## Supported image formats
 
-| N  | Image format                                                                            | Operations    | Dependencies      |
-| -- | --------------------------------------------------------------------------------------- | ------------- | ----------------- |
-| 1  | [APNG (Animated Portable Network Graphics)](https://wikipedia.org/wiki/APNG)            | R             | libpng+APNG patch |
-| 2  | [JPEG (Joint Photographic Experts Group)](https://wikipedia.org/wiki/JPEG)              | RW            | libjpeg-turbo     |
-| 3  | [PNG (Portable Network Graphics)](https://wikipedia.org/wiki/Portable_Network_Graphics) | RW            | libpng            |
+| N  | Image format                                                                            | Operations    | Dependencies      | Notes         |
+| -- | --------------------------------------------------------------------------------------- | ------------- | ----------------- |-------------- |
+| 1  | [APNG (Animated Portable Network Graphics)](https://wikipedia.org/wiki/APNG)            | R             | libpng+APNG patch | Windows only  |
+| 2  | [JPEG (Joint Photographic Experts Group)](https://wikipedia.org/wiki/JPEG)              | RW            | libjpeg-turbo     |               |
+| 3  | [PNG (Portable Network Graphics)](https://wikipedia.org/wiki/Portable_Network_Graphics) | RW            | libpng            |               |
 
 ## Legacy image formats
 
