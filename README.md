@@ -46,7 +46,7 @@ Author: Dmitry Baryshev
 ## Differences from other image decoding libraries
 
 - Fast and easy-to-use API providing expected business entities - images, delays, palettes etc.
-- Access to raw pixel data
+- Access to source pixel data w/o converting it to a different format
 - Reading and writing images in multiple pixel formats, not only RGB and friends
 
 ## Supported image formats
