@@ -57,6 +57,8 @@ Author: Dmitry Baryshev
 | 2  | [JPEG (Joint Photographic Experts Group)](https://wikipedia.org/wiki/JPEG)              | RW            | libjpeg-turbo     |               |
 | 3  | [PNG (Portable Network Graphics)](https://wikipedia.org/wiki/Portable_Network_Graphics) | RW            | libpng            |               |
 
+More image formats will be added in the future.
+
 ## Legacy image formats
 
 I'm very sceptical about adding legacy image formats support into SAIL. However, if you need one, please open a
