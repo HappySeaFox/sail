@@ -271,7 +271,7 @@ sail_error_t image_reader::read_next_frame(image *simage)
         free(image_bits);
     );
 
-    SAIL_TRY(sail_read_next_frame(d->state, &sail_image, (void **)&image_bits));
+    SAIL_TRY(sail_read_next_frame(d->state, &sail_image, &image_bits));
 
     *simage = image(sail_image);
 
