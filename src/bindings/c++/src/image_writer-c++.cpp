@@ -88,17 +88,17 @@ sail_error_t image_writer::write(const char *path, const image &simage)
     sail_image *sail_image;
     SAIL_TRY(sail_alloc_image(&sail_image));
 
-    SAIL_AT_SCOPE_EXIT (
-        sail_destroy_image(sail_image);
-    );
-
-    SAIL_TRY(simage.to_sail_image(sail_image));
+    SAIL_TRY_OR_CLEANUP(simage.to_sail_image(sail_image),
+                        /* cleanup */ sail_destroy_image(sail_image));
 
     const void *bits = simage.bits() ? simage.bits() : simage.shallow_bits();
 
-    SAIL_TRY(sail_write(path,
-                        sail_image,
-                        bits));
+    SAIL_TRY_OR_CLEANUP(sail_write(path,
+                                    sail_image,
+                                    bits),
+                        /* cleanup */ sail_destroy_image(sail_image));
+
+    sail_destroy_image(sail_image);
 
     return 0;
 }
@@ -243,15 +243,15 @@ sail_error_t image_writer::write_next_frame(const image &simage)
     sail_image *sail_image;
     SAIL_TRY(sail_alloc_image(&sail_image));
 
-    SAIL_AT_SCOPE_EXIT (
-        sail_destroy_image(sail_image);
-    );
-
-    SAIL_TRY(simage.to_sail_image(sail_image));
+    SAIL_TRY_OR_CLEANUP(simage.to_sail_image(sail_image),
+                        /* cleanup */ sail_destroy_image(sail_image));
 
     const void *bits = simage.bits() ? simage.bits() : simage.shallow_bits();
 
-    SAIL_TRY(sail_write_next_frame(d->state, sail_image, bits));
+    SAIL_TRY_OR_CLEANUP(sail_write_next_frame(d->state, sail_image, bits),
+                        /* cleanup */ sail_destroy_image(sail_image));
+
+    sail_destroy_image(sail_image);
 
     return 0;
 }

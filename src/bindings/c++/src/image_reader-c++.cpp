@@ -86,12 +86,8 @@ sail_error_t image_reader::probe(const char *path, image *simage, plugin_info *s
     SAIL_CHECK_PATH_PTR(path);
     SAIL_CHECK_IMAGE_PTR(simage);
 
-    const sail_plugin_info *sail_plugin_info = nullptr;
-    sail_image *sail_image = nullptr;
-
-    SAIL_AT_SCOPE_EXIT (
-        sail_destroy_image(sail_image);
-    );
+    const sail_plugin_info *sail_plugin_info;
+    sail_image *sail_image;
 
     SAIL_TRY(sail_probe(path,
                         d->ctx->sail_context_c(),
@@ -99,6 +95,7 @@ sail_error_t image_reader::probe(const char *path, image *simage, plugin_info *s
                         &sail_plugin_info));
 
     *simage = image(sail_image);
+    sail_destroy_image(sail_image);
 
     if (splugin_info != nullptr) {
         *splugin_info = plugin_info(sail_plugin_info);
@@ -119,22 +116,22 @@ sail_error_t image_reader::read(const char *path, image *simage)
     SAIL_CHECK_PATH_PTR(path);
     SAIL_CHECK_IMAGE_PTR(simage);
 
-    sail_image *sail_image = nullptr;
-    void *image_bits = nullptr;
-
-    SAIL_AT_SCOPE_EXIT (
-        sail_destroy_image(sail_image);
-        free(image_bits);
-    );
+    sail_image *sail_image;
+    void *image_bits;
 
     SAIL_TRY(sail_read(path,
                        &sail_image,
                        &image_bits));
 
     unsigned bytes_per_image;
-    SAIL_TRY(sail_bytes_per_image(sail_image, &bytes_per_image));
+    SAIL_TRY_OR_CLEANUP(sail_bytes_per_image(sail_image, &bytes_per_image),
+                        /* cleanup */ sail_destroy_image(sail_image),
+                                      free(image_bits));
 
     *simage = image(sail_image, image_bits, bytes_per_image);
+
+    sail_destroy_image(sail_image);
+    free(image_bits);
 
     return 0;
 }
@@ -263,22 +260,21 @@ sail_error_t image_reader::read_next_frame(image *simage)
 {
     SAIL_CHECK_IMAGE_PTR(simage);
 
-    sail_image *sail_image = nullptr;
-    void *image_bits = nullptr;
-
-    SAIL_AT_SCOPE_EXIT (
-        sail_destroy_image(sail_image);
-        free(image_bits);
-    );
+    sail_image *sail_image;
+    void *image_bits;
 
     SAIL_TRY(sail_read_next_frame(d->state, &sail_image, &image_bits));
 
-    *simage = image(sail_image);
-
     unsigned bytes_per_image;
-    SAIL_TRY(sail_bytes_per_image(sail_image, &bytes_per_image));
+    SAIL_TRY_OR_CLEANUP(sail_bytes_per_image(sail_image, &bytes_per_image),
+                        /* cleanup */ sail_destroy_image(sail_image),
+                                      free(image_bits));
 
+    *simage = image(sail_image);
     simage->with_bits(image_bits, bytes_per_image);
+
+    sail_destroy_image(sail_image);
+    free(image_bits);
 
     return 0;
 }

@@ -120,15 +120,13 @@ sail_error_t write_features::to_write_options(write_options *swrite_options) con
     SAIL_CHECK_WRITE_FEATURES_PTR(d->sail_write_features_c);
     SAIL_CHECK_WRITE_OPTIONS_PTR(swrite_options);
 
-    sail_write_options *sail_write_options = nullptr;
-
-    SAIL_AT_SCOPE_EXIT (
-        sail_destroy_write_options(sail_write_options);
-    );
+    sail_write_options *sail_write_options;
 
     SAIL_TRY(sail_alloc_write_options_from_features(d->sail_write_features_c, &sail_write_options));
 
     *swrite_options = write_options(sail_write_options);
+
+    sail_destroy_write_options(sail_write_options);
 
     return 0;
 }
