@@ -14,7 +14,6 @@ add_library(sail-c++
 # Build a list of public headers to install
 #
 set(PUBLIC_HEADERS "")
-list(APPEND PUBLIC_HEADERS "src/at_scope_exit-c++.h")
 list(APPEND PUBLIC_HEADERS "src/context-c++.h")
 list(APPEND PUBLIC_HEADERS "src/image-c++.h")
 list(APPEND PUBLIC_HEADERS "src/image_reader-c++.h")

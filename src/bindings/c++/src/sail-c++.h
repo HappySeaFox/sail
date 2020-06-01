@@ -24,7 +24,6 @@
 #ifdef SAIL_BUILD
     #include "sail-common.h"
 
-    #include "at_scope_exit-c++.h"
     #include "context-c++.h"
     #include "image-c++.h"
     #include "image_reader-c++.h"
@@ -39,7 +38,6 @@
 #else
     #include <sail-common/sail-common.h>
 
-    #include <sail-c++/at_scope_exit-c++.h>
     #include <sail-c++/context-c++.h>
     #include <sail-c++/image-c++.h>
     #include <sail-c++/image_reader-c++.h>
