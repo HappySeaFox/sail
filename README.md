@@ -59,7 +59,7 @@ Author: Dmitry Baryshev
 
 More image formats will be added in the future.
 
-## Legacy image formats
+### Legacy image formats
 
 I'm very sceptical about adding legacy image formats support into SAIL. However, if you need one, please open a
 GitHub [issue](https://github.com/smoked-herring/sail/issues) with detailed image format description. Pull requests
