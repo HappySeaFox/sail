@@ -7,6 +7,7 @@ Table of Contents
   * [How does SAIL support image formats?](#how-does-sail-support-image-formats)
   * [Describe the high\-level APIs](#describe-the-high-level-apis)
   * [How many image formats do you plan to implement?](#how-many-image-formats-do-you-plan-to-implement)
+  * [Does SAIL support static linking?](#does-sail-support-static-linking)
   * [I have questions, issues, or proposals](#i-have-questions-issues-or-proposals)
   * [Does SAIL provide simple one\-line APIs?](#does-sail-provide-simple-one-line-apis)
   * [How can I point SAIL to a different plugins location?](#how-can-i-point-sail-to-a-different-plugins-location)
@@ -58,6 +59,10 @@ See [EXAMPLES](EXAMPLES.md) for more.
 
 Ksquirrel-libs supported around 60 image formats. I don't plan to port all of them. However,
 the most popular image formats will be definitely ported from ksquirrel-libs.
+
+## Does SAIL support static linking?
+
+No. You're able to build `libsail` statically, however SAIL plugins are still standalone dynamically loaded files.
 
 ## I have questions, issues, or proposals
 
