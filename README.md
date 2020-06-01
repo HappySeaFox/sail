@@ -22,12 +22,13 @@ Author: Dmitry Baryshev
 - Easy-to-use C and C++ interfaces
 - Four levels of APIs, depending on your needs: `junior`, `advanced`, `deep diver`, and `technical diver`.
   See [EXAMPLES](EXAMPLES.md) for more
+- Image formats are supported through dynamically loaded SAIL plugins (codecs)
 - Reading images from file and memory
 - Writing images to file and memory
 - I/O abstraction for technical divers
 - Reading operations are always able to output pixels in the `SOURCE`, `BPP24-RGB`
-  and `BPP32-RGBA` formats. Some plugins may output even more
-- Reading operations are always able to output pixels in the **source pixel format**
+  and `BPP32-RGBA` formats. Some image format plugins may output even more
+- Reading operations are always able to output pixels in the `SOURCE` pixel format
   for those who want to kick the hell out of images manually. For example, one may want to work with
   `CMYK` pixels in a print image
 - Read and write meta information like JPEG comments
