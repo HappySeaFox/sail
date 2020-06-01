@@ -31,6 +31,7 @@ Author: Dmitry Baryshev
 - Reading operations are always able to output pixels in the `SOURCE` pixel format
   for those who want to kick the hell out of images manually. For example, one may want to work with
   `CMYK` pixels in a print image
+- Read and write ICC profiles
 - Read and write meta information like JPEG comments
 - Easily extensible with new image formats for those who want to implement a specific codec for his/her needs
 - Qt, SDL, and pure C examples
