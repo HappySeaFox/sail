@@ -29,7 +29,7 @@ Table of Contents
 
 ## How old is SAIL?
 
-SAIL is a rebranded ksquirrel-libs, enchanced and with high-level APIs. Ksquirrel-libs was a set of C++ image codecs
+SAIL is a rebranded ksquirrel-libs rewritten in C, enchanced and with high-level APIs. Ksquirrel-libs was a set of C++ image codecs
 for the KSquirrel image viewer. See [http://ksquirrel.sourceforge.net](http://ksquirrel.sourceforge.net).
 
 Technically, SAIL was founded in 2003 making it one of the oldest image decoding libraries.
