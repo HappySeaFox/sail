@@ -277,14 +277,14 @@ SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_io *io, const stru
     SAIL_TRY(sail_bytes_per_line(png_state->first_image->width,
                                  png_state->first_image->pixel_format,
                                  &png_state->first_image->bytes_per_line));
-    unsigned bits_per_pixel;
-    SAIL_TRY(sail_bits_per_pixel(png_state->first_image->pixel_format, &bits_per_pixel));
-    png_state->bytes_per_pixel = bits_per_pixel / 8;
-
     /* Apply requested transformations. */
     png_read_update_info(png_state->png_ptr, png_state->info_ptr);
 
 #ifdef PNG_APNG_SUPPORTED
+    unsigned bits_per_pixel;
+    SAIL_TRY(sail_bits_per_pixel(png_state->first_image->pixel_format, &bits_per_pixel));
+    png_state->bytes_per_pixel = bits_per_pixel / 8;
+
     png_state->is_apng = png_get_valid(png_state->png_ptr, png_state->info_ptr, PNG_INFO_acTL) != 0;
     png_state->frames = png_state->is_apng ? png_get_num_frames(png_state->png_ptr, png_state->info_ptr) : 1;
 
@@ -315,11 +315,13 @@ SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_io *io, const stru
         SAIL_TRY(fetch_iccp(png_state->png_ptr, png_state->info_ptr, &png_state->iccp));
     }
 
+#ifdef PNG_APNG_SUPPORTED
     png_state->temp_scanline = malloc(png_state->first_image->width * png_state->bytes_per_pixel);
 
     if (png_state->temp_scanline == NULL) {
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
+#endif
 
     const char *pixel_format_str = NULL;
     SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(png_state->first_image->source_pixel_format, &pixel_format_str));
@@ -437,7 +439,9 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_pass_v2(void *state, struct 
         return SAIL_UNDERLYING_CODEC_ERROR;
     }
 
+#ifdef PNG_APNG_SUPPORTED
     png_state->line = 0;
+#endif
 
     return 0;
 }

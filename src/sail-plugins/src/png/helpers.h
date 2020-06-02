@@ -48,16 +48,18 @@ SAIL_HIDDEN sail_error_t read_png_text(png_structp png_ptr, png_infop info_ptr, 
 
 SAIL_HIDDEN sail_error_t write_png_text(png_structp png_ptr, png_infop info_ptr, const struct sail_meta_entry_node *meta_entry_node);
 
-SAIL_HIDDEN sail_error_t skip_hidden_frame(unsigned bytes_per_line, unsigned height, png_structp png_ptr, png_infop info_ptr, void **row);
-
 SAIL_HIDDEN sail_error_t blend_source(unsigned bytes_per_pixel, void *dst_raw, unsigned dst_offset, const void *src_raw, unsigned src_length);
 
 SAIL_HIDDEN sail_error_t blend_over(unsigned bytes_per_pixel, unsigned width, const void *src_raw, void *dst_raw, unsigned dst_offset);
 
 SAIL_HIDDEN sail_error_t fetch_iccp(png_structp png_ptr, png_infop info_ptr, struct sail_iccp **iccp);
 
+#ifdef PNG_APNG_SUPPORTED
+SAIL_HIDDEN sail_error_t skip_hidden_frame(unsigned bytes_per_line, unsigned height, png_structp png_ptr, png_infop info_ptr, void **row);
+
 SAIL_HIDDEN sail_error_t alloc_rows(png_bytep **A, unsigned row_length, unsigned height);
 
 SAIL_HIDDEN void destroy_rows(png_bytep **A, unsigned height);
+#endif
 
 #endif

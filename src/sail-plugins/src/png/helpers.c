@@ -242,30 +242,6 @@ sail_error_t write_png_text(png_structp png_ptr, png_infop info_ptr, const struc
     return 0;
 }
 
-sail_error_t skip_hidden_frame(unsigned bytes_per_line, unsigned height, png_structp png_ptr, png_infop info_ptr, void **row) {
-
-    SAIL_CHECK_PTR(png_ptr);
-    SAIL_CHECK_PTR(info_ptr);
-    SAIL_CHECK_PTR(row);
-
-    *row = malloc(bytes_per_line);
-
-    if (*row == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
-
-    png_read_frame_head(png_ptr, info_ptr);
-
-    for (unsigned i = 0; i < height; i++) {
-        png_read_row(png_ptr, (png_bytep)(*row), NULL);
-    }
-
-    free(*row);
-    *row = NULL;
-
-    return 0;
-}
-
 sail_error_t blend_source(unsigned bytes_per_pixel, void *dst_raw, unsigned dst_offset, const void *src_raw, unsigned src_length) {
 
     SAIL_CHECK_PTR(dst_raw);
@@ -359,6 +335,32 @@ sail_error_t fetch_iccp(png_structp png_ptr, png_infop info_ptr, struct sail_icc
     return 0;
 }
 
+#ifdef PNG_APNG_SUPPORTED
+
+sail_error_t skip_hidden_frame(unsigned bytes_per_line, unsigned height, png_structp png_ptr, png_infop info_ptr, void **row) {
+
+    SAIL_CHECK_PTR(png_ptr);
+    SAIL_CHECK_PTR(info_ptr);
+    SAIL_CHECK_PTR(row);
+
+    *row = malloc(bytes_per_line);
+
+    if (*row == NULL) {
+        return SAIL_MEMORY_ALLOCATION_FAILED;
+    }
+
+    png_read_frame_head(png_ptr, info_ptr);
+
+    for (unsigned i = 0; i < height; i++) {
+        png_read_row(png_ptr, (png_bytep)(*row), NULL);
+    }
+
+    free(*row);
+    *row = NULL;
+
+    return 0;
+}
+
 sail_error_t alloc_rows(png_bytep **A, unsigned row_length, unsigned height) {
 
     *A = (png_bytep*)malloc(height * sizeof(png_bytep*));
@@ -397,3 +399,5 @@ void destroy_rows(png_bytep **A, unsigned height) {
     free(*A);
     *A = NULL;
 }
+
+#endif
