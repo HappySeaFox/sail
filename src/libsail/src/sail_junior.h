@@ -55,8 +55,8 @@ SAIL_EXPORT sail_error_t sail_probe(const char *path, struct sail_context *conte
  * MUST be destroyed later with sail_destroy_image(). The assigned pixel data MUST be destroyed
  * later with free().
  *
- * Outputs pixels in BPP24-RGB pixel format for image formats without transparency support
- * and BPP32-RGBA otherwise.
+ * Outputs pixels in BPP32-RGBA pixel format for image formats with transparency support
+ * and BPP24-RGB otherwise.
  *
  * Typical usage: This is a standalone function that could be called at any time.
  *

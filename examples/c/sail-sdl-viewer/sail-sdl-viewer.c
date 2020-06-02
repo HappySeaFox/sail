@@ -54,8 +54,8 @@ int main(int argc, char *argv[]) {
     unsigned char *image_bits;
 
     /*
-     * sail_read() reads the image and outputs pixels in BPP24-RGB pixel format for image formats
-     * without transparency support and BPP32-RGBA otherwise. If you need to control output pixel
+     * sail_read() reads the image and outputs pixels in BPP32-RGBA pixel format for image formats
+     * with transparency support and BPP24-RGB otherwise. If you need to control output pixel
      * formats, consider switching to the deep diver API.
      */
     SAIL_TRY(sail_read(argv[1],
