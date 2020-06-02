@@ -41,6 +41,14 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+    struct sail_context *context = NULL;
+
+    /*
+     * Initialize SAIL context. You could cache the context and re-use it multiple times.
+     * When it's not needed anymore, call sail_finish(context).
+     */
+    SAIL_TRY(sail_init(&context));
+
     /* Load the image. */
     struct sail_image *image;
     unsigned char *image_bits;
@@ -51,6 +59,7 @@ int main(int argc, char *argv[]) {
      * formats, consider switching to the deep diver API.
      */
     SAIL_TRY(sail_read(argv[1],
+                       context,
                        &image,
                        (void **)&image_bits));
 
@@ -72,6 +81,7 @@ int main(int argc, char *argv[]) {
 
     if (surface == NULL) {
         fprintf(stderr, "Failed to create surface: %s\n", SDL_GetError());
+        sail_finish(context);
         return 1;
     }
 
@@ -81,6 +91,7 @@ int main(int argc, char *argv[]) {
     /* Create a new window and a renderer. */
     if (SDL_CreateWindowAndRenderer(800, 500, SDL_WINDOW_RESIZABLE, &window, &renderer) != 0) {
         fprintf(stderr, "Failed to create a window: %s\n", SDL_GetError());
+        sail_finish(context);
         return 1;
     }
 
@@ -94,6 +105,7 @@ int main(int argc, char *argv[]) {
 
     if (texture == NULL) {
         fprintf(stderr, "Failed to create a texture: %s\n", SDL_GetError());
+        sail_finish(context);
         return 1;
     }
 
@@ -118,6 +130,8 @@ int main(int argc, char *argv[]) {
         SDL_RenderCopy(renderer, texture, NULL, NULL);
         SDL_RenderPresent(renderer);
     }
+
+    sail_finish(context);
 
     SDL_DestroyTexture(texture);
     SDL_DestroyRenderer(renderer);

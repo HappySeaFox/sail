@@ -120,6 +120,7 @@ sail_error_t image_reader::read(const char *path, image *simage)
     void *image_bits;
 
     SAIL_TRY(sail_read(path,
+                       d->ctx->sail_context_c(),
                        &sail_image,
                        &image_bits));
 

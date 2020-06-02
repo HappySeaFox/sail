@@ -59,9 +59,6 @@ public:
 
     /*
      * An interface to sail_read(). See sail_read() for more.
-     *
-     * WARNING: These functions allocate a local static context and never destroy it. ASAN will report
-     * memory leaks which is OK.
      */
     sail_error_t read(const std::string &path, image *simage);
     sail_error_t read(const char *path, image *simage);

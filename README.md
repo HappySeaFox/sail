@@ -122,6 +122,14 @@ SAIL provides four levels of APIs, depending on your needs. Let's have a quick l
 
 #### C:
 ```C
+struct sail_context *context;
+
+/*
+ * Initialize SAIL context. You could cache the context and re-use it multiple times.
+ * When it's not needed anymore, call sail_finish(context).
+ */
+SAIL_TRY(sail_init(&context));
+
 struct sail_image *image;
 unsigned char *image_bits;
 
@@ -131,6 +139,7 @@ unsigned char *image_bits;
  * formats, consider switching to the deep diver API.
  */
 SAIL_TRY(sail_read(path,
+                   context,
                    &image,
                    (void **)&image_bits));
 

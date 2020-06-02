@@ -53,9 +53,6 @@ public:
 
     /*
      * An interface to sail_write(). See sail_write() for more.
-     *
-     * WARNING: These functions allocate a local static context and never destroy it. ASAN will report
-     * memory leaks which is OK.
      */
     sail_error_t write(const std::string &path, const image &simage);
     sail_error_t write(const char *path, const image &simage);

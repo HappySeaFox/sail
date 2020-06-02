@@ -67,21 +67,12 @@ sail_error_t sail_probe(const char *path, struct sail_context *context, struct s
     return 0;
 }
 
-sail_error_t sail_read(const char *path, struct sail_image **image, void **image_bits) {
+sail_error_t sail_read(const char *path, struct sail_context *context, struct sail_image **image, void **image_bits) {
 
     SAIL_CHECK_PATH_PTR(path);
+    SAIL_CHECK_CONTEXT_PTR(context);
     SAIL_CHECK_IMAGE_PTR(image);
     SAIL_CHECK_PTR(image_bits);
-
-    SAIL_THREAD_LOCAL static struct sail_context *context = NULL;
-    SAIL_THREAD_LOCAL static bool context_initialized = false;
-
-    if (!context_initialized) {
-        SAIL_TRY(sail_init(&context));
-        context_initialized = true;
-    }
-
-    SAIL_CHECK_CONTEXT_PTR(context);
 
     void *state = NULL;
     *image_bits = NULL;
@@ -99,21 +90,12 @@ sail_error_t sail_read(const char *path, struct sail_image **image, void **image
     return 0;
 }
 
-sail_error_t sail_write(const char *path, const struct sail_image *image, const void *image_bits) {
+sail_error_t sail_write(const char *path, struct sail_context *context, const struct sail_image *image, const void *image_bits) {
 
     SAIL_CHECK_PATH_PTR(path);
+    SAIL_CHECK_CONTEXT_PTR(context);
     SAIL_CHECK_IMAGE(image);
     SAIL_CHECK_PTR(image_bits);
-
-    SAIL_THREAD_LOCAL static struct sail_context *context = NULL;
-    SAIL_THREAD_LOCAL static bool context_initialized = false;
-
-    if (!context_initialized) {
-        SAIL_TRY(sail_init(&context));
-        context_initialized = true;
-    }
-
-    SAIL_CHECK_CONTEXT_PTR(context);
 
     void *state = NULL;
 

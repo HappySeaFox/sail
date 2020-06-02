@@ -46,17 +46,23 @@ SAIL provides 4 levels of APIs depending on your needs. Let's have a look at the
 
 #### C:
 ```C
+struct sail_context *context;
+
+/*
+ * Initialize SAIL context. You could cache the context and re-use it multiple times.
+ * When it's not needed anymore, call sail_finish(context).
+ */
+SAIL_TRY(sail_init(&context));
+
 struct sail_image *image;
 unsigned char *image_bits;
 
 /*
  * sail_read() reads the image and outputs pixels in BPP24-RGB pixel format for image formats
  * without transparency support and BPP32-RGBA otherwise.
- *
- * WARNING: This function allocates a local static context and never destroys it. ASAN
- *          will report memory leaks which is OK.
  */
 SAIL_TRY(sail_read(path,
+                   context,
                    &image,
                    (void **)&image_bits));
 
@@ -77,9 +83,6 @@ sail::image image;
 
 // read() reads the image and outputs pixels in BPP24-RGB pixel format for image formats
 // without transparency support and BPP32-RGBA otherwise.
-//
-// WARNING: This function allocates a local static context and never destroys it. ASAN
-//          will report memory leaks which is OK.
 //
 SAIL_TRY(reader.read(path, &image));
 

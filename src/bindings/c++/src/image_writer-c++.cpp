@@ -94,6 +94,7 @@ sail_error_t image_writer::write(const char *path, const image &simage)
     const void *bits = simage.bits() ? simage.bits() : simage.shallow_bits();
 
     SAIL_TRY_OR_CLEANUP(sail_write(path,
+                                    d->ctx->sail_context_c(),
                                     sail_image,
                                     bits),
                         /* cleanup */ sail_destroy_image(sail_image));
