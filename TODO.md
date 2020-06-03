@@ -1,3 +1,5 @@
+- MIT license?
+
 - distribute cmake rules along with .pc files
 
 - icc for c++
