@@ -1,3 +1,5 @@
+- static compilation
+
 - MIT license?
 
 - distribute cmake rules along with .pc files
