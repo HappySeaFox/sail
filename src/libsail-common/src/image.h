@@ -92,7 +92,8 @@ struct sail_image {
      * Is the image a frame in an animation.
      *
      * READ:  Set by SAIL to true if the image is a frame in an animation.
-     * WRITE: Ignored.
+     * WRITE: Must be set by a caller to true if the image is a frame in an animation.
+     *        Codecs may need to know if they write a static or an animated image.
      */
     bool animated;
 
