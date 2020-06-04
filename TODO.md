@@ -1,3 +1,5 @@
+- palette as a struct with 3 fields?
+
 - document c++ classes
 
 - MIT license?
