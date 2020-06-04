@@ -51,8 +51,10 @@ public:
      * Initializes SAIL with default flags. This is a main entry point to start working with SAIL.
      * Builds a list of available SAIL plugins.
      *
-     * You could point SAIL to search plugins in a different location by setting SAIL_PLUGINS_PATH
-     * environment variable to a path with SAIL plugins.
+     * You can point SAIL to search plugins in a different location by setting SAIL_PLUGINS_PATH environment
+     * variable to a path with SAIL plugins.
+     *
+     * See also status().
      */
     context();
 
@@ -60,14 +62,16 @@ public:
      * Initializes SAIL with the specific flags. This is an alternative entry point to start working with SAIL.
      * Builds a list of available SAIL plugins. See SailInitFlags.
      *
-     * You could point SAIL to search plugins in a different location by setting SAIL_PLUGINS_PATH
-     * environment variable to a path with SAIL plugins.
+     * You can point SAIL to search plugins in a different location by setting SAIL_PLUGINS_PATH environment
+     * variable to a path with SAIL plugins.
+     *
+     * See also status().
      */
     context(int flags);
 
     /*
      * When context gets destroyed, all plugin info objects, read and write features get invalidated.
-     * Using them when the context doesn't exist anymore may lead to a crash.
+     * Using them when the context doesn't exist anymore will lead to a crash.
      */
     ~context();
 
