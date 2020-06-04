@@ -21,6 +21,10 @@
 
 struct sail_plugin_info_node;
 
+/*
+ * Context is a main entry point to start working with SAIL. It enumerates plugin info objects which could be
+ * used later in reading and writing operations.
+ */
 struct sail_context {
 
     struct sail_plugin_info_node *plugin_info_node;

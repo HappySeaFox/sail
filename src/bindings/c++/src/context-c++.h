@@ -39,7 +39,7 @@ class plugin_info;
 
 /*
  * Context is a main entry point to start working with SAIL. It enumerates plugin info objects which could be
- * used later in reading and writing methods.
+ * used later in reading and writing operations.
  */
 class SAIL_EXPORT context
 {
