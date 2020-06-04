@@ -8,8 +8,6 @@
 
 - distribute cmake rules along with .pc files
 
-- remove 'animated'?
-
 - macros to hide boilerplate code in plugins
 
 - what to do when 'features' is 0 and we try to read an image?
