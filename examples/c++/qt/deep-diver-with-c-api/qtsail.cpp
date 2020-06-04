@@ -171,6 +171,10 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
                      image->bytes_per_line,
                      qimageFormat).copy();
 
+    SAIL_LOG_DEBUG("Has ICC profile: %s (%u bytes)",
+                   image->iccp->data == NULL ? "no" : "yes",
+                   image->iccp->data_length);
+
     /*
      * Apply palette.
      */
