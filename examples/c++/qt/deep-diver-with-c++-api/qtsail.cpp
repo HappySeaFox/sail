@@ -392,9 +392,9 @@ void QtSail::onSave()
     sail_error_t res;
 
     /*
-     * Allocate 10 Mb.
+     * Allocate 50 Mb.
      */
-    size_t buffer_length = 10*1024*1024;
+    size_t buffer_length = 50*1024*1024;
     char *buffer = new char [buffer_length];
 
     size_t written;
