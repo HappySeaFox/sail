@@ -39,7 +39,6 @@ public:
         free(data);
     }
 
-    std::string name;
     void *data;
     unsigned data_length;
 };
@@ -57,8 +56,7 @@ iccp::iccp(const iccp &ic)
 
 iccp& iccp::operator=(const iccp &ic)
 {
-    with_name(ic.name())
-        .with_data(ic.data(), ic.data_length());
+    with_data(ic.data(), ic.data_length());
 
     return *this;
 }
@@ -73,11 +71,6 @@ bool iccp::is_valid() const
     return d->data != nullptr && d->data_length > 0;
 }
 
-std::string iccp::name() const
-{
-    return d->name;
-}
-
 void* iccp::data() const
 {
     return d->data;
@@ -86,12 +79,6 @@ void* iccp::data() const
 unsigned iccp::data_length() const
 {
     return d->data_length;
-}
-
-iccp& iccp::with_name(const std::string &name)
-{
-    d->name = name;
-    return *this;
 }
 
 iccp& iccp::with_data(const void *data, unsigned data_length)
@@ -126,22 +113,16 @@ iccp::iccp(const sail_iccp *ic)
         return;
     }
 
-    with_name(ic->name)
-        .with_data(ic->data, ic->data_length);
+    with_data(ic->data, ic->data_length);
 }
 
 sail_error_t iccp::to_sail_iccp(sail_iccp *ic) const
 {
     SAIL_CHECK_ICCP_PTR(ic);
 
-    if (!d->name.empty()) {
-        SAIL_TRY(sail_strdup(d->name.c_str(), &ic->name));
-    }
-
     ic->data = malloc(d->data_length);
 
     if (d->data == nullptr) {
-        free(ic->name);
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 

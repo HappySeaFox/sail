@@ -19,8 +19,6 @@
 #ifndef SAIL_ICCP_CPP_H
 #define SAIL_ICCP_CPP_H
 
-#include <string>
-
 #ifdef SAIL_BUILD
     #include "error.h"
     #include "export.h"
@@ -53,11 +51,6 @@ public:
     bool is_valid() const;
 
     /*
-     * Returns an optional ICC profile name. It can be empty.
-     */
-    std::string name() const;
-
-    /*
      * Returns the ICC profile binary data.
      */
     void* data() const;
@@ -66,11 +59,6 @@ public:
      * Returns the length of the ICC binary data.
      */
     unsigned data_length() const;
-
-    /*
-     * Sets a new ICC profile name.
-     */
-    iccp& with_name(const std::string &name);
 
     /*
      * Sets a new ICC profile binary data.

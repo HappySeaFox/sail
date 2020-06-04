@@ -316,7 +316,6 @@ sail_error_t fetch_iccp(png_structp png_ptr, png_infop info_ptr, struct sail_icc
 
     if (ok) {
         SAIL_TRY(sail_alloc_iccp(iccp));
-        SAIL_TRY(sail_strdup(name, &(*iccp)->name));
 
         (*iccp)->data = malloc(data_length);
 

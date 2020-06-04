@@ -38,9 +38,6 @@ struct sail_meta_entry_node;
  */
 struct sail_iccp {
 
-    /* Optional ICC profile name. It can be NULL. */
-    char *name;
-
     /* ICC profile binary data. */
     void *data;
 

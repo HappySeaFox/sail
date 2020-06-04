@@ -641,7 +641,7 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v2(void *state, struc
     if (png_state->write_options->io_options & SAIL_IO_OPTION_ICCP && image->iccp != NULL) {
         png_set_iCCP(png_state->png_ptr,
                         png_state->info_ptr,
-                        image->iccp->name,
+                        "ICC profile",
                         PNG_COMPRESSION_TYPE_BASE,
                         (const png_bytep)image->iccp->data,
                         image->iccp->data_length);
