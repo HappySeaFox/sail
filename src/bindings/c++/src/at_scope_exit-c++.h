@@ -43,13 +43,13 @@ private:
 
 /*
  * Executes the specified code when the scope exits. This macro could be used to perform
- * complex cleanup procedures.
+ * complex cleanup procedures that cannot be achieved by using destructors.
  *
  * For example:
  *
  *    SAIL_AT_SCOPE_EXIT (
- *        delete image;
- *        delete data;
+ *        delete data1;
+ *        delete data2;
  *    );
  *
  *    SAIL_TRY(...);
