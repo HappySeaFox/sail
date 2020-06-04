@@ -1,10 +1,10 @@
-- static compilation
+- document c++ classes
 
 - MIT license?
 
-- distribute cmake rules along with .pc files
+- static compilation
 
-- icc for c++
+- distribute cmake rules along with .pc files
 
 - remove 'animated'?
 
@@ -17,8 +17,6 @@
 - document how SAIL uses plugins APIs
 
 - add benchmarks to README
-
-- document c++ classes
 
 - enum class in C++?
 
