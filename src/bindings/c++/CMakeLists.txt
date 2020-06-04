@@ -1,5 +1,6 @@
 add_library(sail-c++
                 src/context-c++.cpp
+                src/iccp-c++.cpp
                 src/image-c++.cpp
                 src/image_reader-c++.cpp
                 src/image_writer-c++.cpp
@@ -16,6 +17,7 @@ add_library(sail-c++
 set(PUBLIC_HEADERS "")
 list(APPEND PUBLIC_HEADERS "src/at_scope_exit-c++.h")
 list(APPEND PUBLIC_HEADERS "src/context-c++.h")
+list(APPEND PUBLIC_HEADERS "src/iccp-c++.h")
 list(APPEND PUBLIC_HEADERS "src/image-c++.h")
 list(APPEND PUBLIC_HEADERS "src/image_reader-c++.h")
 list(APPEND PUBLIC_HEADERS "src/image_writer-c++.h")

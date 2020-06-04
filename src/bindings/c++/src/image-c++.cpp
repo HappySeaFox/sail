@@ -73,6 +73,7 @@ public:
     void *bits;
     unsigned bits_size;
     const void *shallow_bits;
+    sail::iccp iccp;
 };
 
 image::image()
@@ -106,6 +107,8 @@ image& image::operator=(const image &img)
     } else {
         with_bits(img.bits(), img.bits_size());
     }
+
+    with_iccp(img.iccp());
 
     return *this;
 }
@@ -208,6 +211,11 @@ unsigned image::bits_size() const
 const void* image::shallow_bits() const
 {
     return d->shallow_bits;
+}
+
+sail::iccp image::iccp() const
+{
+    return d->iccp;
 }
 
 image& image::with_width(unsigned width)
@@ -331,6 +339,13 @@ image& image::with_shallow_bits(const void *bits)
     return *this;
 }
 
+image& image::with_iccp(const sail::iccp &ic)
+{
+    d->iccp = ic;
+
+    return *this;
+}
+
 sail_error_t image::bits_per_pixel(SailPixelFormat pixel_format, unsigned *result)
 {
     SAIL_TRY(sail_bits_per_pixel(pixel_format, result));
@@ -434,6 +449,11 @@ image::image(const sail_image *im, const void *bits, unsigned bits_size)
         .with_source_properties(im->source_properties)
         .with_source_compression_type(im->source_compression_type)
         .with_bits(bits, bits_size);
+
+    if (im->iccp != nullptr) {
+        sail::iccp iccp(im->iccp);
+        with_iccp(iccp);
+    }
 }
 
 image::image(const sail_image *im)
@@ -495,6 +515,20 @@ sail_error_t image::to_sail_image(sail_image *image) const
     image->source_pixel_format     = d->source_pixel_format;
     image->source_properties       = d->source_properties;
     image->source_compression_type = d->source_compression_type;
+
+    if (d->iccp.is_valid()) {
+        image->iccp = (sail_iccp *)malloc(sizeof(sail_iccp));
+
+        if (image->iccp == nullptr) {
+            free(image->palette);
+            sail_destroy_meta_entry_node_chain(image->meta_entry_node);
+            return SAIL_MEMORY_ALLOCATION_FAILED;
+        }
+
+        SAIL_TRY_OR_CLEANUP(d->iccp.to_sail_iccp(image->iccp),
+                            /* cleanup */ free(image->palette);
+                                          sail_destroy_meta_entry_node_chain(image->meta_entry_node));
+    }
 
     return 0;
 }

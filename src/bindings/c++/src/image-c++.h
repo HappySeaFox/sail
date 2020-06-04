@@ -26,9 +26,13 @@
 #ifdef SAIL_BUILD
     #include "error.h"
     #include "export.h"
+
+    #include "iccp-c++.h"
 #else
     #include <sail-common/error.h>
     #include <sail-common/export.h>
+
+    #include <sail-c++/iccp-c++.h>
 #endif
 
 struct sail_image;
@@ -200,6 +204,8 @@ public:
      */
     const void* shallow_bits() const;
 
+    sail::iccp iccp() const;
+
     /*
      * Sets a new width.
      */
@@ -251,6 +257,8 @@ public:
      * The pixel data must remain valid until the image exists.
      */
     image& with_shallow_bits(const void *bits);
+
+    image& with_iccp(const sail::iccp &ic);
 
     /*
      * Calculates a number of bits per pixel in the specified pixel format.
@@ -338,8 +346,9 @@ public:
     static sail_error_t compression_type_from_string(const char *str, SailCompressionType *result);
 
 private:
-    // Makes a deep copy of the specified image and the bits
-    //
+    /*
+     * Makes a deep copy of the specified image and the bits.
+     */
     image(const sail_image *im, const void *bits, unsigned bits_size);
     image(const sail_image *im);
 
