@@ -27,7 +27,7 @@ class SAIL_HIDDEN context::pimpl
 {
 public:
     sail_context *context = nullptr;
-    sail_error_t init_result = 0;
+    sail_error_t init_result = SAIL_CONTEXT_UNINITIALIZED;
 };
 
 context::context()
