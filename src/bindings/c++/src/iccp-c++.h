@@ -41,8 +41,8 @@ class SAIL_EXPORT iccp
 
 public:
     iccp();
-    iccp(const iccp &iccp);
-    iccp& operator=(const iccp &iccp);
+    iccp(const iccp &ic);
+    iccp& operator=(const iccp &ic);
     ~iccp();
 
     /*
@@ -71,7 +71,7 @@ private:
      */
     iccp(const sail_iccp *ic);
 
-    sail_error_t to_sail_iccp(sail_iccp *iccp) const;
+    sail_error_t to_sail_iccp(sail_iccp *ic) const;
 
 private:
     class pimpl;
