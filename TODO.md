@@ -1,3 +1,7 @@
+- Remove SOURCE from the guaranteed output pixel formats. TIFF, for examaple, cannot output SOURCE pixels
+
+- initializer lists in C++
+
 - palette as a struct with 3 fields?
 
 - document c++ classes
