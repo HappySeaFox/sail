@@ -122,7 +122,7 @@ sail_error_t iccp::to_sail_iccp(sail_iccp *ic) const
 
     ic->data = malloc(d->data_length);
 
-    if (d->data == nullptr) {
+    if (ic->data == nullptr) {
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
