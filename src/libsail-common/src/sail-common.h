@@ -32,6 +32,7 @@
     #include "io_common.h"
     #include "log.h"
     #include "meta_entry_node.h"
+    #include "palette.h"
     #include "pixel_formats_mapping_node.h"
     #include "read_features.h"
     #include "read_options.h"
@@ -49,6 +50,7 @@
     #include <sail-common/io_common.h>
     #include <sail-common/log.h>
     #include <sail-common/meta_entry_node.h>
+    #include <sail-common/palette.h>
     #include <sail-common/pixel_formats_mapping_node.h>
     #include <sail-common/read_features.h>
     #include <sail-common/read_options.h>

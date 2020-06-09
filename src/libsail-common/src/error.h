@@ -61,6 +61,7 @@ typedef int sail_error_t;
 #define SAIL_RESULT_NULL_PTR              33
 #define SAIL_META_ENTRY_NODE_NULL_PTR     34
 #define SAIL_ICCP_NULL_PTR                35
+#define SAIL_PALETTE_NULL_PTR             36
 
 /*
  * Encoding/decoding specific errors.
@@ -161,6 +162,7 @@ do {                              \
 #define SAIL_CHECK_RESULT_PTR(result)                   SAIL_CHECK_PTR2(result,          SAIL_RESULT_NULL_PTR)
 #define SAIL_CHECK_META_ENTRY_NODE_PTR(meta_entry_node) SAIL_CHECK_PTR2(meta_entry_node, SAIL_META_ENTRY_NODE_NULL_PTR)
 #define SAIL_CHECK_ICCP_PTR(iccp)                       SAIL_CHECK_PTR2(iccp,            SAIL_ICCP_NULL_PTR)
+#define SAIL_CHECK_PALETTE_PTR(palette)                 SAIL_CHECK_PTR2(palette,         SAIL_PALETTE_NULL_PTR)
 
 /*
  * Try to execute the specified SAIL function. If it fails, return the error code.

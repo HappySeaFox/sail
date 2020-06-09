@@ -39,9 +39,7 @@ sail_error_t sail_alloc_image(struct sail_image **image) {
     (*image)->interlaced_passes       = 0;
     (*image)->animated                = false;
     (*image)->delay                   = 0;
-    (*image)->palette_pixel_format    = SAIL_PIXEL_FORMAT_UNKNOWN;
     (*image)->palette                 = NULL;
-    (*image)->palette_color_count     = 0;
     (*image)->meta_entry_node         = NULL;
     (*image)->properties              = 0;
     (*image)->source_pixel_format     = SAIL_PIXEL_FORMAT_UNKNOWN;
@@ -58,8 +56,7 @@ void sail_destroy_image(struct sail_image *image) {
         return;
     }
 
-    free(image->palette);
-
+    sail_destroy_palette(image->palette);
     sail_destroy_meta_entry_node_chain(image->meta_entry_node);
     sail_destroy_iccp(image->iccp);
 
@@ -80,24 +77,11 @@ sail_error_t sail_copy_image(const struct sail_image *source_image, struct sail_
     (*target_image)->interlaced_passes    = source_image->interlaced_passes;
     (*target_image)->animated             = source_image->animated;
     (*target_image)->delay                = source_image->delay;
-    (*target_image)->palette_pixel_format = source_image->palette_pixel_format;
-    (*target_image)->palette              = NULL;
-    (*target_image)->palette_color_count  = source_image->palette_color_count;
 
     if (source_image->palette != NULL) {
-        unsigned bits_per_pixel;
-        SAIL_TRY_OR_CLEANUP(sail_bits_per_pixel(source_image->palette_pixel_format, &bits_per_pixel),
+        SAIL_TRY_OR_CLEANUP(sail_copy_palette(source_image->palette, &(*target_image)->palette),
                             /* cleanup */ sail_destroy_image(*target_image));
 
-        unsigned palette_size = source_image->palette_color_count * bits_per_pixel / 8;
-        (*target_image)->palette = malloc(palette_size);
-
-        if ((*target_image)->palette == NULL) {
-            sail_destroy_image(*target_image);
-            return SAIL_MEMORY_ALLOCATION_FAILED;
-        }
-
-        memcpy((*target_image)->palette, source_image->palette, palette_size);
     }
 
     SAIL_TRY_OR_CLEANUP(sail_copy_meta_entry_node_chain(source_image->meta_entry_node, &(*target_image)->meta_entry_node),

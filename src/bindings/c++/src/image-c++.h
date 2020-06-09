@@ -28,11 +28,13 @@
     #include "export.h"
 
     #include "iccp-c++.h"
+    #include "palette-c++.h"
 #else
     #include <sail-common/error.h>
     #include <sail-common/export.h>
 
     #include <sail-c++/iccp-c++.h>
+    #include <sail-c++/palette-c++.h>
 #endif
 
 struct sail_image;
@@ -114,29 +116,12 @@ public:
     int delay() const;
 
     /*
-     * Returns palette pixel format. See SailPixelFormat.
+     * Returns palette if the image has a palette and the requested pixel format assumes having a palette.
      *
-     * READ:  Set by SAIL to a valid palette pixel format if the image is indexed (palette is not NULL).
-     * WRITE: Must be set by a caller to a valid palette pixel format if the image is indexed
-     *        (palette is not NULL).
+     * READ:  Set by SAIL to valid palette if the image is indexed.
+     * WRITE: Must be set by a caller to valid palette if the image is indexed.
      */
-    SailPixelFormat palette_pixel_format() const;
-
-    /*
-     * Returns palette data if the image has a palette and the requested pixel format assumes having a palette.
-     *
-     * READ:  Set by SAIL to valid pixel data if the image is indexed.
-     * WRITE: Must be set by a caller to valid pixel data if the image is indexed.
-     */
-    void* palette() const;
-
-    /*
-     * Returns the number of colors in the palette.
-     *
-     * READ:  Set by SAIL to a valid number of colors if the image is indexed or to 0.
-     * WRITE: Must be set by a caller to a valid number of colors if the image is indexed.
-     */
-    int palette_color_count() const;
+    sail::palette palette() const;
 
     /*
      * Returns image meta information.
@@ -240,7 +225,7 @@ public:
     /*
      * Deep copies the specified palette.
      */
-    image& with_palette(void *palette, int palette_color_count, SailPixelFormat palette_pixel_format);
+    image& with_palette(const sail::palette &pal);
 
     /*
      * Sets new meta entries.

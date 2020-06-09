@@ -4,8 +4,6 @@
 
 - initializer lists in C++
 
-- palette as a struct with 3 fields?
-
 - document c++ classes
 
 - detect images by magic? Non-seekable I/O sources will not be allowed then

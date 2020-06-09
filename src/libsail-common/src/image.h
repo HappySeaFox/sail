@@ -33,8 +33,9 @@
 extern "C" {
 #endif
 
-struct sail_meta_entry_node;
 struct sail_iccp;
+struct sail_meta_entry_node;
+struct sail_palette;
 
 /*
  * A structure representing an image. Fields set by SAIL when reading images are marked with READ.
@@ -107,31 +108,13 @@ struct sail_image {
     int delay;
 
     /*
-     * Palette pixel format.
-     *
-     * READ:  Set by SAIL to a valid palette pixel format if the image is indexed (palette is not NULL).
-     *        SAIL guarantee the palette pixel format is byte-aligned.
-     * WRITE: Must be set by a caller to a valid palette pixel format if the image is indexed
-     *        (palette is not NULL).
-     */
-    enum SailPixelFormat palette_pixel_format;
-
-    /*
      * Palette if the image has a palette and the requested pixel format assumes having a palette.
      * Destroyed by sail_destroy_image().
      *
-     * READ:  Set by SAIL to a valid pixel array if the image is indexed.
-     * WRITE: Must be allocated and set by a caller to a valid pixel array if the image is indexed.
+     * READ:  Set by SAIL to a valid palette if the image is indexed.
+     * WRITE: Must be allocated and set by a caller to a valid palette if the image is indexed.
      */
-    void *palette;
-
-    /*
-     * Number of colors in the palette.
-     *
-     * READ:  Set by SAIL to a valid number of colors if the image is indexed or to 0.
-     * WRITE: Must be set by a caller to a valid number of colors if the image is indexed.
-     */
-    int palette_color_count;
+    struct sail_palette *palette;
 
     /*
      * Image meta information. See sail_meta_entry_node. Plugins guarantee that keys and values are non-NULL.

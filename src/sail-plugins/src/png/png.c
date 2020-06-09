@@ -201,15 +201,16 @@ SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_io *io, const stru
             }
 
             /* Always use RGB palette. */
-            png_state->first_image->palette_pixel_format = SAIL_PIXEL_FORMAT_BPP24_RGB;
-            png_state->first_image->palette_color_count = palette_color_count;
-            png_state->first_image->palette = malloc(palette_color_count * 3);
+            SAIL_TRY(sail_alloc_palette(&png_state->first_image->palette));
+            png_state->first_image->palette->pixel_format = SAIL_PIXEL_FORMAT_BPP24_RGB;
+            png_state->first_image->palette->color_count = palette_color_count;
+            png_state->first_image->palette->data = malloc(palette_color_count * 3);
 
-            if (png_state->first_image->palette == NULL) {
+            if (png_state->first_image->palette->data == NULL) {
                 return SAIL_MEMORY_ALLOCATION_FAILED;
             }
 
-            unsigned char *palette_ptr = png_state->first_image->palette;
+            unsigned char *palette_ptr = png_state->first_image->palette->data;
 
             for (int i = 0; i < palette_color_count; i++) {
                 *palette_ptr++ = palette[i].red;

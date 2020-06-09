@@ -36,10 +36,6 @@ public:
         , pixel_format(SAIL_PIXEL_FORMAT_UNKNOWN)
         , animated(false)
         , delay(0)
-        , palette_pixel_format(SAIL_PIXEL_FORMAT_UNKNOWN)
-        , palette(nullptr)
-        , palette_color_count(0)
-        , palette_size(0)
         , properties(0)
         , source_pixel_format(SAIL_PIXEL_FORMAT_UNKNOWN)
         , source_properties(0)
@@ -51,7 +47,6 @@ public:
 
     ~pimpl()
     {
-        free(palette);
         free(bits);
     }
 
@@ -61,10 +56,7 @@ public:
     SailPixelFormat pixel_format;
     bool animated;
     int delay;
-    SailPixelFormat palette_pixel_format;
-    void *palette;
-    int palette_color_count;
-    int palette_size;
+    sail::palette palette;
     std::map<std::string, std::string> meta_entries;
     int properties;
     SailPixelFormat source_pixel_format;
@@ -95,7 +87,7 @@ image& image::operator=(const image &img)
         .with_pixel_format(img.pixel_format())
         .with_animated(img.animated())
         .with_delay(img.delay())
-        .with_palette(img.palette(), img.palette_color_count(), img.palette_pixel_format())
+        .with_palette(img.palette())
         .with_meta_entries(meta_entries())
         .with_properties(img.properties())
         .with_source_pixel_format(img.source_pixel_format())
@@ -153,19 +145,9 @@ int image::delay() const
     return d->delay;
 }
 
-SailPixelFormat image::palette_pixel_format() const
-{
-    return d->palette_pixel_format;
-}
-
-void* image::palette() const
+sail::palette image::palette() const
 {
     return d->palette;
-}
-
-int image::palette_color_count() const
-{
-    return d->palette_color_count;
 }
 
 std::map<std::string, std::string> image::meta_entries() const
@@ -256,38 +238,9 @@ image& image::with_delay(int delay)
     return *this;
 }
 
-image& image::with_palette(void *palette, int palette_color_count, SailPixelFormat palette_pixel_format)
+image& image::with_palette(const sail::palette &pal)
 {
-    free(d->palette);
-
-    d->palette = nullptr;
-    d->palette_color_count = 0;
-    d->palette_size = 0;
-    d->palette_pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;
-
-    if (palette == nullptr || palette_color_count <= 0) {
-        return *this;
-    }
-
-    unsigned bits_per_pixel;
-    if (sail_bits_per_pixel(palette_pixel_format, &bits_per_pixel) != 0) {
-        SAIL_LOG_ERROR("Failed to calculate the bits per palette pixel format #%d", palette_pixel_format);
-        return *this;
-    }
-
-    d->palette_size = palette_color_count * bits_per_pixel / 8;
-    d->palette = malloc(d->palette_size);
-
-    if (d->palette == nullptr) {
-        SAIL_LOG_ERROR("Memory allocation failed of palette size %d", d->palette_size);
-        return *this;
-    }
-
-    memcpy(d->palette, palette, d->palette_size);
-
-    d->palette_color_count  = palette_color_count;
-    d->palette_pixel_format = palette_pixel_format;
-
+    d->palette = pal;
     return *this;
 }
 
@@ -442,13 +395,17 @@ image::image(const sail_image *im, const void *bits, unsigned bits_size)
         .with_pixel_format(im->pixel_format)
         .with_animated(im->animated)
         .with_delay(im->delay)
-        .with_palette(im->palette, im->palette_color_count, im->palette_pixel_format)
         .with_meta_entries(meta_entries)
         .with_properties(im->properties)
         .with_source_pixel_format(im->source_pixel_format)
         .with_source_properties(im->source_properties)
         .with_source_compression_type(im->source_compression_type)
         .with_bits(bits, bits_size);
+
+    if (im->palette != nullptr) {
+        sail::palette palette(im->palette);
+        with_palette(palette);
+    }
 
     if (im->iccp != nullptr) {
         sail::iccp iccp(im->iccp);
@@ -495,38 +452,37 @@ sail_error_t image::to_sail_image(sail_image *image) const
     image->animated       = d->animated;
     image->delay          = d->delay;
 
-    if (d->palette != nullptr && d->palette_color_count > 0 && d->palette_size > 0) {
-        image->palette = malloc(d->palette_size);
-
-        if (image->palette == nullptr) {
-            sail_destroy_meta_entry_node_chain(image_meta_entry_node);
-            return SAIL_MEMORY_ALLOCATION_FAILED;
-        }
-
-        memcpy(image->palette, d->palette, d->palette_size);
-
-        image->palette              = d->palette;
-        image->palette_color_count  = d->palette_color_count;
-        image->palette_pixel_format = d->palette_pixel_format;
-    }
-
     image->meta_entry_node         = image_meta_entry_node;
     image->properties              = d->properties;
     image->source_pixel_format     = d->source_pixel_format;
     image->source_properties       = d->source_properties;
     image->source_compression_type = d->source_compression_type;
 
+    if (d->palette.is_valid()) {
+        image->palette = (sail_palette *)malloc(sizeof(sail_palette));
+
+        if (image->palette == nullptr) {
+            sail_destroy_meta_entry_node_chain(image->meta_entry_node);
+            return SAIL_MEMORY_ALLOCATION_FAILED;
+        }
+
+        SAIL_TRY_OR_CLEANUP(d->palette.to_sail_palette(image->palette),
+                            /* cleanup */ sail_destroy_palette(image->palette);
+                                          sail_destroy_meta_entry_node_chain(image->meta_entry_node));
+    }
+
     if (d->iccp.is_valid()) {
         image->iccp = (sail_iccp *)malloc(sizeof(sail_iccp));
 
         if (image->iccp == nullptr) {
-            free(image->palette);
+            sail_destroy_palette(image->palette);
             sail_destroy_meta_entry_node_chain(image->meta_entry_node);
             return SAIL_MEMORY_ALLOCATION_FAILED;
         }
 
         SAIL_TRY_OR_CLEANUP(d->iccp.to_sail_iccp(image->iccp),
-                            /* cleanup */ free(image->palette);
+                            /* cleanup */ sail_destroy_iccp(image->iccp),
+                                          sail_destroy_palette(image->palette);
                                           sail_destroy_meta_entry_node_chain(image->meta_entry_node));
     }
 
