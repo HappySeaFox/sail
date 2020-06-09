@@ -1,6 +1,9 @@
 # Build dir
 build/
 
+# Qt Creator
+CMakeLists.txt.user
+
 # Prerequisites
 *.d
 
