@@ -1,3 +1,5 @@
+- Print more errors on 'return SAIL_XXX'
+
 - Remove SOURCE from the guaranteed output pixel formats. TIFF, for examaple, cannot output SOURCE pixels
 
 - initializer lists in C++
