@@ -12,6 +12,8 @@
 
 - static compilation
 
+- compile dependencies statically on Windows?
+
 - remove SAIL_CHECK_xxx checks in plugins? Are they needed? libsail does them as well
 
 - distribute cmake rules along with .pc files
