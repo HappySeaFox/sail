@@ -108,7 +108,7 @@ elseif (CMAKE_COMPILER_IS_GNUCC)
 
         # Enable ASAN
         #
-        set(SAIL_ASAN "-fsanitize=address,leak")
+        set(SAIL_ASAN_FLAGS "-fsanitize=address,leak")
     endif()
 endif()
 

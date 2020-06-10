@@ -7,7 +7,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Option to ensable ASAN on supported platforms
 #
-option(SAIL_ASAN "Enable ASAN on supported platforms." ON)
+option(SAIL_ASAN "Enable ASAN with supported compilers." ON)
 
 project(advanced-with-c++-api)
 
@@ -44,7 +44,7 @@ if (SAIL_ASAN)
         target_compile_options(advanced-with-c++-api PRIVATE "-fsanitize=address,leak")
         target_link_libraries(advanced-with-c++-api "-fsanitize=address,leak")
     else()
-        message("ASAN is not supported on this platform.")
+        message("ASAN is not supported with this compiler.")
     endif()
 endif()
 
