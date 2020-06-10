@@ -1,5 +1,7 @@
 - Print more errors on 'return SAIL_XXX'
 
+- Remove the scanline reading interface and make an interface to read entire frames?
+
 - Remove SOURCE from the guaranteed output pixel formats. TIFF, for examaple, cannot output SOURCE pixels
 
 - initializer lists in C++
