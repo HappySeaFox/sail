@@ -11,7 +11,7 @@ Files: src/*
 Copyright: 2020 Dmitry Baryshev
 License: LGPL-3+
 
-Files: examples/* tests/*
+Files: examples/* tests/sail/*
 Copyright: 2020 Dmitry Baryshev
 License: MIT
 
