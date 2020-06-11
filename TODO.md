@@ -12,8 +12,6 @@
 
 - detect images by magic? Non-seekable I/O sources will not be allowed then
 
-- MIT license?
-
 - static compilation
 
 - compile dependencies statically on Windows?

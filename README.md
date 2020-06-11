@@ -111,8 +111,7 @@ to use in C++ applications.
 
 ## License
 
-- libsail-common, libsail, C++ bindings, and plugins are under LGPLv3+.
-- Examples and tests are under the MIT license.
+- libsail-common, libsail, plugins, C++ bindings, examples, tests, icons, and CMake scripts are under the MIT license.
 
 ## APIs overview
 

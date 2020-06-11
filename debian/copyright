@@ -9,14 +9,11 @@ License: GPL-3+
 
 Files: src/*
 Copyright: 2020 Dmitry Baryshev
-License: LGPL-3+
-
-Files: examples/* tests/sail/*
-Copyright: 2020 Dmitry Baryshev
 License: MIT
 
-License: LGPL-3
- /usr/share/common-licenses/LGPL-3
+Files: examples/* tests/sail/* icons/*
+Copyright: 2020 Dmitry Baryshev
+License: MIT
 
 License: MIT
  Permission is hereby granted, free of charge, to any person obtaining a copy
