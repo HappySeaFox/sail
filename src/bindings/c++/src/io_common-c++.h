@@ -46,8 +46,8 @@ class SAIL_EXPORT io
 {
 public:
     io();
-    io(const io &io);
-    io& operator=(const io &io);
+    io(const io &i);
+    io& operator=(const io &i);
     ~io();
 
     bool is_valid() const;
