@@ -1,3 +1,5 @@
+- Windows INNO installer with a config file to store SAIL_PLUGINS_PATH
+
 - Print more errors on 'return SAIL_XXX'
 
 - Remove the scanline reading interface and make an interface to read entire frames?
