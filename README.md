@@ -184,6 +184,8 @@ See [EXAMPLES](EXAMPLES.md) for more.
 
 ## Building
 
+Consider [EXAMPLES](EXAMPLES.md) after building and installing.
+
 ### CMake options overview
 
 - `SAIL_DEV=ON|OFF` - Enable developer mode with pedantic warnings and possible `ASAN` enabled for examples
