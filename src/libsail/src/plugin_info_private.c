@@ -130,6 +130,7 @@ static sail_error_t parse_serialized_ints(const char *value, int **target, int *
 
         if (*target == NULL) {
             SAIL_LOG_ERROR("Failed to allocate %d integers", *length);
+            destroy_string_node_chain(string_node);
             return SAIL_MEMORY_ALLOCATION_FAILED;
         }
 
