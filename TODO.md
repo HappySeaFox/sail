@@ -16,6 +16,8 @@
 
 - remove SAIL_CHECK_xxx checks in plugins? Are they needed? libsail does them as well
 
+- C++ move ctors
+
 - tests
   - check all plugins have the same layout version
   - check all plugins could be loaded
