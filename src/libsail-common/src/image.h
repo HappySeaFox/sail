@@ -178,7 +178,7 @@ struct sail_image {
      * Embedded ICC profile.
      *
      * Note for animated/multi-paged images: only the first image in an animated/multi-paged
-     * sequence has an ICC profile.
+     * sequence might have an ICC profile.
      *
      * READ:  Set by SAIL to a valid ICC profile if any.
      * WRITE: Must be allocated and set by a caller to a valid ICC profile if necessary.

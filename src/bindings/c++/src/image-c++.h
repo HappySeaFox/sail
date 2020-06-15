@@ -101,21 +101,24 @@ public:
      *
      * READ:  Set by SAIL to a valid output image pixel format. The list of supported output pixel formats
      *        by a certain plugin can be obtained from read_features.input_pixel_formats.
-     * WRITE: Must be set by a caller to a valid input image pixel format. The list of supported input pixel
-     *        formats by a certain plugin can be obtained from write_features.output_pixel_formats.
+     * WRITE: Must be set by a caller to a valid input image pixel format. Pixels in this format will be supplied
+     *        to the plugin by a caller later. The list of supported input pixel formats by a certain plugin
+     *        can be obtained from write_features.output_pixel_formats.
      */
     SailPixelFormat pixel_format() const;
 
     /*
-     * Returns true if the image is a frame in an animation.
+     * Returns true if the image a frame in an animation.
      *
      * READ:  Set by SAIL to true if the image is a frame in an animation.
-     * WRITE: Ignored.
+     * WRITE: Must be set by a caller to true if the image is a frame in an animation.
+     *        Codecs may need to know if they write a static or an animated image.
      */
     bool animated() const;
 
     /*
-     * Returns delay in milliseconds if the image is a frame in an animation or 0 otherwise.
+     * Returns delay in milliseconds to display the image on the screen if the image is a frame
+     * in an animation or 0 otherwise.
      *
      * READ:  Set by SAIL to a non-negative number of milliseconds.
      * WRITE: Must be set by a caller to a non-negative number of milliseconds.
@@ -125,8 +128,8 @@ public:
     /*
      * Returns palette if the image has a palette and the requested pixel format assumes having a palette.
      *
-     * READ:  Set by SAIL to valid palette if the image is indexed.
-     * WRITE: Must be set by a caller to valid palette if the image is indexed.
+     * READ:  Set by SAIL to a valid palette if the image is indexed.
+     * WRITE: Must be set by a caller to a valid palette if the image is indexed.
      */
     sail::palette palette() const;
 
@@ -143,22 +146,29 @@ public:
      * Returns decoded image properties. See SailImageProperties.
      *
      * READ:  Set by SAIL to valid image properties. For example, some image formats store images flipped.
-     *        A caller must use this field to manipulate the output image accordingly (e.g. flip back etc.).
+     *        A caller must use this field to manipulate the output image accordingly (e.g., flip back etc.).
      * WRITE: Ignored.
      */
     int properties() const;
 
     /*
-     * Returns image source pixel format. See SailPixelFormat.
+     * The only purpose of the following "source" fields is to provide information about
+     * the source image file. They're not supposed to be passed to any reading or writing
+     * functions.
+     */
+
+    /*
+     * Returns source image pixel format. See SailPixelFormat.
      *
-     * READ:  Set by SAIL to a valid source image pixel format before converting it to a requested pixel format
-     *        with read_options.pixel_format.
+     * READ:  Set by SAIL to a valid source image pixel format of the image file before converting it
+     *        to a requested pixel format in read_options.pixel_format.
      * WRITE: Ignored.
      */
     SailPixelFormat source_pixel_format() const;
 
     /*
-     * Returns image source properties. See SailImageProperties.
+     * Returns source image properties. Set by SAIL to a valid source image properties of the image file.
+     * For example, it can be interlaced. See SailImageProperties.
      *
      * READ:  Set by SAIL to valid source image properties or to 0.
      * WRITE: Ignored.
@@ -166,22 +176,30 @@ public:
     int source_properties() const;
 
     /*
-     * Image source compression type. See SailCompressionType.
+     * Returns source image compression type. See SailCompressionType.
      *
-     * READ:  Set by SAIL to a valid source image compression type or to 0.
+     * READ:  Set by SAIL to a valid source image compression type.
      * WRITE: Ignored.
      */
     SailCompressionType source_compression_type() const;
 
     /*
-     * Returns editable deep copied pixel data if any. Images can hold deep copied or shallow data,
-     * but not both.
+     * Returns the editable deep copied pixel data if any. Images can hold deep copied or shallow data,
+     * but not both. This method returns the data set using the with_data() method. To set shallow data,
+     * call with_shallow_data() instead of with_data().
+     *
+     * READ:  Set by SAIL to valid pixel data.
+     * WRITE: Must be set by a caller to valid pixel data using with_bits().
      */
     void* bits();
 
     /*
-     * Returns constant deep copied pixel data if any. Images can hold deep copied or shallow data,
-     * but not both.
+     * Returns the constant deep copied pixel data if any. Images can hold deep copied or shallow data,
+     * but not both. This method returns the data set using the with_data() method. To set shallow data,
+     * call with_shallow_data() instead of with_data().
+     *
+     * READ:  Set by SAIL to valid pixel data.
+     * WRITE: Must be set by a caller to valid pixel data using with_bits().
      */
     const void* bits() const;
 
@@ -191,11 +209,24 @@ public:
     unsigned bits_size() const;
 
     /*
-     * Returns a constant shallow pointer to the external pixel data if any. Images can hold deep copied
-     * or shallow data, but not both.
+     * Returns the constant shallow pixel data if any. Images can hold deep copied or shallow data,
+     * but not both. This method returns the data set using the with_shallow_data() method.
+     * To deep copy pixel data, call with_data() instead of with_shallow_bits().
+     *
+     * READ:  Set by SAIL to valid pixel data.
+     * WRITE: Must be set by a caller to valid pixel data using with_bits().
      */
     const void* shallow_bits() const;
 
+    /*
+     * Returns embedded ICC profile.
+     *
+     * Note for animated/multi-paged images: only the first image in an animated/multi-paged
+     * sequence might have an ICC profile.
+     *
+     * READ:  Set by SAIL to a valid ICC profile if any.
+     * WRITE: Must be set by a caller to a valid ICC profile if necessary.
+     */
     sail::iccp iccp() const;
 
     /*
@@ -240,28 +271,32 @@ public:
     image& with_meta_entries(const std::map<std::string, std::string> &meta_entries);
 
     /*
-     * Deep copies the specified bits. Resets the pointer to shallow bits previously saved if any.
+     * Deep copies the specified pixel data. Resets the pointer to shallow pixel data to nullptr.
+     * The data can be accessed later with bits().
      */
     image& with_bits(const void *bits, unsigned bits_size);
 
     /*
-     * Stores the pointer to external data. Frees the previously stored deep-copied bits if any.
-     * The pixel data must remain valid until the image exists.
+     * Stores the pointer to the external pixel data. Frees the previously stored deep-copied pixel data.
+     * The pixel data must remain valid until the image exists. The data can be accessed later with shallow_bits().
      */
     image& with_shallow_bits(const void *bits);
 
+    /*
+     * Sets a new ICC profile.
+     */
     image& with_iccp(const sail::iccp &ic);
 
     /*
-     * Calculates a number of bits per pixel in the specified pixel format.
-     * For example, for SAIL_PIXEL_FORMAT_BPP24_RGB 24 is assigned.
+     * Calculates the number of bits per pixel in the specified pixel format.
+     * For example, for SAIL_PIXEL_FORMAT_RGB 24 is assigned.
      *
      * Returns 0 on success or sail_error_t on error.
      */
     static sail_error_t bits_per_pixel(SailPixelFormat pixel_format, unsigned *result);
 
     /*
-     * Calculates a number of bytes per line needed to hold a scan line without padding.
+     * Calculates the number of bytes per line needed to hold a scan line without padding.
      *
      * For example:
      *   - 12 pixels * 1 bits per pixel / 8 + 1 ==
@@ -282,16 +317,16 @@ public:
     static sail_error_t bytes_per_line(unsigned width, SailPixelFormat pixel_format, unsigned *result);
 
     /*
-     * Calculates a number of bytes needed to hold an entire image in memory without padding.
-     * It's effectively bytes per line * image height.
+     * Calculates the number of bytes needed to hold an entire image in memory without padding.
+     * It is effectively bytes per line * image height.
      *
      * Returns 0 on success or sail_error_t on error.
      */
     static sail_error_t bytes_per_image(const image &simage, unsigned *result);
 
     /*
-     * Assigns a non-NULL string representation of the specified pixel format. The assigned string
-     * MUST NOT be destroyed. For example: "BPP24-RGB".
+     * Assigns a non-NULL string representation of the specified pixel format.
+     * The assigned string MUST NOT be destroyed. For example: "RGB".
      *
      * Returns 0 on success or sail_error_t on error.
      */
