@@ -11,7 +11,8 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}/releases
-DefaultDirName={autopf}\{#MyAppName}
+DefaultDirName={sd}\{#MyAppName}
+DisableDirPage=Yes
 DefaultGroupName={#MyAppName}
 LicenseFile=LICENSE.txt
 OutputDir=.
@@ -64,8 +65,7 @@ Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 [Registry]
 
 [Run]
-;Filename: "{app}\THT.exe"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
-Filename: "{#MyAppURL}/blob/master/CHANGELOG.md"; Flags: nowait shellexec
+Filename: "{#MyAppURL}/blob/master/README.md"; Flags: nowait shellexec
 
 [Code]
 procedure CurStepChanged(CurStep: TSetupStep);
