@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.6)
 project(SAIL VERSION 0.9.0
              DESCRIPTION "Squirrel Abstract Image Libraries"
              LANGUAGES C CXX)
+set(SAIL_DEV_VERSION_SUFFIX "pre1")
 
 include(GNUInstallDirs)
 include(CheckIncludeFiles)
@@ -173,7 +174,7 @@ include_directories("${PROJECT_BINARY_DIR}/include")
 # Version suffix used in dist utils to build installers
 #
 if (SAIL_DEV)
-    set(SAIL_DIST_VERSION_SUFFIX "-git-${SAIL_GIT_HASH}")
+    set(SAIL_DIST_VERSION_SUFFIX "-${SAIL_DEV_VERSION_SUFFIX}-${SAIL_GIT_HASH}")
 endif()
 
 # INNO Setup
