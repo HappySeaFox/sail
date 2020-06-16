@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.6)
 project(SAIL VERSION 0.9.0
              DESCRIPTION "Squirrel Abstract Image Libraries"
              LANGUAGES C CXX)
-set(SAIL_DEV_VERSION_SUFFIX "pre1")
+set(SAIL_DEV_VERSION_SUFFIX "pre2")
 
 include(GNUInstallDirs)
 include(CheckIncludeFiles)
