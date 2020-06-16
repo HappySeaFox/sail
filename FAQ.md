@@ -143,10 +143,9 @@ SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, ...),
 ## What pixel formats SAIL is able to read?
 
 SAIL codecs (plugins) always try to support as much input pixel formats as possible. The list of
-pixel formats that can be read by SAIL is plugin-specific. Use `read_features` to get the list of
-possible input pixel formats per plugin.
+pixel formats that can be read by SAIL is plugin-specific and is not publicly available.
 
-For example, some plugins may support just 3 input pixel formats. Other may support 10.
+For example, some plugins may be able to read just 3 input pixel formats. Other may be able to read 10.
 
 ## What pixel formats SAIL is able to output after reading an image file?
 
