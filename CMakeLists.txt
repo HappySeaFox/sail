@@ -170,6 +170,17 @@ execute_process(COMMAND git -C "${PROJECT_SOURCE_DIR}" rev-parse --short HEAD
 configure_file("${PROJECT_SOURCE_DIR}/src/config.h.in" "${PROJECT_BINARY_DIR}/include/config.h" @ONLY)
 include_directories("${PROJECT_BINARY_DIR}/include")
 
+# Version suffix used in dist utils to build installers
+#
+if (SAIL_DEV)
+    set(SAIL_DIST_VERSION_SUFFIX "-git-${SAIL_GIT_HASH}")
+endif()
+
+# INNO Setup
+#
+configure_file("${PROJECT_SOURCE_DIR}/LICENSE.txt" "${PROJECT_BINARY_DIR}/LICENSE.txt" COPYONLY)
+configure_file("${PROJECT_SOURCE_DIR}/dist/win/sail.iss" "${PROJECT_BINARY_DIR}/sail.iss" @ONLY)
+
 # Configure subdirs
 #
 
