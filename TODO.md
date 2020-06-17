@@ -2,6 +2,8 @@
 
 - Windows INNO installer with a config file to store SAIL_PLUGINS_PATH
 
+- Move "source" image properties into a separate struct
+
 - Remove the scanline reading interface and make an interface to read entire frames?
 
 - Remove SOURCE from the guaranteed output pixel formats. TIFF, for examaple, cannot output SOURCE pixels
