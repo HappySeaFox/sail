@@ -157,7 +157,7 @@ struct sail_image {
     /*
      * Source image properties.
      *
-     * READ:  Set by SAIL to valid source image properties.
+     * READ:  Set by SAIL to valid source image properties of the original image.
      * WRITE: Ignored.
      */
     struct sail_source_image *source_image;
