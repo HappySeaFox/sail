@@ -40,9 +40,10 @@
 extern "C" {
 #endif
 
-struct sail_iccp;
-struct sail_meta_entry_node;
 struct sail_palette;
+struct sail_meta_entry_node;
+struct sail_iccp;
+struct sail_source_image;
 
 /*
  * A structure representing an image. Fields set by SAIL when reading images are marked with READ.
@@ -154,36 +155,12 @@ struct sail_image {
     int properties;
 
     /*
-     * The only purpose of the following "source" fields is to provide information about
-     * the source image file. They're not supposed to be passed to any reading or writing
-     * functions.
-     */
-
-    /*
-     * Source image pixel format. See SailPixelFormat.
+     * Source image properties.
      *
-     * READ:  Set by SAIL to a valid source image pixel format of the image file before converting it
-     *        to a requested pixel format in sail_read_options.pixel_format.
+     * READ:  Set by SAIL to valid source image properties.
      * WRITE: Ignored.
      */
-    enum SailPixelFormat source_pixel_format;
-
-    /*
-     * Source image properties. Set by SAIL to a valid source image properties of the image file.
-     * For example, it can be interlaced. See SailImageProperties.
-     *
-     * READ:  Set by SAIL to valid source image properties or to 0.
-     * WRITE: Ignored.
-     */
-    int source_properties;
-
-    /*
-     * Source image compression type. See SailCompressionType.
-     *
-     * READ:  Set by SAIL to a valid source image compression type.
-     * WRITE: Ignored.
-     */
-    enum SailCompressionType source_compression_type;
+    struct sail_source_image *source_image;
 };
 
 typedef struct sail_image sail_image_t;

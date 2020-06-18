@@ -186,11 +186,11 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
                                         &bytes_per_line));
     }
 
-    (*image)->width               = jpeg_state->decompress_context.output_width;
-    (*image)->height              = jpeg_state->decompress_context.output_height;
-    (*image)->bytes_per_line      = jpeg_state->decompress_context.output_width * (JDIMENSION)jpeg_state->decompress_context.output_components;
-    (*image)->pixel_format        = jpeg_state->read_options->output_pixel_format;
-    (*image)->source_pixel_format = color_space_to_pixel_format(jpeg_state->decompress_context.jpeg_color_space);
+    (*image)->width                      = jpeg_state->decompress_context.output_width;
+    (*image)->height                     = jpeg_state->decompress_context.output_height;
+    (*image)->bytes_per_line             = jpeg_state->decompress_context.output_width * (JDIMENSION)jpeg_state->decompress_context.output_components;
+    (*image)->pixel_format               = jpeg_state->read_options->output_pixel_format;
+    (*image)->source_image->pixel_format = color_space_to_pixel_format(jpeg_state->decompress_context.jpeg_color_space);
 
     /* Extra scan line used as a buffer when reading CMYK/YCCK images. */
     if (jpeg_state->extra_scan_line_needed) {
@@ -248,7 +248,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
 #endif
 
     const char *pixel_format_str = NULL;
-    SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string((*image)->source_pixel_format, &pixel_format_str));
+    SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string((*image)->source_image->pixel_format, &pixel_format_str));
     SAIL_LOG_DEBUG("JPEG: Input pixel format is %s", pixel_format_str);
     SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(jpeg_state->read_options->output_pixel_format, &pixel_format_str));
     SAIL_LOG_DEBUG("JPEG: Output pixel format is %s", pixel_format_str);

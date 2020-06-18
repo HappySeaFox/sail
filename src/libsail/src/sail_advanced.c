@@ -58,7 +58,7 @@ sail_error_t sail_read_next_frame(void *state, struct sail_image **image, void *
 
     /* Detect the number of passes needed to write an interlaced image. */
     int interlaced_passes;
-    if ((*image)->source_properties & SAIL_IMAGE_PROPERTY_INTERLACED) {
+    if ((*image)->source_image->properties & SAIL_IMAGE_PROPERTY_INTERLACED) {
         interlaced_passes = (*image)->interlaced_passes;
 
         if (interlaced_passes < 1) {

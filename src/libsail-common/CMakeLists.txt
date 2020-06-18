@@ -16,6 +16,7 @@ add_library(sail-common
                 src/pixel_formats_mapping_node.c
                 src/read_features.c
                 src/read_options.c
+                src/source_image.c
                 src/utils.c
                 src/write_features.c
                 src/write_options.c)
@@ -35,6 +36,7 @@ list(APPEND PUBLIC_HEADERS "src/palette.h")
 list(APPEND PUBLIC_HEADERS "src/pixel_formats_mapping_node.h")
 list(APPEND PUBLIC_HEADERS "src/read_features.h")
 list(APPEND PUBLIC_HEADERS "src/read_options.h")
+list(APPEND PUBLIC_HEADERS "src/source_image.h")
 list(APPEND PUBLIC_HEADERS "src/sail-common.h")
 list(APPEND PUBLIC_HEADERS "src/utils.h")
 list(APPEND PUBLIC_HEADERS "src/write_features.h")
