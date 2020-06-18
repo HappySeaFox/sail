@@ -4,6 +4,8 @@
 
 - Move "source" image properties into a separate struct
 
+- Save indexed PNGs
+
 - Remove the scanline reading interface and make an interface to read entire frames?
 
 - Remove SOURCE from the guaranteed output pixel formats. TIFF, for examaple, cannot output SOURCE pixels
