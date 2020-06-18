@@ -65,6 +65,7 @@ public:
     int delay;
     sail::palette palette;
     std::map<std::string, std::string> meta_entries;
+    sail::iccp iccp;
     int properties;
     SailPixelFormat source_pixel_format;
     int source_properties;
@@ -72,7 +73,6 @@ public:
     void *bits;
     unsigned bits_size;
     const void *shallow_bits;
-    sail::iccp iccp;
 };
 
 image::image()
@@ -96,6 +96,7 @@ image& image::operator=(const image &img)
         .with_delay(img.delay())
         .with_palette(img.palette())
         .with_meta_entries(meta_entries())
+        .with_iccp(img.iccp())
         .with_properties(img.properties())
         .with_source_pixel_format(img.source_pixel_format())
         .with_source_properties(img.source_properties())
@@ -106,8 +107,6 @@ image& image::operator=(const image &img)
     } else {
         with_bits(img.bits(), img.bits_size());
     }
-
-    with_iccp(img.iccp());
 
     return *this;
 }
@@ -383,7 +382,7 @@ image::image(const sail_image *im, const void *bits, unsigned bits_size)
     : image()
 {
     if (im == nullptr) {
-        SAIL_LOG_ERROR("NULL pointer has been passed to sail::image()");
+        SAIL_LOG_DEBUG("NULL pointer has been passed to sail::image(). The object is untouched");
         return;
     }
 
@@ -402,22 +401,14 @@ image::image(const sail_image *im, const void *bits, unsigned bits_size)
         .with_pixel_format(im->pixel_format)
         .with_animated(im->animated)
         .with_delay(im->delay)
+        .with_palette(sail::palette(im->palette))
         .with_meta_entries(meta_entries)
+        .with_iccp(sail::iccp(im->iccp))
         .with_properties(im->properties)
         .with_source_pixel_format(im->source_pixel_format)
         .with_source_properties(im->source_properties)
         .with_source_compression_type(im->source_compression_type)
         .with_bits(bits, bits_size);
-
-    if (im->palette != nullptr) {
-        sail::palette palette(im->palette);
-        with_palette(palette);
-    }
-
-    if (im->iccp != nullptr) {
-        sail::iccp iccp(im->iccp);
-        with_iccp(iccp);
-    }
 }
 
 image::image(const sail_image *im)
@@ -459,12 +450,6 @@ sail_error_t image::to_sail_image(sail_image *image) const
     image->animated       = d->animated;
     image->delay          = d->delay;
 
-    image->meta_entry_node         = image_meta_entry_node;
-    image->properties              = d->properties;
-    image->source_pixel_format     = d->source_pixel_format;
-    image->source_properties       = d->source_properties;
-    image->source_compression_type = d->source_compression_type;
-
     if (d->palette.is_valid()) {
         image->palette = (sail_palette *)malloc(sizeof(sail_palette));
 
@@ -477,6 +462,8 @@ sail_error_t image::to_sail_image(sail_image *image) const
                             /* cleanup */ sail_destroy_palette(image->palette);
                                           sail_destroy_meta_entry_node_chain(image->meta_entry_node));
     }
+
+    image->meta_entry_node = image_meta_entry_node;
 
     if (d->iccp.is_valid()) {
         image->iccp = (sail_iccp *)malloc(sizeof(sail_iccp));
@@ -492,6 +479,11 @@ sail_error_t image::to_sail_image(sail_image *image) const
                                           sail_destroy_palette(image->palette);
                                           sail_destroy_meta_entry_node_chain(image->meta_entry_node));
     }
+
+    image->properties              = d->properties;
+    image->source_pixel_format     = d->source_pixel_format;
+    image->source_properties       = d->source_properties;
+    image->source_compression_type = d->source_compression_type;
 
     return 0;
 }

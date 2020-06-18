@@ -61,7 +61,7 @@ image_reader::image_reader(context *ctx)
     d->own_context = false;
 
     if (d->ctx == nullptr) {
-        SAIL_LOG_ERROR("NULL pointer has been passed to image_reader()");
+        SAIL_LOG_ERROR("NULL context pointer has been passed to image_reader()");
     }
 }
 
@@ -90,6 +90,7 @@ sail_error_t image_reader::probe(const std::string &path, image *simage, plugin_
 
 sail_error_t image_reader::probe(const char *path, image *simage, plugin_info *splugin_info)
 {
+    SAIL_CHECK_CONTEXT_PTR(d->ctx);
     SAIL_CHECK_PATH_PTR(path);
     SAIL_CHECK_IMAGE_PTR(simage);
 
@@ -120,6 +121,7 @@ sail_error_t image_reader::read(const std::string &path, image *simage)
 
 sail_error_t image_reader::read(const char *path, image *simage)
 {
+    SAIL_CHECK_CONTEXT_PTR(d->ctx);
     SAIL_CHECK_PATH_PTR(path);
     SAIL_CHECK_IMAGE_PTR(simage);
 
@@ -153,6 +155,7 @@ sail_error_t image_reader::start_reading(const std::string &path)
 
 sail_error_t image_reader::start_reading(const char *path)
 {
+    SAIL_CHECK_CONTEXT_PTR(d->ctx);
     SAIL_CHECK_PATH_PTR(path);
 
     SAIL_TRY(sail_start_reading_file(path, d->ctx->sail_context_c(), nullptr, &d->state));
@@ -169,6 +172,7 @@ sail_error_t image_reader::start_reading(const std::string &path, const plugin_i
 
 sail_error_t image_reader::start_reading(const char *path, const plugin_info &splugin_info)
 {
+    SAIL_CHECK_CONTEXT_PTR(d->ctx);
     SAIL_CHECK_PATH_PTR(path);
 
     SAIL_TRY(sail_start_reading_file(path, d->ctx->sail_context_c(), splugin_info.sail_plugin_info_c(), &d->state));
@@ -185,6 +189,7 @@ sail_error_t image_reader::start_reading(const std::string &path, const plugin_i
 
 sail_error_t image_reader::start_reading(const char *path, const plugin_info &splugin_info, const read_options &sread_options)
 {
+    SAIL_CHECK_CONTEXT_PTR(d->ctx);
     SAIL_CHECK_PATH_PTR(path);
 
     sail_read_options sail_read_options;
@@ -201,6 +206,7 @@ sail_error_t image_reader::start_reading(const char *path, const plugin_info &sp
 
 sail_error_t image_reader::start_reading(const void *buffer, size_t buffer_length, const plugin_info &splugin_info)
 {
+    SAIL_CHECK_CONTEXT_PTR(d->ctx);
     SAIL_CHECK_BUFFER_PTR(buffer);
 
     SAIL_TRY(sail_start_reading_mem(buffer,
@@ -214,6 +220,7 @@ sail_error_t image_reader::start_reading(const void *buffer, size_t buffer_lengt
 
 sail_error_t image_reader::start_reading(const void *buffer, size_t buffer_length, const plugin_info &splugin_info, const read_options &sread_options)
 {
+    SAIL_CHECK_CONTEXT_PTR(d->ctx);
     SAIL_CHECK_BUFFER_PTR(buffer);
 
     sail_read_options sail_read_options;
@@ -231,6 +238,8 @@ sail_error_t image_reader::start_reading(const void *buffer, size_t buffer_lengt
 
 sail_error_t image_reader::start_reading(const io &sio, const plugin_info &splugin_info)
 {
+    SAIL_CHECK_CONTEXT_PTR(d->ctx);
+
     SAIL_TRY(sio.to_sail_io(&d->sail_io));
 
     sail_io *sail_io = &d->sail_io;
@@ -247,6 +256,8 @@ sail_error_t image_reader::start_reading(const io &sio, const plugin_info &splug
 
 sail_error_t image_reader::start_reading(const io &sio, const plugin_info &splugin_info, const read_options &sread_options)
 {
+    SAIL_CHECK_CONTEXT_PTR(d->ctx);
+
     SAIL_TRY(sio.to_sail_io(&d->sail_io));
 
     sail_io *sail_io = &d->sail_io;

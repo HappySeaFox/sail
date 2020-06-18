@@ -116,7 +116,7 @@ iccp::iccp(const sail_iccp *ic)
     : iccp()
 {
     if (ic == nullptr) {
-        SAIL_LOG_ERROR("NULL pointer has been passed to sail::iccp()");
+        SAIL_LOG_DEBUG("NULL pointer has been passed to sail::iccp(). The object is untouched");
         return;
     }
 

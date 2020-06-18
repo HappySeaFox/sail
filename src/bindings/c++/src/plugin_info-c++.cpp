@@ -139,7 +139,7 @@ plugin_info::plugin_info(const sail_plugin_info *pi)
     : plugin_info()
 {
     if (pi == nullptr) {
-        SAIL_LOG_ERROR("NULL pointer has been passed to sail::plugin_info()");
+        SAIL_LOG_DEBUG("NULL pointer has been passed to sail::plugin_info(). The object is untouched");
         return;
     }
 

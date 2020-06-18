@@ -106,7 +106,7 @@ palette::palette(const sail_palette *pal)
     : palette()
 {
     if (pal == nullptr) {
-        SAIL_LOG_ERROR("NULL pointer has been passed to sail::palette()");
+        SAIL_LOG_DEBUG("NULL pointer has been passed to sail::palette(). The object is untouched");
         return;
     }
 

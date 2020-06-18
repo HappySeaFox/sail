@@ -143,6 +143,17 @@ public:
     std::map<std::string, std::string> meta_entries() const;
 
     /*
+     * Returns embedded ICC profile.
+     *
+     * Note for animated/multi-paged images: only the first image in an animated/multi-paged
+     * sequence might have an ICC profile.
+     *
+     * READ:  Set by SAIL to a valid ICC profile if any.
+     * WRITE: Must be set by a caller to a valid ICC profile if necessary.
+     */
+    sail::iccp iccp() const;
+
+    /*
      * Returns decoded image properties. See SailImageProperties.
      *
      * READ:  Set by SAIL to valid image properties. For example, some image formats store images flipped.
@@ -217,17 +228,6 @@ public:
      * WRITE: Must be set by a caller to valid pixel data using with_bits().
      */
     const void* shallow_bits() const;
-
-    /*
-     * Returns embedded ICC profile.
-     *
-     * Note for animated/multi-paged images: only the first image in an animated/multi-paged
-     * sequence might have an ICC profile.
-     *
-     * READ:  Set by SAIL to a valid ICC profile if any.
-     * WRITE: Must be set by a caller to a valid ICC profile if necessary.
-     */
-    sail::iccp iccp() const;
 
     /*
      * Sets a new width.

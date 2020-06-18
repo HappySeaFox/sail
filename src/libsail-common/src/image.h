@@ -134,6 +134,17 @@ struct sail_image {
     struct sail_meta_entry_node *meta_entry_node;
 
     /*
+     * Embedded ICC profile.
+     *
+     * Note for animated/multi-paged images: only the first image in an animated/multi-paged
+     * sequence might have an ICC profile.
+     *
+     * READ:  Set by SAIL to a valid ICC profile if any.
+     * WRITE: Must be allocated and set by a caller to a valid ICC profile if necessary.
+     */
+    struct sail_iccp *iccp;
+
+    /*
      * Decoded image properties. See SailImageProperties.
      *
      * READ:  Set by SAIL to valid image properties. For example, some image formats store images flipped.
@@ -173,17 +184,6 @@ struct sail_image {
      * WRITE: Ignored.
      */
     enum SailCompressionType source_compression_type;
-
-    /*
-     * Embedded ICC profile.
-     *
-     * Note for animated/multi-paged images: only the first image in an animated/multi-paged
-     * sequence might have an ICC profile.
-     *
-     * READ:  Set by SAIL to a valid ICC profile if any.
-     * WRITE: Must be allocated and set by a caller to a valid ICC profile if necessary.
-     */
-    struct sail_iccp *iccp;
 };
 
 typedef struct sail_image sail_image_t;

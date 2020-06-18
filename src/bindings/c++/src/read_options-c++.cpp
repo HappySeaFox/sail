@@ -51,7 +51,7 @@ read_options::read_options(const sail_read_options *ro)
     : read_options()
 {
     if (ro == nullptr) {
-        SAIL_LOG_ERROR("NULL pointer has been passed to sail::read_options()");
+        SAIL_LOG_DEBUG("NULL pointer has been passed to sail::read_options(). The object is untouched");
         return;
     }
 
