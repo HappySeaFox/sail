@@ -70,39 +70,39 @@ void sail_destroy_image(struct sail_image *image) {
     free(image);
 }
 
-sail_error_t sail_copy_image(const struct sail_image *source_image, struct sail_image **target_image) {
+sail_error_t sail_copy_image(const struct sail_image *source, struct sail_image **target) {
 
-    SAIL_CHECK_IMAGE_PTR(source_image);
-    SAIL_CHECK_IMAGE_PTR(target_image);
+    SAIL_CHECK_IMAGE_PTR(source);
+    SAIL_CHECK_IMAGE_PTR(target);
 
-    SAIL_TRY(sail_alloc_image(target_image));
+    SAIL_TRY(sail_alloc_image(target));
 
-    (*target_image)->width                = source_image->width;
-    (*target_image)->height               = source_image->height;
-    (*target_image)->bytes_per_line       = source_image->bytes_per_line;
-    (*target_image)->pixel_format         = source_image->pixel_format;
-    (*target_image)->interlaced_passes    = source_image->interlaced_passes;
-    (*target_image)->animated             = source_image->animated;
-    (*target_image)->delay                = source_image->delay;
+    (*target)->width                = source->width;
+    (*target)->height               = source->height;
+    (*target)->bytes_per_line       = source->bytes_per_line;
+    (*target)->pixel_format         = source->pixel_format;
+    (*target)->interlaced_passes    = source->interlaced_passes;
+    (*target)->animated             = source->animated;
+    (*target)->delay                = source->delay;
 
-    if (source_image->palette != NULL) {
-        SAIL_TRY_OR_CLEANUP(sail_copy_palette(source_image->palette, &(*target_image)->palette),
-                            /* cleanup */ sail_destroy_image(*target_image));
+    if (source->palette != NULL) {
+        SAIL_TRY_OR_CLEANUP(sail_copy_palette(source->palette, &(*target)->palette),
+                            /* cleanup */ sail_destroy_image(*target));
 
     }
 
-    SAIL_TRY_OR_CLEANUP(sail_copy_meta_entry_node_chain(source_image->meta_entry_node, &(*target_image)->meta_entry_node),
-                        /* cleanup */ sail_destroy_image(*target_image));
+    SAIL_TRY_OR_CLEANUP(sail_copy_meta_entry_node_chain(source->meta_entry_node, &(*target)->meta_entry_node),
+                        /* cleanup */ sail_destroy_image(*target));
 
-    if (source_image->iccp != NULL) {
-        SAIL_TRY_OR_CLEANUP(sail_copy_iccp(source_image->iccp, &(*target_image)->iccp),
-                            /* cleanup */ sail_destroy_image(*target_image));
+    if (source->iccp != NULL) {
+        SAIL_TRY_OR_CLEANUP(sail_copy_iccp(source->iccp, &(*target)->iccp),
+                            /* cleanup */ sail_destroy_image(*target));
     }
 
-    (*target_image)->properties              = source_image->properties;
-    (*target_image)->source_pixel_format     = source_image->source_pixel_format;
-    (*target_image)->source_properties       = source_image->source_properties;
-    (*target_image)->source_compression_type = source_image->source_compression_type;
+    (*target)->properties              = source->properties;
+    (*target)->source_pixel_format     = source->source_pixel_format;
+    (*target)->source_properties       = source->source_properties;
+    (*target)->source_compression_type = source->source_compression_type;
 
     return 0;
 }
