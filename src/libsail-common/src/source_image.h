@@ -24,7 +24,7 @@
 */
 
 #ifndef SAIL_SOURCE_IMAGE_H
-#define SAIL_COURCE_IMAGE_H
+#define SAIL_SOURCE_IMAGE_H
 
 #include <stdbool.h>
 
