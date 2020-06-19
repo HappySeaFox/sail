@@ -26,11 +26,10 @@ Author: Dmitry Baryshev
 - Reading images from file and memory
 - Writing images to file and memory
 - I/O abstraction for technical divers
-- Reading operations are always able to output pixels in the `SOURCE`, `BPP24-RGB`
-  and `BPP32-RGBA` formats. Some image format plugins may output even more
-- Reading operations are always able to output pixels in the `SOURCE` pixel format
-  for those who want to kick the hell out of images manually. For example, one may want to work with
-  `CMYK` pixels in a print image
+- Reading operations are always able to output pixels in the `BPP24-RGB` and `BPP32-RGBA` formats.
+  Some image format plugins may output even more
+- Most image format plugins are able to output the `SOURCE` pixel format for those who want
+  to kick the hell out of images manually. For example, one may want to work with `CMYK` pixels in a print image
 - Read and write ICC profiles
 - Read and write meta information like JPEG comments
 - Easily extensible with new image formats for those who want to implement a specific codec for his/her needs
@@ -46,7 +45,7 @@ Author: Dmitry Baryshev
 ## Differences from other image decoding libraries
 
 - Fast and easy-to-use API providing expected business entities - images, delays, palettes etc.
-- Access to source pixel data w/o converting it to a different format
+- Access to source pixel data w/o converting it to a different format (supported by most image format plugins)
 - Reading and writing images in multiple pixel formats, not only RGB and friends
 
 ## Supported image formats

@@ -6,8 +6,6 @@
 
 - Remove the scanline reading interface and make an interface to read entire frames?
 
-- Remove SOURCE from the guaranteed output pixel formats. TIFF, for examaple, cannot output SOURCE pixels
-
 - document c++ classes
 
 - detect images by magic? Non-seekable I/O sources will not be allowed then
@@ -24,7 +22,7 @@
   - check all plugins have the same layout version
   - check all plugins could be loaded
   - decode/encode with reference data
-  - all plugins have RGB, RGBA, and SOURCE output
+  - all plugins have RGB and RGBA output
 
 ## Priority 2
 

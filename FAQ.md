@@ -149,12 +149,13 @@ For example, some plugins may be able to read just 3 input pixel formats. Other 
 
 ## What pixel formats SAIL is able to output after reading an image file?
 
-SAIL is always able to output the `SOURCE`, `BPP24-RGB`, and `BPP32-RGBA` pixel formats after reading. Some plugins may
-support even more output pixel formats. Use `sail_plugin_info_from_extension() -> plugin_info -> read_features ->
-output_pixel_formats` to determine the list of supported output pixel formats per plugin.
+SAIL is always able to output the `BPP24-RGB` and `BPP32-RGBA` pixel formats after reading. Most plugins are able
+to output the `SOURCE` pixel format as well. Some plugins may support even more output pixel formats.
+Use `sail_plugin_info_from_extension() -> plugin_info -> read_features -> output_pixel_formats` to determine
+the list of supported output pixel formats per plugin.
 
-Use the `SOURCE` pixel format to request the image pixel data as is. For example, one may want to work
-with CMYK pixels in a print image without converting them to RGB.
+Use the `SOURCE` pixel format (if it's supported by the plugin) to request the original image pixels.
+For example, one may want to work with CMYK pixels in a print image without converting them to RGB.
 
 ## What pixel formats SAIL is able to write?
 
@@ -193,7 +194,7 @@ read_options->output_pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;
 sail_start_reading_file_with_options(...);
 ```
 
-The `SOURCE`, `BPP24-RGB`, and `BPP32-RGBA` output pixel formats are always supported.
+The `BPP24-RGB` and `BPP32-RGBA` output pixel formats are always supported.
 See [EXAMPLES](EXAMPLES.md) for more.
 
 ## Does SAIL support animated and multi-paged images?
