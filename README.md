@@ -57,7 +57,7 @@ Author: Dmitry Baryshev
 | 2  | [JPEG (Joint Photographic Experts Group)](https://wikipedia.org/wiki/JPEG)              | RW            | libjpeg-turbo     |               |
 | 3  | [PNG (Portable Network Graphics)](https://wikipedia.org/wiki/Portable_Network_Graphics) | RW            | libpng            |               |
 
-More image formats will be added in the future.
+Work to add more image formats is ongoing.
 
 ### Legacy image formats
 
