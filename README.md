@@ -34,6 +34,7 @@ Author: Dmitry Baryshev
 - Read and write meta information like JPEG comments
 - Easily extensible with new image formats for those who want to implement a specific codec for his/her needs
 - Qt, SDL, and pure C examples
+- The best MIME icons in the computer industry
 
 ## Features NOT provided
 
