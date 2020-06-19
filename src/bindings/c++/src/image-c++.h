@@ -36,12 +36,14 @@
 
     #include "iccp-c++.h"
     #include "palette-c++.h"
+    #include "source_image-c++.h"
 #else
     #include <sail-common/error.h>
     #include <sail-common/export.h>
 
     #include <sail-c++/iccp-c++.h>
     #include <sail-c++/palette-c++.h>
+    #include <sail-c++/source_image-c++.h>
 #endif
 
 struct sail_image;
@@ -163,36 +165,12 @@ public:
     int properties() const;
 
     /*
-     * The only purpose of the following "source" fields is to provide information about
-     * the source image file. They're not supposed to be passed to any reading or writing
-     * functions.
-     */
-
-    /*
-     * Returns source image pixel format. See SailPixelFormat.
+     * Source image properties.
      *
-     * READ:  Set by SAIL to a valid source image pixel format of the image file before converting it
-     *        to a requested pixel format in read_options.pixel_format.
+     * READ:  Set by SAIL to valid source image properties of the original image.
      * WRITE: Ignored.
      */
-    SailPixelFormat source_pixel_format() const;
-
-    /*
-     * Returns source image properties. Set by SAIL to a valid source image properties of the image file.
-     * For example, it can be interlaced. See SailImageProperties.
-     *
-     * READ:  Set by SAIL to valid source image properties or to 0.
-     * WRITE: Ignored.
-     */
-    int source_properties() const;
-
-    /*
-     * Returns source image compression type. See SailCompressionType.
-     *
-     * READ:  Set by SAIL to a valid source image compression type.
-     * WRITE: Ignored.
-     */
-    SailCompressionType source_compression_type() const;
+    sail::source_image source_image() const;
 
     /*
      * Returns the editable deep copied pixel data if any. Images can hold deep copied or shallow data,
@@ -383,9 +361,7 @@ private:
 
     image& with_animated(bool animated);
     image& with_properties(int properties);
-    image& with_source_pixel_format(SailPixelFormat source_pixel_format);
-    image& with_source_properties(int source_properties);
-    image& with_source_compression_type(SailCompressionType source_compression_type);
+    image& with_source_image(const sail::source_image &si);
 
 private:
     class pimpl;

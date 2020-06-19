@@ -128,7 +128,7 @@ sail_error_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, QV
     const char *source_pixel_format_str;
     const char *pixel_format_str;
 
-    SAIL_TRY(sail::image::pixel_format_to_string(image.source_pixel_format(), &source_pixel_format_str));
+    SAIL_TRY(sail::image::pixel_format_to_string(image.source_image().pixel_format(), &source_pixel_format_str));
     SAIL_TRY(sail::image::pixel_format_to_string(image.pixel_format(), &pixel_format_str));
 
     m_ui->labelStatus->setText(tr("%1  [%2x%3]  [%4 -> %5]")
@@ -212,7 +212,7 @@ sail_error_t QtSail::onProbe()
     const char *source_pixel_format_str;
     const char *pixel_format_str;
 
-    SAIL_TRY(sail::image::pixel_format_to_string(image.source_pixel_format(), &source_pixel_format_str));
+    SAIL_TRY(sail::image::pixel_format_to_string(image.source_image().pixel_format(), &source_pixel_format_str));
     SAIL_TRY(sail::image::pixel_format_to_string(image.pixel_format(), &pixel_format_str));
 
     QMessageBox::information(this,

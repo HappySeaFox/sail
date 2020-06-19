@@ -44,9 +44,6 @@ public:
         , animated(false)
         , delay(0)
         , properties(0)
-        , source_pixel_format(SAIL_PIXEL_FORMAT_UNKNOWN)
-        , source_properties(0)
-        , source_compression_type(SAIL_COMPRESSION_UNSUPPORTED)
         , bits(nullptr)
         , bits_size(0)
         , shallow_bits(nullptr)
@@ -67,9 +64,7 @@ public:
     std::map<std::string, std::string> meta_entries;
     sail::iccp iccp;
     int properties;
-    SailPixelFormat source_pixel_format;
-    int source_properties;
-    SailCompressionType source_compression_type;
+    sail::source_image source_image;
     void *bits;
     unsigned bits_size;
     const void *shallow_bits;
@@ -98,9 +93,7 @@ image& image::operator=(const image &img)
         .with_meta_entries(meta_entries())
         .with_iccp(img.iccp())
         .with_properties(img.properties())
-        .with_source_pixel_format(img.source_pixel_format())
-        .with_source_properties(img.source_properties())
-        .with_source_compression_type(img.source_compression_type());
+        .with_source_image(img.source_image());
 
     if (img.shallow_bits() != nullptr) {
         with_shallow_bits(img.shallow_bits());
@@ -166,19 +159,9 @@ int image::properties() const
     return d->properties;
 }
 
-SailPixelFormat image::source_pixel_format() const
+sail::source_image image::source_image() const
 {
-    return d->source_pixel_format;
-}
-
-int image::source_properties() const
-{
-    return d->source_properties;
-}
-
-SailCompressionType image::source_compression_type() const
-{
-    return d->source_compression_type;
+    return d->source_image;
 }
 
 void* image::bits()
@@ -405,9 +388,7 @@ image::image(const sail_image *im, const void *bits, unsigned bits_size)
         .with_meta_entries(meta_entries)
         .with_iccp(sail::iccp(im->iccp))
         .with_properties(im->properties)
-        .with_source_pixel_format(im->source_pixel_format)
-        .with_source_properties(im->source_properties)
-        .with_source_compression_type(im->source_compression_type)
+        .with_source_image(im->source_image)
         .with_bits(bits, bits_size);
 }
 
@@ -480,11 +461,21 @@ sail_error_t image::to_sail_image(sail_image *image) const
                                           sail_destroy_meta_entry_node_chain(image->meta_entry_node));
     }
 
-    image->properties              = d->properties;
-    image->source_pixel_format     = d->source_pixel_format;
-    image->source_properties       = d->source_properties;
-    image->source_compression_type = d->source_compression_type;
+    image->properties = d->properties;
 
+    if (d->source_image.is_valid()) {
+        SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image->source_image),
+                            /* cleanup */ sail_destroy_iccp(image->iccp),
+                                          sail_destroy_palette(image->palette);
+                                          sail_destroy_meta_entry_node_chain(image->meta_entry_node));
+
+        SAIL_TRY_OR_CLEANUP(d->source_image.to_sail_source_image(image->source_image),
+                            /* cleanup */ sail_destroy_source_image(image->source_image),
+                                          sail_destroy_iccp(image->iccp),
+                                          sail_destroy_palette(image->palette);
+                                          sail_destroy_meta_entry_node_chain(image->meta_entry_node));
+    }
+    
     return 0;
 }
 
@@ -500,21 +491,9 @@ image& image::with_properties(int properties)
     return *this;
 }
 
-image& image::with_source_pixel_format(SailPixelFormat source_pixel_format)
+image& image::with_source_image(const sail::source_image &si)
 {
-    d->source_pixel_format = source_pixel_format;
-    return *this;
-}
-
-image& image::with_source_properties(int source_properties)
-{
-    d->source_properties = source_properties;
-    return *this;
-}
-
-image& image::with_source_compression_type(SailCompressionType source_compression_type)
-{
-    d->source_compression_type = source_compression_type;
+    d->source_image = si;
     return *this;
 }
 

@@ -43,6 +43,7 @@
     #include "pixel_formats_mapping_node.h"
     #include "read_features.h"
     #include "read_options.h"
+    #include "source_image.h"
     #include "utils.h"
     #include "write_features.h"
     #include "write_options.h"
@@ -61,6 +62,7 @@
     #include <sail-common/pixel_formats_mapping_node.h>
     #include <sail-common/read_features.h>
     #include <sail-common/read_options.h>
+    #include <sail-common/source_image.h>
     #include <sail-common/utils.h>
     #include <sail-common/write_features.h>
     #include <sail-common/write_options.h>

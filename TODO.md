@@ -2,8 +2,6 @@
 
 - Windows INNO installer with a config file to store SAIL_PLUGINS_PATH
 
-- Move "source" image properties into a separate struct
-
 - Save indexed PNGs
 
 - Remove the scanline reading interface and make an interface to read entire frames?

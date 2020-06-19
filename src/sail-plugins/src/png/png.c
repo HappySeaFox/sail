@@ -307,10 +307,10 @@ SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_io *io, const stru
     png_state->frames = 1;
 #endif
 
-    png_state->first_image->source_pixel_format = png_color_type_to_pixel_format(png_state->color_type, png_state->bit_depth);
+    png_state->first_image->source_image->pixel_format = png_color_type_to_pixel_format(png_state->color_type, png_state->bit_depth);
 
     if (png_state->first_image->interlaced_passes > 1) {
-        png_state->first_image->source_properties |= SAIL_IMAGE_PROPERTY_INTERLACED;
+        png_state->first_image->source_image->properties |= SAIL_IMAGE_PROPERTY_INTERLACED;
     }
 
     /* Read meta info. */
@@ -332,7 +332,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_io *io, const stru
 #endif
 
     const char *pixel_format_str = NULL;
-    SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(png_state->first_image->source_pixel_format, &pixel_format_str));
+    SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(png_state->first_image->source_image->pixel_format, &pixel_format_str));
     SAIL_LOG_DEBUG("PNG: Input pixel format is %s", pixel_format_str);
     SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(png_state->read_options->output_pixel_format, &pixel_format_str));
     SAIL_LOG_DEBUG("PNG: Output pixel format is %s", pixel_format_str);

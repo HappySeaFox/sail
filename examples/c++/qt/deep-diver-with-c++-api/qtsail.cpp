@@ -192,7 +192,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     const char *source_pixel_format_str;
     const char *pixel_format_str;
 
-    SAIL_TRY(sail::image::pixel_format_to_string(image.source_pixel_format(), &source_pixel_format_str));
+    SAIL_TRY(sail::image::pixel_format_to_string(image.source_image().pixel_format(), &source_pixel_format_str));
     SAIL_TRY(sail::image::pixel_format_to_string(image.pixel_format(), &pixel_format_str));
 
     m_suffix = QFileInfo(path).suffix();
@@ -373,7 +373,7 @@ sail_error_t QtSail::onProbe()
     const char *source_pixel_format_str;
     const char *pixel_format_str;
 
-    SAIL_TRY(sail::image::pixel_format_to_string(image.source_pixel_format(), &source_pixel_format_str));
+    SAIL_TRY(sail::image::pixel_format_to_string(image.source_image().pixel_format(), &source_pixel_format_str));
     SAIL_TRY(sail::image::pixel_format_to_string(image.pixel_format(), &pixel_format_str));
 
     QMessageBox::information(this,

@@ -108,7 +108,7 @@ sail_error_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, QV
             return SAIL_UNSUPPORTED_PIXEL_FORMAT;
         }
 
-        source_pixel_format = image->source_pixel_format;
+        source_pixel_format = image->source_image->pixel_format;
         pixel_format = image->pixel_format;
         width = image->width;
         height = image->height;
@@ -263,7 +263,7 @@ sail_error_t QtSail::onProbe()
     const char *source_pixel_format_str;
     const char *pixel_format_str;
 
-    SAIL_TRY(sail_pixel_format_to_string(image->source_pixel_format, &source_pixel_format_str));
+    SAIL_TRY(sail_pixel_format_to_string(image->source_image->pixel_format, &source_pixel_format_str));
     SAIL_TRY(sail_pixel_format_to_string(image->pixel_format, &pixel_format_str));
 
     QMessageBox::information(this,

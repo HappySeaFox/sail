@@ -50,9 +50,9 @@ sail_error_t sail_alloc_image(struct sail_image **image) {
     (*image)->meta_entry_node         = NULL;
     (*image)->iccp                    = NULL;
     (*image)->properties              = 0;
-    (*image)->source_pixel_format     = SAIL_PIXEL_FORMAT_UNKNOWN;
-    (*image)->source_properties       = 0;
-    (*image)->source_compression_type = SAIL_COMPRESSION_UNSUPPORTED;
+
+    SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&(*image)->source_image),
+                        /* cleanup */ sail_destroy_image(*image));
 
     return 0;
 }
@@ -66,6 +66,7 @@ void sail_destroy_image(struct sail_image *image) {
     sail_destroy_palette(image->palette);
     sail_destroy_meta_entry_node_chain(image->meta_entry_node);
     sail_destroy_iccp(image->iccp);
+    sail_destroy_source_image(image->source_image);
 
     free(image);
 }
@@ -99,10 +100,10 @@ sail_error_t sail_copy_image(const struct sail_image *source, struct sail_image 
                             /* cleanup */ sail_destroy_image(*target));
     }
 
-    (*target)->properties              = source->properties;
-    (*target)->source_pixel_format     = source->source_pixel_format;
-    (*target)->source_properties       = source->source_properties;
-    (*target)->source_compression_type = source->source_compression_type;
+    (*target)->properties = source->properties;
+
+    SAIL_TRY_OR_CLEANUP(sail_copy_source_image(source->source_image, &(*target)->source_image),
+                        /* cleanup */ sail_destroy_image(*target));
 
     return 0;
 }
