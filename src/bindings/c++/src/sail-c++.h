@@ -42,6 +42,7 @@
     #include "plugin_info-c++.h"
     #include "read_features-c++.h"
     #include "read_options-c++.h"
+    #include "source_image-c++.h"
     #include "write_features-c++.h"
     #include "write_options-c++.h"
     #include "utils-c++.h"
@@ -59,6 +60,7 @@
     #include <sail-c++/plugin_info-c++.h>
     #include <sail-c++/read_features-c++.h>
     #include <sail-c++/read_options-c++.h>
+    #include <sail-c++/source_image-c++.h>
     #include <sail-c++/write_features-c++.h>
     #include <sail-c++/write_options-c++.h>
     #include <sail-c++/utils-c++.h>

@@ -9,6 +9,7 @@ add_library(sail-c++
                 src/plugin_info-c++.cpp
                 src/read_features-c++.cpp
                 src/read_options-c++.cpp
+                src/source_image-c++.cpp
                 src/write_features-c++.cpp
                 src/write_options-c++.cpp
                 src/utils-c++.cpp)
@@ -28,6 +29,7 @@ list(APPEND PUBLIC_HEADERS "src/plugin_info-c++.h")
 list(APPEND PUBLIC_HEADERS "src/read_features-c++.h")
 list(APPEND PUBLIC_HEADERS "src/read_options-c++.h")
 list(APPEND PUBLIC_HEADERS "src/sail-c++.h")
+list(APPEND PUBLIC_HEADERS "src/source_image-c++.h")
 list(APPEND PUBLIC_HEADERS "src/write_features-c++.h")
 list(APPEND PUBLIC_HEADERS "src/write_options-c++.h")
 list(APPEND PUBLIC_HEADERS "src/utils-c++.h")
