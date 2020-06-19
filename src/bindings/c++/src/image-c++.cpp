@@ -432,12 +432,8 @@ sail_error_t image::to_sail_image(sail_image *image) const
     image->delay          = d->delay;
 
     if (d->palette.is_valid()) {
-        image->palette = (sail_palette *)malloc(sizeof(sail_palette));
-
-        if (image->palette == nullptr) {
-            sail_destroy_meta_entry_node_chain(image->meta_entry_node);
-            return SAIL_MEMORY_ALLOCATION_FAILED;
-        }
+        SAIL_TRY_OR_CLEANUP(sail_alloc_palette(&image->palette),
+                            /* cleanup */ sail_destroy_meta_entry_node_chain(image->meta_entry_node));
 
         SAIL_TRY_OR_CLEANUP(d->palette.to_sail_palette(image->palette),
                             /* cleanup */ sail_destroy_palette(image->palette);
@@ -447,13 +443,9 @@ sail_error_t image::to_sail_image(sail_image *image) const
     image->meta_entry_node = image_meta_entry_node;
 
     if (d->iccp.is_valid()) {
-        image->iccp = (sail_iccp *)malloc(sizeof(sail_iccp));
-
-        if (image->iccp == nullptr) {
-            sail_destroy_palette(image->palette);
-            sail_destroy_meta_entry_node_chain(image->meta_entry_node);
-            return SAIL_MEMORY_ALLOCATION_FAILED;
-        }
+        SAIL_TRY_OR_CLEANUP(sail_alloc_iccp(&image->iccp),
+                            /* cleanup */ sail_destroy_palette(image->palette),
+                                          sail_destroy_meta_entry_node_chain(image->meta_entry_node));
 
         SAIL_TRY_OR_CLEANUP(d->iccp.to_sail_iccp(image->iccp),
                             /* cleanup */ sail_destroy_iccp(image->iccp),
