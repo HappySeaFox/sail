@@ -177,6 +177,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_io *io, const stru
     png_read_info(png_state->png_ptr, png_state->info_ptr);
 
     SAIL_TRY(sail_alloc_image(&png_state->first_image));
+    SAIL_TRY(sail_alloc_source_image(&png_state->first_image->source_image));
 
     png_get_IHDR(png_state->png_ptr,
                     png_state->info_ptr,

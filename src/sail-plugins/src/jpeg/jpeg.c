@@ -170,6 +170,9 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
     jpeg_state->frame_read = true;
     SAIL_TRY(sail_alloc_image(image));
 
+    SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&(*image)->source_image),
+                        /* cleanup */ sail_destroy_image(*image));
+
     if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0) {
         jpeg_state->libjpeg_error = true;
         sail_destroy_image(*image);
