@@ -158,16 +158,18 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     if (qimageFormat == QImage::Format_Indexed8) {
         // Assume palette is BPP24-RGB.
         //
-        if (image.palette().pixel_format() != SAIL_PIXEL_FORMAT_BPP24_RGB) {
+        const sail::palette palette = image.palette();
+
+        if (palette.pixel_format() != SAIL_PIXEL_FORMAT_BPP24_RGB) {
             return SAIL_UNSUPPORTED_PIXEL_FORMAT;
         }
 
         QVector<QRgb> colorTable;
-        const unsigned char *palette = reinterpret_cast<const unsigned char *>(image.palette().data());
+        const unsigned char *rgbData = reinterpret_cast<const unsigned char *>(palette.data());
 
-        for (unsigned i = 0; i < image.palette().color_count(); i++) {
-            colorTable.append(qRgb(*palette, *(palette+1), *(palette+2)));
-            palette += 3;
+        for (unsigned i = 0; i < palette.color_count(); i++) {
+            colorTable.append(qRgb(*rgbData, *(rgbData+1), *(rgbData+2)));
+            rgbData += 3;
         }
 
         qimage->setColorTable(colorTable);

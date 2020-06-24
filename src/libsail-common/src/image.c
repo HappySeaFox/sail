@@ -50,9 +50,7 @@ sail_error_t sail_alloc_image(struct sail_image **image) {
     (*image)->meta_entry_node         = NULL;
     (*image)->iccp                    = NULL;
     (*image)->properties              = 0;
-
-    SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&(*image)->source_image),
-                        /* cleanup */ sail_destroy_image(*image));
+    (*image)->source_image            = NULL;
 
     return 0;
 }
@@ -102,8 +100,10 @@ sail_error_t sail_copy_image(const struct sail_image *source, struct sail_image 
 
     (*target)->properties = source->properties;
 
-    SAIL_TRY_OR_CLEANUP(sail_copy_source_image(source->source_image, &(*target)->source_image),
-                        /* cleanup */ sail_destroy_image(*target));
+    if (source->source_image != NULL) {
+        SAIL_TRY_OR_CLEANUP(sail_copy_source_image(source->source_image, &(*target)->source_image),
+                            /* cleanup */ sail_destroy_image(*target));
+    }
 
     return 0;
 }

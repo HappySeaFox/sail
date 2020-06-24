@@ -87,9 +87,7 @@ sail_error_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, QV
      * with transparency support and BPP24-RGB otherwise.
      */
     SAIL_TRY_OR_CLEANUP(sail_start_reading_file(path.toLocal8Bit(), m_context, NULL, &state),
-                        /* cleanup */ sail_stop_reading(state),
-                                      free(image_bits),
-                                      sail_destroy_image(image));
+                        /* cleanup */ sail_stop_reading(state));
 
     /*
      * Read all the available image frames in the file.
@@ -121,31 +119,6 @@ sail_error_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, QV
                                image->height,
                                image->bytes_per_line,
                                qimageFormat).copy();
-
-        /*
-         * Apply palette.
-         */
-        if (qimageFormat == QImage::Format_Indexed8) {
-            /*
-             * Assume palette is BPP24-RGB.
-             */
-            if (image->palette->pixel_format != SAIL_PIXEL_FORMAT_BPP24_RGB) {
-                sail_stop_reading(state);
-                sail_destroy_image(image);
-                free(image_bits);
-                return SAIL_UNSUPPORTED_PIXEL_FORMAT;
-            }
-
-            QVector<QRgb> colorTable;
-            const unsigned char *palette = reinterpret_cast<const unsigned char *>(image->palette);
-
-            for (unsigned i = 0; i < image->palette->color_count; i++) {
-                colorTable.append(qRgb(*palette, *(palette+1), *(palette+2)));
-                palette += 3;
-            }
-
-            qimage.setColorTable(colorTable);
-        }
 
         qimages->append(qimage);
         delays->append(image->delay);

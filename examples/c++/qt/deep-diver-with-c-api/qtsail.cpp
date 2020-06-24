@@ -174,6 +174,8 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
                      image->bytes_per_line,
                      qimageFormat).copy();
 
+    free(image_bits);
+
     SAIL_LOG_DEBUG("Has ICC profile: %s (%u bytes)",
                    image->iccp == NULL ? "no" : "yes",
                    image->iccp == NULL ? 0 : image->iccp->data_length);
@@ -188,7 +190,6 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
         if (image->palette->pixel_format != SAIL_PIXEL_FORMAT_BPP24_RGB) {
             sail_stop_reading(state);
             sail_destroy_image(image);
-            free(image_bits);
             return SAIL_UNSUPPORTED_PIXEL_FORMAT;
         }
 
@@ -202,8 +203,6 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 
         qimage->setColorTable(colorTable);
     }
-
-    free(image_bits);
 
     /*
      * Finish reading.
