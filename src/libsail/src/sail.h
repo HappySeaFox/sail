@@ -103,6 +103,9 @@ SAIL_EXPORT sail_error_t sail_init_with_flags(struct sail_context **context, int
 /*
  * Finalizes working with the specified SAIL context. Frees the context and all its internal memory buffers.
  * Does nothing if context is NULL.
+ *
+ * All pointers to plugin info objects, read and write features get invalidated. Using them after calling
+ * sail_finish() will lead to a crash.
  */
 SAIL_EXPORT void sail_finish(struct sail_context *context);
 
