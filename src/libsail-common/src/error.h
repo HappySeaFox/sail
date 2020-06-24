@@ -83,6 +83,7 @@ typedef int sail_error_t;
 #define SAIL_INCORRECT_BYTES_PER_LINE     46
 #define SAIL_UNSUPPORTED_IMAGE_PROPERTY   47
 #define SAIL_UNSUPPORTED_BIT_DEPTH        48
+#define SAIL_MISSING_PALETTE              49
 
 /*
  * Plugins-specific errors.

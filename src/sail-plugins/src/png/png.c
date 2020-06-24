@@ -205,7 +205,8 @@ SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_io *io, const stru
             png_colorp palette;
 
             if (png_get_PLTE(png_state->png_ptr, png_state->info_ptr, &palette, &palette_color_count) != PNG_INFO_PLTE) {
-                png_error(png_state->png_ptr, "The indexed image has no palette");
+                SAIL_LOG_ERROR("The indexed image has no palette");
+                return SAIL_MISSING_PALETTE;
             }
 
             /* Always use RGB palette. */
@@ -664,11 +665,13 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v2(void *state, struc
             image->pixel_format == SAIL_PIXEL_FORMAT_BPP4_INDEXED ||
             image->pixel_format == SAIL_PIXEL_FORMAT_BPP8_INDEXED) {
         if (image->palette == NULL) {
-            png_error(png_state->png_ptr, "The indexed image has no palette");
+            SAIL_LOG_ERROR("The indexed image has no palette");
+            return SAIL_MISSING_PALETTE;
         }
 
         if (image->palette->pixel_format != SAIL_PIXEL_FORMAT_BPP24_RGB) {
-            png_error(png_state->png_ptr, "Palettes not in BPP24-RGB format are not supported");
+            SAIL_LOG_ERROR("Palettes not in BPP24-RGB format are not supported");
+            return SAIL_UNSUPPORTED_PIXEL_FORMAT;
         }
 
         /* Palette is deep copied. */
