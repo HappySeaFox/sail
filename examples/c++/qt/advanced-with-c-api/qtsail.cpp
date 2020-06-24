@@ -87,9 +87,7 @@ sail_error_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, QV
      * with transparency support and BPP24-RGB otherwise.
      */
     SAIL_TRY_OR_CLEANUP(sail_start_reading_file(path.toLocal8Bit(), m_context, NULL, &state),
-                        /* cleanup */ sail_stop_reading(state),
-                                      free(image_bits),
-                                      sail_destroy_image(image));
+                        /* cleanup */ sail_stop_reading(state));
 
     /*
      * Read all the available image frames in the file.
