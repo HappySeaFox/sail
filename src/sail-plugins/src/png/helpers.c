@@ -104,6 +104,30 @@ sail_error_t pixel_format_to_png_color_type(int pixel_format, int *color_type, i
     SAIL_CHECK_PTR(bit_depth);
 
     switch (pixel_format) {
+        case SAIL_PIXEL_FORMAT_BPP1_INDEXED: {
+            *color_type = PNG_COLOR_TYPE_PALETTE;
+            *bit_depth = 1;
+            return 0;
+        }
+
+        case SAIL_PIXEL_FORMAT_BPP2_INDEXED: {
+            *color_type = PNG_COLOR_TYPE_PALETTE;
+            *bit_depth = 2;
+            return 0;
+        }
+
+        case SAIL_PIXEL_FORMAT_BPP4_INDEXED: {
+            *color_type = PNG_COLOR_TYPE_PALETTE;
+            *bit_depth = 4;
+            return 0;
+        }
+
+        case SAIL_PIXEL_FORMAT_BPP8_INDEXED: {
+            *color_type = PNG_COLOR_TYPE_PALETTE;
+            *bit_depth = 8;
+            return 0;
+        }
+
         case SAIL_PIXEL_FORMAT_BPP24_RGB:
         case SAIL_PIXEL_FORMAT_BPP24_BGR: {
             *color_type = PNG_COLOR_TYPE_RGB;
@@ -160,6 +184,10 @@ sail_error_t supported_read_output_pixel_format(int pixel_format) {
 sail_error_t supported_write_input_pixel_format(int pixel_format) {
 
     switch (pixel_format) {
+        case SAIL_PIXEL_FORMAT_BPP1_INDEXED:
+        case SAIL_PIXEL_FORMAT_BPP2_INDEXED:
+        case SAIL_PIXEL_FORMAT_BPP4_INDEXED:
+        case SAIL_PIXEL_FORMAT_BPP8_INDEXED:
         case SAIL_PIXEL_FORMAT_BPP24_RGB:
         case SAIL_PIXEL_FORMAT_BPP24_BGR:
         case SAIL_PIXEL_FORMAT_BPP48_RGB:

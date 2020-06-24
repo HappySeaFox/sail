@@ -657,6 +657,23 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v2(void *state, struc
         SAIL_LOG_DEBUG("PNG: ICC profile has been set");
     }
 
+    /* Write palette. */
+    if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP1_INDEXED ||
+            image->pixel_format == SAIL_PIXEL_FORMAT_BPP2_INDEXED ||
+            image->pixel_format == SAIL_PIXEL_FORMAT_BPP4_INDEXED ||
+            image->pixel_format == SAIL_PIXEL_FORMAT_BPP8_INDEXED) {
+        if (image->palette == NULL) {
+            png_error(png_state->png_ptr, "The indexed image has no palette");
+        }
+
+        if (image->palette->pixel_format != SAIL_PIXEL_FORMAT_BPP24_RGB) {
+            png_error(png_state->png_ptr, "Palettes not in BPP24-RGB format are not supported");
+        }
+
+        /* Palette is deep copied. */
+        png_set_PLTE(png_state->png_ptr, png_state->info_ptr, image->palette->data, image->palette->color_count);
+    }
+
     const int compression = (png_state->write_options->compression < COMPRESSION_MIN ||
                                 png_state->write_options->compression > COMPRESSION_MAX)
                             ? COMPRESSION_DEFAULT
