@@ -114,7 +114,7 @@ source_image::source_image(const sail_source_image *si)
 
 sail_error_t source_image::to_sail_source_image(sail_source_image *si) const
 {
-    SAIL_CHECK_IMAGE_PTR(si);
+    SAIL_CHECK_SOURCE_IMAGE_PTR(si);
 
     si->pixel_format     = d->source_image->pixel_format;
     si->properties       = d->source_image->properties;
