@@ -119,9 +119,7 @@ unsigned char *image_bits = NULL;
  * for image formats with transparency support and BPP24-RGB otherwise.
  */
 SAIL_TRY_OR_CLEANUP(sail_start_reading_file(path, context, NULL, &state),
-                    /* cleanup */ sail_stop_reading(state),
-                                  free(image_bits),
-                                  sail_destroy_image(image));
+                    /* cleanup */ sail_stop_reading(state));
 
 /*
  * Read just a single frame. It's possible to read more frames if any. Just continue
