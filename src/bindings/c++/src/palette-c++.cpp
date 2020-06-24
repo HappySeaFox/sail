@@ -97,6 +97,12 @@ unsigned palette::color_count() const
 
 palette& palette::with_data(SailPixelFormat pixel_format, const void *data, unsigned color_count)
 {
+    free(d->data);
+    d->data = nullptr;
+
+    d->pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;
+    d->color_count  = 0;
+
     SAIL_TRY_OR_SUPPRESS(copy(pixel_format, data, color_count));
 
     return *this;
