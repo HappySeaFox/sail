@@ -104,6 +104,30 @@ sail_error_t pixel_format_to_png_color_type(int pixel_format, int *color_type, i
     SAIL_CHECK_PTR(bit_depth);
 
     switch (pixel_format) {
+        case SAIL_PIXEL_FORMAT_BPP1_INDEXED: {
+            *color_type = PNG_COLOR_TYPE_PALETTE;
+            *bit_depth = 1;
+            return 0;
+        }
+
+        case SAIL_PIXEL_FORMAT_BPP2_INDEXED: {
+            *color_type = PNG_COLOR_TYPE_PALETTE;
+            *bit_depth = 2;
+            return 0;
+        }
+
+        case SAIL_PIXEL_FORMAT_BPP4_INDEXED: {
+            *color_type = PNG_COLOR_TYPE_PALETTE;
+            *bit_depth = 4;
+            return 0;
+        }
+
+        case SAIL_PIXEL_FORMAT_BPP8_INDEXED: {
+            *color_type = PNG_COLOR_TYPE_PALETTE;
+            *bit_depth = 8;
+            return 0;
+        }
+
         case SAIL_PIXEL_FORMAT_BPP24_RGB:
         case SAIL_PIXEL_FORMAT_BPP24_BGR: {
             *color_type = PNG_COLOR_TYPE_RGB;
@@ -160,6 +184,10 @@ sail_error_t supported_read_output_pixel_format(int pixel_format) {
 sail_error_t supported_write_input_pixel_format(int pixel_format) {
 
     switch (pixel_format) {
+        case SAIL_PIXEL_FORMAT_BPP1_INDEXED:
+        case SAIL_PIXEL_FORMAT_BPP2_INDEXED:
+        case SAIL_PIXEL_FORMAT_BPP4_INDEXED:
+        case SAIL_PIXEL_FORMAT_BPP8_INDEXED:
         case SAIL_PIXEL_FORMAT_BPP24_RGB:
         case SAIL_PIXEL_FORMAT_BPP24_BGR:
         case SAIL_PIXEL_FORMAT_BPP48_RGB:
@@ -249,6 +277,46 @@ sail_error_t write_png_text(png_structp png_ptr, png_infop info_ptr, const struc
     return 0;
 }
 
+sail_error_t fetch_iccp(png_structp png_ptr, png_infop info_ptr, struct sail_iccp **iccp) {
+
+    SAIL_CHECK_PTR(png_ptr);
+    SAIL_CHECK_PTR(info_ptr);
+    SAIL_CHECK_PTR(iccp);
+
+    char *name;
+    int compression;
+    png_bytep data;
+    unsigned data_length;
+
+    bool ok = png_get_iCCP(png_ptr,
+                           info_ptr,
+                           &name,
+                           &compression,
+                           &data,
+                           &data_length) == PNG_INFO_iCCP;
+
+    if (ok) {
+        SAIL_TRY(sail_alloc_iccp(iccp));
+
+        (*iccp)->data = malloc(data_length);
+
+        if ((*iccp)->data == NULL) {
+            return SAIL_MEMORY_ALLOCATION_FAILED;
+        }
+
+        memcpy((*iccp)->data, data, data_length);
+        (*iccp)->data_length = data_length;
+
+        SAIL_LOG_DEBUG("PNG: Found ICC profile '%s' %u bytes long", name, data_length);
+    } else {
+        SAIL_LOG_DEBUG("PNG: ICC profile is not found");
+    }
+
+    return 0;
+}
+
+#ifdef PNG_APNG_SUPPORTED
+
 sail_error_t blend_source(unsigned bytes_per_pixel, void *dst_raw, unsigned dst_offset, const void *src_raw, unsigned src_length) {
 
     SAIL_CHECK_PTR(dst_raw);
@@ -302,46 +370,6 @@ sail_error_t blend_over(unsigned bytes_per_pixel, unsigned width, const void *sr
 
     return 0;
 }
-
-sail_error_t fetch_iccp(png_structp png_ptr, png_infop info_ptr, struct sail_iccp **iccp) {
-
-    SAIL_CHECK_PTR(png_ptr);
-    SAIL_CHECK_PTR(info_ptr);
-    SAIL_CHECK_PTR(iccp);
-
-    char *name;
-    int compression;
-    png_bytep data;
-    unsigned data_length;
-
-    bool ok = png_get_iCCP(png_ptr,
-                           info_ptr,
-                           &name,
-                           &compression,
-                           &data,
-                           &data_length) == PNG_INFO_iCCP;
-
-    if (ok) {
-        SAIL_TRY(sail_alloc_iccp(iccp));
-
-        (*iccp)->data = malloc(data_length);
-
-        if ((*iccp)->data == NULL) {
-            return SAIL_MEMORY_ALLOCATION_FAILED;
-        }
-
-        memcpy((*iccp)->data, data, data_length);
-        (*iccp)->data_length = data_length;
-
-        SAIL_LOG_DEBUG("PNG: Found ICC profile '%s' %u bytes long", name, data_length);
-    } else {
-        SAIL_LOG_DEBUG("PNG: ICC profile is not found");
-    }
-
-    return 0;
-}
-
-#ifdef PNG_APNG_SUPPORTED
 
 sail_error_t skip_hidden_frame(unsigned bytes_per_line, unsigned height, png_structp png_ptr, png_infop info_ptr, void **row) {
 

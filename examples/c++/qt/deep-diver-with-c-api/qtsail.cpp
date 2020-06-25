@@ -266,6 +266,34 @@ sail_error_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffer
     image->width = qimage.width();
     image->height = qimage.height();
     image->pixel_format = qImageFormatToSailPixelFormat(qimage.format());
+
+    /*
+     * Apply palette.
+     */
+    if (qimage.format() == QImage::Format_Indexed8) {
+        SAIL_TRY_OR_CLEANUP(sail_alloc_palette(&image->palette),
+                            /* cleanup */ sail_destroy_image(image));
+
+        const QVector<QRgb> colorTable = qimage.colorTable();
+
+        image->palette->pixel_format = SAIL_PIXEL_FORMAT_BPP24_RGB;
+        image->palette->color_count = colorTable.size();
+        image->palette->data = malloc(3 * image->palette->color_count);
+
+        if (image->palette->data == NULL) {
+            sail_destroy_image(image);
+            return SAIL_MEMORY_ALLOCATION_FAILED;
+        }
+
+        unsigned char *rgbData = reinterpret_cast<unsigned char *>(image->palette->data);
+
+        for(QRgb rgb : colorTable) {
+            *rgbData++ = qRed(rgb);
+            *rgbData++ = qGreen(rgb);
+            *rgbData++ = qBlue(rgb);
+        }
+    }
+
     SAIL_TRY(sail_bytes_per_line(image->width, image->pixel_format, &image->bytes_per_line));
 
     if (image->pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN) {
