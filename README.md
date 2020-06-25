@@ -95,6 +95,12 @@ SAIL plugins are the deepest level. This is a set of standalone, dynamically loa
 and DLL on Windows). They implement actual decoding and encoding capabilities. End-users never work with
 plugins directly. They always use abstract, high-level APIs for that.
 
+Every plugin is accompanied with a so called plugin info (description) file which is just a plain text file.
+It describes what the plugin can actually do: what pixel formats it can read and output, what compression types
+does it support, specifies a preferred output pixel format, and more.
+
+By default, SAIL loads plugins on demand. To preload them, use `sail_init_with_flags(SAIL_FLAG_PRELOAD_PLUGINS)`.
+
 ### libsail-common
 
 libsail-common holds common data types (images, pixel formats, I/O abstractions etc.) and a small set
