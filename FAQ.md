@@ -48,7 +48,7 @@ with the plugins directly. They always work with the abstract high-level APIs.
 ## Does SAIL preload all plugins in the initialization routine?
 
 No. By default, SAIL doesn't preload all plugins in the initialization routine (`sail_init()`). It loads them on demand.
-However, you could preload them explicitly with `sail_init(SAIL_FLAG_PRELOAD_PLUGINS)`.
+However, you could preload them explicitly with `sail_init_with_flags(SAIL_FLAG_PRELOAD_PLUGINS)`.
 
 ## Describe the high-level APIs
 
