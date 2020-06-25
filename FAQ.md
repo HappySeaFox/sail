@@ -5,6 +5,7 @@ Table of Contents
   * [How old is SAIL?](#how-old-is-sail)
   * [Is SAIL cross\-platform?](#is-sail-cross-platform)
   * [How does SAIL support image formats?](#how-does-sail-support-image-formats)
+  * [Can I implement an image decoding plugin in C\+\+?](#can-i-implement-an-image-decoding-plugin-in-c)
   * [Does SAIL preload all plugins in the initialization routine?](#does-sail-preload-all-plugins-in-the-initialization-routine)
   * [Describe the high\-level APIs](#describe-the-high-level-apis)
   * [How many image formats do you plan to implement?](#how-many-image-formats-do-you-plan-to-implement)
@@ -45,10 +46,15 @@ are currently supported. Pull requests to support more platforms are highly welc
 SAIL supports image formats through dynamically loaded SAIL plugins (codecs). End-users never work
 with the plugins directly. They always work with the abstract high-level APIs.
 
+## Can I implement an image decoding plugin in C++?
+
+Yes. Your plugin just needs to export a set of public functions so SAIL can recognize and use it.
+Theoretically, you can implement your plugin in any programming language.
+
 ## Does SAIL preload all plugins in the initialization routine?
 
 No. By default, SAIL doesn't preload all plugins in the initialization routine (`sail_init()`). It loads them on demand.
-However, you could preload them explicitly with `sail_init_with_flags(SAIL_FLAG_PRELOAD_PLUGINS)`.
+However, you can preload them explicitly with `sail_init_with_flags(SAIL_FLAG_PRELOAD_PLUGINS)`.
 
 ## Describe the high-level APIs
 
