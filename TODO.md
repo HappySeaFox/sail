@@ -18,6 +18,8 @@
 
 - C++ move ctors
 
+- add benchmarks to README
+
 - tests
   - check all plugins have the same layout version
   - check all plugins could be loaded
@@ -41,8 +43,6 @@
 - only-, except- cmake runtime defines for bindings ?
 
 - document how SAIL uses plugins APIs
-
-- add benchmarks to README
 
 - enum class in C++?
 
