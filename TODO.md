@@ -6,6 +6,8 @@
 
 - Remove the scanline reading interface and make an interface to read entire frames?
 
+- Probing function for memory & IO: sail_probe_file, sail_probe_mem, sail_probe_io
+
 - document c++ classes
 
 - detect images by magic? Non-seekable I/O sources will not be allowed then
