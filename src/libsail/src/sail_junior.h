@@ -44,7 +44,7 @@ struct sail_io;
 struct sail_plugin_info;
 
 /*
- * Loads the specified image and returns its properties without pixel data. The assigned image
+ * Loads the specified image file and returns its properties without pixel data. The assigned image
  * MUST be destroyed later with sail_destroy_image(). The assigned plugin info MUST NOT be destroyed
  * because it is a pointer to an internal data structure. If you don't need it, just pass NULL.
  *
@@ -54,8 +54,8 @@ struct sail_plugin_info;
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_probe(const char *path, struct sail_context *context,
-                                    struct sail_image **image, const struct sail_plugin_info **plugin_info);
+SAIL_EXPORT sail_error_t sail_probe_file(const char *path, struct sail_context *context,
+                                        struct sail_image **image, const struct sail_plugin_info **plugin_info);
 
 /*
  * Loads the specified image file and returns its properties and pixel data. The assigned image
