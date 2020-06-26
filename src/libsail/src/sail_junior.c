@@ -30,40 +30,63 @@
 #include "sail-common.h"
 #include "sail.h"
 
-sail_error_t sail_probe_file(const char *path, struct sail_context *context, struct sail_image **image, const struct sail_plugin_info **plugin_info) {
+sail_error_t sail_probe_io(struct sail_io *io, struct sail_context *context, struct sail_image **image, const struct sail_plugin_info **plugin_info) {
 
-    SAIL_CHECK_PATH_PTR(path);
+    SAIL_CHECK_IO_PTR(io);
     SAIL_CHECK_CONTEXT_PTR(context);
 
     const struct sail_plugin_info *plugin_info_noop;
     const struct sail_plugin_info **plugin_info_local = plugin_info == NULL ? &plugin_info_noop : plugin_info;
 
-    SAIL_TRY(sail_plugin_info_from_path(path, context, plugin_info_local));
+    SAIL_TRY(sail_plugin_info_by_magic_from_io(io, context, plugin_info_local));
 
     const struct sail_plugin *plugin;
     SAIL_TRY(load_plugin_by_plugin_info(context, *plugin_info_local, &plugin));
-
-    struct sail_io *io;
-    SAIL_TRY(alloc_io_read_file(path, &io));
 
     struct sail_read_options *read_options_local = NULL;
     void *state = NULL;
 
     SAIL_TRY_OR_CLEANUP(sail_alloc_read_options_from_features((*plugin_info_local)->read_features, &read_options_local),
-                        /* cleanup */ sail_destroy_read_options(read_options_local),
-                                      sail_destroy_io(io));
+                        /* cleanup */ sail_destroy_read_options(read_options_local));
 
     SAIL_TRY_OR_CLEANUP(plugin->v2->read_init_v2(io, read_options_local, &state),
                         /* cleanup */ plugin->v2->read_finish_v2(&state, io),
-                                      sail_destroy_read_options(read_options_local),
-                                      sail_destroy_io(io));
+                                      sail_destroy_read_options(read_options_local));
 
     sail_destroy_read_options(read_options_local);
 
     SAIL_TRY_OR_CLEANUP(plugin->v2->read_seek_next_frame_v2(state, io, image),
-                        /* cleanup */ plugin->v2->read_finish_v2(&state, io),
-                                      sail_destroy_io(io));
-    SAIL_TRY_OR_CLEANUP(plugin->v2->read_finish_v2(&state, io),
+                        /* cleanup */ plugin->v2->read_finish_v2(&state, io));
+    SAIL_TRY(plugin->v2->read_finish_v2(&state, io));
+
+    return 0;
+}
+
+sail_error_t sail_probe_file(const char *path, struct sail_context *context, struct sail_image **image, const struct sail_plugin_info **plugin_info) {
+
+    SAIL_CHECK_PATH_PTR(path);
+    SAIL_CHECK_CONTEXT_PTR(context);
+
+    struct sail_io *io;
+    SAIL_TRY(alloc_io_read_file(path, &io));
+
+    SAIL_TRY_OR_CLEANUP(sail_probe_io(io, context, image, plugin_info),
+                        /* cleanup */ sail_destroy_io(io));
+
+    sail_destroy_io(io);
+
+    return 0;
+}
+
+sail_error_t sail_probe_mem(const void *buffer, size_t buffer_length, struct sail_context *context, struct sail_image **image, const struct sail_plugin_info **plugin_info) {
+
+    SAIL_CHECK_BUFFER_PTR(buffer);
+    SAIL_CHECK_CONTEXT_PTR(context);
+
+    struct sail_io *io;
+    SAIL_TRY(alloc_io_read_mem(buffer, buffer_length, &io));
+
+    SAIL_TRY_OR_CLEANUP(sail_probe_io(io, context, image, plugin_info),
                         /* cleanup */ sail_destroy_io(io));
 
     sail_destroy_io(io);
