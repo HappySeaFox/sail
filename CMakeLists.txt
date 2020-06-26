@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.6)
 
 project(SAIL VERSION 0.9.0
-             DESCRIPTION "Squirrel Abstract Image Libraries"
+             DESCRIPTION "Squirrel Abstract Image Library"
              LANGUAGES C CXX)
 set(SAIL_DEV_VERSION_SUFFIX "pre2")
 
