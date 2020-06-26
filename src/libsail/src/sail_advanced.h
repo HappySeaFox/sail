@@ -42,6 +42,34 @@ struct sail_context;
 struct sail_plugin_info;
 
 /*
+ * Loads an image from the specified I/O source and returns its properties without pixel data. The assigned image
+ * MUST be destroyed later with sail_destroy_image(). The assigned plugin info MUST NOT be destroyed
+ * because it is a pointer to an internal data structure. If you don't need it, just pass NULL.
+ *
+ * This function is pretty fast because it doesn't decode whole image data for most image formats.
+ *
+ * Typical usage: This is a standalone function that could be called at any time.
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_probe_io(struct sail_io *io, struct sail_context *context,
+                                       struct sail_image **image, const struct sail_plugin_info **plugin_info);
+
+/*
+ * Loads an image from the specified memory buffer and returns its properties without pixel data. The assigned image
+ * MUST be destroyed later with sail_destroy_image(). The assigned plugin info MUST NOT be destroyed
+ * because it is a pointer to an internal data structure. If you don't need it, just pass NULL.
+ *
+ * This function is pretty fast because it doesn't decode whole image data for most image formats.
+ *
+ * Typical usage: This is a standalone function that could be called at any time.
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_probe_mem(const void *buffer, size_t buffer_length, struct sail_context *context,
+                                        struct sail_image **image, const struct sail_plugin_info **plugin_info);
+
+/*
  * Starts reading the specified image file. Pass plugin info if you would like to start reading
  * with a specific codec. If not, just pass NULL.
  *
