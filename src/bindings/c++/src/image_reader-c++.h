@@ -56,6 +56,9 @@ public:
     image_reader(context *ctx);
     ~image_reader();
 
+    /*
+     * Returns true if the underlying context object is valid.
+     */
     bool is_valid() const;
 
     /*
