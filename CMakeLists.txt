@@ -81,6 +81,11 @@ set(BUILD_SHARED_LIBS ON)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_EXTENSIONS OFF)
 
+# Enable strict C++11
+#
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 # Internal flag used to include SAIL headers locally with "header.h" or <sail/header.h> otherwise
 #
 add_definitions(-DSAIL_BUILD)
