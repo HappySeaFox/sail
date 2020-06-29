@@ -111,10 +111,6 @@ elseif (CMAKE_COMPILER_IS_GNUCC)
     if (SAIL_DEV)
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic")
-
-        # ASAN flags used in sail_enable_asan()
-        #
-        set(SAIL_ASAN_FLAGS "-fsanitize=address,leak")
     endif()
 endif()
 
