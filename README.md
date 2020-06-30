@@ -25,6 +25,7 @@ Author: Dmitry Baryshev
 - Image formats are supported through dynamically loaded SAIL plugins (codecs)
 - Reading images from file and memory
 - Writing images to file and memory
+- Detecting image types by file path, file extension, and [https://en.wikipedia.org/wiki/File_format#Magic_number](magic numbers)
 - I/O abstraction for technical divers
 - Reading operations are always able to output pixels in the `BPP24-RGB` and `BPP32-RGBA` formats.
   Some image format plugins may output even more
