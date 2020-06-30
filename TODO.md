@@ -14,6 +14,8 @@
 
 - C++ move ctors
 
+- C++ return const refs
+
 - add benchmarks to README
 
 - tests
