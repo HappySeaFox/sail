@@ -138,13 +138,21 @@ endif()
 #
 if (WIN32)
     set(SAIL_WIN32 ON)
-elseif (UNIX)
+endif()
+
+if (UNIX)
     set(SAIL_UNIX ON)
-elseif (MINGW)
+endif()
+
+if (MINGW)
     set(SAIL_MINGW ON)
-elseif (CYGWIN)
+endif()
+
+if (CYGWIN)
     set(SAIL_CYGWIN ON)
-elseif (APPLE)
+endif()
+
+if (APPLE)
     set(SAIL_APPLE ON)
 endif()
 
