@@ -101,7 +101,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
      * See https://en.wikipedia.org/wiki/File_format#Magic_number.
      */
     const struct sail_plugin_info *plugin_info;
-    SAIL_TRY(sail_plugin_info_by_magic_number_from_file(path.toLocal8Bit(), m_context, &plugin_info));
+    SAIL_TRY(sail_plugin_info_by_magic_number_from_path(path.toLocal8Bit(), m_context, &plugin_info));
 
     /*
      * Allocate new read options and copy defaults from the plugin-specific read features

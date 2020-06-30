@@ -145,14 +145,14 @@ SAIL_EXPORT sail_error_t sail_plugin_info_from_path(const char *path, const stru
  *
  * The assigned plugin info MUST NOT be destroyed. It is a pointer to an internal data structure.
  *
- * Typical usage: sail_plugin_info_by_magic_number_from_file() ->
+ * Typical usage: sail_plugin_info_by_magic_number_from_path() ->
  *                sail_start_reading_file()                    ->
  *                sail_read_next_frame()                       ->
  *                sail_stop_reading().
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_info_by_magic_number_from_file(const char *path, const struct sail_context *context,
+SAIL_EXPORT sail_error_t sail_plugin_info_by_magic_number_from_path(const char *path, const struct sail_context *context,
                                                                     const struct sail_plugin_info **plugin_info);
 
 /*

@@ -415,7 +415,7 @@ sail_error_t sail_plugin_info_from_path(const char *path, const struct sail_cont
     return 0;
 }
 
-sail_error_t sail_plugin_info_by_magic_number_from_file(const char *path, const struct sail_context *context, const struct sail_plugin_info **plugin_info) {
+sail_error_t sail_plugin_info_by_magic_number_from_path(const char *path, const struct sail_context *context, const struct sail_plugin_info **plugin_info) {
 
     SAIL_CHECK_PATH_PTR(path);
     SAIL_CHECK_CONTEXT_PTR(context);
