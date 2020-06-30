@@ -68,6 +68,11 @@ public:
     sail_error_t probe_path(const char *path, image *simage, plugin_info *splugin_info = nullptr);
 
     /*
+     * An interface to sail_probe_mem(). See sail_probe_mem() for more.
+     */
+    sail_error_t probe_mem(const void *buffer, size_t buffer_length, image *simage, plugin_info *splugin_info = nullptr);
+
+    /*
      * An interface to sail_read(). See sail_read() for more.
      */
     sail_error_t read(const std::string &path, image *simage);

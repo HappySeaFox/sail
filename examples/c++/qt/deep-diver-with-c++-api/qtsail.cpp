@@ -389,10 +389,21 @@ sail_error_t QtSail::onProbe()
     sail_error_t res;
     sail::image_reader reader(&m_context);
 
+    // Load the file into memeory
+    QFile file(path);
+
+    if (!file.open(QIODevice::ReadOnly)) {
+        QMessageBox::critical(this, tr("Error"), tr("Failed to open the file. Error: %1").arg(file.errorString()));
+        return SAIL_FILE_OPEN_ERROR;
+    }
+
+    const QByteArray buffer = file.readAll();
+
     sail::image image;
     sail::plugin_info plugin_info;
 
-    if ((res = reader.probe_path(path.toLocal8Bit(), &image, &plugin_info)) != 0) {
+    // Probe from memory
+    if ((res = reader.probe_mem(buffer.constData(), buffer.length(), &image, &plugin_info)) != 0) {
         QMessageBox::critical(this, tr("Error"), tr("Failed to probe the image. Error: %1").arg(res));
         return res;
     }
