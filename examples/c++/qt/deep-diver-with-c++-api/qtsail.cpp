@@ -88,10 +88,11 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     QElapsedTimer elapsed;
     elapsed.start();
 
-    // Find the codec info by a file extension.
+    // Find the codec info by a file magic number.
+    // See https://en.wikipedia.org/wiki/File_format#Magic_number.
     //
     sail::plugin_info plugin_info;
-    SAIL_TRY(m_context.plugin_info_from_path(path.toLocal8Bit(), &plugin_info));
+    SAIL_TRY(m_context.plugin_info_by_magic_number_from_path(path.toLocal8Bit(), &plugin_info));
     pluginInfo(plugin_info);
 
     // Allocate new read options and copy defaults from the read features

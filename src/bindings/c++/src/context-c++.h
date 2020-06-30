@@ -43,6 +43,7 @@ namespace sail
 {
 
 class plugin_info;
+class io;
 
 /*
  * Context is a main entry point to start working with SAIL. It enumerates plugin info objects which could be
@@ -103,6 +104,46 @@ public:
      * Returns 0 on success or sail_error_t on error.
      */
     sail_error_t unload_plugins();
+
+    /*
+     * Finds a first plugin info object that supports the magic number read from the specified file.
+     * The comparison algorithm is case insensitive.
+     *
+     * Typical usage: context::plugin_info_by_magic_number_from_path() ->
+     *                image_reader::start_reading_file()               ->
+     *                image_reader::read_next_frame()                  ->
+     *                image_reader::stop_reading().
+     *
+     * Returns 0 on success or sail_error_t on error.
+     */
+    sail_error_t plugin_info_by_magic_number_from_path(const std::string &path, plugin_info *splugin_info) const;
+    sail_error_t plugin_info_by_magic_number_from_path(const char *path, plugin_info *splugin_info) const;
+
+    /*
+     * Finds a first plugin info object that supports the magic number read from the specified memory buffer.
+     * The comparison algorithm is case insensitive.
+     *
+     * Typical usage: context::plugin_info_by_magic_number_from_mem() ->
+     *                image_reader::start_reading_file()              ->
+     *                image_reader::read_next_frame()                 ->
+     *                image_reader::stop_reading().
+     *
+     * Returns 0 on success or sail_error_t on error.
+     */
+    sail_error_t plugin_info_by_magic_number_from_mem(const void *buffer, size_t buffer_length, plugin_info *splugin_info) const;
+
+    /*
+     * Finds a first plugin info object that supports the magic number read from the specified I/O source.
+     * The comparison algorithm is case insensitive.
+     *
+     * Typical usage: context::plugin_info_by_magic_number_from_io() ->
+     *                image_reader::start_reading_file()             ->
+     *                image_reader::read_next_frame()                ->
+     *                image_reader::stop_reading().
+     *
+     * Returns 0 on success or sail_error_t on error.
+     */
+    sail_error_t plugin_info_by_magic_number_from_io(const sail::io &io, plugin_info *splugin_info) const;
 
     /*
      * Finds a first plugin info object that supports reading or writing the specified file path by its file extension.

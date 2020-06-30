@@ -66,6 +66,8 @@ Plugins with missing dependencies will be disabled regardless this setting")
 set(SAIL_EXCEPT_PLUGINS "" CACHE STRING "Enable all plugins except the plugins specified in this ';'-separated list. \
 Plugins with missing dependencies will be disabled regardless this setting")
 
+set(SAIL_MAGIC_BUFFER_SIZE 10)
+
 # TODO Move to a Debian patch
 # Set arch-specific include/lib dirs
 #

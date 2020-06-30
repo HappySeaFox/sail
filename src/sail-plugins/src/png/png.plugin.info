@@ -5,6 +5,7 @@ layout=2
 version=1.1.3
 name=PNG
 description=Portable Network Graphics
+magic-numbers=89 50 4E 47 0D 0A 1A 0A
 extensions=png@PLUGIN_INFO_EXTENSION_APNG@
 mime-types=image/png
 
