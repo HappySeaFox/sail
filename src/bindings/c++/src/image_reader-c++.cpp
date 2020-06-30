@@ -137,6 +137,32 @@ sail_error_t image_reader::probe_mem(const void *buffer, size_t buffer_length, i
     return 0;
 }
 
+sail_error_t image_reader::probe_io(const sail::io &io, image *simage, plugin_info *splugin_info)
+{
+    SAIL_CHECK_CONTEXT_PTR(d->ctx);
+    SAIL_CHECK_IMAGE_PTR(simage);
+
+    struct sail_io sail_io;
+    SAIL_TRY(io.to_sail_io(&sail_io));
+
+    const sail_plugin_info *sail_plugin_info;
+    sail_image *sail_image;
+
+    SAIL_TRY(sail_probe_io(&sail_io,
+                           d->ctx->sail_context_c(),
+                           &sail_image,
+                           &sail_plugin_info));
+
+    *simage = image(sail_image);
+    sail_destroy_image(sail_image);
+
+    if (splugin_info != nullptr) {
+        *splugin_info = plugin_info(sail_plugin_info);
+    }
+
+    return 0;
+}
+
 sail_error_t image_reader::read(const std::string &path, image *simage)
 {
     SAIL_TRY(read(path.c_str(), simage));
