@@ -226,7 +226,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     sail_pixel_format_to_string(image->source_image->pixel_format, &source_pixel_format_str);
     sail_pixel_format_to_string(image->pixel_format, &pixel_format_str);
 
-    m_ui->labelStatus->setText(tr("%1  [%2x%3]  [%4 -> %5]  %6")
+    m_ui->labelStatus->setText(tr("%1  [%2x%3]  [%4 → %5]  %6")
                                 .arg(QFileInfo(path).fileName())
                                 .arg(image->width)
                                 .arg(image->height)

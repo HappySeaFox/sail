@@ -200,7 +200,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 
     m_suffix = QFileInfo(path).suffix();
 
-    m_ui->labelStatus->setText(tr("%1  [%2x%3]  [%4 -> %5]  %6")
+    m_ui->labelStatus->setText(tr("%1  [%2x%3]  [%4 → %5]  %6")
                                 .arg(QFileInfo(path).fileName())
                                 .arg(image.width())
                                 .arg(image.height())
