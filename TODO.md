@@ -8,11 +8,7 @@
 
 - document c++ classes
 
-- detect images by magic? Non-seekable I/O sources will not be allowed then
-
 - static compilation
-
-- compile dependencies statically on Windows?
 
 - remove SAIL_CHECK_xxx checks in plugins? Are they needed? libsail does them as well
 
@@ -27,6 +23,8 @@
   - all plugins have RGB and RGBA output
 
 ## Priority 2
+
+- Add HomeBrew tap for MacOS
 
 - Print more errors on 'return SAIL_XXX'
 

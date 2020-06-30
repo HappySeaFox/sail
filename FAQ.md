@@ -38,7 +38,7 @@ Technically, SAIL was founded in 2003 making it one of the oldest image decoding
 
 ## Is SAIL cross-platform?
 
-Yes. It's written in pure C11 and is highly portable. However, only the Windows and Linux platforms
+Yes. It's written in pure C11 and is highly portable. However, only the Windows, MacOS, and Linux platforms
 are currently supported. Pull requests to support more platforms are highly welcomed.
 
 ## How does SAIL support image formats?

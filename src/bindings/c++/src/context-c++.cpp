@@ -89,6 +89,52 @@ sail_error_t context::unload_plugins()
     return 0;
 }
 
+sail_error_t context::plugin_info_by_magic_number_from_path(const std::string &path, plugin_info *splugin_info) const
+{
+    SAIL_TRY(plugin_info_by_magic_number_from_path(path.c_str(), splugin_info));
+
+    return 0;
+}
+
+sail_error_t context::plugin_info_by_magic_number_from_path(const char *path, plugin_info *splugin_info) const
+{
+    SAIL_CHECK_PLUGIN_INFO_PTR(splugin_info);
+
+    const struct sail_plugin_info *sail_plugin_info;
+    SAIL_TRY(sail_plugin_info_by_magic_number_from_path(path, d->context, &sail_plugin_info));
+
+    *splugin_info = plugin_info(sail_plugin_info);
+
+    return 0;
+}
+
+sail_error_t context::plugin_info_by_magic_number_from_mem(const void *buffer, size_t buffer_length, plugin_info *splugin_info) const
+{
+    SAIL_CHECK_PLUGIN_INFO_PTR(splugin_info);
+
+    const struct sail_plugin_info *sail_plugin_info;
+    SAIL_TRY(sail_plugin_info_by_magic_number_from_mem(buffer, buffer_length, d->context, &sail_plugin_info));
+
+    *splugin_info = plugin_info(sail_plugin_info);
+
+    return 0;
+}
+
+sail_error_t context::plugin_info_by_magic_number_from_io(const sail::io &io, plugin_info *splugin_info) const
+{
+    SAIL_CHECK_PLUGIN_INFO_PTR(splugin_info);
+
+    struct sail_io sail_io;
+    SAIL_TRY(io.to_sail_io(&sail_io));
+
+    const struct sail_plugin_info *sail_plugin_info;
+    SAIL_TRY(sail_plugin_info_by_magic_number_from_io(&sail_io, d->context, &sail_plugin_info));
+
+    *splugin_info = plugin_info(sail_plugin_info);
+
+    return 0;
+}
+
 sail_error_t context::plugin_info_from_path(const std::string &path, plugin_info *splugin_info) const
 {
     SAIL_TRY(plugin_info_from_path(path.c_str(), splugin_info));

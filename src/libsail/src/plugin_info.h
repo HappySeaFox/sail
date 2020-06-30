@@ -57,6 +57,12 @@ struct sail_plugin_info {
     /* Plugin description. For example: "Joint Photographic Experts Group". */
     char *description;
 
+    /*
+     * A linked list of supported magic numbers. For example: "FF D8" for JPEGs.
+     * See https://en.wikipedia.org/wiki/File_format#Magic_number.
+     */
+    struct sail_string_node *magic_number_node;
+
     /* A linked list of supported file extensions. For example: "jpg", "jpeg". */
     struct sail_string_node *extension_node;
 

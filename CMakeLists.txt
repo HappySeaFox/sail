@@ -66,6 +66,8 @@ Plugins with missing dependencies will be disabled regardless this setting")
 set(SAIL_EXCEPT_PLUGINS "" CACHE STRING "Enable all plugins except the plugins specified in this ';'-separated list. \
 Plugins with missing dependencies will be disabled regardless this setting")
 
+set(SAIL_MAGIC_BUFFER_SIZE 10)
+
 # TODO Move to a Debian patch
 # Set arch-specific include/lib dirs
 #
@@ -80,6 +82,11 @@ set(BUILD_SHARED_LIBS ON)
 #
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_EXTENSIONS OFF)
+
+# Enable strict C++11
+#
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Internal flag used to include SAIL headers locally with "header.h" or <sail/header.h> otherwise
 #
@@ -106,10 +113,6 @@ elseif (CMAKE_COMPILER_IS_GNUCC)
     if (SAIL_DEV)
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic")
-
-        # Enable ASAN
-        #
-        set(SAIL_ASAN_FLAGS "-fsanitize=address,leak")
     endif()
 endif()
 
@@ -137,12 +140,22 @@ endif()
 #
 if (WIN32)
     set(SAIL_WIN32 ON)
-elseif (UNIX)
+endif()
+
+if (UNIX)
     set(SAIL_UNIX ON)
-elseif (MINGW)
+endif()
+
+if (MINGW)
     set(SAIL_MINGW ON)
-elseif (CYGWIN)
+endif()
+
+if (CYGWIN)
     set(SAIL_CYGWIN ON)
+endif()
+
+if (APPLE)
+    set(SAIL_APPLE ON)
 endif()
 
 # Common required packages

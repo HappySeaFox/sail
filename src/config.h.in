@@ -46,5 +46,9 @@
 #cmakedefine SAIL_WIN32
 #cmakedefine SAIL_MINGW
 #cmakedefine SAIL_CYGWIN
+#cmakedefine SAIL_APPLE
+
+/* Buffer size to read from I/O sources to detect file types by magic numbers. */
+#cmakedefine SAIL_MAGIC_BUFFER_SIZE @SAIL_MAGIC_BUFFER_SIZE@
 
 #endif
