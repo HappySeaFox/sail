@@ -26,7 +26,7 @@
      <item>
       <widget class="QToolButton" name="pushProbe">
        <property name="text">
-        <string>Probe file...</string>
+        <string>Probe memory...</string>
        </property>
       </widget>
      </item>
