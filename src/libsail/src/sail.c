@@ -472,7 +472,7 @@ sail_error_t sail_plugin_info_by_magic_number_from_io(struct sail_io *io, const 
     char hex_numbers[SAIL_MAGIC_BUFFER_SIZE * 3 + 1];
     char *hex_numbers_ptr = hex_numbers;
 
-    for (int i = 0; i < nbytes; i++, hex_numbers_ptr += 3) {
+    for (size_t i = 0; i < nbytes; i++, hex_numbers_ptr += 3) {
 #ifdef SAIL_WIN32
         sprintf_s(hex_numbers_ptr, 4, "%02x ", buffer[i]);
 #else
