@@ -212,6 +212,24 @@ static int inih_handler(void *data, const char *section, const char *name, const
             if ((res = sail_strdup(value, &plugin_info->description)) != 0) {
                 return 0;
             }
+        } else if (strcmp(name, "magic-numbers") == 0) {
+            if (split_into_string_node_chain(value, &plugin_info->magic_number_node) != 0) {
+                return 0;
+            }
+
+            struct sail_string_node *node = plugin_info->magic_number_node;
+
+            while (node != NULL) {
+                if (strlen(node->value) > SAIL_MAGIC_BUFFER_SIZE * 3 - 1) {
+                    SAIL_LOG_ERROR("Magic number '%s' is too long. Magic numbers for the '%s' codec are disabled", node->value, plugin_info->name);
+                    destroy_string_node_chain(plugin_info->magic_number_node);
+                    plugin_info->magic_number_node = NULL;
+                    break;
+                }
+
+                sail_to_lower(node->value);
+                node = node->next;
+            }
         } else if (strcmp(name, "extensions") == 0) {
             if (split_into_string_node_chain(value, &plugin_info->extension_node) != 0) {
                 return 0;
@@ -350,15 +368,16 @@ static sail_error_t alloc_plugin_info(struct sail_plugin_info **plugin_info) {
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
-    (*plugin_info)->path            = NULL;
-    (*plugin_info)->layout          = 0;
-    (*plugin_info)->version         = NULL;
-    (*plugin_info)->name            = NULL;
-    (*plugin_info)->description     = NULL;
-    (*plugin_info)->extension_node  = NULL;
-    (*plugin_info)->mime_type_node  = NULL;
-    (*plugin_info)->read_features   = NULL;
-    (*plugin_info)->write_features  = NULL;
+    (*plugin_info)->path              = NULL;
+    (*plugin_info)->layout            = 0;
+    (*plugin_info)->version           = NULL;
+    (*plugin_info)->name              = NULL;
+    (*plugin_info)->description       = NULL;
+    (*plugin_info)->magic_number_node = NULL;
+    (*plugin_info)->extension_node    = NULL;
+    (*plugin_info)->mime_type_node    = NULL;
+    (*plugin_info)->read_features     = NULL;
+    (*plugin_info)->write_features    = NULL;
 
     return 0;
 }
@@ -374,6 +393,7 @@ static void destroy_plugin_info(struct sail_plugin_info *plugin_info) {
     free(plugin_info->name);
     free(plugin_info->description);
 
+    destroy_string_node_chain(plugin_info->magic_number_node);
     destroy_string_node_chain(plugin_info->extension_node);
     destroy_string_node_chain(plugin_info->mime_type_node);
 

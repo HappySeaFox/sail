@@ -140,6 +140,55 @@ SAIL_EXPORT sail_error_t sail_plugin_info_from_path(const char *path, const stru
                                                     const struct sail_plugin_info **plugin_info);
 
 /*
+ * Finds a first plugin info object that supports the magic number read from the specified file.
+ * The comparison algorithm is case insensitive.
+ *
+ * The assigned plugin info MUST NOT be destroyed. It is a pointer to an internal data structure.
+ *
+ * Typical usage: sail_plugin_info_by_magic_number_from_file() ->
+ *                sail_start_reading_file()                    ->
+ *                sail_read_next_frame()                       ->
+ *                sail_stop_reading().
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_plugin_info_by_magic_number_from_file(const char *path, const struct sail_context *context,
+                                                                    const struct sail_plugin_info **plugin_info);
+
+/*
+ * Finds a first plugin info object that supports the magic number read from the specified memory buffer.
+ * The comparison algorithm is case insensitive.
+ *
+ * The assigned plugin info MUST NOT be destroyed. It is a pointer to an internal data structure.
+ *
+ * Typical usage: sail_plugin_info_by_magic_number_from_mem() ->
+ *                sail_start_reading_file()                   ->
+ *                sail_read_next_frame()                      ->
+ *                sail_stop_reading().
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_plugin_info_by_magic_number_from_mem(const void *buffer, size_t buffer_length, const struct sail_context *context,
+                                                                   const struct sail_plugin_info **plugin_info);
+
+/*
+ * Finds a first plugin info object that supports the magic number read from the specified I/O data source.
+ * The comparison algorithm is case insensitive. After reading a magic number, this function rewinds the I/O
+ * source position back to the beginning. That's why the I/O source must be seekable.
+ *
+ * The assigned plugin info MUST NOT be destroyed. It is a pointer to an internal data structure.
+ *
+ * Typical usage: sail_plugin_info_by_magic_number_from_io() ->
+ *                sail_start_reading_file()                  ->
+ *                sail_read_next_frame()                     ->
+ *                sail_stop_reading().
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_plugin_info_by_magic_number_from_io(struct sail_io *io, const struct sail_context *context,
+                                                                  const struct sail_plugin_info **plugin_info);
+
+/*
  * Finds a first plugin info object that supports the specified file extension.
  * The comparison algorithm is case insensitive. For example: "jpg".
  *

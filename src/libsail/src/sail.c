@@ -415,6 +415,98 @@ sail_error_t sail_plugin_info_from_path(const char *path, const struct sail_cont
     return 0;
 }
 
+sail_error_t sail_plugin_info_by_magic_number_from_file(const char *path, const struct sail_context *context, const struct sail_plugin_info **plugin_info) {
+
+    SAIL_CHECK_PATH_PTR(path);
+    SAIL_CHECK_CONTEXT_PTR(context);
+    SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
+
+    struct sail_io *io;
+    SAIL_TRY(alloc_io_read_file(path, &io));
+
+    SAIL_TRY_OR_CLEANUP(sail_plugin_info_by_magic_number_from_io(io, context, plugin_info),
+                        /* cleanup */ sail_destroy_io(io));
+
+    sail_destroy_io(io);
+
+    return 0;
+}
+
+sail_error_t sail_plugin_info_by_magic_number_from_mem(const void *buffer, size_t buffer_length, const struct sail_context *context, const struct sail_plugin_info **plugin_info) {
+
+    SAIL_CHECK_BUFFER_PTR(buffer);
+    SAIL_CHECK_CONTEXT_PTR(context);
+    SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
+
+    struct sail_io *io;
+    SAIL_TRY(alloc_io_read_mem(buffer, buffer_length, &io));
+
+    SAIL_TRY_OR_CLEANUP(sail_plugin_info_by_magic_number_from_io(io, context, plugin_info),
+                        /* cleanup */ sail_destroy_io(io));
+
+    sail_destroy_io(io);
+
+    return 0;
+}
+
+sail_error_t sail_plugin_info_by_magic_number_from_io(struct sail_io *io, const struct sail_context *context, const struct sail_plugin_info **plugin_info) {
+
+    SAIL_CHECK_IO_PTR(io);
+    SAIL_CHECK_CONTEXT_PTR(context);
+    SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
+
+    size_t nbytes;
+    unsigned char buffer[SAIL_MAGIC_BUFFER_SIZE];
+
+    SAIL_TRY(io->read(io->stream, buffer, 1, SAIL_MAGIC_BUFFER_SIZE, &nbytes));
+
+    if (nbytes != SAIL_MAGIC_BUFFER_SIZE) {
+        SAIL_LOG_ERROR("Failed to read %d bytes from the I/O source", SAIL_MAGIC_BUFFER_SIZE);
+        return SAIL_IO_READ_ERROR;
+    }
+
+    /* Seek back. */
+    SAIL_TRY(io->seek(io->stream, 0, SEEK_SET));
+
+    /* \xFF\xDD => "FF DD" + string terminator. */
+    char hex_numbers[SAIL_MAGIC_BUFFER_SIZE * 3 + 1];
+    char *hex_numbers_ptr = hex_numbers;
+
+    for (int i = 0; i < nbytes; i++, hex_numbers_ptr += 3) {
+#ifdef SAIL_WIN32
+        sprintf_s(hex_numbers_ptr, 4, "%02x ", buffer[i]);
+#else
+        sprintf(hex_numbers_ptr, "%02x ", buffer[i]);
+#endif
+    }
+
+    hex_numbers_ptr--;
+    *hex_numbers_ptr = '\0';
+
+    SAIL_LOG_DEBUG("Read magic number: '%s'", hex_numbers);
+
+    /* Find the plugin info. */
+    struct sail_plugin_info_node *node = context->plugin_info_node;
+
+    while (node != NULL) {
+        struct sail_string_node *string_node = node->plugin_info->magic_number_node;
+
+        while (string_node != NULL) {
+            if (strncmp(hex_numbers, string_node->value, strlen(string_node->value)) == 0) {
+                *plugin_info = node->plugin_info;
+                SAIL_LOG_DEBUG("Found plugin info: '%s'", (*plugin_info)->name);
+                return 0;
+            }
+
+            string_node = string_node->next;
+        }
+
+        node = node->next;
+    }
+
+    return SAIL_PLUGIN_NOT_FOUND;
+}
+
 sail_error_t sail_plugin_info_from_extension(const char *extension, const struct sail_context *context, const struct sail_plugin_info **plugin_info) {
 
     SAIL_CHECK_EXTENSION_PTR(extension);
