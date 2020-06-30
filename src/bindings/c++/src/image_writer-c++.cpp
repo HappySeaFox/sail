@@ -221,11 +221,9 @@ sail_error_t image_writer::start_writing(void *buffer, size_t buffer_length, con
 sail_error_t image_writer::start_writing(const io &sio, const plugin_info &splugin_info)
 {
     SAIL_CHECK_CONTEXT_PTR(d->ctx);
+    SAIL_TRY(sio.verify_valid());
 
     SAIL_TRY(sio.to_sail_io(&d->sail_io));
-
-    sail_io *sail_io = &d->sail_io;
-    SAIL_CHECK_IO(sail_io);
 
     SAIL_TRY(sail_start_writing_io_with_options(&d->sail_io,
                                                 d->ctx->sail_context_c(),
@@ -239,11 +237,9 @@ sail_error_t image_writer::start_writing(const io &sio, const plugin_info &splug
 sail_error_t image_writer::start_writing(const io &sio, const plugin_info &splugin_info, const write_options &swrite_options)
 {
     SAIL_CHECK_CONTEXT_PTR(d->ctx);
+    SAIL_TRY(sio.verify_valid());
 
     SAIL_TRY(sio.to_sail_io(&d->sail_io));
-
-    sail_io *sail_io = &d->sail_io;
-    SAIL_CHECK_IO(sail_io);
 
     sail_write_options sail_write_options;
     SAIL_TRY(swrite_options.to_sail_write_options(&sail_write_options));

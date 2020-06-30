@@ -123,6 +123,7 @@ sail_error_t context::plugin_info_by_magic_number_from_mem(const void *buffer, s
 sail_error_t context::plugin_info_by_magic_number_from_io(const sail::io &io, plugin_info *splugin_info) const
 {
     SAIL_CHECK_PLUGIN_INFO_PTR(splugin_info);
+    SAIL_TRY(io.verify_valid());
 
     struct sail_io sail_io;
     SAIL_TRY(io.to_sail_io(&sail_io));

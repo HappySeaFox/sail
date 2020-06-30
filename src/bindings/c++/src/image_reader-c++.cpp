@@ -141,6 +141,7 @@ sail_error_t image_reader::probe_io(const sail::io &io, image *simage, plugin_in
 {
     SAIL_CHECK_CONTEXT_PTR(d->ctx);
     SAIL_CHECK_IMAGE_PTR(simage);
+    SAIL_TRY(io.verify_valid());
 
     struct sail_io sail_io;
     SAIL_TRY(io.to_sail_io(&sail_io));

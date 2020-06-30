@@ -50,6 +50,8 @@ public:
     io& operator=(const io &i);
     ~io();
 
+    sail_error_t verify_valid() const;
+
     bool is_valid() const;
 
     sail_error_t to_sail_io(sail_io *io) const;

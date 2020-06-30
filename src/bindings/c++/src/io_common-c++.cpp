@@ -80,6 +80,13 @@ io::~io()
     delete d;
 }
 
+sail_error_t io::verify_valid() const
+{
+    SAIL_TRY(is_valid_private());
+
+    return 0;
+}
+
 bool io::is_valid() const
 {
     return is_valid_private() == 0;
