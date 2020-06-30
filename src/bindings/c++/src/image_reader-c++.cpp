@@ -81,14 +81,14 @@ bool image_reader::is_valid() const
     return d->ctx != nullptr && d->ctx->status() == 0;
 }
 
-sail_error_t image_reader::probe(const std::string &path, image *simage, plugin_info *splugin_info)
+sail_error_t image_reader::probe_path(const std::string &path, image *simage, plugin_info *splugin_info)
 {
-    SAIL_TRY(probe(path.c_str(), simage, splugin_info));
+    SAIL_TRY(probe_path(path.c_str(), simage, splugin_info));
 
     return 0;
 }
 
-sail_error_t image_reader::probe(const char *path, image *simage, plugin_info *splugin_info)
+sail_error_t image_reader::probe_path(const char *path, image *simage, plugin_info *splugin_info)
 {
     SAIL_CHECK_CONTEXT_PTR(d->ctx);
     SAIL_CHECK_PATH_PTR(path);

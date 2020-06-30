@@ -184,7 +184,7 @@ sail_error_t QtSail::onProbe()
 
     sail_error_t res;
 
-    if ((res = reader.probe(path.toLocal8Bit().constData(), &image, &plugin_info)) != 0) {
+    if ((res = reader.probe_path(path.toLocal8Bit().constData(), &image, &plugin_info)) != 0) {
         QMessageBox::critical(this, tr("Error"), tr("Failed to probe the image. Error: %1").arg(res));
         return res;
     }
