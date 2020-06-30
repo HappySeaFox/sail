@@ -38,7 +38,7 @@ sail_error_t sail_probe_io(struct sail_io *io, struct sail_context *context, str
     const struct sail_plugin_info *plugin_info_noop;
     const struct sail_plugin_info **plugin_info_local = plugin_info == NULL ? &plugin_info_noop : plugin_info;
 
-    SAIL_TRY(sail_plugin_info_by_magic_from_io(io, context, plugin_info_local));
+    SAIL_TRY(sail_plugin_info_by_magic_number_from_io(io, context, plugin_info_local));
 
     const struct sail_plugin *plugin;
     SAIL_TRY(load_plugin_by_plugin_info(context, *plugin_info_local, &plugin));
