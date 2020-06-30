@@ -144,6 +144,8 @@ elseif (MINGW)
     set(SAIL_MINGW ON)
 elseif (CYGWIN)
     set(SAIL_CYGWIN ON)
+elseif (APPLE)
+    set(SAIL_APPLE ON)
 endif()
 
 # Common required packages
