@@ -81,14 +81,14 @@ bool image_reader::is_valid() const
     return d->ctx != nullptr && d->ctx->status() == 0;
 }
 
-sail_error_t image_reader::probe(const std::string &path, image *simage, plugin_info *splugin_info)
+sail_error_t image_reader::probe_path(const std::string &path, image *simage, plugin_info *splugin_info)
 {
-    SAIL_TRY(probe(path.c_str(), simage, splugin_info));
+    SAIL_TRY(probe_path(path.c_str(), simage, splugin_info));
 
     return 0;
 }
 
-sail_error_t image_reader::probe(const char *path, image *simage, plugin_info *splugin_info)
+sail_error_t image_reader::probe_path(const char *path, image *simage, plugin_info *splugin_info)
 {
     SAIL_CHECK_CONTEXT_PTR(d->ctx);
     SAIL_CHECK_PATH_PTR(path);
@@ -97,10 +97,61 @@ sail_error_t image_reader::probe(const char *path, image *simage, plugin_info *s
     const sail_plugin_info *sail_plugin_info;
     sail_image *sail_image;
 
-    SAIL_TRY(sail_probe(path,
-                        d->ctx->sail_context_c(),
-                        &sail_image,
-                        &sail_plugin_info));
+    SAIL_TRY(sail_probe_path(path,
+                             d->ctx->sail_context_c(),
+                             &sail_image,
+                             &sail_plugin_info));
+
+    *simage = image(sail_image);
+    sail_destroy_image(sail_image);
+
+    if (splugin_info != nullptr) {
+        *splugin_info = plugin_info(sail_plugin_info);
+    }
+
+    return 0;
+}
+
+sail_error_t image_reader::probe_mem(const void *buffer, size_t buffer_length, image *simage, plugin_info *splugin_info)
+{
+    SAIL_CHECK_CONTEXT_PTR(d->ctx);
+    SAIL_CHECK_BUFFER_PTR(buffer);
+    SAIL_CHECK_IMAGE_PTR(simage);
+
+    const sail_plugin_info *sail_plugin_info;
+    sail_image *sail_image;
+
+    SAIL_TRY(sail_probe_mem(buffer,
+                            buffer_length,
+                            d->ctx->sail_context_c(),
+                            &sail_image,
+                            &sail_plugin_info));
+
+    *simage = image(sail_image);
+    sail_destroy_image(sail_image);
+
+    if (splugin_info != nullptr) {
+        *splugin_info = plugin_info(sail_plugin_info);
+    }
+
+    return 0;
+}
+
+sail_error_t image_reader::probe_io(const sail::io &io, image *simage, plugin_info *splugin_info)
+{
+    SAIL_CHECK_CONTEXT_PTR(d->ctx);
+    SAIL_CHECK_IMAGE_PTR(simage);
+
+    struct sail_io sail_io;
+    SAIL_TRY(io.to_sail_io(&sail_io));
+
+    const sail_plugin_info *sail_plugin_info;
+    sail_image *sail_image;
+
+    SAIL_TRY(sail_probe_io(&sail_io,
+                           d->ctx->sail_context_c(),
+                           &sail_image,
+                           &sail_plugin_info));
 
     *simage = image(sail_image);
     sail_destroy_image(sail_image);

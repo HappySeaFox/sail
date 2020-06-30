@@ -62,10 +62,20 @@ public:
     bool is_valid() const;
 
     /*
-     * An interface to sail_probe(). See sail_probe() for more.
+     * An interface to sail_probe_path(). See sail_probe_path() for more.
      */
-    sail_error_t probe(const std::string &path, image *simage, plugin_info *splugin_info = nullptr);
-    sail_error_t probe(const char *path, image *simage, plugin_info *splugin_info = nullptr);
+    sail_error_t probe_path(const std::string &path, image *simage, plugin_info *splugin_info = nullptr);
+    sail_error_t probe_path(const char *path, image *simage, plugin_info *splugin_info = nullptr);
+
+    /*
+     * An interface to sail_probe_mem(). See sail_probe_mem() for more.
+     */
+    sail_error_t probe_mem(const void *buffer, size_t buffer_length, image *simage, plugin_info *splugin_info = nullptr);
+
+    /*
+     * An interface to sail_probe_io(). See sail_probe_io() for more.
+     */
+    sail_error_t probe_io(const sail::io &io, image *simage, plugin_info *splugin_info = nullptr);
 
     /*
      * An interface to sail_read(). See sail_read() for more.

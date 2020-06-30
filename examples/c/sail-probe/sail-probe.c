@@ -44,7 +44,7 @@ static sail_error_t probe(const char *path, struct sail_context *context) {
     struct sail_image *image;
     const struct sail_plugin_info *plugin_info;
 
-    SAIL_TRY(sail_probe(path, context, &image, &plugin_info));
+    SAIL_TRY(sail_probe_path(path, context, &image, &plugin_info));
 
     uint64_t end_time;
     SAIL_TRY(sail_now(&end_time));
