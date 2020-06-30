@@ -27,7 +27,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <SDL2/SDL.h>
+/* /SDL2 is already included in the brew-installed SDL2 on MacOS. */
+#ifdef SAIL_APPLE
+    #include <SDL.h>
+#else
+    #include <SDL2/SDL.h>
+#endif
 
 #include "sail-common.h"
 #include "sail.h"
