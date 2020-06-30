@@ -10,7 +10,7 @@ See [FAQ](FAQ.md) for more.
 
 Author: Dmitry Baryshev
 
-![Screenshot](.github/qt-demo.jpg?raw=true)
+![Screenshot](.github/qt-demo.png?raw=true)
 
 ## Target audience
 

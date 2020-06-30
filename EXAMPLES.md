@@ -28,7 +28,7 @@ See [examples](examples/c).
 
 ### Written in Qt/C++ utilizing SAIL C API
 
-![Screenshot](.github/qt-demo.jpg?raw=true)
+![Screenshot](.github/qt-demo.png?raw=true)
 
 See [*-with-c-api examples](examples/c++/qt). Qt is a pretty easy and a very good readable framework. It's easy to adapt them to your needs.
 
