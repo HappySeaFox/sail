@@ -10,8 +10,6 @@
 
 - document c++ classes
 
-- detect images by magic? Non-seekable I/O sources will not be allowed then
-
 - static compilation
 
 - remove SAIL_CHECK_xxx checks in plugins? Are they needed? libsail does them as well
