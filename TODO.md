@@ -28,6 +28,8 @@
 
 ## Priority 2
 
+- Add HomeBrew tap for MacOS
+
 - Print more errors on 'return SAIL_XXX'
 
 - initializer lists in C++

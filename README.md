@@ -69,7 +69,7 @@ are always highly welcomed.
 
 ## Supported platforms
 
-Currently, SAIL supports the Windows and Linux platforms.
+Currently, SAIL supports the Windows, MacOS, and Linux platforms.
 
 ## Development status
 
@@ -205,6 +205,10 @@ Consider [EXAMPLES](EXAMPLES.md) after building and installing.
 
 ### Windows
 
+#### Tested environments
+
+- Windows 7 x64
+
 #### Build requirements
 
 - git
@@ -234,12 +238,58 @@ cmake --build . --config Release
 cmake --build . --config Release --target install
 ```
 
-### Linux
+### MacOS
+
+:warning: No SAIL `homebrew` package is available so far.
+
+#### Tested environments
+
+- OS X 10.15 Catalina
 
 #### Build requirements
 
 - git
 - cmake 3.6 or later
+- pkg-config
+- XCode command line utils
+- codec-specific development libraries installed. You can grab the list from `debian/control`
+
+#### Build steps
+
+```
+git clone --recursive https://github.com/smoked-herring/sail.git
+cd sail
+
+# Make sure clang is installed
+clang --version
+
+# Install dependencies
+brew install cmake pkg-config sdl2_image libjpeg-turbo libpng
+
+# Use libjpeg-turbo
+export PKG_CONFIG_PATH=/usr/local/opt/jpeg-turbo/lib/pkgconfig
+
+# Compile SAIL
+mkdir build
+cd build
+cmake ..
+make
+
+# Install with your preferred way or just...
+sudo make install
+```
+
+### Linux
+
+#### Tested environments
+
+- LUbuntu 18.04 64-bit
+
+#### Build requirements
+
+- git
+- cmake 3.6 or later
+- pkg-config
 - GCC and G++ 7.5 or later
 - standard C/C++ development files installed (usually installed by metapackages like `build-essential`)
 - codec-specific development libraries installed. You can grab the list from `debian/control`
@@ -249,6 +299,9 @@ cmake --build . --config Release --target install
 ```
 git clone --recursive https://github.com/smoked-herring/sail.git
 cd sail
+
+# Install the required dependencies grabbed from debian/control
+sudo apt install ...
 
 # Compile SAIL
 mkdir build
