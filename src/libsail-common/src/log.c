@@ -125,6 +125,9 @@ void sail_log(enum SailLogLevel level, const char *file, int line, const char *f
         case SAIL_LOG_LEVEL_INFO:    level_string = "I"; break;
         case SAIL_LOG_LEVEL_MESSAGE: level_string = "M"; break;
         case SAIL_LOG_LEVEL_DEBUG:   level_string = "D"; break;
+
+        /* Something weird. */
+        case SAIL_LOG_LEVEL_SILENCE: return;
     }
 
     const bool ansi_colors_supported = check_ansi_colors_supported();
@@ -136,6 +139,8 @@ void sail_log(enum SailLogLevel level, const char *file, int line, const char *f
             case SAIL_LOG_LEVEL_INFO:    fprintf(SAIL_LOG_FPTR, "%s", SAIL_COLOR_BOLD_CYAN);   break;
             case SAIL_LOG_LEVEL_MESSAGE:                                                       break;
             case SAIL_LOG_LEVEL_DEBUG:   fprintf(SAIL_LOG_FPTR, "%s", SAIL_COLOR_BOLD_BLUE);   break;
+
+            case SAIL_LOG_LEVEL_SILENCE: return;
         }
     }
 
