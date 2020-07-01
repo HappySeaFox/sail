@@ -40,6 +40,7 @@ public:
         : pixel_format(SAIL_PIXEL_FORMAT_UNKNOWN)
         , data(nullptr)
         , color_count(0)
+        , palette_size(0)
     {}
 
     ~pimpl()
