@@ -81,42 +81,42 @@ plugin_info::~plugin_info()
     delete d;
 }
 
-std::string plugin_info::path() const
+const std::string& plugin_info::path() const
 {
     return d->path;
 }
 
-std::string plugin_info::version() const
+const std::string& plugin_info::version() const
 {
     return d->version;
 }
 
-std::string plugin_info::name() const
+const std::string& plugin_info::name() const
 {
     return d->name;
 }
 
-std::string plugin_info::description() const
+const std::string& plugin_info::description() const
 {
     return d->description;
 }
 
-std::vector<std::string> plugin_info::extensions() const
+const std::vector<std::string>& plugin_info::extensions() const
 {
     return d->extensions;
 }
 
-std::vector<std::string> plugin_info::mime_types() const
+const std::vector<std::string>& plugin_info::mime_types() const
 {
     return d->mime_types;
 }
 
-read_features plugin_info::read_features() const
+const read_features& plugin_info::read_features() const
 {
     return d->read_features;
 }
 
-write_features plugin_info::write_features() const
+const write_features& plugin_info::write_features() const
 {
     return d->write_features;
 }
