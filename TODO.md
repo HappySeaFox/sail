@@ -1,7 +1,5 @@
 ## Priority 1
 
-- C++ logging sail::log::...
-
 - Windows INNO installer with a config file to store SAIL_PLUGINS_PATH
 
 - Read/write indexed PNGs with alpha
