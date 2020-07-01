@@ -35,6 +35,7 @@ class SAIL_HIDDEN context::pimpl
 public:
     sail_context *context = nullptr;
     sail_error_t init_result = SAIL_CONTEXT_UNINITIALIZED;
+    std::vector<plugin_info> plugin_info_list;
 };
 
 context::context()
@@ -55,6 +56,14 @@ context::context(int flags)
     if (d->init_result != 0) {
         SAIL_LOG_ERROR("Failed to initialize SAIL. Error: %d", d->init_result);
     }
+
+    // Cache plugin info objects
+    const sail_plugin_info_node *plugin_info_node = sail_plugin_info_list(d->context);
+
+    while (plugin_info_node != nullptr) {
+        d->plugin_info_list.push_back(plugin_info(plugin_info_node->plugin_info));
+        plugin_info_node = plugin_info_node->next;
+    }
 }
 
 context::~context()
@@ -70,16 +79,7 @@ sail_error_t context::status() const
 
 std::vector<plugin_info> context::plugin_info_list() const
 {
-    std::vector<plugin_info> list;
-
-    const sail_plugin_info_node *plugin_info_node = sail_plugin_info_list(d->context);
-
-    while (plugin_info_node != nullptr) {
-        list.push_back(plugin_info(plugin_info_node->plugin_info));
-        plugin_info_node = plugin_info_node->next;
-    }
-
-    return list;
+    return d->plugin_info_list;
 }
 
 sail_error_t context::unload_plugins()
