@@ -397,7 +397,7 @@ sail_error_t skip_hidden_frame(unsigned bytes_per_line, unsigned height, png_str
 
 sail_error_t alloc_rows(png_bytep **A, unsigned row_length, unsigned height) {
 
-    *A = (png_bytep*)malloc(height * sizeof(png_bytep*));
+    *A = (png_bytep*)malloc(height * sizeof(png_bytep));
 
     if (*A == NULL) {
         return SAIL_MEMORY_ALLOCATION_FAILED;
