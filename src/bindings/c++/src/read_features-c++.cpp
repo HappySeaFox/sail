@@ -68,7 +68,7 @@ read_features::~read_features()
     delete d;
 }
 
-std::vector<SailPixelFormat> read_features::output_pixel_formats() const
+const std::vector<SailPixelFormat>& read_features::output_pixel_formats() const
 {
     return d->output_pixel_formats;
 }

@@ -55,7 +55,7 @@ public:
     read_features& operator=(const read_features &rf);
     ~read_features();
 
-    std::vector<SailPixelFormat> output_pixel_formats() const;
+    const std::vector<SailPixelFormat>& output_pixel_formats() const;
     SailPixelFormat preferred_output_pixel_format() const;
     int features() const;
 
