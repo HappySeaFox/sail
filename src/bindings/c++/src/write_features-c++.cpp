@@ -82,7 +82,7 @@ write_features::~write_features()
     delete d;
 }
 
-std::map<SailPixelFormat, std::vector<SailPixelFormat>> write_features::pixel_formats_mappings() const
+const std::map<SailPixelFormat, std::vector<SailPixelFormat>>& write_features::pixel_formats_mappings() const
 {
     return d->pixel_formats_mappings;
 }
@@ -97,7 +97,7 @@ int write_features::properties() const
     return d->properties;
 }
 
-std::vector<SailCompressionType> write_features::compression_types() const
+const std::vector<SailCompressionType>& write_features::compression_types() const
 {
     return d->compression_types;
 }
