@@ -38,6 +38,7 @@
     #include "image_reader-c++.h"
     #include "image_writer-c++.h"
     #include "io_common-c++.h"
+    #include "log-c++.h"
     #include "palette-c++.h"
     #include "plugin_info-c++.h"
     #include "read_features-c++.h"
@@ -56,6 +57,7 @@
     #include <sail-c++/image_reader-c++.h>
     #include <sail-c++/image_writer-c++.h>
     #include <sail-c++/io_common-c++.h>
+    #include <sail-c++/log-c++.h>
     #include <sail-c++/palette-c++.h>
     #include <sail-c++/plugin_info-c++.h>
     #include <sail-c++/read_features-c++.h>
