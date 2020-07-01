@@ -60,7 +60,7 @@ public:
     /*
      * Returns the ICC profile binary data.
      */
-    void* data() const;
+    const void* data() const;
 
     /*
      * Returns the length of the ICC binary data.

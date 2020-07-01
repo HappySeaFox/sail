@@ -78,7 +78,7 @@ bool iccp::is_valid() const
     return d->data != nullptr && d->data_length > 0;
 }
 
-void* iccp::data() const
+const void* iccp::data() const
 {
     return d->data;
 }
