@@ -43,6 +43,7 @@ public:
     std::string version;
     std::string name;
     std::string description;
+    std::vector<std::string> magic_numbers;
     std::vector<std::string> extensions;
     std::vector<std::string> mime_types;
     sail::read_features read_features;
@@ -68,6 +69,7 @@ plugin_info& plugin_info::operator=(const plugin_info &pi)
         .with_version(pi.version())
         .with_name(pi.name())
         .with_description(pi.description())
+        .with_magic_numbers(pi.magic_numbers())
         .with_extensions(pi.extensions())
         .with_mime_types(pi.mime_types())
         .with_read_features(pi.read_features())
@@ -99,6 +101,11 @@ const std::string& plugin_info::name() const
 const std::string& plugin_info::description() const
 {
     return d->description;
+}
+
+const std::vector<std::string>& plugin_info::magic_numbers() const
+{
+    return d->magic_numbers;
 }
 
 const std::vector<std::string>& plugin_info::extensions() const
@@ -145,9 +152,19 @@ plugin_info::plugin_info(const sail_plugin_info *pi)
 
     d->sail_plugin_info_c = pi;
 
+    std::vector<std::string> magic_numbers;
     std::vector<std::string> extensions;
     std::vector<std::string> mime_types;
 
+    // magic numbers
+    const sail_string_node *magic_number_node = pi->magic_number_node;
+
+    while (magic_number_node != nullptr) {
+        magic_numbers.push_back(magic_number_node->value);
+        magic_number_node = magic_number_node->next;
+    }
+
+    // extensions
     const sail_string_node *extension_node = pi->extension_node;
 
     while (extension_node != nullptr) {
@@ -155,6 +172,7 @@ plugin_info::plugin_info(const sail_plugin_info *pi)
         extension_node = extension_node->next;
     }
 
+    // mime types
     const sail_string_node *mime_type_node = pi->mime_type_node;
 
     while (mime_type_node != nullptr) {
@@ -166,6 +184,7 @@ plugin_info::plugin_info(const sail_plugin_info *pi)
         .with_version(pi->version)
         .with_name(pi->name)
         .with_description(pi->description)
+        .with_magic_numbers(magic_numbers)
         .with_extensions(extensions)
         .with_mime_types(mime_types)
         .with_read_features(pi->read_features)
@@ -193,6 +212,12 @@ plugin_info& plugin_info::with_name(const std::string &name)
 plugin_info& plugin_info::with_description(const std::string &description)
 {
     d->description = description;
+    return *this;
+}
+
+plugin_info& plugin_info::with_magic_numbers(const std::vector<std::string> &magic_numbers)
+{
+    d->magic_numbers = magic_numbers;
     return *this;
 }
 

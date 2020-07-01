@@ -67,6 +67,7 @@ public:
     const std::string& version() const;
     const std::string& name() const;
     const std::string& description() const;
+    const std::vector<std::string>& magic_numbers() const;
     const std::vector<std::string>& extensions() const;
     const std::vector<std::string>& mime_types() const;
     const sail::read_features& read_features() const;
@@ -86,6 +87,7 @@ private:
     plugin_info& with_version(const std::string &version);
     plugin_info& with_name(const std::string &name);
     plugin_info& with_description(const std::string &description);
+    plugin_info& with_magic_numbers(const std::vector<std::string> &magic_numbers);
     plugin_info& with_extensions(const std::vector<std::string> &extensions);
     plugin_info& with_mime_types(const std::vector<std::string> &mime_types);
     plugin_info& with_read_features(const sail::read_features &read_features);
