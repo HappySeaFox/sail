@@ -93,7 +93,6 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     //
     sail::plugin_info plugin_info;
     SAIL_TRY(m_context.plugin_info_by_magic_number_from_path(path.toLocal8Bit(), &plugin_info));
-    pluginInfo(plugin_info);
 
     // Allocate new read options and copy defaults from the read features
     // (preferred output pixel format etc.).
@@ -267,7 +266,6 @@ sail_error_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffer
 
     sail::plugin_info plugin_info;
     SAIL_TRY(m_context.plugin_info_from_extension(m_suffix.toUtf8(), &plugin_info));
-    pluginInfo(plugin_info);
 
     // Allocate new write options and copy defaults from the write features
     // (preferred output pixel format etc.).
@@ -324,27 +322,6 @@ sail_error_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffer
     // Optional: unload all plugins to free up some memory.
     //
     m_context.unload_plugins();
-
-    return 0;
-}
-
-sail_error_t QtSail::pluginInfo(const sail::plugin_info &plugin_info) const
-{
-    SAIL_LOG_DEBUG("SAIL plugin version: %s", plugin_info.version().c_str());
-    SAIL_LOG_DEBUG("SAIL plugin description: %s", plugin_info.description().c_str());
-    SAIL_LOG_DEBUG("SAIL plugin path: %s", plugin_info.path().c_str());
-
-    const std::vector<std::string> extensions = plugin_info.extensions();
-
-    for (const std::string &extension : extensions) {
-        SAIL_LOG_DEBUG("SAIL extension '%s'", extension.c_str());
-    }
-
-    const std::vector<std::string> mime_types = plugin_info.mime_types();
-
-    for (const std::string &mime_type : mime_types) {
-        SAIL_LOG_DEBUG("SAIL mime type '%s'", mime_type.c_str());
-    }
 
     return 0;
 }
@@ -407,8 +384,6 @@ sail_error_t QtSail::onProbe()
         QMessageBox::critical(this, tr("Error"), tr("Failed to probe the image. Error: %1").arg(res));
         return res;
     }
-
-    pluginInfo(plugin_info);
 
     const char *source_pixel_format_str;
     const char *pixel_format_str;

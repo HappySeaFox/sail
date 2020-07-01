@@ -58,7 +58,6 @@ private:
     sail_error_t loadImage(const QString &path, QImage *qimage);
     sail_error_t saveImage(const QImage &qimage, void *buffer, size_t buffer_length,
                            size_t *written);
-    sail_error_t pluginInfo(const sail::plugin_info &plugin_info) const;
     QStringList filters() const;
 
 private: // slots
