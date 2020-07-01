@@ -77,7 +77,7 @@ sail_error_t context::status() const
     return d->init_result;
 }
 
-std::vector<plugin_info> context::plugin_info_list() const
+const std::vector<plugin_info>& context::plugin_info_list() const
 {
     return d->plugin_info_list;
 }

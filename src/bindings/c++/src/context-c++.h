@@ -95,7 +95,7 @@ public:
      * Returns a list of found plugin info objects. Use it to determine the list of possible
      * image formats, file extensions, and mime types that could be hypothetically read or written by SAIL.
      */
-    std::vector<plugin_info> plugin_info_list() const;
+    const std::vector<plugin_info>& plugin_info_list() const;
 
     /*
      * Unloads all loaded plugins (codecs) to free some memory. Plugin info objects attached
