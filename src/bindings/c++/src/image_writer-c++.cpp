@@ -37,7 +37,9 @@ class SAIL_HIDDEN image_writer::pimpl
 {
 public:
     pimpl()
-        : state(nullptr)
+        : ctx(nullptr)
+        , own_context(false)
+        , state(nullptr)
     {
     }
 
