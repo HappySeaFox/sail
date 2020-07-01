@@ -144,14 +144,19 @@ int image::delay() const
     return d->delay;
 }
 
-sail::palette image::palette() const
+const sail::palette& image::palette() const
 {
     return d->palette;
 }
 
-std::map<std::string, std::string> image::meta_entries() const
+const std::map<std::string, std::string>& image::meta_entries() const
 {
     return d->meta_entries;
+}
+
+const sail::iccp& image::iccp() const
+{
+    return d->iccp;
 }
 
 int image::properties() const
@@ -159,7 +164,7 @@ int image::properties() const
     return d->properties;
 }
 
-sail::source_image image::source_image() const
+const sail::source_image& image::source_image() const
 {
     return d->source_image;
 }
@@ -182,11 +187,6 @@ unsigned image::bits_size() const
 const void* image::shallow_bits() const
 {
     return d->shallow_bits;
-}
-
-sail::iccp image::iccp() const
-{
-    return d->iccp;
 }
 
 image& image::with_width(unsigned width)

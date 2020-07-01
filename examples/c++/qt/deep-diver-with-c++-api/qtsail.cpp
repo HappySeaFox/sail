@@ -159,7 +159,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     if (qimageFormat == QImage::Format_Indexed8) {
         // Assume palette is BPP24-RGB.
         //
-        const sail::palette palette = image.palette();
+        const sail::palette &palette = image.palette();
 
         if (palette.pixel_format() != SAIL_PIXEL_FORMAT_BPP24_RGB) {
             return SAIL_UNSUPPORTED_PIXEL_FORMAT;

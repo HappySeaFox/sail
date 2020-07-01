@@ -133,7 +133,7 @@ public:
      * READ:  Set by SAIL to a valid palette if the image is indexed.
      * WRITE: Must be set by a caller to a valid palette if the image is indexed.
      */
-    sail::palette palette() const;
+    const sail::palette& palette() const;
 
     /*
      * Returns image meta information.
@@ -142,7 +142,7 @@ public:
      * WRITE: Must be set by a caller to a valid map with simple meta information
      *        (like JPEG comments) if necessary.
      */
-    std::map<std::string, std::string> meta_entries() const;
+    const std::map<std::string, std::string>& meta_entries() const;
 
     /*
      * Returns embedded ICC profile.
@@ -153,7 +153,7 @@ public:
      * READ:  Set by SAIL to a valid ICC profile if any.
      * WRITE: Must be set by a caller to a valid ICC profile if necessary.
      */
-    sail::iccp iccp() const;
+    const sail::iccp& iccp() const;
 
     /*
      * Returns decoded image properties. See SailImageProperties.
@@ -170,7 +170,7 @@ public:
      * READ:  Set by SAIL to valid source image properties of the original image.
      * WRITE: Ignored.
      */
-    sail::source_image source_image() const;
+    const sail::source_image& source_image() const;
 
     /*
      * Returns the editable deep copied pixel data if any. Images can hold deep copied or shallow data,
