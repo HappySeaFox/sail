@@ -34,6 +34,7 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QTimer>
 
 #include <sail-common/sail-common.h>
 #include <sail/sail.h>
@@ -75,6 +76,19 @@ sail_error_t QtSail::init()
     SAIL_TRY_OR_CLEANUP(sail_init_with_flags(&m_context, SAIL_FLAG_PRELOAD_PLUGINS),
                         /* cleanup */ QMessageBox::critical(this, tr("Error"), tr("Failed to init SAIL")),
                                       ::exit(1));
+
+    QTimer::singleShot(0, this, [&]{
+        QMessageBox::information(this, tr("Features"), tr("This demo includes:"
+                                                          "<ul>"
+                                                          "<li>Selecting pixel format to output</li>"
+                                                          "<li>Displaying indexed images (if SOURCE is selected)</li>"
+                                                          "</ul>"
+                                                          "This demo doesn't include:"
+                                                          "<ul>"
+                                                          "<li>Playing animations</li>"
+                                                          "</ul>"));
+    });
+
     return 0;
 }
 

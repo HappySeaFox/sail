@@ -59,6 +59,18 @@ sail_error_t QtSail::init()
     SAIL_TRY_OR_CLEANUP(sail_init(&m_context),
                         /* cleanup */ QMessageBox::critical(this, tr("Error"), tr("Failed to init SAIL")),
                                       ::exit(1));
+
+    QTimer::singleShot(0, this, [&]{
+        QMessageBox::information(this, tr("Features"), tr("This demo includes:"
+                                                          "<ul>"
+                                                          "<li>Playing animations</li>"
+                                                          "</ul>"
+                                                          "This demo doesn't include:"
+                                                          "<ul>"
+                                                          "<li>Selecting pixel format to output</li>"
+                                                          "</ul>"));
+    });
+
     return 0;
 }
 
