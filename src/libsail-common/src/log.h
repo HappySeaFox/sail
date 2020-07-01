@@ -38,6 +38,10 @@ extern "C" {
 
 enum SailLogLevel {
 
+    /* Special log level for setting as a barrier to silent all messages. */
+    SAIL_LOG_LEVEL_SILENCE,
+
+    /* Normal log levels. */
     SAIL_LOG_LEVEL_ERROR,
     SAIL_LOG_LEVEL_WARNING,
     SAIL_LOG_LEVEL_INFO,
@@ -45,7 +49,15 @@ enum SailLogLevel {
     SAIL_LOG_LEVEL_DEBUG,
 };
 
-SAIL_EXPORT void sail_log(int level, const char *file, int line, const char *format, ...);
+SAIL_EXPORT void sail_log(enum SailLogLevel level, const char *file, int line, const char *format, ...);
+
+/*
+ * Sets a maximum log level barrier. Only the messages of the specified log level or lower will be displayed.
+ *
+ * This function is not thread-safe. It's recommended to call it in the main thread
+ * before initializing SAIL.
+ */
+SAIL_EXPORT void sail_set_log_barrier(enum SailLogLevel max_level);
 
 /*
  * Log an error message.

@@ -65,6 +65,8 @@
 #define SAIL_LOG_FPTR       stderr
 #define SAIL_LOG_STD_HANDLE STD_ERROR_HANDLE /* for Windows */
 
+static enum SailLogLevel sail_max_log_level = SAIL_LOG_LEVEL_DEBUG;
+
 static bool check_ansi_colors_supported(void) {
 
     SAIL_THREAD_LOCAL static bool ansi_colors_supported_called = false;
@@ -108,7 +110,12 @@ static bool check_ansi_colors_supported(void) {
     return ansi_colors_supported;
 }
 
-void sail_log(int level, const char *file, int line, const char *format, ...) {
+void sail_log(enum SailLogLevel level, const char *file, int line, const char *format, ...) {
+
+    /* Filter out. */
+    if (level > sail_max_log_level) {
+        return;
+    }
 
     const char *level_string = NULL;
 
@@ -120,7 +127,7 @@ void sail_log(int level, const char *file, int line, const char *format, ...) {
         case SAIL_LOG_LEVEL_DEBUG:   level_string = "D"; break;
     }
 
-    bool ansi_colors_supported = check_ansi_colors_supported();
+    const bool ansi_colors_supported = check_ansi_colors_supported();
 
     if (ansi_colors_supported) {
         switch (level) {
@@ -157,4 +164,9 @@ void sail_log(int level, const char *file, int line, const char *format, ...) {
     }
 
     fprintf(SAIL_LOG_FPTR, "\n");
+}
+
+void sail_set_log_barrier(enum SailLogLevel max_level) {
+
+    sail_max_log_level = max_level;
 }
