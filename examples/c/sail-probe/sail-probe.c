@@ -94,7 +94,7 @@ int main(int argc, char *argv[]) {
     }
 
     if (strcmp(argv[1], "-v") == 0 || strcmp(argv[1], "--version") == 0) {
-        fprintf(stderr, "sail-probe 1.0\n");
+        fprintf(stderr, "sail-probe 1.1.0\n");
         return 0;
     }
 
