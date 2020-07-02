@@ -209,7 +209,7 @@ static sail_error_t sail_init_impl(struct sail_context **context, int flags) {
     uint64_t start_time;
     SAIL_TRY(sail_now(&start_time));
 
-    SAIL_LOG_INFO("Version %s-%s", SAIL_VERSION_STRING, SAIL_GIT_HASH);
+    SAIL_LOG_INFO("Version %s", SAIL_VERSION_STRING);
 
     SAIL_CHECK_CONTEXT_PTR(context);
 

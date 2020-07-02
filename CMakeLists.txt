@@ -3,6 +3,9 @@ cmake_minimum_required(VERSION 3.6)
 project(SAIL VERSION 0.9.0
              DESCRIPTION "Squirrel Abstract Image Library"
              LANGUAGES C CXX)
+
+# Used only when SAIL_DEV is ON
+#
 set(SAIL_DEV_VERSION_SUFFIX "pre2")
 
 include(GNUInstallDirs)
@@ -177,17 +180,14 @@ set(SAIL_ICONS_PATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/sail/i
 if (WIN32)
     string(REPLACE "/" "\\\\" SAIL_ICONS_PATH "${SAIL_ICONS_PATH}")
 endif()
-execute_process(COMMAND git -C "${PROJECT_SOURCE_DIR}" rev-parse --short HEAD
-                RESULT_VARIABLE SAIL_GIT_HASH_RESULT
-                OUTPUT_VARIABLE SAIL_GIT_HASH
-                OUTPUT_STRIP_TRAILING_WHITESPACE)
+
 configure_file("${PROJECT_SOURCE_DIR}/src/config.h.in" "${PROJECT_BINARY_DIR}/include/config.h" @ONLY)
 include_directories("${PROJECT_BINARY_DIR}/include")
 
-# Version suffix used in dist utils to build installers
+# Version suffix for pre-release versions used in dist utils to build installers
 #
 if (SAIL_DEV)
-    set(SAIL_DIST_VERSION_SUFFIX "-${SAIL_DEV_VERSION_SUFFIX}-${SAIL_GIT_HASH}")
+    set(SAIL_DIST_VERSION_SUFFIX "-${SAIL_DEV_VERSION_SUFFIX}")
 endif()
 
 # INNO Setup
@@ -240,7 +240,6 @@ message("*")
 message("* Configuration statistics: ")
 message("*")
 message("* SAIL version:                 ${PROJECT_VERSION}")
-message("* SAIL git hash:                ${SAIL_GIT_HASH}")
 message("* Developer mode:               ${SAIL_DEV}")
 message("* SDL example:                  ${SAIL_SDL_EXAMPLE}")
 message("*")

@@ -38,8 +38,6 @@
 
 #cmakedefine SAIL_PLUGINS_PATH "@SAIL_PLUGINS_PATH@"
 
-#cmakedefine SAIL_GIT_HASH "@SAIL_GIT_HASH@"
-
 #cmakedefine SAIL_THREAD_LOCAL @SAIL_THREAD_LOCAL@
 
 #cmakedefine SAIL_UNIX
