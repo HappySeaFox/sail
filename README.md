@@ -260,7 +260,7 @@ brew install smoked-herring/sail/sail
 Or
 
 ```
-brew upgrade smoked-herring/sail/sail
+brew upgrade sail
 ```
 
 ### Linux
