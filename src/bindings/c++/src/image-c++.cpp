@@ -467,7 +467,7 @@ sail_error_t image::to_sail_image(sail_image *image) const
                                           sail_destroy_palette(image->palette);
                                           sail_destroy_meta_entry_node_chain(image->meta_entry_node));
     }
-    
+
     return 0;
 }
 
