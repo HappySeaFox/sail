@@ -241,7 +241,7 @@ cmake --build . --config Release --target install
 
 ### MacOS
 
-:warning: No SAIL `homebrew` package is available so far.
+:warning: No pre-packaged homebrew bottles are available so far.
 
 #### Tested environments
 
@@ -249,35 +249,18 @@ cmake --build . --config Release --target install
 
 #### Build requirements
 
-- git
-- cmake 3.6 or later
-- pkg-config
 - XCode command line utils
-- codec-specific development libraries installed. You can grab the list from `debian/control`
 
-#### Build steps
+#### Installation steps
 
 ```
-git clone --recursive https://github.com/smoked-herring/sail.git
-cd sail
+brew install smoked-herring/sail/sail
+```
 
-# Make sure clang is installed
-clang --version
+Or
 
-# Install dependencies
-brew install cmake pkg-config sdl2_image libjpeg-turbo libpng
-
-# Use libjpeg-turbo
-export PKG_CONFIG_PATH=/usr/local/opt/jpeg-turbo/lib/pkgconfig
-
-# Compile SAIL
-mkdir build
-cd build
-cmake ..
-make
-
-# Install with your preferred way or just...
-sudo make install
+```
+brew upgrade smoked-herring/sail/sail
 ```
 
 ### Linux
