@@ -16,6 +16,8 @@
 
 - add benchmarks to README
 
+- Add HomeBrew tap for MacOS
+
 - tests
   - check all plugins have the same layout version
   - check all plugins could be loaded
@@ -23,8 +25,6 @@
   - all plugins have RGB and RGBA output
 
 ## Priority 2
-
-- Add HomeBrew tap for MacOS
 
 - Print more errors on 'return SAIL_XXX'
 
