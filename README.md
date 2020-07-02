@@ -254,6 +254,7 @@ cmake --build . --config Release --target install
 #### Installation steps
 
 ```
+xcode-select --install
 brew install smoked-herring/sail/sail
 ```
 
