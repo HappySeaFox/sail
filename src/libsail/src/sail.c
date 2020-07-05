@@ -120,9 +120,9 @@ static sail_error_t update_lib_path(void) {
     char *full_path_to_lib;
     SAIL_TRY(sail_concat(&full_path_to_lib, 2, plugs_path, "/lib"));
 
-    struct stat lib_attribs = GetFileAttributes(full_path_to_lib);
+    struct stat lib_attribs;
 
-    if (lstat(pathname, &lib_attribs) != 0 || !S_ISDIR(lib_attribs.st_mode)) {
+    if (lstat(full_path_to_lib, &lib_attribs) != 0 || !S_ISDIR(lib_attribs.st_mode)) {
         SAIL_LOG_DEBUG("The optional LIB directory '%s' doesn't exist, so not updating LD_LIBRARY_PATH with it", full_path_to_lib);
         return 0;
     }
