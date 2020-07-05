@@ -41,8 +41,8 @@ target_include_directories(advanced-with-c-api PRIVATE "${CMAKE_CURRENT_SOURCE_D
 #
 if (SAIL_ASAN)
     if (CMAKE_COMPILER_IS_GNUCC)
-        target_compile_options(advanced-with-c-api PRIVATE "-fsanitize=address,leak")
-        target_link_libraries(advanced-with-c-api "-fsanitize=address,leak")
+        target_compile_options(advanced-with-c-api PRIVATE "-fsanitize=address")
+        target_link_libraries(advanced-with-c-api "-fsanitize=address")
     else()
         message("ASAN is not supported with this compiler.")
     endif()
