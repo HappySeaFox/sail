@@ -60,7 +60,7 @@ struct jpeg_state {
     bool frame_written;
 
     /* Extra scan line used as a buffer when reading CMYK/YCCK images. */
-    bool extra_scan_line_needed;
+    bool extra_scan_line_needed_for_cmyk;
     void *extra_scan_line;
 };
 
@@ -72,13 +72,13 @@ static sail_error_t alloc_jpeg_state(struct jpeg_state **jpeg_state) {
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
-    (*jpeg_state)->libjpeg_error          = false;
-    (*jpeg_state)->read_options           = NULL;
-    (*jpeg_state)->write_options          = NULL;
-    (*jpeg_state)->frame_read             = false;
-    (*jpeg_state)->frame_written          = false;
-    (*jpeg_state)->extra_scan_line_needed = false;
-    (*jpeg_state)->extra_scan_line        = NULL;
+    (*jpeg_state)->libjpeg_error                   = false;
+    (*jpeg_state)->read_options                    = NULL;
+    (*jpeg_state)->write_options                   = NULL;
+    (*jpeg_state)->frame_read                      = false;
+    (*jpeg_state)->frame_written                   = false;
+    (*jpeg_state)->extra_scan_line_needed_for_cmyk = false;
+    (*jpeg_state)->extra_scan_line                 = NULL;
 
     return 0;
 }
@@ -139,7 +139,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_io *io, const stru
 
         if (jpeg_state->decompress_context.jpeg_color_space == JCS_YCCK || jpeg_state->decompress_context.jpeg_color_space == JCS_CMYK) {
             SAIL_LOG_DEBUG("JPEG: Requesting to convert to CMYK and only then to RGB/RGBA");
-            jpeg_state->extra_scan_line_needed = true;
+            jpeg_state->extra_scan_line_needed_for_cmyk = true;
             jpeg_state->decompress_context.out_color_space = JCS_CMYK;
         } else {
             jpeg_state->decompress_context.out_color_space = requested_color_space;
@@ -201,7 +201,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
     }
 
     /* Extra scan line used as a buffer when reading CMYK/YCCK images. */
-    if (jpeg_state->extra_scan_line_needed) {
+    if (jpeg_state->extra_scan_line_needed_for_cmyk) {
         unsigned src_bytes_per_line;
         SAIL_TRY(sail_bytes_per_line((*image)->width,
                                         (*image)->source_image->pixel_format,
@@ -245,7 +245,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
     /* Read ICC profile. */
 #ifdef HAVE_JPEG_ICCP
     if (jpeg_state->read_options->io_options & SAIL_IO_OPTION_ICCP) {
-        if (jpeg_state->extra_scan_line_needed) {
+        if (jpeg_state->extra_scan_line_needed_for_cmyk) {
             SAIL_LOG_DEBUG("JPEG: Skipping the ICC profile (if any) as we convert from CMYK");
         } else {
             SAIL_TRY_OR_CLEANUP(sail_alloc_iccp(&(*image)->iccp),
@@ -297,7 +297,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v2(void *state, struct sail_
     }
 
     /* Convert the CMYK image to BPP24-RGB/BPP32-RGBA. */
-    if (jpeg_state->extra_scan_line_needed) {
+    if (jpeg_state->extra_scan_line_needed_for_cmyk) {
         JSAMPROW row = (JSAMPROW)jpeg_state->extra_scan_line;
         (void)jpeg_read_scanlines(&jpeg_state->decompress_context, &row, 1);
         SAIL_TRY(convert_cmyk(jpeg_state->extra_scan_line, scanline, image->width, image->pixel_format));
