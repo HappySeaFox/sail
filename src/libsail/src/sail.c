@@ -98,6 +98,7 @@ static sail_error_t update_lib_path(void) {
 
     if (lib_attribs == INVALID_FILE_ATTRIBUTES || (lib_attribs & FILE_ATTRIBUTE_DIRECTORY) == 0) {
         SAIL_LOG_DEBUG("The optional DLL directory '%s' doesn't exist, so not loading DLLs from it", full_path_to_lib);
+        free(full_path_to_lib);
         return 0;
     }
 
@@ -124,6 +125,7 @@ static sail_error_t update_lib_path(void) {
 
     if (lstat(full_path_to_lib, &lib_attribs) != 0 || !S_ISDIR(lib_attribs.st_mode)) {
         SAIL_LOG_DEBUG("The optional LIB directory '%s' doesn't exist, so not updating LD_LIBRARY_PATH with it", full_path_to_lib);
+        free(full_path_to_lib);
         return 0;
     }
 
