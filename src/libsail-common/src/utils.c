@@ -41,7 +41,7 @@
 
 #include "sail-common.h"
 
-int sail_strdup(const char *input, char **output) {
+sail_error_t sail_strdup(const char *input, char **output) {
 
     if (input == NULL) {
         *output = NULL;
@@ -62,7 +62,7 @@ int sail_strdup(const char *input, char **output) {
     return 0;
 }
 
-int sail_strdup_length(const char *input, size_t length, char **output) {
+sail_error_t sail_strdup_length(const char *input, size_t length, char **output) {
 
     if (input == NULL) {
         *output = NULL;
