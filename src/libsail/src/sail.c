@@ -94,6 +94,13 @@ static sail_error_t update_lib_path(void) {
     char *full_path_to_lib;
     SAIL_TRY(sail_concat(&full_path_to_lib, 2, plugs_path, "\\lib"));
 
+    const DWORD lib_attribs = GetFileAttributes(full_path_to_lib);
+
+    if (lib_attribs == INVALID_FILE_ATTRIBUTES || (lib_attribs & FILE_ATTRIBUTE_DIRECTORY) == 0) {
+        SAIL_LOG_DEBUG("The optional DLL directory '%s' doesn't exist, so not loading DLLs from it", full_path_to_lib);
+        return 0;
+    }
+
     SAIL_LOG_DEBUG("Set DLL directory to '%s'", full_path_to_lib);
 
     wchar_t *full_path_to_lib_w;
@@ -112,6 +119,13 @@ static sail_error_t update_lib_path(void) {
 #else
     char *full_path_to_lib;
     SAIL_TRY(sail_concat(&full_path_to_lib, 2, plugs_path, "/lib"));
+
+    struct stat lib_attribs = GetFileAttributes(full_path_to_lib);
+
+    if (lstat(pathname, &lib_attribs) != 0 || !S_ISDIR(lib_attribs.st_mode)) {
+        SAIL_LOG_DEBUG("The optional LIB directory '%s' doesn't exist, so not updating LD_LIBRARY_PATH with it", full_path_to_lib);
+        return 0;
+    }
 
     char *combined_ld_library_path;
     char *env = getenv("LD_LIBRARY_PATH");

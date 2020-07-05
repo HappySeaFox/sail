@@ -73,7 +73,7 @@ QtSail::~QtSail()
 sail_error_t QtSail::init()
 {
     if (m_context.status() != 0) {
-        QMessageBox::critical(this, tr("Error"), tr("Failed to init SAIL. Error: %d").arg(m_context.status()));
+        QMessageBox::critical(this, tr("Error"), tr("Failed to init SAIL. Error: %1").arg(m_context.status()));
         ::exit(1);
     }
 
