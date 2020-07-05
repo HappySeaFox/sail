@@ -241,7 +241,7 @@ cmake --build . --config Release --target install
 
 ### MacOS
 
-:warning: No pre-packaged homebrew bottles are available so far.
+:warning: No pre-packaged homebrew bottles are available so far. SAIL will be compiled and installed from source.
 
 #### Tested environments
 
