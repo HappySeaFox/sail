@@ -202,7 +202,12 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
 
     /* Extra scan line used as a buffer when reading CMYK/YCCK images. */
     if (jpeg_state->extra_scan_line_needed) {
-        jpeg_state->extra_scan_line = malloc(bytes_per_line);
+        unsigned src_bytes_per_line;
+        SAIL_TRY(sail_bytes_per_line((*image)->width,
+                                        (*image)->source_image->pixel_format,
+                                        &src_bytes_per_line));
+
+        jpeg_state->extra_scan_line = malloc(src_bytes_per_line);
 
         if (jpeg_state->extra_scan_line == NULL) {
             return SAIL_MEMORY_ALLOCATION_FAILED;
