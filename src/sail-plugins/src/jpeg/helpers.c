@@ -48,7 +48,7 @@ void my_error_exit(j_common_ptr cinfo) {
     longjmp(myerr->setjmp_buffer, 1);
 }
 
-int color_space_to_pixel_format(J_COLOR_SPACE color_space) {
+enum SailPixelFormat color_space_to_pixel_format(J_COLOR_SPACE color_space) {
     switch (color_space) {
         case JCS_GRAYSCALE: return SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE;
 

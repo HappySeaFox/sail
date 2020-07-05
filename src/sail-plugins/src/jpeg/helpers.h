@@ -32,6 +32,7 @@
 
 #include <jpeglib.h>
 
+#include "common.h"
 #include "export.h"
 
 struct my_error_context {
@@ -43,7 +44,7 @@ SAIL_HIDDEN void my_output_message(j_common_ptr cinfo);
 
 SAIL_HIDDEN void my_error_exit(j_common_ptr cinfo);
 
-SAIL_HIDDEN int color_space_to_pixel_format(J_COLOR_SPACE color_space);
+SAIL_HIDDEN enum SailPixelFormat color_space_to_pixel_format(J_COLOR_SPACE color_space);
 
 SAIL_HIDDEN J_COLOR_SPACE pixel_format_to_color_space(int pixel_format);
 
