@@ -108,7 +108,7 @@ SAIL_EXPORT sail_error_t sail_pixel_format_from_string(const char *str, enum Sai
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_image_property_to_string(int image_property, const char **result);
+SAIL_EXPORT sail_error_t sail_image_property_to_string(enum SailImageProperties image_property, const char **result);
 
 /*
  * Assigns image property from a string representation or 0. See SailImageProperties.
@@ -116,7 +116,7 @@ SAIL_EXPORT sail_error_t sail_image_property_to_string(int image_property, const
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_image_property_from_string(const char *str, int *result);
+SAIL_EXPORT sail_error_t sail_image_property_from_string(const char *str, enum SailImageProperties *result);
 
 /*
  * Assigns a non-NULL string representation of the specified compression type. See SailCompressionType.
@@ -140,7 +140,7 @@ SAIL_EXPORT sail_error_t sail_compression_type_from_string(const char *str, enum
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_feature_to_string(int plugin_feature, const char **result);
+SAIL_EXPORT sail_error_t sail_plugin_feature_to_string(enum SailPluginFeatures plugin_feature, const char **result);
 
 /*
  * Assigns plugin feature from a string representation or 0. See SailPluginFeatures.
@@ -148,7 +148,7 @@ SAIL_EXPORT sail_error_t sail_plugin_feature_to_string(int plugin_feature, const
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_feature_from_string(const char *str, int *result);
+SAIL_EXPORT sail_error_t sail_plugin_feature_from_string(const char *str, enum SailPluginFeatures *result);
 
 /*
  * Calculates the number of bits per pixel in the specified pixel format.

@@ -73,8 +73,8 @@ public:
     const sail::read_features& read_features() const;
     const sail::write_features& write_features() const;
 
-    static sail_error_t plugin_feature_to_string(int plugin_feature, const char **result);
-    static sail_error_t plugin_feature_from_string(const char *str, int *result);
+    static sail_error_t plugin_feature_to_string(SailPluginFeatures plugin_feature, const char **result);
+    static sail_error_t plugin_feature_from_string(const char *str, SailPluginFeatures *result);
 
 private:
     /*

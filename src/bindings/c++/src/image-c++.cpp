@@ -333,14 +333,14 @@ sail_error_t image::pixel_format_from_string(const char *str, SailPixelFormat *r
     return 0;
 }
 
-sail_error_t image::image_property_to_string(int image_property, const char **result)
+sail_error_t image::image_property_to_string(SailImageProperties image_property, const char **result)
 {
     SAIL_TRY(sail_image_property_to_string(image_property, result));
 
     return 0;
 }
 
-sail_error_t image::image_property_from_string(const char *str, int *result)
+sail_error_t image::image_property_from_string(const char *str, SailImageProperties *result)
 {
     SAIL_TRY(sail_image_property_from_string(str, result));
 

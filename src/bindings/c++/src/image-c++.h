@@ -324,7 +324,7 @@ public:
      *
      * Returns 0 on success or sail_error_t on error.
      */
-    static sail_error_t image_property_to_string(int image_property, const char **result);
+    static sail_error_t image_property_to_string(SailImageProperties image_property, const char **result);
 
     /*
      * Assigns image property from a string representation or 0. See SailImageProperties.
@@ -332,7 +332,7 @@ public:
      *
      * Returns 0 on success or sail_error_t on error.
      */
-    static sail_error_t image_property_from_string(const char *str, int *result);
+    static sail_error_t image_property_from_string(const char *str, SailImageProperties *result);
 
     /*
      * Assigns a non-NULL string representation of the specified compression type. See SailCompressionType.

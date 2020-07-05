@@ -101,7 +101,7 @@ static sail_error_t update_lib_path(void) {
                         free(full_path_to_lib));
 
     if (!AddDllDirectory(full_path_to_lib_w)) {
-        SAIL_LOG_ERROR("Failed to update library search path. Error: %d", GetLastError());
+        SAIL_LOG_ERROR("Failed to update library search path with '%s'. Error: %d", full_path_to_lib, GetLastError());
         free(full_path_to_lib_w);
         free(full_path_to_lib);
         return SAIL_ENV_UPDATE_FAILED;

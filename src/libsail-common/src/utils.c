@@ -328,7 +328,7 @@ sail_error_t sail_pixel_format_from_string(const char *str, enum SailPixelFormat
     return SAIL_UNSUPPORTED_PIXEL_FORMAT;
 }
 
-sail_error_t sail_image_property_to_string(int image_property, const char **result) {
+sail_error_t sail_image_property_to_string(enum SailImageProperties image_property, const char **result) {
 
     SAIL_CHECK_STRING_PTR(result);
 
@@ -340,7 +340,7 @@ sail_error_t sail_image_property_to_string(int image_property, const char **resu
     return SAIL_UNSUPPORTED_IMAGE_PROPERTY;
 }
 
-sail_error_t sail_image_property_from_string(const char *str, int *result) {
+sail_error_t sail_image_property_from_string(const char *str, enum SailImageProperties *result) {
 
     SAIL_CHECK_STRING_PTR(str);
     SAIL_CHECK_RESULT_PTR(result);
@@ -394,7 +394,7 @@ sail_error_t sail_compression_type_from_string(const char *str, enum SailCompres
     return SAIL_UNSUPPORTED_COMPRESSION_TYPE;
 }
 
-sail_error_t sail_plugin_feature_to_string(int plugin_feature, const char **result) {
+sail_error_t sail_plugin_feature_to_string(enum SailPluginFeatures plugin_feature, const char **result) {
 
     SAIL_CHECK_STRING_PTR(result);
 
@@ -411,7 +411,7 @@ sail_error_t sail_plugin_feature_to_string(int plugin_feature, const char **resu
     return SAIL_UNSUPPORTED_PLUGIN_FEATURE;
 }
 
-sail_error_t sail_plugin_feature_from_string(const char *str, int *result) {
+sail_error_t sail_plugin_feature_from_string(const char *str, enum SailPluginFeatures *result) {
 
     SAIL_CHECK_STRING_PTR(str);
     SAIL_CHECK_RESULT_PTR(result);

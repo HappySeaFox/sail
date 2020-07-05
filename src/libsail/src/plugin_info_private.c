@@ -152,6 +152,20 @@ static sail_error_t parse_serialized_ints(const char *value, int **target, int *
     return 0;
 }
 
+static sail_error_t plugin_feature_from_string(const char *str, int *result) {
+
+    SAIL_TRY(sail_plugin_feature_from_string(str, (enum SailPluginFeatures *)result));
+
+    return 0;
+}
+
+static sail_error_t image_property_from_string(const char *str, int *result) {
+
+    SAIL_TRY(sail_image_property_from_string(str, (enum SailImageProperties *)result));
+
+    return 0;
+}
+
 static sail_error_t parse_flags(const char *value, int *features, sail_error_t (*converter)(const char *str, int *result)) {
 
     SAIL_CHECK_PTR(value);
@@ -270,7 +284,7 @@ static int inih_handler(void *data, const char *section, const char *name, const
                 return 0;
             }
         } else if (strcmp(name, "features") == 0) {
-            if (parse_flags(value, &plugin_info->read_features->features, sail_plugin_feature_from_string) != 0) {
+            if (parse_flags(value, &plugin_info->read_features->features, plugin_feature_from_string) != 0) {
                 SAIL_LOG_ERROR("Failed to parse plugin features: '%s'", value);
                 return 0;
             }
@@ -280,12 +294,12 @@ static int inih_handler(void *data, const char *section, const char *name, const
         }
     } else if (strcmp(section, "write-features") == 0) {
         if (strcmp(name, "features") == 0) {
-            if (parse_flags(value, &plugin_info->write_features->features, sail_plugin_feature_from_string) != 0) {
+            if (parse_flags(value, &plugin_info->write_features->features, plugin_feature_from_string) != 0) {
                 SAIL_LOG_ERROR("Failed to parse plugin features: '%s'", value);
                 return 0;
             }
         } else if (strcmp(name, "properties") == 0) {
-            if (parse_flags(value, &plugin_info->write_features->properties, sail_image_property_from_string) != 0) {
+            if (parse_flags(value, &plugin_info->write_features->properties, image_property_from_string) != 0) {
                 SAIL_LOG_ERROR("Failed to parse image properties: '%s'", value);
                 return 0;
             }
