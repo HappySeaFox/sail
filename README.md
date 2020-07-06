@@ -70,7 +70,11 @@ are always highly welcomed.
 
 ## Supported platforms
 
-Currently, SAIL supports the Windows, MacOS, and Linux platforms.
+Currently, SAIL supports the following platforms:
+
+- Windows
+- MacOS
+- Linux
 
 ## Development status
 
