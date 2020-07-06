@@ -1,24 +1,3 @@
-Table of Contents
-=================
-
-* [SAIL: Squirrel Abstract Image Library](#sail-squirrel-abstract-image-library)
-  * [Target audience](#target-audience)
-  * [Features overview](#features-overview)
-  * [Features NOT provided](#features-not-provided)
-  * [Differences from other image decoding libraries](#differences-from-other-image-decoding-libraries)
-  * [Supported image formats](#supported-image-formats)
-  * [Supported platforms](#supported-platforms)
-  * [Development status](#development-status)
-  * [Have questions or issues?](#have-questions-or-issues)
-  * [Architecture overview](#architecture-overview)
-  * [License](#license)
-  * [APIs overview](#apis-overview)
-  * [Building](#building)
-    * [CMake options overview](#cmake-options-overview)
-    * [Windows](#windows)
-    * [MacOS](#macos)
-    * [Linux](#linux)
-
 # SAIL: Squirrel Abstract Image Library
 
 SAIL is a fast and lightweight cross-platform image decoding and encoding library providing multi-leveled APIs,
