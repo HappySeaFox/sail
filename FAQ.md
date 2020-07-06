@@ -7,12 +7,15 @@ Table of Contents
   * [How does SAIL support image formats?](#how-does-sail-support-image-formats)
   * [Can I implement an image decoding plugin in C\+\+?](#can-i-implement-an-image-decoding-plugin-in-c)
   * [Does SAIL preload all plugins in the initialization routine?](#does-sail-preload-all-plugins-in-the-initialization-routine)
+  * [How does SAIL look for plugins?](#how-does-sail-look-for-plugins)
+    * [Windows](#windows)
+    * [Unix (including MacOS)](#unix-including-macos)
+  * [How can I point SAIL to a different plugins location?](#how-can-i-point-sail-to-a-different-plugins-location)
   * [Describe the high\-level APIs](#describe-the-high-level-apis)
+  * [Does SAIL provide simple one\-line APIs?](#does-sail-provide-simple-one-line-apis)
   * [How many image formats do you plan to implement?](#how-many-image-formats-do-you-plan-to-implement)
   * [Does SAIL support static linking?](#does-sail-support-static-linking)
   * [I have questions, issues, or proposals](#i-have-questions-issues-or-proposals)
-  * [Does SAIL provide simple one\-line APIs?](#does-sail-provide-simple-one-line-apis)
-  * [How can I point SAIL to a different plugins location?](#how-can-i-point-sail-to-a-different-plugins-location)
   * [Please describe memory management techniques implemented in SAIL](#please-describe-memory-management-techniques-implemented-in-sail)
     * [The memory management technique implemented in SAIL](#the-memory-management-technique-implemented-in-sail)
     * [Convention to call SAIL functions](#convention-to-call-sail-functions)
@@ -56,15 +59,37 @@ Theoretically, you can implement your plugin in any programming language.
 No. By default, SAIL doesn't preload all plugins in the initialization routine (`sail_init()`). It loads them on demand.
 However, you can preload them explicitly with `sail_init_with_flags(SAIL_FLAG_PRELOAD_PLUGINS)`.
 
+## How does SAIL look for plugins?
+
+Plugins (image codecs) paths search algorithm (first found path wins):
+
+### Windows
+1. `SAIL_PLUGINS_PATH` environment variable
+2. `<SAIL DEPLOYMENT FOLDER>\lib\sail\plugins`
+3. Hardcoded `SAIL_PLUGINS_PATH` in config.h
+
+### Unix (including MacOS)
+1. `SAIL_PLUGINS_PATH` environment variable
+2. Hardcoded `SAIL_PLUGINS_PATH` in config.h
+
+## How can I point SAIL to a different plugins location?
+
+Set `SAIL_PLUGINGS_PATH` environment variable to a desired location.
+
 ## Describe the high-level APIs
 
 SAIL provides four levels of high-level APIs:
 
-- `Junior` - "I just want to load this damn JPEG."
-- `Advanced` - "I want to load this damn animated GIF from memory."
-- `Deep diver` - "I want to load this damn animated GIF from memory and have control over selected plugins and output pixel formats."
-- `Technical diver` - "I want everything above and my custom I/O source."
+- `Junior`: I just want to load this damn JPEG
+- `Advanced`: I want to load this damn animated GIF from memory
+- `Deep diver`: I want to load this damn animated GIF from memory and have control over selected plugins and output pixel formats
+- `Technical diver`: I want everything above and my custom I/O source
 
+See [EXAMPLES](EXAMPLES.md) for more.
+
+## Does SAIL provide simple one-line APIs?
+
+Yes. SAIL provides four levels of APIs, depending on your needs: `junior`, `advanced`, `deep diver`, and `technical diver`.
 See [EXAMPLES](EXAMPLES.md) for more.
 
 ## How many image formats do you plan to implement?
@@ -82,15 +107,6 @@ Opening a GitHub [issue](https://github.com/smoked-herring/sail/issues) is the p
 of communicating and solving problems.
 
 Pull requests are always welcomed.
-
-## Does SAIL provide simple one-line APIs?
-
-Yes. SAIL provides four levels of APIs, depending on your needs: `junior`, `advanced`, `deep diver`, and `technical diver`.
-See [EXAMPLES](EXAMPLES.md) for more.
-
-## How can I point SAIL to a different plugins location?
-
-Set `SAIL_PLUGINGS_PATH` environment variable to a desired location.
 
 ## Please describe memory management techniques implemented in SAIL
 
