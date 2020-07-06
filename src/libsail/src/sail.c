@@ -62,16 +62,56 @@ static const char* plugins_path(void) {
 
 #ifdef SAIL_WIN32
     _dupenv_s((char **)&env, NULL, "SAIL_PLUGINS_PATH");
+
+    /* Construct "\bin\..\lib\sail\plugins" from "\bin\sail.dll". */
+    if (env == NULL) {
+        char path[MAX_PATH];
+        HMODULE thisModule;
+
+        if (GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                (LPCSTR)&plugins_path, &thisModule) == 0) {
+            SAIL_LOG_ERROR("GetModuleHandleEx() failed with an error code %d. Falling back to loading plugins from '%s'",
+                            GetLastError(), SAIL_PLUGINS_PATH);
+            env = SAIL_PLUGINS_PATH;
+        } else if (GetModuleFileName(thisModule, path, sizeof(path)) == 0) {
+            SAIL_LOG_ERROR("GetModuleFileName() failed with an error code %d. Falling back to loading plugins from '%s'",
+                            GetLastError(), SAIL_PLUGINS_PATH);
+            env = SAIL_PLUGINS_PATH;
+        } else {
+            char *lib_sail_plugins_path;
+
+            /* "\bin\sail.dll" -> "\bin". */
+            char *last_sep = strrchr(path, '\\');
+
+            if (last_sep == NULL) {
+                SAIL_LOG_ERROR("Failed to find a path separator in '%s'. Falling back to loading plugins from '%s'",
+                                path, SAIL_PLUGINS_PATH);
+                env = SAIL_PLUGINS_PATH;
+            } else {
+                *last_sep = '\0';
+
+                /* "\bin" -> "\bin\..\lib\sail\plugins". */
+                SAIL_TRY_OR_EXECUTE(sail_concat(&lib_sail_plugins_path, 2, path, "\\..\\lib\\sail\\plugins"),
+                                    /* on error */ SAIL_LOG_ERROR("Failed to concat strings. Falling back to loading plugins from '%s'",
+                                                                    SAIL_PLUGINS_PATH),
+                                    env = SAIL_PLUGINS_PATH);
+                env = lib_sail_plugins_path;
+                SAIL_LOG_DEBUG("Optional SAIL_PLUGINS_PATH environment variable is not set");
+            }
+        }
+    } else {
+        SAIL_LOG_DEBUG("SAIL_PLUGINS_PATH environment variable is set. Loading plugins from '%s'", env);
+    }
 #else
     env = getenv("SAIL_PLUGINS_PATH");
-#endif
 
     if (env == NULL) {
-        SAIL_LOG_DEBUG("SAIL_PLUGINS_PATH environment variable is not set. Loading plugins from %s", SAIL_PLUGINS_PATH);
+        SAIL_LOG_DEBUG("SAIL_PLUGINS_PATH environment variable is not set. Loading plugins from '%s'", SAIL_PLUGINS_PATH);
         env = SAIL_PLUGINS_PATH;
     } else {
-        SAIL_LOG_DEBUG("SAIL_PLUGINS_PATH environment variable is set. Loading plugins from %s", env);
+        SAIL_LOG_DEBUG("SAIL_PLUGINS_PATH environment variable is set. Loading plugins from '%s'", env);
     }
+#endif
 
     return env;
 }
@@ -97,7 +137,7 @@ static sail_error_t update_lib_path(void) {
     const DWORD lib_attribs = GetFileAttributes(full_path_to_lib);
 
     if (lib_attribs == INVALID_FILE_ATTRIBUTES || (lib_attribs & FILE_ATTRIBUTE_DIRECTORY) == 0) {
-        SAIL_LOG_DEBUG("The optional DLL directory '%s' doesn't exist, so not loading DLLs from it", full_path_to_lib);
+        SAIL_LOG_DEBUG("Optional DLL directory '%s' doesn't exist, so not loading DLLs from it", full_path_to_lib);
         free(full_path_to_lib);
         return 0;
     }
@@ -124,7 +164,7 @@ static sail_error_t update_lib_path(void) {
     struct stat lib_attribs;
 
     if (lstat(full_path_to_lib, &lib_attribs) != 0 || !S_ISDIR(lib_attribs.st_mode)) {
-        SAIL_LOG_DEBUG("The optional LIB directory '%s' doesn't exist, so not updating LD_LIBRARY_PATH with it", full_path_to_lib);
+        SAIL_LOG_DEBUG("Optional LIB directory '%s' doesn't exist, so not updating LD_LIBRARY_PATH with it", full_path_to_lib);
         free(full_path_to_lib);
         return 0;
     }
