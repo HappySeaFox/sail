@@ -26,6 +26,8 @@
 
 ## Priority 2
 
+- Add `sail` command line tool? Usa-case: `sail list -v` to list all the installed plugins
+
 - Print more errors on 'return SAIL_XXX'
 
 - initializer lists in C++
