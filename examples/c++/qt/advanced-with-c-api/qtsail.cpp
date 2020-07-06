@@ -63,6 +63,7 @@ sail_error_t QtSail::init()
     QTimer::singleShot(0, this, [&]{
         QMessageBox::information(this, tr("Features"), tr("This demo includes:"
                                                           "<ul>"
+                                                          "<li>Output RGB or RGBA pixels only</li>"
                                                           "<li>Playing animations</li>"
                                                           "</ul>"
                                                           "This demo doesn't include:"
