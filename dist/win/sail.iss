@@ -12,7 +12,6 @@ AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}/releases
 DefaultDirName={sd}\{#MyAppName}
-DisableDirPage=Yes
 DefaultGroupName={#MyAppName}
 LicenseFile=LICENSE.txt
 OutputDir=.
@@ -74,15 +73,14 @@ var
   Uninstall: String;
   UninstallQuery : String;
 begin
-  UninstallQuery := ExpandConstant('Software\Microsoft\Windows\CurrentVersion\Uninstall\{#emit SetupSetting("AppId")}_is1');
+  UninstallQuery := ExpandConstant('Software\Microsoft\Windows\CurrentVersion\Uninstall\{#SetupSetting("AppId")}_is1');
   if (CurStep = ssInstall) then begin
-    if RegQueryStringValue(HKLM, UninstallQuery, 'UninstallString', Uninstall)
-      or RegQueryStringValue(HKCU, UninstallQuery, 'UninstallString', Uninstall) then begin
-    Uninstall := RemoveQuotes(Uninstall)
-    if (FileExists(Uninstall)) AND (not Exec(RemoveQuotes(Uninstall), '/VERYSILENT', '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode)) then begin
-      MsgBox(SysErrorMessage(ResultCode), mbCriticalError, MB_OK);
-      Abort();
+    if RegQueryStringValue(HKLM, UninstallQuery, 'UninstallString', Uninstall) or RegQueryStringValue(HKCU, UninstallQuery, 'UninstallString', Uninstall) then begin
+      Uninstall := RemoveQuotes(Uninstall)
+      if (FileExists(Uninstall)) AND (not Exec(RemoveQuotes(Uninstall), '/VERYSILENT', '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode)) then begin
+        MsgBox(SysErrorMessage(ResultCode), mbCriticalError, MB_OK);
+        Abort();
+      end;
     end;
   end;
-end;
 end;
