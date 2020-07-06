@@ -83,8 +83,6 @@ sail_error_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, QV
      * Always set the initial state to NULL in C or nullptr in C++.
      */
     void *state = NULL;
-    struct sail_image *image = NULL;
-    uchar *image_bits = NULL;
 
     /*
      * Save this for displaying in the status bar.
@@ -105,6 +103,9 @@ sail_error_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, QV
      * Read all the available image frames in the file.
      */
     sail_error_t res = 0;
+    struct sail_image *image;
+    uchar *image_bits;
+
     while ((res = sail_read_next_frame(state,
                                        &image,
                                        (void **)&image_bits)) == 0) {
@@ -175,7 +176,7 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
      */
     void *state = nullptr;
 
-    struct sail_image *image = nullptr;
+    struct sail_image *image;
     SAIL_TRY(sail_alloc_image(&image));
 
     image->width = qimage.width();

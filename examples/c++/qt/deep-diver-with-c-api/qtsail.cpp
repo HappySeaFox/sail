@@ -94,11 +94,6 @@ sail_error_t QtSail::init()
 
 sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 {
-    sail_read_options *read_options = nullptr;
-
-    sail_image *image = nullptr;
-    uchar *image_bits = nullptr;
-
     /*
      * Always set the initial state to NULL in C or nullptr in C++.
      */
@@ -116,6 +111,8 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
      */
     const struct sail_plugin_info *plugin_info;
     SAIL_TRY(sail_plugin_info_by_magic_number_from_path(path.toLocal8Bit(), m_context, &plugin_info));
+
+    sail_read_options *read_options;
 
     /*
      * Allocate new read options and copy defaults from the plugin-specific read features
@@ -162,6 +159,9 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
      * Our read options are not needed anymore.
      */
     sail_destroy_read_options(read_options);
+
+    sail_image *image;
+    uchar *image_bits;
 
     /*
      * Read just the first frame in the image.
@@ -267,15 +267,13 @@ sail_error_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffer
      * to free memory (pointers, image bits etc.) on error in a real application.
      */
 
-    sail_image *image = nullptr;
-    sail_write_options *write_options = nullptr;
-
     // Always set the initial state to NULL in C or nullptr in C++.
     //
     void *state = nullptr;
 
     // Create a new image to be passed into the SAIL writing functions.
     //
+    sail_image *image;
     SAIL_TRY(sail_alloc_image(&image));
 
     image->width = qimage.width();
@@ -327,6 +325,7 @@ sail_error_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffer
     // Allocate new write options and copy defaults from the write features
     // (preferred output pixel format etc.).
     //
+    sail_write_options *write_options;
     SAIL_TRY(sail_alloc_write_options_from_features(plugin_info->write_features, &write_options));
 
     const qint64 beforeDialog = elapsed.elapsed();

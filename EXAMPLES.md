@@ -110,8 +110,8 @@ SAIL_TRY(sail_init(&context));
  * Always set the initial state to NULL in C or nullptr in C++.
  */
 void *state = NULL;
-struct sail_image *image = NULL;
-unsigned char *image_bits = NULL;
+struct sail_image *image;
+unsigned char *image_bits;
 
 /*
  * Starts reading the specified file.
@@ -210,9 +210,9 @@ struct sail_context *context = NULL;
  */
 SAIL_TRY(sail_init_with_flags(&context, SAIL_FLAG_PRELOAD_PLUGINS));
 
-struct sail_read_options *read_options = NULL;
-struct sail_image *image = NULL;
-unsigned char *image_bits = NULL;
+struct sail_read_options *read_options;
+struct sail_image *image;
+unsigned char *image_bits;
 
 /*
  * Always set the initial state to NULL in C or nullptr in C++.
@@ -379,9 +379,9 @@ struct sail_context *context = NULL;
  */
 SAIL_TRY(sail_init_with_flags(&context, SAIL_FLAG_PRELOAD_PLUGINS));
 
-struct sail_read_options *read_options = NULL;
-struct sail_image *image = NULL;
-unsigned char *image_bits = NULL;
+struct sail_read_options *read_options;
+struct sail_image *image;
+unsigned char *image_bits;
 
 /*
  * Always set the initial state to NULL in C or nullptr in C++.

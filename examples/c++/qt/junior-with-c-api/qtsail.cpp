@@ -107,7 +107,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 
 sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
 {
-    struct sail_image *image = nullptr;
+    struct sail_image *image;
     SAIL_TRY(sail_alloc_image(&image));
 
     image->width = qimage.width();
