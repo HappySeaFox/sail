@@ -62,12 +62,6 @@ Author: Dmitry Baryshev
 
 Work to add more image formats is ongoing.
 
-### Legacy image formats
-
-I'm very sceptical about adding legacy image formats support into SAIL. However, if you need one, please open a
-GitHub [issue](https://github.com/smoked-herring/sail/issues) with detailed image format description. Pull requests
-are always highly welcomed.
-
 ## Supported platforms
 
 Currently, SAIL supports the following platforms:
