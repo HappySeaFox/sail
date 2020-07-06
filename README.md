@@ -126,7 +126,7 @@ to use in C++ applications.
 
 SAIL provides four levels of APIs, depending on your needs. Let's have a quick look at them.
 
-### 1. `Junior` - "I just want to load this damn JPEG."
+### 1. `Junior`: I just want to load this damn JPEG
 
 #### C:
 ```C
@@ -179,15 +179,15 @@ SAIL_TRY(reader.read(path, &image));
 
 It's pretty easy, isn't it? :smile: See [EXAMPLES](EXAMPLES.md) for more.
 
-### 2. `Advanced` - "I want to load this damn animated GIF from memory."
+### 2. `Advanced`: I want to load this damn animated GIF from memory
 
 See [EXAMPLES](EXAMPLES.md) for more.
 
-### 3. `Deep diver` - "I want to load this damn animated GIF from memory and have control over selected plugins and output pixel formats."
+### 3. `Deep diver`: I want to load this damn animated GIF from memory and have control over selected plugins and output pixel formats
 
 See [EXAMPLES](EXAMPLES.md) for more.
 
-### 4. `Technical diver` - "I want everything above and my custom I/O source."
+### 4. `Technical diver`: I want everything above and my custom I/O source
 
 See [EXAMPLES](EXAMPLES.md) for more.
 
