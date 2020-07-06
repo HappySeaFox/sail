@@ -180,7 +180,7 @@ do {                              \
  */
 #define SAIL_TRY(sail_func)       \
 do {                              \
-    int res;                      \
+    sail_error_t res;             \
                                   \
     if ((res = sail_func) != 0) { \
         return res;               \
@@ -193,11 +193,24 @@ do {                              \
  */
 #define SAIL_TRY_OR_SUPPRESS(sail_func) \
 do {                                    \
-    int res;                            \
+    sail_error_t res;                   \
                                         \
     if ((res = sail_func) != 0) {       \
         (void)0;                        \
     }                                   \
+} while(0)
+
+/*
+ * Try to execute the specified SAIL function. If it fails, execute the rest of arguments.
+ * Use do/while to require ';' at the end of a SAIL_TRY_OR_EXECUTE() expression.
+ */
+#define SAIL_TRY_OR_EXECUTE(sail_func, ...) \
+do {                                        \
+    sail_error_t res;                       \
+                                            \
+    if ((res = sail_func) != 0) {           \
+        __VA_ARGS__;                        \
+    }                                       \
 } while(0)
 
 /*
@@ -207,7 +220,7 @@ do {                                    \
  */
 #define SAIL_TRY_OR_CLEANUP(sail_func, ...) \
 do {                                        \
-    int res;                                \
+    sail_error_t res;                       \
                                             \
     if ((res = sail_func) != 0) {           \
         __VA_ARGS__;                        \
