@@ -55,7 +55,7 @@ typedef int sail_error_t;
 #define SAIL_NULL_PTR                     20
 #define SAIL_STATE_NULL_PTR               21
 #define SAIL_IMAGE_NULL_PTR               22
-#define SAIL_SCAN_LINE_NULL_PTR           23
+#define SAIL_BITS_NULL_PTR                23
 #define SAIL_READ_FEATURES_NULL_PTR       24
 #define SAIL_READ_OPTIONS_NULL_PTR        25
 #define SAIL_WRITE_FEATURES_NULL_PTR      26
@@ -152,7 +152,7 @@ do {                              \
     }                             \
 } while(0)
 
-#define SAIL_CHECK_SCAN_LINE_PTR(scan)                  SAIL_CHECK_PTR2(scan,            SAIL_SCAN_LINE_NULL_PTR)
+#define SAIL_CHECK_BITS_PTR(scan)                       SAIL_CHECK_PTR2(scan,            SAIL_BITS_NULL_PTR)
 #define SAIL_CHECK_READ_FEATURES_PTR(read_features)     SAIL_CHECK_PTR2(read_features,   SAIL_READ_FEATURES_NULL_PTR)
 #define SAIL_CHECK_READ_OPTIONS_PTR(read_options)       SAIL_CHECK_PTR2(read_options,    SAIL_READ_OPTIONS_NULL_PTR)
 #define SAIL_CHECK_WRITE_FEATURES_PTR(write_features)   SAIL_CHECK_PTR2(write_features,  SAIL_WRITE_FEATURES_NULL_PTR)

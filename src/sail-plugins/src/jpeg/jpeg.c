@@ -278,12 +278,12 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_pass_v3(void *state, struct 
     return 0;
 }
 
-SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v3(void *state, struct sail_io *io, const struct sail_image *image, void *scanline) {
+SAIL_EXPORT sail_error_t sail_plugin_read_frame_v3(void *state, struct sail_io *io, const struct sail_image *image, void *bits) {
 
     SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IO(io);
     SAIL_CHECK_IMAGE(image);
-    SAIL_CHECK_SCAN_LINE_PTR(scanline);
+    SAIL_CHECK_BITS_PTR(bits);
 
     struct jpeg_state *jpeg_state = (struct jpeg_state *)state;
 
@@ -296,14 +296,18 @@ SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v3(void *state, struct sail_
         return SAIL_UNDERLYING_CODEC_ERROR;
     }
 
-    /* Convert the CMYK image to BPP24-RGB/BPP32-RGBA. */
-    if (jpeg_state->extra_scan_line_needed_for_cmyk) {
-        JSAMPROW row = (JSAMPROW)jpeg_state->extra_scan_line;
-        (void)jpeg_read_scanlines(&jpeg_state->decompress_context, &row, 1);
-        SAIL_TRY(convert_cmyk(jpeg_state->extra_scan_line, scanline, image->width, image->pixel_format));
-    } else {
-        JSAMPROW row = (JSAMPROW)scanline;
-        (void)jpeg_read_scanlines(&jpeg_state->decompress_context, &row, 1);
+    for (unsigned row = 0; row < image->height; row++) {
+        unsigned char *scanline = (unsigned char *)bits + row * image->bytes_per_line;
+
+        /* Convert the CMYK image to BPP24-RGB/BPP32-RGBA. */
+        if (jpeg_state->extra_scan_line_needed_for_cmyk) {
+            JSAMPROW samprow = (JSAMPROW)jpeg_state->extra_scan_line;
+            (void)jpeg_read_scanlines(&jpeg_state->decompress_context, &samprow, 1);
+            SAIL_TRY(convert_cmyk(jpeg_state->extra_scan_line, scanline, image->width, image->pixel_format));
+        } else {
+            JSAMPROW samprow = (JSAMPROW)scanline;
+            (void)jpeg_read_scanlines(&jpeg_state->decompress_context, &samprow, 1);
+        }
     }
 
     return 0;
@@ -473,12 +477,12 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_pass_v3(void *state, struct
     return 0;
 }
 
-SAIL_EXPORT sail_error_t sail_plugin_write_scan_line_v3(void *state, struct sail_io *io, const struct sail_image *image, const void *scanline) {
+SAIL_EXPORT sail_error_t sail_plugin_write_frame_v3(void *state, struct sail_io *io, const struct sail_image *image, const void *bits) {
 
     SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IO(io);
     SAIL_CHECK_IMAGE(image);
-    SAIL_CHECK_SCAN_LINE_PTR(scanline);
+    SAIL_CHECK_BITS_PTR(bits);
 
     struct jpeg_state *jpeg_state = (struct jpeg_state *)state;
 
@@ -491,9 +495,10 @@ SAIL_EXPORT sail_error_t sail_plugin_write_scan_line_v3(void *state, struct sail
         return SAIL_UNDERLYING_CODEC_ERROR;
     }
 
-    JSAMPROW row = (JSAMPROW)scanline;
-
-    jpeg_write_scanlines(&jpeg_state->compress_context, &row, 1);
+    for (unsigned row = 0; row < image->height; row++) {
+        JSAMPROW samprow = (JSAMPROW)((const unsigned char *)bits + row * image->bytes_per_line);
+        jpeg_write_scanlines(&jpeg_state->compress_context, &samprow, 1);
+    }
 
     return 0;
 }

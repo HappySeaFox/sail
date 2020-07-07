@@ -80,7 +80,6 @@ struct png_state {
 
     bool skipped_hidden;
     png_bytep *prev;
-    unsigned line;
     /* Temporary scanline to read into. We need it for blending. */
     void *temp_scanline;
     /* Scan line for skipping a first hidden frame. */
@@ -449,19 +448,15 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_pass_v3(void *state, struct 
         return SAIL_UNDERLYING_CODEC_ERROR;
     }
 
-#ifdef PNG_APNG_SUPPORTED
-    png_state->line = 0;
-#endif
-
     return 0;
 }
 
-SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v3(void *state, struct sail_io *io, const struct sail_image *image, void *scanline) {
+SAIL_EXPORT sail_error_t sail_plugin_read_frame_v3(void *state, struct sail_io *io, const struct sail_image *image, void *bits) {
 
     SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IO(io);
     SAIL_CHECK_IMAGE(image);
-    SAIL_CHECK_SCAN_LINE_PTR(scanline);
+    SAIL_CHECK_BITS_PTR(bits);
 
     struct png_state *png_state = (struct png_state *)state;
 
@@ -476,44 +471,50 @@ SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v3(void *state, struct sail_
 
 #ifdef PNG_APNG_SUPPORTED
     if (png_state->is_apng) {
-        memcpy(scanline, png_state->prev[png_state->line], png_state->first_image->width * png_state->bytes_per_pixel);
+        for (unsigned row = 0; row < image->height; row++) {
+            unsigned char *scanline = (unsigned char *)bits + row * image->bytes_per_line;
 
-        if (png_state->line >= png_state->next_frame_y_offset && png_state->line < png_state->next_frame_y_offset + png_state->next_frame_height) {
-            png_read_row(png_state->png_ptr, (png_bytep)png_state->temp_scanline, NULL);
+            memcpy(scanline, png_state->prev[row], png_state->first_image->width * png_state->bytes_per_pixel);
 
-            /* Copy all pixel values including alpha. */
-            if (png_state->current_frame == 1 || png_state->next_frame_blend_op == PNG_BLEND_OP_SOURCE) {
-                SAIL_TRY(blend_source(png_state->bytes_per_pixel,
-                                        scanline,
-                                        png_state->next_frame_x_offset * png_state->bytes_per_pixel,
+            if (row >= png_state->next_frame_y_offset && row < png_state->next_frame_y_offset + png_state->next_frame_height) {
+                png_read_row(png_state->png_ptr, (png_bytep)png_state->temp_scanline, NULL);
+
+                /* Copy all pixel values including alpha. */
+                if (png_state->current_frame == 1 || png_state->next_frame_blend_op == PNG_BLEND_OP_SOURCE) {
+                    SAIL_TRY(blend_source(png_state->bytes_per_pixel,
+                                            scanline,
+                                            png_state->next_frame_x_offset * png_state->bytes_per_pixel,
+                                            png_state->temp_scanline,
+                                            png_state->next_frame_width * png_state->bytes_per_pixel));
+                } else { /* PNG_BLEND_OP_OVER */
+                    SAIL_TRY(blend_over(png_state->bytes_per_pixel,
+                                        png_state->next_frame_width,
                                         png_state->temp_scanline,
-                                        png_state->next_frame_width * png_state->bytes_per_pixel));
-            } else { /* PNG_BLEND_OP_OVER */
-                SAIL_TRY(blend_over(png_state->bytes_per_pixel,
-                                    png_state->next_frame_width,
-                                    png_state->temp_scanline,
-                                    scanline,
-                                    png_state->next_frame_x_offset * png_state->bytes_per_pixel));
-            }
+                                        scanline,
+                                        png_state->next_frame_x_offset * png_state->bytes_per_pixel));
+                }
 
-            if (png_state->next_frame_dispose_op == PNG_DISPOSE_OP_BACKGROUND) {
-                memset(png_state->prev[png_state->line] + png_state->next_frame_x_offset * png_state->bytes_per_pixel,
-                        0,
-                        png_state->next_frame_width * png_state->bytes_per_pixel);
-            } else if (png_state->next_frame_dispose_op == PNG_DISPOSE_OP_NONE) {
-                memcpy(png_state->prev[png_state->line] + png_state->next_frame_x_offset * png_state->bytes_per_pixel,
-                        scanline,
-                        png_state->next_frame_width * png_state->bytes_per_pixel);
-            } else { /* PNG_DISPOSE_OP_PREVIOUS */
+                if (png_state->next_frame_dispose_op == PNG_DISPOSE_OP_BACKGROUND) {
+                    memset(png_state->prev[row] + png_state->next_frame_x_offset * png_state->bytes_per_pixel,
+                            0,
+                            png_state->next_frame_width * png_state->bytes_per_pixel);
+                } else if (png_state->next_frame_dispose_op == PNG_DISPOSE_OP_NONE) {
+                    memcpy(png_state->prev[row] + png_state->next_frame_x_offset * png_state->bytes_per_pixel,
+                            scanline,
+                            png_state->next_frame_width * png_state->bytes_per_pixel);
+                } else { /* PNG_DISPOSE_OP_PREVIOUS */
+                }
             }
         }
     } else {
-        png_read_row(png_state->png_ptr, (png_bytep)scanline, NULL);
+        for (unsigned row = 0; row < image->height; row++) {
+            png_read_row(png_state->png_ptr, (unsigned char *)bits + row * image->bytes_per_line, NULL);
+        }
     }
-
-    png_state->line++;
 #else
-    png_read_row(png_state->png_ptr, (png_bytep)scanline, NULL);
+    for (unsigned row = 0; row < image->height; row++) {
+        png_read_row(png_state->png_ptr, (unsigned char *)bits + row * image->bytes_per_line, NULL);
+    }
 #endif
 
     return 0;
@@ -725,12 +726,12 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_pass_v3(void *state, struct
     return 0;
 }
 
-SAIL_EXPORT sail_error_t sail_plugin_write_scan_line_v3(void *state, struct sail_io *io, const struct sail_image *image, const void *scanline) {
+SAIL_EXPORT sail_error_t sail_plugin_write_frame_v3(void *state, struct sail_io *io, const struct sail_image *image, const void *bits) {
 
     SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IO(io);
     SAIL_CHECK_IMAGE(image);
-    SAIL_CHECK_SCAN_LINE_PTR(scanline);
+    SAIL_CHECK_BITS_PTR(bits);
 
     struct png_state *png_state = (struct png_state *)state;
 
@@ -744,9 +745,9 @@ SAIL_EXPORT sail_error_t sail_plugin_write_scan_line_v3(void *state, struct sail
         return SAIL_UNDERLYING_CODEC_ERROR;
     }
 
-    png_bytep row_pointer = (png_bytep)scanline;
-
-    png_write_rows(png_state->png_ptr, &row_pointer, 1);
+    for (unsigned row = 0; row < image->height; row++) {
+        png_write_row(png_state->png_ptr, (const unsigned char *)bits + row * image->bytes_per_line);
+    }
 
     return 0;
 }
