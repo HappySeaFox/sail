@@ -199,43 +199,34 @@ struct init_data {
     struct sail_pixel_formats_mapping_node **last_mapping_node;
 };
 
-static int inih_handler(void *data, const char *section, const char *name, const char *value) {
+static sail_error_t inih_handler_sail_error(void *data, const char *section, const char *name, const char *value) {
 
     /* Silently ignore empty values. */
     if (strlen(value) == 0) {
-        return 1;
+        return 0;
     }
 
     struct init_data *init_data = (struct init_data *)data;
     struct sail_plugin_info *plugin_info = init_data->plugin_info;
 
-    int res;
-
     if (strcmp(section, "plugin") == 0) {
         if (strcmp(name, "layout") == 0) {
             plugin_info->layout = atoi(value);
         } else if (strcmp(name, "version") == 0) {
-            if ((res = sail_strdup(value, &plugin_info->version)) != 0) {
-                return 0;
-            }
+            SAIL_TRY(sail_strdup(value, &plugin_info->version));
         } else if (strcmp(name, "name") == 0) {
-            if ((res = sail_strdup(value, &plugin_info->name)) != 0) {
-                return 0;
-            }
+            SAIL_TRY(sail_strdup(value, &plugin_info->name));
         } else if (strcmp(name, "description") == 0) {
-            if ((res = sail_strdup(value, &plugin_info->description)) != 0) {
-                return 0;
-            }
+            SAIL_TRY(sail_strdup(value, &plugin_info->description));
         } else if (strcmp(name, "magic-numbers") == 0) {
-            if (split_into_string_node_chain(value, &plugin_info->magic_number_node) != 0) {
-                return 0;
-            }
+            SAIL_TRY(split_into_string_node_chain(value, &plugin_info->magic_number_node));
 
             struct sail_string_node *node = plugin_info->magic_number_node;
 
             while (node != NULL) {
                 if (strlen(node->value) > SAIL_MAGIC_BUFFER_SIZE * 3 - 1) {
-                    SAIL_LOG_ERROR("Magic number '%s' is too long. Magic numbers for the '%s' codec are disabled", node->value, plugin_info->name);
+                    SAIL_LOG_ERROR("Magic number '%s' is too long. Magic numbers for the '%s' codec are disabled",
+                                    node->value, plugin_info->name);
                     destroy_string_node_chain(plugin_info->magic_number_node);
                     plugin_info->magic_number_node = NULL;
                     break;
@@ -245,9 +236,7 @@ static int inih_handler(void *data, const char *section, const char *name, const
                 node = node->next;
             }
         } else if (strcmp(name, "extensions") == 0) {
-            if (split_into_string_node_chain(value, &plugin_info->extension_node) != 0) {
-                return 0;
-            }
+            SAIL_TRY(split_into_string_node_chain(value, &plugin_info->extension_node));
 
             struct sail_string_node *node = plugin_info->extension_node;
 
@@ -256,9 +245,7 @@ static int inih_handler(void *data, const char *section, const char *name, const
                 node = node->next;
             }
         } else if (strcmp(name, "mime-types") == 0) {
-            if (split_into_string_node_chain(value, &plugin_info->mime_type_node) != 0) {
-                return 0;
-            }
+            SAIL_TRY(split_into_string_node_chain(value, &plugin_info->mime_type_node));
 
             struct sail_string_node *node = plugin_info->mime_type_node;
 
@@ -268,55 +255,43 @@ static int inih_handler(void *data, const char *section, const char *name, const
             }
         } else {
             SAIL_LOG_ERROR("Unsupported plugin info key '%s' in [%s]", name, section);
-            return 0; /* error */
+            return SAIL_FILE_PARSE_ERROR;
         }
     } else if (strcmp(section, "read-features") == 0) {
         if (strcmp(name, "output-pixel-formats") == 0) {
-            if (parse_serialized_ints(value, (int **)&plugin_info->read_features->output_pixel_formats,
-                                      &plugin_info->read_features->output_pixel_formats_length,
-                                      pixel_format_from_string) != 0) {
-                SAIL_LOG_ERROR("Failed to parse output pixel formats: '%s'", value);
-                return 0;
-            }
+            SAIL_TRY_OR_CLEANUP(parse_serialized_ints(value,
+                                                        (int **)&plugin_info->read_features->output_pixel_formats,
+                                                        &plugin_info->read_features->output_pixel_formats_length,
+                                                        pixel_format_from_string),
+                                /* cleanup */ SAIL_LOG_ERROR("Failed to parse output pixel formats: '%s'", value));
         } else if (strcmp(name, "preferred-output-pixel-format") == 0) {
-            if (sail_pixel_format_from_string(value, &plugin_info->read_features->preferred_output_pixel_format) != 0) {
-                SAIL_LOG_ERROR("Failed to parse preferred output pixel format: '%s'", value);
-                return 0;
-            }
+            SAIL_TRY_OR_CLEANUP(sail_pixel_format_from_string(value, &plugin_info->read_features->preferred_output_pixel_format),
+                                /* cleanup */ SAIL_LOG_ERROR("Failed to parse preferred output pixel format: '%s'", value));
         } else if (strcmp(name, "features") == 0) {
-            if (parse_flags(value, &plugin_info->read_features->features, plugin_feature_from_string) != 0) {
-                SAIL_LOG_ERROR("Failed to parse plugin features: '%s'", value);
-                return 0;
-            }
+            SAIL_TRY_OR_CLEANUP(parse_flags(value, &plugin_info->read_features->features, plugin_feature_from_string),
+                                /* cleanup */ SAIL_LOG_ERROR("Failed to parse plugin features: '%s'", value));
         } else {
             SAIL_LOG_ERROR("Unsupported plugin info key '%s' in [%s]", name, section);
-            return 0;
+            return SAIL_FILE_PARSE_ERROR;
         }
     } else if (strcmp(section, "write-features") == 0) {
         if (strcmp(name, "features") == 0) {
-            if (parse_flags(value, &plugin_info->write_features->features, plugin_feature_from_string) != 0) {
-                SAIL_LOG_ERROR("Failed to parse plugin features: '%s'", value);
-                return 0;
-            }
+            SAIL_TRY_OR_CLEANUP(parse_flags(value, &plugin_info->write_features->features, plugin_feature_from_string),
+                                /* cleanup */ SAIL_LOG_ERROR("Failed to parse plugin features: '%s'", value));
         } else if (strcmp(name, "properties") == 0) {
-            if (parse_flags(value, &plugin_info->write_features->properties, image_property_from_string) != 0) {
-                SAIL_LOG_ERROR("Failed to parse image properties: '%s'", value);
-                return 0;
-            }
+            SAIL_TRY_OR_CLEANUP(parse_flags(value, &plugin_info->write_features->properties, image_property_from_string),
+                                /* cleanup */ SAIL_LOG_ERROR("Failed to parse image properties: '%s'", value));
         } else if (strcmp(name, "interlaced-passes") == 0) {
             plugin_info->write_features->interlaced_passes = atoi(value);
         } else if (strcmp(name, "compression-types") == 0) {
-            if (parse_serialized_ints(value, (int **)&plugin_info->write_features->compression_types,
-                                      &plugin_info->write_features->compression_types_length,
-                                      compression_type_from_string) != 0) {
-                SAIL_LOG_ERROR("Failed to parse compression types: '%s'", value);
-                return 0;
-            }
+            SAIL_TRY_OR_CLEANUP(parse_serialized_ints(value,
+                                                        (int **)&plugin_info->write_features->compression_types,
+                                                        &plugin_info->write_features->compression_types_length,
+                                                        compression_type_from_string),
+                                /* cleanup */ SAIL_LOG_ERROR("Failed to parse compression types: '%s'", value));
         } else if (strcmp(name, "preferred-compression-type") == 0) {
-            if (sail_compression_type_from_string(value, &plugin_info->write_features->preferred_compression_type) != 0) {
-                SAIL_LOG_ERROR("Failed to parse compression type: '%s'", value);
-                return 0;
-            }
+            SAIL_TRY_OR_CLEANUP(sail_compression_type_from_string(value, &plugin_info->write_features->preferred_compression_type),
+                                /* cleanup */ SAIL_LOG_ERROR("Failed to parse compression type: '%s'", value));
         } else if (strcmp(name, "compression-min") == 0) {
             plugin_info->write_features->compression_min = atoi(value);
         } else if (strcmp(name, "compression-max") == 0) {
@@ -325,36 +300,40 @@ static int inih_handler(void *data, const char *section, const char *name, const
             plugin_info->write_features->compression_default = atoi(value);
         } else {
             SAIL_LOG_ERROR("Unsupported plugin info key '%s' in [%s]", name, section);
-            return 0;
+            return SAIL_FILE_PARSE_ERROR;
         }
     } else if (strcmp(section, "write-pixel-formats-mapping") == 0) {
-
         struct sail_pixel_formats_mapping_node *node;
 
-        if (sail_alloc_pixel_formats_mapping_node(&node) != 0) {
-            SAIL_LOG_ERROR("Failed to allocate a new write mapping node");
-            return 0;
-        }
+        SAIL_TRY_OR_CLEANUP(sail_alloc_pixel_formats_mapping_node(&node),
+                            /* cleanup */ SAIL_LOG_ERROR("Failed to allocate a new write mapping node"));
 
-        if (sail_pixel_format_from_string(name, &node->input_pixel_format) != 0) {
-            SAIL_LOG_ERROR("Failed to parse write pixel format: '%s'", name);
-            sail_destroy_pixel_formats_mapping_node(node);
-            return 0;
-        }
+        SAIL_TRY_OR_CLEANUP(sail_pixel_format_from_string(name, &node->input_pixel_format),
+                            /* cleanup */ SAIL_LOG_ERROR("Failed to parse write pixel format: '%s'", name),
+                                          sail_destroy_pixel_formats_mapping_node(node));
 
-        if (parse_serialized_ints(value, (int **)&node->output_pixel_formats, &node->output_pixel_formats_length,
-                                    pixel_format_from_string) != 0) {
-            SAIL_LOG_ERROR("Failed to parse mapped write pixel formats: '%s'", value);
-            sail_destroy_pixel_formats_mapping_node(node);
-            return 0;
-        }
+        SAIL_TRY_OR_CLEANUP(parse_serialized_ints(value,
+                                                    (int **)&node->output_pixel_formats,
+                                                    &node->output_pixel_formats_length,
+                                                    pixel_format_from_string),
+                            /* cleanup */ SAIL_LOG_ERROR("Failed to parse mapped write pixel formats: '%s'", value),
+                                          sail_destroy_pixel_formats_mapping_node(node));
 
         *(init_data->last_mapping_node) = node;
         init_data->last_mapping_node = &node->next;
     } else {
         SAIL_LOG_ERROR("Unsupported plugin info section '%s'", section);
-        return 0;
+        return SAIL_FILE_PARSE_ERROR;
     }
+
+    return 0;
+}
+
+/* Returns 1 on success. */
+static int inih_handler(void *data, const char *section, const char *name, const char *value) {
+
+    SAIL_TRY_OR_EXECUTE(inih_handler_sail_error(data, section, name, value),
+                        /* on error */ return 0);
 
     return 1;
 }
