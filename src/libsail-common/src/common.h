@@ -160,7 +160,7 @@ enum SailCompressionType {
 };
 
 /* Plugin features. */
-enum SailPluginFeatures {
+enum SailPluginFeature {
 
     /* Ability to read or write static images. */
     SAIL_PLUGIN_FEATURE_STATIC     = 1 << 0,

@@ -154,7 +154,7 @@ static sail_error_t parse_serialized_ints(const char *value, int **target, int *
 
 static sail_error_t plugin_feature_from_string(const char *str, int *result) {
 
-    SAIL_TRY(sail_plugin_feature_from_string(str, (enum SailPluginFeatures *)result));
+    SAIL_TRY(sail_plugin_feature_from_string(str, (enum SailPluginFeature *)result));
 
     return 0;
 }

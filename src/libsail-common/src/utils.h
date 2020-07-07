@@ -136,20 +136,20 @@ SAIL_EXPORT sail_error_t sail_compression_type_to_string(enum SailCompressionTyp
 SAIL_EXPORT sail_error_t sail_compression_type_from_string(const char *str, enum SailCompressionType *result);
 
 /*
- * Assigns a non-NULL string representation of the specified plugin feature. See SailPluginFeatures.
+ * Assigns a non-NULL string representation of the specified plugin feature. See SailPluginFeature.
  * The assigned string MUST NOT be destroyed. For example: "STATIC".
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_feature_to_string(enum SailPluginFeatures plugin_feature, const char **result);
+SAIL_EXPORT sail_error_t sail_plugin_feature_to_string(enum SailPluginFeature plugin_feature, const char **result);
 
 /*
- * Assigns plugin feature from a string representation or 0. See SailPluginFeatures.
+ * Assigns plugin feature from a string representation or 0. See SailPluginFeature.
  * For example: SAIL_PLUGIN_FEATURE_STATIC is assigned for "STATIC".
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_feature_from_string(const char *str, enum SailPluginFeatures *result);
+SAIL_EXPORT sail_error_t sail_plugin_feature_from_string(const char *str, enum SailPluginFeature *result);
 
 /*
  * Calculates the number of bits per pixel in the specified pixel format.

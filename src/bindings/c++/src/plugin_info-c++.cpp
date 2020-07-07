@@ -128,14 +128,14 @@ const write_features& plugin_info::write_features() const
     return d->write_features;
 }
 
-sail_error_t plugin_info::plugin_feature_to_string(SailPluginFeatures plugin_feature, const char **result)
+sail_error_t plugin_info::plugin_feature_to_string(SailPluginFeature plugin_feature, const char **result)
 {
     SAIL_TRY(sail_plugin_feature_to_string(plugin_feature, result));
 
     return 0;
 }
 
-sail_error_t plugin_info::plugin_feature_from_string(const char *str, SailPluginFeatures *result)
+sail_error_t plugin_info::plugin_feature_from_string(const char *str, SailPluginFeature *result)
 {
     SAIL_TRY(sail_plugin_feature_from_string(str, result));
 

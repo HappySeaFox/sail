@@ -397,7 +397,7 @@ sail_error_t sail_compression_type_from_string(const char *str, enum SailCompres
     return SAIL_UNSUPPORTED_COMPRESSION_TYPE;
 }
 
-sail_error_t sail_plugin_feature_to_string(enum SailPluginFeatures plugin_feature, const char **result) {
+sail_error_t sail_plugin_feature_to_string(enum SailPluginFeature plugin_feature, const char **result) {
 
     SAIL_CHECK_STRING_PTR(result);
 
@@ -414,7 +414,7 @@ sail_error_t sail_plugin_feature_to_string(enum SailPluginFeatures plugin_featur
     return SAIL_UNSUPPORTED_PLUGIN_FEATURE;
 }
 
-sail_error_t sail_plugin_feature_from_string(const char *str, enum SailPluginFeatures *result) {
+sail_error_t sail_plugin_feature_from_string(const char *str, enum SailPluginFeature *result) {
 
     SAIL_CHECK_STRING_PTR(str);
     SAIL_CHECK_RESULT_PTR(result);
