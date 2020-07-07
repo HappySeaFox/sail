@@ -75,7 +75,7 @@ sail_error_t QtSail::init()
 sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 {
     struct sail_image *image;
-    uchar *image_bits;
+    uchar *pixels;
 
     /*
      * sail_read() reads the image and outputs pixels in BPP32-RGBA pixel format for image formats
@@ -84,11 +84,11 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     SAIL_TRY(sail_read(path.toLocal8Bit(),
                        m_context,
                        &image,
-                       reinterpret_cast<void **>(&image_bits)));
+                       reinterpret_cast<void **>(&pixels)));
 
-    // Construct QImage from the read image bits.
+    // Construct QImage from the read image pixels.
     //
-    *qimage = QImage(image_bits,
+    *qimage = QImage(pixels,
                      image->width,
                      image->height,
                      image->bytes_per_line,
@@ -99,7 +99,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
                                 .arg(image->width)
                                 .arg(image->height)
                                 );
-    free(image_bits);
+    free(pixels);
     sail_destroy_image(image);
 
     return 0;

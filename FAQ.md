@@ -19,7 +19,7 @@ Table of Contents
   * [Please describe memory management techniques implemented in SAIL](#please-describe-memory-management-techniques-implemented-in-sail)
     * [The memory management technique implemented in SAIL](#the-memory-management-technique-implemented-in-sail)
     * [Convention to call SAIL functions](#convention-to-call-sail-functions)
-    * [Pointers to images, bits, etc\. are always freed on error](#pointers-to-images-bits-etc-are-always-freed-on-error)
+    * [Pointers to images, pixels, etc\. are always freed on error](#pointers-to-images-pixels-etc-are-always-freed-on-error)
     * [Always set a pointer to state to NULL (C only)](#always-set-a-pointer-to-state-to-null-c-only)
   * [What pixel formats SAIL is able to read?](#what-pixel-formats-sail-is-able-to-read)
   * [What pixel formats SAIL is able to output after reading an image file?](#what-pixel-formats-sail-is-able-to-output-after-reading-an-image-file)
@@ -127,7 +127,7 @@ situation in `~image_reader()` or `~image_writer()`.
 It's always recommended to use the `SAIL_TRY()` macro to call SAIL functions. It's also always recommended
 to clean up in your code with the `SAIL_TRY_OR_CLEANUP()` macro if you need to.
 
-### Pointers to images, bits, etc. are always freed on error
+### Pointers to images, pixels, etc. are always freed on error
 
 Pointers that are modified by SAIL functions are always freed on error but may be left set
 to a non-NULL value. SAIL does not reset them to a NULL value on error. For example:
@@ -135,7 +135,7 @@ to a non-NULL value. SAIL does not reset them to a NULL value on error. For exam
 ```C
 void *state = NULL;
 struct sail_image *image;
-void *bits;
+void *pixels;
 
 SAIL_TRY(sail_start_reading_file(..., &state));
 
@@ -143,7 +143,7 @@ SAIL_TRY(sail_start_reading_file(..., &state));
  * SAIL frees the 'image' or error, but doesn't reset its value.
  * This code sample prints a non-NULL address on error.
  */
-SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, &image, &bits),
+SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, &image, &pixels),
                     /* cleanup */ printf("%p\n", image),
                                   sail_stop_reading(state));
 ```

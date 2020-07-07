@@ -105,31 +105,31 @@ bool jpeg_supported_pixel_format(int pixel_format) {
     }
 }
 
-sail_error_t convert_cmyk(unsigned char *bits_source, unsigned char *bits_target, unsigned width, int target_pixel_format) {
+sail_error_t convert_cmyk(unsigned char *pixels_source, unsigned char *pixels_target, unsigned width, int target_pixel_format) {
     unsigned char C, M, Y, K;
 
     if (target_pixel_format == SAIL_PIXEL_FORMAT_BPP24_RGB) {
         for (unsigned i = 0; i < width; i++) {
-            C = (unsigned char)(*bits_source++ / 100.0);
-            M = (unsigned char)(*bits_source++ / 100.0);
-            Y = (unsigned char)(*bits_source++ / 100.0);
-            K = (unsigned char)(*bits_source++ / 100.0);
+            C = (unsigned char)(*pixels_source++ / 100.0);
+            M = (unsigned char)(*pixels_source++ / 100.0);
+            Y = (unsigned char)(*pixels_source++ / 100.0);
+            K = (unsigned char)(*pixels_source++ / 100.0);
 
-            *bits_target++ = 255 * (1-C) * (1-K);
-            *bits_target++ = 255 * (1-M) * (1-K);
-            *bits_target++ = 255 * (1-Y) * (1-K);
+            *pixels_target++ = 255 * (1-C) * (1-K);
+            *pixels_target++ = 255 * (1-M) * (1-K);
+            *pixels_target++ = 255 * (1-Y) * (1-K);
         }
     } else if (target_pixel_format == SAIL_PIXEL_FORMAT_BPP32_RGBA) {
         for (unsigned i = 0; i < width; i++) {
-            C = (unsigned char)(*bits_source++ / 100.0);
-            M = (unsigned char)(*bits_source++ / 100.0);
-            Y = (unsigned char)(*bits_source++ / 100.0);
-            K = (unsigned char)(*bits_source++ / 100.0);
+            C = (unsigned char)(*pixels_source++ / 100.0);
+            M = (unsigned char)(*pixels_source++ / 100.0);
+            Y = (unsigned char)(*pixels_source++ / 100.0);
+            K = (unsigned char)(*pixels_source++ / 100.0);
 
-            *bits_target++ = 255 * (1-C) * (1-K);
-            *bits_target++ = 255 * (1-M) * (1-K);
-            *bits_target++ = 255 * (1-Y) * (1-K);
-            *bits_target++ = 255;
+            *pixels_target++ = 255 * (1-C) * (1-K);
+            *pixels_target++ = 255 * (1-M) * (1-K);
+            *pixels_target++ = 255 * (1-Y) * (1-K);
+            *pixels_target++ = 255;
         }
     } else {
         return SAIL_UNSUPPORTED_PIXEL_FORMAT;

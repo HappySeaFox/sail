@@ -101,12 +101,12 @@ sail_error_t image_writer::write(const char *path, const image &simage)
     SAIL_TRY_OR_CLEANUP(simage.to_sail_image(sail_image),
                         /* cleanup */ sail_destroy_image(sail_image));
 
-    const void *bits = simage.bits() ? simage.bits() : simage.shallow_bits();
+    const void *pixels = simage.pixels() ? simage.pixels() : simage.shallow_pixels();
 
     SAIL_TRY_OR_CLEANUP(sail_write(path,
                                     d->ctx->sail_context_c(),
                                     sail_image,
-                                    bits),
+                                    pixels),
                         /* cleanup */ sail_destroy_image(sail_image));
 
     sail_destroy_image(sail_image);
@@ -263,9 +263,9 @@ sail_error_t image_writer::write_next_frame(const image &simage)
     SAIL_TRY_OR_CLEANUP(simage.to_sail_image(sail_image),
                         /* cleanup */ sail_destroy_image(sail_image));
 
-    const void *bits = simage.bits() ? simage.bits() : simage.shallow_bits();
+    const void *pixels = simage.pixels() ? simage.pixels() : simage.shallow_pixels();
 
-    SAIL_TRY_OR_CLEANUP(sail_write_next_frame(d->state, sail_image, bits),
+    SAIL_TRY_OR_CLEANUP(sail_write_next_frame(d->state, sail_image, pixels),
                         /* cleanup */ sail_destroy_image(sail_image));
 
     sail_destroy_image(sail_image);

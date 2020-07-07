@@ -105,18 +105,18 @@ sail_error_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, QV
      */
     sail_error_t res = 0;
     struct sail_image *image;
-    uchar *image_bits;
+    uchar *pixels;
 
     while ((res = sail_read_next_frame(state,
                                        &image,
-                                       (void **)&image_bits)) == 0) {
+                                       (void **)&pixels)) == 0) {
 
         const QImage::Format qimageFormat = sailPixelFormatToQImageFormat(image->pixel_format);
 
         if (qimageFormat == QImage::Format_Invalid) {
             sail_stop_reading(state);
             sail_destroy_image(image);
-            free(image_bits);
+            free(pixels);
             return SAIL_UNSUPPORTED_PIXEL_FORMAT;
         }
 
@@ -128,7 +128,7 @@ sail_error_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, QV
         /*
          * Convert to QImage.
          */
-        QImage qimage = QImage(image_bits,
+        QImage qimage = QImage(pixels,
                                image->width,
                                image->height,
                                image->bytes_per_line,
@@ -138,7 +138,7 @@ sail_error_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, QV
         delays->append(image->delay);
 
         sail_destroy_image(image);
-        free(image_bits);
+        free(pixels);
     }
 
     if (res != SAIL_NO_MORE_FRAMES) {

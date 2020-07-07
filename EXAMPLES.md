@@ -55,7 +55,7 @@ struct sail_context *context;
 SAIL_TRY(sail_init(&context));
 
 struct sail_image *image;
-unsigned char *image_bits;
+unsigned char *image_pixels;
 
 /*
  * sail_read() reads the image and outputs pixels in BPP32-RGBA pixel format for image formats
@@ -64,15 +64,15 @@ unsigned char *image_bits;
 SAIL_TRY(sail_read(path,
                    context,
                    &image,
-                   (void **)&image_bits));
+                   (void **)&image_pixels));
 
 /*
- * Handle the image bits here.
+ * Handle the image pixels here.
  * Use image->width, image->height, image->bytes_per_line,
  * and image->pixel_format for that.
  */
 
-free(image_bits);
+free(image_pixels);
 sail_destroy_image(image);
 ```
 
@@ -86,9 +86,9 @@ sail::image image;
 //
 SAIL_TRY(reader.read(path, &image));
 
-// Handle the image and its bits here.
+// Handle the image and its pixels here.
 // Use image.width(), image.height(), image.bytes_per_line(),
-// image.pixel_format(), and image.bits() for that.
+// image.pixel_format(), and image.pixels() for that.
 ```
 
 ### 2. `advanced`
@@ -111,7 +111,7 @@ SAIL_TRY(sail_init(&context));
  */
 void *state = NULL;
 struct sail_image *image;
-unsigned char *image_bits;
+unsigned char *image_pixels;
 
 /*
  * Starts reading the specified file.
@@ -126,7 +126,7 @@ SAIL_TRY_OR_CLEANUP(sail_start_reading_file(path, context, NULL, &state),
  * reading frames till sail_read_next_frame() returns 0. If no more frames are available,
  * it returns SAIL_NO_MORE_FRAMES.
  */
-SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, &image, (void **)&image_bits),
+SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, &image, (void **)&image_pixels),
                     /* cleanup */ sail_stop_reading(state));
 
 /*
@@ -134,16 +134,16 @@ SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, &image, (void **)&image_bits),
  * Avoiding doing so will lead to memory leaks.
  */
 SAIL_TRY_OR_CLEANUP(sail_stop_reading(state),
-         /* cleanup */ free(image_bits),
+         /* cleanup */ free(image_pixels),
                        sail_destroy_image(image));
 
 /*
- * Handle the image bits here.
+ * Handle the image pixels here.
  * Use image->width, image->height, image->bytes_per_line,
  * and image->pixel_format for that.
  */
 
-free(image_bits);
+free(image_pixels);
 sail_destroy_image(image);
 
 /*
@@ -189,9 +189,9 @@ SAIL_TRY(reader.read_next_frame(&image));
 
 SAIL_TRY(reader.stop_reading());
 
-// Handle the image and its bits here.
+// Handle the image and its pixels here.
 // Use image.width(), image.height(), image.bytes_per_line(),
-// image.pixel_format(), and image.bits() for that.
+// image.pixel_format(), and image.pixels() for that.
 ```
 
 ### 3. `deep diver`
@@ -212,7 +212,7 @@ SAIL_TRY(sail_init_with_flags(&context, SAIL_FLAG_PRELOAD_PLUGINS));
 
 struct sail_read_options *read_options;
 struct sail_image *image;
-unsigned char *image_bits;
+unsigned char *image_pixels;
 
 /*
  * Always set the initial state to NULL in C or nullptr in C++.
@@ -262,14 +262,14 @@ sail_destroy_read_options(read_options);
  */
 SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state,
                                          &image,
-                                         (void **)&image_bits),
+                                         (void **)&image_pixels),
                     /* cleanup */ sail_stop_reading(state));
 
 /*
  * Finish reading.
  */
 SAIL_TRY_OR_CLEANUP(sail_stop_reading(state),
-                    /* cleanup */ free(image_bits),
+                    /* cleanup */ free(image_pixels),
                                   sail_destroy_image(image));
 
 /*
@@ -282,12 +282,12 @@ if (node != NULL) {
 }
 
 /*
- * Handle the image bits here.
+ * Handle the image pixels here.
  * Use image->width, image->height, image->bytes_per_line,
  * and image->pixel_format for that.
  */
 
-free(image_bits);
+free(image_pixels);
 sail_destroy_image(image);
 
 /*
@@ -355,9 +355,9 @@ if (!meta_entries.empty()) {
     SAIL_LOG_DEBUG("%s: %s", first_pair.first.c_str(), first_pair.second.c_str());
 }
 
-// Handle the image and its bits here.
+// Handle the image and its pixels here.
 // Use image.width(), image.height(), image.bytes_per_line(),
-// image.pixel_format(), and image.bits() for that.
+// image.pixel_format(), and image.pixels() for that.
 ```
 
 ### 4. `technical diver`
@@ -381,7 +381,7 @@ SAIL_TRY(sail_init_with_flags(&context, SAIL_FLAG_PRELOAD_PLUGINS));
 
 struct sail_read_options *read_options;
 struct sail_image *image;
-unsigned char *image_bits;
+unsigned char *image_pixels;
 
 /*
  * Always set the initial state to NULL in C or nullptr in C++.
@@ -454,7 +454,7 @@ sail_destroy_read_options(read_options);
  */
 SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state,
                                          &image,
-                                         (void **)&image_bits),
+                                         (void **)&image_pixels),
                     /* cleanup */ sail_stop_reading(state),
                                   sail_destroy_io(io));
 
@@ -462,7 +462,7 @@ SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state,
  * Finish reading.
  */
 SAIL_TRY_OR_CLEANUP(sail_stop_reading(state),
-                    /* cleanup */ free(image_bits),
+                    /* cleanup */ free(image_pixels),
                                   sail_destroy_image(image),
                                   sail_destroy_io(io));
 
@@ -478,12 +478,12 @@ if (node != NULL) {
 }
 
 /*
- * Handle the image bits here.
+ * Handle the image pixels here.
  * Use image->width, image->height, image->bytes_per_line,
  * and image->pixel_format for that.
  */
 
-free(image_bits);
+free(image_pixels);
 sail_destroy_image(image);
 
 /*
@@ -572,7 +572,7 @@ if (!meta_entries.empty()) {
     SAIL_LOG_DEBUG("%s: %s", first_pair.first.c_str(), first_pair.second.c_str());
 }
 
-// Handle the image and its bits here.
+// Handle the image and its pixels here.
 // Use image.width(), image.height(), image.bytes_per_line(),
-// image.pixel_format(), and image.bits() for that.
+// image.pixel_format(), and image.pixels() for that.
 ```

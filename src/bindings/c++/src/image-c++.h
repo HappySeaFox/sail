@@ -178,9 +178,9 @@ public:
      * call with_shallow_data() instead of with_data().
      *
      * READ:  Set by SAIL to valid pixel data.
-     * WRITE: Must be set by a caller to valid pixel data using with_bits().
+     * WRITE: Must be set by a caller to valid pixel data using with_pixels().
      */
-    void* bits();
+    void* pixels();
 
     /*
      * Returns the constant deep copied pixel data if any. Images can hold deep copied or shallow data,
@@ -188,24 +188,24 @@ public:
      * call with_shallow_data() instead of with_data().
      *
      * READ:  Set by SAIL to valid pixel data.
-     * WRITE: Must be set by a caller to valid pixel data using with_bits().
+     * WRITE: Must be set by a caller to valid pixel data using with_pixels().
      */
-    const void* bits() const;
+    const void* pixels() const;
 
     /*
      * Returns the size of deep copied pixel data in bytes.
      */
-    unsigned bits_size() const;
+    unsigned pixels_size() const;
 
     /*
      * Returns the constant shallow pixel data if any. Images can hold deep copied or shallow data,
      * but not both. This method returns the data set using the with_shallow_data() method.
-     * To deep copy pixel data, call with_data() instead of with_shallow_bits().
+     * To deep copy pixel data, call with_data() instead of with_shallow_pixels().
      *
      * READ:  Set by SAIL to valid pixel data.
-     * WRITE: Must be set by a caller to valid pixel data using with_bits().
+     * WRITE: Must be set by a caller to valid pixel data using with_pixels().
      */
-    const void* shallow_bits() const;
+    const void* shallow_pixels() const;
 
     /*
      * Sets a new width.
@@ -250,15 +250,15 @@ public:
 
     /*
      * Deep copies the specified pixel data. Resets the pointer to shallow pixel data to nullptr.
-     * The data can be accessed later with bits().
+     * The data can be accessed later with pixels().
      */
-    image& with_bits(const void *bits, unsigned bits_size);
+    image& with_pixels(const void *pixels, unsigned pixels_size);
 
     /*
      * Stores the pointer to the external pixel data. Frees the previously stored deep-copied pixel data.
-     * The pixel data must remain valid until the image exists. The data can be accessed later with shallow_bits().
+     * The pixel data must remain valid until the image exists. The data can be accessed later with shallow_pixels().
      */
-    image& with_shallow_bits(const void *bits);
+    image& with_shallow_pixels(const void *pixels);
 
     /*
      * Sets a new ICC profile.
@@ -352,9 +352,9 @@ public:
 
 private:
     /*
-     * Makes a deep copy of the specified image and the bits.
+     * Makes a deep copy of the specified image and the pixels.
      */
-    image(const sail_image *im, const void *bits, unsigned bits_size);
+    image(const sail_image *im, const void *pixels, unsigned pixels_size);
     image(const sail_image *im);
 
     sail_error_t to_sail_image(sail_image *image) const;

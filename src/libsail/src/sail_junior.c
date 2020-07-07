@@ -46,42 +46,42 @@ sail_error_t sail_probe_path(const char *path, struct sail_context *context, str
     return 0;
 }
 
-sail_error_t sail_read(const char *path, struct sail_context *context, struct sail_image **image, void **image_bits) {
+sail_error_t sail_read(const char *path, struct sail_context *context, struct sail_image **image, void **pixels) {
 
     SAIL_CHECK_PATH_PTR(path);
     SAIL_CHECK_CONTEXT_PTR(context);
     SAIL_CHECK_IMAGE_PTR(image);
-    SAIL_CHECK_PTR(image_bits);
+    SAIL_CHECK_PTR(pixels);
 
     void *state = NULL;
-    *image_bits = NULL;
+    *pixels = NULL;
 
     SAIL_TRY_OR_CLEANUP(sail_start_reading_file(path, context, NULL /* plugin info */, &state),
                         /* cleanup */ sail_stop_reading(state));
 
-    SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, image, image_bits),
+    SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, image, pixels),
                         /* cleanup */ sail_stop_reading(state));
 
     SAIL_TRY_OR_CLEANUP(sail_stop_reading(state),
-                        /* cleanup */ free(image_bits),
+                        /* cleanup */ free(pixels),
                                       sail_destroy_image(*image));
 
     return 0;
 }
 
-sail_error_t sail_write(const char *path, struct sail_context *context, const struct sail_image *image, const void *image_bits) {
+sail_error_t sail_write(const char *path, struct sail_context *context, const struct sail_image *image, const void *pixels) {
 
     SAIL_CHECK_PATH_PTR(path);
     SAIL_CHECK_CONTEXT_PTR(context);
     SAIL_CHECK_IMAGE(image);
-    SAIL_CHECK_PTR(image_bits);
+    SAIL_CHECK_PTR(pixels);
 
     void *state = NULL;
 
     SAIL_TRY_OR_CLEANUP(sail_start_writing_file(path, context, NULL /* plugin info */, &state),
                         sail_stop_writing(state));
 
-    SAIL_TRY_OR_CLEANUP(sail_write_next_frame(state, image, image_bits),
+    SAIL_TRY_OR_CLEANUP(sail_write_next_frame(state, image, pixels),
                         sail_stop_writing(state));
 
     SAIL_TRY(sail_stop_writing(state));

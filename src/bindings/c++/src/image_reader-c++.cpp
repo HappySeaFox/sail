@@ -180,22 +180,22 @@ sail_error_t image_reader::read(const char *path, image *simage)
     SAIL_CHECK_IMAGE_PTR(simage);
 
     sail_image *sail_image;
-    void *image_bits;
+    void *pixels;
 
     SAIL_TRY(sail_read(path,
                        d->ctx->sail_context_c(),
                        &sail_image,
-                       &image_bits));
+                       &pixels));
 
     unsigned bytes_per_image;
     SAIL_TRY_OR_CLEANUP(sail_bytes_per_image(sail_image, &bytes_per_image),
                         /* cleanup */ sail_destroy_image(sail_image),
-                                      free(image_bits));
+                                      free(pixels));
 
-    *simage = image(sail_image, image_bits, bytes_per_image);
+    *simage = image(sail_image, pixels, bytes_per_image);
 
     sail_destroy_image(sail_image);
-    free(image_bits);
+    free(pixels);
 
     return 0;
 }
@@ -334,20 +334,20 @@ sail_error_t image_reader::read_next_frame(image *simage)
     SAIL_CHECK_IMAGE_PTR(simage);
 
     sail_image *sail_image;
-    void *image_bits;
+    void *pixels;
 
-    SAIL_TRY(sail_read_next_frame(d->state, &sail_image, &image_bits));
+    SAIL_TRY(sail_read_next_frame(d->state, &sail_image, &pixels));
 
     unsigned bytes_per_image;
     SAIL_TRY_OR_CLEANUP(sail_bytes_per_image(sail_image, &bytes_per_image),
                         /* cleanup */ sail_destroy_image(sail_image),
-                                      free(image_bits));
+                                      free(pixels));
 
     *simage = image(sail_image);
-    simage->with_bits(image_bits, bytes_per_image);
+    simage->with_pixels(pixels, bytes_per_image);
 
     sail_destroy_image(sail_image);
-    free(image_bits);
+    free(pixels);
 
     return 0;
 }

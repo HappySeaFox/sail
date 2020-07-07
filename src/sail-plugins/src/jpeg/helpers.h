@@ -50,6 +50,6 @@ SAIL_HIDDEN J_COLOR_SPACE pixel_format_to_color_space(int pixel_format);
 
 SAIL_HIDDEN bool jpeg_supported_pixel_format(int pixel_format);
 
-SAIL_HIDDEN sail_error_t convert_cmyk(unsigned char *bits_source, unsigned char *bits_target, unsigned width, int target_pixel_format);
+SAIL_HIDDEN sail_error_t convert_cmyk(unsigned char *pixels_source, unsigned char *pixels_target, unsigned width, int target_pixel_format);
 
 #endif

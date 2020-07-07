@@ -161,14 +161,14 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     sail_destroy_read_options(read_options);
 
     sail_image *image;
-    uchar *image_bits;
+    uchar *pixels;
 
     /*
      * Read just the first frame in the image.
      */
     SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state,
                                              &image,
-                                             (void **)&image_bits),
+                                             (void **)&pixels),
                         /* cleanup */ sail_stop_reading(state));
 
     const QImage::Format qimageFormat = sailPixelFormatToQImageFormat(image->pixel_format);
@@ -176,20 +176,20 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     if (qimageFormat == QImage::Format_Invalid) {
         sail_stop_reading(state);
         sail_destroy_image(image);
-        free(image_bits);
+        free(pixels);
         return SAIL_UNSUPPORTED_PIXEL_FORMAT;
     }
 
     /*
      * Convert to QImage.
      */
-    *qimage = QImage(image_bits,
+    *qimage = QImage(pixels,
                      image->width,
                      image->height,
                      image->bytes_per_line,
                      qimageFormat).copy();
 
-    free(image_bits);
+    free(pixels);
 
     SAIL_LOG_DEBUG("Has ICC profile: %s (%u bytes)",
                    image->iccp == NULL ? "no" : "yes",
@@ -264,7 +264,7 @@ sail_error_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffer
 {
     /*
      * WARNING: Memory cleanup on error is not implemented in this demo. Please don't forget
-     * to free memory (pointers, image bits etc.) on error in a real application.
+     * to free memory (pointers, image pixels etc.) on error in a real application.
      */
 
     // Always set the initial state to NULL in C or nullptr in C++.

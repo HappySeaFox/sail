@@ -44,14 +44,14 @@ public:
         , animated(false)
         , delay(0)
         , properties(0)
-        , bits(nullptr)
-        , bits_size(0)
-        , shallow_bits(nullptr)
+        , pixels(nullptr)
+        , pixels_size(0)
+        , shallow_pixels(nullptr)
     {}
 
     ~pimpl()
     {
-        free(bits);
+        free(pixels);
     }
 
     unsigned width;
@@ -65,9 +65,9 @@ public:
     sail::iccp iccp;
     int properties;
     sail::source_image source_image;
-    void *bits;
-    unsigned bits_size;
-    const void *shallow_bits;
+    void *pixels;
+    unsigned pixels_size;
+    const void *shallow_pixels;
 };
 
 image::image()
@@ -95,10 +95,10 @@ image& image::operator=(const image &img)
         .with_properties(img.properties())
         .with_source_image(img.source_image());
 
-    if (img.shallow_bits() != nullptr) {
-        with_shallow_bits(img.shallow_bits());
+    if (img.shallow_pixels() != nullptr) {
+        with_shallow_pixels(img.shallow_pixels());
     } else {
-        with_bits(img.bits(), img.bits_size());
+        with_pixels(img.pixels(), img.pixels_size());
     }
 
     return *this;
@@ -111,7 +111,7 @@ image::~image()
 
 bool image::is_valid() const
 {
-    return d->width > 0 && d->height > 0 && d->bytes_per_line > 0 && (d->bits != nullptr || d->shallow_bits != nullptr);
+    return d->width > 0 && d->height > 0 && d->bytes_per_line > 0 && (d->pixels != nullptr || d->shallow_pixels != nullptr);
 }
 
 unsigned image::width() const
@@ -169,24 +169,24 @@ const sail::source_image& image::source_image() const
     return d->source_image;
 }
 
-void* image::bits()
+void* image::pixels()
 {
-    return d->bits;
+    return d->pixels;
 }
 
-const void* image::bits() const
+const void* image::pixels() const
 {
-    return d->bits;
+    return d->pixels;
 }
 
-unsigned image::bits_size() const
+unsigned image::pixels_size() const
 {
-    return d->bits_size;
+    return d->pixels_size;
 }
 
-const void* image::shallow_bits() const
+const void* image::shallow_pixels() const
 {
-    return d->shallow_bits;
+    return d->shallow_pixels;
 }
 
 image& image::with_width(unsigned width)
@@ -239,44 +239,44 @@ image& image::with_meta_entries(const std::map<std::string, std::string> &meta_e
     return *this;
 }
 
-image& image::with_bits(const void *bits, unsigned bits_size)
+image& image::with_pixels(const void *pixels, unsigned pixels_size)
 {
-    free(d->bits);
+    free(d->pixels);
 
-    d->bits         = nullptr;
-    d->bits_size    = 0;
-    d->shallow_bits = nullptr;
+    d->pixels         = nullptr;
+    d->pixels_size    = 0;
+    d->shallow_pixels = nullptr;
 
-    if (bits == nullptr || bits_size == 0) {
+    if (pixels == nullptr || pixels_size == 0) {
         return *this;
     }
 
-    d->bits_size = bits_size;
-    d->bits = malloc(d->bits_size);
+    d->pixels_size = pixels_size;
+    d->pixels = malloc(d->pixels_size);
 
-    if (d->bits == nullptr) {
-        SAIL_LOG_ERROR("Memory allocation failed of bits size %u", d->bits_size);
+    if (d->pixels == nullptr) {
+        SAIL_LOG_ERROR("Memory allocation failed of pixels size %u", d->pixels_size);
         return *this;
     }
 
-    memcpy(d->bits, bits, bits_size);
+    memcpy(d->pixels, pixels, pixels_size);
 
     return *this;
 }
 
-image& image::with_shallow_bits(const void *bits)
+image& image::with_shallow_pixels(const void *pixels)
 {
-    free(d->bits);
+    free(d->pixels);
 
-    d->bits = nullptr;
-    d->bits_size = 0;
+    d->pixels = nullptr;
+    d->pixels_size = 0;
 
-    if (bits == nullptr ) {
-        SAIL_LOG_ERROR("Not assigning invalid bits. Bits pointer: %p", bits);
+    if (pixels == nullptr ) {
+        SAIL_LOG_ERROR("Not assigning invalid pixels. pixels pointer: %p", pixels);
         return *this;
     }
 
-    d->shallow_bits = bits;
+    d->shallow_pixels = pixels;
 
     return *this;
 }
@@ -361,7 +361,7 @@ sail_error_t image::compression_type_from_string(const char *str, SailCompressio
     return 0;
 }
 
-image::image(const sail_image *im, const void *bits, unsigned bits_size)
+image::image(const sail_image *im, const void *pixels, unsigned pixels_size)
     : image()
 {
     if (im == nullptr) {
@@ -389,7 +389,7 @@ image::image(const sail_image *im, const void *bits, unsigned bits_size)
         .with_iccp(sail::iccp(im->iccp))
         .with_properties(im->properties)
         .with_source_image(im->source_image)
-        .with_bits(bits, bits_size);
+        .with_pixels(pixels, pixels_size);
 }
 
 image::image(const sail_image *im)

@@ -161,7 +161,7 @@ struct sail_context *context;
 SAIL_TRY(sail_init(&context));
 
 struct sail_image *image;
-unsigned char *image_bits;
+unsigned char *image_pixels;
 
 /*
  * sail_read() reads the image and outputs pixels in BPP32-RGBA pixel format for image formats
@@ -171,15 +171,15 @@ unsigned char *image_bits;
 SAIL_TRY(sail_read(path,
                    context,
                    &image,
-                   (void **)&image_bits));
+                   (void **)&image_pixels));
 
 /*
- * Handle the image bits here.
+ * Handle the image pixels here.
  * Use image->width, image->height, image->bytes_per_line,
  * and image->pixel_format for that.
  */
 
-free(image_bits);
+free(image_pixels);
 sail_destroy_image(image);
 ```
 
@@ -194,9 +194,9 @@ sail::image image;
 //
 SAIL_TRY(reader.read(path, &image));
 
-// Handle the image and its bits here.
+// Handle the image and its pixels here.
 // Use image.width(), image.height(), image.bytes_per_line(),
-// image.pixel_format(), and image.bits() for that.
+// image.pixel_format(), and image.pixels() for that.
 ```
 
 It's pretty easy, isn't it? :smile: See [EXAMPLES](EXAMPLES.md) for more.
