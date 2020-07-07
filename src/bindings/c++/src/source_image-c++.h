@@ -68,7 +68,7 @@ public:
     SailPixelFormat pixel_format() const;
 
     /*
-     * Returns the source image properties. Set by SAIL to a valid source image properties of the image file.
+     * Returns the or-ed source image properties. Set by SAIL to a valid source image properties of the image file.
      * For example, it can be interlaced. See SailImageProperty.
      *
      * READ:  Set by SAIL to valid source image properties or to 0.

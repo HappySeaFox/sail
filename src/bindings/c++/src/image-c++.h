@@ -156,7 +156,7 @@ public:
     const sail::iccp& iccp() const;
 
     /*
-     * Returns decoded image properties. See SailImageProperty.
+     * Returns or-ed decoded image properties. See SailImageProperty.
      *
      * READ:  Set by SAIL to valid image properties. For example, some image formats store images flipped.
      *        A caller must use this field to manipulate the output image accordingly (e.g., flip back etc.).
