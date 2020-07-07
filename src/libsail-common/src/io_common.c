@@ -58,9 +58,8 @@ void sail_destroy_io(struct sail_io *io) {
     }
 
     if (io->close != NULL && io->stream != NULL) {
-        if (io->close(io->stream) != 0) {
-            sail_print_errno("Failed to close the I/O stream: %s");
-        }
+        SAIL_TRY_OR_EXECUTE(io->close(io->stream),
+                            /* on error */ sail_print_errno("Failed to close the I/O stream: %s"));
     }
 
     free(io);
