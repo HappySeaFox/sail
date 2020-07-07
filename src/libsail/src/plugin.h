@@ -37,7 +37,7 @@
 /*
  * Currently supported plugin layout version.
  */
-#define SAIL_PLUGIN_LAYOUT_V2 2
+#define SAIL_PLUGIN_LAYOUT_V3 3
 
 struct sail_plugin_info;
 
@@ -49,30 +49,30 @@ struct sail_image;
 struct sail_io;
 
 /* V2 declarations. */
-typedef sail_error_t (*sail_plugin_read_init_v2_t)           (struct sail_io *io, const struct sail_read_options *read_options, void **state);
-typedef sail_error_t (*sail_plugin_read_seek_next_frame_v2_t)(void *state, struct sail_io *io, struct sail_image **image);
-typedef sail_error_t (*sail_plugin_read_seek_next_pass_v2_t) (void *state, struct sail_io *io, const struct sail_image *image);
-typedef sail_error_t (*sail_plugin_read_scan_line_v2_t)      (void *state, struct sail_io *io, const struct sail_image *image, void *scanline);
-typedef sail_error_t (*sail_plugin_read_finish_v2_t)         (void **state, struct sail_io *io);
+typedef sail_error_t (*sail_plugin_read_init_v3_t)           (struct sail_io *io, const struct sail_read_options *read_options, void **state);
+typedef sail_error_t (*sail_plugin_read_seek_next_frame_v3_t)(void *state, struct sail_io *io, struct sail_image **image);
+typedef sail_error_t (*sail_plugin_read_seek_next_pass_v3_t) (void *state, struct sail_io *io, const struct sail_image *image);
+typedef sail_error_t (*sail_plugin_read_scan_line_v3_t)      (void *state, struct sail_io *io, const struct sail_image *image, void *scanline);
+typedef sail_error_t (*sail_plugin_read_finish_v3_t)         (void **state, struct sail_io *io);
 
-typedef sail_error_t (*sail_plugin_write_init_v2_t)           (struct sail_io *io, const struct sail_write_options *write_options, void **state);
-typedef sail_error_t (*sail_plugin_write_seek_next_frame_v2_t)(void *state, struct sail_io *io, const struct sail_image *image);
-typedef sail_error_t (*sail_plugin_write_seek_next_pass_v2_t) (void *state, struct sail_io *io, const struct sail_image *image);
-typedef sail_error_t (*sail_plugin_write_scan_line_v2_t)      (void *state, struct sail_io *io, const struct sail_image *image, const void *scanline);
-typedef sail_error_t (*sail_plugin_write_finish_v2_t)         (void **state, struct sail_io *io);
+typedef sail_error_t (*sail_plugin_write_init_v3_t)           (struct sail_io *io, const struct sail_write_options *write_options, void **state);
+typedef sail_error_t (*sail_plugin_write_seek_next_frame_v3_t)(void *state, struct sail_io *io, const struct sail_image *image);
+typedef sail_error_t (*sail_plugin_write_seek_next_pass_v3_t) (void *state, struct sail_io *io, const struct sail_image *image);
+typedef sail_error_t (*sail_plugin_write_scan_line_v3_t)      (void *state, struct sail_io *io, const struct sail_image *image, const void *scanline);
+typedef sail_error_t (*sail_plugin_write_finish_v3_t)         (void **state, struct sail_io *io);
 
-struct sail_plugin_layout_v2 {
-    sail_plugin_read_init_v2_t            read_init_v2;
-    sail_plugin_read_seek_next_frame_v2_t read_seek_next_frame_v2;
-    sail_plugin_read_seek_next_pass_v2_t  read_seek_next_pass_v2;
-    sail_plugin_read_scan_line_v2_t       read_scan_line_v2;
-    sail_plugin_read_finish_v2_t          read_finish_v2;
+struct sail_plugin_layout_v3 {
+    sail_plugin_read_init_v3_t            read_init_v3;
+    sail_plugin_read_seek_next_frame_v3_t read_seek_next_frame_v3;
+    sail_plugin_read_seek_next_pass_v3_t  read_seek_next_pass_v3;
+    sail_plugin_read_scan_line_v3_t       read_scan_line_v3;
+    sail_plugin_read_finish_v3_t          read_finish_v3;
 
-    sail_plugin_write_init_v2_t            write_init_v2;
-    sail_plugin_write_seek_next_frame_v2_t write_seek_next_frame_v2;
-    sail_plugin_write_seek_next_pass_v2_t  write_seek_next_pass_v2;
-    sail_plugin_write_scan_line_v2_t       write_scan_line_v2;
-    sail_plugin_write_finish_v2_t          write_finish_v2;
+    sail_plugin_write_init_v3_t            write_init_v3;
+    sail_plugin_write_seek_next_frame_v3_t write_seek_next_frame_v3;
+    sail_plugin_write_seek_next_pass_v3_t  write_seek_next_pass_v3;
+    sail_plugin_write_scan_line_v3_t       write_scan_line_v3;
+    sail_plugin_write_finish_v3_t          write_finish_v3;
 };
 
 /*
@@ -87,7 +87,7 @@ struct sail_plugin {
     void *handle;
 
     /* Plugin interface. */
-    struct sail_plugin_layout_v2 *v2;
+    struct sail_plugin_layout_v3 *v3;
 };
 
 typedef struct sail_plugin sail_plugin_t;

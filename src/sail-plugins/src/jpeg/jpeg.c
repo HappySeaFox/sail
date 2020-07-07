@@ -87,7 +87,7 @@ static sail_error_t alloc_jpeg_state(struct jpeg_state **jpeg_state) {
  * Decoding functions.
  */
 
-SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_io *io, const struct sail_read_options *read_options, void **state) {
+SAIL_EXPORT sail_error_t sail_plugin_read_init_v3(struct sail_io *io, const struct sail_read_options *read_options, void **state) {
 
     SAIL_CHECK_STATE_PTR(state);
     *state = NULL;
@@ -155,7 +155,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_init_v2(struct sail_io *io, const stru
     return 0;
 }
 
-SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct sail_io *io, struct sail_image **image) {
+SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v3(void *state, struct sail_io *io, struct sail_image **image) {
 
     SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IO(io);
@@ -269,7 +269,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v2(void *state, struct
     return 0;
 }
 
-SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_pass_v2(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_pass_v3(void *state, struct sail_io *io, const struct sail_image *image) {
 
     SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IO(io);
@@ -278,7 +278,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_pass_v2(void *state, struct 
     return 0;
 }
 
-SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v2(void *state, struct sail_io *io, const struct sail_image *image, void *scanline) {
+SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v3(void *state, struct sail_io *io, const struct sail_image *image, void *scanline) {
 
     SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IO(io);
@@ -309,7 +309,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v2(void *state, struct sail_
     return 0;
 }
 
-SAIL_EXPORT sail_error_t sail_plugin_read_finish_v2(void **state, struct sail_io *io) {
+SAIL_EXPORT sail_error_t sail_plugin_read_finish_v3(void **state, struct sail_io *io) {
 
     SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IO(io);
@@ -339,7 +339,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_finish_v2(void **state, struct sail_io
  * Encoding functions.
  */
 
-SAIL_EXPORT sail_error_t sail_plugin_write_init_v2(struct sail_io *io, const struct sail_write_options *write_options, void **state) {
+SAIL_EXPORT sail_error_t sail_plugin_write_init_v3(struct sail_io *io, const struct sail_write_options *write_options, void **state) {
 
     SAIL_CHECK_STATE_PTR(state);
     *state = NULL;
@@ -383,7 +383,7 @@ SAIL_EXPORT sail_error_t sail_plugin_write_init_v2(struct sail_io *io, const str
     return 0;
 }
 
-SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v2(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v3(void *state, struct sail_io *io, const struct sail_image *image) {
 
     SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IO(io);
@@ -464,7 +464,7 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v2(void *state, struc
     return 0;
 }
 
-SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_pass_v2(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_pass_v3(void *state, struct sail_io *io, const struct sail_image *image) {
 
     SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IO(io);
@@ -473,7 +473,7 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_pass_v2(void *state, struct
     return 0;
 }
 
-SAIL_EXPORT sail_error_t sail_plugin_write_scan_line_v2(void *state, struct sail_io *io, const struct sail_image *image, const void *scanline) {
+SAIL_EXPORT sail_error_t sail_plugin_write_scan_line_v3(void *state, struct sail_io *io, const struct sail_image *image, const void *scanline) {
 
     SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IO(io);
@@ -498,7 +498,7 @@ SAIL_EXPORT sail_error_t sail_plugin_write_scan_line_v2(void *state, struct sail
     return 0;
 }
 
-SAIL_EXPORT sail_error_t sail_plugin_write_finish_v2(void **state, struct sail_io *io) {
+SAIL_EXPORT sail_error_t sail_plugin_write_finish_v3(void **state, struct sail_io *io) {
 
     SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IO(io);

@@ -51,7 +51,7 @@ sail_error_t alloc_plugin(const struct sail_plugin_info *plugin_info, struct sai
 
     (*plugin)->layout = plugin_info->layout;
     (*plugin)->handle = NULL;
-    (*plugin)->v2     = NULL;
+    (*plugin)->v3     = NULL;
 
     SAIL_LOG_DEBUG("Loading plugin '%s'", plugin_info->path);
 
@@ -99,20 +99,20 @@ sail_error_t alloc_plugin(const struct sail_plugin_info *plugin_info, struct sai
     }                                                            \
     while(0)
 
-    if ((*plugin)->layout == SAIL_PLUGIN_LAYOUT_V2) {
-        (*plugin)->v2 = (struct sail_plugin_layout_v2 *)malloc(sizeof(struct sail_plugin_layout_v2));
+    if ((*plugin)->layout == SAIL_PLUGIN_LAYOUT_V3) {
+        (*plugin)->v3 = (struct sail_plugin_layout_v3 *)malloc(sizeof(struct sail_plugin_layout_v3));
 
-        SAIL_RESOLVE((*plugin)->v2->read_init_v2,            handle, sail_plugin_read_init_v2);
-        SAIL_RESOLVE((*plugin)->v2->read_seek_next_frame_v2, handle, sail_plugin_read_seek_next_frame_v2);
-        SAIL_RESOLVE((*plugin)->v2->read_seek_next_pass_v2,  handle, sail_plugin_read_seek_next_pass_v2);
-        SAIL_RESOLVE((*plugin)->v2->read_scan_line_v2,       handle, sail_plugin_read_scan_line_v2);
-        SAIL_RESOLVE((*plugin)->v2->read_finish_v2,          handle, sail_plugin_read_finish_v2);
+        SAIL_RESOLVE((*plugin)->v3->read_init_v3,            handle, sail_plugin_read_init_v3);
+        SAIL_RESOLVE((*plugin)->v3->read_seek_next_frame_v3, handle, sail_plugin_read_seek_next_frame_v3);
+        SAIL_RESOLVE((*plugin)->v3->read_seek_next_pass_v3,  handle, sail_plugin_read_seek_next_pass_v3);
+        SAIL_RESOLVE((*plugin)->v3->read_scan_line_v3,       handle, sail_plugin_read_scan_line_v3);
+        SAIL_RESOLVE((*plugin)->v3->read_finish_v3,          handle, sail_plugin_read_finish_v3);
 
-        SAIL_RESOLVE((*plugin)->v2->write_init_v2,            handle, sail_plugin_write_init_v2);
-        SAIL_RESOLVE((*plugin)->v2->write_seek_next_frame_v2, handle, sail_plugin_write_seek_next_frame_v2);
-        SAIL_RESOLVE((*plugin)->v2->write_seek_next_pass_v2,  handle, sail_plugin_write_seek_next_pass_v2);
-        SAIL_RESOLVE((*plugin)->v2->write_scan_line_v2,       handle, sail_plugin_write_scan_line_v2);
-        SAIL_RESOLVE((*plugin)->v2->write_finish_v2,          handle, sail_plugin_write_finish_v2);
+        SAIL_RESOLVE((*plugin)->v3->write_init_v3,            handle, sail_plugin_write_init_v3);
+        SAIL_RESOLVE((*plugin)->v3->write_seek_next_frame_v3, handle, sail_plugin_write_seek_next_frame_v3);
+        SAIL_RESOLVE((*plugin)->v3->write_seek_next_pass_v3,  handle, sail_plugin_write_seek_next_pass_v3);
+        SAIL_RESOLVE((*plugin)->v3->write_scan_line_v3,       handle, sail_plugin_write_scan_line_v3);
+        SAIL_RESOLVE((*plugin)->v3->write_finish_v3,          handle, sail_plugin_write_finish_v3);
     } else {
         return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
     }
@@ -134,8 +134,8 @@ void destroy_plugin(struct sail_plugin *plugin) {
 #endif
     }
 
-    if (plugin->layout == SAIL_PLUGIN_LAYOUT_V2) {
-        free(plugin->v2);
+    if (plugin->layout == SAIL_PLUGIN_LAYOUT_V3) {
+        free(plugin->v3);
     } else {
         SAIL_LOG_WARNING("Don't know how to destroy plugin interface version %d", plugin->layout);
     }

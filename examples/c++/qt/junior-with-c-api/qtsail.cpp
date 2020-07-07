@@ -37,7 +37,7 @@
 
 #include <sail/sail.h>
 
-//#include <sail/layouts/v2.h>
+//#include <sail/layouts/v3.h>
 
 #include "qtsail.h"
 #include "ui_qtsail.h"
