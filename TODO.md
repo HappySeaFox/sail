@@ -1,7 +1,5 @@
 ## Priority 1
 
-- Windows INNO installer with a config file to store SAIL_PLUGINS_PATH
-
 - Read/write indexed PNGs with alpha
 
 - Remove the scanline reading interface and make an interface to read entire frames?
