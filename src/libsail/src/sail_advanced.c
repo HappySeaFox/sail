@@ -49,15 +49,15 @@ sail_error_t sail_probe_io(struct sail_io *io, struct sail_context *context, str
     SAIL_TRY_OR_CLEANUP(sail_alloc_read_options_from_features((*plugin_info_local)->read_features, &read_options_local),
                         /* cleanup */ sail_destroy_read_options(read_options_local));
 
-    SAIL_TRY_OR_CLEANUP(plugin->v3->read_init_v3(io, read_options_local, &state),
-                        /* cleanup */ plugin->v3->read_finish_v3(&state, io),
+    SAIL_TRY_OR_CLEANUP(plugin->v3->read_init(io, read_options_local, &state),
+                        /* cleanup */ plugin->v3->read_finish(&state, io),
                                       sail_destroy_read_options(read_options_local));
 
     sail_destroy_read_options(read_options_local);
 
-    SAIL_TRY_OR_CLEANUP(plugin->v3->read_seek_next_frame_v3(state, io, image),
-                        /* cleanup */ plugin->v3->read_finish_v3(&state, io));
-    SAIL_TRY(plugin->v3->read_finish_v3(&state, io));
+    SAIL_TRY_OR_CLEANUP(plugin->v3->read_seek_next_frame(state, io, image),
+                        /* cleanup */ plugin->v3->read_finish(&state, io));
+    SAIL_TRY(plugin->v3->read_finish(&state, io));
 
     return 0;
 }
@@ -102,7 +102,7 @@ sail_error_t sail_read_next_frame(void *state, struct sail_image **image, void *
     SAIL_CHECK_STATE_PTR(state_of_mind->state);
     SAIL_CHECK_PLUGIN_PTR(state_of_mind->plugin);
 
-    SAIL_TRY(state_of_mind->plugin->v3->read_seek_next_frame_v3(state_of_mind->state, state_of_mind->io, image));
+    SAIL_TRY(state_of_mind->plugin->v3->read_seek_next_frame(state_of_mind->state, state_of_mind->io, image));
 
     /* Detect the number of passes needed to write an interlaced image. */
     int interlaced_passes;
@@ -126,15 +126,15 @@ sail_error_t sail_read_next_frame(void *state, struct sail_image **image, void *
     }
 
     for (int pass = 0; pass < interlaced_passes; pass++) {
-        SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v3->read_seek_next_pass_v3(state_of_mind->state, state_of_mind->io, *image),
+        SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v3->read_seek_next_pass(state_of_mind->state, state_of_mind->io, *image),
                             /* cleanup */ free(*image_bits),
                                           sail_destroy_image(*image));
 
         for (unsigned j = 0; j < (*image)->height; j++) {
-            SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v3->read_scan_line_v3(state_of_mind->state,
-                                                                             state_of_mind->io,
-                                                                             *image,
-                                                                             ((char *)*image_bits) + j * (*image)->bytes_per_line),
+            SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v3->read_scan_line(state_of_mind->state,
+                                                                            state_of_mind->io,
+                                                                            *image,
+                                                                            ((char *)*image_bits) + j * (*image)->bytes_per_line),
                                 /* cleanup */ free(*image_bits),
                                               sail_destroy_image(*image));
         }
@@ -158,7 +158,7 @@ sail_error_t sail_stop_reading(void *state) {
         return 0;
     }
 
-    SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v3->read_finish_v3(&state_of_mind->state, state_of_mind->io),
+    SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v3->read_finish(&state_of_mind->state, state_of_mind->io),
                         /* cleanup */ destroy_hidden_state(state_of_mind));
 
     destroy_hidden_state(state_of_mind);
@@ -211,16 +211,16 @@ sail_error_t sail_write_next_frame(void *state, const struct sail_image *image, 
     unsigned bytes_per_line;
     SAIL_TRY(sail_bytes_per_line(image->width, image->pixel_format, &bytes_per_line));
 
-    SAIL_TRY(state_of_mind->plugin->v3->write_seek_next_frame_v3(state_of_mind->state, state_of_mind->io, image));
+    SAIL_TRY(state_of_mind->plugin->v3->write_seek_next_frame(state_of_mind->state, state_of_mind->io, image));
 
     for (int pass = 0; pass < interlaced_passes; pass++) {
-        SAIL_TRY(state_of_mind->plugin->v3->write_seek_next_pass_v3(state_of_mind->state, state_of_mind->io, image));
+        SAIL_TRY(state_of_mind->plugin->v3->write_seek_next_pass(state_of_mind->state, state_of_mind->io, image));
 
         for (unsigned j = 0; j < image->height; j++) {
-            SAIL_TRY(state_of_mind->plugin->v3->write_scan_line_v3(state_of_mind->state,
-                                                                    state_of_mind->io,
-                                                                    image,
-                                                                    ((const char *)image_bits) + j * bytes_per_line));
+            SAIL_TRY(state_of_mind->plugin->v3->write_scan_line(state_of_mind->state,
+                                                                state_of_mind->io,
+                                                                image,
+                                                                ((const char *)image_bits) + j * bytes_per_line));
         }
     }
 

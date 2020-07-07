@@ -48,7 +48,7 @@ struct sail_write_options;
 struct sail_image;
 struct sail_io;
 
-/* V2 declarations. */
+/* V3 declarations. */
 typedef sail_error_t (*sail_plugin_read_init_v3_t)           (struct sail_io *io, const struct sail_read_options *read_options, void **state);
 typedef sail_error_t (*sail_plugin_read_seek_next_frame_v3_t)(void *state, struct sail_io *io, struct sail_image **image);
 typedef sail_error_t (*sail_plugin_read_seek_next_pass_v3_t) (void *state, struct sail_io *io, const struct sail_image *image);
@@ -62,17 +62,17 @@ typedef sail_error_t (*sail_plugin_write_scan_line_v3_t)      (void *state, stru
 typedef sail_error_t (*sail_plugin_write_finish_v3_t)         (void **state, struct sail_io *io);
 
 struct sail_plugin_layout_v3 {
-    sail_plugin_read_init_v3_t            read_init_v3;
-    sail_plugin_read_seek_next_frame_v3_t read_seek_next_frame_v3;
-    sail_plugin_read_seek_next_pass_v3_t  read_seek_next_pass_v3;
-    sail_plugin_read_scan_line_v3_t       read_scan_line_v3;
-    sail_plugin_read_finish_v3_t          read_finish_v3;
+    sail_plugin_read_init_v3_t            read_init;
+    sail_plugin_read_seek_next_frame_v3_t read_seek_next_frame;
+    sail_plugin_read_seek_next_pass_v3_t  read_seek_next_pass;
+    sail_plugin_read_scan_line_v3_t       read_scan_line;
+    sail_plugin_read_finish_v3_t          read_finish;
 
-    sail_plugin_write_init_v3_t            write_init_v3;
-    sail_plugin_write_seek_next_frame_v3_t write_seek_next_frame_v3;
-    sail_plugin_write_seek_next_pass_v3_t  write_seek_next_pass_v3;
-    sail_plugin_write_scan_line_v3_t       write_scan_line_v3;
-    sail_plugin_write_finish_v3_t          write_finish_v3;
+    sail_plugin_write_init_v3_t            write_init;
+    sail_plugin_write_seek_next_frame_v3_t write_seek_next_frame;
+    sail_plugin_write_seek_next_pass_v3_t  write_seek_next_pass;
+    sail_plugin_write_scan_line_v3_t       write_scan_line;
+    sail_plugin_write_finish_v3_t          write_finish;
 };
 
 /*

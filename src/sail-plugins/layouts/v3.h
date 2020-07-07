@@ -29,7 +29,7 @@
 /*
  * This is a plugin layout definition file (version 2).
  *
- * It's intedened to be used as a reference how plugins V2 are organized. It's also could
+ * It's intedened to be used as a reference how plugins V3 are organized. It's also could
  * be used by plugins' developers to compile their plugins directly into a testing application
  * to simplify debugging.
  */
