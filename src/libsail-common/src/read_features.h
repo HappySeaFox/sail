@@ -61,7 +61,7 @@ struct sail_read_features {
      */
     enum SailPixelFormat preferred_output_pixel_format;
 
-    /* Supported features of reading operations. See SailPluginFeature. */
+    /* Supported or-ed features of reading operations. See SailPluginFeature. */
     int features;
 };
 

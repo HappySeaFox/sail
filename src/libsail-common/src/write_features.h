@@ -53,7 +53,7 @@ struct sail_write_features {
      */
     struct sail_pixel_formats_mapping_node *pixel_formats_mapping_node;
 
-    /* Supported plugin features of writing operations. See SailPluginFeature. */
+    /* Supported or-ed features of writing operations. See SailPluginFeature. */
     int features;
 
     /*
