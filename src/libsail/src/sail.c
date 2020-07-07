@@ -38,8 +38,6 @@
 #else
     #include <dirent.h>
     #include <sys/types.h>
-    #include <sys/stat.h>
-    #include <unistd.h>
 #endif
 
 #include "sail-common.h"
@@ -134,9 +132,7 @@ static sail_error_t update_lib_path(void) {
     char *full_path_to_lib;
     SAIL_TRY(sail_concat(&full_path_to_lib, 2, plugs_path, "\\lib"));
 
-    const DWORD lib_attribs = GetFileAttributes(full_path_to_lib);
-
-    if (lib_attribs == INVALID_FILE_ATTRIBUTES || (lib_attribs & FILE_ATTRIBUTE_DIRECTORY) == 0) {
+    if (!sail_is_dir(full_path_to_lib)) {
         SAIL_LOG_DEBUG("Optional DLL directory '%s' doesn't exist, so not loading DLLs from it", full_path_to_lib);
         free(full_path_to_lib);
         return 0;
@@ -161,9 +157,7 @@ static sail_error_t update_lib_path(void) {
     char *full_path_to_lib;
     SAIL_TRY(sail_concat(&full_path_to_lib, 2, plugs_path, "/lib"));
 
-    struct stat lib_attribs;
-
-    if (lstat(full_path_to_lib, &lib_attribs) != 0 || !S_ISDIR(lib_attribs.st_mode)) {
+    if (!sail_is_dir(full_path_to_lib)) {
         SAIL_LOG_DEBUG("Optional LIB directory '%s' doesn't exist, so not updating LD_LIBRARY_PATH with it", full_path_to_lib);
         free(full_path_to_lib);
         return 0;
@@ -359,11 +353,7 @@ static sail_error_t sail_init_impl(struct sail_context **context, int flags) {
         }
 
         /* Handle files only. */
-        struct stat full_path_stat;
-        stat(full_path, &full_path_stat);
-        bool is_file = S_ISREG(full_path_stat.st_mode);
-
-        if (is_file) {
+        if (sail_is_file(full_path)) {
             bool is_plugin_info = strstr(full_path, ".plugin.info") != NULL;
 
             if (is_plugin_info) {

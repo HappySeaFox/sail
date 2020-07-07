@@ -26,6 +26,7 @@
 #ifndef SAIL_UTILS_H
 #define SAIL_UTILS_H
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <wchar.h>
 
@@ -200,6 +201,21 @@ SAIL_EXPORT sail_error_t sail_print_errno(const char *format);
  * Returns 0 on success or sail_error_t on error.
  */
 SAIL_EXPORT sail_error_t sail_now(uint64_t *result);
+
+/*
+ * Returns true if the specified file system path exists.
+ */
+SAIL_EXPORT bool sail_path_exists(const char *path);
+
+/*
+ * Returns true if the specified file system path is a directory.
+ */
+SAIL_EXPORT bool sail_is_dir(const char *path);
+
+/*
+ * Returns true if the specified file system path is a regular file.
+ */
+SAIL_EXPORT bool sail_is_file(const char *path);
 
 /* extern "C" */
 #ifdef __cplusplus
