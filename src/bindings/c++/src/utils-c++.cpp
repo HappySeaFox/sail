@@ -41,4 +41,34 @@ uint64_t now()
     return sail_now();
 }
 
+bool path_exists(const std::string &path)
+{
+    return path_exists(path.c_str());
+}
+
+bool path_exists(const char *path)
+{
+    return sail_path_exists(path);
+}
+
+bool is_dir(const std::string &path)
+{
+    return is_dir(path.c_str());
+}
+
+bool is_dir(const char *path)
+{
+    return sail_is_dir(path);
+}
+
+bool is_file(const std::string &path)
+{
+    return is_file(path.c_str());
+}
+
+bool is_file(const char *path)
+{
+    return sail_is_file(path);
+}
+
 }

@@ -26,6 +26,8 @@
 #ifndef SAIL_UTILS_CPP_H
 #define SAIL_UTILS_CPP_H
 
+#include <string>
+
 #include <stdint.h>
 
 #ifdef SAIL_BUILD
@@ -42,6 +44,24 @@ namespace sail
 SAIL_EXPORT sail_error_t print_errno(const char *format);
 
 SAIL_EXPORT uint64_t now();
+
+/*
+ * Returns true if the specified file system path exists.
+ */
+SAIL_EXPORT bool path_exists(const std::string &path);
+SAIL_EXPORT bool path_exists(const char *path);
+
+/*
+ * Returns true if the specified file system path is a directory.
+ */
+SAIL_EXPORT bool is_dir(const std::string &path);
+SAIL_EXPORT bool is_dir(const char *path);
+
+/*
+ * Returns true if the specified file system path is a regular file.
+ */
+SAIL_EXPORT bool is_file(const std::string &path);
+SAIL_EXPORT bool is_file(const char *path);
 
 }
 
