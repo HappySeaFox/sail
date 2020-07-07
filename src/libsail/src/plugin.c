@@ -105,13 +105,13 @@ sail_error_t alloc_plugin(const struct sail_plugin_info *plugin_info, struct sai
         SAIL_RESOLVE((*plugin)->v3->read_init,            handle, sail_plugin_read_init_v3);
         SAIL_RESOLVE((*plugin)->v3->read_seek_next_frame, handle, sail_plugin_read_seek_next_frame_v3);
         SAIL_RESOLVE((*plugin)->v3->read_seek_next_pass,  handle, sail_plugin_read_seek_next_pass_v3);
-        SAIL_RESOLVE((*plugin)->v3->read_scan_line,       handle, sail_plugin_read_scan_line_v3);
+        SAIL_RESOLVE((*plugin)->v3->read_frame,           handle, sail_plugin_read_frame_v3);
         SAIL_RESOLVE((*plugin)->v3->read_finish,          handle, sail_plugin_read_finish_v3);
 
         SAIL_RESOLVE((*plugin)->v3->write_init,            handle, sail_plugin_write_init_v3);
         SAIL_RESOLVE((*plugin)->v3->write_seek_next_frame, handle, sail_plugin_write_seek_next_frame_v3);
         SAIL_RESOLVE((*plugin)->v3->write_seek_next_pass,  handle, sail_plugin_write_seek_next_pass_v3);
-        SAIL_RESOLVE((*plugin)->v3->write_scan_line,       handle, sail_plugin_write_scan_line_v3);
+        SAIL_RESOLVE((*plugin)->v3->write_frame,           handle, sail_plugin_write_frame_v3);
         SAIL_RESOLVE((*plugin)->v3->write_finish,          handle, sail_plugin_write_finish_v3);
     } else {
         return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;

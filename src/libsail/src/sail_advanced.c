@@ -130,14 +130,12 @@ sail_error_t sail_read_next_frame(void *state, struct sail_image **image, void *
                             /* cleanup */ free(*image_bits),
                                           sail_destroy_image(*image));
 
-        for (unsigned j = 0; j < (*image)->height; j++) {
-            SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v3->read_scan_line(state_of_mind->state,
-                                                                            state_of_mind->io,
-                                                                            *image,
-                                                                            ((char *)*image_bits) + j * (*image)->bytes_per_line),
-                                /* cleanup */ free(*image_bits),
-                                              sail_destroy_image(*image));
-        }
+        SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v3->read_frame(state_of_mind->state,
+                                                                    state_of_mind->io,
+                                                                    *image,
+                                                                    *image_bits),
+                            /* cleanup */ free(*image_bits),
+                                          sail_destroy_image(*image));
     }
 
     return 0;
@@ -216,12 +214,10 @@ sail_error_t sail_write_next_frame(void *state, const struct sail_image *image, 
     for (int pass = 0; pass < interlaced_passes; pass++) {
         SAIL_TRY(state_of_mind->plugin->v3->write_seek_next_pass(state_of_mind->state, state_of_mind->io, image));
 
-        for (unsigned j = 0; j < image->height; j++) {
-            SAIL_TRY(state_of_mind->plugin->v3->write_scan_line(state_of_mind->state,
-                                                                state_of_mind->io,
-                                                                image,
-                                                                ((const char *)image_bits) + j * bytes_per_line));
-        }
+        SAIL_TRY(state_of_mind->plugin->v3->write_frame(state_of_mind->state,
+                                                        state_of_mind->io,
+                                                        image,
+                                                        image_bits));
     }
 
     return 0;
