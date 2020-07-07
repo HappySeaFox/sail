@@ -51,7 +51,7 @@ struct sail_read_options {
      */
     enum SailPixelFormat output_pixel_format;
 
-    /* IO manipulation options. See SailIoOptions. */
+    /* Or-ed IO manipulation options. See SailIoOption. */
     int io_options;
 };
 

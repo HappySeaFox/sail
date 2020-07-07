@@ -185,7 +185,7 @@ enum SailPluginFeature {
 };
 
 /* Read or write options. */
-enum SailIoOptions {
+enum SailIoOption {
 
     /* Instruction to read or write simple image meta information like JPEG comments. */
     SAIL_IO_OPTION_META_INFO  = 1 << 0,
