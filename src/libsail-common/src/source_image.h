@@ -61,7 +61,7 @@ struct sail_source_image {
 
     /*
      * Source image properties. Set by SAIL to a valid source image properties of the image file.
-     * For example, it can be interlaced. See SailImageProperties.
+     * For example, it can be interlaced. See SailImageProperty.
      *
      * READ:  Set by SAIL to valid source image properties or to 0.
      * WRITE: Ignored.

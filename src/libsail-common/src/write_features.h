@@ -58,7 +58,7 @@ struct sail_write_features {
 
     /*
      * Required image properties. For example, an input image must be flipped by a caller before writing
-     * it with SAIL (or supply scan lines in a reverse order). See SailImageProperties.
+     * it with SAIL (or supply scan lines in a reverse order). See SailImageProperty.
      */
     int properties;
 

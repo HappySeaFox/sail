@@ -156,7 +156,7 @@ public:
     const sail::iccp& iccp() const;
 
     /*
-     * Returns decoded image properties. See SailImageProperties.
+     * Returns decoded image properties. See SailImageProperty.
      *
      * READ:  Set by SAIL to valid image properties. For example, some image formats store images flipped.
      *        A caller must use this field to manipulate the output image accordingly (e.g., flip back etc.).
@@ -319,20 +319,20 @@ public:
     static sail_error_t pixel_format_from_string(const char *str, SailPixelFormat *result);
 
     /*
-     * Assigns a non-NULL string representation of the specified image property. See SailImageProperties.
+     * Assigns a non-NULL string representation of the specified image property. See SailImageProperty.
      * The assigned string MUST NOT be destroyed. For example: "FLIPPED-VERTICALLY".
      *
      * Returns 0 on success or sail_error_t on error.
      */
-    static sail_error_t image_property_to_string(SailImageProperties image_property, const char **result);
+    static sail_error_t image_property_to_string(SailImageProperty image_property, const char **result);
 
     /*
-     * Assigns image property from a string representation or 0. See SailImageProperties.
+     * Assigns image property from a string representation or 0. See SailImageProperty.
      * For example: SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY is assigned for "FLIPPED-VERTICALLY".
      *
      * Returns 0 on success or sail_error_t on error.
      */
-    static sail_error_t image_property_from_string(const char *str, SailImageProperties *result);
+    static sail_error_t image_property_from_string(const char *str, SailImageProperty *result);
 
     /*
      * Assigns a non-NULL string representation of the specified compression type. See SailCompressionType.

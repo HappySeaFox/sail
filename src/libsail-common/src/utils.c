@@ -331,7 +331,7 @@ sail_error_t sail_pixel_format_from_string(const char *str, enum SailPixelFormat
     return SAIL_UNSUPPORTED_PIXEL_FORMAT;
 }
 
-sail_error_t sail_image_property_to_string(enum SailImageProperties image_property, const char **result) {
+sail_error_t sail_image_property_to_string(enum SailImageProperty image_property, const char **result) {
 
     SAIL_CHECK_STRING_PTR(result);
 
@@ -343,7 +343,7 @@ sail_error_t sail_image_property_to_string(enum SailImageProperties image_proper
     return SAIL_UNSUPPORTED_IMAGE_PROPERTY;
 }
 
-sail_error_t sail_image_property_from_string(const char *str, enum SailImageProperties *result) {
+sail_error_t sail_image_property_from_string(const char *str, enum SailImageProperty *result) {
 
     SAIL_CHECK_STRING_PTR(str);
     SAIL_CHECK_RESULT_PTR(result);

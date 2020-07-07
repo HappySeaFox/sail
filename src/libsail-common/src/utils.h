@@ -104,20 +104,20 @@ SAIL_EXPORT sail_error_t sail_pixel_format_to_string(enum SailPixelFormat pixel_
 SAIL_EXPORT sail_error_t sail_pixel_format_from_string(const char *str, enum SailPixelFormat *result);
 
 /*
- * Assigns a non-NULL string representation of the specified image property. See SailImageProperties.
+ * Assigns a non-NULL string representation of the specified image property. See SailImageProperty.
  * The assigned string MUST NOT be destroyed. For example: "FLIPPED-VERTICALLY".
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_image_property_to_string(enum SailImageProperties image_property, const char **result);
+SAIL_EXPORT sail_error_t sail_image_property_to_string(enum SailImageProperty image_property, const char **result);
 
 /*
- * Assigns image property from a string representation or 0. See SailImageProperties.
+ * Assigns image property from a string representation or 0. See SailImageProperty.
  * For example: SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY is assigned for "FLIPPED-VERTICALLY".
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_image_property_from_string(const char *str, enum SailImageProperties *result);
+SAIL_EXPORT sail_error_t sail_image_property_from_string(const char *str, enum SailImageProperty *result);
 
 /*
  * Assigns a non-NULL string representation of the specified compression type. See SailCompressionType.

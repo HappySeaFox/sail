@@ -133,7 +133,7 @@ enum SailPixelFormat {
 };
 
 /* Image properties. */
-enum SailImageProperties {
+enum SailImageProperty {
 
     /* Image needs flipping vertically. */
     SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY = 1 << 0,

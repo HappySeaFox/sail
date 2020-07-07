@@ -161,7 +161,7 @@ static sail_error_t plugin_feature_from_string(const char *str, int *result) {
 
 static sail_error_t image_property_from_string(const char *str, int *result) {
 
-    SAIL_TRY(sail_image_property_from_string(str, (enum SailImageProperties *)result));
+    SAIL_TRY(sail_image_property_from_string(str, (enum SailImageProperty *)result));
 
     return 0;
 }
