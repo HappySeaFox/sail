@@ -175,43 +175,29 @@ do {                              \
 #define SAIL_CHECK_SOURCE_IMAGE_PTR(source_image)       SAIL_CHECK_PTR2(source_image,    SAIL_SOURCE_IMAGE_NULL_PTR)
 
 /*
+ * Try to execute the specified SAIL function. If it fails, execute the rest of arguments.
+ * Use do/while to require ';' at the end of a SAIL_TRY_OR_EXECUTE() expression.
+ */
+#define SAIL_TRY_OR_EXECUTE(sail_func, ...)       \
+do {                                              \
+    sail_error_t __sail_error_result;             \
+                                                  \
+    if ((__sail_error_result = sail_func) != 0) { \
+        __VA_ARGS__;                              \
+    }                                             \
+} while(0)
+
+/*
  * Try to execute the specified SAIL function. If it fails, return the error code.
  * Use do/while to require ';' at the end of a SAIL_TRY() expression.
  */
-#define SAIL_TRY(sail_func)       \
-do {                              \
-    sail_error_t res;             \
-                                  \
-    if ((res = sail_func) != 0) { \
-        return res;               \
-    }                             \
-} while(0)
+#define SAIL_TRY(sail_func) SAIL_TRY_OR_EXECUTE(sail_func, return __sail_error_result)
 
 /*
  * Try to execute the specified SAIL function. If it fails, ignore the error and continue execution.
  * Use do/while to require ';' at the end of a SAIL_TRY_OR_SUPPRESS() expression.
  */
-#define SAIL_TRY_OR_SUPPRESS(sail_func) \
-do {                                    \
-    sail_error_t res;                   \
-                                        \
-    if ((res = sail_func) != 0) {       \
-        (void)0;                        \
-    }                                   \
-} while(0)
-
-/*
- * Try to execute the specified SAIL function. If it fails, execute the rest of arguments.
- * Use do/while to require ';' at the end of a SAIL_TRY_OR_EXECUTE() expression.
- */
-#define SAIL_TRY_OR_EXECUTE(sail_func, ...) \
-do {                                        \
-    sail_error_t res;                       \
-                                            \
-    if ((res = sail_func) != 0) {           \
-        __VA_ARGS__;                        \
-    }                                       \
-} while(0)
+#define SAIL_TRY_OR_SUPPRESS(sail_func) SAIL_TRY_OR_EXECUTE(sail_func, (void)0)
 
 /*
  * Try to execute the specified SAIL function. If it fails, execute the rest of arguments
