@@ -2,8 +2,6 @@
 
 - Read/write indexed PNGs with alpha
 
-- Remove the scanline reading interface and make an interface to read entire frames?
-
 - document c++ classes
 
 - static compilation

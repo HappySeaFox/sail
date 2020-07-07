@@ -119,7 +119,7 @@ sail_error_t stop_writing(void *state, size_t *written) {
         return 0;
     }
 
-    SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v2->write_finish_v2(&state_of_mind->state, state_of_mind->io),
+    SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v3->write_finish(&state_of_mind->state, state_of_mind->io),
                         /* cleanup */ destroy_hidden_state(state_of_mind));
 
     if (written != NULL) {

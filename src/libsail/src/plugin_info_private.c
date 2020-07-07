@@ -487,7 +487,7 @@ sail_error_t plugin_read_info(const char *path, struct sail_plugin_info **plugin
 
     /* Success. */
     if (code == 0) {
-        if ((*plugin_info)->layout != SAIL_PLUGIN_LAYOUT_V2) {
+        if ((*plugin_info)->layout != SAIL_PLUGIN_LAYOUT_V3) {
             SAIL_LOG_ERROR("Unsupported plugin layout version %d in '%s'", (*plugin_info)->layout, path);
             destroy_plugin_info(*plugin_info);
             return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
