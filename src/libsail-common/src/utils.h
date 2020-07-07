@@ -200,7 +200,7 @@ SAIL_EXPORT sail_error_t sail_print_errno(const char *format);
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_now(uint64_t *result);
+SAIL_EXPORT uint64_t sail_now(void);
 
 /*
  * Returns true if the specified file system path exists.

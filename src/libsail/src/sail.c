@@ -256,8 +256,7 @@ static sail_error_t sail_init_impl(struct sail_context **context, int flags) {
     SAIL_CHECK_CONTEXT_PTR(context);
 
     /* Time counter. */
-    uint64_t start_time;
-    SAIL_TRY(sail_now(&start_time));
+    uint64_t start_time = sail_now();
 
     SAIL_LOG_INFO("Version %s", SAIL_VERSION_STRING);
 
@@ -372,9 +371,6 @@ static sail_error_t sail_init_impl(struct sail_context **context, int flags) {
     closedir(d);
 #endif
 
-    uint64_t end_time;
-    SAIL_TRY(sail_now(&end_time));
-
     if (flags & SAIL_FLAG_PRELOAD_PLUGINS) {
         SAIL_LOG_DEBUG("Preloading plugins");
 
@@ -401,7 +397,7 @@ static sail_error_t sail_init_impl(struct sail_context **context, int flags) {
         node = node->next;
     }
 
-    SAIL_LOG_DEBUG("Initialized in %lld ms.", (unsigned long)(end_time - start_time));
+    SAIL_LOG_DEBUG("Initialized in %lld ms.", (unsigned long)(sail_now() - start_time));
 
     return 0;
 }

@@ -554,9 +554,7 @@ sail_error_t sail_print_errno(const char *format) {
     return 0;
 }
 
-sail_error_t sail_now(uint64_t *result) {
-
-    SAIL_CHECK_RESULT_PTR(result);
+uint64_t sail_now(void) {
 
 #ifdef SAIL_WIN32
     SAIL_THREAD_LOCAL static bool initialized = false;
@@ -569,7 +567,7 @@ sail_error_t sail_now(uint64_t *result) {
 
         if (!QueryPerformanceFrequency(&li)) {
             SAIL_LOG_ERROR("Failed to get the current time. Error: %d", GetLastError());
-            return SAIL_INVALID_ARGUMENT;
+            return 0;
         }
 
         frequency = (double)li.QuadPart / 1000;
@@ -577,10 +575,10 @@ sail_error_t sail_now(uint64_t *result) {
 
     if (!QueryPerformanceCounter(&li)) {
         SAIL_LOG_ERROR("Failed to get the current time. Error: %d", GetLastError());
-        return SAIL_INVALID_ARGUMENT;
+        return 0;
     }
 
-    *result = (uint64_t)((double)li.QuadPart / frequency);
+    return (uint64_t)((double)li.QuadPart / frequency);
 #else
     struct timeval tv;
 
@@ -589,10 +587,8 @@ sail_error_t sail_now(uint64_t *result) {
         return 0;
     }
 
-    *result = (uint64_t)tv.tv_sec * 1000 + (uint64_t)tv.tv_usec / 1000;
+    return (uint64_t)tv.tv_sec * 1000 + (uint64_t)tv.tv_usec / 1000;
 #endif
-
-    return 0;
 }
 
 bool sail_path_exists(const char *path) {

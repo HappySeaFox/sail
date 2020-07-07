@@ -36,11 +36,9 @@ sail_error_t print_errno(const char *format)
     return 0;
 }
 
-sail_error_t now(uint64_t *result)
+uint64_t now()
 {
-    SAIL_TRY(sail_now(result));
-
-    return 0;
+    return sail_now();
 }
 
 }

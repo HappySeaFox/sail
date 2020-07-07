@@ -38,19 +38,15 @@ static sail_error_t probe(const char *path, struct sail_context *context) {
     SAIL_CHECK_CONTEXT_PTR(context);
 
     /* Time counter. */
-    uint64_t start_time;
-    SAIL_TRY(sail_now(&start_time));
+    uint64_t start_time = sail_now();
 
     struct sail_image *image;
     const struct sail_plugin_info *plugin_info;
 
     SAIL_TRY(sail_probe_path(path, context, &image, &plugin_info));
 
-    uint64_t end_time;
-    SAIL_TRY(sail_now(&end_time));
-
     printf("File          : %s\n", path);
-    printf("Probe time    : %lu ms.\n", (unsigned long)(end_time - start_time));
+    printf("Probe time    : %lu ms.\n", (unsigned long)(sail_now() - start_time));
     printf("Codec         : %s [%s]\n", plugin_info->name, plugin_info->description);
     printf("Codec version : %s\n", plugin_info->version);
     printf("Size          : %ux%u\n", image->width, image->height);
