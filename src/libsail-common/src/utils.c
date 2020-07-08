@@ -368,9 +368,40 @@ sail_error_t sail_compression_type_to_string(enum SailCompressionType compressio
     SAIL_CHECK_STRING_PTR(result);
 
     switch (compression) {
-        case SAIL_COMPRESSION_UNSUPPORTED: *result = "UNSUPPORTED"; return 0;
-        case SAIL_COMPRESSION_NONE:        *result = "NONE";        return 0;
-        case SAIL_COMPRESSION_RLE:         *result = "RLE";         return 0;
+        case SAIL_COMPRESSION_UNSUPPORTED:   *result = "UNSUPPORTED";   return 0;
+        case SAIL_COMPRESSION_NONE:          *result = "NONE";          return 0;
+        case SAIL_COMPRESSION_ADOBE_DEFLATE: *result = "ADOBE-DEFLATE"; return 0;
+        case SAIL_COMPRESSION_CCITT_FAX3:    *result = "CCITT-FAX3";    return 0;
+        case SAIL_COMPRESSION_CCITT_FAX4:    *result = "CCITT-FAX4";    return 0;
+        case SAIL_COMPRESSION_CCITT_RLE:     *result = "CCITT-RLE";     return 0;
+        case SAIL_COMPRESSION_CCITT_RLEW:    *result = "CCITT-RLEW";    return 0;
+        case SAIL_COMPRESSION_CCITT_T4:      *result = "CCITT-T4";      return 0;
+        case SAIL_COMPRESSION_CCITT_T6:      *result = "CCITT-T6";      return 0;
+        case SAIL_COMPRESSION_DCS:           *result = "DCS";           return 0;
+        case SAIL_COMPRESSION_DEFLATE:       *result = "DEFLATE";       return 0;
+        case SAIL_COMPRESSION_IT8_BL:        *result = "IT8-BL";        return 0;
+        case SAIL_COMPRESSION_IT8_CTPAD:     *result = "IT8-CTPAD";     return 0;
+        case SAIL_COMPRESSION_IT8_LW:        *result = "IT8-LW";        return 0;
+        case SAIL_COMPRESSION_IT8_MP:        *result = "IT8-MP";        return 0;
+        case SAIL_COMPRESSION_JBIG:          *result = "JBIG";          return 0;
+        case SAIL_COMPRESSION_JPEG:          *result = "JPEG";          return 0;
+        case SAIL_COMPRESSION_JPEG2000:      *result = "JPEG2000";      return 0;
+        case SAIL_COMPRESSION_LERC:          *result = "LERC";          return 0;
+        case SAIL_COMPRESSION_LZMA:          *result = "LZMA";          return 0;
+        case SAIL_COMPRESSION_LZW:           *result = "LZW";           return 0;
+        case SAIL_COMPRESSION_NEXT:          *result = "NEXT";          return 0;
+        case SAIL_COMPRESSION_OJPEG:         *result = "OJPEG";         return 0;
+        case SAIL_COMPRESSION_PACKBITS:      *result = "PACKBITS";      return 0;
+        case SAIL_COMPRESSION_PIXAR_FILM:    *result = "PIXAR-FILM";    return 0;
+        case SAIL_COMPRESSION_PIXAR_LOG:     *result = "PIXAR-LOG";     return 0;
+        case SAIL_COMPRESSION_RLE:           *result = "RLE";           return 0;
+        case SAIL_COMPRESSION_SGI_LOG:       *result = "SGI-LOG";       return 0;
+        case SAIL_COMPRESSION_SGI_LOG24:     *result = "SGI-LOG24";     return 0;
+        case SAIL_COMPRESSION_T43:           *result = "T43";           return 0;
+        case SAIL_COMPRESSION_T85:           *result = "T85";           return 0;
+        case SAIL_COMPRESSION_THUNDERSCAN:   *result = "THUNDERSCAN";   return 0;
+        case SAIL_COMPRESSION_WEBP:          *result = "WEBP";          return 0;
+        case SAIL_COMPRESSION_ZSTD:          *result = "ZSTD";          return 0;
     }
 
     return SAIL_UNSUPPORTED_COMPRESSION_TYPE;
@@ -389,9 +420,40 @@ sail_error_t sail_compression_type_from_string(const char *str, enum SailCompres
     SAIL_TRY(sail_string_hash(str, &hash));
 
     switch (hash) {
-        case UINT64_C(13846582888989074574): *result = SAIL_COMPRESSION_UNSUPPORTED; return 0;
-        case UINT64_C(6384332661):           *result = SAIL_COMPRESSION_NONE;        return 0;
-        case UINT64_C(193468872):            *result = SAIL_COMPRESSION_RLE;         return 0;
+        case UINT64_C(13846582888989074574): *result = SAIL_COMPRESSION_UNSUPPORTED;   return 0;
+        case UINT64_C(6384332661):           *result = SAIL_COMPRESSION_NONE;          return 0;
+        case UINT64_C(10962109560604417378): *result = SAIL_COMPRESSION_ADOBE_DEFLATE; return 0;
+        case UINT64_C(8244633541513328571):  *result = SAIL_COMPRESSION_CCITT_FAX3;    return 0;
+        case UINT64_C(8244633541513328572):  *result = SAIL_COMPRESSION_CCITT_FAX4;    return 0;
+        case UINT64_C(249837380045871852):   *result = SAIL_COMPRESSION_CCITT_RLE;     return 0;
+        case UINT64_C(8244633541513771203):  *result = SAIL_COMPRESSION_CCITT_RLEW;    return 0;
+        case UINT64_C(7570829698359793):     *result = SAIL_COMPRESSION_CCITT_T4;      return 0;
+        case UINT64_C(7570829698359795):     *result = SAIL_COMPRESSION_CCITT_T6;      return 0;
+        case UINT64_C(193453343):            *result = SAIL_COMPRESSION_DCS;           return 0;
+        case UINT64_C(229420447642554):      *result = SAIL_COMPRESSION_DEFLATE;       return 0;
+        case UINT64_C(6952347705973):        *result = SAIL_COMPRESSION_IT8_BL;        return 0;
+        case UINT64_C(249846519511114451):   *result = SAIL_COMPRESSION_IT8_CTPAD;     return 0;
+        case UINT64_C(6952347706314):        *result = SAIL_COMPRESSION_IT8_LW;        return 0;
+        case UINT64_C(6952347706340):        *result = SAIL_COMPRESSION_IT8_MP;        return 0;
+        case UINT64_C(6384174593):           *result = SAIL_COMPRESSION_JBIG;          return 0;
+        case UINT64_C(6384189707):           *result = SAIL_COMPRESSION_JPEG;          return 0;
+        case UINT64_C(7571144643365901):     *result = SAIL_COMPRESSION_JPEG2000;      return 0;
+        case UINT64_C(6384250027):           *result = SAIL_COMPRESSION_LERC;          return 0;
+        case UINT64_C(6384272729):           *result = SAIL_COMPRESSION_LZMA;          return 0;
+        case UINT64_C(193462818):            *result = SAIL_COMPRESSION_LZW;           return 0;
+        case UINT64_C(6384322116):           *result = SAIL_COMPRESSION_NEXT;          return 0;
+        case UINT64_C(210683986298):         *result = SAIL_COMPRESSION_OJPEG;         return 0;
+        case UINT64_C(7571380909080566):     *result = SAIL_COMPRESSION_PACKBITS;      return 0;
+        case UINT64_C(8245245943922754206):  *result = SAIL_COMPRESSION_PIXAR_FILM;    return 0;
+        case UINT64_C(249855937694635640):   *result = SAIL_COMPRESSION_PIXAR_LOG;     return 0;
+        case UINT64_C(193468872):            *result = SAIL_COMPRESSION_RLE;           return 0;
+        case UINT64_C(229439900388407):      *result = SAIL_COMPRESSION_SGI_LOG;       return 0;
+        case UINT64_C(249860051522976925):   *result = SAIL_COMPRESSION_SGI_LOG24;     return 0;
+        case UINT64_C(193470240):            *result = SAIL_COMPRESSION_T43;           return 0;
+        case UINT64_C(193470374):            *result = SAIL_COMPRESSION_T85;           return 0;
+        case UINT64_C(13844775339661004164): *result = SAIL_COMPRESSION_THUNDERSCAN;   return 0;
+        case UINT64_C(6384644819):           *result = SAIL_COMPRESSION_WEBP;          return 0;
+        case UINT64_C(6384768458):           *result = SAIL_COMPRESSION_ZSTD;          return 0;
     }
 
     return SAIL_UNSUPPORTED_COMPRESSION_TYPE;
