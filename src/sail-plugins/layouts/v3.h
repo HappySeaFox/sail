@@ -27,7 +27,7 @@
 #define SAIL_PLUGIN_LAYOUT_V3_H
 
 /*
- * This is a plugin layout definition file (version 2).
+ * This is a plugin layout definition file (version 3).
  *
  * It's intedened to be used as a reference how plugins V3 are organized. It's also could
  * be used by plugins' developers to compile their plugins directly into a testing application
@@ -63,7 +63,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_init_v3(struct sail_io *io, const stru
  * Seeks to the next frame. The frame is NOT immediately read or decoded by most SAIL plugins. One could
  * use this method to quickly detect the image dimensions without parsing the whole file or frame.
  *
- * Use sail_plugin_read_seek_next_pass() + sail_plugin_read_scan_line() to actually read the frame.
+ * Use sail_plugin_read_seek_next_pass() + sail_plugin_read_frame() to actually read the frame.
  * The assigned image MUST be destroyed later with sail_destroy_image().
  *
  * Returns 0 on success or sail_error_t on error.
@@ -78,13 +78,12 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v3(void *state, struct
 SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_pass_v3(void *state, struct sail_io *io, const struct sail_image *image);
 
 /*
- * Reads a scan line of the current image in the current pass. The specified scan line must be
- * allocated by the caller and must be be large enough. Use bytes_per_line field to calculate
- * the necessary length of a scan line.
+ * Reads the next frame of the current image in the current pass. The specified frame pixels must be
+ * allocated by the caller and must be be large enough.
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_read_scan_line_v3(void *state, struct sail_io *io, const struct sail_image *image, void *scanline);
+SAIL_EXPORT sail_error_t sail_plugin_read_frame_v3(void *state, struct sail_io *io, const struct sail_image *image, void *pixels);
 
 /*
  * Finilizes reading operation. No more readings are possible after calling this function.
@@ -115,7 +114,7 @@ SAIL_EXPORT sail_error_t sail_plugin_write_init_v3(struct sail_io *io, const str
 
 /*
  * Seeks to a next frame before writing it. The frame is NOT immediately written. Use sail_plugin_write_seek_next_pass()
- * and sail_plugin_write_scan_line() to actually write a frame.
+ * and sail_plugin_write_frame() to actually write a frame.
  *
  * Returns 0 on success or sail_error_t on error.
  */
@@ -129,11 +128,11 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v3(void *state, struc
 SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_pass_v3(void *state, struct sail_io *io, const struct sail_image *image);
 
 /*
- * Writes a scan line of the current image in the current pass.
+ * Writes a next frame of the current image in the current pass.
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_write_scan_line_v3(void *state, struct sail_io *io, const struct sail_image *image, const void *scanline);
+SAIL_EXPORT sail_error_t sail_plugin_write_frame_v3(void *state, struct sail_io *io, const struct sail_image *image, const void *frame);
 
 /*
  * Finilizes writing operation. No more writings are possible after calling this function.
