@@ -267,14 +267,9 @@ cmake --build . --config Release --target install
 
 - OS X 10.15 Catalina
 
-#### Build requirements
-
-- XCode command line utils
-
 #### Installation steps
 
 ```
-xcode-select --install
 brew install smoked-herring/sail/sail
 ```
 
