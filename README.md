@@ -265,8 +265,8 @@ cmake --build . --config Release --target install
 
 #### Tested environments
 
-- OS X 10.14 Mojave
-- OS X 10.15 Catalina
+- MacOS 10.14 Mojave
+- MacOS 10.15 Catalina
 
 #### Installation steps
 
