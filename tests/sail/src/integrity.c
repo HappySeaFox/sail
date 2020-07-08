@@ -199,7 +199,7 @@ static MunitResult test_image_property_from_string(const MunitParameter params[]
     (void)params;
     (void)user_data;
 
-    enum SailImageProperties result;
+    enum SailImageProperty result;
 
 #define TEST_SAIL_CONVERSION(s, e)               \
     sail_image_property_from_string(s, &result); \
@@ -286,7 +286,7 @@ static MunitResult test_plugin_feature_from_string(const MunitParameter params[]
     (void)params;
     (void)user_data;
 
-    enum SailPluginFeatures result;
+    enum SailPluginFeature result;
 
 #define TEST_SAIL_CONVERSION(s, e)               \
     sail_plugin_feature_from_string(s, &result); \
