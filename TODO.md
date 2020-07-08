@@ -12,8 +12,6 @@
 
 - add benchmarks to README
 
-- Add HomeBrew tap for MacOS
-
 - tests
   - check all plugins have the same layout version
   - check all plugins could be loaded
