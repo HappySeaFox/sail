@@ -369,7 +369,7 @@ sail_error_t sail_compression_type_to_string(enum SailCompressionType compressio
 
     switch (compression) {
         case SAIL_COMPRESSION_UNSUPPORTED: *result = "UNSUPPORTED"; return 0;
-        case SAIL_COMPRESSION_NO:          *result = "NO";          return 0;
+        case SAIL_COMPRESSION_NONE:        *result = "NONE";        return 0;
         case SAIL_COMPRESSION_RLE:         *result = "RLE";         return 0;
     }
 
@@ -390,7 +390,7 @@ sail_error_t sail_compression_type_from_string(const char *str, enum SailCompres
 
     switch (hash) {
         case UINT64_C(13846582888989074574): *result = SAIL_COMPRESSION_UNSUPPORTED; return 0;
-        case UINT64_C(5862562):              *result = SAIL_COMPRESSION_NO;          return 0;
+        case UINT64_C(6384332661):           *result = SAIL_COMPRESSION_NONE;        return 0;
         case UINT64_C(193468872):            *result = SAIL_COMPRESSION_RLE;         return 0;
     }
 

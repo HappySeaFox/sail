@@ -228,7 +228,7 @@ static MunitResult test_compression_type_to_string(const MunitParameter params[]
     munit_assert_string_equal(result, s);
 
     TEST_SAIL_CONVERSION(SAIL_COMPRESSION_UNSUPPORTED, "UNSUPPORTED");
-    TEST_SAIL_CONVERSION(SAIL_COMPRESSION_NO,          "NO");
+    TEST_SAIL_CONVERSION(SAIL_COMPRESSION_NONE,        "NONE");
     TEST_SAIL_CONVERSION(SAIL_COMPRESSION_RLE,         "RLE");
 
 #undef TEST_SAIL_CONVERSION
@@ -248,7 +248,7 @@ static MunitResult test_compression_type_from_string(const MunitParameter params
     munit_assert(result == e);
 
     TEST_SAIL_CONVERSION("UNSUPPORTED", SAIL_COMPRESSION_UNSUPPORTED);
-    TEST_SAIL_CONVERSION("NO",          SAIL_COMPRESSION_NO);
+    TEST_SAIL_CONVERSION("NONE",        SAIL_COMPRESSION_NONE);
     TEST_SAIL_CONVERSION("RLE",         SAIL_COMPRESSION_RLE);
 
 #undef TEST_SAIL_CONVERSION
