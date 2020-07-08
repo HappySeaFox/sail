@@ -154,6 +154,39 @@ enum SailCompressionType {
 
     /* No compression at all. */
     SAIL_COMPRESSION_NONE,
+
+    SAIL_COMPRESSION_RLE,           /* RLE compression. */
+    SAIL_COMPRESSION_CCITTRLE,      /* CCITT modified Huffman RLE. */
+    SAIL_COMPRESSION_CCITTFAX3,     /* CCITT Group 3 fax encoding. */
+    SAIL_COMPRESSION_CCITT_T4,      /* CCITT T.4 (TIFF 6 name). */
+    SAIL_COMPRESSION_CCITTFAX4,     /* CCITT Group 4 fax encoding. */
+    SAIL_COMPRESSION_CCITT_T6,      /* CCITT T.6 (TIFF 6 name). */
+    SAIL_COMPRESSION_LZW,           /* Lempel-Ziv  & Welch. */
+    SAIL_COMPRESSION_OJPEG,         /* !6.0 JPEG. */
+    SAIL_COMPRESSION_JPEG,          /* %JPEG DCT compression. */
+    SAIL_COMPRESSION_T85,           /* !TIFF/FX T.85 JBIG compression. */
+    SAIL_COMPRESSION_T43,           /* !TIFF/FX T.43 colour by layered JBIG compression. */
+    SAIL_COMPRESSION_NEXT,          /* NeXT 2-bit RLE. */
+    SAIL_COMPRESSION_CCITTRLEW,     /* #1 w/ word alignment. */
+    SAIL_COMPRESSION_PACKBITS,      /* Macintosh RLE. */
+    SAIL_COMPRESSION_THUNDERSCAN,   /* ThunderScan RLE. */
+    SAIL_COMPRESSION_IT8CTPAD,      /* IT8 CT w/padding. */
+    SAIL_COMPRESSION_IT8LW,         /* IT8 Linework RLE. */
+    SAIL_COMPRESSION_IT8MP,         /* IT8 Monochrome picture. */
+    SAIL_COMPRESSION_IT8BL,         /* IT8 Binary line art. */
+    SAIL_COMPRESSION_PIXARFILM,     /* Pixar companded 10bit LZW. */
+    SAIL_COMPRESSION_PIXARLOG,      /* Pixar companded 11bit ZIP. */
+    SAIL_COMPRESSION_DEFLATE,       /* Deflate compression. */
+    SAIL_COMPRESSION_ADOBE_DEFLATE, /* Deflate compression, as recognized by Adobe. */
+    SAIL_COMPRESSION_DCS,           /* Kodak DCS encoding. */
+    SAIL_COMPRESSION_JBIG,          /* ISO JBIG. */
+    SAIL_COMPRESSION_SGILOG,        /* SGI Log Luminance RLE. */
+    SAIL_COMPRESSION_SGILOG24,      /* SGI Log 24-bit packed. */
+    SAIL_COMPRESSION_JPEG2000,      /* Leadtools JPEG2000. */
+    SAIL_COMPRESSION_LERC,          /* ESRI Lerc codec. */
+    SAIL_COMPRESSION_LZMA,          /* LZMA2. */
+    SAIL_COMPRESSION_ZSTD,          /* ZSTD. */
+    SAIL_COMPRESSION_WEBP,          /* WEBP. */
 };
 
 /* Plugin features. */
