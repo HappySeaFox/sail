@@ -1,0 +1,12 @@
+#!/bin/sh -e
+
+# Update the tap
+brew tap smoked-herring/sail
+
+# Make a new bottle
+brew test-bot --root-url=https://dl.bintray.com/smoked-herring/bottles-sail --bintray-org=smoked-herring \
+    --tap=smoked-herring/sail smoked-herring/sail/sail
+
+echo
+echo "SUCCESS. Now you can upload the created bottles."
+echo

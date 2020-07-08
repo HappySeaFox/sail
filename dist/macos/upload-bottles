@@ -1,0 +1,12 @@
+#!/bin/sh -e
+
+PWD="$(dirname "$0")"
+
+export HOMEBREW_BINTRAY_USER=smoked-herring
+export HOMEBREW_BINTRAY_KEY="$(cat "$PWD/bintray-key")"
+
+brew pr-upload --bintray-org="$HOMEBREW_BINTRAY_USER" --root-url=https://dl.bintray.com/smoked-herring/bottles-sail
+
+echo
+echo "SUCCESS. Now you can reset the tap and commit the new 'bottle do' block."
+echo

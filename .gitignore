@@ -1,6 +1,9 @@
 # Build dir
 build/
 
+# Bintray key
+dist/macos/bintray-key
+
 # Qt Creator
 CMakeLists.txt.user
 
