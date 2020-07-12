@@ -43,7 +43,7 @@ list(APPEND PUBLIC_HEADERS "src/write_features.h")
 list(APPEND PUBLIC_HEADERS "src/write_options.h")
 
 set_target_properties(sail-common PROPERTIES
-                                  VERSION "0.5.0"
+                                  VERSION "0.7.2"
                                   SOVERSION 0
                                   PUBLIC_HEADER "${PUBLIC_HEADERS}")
 

@@ -37,7 +37,7 @@ list(APPEND PUBLIC_HEADERS "src/write_options-c++.h")
 list(APPEND PUBLIC_HEADERS "src/utils-c++.h")
 
 set_target_properties(sail-c++ PROPERTIES
-                               VERSION "0.3.1"
+                               VERSION "0.5.0"
                                SOVERSION 0
                                PUBLIC_HEADER "${PUBLIC_HEADERS}")
 

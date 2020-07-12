@@ -26,7 +26,7 @@ list(APPEND PUBLIC_HEADERS "src/sail_technical_diver.h")
 list(APPEND PUBLIC_HEADERS "src/string_node.h")
 
 set_target_properties(sail PROPERTIES
-                           VERSION "0.5.0"
+                           VERSION "0.7.0"
                            SOVERSION 0
                            PUBLIC_HEADER "${PUBLIC_HEADERS}")
 
