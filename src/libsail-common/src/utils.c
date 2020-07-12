@@ -471,7 +471,7 @@ sail_error_t sail_plugin_feature_to_string(enum SailPluginFeature plugin_feature
     switch (plugin_feature) {
         case SAIL_PLUGIN_FEATURE_STATIC:      *result = "STATIC";      return 0;
         case SAIL_PLUGIN_FEATURE_ANIMATED:    *result = "ANIMATED";    return 0;
-        case SAIL_PLUGIN_FEATURE_MULTI_PAGED: *result = "MULTI-PAGED"; return 0;
+        case SAIL_PLUGIN_FEATURE_MULTI_FRAME: *result = "MULTI-FRAME"; return 0;
         case SAIL_PLUGIN_FEATURE_META_INFO:   *result = "META-INFO";   return 0;
         case SAIL_PLUGIN_FEATURE_EXIF:        *result = "EXIF";        return 0;
         case SAIL_PLUGIN_FEATURE_INTERLACED:  *result = "INTERLACED";  return 0;
@@ -496,7 +496,7 @@ sail_error_t sail_plugin_feature_from_string(const char *str, enum SailPluginFea
     switch (hash) {
         case UINT64_C(6952739426029):        *result = SAIL_PLUGIN_FEATURE_STATIC;      return 0;
         case UINT64_C(7570758658679240):     *result = SAIL_PLUGIN_FEATURE_ANIMATED;    return 0;
-        case UINT64_C(13834645239609548286): *result = SAIL_PLUGIN_FEATURE_MULTI_PAGED; return 0;
+        case UINT64_C(13834645239598293736): *result = SAIL_PLUGIN_FEATURE_MULTI_FRAME; return 0;
         case UINT64_C(249851542786266181):   *result = SAIL_PLUGIN_FEATURE_META_INFO;   return 0;
         case UINT64_C(6384018865):           *result = SAIL_PLUGIN_FEATURE_EXIF;        return 0;
         case UINT64_C(8244927930303708800):  *result = SAIL_PLUGIN_FEATURE_INTERLACED;  return 0;

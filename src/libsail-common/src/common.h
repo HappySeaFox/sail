@@ -204,8 +204,8 @@ enum SailPluginFeature {
     /* Ability to read or write animated images. */
     SAIL_PLUGIN_FEATURE_ANIMATED    = 1 << 1,
 
-    /* Ability to read or write multi-paged (but not animated) images. */
-    SAIL_PLUGIN_FEATURE_MULTI_PAGED = 1 << 2,
+    /* Ability to read or write multi-frame (but not animated) images. */
+    SAIL_PLUGIN_FEATURE_MULTI_FRAME = 1 << 2,
 
     /* Ability to read or write simple image meta information like JPEG comments. */
     SAIL_PLUGIN_FEATURE_META_INFO   = 1 << 3,
