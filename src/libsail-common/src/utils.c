@@ -566,6 +566,9 @@ sail_error_t sail_bits_per_pixel(enum SailPixelFormat pixel_format, unsigned *re
         case SAIL_PIXEL_FORMAT_BPP24_YCBCR: *result = 24; return 0;
 
         case SAIL_PIXEL_FORMAT_BPP32_YCCK: *result = 32; return 0;
+
+        case SAIL_PIXEL_FORMAT_BPP24_CIE_LAB: *result = 24; return 0;
+        case SAIL_PIXEL_FORMAT_BPP48_CIE_LAB: *result = 48; return 0;
     }
 
     return SAIL_UNSUPPORTED_PIXEL_FORMAT;
