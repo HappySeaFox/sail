@@ -469,13 +469,13 @@ sail_error_t sail_plugin_feature_to_string(enum SailPluginFeature plugin_feature
     SAIL_CHECK_STRING_PTR(result);
 
     switch (plugin_feature) {
-        case SAIL_PLUGIN_FEATURE_STATIC:     *result = "STATIC";     return 0;
-        case SAIL_PLUGIN_FEATURE_ANIMATED:   *result = "ANIMATED";   return 0;
-        case SAIL_PLUGIN_FEATURE_MULTIPAGED: *result = "MULTIPAGED"; return 0;
-        case SAIL_PLUGIN_FEATURE_META_INFO:  *result = "META-INFO";  return 0;
-        case SAIL_PLUGIN_FEATURE_EXIF:       *result = "EXIF";       return 0;
-        case SAIL_PLUGIN_FEATURE_INTERLACED: *result = "INTERLACED"; return 0;
-        case SAIL_PLUGIN_FEATURE_ICCP:       *result = "ICCP";       return 0;
+        case SAIL_PLUGIN_FEATURE_STATIC:      *result = "STATIC";      return 0;
+        case SAIL_PLUGIN_FEATURE_ANIMATED:    *result = "ANIMATED";    return 0;
+        case SAIL_PLUGIN_FEATURE_MULTI_PAGED: *result = "MULTI-PAGED"; return 0;
+        case SAIL_PLUGIN_FEATURE_META_INFO:   *result = "META-INFO";   return 0;
+        case SAIL_PLUGIN_FEATURE_EXIF:        *result = "EXIF";        return 0;
+        case SAIL_PLUGIN_FEATURE_INTERLACED:  *result = "INTERLACED";  return 0;
+        case SAIL_PLUGIN_FEATURE_ICCP:        *result = "ICCP";        return 0;
     }
 
     return SAIL_UNSUPPORTED_PLUGIN_FEATURE;
@@ -494,13 +494,13 @@ sail_error_t sail_plugin_feature_from_string(const char *str, enum SailPluginFea
     SAIL_TRY(sail_string_hash(str, &hash));
 
     switch (hash) {
-        case UINT64_C(6952739426029):       *result = SAIL_PLUGIN_FEATURE_STATIC;     return 0;
-        case UINT64_C(7570758658679240):    *result = SAIL_PLUGIN_FEATURE_ANIMATED;   return 0;
-        case UINT64_C(8245123099178649521): *result = SAIL_PLUGIN_FEATURE_MULTIPAGED; return 0;
-        case UINT64_C(249851542786266181):  *result = SAIL_PLUGIN_FEATURE_META_INFO;  return 0;
-        case UINT64_C(6384018865):          *result = SAIL_PLUGIN_FEATURE_EXIF;       return 0;
-        case UINT64_C(8244927930303708800): *result = SAIL_PLUGIN_FEATURE_INTERLACED; return 0;
-        case UINT64_C(6384139556):          *result = SAIL_PLUGIN_FEATURE_ICCP;       return 0;
+        case UINT64_C(6952739426029):        *result = SAIL_PLUGIN_FEATURE_STATIC;      return 0;
+        case UINT64_C(7570758658679240):     *result = SAIL_PLUGIN_FEATURE_ANIMATED;    return 0;
+        case UINT64_C(13834645239609548286): *result = SAIL_PLUGIN_FEATURE_MULTI_PAGED; return 0;
+        case UINT64_C(249851542786266181):   *result = SAIL_PLUGIN_FEATURE_META_INFO;   return 0;
+        case UINT64_C(6384018865):           *result = SAIL_PLUGIN_FEATURE_EXIF;        return 0;
+        case UINT64_C(8244927930303708800):  *result = SAIL_PLUGIN_FEATURE_INTERLACED;  return 0;
+        case UINT64_C(6384139556):           *result = SAIL_PLUGIN_FEATURE_ICCP;        return 0;
     }
 
     return SAIL_UNSUPPORTED_PLUGIN_FEATURE;

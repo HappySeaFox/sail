@@ -345,7 +345,7 @@ static sail_error_t check_plugin_info(const char *path, const struct sail_plugin
     /* Check write features. */
     if ((write_features->features & SAIL_PLUGIN_FEATURE_STATIC ||
             write_features->features & SAIL_PLUGIN_FEATURE_ANIMATED ||
-            write_features->features & SAIL_PLUGIN_FEATURE_MULTIPAGED) && write_features->pixel_formats_mapping_node == NULL) {
+            write_features->features & SAIL_PLUGIN_FEATURE_MULTI_PAGED) && write_features->pixel_formats_mapping_node == NULL) {
         SAIL_LOG_ERROR("The plugin '%s' is able to write images, but output pixel formats mappings are not specified", path);
         return SAIL_INCOMPLETE_PLUGIN_INFO;
     }

@@ -199,25 +199,25 @@ enum SailCompressionType {
 enum SailPluginFeature {
 
     /* Ability to read or write static images. */
-    SAIL_PLUGIN_FEATURE_STATIC     = 1 << 0,
+    SAIL_PLUGIN_FEATURE_STATIC      = 1 << 0,
 
     /* Ability to read or write animated images. */
-    SAIL_PLUGIN_FEATURE_ANIMATED   = 1 << 1,
+    SAIL_PLUGIN_FEATURE_ANIMATED    = 1 << 1,
 
-    /* Ability to read or write multipaged (not animated) images. */
-    SAIL_PLUGIN_FEATURE_MULTIPAGED = 1 << 2,
+    /* Ability to read or write multi-paged (but not animated) images. */
+    SAIL_PLUGIN_FEATURE_MULTI_PAGED = 1 << 2,
 
     /* Ability to read or write simple image meta information like JPEG comments. */
-    SAIL_PLUGIN_FEATURE_META_INFO  = 1 << 3,
+    SAIL_PLUGIN_FEATURE_META_INFO   = 1 << 3,
 
     /* Ability to read or write EXIF meta information. */
-    SAIL_PLUGIN_FEATURE_EXIF       = 1 << 4,
+    SAIL_PLUGIN_FEATURE_EXIF        = 1 << 4,
 
     /* Ability to read or write interlaced images. */
-    SAIL_PLUGIN_FEATURE_INTERLACED = 1 << 5,
+    SAIL_PLUGIN_FEATURE_INTERLACED  = 1 << 5,
 
     /* Ability to read or write embedded ICC profiles. */
-    SAIL_PLUGIN_FEATURE_ICCP       = 1 << 6,
+    SAIL_PLUGIN_FEATURE_ICCP        = 1 << 6,
 };
 
 /* Read or write options. */
