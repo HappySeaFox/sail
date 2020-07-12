@@ -257,6 +257,9 @@ sail_error_t sail_pixel_format_to_string(enum SailPixelFormat pixel_format, cons
         case SAIL_PIXEL_FORMAT_BPP24_YCBCR:           *result = "BPP24-YCBCR";           return 0;
 
         case SAIL_PIXEL_FORMAT_BPP32_YCCK:            *result = "BPP32-YCCK";            return 0;
+
+        case SAIL_PIXEL_FORMAT_BPP24_CIE_LAB:         *result = "BPP24-CIE-LAB";         return 0;
+        case SAIL_PIXEL_FORMAT_BPP48_CIE_LAB:         *result = "BPP48-CIE-LAB";         return 0;
     }
 
     return SAIL_UNSUPPORTED_PIXEL_FORMAT;
@@ -326,6 +329,8 @@ sail_error_t sail_pixel_format_from_string(const char *str, enum SailPixelFormat
         case UINT64_C(8244605671673598258):  *result = SAIL_PIXEL_FORMAT_BPP64_CMYK;            return 0;
         case UINT64_C(13817569962846953645): *result = SAIL_PIXEL_FORMAT_BPP24_YCBCR;           return 0;
         case UINT64_C(8244605667721702563):  *result = SAIL_PIXEL_FORMAT_BPP32_YCCK;            return 0;
+        case UINT64_C(13237269438873232231): *result = SAIL_PIXEL_FORMAT_BPP24_CIE_LAB;         return 0;
+        case UINT64_C(13237367887476509101): *result = SAIL_PIXEL_FORMAT_BPP48_CIE_LAB;         return 0;
     }
 
     return SAIL_UNSUPPORTED_PIXEL_FORMAT;
