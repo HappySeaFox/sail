@@ -47,7 +47,7 @@ Author: Dmitry Baryshev
 
 ## Differences from other image decoding libraries
 
-- Fast and easy-to-use API providing expected business entities - images, delays, palettes etc.
+- Simple yet powerful API providing expected business entities - images, delays, palettes, pixels etc.
 - Access to source pixel data w/o converting it to a different format (supported by most image format plugins)
 - Reading and writing images in multiple pixel formats, not only RGB and friends
 - Image formats are supported through dynamically loaded plugins (codecs) which means you can add or remove codecs
