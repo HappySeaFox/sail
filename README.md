@@ -50,6 +50,8 @@ Author: Dmitry Baryshev
 - Simple yet powerful API providing expected business entities - images, delays, palettes, pixels etc.
 - Access to source pixel data w/o converting it to a different format (supported by most image format plugins)
 - Reading and writing images in multiple pixel formats, not only RGB and friends
+- Probing (access to the image properties w/o decoding the whole pixel data)
+- Access to the source image properties (source pixel format etc.)
 - Image formats are supported through dynamically loaded plugins (codecs) which means you can add or remove codecs
   without re-compiling the whole library
 
