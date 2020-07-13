@@ -3,8 +3,9 @@
 SAIL is a fast and lightweight cross-platform image decoding and encoding library providing multi-leveled APIs,
 from one-liners to complex use cases with custom I/O sources. :sailboat:
 
-SAIL is a rebranded ksquirrel-libs rewritten in C, enchanced and with high-level APIs. Ksquirrel-libs was a set of C++ image codecs
-for the KSquirrel image viewer. See [http://ksquirrel.sourceforge.net](http://ksquirrel.sourceforge.net).
+SAIL is a rebranded ksquirrel-libs rewritten in C without using any third-party libraries (except for codecs),
+enchanced, and with high-level APIs. Ksquirrel-libs was a set of C++ image codecs for the KSquirrel image viewer.
+See [http://ksquirrel.sourceforge.net](http://ksquirrel.sourceforge.net).
 
 See [FAQ](FAQ.md) for more.
 
@@ -90,7 +91,7 @@ bindings to C++.
 
 ### SAIL plugins
 
-SAIL plugins are the deepest level. This is a set of standalone, dynamically loaded codecs (SO on Linux
+SAIL plugins is the deepest level. This is a set of standalone, dynamically loaded codecs (SO on Linux
 and DLL on Windows). They implement actual decoding and encoding capabilities. End-users never work with
 plugins directly. They always use abstract, high-level APIs for that.
 
