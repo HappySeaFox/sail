@@ -45,16 +45,6 @@ Author: Dmitry Baryshev
 - Color management functions (applying ICC profiles etc.)
 - EXIF rotation
 
-## Differences from other image decoding libraries
-
-- Simple yet powerful API providing expected business entities - images, delays, palettes, pixels etc.
-- Access to source pixel data w/o converting it to a different format (supported by most image format plugins)
-- Reading and writing images in multiple pixel formats, not only RGB and friends
-- Probing (access to the image properties w/o decoding the whole pixel data)
-- Access to the source image properties (source pixel format etc.)
-- Image formats are supported through dynamically loaded plugins (codecs) which means you can add or remove codecs
-  without re-compiling the whole library
-
 ## Supported image formats
 
 | N  | Image format                                                                            | Operations    | Dependencies      | Notes         |
@@ -72,6 +62,27 @@ Currently, SAIL supports the following platforms:
 - Windows
 - MacOS
 - Linux
+
+## Competitors
+
+- [FreeImage](https://freeimage.sourceforge.io)
+- [DevIL](http://openil.sourceforge.net)
+- [SDL_Image](https://www.libsdl.org/projects/SDL_image)
+- [WIC (Windows only)](https://docs.microsoft.com/en-us/windows/win32/wic/-wic-about-windows-imaging-codec)
+- [stb_image](https://github.com/nothings/stb)
+- [Boost.GIL](https://www.boost.org/doc/libs/1_68_0/libs/gil/doc/html/index.html)
+- [gdk-pixbuf](https://developer.gnome.org/gdk-pixbuf)
+
+## Differences from other image decoding libraries
+
+- Simple yet powerful API providing expected business entities - images, delays, palettes, pixels etc.
+- Access to source pixel data w/o converting it to a different format (supported by the most codecs)
+- Reading and writing images in multiple pixel formats, not only RGB and friends
+- Access to the image properties w/o decoding the whole pixel data (probing)
+- Access to the source image properties (source pixel format etc.)
+- Image formats are supported through dynamically loaded plugins (codecs) which means you can add or remove codecs
+  without re-compiling the whole library
+- Image codecs can be implemented in any programming language
 
 ## Development status
 
