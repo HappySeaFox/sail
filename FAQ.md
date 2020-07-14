@@ -1,7 +1,9 @@
 Table of Contents
 =================
 
+* [Table of Contents](#table-of-contents)
 * [SAIL Frequently Asked Questions (FAQ)](#sail-frequently-asked-questions-faq)
+  * [What are the competitors of SAIL?](#what-are-the-competitors-of-sail)
   * [How old is SAIL?](#how-old-is-sail)
   * [Is SAIL cross\-platform?](#is-sail-cross-platform)
   * [How does SAIL support image formats?](#how-does-sail-support-image-formats)
@@ -31,6 +33,16 @@ Table of Contents
   * [Are there any bindings to other programming languages?](#are-there-any-bindings-to-other-programming-languages)
 
 # SAIL Frequently Asked Questions (FAQ)
+
+## What are the competitors of SAIL?
+
+- [FreeImage](https://freeimage.sourceforge.io)
+- [DevIL](http://openil.sourceforge.net)
+- [SDL_Image](https://www.libsdl.org/projects/SDL_image)
+- [WIC (Windows only)](https://docs.microsoft.com/en-us/windows/win32/wic/-wic-about-windows-imaging-codec)
+- [stb_image](https://github.com/nothings/stb)
+- [Boost.GIL](https://www.boost.org/doc/libs/1_68_0/libs/gil/doc/html/index.html)
+- [gdk-pixbuf](https://developer.gnome.org/gdk-pixbuf)
 
 ## How old is SAIL?
 
