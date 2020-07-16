@@ -48,7 +48,7 @@ sail_error_t sail_probe_path(const char *path, struct sail_context *context, str
     return 0;
 }
 
-sail_error_t sail_read(const char *path, struct sail_context *context, struct sail_image **image) {
+sail_error_t sail_read_path(const char *path, struct sail_context *context, struct sail_image **image) {
 
     SAIL_CHECK_PATH_PTR(path);
     SAIL_CHECK_IMAGE_PTR(image);
@@ -70,7 +70,7 @@ sail_error_t sail_read(const char *path, struct sail_context *context, struct sa
     return 0;
 }
 
-sail_error_t sail_write(const char *path, struct sail_context *context, const struct sail_image *image) {
+sail_error_t sail_write_path(const char *path, struct sail_context *context, const struct sail_image *image) {
 
     SAIL_CHECK_PATH_PTR(path);
     SAIL_CHECK_IMAGE(image);

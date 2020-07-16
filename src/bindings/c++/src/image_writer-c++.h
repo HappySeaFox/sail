@@ -59,7 +59,7 @@ public:
     bool is_valid() const;
 
     /*
-     * An interface to sail_write(). See sail_write() for more.
+     * An interface to sail_write_path(). See sail_write_path() for more.
      */
     sail_error_t write(const std::string &path, const image &simage);
     sail_error_t write(const char *path, const image &simage);

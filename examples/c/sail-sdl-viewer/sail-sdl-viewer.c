@@ -58,13 +58,13 @@ int main(int argc, char *argv[]) {
     struct sail_image *image;
 
     /*
-     * sail_read() reads the image and outputs pixels in BPP32-RGBA pixel format for image formats
+     * sail_read_path() reads the image and outputs pixels in BPP32-RGBA pixel format for image formats
      * with transparency support and BPP24-RGB otherwise. If you need to control output pixel
      * formats, consider switching to the deep diver API.
      */
-    SAIL_TRY(sail_read(argv[1],
-                       context,
-                       &image));
+    SAIL_TRY(sail_read_path(argv[1],
+                            context,
+                            &image));
 
     /* Create an SDL surface from the image data. */
     unsigned bytes_per_line;

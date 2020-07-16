@@ -65,12 +65,12 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     struct sail_image *image;
 
     /*
-     * sail_read() reads the image and outputs pixels in BPP32-RGBA pixel format for image formats
+     * sail_read_path() reads the image and outputs pixels in BPP32-RGBA pixel format for image formats
      * with transparency support and BPP24-RGB otherwise.
      */
-    SAIL_TRY(sail_read(path.toLocal8Bit(),
-                       NULL,
-                       &image));
+    SAIL_TRY(sail_read_path(path.toLocal8Bit(),
+                            NULL,
+                            &image));
 
     // Construct QImage from the read image pixels.
     //
@@ -103,10 +103,10 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
     SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(image->width, image->pixel_format, &image->bytes_per_line),
                         /* cleanup */ sail_destroy_image(image));
 
-    SAIL_TRY_OR_CLEANUP(sail_write(path.toLocal8Bit(),
-                                   NULL,
-                                   image),
-                        /* cleanup */ sail_destroy_image(image));
+    SAIL_TRY_OR_CLEANUP(sail_write_path(path.toLocal8Bit(),
+                                        NULL,
+                                        image),
+                                        /* cleanup */ sail_destroy_image(image));
 
     sail_destroy_image(image);
 

@@ -102,11 +102,11 @@ sail_error_t image_writer::write(const char *path, const image &simage)
                         /* cleanup */ sail_image->pixels = NULL,
                                       sail_destroy_image(sail_image));
 
-    SAIL_TRY_OR_CLEANUP(sail_write(path,
-                                    d->ctx->sail_context_c(),
-                                    sail_image),
-                        /* cleanup */ sail_image->pixels = NULL,
-                                      sail_destroy_image(sail_image));
+    SAIL_TRY_OR_CLEANUP(sail_write_path(path,
+                                        d->ctx->sail_context_c(),
+                                        sail_image),
+                                        /* cleanup */ sail_image->pixels = NULL,
+                                        sail_destroy_image(sail_image));
 
     sail_image->pixels = NULL;
     sail_destroy_image(sail_image);

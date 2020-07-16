@@ -74,7 +74,7 @@ SAIL_EXPORT sail_error_t sail_probe_path(const char *path, struct sail_context *
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_read(const char *path, struct sail_context *context, struct sail_image **image);
+SAIL_EXPORT sail_error_t sail_read_path(const char *path, struct sail_context *context, struct sail_image **image);
 
 /*
  * Writes the pixels of the specified image file into the file.
@@ -88,7 +88,7 @@ SAIL_EXPORT sail_error_t sail_read(const char *path, struct sail_context *contex
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_write(const char *path, struct sail_context *context, const struct sail_image *image);
+SAIL_EXPORT sail_error_t sail_write_path(const char *path, struct sail_context *context, const struct sail_image *image);
 
 /* extern "C" */
 #ifdef __cplusplus
