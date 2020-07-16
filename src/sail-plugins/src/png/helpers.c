@@ -298,11 +298,7 @@ sail_error_t fetch_iccp(png_structp png_ptr, png_infop info_ptr, struct sail_icc
     if (ok) {
         SAIL_TRY(sail_alloc_iccp(iccp));
 
-        (*iccp)->data = malloc(data_length);
-
-        if ((*iccp)->data == NULL) {
-            return SAIL_MEMORY_ALLOCATION_FAILED;
-        }
+        SAIL_TRY(sail_malloc(&(*iccp)->data, data_length));
 
         memcpy((*iccp)->data, data, data_length);
         (*iccp)->data_length = data_length;
@@ -377,11 +373,7 @@ sail_error_t skip_hidden_frame(unsigned bytes_per_line, unsigned height, png_str
     SAIL_CHECK_PTR(info_ptr);
     SAIL_CHECK_PTR(row);
 
-    *row = malloc(bytes_per_line);
-
-    if (*row == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
+    SAIL_TRY(sail_malloc(row, bytes_per_line));
 
     png_read_frame_head(png_ptr, info_ptr);
 
@@ -397,22 +389,17 @@ sail_error_t skip_hidden_frame(unsigned bytes_per_line, unsigned height, png_str
 
 sail_error_t alloc_rows(png_bytep **A, unsigned row_length, unsigned height) {
 
-    *A = (png_bytep*)malloc(height * sizeof(png_bytep));
+    void *temp_ptr;
+    SAIL_TRY(sail_malloc(&temp_ptr, height * sizeof(png_bytep)));
 
-    if (*A == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
+    *A = temp_ptr;
 
     for (unsigned row = 0; row < height; row++) {
         (*A)[row] = NULL;
     }
 
     for (unsigned row = 0; row < height; row++) {
-        (*A)[row] = (png_bytep)malloc(row_length);
-
-        if ((*A)[row] == NULL) {
-            return SAIL_MEMORY_ALLOCATION_FAILED;
-        }
+        SAIL_TRY(sail_malloc(&(*A)[row], row_length));
 
         memset((*A)[row], 0, row_length);
     }

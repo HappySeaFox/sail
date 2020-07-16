@@ -89,11 +89,7 @@ struct png_state {
 
 static int alloc_png_state(struct png_state **png_state) {
 
-    *png_state = (struct png_state *)malloc(sizeof(struct png_state));
-
-    if (*png_state == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
+    SAIL_TRY(sail_malloc(png_state, sizeof(struct png_state)));
 
     (*png_state)->png_ptr        = NULL;
     (*png_state)->info_ptr       = NULL;
@@ -212,11 +208,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_init_v3(struct sail_io *io, const stru
             SAIL_TRY(sail_alloc_palette(&png_state->first_image->palette));
             png_state->first_image->palette->pixel_format = SAIL_PIXEL_FORMAT_BPP24_RGB;
             png_state->first_image->palette->color_count = palette_color_count;
-            png_state->first_image->palette->data = malloc(palette_color_count * 3);
-
-            if (png_state->first_image->palette->data == NULL) {
-                return SAIL_MEMORY_ALLOCATION_FAILED;
-            }
+            SAIL_TRY(sail_malloc(&png_state->first_image->palette->data, palette_color_count * 3));
 
             unsigned char *palette_ptr = png_state->first_image->palette->data;
 
@@ -325,11 +317,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_init_v3(struct sail_io *io, const stru
     }
 
 #ifdef PNG_APNG_SUPPORTED
-    png_state->temp_scanline = malloc(png_state->first_image->width * png_state->bytes_per_pixel);
-
-    if (png_state->temp_scanline == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
+    SAIL_TRY(sail_malloc(&png_state->temp_scanline, png_state->first_image->width * png_state->bytes_per_pixel));
 #endif
 
     const char *pixel_format_str = NULL;

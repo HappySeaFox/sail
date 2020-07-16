@@ -66,11 +66,7 @@ struct jpeg_state {
 
 static sail_error_t alloc_jpeg_state(struct jpeg_state **jpeg_state) {
 
-    *jpeg_state = (struct jpeg_state *)malloc(sizeof(struct jpeg_state));
-
-    if (*jpeg_state == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
+    SAIL_TRY(sail_malloc(jpeg_state, sizeof(struct jpeg_state)));
 
     (*jpeg_state)->libjpeg_error                   = false;
     (*jpeg_state)->read_options                    = NULL;
@@ -207,11 +203,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v3(void *state, struct
                                         (*image)->source_image->pixel_format,
                                         &src_bytes_per_line));
 
-        jpeg_state->extra_scan_line = malloc(src_bytes_per_line);
-
-        if (jpeg_state->extra_scan_line == NULL) {
-            return SAIL_MEMORY_ALLOCATION_FAILED;
-        }
+        SAIL_TRY(sail_malloc(&jpeg_state->extra_scan_line, src_bytes_per_line));
     }
 
     /* Read meta info. */
