@@ -281,7 +281,7 @@ sail_error_t fetch_iccp(png_structp png_ptr, png_infop info_ptr, struct sail_icc
 
     SAIL_CHECK_PTR(png_ptr);
     SAIL_CHECK_PTR(info_ptr);
-    SAIL_CHECK_PTR(iccp);
+    SAIL_CHECK_ICCP_PTR(iccp);
 
     char *name;
     int compression;
@@ -300,6 +300,37 @@ sail_error_t fetch_iccp(png_structp png_ptr, png_infop info_ptr, struct sail_icc
         SAIL_LOG_DEBUG("PNG: Found ICC profile '%s' %u bytes long", name, data_length);
     } else {
         SAIL_LOG_DEBUG("PNG: ICC profile is not found");
+    }
+
+    return 0;
+}
+
+SAIL_HIDDEN sail_error_t fetch_palette(png_structp png_ptr, png_infop info_ptr, struct sail_palette **palette) {
+
+    SAIL_CHECK_PTR(png_ptr);
+    SAIL_CHECK_PTR(info_ptr);
+    SAIL_CHECK_PALETTE_PTR(palette);
+
+    png_colorp png_palette;
+    int png_palette_color_count;
+
+    if (png_get_PLTE(png_ptr, info_ptr, &png_palette, &png_palette_color_count) == 0) {
+        SAIL_LOG_ERROR("The indexed image has no palette");
+        return SAIL_MISSING_PALETTE;
+    }
+
+    /* Always use RGB palette. */
+    SAIL_TRY(sail_alloc_palette(palette));
+    (*palette)->pixel_format = SAIL_PIXEL_FORMAT_BPP24_RGB;
+    (*palette)->color_count = png_palette_color_count;
+    SAIL_TRY(sail_malloc(&(*palette)->data, png_palette_color_count * 3));
+
+    unsigned char *palette_ptr = (*palette)->data;
+
+    for (int i = 0; i < png_palette_color_count; i++) {
+        *palette_ptr++ = png_palette[i].red;
+        *palette_ptr++ = png_palette[i].green;
+        *palette_ptr++ = png_palette[i].blue;
     }
 
     return 0;

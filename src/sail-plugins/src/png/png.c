@@ -196,27 +196,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_init_v3(struct sail_io *io, const stru
 
         /* Save palette. */
         if (png_state->color_type == PNG_COLOR_TYPE_PALETTE) {
-            png_colorp palette;
-            int palette_color_count;
-
-            if (png_get_PLTE(png_state->png_ptr, png_state->info_ptr, &palette, &palette_color_count) == 0) {
-                SAIL_LOG_ERROR("The indexed image has no palette");
-                return SAIL_MISSING_PALETTE;
-            }
-
-            /* Always use RGB palette. */
-            SAIL_TRY(sail_alloc_palette(&png_state->first_image->palette));
-            png_state->first_image->palette->pixel_format = SAIL_PIXEL_FORMAT_BPP24_RGB;
-            png_state->first_image->palette->color_count = palette_color_count;
-            SAIL_TRY(sail_malloc(&png_state->first_image->palette->data, palette_color_count * 3));
-
-            unsigned char *palette_ptr = png_state->first_image->palette->data;
-
-            for (int i = 0; i < palette_color_count; i++) {
-                *palette_ptr++ = palette[i].red;
-                *palette_ptr++ = palette[i].green;
-                *palette_ptr++ = palette[i].blue;
-            }
+            SAIL_TRY(fetch_palette(png_state->png_ptr, png_state->info_ptr, &png_state->first_image->palette));
         }
     } else {
         if (png_state->bit_depth == 16) {
