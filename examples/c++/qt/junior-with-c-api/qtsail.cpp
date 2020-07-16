@@ -95,8 +95,8 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
     struct sail_image *image;
     SAIL_TRY(sail_alloc_image(&image));
 
-    image->pixels = malloc(100);
-    memcpy(image->pixels, qimage.bits(), 100);
+    image->pixels = malloc(qimage.sizeInBytes());
+    memcpy(image->pixels, qimage.bits(), qimage.sizeInBytes());
     image->width = qimage.width();
     image->height = qimage.height();
     image->pixel_format = qImageFormatToSailPixelFormat(qimage.format());
