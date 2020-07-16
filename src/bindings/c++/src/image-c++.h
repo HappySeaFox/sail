@@ -173,22 +173,18 @@ public:
     const sail::source_image& source_image() const;
 
     /*
-     * Returns the editable deep copied pixel data if any. Images can hold deep copied or shallow data,
-     * but not both. This method returns the data set using the with_data() method. To set shallow data,
-     * call with_shallow_data() instead of with_data().
+     * Returns the editable pixel data if any. Images hold deep copied or shallow data, but not both.
      *
      * READ:  Set by SAIL to valid pixel data.
-     * WRITE: Must be set by a caller to valid pixel data using with_pixels().
+     * WRITE: Must be set by a caller to valid pixel data using with_pixels() or with_shallow_pixels().
      */
     void* pixels();
 
     /*
-     * Returns the constant deep copied pixel data if any. Images can hold deep copied or shallow data,
-     * but not both. This method returns the data set using the with_data() method. To set shallow data,
-     * call with_shallow_data() instead of with_data().
+     * Returns the constant pixel data if any. Images hold deep copied or shallow data, but not both.
      *
      * READ:  Set by SAIL to valid pixel data.
-     * WRITE: Must be set by a caller to valid pixel data using with_pixels().
+     * WRITE: Must be set by a caller to valid pixel data using with_pixels() or with_shallow_pixels().
      */
     const void* pixels() const;
 
@@ -196,16 +192,6 @@ public:
      * Returns the size of deep copied pixel data in bytes.
      */
     unsigned pixels_size() const;
-
-    /*
-     * Returns the constant shallow pixel data if any. Images can hold deep copied or shallow data,
-     * but not both. This method returns the data set using the with_shallow_data() method.
-     * To deep copy pixel data, call with_data() instead of with_shallow_pixels().
-     *
-     * READ:  Set by SAIL to valid pixel data.
-     * WRITE: Must be set by a caller to valid pixel data using with_pixels().
-     */
-    const void* shallow_pixels() const;
 
     /*
      * Sets a new width.
@@ -249,23 +235,34 @@ public:
     image& with_meta_entries(const std::map<std::string, std::string> &meta_entries);
 
     /*
-     * Deep copies the specified pixel data. Resets the pointer to shallow pixel data to nullptr.
-     * The data can be accessed later with pixels(). The size of the pixel data is calculated
-     * based on the image width, height, and the pixel format which must be set beforehand.
+     * Deep copies the specified pixel data. The data can be accessed later with pixels().
+     * The size of the pixel data is calculated based on the image width, height, and the pixel
+     * format which must be set beforehand. The deep copied data is deleted upon image destruction.
      */
     image& with_pixels(const void *pixels);
 
     /*
-     * Deep copies the specified pixel data. Resets the pointer to shallow pixel data to nullptr.
-     * The data can be accessed later with pixels().
+     * Deep copies the specified pixel data and stores its size. The data can be accessed later with pixels().
+     * The deep copied data is deleted upon image destruction.
      */
     image& with_pixels(const void *pixels, unsigned pixels_size);
 
     /*
      * Stores the pointer to the external pixel data. Frees the previously stored deep-copied pixel data.
-     * The pixel data must remain valid until the image exists. The data can be accessed later with shallow_pixels().
+     * The pixel data must remain valid until the image exists. The shallow data is not deleted upon
+     * image destruction.
+     *
+     * The size of the pixel data is calculated based on the image width, height, and the pixel
+     * format which must be set beforehand.
      */
-    image& with_shallow_pixels(const void *pixels);
+    image& with_shallow_pixels(void *pixels);
+
+    /*
+     * Stores the pointer to the external pixel data and stores its size. Frees the previously stored
+     * deep-copied pixel data. The pixel data must remain valid until the image exists. The shallow data
+     * is not deleted upon image destruction.
+     */
+    image& with_shallow_pixels(void *pixels, unsigned pixels_size);
 
     /*
      * Sets a new ICC profile.

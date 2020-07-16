@@ -72,7 +72,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 
     // Construct QImage from the read image.
     //
-    *qimage = QImage(reinterpret_cast<const uchar *>(image.pixels() ? image.pixels() : image.shallow_pixels()),
+    *qimage = QImage(reinterpret_cast<const uchar *>(image.pixels()),
                      image.width(),
                      image.height(),
                      image.bytes_per_line(),
@@ -96,7 +96,7 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
          .with_height(qimage.height())
          .with_pixel_format(qImageFormatToSailPixelFormat(qimage.format()))
          .with_bytes_per_line_auto()
-         .with_shallow_pixels(qimage.bits());
+         .with_shallow_pixels(const_cast<uchar *>(qimage.bits()));
 
     SAIL_TRY(writer.write(path.toLocal8Bit(), image));
 

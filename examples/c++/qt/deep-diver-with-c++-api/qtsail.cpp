@@ -156,7 +156,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 
     // Convert to QImage.
     //
-    *qimage = QImage(reinterpret_cast<const uchar *>(image.pixels() ? image.pixels() : image.shallow_pixels()),
+    *qimage = QImage(reinterpret_cast<const uchar *>(image.pixels()),
                      image.width(),
                      image.height(),
                      image.bytes_per_line(),
@@ -265,7 +265,7 @@ sail_error_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffer
          .with_height(qimage.height())
          .with_pixel_format(qImageFormatToSailPixelFormat(qimage.format()))
          .with_bytes_per_line_auto()
-         .with_shallow_pixels(qimage.bits())
+         .with_shallow_pixels(const_cast<uchar *>(qimage.bits()))
          .with_palette(palette);
 
     if (image.pixel_format() == SAIL_PIXEL_FORMAT_UNKNOWN) {

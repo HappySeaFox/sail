@@ -46,12 +46,14 @@ public:
         , properties(0)
         , pixels(nullptr)
         , pixels_size(0)
-        , shallow_pixels(nullptr)
+        , shallow_pixels(false)
     {}
 
     ~pimpl()
     {
-        delete [] pixels;
+        if (!shallow_pixels) {
+            delete [] pixels;
+        }
     }
 
     unsigned width;
@@ -67,7 +69,7 @@ public:
     sail::source_image source_image;
     void *pixels;
     unsigned pixels_size;
-    const void *shallow_pixels;
+    bool shallow_pixels;
 };
 
 image::image()
@@ -93,13 +95,8 @@ image& image::operator=(const image &img)
         .with_meta_entries(meta_entries())
         .with_iccp(img.iccp())
         .with_properties(img.properties())
-        .with_source_image(img.source_image());
-
-    if (img.shallow_pixels() != nullptr) {
-        with_shallow_pixels(img.shallow_pixels());
-    } else {
-        with_pixels(img.pixels(), img.pixels_size());
-    }
+        .with_source_image(img.source_image())
+        .with_pixels(img.pixels(), img.pixels_size());
 
     return *this;
 }
@@ -111,7 +108,7 @@ image::~image()
 
 bool image::is_valid() const
 {
-    return d->width > 0 && d->height > 0 && d->bytes_per_line > 0 && (d->pixels != nullptr || d->shallow_pixels != nullptr);
+    return d->width > 0 && d->height > 0 && d->bytes_per_line > 0 && d->pixels != nullptr;
 }
 
 unsigned image::width() const
@@ -184,11 +181,6 @@ unsigned image::pixels_size() const
     return d->pixels_size;
 }
 
-const void* image::shallow_pixels() const
-{
-    return d->shallow_pixels;
-}
-
 image& image::with_width(unsigned width)
 {
     d->width = width;
@@ -255,7 +247,7 @@ image& image::with_pixels(const void *pixels, unsigned pixels_size)
 
     d->pixels         = nullptr;
     d->pixels_size    = 0;
-    d->shallow_pixels = nullptr;
+    d->shallow_pixels = false;
 
     if (pixels == nullptr || pixels_size == 0) {
         return *this;
@@ -269,19 +261,32 @@ image& image::with_pixels(const void *pixels, unsigned pixels_size)
     return *this;
 }
 
-image& image::with_shallow_pixels(const void *pixels)
+image& image::with_shallow_pixels(void *pixels)
+{
+    unsigned bytes_per_image;
+    SAIL_TRY_OR_EXECUTE(image::bytes_per_image(*this, &bytes_per_image),
+                        /* on error */ return *this);
+
+    with_shallow_pixels(pixels, bytes_per_image);
+    return *this;
+}
+
+image& image::with_shallow_pixels(void *pixels, unsigned pixels_size)
 {
     delete [] d->pixels;
 
-    d->pixels      = nullptr;
-    d->pixels_size = 0;
+    d->pixels         = nullptr;
+    d->pixels_size    = 0;
+    d->shallow_pixels = false;
 
-    if (pixels == nullptr ) {
+    if (pixels == nullptr) {
         SAIL_LOG_ERROR("Not assigning invalid pixels. pixels pointer: %p", pixels);
         return *this;
     }
 
-    d->shallow_pixels = pixels;
+    d->pixels         = pixels;
+    d->pixels_size    = pixels_size;
+    d->shallow_pixels = true;
 
     return *this;
 }
@@ -409,7 +414,7 @@ sail_error_t image::transfer_pixels_pointer(const sail_image *sail_image)
 
     d->pixels         = nullptr;
     d->pixels_size    = 0;
-    d->shallow_pixels = nullptr;
+    d->shallow_pixels = false;
 
     if (sail_image->pixels == nullptr) {
         return 0;
@@ -451,7 +456,7 @@ sail_error_t image::to_sail_image(sail_image *sail_image) const
         ++it;
     }
 
-    sail_image->pixels         = d->pixels != nullptr ? d->pixels : (void *)d->shallow_pixels;
+    sail_image->pixels         = d->pixels;
     sail_image->width          = d->width;
     sail_image->height         = d->height;
     sail_image->bytes_per_line = d->bytes_per_line;
