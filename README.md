@@ -144,11 +144,11 @@ SAIL_TRY(reader.read(path, &image));
 
 It's pretty easy, isn't it? :smile: See [EXAMPLES](EXAMPLES.md) for more.
 
-### 2. `Advanced`: I want to load this damn animated GIF
+### 2. `Advanced`: I want to load this damn animated GIF from a file or memory
 
 See [EXAMPLES](EXAMPLES.md) for more.
 
-### 3. `Deep diver`: I want to load this damn animated GIF and have control over selected plugins and output pixel formats
+### 3. `Deep diver`: I want to load this damn animated GIF from a file or memory and have control over selected plugins and output pixel formats
 
 See [EXAMPLES](EXAMPLES.md) for more.
 
