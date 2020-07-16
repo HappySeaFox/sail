@@ -46,14 +46,6 @@ SAIL provides 4 levels of APIs depending on your needs. Let's have a look at the
 
 #### C:
 ```C
-struct sail_context *context;
-
-/*
- * Initialize SAIL context. You could cache the context and re-use it multiple times.
- * When it's not needed anymore, call sail_finish(context).
- */
-SAIL_TRY(sail_init(&context));
-
 struct sail_image *image;
 unsigned char *image_pixels;
 
@@ -62,7 +54,7 @@ unsigned char *image_pixels;
  * with transparency support and BPP24-RGB otherwise.
  */
 SAIL_TRY(sail_read(path,
-                   context,
+                   NULL,
                    &image,
                    (void **)&image_pixels));
 

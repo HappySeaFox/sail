@@ -33,12 +33,14 @@
 sail_error_t sail_probe_path(const char *path, struct sail_context *context, struct sail_image **image, const struct sail_plugin_info **plugin_info) {
 
     SAIL_CHECK_PATH_PTR(path);
-    SAIL_CHECK_CONTEXT_PTR(context);
+
+    struct sail_context *context_local;
+    SAIL_TRY(possibly_allocate_context(context, &context_local));
 
     struct sail_io *io;
     SAIL_TRY(alloc_io_read_file(path, &io));
 
-    SAIL_TRY_OR_CLEANUP(sail_probe_io(io, context, image, plugin_info),
+    SAIL_TRY_OR_CLEANUP(sail_probe_io(io, context_local, image, plugin_info),
                         /* cleanup */ sail_destroy_io(io));
 
     sail_destroy_io(io);
@@ -49,12 +51,14 @@ sail_error_t sail_probe_path(const char *path, struct sail_context *context, str
 sail_error_t sail_read(const char *path, struct sail_context *context, struct sail_image **image) {
 
     SAIL_CHECK_PATH_PTR(path);
-    SAIL_CHECK_CONTEXT_PTR(context);
     SAIL_CHECK_IMAGE_PTR(image);
+
+    struct sail_context *context_local;
+    SAIL_TRY(possibly_allocate_context(context, &context_local));
 
     void *state = NULL;
 
-    SAIL_TRY_OR_CLEANUP(sail_start_reading_file(path, context, NULL /* plugin info */, &state),
+    SAIL_TRY_OR_CLEANUP(sail_start_reading_file(path, context_local, NULL /* plugin info */, &state),
                         /* cleanup */ sail_stop_reading(state));
 
     SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, image),
@@ -69,12 +73,14 @@ sail_error_t sail_read(const char *path, struct sail_context *context, struct sa
 sail_error_t sail_write(const char *path, struct sail_context *context, const struct sail_image *image) {
 
     SAIL_CHECK_PATH_PTR(path);
-    SAIL_CHECK_CONTEXT_PTR(context);
     SAIL_CHECK_IMAGE(image);
+
+    struct sail_context *context_local;
+    SAIL_TRY(possibly_allocate_context(context, &context_local));
 
     void *state = NULL;
 
-    SAIL_TRY_OR_CLEANUP(sail_start_writing_file(path, context, NULL /* plugin info */, &state),
+    SAIL_TRY_OR_CLEANUP(sail_start_writing_file(path, context_local, NULL /* plugin info */, &state),
                         sail_stop_writing(state));
 
     SAIL_TRY_OR_CLEANUP(sail_write_next_frame(state, image),

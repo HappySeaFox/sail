@@ -169,3 +169,24 @@ sail_error_t allowed_write_output_pixel_format(const struct sail_write_features 
 
     return SAIL_UNSUPPORTED_PIXEL_FORMAT;
 }
+
+sail_error_t possibly_allocate_context(struct sail_context *context, struct sail_context **context_result) {
+
+    SAIL_CHECK_CONTEXT_PTR(context_result);
+
+    SAIL_THREAD_LOCAL static struct sail_context *tls_context = NULL;
+    SAIL_THREAD_LOCAL static bool tls_context_initialized = false;
+
+    if (context == NULL) {
+        if (!tls_context_initialized) {
+            SAIL_TRY(sail_init(&tls_context));
+            tls_context_initialized = true;
+        }
+
+        *context_result = tls_context;
+    } else {
+        *context_result = context;
+    }
+
+    return 0;
+}

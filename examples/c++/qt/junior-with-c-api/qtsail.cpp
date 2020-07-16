@@ -54,22 +54,10 @@ QtSail::QtSail(QWidget *parent)
 
     connect(m_ui->pushOpen,  &QPushButton::clicked, this, &QtSail::onOpenFile);
     connect(m_ui->pushSave,  &QPushButton::clicked, this, &QtSail::onSave);
-
-    init();
 }
 
 QtSail::~QtSail()
 {
-    sail_finish(m_context);
-    m_context = nullptr;
-}
-
-sail_error_t QtSail::init()
-{
-    SAIL_TRY_OR_CLEANUP(sail_init(&m_context),
-                        /* cleanup */ QMessageBox::critical(this, tr("Error"), tr("Failed to init SAIL")),
-                                      ::exit(1));
-    return 0;
 }
 
 sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
@@ -81,7 +69,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
      * with transparency support and BPP24-RGB otherwise.
      */
     SAIL_TRY(sail_read(path.toLocal8Bit(),
-                       m_context,
+                       NULL,
                        &image));
 
     // Construct QImage from the read image pixels.
@@ -116,7 +104,7 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
                         /* cleanup */ sail_destroy_image(image));
 
     SAIL_TRY_OR_CLEANUP(sail_write(path.toLocal8Bit(),
-                                   m_context,
+                                   NULL,
                                    image),
                         /* cleanup */ sail_destroy_image(image));
 

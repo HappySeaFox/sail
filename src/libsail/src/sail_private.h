@@ -81,4 +81,7 @@ SAIL_HIDDEN sail_error_t allowed_write_output_pixel_format(const struct sail_wri
                                                             enum SailPixelFormat input_pixel_format,
                                                             enum SailPixelFormat output_pixel_format);
 
+SAIL_HIDDEN sail_error_t possibly_allocate_context(struct sail_context *context,
+                                                    struct sail_context **context_result);
+
 #endif
