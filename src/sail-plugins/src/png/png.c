@@ -196,8 +196,8 @@ SAIL_EXPORT sail_error_t sail_plugin_read_init_v3(struct sail_io *io, const stru
 
         /* Save palette. */
         if (png_state->color_type == PNG_COLOR_TYPE_PALETTE) {
-            int palette_color_count;
             png_colorp palette;
+            int palette_color_count;
 
             if (png_get_PLTE(png_state->png_ptr, png_state->info_ptr, &palette, &palette_color_count) == 0) {
                 SAIL_LOG_ERROR("The indexed image has no palette");
