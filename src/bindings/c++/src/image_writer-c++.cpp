@@ -114,6 +114,39 @@ sail_error_t image_writer::write(const char *path, const image &simage)
     return 0;
 }
 
+sail_error_t image_writer::write(void *buffer, size_t buffer_length, const image &simage)
+{
+    SAIL_TRY(write(buffer, buffer_length, simage, nullptr));
+
+    return 0;
+}
+
+sail_error_t image_writer::write(void *buffer, size_t buffer_length, const image &simage, size_t *written)
+{
+    SAIL_CHECK_CONTEXT_PTR(d->ctx);
+    SAIL_CHECK_BUFFER_PTR(buffer);
+
+    sail_image *sail_image;
+    SAIL_TRY(sail_alloc_image(&sail_image));
+
+    SAIL_TRY_OR_CLEANUP(simage.to_sail_image(sail_image),
+                        /* cleanup */ sail_image->pixels = NULL,
+                                      sail_destroy_image(sail_image));
+
+    SAIL_TRY_OR_CLEANUP(sail_write_mem(buffer,
+                                        buffer_length,
+                                        d->ctx->sail_context_c(),
+                                        sail_image,
+                                        written),
+                        /* cleanup */ sail_image->pixels = NULL,
+                                      sail_destroy_image(sail_image));
+
+    sail_image->pixels = NULL;
+    sail_destroy_image(sail_image);
+
+    return 0;
+}
+
 sail_error_t image_writer::start_writing(const std::string &path)
 {
     SAIL_TRY(start_writing(path.c_str()));

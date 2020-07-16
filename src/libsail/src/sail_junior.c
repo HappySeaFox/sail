@@ -112,3 +112,28 @@ sail_error_t sail_write_path(const char *path, struct sail_context *context, con
 
     return 0;
 }
+
+SAIL_EXPORT sail_error_t sail_write_mem(void *buffer, size_t buffer_length, struct sail_context *context, const struct sail_image *image, size_t *written) {
+
+    SAIL_CHECK_BUFFER_PTR(buffer);
+    SAIL_CHECK_IMAGE(image);
+
+    struct sail_context *context_local;
+    SAIL_TRY(possibly_allocate_context(context, &context_local));
+
+    void *state = NULL;
+
+    SAIL_TRY_OR_CLEANUP(sail_start_writing_mem(buffer, buffer_length, context_local, NULL /* plugin info */, &state),
+                        sail_stop_writing(state));
+
+    SAIL_TRY_OR_CLEANUP(sail_write_next_frame(state, image),
+                        sail_stop_writing(state));
+
+    if (written == NULL) {
+        SAIL_TRY(sail_stop_writing(state));
+    } else {
+        SAIL_TRY(sail_stop_writing_with_written(state, written));
+    }
+
+    return 0;
+}

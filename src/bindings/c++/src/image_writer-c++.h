@@ -65,6 +65,12 @@ public:
     sail_error_t write(const char *path, const image &simage);
 
     /*
+     * An interface to sail_write_mem(). See sail_write_mem() for more.
+     */
+    sail_error_t write(void *buffer, size_t buffer_length, const image &simage);
+    sail_error_t write(void *buffer, size_t buffer_length, const image &simage, size_t *written);
+
+    /*
      * An interface to sail_start_writing(). See sail_start_writing() for more.
      */
     sail_error_t start_writing(const std::string &path);
