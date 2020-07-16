@@ -30,11 +30,7 @@
 
 sail_error_t sail_alloc_pixel_formats_mapping_node(struct sail_pixel_formats_mapping_node **node) {
 
-    *node = (struct sail_pixel_formats_mapping_node *)malloc(sizeof(struct sail_pixel_formats_mapping_node));
-
-    if (*node == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
+    SAIL_TRY(sail_malloc(node, sizeof(struct sail_pixel_formats_mapping_node)));
 
     (*node)->input_pixel_format          = SAIL_PIXEL_FORMAT_UNKNOWN;
     (*node)->output_pixel_formats        = NULL;

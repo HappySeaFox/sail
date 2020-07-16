@@ -31,11 +31,7 @@
 
 sail_error_t sail_alloc_iccp(struct sail_iccp **iccp) {
 
-    *iccp = (struct sail_iccp *)malloc(sizeof(struct sail_iccp));
-
-    if (*iccp == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
+    SAIL_TRY(sail_malloc(iccp, sizeof(struct sail_iccp)));
 
     (*iccp)->data        = NULL;
     (*iccp)->data_length = 0;
@@ -60,12 +56,8 @@ sail_error_t sail_copy_iccp(const struct sail_iccp *source_iccp, struct sail_icc
 
     SAIL_TRY(sail_alloc_iccp(target_iccp));
 
-    (*target_iccp)->data = malloc(source_iccp->data_length);
-
-    if ((*target_iccp)->data == NULL) {
-        sail_destroy_iccp(*target_iccp);
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
+    SAIL_TRY_OR_CLEANUP(sail_malloc(&(*target_iccp)->data, source_iccp->data_length),
+                        /* cleanup */ sail_destroy_iccp(*target_iccp));
 
     memcpy((*target_iccp)->data, source_iccp->data, source_iccp->data_length);
 

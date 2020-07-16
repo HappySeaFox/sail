@@ -30,11 +30,7 @@
 
 sail_error_t sail_alloc_meta_entry_node(struct sail_meta_entry_node **node) {
 
-    *node = (struct sail_meta_entry_node *)malloc(sizeof(struct sail_meta_entry_node));
-
-    if (*node == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
+    SAIL_TRY(sail_malloc(node, sizeof(struct sail_meta_entry_node)));
 
     (*node)->key   = NULL;
     (*node)->value = NULL;

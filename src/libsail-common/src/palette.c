@@ -31,11 +31,7 @@
 
 sail_error_t sail_alloc_palette(struct sail_palette **palette) {
 
-    *palette = (struct sail_palette *)malloc(sizeof(struct sail_palette));
-
-    if (*palette == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
+    SAIL_TRY(sail_malloc(palette, sizeof(struct sail_palette)));
 
     (*palette)->pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;
     (*palette)->data         = NULL;
@@ -66,12 +62,9 @@ sail_error_t sail_copy_palette(const struct sail_palette *source_palette, struct
                         /* cleanup */ sail_destroy_palette(*target_palette));
 
     unsigned palette_size = source_palette->color_count * bits_per_pixel / 8;
-    (*target_palette)->data = malloc(palette_size);
 
-    if ((*target_palette)->data == NULL) {
-        sail_destroy_palette(*target_palette);
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
+    SAIL_TRY_OR_CLEANUP(sail_malloc(&(*target_palette)->data, palette_size),
+                        /* cleanup */ sail_destroy_palette(*target_palette));
 
     (*target_palette)->pixel_format = source_palette->pixel_format;
     (*target_palette)->color_count  = source_palette->color_count;

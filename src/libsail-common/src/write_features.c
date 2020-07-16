@@ -30,11 +30,7 @@
 
 int sail_alloc_write_features(struct sail_write_features **write_features) {
 
-    *write_features = (struct sail_write_features *)malloc(sizeof(struct sail_write_features));
-
-    if (*write_features == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
+    SAIL_TRY(sail_malloc(write_features, sizeof(struct sail_write_features)));
 
     (*write_features)->pixel_formats_mapping_node = NULL;
     (*write_features)->features                   = 0;

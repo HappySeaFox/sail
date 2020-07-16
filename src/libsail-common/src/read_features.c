@@ -30,11 +30,7 @@
 
 int sail_alloc_read_features(struct sail_read_features **read_features) {
 
-    *read_features = (struct sail_read_features *)malloc(sizeof(struct sail_read_features));
-
-    if (*read_features == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
+    SAIL_TRY(sail_malloc(read_features, sizeof(struct sail_read_features)));
 
     (*read_features)->output_pixel_formats          = NULL;
     (*read_features)->output_pixel_formats_length   = 0;

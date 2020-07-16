@@ -33,11 +33,7 @@ sail_error_t sail_alloc_image(struct sail_image **image) {
 
     SAIL_CHECK_IMAGE_PTR(image);
 
-    *image = (struct sail_image *)malloc(sizeof(struct sail_image));
-
-    if (*image == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
+    SAIL_TRY(sail_malloc(image, sizeof(struct sail_image)));
 
     (*image)->pixels                  = NULL;
     (*image)->width                   = 0;
@@ -83,12 +79,8 @@ sail_error_t sail_copy_image(const struct sail_image *source, struct sail_image 
     SAIL_TRY(sail_alloc_image(target));
 
     if (source->pixels != NULL) {
-        (*target)->pixels = malloc(pixels_size);
-
-        if ((*target)->pixels == NULL) {
-            sail_destroy_image(*target);
-            return SAIL_MEMORY_ALLOCATION_FAILED;
-        }
+        SAIL_TRY_OR_CLEANUP(sail_malloc(&(*target)->pixels, pixels_size),
+                            /* cleanup */ sail_destroy_image(*target));
 
         memcpy((*target)->pixels, source->pixels, pixels_size);
     }

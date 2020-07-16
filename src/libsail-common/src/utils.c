@@ -53,11 +53,7 @@ sail_error_t sail_strdup(const char *input, char **output) {
 
     const size_t len = strlen((const char *)input);
 
-    *output = (char *)malloc(len+1);
-
-    if (*output == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
+    SAIL_TRY(sail_malloc(output, len+1));
 
     memcpy(*output, input, len);
     (*output)[len] = '\0';
@@ -76,11 +72,7 @@ sail_error_t sail_strdup_length(const char *input, size_t length, char **output)
         return SAIL_INVALID_ARGUMENT;
     }
 
-    *output = (char *)malloc(length+1);
-
-    if (*output == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
+    SAIL_TRY(sail_malloc(output, length+1));
 
     memcpy(*output, input, length);
     (*output)[length] = '\0';
@@ -111,11 +103,7 @@ sail_error_t sail_concat(char **output, int num, ...) {
 
     va_end(args);
 
-    *output = (char *)malloc(length);
-
-    if (*output == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
+    SAIL_TRY(sail_malloc(output, length));
 
     (*output)[0] = '\0';
 
@@ -157,11 +145,7 @@ sail_error_t sail_to_wchar(const char *input, wchar_t **output) {
 
     size_t length = strlen(input);
 
-    *output = (wchar_t *)malloc((length+1) * sizeof(wchar_t));
-
-    if (*output == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
+    SAIL_TRY(sail_malloc(output, (length+1) * sizeof(wchar_t)));
 
 #ifdef SAIL_WIN32
     size_t ret;

@@ -33,11 +33,7 @@ sail_error_t sail_alloc_io(struct sail_io **io) {
 
     SAIL_CHECK_IO_PTR(io);
 
-    *io = (struct sail_io *)malloc(sizeof(struct sail_io));
-
-    if (*io == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
+    SAIL_TRY(sail_malloc(io, sizeof(struct sail_io)));
 
     (*io)->stream = NULL;
     (*io)->read   = NULL;

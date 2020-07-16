@@ -33,11 +33,7 @@ sail_error_t sail_alloc_source_image(struct sail_source_image **source_image) {
 
     SAIL_CHECK_SOURCE_IMAGE_PTR(source_image);
 
-    *source_image = (struct sail_source_image *)malloc(sizeof(struct sail_source_image));
-
-    if (*source_image == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
+    SAIL_TRY(sail_malloc(source_image, sizeof(struct sail_source_image)));
 
     (*source_image)->pixel_format     = SAIL_PIXEL_FORMAT_UNKNOWN;
     (*source_image)->properties       = 0;

@@ -31,11 +31,7 @@
 
 int sail_alloc_read_options(struct sail_read_options **read_options) {
 
-    *read_options = (struct sail_read_options *)malloc(sizeof(struct sail_read_options));
-
-    if (*read_options == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
+    SAIL_TRY(sail_malloc(read_options, sizeof(struct sail_read_options)));
 
     (*read_options)->output_pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;
     (*read_options)->io_options          = 0;
@@ -90,11 +86,7 @@ sail_error_t sail_copy_read_options(const struct sail_read_options *source, stru
     SAIL_CHECK_READ_OPTIONS_PTR(source);
     SAIL_CHECK_READ_OPTIONS_PTR(target);
 
-    *target = (struct sail_read_options *)malloc(sizeof(struct sail_read_options));
-
-    if (*target == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
+    SAIL_TRY(sail_malloc(target, sizeof(struct sail_read_options)));
 
     memcpy(*target, source, sizeof(struct sail_read_options));
 
