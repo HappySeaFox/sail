@@ -113,9 +113,7 @@ struct sail_image *image;
  * with transparency support and BPP24-RGB otherwise. If you need to control output pixel
  * formats, consider switching to the deep diver API.
  */
-SAIL_TRY(sail_read_path(path,
-                        NULL,
-                        &image));
+SAIL_TRY(sail_read_path(path, NULL, &image));
 
 /*
  * Handle the image pixels here.
