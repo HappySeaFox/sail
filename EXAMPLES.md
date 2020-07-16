@@ -42,7 +42,7 @@ SAIL provides 4 levels of APIs depending on your needs. Let's have a look at the
 
 ### 1. `junior`
 
-**Purpose:** read a single image frame in a one-line manner.
+**Purpose:** read a single image frame in a one-line manner from a file or memory.
 
 #### C:
 ```C

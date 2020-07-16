@@ -94,8 +94,8 @@ Set `SAIL_PLUGINGS_PATH` environment variable to a desired location.
 SAIL provides four levels of high-level APIs:
 
 - `Junior`: I just want to load this damn JPEG
-- `Advanced`: I want to load this damn animated GIF from memory
-- `Deep diver`: I want to load this damn animated GIF from memory and have control over selected plugins and output pixel formats
+- `Advanced`: I want to load this damn animated GIF
+- `Deep diver`: I want to load this damn animated GIF and have control over selected plugins and output pixel formats
 - `Technical diver`: I want everything above and my custom I/O source
 
 See [EXAMPLES](EXAMPLES.md) for more.
