@@ -47,7 +47,6 @@ SAIL provides 4 levels of APIs depending on your needs. Let's have a look at the
 #### C:
 ```C
 struct sail_image *image;
-unsigned char *image_pixels;
 
 /*
  * sail_read() reads the image and outputs pixels in BPP32-RGBA pixel format for image formats
@@ -55,16 +54,14 @@ unsigned char *image_pixels;
  */
 SAIL_TRY(sail_read(path,
                    NULL,
-                   &image,
-                   (void **)&image_pixels));
+                   &image));
 
 /*
  * Handle the image pixels here.
  * Use image->width, image->height, image->bytes_per_line,
- * and image->pixel_format for that.
+ * image->pixel_format, and image->pixels for that.
  */
 
-free(image_pixels);
 sail_destroy_image(image);
 ```
 
@@ -103,7 +100,6 @@ SAIL_TRY(sail_init(&context));
  */
 void *state = NULL;
 struct sail_image *image;
-unsigned char *image_pixels;
 
 /*
  * Starts reading the specified file.
@@ -118,7 +114,7 @@ SAIL_TRY_OR_CLEANUP(sail_start_reading_file(path, context, NULL, &state),
  * reading frames till sail_read_next_frame() returns 0. If no more frames are available,
  * it returns SAIL_NO_MORE_FRAMES.
  */
-SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, &image, (void **)&image_pixels),
+SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, &image),
                     /* cleanup */ sail_stop_reading(state));
 
 /*
@@ -126,16 +122,14 @@ SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, &image, (void **)&image_pixels),
  * Avoiding doing so will lead to memory leaks.
  */
 SAIL_TRY_OR_CLEANUP(sail_stop_reading(state),
-         /* cleanup */ free(image_pixels),
-                       sail_destroy_image(image));
+         /* cleanup */ sail_destroy_image(image));
 
 /*
  * Handle the image pixels here.
  * Use image->width, image->height, image->bytes_per_line,
- * and image->pixel_format for that.
+ * image->pixel_format, and image->pixels for that.
  */
 
-free(image_pixels);
 sail_destroy_image(image);
 
 /*
@@ -204,7 +198,6 @@ SAIL_TRY(sail_init_with_flags(&context, SAIL_FLAG_PRELOAD_PLUGINS));
 
 struct sail_read_options *read_options;
 struct sail_image *image;
-unsigned char *image_pixels;
 
 /*
  * Always set the initial state to NULL in C or nullptr in C++.
@@ -252,17 +245,14 @@ sail_destroy_read_options(read_options);
  *
  * sail_read_next_frame() outputs pixels in the requested pixel format (BPP24-RGB or BPP32-RGBA by default).
  */
-SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state,
-                                         &image,
-                                         (void **)&image_pixels),
+SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, &image),
                     /* cleanup */ sail_stop_reading(state));
 
 /*
  * Finish reading.
  */
 SAIL_TRY_OR_CLEANUP(sail_stop_reading(state),
-                    /* cleanup */ free(image_pixels),
-                                  sail_destroy_image(image));
+                    /* cleanup */ sail_destroy_image(image));
 
 /*
  * Print the image meta information if any (JPEG comments etc.).
@@ -276,10 +266,9 @@ if (node != NULL) {
 /*
  * Handle the image pixels here.
  * Use image->width, image->height, image->bytes_per_line,
- * and image->pixel_format for that.
+ * image->pixel_format, and image->pixels for that.
  */
 
-free(image_pixels);
 sail_destroy_image(image);
 
 /*
@@ -373,7 +362,6 @@ SAIL_TRY(sail_init_with_flags(&context, SAIL_FLAG_PRELOAD_PLUGINS));
 
 struct sail_read_options *read_options;
 struct sail_image *image;
-unsigned char *image_pixels;
 
 /*
  * Always set the initial state to NULL in C or nullptr in C++.
@@ -444,9 +432,7 @@ sail_destroy_read_options(read_options);
  *
  * sail_read_next_frame() outputs pixels in the requested pixel format (BPP24-RGB or BPP32-RGBA by default).
  */
-SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state,
-                                         &image,
-                                         (void **)&image_pixels),
+SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, &image),
                     /* cleanup */ sail_stop_reading(state),
                                   sail_destroy_io(io));
 
@@ -454,8 +440,7 @@ SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state,
  * Finish reading.
  */
 SAIL_TRY_OR_CLEANUP(sail_stop_reading(state),
-                    /* cleanup */ free(image_pixels),
-                                  sail_destroy_image(image),
+                    /* cleanup */ sail_destroy_image(image),
                                   sail_destroy_io(io));
 
 sail_destroy_io(io);
@@ -472,10 +457,9 @@ if (node != NULL) {
 /*
  * Handle the image pixels here.
  * Use image->width, image->height, image->bytes_per_line,
- * and image->pixel_format for that.
+ * image->pixel_format, and image->pixels for that.
  */
 
-free(image_pixels);
 sail_destroy_image(image);
 
 /*

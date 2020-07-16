@@ -107,7 +107,6 @@ SAIL provides four levels of APIs, depending on your needs. Let's have a quick l
 #### C:
 ```C
 struct sail_image *image;
-unsigned char *image_pixels;
 
 /*
  * sail_read() reads the image and outputs pixels in BPP32-RGBA pixel format for image formats
@@ -116,16 +115,14 @@ unsigned char *image_pixels;
  */
 SAIL_TRY(sail_read(path,
                    NULL,
-                   &image,
-                   (void **)&image_pixels));
+                   &image));
 
 /*
  * Handle the image pixels here.
  * Use image->width, image->height, image->bytes_per_line,
- * and image->pixel_format for that.
+ * image->pixel_format, and image->pixels for that.
  */
 
-free(image_pixels);
 sail_destroy_image(image);
 ```
 
