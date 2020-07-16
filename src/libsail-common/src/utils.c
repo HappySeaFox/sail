@@ -624,6 +624,20 @@ sail_error_t sail_print_errno(const char *format) {
     return 0;
 }
 
+sail_error_t sail_malloc(void **ptr, size_t size) {
+
+    SAIL_CHECK_PTR(ptr);
+
+    void *ptr_local = malloc(size);
+
+    if (ptr_local == NULL) {
+        return SAIL_MEMORY_ALLOCATION_FAILED;
+    }
+
+    *ptr = ptr_local;
+    return 0;
+}
+
 uint64_t sail_now(void) {
 
 #ifdef SAIL_WIN32

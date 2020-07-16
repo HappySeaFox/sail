@@ -196,6 +196,13 @@ SAIL_EXPORT sail_error_t sail_bytes_per_image(const struct sail_image *image, un
 SAIL_EXPORT sail_error_t sail_print_errno(const char *format);
 
 /*
+ * Interface to malloc().
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_malloc(void **ptr, size_t size);
+
+/*
  * Assigns the current number of milliseconds since Epoch.
  *
  * Returns 0 on success or sail_error_t on error.
