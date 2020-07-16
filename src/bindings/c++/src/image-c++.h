@@ -250,6 +250,13 @@ public:
 
     /*
      * Deep copies the specified pixel data. Resets the pointer to shallow pixel data to nullptr.
+     * The data can be accessed later with pixels(). The size of the pixel data is calculated
+     * based on the image width, height, and the pixel format which must be set beforehand.
+     */
+    image& with_pixels(const void *pixels);
+
+    /*
+     * Deep copies the specified pixel data. Resets the pointer to shallow pixel data to nullptr.
      * The data can be accessed later with pixels().
      */
     image& with_pixels(const void *pixels, unsigned pixels_size);

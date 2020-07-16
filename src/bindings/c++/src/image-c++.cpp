@@ -239,6 +239,16 @@ image& image::with_meta_entries(const std::map<std::string, std::string> &meta_e
     return *this;
 }
 
+image& image::with_pixels(const void *pixels)
+{
+    unsigned bytes_per_image;
+    SAIL_TRY_OR_EXECUTE(image::bytes_per_image(*this, &bytes_per_image),
+                        /* on error */ return *this);
+
+    with_pixels(pixels, bytes_per_image);
+    return *this;
+}
+
 image& image::with_pixels(const void *pixels, unsigned pixels_size)
 {
     free(d->pixels);
