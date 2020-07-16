@@ -42,7 +42,7 @@ struct sail_context;
 struct sail_plugin_info;
 
 /*
- * Loads an image from the specified I/O source and returns its properties without pixel data. The assigned image
+ * Loads an image from the specified I/O source and returns its properties without pixels. The assigned image
  * MUST be destroyed later with sail_destroy_image(). The assigned plugin info MUST NOT be destroyed
  * because it is a pointer to an internal data structure. If you don't need it, just pass NULL.
  *
@@ -56,7 +56,7 @@ SAIL_EXPORT sail_error_t sail_probe_io(struct sail_io *io, struct sail_context *
                                        struct sail_image **image, const struct sail_plugin_info **plugin_info);
 
 /*
- * Loads an image from the specified memory buffer and returns its properties without pixel data. The assigned image
+ * Loads an image from the specified memory buffer and returns its properties without pixels. The assigned image
  * MUST be destroyed later with sail_destroy_image(). The assigned plugin info MUST NOT be destroyed
  * because it is a pointer to an internal data structure. If you don't need it, just pass NULL.
  *
@@ -126,13 +126,12 @@ SAIL_EXPORT sail_error_t sail_start_reading_mem(const void *buffer, size_t buffe
 
 /*
  * Continues reading the file started by sail_start_reading_file() and brothers. The assigned image
- * MUST be destroyed later with sail_image_destroy(). The assigned image pixels MUST be destroyed later
- * with free().
+ * MUST be destroyed later with sail_image_destroy().
  *
  * Returns 0 on success or sail_error_t on error.
  * Returns SAIL_NO_MORE_FRAMES when no more frames are available.
  */
-SAIL_EXPORT sail_error_t sail_read_next_frame(void *state, struct sail_image **image, void **pixels);
+SAIL_EXPORT sail_error_t sail_read_next_frame(void *state, struct sail_image **image);
 
 /*
  * Stops reading the file started by sail_start_reading_file() and brothers. Does nothing if the state is NULL.
@@ -203,7 +202,7 @@ SAIL_EXPORT sail_error_t sail_start_writing_mem(void *buffer, size_t buffer_leng
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_write_next_frame(void *state, const struct sail_image *image, const void *pixels);
+SAIL_EXPORT sail_error_t sail_write_next_frame(void *state, const struct sail_image *image);
 
 /*
  * Stops writing the file started by sail_start_writing_file() and brothers. Does nothing if the state is NULL.

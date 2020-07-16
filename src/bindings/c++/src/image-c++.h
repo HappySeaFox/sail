@@ -352,9 +352,9 @@ public:
 
 private:
     /*
-     * Makes a deep copy of the specified image and the pixels.
+     * Makes a deep copy of the specified image. The pixels are shallow copied. The caller must set the pixels
+     * in the sail_image object to NULL afterwards to avoid destructing them in sail_destroy_image().
      */
-    image(const sail_image *im, const void *pixels, unsigned pixels_size);
     image(const sail_image *im);
 
     sail_error_t to_sail_image(sail_image *image) const;

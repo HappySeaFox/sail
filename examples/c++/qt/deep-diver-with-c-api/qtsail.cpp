@@ -161,14 +161,11 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     sail_destroy_read_options(read_options);
 
     sail_image *image;
-    uchar *pixels;
 
     /*
      * Read just the first frame in the image.
      */
-    SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state,
-                                             &image,
-                                             (void **)&pixels),
+    SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, &image),
                         /* cleanup */ sail_stop_reading(state));
 
     const QImage::Format qimageFormat = sailPixelFormatToQImageFormat(image->pixel_format);
@@ -176,20 +173,17 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     if (qimageFormat == QImage::Format_Invalid) {
         sail_stop_reading(state);
         sail_destroy_image(image);
-        free(pixels);
         return SAIL_UNSUPPORTED_PIXEL_FORMAT;
     }
 
     /*
      * Convert to QImage.
      */
-    *qimage = QImage(pixels,
+    *qimage = QImage(reinterpret_cast<uchar *>(image->pixels),
                      image->width,
                      image->height,
                      image->bytes_per_line,
                      qimageFormat).copy();
-
-    free(pixels);
 
     SAIL_LOG_DEBUG("Has ICC profile: %s (%u bytes)",
                    image->iccp == NULL ? "no" : "yes",
@@ -276,6 +270,8 @@ sail_error_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffer
     sail_image *image;
     SAIL_TRY(sail_alloc_image(&image));
 
+    image->pixels = malloc(qimage.sizeInBytes());
+    memcpy(image->pixels, qimage.bits(), qimage.sizeInBytes());
     image->width = qimage.width();
     image->height = qimage.height();
     image->pixel_format = qImageFormatToSailPixelFormat(qimage.format());
@@ -373,7 +369,7 @@ sail_error_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffer
 
     // Seek and write the next image frame into the file.
     //
-    SAIL_TRY(sail_write_next_frame(state, image, qimage.bits()));
+    SAIL_TRY(sail_write_next_frame(state, image));
 
     // Finish writing.
     //

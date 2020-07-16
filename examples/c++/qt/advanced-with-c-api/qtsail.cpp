@@ -105,18 +105,14 @@ sail_error_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, QV
      */
     sail_error_t res = 0;
     struct sail_image *image;
-    uchar *pixels;
 
-    while ((res = sail_read_next_frame(state,
-                                       &image,
-                                       (void **)&pixels)) == 0) {
+    while ((res = sail_read_next_frame(state, &image)) == 0) {
 
         const QImage::Format qimageFormat = sailPixelFormatToQImageFormat(image->pixel_format);
 
         if (qimageFormat == QImage::Format_Invalid) {
             sail_stop_reading(state);
             sail_destroy_image(image);
-            free(pixels);
             return SAIL_UNSUPPORTED_PIXEL_FORMAT;
         }
 
@@ -128,7 +124,7 @@ sail_error_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, QV
         /*
          * Convert to QImage.
          */
-        QImage qimage = QImage(pixels,
+        QImage qimage = QImage(reinterpret_cast<uchar *>(image->pixels),
                                image->width,
                                image->height,
                                image->bytes_per_line,
@@ -138,7 +134,6 @@ sail_error_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, QV
         delays->append(image->delay);
 
         sail_destroy_image(image);
-        free(pixels);
     }
 
     if (res != SAIL_NO_MORE_FRAMES) {
@@ -180,16 +175,18 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
     struct sail_image *image;
     SAIL_TRY(sail_alloc_image(&image));
 
+    image->pixels = malloc(qimage.sizeInBytes());
+    memcpy(image->pixels, qimage.bits(), qimage.sizeInBytes());
     image->width = qimage.width();
     image->height = qimage.height();
     image->pixel_format = qImageFormatToSailPixelFormat(qimage.format());
 
     SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(image->width, image->pixel_format, &image->bytes_per_line),
-                        /* cleanup */ sail_destroy_image(image));
+                        /* cleanup */sail_destroy_image(image));
 
     SAIL_TRY_OR_CLEANUP(sail_start_writing_file(path.toLocal8Bit(), m_context, nullptr, &state),
                         /* cleanup */ sail_destroy_image(image));
-    SAIL_TRY_OR_CLEANUP(sail_write_next_frame(state, image, qimage.bits()),
+    SAIL_TRY_OR_CLEANUP(sail_write_next_frame(state, image),
                         /* cleanup */ sail_destroy_image(image));
     SAIL_TRY_OR_CLEANUP(sail_stop_writing(state),
                         /* cleanup */ sail_destroy_image(image));

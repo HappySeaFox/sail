@@ -52,6 +52,14 @@ struct sail_source_image;
 struct sail_image {
 
     /*
+     * Image pixels.
+     *
+     * READ:  Set by SAIL to an allocated array of pixels.
+     * WRITE: Must be set by a caller to an allocated array of pixels.
+     */
+    void *pixels;
+
+    /*
      * Image width.
      *
      * READ:  Set by SAIL to a positive image width in pixels.

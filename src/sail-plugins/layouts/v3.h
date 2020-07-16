@@ -78,12 +78,11 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_frame_v3(void *state, struct
 SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_pass_v3(void *state, struct sail_io *io, const struct sail_image *image);
 
 /*
- * Reads the next frame of the current image in the current pass. The specified frame pixels must be
- * allocated by the caller and must be be large enough.
+ * Reads the next frame of the current image in the current pass.
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_read_frame_v3(void *state, struct sail_io *io, const struct sail_image *image, void *pixels);
+SAIL_EXPORT sail_error_t sail_plugin_read_frame_v3(void *state, struct sail_io *io, const struct sail_image *image);
 
 /*
  * Finilizes reading operation. No more readings are possible after calling this function.
@@ -132,7 +131,7 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_pass_v3(void *state, struct
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_write_frame_v3(void *state, struct sail_io *io, const struct sail_image *image, const void *frame);
+SAIL_EXPORT sail_error_t sail_plugin_write_frame_v3(void *state, struct sail_io *io, const struct sail_image *image);
 
 /*
  * Finilizes writing operation. No more writings are possible after calling this function.

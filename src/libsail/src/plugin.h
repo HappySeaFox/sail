@@ -52,13 +52,13 @@ struct sail_io;
 typedef sail_error_t (*sail_plugin_read_init_v3_t)           (struct sail_io *io, const struct sail_read_options *read_options, void **state);
 typedef sail_error_t (*sail_plugin_read_seek_next_frame_v3_t)(void *state, struct sail_io *io, struct sail_image **image);
 typedef sail_error_t (*sail_plugin_read_seek_next_pass_v3_t) (void *state, struct sail_io *io, const struct sail_image *image);
-typedef sail_error_t (*sail_plugin_read_frame_v3_t)          (void *state, struct sail_io *io, const struct sail_image *image, void *pixels);
+typedef sail_error_t (*sail_plugin_read_frame_v3_t)          (void *state, struct sail_io *io, const struct sail_image *image);
 typedef sail_error_t (*sail_plugin_read_finish_v3_t)         (void **state, struct sail_io *io);
 
 typedef sail_error_t (*sail_plugin_write_init_v3_t)           (struct sail_io *io, const struct sail_write_options *write_options, void **state);
 typedef sail_error_t (*sail_plugin_write_seek_next_frame_v3_t)(void *state, struct sail_io *io, const struct sail_image *image);
 typedef sail_error_t (*sail_plugin_write_seek_next_pass_v3_t) (void *state, struct sail_io *io, const struct sail_image *image);
-typedef sail_error_t (*sail_plugin_write_frame_v3_t)          (void *state, struct sail_io *io, const struct sail_image *image, const void *pixels);
+typedef sail_error_t (*sail_plugin_write_frame_v3_t)          (void *state, struct sail_io *io, const struct sail_image *image);
 typedef sail_error_t (*sail_plugin_write_finish_v3_t)         (void **state, struct sail_io *io);
 
 struct sail_plugin_layout_v3 {

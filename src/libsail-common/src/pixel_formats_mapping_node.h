@@ -59,9 +59,9 @@ struct sail_pixel_formats_mapping_node {
     /*
      * A list of supported pixel formats that can be output from the input pixel format.
      *
-     * If the array contains the SOURCE pixel format, then the codec is able to output pixel data as is.
+     * If the array contains the SOURCE pixel format, then the codec is able to output pixels as is.
      * It is a caller's responsibility to convert it to a suitable pixel format in this case. Refer to
-     * sail_image.pixel_format to detect the actual pixel format of the pixel data.
+     * sail_image.pixel_format to detect the actual pixel format of the pixels.
      *
      * Outputting SOURCE pixels is always supported. Some plugins may provide even more
      * pixel formats to output.

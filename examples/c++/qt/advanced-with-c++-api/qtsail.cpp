@@ -99,7 +99,7 @@ sail_error_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, QV
 
         // Convert to QImage.
         //
-        QImage qimage = QImage(reinterpret_cast<uchar *>(image.pixels()),
+        QImage qimage = QImage(reinterpret_cast<const uchar *>(image.pixels() ? image.pixels() : image.shallow_pixels()),
                                image.width(),
                                image.height(),
                                image.bytes_per_line(),

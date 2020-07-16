@@ -75,7 +75,6 @@ sail_error_t QtSail::init()
 sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 {
     struct sail_image *image;
-    uchar *pixels;
 
     /*
      * sail_read() reads the image and outputs pixels in BPP32-RGBA pixel format for image formats
@@ -83,12 +82,11 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
      */
     SAIL_TRY(sail_read(path.toLocal8Bit(),
                        m_context,
-                       &image,
-                       reinterpret_cast<void **>(&pixels)));
+                       &image));
 
     // Construct QImage from the read image pixels.
     //
-    *qimage = QImage(pixels,
+    *qimage = QImage(reinterpret_cast<const uchar *>(image->pixels),
                      image->width,
                      image->height,
                      image->bytes_per_line,
@@ -99,7 +97,6 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
                                 .arg(image->width)
                                 .arg(image->height)
                                 );
-    free(pixels);
     sail_destroy_image(image);
 
     return 0;
@@ -110,6 +107,8 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
     struct sail_image *image;
     SAIL_TRY(sail_alloc_image(&image));
 
+    image->pixels = malloc(qimage.sizeInBytes());
+    memcpy(image->pixels, qimage.bits(), qimage.sizeInBytes());
     image->width = qimage.width();
     image->height = qimage.height();
     image->pixel_format = qImageFormatToSailPixelFormat(qimage.format());
@@ -118,8 +117,7 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
 
     SAIL_TRY_OR_CLEANUP(sail_write(path.toLocal8Bit(),
                                    m_context,
-                                   image,
-                                   reinterpret_cast<const void *>(qimage.bits())),
+                                   image),
                         /* cleanup */ sail_destroy_image(image));
 
     sail_destroy_image(image);

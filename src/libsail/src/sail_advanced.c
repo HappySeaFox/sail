@@ -92,7 +92,7 @@ sail_error_t sail_start_reading_mem(const void *buffer, size_t buffer_length, st
     return 0;
 }
 
-sail_error_t sail_read_next_frame(void *state, struct sail_image **image, void **pixels) {
+sail_error_t sail_read_next_frame(void *state, struct sail_image **image) {
 
     SAIL_CHECK_STATE_PTR(state);
 
@@ -117,25 +117,26 @@ sail_error_t sail_read_next_frame(void *state, struct sail_image **image, void *
         interlaced_passes = 1;
     }
 
-    /* Allocate pixel data. */
-    *pixels = malloc((*image)->bytes_per_line * (*image)->height);
+    /* Allocate pixels. */
+    unsigned pixels_size;
+    SAIL_TRY_OR_CLEANUP(sail_bytes_per_image(*image, &pixels_size),
+                        /* cleanup */ sail_destroy_image(*image));
 
-    if (*pixels == NULL) {
+    (*image)->pixels = malloc(pixels_size);
+
+    if ((*image)->pixels == NULL) {
         sail_destroy_image(*image);
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
     for (int pass = 0; pass < interlaced_passes; pass++) {
         SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v3->read_seek_next_pass(state_of_mind->state, state_of_mind->io, *image),
-                            /* cleanup */ free(*pixels),
-                                          sail_destroy_image(*image));
+                            /* cleanup */ sail_destroy_image(*image));
 
         SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v3->read_frame(state_of_mind->state,
                                                                     state_of_mind->io,
-                                                                    *image,
-                                                                    *pixels),
-                            /* cleanup */ free(*pixels),
-                                          sail_destroy_image(*image));
+                                                                    *image),
+                            /* cleanup */ sail_destroy_image(*image));
     }
 
     return 0;
@@ -178,7 +179,7 @@ sail_error_t sail_start_writing_mem(void *buffer, size_t buffer_length, struct s
     return 0;
 }
 
-sail_error_t sail_write_next_frame(void *state, const struct sail_image *image, const void *pixels) {
+sail_error_t sail_write_next_frame(void *state, const struct sail_image *image) {
 
     SAIL_CHECK_STATE_PTR(state);
 
@@ -216,8 +217,7 @@ sail_error_t sail_write_next_frame(void *state, const struct sail_image *image, 
 
         SAIL_TRY(state_of_mind->plugin->v3->write_frame(state_of_mind->state,
                                                         state_of_mind->io,
-                                                        image,
-                                                        pixels));
+                                                        image));
     }
 
     return 0;

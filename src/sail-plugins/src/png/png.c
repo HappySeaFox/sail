@@ -451,12 +451,11 @@ SAIL_EXPORT sail_error_t sail_plugin_read_seek_next_pass_v3(void *state, struct 
     return 0;
 }
 
-SAIL_EXPORT sail_error_t sail_plugin_read_frame_v3(void *state, struct sail_io *io, const struct sail_image *image, void *pixels) {
+SAIL_EXPORT sail_error_t sail_plugin_read_frame_v3(void *state, struct sail_io *io, const struct sail_image *image) {
 
     SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IO(io);
     SAIL_CHECK_IMAGE(image);
-    SAIL_CHECK_PIXELS_PTR(pixels);
 
     struct png_state *png_state = (struct png_state *)state;
 
@@ -472,7 +471,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_frame_v3(void *state, struct sail_io *
 #ifdef PNG_APNG_SUPPORTED
     if (png_state->is_apng) {
         for (unsigned row = 0; row < image->height; row++) {
-            unsigned char *scanline = (unsigned char *)pixels + row * image->bytes_per_line;
+            unsigned char *scanline = (unsigned char *)image->pixels + row * image->bytes_per_line;
 
             memcpy(scanline, png_state->prev[row], png_state->first_image->width * png_state->bytes_per_pixel);
 
@@ -508,12 +507,12 @@ SAIL_EXPORT sail_error_t sail_plugin_read_frame_v3(void *state, struct sail_io *
         }
     } else {
         for (unsigned row = 0; row < image->height; row++) {
-            png_read_row(png_state->png_ptr, (unsigned char *)pixels + row * image->bytes_per_line, NULL);
+            png_read_row(png_state->png_ptr, (unsigned char *)image->pixels + row * image->bytes_per_line, NULL);
         }
     }
 #else
     for (unsigned row = 0; row < image->height; row++) {
-        png_read_row(png_state->png_ptr, (unsigned char *)pixels + row * image->bytes_per_line, NULL);
+        png_read_row(png_state->png_ptr, (unsigned char *)image->pixels + row * image->bytes_per_line, NULL);
     }
 #endif
 
@@ -726,12 +725,11 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_pass_v3(void *state, struct
     return 0;
 }
 
-SAIL_EXPORT sail_error_t sail_plugin_write_frame_v3(void *state, struct sail_io *io, const struct sail_image *image, const void *pixels) {
+SAIL_EXPORT sail_error_t sail_plugin_write_frame_v3(void *state, struct sail_io *io, const struct sail_image *image) {
 
     SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IO(io);
     SAIL_CHECK_IMAGE(image);
-    SAIL_CHECK_PIXELS_PTR(pixels);
 
     struct png_state *png_state = (struct png_state *)state;
 
@@ -746,7 +744,7 @@ SAIL_EXPORT sail_error_t sail_plugin_write_frame_v3(void *state, struct sail_io 
     }
 
     for (unsigned row = 0; row < image->height; row++) {
-        png_write_row(png_state->png_ptr, (const unsigned char *)pixels + row * image->bytes_per_line);
+        png_write_row(png_state->png_ptr, (const unsigned char *)image->pixels + row * image->bytes_per_line);
     }
 
     return 0;

@@ -44,7 +44,7 @@ struct sail_io;
 struct sail_plugin_info;
 
 /*
- * Loads the specified image file and returns its properties without pixel data. The assigned image
+ * Loads the specified image file and returns its properties without pixels. The assigned image
  * MUST be destroyed later with sail_destroy_image(). The assigned plugin info MUST NOT be destroyed
  * because it is a pointer to an internal data structure. If you don't need it, just pass NULL.
  *
@@ -58,9 +58,8 @@ SAIL_EXPORT sail_error_t sail_probe_path(const char *path, struct sail_context *
                                          struct sail_image **image, const struct sail_plugin_info **plugin_info);
 
 /*
- * Loads the specified image file and returns its properties and pixel data. The assigned image
- * MUST be destroyed later with sail_destroy_image(). The assigned pixel data MUST be destroyed
- * later with free().
+ * Loads the specified image file and returns its properties and pixels. The assigned image
+ * MUST be destroyed later with sail_destroy_image().
  *
  * Outputs pixels in BPP32-RGBA pixel format for image formats with transparency support
  * and BPP24-RGB otherwise.
@@ -69,20 +68,18 @@ SAIL_EXPORT sail_error_t sail_probe_path(const char *path, struct sail_context *
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_read(const char *path, struct sail_context *context,
-                                    struct sail_image **image, void **pixels);
+SAIL_EXPORT sail_error_t sail_read(const char *path, struct sail_context *context, struct sail_image **image);
 
 /*
- * Writes the pixel data of the specified image file into the file.
+ * Writes the pixels of the specified image file into the file.
  *
- * Outputs pixels in pixel format as specified in sail_write_features.preferred_output_pixel_format.
+ * Outputs pixels in the pixel format as specified in sail_write_features.preferred_output_pixel_format.
  *
  * Typical usage: This is a standalone function that could be called at any time.
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_write(const char *path, struct sail_context *context,
-                                    const struct sail_image *image, const void *pixels);
+SAIL_EXPORT sail_error_t sail_write(const char *path, struct sail_context *context, const struct sail_image *image);
 
 /* extern "C" */
 #ifdef __cplusplus

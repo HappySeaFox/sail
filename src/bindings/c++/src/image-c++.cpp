@@ -361,7 +361,7 @@ sail_error_t image::compression_type_from_string(const char *str, SailCompressio
     return 0;
 }
 
-image::image(const sail_image *im, const void *pixels, unsigned pixels_size)
+image::image(const sail_image *im)
     : image()
 {
     if (im == nullptr) {
@@ -388,13 +388,11 @@ image::image(const sail_image *im, const void *pixels, unsigned pixels_size)
         .with_meta_entries(meta_entries)
         .with_iccp(sail::iccp(im->iccp))
         .with_properties(im->properties)
-        .with_source_image(im->source_image)
-        .with_pixels(pixels, pixels_size);
-}
+        .with_source_image(im->source_image);
 
-image::image(const sail_image *im)
-    : image(im, nullptr, 0)
-{
+    if (im->pixels != nullptr) {
+        with_shallow_pixels(im->pixels);
+    }
 }
 
 sail_error_t image::to_sail_image(sail_image *image) const
@@ -424,6 +422,7 @@ sail_error_t image::to_sail_image(sail_image *image) const
         ++it;
     }
 
+    image->pixels         = d->pixels != nullptr ? d->pixels : (void *)d->shallow_pixels;
     image->width          = d->width;
     image->height         = d->height;
     image->bytes_per_line = d->bytes_per_line;

@@ -43,7 +43,6 @@ static sail_error_t convert(const char *input, const char *output, struct sail_c
     void *state;
 
     struct sail_image *image;
-    void *pixels;
 
     /* Read the image. */
     SAIL_LOG_INFO("Input file: %s", input);
@@ -53,7 +52,7 @@ static sail_error_t convert(const char *input, const char *output, struct sail_c
 
     SAIL_TRY(sail_start_reading_file(input, context, plugin_info, &state));
 
-    SAIL_TRY(sail_read_next_frame(state, &image, &pixels));
+    SAIL_TRY(sail_read_next_frame(state, &image));
     SAIL_TRY(sail_stop_reading(state));
 
     /* Write the image. */
@@ -70,11 +69,10 @@ static sail_error_t convert(const char *input, const char *output, struct sail_c
     write_options->compression = compression;
 
     SAIL_TRY(sail_start_writing_file_with_options(output, context, plugin_info, write_options, &state));
-    SAIL_TRY(sail_write_next_frame(state, image, pixels));
+    SAIL_TRY(sail_write_next_frame(state, image));
     SAIL_TRY(sail_stop_writing(state));
 
     /* Clean up. */
-    free(pixels);
     sail_destroy_write_options(write_options);
     sail_destroy_image(image);
 

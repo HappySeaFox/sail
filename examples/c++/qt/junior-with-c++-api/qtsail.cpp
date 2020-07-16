@@ -72,7 +72,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 
     // Construct QImage from the read image.
     //
-    *qimage = QImage(reinterpret_cast<uchar *>(image.pixels()),
+    *qimage = QImage(reinterpret_cast<const uchar *>(image.pixels() ? image.pixels() : image.shallow_pixels()),
                      image.width(),
                      image.height(),
                      image.bytes_per_line(),
