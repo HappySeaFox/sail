@@ -261,8 +261,8 @@ image& image::with_pixels(const void *pixels, unsigned pixels_size)
         return *this;
     }
 
+    d->pixels      = malloc(pixels_size);
     d->pixels_size = pixels_size;
-    d->pixels = malloc(d->pixels_size);
 
     if (d->pixels == nullptr) {
         SAIL_LOG_ERROR("Memory allocation failed of pixels size %u", d->pixels_size);
@@ -278,7 +278,7 @@ image& image::with_shallow_pixels(const void *pixels)
 {
     free(d->pixels);
 
-    d->pixels = nullptr;
+    d->pixels      = nullptr;
     d->pixels_size = 0;
 
     if (pixels == nullptr ) {
@@ -371,43 +371,67 @@ sail_error_t image::compression_type_from_string(const char *str, SailCompressio
     return 0;
 }
 
-image::image(const sail_image *im)
+image::image(const sail_image *sail_image)
     : image()
 {
-    if (im == nullptr) {
+    if (sail_image == nullptr) {
         SAIL_LOG_DEBUG("NULL pointer has been passed to sail::image(). The object is untouched");
         return;
     }
 
     std::map<std::string, std::string> meta_entries;
 
-    sail_meta_entry_node *node = im->meta_entry_node;
+    sail_meta_entry_node *node = sail_image->meta_entry_node;
 
     while (node != nullptr) {
         meta_entries.insert({ node->key, node->value });
         node = node->next;
     }
 
-    with_width(im->width)
-        .with_height(im->height)
-        .with_bytes_per_line(im->bytes_per_line)
-        .with_pixel_format(im->pixel_format)
-        .with_animated(im->animated)
-        .with_delay(im->delay)
-        .with_palette(sail::palette(im->palette))
+    with_width(sail_image->width)
+        .with_height(sail_image->height)
+        .with_bytes_per_line(sail_image->bytes_per_line)
+        .with_pixel_format(sail_image->pixel_format)
+        .with_animated(sail_image->animated)
+        .with_delay(sail_image->delay)
+        .with_palette(sail::palette(sail_image->palette))
         .with_meta_entries(meta_entries)
-        .with_iccp(sail::iccp(im->iccp))
-        .with_properties(im->properties)
-        .with_source_image(im->source_image);
+        .with_iccp(sail::iccp(sail_image->iccp))
+        .with_properties(sail_image->properties)
+        .with_source_image(sail_image->source_image);
 
-    if (im->pixels != nullptr) {
-        with_shallow_pixels(im->pixels);
+    if (sail_image->pixels != nullptr) {
+        SAIL_TRY_OR_EXECUTE(transfer_pixels_pointer(sail_image),
+                            /* on error */ return);
     }
 }
 
-sail_error_t image::to_sail_image(sail_image *image) const
+sail_error_t image::transfer_pixels_pointer(const sail_image *sail_image)
 {
-    SAIL_CHECK_IMAGE_PTR(image);
+    SAIL_CHECK_IMAGE_PTR(sail_image);
+
+    free(d->pixels);
+
+    d->pixels         = nullptr;
+    d->pixels_size    = 0;
+    d->shallow_pixels = nullptr;
+
+    if (sail_image->pixels == nullptr) {
+        return 0;
+    }
+
+    unsigned bytes_per_image;
+    SAIL_TRY(sail_bytes_per_image(sail_image, &bytes_per_image));
+
+    d->pixels      = sail_image->pixels;
+    d->pixels_size = bytes_per_image;
+
+    return 0;
+}
+
+sail_error_t image::to_sail_image(sail_image *sail_image) const
+{
+    SAIL_CHECK_IMAGE_PTR(sail_image);
 
     // Resulting meta entries
     sail_meta_entry_node *image_meta_entry_node = nullptr;
@@ -432,49 +456,49 @@ sail_error_t image::to_sail_image(sail_image *image) const
         ++it;
     }
 
-    image->pixels         = d->pixels != nullptr ? d->pixels : (void *)d->shallow_pixels;
-    image->width          = d->width;
-    image->height         = d->height;
-    image->bytes_per_line = d->bytes_per_line;
-    image->pixel_format   = d->pixel_format;
-    image->animated       = d->animated;
-    image->delay          = d->delay;
+    sail_image->pixels         = d->pixels != nullptr ? d->pixels : (void *)d->shallow_pixels;
+    sail_image->width          = d->width;
+    sail_image->height         = d->height;
+    sail_image->bytes_per_line = d->bytes_per_line;
+    sail_image->pixel_format   = d->pixel_format;
+    sail_image->animated       = d->animated;
+    sail_image->delay          = d->delay;
 
     if (d->palette.is_valid()) {
-        SAIL_TRY_OR_CLEANUP(sail_alloc_palette(&image->palette),
-                            /* cleanup */ sail_destroy_meta_entry_node_chain(image->meta_entry_node));
+        SAIL_TRY_OR_CLEANUP(sail_alloc_palette(&sail_image->palette),
+                            /* cleanup */ sail_destroy_meta_entry_node_chain(sail_image->meta_entry_node));
 
-        SAIL_TRY_OR_CLEANUP(d->palette.to_sail_palette(image->palette),
-                            /* cleanup */ sail_destroy_palette(image->palette);
-                                          sail_destroy_meta_entry_node_chain(image->meta_entry_node));
+        SAIL_TRY_OR_CLEANUP(d->palette.to_sail_palette(sail_image->palette),
+                            /* cleanup */ sail_destroy_palette(sail_image->palette);
+                                          sail_destroy_meta_entry_node_chain(sail_image->meta_entry_node));
     }
 
-    image->meta_entry_node = image_meta_entry_node;
+    sail_image->meta_entry_node = image_meta_entry_node;
 
     if (d->iccp.is_valid()) {
-        SAIL_TRY_OR_CLEANUP(sail_alloc_iccp(&image->iccp),
-                            /* cleanup */ sail_destroy_palette(image->palette),
-                                          sail_destroy_meta_entry_node_chain(image->meta_entry_node));
+        SAIL_TRY_OR_CLEANUP(sail_alloc_iccp(&sail_image->iccp),
+                            /* cleanup */ sail_destroy_palette(sail_image->palette),
+                                          sail_destroy_meta_entry_node_chain(sail_image->meta_entry_node));
 
-        SAIL_TRY_OR_CLEANUP(d->iccp.to_sail_iccp(image->iccp),
-                            /* cleanup */ sail_destroy_iccp(image->iccp),
-                                          sail_destroy_palette(image->palette);
-                                          sail_destroy_meta_entry_node_chain(image->meta_entry_node));
+        SAIL_TRY_OR_CLEANUP(d->iccp.to_sail_iccp(sail_image->iccp),
+                            /* cleanup */ sail_destroy_iccp(sail_image->iccp),
+                                          sail_destroy_palette(sail_image->palette);
+                                          sail_destroy_meta_entry_node_chain(sail_image->meta_entry_node));
     }
 
-    image->properties = d->properties;
+    sail_image->properties = d->properties;
 
     if (d->source_image.is_valid()) {
-        SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image->source_image),
-                            /* cleanup */ sail_destroy_iccp(image->iccp),
-                                          sail_destroy_palette(image->palette);
-                                          sail_destroy_meta_entry_node_chain(image->meta_entry_node));
+        SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&sail_image->source_image),
+                            /* cleanup */ sail_destroy_iccp(sail_image->iccp),
+                                          sail_destroy_palette(sail_image->palette);
+                                          sail_destroy_meta_entry_node_chain(sail_image->meta_entry_node));
 
-        SAIL_TRY_OR_CLEANUP(d->source_image.to_sail_source_image(image->source_image),
-                            /* cleanup */ sail_destroy_source_image(image->source_image),
-                                          sail_destroy_iccp(image->iccp),
-                                          sail_destroy_palette(image->palette);
-                                          sail_destroy_meta_entry_node_chain(image->meta_entry_node));
+        SAIL_TRY_OR_CLEANUP(d->source_image.to_sail_source_image(sail_image->source_image),
+                            /* cleanup */ sail_destroy_source_image(sail_image->source_image),
+                                          sail_destroy_iccp(sail_image->iccp),
+                                          sail_destroy_palette(sail_image->palette);
+                                          sail_destroy_meta_entry_node_chain(sail_image->meta_entry_node));
     }
 
     return 0;

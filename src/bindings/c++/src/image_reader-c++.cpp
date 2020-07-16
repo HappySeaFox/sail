@@ -333,7 +333,6 @@ sail_error_t image_reader::read_next_frame(image *simage)
                         /* cleanup */ sail_destroy_image(sail_image));
 
     *simage = image(sail_image);
-
     sail_image->pixels = NULL;
     sail_destroy_image(sail_image);
 

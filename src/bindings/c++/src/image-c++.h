@@ -359,12 +359,14 @@ public:
 
 private:
     /*
-     * Makes a deep copy of the specified image. The pixels are shallow copied. The caller must set the pixels
+     * Makes a deep copy of the specified image. The pixels are transferred. The caller must set the pixels
      * in the sail_image object to NULL afterwards to avoid destructing them in sail_destroy_image().
      */
-    image(const sail_image *im);
+    image(const sail_image *sail_image);
 
-    sail_error_t to_sail_image(sail_image *image) const;
+    sail_error_t transfer_pixels_pointer(const sail_image *sail_image);
+
+    sail_error_t to_sail_image(sail_image *sail_image) const;
 
     image& with_animated(bool animated);
     image& with_properties(int properties);
