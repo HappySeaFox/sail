@@ -46,8 +46,8 @@ struct sail_plugin_info;
  * MUST be destroyed later with sail_destroy_image(). The assigned plugin info MUST NOT be destroyed
  * because it is a pointer to an internal data structure. If you don't need it, just pass NULL.
  *
- * Context is optional and can be NULL. SAIL allocates a local static context when the passed context is NULL.
- * ASAN will report a memory leak in this case, which is OK.
+ * Context is optional and can be NULL. SAIL allocates a thread-local static context when it's NULL.
+ * ASAN may report a memory leak in this case, which is OK.
  *
  * This function is pretty fast because it doesn't decode whole image data for most image formats.
  *
@@ -63,8 +63,8 @@ SAIL_EXPORT sail_error_t sail_probe_io(struct sail_io *io, struct sail_context *
  * MUST be destroyed later with sail_destroy_image(). The assigned plugin info MUST NOT be destroyed
  * because it is a pointer to an internal data structure. If you don't need it, just pass NULL.
  *
- * Context is optional and can be NULL. SAIL allocates a local static context when the passed context is NULL.
- * ASAN will report a memory leak in this case, which is OK.
+ * Context is optional and can be NULL. SAIL allocates a thread-local static context when it's NULL.
+ * ASAN may report a memory leak in this case, which is OK.
  *
  * This function is pretty fast because it doesn't decode whole image data for most image formats.
  *

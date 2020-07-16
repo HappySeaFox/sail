@@ -179,6 +179,7 @@ sail_error_t possibly_allocate_context(struct sail_context *context, struct sail
 
     if (context == NULL) {
         if (!tls_context_initialized) {
+            SAIL_LOG_DEBUG("Initializing a thread-local static context");
             SAIL_TRY(sail_init(&tls_context));
             tls_context_initialized = true;
         }
