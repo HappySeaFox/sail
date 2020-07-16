@@ -39,6 +39,21 @@ sail_error_t sail_alloc_iccp(struct sail_iccp **iccp) {
     return 0;
 }
 
+sail_error_t sail_alloc_iccp_with_data(struct sail_iccp **iccp, const void *data, unsigned data_length) {
+
+    SAIL_CHECK_ICCP_PTR(iccp);
+
+    SAIL_TRY(sail_alloc_iccp(iccp));
+
+    SAIL_TRY_OR_CLEANUP(sail_malloc(&(*iccp)->data, data_length),
+                        /* cleanup */ sail_destroy_iccp(*iccp));
+
+    memcpy((*iccp)->data, data, data_length);
+    (*iccp)->data_length = data_length;
+
+    return 0;
+}
+
 void sail_destroy_iccp(struct sail_iccp *iccp) {
 
     if (iccp == NULL) {

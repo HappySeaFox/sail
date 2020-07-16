@@ -296,13 +296,7 @@ sail_error_t fetch_iccp(png_structp png_ptr, png_infop info_ptr, struct sail_icc
                            &data_length) == PNG_INFO_iCCP;
 
     if (ok) {
-        SAIL_TRY(sail_alloc_iccp(iccp));
-
-        SAIL_TRY(sail_malloc(&(*iccp)->data, data_length));
-
-        memcpy((*iccp)->data, data, data_length);
-        (*iccp)->data_length = data_length;
-
+        SAIL_TRY(sail_alloc_iccp_with_data(iccp, data, data_length));
         SAIL_LOG_DEBUG("PNG: Found ICC profile '%s' %u bytes long", name, data_length);
     } else {
         SAIL_LOG_DEBUG("PNG: ICC profile is not found");
