@@ -56,7 +56,6 @@ int main(int argc, char *argv[]) {
 
     /* Load the image. */
     struct sail_image *image;
-    unsigned char *pixels;
 
     /*
      * sail_read() reads the image and outputs pixels in BPP32-RGBA pixel format for image formats
@@ -65,8 +64,7 @@ int main(int argc, char *argv[]) {
      */
     SAIL_TRY(sail_read(argv[1],
                        context,
-                       &image,
-                       (void **)&pixels));
+                       &image));
 
     /* Create an SDL surface from the image data. */
     unsigned bytes_per_line;
@@ -74,7 +72,7 @@ int main(int argc, char *argv[]) {
 
     const bool is_rgba = image->pixel_format == SAIL_PIXEL_FORMAT_BPP32_RGBA;
 
-    SDL_Surface *surface = SDL_CreateRGBSurfaceFrom(pixels,
+    SDL_Surface *surface = SDL_CreateRGBSurfaceFrom(image->pixels,
                                                     image->width,
                                                     image->height,
                                                     is_rgba ? 32 : 24,
@@ -115,7 +113,6 @@ int main(int argc, char *argv[]) {
     }
 
     /* We don't need the image data anymore. */
-    free(pixels);
     sail_destroy_image(image);
 
     SDL_FreeSurface(surface);
