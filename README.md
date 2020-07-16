@@ -68,10 +68,11 @@ Currently, SAIL supports the following platforms:
 - [FreeImage](https://freeimage.sourceforge.io)
 - [DevIL](http://openil.sourceforge.net)
 - [SDL_Image](https://www.libsdl.org/projects/SDL_image)
-- [WIC (Windows only)](https://docs.microsoft.com/en-us/windows/win32/wic/-wic-about-windows-imaging-codec)
 - [stb_image](https://github.com/nothings/stb)
 - [Boost.GIL](https://www.boost.org/doc/libs/1_68_0/libs/gil/doc/html/index.html)
 - [gdk-pixbuf](https://developer.gnome.org/gdk-pixbuf)
+- [imlib2](https://docs.enlightenment.org/api/imlib2/html)
+- [WIC (Windows only)](https://docs.microsoft.com/en-us/windows/win32/wic/-wic-about-windows-imaging-codec)
 
 ## Differences from other image decoding libraries
 
