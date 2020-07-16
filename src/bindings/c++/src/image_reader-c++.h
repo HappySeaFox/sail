@@ -84,6 +84,11 @@ public:
     sail_error_t read(const char *path, image *simage);
 
     /*
+     * An interface to sail_read_mem(). See sail_read_mem() for more.
+     */
+    sail_error_t read(const void *buffer, size_t buffer_length, image *simage);
+
+    /*
      * An interface to sail_start_reading_file(). See sail_start_reading() for more.
      */
     sail_error_t start_reading(const std::string &path);

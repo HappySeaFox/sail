@@ -192,6 +192,26 @@ sail_error_t image_reader::read(const char *path, image *simage)
     return 0;
 }
 
+sail_error_t image_reader::read(const void *buffer, size_t buffer_length, image *simage)
+{
+    SAIL_CHECK_CONTEXT_PTR(d->ctx);
+    SAIL_CHECK_BUFFER_PTR(buffer);
+    SAIL_CHECK_IMAGE_PTR(simage);
+
+    sail_image *sail_image;
+
+    SAIL_TRY(sail_read_mem(buffer,
+                            buffer_length,
+                            d->ctx->sail_context_c(),
+                            &sail_image));
+
+    *simage = image(sail_image);
+    sail_image->pixels = NULL;
+    sail_destroy_image(sail_image);
+
+    return 0;
+}
+
 sail_error_t image_reader::start_reading(const std::string &path)
 {
     SAIL_TRY(start_reading(path.c_str()));

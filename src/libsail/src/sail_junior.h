@@ -77,6 +77,22 @@ SAIL_EXPORT sail_error_t sail_probe_path(const char *path, struct sail_context *
 SAIL_EXPORT sail_error_t sail_read_path(const char *path, struct sail_context *context, struct sail_image **image);
 
 /*
+ * Loads the specified image file from the specified memory buffer and returns its properties and pixels.
+ * The assigned image MUST be destroyed later with sail_destroy_image().
+ *
+ * Context is optional and can be NULL. SAIL allocates a thread-local static context when it's NULL.
+ * ASAN may report a memory leak in this case, which is OK.
+ *
+ * Outputs pixels in BPP32-RGBA pixel format for image formats with transparency support
+ * and BPP24-RGB otherwise.
+ *
+ * Typical usage: This is a standalone function that could be called at any time.
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_read_mem(const void *buffer, size_t buffer_length, struct sail_context *context, struct sail_image **image);
+
+/*
  * Writes the pixels of the specified image file into the file.
  *
  * Context is optional and can be NULL. SAIL allocates a thread-local static context when it's NULL.

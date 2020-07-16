@@ -70,6 +70,28 @@ sail_error_t sail_read_path(const char *path, struct sail_context *context, stru
     return 0;
 }
 
+SAIL_EXPORT sail_error_t sail_read_mem(const void *buffer, size_t buffer_length, struct sail_context *context, struct sail_image **image) {
+
+    SAIL_CHECK_BUFFER_PTR(buffer);
+    SAIL_CHECK_IMAGE_PTR(image);
+
+    struct sail_context *context_local;
+    SAIL_TRY(possibly_allocate_context(context, &context_local));
+
+    void *state = NULL;
+
+    SAIL_TRY_OR_CLEANUP(sail_start_reading_mem(buffer, buffer_length, context_local, NULL /* plugin info */, &state),
+                        /* cleanup */ sail_stop_reading(state));
+
+    SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, image),
+                        /* cleanup */ sail_stop_reading(state));
+
+    SAIL_TRY_OR_CLEANUP(sail_stop_reading(state),
+                        /* cleanup */ sail_destroy_image(*image));
+
+    return 0;
+}
+
 sail_error_t sail_write_path(const char *path, struct sail_context *context, const struct sail_image *image) {
 
     SAIL_CHECK_PATH_PTR(path);
