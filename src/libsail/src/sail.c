@@ -260,13 +260,7 @@ static sail_error_t sail_init_impl(struct sail_context **context, int flags) {
 
     SAIL_LOG_INFO("Version %s", SAIL_VERSION_STRING);
 
-    SAIL_CHECK_CONTEXT_PTR(context);
-
-    *context = (struct sail_context *)malloc(sizeof(struct sail_context));
-
-    if (*context == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
+    SAIL_TRY(sail_malloc(context, sizeof(struct sail_context)));
 
     (*context)->plugin_info_node = NULL;
 
@@ -285,12 +279,10 @@ static sail_error_t sail_init_impl(struct sail_context **context, int flags) {
     const char *plugs_info_mask = "\\*.plugin.info";
 
     size_t plugs_path_with_mask_length = strlen(plugs_path) + strlen(plugs_info_mask) + 1;
-    char *plugs_path_with_mask = (char *)malloc(plugs_path_with_mask_length);
 
-    if (plugs_path_with_mask == NULL) {
-        free(*context);
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
+    char *plugs_path_with_mask;
+    SAIL_TRY_OR_CLEANUP(sail_malloc(&plugs_path_with_mask, plugs_path_with_mask_length),
+                        /* cleanup */ free(*context));
 
     strcpy_s(plugs_path_with_mask, plugs_path_with_mask_length, plugs_path);
     strcat_s(plugs_path_with_mask, plugs_path_with_mask_length, plugs_info_mask);

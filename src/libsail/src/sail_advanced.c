@@ -126,12 +126,8 @@ sail_error_t sail_read_next_frame(void *state, struct sail_image **image) {
     SAIL_TRY_OR_CLEANUP(sail_bytes_per_image(*image, &pixels_size),
                         /* cleanup */ sail_destroy_image(*image));
 
-    (*image)->pixels = malloc(pixels_size);
-
-    if ((*image)->pixels == NULL) {
-        sail_destroy_image(*image);
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
+    SAIL_TRY_OR_CLEANUP(sail_malloc(&(*image)->pixels, pixels_size),
+                        /* cleanup */ sail_destroy_image(*image));
 
     for (int pass = 0; pass < interlaced_passes; pass++) {
         SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v3->read_seek_next_pass(state_of_mind->state, state_of_mind->io, *image),

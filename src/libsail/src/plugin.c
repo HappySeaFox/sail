@@ -43,11 +43,7 @@ sail_error_t alloc_plugin(const struct sail_plugin_info *plugin_info, struct sai
     SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
     SAIL_CHECK_PATH_PTR(plugin_info->path);
 
-    *plugin = (struct sail_plugin *)malloc(sizeof(struct sail_plugin));
-
-    if (*plugin == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
+    SAIL_TRY(sail_malloc(plugin, sizeof(struct sail_plugin)));
 
     (*plugin)->layout = plugin_info->layout;
     (*plugin)->handle = NULL;
@@ -100,7 +96,8 @@ sail_error_t alloc_plugin(const struct sail_plugin_info *plugin_info, struct sai
     while(0)
 
     if ((*plugin)->layout == SAIL_PLUGIN_LAYOUT_V3) {
-        (*plugin)->v3 = (struct sail_plugin_layout_v3 *)malloc(sizeof(struct sail_plugin_layout_v3));
+        SAIL_TRY_OR_CLEANUP(sail_malloc(&(*plugin)->v3, sizeof(struct sail_plugin_layout_v3)),
+                            /* cleanup */ destroy_plugin(*plugin));
 
         SAIL_RESOLVE((*plugin)->v3->read_init,            handle, sail_plugin_read_init_v3);
         SAIL_RESOLVE((*plugin)->v3->read_seek_next_frame, handle, sail_plugin_read_seek_next_frame_v3);
@@ -114,6 +111,7 @@ sail_error_t alloc_plugin(const struct sail_plugin_info *plugin_info, struct sai
         SAIL_RESOLVE((*plugin)->v3->write_frame,           handle, sail_plugin_write_frame_v3);
         SAIL_RESOLVE((*plugin)->v3->write_finish,          handle, sail_plugin_write_finish_v3);
     } else {
+        destroy_plugin(*plugin);
         return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
     }
 
