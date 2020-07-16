@@ -51,7 +51,7 @@ public:
 
     ~pimpl()
     {
-        free(pixels);
+        delete [] pixels;
     }
 
     unsigned width;
@@ -251,7 +251,7 @@ image& image::with_pixels(const void *pixels)
 
 image& image::with_pixels(const void *pixels, unsigned pixels_size)
 {
-    free(d->pixels);
+    delete [] d->pixels;
 
     d->pixels         = nullptr;
     d->pixels_size    = 0;
@@ -261,13 +261,8 @@ image& image::with_pixels(const void *pixels, unsigned pixels_size)
         return *this;
     }
 
-    d->pixels      = malloc(pixels_size);
+    d->pixels      = new char [pixels_size];
     d->pixels_size = pixels_size;
-
-    if (d->pixels == nullptr) {
-        SAIL_LOG_ERROR("Memory allocation failed of pixels size %u", d->pixels_size);
-        return *this;
-    }
 
     memcpy(d->pixels, pixels, pixels_size);
 
@@ -276,7 +271,7 @@ image& image::with_pixels(const void *pixels, unsigned pixels_size)
 
 image& image::with_shallow_pixels(const void *pixels)
 {
-    free(d->pixels);
+    delete [] d->pixels;
 
     d->pixels      = nullptr;
     d->pixels_size = 0;
@@ -410,7 +405,7 @@ sail_error_t image::transfer_pixels_pointer(const sail_image *sail_image)
 {
     SAIL_CHECK_IMAGE_PTR(sail_image);
 
-    free(d->pixels);
+    delete [] d->pixels;
 
     d->pixels         = nullptr;
     d->pixels_size    = 0;

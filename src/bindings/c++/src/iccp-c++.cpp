@@ -43,7 +43,7 @@ public:
 
     ~pimpl()
     {
-        free(data);
+        delete [] data;
     }
 
     void *data;
@@ -90,7 +90,7 @@ unsigned iccp::data_length() const
 
 iccp& iccp::with_data(const void *data, unsigned data_length)
 {
-    free(d->data);
+    delete [] d->data;
 
     d->data = nullptr;
     d->data_length = 0;
@@ -99,15 +99,10 @@ iccp& iccp::with_data(const void *data, unsigned data_length)
         return *this;
     }
 
-    d->data = malloc(data_length);
-
-    if (d->data == nullptr) {
-        SAIL_LOG_ERROR("Memory allocation failed of ICC data length %u", data_length);
-        return *this;
-    }
+    d->data        = new char [data_length];
+    d->data_length = data_length;
 
     memcpy(d->data, data, data_length);
-    d->data_length = data_length;
 
     return *this;
 }
@@ -127,11 +122,7 @@ sail_error_t iccp::to_sail_iccp(sail_iccp *ic) const
 {
     SAIL_CHECK_ICCP_PTR(ic);
 
-    ic->data = malloc(d->data_length);
-
-    if (ic->data == nullptr) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
-    }
+    SAIL_TRY(sail_malloc(&ic->data, d->data_length));
 
     memcpy(ic->data, d->data, d->data_length);
     ic->data_length = d->data_length;
