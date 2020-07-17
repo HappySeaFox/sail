@@ -31,7 +31,11 @@
 
 int sail_alloc_read_options(struct sail_read_options **read_options) {
 
-    SAIL_TRY(sail_malloc(read_options, sizeof(struct sail_read_options)));
+    SAIL_CHECK_READ_OPTIONS_PTR(read_options);
+
+    void *ptr;
+    SAIL_TRY(sail_malloc(&ptr, sizeof(struct sail_read_options)));
+    *read_options = ptr;
 
     (*read_options)->output_pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;
     (*read_options)->io_options          = 0;
@@ -74,6 +78,8 @@ sail_error_t sail_read_options_from_features(const struct sail_read_features *re
 
 sail_error_t sail_alloc_read_options_from_features(const struct sail_read_features *read_features, struct sail_read_options **read_options) {
 
+    SAIL_CHECK_READ_OPTIONS_PTR(read_options);
+
     SAIL_TRY(sail_alloc_read_options(read_options));
     SAIL_TRY_OR_CLEANUP(sail_read_options_from_features(read_features, *read_options),
                         /* cleanup */ sail_destroy_read_options(*read_options));
@@ -86,7 +92,9 @@ sail_error_t sail_copy_read_options(const struct sail_read_options *source, stru
     SAIL_CHECK_READ_OPTIONS_PTR(source);
     SAIL_CHECK_READ_OPTIONS_PTR(target);
 
-    SAIL_TRY(sail_malloc(target, sizeof(struct sail_read_options)));
+    void *ptr;
+    SAIL_TRY(sail_malloc(&ptr, sizeof(struct sail_read_options)));
+    *target = ptr;
 
     memcpy(*target, source, sizeof(struct sail_read_options));
 

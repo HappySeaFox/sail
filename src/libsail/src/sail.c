@@ -260,7 +260,9 @@ static sail_error_t sail_init_impl(struct sail_context **context, int flags) {
 
     SAIL_LOG_INFO("Version %s", SAIL_VERSION_STRING);
 
-    SAIL_TRY(sail_malloc(context, sizeof(struct sail_context)));
+    void *ptr;
+    SAIL_TRY(sail_malloc(&ptr, sizeof(struct sail_context)));
+    *context = ptr;
 
     (*context)->plugin_info_node = NULL;
 

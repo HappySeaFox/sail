@@ -214,9 +214,10 @@ sail_error_t alloc_io_read_mem(const void *buffer, size_t buffer_length, struct 
 
     SAIL_TRY(sail_alloc_io(io));
 
-    struct mem_io_read_stream *mem_io_read_stream;
-    SAIL_TRY_OR_CLEANUP(sail_malloc(&mem_io_read_stream, sizeof(struct mem_io_read_stream)),
+    void *ptr;
+    SAIL_TRY_OR_CLEANUP(sail_malloc(&ptr, sizeof(struct mem_io_read_stream)),
                         /* cleanup */ sail_destroy_io(*io));
+    struct mem_io_read_stream *mem_io_read_stream = ptr;
 
     mem_io_read_stream->mem_io_buffer_info.buffer_length = buffer_length;
     mem_io_read_stream->mem_io_buffer_info.pos           = 0;

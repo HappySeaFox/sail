@@ -66,7 +66,9 @@ struct jpeg_state {
 
 static sail_error_t alloc_jpeg_state(struct jpeg_state **jpeg_state) {
 
-    SAIL_TRY(sail_malloc(jpeg_state, sizeof(struct jpeg_state)));
+    void *ptr;
+    SAIL_TRY(sail_malloc(&ptr, sizeof(struct jpeg_state)));
+    *jpeg_state = ptr;
 
     (*jpeg_state)->libjpeg_error                   = false;
     (*jpeg_state)->read_options                    = NULL;

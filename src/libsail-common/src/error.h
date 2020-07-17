@@ -52,24 +52,27 @@ typedef int sail_error_t;
 /*
  * Encoding/decoding common errors.
  */
-#define SAIL_NULL_PTR                     20
-#define SAIL_STATE_NULL_PTR               21
-#define SAIL_IMAGE_NULL_PTR               22
-#define SAIL_PIXELS_NULL_PTR              23
-#define SAIL_READ_FEATURES_NULL_PTR       24
-#define SAIL_READ_OPTIONS_NULL_PTR        25
-#define SAIL_WRITE_FEATURES_NULL_PTR      26
-#define SAIL_WRITE_OPTIONS_NULL_PTR       27
-#define SAIL_STRING_NULL_PTR              28
-#define SAIL_IO_NULL_PTR                  29
-#define SAIL_STREAM_NULL_PTR              30
-#define SAIL_BUFFER_NULL_PTR              31
-#define SAIL_INVALID_IO                   32
-#define SAIL_RESULT_NULL_PTR              33
-#define SAIL_META_ENTRY_NODE_NULL_PTR     34
-#define SAIL_ICCP_NULL_PTR                35
-#define SAIL_PALETTE_NULL_PTR             36
-#define SAIL_SOURCE_IMAGE_NULL_PTR        37
+#define SAIL_NULL_PTR                            20
+#define SAIL_STATE_NULL_PTR                      21
+#define SAIL_IMAGE_NULL_PTR                      22
+#define SAIL_PIXELS_NULL_PTR                     23
+#define SAIL_READ_FEATURES_NULL_PTR              24
+#define SAIL_READ_OPTIONS_NULL_PTR               25
+#define SAIL_WRITE_FEATURES_NULL_PTR             26
+#define SAIL_WRITE_OPTIONS_NULL_PTR              27
+#define SAIL_STRING_NULL_PTR                     28
+#define SAIL_IO_NULL_PTR                         29
+#define SAIL_STREAM_NULL_PTR                     30
+#define SAIL_BUFFER_NULL_PTR                     31
+#define SAIL_INVALID_IO                          32
+#define SAIL_RESULT_NULL_PTR                     33
+#define SAIL_META_ENTRY_NODE_NULL_PTR            34
+#define SAIL_ICCP_NULL_PTR                       35
+#define SAIL_PALETTE_NULL_PTR                    36
+#define SAIL_SOURCE_IMAGE_NULL_PTR               37
+#define SAIL_PIXEL_FORMATS_MAPPING_NODE_NULL_PTR 38
+#define SAIL_STRING_NODE_NULL_PTR                39
+#define SAIL_PLUGIN_INFO_NODE_NULL_PTR           40
 
 /*
  * Encoding/decoding specific errors.
@@ -173,6 +176,9 @@ do {                              \
 #define SAIL_CHECK_ICCP_PTR(iccp)                       SAIL_CHECK_PTR2(iccp,            SAIL_ICCP_NULL_PTR)
 #define SAIL_CHECK_PALETTE_PTR(palette)                 SAIL_CHECK_PTR2(palette,         SAIL_PALETTE_NULL_PTR)
 #define SAIL_CHECK_SOURCE_IMAGE_PTR(source_image)       SAIL_CHECK_PTR2(source_image,    SAIL_SOURCE_IMAGE_NULL_PTR)
+#define SAIL_CHECK_PIXEL_FORMATS_MAPPING_NODE_PTR(node) SAIL_CHECK_PTR2(node,            SAIL_PIXEL_FORMATS_MAPPING_NODE_NULL_PTR)
+#define SAIL_CHECK_STRING_NODE_PTR(node)                SAIL_CHECK_PTR2(node,            SAIL_STRING_NODE_NULL_PTR)
+#define SAIL_CHECK_PLUGIN_INFO_NODE_PTR(node)           SAIL_CHECK_PTR2(node,            SAIL_PLUGIN_INFO_NODE_NULL_PTR)
 
 /*
  * Try to execute the specified SAIL function. If it fails, execute the rest of arguments.

@@ -36,7 +36,11 @@
 
 static sail_error_t alloc_string_node(struct sail_string_node **string_node) {
 
-    SAIL_TRY(sail_malloc(string_node, sizeof(struct sail_string_node)));
+    SAIL_CHECK_STRING_NODE_PTR(string_node);
+
+    void *ptr;
+    SAIL_TRY(sail_malloc(&ptr, sizeof(struct sail_string_node)));
+    *string_node = ptr;
 
     (*string_node)->value = NULL;
     (*string_node)->next  = NULL;
@@ -351,7 +355,11 @@ static sail_error_t check_plugin_info(const char *path, const struct sail_plugin
 
 static sail_error_t alloc_plugin_info(struct sail_plugin_info **plugin_info) {
 
-    SAIL_TRY(sail_malloc(plugin_info, sizeof(struct sail_plugin_info)));
+    SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
+
+    void *ptr;
+    SAIL_TRY(sail_malloc(&ptr, sizeof(struct sail_plugin_info)));
+    *plugin_info = ptr;
 
     (*plugin_info)->path              = NULL;
     (*plugin_info)->layout            = 0;
@@ -394,7 +402,11 @@ static void destroy_plugin_info(struct sail_plugin_info *plugin_info) {
 
 sail_error_t alloc_plugin_info_node(struct sail_plugin_info_node **plugin_info_node) {
 
-    SAIL_TRY(sail_malloc(plugin_info_node, sizeof(struct sail_plugin_info_node)));
+    SAIL_CHECK_PLUGIN_INFO_NODE_PTR(plugin_info_node);
+
+    void *ptr;
+    SAIL_TRY(sail_malloc(&ptr, sizeof(struct sail_plugin_info_node)));
+    *plugin_info_node = ptr;
 
     (*plugin_info_node)->plugin_info = NULL;
     (*plugin_info_node)->plugin      = NULL;

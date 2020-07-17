@@ -31,7 +31,11 @@
 
 sail_error_t sail_alloc_palette(struct sail_palette **palette) {
 
-    SAIL_TRY(sail_malloc(palette, sizeof(struct sail_palette)));
+    SAIL_CHECK_PALETTE_PTR(palette);
+
+    void *ptr;
+    SAIL_TRY(sail_malloc(&ptr, sizeof(struct sail_palette)));
+    *palette = ptr;
 
     (*palette)->pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;
     (*palette)->data         = NULL;

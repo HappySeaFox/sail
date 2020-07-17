@@ -33,7 +33,9 @@ sail_error_t sail_alloc_io(struct sail_io **io) {
 
     SAIL_CHECK_IO_PTR(io);
 
-    SAIL_TRY(sail_malloc(io, sizeof(struct sail_io)));
+    void *ptr;
+    SAIL_TRY(sail_malloc(&ptr, sizeof(struct sail_io)));
+    *io = ptr;
 
     (*io)->stream = NULL;
     (*io)->read   = NULL;

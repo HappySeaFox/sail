@@ -31,7 +31,11 @@
 
 sail_error_t sail_alloc_iccp(struct sail_iccp **iccp) {
 
-    SAIL_TRY(sail_malloc(iccp, sizeof(struct sail_iccp)));
+    SAIL_CHECK_ICCP_PTR(iccp);
+
+    void *ptr;
+    SAIL_TRY(sail_malloc(&ptr, sizeof(struct sail_iccp)));
+    *iccp = ptr;
 
     (*iccp)->data        = NULL;
     (*iccp)->data_length = 0;

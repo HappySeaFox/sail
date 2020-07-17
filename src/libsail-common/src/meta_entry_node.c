@@ -30,7 +30,11 @@
 
 sail_error_t sail_alloc_meta_entry_node(struct sail_meta_entry_node **node) {
 
-    SAIL_TRY(sail_malloc(node, sizeof(struct sail_meta_entry_node)));
+    SAIL_CHECK_META_ENTRY_NODE_PTR(node);
+
+    void *ptr;
+    SAIL_TRY(sail_malloc(&ptr, sizeof(struct sail_meta_entry_node)));
+    *node = ptr;
 
     (*node)->key   = NULL;
     (*node)->value = NULL;

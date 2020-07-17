@@ -43,7 +43,9 @@ sail_error_t alloc_plugin(const struct sail_plugin_info *plugin_info, struct sai
     SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
     SAIL_CHECK_PATH_PTR(plugin_info->path);
 
-    SAIL_TRY(sail_malloc(plugin, sizeof(struct sail_plugin)));
+    void *ptr;
+    SAIL_TRY(sail_malloc(&ptr, sizeof(struct sail_plugin)));
+    *plugin = ptr;
 
     (*plugin)->layout = plugin_info->layout;
     (*plugin)->handle = NULL;
@@ -96,8 +98,10 @@ sail_error_t alloc_plugin(const struct sail_plugin_info *plugin_info, struct sai
     while(0)
 
     if ((*plugin)->layout == SAIL_PLUGIN_LAYOUT_V3) {
-        SAIL_TRY_OR_CLEANUP(sail_malloc(&(*plugin)->v3, sizeof(struct sail_plugin_layout_v3)),
+        void *ptr;
+        SAIL_TRY_OR_CLEANUP(sail_malloc(&ptr, sizeof(struct sail_plugin_layout_v3)),
                             /* cleanup */ destroy_plugin(*plugin));
+        (*plugin)->v3 = ptr;
 
         SAIL_RESOLVE((*plugin)->v3->read_init,            handle, sail_plugin_read_init_v3);
         SAIL_RESOLVE((*plugin)->v3->read_seek_next_frame, handle, sail_plugin_read_seek_next_frame_v3);
