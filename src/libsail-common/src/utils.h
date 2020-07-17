@@ -61,7 +61,7 @@ SAIL_EXPORT sail_error_t sail_strdup_length(const char *input, size_t length, ch
 
 /*
  * Concatenates 'num' number of strings together and puts the result into the specified output string.
- * The assigned output string MUST be destroyed later with free().
+ * The assigned output string MUST be destroyed later with sail_free().
  *
  * Returns 0 on success or sail_error_t on error.
  */
