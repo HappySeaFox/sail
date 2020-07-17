@@ -44,7 +44,7 @@ public:
 
     ~pimpl()
     {
-        delete [] sail_iccp.data;
+        free(sail_iccp.data);
     }
 
     sail_iccp sail_iccp;
@@ -90,7 +90,7 @@ unsigned iccp::data_length() const
 
 iccp& iccp::with_data(const void *data, unsigned data_length)
 {
-    delete [] d->sail_iccp.data;
+    free(d->sail_iccp.data);
 
     d->sail_iccp.data        = nullptr;
     d->sail_iccp.data_length = 0;
@@ -99,7 +99,9 @@ iccp& iccp::with_data(const void *data, unsigned data_length)
         return *this;
     }
 
-    d->sail_iccp.data        = new char [data_length];
+    SAIL_TRY_OR_EXECUTE(sail_malloc(&d->sail_iccp.data, data_length),
+                        /* on error */ return *this);
+
     d->sail_iccp.data_length = data_length;
 
     memcpy(d->sail_iccp.data, data, data_length);
