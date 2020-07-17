@@ -91,7 +91,7 @@ See [README](README.md) for more.
 - CAMERA codec now uses dcraw 8.61
 - added settings support to CAMERA, SVG
 - small fixes in configure script
-- configure output is more verobose now
+- configure output is more verbose now
 
 ## 0.6.2 2006-01-02
 
