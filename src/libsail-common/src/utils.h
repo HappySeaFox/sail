@@ -203,6 +203,27 @@ SAIL_EXPORT sail_error_t sail_print_errno(const char *format);
 SAIL_EXPORT sail_error_t sail_malloc(void **ptr, size_t size);
 
 /*
+ * Interface to realloc().
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_realloc(void **ptr, size_t size);
+
+/*
+ * Interface to calloc().
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT sail_error_t sail_calloc(void **ptr, size_t nmemb, size_t size);
+
+/*
+ * Interface to free().
+ *
+ * Returns 0 on success or sail_error_t on error.
+ */
+SAIL_EXPORT void sail_free(void *ptr);
+
+/*
  * Assigns the current number of milliseconds since Epoch.
  *
  * Returns 0 on success or sail_error_t on error.

@@ -622,6 +622,39 @@ sail_error_t sail_malloc(void **ptr, size_t size) {
     return 0;
 }
 
+sail_error_t sail_realloc(void **ptr, size_t size) {
+
+    SAIL_CHECK_PTR(ptr);
+
+    void *ptr_local = realloc(*ptr, size);
+
+    if (ptr_local == NULL) {
+        return SAIL_MEMORY_ALLOCATION_FAILED;
+    }
+
+    *ptr = ptr_local;
+    return 0;
+}
+
+sail_error_t sail_calloc(void **ptr, size_t nmemb, size_t size) {
+
+    SAIL_CHECK_PTR(ptr);
+
+    void *ptr_local = calloc(nmemb, size);
+
+    if (ptr_local == NULL) {
+        return SAIL_MEMORY_ALLOCATION_FAILED;
+    }
+
+    *ptr = ptr_local;
+    return 0;
+}
+
+void sail_free(void *ptr) {
+
+    free(ptr);
+}
+
 uint64_t sail_now(void) {
 
 #ifdef SAIL_WIN32
