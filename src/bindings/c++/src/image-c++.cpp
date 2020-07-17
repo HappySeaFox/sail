@@ -52,7 +52,7 @@ public:
     ~pimpl()
     {
         if (!shallow_pixels) {
-            delete [] pixels;
+            free(pixels);
         }
     }
 
@@ -243,7 +243,7 @@ image& image::with_pixels(const void *pixels)
 
 image& image::with_pixels(const void *pixels, unsigned pixels_size)
 {
-    delete [] d->pixels;
+    free(d->pixels);
 
     d->pixels         = nullptr;
     d->pixels_size    = 0;
@@ -253,7 +253,9 @@ image& image::with_pixels(const void *pixels, unsigned pixels_size)
         return *this;
     }
 
-    d->pixels      = new char [pixels_size];
+    SAIL_TRY_OR_EXECUTE(sail_malloc(&d->pixels, pixels_size),
+                        /* on error */ return *this);
+
     d->pixels_size = pixels_size;
 
     memcpy(d->pixels, pixels, pixels_size);
@@ -273,7 +275,7 @@ image& image::with_shallow_pixels(void *pixels)
 
 image& image::with_shallow_pixels(void *pixels, unsigned pixels_size)
 {
-    delete [] d->pixels;
+    free(d->pixels);
 
     d->pixels         = nullptr;
     d->pixels_size    = 0;
@@ -410,7 +412,7 @@ sail_error_t image::transfer_pixels_pointer(const sail_image *sail_image)
 {
     SAIL_CHECK_IMAGE_PTR(sail_image);
 
-    delete [] d->pixels;
+    free(d->pixels);
 
     d->pixels         = nullptr;
     d->pixels_size    = 0;
