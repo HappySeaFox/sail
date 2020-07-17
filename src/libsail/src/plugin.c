@@ -98,7 +98,6 @@ sail_error_t alloc_plugin(const struct sail_plugin_info *plugin_info, struct sai
     while(0)
 
     if ((*plugin)->layout == SAIL_PLUGIN_LAYOUT_V3) {
-        void *ptr;
         SAIL_TRY_OR_CLEANUP(sail_malloc(&ptr, sizeof(struct sail_plugin_layout_v3)),
                             /* cleanup */ destroy_plugin(*plugin));
         (*plugin)->v3 = ptr;
