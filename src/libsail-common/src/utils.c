@@ -612,13 +612,12 @@ sail_error_t sail_malloc(void **ptr, size_t size) {
 
     SAIL_CHECK_PTR(ptr);
 
-    void *ptr_local = malloc(size);
+    *ptr = malloc(size);
 
-    if (ptr_local == NULL) {
+    if (*ptr == NULL) {
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
-    *ptr = ptr_local;
     return 0;
 }
 
@@ -626,13 +625,12 @@ sail_error_t sail_realloc(void **ptr, size_t size) {
 
     SAIL_CHECK_PTR(ptr);
 
-    void *ptr_local = realloc(*ptr, size);
+    *ptr = realloc(*ptr, size);
 
-    if (ptr_local == NULL) {
+    if (*ptr == NULL) {
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
-    *ptr = ptr_local;
     return 0;
 }
 
@@ -640,13 +638,12 @@ sail_error_t sail_calloc(void **ptr, size_t nmemb, size_t size) {
 
     SAIL_CHECK_PTR(ptr);
 
-    void *ptr_local = calloc(nmemb, size);
+    *ptr = calloc(nmemb, size);
 
-    if (ptr_local == NULL) {
+    if (*ptr == NULL) {
         return SAIL_MEMORY_ALLOCATION_FAILED;
     }
 
-    *ptr = ptr_local;
     return 0;
 }
 
