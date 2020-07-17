@@ -1,7 +1,6 @@
 Table of Contents
 =================
 
-* [Table of Contents](#table-of-contents)
 * [SAIL Frequently Asked Questions (FAQ)](#sail-frequently-asked-questions-faq)
   * [What are the competitors of SAIL?](#what-are-the-competitors-of-sail)
   * [How old is SAIL?](#how-old-is-sail)
@@ -12,6 +11,7 @@ Table of Contents
   * [How does SAIL look for plugins?](#how-does-sail-look-for-plugins)
     * [Windows](#windows)
     * [Unix (including MacOS)](#unix-including-macos)
+  * [I'd like to reorganize the standard SAIL folder layout on Windows](#id-like-to-reorganize-the-standard-sail-folder-layout-on-windows)
   * [How can I point SAIL to a different plugins location?](#how-can-i-point-sail-to-a-different-plugins-location)
   * [Describe the high\-level APIs](#describe-the-high-level-apis)
   * [Does SAIL provide simple one\-line APIs?](#does-sail-provide-simple-one-line-apis)
@@ -84,6 +84,12 @@ Plugins (image codecs) paths search algorithm (first found path wins):
 ### Unix (including MacOS)
 1. `SAIL_PLUGINS_PATH` environment variable
 2. Hardcoded `SAIL_PLUGINS_PATH` in config.h
+
+## I'd like to reorganize the standard SAIL folder layout on Windows
+
+I can surely do that. However, with the standard layout SAIL detects the plugins' location automatically.
+If you reorganize the standard SAIL folder layout, you'll need to specify the new plugins' location by
+setting the `SAIL_PLUGINGS_PATH` environment variable.
 
 ## How can I point SAIL to a different plugins location?
 
