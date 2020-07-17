@@ -134,7 +134,7 @@ static sail_error_t update_lib_path(void) {
 
     if (!sail_is_dir(full_path_to_lib)) {
         SAIL_LOG_DEBUG("Optional DLL directory '%s' doesn't exist, so not loading DLLs from it", full_path_to_lib);
-        free(full_path_to_lib);
+        sail_free(full_path_to_lib);
         return 0;
     }
 
@@ -142,24 +142,24 @@ static sail_error_t update_lib_path(void) {
 
     wchar_t *full_path_to_lib_w;
     SAIL_TRY_OR_CLEANUP(sail_to_wchar(full_path_to_lib, &full_path_to_lib_w),
-                        free(full_path_to_lib));
+                        sail_free(full_path_to_lib));
 
     if (!AddDllDirectory(full_path_to_lib_w)) {
         SAIL_LOG_ERROR("Failed to update library search path with '%s'. Error: %d", full_path_to_lib, GetLastError());
-        free(full_path_to_lib_w);
-        free(full_path_to_lib);
+        sail_free(full_path_to_lib_w);
+        sail_free(full_path_to_lib);
         return SAIL_ENV_UPDATE_FAILED;
     }
 
-    free(full_path_to_lib_w);
-    free(full_path_to_lib);
+    sail_free(full_path_to_lib_w);
+    sail_free(full_path_to_lib);
 #else
     char *full_path_to_lib;
     SAIL_TRY(sail_concat(&full_path_to_lib, 2, plugs_path, "/lib"));
 
     if (!sail_is_dir(full_path_to_lib)) {
         SAIL_LOG_DEBUG("Optional LIB directory '%s' doesn't exist, so not updating LD_LIBRARY_PATH with it", full_path_to_lib);
-        free(full_path_to_lib);
+        sail_free(full_path_to_lib);
         return 0;
     }
 
@@ -168,22 +168,22 @@ static sail_error_t update_lib_path(void) {
 
     if (env == NULL) {
         SAIL_TRY_OR_CLEANUP(sail_strdup(full_path_to_lib, &combined_ld_library_path),
-                            free(full_path_to_lib));
+                            sail_free(full_path_to_lib));
     } else {
         SAIL_TRY_OR_CLEANUP(sail_concat(&combined_ld_library_path, 3, env, ":", full_path_to_lib),
-                            free(full_path_to_lib));
+                            sail_free(full_path_to_lib));
     }
 
-    free(full_path_to_lib);
+    sail_free(full_path_to_lib);
     SAIL_LOG_DEBUG("Set LD_LIBRARY_PATH to '%s'", combined_ld_library_path);
 
     if (setenv("LD_LIBRARY_PATH", combined_ld_library_path, true) != 0) {
         SAIL_LOG_ERROR("Failed to update library search path: %s", strerror(errno));
-        free(combined_ld_library_path);
+        sail_free(combined_ld_library_path);
         return SAIL_ENV_UPDATE_FAILED;
     }
 
-    free(combined_ld_library_path);
+    sail_free(combined_ld_library_path);
 #endif
 
     return 0;
@@ -237,12 +237,12 @@ static sail_error_t build_plugin_from_plugin_info(const char *plugin_info_full_p
 
     /* Parse plugin info. */
     SAIL_TRY_OR_CLEANUP(alloc_plugin_info_node(plugin_info_node),
-                        free(plugin_full_path));
+                        sail_free(plugin_full_path));
 
     struct sail_plugin_info *plugin_info;
     SAIL_TRY_OR_CLEANUP(plugin_read_info(plugin_info_full_path, &plugin_info),
                         destroy_plugin_info_node(*plugin_info_node),
-                        free(plugin_full_path));
+                        sail_free(plugin_full_path));
 
     /* Save the parsed plugin info into the SAIL context. */
     (*plugin_info_node)->plugin_info = plugin_info;
@@ -265,7 +265,7 @@ static sail_error_t sail_init_impl(struct sail_context **context, int flags) {
     (*context)->plugin_info_node = NULL;
 
     SAIL_TRY_OR_CLEANUP(update_lib_path(),
-                        /* cleanup */ free(*context));
+                        /* cleanup */ sail_free(*context));
 
     const char *plugs_path = plugins_path();
 
@@ -282,7 +282,7 @@ static sail_error_t sail_init_impl(struct sail_context **context, int flags) {
 
     char *plugs_path_with_mask;
     SAIL_TRY_OR_CLEANUP(sail_malloc(&plugs_path_with_mask, plugs_path_with_mask_length),
-                        /* cleanup */ free(*context));
+                        /* cleanup */ sail_free(*context));
 
     strcpy_s(plugs_path_with_mask, plugs_path_with_mask_length, plugs_path);
     strcat_s(plugs_path_with_mask, plugs_path_with_mask_length, plugs_info_mask);
@@ -292,8 +292,8 @@ static sail_error_t sail_init_impl(struct sail_context **context, int flags) {
 
     if (hFind == INVALID_HANDLE_VALUE) {
         SAIL_LOG_ERROR("Failed to list files in '%s'. Error: %d", plugs_path, GetLastError());
-        free(plugs_path_with_mask);
-        free(*context);
+        sail_free(plugs_path_with_mask);
+        sail_free(*context);
         return SAIL_DIR_OPEN_ERROR;
     }
 
@@ -312,21 +312,21 @@ static sail_error_t sail_init_impl(struct sail_context **context, int flags) {
             last_plugin_info_node = &plugin_info_node->next;
         }
 
-        free(full_path);
+        sail_free(full_path);
     } while (FindNextFile(hFind, &data));
 
     if (GetLastError() != ERROR_NO_MORE_FILES) {
         SAIL_LOG_ERROR("Failed to list files in '%s'. Error: %d. Some plugins may be ignored", plugs_path, GetLastError());
     }
 
-    free(plugs_path_with_mask);
+    sail_free(plugs_path_with_mask);
     FindClose(hFind);
 #else
     DIR *d = opendir(plugs_path);
 
     if (d == NULL) {
         SAIL_LOG_ERROR("Failed to list files in '%s': %s", plugs_path, strerror(errno));
-        free(*context);
+        sail_free(*context);
         return SAIL_DIR_OPEN_ERROR;
     }
 
@@ -355,7 +355,7 @@ static sail_error_t sail_init_impl(struct sail_context **context, int flags) {
             }
         }
 
-        free(full_path);
+        sail_free(full_path);
     }
 
     closedir(d);
@@ -420,7 +420,7 @@ void sail_finish(struct sail_context *context) {
 
     destroy_plugin_info_node_chain(context->plugin_info_node);
 
-    free(context);
+    sail_free(context);
 }
 
 const struct sail_plugin_info_node* sail_plugin_info_list(const struct sail_context *context) {
@@ -560,7 +560,7 @@ sail_error_t sail_plugin_info_from_extension(const char *extension, const struct
 
         while (string_node != NULL) {
             if (strcmp(string_node->value, extension_copy) == 0) {
-                free(extension_copy);
+                sail_free(extension_copy);
                 *plugin_info = node->plugin_info;
                 SAIL_LOG_DEBUG("Found plugin info: '%s'", (*plugin_info)->name);
                 return 0;
@@ -572,7 +572,7 @@ sail_error_t sail_plugin_info_from_extension(const char *extension, const struct
         node = node->next;
     }
 
-    free(extension_copy);
+    sail_free(extension_copy);
     return SAIL_PLUGIN_NOT_FOUND;
 }
 
@@ -597,7 +597,7 @@ sail_error_t sail_plugin_info_from_mime_type(const struct sail_context *context,
 
         while (string_node != NULL) {
             if (strcmp(string_node->value, mime_type_copy) == 0) {
-                free(mime_type_copy);
+                sail_free(mime_type_copy);
                 *plugin_info = node->plugin_info;
                 SAIL_LOG_DEBUG("Found plugin info: '%s'", (*plugin_info)->name);
                 return 0;
@@ -609,7 +609,7 @@ sail_error_t sail_plugin_info_from_mime_type(const struct sail_context *context,
         node = node->next;
     }
 
-    free(mime_type_copy);
+    sail_free(mime_type_copy);
     return SAIL_PLUGIN_NOT_FOUND;
 }
 

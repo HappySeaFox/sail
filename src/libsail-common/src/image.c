@@ -58,14 +58,14 @@ void sail_destroy_image(struct sail_image *image) {
         return;
     }
 
-    free(image->pixels);
+    sail_free(image->pixels);
 
     sail_destroy_palette(image->palette);
     sail_destroy_meta_entry_node_chain(image->meta_entry_node);
     sail_destroy_iccp(image->iccp);
     sail_destroy_source_image(image->source_image);
 
-    free(image);
+    sail_free(image);
 }
 
 sail_error_t sail_copy_image(const struct sail_image *source, struct sail_image **target) {

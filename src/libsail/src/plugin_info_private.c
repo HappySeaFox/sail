@@ -50,8 +50,8 @@ static void destroy_string_node(struct sail_string_node *string_node) {
         return;
     }
 
-    free(string_node->value);
-    free(string_node);
+    sail_free(string_node->value);
+    sail_free(string_node);
 }
 
 static void destroy_string_node_chain(struct sail_string_node *string_node) {
@@ -373,10 +373,10 @@ static void destroy_plugin_info(struct sail_plugin_info *plugin_info) {
         return;
     }
 
-    free(plugin_info->path);
-    free(plugin_info->version);
-    free(plugin_info->name);
-    free(plugin_info->description);
+    sail_free(plugin_info->path);
+    sail_free(plugin_info->version);
+    sail_free(plugin_info->name);
+    sail_free(plugin_info->description);
 
     destroy_string_node_chain(plugin_info->magic_number_node);
     destroy_string_node_chain(plugin_info->extension_node);
@@ -385,7 +385,7 @@ static void destroy_plugin_info(struct sail_plugin_info *plugin_info) {
     sail_destroy_read_features(plugin_info->read_features);
     sail_destroy_write_features(plugin_info->write_features);
 
-    free(plugin_info);
+    sail_free(plugin_info);
 }
 
 /*
@@ -412,7 +412,7 @@ void destroy_plugin_info_node(struct sail_plugin_info_node *plugin_info_node) {
     destroy_plugin_info(plugin_info_node->plugin_info);
     destroy_plugin(plugin_info_node->plugin);
 
-    free(plugin_info_node);
+    sail_free(plugin_info_node);
 }
 
 void destroy_plugin_info_node_chain(struct sail_plugin_info_node *plugin_info_node) {

@@ -46,8 +46,8 @@ void sail_destroy_pixel_formats_mapping_node(struct sail_pixel_formats_mapping_n
         return;
     }
 
-    free(node->output_pixel_formats);
-    free(node);
+    sail_free(node->output_pixel_formats);
+    sail_free(node);
 }
 
 void sail_destroy_pixel_formats_mapping_node_chain(struct sail_pixel_formats_mapping_node *node) {

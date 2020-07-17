@@ -44,7 +44,7 @@ public:
 
     ~pimpl()
     {
-        free(iccp.data);
+        sail_free(iccp.data);
     }
 
     sail_iccp iccp;
@@ -90,7 +90,7 @@ unsigned iccp::data_length() const
 
 iccp& iccp::with_data(const void *data, unsigned data_length)
 {
-    free(d->iccp.data);
+    sail_free(d->iccp.data);
 
     d->iccp.data        = nullptr;
     d->iccp.data_length = 0;

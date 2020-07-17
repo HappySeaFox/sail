@@ -498,8 +498,8 @@ SAIL_EXPORT sail_error_t sail_plugin_read_finish_v3(void **state, struct sail_io
     *state = NULL;
 
 #ifdef PNG_APNG_SUPPORTED
-    free(png_state->temp_scanline);
-    free(png_state->scanline_for_skipping);
+    sail_free(png_state->temp_scanline);
+    sail_free(png_state->scanline_for_skipping);
     destroy_rows(&png_state->prev, png_state->first_image->height);
 #endif
 
@@ -509,7 +509,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_finish_v3(void **state, struct sail_io
 
     if (png_state->png_ptr != NULL) {
         if (setjmp(png_jmpbuf(png_state->png_ptr))) {
-            free(png_state);
+            sail_free(png_state);
             return SAIL_UNDERLYING_CODEC_ERROR;
         }
     }
@@ -518,7 +518,7 @@ SAIL_EXPORT sail_error_t sail_plugin_read_finish_v3(void **state, struct sail_io
         png_destroy_read_struct(&png_state->png_ptr, &png_state->info_ptr, NULL);
     }
 
-    free(png_state);
+    sail_free(png_state);
 
     return 0;
 }
@@ -733,7 +733,7 @@ SAIL_EXPORT sail_error_t sail_plugin_write_finish_v3(void **state, struct sail_i
     /* Error handling setup. */
     if (png_state->png_ptr != NULL) {
         if (setjmp(png_jmpbuf(png_state->png_ptr))) {
-            free(png_state);
+            sail_free(png_state);
             return SAIL_UNDERLYING_CODEC_ERROR;
         }
     }
@@ -746,7 +746,7 @@ SAIL_EXPORT sail_error_t sail_plugin_write_finish_v3(void **state, struct sail_i
         png_destroy_write_struct(&png_state->png_ptr, &png_state->info_ptr);
     }
 
-    free(png_state);
+    sail_free(png_state);
 
     return 0;
 }

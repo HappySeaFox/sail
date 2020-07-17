@@ -46,6 +46,6 @@ void sail_destroy_read_features(struct sail_read_features *read_features) {
         return;
     }
 
-    free(read_features->output_pixel_formats);
-    free(read_features);
+    sail_free(read_features->output_pixel_formats);
+    sail_free(read_features);
 }

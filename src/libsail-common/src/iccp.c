@@ -60,8 +60,8 @@ void sail_destroy_iccp(struct sail_iccp *iccp) {
         return;
     }
 
-    free(iccp->data);
-    free(iccp);
+    sail_free(iccp->data);
+    sail_free(iccp);
 }
 
 sail_error_t sail_copy_iccp(const struct sail_iccp *source_iccp, struct sail_iccp **target_iccp) {

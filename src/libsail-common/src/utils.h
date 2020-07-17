@@ -74,7 +74,7 @@ SAIL_EXPORT void sail_to_lower(char *str);
 
 /*
  * Converts the specified char* string into a wchar_t* string.
- * The assigned output string MUST be destroyed later with free().
+ * The assigned output string MUST be destroyed later with sail_free().
  *
  * Returns 0 on success or sail_error_t on error.
  */

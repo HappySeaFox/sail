@@ -58,5 +58,5 @@ void sail_destroy_io(struct sail_io *io) {
                             /* on error */ sail_print_errno("Failed to close the I/O stream: %s"));
     }
 
-    free(io);
+    sail_free(io);
 }

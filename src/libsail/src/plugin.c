@@ -133,10 +133,10 @@ void destroy_plugin(struct sail_plugin *plugin) {
     }
 
     if (plugin->layout == SAIL_PLUGIN_LAYOUT_V3) {
-        free(plugin->v3);
+        sail_free(plugin->v3);
     } else {
         SAIL_LOG_WARNING("Don't know how to destroy plugin interface version %d", plugin->layout);
     }
 
-    free(plugin);
+    sail_free(plugin);
 }

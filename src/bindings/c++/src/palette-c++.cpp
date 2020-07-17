@@ -45,7 +45,7 @@ public:
 
     ~pimpl()
     {
-        free(data);
+        sail_free(data);
     }
 
     SailPixelFormat pixel_format;
@@ -99,7 +99,7 @@ unsigned palette::color_count() const
 
 palette& palette::with_data(SailPixelFormat pixel_format, const void *data, unsigned color_count)
 {
-    free(d->data);
+    sail_free(d->data);
 
     d->data         = nullptr;
     d->pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;

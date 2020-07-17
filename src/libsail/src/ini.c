@@ -28,6 +28,9 @@ https://github.com/benhoyt/inih
 #define MAX_SECTION 50
 #define MAX_NAME 50
 
+/* sail-common. */
+#include "sail-common.h"
+
 /* Used by ini_parse_string() to keep track of string parsing state. */
 typedef struct {
     const char* ptr;
@@ -106,10 +109,8 @@ int ini_parse_stream(ini_reader reader, void* stream, ini_handler handler,
     int error = 0;
 
 #if !INI_USE_STACK
-    line = (char*)malloc(INI_INITIAL_ALLOC);
-    if (!line) {
-        return -2;
-    }
+    SAIL_TRY_OR_EXECUTE(sail_malloc(&line, INI_INITIAL_ALLOC),
+                        /* on error */ return -2);
 #endif
 
 #if INI_HANDLER_LINENO
@@ -126,11 +127,8 @@ int ini_parse_stream(ini_reader reader, void* stream, ini_handler handler,
             max_line *= 2;
             if (max_line > INI_MAX_LINE)
                 max_line = INI_MAX_LINE;
-            new_line = realloc(line, max_line);
-            if (!new_line) {
-                free(line);
-                return -2;
-            }
+            SAIL_TRY_OR_EXECUTE(sail_realloc(&new_line, line, max_line),
+                                /* on error */ sail_free(line), return -2);
             line = new_line;
             if (reader(line + offset, (int)(max_line - offset), stream) == NULL)
                 break;
@@ -220,7 +218,7 @@ int ini_parse_stream(ini_reader reader, void* stream, ini_handler handler,
     }
 
 #if !INI_USE_STACK
-    free(line);
+    sail_free(line);
 #endif
 
     return error;

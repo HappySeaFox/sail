@@ -151,12 +151,12 @@ sail_error_t sail_to_wchar(const char *input, wchar_t **output) {
     size_t ret;
 
     if (mbstowcs_s(&ret, *output, length+1, input, length) != 0) {
-        free(*output);
+        sail_free(*output);
         return SAIL_INVALID_ARGUMENT;
     }
 #else
     if (mbstowcs(*output, input, length) == (size_t)-1) {
-        free(*output);
+        sail_free(*output);
         return SAIL_INVALID_ARGUMENT;
     }
 #endif

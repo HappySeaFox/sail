@@ -45,7 +45,7 @@ void sail_destroy_read_options(struct sail_read_options *read_options) {
         return;
     }
 
-    free(read_options);
+    sail_free(read_options);
 }
 
 sail_error_t sail_read_options_from_features(const struct sail_read_features *read_features, struct sail_read_options *read_options) {

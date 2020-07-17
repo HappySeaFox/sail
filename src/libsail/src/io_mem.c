@@ -184,7 +184,7 @@ static sail_error_t io_mem_close(void *stream) {
 
     SAIL_CHECK_STREAM_PTR(stream);
 
-    free(stream);
+    sail_free(stream);
 
     return 0;
 }

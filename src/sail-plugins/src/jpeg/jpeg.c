@@ -315,17 +315,17 @@ SAIL_EXPORT sail_error_t sail_plugin_read_finish_v3(void **state, struct sail_io
     *state = NULL;
 
     sail_destroy_read_options(jpeg_state->read_options);
-    free(jpeg_state->extra_scan_line);
+    sail_free(jpeg_state->extra_scan_line);
 
     if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0) {
-        free(jpeg_state);
+        sail_free(jpeg_state);
         return SAIL_UNDERLYING_CODEC_ERROR;
     }
 
     jpeg_abort_decompress(&jpeg_state->decompress_context);
     jpeg_destroy_decompress(&jpeg_state->decompress_context);
 
-    free(jpeg_state);
+    sail_free(jpeg_state);
 
     return 0;
 }
@@ -504,17 +504,17 @@ SAIL_EXPORT sail_error_t sail_plugin_write_finish_v3(void **state, struct sail_i
     *state = NULL;
 
     sail_destroy_write_options(jpeg_state->write_options);
-    free(jpeg_state->extra_scan_line);
+    sail_free(jpeg_state->extra_scan_line);
 
     if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0) {
-        free(jpeg_state);
+        sail_free(jpeg_state);
         return SAIL_UNDERLYING_CODEC_ERROR;
     }
 
     jpeg_finish_compress(&jpeg_state->compress_context);
     jpeg_destroy_compress(&jpeg_state->compress_context);
 
-    free(jpeg_state);
+    sail_free(jpeg_state);
 
     return 0;
 }

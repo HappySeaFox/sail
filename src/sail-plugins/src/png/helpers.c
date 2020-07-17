@@ -406,7 +406,7 @@ sail_error_t skip_hidden_frame(unsigned bytes_per_line, unsigned height, png_str
         png_read_row(png_ptr, (png_bytep)(*row), NULL);
     }
 
-    free(*row);
+    sail_free(*row);
     *row = NULL;
 
     return 0;
@@ -439,10 +439,10 @@ void destroy_rows(png_bytep **A, unsigned height) {
     }
 
     for (unsigned row = 0; row < height; row++) {
-        free((*A)[row]);
+        sail_free((*A)[row]);
     }
 
-    free(*A);
+    sail_free(*A);
     *A = NULL;
 }
 

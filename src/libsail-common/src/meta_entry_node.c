@@ -45,9 +45,9 @@ void sail_destroy_meta_entry_node(struct sail_meta_entry_node *node) {
         return;
     }
 
-    free(node->key);
-    free(node->value);
-    free(node);
+    sail_free(node->key);
+    sail_free(node->value);
+    sail_free(node);
 }
 
 sail_error_t sail_copy_meta_entry_node(struct sail_meta_entry_node *source, struct sail_meta_entry_node **target) {

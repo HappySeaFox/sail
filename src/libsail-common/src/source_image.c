@@ -48,7 +48,7 @@ void sail_destroy_source_image(struct sail_source_image *source_image) {
         return;
     }
 
-    free(source_image);
+    sail_free(source_image);
 }
 
 sail_error_t sail_copy_source_image(const struct sail_source_image *source, struct sail_source_image **target) {

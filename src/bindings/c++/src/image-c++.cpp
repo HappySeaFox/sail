@@ -52,7 +52,7 @@ public:
     ~pimpl()
     {
         if (!shallow_pixels) {
-            free(pixels);
+            sail_free(pixels);
         }
     }
 
@@ -243,7 +243,7 @@ image& image::with_pixels(const void *pixels)
 
 image& image::with_pixels(const void *pixels, unsigned pixels_size)
 {
-    free(d->pixels);
+    sail_free(d->pixels);
 
     d->pixels         = nullptr;
     d->pixels_size    = 0;
@@ -275,7 +275,7 @@ image& image::with_shallow_pixels(void *pixels)
 
 image& image::with_shallow_pixels(void *pixels, unsigned pixels_size)
 {
-    free(d->pixels);
+    sail_free(d->pixels);
 
     d->pixels         = nullptr;
     d->pixels_size    = 0;
@@ -412,7 +412,7 @@ sail_error_t image::transfer_pixels_pointer(const sail_image *sail_image)
 {
     SAIL_CHECK_IMAGE_PTR(sail_image);
 
-    free(d->pixels);
+    sail_free(d->pixels);
 
     d->pixels         = nullptr;
     d->pixels_size    = 0;

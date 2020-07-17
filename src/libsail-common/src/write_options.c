@@ -47,7 +47,7 @@ void sail_destroy_write_options(struct sail_write_options *write_options) {
         return;
     }
 
-    free(write_options);
+    sail_free(write_options);
 }
 
 sail_error_t sail_write_options_from_features(const struct sail_write_features *write_features, struct sail_write_options *write_options) {

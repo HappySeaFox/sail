@@ -46,8 +46,8 @@ void sail_destroy_palette(struct sail_palette *palette) {
         return;
     }
 
-    free(palette->data);
-    free(palette);
+    sail_free(palette->data);
+    sail_free(palette);
 }
 
 sail_error_t sail_copy_palette(const struct sail_palette *source_palette, struct sail_palette **target_palette) {
