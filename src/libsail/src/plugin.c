@@ -85,7 +85,7 @@ sail_error_t alloc_plugin(const struct sail_plugin_info *plugin_info, struct sai
         SAIL_LOG_ERROR("Failed to resolve '%s' in '%s': %s", #symbol, plugin_info->path, dlerror())
 #endif
 
-    #define SAIL_RESOLVE(target, handle, symbol)                 \
+#define SAIL_RESOLVE(target, handle, symbol)                     \
     do {                                                         \
         target = (symbol##_t)SAIL_RESOLVE_FUNC(handle, #symbol); \
                                                                  \
