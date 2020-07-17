@@ -240,12 +240,8 @@ sail_error_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffer
     if (qimage.format() == QImage::Format_Indexed8) {
         const QVector<QRgb> colorTable = qimage.colorTable();
 
-        unsigned char *rgbData = reinterpret_cast<unsigned char *>(malloc(3 * colorTable.size()));
-        unsigned char *rgbDataStart = rgbData;
-
-        if (rgbData == nullptr) {
-            return SAIL_MEMORY_ALLOCATION_FAILED;
-        }
+        unsigned char *rgbData = new unsigned char [3 * colorTable.size()];
+        const unsigned char * const rgbDataStart = rgbData;
 
         for(QRgb rgb : colorTable) {
             *rgbData++ = qRed(rgb);
@@ -255,7 +251,7 @@ sail_error_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffer
 
         palette.with_data(SAIL_PIXEL_FORMAT_BPP24_RGB, rgbDataStart, colorTable.size());
 
-        free(rgbDataStart);
+        delete [] rgbDataStart;
     }
 
     // Create a new image to be passed into the SAIL writing functions.
