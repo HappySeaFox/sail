@@ -1,6 +1,6 @@
 # SAIL: Squirrel Abstract Image Library
 
-SAIL is a fast and lightweight cross-platform image decoding and encoding library providing multi-leveled APIs,
+SAIL is a fast and lightweight cross-platform image decoding and encoding library providing rich APIs,
 from one-liners to complex use cases with custom I/O sources. :sailboat:
 
 SAIL is a rebranded ksquirrel-libs rewritten in C without using any third-party libraries (except for codecs),
