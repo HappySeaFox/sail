@@ -45,7 +45,7 @@ public:
 
     ~pimpl()
     {
-        delete [] data;
+        free(data);
     }
 
     SailPixelFormat pixel_format;
@@ -99,7 +99,7 @@ unsigned palette::color_count() const
 
 palette& palette::with_data(SailPixelFormat pixel_format, const void *data, unsigned color_count)
 {
-    delete [] d->data;
+    free(d->data);
 
     d->data         = nullptr;
     d->pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;
@@ -125,7 +125,7 @@ sail_error_t palette::to_sail_palette(sail_palette *pal) const
 {
     SAIL_CHECK_PALETTE_PTR(pal);
 
-    pal->data = new char [d->palette_size];
+    SAIL_TRY(sail_malloc(&pal->data, d->palette_size));
 
     memcpy(pal->data, d->data, d->palette_size);
 
@@ -142,7 +142,7 @@ sail_error_t palette::copy(SailPixelFormat pixel_format, const void *data, unsig
 
     d->palette_size = color_count * bits_per_pixel / 8;
 
-    d->data = new char [d->palette_size];
+    SAIL_TRY(sail_malloc(&d->data, d->palette_size));
 
     d->pixel_format = pixel_format;
     d->color_count  = color_count;
