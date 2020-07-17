@@ -38,16 +38,16 @@ class SAIL_HIDDEN iccp::pimpl
 public:
     pimpl()
     {
-        sail_iccp.data        = nullptr;
-        sail_iccp.data_length = 0;
+        iccp.data        = nullptr;
+        iccp.data_length = 0;
     }
 
     ~pimpl()
     {
-        free(sail_iccp.data);
+        free(iccp.data);
     }
 
-    sail_iccp sail_iccp;
+    sail_iccp iccp;
 };
 
 iccp::iccp()
@@ -75,36 +75,36 @@ iccp::~iccp()
 
 bool iccp::is_valid() const
 {
-    return d->sail_iccp.data != nullptr && d->sail_iccp.data_length > 0;
+    return d->iccp.data != nullptr && d->iccp.data_length > 0;
 }
 
 const void* iccp::data() const
 {
-    return d->sail_iccp.data;
+    return d->iccp.data;
 }
 
 unsigned iccp::data_length() const
 {
-    return d->sail_iccp.data_length;
+    return d->iccp.data_length;
 }
 
 iccp& iccp::with_data(const void *data, unsigned data_length)
 {
-    free(d->sail_iccp.data);
+    free(d->iccp.data);
 
-    d->sail_iccp.data        = nullptr;
-    d->sail_iccp.data_length = 0;
+    d->iccp.data        = nullptr;
+    d->iccp.data_length = 0;
 
     if (data == nullptr || data_length == 0) {
         return *this;
     }
 
-    SAIL_TRY_OR_EXECUTE(sail_malloc(&d->sail_iccp.data, data_length),
+    SAIL_TRY_OR_EXECUTE(sail_malloc(&d->iccp.data, data_length),
                         /* on error */ return *this);
 
-    d->sail_iccp.data_length = data_length;
+    d->iccp.data_length = data_length;
 
-    memcpy(d->sail_iccp.data, data, data_length);
+    memcpy(d->iccp.data, data, data_length);
 
     return *this;
 }
@@ -124,10 +124,10 @@ sail_error_t iccp::to_sail_iccp(sail_iccp *ic) const
 {
     SAIL_CHECK_ICCP_PTR(ic);
 
-    SAIL_TRY(sail_malloc(&ic->data, d->sail_iccp.data_length));
-    memcpy(ic->data, d->sail_iccp.data, d->sail_iccp.data_length);
+    SAIL_TRY(sail_malloc(&ic->data, d->iccp.data_length));
+    memcpy(ic->data, d->iccp.data, d->iccp.data_length);
 
-    ic->data_length = d->sail_iccp.data_length;
+    ic->data_length = d->iccp.data_length;
 
     return 0;
 }
