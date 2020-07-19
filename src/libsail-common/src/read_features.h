@@ -59,7 +59,7 @@ struct sail_read_features {
      * Output pixel format to use by default when no specific output pixel format was requested by a user.
      * It's always BPP32-RGBA for image formats with transparency support and BPP24-RGB otherwise.
      */
-    enum SailPixelFormat preferred_output_pixel_format;
+    enum SailPixelFormat default_output_pixel_format;
 
     /* Supported or-ed features of reading operations. See SailPluginFeature. */
     int features;

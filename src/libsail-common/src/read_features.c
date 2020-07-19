@@ -36,10 +36,10 @@ sail_error_t sail_alloc_read_features(struct sail_read_features **read_features)
     SAIL_TRY(sail_malloc(&ptr, sizeof(struct sail_read_features)));
     *read_features = ptr;
 
-    (*read_features)->output_pixel_formats          = NULL;
-    (*read_features)->output_pixel_formats_length   = 0;
-    (*read_features)->preferred_output_pixel_format = 0;
-    (*read_features)->features                      = 0;
+    (*read_features)->output_pixel_formats        = NULL;
+    (*read_features)->output_pixel_formats_length = 0;
+    (*read_features)->default_output_pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;
+    (*read_features)->features                    = 0;
 
     return 0;
 }

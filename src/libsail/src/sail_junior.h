@@ -98,7 +98,7 @@ SAIL_EXPORT sail_error_t sail_read_mem(const void *buffer, size_t buffer_length,
  * Context is optional and can be NULL. SAIL allocates a thread-local static context when it's NULL.
  * ASAN may report a memory leak in this case, which is OK.
  *
- * Outputs pixels in the pixel format as specified in sail_write_features.preferred_output_pixel_format.
+ * Outputs pixels in the pixel format as specified in sail_write_features.default_output_pixel_format.
  *
  * Typical usage: This is a standalone function that could be called at any time.
  *
@@ -112,7 +112,7 @@ SAIL_EXPORT sail_error_t sail_write_path(const char *path, struct sail_context *
  * Context is optional and can be NULL. SAIL allocates a thread-local static context when it's NULL.
  * ASAN may report a memory leak in this case, which is OK.
  *
- * Outputs pixels in the pixel format as specified in sail_write_features.preferred_output_pixel_format.
+ * Outputs pixels in the pixel format as specified in sail_write_features.default_output_pixel_format.
  *
  * Saves the number of bytes written into the 'written' parameter if it's not NULL.
  *

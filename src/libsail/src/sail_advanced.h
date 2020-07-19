@@ -153,7 +153,7 @@ SAIL_EXPORT sail_error_t sail_stop_reading(void *state);
  * with a specific codec. If not, just pass NULL.
  *
  * The subsequent calls to sail_write_next_frame() output pixels in pixel format as specified
- * in sail_write_features.preferred_output_pixel_format.
+ * in sail_write_features.default_output_pixel_format.
  *
  * Typical usage: sail_start_writing()    ->
  *                sail_write_next_frame() ->
@@ -187,7 +187,7 @@ SAIL_EXPORT sail_error_t sail_start_writing_file(const char *path, struct sail_c
  * Starts writing the specified memory buffer.
  *
  * The subsequent calls to sail_write_next_frame() output pixels in pixel format
- * as specified in sail_write_features.preferred_output_pixel_format.
+ * as specified in sail_write_features.default_output_pixel_format.
  *
  * Typical usage: sail_plugin_info_from_extension() ->
  *                sail_start_writing_mem()          ->

@@ -107,7 +107,7 @@ SAIL_EXPORT sail_error_t sail_start_reading_mem_with_options(const void *buffer,
  * The write options are deep copied.
  *
  * If write options is NULL, the subsequent calls to sail_write_next_frame() output pixels in pixel format
- * as specified in sail_write_features.preferred_output_pixel_format.
+ * as specified in sail_write_features.default_output_pixel_format.
  *
  * Typical usage: sail_start_writing_file_with_options() ->
  *                sail_write_next_frame()                ->
@@ -135,7 +135,7 @@ SAIL_EXPORT sail_error_t sail_start_writing_file_with_options(const char *path, 
  * The write options are deep copied.
  *
  * If write options is NULL, the subsequent calls to sail_write_next_frame() output pixels in pixel format
- * as specified in sail_write_features.preferred_output_pixel_format.
+ * as specified in sail_write_features.default_output_pixel_format.
  *
  * Typical usage: sail_plugin_info_from_extension()     ->
  *                sail_start_writing_mem_with_options() ->

@@ -76,7 +76,7 @@ sail_error_t ReadOptions::init(const sail_read_features *read_features)
                                        /* user data */ read_features->output_pixel_formats[i]);
         }
 
-        SAIL_TRY(sail_pixel_format_to_string(read_features->preferred_output_pixel_format, &output_pixel_format_str));
+        SAIL_TRY(sail_pixel_format_to_string(read_features->default_output_pixel_format, &output_pixel_format_str));
         d->ui->comboColor->setCurrentText(output_pixel_format_str);
     }
 

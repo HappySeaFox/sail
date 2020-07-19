@@ -35,14 +35,14 @@ class SAIL_HIDDEN read_features::pimpl
 public:
     pimpl()
         : sail_read_features_c(nullptr)
-        , preferred_output_pixel_format(SAIL_PIXEL_FORMAT_UNKNOWN)
+        , default_output_pixel_format(SAIL_PIXEL_FORMAT_UNKNOWN)
         , features(0)
     {}
 
     const sail_read_features *sail_read_features_c;
 
     std::vector<SailPixelFormat> output_pixel_formats;
-    SailPixelFormat preferred_output_pixel_format;
+    SailPixelFormat default_output_pixel_format;
     int features;
 };
 
@@ -57,7 +57,7 @@ read_features& read_features::operator=(const read_features &rf)
     d->sail_read_features_c = rf.d->sail_read_features_c;
 
     with_output_pixel_formats(rf.output_pixel_formats())
-        .with_preferred_output_pixel_format(rf.preferred_output_pixel_format())
+        .with_default_output_pixel_format(rf.default_output_pixel_format())
         .with_features(rf.features());
 
     return *this;
@@ -73,9 +73,9 @@ const std::vector<SailPixelFormat>& read_features::output_pixel_formats() const
     return d->output_pixel_formats;
 }
 
-SailPixelFormat read_features::preferred_output_pixel_format() const
+SailPixelFormat read_features::default_output_pixel_format() const
 {
-    return d->preferred_output_pixel_format;
+    return d->default_output_pixel_format;
 }
 
 int read_features::features() const
@@ -125,7 +125,7 @@ read_features::read_features(const sail_read_features *rf)
     }
 
     with_output_pixel_formats(output_pixel_formats)
-        .with_preferred_output_pixel_format(rf->preferred_output_pixel_format)
+        .with_default_output_pixel_format(rf->default_output_pixel_format)
         .with_features(rf->features);
 }
 
@@ -135,9 +135,9 @@ read_features& read_features::with_output_pixel_formats(const std::vector<SailPi
     return *this;
 }
 
-read_features& read_features::with_preferred_output_pixel_format(SailPixelFormat preferred_output_pixel_format)
+read_features& read_features::with_default_output_pixel_format(SailPixelFormat default_output_pixel_format)
 {
-    d->preferred_output_pixel_format = preferred_output_pixel_format;
+    d->default_output_pixel_format = default_output_pixel_format;
     return *this;
 }
 

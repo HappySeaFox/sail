@@ -264,8 +264,8 @@ static sail_error_t inih_handler_sail_error(void *data, const char *section, con
                                                         &plugin_info->read_features->output_pixel_formats_length,
                                                         pixel_format_from_string),
                                 /* cleanup */ SAIL_LOG_ERROR("Failed to parse output pixel formats: '%s'", value));
-        } else if (strcmp(name, "preferred-output-pixel-format") == 0) {
-            SAIL_TRY_OR_CLEANUP(sail_pixel_format_from_string(value, &plugin_info->read_features->preferred_output_pixel_format),
+        } else if (strcmp(name, "default-output-pixel-format") == 0) {
+            SAIL_TRY_OR_CLEANUP(sail_pixel_format_from_string(value, &plugin_info->read_features->default_output_pixel_format),
                                 /* cleanup */ SAIL_LOG_ERROR("Failed to parse preferred output pixel format: '%s'", value));
         } else if (strcmp(name, "features") == 0) {
             SAIL_TRY_OR_CLEANUP(parse_flags(value, &plugin_info->read_features->features, plugin_feature_from_string),

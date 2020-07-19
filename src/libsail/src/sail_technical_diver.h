@@ -95,7 +95,7 @@ SAIL_EXPORT sail_error_t sail_start_reading_io_with_options(struct sail_io *io, 
  * Starts writing into the specified I/O stream.
  *
  * The subsequent calls to sail_write_next_frame() output pixels in pixel format as specified
- * in sail_write_features.preferred_output_pixel_format.
+ * in sail_write_features.default_output_pixel_format.
  *
  * Typical usage: sail_alloc_io()                   ->
  *                set I/O callbacks                 ->
@@ -119,7 +119,7 @@ SAIL_EXPORT sail_error_t sail_start_writing_io(struct sail_io *io, struct sail_c
  * just pass NULL. Plugin-specific defaults will be used in this case. The write options are deep copied.
  *
  * If write options is NULL, the subsequent calls to sail_write_next_frame() output pixels in pixel format
- * as specified in sail_write_features.preferred_output_pixel_format.
+ * as specified in sail_write_features.default_output_pixel_format.
  *
  * Typical usage: sail_alloc_io()                      ->
  *                set I/O callbacks                    ->
