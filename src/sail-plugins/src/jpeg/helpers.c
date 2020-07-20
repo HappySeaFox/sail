@@ -71,7 +71,7 @@ enum SailPixelFormat color_space_to_pixel_format(J_COLOR_SPACE color_space) {
     }
 }
 
-J_COLOR_SPACE pixel_format_to_color_space(int pixel_format) {
+J_COLOR_SPACE pixel_format_to_color_space(enum SailPixelFormat pixel_format) {
     switch (pixel_format) {
         case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE:  return JCS_GRAYSCALE;
 
@@ -93,7 +93,7 @@ J_COLOR_SPACE pixel_format_to_color_space(int pixel_format) {
     }
 }
 
-bool jpeg_supported_pixel_format(int pixel_format) {
+bool jpeg_supported_pixel_format(enum SailPixelFormat pixel_format) {
     switch (pixel_format) {
         case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE:
         case SAIL_PIXEL_FORMAT_BPP24_RGB:
