@@ -1,5 +1,7 @@
 ## Priority 1
 
+- Make the default output format BGRA
+
 - Read/write indexed PNGs with alpha
 
 - document c++ classes
