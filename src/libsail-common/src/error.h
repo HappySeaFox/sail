@@ -133,10 +133,10 @@ do {                                               \
     if (image == NULL) {                           \
         return SAIL_IMAGE_NULL_PTR;                \
     }                                              \
-    if (image->width <= 0 || image->height <= 0) { \
+    if (image->width == 0 || image->height == 0) { \
         return SAIL_INCORRECT_IMAGE_DIMENSIONS;    \
     }                                              \
-    if (image->bytes_per_line <= 0) {              \
+    if (image->bytes_per_line == 0) {              \
         return SAIL_INCORRECT_BYTES_PER_LINE;      \
     }                                              \
 } while(0)
