@@ -105,6 +105,27 @@ bool jpeg_supported_pixel_format(enum SailPixelFormat pixel_format) {
     }
 }
 
+sail_error_t auto_output_color_space(enum SailPixelFormat input_pixel_format, J_COLOR_SPACE *output_color_space) {
+
+    SAIL_CHECK_PTR(output_color_space);
+
+    switch (input_pixel_format) {
+
+        case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE: *output_color_space = JCS_GRAYSCALE; return 0;
+        case SAIL_PIXEL_FORMAT_BPP24_RGB:
+        case SAIL_PIXEL_FORMAT_BPP24_BGR:
+        case SAIL_PIXEL_FORMAT_BPP32_RGBA:
+        case SAIL_PIXEL_FORMAT_BPP32_BGRA:
+        case SAIL_PIXEL_FORMAT_BPP32_ABGR:
+        case SAIL_PIXEL_FORMAT_BPP32_ARGB:
+        case SAIL_PIXEL_FORMAT_BPP24_YCBCR:    *output_color_space = JCS_YCbCr;     return 0;
+        case SAIL_PIXEL_FORMAT_BPP32_CMYK:     *output_color_space = JCS_CMYK;      return 0;
+        case SAIL_PIXEL_FORMAT_BPP32_YCCK:     *output_color_space = JCS_YCCK;      return 0;
+
+        default: return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+    }
+}
+
 sail_error_t convert_cmyk(unsigned char *pixels_source, unsigned char *pixels_target, unsigned width, int target_pixel_format) {
     unsigned char C, M, Y, K;
 

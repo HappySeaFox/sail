@@ -546,8 +546,6 @@ SAIL_EXPORT sail_error_t sail_plugin_write_init_v3(struct sail_io *io, const str
     SAIL_TRY(sail_copy_write_options(write_options, &png_state->write_options));
 
     /* Sanity check. */
-    SAIL_TRY(supported_write_output_pixel_format(png_state->write_options->output_pixel_format));
-
     if (png_state->write_options->compression_type != 0) {
         return SAIL_UNSUPPORTED_COMPRESSION_TYPE;
     }
@@ -587,9 +585,6 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v3(void *state, struc
     }
 
     png_state->frame_written = true;
-
-    /* Sanity check. */
-    SAIL_TRY(supported_write_input_pixel_format(image->pixel_format));
 
     /* Error handling setup. */
     if (setjmp(png_jmpbuf(png_state->png_ptr))) {

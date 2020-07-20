@@ -49,10 +49,6 @@ SAIL_HIDDEN sail_error_t pixel_format_to_png_color_type(enum SailPixelFormat pix
 
 SAIL_HIDDEN sail_error_t supported_read_output_pixel_format(enum SailPixelFormat pixel_format);
 
-SAIL_HIDDEN sail_error_t supported_write_input_pixel_format(enum SailPixelFormat pixel_format);
-
-SAIL_HIDDEN sail_error_t supported_write_output_pixel_format(enum SailPixelFormat pixel_format);
-
 SAIL_HIDDEN sail_error_t read_png_text(png_structp png_ptr, png_infop info_ptr, struct sail_meta_entry_node **target_meta_entry_node);
 
 SAIL_HIDDEN sail_error_t write_png_text(png_structp png_ptr, png_infop info_ptr, const struct sail_meta_entry_node *meta_entry_node);

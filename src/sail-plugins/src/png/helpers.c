@@ -181,43 +181,6 @@ sail_error_t supported_read_output_pixel_format(enum SailPixelFormat pixel_forma
     return SAIL_UNSUPPORTED_PIXEL_FORMAT;
 }
 
-sail_error_t supported_write_input_pixel_format(enum SailPixelFormat pixel_format) {
-
-    switch (pixel_format) {
-        case SAIL_PIXEL_FORMAT_BPP1_INDEXED:
-        case SAIL_PIXEL_FORMAT_BPP2_INDEXED:
-        case SAIL_PIXEL_FORMAT_BPP4_INDEXED:
-        case SAIL_PIXEL_FORMAT_BPP8_INDEXED:
-        case SAIL_PIXEL_FORMAT_BPP24_RGB:
-        case SAIL_PIXEL_FORMAT_BPP24_BGR:
-        case SAIL_PIXEL_FORMAT_BPP48_RGB:
-        case SAIL_PIXEL_FORMAT_BPP48_BGR:
-        case SAIL_PIXEL_FORMAT_BPP32_RGBA:
-        case SAIL_PIXEL_FORMAT_BPP32_BGRA:
-        case SAIL_PIXEL_FORMAT_BPP32_ARGB:
-        case SAIL_PIXEL_FORMAT_BPP32_ABGR:
-        case SAIL_PIXEL_FORMAT_BPP64_RGBA:
-        case SAIL_PIXEL_FORMAT_BPP64_BGRA:
-        case SAIL_PIXEL_FORMAT_BPP64_ARGB:
-        case SAIL_PIXEL_FORMAT_BPP64_ABGR: {
-            return 0;
-        }
-    }
-
-    return SAIL_UNSUPPORTED_PIXEL_FORMAT;
-}
-
-sail_error_t supported_write_output_pixel_format(enum SailPixelFormat pixel_format) {
-
-    switch (pixel_format) {
-        case SAIL_PIXEL_FORMAT_SOURCE: {
-            return 0;
-        }
-    }
-
-    return SAIL_UNSUPPORTED_PIXEL_FORMAT;
-}
-
 sail_error_t read_png_text(png_structp png_ptr, png_infop info_ptr, struct sail_meta_entry_node **target_meta_entry_node) {
 
     SAIL_CHECK_PTR(png_ptr);

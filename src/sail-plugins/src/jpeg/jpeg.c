@@ -355,12 +355,6 @@ SAIL_EXPORT sail_error_t sail_plugin_write_init_v3(struct sail_io *io, const str
     SAIL_TRY(sail_copy_write_options(write_options, &jpeg_state->write_options));
 
     /* Sanity check. */
-    if (jpeg_state->write_options->output_pixel_format != SAIL_PIXEL_FORMAT_SOURCE) {
-        if (!jpeg_supported_pixel_format(jpeg_state->write_options->output_pixel_format)) {
-            return SAIL_UNSUPPORTED_PIXEL_FORMAT;
-        }
-    }
-
     if (jpeg_state->write_options->compression_type != 0) {
         return SAIL_UNSUPPORTED_COMPRESSION_TYPE;
     }
@@ -394,11 +388,6 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v3(void *state, struc
         return SAIL_NO_MORE_FRAMES;
     }
 
-    /* Sanity check. */
-    if (pixel_format_to_color_space(image->pixel_format) == JCS_UNKNOWN) {
-        return SAIL_UNSUPPORTED_PIXEL_FORMAT;
-    }
-
     jpeg_state->frame_written = true;
 
     /* Error handling setup. */
@@ -410,6 +399,7 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v3(void *state, struc
     unsigned bits_per_pixel;
     SAIL_TRY(sail_bits_per_pixel(image->pixel_format, &bits_per_pixel));
 
+    /* Initialize compression. */
     jpeg_state->compress_context.image_width = image->width;
     jpeg_state->compress_context.image_height = image->height;
     jpeg_state->compress_context.input_components = bits_per_pixel / 8;
@@ -417,24 +407,35 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v3(void *state, struc
 
     jpeg_set_defaults(&jpeg_state->compress_context);
 
+    /* Compute output pixel format. */
     if (jpeg_state->write_options->output_pixel_format == SAIL_PIXEL_FORMAT_SOURCE) {
+        if (!jpeg_supported_pixel_format(jpeg_state->write_options->output_pixel_format)) {
+            return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+        }
+
         jpeg_set_colorspace(&jpeg_state->compress_context, pixel_format_to_color_space(image->pixel_format));
+    } else if (jpeg_state->write_options->output_pixel_format == SAIL_PIXEL_FORMAT_AUTO) {
+        J_COLOR_SPACE output_color_space;
+        SAIL_TRY(auto_output_color_space(image->pixel_format, &output_color_space));
+
+        jpeg_set_colorspace(&jpeg_state->compress_context, output_color_space);
     } else {
         jpeg_set_colorspace(&jpeg_state->compress_context, pixel_format_to_color_space(jpeg_state->write_options->output_pixel_format));
     }
 
+    /* Compute image quality. */
     const int compression = (jpeg_state->write_options->compression < COMPRESSION_MIN ||
                                 jpeg_state->write_options->compression > COMPRESSION_MAX)
                             ? COMPRESSION_DEFAULT
                             : jpeg_state->write_options->compression;
-    jpeg_set_quality(&jpeg_state->compress_context, /* to quality */COMPRESSION_MAX-compression, true);
+    jpeg_set_quality(&jpeg_state->compress_context, /* to quality */ COMPRESSION_MAX-compression, true);
 
+    /* Start compression. */
     jpeg_start_compress(&jpeg_state->compress_context, true);
     jpeg_state->started_compress = true;
 
     /* Write meta info. */
     if (jpeg_state->write_options->io_options & SAIL_IO_OPTION_META_INFO && image->meta_entry_node != NULL) {
-
         struct sail_meta_entry_node *meta_entry_node = image->meta_entry_node;
 
         while (meta_entry_node != NULL) {
