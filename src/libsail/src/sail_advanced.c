@@ -99,6 +99,7 @@ sail_error_t sail_start_reading_mem(const void *buffer, size_t buffer_length, st
 sail_error_t sail_read_next_frame(void *state, struct sail_image **image) {
 
     SAIL_CHECK_STATE_PTR(state);
+    SAIL_CHECK_IMAGE_PTR(image);
 
     struct hidden_state *state_of_mind = (struct hidden_state *)state;
 
@@ -182,6 +183,7 @@ sail_error_t sail_start_writing_mem(void *buffer, size_t buffer_length, struct s
 sail_error_t sail_write_next_frame(void *state, const struct sail_image *image) {
 
     SAIL_CHECK_STATE_PTR(state);
+    SAIL_CHECK_IMAGE_PTR(image);
 
     struct hidden_state *state_of_mind = (struct hidden_state *)state;
 
