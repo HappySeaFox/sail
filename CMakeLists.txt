@@ -6,7 +6,7 @@ project(SAIL VERSION 0.9.0
 
 # Used only when SAIL_DEV is ON
 #
-set(SAIL_DEV_VERSION_SUFFIX "pre5")
+set(SAIL_DEV_VERSION_SUFFIX "pre6")
 
 include(GNUInstallDirs)
 include(CheckIncludeFiles)
