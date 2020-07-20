@@ -79,8 +79,7 @@ SAIL_EXPORT sail_error_t sail_probe_mem(const void *buffer, size_t buffer_length
  * Starts reading the specified image file. Pass plugin info if you would like to start reading
  * with a specific codec. If not, just pass NULL.
  *
- * The subsequent calls to sail_read_next_frame() output pixels in BPP32-RGBA pixel format for image
- * formats with transparency support and BPP24-RGB otherwise.
+ * The subsequent calls to sail_read_next_frame() output pixels in the BPP32-RGBA pixel format.
  *
  * Typical usage: sail_start_reading_file() ->
  *                sail_read_next_frame()    ->
@@ -113,8 +112,7 @@ SAIL_EXPORT sail_error_t sail_start_reading_file(const char *path, struct sail_c
 /*
  * Starts reading the specified memory buffer.
  *
- * The subsequent calls to sail_read_next_frame() output pixels in BPP32-RGBA
- * pixel format for image formats with transparency support and BPP24-RGB otherwise.
+ * The subsequent calls to sail_read_next_frame() output pixels in the BPP32-RGBA pixel format.
  *
  * Typical usage: sail_plugin_info_from_extension() ->
  *                sail_start_reading_mem()          ->

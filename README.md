@@ -28,8 +28,7 @@ Author: Dmitry Baryshev
 - Reading images from file, memory, and custom I/O streams
 - Writing images to file, memory, and custom I/O streams
 - Detecting image types by file path, file extension, and [magic numbers](https://en.wikipedia.org/wiki/File_format#Magic_number)
-- Reading operations are always able to output pixels in the `BPP24-RGB` and `BPP32-RGBA` formats.
-  Some image format plugins may output even more
+- Reading operations output `BPP32-RGBA` pixels by default
 - Most image format plugins are able to output the `SOURCE` pixel format for those who want
   to kick the hell out of images manually. For example, one may want to work with `CMYK` pixels in a print image
 - Read and write ICC profiles
@@ -109,9 +108,8 @@ SAIL provides four levels of APIs, depending on your needs. Let's have a quick l
 struct sail_image *image;
 
 /*
- * sail_read_path() reads the image and outputs pixels in BPP32-RGBA pixel format for image formats
- * with transparency support and BPP24-RGB otherwise. If you need to control output pixel
- * formats, consider switching to the deep diver API.
+ * sail_read_path() reads the image and outputs pixels in the BPP32-RGBA pixel format.
+ * If you need to control output pixel formats, consider switching to the deep diver API.
  */
 SAIL_TRY(sail_read_path(path, NULL, &image));
 
@@ -129,9 +127,8 @@ sail_destroy_image(image);
 sail::image_reader reader;
 sail::image image;
 
-// read() reads the image and outputs pixels in BPP32-RGBA pixel format for image formats
-// with transparency support and BPP24-RGB otherwise. If you need to control output pixel
-// formats, consider switching to the deep diver API.
+// read() reads the image and outputs pixels in the BPP32-RGBA pixel format.
+// If you need to control output pixel formats, consider switching to the deep diver API.
 //
 SAIL_TRY(reader.read(path, &image));
 

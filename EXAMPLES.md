@@ -49,8 +49,7 @@ SAIL provides 4 levels of APIs depending on your needs. Let's have a look at the
 struct sail_image *image;
 
 /*
- * sail_read_path() reads the image and outputs pixels in BPP32-RGBA pixel format for image formats
- * with transparency support and BPP24-RGB otherwise.
+ * sail_read_path() reads the image and outputs pixels in the BPP32-RGBA pixel format.
  */
 SAIL_TRY(sail_read_path(path,
                         NULL,
@@ -70,8 +69,7 @@ sail_destroy_image(image);
 sail::image_reader reader;
 sail::image image;
 
-// read() reads the image and outputs pixels in BPP32-RGBA pixel format for image formats
-// with transparency support and BPP24-RGB otherwise.
+// read() reads the image and outputs pixels in the BPP32-RGBA pixel format.
 //
 SAIL_TRY(reader.read(path, &image));
 
@@ -103,8 +101,7 @@ struct sail_image *image;
 
 /*
  * Starts reading the specified file.
- * The subsequent calls to sail_read_next_frame() will output pixels in BPP32-RGBA pixel format
- * for image formats with transparency support and BPP24-RGB otherwise.
+ * The subsequent calls to sail_read_next_frame() output pixels in the BPP32-RGBA pixel format.
  */
 SAIL_TRY_OR_CLEANUP(sail_start_reading_file(path, context, NULL, &state),
                     /* cleanup */ sail_stop_reading(state));
@@ -159,8 +156,7 @@ SAIL_AT_SCOPE_EXIT (
 );
 
 // Starts reading the specified file.
-// The subsequent calls to read_next_frame() will output pixels in BPP32-RGBA pixel format
-// for image formats with transparency support and BPP24-RGB otherwise.
+// The subsequent calls to read_next_frame() outputs pixels in the BPP32-RGBA pixel format.
 //
 SAIL_TRY(reader.start_reading(path));
 
@@ -168,8 +164,7 @@ SAIL_TRY(reader.start_reading(path));
 // reading frames till read_next_frame() returns 0. If no more frames are available,
 // it returns SAIL_NO_MORE_FRAMES.
 //
-// read_next_frame() outputs pixels in BPP32-RGBA pixel format for image formats
-// with transparency support and BPP24-RGB otherwise.
+// read_next_frame() outputs pixels in the BPP32-RGBA pixel format.
 //
 SAIL_TRY(reader.read_next_frame(&image));
 
@@ -243,7 +238,7 @@ sail_destroy_read_options(read_options);
  * reading frames till sail_read_next_frame() returns 0. If no more frames are available,
  * it returns SAIL_NO_MORE_FRAMES.
  *
- * sail_read_next_frame() outputs pixels in the requested pixel format (BPP24-RGB or BPP32-RGBA by default).
+ * sail_read_next_frame() outputs pixels in the requested pixel format (BPP32-RGBA by default).
  */
 SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, &image),
                     /* cleanup */ sail_stop_reading(state));
@@ -318,7 +313,7 @@ SAIL_TRY(reader.start_reading(buffer, buffer_length, plugin_info, read_options))
 // reading frames till read_next_frame() returns 0. If no more frames are available,
 // it returns SAIL_NO_MORE_FRAMES.
 //
-// read_next_frame() outputs pixels in the requested pixel format (BPP24-RGB or BPP32-RGBA by default).
+// read_next_frame() outputs pixels in the requested pixel format (BPP32-RGBA by default).
 //
 sail::image image;
 SAIL_TRY(reader.read_next_frame(&image));
@@ -430,7 +425,7 @@ sail_destroy_read_options(read_options);
  * reading frames till sail_read_next_frame() returns 0. If no more frames are available,
  * it returns SAIL_NO_MORE_FRAMES.
  *
- * sail_read_next_frame() outputs pixels in the requested pixel format (BPP24-RGB or BPP32-RGBA by default).
+ * sail_read_next_frame() outputs pixels in the requested pixel format (BPP32-RGBA by default).
  */
 SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, &image),
                     /* cleanup */ sail_stop_reading(state),
@@ -530,7 +525,7 @@ SAIL_TRY(reader.start_reading(io, plugin_info, read_options));
 // reading frames till read_next_frame() returns 0. If no more frames are available,
 // it returns SAIL_NO_MORE_FRAMES.
 //
-// read_next_frame() outputs pixels in the requested pixel format (BPP24-RGB or BPP32-RGBA by default).
+// read_next_frame() outputs pixels in the requested pixel format (BPP32-RGBA by default).
 //
 sail::image image;
 SAIL_TRY(reader.read_next_frame(&image));

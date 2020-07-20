@@ -67,8 +67,7 @@ SAIL_EXPORT sail_error_t sail_probe_path(const char *path, struct sail_context *
  * Context is optional and can be NULL. SAIL allocates a thread-local static context when it's NULL.
  * ASAN may report a memory leak in this case, which is OK.
  *
- * Outputs pixels in BPP32-RGBA pixel format for image formats with transparency support
- * and BPP24-RGB otherwise.
+ * Outputs pixels in the BPP32-RGBA pixel format.
  *
  * Typical usage: This is a standalone function that could be called at any time.
  *
@@ -83,8 +82,7 @@ SAIL_EXPORT sail_error_t sail_read_path(const char *path, struct sail_context *c
  * Context is optional and can be NULL. SAIL allocates a thread-local static context when it's NULL.
  * ASAN may report a memory leak in this case, which is OK.
  *
- * Outputs pixels in BPP32-RGBA pixel format for image formats with transparency support
- * and BPP24-RGB otherwise.
+ * Outputs pixels in the BPP32-RGBA pixel format.
  *
  * Typical usage: This is a standalone function that could be called at any time.
  *

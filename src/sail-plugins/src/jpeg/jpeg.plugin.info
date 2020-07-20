@@ -12,7 +12,7 @@ mime-types=image/jpeg
 [read-features]
 features=STATIC;META-INFO@PLUGIN_INFO_FEATURE_ICCP@
 output-pixel-formats=SOURCE;BPP24-RGB;BPP32-RGBA
-default-output-pixel-format=BPP24-RGB
+default-output-pixel-format=BPP32-RGBA
 
 [write-features]
 features=STATIC;META-INFO@PLUGIN_INFO_FEATURE_ICCP@

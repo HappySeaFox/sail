@@ -94,8 +94,7 @@ sail_error_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, QV
 
     /*
      * Starts reading the specified file.
-     * The subsequent calls to sail_read_next_frame() will output pixels in BPP32-RGBA pixel format for image formats
-     * with transparency support and BPP24-RGB otherwise.
+     * The subsequent calls to sail_read_next_frame() output pixels in the BPP32-RGBA pixel format.
      */
     SAIL_TRY_OR_CLEANUP(sail_start_reading_file(path.toLocal8Bit(), m_context, NULL, &state),
                         /* cleanup */ sail_stop_reading(state));
