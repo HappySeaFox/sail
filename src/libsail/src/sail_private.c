@@ -151,7 +151,7 @@ sail_error_t allowed_write_output_pixel_format(const struct sail_write_features 
 
     SAIL_CHECK_WRITE_FEATURES_PTR(write_features);
 
-    /* Plugins compute output pixel format automaticlly. */
+    /* Plugins compute output pixel format automatically. */
     if (output_pixel_format == SAIL_PIXEL_FORMAT_AUTO) {
         return 0;
     }
