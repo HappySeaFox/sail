@@ -114,7 +114,7 @@ sail_error_t auto_output_color_space(enum SailPixelFormat input_pixel_format, J_
     }
 }
 
-sail_error_t convert_cmyk(unsigned char *pixels_source, unsigned char *pixels_target, unsigned width, int target_pixel_format) {
+sail_error_t convert_cmyk(unsigned char *pixels_source, unsigned char *pixels_target, unsigned width, enum SailPixelFormat target_pixel_format) {
     unsigned char C, M, Y, K;
 
     if (target_pixel_format == SAIL_PIXEL_FORMAT_BPP24_RGB) {
