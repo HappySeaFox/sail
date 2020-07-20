@@ -409,11 +409,13 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v3(void *state, struc
 
     /* Compute output pixel format. */
     if (jpeg_state->write_options->output_pixel_format == SAIL_PIXEL_FORMAT_SOURCE) {
-        if (!jpeg_supported_pixel_format(jpeg_state->write_options->output_pixel_format)) {
+        J_COLOR_SPACE output_color_space = pixel_format_to_color_space(image->pixel_format);
+
+        if (output_color_space == JCS_UNKNOWN) {
             return SAIL_UNSUPPORTED_PIXEL_FORMAT;
         }
 
-        jpeg_set_colorspace(&jpeg_state->compress_context, pixel_format_to_color_space(image->pixel_format));
+        jpeg_set_colorspace(&jpeg_state->compress_context, output_color_space);
     } else if (jpeg_state->write_options->output_pixel_format == SAIL_PIXEL_FORMAT_AUTO) {
         J_COLOR_SPACE output_color_space;
         SAIL_TRY(auto_output_color_space(image->pixel_format, &output_color_space));
