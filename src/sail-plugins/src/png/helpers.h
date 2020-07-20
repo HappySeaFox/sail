@@ -31,6 +31,7 @@
 
 #include <png.h>
 
+#include "common.h"
 #include "error.h"
 #include "export.h"
 
@@ -44,13 +45,13 @@ SAIL_HIDDEN void my_warning_fn(png_structp png_ptr, png_const_charp text);
 
 SAIL_HIDDEN int png_color_type_to_pixel_format(int color_type, int bit_depth);
 
-SAIL_HIDDEN sail_error_t pixel_format_to_png_color_type(int pixel_format, int *color_type, int *bit_depth);
+SAIL_HIDDEN sail_error_t pixel_format_to_png_color_type(enum SailPixelFormat pixel_format, int *color_type, int *bit_depth);
 
-SAIL_HIDDEN sail_error_t supported_read_output_pixel_format(int pixel_format);
+SAIL_HIDDEN sail_error_t supported_read_output_pixel_format(enum SailPixelFormat pixel_format);
 
-SAIL_HIDDEN sail_error_t supported_write_input_pixel_format(int pixel_format);
+SAIL_HIDDEN sail_error_t supported_write_input_pixel_format(enum SailPixelFormat pixel_format);
 
-SAIL_HIDDEN sail_error_t supported_write_output_pixel_format(int pixel_format);
+SAIL_HIDDEN sail_error_t supported_write_output_pixel_format(enum SailPixelFormat pixel_format);
 
 SAIL_HIDDEN sail_error_t read_png_text(png_structp png_ptr, png_infop info_ptr, struct sail_meta_entry_node **target_meta_entry_node);
 

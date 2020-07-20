@@ -98,7 +98,7 @@ int png_color_type_to_pixel_format(int color_type, int bit_depth) {
     return SAIL_PIXEL_FORMAT_UNKNOWN;
 }
 
-sail_error_t pixel_format_to_png_color_type(int pixel_format, int *color_type, int *bit_depth) {
+sail_error_t pixel_format_to_png_color_type(enum SailPixelFormat pixel_format, int *color_type, int *bit_depth) {
 
     SAIL_CHECK_PTR(color_type);
     SAIL_CHECK_PTR(bit_depth);
@@ -164,7 +164,7 @@ sail_error_t pixel_format_to_png_color_type(int pixel_format, int *color_type, i
     return SAIL_PIXEL_FORMAT_UNKNOWN;
 }
 
-sail_error_t supported_read_output_pixel_format(int pixel_format) {
+sail_error_t supported_read_output_pixel_format(enum SailPixelFormat pixel_format) {
 
     switch (pixel_format) {
         case SAIL_PIXEL_FORMAT_SOURCE:
@@ -181,7 +181,7 @@ sail_error_t supported_read_output_pixel_format(int pixel_format) {
     return SAIL_UNSUPPORTED_PIXEL_FORMAT;
 }
 
-sail_error_t supported_write_input_pixel_format(int pixel_format) {
+sail_error_t supported_write_input_pixel_format(enum SailPixelFormat pixel_format) {
 
     switch (pixel_format) {
         case SAIL_PIXEL_FORMAT_BPP1_INDEXED:
@@ -207,7 +207,7 @@ sail_error_t supported_write_input_pixel_format(int pixel_format) {
     return SAIL_UNSUPPORTED_PIXEL_FORMAT;
 }
 
-sail_error_t supported_write_output_pixel_format(int pixel_format) {
+sail_error_t supported_write_output_pixel_format(enum SailPixelFormat pixel_format) {
 
     switch (pixel_format) {
         case SAIL_PIXEL_FORMAT_SOURCE: {
