@@ -58,6 +58,7 @@ struct jpeg_state {
     struct sail_write_options *write_options;
     bool frame_read;
     bool frame_written;
+    bool started_compress;
 
     /* Extra scan line used as a buffer when reading CMYK/YCCK images. */
     bool extra_scan_line_needed_for_cmyk;
@@ -75,6 +76,7 @@ static sail_error_t alloc_jpeg_state(struct jpeg_state **jpeg_state) {
     (*jpeg_state)->write_options                   = NULL;
     (*jpeg_state)->frame_read                      = false;
     (*jpeg_state)->frame_written                   = false;
+    (*jpeg_state)->started_compress                = false;
     (*jpeg_state)->extra_scan_line_needed_for_cmyk = false;
     (*jpeg_state)->extra_scan_line                 = NULL;
 
@@ -428,6 +430,7 @@ SAIL_EXPORT sail_error_t sail_plugin_write_seek_next_frame_v3(void *state, struc
     jpeg_set_quality(&jpeg_state->compress_context, /* to quality */COMPRESSION_MAX-compression, true);
 
     jpeg_start_compress(&jpeg_state->compress_context, true);
+    jpeg_state->started_compress = true;
 
     /* Write meta info. */
     if (jpeg_state->write_options->io_options & SAIL_IO_OPTION_META_INFO && image->meta_entry_node != NULL) {
@@ -513,7 +516,9 @@ SAIL_EXPORT sail_error_t sail_plugin_write_finish_v3(void **state, struct sail_i
         return SAIL_UNDERLYING_CODEC_ERROR;
     }
 
-    jpeg_finish_compress(&jpeg_state->compress_context);
+    if (jpeg_state->started_compress) {
+        jpeg_finish_compress(&jpeg_state->compress_context);
+    }
     jpeg_destroy_compress(&jpeg_state->compress_context);
 
     sail_free(jpeg_state);
