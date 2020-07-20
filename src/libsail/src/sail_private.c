@@ -156,6 +156,16 @@ sail_error_t allowed_write_output_pixel_format(const struct sail_write_features 
         return 0;
     }
 
+    /*
+     * For example:
+     *
+     * [write-pixel-formats-mapping]
+     * BPP8-GRAYSCALE=SOURCE
+     * BPP24-RGB=SOURCE;BPP24-YCBCR;BPP8-GRAYSCALE
+     *
+     * When input_pixel_format is BPP24-RGB and output_pixel_format is BPP24-YCBCR, success is returned.
+     * When input_pixel_format is BPP24-RGB and output_pixel_format is BPP32-CMYK, error is returned.
+     */
     const struct sail_pixel_formats_mapping_node *node = write_features->pixel_formats_mapping_node;
 
     while (node != NULL) {
