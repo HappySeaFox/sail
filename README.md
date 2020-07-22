@@ -59,7 +59,7 @@ Work to add more image formats is ongoing.
 Currently, SAIL supports the following platforms:
 
 - Windows
-- MacOS
+- macOS
 - Linux
 
 ## Competitors
@@ -232,12 +232,12 @@ cmake --build . --config Release
 cmake --build . --config Release --target install
 ```
 
-### MacOS
+### macOS
 
 #### Tested environments
 
-- MacOS 10.14 Mojave
-- MacOS 10.15 Catalina
+- macOS 10.14 Mojave
+- macOS 10.15 Catalina
 
 #### Installation steps
 

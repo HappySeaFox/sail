@@ -66,7 +66,7 @@ public:
      *     2. <SAIL DEPLOYMENT FOLDER>\lib\sail\plugins
      *     3. Hardcoded SAIL_PLUGINS_PATH in config.h
      *
-     *   Unix (including MacOS):
+     *   Unix (including macOS):
      *     1. SAIL_PLUGINS_PATH environment variable
      *     2. Hardcoded SAIL_PLUGINS_PATH in config.h
      *
@@ -85,7 +85,7 @@ public:
      *     2. <SAIL DEPLOYMENT FOLDER>\lib\sail\plugins
      *     3. Hardcoded SAIL_PLUGINS_PATH in config.h
      *
-     *   Unix (including MacOS):
+     *   Unix (including macOS):
      *     1. SAIL_PLUGINS_PATH environment variable
      *     2. Hardcoded SAIL_PLUGINS_PATH in config.h
      *

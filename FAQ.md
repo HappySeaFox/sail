@@ -10,7 +10,7 @@ Table of Contents
   * [Does SAIL preload all plugins in the initialization routine?](#does-sail-preload-all-plugins-in-the-initialization-routine)
   * [How does SAIL look for plugins?](#how-does-sail-look-for-plugins)
     * [Windows](#windows)
-    * [Unix (including MacOS)](#unix-including-macos)
+    * [Unix (including macOS)](#unix-including-macos)
   * [I'd like to reorganize the standard SAIL folder layout on Windows](#id-like-to-reorganize-the-standard-sail-folder-layout-on-windows)
   * [How can I point SAIL to a different plugins location?](#how-can-i-point-sail-to-a-different-plugins-location)
   * [Describe the high\-level APIs](#describe-the-high-level-apis)
@@ -54,7 +54,7 @@ Technically, SAIL was founded in 2003 making it one of the oldest image decoding
 
 ## Is SAIL cross-platform?
 
-Yes. It's written in pure C11 and is highly portable. However, only the Windows, MacOS, and Linux platforms
+Yes. It's written in pure C11 and is highly portable. However, only the Windows, macOS, and Linux platforms
 are currently supported. Pull requests to support more platforms are highly welcomed.
 
 ## How does SAIL support image formats?
@@ -81,7 +81,7 @@ Plugins (image codecs) paths search algorithm (first found path wins):
 2. `<SAIL DEPLOYMENT FOLDER>\lib\sail\plugins`
 3. Hardcoded `SAIL_PLUGINS_PATH` in config.h
 
-### Unix (including MacOS)
+### Unix (including macOS)
 1. `SAIL_PLUGINS_PATH` environment variable
 2. Hardcoded `SAIL_PLUGINS_PATH` in config.h
 
