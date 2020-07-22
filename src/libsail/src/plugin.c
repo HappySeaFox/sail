@@ -42,6 +42,7 @@ sail_error_t alloc_plugin(const struct sail_plugin_info *plugin_info, struct sai
 
     SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
     SAIL_CHECK_PATH_PTR(plugin_info->path);
+    SAIL_CHECK_PLUGIN_PTR(plugin);
 
     void *ptr;
     SAIL_TRY(sail_malloc(&ptr, sizeof(struct sail_plugin)));
