@@ -38,7 +38,7 @@
 #include "sail-common.h"
 #include "sail.h"
 
-sail_error_t alloc_plugin(const struct sail_plugin_info *plugin_info, struct sail_plugin **plugin) {
+sail_error_t alloc_and_load_plugin(const struct sail_plugin_info *plugin_info, struct sail_plugin **plugin) {
 
     SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
     SAIL_CHECK_PATH_PTR(plugin_info->path);
