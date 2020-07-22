@@ -92,7 +92,7 @@ SAIL_EXPORT sail_error_t sail_read_mem(const void *buffer, size_t buffer_length,
     return 0;
 }
 
-sail_error_t sail_write_path(const char *path, struct sail_context *context, const struct sail_image *image) {
+sail_error_t sail_write_file(const char *path, struct sail_context *context, const struct sail_image *image) {
 
     SAIL_CHECK_PATH_PTR(path);
     SAIL_CHECK_IMAGE(image);

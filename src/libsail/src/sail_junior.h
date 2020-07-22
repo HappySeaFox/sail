@@ -102,7 +102,7 @@ SAIL_EXPORT sail_error_t sail_read_mem(const void *buffer, size_t buffer_length,
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_write_path(const char *path, struct sail_context *context, const struct sail_image *image);
+SAIL_EXPORT sail_error_t sail_write_file(const char *path, struct sail_context *context, const struct sail_image *image);
 
 /*
  * Writes the pixels of the specified image file into the specified memory buffer.
