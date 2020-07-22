@@ -181,7 +181,7 @@ sail_error_t image_reader::read(const char *path, image *simage)
 
     sail_image *sail_image;
 
-    SAIL_TRY(sail_read_path(path,
+    SAIL_TRY(sail_read_file(path,
                             d->ctx->sail_context_c(),
                             &sail_image));
 

@@ -49,9 +49,9 @@ SAIL provides 4 levels of APIs depending on your needs. Let's have a look at the
 struct sail_image *image;
 
 /*
- * sail_read_path() reads the image and outputs pixels in the BPP32-RGBA pixel format.
+ * sail_read_file() reads the image and outputs pixels in the BPP32-RGBA pixel format.
  */
-SAIL_TRY(sail_read_path(path,
+SAIL_TRY(sail_read_file(path,
                         NULL,
                         &image));
 

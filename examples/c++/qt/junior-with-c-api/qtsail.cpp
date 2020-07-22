@@ -65,9 +65,9 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     struct sail_image *image;
 
     /*
-     * sail_read_path() reads the image and outputs pixels in the BPP32-RGBA pixel format.
+     * sail_read_file() reads the image and outputs pixels in the BPP32-RGBA pixel format.
      */
-    SAIL_TRY(sail_read_path(path.toLocal8Bit(),
+    SAIL_TRY(sail_read_file(path.toLocal8Bit(),
                             NULL,
                             &image));
 
