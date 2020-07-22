@@ -64,18 +64,18 @@ public:
     /*
      * An interface to sail_probe_file(). See sail_probe_file() for more.
      */
-    sail_error_t probe_file(const std::string &path, image *simage, plugin_info *splugin_info = nullptr);
-    sail_error_t probe_file(const char *path, image *simage, plugin_info *splugin_info = nullptr);
+    sail_error_t probe(const std::string &path, image *simage, plugin_info *splugin_info = nullptr);
+    sail_error_t probe(const char *path, image *simage, plugin_info *splugin_info = nullptr);
 
     /*
      * An interface to sail_probe_mem(). See sail_probe_mem() for more.
      */
-    sail_error_t probe_mem(const void *buffer, size_t buffer_length, image *simage, plugin_info *splugin_info = nullptr);
+    sail_error_t probe(const void *buffer, size_t buffer_length, image *simage, plugin_info *splugin_info = nullptr);
 
     /*
      * An interface to sail_probe_io(). See sail_probe_io() for more.
      */
-    sail_error_t probe_io(const sail::io &io, image *simage, plugin_info *splugin_info = nullptr);
+    sail_error_t probe(const sail::io &io, image *simage, plugin_info *splugin_info = nullptr);
 
     /*
      * An interface to sail_read_file(). See sail_read_file() for more.

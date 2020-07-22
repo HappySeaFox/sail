@@ -83,14 +83,14 @@ bool image_reader::is_valid() const
     return d->ctx != nullptr && d->ctx->status() == 0;
 }
 
-sail_error_t image_reader::probe_file(const std::string &path, image *simage, plugin_info *splugin_info)
+sail_error_t image_reader::probe(const std::string &path, image *simage, plugin_info *splugin_info)
 {
-    SAIL_TRY(probe_file(path.c_str(), simage, splugin_info));
+    SAIL_TRY(probe(path.c_str(), simage, splugin_info));
 
     return 0;
 }
 
-sail_error_t image_reader::probe_file(const char *path, image *simage, plugin_info *splugin_info)
+sail_error_t image_reader::probe(const char *path, image *simage, plugin_info *splugin_info)
 {
     SAIL_CHECK_CONTEXT_PTR(d->ctx);
     SAIL_CHECK_PATH_PTR(path);
@@ -114,7 +114,7 @@ sail_error_t image_reader::probe_file(const char *path, image *simage, plugin_in
     return 0;
 }
 
-sail_error_t image_reader::probe_mem(const void *buffer, size_t buffer_length, image *simage, plugin_info *splugin_info)
+sail_error_t image_reader::probe(const void *buffer, size_t buffer_length, image *simage, plugin_info *splugin_info)
 {
     SAIL_CHECK_CONTEXT_PTR(d->ctx);
     SAIL_CHECK_BUFFER_PTR(buffer);
@@ -139,7 +139,7 @@ sail_error_t image_reader::probe_mem(const void *buffer, size_t buffer_length, i
     return 0;
 }
 
-sail_error_t image_reader::probe_io(const sail::io &io, image *simage, plugin_info *splugin_info)
+sail_error_t image_reader::probe(const sail::io &io, image *simage, plugin_info *splugin_info)
 {
     SAIL_CHECK_CONTEXT_PTR(d->ctx);
     SAIL_CHECK_IMAGE_PTR(simage);

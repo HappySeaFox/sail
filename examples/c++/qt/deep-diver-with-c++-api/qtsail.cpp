@@ -389,7 +389,7 @@ sail_error_t QtSail::onProbe()
     sail::plugin_info plugin_info;
 
     // Probe from memory
-    if ((res = reader.probe_mem(buffer.constData(), buffer.length(), &image, &plugin_info)) != 0) {
+    if ((res = reader.probe(buffer.constData(), buffer.length(), &image, &plugin_info)) != 0) {
         QMessageBox::critical(this, tr("Error"), tr("Failed to probe the image. Error: %1").arg(res));
         return res;
     }
