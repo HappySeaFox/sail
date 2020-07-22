@@ -57,7 +57,7 @@ struct sail_plugin_info;
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_probe_path(const char *path, struct sail_context *context,
+SAIL_EXPORT sail_error_t sail_probe_file(const char *path, struct sail_context *context,
                                          struct sail_image **image, const struct sail_plugin_info **plugin_info);
 
 /*
