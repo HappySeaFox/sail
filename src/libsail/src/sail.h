@@ -114,7 +114,7 @@ SAIL_EXPORT sail_error_t sail_init_with_flags(int flags);
  * All pointers to plugin info objects, read and write features get invalidated. Using them after calling
  * sail_finish() will lead to a crash.
  */
-SAIL_EXPORT void sail_finish();
+SAIL_EXPORT void sail_finish(void);
 
 /*
  * Returns a linked list of found plugin info nodes. Use it to determine the list of possible image formats,
@@ -123,7 +123,7 @@ SAIL_EXPORT void sail_finish();
  * Returns a pointer to the first plugin info node or NULL when no SAIL plugins were found.
  * Use sail_plugin_info_node.next to iterate.
  */
-SAIL_EXPORT const struct sail_plugin_info_node* sail_plugin_info_list();
+SAIL_EXPORT const struct sail_plugin_info_node* sail_plugin_info_list(void);
 
 /*
  * Finds a first plugin info object that supports reading or writing the specified file path by its file extension.
@@ -241,7 +241,7 @@ SAIL_EXPORT sail_error_t sail_plugin_info_from_mime_type(const char *mime_type, 
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_unload_plugins();
+SAIL_EXPORT sail_error_t sail_unload_plugins(void);
 
 /* extern "C" */
 #ifdef __cplusplus

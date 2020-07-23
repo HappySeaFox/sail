@@ -42,14 +42,14 @@ sail_error_t sail_init_with_flags(int flags) {
     return 0;
 }
 
-void sail_finish() {
+void sail_finish(void) {
 
     SAIL_LOG_INFO("Finish");
 
     control_tls_context(/* context - not needed */ NULL, SAIL_CONTEXT_DESTROY);
 }
 
-const struct sail_plugin_info_node* sail_plugin_info_list() {
+const struct sail_plugin_info_node* sail_plugin_info_list(void) {
 
     struct sail_context *context;
     SAIL_TRY_OR_EXECUTE(current_tls_context(&context),
@@ -246,7 +246,7 @@ sail_error_t sail_plugin_info_from_mime_type(const char *mime_type, const struct
     return SAIL_PLUGIN_NOT_FOUND;
 }
 
-sail_error_t sail_unload_plugins() {
+sail_error_t sail_unload_plugins(void) {
 
     SAIL_LOG_DEBUG("Unloading cached plugins");
 
