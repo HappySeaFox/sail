@@ -136,12 +136,7 @@ sail_finish();
 
 #### C++:
 ```C++
-// Initialize SAIL context. You could cache the context as a class member and re-use it
-// multiple times.
-//
-sail::context context;
-
-sail::image_reader reader(&context);
+sail::image_reader reader;
 sail::image image;
 
 // It's essential to ALWAYS stop reading to free memory resources.
@@ -170,6 +165,11 @@ SAIL_TRY(reader.stop_reading());
 // Handle the image and its pixels here.
 // Use image.width(), image.height(), image.bytes_per_line(),
 // image.pixel_format(), and image.pixels() for that.
+
+// Recommended: finish working with the implicitly allocated SAIL context in this thread
+// and unload all loaded plugins attached to it.
+//
+sail::context::finish();
 ```
 
 ### 3. `deep diver`
@@ -180,8 +180,8 @@ SAIL_TRY(reader.stop_reading());
 #### C:
 ```C
 /*
- * Initialize SAIL context and preload all plugins. Plugins are lazy-loaded when
- * SAIL_FLAG_PRELOAD_PLUGINS is not specified.
+ * Initialize a new SAIL thread-local static context explicitly and preload all plugins.
+ * Plugins are lazy-loaded when SAIL_FLAG_PRELOAD_PLUGINS is not specified.
  */
 SAIL_TRY(sail_init_with_flags(SAIL_FLAG_PRELOAD_PLUGINS));
 
@@ -273,17 +273,16 @@ sail_finish();
 
 #### C++:
 ```C++
-// Initialize SAIL context and preload all plugins. Plugins are lazy-loaded when
-// SAIL_FLAG_PRELOAD_PLUGINS is not specified. You could cache the context
-// and re-use it multiple times.
+// Initialize a new SAIL thread-local static context explicitly and preload all plugins.
+// Plugins are lazy-loaded when SAIL_FLAG_PRELOAD_PLUGINS is not specified.
 //
-sail::context context(SAIL_FLAG_PRELOAD_PLUGINS);
-sail::image_reader reader(&context);
+sail::context::init(SAIL_FLAG_PRELOAD_PLUGINS);
+sail::image_reader reader;
 
 // Find the codec to read JPEGs.
 //
 sail::plugin_info plugin_info;
-SAIL_TRY(context.plugin_info_from_extension("JPEG", &plugin_info));
+SAIL_TRY(plugin_info::from_extension("JPEG", &plugin_info));
 
 // Instantiate new read options and copy defaults from the read features
 // (preferred output pixel format etc.).
@@ -325,6 +324,11 @@ if (!meta_entries.empty()) {
 // Handle the image and its pixels here.
 // Use image.width(), image.height(), image.bytes_per_line(),
 // image.pixel_format(), and image.pixels() for that.
+
+// Recommended: finish working with the implicitly allocated SAIL context in this thread
+// and unload all loaded plugins attached to it.
+//
+sail::context::finish();
 ```
 
 ### 4. `technical diver`
@@ -338,8 +342,8 @@ and call `sail_start_reading_io_with_options()`.
 
 ```C
 /*
- * Initialize SAIL context and preload all plugins. Plugins are lazy-loaded when
- * SAIL_FLAG_PRELOAD_PLUGINS is not specified.
+ * Initialize a new SAIL thread-local static context explicitly and preload all plugins.
+ * Plugins are lazy-loaded when SAIL_FLAG_PRELOAD_PLUGINS is not specified.
  */
 SAIL_TRY(sail_init_with_flags(SAIL_FLAG_PRELOAD_PLUGINS));
 
@@ -458,17 +462,16 @@ sail_finish();
 
 #### C++:
 ```C++
-// Initialize SAIL context and preload all plugins. Plugins are lazy-loaded when
-// SAIL_FLAG_PRELOAD_PLUGINS is not specified. You could cache the context and re-use
-// it multiple times.
+// Initialize a new SAIL thread-local static context explicitly and preload all plugins.
+// Plugins are lazy-loaded when SAIL_FLAG_PRELOAD_PLUGINS is not specified.
 //
-sail::context context(SAIL_FLAG_PRELOAD_PLUGINS);
-sail::image_reader reader(&context);
+sail::context::init(SAIL_FLAG_PRELOAD_PLUGINS);
+sail::image_reader reader;
 
 // Find the codec info by a file extension.
 //
 sail::plugin_info plugin_info;
-SAIL_TRY(context.plugin_info_from_path(path, &plugin_info));
+SAIL_TRY(plugin_info::from_path(path, &plugin_info));
 
 /*
  * Create our custom I/O source.
@@ -531,4 +534,9 @@ if (!meta_entries.empty()) {
 // Handle the image and its pixels here.
 // Use image.width(), image.height(), image.bytes_per_line(),
 // image.pixel_format(), and image.pixels() for that.
+
+// Recommended: finish working with the implicitly allocated SAIL context in this thread
+// and unload all loaded plugins attached to it.
+//
+sail::context::finish();
 ```
