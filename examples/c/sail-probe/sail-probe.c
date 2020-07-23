@@ -32,10 +32,9 @@
 #include "sail-common.h"
 #include "sail.h"
 
-static sail_error_t probe(const char *path, struct sail_context *context) {
+static sail_error_t probe(const char *path) {
 
     SAIL_CHECK_PATH_PTR(path);
-    SAIL_CHECK_CONTEXT_PTR(context);
 
     /* Time counter. */
     uint64_t start_time = sail_now();
@@ -43,7 +42,7 @@ static sail_error_t probe(const char *path, struct sail_context *context) {
     struct sail_image *image;
     const struct sail_plugin_info *plugin_info;
 
-    SAIL_TRY(sail_probe_file(path, context, &image, &plugin_info));
+    SAIL_TRY(sail_probe_file(path, &image, &plugin_info));
 
     printf("File          : %s\n", path);
     printf("Probe time    : %lu ms.\n", (unsigned long)(sail_now() - start_time));
@@ -94,13 +93,9 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
-    struct sail_context *context;
+    SAIL_TRY(probe(argv[1]));
 
-    SAIL_TRY(sail_init(&context));
-
-    SAIL_TRY(probe(argv[1], context));
-
-    sail_finish(context);
+    sail_finish();
 
     return 0;
 }
