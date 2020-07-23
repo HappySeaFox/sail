@@ -30,20 +30,17 @@
 #include "sail-common.h"
 #include "sail.h"
 
-sail_error_t sail_probe_io(struct sail_io *io, struct sail_context *context, struct sail_image **image, const struct sail_plugin_info **plugin_info) {
+sail_error_t sail_probe_io(struct sail_io *io, struct sail_image **image, const struct sail_plugin_info **plugin_info) {
 
     SAIL_CHECK_IO_PTR(io);
-
-    struct sail_context *context_local;
-    SAIL_TRY(possibly_allocate_context(context, &context_local));
 
     const struct sail_plugin_info *plugin_info_noop;
     const struct sail_plugin_info **plugin_info_local = plugin_info == NULL ? &plugin_info_noop : plugin_info;
 
-    SAIL_TRY(sail_plugin_info_by_magic_number_from_io(io, context_local, plugin_info_local));
+    SAIL_TRY(sail_plugin_info_by_magic_number_from_io(io, plugin_info_local));
 
     const struct sail_plugin *plugin;
-    SAIL_TRY(load_plugin_by_plugin_info(context_local, *plugin_info_local, &plugin));
+    SAIL_TRY(load_plugin_by_plugin_info(*plugin_info_local, &plugin));
 
     struct sail_read_options *read_options_local = NULL;
     void *state = NULL;
@@ -64,17 +61,14 @@ sail_error_t sail_probe_io(struct sail_io *io, struct sail_context *context, str
     return 0;
 }
 
-sail_error_t sail_probe_mem(const void *buffer, size_t buffer_length, struct sail_context *context, struct sail_image **image, const struct sail_plugin_info **plugin_info) {
+sail_error_t sail_probe_mem(const void *buffer, size_t buffer_length, struct sail_image **image, const struct sail_plugin_info **plugin_info) {
 
     SAIL_CHECK_BUFFER_PTR(buffer);
-
-    struct sail_context *context_local;
-    SAIL_TRY(possibly_allocate_context(context, &context_local));
 
     struct sail_io *io;
     SAIL_TRY(alloc_io_read_mem(buffer, buffer_length, &io));
 
-    SAIL_TRY_OR_CLEANUP(sail_probe_io(io, context_local, image, plugin_info),
+    SAIL_TRY_OR_CLEANUP(sail_probe_io(io, image, plugin_info),
                         /* cleanup */ sail_destroy_io(io));
 
     sail_destroy_io(io);
@@ -82,16 +76,16 @@ sail_error_t sail_probe_mem(const void *buffer, size_t buffer_length, struct sai
     return 0;
 }
 
-sail_error_t sail_start_reading_file(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info, void **state) {
+sail_error_t sail_start_reading_file(const char *path, const struct sail_plugin_info *plugin_info, void **state) {
 
-    SAIL_TRY(sail_start_reading_file_with_options(path, context, plugin_info, NULL, state));
+    SAIL_TRY(sail_start_reading_file_with_options(path, plugin_info, NULL, state));
 
     return 0;
 }
 
-sail_error_t sail_start_reading_mem(const void *buffer, size_t buffer_length, struct sail_context *context, const struct sail_plugin_info *plugin_info, void **state) {
+sail_error_t sail_start_reading_mem(const void *buffer, size_t buffer_length, const struct sail_plugin_info *plugin_info, void **state) {
 
-    SAIL_TRY(sail_start_reading_mem_with_options(buffer, buffer_length, context, plugin_info, NULL, state));
+    SAIL_TRY(sail_start_reading_mem_with_options(buffer, buffer_length, plugin_info, NULL, state));
 
     return 0;
 }
@@ -166,16 +160,16 @@ sail_error_t sail_stop_reading(void *state) {
     return 0;
 }
 
-sail_error_t sail_start_writing_file(const char *path, struct sail_context *context, const struct sail_plugin_info *plugin_info, void **state) {
+sail_error_t sail_start_writing_file(const char *path, const struct sail_plugin_info *plugin_info, void **state) {
 
-    SAIL_TRY(sail_start_writing_file_with_options(path, context, plugin_info, NULL, state));
+    SAIL_TRY(sail_start_writing_file_with_options(path, plugin_info, NULL, state));
 
     return 0;
 }
 
-sail_error_t sail_start_writing_mem(void *buffer, size_t buffer_length, struct sail_context *context, const struct sail_plugin_info *plugin_info, void **state) {
+sail_error_t sail_start_writing_mem(void *buffer, size_t buffer_length, const struct sail_plugin_info *plugin_info, void **state) {
 
-    SAIL_TRY(sail_start_writing_mem_with_options(buffer, buffer_length, context, plugin_info, NULL, state));
+    SAIL_TRY(sail_start_writing_mem_with_options(buffer, buffer_length, plugin_info, NULL, state));
 
     return 0;
 }

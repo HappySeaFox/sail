@@ -30,17 +30,14 @@
 #include "sail-common.h"
 #include "sail.h"
 
-sail_error_t sail_probe_file(const char *path, struct sail_context *context, struct sail_image **image, const struct sail_plugin_info **plugin_info) {
+sail_error_t sail_probe_file(const char *path, struct sail_image **image, const struct sail_plugin_info **plugin_info) {
 
     SAIL_CHECK_PATH_PTR(path);
-
-    struct sail_context *context_local;
-    SAIL_TRY(possibly_allocate_context(context, &context_local));
 
     struct sail_io *io;
     SAIL_TRY(alloc_io_read_file(path, &io));
 
-    SAIL_TRY_OR_CLEANUP(sail_probe_io(io, context_local, image, plugin_info),
+    SAIL_TRY_OR_CLEANUP(sail_probe_io(io, image, plugin_info),
                         /* cleanup */ sail_destroy_io(io));
 
     sail_destroy_io(io);
@@ -48,17 +45,14 @@ sail_error_t sail_probe_file(const char *path, struct sail_context *context, str
     return 0;
 }
 
-sail_error_t sail_read_file(const char *path, struct sail_context *context, struct sail_image **image) {
+sail_error_t sail_read_file(const char *path, struct sail_image **image) {
 
     SAIL_CHECK_PATH_PTR(path);
     SAIL_CHECK_IMAGE_PTR(image);
 
-    struct sail_context *context_local;
-    SAIL_TRY(possibly_allocate_context(context, &context_local));
-
     void *state = NULL;
 
-    SAIL_TRY_OR_CLEANUP(sail_start_reading_file(path, context_local, NULL /* plugin info */, &state),
+    SAIL_TRY_OR_CLEANUP(sail_start_reading_file(path, NULL /* plugin info */, &state),
                         /* cleanup */ sail_stop_reading(state));
 
     SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, image),
@@ -70,17 +64,14 @@ sail_error_t sail_read_file(const char *path, struct sail_context *context, stru
     return 0;
 }
 
-SAIL_EXPORT sail_error_t sail_read_mem(const void *buffer, size_t buffer_length, struct sail_context *context, struct sail_image **image) {
+SAIL_EXPORT sail_error_t sail_read_mem(const void *buffer, size_t buffer_length, struct sail_image **image) {
 
     SAIL_CHECK_BUFFER_PTR(buffer);
     SAIL_CHECK_IMAGE_PTR(image);
 
-    struct sail_context *context_local;
-    SAIL_TRY(possibly_allocate_context(context, &context_local));
-
     void *state = NULL;
 
-    SAIL_TRY_OR_CLEANUP(sail_start_reading_mem(buffer, buffer_length, context_local, NULL /* plugin info */, &state),
+    SAIL_TRY_OR_CLEANUP(sail_start_reading_mem(buffer, buffer_length, NULL /* plugin info */, &state),
                         /* cleanup */ sail_stop_reading(state));
 
     SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, image),
@@ -92,17 +83,14 @@ SAIL_EXPORT sail_error_t sail_read_mem(const void *buffer, size_t buffer_length,
     return 0;
 }
 
-sail_error_t sail_write_file(const char *path, struct sail_context *context, const struct sail_image *image) {
+sail_error_t sail_write_file(const char *path, const struct sail_image *image) {
 
     SAIL_CHECK_PATH_PTR(path);
     SAIL_CHECK_IMAGE(image);
 
-    struct sail_context *context_local;
-    SAIL_TRY(possibly_allocate_context(context, &context_local));
-
     void *state = NULL;
 
-    SAIL_TRY_OR_CLEANUP(sail_start_writing_file(path, context_local, NULL /* plugin info */, &state),
+    SAIL_TRY_OR_CLEANUP(sail_start_writing_file(path, NULL /* plugin info */, &state),
                         sail_stop_writing(state));
 
     SAIL_TRY_OR_CLEANUP(sail_write_next_frame(state, image),
@@ -113,17 +101,14 @@ sail_error_t sail_write_file(const char *path, struct sail_context *context, con
     return 0;
 }
 
-SAIL_EXPORT sail_error_t sail_write_mem(void *buffer, size_t buffer_length, struct sail_context *context, const struct sail_image *image, size_t *written) {
+SAIL_EXPORT sail_error_t sail_write_mem(void *buffer, size_t buffer_length, const struct sail_image *image, size_t *written) {
 
     SAIL_CHECK_BUFFER_PTR(buffer);
     SAIL_CHECK_IMAGE(image);
 
-    struct sail_context *context_local;
-    SAIL_TRY(possibly_allocate_context(context, &context_local));
-
     void *state = NULL;
 
-    SAIL_TRY_OR_CLEANUP(sail_start_writing_mem(buffer, buffer_length, context_local, NULL /* plugin info */, &state),
+    SAIL_TRY_OR_CLEANUP(sail_start_writing_mem(buffer, buffer_length, NULL /* plugin info */, &state),
                         sail_stop_writing(state));
 
     SAIL_TRY_OR_CLEANUP(sail_write_next_frame(state, image),

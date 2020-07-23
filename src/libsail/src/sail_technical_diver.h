@@ -38,7 +38,6 @@
 extern "C" {
 #endif
 
-struct sail_context;
 struct sail_io;
 struct sail_plugin_info;
 struct sail_read_options;
@@ -63,8 +62,7 @@ struct sail_write_options;
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_start_reading_io(struct sail_io *io, struct sail_context *context,
-                                               const struct sail_plugin_info *plugin_info, void **state);
+SAIL_EXPORT sail_error_t sail_start_reading_io(struct sail_io *io, const struct sail_plugin_info *plugin_info, void **state);
 
 /*
  * Starts reading the specified I/O stream with the specified read options. If you don't need specific read options,
@@ -86,7 +84,7 @@ SAIL_EXPORT sail_error_t sail_start_reading_io(struct sail_io *io, struct sail_c
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_start_reading_io_with_options(struct sail_io *io, struct sail_context *context,
+SAIL_EXPORT sail_error_t sail_start_reading_io_with_options(struct sail_io *io,
                                                             const struct sail_plugin_info *plugin_info,
                                                             const struct sail_read_options *read_options, void **state);
 
@@ -110,8 +108,7 @@ SAIL_EXPORT sail_error_t sail_start_reading_io_with_options(struct sail_io *io, 
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_start_writing_io(struct sail_io *io, struct sail_context *context,
-                                               const struct sail_plugin_info *plugin_info, void **state);
+SAIL_EXPORT sail_error_t sail_start_writing_io(struct sail_io *io, const struct sail_plugin_info *plugin_info, void **state);
 
 /*
  * Starts writing the specified I/O stream with the specified write options. If you don't need specific write options,
@@ -134,7 +131,7 @@ SAIL_EXPORT sail_error_t sail_start_writing_io(struct sail_io *io, struct sail_c
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_start_writing_io_with_options(struct sail_io *io, struct sail_context *context,
+SAIL_EXPORT sail_error_t sail_start_writing_io_with_options(struct sail_io *io,
                                                             const struct sail_plugin_info *plugin_info,
                                                             const struct sail_write_options *write_options, void **state);
 
