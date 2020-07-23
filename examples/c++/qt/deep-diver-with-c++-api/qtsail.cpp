@@ -72,11 +72,6 @@ QtSail::~QtSail()
 
 sail_error_t QtSail::init()
 {
-    if (m_context.status() != 0) {
-        QMessageBox::critical(this, tr("Error"), tr("Failed to init SAIL. Error: %1").arg(m_context.status()));
-        ::exit(1);
-    }
-
     QTimer::singleShot(0, this, [&]{
         QMessageBox::information(this, tr("Features"), tr("This demo includes:"
                                                           "<ul>"
@@ -94,7 +89,7 @@ sail_error_t QtSail::init()
 
 sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 {
-    sail::image_reader reader(&m_context);
+    sail::image_reader reader;
 
     // Time counter.
     //
@@ -105,7 +100,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     // See https://en.wikipedia.org/wiki/File_format#Magic_number.
     //
     sail::plugin_info plugin_info;
-    SAIL_TRY(m_context.plugin_info_by_magic_number_from_path(path.toLocal8Bit(), &plugin_info));
+    SAIL_TRY(sail::plugin_info::by_magic_number_from_path(path.toLocal8Bit(), &plugin_info));
 
     // Allocate new read options and copy defaults from the read features
     // (preferred output pixel format etc.).
@@ -223,7 +218,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 
     // Optional: unload all plugins to free up some memory.
     //
-    m_context.unload_plugins();
+    sail::context::unload_plugins();
 
     return 0;
 }
@@ -231,7 +226,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 sail_error_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffer_length,
                                size_t *written)
 {
-    sail::image_writer writer(&m_context);
+    sail::image_writer writer;
 
     // Apply palette.
     //
@@ -274,7 +269,7 @@ sail_error_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffer
     elapsed.start();
 
     sail::plugin_info plugin_info;
-    SAIL_TRY(m_context.plugin_info_from_extension(m_suffix.toUtf8(), &plugin_info));
+    SAIL_TRY(sail::plugin_info::from_extension(m_suffix.toUtf8(), &plugin_info));
 
     // Allocate new write options and copy defaults from the write features
     // (preferred output pixel format etc.).
@@ -330,7 +325,7 @@ sail_error_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffer
 
     // Optional: unload all plugins to free up some memory.
     //
-    m_context.unload_plugins();
+    sail::context::unload_plugins();
 
     return 0;
 }
@@ -373,7 +368,7 @@ sail_error_t QtSail::onProbe()
 
     // Probe
     sail_error_t res;
-    sail::image_reader reader(&m_context);
+    sail::image_reader reader;
 
     // Load the file into memeory
     QFile file(path);

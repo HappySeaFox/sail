@@ -53,7 +53,6 @@ namespace sail
  */
 class SAIL_EXPORT plugin_info
 {
-    friend class context;
     friend class image_reader;
     friend class image_writer;
 
@@ -75,6 +74,109 @@ public:
 
     static sail_error_t plugin_feature_to_string(SailPluginFeature plugin_feature, const char **result);
     static sail_error_t plugin_feature_from_string(const char *str, SailPluginFeature *result);
+
+    /*
+     * Finds a first plugin info object that supports the magic number read from the specified file.
+     * The comparison algorithm is case insensitive.
+     *
+     * Typical usage: plugin_info::by_magic_number_from_path() ->
+     *                image_reader::start_reading_file(        ->
+     *                image_reader::read_next_frame()          ->
+     *                image_reader::stop_reading().
+     *
+     * Returns 0 on success or sail_error_t on error.
+     */
+    static sail_error_t by_magic_number_from_path(const std::string &path, plugin_info *splugin_info);
+    static sail_error_t by_magic_number_from_path(const char *path, plugin_info *splugin_info);
+
+    /*
+     * Finds a first plugin info object that supports the magic number read from the specified memory buffer.
+     * The comparison algorithm is case insensitive.
+     *
+     * Typical usage: plugin_info::by_magic_number_from_mem() ->
+     *                image_reader::start_reading_file()      ->
+     *                image_reader::read_next_frame()         ->
+     *                image_reader::stop_reading().
+     *
+     * Returns 0 on success or sail_error_t on error.
+     */
+    static sail_error_t by_magic_number_from_mem(const void *buffer, size_t buffer_length, plugin_info *splugin_info);
+
+    /*
+     * Finds a first plugin info object that supports the magic number read from the specified I/O source.
+     * The comparison algorithm is case insensitive.
+     *
+     * Typical usage: plugin_info::by_magic_number_from_io() ->
+     *                image_reader::start_reading_file()     ->
+     *                image_reader::read_next_frame()        ->
+     *                image_reader::stop_reading().
+     *
+     * Returns 0 on success or sail_error_t on error.
+     */
+    static sail_error_t by_magic_number_from_io(const sail::io &io, plugin_info *splugin_info);
+
+    /*
+     * Finds a first plugin info object that supports reading or writing the specified file path by its file extension.
+     * The comparison algorithm is case-insensitive. For example: "/test.jpg". The path might not exist.
+     *
+     * Typical usage: plugin_info::from_path()           ->
+     *                image_reader::start_reading_file() ->
+     *                image_reader::read_next_frame()    ->
+     *                image_reader::stop_reading().
+     *
+     * Or:            plugin_info::from_path()        ->
+     *                image_writer::start_writing()   ->
+     *                image_writer::read_next_frame() ->
+     *                image_writer::stop_writing().
+     *
+     * Returns 0 on success or sail_error_t on error.
+     */
+    static sail_error_t from_path(const std::string &path, plugin_info *splugin_info);
+    static sail_error_t from_path(const char *path, plugin_info *splugin_info);
+
+    /*
+     * Finds a first plugin info object that supports the specified file extension. The comparison
+     * algorithm is case-insensitive. For example: "jpg".
+     *
+     * Typical usage: plugin_info::from_extension()      ->
+     *                image_reader::start_reading_file() ->
+     *                image_reader::read_next_frame()    ->
+     *                image_reader::stop_reading().
+     *
+     * Or:            plugin_info::from_extension()   ->
+     *                image_writer::start_writing()   ->
+     *                image_writer::read_next_frame() ->
+     *                image_writer::stop_writing().
+     *
+     * Returns 0 on success or sail_error_t on error.
+     */
+    static sail_error_t from_extension(const std::string &suffix, plugin_info *splugin_info);
+    static sail_error_t from_extension(const char *suffix, plugin_info *splugin_info);
+
+    /*
+     * Finds a first plugin info object that supports the specified mime type. The comparison
+     * algorithm is case-insensitive. For example: "image/jpeg".
+     *
+     * Typical usage: plugin_info::from_mime_type()      ->
+     *                image_reader::start_reading_file() ->
+     *                image_reader::read_next_frame()    ->
+     *                image_reader::stop_reading().
+     *
+     * Or:            plugin_info::from_mime_type()   ->
+     *                image_writer::start_writing()   ->
+     *                image_writer::read_next_frame() ->
+     *                image_writer::stop_writing().
+     *
+     * Returns 0 on success or sail_error_t on error.
+     */
+    static sail_error_t from_mime_type(const std::string &mime_type, plugin_info *splugin_info);
+    static sail_error_t from_mime_type(const char *mime_type, plugin_info *splugin_info);
+
+    /*
+     * Returns a list of found plugin info objects. Use it to determine the list of possible
+     * image formats, file extensions, and mime types that could be hypothetically read or written by SAIL.
+     */
+    static std::vector<plugin_info> list();
 
 private:
     /*

@@ -92,6 +92,11 @@ enum SailInitFlags {
  * already exists. Builds a list of available SAIL plugins. See SailInitFlags.
  *
  * If you don't need specific features like preloading plugins, just don't use this function at all.
+ * All reading or writing functions allocate a thread-local static context implicitly when they need it
+ * and when it doesn't exist already.
+ *
+ * It's always recommended to destroy the implicitly or explicitly allocated SAIL thread-local static context
+ * with sail_finish() when you're done with calling SAIL functions in the current thread.
  *
  * Plugins (image codecs) paths search algorithm (first found path wins):
  *
@@ -109,10 +114,13 @@ enum SailInitFlags {
 SAIL_EXPORT sail_error_t sail_init_with_flags(int flags);
 
 /*
- * Finalizes working with the thread-local static context that was implicitly allocated by reading and writing functions.
+ * Finalizes working with the thread-local static context that was implicitly or explicitly allocated by
+ * reading or writing functions.
  *
- * All pointers to plugin info objects, read and write features get invalidated. Using them after calling
- * sail_finish() will lead to a crash.
+ * Unloads all plugins. All pointers to plugin info objects, read and write features get invalidated. 
+ * Using them after calling sail_finish() will lead to a crash.
+ *
+ * It's possible to initialize a new SAIL thread-local static context afterwards, implicitly or explicitly.
  */
 SAIL_EXPORT void sail_finish(void);
 

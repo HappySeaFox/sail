@@ -37,14 +37,10 @@ class SAIL_HIDDEN image_writer::pimpl
 {
 public:
     pimpl()
-        : ctx(nullptr)
-        , own_context(false)
-        , state(nullptr)
+        : state(nullptr)
     {
     }
 
-    context *ctx;
-    bool own_context;
     void *state;
     struct sail_io sail_io;
 };
@@ -52,35 +48,12 @@ public:
 image_writer::image_writer()
     : d(new pimpl)
 {
-    d->ctx = new context;
-    d->own_context = true;
-}
-
-image_writer::image_writer(context *ctx)
-    : d(new pimpl)
-{
-    d->ctx = ctx;
-    d->own_context = false;
-
-    if (d->ctx == nullptr) {
-        SAIL_LOG_ERROR("NULL context pointer has been passed to image_writer()");
-    }
 }
 
 image_writer::~image_writer()
 {
     stop_writing();
-
-    if (d->own_context) {
-        delete d->ctx;
-    }
-
     delete d;
-}
-
-bool image_writer::is_valid() const
-{
-    return d->ctx != nullptr && d->ctx->status() == 0;
 }
 
 sail_error_t image_writer::write(const std::string &path, const image &simage)
@@ -92,7 +65,6 @@ sail_error_t image_writer::write(const std::string &path, const image &simage)
 
 sail_error_t image_writer::write(const char *path, const image &simage)
 {
-    SAIL_CHECK_CONTEXT_PTR(d->ctx);
     SAIL_CHECK_PATH_PTR(path);
 
     sail_image *sail_image;
@@ -103,7 +75,6 @@ sail_error_t image_writer::write(const char *path, const image &simage)
                                       sail_destroy_image(sail_image));
 
     SAIL_TRY_OR_CLEANUP(sail_write_file(path,
-                                        d->ctx->sail_context_c(),
                                         sail_image),
                                         /* cleanup */ sail_image->pixels = NULL,
                                         sail_destroy_image(sail_image));
@@ -123,7 +94,6 @@ sail_error_t image_writer::write(void *buffer, size_t buffer_length, const image
 
 sail_error_t image_writer::write(void *buffer, size_t buffer_length, const image &simage, size_t *written)
 {
-    SAIL_CHECK_CONTEXT_PTR(d->ctx);
     SAIL_CHECK_BUFFER_PTR(buffer);
 
     sail_image *sail_image;
@@ -135,7 +105,6 @@ sail_error_t image_writer::write(void *buffer, size_t buffer_length, const image
 
     SAIL_TRY_OR_CLEANUP(sail_write_mem(buffer,
                                         buffer_length,
-                                        d->ctx->sail_context_c(),
                                         sail_image,
                                         written),
                         /* cleanup */ sail_image->pixels = NULL,
@@ -156,10 +125,9 @@ sail_error_t image_writer::start_writing(const std::string &path)
 
 sail_error_t image_writer::start_writing(const char *path)
 {
-    SAIL_CHECK_CONTEXT_PTR(d->ctx);
     SAIL_CHECK_PATH_PTR(path);
 
-    SAIL_TRY(sail_start_writing_file(path, d->ctx->sail_context_c(), nullptr, &d->state));
+    SAIL_TRY(sail_start_writing_file(path, nullptr, &d->state));
 
     return 0;
 }
@@ -173,10 +141,9 @@ sail_error_t image_writer::start_writing(const std::string &path, const plugin_i
 
 sail_error_t image_writer::start_writing(const char *path, const plugin_info &splugin_info)
 {
-    SAIL_CHECK_CONTEXT_PTR(d->ctx);
     SAIL_CHECK_PATH_PTR(path);
 
-    SAIL_TRY(sail_start_writing_file(path, d->ctx->sail_context_c(), splugin_info.sail_plugin_info_c(), &d->state));
+    SAIL_TRY(sail_start_writing_file(path, splugin_info.sail_plugin_info_c(), &d->state));
 
     return 0;
 }
@@ -190,13 +157,12 @@ sail_error_t image_writer::start_writing(const std::string &path, const write_op
 
 sail_error_t image_writer::start_writing(const char *path, const write_options &swrite_options)
 {
-    SAIL_CHECK_CONTEXT_PTR(d->ctx);
     SAIL_CHECK_PATH_PTR(path);
 
     sail_write_options sail_write_options;
     SAIL_TRY(swrite_options.to_sail_write_options(&sail_write_options));
 
-    SAIL_TRY(sail_start_writing_file_with_options(path, d->ctx->sail_context_c(), nullptr, &sail_write_options, &d->state));
+    SAIL_TRY(sail_start_writing_file_with_options(path, nullptr, &sail_write_options, &d->state));
 
     return 0;
 }
@@ -210,25 +176,22 @@ sail_error_t image_writer::start_writing(const std::string &path, const plugin_i
 
 sail_error_t image_writer::start_writing(const char *path, const plugin_info &splugin_info, const write_options &swrite_options)
 {
-    SAIL_CHECK_CONTEXT_PTR(d->ctx);
     SAIL_CHECK_PATH_PTR(path);
 
     sail_write_options sail_write_options;
     SAIL_TRY(swrite_options.to_sail_write_options(&sail_write_options));
 
-    SAIL_TRY(sail_start_writing_file_with_options(path, d->ctx->sail_context_c(), splugin_info.sail_plugin_info_c(), &sail_write_options, &d->state));
+    SAIL_TRY(sail_start_writing_file_with_options(path, splugin_info.sail_plugin_info_c(), &sail_write_options, &d->state));
 
     return 0;
 }
 
 sail_error_t image_writer::start_writing(void *buffer, size_t buffer_length, const plugin_info &splugin_info)
 {
-    SAIL_CHECK_CONTEXT_PTR(d->ctx);
     SAIL_CHECK_BUFFER_PTR(buffer);
 
     SAIL_TRY(sail_start_writing_mem(buffer,
                                     buffer_length,
-                                    d->ctx->sail_context_c(),
                                     splugin_info.sail_plugin_info_c(),
                                     &d->state));
 
@@ -237,7 +200,6 @@ sail_error_t image_writer::start_writing(void *buffer, size_t buffer_length, con
 
 sail_error_t image_writer::start_writing(void *buffer, size_t buffer_length, const plugin_info &splugin_info, const write_options &swrite_options)
 {
-    SAIL_CHECK_CONTEXT_PTR(d->ctx);
     SAIL_CHECK_BUFFER_PTR(buffer);
 
     sail_write_options sail_write_options;
@@ -245,7 +207,6 @@ sail_error_t image_writer::start_writing(void *buffer, size_t buffer_length, con
 
     SAIL_TRY(sail_start_writing_mem_with_options(buffer,
                                                  buffer_length,
-                                                 d->ctx->sail_context_c(),
                                                  splugin_info.sail_plugin_info_c(),
                                                  &sail_write_options,
                                                  &d->state));
@@ -255,13 +216,11 @@ sail_error_t image_writer::start_writing(void *buffer, size_t buffer_length, con
 
 sail_error_t image_writer::start_writing(const io &sio, const plugin_info &splugin_info)
 {
-    SAIL_CHECK_CONTEXT_PTR(d->ctx);
     SAIL_TRY(sio.verify_valid());
 
     SAIL_TRY(sio.to_sail_io(&d->sail_io));
 
     SAIL_TRY(sail_start_writing_io_with_options(&d->sail_io,
-                                                d->ctx->sail_context_c(),
                                                 splugin_info.sail_plugin_info_c(),
                                                 NULL,
                                                 &d->state));
@@ -271,7 +230,6 @@ sail_error_t image_writer::start_writing(const io &sio, const plugin_info &splug
 
 sail_error_t image_writer::start_writing(const io &sio, const plugin_info &splugin_info, const write_options &swrite_options)
 {
-    SAIL_CHECK_CONTEXT_PTR(d->ctx);
     SAIL_TRY(sio.verify_valid());
 
     SAIL_TRY(sio.to_sail_io(&d->sail_io));
@@ -280,7 +238,6 @@ sail_error_t image_writer::start_writing(const io &sio, const plugin_info &splug
     SAIL_TRY(swrite_options.to_sail_write_options(&sail_write_options));
 
     SAIL_TRY(sail_start_writing_io_with_options(&d->sail_io,
-                                                d->ctx->sail_context_c(),
                                                 splugin_info.sail_plugin_info_c(),
                                                 &sail_write_options,
                                                 &d->state));

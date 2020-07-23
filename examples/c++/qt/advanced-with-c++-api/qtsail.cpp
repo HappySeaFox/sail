@@ -54,11 +54,6 @@ QtSail::~QtSail()
 
 sail_error_t QtSail::init()
 {
-    if (m_context.status() != 0) {
-        QMessageBox::critical(this, tr("Error"), tr("Failed to init SAIL. Error: %1").arg(m_context.status()));
-        ::exit(1);
-    }
-
     QTimer::singleShot(0, this, [&]{
         QMessageBox::information(this, tr("Features"), tr("This demo includes:"
                                                           "<ul>"
@@ -79,7 +74,7 @@ sail_error_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, QV
     qimages->clear();
     delays->clear();
 
-    sail::image_reader reader(&m_context);
+    sail::image_reader reader;
     sail::image image;
 
     // Initialize reading.
@@ -136,7 +131,7 @@ sail_error_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, QV
 
 sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
 {
-    sail::image_writer writer(&m_context);
+    sail::image_writer writer;
     sail::image image;
 
     image.with_width(qimage.width())
@@ -190,7 +185,7 @@ sail_error_t QtSail::onProbe()
     QElapsedTimer elapsedTimer;
     elapsedTimer.start();
 
-    sail::image_reader reader(&m_context);
+    sail::image_reader reader;
     sail::image image;
     sail::plugin_info plugin_info;
 

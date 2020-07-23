@@ -142,6 +142,123 @@ sail_error_t plugin_info::plugin_feature_from_string(const char *str, SailPlugin
     return 0;
 }
 
+sail_error_t plugin_info::by_magic_number_from_path(const std::string &path, plugin_info *splugin_info)
+{
+    SAIL_TRY(by_magic_number_from_path(path.c_str(), splugin_info));
+
+    return 0;
+}
+
+sail_error_t plugin_info::by_magic_number_from_path(const char *path, plugin_info *splugin_info)
+{
+    SAIL_CHECK_PLUGIN_INFO_PTR(splugin_info);
+
+    const struct sail_plugin_info *sail_plugin_info;
+    SAIL_TRY(sail_plugin_info_by_magic_number_from_path(path, &sail_plugin_info));
+
+    *splugin_info = plugin_info(sail_plugin_info);
+
+    return 0;
+}
+
+sail_error_t plugin_info::by_magic_number_from_mem(const void *buffer, size_t buffer_length, plugin_info *splugin_info)
+{
+    SAIL_CHECK_PLUGIN_INFO_PTR(splugin_info);
+
+    const struct sail_plugin_info *sail_plugin_info;
+    SAIL_TRY(sail_plugin_info_by_magic_number_from_mem(buffer, buffer_length, &sail_plugin_info));
+
+    *splugin_info = plugin_info(sail_plugin_info);
+
+    return 0;
+}
+
+sail_error_t plugin_info::by_magic_number_from_io(const sail::io &io, plugin_info *splugin_info)
+{
+    SAIL_CHECK_PLUGIN_INFO_PTR(splugin_info);
+    SAIL_TRY(io.verify_valid());
+
+    struct sail_io sail_io;
+    SAIL_TRY(io.to_sail_io(&sail_io));
+
+    const struct sail_plugin_info *sail_plugin_info;
+    SAIL_TRY(sail_plugin_info_by_magic_number_from_io(&sail_io, &sail_plugin_info));
+
+    *splugin_info = plugin_info(sail_plugin_info);
+
+    return 0;
+}
+
+sail_error_t plugin_info::from_path(const std::string &path, plugin_info *splugin_info)
+{
+    SAIL_TRY(from_path(path.c_str(), splugin_info));
+
+    return 0;
+}
+
+sail_error_t plugin_info::from_path(const char *path, plugin_info *splugin_info)
+{
+    SAIL_CHECK_PLUGIN_INFO_PTR(splugin_info);
+
+    const struct sail_plugin_info *sail_plugin_info;
+    SAIL_TRY(sail_plugin_info_from_path(path, &sail_plugin_info));
+
+    *splugin_info = plugin_info(sail_plugin_info);
+
+    return 0;
+}
+
+sail_error_t plugin_info::from_extension(const std::string &suffix, plugin_info *splugin_info)
+{
+    SAIL_TRY(from_extension(suffix.c_str(), splugin_info));
+
+    return 0;
+}
+
+sail_error_t plugin_info::from_extension(const char *suffix, plugin_info *splugin_info)
+{
+    SAIL_CHECK_PLUGIN_INFO_PTR(splugin_info);
+
+    const struct sail_plugin_info *sail_plugin_info;
+    SAIL_TRY(sail_plugin_info_from_extension(suffix, &sail_plugin_info));
+
+    *splugin_info = plugin_info(sail_plugin_info);
+
+    return 0;
+}
+
+sail_error_t plugin_info::from_mime_type(const std::string &mime_type, plugin_info *splugin_info)
+{
+    SAIL_TRY(from_mime_type(mime_type.c_str(), splugin_info));
+
+    return 0;
+}
+
+sail_error_t plugin_info::from_mime_type(const char *mime_type, plugin_info *splugin_info)
+{
+    SAIL_CHECK_PLUGIN_INFO_PTR(splugin_info);
+
+    const struct sail_plugin_info *sail_plugin_info;
+    SAIL_TRY(sail_plugin_info_from_mime_type(mime_type, &sail_plugin_info));
+
+    *splugin_info = plugin_info(sail_plugin_info);
+
+    return 0;
+}
+
+std::vector<plugin_info> plugin_info::list()
+{
+    std::vector<plugin_info> plugin_info_list;
+    const sail_plugin_info_node *plugin_info_node = sail_plugin_info_list();
+
+    while (plugin_info_node != nullptr) {
+        plugin_info_list.push_back(plugin_info(plugin_info_node->plugin_info));
+        plugin_info_node = plugin_info_node->next;
+    }
+
+    return plugin_info_list;
+}
+
 plugin_info::plugin_info(const sail_plugin_info *pi)
     : plugin_info()
 {

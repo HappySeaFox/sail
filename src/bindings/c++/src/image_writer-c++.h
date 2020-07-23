@@ -40,7 +40,6 @@
 namespace sail
 {
 
-class context;
 class image;
 class io;
 class plugin_info;
@@ -53,10 +52,7 @@ class SAIL_EXPORT image_writer
 {
 public:
     image_writer();
-    image_writer(context *ctx);
     ~image_writer();
-
-    bool is_valid() const;
 
     /*
      * An interface to sail_write_file(). See sail_write_file() for more.

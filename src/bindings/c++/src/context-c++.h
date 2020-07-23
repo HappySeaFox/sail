@@ -26,9 +26,6 @@
 #ifndef SAIL_CONTEXT_CPP_H
 #define SAIL_CONTEXT_CPP_H
 
-#include <string>
-#include <vector>
-
 #ifdef SAIL_BUILD
     #include "error.h"
     #include "export.h"
@@ -37,7 +34,15 @@
     #include <sail-common/export.h>
 #endif
 
-struct sail_context;
+/*
+ * SAIL contexts.
+ *
+ * All SAIL functions allocate a thread-local static context per thread when necessary. The context enumerates and holds
+ * a list of available plugin info objects.
+ *
+ * If you call SAIL functions from three different threads, three different contexts are allocated.
+ * You can destroy them with calling sail_finish() in each thread.
+ */
 
 namespace sail
 {
@@ -45,19 +50,26 @@ namespace sail
 class plugin_info;
 class io;
 
-/*
- * Context is a main entry point to start working with SAIL. It enumerates plugin info objects which could be
- * used later in reading and writing operations.
- */
 class SAIL_EXPORT context
 {
     friend class image_reader;
     friend class image_writer;
 
 public:
+    context() = delete;
+    context(const context&) = delete;
+    context& operator=(const context&) = delete;
+
     /*
-     * Initializes SAIL with default flags. This is a main entry point to start working with SAIL.
-     * Builds a list of available SAIL plugins.
+     * Initializes a new SAIL thread-local static context with the specific flags. Does nothing if the thread-local static context
+     * already exists. Builds a list of available SAIL plugins. See SailInitFlags.
+     *
+     * If you don't need specific features like preloading plugins, just don't use this method at all.
+     * All reading or writing methods allocate a thread-local static context implicitly when they need it
+     * and when it doesn't exist already.
+     *
+     * It's always recommended to destroy the implicitly or explicitly allocated SAIL thread-local static context
+     * with finish() when you're done with calling SAIL methods in the current thread.
      *
      * Plugins (image codecs) paths search algorithm (first found path wins):
      *
@@ -70,158 +82,29 @@ public:
      *     1. SAIL_PLUGINS_PATH environment variable
      *     2. Hardcoded SAIL_PLUGINS_PATH in config.h
      *
-     * See also status().
+     * Returns 0 on success or sail_error_t on error.
      */
-    context();
+    static sail_error_t init(int flags);
 
     /*
-     * Initializes SAIL with the specific flags. This is an alternative entry point to start working with SAIL.
-     * Builds a list of available SAIL plugins. See SailInitFlags.
-     *
-     * Plugins (image codecs) paths search algorithm (first found path wins):
-     *
-     *   Windows:
-     *     1. SAIL_PLUGINS_PATH environment variable
-     *     2. <SAIL DEPLOYMENT FOLDER>\lib\sail\plugins
-     *     3. Hardcoded SAIL_PLUGINS_PATH in config.h
-     *
-     *   Unix (including macOS):
-     *     1. SAIL_PLUGINS_PATH environment variable
-     *     2. Hardcoded SAIL_PLUGINS_PATH in config.h
-     *
-     * See also status().
-     */
-    context(int flags);
-
-    /*
-     * When context gets destroyed, all plugin info objects, read and write features get invalidated.
-     * Using them when the context doesn't exist anymore will lead to a crash.
-     */
-    ~context();
-
-    /*
-     * Returns a context initialization status. Using SAIL when this function returns a non-zero status
-     * has no sense as most methods will return errors.
+     * Unloads all the loaded plugins from the cache to release memory occupied by them. Use it if you want
+     * to release some memory but do not want to deinitialize SAIL with sail_finish(). Subsequent attempts
+     * to read or write images will reload necessary SAIL plugins from disk.
      *
      * Returns 0 on success or sail_error_t on error.
      */
-    sail_error_t status() const;
+    static sail_error_t unload_plugins();
 
     /*
-     * Returns a list of found plugin info objects. Use it to determine the list of possible
-     * image formats, file extensions, and mime types that could be hypothetically read or written by SAIL.
+     * Finalizes working with the thread-local static context that was implicitly or explicitly allocated by
+     * reading or writing functions.
+     *
+     * Unloads all plugins. All pointers to plugin info objects, read and write features get invalidated. 
+     * Using them after calling finish() will lead to a crash.
+     *
+     * It's possible to initialize a new SAIL thread-local static context afterwards, implicitly or explicitly.
      */
-    const std::vector<plugin_info>& plugin_info_list() const;
-
-    /*
-     * Unloads all loaded plugins (codecs) to free some memory. Plugin info objects attached
-     * to the context remain untouched.
-     *
-     * Returns 0 on success or sail_error_t on error.
-     */
-    sail_error_t unload_plugins();
-
-    /*
-     * Finds a first plugin info object that supports the magic number read from the specified file.
-     * The comparison algorithm is case insensitive.
-     *
-     * Typical usage: context::plugin_info_by_magic_number_from_path() ->
-     *                image_reader::start_reading_file()               ->
-     *                image_reader::read_next_frame()                  ->
-     *                image_reader::stop_reading().
-     *
-     * Returns 0 on success or sail_error_t on error.
-     */
-    sail_error_t plugin_info_by_magic_number_from_path(const std::string &path, plugin_info *splugin_info) const;
-    sail_error_t plugin_info_by_magic_number_from_path(const char *path, plugin_info *splugin_info) const;
-
-    /*
-     * Finds a first plugin info object that supports the magic number read from the specified memory buffer.
-     * The comparison algorithm is case insensitive.
-     *
-     * Typical usage: context::plugin_info_by_magic_number_from_mem() ->
-     *                image_reader::start_reading_file()              ->
-     *                image_reader::read_next_frame()                 ->
-     *                image_reader::stop_reading().
-     *
-     * Returns 0 on success or sail_error_t on error.
-     */
-    sail_error_t plugin_info_by_magic_number_from_mem(const void *buffer, size_t buffer_length, plugin_info *splugin_info) const;
-
-    /*
-     * Finds a first plugin info object that supports the magic number read from the specified I/O source.
-     * The comparison algorithm is case insensitive.
-     *
-     * Typical usage: context::plugin_info_by_magic_number_from_io() ->
-     *                image_reader::start_reading_file()             ->
-     *                image_reader::read_next_frame()                ->
-     *                image_reader::stop_reading().
-     *
-     * Returns 0 on success or sail_error_t on error.
-     */
-    sail_error_t plugin_info_by_magic_number_from_io(const sail::io &io, plugin_info *splugin_info) const;
-
-    /*
-     * Finds a first plugin info object that supports reading or writing the specified file path by its file extension.
-     * The comparison algorithm is case-insensitive. For example: "/test.jpg". The path might not exist.
-     *
-     * Typical usage: context::plugin_info_from_path()   ->
-     *                image_reader::start_reading_file() ->
-     *                image_reader::read_next_frame()    ->
-     *                image_reader::stop_reading().
-     *
-     * Or:            context::plugin_info_from_path() ->
-     *                image_writer::start_writing()    ->
-     *                image_writer::read_next_frame()  ->
-     *                image_writer::stop_writing().
-     *
-     * Returns 0 on success or sail_error_t on error.
-     */
-    sail_error_t plugin_info_from_path(const std::string &path, plugin_info *splugin_info) const;
-    sail_error_t plugin_info_from_path(const char *path, plugin_info *splugin_info) const;
-
-    /*
-     * Finds a first plugin info object that supports the specified file extension. The comparison
-     * algorithm is case-insensitive. For example: "jpg".
-     *
-     * Typical usage: context::plugin_info_from_extension() ->
-     *                image_reader::start_reading_file()    ->
-     *                image_reader::read_next_frame()       ->
-     *                image_reader::stop_reading().
-     *
-     * Or:            context::plugin_info_from_extension() ->
-     *                image_writer::start_writing()         ->
-     *                image_writer::read_next_frame()       ->
-     *                image_writer::stop_writing().
-     *
-     * Returns 0 on success or sail_error_t on error.
-     */
-    sail_error_t plugin_info_from_extension(const std::string &suffix, plugin_info *splugin_info) const;
-    sail_error_t plugin_info_from_extension(const char *suffix, plugin_info *splugin_info) const;
-
-    /*
-     * Finds a first plugin info object that supports the specified mime type. The comparison
-     * algorithm is case-insensitive. For example: "image/jpeg".
-     *
-     * Typical usage: context::plugin_info_from_mime_type() ->
-     *                image_reader::start_reading_file()    ->
-     *                image_reader::read_next_frame()       ->
-     *                image_reader::stop_reading().
-     *
-     * Or:            context::plugin_info_from_mime_type() ->
-     *                image_writer::start_writing()         ->
-     *                image_writer::read_next_frame()       ->
-     *                image_writer::stop_writing().
-     *
-     * Returns 0 on success or sail_error_t on error.
-     */
-    sail_error_t plugin_info_from_mime_type(const std::string &mime_type, plugin_info *splugin_info) const;
-    sail_error_t plugin_info_from_mime_type(const char *mime_type, plugin_info *splugin_info) const;
-
-private:
-    sail_error_t init(int flags);
-
-    sail_context* sail_context_c() const;
+    static void finish();
 
 private:
     class pimpl;
