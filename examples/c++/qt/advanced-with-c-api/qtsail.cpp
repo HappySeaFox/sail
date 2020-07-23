@@ -50,16 +50,11 @@
 
 QtSail::~QtSail()
 {
-    sail_finish(m_context);
-    m_context = nullptr;
+    sail_finish();
 }
 
 sail_error_t QtSail::init()
 {
-    SAIL_TRY_OR_CLEANUP(sail_init(&m_context),
-                        /* cleanup */ QMessageBox::critical(this, tr("Error"), tr("Failed to init SAIL")),
-                                      ::exit(1));
-
     QTimer::singleShot(0, this, [&]{
         QMessageBox::information(this, tr("Features"), tr("This demo includes:"
                                                           "<ul>"
@@ -96,7 +91,7 @@ sail_error_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, QV
      * Starts reading the specified file.
      * The subsequent calls to sail_read_next_frame() output pixels in the BPP32-RGBA pixel format.
      */
-    SAIL_TRY_OR_CLEANUP(sail_start_reading_file(path.toLocal8Bit(), m_context, NULL, &state),
+    SAIL_TRY_OR_CLEANUP(sail_start_reading_file(path.toLocal8Bit(), NULL, &state),
                         /* cleanup */ sail_stop_reading(state));
 
     /*
@@ -183,7 +178,7 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
     SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(image->width, image->pixel_format, &image->bytes_per_line),
                         /* cleanup */sail_destroy_image(image));
 
-    SAIL_TRY_OR_CLEANUP(sail_start_writing_file(path.toLocal8Bit(), m_context, nullptr, &state),
+    SAIL_TRY_OR_CLEANUP(sail_start_writing_file(path.toLocal8Bit(), nullptr, &state),
                         /* cleanup */ sail_destroy_image(image));
     SAIL_TRY_OR_CLEANUP(sail_write_next_frame(state, image),
                         /* cleanup */ sail_destroy_image(image));
@@ -238,7 +233,7 @@ sail_error_t QtSail::onProbe()
     const struct sail_plugin_info *plugin_info;
     sail_error_t res;
 
-    if ((res = sail_probe_file(path.toLocal8Bit(), m_context, &image, &plugin_info)) != 0) {
+    if ((res = sail_probe_file(path.toLocal8Bit(), &image, &plugin_info)) != 0) {
         QMessageBox::critical(this, tr("Error"), tr("Failed to probe the image. Error: %1").arg(res));
         return res;
     }

@@ -39,8 +39,6 @@ namespace Ui {
 class QImage;
 class QTimer;
 
-struct sail_context;
-
 class QtSail : public QWidget
 {
     Q_OBJECT
@@ -73,8 +71,6 @@ private:
     QScopedPointer<QTimer> m_animationTimer;
     int m_currentIndex = 0;
     QString m_suffix;
-
-    sail_context *m_context = nullptr;
 };
 
 #endif
