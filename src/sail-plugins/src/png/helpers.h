@@ -43,7 +43,7 @@ SAIL_HIDDEN void my_error_fn(png_structp png_ptr, png_const_charp text);
 
 SAIL_HIDDEN void my_warning_fn(png_structp png_ptr, png_const_charp text);
 
-SAIL_HIDDEN int png_color_type_to_pixel_format(int color_type, int bit_depth);
+SAIL_HIDDEN enum SailPixelFormat png_color_type_to_pixel_format(int color_type, int bit_depth);
 
 SAIL_HIDDEN sail_error_t pixel_format_to_png_color_type(enum SailPixelFormat pixel_format, int *color_type, int *bit_depth);
 

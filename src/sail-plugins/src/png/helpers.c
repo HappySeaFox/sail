@@ -46,7 +46,7 @@ void my_warning_fn(png_structp png_ptr, png_const_charp text) {
     SAIL_LOG_WARNING("PNG: %s", text);
 }
 
-int png_color_type_to_pixel_format(int color_type, int bit_depth) {
+enum SailPixelFormat png_color_type_to_pixel_format(int color_type, int bit_depth) {
 
     switch (color_type) {
         case PNG_COLOR_TYPE_GRAY: {
