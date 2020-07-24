@@ -290,13 +290,14 @@ sail_error_t control_tls_context(struct sail_context **context, enum SailContext
         SAIL_CHECK_CONTEXT_PTR(context);
 
         if (tls_context == NULL) {
-            SAIL_LOG_DEBUG("Initializing a thread-local static context");
             SAIL_TRY(alloc_context(&tls_context));
+            SAIL_LOG_DEBUG("Allocated a new thread-local context %p", tls_context);
         }
 
         *context = tls_context;
     } else if (action == SAIL_CONTEXT_DESTROY) {
         destroy_context(tls_context);
+        SAIL_LOG_DEBUG("Destroyed the thread-local context %p", tls_context);
         tls_context = NULL;
     }
 
