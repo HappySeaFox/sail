@@ -26,6 +26,8 @@
 #ifndef SAIL_CONTEXT_H
 #define SAIL_CONTEXT_H
 
+#include <stdbool.h>
+
 struct sail_plugin_info_node;
 
 /*
@@ -34,6 +36,10 @@ struct sail_plugin_info_node;
  */
 struct sail_context {
 
+    /* Context is already initialized. */
+    bool initialized;
+
+    /* Linked list of found plugin info objects. */
     struct sail_plugin_info_node *plugin_info_node;
 };
 

@@ -67,13 +67,12 @@ QtSail::QtSail(QWidget *parent)
 
 QtSail::~QtSail()
 {
-    sail_finish(m_context);
-    m_context = nullptr;
+    sail_finish();
 }
 
 sail_error_t QtSail::init()
 {
-    SAIL_TRY_OR_CLEANUP(sail_init_with_flags(&m_context, SAIL_FLAG_PRELOAD_PLUGINS),
+    SAIL_TRY_OR_CLEANUP(sail_init_with_flags(SAIL_FLAG_PRELOAD_PLUGINS),
                         /* cleanup */ QMessageBox::critical(this, tr("Error"), tr("Failed to init SAIL")),
                                       ::exit(1));
 
@@ -110,7 +109,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
      * See https://en.wikipedia.org/wiki/File_format#Magic_number.
      */
     const struct sail_plugin_info *plugin_info;
-    SAIL_TRY(sail_plugin_info_by_magic_number_from_path(path.toLocal8Bit(), m_context, &plugin_info));
+    SAIL_TRY(sail_plugin_info_by_magic_number_from_path(path.toLocal8Bit(), &plugin_info));
 
     sail_read_options *read_options;
 
@@ -149,7 +148,6 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
      */
     SAIL_TRY_OR_CLEANUP(sail_start_reading_mem_with_options(buf,
                                                             buf.length(),
-                                                            m_context,
                                                             plugin_info,
                                                             read_options,
                                                             &state),
@@ -248,7 +246,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     m_suffix = QFileInfo(path).suffix();
 
     /* Optional: unload all plugins to free up some memory. */
-    sail_unload_plugins(m_context);
+    sail_unload_plugins();
 
     return 0;
 }
@@ -316,7 +314,7 @@ sail_error_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffer
     elapsed.start();
 
     const struct sail_plugin_info *plugin_info;
-    SAIL_TRY(sail_plugin_info_from_extension(m_suffix.toUtf8(), m_context, &plugin_info));
+    SAIL_TRY(sail_plugin_info_from_extension(m_suffix.toUtf8(), &plugin_info));
 
     // Allocate new write options and copy defaults from the write features
     // (preferred output pixel format etc.).
@@ -344,7 +342,6 @@ sail_error_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffer
     //
     SAIL_TRY(sail_start_writing_mem_with_options(buffer,
                                                   buffer_length,
-                                                  m_context,
                                                   plugin_info,
                                                   write_options,
                                                   &state));
@@ -381,7 +378,7 @@ sail_error_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffer
     sail_destroy_image(image);
 
     /* Optional: unload all plugins to free up some memory. */
-    sail_unload_plugins(m_context);
+    sail_unload_plugins();
 
     return 0;
 }
@@ -438,7 +435,7 @@ sail_error_t QtSail::onProbe()
     const QByteArray buffer = file.readAll();
 
     // Probe from memory
-    if ((res = sail_probe_mem(buffer.constData(), buffer.length(), m_context, &image, &plugin_info)) != 0) {
+    if ((res = sail_probe_mem(buffer.constData(), buffer.length(), &image, &plugin_info)) != 0) {
         QMessageBox::critical(this, tr("Error"), tr("Failed to probe the image. Error: %1").arg(res));
         return res;
     }

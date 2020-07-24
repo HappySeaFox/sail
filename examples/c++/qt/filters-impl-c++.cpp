@@ -26,7 +26,7 @@
 QStringList QtSail::filters() const
 {
     QStringList filters { QStringLiteral("All Files (*.*)") };
-    const std::vector<sail::plugin_info> plugin_info_list = m_context.plugin_info_list();
+    const std::vector<sail::plugin_info> plugin_info_list = sail::plugin_info::list();
 
     for (const sail::plugin_info &plugin_info : plugin_info_list) {
         QStringList masks;

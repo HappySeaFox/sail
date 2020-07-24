@@ -30,36 +30,34 @@
 #include "sail-common.h"
 #include "sail.h"
 
-sail_error_t sail_start_reading_io(struct sail_io *io, struct sail_context *context,
-                                   const struct sail_plugin_info *plugin_info, void **state) {
+sail_error_t sail_start_reading_io(struct sail_io *io, const struct sail_plugin_info *plugin_info, void **state) {
 
-    SAIL_TRY(sail_start_reading_io_with_options(io, context, plugin_info, NULL, state));
+    SAIL_TRY(sail_start_reading_io_with_options(io, plugin_info, NULL, state));
 
     return 0;
 }
 
-sail_error_t sail_start_reading_io_with_options(struct sail_io *io, struct sail_context *context,
+sail_error_t sail_start_reading_io_with_options(struct sail_io *io,
                                                 const struct sail_plugin_info *plugin_info,
                                                 const struct sail_read_options *read_options, void **state) {
 
-    SAIL_TRY(start_reading_io_with_options(io, false, context, plugin_info, read_options, state));
+    SAIL_TRY(start_reading_io_with_options(io, false, plugin_info, read_options, state));
 
     return 0;
 }
 
-sail_error_t sail_start_writing_io(struct sail_io *io, struct sail_context *context,
-                                   const struct sail_plugin_info *plugin_info, void **state) {
+sail_error_t sail_start_writing_io(struct sail_io *io, const struct sail_plugin_info *plugin_info, void **state) {
 
-    SAIL_TRY(sail_start_writing_io_with_options(io, context, plugin_info, NULL, state));
+    SAIL_TRY(sail_start_writing_io_with_options(io, plugin_info, NULL, state));
 
     return 0;
 }
 
-sail_error_t sail_start_writing_io_with_options(struct sail_io *io, struct sail_context *context,
+sail_error_t sail_start_writing_io_with_options(struct sail_io *io,
                                                 const struct sail_plugin_info *plugin_info,
                                                 const struct sail_write_options *write_options, void **state) {
 
-    SAIL_TRY(start_writing_io_with_options(io, false, context, plugin_info, write_options, state));
+    SAIL_TRY(start_writing_io_with_options(io, false, plugin_info, write_options, state));
 
     return 0;
 }

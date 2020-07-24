@@ -62,6 +62,12 @@ SAIL_TRY(sail_read_file(path,
  */
 
 sail_destroy_image(image);
+
+/*
+ * Recommended: finish working with the implicitly allocated SAIL context in this thread
+ * and unload all loaded plugins attached to it.
+ */
+sail_finish();
 ```
 
 #### C++:
@@ -84,14 +90,6 @@ SAIL_TRY(reader.read(path, &image));
 
 #### C:
 ```C
-struct sail_context *context = NULL;
-
-/*
- * Initialize SAIL context. You could cache the context and re-use it multiple times.
- * When it's not needed anymore, call sail_finish(context).
- */
-SAIL_TRY(sail_init(&context));
-
 /*
  * A local void pointer is needed for SAIL to save a state in it.
  * Always set the initial state to NULL in C or nullptr in C++.
@@ -103,7 +101,7 @@ struct sail_image *image;
  * Starts reading the specified file.
  * The subsequent calls to sail_read_next_frame() output pixels in the BPP32-RGBA pixel format.
  */
-SAIL_TRY_OR_CLEANUP(sail_start_reading_file(path, context, NULL, &state),
+SAIL_TRY_OR_CLEANUP(sail_start_reading_file(path, NULL, &state),
                     /* cleanup */ sail_stop_reading(state));
 
 /*
@@ -130,21 +128,15 @@ SAIL_TRY_OR_CLEANUP(sail_stop_reading(state),
 sail_destroy_image(image);
 
 /*
- * If you have no plans to re-use the same context in the future, finish working with this
- * context and unload all loaded plugins attached to it.
+ * Recommended: finish working with the implicitly allocated SAIL context in this thread
+ * and unload all loaded plugins attached to it.
  */
-sail_finish(context);
-context = NULL;
+sail_finish();
 ```
 
 #### C++:
 ```C++
-// Initialize SAIL context. You could cache the context as a class member and re-use it
-// multiple times.
-//
-sail::context context;
-
-sail::image_reader reader(&context);
+sail::image_reader reader;
 sail::image image;
 
 // It's essential to ALWAYS stop reading to free memory resources.
@@ -173,6 +165,11 @@ SAIL_TRY(reader.stop_reading());
 // Handle the image and its pixels here.
 // Use image.width(), image.height(), image.bytes_per_line(),
 // image.pixel_format(), and image.pixels() for that.
+
+// Recommended: finish working with the implicitly allocated SAIL context in this thread
+// and unload all loaded plugins attached to it.
+//
+sail::context::finish();
 ```
 
 ### 3. `deep diver`
@@ -182,14 +179,11 @@ SAIL_TRY(reader.stop_reading());
 
 #### C:
 ```C
-struct sail_context *context = NULL;
-
 /*
- * Initialize SAIL context and preload all plugins. Plugins are lazy-loaded when
- * SAIL_FLAG_PRELOAD_PLUGINS is not specified. You could cache the context and re-use it
- * multiple times. When it's not needed anymore, call sail_finish(context).
+ * Initialize a new SAIL thread-local static context explicitly and preload all plugins.
+ * Plugins are lazy-loaded when SAIL_FLAG_PRELOAD_PLUGINS is not specified.
  */
-SAIL_TRY(sail_init_with_flags(&context, SAIL_FLAG_PRELOAD_PLUGINS));
+SAIL_TRY(sail_init_with_flags(SAIL_FLAG_PRELOAD_PLUGINS));
 
 struct sail_read_options *read_options;
 struct sail_image *image;
@@ -203,7 +197,7 @@ void *state = NULL;
  * Find the codec to read JPEGs.
  */
 const struct sail_plugin_info *plugin_info;
-SAIL_TRY(sail_plugin_info_from_extension("JPEG", context, &plugin_info));
+SAIL_TRY(sail_plugin_info_from_extension("JPEG", &plugin_info));
 
 /*
  * Allocate new read options and copy defaults from the plugin-specific read features
@@ -222,7 +216,6 @@ size_t buffer_length = ...
  */
 SAIL_TRY_OR_CLEANUP(sail_start_reading_mem_with_options(buffer,
                                                         buffer_length,
-                                                        context,
                                                         plugin_info,
                                                         read_options,
                                                         &state),
@@ -267,32 +260,29 @@ if (node != NULL) {
 sail_destroy_image(image);
 
 /*
- * Optional: unload all plugins to free up some memory if you plan to re-use the same
- * context in the future.
+ * Optional: unload all plugins to free up some memory.
  */
-sail_unload_plugins(context);
+sail_unload_plugins();
 
 /*
- * If you have no plans to re-use the same context in the future, finish working with
- * this context and unload all loaded plugins attached to it.
+ * Recommended: finish working with the explicitly allocated SAIL context in this thread
+ * and unload all loaded plugins attached to it.
  */
-sail_finish(context);
-context = NULL;
+sail_finish();
 ```
 
 #### C++:
 ```C++
-// Initialize SAIL context and preload all plugins. Plugins are lazy-loaded when
-// SAIL_FLAG_PRELOAD_PLUGINS is not specified. You could cache the context
-// and re-use it multiple times.
+// Initialize a new SAIL thread-local static context explicitly and preload all plugins.
+// Plugins are lazy-loaded when SAIL_FLAG_PRELOAD_PLUGINS is not specified.
 //
-sail::context context(SAIL_FLAG_PRELOAD_PLUGINS);
-sail::image_reader reader(&context);
+sail::context::init(SAIL_FLAG_PRELOAD_PLUGINS);
+sail::image_reader reader;
 
 // Find the codec to read JPEGs.
 //
 sail::plugin_info plugin_info;
-SAIL_TRY(context.plugin_info_from_extension("JPEG", &plugin_info));
+SAIL_TRY(plugin_info::from_extension("JPEG", &plugin_info));
 
 // Instantiate new read options and copy defaults from the read features
 // (preferred output pixel format etc.).
@@ -334,6 +324,11 @@ if (!meta_entries.empty()) {
 // Handle the image and its pixels here.
 // Use image.width(), image.height(), image.bytes_per_line(),
 // image.pixel_format(), and image.pixels() for that.
+
+// Recommended: finish working with the implicitly allocated SAIL context in this thread
+// and unload all loaded plugins attached to it.
+//
+sail::context::finish();
 ```
 
 ### 4. `technical diver`
@@ -346,14 +341,11 @@ Instead of using `sail_start_reading_file_with_options()` in the `deep diver` ex
 and call `sail_start_reading_io_with_options()`.
 
 ```C
-struct sail_context *context = NULL;
-
 /*
- * Initialize SAIL context and preload all plugins. Plugins are lazy-loaded when
- * SAIL_FLAG_PRELOAD_PLUGINS is not specified. You could cache the context and re-use it
- * multiple times. When it's not needed anymore, call sail_finish(context).
+ * Initialize a new SAIL thread-local static context explicitly and preload all plugins.
+ * Plugins are lazy-loaded when SAIL_FLAG_PRELOAD_PLUGINS is not specified.
  */
-SAIL_TRY(sail_init_with_flags(&context, SAIL_FLAG_PRELOAD_PLUGINS));
+SAIL_TRY(sail_init_with_flags(SAIL_FLAG_PRELOAD_PLUGINS));
 
 struct sail_read_options *read_options;
 struct sail_image *image;
@@ -367,7 +359,7 @@ void *state = NULL;
  * Find the codec to read JPEGs.
  */
 const struct sail_plugin_info *plugin_info;
-SAIL_TRY(sail_plugin_info_from_extension("JPEG", context, &plugin_info));
+SAIL_TRY(sail_plugin_info_from_extension("JPEG", &plugin_info));
 
 /*
  * Create our custom I/O source.
@@ -408,7 +400,6 @@ SAIL_TRY_OR_CLEANUP(sail_alloc_read_options_from_features(plugin_info->read_feat
  * Initialize reading with our options. The options will be deep copied.
  */
 SAIL_TRY_OR_CLEANUP(sail_start_reading_io_with_options(io,
-                                                       context,
                                                        plugin_info,
                                                        read_options,
                                                        &state),
@@ -458,32 +449,29 @@ if (node != NULL) {
 sail_destroy_image(image);
 
 /*
- * Optional: unload all plugins to free up some memory if you plan to re-use the same context
- * in the future.
+ * Optional: unload all plugins to free up some memory.
  */
-sail_unload_plugins(context);
+sail_unload_plugins();
 
 /*
- * If you have no plans to re-use the same context in the future, finish working with this
- * context and unload all loaded plugins attached to it.
+ * Recommended: finish working with the explicitly allocated SAIL context in this thread
+ * and unload all loaded plugins attached to it.
  */
-sail_finish(context);
-context = NULL;
+sail_finish();
 ```
 
 #### C++:
 ```C++
-// Initialize SAIL context and preload all plugins. Plugins are lazy-loaded when
-// SAIL_FLAG_PRELOAD_PLUGINS is not specified. You could cache the context and re-use
-// it multiple times.
+// Initialize a new SAIL thread-local static context explicitly and preload all plugins.
+// Plugins are lazy-loaded when SAIL_FLAG_PRELOAD_PLUGINS is not specified.
 //
-sail::context context(SAIL_FLAG_PRELOAD_PLUGINS);
-sail::image_reader reader(&context);
+sail::context::init(SAIL_FLAG_PRELOAD_PLUGINS);
+sail::image_reader reader;
 
 // Find the codec info by a file extension.
 //
 sail::plugin_info plugin_info;
-SAIL_TRY(context.plugin_info_from_path(path, &plugin_info));
+SAIL_TRY(plugin_info::from_path(path, &plugin_info));
 
 /*
  * Create our custom I/O source.
@@ -546,4 +534,9 @@ if (!meta_entries.empty()) {
 // Handle the image and its pixels here.
 // Use image.width(), image.height(), image.bytes_per_line(),
 // image.pixel_format(), and image.pixels() for that.
+
+// Recommended: finish working with the implicitly allocated SAIL context in this thread
+// and unload all loaded plugins attached to it.
+//
+sail::context::finish();
 ```

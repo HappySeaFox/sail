@@ -34,8 +34,6 @@
 
 #include <sail-common/error.h>
 
-#include <sail-c++/context-c++.h>
-
 namespace Ui {
     class QtSail;
 }
@@ -81,8 +79,6 @@ private:
     QScopedPointer<QTimer> m_animationTimer;
     int m_currentIndex = 0;
     QString m_suffix;
-
-    sail::context m_context;
 };
 
 #endif

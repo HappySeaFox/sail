@@ -38,7 +38,6 @@
 extern "C" {
 #endif
 
-struct sail_context;
 struct sail_plugin_info;
 
 /*
@@ -46,33 +45,26 @@ struct sail_plugin_info;
  * MUST be destroyed later with sail_destroy_image(). The assigned plugin info MUST NOT be destroyed
  * because it is a pointer to an internal data structure. If you don't need it, just pass NULL.
  *
- * Context is optional and can be NULL. SAIL allocates a thread-local static context when it's NULL.
- * ASAN may report a memory leak in this case, which is OK.
- *
  * This function is pretty fast because it doesn't decode whole image data for most image formats.
  *
  * Typical usage: This is a standalone function that could be called at any time.
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_probe_io(struct sail_io *io, struct sail_context *context,
-                                       struct sail_image **image, const struct sail_plugin_info **plugin_info);
+SAIL_EXPORT sail_error_t sail_probe_io(struct sail_io *io, struct sail_image **image, const struct sail_plugin_info **plugin_info);
 
 /*
  * Loads an image from the specified memory buffer and returns its properties without pixels. The assigned image
  * MUST be destroyed later with sail_destroy_image(). The assigned plugin info MUST NOT be destroyed
  * because it is a pointer to an internal data structure. If you don't need it, just pass NULL.
  *
- * Context is optional and can be NULL. SAIL allocates a thread-local static context when it's NULL.
- * ASAN may report a memory leak in this case, which is OK.
- *
  * This function is pretty fast because it doesn't decode whole image data for most image formats.
  *
  * Typical usage: This is a standalone function that could be called at any time.
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_probe_mem(const void *buffer, size_t buffer_length, struct sail_context *context,
+SAIL_EXPORT sail_error_t sail_probe_mem(const void *buffer, size_t buffer_length,
                                         struct sail_image **image, const struct sail_plugin_info **plugin_info);
 
 /*
@@ -106,8 +98,7 @@ SAIL_EXPORT sail_error_t sail_probe_mem(const void *buffer, size_t buffer_length
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_start_reading_file(const char *path, struct sail_context *context,
-                                                 const struct sail_plugin_info *plugin_info, void **state);
+SAIL_EXPORT sail_error_t sail_start_reading_file(const char *path, const struct sail_plugin_info *plugin_info, void **state);
 
 /*
  * Starts reading the specified memory buffer.
@@ -125,7 +116,7 @@ SAIL_EXPORT sail_error_t sail_start_reading_file(const char *path, struct sail_c
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_start_reading_mem(const void *buffer, size_t buffer_length, struct sail_context *context,
+SAIL_EXPORT sail_error_t sail_start_reading_mem(const void *buffer, size_t buffer_length,
                                                 const struct sail_plugin_info *plugin_info, void **state);
 
 /*
@@ -178,8 +169,7 @@ SAIL_EXPORT sail_error_t sail_stop_reading(void *state);
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_start_writing_file(const char *path, struct sail_context *context,
-                                                 const struct sail_plugin_info *plugin_info, void **state);
+SAIL_EXPORT sail_error_t sail_start_writing_file(const char *path, const struct sail_plugin_info *plugin_info, void **state);
 
 /*
  * Starts writing the specified memory buffer.
@@ -198,7 +188,7 @@ SAIL_EXPORT sail_error_t sail_start_writing_file(const char *path, struct sail_c
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_start_writing_mem(void *buffer, size_t buffer_length, struct sail_context *context,
+SAIL_EXPORT sail_error_t sail_start_writing_mem(void *buffer, size_t buffer_length,
                                                 const struct sail_plugin_info *plugin_info, void **state);
 
 /*

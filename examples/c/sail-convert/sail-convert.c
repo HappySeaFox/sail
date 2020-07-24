@@ -33,11 +33,10 @@
 #include "sail-common.h"
 #include "sail.h"
 
-static sail_error_t convert(const char *input, const char *output, struct sail_context *context, int compression) {
+static sail_error_t convert(const char *input, const char *output, int compression) {
 
     SAIL_CHECK_PATH_PTR(input);
     SAIL_CHECK_PATH_PTR(output);
-    SAIL_CHECK_CONTEXT_PTR(context);
 
     const struct sail_plugin_info *plugin_info;
     void *state;
@@ -47,10 +46,10 @@ static sail_error_t convert(const char *input, const char *output, struct sail_c
     /* Read the image. */
     SAIL_LOG_INFO("Input file: %s", input);
 
-    SAIL_TRY(sail_plugin_info_from_path(input, context, &plugin_info));
+    SAIL_TRY(sail_plugin_info_from_path(input, &plugin_info));
     SAIL_LOG_INFO("Input codec: %s", plugin_info->description);
 
-    SAIL_TRY(sail_start_reading_file(input, context, plugin_info, &state));
+    SAIL_TRY(sail_start_reading_file(input, plugin_info, &state));
 
     SAIL_TRY(sail_read_next_frame(state, &image));
     SAIL_TRY(sail_stop_reading(state));
@@ -58,7 +57,7 @@ static sail_error_t convert(const char *input, const char *output, struct sail_c
     /* Write the image. */
     SAIL_LOG_INFO("Output file: %s", output);
 
-    SAIL_TRY(sail_plugin_info_from_path(output, context, &plugin_info));
+    SAIL_TRY(sail_plugin_info_from_path(output, &plugin_info));
     SAIL_LOG_INFO("Output codec: %s", plugin_info->description);
 
     struct sail_write_options *write_options;
@@ -68,7 +67,7 @@ static sail_error_t convert(const char *input, const char *output, struct sail_c
     SAIL_LOG_INFO("Compression: %d%s", compression, compression == -1 ? " (default)" : "");
     write_options->compression = compression;
 
-    SAIL_TRY(sail_start_writing_file_with_options(output, context, plugin_info, write_options, &state));
+    SAIL_TRY(sail_start_writing_file_with_options(output, plugin_info, write_options, &state));
     SAIL_TRY(sail_write_next_frame(state, image));
     SAIL_TRY(sail_stop_writing(state));
 
@@ -133,13 +132,9 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    struct sail_context *context;
+    SAIL_TRY(convert(argv[1], argv[2], compression));
 
-    SAIL_TRY(sail_init(&context));
-
-    SAIL_TRY(convert(argv[1], argv[2], context, compression));
-
-    sail_finish(context);
+    sail_finish();
 
     return 0;
 }

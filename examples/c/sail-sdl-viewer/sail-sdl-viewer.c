@@ -46,14 +46,6 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    struct sail_context *context = NULL;
-
-    /*
-     * Initialize SAIL context. You could cache the context and re-use it multiple times.
-     * When it's not needed anymore, call sail_finish(context).
-     */
-    SAIL_TRY(sail_init(&context));
-
     /* Load the image. */
     struct sail_image *image;
 
@@ -61,9 +53,7 @@ int main(int argc, char *argv[]) {
      * sail_read_file() reads the image and outputs pixels in the BPP32-RGBA pixel format.
      * If you need to control output pixel formats, consider switching to the deep diver API.
      */
-    SAIL_TRY(sail_read_file(argv[1],
-                            context,
-                            &image));
+    SAIL_TRY(sail_read_file(argv[1], &image));
 
     /* Create an SDL surface from the image data. */
     unsigned bytes_per_line;
@@ -83,7 +73,7 @@ int main(int argc, char *argv[]) {
 
     if (surface == NULL) {
         fprintf(stderr, "Failed to create surface: %s\n", SDL_GetError());
-        sail_finish(context);
+        sail_finish();
         return 1;
     }
 
@@ -93,7 +83,7 @@ int main(int argc, char *argv[]) {
     /* Create a new window and a renderer. */
     if (SDL_CreateWindowAndRenderer(800, 500, SDL_WINDOW_RESIZABLE, &window, &renderer) != 0) {
         fprintf(stderr, "Failed to create a window: %s\n", SDL_GetError());
-        sail_finish(context);
+        sail_finish();
         return 1;
     }
 
@@ -107,7 +97,7 @@ int main(int argc, char *argv[]) {
 
     if (texture == NULL) {
         fprintf(stderr, "Failed to create a texture: %s\n", SDL_GetError());
-        sail_finish(context);
+        sail_finish();
         return 1;
     }
 
@@ -132,7 +122,7 @@ int main(int argc, char *argv[]) {
         SDL_RenderPresent(renderer);
     }
 
-    sail_finish(context);
+    sail_finish();
 
     SDL_DestroyTexture(texture);
     SDL_DestroyRenderer(renderer);

@@ -34,12 +34,13 @@
  * Private functions.
  */
 
-static sail_error_t check_io_arguments(struct sail_io *io, struct sail_context *context,
-                                        const struct sail_plugin_info *plugin_info) {
+static sail_error_t check_io_arguments(struct sail_io *io,
+                                        const struct sail_plugin_info *plugin_info,
+                                        void **state) {
 
     SAIL_CHECK_IO_PTR(io);
-    SAIL_CHECK_CONTEXT_PTR(context);
     SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
+    SAIL_CHECK_STATE_PTR(state);
 
     return 0;
 }
@@ -48,15 +49,14 @@ static sail_error_t check_io_arguments(struct sail_io *io, struct sail_context *
  * Public functions.
  */
 
-sail_error_t start_reading_io_with_options(struct sail_io *io, bool own_io, struct sail_context *context,
+sail_error_t start_reading_io_with_options(struct sail_io *io, bool own_io,
                                            const struct sail_plugin_info *plugin_info,
                                            const struct sail_read_options *read_options, void **state) {
 
-    SAIL_CHECK_STATE_PTR(state);
-    *state = NULL;
-
-    SAIL_TRY_OR_CLEANUP(check_io_arguments(io, context, plugin_info),
+    SAIL_TRY_OR_CLEANUP(check_io_arguments(io, plugin_info, state),
                         /* cleanup */ if (own_io) sail_destroy_io(io));
+
+    *state = NULL;
 
     /*
      * When read options is not NULL, we need to check if we can actually output the requested pixel format.
@@ -79,7 +79,7 @@ sail_error_t start_reading_io_with_options(struct sail_io *io, bool own_io, stru
     state_of_mind->plugin_info   = plugin_info;
     state_of_mind->plugin        = NULL;
 
-    SAIL_TRY_OR_CLEANUP(load_plugin_by_plugin_info(context, state_of_mind->plugin_info, &state_of_mind->plugin),
+    SAIL_TRY_OR_CLEANUP(load_plugin_by_plugin_info(state_of_mind->plugin_info, &state_of_mind->plugin),
                         /* cleanup */ destroy_hidden_state(state_of_mind));
 
     if (read_options == NULL) {
@@ -104,15 +104,14 @@ sail_error_t start_reading_io_with_options(struct sail_io *io, bool own_io, stru
     return 0;
 }
 
-sail_error_t start_writing_io_with_options(struct sail_io *io, bool own_io, struct sail_context *context,
+sail_error_t start_writing_io_with_options(struct sail_io *io, bool own_io,
                                            const struct sail_plugin_info *plugin_info,
                                            const struct sail_write_options *write_options, void **state) {
 
-    SAIL_CHECK_STATE_PTR(state);
-    *state = NULL;
-
-    SAIL_TRY_OR_CLEANUP(check_io_arguments(io, context, plugin_info),
+    SAIL_TRY_OR_CLEANUP(check_io_arguments(io, plugin_info, state),
                         /* cleanup */ if (own_io) sail_destroy_io(io));
+
+    *state = NULL;
 
     void *ptr;
     SAIL_TRY_OR_CLEANUP(sail_malloc(&ptr, sizeof(struct hidden_state)),
@@ -126,7 +125,7 @@ sail_error_t start_writing_io_with_options(struct sail_io *io, bool own_io, stru
     state_of_mind->plugin_info   = plugin_info;
     state_of_mind->plugin        = NULL;
 
-    SAIL_TRY_OR_CLEANUP(load_plugin_by_plugin_info(context, state_of_mind->plugin_info, &state_of_mind->plugin),
+    SAIL_TRY_OR_CLEANUP(load_plugin_by_plugin_info(state_of_mind->plugin_info, &state_of_mind->plugin),
                         /* cleanup */ destroy_hidden_state(state_of_mind));
 
     if (write_options == NULL) {

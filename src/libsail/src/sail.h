@@ -63,12 +63,21 @@
 extern "C" {
 #endif
 
-struct sail_context;
 struct sail_plugin_info_node;
 struct sail_plugin_info;
 
 /*
- * Flags to control SAIL behavior.
+ * SAIL contexts.
+ *
+ * All SAIL functions allocate a thread-local static context per thread when necessary. The context enumerates and holds
+ * a list of available plugin info objects.
+ *
+ * If you call SAIL functions from three different threads, three different contexts are allocated.
+ * You can destroy them with calling sail_finish() in each thread.
+ */
+
+/*
+ * Flags to control SAIL initialization behavior.
  */
 enum SailInitFlags {
 
@@ -79,8 +88,15 @@ enum SailInitFlags {
 };
 
 /*
- * Initializes SAIL with default flags. This is a main entry point to start working with SAIL.
- * Builds a list of available SAIL plugins.
+ * Initializes a new SAIL thread-local static context with the specific flags. Does nothing if the thread-local static context
+ * already exists. Builds a list of available SAIL plugins. See SailInitFlags.
+ *
+ * If you don't need specific features like preloading plugins, just don't use this function at all.
+ * All reading or writing functions allocate a thread-local static context implicitly when they need it
+ * and when it doesn't exist already.
+ *
+ * It's always recommended to destroy the implicitly or explicitly allocated SAIL thread-local static context
+ * with sail_finish() when you're done with calling SAIL functions in the current thread.
  *
  * Plugins (image codecs) paths search algorithm (first found path wins):
  *
@@ -95,35 +111,18 @@ enum SailInitFlags {
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_init(struct sail_context **context);
+SAIL_EXPORT sail_error_t sail_init_with_flags(int flags);
 
 /*
- * Initializes SAIL with the specific flags. This is an alternative entry point to start working with SAIL.
- * Builds a list of available SAIL plugins. See SailInitFlags.
+ * Finalizes working with the thread-local static context that was implicitly or explicitly allocated by
+ * reading or writing functions.
  *
- * Plugins (image codecs) paths search algorithm (first found path wins):
+ * Unloads all plugins. All pointers to plugin info objects, read and write features get invalidated. 
+ * Using them after calling sail_finish() will lead to a crash.
  *
- *   Windows:
- *     1. SAIL_PLUGINS_PATH environment variable
- *     2. <SAIL DEPLOYMENT FOLDER>\lib\sail\plugins
- *     3. Hardcoded SAIL_PLUGINS_PATH in config.h
- *
- *   Unix (including macOS):
- *     1. SAIL_PLUGINS_PATH environment variable
- *     2. Hardcoded SAIL_PLUGINS_PATH in config.h
- *
- * Returns 0 on success or sail_error_t on error.
+ * It's possible to initialize a new SAIL thread-local static context afterwards, implicitly or explicitly.
  */
-SAIL_EXPORT sail_error_t sail_init_with_flags(struct sail_context **context, int flags);
-
-/*
- * Finalizes working with the specified SAIL context. Frees the context and all its internal memory buffers.
- * Does nothing if context is NULL.
- *
- * All pointers to plugin info objects, read and write features get invalidated. Using them after calling
- * sail_finish() will lead to a crash.
- */
-SAIL_EXPORT void sail_finish(struct sail_context *context);
+SAIL_EXPORT void sail_finish(void);
 
 /*
  * Returns a linked list of found plugin info nodes. Use it to determine the list of possible image formats,
@@ -132,7 +131,7 @@ SAIL_EXPORT void sail_finish(struct sail_context *context);
  * Returns a pointer to the first plugin info node or NULL when no SAIL plugins were found.
  * Use sail_plugin_info_node.next to iterate.
  */
-SAIL_EXPORT const struct sail_plugin_info_node* sail_plugin_info_list(const struct sail_context *context);
+SAIL_EXPORT const struct sail_plugin_info_node* sail_plugin_info_list(void);
 
 /*
  * Finds a first plugin info object that supports reading or writing the specified file path by its file extension.
@@ -152,8 +151,7 @@ SAIL_EXPORT const struct sail_plugin_info_node* sail_plugin_info_list(const stru
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_info_from_path(const char *path, const struct sail_context *context,
-                                                    const struct sail_plugin_info **plugin_info);
+SAIL_EXPORT sail_error_t sail_plugin_info_from_path(const char *path, const struct sail_plugin_info **plugin_info);
 
 /*
  * Finds a first plugin info object that supports the magic number read from the specified file.
@@ -168,8 +166,7 @@ SAIL_EXPORT sail_error_t sail_plugin_info_from_path(const char *path, const stru
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_info_by_magic_number_from_path(const char *path, const struct sail_context *context,
-                                                                    const struct sail_plugin_info **plugin_info);
+SAIL_EXPORT sail_error_t sail_plugin_info_by_magic_number_from_path(const char *path, const struct sail_plugin_info **plugin_info);
 
 /*
  * Finds a first plugin info object that supports the magic number read from the specified memory buffer.
@@ -184,7 +181,7 @@ SAIL_EXPORT sail_error_t sail_plugin_info_by_magic_number_from_path(const char *
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_info_by_magic_number_from_mem(const void *buffer, size_t buffer_length, const struct sail_context *context,
+SAIL_EXPORT sail_error_t sail_plugin_info_by_magic_number_from_mem(const void *buffer, size_t buffer_length,
                                                                    const struct sail_plugin_info **plugin_info);
 
 /*
@@ -201,8 +198,7 @@ SAIL_EXPORT sail_error_t sail_plugin_info_by_magic_number_from_mem(const void *b
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_info_by_magic_number_from_io(struct sail_io *io, const struct sail_context *context,
-                                                                  const struct sail_plugin_info **plugin_info);
+SAIL_EXPORT sail_error_t sail_plugin_info_by_magic_number_from_io(struct sail_io *io, const struct sail_plugin_info **plugin_info);
 
 /*
  * Finds a first plugin info object that supports the specified file extension.
@@ -222,8 +218,7 @@ SAIL_EXPORT sail_error_t sail_plugin_info_by_magic_number_from_io(struct sail_io
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_info_from_extension(const char *extension, const struct sail_context *context,
-                                                         const struct sail_plugin_info **plugin_info);
+SAIL_EXPORT sail_error_t sail_plugin_info_from_extension(const char *extension, const struct sail_plugin_info **plugin_info);
 
 /*
  * Finds a first plugin info object that supports the specified mime type.
@@ -243,11 +238,10 @@ SAIL_EXPORT sail_error_t sail_plugin_info_from_extension(const char *extension, 
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_info_from_mime_type(const struct sail_context *context, const char *mime_type,
-                                                         const struct sail_plugin_info **plugin_info);
+SAIL_EXPORT sail_error_t sail_plugin_info_from_mime_type(const char *mime_type, const struct sail_plugin_info **plugin_info);
 
 /*
- * Unloads all loaded plugins from the cache to release memory occupied by them. Use it if you want
+ * Unloads all the loaded plugins from the cache to release memory occupied by them. Use it if you want
  * to release some memory but do not want to deinitialize SAIL with sail_finish(). Subsequent attempts
  * to read or write images will reload necessary SAIL plugins from disk.
  *
@@ -255,7 +249,7 @@ SAIL_EXPORT sail_error_t sail_plugin_info_from_mime_type(const struct sail_conte
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_unload_plugins(struct sail_context *context);
+SAIL_EXPORT sail_error_t sail_unload_plugins(void);
 
 /* extern "C" */
 #ifdef __cplusplus

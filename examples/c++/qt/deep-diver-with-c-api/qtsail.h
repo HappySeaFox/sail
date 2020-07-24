@@ -38,8 +38,6 @@ namespace Ui {
     class QtSail;
 }
 
-struct sail_context;
-
 class QtSail : public QWidget
 {
     Q_OBJECT
@@ -66,8 +64,6 @@ private:
 
     QImage m_qimage;
     QString m_suffix;
-
-    sail_context *m_context = nullptr;
 };
 
 #endif

@@ -38,7 +38,6 @@
 extern "C" {
 #endif
 
-struct sail_context;
 struct sail_image;
 struct sail_io;
 struct sail_plugin_info;
@@ -48,53 +47,40 @@ struct sail_plugin_info;
  * MUST be destroyed later with sail_destroy_image(). The assigned plugin info MUST NOT be destroyed
  * because it is a pointer to an internal data structure. If you don't need it, just pass NULL.
  *
- * Context is optional and can be NULL. SAIL allocates a thread-local static context when it's NULL.
- * ASAN may report a memory leak in this case, which is OK.
- *
  * This function is pretty fast because it doesn't decode whole image data for most image formats.
  *
  * Typical usage: This is a standalone function that could be called at any time.
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_probe_file(const char *path, struct sail_context *context,
-                                         struct sail_image **image, const struct sail_plugin_info **plugin_info);
+SAIL_EXPORT sail_error_t sail_probe_file(const char *path, struct sail_image **image, const struct sail_plugin_info **plugin_info);
 
 /*
  * Loads the specified image file and returns its properties and pixels. The assigned image
  * MUST be destroyed later with sail_destroy_image().
  *
- * Context is optional and can be NULL. SAIL allocates a thread-local static context when it's NULL.
- * ASAN may report a memory leak in this case, which is OK.
- *
  * Outputs pixels in the BPP32-RGBA pixel format.
  *
  * Typical usage: This is a standalone function that could be called at any time.
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_read_file(const char *path, struct sail_context *context, struct sail_image **image);
+SAIL_EXPORT sail_error_t sail_read_file(const char *path, struct sail_image **image);
 
 /*
  * Loads the specified image file from the specified memory buffer and returns its properties and pixels.
  * The assigned image MUST be destroyed later with sail_destroy_image().
  *
- * Context is optional and can be NULL. SAIL allocates a thread-local static context when it's NULL.
- * ASAN may report a memory leak in this case, which is OK.
- *
  * Outputs pixels in the BPP32-RGBA pixel format.
  *
  * Typical usage: This is a standalone function that could be called at any time.
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_read_mem(const void *buffer, size_t buffer_length, struct sail_context *context, struct sail_image **image);
+SAIL_EXPORT sail_error_t sail_read_mem(const void *buffer, size_t buffer_length, struct sail_image **image);
 
 /*
  * Writes the pixels of the specified image file into the file.
- *
- * Context is optional and can be NULL. SAIL allocates a thread-local static context when it's NULL.
- * ASAN may report a memory leak in this case, which is OK.
  *
  * Outputs pixels in the pixel format as specified in sail_write_features.default_output_pixel_format.
  *
@@ -102,13 +88,10 @@ SAIL_EXPORT sail_error_t sail_read_mem(const void *buffer, size_t buffer_length,
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_write_file(const char *path, struct sail_context *context, const struct sail_image *image);
+SAIL_EXPORT sail_error_t sail_write_file(const char *path, const struct sail_image *image);
 
 /*
  * Writes the pixels of the specified image file into the specified memory buffer.
- *
- * Context is optional and can be NULL. SAIL allocates a thread-local static context when it's NULL.
- * ASAN may report a memory leak in this case, which is OK.
  *
  * Outputs pixels in the pixel format as specified in sail_write_features.default_output_pixel_format.
  *
@@ -118,7 +101,7 @@ SAIL_EXPORT sail_error_t sail_write_file(const char *path, struct sail_context *
  *
  * Returns 0 on success or sail_error_t on error.
  */
-SAIL_EXPORT sail_error_t sail_write_mem(void *buffer, size_t buffer_length, struct sail_context *context, const struct sail_image *image, size_t *written);
+SAIL_EXPORT sail_error_t sail_write_mem(void *buffer, size_t buffer_length, const struct sail_image *image, size_t *written);
 
 /* extern "C" */
 #ifdef __cplusplus

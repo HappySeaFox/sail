@@ -40,7 +40,6 @@
 namespace sail
 {
 
-class context;
 class image;
 class io;
 class plugin_info;
@@ -53,13 +52,7 @@ class SAIL_EXPORT image_reader
 {
 public:
     image_reader();
-    image_reader(context *ctx);
     ~image_reader();
-
-    /*
-     * Returns true if the underlying context object is valid.
-     */
-    bool is_valid() const;
 
     /*
      * An interface to sail_probe_file(). See sail_probe_file() for more.
