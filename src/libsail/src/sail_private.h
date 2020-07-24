@@ -85,11 +85,14 @@ enum SailContextAction {
  */
 SAIL_HIDDEN sail_status_t control_tls_context(struct sail_context **context, enum SailContextAction action);
 
-/* Initializes the context and loads all the plugin info files if the context is not initialized. */
-SAIL_HIDDEN sail_status_t init_context(struct sail_context *context, int flags);
-
 /* Returns the allocated and initialized TLS context. */
 SAIL_HIDDEN sail_status_t current_tls_context(struct sail_context **context);
+
+/*
+ * Returns the allocated and initialized TLS context. The specified flags are used to initialize it.
+ * See SailInitFlags.
+ */
+SAIL_HIDDEN sail_status_t current_tls_context_with_flags(struct sail_context **context, int flags);
 
 SAIL_HIDDEN sail_status_t load_plugin(struct sail_plugin_info_node *node);
 

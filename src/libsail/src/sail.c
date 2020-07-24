@@ -35,9 +35,7 @@
 sail_status_t sail_init_with_flags(int flags) {
 
     struct sail_context *context;
-    SAIL_TRY(control_tls_context(&context, SAIL_CONTEXT_ALLOCATE));
-
-    SAIL_TRY(init_context(context, flags));
+    SAIL_TRY(current_tls_context_with_flags(&context, flags));
 
     return SAIL_OK;
 }
