@@ -79,9 +79,9 @@ struct sail_pixel_formats_mapping_node {
 /*
  * Allocates a new pixel formats mapping node. The assigned node MUST be destroyed later with sail_destroy_pixel_formats_mapping_node().
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_alloc_pixel_formats_mapping_node(struct sail_pixel_formats_mapping_node **node);
+SAIL_EXPORT sail_status_t sail_alloc_pixel_formats_mapping_node(struct sail_pixel_formats_mapping_node **node);
 
 /*
  * Destroys the specified pixel formats mapping node and all its internal allocated memory buffers.

@@ -32,7 +32,7 @@
 #include "sail-common.h"
 #include "sail.h"
 
-static sail_error_t probe(const char *path) {
+static sail_status_t probe(const char *path) {
 
     SAIL_CHECK_PATH_PTR(path);
 
@@ -65,7 +65,7 @@ static sail_error_t probe(const char *path) {
 
     sail_destroy_image(image);
 
-    return 0;
+    return SAIL_OK;
 }
 
 static void help(char *app) {
@@ -85,17 +85,17 @@ int main(int argc, char *argv[]) {
 
     if (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0) {
         help(argv[0]);
-        return 0;
+        return SAIL_OK;
     }
 
     if (strcmp(argv[1], "-v") == 0 || strcmp(argv[1], "--version") == 0) {
         fprintf(stderr, "sail-probe 1.1.0\n");
-        return 0;
+        return SAIL_OK;
     }
 
     SAIL_TRY(probe(argv[1]));
 
     sail_finish();
 
-    return 0;
+    return SAIL_OK;
 }

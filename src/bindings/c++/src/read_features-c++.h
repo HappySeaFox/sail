@@ -59,7 +59,7 @@ public:
     SailPixelFormat default_output_pixel_format() const;
     int features() const;
 
-    sail_error_t to_read_options(read_options *sread_options) const;
+    sail_status_t to_read_options(read_options *sread_options) const;
 
 private:
     read_features();

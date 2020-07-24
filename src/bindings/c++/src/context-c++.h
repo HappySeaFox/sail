@@ -82,18 +82,18 @@ public:
      *     1. SAIL_PLUGINS_PATH environment variable
      *     2. Hardcoded SAIL_PLUGINS_PATH in config.h
      *
-     * Returns 0 on success or sail_error_t on error.
+     * Returns 0 on success or sail_status_t on error.
      */
-    static sail_error_t init(int flags);
+    static sail_status_t init(int flags);
 
     /*
      * Unloads all the loaded plugins from the cache to release memory occupied by them. Use it if you want
      * to release some memory but do not want to deinitialize SAIL with sail_finish(). Subsequent attempts
      * to read or write images will reload necessary SAIL plugins from disk.
      *
-     * Returns 0 on success or sail_error_t on error.
+     * Returns 0 on success or sail_status_t on error.
      */
-    static sail_error_t unload_plugins();
+    static sail_status_t unload_plugins();
 
     /*
      * Finalizes working with the thread-local static context that was implicitly or explicitly allocated by

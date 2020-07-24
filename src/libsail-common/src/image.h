@@ -176,9 +176,9 @@ typedef struct sail_image sail_image_t;
 /*
  * Allocates a new image. The assigned image MUST be destroyed later with sail_destroy_image().
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_alloc_image(struct sail_image **image);
+SAIL_EXPORT sail_status_t sail_alloc_image(struct sail_image **image);
 
 /*
  * Destroys the specified image and all its internal allocated memory buffers. The image MUST NOT be used anymore
@@ -189,9 +189,9 @@ SAIL_EXPORT void sail_destroy_image(struct sail_image *image);
 /*
  * Makes a deep copy of the specified image. The assigned image MUST be destroyed later with sail_destroy_image().
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_copy_image(const struct sail_image *source, struct sail_image **target);
+SAIL_EXPORT sail_status_t sail_copy_image(const struct sail_image *source, struct sail_image **target);
 
 /* extern "C" */
 #ifdef __cplusplus

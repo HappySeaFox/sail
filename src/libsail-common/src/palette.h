@@ -76,9 +76,9 @@ typedef struct sail_palette sail_palette_t;
 /*
  * Allocates a new palette. The assigned palette MUST be destroyed later with sail_destroy_palette().
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_alloc_palette(struct sail_palette **palette);
+SAIL_EXPORT sail_status_t sail_alloc_palette(struct sail_palette **palette);
 
 /*
  * Destroys the specified palette and all its internal allocated memory buffers.
@@ -90,9 +90,9 @@ SAIL_EXPORT void sail_destroy_palette(struct sail_palette *palette);
  * Makes a deep copy of the specified palette. The assigned palette MUST be destroyed later
  * with sail_destroy_palette().
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_copy_palette(const struct sail_palette *source_palette, struct sail_palette **target_palette);
+SAIL_EXPORT sail_status_t sail_copy_palette(const struct sail_palette *source_palette, struct sail_palette **target_palette);
 
 /* extern "C" */
 #ifdef __cplusplus

@@ -29,7 +29,7 @@
 
 #include "sail-common.h"
 
-int sail_alloc_read_options(struct sail_read_options **read_options) {
+sail_status_t sail_alloc_read_options(struct sail_read_options **read_options) {
 
     SAIL_CHECK_READ_OPTIONS_PTR(read_options);
 
@@ -40,7 +40,7 @@ int sail_alloc_read_options(struct sail_read_options **read_options) {
     (*read_options)->output_pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;
     (*read_options)->io_options          = 0;
 
-    return 0;
+    return SAIL_OK;
 }
 
 void sail_destroy_read_options(struct sail_read_options *read_options) {
@@ -52,7 +52,7 @@ void sail_destroy_read_options(struct sail_read_options *read_options) {
     sail_free(read_options);
 }
 
-sail_error_t sail_read_options_from_features(const struct sail_read_features *read_features, struct sail_read_options *read_options) {
+sail_status_t sail_read_options_from_features(const struct sail_read_features *read_features, struct sail_read_options *read_options) {
 
     SAIL_CHECK_READ_FEATURES_PTR(read_features);
     SAIL_CHECK_READ_OPTIONS_PTR(read_options);
@@ -73,10 +73,10 @@ sail_error_t sail_read_options_from_features(const struct sail_read_features *re
         read_options->io_options |= SAIL_IO_OPTION_ICCP;
     }
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t sail_alloc_read_options_from_features(const struct sail_read_features *read_features, struct sail_read_options **read_options) {
+sail_status_t sail_alloc_read_options_from_features(const struct sail_read_features *read_features, struct sail_read_options **read_options) {
 
     SAIL_CHECK_READ_OPTIONS_PTR(read_options);
 
@@ -84,10 +84,10 @@ sail_error_t sail_alloc_read_options_from_features(const struct sail_read_featur
     SAIL_TRY_OR_CLEANUP(sail_read_options_from_features(read_features, *read_options),
                         /* cleanup */ sail_destroy_read_options(*read_options));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t sail_copy_read_options(const struct sail_read_options *source, struct sail_read_options **target) {
+sail_status_t sail_copy_read_options(const struct sail_read_options *source, struct sail_read_options **target) {
 
     SAIL_CHECK_READ_OPTIONS_PTR(source);
     SAIL_CHECK_READ_OPTIONS_PTR(target);
@@ -98,5 +98,5 @@ sail_error_t sail_copy_read_options(const struct sail_read_options *source, stru
 
     memcpy(*target, source, sizeof(struct sail_read_options));
 
-    return 0;
+    return SAIL_OK;
 }

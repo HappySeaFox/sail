@@ -64,9 +64,9 @@ struct hidden_state {
     const struct sail_plugin *plugin;
 };
 
-SAIL_HIDDEN sail_error_t alloc_context(struct sail_context **context);
+SAIL_HIDDEN sail_status_t alloc_context(struct sail_context **context);
 
-SAIL_HIDDEN sail_error_t destroy_context(struct sail_context *context);
+SAIL_HIDDEN sail_status_t destroy_context(struct sail_context *context);
 
 enum SailContextAction {
     /* Allocates a new TLS context if it's not allocated yet. */
@@ -80,27 +80,27 @@ enum SailContextAction {
  * Allocates or destroyes the current SAIL TLS context.
  * If it's already allocated, just returns it.
  */
-SAIL_HIDDEN sail_error_t control_tls_context(struct sail_context **context, enum SailContextAction action);
+SAIL_HIDDEN sail_status_t control_tls_context(struct sail_context **context, enum SailContextAction action);
 
 /* Initializes the context and loads all the plugin info files if the context is not initialized. */
-SAIL_HIDDEN sail_error_t init_context(struct sail_context *context, int flags);
+SAIL_HIDDEN sail_status_t init_context(struct sail_context *context, int flags);
 
 /* Returns the allocated and initialized TLS context. */
-SAIL_HIDDEN sail_error_t current_tls_context(struct sail_context **context);
+SAIL_HIDDEN sail_status_t current_tls_context(struct sail_context **context);
 
-SAIL_HIDDEN sail_error_t load_plugin(struct sail_plugin_info_node *node);
+SAIL_HIDDEN sail_status_t load_plugin(struct sail_plugin_info_node *node);
 
-SAIL_HIDDEN sail_error_t load_plugin_by_plugin_info(const struct sail_plugin_info *plugin_info,
+SAIL_HIDDEN sail_status_t load_plugin_by_plugin_info(const struct sail_plugin_info *plugin_info,
                                                     const struct sail_plugin **plugin);
 
 SAIL_HIDDEN void destroy_hidden_state(struct hidden_state *state);
 
-SAIL_HIDDEN sail_error_t stop_writing(void *state, size_t *written);
+SAIL_HIDDEN sail_status_t stop_writing(void *state, size_t *written);
 
-SAIL_HIDDEN sail_error_t allowed_read_output_pixel_format(const struct sail_read_features *read_features,
+SAIL_HIDDEN sail_status_t allowed_read_output_pixel_format(const struct sail_read_features *read_features,
                                                             enum SailPixelFormat pixel_format);
 
-SAIL_HIDDEN sail_error_t allowed_write_output_pixel_format(const struct sail_write_features *write_features,
+SAIL_HIDDEN sail_status_t allowed_write_output_pixel_format(const struct sail_write_features *write_features,
                                                             enum SailPixelFormat input_pixel_format,
                                                             enum SailPixelFormat output_pixel_format);
 

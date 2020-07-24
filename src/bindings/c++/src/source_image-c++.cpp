@@ -44,11 +44,11 @@ public:
         sail_destroy_source_image(source_image);
     }
 
-    sail_error_t init()
+    sail_status_t init()
     {
         SAIL_TRY(sail_alloc_source_image(&source_image));
 
-        return 0;
+        return SAIL_OK;
     }
 
     sail_source_image *source_image;
@@ -112,7 +112,7 @@ source_image::source_image(const sail_source_image *si)
         .with_compression_type(si->compression_type);
 }
 
-sail_error_t source_image::to_sail_source_image(sail_source_image *si) const
+sail_status_t source_image::to_sail_source_image(sail_source_image *si) const
 {
     SAIL_CHECK_SOURCE_IMAGE_PTR(si);
 
@@ -120,7 +120,7 @@ sail_error_t source_image::to_sail_source_image(sail_source_image *si) const
     si->properties       = d->source_image->properties;
     si->compression_type = d->source_image->compression_type;
 
-    return 0;
+    return SAIL_OK;
 }
 
 source_image& source_image::with_pixel_format(SailPixelFormat pixel_format)

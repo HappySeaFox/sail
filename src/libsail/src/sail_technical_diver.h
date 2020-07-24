@@ -60,9 +60,9 @@ struct sail_write_options;
  * in it and destroy it in sail_stop_reading. States must be used per image. DO NOT use the same state
  * to read multiple images in the same time.
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_start_reading_io(struct sail_io *io, const struct sail_plugin_info *plugin_info, void **state);
+SAIL_EXPORT sail_status_t sail_start_reading_io(struct sail_io *io, const struct sail_plugin_info *plugin_info, void **state);
 
 /*
  * Starts reading the specified I/O stream with the specified read options. If you don't need specific read options,
@@ -82,9 +82,9 @@ SAIL_EXPORT sail_error_t sail_start_reading_io(struct sail_io *io, const struct 
  * in it and destroy it in sail_stop_reading. States must be used per image. DO NOT use the same state
  * to read multiple images in the same time.
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_start_reading_io_with_options(struct sail_io *io,
+SAIL_EXPORT sail_status_t sail_start_reading_io_with_options(struct sail_io *io,
                                                             const struct sail_plugin_info *plugin_info,
                                                             const struct sail_read_options *read_options, void **state);
 
@@ -106,9 +106,9 @@ SAIL_EXPORT sail_error_t sail_start_reading_io_with_options(struct sail_io *io,
  * in it and destroy it in sail_stop_writing. States must be used per image. DO NOT use the same state
  * to write multiple images in the same time.
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_start_writing_io(struct sail_io *io, const struct sail_plugin_info *plugin_info, void **state);
+SAIL_EXPORT sail_status_t sail_start_writing_io(struct sail_io *io, const struct sail_plugin_info *plugin_info, void **state);
 
 /*
  * Starts writing the specified I/O stream with the specified write options. If you don't need specific write options,
@@ -129,9 +129,9 @@ SAIL_EXPORT sail_error_t sail_start_writing_io(struct sail_io *io, const struct 
  * in it and destroy it in sail_stop_writing. States must be used per image. DO NOT use the same state
  * to write multiple images in the same time.
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_start_writing_io_with_options(struct sail_io *io,
+SAIL_EXPORT sail_status_t sail_start_writing_io_with_options(struct sail_io *io,
                                                             const struct sail_plugin_info *plugin_info,
                                                             const struct sail_write_options *write_options, void **state);
 

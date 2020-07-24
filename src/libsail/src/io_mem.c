@@ -52,7 +52,7 @@ struct mem_io_write_stream {
  * Private functions.
  */
 
-static sail_error_t io_mem_read(void *stream, void *buf, size_t object_size, size_t objects_count, size_t *read_objects_count) {
+static sail_status_t io_mem_read(void *stream, void *buf, size_t object_size, size_t objects_count, size_t *read_objects_count) {
 
     SAIL_CHECK_STREAM_PTR(stream);
     SAIL_CHECK_BUFFER_PTR(buf);
@@ -64,7 +64,7 @@ static sail_error_t io_mem_read(void *stream, void *buf, size_t object_size, siz
     *read_objects_count = 0;
 
     if (mem_io_buffer_info->pos >= mem_io_buffer_info->buffer_length) {
-        return SAIL_IO_EOF;
+        return SAIL_ERROR_EOF;
     }
 
     while (mem_io_buffer_info->pos <= mem_io_buffer_info->buffer_length - object_size && objects_count > 0) {
@@ -77,10 +77,10 @@ static sail_error_t io_mem_read(void *stream, void *buf, size_t object_size, siz
         objects_count--;
     }
 
-    return 0;
+    return SAIL_OK;
 }
 
-static sail_error_t io_mem_seek(void *stream, long offset, int whence) {
+static sail_status_t io_mem_seek(void *stream, long offset, int whence) {
 
     SAIL_CHECK_STREAM_PTR(stream);
 
@@ -130,10 +130,10 @@ static sail_error_t io_mem_seek(void *stream, long offset, int whence) {
         }
     }
 
-    return 0;
+    return SAIL_OK;
 }
 
-static sail_error_t io_mem_tell(void *stream, size_t *offset) {
+static sail_status_t io_mem_tell(void *stream, size_t *offset) {
 
     SAIL_CHECK_STREAM_PTR(stream);
     SAIL_CHECK_PTR(offset);
@@ -142,10 +142,10 @@ static sail_error_t io_mem_tell(void *stream, size_t *offset) {
 
     *offset = mem_io_buffer_info->pos;
 
-    return SAIL_NOT_IMPLEMENTED;
+    return SAIL_ERROR_NOT_IMPLEMENTED;
 }
 
-static sail_error_t io_mem_write(void *stream, const void *buf, size_t object_size, size_t objects_count, size_t *written_objects_count) {
+static sail_status_t io_mem_write(void *stream, const void *buf, size_t object_size, size_t objects_count, size_t *written_objects_count) {
 
     SAIL_CHECK_STREAM_PTR(stream);
     SAIL_CHECK_BUFFER_PTR(buf);
@@ -157,7 +157,7 @@ static sail_error_t io_mem_write(void *stream, const void *buf, size_t object_si
     *written_objects_count = 0;
 
     if (mem_io_buffer_info->pos >= mem_io_buffer_info->buffer_length) {
-        return SAIL_IO_EOF;
+        return SAIL_ERROR_EOF;
     }
 
     while (mem_io_buffer_info->pos <= mem_io_buffer_info->buffer_length - object_size && objects_count > 0) {
@@ -170,26 +170,26 @@ static sail_error_t io_mem_write(void *stream, const void *buf, size_t object_si
         objects_count--;
     }
 
-    return 0;
+    return SAIL_OK;
 }
 
-static sail_error_t io_mem_flush(void *stream) {
+static sail_status_t io_mem_flush(void *stream) {
 
     SAIL_CHECK_STREAM_PTR(stream);
 
-    return 0;
+    return SAIL_OK;
 }
 
-static sail_error_t io_mem_close(void *stream) {
+static sail_status_t io_mem_close(void *stream) {
 
     SAIL_CHECK_STREAM_PTR(stream);
 
     sail_free(stream);
 
-    return 0;
+    return SAIL_OK;
 }
 
-static sail_error_t io_mem_eof(void *stream, bool *result) {
+static sail_status_t io_mem_eof(void *stream, bool *result) {
 
     SAIL_CHECK_STREAM_PTR(stream);
     SAIL_CHECK_RESULT_PTR(result);
@@ -198,14 +198,14 @@ static sail_error_t io_mem_eof(void *stream, bool *result) {
 
     *result = mem_io_buffer_info->pos >= mem_io_buffer_info->buffer_length;
 
-    return 0;
+    return SAIL_OK;
 }
 
 /*
  * Public functions.
  */
 
-sail_error_t alloc_io_read_mem(const void *buffer, size_t buffer_length, struct sail_io **io) {
+sail_status_t alloc_io_read_mem(const void *buffer, size_t buffer_length, struct sail_io **io) {
 
     SAIL_CHECK_BUFFER_PTR(buffer);
     SAIL_CHECK_IO_PTR(io);
@@ -232,10 +232,10 @@ sail_error_t alloc_io_read_mem(const void *buffer, size_t buffer_length, struct 
     (*io)->close  = io_mem_close;
     (*io)->eof    = io_mem_eof;
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t alloc_io_write_mem(void *buffer, size_t buffer_length, struct sail_io **io) {
+sail_status_t alloc_io_write_mem(void *buffer, size_t buffer_length, struct sail_io **io) {
 
     SAIL_CHECK_BUFFER_PTR(buffer);
     SAIL_CHECK_IO_PTR(io);
@@ -248,7 +248,7 @@ sail_error_t alloc_io_write_mem(void *buffer, size_t buffer_length, struct sail_
 
     if (mem_io_write_stream == NULL) {
         sail_destroy_io(*io);
-        return SAIL_MEMORY_ALLOCATION_FAILED;
+        return SAIL_ERROR_MEMORY_ALLOCATION;
     }
 
     mem_io_write_stream->mem_io_buffer_info.buffer_length = buffer_length;
@@ -264,5 +264,5 @@ sail_error_t alloc_io_write_mem(void *buffer, size_t buffer_length, struct sail_
     (*io)->close  = io_mem_close;
     (*io)->eof    = io_mem_eof;
 
-    return 0;
+    return SAIL_OK;
 }

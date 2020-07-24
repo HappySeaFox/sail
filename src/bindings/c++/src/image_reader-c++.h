@@ -57,75 +57,75 @@ public:
     /*
      * An interface to sail_probe_file(). See sail_probe_file() for more.
      */
-    sail_error_t probe(const std::string &path, image *simage, plugin_info *splugin_info = nullptr);
-    sail_error_t probe(const char *path, image *simage, plugin_info *splugin_info = nullptr);
+    sail_status_t probe(const std::string &path, image *simage, plugin_info *splugin_info = nullptr);
+    sail_status_t probe(const char *path, image *simage, plugin_info *splugin_info = nullptr);
 
     /*
      * An interface to sail_probe_mem(). See sail_probe_mem() for more.
      */
-    sail_error_t probe(const void *buffer, size_t buffer_length, image *simage, plugin_info *splugin_info = nullptr);
+    sail_status_t probe(const void *buffer, size_t buffer_length, image *simage, plugin_info *splugin_info = nullptr);
 
     /*
      * An interface to sail_probe_io(). See sail_probe_io() for more.
      */
-    sail_error_t probe(const sail::io &io, image *simage, plugin_info *splugin_info = nullptr);
+    sail_status_t probe(const sail::io &io, image *simage, plugin_info *splugin_info = nullptr);
 
     /*
      * An interface to sail_read_file(). See sail_read_file() for more.
      */
-    sail_error_t read(const std::string &path, image *simage);
-    sail_error_t read(const char *path, image *simage);
+    sail_status_t read(const std::string &path, image *simage);
+    sail_status_t read(const char *path, image *simage);
 
     /*
      * An interface to sail_read_mem(). See sail_read_mem() for more.
      */
-    sail_error_t read(const void *buffer, size_t buffer_length, image *simage);
+    sail_status_t read(const void *buffer, size_t buffer_length, image *simage);
 
     /*
      * An interface to sail_start_reading_file(). See sail_start_reading() for more.
      */
-    sail_error_t start_reading(const std::string &path);
-    sail_error_t start_reading(const char *path);
+    sail_status_t start_reading(const std::string &path);
+    sail_status_t start_reading(const char *path);
 
     /*
      * An interface to sail_start_reading_file(). See sail_start_reading_file() for more.
      */
-    sail_error_t start_reading(const std::string &path, const plugin_info &splugin_info);
-    sail_error_t start_reading(const char *path, const plugin_info &splugin_info);
+    sail_status_t start_reading(const std::string &path, const plugin_info &splugin_info);
+    sail_status_t start_reading(const char *path, const plugin_info &splugin_info);
 
     /*
      * An interface to sail_start_reading_file_with_options(). See sail_start_reading_file_with_options() for more.
      */
-    sail_error_t start_reading(const std::string &path, const read_options &sread_options);
-    sail_error_t start_reading(const char *path, const read_options &sread_options);
+    sail_status_t start_reading(const std::string &path, const read_options &sread_options);
+    sail_status_t start_reading(const char *path, const read_options &sread_options);
 
     /*
      * An interface to sail_start_reading_file_with_options(). See sail_start_reading_file_with_options() for more.
      */
-    sail_error_t start_reading(const std::string &path, const plugin_info &splugin_info, const read_options &sread_options);
-    sail_error_t start_reading(const char *path, const plugin_info &splugin_info, const read_options &sread_options);
+    sail_status_t start_reading(const std::string &path, const plugin_info &splugin_info, const read_options &sread_options);
+    sail_status_t start_reading(const char *path, const plugin_info &splugin_info, const read_options &sread_options);
 
     /*
      * An interface to sail_start_reading_mem(). See sail_start_reading_mem() for more.
      */
-    sail_error_t start_reading(const void *buffer, size_t buffer_length, const plugin_info &splugin_info);
-    sail_error_t start_reading(const void *buffer, size_t buffer_length, const plugin_info &splugin_info, const read_options &sread_options);
+    sail_status_t start_reading(const void *buffer, size_t buffer_length, const plugin_info &splugin_info);
+    sail_status_t start_reading(const void *buffer, size_t buffer_length, const plugin_info &splugin_info, const read_options &sread_options);
 
     /*
      * An interface to sail_start_reading_io(). See sail_start_reading_io() for more.
      */
-    sail_error_t start_reading(const io &sio, const plugin_info &splugin_info);
-    sail_error_t start_reading(const io &sio, const plugin_info &splugin_info, const read_options &sread_options);
+    sail_status_t start_reading(const io &sio, const plugin_info &splugin_info);
+    sail_status_t start_reading(const io &sio, const plugin_info &splugin_info, const read_options &sread_options);
 
     /*
      * An interface to sail_read_next_frame(). See sail_read_next_frame() for more.
      */
-    sail_error_t read_next_frame(image *simage);
+    sail_status_t read_next_frame(image *simage);
 
     /*
      * An interface to sail_stop_reading(). See sail_stop_reading() for more.
      */
-    sail_error_t stop_reading();
+    sail_status_t stop_reading();
 
 private:
     class pimpl;

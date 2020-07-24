@@ -29,7 +29,7 @@
 
 #include "sail-common.h"
 
-sail_error_t sail_alloc_palette(struct sail_palette **palette) {
+sail_status_t sail_alloc_palette(struct sail_palette **palette) {
 
     SAIL_CHECK_PALETTE_PTR(palette);
 
@@ -41,7 +41,7 @@ sail_error_t sail_alloc_palette(struct sail_palette **palette) {
     (*palette)->data         = NULL;
     (*palette)->color_count  = 0;
 
-    return 0;
+    return SAIL_OK;
 }
 
 void sail_destroy_palette(struct sail_palette *palette) {
@@ -54,7 +54,7 @@ void sail_destroy_palette(struct sail_palette *palette) {
     sail_free(palette);
 }
 
-sail_error_t sail_copy_palette(const struct sail_palette *source_palette, struct sail_palette **target_palette) {
+sail_status_t sail_copy_palette(const struct sail_palette *source_palette, struct sail_palette **target_palette) {
 
     SAIL_CHECK_ICCP_PTR(source_palette);
     SAIL_CHECK_ICCP_PTR(target_palette);
@@ -75,5 +75,5 @@ sail_error_t sail_copy_palette(const struct sail_palette *source_palette, struct
 
     memcpy((*target_palette)->data, source_palette->data, palette_size);
 
-    return 0;
+    return SAIL_OK;
 }

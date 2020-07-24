@@ -48,15 +48,15 @@ public:
     ~QtSail();
 
 private:
-    sail_error_t init();
-    sail_error_t loadImage(const QString &path, QVector<QImage> *qimages, QVector<int> *delays);
-    sail_error_t saveImage(const QString &path, const QImage &qimage);
+    sail_status_t init();
+    sail_status_t loadImage(const QString &path, QVector<QImage> *qimages, QVector<int> *delays);
+    sail_status_t saveImage(const QString &path, const QImage &qimage);
     QStringList filters() const;
     void detectAnimated();
 
 private: // slots
     void onOpenFile();
-    sail_error_t onProbe();
+    sail_status_t onProbe();
     void onSave();
     void onFit(bool fit);
     void onPrevious();

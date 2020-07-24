@@ -58,7 +58,7 @@ SailPixelFormat ReadOptions::pixelFormat() const
     return static_cast<SailPixelFormat>(d->ui->comboColor->currentData().toInt());
 }
 
-sail_error_t ReadOptions::init(const sail::read_features &read_features)
+sail_status_t ReadOptions::init(const sail::read_features &read_features)
 {
     if (read_features.output_pixel_formats().empty()) {
         d->ui->labelColor->setText(tr("Output color selection is not available"));
@@ -80,5 +80,5 @@ sail_error_t ReadOptions::init(const sail::read_features &read_features)
         d->ui->comboColor->setCurrentText(output_pixel_format_str);
     }
 
-    return 0;
+    return SAIL_OK;
 }

@@ -56,14 +56,14 @@ image_reader::~image_reader()
     delete d;
 }
 
-sail_error_t image_reader::probe(const std::string &path, image *simage, plugin_info *splugin_info)
+sail_status_t image_reader::probe(const std::string &path, image *simage, plugin_info *splugin_info)
 {
     SAIL_TRY(probe(path.c_str(), simage, splugin_info));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image_reader::probe(const char *path, image *simage, plugin_info *splugin_info)
+sail_status_t image_reader::probe(const char *path, image *simage, plugin_info *splugin_info)
 {
     SAIL_CHECK_PATH_PTR(path);
     SAIL_CHECK_IMAGE_PTR(simage);
@@ -82,10 +82,10 @@ sail_error_t image_reader::probe(const char *path, image *simage, plugin_info *s
         *splugin_info = plugin_info(sail_plugin_info);
     }
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image_reader::probe(const void *buffer, size_t buffer_length, image *simage, plugin_info *splugin_info)
+sail_status_t image_reader::probe(const void *buffer, size_t buffer_length, image *simage, plugin_info *splugin_info)
 {
     SAIL_CHECK_BUFFER_PTR(buffer);
     SAIL_CHECK_IMAGE_PTR(simage);
@@ -105,10 +105,10 @@ sail_error_t image_reader::probe(const void *buffer, size_t buffer_length, image
         *splugin_info = plugin_info(sail_plugin_info);
     }
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image_reader::probe(const sail::io &io, image *simage, plugin_info *splugin_info)
+sail_status_t image_reader::probe(const sail::io &io, image *simage, plugin_info *splugin_info)
 {
     SAIL_CHECK_IMAGE_PTR(simage);
     SAIL_TRY(io.verify_valid());
@@ -130,17 +130,17 @@ sail_error_t image_reader::probe(const sail::io &io, image *simage, plugin_info 
         *splugin_info = plugin_info(sail_plugin_info);
     }
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image_reader::read(const std::string &path, image *simage)
+sail_status_t image_reader::read(const std::string &path, image *simage)
 {
     SAIL_TRY(read(path.c_str(), simage));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image_reader::read(const char *path, image *simage)
+sail_status_t image_reader::read(const char *path, image *simage)
 {
     SAIL_CHECK_PATH_PTR(path);
     SAIL_CHECK_IMAGE_PTR(simage);
@@ -153,10 +153,10 @@ sail_error_t image_reader::read(const char *path, image *simage)
     sail_image->pixels = NULL;
     sail_destroy_image(sail_image);
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image_reader::read(const void *buffer, size_t buffer_length, image *simage)
+sail_status_t image_reader::read(const void *buffer, size_t buffer_length, image *simage)
 {
     SAIL_CHECK_BUFFER_PTR(buffer);
     SAIL_CHECK_IMAGE_PTR(simage);
@@ -171,49 +171,49 @@ sail_error_t image_reader::read(const void *buffer, size_t buffer_length, image 
     sail_image->pixels = NULL;
     sail_destroy_image(sail_image);
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image_reader::start_reading(const std::string &path)
+sail_status_t image_reader::start_reading(const std::string &path)
 {
     SAIL_TRY(start_reading(path.c_str()));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image_reader::start_reading(const char *path)
+sail_status_t image_reader::start_reading(const char *path)
 {
     SAIL_CHECK_PATH_PTR(path);
 
     SAIL_TRY(sail_start_reading_file(path, nullptr, &d->state));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image_reader::start_reading(const std::string &path, const plugin_info &splugin_info)
+sail_status_t image_reader::start_reading(const std::string &path, const plugin_info &splugin_info)
 {
     SAIL_TRY(start_reading(path.c_str(), splugin_info));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image_reader::start_reading(const char *path, const plugin_info &splugin_info)
+sail_status_t image_reader::start_reading(const char *path, const plugin_info &splugin_info)
 {
     SAIL_CHECK_PATH_PTR(path);
 
     SAIL_TRY(sail_start_reading_file(path, splugin_info.sail_plugin_info_c(), &d->state));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image_reader::start_reading(const std::string &path, const plugin_info &splugin_info, const read_options &sread_options)
+sail_status_t image_reader::start_reading(const std::string &path, const plugin_info &splugin_info, const read_options &sread_options)
 {
     SAIL_TRY(start_reading(path.c_str(), splugin_info, sread_options));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image_reader::start_reading(const char *path, const plugin_info &splugin_info, const read_options &sread_options)
+sail_status_t image_reader::start_reading(const char *path, const plugin_info &splugin_info, const read_options &sread_options)
 {
     SAIL_CHECK_PATH_PTR(path);
 
@@ -225,10 +225,10 @@ sail_error_t image_reader::start_reading(const char *path, const plugin_info &sp
                                                   &sail_read_options,
                                                   &d->state));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image_reader::start_reading(const void *buffer, size_t buffer_length, const plugin_info &splugin_info)
+sail_status_t image_reader::start_reading(const void *buffer, size_t buffer_length, const plugin_info &splugin_info)
 {
     SAIL_CHECK_BUFFER_PTR(buffer);
 
@@ -237,10 +237,10 @@ sail_error_t image_reader::start_reading(const void *buffer, size_t buffer_lengt
                                     splugin_info.sail_plugin_info_c(),
                                     &d->state));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image_reader::start_reading(const void *buffer, size_t buffer_length, const plugin_info &splugin_info, const read_options &sread_options)
+sail_status_t image_reader::start_reading(const void *buffer, size_t buffer_length, const plugin_info &splugin_info, const read_options &sread_options)
 {
     SAIL_CHECK_BUFFER_PTR(buffer);
 
@@ -253,10 +253,10 @@ sail_error_t image_reader::start_reading(const void *buffer, size_t buffer_lengt
                                                  &sail_read_options,
                                                  &d->state));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image_reader::start_reading(const io &sio, const plugin_info &splugin_info)
+sail_status_t image_reader::start_reading(const io &sio, const plugin_info &splugin_info)
 {
     SAIL_TRY(sio.to_sail_io(&d->sail_io));
 
@@ -268,10 +268,10 @@ sail_error_t image_reader::start_reading(const io &sio, const plugin_info &splug
                                                 NULL,
                                                 &d->state));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image_reader::start_reading(const io &sio, const plugin_info &splugin_info, const read_options &sread_options)
+sail_status_t image_reader::start_reading(const io &sio, const plugin_info &splugin_info, const read_options &sread_options)
 {
     SAIL_TRY(sio.to_sail_io(&d->sail_io));
 
@@ -286,10 +286,10 @@ sail_error_t image_reader::start_reading(const io &sio, const plugin_info &splug
                                                 &sail_read_options,
                                                 &d->state));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image_reader::read_next_frame(image *simage)
+sail_status_t image_reader::read_next_frame(image *simage)
 {
     SAIL_CHECK_IMAGE_PTR(simage);
 
@@ -304,16 +304,16 @@ sail_error_t image_reader::read_next_frame(image *simage)
     sail_image->pixels = NULL;
     sail_destroy_image(sail_image);
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image_reader::stop_reading()
+sail_status_t image_reader::stop_reading()
 {
     SAIL_TRY(sail_stop_reading(d->state));
 
     d->state = nullptr;
 
-    return 0;
+    return SAIL_OK;
 }
 
 }

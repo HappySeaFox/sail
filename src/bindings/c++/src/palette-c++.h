@@ -83,9 +83,9 @@ private:
      */
     palette(const sail_palette *pal);
 
-    sail_error_t to_sail_palette(sail_palette *pal) const;
+    sail_status_t to_sail_palette(sail_palette *pal) const;
 
-    sail_error_t copy(SailPixelFormat pixel_format, const void *data, unsigned color_count);
+    sail_status_t copy(SailPixelFormat pixel_format, const void *data, unsigned color_count);
 
 private:
     class pimpl;

@@ -28,7 +28,7 @@
 
 #include "sail-common.h"
 
-sail_error_t sail_alloc_write_features(struct sail_write_features **write_features) {
+sail_status_t sail_alloc_write_features(struct sail_write_features **write_features) {
 
     SAIL_CHECK_WRITE_FEATURES_PTR(write_features);
 
@@ -47,7 +47,7 @@ sail_error_t sail_alloc_write_features(struct sail_write_features **write_featur
     (*write_features)->compression_max            = 0;
     (*write_features)->compression_default        = 0;
 
-    return 0;
+    return SAIL_OK;
 }
 
 void sail_destroy_write_features(struct sail_write_features *write_features) {

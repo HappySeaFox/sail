@@ -32,14 +32,14 @@
 #include "sail-common.h"
 #include "sail.h"
 
-sail_error_t sail_init_with_flags(int flags) {
+sail_status_t sail_init_with_flags(int flags) {
 
     struct sail_context *context;
     SAIL_TRY(control_tls_context(&context, SAIL_CONTEXT_ALLOCATE));
 
     SAIL_TRY(init_context(context, flags));
 
-    return 0;
+    return SAIL_OK;
 }
 
 void sail_finish(void) {
@@ -58,7 +58,7 @@ const struct sail_plugin_info_node* sail_plugin_info_list(void) {
     return context->plugin_info_node;
 }
 
-sail_error_t sail_plugin_info_from_path(const char *path, const struct sail_plugin_info **plugin_info) {
+sail_status_t sail_plugin_info_from_path(const char *path, const struct sail_plugin_info **plugin_info) {
 
     SAIL_CHECK_PATH_PTR(path);
     SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
@@ -66,17 +66,17 @@ sail_error_t sail_plugin_info_from_path(const char *path, const struct sail_plug
     const char *dot = strrchr(path, '.');
 
     if (dot == NULL || *dot == '\0' || *(dot+1) == '\0') {
-        return SAIL_INVALID_ARGUMENT;
+        return SAIL_ERROR_INVALID_ARGUMENT;
     }
 
     SAIL_LOG_DEBUG("Finding plugin info for path '%s'", path);
 
     SAIL_TRY(sail_plugin_info_from_extension(dot+1, plugin_info));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t sail_plugin_info_by_magic_number_from_path(const char *path, const struct sail_plugin_info **plugin_info) {
+sail_status_t sail_plugin_info_by_magic_number_from_path(const char *path, const struct sail_plugin_info **plugin_info) {
 
     SAIL_CHECK_PATH_PTR(path);
     SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
@@ -89,10 +89,10 @@ sail_error_t sail_plugin_info_by_magic_number_from_path(const char *path, const 
 
     sail_destroy_io(io);
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t sail_plugin_info_by_magic_number_from_mem(const void *buffer, size_t buffer_length, const struct sail_plugin_info **plugin_info) {
+sail_status_t sail_plugin_info_by_magic_number_from_mem(const void *buffer, size_t buffer_length, const struct sail_plugin_info **plugin_info) {
 
     SAIL_CHECK_BUFFER_PTR(buffer);
     SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
@@ -105,10 +105,10 @@ sail_error_t sail_plugin_info_by_magic_number_from_mem(const void *buffer, size_
 
     sail_destroy_io(io);
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t sail_plugin_info_by_magic_number_from_io(struct sail_io *io, const struct sail_plugin_info **plugin_info) {
+sail_status_t sail_plugin_info_by_magic_number_from_io(struct sail_io *io, const struct sail_plugin_info **plugin_info) {
 
     SAIL_CHECK_IO_PTR(io);
     SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
@@ -123,7 +123,7 @@ sail_error_t sail_plugin_info_by_magic_number_from_io(struct sail_io *io, const 
 
     if (nbytes != SAIL_MAGIC_BUFFER_SIZE) {
         SAIL_LOG_ERROR("Failed to read %d bytes from the I/O source", SAIL_MAGIC_BUFFER_SIZE);
-        return SAIL_IO_READ_ERROR;
+        return SAIL_ERROR_READ_IO;
     }
 
     /* Seek back. */
@@ -156,7 +156,7 @@ sail_error_t sail_plugin_info_by_magic_number_from_io(struct sail_io *io, const 
             if (strncmp(hex_numbers, string_node->value, strlen(string_node->value)) == 0) {
                 *plugin_info = node->plugin_info;
                 SAIL_LOG_DEBUG("Found plugin info: '%s'", (*plugin_info)->name);
-                return 0;
+                return SAIL_OK;
             }
 
             string_node = string_node->next;
@@ -165,10 +165,10 @@ sail_error_t sail_plugin_info_by_magic_number_from_io(struct sail_io *io, const 
         node = node->next;
     }
 
-    return SAIL_PLUGIN_NOT_FOUND;
+    return SAIL_ERROR_PLUGIN_NOT_FOUND;
 }
 
-sail_error_t sail_plugin_info_from_extension(const char *extension, const struct sail_plugin_info **plugin_info) {
+sail_status_t sail_plugin_info_from_extension(const char *extension, const struct sail_plugin_info **plugin_info) {
 
     SAIL_CHECK_EXTENSION_PTR(extension);
     SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
@@ -194,7 +194,7 @@ sail_error_t sail_plugin_info_from_extension(const char *extension, const struct
                 sail_free(extension_copy);
                 *plugin_info = node->plugin_info;
                 SAIL_LOG_DEBUG("Found plugin info: '%s'", (*plugin_info)->name);
-                return 0;
+                return SAIL_OK;
             }
 
             string_node = string_node->next;
@@ -204,10 +204,10 @@ sail_error_t sail_plugin_info_from_extension(const char *extension, const struct
     }
 
     sail_free(extension_copy);
-    return SAIL_PLUGIN_NOT_FOUND;
+    return SAIL_ERROR_PLUGIN_NOT_FOUND;
 }
 
-sail_error_t sail_plugin_info_from_mime_type(const char *mime_type, const struct sail_plugin_info **plugin_info) {
+sail_status_t sail_plugin_info_from_mime_type(const char *mime_type, const struct sail_plugin_info **plugin_info) {
 
     SAIL_CHECK_PTR(mime_type);
     SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
@@ -233,7 +233,7 @@ sail_error_t sail_plugin_info_from_mime_type(const char *mime_type, const struct
                 sail_free(mime_type_copy);
                 *plugin_info = node->plugin_info;
                 SAIL_LOG_DEBUG("Found plugin info: '%s'", (*plugin_info)->name);
-                return 0;
+                return SAIL_OK;
             }
 
             string_node = string_node->next;
@@ -243,10 +243,10 @@ sail_error_t sail_plugin_info_from_mime_type(const char *mime_type, const struct
     }
 
     sail_free(mime_type_copy);
-    return SAIL_PLUGIN_NOT_FOUND;
+    return SAIL_ERROR_PLUGIN_NOT_FOUND;
 }
 
-sail_error_t sail_unload_plugins(void) {
+sail_status_t sail_unload_plugins(void) {
 
     SAIL_LOG_DEBUG("Unloading cached plugins");
 
@@ -269,5 +269,5 @@ sail_error_t sail_unload_plugins(void) {
 
     SAIL_LOG_DEBUG("Unloaded plugins: %d", counter);
 
-    return 0;
+    return SAIL_OK;
 }

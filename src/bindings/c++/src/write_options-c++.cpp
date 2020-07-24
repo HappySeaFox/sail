@@ -130,7 +130,7 @@ write_options& write_options::with_compression(int compression)
     return *this;
 }
 
-sail_error_t write_options::to_sail_write_options(sail_write_options *write_options) const
+sail_status_t write_options::to_sail_write_options(sail_write_options *write_options) const
 {
     SAIL_CHECK_WRITE_OPTIONS_PTR(write_options);
 
@@ -139,7 +139,7 @@ sail_error_t write_options::to_sail_write_options(sail_write_options *write_opti
     write_options->compression_type    = d->compression_type;
     write_options->compression         = d->compression;
 
-    return 0;
+    return SAIL_OK;
 }
 
 }

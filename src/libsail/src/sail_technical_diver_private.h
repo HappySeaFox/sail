@@ -41,11 +41,11 @@ struct sail_plugin_info;
 struct sail_read_options;
 struct sail_write_options;
 
-SAIL_HIDDEN sail_error_t start_reading_io_with_options(struct sail_io *io, bool own_io,
+SAIL_HIDDEN sail_status_t start_reading_io_with_options(struct sail_io *io, bool own_io,
                                                        const struct sail_plugin_info *plugin_info,
                                                        const struct sail_read_options *read_options, void **state);
 
-SAIL_HIDDEN sail_error_t start_writing_io_with_options(struct sail_io *io, bool own_io,
+SAIL_HIDDEN sail_status_t start_writing_io_with_options(struct sail_io *io, bool own_io,
                                                        const struct sail_plugin_info *plugin_info,
                                                        const struct sail_write_options *write_options, void **state);
 

@@ -38,7 +38,7 @@
 #include "sail-common.h"
 #include "sail.h"
 
-sail_error_t alloc_and_load_plugin(const struct sail_plugin_info *plugin_info, struct sail_plugin **plugin) {
+sail_status_t alloc_and_load_plugin(const struct sail_plugin_info *plugin_info, struct sail_plugin **plugin) {
 
     SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
     SAIL_CHECK_PATH_PTR(plugin_info->path);
@@ -60,7 +60,7 @@ sail_error_t alloc_and_load_plugin(const struct sail_plugin_info *plugin_info, s
     if (handle == NULL) {
         SAIL_LOG_ERROR("Failed to load '%s'. Error: %d", plugin_info->path, GetLastError());
         destroy_plugin(*plugin);
-        return SAIL_PLUGIN_LOAD_ERROR;
+        return SAIL_ERROR_PLUGIN_LOAD;
     }
 
     (*plugin)->handle = handle;
@@ -70,7 +70,7 @@ sail_error_t alloc_and_load_plugin(const struct sail_plugin_info *plugin_info, s
     if (handle == NULL) {
         SAIL_LOG_ERROR("Failed to load '%s': %s", plugin_info->path, dlerror());
         destroy_plugin(*plugin);
-        return SAIL_PLUGIN_LOAD_ERROR;
+        return SAIL_ERROR_PLUGIN_LOAD;
     }
 
     (*plugin)->handle = handle;
@@ -93,7 +93,7 @@ sail_error_t alloc_and_load_plugin(const struct sail_plugin_info *plugin_info, s
         if (target == NULL) {                                    \
             SAIL_RESOLVE_LOG_ERROR(symbol);                      \
             destroy_plugin(*plugin);                             \
-            return SAIL_PLUGIN_SYMBOL_RESOLVE_FAILED;            \
+            return SAIL_ERROR_PLUGIN_SYMBOL_RESOLVE;             \
         }                                                        \
     }                                                            \
     while(0)
@@ -116,10 +116,10 @@ sail_error_t alloc_and_load_plugin(const struct sail_plugin_info *plugin_info, s
         SAIL_RESOLVE((*plugin)->v3->write_finish,          handle, sail_plugin_write_finish_v3);
     } else {
         destroy_plugin(*plugin);
-        return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
+        return SAIL_ERROR_UNSUPPORTED_PLUGIN_LAYOUT;
     }
 
-    return 0;
+    return SAIL_OK;
 }
 
 void destroy_plugin(struct sail_plugin *plugin) {

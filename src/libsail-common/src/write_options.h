@@ -79,9 +79,9 @@ typedef struct sail_write_options sail_write_options_t;
  * Allocates write options. The assigned write options MUST be destroyed later
  * with sail_destroy_write_options().
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_alloc_write_options(struct sail_write_options **write_options);
+SAIL_EXPORT sail_status_t sail_alloc_write_options(struct sail_write_options **write_options);
 
 /*
  * Destroys the specified write options object and all its internal allocated memory buffers.
@@ -93,25 +93,25 @@ SAIL_EXPORT void sail_destroy_write_options(struct sail_write_options *write_opt
 /*
  * Builds default write options from write features.
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_write_options_from_features(const struct sail_write_features *write_features, struct sail_write_options *write_options);
+SAIL_EXPORT sail_status_t sail_write_options_from_features(const struct sail_write_features *write_features, struct sail_write_options *write_options);
 
 /*
  * Allocates and builds default write options from write features.
  * The assigned write options MUST be destroyed later with sail_destroy_write_options().
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_alloc_write_options_from_features(const struct sail_write_features *write_features, struct sail_write_options **write_options);
+SAIL_EXPORT sail_status_t sail_alloc_write_options_from_features(const struct sail_write_features *write_features, struct sail_write_options **write_options);
 
 /*
  * Makes a deep copy of the specified write options object. The assigned write options MUST be destroyed later
  * with sail_destroy_write_options().
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_copy_write_options(const struct sail_write_options *write_options_source, struct sail_write_options **write_options_target);
+SAIL_EXPORT sail_status_t sail_copy_write_options(const struct sail_write_options *write_options_source, struct sail_write_options **write_options_target);
 
 /* extern "C" */
 #ifdef __cplusplus

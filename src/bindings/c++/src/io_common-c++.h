@@ -50,11 +50,11 @@ public:
     io& operator=(const io &i);
     ~io();
 
-    sail_error_t verify_valid() const;
+    sail_status_t verify_valid() const;
 
     bool is_valid() const;
 
-    sail_error_t to_sail_io(sail_io *io) const;
+    sail_status_t to_sail_io(sail_io *io) const;
 
     io& with_stream(void *stream);
     io& with_read(sail_io_read_t read);
@@ -66,7 +66,7 @@ public:
     io& with_eof(sail_io_eof_t eof);
 
 private:
-    sail_error_t is_valid_private() const;
+    sail_status_t is_valid_private() const;
 
 private:
     class pimpl;

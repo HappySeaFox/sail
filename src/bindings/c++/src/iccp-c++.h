@@ -78,7 +78,7 @@ private:
      */
     iccp(const sail_iccp *ic);
 
-    sail_error_t to_sail_iccp(sail_iccp *ic) const;
+    sail_status_t to_sail_iccp(sail_iccp *ic) const;
 
 private:
     class pimpl;

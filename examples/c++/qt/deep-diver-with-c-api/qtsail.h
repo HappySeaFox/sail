@@ -47,15 +47,15 @@ public:
     ~QtSail();
 
 private:
-    sail_error_t init();
-    sail_error_t loadImage(const QString &path, QImage *qimage);
-    sail_error_t saveImage(const QImage &qimage, void *buffer, size_t buffer_length,
+    sail_status_t init();
+    sail_status_t loadImage(const QString &path, QImage *qimage);
+    sail_status_t saveImage(const QImage &qimage, void *buffer, size_t buffer_length,
                            size_t *written);
     QStringList filters() const;
 
 private: // slots
     void onOpenFile();
-    sail_error_t onProbe();
+    sail_status_t onProbe();
     void onSave();
     void onFit(bool fit);
 

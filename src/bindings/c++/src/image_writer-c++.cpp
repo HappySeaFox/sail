@@ -56,14 +56,14 @@ image_writer::~image_writer()
     delete d;
 }
 
-sail_error_t image_writer::write(const std::string &path, const image &simage)
+sail_status_t image_writer::write(const std::string &path, const image &simage)
 {
     SAIL_TRY(write(path.c_str(), simage));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image_writer::write(const char *path, const image &simage)
+sail_status_t image_writer::write(const char *path, const image &simage)
 {
     SAIL_CHECK_PATH_PTR(path);
 
@@ -82,17 +82,17 @@ sail_error_t image_writer::write(const char *path, const image &simage)
     sail_image->pixels = NULL;
     sail_destroy_image(sail_image);
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image_writer::write(void *buffer, size_t buffer_length, const image &simage)
+sail_status_t image_writer::write(void *buffer, size_t buffer_length, const image &simage)
 {
     SAIL_TRY(write(buffer, buffer_length, simage, nullptr));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image_writer::write(void *buffer, size_t buffer_length, const image &simage, size_t *written)
+sail_status_t image_writer::write(void *buffer, size_t buffer_length, const image &simage, size_t *written)
 {
     SAIL_CHECK_BUFFER_PTR(buffer);
 
@@ -113,49 +113,49 @@ sail_error_t image_writer::write(void *buffer, size_t buffer_length, const image
     sail_image->pixels = NULL;
     sail_destroy_image(sail_image);
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image_writer::start_writing(const std::string &path)
+sail_status_t image_writer::start_writing(const std::string &path)
 {
     SAIL_TRY(start_writing(path.c_str()));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image_writer::start_writing(const char *path)
+sail_status_t image_writer::start_writing(const char *path)
 {
     SAIL_CHECK_PATH_PTR(path);
 
     SAIL_TRY(sail_start_writing_file(path, nullptr, &d->state));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image_writer::start_writing(const std::string &path, const plugin_info &splugin_info)
+sail_status_t image_writer::start_writing(const std::string &path, const plugin_info &splugin_info)
 {
     SAIL_TRY(start_writing(path.c_str(), splugin_info));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image_writer::start_writing(const char *path, const plugin_info &splugin_info)
+sail_status_t image_writer::start_writing(const char *path, const plugin_info &splugin_info)
 {
     SAIL_CHECK_PATH_PTR(path);
 
     SAIL_TRY(sail_start_writing_file(path, splugin_info.sail_plugin_info_c(), &d->state));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image_writer::start_writing(const std::string &path, const write_options &swrite_options)
+sail_status_t image_writer::start_writing(const std::string &path, const write_options &swrite_options)
 {
     SAIL_TRY(start_writing(path.c_str(), swrite_options));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image_writer::start_writing(const char *path, const write_options &swrite_options)
+sail_status_t image_writer::start_writing(const char *path, const write_options &swrite_options)
 {
     SAIL_CHECK_PATH_PTR(path);
 
@@ -164,17 +164,17 @@ sail_error_t image_writer::start_writing(const char *path, const write_options &
 
     SAIL_TRY(sail_start_writing_file_with_options(path, nullptr, &sail_write_options, &d->state));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image_writer::start_writing(const std::string &path, const plugin_info &splugin_info, const write_options &swrite_options)
+sail_status_t image_writer::start_writing(const std::string &path, const plugin_info &splugin_info, const write_options &swrite_options)
 {
     SAIL_TRY(start_writing(path.c_str(), splugin_info, swrite_options));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image_writer::start_writing(const char *path, const plugin_info &splugin_info, const write_options &swrite_options)
+sail_status_t image_writer::start_writing(const char *path, const plugin_info &splugin_info, const write_options &swrite_options)
 {
     SAIL_CHECK_PATH_PTR(path);
 
@@ -183,10 +183,10 @@ sail_error_t image_writer::start_writing(const char *path, const plugin_info &sp
 
     SAIL_TRY(sail_start_writing_file_with_options(path, splugin_info.sail_plugin_info_c(), &sail_write_options, &d->state));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image_writer::start_writing(void *buffer, size_t buffer_length, const plugin_info &splugin_info)
+sail_status_t image_writer::start_writing(void *buffer, size_t buffer_length, const plugin_info &splugin_info)
 {
     SAIL_CHECK_BUFFER_PTR(buffer);
 
@@ -195,10 +195,10 @@ sail_error_t image_writer::start_writing(void *buffer, size_t buffer_length, con
                                     splugin_info.sail_plugin_info_c(),
                                     &d->state));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image_writer::start_writing(void *buffer, size_t buffer_length, const plugin_info &splugin_info, const write_options &swrite_options)
+sail_status_t image_writer::start_writing(void *buffer, size_t buffer_length, const plugin_info &splugin_info, const write_options &swrite_options)
 {
     SAIL_CHECK_BUFFER_PTR(buffer);
 
@@ -211,10 +211,10 @@ sail_error_t image_writer::start_writing(void *buffer, size_t buffer_length, con
                                                  &sail_write_options,
                                                  &d->state));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image_writer::start_writing(const io &sio, const plugin_info &splugin_info)
+sail_status_t image_writer::start_writing(const io &sio, const plugin_info &splugin_info)
 {
     SAIL_TRY(sio.verify_valid());
 
@@ -225,10 +225,10 @@ sail_error_t image_writer::start_writing(const io &sio, const plugin_info &splug
                                                 NULL,
                                                 &d->state));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image_writer::start_writing(const io &sio, const plugin_info &splugin_info, const write_options &swrite_options)
+sail_status_t image_writer::start_writing(const io &sio, const plugin_info &splugin_info, const write_options &swrite_options)
 {
     SAIL_TRY(sio.verify_valid());
 
@@ -242,10 +242,10 @@ sail_error_t image_writer::start_writing(const io &sio, const plugin_info &splug
                                                 &sail_write_options,
                                                 &d->state));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image_writer::write_next_frame(const image &simage)
+sail_status_t image_writer::write_next_frame(const image &simage)
 {
     sail_image *sail_image;
     SAIL_TRY(sail_alloc_image(&sail_image));
@@ -261,25 +261,25 @@ sail_error_t image_writer::write_next_frame(const image &simage)
     sail_image->pixels = NULL;
     sail_destroy_image(sail_image);
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image_writer::stop_writing()
+sail_status_t image_writer::stop_writing()
 {
     SAIL_TRY(sail_stop_writing(d->state));
 
     d->state = nullptr;
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image_writer::stop_writing(size_t *written)
+sail_status_t image_writer::stop_writing(size_t *written)
 {
     SAIL_TRY(sail_stop_writing_with_written(d->state, written));
 
     d->state = nullptr;
 
-    return 0;
+    return SAIL_OK;
 }
 
 }

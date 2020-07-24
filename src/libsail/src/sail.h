@@ -109,9 +109,9 @@ enum SailInitFlags {
  *     1. SAIL_PLUGINS_PATH environment variable
  *     2. Hardcoded SAIL_PLUGINS_PATH in config.h
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_init_with_flags(int flags);
+SAIL_EXPORT sail_status_t sail_init_with_flags(int flags);
 
 /*
  * Finalizes working with the thread-local static context that was implicitly or explicitly allocated by
@@ -149,9 +149,9 @@ SAIL_EXPORT const struct sail_plugin_info_node* sail_plugin_info_list(void);
  *                sail_read_next_frame()       ->
  *                sail_stop_writing().
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_info_from_path(const char *path, const struct sail_plugin_info **plugin_info);
+SAIL_EXPORT sail_status_t sail_plugin_info_from_path(const char *path, const struct sail_plugin_info **plugin_info);
 
 /*
  * Finds a first plugin info object that supports the magic number read from the specified file.
@@ -164,9 +164,9 @@ SAIL_EXPORT sail_error_t sail_plugin_info_from_path(const char *path, const stru
  *                sail_read_next_frame()                       ->
  *                sail_stop_reading().
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_info_by_magic_number_from_path(const char *path, const struct sail_plugin_info **plugin_info);
+SAIL_EXPORT sail_status_t sail_plugin_info_by_magic_number_from_path(const char *path, const struct sail_plugin_info **plugin_info);
 
 /*
  * Finds a first plugin info object that supports the magic number read from the specified memory buffer.
@@ -179,9 +179,9 @@ SAIL_EXPORT sail_error_t sail_plugin_info_by_magic_number_from_path(const char *
  *                sail_read_next_frame()                      ->
  *                sail_stop_reading().
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_info_by_magic_number_from_mem(const void *buffer, size_t buffer_length,
+SAIL_EXPORT sail_status_t sail_plugin_info_by_magic_number_from_mem(const void *buffer, size_t buffer_length,
                                                                    const struct sail_plugin_info **plugin_info);
 
 /*
@@ -196,9 +196,9 @@ SAIL_EXPORT sail_error_t sail_plugin_info_by_magic_number_from_mem(const void *b
  *                sail_read_next_frame()                     ->
  *                sail_stop_reading().
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_info_by_magic_number_from_io(struct sail_io *io, const struct sail_plugin_info **plugin_info);
+SAIL_EXPORT sail_status_t sail_plugin_info_by_magic_number_from_io(struct sail_io *io, const struct sail_plugin_info **plugin_info);
 
 /*
  * Finds a first plugin info object that supports the specified file extension.
@@ -216,9 +216,9 @@ SAIL_EXPORT sail_error_t sail_plugin_info_by_magic_number_from_io(struct sail_io
  *                sail_read_next_frame()            ->
  *                sail_stop_writing().
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_info_from_extension(const char *extension, const struct sail_plugin_info **plugin_info);
+SAIL_EXPORT sail_status_t sail_plugin_info_from_extension(const char *extension, const struct sail_plugin_info **plugin_info);
 
 /*
  * Finds a first plugin info object that supports the specified mime type.
@@ -236,9 +236,9 @@ SAIL_EXPORT sail_error_t sail_plugin_info_from_extension(const char *extension, 
  *                sail_read_next_frame()            ->
  *                sail_stop_writing().
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_plugin_info_from_mime_type(const char *mime_type, const struct sail_plugin_info **plugin_info);
+SAIL_EXPORT sail_status_t sail_plugin_info_from_mime_type(const char *mime_type, const struct sail_plugin_info **plugin_info);
 
 /*
  * Unloads all the loaded plugins from the cache to release memory occupied by them. Use it if you want
@@ -247,9 +247,9 @@ SAIL_EXPORT sail_error_t sail_plugin_info_from_mime_type(const char *mime_type, 
  *
  * Typical usage: This is a standalone function that can be called at any time.
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_unload_plugins(void);
+SAIL_EXPORT sail_status_t sail_unload_plugins(void);
 
 /* extern "C" */
 #ifdef __cplusplus

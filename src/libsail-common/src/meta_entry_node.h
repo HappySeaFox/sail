@@ -52,9 +52,9 @@ struct sail_meta_entry_node {
 /*
  * Allocates a new meta entry node. The assigned node MUST be destroyed later with sail_destroy_meta_entry_node().
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_alloc_meta_entry_node(struct sail_meta_entry_node **node);
+SAIL_EXPORT sail_status_t sail_alloc_meta_entry_node(struct sail_meta_entry_node **node);
 
 /*
  * Destroys the specified meta entry node and all its internal allocated memory buffers.
@@ -65,9 +65,9 @@ SAIL_EXPORT void sail_destroy_meta_entry_node(struct sail_meta_entry_node *node)
  * Makes a deep copy of the specified meta entry node. The assigned node MUST be destroyed
  * later with sail_destroy_meta_entry_node().
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_copy_meta_entry_node(struct sail_meta_entry_node *source,
+SAIL_EXPORT sail_status_t sail_copy_meta_entry_node(struct sail_meta_entry_node *source,
                                                    struct sail_meta_entry_node **target);
 
 /*
@@ -81,9 +81,9 @@ SAIL_EXPORT void sail_destroy_meta_entry_node_chain(struct sail_meta_entry_node 
  * later with sail_destroy_meta_entry_node_chain(). If the source chain is NULL, it assigns NULL
  * to the target chain and returns 0.
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_copy_meta_entry_node_chain(struct sail_meta_entry_node *source,
+SAIL_EXPORT sail_status_t sail_copy_meta_entry_node_chain(struct sail_meta_entry_node *source,
                                                          struct sail_meta_entry_node **target);
 
 /* extern "C" */

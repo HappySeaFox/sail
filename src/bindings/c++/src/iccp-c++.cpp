@@ -120,7 +120,7 @@ iccp::iccp(const sail_iccp *ic)
     with_data(ic->data, ic->data_length);
 }
 
-sail_error_t iccp::to_sail_iccp(sail_iccp *ic) const
+sail_status_t iccp::to_sail_iccp(sail_iccp *ic) const
 {
     SAIL_CHECK_ICCP_PTR(ic);
 
@@ -129,7 +129,7 @@ sail_error_t iccp::to_sail_iccp(sail_iccp *ic) const
 
     ic->data_length = d->iccp.data_length;
 
-    return 0;
+    return SAIL_OK;
 }
 
 }

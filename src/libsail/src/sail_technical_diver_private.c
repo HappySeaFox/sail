@@ -34,7 +34,7 @@
  * Private functions.
  */
 
-static sail_error_t check_io_arguments(struct sail_io *io,
+static sail_status_t check_io_arguments(struct sail_io *io,
                                         const struct sail_plugin_info *plugin_info,
                                         void **state) {
 
@@ -42,14 +42,14 @@ static sail_error_t check_io_arguments(struct sail_io *io,
     SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
     SAIL_CHECK_STATE_PTR(state);
 
-    return 0;
+    return SAIL_OK;
 }
 
 /*
  * Public functions.
  */
 
-sail_error_t start_reading_io_with_options(struct sail_io *io, bool own_io,
+sail_status_t start_reading_io_with_options(struct sail_io *io, bool own_io,
                                            const struct sail_plugin_info *plugin_info,
                                            const struct sail_read_options *read_options, void **state) {
 
@@ -101,10 +101,10 @@ sail_error_t start_reading_io_with_options(struct sail_io *io, bool own_io,
 
     *state = state_of_mind;
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t start_writing_io_with_options(struct sail_io *io, bool own_io,
+sail_status_t start_writing_io_with_options(struct sail_io *io, bool own_io,
                                            const struct sail_plugin_info *plugin_info,
                                            const struct sail_write_options *write_options, void **state) {
 
@@ -142,5 +142,5 @@ sail_error_t start_writing_io_with_options(struct sail_io *io, bool own_io,
 
     *state = state_of_mind;
 
-    return 0;
+    return SAIL_OK;
 }

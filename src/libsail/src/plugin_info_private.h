@@ -45,9 +45,9 @@ struct sail_plugin_info;
  * Allocates a new plugin info node. The assigned node MUST be destroyed later
  * with destroy_plugin_info_node().
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_HIDDEN sail_error_t alloc_plugin_info_node(struct sail_plugin_info_node **plugin_info_node);
+SAIL_HIDDEN sail_status_t alloc_plugin_info_node(struct sail_plugin_info_node **plugin_info_node);
 
 /*
  * Destroys the specified plugin info node and all its internal allocated memory buffers.
@@ -64,8 +64,8 @@ SAIL_HIDDEN void destroy_plugin_info_node_chain(struct sail_plugin_info_node *pl
  * Reads SAIL plugin info from the specified file and stores the parsed information into the specified
  * plugin info object. The assigned plugin info MUST be destroyed later with destroy_plugin_info().
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_HIDDEN sail_error_t plugin_read_info(const char *path, struct sail_plugin_info **plugin_info);
+SAIL_HIDDEN sail_status_t plugin_read_info(const char *path, struct sail_plugin_info **plugin_info);
 
 #endif

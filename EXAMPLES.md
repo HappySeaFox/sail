@@ -107,7 +107,7 @@ SAIL_TRY_OR_CLEANUP(sail_start_reading_file(path, NULL, &state),
 /*
  * Read just a single frame. It's possible to read more frames if any. Just continue
  * reading frames till sail_read_next_frame() returns 0. If no more frames are available,
- * it returns SAIL_NO_MORE_FRAMES.
+ * it returns SAIL_ERROR_NO_MORE_FRAMES.
  */
 SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, &image),
                     /* cleanup */ sail_stop_reading(state));
@@ -154,7 +154,7 @@ SAIL_TRY(reader.start_reading(path));
 
 // Read just a single frame. It's possible to read more frames if any. Just continue
 // reading frames till read_next_frame() returns 0. If no more frames are available,
-// it returns SAIL_NO_MORE_FRAMES.
+// it returns SAIL_ERROR_NO_MORE_FRAMES.
 //
 // read_next_frame() outputs pixels in the BPP32-RGBA pixel format.
 //
@@ -229,7 +229,7 @@ sail_destroy_read_options(read_options);
 /*
  * Read just a single frame. It's possible to read more frames if any. Just continue
  * reading frames till sail_read_next_frame() returns 0. If no more frames are available,
- * it returns SAIL_NO_MORE_FRAMES.
+ * it returns SAIL_ERROR_NO_MORE_FRAMES.
  *
  * sail_read_next_frame() outputs pixels in the requested pixel format (BPP32-RGBA by default).
  */
@@ -301,7 +301,7 @@ SAIL_TRY(reader.start_reading(buffer, buffer_length, plugin_info, read_options))
 
 // Read just a single frame. It's possible to read more frames if any. Just continue
 // reading frames till read_next_frame() returns 0. If no more frames are available,
-// it returns SAIL_NO_MORE_FRAMES.
+// it returns SAIL_ERROR_NO_MORE_FRAMES.
 //
 // read_next_frame() outputs pixels in the requested pixel format (BPP32-RGBA by default).
 //
@@ -414,7 +414,7 @@ sail_destroy_read_options(read_options);
 /*
  * Read just a single frame. It's possible to read more frames if any. Just continue
  * reading frames till sail_read_next_frame() returns 0. If no more frames are available,
- * it returns SAIL_NO_MORE_FRAMES.
+ * it returns SAIL_ERROR_NO_MORE_FRAMES.
  *
  * sail_read_next_frame() outputs pixels in the requested pixel format (BPP32-RGBA by default).
  */
@@ -511,7 +511,7 @@ SAIL_TRY(reader.start_reading(io, plugin_info, read_options));
 
 // Read just a single frame. It's possible to read more frames if any. Just continue
 // reading frames till read_next_frame() returns 0. If no more frames are available,
-// it returns SAIL_NO_MORE_FRAMES.
+// it returns SAIL_ERROR_NO_MORE_FRAMES.
 //
 // read_next_frame() outputs pixels in the requested pixel format (BPP32-RGBA by default).
 //

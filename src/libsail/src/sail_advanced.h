@@ -49,9 +49,9 @@ struct sail_plugin_info;
  *
  * Typical usage: This is a standalone function that could be called at any time.
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_probe_io(struct sail_io *io, struct sail_image **image, const struct sail_plugin_info **plugin_info);
+SAIL_EXPORT sail_status_t sail_probe_io(struct sail_io *io, struct sail_image **image, const struct sail_plugin_info **plugin_info);
 
 /*
  * Loads an image from the specified memory buffer and returns its properties without pixels. The assigned image
@@ -62,9 +62,9 @@ SAIL_EXPORT sail_error_t sail_probe_io(struct sail_io *io, struct sail_image **i
  *
  * Typical usage: This is a standalone function that could be called at any time.
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_probe_mem(const void *buffer, size_t buffer_length,
+SAIL_EXPORT sail_status_t sail_probe_mem(const void *buffer, size_t buffer_length,
                                         struct sail_image **image, const struct sail_plugin_info **plugin_info);
 
 /*
@@ -96,9 +96,9 @@ SAIL_EXPORT sail_error_t sail_probe_mem(const void *buffer, size_t buffer_length
  * in it and destroy it in sail_stop_reading. States must be used per image. DO NOT use the same state
  * to start reading multiple images at the same time.
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_start_reading_file(const char *path, const struct sail_plugin_info *plugin_info, void **state);
+SAIL_EXPORT sail_status_t sail_start_reading_file(const char *path, const struct sail_plugin_info *plugin_info, void **state);
 
 /*
  * Starts reading the specified memory buffer.
@@ -114,28 +114,28 @@ SAIL_EXPORT sail_error_t sail_start_reading_file(const char *path, const struct 
  * in it and destroy it in sail_stop_reading(). States must be used per image. DO NOT use the same state
  * to start reading multiple images at the same time.
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_start_reading_mem(const void *buffer, size_t buffer_length,
+SAIL_EXPORT sail_status_t sail_start_reading_mem(const void *buffer, size_t buffer_length,
                                                 const struct sail_plugin_info *plugin_info, void **state);
 
 /*
  * Continues reading the file started by sail_start_reading_file() and brothers. The assigned image
  * MUST be destroyed later with sail_image_destroy().
  *
- * Returns 0 on success or sail_error_t on error.
- * Returns SAIL_NO_MORE_FRAMES when no more frames are available.
+ * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_ERROR_NO_MORE_FRAMES when no more frames are available.
  */
-SAIL_EXPORT sail_error_t sail_read_next_frame(void *state, struct sail_image **image);
+SAIL_EXPORT sail_status_t sail_read_next_frame(void *state, struct sail_image **image);
 
 /*
  * Stops reading the file started by sail_start_reading_file() and brothers. Does nothing if the state is NULL.
  *
  * It is essential to always stop writing to free memory resources. Failure to do so will lead to memory leaks.
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_stop_reading(void *state);
+SAIL_EXPORT sail_status_t sail_stop_reading(void *state);
 
 /*
  * Starts writing into the specified image file. Pass plugin info if you'd like to start writing
@@ -167,9 +167,9 @@ SAIL_EXPORT sail_error_t sail_stop_reading(void *state);
  * in it and destroy it in sail_stop_writing. States must be used per image. DO NOT use the same state
  * to start writing multiple images at the same time.
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_start_writing_file(const char *path, const struct sail_plugin_info *plugin_info, void **state);
+SAIL_EXPORT sail_status_t sail_start_writing_file(const char *path, const struct sail_plugin_info *plugin_info, void **state);
 
 /*
  * Starts writing the specified memory buffer.
@@ -186,26 +186,26 @@ SAIL_EXPORT sail_error_t sail_start_writing_file(const char *path, const struct 
  * in it and destroy it in sail_stop_writing. States must be used per image. DO NOT use the same state
  * to start writing multiple images at the same time.
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_start_writing_mem(void *buffer, size_t buffer_length,
+SAIL_EXPORT sail_status_t sail_start_writing_mem(void *buffer, size_t buffer_length,
                                                 const struct sail_plugin_info *plugin_info, void **state);
 
 /*
  * Continues writing the file started by sail_start_writing_file() and brothers.
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_write_next_frame(void *state, const struct sail_image *image);
+SAIL_EXPORT sail_status_t sail_write_next_frame(void *state, const struct sail_image *image);
 
 /*
  * Stops writing the file started by sail_start_writing_file() and brothers. Does nothing if the state is NULL.
  *
  * It is essential to always stop writing to free memory resources. Failure to do so will lead to memory leaks.
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_stop_writing(void *state);
+SAIL_EXPORT sail_status_t sail_stop_writing(void *state);
 
 /* extern "C" */
 #ifdef __cplusplus

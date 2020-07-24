@@ -29,11 +29,11 @@
 namespace sail
 {
 
-sail_error_t print_errno(const char *format)
+sail_status_t print_errno(const char *format)
 {
     SAIL_TRY(sail_print_errno(format));
 
-    return 0;
+    return SAIL_OK;
 }
 
 uint64_t now()

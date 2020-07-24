@@ -106,9 +106,9 @@ typedef struct sail_write_features sail_write_features_t;
  * Allocates write features. The assigned write features MUST be destroyed later
  * with sail_destroy_write_features().
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_alloc_write_features(struct sail_write_features **write_features);
+SAIL_EXPORT sail_status_t sail_alloc_write_features(struct sail_write_features **write_features);
 
 /*
  * Destroys the specified write features object and all its internal allocated memory buffers.

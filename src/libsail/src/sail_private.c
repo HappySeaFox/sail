@@ -115,12 +115,12 @@ static const char* plugins_path(void) {
 }
 
 /* Add "sail/plugins/lib" to the DLL/SO search path. */
-static sail_error_t update_lib_path(void) {
+static sail_status_t update_lib_path(void) {
 
     SAIL_THREAD_LOCAL static bool update_lib_path_called = false;
 
     if (update_lib_path_called) {
-        return 0;
+        return SAIL_OK;
     }
 
     update_lib_path_called = true;
@@ -135,7 +135,7 @@ static sail_error_t update_lib_path(void) {
     if (!sail_is_dir(full_path_to_lib)) {
         SAIL_LOG_DEBUG("Optional DLL directory '%s' doesn't exist, so not loading DLLs from it", full_path_to_lib);
         sail_free(full_path_to_lib);
-        return 0;
+        return SAIL_OK;
     }
 
     SAIL_LOG_DEBUG("Set DLL directory to '%s'", full_path_to_lib);
@@ -148,7 +148,7 @@ static sail_error_t update_lib_path(void) {
         SAIL_LOG_ERROR("Failed to update library search path with '%s'. Error: %d", full_path_to_lib, GetLastError());
         sail_free(full_path_to_lib_w);
         sail_free(full_path_to_lib);
-        return SAIL_ENV_UPDATE_FAILED;
+        return SAIL_ERROR_ENV_UPDATE;
     }
 
     sail_free(full_path_to_lib_w);
@@ -160,7 +160,7 @@ static sail_error_t update_lib_path(void) {
     if (!sail_is_dir(full_path_to_lib)) {
         SAIL_LOG_DEBUG("Optional LIB directory '%s' doesn't exist, so not updating LD_LIBRARY_PATH with it", full_path_to_lib);
         sail_free(full_path_to_lib);
-        return 0;
+        return SAIL_OK;
     }
 
     char *combined_ld_library_path;
@@ -180,16 +180,16 @@ static sail_error_t update_lib_path(void) {
     if (setenv("LD_LIBRARY_PATH", combined_ld_library_path, true) != 0) {
         SAIL_LOG_ERROR("Failed to update library search path: %s", strerror(errno));
         sail_free(combined_ld_library_path);
-        return SAIL_ENV_UPDATE_FAILED;
+        return SAIL_ERROR_ENV_UPDATE;
     }
 
     sail_free(combined_ld_library_path);
 #endif
 
-    return 0;
+    return SAIL_OK;
 }
 
-static sail_error_t build_full_path(const char *sail_plugins_path, const char *name, char **full_path) {
+static sail_status_t build_full_path(const char *sail_plugins_path, const char *name, char **full_path) {
 
 #ifdef SAIL_WIN32
     SAIL_TRY(sail_concat(full_path, 3, sail_plugins_path, "\\", name));
@@ -197,10 +197,10 @@ static sail_error_t build_full_path(const char *sail_plugins_path, const char *n
     SAIL_TRY(sail_concat(full_path, 3, sail_plugins_path, "/", name));
 #endif
 
-    return 0;
+    return SAIL_OK;
 }
 
-static sail_error_t build_plugin_from_plugin_info(const char *plugin_info_full_path,
+static sail_status_t build_plugin_from_plugin_info(const char *plugin_info_full_path,
                                                     struct sail_plugin_info_node **plugin_info_node) {
 
     SAIL_CHECK_PATH_PTR(plugin_info_full_path);
@@ -210,7 +210,7 @@ static sail_error_t build_plugin_from_plugin_info(const char *plugin_info_full_p
     char *plugin_info_part = strstr(plugin_info_full_path, ".plugin.info");
 
     if (plugin_info_part == NULL) {
-        return SAIL_MEMORY_ALLOCATION_FAILED;
+        return SAIL_ERROR_MEMORY_ALLOCATION;
     }
 
     /* The length of "/path/jpeg". */
@@ -248,14 +248,14 @@ static sail_error_t build_plugin_from_plugin_info(const char *plugin_info_full_p
     (*plugin_info_node)->plugin_info = plugin_info;
     plugin_info->path = plugin_full_path;
 
-    return 0;
+    return SAIL_OK;
 }
 
 /*
  * Public functions.
  */
 
-sail_error_t alloc_context(struct sail_context **context) {
+sail_status_t alloc_context(struct sail_context **context) {
 
     SAIL_CHECK_CONTEXT_PTR(context);
 
@@ -267,22 +267,22 @@ sail_error_t alloc_context(struct sail_context **context) {
     (*context)->initialized      = false;
     (*context)->plugin_info_node = NULL;
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t destroy_context(struct sail_context *context) {
+sail_status_t destroy_context(struct sail_context *context) {
 
     if (context == NULL) {
-        return 0;
+        return SAIL_OK;
     }
 
     destroy_plugin_info_node_chain(context->plugin_info_node);
     sail_free(context);
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t control_tls_context(struct sail_context **context, enum SailContextAction action) {
+sail_status_t control_tls_context(struct sail_context **context, enum SailContextAction action) {
 
     SAIL_THREAD_LOCAL static struct sail_context *tls_context = NULL;
 
@@ -301,16 +301,16 @@ sail_error_t control_tls_context(struct sail_context **context, enum SailContext
         tls_context = NULL;
     }
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t init_context(struct sail_context *context, int flags) {
+sail_status_t init_context(struct sail_context *context, int flags) {
 
     SAIL_CHECK_CONTEXT_PTR(context);
 
     if (context->initialized) {
         SAIL_LOG_DEBUG("The thread-local static context is already initialized so bypassing initialization");
-        return 0;
+        return SAIL_OK;
     }
 
     context->initialized = true;
@@ -347,7 +347,7 @@ sail_error_t init_context(struct sail_context *context, int flags) {
     if (hFind == INVALID_HANDLE_VALUE) {
         SAIL_LOG_ERROR("Failed to list files in '%s'. Error: %d", plugs_path, GetLastError());
         sail_free(plugs_path_with_mask);
-        return SAIL_DIR_OPEN_ERROR;
+        return SAIL_ERROR_LIST_DIR;
     }
 
     do {
@@ -360,7 +360,7 @@ sail_error_t init_context(struct sail_context *context, int flags) {
 
         SAIL_LOG_DEBUG("Found plugin info '%s'", data.cFileName);
 
-        if (build_plugin_from_plugin_info(full_path, &plugin_info_node) == 0) {
+        if (build_plugin_from_plugin_info(full_path, &plugin_info_node) == SAIL_OK) {
             *last_plugin_info_node = plugin_info_node;
             last_plugin_info_node = &plugin_info_node->next;
         }
@@ -379,7 +379,7 @@ sail_error_t init_context(struct sail_context *context, int flags) {
 
     if (d == NULL) {
         SAIL_LOG_ERROR("Failed to list files in '%s': %s", plugs_path, strerror(errno));
-        return SAIL_DIR_OPEN_ERROR;
+        return SAIL_ERROR_LIST_DIR;
     }
 
     struct dirent *dir;
@@ -399,7 +399,7 @@ sail_error_t init_context(struct sail_context *context, int flags) {
             if (is_plugin_info) {
                 SAIL_LOG_DEBUG("Found plugin info '%s'", dir->d_name);
 
-                if (build_plugin_from_plugin_info(full_path, &plugin_info_node) == 0) {
+                if (build_plugin_from_plugin_info(full_path, &plugin_info_node) == SAIL_OK) {
                     *last_plugin_info_node = plugin_info_node;
                     last_plugin_info_node = &plugin_info_node->next;
                 }
@@ -440,35 +440,35 @@ sail_error_t init_context(struct sail_context *context, int flags) {
 
     SAIL_LOG_DEBUG("Initialized in %lld ms.", (unsigned long)(sail_now() - start_time));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t current_tls_context(struct sail_context **context) {
+sail_status_t current_tls_context(struct sail_context **context) {
 
     SAIL_CHECK_CONTEXT_PTR(context);
 
     SAIL_TRY(control_tls_context(context, SAIL_CONTEXT_ALLOCATE));
     SAIL_TRY(init_context(*context, /* flags */ 0));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t load_plugin(struct sail_plugin_info_node *node) {
+sail_status_t load_plugin(struct sail_plugin_info_node *node) {
 
     SAIL_CHECK_PTR(node);
 
     /* Already loaded. */
     if (node->plugin != NULL) {
-        return 0;
+        return SAIL_OK;
     }
 
     /* Plugin is not loaded. Let's load it. */
     SAIL_TRY(alloc_and_load_plugin(node->plugin_info, &node->plugin));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t load_plugin_by_plugin_info(const struct sail_plugin_info *plugin_info, const struct sail_plugin **plugin) {
+sail_status_t load_plugin_by_plugin_info(const struct sail_plugin_info *plugin_info, const struct sail_plugin **plugin) {
 
     SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
     SAIL_CHECK_PLUGIN_PTR(plugin);
@@ -484,7 +484,7 @@ sail_error_t load_plugin_by_plugin_info(const struct sail_plugin_info *plugin_in
         if (node->plugin_info == plugin_info) {
             if (node->plugin != NULL) {
                 *plugin = node->plugin;
-                return 0;
+                return SAIL_OK;
             }
 
             found_node = node;
@@ -496,14 +496,14 @@ sail_error_t load_plugin_by_plugin_info(const struct sail_plugin_info *plugin_in
 
     /* Something weird. The pointer to the plugin info is not found the cache. */
     if (found_node == NULL) {
-        return SAIL_PLUGIN_NOT_FOUND;
+        return SAIL_ERROR_PLUGIN_NOT_FOUND;
     }
 
     SAIL_TRY(load_plugin(found_node));
 
     *plugin = found_node->plugin;
 
-    return 0;
+    return SAIL_OK;
 }
 
 void destroy_hidden_state(struct hidden_state *state) {
@@ -524,7 +524,7 @@ void destroy_hidden_state(struct hidden_state *state) {
     sail_free(state);
 }
 
-sail_error_t stop_writing(void *state, size_t *written) {
+sail_status_t stop_writing(void *state, size_t *written) {
 
     if (written != NULL) {
         *written = 0;
@@ -532,7 +532,7 @@ sail_error_t stop_writing(void *state, size_t *written) {
 
     /* Not an error. */
     if (state == NULL) {
-        return 0;
+        return SAIL_OK;
     }
 
     struct hidden_state *state_of_mind = (struct hidden_state *)state;
@@ -540,7 +540,7 @@ sail_error_t stop_writing(void *state, size_t *written) {
     /* Not an error. */
     if (state_of_mind->plugin == NULL) {
         destroy_hidden_state(state_of_mind);
-        return 0;
+        return SAIL_OK;
     }
 
     SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v3->write_finish(&state_of_mind->state, state_of_mind->io),
@@ -552,24 +552,24 @@ sail_error_t stop_writing(void *state, size_t *written) {
 
     destroy_hidden_state(state_of_mind);
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t allowed_read_output_pixel_format(const struct sail_read_features *read_features,
+sail_status_t allowed_read_output_pixel_format(const struct sail_read_features *read_features,
                                                 enum SailPixelFormat pixel_format) {
 
     SAIL_CHECK_READ_FEATURES_PTR(read_features);
 
     for (int i = 0; i < read_features->output_pixel_formats_length; i++) {
         if (read_features->output_pixel_formats[i] == pixel_format) {
-            return 0;
+            return SAIL_OK;
         }
     }
 
-    return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+    return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
 }
 
-sail_error_t allowed_write_output_pixel_format(const struct sail_write_features *write_features,
+sail_status_t allowed_write_output_pixel_format(const struct sail_write_features *write_features,
                                                 enum SailPixelFormat input_pixel_format,
                                                 enum SailPixelFormat output_pixel_format) {
 
@@ -577,7 +577,7 @@ sail_error_t allowed_write_output_pixel_format(const struct sail_write_features 
 
     /* Plugins will compute output pixel format automatically. */
     if (output_pixel_format == SAIL_PIXEL_FORMAT_AUTO) {
-        return 0;
+        return SAIL_OK;
     }
 
     /*
@@ -596,15 +596,15 @@ sail_error_t allowed_write_output_pixel_format(const struct sail_write_features 
         if (node->input_pixel_format == input_pixel_format) {
             for (int i = 0; i < node->output_pixel_formats_length; i++) {
                 if (node->output_pixel_formats[i] == output_pixel_format) {
-                    return 0;
+                    return SAIL_OK;
                 }
             }
 
-            return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+            return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
         }
 
         node = node->next;
     }
 
-    return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+    return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
 }

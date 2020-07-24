@@ -63,11 +63,11 @@ int WriteOptions::compression() const
     return d->ui->sliderCompression->isEnabled() ? d->ui->sliderCompression->value() : -1;
 }
 
-sail_error_t WriteOptions::init(const sail_write_features *write_features, int input_pixel_format)
+sail_status_t WriteOptions::init(const sail_write_features *write_features, int input_pixel_format)
 {
     if (write_features->pixel_formats_mapping_node == nullptr) {
         disable();
-        return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+        return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
     }
     d->ui->labelColor->setText(tr("Output color:"));
 
@@ -94,7 +94,7 @@ sail_error_t WriteOptions::init(const sail_write_features *write_features, int i
 
     if (!allowedInputPixelFormat) {
         disable();
-        return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+        return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
     }
 
     if (write_features->compression_min == 0 && write_features->compression_max == 0) {
@@ -113,7 +113,7 @@ sail_error_t WriteOptions::init(const sail_write_features *write_features, int i
         });
     }
 
-    return 0;
+    return SAIL_OK;
 }
 
 void WriteOptions::disable()

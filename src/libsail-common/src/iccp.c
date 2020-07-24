@@ -29,7 +29,7 @@
 
 #include "sail-common.h"
 
-sail_error_t sail_alloc_iccp(struct sail_iccp **iccp) {
+sail_status_t sail_alloc_iccp(struct sail_iccp **iccp) {
 
     SAIL_CHECK_ICCP_PTR(iccp);
 
@@ -40,10 +40,10 @@ sail_error_t sail_alloc_iccp(struct sail_iccp **iccp) {
     (*iccp)->data        = NULL;
     (*iccp)->data_length = 0;
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t sail_alloc_iccp_with_data(struct sail_iccp **iccp, const void *data, unsigned data_length) {
+sail_status_t sail_alloc_iccp_with_data(struct sail_iccp **iccp, const void *data, unsigned data_length) {
 
     SAIL_CHECK_ICCP_PTR(iccp);
 
@@ -55,7 +55,7 @@ sail_error_t sail_alloc_iccp_with_data(struct sail_iccp **iccp, const void *data
     memcpy((*iccp)->data, data, data_length);
     (*iccp)->data_length = data_length;
 
-    return 0;
+    return SAIL_OK;
 }
 
 void sail_destroy_iccp(struct sail_iccp *iccp) {
@@ -68,7 +68,7 @@ void sail_destroy_iccp(struct sail_iccp *iccp) {
     sail_free(iccp);
 }
 
-sail_error_t sail_copy_iccp(const struct sail_iccp *source_iccp, struct sail_iccp **target_iccp) {
+sail_status_t sail_copy_iccp(const struct sail_iccp *source_iccp, struct sail_iccp **target_iccp) {
 
     SAIL_CHECK_ICCP_PTR(source_iccp);
     SAIL_CHECK_ICCP_PTR(target_iccp);
@@ -82,5 +82,5 @@ sail_error_t sail_copy_iccp(const struct sail_iccp *source_iccp, struct sail_icc
 
     (*target_iccp)->data_length = source_iccp->data_length;
 
-    return 0;
+    return SAIL_OK;
 }

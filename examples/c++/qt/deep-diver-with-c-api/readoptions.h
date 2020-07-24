@@ -47,7 +47,7 @@ public:
     SailPixelFormat pixelFormat() const;
 
 private:
-    sail_error_t init(const sail_read_features *read_features);
+    sail_status_t init(const sail_read_features *read_features);
 
 private:
     class Private;

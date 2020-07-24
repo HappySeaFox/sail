@@ -29,7 +29,7 @@
 
 #include "sail-common.h"
 
-sail_error_t sail_alloc_image(struct sail_image **image) {
+sail_status_t sail_alloc_image(struct sail_image **image) {
 
     SAIL_CHECK_IMAGE_PTR(image);
 
@@ -51,7 +51,7 @@ sail_error_t sail_alloc_image(struct sail_image **image) {
     (*image)->properties              = 0;
     (*image)->source_image            = NULL;
 
-    return 0;
+    return SAIL_OK;
 }
 
 void sail_destroy_image(struct sail_image *image) {
@@ -70,7 +70,7 @@ void sail_destroy_image(struct sail_image *image) {
     sail_free(image);
 }
 
-sail_error_t sail_copy_image(const struct sail_image *source, struct sail_image **target) {
+sail_status_t sail_copy_image(const struct sail_image *source, struct sail_image **target) {
 
     SAIL_CHECK_IMAGE_PTR(source);
     SAIL_CHECK_IMAGE_PTR(target);
@@ -116,5 +116,5 @@ sail_error_t sail_copy_image(const struct sail_image *source, struct sail_image 
                             /* cleanup */ sail_destroy_image(*target));
     }
 
-    return 0;
+    return SAIL_OK;
 }

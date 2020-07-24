@@ -128,28 +128,28 @@ const write_features& plugin_info::write_features() const
     return d->write_features;
 }
 
-sail_error_t plugin_info::plugin_feature_to_string(SailPluginFeature plugin_feature, const char **result)
+sail_status_t plugin_info::plugin_feature_to_string(SailPluginFeature plugin_feature, const char **result)
 {
     SAIL_TRY(sail_plugin_feature_to_string(plugin_feature, result));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t plugin_info::plugin_feature_from_string(const char *str, SailPluginFeature *result)
+sail_status_t plugin_info::plugin_feature_from_string(const char *str, SailPluginFeature *result)
 {
     SAIL_TRY(sail_plugin_feature_from_string(str, result));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t plugin_info::by_magic_number_from_path(const std::string &path, plugin_info *splugin_info)
+sail_status_t plugin_info::by_magic_number_from_path(const std::string &path, plugin_info *splugin_info)
 {
     SAIL_TRY(by_magic_number_from_path(path.c_str(), splugin_info));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t plugin_info::by_magic_number_from_path(const char *path, plugin_info *splugin_info)
+sail_status_t plugin_info::by_magic_number_from_path(const char *path, plugin_info *splugin_info)
 {
     SAIL_CHECK_PLUGIN_INFO_PTR(splugin_info);
 
@@ -158,10 +158,10 @@ sail_error_t plugin_info::by_magic_number_from_path(const char *path, plugin_inf
 
     *splugin_info = plugin_info(sail_plugin_info);
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t plugin_info::by_magic_number_from_mem(const void *buffer, size_t buffer_length, plugin_info *splugin_info)
+sail_status_t plugin_info::by_magic_number_from_mem(const void *buffer, size_t buffer_length, plugin_info *splugin_info)
 {
     SAIL_CHECK_PLUGIN_INFO_PTR(splugin_info);
 
@@ -170,10 +170,10 @@ sail_error_t plugin_info::by_magic_number_from_mem(const void *buffer, size_t bu
 
     *splugin_info = plugin_info(sail_plugin_info);
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t plugin_info::by_magic_number_from_io(const sail::io &io, plugin_info *splugin_info)
+sail_status_t plugin_info::by_magic_number_from_io(const sail::io &io, plugin_info *splugin_info)
 {
     SAIL_CHECK_PLUGIN_INFO_PTR(splugin_info);
     SAIL_TRY(io.verify_valid());
@@ -186,17 +186,17 @@ sail_error_t plugin_info::by_magic_number_from_io(const sail::io &io, plugin_inf
 
     *splugin_info = plugin_info(sail_plugin_info);
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t plugin_info::from_path(const std::string &path, plugin_info *splugin_info)
+sail_status_t plugin_info::from_path(const std::string &path, plugin_info *splugin_info)
 {
     SAIL_TRY(from_path(path.c_str(), splugin_info));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t plugin_info::from_path(const char *path, plugin_info *splugin_info)
+sail_status_t plugin_info::from_path(const char *path, plugin_info *splugin_info)
 {
     SAIL_CHECK_PLUGIN_INFO_PTR(splugin_info);
 
@@ -205,17 +205,17 @@ sail_error_t plugin_info::from_path(const char *path, plugin_info *splugin_info)
 
     *splugin_info = plugin_info(sail_plugin_info);
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t plugin_info::from_extension(const std::string &suffix, plugin_info *splugin_info)
+sail_status_t plugin_info::from_extension(const std::string &suffix, plugin_info *splugin_info)
 {
     SAIL_TRY(from_extension(suffix.c_str(), splugin_info));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t plugin_info::from_extension(const char *suffix, plugin_info *splugin_info)
+sail_status_t plugin_info::from_extension(const char *suffix, plugin_info *splugin_info)
 {
     SAIL_CHECK_PLUGIN_INFO_PTR(splugin_info);
 
@@ -224,17 +224,17 @@ sail_error_t plugin_info::from_extension(const char *suffix, plugin_info *splugi
 
     *splugin_info = plugin_info(sail_plugin_info);
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t plugin_info::from_mime_type(const std::string &mime_type, plugin_info *splugin_info)
+sail_status_t plugin_info::from_mime_type(const std::string &mime_type, plugin_info *splugin_info)
 {
     SAIL_TRY(from_mime_type(mime_type.c_str(), splugin_info));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t plugin_info::from_mime_type(const char *mime_type, plugin_info *splugin_info)
+sail_status_t plugin_info::from_mime_type(const char *mime_type, plugin_info *splugin_info)
 {
     SAIL_CHECK_PLUGIN_INFO_PTR(splugin_info);
 
@@ -243,7 +243,7 @@ sail_error_t plugin_info::from_mime_type(const char *mime_type, plugin_info *spl
 
     *splugin_info = plugin_info(sail_plugin_info);
 
-    return 0;
+    return SAIL_OK;
 }
 
 std::vector<plugin_info> plugin_info::list()

@@ -300,23 +300,23 @@ image& image::with_iccp(const sail::iccp &ic)
     return *this;
 }
 
-sail_error_t image::bits_per_pixel(SailPixelFormat pixel_format, unsigned *result)
+sail_status_t image::bits_per_pixel(SailPixelFormat pixel_format, unsigned *result)
 {
     SAIL_TRY(sail_bits_per_pixel(pixel_format, result));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image::bytes_per_line(unsigned width, SailPixelFormat pixel_format, unsigned *result)
+sail_status_t image::bytes_per_line(unsigned width, SailPixelFormat pixel_format, unsigned *result)
 {
     SAIL_CHECK_PTR(result);
 
     SAIL_TRY(sail_bytes_per_line(width, pixel_format, result));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image::bytes_per_image(const image &simage, unsigned *result)
+sail_status_t image::bytes_per_image(const image &simage, unsigned *result)
 {
     SAIL_CHECK_PTR(result);
 
@@ -328,49 +328,49 @@ sail_error_t image::bytes_per_image(const image &simage, unsigned *result)
 
     SAIL_TRY(sail_bytes_per_image(&sail_image, result));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image::pixel_format_to_string(SailPixelFormat pixel_format, const char **result)
+sail_status_t image::pixel_format_to_string(SailPixelFormat pixel_format, const char **result)
 {
     SAIL_TRY(sail_pixel_format_to_string(pixel_format, result));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image::pixel_format_from_string(const char *str, SailPixelFormat *result)
+sail_status_t image::pixel_format_from_string(const char *str, SailPixelFormat *result)
 {
     SAIL_TRY(sail_pixel_format_from_string(str, result));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image::image_property_to_string(SailImageProperty image_property, const char **result)
+sail_status_t image::image_property_to_string(SailImageProperty image_property, const char **result)
 {
     SAIL_TRY(sail_image_property_to_string(image_property, result));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image::image_property_from_string(const char *str, SailImageProperty *result)
+sail_status_t image::image_property_from_string(const char *str, SailImageProperty *result)
 {
     SAIL_TRY(sail_image_property_from_string(str, result));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image::compression_type_to_string(SailCompressionType compression, const char **result)
+sail_status_t image::compression_type_to_string(SailCompressionType compression, const char **result)
 {
     SAIL_TRY(sail_compression_type_to_string(compression, result));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image::compression_type_from_string(const char *str, SailCompressionType *result)
+sail_status_t image::compression_type_from_string(const char *str, SailCompressionType *result)
 {
     SAIL_TRY(sail_compression_type_from_string(str, result));
 
-    return 0;
+    return SAIL_OK;
 }
 
 image::image(const sail_image *sail_image)
@@ -408,7 +408,7 @@ image::image(const sail_image *sail_image)
     }
 }
 
-sail_error_t image::transfer_pixels_pointer(const sail_image *sail_image)
+sail_status_t image::transfer_pixels_pointer(const sail_image *sail_image)
 {
     SAIL_CHECK_IMAGE_PTR(sail_image);
 
@@ -419,7 +419,7 @@ sail_error_t image::transfer_pixels_pointer(const sail_image *sail_image)
     d->shallow_pixels = false;
 
     if (sail_image->pixels == nullptr) {
-        return 0;
+        return SAIL_OK;
     }
 
     unsigned bytes_per_image;
@@ -428,10 +428,10 @@ sail_error_t image::transfer_pixels_pointer(const sail_image *sail_image)
     d->pixels      = sail_image->pixels;
     d->pixels_size = bytes_per_image;
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t image::to_sail_image(sail_image *sail_image) const
+sail_status_t image::to_sail_image(sail_image *sail_image) const
 {
     SAIL_CHECK_IMAGE_PTR(sail_image);
 
@@ -503,7 +503,7 @@ sail_error_t image::to_sail_image(sail_image *sail_image) const
                                           sail_destroy_meta_entry_node_chain(sail_image->meta_entry_node));
     }
 
-    return 0;
+    return SAIL_OK;
 }
 
 image& image::with_animated(bool animated)

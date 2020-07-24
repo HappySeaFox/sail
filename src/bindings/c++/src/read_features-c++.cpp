@@ -83,7 +83,7 @@ int read_features::features() const
     return d->features;
 }
 
-sail_error_t read_features::to_read_options(read_options *sread_options) const
+sail_status_t read_features::to_read_options(read_options *sread_options) const
 {
     SAIL_CHECK_READ_FEATURES_PTR(d->sail_read_features_c);
     SAIL_CHECK_READ_OPTIONS_PTR(sread_options);
@@ -96,7 +96,7 @@ sail_error_t read_features::to_read_options(read_options *sread_options) const
 
     sail_destroy_read_options(sail_read_options);
 
-    return 0;
+    return SAIL_OK;
 }
 
 read_features::read_features()

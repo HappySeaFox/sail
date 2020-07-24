@@ -29,7 +29,7 @@
 
 #include "sail-common.h"
 
-sail_error_t sail_alloc_source_image(struct sail_source_image **source_image) {
+sail_status_t sail_alloc_source_image(struct sail_source_image **source_image) {
 
     SAIL_CHECK_SOURCE_IMAGE_PTR(source_image);
 
@@ -41,7 +41,7 @@ sail_error_t sail_alloc_source_image(struct sail_source_image **source_image) {
     (*source_image)->properties       = 0;
     (*source_image)->compression_type = SAIL_COMPRESSION_UNSUPPORTED;
 
-    return 0;
+    return SAIL_OK;
 }
 
 void sail_destroy_source_image(struct sail_source_image *source_image) {
@@ -53,7 +53,7 @@ void sail_destroy_source_image(struct sail_source_image *source_image) {
     sail_free(source_image);
 }
 
-sail_error_t sail_copy_source_image(const struct sail_source_image *source, struct sail_source_image **target) {
+sail_status_t sail_copy_source_image(const struct sail_source_image *source, struct sail_source_image **target) {
 
     SAIL_CHECK_SOURCE_IMAGE_PTR(source);
     SAIL_CHECK_SOURCE_IMAGE_PTR(target);
@@ -64,5 +64,5 @@ sail_error_t sail_copy_source_image(const struct sail_source_image *source, stru
     (*target)->properties       = source->properties;
     (*target)->compression_type = source->compression_type;
 
-    return 0;
+    return SAIL_OK;
 }

@@ -241,7 +241,7 @@ See [EXAMPLES](EXAMPLES.md) for more.
 ## Does SAIL support animated and multi-paged images?
 
 Yes. Just continue reading the image file until the reading functions return `0`.
-If no more frames are available, the reading functions return `SAIL_NO_MORE_FRAMES`.
+If no more frames are available, the reading functions return `SAIL_ERROR_NO_MORE_FRAMES`.
 
 ## Does SAIL support reading from memory?
 

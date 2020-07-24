@@ -98,7 +98,7 @@ enum SailPixelFormat png_color_type_to_pixel_format(int color_type, int bit_dept
     return SAIL_PIXEL_FORMAT_UNKNOWN;
 }
 
-sail_error_t pixel_format_to_png_color_type(enum SailPixelFormat pixel_format, int *color_type, int *bit_depth) {
+sail_status_t pixel_format_to_png_color_type(enum SailPixelFormat pixel_format, int *color_type, int *bit_depth) {
 
     SAIL_CHECK_PTR(color_type);
     SAIL_CHECK_PTR(bit_depth);
@@ -107,39 +107,39 @@ sail_error_t pixel_format_to_png_color_type(enum SailPixelFormat pixel_format, i
         case SAIL_PIXEL_FORMAT_BPP1_INDEXED: {
             *color_type = PNG_COLOR_TYPE_PALETTE;
             *bit_depth = 1;
-            return 0;
+            return SAIL_OK;
         }
 
         case SAIL_PIXEL_FORMAT_BPP2_INDEXED: {
             *color_type = PNG_COLOR_TYPE_PALETTE;
             *bit_depth = 2;
-            return 0;
+            return SAIL_OK;
         }
 
         case SAIL_PIXEL_FORMAT_BPP4_INDEXED: {
             *color_type = PNG_COLOR_TYPE_PALETTE;
             *bit_depth = 4;
-            return 0;
+            return SAIL_OK;
         }
 
         case SAIL_PIXEL_FORMAT_BPP8_INDEXED: {
             *color_type = PNG_COLOR_TYPE_PALETTE;
             *bit_depth = 8;
-            return 0;
+            return SAIL_OK;
         }
 
         case SAIL_PIXEL_FORMAT_BPP24_RGB:
         case SAIL_PIXEL_FORMAT_BPP24_BGR: {
             *color_type = PNG_COLOR_TYPE_RGB;
             *bit_depth = 8;
-            return 0;
+            return SAIL_OK;
         }
 
         case SAIL_PIXEL_FORMAT_BPP48_RGB:
         case SAIL_PIXEL_FORMAT_BPP48_BGR: {
             *color_type = PNG_COLOR_TYPE_RGB;
             *bit_depth = 16;
-            return 0;
+            return SAIL_OK;
         }
 
         case SAIL_PIXEL_FORMAT_BPP32_RGBA:
@@ -148,7 +148,7 @@ sail_error_t pixel_format_to_png_color_type(enum SailPixelFormat pixel_format, i
         case SAIL_PIXEL_FORMAT_BPP32_ABGR: {
             *color_type = PNG_COLOR_TYPE_RGB_ALPHA;
             *bit_depth = 8;
-            return 0;
+            return SAIL_OK;
         }
 
         case SAIL_PIXEL_FORMAT_BPP64_RGBA:
@@ -157,16 +157,16 @@ sail_error_t pixel_format_to_png_color_type(enum SailPixelFormat pixel_format, i
         case SAIL_PIXEL_FORMAT_BPP64_ABGR: {
             *color_type = PNG_COLOR_TYPE_RGB_ALPHA;
             *bit_depth = 16;
-            return 0;
+            return SAIL_OK;
         }
 
         default: {
-            return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+            return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
         }
     }
 }
 
-sail_error_t supported_read_output_pixel_format(enum SailPixelFormat pixel_format) {
+sail_status_t supported_read_output_pixel_format(enum SailPixelFormat pixel_format) {
 
     switch (pixel_format) {
         case SAIL_PIXEL_FORMAT_SOURCE:
@@ -176,16 +176,16 @@ sail_error_t supported_read_output_pixel_format(enum SailPixelFormat pixel_forma
         case SAIL_PIXEL_FORMAT_BPP32_BGRA:
         case SAIL_PIXEL_FORMAT_BPP32_ARGB:
         case SAIL_PIXEL_FORMAT_BPP32_ABGR: {
-            return 0;
+            return SAIL_OK;
         }
 
         default: {
-            return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+            return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
         }
     }
 }
 
-sail_error_t read_png_text(png_structp png_ptr, png_infop info_ptr, struct sail_meta_entry_node **target_meta_entry_node) {
+sail_status_t read_png_text(png_structp png_ptr, png_infop info_ptr, struct sail_meta_entry_node **target_meta_entry_node) {
 
     SAIL_CHECK_PTR(png_ptr);
     SAIL_CHECK_PTR(info_ptr);
@@ -213,10 +213,10 @@ sail_error_t read_png_text(png_structp png_ptr, png_infop info_ptr, struct sail_
     }
 #endif
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t write_png_text(png_structp png_ptr, png_infop info_ptr, const struct sail_meta_entry_node *meta_entry_node) {
+sail_status_t write_png_text(png_structp png_ptr, png_infop info_ptr, const struct sail_meta_entry_node *meta_entry_node) {
 
     SAIL_CHECK_PTR(png_ptr);
     SAIL_CHECK_PTR(info_ptr);
@@ -241,10 +241,10 @@ sail_error_t write_png_text(png_structp png_ptr, png_infop info_ptr, const struc
     (void)meta_entry_node;
 #endif
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t fetch_iccp(png_structp png_ptr, png_infop info_ptr, struct sail_iccp **iccp) {
+sail_status_t fetch_iccp(png_structp png_ptr, png_infop info_ptr, struct sail_iccp **iccp) {
 
     SAIL_CHECK_PTR(png_ptr);
     SAIL_CHECK_PTR(info_ptr);
@@ -269,10 +269,10 @@ sail_error_t fetch_iccp(png_structp png_ptr, png_infop info_ptr, struct sail_icc
         SAIL_LOG_DEBUG("PNG: ICC profile is not found");
     }
 
-    return 0;
+    return SAIL_OK;
 }
 
-SAIL_HIDDEN sail_error_t fetch_palette(png_structp png_ptr, png_infop info_ptr, struct sail_palette **palette) {
+SAIL_HIDDEN sail_status_t fetch_palette(png_structp png_ptr, png_infop info_ptr, struct sail_palette **palette) {
 
     SAIL_CHECK_PTR(png_ptr);
     SAIL_CHECK_PTR(info_ptr);
@@ -283,7 +283,7 @@ SAIL_HIDDEN sail_error_t fetch_palette(png_structp png_ptr, png_infop info_ptr, 
 
     if (png_get_PLTE(png_ptr, info_ptr, &png_palette, &png_palette_color_count) == 0) {
         SAIL_LOG_ERROR("The indexed image has no palette");
-        return SAIL_MISSING_PALETTE;
+        return SAIL_ERROR_MISSING_PALETTE;
     }
 
     /* Always use RGB palette. */
@@ -300,12 +300,12 @@ SAIL_HIDDEN sail_error_t fetch_palette(png_structp png_ptr, png_infop info_ptr, 
         *palette_ptr++ = png_palette[i].blue;
     }
 
-    return 0;
+    return SAIL_OK;
 }
 
 #ifdef PNG_APNG_SUPPORTED
 
-sail_error_t blend_source(unsigned bytes_per_pixel, void *dst_raw, unsigned dst_offset, const void *src_raw, unsigned src_length) {
+sail_status_t blend_source(unsigned bytes_per_pixel, void *dst_raw, unsigned dst_offset, const void *src_raw, unsigned src_length) {
 
     SAIL_CHECK_PTR(dst_raw);
     SAIL_CHECK_PTR(src_raw);
@@ -315,13 +315,13 @@ sail_error_t blend_source(unsigned bytes_per_pixel, void *dst_raw, unsigned dst_
     } else if (bytes_per_pixel == 8) {
         memcpy((uint16_t*)dst_raw + dst_offset, src_raw, src_length);
     } else {
-        return SAIL_UNSUPPORTED_BIT_DEPTH;
+        return SAIL_ERROR_UNSUPPORTED_BIT_DEPTH;
     }
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t blend_over(unsigned bytes_per_pixel, unsigned width, const void *src_raw, void *dst_raw, unsigned dst_offset) {
+sail_status_t blend_over(unsigned bytes_per_pixel, unsigned width, const void *src_raw, void *dst_raw, unsigned dst_offset) {
 
     SAIL_CHECK_PTR(src_raw);
     SAIL_CHECK_PTR(dst_raw);
@@ -353,13 +353,13 @@ sail_error_t blend_over(unsigned bytes_per_pixel, unsigned width, const void *sr
             *dst = (uint16_t)((src_a + (1-src_a) * dst_a) * 65535);         src++; dst++;
         }
     } else {
-        return SAIL_UNSUPPORTED_BIT_DEPTH;
+        return SAIL_ERROR_UNSUPPORTED_BIT_DEPTH;
     }
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t skip_hidden_frame(unsigned bytes_per_line, unsigned height, png_structp png_ptr, png_infop info_ptr, void **row) {
+sail_status_t skip_hidden_frame(unsigned bytes_per_line, unsigned height, png_structp png_ptr, png_infop info_ptr, void **row) {
 
     SAIL_CHECK_PTR(png_ptr);
     SAIL_CHECK_PTR(info_ptr);
@@ -376,10 +376,10 @@ sail_error_t skip_hidden_frame(unsigned bytes_per_line, unsigned height, png_str
     sail_free(*row);
     *row = NULL;
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t alloc_rows(png_bytep **A, unsigned row_length, unsigned height) {
+sail_status_t alloc_rows(png_bytep **A, unsigned row_length, unsigned height) {
 
     void *temp_ptr;
     SAIL_TRY(sail_malloc(&temp_ptr, height * sizeof(png_bytep)));
@@ -396,7 +396,7 @@ sail_error_t alloc_rows(png_bytep **A, unsigned row_length, unsigned height) {
         memset((*A)[row], 0, row_length);
     }
 
-    return 0;
+    return SAIL_OK;
 }
 
 void destroy_rows(png_bytep **A, unsigned height) {

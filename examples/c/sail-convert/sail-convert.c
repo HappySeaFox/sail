@@ -33,7 +33,7 @@
 #include "sail-common.h"
 #include "sail.h"
 
-static sail_error_t convert(const char *input, const char *output, int compression) {
+static sail_status_t convert(const char *input, const char *output, int compression) {
 
     SAIL_CHECK_PATH_PTR(input);
     SAIL_CHECK_PATH_PTR(output);
@@ -77,7 +77,7 @@ static sail_error_t convert(const char *input, const char *output, int compressi
 
     SAIL_LOG_INFO("Success");
 
-    return 0;
+    return SAIL_OK;
 }
 
 static void help(char *app) {
@@ -97,12 +97,12 @@ int main(int argc, char *argv[]) {
 
     if (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0) {
         help(argv[0]);
-        return 0;
+        return SAIL_OK;
     }
 
     if (strcmp(argv[1], "-v") == 0 || strcmp(argv[1], "--version") == 0) {
         fprintf(stderr, "sail-convert 1.1.0\n");
-        return 0;
+        return SAIL_OK;
     }
 
     if (argc < 3) {
@@ -136,5 +136,5 @@ int main(int argc, char *argv[]) {
 
     sail_finish();
 
-    return 0;
+    return SAIL_OK;
 }

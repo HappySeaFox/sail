@@ -61,9 +61,9 @@ typedef struct sail_read_options sail_read_options_t;
  * Allocates read options. The assigned read options MUST be destroyed later
  * with sail_destroy_read_options().
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_alloc_read_options(struct sail_read_options **read_options);
+SAIL_EXPORT sail_status_t sail_alloc_read_options(struct sail_read_options **read_options);
 
 /*
  * Destroys the specified read options object and all its internal allocated memory buffers. The read options
@@ -74,25 +74,25 @@ SAIL_EXPORT void sail_destroy_read_options(struct sail_read_options *read_option
 /*
  * Builds default read options from read features.
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_read_options_from_features(const struct sail_read_features *read_features, struct sail_read_options *read_options);
+SAIL_EXPORT sail_status_t sail_read_options_from_features(const struct sail_read_features *read_features, struct sail_read_options *read_options);
 
 /*
  * Allocates and builds default read options from read features. The assigned read options MUST be destroyed later
  * with sail_destroy_read_options().
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_alloc_read_options_from_features(const struct sail_read_features *read_features, struct sail_read_options **read_options);
+SAIL_EXPORT sail_status_t sail_alloc_read_options_from_features(const struct sail_read_features *read_features, struct sail_read_options **read_options);
 
 /*
  * Makes a deep copy of the specified read options object. The assigned read options MUST be destroyed later
  * with sail_destroy_read_options().
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_copy_read_options(const struct sail_read_options *source, struct sail_read_options **target);
+SAIL_EXPORT sail_status_t sail_copy_read_options(const struct sail_read_options *source, struct sail_read_options **target);
 
 /* extern "C" */
 #ifdef __cplusplus

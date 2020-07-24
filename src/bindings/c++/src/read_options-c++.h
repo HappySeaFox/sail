@@ -66,7 +66,7 @@ public:
     read_options& with_io_options(int io_options);
 
 private:
-    sail_error_t to_sail_read_options(sail_read_options *read_options) const;
+    sail_status_t to_sail_read_options(sail_read_options *read_options) const;
 
 private:
     class pimpl;

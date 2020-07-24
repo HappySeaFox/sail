@@ -28,7 +28,7 @@
 
 #include "sail-common.h"
 
-sail_error_t sail_alloc_read_features(struct sail_read_features **read_features) {
+sail_status_t sail_alloc_read_features(struct sail_read_features **read_features) {
 
     SAIL_CHECK_READ_FEATURES_PTR(read_features);
 
@@ -41,7 +41,7 @@ sail_error_t sail_alloc_read_features(struct sail_read_features **read_features)
     (*read_features)->default_output_pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;
     (*read_features)->features                    = 0;
 
-    return 0;
+    return SAIL_OK;
 }
 
 void sail_destroy_read_features(struct sail_read_features *read_features) {

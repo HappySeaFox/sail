@@ -53,7 +53,7 @@ public:
     int compression() const;
 
 private:
-    sail_error_t init(const sail::write_features &write_features, int input_pixel_format);
+    sail_status_t init(const sail::write_features &write_features, int input_pixel_format);
     void disable();
 
 private:

@@ -80,25 +80,25 @@ io::~io()
     delete d;
 }
 
-sail_error_t io::verify_valid() const
+sail_status_t io::verify_valid() const
 {
     SAIL_TRY(is_valid_private());
 
-    return 0;
+    return SAIL_OK;
 }
 
 bool io::is_valid() const
 {
-    return is_valid_private() == 0;
+    return is_valid_private() == SAIL_OK;
 }
 
-sail_error_t io::to_sail_io(sail_io *io) const
+sail_status_t io::to_sail_io(sail_io *io) const
 {
     SAIL_CHECK_IO_PTR(io);
 
     *io = d->sail_io;
 
-    return 0;
+    return SAIL_OK;
 }
 
 io& io::with_stream(void *stream)
@@ -149,13 +149,13 @@ io& io::with_eof(sail_io_eof_t eof)
     return *this;
 }
 
-sail_error_t io::is_valid_private() const
+sail_status_t io::is_valid_private() const
 {
     sail_io *sail_io = &d->sail_io;
 
     SAIL_CHECK_IO(sail_io);
 
-    return 0;
+    return SAIL_OK;
 }
 
 }

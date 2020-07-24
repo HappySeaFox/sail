@@ -70,7 +70,7 @@ QtSail::~QtSail()
     sail_finish();
 }
 
-sail_error_t QtSail::init()
+sail_status_t QtSail::init()
 {
     SAIL_TRY_OR_CLEANUP(sail_init_with_flags(SAIL_FLAG_PRELOAD_PLUGINS),
                         /* cleanup */ QMessageBox::critical(this, tr("Error"), tr("Failed to init SAIL")),
@@ -88,10 +88,10 @@ sail_error_t QtSail::init()
                                                           "</ul>"));
     });
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
+sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
 {
     /*
      * Always set the initial state to NULL in C or nullptr in C++.
@@ -138,7 +138,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
 
     if (!file.open(QIODevice::ReadOnly)) {
         QMessageBox::critical(this, tr("Error"), tr("Failed to open the file: %1").arg(file.errorString()));
-        return SAIL_IO_EOF;
+        return SAIL_ERROR_EOF;
     }
 
     const QByteArray buf = file.readAll();
@@ -171,7 +171,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     if (qimageFormat == QImage::Format_Invalid) {
         sail_stop_reading(state);
         sail_destroy_image(image);
-        return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+        return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
     }
 
     /*
@@ -197,7 +197,7 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
         if (image->palette->pixel_format != SAIL_PIXEL_FORMAT_BPP24_RGB) {
             sail_stop_reading(state);
             sail_destroy_image(image);
-            return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+            return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
         }
 
         QVector<QRgb> colorTable;
@@ -248,10 +248,10 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
     /* Optional: unload all plugins to free up some memory. */
     sail_unload_plugins();
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffer_length,
+sail_status_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffer_length,
                                size_t *written)
 {
     /*
@@ -289,7 +289,7 @@ sail_error_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffer
 
         if (image->palette->data == NULL) {
             sail_destroy_image(image);
-            return SAIL_MEMORY_ALLOCATION_FAILED;
+            return SAIL_ERROR_MEMORY_ALLOCATION;
         }
 
         unsigned char *rgbData = reinterpret_cast<unsigned char *>(image->palette->data);
@@ -305,7 +305,7 @@ sail_error_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffer
 
     if (image->pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN) {
         sail_destroy_image(image);
-        return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+        return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
     }
 
     // Time counter.
@@ -380,7 +380,7 @@ sail_error_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffer
     /* Optional: unload all plugins to free up some memory. */
     sail_unload_plugins();
 
-    return 0;
+    return SAIL_OK;
 }
 
 #include "filters-impl-c.cpp"
@@ -396,9 +396,9 @@ void QtSail::onOpenFile()
         return;
     }
 
-    sail_error_t res;
+    sail_status_t res;
 
-    if ((res = loadImage(path, &m_qimage)) == 0) {
+    if ((res = loadImage(path, &m_qimage)) == SAIL_OK) {
         onFit(m_ui->checkFit->isChecked());
     } else {
         QMessageBox::critical(this, tr("Error"), tr("Failed to load '%1'. Error: %2.")
@@ -408,12 +408,12 @@ void QtSail::onOpenFile()
     }
 }
 
-sail_error_t QtSail::onProbe()
+sail_status_t QtSail::onProbe()
 {
     const QString path = QFileDialog::getOpenFileName(this, tr("Select a file"));
 
     if (path.isEmpty()) {
-        return 0;
+        return SAIL_OK;
     }
 
     QElapsedTimer elapsed;
@@ -422,20 +422,20 @@ sail_error_t QtSail::onProbe()
     // Probe
     sail_image *image;
     const struct sail_plugin_info *plugin_info;
-    sail_error_t res;
+    sail_status_t res;
 
     // Load the file into memeory
     QFile file(path);
 
     if (!file.open(QIODevice::ReadOnly)) {
         QMessageBox::critical(this, tr("Error"), tr("Failed to open the file. Error: %1").arg(file.errorString()));
-        return SAIL_FILE_OPEN_ERROR;
+        return SAIL_ERROR_OPEN_FILE;
     }
 
     const QByteArray buffer = file.readAll();
 
     // Probe from memory
-    if ((res = sail_probe_mem(buffer.constData(), buffer.length(), &image, &plugin_info)) != 0) {
+    if ((res = sail_probe_mem(buffer.constData(), buffer.length(), &image, &plugin_info)) != SAIL_OK) {
         QMessageBox::critical(this, tr("Error"), tr("Failed to probe the image. Error: %1").arg(res));
         return res;
     }
@@ -459,12 +459,12 @@ sail_error_t QtSail::onProbe()
 
     sail_destroy_image(image);
 
-    return 0;
+    return SAIL_OK;
 }
 
 void QtSail::onSave()
 {
-    sail_error_t res;
+    sail_status_t res;
 
     /*
      * Allocate 50 Mb.
@@ -474,7 +474,7 @@ void QtSail::onSave()
 
     size_t written;
 
-    if ((res = saveImage(m_qimage, buffer, buffer_length, &written)) != 0) {
+    if ((res = saveImage(m_qimage, buffer, buffer_length, &written)) != SAIL_OK) {
         delete [] buffer;
         QMessageBox::critical(this, tr("Error"), tr("Failed to save to memory buffer. Error: %1.")
                               .arg(res));

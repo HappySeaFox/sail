@@ -41,13 +41,13 @@
 extern "C" {
 #endif
 
-typedef sail_error_t (*sail_io_read_t)(void *stream, void *buf, size_t object_size, size_t objects_count, size_t *read_objects_count);
-typedef sail_error_t (*sail_io_seek_t)(void *stream, long offset, int whence);
-typedef sail_error_t (*sail_io_tell_t)(void *stream, size_t *offset);
-typedef sail_error_t (*sail_io_write_t)(void *stream, const void *buf, size_t object_size, size_t objects_count, size_t *written_objects_count);
-typedef sail_error_t (*sail_io_flush_t)(void *stream);
-typedef sail_error_t (*sail_io_close_t)(void *stream);
-typedef sail_error_t (*sail_io_eof_t)(void *stream, bool *result);
+typedef sail_status_t (*sail_io_read_t)(void *stream, void *buf, size_t object_size, size_t objects_count, size_t *read_objects_count);
+typedef sail_status_t (*sail_io_seek_t)(void *stream, long offset, int whence);
+typedef sail_status_t (*sail_io_tell_t)(void *stream, size_t *offset);
+typedef sail_status_t (*sail_io_write_t)(void *stream, const void *buf, size_t object_size, size_t objects_count, size_t *written_objects_count);
+typedef sail_status_t (*sail_io_flush_t)(void *stream);
+typedef sail_status_t (*sail_io_close_t)(void *stream);
+typedef sail_status_t (*sail_io_eof_t)(void *stream, bool *result);
 
 /*
  * A structure representing an input/output abstraction. Use sail_alloc_io_read_file() and brothers to
@@ -64,7 +64,7 @@ struct sail_io {
      * Reads from the underlying I/O object into the specified buffer. Assigns the number of objects
      * actually read to read_objects_count.
      *
-     * Returns 0 on success or sail_error_t on error.
+     * Returns 0 on success or sail_status_t on error.
      */
     sail_io_read_t read;
 
@@ -73,14 +73,14 @@ struct sail_io {
      *
      * whence possible values: SEEK_SET, SEEK_CUR, or SEEK_END declared in <stdio.h>.
      *
-     * Returns 0 on success or sail_error_t on error.
+     * Returns 0 on success or sail_status_t on error.
      */
     sail_io_seek_t seek;
 
     /*
      * Assigns the current I/O position in the underlying I/O object.
      *
-     * Returns 0 on success or sail_error_t on error.
+     * Returns 0 on success or sail_status_t on error.
      */
     sail_io_tell_t tell;
 
@@ -88,7 +88,7 @@ struct sail_io {
      * Writes the specified buffer to the underlying I/O object. Assigns the number of objects
      * actually written to written_objects_count.
      *
-     * Returns 0 on success or sail_error_t on error.
+     * Returns 0 on success or sail_status_t on error.
      */
     sail_io_write_t write;
 
@@ -96,21 +96,21 @@ struct sail_io {
      * Flushes buffers of the underlying I/O object. Has no effect if the underlying I/O object
      * is opened for reading.
      *
-     * Returns 0 on success or sail_error_t on error.
+     * Returns 0 on success or sail_status_t on error.
      */
     sail_io_flush_t flush;
 
     /*
      * Closes the underlying I/O object.
      *
-     * Returns 0 on success or sail_error_t on error.
+     * Returns 0 on success or sail_status_t on error.
      */
     sail_io_close_t close;
 
     /*
      * Assigns true to the specified result if the underlying I/O object reached the end-of-file indicator.
      *
-     * Returns 0 on success or sail_error_t on error.
+     * Returns 0 on success or sail_status_t on error.
      */
     sail_io_eof_t eof;
 };
@@ -120,9 +120,9 @@ typedef struct sail_io sail_io_t;
 /*
  * Allocates a new I/O object. The assigned I/O object MUST be destroyed later with sail_destroy_io().
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_alloc_io(struct sail_io **io);
+SAIL_EXPORT sail_status_t sail_alloc_io(struct sail_io **io);
 
 /*
  * Closes and destroys the specified I/O object and all its internal allocated memory buffers.

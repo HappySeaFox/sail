@@ -51,9 +51,9 @@ struct sail_plugin_info;
  *
  * Typical usage: This is a standalone function that could be called at any time.
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_probe_file(const char *path, struct sail_image **image, const struct sail_plugin_info **plugin_info);
+SAIL_EXPORT sail_status_t sail_probe_file(const char *path, struct sail_image **image, const struct sail_plugin_info **plugin_info);
 
 /*
  * Loads the specified image file and returns its properties and pixels. The assigned image
@@ -63,9 +63,9 @@ SAIL_EXPORT sail_error_t sail_probe_file(const char *path, struct sail_image **i
  *
  * Typical usage: This is a standalone function that could be called at any time.
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_read_file(const char *path, struct sail_image **image);
+SAIL_EXPORT sail_status_t sail_read_file(const char *path, struct sail_image **image);
 
 /*
  * Loads the specified image file from the specified memory buffer and returns its properties and pixels.
@@ -75,9 +75,9 @@ SAIL_EXPORT sail_error_t sail_read_file(const char *path, struct sail_image **im
  *
  * Typical usage: This is a standalone function that could be called at any time.
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_read_mem(const void *buffer, size_t buffer_length, struct sail_image **image);
+SAIL_EXPORT sail_status_t sail_read_mem(const void *buffer, size_t buffer_length, struct sail_image **image);
 
 /*
  * Writes the pixels of the specified image file into the file.
@@ -86,9 +86,9 @@ SAIL_EXPORT sail_error_t sail_read_mem(const void *buffer, size_t buffer_length,
  *
  * Typical usage: This is a standalone function that could be called at any time.
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_write_file(const char *path, const struct sail_image *image);
+SAIL_EXPORT sail_status_t sail_write_file(const char *path, const struct sail_image *image);
 
 /*
  * Writes the pixels of the specified image file into the specified memory buffer.
@@ -99,9 +99,9 @@ SAIL_EXPORT sail_error_t sail_write_file(const char *path, const struct sail_ima
  *
  * Typical usage: This is a standalone function that could be called at any time.
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_error_t sail_write_mem(void *buffer, size_t buffer_length, const struct sail_image *image, size_t *written);
+SAIL_EXPORT sail_status_t sail_write_mem(void *buffer, size_t buffer_length, const struct sail_image *image, size_t *written);
 
 /* extern "C" */
 #ifdef __cplusplus

@@ -29,7 +29,7 @@
 
 #include "sail-common.h"
 
-sail_error_t sail_alloc_io(struct sail_io **io) {
+sail_status_t sail_alloc_io(struct sail_io **io) {
 
     SAIL_CHECK_IO_PTR(io);
 
@@ -46,7 +46,7 @@ sail_error_t sail_alloc_io(struct sail_io **io) {
     (*io)->close  = NULL;
     (*io)->eof    = NULL;
 
-    return 0;
+    return SAIL_OK;
 }
 
 void sail_destroy_io(struct sail_io *io) {

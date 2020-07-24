@@ -28,7 +28,7 @@
 
 #include "sail-common.h"
 
-sail_error_t sail_alloc_pixel_formats_mapping_node(struct sail_pixel_formats_mapping_node **node) {
+sail_status_t sail_alloc_pixel_formats_mapping_node(struct sail_pixel_formats_mapping_node **node) {
 
     SAIL_CHECK_PIXEL_FORMATS_MAPPING_NODE_PTR(node);
 
@@ -41,7 +41,7 @@ sail_error_t sail_alloc_pixel_formats_mapping_node(struct sail_pixel_formats_map
     (*node)->output_pixel_formats_length = 0;
     (*node)->next                        = NULL;
 
-    return 0;
+    return SAIL_OK;
 }
 
 void sail_destroy_pixel_formats_mapping_node(struct sail_pixel_formats_mapping_node *node) {

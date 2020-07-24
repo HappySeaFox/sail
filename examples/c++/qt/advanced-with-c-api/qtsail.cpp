@@ -53,7 +53,7 @@ QtSail::~QtSail()
     sail_finish();
 }
 
-sail_error_t QtSail::init()
+sail_status_t QtSail::init()
 {
     QTimer::singleShot(0, this, [&]{
         QMessageBox::information(this, tr("Features"), tr("This demo includes:"
@@ -67,10 +67,10 @@ sail_error_t QtSail::init()
                                                           "</ul>"));
     });
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, QVector<int> *delays)
+sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, QVector<int> *delays)
 {
     qimages->clear();
     delays->clear();
@@ -97,17 +97,17 @@ sail_error_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, QV
     /*
      * Read all the available image frames in the file.
      */
-    sail_error_t res = 0;
+    sail_status_t res;
     struct sail_image *image;
 
-    while ((res = sail_read_next_frame(state, &image)) == 0) {
+    while ((res = sail_read_next_frame(state, &image)) == SAIL_OK) {
 
         const QImage::Format qimageFormat = sailPixelFormatToQImageFormat(image->pixel_format);
 
         if (qimageFormat == QImage::Format_Invalid) {
             sail_stop_reading(state);
             sail_destroy_image(image);
-            return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+            return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
         }
 
         source_pixel_format = image->source_image->pixel_format;
@@ -130,7 +130,7 @@ sail_error_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, QV
         sail_destroy_image(image);
     }
 
-    if (res != SAIL_NO_MORE_FRAMES) {
+    if (res != SAIL_ERROR_NO_MORE_FRAMES) {
         sail_stop_reading(state);
         return res;
     }
@@ -156,10 +156,10 @@ sail_error_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, QV
                                 .arg(pixel_format_str)
                                 );
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
+sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
 {
     /*
      * Always set the initial state to NULL in C or nullptr in C++.
@@ -187,7 +187,7 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
 
     sail_destroy_image(image);
 
-    return 0;
+    return SAIL_OK;
 }
 
 #include "filters-impl-c.cpp"
@@ -203,9 +203,9 @@ void QtSail::onOpenFile()
         return;
     }
 
-    sail_error_t res;
+    sail_status_t res;
 
-    if ((res = loadImage(path, &m_qimages, &m_delays)) == 0) {
+    if ((res = loadImage(path, &m_qimages, &m_delays)) == SAIL_OK) {
         m_currentIndex = 0;
         onFit(m_ui->checkFit->isChecked());
         detectAnimated();
@@ -217,12 +217,12 @@ void QtSail::onOpenFile()
     }
 }
 
-sail_error_t QtSail::onProbe()
+sail_status_t QtSail::onProbe()
 {
     const QString path = QFileDialog::getOpenFileName(this, tr("Select a file"));
 
     if (path.isEmpty()) {
-        return 0;
+        return SAIL_OK;
     }
 
     QElapsedTimer elapsedTimer;
@@ -231,9 +231,9 @@ sail_error_t QtSail::onProbe()
     // Probe
     sail_image *image;
     const struct sail_plugin_info *plugin_info;
-    sail_error_t res;
+    sail_status_t res;
 
-    if ((res = sail_probe_file(path.toLocal8Bit(), &image, &plugin_info)) != 0) {
+    if ((res = sail_probe_file(path.toLocal8Bit(), &image, &plugin_info)) != SAIL_OK) {
         QMessageBox::critical(this, tr("Error"), tr("Failed to probe the image. Error: %1").arg(res));
         return res;
     }
@@ -257,7 +257,7 @@ sail_error_t QtSail::onProbe()
 
     sail_destroy_image(image);
 
-    return 0;
+    return SAIL_OK;
 }
 
 void QtSail::onSave()
@@ -271,9 +271,9 @@ void QtSail::onSave()
         return;
     }
 
-    sail_error_t res;
+    sail_status_t res;
 
-    if ((res = saveImage(path, m_qimages.first())) != 0) {
+    if ((res = saveImage(path, m_qimages.first())) != SAIL_OK) {
         QMessageBox::critical(this, tr("Error"), tr("Failed to save '%1'. Error: %2.")
                               .arg(path)
                               .arg(res));
@@ -282,7 +282,7 @@ void QtSail::onSave()
 
     if (QMessageBox::question(this, tr("Open file"), tr("%1 has been saved succesfully. Open the saved file?")
                               .arg(QDir::toNativeSeparators(path))) == QMessageBox::Yes) {
-        if ((res = loadImage(path, &m_qimages, &m_delays)) == 0) {
+        if ((res = loadImage(path, &m_qimages, &m_delays)) == SAIL_OK) {
             m_currentIndex = 0;
             onFit(m_ui->checkFit->isChecked());
             detectAnimated();

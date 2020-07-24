@@ -34,7 +34,7 @@
  * Private functions.
  */
 
-static sail_error_t alloc_string_node(struct sail_string_node **string_node) {
+static sail_status_t alloc_string_node(struct sail_string_node **string_node) {
 
     SAIL_CHECK_STRING_NODE_PTR(string_node);
 
@@ -45,7 +45,7 @@ static sail_error_t alloc_string_node(struct sail_string_node **string_node) {
     (*string_node)->value = NULL;
     (*string_node)->next  = NULL;
 
-    return 0;
+    return SAIL_OK;
 }
 
 static void destroy_string_node(struct sail_string_node *string_node) {
@@ -69,7 +69,7 @@ static void destroy_string_node_chain(struct sail_string_node *string_node) {
     }
 }
 
-static sail_error_t split_into_string_node_chain(const char *value, struct sail_string_node **target_string_node) {
+static sail_status_t split_into_string_node_chain(const char *value, struct sail_string_node **target_string_node) {
 
     struct sail_string_node **last_string_node = target_string_node;
 
@@ -89,24 +89,24 @@ static sail_error_t split_into_string_node_chain(const char *value, struct sail_
         value += length;
     }
 
-    return 0;
+    return SAIL_OK;
 }
 
-static sail_error_t pixel_format_from_string(const char *str, int *result) {
+static sail_status_t pixel_format_from_string(const char *str, int *result) {
 
     SAIL_TRY(sail_pixel_format_from_string(str, (enum SailPixelFormat*)result));
 
-    return 0;
+    return SAIL_OK;
 }
 
-static sail_error_t compression_type_from_string(const char *str, int *result) {
+static sail_status_t compression_type_from_string(const char *str, int *result) {
 
     SAIL_TRY(sail_compression_type_from_string(str, (enum SailCompressionType*)result));
 
-    return 0;
+    return SAIL_OK;
 }
 
-static sail_error_t parse_serialized_ints(const char *value, int **target, int *length, sail_error_t (*converter)(const char *str, int *result)) {
+static sail_status_t parse_serialized_ints(const char *value, int **target, int *length, sail_status_t (*converter)(const char *str, int *result)) {
 
     SAIL_CHECK_PTR(value);
     SAIL_CHECK_PTR(target);
@@ -131,7 +131,7 @@ static sail_error_t parse_serialized_ints(const char *value, int **target, int *
         if (*target == NULL) {
             SAIL_LOG_ERROR("Failed to allocate %d integers", *length);
             destroy_string_node_chain(string_node);
-            return SAIL_MEMORY_ALLOCATION_FAILED;
+            return SAIL_ERROR_MEMORY_ALLOCATION;
         }
 
         node = string_node;
@@ -149,24 +149,24 @@ static sail_error_t parse_serialized_ints(const char *value, int **target, int *
 
     destroy_string_node_chain(string_node);
 
-    return 0;
+    return SAIL_OK;
 }
 
-static sail_error_t plugin_feature_from_string(const char *str, int *result) {
+static sail_status_t plugin_feature_from_string(const char *str, int *result) {
 
     SAIL_TRY(sail_plugin_feature_from_string(str, (enum SailPluginFeature *)result));
 
-    return 0;
+    return SAIL_OK;
 }
 
-static sail_error_t image_property_from_string(const char *str, int *result) {
+static sail_status_t image_property_from_string(const char *str, int *result) {
 
     SAIL_TRY(sail_image_property_from_string(str, (enum SailImageProperty *)result));
 
-    return 0;
+    return SAIL_OK;
 }
 
-static sail_error_t parse_flags(const char *value, int *features, sail_error_t (*converter)(const char *str, int *result)) {
+static sail_status_t parse_flags(const char *value, int *features, sail_status_t (*converter)(const char *str, int *result)) {
 
     SAIL_CHECK_PTR(value);
     SAIL_CHECK_PTR(features);
@@ -191,7 +191,7 @@ static sail_error_t parse_flags(const char *value, int *features, sail_error_t (
 
     destroy_string_node_chain(string_node);
 
-    return 0;
+    return SAIL_OK;
 }
 
 struct init_data {
@@ -199,11 +199,11 @@ struct init_data {
     struct sail_pixel_formats_mapping_node **last_mapping_node;
 };
 
-static sail_error_t inih_handler_sail_error(void *data, const char *section, const char *name, const char *value) {
+static sail_status_t inih_handler_sail_error(void *data, const char *section, const char *name, const char *value) {
 
     /* Silently ignore empty values. */
     if (strlen(value) == 0) {
-        return 0;
+        return SAIL_OK;
     }
 
     struct init_data *init_data = (struct init_data *)data;
@@ -255,7 +255,7 @@ static sail_error_t inih_handler_sail_error(void *data, const char *section, con
             }
         } else {
             SAIL_LOG_ERROR("Unsupported plugin info key '%s' in [%s]", name, section);
-            return SAIL_FILE_PARSE_ERROR;
+            return SAIL_ERROR_PARSE_FILE;
         }
     } else if (strcmp(section, "read-features") == 0) {
         if (strcmp(name, "output-pixel-formats") == 0) {
@@ -272,7 +272,7 @@ static sail_error_t inih_handler_sail_error(void *data, const char *section, con
                                 /* cleanup */ SAIL_LOG_ERROR("Failed to parse plugin features: '%s'", value));
         } else {
             SAIL_LOG_ERROR("Unsupported plugin info key '%s' in [%s]", name, section);
-            return SAIL_FILE_PARSE_ERROR;
+            return SAIL_ERROR_PARSE_FILE;
         }
     } else if (strcmp(section, "write-features") == 0) {
         if (strcmp(name, "features") == 0) {
@@ -300,7 +300,7 @@ static sail_error_t inih_handler_sail_error(void *data, const char *section, con
             plugin_info->write_features->compression_default = atoi(value);
         } else {
             SAIL_LOG_ERROR("Unsupported plugin info key '%s' in [%s]", name, section);
-            return SAIL_FILE_PARSE_ERROR;
+            return SAIL_ERROR_PARSE_FILE;
         }
     } else if (strcmp(section, "write-pixel-formats-mapping") == 0) {
         struct sail_pixel_formats_mapping_node *node;
@@ -323,10 +323,10 @@ static sail_error_t inih_handler_sail_error(void *data, const char *section, con
         init_data->last_mapping_node = &node->next;
     } else {
         SAIL_LOG_ERROR("Unsupported plugin info section '%s'", section);
-        return SAIL_FILE_PARSE_ERROR;
+        return SAIL_ERROR_PARSE_FILE;
     }
 
-    return 0;
+    return SAIL_OK;
 }
 
 /* Returns 1 on success. */
@@ -338,7 +338,7 @@ static int inih_handler(void *data, const char *section, const char *name, const
     return 1;
 }
 
-static sail_error_t check_plugin_info(const char *path, const struct sail_plugin_info *plugin_info) {
+static sail_status_t check_plugin_info(const char *path, const struct sail_plugin_info *plugin_info) {
 
     const struct sail_write_features *write_features = plugin_info->write_features;
 
@@ -347,13 +347,13 @@ static sail_error_t check_plugin_info(const char *path, const struct sail_plugin
             write_features->features & SAIL_PLUGIN_FEATURE_ANIMATED ||
             write_features->features & SAIL_PLUGIN_FEATURE_MULTI_FRAME) && write_features->pixel_formats_mapping_node == NULL) {
         SAIL_LOG_ERROR("The plugin '%s' is able to write images, but output pixel formats mappings are not specified", path);
-        return SAIL_INCOMPLETE_PLUGIN_INFO;
+        return SAIL_ERROR_INCOMPLETE_PLUGIN_INFO;
     }
 
-    return 0;
+    return SAIL_OK;
 }
 
-static sail_error_t alloc_plugin_info(struct sail_plugin_info **plugin_info) {
+static sail_status_t alloc_plugin_info(struct sail_plugin_info **plugin_info) {
 
     SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
 
@@ -372,7 +372,7 @@ static sail_error_t alloc_plugin_info(struct sail_plugin_info **plugin_info) {
     (*plugin_info)->read_features     = NULL;
     (*plugin_info)->write_features    = NULL;
 
-    return 0;
+    return SAIL_OK;
 }
 
 static void destroy_plugin_info(struct sail_plugin_info *plugin_info) {
@@ -400,7 +400,7 @@ static void destroy_plugin_info(struct sail_plugin_info *plugin_info) {
  * Public functions.
  */
 
-sail_error_t alloc_plugin_info_node(struct sail_plugin_info_node **plugin_info_node) {
+sail_status_t alloc_plugin_info_node(struct sail_plugin_info_node **plugin_info_node) {
 
     SAIL_CHECK_PLUGIN_INFO_NODE_PTR(plugin_info_node);
 
@@ -412,7 +412,7 @@ sail_error_t alloc_plugin_info_node(struct sail_plugin_info_node **plugin_info_n
     (*plugin_info_node)->plugin      = NULL;
     (*plugin_info_node)->next        = NULL;
 
-    return 0;
+    return SAIL_OK;
 }
 
 void destroy_plugin_info_node(struct sail_plugin_info_node *plugin_info_node) {
@@ -438,7 +438,7 @@ void destroy_plugin_info_node_chain(struct sail_plugin_info_node *plugin_info_no
     }
 }
 
-sail_error_t plugin_read_info(const char *path, struct sail_plugin_info **plugin_info) {
+sail_status_t plugin_read_info(const char *path, struct sail_plugin_info **plugin_info) {
 
     SAIL_CHECK_PATH_PTR(path);
     SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
@@ -469,22 +469,22 @@ sail_error_t plugin_read_info(const char *path, struct sail_plugin_info **plugin
         if ((*plugin_info)->layout != SAIL_PLUGIN_LAYOUT_V3) {
             SAIL_LOG_ERROR("Unsupported plugin layout version %d in '%s'", (*plugin_info)->layout, path);
             destroy_plugin_info(*plugin_info);
-            return SAIL_UNSUPPORTED_PLUGIN_LAYOUT;
+            return SAIL_ERROR_UNSUPPORTED_PLUGIN_LAYOUT;
         }
 
         /* Paranoid error checks. */
         SAIL_TRY_OR_CLEANUP(check_plugin_info(path, *plugin_info),
                             /* cleanup */ destroy_plugin_info(*plugin_info));
 
-        return 0;
+        return SAIL_OK;
     } else {
         destroy_plugin_info(*plugin_info);
 
         switch (code) {
-            case -1: return SAIL_FILE_OPEN_ERROR;
-            case -2: return SAIL_MEMORY_ALLOCATION_FAILED;
+            case -1: return SAIL_ERROR_OPEN_FILE;
+            case -2: return SAIL_ERROR_MEMORY_ALLOCATION;
 
-            default: return SAIL_FILE_PARSE_ERROR;
+            default: return SAIL_ERROR_PARSE_FILE;
         }
     }
 }

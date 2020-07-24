@@ -72,8 +72,8 @@ public:
     const sail::read_features& read_features() const;
     const sail::write_features& write_features() const;
 
-    static sail_error_t plugin_feature_to_string(SailPluginFeature plugin_feature, const char **result);
-    static sail_error_t plugin_feature_from_string(const char *str, SailPluginFeature *result);
+    static sail_status_t plugin_feature_to_string(SailPluginFeature plugin_feature, const char **result);
+    static sail_status_t plugin_feature_from_string(const char *str, SailPluginFeature *result);
 
     /*
      * Finds a first plugin info object that supports the magic number read from the specified file.
@@ -84,10 +84,10 @@ public:
      *                image_reader::read_next_frame()          ->
      *                image_reader::stop_reading().
      *
-     * Returns 0 on success or sail_error_t on error.
+     * Returns 0 on success or sail_status_t on error.
      */
-    static sail_error_t by_magic_number_from_path(const std::string &path, plugin_info *splugin_info);
-    static sail_error_t by_magic_number_from_path(const char *path, plugin_info *splugin_info);
+    static sail_status_t by_magic_number_from_path(const std::string &path, plugin_info *splugin_info);
+    static sail_status_t by_magic_number_from_path(const char *path, plugin_info *splugin_info);
 
     /*
      * Finds a first plugin info object that supports the magic number read from the specified memory buffer.
@@ -98,9 +98,9 @@ public:
      *                image_reader::read_next_frame()         ->
      *                image_reader::stop_reading().
      *
-     * Returns 0 on success or sail_error_t on error.
+     * Returns 0 on success or sail_status_t on error.
      */
-    static sail_error_t by_magic_number_from_mem(const void *buffer, size_t buffer_length, plugin_info *splugin_info);
+    static sail_status_t by_magic_number_from_mem(const void *buffer, size_t buffer_length, plugin_info *splugin_info);
 
     /*
      * Finds a first plugin info object that supports the magic number read from the specified I/O source.
@@ -111,9 +111,9 @@ public:
      *                image_reader::read_next_frame()        ->
      *                image_reader::stop_reading().
      *
-     * Returns 0 on success or sail_error_t on error.
+     * Returns 0 on success or sail_status_t on error.
      */
-    static sail_error_t by_magic_number_from_io(const sail::io &io, plugin_info *splugin_info);
+    static sail_status_t by_magic_number_from_io(const sail::io &io, plugin_info *splugin_info);
 
     /*
      * Finds a first plugin info object that supports reading or writing the specified file path by its file extension.
@@ -129,10 +129,10 @@ public:
      *                image_writer::read_next_frame() ->
      *                image_writer::stop_writing().
      *
-     * Returns 0 on success or sail_error_t on error.
+     * Returns 0 on success or sail_status_t on error.
      */
-    static sail_error_t from_path(const std::string &path, plugin_info *splugin_info);
-    static sail_error_t from_path(const char *path, plugin_info *splugin_info);
+    static sail_status_t from_path(const std::string &path, plugin_info *splugin_info);
+    static sail_status_t from_path(const char *path, plugin_info *splugin_info);
 
     /*
      * Finds a first plugin info object that supports the specified file extension. The comparison
@@ -148,10 +148,10 @@ public:
      *                image_writer::read_next_frame() ->
      *                image_writer::stop_writing().
      *
-     * Returns 0 on success or sail_error_t on error.
+     * Returns 0 on success or sail_status_t on error.
      */
-    static sail_error_t from_extension(const std::string &suffix, plugin_info *splugin_info);
-    static sail_error_t from_extension(const char *suffix, plugin_info *splugin_info);
+    static sail_status_t from_extension(const std::string &suffix, plugin_info *splugin_info);
+    static sail_status_t from_extension(const char *suffix, plugin_info *splugin_info);
 
     /*
      * Finds a first plugin info object that supports the specified mime type. The comparison
@@ -167,10 +167,10 @@ public:
      *                image_writer::read_next_frame() ->
      *                image_writer::stop_writing().
      *
-     * Returns 0 on success or sail_error_t on error.
+     * Returns 0 on success or sail_status_t on error.
      */
-    static sail_error_t from_mime_type(const std::string &mime_type, plugin_info *splugin_info);
-    static sail_error_t from_mime_type(const char *mime_type, plugin_info *splugin_info);
+    static sail_status_t from_mime_type(const std::string &mime_type, plugin_info *splugin_info);
+    static sail_status_t from_mime_type(const char *mime_type, plugin_info *splugin_info);
 
     /*
      * Returns a list of found plugin info objects. Use it to determine the list of possible

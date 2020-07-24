@@ -30,7 +30,7 @@
 #include "sail-common.h"
 #include "sail.h"
 
-sail_error_t sail_probe_io(struct sail_io *io, struct sail_image **image, const struct sail_plugin_info **plugin_info) {
+sail_status_t sail_probe_io(struct sail_io *io, struct sail_image **image, const struct sail_plugin_info **plugin_info) {
 
     SAIL_CHECK_IO_PTR(io);
 
@@ -58,10 +58,10 @@ sail_error_t sail_probe_io(struct sail_io *io, struct sail_image **image, const 
                         /* cleanup */ plugin->v3->read_finish(&state, io));
     SAIL_TRY(plugin->v3->read_finish(&state, io));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t sail_probe_mem(const void *buffer, size_t buffer_length, struct sail_image **image, const struct sail_plugin_info **plugin_info) {
+sail_status_t sail_probe_mem(const void *buffer, size_t buffer_length, struct sail_image **image, const struct sail_plugin_info **plugin_info) {
 
     SAIL_CHECK_BUFFER_PTR(buffer);
 
@@ -73,24 +73,24 @@ sail_error_t sail_probe_mem(const void *buffer, size_t buffer_length, struct sai
 
     sail_destroy_io(io);
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t sail_start_reading_file(const char *path, const struct sail_plugin_info *plugin_info, void **state) {
+sail_status_t sail_start_reading_file(const char *path, const struct sail_plugin_info *plugin_info, void **state) {
 
     SAIL_TRY(sail_start_reading_file_with_options(path, plugin_info, NULL, state));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t sail_start_reading_mem(const void *buffer, size_t buffer_length, const struct sail_plugin_info *plugin_info, void **state) {
+sail_status_t sail_start_reading_mem(const void *buffer, size_t buffer_length, const struct sail_plugin_info *plugin_info, void **state) {
 
     SAIL_TRY(sail_start_reading_mem_with_options(buffer, buffer_length, plugin_info, NULL, state));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t sail_read_next_frame(void *state, struct sail_image **image) {
+sail_status_t sail_read_next_frame(void *state, struct sail_image **image) {
 
     SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IMAGE_PTR(image);
@@ -110,7 +110,7 @@ sail_error_t sail_read_next_frame(void *state, struct sail_image **image) {
 
         if (interlaced_passes < 1) {
             sail_destroy_image(*image);
-            return SAIL_INTERLACED_UNSUPPORTED;
+            return SAIL_ERROR_INTERLACING_UNSUPPORTED;
         }
     } else {
         interlaced_passes = 1;
@@ -134,14 +134,14 @@ sail_error_t sail_read_next_frame(void *state, struct sail_image **image) {
                             /* cleanup */ sail_destroy_image(*image));
     }
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t sail_stop_reading(void *state) {
+sail_status_t sail_stop_reading(void *state) {
 
     /* Not an error. */
     if (state == NULL) {
-        return 0;
+        return SAIL_OK;
     }
 
     struct hidden_state *state_of_mind = (struct hidden_state *)state;
@@ -149,7 +149,7 @@ sail_error_t sail_stop_reading(void *state) {
     /* Not an error. */
     if (state_of_mind->plugin == NULL) {
         destroy_hidden_state(state_of_mind);
-        return 0;
+        return SAIL_OK;
     }
 
     SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v3->read_finish(&state_of_mind->state, state_of_mind->io),
@@ -157,24 +157,24 @@ sail_error_t sail_stop_reading(void *state) {
 
     destroy_hidden_state(state_of_mind);
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t sail_start_writing_file(const char *path, const struct sail_plugin_info *plugin_info, void **state) {
+sail_status_t sail_start_writing_file(const char *path, const struct sail_plugin_info *plugin_info, void **state) {
 
     SAIL_TRY(sail_start_writing_file_with_options(path, plugin_info, NULL, state));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t sail_start_writing_mem(void *buffer, size_t buffer_length, const struct sail_plugin_info *plugin_info, void **state) {
+sail_status_t sail_start_writing_mem(void *buffer, size_t buffer_length, const struct sail_plugin_info *plugin_info, void **state) {
 
     SAIL_TRY(sail_start_writing_mem_with_options(buffer, buffer_length, plugin_info, NULL, state));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t sail_write_next_frame(void *state, const struct sail_image *image) {
+sail_status_t sail_write_next_frame(void *state, const struct sail_image *image) {
 
     SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IMAGE_PTR(image);
@@ -197,7 +197,7 @@ sail_error_t sail_write_next_frame(void *state, const struct sail_image *image) 
         interlaced_passes = state_of_mind->plugin_info->write_features->interlaced_passes;
 
         if (interlaced_passes < 1) {
-            return SAIL_INTERLACED_UNSUPPORTED;
+            return SAIL_ERROR_INTERLACING_UNSUPPORTED;
         }
     } else {
         interlaced_passes = 1;
@@ -216,12 +216,12 @@ sail_error_t sail_write_next_frame(void *state, const struct sail_image *image) 
                                                         image));
     }
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t sail_stop_writing(void *state) {
+sail_status_t sail_stop_writing(void *state) {
 
     SAIL_TRY(stop_writing(state, NULL));
 
-    return 0;
+    return SAIL_OK;
 }

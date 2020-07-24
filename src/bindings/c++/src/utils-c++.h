@@ -41,7 +41,7 @@
 namespace sail
 {
 
-SAIL_EXPORT sail_error_t print_errno(const char *format);
+SAIL_EXPORT sail_status_t print_errno(const char *format);
 
 SAIL_EXPORT uint64_t now();
 

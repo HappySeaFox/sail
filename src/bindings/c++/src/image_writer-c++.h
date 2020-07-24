@@ -57,65 +57,65 @@ public:
     /*
      * An interface to sail_write_file(). See sail_write_file() for more.
      */
-    sail_error_t write(const std::string &path, const image &simage);
-    sail_error_t write(const char *path, const image &simage);
+    sail_status_t write(const std::string &path, const image &simage);
+    sail_status_t write(const char *path, const image &simage);
 
     /*
      * An interface to sail_write_mem(). See sail_write_mem() for more.
      */
-    sail_error_t write(void *buffer, size_t buffer_length, const image &simage);
-    sail_error_t write(void *buffer, size_t buffer_length, const image &simage, size_t *written);
+    sail_status_t write(void *buffer, size_t buffer_length, const image &simage);
+    sail_status_t write(void *buffer, size_t buffer_length, const image &simage, size_t *written);
 
     /*
      * An interface to sail_start_writing(). See sail_start_writing() for more.
      */
-    sail_error_t start_writing(const std::string &path);
-    sail_error_t start_writing(const char *path);
+    sail_status_t start_writing(const std::string &path);
+    sail_status_t start_writing(const char *path);
 
     /*
      * An interface to sail_start_writing(). See sail_start_writing() for more.
      */
-    sail_error_t start_writing(const std::string &path, const plugin_info &splugin_info);
-    sail_error_t start_writing(const char *path, const plugin_info &splugin_info);
+    sail_status_t start_writing(const std::string &path, const plugin_info &splugin_info);
+    sail_status_t start_writing(const char *path, const plugin_info &splugin_info);
 
     /*
      * An interface to sail_start_writing_with_options(). See sail_start_writing_with_options() for more.
      */
-    sail_error_t start_writing(const std::string &path, const write_options &swrite_options);
-    sail_error_t start_writing(const char *path, const write_options &swrite_options);
+    sail_status_t start_writing(const std::string &path, const write_options &swrite_options);
+    sail_status_t start_writing(const char *path, const write_options &swrite_options);
 
     /*
      * An interface to sail_start_writing_with_options(). See sail_start_writing_with_options() for more.
      */
-    sail_error_t start_writing(const std::string &path, const plugin_info &splugin_info, const write_options &swrite_options);
-    sail_error_t start_writing(const char *path, const plugin_info &splugin_info, const write_options &swrite_options);
+    sail_status_t start_writing(const std::string &path, const plugin_info &splugin_info, const write_options &swrite_options);
+    sail_status_t start_writing(const char *path, const plugin_info &splugin_info, const write_options &swrite_options);
 
     /*
      * An interface to sail_start_writing_mem(). See sail_start_writing_mem() for more.
      */
-    sail_error_t start_writing(void *buffer, size_t buffer_length, const plugin_info &splugin_info);
-    sail_error_t start_writing(void *buffer, size_t buffer_length, const plugin_info &splugin_info, const write_options &swrite_options);
+    sail_status_t start_writing(void *buffer, size_t buffer_length, const plugin_info &splugin_info);
+    sail_status_t start_writing(void *buffer, size_t buffer_length, const plugin_info &splugin_info, const write_options &swrite_options);
 
     /*
      * An interface to sail_start_writing_io(). See sail_start_writing_io() for more.
      */
-    sail_error_t start_writing(const io &sio, const plugin_info &splugin_info);
-    sail_error_t start_writing(const io &sio, const plugin_info &splugin_info, const write_options &swrite_options);
+    sail_status_t start_writing(const io &sio, const plugin_info &splugin_info);
+    sail_status_t start_writing(const io &sio, const plugin_info &splugin_info, const write_options &swrite_options);
 
     /*
      * An interface to sail_write_next_frame(). See sail_write_next_frame() for more.
      */
-    sail_error_t write_next_frame(const image &simage);
+    sail_status_t write_next_frame(const image &simage);
 
     /*
      * An interface to sail_stop_writing(). See sail_stop_writing() for more.
      */
-    sail_error_t stop_writing();
+    sail_status_t stop_writing();
 
     /*
      * An interface to sail_stop_writing_with_written(). See sail_stop_writing_with_written() for more.
      */
-    sail_error_t stop_writing(size_t *written);
+    sail_status_t stop_writing(size_t *written);
 
 private:
     class pimpl;

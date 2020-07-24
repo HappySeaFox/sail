@@ -29,7 +29,7 @@
 
 #include "sail-common.h"
 
-sail_error_t sail_alloc_write_options(struct sail_write_options **write_options) {
+sail_status_t sail_alloc_write_options(struct sail_write_options **write_options) {
 
     SAIL_CHECK_WRITE_OPTIONS_PTR(write_options);
 
@@ -42,7 +42,7 @@ sail_error_t sail_alloc_write_options(struct sail_write_options **write_options)
     (*write_options)->compression_type    = 0;
     (*write_options)->compression         = 0;
 
-    return 0;
+    return SAIL_OK;
 }
 
 void sail_destroy_write_options(struct sail_write_options *write_options) {
@@ -54,7 +54,7 @@ void sail_destroy_write_options(struct sail_write_options *write_options) {
     sail_free(write_options);
 }
 
-sail_error_t sail_write_options_from_features(const struct sail_write_features *write_features, struct sail_write_options *write_options) {
+sail_status_t sail_write_options_from_features(const struct sail_write_features *write_features, struct sail_write_options *write_options) {
 
     SAIL_CHECK_WRITE_FEATURES_PTR(write_features);
     SAIL_CHECK_WRITE_OPTIONS_PTR(write_options);
@@ -81,19 +81,19 @@ sail_error_t sail_write_options_from_features(const struct sail_write_features *
         write_options->compression = write_features->compression_default;
     }
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t sail_alloc_write_options_from_features(const struct sail_write_features *write_features, struct sail_write_options **write_options) {
+sail_status_t sail_alloc_write_options_from_features(const struct sail_write_features *write_features, struct sail_write_options **write_options) {
 
     SAIL_TRY(sail_alloc_write_options(write_options));
     SAIL_TRY_OR_CLEANUP(sail_write_options_from_features(write_features, *write_options),
                         /* cleanup */ sail_destroy_write_options(*write_options));
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t sail_copy_write_options(const struct sail_write_options *write_options_source, struct sail_write_options **write_options_target) {
+sail_status_t sail_copy_write_options(const struct sail_write_options *write_options_source, struct sail_write_options **write_options_target) {
 
     SAIL_CHECK_WRITE_OPTIONS_PTR(write_options_source);
     SAIL_CHECK_WRITE_OPTIONS_PTR(write_options_target);
@@ -104,5 +104,5 @@ sail_error_t sail_copy_write_options(const struct sail_write_options *write_opti
 
     memcpy(*write_options_target, write_options_source, sizeof(struct sail_write_options));
 
-    return 0;
+    return SAIL_OK;
 }

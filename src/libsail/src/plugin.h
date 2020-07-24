@@ -49,17 +49,17 @@ struct sail_image;
 struct sail_io;
 
 /* V3 declarations. */
-typedef sail_error_t (*sail_plugin_read_init_v3_t)           (struct sail_io *io, const struct sail_read_options *read_options, void **state);
-typedef sail_error_t (*sail_plugin_read_seek_next_frame_v3_t)(void *state, struct sail_io *io, struct sail_image **image);
-typedef sail_error_t (*sail_plugin_read_seek_next_pass_v3_t) (void *state, struct sail_io *io, const struct sail_image *image);
-typedef sail_error_t (*sail_plugin_read_frame_v3_t)          (void *state, struct sail_io *io, const struct sail_image *image);
-typedef sail_error_t (*sail_plugin_read_finish_v3_t)         (void **state, struct sail_io *io);
+typedef sail_status_t (*sail_plugin_read_init_v3_t)           (struct sail_io *io, const struct sail_read_options *read_options, void **state);
+typedef sail_status_t (*sail_plugin_read_seek_next_frame_v3_t)(void *state, struct sail_io *io, struct sail_image **image);
+typedef sail_status_t (*sail_plugin_read_seek_next_pass_v3_t) (void *state, struct sail_io *io, const struct sail_image *image);
+typedef sail_status_t (*sail_plugin_read_frame_v3_t)          (void *state, struct sail_io *io, const struct sail_image *image);
+typedef sail_status_t (*sail_plugin_read_finish_v3_t)         (void **state, struct sail_io *io);
 
-typedef sail_error_t (*sail_plugin_write_init_v3_t)           (struct sail_io *io, const struct sail_write_options *write_options, void **state);
-typedef sail_error_t (*sail_plugin_write_seek_next_frame_v3_t)(void *state, struct sail_io *io, const struct sail_image *image);
-typedef sail_error_t (*sail_plugin_write_seek_next_pass_v3_t) (void *state, struct sail_io *io, const struct sail_image *image);
-typedef sail_error_t (*sail_plugin_write_frame_v3_t)          (void *state, struct sail_io *io, const struct sail_image *image);
-typedef sail_error_t (*sail_plugin_write_finish_v3_t)         (void **state, struct sail_io *io);
+typedef sail_status_t (*sail_plugin_write_init_v3_t)           (struct sail_io *io, const struct sail_write_options *write_options, void **state);
+typedef sail_status_t (*sail_plugin_write_seek_next_frame_v3_t)(void *state, struct sail_io *io, const struct sail_image *image);
+typedef sail_status_t (*sail_plugin_write_seek_next_pass_v3_t) (void *state, struct sail_io *io, const struct sail_image *image);
+typedef sail_status_t (*sail_plugin_write_frame_v3_t)          (void *state, struct sail_io *io, const struct sail_image *image);
+typedef sail_status_t (*sail_plugin_write_finish_v3_t)         (void **state, struct sail_io *io);
 
 struct sail_plugin_layout_v3 {
     sail_plugin_read_init_v3_t            read_init;
@@ -97,9 +97,9 @@ typedef struct sail_plugin sail_plugin_t;
  * the specified plugin instance.
  * The assigned plugin MUST be destroyed later with sail_destroy_plugin().
  *
- * Returns 0 on success or sail_error_t on error.
+ * Returns 0 on success or sail_status_t on error.
  */
-SAIL_HIDDEN sail_error_t alloc_and_load_plugin(const struct sail_plugin_info *plugin_info, struct sail_plugin **plugin);
+SAIL_HIDDEN sail_status_t alloc_and_load_plugin(const struct sail_plugin_info *plugin_info, struct sail_plugin **plugin);
 
 /*
  * Destroys the specified plugin and all its internal memory buffers.

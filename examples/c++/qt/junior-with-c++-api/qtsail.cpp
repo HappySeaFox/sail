@@ -60,7 +60,7 @@ QtSail::~QtSail()
 {
 }
 
-sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
+sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
 {
     sail::image_reader reader;
     sail::image image;
@@ -83,10 +83,10 @@ sail_error_t QtSail::loadImage(const QString &path, QImage *qimage)
                                 .arg(image.height())
                                 );
 
-    return 0;
+    return SAIL_OK;
 }
 
-sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
+sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
 {
     sail::image_writer writer;
     sail::image image;
@@ -99,7 +99,7 @@ sail_error_t QtSail::saveImage(const QString &path, const QImage &qimage)
 
     SAIL_TRY(writer.write(path.toLocal8Bit(), image));
 
-    return 0;
+    return SAIL_OK;
 }
 
 QStringList QtSail::filters() const
@@ -118,9 +118,9 @@ void QtSail::onOpenFile()
         return;
     }
 
-    sail_error_t res;
+    sail_status_t res;
 
-    if ((res = loadImage(path, &m_qimage)) == 0) {
+    if ((res = loadImage(path, &m_qimage)) == SAIL_OK) {
         fit();
     } else {
         QMessageBox::critical(this, tr("Error"), tr("Failed to load '%1'. Error: %2.")
@@ -141,9 +141,9 @@ void QtSail::onSave()
         return;
     }
 
-    sail_error_t res;
+    sail_status_t res;
 
-    if ((res = saveImage(path, m_qimage)) != 0) {
+    if ((res = saveImage(path, m_qimage)) != SAIL_OK) {
         QMessageBox::critical(this, tr("Error"), tr("Failed to save '%1'. Error: %2.")
                               .arg(path)
                               .arg(res));

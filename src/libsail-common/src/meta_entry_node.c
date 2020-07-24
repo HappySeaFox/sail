@@ -28,7 +28,7 @@
 
 #include "sail-common.h"
 
-sail_error_t sail_alloc_meta_entry_node(struct sail_meta_entry_node **node) {
+sail_status_t sail_alloc_meta_entry_node(struct sail_meta_entry_node **node) {
 
     SAIL_CHECK_META_ENTRY_NODE_PTR(node);
 
@@ -40,7 +40,7 @@ sail_error_t sail_alloc_meta_entry_node(struct sail_meta_entry_node **node) {
     (*node)->value = NULL;
     (*node)->next  = NULL;
 
-    return 0;
+    return SAIL_OK;
 }
 
 void sail_destroy_meta_entry_node(struct sail_meta_entry_node *node) {
@@ -54,7 +54,7 @@ void sail_destroy_meta_entry_node(struct sail_meta_entry_node *node) {
     sail_free(node);
 }
 
-sail_error_t sail_copy_meta_entry_node(struct sail_meta_entry_node *source, struct sail_meta_entry_node **target) {
+sail_status_t sail_copy_meta_entry_node(struct sail_meta_entry_node *source, struct sail_meta_entry_node **target) {
 
     SAIL_CHECK_META_ENTRY_NODE_PTR(source);
     SAIL_CHECK_META_ENTRY_NODE_PTR(target);
@@ -66,7 +66,7 @@ sail_error_t sail_copy_meta_entry_node(struct sail_meta_entry_node *source, stru
     SAIL_TRY_OR_CLEANUP(sail_strdup(source->value, &(*target)->value),
                         /* cleanup */ sail_destroy_meta_entry_node(*target));
 
-    return 0;
+    return SAIL_OK;
 }
 
 void sail_destroy_meta_entry_node_chain(struct sail_meta_entry_node *node) {
@@ -80,13 +80,13 @@ void sail_destroy_meta_entry_node_chain(struct sail_meta_entry_node *node) {
     }
 }
 
-sail_error_t sail_copy_meta_entry_node_chain(struct sail_meta_entry_node *source, struct sail_meta_entry_node **target) {
+sail_status_t sail_copy_meta_entry_node_chain(struct sail_meta_entry_node *source, struct sail_meta_entry_node **target) {
 
     SAIL_CHECK_META_ENTRY_NODE_PTR(target);
 
     if (source == NULL) {
         *target = NULL;
-        return 0;
+        return SAIL_OK;
     }
 
     *target = NULL;
@@ -109,5 +109,5 @@ sail_error_t sail_copy_meta_entry_node_chain(struct sail_meta_entry_node *source
         source = source->next;
     }
 
-    return 0;
+    return SAIL_OK;
 }
