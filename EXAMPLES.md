@@ -50,7 +50,7 @@ struct sail_image *image;
 
 /*
  * sail_read_file() reads the image and outputs pixels in the BPP32-RGBA pixel format by default.
- * When SAIL is compiled with SAIL_READ_OUTPUT_BPP32_BGRA=ON, it outputs BPP32-BGRA pixels.
+ * If SAIL is compiled with SAIL_READ_OUTPUT_BPP32_BGRA=ON, it outputs BPP32-BGRA pixels.
  */
 SAIL_TRY(sail_read_file(path,
                         NULL,
@@ -77,7 +77,7 @@ sail::image_reader reader;
 sail::image image;
 
 // read() reads the image and outputs pixels in the BPP32-RGBA pixel format by default.
-// When SAIL is compiled with SAIL_READ_OUTPUT_BPP32_BGRA=ON, it outputs BPP32-BGRA pixels.
+// If SAIL is compiled with SAIL_READ_OUTPUT_BPP32_BGRA=ON, it outputs BPP32-BGRA pixels.
 //
 SAIL_TRY(reader.read(path, &image));
 
@@ -102,7 +102,7 @@ struct sail_image *image;
 /*
  * Starts reading the specified file.
  * The subsequent calls to sail_read_next_frame() output pixels in the BPP32-RGBA pixel format by default.
- * When SAIL is compiled with SAIL_READ_OUTPUT_BPP32_BGRA=ON, they output BPP32-BGRA pixels.
+ * If SAIL is compiled with SAIL_READ_OUTPUT_BPP32_BGRA=ON, they output BPP32-BGRA pixels.
  */
 SAIL_TRY_OR_CLEANUP(sail_start_reading_file(path, NULL, &state),
                     /* cleanup */ sail_stop_reading(state));
@@ -152,7 +152,7 @@ SAIL_AT_SCOPE_EXIT (
 
 // Starts reading the specified file.
 // The subsequent calls to read_next_frame() outputs pixels in the BPP32-RGBA pixel format by default.
-// When SAIL is compiled with SAIL_READ_OUTPUT_BPP32_BGRA=ON, they output BPP32-BGRA pixels.
+// If SAIL is compiled with SAIL_READ_OUTPUT_BPP32_BGRA=ON, they output BPP32-BGRA pixels.
 //
 SAIL_TRY(reader.start_reading(path));
 
@@ -161,7 +161,7 @@ SAIL_TRY(reader.start_reading(path));
 // it returns SAIL_ERROR_NO_MORE_FRAMES.
 //
 // read_next_frame() outputs pixels in the BPP32-RGBA pixel format by default.
-// When SAIL is compiled with SAIL_READ_OUTPUT_BPP32_BGRA=ON, it outputs BPP32-BGRA pixels.
+// If SAIL is compiled with SAIL_READ_OUTPUT_BPP32_BGRA=ON, it outputs BPP32-BGRA pixels.
 //
 SAIL_TRY(reader.read_next_frame(&image));
 

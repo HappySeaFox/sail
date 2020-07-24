@@ -109,7 +109,7 @@ struct sail_image *image;
 
 /*
  * sail_read_file() reads the image and outputs pixels in the BPP32-RGBA pixel format by default.
- * When SAIL is compiled with SAIL_READ_OUTPUT_BPP32_BGRA=ON, it outputs BPP32-BGRA pixels.
+ * If SAIL is compiled with SAIL_READ_OUTPUT_BPP32_BGRA=ON, it outputs BPP32-BGRA pixels.
  * If you need to control output pixel formats, consider switching to the deep diver API.
  */
 SAIL_TRY(sail_read_file(path, &image));
@@ -129,7 +129,7 @@ sail::image_reader reader;
 sail::image image;
 
 // read() reads the image and outputs pixels in the BPP32-RGBA pixel format by default.
-// When SAIL is compiled with SAIL_READ_OUTPUT_BPP32_BGRA=ON, it outputs BPP32-BGRA pixels.
+// If SAIL is compiled with SAIL_READ_OUTPUT_BPP32_BGRA=ON, it outputs BPP32-BGRA pixels.
 // If you need to control output pixel formats, consider switching to the deep diver API.
 //
 SAIL_TRY(reader.read(path, &image));
