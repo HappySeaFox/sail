@@ -195,6 +195,7 @@ Consider [EXAMPLES](EXAMPLES.md) after building and installing.
   Plugins with missing dependencies will be disabled regardless this setting
 - `SAIL_EXCEPT_PLUGINS="a;b;c"` - Enable all plugins except the plugins specified in this ';'-separated list.
   Plugins with missing dependencies will be disabled regardless this setting
+- `SAIL_READ_OUTPUT_BPP32_BGRA=ON|OFF` - Make the read operations output BPP32-BGRA pixels instead of BPP32-RGBA
 - `SAIL_COLORED_OUTPUT=ON|OFF` - Enable colored console output on Windows >= 10 and Unix platforms
 
 ### Windows

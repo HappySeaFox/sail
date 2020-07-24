@@ -1,7 +1,5 @@
 ## Priority 1
 
-- Make the default output format BGRA and/or a build options to switch RGBA/BGRA
-
 - Read/write indexed PNGs with alpha
 
 - document c++ classes

@@ -68,6 +68,13 @@ set(SAIL_ONLY_PLUGINS "" CACHE STRING "Enable only the plugins specified in this
 Plugins with missing dependencies will be disabled regardless this setting")
 set(SAIL_EXCEPT_PLUGINS "" CACHE STRING "Enable all plugins except the plugins specified in this ';'-separated list. \
 Plugins with missing dependencies will be disabled regardless this setting")
+option(SAIL_READ_OUTPUT_BPP32_BGRA "Make the read operations output BPP32-BGRA pixels instead of BPP32-RGBA." OFF)
+
+if (SAIL_READ_OUTPUT_BPP32_BGRA)
+    set(SAIL_DEFAULT_READ_OUTPUT_PIXEL_FORMAT "BPP32-BGRA")
+else()
+    set(SAIL_DEFAULT_READ_OUTPUT_PIXEL_FORMAT "BPP32-RGBA")
+endif()
 
 set(SAIL_MAGIC_BUFFER_SIZE 10)
 
