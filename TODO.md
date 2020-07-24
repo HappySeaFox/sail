@@ -1,7 +1,5 @@
 ## Priority 1
 
-- Hide contexts into sail_context() and avoid passing it from client code
-
 - Make the default output format BGRA
 
 - Make the compress/decompress context fields nullable pointers in the JPEG codec
