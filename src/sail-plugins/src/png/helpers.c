@@ -144,8 +144,8 @@ sail_error_t pixel_format_to_png_color_type(enum SailPixelFormat pixel_format, i
 
         case SAIL_PIXEL_FORMAT_BPP32_RGBA:
         case SAIL_PIXEL_FORMAT_BPP32_BGRA:
-        case SAIL_PIXEL_FORMAT_BPP32_ARGB: {
-        case SAIL_PIXEL_FORMAT_BPP32_ABGR:
+        case SAIL_PIXEL_FORMAT_BPP32_ARGB:
+        case SAIL_PIXEL_FORMAT_BPP32_ABGR: {
             *color_type = PNG_COLOR_TYPE_RGB_ALPHA;
             *bit_depth = 8;
             return 0;
@@ -153,8 +153,8 @@ sail_error_t pixel_format_to_png_color_type(enum SailPixelFormat pixel_format, i
 
         case SAIL_PIXEL_FORMAT_BPP64_RGBA:
         case SAIL_PIXEL_FORMAT_BPP64_BGRA:
-        case SAIL_PIXEL_FORMAT_BPP64_ARGB: {
-        case SAIL_PIXEL_FORMAT_BPP64_ABGR:
+        case SAIL_PIXEL_FORMAT_BPP64_ARGB:
+        case SAIL_PIXEL_FORMAT_BPP64_ABGR: {
             *color_type = PNG_COLOR_TYPE_RGB_ALPHA;
             *bit_depth = 16;
             return 0;
