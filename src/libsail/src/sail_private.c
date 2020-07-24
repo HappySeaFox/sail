@@ -286,19 +286,28 @@ sail_status_t control_tls_context(struct sail_context **context, enum SailContex
 
     SAIL_THREAD_LOCAL static struct sail_context *tls_context = NULL;
 
-    if (action == SAIL_CONTEXT_ALLOCATE) {
-        SAIL_CHECK_CONTEXT_PTR(context);
+    switch (action) {
+        case SAIL_CONTEXT_ALLOCATE: {
+            SAIL_CHECK_CONTEXT_PTR(context);
 
-        if (tls_context == NULL) {
-            SAIL_TRY(alloc_context(&tls_context));
-            SAIL_LOG_DEBUG("Allocated a new thread-local context %p", tls_context);
+            if (tls_context == NULL) {
+                SAIL_TRY(alloc_context(&tls_context));
+                SAIL_LOG_DEBUG("Allocated a new thread-local context %p", tls_context);
+            }
+
+            *context = tls_context;
+            break;
         }
-
-        *context = tls_context;
-    } else if (action == SAIL_CONTEXT_DESTROY) {
-        destroy_context(tls_context);
-        SAIL_LOG_DEBUG("Destroyed the thread-local context %p", tls_context);
-        tls_context = NULL;
+        case SAIL_CONTEXT_FETCH: {
+            *context = tls_context;
+            break;
+        }
+        case SAIL_CONTEXT_DESTROY: {
+            destroy_context(tls_context);
+            SAIL_LOG_DEBUG("Destroyed the thread-local context %p", tls_context);
+            tls_context = NULL;
+            break;
+        }
     }
 
     return SAIL_OK;
@@ -309,7 +318,6 @@ sail_status_t init_context(struct sail_context *context, int flags) {
     SAIL_CHECK_CONTEXT_PTR(context);
 
     if (context->initialized) {
-        SAIL_LOG_DEBUG("The thread-local static context is already initialized so bypassing initialization");
         return SAIL_OK;
     }
 
