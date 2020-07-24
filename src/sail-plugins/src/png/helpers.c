@@ -144,8 +144,8 @@ sail_error_t pixel_format_to_png_color_type(enum SailPixelFormat pixel_format, i
 
         case SAIL_PIXEL_FORMAT_BPP32_RGBA:
         case SAIL_PIXEL_FORMAT_BPP32_BGRA:
-        case SAIL_PIXEL_FORMAT_BPP32_ARGB: {
-        case SAIL_PIXEL_FORMAT_BPP32_ABGR:
+        case SAIL_PIXEL_FORMAT_BPP32_ARGB:
+        case SAIL_PIXEL_FORMAT_BPP32_ABGR: {
             *color_type = PNG_COLOR_TYPE_RGB_ALPHA;
             *bit_depth = 8;
             return 0;
@@ -153,15 +153,17 @@ sail_error_t pixel_format_to_png_color_type(enum SailPixelFormat pixel_format, i
 
         case SAIL_PIXEL_FORMAT_BPP64_RGBA:
         case SAIL_PIXEL_FORMAT_BPP64_BGRA:
-        case SAIL_PIXEL_FORMAT_BPP64_ARGB: {
-        case SAIL_PIXEL_FORMAT_BPP64_ABGR:
+        case SAIL_PIXEL_FORMAT_BPP64_ARGB:
+        case SAIL_PIXEL_FORMAT_BPP64_ABGR: {
             *color_type = PNG_COLOR_TYPE_RGB_ALPHA;
             *bit_depth = 16;
             return 0;
         }
-    }
 
-    return SAIL_PIXEL_FORMAT_UNKNOWN;
+        default: {
+            return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+        }
+    }
 }
 
 sail_error_t supported_read_output_pixel_format(enum SailPixelFormat pixel_format) {
@@ -176,9 +178,11 @@ sail_error_t supported_read_output_pixel_format(enum SailPixelFormat pixel_forma
         case SAIL_PIXEL_FORMAT_BPP32_ABGR: {
             return 0;
         }
-    }
 
-    return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+        default: {
+            return SAIL_UNSUPPORTED_PIXEL_FORMAT;
+        }
+    }
 }
 
 sail_error_t read_png_text(png_structp png_ptr, png_infop info_ptr, struct sail_meta_entry_node **target_meta_entry_node) {

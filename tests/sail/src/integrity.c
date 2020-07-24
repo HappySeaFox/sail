@@ -42,6 +42,7 @@ static MunitResult test_pixel_format_to_string(const MunitParameter params[], vo
     munit_assert_string_equal(result, s);
 
     TEST_SAIL_CONVERSION(SAIL_PIXEL_FORMAT_UNKNOWN, "UNKNOWN");
+    TEST_SAIL_CONVERSION(SAIL_PIXEL_FORMAT_AUTO,    "AUTO");
     TEST_SAIL_CONVERSION(SAIL_PIXEL_FORMAT_SOURCE,  "SOURCE");
 
     TEST_SAIL_CONVERSION(SAIL_PIXEL_FORMAT_BPP1_INDEXED,  "BPP1-INDEXED");
@@ -117,6 +118,7 @@ static MunitResult test_pixel_format_from_string(const MunitParameter params[], 
     munit_assert(result == e);
 
     TEST_SAIL_CONVERSION("UNKNOWN", SAIL_PIXEL_FORMAT_UNKNOWN);
+    TEST_SAIL_CONVERSION("AUTO",    SAIL_PIXEL_FORMAT_AUTO);
     TEST_SAIL_CONVERSION("SOURCE",  SAIL_PIXEL_FORMAT_SOURCE);
 
     TEST_SAIL_CONVERSION("BPP1-INDEXED",  SAIL_PIXEL_FORMAT_BPP1_INDEXED);
