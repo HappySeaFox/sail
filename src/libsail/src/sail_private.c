@@ -251,6 +251,48 @@ static sail_status_t build_plugin_from_plugin_info(const char *plugin_info_full_
     return SAIL_OK;
 }
 
+static sail_status_t load_plugin(struct sail_plugin_info_node *node) {
+
+    SAIL_CHECK_PTR(node);
+
+    /* Already loaded. */
+    if (node->plugin != NULL) {
+        return SAIL_OK;
+    }
+
+    /* Plugin is not loaded. Let's load it. */
+    SAIL_TRY(alloc_and_load_plugin(node->plugin_info, &node->plugin));
+
+    return SAIL_OK;
+}
+
+static sail_status_t alloc_context(struct sail_context **context) {
+
+    SAIL_CHECK_CONTEXT_PTR(context);
+
+    void *ptr;
+    SAIL_TRY(sail_malloc(&ptr, sizeof(struct sail_context)));
+
+    *context = ptr;
+
+    (*context)->initialized      = false;
+    (*context)->plugin_info_node = NULL;
+
+    return SAIL_OK;
+}
+
+static sail_status_t destroy_context(struct sail_context *context) {
+
+    if (context == NULL) {
+        return SAIL_OK;
+    }
+
+    destroy_plugin_info_node_chain(context->plugin_info_node);
+    sail_free(context);
+
+    return SAIL_OK;
+}
+
 /* Initializes the context and loads all the plugin info files if the context is not initialized. */
 static sail_status_t init_context(struct sail_context *context, int flags) {
 
@@ -394,33 +436,6 @@ static sail_status_t init_context(struct sail_context *context, int flags) {
  * Public functions.
  */
 
-sail_status_t alloc_context(struct sail_context **context) {
-
-    SAIL_CHECK_CONTEXT_PTR(context);
-
-    void *ptr;
-    SAIL_TRY(sail_malloc(&ptr, sizeof(struct sail_context)));
-
-    *context = ptr;
-
-    (*context)->initialized      = false;
-    (*context)->plugin_info_node = NULL;
-
-    return SAIL_OK;
-}
-
-sail_status_t destroy_context(struct sail_context *context) {
-
-    if (context == NULL) {
-        return SAIL_OK;
-    }
-
-    destroy_plugin_info_node_chain(context->plugin_info_node);
-    sail_free(context);
-
-    return SAIL_OK;
-}
-
 sail_status_t control_tls_context(struct sail_context **context, enum SailContextAction action) {
 
     SAIL_THREAD_LOCAL static struct sail_context *tls_context = NULL;
@@ -465,21 +480,6 @@ sail_status_t current_tls_context_with_flags(struct sail_context **context, int 
 
     SAIL_TRY(control_tls_context(context, SAIL_CONTEXT_ALLOCATE));
     SAIL_TRY(init_context(*context, flags));
-
-    return SAIL_OK;
-}
-
-sail_status_t load_plugin(struct sail_plugin_info_node *node) {
-
-    SAIL_CHECK_PTR(node);
-
-    /* Already loaded. */
-    if (node->plugin != NULL) {
-        return SAIL_OK;
-    }
-
-    /* Plugin is not loaded. Let's load it. */
-    SAIL_TRY(alloc_and_load_plugin(node->plugin_info, &node->plugin));
 
     return SAIL_OK;
 }

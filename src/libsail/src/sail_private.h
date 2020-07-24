@@ -64,10 +64,6 @@ struct hidden_state {
     const struct sail_plugin *plugin;
 };
 
-SAIL_HIDDEN sail_status_t alloc_context(struct sail_context **context);
-
-SAIL_HIDDEN sail_status_t destroy_context(struct sail_context *context);
-
 enum SailContextAction {
     /* Allocates a new TLS context if it's not allocated yet. */
     SAIL_CONTEXT_ALLOCATE,
@@ -93,8 +89,6 @@ SAIL_HIDDEN sail_status_t current_tls_context(struct sail_context **context);
  * See SailInitFlags.
  */
 SAIL_HIDDEN sail_status_t current_tls_context_with_flags(struct sail_context **context, int flags);
-
-SAIL_HIDDEN sail_status_t load_plugin(struct sail_plugin_info_node *node);
 
 SAIL_HIDDEN sail_status_t load_plugin_by_plugin_info(const struct sail_plugin_info *plugin_info,
                                                     const struct sail_plugin **plugin);
