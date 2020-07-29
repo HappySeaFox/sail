@@ -36,35 +36,27 @@
 
 void my_error_fn(const char *module, const char *format, va_list ap) {
 
-    char buffer[80];
+    char buffer[160];
 
-#ifdef SAIL_WIN32
-    vsprintf_s(buffer, sizeof(buffer), format, ap);
-#else
-    vsprintf(buffer, format, ap);
-#endif
+    vsnprintf(buffer, sizeof(buffer), format, ap);
 
-        if (module != NULL) {
-        SAIL_LOG_ERROR("%s: %s", module, buffer);
+    if (module != NULL) {
+        SAIL_LOG_ERROR("TIFF: %s: %s", module, buffer);
     } else {
-        SAIL_LOG_ERROR("%s", buffer);
+        SAIL_LOG_ERROR("TIFF: %s", buffer);
     }
 }
 
 void my_warning_fn(const char *module, const char *format, va_list ap) {
 
-    char buffer[80];
+    char buffer[160];
 
-#ifdef SAIL_WIN32
-    vsprintf_s(buffer, sizeof(buffer), format, ap);
-#else
-    vsprintf(buffer, format, ap);
-#endif
+    vsnprintf(buffer, sizeof(buffer), format, ap);
 
-        if (module != NULL) {
-        SAIL_LOG_WARNING("%s: %s", module, buffer);
+    if (module != NULL) {
+        SAIL_LOG_WARNING("TIFF: %s: %s", module, buffer);
     } else {
-        SAIL_LOG_WARNING("%s", buffer);
+        SAIL_LOG_WARNING("TIFF: %s", buffer);
     }
 }
 
