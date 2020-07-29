@@ -45,11 +45,14 @@ struct tiff_state {
     bool libtiff_error;
     struct sail_read_options *read_options;
     struct sail_write_options *write_options;
+    void *scanline;
 };
 
 static sail_status_t alloc_tiff_state(struct tiff_state **tiff_state) {
 
-    *tiff_state = (struct tiff_state *)malloc(sizeof(struct tiff_state));
+    void *ptr;
+    SAIL_TRY(sail_malloc(&ptr, sizeof(struct tiff_state)));
+    *tiff_state = ptr;
 
     if (*tiff_state == NULL) {
         return SAIL_ERROR_MEMORY_ALLOCATION;
@@ -59,6 +62,7 @@ static sail_status_t alloc_tiff_state(struct tiff_state **tiff_state) {
     (*tiff_state)->libtiff_error = false;
     (*tiff_state)->read_options  = NULL;
     (*tiff_state)->write_options = NULL;
+    (*tiff_state)->scanline      = NULL;
 
     return SAIL_OK;
 }
@@ -91,7 +95,7 @@ SAIL_EXPORT sail_status_t sail_plugin_read_init_v3(struct sail_io *io, const str
 
     /* Initialize TIFF. */
     tiff_state->tiff = TIFFClientOpen("tiff-sail-plugin",
-                                        "rb",
+                                        "rb", /* TIFF wants this even when we use our own I/O mechanism. */
 	                                    io,
 	                                    my_read_proc,
                                         my_write_proc,
@@ -106,13 +110,6 @@ SAIL_EXPORT sail_status_t sail_plugin_read_init_v3(struct sail_io *io, const str
         return SAIL_ERROR_UNDERLYING_CODEC;
     }
 
-/*
-    const char *pixel_format_str = NULL;
-    SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(tiff_state->first_image->source_image->pixel_format, &pixel_format_str));
-    SAIL_LOG_DEBUG("TIFF: Input pixel format is %s", pixel_format_str);
-    SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(tiff_state->read_options->output_pixel_format, &pixel_format_str));
-    SAIL_LOG_DEBUG("TIFF: Output pixel format is %s", pixel_format_str);
-*/
     return SAIL_OK;
 }
 
@@ -131,6 +128,12 @@ SAIL_EXPORT sail_status_t sail_plugin_read_seek_next_frame_v3(void *state, struc
     SAIL_TRY(sail_alloc_image(image));
     SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&(*image)->source_image),
                         /* cleanup */ sail_destroy_image(*image));
+
+    const char *pixel_format_str;
+    SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string((*image)->source_image->pixel_format, &pixel_format_str));
+    SAIL_LOG_DEBUG("TIFF: Input pixel format is %s", pixel_format_str);
+    SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(tiff_state->read_options->output_pixel_format, &pixel_format_str));
+    SAIL_LOG_DEBUG("TIFF: Output pixel format is %s", pixel_format_str);
 
     return SAIL_OK;
 }
@@ -186,7 +189,8 @@ SAIL_EXPORT sail_status_t sail_plugin_read_finish_v3(void **state, struct sail_i
         TIFFCleanup(tiff_state->tiff);
     }
 
-    free(tiff_state);
+    sail_free(tiff_state->scanline);
+    sail_free(tiff_state);
 
     return SAIL_OK;
 }
@@ -400,7 +404,8 @@ SAIL_EXPORT sail_status_t sail_plugin_write_finish_v3(void **state, struct sail_
         TIFFCleanup(tiff_state->tiff);
     }
 
-    free(tiff_state);
+    sail_free(tiff_state->scanline);
+    sail_free(tiff_state);
 
     return SAIL_OK;
 }
