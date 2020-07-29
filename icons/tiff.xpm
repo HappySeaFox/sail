@@ -1,0 +1,34 @@
+/* XPM */
+static const char *codec_tiff[] = {
+/* columns rows colors chars-per-pixel */
+"16 16 12 1",
+"  c gray27",
+". c #4C4C4C",
+"X c #000099",
+"o c #CF0008",
+"O c #AEAEAE",
+"+ c gray69",
+"@ c #B1B1B1",
+"# c #C8C8C8",
+"$ c #DDDDDD",
+"% c #F3F3F3",
+"& c gray100",
+"* c None",
+/* pixels */
+"..........+*****",
+".########.$O****",
+".#&&&&&&#.%$+***",
+".#&&&&&&#....***",
+".#&&&&&&####.***",
+".               ",
+".XXXXXXXXXXXXXX ",
+".X&&&X&X&&X&&&X ",
+".XX&XX&X&XX&XXX ",
+".XX&XX&X&&X&&XX ",
+".XX&XX&X&XX&XXX ",
+".XX&XX&X&XX&XXX ",
+".XXXXXXXXXXXXXX ",
+".               ",
+".###########.***",
+"*............***"
+};
