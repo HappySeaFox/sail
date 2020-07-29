@@ -263,7 +263,7 @@ SAIL_EXPORT sail_status_t sail_plugin_read_seek_next_frame_v3(void *state, struc
     }
 #endif
 
-    const char *pixel_format_str = NULL;
+    const char *pixel_format_str;
     SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string((*image)->source_image->pixel_format, &pixel_format_str));
     SAIL_LOG_DEBUG("JPEG: Input pixel format is %s", pixel_format_str);
     SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(jpeg_state->read_options->output_pixel_format, &pixel_format_str));
