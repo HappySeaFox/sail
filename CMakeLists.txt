@@ -259,6 +259,7 @@ message("* Colored output:               ${SAIL_COLORED_OUTPUT}${SAIL_COLORED_OU
 message("* Enabled plugins:              ${PLUGINS}")
 message("* Enabled conditional plugins:  ${ENABLED_CONDITIONAL_PLUGINS}")
 message("* Disabled conditional plugins: ${DISABLED_CONDITIONAL_PLUGINS}")
+message("* Default read output format:   ${SAIL_DEFAULT_READ_OUTPUT_PIXEL_FORMAT}")
 message("*")
 message("***************************************")
 message("")
