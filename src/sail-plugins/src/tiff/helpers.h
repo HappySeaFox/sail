@@ -29,6 +29,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#include "common.h"
 #include "error.h"
 #include "export.h"
 
@@ -37,5 +38,9 @@ SAIL_HIDDEN void my_error_fn(const char *module, const char *format, va_list ap)
 SAIL_HIDDEN void my_warning_fn(const char *module, const char *format, va_list ap);
 
 SAIL_HIDDEN sail_status_t supported_read_output_pixel_format(enum SailPixelFormat pixel_format);
+
+SAIL_HIDDEN sail_status_t tiff_compression_to_sail_compression_type(int compression, enum SailCompressionType *compression_type);
+
+SAIL_HIDDEN sail_status_t sail_compression_type_to_tiff_compression(enum SailCompressionType compression_type, int *compression);
 
 #endif
