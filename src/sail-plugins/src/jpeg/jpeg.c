@@ -281,7 +281,7 @@ SAIL_EXPORT sail_status_t sail_plugin_read_seek_next_pass_v3(void *state, struct
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_plugin_read_frame_v3(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_plugin_read_frame_v3(void *state, struct sail_io *io, struct sail_image *image) {
 
     SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IO(io);

@@ -82,7 +82,7 @@ SAIL_EXPORT sail_status_t sail_plugin_read_seek_next_pass_v3(void *state, struct
  *
  * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_status_t sail_plugin_read_frame_v3(void *state, struct sail_io *io, const struct sail_image *image);
+SAIL_EXPORT sail_status_t sail_plugin_read_frame_v3(void *state, struct sail_io *io, struct sail_image *image);
 
 /*
  * Finilizes reading operation. No more readings are possible after calling this function.
