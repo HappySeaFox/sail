@@ -154,7 +154,6 @@ to a non-NULL value. SAIL does not reset them to a NULL value on error. For exam
 ```C
 void *state = NULL;
 struct sail_image *image;
-void *pixels;
 
 SAIL_TRY(sail_start_reading_file(..., &state));
 
@@ -162,7 +161,7 @@ SAIL_TRY(sail_start_reading_file(..., &state));
  * SAIL frees the 'image' or error, but doesn't reset its value.
  * This code sample prints a non-NULL address on error.
  */
-SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, &image, &pixels),
+SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, &image),
                     /* cleanup */ printf("%p\n", image),
                                   sail_stop_reading(state));
 ```
