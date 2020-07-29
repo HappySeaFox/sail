@@ -46,10 +46,8 @@ extern "C" {
  */
 
 /*
- * Starts decoding the specified io stream using the specified options (or NULL to use defaults).
- * The specified read options will be deep copied into an internal buffer.
- *
- * If the specified read options is NULL, plugin-specific defaults will be used.
+ * Starts decoding the specified io stream using the specified options. The specified read options
+ * will be deep copied into an internal buffer.
  *
  * STATE explanation: Pass the address of a local void* pointer. Plugins will store an internal state
  * in it and destroy it in sail_plugin_read_finish_vx(). States must be used per image. DO NOT use the same state
@@ -60,11 +58,15 @@ extern "C" {
 SAIL_EXPORT sail_status_t sail_plugin_read_init_v3(struct sail_io *io, const struct sail_read_options *read_options, void **state);
 
 /*
- * Seeks to the next frame. The frame is NOT immediately read or decoded by most SAIL plugins. One could
- * use this method to quickly detect the image dimensions without parsing the whole file or frame.
+ * Seeks to the next frame. The frame is NOT immediately read or decoded by most SAIL plugins.
+ * SAIL uses this method in reading and probing operations.
  *
- * Use sail_plugin_read_seek_next_pass() + sail_plugin_read_frame() to actually read the frame.
- * The assigned image MUST be destroyed later with sail_destroy_image().
+ * SAIL uses sail_plugin_read_seek_next_pass() + sail_plugin_read_frame() to actually read the frame.
+ * The assigned image MUST be destroyed later with sail_destroy_image() by the client.
+ *
+ * This method MUST allocate the image and the source image (sail_image.sail_source_image).
+ * It MUST NOT allocate image pixels. They will be allocated by libsail and will be available in
+ * sail_plugin_read_seek_next_pass()/sail_plugin_read_frame().
  *
  * Returns 0 on success or sail_status_t on error.
  */
@@ -78,7 +80,7 @@ SAIL_EXPORT sail_status_t sail_plugin_read_seek_next_frame_v3(void *state, struc
 SAIL_EXPORT sail_status_t sail_plugin_read_seek_next_pass_v3(void *state, struct sail_io *io, const struct sail_image *image);
 
 /*
- * Reads the next frame of the current image in the current pass.
+ * Reads the next frame of the current image in the current pass. The image pixels are pre-allocated by libsail.
  *
  * Returns 0 on success or sail_status_t on error.
  */
@@ -98,10 +100,8 @@ SAIL_EXPORT sail_status_t sail_plugin_read_finish_v3(void **state, struct sail_i
  */
 
 /*
- * Starts encoding the specified io stream using the specified options (or NULL to use defaults).
- * The specified write options will be deep copied into an internal buffer.
- *
- * If the specified write options is NULL, plugin-specific defaults will be used.
+ * Starts encoding the specified io stream using the specified options. The specified write options
+ * will be deep copied into an internal buffer.
  *
  * STATE explanation: Pass the address of a local void* pointer. Plugins will store an internal state
  * in it and destroy it in sail_plugin_write_finish_vx(). States must be used per image. DO NOT use the same state
