@@ -193,7 +193,7 @@ do {                              \
  */
 #define SAIL_TRY_OR_EXECUTE(sail_func, ...)       \
 do {                                              \
-    sail_status_t __sail_error_result;             \
+    sail_status_t __sail_error_result;            \
                                                   \
     if ((__sail_error_result = sail_func) != 0) { \
         __VA_ARGS__;                              \
