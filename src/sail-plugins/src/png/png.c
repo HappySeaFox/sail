@@ -87,7 +87,7 @@ struct png_state {
 #endif
 };
 
-static int alloc_png_state(struct png_state **png_state) {
+static sail_status_t alloc_png_state(struct png_state **png_state) {
 
     void *ptr;
     SAIL_TRY(sail_malloc(&ptr, sizeof(struct png_state)));
