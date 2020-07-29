@@ -85,6 +85,23 @@ static sail_status_t alloc_jpeg_state(struct jpeg_state **jpeg_state) {
     return SAIL_OK;
 }
 
+static void destroy_jpeg_state(struct jpeg_state *jpeg_state) {
+
+    if (jpeg_state == NULL) {
+        return;
+    }
+
+    sail_free(jpeg_state->decompress_context);
+    sail_free(jpeg_state->compress_context);
+
+    sail_destroy_read_options(jpeg_state->read_options);
+    sail_destroy_write_options(jpeg_state->write_options);
+
+    sail_free(jpeg_state->extra_scan_line);
+
+    sail_free(jpeg_state);
+}
+
 /*
  * Decoding functions.
  */
@@ -325,21 +342,17 @@ SAIL_EXPORT sail_status_t sail_plugin_read_finish_v3(void **state, struct sail_i
     /* Subsequent calls to finish() will expectedly fail in the above line. */
     *state = NULL;
 
-    sail_destroy_read_options(jpeg_state->read_options);
-    sail_free(jpeg_state->extra_scan_line);
-
     if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0) {
-        sail_free(jpeg_state);
+        destroy_jpeg_state(jpeg_state);
         return SAIL_ERROR_UNDERLYING_CODEC;
     }
 
     if (jpeg_state->decompress_context != NULL) {
         jpeg_abort_decompress(jpeg_state->decompress_context);
         jpeg_destroy_decompress(jpeg_state->decompress_context);
-        sail_free(jpeg_state->decompress_context);
     }
 
-    sail_free(jpeg_state);
+    destroy_jpeg_state(jpeg_state);
 
     return SAIL_OK;
 }
@@ -526,11 +539,8 @@ SAIL_EXPORT sail_status_t sail_plugin_write_finish_v3(void **state, struct sail_
     /* Subsequent calls to finish() will expectedly fail in the above line. */
     *state = NULL;
 
-    sail_destroy_write_options(jpeg_state->write_options);
-    sail_free(jpeg_state->extra_scan_line);
-
     if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0) {
-        sail_free(jpeg_state);
+        destroy_jpeg_state(jpeg_state);
         return SAIL_ERROR_UNDERLYING_CODEC;
     }
 
@@ -540,10 +550,9 @@ SAIL_EXPORT sail_status_t sail_plugin_write_finish_v3(void **state, struct sail_
         }
 
         jpeg_destroy_compress(jpeg_state->compress_context);
-        sail_free(jpeg_state->compress_context);
     }
 
-    sail_free(jpeg_state);
+    destroy_jpeg_state(jpeg_state);
 
     return SAIL_OK;
 }
