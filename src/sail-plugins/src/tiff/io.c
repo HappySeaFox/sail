@@ -90,5 +90,5 @@ toff_t my_dummy_size_proc(thandle_t client_data) {
 
     (void)client_data;
 
-    return 0;
+    return (toff_t)-1;
 }
