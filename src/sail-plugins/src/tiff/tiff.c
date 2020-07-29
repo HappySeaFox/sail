@@ -67,6 +67,20 @@ static sail_status_t alloc_tiff_state(struct tiff_state **tiff_state) {
     return SAIL_OK;
 }
 
+static void destroy_tiff_state(struct tiff_state *tiff_state) {
+
+    if (tiff_state == NULL) {
+        return;
+    }
+
+    sail_destroy_read_options(tiff_state->read_options);
+    sail_destroy_write_options(tiff_state->write_options);
+
+    sail_free(tiff_state->scanline);
+
+    sail_free(tiff_state);
+}
+
 /*
  * Decoding functions.
  */
@@ -183,14 +197,11 @@ SAIL_EXPORT sail_status_t sail_plugin_read_finish_v3(void **state, struct sail_i
     /* Subsequent calls to finish() will expectedly fail in the above line. */
     *state = NULL;
 
-    sail_destroy_read_options(tiff_state->read_options);
-
     if (tiff_state->tiff != NULL) {
         TIFFCleanup(tiff_state->tiff);
     }
 
-    sail_free(tiff_state->scanline);
-    sail_free(tiff_state);
+    destroy_tiff_state(tiff_state);
 
     return SAIL_OK;
 }
@@ -397,15 +408,12 @@ SAIL_EXPORT sail_status_t sail_plugin_write_finish_v3(void **state, struct sail_
     /* Subsequent calls to finish() will expectedly fail in the above line. */
     *state = NULL;
 
-    sail_destroy_write_options(tiff_state->write_options);
-
     /* Error handling setup. */
     if (tiff_state->tiff != NULL) {
         TIFFCleanup(tiff_state->tiff);
     }
 
-    sail_free(tiff_state->scanline);
-    sail_free(tiff_state);
+    destroy_tiff_state(tiff_state);
 
     return SAIL_OK;
 }
