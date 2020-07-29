@@ -672,7 +672,7 @@ SAIL_EXPORT sail_status_t sail_plugin_write_seek_next_frame_v3(void *state, stru
         png_set_interlace_handling(png_state->png_ptr);
     }
 
-    const char *pixel_format_str = NULL;
+    const char *pixel_format_str;
     SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(image->pixel_format, &pixel_format_str));
     SAIL_LOG_DEBUG("PNG: Input pixel format is %s", pixel_format_str);
     SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(png_state->write_options->output_pixel_format, &pixel_format_str));
