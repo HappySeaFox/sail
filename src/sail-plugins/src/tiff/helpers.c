@@ -257,6 +257,7 @@ sail_status_t fetch_meta_info(TIFF *tiff, struct sail_meta_entry_node ***last_me
     SAIL_TRY(fetch_single_meta_info(tiff, TIFFTAG_MODEL,            "Model",         last_meta_entry_node));
     SAIL_TRY(fetch_single_meta_info(tiff, TIFFTAG_SOFTWARE,         "Software",      last_meta_entry_node));
     SAIL_TRY(fetch_single_meta_info(tiff, TIFFTAG_ARTIST,           "Artist",        last_meta_entry_node));
+    SAIL_TRY(fetch_single_meta_info(tiff, TIFFTAG_COPYRIGHT,        "Copyright",     last_meta_entry_node));
 
     return SAIL_OK;
 }
