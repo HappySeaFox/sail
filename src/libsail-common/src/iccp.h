@@ -62,12 +62,20 @@ typedef struct sail_iccp sail_iccp_t;
 SAIL_EXPORT sail_status_t sail_alloc_iccp(struct sail_iccp **iccp);
 
 /*
- * Allocates a new ICC profile with the specified ICC profile data. The assigned profile MUST be destroyed
- * later with sail_destroy_iccp().
+ * Allocates a new ICC profile and deep copies the specified ICC profile data into it.
+ * The assigned profile MUST be destroyed later with sail_destroy_iccp().
  *
  * Returns 0 on success or sail_status_t on error.
  */
 SAIL_EXPORT sail_status_t sail_alloc_iccp_with_data(struct sail_iccp **iccp, const void *data, unsigned data_length);
+
+/*
+ * Allocates a new ICC profile and copies the pointer to the specified ICC profile data into it.
+ * The assigned profile MUST be destroyed later with sail_destroy_iccp().
+ *
+ * Returns 0 on success or sail_status_t on error.
+ */
+SAIL_EXPORT sail_status_t sail_alloc_iccp_with_shallow_data(struct sail_iccp **iccp, void *data, unsigned data_length);
 
 /*
  * Destroys the specified ICC profile and all its internal allocated memory buffers.
