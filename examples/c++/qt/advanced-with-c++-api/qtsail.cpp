@@ -63,6 +63,7 @@ sail_status_t QtSail::init()
                                                           "This demo doesn't include:"
                                                           "<ul>"
                                                           "<li>Selecting pixel format to output</li>"
+                                                          "<li>Printing all meta info entries into stderr</li>"
                                                           "</ul>"));
     });
 

@@ -81,6 +81,7 @@ sail_status_t QtSail::init()
                                                           "<ul>"
                                                           "<li>Selecting pixel format to output</li>"
                                                           "<li>Displaying indexed images (if SOURCE is selected)</li>"
+                                                          "<li>Printing all meta info entries into stderr</li>"
                                                           "</ul>"
                                                           "This demo doesn't include:"
                                                           "<ul>"
@@ -224,6 +225,11 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
 
     if (node != nullptr) {
         meta = tr("%1: %2").arg(node->key).arg(QString(node->value).left(24).replace('\n', ' '));
+
+        while (node != nullptr) {
+            SAIL_LOG_DEBUG("[META] %s: %s", node->key, node->value);
+            node = node->next;
+        }
     }
 
     const char *source_pixel_format_str;
