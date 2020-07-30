@@ -236,30 +236,8 @@ SAIL_EXPORT sail_status_t sail_plugin_read_seek_next_frame_v3(void *state, struc
 
     /* Read meta info. */
     if (jpeg_state->read_options->io_options & SAIL_IO_OPTION_META_INFO) {
-        SAIL_LOG_DEBUG("JPEG: Try to read the text comments if any");
-
-        jpeg_saved_marker_ptr it = jpeg_state->decompress_context->marker_list;
-        struct sail_meta_entry_node **last_meta_entry_node = &(*image)->meta_entry_node;
-
-        while(it != NULL) {
-            if(it->marker == JPEG_COM) {
-                struct sail_meta_entry_node *meta_entry_node;
-
-                SAIL_TRY_OR_CLEANUP(sail_alloc_meta_entry_node(&meta_entry_node),
-                                    /* cleanup */ sail_destroy_image(*image));
-                SAIL_TRY_OR_CLEANUP(sail_strdup("Comment", &meta_entry_node->key),
-                                    /* cleanup */ sail_destroy_meta_entry_node(meta_entry_node),
-                                                  sail_destroy_image(*image));
-                SAIL_TRY_OR_CLEANUP(sail_strdup_length((const char *)it->data, it->data_length, &meta_entry_node->value),
-                                    /* cleanup */ sail_destroy_meta_entry_node(meta_entry_node),
-                                                  sail_destroy_image(*image));
-
-                *last_meta_entry_node = meta_entry_node;
-                last_meta_entry_node = &meta_entry_node->next;
-            }
-
-            it = it->next;
-        }
+        SAIL_TRY_OR_CLEANUP(fetch_meta_info(jpeg_state->decompress_context, &(*image)->meta_entry_node),
+                            /* cleanup */ sail_destroy_image(*image));
     }
 
     /* Read ICC profile. */
@@ -268,14 +246,8 @@ SAIL_EXPORT sail_status_t sail_plugin_read_seek_next_frame_v3(void *state, struc
         if (jpeg_state->extra_scan_line_needed_for_cmyk) {
             SAIL_LOG_DEBUG("JPEG: Skipping the ICC profile (if any) as we convert from CMYK");
         } else {
-            SAIL_TRY_OR_CLEANUP(sail_alloc_iccp(&(*image)->iccp),
+            SAIL_TRY_OR_CLEANUP(fetch_iccp(jpeg_state->decompress_context, &(*image)->iccp),
                                 /* cleanup */ sail_destroy_image(*image));
-
-            SAIL_LOG_DEBUG("JPEG: ICC profile is %sfound",
-                            jpeg_read_icc_profile(jpeg_state->decompress_context,
-                                                    (JOCTET **)&(*image)->iccp->data,
-                                                    &(*image)->iccp->data_length)
-                            ? "" : "not ");
         }
     }
 #endif

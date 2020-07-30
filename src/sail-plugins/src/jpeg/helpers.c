@@ -174,3 +174,50 @@ sail_status_t convert_cmyk(unsigned char *pixels_source, unsigned char *pixels_t
         }
     }
 }
+
+sail_status_t fetch_meta_info(struct jpeg_decompress_struct *decompress_context, struct sail_meta_entry_node **last_meta_entry_node) {
+
+    SAIL_CHECK_META_ENTRY_NODE_PTR(last_meta_entry_node);
+
+    jpeg_saved_marker_ptr it = decompress_context->marker_list;
+
+    while(it != NULL) {
+        if(it->marker == JPEG_COM) {
+            struct sail_meta_entry_node *meta_entry_node;
+
+            SAIL_TRY(sail_alloc_meta_entry_node(&meta_entry_node));
+            SAIL_TRY_OR_CLEANUP(sail_strdup("Comment", &meta_entry_node->key),
+                                /* cleanup */ sail_destroy_meta_entry_node(meta_entry_node));
+            SAIL_TRY_OR_CLEANUP(sail_strdup_length((const char *)it->data, it->data_length, &meta_entry_node->value),
+                                /* cleanup */ sail_destroy_meta_entry_node(meta_entry_node));
+
+            *last_meta_entry_node = meta_entry_node;
+            last_meta_entry_node = &meta_entry_node->next;
+        }
+
+        it = it->next;
+    }
+
+    return SAIL_OK;
+}
+
+sail_status_t fetch_iccp(struct jpeg_decompress_struct *decompress_context, struct sail_iccp **iccp) {
+
+    SAIL_CHECK_ICCP_PTR(iccp);
+
+    void *data = NULL;
+    unsigned data_length = 0;
+
+    SAIL_LOG_DEBUG("JPEG: ICC profile is %sfound",
+                   jpeg_read_icc_profile(decompress_context,
+                                         (JOCTET **)&data,
+                                         &data_length)
+                   ? "" : "not ");
+
+    if (data != NULL && data_length > 0) {
+        SAIL_TRY_OR_CLEANUP(sail_alloc_iccp_with_shallow_data(iccp, data, data_length),
+                            /* cleanup */ sail_free(data));
+    }
+
+    return SAIL_OK;
+}

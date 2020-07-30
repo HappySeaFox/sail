@@ -35,6 +35,9 @@
 #include "common.h"
 #include "export.h"
 
+struct sail_iccp;
+struct sail_meta_entry_node;
+
 struct my_error_context {
     struct jpeg_error_mgr jpeg_error_mgr;
     jmp_buf setjmp_buffer;
@@ -51,5 +54,9 @@ SAIL_HIDDEN J_COLOR_SPACE pixel_format_to_color_space(enum SailPixelFormat pixel
 SAIL_HIDDEN sail_status_t auto_output_color_space(enum SailPixelFormat input_pixel_format, J_COLOR_SPACE *output_color_space);
 
 SAIL_HIDDEN sail_status_t convert_cmyk(unsigned char *pixels_source, unsigned char *pixels_target, unsigned width, enum SailPixelFormat target_pixel_format);
+
+SAIL_HIDDEN sail_status_t fetch_meta_info(struct jpeg_decompress_struct *decompress_context, struct sail_meta_entry_node **last_meta_entry_node);
+
+SAIL_HIDDEN sail_status_t fetch_iccp(struct jpeg_decompress_struct *decompress_context, struct sail_iccp **iccp);
 
 #endif
