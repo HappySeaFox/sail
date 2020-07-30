@@ -547,6 +547,19 @@ sail_status_t sail_bits_per_pixel(enum SailPixelFormat pixel_format, unsigned *r
         case SAIL_PIXEL_FORMAT_AUTO:      return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
         case SAIL_PIXEL_FORMAT_SOURCE:    return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
 
+        case SAIL_PIXEL_FORMAT_BPP1:   *result = 1;   return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP2:   *result = 2;   return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP4:   *result = 4;   return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP8:   *result = 8;   return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP16:  *result = 16;  return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP24:  *result = 24;  return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP32:  *result = 32;  return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP48:  *result = 48;  return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP64:  *result = 64;  return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP72:  *result = 72;  return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP96:  *result = 96;  return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP128: *result = 128; return SAIL_OK;
+
         case SAIL_PIXEL_FORMAT_BPP1_INDEXED:  *result = 1; return SAIL_OK;
         case SAIL_PIXEL_FORMAT_BPP2_INDEXED:  *result = 2; return SAIL_OK;
         case SAIL_PIXEL_FORMAT_BPP4_INDEXED:  *result = 4; return SAIL_OK;
