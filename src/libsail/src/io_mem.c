@@ -142,7 +142,7 @@ static sail_status_t io_mem_tell(void *stream, size_t *offset) {
 
     *offset = mem_io_buffer_info->pos;
 
-    return SAIL_ERROR_NOT_IMPLEMENTED;
+    return SAIL_OK;
 }
 
 static sail_status_t io_mem_write(void *stream, const void *buf, size_t object_size, size_t objects_count, size_t *written_objects_count) {
