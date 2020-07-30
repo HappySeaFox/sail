@@ -173,13 +173,13 @@ SAIL_EXPORT sail_status_t sail_plugin_read_seek_next_frame_v3(void *state, struc
     }
 
     /* Fetch meta info and ICCP. */
-    if (tiff_state->read_options->io_options & SAIL_IO_OPTION_META_INFO && tiff_state->current_frame == 1) {
+    if (tiff_state->read_options->io_options & SAIL_IO_OPTION_META_INFO) {
         struct sail_meta_entry_node **last_meta_entry_node = &(*image)->meta_entry_node;
 
         SAIL_TRY_OR_CLEANUP(fetch_meta_info(tiff_state->tiff, &last_meta_entry_node),
                             /* cleanup */ sail_destroy_image(*image));
     }
-    if (tiff_state->read_options->io_options & SAIL_IO_OPTION_ICCP && tiff_state->current_frame == 1) {
+    if (tiff_state->read_options->io_options & SAIL_IO_OPTION_ICCP) {
         SAIL_TRY_OR_CLEANUP(fetch_iccp(tiff_state->tiff, &(*image)->iccp),
                             /* cleanup */ sail_destroy_image(*image));
     }
