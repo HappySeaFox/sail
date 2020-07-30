@@ -85,6 +85,23 @@ static sail_status_t alloc_jpeg_state(struct jpeg_state **jpeg_state) {
     return SAIL_OK;
 }
 
+static void destroy_jpeg_state(struct jpeg_state *jpeg_state) {
+
+    if (jpeg_state == NULL) {
+        return;
+    }
+
+    sail_free(jpeg_state->decompress_context);
+    sail_free(jpeg_state->compress_context);
+
+    sail_destroy_read_options(jpeg_state->read_options);
+    sail_destroy_write_options(jpeg_state->write_options);
+
+    sail_free(jpeg_state->extra_scan_line);
+
+    sail_free(jpeg_state);
+}
+
 /*
  * Decoding functions.
  */
@@ -281,7 +298,7 @@ SAIL_EXPORT sail_status_t sail_plugin_read_seek_next_pass_v3(void *state, struct
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_plugin_read_frame_v3(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_plugin_read_frame_v3(void *state, struct sail_io *io, struct sail_image *image) {
 
     SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IO(io);
@@ -301,7 +318,7 @@ SAIL_EXPORT sail_status_t sail_plugin_read_frame_v3(void *state, struct sail_io 
     for (unsigned row = 0; row < image->height; row++) {
         unsigned char *scanline = (unsigned char *)image->pixels + row * image->bytes_per_line;
 
-        /* Convert the CMYK image to BPP24-RGB/BPP32-RGBA. */
+        /* Convert the CMYK image to BPP32-RGBA/BPP32-BGRA/etc. */
         if (jpeg_state->extra_scan_line_needed_for_cmyk) {
             JSAMPROW samprow = (JSAMPROW)jpeg_state->extra_scan_line;
             (void)jpeg_read_scanlines(jpeg_state->decompress_context, &samprow, 1);
@@ -325,21 +342,17 @@ SAIL_EXPORT sail_status_t sail_plugin_read_finish_v3(void **state, struct sail_i
     /* Subsequent calls to finish() will expectedly fail in the above line. */
     *state = NULL;
 
-    sail_destroy_read_options(jpeg_state->read_options);
-    sail_free(jpeg_state->extra_scan_line);
-
     if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0) {
-        sail_free(jpeg_state);
+        destroy_jpeg_state(jpeg_state);
         return SAIL_ERROR_UNDERLYING_CODEC;
     }
 
     if (jpeg_state->decompress_context != NULL) {
         jpeg_abort_decompress(jpeg_state->decompress_context);
         jpeg_destroy_decompress(jpeg_state->decompress_context);
-        sail_free(jpeg_state->decompress_context);
     }
 
-    sail_free(jpeg_state);
+    destroy_jpeg_state(jpeg_state);
 
     return SAIL_OK;
 }
@@ -526,11 +539,8 @@ SAIL_EXPORT sail_status_t sail_plugin_write_finish_v3(void **state, struct sail_
     /* Subsequent calls to finish() will expectedly fail in the above line. */
     *state = NULL;
 
-    sail_destroy_write_options(jpeg_state->write_options);
-    sail_free(jpeg_state->extra_scan_line);
-
     if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0) {
-        sail_free(jpeg_state);
+        destroy_jpeg_state(jpeg_state);
         return SAIL_ERROR_UNDERLYING_CODEC;
     }
 
@@ -540,10 +550,9 @@ SAIL_EXPORT sail_status_t sail_plugin_write_finish_v3(void **state, struct sail_
         }
 
         jpeg_destroy_compress(jpeg_state->compress_context);
-        sail_free(jpeg_state->compress_context);
     }
 
-    sail_free(jpeg_state);
+    destroy_jpeg_state(jpeg_state);
 
     return SAIL_OK;
 }

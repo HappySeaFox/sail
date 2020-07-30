@@ -47,7 +47,7 @@ struct sail_read_features {
 
     /*
      * A list of supported pixel formats that can be output by this plugin.
-     * The BPP24-RGB and BPP32-RGBA output pixel formats are always supported. Most image format plugins
+     * The BPP32-RGBA and BPP32-BGRA output pixel formats are always supported. Most image format plugins
      * are able to output the SOURCE pixel format as well. Some plugins may support even more output pixel formats.
      */
     enum SailPixelFormat *output_pixel_formats;

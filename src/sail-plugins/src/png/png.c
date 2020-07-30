@@ -130,6 +130,30 @@ static sail_status_t alloc_png_state(struct png_state **png_state) {
     return SAIL_OK;
 }
 
+static void destroy_png_state(struct png_state *png_state) {
+
+    if (png_state == NULL) {
+        return;
+    }
+
+    sail_destroy_read_options(png_state->read_options);
+    sail_destroy_write_options(png_state->write_options);
+
+#ifdef PNG_APNG_SUPPORTED
+    sail_free(png_state->temp_scanline);
+    sail_free(png_state->scanline_for_skipping);
+
+    if (png_state->first_image != NULL) {
+        destroy_rows(&png_state->prev, png_state->first_image->height);
+    }
+#endif
+
+    sail_destroy_image(png_state->first_image);
+    sail_destroy_iccp(png_state->iccp);
+
+    sail_free(png_state);
+}
+
 /*
  * Decoding functions.
  */
@@ -421,7 +445,7 @@ SAIL_EXPORT sail_status_t sail_plugin_read_seek_next_pass_v3(void *state, struct
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_plugin_read_frame_v3(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_plugin_read_frame_v3(void *state, struct sail_io *io, struct sail_image *image) {
 
     SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IO(io);
@@ -499,19 +523,9 @@ SAIL_EXPORT sail_status_t sail_plugin_read_finish_v3(void **state, struct sail_i
     /* Subsequent calls to finish() will expectedly fail in the above line. */
     *state = NULL;
 
-#ifdef PNG_APNG_SUPPORTED
-    sail_free(png_state->temp_scanline);
-    sail_free(png_state->scanline_for_skipping);
-    destroy_rows(&png_state->prev, png_state->first_image->height);
-#endif
-
-    sail_destroy_image(png_state->first_image);
-    sail_destroy_iccp(png_state->iccp);
-    sail_destroy_read_options(png_state->read_options);
-
     if (png_state->png_ptr != NULL) {
         if (setjmp(png_jmpbuf(png_state->png_ptr))) {
-            sail_free(png_state);
+            destroy_png_state(png_state);
             return SAIL_ERROR_UNDERLYING_CODEC;
         }
     }
@@ -520,7 +534,7 @@ SAIL_EXPORT sail_status_t sail_plugin_read_finish_v3(void **state, struct sail_i
         png_destroy_read_struct(&png_state->png_ptr, &png_state->info_ptr, NULL);
     }
 
-    sail_free(png_state);
+    destroy_png_state(png_state);
 
     return SAIL_OK;
 }
@@ -725,12 +739,10 @@ SAIL_EXPORT sail_status_t sail_plugin_write_finish_v3(void **state, struct sail_
     /* Subsequent calls to finish() will expectedly fail in the above line. */
     *state = NULL;
 
-    sail_destroy_write_options(png_state->write_options);
-
     /* Error handling setup. */
     if (png_state->png_ptr != NULL) {
         if (setjmp(png_jmpbuf(png_state->png_ptr))) {
-            sail_free(png_state);
+            destroy_png_state(png_state);
             return SAIL_ERROR_UNDERLYING_CODEC;
         }
     }
@@ -743,7 +755,7 @@ SAIL_EXPORT sail_status_t sail_plugin_write_finish_v3(void **state, struct sail_
         png_destroy_write_struct(&png_state->png_ptr, &png_state->info_ptr);
     }
 
-    sail_free(png_state);
+    destroy_png_state(png_state);
 
     return SAIL_OK;
 }

@@ -51,7 +51,7 @@ struct sail_io;
 /* V3 declarations. */
 typedef sail_status_t (*sail_plugin_read_init_v3_t)           (struct sail_io *io, const struct sail_read_options *read_options, void **state);
 typedef sail_status_t (*sail_plugin_read_seek_next_frame_v3_t)(void *state, struct sail_io *io, struct sail_image **image);
-typedef sail_status_t (*sail_plugin_read_seek_next_pass_v3_t) (void *state, struct sail_io *io, const struct sail_image *image);
+typedef sail_status_t (*sail_plugin_read_seek_next_pass_v3_t) (void *state, struct sail_io *io, struct sail_image *image);
 typedef sail_status_t (*sail_plugin_read_frame_v3_t)          (void *state, struct sail_io *io, const struct sail_image *image);
 typedef sail_status_t (*sail_plugin_read_finish_v3_t)         (void **state, struct sail_io *io);
 

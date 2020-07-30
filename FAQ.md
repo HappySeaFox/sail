@@ -189,8 +189,8 @@ For example, some plugins may be able to read just 3 input pixel formats. Other 
 
 ## What pixel formats SAIL is able to output after reading an image file?
 
-SAIL is always able to output the `BPP24-RGB` and `BPP32-RGBA` pixel formats after reading. Most plugins are able
-to output the `SOURCE` pixel format as well. Some plugins may support even more output pixel formats.
+SAIL is always able to output pixels in the `BPP32-RGBA` and `BPP32-BGRA` pixel formats after reading.
+Most plugins are able to output the `SOURCE` pixel format as well. Some plugins support even more output pixel formats.
 Use `sail_plugin_info_from_extension() -> plugin_info -> read_features -> output_pixel_formats` to determine
 the list of supported output pixel formats per plugin.
 

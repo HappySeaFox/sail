@@ -114,35 +114,63 @@ sail_status_t auto_output_color_space(enum SailPixelFormat input_pixel_format, J
     }
 }
 
+static void get_cmyk(unsigned char **pixels, unsigned char *C, unsigned char *M, unsigned char *Y, unsigned char *K) {
+
+    *C = (unsigned char)(*(*pixels)++ / 100.0);
+    *M = (unsigned char)(*(*pixels)++ / 100.0);
+    *Y = (unsigned char)(*(*pixels)++ / 100.0);
+    *K = (unsigned char)(*(*pixels)++ / 100.0);
+}
+
 sail_status_t convert_cmyk(unsigned char *pixels_source, unsigned char *pixels_target, unsigned width, enum SailPixelFormat target_pixel_format) {
     unsigned char C, M, Y, K;
 
-    if (target_pixel_format == SAIL_PIXEL_FORMAT_BPP24_RGB) {
-        for (unsigned i = 0; i < width; i++) {
-            C = (unsigned char)(*pixels_source++ / 100.0);
-            M = (unsigned char)(*pixels_source++ / 100.0);
-            Y = (unsigned char)(*pixels_source++ / 100.0);
-            K = (unsigned char)(*pixels_source++ / 100.0);
+    switch (target_pixel_format) {
+        case SAIL_PIXEL_FORMAT_BPP32_RGBA: {
+            for (unsigned i = 0; i < width; i++) {
+                get_cmyk(&pixels_source, &C, &M, &Y, &K);
 
-            *pixels_target++ = 255 * (1-C) * (1-K);
-            *pixels_target++ = 255 * (1-M) * (1-K);
-            *pixels_target++ = 255 * (1-Y) * (1-K);
+                *pixels_target++ = 255 * (1-C) * (1-K);
+                *pixels_target++ = 255 * (1-M) * (1-K);
+                *pixels_target++ = 255 * (1-Y) * (1-K);
+                *pixels_target++ = 255;
+            }
+            return SAIL_OK;
         }
-    } else if (target_pixel_format == SAIL_PIXEL_FORMAT_BPP32_RGBA) {
-        for (unsigned i = 0; i < width; i++) {
-            C = (unsigned char)(*pixels_source++ / 100.0);
-            M = (unsigned char)(*pixels_source++ / 100.0);
-            Y = (unsigned char)(*pixels_source++ / 100.0);
-            K = (unsigned char)(*pixels_source++ / 100.0);
+        case SAIL_PIXEL_FORMAT_BPP32_BGRA: {
+            for (unsigned i = 0; i < width; i++) {
+                get_cmyk(&pixels_source, &C, &M, &Y, &K);
 
-            *pixels_target++ = 255 * (1-C) * (1-K);
-            *pixels_target++ = 255 * (1-M) * (1-K);
-            *pixels_target++ = 255 * (1-Y) * (1-K);
-            *pixels_target++ = 255;
+                *pixels_target++ = 255 * (1-Y) * (1-K);
+                *pixels_target++ = 255 * (1-M) * (1-K);
+                *pixels_target++ = 255 * (1-C) * (1-K);
+                *pixels_target++ = 255;
+            }
+            return SAIL_OK;
         }
-    } else {
-        return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
+        case SAIL_PIXEL_FORMAT_BPP24_RGB: {
+            for (unsigned i = 0; i < width; i++) {
+                get_cmyk(&pixels_source, &C, &M, &Y, &K);
+
+                *pixels_target++ = 255 * (1-C) * (1-K);
+                *pixels_target++ = 255 * (1-M) * (1-K);
+                *pixels_target++ = 255 * (1-Y) * (1-K);
+            }
+            return SAIL_OK;
+        }
+        case SAIL_PIXEL_FORMAT_BPP24_BGR: {
+            for (unsigned i = 0; i < width; i++) {
+                get_cmyk(&pixels_source, &C, &M, &Y, &K);
+
+                *pixels_target++ = 255 * (1-Y) * (1-K);
+                *pixels_target++ = 255 * (1-M) * (1-K);
+                *pixels_target++ = 255 * (1-C) * (1-K);
+            }
+            return SAIL_OK;
+        }
+
+        default: {
+            return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
+        }
     }
-
-    return SAIL_OK;
 }
