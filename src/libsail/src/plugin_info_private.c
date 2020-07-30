@@ -289,8 +289,8 @@ static sail_status_t inih_handler_sail_error(void *data, const char *section, co
                                                         &plugin_info->write_features->compression_types_length,
                                                         compression_type_from_string),
                                 /* cleanup */ SAIL_LOG_ERROR("Failed to parse compression types: '%s'", value));
-        } else if (strcmp(name, "preferred-compression-type") == 0) {
-            SAIL_TRY_OR_CLEANUP(sail_compression_type_from_string(value, &plugin_info->write_features->preferred_compression_type),
+        } else if (strcmp(name, "default-compression-type") == 0) {
+            SAIL_TRY_OR_CLEANUP(sail_compression_type_from_string(value, &plugin_info->write_features->default_compression_type),
                                 /* cleanup */ SAIL_LOG_ERROR("Failed to parse compression type: '%s'", value));
         } else if (strcmp(name, "compression-min") == 0) {
             plugin_info->write_features->compression_min = atoi(value);

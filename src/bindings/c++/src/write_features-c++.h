@@ -60,7 +60,7 @@ public:
     int features() const;
     int properties() const;
     const std::vector<SailCompressionType>& compression_types() const;
-    SailCompressionType preferred_compression_type() const;
+    SailCompressionType default_compression_type() const;
     int compression_min() const;
     int compression_max() const;
     int compression_default() const;
@@ -79,7 +79,7 @@ private:
     write_features& with_features(int features);
     write_features& with_properties(int properties);
     write_features& with_compression_types(const std::vector<SailCompressionType> &compression_types);
-    write_features& with_preferred_compression_type(SailCompressionType preferred_compression_type);
+    write_features& with_default_compression_type(SailCompressionType default_compression_type);
     write_features& with_compression_min(int compression_min);
     write_features& with_compression_max(int compression_max);
     write_features& with_compression_default(int compression_default);

@@ -76,7 +76,7 @@ sail_status_t sail_write_options_from_features(const struct sail_write_features 
 
     /* Compression levels are not supported. */
     if (write_features->compression_min == write_features->compression_max) {
-        write_options->compression_type = write_features->preferred_compression_type;
+        write_options->compression_type = write_features->default_compression_type;
     } else {
         write_options->compression = write_features->compression_default;
     }

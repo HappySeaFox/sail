@@ -37,7 +37,7 @@ public:
         : sail_write_features_c(nullptr)
         , features(0)
         , properties(0)
-        , preferred_compression_type(SAIL_COMPRESSION_UNSUPPORTED)
+        , default_compression_type(SAIL_COMPRESSION_UNSUPPORTED)
         , compression_min(0)
         , compression_max(0)
         , compression_default(0)
@@ -49,7 +49,7 @@ public:
     int features;
     int properties;
     std::vector<SailCompressionType> compression_types;
-    SailCompressionType preferred_compression_type;
+    SailCompressionType default_compression_type;
     int compression_min;
     int compression_max;
     int compression_default;
@@ -69,7 +69,7 @@ write_features& write_features::operator=(const write_features &wf)
         .with_features(wf.features())
         .with_properties(wf.properties())
         .with_compression_types(compression_types())
-        .with_preferred_compression_type(wf.preferred_compression_type())
+        .with_default_compression_type(wf.default_compression_type())
         .with_compression_min(wf.compression_min())
         .with_compression_max(wf.compression_max())
         .with_compression_default(wf.compression_default());
@@ -102,9 +102,9 @@ const std::vector<SailCompressionType>& write_features::compression_types() cons
     return d->compression_types;
 }
 
-SailCompressionType write_features::preferred_compression_type() const
+SailCompressionType write_features::default_compression_type() const
 {
-    return d->preferred_compression_type;
+    return d->default_compression_type;
 }
 
 int write_features::compression_min() const
@@ -183,7 +183,7 @@ write_features::write_features(const sail_write_features *wf)
         .with_features(wf->features)
         .with_properties(wf->properties)
         .with_compression_types(compression_types)
-        .with_preferred_compression_type(wf->preferred_compression_type)
+        .with_default_compression_type(wf->default_compression_type)
         .with_compression_min(wf->compression_min)
         .with_compression_max(wf->compression_max)
             .with_compression_default(wf->compression_default);
@@ -213,9 +213,9 @@ write_features& write_features::with_compression_types(const std::vector<SailCom
     return *this;
 }
 
-write_features& write_features::with_preferred_compression_type(SailCompressionType preferred_compression_type)
+write_features& write_features::with_default_compression_type(SailCompressionType default_compression_type)
 {
-    d->preferred_compression_type = preferred_compression_type;
+    d->default_compression_type = default_compression_type;
     return *this;
 }
 

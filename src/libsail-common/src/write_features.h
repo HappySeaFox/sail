@@ -79,8 +79,8 @@ struct sail_write_features {
     /* The length of compression_types. */
     int compression_types_length;
 
-    /* Preferred compression type to use by default. */
-    enum SailCompressionType preferred_compression_type;
+    /* Compression type to use by default. */
+    enum SailCompressionType default_compression_type;
 
     /*
      * Minimum compression value. For lossy codecs, more compression means less quality and vice versa.
