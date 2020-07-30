@@ -201,6 +201,7 @@ sail_status_t fetch_meta_info(struct jpeg_decompress_struct *decompress_context,
     return SAIL_OK;
 }
 
+#ifdef HAVE_JPEG_ICCP
 sail_status_t fetch_iccp(struct jpeg_decompress_struct *decompress_context, struct sail_iccp **iccp) {
 
     SAIL_CHECK_ICCP_PTR(iccp);
@@ -221,3 +222,4 @@ sail_status_t fetch_iccp(struct jpeg_decompress_struct *decompress_context, stru
 
     return SAIL_OK;
 }
+#endif

@@ -57,6 +57,8 @@ SAIL_HIDDEN sail_status_t convert_cmyk(unsigned char *pixels_source, unsigned ch
 
 SAIL_HIDDEN sail_status_t fetch_meta_info(struct jpeg_decompress_struct *decompress_context, struct sail_meta_entry_node **last_meta_entry_node);
 
+#ifdef HAVE_JPEG_ICCP
 SAIL_HIDDEN sail_status_t fetch_iccp(struct jpeg_decompress_struct *decompress_context, struct sail_iccp **iccp);
+#endif
 
 #endif
