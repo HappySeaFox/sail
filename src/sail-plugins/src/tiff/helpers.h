@@ -29,6 +29,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#include <tiffio.h>
+
 #include "common.h"
 #include "error.h"
 #include "export.h"
@@ -42,5 +44,9 @@ SAIL_HIDDEN sail_status_t supported_read_output_pixel_format(enum SailPixelForma
 SAIL_HIDDEN sail_status_t tiff_compression_to_sail_compression_type(int compression, enum SailCompressionType *compression_type);
 
 SAIL_HIDDEN sail_status_t sail_compression_type_to_tiff_compression(enum SailCompressionType compression_type, int *compression);
+
+SAIL_HIDDEN sail_status_t bpp_to_pixel_format(int bpp, enum SailPixelFormat *pixel_format);
+
+SAIL_HIDDEN void zero_tiff_image(TIFFRGBAImage *img);
 
 #endif

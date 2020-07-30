@@ -42,10 +42,11 @@
  */
 struct tiff_state {
     TIFF *tiff;
+    uint16_t current_frame;
     bool libtiff_error;
     struct sail_read_options *read_options;
     struct sail_write_options *write_options;
-    void *scanline;
+    TIFFRGBAImage image;
 };
 
 static sail_status_t alloc_tiff_state(struct tiff_state **tiff_state) {
@@ -59,10 +60,12 @@ static sail_status_t alloc_tiff_state(struct tiff_state **tiff_state) {
     }
 
     (*tiff_state)->tiff          = NULL;
+    (*tiff_state)->current_frame = 0;
     (*tiff_state)->libtiff_error = false;
     (*tiff_state)->read_options  = NULL;
     (*tiff_state)->write_options = NULL;
-    (*tiff_state)->scanline      = NULL;
+
+    zero_tiff_image(&(*tiff_state)->image);
 
     return SAIL_OK;
 }
@@ -76,7 +79,7 @@ static void destroy_tiff_state(struct tiff_state *tiff_state) {
     sail_destroy_read_options(tiff_state->read_options);
     sail_destroy_write_options(tiff_state->write_options);
 
-    sail_free(tiff_state->scanline);
+    TIFFRGBAImageEnd(&tiff_state->image);
 
     sail_free(tiff_state);
 }
@@ -107,9 +110,14 @@ SAIL_EXPORT sail_status_t sail_plugin_read_init_v3(struct sail_io *io, const str
     /* Deep copy read options. */
     SAIL_TRY(sail_copy_read_options(read_options, &tiff_state->read_options));
 
-    /* Initialize TIFF. */
+    /* Initialize TIFF.
+     *
+     * 'r': reading operation
+     * 'm': disable use of memory-mapped files
+     * 'h': read TIFF header only
+     */
     tiff_state->tiff = TIFFClientOpen("tiff-sail-plugin",
-                                        "rb", /* TIFF wants this even when we use our own I/O mechanism. */
+                                        "rhm",
 	                                    io,
 	                                    my_read_proc,
                                         my_write_proc,
@@ -143,6 +151,39 @@ SAIL_EXPORT sail_status_t sail_plugin_read_seek_next_frame_v3(void *state, struc
     SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&(*image)->source_image),
                         /* cleanup */ sail_destroy_image(*image));
 
+    /* Start reading the next directory. */
+    if (!TIFFSetDirectory(tiff_state->tiff, tiff_state->current_frame++)) {
+        return SAIL_ERROR_NO_MORE_FRAMES;
+    }
+
+    /* Start reading the next image. */
+    char emsg[1024];
+    if (!TIFFRGBAImageBegin(&tiff_state->image, tiff_state->tiff, /* stop */ 1, emsg)) {
+        SAIL_LOG_ERROR("TIFF: %s", emsg);
+        return SAIL_ERROR_UNDERLYING_CODEC;
+    }
+
+    tiff_state->image.req_orientation = ORIENTATION_TOPLEFT;
+
+    /* Fill the image properties. */
+    if (!TIFFGetField(tiff_state->tiff, TIFFTAG_IMAGEWIDTH,  &(*image)->width) || !TIFFGetField(tiff_state->tiff, TIFFTAG_IMAGELENGTH, &(*image)->height)) {
+        SAIL_LOG_ERROR("Failed to get the image dimensions");
+        return SAIL_ERROR_UNDERLYING_CODEC;
+    }
+
+    (*image)->pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;
+    SAIL_TRY(sail_bytes_per_line((*image)->width, (*image)->pixel_format, &(*image)->bytes_per_line));
+
+    /* Fill the source image properties. */
+    int compression = COMPRESSION_NONE;
+    if (!TIFFGetField(tiff_state->tiff, TIFFTAG_COMPRESSION, &compression)) {
+        SAIL_LOG_ERROR("Failed to get the image compression type");
+        return SAIL_ERROR_UNDERLYING_CODEC;
+    }
+
+    SAIL_TRY(tiff_compression_to_sail_compression_type(compression, &(*image)->source_image->compression_type));
+    SAIL_TRY(bpp_to_pixel_format(tiff_state->image.bitspersample * tiff_state->image.samplesperpixel, &(*image)->source_image->pixel_format));
+
     const char *pixel_format_str;
     SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string((*image)->source_image->pixel_format, &pixel_format_str));
     SAIL_LOG_DEBUG("TIFF: Input pixel format is %s", pixel_format_str);
@@ -157,12 +198,6 @@ SAIL_EXPORT sail_status_t sail_plugin_read_seek_next_pass_v3(void *state, struct
     SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IO(io);
     SAIL_CHECK_IMAGE(image);
-
-    struct tiff_state *tiff_state = (struct tiff_state *)state;
-
-    if (tiff_state->libtiff_error) {
-        return SAIL_ERROR_UNDERLYING_CODEC;
-    }
 
     return SAIL_OK;
 }
@@ -179,11 +214,25 @@ SAIL_EXPORT sail_status_t sail_plugin_read_frame_v3(void *state, struct sail_io 
         return SAIL_ERROR_UNDERLYING_CODEC;
     }
 
-/*
-    for (unsigned row = 0; row < image->height; row++) {
-        png_read_row(tiff_state->png_ptr, (unsigned char *)image->pixels + row * image->bytes_per_line, NULL);
+    if (!TIFFRGBAImageGet(&tiff_state->image, image->pixels, image->width, image->height)) {
+        return SAIL_ERROR_UNDERLYING_CODEC;
     }
-*/
+
+    TIFFRGBAImageEnd(&tiff_state->image);
+
+    /* Swap colors. */
+    if (tiff_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_BGRA) {
+        unsigned char *pixels = image->pixels;
+        const unsigned pixels_count = image->width * image->height;
+        unsigned char tmp;
+
+        for (unsigned i = 0; i < pixels_count; i++, pixels += 4) {
+            tmp = *pixels;
+            *pixels = *(pixels+2);
+            *(pixels+2) = tmp;
+        }
+    }
+
     return SAIL_OK;
 }
 

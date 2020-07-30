@@ -11,7 +11,7 @@ mime-types=image/tiff;image/tiff-fx
 
 [read-features]
 features=STATIC;MULTI-FRAME;META-INFO;ICCP
-output-pixel-formats=BPP24-RGB;BPP24-BGR;BPP32-RGBA;BPP32-BGRA
+output-pixel-formats=BPP32-RGBA;BPP32-BGRA
 default-output-pixel-format=@SAIL_DEFAULT_READ_OUTPUT_PIXEL_FORMAT@
 
 [write-features]

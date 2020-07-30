@@ -161,3 +161,48 @@ sail_status_t sail_compression_type_to_tiff_compression(enum SailCompressionType
         }
     }
 }
+
+sail_status_t bpp_to_pixel_format(int bpp, enum SailPixelFormat *pixel_format) {
+
+    SAIL_CHECK_PIXEL_FORMAT_PTR(pixel_format);
+
+    switch (bpp) {
+
+        case 1:   *pixel_format = SAIL_PIXEL_FORMAT_BPP1;   break;
+        case 2:   *pixel_format = SAIL_PIXEL_FORMAT_BPP2;   break;
+        case 4:   *pixel_format = SAIL_PIXEL_FORMAT_BPP4;   break;
+        case 8:   *pixel_format = SAIL_PIXEL_FORMAT_BPP8;   break;
+        case 16:  *pixel_format = SAIL_PIXEL_FORMAT_BPP16;  break;
+        case 24:  *pixel_format = SAIL_PIXEL_FORMAT_BPP24;  break;
+        case 32:  *pixel_format = SAIL_PIXEL_FORMAT_BPP32;  break;
+        case 48:  *pixel_format = SAIL_PIXEL_FORMAT_BPP48;  break;
+        case 64:  *pixel_format = SAIL_PIXEL_FORMAT_BPP64;  break;
+        case 72:  *pixel_format = SAIL_PIXEL_FORMAT_BPP72;  break;
+        case 96:  *pixel_format = SAIL_PIXEL_FORMAT_BPP96;  break;
+        case 128: *pixel_format = SAIL_PIXEL_FORMAT_BPP128; break;
+
+        default: {
+            *pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;
+        }
+    }
+
+    return SAIL_OK;
+}
+
+void zero_tiff_image(TIFFRGBAImage *img) {
+
+    if (img == NULL) {
+        return;
+    }
+
+    img->Map           = NULL;
+    img->BWmap         = NULL;
+    img->PALmap        = NULL;
+    img->ycbcr         = NULL;
+    img->cielab        = NULL;
+    img->UaToAa        = NULL;
+    img->Bitdepth16To8 = NULL;
+    img->redcmap       = NULL;
+    img->greencmap     = NULL;
+    img->bluecmap      = NULL;
+}
