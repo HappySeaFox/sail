@@ -128,6 +128,10 @@ static sail_status_t io_mem_seek(void *stream, long offset, int whence) {
             }
             break;
         }
+
+        default: {
+            return SAIL_ERROR_UNSUPPORTED_SEEK_WHENCE;
+        }
     }
 
     return SAIL_OK;
