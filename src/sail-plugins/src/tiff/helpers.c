@@ -206,3 +206,49 @@ void zero_tiff_image(TIFFRGBAImage *img) {
     img->greencmap     = NULL;
     img->bluecmap      = NULL;
 }
+
+sail_status_t fetch_iccp(TIFF *tiff, struct sail_iccp **iccp) {
+
+    unsigned char *data;
+    unsigned data_length;
+
+    if (TIFFGetField(tiff, TIFFTAG_ICCPROFILE, &data_length, &data)) {
+        SAIL_TRY(sail_alloc_iccp_with_data(iccp, data, data_length));
+    }
+
+    return SAIL_OK;
+}
+
+static sail_status_t fetch_single_meta_info(TIFF *tiff, int tag, const char *key, struct sail_meta_entry_node ***last_meta_entry_node) {
+
+    char *data;
+
+    if (TIFFGetField(tiff, tag, &data)) {
+        struct sail_meta_entry_node *meta_entry_node;
+
+        SAIL_TRY(sail_alloc_meta_entry_node(&meta_entry_node));
+        SAIL_TRY_OR_CLEANUP(sail_strdup(key, &meta_entry_node->key),
+                            /* cleanup */ sail_destroy_meta_entry_node(meta_entry_node));
+        SAIL_TRY_OR_CLEANUP(sail_strdup(data, &meta_entry_node->value),
+                            /* cleanup */ sail_destroy_meta_entry_node(meta_entry_node));
+
+        **last_meta_entry_node = meta_entry_node;
+        *last_meta_entry_node = &meta_entry_node->next;
+    }
+
+    return SAIL_OK;
+}
+
+sail_status_t fetch_meta_info(TIFF *tiff, struct sail_meta_entry_node ***last_meta_entry_node) {
+
+    SAIL_CHECK_META_ENTRY_NODE_PTR(last_meta_entry_node);
+
+    SAIL_TRY(fetch_single_meta_info(tiff, TIFFTAG_DOCUMENTNAME,     "Document Name", last_meta_entry_node));
+    SAIL_TRY(fetch_single_meta_info(tiff, TIFFTAG_IMAGEDESCRIPTION, "Description",   last_meta_entry_node));
+    SAIL_TRY(fetch_single_meta_info(tiff, TIFFTAG_MAKE,             "Make",          last_meta_entry_node));
+    SAIL_TRY(fetch_single_meta_info(tiff, TIFFTAG_MODEL,            "Model",         last_meta_entry_node));
+    SAIL_TRY(fetch_single_meta_info(tiff, TIFFTAG_SOFTWARE,         "Software",      last_meta_entry_node));
+    SAIL_TRY(fetch_single_meta_info(tiff, TIFFTAG_ARTIST,           "Artist",        last_meta_entry_node));
+
+    return SAIL_OK;
+}

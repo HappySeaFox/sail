@@ -35,6 +35,8 @@
 #include "error.h"
 #include "export.h"
 
+struct sail_meta_entry_node;
+
 SAIL_HIDDEN void my_error_fn(const char *module, const char *format, va_list ap);
 
 SAIL_HIDDEN void my_warning_fn(const char *module, const char *format, va_list ap);
@@ -48,5 +50,9 @@ SAIL_HIDDEN sail_status_t sail_compression_type_to_tiff_compression(enum SailCom
 SAIL_HIDDEN sail_status_t bpp_to_pixel_format(int bpp, enum SailPixelFormat *pixel_format);
 
 SAIL_HIDDEN void zero_tiff_image(TIFFRGBAImage *img);
+
+SAIL_HIDDEN sail_status_t fetch_iccp(TIFF *tiff, struct sail_iccp **iccp);
+
+SAIL_HIDDEN sail_status_t fetch_meta_info(TIFF *tiff, struct sail_meta_entry_node ***last_meta_entry_node);
 
 #endif
