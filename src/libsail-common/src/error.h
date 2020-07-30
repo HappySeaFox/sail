@@ -52,6 +52,7 @@ enum SailStatus {
     SAIL_ERROR_CLOSE_IO,
     SAIL_ERROR_EOF,
     SAIL_ERROR_NOT_IMPLEMENTED,
+    SAIL_ERROR_UNSUPPORTED_SEEK_WHENCE,
 
     /*
      * Encoding/decoding common errors.
