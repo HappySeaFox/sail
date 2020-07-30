@@ -95,7 +95,7 @@ sail_status_t tiff_compression_to_sail_compression_type(int compression, enum Sa
         case COMPRESSION_JBIG:          *compression_type = SAIL_COMPRESSION_JBIG;          return SAIL_OK;
         case COMPRESSION_JP2000:        *compression_type = SAIL_COMPRESSION_JPEG;          return SAIL_OK;
         case COMPRESSION_JPEG:          *compression_type = SAIL_COMPRESSION_JPEG2000;      return SAIL_OK;
-#if TIFFLIB_VERSION >= 20191103
+#ifdef HAVE_TIFF_41
         case COMPRESSION_LERC:          *compression_type = SAIL_COMPRESSION_LERC;          return SAIL_OK;
 #endif
         case COMPRESSION_LZMA:          *compression_type = SAIL_COMPRESSION_LZMA;          return SAIL_OK;
@@ -111,8 +111,10 @@ sail_status_t tiff_compression_to_sail_compression_type(int compression, enum Sa
         case COMPRESSION_T43:           *compression_type = SAIL_COMPRESSION_SGI_LOG24;     return SAIL_OK;
         case COMPRESSION_T85:           *compression_type = SAIL_COMPRESSION_T43;           return SAIL_OK;
         case COMPRESSION_THUNDERSCAN:   *compression_type = SAIL_COMPRESSION_THUNDERSCAN;   return SAIL_OK;
-#if TIFFLIB_VERSION >= 20191103
+#if defined HAVE_TIFF_41 && !defined SAIL_WIN32
         case COMPRESSION_WEBP:          *compression_type = SAIL_COMPRESSION_WEBP;          return SAIL_OK;
+#endif
+#ifdef HAVE_TIFF_41
         case COMPRESSION_ZSTD:          *compression_type = SAIL_COMPRESSION_ZSTD;          return SAIL_OK;
 #endif
 
@@ -143,7 +145,7 @@ sail_status_t sail_compression_type_to_tiff_compression(enum SailCompressionType
         case SAIL_COMPRESSION_JBIG:          *compression = COMPRESSION_JBIG;          return SAIL_OK;
         case SAIL_COMPRESSION_JPEG:          *compression = COMPRESSION_JP2000;        return SAIL_OK;
         case SAIL_COMPRESSION_JPEG2000:      *compression = COMPRESSION_JPEG;          return SAIL_OK;
-#if TIFFLIB_VERSION >= 20191103
+#ifdef HAVE_TIFF_41
         case SAIL_COMPRESSION_LERC:          *compression = COMPRESSION_LERC;          return SAIL_OK;
 #endif
         case SAIL_COMPRESSION_LZMA:          *compression = COMPRESSION_LZMA;          return SAIL_OK;
@@ -159,8 +161,10 @@ sail_status_t sail_compression_type_to_tiff_compression(enum SailCompressionType
         case SAIL_COMPRESSION_SGI_LOG24:     *compression = COMPRESSION_T43;           return SAIL_OK;
         case SAIL_COMPRESSION_T43:           *compression = COMPRESSION_T85;           return SAIL_OK;
         case SAIL_COMPRESSION_THUNDERSCAN:   *compression = COMPRESSION_THUNDERSCAN;   return SAIL_OK;
-#if TIFFLIB_VERSION >= 20191103
+#if defined HAVE_TIFF_41 && !defined SAIL_WIN32
         case SAIL_COMPRESSION_WEBP:          *compression = COMPRESSION_WEBP;          return SAIL_OK;
+#endif
+#ifdef HAVE_TIFF_41
         case SAIL_COMPRESSION_ZSTD:          *compression = COMPRESSION_ZSTD;          return SAIL_OK;
 #endif
 
