@@ -2,6 +2,8 @@
 
 - Read/write indexed PNGs with alpha
 
+- Make meta info keys as enum
+
 - document c++ classes
 
 - static compilation
