@@ -196,10 +196,8 @@ SAIL_EXPORT sail_status_t sail_plugin_read_seek_next_frame_v3(void *state, struc
         return SAIL_ERROR_UNDERLYING_CODEC;
     }
 
-    SAIL_TRY_OR_CLEANUP(tiff_compression_to_sail_compression_type(compression, &(*image)->source_image->compression_type),
-                        /* cleanup */ sail_destroy_image(*image));
-    SAIL_TRY_OR_CLEANUP(bpp_to_pixel_format(tiff_state->image.bitspersample * tiff_state->image.samplesperpixel, &(*image)->source_image->pixel_format),
-                        /* cleanup */ sail_destroy_image(*image));
+    (*image)->source_image->compression_type = tiff_compression_to_sail_compression_type(compression);
+    (*image)->source_image->pixel_format = bpp_to_pixel_format(tiff_state->image.bitspersample * tiff_state->image.samplesperpixel);
 
     const char *pixel_format_str;
     SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string((*image)->source_image->pixel_format, &pixel_format_str));

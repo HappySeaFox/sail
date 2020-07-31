@@ -76,50 +76,48 @@ sail_status_t supported_read_output_pixel_format(enum SailPixelFormat pixel_form
     }
 }
 
-sail_status_t tiff_compression_to_sail_compression_type(int compression, enum SailCompressionType *compression_type) {
-
-    SAIL_CHECK_PTR(compression_type);
+enum SailCompressionType tiff_compression_to_sail_compression_type(int compression) {
 
     switch (compression) {
-        case COMPRESSION_ADOBE_DEFLATE: *compression_type = SAIL_COMPRESSION_ADOBE_DEFLATE; return SAIL_OK;
-        case COMPRESSION_CCITTRLE:      *compression_type = SAIL_COMPRESSION_CCITT_RLE;     return SAIL_OK;
-        case COMPRESSION_CCITTRLEW:     *compression_type = SAIL_COMPRESSION_CCITT_RLEW;    return SAIL_OK;
-        case COMPRESSION_CCITT_T4:      *compression_type = SAIL_COMPRESSION_CCITT_T4;      return SAIL_OK;
-        case COMPRESSION_CCITT_T6:      *compression_type = SAIL_COMPRESSION_CCITT_T6;      return SAIL_OK;
-        case COMPRESSION_DCS:           *compression_type = SAIL_COMPRESSION_DCS;           return SAIL_OK;
-        case COMPRESSION_DEFLATE:       *compression_type = SAIL_COMPRESSION_DEFLATE;       return SAIL_OK;
-        case COMPRESSION_IT8BL:         *compression_type = SAIL_COMPRESSION_IT8_BL;        return SAIL_OK;
-        case COMPRESSION_IT8CTPAD:      *compression_type = SAIL_COMPRESSION_IT8_CTPAD;     return SAIL_OK;
-        case COMPRESSION_IT8LW:         *compression_type = SAIL_COMPRESSION_IT8_LW;        return SAIL_OK;
-        case COMPRESSION_IT8MP:         *compression_type = SAIL_COMPRESSION_IT8_MP;        return SAIL_OK;
-        case COMPRESSION_JBIG:          *compression_type = SAIL_COMPRESSION_JBIG;          return SAIL_OK;
-        case COMPRESSION_JP2000:        *compression_type = SAIL_COMPRESSION_JPEG;          return SAIL_OK;
-        case COMPRESSION_JPEG:          *compression_type = SAIL_COMPRESSION_JPEG2000;      return SAIL_OK;
+        case COMPRESSION_ADOBE_DEFLATE: return SAIL_COMPRESSION_ADOBE_DEFLATE;
+        case COMPRESSION_CCITTRLE:      return SAIL_COMPRESSION_CCITT_RLE;
+        case COMPRESSION_CCITTRLEW:     return SAIL_COMPRESSION_CCITT_RLEW;
+        case COMPRESSION_CCITT_T4:      return SAIL_COMPRESSION_CCITT_T4;
+        case COMPRESSION_CCITT_T6:      return SAIL_COMPRESSION_CCITT_T6;
+        case COMPRESSION_DCS:           return SAIL_COMPRESSION_DCS;
+        case COMPRESSION_DEFLATE:       return SAIL_COMPRESSION_DEFLATE;
+        case COMPRESSION_IT8BL:         return SAIL_COMPRESSION_IT8_BL;
+        case COMPRESSION_IT8CTPAD:      return SAIL_COMPRESSION_IT8_CTPAD;
+        case COMPRESSION_IT8LW:         return SAIL_COMPRESSION_IT8_LW;
+        case COMPRESSION_IT8MP:         return SAIL_COMPRESSION_IT8_MP;
+        case COMPRESSION_JBIG:          return SAIL_COMPRESSION_JBIG;
+        case COMPRESSION_JP2000:        return SAIL_COMPRESSION_JPEG;
+        case COMPRESSION_JPEG:          return SAIL_COMPRESSION_JPEG2000;
 #ifdef HAVE_TIFF_41
-        case COMPRESSION_LERC:          *compression_type = SAIL_COMPRESSION_LERC;          return SAIL_OK;
+        case COMPRESSION_LERC:          return SAIL_COMPRESSION_LERC;
 #endif
-        case COMPRESSION_LZMA:          *compression_type = SAIL_COMPRESSION_LZMA;          return SAIL_OK;
-        case COMPRESSION_LZW:           *compression_type = SAIL_COMPRESSION_LZW;           return SAIL_OK;
-        case COMPRESSION_NEXT:          *compression_type = SAIL_COMPRESSION_NEXT;          return SAIL_OK;
-        case COMPRESSION_NONE:          *compression_type = SAIL_COMPRESSION_NONE;          return SAIL_OK;
-        case COMPRESSION_OJPEG:         *compression_type = SAIL_COMPRESSION_OJPEG;         return SAIL_OK;
-        case COMPRESSION_PACKBITS:      *compression_type = SAIL_COMPRESSION_PACKBITS;      return SAIL_OK;
-        case COMPRESSION_PIXARFILM:     *compression_type = SAIL_COMPRESSION_PIXAR_FILM;    return SAIL_OK;
-        case COMPRESSION_PIXARLOG:      *compression_type = SAIL_COMPRESSION_PIXAR_LOG;     return SAIL_OK;
-        case COMPRESSION_SGILOG24:      *compression_type = SAIL_COMPRESSION_RLE;           return SAIL_OK;
-        case COMPRESSION_SGILOG:        *compression_type = SAIL_COMPRESSION_SGI_LOG;       return SAIL_OK;
-        case COMPRESSION_T43:           *compression_type = SAIL_COMPRESSION_SGI_LOG24;     return SAIL_OK;
-        case COMPRESSION_T85:           *compression_type = SAIL_COMPRESSION_T43;           return SAIL_OK;
-        case COMPRESSION_THUNDERSCAN:   *compression_type = SAIL_COMPRESSION_THUNDERSCAN;   return SAIL_OK;
+        case COMPRESSION_LZMA:          return SAIL_COMPRESSION_LZMA;
+        case COMPRESSION_LZW:           return SAIL_COMPRESSION_LZW;
+        case COMPRESSION_NEXT:          return SAIL_COMPRESSION_NEXT;
+        case COMPRESSION_NONE:          return SAIL_COMPRESSION_NONE;
+        case COMPRESSION_OJPEG:         return SAIL_COMPRESSION_OJPEG;
+        case COMPRESSION_PACKBITS:      return SAIL_COMPRESSION_PACKBITS;
+        case COMPRESSION_PIXARFILM:     return SAIL_COMPRESSION_PIXAR_FILM;
+        case COMPRESSION_PIXARLOG:      return SAIL_COMPRESSION_PIXAR_LOG;
+        case COMPRESSION_SGILOG24:      return SAIL_COMPRESSION_RLE;
+        case COMPRESSION_SGILOG:        return SAIL_COMPRESSION_SGI_LOG;
+        case COMPRESSION_T43:           return SAIL_COMPRESSION_SGI_LOG24;
+        case COMPRESSION_T85:           return SAIL_COMPRESSION_T43;
+        case COMPRESSION_THUNDERSCAN:   return SAIL_COMPRESSION_THUNDERSCAN;
 #if defined HAVE_TIFF_41 && !defined SAIL_WIN32
-        case COMPRESSION_WEBP:          *compression_type = SAIL_COMPRESSION_WEBP;          return SAIL_OK;
+        case COMPRESSION_WEBP:          return SAIL_COMPRESSION_WEBP;
 #endif
 #ifdef HAVE_TIFF_41
-        case COMPRESSION_ZSTD:          *compression_type = SAIL_COMPRESSION_ZSTD;          return SAIL_OK;
+        case COMPRESSION_ZSTD:          return SAIL_COMPRESSION_ZSTD;
 #endif
 
         default: {
-            return SAIL_ERROR_UNSUPPORTED_COMPRESSION_TYPE;
+            return SAIL_COMPRESSION_UNKNOWN;
         }
     }
 }
@@ -174,31 +172,26 @@ sail_status_t sail_compression_type_to_tiff_compression(enum SailCompressionType
     }
 }
 
-sail_status_t bpp_to_pixel_format(int bpp, enum SailPixelFormat *pixel_format) {
-
-    SAIL_CHECK_PIXEL_FORMAT_PTR(pixel_format);
+enum SailPixelFormat bpp_to_pixel_format(int bpp) {
 
     switch (bpp) {
-
-        case 1:   *pixel_format = SAIL_PIXEL_FORMAT_BPP1;   break;
-        case 2:   *pixel_format = SAIL_PIXEL_FORMAT_BPP2;   break;
-        case 4:   *pixel_format = SAIL_PIXEL_FORMAT_BPP4;   break;
-        case 8:   *pixel_format = SAIL_PIXEL_FORMAT_BPP8;   break;
-        case 16:  *pixel_format = SAIL_PIXEL_FORMAT_BPP16;  break;
-        case 24:  *pixel_format = SAIL_PIXEL_FORMAT_BPP24;  break;
-        case 32:  *pixel_format = SAIL_PIXEL_FORMAT_BPP32;  break;
-        case 48:  *pixel_format = SAIL_PIXEL_FORMAT_BPP48;  break;
-        case 64:  *pixel_format = SAIL_PIXEL_FORMAT_BPP64;  break;
-        case 72:  *pixel_format = SAIL_PIXEL_FORMAT_BPP72;  break;
-        case 96:  *pixel_format = SAIL_PIXEL_FORMAT_BPP96;  break;
-        case 128: *pixel_format = SAIL_PIXEL_FORMAT_BPP128; break;
+        case 1:   return SAIL_PIXEL_FORMAT_BPP1;
+        case 2:   return SAIL_PIXEL_FORMAT_BPP2;
+        case 4:   return SAIL_PIXEL_FORMAT_BPP4;
+        case 8:   return SAIL_PIXEL_FORMAT_BPP8;
+        case 16:  return SAIL_PIXEL_FORMAT_BPP16;
+        case 24:  return SAIL_PIXEL_FORMAT_BPP24;
+        case 32:  return SAIL_PIXEL_FORMAT_BPP32;
+        case 48:  return SAIL_PIXEL_FORMAT_BPP48;
+        case 64:  return SAIL_PIXEL_FORMAT_BPP64;
+        case 72:  return SAIL_PIXEL_FORMAT_BPP72;
+        case 96:  return SAIL_PIXEL_FORMAT_BPP96;
+        case 128: return SAIL_PIXEL_FORMAT_BPP128;
 
         default: {
-            *pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;
+            return SAIL_PIXEL_FORMAT_UNKNOWN;
         }
     }
-
-    return SAIL_OK;
 }
 
 void zero_tiff_image(TIFFRGBAImage *img) {
