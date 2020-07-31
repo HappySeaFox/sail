@@ -406,6 +406,7 @@ sail_status_t sail_compression_type_to_string(enum SailCompressionType compressi
 
     switch (compression) {
         case SAIL_COMPRESSION_UNSUPPORTED:   *result = "UNSUPPORTED";   return SAIL_OK;
+        case SAIL_COMPRESSION_UNKNOWN:       *result = "UNKNOWN";       return SAIL_OK;
         case SAIL_COMPRESSION_NONE:          *result = "NONE";          return SAIL_OK;
         case SAIL_COMPRESSION_ADOBE_DEFLATE: *result = "ADOBE-DEFLATE"; return SAIL_OK;
         case SAIL_COMPRESSION_CCITT_FAX3:    *result = "CCITT-FAX3";    return SAIL_OK;
@@ -458,6 +459,7 @@ sail_status_t sail_compression_type_from_string(const char *str, enum SailCompre
 
     switch (hash) {
         case UINT64_C(13846582888989074574): *result = SAIL_COMPRESSION_UNSUPPORTED;   return SAIL_OK;
+        case UINT64_C(229442760833397):      *result = SAIL_COMPRESSION_UNKNOWN;       return SAIL_OK;
         case UINT64_C(6384332661):           *result = SAIL_COMPRESSION_NONE;          return SAIL_OK;
         case UINT64_C(10962109560604417378): *result = SAIL_COMPRESSION_ADOBE_DEFLATE; return SAIL_OK;
         case UINT64_C(8244633541513328571):  *result = SAIL_COMPRESSION_CCITT_FAX3;    return SAIL_OK;
