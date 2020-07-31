@@ -164,6 +164,9 @@ enum SailCompressionType {
     /* Compression is unsupported. */
     SAIL_COMPRESSION_UNSUPPORTED,
 
+    /* Unknown compression. */
+    SAIL_COMPRESSION_UNKNOWN,
+
     /* No compression at all. */
     SAIL_COMPRESSION_NONE,
 
