@@ -106,7 +106,7 @@ static sail_status_t compression_from_string(const char *str, int *result) {
     return SAIL_OK;
 }
 
-static sail_status_t parse_serialized_ints(const char *value, int **target, int *length, sail_status_t (*converter)(const char *str, int *result)) {
+static sail_status_t parse_serialized_ints(const char *value, int **target, unsigned *length, sail_status_t (*converter)(const char *str, int *result)) {
 
     SAIL_CHECK_PTR(value);
     SAIL_CHECK_PTR(target);
@@ -129,7 +129,7 @@ static sail_status_t parse_serialized_ints(const char *value, int **target, int 
         *target = (int *)malloc((size_t)*length * sizeof(int));
 
         if (*target == NULL) {
-            SAIL_LOG_ERROR("Failed to allocate %d integers", *length);
+            SAIL_LOG_ERROR("Failed to allocate %u integers", *length);
             destroy_string_node_chain(string_node);
             return SAIL_ERROR_MEMORY_ALLOCATION;
         }

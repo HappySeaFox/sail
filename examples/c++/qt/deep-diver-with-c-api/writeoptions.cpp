@@ -76,7 +76,7 @@ sail_status_t WriteOptions::init(const sail_write_features *write_features, int 
 
     while (node != nullptr) {
         if (node->input_pixel_format == input_pixel_format) {
-            for (int i = 0; i < node->output_pixel_formats_length; i++) {
+            for (unsigned i = 0; i < node->output_pixel_formats_length; i++) {
                 const char *output_pixel_format_str;
 
                 SAIL_TRY(sail_pixel_format_to_string(node->output_pixel_formats[i], &output_pixel_format_str));

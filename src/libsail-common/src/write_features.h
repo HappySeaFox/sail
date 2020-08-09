@@ -79,7 +79,7 @@ struct sail_write_features {
     enum SailCompression *compressions;
 
     /* The length of compressions. */
-    int compressions_length;
+    unsigned compressions_length;
 
     /* Compression type to use by default. */
     enum SailCompression default_compression;

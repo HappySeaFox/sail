@@ -576,7 +576,7 @@ sail_status_t allowed_read_output_pixel_format(const struct sail_read_features *
 
     SAIL_CHECK_READ_FEATURES_PTR(read_features);
 
-    for (int i = 0; i < read_features->output_pixel_formats_length; i++) {
+    for (unsigned i = 0; i < read_features->output_pixel_formats_length; i++) {
         if (read_features->output_pixel_formats[i] == pixel_format) {
             return SAIL_OK;
         }
@@ -610,7 +610,7 @@ sail_status_t allowed_write_output_pixel_format(const struct sail_write_features
 
     while (node != NULL) {
         if (node->input_pixel_format == input_pixel_format) {
-            for (int i = 0; i < node->output_pixel_formats_length; i++) {
+            for (unsigned i = 0; i < node->output_pixel_formats_length; i++) {
                 if (node->output_pixel_formats[i] == output_pixel_format) {
                     return SAIL_OK;
                 }

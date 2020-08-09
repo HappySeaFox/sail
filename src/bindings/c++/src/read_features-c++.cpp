@@ -119,7 +119,7 @@ read_features::read_features(const sail_read_features *rf)
     if (rf->output_pixel_formats != nullptr && rf->output_pixel_formats_length > 0) {
         output_pixel_formats.reserve(rf->output_pixel_formats_length);
 
-        for (int i = 0; i < rf->output_pixel_formats_length; i++) {
+        for (unsigned i = 0; i < rf->output_pixel_formats_length; i++) {
             output_pixel_formats.push_back(rf->output_pixel_formats[i]);
         }
     }

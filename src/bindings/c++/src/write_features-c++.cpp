@@ -160,7 +160,7 @@ write_features::write_features(const sail_write_features *wf)
         std::vector<SailPixelFormat> pixel_formats;
         pixel_formats.reserve(node->output_pixel_formats_length);
 
-        for (int i = 0; i < node->output_pixel_formats_length; i++) {
+        for (unsigned i = 0; i < node->output_pixel_formats_length; i++) {
             pixel_formats.push_back(node->output_pixel_formats[i]);
         }
 
@@ -174,7 +174,7 @@ write_features::write_features(const sail_write_features *wf)
     if (wf->compressions != nullptr && wf->compressions_length > 0) {
         compressions.reserve(wf->compressions_length);
 
-        for (int i = 0; i < wf->compressions_length; i++) {
+        for (unsigned i = 0; i < wf->compressions_length; i++) {
             compressions.push_back(wf->compressions[i]);
         }
     }
