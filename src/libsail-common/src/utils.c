@@ -401,6 +401,7 @@ sail_status_t sail_compression_to_string(enum SailCompression compression, const
         case SAIL_COMPRESSION_T85:           *result = "T85";           return SAIL_OK;
         case SAIL_COMPRESSION_THUNDERSCAN:   *result = "THUNDERSCAN";   return SAIL_OK;
         case SAIL_COMPRESSION_WEBP:          *result = "WEBP";          return SAIL_OK;
+        case SAIL_COMPRESSION_ZLIB:          *result = "ZLIB";          return SAIL_OK;
         case SAIL_COMPRESSION_ZSTD:          *result = "ZSTD";          return SAIL_OK;
     }
 
@@ -454,6 +455,7 @@ sail_status_t sail_compression_from_string(const char *str, enum SailCompression
         case UINT64_C(193470374):            *result = SAIL_COMPRESSION_T85;           return SAIL_OK;
         case UINT64_C(13844775339661004164): *result = SAIL_COMPRESSION_THUNDERSCAN;   return SAIL_OK;
         case UINT64_C(6384644819):           *result = SAIL_COMPRESSION_WEBP;          return SAIL_OK;
+        case UINT64_C(6384760470):           *result = SAIL_COMPRESSION_ZLIB;          return SAIL_OK;
         case UINT64_C(6384768458):           *result = SAIL_COMPRESSION_ZSTD;          return SAIL_OK;
     }
 

@@ -4,8 +4,6 @@
 
 - Make compression level double
 
-- Add ZLIB compression type
-
 - Add compressions to JPEG/PNG (JPEG and ZLIB)
 
 - Read/write indexed PNGs with alpha
