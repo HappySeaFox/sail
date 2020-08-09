@@ -42,7 +42,7 @@ sail_status_t sail_alloc_write_features(struct sail_write_features **write_featu
     (*write_features)->interlaced_passes          = 0;
     (*write_features)->compressions               = NULL;
     (*write_features)->compressions_length        = 0;
-    (*write_features)->default_compression        = 0;
+    (*write_features)->default_compression        = SAIL_COMPRESSION_UNSUPPORTED;
     (*write_features)->compression_level_min      = 0;
     (*write_features)->compression_level_max      = 0;
     (*write_features)->compression_level_default  = 0;
