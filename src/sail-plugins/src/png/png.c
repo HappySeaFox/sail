@@ -41,9 +41,9 @@
  * Plugin-specific data types.
  */
 
-static const int COMPRESSION_MIN     = 1;
-static const int COMPRESSION_MAX     = 9;
-static const int COMPRESSION_DEFAULT = 6;
+static const double COMPRESSION_MIN     = 1;
+static const double COMPRESSION_MAX     = 9;
+static const double COMPRESSION_DEFAULT = 6;
 
 /*
  * Plugin-specific state.
@@ -657,12 +657,12 @@ SAIL_EXPORT sail_status_t sail_plugin_write_seek_next_frame_v3(void *state, stru
         png_set_PLTE(png_state->png_ptr, png_state->info_ptr, image->palette->data, image->palette->color_count);
     }
 
-    const int compression = (png_state->write_options->compression_level < COMPRESSION_MIN ||
+    const double compression = (png_state->write_options->compression_level < COMPRESSION_MIN ||
                                 png_state->write_options->compression_level > COMPRESSION_MAX)
-                            ? COMPRESSION_DEFAULT
-                            : png_state->write_options->compression_level;
+                                ? COMPRESSION_DEFAULT
+                                : png_state->write_options->compression_level;
 
-    png_set_compression_level(png_state->png_ptr, compression);
+    png_set_compression_level(png_state->png_ptr, (int)compression);
 
     png_write_info(png_state->png_ptr, png_state->info_ptr);
 

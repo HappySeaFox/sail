@@ -292,11 +292,11 @@ static sail_status_t inih_handler_sail_error(void *data, const char *section, co
             SAIL_TRY_OR_CLEANUP(sail_compression_from_string(value, &plugin_info->write_features->default_compression),
                                 /* cleanup */ SAIL_LOG_ERROR("Failed to parse compression: '%s'", value));
         } else if (strcmp(name, "compression-level-min") == 0) {
-            plugin_info->write_features->compression_level_min = atoi(value);
+            plugin_info->write_features->compression_level_min = atof(value);
         } else if (strcmp(name, "compression-level-max") == 0) {
-            plugin_info->write_features->compression_level_max = atoi(value);
+            plugin_info->write_features->compression_level_max = atof(value);
         } else if (strcmp(name, "compression-level-default") == 0) {
-            plugin_info->write_features->compression_level_default = atoi(value);
+            plugin_info->write_features->compression_level_default = atof(value);
         } else {
             SAIL_LOG_ERROR("Unsupported plugin info key '%s' in [%s]", name, section);
             return SAIL_ERROR_PARSE_FILE;

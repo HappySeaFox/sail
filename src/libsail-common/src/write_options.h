@@ -73,7 +73,7 @@ struct sail_write_options {
      * Requested compression value. Must be in the range specified by compression_level_min and compression_level_max
      * in sail_write_features. If compression_level < compression_level_min, compression_level_default will be used.
      */
-    int compression_level;
+    double compression_level;
 };
 
 typedef struct sail_write_options sail_write_options_t;

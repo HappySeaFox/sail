@@ -50,9 +50,9 @@ public:
     int properties;
     std::vector<SailCompression> compressions;
     SailCompression default_compression;
-    int compression_level_min;
-    int compression_level_max;
-    int compression_level_default;
+    double compression_level_min;
+    double compression_level_max;
+    double compression_level_default;
 };
 
 write_features::write_features(const write_features &wf)
@@ -107,17 +107,17 @@ SailCompression write_features::default_compression() const
     return d->default_compression;
 }
 
-int write_features::compression_level_min() const
+double write_features::compression_level_min() const
 {
     return d->compression_level_min;
 }
 
-int write_features::compression_level_max() const
+double write_features::compression_level_max() const
 {
     return d->compression_level_max;
 }
 
-int write_features::compression_level_default() const
+double write_features::compression_level_default() const
 {
     return d->compression_level_default;
 }
@@ -219,19 +219,19 @@ write_features& write_features::with_default_compression(SailCompression default
     return *this;
 }
 
-write_features& write_features::with_compression_level_min(int compression_level_min)
+write_features& write_features::with_compression_level_min(double compression_level_min)
 {
     d->compression_level_min = compression_level_min;
     return *this;
 }
 
-write_features& write_features::with_compression_level_max(int compression_level_max)
+write_features& write_features::with_compression_level_max(double compression_level_max)
 {
     d->compression_level_max = compression_level_max;
     return *this;
 }
 
-write_features& write_features::with_compression_level_default(int compression_level_default)
+write_features& write_features::with_compression_level_default(double compression_level_default)
 {
     d->compression_level_default = compression_level_default;
     return *this;

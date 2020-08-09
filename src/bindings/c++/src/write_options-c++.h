@@ -62,12 +62,12 @@ public:
     SailPixelFormat output_pixel_format() const;
     int io_options() const;
     SailCompression compression() const;
-    int compression_level() const;
+    double compression_level() const;
 
     write_options& with_output_pixel_format(SailPixelFormat output_pixel_format);
     write_options& with_io_options(int io_options);
     write_options& with_compression(SailCompression compression);
-    write_options& with_compression_level(int compression_level);
+    write_options& with_compression_level(double compression_level);
 
 private:
     sail_status_t to_sail_write_options(sail_write_options *write_options) const;

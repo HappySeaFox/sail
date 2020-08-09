@@ -90,16 +90,16 @@ struct sail_write_features {
      * plugin-specific. If compression_level_min == compression_level_max == 0, no compression tuning is available.
      * For example: 0.
      */
-    int compression_level_min;
+    double compression_level_min;
 
     /*
      * Maximum compression value. This field is plugin-specific. If compression_level_min == compression_level_max == 0,
      * no compression tuning is available. For example: 100.
      */
-    int compression_level_max;
+    double compression_level_max;
 
     /* Default compression value. For example: 15. */
-    int compression_level_default;
+    double compression_level_default;
 };
 
 typedef struct sail_write_features sail_write_features_t;

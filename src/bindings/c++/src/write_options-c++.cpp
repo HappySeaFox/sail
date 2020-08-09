@@ -43,7 +43,7 @@ public:
     SailPixelFormat output_pixel_format;
     int io_options;
     SailCompression compression;
-    int compression_level;
+    double compression_level;
 };
 
 write_options::write_options()
@@ -101,7 +101,7 @@ SailCompression write_options::compression() const
     return d->compression;
 }
 
-int write_options::compression_level() const
+double write_options::compression_level() const
 {
     return d->compression_level;
 }
@@ -124,7 +124,7 @@ write_options& write_options::with_compression(SailCompression compression)
     return *this;
 }
 
-write_options& write_options::with_compression_level(int compression_level)
+write_options& write_options::with_compression_level(double compression_level)
 {
     d->compression_level = compression_level;
     return *this;

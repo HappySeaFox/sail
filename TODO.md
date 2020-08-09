@@ -2,8 +2,6 @@
 
 - Add warnings with Clang
 
-- Make compression level double
-
 - Read/write indexed PNGs with alpha
 
 - Make meta info keys as enum

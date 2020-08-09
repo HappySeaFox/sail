@@ -41,9 +41,9 @@
  * Plugin-specific data types.
  */
 
-static const int COMPRESSION_MIN     = 0;
-static const int COMPRESSION_MAX     = 100;
-static const int COMPRESSION_DEFAULT = 15;
+static const double COMPRESSION_MIN     = 0;
+static const double COMPRESSION_MAX     = 100;
+static const double COMPRESSION_DEFAULT = 15;
 
 /*
  * Plugin-specific state.
@@ -426,11 +426,11 @@ SAIL_EXPORT sail_status_t sail_plugin_write_seek_next_frame_v3(void *state, stru
     }
 
     /* Compute image quality. */
-    const int compression = (jpeg_state->write_options->compression_level < COMPRESSION_MIN ||
+    const double compression = (jpeg_state->write_options->compression_level < COMPRESSION_MIN ||
                                 jpeg_state->write_options->compression_level > COMPRESSION_MAX)
-                            ? COMPRESSION_DEFAULT
-                            : jpeg_state->write_options->compression_level;
-    jpeg_set_quality(jpeg_state->compress_context, /* to quality */ COMPRESSION_MAX-compression, true);
+                                ? COMPRESSION_DEFAULT
+                                : jpeg_state->write_options->compression_level;
+    jpeg_set_quality(jpeg_state->compress_context, /* to quality */ (int)(COMPRESSION_MAX-compression), true);
 
     /* Start compression. */
     jpeg_start_compress(jpeg_state->compress_context, true);
