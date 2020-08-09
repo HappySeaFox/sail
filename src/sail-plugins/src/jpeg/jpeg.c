@@ -426,10 +426,10 @@ SAIL_EXPORT sail_status_t sail_plugin_write_seek_next_frame_v3(void *state, stru
     }
 
     /* Compute image quality. */
-    const int compression = (jpeg_state->write_options->compression < COMPRESSION_MIN ||
-                                jpeg_state->write_options->compression > COMPRESSION_MAX)
+    const int compression = (jpeg_state->write_options->compression_level < COMPRESSION_MIN ||
+                                jpeg_state->write_options->compression_level > COMPRESSION_MAX)
                             ? COMPRESSION_DEFAULT
-                            : jpeg_state->write_options->compression;
+                            : jpeg_state->write_options->compression_level;
     jpeg_set_quality(jpeg_state->compress_context, /* to quality */ COMPRESSION_MAX-compression, true);
 
     /* Start compression. */

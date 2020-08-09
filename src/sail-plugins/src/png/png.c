@@ -657,10 +657,10 @@ SAIL_EXPORT sail_status_t sail_plugin_write_seek_next_frame_v3(void *state, stru
         png_set_PLTE(png_state->png_ptr, png_state->info_ptr, image->palette->data, image->palette->color_count);
     }
 
-    const int compression = (png_state->write_options->compression < COMPRESSION_MIN ||
-                                png_state->write_options->compression > COMPRESSION_MAX)
+    const int compression = (png_state->write_options->compression_level < COMPRESSION_MIN ||
+                                png_state->write_options->compression_level > COMPRESSION_MAX)
                             ? COMPRESSION_DEFAULT
-                            : png_state->write_options->compression;
+                            : png_state->write_options->compression_level;
 
     png_set_compression_level(png_state->png_ptr, compression);
 
