@@ -201,7 +201,6 @@ enum SailCompression {
     SAIL_COMPRESSION_T85,           /* !TIFF/FX T.85 JBIG compression. */
     SAIL_COMPRESSION_THUNDERSCAN,   /* ThunderScan RLE. */
     SAIL_COMPRESSION_WEBP,          /* WEBP. */
-    SAIL_COMPRESSION_ZLIB,          /* ZLIB. */
     SAIL_COMPRESSION_ZSTD,          /* ZSTD. */
 };
 
