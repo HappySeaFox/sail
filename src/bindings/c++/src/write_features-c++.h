@@ -64,6 +64,7 @@ public:
     double compression_level_min() const;
     double compression_level_max() const;
     double compression_level_default() const;
+    double compression_level_step() const;
 
     sail_status_t to_write_options(write_options *swrite_options) const;
 
@@ -83,6 +84,7 @@ private:
     write_features& with_compression_level_min(double compression_level_min);
     write_features& with_compression_level_max(double compression_level_max);
     write_features& with_compression_level_default(double compression_level_default);
+    write_features& with_compression_level_step(double compression_level_step);
 
     const sail_write_features* sail_write_features_c() const;
 

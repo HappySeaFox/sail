@@ -106,6 +106,7 @@ sail_status_t WriteOptions::init(const sail::write_features &write_features, int
         d->ui->sliderCompression->setMinimum(write_features.compression_level_min());
         d->ui->sliderCompression->setMaximum(write_features.compression_level_max());
         d->ui->sliderCompression->setValue(write_features.compression_level_default());
+        d->ui->sliderCompression->setSingleStep(write_features.compression_level_step());
         d->ui->labelCompressionValue->setNum(d->ui->sliderCompression->value());
 
         connect(d->ui->sliderCompression, &QSlider::valueChanged, [&](int value) {

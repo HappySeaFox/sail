@@ -46,6 +46,7 @@ sail_status_t sail_alloc_write_features(struct sail_write_features **write_featu
     (*write_features)->compression_level_min      = 0;
     (*write_features)->compression_level_max      = 0;
     (*write_features)->compression_level_default  = 0;
+    (*write_features)->compression_level_step     = 0;
 
     return SAIL_OK;
 }

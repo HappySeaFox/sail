@@ -100,6 +100,9 @@ struct sail_write_features {
 
     /* Default compression value. For example: 15. */
     double compression_level_default;
+
+    /* Step to increase or decrease compression levels. For example: 1. */
+    double compression_level_step;
 };
 
 typedef struct sail_write_features sail_write_features_t;

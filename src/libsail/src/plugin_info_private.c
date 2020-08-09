@@ -297,6 +297,8 @@ static sail_status_t inih_handler_sail_error(void *data, const char *section, co
             plugin_info->write_features->compression_level_max = atof(value);
         } else if (strcmp(name, "compression-level-default") == 0) {
             plugin_info->write_features->compression_level_default = atof(value);
+        } else if (strcmp(name, "compression-level-step") == 0) {
+            plugin_info->write_features->compression_level_step = atof(value);
         } else {
             SAIL_LOG_ERROR("Unsupported plugin info key '%s' in [%s]", name, section);
             return SAIL_ERROR_PARSE_FILE;

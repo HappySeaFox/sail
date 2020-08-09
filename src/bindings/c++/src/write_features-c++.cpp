@@ -41,6 +41,7 @@ public:
         , compression_level_min(0)
         , compression_level_max(0)
         , compression_level_default(0)
+        , compression_level_step(0)
     {}
 
     const sail_write_features *sail_write_features_c;
@@ -53,6 +54,7 @@ public:
     double compression_level_min;
     double compression_level_max;
     double compression_level_default;
+    double compression_level_step;
 };
 
 write_features::write_features(const write_features &wf)
@@ -72,7 +74,8 @@ write_features& write_features::operator=(const write_features &wf)
         .with_default_compression(wf.default_compression())
         .with_compression_level_min(wf.compression_level_min())
         .with_compression_level_max(wf.compression_level_max())
-        .with_compression_level_default(wf.compression_level_default());
+        .with_compression_level_default(wf.compression_level_default())
+        .with_compression_level_step(wf.compression_level_step());
 
     return *this;
 }
@@ -120,6 +123,11 @@ double write_features::compression_level_max() const
 double write_features::compression_level_default() const
 {
     return d->compression_level_default;
+}
+
+double write_features::compression_level_step() const
+{
+    return d->compression_level_step;
 }
 
 sail_status_t write_features::to_write_options(write_options *swrite_options) const
@@ -186,7 +194,8 @@ write_features::write_features(const sail_write_features *wf)
         .with_default_compression(wf->default_compression)
         .with_compression_level_min(wf->compression_level_min)
         .with_compression_level_max(wf->compression_level_max)
-        .with_compression_level_default(wf->compression_level_default);
+        .with_compression_level_default(wf->compression_level_default)
+        .with_compression_level_step(wf->compression_level_step);
 }
 
 write_features &write_features::with_pixel_formats_mappings(const std::map<SailPixelFormat, std::vector<SailPixelFormat>> &pixel_formats_mappings)
@@ -234,6 +243,12 @@ write_features& write_features::with_compression_level_max(double compression_le
 write_features& write_features::with_compression_level_default(double compression_level_default)
 {
     d->compression_level_default = compression_level_default;
+    return *this;
+}
+
+write_features& write_features::with_compression_level_step(double compression_level_step)
+{
+    d->compression_level_step = compression_level_step;
     return *this;
 }
 

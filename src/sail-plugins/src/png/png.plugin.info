@@ -23,6 +23,7 @@ default-compression=DEFLATE
 compression-level-min=1
 compression-level-max=9
 compression-level-default=6
+compression-level-step=1
 
 [write-pixel-formats-mapping]
 BPP1-INDEXED=SOURCE

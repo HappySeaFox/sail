@@ -23,6 +23,7 @@ default-compression=JPEG
 compression-level-min=0
 compression-level-max=100
 compression-level-default=15
+compression-level-step=1
 
 [write-pixel-formats-mapping]
 BPP8-GRAYSCALE=SOURCE
