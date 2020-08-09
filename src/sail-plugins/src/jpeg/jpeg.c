@@ -355,7 +355,7 @@ SAIL_EXPORT sail_status_t sail_plugin_write_init_v3(struct sail_io *io, const st
     jpeg_state->compress_context = ptr;
 
     /* Sanity check. */
-    if (jpeg_state->write_options->compression != SAIL_COMPRESSION_UNSUPPORTED) {
+    if (jpeg_state->write_options->compression != SAIL_COMPRESSION_JPEG) {
         return SAIL_ERROR_UNSUPPORTED_COMPRESSION_TYPE;
     }
 

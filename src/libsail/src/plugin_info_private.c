@@ -138,7 +138,6 @@ static sail_status_t parse_serialized_ints(const char *value, int **target, int 
         int i = 0;
 
         while (node != NULL) {
-
             SAIL_TRY_OR_CLEANUP(converter(node->value, *target + i),
                                 /* cleanup */ SAIL_LOG_ERROR("Conversion of '%s' failed", node->value),
                                               destroy_string_node_chain(string_node));
@@ -350,9 +349,15 @@ static sail_status_t check_plugin_info(const char *path, const struct sail_plugi
         return SAIL_ERROR_INCOMPLETE_PLUGIN_INFO;
     }
 
+    /* Compressions must always exist.*/
+    if (write_features->compressions == NULL || write_features->compressions_length < 1) {
+        SAIL_LOG_ERROR("The plugin '%s' specifies an empty compressions list", path);
+        return SAIL_ERROR_INCOMPLETE_PLUGIN_INFO;
+    }
+
     /* Compression levels and types are mutually exclusive.*/
-    if (write_features->compressions != NULL && (write_features->compression_level_min != 0 || write_features->compression_level_max != 0)) {
-        SAIL_LOG_ERROR("The plugin '%s' specifies both compression levels and types which is unsupported", path);
+    if (write_features->compressions_length > 1 && (write_features->compression_level_min != 0 || write_features->compression_level_max != 0)) {
+        SAIL_LOG_ERROR("The plugin '%s' specifies more than two compression types and non-zero compression levels which is unsupported", path);
         return SAIL_ERROR_INCOMPLETE_PLUGIN_INFO;
     }
 

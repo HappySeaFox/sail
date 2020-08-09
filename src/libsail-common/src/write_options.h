@@ -56,13 +56,16 @@ struct sail_write_options {
 
     /*
      * Compression type. For example: SAIL_COMPRESSION_RLE. See SailCompression.
-     * Plugins support compression levels or compression types, but not both.
      * Use sail_write_features to determine what compression types or values are supported by a particular plugin.
+     *
+     * If a plugin supports more than two compression types, compression levels are not supported in this case.
      *
      * For example:
      *
-     *     1. The JPEG plugin supports only compression levels (compression_level_min, compression_level_max, compression_level_default).
-     *     2. The TIFF plugin supports only compression types (PACKBITS, JPEG, etc.).
+     *     1. The JPEG plugin supports only one compression, JPEG. compression_level_min, compression_level_max,
+     *        compression_level_default can be used to select a compression level.
+     *     2. The TIFF plugin supports more than two compression types (PACKBITS, JPEG, etc.). Compression levels
+     *        are not supported.
      */
     enum SailCompression compression;
 

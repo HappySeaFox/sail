@@ -66,13 +66,15 @@ struct sail_write_features {
     int interlaced_passes;
 
     /*
-     * A list of supported pixels compression types by this plugin. NULL if no compression types are available.
-     * Plugins support compression levels or compression types, but not both.
+     * A list of supported pixels compression types by this plugin. If the list has more than two entries,
+     * compression levels are ignored.
      *
      * For example:
      *
-     *     1. The JPEG plugin supports only compression levels (compression_level_min, compression_level_max, compression_level_default).
-     *     2. The TIFF plugin supports only compression types (PACKBITS, JPEG, etc.).
+     *     1. The JPEG plugin supports only one compression, JPEG. compression_level_min, compression_level_max,
+     *        compression_level_default can be used to select a compression level.
+     *     2. The TIFF plugin supports more than two compression types (PACKBITS, JPEG, etc.). Compression levels
+     *        are not supported.
      */
     enum SailCompression *compressions;
 
