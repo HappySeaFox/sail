@@ -1,5 +1,13 @@
 ## Priority 1
 
+- Add warnings with Clang
+
+- Make compression level double
+
+- Add ZLIB compression type
+
+- Add compressions to JPEG/PNG (JPEG and ZLIB)
+
 - Read/write indexed PNGs with alpha
 
 - Make meta info keys as enum
