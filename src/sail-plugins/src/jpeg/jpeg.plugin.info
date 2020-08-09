@@ -19,10 +19,10 @@ features=STATIC;META-INFO@PLUGIN_INFO_FEATURE_ICCP@
 properties=
 interlaced-passes=0
 compression-types=
-default-compression-type=UNSUPPORTED
-compression-min=0
-compression-max=100
-compression-default=15
+default-compression=UNSUPPORTED
+compression-level-min=0
+compression-level-max=100
+compression-level-default=15
 
 [write-pixel-formats-mapping]
 BPP8-GRAYSCALE=SOURCE

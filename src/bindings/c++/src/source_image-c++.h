@@ -77,12 +77,12 @@ public:
     int properties() const;
 
     /*
-     * Returns the source image compression type. See SailCompressionType.
+     * Returns the source image compression type. See SailCompression.
      *
      * READ:  Set by SAIL to a valid source image compression type.
      * WRITE: Ignored.
      */
-    SailCompressionType compression_type() const;
+    SailCompression compression() const;
 
 private:
     /*
@@ -94,7 +94,7 @@ private:
 
     source_image& with_pixel_format(SailPixelFormat pixel_format);
     source_image& with_properties(int properties);
-    source_image& with_compression_type(SailCompressionType compression_type);
+    source_image& with_compression(SailCompression compression);
 
 private:
     class pimpl;

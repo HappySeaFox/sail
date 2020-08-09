@@ -560,7 +560,7 @@ SAIL_EXPORT sail_status_t sail_plugin_write_init_v3(struct sail_io *io, const st
     SAIL_TRY(sail_copy_write_options(write_options, &png_state->write_options));
 
     /* Sanity check. */
-    if (png_state->write_options->compression_type != 0) {
+    if (png_state->write_options->compression != SAIL_COMPRESSION_UNSUPPORTED) {
         return SAIL_ERROR_UNSUPPORTED_COMPRESSION_TYPE;
     }
 

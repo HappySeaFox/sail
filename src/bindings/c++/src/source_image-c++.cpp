@@ -69,7 +69,7 @@ source_image& source_image::operator=(const source_image &si)
 {
     with_pixel_format(si.pixel_format())
         .with_properties(si.properties())
-        .with_compression_type(si.compression_type());
+        .with_compression(si.compression());
 
     return *this;
 }
@@ -94,9 +94,9 @@ int source_image::properties() const
     return d->source_image->properties;
 }
 
-SailCompressionType source_image::compression_type() const
+SailCompression source_image::compression() const
 {
-    return d->source_image->compression_type;
+    return d->source_image->compression;
 }
 
 source_image::source_image(const sail_source_image *si)
@@ -109,16 +109,16 @@ source_image::source_image(const sail_source_image *si)
 
     with_pixel_format(si->pixel_format)
         .with_properties(si->properties)
-        .with_compression_type(si->compression_type);
+        .with_compression(si->compression);
 }
 
 sail_status_t source_image::to_sail_source_image(sail_source_image *si) const
 {
     SAIL_CHECK_SOURCE_IMAGE_PTR(si);
 
-    si->pixel_format     = d->source_image->pixel_format;
-    si->properties       = d->source_image->properties;
-    si->compression_type = d->source_image->compression_type;
+    si->pixel_format = d->source_image->pixel_format;
+    si->properties   = d->source_image->properties;
+    si->compression  = d->source_image->compression;
 
     return SAIL_OK;
 }
@@ -135,9 +135,9 @@ source_image& source_image::with_properties(int properties)
     return *this;
 }
 
-source_image& source_image::with_compression_type(SailCompressionType compression_type)
+source_image& source_image::with_compression(SailCompression compression)
 {
-    d->source_image->compression_type = compression_type;
+    d->source_image->compression = compression;
     return *this;
 }
 

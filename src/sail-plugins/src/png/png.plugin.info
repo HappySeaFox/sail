@@ -19,10 +19,10 @@ features=STATIC;META-INFO;INTERLACED;ICCP
 properties=
 interlaced-passes=7
 compression-types=
-default-compression-type=UNSUPPORTED
-compression-min=1
-compression-max=9
-compression-default=6
+default-compression=UNSUPPORTED
+compression-level-min=1
+compression-level-max=9
+compression-level-default=6
 
 [write-pixel-formats-mapping]
 BPP1-INDEXED=SOURCE

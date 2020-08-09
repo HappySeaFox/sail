@@ -331,7 +331,7 @@ public:
     static sail_status_t image_property_to_string(SailImageProperty image_property, const char **result);
 
     /*
-     * Assigns image property from a string representation or 0. See SailImageProperty.
+     * Assigns image property from a string representation. See SailImageProperty.
      * For example: SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY is assigned for "FLIPPED-VERTICALLY".
      *
      * Returns 0 on success or sail_status_t on error.
@@ -339,20 +339,20 @@ public:
     static sail_status_t image_property_from_string(const char *str, SailImageProperty *result);
 
     /*
-     * Assigns a non-NULL string representation of the specified compression type. See SailCompressionType.
+     * Assigns a non-NULL string representation of the specified compression type. See SailCompression.
      * The assigned string MUST NOT be destroyed. For example: "RLE".
      *
      * Returns 0 on success or sail_status_t on error.
      */
-    static sail_status_t compression_type_to_string(SailCompressionType compression, const char **result);
+    static sail_status_t compression_to_string(SailCompression compression, const char **result);
 
     /*
-     * Assigns compression from a string representation or 0. See SailCompressionType.
+     * Assigns compression from a string representation. See SailCompression.
      * For example: SAIL_COMPRESSION_RLE is assigned for "RLE".
      *
      * Returns 0 on success or sail_status_t on error.
      */
-    static sail_status_t compression_type_from_string(const char *str, SailCompressionType *result);
+    static sail_status_t compression_from_string(const char *str, SailCompression *result);
 
 private:
     /*

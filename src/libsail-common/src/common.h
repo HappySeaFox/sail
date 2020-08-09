@@ -159,7 +159,7 @@ enum SailImageProperty {
 };
 
 /* Pixels compression types. */
-enum SailCompressionType {
+enum SailCompression {
 
     /* Compression is unsupported. */
     SAIL_COMPRESSION_UNSUPPORTED,

@@ -99,9 +99,9 @@ static sail_status_t pixel_format_from_string(const char *str, int *result) {
     return SAIL_OK;
 }
 
-static sail_status_t compression_type_from_string(const char *str, int *result) {
+static sail_status_t compression_from_string(const char *str, int *result) {
 
-    SAIL_TRY(sail_compression_type_from_string(str, (enum SailCompressionType*)result));
+    SAIL_TRY(sail_compression_from_string(str, (enum SailCompression*)result));
 
     return SAIL_OK;
 }
@@ -285,19 +285,19 @@ static sail_status_t inih_handler_sail_error(void *data, const char *section, co
             plugin_info->write_features->interlaced_passes = atoi(value);
         } else if (strcmp(name, "compression-types") == 0) {
             SAIL_TRY_OR_CLEANUP(parse_serialized_ints(value,
-                                                        (int **)&plugin_info->write_features->compression_types,
-                                                        &plugin_info->write_features->compression_types_length,
-                                                        compression_type_from_string),
-                                /* cleanup */ SAIL_LOG_ERROR("Failed to parse compression types: '%s'", value));
-        } else if (strcmp(name, "default-compression-type") == 0) {
-            SAIL_TRY_OR_CLEANUP(sail_compression_type_from_string(value, &plugin_info->write_features->default_compression_type),
-                                /* cleanup */ SAIL_LOG_ERROR("Failed to parse compression type: '%s'", value));
-        } else if (strcmp(name, "compression-min") == 0) {
-            plugin_info->write_features->compression_min = atoi(value);
-        } else if (strcmp(name, "compression-max") == 0) {
-            plugin_info->write_features->compression_max = atoi(value);
-        } else if (strcmp(name, "compression-default") == 0) {
-            plugin_info->write_features->compression_default = atoi(value);
+                                                        (int **)&plugin_info->write_features->compressions,
+                                                        &plugin_info->write_features->compressions_length,
+                                                        compression_from_string),
+                                /* cleanup */ SAIL_LOG_ERROR("Failed to parse compressions: '%s'", value));
+        } else if (strcmp(name, "default-compression") == 0) {
+            SAIL_TRY_OR_CLEANUP(sail_compression_from_string(value, &plugin_info->write_features->default_compression),
+                                /* cleanup */ SAIL_LOG_ERROR("Failed to parse compression: '%s'", value));
+        } else if (strcmp(name, "compression-level-min") == 0) {
+            plugin_info->write_features->compression_level_min = atoi(value);
+        } else if (strcmp(name, "compression-level-max") == 0) {
+            plugin_info->write_features->compression_level_max = atoi(value);
+        } else if (strcmp(name, "compression-level-default") == 0) {
+            plugin_info->write_features->compression_level_default = atoi(value);
         } else {
             SAIL_LOG_ERROR("Unsupported plugin info key '%s' in [%s]", name, section);
             return SAIL_ERROR_PARSE_FILE;
@@ -347,6 +347,12 @@ static sail_status_t check_plugin_info(const char *path, const struct sail_plugi
             write_features->features & SAIL_PLUGIN_FEATURE_ANIMATED ||
             write_features->features & SAIL_PLUGIN_FEATURE_MULTI_FRAME) && write_features->pixel_formats_mapping_node == NULL) {
         SAIL_LOG_ERROR("The plugin '%s' is able to write images, but output pixel formats mappings are not specified", path);
+        return SAIL_ERROR_INCOMPLETE_PLUGIN_INFO;
+    }
+
+    /* Compression levels and types are mutually exclusive.*/
+    if (write_features->compressions != NULL && (write_features->compression_level_min != 0 || write_features->compression_level_max != 0)) {
+        SAIL_LOG_ERROR("The plugin '%s' specifies both compression levels and types which is unsupported", path);
         return SAIL_ERROR_INCOMPLETE_PLUGIN_INFO;
     }
 

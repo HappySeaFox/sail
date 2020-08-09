@@ -333,7 +333,7 @@ sail_status_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffe
 
     if (writeOptions.exec() == QDialog::Accepted) {
         write_options->output_pixel_format = writeOptions.pixelFormat();
-        write_options->compression = writeOptions.compression();
+        write_options->compression_level = writeOptions.compressionLevel();
     }
 
     elapsed.restart();
@@ -469,7 +469,7 @@ void QtSail::onSave()
     /*
      * Allocate 50 Mb.
      */
-    size_t buffer_length = 50*1024*1024;
+    const size_t buffer_length = 50*1024*1024;
     char *buffer = new char [buffer_length];
 
     size_t written;

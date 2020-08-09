@@ -36,14 +36,14 @@ public:
     pimpl()
         : output_pixel_format(SAIL_PIXEL_FORMAT_UNKNOWN)
         , io_options(0)
-        , compression_type(SAIL_COMPRESSION_UNSUPPORTED)
-        , compression(0)
+        , compression(SAIL_COMPRESSION_UNSUPPORTED)
+        , compression_level(0)
     {}
 
     SailPixelFormat output_pixel_format;
     int io_options;
-    SailCompressionType compression_type;
-    int compression;
+    SailCompression compression;
+    int compression_level;
 };
 
 write_options::write_options()
@@ -61,8 +61,8 @@ write_options::write_options(const sail_write_options *wo)
 
     with_output_pixel_format(wo->output_pixel_format)
         .with_io_options(wo->io_options)
-        .with_compression_type(wo->compression_type)
-        .with_compression(wo->compression);
+        .with_compression(wo->compression)
+        .with_compression_level(wo->compression_level);
 }
 
 write_options::write_options(const write_options &wo)
@@ -75,8 +75,8 @@ write_options& write_options::operator=(const write_options &wo)
 {
     with_output_pixel_format(wo.output_pixel_format())
         .with_io_options(wo.io_options())
-        .with_compression_type(wo.compression_type())
-        .with_compression(wo.compression());
+        .with_compression(wo.compression())
+        .with_compression_level(wo.compression_level());
 
     return *this;
 }
@@ -96,14 +96,14 @@ int write_options::io_options() const
     return d->io_options;
 }
 
-SailCompressionType write_options::compression_type() const
-{
-    return d->compression_type;
-}
-
-int write_options::compression() const
+SailCompression write_options::compression() const
 {
     return d->compression;
+}
+
+int write_options::compression_level() const
+{
+    return d->compression_level;
 }
 
 write_options& write_options::with_output_pixel_format(SailPixelFormat output_pixel_format)
@@ -118,15 +118,15 @@ write_options& write_options::with_io_options(int io_options)
     return *this;
 }
 
-write_options& write_options::with_compression_type(SailCompressionType compression_type)
+write_options& write_options::with_compression(SailCompression compression)
 {
-    d->compression_type = compression_type;
+    d->compression = compression;
     return *this;
 }
 
-write_options& write_options::with_compression(int compression)
+write_options& write_options::with_compression_level(int compression_level)
 {
-    d->compression = compression;
+    d->compression_level = compression_level;
     return *this;
 }
 
@@ -136,8 +136,8 @@ sail_status_t write_options::to_sail_write_options(sail_write_options *write_opt
 
     write_options->output_pixel_format = d->output_pixel_format;
     write_options->io_options          = d->io_options;
-    write_options->compression_type    = d->compression_type;
     write_options->compression         = d->compression;
+    write_options->compression_level   = d->compression_level;
 
     return SAIL_OK;
 }
