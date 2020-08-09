@@ -39,7 +39,7 @@ sail_status_t sail_alloc_write_options(struct sail_write_options **write_options
 
     (*write_options)->output_pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;
     (*write_options)->io_options          = 0;
-    (*write_options)->compression         = 0;
+    (*write_options)->compression         = SAIL_COMPRESSION_UNSUPPORTED;
     (*write_options)->compression_level   = 0;
 
     return SAIL_OK;
