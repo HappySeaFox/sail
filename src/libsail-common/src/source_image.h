@@ -69,12 +69,12 @@ struct sail_source_image {
     int properties;
 
     /*
-     * Source image compression type. See SailCompressionType.
+     * Source image compression type. See SailCompression.
      *
      * READ:  Set by SAIL to a valid source image compression type.
      * WRITE: Ignored.
      */
-    enum SailCompressionType compression_type;
+    enum SailCompression compression;
 };
 
 typedef struct sail_source_image sail_source_image_t;

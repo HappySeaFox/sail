@@ -99,14 +99,14 @@ static sail_status_t pixel_format_from_string(const char *str, int *result) {
     return SAIL_OK;
 }
 
-static sail_status_t compression_type_from_string(const char *str, int *result) {
+static sail_status_t compression_from_string(const char *str, int *result) {
 
-    SAIL_TRY(sail_compression_type_from_string(str, (enum SailCompressionType*)result));
+    SAIL_TRY(sail_compression_from_string(str, (enum SailCompression*)result));
 
     return SAIL_OK;
 }
 
-static sail_status_t parse_serialized_ints(const char *value, int **target, int *length, sail_status_t (*converter)(const char *str, int *result)) {
+static sail_status_t parse_serialized_ints(const char *value, int **target, unsigned *length, sail_status_t (*converter)(const char *str, int *result)) {
 
     SAIL_CHECK_PTR(value);
     SAIL_CHECK_PTR(target);
@@ -129,7 +129,7 @@ static sail_status_t parse_serialized_ints(const char *value, int **target, int 
         *target = (int *)malloc((size_t)*length * sizeof(int));
 
         if (*target == NULL) {
-            SAIL_LOG_ERROR("Failed to allocate %d integers", *length);
+            SAIL_LOG_ERROR("Failed to allocate %u integers", *length);
             destroy_string_node_chain(string_node);
             return SAIL_ERROR_MEMORY_ALLOCATION;
         }
@@ -138,7 +138,6 @@ static sail_status_t parse_serialized_ints(const char *value, int **target, int 
         int i = 0;
 
         while (node != NULL) {
-
             SAIL_TRY_OR_CLEANUP(converter(node->value, *target + i),
                                 /* cleanup */ SAIL_LOG_ERROR("Conversion of '%s' failed", node->value),
                                               destroy_string_node_chain(string_node));
@@ -285,19 +284,21 @@ static sail_status_t inih_handler_sail_error(void *data, const char *section, co
             plugin_info->write_features->interlaced_passes = atoi(value);
         } else if (strcmp(name, "compression-types") == 0) {
             SAIL_TRY_OR_CLEANUP(parse_serialized_ints(value,
-                                                        (int **)&plugin_info->write_features->compression_types,
-                                                        &plugin_info->write_features->compression_types_length,
-                                                        compression_type_from_string),
-                                /* cleanup */ SAIL_LOG_ERROR("Failed to parse compression types: '%s'", value));
-        } else if (strcmp(name, "default-compression-type") == 0) {
-            SAIL_TRY_OR_CLEANUP(sail_compression_type_from_string(value, &plugin_info->write_features->default_compression_type),
-                                /* cleanup */ SAIL_LOG_ERROR("Failed to parse compression type: '%s'", value));
-        } else if (strcmp(name, "compression-min") == 0) {
-            plugin_info->write_features->compression_min = atoi(value);
-        } else if (strcmp(name, "compression-max") == 0) {
-            plugin_info->write_features->compression_max = atoi(value);
-        } else if (strcmp(name, "compression-default") == 0) {
-            plugin_info->write_features->compression_default = atoi(value);
+                                                        (int **)&plugin_info->write_features->compressions,
+                                                        &plugin_info->write_features->compressions_length,
+                                                        compression_from_string),
+                                /* cleanup */ SAIL_LOG_ERROR("Failed to parse compressions: '%s'", value));
+        } else if (strcmp(name, "default-compression") == 0) {
+            SAIL_TRY_OR_CLEANUP(sail_compression_from_string(value, &plugin_info->write_features->default_compression),
+                                /* cleanup */ SAIL_LOG_ERROR("Failed to parse compression: '%s'", value));
+        } else if (strcmp(name, "compression-level-min") == 0) {
+            plugin_info->write_features->compression_level_min = atof(value);
+        } else if (strcmp(name, "compression-level-max") == 0) {
+            plugin_info->write_features->compression_level_max = atof(value);
+        } else if (strcmp(name, "compression-level-default") == 0) {
+            plugin_info->write_features->compression_level_default = atof(value);
+        } else if (strcmp(name, "compression-level-step") == 0) {
+            plugin_info->write_features->compression_level_step = atof(value);
         } else {
             SAIL_LOG_ERROR("Unsupported plugin info key '%s' in [%s]", name, section);
             return SAIL_ERROR_PARSE_FILE;
@@ -347,6 +348,18 @@ static sail_status_t check_plugin_info(const char *path, const struct sail_plugi
             write_features->features & SAIL_PLUGIN_FEATURE_ANIMATED ||
             write_features->features & SAIL_PLUGIN_FEATURE_MULTI_FRAME) && write_features->pixel_formats_mapping_node == NULL) {
         SAIL_LOG_ERROR("The plugin '%s' is able to write images, but output pixel formats mappings are not specified", path);
+        return SAIL_ERROR_INCOMPLETE_PLUGIN_INFO;
+    }
+
+    /* Compressions must always exist.*/
+    if (write_features->compressions == NULL || write_features->compressions_length < 1) {
+        SAIL_LOG_ERROR("The plugin '%s' specifies an empty compressions list", path);
+        return SAIL_ERROR_INCOMPLETE_PLUGIN_INFO;
+    }
+
+    /* Compression levels and types are mutually exclusive.*/
+    if (write_features->compressions_length > 1 && (write_features->compression_level_min != 0 || write_features->compression_level_max != 0)) {
+        SAIL_LOG_ERROR("The plugin '%s' specifies more than two compression types and non-zero compression levels which is unsupported", path);
         return SAIL_ERROR_INCOMPLETE_PLUGIN_INFO;
     }
 

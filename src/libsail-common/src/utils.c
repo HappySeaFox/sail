@@ -400,7 +400,7 @@ sail_status_t sail_image_property_from_string(const char *str, enum SailImagePro
     return SAIL_ERROR_UNSUPPORTED_IMAGE_PROPERTY;
 }
 
-sail_status_t sail_compression_type_to_string(enum SailCompressionType compression, const char **result) {
+sail_status_t sail_compression_to_string(enum SailCompression compression, const char **result) {
 
     SAIL_CHECK_STRING_PTR(result);
 
@@ -445,7 +445,7 @@ sail_status_t sail_compression_type_to_string(enum SailCompressionType compressi
     return SAIL_ERROR_UNSUPPORTED_COMPRESSION_TYPE;
 }
 
-sail_status_t sail_compression_type_from_string(const char *str, enum SailCompressionType *result) {
+sail_status_t sail_compression_from_string(const char *str, enum SailCompression *result) {
 
     SAIL_CHECK_STRING_PTR(str);
     SAIL_CHECK_RESULT_PTR(result);

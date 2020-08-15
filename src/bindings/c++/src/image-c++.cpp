@@ -359,16 +359,16 @@ sail_status_t image::image_property_from_string(const char *str, SailImageProper
     return SAIL_OK;
 }
 
-sail_status_t image::compression_type_to_string(SailCompressionType compression, const char **result)
+sail_status_t image::compression_to_string(SailCompression compression, const char **result)
 {
-    SAIL_TRY(sail_compression_type_to_string(compression, result));
+    SAIL_TRY(sail_compression_to_string(compression, result));
 
     return SAIL_OK;
 }
 
-sail_status_t image::compression_type_from_string(const char *str, SailCompressionType *result)
+sail_status_t image::compression_from_string(const char *str, SailCompression *result)
 {
-    SAIL_TRY(sail_compression_type_from_string(str, result));
+    SAIL_TRY(sail_compression_from_string(str, result));
 
     return SAIL_OK;
 }

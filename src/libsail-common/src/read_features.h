@@ -53,7 +53,7 @@ struct sail_read_features {
     enum SailPixelFormat *output_pixel_formats;
 
     /* The length of output_pixel_formats. */
-    int output_pixel_formats_length;
+    unsigned output_pixel_formats_length;
 
     /*
      * Output pixel format to use by default when no specific output pixel format was requested by a user.

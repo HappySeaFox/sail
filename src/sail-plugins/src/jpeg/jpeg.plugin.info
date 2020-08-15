@@ -18,11 +18,12 @@ default-output-pixel-format=@SAIL_DEFAULT_READ_OUTPUT_PIXEL_FORMAT@
 features=STATIC;META-INFO@PLUGIN_INFO_FEATURE_ICCP@
 properties=
 interlaced-passes=0
-compression-types=
-default-compression-type=UNSUPPORTED
-compression-min=0
-compression-max=100
-compression-default=15
+compression-types=JPEG
+default-compression=JPEG
+compression-level-min=0
+compression-level-max=100
+compression-level-default=15
+compression-level-step=1
 
 [write-pixel-formats-mapping]
 BPP8-GRAYSCALE=SOURCE

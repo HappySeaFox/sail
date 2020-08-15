@@ -250,15 +250,15 @@ static MunitResult test_image_property_from_string(const MunitParameter params[]
 /*
  * Compression types.
  */
-static MunitResult test_compression_type_to_string(const MunitParameter params[], void *user_data) {
+static MunitResult test_compression_to_string(const MunitParameter params[], void *user_data) {
     (void)params;
     (void)user_data;
 
     const char *result;
 
-#define TEST_SAIL_CONVERSION(e, s)               \
-    result = NULL;                               \
-    sail_compression_type_to_string(e, &result); \
+#define TEST_SAIL_CONVERSION(e, s)          \
+    result = NULL;                          \
+    sail_compression_to_string(e, &result); \
     munit_assert_string_equal(result, s);
 
     TEST_SAIL_CONVERSION(SAIL_COMPRESSION_UNSUPPORTED,   "UNSUPPORTED");
@@ -301,15 +301,15 @@ static MunitResult test_compression_type_to_string(const MunitParameter params[]
     return MUNIT_OK;
 }
 
-static MunitResult test_compression_type_from_string(const MunitParameter params[], void *user_data) {
+static MunitResult test_compression_from_string(const MunitParameter params[], void *user_data) {
     (void)params;
     (void)user_data;
 
     enum SailCompressionType result;
 
-#define TEST_SAIL_CONVERSION(s, e)                 \
-    result = SAIL_COMPRESSION_UNSUPPORTED;         \
-    sail_compression_type_from_string(s, &result); \
+#define TEST_SAIL_CONVERSION(s, e)            \
+    result = SAIL_COMPRESSION_UNSUPPORTED;    \
+    sail_compression_from_string(s, &result); \
     munit_assert(result == e);
 
     TEST_SAIL_CONVERSION("UNSUPPORTED",   SAIL_COMPRESSION_UNSUPPORTED);
@@ -408,8 +408,8 @@ static MunitTest test_suite_tests[] = {
     { (char *)"/image-property-to-string",   test_image_property_to_string,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/image-property-from-string", test_image_property_from_string, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
-    { (char *)"/compression-type-to-string",   test_compression_type_to_string,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/compression-type-from-string", test_compression_type_from_string, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/compression-to-string",   test_compression_to_string,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/compression-from-string", test_compression_from_string, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { (char *)"/plugin-feature-to-string",   test_plugin_feature_to_string,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/plugin-feature-from-string", test_plugin_feature_from_string, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },

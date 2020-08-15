@@ -69,7 +69,7 @@ sail_status_t ReadOptions::init(const sail_read_features *read_features)
 
         const char *output_pixel_format_str;
 
-        for (int i = 0; i < read_features->output_pixel_formats_length; i++) {
+        for (unsigned i = 0; i < read_features->output_pixel_formats_length; i++) {
             SAIL_TRY(sail_pixel_format_to_string(read_features->output_pixel_formats[i], &output_pixel_format_str));
 
             d->ui->comboColor->addItem(output_pixel_format_str,

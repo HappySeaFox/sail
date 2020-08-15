@@ -50,7 +50,7 @@ public:
 
     SailPixelFormat pixelFormat() const;
 
-    int compression() const;
+    int compressionLevel() const;
 
 private:
     sail_status_t init(const sail::write_features &write_features, int input_pixel_format);

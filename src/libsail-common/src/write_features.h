@@ -66,38 +66,43 @@ struct sail_write_features {
     int interlaced_passes;
 
     /*
-     * A list of supported pixels compression types by this plugin. NULL if no compression types are available.
-     * In most cases plugins support compression levels or compression types, but not both.
+     * A list of supported pixels compression types by this plugin. If the list has more than two entries,
+     * compression levels are ignored.
      *
      * For example:
      *
-     *     1. The JPEG plugin supports only compression levels (compression_min, compression_max, compression_default).
-     *     2. The TIFF plugin supports only compression types (RLE or no compression at all).
+     *     1. The JPEG plugin supports only one compression, JPEG. compression_level_min, compression_level_max,
+     *        compression_level_default can be used to select a compression level.
+     *     2. The TIFF plugin supports more than two compression types (PACKBITS, JPEG, etc.). Compression levels
+     *        are not supported.
      */
-    enum SailCompressionType *compression_types;
+    enum SailCompression *compressions;
 
-    /* The length of compression_types. */
-    int compression_types_length;
+    /* The length of compressions. */
+    unsigned compressions_length;
 
     /* Compression type to use by default. */
-    enum SailCompressionType default_compression_type;
+    enum SailCompression default_compression;
 
     /*
      * Minimum compression value. For lossy codecs, more compression means less quality and vice versa.
      * For lossless codecs, more compression means nothing but a smaller file size. This field is
-     * plugin-specific. If compression_min == compression_max == 0, no compression tuning is available.
+     * plugin-specific. If compression_level_min == compression_level_max == 0, no compression tuning is available.
      * For example: 0.
      */
-    int compression_min;
+    double compression_level_min;
 
     /*
-     * Maximum compression value. This field is plugin-specific. If compression_min == compression_max == 0,
+     * Maximum compression value. This field is plugin-specific. If compression_level_min == compression_level_max == 0,
      * no compression tuning is available. For example: 100.
      */
-    int compression_max;
+    double compression_level_max;
 
     /* Default compression value. For example: 15. */
-    int compression_default;
+    double compression_level_default;
+
+    /* Step to increase or decrease compression levels. For example: 1. */
+    double compression_level_step;
 };
 
 typedef struct sail_write_features sail_write_features_t;

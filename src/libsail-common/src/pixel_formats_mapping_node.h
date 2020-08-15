@@ -71,7 +71,7 @@ struct sail_pixel_formats_mapping_node {
     enum SailPixelFormat *output_pixel_formats;
 
     /* The length of output_pixel_formats. */
-    int output_pixel_formats_length;
+    unsigned output_pixel_formats_length;
 
     struct sail_pixel_formats_mapping_node *next;
 };

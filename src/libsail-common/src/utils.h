@@ -112,7 +112,7 @@ SAIL_EXPORT sail_status_t sail_pixel_format_from_string(const char *str, enum Sa
 SAIL_EXPORT sail_status_t sail_image_property_to_string(enum SailImageProperty image_property, const char **result);
 
 /*
- * Assigns image property from a string representation or 0. See SailImageProperty.
+ * Assigns image property from a string representation. See SailImageProperty.
  * For example: SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY is assigned for "FLIPPED-VERTICALLY".
  *
  * Returns 0 on success or sail_status_t on error.
@@ -120,20 +120,20 @@ SAIL_EXPORT sail_status_t sail_image_property_to_string(enum SailImageProperty i
 SAIL_EXPORT sail_status_t sail_image_property_from_string(const char *str, enum SailImageProperty *result);
 
 /*
- * Assigns a non-NULL string representation of the specified compression type. See SailCompressionType.
+ * Assigns a non-NULL string representation of the specified compression type. See SailCompression.
  * The assigned string MUST NOT be destroyed. For example: "RLE".
  *
  * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_status_t sail_compression_type_to_string(enum SailCompressionType compression, const char **result);
+SAIL_EXPORT sail_status_t sail_compression_to_string(enum SailCompression compression, const char **result);
 
 /*
- * Assigns compression from a string representation or 0. See SailCompressionType.
+ * Assigns compression from a string representation. See SailCompression.
  * For example: SAIL_COMPRESSION_RLE is assigned for "RLE".
  *
  * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_status_t sail_compression_type_from_string(const char *str, enum SailCompressionType *result);
+SAIL_EXPORT sail_status_t sail_compression_from_string(const char *str, enum SailCompression *result);
 
 /*
  * Assigns a non-NULL string representation of the specified plugin feature. See SailPluginFeature.
@@ -144,7 +144,7 @@ SAIL_EXPORT sail_status_t sail_compression_type_from_string(const char *str, enu
 SAIL_EXPORT sail_status_t sail_plugin_feature_to_string(enum SailPluginFeature plugin_feature, const char **result);
 
 /*
- * Assigns plugin feature from a string representation or 0. See SailPluginFeature.
+ * Assigns plugin feature from a string representation. See SailPluginFeature.
  * For example: SAIL_PLUGIN_FEATURE_STATIC is assigned for "STATIC".
  *
  * Returns 0 on success or sail_status_t on error.

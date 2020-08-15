@@ -59,11 +59,12 @@ public:
     const std::map<SailPixelFormat, std::vector<SailPixelFormat>>& pixel_formats_mappings() const;
     int features() const;
     int properties() const;
-    const std::vector<SailCompressionType>& compression_types() const;
-    SailCompressionType default_compression_type() const;
-    int compression_min() const;
-    int compression_max() const;
-    int compression_default() const;
+    const std::vector<SailCompression>& compressions() const;
+    SailCompression default_compression() const;
+    double compression_level_min() const;
+    double compression_level_max() const;
+    double compression_level_default() const;
+    double compression_level_step() const;
 
     sail_status_t to_write_options(write_options *swrite_options) const;
 
@@ -78,11 +79,12 @@ private:
     write_features& with_pixel_formats_mappings(const std::map<SailPixelFormat, std::vector<SailPixelFormat>> &pixel_formats_mappings);
     write_features& with_features(int features);
     write_features& with_properties(int properties);
-    write_features& with_compression_types(const std::vector<SailCompressionType> &compression_types);
-    write_features& with_default_compression_type(SailCompressionType default_compression_type);
-    write_features& with_compression_min(int compression_min);
-    write_features& with_compression_max(int compression_max);
-    write_features& with_compression_default(int compression_default);
+    write_features& with_compressions(const std::vector<SailCompression> &compressions);
+    write_features& with_default_compression(SailCompression default_compression);
+    write_features& with_compression_level_min(double compression_level_min);
+    write_features& with_compression_level_max(double compression_level_max);
+    write_features& with_compression_level_default(double compression_level_default);
+    write_features& with_compression_level_step(double compression_level_step);
 
     const sail_write_features* sail_write_features_c() const;
 

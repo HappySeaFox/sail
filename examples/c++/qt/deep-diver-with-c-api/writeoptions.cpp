@@ -58,7 +58,7 @@ SailPixelFormat WriteOptions::pixelFormat() const
     return static_cast<SailPixelFormat>(d->ui->comboColor->currentData().toInt());
 }
 
-int WriteOptions::compression() const
+int WriteOptions::compressionLevel() const
 {
     return d->ui->sliderCompression->isEnabled() ? d->ui->sliderCompression->value() : -1;
 }
@@ -76,7 +76,7 @@ sail_status_t WriteOptions::init(const sail_write_features *write_features, int 
 
     while (node != nullptr) {
         if (node->input_pixel_format == input_pixel_format) {
-            for (int i = 0; i < node->output_pixel_formats_length; i++) {
+            for (unsigned i = 0; i < node->output_pixel_formats_length; i++) {
                 const char *output_pixel_format_str;
 
                 SAIL_TRY(sail_pixel_format_to_string(node->output_pixel_formats[i], &output_pixel_format_str));
@@ -97,20 +97,22 @@ sail_status_t WriteOptions::init(const sail_write_features *write_features, int 
         return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
     }
 
-    if (write_features->compression_min == 0 && write_features->compression_max == 0) {
-        d->ui->labelCompression->setText(tr("Compression levels are not available"));
-        d->ui->labelCompression->setEnabled(false);
-        d->ui->sliderCompression->setEnabled(false);
-    } else {
+    /* Plugins support compression levels only when they support just a single compression. */
+    if (write_features->compressions_length == 1) {
         d->ui->labelCompression->setText(tr("Compression:"));
-        d->ui->sliderCompression->setMinimum(write_features->compression_min);
-        d->ui->sliderCompression->setMaximum(write_features->compression_max);
-        d->ui->sliderCompression->setValue(write_features->compression_default);
+        d->ui->sliderCompression->setMinimum(write_features->compression_level_min);
+        d->ui->sliderCompression->setMaximum(write_features->compression_level_max);
+        d->ui->sliderCompression->setValue(write_features->compression_level_default);
+        d->ui->sliderCompression->setSingleStep(write_features->compression_level_step);
         d->ui->labelCompressionValue->setNum(d->ui->sliderCompression->value());
 
         connect(d->ui->sliderCompression, &QSlider::valueChanged, [&](int value) {
             d->ui->labelCompressionValue->setNum(value);
         });
+    } else {
+        d->ui->labelCompression->setText(tr("Compression levels are not available"));
+        d->ui->labelCompression->setEnabled(false);
+        d->ui->sliderCompression->setEnabled(false);
     }
 
     return SAIL_OK;

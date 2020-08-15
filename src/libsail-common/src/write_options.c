@@ -39,8 +39,8 @@ sail_status_t sail_alloc_write_options(struct sail_write_options **write_options
 
     (*write_options)->output_pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;
     (*write_options)->io_options          = 0;
-    (*write_options)->compression_type    = 0;
-    (*write_options)->compression         = 0;
+    (*write_options)->compression         = SAIL_COMPRESSION_UNSUPPORTED;
+    (*write_options)->compression_level   = 0;
 
     return SAIL_OK;
 }
@@ -74,12 +74,8 @@ sail_status_t sail_write_options_from_features(const struct sail_write_features 
         write_options->io_options |= SAIL_IO_OPTION_ICCP;
     }
 
-    /* Compression levels are not supported. */
-    if (write_features->compression_min == write_features->compression_max) {
-        write_options->compression_type = write_features->default_compression_type;
-    } else {
-        write_options->compression = write_features->compression_default;
-    }
+    write_options->compression = write_features->default_compression;
+    write_options->compression_level = write_features->compression_level_default;
 
     return SAIL_OK;
 }
