@@ -44,7 +44,9 @@ struct tiff_state {
     bool libtiff_error;
     struct sail_read_options *read_options;
     struct sail_write_options *write_options;
+    int write_compression;
     TIFFRGBAImage image;
+    int line;
 };
 
 static sail_status_t alloc_tiff_state(struct tiff_state **tiff_state) {
@@ -57,11 +59,13 @@ static sail_status_t alloc_tiff_state(struct tiff_state **tiff_state) {
         return SAIL_ERROR_MEMORY_ALLOCATION;
     }
 
-    (*tiff_state)->tiff          = NULL;
-    (*tiff_state)->current_frame = 0;
-    (*tiff_state)->libtiff_error = false;
-    (*tiff_state)->read_options  = NULL;
-    (*tiff_state)->write_options = NULL;
+    (*tiff_state)->tiff              = NULL;
+    (*tiff_state)->current_frame     = 0;
+    (*tiff_state)->libtiff_error     = false;
+    (*tiff_state)->read_options      = NULL;
+    (*tiff_state)->write_options     = NULL;
+    (*tiff_state)->write_compression = COMPRESSION_NONE;
+    (*tiff_state)->line              = 0;
 
     zero_tiff_image(&(*tiff_state)->image);
 
@@ -111,19 +115,19 @@ SAIL_EXPORT sail_status_t sail_plugin_read_init_v3(struct sail_io *io, const str
     /* Initialize TIFF.
      *
      * 'r': reading operation
-     * 'm': disable use of memory-mapped files
      * 'h': read TIFF header only
+     * 'm': disable use of memory-mapped files
      */
     tiff_state->tiff = TIFFClientOpen("tiff-sail-plugin",
-                                        "rhm",
-	                                    io,
-	                                    my_read_proc,
-                                        my_write_proc,
-                                	    my_seek_proc,
-                                        my_dummy_close_proc,
-                                	    my_dummy_size_proc,
-                                	    /* map */ NULL,
-                                        /* unmap */ NULL);
+                                      "rhm",
+                                      io,
+                                      my_read_proc,
+                                      my_write_proc,
+                                      my_seek_proc,
+                                      my_dummy_close_proc,
+                                      my_dummy_size_proc,
+                                      /* map */ NULL,
+                                      /* unmap */ NULL);
 
     if (tiff_state->tiff == NULL) {
         tiff_state->libtiff_error = true;
@@ -196,7 +200,7 @@ SAIL_EXPORT sail_status_t sail_plugin_read_seek_next_frame_v3(void *state, struc
         return SAIL_ERROR_UNDERLYING_CODEC;
     }
 
-    (*image)->source_image->compression_type = tiff_compression_to_sail_compression_type(compression);
+    (*image)->source_image->compression = tiff_compression_to_sail_compression(compression);
     (*image)->source_image->pixel_format = bpp_to_pixel_format(tiff_state->image.bitspersample * tiff_state->image.samplesperpixel);
 
     const char *pixel_format_str;
@@ -290,33 +294,34 @@ SAIL_EXPORT sail_status_t sail_plugin_write_init_v3(struct sail_io *io, const st
     /* Deep copy write options. */
     SAIL_TRY(sail_copy_write_options(write_options, &tiff_state->write_options));
 
-#if 0
     /* Sanity check. */
     SAIL_TRY(supported_write_output_pixel_format(tiff_state->write_options->output_pixel_format));
+    SAIL_TRY(sail_compression_to_tiff_compression(tiff_state->write_options->compression, &tiff_state->write_compression));
 
-    if (tiff_state->write_options->compression_type != 0) {
-        return SAIL_UNSUPPORTED_COMPRESSION_TYPE;
-    }
+    TIFFSetWarningHandler(my_warning_fn);
+    TIFFSetErrorHandler(my_error_fn);
 
-    /* Initialize PNG. */
-    if ((tiff_state->png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, my_error_fn, my_warning_fn)) == NULL) {
-        tiff_state->libpng_error = true;
+    /* Initialize TIFF.
+     *
+     * 'w': writing operation
+     * 'm': disable use of memory-mapped files
+     */
+    tiff_state->tiff = TIFFClientOpen("tiff-sail-plugin",
+                                      "wm",
+                                      io,
+                                      my_read_proc,
+                                      my_write_proc,
+                                      my_seek_proc,
+                                      /* libsail will close for us. */ my_dummy_close_proc,
+                                      my_dummy_size_proc,
+                                      /* map */ NULL,
+                                      /* unmap */ NULL);
+
+    if (tiff_state->tiff == NULL) {
+        tiff_state->libtiff_error = true;
         return SAIL_ERROR_UNDERLYING_CODEC;
     }
 
-    if ((tiff_state->info_ptr = png_create_info_struct(tiff_state->png_ptr)) == NULL) {
-        tiff_state->libpng_error = true;
-        return SAIL_ERROR_UNDERLYING_CODEC;
-    }
-
-    /* Error handling setup. */
-    if (setjmp(png_jmpbuf(tiff_state->png_ptr))) {
-        tiff_state->libpng_error = true;
-        return SAIL_ERROR_UNDERLYING_CODEC;
-    }
-
-    png_set_write_fn(tiff_state->png_ptr, io, my_write_fn, my_flush_fn);
-#endif
     return SAIL_OK;
 }
 
@@ -332,102 +337,24 @@ SAIL_EXPORT sail_status_t sail_plugin_write_seek_next_frame_v3(void *state, stru
         return SAIL_ERROR_UNDERLYING_CODEC;
     }
 
-#if 0
-    /* Sanity check. */
-    SAIL_TRY(supported_write_input_pixel_format(image->pixel_format));
+    tiff_state->line = 0;
 
-    /* Error handling setup. */
-    if (setjmp(png_jmpbuf(tiff_state->png_ptr))) {
-        tiff_state->libpng_error = true;
-        return SAIL_ERROR_UNDERLYING_CODEC;
-    }
-
-    int color_type;
-    int bit_depth;
-    SAIL_TRY(pixel_format_to_png_color_type(image->pixel_format, &color_type, &bit_depth));
-
-    /* Write meta info. */
-    if (tiff_state->write_options->io_options & SAIL_IO_OPTION_META_INFO && image->meta_entry_node != NULL) {
-        SAIL_LOG_DEBUG("PNG: Writing meta info");
-        SAIL_TRY(write_png_text(tiff_state->png_ptr, tiff_state->info_ptr, image->meta_entry_node));
-    }
-
-    png_set_IHDR(tiff_state->png_ptr,
-                 tiff_state->info_ptr,
-                 image->width,
-                 image->height,
-                 bit_depth,
-                 color_type,
-                 (tiff_state->write_options->io_options & SAIL_IO_OPTION_INTERLACED) ? PNG_INTERLACE_ADAM7 : PNG_INTERLACE_NONE,
-                 PNG_COMPRESSION_TYPE_BASE,
-                 PNG_FILTER_TYPE_BASE);
-
-    /* Write ICC profile. */
-    if (tiff_state->write_options->io_options & SAIL_IO_OPTION_ICCP && image->iccp != NULL) {
-        png_set_iCCP(tiff_state->png_ptr,
-                        tiff_state->info_ptr,
-                        "ICC profile",
-                        PNG_COMPRESSION_TYPE_BASE,
-                        (const png_bytep)image->iccp->data,
-                        image->iccp->data_length);
-
-        SAIL_LOG_DEBUG("PNG: ICC profile has been set");
-    }
-
-    /* Write palette. */
-    if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP1_INDEXED ||
-            image->pixel_format == SAIL_PIXEL_FORMAT_BPP2_INDEXED ||
-            image->pixel_format == SAIL_PIXEL_FORMAT_BPP4_INDEXED ||
-            image->pixel_format == SAIL_PIXEL_FORMAT_BPP8_INDEXED) {
-        if (image->palette == NULL) {
-            SAIL_LOG_ERROR("The indexed image has no palette");
-            return SAIL_MISSING_PALETTE;
-        }
-
-        if (image->palette->pixel_format != SAIL_PIXEL_FORMAT_BPP24_RGB) {
-            SAIL_LOG_ERROR("Palettes not in BPP24-RGB format are not supported");
-            return SAIL_UNSUPPORTED_PIXEL_FORMAT;
-        }
-
-        /* Palette is deep copied. */
-        png_set_PLTE(tiff_state->png_ptr, tiff_state->info_ptr, image->palette->data, image->palette->color_count);
-    }
-
-    const int compression = (tiff_state->write_options->compression < COMPRESSION_MIN ||
-                                tiff_state->write_options->compression > COMPRESSION_MAX)
-                            ? COMPRESSION_DEFAULT
-                            : tiff_state->write_options->compression;
-
-    png_set_compression_level(tiff_state->png_ptr, compression);
-
-    png_write_info(tiff_state->png_ptr, tiff_state->info_ptr);
-
-    if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP24_BGR      ||
-            image->pixel_format == SAIL_PIXEL_FORMAT_BPP48_BGR  ||
-            image->pixel_format == SAIL_PIXEL_FORMAT_BPP32_BGRA ||
-            image->pixel_format == SAIL_PIXEL_FORMAT_BPP32_ABGR ||
-            image->pixel_format == SAIL_PIXEL_FORMAT_BPP64_BGRA ||
-            image->pixel_format == SAIL_PIXEL_FORMAT_BPP64_ABGR) {
-        png_set_bgr(tiff_state->png_ptr);
-    }
-
-    if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP32_ARGB     ||
-            image->pixel_format == SAIL_PIXEL_FORMAT_BPP32_ABGR ||
-            image->pixel_format == SAIL_PIXEL_FORMAT_BPP64_ARGB ||
-            image->pixel_format == SAIL_PIXEL_FORMAT_BPP64_ABGR) {
-        png_set_swap_alpha(tiff_state->png_ptr);
-    }
-
-    if (tiff_state->write_options->io_options & SAIL_IO_OPTION_INTERLACED) {
-        png_set_interlace_handling(tiff_state->png_ptr);
-    }
+    TIFFSetField(tiff_state->tiff, TIFFTAG_IMAGEWIDTH,  image->width);
+    TIFFSetField(tiff_state->tiff, TIFFTAG_IMAGELENGTH, image->height);
+    TIFFSetField(tiff_state->tiff, TIFFTAG_ORIENTATION, ORIENTATION_TOPLEFT);
+    TIFFSetField(tiff_state->tiff, TIFFTAG_SAMPLESPERPIXEL, 4);
+    TIFFSetField(tiff_state->tiff, TIFFTAG_BITSPERSAMPLE, 8);
+    TIFFSetField(tiff_state->tiff, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
+    TIFFSetField(tiff_state->tiff, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_RGB);
+    TIFFSetField(tiff_state->tiff, TIFFTAG_COMPRESSION, tiff_state->write_compression);
+    TIFFSetField(tiff_state->tiff, TIFFTAG_ROWSPERSTRIP, TIFFDefaultStripSize(tiff_state->tiff, image->height));
+    TIFFSetupStrips(tiff_state->tiff);
 
     const char *pixel_format_str = NULL;
     SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(image->pixel_format, &pixel_format_str));
-    SAIL_LOG_DEBUG("PNG: Input pixel format is %s", pixel_format_str);
+    SAIL_LOG_DEBUG("TIFF: Input pixel format is %s", pixel_format_str);
     SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(tiff_state->write_options->output_pixel_format, &pixel_format_str));
-    SAIL_LOG_DEBUG("PNG: Output pixel format is %s", pixel_format_str);
-#endif
+    SAIL_LOG_DEBUG("TIFF: Output pixel format is %s", pixel_format_str);
 
     return SAIL_OK;
 }
@@ -453,11 +380,11 @@ SAIL_EXPORT sail_status_t sail_plugin_write_frame_v3(void *state, struct sail_io
         return SAIL_ERROR_UNDERLYING_CODEC;
     }
 
-#if 0
     for (unsigned row = 0; row < image->height; row++) {
-        png_write_row(tiff_state->png_ptr, (const unsigned char *)image->pixels + row * image->bytes_per_line);
+        if (TIFFWriteScanline(tiff_state->tiff, (unsigned char *)image->pixels + row * image->bytes_per_line, tiff_state->line++, 0) < 0) {
+            return SAIL_ERROR_UNDERLYING_CODEC;
+        }
     }
-#endif
 
     return SAIL_OK;
 }

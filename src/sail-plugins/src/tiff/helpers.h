@@ -43,9 +43,9 @@ SAIL_HIDDEN void my_warning_fn(const char *module, const char *format, va_list a
 
 SAIL_HIDDEN sail_status_t supported_read_output_pixel_format(enum SailPixelFormat pixel_format);
 
-SAIL_HIDDEN enum SailCompressionType tiff_compression_to_sail_compression_type(int compression);
+SAIL_HIDDEN enum SailCompressionType tiff_compression_to_sail_compression(int compression);
 
-SAIL_HIDDEN sail_status_t sail_compression_type_to_tiff_compression(enum SailCompressionType compression_type, int *compression);
+SAIL_HIDDEN sail_status_t sail_compression_to_tiff_compression(enum SailCompressionType compression, int *tiff_compression);
 
 SAIL_HIDDEN enum SailPixelFormat bpp_to_pixel_format(int bpp);
 
@@ -54,5 +54,7 @@ SAIL_HIDDEN void zero_tiff_image(TIFFRGBAImage *img);
 SAIL_HIDDEN sail_status_t fetch_iccp(TIFF *tiff, struct sail_iccp **iccp);
 
 SAIL_HIDDEN sail_status_t fetch_meta_info(TIFF *tiff, struct sail_meta_entry_node ***last_meta_entry_node);
+
+SAIL_HIDDEN sail_status_t supported_write_output_pixel_format(enum SailPixelFormat pixel_format);
 
 #endif
