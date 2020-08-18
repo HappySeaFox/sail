@@ -44,7 +44,7 @@ struct sail_io;
  *
  * Returns 0 on success or sail_status_t on error.
  */
-SAIL_HIDDEN sail_status_t alloc_io_read_mem(const void *buffer, size_t buffer_length, struct sail_io **io);
+SAIL_HIDDEN sail_status_t alloc_io_read_mem(const void *buffer, size_t length, struct sail_io **io);
 
 /*
  * Opens the specified memory buffer for writing and allocates a new I/O object for it.
@@ -52,6 +52,6 @@ SAIL_HIDDEN sail_status_t alloc_io_read_mem(const void *buffer, size_t buffer_le
  *
  * Returns 0 on success or sail_status_t on error.
  */
-SAIL_HIDDEN sail_status_t alloc_io_write_mem(void *buffer, size_t buffer_length, struct sail_io **io);
+SAIL_HIDDEN sail_status_t alloc_io_write_mem(void *buffer, size_t length, struct sail_io **io);
 
 #endif
