@@ -185,6 +185,20 @@ sail_status_t supported_read_output_pixel_format(enum SailPixelFormat pixel_form
     }
 }
 
+sail_status_t supported_write_output_pixel_format(enum SailPixelFormat pixel_format) {
+
+    switch (pixel_format) {
+        case SAIL_PIXEL_FORMAT_AUTO:
+        case SAIL_PIXEL_FORMAT_SOURCE: {
+            return SAIL_OK;
+        }
+
+        default: {
+            return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
+        }
+    }
+}
+
 sail_status_t read_png_text(png_structp png_ptr, png_infop info_ptr, struct sail_meta_entry_node **target_meta_entry_node) {
 
     SAIL_CHECK_PTR(png_ptr);

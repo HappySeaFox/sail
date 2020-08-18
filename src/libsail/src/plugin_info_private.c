@@ -126,13 +126,10 @@ static sail_status_t parse_serialized_ints(const char *value, int **target, unsi
     }
 
     if (*length > 0) {
-        *target = (int *)malloc((size_t)*length * sizeof(int));
-
-        if (*target == NULL) {
-            SAIL_LOG_ERROR("Failed to allocate %u integers", *length);
-            destroy_string_node_chain(string_node);
-            return SAIL_ERROR_MEMORY_ALLOCATION;
-        }
+        void *ptr;
+        SAIL_TRY_OR_CLEANUP(sail_malloc(&ptr, (size_t)*length * sizeof(int)),
+                            /* cleanup */ destroy_string_node_chain(string_node));
+        *target = ptr;
 
         node = string_node;
         int i = 0;
