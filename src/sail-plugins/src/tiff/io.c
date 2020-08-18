@@ -32,6 +32,7 @@ tmsize_t my_read_proc(thandle_t client_data, void *buffer, tmsize_t buffer_size)
     struct sail_io *io = (struct sail_io *)client_data;
     size_t nbytes;
 
+SAIL_LOG_DEBUG("+++ >>> READ");
     sail_status_t err = io->read(io->stream, buffer, 1, buffer_size, &nbytes);
 
     if (err != SAIL_OK) {

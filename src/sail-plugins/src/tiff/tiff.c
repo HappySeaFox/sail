@@ -347,16 +347,11 @@ SAIL_EXPORT sail_status_t sail_plugin_write_seek_next_frame_v3(void *state, stru
     TIFFSetField(tiff_state->tiff, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
     TIFFSetField(tiff_state->tiff, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_RGB);
     TIFFSetField(tiff_state->tiff, TIFFTAG_COMPRESSION, tiff_state->write_compression);
-    TIFFSetField(tiff_state->tiff, TIFFTAG_ROWSPERSTRIP, TIFFDefaultStripSize(tiff_state->tiff, image->height));
+    TIFFSetField(tiff_state->tiff, TIFFTAG_ROWSPERSTRIP, TIFFDefaultStripSize(tiff_state->tiff, (uint32)-1));
 
     if (tiff_state->write_options->io_options & SAIL_IO_OPTION_ICCP && image->iccp != NULL) {
         TIFFSetField(tiff_state->tiff, TIFFTAG_ICCPROFILE, image->iccp->data_length, image->iccp->data);
         SAIL_LOG_DEBUG("TIFF: ICC profile has been set");
-    }
-
-    if (!TIFFSetupStrips(tiff_state->tiff)) {
-        tiff_state->libtiff_error = true;
-        return SAIL_ERROR_UNDERLYING_CODEC;
     }
 
     const char *pixel_format_str = NULL;
