@@ -32,7 +32,6 @@ tmsize_t my_read_proc(thandle_t client_data, void *buffer, tmsize_t buffer_size)
     struct sail_io *io = (struct sail_io *)client_data;
     size_t nbytes;
 
-SAIL_LOG_DEBUG("+++ >>> READ");
     sail_status_t err = io->read(io->stream, buffer, 1, buffer_size, &nbytes);
 
     if (err != SAIL_OK) {
@@ -50,7 +49,6 @@ tmsize_t my_write_proc(thandle_t client_data, void *buffer, tmsize_t buffer_size
 
     sail_status_t err = io->write(io->stream, buffer, 1, buffer_size, &nbytes);
 
-SAIL_LOG_DEBUG("+++ WRITE %u %ld", buffer_size, nbytes);
     if (err != SAIL_OK) {
         TIFFError(NULL, "Failed to write to the I/O stream: %d", err);
         return (tmsize_t)-1;
@@ -65,7 +63,6 @@ toff_t my_seek_proc(thandle_t client_data, toff_t offset, int whence) {
 
     sail_status_t err = io->seek(io->stream, (long)offset, whence);
 
-SAIL_LOG_DEBUG("+++ SEEK %ld %d", (long)offset, whence);
     if (err != SAIL_OK) {
         TIFFError(NULL, "Failed to seek the I/O stream: %d", err);
         return (toff_t)-1;
@@ -74,7 +71,6 @@ SAIL_LOG_DEBUG("+++ SEEK %ld %d", (long)offset, whence);
     size_t new_offset;
     err = io->tell(io->stream, &new_offset);
 
-SAIL_LOG_DEBUG("+++ TELL %ld", (long)new_offset);
     if (err != SAIL_OK) {
         TIFFError(NULL, "Failed to get the current position of the I/O stream: %d", err);
         return (toff_t)-1;
