@@ -248,12 +248,10 @@ sail_status_t alloc_io_write_mem(void *buffer, size_t buffer_length, struct sail
 
     SAIL_TRY(sail_alloc_io(io));
 
-    struct mem_io_write_stream *mem_io_write_stream = (struct mem_io_write_stream *)malloc(sizeof(struct mem_io_write_stream));
-
-    if (mem_io_write_stream == NULL) {
-        sail_destroy_io(*io);
-        return SAIL_ERROR_MEMORY_ALLOCATION;
-    }
+    void *ptr;
+    SAIL_TRY_OR_CLEANUP(sail_malloc(&ptr, sizeof(struct mem_io_write_stream)),
+                        /* cleanup */ sail_destroy_io(*io));
+    struct mem_io_write_stream *mem_io_write_stream = ptr;
 
     mem_io_write_stream->mem_io_buffer_info.buffer_length = buffer_length;
     mem_io_write_stream->mem_io_buffer_info.pos           = 0;
