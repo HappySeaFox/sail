@@ -194,9 +194,9 @@ sail_status_t alloc_io_read_file(const char *path, struct sail_io **io) {
 
 sail_status_t alloc_io_write_file(const char *path, struct sail_io **io) {
 
-    SAIL_TRY(alloc_io_file(path, "wb", io));
+    SAIL_TRY(alloc_io_file(path, "w+b", io));
 
-    (*io)->read  = io_noop_read;
+    (*io)->read  = io_file_read;
     (*io)->seek  = io_file_seek;
     (*io)->tell  = io_file_tell;
     (*io)->write = io_file_write;
