@@ -34,7 +34,27 @@
 #include "sail.h"
 
 struct mem_io_buffer_info {
-    size_t buffer_length;
+
+    /* Total buffer size. */
+    size_t length;
+
+    /*
+     * The length of accessible buffer length.
+     *
+     * For example:
+     *
+     *   1. Reading
+     *      - open buffer of 10 Mb for reading
+     *      - accessible length now is 10 Mb
+     *
+     *   2. Writing
+     *      - open buffer of 10 Mb for writing
+     *      - write 100 Kb
+     *      - accessible length now is 100 Kb
+     */
+    size_t accessible_length;
+
+    /* Current stream position. */
     size_t pos;
 };
 
@@ -63,11 +83,11 @@ static sail_status_t io_mem_read(void *stream, void *buf, size_t object_size, si
 
     *read_objects_count = 0;
 
-    if (mem_io_buffer_info->pos >= mem_io_buffer_info->buffer_length) {
+    if (mem_io_buffer_info->pos >= mem_io_buffer_info->accessible_length) {
         return SAIL_ERROR_EOF;
     }
 
-    while (mem_io_buffer_info->pos <= mem_io_buffer_info->buffer_length - object_size && objects_count > 0) {
+    while (mem_io_buffer_info->pos <= mem_io_buffer_info->accessible_length - object_size && objects_count > 0) {
         memcpy(buf, (const char *)mem_io_read_stream->buffer + mem_io_buffer_info->pos, object_size);
 
         buf = (char *)buf + object_size;
@@ -86,46 +106,21 @@ static sail_status_t io_mem_seek(void *stream, long offset, int whence) {
 
     struct mem_io_buffer_info *mem_io_buffer_info = (struct mem_io_buffer_info *)stream;
 
+    size_t new_pos;
+
     switch (whence) {
         case SEEK_SET: {
-            /* Cannot seek to -2. Seek to the beginning. */
-            if (offset < 0) {
-                mem_io_buffer_info->pos = 0;
-            }
-            /* Cannot seek past buffer. Seek to the EOF. */
-            else if ((size_t)offset > mem_io_buffer_info->buffer_length) {
-                mem_io_buffer_info->pos = mem_io_buffer_info->buffer_length;
-            } else {
-                mem_io_buffer_info->pos = offset;
-            }
+            new_pos = offset;
             break;
         }
 
         case SEEK_CUR: {
-            /* Cannot seek to -2. Seek to the beginning. */
-            if (offset < 0 && (size_t)(-offset) > mem_io_buffer_info->pos) {
-                mem_io_buffer_info->pos = 0;
-            }
-            /* Cannot seek past buffer. Seek to the EOF. */
-            else if (mem_io_buffer_info->pos + offset > mem_io_buffer_info->buffer_length) {
-                mem_io_buffer_info->pos = mem_io_buffer_info->buffer_length;
-            } else {
-                mem_io_buffer_info->pos += offset;
-            }
+            new_pos = mem_io_buffer_info->pos + offset;
             break;
         }
 
         case SEEK_END: {
-            /* Cannot seek past buffer. Seek to the EOF. */
-            if (offset >= 0) {
-                mem_io_buffer_info->pos = mem_io_buffer_info->buffer_length;
-            }
-            /* Cannot seek to -2. Seek to the beginning. */
-            else if (offset < 0 && (size_t)(-offset) > mem_io_buffer_info->buffer_length) {
-                mem_io_buffer_info->pos = 0;
-            } else {
-                mem_io_buffer_info->pos = mem_io_buffer_info->buffer_length + offset;
-            }
+            new_pos = mem_io_buffer_info->accessible_length + offset;
             break;
         }
 
@@ -133,6 +128,18 @@ static sail_status_t io_mem_seek(void *stream, long offset, int whence) {
             return SAIL_ERROR_UNSUPPORTED_SEEK_WHENCE;
         }
     }
+
+    /* Correct the value. */
+    if (new_pos < 0) {
+        new_pos = 0;
+    } else if (new_pos >= mem_io_buffer_info->length) {
+        new_pos = mem_io_buffer_info->length;
+        mem_io_buffer_info->accessible_length = mem_io_buffer_info->length;
+    } else if (new_pos >= mem_io_buffer_info->accessible_length) {
+        mem_io_buffer_info->accessible_length = new_pos + 1;
+    }
+
+    mem_io_buffer_info->pos = new_pos;
 
     return SAIL_OK;
 }
@@ -160,15 +167,20 @@ static sail_status_t io_mem_write(void *stream, const void *buf, size_t object_s
 
     *written_objects_count = 0;
 
-    if (mem_io_buffer_info->pos >= mem_io_buffer_info->buffer_length) {
+    if (mem_io_buffer_info->pos >= mem_io_buffer_info->length) {
         return SAIL_ERROR_EOF;
     }
 
-    while (mem_io_buffer_info->pos <= mem_io_buffer_info->buffer_length - object_size && objects_count > 0) {
+    while (mem_io_buffer_info->pos <= mem_io_buffer_info->length - object_size && objects_count > 0) {
         memcpy((char *)mem_io_write_stream->buffer + mem_io_buffer_info->pos, buf, object_size);
 
         buf = (const char *)buf + object_size;
         mem_io_buffer_info->pos += object_size;
+
+        /* Update the accessible length if we overwrote it. */
+        if (mem_io_buffer_info->pos >= mem_io_buffer_info->accessible_length) {
+            mem_io_buffer_info->accessible_length = mem_io_buffer_info->pos;
+        }
 
         (*written_objects_count)++;
         objects_count--;
@@ -200,7 +212,7 @@ static sail_status_t io_mem_eof(void *stream, bool *result) {
 
     struct mem_io_buffer_info *mem_io_buffer_info = (struct mem_io_buffer_info *)stream;
 
-    *result = mem_io_buffer_info->pos >= mem_io_buffer_info->buffer_length;
+    *result = mem_io_buffer_info->pos >= mem_io_buffer_info->accessible_length;
 
     return SAIL_OK;
 }
@@ -209,12 +221,12 @@ static sail_status_t io_mem_eof(void *stream, bool *result) {
  * Public functions.
  */
 
-sail_status_t alloc_io_read_mem(const void *buffer, size_t buffer_length, struct sail_io **io) {
+sail_status_t alloc_io_read_mem(const void *buffer, size_t length, struct sail_io **io) {
 
     SAIL_CHECK_BUFFER_PTR(buffer);
     SAIL_CHECK_IO_PTR(io);
 
-    SAIL_LOG_DEBUG("Opening memory buffer of size %lu for reading", buffer_length);
+    SAIL_LOG_DEBUG("Opening memory buffer of size %lu for reading", length);
 
     SAIL_TRY(sail_alloc_io(io));
 
@@ -223,9 +235,10 @@ sail_status_t alloc_io_read_mem(const void *buffer, size_t buffer_length, struct
                         /* cleanup */ sail_destroy_io(*io));
     struct mem_io_read_stream *mem_io_read_stream = ptr;
 
-    mem_io_read_stream->mem_io_buffer_info.buffer_length = buffer_length;
-    mem_io_read_stream->mem_io_buffer_info.pos           = 0;
-    mem_io_read_stream->buffer                           = buffer;
+    mem_io_read_stream->mem_io_buffer_info.length            = length;
+    mem_io_read_stream->mem_io_buffer_info.accessible_length = length;
+    mem_io_read_stream->mem_io_buffer_info.pos               = 0;
+    mem_io_read_stream->buffer                               = buffer;
 
     (*io)->stream = mem_io_read_stream;
     (*io)->read   = io_mem_read;
@@ -239,12 +252,12 @@ sail_status_t alloc_io_read_mem(const void *buffer, size_t buffer_length, struct
     return SAIL_OK;
 }
 
-sail_status_t alloc_io_write_mem(void *buffer, size_t buffer_length, struct sail_io **io) {
+sail_status_t alloc_io_write_mem(void *buffer, size_t length, struct sail_io **io) {
 
     SAIL_CHECK_BUFFER_PTR(buffer);
     SAIL_CHECK_IO_PTR(io);
 
-    SAIL_LOG_DEBUG("Opening memory buffer of size %lu for writing", buffer_length);
+    SAIL_LOG_DEBUG("Opening memory buffer of size %lu for writing", length);
 
     SAIL_TRY(sail_alloc_io(io));
 
@@ -253,9 +266,10 @@ sail_status_t alloc_io_write_mem(void *buffer, size_t buffer_length, struct sail
                         /* cleanup */ sail_destroy_io(*io));
     struct mem_io_write_stream *mem_io_write_stream = ptr;
 
-    mem_io_write_stream->mem_io_buffer_info.buffer_length = buffer_length;
-    mem_io_write_stream->mem_io_buffer_info.pos           = 0;
-    mem_io_write_stream->buffer                           = buffer;
+    mem_io_write_stream->mem_io_buffer_info.length            = length;
+    mem_io_write_stream->mem_io_buffer_info.accessible_length = 0;
+    mem_io_write_stream->mem_io_buffer_info.pos               = 0;
+    mem_io_write_stream->buffer                               = buffer;
 
     (*io)->stream = mem_io_write_stream;
     (*io)->read   = io_noop_read;
