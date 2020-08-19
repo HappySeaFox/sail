@@ -1,0 +1,29 @@
+# TIFF plugin information
+#
+[plugin]
+layout=3
+version=1.0.1
+name=TIFF
+description=Tagged Image File Format
+magic-numbers=49 49 2A 00;4D 4D 00 2A
+extensions=tif;tiff
+mime-types=image/tiff;image/tiff-fx
+
+[read-features]
+features=STATIC;MULTI-FRAME;META-INFO;ICCP
+output-pixel-formats=BPP32-RGBA;BPP32-BGRA
+default-output-pixel-format=@SAIL_DEFAULT_READ_OUTPUT_PIXEL_FORMAT@
+
+[write-features]
+features=STATIC;MULTI-FRAME;META-INFO;ICCP
+properties=
+interlaced-passes=1
+compression-types=JPEG
+default-compression=JPEG
+compression-level-min=0
+compression-level-max=0
+compression-level-default=0
+compression-level-step=0
+
+[write-pixel-formats-mapping]
+BPP32-RGBA=SOURCE

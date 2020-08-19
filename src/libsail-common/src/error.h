@@ -78,6 +78,7 @@ enum SailStatus {
     SAIL_ERROR_PIXEL_FORMATS_MAPPING_NODE_NULL_PTR,
     SAIL_ERROR_STRING_NODE_NULL_PTR,
     SAIL_ERROR_PLUGIN_INFO_NODE_NULL_PTR,
+    SAIL_ERROR_PIXEL_FORMAT_NULL_PTR,
 
     /*
      * Encoding/decoding specific errors.
@@ -187,6 +188,7 @@ do {                              \
 #define SAIL_CHECK_PIXEL_FORMATS_MAPPING_NODE_PTR(node) SAIL_CHECK_PTR2(node,            SAIL_ERROR_PIXEL_FORMATS_MAPPING_NODE_NULL_PTR)
 #define SAIL_CHECK_STRING_NODE_PTR(node)                SAIL_CHECK_PTR2(node,            SAIL_ERROR_STRING_NODE_NULL_PTR)
 #define SAIL_CHECK_PLUGIN_INFO_NODE_PTR(node)           SAIL_CHECK_PTR2(node,            SAIL_ERROR_PLUGIN_INFO_NODE_NULL_PTR)
+#define SAIL_CHECK_PIXEL_FORMAT_PTR(pixel_format)       SAIL_CHECK_PTR2(pixel_format,    SAIL_ERROR_PIXEL_FORMAT_NULL_PTR)
 
 /*
  * Try to execute the specified SAIL function. If it fails, execute the rest of arguments.
@@ -194,7 +196,7 @@ do {                              \
  */
 #define SAIL_TRY_OR_EXECUTE(sail_func, ...)       \
 do {                                              \
-    sail_status_t __sail_error_result;             \
+    sail_status_t __sail_error_result;            \
                                                   \
     if ((__sail_error_result = sail_func) != 0) { \
         __VA_ARGS__;                              \

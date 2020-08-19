@@ -64,6 +64,7 @@ sail_status_t QtSail::init()
                                                           "This demo doesn't include:"
                                                           "<ul>"
                                                           "<li>Selecting pixel format to output</li>"
+                                                          "<li>Printing all meta info entries into stderr</li>"
                                                           "</ul>"));
     });
 
@@ -169,8 +170,9 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
     struct sail_image *image;
     SAIL_TRY(sail_alloc_image(&image));
 
-    image->pixels = malloc(qimage.sizeInBytes());
-    memcpy(image->pixels, qimage.bits(), qimage.sizeInBytes());
+    const int sizeInBytes = qimage.bytesPerLine() * qimage.height();
+    image->pixels = malloc(sizeInBytes);
+    memcpy(image->pixels, qimage.bits(), sizeInBytes);
     image->width = qimage.width();
     image->height = qimage.height();
     image->pixel_format = qImageFormatToSailPixelFormat(qimage.format());

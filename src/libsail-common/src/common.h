@@ -61,6 +61,22 @@ enum SailPixelFormat {
     SAIL_PIXEL_FORMAT_SOURCE,
 
     /*
+     * Formats with unknown pixel representation/model.
+     */
+    SAIL_PIXEL_FORMAT_BPP1,
+    SAIL_PIXEL_FORMAT_BPP2,
+    SAIL_PIXEL_FORMAT_BPP4,
+    SAIL_PIXEL_FORMAT_BPP8,
+    SAIL_PIXEL_FORMAT_BPP16,
+    SAIL_PIXEL_FORMAT_BPP24,
+    SAIL_PIXEL_FORMAT_BPP32,
+    SAIL_PIXEL_FORMAT_BPP48,
+    SAIL_PIXEL_FORMAT_BPP64,
+    SAIL_PIXEL_FORMAT_BPP72,
+    SAIL_PIXEL_FORMAT_BPP96,
+    SAIL_PIXEL_FORMAT_BPP128,
+
+    /*
      * Indexed formats with palette.
      */
     SAIL_PIXEL_FORMAT_BPP1_INDEXED,

@@ -77,6 +77,7 @@ sail_status_t QtSail::init()
                                                           "<ul>"
                                                           "<li>Selecting pixel format to output</li>"
                                                           "<li>Displaying indexed images (if SOURCE is selected)</li>"
+                                                          "<li>Printing all meta info entries into stderr</li>"
                                                           "</ul>"
                                                           "This demo doesn't include:"
                                                           "<ul>"
@@ -197,6 +198,10 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
         meta = tr("%1: %2")
                 .arg(first_pair.first.c_str())
                 .arg(QString(first_pair.second.c_str()).left(24).replace('\n', ' '));
+
+        for (const std::pair<std::string, std::string> &pair: meta_entries) {
+            SAIL_LOG_DEBUG("[META] %s: %s", pair.first.c_str(), pair.second.c_str());
+        }
     }
 
     const char *source_pixel_format_str;
@@ -302,7 +307,7 @@ sail_status_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffe
     //
     if (write_options.io_options() & SAIL_IO_OPTION_META_INFO) {
         std::map<std::string, std::string> meta_entries {
-            { "Comment", "SAIL demo comment" }
+            { "Software", "SAIL" }
         };
         image.with_meta_entries(meta_entries);
     }

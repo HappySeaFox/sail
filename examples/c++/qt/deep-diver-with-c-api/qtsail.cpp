@@ -81,6 +81,7 @@ sail_status_t QtSail::init()
                                                           "<ul>"
                                                           "<li>Selecting pixel format to output</li>"
                                                           "<li>Displaying indexed images (if SOURCE is selected)</li>"
+                                                          "<li>Printing all meta info entries into stderr</li>"
                                                           "</ul>"
                                                           "This demo doesn't include:"
                                                           "<ul>"
@@ -224,6 +225,11 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
 
     if (node != nullptr) {
         meta = tr("%1: %2").arg(node->key).arg(QString(node->value).left(24).replace('\n', ' '));
+
+        while (node != nullptr) {
+            SAIL_LOG_DEBUG("[META] %s: %s", node->key, node->value);
+            node = node->next;
+        }
     }
 
     const char *source_pixel_format_str;
@@ -268,8 +274,9 @@ sail_status_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffe
     sail_image *image;
     SAIL_TRY(sail_alloc_image(&image));
 
-    image->pixels = malloc(qimage.sizeInBytes());
-    memcpy(image->pixels, qimage.bits(), qimage.sizeInBytes());
+    const int sizeInBytes = qimage.bytesPerLine() * qimage.height();
+    image->pixels = malloc(sizeInBytes);
+    memcpy(image->pixels, qimage.bits(), sizeInBytes);
     image->width = qimage.width();
     image->height = qimage.height();
     image->pixel_format = qImageFormatToSailPixelFormat(qimage.format());
@@ -352,8 +359,8 @@ sail_status_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffe
         struct sail_meta_entry_node *meta_entry_node;
 
         SAIL_TRY(sail_alloc_meta_entry_node(&meta_entry_node));
-        SAIL_TRY(sail_strdup("Comment", &meta_entry_node->key));
-        SAIL_TRY(sail_strdup("SAIL demo comment", &meta_entry_node->value));
+        SAIL_TRY(sail_strdup("Software", &meta_entry_node->key));
+        SAIL_TRY(sail_strdup("SAIL", &meta_entry_node->value));
 
         image->meta_entry_node = meta_entry_node;
     }

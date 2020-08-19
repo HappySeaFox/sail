@@ -198,6 +198,19 @@ sail_status_t sail_pixel_format_to_string(enum SailPixelFormat pixel_format, con
         case SAIL_PIXEL_FORMAT_AUTO:                  *result = "AUTO";                  return SAIL_OK;
         case SAIL_PIXEL_FORMAT_SOURCE:                *result = "SOURCE";                return SAIL_OK;
 
+        case SAIL_PIXEL_FORMAT_BPP1:                  *result = "BPP1";                  return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP2:                  *result = "BPP2";                  return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP4:                  *result = "BPP4";                  return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP8:                  *result = "BPP8";                  return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP16:                 *result = "BPP16";                 return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP24:                 *result = "BPP24";                 return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP32:                 *result = "BPP32";                 return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP48:                 *result = "BPP48";                 return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP64:                 *result = "BPP64";                 return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP72:                 *result = "BPP72";                 return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP96:                 *result = "BPP96";                 return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP128:                *result = "BPP128";                return SAIL_OK;
+
         case SAIL_PIXEL_FORMAT_BPP1_INDEXED:          *result = "BPP1-INDEXED";          return SAIL_OK;
         case SAIL_PIXEL_FORMAT_BPP2_INDEXED:          *result = "BPP2-INDEXED";          return SAIL_OK;
         case SAIL_PIXEL_FORMAT_BPP4_INDEXED:          *result = "BPP4-INDEXED";          return SAIL_OK;
@@ -281,28 +294,48 @@ sail_status_t sail_pixel_format_from_string(const char *str, enum SailPixelForma
         case UINT64_C(229442760833397):      *result = SAIL_PIXEL_FORMAT_UNKNOWN;               return SAIL_OK;
         case UINT64_C(6383872222):           *result = SAIL_PIXEL_FORMAT_AUTO;                  return SAIL_OK;
         case UINT64_C(6952734212790):        *result = SAIL_PIXEL_FORMAT_SOURCE;                return SAIL_OK;
+
+        case UINT64_C(6383902552):           *result = SAIL_PIXEL_FORMAT_BPP1;                  return SAIL_OK;
+        case UINT64_C(6383902553):           *result = SAIL_PIXEL_FORMAT_BPP2;                  return SAIL_OK;
+        case UINT64_C(6383902555):           *result = SAIL_PIXEL_FORMAT_BPP4;                  return SAIL_OK;
+        case UINT64_C(6383902559):           *result = SAIL_PIXEL_FORMAT_BPP8;                  return SAIL_OK;
+        case UINT64_C(210668784270):         *result = SAIL_PIXEL_FORMAT_BPP16;                 return SAIL_OK;
+        case UINT64_C(210668784301):         *result = SAIL_PIXEL_FORMAT_BPP24;                 return SAIL_OK;
+        case UINT64_C(210668784332):         *result = SAIL_PIXEL_FORMAT_BPP32;                 return SAIL_OK;
+        case UINT64_C(210668784371):         *result = SAIL_PIXEL_FORMAT_BPP48;                 return SAIL_OK;
+        case UINT64_C(210668784433):         *result = SAIL_PIXEL_FORMAT_BPP64;                 return SAIL_OK;
+        case UINT64_C(210668784464):         *result = SAIL_PIXEL_FORMAT_BPP72;                 return SAIL_OK;
+        case UINT64_C(210668784534):         *result = SAIL_PIXEL_FORMAT_BPP96;                 return SAIL_OK;
+        case UINT64_C(6952069880834):        *result = SAIL_PIXEL_FORMAT_BPP128;                return SAIL_OK;
+
         case UINT64_C(13257949335914442470): *result = SAIL_PIXEL_FORMAT_BPP1_INDEXED;          return SAIL_OK;
         case UINT64_C(13257950742323060711): *result = SAIL_PIXEL_FORMAT_BPP2_INDEXED;          return SAIL_OK;
         case UINT64_C(13257953555140297193): *result = SAIL_PIXEL_FORMAT_BPP4_INDEXED;          return SAIL_OK;
         case UINT64_C(13257959180774770157): *result = SAIL_PIXEL_FORMAT_BPP8_INDEXED;          return SAIL_OK;
         case UINT64_C(13237225848150241308): *result = SAIL_PIXEL_FORMAT_BPP16_INDEXED;         return SAIL_OK;
+
         case UINT64_C(12552958524517323328): *result = SAIL_PIXEL_FORMAT_BPP1_GRAYSCALE;        return SAIL_OK;
         case UINT64_C(12554490103502587777): *result = SAIL_PIXEL_FORMAT_BPP2_GRAYSCALE;        return SAIL_OK;
         case UINT64_C(12557553261473116675): *result = SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE;        return SAIL_OK;
         case UINT64_C(12563679577414174471): *result = SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE;        return SAIL_OK;
         case UINT64_C(8431824423011809526):  *result = SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE;       return SAIL_OK;
+
         case UINT64_C(9367569596161118198):  *result = SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE_ALPHA;  return SAIL_OK;
         case UINT64_C(12512997289017890810): *result = SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE_ALPHA;  return SAIL_OK;
         case UINT64_C(3292614999547101481):  *result = SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA; return SAIL_OK;
         case UINT64_C(5929884054553197927):  *result = SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA; return SAIL_OK;
+
         case UINT64_C(13257949683479278997): *result = SAIL_PIXEL_FORMAT_BPP16_RGB555;          return SAIL_OK;
         case UINT64_C(13257949682853687701): *result = SAIL_PIXEL_FORMAT_BPP16_BGR555;          return SAIL_OK;
         case UINT64_C(13257949683479279030): *result = SAIL_PIXEL_FORMAT_BPP16_RGB565;          return SAIL_OK;
         case UINT64_C(13257949682853687734): *result = SAIL_PIXEL_FORMAT_BPP16_BGR565;          return SAIL_OK;
+
         case UINT64_C(249836535348735093):   *result = SAIL_PIXEL_FORMAT_BPP24_RGB;             return SAIL_OK;
         case UINT64_C(249836535348717685):   *result = SAIL_PIXEL_FORMAT_BPP24_BGR;             return SAIL_OK;
+
         case UINT64_C(249836535431749563):   *result = SAIL_PIXEL_FORMAT_BPP48_RGB;             return SAIL_OK;
         case UINT64_C(249836535431732155):   *result = SAIL_PIXEL_FORMAT_BPP48_BGR;             return SAIL_OK;
+
         case UINT64_C(8244605667721455340):  *result = SAIL_PIXEL_FORMAT_BPP32_RGBX;            return SAIL_OK;
         case UINT64_C(8244605667720880876):  *result = SAIL_PIXEL_FORMAT_BPP32_BGRX;            return SAIL_OK;
         case UINT64_C(8244605667721683084):  *result = SAIL_PIXEL_FORMAT_BPP32_XRGB;            return SAIL_OK;
@@ -311,6 +344,7 @@ sail_status_t sail_pixel_format_from_string(const char *str, enum SailPixelForma
         case UINT64_C(8244605667720880853):  *result = SAIL_PIXEL_FORMAT_BPP32_BGRA;            return SAIL_OK;
         case UINT64_C(8244605667720856533):  *result = SAIL_PIXEL_FORMAT_BPP32_ARGB;            return SAIL_OK;
         case UINT64_C(8244605667720839125):  *result = SAIL_PIXEL_FORMAT_BPP32_ABGR;            return SAIL_OK;
+
         case UINT64_C(8244605671674130033):  *result = SAIL_PIXEL_FORMAT_BPP64_RGBX;            return SAIL_OK;
         case UINT64_C(8244605671673555569):  *result = SAIL_PIXEL_FORMAT_BPP64_BGRX;            return SAIL_OK;
         case UINT64_C(8244605671674357777):  *result = SAIL_PIXEL_FORMAT_BPP64_XRGB;            return SAIL_OK;
@@ -319,10 +353,14 @@ sail_status_t sail_pixel_format_from_string(const char *str, enum SailPixelForma
         case UINT64_C(8244605671673555546):  *result = SAIL_PIXEL_FORMAT_BPP64_BGRA;            return SAIL_OK;
         case UINT64_C(8244605671673531226):  *result = SAIL_PIXEL_FORMAT_BPP64_ARGB;            return SAIL_OK;
         case UINT64_C(8244605671673513818):  *result = SAIL_PIXEL_FORMAT_BPP64_ABGR;            return SAIL_OK;
+
         case UINT64_C(8244605667720923565):  *result = SAIL_PIXEL_FORMAT_BPP32_CMYK;            return SAIL_OK;
         case UINT64_C(8244605671673598258):  *result = SAIL_PIXEL_FORMAT_BPP64_CMYK;            return SAIL_OK;
+
         case UINT64_C(13817569962846953645): *result = SAIL_PIXEL_FORMAT_BPP24_YCBCR;           return SAIL_OK;
+
         case UINT64_C(8244605667721702563):  *result = SAIL_PIXEL_FORMAT_BPP32_YCCK;            return SAIL_OK;
+
         case UINT64_C(13237269438873232231): *result = SAIL_PIXEL_FORMAT_BPP24_CIE_LAB;         return SAIL_OK;
         case UINT64_C(13237367887476509101): *result = SAIL_PIXEL_FORMAT_BPP48_CIE_LAB;         return SAIL_OK;
     }
@@ -510,6 +548,19 @@ sail_status_t sail_bits_per_pixel(enum SailPixelFormat pixel_format, unsigned *r
         case SAIL_PIXEL_FORMAT_UNKNOWN:   return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
         case SAIL_PIXEL_FORMAT_AUTO:      return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
         case SAIL_PIXEL_FORMAT_SOURCE:    return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
+
+        case SAIL_PIXEL_FORMAT_BPP1:   *result = 1;   return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP2:   *result = 2;   return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP4:   *result = 4;   return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP8:   *result = 8;   return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP16:  *result = 16;  return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP24:  *result = 24;  return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP32:  *result = 32;  return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP48:  *result = 48;  return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP64:  *result = 64;  return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP72:  *result = 72;  return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP96:  *result = 96;  return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP128: *result = 128; return SAIL_OK;
 
         case SAIL_PIXEL_FORMAT_BPP1_INDEXED:  *result = 1; return SAIL_OK;
         case SAIL_PIXEL_FORMAT_BPP2_INDEXED:  *result = 2; return SAIL_OK;
