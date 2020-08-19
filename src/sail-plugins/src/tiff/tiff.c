@@ -357,8 +357,10 @@ SAIL_EXPORT sail_status_t sail_plugin_write_seek_next_frame_v3(void *state, stru
 
     /* Write meta info. */
     if (tiff_state->write_options->io_options & SAIL_IO_OPTION_META_INFO && image->meta_entry_node != NULL) {
-        //SAIL_LOG_DEBUG("TIFF: Writing meta info");
-        //SAIL_TRY(write_meta_info(tiff_state->tiff, image->meta_entry_node));
+#if 0
+        SAIL_LOG_DEBUG("TIFF: Writing meta info");
+        SAIL_TRY(write_meta_info(tiff_state->tiff, image->meta_entry_node));
+#endif
     }
 
     const char *pixel_format_str = NULL;
