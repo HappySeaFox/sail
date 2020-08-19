@@ -563,6 +563,9 @@ sail_status_t stop_writing(void *state, size_t *written) {
                         /* cleanup */ destroy_hidden_state(state_of_mind));
 
     if (written != NULL) {
+        /* The stream cursor may not be positioned at the end. Let's move it. */
+        SAIL_TRY_OR_CLEANUP(state_of_mind->io->seek(state_of_mind->io->stream, 0, SEEK_END),
+                            /* cleanup */ destroy_hidden_state(state_of_mind));
         state_of_mind->io->tell(state_of_mind->io->stream, written);
     }
 
