@@ -130,9 +130,7 @@ static sail_status_t io_mem_seek(void *stream, long offset, int whence) {
     }
 
     /* Correct the value. */
-    if (new_pos < 0) {
-        new_pos = 0;
-    } else if (new_pos >= mem_io_buffer_info->length) {
+    if (new_pos >= mem_io_buffer_info->length) {
         new_pos = mem_io_buffer_info->length;
         mem_io_buffer_info->accessible_length = mem_io_buffer_info->length;
     } else if (new_pos >= mem_io_buffer_info->accessible_length) {
