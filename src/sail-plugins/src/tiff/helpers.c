@@ -76,7 +76,7 @@ sail_status_t supported_read_output_pixel_format(enum SailPixelFormat pixel_form
     }
 }
 
-enum SailCompressionType tiff_compression_to_sail_compression(int compression) {
+enum SailCompression tiff_compression_to_sail_compression(int compression) {
 
     switch (compression) {
         case COMPRESSION_ADOBE_DEFLATE: return SAIL_COMPRESSION_ADOBE_DEFLATE;
