@@ -259,6 +259,36 @@ sail_status_t fetch_meta_info(TIFF *tiff, struct sail_meta_entry_node ***last_me
     return SAIL_OK;
 }
 
+sail_status_t write_meta_info(TIFF *tiff, const struct sail_meta_entry_node *meta_entry_node) {
+
+    SAIL_CHECK_PTR(tiff);
+
+    while (meta_entry_node != NULL) {
+
+        if (strcmp(meta_entry_node->key, "Document Name") == 0) {
+            TIFFSetField(tiff, TIFFTAG_DOCUMENTNAME, meta_entry_node->value);
+        } else if (strcmp(meta_entry_node->key, "Description") == 0) {
+            TIFFSetField(tiff, TIFFTAG_IMAGEDESCRIPTION, meta_entry_node->value);
+        } else if (strcmp(meta_entry_node->key, "Make") == 0) {
+            TIFFSetField(tiff, TIFFTAG_MAKE, meta_entry_node->value);
+        } else if (strcmp(meta_entry_node->key, "Model") == 0) {
+            TIFFSetField(tiff, TIFFTAG_MODEL, meta_entry_node->value);
+        } else if (strcmp(meta_entry_node->key, "Software") == 0) {
+            TIFFSetField(tiff, TIFFTAG_SOFTWARE, meta_entry_node->value);
+        } else if (strcmp(meta_entry_node->key, "Artist") == 0) {
+            TIFFSetField(tiff, TIFFTAG_ARTIST, meta_entry_node->value);
+        } else if (strcmp(meta_entry_node->key, "Copyright") == 0) {
+            TIFFSetField(tiff, TIFFTAG_COPYRIGHT, meta_entry_node->value);
+        } else {
+            SAIL_LOG_WARNING("TIFF: Ignoring unsupported meta entry key '%s'", meta_entry_node->key);
+        }
+
+        meta_entry_node = meta_entry_node->next;
+    }
+
+    return SAIL_OK;
+}
+
 sail_status_t supported_write_output_pixel_format(enum SailPixelFormat pixel_format) {
 
     switch (pixel_format) {

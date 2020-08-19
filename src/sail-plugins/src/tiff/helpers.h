@@ -55,6 +55,8 @@ SAIL_HIDDEN sail_status_t fetch_iccp(TIFF *tiff, struct sail_iccp **iccp);
 
 SAIL_HIDDEN sail_status_t fetch_meta_info(TIFF *tiff, struct sail_meta_entry_node ***last_meta_entry_node);
 
+SAIL_HIDDEN sail_status_t write_meta_info(TIFF *tiff, const struct sail_meta_entry_node *meta_entry_node);
+
 SAIL_HIDDEN sail_status_t supported_write_output_pixel_format(enum SailPixelFormat pixel_format);
 
 #endif
