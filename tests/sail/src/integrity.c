@@ -279,7 +279,7 @@ static MunitResult test_compression_from_string(const MunitParameter params[], v
     (void)params;
     (void)user_data;
 
-    enum SailCompressionType result;
+    enum SailCompression result;
 
 #define TEST_SAIL_CONVERSION(s, e)            \
     result = SAIL_COMPRESSION_UNSUPPORTED;    \
