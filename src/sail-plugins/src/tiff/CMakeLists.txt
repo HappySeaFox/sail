@@ -25,7 +25,13 @@ endif()
 
 # Common plugin configuration
 #
-sail_plugin(TARGET tiff SOURCES helpers.c io.c tiff.c PKGCONFIG libtiff-4 libjpeg zlib libzstd)
+if (WIN32)
+    set(TIFF_DEPS libtiff-4 libjpeg zlib libzstd)
+else()
+    set(TIFF_DEPS libtiff-4 libjpeg zlib)
+endif()
+
+sail_plugin(TARGET tiff SOURCES helpers.c io.c tiff.c PKGCONFIG ${TIFF_DEPS})
 
 if (HAVE_TIFF_41)
     target_compile_definitions(jpeg PRIVATE HAVE_TIFF_41)
