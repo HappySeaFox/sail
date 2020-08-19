@@ -358,8 +358,8 @@ sail_status_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffe
         struct sail_meta_entry_node *meta_entry_node;
 
         SAIL_TRY(sail_alloc_meta_entry_node(&meta_entry_node));
-        SAIL_TRY(sail_strdup("Comment", &meta_entry_node->key));
-        SAIL_TRY(sail_strdup("SAIL demo comment", &meta_entry_node->value));
+        SAIL_TRY(sail_strdup("Software", &meta_entry_node->key));
+        SAIL_TRY(sail_strdup("SAIL", &meta_entry_node->value));
 
         image->meta_entry_node = meta_entry_node;
     }

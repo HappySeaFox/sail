@@ -307,7 +307,7 @@ sail_status_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffe
     //
     if (write_options.io_options() & SAIL_IO_OPTION_META_INFO) {
         std::map<std::string, std::string> meta_entries {
-            { "Comment", "SAIL demo comment" }
+            { "Software", "SAIL" }
         };
         image.with_meta_entries(meta_entries);
     }
