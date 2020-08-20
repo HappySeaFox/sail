@@ -59,6 +59,20 @@ static sail_status_t allowed_read_output_pixel_format(const struct sail_read_fea
     return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
 }
 
+static sail_status_t allowed_write_compression(const struct sail_write_features *write_features,
+                                               enum SailCompression compression) {
+
+    SAIL_CHECK_WRITE_FEATURES_PTR(write_features);
+
+    for (unsigned i = 0; i < write_features->compressions_length; i++) {
+        if (write_features->compressions[i] == compression) {
+            return SAIL_OK;
+        }
+    }
+
+    return SAIL_ERROR_UNSUPPORTED_COMPRESSION;
+}
+
 /*
  * Public functions.
  */
@@ -74,7 +88,7 @@ sail_status_t start_reading_io_with_options(struct sail_io *io, bool own_io,
 
     /*
      * When read options is not NULL, we need to check if we can actually output the requested pixel format.
-     * When read options is NULL, we use the preferred output pixel format which is always acceptable.
+     * When read options is NULL, we use the default output pixel format which is always acceptable.
      */
     if (read_options != NULL) {
         SAIL_TRY_OR_CLEANUP(allowed_read_output_pixel_format(plugin_info->read_features, read_options->output_pixel_format),
@@ -126,6 +140,15 @@ sail_status_t start_writing_io_with_options(struct sail_io *io, bool own_io,
                         /* cleanup */ if (own_io) sail_destroy_io(io));
 
     *state = NULL;
+
+    /*
+     * When write options is not NULL, we need to check if we can actually output the requested compression.
+     * When write options is NULL, we use the default compression which is always acceptable.
+     */
+    if (write_options != NULL) {
+        SAIL_TRY_OR_CLEANUP(allowed_write_compression(plugin_info->write_features, write_options->compression),
+                            /* cleanup */ if (own_io) sail_destroy_io(io));
+    }
 
     void *ptr;
     SAIL_TRY_OR_CLEANUP(sail_malloc(&ptr, sizeof(struct hidden_state)),
