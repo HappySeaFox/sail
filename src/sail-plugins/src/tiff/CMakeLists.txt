@@ -34,5 +34,5 @@ endif()
 sail_plugin(TARGET tiff SOURCES helpers.c io.c tiff.c PKGCONFIG ${TIFF_DEPS})
 
 if (HAVE_TIFF_41)
-    target_compile_definitions(jpeg PRIVATE HAVE_TIFF_41)
+    target_compile_definitions(tiff PRIVATE HAVE_TIFF_41)
 endif()
