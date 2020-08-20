@@ -17,9 +17,9 @@ cmake_pop_check_state()
 if (HAVE_TIFF_41)
     # We compile libtiff w/o WEBP support on Windows
     if (WIN32)
-        set(PLUGIN_INFO_COMPRESSIONS_41 ";LERC;ZSTD")
+        #set(PLUGIN_INFO_COMPRESSIONS_41 "ZSTD")
     else()
-        set(PLUGIN_INFO_COMPRESSIONS_41 ";LERC;WEBP;ZSTD")
+        #set(PLUGIN_INFO_COMPRESSIONS_41 "WEBP;ZSTD")
     endif()
 endif()
 
