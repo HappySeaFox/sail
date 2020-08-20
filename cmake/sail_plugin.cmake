@@ -19,6 +19,8 @@ macro(sail_plugin)
     # Pkg-config dependencies
     #
     foreach(pkgconfig ${SAIL_PLUGIN_PKGCONFIG})
+        pkg_check_modules(${pkgconfig} IMPORTED_TARGET REQUIRED ${pkgconfig})
+
         target_compile_options("${SAIL_PLUGIN_TARGET}"     PRIVATE "${${pkgconfig}_CFLAGS}")
         target_compile_options("${SAIL_PLUGIN_TARGET}"     PRIVATE "${${pkgconfig}_CFLAGS_OTHER}")
         target_include_directories("${SAIL_PLUGIN_TARGET}" PRIVATE "${${pkgconfig}_INCLUDE_DIRS}")

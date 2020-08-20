@@ -8,15 +8,9 @@ list(SORT PLUGINS)
 #
 set(CONDITIONAL_PLUGINS jpeg png tiff)
 
-# Actual dependencies. Will use pkg_check_modules() to find them. Nested lists must use \; as a separator
+# Actual dependencies. Will use pkg_check_modules() to find them. Nested lists must use \; as a separator like that: "a\;b"
 #
-if (WIN32)
-    set(TIFF_DEPS "libtiff-4\;libjpeg\;zlib\;libzstd")
-else()
-    set(TIFF_DEPS "libtiff-4\;libjpeg\;zlib")
-endif()
-
-set(CONDITIONAL_DEPENDENCIES libjpeg libpng16 "${TIFF_DEPS}")
+set(CONDITIONAL_DEPENDENCIES libjpeg libpng16 libtiff-4)
 
 ################################################################################
 

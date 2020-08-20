@@ -28,7 +28,7 @@ endif()
 if (WIN32)
     set(TIFF_DEPS libtiff-4 libjpeg zlib libzstd)
 else()
-    set(TIFF_DEPS libtiff-4 libjpeg zlib)
+    set(TIFF_DEPS libtiff-4)
 endif()
 
 sail_plugin(TARGET tiff SOURCES helpers.c io.c tiff.c PKGCONFIG ${TIFF_DEPS})
