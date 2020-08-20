@@ -261,8 +261,10 @@ sail_status_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffe
                                size_t *written)
 {
     /*
-     * WARNING: Memory cleanup on error is not implemented in this demo. Please don't forget
+     * WARNING: Memory cleanup on error is not fully implemented in this demo. Please don't forget
      * to free memory (pointers, image pixels etc.) on error in a real application.
+     *
+     * For example, you can use SAIL_TRY_OR_CLEANUP().
      */
 
     // Always set the initial state to NULL in C or nullptr in C++.
