@@ -442,7 +442,7 @@ sail_status_t sail_compression_to_string(enum SailCompression compression, const
         case SAIL_COMPRESSION_ZSTD:          *result = "ZSTD";          return SAIL_OK;
     }
 
-    return SAIL_ERROR_UNSUPPORTED_COMPRESSION_TYPE;
+    return SAIL_ERROR_UNSUPPORTED_COMPRESSION;
 }
 
 sail_status_t sail_compression_from_string(const char *str, enum SailCompression *result) {
@@ -451,7 +451,7 @@ sail_status_t sail_compression_from_string(const char *str, enum SailCompression
     SAIL_CHECK_RESULT_PTR(result);
 
     if (strlen(str) == 0) {
-        return SAIL_ERROR_UNSUPPORTED_COMPRESSION_TYPE;
+        return SAIL_ERROR_UNSUPPORTED_COMPRESSION;
     }
 
     uint64_t hash;
@@ -495,7 +495,7 @@ sail_status_t sail_compression_from_string(const char *str, enum SailCompression
         case UINT64_C(6384768458):           *result = SAIL_COMPRESSION_ZSTD;          return SAIL_OK;
     }
 
-    return SAIL_ERROR_UNSUPPORTED_COMPRESSION_TYPE;
+    return SAIL_ERROR_UNSUPPORTED_COMPRESSION;
 }
 
 sail_status_t sail_plugin_feature_to_string(enum SailPluginFeature plugin_feature, const char **result) {

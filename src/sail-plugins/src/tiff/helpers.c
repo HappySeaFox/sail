@@ -142,7 +142,7 @@ sail_status_t sail_compression_to_tiff_compression(enum SailCompression compress
 #endif
 
         default: {
-            return SAIL_ERROR_UNSUPPORTED_COMPRESSION_TYPE;
+            return SAIL_ERROR_UNSUPPORTED_COMPRESSION;
         }
     }
 }

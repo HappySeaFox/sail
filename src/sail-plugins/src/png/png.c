@@ -563,7 +563,7 @@ SAIL_EXPORT sail_status_t sail_plugin_write_init_v3(struct sail_io *io, const st
     SAIL_TRY(supported_write_output_pixel_format(png_state->write_options->output_pixel_format));
 
     if (png_state->write_options->compression != SAIL_COMPRESSION_DEFLATE) {
-        return SAIL_ERROR_UNSUPPORTED_COMPRESSION_TYPE;
+        return SAIL_ERROR_UNSUPPORTED_COMPRESSION;
     }
 
     /* Initialize PNG. */
