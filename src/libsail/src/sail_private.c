@@ -574,20 +574,6 @@ sail_status_t stop_writing(void *state, size_t *written) {
     return SAIL_OK;
 }
 
-sail_status_t allowed_read_output_pixel_format(const struct sail_read_features *read_features,
-                                                enum SailPixelFormat pixel_format) {
-
-    SAIL_CHECK_READ_FEATURES_PTR(read_features);
-
-    for (unsigned i = 0; i < read_features->output_pixel_formats_length; i++) {
-        if (read_features->output_pixel_formats[i] == pixel_format) {
-            return SAIL_OK;
-        }
-    }
-
-    return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
-}
-
 sail_status_t allowed_write_output_pixel_format(const struct sail_write_features *write_features,
                                                 enum SailPixelFormat input_pixel_format,
                                                 enum SailPixelFormat output_pixel_format) {
