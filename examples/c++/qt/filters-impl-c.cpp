@@ -26,12 +26,12 @@
 QStringList QtSail::filters() const
 {
     QStringList filters { QStringLiteral("All Files (*.*)") };
-    const sail_plugin_info_node *plugin_info_node = sail_plugin_info_list();
+    const sail_codec_info_node *codec_info_node = sail_codec_info_list();
 
-    while (plugin_info_node != nullptr) {
+    while (codec_info_node != nullptr) {
         QStringList masks;
 
-        sail_string_node *extension_node = plugin_info_node->plugin_info->extension_node;
+        sail_string_node *extension_node = codec_info_node->codec_info->extension_node;
 
         while (extension_node != nullptr) {
             masks.append(QStringLiteral("*.%1").arg(extension_node->value));
@@ -39,11 +39,11 @@ QStringList QtSail::filters() const
         }
 
         filters.append(QStringLiteral("%1: %2 (%3)")
-                       .arg(plugin_info_node->plugin_info->name)
-                       .arg(plugin_info_node->plugin_info->description)
+                       .arg(codec_info_node->codec_info->name)
+                       .arg(codec_info_node->codec_info->description)
                        .arg(masks.join(QStringLiteral(" "))));
 
-        plugin_info_node = plugin_info_node->next;
+        codec_info_node = codec_info_node->next;
     }
 
     return filters;

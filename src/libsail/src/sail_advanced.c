@@ -30,45 +30,45 @@
 #include "sail-common.h"
 #include "sail.h"
 
-sail_status_t sail_probe_io(struct sail_io *io, struct sail_image **image, const struct sail_plugin_info **plugin_info) {
+sail_status_t sail_probe_io(struct sail_io *io, struct sail_image **image, const struct sail_codec_info **codec_info) {
 
     SAIL_CHECK_IO_PTR(io);
 
-    const struct sail_plugin_info *plugin_info_noop;
-    const struct sail_plugin_info **plugin_info_local = plugin_info == NULL ? &plugin_info_noop : plugin_info;
+    const struct sail_codec_info *codec_info_noop;
+    const struct sail_codec_info **codec_info_local = codec_info == NULL ? &codec_info_noop : codec_info;
 
-    SAIL_TRY(sail_plugin_info_by_magic_number_from_io(io, plugin_info_local));
+    SAIL_TRY(sail_codec_info_by_magic_number_from_io(io, codec_info_local));
 
-    const struct sail_plugin *plugin;
-    SAIL_TRY(load_plugin_by_plugin_info(*plugin_info_local, &plugin));
+    const struct sail_codec *codec;
+    SAIL_TRY(load_codec_by_codec_info(*codec_info_local, &codec));
 
     struct sail_read_options *read_options_local = NULL;
     void *state = NULL;
 
-    SAIL_TRY_OR_CLEANUP(sail_alloc_read_options_from_features((*plugin_info_local)->read_features, &read_options_local),
+    SAIL_TRY_OR_CLEANUP(sail_alloc_read_options_from_features((*codec_info_local)->read_features, &read_options_local),
                         /* cleanup */ sail_destroy_read_options(read_options_local));
 
-    SAIL_TRY_OR_CLEANUP(plugin->v3->read_init(io, read_options_local, &state),
-                        /* cleanup */ plugin->v3->read_finish(&state, io),
+    SAIL_TRY_OR_CLEANUP(codec->v3->read_init(io, read_options_local, &state),
+                        /* cleanup */ codec->v3->read_finish(&state, io),
                                       sail_destroy_read_options(read_options_local));
 
     sail_destroy_read_options(read_options_local);
 
-    SAIL_TRY_OR_CLEANUP(plugin->v3->read_seek_next_frame(state, io, image),
-                        /* cleanup */ plugin->v3->read_finish(&state, io));
-    SAIL_TRY(plugin->v3->read_finish(&state, io));
+    SAIL_TRY_OR_CLEANUP(codec->v3->read_seek_next_frame(state, io, image),
+                        /* cleanup */ codec->v3->read_finish(&state, io));
+    SAIL_TRY(codec->v3->read_finish(&state, io));
 
     return SAIL_OK;
 }
 
-sail_status_t sail_probe_mem(const void *buffer, size_t buffer_length, struct sail_image **image, const struct sail_plugin_info **plugin_info) {
+sail_status_t sail_probe_mem(const void *buffer, size_t buffer_length, struct sail_image **image, const struct sail_codec_info **codec_info) {
 
     SAIL_CHECK_BUFFER_PTR(buffer);
 
     struct sail_io *io;
     SAIL_TRY(alloc_io_read_mem(buffer, buffer_length, &io));
 
-    SAIL_TRY_OR_CLEANUP(sail_probe_io(io, image, plugin_info),
+    SAIL_TRY_OR_CLEANUP(sail_probe_io(io, image, codec_info),
                         /* cleanup */ sail_destroy_io(io));
 
     sail_destroy_io(io);
@@ -76,16 +76,16 @@ sail_status_t sail_probe_mem(const void *buffer, size_t buffer_length, struct sa
     return SAIL_OK;
 }
 
-sail_status_t sail_start_reading_file(const char *path, const struct sail_plugin_info *plugin_info, void **state) {
+sail_status_t sail_start_reading_file(const char *path, const struct sail_codec_info *codec_info, void **state) {
 
-    SAIL_TRY(sail_start_reading_file_with_options(path, plugin_info, NULL, state));
+    SAIL_TRY(sail_start_reading_file_with_options(path, codec_info, NULL, state));
 
     return SAIL_OK;
 }
 
-sail_status_t sail_start_reading_mem(const void *buffer, size_t buffer_length, const struct sail_plugin_info *plugin_info, void **state) {
+sail_status_t sail_start_reading_mem(const void *buffer, size_t buffer_length, const struct sail_codec_info *codec_info, void **state) {
 
-    SAIL_TRY(sail_start_reading_mem_with_options(buffer, buffer_length, plugin_info, NULL, state));
+    SAIL_TRY(sail_start_reading_mem_with_options(buffer, buffer_length, codec_info, NULL, state));
 
     return SAIL_OK;
 }
@@ -99,9 +99,9 @@ sail_status_t sail_read_next_frame(void *state, struct sail_image **image) {
 
     SAIL_CHECK_IO(state_of_mind->io);
     SAIL_CHECK_STATE_PTR(state_of_mind->state);
-    SAIL_CHECK_PLUGIN_PTR(state_of_mind->plugin);
+    SAIL_CHECK_CODEC_PTR(state_of_mind->codec);
 
-    SAIL_TRY(state_of_mind->plugin->v3->read_seek_next_frame(state_of_mind->state, state_of_mind->io, image));
+    SAIL_TRY(state_of_mind->codec->v3->read_seek_next_frame(state_of_mind->state, state_of_mind->io, image));
 
     /* Detect the number of passes needed to write an interlaced image. */
     int interlaced_passes;
@@ -125,10 +125,10 @@ sail_status_t sail_read_next_frame(void *state, struct sail_image **image) {
                         /* cleanup */ sail_destroy_image(*image));
 
     for (int pass = 0; pass < interlaced_passes; pass++) {
-        SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v3->read_seek_next_pass(state_of_mind->state, state_of_mind->io, *image),
+        SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v3->read_seek_next_pass(state_of_mind->state, state_of_mind->io, *image),
                             /* cleanup */ sail_destroy_image(*image));
 
-        SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v3->read_frame(state_of_mind->state,
+        SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v3->read_frame(state_of_mind->state,
                                                                     state_of_mind->io,
                                                                     *image),
                             /* cleanup */ sail_destroy_image(*image));
@@ -147,12 +147,12 @@ sail_status_t sail_stop_reading(void *state) {
     struct hidden_state *state_of_mind = (struct hidden_state *)state;
 
     /* Not an error. */
-    if (state_of_mind->plugin == NULL) {
+    if (state_of_mind->codec == NULL) {
         destroy_hidden_state(state_of_mind);
         return SAIL_OK;
     }
 
-    SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v3->read_finish(&state_of_mind->state, state_of_mind->io),
+    SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v3->read_finish(&state_of_mind->state, state_of_mind->io),
                         /* cleanup */ destroy_hidden_state(state_of_mind));
 
     destroy_hidden_state(state_of_mind);
@@ -160,16 +160,16 @@ sail_status_t sail_stop_reading(void *state) {
     return SAIL_OK;
 }
 
-sail_status_t sail_start_writing_file(const char *path, const struct sail_plugin_info *plugin_info, void **state) {
+sail_status_t sail_start_writing_file(const char *path, const struct sail_codec_info *codec_info, void **state) {
 
-    SAIL_TRY(sail_start_writing_file_with_options(path, plugin_info, NULL, state));
+    SAIL_TRY(sail_start_writing_file_with_options(path, codec_info, NULL, state));
 
     return SAIL_OK;
 }
 
-sail_status_t sail_start_writing_mem(void *buffer, size_t buffer_length, const struct sail_plugin_info *plugin_info, void **state) {
+sail_status_t sail_start_writing_mem(void *buffer, size_t buffer_length, const struct sail_codec_info *codec_info, void **state) {
 
-    SAIL_TRY(sail_start_writing_mem_with_options(buffer, buffer_length, plugin_info, NULL, state));
+    SAIL_TRY(sail_start_writing_mem_with_options(buffer, buffer_length, codec_info, NULL, state));
 
     return SAIL_OK;
 }
@@ -183,18 +183,18 @@ sail_status_t sail_write_next_frame(void *state, const struct sail_image *image)
 
     SAIL_CHECK_IO(state_of_mind->io);
     SAIL_CHECK_STATE_PTR(state_of_mind->state);
-    SAIL_CHECK_PLUGIN_INFO_PTR(state_of_mind->plugin_info);
-    SAIL_CHECK_PLUGIN_PTR(state_of_mind->plugin);
+    SAIL_CHECK_CODEC_INFO_PTR(state_of_mind->codec_info);
+    SAIL_CHECK_CODEC_PTR(state_of_mind->codec);
 
     /* Check if we actually able to write the requested pixel format. */
-    SAIL_TRY(allowed_write_output_pixel_format(state_of_mind->plugin_info->write_features,
+    SAIL_TRY(allowed_write_output_pixel_format(state_of_mind->codec_info->write_features,
                                                 image->pixel_format,
                                                 state_of_mind->write_options->output_pixel_format));
 
     /* Detect the number of passes needed to write an interlaced image. */
     int interlaced_passes;
     if (state_of_mind->write_options->io_options & SAIL_IO_OPTION_INTERLACED) {
-        interlaced_passes = state_of_mind->plugin_info->write_features->interlaced_passes;
+        interlaced_passes = state_of_mind->codec_info->write_features->interlaced_passes;
 
         if (interlaced_passes < 1) {
             return SAIL_ERROR_INTERLACING_UNSUPPORTED;
@@ -206,12 +206,12 @@ sail_status_t sail_write_next_frame(void *state, const struct sail_image *image)
     unsigned bytes_per_line;
     SAIL_TRY(sail_bytes_per_line(image->width, image->pixel_format, &bytes_per_line));
 
-    SAIL_TRY(state_of_mind->plugin->v3->write_seek_next_frame(state_of_mind->state, state_of_mind->io, image));
+    SAIL_TRY(state_of_mind->codec->v3->write_seek_next_frame(state_of_mind->state, state_of_mind->io, image));
 
     for (int pass = 0; pass < interlaced_passes; pass++) {
-        SAIL_TRY(state_of_mind->plugin->v3->write_seek_next_pass(state_of_mind->state, state_of_mind->io, image));
+        SAIL_TRY(state_of_mind->codec->v3->write_seek_next_pass(state_of_mind->state, state_of_mind->io, image));
 
-        SAIL_TRY(state_of_mind->plugin->v3->write_frame(state_of_mind->state,
+        SAIL_TRY(state_of_mind->codec->v3->write_frame(state_of_mind->state,
                                                         state_of_mind->io,
                                                         image));
     }

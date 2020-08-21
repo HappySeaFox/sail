@@ -100,7 +100,7 @@ sail_status_t WriteOptions::init(const sail::write_features &write_features, int
         return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
     }
 
-    // Plugins support compression levels only when they support just a single compression.
+    // Codecs support compression levels only when they support just a single compression.
     if (write_features.compressions().size() == 1) {
         d->ui->labelCompression->setText(tr("Compression:"));
         d->ui->sliderCompression->setMinimum(write_features.compression_level_min());

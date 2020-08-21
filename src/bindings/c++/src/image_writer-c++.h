@@ -42,7 +42,7 @@ namespace sail
 
 class image;
 class io;
-class plugin_info;
+class codec_info;
 class write_options;
 
 /*
@@ -75,8 +75,8 @@ public:
     /*
      * An interface to sail_start_writing(). See sail_start_writing() for more.
      */
-    sail_status_t start_writing(const std::string &path, const plugin_info &splugin_info);
-    sail_status_t start_writing(const char *path, const plugin_info &splugin_info);
+    sail_status_t start_writing(const std::string &path, const codec_info &scodec_info);
+    sail_status_t start_writing(const char *path, const codec_info &scodec_info);
 
     /*
      * An interface to sail_start_writing_with_options(). See sail_start_writing_with_options() for more.
@@ -87,20 +87,20 @@ public:
     /*
      * An interface to sail_start_writing_with_options(). See sail_start_writing_with_options() for more.
      */
-    sail_status_t start_writing(const std::string &path, const plugin_info &splugin_info, const write_options &swrite_options);
-    sail_status_t start_writing(const char *path, const plugin_info &splugin_info, const write_options &swrite_options);
+    sail_status_t start_writing(const std::string &path, const codec_info &scodec_info, const write_options &swrite_options);
+    sail_status_t start_writing(const char *path, const codec_info &scodec_info, const write_options &swrite_options);
 
     /*
      * An interface to sail_start_writing_mem(). See sail_start_writing_mem() for more.
      */
-    sail_status_t start_writing(void *buffer, size_t buffer_length, const plugin_info &splugin_info);
-    sail_status_t start_writing(void *buffer, size_t buffer_length, const plugin_info &splugin_info, const write_options &swrite_options);
+    sail_status_t start_writing(void *buffer, size_t buffer_length, const codec_info &scodec_info);
+    sail_status_t start_writing(void *buffer, size_t buffer_length, const codec_info &scodec_info, const write_options &swrite_options);
 
     /*
      * An interface to sail_start_writing_io(). See sail_start_writing_io() for more.
      */
-    sail_status_t start_writing(const io &sio, const plugin_info &splugin_info);
-    sail_status_t start_writing(const io &sio, const plugin_info &splugin_info, const write_options &swrite_options);
+    sail_status_t start_writing(const io &sio, const codec_info &scodec_info);
+    sail_status_t start_writing(const io &sio, const codec_info &scodec_info, const write_options &swrite_options);
 
     /*
      * An interface to sail_write_next_frame(). See sail_write_next_frame() for more.

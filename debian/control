@@ -26,7 +26,7 @@ Description: SAIL is a fast and lightweight cross-platform image decoding
  .
  This package provides common low-level SAIL development headers and libraries.
 
-Package: sail-plugins
+Package: sail-codecs
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
@@ -39,7 +39,7 @@ Description: SAIL is a fast and lightweight cross-platform image decoding
 Package: libsail0
 Section: libs
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, sail-plugins (= ${binary:Version})
+Depends: ${shlibs:Depends}, ${misc:Depends}, sail-codecs (= ${binary:Version})
 Description: SAIL is a fast and lightweight cross-platform image decoding
  and encoding library providing multi-leveled APIs from one-liners
  to complex use-cases with custom I/O sources.

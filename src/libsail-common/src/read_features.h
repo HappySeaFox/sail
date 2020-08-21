@@ -41,14 +41,14 @@ extern "C" {
 struct sail_pixel_formats_mapping_node;
 
 /*
- * Read features. Use this structure to determine what a plugin can actually read.
+ * Read features. Use this structure to determine what a codec can actually read.
  */
 struct sail_read_features {
 
     /*
-     * A list of supported pixel formats that can be output by this plugin.
-     * The BPP32-RGBA and BPP32-BGRA output pixel formats are always supported. Most image format plugins
-     * are able to output the SOURCE pixel format as well. Some plugins may support even more output pixel formats.
+     * A list of supported pixel formats that can be output by this codec.
+     * The BPP32-RGBA and BPP32-BGRA output pixel formats are always supported. Most image format codecs
+     * are able to output the SOURCE pixel format as well. Some codecs may support even more output pixel formats.
      */
     enum SailPixelFormat *output_pixel_formats;
 
@@ -61,7 +61,7 @@ struct sail_read_features {
      */
     enum SailPixelFormat default_output_pixel_format;
 
-    /* Supported or-ed features of reading operations. See SailPluginFeature. */
+    /* Supported or-ed features of reading operations. See SailCodecFeature. */
     int features;
 };
 

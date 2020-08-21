@@ -41,19 +41,19 @@ extern "C" {
 struct sail_pixel_formats_mapping_node;
 
 /*
- * Write features. Use this structure to determine what a plugin can actually write.
+ * Write features. Use this structure to determine what a codec can actually write.
  */
 struct sail_write_features {
 
     /*
-     * A mapping of supported pixel formats that can be written by this plugin.
+     * A mapping of supported pixel formats that can be written by this codec.
      *
-     * Outputting SOURCE pixels is always supported. Some plugins may provide even more
+     * Outputting SOURCE pixels is always supported. Some codecs may provide even more
      * pixel formats to output.
      */
     struct sail_pixel_formats_mapping_node *pixel_formats_mapping_node;
 
-    /* Supported or-ed features of writing operations. See SailPluginFeature. */
+    /* Supported or-ed features of writing operations. See SailCodecFeature. */
     int features;
 
     /*
@@ -66,14 +66,14 @@ struct sail_write_features {
     int interlaced_passes;
 
     /*
-     * A list of supported pixels compression types by this plugin. If the list has more than two entries,
+     * A list of supported pixels compression types by this codec. If the list has more than two entries,
      * compression levels are ignored.
      *
      * For example:
      *
-     *     1. The JPEG plugin supports only one compression, JPEG. compression_level_min, compression_level_max,
+     *     1. The JPEG codec supports only one compression, JPEG. compression_level_min, compression_level_max,
      *        compression_level_default can be used to select a compression level.
-     *     2. The TIFF plugin supports more than two compression types (PACKBITS, JPEG, etc.). Compression levels
+     *     2. The TIFF codec supports more than two compression types (PACKBITS, JPEG, etc.). Compression levels
      *        are not supported.
      */
     enum SailCompression *compressions;
@@ -87,13 +87,13 @@ struct sail_write_features {
     /*
      * Minimum compression value. For lossy codecs, more compression means less quality and vice versa.
      * For lossless codecs, more compression means nothing but a smaller file size. This field is
-     * plugin-specific. If compression_level_min == compression_level_max == 0, no compression tuning is available.
+     * codec-specific. If compression_level_min == compression_level_max == 0, no compression tuning is available.
      * For example: 0.
      */
     double compression_level_min;
 
     /*
-     * Maximum compression value. This field is plugin-specific. If compression_level_min == compression_level_max == 0,
+     * Maximum compression value. This field is codec-specific. If compression_level_min == compression_level_max == 0,
      * no compression tuning is available. For example: 100.
      */
     double compression_level_max;

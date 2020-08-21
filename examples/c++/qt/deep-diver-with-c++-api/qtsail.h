@@ -40,7 +40,7 @@ namespace Ui {
 
 namespace sail
 {
-class plugin_info;
+class codec_info;
 }
 
 class QtSail : public QWidget

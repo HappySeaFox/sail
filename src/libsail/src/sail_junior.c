@@ -30,14 +30,14 @@
 #include "sail-common.h"
 #include "sail.h"
 
-sail_status_t sail_probe_file(const char *path, struct sail_image **image, const struct sail_plugin_info **plugin_info) {
+sail_status_t sail_probe_file(const char *path, struct sail_image **image, const struct sail_codec_info **codec_info) {
 
     SAIL_CHECK_PATH_PTR(path);
 
     struct sail_io *io;
     SAIL_TRY(alloc_io_read_file(path, &io));
 
-    SAIL_TRY_OR_CLEANUP(sail_probe_io(io, image, plugin_info),
+    SAIL_TRY_OR_CLEANUP(sail_probe_io(io, image, codec_info),
                         /* cleanup */ sail_destroy_io(io));
 
     sail_destroy_io(io);
@@ -52,7 +52,7 @@ sail_status_t sail_read_file(const char *path, struct sail_image **image) {
 
     void *state = NULL;
 
-    SAIL_TRY_OR_CLEANUP(sail_start_reading_file(path, NULL /* plugin info */, &state),
+    SAIL_TRY_OR_CLEANUP(sail_start_reading_file(path, NULL /* codec info */, &state),
                         /* cleanup */ sail_stop_reading(state));
 
     SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, image),
@@ -71,7 +71,7 @@ SAIL_EXPORT sail_status_t sail_read_mem(const void *buffer, size_t buffer_length
 
     void *state = NULL;
 
-    SAIL_TRY_OR_CLEANUP(sail_start_reading_mem(buffer, buffer_length, NULL /* plugin info */, &state),
+    SAIL_TRY_OR_CLEANUP(sail_start_reading_mem(buffer, buffer_length, NULL /* codec info */, &state),
                         /* cleanup */ sail_stop_reading(state));
 
     SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, image),
@@ -90,7 +90,7 @@ sail_status_t sail_write_file(const char *path, const struct sail_image *image) 
 
     void *state = NULL;
 
-    SAIL_TRY_OR_CLEANUP(sail_start_writing_file(path, NULL /* plugin info */, &state),
+    SAIL_TRY_OR_CLEANUP(sail_start_writing_file(path, NULL /* codec info */, &state),
                         sail_stop_writing(state));
 
     SAIL_TRY_OR_CLEANUP(sail_write_next_frame(state, image),
@@ -108,7 +108,7 @@ SAIL_EXPORT sail_status_t sail_write_mem(void *buffer, size_t buffer_length, con
 
     void *state = NULL;
 
-    SAIL_TRY_OR_CLEANUP(sail_start_writing_mem(buffer, buffer_length, NULL /* plugin info */, &state),
+    SAIL_TRY_OR_CLEANUP(sail_start_writing_mem(buffer, buffer_length, NULL /* codec info */, &state),
                         sail_stop_writing(state));
 
     SAIL_TRY_OR_CLEANUP(sail_write_next_frame(state, image),

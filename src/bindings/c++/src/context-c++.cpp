@@ -42,9 +42,9 @@ sail_status_t context::init(int flags)
     return SAIL_OK;
 }
 
-sail_status_t context::unload_plugins()
+sail_status_t context::unload_codecs()
 {
-    SAIL_TRY(sail_unload_plugins());
+    SAIL_TRY(sail_unload_codecs());
 
     return SAIL_OK;
 }

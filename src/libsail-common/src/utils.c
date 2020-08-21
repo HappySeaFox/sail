@@ -498,46 +498,46 @@ sail_status_t sail_compression_from_string(const char *str, enum SailCompression
     return SAIL_ERROR_UNSUPPORTED_COMPRESSION;
 }
 
-sail_status_t sail_plugin_feature_to_string(enum SailPluginFeature plugin_feature, const char **result) {
+sail_status_t sail_codec_feature_to_string(enum SailCodecFeature codec_feature, const char **result) {
 
     SAIL_CHECK_STRING_PTR(result);
 
-    switch (plugin_feature) {
-        case SAIL_PLUGIN_FEATURE_STATIC:      *result = "STATIC";      return SAIL_OK;
-        case SAIL_PLUGIN_FEATURE_ANIMATED:    *result = "ANIMATED";    return SAIL_OK;
-        case SAIL_PLUGIN_FEATURE_MULTI_FRAME: *result = "MULTI-FRAME"; return SAIL_OK;
-        case SAIL_PLUGIN_FEATURE_META_INFO:   *result = "META-INFO";   return SAIL_OK;
-        case SAIL_PLUGIN_FEATURE_EXIF:        *result = "EXIF";        return SAIL_OK;
-        case SAIL_PLUGIN_FEATURE_INTERLACED:  *result = "INTERLACED";  return SAIL_OK;
-        case SAIL_PLUGIN_FEATURE_ICCP:        *result = "ICCP";        return SAIL_OK;
+    switch (codec_feature) {
+        case SAIL_CODEC_FEATURE_STATIC:      *result = "STATIC";      return SAIL_OK;
+        case SAIL_CODEC_FEATURE_ANIMATED:    *result = "ANIMATED";    return SAIL_OK;
+        case SAIL_CODEC_FEATURE_MULTI_FRAME: *result = "MULTI-FRAME"; return SAIL_OK;
+        case SAIL_CODEC_FEATURE_META_INFO:   *result = "META-INFO";   return SAIL_OK;
+        case SAIL_CODEC_FEATURE_EXIF:        *result = "EXIF";        return SAIL_OK;
+        case SAIL_CODEC_FEATURE_INTERLACED:  *result = "INTERLACED";  return SAIL_OK;
+        case SAIL_CODEC_FEATURE_ICCP:        *result = "ICCP";        return SAIL_OK;
     }
 
-    return SAIL_ERROR_UNSUPPORTED_PLUGIN_FEATURE;
+    return SAIL_ERROR_UNSUPPORTED_CODEC_FEATURE;
 }
 
-sail_status_t sail_plugin_feature_from_string(const char *str, enum SailPluginFeature *result) {
+sail_status_t sail_codec_feature_from_string(const char *str, enum SailCodecFeature *result) {
 
     SAIL_CHECK_STRING_PTR(str);
     SAIL_CHECK_RESULT_PTR(result);
 
     if (strlen(str) == 0) {
-        return SAIL_ERROR_UNSUPPORTED_PLUGIN_FEATURE;
+        return SAIL_ERROR_UNSUPPORTED_CODEC_FEATURE;
     }
 
     uint64_t hash;
     SAIL_TRY(sail_string_hash(str, &hash));
 
     switch (hash) {
-        case UINT64_C(6952739426029):        *result = SAIL_PLUGIN_FEATURE_STATIC;      return SAIL_OK;
-        case UINT64_C(7570758658679240):     *result = SAIL_PLUGIN_FEATURE_ANIMATED;    return SAIL_OK;
-        case UINT64_C(13834645239598293736): *result = SAIL_PLUGIN_FEATURE_MULTI_FRAME; return SAIL_OK;
-        case UINT64_C(249851542786266181):   *result = SAIL_PLUGIN_FEATURE_META_INFO;   return SAIL_OK;
-        case UINT64_C(6384018865):           *result = SAIL_PLUGIN_FEATURE_EXIF;        return SAIL_OK;
-        case UINT64_C(8244927930303708800):  *result = SAIL_PLUGIN_FEATURE_INTERLACED;  return SAIL_OK;
-        case UINT64_C(6384139556):           *result = SAIL_PLUGIN_FEATURE_ICCP;        return SAIL_OK;
+        case UINT64_C(6952739426029):        *result = SAIL_CODEC_FEATURE_STATIC;      return SAIL_OK;
+        case UINT64_C(7570758658679240):     *result = SAIL_CODEC_FEATURE_ANIMATED;    return SAIL_OK;
+        case UINT64_C(13834645239598293736): *result = SAIL_CODEC_FEATURE_MULTI_FRAME; return SAIL_OK;
+        case UINT64_C(249851542786266181):   *result = SAIL_CODEC_FEATURE_META_INFO;   return SAIL_OK;
+        case UINT64_C(6384018865):           *result = SAIL_CODEC_FEATURE_EXIF;        return SAIL_OK;
+        case UINT64_C(8244927930303708800):  *result = SAIL_CODEC_FEATURE_INTERLACED;  return SAIL_OK;
+        case UINT64_C(6384139556):           *result = SAIL_CODEC_FEATURE_ICCP;        return SAIL_OK;
     }
 
-    return SAIL_ERROR_UNSUPPORTED_PLUGIN_FEATURE;
+    return SAIL_ERROR_UNSUPPORTED_CODEC_FEATURE;
 }
 
 sail_status_t sail_bits_per_pixel(enum SailPixelFormat pixel_format, unsigned *result) {

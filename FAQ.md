@@ -6,13 +6,13 @@ Table of Contents
   * [How old is SAIL?](#how-old-is-sail)
   * [Is SAIL cross\-platform?](#is-sail-cross-platform)
   * [How does SAIL support image formats?](#how-does-sail-support-image-formats)
-  * [Can I implement an image decoding plugin in C\+\+?](#can-i-implement-an-image-decoding-plugin-in-c)
-  * [Does SAIL preload all plugins in the initialization routine?](#does-sail-preload-all-plugins-in-the-initialization-routine)
-  * [How does SAIL look for plugins?](#how-does-sail-look-for-plugins)
+  * [Can I implement an image decoding codec in C\+\+?](#can-i-implement-an-image-decoding-codec-in-c)
+  * [Does SAIL preload all codecs in the initialization routine?](#does-sail-preload-all-codecs-in-the-initialization-routine)
+  * [How does SAIL look for codecs?](#how-does-sail-look-for-codecs)
     * [Windows](#windows)
     * [Unix (including macOS)](#unix-including-macos)
   * [I'd like to reorganize the standard SAIL folder layout on Windows](#id-like-to-reorganize-the-standard-sail-folder-layout-on-windows)
-  * [How can I point SAIL to a different plugins location?](#how-can-i-point-sail-to-a-different-plugins-location)
+  * [How can I point SAIL to a different codecs location?](#how-can-i-point-sail-to-a-different-codecs-location)
   * [Describe the high\-level APIs](#describe-the-high-level-apis)
   * [Does SAIL provide simple one\-line APIs?](#does-sail-provide-simple-one-line-apis)
   * [How many image formats do you plan to implement?](#how-many-image-formats-do-you-plan-to-implement)
@@ -59,41 +59,41 @@ are currently supported. Pull requests to support more platforms are highly welc
 
 ## How does SAIL support image formats?
 
-SAIL supports image formats through dynamically loaded SAIL plugins (codecs). End-users never work
-with the plugins directly. They always work with the abstract high-level APIs.
+SAIL supports image formats through dynamically loaded SAIL codecs. End-users never work
+with the codecs directly. They always work with the abstract high-level APIs.
 
-## Can I implement an image decoding plugin in C++?
+## Can I implement an image decoding codec in C++?
 
-Yes. Your plugin just needs to export a set of public functions so SAIL can recognize and use it.
-Theoretically, you can implement your plugin in any programming language.
+Yes. Your codec just needs to export a set of public functions so SAIL can recognize and use it.
+Theoretically, you can implement your codec in any programming language.
 
-## Does SAIL preload all plugins in the initialization routine?
+## Does SAIL preload all codecs in the initialization routine?
 
-No. By default, SAIL doesn't preload all plugins in the initialization routine (`sail_init()`). It loads them on demand.
-However, you can preload them explicitly with `sail_init_with_flags(SAIL_FLAG_PRELOAD_PLUGINS)`.
+No. By default, SAIL doesn't preload all codecs in the initialization routine (`sail_init()`). It loads them on demand.
+However, you can preload them explicitly with `sail_init_with_flags(SAIL_FLAG_PRELOAD_CODECS)`.
 
-## How does SAIL look for plugins?
+## How does SAIL look for codecs?
 
-Plugins (image codecs) paths search algorithm (first found path wins):
+Codecs paths search algorithm (first found path wins):
 
 ### Windows
-1. `SAIL_PLUGINS_PATH` environment variable
-2. `<SAIL DEPLOYMENT FOLDER>\lib\sail\plugins`
-3. Hardcoded `SAIL_PLUGINS_PATH` in config.h
+1. `SAIL_CODECS_PATH` environment variable
+2. `<SAIL DEPLOYMENT FOLDER>\lib\sail\codecs`
+3. Hardcoded `SAIL_CODECS_PATH` in config.h
 
 ### Unix (including macOS)
-1. `SAIL_PLUGINS_PATH` environment variable
-2. Hardcoded `SAIL_PLUGINS_PATH` in config.h
+1. `SAIL_CODECS_PATH` environment variable
+2. Hardcoded `SAIL_CODECS_PATH` in config.h
 
 ## I'd like to reorganize the standard SAIL folder layout on Windows
 
-I can surely do that. However, with the standard layout SAIL detects the plugins' location automatically.
-If you reorganize the standard SAIL folder layout, you'll need to specify the new plugins' location by
-setting the `SAIL_PLUGINGS_PATH` environment variable.
+I can surely do that. However, with the standard layout SAIL detects the codecs' location automatically.
+If you reorganize the standard SAIL folder layout, you'll need to specify the new codecs' location by
+setting the `SAIL_CODECGS_PATH` environment variable.
 
-## How can I point SAIL to a different plugins location?
+## How can I point SAIL to a different codecs location?
 
-Set `SAIL_PLUGINGS_PATH` environment variable to a desired location.
+Set `SAIL_CODECGS_PATH` environment variable to a desired location.
 
 ## Describe the high-level APIs
 
@@ -101,7 +101,7 @@ SAIL provides four levels of high-level APIs:
 
 - `Junior`: I just want to load this damn JPEG from a file or memory
 - `Advanced`: I want to load this damn animated GIF from a file or memory
-- `Deep diver`: I want to load this damn animated GIF from a file or memory and have control over selected plugins and output pixel formats
+- `Deep diver`: I want to load this damn animated GIF from a file or memory and have control over selected codecs and output pixel formats
 - `Technical diver`: I want everything above and my custom I/O source
 
 See [EXAMPLES](EXAMPLES.md) for more.
@@ -118,7 +118,7 @@ the most popular image formats will be definitely ported from ksquirrel-libs.
 
 ## Does SAIL support static linking?
 
-No. You're able to build `libsail` statically, however SAIL plugins are still standalone dynamically loaded files.
+No. You're able to build `libsail` statically, however SAIL codecs are still standalone dynamically loaded files.
 
 ## I have questions, issues, or proposals
 
@@ -182,26 +182,26 @@ SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, ...),
 
 ## What pixel formats SAIL is able to read?
 
-SAIL codecs (plugins) always try to support as much input pixel formats as possible. The list of
-pixel formats that can be read by SAIL is plugin-specific and is not publicly available.
+SAIL codecs always try to support as much input pixel formats as possible. The list of
+pixel formats that can be read by SAIL is codec-specific and is not publicly available.
 
-For example, some plugins may be able to read just 3 input pixel formats. Other may be able to read 10.
+For example, some codecs may be able to read just 3 input pixel formats. Other may be able to read 10.
 
 ## What pixel formats SAIL is able to output after reading an image file?
 
 SAIL is always able to output pixels in the `BPP32-RGBA` and `BPP32-BGRA` pixel formats after reading.
-Most plugins are able to output the `SOURCE` pixel format as well. Some plugins support even more output pixel formats.
-Use `sail_plugin_info_from_extension() -> plugin_info -> read_features -> output_pixel_formats` to determine
-the list of supported output pixel formats per plugin.
+Most codecs are able to output the `SOURCE` pixel format as well. Some codecs support even more output pixel formats.
+Use `sail_codec_info_from_extension() -> codec_info -> read_features -> output_pixel_formats` to determine
+the list of supported output pixel formats per codec.
 
-Use the `SOURCE` pixel format (if it's supported by the plugin) to request the original image pixels.
+Use the `SOURCE` pixel format (if it's supported by the codec) to request the original image pixels.
 For example, one may want to work with CMYK pixels in a print image without converting them to RGB.
 
 ## What pixel formats SAIL is able to write?
 
-SAIL codecs (plugins) always try to support as much output pixel formats as possible. The list of
-pixel formats that can be written by SAIL is plugin-specific and is publicly available in every
-.plugin.info file. It can be accessed through `sail_plugin_info_from_extension() -> plugin_info -> write_features ->
+SAIL codecs always try to support as much output pixel formats as possible. The list of
+pixel formats that can be written by SAIL is codec-specific and is publicly available in every
+.codec.info file. It can be accessed through `sail_codec_info_from_extension() -> codec_info -> write_features ->
 pixel_formats_mapping_node`.
 
 `pixel_formats_mapping_node` is a map-like linked list describing what pixel formats SAIL is able to write from
@@ -225,7 +225,7 @@ The `SOURCE` output pixel format is always supported.
 Use read options for that. For example:
 
 ```C
-sail_plugin_info_from_extension(...);
+sail_codec_info_from_extension(...);
 
 sail_read_options_from_features(...);
 

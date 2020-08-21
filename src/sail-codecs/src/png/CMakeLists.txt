@@ -19,10 +19,10 @@ cmake_push_check_state(RESET)
 cmake_pop_check_state()
 
 if (HAVE_APNG)
-    set(PLUGIN_INFO_EXTENSION_APNG   ";apng")
-    set(PLUGIN_INFO_FEATURE_ANIMATED ";ANIMATED")
+    set(CODEC_INFO_EXTENSION_APNG   ";apng")
+    set(CODEC_INFO_FEATURE_ANIMATED ";ANIMATED")
 endif()
 
-# Common plugin configuration
+# Common codec configuration
 #
-sail_plugin(TARGET png SOURCES helpers.c io.c png.c PKGCONFIG libpng16)
+sail_codec(TARGET png SOURCES helpers.c io.c png.c PKGCONFIG libpng16)

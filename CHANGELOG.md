@@ -12,7 +12,7 @@ See [README](README.md) for more.
 - first public release
 - implemented a rich C client API to read and write images
 - implemented a rich C++ client API to read and write images
-- plugins interfaces are now hidden. Always use the client APIs to read or write images
+- codecs interfaces are now hidden. Always use the client APIs to read or write images
 
 # ksquirrel-libs (until 0.8.0)
 

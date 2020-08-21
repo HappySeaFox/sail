@@ -40,7 +40,7 @@
     #include "io_common-c++.h"
     #include "log-c++.h"
     #include "palette-c++.h"
-    #include "plugin_info-c++.h"
+    #include "codec_info-c++.h"
     #include "read_features-c++.h"
     #include "read_options-c++.h"
     #include "source_image-c++.h"
@@ -59,7 +59,7 @@
     #include <sail-c++/io_common-c++.h>
     #include <sail-c++/log-c++.h>
     #include <sail-c++/palette-c++.h>
-    #include <sail-c++/plugin_info-c++.h>
+    #include <sail-c++/codec_info-c++.h>
     #include <sail-c++/read_features-c++.h>
     #include <sail-c++/read_options-c++.h>
     #include <sail-c++/source_image-c++.h>

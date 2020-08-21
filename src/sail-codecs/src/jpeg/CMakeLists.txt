@@ -20,12 +20,12 @@ cmake_push_check_state(RESET)
 cmake_pop_check_state()
 
 if (HAVE_JPEG_ICCP)
-    set(PLUGIN_INFO_FEATURE_ICCP ";ICCP")
+    set(CODEC_INFO_FEATURE_ICCP ";ICCP")
 endif()
 
-# Common plugin configuration
+# Common codec configuration
 #
-sail_plugin(TARGET jpeg SOURCES jpeg.c helpers.c io_dest.c io_src.c PKGCONFIG libjpeg)
+sail_codec(TARGET jpeg SOURCES jpeg.c helpers.c io_dest.c io_src.c PKGCONFIG libjpeg)
 
 if (HAVE_JPEG_ICCP)
     target_compile_definitions(jpeg PRIVATE HAVE_JPEG_ICCP)

@@ -88,9 +88,9 @@ struct sail_image {
      * Image pixel format. See SailPixelFormat.
      *
      * READ:  Set by SAIL to a valid output image pixel format. The list of supported output pixel formats
-     *        by a certain plugin can be obtained from sail_read_features.input_pixel_formats.
+     *        by a certain codec can be obtained from sail_read_features.input_pixel_formats.
      * WRITE: Must be set by a caller to a valid input image pixel format. Pixels in this format will be supplied
-     *        to the plugin by a caller later. The list of supported input pixel formats by a certain plugin
+     *        to the codec by a caller later. The list of supported input pixel formats by a certain codec
      *        can be obtained from sail_write_features.output_pixel_formats.
      */
     enum SailPixelFormat pixel_format;
@@ -133,7 +133,7 @@ struct sail_image {
     struct sail_palette *palette;
 
     /*
-     * Image meta information. See sail_meta_entry_node. Plugins guarantee that keys and values are non-NULL.
+     * Image meta information. See sail_meta_entry_node. Codecs guarantee that keys and values are non-NULL.
      * Destroyed by sail_destroy_image().
      *
      * READ:  Set by SAIL to a valid linked list with simple meta information (like JPEG comments) or to NULL.

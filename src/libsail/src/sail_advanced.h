@@ -38,11 +38,11 @@
 extern "C" {
 #endif
 
-struct sail_plugin_info;
+struct sail_codec_info;
 
 /*
  * Loads an image from the specified I/O source and returns its properties without pixels. The assigned image
- * MUST be destroyed later with sail_destroy_image(). The assigned plugin info MUST NOT be destroyed
+ * MUST be destroyed later with sail_destroy_image(). The assigned codec info MUST NOT be destroyed
  * because it is a pointer to an internal data structure. If you don't need it, just pass NULL.
  *
  * This function is pretty fast because it doesn't decode whole image data for most image formats.
@@ -51,11 +51,11 @@ struct sail_plugin_info;
  *
  * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_status_t sail_probe_io(struct sail_io *io, struct sail_image **image, const struct sail_plugin_info **plugin_info);
+SAIL_EXPORT sail_status_t sail_probe_io(struct sail_io *io, struct sail_image **image, const struct sail_codec_info **codec_info);
 
 /*
  * Loads an image from the specified memory buffer and returns its properties without pixels. The assigned image
- * MUST be destroyed later with sail_destroy_image(). The assigned plugin info MUST NOT be destroyed
+ * MUST be destroyed later with sail_destroy_image(). The assigned codec info MUST NOT be destroyed
  * because it is a pointer to an internal data structure. If you don't need it, just pass NULL.
  *
  * This function is pretty fast because it doesn't decode whole image data for most image formats.
@@ -65,10 +65,10 @@ SAIL_EXPORT sail_status_t sail_probe_io(struct sail_io *io, struct sail_image **
  * Returns 0 on success or sail_status_t on error.
  */
 SAIL_EXPORT sail_status_t sail_probe_mem(const void *buffer, size_t buffer_length,
-                                        struct sail_image **image, const struct sail_plugin_info **plugin_info);
+                                        struct sail_image **image, const struct sail_codec_info **codec_info);
 
 /*
- * Starts reading the specified image file. Pass plugin info if you would like to start reading
+ * Starts reading the specified image file. Pass codec info if you would like to start reading
  * with a specific codec. If not, just pass NULL.
  *
  * The subsequent calls to sail_read_next_frame() output pixels in the BPP32-RGBA pixel format.
@@ -77,7 +77,7 @@ SAIL_EXPORT sail_status_t sail_probe_mem(const void *buffer, size_t buffer_lengt
  *                sail_read_next_frame()    ->
  *                sail_stop_reading().
  *
- * Or:            sail_plugin_info_from_extension() ->
+ * Or:            sail_codec_info_from_extension() ->
  *                sail_start_reading_file()         ->
  *                sail_read_next_frame()            ->
  *                sail_stop_reading().
@@ -98,14 +98,14 @@ SAIL_EXPORT sail_status_t sail_probe_mem(const void *buffer, size_t buffer_lengt
  *
  * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_status_t sail_start_reading_file(const char *path, const struct sail_plugin_info *plugin_info, void **state);
+SAIL_EXPORT sail_status_t sail_start_reading_file(const char *path, const struct sail_codec_info *codec_info, void **state);
 
 /*
  * Starts reading the specified memory buffer.
  *
  * The subsequent calls to sail_read_next_frame() output pixels in the BPP32-RGBA pixel format.
  *
- * Typical usage: sail_plugin_info_from_extension() ->
+ * Typical usage: sail_codec_info_from_extension() ->
  *                sail_start_reading_mem()          ->
  *                sail_read_next_frame()            ->
  *                sail_stop_reading().
@@ -117,7 +117,7 @@ SAIL_EXPORT sail_status_t sail_start_reading_file(const char *path, const struct
  * Returns 0 on success or sail_status_t on error.
  */
 SAIL_EXPORT sail_status_t sail_start_reading_mem(const void *buffer, size_t buffer_length,
-                                                const struct sail_plugin_info *plugin_info, void **state);
+                                                const struct sail_codec_info *codec_info, void **state);
 
 /*
  * Continues reading the file started by sail_start_reading_file() and brothers. The assigned image
@@ -138,7 +138,7 @@ SAIL_EXPORT sail_status_t sail_read_next_frame(void *state, struct sail_image **
 SAIL_EXPORT sail_status_t sail_stop_reading(void *state);
 
 /*
- * Starts writing into the specified image file. Pass plugin info if you'd like to start writing
+ * Starts writing into the specified image file. Pass codec info if you'd like to start writing
  * with a specific codec. If not, just pass NULL.
  *
  * The subsequent calls to sail_write_next_frame() output pixels in pixel format as specified
@@ -148,7 +148,7 @@ SAIL_EXPORT sail_status_t sail_stop_reading(void *state);
  *                sail_write_next_frame() ->
  *                sail_stop_writing().
  *
- * Or:            sail_plugin_info_from_extension() ->
+ * Or:            sail_codec_info_from_extension() ->
  *                sail_start_writing()              ->
  *                sail_write_next_frame()           ->
  *                sail_stop_writing().
@@ -169,7 +169,7 @@ SAIL_EXPORT sail_status_t sail_stop_reading(void *state);
  *
  * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_status_t sail_start_writing_file(const char *path, const struct sail_plugin_info *plugin_info, void **state);
+SAIL_EXPORT sail_status_t sail_start_writing_file(const char *path, const struct sail_codec_info *codec_info, void **state);
 
 /*
  * Starts writing the specified memory buffer.
@@ -177,7 +177,7 @@ SAIL_EXPORT sail_status_t sail_start_writing_file(const char *path, const struct
  * The subsequent calls to sail_write_next_frame() output pixels in pixel format
  * as specified in sail_write_features.default_output_pixel_format.
  *
- * Typical usage: sail_plugin_info_from_extension() ->
+ * Typical usage: sail_codec_info_from_extension() ->
  *                sail_start_writing_mem()          ->
  *                sail_write_next_frame()           ->
  *                sail_stop_writing().
@@ -189,7 +189,7 @@ SAIL_EXPORT sail_status_t sail_start_writing_file(const char *path, const struct
  * Returns 0 on success or sail_status_t on error.
  */
 SAIL_EXPORT sail_status_t sail_start_writing_mem(void *buffer, size_t buffer_length,
-                                                const struct sail_plugin_info *plugin_info, void **state);
+                                                const struct sail_codec_info *codec_info, void **state);
 
 /*
  * Continues writing the file started by sail_start_writing_file() and brothers.

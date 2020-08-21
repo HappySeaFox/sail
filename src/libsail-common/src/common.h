@@ -35,7 +35,7 @@
 #endif
 
 /*
- * Common data structures and functions used across SAIL, both in libsail and in image plugins.
+ * Common data structures and functions used across SAIL, both in libsail and in image codecs.
  */
 
 /* Pixel format */
@@ -47,7 +47,7 @@ enum SailPixelFormat {
     SAIL_PIXEL_FORMAT_UNKNOWN,
 
     /*
-     * Pixel format used to write images with default parameters. Plugins detect an actual
+     * Pixel format used to write images with default parameters. Codecs detect an actual
      * pixel format to write automatically in this case.
      */
     SAIL_PIXEL_FORMAT_AUTO,
@@ -220,29 +220,29 @@ enum SailCompression {
     SAIL_COMPRESSION_ZSTD,          /* ZSTD. */
 };
 
-/* Plugin features. */
-enum SailPluginFeature {
+/* Codec features. */
+enum SailCodecFeature {
 
     /* Ability to read or write static images. */
-    SAIL_PLUGIN_FEATURE_STATIC      = 1 << 0,
+    SAIL_CODEC_FEATURE_STATIC      = 1 << 0,
 
     /* Ability to read or write animated images. */
-    SAIL_PLUGIN_FEATURE_ANIMATED    = 1 << 1,
+    SAIL_CODEC_FEATURE_ANIMATED    = 1 << 1,
 
     /* Ability to read or write multi-frame (but not animated) images. */
-    SAIL_PLUGIN_FEATURE_MULTI_FRAME = 1 << 2,
+    SAIL_CODEC_FEATURE_MULTI_FRAME = 1 << 2,
 
     /* Ability to read or write simple image meta information like JPEG comments. */
-    SAIL_PLUGIN_FEATURE_META_INFO   = 1 << 3,
+    SAIL_CODEC_FEATURE_META_INFO   = 1 << 3,
 
     /* Ability to read or write EXIF meta information. */
-    SAIL_PLUGIN_FEATURE_EXIF        = 1 << 4,
+    SAIL_CODEC_FEATURE_EXIF        = 1 << 4,
 
     /* Ability to read or write interlaced images. */
-    SAIL_PLUGIN_FEATURE_INTERLACED  = 1 << 5,
+    SAIL_CODEC_FEATURE_INTERLACED  = 1 << 5,
 
     /* Ability to read or write embedded ICC profiles. */
-    SAIL_PLUGIN_FEATURE_ICCP        = 1 << 6,
+    SAIL_CODEC_FEATURE_ICCP        = 1 << 6,
 };
 
 /* Read or write options. */

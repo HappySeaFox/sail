@@ -28,10 +28,10 @@
 
 #include <stdbool.h>
 
-struct sail_plugin_info_node;
+struct sail_codec_info_node;
 
 /*
- * Context is a main entry point to start working with SAIL. It enumerates plugin info objects which could be
+ * Context is a main entry point to start working with SAIL. It enumerates codec info objects which could be
  * used later in reading and writing operations.
  */
 struct sail_context {
@@ -39,8 +39,8 @@ struct sail_context {
     /* Context is already initialized. */
     bool initialized;
 
-    /* Linked list of found plugin info objects. */
-    struct sail_plugin_info_node *plugin_info_node;
+    /* Linked list of found codec info objects. */
+    struct sail_codec_info_node *codec_info_node;
 };
 
 typedef struct sail_context sail_context_t;

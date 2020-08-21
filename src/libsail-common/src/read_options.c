@@ -61,15 +61,15 @@ sail_status_t sail_read_options_from_features(const struct sail_read_features *r
 
     read_options->io_options = 0;
 
-    if (read_features->features & SAIL_PLUGIN_FEATURE_META_INFO) {
+    if (read_features->features & SAIL_CODEC_FEATURE_META_INFO) {
         read_options->io_options |= SAIL_IO_OPTION_META_INFO;
     }
 
-    if (read_features->features & SAIL_PLUGIN_FEATURE_INTERLACED) {
+    if (read_features->features & SAIL_CODEC_FEATURE_INTERLACED) {
         read_options->io_options |= SAIL_IO_OPTION_INTERLACED;
     }
 
-    if (read_features->features & SAIL_PLUGIN_FEATURE_ICCP) {
+    if (read_features->features & SAIL_CODEC_FEATURE_ICCP) {
         read_options->io_options |= SAIL_IO_OPTION_ICCP;
     }
 

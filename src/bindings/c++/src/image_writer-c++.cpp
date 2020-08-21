@@ -132,18 +132,18 @@ sail_status_t image_writer::start_writing(const char *path)
     return SAIL_OK;
 }
 
-sail_status_t image_writer::start_writing(const std::string &path, const plugin_info &splugin_info)
+sail_status_t image_writer::start_writing(const std::string &path, const codec_info &scodec_info)
 {
-    SAIL_TRY(start_writing(path.c_str(), splugin_info));
+    SAIL_TRY(start_writing(path.c_str(), scodec_info));
 
     return SAIL_OK;
 }
 
-sail_status_t image_writer::start_writing(const char *path, const plugin_info &splugin_info)
+sail_status_t image_writer::start_writing(const char *path, const codec_info &scodec_info)
 {
     SAIL_CHECK_PATH_PTR(path);
 
-    SAIL_TRY(sail_start_writing_file(path, splugin_info.sail_plugin_info_c(), &d->state));
+    SAIL_TRY(sail_start_writing_file(path, scodec_info.sail_codec_info_c(), &d->state));
 
     return SAIL_OK;
 }
@@ -167,38 +167,38 @@ sail_status_t image_writer::start_writing(const char *path, const write_options 
     return SAIL_OK;
 }
 
-sail_status_t image_writer::start_writing(const std::string &path, const plugin_info &splugin_info, const write_options &swrite_options)
+sail_status_t image_writer::start_writing(const std::string &path, const codec_info &scodec_info, const write_options &swrite_options)
 {
-    SAIL_TRY(start_writing(path.c_str(), splugin_info, swrite_options));
+    SAIL_TRY(start_writing(path.c_str(), scodec_info, swrite_options));
 
     return SAIL_OK;
 }
 
-sail_status_t image_writer::start_writing(const char *path, const plugin_info &splugin_info, const write_options &swrite_options)
+sail_status_t image_writer::start_writing(const char *path, const codec_info &scodec_info, const write_options &swrite_options)
 {
     SAIL_CHECK_PATH_PTR(path);
 
     sail_write_options sail_write_options;
     SAIL_TRY(swrite_options.to_sail_write_options(&sail_write_options));
 
-    SAIL_TRY(sail_start_writing_file_with_options(path, splugin_info.sail_plugin_info_c(), &sail_write_options, &d->state));
+    SAIL_TRY(sail_start_writing_file_with_options(path, scodec_info.sail_codec_info_c(), &sail_write_options, &d->state));
 
     return SAIL_OK;
 }
 
-sail_status_t image_writer::start_writing(void *buffer, size_t buffer_length, const plugin_info &splugin_info)
+sail_status_t image_writer::start_writing(void *buffer, size_t buffer_length, const codec_info &scodec_info)
 {
     SAIL_CHECK_BUFFER_PTR(buffer);
 
     SAIL_TRY(sail_start_writing_mem(buffer,
                                     buffer_length,
-                                    splugin_info.sail_plugin_info_c(),
+                                    scodec_info.sail_codec_info_c(),
                                     &d->state));
 
     return SAIL_OK;
 }
 
-sail_status_t image_writer::start_writing(void *buffer, size_t buffer_length, const plugin_info &splugin_info, const write_options &swrite_options)
+sail_status_t image_writer::start_writing(void *buffer, size_t buffer_length, const codec_info &scodec_info, const write_options &swrite_options)
 {
     SAIL_CHECK_BUFFER_PTR(buffer);
 
@@ -207,28 +207,28 @@ sail_status_t image_writer::start_writing(void *buffer, size_t buffer_length, co
 
     SAIL_TRY(sail_start_writing_mem_with_options(buffer,
                                                  buffer_length,
-                                                 splugin_info.sail_plugin_info_c(),
+                                                 scodec_info.sail_codec_info_c(),
                                                  &sail_write_options,
                                                  &d->state));
 
     return SAIL_OK;
 }
 
-sail_status_t image_writer::start_writing(const io &sio, const plugin_info &splugin_info)
+sail_status_t image_writer::start_writing(const io &sio, const codec_info &scodec_info)
 {
     SAIL_TRY(sio.verify_valid());
 
     SAIL_TRY(sio.to_sail_io(&d->sail_io));
 
     SAIL_TRY(sail_start_writing_io_with_options(&d->sail_io,
-                                                splugin_info.sail_plugin_info_c(),
+                                                scodec_info.sail_codec_info_c(),
                                                 NULL,
                                                 &d->state));
 
     return SAIL_OK;
 }
 
-sail_status_t image_writer::start_writing(const io &sio, const plugin_info &splugin_info, const write_options &swrite_options)
+sail_status_t image_writer::start_writing(const io &sio, const codec_info &scodec_info, const write_options &swrite_options)
 {
     SAIL_TRY(sio.verify_valid());
 
@@ -238,7 +238,7 @@ sail_status_t image_writer::start_writing(const io &sio, const plugin_info &splu
     SAIL_TRY(swrite_options.to_sail_write_options(&sail_write_options));
 
     SAIL_TRY(sail_start_writing_io_with_options(&d->sail_io,
-                                                splugin_info.sail_plugin_info_c(),
+                                                scodec_info.sail_codec_info_c(),
                                                 &sail_write_options,
                                                 &d->state));
 

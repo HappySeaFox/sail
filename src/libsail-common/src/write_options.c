@@ -62,15 +62,15 @@ sail_status_t sail_write_options_from_features(const struct sail_write_features 
     write_options->output_pixel_format = SAIL_PIXEL_FORMAT_AUTO;
     write_options->io_options = 0;
 
-    if (write_features->features & SAIL_PLUGIN_FEATURE_META_INFO) {
+    if (write_features->features & SAIL_CODEC_FEATURE_META_INFO) {
         write_options->io_options |= SAIL_IO_OPTION_META_INFO;
     }
 
-    if (write_features->features & SAIL_PLUGIN_FEATURE_INTERLACED) {
+    if (write_features->features & SAIL_CODEC_FEATURE_INTERLACED) {
         write_options->io_options |= SAIL_IO_OPTION_INTERLACED;
     }
 
-    if (write_features->features & SAIL_PLUGIN_FEATURE_ICCP) {
+    if (write_features->features & SAIL_CODEC_FEATURE_ICCP) {
         write_options->io_options |= SAIL_IO_OPTION_ICCP;
     }
 

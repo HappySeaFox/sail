@@ -23,14 +23,14 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_PLUGIN_LAYOUT_V3_H
-#define SAIL_PLUGIN_LAYOUT_V3_H
+#ifndef SAIL_CODEC_LAYOUT_V3_H
+#define SAIL_CODEC_LAYOUT_V3_H
 
 /*
- * This is a plugin layout definition file (version 3).
+ * This is a codec layout definition file (version 3).
  *
- * It's intedened to be used as a reference how plugins V3 are organized. It's also could
- * be used by plugins' developers to compile their plugins directly into a testing application
+ * It's intedened to be used as a reference how codecs V3 are organized. It's also could
+ * be used by codecs' developers to compile their codecs directly into a testing application
  * to simplify debugging.
  */
 
@@ -49,42 +49,42 @@ extern "C" {
  * Starts decoding the specified io stream using the specified options. The specified read options
  * will be deep copied into an internal buffer.
  *
- * STATE explanation: Pass the address of a local void* pointer. Plugins will store an internal state
- * in it and destroy it in sail_plugin_read_finish_vx(). States must be used per image. DO NOT use the same state
+ * STATE explanation: Pass the address of a local void* pointer. Codecs will store an internal state
+ * in it and destroy it in sail_codec_read_finish_vx(). States must be used per image. DO NOT use the same state
  * to read multiple images in the same time.
  *
  * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_status_t sail_plugin_read_init_v3(struct sail_io *io, const struct sail_read_options *read_options, void **state);
+SAIL_EXPORT sail_status_t sail_codec_read_init_v3(struct sail_io *io, const struct sail_read_options *read_options, void **state);
 
 /*
- * Seeks to the next frame. The frame is NOT immediately read or decoded by most SAIL plugins.
+ * Seeks to the next frame. The frame is NOT immediately read or decoded by most SAIL codecs.
  * SAIL uses this method in reading and probing operations.
  *
- * SAIL uses sail_plugin_read_seek_next_pass() + sail_plugin_read_frame() to actually read the frame.
+ * SAIL uses sail_codec_read_seek_next_pass() + sail_codec_read_frame() to actually read the frame.
  * The assigned image MUST be destroyed later with sail_destroy_image() by the client.
  *
  * This method MUST allocate the image and the source image (sail_image.sail_source_image).
  * It MUST NOT allocate image pixels. They will be allocated by libsail and will be available in
- * sail_plugin_read_seek_next_pass()/sail_plugin_read_frame().
+ * sail_codec_read_seek_next_pass()/sail_codec_read_frame().
  *
  * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_status_t sail_plugin_read_seek_next_frame_v3(void *state, struct sail_io *io, struct sail_image **image);
+SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct sail_io *io, struct sail_image **image);
 
 /*
  * Seeks to the next pass if the specified image has multiple passes. Does nothing otherwise.
  *
  * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_status_t sail_plugin_read_seek_next_pass_v3(void *state, struct sail_io *io, const struct sail_image *image);
+SAIL_EXPORT sail_status_t sail_codec_read_seek_next_pass_v3(void *state, struct sail_io *io, const struct sail_image *image);
 
 /*
  * Reads the next frame of the current image in the current pass. The image pixels are pre-allocated by libsail.
  *
  * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_status_t sail_plugin_read_frame_v3(void *state, struct sail_io *io, struct sail_image *image);
+SAIL_EXPORT sail_status_t sail_codec_read_frame_v3(void *state, struct sail_io *io, struct sail_image *image);
 
 /*
  * Finilizes reading operation. No more readings are possible after calling this function.
@@ -93,7 +93,7 @@ SAIL_EXPORT sail_status_t sail_plugin_read_frame_v3(void *state, struct sail_io 
  *
  * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_status_t sail_plugin_read_finish_v3(void **state, struct sail_io *io);
+SAIL_EXPORT sail_status_t sail_codec_read_finish_v3(void **state, struct sail_io *io);
 
 /*
  * Encoding functions.
@@ -103,35 +103,35 @@ SAIL_EXPORT sail_status_t sail_plugin_read_finish_v3(void **state, struct sail_i
  * Starts encoding the specified io stream using the specified options. The specified write options
  * will be deep copied into an internal buffer.
  *
- * STATE explanation: Pass the address of a local void* pointer. Plugins will store an internal state
- * in it and destroy it in sail_plugin_write_finish_vx(). States must be used per image. DO NOT use the same state
+ * STATE explanation: Pass the address of a local void* pointer. Codecs will store an internal state
+ * in it and destroy it in sail_codec_write_finish_vx(). States must be used per image. DO NOT use the same state
  * to write multiple images in the same time.
  *
  * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_status_t sail_plugin_write_init_v3(struct sail_io *io, const struct sail_write_options *write_options, void **state);
+SAIL_EXPORT sail_status_t sail_codec_write_init_v3(struct sail_io *io, const struct sail_write_options *write_options, void **state);
 
 /*
- * Seeks to a next frame before writing it. The frame is NOT immediately written. Use sail_plugin_write_seek_next_pass()
- * and sail_plugin_write_frame() to actually write a frame.
+ * Seeks to a next frame before writing it. The frame is NOT immediately written. Use sail_codec_write_seek_next_pass()
+ * and sail_codec_write_frame() to actually write a frame.
  *
  * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_status_t sail_plugin_write_seek_next_frame_v3(void *state, struct sail_io *io, const struct sail_image *image);
+SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v3(void *state, struct sail_io *io, const struct sail_image *image);
 
 /*
  * Seeks to a next pass before writing it if the specified image is interlaced. Does nothing otherwise.
  *
  * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_status_t sail_plugin_write_seek_next_pass_v3(void *state, struct sail_io *io, const struct sail_image *image);
+SAIL_EXPORT sail_status_t sail_codec_write_seek_next_pass_v3(void *state, struct sail_io *io, const struct sail_image *image);
 
 /*
  * Writes a next frame of the current image in the current pass.
  *
  * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_status_t sail_plugin_write_frame_v3(void *state, struct sail_io *io, const struct sail_image *image);
+SAIL_EXPORT sail_status_t sail_codec_write_frame_v3(void *state, struct sail_io *io, const struct sail_image *image);
 
 /*
  * Finilizes writing operation. No more writings are possible after calling this function.
@@ -140,7 +140,7 @@ SAIL_EXPORT sail_status_t sail_plugin_write_frame_v3(void *state, struct sail_io
  *
  * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_status_t sail_plugin_write_finish_v3(void **state, struct sail_io *io);
+SAIL_EXPORT sail_status_t sail_codec_write_finish_v3(void **state, struct sail_io *io);
 
 /* extern "C" */
 #ifdef __cplusplus

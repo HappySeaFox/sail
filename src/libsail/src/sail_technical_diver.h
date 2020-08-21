@@ -39,7 +39,7 @@ extern "C" {
 #endif
 
 struct sail_io;
-struct sail_plugin_info;
+struct sail_codec_info;
 struct sail_read_options;
 struct sail_write_options;
 
@@ -50,7 +50,7 @@ struct sail_write_options;
  *
  * Typical usage: sail_alloc_io()                   ->
  *                set I/O callbacks                 ->
- *                sail_plugin_info_from_extension() ->
+ *                sail_codec_info_from_extension() ->
  *                sail_start_reading_io()           ->
  *                sail_read_next_frame()            ->
  *                sail_stop_reading()               ->
@@ -62,17 +62,17 @@ struct sail_write_options;
  *
  * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_status_t sail_start_reading_io(struct sail_io *io, const struct sail_plugin_info *plugin_info, void **state);
+SAIL_EXPORT sail_status_t sail_start_reading_io(struct sail_io *io, const struct sail_codec_info *codec_info, void **state);
 
 /*
  * Starts reading the specified I/O stream with the specified read options. If you don't need specific read options,
- * just pass NULL. Plugin-specific defaults will be used in this case. The read options are deep copied.
+ * just pass NULL. Codec-specific defaults will be used in this case. The read options are deep copied.
  *
  * If read options is NULL, the subsequent calls to sail_read_next_frame() output pixels in the BPP32-RGBA pixel format.
  *
  * Typical usage: sail_alloc_io()                      ->
  *                set I/O callbacks                    ->
- *                sail_plugin_info_from_extension()    ->
+ *                sail_codec_info_from_extension()    ->
  *                sail_start_reading_io_with_options() ->
  *                sail_read_next_frame()               ->
  *                sail_stop_reading()                  ->
@@ -85,7 +85,7 @@ SAIL_EXPORT sail_status_t sail_start_reading_io(struct sail_io *io, const struct
  * Returns 0 on success or sail_status_t on error.
  */
 SAIL_EXPORT sail_status_t sail_start_reading_io_with_options(struct sail_io *io,
-                                                            const struct sail_plugin_info *plugin_info,
+                                                            const struct sail_codec_info *codec_info,
                                                             const struct sail_read_options *read_options, void **state);
 
 /*
@@ -96,7 +96,7 @@ SAIL_EXPORT sail_status_t sail_start_reading_io_with_options(struct sail_io *io,
  *
  * Typical usage: sail_alloc_io()                   ->
  *                set I/O callbacks                 ->
- *                sail_plugin_info_from_extension() ->
+ *                sail_codec_info_from_extension() ->
  *                sail_start_writing()              ->
  *                sail_write_next_frame()           ->
  *                sail_stop_writing()               ->
@@ -108,18 +108,18 @@ SAIL_EXPORT sail_status_t sail_start_reading_io_with_options(struct sail_io *io,
  *
  * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_status_t sail_start_writing_io(struct sail_io *io, const struct sail_plugin_info *plugin_info, void **state);
+SAIL_EXPORT sail_status_t sail_start_writing_io(struct sail_io *io, const struct sail_codec_info *codec_info, void **state);
 
 /*
  * Starts writing the specified I/O stream with the specified write options. If you don't need specific write options,
- * just pass NULL. Plugin-specific defaults will be used in this case. The write options are deep copied.
+ * just pass NULL. Codec-specific defaults will be used in this case. The write options are deep copied.
  *
  * If write options is NULL, the subsequent calls to sail_write_next_frame() output pixels in pixel format
  * as specified in sail_write_features.default_output_pixel_format.
  *
  * Typical usage: sail_alloc_io()                      ->
  *                set I/O callbacks                    ->
- *                sail_plugin_info_from_extension()    ->
+ *                sail_codec_info_from_extension()    ->
  *                sail_start_writing_io_with_options() ->
  *                sail_write_next_frame()              ->
  *                sail_stop_writing()                  ->
@@ -132,7 +132,7 @@ SAIL_EXPORT sail_status_t sail_start_writing_io(struct sail_io *io, const struct
  * Returns 0 on success or sail_status_t on error.
  */
 SAIL_EXPORT sail_status_t sail_start_writing_io_with_options(struct sail_io *io,
-                                                            const struct sail_plugin_info *plugin_info,
+                                                            const struct sail_codec_info *codec_info,
                                                             const struct sail_write_options *write_options, void **state);
 
 /* extern "C" */

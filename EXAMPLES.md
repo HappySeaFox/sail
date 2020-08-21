@@ -66,7 +66,7 @@ sail_destroy_image(image);
 
 /*
  * Recommended: finish working with the implicitly allocated SAIL context in this thread
- * and unload all loaded plugins attached to it.
+ * and unload all loaded codecs attached to it.
  */
 sail_finish();
 ```
@@ -132,7 +132,7 @@ sail_destroy_image(image);
 
 /*
  * Recommended: finish working with the implicitly allocated SAIL context in this thread
- * and unload all loaded plugins attached to it.
+ * and unload all loaded codecs attached to it.
  */
 sail_finish();
 ```
@@ -172,23 +172,23 @@ SAIL_TRY(reader.stop_reading());
 // image.pixel_format(), and image.pixels() for that.
 
 // Recommended: finish working with the implicitly allocated SAIL context in this thread
-// and unload all loaded plugins attached to it.
+// and unload all loaded codecs attached to it.
 //
 sail::context::finish();
 ```
 
 ### 3. `deep diver`
 
-**Purpose:** read a single-paged or multi-paged image from a file or memory. Specify a concrete plugin to use.
+**Purpose:** read a single-paged or multi-paged image from a file or memory. Specify a concrete codec to use.
              Possibly specify a desired pixel format to output.
 
 #### C:
 ```C
 /*
- * Initialize a new SAIL thread-local static context explicitly and preload all plugins.
- * Plugins are lazy-loaded when SAIL_FLAG_PRELOAD_PLUGINS is not specified.
+ * Initialize a new SAIL thread-local static context explicitly and preload all codecs.
+ * Codecs are lazy-loaded when SAIL_FLAG_PRELOAD_CODECS is not specified.
  */
-SAIL_TRY(sail_init_with_flags(SAIL_FLAG_PRELOAD_PLUGINS));
+SAIL_TRY(sail_init_with_flags(SAIL_FLAG_PRELOAD_CODECS));
 
 struct sail_read_options *read_options;
 struct sail_image *image;
@@ -201,14 +201,14 @@ void *state = NULL;
 /*
  * Find the codec to read JPEGs.
  */
-const struct sail_plugin_info *plugin_info;
-SAIL_TRY(sail_plugin_info_from_extension("JPEG", &plugin_info));
+const struct sail_codec_info *codec_info;
+SAIL_TRY(sail_codec_info_from_extension("JPEG", &codec_info));
 
 /*
- * Allocate new read options and copy defaults from the plugin-specific read features
+ * Allocate new read options and copy defaults from the codec-specific read features
  * (preferred output pixel format etc.).
  */
-SAIL_TRY(sail_alloc_read_options_from_features(plugin_info->read_features, &read_options));
+SAIL_TRY(sail_alloc_read_options_from_features(codec_info->read_features, &read_options));
 
 /*
  * Obtain an image data in a buffer: read it from a file etc.
@@ -221,7 +221,7 @@ size_t buffer_length = ...
  */
 SAIL_TRY_OR_CLEANUP(sail_start_reading_mem_with_options(buffer,
                                                         buffer_length,
-                                                        plugin_info,
+                                                        codec_info,
                                                         read_options,
                                                         &state),
                     /* cleanup */ sail_destroy_read_options(read_options));
@@ -265,35 +265,35 @@ if (node != NULL) {
 sail_destroy_image(image);
 
 /*
- * Optional: unload all plugins to free up some memory.
+ * Optional: unload all codecs to free up some memory.
  */
-sail_unload_plugins();
+sail_unload_codecs();
 
 /*
  * Recommended: finish working with the explicitly allocated SAIL context in this thread
- * and unload all loaded plugins attached to it.
+ * and unload all loaded codecs attached to it.
  */
 sail_finish();
 ```
 
 #### C++:
 ```C++
-// Initialize a new SAIL thread-local static context explicitly and preload all plugins.
-// Plugins are lazy-loaded when SAIL_FLAG_PRELOAD_PLUGINS is not specified.
+// Initialize a new SAIL thread-local static context explicitly and preload all codecs.
+// Codecs are lazy-loaded when SAIL_FLAG_PRELOAD_CODECS is not specified.
 //
-sail::context::init(SAIL_FLAG_PRELOAD_PLUGINS);
+sail::context::init(SAIL_FLAG_PRELOAD_CODECS);
 sail::image_reader reader;
 
 // Find the codec to read JPEGs.
 //
-sail::plugin_info plugin_info;
-SAIL_TRY(plugin_info::from_extension("JPEG", &plugin_info));
+sail::codec_info codec_info;
+SAIL_TRY(codec_info::from_extension("JPEG", &codec_info));
 
 // Instantiate new read options and copy defaults from the read features
 // (preferred output pixel format etc.).
 //
 sail::read_options read_options;
-SAIL_TRY(plugin_info.read_features().to_read_options(&read_options));
+SAIL_TRY(codec_info.read_features().to_read_options(&read_options));
 
 // Obtain an image data in a buffer: read it from a file etc.
 //
@@ -302,7 +302,7 @@ size_t buffer_length = ...
 
 // Initialize reading from memory with our options. The options will be deep copied.
 //
-SAIL_TRY(reader.start_reading(buffer, buffer_length, plugin_info, read_options));
+SAIL_TRY(reader.start_reading(buffer, buffer_length, codec_info, read_options));
 
 // Read just a single frame. It's possible to read more frames if any. Just continue
 // reading frames till read_next_frame() returns 0. If no more frames are available,
@@ -331,7 +331,7 @@ if (!meta_entries.empty()) {
 // image.pixel_format(), and image.pixels() for that.
 
 // Recommended: finish working with the implicitly allocated SAIL context in this thread
-// and unload all loaded plugins attached to it.
+// and unload all loaded codecs attached to it.
 //
 sail::context::finish();
 ```
@@ -347,10 +347,10 @@ and call `sail_start_reading_io_with_options()`.
 
 ```C
 /*
- * Initialize a new SAIL thread-local static context explicitly and preload all plugins.
- * Plugins are lazy-loaded when SAIL_FLAG_PRELOAD_PLUGINS is not specified.
+ * Initialize a new SAIL thread-local static context explicitly and preload all codecs.
+ * Codecs are lazy-loaded when SAIL_FLAG_PRELOAD_CODECS is not specified.
  */
-SAIL_TRY(sail_init_with_flags(SAIL_FLAG_PRELOAD_PLUGINS));
+SAIL_TRY(sail_init_with_flags(SAIL_FLAG_PRELOAD_CODECS));
 
 struct sail_read_options *read_options;
 struct sail_image *image;
@@ -363,8 +363,8 @@ void *state = NULL;
 /*
  * Find the codec to read JPEGs.
  */
-const struct sail_plugin_info *plugin_info;
-SAIL_TRY(sail_plugin_info_from_extension("JPEG", &plugin_info));
+const struct sail_codec_info *codec_info;
+SAIL_TRY(sail_codec_info_from_extension("JPEG", &codec_info));
 
 /*
  * Create our custom I/O source.
@@ -394,10 +394,10 @@ io->close = io_my_data_source_close;
 io->eof   = io_my_data_source_eof;
 
 /*
- * Allocate new read options and copy defaults from the plugin-specific read features
+ * Allocate new read options and copy defaults from the codec-specific read features
  * (preferred output pixel format etc.).
  */
-SAIL_TRY_OR_CLEANUP(sail_alloc_read_options_from_features(plugin_info->read_features,
+SAIL_TRY_OR_CLEANUP(sail_alloc_read_options_from_features(codec_info->read_features,
                                                           &read_options),
                     /* cleanup */ sail_destroy_io(io));
 
@@ -405,7 +405,7 @@ SAIL_TRY_OR_CLEANUP(sail_alloc_read_options_from_features(plugin_info->read_feat
  * Initialize reading with our options. The options will be deep copied.
  */
 SAIL_TRY_OR_CLEANUP(sail_start_reading_io_with_options(io,
-                                                       plugin_info,
+                                                       codec_info,
                                                        read_options,
                                                        &state),
                     /* cleanup */ sail_destroy_read_options(read_options),
@@ -454,29 +454,29 @@ if (node != NULL) {
 sail_destroy_image(image);
 
 /*
- * Optional: unload all plugins to free up some memory.
+ * Optional: unload all codecs to free up some memory.
  */
-sail_unload_plugins();
+sail_unload_codecs();
 
 /*
  * Recommended: finish working with the explicitly allocated SAIL context in this thread
- * and unload all loaded plugins attached to it.
+ * and unload all loaded codecs attached to it.
  */
 sail_finish();
 ```
 
 #### C++:
 ```C++
-// Initialize a new SAIL thread-local static context explicitly and preload all plugins.
-// Plugins are lazy-loaded when SAIL_FLAG_PRELOAD_PLUGINS is not specified.
+// Initialize a new SAIL thread-local static context explicitly and preload all codecs.
+// Codecs are lazy-loaded when SAIL_FLAG_PRELOAD_CODECS is not specified.
 //
-sail::context::init(SAIL_FLAG_PRELOAD_PLUGINS);
+sail::context::init(SAIL_FLAG_PRELOAD_CODECS);
 sail::image_reader reader;
 
 // Find the codec info by a file extension.
 //
-sail::plugin_info plugin_info;
-SAIL_TRY(plugin_info::from_path(path, &plugin_info));
+sail::codec_info codec_info;
+SAIL_TRY(codec_info::from_path(path, &codec_info));
 
 /*
  * Create our custom I/O source.
@@ -508,11 +508,11 @@ io.with_read(io_my_data_source_read)
 // (preferred output pixel format etc.).
 //
 sail::read_options read_options;
-SAIL_TRY(plugin_info.read_features().to_read_options(&read_options));
+SAIL_TRY(codec_info.read_features().to_read_options(&read_options));
 
 // Initialize reading with our I/O stream and options.
 //
-SAIL_TRY(reader.start_reading(io, plugin_info, read_options));
+SAIL_TRY(reader.start_reading(io, codec_info, read_options));
 
 // Read just a single frame. It's possible to read more frames if any. Just continue
 // reading frames till read_next_frame() returns 0. If no more frames are available,
@@ -541,7 +541,7 @@ if (!meta_entries.empty()) {
 // image.pixel_format(), and image.pixels() for that.
 
 // Recommended: finish working with the implicitly allocated SAIL context in this thread
-// and unload all loaded plugins attached to it.
+// and unload all loaded codecs attached to it.
 //
 sail::context::finish();
 ```

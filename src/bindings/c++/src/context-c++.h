@@ -38,7 +38,7 @@
  * SAIL contexts.
  *
  * All SAIL functions allocate a thread-local static context per thread when necessary. The context enumerates and holds
- * a list of available plugin info objects.
+ * a list of available codec info objects.
  *
  * If you call SAIL functions from three different threads, three different contexts are allocated.
  * You can destroy them with calling sail_finish() in each thread.
@@ -47,7 +47,7 @@
 namespace sail
 {
 
-class plugin_info;
+class codec_info;
 class io;
 
 class SAIL_EXPORT context
@@ -62,44 +62,44 @@ public:
 
     /*
      * Initializes a new SAIL thread-local static context with the specific flags. Does nothing if the thread-local static context
-     * already exists. Builds a list of available SAIL plugins. See SailInitFlags.
+     * already exists. Builds a list of available SAIL codecs. See SailInitFlags.
      *
-     * If you don't need specific features like preloading plugins, just don't use this method at all.
+     * If you don't need specific features like preloading codecs, just don't use this method at all.
      * All reading or writing methods allocate a thread-local static context implicitly when they need it
      * and when it doesn't exist already.
      *
      * It's always recommended to destroy the implicitly or explicitly allocated SAIL thread-local static context
      * with finish() when you're done with calling SAIL methods in the current thread.
      *
-     * Plugins (image codecs) paths search algorithm (first found path wins):
+     * Codecs paths search algorithm (first found path wins):
      *
      *   Windows:
-     *     1. SAIL_PLUGINS_PATH environment variable
-     *     2. <SAIL DEPLOYMENT FOLDER>\lib\sail\plugins
-     *     3. Hardcoded SAIL_PLUGINS_PATH in config.h
+     *     1. SAIL_CODECS_PATH environment variable
+     *     2. <SAIL DEPLOYMENT FOLDER>\lib\sail\codecs
+     *     3. Hardcoded SAIL_CODECS_PATH in config.h
      *
      *   Unix (including macOS):
-     *     1. SAIL_PLUGINS_PATH environment variable
-     *     2. Hardcoded SAIL_PLUGINS_PATH in config.h
+     *     1. SAIL_CODECS_PATH environment variable
+     *     2. Hardcoded SAIL_CODECS_PATH in config.h
      *
      * Returns 0 on success or sail_status_t on error.
      */
     static sail_status_t init(int flags);
 
     /*
-     * Unloads all the loaded plugins from the cache to release memory occupied by them. Use it if you want
+     * Unloads all the loaded codecs from the cache to release memory occupied by them. Use it if you want
      * to release some memory but do not want to deinitialize SAIL with sail_finish(). Subsequent attempts
-     * to read or write images will reload necessary SAIL plugins from disk.
+     * to read or write images will reload necessary SAIL codecs from disk.
      *
      * Returns 0 on success or sail_status_t on error.
      */
-    static sail_status_t unload_plugins();
+    static sail_status_t unload_codecs();
 
     /*
      * Finalizes working with the thread-local static context that was implicitly or explicitly allocated by
      * reading or writing functions.
      *
-     * Unloads all plugins. All pointers to plugin info objects, read and write features get invalidated. 
+     * Unloads all codecs. All pointers to codec info objects, read and write features get invalidated. 
      * Using them after calling finish() will lead to a crash.
      *
      * It's possible to initialize a new SAIL thread-local static context afterwards, implicitly or explicitly.

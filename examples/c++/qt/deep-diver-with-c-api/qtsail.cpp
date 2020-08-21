@@ -72,7 +72,7 @@ QtSail::~QtSail()
 
 sail_status_t QtSail::init()
 {
-    SAIL_TRY_OR_CLEANUP(sail_init_with_flags(SAIL_FLAG_PRELOAD_PLUGINS),
+    SAIL_TRY_OR_CLEANUP(sail_init_with_flags(SAIL_FLAG_PRELOAD_CODECS),
                         /* cleanup */ QMessageBox::critical(this, tr("Error"), tr("Failed to init SAIL")),
                                       ::exit(1));
 
@@ -109,22 +109,22 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
      * Find the codec info by a file magic number.
      * See https://en.wikipedia.org/wiki/File_format#Magic_number.
      */
-    const struct sail_plugin_info *plugin_info;
-    SAIL_TRY(sail_plugin_info_by_magic_number_from_path(path.toLocal8Bit(), &plugin_info));
+    const struct sail_codec_info *codec_info;
+    SAIL_TRY(sail_codec_info_by_magic_number_from_path(path.toLocal8Bit(), &codec_info));
 
     sail_read_options *read_options;
 
     /*
-     * Allocate new read options and copy defaults from the plugin-specific read features
+     * Allocate new read options and copy defaults from the codec-specific read features
      * (preferred output pixel format etc.).
      */
-    SAIL_TRY(sail_alloc_read_options_from_features(plugin_info->read_features, &read_options));
+    SAIL_TRY(sail_alloc_read_options_from_features(codec_info->read_features, &read_options));
 
     const qint64 beforeDialog = elapsed.elapsed();
 
     // Ask the user to provide his/her preferred output options.
     //
-    ReadOptions readOptions(QString::fromUtf8(plugin_info->description), plugin_info->read_features, this);
+    ReadOptions readOptions(QString::fromUtf8(codec_info->description), codec_info->read_features, this);
 
     if (readOptions.exec() == QDialog::Accepted) {
         read_options->output_pixel_format = readOptions.pixelFormat();
@@ -149,7 +149,7 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
      */
     SAIL_TRY_OR_CLEANUP(sail_start_reading_mem_with_options(buf,
                                                             buf.length(),
-                                                            plugin_info,
+                                                            codec_info,
                                                             read_options,
                                                             &state),
                         /* cleanup */ sail_destroy_read_options(read_options));
@@ -251,8 +251,8 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
 
     m_suffix = QFileInfo(path).suffix();
 
-    /* Optional: unload all plugins to free up some memory. */
-    sail_unload_plugins();
+    /* Optional: unload all codecs to free up some memory. */
+    sail_unload_codecs();
 
     return SAIL_OK;
 }
@@ -322,21 +322,21 @@ sail_status_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffe
     QElapsedTimer elapsed;
     elapsed.start();
 
-    const struct sail_plugin_info *plugin_info;
-    SAIL_TRY(sail_plugin_info_from_extension(m_suffix.toUtf8(), &plugin_info));
+    const struct sail_codec_info *codec_info;
+    SAIL_TRY(sail_codec_info_from_extension(m_suffix.toUtf8(), &codec_info));
 
     // Allocate new write options and copy defaults from the write features
     // (preferred output pixel format etc.).
     //
     sail_write_options *write_options;
-    SAIL_TRY(sail_alloc_write_options_from_features(plugin_info->write_features, &write_options));
+    SAIL_TRY(sail_alloc_write_options_from_features(codec_info->write_features, &write_options));
 
     const qint64 beforeDialog = elapsed.elapsed();
 
     // Ask the user to provide his/her preferred output options.
     //
-    WriteOptions writeOptions(QString::fromUtf8(plugin_info->description),
-                              plugin_info->write_features,
+    WriteOptions writeOptions(QString::fromUtf8(codec_info->description),
+                              codec_info->write_features,
                               image->pixel_format,
                               this);
 
@@ -351,7 +351,7 @@ sail_status_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffe
     //
     SAIL_TRY(sail_start_writing_mem_with_options(buffer,
                                                   buffer_length,
-                                                  plugin_info,
+                                                  codec_info,
                                                   write_options,
                                                   &state));
 
@@ -386,8 +386,8 @@ sail_status_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffe
     sail_destroy_write_options(write_options);
     sail_destroy_image(image);
 
-    /* Optional: unload all plugins to free up some memory. */
-    sail_unload_plugins();
+    /* Optional: unload all codecs to free up some memory. */
+    sail_unload_codecs();
 
     return SAIL_OK;
 }
@@ -430,7 +430,7 @@ sail_status_t QtSail::onProbe()
 
     // Probe
     sail_image *image;
-    const struct sail_plugin_info *plugin_info;
+    const struct sail_codec_info *codec_info;
     sail_status_t res;
 
     // Load the file into memeory
@@ -444,7 +444,7 @@ sail_status_t QtSail::onProbe()
     const QByteArray buffer = file.readAll();
 
     // Probe from memory
-    if ((res = sail_probe_mem(buffer.constData(), buffer.length(), &image, &plugin_info)) != SAIL_OK) {
+    if ((res = sail_probe_mem(buffer.constData(), buffer.length(), &image, &codec_info)) != SAIL_OK) {
         QMessageBox::critical(this, tr("Error"), tr("Failed to probe the image. Error: %1").arg(res));
         return res;
     }
@@ -459,7 +459,7 @@ sail_status_t QtSail::onProbe()
                              tr("File info"),
                              tr("Probed in: %1 ms.\nCodec: %2\nSize: %3x%4\nSource pixel format: %5\nOutput pixel format: %6")
                                 .arg(elapsed.elapsed())
-                                .arg(plugin_info->description)
+                                .arg(codec_info->description)
                                 .arg(image->width)
                                 .arg(image->height)
                                 .arg(source_pixel_format_str)

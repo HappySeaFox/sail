@@ -232,10 +232,10 @@ sail_status_t QtSail::onProbe()
 
     // Probe
     sail_image *image;
-    const struct sail_plugin_info *plugin_info;
+    const struct sail_codec_info *codec_info;
     sail_status_t res;
 
-    if ((res = sail_probe_file(path.toLocal8Bit(), &image, &plugin_info)) != SAIL_OK) {
+    if ((res = sail_probe_file(path.toLocal8Bit(), &image, &codec_info)) != SAIL_OK) {
         QMessageBox::critical(this, tr("Error"), tr("Failed to probe the image. Error: %1").arg(res));
         return res;
     }
@@ -250,7 +250,7 @@ sail_status_t QtSail::onProbe()
                              tr("File info"),
                              tr("Probed in: %1 ms.\nCodec: %2\nSize: %3x%4\nSource pixel format: %5\nOutput pixel format: %6")
                                 .arg(elapsedTimer.elapsed())
-                                .arg(plugin_info->description)
+                                .arg(codec_info->description)
                                 .arg(image->width)
                                 .arg(image->height)
                                 .arg(source_pixel_format_str)

@@ -100,20 +100,20 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
     // Find the codec info by a file magic number.
     // See https://en.wikipedia.org/wiki/File_format#Magic_number.
     //
-    sail::plugin_info plugin_info;
-    SAIL_TRY(sail::plugin_info::by_magic_number_from_path(path.toLocal8Bit(), &plugin_info));
+    sail::codec_info codec_info;
+    SAIL_TRY(sail::codec_info::by_magic_number_from_path(path.toLocal8Bit(), &codec_info));
 
     // Allocate new read options and copy defaults from the read features
     // (preferred output pixel format etc.).
     //
     sail::read_options read_options;
-    SAIL_TRY(plugin_info.read_features().to_read_options(&read_options));
+    SAIL_TRY(codec_info.read_features().to_read_options(&read_options));
 
     const qint64 beforeDialog = elapsed.elapsed();
 
     // Ask the user to provide his/her preferred output options.
     //
-    ReadOptions readOptions(plugin_info.description().c_str(), plugin_info.read_features(), this);
+    ReadOptions readOptions(codec_info.description().c_str(), codec_info.read_features(), this);
 
     if (readOptions.exec() == QDialog::Accepted) {
         read_options.with_output_pixel_format(readOptions.pixelFormat());
@@ -134,7 +134,7 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
 
     // Initialize reading with our options.
     //
-    SAIL_TRY(reader.start_reading(buf, buf.length(), plugin_info, read_options));
+    SAIL_TRY(reader.start_reading(buf, buf.length(), codec_info, read_options));
 
     // Seek and read the next image frame in the file.
     //
@@ -221,9 +221,9 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
                                 .arg(meta)
                                 );
 
-    // Optional: unload all plugins to free up some memory.
+    // Optional: unload all codecs to free up some memory.
     //
-    sail::context::unload_plugins();
+    sail::context::unload_codecs();
 
     return SAIL_OK;
 }
@@ -273,21 +273,21 @@ sail_status_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffe
     QElapsedTimer elapsed;
     elapsed.start();
 
-    sail::plugin_info plugin_info;
-    SAIL_TRY(sail::plugin_info::from_extension(m_suffix.toUtf8(), &plugin_info));
+    sail::codec_info codec_info;
+    SAIL_TRY(sail::codec_info::from_extension(m_suffix.toUtf8(), &codec_info));
 
     // Allocate new write options and copy defaults from the write features
     // (preferred output pixel format etc.).
     //
     sail::write_options write_options;
-    SAIL_TRY(plugin_info.write_features().to_write_options(&write_options));
+    SAIL_TRY(codec_info.write_features().to_write_options(&write_options));
 
     const qint64 beforeDialog = elapsed.elapsed();
 
     // Ask the user to provide his/her preferred output options.
     //
-    WriteOptions writeOptions(QString::fromUtf8(plugin_info.description().c_str()),
-                              plugin_info.write_features(),
+    WriteOptions writeOptions(QString::fromUtf8(codec_info.description().c_str()),
+                              codec_info.write_features(),
                               image.pixel_format(),
                               this);
 
@@ -301,7 +301,7 @@ sail_status_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffe
 
     // Initialize writing with our options.
     //
-    SAIL_TRY(writer.start_writing(buffer, buffer_length, plugin_info, write_options));
+    SAIL_TRY(writer.start_writing(buffer, buffer_length, codec_info, write_options));
 
     // Save some meta info...
     //
@@ -328,9 +328,9 @@ sail_status_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffe
 
     SAIL_LOG_INFO("Saved in %lld ms.", elapsed.elapsed() + beforeDialog);
 
-    // Optional: unload all plugins to free up some memory.
+    // Optional: unload all codecs to free up some memory.
     //
-    sail::context::unload_plugins();
+    sail::context::unload_codecs();
 
     return SAIL_OK;
 }
@@ -386,10 +386,10 @@ sail_status_t QtSail::onProbe()
     const QByteArray buffer = file.readAll();
 
     sail::image image;
-    sail::plugin_info plugin_info;
+    sail::codec_info codec_info;
 
     // Probe from memory
-    if ((res = reader.probe(buffer.constData(), buffer.length(), &image, &plugin_info)) != SAIL_OK) {
+    if ((res = reader.probe(buffer.constData(), buffer.length(), &image, &codec_info)) != SAIL_OK) {
         QMessageBox::critical(this, tr("Error"), tr("Failed to probe the image. Error: %1").arg(res));
         return res;
     }
@@ -404,7 +404,7 @@ sail_status_t QtSail::onProbe()
                              tr("File info"),
                              tr("Probed in: %1 ms.\nCodec: %2\nSize: %3x%4\nSource pixel format: %5\nOutput pixel format: %6")
                                 .arg(elapsed.elapsed())
-                                .arg(plugin_info.description().c_str())
+                                .arg(codec_info.description().c_str())
                                 .arg(image.width())
                                 .arg(image.height())
                                 .arg(source_pixel_format_str)

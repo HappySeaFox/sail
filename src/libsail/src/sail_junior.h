@@ -40,11 +40,11 @@ extern "C" {
 
 struct sail_image;
 struct sail_io;
-struct sail_plugin_info;
+struct sail_codec_info;
 
 /*
  * Loads the specified image file and returns its properties without pixels. The assigned image
- * MUST be destroyed later with sail_destroy_image(). The assigned plugin info MUST NOT be destroyed
+ * MUST be destroyed later with sail_destroy_image(). The assigned codec info MUST NOT be destroyed
  * because it is a pointer to an internal data structure. If you don't need it, just pass NULL.
  *
  * This function is pretty fast because it doesn't decode whole image data for most image formats.
@@ -53,7 +53,7 @@ struct sail_plugin_info;
  *
  * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_status_t sail_probe_file(const char *path, struct sail_image **image, const struct sail_plugin_info **plugin_info);
+SAIL_EXPORT sail_status_t sail_probe_file(const char *path, struct sail_image **image, const struct sail_codec_info **codec_info);
 
 /*
  * Loads the specified image file and returns its properties and pixels. The assigned image

@@ -17,13 +17,13 @@ cmake_pop_check_state()
 if (HAVE_TIFF_41)
     # We compile libtiff w/o WEBP support on Windows
     if (WIN32)
-        set(PLUGIN_INFO_COMPRESSIONS_41 "ZSTD")
+        set(CODEC_INFO_COMPRESSIONS_41 "ZSTD")
     else()
-        set(PLUGIN_INFO_COMPRESSIONS_41 "WEBP;ZSTD")
+        set(CODEC_INFO_COMPRESSIONS_41 "WEBP;ZSTD")
     endif()
 endif()
 
-# Common plugin configuration
+# Common codec configuration
 #
 if (WIN32)
     set(TIFF_DEPS libtiff-4 libjpeg zlib libzstd)
@@ -31,7 +31,7 @@ else()
     set(TIFF_DEPS libtiff-4)
 endif()
 
-sail_plugin(TARGET tiff SOURCES helpers.c io.c tiff.c PKGCONFIG ${TIFF_DEPS})
+sail_codec(TARGET tiff SOURCES helpers.c io.c tiff.c PKGCONFIG ${TIFF_DEPS})
 
 if (HAVE_TIFF_41)
     target_compile_definitions(tiff PRIVATE HAVE_TIFF_41)

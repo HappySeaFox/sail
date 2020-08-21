@@ -148,9 +148,9 @@ static sail_status_t parse_serialized_ints(const char *value, int **target, unsi
     return SAIL_OK;
 }
 
-static sail_status_t plugin_feature_from_string(const char *str, int *result) {
+static sail_status_t codec_feature_from_string(const char *str, int *result) {
 
-    SAIL_TRY(sail_plugin_feature_from_string(str, (enum SailPluginFeature *)result));
+    SAIL_TRY(sail_codec_feature_from_string(str, (enum SailCodecFeature *)result));
 
     return SAIL_OK;
 }
@@ -191,7 +191,7 @@ static sail_status_t parse_flags(const char *value, int *features, sail_status_t
 }
 
 struct init_data {
-    struct sail_plugin_info *plugin_info;
+    struct sail_codec_info *codec_info;
     struct sail_pixel_formats_mapping_node **last_mapping_node;
 };
 
@@ -203,28 +203,28 @@ static sail_status_t inih_handler_sail_error(void *data, const char *section, co
     }
 
     struct init_data *init_data = (struct init_data *)data;
-    struct sail_plugin_info *plugin_info = init_data->plugin_info;
+    struct sail_codec_info *codec_info = init_data->codec_info;
 
-    if (strcmp(section, "plugin") == 0) {
+    if (strcmp(section, "codec") == 0) {
         if (strcmp(name, "layout") == 0) {
-            plugin_info->layout = atoi(value);
+            codec_info->layout = atoi(value);
         } else if (strcmp(name, "version") == 0) {
-            SAIL_TRY(sail_strdup(value, &plugin_info->version));
+            SAIL_TRY(sail_strdup(value, &codec_info->version));
         } else if (strcmp(name, "name") == 0) {
-            SAIL_TRY(sail_strdup(value, &plugin_info->name));
+            SAIL_TRY(sail_strdup(value, &codec_info->name));
         } else if (strcmp(name, "description") == 0) {
-            SAIL_TRY(sail_strdup(value, &plugin_info->description));
+            SAIL_TRY(sail_strdup(value, &codec_info->description));
         } else if (strcmp(name, "magic-numbers") == 0) {
-            SAIL_TRY(split_into_string_node_chain(value, &plugin_info->magic_number_node));
+            SAIL_TRY(split_into_string_node_chain(value, &codec_info->magic_number_node));
 
-            struct sail_string_node *node = plugin_info->magic_number_node;
+            struct sail_string_node *node = codec_info->magic_number_node;
 
             while (node != NULL) {
                 if (strlen(node->value) > SAIL_MAGIC_BUFFER_SIZE * 3 - 1) {
                     SAIL_LOG_ERROR("Magic number '%s' is too long. Magic numbers for the '%s' codec are disabled",
-                                    node->value, plugin_info->name);
-                    destroy_string_node_chain(plugin_info->magic_number_node);
-                    plugin_info->magic_number_node = NULL;
+                                    node->value, codec_info->name);
+                    destroy_string_node_chain(codec_info->magic_number_node);
+                    codec_info->magic_number_node = NULL;
                     break;
                 }
 
@@ -232,72 +232,72 @@ static sail_status_t inih_handler_sail_error(void *data, const char *section, co
                 node = node->next;
             }
         } else if (strcmp(name, "extensions") == 0) {
-            SAIL_TRY(split_into_string_node_chain(value, &plugin_info->extension_node));
+            SAIL_TRY(split_into_string_node_chain(value, &codec_info->extension_node));
 
-            struct sail_string_node *node = plugin_info->extension_node;
+            struct sail_string_node *node = codec_info->extension_node;
 
             while (node != NULL) {
                 sail_to_lower(node->value);
                 node = node->next;
             }
         } else if (strcmp(name, "mime-types") == 0) {
-            SAIL_TRY(split_into_string_node_chain(value, &plugin_info->mime_type_node));
+            SAIL_TRY(split_into_string_node_chain(value, &codec_info->mime_type_node));
 
-            struct sail_string_node *node = plugin_info->mime_type_node;
+            struct sail_string_node *node = codec_info->mime_type_node;
 
             while (node != NULL) {
                 sail_to_lower(node->value);
                 node = node->next;
             }
         } else {
-            SAIL_LOG_ERROR("Unsupported plugin info key '%s' in [%s]", name, section);
+            SAIL_LOG_ERROR("Unsupported codec info key '%s' in [%s]", name, section);
             return SAIL_ERROR_PARSE_FILE;
         }
     } else if (strcmp(section, "read-features") == 0) {
         if (strcmp(name, "output-pixel-formats") == 0) {
             SAIL_TRY_OR_CLEANUP(parse_serialized_ints(value,
-                                                        (int **)&plugin_info->read_features->output_pixel_formats,
-                                                        &plugin_info->read_features->output_pixel_formats_length,
+                                                        (int **)&codec_info->read_features->output_pixel_formats,
+                                                        &codec_info->read_features->output_pixel_formats_length,
                                                         pixel_format_from_string),
                                 /* cleanup */ SAIL_LOG_ERROR("Failed to parse output pixel formats: '%s'", value));
         } else if (strcmp(name, "default-output-pixel-format") == 0) {
-            SAIL_TRY_OR_CLEANUP(sail_pixel_format_from_string(value, &plugin_info->read_features->default_output_pixel_format),
+            SAIL_TRY_OR_CLEANUP(sail_pixel_format_from_string(value, &codec_info->read_features->default_output_pixel_format),
                                 /* cleanup */ SAIL_LOG_ERROR("Failed to parse preferred output pixel format: '%s'", value));
         } else if (strcmp(name, "features") == 0) {
-            SAIL_TRY_OR_CLEANUP(parse_flags(value, &plugin_info->read_features->features, plugin_feature_from_string),
-                                /* cleanup */ SAIL_LOG_ERROR("Failed to parse plugin features: '%s'", value));
+            SAIL_TRY_OR_CLEANUP(parse_flags(value, &codec_info->read_features->features, codec_feature_from_string),
+                                /* cleanup */ SAIL_LOG_ERROR("Failed to parse codec features: '%s'", value));
         } else {
-            SAIL_LOG_ERROR("Unsupported plugin info key '%s' in [%s]", name, section);
+            SAIL_LOG_ERROR("Unsupported codec info key '%s' in [%s]", name, section);
             return SAIL_ERROR_PARSE_FILE;
         }
     } else if (strcmp(section, "write-features") == 0) {
         if (strcmp(name, "features") == 0) {
-            SAIL_TRY_OR_CLEANUP(parse_flags(value, &plugin_info->write_features->features, plugin_feature_from_string),
-                                /* cleanup */ SAIL_LOG_ERROR("Failed to parse plugin features: '%s'", value));
+            SAIL_TRY_OR_CLEANUP(parse_flags(value, &codec_info->write_features->features, codec_feature_from_string),
+                                /* cleanup */ SAIL_LOG_ERROR("Failed to parse codec features: '%s'", value));
         } else if (strcmp(name, "properties") == 0) {
-            SAIL_TRY_OR_CLEANUP(parse_flags(value, &plugin_info->write_features->properties, image_property_from_string),
+            SAIL_TRY_OR_CLEANUP(parse_flags(value, &codec_info->write_features->properties, image_property_from_string),
                                 /* cleanup */ SAIL_LOG_ERROR("Failed to parse image properties: '%s'", value));
         } else if (strcmp(name, "interlaced-passes") == 0) {
-            plugin_info->write_features->interlaced_passes = atoi(value);
+            codec_info->write_features->interlaced_passes = atoi(value);
         } else if (strcmp(name, "compression-types") == 0) {
             SAIL_TRY_OR_CLEANUP(parse_serialized_ints(value,
-                                                        (int **)&plugin_info->write_features->compressions,
-                                                        &plugin_info->write_features->compressions_length,
+                                                        (int **)&codec_info->write_features->compressions,
+                                                        &codec_info->write_features->compressions_length,
                                                         compression_from_string),
                                 /* cleanup */ SAIL_LOG_ERROR("Failed to parse compressions: '%s'", value));
         } else if (strcmp(name, "default-compression") == 0) {
-            SAIL_TRY_OR_CLEANUP(sail_compression_from_string(value, &plugin_info->write_features->default_compression),
+            SAIL_TRY_OR_CLEANUP(sail_compression_from_string(value, &codec_info->write_features->default_compression),
                                 /* cleanup */ SAIL_LOG_ERROR("Failed to parse compression: '%s'", value));
         } else if (strcmp(name, "compression-level-min") == 0) {
-            plugin_info->write_features->compression_level_min = atof(value);
+            codec_info->write_features->compression_level_min = atof(value);
         } else if (strcmp(name, "compression-level-max") == 0) {
-            plugin_info->write_features->compression_level_max = atof(value);
+            codec_info->write_features->compression_level_max = atof(value);
         } else if (strcmp(name, "compression-level-default") == 0) {
-            plugin_info->write_features->compression_level_default = atof(value);
+            codec_info->write_features->compression_level_default = atof(value);
         } else if (strcmp(name, "compression-level-step") == 0) {
-            plugin_info->write_features->compression_level_step = atof(value);
+            codec_info->write_features->compression_level_step = atof(value);
         } else {
-            SAIL_LOG_ERROR("Unsupported plugin info key '%s' in [%s]", name, section);
+            SAIL_LOG_ERROR("Unsupported codec info key '%s' in [%s]", name, section);
             return SAIL_ERROR_PARSE_FILE;
         }
     } else if (strcmp(section, "write-pixel-formats-mapping") == 0) {
@@ -320,7 +320,7 @@ static sail_status_t inih_handler_sail_error(void *data, const char *section, co
         *(init_data->last_mapping_node) = node;
         init_data->last_mapping_node = &node->next;
     } else {
-        SAIL_LOG_ERROR("Unsupported plugin info section '%s'", section);
+        SAIL_LOG_ERROR("Unsupported codec info section '%s'", section);
         return SAIL_ERROR_PARSE_FILE;
     }
 
@@ -336,134 +336,134 @@ static int inih_handler(void *data, const char *section, const char *name, const
     return 1;
 }
 
-static sail_status_t check_plugin_info(const char *path, const struct sail_plugin_info *plugin_info) {
+static sail_status_t check_codec_info(const char *path, const struct sail_codec_info *codec_info) {
 
-    const struct sail_write_features *write_features = plugin_info->write_features;
+    const struct sail_write_features *write_features = codec_info->write_features;
 
     /* Check write features. */
-    if ((write_features->features & SAIL_PLUGIN_FEATURE_STATIC ||
-            write_features->features & SAIL_PLUGIN_FEATURE_ANIMATED ||
-            write_features->features & SAIL_PLUGIN_FEATURE_MULTI_FRAME) && write_features->pixel_formats_mapping_node == NULL) {
-        SAIL_LOG_ERROR("The plugin '%s' is able to write images, but output pixel formats mappings are not specified", path);
-        return SAIL_ERROR_INCOMPLETE_PLUGIN_INFO;
+    if ((write_features->features & SAIL_CODEC_FEATURE_STATIC ||
+            write_features->features & SAIL_CODEC_FEATURE_ANIMATED ||
+            write_features->features & SAIL_CODEC_FEATURE_MULTI_FRAME) && write_features->pixel_formats_mapping_node == NULL) {
+        SAIL_LOG_ERROR("The codec '%s' is able to write images, but output pixel formats mappings are not specified", path);
+        return SAIL_ERROR_INCOMPLETE_CODEC_INFO;
     }
 
     /* Compressions must always exist.*/
     if (write_features->compressions == NULL || write_features->compressions_length < 1) {
-        SAIL_LOG_ERROR("The plugin '%s' specifies an empty compressions list", path);
-        return SAIL_ERROR_INCOMPLETE_PLUGIN_INFO;
+        SAIL_LOG_ERROR("The codec '%s' specifies an empty compressions list", path);
+        return SAIL_ERROR_INCOMPLETE_CODEC_INFO;
     }
 
     /* Compression levels and types are mutually exclusive.*/
     if (write_features->compressions_length > 1 && (write_features->compression_level_min != 0 || write_features->compression_level_max != 0)) {
-        SAIL_LOG_ERROR("The plugin '%s' specifies more than two compression types and non-zero compression levels which is unsupported", path);
-        return SAIL_ERROR_INCOMPLETE_PLUGIN_INFO;
+        SAIL_LOG_ERROR("The codec '%s' specifies more than two compression types and non-zero compression levels which is unsupported", path);
+        return SAIL_ERROR_INCOMPLETE_CODEC_INFO;
     }
 
     return SAIL_OK;
 }
 
-static sail_status_t alloc_plugin_info(struct sail_plugin_info **plugin_info) {
+static sail_status_t alloc_codec_info(struct sail_codec_info **codec_info) {
 
-    SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
+    SAIL_CHECK_CODEC_INFO_PTR(codec_info);
 
     void *ptr;
-    SAIL_TRY(sail_malloc(&ptr, sizeof(struct sail_plugin_info)));
-    *plugin_info = ptr;
+    SAIL_TRY(sail_malloc(&ptr, sizeof(struct sail_codec_info)));
+    *codec_info = ptr;
 
-    (*plugin_info)->path              = NULL;
-    (*plugin_info)->layout            = 0;
-    (*plugin_info)->version           = NULL;
-    (*plugin_info)->name              = NULL;
-    (*plugin_info)->description       = NULL;
-    (*plugin_info)->magic_number_node = NULL;
-    (*plugin_info)->extension_node    = NULL;
-    (*plugin_info)->mime_type_node    = NULL;
-    (*plugin_info)->read_features     = NULL;
-    (*plugin_info)->write_features    = NULL;
+    (*codec_info)->path              = NULL;
+    (*codec_info)->layout            = 0;
+    (*codec_info)->version           = NULL;
+    (*codec_info)->name              = NULL;
+    (*codec_info)->description       = NULL;
+    (*codec_info)->magic_number_node = NULL;
+    (*codec_info)->extension_node    = NULL;
+    (*codec_info)->mime_type_node    = NULL;
+    (*codec_info)->read_features     = NULL;
+    (*codec_info)->write_features    = NULL;
 
     return SAIL_OK;
 }
 
-static void destroy_plugin_info(struct sail_plugin_info *plugin_info) {
+static void destroy_codec_info(struct sail_codec_info *codec_info) {
 
-    if (plugin_info == NULL) {
+    if (codec_info == NULL) {
         return;
     }
 
-    sail_free(plugin_info->path);
-    sail_free(plugin_info->version);
-    sail_free(plugin_info->name);
-    sail_free(plugin_info->description);
+    sail_free(codec_info->path);
+    sail_free(codec_info->version);
+    sail_free(codec_info->name);
+    sail_free(codec_info->description);
 
-    destroy_string_node_chain(plugin_info->magic_number_node);
-    destroy_string_node_chain(plugin_info->extension_node);
-    destroy_string_node_chain(plugin_info->mime_type_node);
+    destroy_string_node_chain(codec_info->magic_number_node);
+    destroy_string_node_chain(codec_info->extension_node);
+    destroy_string_node_chain(codec_info->mime_type_node);
 
-    sail_destroy_read_features(plugin_info->read_features);
-    sail_destroy_write_features(plugin_info->write_features);
+    sail_destroy_read_features(codec_info->read_features);
+    sail_destroy_write_features(codec_info->write_features);
 
-    sail_free(plugin_info);
+    sail_free(codec_info);
 }
 
 /*
  * Public functions.
  */
 
-sail_status_t alloc_plugin_info_node(struct sail_plugin_info_node **plugin_info_node) {
+sail_status_t alloc_codec_info_node(struct sail_codec_info_node **codec_info_node) {
 
-    SAIL_CHECK_PLUGIN_INFO_NODE_PTR(plugin_info_node);
+    SAIL_CHECK_CODEC_INFO_NODE_PTR(codec_info_node);
 
     void *ptr;
-    SAIL_TRY(sail_malloc(&ptr, sizeof(struct sail_plugin_info_node)));
-    *plugin_info_node = ptr;
+    SAIL_TRY(sail_malloc(&ptr, sizeof(struct sail_codec_info_node)));
+    *codec_info_node = ptr;
 
-    (*plugin_info_node)->plugin_info = NULL;
-    (*plugin_info_node)->plugin      = NULL;
-    (*plugin_info_node)->next        = NULL;
+    (*codec_info_node)->codec_info = NULL;
+    (*codec_info_node)->codec      = NULL;
+    (*codec_info_node)->next        = NULL;
 
     return SAIL_OK;
 }
 
-void destroy_plugin_info_node(struct sail_plugin_info_node *plugin_info_node) {
+void destroy_codec_info_node(struct sail_codec_info_node *codec_info_node) {
 
-    if (plugin_info_node == NULL) {
+    if (codec_info_node == NULL) {
         return;
     }
 
-    destroy_plugin_info(plugin_info_node->plugin_info);
-    destroy_plugin(plugin_info_node->plugin);
+    destroy_codec_info(codec_info_node->codec_info);
+    destroy_codec(codec_info_node->codec);
 
-    sail_free(plugin_info_node);
+    sail_free(codec_info_node);
 }
 
-void destroy_plugin_info_node_chain(struct sail_plugin_info_node *plugin_info_node) {
+void destroy_codec_info_node_chain(struct sail_codec_info_node *codec_info_node) {
 
-    while (plugin_info_node != NULL) {
-        struct sail_plugin_info_node *plugin_info_node_next = plugin_info_node->next;
+    while (codec_info_node != NULL) {
+        struct sail_codec_info_node *codec_info_node_next = codec_info_node->next;
 
-        destroy_plugin_info_node(plugin_info_node);
+        destroy_codec_info_node(codec_info_node);
 
-        plugin_info_node = plugin_info_node_next;
+        codec_info_node = codec_info_node_next;
     }
 }
 
-sail_status_t plugin_read_info(const char *path, struct sail_plugin_info **plugin_info) {
+sail_status_t codec_read_info(const char *path, struct sail_codec_info **codec_info) {
 
     SAIL_CHECK_PATH_PTR(path);
-    SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
+    SAIL_CHECK_CODEC_INFO_PTR(codec_info);
 
-    SAIL_LOG_DEBUG("Loading plugin info '%s'", path);
+    SAIL_LOG_DEBUG("Loading codec info '%s'", path);
 
-    SAIL_TRY(alloc_plugin_info(plugin_info));
-    SAIL_TRY_OR_CLEANUP(sail_alloc_read_features(&(*plugin_info)->read_features),
-                        destroy_plugin_info(*plugin_info));
-    SAIL_TRY_OR_CLEANUP(sail_alloc_write_features(&(*plugin_info)->write_features),
-                        destroy_plugin_info(*plugin_info));
+    SAIL_TRY(alloc_codec_info(codec_info));
+    SAIL_TRY_OR_CLEANUP(sail_alloc_read_features(&(*codec_info)->read_features),
+                        destroy_codec_info(*codec_info));
+    SAIL_TRY_OR_CLEANUP(sail_alloc_write_features(&(*codec_info)->write_features),
+                        destroy_codec_info(*codec_info));
 
     struct init_data init_data;
-    init_data.plugin_info = *plugin_info;
-    init_data.last_mapping_node = &(*plugin_info)->write_features->pixel_formats_mapping_node;
+    init_data.codec_info = *codec_info;
+    init_data.last_mapping_node = &(*codec_info)->write_features->pixel_formats_mapping_node;
 
     /*
      * Returns:
@@ -476,19 +476,19 @@ sail_status_t plugin_read_info(const char *path, struct sail_plugin_info **plugi
 
     /* Success. */
     if (code == 0) {
-        if ((*plugin_info)->layout != SAIL_PLUGIN_LAYOUT_V3) {
-            SAIL_LOG_ERROR("Unsupported plugin layout version %d in '%s'", (*plugin_info)->layout, path);
-            destroy_plugin_info(*plugin_info);
-            return SAIL_ERROR_UNSUPPORTED_PLUGIN_LAYOUT;
+        if ((*codec_info)->layout != SAIL_CODEC_LAYOUT_V3) {
+            SAIL_LOG_ERROR("Unsupported codec layout version %d in '%s'", (*codec_info)->layout, path);
+            destroy_codec_info(*codec_info);
+            return SAIL_ERROR_UNSUPPORTED_CODEC_LAYOUT;
         }
 
         /* Paranoid error checks. */
-        SAIL_TRY_OR_CLEANUP(check_plugin_info(path, *plugin_info),
-                            /* cleanup */ destroy_plugin_info(*plugin_info));
+        SAIL_TRY_OR_CLEANUP(check_codec_info(path, *codec_info),
+                            /* cleanup */ destroy_codec_info(*codec_info));
 
         return SAIL_OK;
     } else {
-        destroy_plugin_info(*plugin_info);
+        destroy_codec_info(*codec_info);
 
         switch (code) {
             case -1: return SAIL_ERROR_OPEN_FILE;

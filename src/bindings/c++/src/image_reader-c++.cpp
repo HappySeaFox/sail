@@ -56,59 +56,59 @@ image_reader::~image_reader()
     delete d;
 }
 
-sail_status_t image_reader::probe(const std::string &path, image *simage, plugin_info *splugin_info)
+sail_status_t image_reader::probe(const std::string &path, image *simage, codec_info *scodec_info)
 {
-    SAIL_TRY(probe(path.c_str(), simage, splugin_info));
+    SAIL_TRY(probe(path.c_str(), simage, scodec_info));
 
     return SAIL_OK;
 }
 
-sail_status_t image_reader::probe(const char *path, image *simage, plugin_info *splugin_info)
+sail_status_t image_reader::probe(const char *path, image *simage, codec_info *scodec_info)
 {
     SAIL_CHECK_PATH_PTR(path);
     SAIL_CHECK_IMAGE_PTR(simage);
 
-    const sail_plugin_info *sail_plugin_info;
+    const sail_codec_info *sail_codec_info;
     sail_image *sail_image;
 
     SAIL_TRY(sail_probe_file(path,
                              &sail_image,
-                             &sail_plugin_info));
+                             &sail_codec_info));
 
     *simage = image(sail_image);
     sail_destroy_image(sail_image);
 
-    if (splugin_info != nullptr) {
-        *splugin_info = plugin_info(sail_plugin_info);
+    if (scodec_info != nullptr) {
+        *scodec_info = codec_info(sail_codec_info);
     }
 
     return SAIL_OK;
 }
 
-sail_status_t image_reader::probe(const void *buffer, size_t buffer_length, image *simage, plugin_info *splugin_info)
+sail_status_t image_reader::probe(const void *buffer, size_t buffer_length, image *simage, codec_info *scodec_info)
 {
     SAIL_CHECK_BUFFER_PTR(buffer);
     SAIL_CHECK_IMAGE_PTR(simage);
 
-    const sail_plugin_info *sail_plugin_info;
+    const sail_codec_info *sail_codec_info;
     sail_image *sail_image;
 
     SAIL_TRY(sail_probe_mem(buffer,
                             buffer_length,
                             &sail_image,
-                            &sail_plugin_info));
+                            &sail_codec_info));
 
     *simage = image(sail_image);
     sail_destroy_image(sail_image);
 
-    if (splugin_info != nullptr) {
-        *splugin_info = plugin_info(sail_plugin_info);
+    if (scodec_info != nullptr) {
+        *scodec_info = codec_info(sail_codec_info);
     }
 
     return SAIL_OK;
 }
 
-sail_status_t image_reader::probe(const sail::io &io, image *simage, plugin_info *splugin_info)
+sail_status_t image_reader::probe(const sail::io &io, image *simage, codec_info *scodec_info)
 {
     SAIL_CHECK_IMAGE_PTR(simage);
     SAIL_TRY(io.verify_valid());
@@ -116,18 +116,18 @@ sail_status_t image_reader::probe(const sail::io &io, image *simage, plugin_info
     struct sail_io sail_io;
     SAIL_TRY(io.to_sail_io(&sail_io));
 
-    const sail_plugin_info *sail_plugin_info;
+    const sail_codec_info *sail_codec_info;
     sail_image *sail_image;
 
     SAIL_TRY(sail_probe_io(&sail_io,
                            &sail_image,
-                           &sail_plugin_info));
+                           &sail_codec_info));
 
     *simage = image(sail_image);
     sail_destroy_image(sail_image);
 
-    if (splugin_info != nullptr) {
-        *splugin_info = plugin_info(sail_plugin_info);
+    if (scodec_info != nullptr) {
+        *scodec_info = codec_info(sail_codec_info);
     }
 
     return SAIL_OK;
@@ -190,30 +190,30 @@ sail_status_t image_reader::start_reading(const char *path)
     return SAIL_OK;
 }
 
-sail_status_t image_reader::start_reading(const std::string &path, const plugin_info &splugin_info)
+sail_status_t image_reader::start_reading(const std::string &path, const codec_info &scodec_info)
 {
-    SAIL_TRY(start_reading(path.c_str(), splugin_info));
+    SAIL_TRY(start_reading(path.c_str(), scodec_info));
 
     return SAIL_OK;
 }
 
-sail_status_t image_reader::start_reading(const char *path, const plugin_info &splugin_info)
+sail_status_t image_reader::start_reading(const char *path, const codec_info &scodec_info)
 {
     SAIL_CHECK_PATH_PTR(path);
 
-    SAIL_TRY(sail_start_reading_file(path, splugin_info.sail_plugin_info_c(), &d->state));
+    SAIL_TRY(sail_start_reading_file(path, scodec_info.sail_codec_info_c(), &d->state));
 
     return SAIL_OK;
 }
 
-sail_status_t image_reader::start_reading(const std::string &path, const plugin_info &splugin_info, const read_options &sread_options)
+sail_status_t image_reader::start_reading(const std::string &path, const codec_info &scodec_info, const read_options &sread_options)
 {
-    SAIL_TRY(start_reading(path.c_str(), splugin_info, sread_options));
+    SAIL_TRY(start_reading(path.c_str(), scodec_info, sread_options));
 
     return SAIL_OK;
 }
 
-sail_status_t image_reader::start_reading(const char *path, const plugin_info &splugin_info, const read_options &sread_options)
+sail_status_t image_reader::start_reading(const char *path, const codec_info &scodec_info, const read_options &sread_options)
 {
     SAIL_CHECK_PATH_PTR(path);
 
@@ -221,26 +221,26 @@ sail_status_t image_reader::start_reading(const char *path, const plugin_info &s
     SAIL_TRY(sread_options.to_sail_read_options(&sail_read_options));
 
     SAIL_TRY(sail_start_reading_file_with_options(path,
-                                                  splugin_info.sail_plugin_info_c(),
+                                                  scodec_info.sail_codec_info_c(),
                                                   &sail_read_options,
                                                   &d->state));
 
     return SAIL_OK;
 }
 
-sail_status_t image_reader::start_reading(const void *buffer, size_t buffer_length, const plugin_info &splugin_info)
+sail_status_t image_reader::start_reading(const void *buffer, size_t buffer_length, const codec_info &scodec_info)
 {
     SAIL_CHECK_BUFFER_PTR(buffer);
 
     SAIL_TRY(sail_start_reading_mem(buffer,
                                     buffer_length,
-                                    splugin_info.sail_plugin_info_c(),
+                                    scodec_info.sail_codec_info_c(),
                                     &d->state));
 
     return SAIL_OK;
 }
 
-sail_status_t image_reader::start_reading(const void *buffer, size_t buffer_length, const plugin_info &splugin_info, const read_options &sread_options)
+sail_status_t image_reader::start_reading(const void *buffer, size_t buffer_length, const codec_info &scodec_info, const read_options &sread_options)
 {
     SAIL_CHECK_BUFFER_PTR(buffer);
 
@@ -249,14 +249,14 @@ sail_status_t image_reader::start_reading(const void *buffer, size_t buffer_leng
 
     SAIL_TRY(sail_start_reading_mem_with_options(buffer,
                                                  buffer_length,
-                                                 splugin_info.sail_plugin_info_c(),
+                                                 scodec_info.sail_codec_info_c(),
                                                  &sail_read_options,
                                                  &d->state));
 
     return SAIL_OK;
 }
 
-sail_status_t image_reader::start_reading(const io &sio, const plugin_info &splugin_info)
+sail_status_t image_reader::start_reading(const io &sio, const codec_info &scodec_info)
 {
     SAIL_TRY(sio.to_sail_io(&d->sail_io));
 
@@ -264,14 +264,14 @@ sail_status_t image_reader::start_reading(const io &sio, const plugin_info &splu
     SAIL_CHECK_IO(sail_io);
 
     SAIL_TRY(sail_start_reading_io_with_options(&d->sail_io,
-                                                splugin_info.sail_plugin_info_c(),
+                                                scodec_info.sail_codec_info_c(),
                                                 NULL,
                                                 &d->state));
 
     return SAIL_OK;
 }
 
-sail_status_t image_reader::start_reading(const io &sio, const plugin_info &splugin_info, const read_options &sread_options)
+sail_status_t image_reader::start_reading(const io &sio, const codec_info &scodec_info, const read_options &sread_options)
 {
     SAIL_TRY(sio.to_sail_io(&d->sail_io));
 
@@ -282,7 +282,7 @@ sail_status_t image_reader::start_reading(const io &sio, const plugin_info &splu
     SAIL_TRY(sread_options.to_sail_read_options(&sail_read_options));
 
     SAIL_TRY(sail_start_reading_io_with_options(&d->sail_io,
-                                                splugin_info.sail_plugin_info_c(),
+                                                scodec_info.sail_codec_info_c(),
                                                 &sail_read_options,
                                                 &d->state));
 

@@ -26,19 +26,19 @@
 QStringList QtSail::filters() const
 {
     QStringList filters { QStringLiteral("All Files (*.*)") };
-    const std::vector<sail::plugin_info> plugin_info_list = sail::plugin_info::list();
+    const std::vector<sail::codec_info> codec_info_list = sail::codec_info::list();
 
-    for (const sail::plugin_info &plugin_info : plugin_info_list) {
+    for (const sail::codec_info &codec_info : codec_info_list) {
         QStringList masks;
 
-        const std::vector<std::string> extensions = plugin_info.extensions();
+        const std::vector<std::string> extensions = codec_info.extensions();
 
         for (const std::string &extension : extensions) {
             masks.append(QStringLiteral("*.%1").arg(extension.c_str()));
         }
 
         filters.append(QStringLiteral("%1 (%2)")
-                       .arg(plugin_info.description().c_str())
+                       .arg(codec_info.description().c_str())
                        .arg(masks.join(QStringLiteral(" "))));
     }
 

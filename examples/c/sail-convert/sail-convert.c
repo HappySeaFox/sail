@@ -38,7 +38,7 @@ static sail_status_t convert(const char *input, const char *output, int compress
     SAIL_CHECK_PATH_PTR(input);
     SAIL_CHECK_PATH_PTR(output);
 
-    const struct sail_plugin_info *plugin_info;
+    const struct sail_codec_info *codec_info;
     void *state;
 
     struct sail_image *image;
@@ -46,10 +46,10 @@ static sail_status_t convert(const char *input, const char *output, int compress
     /* Read the image. */
     SAIL_LOG_INFO("Input file: %s", input);
 
-    SAIL_TRY(sail_plugin_info_from_path(input, &plugin_info));
-    SAIL_LOG_INFO("Input codec: %s", plugin_info->description);
+    SAIL_TRY(sail_codec_info_from_path(input, &codec_info));
+    SAIL_LOG_INFO("Input codec: %s", codec_info->description);
 
-    SAIL_TRY(sail_start_reading_file(input, plugin_info, &state));
+    SAIL_TRY(sail_start_reading_file(input, codec_info, &state));
 
     SAIL_TRY(sail_read_next_frame(state, &image));
     SAIL_TRY(sail_stop_reading(state));
@@ -57,17 +57,17 @@ static sail_status_t convert(const char *input, const char *output, int compress
     /* Write the image. */
     SAIL_LOG_INFO("Output file: %s", output);
 
-    SAIL_TRY(sail_plugin_info_from_path(output, &plugin_info));
-    SAIL_LOG_INFO("Output codec: %s", plugin_info->description);
+    SAIL_TRY(sail_codec_info_from_path(output, &codec_info));
+    SAIL_LOG_INFO("Output codec: %s", codec_info->description);
 
     struct sail_write_options *write_options;
-    SAIL_TRY(sail_alloc_write_options_from_features(plugin_info->write_features, &write_options));
+    SAIL_TRY(sail_alloc_write_options_from_features(codec_info->write_features, &write_options));
 
     /* Apply our tuning. */
     SAIL_LOG_INFO("Compression: %d%s", compression, compression == -1 ? " (default)" : "");
     write_options->compression = compression;
 
-    SAIL_TRY(sail_start_writing_file_with_options(output, plugin_info, write_options, &state));
+    SAIL_TRY(sail_start_writing_file_with_options(output, codec_info, write_options, &state));
     SAIL_TRY(sail_write_next_frame(state, image));
     SAIL_TRY(sail_stop_writing(state));
 

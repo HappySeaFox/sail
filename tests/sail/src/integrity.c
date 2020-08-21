@@ -353,48 +353,48 @@ static MunitResult test_compression_from_string(const MunitParameter params[], v
 }
 
 /*
- * Plugin features.
+ * Codec features.
  */
-static MunitResult test_plugin_feature_to_string(const MunitParameter params[], void *user_data) {
+static MunitResult test_codec_feature_to_string(const MunitParameter params[], void *user_data) {
     (void)params;
     (void)user_data;
 
     const char *result;
 
 #define TEST_SAIL_CONVERSION(e, s)             \
-    sail_plugin_feature_to_string(e, &result); \
+    sail_codec_feature_to_string(e, &result); \
     munit_assert_string_equal(result, s);
 
-    TEST_SAIL_CONVERSION(SAIL_PLUGIN_FEATURE_STATIC,      "STATIC");
-    TEST_SAIL_CONVERSION(SAIL_PLUGIN_FEATURE_ANIMATED,    "ANIMATED");
-    TEST_SAIL_CONVERSION(SAIL_PLUGIN_FEATURE_MULTI_FRAME, "MULTI-FRAME");
-    TEST_SAIL_CONVERSION(SAIL_PLUGIN_FEATURE_META_INFO,   "META-INFO");
-    TEST_SAIL_CONVERSION(SAIL_PLUGIN_FEATURE_EXIF,        "EXIF");
-    TEST_SAIL_CONVERSION(SAIL_PLUGIN_FEATURE_INTERLACED,  "INTERLACED");
-    TEST_SAIL_CONVERSION(SAIL_PLUGIN_FEATURE_ICCP,        "ICCP");
+    TEST_SAIL_CONVERSION(SAIL_CODEC_FEATURE_STATIC,      "STATIC");
+    TEST_SAIL_CONVERSION(SAIL_CODEC_FEATURE_ANIMATED,    "ANIMATED");
+    TEST_SAIL_CONVERSION(SAIL_CODEC_FEATURE_MULTI_FRAME, "MULTI-FRAME");
+    TEST_SAIL_CONVERSION(SAIL_CODEC_FEATURE_META_INFO,   "META-INFO");
+    TEST_SAIL_CONVERSION(SAIL_CODEC_FEATURE_EXIF,        "EXIF");
+    TEST_SAIL_CONVERSION(SAIL_CODEC_FEATURE_INTERLACED,  "INTERLACED");
+    TEST_SAIL_CONVERSION(SAIL_CODEC_FEATURE_ICCP,        "ICCP");
 
 #undef TEST_SAIL_CONVERSION
 
     return MUNIT_OK;
 }
 
-static MunitResult test_plugin_feature_from_string(const MunitParameter params[], void *user_data) {
+static MunitResult test_codec_feature_from_string(const MunitParameter params[], void *user_data) {
     (void)params;
     (void)user_data;
 
-    enum SailPluginFeature result;
+    enum SailCodecFeature result;
 
 #define TEST_SAIL_CONVERSION(s, e)               \
-    sail_plugin_feature_from_string(s, &result); \
+    sail_codec_feature_from_string(s, &result); \
     munit_assert(result == e);
 
-    TEST_SAIL_CONVERSION("STATIC",      SAIL_PLUGIN_FEATURE_STATIC);
-    TEST_SAIL_CONVERSION("ANIMATED",    SAIL_PLUGIN_FEATURE_ANIMATED);
-    TEST_SAIL_CONVERSION("MULTI-FRAME", SAIL_PLUGIN_FEATURE_MULTI_FRAME);
-    TEST_SAIL_CONVERSION("META-INFO",   SAIL_PLUGIN_FEATURE_META_INFO);
-    TEST_SAIL_CONVERSION("EXIF",        SAIL_PLUGIN_FEATURE_EXIF);
-    TEST_SAIL_CONVERSION("INTERLACED",  SAIL_PLUGIN_FEATURE_INTERLACED);
-    TEST_SAIL_CONVERSION("ICCP",        SAIL_PLUGIN_FEATURE_ICCP);
+    TEST_SAIL_CONVERSION("STATIC",      SAIL_CODEC_FEATURE_STATIC);
+    TEST_SAIL_CONVERSION("ANIMATED",    SAIL_CODEC_FEATURE_ANIMATED);
+    TEST_SAIL_CONVERSION("MULTI-FRAME", SAIL_CODEC_FEATURE_MULTI_FRAME);
+    TEST_SAIL_CONVERSION("META-INFO",   SAIL_CODEC_FEATURE_META_INFO);
+    TEST_SAIL_CONVERSION("EXIF",        SAIL_CODEC_FEATURE_EXIF);
+    TEST_SAIL_CONVERSION("INTERLACED",  SAIL_CODEC_FEATURE_INTERLACED);
+    TEST_SAIL_CONVERSION("ICCP",        SAIL_CODEC_FEATURE_ICCP);
 
 #undef TEST_SAIL_CONVERSION
 
@@ -411,8 +411,8 @@ static MunitTest test_suite_tests[] = {
     { (char *)"/compression-to-string",   test_compression_to_string,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/compression-from-string", test_compression_from_string, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
-    { (char *)"/plugin-feature-to-string",   test_plugin_feature_to_string,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/plugin-feature-from-string", test_plugin_feature_from_string, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/codec-feature-to-string",   test_codec_feature_to_string,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/codec-feature-from-string", test_codec_feature_from_string, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };

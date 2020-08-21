@@ -23,26 +23,26 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_PLUGIN_INFO_NODE_H
-#define SAIL_PLUGIN_INFO_NODE_H
+#ifndef SAIL_CODEC_INFO_NODE_H
+#define SAIL_CODEC_INFO_NODE_H
 
-struct sail_plugin_info;
-struct sail_plugin;
+struct sail_codec_info;
+struct sail_codec;
 
 /*
- * A structure representing a plugin information linked list.
+ * A structure representing a codec information linked list.
  */
-struct sail_plugin_info_node {
+struct sail_codec_info_node {
 
-    /* Plugin information. */
-    struct sail_plugin_info *plugin_info;
+    /* Codec information. */
+    struct sail_codec_info *codec_info;
 
-    /* Plugin instance. */
-    struct sail_plugin *plugin;
+    /* Codec instance. */
+    struct sail_codec *codec;
 
-    struct sail_plugin_info_node *next;
+    struct sail_codec_info_node *next;
 };
 
-typedef struct sail_plugin_info_node sail_plugin_info_node_t;
+typedef struct sail_codec_info_node sail_codec_info_node_t;
 
 #endif

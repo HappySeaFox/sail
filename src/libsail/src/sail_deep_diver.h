@@ -41,14 +41,14 @@ extern "C" {
 #endif
 
 struct sail_io;
-struct sail_plugin_info;
+struct sail_codec_info;
 struct sail_read_options;
 struct sail_write_options;
 
 /*
- * Starts reading the specified image file with the specified read options. Pass plugin info if you would like
+ * Starts reading the specified image file with the specified read options. Pass codec info if you would like
  * to start reading with a specific codec. If not, just pass NULL. If you do not need specific read options,
- * just pass NULL. Plugin-specific defaults will be used in this case.
+ * just pass NULL. Codec-specific defaults will be used in this case.
  *
  * The read options are deep copied.
  *
@@ -58,7 +58,7 @@ struct sail_write_options;
  *                sail_read_next_frame()                 ->
  *                sail_stop_reading().
  *
- * Or:            sail_plugin_info_from_extension()      ->
+ * Or:            sail_codec_info_from_extension()      ->
  *                sail_start_reading_file_with_options() ->
  *                sail_read_next_frame()                 ->
  *                sail_stop_reading().
@@ -69,18 +69,18 @@ struct sail_write_options;
  *
  * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_status_t sail_start_reading_file_with_options(const char *path, const struct sail_plugin_info *plugin_info,
+SAIL_EXPORT sail_status_t sail_start_reading_file_with_options(const char *path, const struct sail_codec_info *codec_info,
                                                               const struct sail_read_options *read_options, void **state);
 
 /*
  * Starts reading the specified memory buffer with the specified read options. If you do not need specific read options,
- * just pass NULL. Plugin-specific defaults will be used in this case.
+ * just pass NULL. Codec-specific defaults will be used in this case.
  *
  * The read options are deep copied.
  *
  * If read options is NULL, the subsequent calls to sail_read_next_frame() output pixels in the BPP32-RGBA pixel format.
  *
- * Typical usage: sail_plugin_info_from_extension()     ->
+ * Typical usage: sail_codec_info_from_extension()     ->
  *                sail_start_reading_mem_with_options() ->
  *                sail_read_next_frame()                ->
  *                sail_stop_reading().
@@ -92,13 +92,13 @@ SAIL_EXPORT sail_status_t sail_start_reading_file_with_options(const char *path,
  * Returns 0 on success or sail_status_t on error.
  */
 SAIL_EXPORT sail_status_t sail_start_reading_mem_with_options(const void *buffer, size_t buffer_length,
-                                                             const struct sail_plugin_info *plugin_info,
+                                                             const struct sail_codec_info *codec_info,
                                                              const struct sail_read_options *read_options, void **state);
 
 /*
- * Starts writing the specified image file with the specified write options. Pass plugin info if you would like
+ * Starts writing the specified image file with the specified write options. Pass codec info if you would like
  * to start writing with a specific codec. If not, just pass NULL. If you do not need specific write options,
- * just pass NULL. Plugin-specific defaults will be used in this case.
+ * just pass NULL. Codec-specific defaults will be used in this case.
  *
  * The write options are deep copied.
  *
@@ -109,7 +109,7 @@ SAIL_EXPORT sail_status_t sail_start_reading_mem_with_options(const void *buffer
  *                sail_write_next_frame()                ->
  *                sail_stop_writing().
  *
- * Or:            sail_plugin_info_from_extension()      ->
+ * Or:            sail_codec_info_from_extension()      ->
  *                sail_start_writing_file_with_options() ->
  *                sail_write_next_frame()                ->
  *                sail_stop_writing().
@@ -121,19 +121,19 @@ SAIL_EXPORT sail_status_t sail_start_reading_mem_with_options(const void *buffer
  * Returns 0 on success or sail_status_t on error.
  */
 SAIL_EXPORT sail_status_t sail_start_writing_file_with_options(const char *path,
-                                                              const struct sail_plugin_info *plugin_info,
+                                                              const struct sail_codec_info *codec_info,
                                                               const struct sail_write_options *write_options, void **state);
 
 /*
  * Starts writing the specified memory buffer with the specified write options. If you do not need specific
- * write options, just pass NULL. Plugin-specific defaults will be used in this case.
+ * write options, just pass NULL. Codec-specific defaults will be used in this case.
  *
  * The write options are deep copied.
  *
  * If write options is NULL, the subsequent calls to sail_write_next_frame() output pixels in pixel format
  * as specified in sail_write_features.default_output_pixel_format.
  *
- * Typical usage: sail_plugin_info_from_extension()     ->
+ * Typical usage: sail_codec_info_from_extension()     ->
  *                sail_start_writing_mem_with_options() ->
  *                sail_write_next_frame()               ->
  *                sail_stop_writing().
@@ -145,7 +145,7 @@ SAIL_EXPORT sail_status_t sail_start_writing_file_with_options(const char *path,
  * Returns 0 on success or sail_status_t on error.
  */
 SAIL_EXPORT sail_status_t sail_start_writing_mem_with_options(void *buffer, size_t buffer_length,
-                                                             const struct sail_plugin_info *plugin_info,
+                                                             const struct sail_codec_info *codec_info,
                                                              const struct sail_write_options *write_options, void **state);
 
 

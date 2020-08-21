@@ -39,9 +39,9 @@
 
 struct sail_context;
 struct sail_io;
-struct sail_plugin_info;
-struct sail_plugin_info_node;
-struct sail_plugin;
+struct sail_codec_info;
+struct sail_codec_info_node;
+struct sail_codec;
 struct sail_read_features;
 struct sail_write_features;
 
@@ -56,12 +56,12 @@ struct hidden_state {
      */
     struct sail_write_options *write_options;
 
-    /* Local state passed to plugin reading and writing functions. */
+    /* Local state passed to codec reading and writing functions. */
     void *state;
 
     /* Pointers to internal data structures so no need to free these. */
-    const struct sail_plugin_info *plugin_info;
-    const struct sail_plugin *plugin;
+    const struct sail_codec_info *codec_info;
+    const struct sail_codec *codec;
 };
 
 enum SailContextAction {
@@ -90,8 +90,8 @@ SAIL_HIDDEN sail_status_t current_tls_context(struct sail_context **context);
  */
 SAIL_HIDDEN sail_status_t current_tls_context_with_flags(struct sail_context **context, int flags);
 
-SAIL_HIDDEN sail_status_t load_plugin_by_plugin_info(const struct sail_plugin_info *plugin_info,
-                                                    const struct sail_plugin **plugin);
+SAIL_HIDDEN sail_status_t load_codec_by_codec_info(const struct sail_codec_info *codec_info,
+                                                    const struct sail_codec **codec);
 
 SAIL_HIDDEN void destroy_hidden_state(struct hidden_state *state);
 

@@ -48,7 +48,7 @@ class read_options;
  */
 class SAIL_EXPORT read_features
 {
-    friend class plugin_info;
+    friend class codec_info;
 
 public:
     read_features(const read_features &rf);

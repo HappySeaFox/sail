@@ -35,11 +35,11 @@
  */
 
 static sail_status_t check_io_arguments(struct sail_io *io,
-                                        const struct sail_plugin_info *plugin_info,
+                                        const struct sail_codec_info *codec_info,
                                         void **state) {
 
     SAIL_CHECK_IO_PTR(io);
-    SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
+    SAIL_CHECK_CODEC_INFO_PTR(codec_info);
     SAIL_CHECK_STATE_PTR(state);
 
     return SAIL_OK;
@@ -78,10 +78,10 @@ static sail_status_t allowed_write_compression(const struct sail_write_features 
  */
 
 sail_status_t start_reading_io_with_options(struct sail_io *io, bool own_io,
-                                           const struct sail_plugin_info *plugin_info,
+                                           const struct sail_codec_info *codec_info,
                                            const struct sail_read_options *read_options, void **state) {
 
-    SAIL_TRY_OR_CLEANUP(check_io_arguments(io, plugin_info, state),
+    SAIL_TRY_OR_CLEANUP(check_io_arguments(io, codec_info, state),
                         /* cleanup */ if (own_io) sail_destroy_io(io));
 
     *state = NULL;
@@ -91,7 +91,7 @@ sail_status_t start_reading_io_with_options(struct sail_io *io, bool own_io,
      * When read options is NULL, we use the default output pixel format which is always acceptable.
      */
     if (read_options != NULL) {
-        SAIL_TRY_OR_CLEANUP(allowed_read_output_pixel_format(plugin_info->read_features, read_options->output_pixel_format),
+        SAIL_TRY_OR_CLEANUP(allowed_read_output_pixel_format(codec_info->read_features, read_options->output_pixel_format),
                             /* cleanup */ if (own_io) sail_destroy_io(io));
     }
 
@@ -104,26 +104,26 @@ sail_status_t start_reading_io_with_options(struct sail_io *io, bool own_io,
     state_of_mind->own_io        = own_io;
     state_of_mind->write_options = NULL;
     state_of_mind->state         = NULL;
-    state_of_mind->plugin_info   = plugin_info;
-    state_of_mind->plugin        = NULL;
+    state_of_mind->codec_info   = codec_info;
+    state_of_mind->codec        = NULL;
 
-    SAIL_TRY_OR_CLEANUP(load_plugin_by_plugin_info(state_of_mind->plugin_info, &state_of_mind->plugin),
+    SAIL_TRY_OR_CLEANUP(load_codec_by_codec_info(state_of_mind->codec_info, &state_of_mind->codec),
                         /* cleanup */ destroy_hidden_state(state_of_mind));
 
     if (read_options == NULL) {
         struct sail_read_options *read_options_local = NULL;
 
-        SAIL_TRY_OR_CLEANUP(sail_alloc_read_options_from_features(state_of_mind->plugin_info->read_features, &read_options_local),
+        SAIL_TRY_OR_CLEANUP(sail_alloc_read_options_from_features(state_of_mind->codec_info->read_features, &read_options_local),
                             /* cleanup */ sail_destroy_read_options(read_options_local),
                                           destroy_hidden_state(state_of_mind));
-        SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v3->read_init(state_of_mind->io, read_options_local, &state_of_mind->state),
+        SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v3->read_init(state_of_mind->io, read_options_local, &state_of_mind->state),
                             /* cleanup */ sail_destroy_read_options(read_options_local),
-                                          state_of_mind->plugin->v3->read_finish(&state_of_mind->state, state_of_mind->io),
+                                          state_of_mind->codec->v3->read_finish(&state_of_mind->state, state_of_mind->io),
                                           destroy_hidden_state(state_of_mind));
         sail_destroy_read_options(read_options_local);
     } else {
-        SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v3->read_init(state_of_mind->io, read_options, &state_of_mind->state),
-                            /* cleanup */ state_of_mind->plugin->v3->read_finish(&state_of_mind->state, state_of_mind->io),
+        SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v3->read_init(state_of_mind->io, read_options, &state_of_mind->state),
+                            /* cleanup */ state_of_mind->codec->v3->read_finish(&state_of_mind->state, state_of_mind->io),
                                           destroy_hidden_state(state_of_mind));
     }
 
@@ -133,10 +133,10 @@ sail_status_t start_reading_io_with_options(struct sail_io *io, bool own_io,
 }
 
 sail_status_t start_writing_io_with_options(struct sail_io *io, bool own_io,
-                                           const struct sail_plugin_info *plugin_info,
+                                           const struct sail_codec_info *codec_info,
                                            const struct sail_write_options *write_options, void **state) {
 
-    SAIL_TRY_OR_CLEANUP(check_io_arguments(io, plugin_info, state),
+    SAIL_TRY_OR_CLEANUP(check_io_arguments(io, codec_info, state),
                         /* cleanup */ if (own_io) sail_destroy_io(io));
 
     *state = NULL;
@@ -146,7 +146,7 @@ sail_status_t start_writing_io_with_options(struct sail_io *io, bool own_io,
      * When write options is NULL, we use the default compression which is always acceptable.
      */
     if (write_options != NULL) {
-        SAIL_TRY_OR_CLEANUP(allowed_write_compression(plugin_info->write_features, write_options->compression),
+        SAIL_TRY_OR_CLEANUP(allowed_write_compression(codec_info->write_features, write_options->compression),
                             /* cleanup */ if (own_io) sail_destroy_io(io));
     }
 
@@ -159,22 +159,22 @@ sail_status_t start_writing_io_with_options(struct sail_io *io, bool own_io,
     state_of_mind->own_io        = own_io;
     state_of_mind->write_options = NULL;
     state_of_mind->state         = NULL;
-    state_of_mind->plugin_info   = plugin_info;
-    state_of_mind->plugin        = NULL;
+    state_of_mind->codec_info   = codec_info;
+    state_of_mind->codec        = NULL;
 
-    SAIL_TRY_OR_CLEANUP(load_plugin_by_plugin_info(state_of_mind->plugin_info, &state_of_mind->plugin),
+    SAIL_TRY_OR_CLEANUP(load_codec_by_codec_info(state_of_mind->codec_info, &state_of_mind->codec),
                         /* cleanup */ destroy_hidden_state(state_of_mind));
 
     if (write_options == NULL) {
-        SAIL_TRY_OR_CLEANUP(sail_alloc_write_options_from_features(state_of_mind->plugin_info->write_features, &state_of_mind->write_options),
+        SAIL_TRY_OR_CLEANUP(sail_alloc_write_options_from_features(state_of_mind->codec_info->write_features, &state_of_mind->write_options),
                             /* cleanup */ destroy_hidden_state(state_of_mind));
     } else {
         SAIL_TRY_OR_CLEANUP(sail_copy_write_options(write_options, &state_of_mind->write_options),
                             /* cleanup */ destroy_hidden_state(state_of_mind));
     }
 
-    SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v3->write_init(state_of_mind->io, state_of_mind->write_options, &state_of_mind->state),
-                        /* cleanup */ state_of_mind->plugin->v3->write_finish(&state_of_mind->state, state_of_mind->io),
+    SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v3->write_init(state_of_mind->io, state_of_mind->write_options, &state_of_mind->state),
+                        /* cleanup */ state_of_mind->codec->v3->write_finish(&state_of_mind->state, state_of_mind->io),
                                       destroy_hidden_state(state_of_mind));
 
     *state = state_of_mind;

@@ -47,74 +47,74 @@
  * Private functions.
  */
 
-static const char* plugins_path(void) {
+static const char* codecs_path(void) {
 
-    SAIL_THREAD_LOCAL static bool plugins_path_called = false;
+    SAIL_THREAD_LOCAL static bool codecs_path_called = false;
     SAIL_THREAD_LOCAL static const char *env = NULL;
 
-    if (plugins_path_called) {
+    if (codecs_path_called) {
         return env;
     }
 
-    plugins_path_called = true;
+    codecs_path_called = true;
 
 #ifdef SAIL_WIN32
-    _dupenv_s((char **)&env, NULL, "SAIL_PLUGINS_PATH");
+    _dupenv_s((char **)&env, NULL, "SAIL_CODECS_PATH");
 
-    /* Construct "\bin\..\lib\sail\plugins" from "\bin\sail.dll". */
+    /* Construct "\bin\..\lib\sail\codecs" from "\bin\sail.dll". */
     if (env == NULL) {
         char path[MAX_PATH];
         HMODULE thisModule;
 
         if (GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-                (LPCSTR)&plugins_path, &thisModule) == 0) {
-            SAIL_LOG_ERROR("GetModuleHandleEx() failed with an error code %d. Falling back to loading plugins from '%s'",
-                            GetLastError(), SAIL_PLUGINS_PATH);
-            env = SAIL_PLUGINS_PATH;
+                (LPCSTR)&codecs_path, &thisModule) == 0) {
+            SAIL_LOG_ERROR("GetModuleHandleEx() failed with an error code %d. Falling back to loading codecs from '%s'",
+                            GetLastError(), SAIL_CODECS_PATH);
+            env = SAIL_CODECS_PATH;
         } else if (GetModuleFileName(thisModule, path, sizeof(path)) == 0) {
-            SAIL_LOG_ERROR("GetModuleFileName() failed with an error code %d. Falling back to loading plugins from '%s'",
-                            GetLastError(), SAIL_PLUGINS_PATH);
-            env = SAIL_PLUGINS_PATH;
+            SAIL_LOG_ERROR("GetModuleFileName() failed with an error code %d. Falling back to loading codecs from '%s'",
+                            GetLastError(), SAIL_CODECS_PATH);
+            env = SAIL_CODECS_PATH;
         } else {
-            char *lib_sail_plugins_path;
+            char *lib_sail_codecs_path;
 
             /* "\bin\sail.dll" -> "\bin". */
             char *last_sep = strrchr(path, '\\');
 
             if (last_sep == NULL) {
-                SAIL_LOG_ERROR("Failed to find a path separator in '%s'. Falling back to loading plugins from '%s'",
-                                path, SAIL_PLUGINS_PATH);
-                env = SAIL_PLUGINS_PATH;
+                SAIL_LOG_ERROR("Failed to find a path separator in '%s'. Falling back to loading codecs from '%s'",
+                                path, SAIL_CODECS_PATH);
+                env = SAIL_CODECS_PATH;
             } else {
                 *last_sep = '\0';
 
-                /* "\bin" -> "\bin\..\lib\sail\plugins". */
-                SAIL_TRY_OR_EXECUTE(sail_concat(&lib_sail_plugins_path, 2, path, "\\..\\lib\\sail\\plugins"),
-                                    /* on error */ SAIL_LOG_ERROR("Failed to concat strings. Falling back to loading plugins from '%s'",
-                                                                    SAIL_PLUGINS_PATH),
-                                    env = SAIL_PLUGINS_PATH);
-                env = lib_sail_plugins_path;
-                SAIL_LOG_DEBUG("Optional SAIL_PLUGINS_PATH environment variable is not set");
+                /* "\bin" -> "\bin\..\lib\sail\codecs". */
+                SAIL_TRY_OR_EXECUTE(sail_concat(&lib_sail_codecs_path, 2, path, "\\..\\lib\\sail\\codecs"),
+                                    /* on error */ SAIL_LOG_ERROR("Failed to concat strings. Falling back to loading codecs from '%s'",
+                                                                    SAIL_CODECS_PATH),
+                                    env = SAIL_CODECS_PATH);
+                env = lib_sail_codecs_path;
+                SAIL_LOG_DEBUG("Optional SAIL_CODECS_PATH environment variable is not set");
             }
         }
     } else {
-        SAIL_LOG_DEBUG("SAIL_PLUGINS_PATH environment variable is set. Loading plugins from '%s'", env);
+        SAIL_LOG_DEBUG("SAIL_CODECS_PATH environment variable is set. Loading codecs from '%s'", env);
     }
 #else
-    env = getenv("SAIL_PLUGINS_PATH");
+    env = getenv("SAIL_CODECS_PATH");
 
     if (env == NULL) {
-        SAIL_LOG_DEBUG("SAIL_PLUGINS_PATH environment variable is not set. Loading plugins from '%s'", SAIL_PLUGINS_PATH);
-        env = SAIL_PLUGINS_PATH;
+        SAIL_LOG_DEBUG("SAIL_CODECS_PATH environment variable is not set. Loading codecs from '%s'", SAIL_CODECS_PATH);
+        env = SAIL_CODECS_PATH;
     } else {
-        SAIL_LOG_DEBUG("SAIL_PLUGINS_PATH environment variable is set. Loading plugins from '%s'", env);
+        SAIL_LOG_DEBUG("SAIL_CODECS_PATH environment variable is set. Loading codecs from '%s'", env);
     }
 #endif
 
     return env;
 }
 
-/* Add "sail/plugins/lib" to the DLL/SO search path. */
+/* Add "sail/codecs/lib" to the DLL/SO search path. */
 static sail_status_t update_lib_path(void) {
 
     SAIL_THREAD_LOCAL static bool update_lib_path_called = false;
@@ -125,8 +125,8 @@ static sail_status_t update_lib_path(void) {
 
     update_lib_path_called = true;
 
-    /* Build a full path to the SAIL plugins path + "/lib". */
-    const char *plugs_path = plugins_path();
+    /* Build a full path to the SAIL codecs path + "/lib". */
+    const char *plugs_path = codecs_path();
 
 #ifdef SAIL_WIN32
     char *full_path_to_lib;
@@ -189,33 +189,33 @@ static sail_status_t update_lib_path(void) {
     return SAIL_OK;
 }
 
-static sail_status_t build_full_path(const char *sail_plugins_path, const char *name, char **full_path) {
+static sail_status_t build_full_path(const char *sail_codecs_path, const char *name, char **full_path) {
 
 #ifdef SAIL_WIN32
-    SAIL_TRY(sail_concat(full_path, 3, sail_plugins_path, "\\", name));
+    SAIL_TRY(sail_concat(full_path, 3, sail_codecs_path, "\\", name));
 #else
-    SAIL_TRY(sail_concat(full_path, 3, sail_plugins_path, "/", name));
+    SAIL_TRY(sail_concat(full_path, 3, sail_codecs_path, "/", name));
 #endif
 
     return SAIL_OK;
 }
 
-static sail_status_t build_plugin_from_plugin_info(const char *plugin_info_full_path,
-                                                    struct sail_plugin_info_node **plugin_info_node) {
+static sail_status_t build_codec_from_codec_info(const char *codec_info_full_path,
+                                                    struct sail_codec_info_node **codec_info_node) {
 
-    SAIL_CHECK_PATH_PTR(plugin_info_full_path);
-    SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info_node);
+    SAIL_CHECK_PATH_PTR(codec_info_full_path);
+    SAIL_CHECK_CODEC_INFO_PTR(codec_info_node);
 
-    /* Build "/path/jpeg.so" from "/path/jpeg.plugin.info". */
-    char *plugin_info_part = strstr(plugin_info_full_path, ".plugin.info");
+    /* Build "/path/jpeg.so" from "/path/jpeg.codec.info". */
+    char *codec_info_part = strstr(codec_info_full_path, ".codec.info");
 
-    if (plugin_info_part == NULL) {
+    if (codec_info_part == NULL) {
         return SAIL_ERROR_MEMORY_ALLOCATION;
     }
 
     /* The length of "/path/jpeg". */
-    size_t plugin_full_path_length = strlen(plugin_info_full_path) - strlen(plugin_info_part);
-    char *plugin_full_path;
+    size_t codec_full_path_length = strlen(codec_info_full_path) - strlen(codec_info_part);
+    char *codec_full_path;
 
 #ifdef SAIL_WIN32
     static const char * const LIB_SUFFIX = "dll";
@@ -224,44 +224,44 @@ static sail_status_t build_plugin_from_plugin_info(const char *plugin_info_full_
 #endif
 
     /* The resulting string will be "/path/jpeg.plu" (on Windows) or "/path/jpeg.pl". */
-    SAIL_TRY(sail_strdup_length(plugin_info_full_path,
-                                plugin_full_path_length + strlen(LIB_SUFFIX) + 1, &plugin_full_path));
+    SAIL_TRY(sail_strdup_length(codec_info_full_path,
+                                codec_full_path_length + strlen(LIB_SUFFIX) + 1, &codec_full_path));
 
 #ifdef SAIL_WIN32
     /* Overwrite the end of the path with "dll". */
-    strcpy_s(plugin_full_path + plugin_full_path_length + 1, strlen(LIB_SUFFIX) + 1, LIB_SUFFIX);
+    strcpy_s(codec_full_path + codec_full_path_length + 1, strlen(LIB_SUFFIX) + 1, LIB_SUFFIX);
 #else
     /* Overwrite the end of the path with "so". */
-    strcpy(plugin_full_path + plugin_full_path_length + 1, LIB_SUFFIX);
+    strcpy(codec_full_path + codec_full_path_length + 1, LIB_SUFFIX);
 #endif
 
-    /* Parse plugin info. */
-    SAIL_TRY_OR_CLEANUP(alloc_plugin_info_node(plugin_info_node),
-                        sail_free(plugin_full_path));
+    /* Parse codec info. */
+    SAIL_TRY_OR_CLEANUP(alloc_codec_info_node(codec_info_node),
+                        sail_free(codec_full_path));
 
-    struct sail_plugin_info *plugin_info;
-    SAIL_TRY_OR_CLEANUP(plugin_read_info(plugin_info_full_path, &plugin_info),
-                        destroy_plugin_info_node(*plugin_info_node),
-                        sail_free(plugin_full_path));
+    struct sail_codec_info *codec_info;
+    SAIL_TRY_OR_CLEANUP(codec_read_info(codec_info_full_path, &codec_info),
+                        destroy_codec_info_node(*codec_info_node),
+                        sail_free(codec_full_path));
 
-    /* Save the parsed plugin info into the SAIL context. */
-    (*plugin_info_node)->plugin_info = plugin_info;
-    plugin_info->path = plugin_full_path;
+    /* Save the parsed codec info into the SAIL context. */
+    (*codec_info_node)->codec_info = codec_info;
+    codec_info->path = codec_full_path;
 
     return SAIL_OK;
 }
 
-static sail_status_t load_plugin(struct sail_plugin_info_node *node) {
+static sail_status_t load_codec(struct sail_codec_info_node *node) {
 
     SAIL_CHECK_PTR(node);
 
     /* Already loaded. */
-    if (node->plugin != NULL) {
+    if (node->codec != NULL) {
         return SAIL_OK;
     }
 
-    /* Plugin is not loaded. Let's load it. */
-    SAIL_TRY(alloc_and_load_plugin(node->plugin_info, &node->plugin));
+    /* Codec is not loaded. Let's load it. */
+    SAIL_TRY(alloc_and_load_codec(node->codec_info, &node->codec));
 
     return SAIL_OK;
 }
@@ -276,7 +276,7 @@ static sail_status_t alloc_context(struct sail_context **context) {
     *context = ptr;
 
     (*context)->initialized      = false;
-    (*context)->plugin_info_node = NULL;
+    (*context)->codec_info_node = NULL;
 
     return SAIL_OK;
 }
@@ -287,13 +287,13 @@ static sail_status_t destroy_context(struct sail_context *context) {
         return SAIL_OK;
     }
 
-    destroy_plugin_info_node_chain(context->plugin_info_node);
+    destroy_codec_info_node_chain(context->codec_info_node);
     sail_free(context);
 
     return SAIL_OK;
 }
 
-/* Initializes the context and loads all the plugin info files if the context is not initialized. */
+/* Initializes the context and loads all the codec info files if the context is not initialized. */
 static sail_status_t init_context(struct sail_context *context, int flags) {
 
     SAIL_CHECK_CONTEXT_PTR(context);
@@ -311,16 +311,16 @@ static sail_status_t init_context(struct sail_context *context, int flags) {
 
     SAIL_TRY(update_lib_path());
 
-    const char *plugs_path = plugins_path();
+    const char *plugs_path = codecs_path();
 
-    SAIL_LOG_DEBUG("Loading plugins from '%s'", plugs_path);
+    SAIL_LOG_DEBUG("Loading codecs from '%s'", plugs_path);
 
-    /* Used to load and store plugin info objects. */
-    struct sail_plugin_info_node **last_plugin_info_node = &context->plugin_info_node;
-    struct sail_plugin_info_node *plugin_info_node;
+    /* Used to load and store codec info objects. */
+    struct sail_codec_info_node **last_codec_info_node = &context->codec_info_node;
+    struct sail_codec_info_node *codec_info_node;
 
 #ifdef SAIL_WIN32
-    const char *plugs_info_mask = "\\*.plugin.info";
+    const char *plugs_info_mask = "\\*.codec.info";
 
     size_t plugs_path_with_mask_length = strlen(plugs_path) + strlen(plugs_info_mask) + 1;
 
@@ -347,18 +347,18 @@ static sail_status_t init_context(struct sail_context *context, int flags) {
         SAIL_TRY_OR_EXECUTE(build_full_path(plugs_path, data.cFileName, &full_path),
                             /* on error */ continue);
 
-        SAIL_LOG_DEBUG("Found plugin info '%s'", data.cFileName);
+        SAIL_LOG_DEBUG("Found codec info '%s'", data.cFileName);
 
-        if (build_plugin_from_plugin_info(full_path, &plugin_info_node) == SAIL_OK) {
-            *last_plugin_info_node = plugin_info_node;
-            last_plugin_info_node = &plugin_info_node->next;
+        if (build_codec_from_codec_info(full_path, &codec_info_node) == SAIL_OK) {
+            *last_codec_info_node = codec_info_node;
+            last_codec_info_node = &codec_info_node->next;
         }
 
         sail_free(full_path);
     } while (FindNextFile(hFind, &data));
 
     if (GetLastError() != ERROR_NO_MORE_FILES) {
-        SAIL_LOG_ERROR("Failed to list files in '%s'. Error: %d. Some plugins may be ignored", plugs_path, GetLastError());
+        SAIL_LOG_ERROR("Failed to list files in '%s'. Error: %d. Some codecs may be ignored", plugs_path, GetLastError());
     }
 
     sail_free(plugs_path_with_mask);
@@ -383,14 +383,14 @@ static sail_status_t init_context(struct sail_context *context, int flags) {
 
         /* Handle files only. */
         if (sail_is_file(full_path)) {
-            bool is_plugin_info = strstr(full_path, ".plugin.info") != NULL;
+            bool is_codec_info = strstr(full_path, ".codec.info") != NULL;
 
-            if (is_plugin_info) {
-                SAIL_LOG_DEBUG("Found plugin info '%s'", dir->d_name);
+            if (is_codec_info) {
+                SAIL_LOG_DEBUG("Found codec info '%s'", dir->d_name);
 
-                if (build_plugin_from_plugin_info(full_path, &plugin_info_node) == SAIL_OK) {
-                    *last_plugin_info_node = plugin_info_node;
-                    last_plugin_info_node = &plugin_info_node->next;
+                if (build_codec_from_codec_info(full_path, &codec_info_node) == SAIL_OK) {
+                    *last_codec_info_node = codec_info_node;
+                    last_codec_info_node = &codec_info_node->next;
                 }
             }
         }
@@ -401,29 +401,29 @@ static sail_status_t init_context(struct sail_context *context, int flags) {
     closedir(d);
 #endif
 
-    if (flags & SAIL_FLAG_PRELOAD_PLUGINS) {
-        SAIL_LOG_DEBUG("Preloading plugins");
+    if (flags & SAIL_FLAG_PRELOAD_CODECS) {
+        SAIL_LOG_DEBUG("Preloading codecs");
 
-        plugin_info_node = context->plugin_info_node;
+        codec_info_node = context->codec_info_node;
 
-        while (plugin_info_node != NULL) {
-            const struct sail_plugin *plugin;
+        while (codec_info_node != NULL) {
+            const struct sail_codec *codec;
 
             /* Ignore loading errors on purpose. */
-            load_plugin_by_plugin_info(plugin_info_node->plugin_info, &plugin);
+            load_codec_by_codec_info(codec_info_node->codec_info, &codec);
 
-            plugin_info_node = plugin_info_node->next;
+            codec_info_node = codec_info_node->next;
         }
     }
 
-    SAIL_LOG_DEBUG("Enumerated plugins:");
+    SAIL_LOG_DEBUG("Enumerated codecs:");
 
-    /* Print the found plugin infos. */
-    struct sail_plugin_info_node *node = context->plugin_info_node;
+    /* Print the found codec infos. */
+    struct sail_codec_info_node *node = context->codec_info_node;
     int counter = 1;
 
     while (node != NULL) {
-        SAIL_LOG_DEBUG("%d. %s [%s] %s", counter++, node->plugin_info->name, node->plugin_info->description, node->plugin_info->version);
+        SAIL_LOG_DEBUG("%d. %s [%s] %s", counter++, node->codec_info->name, node->codec_info->description, node->codec_info->version);
         node = node->next;
     }
 
@@ -484,22 +484,22 @@ sail_status_t current_tls_context_with_flags(struct sail_context **context, int 
     return SAIL_OK;
 }
 
-sail_status_t load_plugin_by_plugin_info(const struct sail_plugin_info *plugin_info, const struct sail_plugin **plugin) {
+sail_status_t load_codec_by_codec_info(const struct sail_codec_info *codec_info, const struct sail_codec **codec) {
 
-    SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
-    SAIL_CHECK_PLUGIN_PTR(plugin);
+    SAIL_CHECK_CODEC_INFO_PTR(codec_info);
+    SAIL_CHECK_CODEC_PTR(codec);
 
     struct sail_context *context;
     SAIL_TRY(current_tls_context(&context));
 
-    /* Find the plugin in the cache. */
-    struct sail_plugin_info_node *node = context->plugin_info_node;
-    struct sail_plugin_info_node *found_node = NULL;
+    /* Find the codec in the cache. */
+    struct sail_codec_info_node *node = context->codec_info_node;
+    struct sail_codec_info_node *found_node = NULL;
 
     while (node != NULL) {
-        if (node->plugin_info == plugin_info) {
-            if (node->plugin != NULL) {
-                *plugin = node->plugin;
+        if (node->codec_info == codec_info) {
+            if (node->codec != NULL) {
+                *codec = node->codec;
                 return SAIL_OK;
             }
 
@@ -510,14 +510,14 @@ sail_status_t load_plugin_by_plugin_info(const struct sail_plugin_info *plugin_i
         node = node->next;
     }
 
-    /* Something weird. The pointer to the plugin info is not found the cache. */
+    /* Something weird. The pointer to the codec info is not found the cache. */
     if (found_node == NULL) {
-        return SAIL_ERROR_PLUGIN_NOT_FOUND;
+        return SAIL_ERROR_CODEC_NOT_FOUND;
     }
 
-    SAIL_TRY(load_plugin(found_node));
+    SAIL_TRY(load_codec(found_node));
 
-    *plugin = found_node->plugin;
+    *codec = found_node->codec;
 
     return SAIL_OK;
 }
@@ -534,7 +534,7 @@ void destroy_hidden_state(struct hidden_state *state) {
 
     sail_destroy_write_options(state->write_options);
 
-    /* This state must be freed and zeroed by plugins. We free it just in case to avoid memory leaks. */
+    /* This state must be freed and zeroed by codecs. We free it just in case to avoid memory leaks. */
     sail_free(state->state);
 
     sail_free(state);
@@ -554,12 +554,12 @@ sail_status_t stop_writing(void *state, size_t *written) {
     struct hidden_state *state_of_mind = (struct hidden_state *)state;
 
     /* Not an error. */
-    if (state_of_mind->plugin == NULL) {
+    if (state_of_mind->codec == NULL) {
         destroy_hidden_state(state_of_mind);
         return SAIL_OK;
     }
 
-    SAIL_TRY_OR_CLEANUP(state_of_mind->plugin->v3->write_finish(&state_of_mind->state, state_of_mind->io),
+    SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v3->write_finish(&state_of_mind->state, state_of_mind->io),
                         /* cleanup */ destroy_hidden_state(state_of_mind));
 
     if (written != NULL) {
@@ -580,7 +580,7 @@ sail_status_t allowed_write_output_pixel_format(const struct sail_write_features
 
     SAIL_CHECK_WRITE_FEATURES_PTR(write_features);
 
-    /* Plugins will compute output pixel format automatically. */
+    /* Codecs will compute output pixel format automatically. */
     if (output_pixel_format == SAIL_PIXEL_FORMAT_AUTO) {
         return SAIL_OK;
     }

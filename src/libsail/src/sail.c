@@ -47,19 +47,19 @@ void sail_finish(void) {
     control_tls_context(/* context - not needed */ NULL, SAIL_CONTEXT_DESTROY);
 }
 
-const struct sail_plugin_info_node* sail_plugin_info_list(void) {
+const struct sail_codec_info_node* sail_codec_info_list(void) {
 
     struct sail_context *context;
     SAIL_TRY_OR_EXECUTE(current_tls_context(&context),
                         /* on error */ return NULL);
 
-    return context->plugin_info_node;
+    return context->codec_info_node;
 }
 
-sail_status_t sail_plugin_info_from_path(const char *path, const struct sail_plugin_info **plugin_info) {
+sail_status_t sail_codec_info_from_path(const char *path, const struct sail_codec_info **codec_info) {
 
     SAIL_CHECK_PATH_PTR(path);
-    SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
+    SAIL_CHECK_CODEC_INFO_PTR(codec_info);
 
     const char *dot = strrchr(path, '.');
 
@@ -67,22 +67,22 @@ sail_status_t sail_plugin_info_from_path(const char *path, const struct sail_plu
         return SAIL_ERROR_INVALID_ARGUMENT;
     }
 
-    SAIL_LOG_DEBUG("Finding plugin info for path '%s'", path);
+    SAIL_LOG_DEBUG("Finding codec info for path '%s'", path);
 
-    SAIL_TRY(sail_plugin_info_from_extension(dot+1, plugin_info));
+    SAIL_TRY(sail_codec_info_from_extension(dot+1, codec_info));
 
     return SAIL_OK;
 }
 
-sail_status_t sail_plugin_info_by_magic_number_from_path(const char *path, const struct sail_plugin_info **plugin_info) {
+sail_status_t sail_codec_info_by_magic_number_from_path(const char *path, const struct sail_codec_info **codec_info) {
 
     SAIL_CHECK_PATH_PTR(path);
-    SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
+    SAIL_CHECK_CODEC_INFO_PTR(codec_info);
 
     struct sail_io *io;
     SAIL_TRY(alloc_io_read_file(path, &io));
 
-    SAIL_TRY_OR_CLEANUP(sail_plugin_info_by_magic_number_from_io(io, plugin_info),
+    SAIL_TRY_OR_CLEANUP(sail_codec_info_by_magic_number_from_io(io, codec_info),
                         /* cleanup */ sail_destroy_io(io));
 
     sail_destroy_io(io);
@@ -90,15 +90,15 @@ sail_status_t sail_plugin_info_by_magic_number_from_path(const char *path, const
     return SAIL_OK;
 }
 
-sail_status_t sail_plugin_info_by_magic_number_from_mem(const void *buffer, size_t buffer_length, const struct sail_plugin_info **plugin_info) {
+sail_status_t sail_codec_info_by_magic_number_from_mem(const void *buffer, size_t buffer_length, const struct sail_codec_info **codec_info) {
 
     SAIL_CHECK_BUFFER_PTR(buffer);
-    SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
+    SAIL_CHECK_CODEC_INFO_PTR(codec_info);
 
     struct sail_io *io;
     SAIL_TRY(alloc_io_read_mem(buffer, buffer_length, &io));
 
-    SAIL_TRY_OR_CLEANUP(sail_plugin_info_by_magic_number_from_io(io, plugin_info),
+    SAIL_TRY_OR_CLEANUP(sail_codec_info_by_magic_number_from_io(io, codec_info),
                         /* cleanup */ sail_destroy_io(io));
 
     sail_destroy_io(io);
@@ -106,10 +106,10 @@ sail_status_t sail_plugin_info_by_magic_number_from_mem(const void *buffer, size
     return SAIL_OK;
 }
 
-sail_status_t sail_plugin_info_by_magic_number_from_io(struct sail_io *io, const struct sail_plugin_info **plugin_info) {
+sail_status_t sail_codec_info_by_magic_number_from_io(struct sail_io *io, const struct sail_codec_info **codec_info) {
 
     SAIL_CHECK_IO_PTR(io);
-    SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
+    SAIL_CHECK_CODEC_INFO_PTR(codec_info);
 
     struct sail_context *context;
     SAIL_TRY(current_tls_context(&context));
@@ -144,16 +144,16 @@ sail_status_t sail_plugin_info_by_magic_number_from_io(struct sail_io *io, const
 
     SAIL_LOG_DEBUG("Read magic number: '%s'", hex_numbers);
 
-    /* Find the plugin info. */
-    struct sail_plugin_info_node *node = context->plugin_info_node;
+    /* Find the codec info. */
+    struct sail_codec_info_node *node = context->codec_info_node;
 
     while (node != NULL) {
-        struct sail_string_node *string_node = node->plugin_info->magic_number_node;
+        struct sail_string_node *string_node = node->codec_info->magic_number_node;
 
         while (string_node != NULL) {
             if (strncmp(hex_numbers, string_node->value, strlen(string_node->value)) == 0) {
-                *plugin_info = node->plugin_info;
-                SAIL_LOG_DEBUG("Found plugin info: '%s'", (*plugin_info)->name);
+                *codec_info = node->codec_info;
+                SAIL_LOG_DEBUG("Found codec info: '%s'", (*codec_info)->name);
                 return SAIL_OK;
             }
 
@@ -163,15 +163,15 @@ sail_status_t sail_plugin_info_by_magic_number_from_io(struct sail_io *io, const
         node = node->next;
     }
 
-    return SAIL_ERROR_PLUGIN_NOT_FOUND;
+    return SAIL_ERROR_CODEC_NOT_FOUND;
 }
 
-sail_status_t sail_plugin_info_from_extension(const char *extension, const struct sail_plugin_info **plugin_info) {
+sail_status_t sail_codec_info_from_extension(const char *extension, const struct sail_codec_info **codec_info) {
 
     SAIL_CHECK_EXTENSION_PTR(extension);
-    SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
+    SAIL_CHECK_CODEC_INFO_PTR(codec_info);
 
-    SAIL_LOG_DEBUG("Finding plugin info for extension '%s'", extension);
+    SAIL_LOG_DEBUG("Finding codec info for extension '%s'", extension);
 
     struct sail_context *context;
     SAIL_TRY(current_tls_context(&context));
@@ -182,16 +182,16 @@ sail_status_t sail_plugin_info_from_extension(const char *extension, const struc
     /* Will compare in lower case. */
     sail_to_lower(extension_copy);
 
-    struct sail_plugin_info_node *node = context->plugin_info_node;
+    struct sail_codec_info_node *node = context->codec_info_node;
 
     while (node != NULL) {
-        struct sail_string_node *string_node = node->plugin_info->extension_node;
+        struct sail_string_node *string_node = node->codec_info->extension_node;
 
         while (string_node != NULL) {
             if (strcmp(string_node->value, extension_copy) == 0) {
                 sail_free(extension_copy);
-                *plugin_info = node->plugin_info;
-                SAIL_LOG_DEBUG("Found plugin info: '%s'", (*plugin_info)->name);
+                *codec_info = node->codec_info;
+                SAIL_LOG_DEBUG("Found codec info: '%s'", (*codec_info)->name);
                 return SAIL_OK;
             }
 
@@ -202,15 +202,15 @@ sail_status_t sail_plugin_info_from_extension(const char *extension, const struc
     }
 
     sail_free(extension_copy);
-    return SAIL_ERROR_PLUGIN_NOT_FOUND;
+    return SAIL_ERROR_CODEC_NOT_FOUND;
 }
 
-sail_status_t sail_plugin_info_from_mime_type(const char *mime_type, const struct sail_plugin_info **plugin_info) {
+sail_status_t sail_codec_info_from_mime_type(const char *mime_type, const struct sail_codec_info **codec_info) {
 
     SAIL_CHECK_PTR(mime_type);
-    SAIL_CHECK_PLUGIN_INFO_PTR(plugin_info);
+    SAIL_CHECK_CODEC_INFO_PTR(codec_info);
 
-    SAIL_LOG_DEBUG("Finding plugin info for mime type '%s'", mime_type);
+    SAIL_LOG_DEBUG("Finding codec info for mime type '%s'", mime_type);
 
     struct sail_context *context;
     SAIL_TRY(current_tls_context(&context));
@@ -221,16 +221,16 @@ sail_status_t sail_plugin_info_from_mime_type(const char *mime_type, const struc
     /* Will compare in lower case. */
     sail_to_lower(mime_type_copy);
 
-    struct sail_plugin_info_node *node = context->plugin_info_node;
+    struct sail_codec_info_node *node = context->codec_info_node;
 
     while (node != NULL) {
-        struct sail_string_node *string_node = node->plugin_info->mime_type_node;
+        struct sail_string_node *string_node = node->codec_info->mime_type_node;
 
         while (string_node != NULL) {
             if (strcmp(string_node->value, mime_type_copy) == 0) {
                 sail_free(mime_type_copy);
-                *plugin_info = node->plugin_info;
-                SAIL_LOG_DEBUG("Found plugin info: '%s'", (*plugin_info)->name);
+                *codec_info = node->codec_info;
+                SAIL_LOG_DEBUG("Found codec info: '%s'", (*codec_info)->name);
                 return SAIL_OK;
             }
 
@@ -241,31 +241,31 @@ sail_status_t sail_plugin_info_from_mime_type(const char *mime_type, const struc
     }
 
     sail_free(mime_type_copy);
-    return SAIL_ERROR_PLUGIN_NOT_FOUND;
+    return SAIL_ERROR_CODEC_NOT_FOUND;
 }
 
-sail_status_t sail_unload_plugins(void) {
+sail_status_t sail_unload_codecs(void) {
 
-    SAIL_LOG_DEBUG("Unloading cached plugins");
+    SAIL_LOG_DEBUG("Unloading cached codecs");
 
     struct sail_context *context;
     SAIL_TRY(current_tls_context(&context));
 
-    struct sail_plugin_info_node *node = context->plugin_info_node;
+    struct sail_codec_info_node *node = context->codec_info_node;
     int counter = 0;
 
     while (node != NULL) {
-        if (node->plugin != NULL) {
-            destroy_plugin(node->plugin);
+        if (node->codec != NULL) {
+            destroy_codec(node->codec);
             counter++;
         }
 
-        node->plugin = NULL;
+        node->codec = NULL;
 
         node = node->next;
     }
 
-    SAIL_LOG_DEBUG("Unloaded plugins: %d", counter);
+    SAIL_LOG_DEBUG("Unloaded codecs: %d", counter);
 
     return SAIL_OK;
 }

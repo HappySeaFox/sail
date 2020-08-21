@@ -23,38 +23,38 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_PLUGIN_INFO_H
-#define SAIL_PLUGIN_INFO_H
+#ifndef SAIL_CODEC_INFO_H
+#define SAIL_CODEC_INFO_H
 
 struct sail_string_node;
 
 struct sail_read_features;
 struct sail_write_features;
 
-struct sail_plugin;
+struct sail_codec;
 
 /*
- * A structure representing plugin information.
+ * A structure representing codec information.
  */
-struct sail_plugin_info {
+struct sail_codec_info {
 
-    /* Full path to the plugin. */
+    /* Full path to the codec. */
     char *path;
 
     /*
-     * The plugin loader will use the plugin's layout version to correctly handle the plugin.
-     * Unsupported plugin layout versions will be reported. This field must be the very first key
-     * in a plugin information file.
+     * The codec loader will use the codec's layout version to correctly handle the codec.
+     * Unsupported codec layout versions will be reported. This field must be the very first key
+     * in a codec information file.
      */
     int layout;
 
-    /* Plugin version. For example: "1.5.2". */
+    /* Codec version. For example: "1.5.2". */
     char *version;
 
-    /* Short plugin name in upper case. For example: "JPEG". */
+    /* Short codec name in upper case. For example: "JPEG". */
     char *name;
 
-    /* Plugin description. For example: "Joint Photographic Experts Group". */
+    /* Codec description. For example: "Joint Photographic Experts Group". */
     char *description;
 
     /*
@@ -69,13 +69,13 @@ struct sail_plugin_info {
     /* A linked list of supported mime types. For example: "image/jpeg". */
     struct sail_string_node *mime_type_node;
 
-    /* Read features of the plugin. */
+    /* Read features of the codec. */
     struct sail_read_features *read_features;
 
-    /* Write features of the plugin. */
+    /* Write features of the codec. */
     struct sail_write_features *write_features;
 };
 
-typedef struct sail_plugin_info sail_plugin_info_t;
+typedef struct sail_codec_info sail_codec_info_t;
 
 #endif

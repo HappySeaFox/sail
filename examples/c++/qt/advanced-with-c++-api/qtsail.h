@@ -43,7 +43,7 @@ class QTimer;
 
 namespace sail
 {
-class plugin_info;
+class codec_info;
 }
 
 class QtSail : public QWidget
@@ -58,7 +58,7 @@ private:
     sail_status_t init();
     sail_status_t loadImage(const QString &path, QVector<QImage> *qimages, QVector<int> *delays);
     sail_status_t saveImage(const QString &path, const QImage &qimage);
-    sail_status_t pluginInfo(const sail::plugin_info &plugin_info) const;
+    sail_status_t codecInfo(const sail::codec_info &codec_info) const;
     QStringList filters() const;
     void detectAnimated();
 

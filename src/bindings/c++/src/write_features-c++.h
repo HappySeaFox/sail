@@ -49,7 +49,7 @@ class write_options;
  */
 class SAIL_EXPORT write_features
 {
-    friend class plugin_info;
+    friend class codec_info;
 
 public:
     write_features(const write_features &wf);

@@ -1,6 +1,6 @@
-# TIFF plugin information
+# TIFF codec information
 #
-[plugin]
+[codec]
 layout=3
 version=1.0.1
 name=TIFF
@@ -18,7 +18,7 @@ default-output-pixel-format=@SAIL_DEFAULT_READ_OUTPUT_PIXEL_FORMAT@
 features=STATIC;MULTI-FRAME;META-INFO;ICCP
 properties=
 interlaced-passes=1
-compression-types=ADOBE-DEFLATE;DEFLATE;JPEG;LZW;NONE;PACKBITS;PIXAR-LOG;@PLUGIN_INFO_COMPRESSIONS_41@
+compression-types=ADOBE-DEFLATE;DEFLATE;JPEG;LZW;NONE;PACKBITS;PIXAR-LOG;@CODEC_INFO_COMPRESSIONS_41@
 default-compression=JPEG
 compression-level-min=0
 compression-level-max=0

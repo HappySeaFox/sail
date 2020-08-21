@@ -40,14 +40,14 @@ static sail_status_t probe(const char *path) {
     uint64_t start_time = sail_now();
 
     struct sail_image *image;
-    const struct sail_plugin_info *plugin_info;
+    const struct sail_codec_info *codec_info;
 
-    SAIL_TRY(sail_probe_file(path, &image, &plugin_info));
+    SAIL_TRY(sail_probe_file(path, &image, &codec_info));
 
     printf("File          : %s\n", path);
     printf("Probe time    : %lu ms.\n", (unsigned long)(sail_now() - start_time));
-    printf("Codec         : %s [%s]\n", plugin_info->name, plugin_info->description);
-    printf("Codec version : %s\n", plugin_info->version);
+    printf("Codec         : %s [%s]\n", codec_info->name, codec_info->description);
+    printf("Codec version : %s\n", codec_info->version);
     printf("Size          : %ux%u\n", image->width, image->height);
     const char *pixel_format_str;
     SAIL_TRY(sail_pixel_format_to_string(image->source_image->pixel_format, &pixel_format_str));

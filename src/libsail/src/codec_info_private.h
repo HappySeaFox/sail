@@ -23,8 +23,8 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_PLUGIN_INFO_PRIVATE_H
-#define SAIL_PLUGIN_INFO_PRIVATE_H
+#ifndef SAIL_CODEC_INFO_PRIVATE_H
+#define SAIL_CODEC_INFO_PRIVATE_H
 
 #ifdef SAIL_BUILD
     #include "error.h"
@@ -34,38 +34,38 @@
     #include <sail-common/export.h>
 #endif
 
-struct sail_plugin_info_node;
-struct sail_plugin_info;
+struct sail_codec_info_node;
+struct sail_codec_info;
 
 /*
- * Private plugin info functions.
+ * Private codec info functions.
  */
 
 /*
- * Allocates a new plugin info node. The assigned node MUST be destroyed later
- * with destroy_plugin_info_node().
+ * Allocates a new codec info node. The assigned node MUST be destroyed later
+ * with destroy_codec_info_node().
  *
  * Returns 0 on success or sail_status_t on error.
  */
-SAIL_HIDDEN sail_status_t alloc_plugin_info_node(struct sail_plugin_info_node **plugin_info_node);
+SAIL_HIDDEN sail_status_t alloc_codec_info_node(struct sail_codec_info_node **codec_info_node);
 
 /*
- * Destroys the specified plugin info node and all its internal allocated memory buffers.
+ * Destroys the specified codec info node and all its internal allocated memory buffers.
  */
-SAIL_HIDDEN void destroy_plugin_info_node(struct sail_plugin_info_node *plugin_info_node);
+SAIL_HIDDEN void destroy_codec_info_node(struct sail_codec_info_node *codec_info_node);
 
 /*
- * Destroys the specified plugin info node and all its internal allocated memory buffers.
+ * Destroys the specified codec info node and all its internal allocated memory buffers.
  * Repeats the destruction procedure recursively for the next stored pointer.
  */
-SAIL_HIDDEN void destroy_plugin_info_node_chain(struct sail_plugin_info_node *plugin_info_node);
+SAIL_HIDDEN void destroy_codec_info_node_chain(struct sail_codec_info_node *codec_info_node);
 
 /*
- * Reads SAIL plugin info from the specified file and stores the parsed information into the specified
- * plugin info object. The assigned plugin info MUST be destroyed later with destroy_plugin_info().
+ * Reads SAIL codec info from the specified file and stores the parsed information into the specified
+ * codec info object. The assigned codec info MUST be destroyed later with destroy_codec_info().
  *
  * Returns 0 on success or sail_status_t on error.
  */
-SAIL_HIDDEN sail_status_t plugin_read_info(const char *path, struct sail_plugin_info **plugin_info);
+SAIL_HIDDEN sail_status_t codec_read_info(const char *path, struct sail_codec_info **codec_info);
 
 #endif

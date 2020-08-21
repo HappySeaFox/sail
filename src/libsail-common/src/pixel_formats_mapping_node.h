@@ -43,7 +43,7 @@ extern "C" {
  * and which pixel formats are allowed to be written from them.
  *
  * It's not just a flat list as not every input pixel format maps to every output pixel format.
- * For example, the JPEG plugin cannot accept YCBCR pixels and output CMYK pixels from them.
+ * For example, the JPEG codec cannot accept YCBCR pixels and output CMYK pixels from them.
  *
  * That's why we need a more complex structure.
  */
@@ -63,7 +63,7 @@ struct sail_pixel_formats_mapping_node {
      * It is a caller's responsibility to convert it to a suitable pixel format in this case. Refer to
      * sail_image.pixel_format to detect the actual pixel format of the pixels.
      *
-     * Outputting SOURCE pixels is always supported. Some plugins may provide even more
+     * Outputting SOURCE pixels is always supported. Some codecs may provide even more
      * pixel formats to output.
      *
      * For example: SOURCE, BPP32-RGBA.

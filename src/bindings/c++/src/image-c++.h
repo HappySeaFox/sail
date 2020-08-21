@@ -51,7 +51,7 @@ struct sail_image;
 namespace sail
 {
 
-class plugin_info;
+class codec_info;
 
 /*
  * Image representation with direct access to the pixel data.
@@ -102,9 +102,9 @@ public:
      * Returns image pixel format. See SailPixelFormat.
      *
      * READ:  Set by SAIL to a valid output image pixel format. The list of supported output pixel formats
-     *        by a certain plugin can be obtained from read_features.input_pixel_formats.
+     *        by a certain codec can be obtained from read_features.input_pixel_formats.
      * WRITE: Must be set by a caller to a valid input image pixel format. Pixels in this format will be supplied
-     *        to the plugin by a caller later. The list of supported input pixel formats by a certain plugin
+     *        to the codec by a caller later. The list of supported input pixel formats by a certain codec
      *        can be obtained from write_features.output_pixel_formats.
      */
     SailPixelFormat pixel_format() const;

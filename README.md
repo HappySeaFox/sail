@@ -25,11 +25,11 @@ Author: Dmitry Baryshev
 - Writing images to file, memory, and custom I/O streams
 - Detecting image types by file path, file extension, and [magic numbers](https://en.wikipedia.org/wiki/File_format#Magic_number)
 - Reading operations output `BPP32-RGBA` pixels by default
-- Most image format plugins are able to output the `SOURCE` pixel format for those who want
+- Most image format codecs are able to output the `SOURCE` pixel format for those who want
   to kick the hell out of images manually. For example, one may want to work with `CMYK` pixels in a print image
 - Read and write ICC profiles
 - Read and write meta information like JPEG comments
-- Image formats are supported through dynamically loaded SAIL plugins (codecs)
+- Image formats are supported through dynamically loaded SAIL codecs
 - Qt, SDL, and pure C examples
 - The best MIME icons in the computer industry
 
@@ -77,7 +77,7 @@ Currently, SAIL supports the following platforms:
 - Reading and writing images in multiple pixel formats, not only RGB and friends
 - Access to the image properties w/o decoding the whole pixel data (probing)
 - Access to the source image properties (source pixel format etc.)
-- Image formats are supported through dynamically loaded plugins (codecs) which means you can add or remove codecs
+- Image formats are supported through dynamically loaded codecs which means you can add or remove codecs
   without re-compiling the whole library
 - Image codecs can be implemented in any programming language
 
@@ -142,7 +142,7 @@ It's pretty easy, isn't it? :smile: See [EXAMPLES](EXAMPLES.md) for more.
 
 See [EXAMPLES](EXAMPLES.md) for more.
 
-### 3. `Deep diver`: I want to load this damn animated GIF from a file or memory and have control over selected plugins and output pixel formats
+### 3. `Deep diver`: I want to load this damn animated GIF from a file or memory and have control over selected codecs and output pixel formats
 
 See [EXAMPLES](EXAMPLES.md) for more.
 
@@ -155,22 +155,22 @@ See [EXAMPLES](EXAMPLES.md) for more.
 SAIL is written in pure C11 w/o using any third-party libraries (except for codecs). It also provides
 bindings to C++.
 
-### SAIL plugins
+### SAIL codecs
 
-SAIL plugins is the deepest level. This is a set of standalone, dynamically loaded codecs (SO on Linux
+SAIL codecs is the deepest level. This is a set of standalone, dynamically loaded codecs (SO on Linux
 and DLL on Windows). They implement actual decoding and encoding capabilities. End-users never work with
-plugins directly. They always use abstract, high-level APIs for that.
+codecs directly. They always use abstract, high-level APIs for that.
 
-Every plugin is accompanied with a so called plugin info (description) file which is just a plain text file.
-It describes what the plugin can actually do: what pixel formats it can read and output, what compression types
+Every codec is accompanied with a so called codec info (description) file which is just a plain text file.
+It describes what the codec can actually do: what pixel formats it can read and output, what compression types
 does it support, specifies a preferred output pixel format, and more.
 
-By default, SAIL loads plugins on demand. To preload them, use `sail_init_with_flags(SAIL_FLAG_PRELOAD_PLUGINS)`.
+By default, SAIL loads codecs on demand. To preload them, use `sail_init_with_flags(SAIL_FLAG_PRELOAD_CODECS)`.
 
 ### libsail-common
 
 libsail-common holds common data types (images, pixel formats, I/O abstractions etc.) and a small set
-of functions shared between SAIL plugins and the high-level APIs.
+of functions shared between SAIL codecs and the high-level APIs.
 
 ### libsail
 
@@ -190,10 +190,10 @@ Consider [EXAMPLES](EXAMPLES.md) after building and installing.
 ### CMake options overview
 
 - `SAIL_DEV=ON|OFF` - Enable developer mode with pedantic warnings and possible `ASAN` enabled for examples. Default: `OFF`
-- `SAIL_ONLY_PLUGINS="a;b;c"` - Enable only the plugins specified in this ';'-separated list.
-  Plugins with missing dependencies will be disabled regardless this setting. Default: empty list
-- `SAIL_EXCEPT_PLUGINS="a;b;c"` - Enable all plugins except the plugins specified in this ';'-separated list.
-  Plugins with missing dependencies will be disabled regardless this setting. Default: empty list
+- `SAIL_ONLY_CODECS="a;b;c"` - Enable only the codecs specified in this ';'-separated list.
+  Codecs with missing dependencies will be disabled regardless this setting. Default: empty list
+- `SAIL_EXCEPT_CODECS="a;b;c"` - Enable all codecs except the codecs specified in this ';'-separated list.
+  Codecs with missing dependencies will be disabled regardless this setting. Default: empty list
 - `SAIL_READ_OUTPUT_BPP32_BGRA=ON|OFF` - Make the read operations output BPP32-BGRA pixels instead of BPP32-RGBA. Default: `OFF`
 - `SAIL_COLORED_OUTPUT=ON|OFF` - Enable colored console output on Windows >= 10 and Unix platforms. Default: `ON`
 

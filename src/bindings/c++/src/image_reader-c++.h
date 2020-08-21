@@ -42,7 +42,7 @@ namespace sail
 
 class image;
 class io;
-class plugin_info;
+class codec_info;
 class read_options;
 
 /*
@@ -57,18 +57,18 @@ public:
     /*
      * An interface to sail_probe_file(). See sail_probe_file() for more.
      */
-    sail_status_t probe(const std::string &path, image *simage, plugin_info *splugin_info = nullptr);
-    sail_status_t probe(const char *path, image *simage, plugin_info *splugin_info = nullptr);
+    sail_status_t probe(const std::string &path, image *simage, codec_info *scodec_info = nullptr);
+    sail_status_t probe(const char *path, image *simage, codec_info *scodec_info = nullptr);
 
     /*
      * An interface to sail_probe_mem(). See sail_probe_mem() for more.
      */
-    sail_status_t probe(const void *buffer, size_t buffer_length, image *simage, plugin_info *splugin_info = nullptr);
+    sail_status_t probe(const void *buffer, size_t buffer_length, image *simage, codec_info *scodec_info = nullptr);
 
     /*
      * An interface to sail_probe_io(). See sail_probe_io() for more.
      */
-    sail_status_t probe(const sail::io &io, image *simage, plugin_info *splugin_info = nullptr);
+    sail_status_t probe(const sail::io &io, image *simage, codec_info *scodec_info = nullptr);
 
     /*
      * An interface to sail_read_file(). See sail_read_file() for more.
@@ -90,8 +90,8 @@ public:
     /*
      * An interface to sail_start_reading_file(). See sail_start_reading_file() for more.
      */
-    sail_status_t start_reading(const std::string &path, const plugin_info &splugin_info);
-    sail_status_t start_reading(const char *path, const plugin_info &splugin_info);
+    sail_status_t start_reading(const std::string &path, const codec_info &scodec_info);
+    sail_status_t start_reading(const char *path, const codec_info &scodec_info);
 
     /*
      * An interface to sail_start_reading_file_with_options(). See sail_start_reading_file_with_options() for more.
@@ -102,20 +102,20 @@ public:
     /*
      * An interface to sail_start_reading_file_with_options(). See sail_start_reading_file_with_options() for more.
      */
-    sail_status_t start_reading(const std::string &path, const plugin_info &splugin_info, const read_options &sread_options);
-    sail_status_t start_reading(const char *path, const plugin_info &splugin_info, const read_options &sread_options);
+    sail_status_t start_reading(const std::string &path, const codec_info &scodec_info, const read_options &sread_options);
+    sail_status_t start_reading(const char *path, const codec_info &scodec_info, const read_options &sread_options);
 
     /*
      * An interface to sail_start_reading_mem(). See sail_start_reading_mem() for more.
      */
-    sail_status_t start_reading(const void *buffer, size_t buffer_length, const plugin_info &splugin_info);
-    sail_status_t start_reading(const void *buffer, size_t buffer_length, const plugin_info &splugin_info, const read_options &sread_options);
+    sail_status_t start_reading(const void *buffer, size_t buffer_length, const codec_info &scodec_info);
+    sail_status_t start_reading(const void *buffer, size_t buffer_length, const codec_info &scodec_info, const read_options &sread_options);
 
     /*
      * An interface to sail_start_reading_io(). See sail_start_reading_io() for more.
      */
-    sail_status_t start_reading(const io &sio, const plugin_info &splugin_info);
-    sail_status_t start_reading(const io &sio, const plugin_info &splugin_info, const read_options &sread_options);
+    sail_status_t start_reading(const io &sio, const codec_info &scodec_info);
+    sail_status_t start_reading(const io &sio, const codec_info &scodec_info, const read_options &sread_options);
 
     /*
      * An interface to sail_read_next_frame(). See sail_read_next_frame() for more.
