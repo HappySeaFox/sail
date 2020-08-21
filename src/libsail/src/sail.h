@@ -140,13 +140,13 @@ SAIL_EXPORT const struct sail_codec_info_node* sail_codec_info_list(void);
  * The assigned codec info MUST NOT be destroyed. It is a pointer to an internal data structure.
  *
  * Typical usage: sail_codec_info_from_path() ->
- *                sail_start_reading_file()    ->
- *                sail_read_next_frame()       ->
+ *                sail_start_reading_file()   ->
+ *                sail_read_next_frame()      ->
  *                sail_stop_reading().
  *
  * Or:            sail_codec_info_from_path() ->
- *                sail_start_writing()         ->
- *                sail_read_next_frame()       ->
+ *                sail_start_writing()        ->
+ *                sail_read_next_frame()      ->
  *                sail_stop_writing().
  *
  * Returns 0 on success or sail_status_t on error.
@@ -160,8 +160,8 @@ SAIL_EXPORT sail_status_t sail_codec_info_from_path(const char *path, const stru
  * The assigned codec info MUST NOT be destroyed. It is a pointer to an internal data structure.
  *
  * Typical usage: sail_codec_info_by_magic_number_from_path() ->
- *                sail_start_reading_file()                    ->
- *                sail_read_next_frame()                       ->
+ *                sail_start_reading_file()                   ->
+ *                sail_read_next_frame()                      ->
  *                sail_stop_reading().
  *
  * Returns 0 on success or sail_status_t on error.
@@ -175,8 +175,8 @@ SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_path(const char *
  * The assigned codec info MUST NOT be destroyed. It is a pointer to an internal data structure.
  *
  * Typical usage: sail_codec_info_by_magic_number_from_mem() ->
- *                sail_start_reading_file()                   ->
- *                sail_read_next_frame()                      ->
+ *                sail_start_reading_file()                  ->
+ *                sail_read_next_frame()                     ->
  *                sail_stop_reading().
  *
  * Returns 0 on success or sail_status_t on error.
@@ -192,8 +192,8 @@ SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_mem(const void *b
  * The assigned codec info MUST NOT be destroyed. It is a pointer to an internal data structure.
  *
  * Typical usage: sail_codec_info_by_magic_number_from_io() ->
- *                sail_start_reading_file()                  ->
- *                sail_read_next_frame()                     ->
+ *                sail_start_reading_file()                 ->
+ *                sail_read_next_frame()                    ->
  *                sail_stop_reading().
  *
  * Returns 0 on success or sail_status_t on error.
@@ -207,13 +207,13 @@ SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_io(struct sail_io
  * The assigned codec info MUST NOT be destroyed. It is a pointer to an internal data structure.
  *
  * Typical usage: sail_codec_info_from_extension() ->
- *                sail_start_reading_file()         ->
- *                sail_read_next_frame()            ->
+ *                sail_start_reading_file()        ->
+ *                sail_read_next_frame()           ->
  *                sail_stop_reading().
  *
  * Or:            sail_codec_info_from_extension() ->
- *                sail_start_writing()              ->
- *                sail_read_next_frame()            ->
+ *                sail_start_writing()             ->
+ *                sail_read_next_frame()           ->
  *                sail_stop_writing().
  *
  * Returns 0 on success or sail_status_t on error.
@@ -227,13 +227,13 @@ SAIL_EXPORT sail_status_t sail_codec_info_from_extension(const char *extension, 
  * The assigned codec info MUST NOT be destroyed. It is a pointer to an internal data structure.
  *
  * Typical usage: sail_codec_info_from_mime_type() ->
- *                sail_start_reading_file()         ->
- *                sail_read_next_frame()            ->
+ *                sail_start_reading_file()        ->
+ *                sail_read_next_frame()           ->
  *                sail_stop_reading().
  *
  * Or:            sail_codec_info_from_mime_type() ->
- *                sail_start_writing()              ->
- *                sail_read_next_frame()            ->
+ *                sail_start_writing()             ->
+ *                sail_read_next_frame()           ->
  *                sail_stop_writing().
  *
  * Returns 0 on success or sail_status_t on error.

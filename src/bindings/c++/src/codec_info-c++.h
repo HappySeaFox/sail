@@ -80,8 +80,8 @@ public:
      * The comparison algorithm is case insensitive.
      *
      * Typical usage: codec_info::by_magic_number_from_path() ->
-     *                image_reader::start_reading_file(        ->
-     *                image_reader::read_next_frame()          ->
+     *                image_reader::start_reading_file()      ->
+     *                image_reader::read_next_frame()         ->
      *                image_reader::stop_reading().
      *
      * Returns 0 on success or sail_status_t on error.
@@ -94,8 +94,8 @@ public:
      * The comparison algorithm is case insensitive.
      *
      * Typical usage: codec_info::by_magic_number_from_mem() ->
-     *                image_reader::start_reading_file()      ->
-     *                image_reader::read_next_frame()         ->
+     *                image_reader::start_reading_file()     ->
+     *                image_reader::read_next_frame()        ->
      *                image_reader::stop_reading().
      *
      * Returns 0 on success or sail_status_t on error.
@@ -107,8 +107,8 @@ public:
      * The comparison algorithm is case insensitive.
      *
      * Typical usage: codec_info::by_magic_number_from_io() ->
-     *                image_reader::start_reading_file()     ->
-     *                image_reader::read_next_frame()        ->
+     *                image_reader::start_reading_file()    ->
+     *                image_reader::read_next_frame()       ->
      *                image_reader::stop_reading().
      *
      * Returns 0 on success or sail_status_t on error.
@@ -119,12 +119,12 @@ public:
      * Finds a first codec info object that supports reading or writing the specified file path by its file extension.
      * The comparison algorithm is case-insensitive. For example: "/test.jpg". The path might not exist.
      *
-     * Typical usage: codec_info::from_path()           ->
+     * Typical usage: codec_info::from_path()            ->
      *                image_reader::start_reading_file() ->
      *                image_reader::read_next_frame()    ->
      *                image_reader::stop_reading().
      *
-     * Or:            codec_info::from_path()        ->
+     * Or:            codec_info::from_path()         ->
      *                image_writer::start_writing()   ->
      *                image_writer::read_next_frame() ->
      *                image_writer::stop_writing().
@@ -138,12 +138,12 @@ public:
      * Finds a first codec info object that supports the specified file extension. The comparison
      * algorithm is case-insensitive. For example: "jpg".
      *
-     * Typical usage: codec_info::from_extension()      ->
+     * Typical usage: codec_info::from_extension()       ->
      *                image_reader::start_reading_file() ->
      *                image_reader::read_next_frame()    ->
      *                image_reader::stop_reading().
      *
-     * Or:            codec_info::from_extension()   ->
+     * Or:            codec_info::from_extension()    ->
      *                image_writer::start_writing()   ->
      *                image_writer::read_next_frame() ->
      *                image_writer::stop_writing().
@@ -157,12 +157,12 @@ public:
      * Finds a first codec info object that supports the specified mime type. The comparison
      * algorithm is case-insensitive. For example: "image/jpeg".
      *
-     * Typical usage: codec_info::from_mime_type()      ->
+     * Typical usage: codec_info::from_mime_type()       ->
      *                image_reader::start_reading_file() ->
      *                image_reader::read_next_frame()    ->
      *                image_reader::stop_reading().
      *
-     * Or:            codec_info::from_mime_type()   ->
+     * Or:            codec_info::from_mime_type()    ->
      *                image_writer::start_writing()   ->
      *                image_writer::read_next_frame() ->
      *                image_writer::stop_writing().

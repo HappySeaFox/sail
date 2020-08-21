@@ -48,12 +48,12 @@ struct sail_write_options;
  *
  * Outputs pixels in the BPP32-RGBA pixel format.
  *
- * Typical usage: sail_alloc_io()                   ->
- *                set I/O callbacks                 ->
+ * Typical usage: sail_alloc_io()                  ->
+ *                set I/O callbacks                ->
  *                sail_codec_info_from_extension() ->
- *                sail_start_reading_io()           ->
- *                sail_read_next_frame()            ->
- *                sail_stop_reading()               ->
+ *                sail_start_reading_io()          ->
+ *                sail_read_next_frame()           ->
+ *                sail_stop_reading()              ->
  *                sail_destroy_io().
  *
  * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
@@ -72,7 +72,7 @@ SAIL_EXPORT sail_status_t sail_start_reading_io(struct sail_io *io, const struct
  *
  * Typical usage: sail_alloc_io()                      ->
  *                set I/O callbacks                    ->
- *                sail_codec_info_from_extension()    ->
+ *                sail_codec_info_from_extension()     ->
  *                sail_start_reading_io_with_options() ->
  *                sail_read_next_frame()               ->
  *                sail_stop_reading()                  ->
@@ -94,12 +94,12 @@ SAIL_EXPORT sail_status_t sail_start_reading_io_with_options(struct sail_io *io,
  * The subsequent calls to sail_write_next_frame() output pixels in pixel format as specified
  * in sail_write_features.default_output_pixel_format.
  *
- * Typical usage: sail_alloc_io()                   ->
- *                set I/O callbacks                 ->
+ * Typical usage: sail_alloc_io()                  ->
+ *                set I/O callbacks                ->
  *                sail_codec_info_from_extension() ->
- *                sail_start_writing()              ->
- *                sail_write_next_frame()           ->
- *                sail_stop_writing()               ->
+ *                sail_start_writing()             ->
+ *                sail_write_next_frame()          ->
+ *                sail_stop_writing()              ->
  *                sail_destroy_io().
  *
  * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
@@ -119,7 +119,7 @@ SAIL_EXPORT sail_status_t sail_start_writing_io(struct sail_io *io, const struct
  *
  * Typical usage: sail_alloc_io()                      ->
  *                set I/O callbacks                    ->
- *                sail_codec_info_from_extension()    ->
+ *                sail_codec_info_from_extension()     ->
  *                sail_start_writing_io_with_options() ->
  *                sail_write_next_frame()              ->
  *                sail_stop_writing()                  ->

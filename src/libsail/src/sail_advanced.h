@@ -78,8 +78,8 @@ SAIL_EXPORT sail_status_t sail_probe_mem(const void *buffer, size_t buffer_lengt
  *                sail_stop_reading().
  *
  * Or:            sail_codec_info_from_extension() ->
- *                sail_start_reading_file()         ->
- *                sail_read_next_frame()            ->
+ *                sail_start_reading_file()        ->
+ *                sail_read_next_frame()           ->
  *                sail_stop_reading().
  *
  * For example:
@@ -106,8 +106,8 @@ SAIL_EXPORT sail_status_t sail_start_reading_file(const char *path, const struct
  * The subsequent calls to sail_read_next_frame() output pixels in the BPP32-RGBA pixel format.
  *
  * Typical usage: sail_codec_info_from_extension() ->
- *                sail_start_reading_mem()          ->
- *                sail_read_next_frame()            ->
+ *                sail_start_reading_mem()         ->
+ *                sail_read_next_frame()           ->
  *                sail_stop_reading().
  *
  * STATE explanation: Passes the address of a local void* pointer. SAIL will store an internal state
@@ -149,8 +149,8 @@ SAIL_EXPORT sail_status_t sail_stop_reading(void *state);
  *                sail_stop_writing().
  *
  * Or:            sail_codec_info_from_extension() ->
- *                sail_start_writing()              ->
- *                sail_write_next_frame()           ->
+ *                sail_start_writing()             ->
+ *                sail_write_next_frame()          ->
  *                sail_stop_writing().
  *
  * For example:
@@ -178,8 +178,8 @@ SAIL_EXPORT sail_status_t sail_start_writing_file(const char *path, const struct
  * as specified in sail_write_features.default_output_pixel_format.
  *
  * Typical usage: sail_codec_info_from_extension() ->
- *                sail_start_writing_mem()          ->
- *                sail_write_next_frame()           ->
+ *                sail_start_writing_mem()         ->
+ *                sail_write_next_frame()          ->
  *                sail_stop_writing().
  *
  * STATE explanation: Passes the address of a local void* pointer. SAIL will store an internal state
