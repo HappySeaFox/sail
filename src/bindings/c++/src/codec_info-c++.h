@@ -86,8 +86,8 @@ public:
      *
      * Returns 0 on success or sail_status_t on error.
      */
-    static sail_status_t by_magic_number_from_path(const std::string &path, codec_info *scodec_info);
-    static sail_status_t by_magic_number_from_path(const char *path, codec_info *scodec_info);
+    static sail_status_t from_magic_number(const std::string &path, codec_info *scodec_info);
+    static sail_status_t from_magic_number(const char *path, codec_info *scodec_info);
 
     /*
      * Finds a first codec info object that supports the magic number read from the specified memory buffer.
@@ -100,7 +100,7 @@ public:
      *
      * Returns 0 on success or sail_status_t on error.
      */
-    static sail_status_t by_magic_number_from_mem(const void *buffer, size_t buffer_length, codec_info *scodec_info);
+    static sail_status_t from_magic_number(const void *buffer, size_t buffer_length, codec_info *scodec_info);
 
     /*
      * Finds a first codec info object that supports the magic number read from the specified I/O source.
@@ -113,7 +113,7 @@ public:
      *
      * Returns 0 on success or sail_status_t on error.
      */
-    static sail_status_t by_magic_number_from_io(const sail::io &io, codec_info *scodec_info);
+    static sail_status_t from_magic_number(const sail::io &io, codec_info *scodec_info);
 
     /*
      * Finds a first codec info object that supports reading or writing the specified file path by its file extension.

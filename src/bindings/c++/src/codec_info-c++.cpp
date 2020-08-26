@@ -142,14 +142,14 @@ sail_status_t codec_info::codec_feature_from_string(const char *str, SailCodecFe
     return SAIL_OK;
 }
 
-sail_status_t codec_info::by_magic_number_from_path(const std::string &path, codec_info *scodec_info)
+sail_status_t codec_info::from_magic_number(const std::string &path, codec_info *scodec_info)
 {
-    SAIL_TRY(by_magic_number_from_path(path.c_str(), scodec_info));
+    SAIL_TRY(from_magic_number(path.c_str(), scodec_info));
 
     return SAIL_OK;
 }
 
-sail_status_t codec_info::by_magic_number_from_path(const char *path, codec_info *scodec_info)
+sail_status_t codec_info::from_magic_number(const char *path, codec_info *scodec_info)
 {
     SAIL_CHECK_CODEC_INFO_PTR(scodec_info);
 
@@ -161,7 +161,7 @@ sail_status_t codec_info::by_magic_number_from_path(const char *path, codec_info
     return SAIL_OK;
 }
 
-sail_status_t codec_info::by_magic_number_from_mem(const void *buffer, size_t buffer_length, codec_info *scodec_info)
+sail_status_t codec_info::from_magic_number(const void *buffer, size_t buffer_length, codec_info *scodec_info)
 {
     SAIL_CHECK_CODEC_INFO_PTR(scodec_info);
 
@@ -173,7 +173,7 @@ sail_status_t codec_info::by_magic_number_from_mem(const void *buffer, size_t bu
     return SAIL_OK;
 }
 
-sail_status_t codec_info::by_magic_number_from_io(const sail::io &io, codec_info *scodec_info)
+sail_status_t codec_info::from_magic_number(const sail::io &io, codec_info *scodec_info)
 {
     SAIL_CHECK_CODEC_INFO_PTR(scodec_info);
     SAIL_TRY(io.verify_valid());
