@@ -45,6 +45,15 @@ static sail_status_t check_io_arguments(struct sail_io *io,
     return SAIL_OK;
 }
 
+static void print_unsupported_read_output_pixel_format(enum SailPixelFormat output_pixel_format) {
+
+    const char *output_pixel_format_str = NULL;
+    SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(output_pixel_format, &output_pixel_format_str));
+
+    SAIL_LOG_ERROR("This codec cannot output %s pixels. Use its read features to get the list of supported output pixel formats",
+                    output_pixel_format_str);
+}
+
 static sail_status_t allowed_read_output_pixel_format(const struct sail_read_features *read_features,
                                                       enum SailPixelFormat pixel_format) {
 
@@ -56,6 +65,7 @@ static sail_status_t allowed_read_output_pixel_format(const struct sail_read_fea
         }
     }
 
+    print_unsupported_read_output_pixel_format(pixel_format);
     return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
 }
 

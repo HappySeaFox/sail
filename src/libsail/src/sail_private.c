@@ -432,6 +432,27 @@ static sail_status_t init_context(struct sail_context *context, int flags) {
     return SAIL_OK;
 }
 
+static void print_unsupported_write_output_pixel_format(enum SailPixelFormat input_pixel_format, enum SailPixelFormat output_pixel_format) {
+
+    const char *input_pixel_format_str = NULL;
+    const char *output_pixel_format_str = NULL;
+
+    SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(input_pixel_format, &input_pixel_format_str));
+    SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(output_pixel_format, &output_pixel_format_str));
+
+    SAIL_LOG_ERROR("This codec cannot output %s pixels from %s pixels. Use its write features to get the list of supported output pixel formats",
+                    input_pixel_format_str, output_pixel_format_str);
+}
+
+static void print_unsupported_write_input_pixel_format(enum SailPixelFormat input_pixel_format) {
+
+    const char *input_pixel_format_str = NULL;
+    SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(input_pixel_format, &input_pixel_format_str));
+
+    SAIL_LOG_ERROR("This codec cannot take %s pixels as input. Use its write features to get the list of supported input pixel formats",
+                    input_pixel_format_str);
+}
+
 /*
  * Public functions.
  */
@@ -605,11 +626,13 @@ sail_status_t allowed_write_output_pixel_format(const struct sail_write_features
                 }
             }
 
+            print_unsupported_write_output_pixel_format(input_pixel_format, output_pixel_format);
             return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
         }
 
         node = node->next;
     }
 
+    print_unsupported_write_input_pixel_format(input_pixel_format);
     return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
 }
