@@ -173,8 +173,8 @@ do {                              \
 #define SAIL_CHECK_PATH_PTR(path)                       SAIL_CHECK_PTR2(path,            SAIL_ERROR_PATH_NULL_PTR)
 #define SAIL_CHECK_EXTENSION_PTR(extension)             SAIL_CHECK_PTR2(extension,       SAIL_ERROR_EXTENSION_NULL_PTR)
 #define SAIL_CHECK_IMAGE_PTR(image)                     SAIL_CHECK_PTR2(image,           SAIL_ERROR_IMAGE_NULL_PTR)
-#define SAIL_CHECK_CODEC_INFO_PTR(codec_info)         SAIL_CHECK_PTR2(codec_info,     SAIL_ERROR_CODEC_INFO_NULL_PTR)
-#define SAIL_CHECK_CODEC_PTR(codec)                   SAIL_CHECK_PTR2(codec,          SAIL_ERROR_CODEC_NULL_PTR)
+#define SAIL_CHECK_CODEC_INFO_PTR(codec_info)           SAIL_CHECK_PTR2(codec_info,      SAIL_ERROR_CODEC_INFO_NULL_PTR)
+#define SAIL_CHECK_CODEC_PTR(codec)                     SAIL_CHECK_PTR2(codec,           SAIL_ERROR_CODEC_NULL_PTR)
 #define SAIL_CHECK_STATE_PTR(state)                     SAIL_CHECK_PTR2(state,           SAIL_ERROR_STATE_NULL_PTR)
 #define SAIL_CHECK_STRING_PTR(str)                      SAIL_CHECK_PTR2(str,             SAIL_ERROR_STRING_NULL_PTR)
 #define SAIL_CHECK_IO_PTR(io)                           SAIL_CHECK_PTR2(io,              SAIL_ERROR_IO_NULL_PTR)
@@ -187,7 +187,7 @@ do {                              \
 #define SAIL_CHECK_SOURCE_IMAGE_PTR(source_image)       SAIL_CHECK_PTR2(source_image,    SAIL_ERROR_SOURCE_IMAGE_NULL_PTR)
 #define SAIL_CHECK_PIXEL_FORMATS_MAPPING_NODE_PTR(node) SAIL_CHECK_PTR2(node,            SAIL_ERROR_PIXEL_FORMATS_MAPPING_NODE_NULL_PTR)
 #define SAIL_CHECK_STRING_NODE_PTR(node)                SAIL_CHECK_PTR2(node,            SAIL_ERROR_STRING_NODE_NULL_PTR)
-#define SAIL_CHECK_CODEC_INFO_NODE_PTR(node)           SAIL_CHECK_PTR2(node,            SAIL_ERROR_CODEC_INFO_NODE_NULL_PTR)
+#define SAIL_CHECK_CODEC_INFO_NODE_PTR(node)            SAIL_CHECK_PTR2(node,            SAIL_ERROR_CODEC_INFO_NODE_NULL_PTR)
 #define SAIL_CHECK_PIXEL_FORMAT_PTR(pixel_format)       SAIL_CHECK_PTR2(pixel_format,    SAIL_ERROR_PIXEL_FORMAT_NULL_PTR)
 
 /*
@@ -222,7 +222,7 @@ do {                                              \
  */
 #define SAIL_TRY_OR_CLEANUP(sail_func, ...) \
 do {                                        \
-    sail_status_t res;                       \
+    sail_status_t res;                      \
                                             \
     if ((res = sail_func) != 0) {           \
         __VA_ARGS__;                        \
