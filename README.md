@@ -4,6 +4,11 @@ SAIL is a fast and lightweight cross-platform image decoding and encoding librar
 from one-liners to complex use cases with custom I/O sources. It enables a client to read and write static,
 animated, multi-paged images along with their meta information and ICC profiles. :sailboat:
 
+
+**Latest release:** unreleased <br/>
+**Latest pre-release:** [v0.9.0-pre7](https://github.com/smoked-herring/sail/releases/tag/v0.9.0-pre7)<br/>
+**License:** MIT
+
 See [FAQ](FAQ.md) for more.
 
 Author: Dmitry Baryshev
