@@ -277,7 +277,7 @@ sail_status_t sail_pixel_format_from_string(const char *str, enum SailPixelForma
     SAIL_CHECK_RESULT_PTR(result);
 
     if (strlen(str) == 0) {
-        return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
+        return SAIL_ERROR_EMPTY_STRING;
     }
 
     uint64_t hash;
@@ -386,7 +386,7 @@ sail_status_t sail_image_property_from_string(const char *str, enum SailImagePro
     SAIL_CHECK_RESULT_PTR(result);
 
     if (strlen(str) == 0) {
-        return SAIL_ERROR_UNSUPPORTED_IMAGE_PROPERTY;
+        return SAIL_ERROR_EMPTY_STRING;
     }
 
     uint64_t hash;
@@ -451,7 +451,7 @@ sail_status_t sail_compression_from_string(const char *str, enum SailCompression
     SAIL_CHECK_RESULT_PTR(result);
 
     if (strlen(str) == 0) {
-        return SAIL_ERROR_UNSUPPORTED_COMPRESSION;
+        return SAIL_ERROR_EMPTY_STRING;
     }
 
     uint64_t hash;
@@ -498,6 +498,84 @@ sail_status_t sail_compression_from_string(const char *str, enum SailCompression
     return SAIL_ERROR_UNSUPPORTED_COMPRESSION;
 }
 
+sail_status_t sail_meta_info_to_string(enum SailMetaInfo meta_info, const char **result) {
+
+    SAIL_CHECK_STRING_PTR(result);
+
+    switch (meta_info) {
+        case SAIL_META_INFO_ARTIST:          *result = "Artist";          return SAIL_OK;
+        case SAIL_META_INFO_AUTHOR:          *result = "Author";          return SAIL_OK;
+        case SAIL_META_INFO_COMMENT:         *result = "Comment";         return SAIL_OK;
+        case SAIL_META_INFO_COMPUTER:        *result = "Computer";        return SAIL_OK;
+        case SAIL_META_INFO_COPYRIGHT:       *result = "Copyright";       return SAIL_OK;
+        case SAIL_META_INFO_CREATION_TIME:   *result = "Creation Time";   return SAIL_OK;
+        case SAIL_META_INFO_DESCRIPTION:     *result = "Description";     return SAIL_OK;
+        case SAIL_META_INFO_DISCLAIMER:      *result = "Disclaimer";      return SAIL_OK;
+        case SAIL_META_INFO_DOCUMENT:        *result = "Document";        return SAIL_OK;
+        case SAIL_META_INFO_EXIF:            *result = "EXIF";            return SAIL_OK;
+        case SAIL_META_INFO_IPTC:            *result = "IPTC";            return SAIL_OK;
+        case SAIL_META_INFO_LABEL:           *result = "Label";           return SAIL_OK;
+        case SAIL_META_INFO_MAKE:            *result = "Make";            return SAIL_OK;
+        case SAIL_META_INFO_MODEL:           *result = "Model";           return SAIL_OK;
+        case SAIL_META_INFO_NAME:            *result = "Name";            return SAIL_OK;
+        case SAIL_META_INFO_PRINTER:         *result = "Printer";         return SAIL_OK;
+        case SAIL_META_INFO_RESOLUTION_UNIT: *result = "Resolution Unit"; return SAIL_OK;
+        case SAIL_META_INFO_SOFTWARE:        *result = "Software";        return SAIL_OK;
+        case SAIL_META_INFO_SOURCE:          *result = "Source";          return SAIL_OK;
+        case SAIL_META_INFO_TITLE:           *result = "Title";           return SAIL_OK;
+        case SAIL_META_INFO_WARNING:         *result = "Warning";         return SAIL_OK;
+        case SAIL_META_INFO_XMP:             *result = "XMP";             return SAIL_OK;
+        case SAIL_META_INFO_X_RESOLUTION:    *result = "X Resolution";    return SAIL_OK;
+        case SAIL_META_INFO_Y_RESOLUTION:    *result = "Y Resolution";    return SAIL_OK;
+    }
+
+    *result = "UNKNOWN";
+    return SAIL_OK;
+}
+
+sail_status_t sail_meta_info_from_string(const char *str, enum SailMetaInfo *result) {
+
+    SAIL_CHECK_STRING_PTR(str);
+    SAIL_CHECK_RESULT_PTR(result);
+
+    if (strlen(str) == 0) {
+        return SAIL_ERROR_EMPTY_STRING;
+    }
+
+    uint64_t hash;
+    SAIL_TRY(sail_string_hash(str, &hash));
+
+    switch (hash) {
+        case UINT64_C(6952072423676):        *result = SAIL_META_INFO_ARTIST;          return SAIL_OK;
+        case UINT64_C(6952075980216):        *result = SAIL_META_INFO_AUTHOR;          return SAIL_OK;
+        case UINT64_C(229420847338040):      *result = SAIL_META_INFO_COMMENT;         return SAIL_OK;
+        case UINT64_C(7570887966294228):     *result = SAIL_META_INFO_COMPUTER;        return SAIL_OK;
+        case UINT64_C(249839307110380862):   *result = SAIL_META_INFO_COPYRIGHT;       return SAIL_OK;
+        case UINT64_C(16658027699238675945): *result = SAIL_META_INFO_CREATION_TIME;   return SAIL_OK;
+        case UINT64_C(13821659157043486569): *result = SAIL_META_INFO_DESCRIPTION;     return SAIL_OK;
+        case UINT64_C(8244735206874071778):  *result = SAIL_META_INFO_DISCLAIMER;      return SAIL_OK;
+        case UINT64_C(7570930199009348):     *result = SAIL_META_INFO_DOCUMENT;        return SAIL_OK;
+        case UINT64_C(6384018865):           *result = SAIL_META_INFO_EXIF;            return SAIL_OK;
+        case UINT64_C(6384154261):           *result = SAIL_META_INFO_IPTC;            return SAIL_OK;
+        case UINT64_C(210681275781):         *result = SAIL_META_INFO_LABEL;           return SAIL_OK;
+        case UINT64_C(6384317315):           *result = SAIL_META_INFO_MAKE;            return SAIL_OK;
+        case UINT64_C(210682966998):         *result = SAIL_META_INFO_MODEL;           return SAIL_OK;
+        case UINT64_C(6384353318):           *result = SAIL_META_INFO_NAME;            return SAIL_OK;
+        case UINT64_C(229437749136105):      *result = SAIL_META_INFO_PRINTER;         return SAIL_OK;
+        case UINT64_C(16074996716934497305): *result = SAIL_META_INFO_RESOLUTION_UNIT; return SAIL_OK;
+        case UINT64_C(7571569592229392):     *result = SAIL_META_INFO_SOFTWARE;        return SAIL_OK;
+        case UINT64_C(6952773348182):        *result = SAIL_META_INFO_SOURCE;          return SAIL_OK;
+        case UINT64_C(210691070471):         *result = SAIL_META_INFO_TITLE;           return SAIL_OK;
+        case UINT64_C(229446134771803):      *result = SAIL_META_INFO_WARNING;         return SAIL_OK;
+        case UINT64_C(193475450):            *result = SAIL_META_INFO_XMP;             return SAIL_OK;
+        case UINT64_C(14296528877741363441): *result = SAIL_META_INFO_X_RESOLUTION;    return SAIL_OK;
+        case UINT64_C(14347070984255090258): *result = SAIL_META_INFO_Y_RESOLUTION;    return SAIL_OK;
+    }
+
+    *result = SAIL_META_INFO_UNKNOWN;
+    return SAIL_OK;
+}
+
 sail_status_t sail_codec_feature_to_string(enum SailCodecFeature codec_feature, const char **result) {
 
     SAIL_CHECK_STRING_PTR(result);
@@ -521,7 +599,7 @@ sail_status_t sail_codec_feature_from_string(const char *str, enum SailCodecFeat
     SAIL_CHECK_RESULT_PTR(result);
 
     if (strlen(str) == 0) {
-        return SAIL_ERROR_UNSUPPORTED_CODEC_FEATURE;
+        return SAIL_ERROR_EMPTY_STRING;
     }
 
     uint64_t hash;

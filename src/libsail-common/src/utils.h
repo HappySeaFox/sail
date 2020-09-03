@@ -136,6 +136,22 @@ SAIL_EXPORT sail_status_t sail_compression_to_string(enum SailCompression compre
 SAIL_EXPORT sail_status_t sail_compression_from_string(const char *str, enum SailCompression *result);
 
 /*
+ * Assigns a non-NULL string representation of the specified meta info key. See SailMetaInfo.
+ * The assigned string MUST NOT be destroyed. For example: "Author".
+ *
+ * Returns 0 on success or sail_status_t on error.
+ */
+SAIL_EXPORT sail_status_t sail_meta_info_to_string(enum SailMetaInfo meta_info, const char **result);
+
+/*
+ * Assigns meta info key from a string representation. See SailMetaInfo.
+ * For example: SAIL_META_INFO_AUTHOR is assigned for "Author".
+ *
+ * Returns 0 on success or sail_status_t on error.
+ */
+SAIL_EXPORT sail_status_t sail_meta_info_from_string(const char *str, enum SailMetaInfo *result);
+
+/*
  * Assigns a non-NULL string representation of the specified codec feature. See SailCodecFeature.
  * The assigned string MUST NOT be destroyed. For example: "STATIC".
  *
