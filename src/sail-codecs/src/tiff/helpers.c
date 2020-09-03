@@ -199,18 +199,14 @@ sail_status_t fetch_iccp(TIFF *tiff, struct sail_iccp **iccp) {
     return SAIL_OK;
 }
 
-static sail_status_t fetch_single_meta_info(TIFF *tiff, int tag, const char *key, struct sail_meta_entry_node ***last_meta_entry_node) {
+static sail_status_t fetch_single_meta_info(TIFF *tiff, int tag, enum SailMetaInfo key, struct sail_meta_entry_node ***last_meta_entry_node) {
 
     char *data;
 
     if (TIFFGetField(tiff, tag, &data)) {
         struct sail_meta_entry_node *meta_entry_node;
 
-        SAIL_TRY(sail_alloc_meta_entry_node(&meta_entry_node));
-        SAIL_TRY_OR_CLEANUP(sail_strdup(key, &meta_entry_node->key),
-                            /* cleanup */ sail_destroy_meta_entry_node(meta_entry_node));
-        SAIL_TRY_OR_CLEANUP(sail_strdup(data, &meta_entry_node->value),
-                            /* cleanup */ sail_destroy_meta_entry_node(meta_entry_node));
+        SAIL_TRY(sail_alloc_meta_entry_node_from_data(key, NULL, data, &meta_entry_node));
 
         **last_meta_entry_node = meta_entry_node;
         *last_meta_entry_node = &meta_entry_node->next;
@@ -223,13 +219,13 @@ sail_status_t fetch_meta_info(TIFF *tiff, struct sail_meta_entry_node ***last_me
 
     SAIL_CHECK_META_ENTRY_NODE_PTR(last_meta_entry_node);
 
-    SAIL_TRY(fetch_single_meta_info(tiff, TIFFTAG_DOCUMENTNAME,     "Document Name", last_meta_entry_node));
-    SAIL_TRY(fetch_single_meta_info(tiff, TIFFTAG_IMAGEDESCRIPTION, "Description",   last_meta_entry_node));
-    SAIL_TRY(fetch_single_meta_info(tiff, TIFFTAG_MAKE,             "Make",          last_meta_entry_node));
-    SAIL_TRY(fetch_single_meta_info(tiff, TIFFTAG_MODEL,            "Model",         last_meta_entry_node));
-    SAIL_TRY(fetch_single_meta_info(tiff, TIFFTAG_SOFTWARE,         "Software",      last_meta_entry_node));
-    SAIL_TRY(fetch_single_meta_info(tiff, TIFFTAG_ARTIST,           "Artist",        last_meta_entry_node));
-    SAIL_TRY(fetch_single_meta_info(tiff, TIFFTAG_COPYRIGHT,        "Copyright",     last_meta_entry_node));
+    SAIL_TRY(fetch_single_meta_info(tiff, TIFFTAG_DOCUMENTNAME,     SAIL_META_INFO_DOCUMENT,    last_meta_entry_node));
+    SAIL_TRY(fetch_single_meta_info(tiff, TIFFTAG_IMAGEDESCRIPTION, SAIL_META_INFO_DESCRIPTION, last_meta_entry_node));
+    SAIL_TRY(fetch_single_meta_info(tiff, TIFFTAG_MAKE,             SAIL_META_INFO_MAKE,        last_meta_entry_node));
+    SAIL_TRY(fetch_single_meta_info(tiff, TIFFTAG_MODEL,            SAIL_META_INFO_MODEL,       last_meta_entry_node));
+    SAIL_TRY(fetch_single_meta_info(tiff, TIFFTAG_SOFTWARE,         SAIL_META_INFO_SOFTWARE,    last_meta_entry_node));
+    SAIL_TRY(fetch_single_meta_info(tiff, TIFFTAG_ARTIST,           SAIL_META_INFO_ARTIST,      last_meta_entry_node));
+    SAIL_TRY(fetch_single_meta_info(tiff, TIFFTAG_COPYRIGHT,        SAIL_META_INFO_COPYRIGHT,   last_meta_entry_node));
 
     return SAIL_OK;
 }
@@ -239,24 +235,34 @@ sail_status_t write_meta_info(TIFF *tiff, const struct sail_meta_entry_node *met
     SAIL_CHECK_PTR(tiff);
 
     while (meta_entry_node != NULL) {
+        int tiff_tag = -1;
 
-        if (strcmp(meta_entry_node->key, "Document Name") == 0) {
-            TIFFSetField(tiff, TIFFTAG_DOCUMENTNAME, meta_entry_node->value);
-        } else if (strcmp(meta_entry_node->key, "Description") == 0) {
-            TIFFSetField(tiff, TIFFTAG_IMAGEDESCRIPTION, meta_entry_node->value);
-        } else if (strcmp(meta_entry_node->key, "Make") == 0) {
-            TIFFSetField(tiff, TIFFTAG_MAKE, meta_entry_node->value);
-        } else if (strcmp(meta_entry_node->key, "Model") == 0) {
-            TIFFSetField(tiff, TIFFTAG_MODEL, meta_entry_node->value);
-        } else if (strcmp(meta_entry_node->key, "Software") == 0) {
-            TIFFSetField(tiff, TIFFTAG_SOFTWARE, meta_entry_node->value);
-        } else if (strcmp(meta_entry_node->key, "Artist") == 0) {
-            TIFFSetField(tiff, TIFFTAG_ARTIST, meta_entry_node->value);
-        } else if (strcmp(meta_entry_node->key, "Copyright") == 0) {
-            TIFFSetField(tiff, TIFFTAG_COPYRIGHT, meta_entry_node->value);
-        } else {
-            SAIL_LOG_WARNING("TIFF: Ignoring unsupported meta entry key '%s'", meta_entry_node->key);
+        switch (meta_entry_node->key) {
+            case SAIL_META_INFO_DOCUMENT:    tiff_tag = TIFFTAG_DOCUMENTNAME;     break;
+            case SAIL_META_INFO_DESCRIPTION: tiff_tag = TIFFTAG_IMAGEDESCRIPTION; break;
+            case SAIL_META_INFO_MAKE:        tiff_tag = TIFFTAG_MAKE;             break;
+            case SAIL_META_INFO_MODEL:       tiff_tag = TIFFTAG_MODEL;            break;
+            case SAIL_META_INFO_SOFTWARE:    tiff_tag = TIFFTAG_SOFTWARE;         break;
+            case SAIL_META_INFO_ARTIST:      tiff_tag = TIFFTAG_ARTIST;           break;
+            case SAIL_META_INFO_COPYRIGHT:   tiff_tag = TIFFTAG_COPYRIGHT;        break;
+
+            case SAIL_META_INFO_UNKNOWN: {
+                SAIL_LOG_WARNING("TIFF: The codec doesn't support writing unknown meta info keys like '%s'", meta_entry_node->key_unknown);
+                break;
+            }
+
+            default: {
+                const char *meta_info_str = NULL;
+                SAIL_TRY_OR_SUPPRESS(sail_meta_info_to_string(meta_entry_node->key, &meta_info_str));
+                SAIL_LOG_WARNING("TIFF: Ignoring unsupported meta info key '%s'", meta_info_str);
+            }
         }
+
+        if (tiff_tag < 0) {
+            continue;
+        }
+
+        TIFFSetField(tiff, tiff_tag, meta_entry_node->value);
 
         meta_entry_node = meta_entry_node->next;
     }
