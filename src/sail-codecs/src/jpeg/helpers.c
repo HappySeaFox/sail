@@ -200,6 +200,20 @@ sail_status_t fetch_meta_info(struct jpeg_decompress_struct *decompress_context,
     return SAIL_OK;
 }
 
+sail_status_t write_meta_info(struct jpeg_compress_struct *compress_context, const struct sail_meta_entry_node *meta_entry_node) {
+
+    while (meta_entry_node != NULL) {
+        jpeg_write_marker(compress_context,
+                            JPEG_COM,
+                            (JOCTET *)meta_entry_node->value,
+                            (unsigned int)strlen(meta_entry_node->value));
+
+        meta_entry_node = meta_entry_node->next;
+    }
+
+    return SAIL_OK;
+}
+
 #ifdef HAVE_JPEG_ICCP
 sail_status_t fetch_iccp(struct jpeg_decompress_struct *decompress_context, struct sail_iccp **iccp) {
 

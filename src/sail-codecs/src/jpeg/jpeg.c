@@ -438,16 +438,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v3(void *state, struc
 
     /* Write meta info. */
     if (jpeg_state->write_options->io_options & SAIL_IO_OPTION_META_INFO && image->meta_entry_node != NULL) {
-        struct sail_meta_entry_node *meta_entry_node = image->meta_entry_node;
-
-        while (meta_entry_node != NULL) {
-            jpeg_write_marker(jpeg_state->compress_context,
-                                JPEG_COM,
-                                (JOCTET *)meta_entry_node->value,
-                                (unsigned int)strlen(meta_entry_node->value));
-
-            meta_entry_node = meta_entry_node->next;
-        }
+        SAIL_TRY(write_meta_info(jpeg_state->compress_context, image->meta_entry_node));
     }
 
     /* Write ICC profile. */
