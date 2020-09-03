@@ -216,11 +216,13 @@ sail_status_t read_png_text(png_structp png_ptr, png_infop info_ptr, struct sail
     for (int i = 0; i < num_text; i++) {
         struct sail_meta_entry_node *meta_entry_node;
 
-        SAIL_TRY(sail_alloc_meta_entry_node(&meta_entry_node));
-        SAIL_TRY_OR_CLEANUP(sail_strdup(lines[i].key, &meta_entry_node->key),
-                            /* cleanup */ sail_destroy_meta_entry_node(meta_entry_node));
-        SAIL_TRY_OR_CLEANUP(sail_strdup_length(lines[i].text, strlen(lines[i].text), &meta_entry_node->value),
-                            /* cleanup */ sail_destroy_meta_entry_node(meta_entry_node));
+        enum SailMetaInfo meta_info;
+        SAIL_TRY(sail_meta_info_from_string(lines[i].key, &meta_info));
+
+        SAIL_TRY(sail_alloc_meta_entry_node_from_data(meta_info,
+                                                        meta_info == SAIL_META_INFO_UNKNOWN ? lines[i].key : NULL,
+                                                        lines[i].text,
+                                                        &meta_entry_node));
 
         *last_meta_entry_node = meta_entry_node;
         last_meta_entry_node = &meta_entry_node->next;
@@ -242,8 +244,16 @@ sail_status_t write_png_text(png_structp png_ptr, png_infop info_ptr, const stru
 
     /* Build PNG lines. */
     while (meta_entry_node != NULL && count < 32) {
+        const char *meta_info_str;
+
+        if (meta_entry_node->key == SAIL_META_INFO_UNKNOWN) {
+            meta_info_str = meta_entry_node->key_unknown;
+        } else {
+            SAIL_TRY(sail_meta_info_to_string(meta_entry_node->key, &meta_info_str));
+        }
+
         lines[count].compression = PNG_TEXT_COMPRESSION_zTXt;
-        lines[count].key         = meta_entry_node->key;
+        lines[count].key         = meta_info_str;
         lines[count].text        = meta_entry_node->value;
 
         count++;

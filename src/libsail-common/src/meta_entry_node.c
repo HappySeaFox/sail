@@ -36,9 +36,34 @@ sail_status_t sail_alloc_meta_entry_node(struct sail_meta_entry_node **node) {
     SAIL_TRY(sail_malloc(&ptr, sizeof(struct sail_meta_entry_node)));
     *node = ptr;
 
-    (*node)->key   = NULL;
-    (*node)->value = NULL;
-    (*node)->next  = NULL;
+    (*node)->key         = SAIL_META_INFO_UNKNOWN;
+    (*node)->key_unknown = NULL;
+    (*node)->value       = NULL;
+    (*node)->next        = NULL;
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_alloc_meta_entry_node_from_data(enum SailMetaInfo key, const char *key_unknown, const char *value, struct sail_meta_entry_node **node) {
+
+    if (key == SAIL_META_INFO_UNKNOWN) {
+        SAIL_CHECK_STRING_PTR(key_unknown);
+    }
+
+    SAIL_CHECK_STRING_PTR(value);
+    SAIL_CHECK_META_ENTRY_NODE_PTR(node);
+
+    SAIL_TRY(sail_alloc_meta_entry_node(node));
+
+    (*node)->key = key;
+
+    if (key == SAIL_META_INFO_UNKNOWN) {
+        SAIL_TRY_OR_CLEANUP(sail_strdup(key_unknown, &(*node)->key_unknown),
+                            /* cleanup */ sail_destroy_meta_entry_node(*node));
+    }
+
+    SAIL_TRY_OR_CLEANUP(sail_strdup(value, &(*node)->value),
+                        /* cleanup */ sail_destroy_meta_entry_node(*node));
 
     return SAIL_OK;
 }
@@ -49,7 +74,7 @@ void sail_destroy_meta_entry_node(struct sail_meta_entry_node *node) {
         return;
     }
 
-    sail_free(node->key);
+    sail_free(node->key_unknown);
     sail_free(node->value);
     sail_free(node);
 }
@@ -61,8 +86,13 @@ sail_status_t sail_copy_meta_entry_node(struct sail_meta_entry_node *source, str
 
     SAIL_TRY(sail_alloc_meta_entry_node(target));
 
-    SAIL_TRY_OR_CLEANUP(sail_strdup(source->key, &(*target)->key),
-                        /* cleanup */ sail_destroy_meta_entry_node(*target));
+    (*target)->key = source->key;
+
+    if (source->key_unknown != NULL) {
+        SAIL_TRY_OR_CLEANUP(sail_strdup(source->key_unknown, &(*target)->key_unknown),
+                            /* cleanup */ sail_destroy_meta_entry_node(*target));
+    }
+
     SAIL_TRY_OR_CLEANUP(sail_strdup(source->value, &(*target)->value),
                         /* cleanup */ sail_destroy_meta_entry_node(*target));
 

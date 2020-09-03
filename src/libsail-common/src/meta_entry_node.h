@@ -27,9 +27,11 @@
 #define SAIL_META_ENTRY_NODE_H
 
 #ifdef SAIL_BUILD
+    #include "common.h"
     #include "error.h"
     #include "export.h"
 #else
+    #include <sail-common/common.h>
     #include <sail-common/error.h>
     #include <sail-common/export.h>
 #endif
@@ -40,10 +42,31 @@ extern "C" {
 
 /*
  * A simple key-pair structure representing meta information like a JPEG comment.
+ *
+ * For example:
+ *
+ * {
+ *     key         = SAIL_META_INFO_UNKNOWN,
+ *     key_unknown = "My Data",
+ *     value       = "Data"
+ * }
+ *
+ * {
+ *     key         = SAIL_META_INFO_COMMENT,
+ *     key_unknown = NULL,
+ *     value       = "Holidays"
+ * }
  */
 struct sail_meta_entry_node {
 
-    char *key;
+    /*
+     * If key is SAIL_META_INFO_UNKNOWN, key_unknown contains an actual string key.
+     * If key is not SAIL_META_INFO_UNKNOWN, key_unknown is NULL.
+     */
+    enum SailMetaInfo key;
+    char *key_unknown;
+
+    /* Actual meta info value. Any string data. */
     char *value;
 
     struct sail_meta_entry_node *next;
@@ -55,6 +78,17 @@ struct sail_meta_entry_node {
  * Returns 0 on success or sail_status_t on error.
  */
 SAIL_EXPORT sail_status_t sail_alloc_meta_entry_node(struct sail_meta_entry_node **node);
+
+/*
+ * Allocates a new meta entry node from the specified data. The assigned node MUST be destroyed later
+ * with sail_destroy_meta_entry_node().
+ *
+ * Returns 0 on success or sail_status_t on error.
+ */
+SAIL_EXPORT sail_status_t sail_alloc_meta_entry_node_from_data(enum SailMetaInfo key,
+                                                                const char *key_unknown,
+                                                                const char *value,
+                                                                struct sail_meta_entry_node **node);
 
 /*
  * Destroys the specified meta entry node and all its internal allocated memory buffers.

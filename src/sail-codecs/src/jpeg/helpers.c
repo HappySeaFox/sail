@@ -186,8 +186,7 @@ sail_status_t fetch_meta_info(struct jpeg_decompress_struct *decompress_context,
             struct sail_meta_entry_node *meta_entry_node;
 
             SAIL_TRY(sail_alloc_meta_entry_node(&meta_entry_node));
-            SAIL_TRY_OR_CLEANUP(sail_strdup("Comment", &meta_entry_node->key),
-                                /* cleanup */ sail_destroy_meta_entry_node(meta_entry_node));
+            meta_entry_node->key = SAIL_META_INFO_COMMENT;
             SAIL_TRY_OR_CLEANUP(sail_strdup_length((const char *)it->data, it->data_length, &meta_entry_node->value),
                                 /* cleanup */ sail_destroy_meta_entry_node(meta_entry_node));
 
