@@ -59,7 +59,15 @@ static sail_status_t probe(const char *path) {
     struct sail_meta_entry_node *node = image->meta_entry_node;
 
     while (node != NULL) {
-        printf("%-14s: %s\n", node->key, node->value);
+        const char *meta_info_str = NULL;
+
+        if (node->key == SAIL_META_INFO_UNKNOWN) {
+            meta_info_str = node->key_unknown;
+        } else {
+            SAIL_TRY_OR_SUPPRESS(sail_meta_info_to_string(node->key, &meta_info_str));
+        }
+
+        printf("%-14s: %s\n", meta_info_str, node->value);
         node = node->next;
     }
 
