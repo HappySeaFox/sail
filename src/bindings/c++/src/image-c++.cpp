@@ -382,7 +382,6 @@ image::image(const sail_image *sail_image)
     }
 
     std::vector<sail::meta_data> meta_data;
-
     sail_meta_data_node *node = sail_image->meta_data_node;
 
     while (node != nullptr) {

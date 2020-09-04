@@ -118,6 +118,10 @@ sail_status_t meta_data::meta_data_from_string(const char *str, enum SailMetaDat
     return SAIL_OK;
 }
 
+static inline std::string empty_string_on_nullptr(const char *str) {
+    return str == nullptr ? std::string() : str;
+}
+
 meta_data::meta_data(const sail_meta_data_node *md)
     : meta_data()
 {
@@ -127,8 +131,8 @@ meta_data::meta_data(const sail_meta_data_node *md)
     }
 
     with_key(md->key)
-        .with_key_unknown(md->key_unknown)
-        .with_value(md->value);
+        .with_key_unknown(empty_string_on_nullptr(md->key_unknown))
+        .with_value(empty_string_on_nullptr(md->value));
 }
 
 sail_status_t meta_data::to_sail_meta_data_node(sail_meta_data_node *md) const

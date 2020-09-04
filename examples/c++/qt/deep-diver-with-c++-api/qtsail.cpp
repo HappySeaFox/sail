@@ -205,7 +205,7 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
 
         for (const sail::meta_data &meta_data: meta_data) {
             meta_data_str = nullptr;
-            SAIL_TRY_OR_SUPPRESS(sail::meta_data::meta_data_to_string(first.key(), &meta_data_str));
+            SAIL_TRY_OR_SUPPRESS(sail::meta_data::meta_data_to_string(meta_data.key(), &meta_data_str));
             SAIL_LOG_DEBUG("[META] %s: %s", meta_data_str, meta_data.value().c_str());
         }
     }
