@@ -136,13 +136,13 @@ public:
     const sail::palette& palette() const;
 
     /*
-     * Returns image meta information.
+     * Returns image meta data.
      *
-     * READ:  Set by SAIL to a valid map with simple meta information (like JPEG comments).
-     * WRITE: Must be set by a caller to a valid map with simple meta information
+     * READ:  Set by SAIL to a valid map with simple meta data (like JPEG comments).
+     * WRITE: Must be set by a caller to a valid map with simple meta data
      *        (like JPEG comments) if necessary.
      */
-    const std::map<std::string, std::string>& meta_entries() const;
+    const std::map<std::string, std::string>& meta_data() const;
 
     /*
      * Returns embedded ICC profile.
@@ -232,7 +232,7 @@ public:
     /*
      * Sets new meta entries.
      */
-    image& with_meta_entries(const std::map<std::string, std::string> &meta_entries);
+    image& with_meta_data(const std::map<std::string, std::string> &meta_data);
 
     /*
      * Deep copies the specified pixel data. The data can be accessed later with pixels().

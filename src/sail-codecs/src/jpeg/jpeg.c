@@ -142,7 +142,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v3(struct sail_io *io, const stru
     jpeg_create_decompress(jpeg_state->decompress_context);
     jpeg_sail_io_src(jpeg_state->decompress_context, io);
 
-    if (jpeg_state->read_options->io_options & SAIL_IO_OPTION_META_INFO) {
+    if (jpeg_state->read_options->io_options & SAIL_IO_OPTION_META_DATA) {
         jpeg_save_markers(jpeg_state->decompress_context, JPEG_COM, 0xffff);
     }
     if (jpeg_state->read_options->io_options & SAIL_IO_OPTION_ICCP) {
@@ -234,9 +234,9 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
         SAIL_TRY(sail_malloc(&jpeg_state->extra_scan_line, src_bytes_per_line));
     }
 
-    /* Read meta info. */
-    if (jpeg_state->read_options->io_options & SAIL_IO_OPTION_META_INFO) {
-        SAIL_TRY_OR_CLEANUP(fetch_meta_info(jpeg_state->decompress_context, &(*image)->meta_entry_node),
+    /* Read meta data. */
+    if (jpeg_state->read_options->io_options & SAIL_IO_OPTION_META_DATA) {
+        SAIL_TRY_OR_CLEANUP(fetch_meta_data(jpeg_state->decompress_context, &(*image)->meta_data_node),
                             /* cleanup */ sail_destroy_image(*image));
     }
 
@@ -436,9 +436,9 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v3(void *state, struc
     jpeg_start_compress(jpeg_state->compress_context, true);
     jpeg_state->started_compress = true;
 
-    /* Write meta info. */
-    if (jpeg_state->write_options->io_options & SAIL_IO_OPTION_META_INFO && image->meta_entry_node != NULL) {
-        SAIL_TRY(write_meta_info(jpeg_state->compress_context, image->meta_entry_node));
+    /* Write meta data. */
+    if (jpeg_state->write_options->io_options & SAIL_IO_OPTION_META_DATA && image->meta_data_node != NULL) {
+        SAIL_TRY(write_meta_data(jpeg_state->compress_context, image->meta_data_node));
     }
 
     /* Write ICC profile. */

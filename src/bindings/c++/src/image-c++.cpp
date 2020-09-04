@@ -63,7 +63,7 @@ public:
     bool animated;
     int delay;
     sail::palette palette;
-    std::map<std::string, std::string> meta_entries;
+    std::map<std::string, std::string> meta_data;
     sail::iccp iccp;
     int properties;
     sail::source_image source_image;
@@ -92,7 +92,7 @@ image& image::operator=(const image &img)
         .with_animated(img.animated())
         .with_delay(img.delay())
         .with_palette(img.palette())
-        .with_meta_entries(img.meta_entries())
+        .with_meta_data(img.meta_data())
         .with_iccp(img.iccp())
         .with_properties(img.properties())
         .with_source_image(img.source_image())
@@ -146,9 +146,9 @@ const sail::palette& image::palette() const
     return d->palette;
 }
 
-const std::map<std::string, std::string>& image::meta_entries() const
+const std::map<std::string, std::string>& image::meta_data() const
 {
-    return d->meta_entries;
+    return d->meta_data;
 }
 
 const sail::iccp& image::iccp() const
@@ -225,9 +225,9 @@ image& image::with_palette(const sail::palette &pal)
     return *this;
 }
 
-image& image::with_meta_entries(const std::map<std::string, std::string> &meta_entries)
+image& image::with_meta_data(const std::map<std::string, std::string> &meta_data)
 {
-    d->meta_entries = meta_entries;
+    d->meta_data = meta_data;
     return *this;
 }
 
@@ -381,12 +381,12 @@ image::image(const sail_image *sail_image)
         return;
     }
 
-    std::map<std::string, std::string> meta_entries;
+    std::map<std::string, std::string> meta_data;
 
-    sail_meta_entry_node *node = sail_image->meta_entry_node;
+    sail_meta_data_node *node = sail_image->meta_data_node;
 
     while (node != nullptr) {
-        meta_entries.insert({ node->key, node->value });
+        meta_data.insert({ node->key, node->value });
         node = node->next;
     }
 
@@ -397,7 +397,7 @@ image::image(const sail_image *sail_image)
         .with_animated(sail_image->animated)
         .with_delay(sail_image->delay)
         .with_palette(sail::palette(sail_image->palette))
-        .with_meta_entries(meta_entries)
+        .with_meta_data(meta_data)
         .with_iccp(sail::iccp(sail_image->iccp))
         .with_properties(sail_image->properties)
         .with_source_image(sail_image->source_image);
@@ -436,24 +436,24 @@ sail_status_t image::to_sail_image(sail_image *sail_image) const
     SAIL_CHECK_IMAGE_PTR(sail_image);
 
     // Resulting meta entries
-    sail_meta_entry_node *image_meta_entry_node = nullptr;
+    sail_meta_data_node *image_meta_data_node = nullptr;
 
-    sail_meta_entry_node **last_meta_entry_node = &image_meta_entry_node;
-    auto it = d->meta_entries.begin();
+    sail_meta_data_node **last_meta_data_node = &image_meta_data_node;
+    auto it = d->meta_data.begin();
 
-    while (it != d->meta_entries.end()) {
-        sail_meta_entry_node *meta_entry_node;
+    while (it != d->meta_data.end()) {
+        sail_meta_data_node *meta_data_node;
 
-        SAIL_TRY(sail_alloc_meta_entry_node(&meta_entry_node));
-        SAIL_TRY_OR_CLEANUP(sail_strdup(it->first.c_str(), &meta_entry_node->key),
-                            sail_destroy_meta_entry_node(meta_entry_node),
-                            sail_destroy_meta_entry_node_chain(image_meta_entry_node));
-        SAIL_TRY_OR_CLEANUP(sail_strdup(it->second.c_str(), &meta_entry_node->value),
-                            sail_destroy_meta_entry_node(meta_entry_node),
-                            sail_destroy_meta_entry_node_chain(image_meta_entry_node));
+        SAIL_TRY(sail_alloc_meta_data_node(&meta_data_node));
+        SAIL_TRY_OR_CLEANUP(sail_strdup(it->first.c_str(), &meta_data_node->key),
+                            sail_destroy_meta_data_node(meta_data_node),
+                            sail_destroy_meta_data_node_chain(image_meta_data_node));
+        SAIL_TRY_OR_CLEANUP(sail_strdup(it->second.c_str(), &meta_data_node->value),
+                            sail_destroy_meta_data_node(meta_data_node),
+                            sail_destroy_meta_data_node_chain(image_meta_data_node));
 
-        *last_meta_entry_node = meta_entry_node;
-        last_meta_entry_node = &meta_entry_node->next;
+        *last_meta_data_node = meta_data_node;
+        last_meta_data_node = &meta_data_node->next;
 
         ++it;
     }
@@ -468,24 +468,24 @@ sail_status_t image::to_sail_image(sail_image *sail_image) const
 
     if (d->palette.is_valid()) {
         SAIL_TRY_OR_CLEANUP(sail_alloc_palette(&sail_image->palette),
-                            /* cleanup */ sail_destroy_meta_entry_node_chain(sail_image->meta_entry_node));
+                            /* cleanup */ sail_destroy_meta_data_node_chain(sail_image->meta_data_node));
 
         SAIL_TRY_OR_CLEANUP(d->palette.to_sail_palette(sail_image->palette),
                             /* cleanup */ sail_destroy_palette(sail_image->palette);
-                                          sail_destroy_meta_entry_node_chain(sail_image->meta_entry_node));
+                                          sail_destroy_meta_data_node_chain(sail_image->meta_data_node));
     }
 
-    sail_image->meta_entry_node = image_meta_entry_node;
+    sail_image->meta_data_node = image_meta_data_node;
 
     if (d->iccp.is_valid()) {
         SAIL_TRY_OR_CLEANUP(sail_alloc_iccp(&sail_image->iccp),
                             /* cleanup */ sail_destroy_palette(sail_image->palette),
-                                          sail_destroy_meta_entry_node_chain(sail_image->meta_entry_node));
+                                          sail_destroy_meta_data_node_chain(sail_image->meta_data_node));
 
         SAIL_TRY_OR_CLEANUP(d->iccp.to_sail_iccp(sail_image->iccp),
                             /* cleanup */ sail_destroy_iccp(sail_image->iccp),
                                           sail_destroy_palette(sail_image->palette);
-                                          sail_destroy_meta_entry_node_chain(sail_image->meta_entry_node));
+                                          sail_destroy_meta_data_node_chain(sail_image->meta_data_node));
     }
 
     sail_image->properties = d->properties;
@@ -494,13 +494,13 @@ sail_status_t image::to_sail_image(sail_image *sail_image) const
         SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&sail_image->source_image),
                             /* cleanup */ sail_destroy_iccp(sail_image->iccp),
                                           sail_destroy_palette(sail_image->palette);
-                                          sail_destroy_meta_entry_node_chain(sail_image->meta_entry_node));
+                                          sail_destroy_meta_data_node_chain(sail_image->meta_data_node));
 
         SAIL_TRY_OR_CLEANUP(d->source_image.to_sail_source_image(sail_image->source_image),
                             /* cleanup */ sail_destroy_source_image(sail_image->source_image),
                                           sail_destroy_iccp(sail_image->iccp),
                                           sail_destroy_palette(sail_image->palette);
-                                          sail_destroy_meta_entry_node_chain(sail_image->meta_entry_node));
+                                          sail_destroy_meta_data_node_chain(sail_image->meta_data_node));
     }
 
     return SAIL_OK;

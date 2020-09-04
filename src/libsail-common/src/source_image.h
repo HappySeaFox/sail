@@ -40,10 +40,6 @@
 extern "C" {
 #endif
 
-struct sail_iccp;
-struct sail_meta_entry_node;
-struct sail_palette;
-
 /*
  * A structure representing a source image properties. The structure is used in reading operations only
  * to preserve the source image properties. It's ignored in writing operations.

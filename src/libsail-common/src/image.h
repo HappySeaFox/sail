@@ -41,7 +41,7 @@ extern "C" {
 #endif
 
 struct sail_palette;
-struct sail_meta_entry_node;
+struct sail_meta_data_node;
 struct sail_iccp;
 struct sail_source_image;
 
@@ -133,14 +133,13 @@ struct sail_image {
     struct sail_palette *palette;
 
     /*
-     * Image meta information. See sail_meta_entry_node. Codecs guarantee that keys and values are non-NULL.
-     * Destroyed by sail_destroy_image().
+     * Image meta data. Codecs guarantee that keys and values are non-NULL.
      *
-     * READ:  Set by SAIL to a valid linked list with simple meta information (like JPEG comments) or to NULL.
-     * WRITE: Must be allocated and set by a caller to a valid linked list with simple meta information
+     * READ:  Set by SAIL to a valid linked list with simple meta data (like JPEG comments) or to NULL.
+     * WRITE: Must be allocated and set by a caller to a valid linked list with simple meta data
      *        (like JPEG comments) if necessary.
      */
-    struct sail_meta_entry_node *meta_entry_node;
+    struct sail_meta_data_node *meta_data_node;
 
     /*
      * Embedded ICC profile.

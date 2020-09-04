@@ -23,8 +23,8 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_META_ENTRY_NODE_H
-#define SAIL_META_ENTRY_NODE_H
+#ifndef SAIL_META_DATA_NODE_H
+#define SAIL_META_DATA_NODE_H
 
 #ifdef SAIL_BUILD
     #include "common.h"
@@ -41,84 +41,84 @@ extern "C" {
 #endif
 
 /*
- * A simple key-pair structure representing meta information like a JPEG comment.
+ * A simple key-pair structure representing meta data like a JPEG comment.
  *
  * For example:
  *
  * {
- *     key         = SAIL_META_INFO_UNKNOWN,
+ *     key         = SAIL_META_DATA_UNKNOWN,
  *     key_unknown = "My Data",
  *     value       = "Data"
  * }
  *
  * {
- *     key         = SAIL_META_INFO_COMMENT,
+ *     key         = SAIL_META_DATA_COMMENT,
  *     key_unknown = NULL,
  *     value       = "Holidays"
  * }
  */
-struct sail_meta_entry_node {
+struct sail_meta_data_node {
 
     /*
-     * If key is SAIL_META_INFO_UNKNOWN, key_unknown contains an actual string key.
-     * If key is not SAIL_META_INFO_UNKNOWN, key_unknown is NULL.
+     * If key is SAIL_META_DATA_UNKNOWN, key_unknown contains an actual string key.
+     * If key is not SAIL_META_DATA_UNKNOWN, key_unknown is NULL.
      */
-    enum SailMetaInfo key;
+    enum SailMetaData key;
     char *key_unknown;
 
-    /* Actual meta info value. Any string data. */
+    /* Actual meta data value. Any string data. */
     char *value;
 
-    struct sail_meta_entry_node *next;
+    struct sail_meta_data_node *next;
 };
 
 /*
- * Allocates a new meta entry node. The assigned node MUST be destroyed later with sail_destroy_meta_entry_node().
+ * Allocates a new meta entry node. The assigned node MUST be destroyed later with sail_destroy_meta_data_node().
  *
  * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_status_t sail_alloc_meta_entry_node(struct sail_meta_entry_node **node);
+SAIL_EXPORT sail_status_t sail_alloc_meta_data_node(struct sail_meta_data_node **node);
 
 /*
  * Allocates a new meta entry node from the specified data. The assigned node MUST be destroyed later
- * with sail_destroy_meta_entry_node().
+ * with sail_destroy_meta_data_node().
  *
  * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_status_t sail_alloc_meta_entry_node_from_data(enum SailMetaInfo key,
+SAIL_EXPORT sail_status_t sail_alloc_meta_data_node_from_data(enum SailMetaData key,
                                                                 const char *key_unknown,
                                                                 const char *value,
-                                                                struct sail_meta_entry_node **node);
+                                                                struct sail_meta_data_node **node);
 
 /*
  * Destroys the specified meta entry node and all its internal allocated memory buffers.
  */
-SAIL_EXPORT void sail_destroy_meta_entry_node(struct sail_meta_entry_node *node);
+SAIL_EXPORT void sail_destroy_meta_data_node(struct sail_meta_data_node *node);
 
 /*
  * Makes a deep copy of the specified meta entry node. The assigned node MUST be destroyed
- * later with sail_destroy_meta_entry_node().
+ * later with sail_destroy_meta_data_node().
  *
  * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_status_t sail_copy_meta_entry_node(struct sail_meta_entry_node *source,
-                                                   struct sail_meta_entry_node **target);
+SAIL_EXPORT sail_status_t sail_copy_meta_data_node(struct sail_meta_data_node *source,
+                                                   struct sail_meta_data_node **target);
 
 /*
  * Destroys the specified meta entry node and all its internal allocated memory buffers.
  * Repeats the destruction procedure recursively for the stored next pointer.
  */
-SAIL_EXPORT void sail_destroy_meta_entry_node_chain(struct sail_meta_entry_node *node);
+SAIL_EXPORT void sail_destroy_meta_data_node_chain(struct sail_meta_data_node *node);
 
 /*
  * Makes a deep copy of the specified meta entry node chain. The assigned chain MUST be destroyed
- * later with sail_destroy_meta_entry_node_chain(). If the source chain is NULL, it assigns NULL
+ * later with sail_destroy_meta_data_node_chain(). If the source chain is NULL, it assigns NULL
  * to the target chain and returns 0.
  *
  * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_status_t sail_copy_meta_entry_node_chain(struct sail_meta_entry_node *source,
-                                                         struct sail_meta_entry_node **target);
+SAIL_EXPORT sail_status_t sail_copy_meta_data_node_chain(struct sail_meta_data_node *source,
+                                                         struct sail_meta_data_node **target);
 
 /* extern "C" */
 #ifdef __cplusplus

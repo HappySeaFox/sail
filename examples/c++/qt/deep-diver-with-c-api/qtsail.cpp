@@ -81,7 +81,7 @@ sail_status_t QtSail::init()
                                                           "<ul>"
                                                           "<li>Selecting pixel format to output</li>"
                                                           "<li>Displaying indexed images (if SOURCE is selected)</li>"
-                                                          "<li>Printing all meta info entries into stderr</li>"
+                                                          "<li>Printing all meta data entries into stderr</li>"
                                                           "</ul>"
                                                           "This demo doesn't include:"
                                                           "<ul>"
@@ -221,7 +221,7 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
     SAIL_LOG_INFO("Loaded in %lld ms.", elapsed.elapsed() + beforeDialog);
 
     QString meta;
-    struct sail_meta_entry_node *node = image->meta_entry_node;
+    struct sail_meta_data_node *node = image->meta_data_node;
 
     if (node != nullptr) {
         meta = tr("%1: %2").arg(node->key).arg(QString(node->value).left(24).replace('\n', ' '));
@@ -355,16 +355,17 @@ sail_status_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffe
                                                   write_options,
                                                   &state));
 
-    // Save some meta info...
+    // Save some meta data...
     //
-    if (write_options->io_options & SAIL_IO_OPTION_META_INFO) {
-        struct sail_meta_entry_node *meta_entry_node;
+    if (write_options->io_options & SAIL_IO_OPTION_META_DATA) {
+        struct sail_meta_data_node *meta_data_node;
 
-        SAIL_TRY(sail_alloc_meta_entry_node(&meta_entry_node));
-        SAIL_TRY(sail_strdup("Software", &meta_entry_node->key));
-        SAIL_TRY(sail_strdup("SAIL", &meta_entry_node->value));
+        SAIL_TRY(sail_alloc_meta_data_node_from_data(SAIL_META_DATA_SOFTWARE,
+                                                     NULL,
+                                                     "SAIL",
+                                                     &meta_data_node));
 
-        image->meta_entry_node = meta_entry_node;
+        image->meta_data_node = meta_data_node;
     }
 
     const char *pixel_format_str;

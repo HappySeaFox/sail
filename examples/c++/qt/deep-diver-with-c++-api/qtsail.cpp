@@ -77,7 +77,7 @@ sail_status_t QtSail::init()
                                                           "<ul>"
                                                           "<li>Selecting pixel format to output</li>"
                                                           "<li>Displaying indexed images (if SOURCE is selected)</li>"
-                                                          "<li>Printing all meta info entries into stderr</li>"
+                                                          "<li>Printing all meta data entries into stderr</li>"
                                                           "</ul>"
                                                           "This demo doesn't include:"
                                                           "<ul>"
@@ -191,15 +191,15 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
     SAIL_LOG_INFO("Loaded in %lld ms.", elapsed.elapsed() + beforeDialog);
 
     QString meta;
-    const std::map<std::string, std::string> meta_entries = image.meta_entries();
+    const std::map<std::string, std::string> meta_data = image.meta_data();
 
-    if (!meta_entries.empty()) {
-        const std::pair<std::string, std::string> first_pair = *meta_entries.begin();
+    if (!meta_data.empty()) {
+        const std::pair<std::string, std::string> first_pair = *meta_data.begin();
         meta = tr("%1: %2")
                 .arg(first_pair.first.c_str())
                 .arg(QString(first_pair.second.c_str()).left(24).replace('\n', ' '));
 
-        for (const std::pair<std::string, std::string> &pair: meta_entries) {
+        for (const std::pair<std::string, std::string> &pair: meta_data) {
             SAIL_LOG_DEBUG("[META] %s: %s", pair.first.c_str(), pair.second.c_str());
         }
     }
@@ -303,13 +303,13 @@ sail_status_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffe
     //
     SAIL_TRY(writer.start_writing(buffer, buffer_length, codec_info, write_options));
 
-    // Save some meta info...
+    // Save some meta data...
     //
-    if (write_options.io_options() & SAIL_IO_OPTION_META_INFO) {
-        std::map<std::string, std::string> meta_entries {
+    if (write_options.io_options() & SAIL_IO_OPTION_META_DATA) {
+        std::map<std::string, std::string> meta_data {
             { "Software", "SAIL" }
         };
-        image.with_meta_entries(meta_entries);
+        image.with_meta_data(meta_data);
     }
 
     const char *output_pixel_format_str;

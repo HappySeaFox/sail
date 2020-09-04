@@ -2,7 +2,7 @@
 
 SAIL is a fast and lightweight cross-platform image decoding and encoding library providing rich APIs,
 from one-liners to complex use cases with custom I/O sources. It enables a client to read and write static,
-animated, multi-paged images along with their meta information and ICC profiles. :sailboat:
+animated, multi-paged images along with their meta data and ICC profiles. :sailboat:
 
 
 **Latest release:** unreleased <br/>
@@ -34,7 +34,7 @@ Author: Dmitry Baryshev
 - Most image format codecs are able to output the `SOURCE` pixel format for those who want
   to kick the hell out of images manually. For example, one may want to work with `CMYK` pixels in a print image
 - Read and write ICC profiles
-- Read and write meta information like JPEG comments
+- Read and write meta data like JPEG comments
 - Image formats are supported through dynamically loaded SAIL codecs
 - Qt, SDL, and pure C examples
 - The best MIME icons in the computer industry

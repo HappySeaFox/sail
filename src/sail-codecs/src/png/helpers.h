@@ -36,7 +36,7 @@
 #include "export.h"
 
 struct sail_iccp;
-struct sail_meta_entry_node;
+struct sail_meta_data_node;
 struct sail_palette;
 
 SAIL_HIDDEN void my_error_fn(png_structp png_ptr, png_const_charp text);
@@ -51,9 +51,9 @@ SAIL_HIDDEN sail_status_t supported_read_output_pixel_format(enum SailPixelForma
 
 SAIL_HIDDEN sail_status_t supported_write_output_pixel_format(enum SailPixelFormat pixel_format);
 
-SAIL_HIDDEN sail_status_t read_png_text(png_structp png_ptr, png_infop info_ptr, struct sail_meta_entry_node **target_meta_entry_node);
+SAIL_HIDDEN sail_status_t read_png_text(png_structp png_ptr, png_infop info_ptr, struct sail_meta_data_node **target_meta_data_node);
 
-SAIL_HIDDEN sail_status_t write_png_text(png_structp png_ptr, png_infop info_ptr, const struct sail_meta_entry_node *meta_entry_node);
+SAIL_HIDDEN sail_status_t write_png_text(png_structp png_ptr, png_infop info_ptr, const struct sail_meta_data_node *meta_data_node);
 
 SAIL_HIDDEN sail_status_t fetch_iccp(png_structp png_ptr, png_infop info_ptr, struct sail_iccp **iccp);
 

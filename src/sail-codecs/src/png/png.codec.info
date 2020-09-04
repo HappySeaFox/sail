@@ -10,12 +10,12 @@ extensions=png@CODEC_INFO_EXTENSION_APNG@
 mime-types=image/png
 
 [read-features]
-features=STATIC@CODEC_INFO_FEATURE_ANIMATED@;META-INFO;INTERLACED;ICCP
+features=STATIC@CODEC_INFO_FEATURE_ANIMATED@;META-DATA;INTERLACED;ICCP
 output-pixel-formats=SOURCE;BPP24-RGB;BPP24-BGR;BPP32-RGBA;BPP32-BGRA;BPP32-ARGB;BPP32-ABGR
 default-output-pixel-format=@SAIL_DEFAULT_READ_OUTPUT_PIXEL_FORMAT@
 
 [write-features]
-features=STATIC;META-INFO;INTERLACED;ICCP
+features=STATIC;META-DATA;INTERLACED;ICCP
 properties=
 interlaced-passes=7
 compression-types=DEFLATE

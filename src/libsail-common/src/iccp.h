@@ -38,7 +38,7 @@
 extern "C" {
 #endif
 
-struct sail_meta_entry_node;
+struct sail_meta_data_node;
 
 /*
  * A structure representing an ICC profile.

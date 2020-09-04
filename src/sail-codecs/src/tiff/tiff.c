@@ -176,11 +176,11 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
         return SAIL_ERROR_UNDERLYING_CODEC;
     }
 
-    /* Fetch meta info and ICCP. */
-    if (tiff_state->read_options->io_options & SAIL_IO_OPTION_META_INFO) {
-        struct sail_meta_entry_node **last_meta_entry_node = &(*image)->meta_entry_node;
+    /* Fetch meta data and ICCP. */
+    if (tiff_state->read_options->io_options & SAIL_IO_OPTION_META_DATA) {
+        struct sail_meta_data_node **last_meta_data_node = &(*image)->meta_data_node;
 
-        SAIL_TRY_OR_CLEANUP(fetch_meta_info(tiff_state->tiff, &last_meta_entry_node),
+        SAIL_TRY_OR_CLEANUP(fetch_meta_data(tiff_state->tiff, &last_meta_data_node),
                             /* cleanup */ sail_destroy_image(*image));
     }
     if (tiff_state->read_options->io_options & SAIL_IO_OPTION_ICCP) {
@@ -355,10 +355,10 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v3(void *state, struc
         SAIL_LOG_DEBUG("TIFF: ICC profile has been set");
     }
 
-    /* Write meta info. */
-    if (tiff_state->write_options->io_options & SAIL_IO_OPTION_META_INFO && image->meta_entry_node != NULL) {
-        SAIL_LOG_DEBUG("TIFF: Writing meta info");
-        SAIL_TRY(write_meta_info(tiff_state->tiff, image->meta_entry_node));
+    /* Write meta data. */
+    if (tiff_state->write_options->io_options & SAIL_IO_OPTION_META_DATA && image->meta_data_node != NULL) {
+        SAIL_LOG_DEBUG("TIFF: Writing meta data");
+        SAIL_TRY(write_meta_data(tiff_state->tiff, image->meta_data_node));
     }
 
     const char *pixel_format_str = NULL;
