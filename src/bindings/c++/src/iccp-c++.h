@@ -68,7 +68,7 @@ public:
     unsigned data_length() const;
 
     /*
-     * Sets a new ICC profile binary data.
+     * Sets new ICC profile binary data.
      */
     iccp& with_data(const void *data, unsigned data_length);
 
