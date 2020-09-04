@@ -39,6 +39,7 @@
     #include "image_writer-c++.h"
     #include "io_common-c++.h"
     #include "log-c++.h"
+    #include "meta_data-c++.h"
     #include "palette-c++.h"
     #include "codec_info-c++.h"
     #include "read_features-c++.h"
@@ -58,6 +59,7 @@
     #include <sail-c++/image_writer-c++.h>
     #include <sail-c++/io_common-c++.h>
     #include <sail-c++/log-c++.h>
+    #include <sail-c++/meta_data-c++.h>
     #include <sail-c++/palette-c++.h>
     #include <sail-c++/codec_info-c++.h>
     #include <sail-c++/read_features-c++.h>

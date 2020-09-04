@@ -63,7 +63,7 @@ public:
     bool animated;
     int delay;
     sail::palette palette;
-    std::map<std::string, std::string> meta_data;
+    std::vector<sail::meta_data> meta_data;
     sail::iccp iccp;
     int properties;
     sail::source_image source_image;
@@ -146,7 +146,7 @@ const sail::palette& image::palette() const
     return d->palette;
 }
 
-const std::map<std::string, std::string>& image::meta_data() const
+const std::vector<sail::meta_data>& image::meta_data() const
 {
     return d->meta_data;
 }
@@ -225,7 +225,7 @@ image& image::with_palette(const sail::palette &pal)
     return *this;
 }
 
-image& image::with_meta_data(const std::map<std::string, std::string> &meta_data)
+image& image::with_meta_data(const std::vector<sail::meta_data> &meta_data)
 {
     d->meta_data = meta_data;
     return *this;
@@ -381,12 +381,12 @@ image::image(const sail_image *sail_image)
         return;
     }
 
-    std::map<std::string, std::string> meta_data;
+    std::vector<sail::meta_data> meta_data;
 
     sail_meta_data_node *node = sail_image->meta_data_node;
 
     while (node != nullptr) {
-        meta_data.insert({ node->key, node->value });
+        meta_data.push_back(sail::meta_data(node));
         node = node->next;
     }
 
@@ -437,25 +437,19 @@ sail_status_t image::to_sail_image(sail_image *sail_image) const
 
     // Resulting meta entries
     sail_meta_data_node *image_meta_data_node = nullptr;
-
     sail_meta_data_node **last_meta_data_node = &image_meta_data_node;
-    auto it = d->meta_data.begin();
 
-    while (it != d->meta_data.end()) {
+    for (const sail::meta_data &meta_data : d->meta_data) {
         sail_meta_data_node *meta_data_node;
 
         SAIL_TRY(sail_alloc_meta_data_node(&meta_data_node));
-        SAIL_TRY_OR_CLEANUP(sail_strdup(it->first.c_str(), &meta_data_node->key),
-                            sail_destroy_meta_data_node(meta_data_node),
-                            sail_destroy_meta_data_node_chain(image_meta_data_node));
-        SAIL_TRY_OR_CLEANUP(sail_strdup(it->second.c_str(), &meta_data_node->value),
-                            sail_destroy_meta_data_node(meta_data_node),
-                            sail_destroy_meta_data_node_chain(image_meta_data_node));
+
+        SAIL_TRY_OR_CLEANUP(meta_data.to_sail_meta_data_node(meta_data_node),
+                            /* cleanup */ sail_destroy_meta_data_node(meta_data_node),
+                                          sail_destroy_meta_data_node_chain(image_meta_data_node));
 
         *last_meta_data_node = meta_data_node;
         last_meta_data_node = &meta_data_node->next;
-
-        ++it;
     }
 
     sail_image->pixels         = d->pixels;

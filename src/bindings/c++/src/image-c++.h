@@ -26,7 +26,6 @@
 #ifndef SAIL_IMAGE_CPP_H
 #define SAIL_IMAGE_CPP_H
 
-#include <map>
 #include <string>
 #include <vector>
 
@@ -45,6 +44,10 @@
     #include <sail-c++/palette-c++.h>
     #include <sail-c++/source_image-c++.h>
 #endif
+
+namespace sail {
+    class meta_data;
+}
 
 struct sail_image;
 
@@ -142,7 +145,7 @@ public:
      * WRITE: Must be set by a caller to a valid map with simple meta data
      *        (like JPEG comments) if necessary.
      */
-    const std::map<std::string, std::string>& meta_data() const;
+    const std::vector<sail::meta_data>& meta_data() const;
 
     /*
      * Returns embedded ICC profile.
@@ -232,7 +235,7 @@ public:
     /*
      * Sets new meta entries.
      */
-    image& with_meta_data(const std::map<std::string, std::string> &meta_data);
+    image& with_meta_data(const std::vector<sail::meta_data> &md);
 
     /*
      * Deep copies the specified pixel data. The data can be accessed later with pixels().
