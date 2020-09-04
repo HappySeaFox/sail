@@ -609,7 +609,7 @@ sail_status_t sail_codec_feature_from_string(const char *str, enum SailCodecFeat
         case UINT64_C(6952739426029):        *result = SAIL_CODEC_FEATURE_STATIC;      return SAIL_OK;
         case UINT64_C(7570758658679240):     *result = SAIL_CODEC_FEATURE_ANIMATED;    return SAIL_OK;
         case UINT64_C(13834645239598293736): *result = SAIL_CODEC_FEATURE_MULTI_FRAME; return SAIL_OK;
-        case UINT64_C(249851542786266181):   *result = SAIL_CODEC_FEATURE_META_DATA;   return SAIL_OK;
+        case UINT64_C(249851542786072787):   *result = SAIL_CODEC_FEATURE_META_DATA;   return SAIL_OK;
         case UINT64_C(6384018865):           *result = SAIL_CODEC_FEATURE_EXIF;        return SAIL_OK;
         case UINT64_C(8244927930303708800):  *result = SAIL_CODEC_FEATURE_INTERLACED;  return SAIL_OK;
         case UINT64_C(6384139556):           *result = SAIL_CODEC_FEATURE_ICCP;        return SAIL_OK;
