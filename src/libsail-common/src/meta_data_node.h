@@ -56,6 +56,14 @@ extern "C" {
  *     key_unknown = NULL,
  *     value       = "Holidays"
  * }
+ *
+ * Not every image codec supports key-values. For example:
+ *
+ *   - JPEG doesn't support keys. When you try to save key-value meta data pairs,
+ *     only values are saved.
+ *   - TIFF supports only a subset of known meta data keys (Artist, Make, Model etc.).
+ *     It doesn't support unknown keys (SAIL_META_DATA_UNKNOWN).
+ *   - PNG supports both keys and values
  */
 struct sail_meta_data_node {
 
