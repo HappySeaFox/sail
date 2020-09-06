@@ -62,8 +62,13 @@ extern "C" {
  *   - JPEG doesn't support keys. When you try to save key-value meta data pairs,
  *     only values are saved.
  *   - TIFF supports only a subset of known meta data keys (Artist, Make, Model etc.).
- *     It doesn't support unknown keys (SAIL_META_DATA_UNKNOWN).
+ *     It doesn't support unknown keys (SAIL_META_DATA_UNKNOWN). This is why TIFF never
+ *     output SAIL_META_DATA_UNKNOWN keys.
  *   - PNG supports both keys and values
+ *
+ * When writing images, SAIL codecs don't necessarily use sail_meta_data_to_string() to convert
+ * keys to string representations. PNG, for example, uses hardcoded "Raw profile type exif" key name
+ * for EXIF tags.
  */
 struct sail_meta_data_node {
 
