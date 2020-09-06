@@ -503,6 +503,8 @@ sail_status_t sail_meta_data_to_string(enum SailMetaData meta_data, const char *
     SAIL_CHECK_STRING_PTR(result);
 
     switch (meta_data) {
+        case SAIL_META_DATA_UNKNOWN:         *result = "Unknown";         return SAIL_OK;
+
         case SAIL_META_DATA_ARTIST:          *result = "Artist";          return SAIL_OK;
         case SAIL_META_DATA_AUTHOR:          *result = "Author";          return SAIL_OK;
         case SAIL_META_DATA_COMMENT:         *result = "Comment";         return SAIL_OK;
