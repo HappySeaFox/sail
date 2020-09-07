@@ -414,7 +414,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_finish_v3(void **state, struct sail_i
     /* Subsequent calls to finish() will expectedly fail in the above line. */
     *state = NULL;
 
-    /* Error handling setup. */
+    /* Destroy internal TIFF objects. */
     if (tiff_state->tiff != NULL) {
         TIFFCleanup(tiff_state->tiff);
     }
