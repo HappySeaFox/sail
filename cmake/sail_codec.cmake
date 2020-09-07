@@ -29,7 +29,7 @@ macro(sail_codec)
 
     # Copy .codec.info into the build dir
     #
-    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/${SAIL_CODEC_TARGET}.codec.info"
+    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/${SAIL_CODEC_TARGET}.codec.info.in"
                    "${CMAKE_CURRENT_BINARY_DIR}/${SAIL_CODEC_TARGET}.codec.info"
                    @ONLY)
     # Installation
