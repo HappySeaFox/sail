@@ -28,6 +28,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #ifdef SAIL_BUILD
     #include "error.h"
@@ -50,10 +51,32 @@ typedef sail_status_t (*sail_io_close_t)(void *stream);
 typedef sail_status_t (*sail_io_eof_t)(void *stream, bool *result);
 
 /*
+ * Well-known I/O ids used in libsail for file and memory I/O classes.
+ *
+ * You MUST use your own unique id for custom I/O classes. For example, you can use sail_hash()
+ * to generate a unique id and store it in the source code.
+ *
+ * SAIL_FILE_IO_ID   = sail_hash("sail-file-io-id")
+ * SAIL_MEMORY_IO_ID = sail_hash("sail-memory-io-id")
+ */
+static const uint64_t SAIL_FILE_IO_ID   = UINT64_C(5820790535323209114);
+static const uint64_t SAIL_MEMORY_IO_ID = UINT64_C(11955407548648566675);
+
+/*
  * A structure representing an input/output abstraction. Use sail_alloc_io_read_file() and brothers to
  * allocate I/O objects.
  */
 struct sail_io {
+
+    /*
+     * Unique I/O class id. The same I/O classes (file, memory etc.) share the same ids. This way
+     * a client can known the exact type of the I/O object. For example, a client can distinguish between
+     * file and memory I/O objects.
+     *
+     * You MUST use your own unique id for custom I/O classes. For example, you can use sail_hash()
+     * to generate a unique id and assign it to this field.
+     */
+    uint64_t id;
 
     /*
      * I/O specific data object. For example, a pointer to FILE.

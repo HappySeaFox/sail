@@ -48,6 +48,7 @@ public:
 
 void io::pimpl::empty_sail_io()
 {
+    sail_io.id     = 0;
     sail_io.stream = nullptr;
     sail_io.read   = nullptr;
     sail_io.seek   = nullptr;
@@ -99,6 +100,17 @@ sail_status_t io::to_sail_io(sail_io *io) const
     *io = d->sail_io;
 
     return SAIL_OK;
+}
+
+uint64_t io::id() const
+{
+    return d->sail_io.id;
+}
+
+io& io::with_id(uint64_t id)
+{
+    d->sail_io.id = id;
+    return *this;
 }
 
 io& io::with_stream(void *stream)
