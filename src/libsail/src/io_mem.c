@@ -238,6 +238,7 @@ sail_status_t alloc_io_read_mem(const void *buffer, size_t length, struct sail_i
     mem_io_read_stream->mem_io_buffer_info.pos               = 0;
     mem_io_read_stream->buffer                               = buffer;
 
+    (*io)->id     = SAIL_MEMORY_IO_ID;
     (*io)->stream = mem_io_read_stream;
     (*io)->read   = io_mem_read;
     (*io)->seek   = io_mem_seek;
@@ -269,6 +270,7 @@ sail_status_t alloc_io_write_mem(void *buffer, size_t length, struct sail_io **i
     mem_io_write_stream->mem_io_buffer_info.pos               = 0;
     mem_io_write_stream->buffer                               = buffer;
 
+    (*io)->id     = SAIL_MEMORY_IO_ID;
     (*io)->stream = mem_io_write_stream;
     (*io)->read   = io_mem_read;
     (*io)->seek   = io_mem_seek;

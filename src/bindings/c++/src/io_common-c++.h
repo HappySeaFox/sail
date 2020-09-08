@@ -56,6 +56,9 @@ public:
 
     sail_status_t to_sail_io(sail_io *io) const;
 
+    uint64_t id() const;
+
+    io& with_id(uint64_t id);
     io& with_stream(void *stream);
     io& with_read(sail_io_read_t read);
     io& with_seek(sail_io_seek_t seek);

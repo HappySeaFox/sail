@@ -434,7 +434,8 @@ sail_status_t alloc_rows(png_bytep **A, unsigned row_length, unsigned height) {
     }
 
     for (unsigned row = 0; row < height; row++) {
-        SAIL_TRY(sail_malloc(&(*A)[row], row_length));
+        SAIL_TRY(sail_malloc(&temp_ptr, row_length));
+        (*A)[row] = temp_ptr;
 
         memset((*A)[row], 0, row_length);
     }
