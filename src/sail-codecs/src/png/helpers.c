@@ -220,10 +220,12 @@ sail_status_t read_png_text(png_structp png_ptr, png_infop info_ptr, struct sail
 
         /* Legacy EXIF and friends. */
         if (strcmp(lines[i].key, "Raw profile type exif") == 0) {
-            meta_data = SAIL_META_DATA_EXIF;
+            meta_data = SAIL_META_DATA_HEX_EXIF;
         } else if (strcmp(lines[i].key, "Raw profile type iptc") == 0) {
-            meta_data = SAIL_META_DATA_IPTC;
-        } else if (strcmp(lines[i].key, "Raw profile type xmp") == 0 || strcmp(lines[i].key, "XML:com.adobe.xmp") == 0) {
+            meta_data = SAIL_META_DATA_HEX_IPTC;
+        } else if (strcmp(lines[i].key, "Raw profile type xmp") == 0) {
+            meta_data = SAIL_META_DATA_HEX_XMP;
+        } else if (strcmp(lines[i].key, "XML:com.adobe.xmp") == 0) {
             meta_data = SAIL_META_DATA_XMP;
         } else {
             SAIL_TRY(sail_meta_data_from_string(lines[i].key, &meta_data));
@@ -261,9 +263,10 @@ sail_status_t write_png_text(png_structp png_ptr, png_infop info_ptr, const stru
         } else {
             /* Legacy EXIF and friends. */
             switch (meta_data_node->key) {
-                case SAIL_META_DATA_EXIF: meta_data_str = "Raw profile type exif"; break;
-                case SAIL_META_DATA_IPTC: meta_data_str = "Raw profile type iptc"; break;
-                case SAIL_META_DATA_XMP:  meta_data_str = "Raw profile type xmp";  break;
+                case SAIL_META_DATA_HEX_EXIF: meta_data_str = "Raw profile type exif"; break;
+                case SAIL_META_DATA_HEX_IPTC: meta_data_str = "Raw profile type iptc"; break;
+                case SAIL_META_DATA_HEX_XMP:  meta_data_str = "Raw profile type xmp";  break;
+                case SAIL_META_DATA_XMP:      meta_data_str = "XML:com.adobe.xmp";     break;
 
                 default: {
                     SAIL_TRY(sail_meta_data_to_string(meta_data_node->key, &meta_data_str));

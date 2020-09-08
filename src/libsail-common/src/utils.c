@@ -514,8 +514,9 @@ sail_status_t sail_meta_data_to_string(enum SailMetaData meta_data, const char *
         case SAIL_META_DATA_DESCRIPTION:     *result = "Description";     return SAIL_OK;
         case SAIL_META_DATA_DISCLAIMER:      *result = "Disclaimer";      return SAIL_OK;
         case SAIL_META_DATA_DOCUMENT:        *result = "Document";        return SAIL_OK;
-        case SAIL_META_DATA_EXIF:            *result = "EXIF";            return SAIL_OK;
-        case SAIL_META_DATA_IPTC:            *result = "IPTC";            return SAIL_OK;
+        case SAIL_META_DATA_HEX_EXIF:        *result = "Hex EXIF";        return SAIL_OK;
+        case SAIL_META_DATA_HEX_IPTC:        *result = "Hex IPTC";        return SAIL_OK;
+        case SAIL_META_DATA_HEX_XMP:         *result = "Hex XMP";         return SAIL_OK;
         case SAIL_META_DATA_LABEL:           *result = "Label";           return SAIL_OK;
         case SAIL_META_DATA_MAKE:            *result = "Make";            return SAIL_OK;
         case SAIL_META_DATA_MODEL:           *result = "Model";           return SAIL_OK;
@@ -558,8 +559,9 @@ sail_status_t sail_meta_data_from_string(const char *str, enum SailMetaData *res
         case UINT64_C(13821659157043486569): *result = SAIL_META_DATA_DESCRIPTION;     return SAIL_OK;
         case UINT64_C(8244735206874071778):  *result = SAIL_META_DATA_DISCLAIMER;      return SAIL_OK;
         case UINT64_C(7570930199009348):     *result = SAIL_META_DATA_DOCUMENT;        return SAIL_OK;
-        case UINT64_C(6384018865):           *result = SAIL_META_DATA_EXIF;            return SAIL_OK;
-        case UINT64_C(6384154261):           *result = SAIL_META_DATA_IPTC;            return SAIL_OK;
+        case UINT64_C(7571088477688630):     *result = SAIL_META_DATA_HEX_EXIF;        return SAIL_OK;
+        case UINT64_C(7571088477824026):     *result = SAIL_META_DATA_HEX_IPTC;        return SAIL_OK;
+        case UINT64_C(229426923586655):      *result = SAIL_META_DATA_HEX_XMP;         return SAIL_OK;
         case UINT64_C(210681275781):         *result = SAIL_META_DATA_LABEL;           return SAIL_OK;
         case UINT64_C(6384317315):           *result = SAIL_META_DATA_MAKE;            return SAIL_OK;
         case UINT64_C(210682966998):         *result = SAIL_META_DATA_MODEL;           return SAIL_OK;

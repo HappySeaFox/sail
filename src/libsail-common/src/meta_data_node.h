@@ -68,7 +68,7 @@ extern "C" {
  *
  * When writing images, SAIL codecs don't necessarily use sail_meta_data_to_string() to convert
  * keys to string representations. PNG, for example, uses hardcoded "Raw profile type exif" key name
- * for EXIF tags.
+ * for raw Hex-encoded EXIF tags.
  */
 struct sail_meta_data_node {
 
