@@ -130,7 +130,8 @@ public:
     /*
      * Returns palette if the image has a palette and the requested pixel format assumes having a palette.
      *
-     * READ:  Set by SAIL to a valid palette if the image is indexed.
+     * READ:  Set by SAIL to a valid palette if the image is indexed and the requested pixel format
+     *        assumes having a palette.
      * WRITE: Must be set by a caller to a valid palette if the image is indexed.
      */
     const sail::palette& palette() const;

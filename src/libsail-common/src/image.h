@@ -127,7 +127,8 @@ struct sail_image {
      * Palette if the image has a palette and the requested pixel format assumes having a palette.
      * Destroyed by sail_destroy_image().
      *
-     * READ:  Set by SAIL to a valid palette if the image is indexed.
+     * READ:  Set by SAIL to a valid palette if the image is indexed and the requested pixel format
+     *        assumes having a palette. NULL otherwise.
      * WRITE: Must be allocated and set by a caller to a valid palette if the image is indexed.
      */
     struct sail_palette *palette;
@@ -148,7 +149,7 @@ struct sail_image {
      * Note for animated/multi-paged images: only the first image in an animated/multi-paged
      * sequence might have an ICC profile.
      *
-     * READ:  Set by SAIL to a valid ICC profile if any.
+     * READ:  Set by SAIL to a valid ICC profile or to NULL.
      * WRITE: Must be allocated and set by a caller to a valid ICC profile if necessary.
      */
     struct sail_iccp *iccp;
