@@ -234,17 +234,17 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
         SAIL_TRY(sail_malloc(&jpeg_state->extra_scan_line, src_bytes_per_line));
     }
 
-    /* Read meta info. */
+    /* Fetch meta info. */
     if (jpeg_state->read_options->io_options & SAIL_IO_OPTION_META_INFO) {
         SAIL_TRY_OR_CLEANUP(fetch_meta_info(jpeg_state->decompress_context, &(*image)->meta_entry_node),
                             /* cleanup */ sail_destroy_image(*image));
     }
 
-    /* Read resolution. */
+    /* Fetch resolution. */
     SAIL_TRY_OR_CLEANUP(fetch_resolution(jpeg_state->decompress_context, &(*image)->resolution),
                             /* cleanup */ sail_destroy_image(*image));
 
-    /* Read ICC profile. */
+    /* Fetch ICC profile. */
 #ifdef HAVE_JPEG_ICCP
     if (jpeg_state->read_options->io_options & SAIL_IO_OPTION_ICCP) {
         if (jpeg_state->extra_scan_line_needed_for_cmyk) {
