@@ -71,4 +71,8 @@ SAIL_HIDDEN sail_status_t alloc_rows(png_bytep **A, unsigned row_length, unsigne
 SAIL_HIDDEN void destroy_rows(png_bytep **A, unsigned height);
 #endif
 
+SAIL_HIDDEN sail_status_t fetch_resolution(png_structp png_ptr, png_infop info_ptr, struct sail_resolution **resolution);
+
+SAIL_HIDDEN sail_status_t write_resolution(png_structp png_ptr, png_infop info_ptr, const struct sail_resolution *resolution);
+
 #endif

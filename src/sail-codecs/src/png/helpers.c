@@ -429,3 +429,53 @@ void destroy_rows(png_bytep **A, unsigned height) {
 }
 
 #endif
+
+sail_status_t fetch_resolution(png_structp png_ptr, png_infop info_ptr, struct sail_resolution **resolution) {
+
+    SAIL_CHECK_RESOLUTION_PTR(resolution);
+
+    SAIL_TRY(sail_alloc_resolution(resolution));
+
+    int unit = PNG_RESOLUTION_UNKNOWN;
+    unsigned x = 0, y = 0;
+
+    png_get_pHYs(png_ptr, info_ptr, &x, &y, &unit);
+
+    switch (unit) {
+        case PNG_RESOLUTION_METER: {
+            (*resolution)->unit = SAIL_RESOLUTION_UNIT_METER;
+            break;
+        }
+    }
+
+    (*resolution)->x = (uint16_t)x;
+    (*resolution)->y = (uint16_t)y;
+
+    return SAIL_OK;
+}
+
+sail_status_t write_resolution(png_structp png_ptr, png_infop info_ptr, const struct sail_resolution *resolution) {
+
+    /* Not an error. */
+    if (resolution == NULL) {
+        return SAIL_OK;
+    }
+
+    int unit;
+
+    /* PNG supports just meters. */
+    switch (resolution->unit) {
+        case SAIL_RESOLUTION_UNIT_METER: {
+            unit = PNG_RESOLUTION_METER;
+            break;
+        }
+        default: {
+            unit = PNG_RESOLUTION_UNKNOWN;
+            break;
+        }
+    }
+
+    png_set_pHYs(png_ptr, info_ptr, resolution->x, resolution->y, unit);
+
+    return SAIL_OK;
+}
