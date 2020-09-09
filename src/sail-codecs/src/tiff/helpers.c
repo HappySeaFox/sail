@@ -283,3 +283,69 @@ sail_status_t supported_write_output_pixel_format(enum SailPixelFormat pixel_for
         }
     }
 }
+
+sail_status_t fetch_resolution(TIFF *tiff, struct sail_resolution **resolution) {
+
+    SAIL_CHECK_RESOLUTION_PTR(resolution);
+
+    int unit = RESUNIT_NONE;
+    float x = 0, y = 0;
+
+    TIFFGetField(tiff, TIFFTAG_RESOLUTIONUNIT, &unit);
+    TIFFGetField(tiff, TIFFTAG_XRESOLUTION,    &x);
+    TIFFGetField(tiff, TIFFTAG_YRESOLUTION,    &y);
+
+    /* Resolution information is not valid. */
+    if (x == 0 && y == 0) {
+        return SAIL_OK;
+    }
+
+    SAIL_TRY(sail_alloc_resolution(resolution));
+
+    switch (unit) {
+        case RESUNIT_INCH: {
+            (*resolution)->unit = SAIL_RESOLUTION_UNIT_INCH;
+            break;
+        }
+        case RESUNIT_CENTIMETER: {
+            (*resolution)->unit = SAIL_RESOLUTION_UNIT_CENTIMETER;
+            break;
+        }
+    }
+
+    (*resolution)->x = (uint16_t)x;
+    (*resolution)->y = (uint16_t)y;
+
+    return SAIL_OK;
+}
+
+sail_status_t write_resolution(TIFF *tiff, const struct sail_resolution *resolution) {
+
+    /* Not an error. */
+    if (resolution == NULL) {
+        return SAIL_OK;
+    }
+
+    uint16_t unit;
+
+    switch (resolution->unit) {
+        case SAIL_RESOLUTION_UNIT_INCH: {
+            unit = RESUNIT_INCH;
+            break;
+        }
+        case SAIL_RESOLUTION_UNIT_CENTIMETER: {
+            unit = RESUNIT_CENTIMETER;
+            break;
+        }
+        default: {
+            unit = RESUNIT_NONE;
+            break;
+        }
+    }
+
+    TIFFSetField(tiff, TIFFTAG_RESOLUTIONUNIT, unit);
+    TIFFSetField(tiff, TIFFTAG_XRESOLUTION,    (float)resolution->x);
+    TIFFSetField(tiff, TIFFTAG_YRESOLUTION,    (float)resolution->y);
+
+    return SAIL_OK;
+}

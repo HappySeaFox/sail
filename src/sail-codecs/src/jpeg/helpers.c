@@ -241,6 +241,11 @@ sail_status_t fetch_resolution(struct jpeg_decompress_struct *decompress_context
 
     SAIL_CHECK_RESOLUTION_PTR(resolution);
 
+    /* Resolution information is not valid. */
+    if (decompress_context->X_density == 0 && decompress_context->Y_density == 0) {
+        return SAIL_OK;
+    }
+
     SAIL_TRY(sail_alloc_resolution(resolution));
 
     switch (decompress_context->density_unit) {

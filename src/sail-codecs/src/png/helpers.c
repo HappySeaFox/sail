@@ -466,12 +466,17 @@ sail_status_t fetch_resolution(png_structp png_ptr, png_infop info_ptr, struct s
 
     SAIL_CHECK_RESOLUTION_PTR(resolution);
 
-    SAIL_TRY(sail_alloc_resolution(resolution));
-
     int unit = PNG_RESOLUTION_UNKNOWN;
     unsigned x = 0, y = 0;
 
     png_get_pHYs(png_ptr, info_ptr, &x, &y, &unit);
+
+    /* Resolution information is not valid. */
+    if (x == 0 && y == 0) {
+        return SAIL_OK;
+    }
+
+    SAIL_TRY(sail_alloc_resolution(resolution));
 
     switch (unit) {
         case PNG_RESOLUTION_METER: {

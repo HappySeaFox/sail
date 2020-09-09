@@ -210,7 +210,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v3(struct sail_io *io, const stru
                     /* compression type */ NULL,
                     /* filter method */ NULL);
 
-    /* Read resolution. */
+    /* Fetch resolution. */
     SAIL_TRY(fetch_resolution(png_state->png_ptr, png_state->info_ptr, &png_state->first_image->resolution));
 
     /* Transform the PNG stream. */
@@ -223,7 +223,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v3(struct sail_io *io, const stru
             png_state->first_image->pixel_format = png_color_type_to_pixel_format(png_state->color_type, png_state->bit_depth);
         }
 
-        /* Save palette. */
+        /* Fetch palette. */
         if (png_state->color_type == PNG_COLOR_TYPE_PALETTE) {
             SAIL_TRY(fetch_palette(png_state->png_ptr, png_state->info_ptr, &png_state->first_image->palette));
         }
@@ -320,7 +320,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v3(struct sail_io *io, const stru
         SAIL_TRY(read_png_text(png_state->png_ptr, png_state->info_ptr, &png_state->first_image->meta_data_node));
     }
 
-    /* Read ICC profile. */
+    /* Fetch ICC profile. */
     if (png_state->read_options->io_options & SAIL_IO_OPTION_ICCP) {
         SAIL_TRY(fetch_iccp(png_state->png_ptr, png_state->info_ptr, &png_state->iccp));
     }
