@@ -240,6 +240,10 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
                             /* cleanup */ sail_destroy_image(*image));
     }
 
+    /* Read resolution. */
+    SAIL_TRY_OR_CLEANUP(fetch_resolution(jpeg_state->decompress_context, &(*image)->resolution),
+                            /* cleanup */ sail_destroy_image(*image));
+
     /* Read ICC profile. */
 #ifdef HAVE_JPEG_ICCP
     if (jpeg_state->read_options->io_options & SAIL_IO_OPTION_ICCP) {
@@ -346,10 +350,10 @@ SAIL_EXPORT sail_status_t sail_codec_write_init_v3(struct sail_io *io, const str
 
     *state = jpeg_state;
 
-    /* Deep copy read options. */
+    /* Deep copy write options. */
     SAIL_TRY(sail_copy_write_options(write_options, &jpeg_state->write_options));
 
-    /* Create decompress context. */
+    /* Create compress context. */
     void *ptr;
     SAIL_TRY(sail_malloc(&ptr, sizeof(struct jpeg_compress_struct)));
     jpeg_state->compress_context = ptr;
@@ -406,6 +410,9 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v3(void *state, struc
     jpeg_state->compress_context->in_color_space = pixel_format_to_color_space(image->pixel_format);
 
     jpeg_set_defaults(jpeg_state->compress_context);
+
+    /* Write resolution. */
+    SAIL_TRY(write_resolution(jpeg_state->compress_context, image->resolution));
 
     /* Compute output pixel format. */
     if (jpeg_state->write_options->output_pixel_format == SAIL_PIXEL_FORMAT_SOURCE) {

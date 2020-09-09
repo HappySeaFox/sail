@@ -23,51 +23,83 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_SAIL_COMMON_H
-#define SAIL_SAIL_COMMON_H
-
-/* Universal libsail-common include. */
+#ifndef SAIL_RESOLUTION_CPP_H
+#define SAIL_RESOLUTION_CPP_H
 
 #ifdef SAIL_BUILD
-    #include "config.h"
-
-    #include "common.h"
     #include "error.h"
     #include "export.h"
-    #include "iccp.h"
-    #include "image.h"
-    #include "io_common.h"
-    #include "log.h"
-    #include "meta_data_node.h"
-    #include "palette.h"
-    #include "pixel_formats_mapping_node.h"
-    #include "read_features.h"
-    #include "read_options.h"
-    #include "resolution.h"
-    #include "source_image.h"
-    #include "utils.h"
-    #include "write_features.h"
-    #include "write_options.h"
 #else
-    #include <sail-common/config.h>
-
-    #include <sail-common/common.h>
     #include <sail-common/error.h>
     #include <sail-common/export.h>
-    #include <sail-common/iccp.h>
-    #include <sail-common/image.h>
-    #include <sail-common/io_common.h>
-    #include <sail-common/log.h>
-    #include <sail-common/meta_data_node.h>
-    #include <sail-common/palette.h>
-    #include <sail-common/pixel_formats_mapping_node.h>
-    #include <sail-common/read_features.h>
-    #include <sail-common/read_options.h>
-    #include <sail-common/resolution.h>
-    #include <sail-common/source_image.h>
-    #include <sail-common/utils.h>
-    #include <sail-common/write_features.h>
-    #include <sail-common/write_options.h>
 #endif
+
+struct sail_resolution;
+
+namespace sail
+{
+
+/*
+ * Image resolution unit and values.
+ */
+class SAIL_EXPORT resolution
+{
+    friend class image;
+
+public:
+    resolution();
+    resolution(const resolution &res);
+    resolution& operator=(const resolution &res);
+    ~resolution();
+
+    /*
+     * Returns true if the resolution has valid units and x/y values.
+     */
+    bool is_valid() const;
+
+    /*
+     * Returns the resolution unit.
+     */
+    SailResolutionUnit unit() const;
+
+    /*
+     * Returns the resolution x value.
+     */
+    uint16_t x() const;
+
+    /*
+     * Returns the resolution y value.
+     */
+    uint16_t y() const;
+
+    /*
+     * Sets a new resolution units.
+     */
+    resolution& with_unit(SailResolutionUnit unit);
+
+    /*
+     * Sets a new resolution x value.
+     */
+    resolution& with_x(uint16_t x);
+
+    /*
+     * Sets a new resolution y value.
+     */
+    resolution& with_y(uint16_t y);
+
+private:
+    /*
+     * Makes a deep copy of the specified resolution.
+     */
+    resolution(const sail_resolution *res);
+
+    sail_status_t to_sail_resolution(sail_resolution *res) const;
+
+private:
+    class pimpl;
+    pimpl * const d;
+};
+
+}
 
 #endif

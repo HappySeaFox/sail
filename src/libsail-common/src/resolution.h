@@ -23,8 +23,10 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_ICCP_H
-#define SAIL_ICCP_H
+#ifndef SAIL_RESOLUTION_H
+#define SAIL_RESOLUTION_H
+
+#include <stdint.h>
 
 #ifdef SAIL_BUILD
     #include "error.h"
@@ -38,58 +40,44 @@
 extern "C" {
 #endif
 
-struct sail_meta_data_node;
-
 /*
- * A structure representing an ICC profile.
+ * Image resolution unit and values.
  */
-struct sail_iccp {
+struct sail_resolution {
 
-    /* ICC profile binary data. */
-    void *data;
+    enum SailResolutionUnit unit;
 
-    /* The length of the data. */
-    unsigned data_length;
+    uint16_t x;
+    uint16_t y;
 };
 
-typedef struct sail_iccp sail_iccp_t;
-
 /*
- * Allocates a new ICC profile. The assigned profile MUST be destroyed later with sail_destroy_iccp().
+ * Allocates a new resolution. The assigned resolution MUST be destroyed later with sail_destroy_resolution().
  *
  * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_status_t sail_alloc_iccp(struct sail_iccp **iccp);
+SAIL_EXPORT sail_status_t sail_alloc_resolution(struct sail_resolution **resolution);
 
 /*
- * Allocates a new ICC profile and deep copies the specified ICC profile data into it.
- * The assigned profile MUST be destroyed later with sail_destroy_iccp().
+ * Allocates a new resolution and initializes its fields with the specified values.
+ * The assigned resolution MUST be destroyed later with sail_destroy_resolution().
  *
  * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_status_t sail_alloc_iccp_from_data(struct sail_iccp **iccp, const void *data, unsigned data_length);
+SAIL_EXPORT sail_status_t sail_alloc_resolution_from_data(struct sail_resolution **resolution, enum SailResolutionUnit unit, uint16_t x, uint16_t y);
 
 /*
- * Allocates a new ICC profile and copies the pointer to the specified ICC profile data into it.
- * The assigned profile MUST be destroyed later with sail_destroy_iccp().
+ * Destroys the specified resolution.
+ */
+SAIL_EXPORT void sail_destroy_resolution(struct sail_resolution *resolution);
+
+/*
+ * Makes a deep copy of the specified resolution. The assigned resolution MUST be destroyed
+ * later with sail_destroy_resolution().
  *
  * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_status_t sail_alloc_iccp_from_shallow_data(struct sail_iccp **iccp, void *data, unsigned data_length);
-
-/*
- * Destroys the specified ICC profile and all its internal allocated memory buffers.
- * Does nothing if the profile is NULL.
- */
-SAIL_EXPORT void sail_destroy_iccp(struct sail_iccp *iccp);
-
-/*
- * Makes a deep copy of the specified ICC profile. The assigned profile MUST be destroyed later
- * with sail_destroy_iccp().
- *
- * Returns 0 on success or sail_status_t on error.
- */
-SAIL_EXPORT sail_status_t sail_copy_iccp(const struct sail_iccp *source_iccp, struct sail_iccp **target_iccp);
+SAIL_EXPORT sail_status_t sail_copy_resolution(struct sail_resolution *source, struct sail_resolution **target);
 
 /* extern "C" */
 #ifdef __cplusplus

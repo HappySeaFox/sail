@@ -44,6 +44,7 @@
     #include "codec_info-c++.h"
     #include "read_features-c++.h"
     #include "read_options-c++.h"
+    #include "resolution-c++.h"
     #include "source_image-c++.h"
     #include "write_features-c++.h"
     #include "write_options-c++.h"
@@ -64,6 +65,7 @@
     #include <sail-c++/codec_info-c++.h>
     #include <sail-c++/read_features-c++.h>
     #include <sail-c++/read_options-c++.h>
+    #include <sail-c++/resolution-c++.h>
     #include <sail-c++/source_image-c++.h>
     #include <sail-c++/write_features-c++.h>
     #include <sail-c++/write_options-c++.h>

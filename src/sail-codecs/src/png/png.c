@@ -210,6 +210,9 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v3(struct sail_io *io, const stru
                     /* compression type */ NULL,
                     /* filter method */ NULL);
 
+    /* Read resolution. */
+    SAIL_TRY(fetch_resolution(png_state->png_ptr, png_state->info_ptr, &png_state->first_image->resolution));
+
     /* Transform the PNG stream. */
     if (png_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_SOURCE) {
         /* Expand 1, 2, and 4 bpp images to 8 bpp. */
@@ -627,6 +630,9 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v3(void *state, struc
                  (png_state->write_options->io_options & SAIL_IO_OPTION_INTERLACED) ? PNG_INTERLACE_ADAM7 : PNG_INTERLACE_NONE,
                  PNG_COMPRESSION_TYPE_BASE,
                  PNG_FILTER_TYPE_BASE);
+
+    /* Write resolution. */
+    SAIL_TRY(write_resolution(png_state->png_ptr, png_state->info_ptr, image->resolution));
 
     /* Write ICC profile. */
     if (png_state->write_options->io_options & SAIL_IO_OPTION_ICCP && image->iccp != NULL) {

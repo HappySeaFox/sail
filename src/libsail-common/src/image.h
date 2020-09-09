@@ -40,9 +40,10 @@
 extern "C" {
 #endif
 
-struct sail_palette;
-struct sail_meta_data_node;
 struct sail_iccp;
+struct sail_meta_data_node;
+struct sail_palette;
+struct sail_resolution;
 struct sail_source_image;
 
 /*
@@ -83,6 +84,14 @@ struct sail_image {
      *        it to sail_bytes_per_line() if scan lines are not padded to a certain boundary.
      */
     unsigned bytes_per_line;
+
+    /*
+     * Image resolution.
+     *
+     * READ:  Set by SAIL to a valid resolution or to NULL if this information is not available.
+     * WRITE: Must be allocated and set by a caller to a valid image resolution if necessary.
+     */
+    struct sail_resolution *resolution;
 
     /*
      * Image pixel format. See SailPixelFormat.
@@ -127,7 +136,8 @@ struct sail_image {
      * Palette if the image has a palette and the requested pixel format assumes having a palette.
      * Destroyed by sail_destroy_image().
      *
-     * READ:  Set by SAIL to a valid palette if the image is indexed.
+     * READ:  Set by SAIL to a valid palette if the image is indexed and the requested pixel format
+     *        assumes having a palette. NULL otherwise.
      * WRITE: Must be allocated and set by a caller to a valid palette if the image is indexed.
      */
     struct sail_palette *palette;
@@ -147,7 +157,7 @@ struct sail_image {
      * Note for animated/multi-paged images: only the first image in an animated/multi-paged
      * sequence might have an ICC profile.
      *
-     * READ:  Set by SAIL to a valid ICC profile if any.
+     * READ:  Set by SAIL to a valid ICC profile or to NULL.
      * WRITE: Must be allocated and set by a caller to a valid ICC profile if necessary.
      */
     struct sail_iccp *iccp;
@@ -162,7 +172,8 @@ struct sail_image {
     int properties;
 
     /*
-     * Source image properties.
+     * Source image properties which are usually lost during decoding.
+     * For example, one might want to know the source image pixel format.
      *
      * READ:  Set by SAIL to valid source image properties of the original image.
      * WRITE: Ignored.

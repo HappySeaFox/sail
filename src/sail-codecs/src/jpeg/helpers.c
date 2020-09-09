@@ -229,10 +229,61 @@ sail_status_t fetch_iccp(struct jpeg_decompress_struct *decompress_context, stru
                    ? "" : "not ");
 
     if (data != NULL && data_length > 0) {
-        SAIL_TRY_OR_CLEANUP(sail_alloc_iccp_with_shallow_data(iccp, data, data_length),
+        SAIL_TRY_OR_CLEANUP(sail_alloc_iccp_from_shallow_data(iccp, data, data_length),
                             /* cleanup */ sail_free(data));
     }
 
     return SAIL_OK;
 }
 #endif
+
+sail_status_t fetch_resolution(struct jpeg_decompress_struct *decompress_context, struct sail_resolution **resolution) {
+
+    SAIL_CHECK_RESOLUTION_PTR(resolution);
+
+    SAIL_TRY(sail_alloc_resolution(resolution));
+
+    switch (decompress_context->density_unit) {
+        case 1: {
+            (*resolution)->unit = SAIL_RESOLUTION_UNIT_INCH;
+            break;
+        }
+        case 2: {
+            (*resolution)->unit = SAIL_RESOLUTION_UNIT_CENTIMETER;
+            break;
+        }
+    }
+
+    (*resolution)->x = decompress_context->X_density;
+    (*resolution)->y = decompress_context->Y_density;
+
+    return SAIL_OK;
+}
+
+sail_status_t write_resolution(struct jpeg_compress_struct *compress_context, const struct sail_resolution *resolution) {
+
+    /* Not an error. */
+    if (resolution == NULL) {
+        return SAIL_OK;
+    }
+
+    switch (resolution->unit) {
+        case SAIL_RESOLUTION_UNIT_INCH: {
+            compress_context->density_unit = 1;
+            break;
+        }
+        case SAIL_RESOLUTION_UNIT_CENTIMETER: {
+            compress_context->density_unit = 2;
+            break;
+        }
+        default: {
+            compress_context->density_unit = 0;
+            break;
+        }
+    }
+
+    compress_context->X_density = resolution->x;
+    compress_context->Y_density = resolution->y;
+
+    return SAIL_OK;
+}

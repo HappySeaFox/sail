@@ -254,6 +254,16 @@ enum SailMetaData {
     SAIL_META_DATA_Y_RESOLUTION,
 };
 
+/* Resolution units. */
+enum SailResolutionUnit {
+
+    SAIL_RESOLUTION_UNIT_UNKNOWN,
+    SAIL_RESOLUTION_UNIT_MICROMETER,
+    SAIL_RESOLUTION_UNIT_CENTIMETER,
+    SAIL_RESOLUTION_UNIT_METER,
+    SAIL_RESOLUTION_UNIT_INCH,
+};
+
 /* Codec features. */
 enum SailCodecFeature {
 

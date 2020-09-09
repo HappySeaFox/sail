@@ -41,6 +41,7 @@ sail_status_t sail_alloc_image(struct sail_image **image) {
     (*image)->width                   = 0;
     (*image)->height                  = 0;
     (*image)->bytes_per_line          = 0;
+    (*image)->resolution              = NULL;
     (*image)->pixel_format            = SAIL_PIXEL_FORMAT_UNKNOWN;
     (*image)->interlaced_passes       = 0;
     (*image)->animated                = false;
@@ -62,6 +63,7 @@ void sail_destroy_image(struct sail_image *image) {
 
     sail_free(image->pixels);
 
+    sail_destroy_resolution(image->resolution);
     sail_destroy_palette(image->palette);
     sail_destroy_meta_data_node_chain(image->meta_data_node);
     sail_destroy_iccp(image->iccp);
@@ -90,6 +92,13 @@ sail_status_t sail_copy_image(const struct sail_image *source, struct sail_image
     (*target)->width                = source->width;
     (*target)->height               = source->height;
     (*target)->bytes_per_line       = source->bytes_per_line;
+
+    if (source->resolution != NULL) {
+        SAIL_TRY_OR_CLEANUP(sail_copy_resolution(source->resolution, &(*target)->resolution),
+                            /* cleanup */ sail_destroy_image(*target));
+
+    }
+
     (*target)->pixel_format         = source->pixel_format;
     (*target)->interlaced_passes    = source->interlaced_passes;
     (*target)->animated             = source->animated;

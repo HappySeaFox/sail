@@ -49,6 +49,11 @@ static sail_status_t probe(const char *path) {
     printf("Codec         : %s [%s]\n", codec_info->name, codec_info->description);
     printf("Codec version : %s\n", codec_info->version);
     printf("Size          : %ux%u\n", image->width, image->height);
+    if (image->resolution == NULL) {
+        printf("Resolution:   : -\n");
+    } else {
+        printf("Resolution:   : %ux%u\n", image->resolution->x, image->resolution->y);
+    }
     const char *pixel_format_str;
     SAIL_TRY(sail_pixel_format_to_string(image->source_image->pixel_format, &pixel_format_str));
     printf("Color         : %s\n", pixel_format_str);

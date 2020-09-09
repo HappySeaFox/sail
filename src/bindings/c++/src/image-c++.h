@@ -36,6 +36,7 @@
     #include "iccp-c++.h"
     #include "palette-c++.h"
     #include "source_image-c++.h"
+    #include "resolution-c++.h"
 #else
     #include <sail-common/error.h>
     #include <sail-common/export.h>
@@ -43,6 +44,7 @@
     #include <sail-c++/iccp-c++.h>
     #include <sail-c++/palette-c++.h>
     #include <sail-c++/source_image-c++.h>
+    #include <sail-c++/resolution-c++.h>
 #endif
 
 namespace sail {
@@ -102,6 +104,14 @@ public:
     unsigned bytes_per_line() const;
 
     /*
+     * Image resolution.
+     *
+     * READ:  Set by SAIL to a valid resolution if this information is available.
+     * WRITE: Must set by a caller to a valid image resolution if necessary.
+     */
+    const sail::resolution& resolution() const;
+
+    /*
      * Returns image pixel format. See SailPixelFormat.
      *
      * READ:  Set by SAIL to a valid output image pixel format. The list of supported output pixel formats
@@ -133,7 +143,8 @@ public:
     /*
      * Returns palette if the image has a palette and the requested pixel format assumes having a palette.
      *
-     * READ:  Set by SAIL to a valid palette if the image is indexed.
+     * READ:  Set by SAIL to a valid palette if the image is indexed and the requested pixel format
+     *        assumes having a palette.
      * WRITE: Must be set by a caller to a valid palette if the image is indexed.
      */
     const sail::palette& palette() const;
@@ -216,6 +227,11 @@ public:
      * and the pixel format. These two properties must be set beforehand.
      */
     image& with_bytes_per_line_auto();
+
+    /*
+     * Sets a new resolution.
+     */
+    image& with_resolution(const sail::resolution &res);
 
     /*
      * Sets a new pixel format. See SailPixelFormat.
