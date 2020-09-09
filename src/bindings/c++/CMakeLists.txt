@@ -10,6 +10,7 @@ add_library(sail-c++
                 src/codec_info-c++.cpp
                 src/read_features-c++.cpp
                 src/read_options-c++.cpp
+                src/resolution-c++.cpp
                 src/source_image-c++.cpp
                 src/write_features-c++.cpp
                 src/write_options-c++.cpp
@@ -30,6 +31,7 @@ list(APPEND PUBLIC_HEADERS "src/palette-c++.h")
 list(APPEND PUBLIC_HEADERS "src/codec_info-c++.h")
 list(APPEND PUBLIC_HEADERS "src/read_features-c++.h")
 list(APPEND PUBLIC_HEADERS "src/read_options-c++.h")
+list(APPEND PUBLIC_HEADERS "src/resolution-c++.h")
 list(APPEND PUBLIC_HEADERS "src/sail-c++.h")
 list(APPEND PUBLIC_HEADERS "src/source_image-c++.h")
 list(APPEND PUBLIC_HEADERS "src/write_features-c++.h")

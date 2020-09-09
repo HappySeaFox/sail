@@ -37,6 +37,7 @@
     #include "iccp-c++.h"
     #include "palette-c++.h"
     #include "source_image-c++.h"
+    #include "resolution-c++.h"
 #else
     #include <sail-common/error.h>
     #include <sail-common/export.h>
@@ -44,6 +45,7 @@
     #include <sail-c++/iccp-c++.h>
     #include <sail-c++/palette-c++.h>
     #include <sail-c++/source_image-c++.h>
+    #include <sail-c++/resolution-c++.h>
 #endif
 
 struct sail_image;
@@ -97,6 +99,14 @@ public:
      *        it with bytes_per_line_auto() if scan lines are not padded to a certain boundary.
      */
     unsigned bytes_per_line() const;
+
+    /*
+     * Image resolution.
+     *
+     * READ:  Set by SAIL to a valid resolution if this information is available.
+     * WRITE: Must set by a caller to a valid image resolution if necessary.
+     */
+    const sail::resolution& resolution() const;
 
     /*
      * Returns image pixel format. See SailPixelFormat.
@@ -214,6 +224,11 @@ public:
      * and the pixel format. These two properties must be set beforehand.
      */
     image& with_bytes_per_line_auto();
+
+    /*
+     * Sets a new resolution.
+     */
+    image& with_resolution(const sail::resolution &res);
 
     /*
      * Sets a new pixel format. See SailPixelFormat.

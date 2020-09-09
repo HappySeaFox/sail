@@ -40,9 +40,10 @@
 extern "C" {
 #endif
 
-struct sail_palette;
-struct sail_meta_entry_node;
 struct sail_iccp;
+struct sail_meta_entry_node;
+struct sail_palette;
+struct sail_resolution;
 struct sail_source_image;
 
 /*
@@ -83,6 +84,14 @@ struct sail_image {
      *        it to sail_bytes_per_line() if scan lines are not padded to a certain boundary.
      */
     unsigned bytes_per_line;
+
+    /*
+     * Image resolution.
+     *
+     * READ:  Set by SAIL to a valid resolution or to NULL if this information is not available.
+     * WRITE: Must be allocated and set by a caller to a valid image resolution if necessary.
+     */
+    struct sail_resolution *resolution;
 
     /*
      * Image pixel format. See SailPixelFormat.

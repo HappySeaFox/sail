@@ -59,6 +59,7 @@ public:
     unsigned width;
     unsigned height;
     unsigned bytes_per_line;
+    sail::resolution resolution;
     SailPixelFormat pixel_format;
     bool animated;
     int delay;
@@ -88,6 +89,7 @@ image& image::operator=(const image &img)
     with_width(img.width())
         .with_height(img.height())
         .with_bytes_per_line(img.bytes_per_line())
+        .with_resolution(img.resolution())
         .with_pixel_format(img.pixel_format())
         .with_animated(img.animated())
         .with_delay(img.delay())
@@ -124,6 +126,11 @@ unsigned image::height() const
 unsigned image::bytes_per_line() const
 {
     return d->bytes_per_line;
+}
+
+const sail::resolution& image::resolution() const
+{
+    return d->resolution;
 }
 
 SailPixelFormat image::pixel_format() const
@@ -205,6 +212,12 @@ image& image::with_bytes_per_line_auto()
     image::bytes_per_line(d->width, d->pixel_format, &bytes_per_line);
 
     return with_bytes_per_line(bytes_per_line);
+}
+
+image& image::with_resolution(const sail::resolution &res)
+{
+    d->resolution = res;
+    return *this;
 }
 
 image& image::with_pixel_format(SailPixelFormat pixel_format)
@@ -393,6 +406,7 @@ image::image(const sail_image *sail_image)
     with_width(sail_image->width)
         .with_height(sail_image->height)
         .with_bytes_per_line(sail_image->bytes_per_line)
+        .with_resolution(sail_image->resolution)
         .with_pixel_format(sail_image->pixel_format)
         .with_animated(sail_image->animated)
         .with_delay(sail_image->delay)
@@ -462,6 +476,15 @@ sail_status_t image::to_sail_image(sail_image *sail_image) const
     sail_image->width          = d->width;
     sail_image->height         = d->height;
     sail_image->bytes_per_line = d->bytes_per_line;
+
+    if (d->resolution.is_valid()) {
+        SAIL_TRY_OR_CLEANUP(sail_alloc_resolution(&sail_image->resolution),
+                            /* cleanup */ sail_destroy_meta_entry_node_chain(sail_image->meta_entry_node));
+
+        SAIL_TRY_OR_CLEANUP(d->resolution.to_sail_resolution(sail_image->resolution),
+                            /* cleanup */ sail_destroy_meta_entry_node_chain(sail_image->meta_entry_node));
+    }
+
     sail_image->pixel_format   = d->pixel_format;
     sail_image->animated       = d->animated;
     sail_image->delay          = d->delay;
