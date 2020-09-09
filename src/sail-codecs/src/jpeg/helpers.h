@@ -37,6 +37,7 @@
 
 struct sail_iccp;
 struct sail_meta_entry_node;
+struct sail_resolution;
 
 struct my_error_context {
     struct jpeg_error_mgr jpeg_error_mgr;
@@ -60,5 +61,9 @@ SAIL_HIDDEN sail_status_t fetch_meta_info(struct jpeg_decompress_struct *decompr
 #ifdef HAVE_JPEG_ICCP
 SAIL_HIDDEN sail_status_t fetch_iccp(struct jpeg_decompress_struct *decompress_context, struct sail_iccp **iccp);
 #endif
+
+SAIL_HIDDEN sail_status_t fetch_resolution(struct jpeg_decompress_struct *decompress_context, struct sail_resolution **resolution);
+
+SAIL_HIDDEN sail_status_t write_resolution(struct jpeg_compress_struct *compress_context, const struct sail_resolution *resolution);
 
 #endif
