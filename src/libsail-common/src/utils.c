@@ -522,15 +522,12 @@ sail_status_t sail_meta_data_to_string(enum SailMetaData meta_data, const char *
         case SAIL_META_DATA_MODEL:           *result = "Model";           return SAIL_OK;
         case SAIL_META_DATA_NAME:            *result = "Name";            return SAIL_OK;
         case SAIL_META_DATA_PRINTER:         *result = "Printer";         return SAIL_OK;
-        case SAIL_META_DATA_RESOLUTION_UNIT: *result = "Resolution Unit"; return SAIL_OK;
         case SAIL_META_DATA_SOFTWARE:        *result = "Software";        return SAIL_OK;
         case SAIL_META_DATA_SOURCE:          *result = "Source";          return SAIL_OK;
         case SAIL_META_DATA_TITLE:           *result = "Title";           return SAIL_OK;
         case SAIL_META_DATA_URL:             *result = "URL";             return SAIL_OK;
         case SAIL_META_DATA_WARNING:         *result = "Warning";         return SAIL_OK;
         case SAIL_META_DATA_XMP:             *result = "XMP";             return SAIL_OK;
-        case SAIL_META_DATA_X_RESOLUTION:    *result = "X Resolution";    return SAIL_OK;
-        case SAIL_META_DATA_Y_RESOLUTION:    *result = "Y Resolution";    return SAIL_OK;
     }
 
     *result = "UNKNOWN";
@@ -567,15 +564,12 @@ sail_status_t sail_meta_data_from_string(const char *str, enum SailMetaData *res
         case UINT64_C(210682966998):         *result = SAIL_META_DATA_MODEL;           return SAIL_OK;
         case UINT64_C(6384353318):           *result = SAIL_META_DATA_NAME;            return SAIL_OK;
         case UINT64_C(229437749136105):      *result = SAIL_META_DATA_PRINTER;         return SAIL_OK;
-        case UINT64_C(16074996716934497305): *result = SAIL_META_DATA_RESOLUTION_UNIT; return SAIL_OK;
         case UINT64_C(7571569592229392):     *result = SAIL_META_DATA_SOFTWARE;        return SAIL_OK;
         case UINT64_C(6952773348182):        *result = SAIL_META_DATA_SOURCE;          return SAIL_OK;
         case UINT64_C(210691070471):         *result = SAIL_META_DATA_TITLE;           return SAIL_OK;
         case UINT64_C(193472344):            *result = SAIL_META_DATA_URL;             return SAIL_OK;
         case UINT64_C(229446134771803):      *result = SAIL_META_DATA_WARNING;         return SAIL_OK;
         case UINT64_C(193475450):            *result = SAIL_META_DATA_XMP;             return SAIL_OK;
-        case UINT64_C(14296528877741363441): *result = SAIL_META_DATA_X_RESOLUTION;    return SAIL_OK;
-        case UINT64_C(14347070984255090258): *result = SAIL_META_DATA_Y_RESOLUTION;    return SAIL_OK;
     }
 
     *result = SAIL_META_DATA_UNKNOWN;
