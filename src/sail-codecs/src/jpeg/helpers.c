@@ -216,7 +216,7 @@ sail_status_t fetch_iccp(struct jpeg_decompress_struct *decompress_context, stru
                    ? "" : "not ");
 
     if (data != NULL && data_length > 0) {
-        SAIL_TRY_OR_CLEANUP(sail_alloc_iccp_with_shallow_data(iccp, data, data_length),
+        SAIL_TRY_OR_CLEANUP(sail_alloc_iccp_from_shallow_data(iccp, data, data_length),
                             /* cleanup */ sail_free(data));
     }
 

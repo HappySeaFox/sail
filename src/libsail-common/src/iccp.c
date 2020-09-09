@@ -43,7 +43,7 @@ sail_status_t sail_alloc_iccp(struct sail_iccp **iccp) {
     return SAIL_OK;
 }
 
-sail_status_t sail_alloc_iccp_with_data(struct sail_iccp **iccp, const void *data, unsigned data_length) {
+sail_status_t sail_alloc_iccp_from_data(struct sail_iccp **iccp, const void *data, unsigned data_length) {
 
     SAIL_CHECK_ICCP_PTR(iccp);
 
@@ -58,7 +58,7 @@ sail_status_t sail_alloc_iccp_with_data(struct sail_iccp **iccp, const void *dat
     return SAIL_OK;
 }
 
-sail_status_t sail_alloc_iccp_with_shallow_data(struct sail_iccp **iccp, void *data, unsigned data_length) {
+sail_status_t sail_alloc_iccp_from_shallow_data(struct sail_iccp **iccp, void *data, unsigned data_length) {
 
     SAIL_CHECK_ICCP_PTR(iccp);
 
