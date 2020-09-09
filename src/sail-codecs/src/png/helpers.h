@@ -38,6 +38,7 @@
 struct sail_iccp;
 struct sail_meta_entry_node;
 struct sail_palette;
+struct sail_resolution;
 
 SAIL_HIDDEN void my_error_fn(png_structp png_ptr, png_const_charp text);
 

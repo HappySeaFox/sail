@@ -176,17 +176,23 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
         return SAIL_ERROR_UNDERLYING_CODEC;
     }
 
-    /* Fetch meta info and ICCP. */
+    /* Fetch meta info. */
     if (tiff_state->read_options->io_options & SAIL_IO_OPTION_META_INFO) {
         struct sail_meta_entry_node **last_meta_entry_node = &(*image)->meta_entry_node;
 
         SAIL_TRY_OR_CLEANUP(fetch_meta_info(tiff_state->tiff, &last_meta_entry_node),
                             /* cleanup */ sail_destroy_image(*image));
     }
+
+    /* Fetch ICC profile. */
     if (tiff_state->read_options->io_options & SAIL_IO_OPTION_ICCP) {
         SAIL_TRY_OR_CLEANUP(fetch_iccp(tiff_state->tiff, &(*image)->iccp),
                             /* cleanup */ sail_destroy_image(*image));
     }
+
+    /* Fetch resolution. */
+    SAIL_TRY_OR_CLEANUP(fetch_resolution(tiff_state->tiff, &(*image)->resolution),
+                            /* cleanup */ sail_destroy_image(*image));
 
     (*image)->pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;
     SAIL_TRY_OR_CLEANUP(sail_bytes_per_line((*image)->width, (*image)->pixel_format, &(*image)->bytes_per_line),
@@ -360,6 +366,9 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v3(void *state, struc
         SAIL_LOG_DEBUG("TIFF: Writing meta info");
         SAIL_TRY(write_meta_info(tiff_state->tiff, image->meta_entry_node));
     }
+
+    /* Write resolution. */
+    SAIL_TRY(write_resolution(tiff_state->tiff, image->resolution));
 
     const char *pixel_format_str = NULL;
     SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(image->pixel_format, &pixel_format_str));

@@ -36,6 +36,7 @@
 #include "export.h"
 
 struct sail_meta_entry_node;
+struct sail_resolution;
 
 SAIL_HIDDEN void my_error_fn(const char *module, const char *format, va_list ap);
 
@@ -58,5 +59,9 @@ SAIL_HIDDEN sail_status_t fetch_meta_info(TIFF *tiff, struct sail_meta_entry_nod
 SAIL_HIDDEN sail_status_t write_meta_info(TIFF *tiff, const struct sail_meta_entry_node *meta_entry_node);
 
 SAIL_HIDDEN sail_status_t supported_write_output_pixel_format(enum SailPixelFormat pixel_format);
+
+SAIL_HIDDEN sail_status_t fetch_resolution(TIFF *tiff, struct sail_resolution **resolution);
+
+SAIL_HIDDEN sail_status_t write_resolution(TIFF *tiff, const struct sail_resolution *resolution);
 
 #endif
