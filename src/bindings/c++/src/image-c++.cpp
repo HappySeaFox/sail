@@ -472,10 +472,10 @@ sail_status_t image::to_sail_image(sail_image *sail_image) const
 
     if (d->resolution.is_valid()) {
         SAIL_TRY_OR_CLEANUP(sail_alloc_resolution(&sail_image->resolution),
-                            /* cleanup */ sail_destroy_meta_entry_node_chain(sail_image->meta_entry_node));
+                            /* cleanup */ sail_destroy_meta_data_node_chain(sail_image->meta_data_node));
 
         SAIL_TRY_OR_CLEANUP(d->resolution.to_sail_resolution(sail_image->resolution),
-                            /* cleanup */ sail_destroy_meta_entry_node_chain(sail_image->meta_entry_node));
+                            /* cleanup */ sail_destroy_meta_data_node_chain(sail_image->meta_data_node));
     }
 
     sail_image->pixel_format   = d->pixel_format;
