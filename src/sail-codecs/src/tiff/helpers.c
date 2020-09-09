@@ -289,6 +289,11 @@ sail_status_t fetch_resolution(TIFF *tiff, struct sail_resolution **resolution) 
     TIFFGetField(tiff, TIFFTAG_XRESOLUTION,    &x);
     TIFFGetField(tiff, TIFFTAG_YRESOLUTION,    &y);
 
+    /* Resolution information is not valid. */
+    if (x == 0 && y == 0) {
+        return SAIL_OK;
+    }
+
     SAIL_TRY(sail_alloc_resolution(resolution));
 
     switch (unit) {
