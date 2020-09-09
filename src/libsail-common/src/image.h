@@ -163,7 +163,8 @@ struct sail_image {
     int properties;
 
     /*
-     * Source image properties.
+     * Source image properties which are usually lost during decoding.
+     * For example, one might want to know the source image pixel format.
      *
      * READ:  Set by SAIL to valid source image properties of the original image.
      * WRITE: Ignored.

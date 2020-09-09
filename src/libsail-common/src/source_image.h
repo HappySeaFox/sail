@@ -45,8 +45,10 @@ struct sail_meta_entry_node;
 struct sail_palette;
 
 /*
- * A structure representing a source image properties. The structure is used in reading operations only
- * to preserve the source image properties. It's ignored in writing operations.
+ * Source image properties. The structure is used in reading operations only
+ * to preserve the source image properties which are usually lost during decoding.
+ * For example, one might want to know the source image pixel format.
+ * It's ignored in writing operations.
  */
 struct sail_source_image {
 
