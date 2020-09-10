@@ -313,8 +313,8 @@ sail_status_t fetch_resolution(TIFF *tiff, struct sail_resolution **resolution) 
         }
     }
 
-    (*resolution)->x = (uint16_t)x;
-    (*resolution)->y = (uint16_t)y;
+    (*resolution)->x = x;
+    (*resolution)->y = y;
 
     return SAIL_OK;
 }
@@ -344,8 +344,8 @@ sail_status_t write_resolution(TIFF *tiff, const struct sail_resolution *resolut
     }
 
     TIFFSetField(tiff, TIFFTAG_RESOLUTIONUNIT, unit);
-    TIFFSetField(tiff, TIFFTAG_XRESOLUTION,    (float)resolution->x);
-    TIFFSetField(tiff, TIFFTAG_YRESOLUTION,    (float)resolution->y);
+    TIFFSetField(tiff, TIFFTAG_XRESOLUTION,    resolution->x);
+    TIFFSetField(tiff, TIFFTAG_YRESOLUTION,    resolution->y);
 
     return SAIL_OK;
 }

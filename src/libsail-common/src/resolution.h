@@ -26,8 +26,6 @@
 #ifndef SAIL_RESOLUTION_H
 #define SAIL_RESOLUTION_H
 
-#include <stdint.h>
-
 #ifdef SAIL_BUILD
     #include "error.h"
     #include "export.h"
@@ -47,8 +45,8 @@ struct sail_resolution {
 
     enum SailResolutionUnit unit;
 
-    uint16_t x;
-    uint16_t y;
+    float x;
+    float y;
 };
 
 /*
@@ -64,7 +62,7 @@ SAIL_EXPORT sail_status_t sail_alloc_resolution(struct sail_resolution **resolut
  *
  * Returns 0 on success or sail_status_t on error.
  */
-SAIL_EXPORT sail_status_t sail_alloc_resolution_from_data(struct sail_resolution **resolution, enum SailResolutionUnit unit, uint16_t x, uint16_t y);
+SAIL_EXPORT sail_status_t sail_alloc_resolution_from_data(struct sail_resolution **resolution, enum SailResolutionUnit unit, float x, float y);
 
 /*
  * Destroys the specified resolution.
