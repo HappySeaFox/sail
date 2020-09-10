@@ -65,12 +65,12 @@ public:
     /*
      * Returns the resolution x value.
      */
-    uint16_t x() const;
+    float x() const;
 
     /*
      * Returns the resolution y value.
      */
-    uint16_t y() const;
+    float y() const;
 
     /*
      * Sets a new resolution units.
@@ -80,12 +80,12 @@ public:
     /*
      * Sets a new resolution x value.
      */
-    resolution& with_x(uint16_t x);
+    resolution& with_x(float x);
 
     /*
      * Sets a new resolution y value.
      */
-    resolution& with_y(uint16_t y);
+    resolution& with_y(float y);
 
 private:
     /*

@@ -453,8 +453,8 @@ sail_status_t fetch_resolution(png_structp png_ptr, png_infop info_ptr, struct s
         }
     }
 
-    (*resolution)->x = (uint16_t)x;
-    (*resolution)->y = (uint16_t)y;
+    (*resolution)->x = (float)x;
+    (*resolution)->y = (float)y;
 
     return SAIL_OK;
 }
@@ -480,7 +480,7 @@ sail_status_t write_resolution(png_structp png_ptr, png_infop info_ptr, const st
         }
     }
 
-    png_set_pHYs(png_ptr, info_ptr, resolution->x, resolution->y, unit);
+    png_set_pHYs(png_ptr, info_ptr, (unsigned)resolution->x, (unsigned)resolution->y, unit);
 
     return SAIL_OK;
 }

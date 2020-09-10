@@ -81,12 +81,12 @@ SailResolutionUnit resolution::unit() const
     return d->resolution.unit;
 }
 
-uint16_t resolution::x() const
+float resolution::x() const
 {
     return d->resolution.x;
 }
 
-uint16_t resolution::y() const
+float resolution::y() const
 {
     return d->resolution.y;
 }
@@ -97,13 +97,13 @@ resolution& resolution::with_unit(SailResolutionUnit unit)
     return *this;
 }
 
-resolution& resolution::with_x(uint16_t x)
+resolution& resolution::with_x(float x)
 {
     d->resolution.x = x;
     return *this;
 }
 
-resolution& resolution::with_y(uint16_t y)
+resolution& resolution::with_y(float y)
 {
     d->resolution.y = y;
     return *this;

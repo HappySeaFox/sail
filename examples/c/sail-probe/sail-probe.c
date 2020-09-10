@@ -52,7 +52,7 @@ static sail_status_t probe(const char *path) {
     if (image->resolution == NULL) {
         printf("Resolution:   : -\n");
     } else {
-        printf("Resolution:   : %ux%u\n", image->resolution->x, image->resolution->y);
+        printf("Resolution:   : %.1fx%.1f\n", image->resolution->x, image->resolution->y);
     }
     const char *pixel_format_str;
     SAIL_TRY(sail_pixel_format_to_string(image->source_image->pixel_format, &pixel_format_str));

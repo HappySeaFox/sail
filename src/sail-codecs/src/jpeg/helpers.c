@@ -246,8 +246,8 @@ sail_status_t fetch_resolution(struct jpeg_decompress_struct *decompress_context
         }
     }
 
-    (*resolution)->x = decompress_context->X_density;
-    (*resolution)->y = decompress_context->Y_density;
+    (*resolution)->x = (float)decompress_context->X_density;
+    (*resolution)->y = (float)decompress_context->Y_density;
 
     return SAIL_OK;
 }
@@ -274,8 +274,8 @@ sail_status_t write_resolution(struct jpeg_compress_struct *compress_context, co
         }
     }
 
-    compress_context->X_density = resolution->x;
-    compress_context->Y_density = resolution->y;
+    compress_context->X_density = (UINT16)resolution->x;
+    compress_context->Y_density = (UINT16)resolution->y;
 
     return SAIL_OK;
 }
