@@ -1,7 +1,5 @@
 ## Priority 1
 
-- Add warnings with Clang
-
 - Read/write indexed PNGs with alpha
 
 - Make meta info keys as enum
