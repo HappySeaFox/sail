@@ -45,6 +45,13 @@ extern "C" {
 #endif
 
 /*
+ * Duplicates the specified memory buffer and stores a new buffer in the specified output.
+ *
+ * Returns 0 on success or sail_status_t on error.
+ */
+SAIL_EXPORT sail_status_t sail_memdup(const void *input, size_t input_size, void **output);
+
+/*
  * Duplicates the specified string and stores a new string in the specified output.
  *
  * Returns 0 on success or sail_status_t on error.

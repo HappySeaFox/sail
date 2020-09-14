@@ -52,7 +52,7 @@ enum SailLogLevel {
 SAIL_EXPORT void sail_log(enum SailLogLevel level, const char *file, int line, const char *format, ...);
 
 /*
- * Sets a maximum log level barrier. Only the messages of the specified log level or lower will be displayed.
+ * Sets a maximum log level barrier. Only messages of the specified log level or lower will be displayed.
  *
  * This function is not thread-safe. It's recommended to call it in the main thread
  * before initializing SAIL.
