@@ -44,7 +44,7 @@ target_include_directories(deep-diver-with-c++-api PRIVATE "${CMAKE_CURRENT_SOUR
 # Enable ASAN
 #
 if (SAIL_ASAN)
-    if (CMAKE_COMPILER_IS_GNUCC)
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         target_compile_options(deep-diver-with-c++-api PRIVATE "-fsanitize=address")
         target_link_libraries(deep-diver-with-c++-api "-fsanitize=address")
     else()
