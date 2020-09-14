@@ -44,6 +44,24 @@
 
 #include "sail-common.h"
 
+sail_status_t sail_memdup(const void *input, size_t input_size, void **output) {
+
+    if (input == NULL) {
+        *output = NULL;
+        return SAIL_OK;
+    }
+
+    if (input_size == 0) {
+        return SAIL_ERROR_INVALID_ARGUMENT;
+    }
+
+    SAIL_TRY(sail_malloc(output, input_size));
+
+    memcpy(*output, input, input_size);
+
+    return SAIL_OK;
+}
+
 sail_status_t sail_strdup(const char *input, char **output) {
 
     if (input == NULL) {
@@ -51,14 +69,7 @@ sail_status_t sail_strdup(const char *input, char **output) {
         return SAIL_OK;
     }
 
-    const size_t len = strlen((const char *)input);
-
-    void *ptr;
-    SAIL_TRY(sail_malloc(&ptr, len+1));
-    *output = ptr;
-
-    memcpy(*output, input, len);
-    (*output)[len] = '\0';
+    SAIL_TRY(sail_memdup(input, strlen(input) + 1, output));
 
     return SAIL_OK;
 }
