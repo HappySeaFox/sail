@@ -40,7 +40,7 @@ target_include_directories(junior-with-c++-api PRIVATE "${CMAKE_CURRENT_SOURCE_D
 # Enable ASAN
 #
 if (SAIL_ASAN)
-    if (CMAKE_COMPILER_IS_GNUCC)
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         target_compile_options(junior-with-c++-api PRIVATE "-fsanitize=address")
         target_link_libraries(junior-with-c++-api "-fsanitize=address")
     else()
