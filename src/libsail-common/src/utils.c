@@ -69,7 +69,9 @@ sail_status_t sail_strdup(const char *input, char **output) {
         return SAIL_OK;
     }
 
-    SAIL_TRY(sail_memdup(input, strlen(input) + 1, output));
+    void *ptr;
+    SAIL_TRY(sail_memdup(input, strlen(input) + 1, &ptr));
+    *output = ptr;
 
     return SAIL_OK;
 }
