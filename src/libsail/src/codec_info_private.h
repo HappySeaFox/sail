@@ -45,7 +45,7 @@ struct sail_codec_info;
  * Allocates a new codec info node. The assigned node MUST be destroyed later
  * with destroy_codec_info_node().
  *
- * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_OK on success.
  */
 SAIL_HIDDEN sail_status_t alloc_codec_info_node(struct sail_codec_info_node **codec_info_node);
 
@@ -64,7 +64,7 @@ SAIL_HIDDEN void destroy_codec_info_node_chain(struct sail_codec_info_node *code
  * Reads SAIL codec info from the specified file and stores the parsed information into the specified
  * codec info object. The assigned codec info MUST be destroyed later with destroy_codec_info().
  *
- * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_OK on success.
  */
 SAIL_HIDDEN sail_status_t codec_read_info(const char *path, struct sail_codec_info **codec_info);
 

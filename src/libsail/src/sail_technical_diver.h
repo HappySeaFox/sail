@@ -60,7 +60,7 @@ struct sail_write_options;
  * in it and destroy it in sail_stop_reading. States must be used per image. DO NOT use the same state
  * to read multiple images in the same time.
  *
- * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_start_reading_io(struct sail_io *io, const struct sail_codec_info *codec_info, void **state);
 
@@ -82,7 +82,7 @@ SAIL_EXPORT sail_status_t sail_start_reading_io(struct sail_io *io, const struct
  * in it and destroy it in sail_stop_reading. States must be used per image. DO NOT use the same state
  * to read multiple images in the same time.
  *
- * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_start_reading_io_with_options(struct sail_io *io,
                                                             const struct sail_codec_info *codec_info,
@@ -106,7 +106,7 @@ SAIL_EXPORT sail_status_t sail_start_reading_io_with_options(struct sail_io *io,
  * in it and destroy it in sail_stop_writing. States must be used per image. DO NOT use the same state
  * to write multiple images in the same time.
  *
- * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_start_writing_io(struct sail_io *io, const struct sail_codec_info *codec_info, void **state);
 
@@ -129,7 +129,7 @@ SAIL_EXPORT sail_status_t sail_start_writing_io(struct sail_io *io, const struct
  * in it and destroy it in sail_stop_writing. States must be used per image. DO NOT use the same state
  * to write multiple images in the same time.
  *
- * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_start_writing_io_with_options(struct sail_io *io,
                                                             const struct sail_codec_info *codec_info,

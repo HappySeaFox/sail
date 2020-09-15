@@ -292,7 +292,7 @@ public:
      * Calculates the number of bits per pixel in the specified pixel format.
      * For example, for SAIL_PIXEL_FORMAT_RGB 24 is assigned.
      *
-     * Returns 0 on success or sail_status_t on error.
+     * Returns SAIL_OK on success.
      */
     static sail_status_t bits_per_pixel(SailPixelFormat pixel_format, unsigned *result);
 
@@ -313,7 +313,7 @@ public:
      *     24 + 0                                ==
      *     24 bytes per line
      *
-     * Returns 0 on success or sail_status_t on error.
+     * Returns SAIL_OK on success.
      */
     static sail_status_t bytes_per_line(unsigned width, SailPixelFormat pixel_format, unsigned *result);
 
@@ -321,7 +321,7 @@ public:
      * Calculates the number of bytes needed to hold an entire image in memory without padding.
      * It is effectively bytes per line * image height.
      *
-     * Returns 0 on success or sail_status_t on error.
+     * Returns SAIL_OK on success.
      */
     static sail_status_t bytes_per_image(const image &simage, unsigned *result);
 
@@ -329,7 +329,7 @@ public:
      * Assigns a non-NULL string representation of the specified pixel format.
      * The assigned string MUST NOT be destroyed. For example: "RGB".
      *
-     * Returns 0 on success or sail_status_t on error.
+     * Returns SAIL_OK on success.
      */
     static sail_status_t pixel_format_to_string(SailPixelFormat pixel_format, const char **result);
 
@@ -337,7 +337,7 @@ public:
      * Assigns pixel format from a string representation.
      * For example: SAIL_PIXEL_FORMAT_SOURCE is assigned for "SOURCE".
      *
-     * Returns 0 on success or sail_status_t on error.
+     * Returns SAIL_OK on success.
      */
     static sail_status_t pixel_format_from_string(const char *str, SailPixelFormat *result);
 
@@ -345,7 +345,7 @@ public:
      * Assigns a non-NULL string representation of the specified image property. See SailImageProperty.
      * The assigned string MUST NOT be destroyed. For example: "FLIPPED-VERTICALLY".
      *
-     * Returns 0 on success or sail_status_t on error.
+     * Returns SAIL_OK on success.
      */
     static sail_status_t image_property_to_string(SailImageProperty image_property, const char **result);
 
@@ -353,7 +353,7 @@ public:
      * Assigns image property from a string representation. See SailImageProperty.
      * For example: SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY is assigned for "FLIPPED-VERTICALLY".
      *
-     * Returns 0 on success or sail_status_t on error.
+     * Returns SAIL_OK on success.
      */
     static sail_status_t image_property_from_string(const char *str, SailImageProperty *result);
 
@@ -361,7 +361,7 @@ public:
      * Assigns a non-NULL string representation of the specified compression type. See SailCompression.
      * The assigned string MUST NOT be destroyed. For example: "RLE".
      *
-     * Returns 0 on success or sail_status_t on error.
+     * Returns SAIL_OK on success.
      */
     static sail_status_t compression_to_string(SailCompression compression, const char **result);
 
@@ -369,7 +369,7 @@ public:
      * Assigns compression from a string representation. See SailCompression.
      * For example: SAIL_COMPRESSION_RLE is assigned for "RLE".
      *
-     * Returns 0 on success or sail_status_t on error.
+     * Returns SAIL_OK on success.
      */
     static sail_status_t compression_from_string(const char *str, SailCompression *result);
 

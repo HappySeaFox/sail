@@ -42,7 +42,7 @@ struct sail_io;
  * Opens the specified memory buffer for reading and allocates a new I/O object for it.
  * The assigned I/O object MUST be destroyed later with sail_destroy_io().
  *
- * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_OK on success.
  */
 SAIL_HIDDEN sail_status_t alloc_io_read_mem(const void *buffer, size_t length, struct sail_io **io);
 
@@ -50,7 +50,7 @@ SAIL_HIDDEN sail_status_t alloc_io_read_mem(const void *buffer, size_t length, s
  * Opens the specified memory buffer for writing and allocates a new I/O object for it.
  * The assigned I/O object MUST be destroyed later with sail_destroy_io().
  *
- * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_OK on success.
  */
 SAIL_HIDDEN sail_status_t alloc_io_write_mem(void *buffer, size_t length, struct sail_io **io);
 

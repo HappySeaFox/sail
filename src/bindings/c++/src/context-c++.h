@@ -82,7 +82,7 @@ public:
      *     1. SAIL_CODECS_PATH environment variable
      *     2. Hardcoded SAIL_CODECS_PATH in config.h
      *
-     * Returns 0 on success or sail_status_t on error.
+     * Returns SAIL_OK on success.
      */
     static sail_status_t init(int flags);
 
@@ -91,7 +91,7 @@ public:
      * to release some memory but do not want to deinitialize SAIL with sail_finish(). Subsequent attempts
      * to read or write images will reload necessary SAIL codecs from disk.
      *
-     * Returns 0 on success or sail_status_t on error.
+     * Returns SAIL_OK on success.
      */
     static sail_status_t unload_codecs();
 
