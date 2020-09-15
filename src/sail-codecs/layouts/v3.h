@@ -53,7 +53,7 @@ extern "C" {
  * in it and destroy it in sail_codec_read_finish_vx(). States must be used per image. DO NOT use the same state
  * to read multiple images in the same time.
  *
- * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_codec_read_init_v3(struct sail_io *io, const struct sail_read_options *read_options, void **state);
 
@@ -68,21 +68,21 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v3(struct sail_io *io, const stru
  * It MUST NOT allocate image pixels. They will be allocated by libsail and will be available in
  * sail_codec_read_seek_next_pass()/sail_codec_read_frame().
  *
- * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct sail_io *io, struct sail_image **image);
 
 /*
  * Seeks to the next pass if the specified image has multiple passes. Does nothing otherwise.
  *
- * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_codec_read_seek_next_pass_v3(void *state, struct sail_io *io, const struct sail_image *image);
 
 /*
  * Reads the next frame of the current image in the current pass. The image pixels are pre-allocated by libsail.
  *
- * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_codec_read_frame_v3(void *state, struct sail_io *io, struct sail_image *image);
 
@@ -91,7 +91,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v3(void *state, struct sail_io *
  * This function doesn't close the io stream. It just stops decoding. Use io->close() or sail_destroy_io()
  * to actually close the io stream.
  *
- * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_codec_read_finish_v3(void **state, struct sail_io *io);
 
@@ -107,7 +107,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_finish_v3(void **state, struct sail_io
  * in it and destroy it in sail_codec_write_finish_vx(). States must be used per image. DO NOT use the same state
  * to write multiple images in the same time.
  *
- * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_codec_write_init_v3(struct sail_io *io, const struct sail_write_options *write_options, void **state);
 
@@ -115,21 +115,21 @@ SAIL_EXPORT sail_status_t sail_codec_write_init_v3(struct sail_io *io, const str
  * Seeks to a next frame before writing it. The frame is NOT immediately written. Use sail_codec_write_seek_next_pass()
  * and sail_codec_write_frame() to actually write a frame.
  *
- * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v3(void *state, struct sail_io *io, const struct sail_image *image);
 
 /*
  * Seeks to a next pass before writing it if the specified image is interlaced. Does nothing otherwise.
  *
- * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_codec_write_seek_next_pass_v3(void *state, struct sail_io *io, const struct sail_image *image);
 
 /*
  * Writes a next frame of the current image in the current pass.
  *
- * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_codec_write_frame_v3(void *state, struct sail_io *io, const struct sail_image *image);
 
@@ -138,7 +138,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_frame_v3(void *state, struct sail_io 
  * This function doesn't close the io stream. Use io->close() or sail_destroy_io() to actually
  * close the io stream.
  *
- * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_codec_write_finish_v3(void **state, struct sail_io *io);
 

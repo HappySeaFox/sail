@@ -67,7 +67,7 @@ struct sail_write_options;
  * in it and destroy it in sail_stop_reading(). States must be used per image. DO NOT use the same state
  * to start reading multiple images at the same time.
  *
- * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_start_reading_file_with_options(const char *path, const struct sail_codec_info *codec_info,
                                                               const struct sail_read_options *read_options, void **state);
@@ -89,7 +89,7 @@ SAIL_EXPORT sail_status_t sail_start_reading_file_with_options(const char *path,
  * in it and destroy it in sail_stop_reading(). States must be used per image. DO NOT use the same state
  * to start reading multiple images at the same time.
  *
- * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_start_reading_mem_with_options(const void *buffer, size_t buffer_length,
                                                              const struct sail_codec_info *codec_info,
@@ -118,7 +118,7 @@ SAIL_EXPORT sail_status_t sail_start_reading_mem_with_options(const void *buffer
  * in it and destroy it in sail_stop_writing(). States must be used per image. DO NOT use the same state
  * to start writing multiple images at the same time.
  *
- * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_start_writing_file_with_options(const char *path,
                                                               const struct sail_codec_info *codec_info,
@@ -142,7 +142,7 @@ SAIL_EXPORT sail_status_t sail_start_writing_file_with_options(const char *path,
  * in it and destroy it in sail_stop_writing. States must be used per image. DO NOT use the same state
  * to start writing multiple images at the same time.
  *
- * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_start_writing_mem_with_options(void *buffer, size_t buffer_length,
                                                              const struct sail_codec_info *codec_info,
@@ -155,7 +155,7 @@ SAIL_EXPORT sail_status_t sail_start_writing_mem_with_options(void *buffer, size
  *
  * It is essential to always stop writing to free memory resources. Failure to do so will lead to memory leaks.
  *
- * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_stop_writing_with_written(void *state, size_t *written);
 

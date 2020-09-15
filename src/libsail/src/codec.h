@@ -97,7 +97,7 @@ typedef struct sail_codec sail_codec_t;
  * the specified codec instance.
  * The assigned codec MUST be destroyed later with sail_destroy_codec().
  *
- * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_OK on success.
  */
 SAIL_HIDDEN sail_status_t alloc_and_load_codec(const struct sail_codec_info *codec_info, struct sail_codec **codec);
 

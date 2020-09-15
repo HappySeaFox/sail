@@ -51,7 +51,7 @@ struct sail_codec_info;
  *
  * Typical usage: This is a standalone function that could be called at any time.
  *
- * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_probe_file(const char *path, struct sail_image **image, const struct sail_codec_info **codec_info);
 
@@ -63,7 +63,7 @@ SAIL_EXPORT sail_status_t sail_probe_file(const char *path, struct sail_image **
  *
  * Typical usage: This is a standalone function that could be called at any time.
  *
- * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_read_file(const char *path, struct sail_image **image);
 
@@ -75,7 +75,7 @@ SAIL_EXPORT sail_status_t sail_read_file(const char *path, struct sail_image **i
  *
  * Typical usage: This is a standalone function that could be called at any time.
  *
- * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_read_mem(const void *buffer, size_t buffer_length, struct sail_image **image);
 
@@ -86,7 +86,7 @@ SAIL_EXPORT sail_status_t sail_read_mem(const void *buffer, size_t buffer_length
  *
  * Typical usage: This is a standalone function that could be called at any time.
  *
- * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_write_file(const char *path, const struct sail_image *image);
 
@@ -99,7 +99,7 @@ SAIL_EXPORT sail_status_t sail_write_file(const char *path, const struct sail_im
  *
  * Typical usage: This is a standalone function that could be called at any time.
  *
- * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_write_mem(void *buffer, size_t buffer_length, const struct sail_image *image, size_t *written);
 

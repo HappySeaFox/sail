@@ -109,7 +109,7 @@ enum SailInitFlags {
  *     1. SAIL_CODECS_PATH environment variable
  *     2. Hardcoded SAIL_CODECS_PATH in config.h
  *
- * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_init_with_flags(int flags);
 
@@ -149,7 +149,7 @@ SAIL_EXPORT const struct sail_codec_info_node* sail_codec_info_list(void);
  *                sail_read_next_frame()      ->
  *                sail_stop_writing().
  *
- * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_codec_info_from_path(const char *path, const struct sail_codec_info **codec_info);
 
@@ -164,7 +164,7 @@ SAIL_EXPORT sail_status_t sail_codec_info_from_path(const char *path, const stru
  *                sail_read_next_frame()                      ->
  *                sail_stop_reading().
  *
- * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_path(const char *path, const struct sail_codec_info **codec_info);
 
@@ -179,7 +179,7 @@ SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_path(const char *
  *                sail_read_next_frame()                     ->
  *                sail_stop_reading().
  *
- * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_mem(const void *buffer, size_t buffer_length,
                                                                    const struct sail_codec_info **codec_info);
@@ -196,7 +196,7 @@ SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_mem(const void *b
  *                sail_read_next_frame()                    ->
  *                sail_stop_reading().
  *
- * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_io(struct sail_io *io, const struct sail_codec_info **codec_info);
 
@@ -216,7 +216,7 @@ SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_io(struct sail_io
  *                sail_read_next_frame()           ->
  *                sail_stop_writing().
  *
- * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_codec_info_from_extension(const char *extension, const struct sail_codec_info **codec_info);
 
@@ -236,7 +236,7 @@ SAIL_EXPORT sail_status_t sail_codec_info_from_extension(const char *extension, 
  *                sail_read_next_frame()           ->
  *                sail_stop_writing().
  *
- * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_codec_info_from_mime_type(const char *mime_type, const struct sail_codec_info **codec_info);
 
@@ -247,7 +247,7 @@ SAIL_EXPORT sail_status_t sail_codec_info_from_mime_type(const char *mime_type, 
  *
  * Typical usage: This is a standalone function that can be called at any time.
  *
- * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_unload_codecs(void);
 

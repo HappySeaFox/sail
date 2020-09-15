@@ -84,7 +84,7 @@ public:
      *                image_reader::read_next_frame()         ->
      *                image_reader::stop_reading().
      *
-     * Returns 0 on success or sail_status_t on error.
+     * Returns SAIL_OK on success.
      */
     static sail_status_t from_magic_number(const std::string &path, codec_info *scodec_info);
     static sail_status_t from_magic_number(const char *path, codec_info *scodec_info);
@@ -98,7 +98,7 @@ public:
      *                image_reader::read_next_frame()        ->
      *                image_reader::stop_reading().
      *
-     * Returns 0 on success or sail_status_t on error.
+     * Returns SAIL_OK on success.
      */
     static sail_status_t from_magic_number(const void *buffer, size_t buffer_length, codec_info *scodec_info);
 
@@ -111,7 +111,7 @@ public:
      *                image_reader::read_next_frame()       ->
      *                image_reader::stop_reading().
      *
-     * Returns 0 on success or sail_status_t on error.
+     * Returns SAIL_OK on success.
      */
     static sail_status_t from_magic_number(const sail::io &io, codec_info *scodec_info);
 
@@ -129,7 +129,7 @@ public:
      *                image_writer::read_next_frame() ->
      *                image_writer::stop_writing().
      *
-     * Returns 0 on success or sail_status_t on error.
+     * Returns SAIL_OK on success.
      */
     static sail_status_t from_path(const std::string &path, codec_info *scodec_info);
     static sail_status_t from_path(const char *path, codec_info *scodec_info);
@@ -148,7 +148,7 @@ public:
      *                image_writer::read_next_frame() ->
      *                image_writer::stop_writing().
      *
-     * Returns 0 on success or sail_status_t on error.
+     * Returns SAIL_OK on success.
      */
     static sail_status_t from_extension(const std::string &suffix, codec_info *scodec_info);
     static sail_status_t from_extension(const char *suffix, codec_info *scodec_info);
@@ -167,7 +167,7 @@ public:
      *                image_writer::read_next_frame() ->
      *                image_writer::stop_writing().
      *
-     * Returns 0 on success or sail_status_t on error.
+     * Returns SAIL_OK on success.
      */
     static sail_status_t from_mime_type(const std::string &mime_type, codec_info *scodec_info);
     static sail_status_t from_mime_type(const char *mime_type, codec_info *scodec_info);
