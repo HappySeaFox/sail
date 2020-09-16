@@ -55,7 +55,7 @@ sail_status_t alloc_and_load_codec(const struct sail_codec_info *codec_info, str
     SAIL_LOG_DEBUG("Loading codec '%s'", codec_info->path);
 
 #ifdef SAIL_WIN32
-    HMODULE handle = LoadLibraryEx(codec_info->path, NULL, LOAD_LIBRARY_SEARCH_USER_DIRS);
+    HMODULE handle = LoadLibraryEx(codec_info->path, NULL, LOAD_LIBRARY_SEARCH_SYSTEM32 | LOAD_LIBRARY_SEARCH_USER_DIRS);
 
     if (handle == NULL) {
         SAIL_LOG_ERROR("Failed to load '%s'. Error: %d", codec_info->path, GetLastError());
