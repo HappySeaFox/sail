@@ -368,6 +368,7 @@ static MunitResult test_meta_data_to_string(const MunitParameter params[], void 
 
     TEST_SAIL_CONVERSION(SAIL_META_DATA_UNKNOWN,         "Unknown");
 
+    /* Strings. */
     TEST_SAIL_CONVERSION(SAIL_META_DATA_ARTIST,          "Artist");
     TEST_SAIL_CONVERSION(SAIL_META_DATA_AUTHOR,          "Author");
     TEST_SAIL_CONVERSION(SAIL_META_DATA_COMMENT,         "Comment");
@@ -377,7 +378,6 @@ static MunitResult test_meta_data_to_string(const MunitParameter params[], void 
     TEST_SAIL_CONVERSION(SAIL_META_DATA_DESCRIPTION,     "Description");
     TEST_SAIL_CONVERSION(SAIL_META_DATA_DISCLAIMER,      "Disclaimer");
     TEST_SAIL_CONVERSION(SAIL_META_DATA_DOCUMENT,        "Document");
-    TEST_SAIL_CONVERSION(SAIL_META_DATA_EXIF,            "EXIF");
     TEST_SAIL_CONVERSION(SAIL_META_DATA_HEX_EXIF,        "Hex EXIF");
     TEST_SAIL_CONVERSION(SAIL_META_DATA_HEX_IPTC,        "Hex IPTC");
     TEST_SAIL_CONVERSION(SAIL_META_DATA_HEX_XMP,         "Hex XMP");
@@ -392,6 +392,9 @@ static MunitResult test_meta_data_to_string(const MunitParameter params[], void 
     TEST_SAIL_CONVERSION(SAIL_META_DATA_URL,             "URL");
     TEST_SAIL_CONVERSION(SAIL_META_DATA_WARNING,         "Warning");
     TEST_SAIL_CONVERSION(SAIL_META_DATA_XMP,             "XMP");
+
+    /* Binary data. */
+    TEST_SAIL_CONVERSION(SAIL_META_DATA_EXIF,            "EXIF");
 
 #undef TEST_SAIL_CONVERSION
 
@@ -411,6 +414,7 @@ static MunitResult test_meta_data_from_string(const MunitParameter params[], voi
 
     TEST_SAIL_CONVERSION("Unknown",         SAIL_META_DATA_UNKNOWN);
 
+    /* Strings. */
     TEST_SAIL_CONVERSION("Artist",          SAIL_META_DATA_ARTIST);
     TEST_SAIL_CONVERSION("Author",          SAIL_META_DATA_AUTHOR);
     TEST_SAIL_CONVERSION("Comment",         SAIL_META_DATA_COMMENT);
@@ -420,7 +424,6 @@ static MunitResult test_meta_data_from_string(const MunitParameter params[], voi
     TEST_SAIL_CONVERSION("Description",     SAIL_META_DATA_DESCRIPTION);
     TEST_SAIL_CONVERSION("Disclaimer",      SAIL_META_DATA_DISCLAIMER);
     TEST_SAIL_CONVERSION("Document",        SAIL_META_DATA_DOCUMENT);
-    TEST_SAIL_CONVERSION("EXIF",            SAIL_META_DATA_EXIF);
     TEST_SAIL_CONVERSION("Hex EXIF",        SAIL_META_DATA_HEX_EXIF);
     TEST_SAIL_CONVERSION("Hex IPTC",        SAIL_META_DATA_HEX_IPTC);
     TEST_SAIL_CONVERSION("Hex XMP",         SAIL_META_DATA_HEX_XMP);
@@ -435,6 +438,9 @@ static MunitResult test_meta_data_from_string(const MunitParameter params[], voi
     TEST_SAIL_CONVERSION("URL",             SAIL_META_DATA_URL);
     TEST_SAIL_CONVERSION("Warning",         SAIL_META_DATA_WARNING);
     TEST_SAIL_CONVERSION("XMP",             SAIL_META_DATA_XMP);
+
+    /* Binary data. */
+    TEST_SAIL_CONVERSION("EXIF",            SAIL_META_DATA_EXIF);
 
 #undef TEST_SAIL_CONVERSION
 
