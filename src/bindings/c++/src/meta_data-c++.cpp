@@ -38,12 +38,20 @@ class SAIL_HIDDEN meta_data::pimpl
 public:
     pimpl()
         : key(SAIL_META_DATA_UNKNOWN)
+        , value(nullptr)
+        , value_length(0)
     {
+    }
+
+    ~pimpl()
+    {
+        sail_free(const_cast<char *>(value));
     }
 
     SailMetaData key;
     std::string key_unknown;
-    std::string value;
+    const char *value;
+    unsigned value_length;
 };
 
 meta_data::meta_data()
@@ -61,7 +69,7 @@ meta_data& meta_data::operator=(const meta_data &md)
 {
     with_key(md.key())
         .with_key_unknown(md.key_unknown())
-        .with_value(md.value());
+        .with_value(md.value(), md.length());
 
     return *this;
 }
@@ -81,26 +89,53 @@ std::string meta_data::key_unknown() const
     return d->key_unknown;
 }
 
-std::string meta_data::value() const
+const char* meta_data::value() const
 {
     return d->value;
+}
+
+unsigned meta_data::length() const
+{
+    return d->value_length;
 }
 
 meta_data& meta_data::with_key(SailMetaData key)
 {
     d->key = key;
+    d->key_unknown.clear();
+
     return *this;
 }
 
 meta_data& meta_data::with_key_unknown(const std::string &key_unknown)
 {
+    d->key = SAIL_META_DATA_UNKNOWN;
     d->key_unknown = key_unknown;
+
     return *this;
 }
 
 meta_data& meta_data::with_value(const std::string &value)
 {
-    d->value = value;
+    with_value(value.c_str(), (unsigned)value.length() + 1);
+    return *this;
+}
+
+meta_data& meta_data::with_value(const char *value)
+{
+    with_value(value, (unsigned)strlen(value) + 1);
+    return *this;
+}
+
+meta_data& meta_data::with_value(const char *value, unsigned value_length)
+{
+    sail_free(const_cast<char *>(d->value));
+    d->value = nullptr;
+
+    void *ptr;
+    SAIL_TRY_OR_SUPPRESS(sail_memdup(value, value_length, &ptr));
+    d->value = reinterpret_cast<const char *>(ptr);
+
     return *this;
 }
 
@@ -132,7 +167,7 @@ meta_data::meta_data(const sail_meta_data_node *md)
 
     with_key(md->key)
         .with_key_unknown(empty_string_on_nullptr(md->key_unknown))
-        .with_value(empty_string_on_nullptr(md->value));
+        .with_value(md->value, md->value_length);
 }
 
 sail_status_t meta_data::to_sail_meta_data_node(sail_meta_data_node *md) const
@@ -145,7 +180,11 @@ sail_status_t meta_data::to_sail_meta_data_node(sail_meta_data_node *md) const
         SAIL_TRY(sail_strdup(d->key_unknown.c_str(), &md->key_unknown));
     }
 
-    SAIL_TRY(sail_strdup(d->value.c_str(), &md->value));
+    void *ptr;
+    SAIL_TRY(sail_memdup(d->value, d->value_length, &ptr));
+
+    md->value        = reinterpret_cast<char *>(ptr);
+    md->value_length = d->value_length;
 
     return SAIL_OK;
 }

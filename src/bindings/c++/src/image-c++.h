@@ -152,8 +152,8 @@ public:
     /*
      * Returns image meta data.
      *
-     * READ:  Set by SAIL to a valid map with simple meta data (like JPEG comments).
-     * WRITE: Must be set by a caller to a valid map with simple meta data
+     * READ:  Set by SAIL to a valid map with meta data (like JPEG comments).
+     * WRITE: Must be set by a caller to a valid map with meta data
      *        (like JPEG comments) if necessary.
      */
     const std::vector<sail::meta_data>& meta_data() const;

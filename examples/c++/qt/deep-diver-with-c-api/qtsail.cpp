@@ -363,10 +363,10 @@ sail_status_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffe
     if (write_options->io_options & SAIL_IO_OPTION_META_DATA) {
         struct sail_meta_data_node *meta_data_node;
 
-        SAIL_TRY(sail_alloc_meta_data_node_from_data(SAIL_META_DATA_SOFTWARE,
-                                                     NULL,
-                                                     "SAIL",
-                                                     &meta_data_node));
+        SAIL_TRY(sail_alloc_meta_data_node_from_known_string(
+                     SAIL_META_DATA_SOFTWARE,
+                     "SAIL",
+                     &meta_data_node));
 
         image->meta_data_node = meta_data_node;
     }

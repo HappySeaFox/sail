@@ -46,15 +46,24 @@ extern "C" {
  * For example:
  *
  * {
- *     key         = SAIL_META_DATA_UNKNOWN,
- *     key_unknown = "My Data",
- *     value       = "Data"
+ *     key          = SAIL_META_DATA_UNKNOWN,
+ *     key_unknown  = "My Data",
+ *     value        = "Data",
+ *     value_length = 4
  * }
  *
  * {
- *     key         = SAIL_META_DATA_COMMENT,
- *     key_unknown = NULL,
- *     value       = "Holidays"
+ *     key          = SAIL_META_DATA_COMMENT,
+ *     key_unknown  = NULL,
+ *     value        = "Holidays",
+ *     value_length = 8
+ * }
+ *
+ * {
+ *     key          = SAIL_META_DATA_EXIF,
+ *     key_unknown  = NULL,
+ *     value        = <binary data>,
+ *     value_length = 2113
  * }
  *
  * Not every image codec supports key-values. For example:
@@ -79,29 +88,72 @@ struct sail_meta_data_node {
     enum SailMetaData key;
     char *key_unknown;
 
-    /* Actual meta data value. Any string data. */
+    /*
+     * Actual meta data value. Any string or binary data. If it's binary,
+     * use 'value_length' for its length.
+     */
     char *value;
+
+    /*
+     * The length of the value. If the value is a string, it's just strlen(value) + 1.
+     * If the value is binary data (like binary EXIF profile), it's the data length.
+     */
+    unsigned value_length;
 
     struct sail_meta_data_node *next;
 };
 
 /*
  * Allocates a new meta entry node. The assigned node MUST be destroyed later with sail_destroy_meta_data_node().
+ * Use sail_alloc_meta_data_node_from_string() and sail_alloc_meta_data_node_from_data() to allocate meta data
+ * nodes from actual data.
  *
- * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_alloc_meta_data_node(struct sail_meta_data_node **node);
 
 /*
- * Allocates a new meta entry node from the specified data. The assigned node MUST be destroyed later
- * with sail_destroy_meta_data_node().
+ * Allocates a new meta entry node from the specified string. The value of 'value_length' is set to strlen(value) + 1.
+ * The key must not be SAIL_META_DATA_UNKNOWN. This is the key of this method. The assigned node MUST be destroyed
+ * later with sail_destroy_meta_data_node().
  *
- * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_meta_data_node_from_data(enum SailMetaData key,
-                                                                const char *key_unknown,
-                                                                const char *value,
-                                                                struct sail_meta_data_node **node);
+SAIL_EXPORT sail_status_t sail_alloc_meta_data_node_from_known_string(enum SailMetaData key,
+                                                                        const char *value,
+                                                                        struct sail_meta_data_node **node);
+
+/*
+ * Allocates a new meta entry node from the specified string. The value of 'value_length' is set to strlen(value) + 1.
+ * Sets the key to SAIL_META_DATA_UNKNOWN. This is the key of this method.
+ * The assigned node MUST be destroyed later with sail_destroy_meta_data_node().
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_alloc_meta_data_node_from_unknown_string(const char *key_unknown,
+                                                                        const char *value,
+                                                                        struct sail_meta_data_node **node);
+/*
+ * Allocates a new meta entry node from the specified data. The key must not be SAIL_META_DATA_UNKNOWN.
+ * This is the key of this method. The assigned node MUST be destroyed later with sail_destroy_meta_data_node().
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_alloc_meta_data_node_from_known_data(enum SailMetaData key,
+                                                                    const void *value,
+                                                                    unsigned value_length,
+                                                                    struct sail_meta_data_node **node);
+
+/*
+ * Allocates a new meta entry node from the specified data. Sets the key to SAIL_META_DATA_UNKNOWN.
+ * The assigned node MUST be destroyed later with sail_destroy_meta_data_node().
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_alloc_meta_data_node_from_unknown_data(const char *key_unknown,
+                                                                        const void *value,
+                                                                        unsigned value_length,
+                                                                        struct sail_meta_data_node **node);
 
 /*
  * Destroys the specified meta entry node and all its internal allocated memory buffers.
@@ -112,7 +164,7 @@ SAIL_EXPORT void sail_destroy_meta_data_node(struct sail_meta_data_node *node);
  * Makes a deep copy of the specified meta entry node. The assigned node MUST be destroyed
  * later with sail_destroy_meta_data_node().
  *
- * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_copy_meta_data_node(struct sail_meta_data_node *source,
                                                    struct sail_meta_data_node **target);
@@ -128,7 +180,7 @@ SAIL_EXPORT void sail_destroy_meta_data_node_chain(struct sail_meta_data_node *n
  * later with sail_destroy_meta_data_node_chain(). If the source chain is NULL, it assigns NULL
  * to the target chain and returns 0.
  *
- * Returns 0 on success or sail_status_t on error.
+ * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_copy_meta_data_node_chain(struct sail_meta_data_node *source,
                                                          struct sail_meta_data_node **target);

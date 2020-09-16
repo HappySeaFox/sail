@@ -52,9 +52,9 @@ SAIL_HIDDEN sail_status_t supported_read_output_pixel_format(enum SailPixelForma
 
 SAIL_HIDDEN sail_status_t supported_write_output_pixel_format(enum SailPixelFormat pixel_format);
 
-SAIL_HIDDEN sail_status_t read_png_text(png_structp png_ptr, png_infop info_ptr, struct sail_meta_data_node **target_meta_data_node);
+SAIL_HIDDEN sail_status_t fetch_meta_data(png_structp png_ptr, png_infop info_ptr, struct sail_meta_data_node **target_meta_data_node);
 
-SAIL_HIDDEN sail_status_t write_png_text(png_structp png_ptr, png_infop info_ptr, const struct sail_meta_data_node *meta_data_node);
+SAIL_HIDDEN sail_status_t write_meta_data(png_structp png_ptr, png_infop info_ptr, const struct sail_meta_data_node *meta_data_node);
 
 SAIL_HIDDEN sail_status_t fetch_iccp(png_structp png_ptr, png_infop info_ptr, struct sail_iccp **iccp);
 

@@ -55,7 +55,8 @@ public:
     ~meta_data();
 
     /*
-     * Returns the meta data key.
+     * Returns the meta data key. See SailMetaData to know which keys can point to strings
+     * and which to binary data.
      */
     SailMetaData key() const;
 
@@ -67,28 +68,44 @@ public:
     /*
      * Returns the meta data value.
      */
-    std::string value() const;
+    const char* value() const;
 
     /*
-     * Sets new meta data key.
+     * Returns the length of the value. It's strlen(value) + 1 if the value is a string
+     * or the length of the binary data otherwise.
+     */
+    unsigned length() const;
+
+    /*
+     * Sets a new known meta data key. Resets the saved unknown key to an empty string.
      */
     meta_data& with_key(SailMetaData key);
 
     /*
-     * Sets a new meta data string key representation when key() is SAIL_META_DATA_UNKNOWN.
+     * Sets a new unknown meta data string key representation. Resets the saved key to SAIL_META_DATA_UNKNOWN.
      */
     meta_data& with_key_unknown(const std::string &key_unknown);
 
     /*
-     * Sets a new meta data value.
+     * Sets a new meta data string value.
      */
     meta_data& with_value(const std::string &value);
+
+    /*
+     * Sets a new meta data string value.
+     */
+    meta_data& with_value(const char *value);
+
+    /*
+     * Sets a new meta data binary value.
+     */
+    meta_data& with_value(const char *value, unsigned value_length);
 
     /*
      * Assigns a non-NULL string representation of the specified meta data key. See SailMetaData.
      * The assigned string MUST NOT be destroyed. For example: "Author".
      *
-     * Returns 0 on success or sail_status_t on error.
+     * Returns SAIL_OK on success.
      */
     static sail_status_t meta_data_to_string(enum SailMetaData meta_data, const char **result);
 
@@ -96,7 +113,7 @@ public:
      * Assigns meta data key from a string representation. See SailMetaData.
      * For example: SAIL_META_DATA_AUTHOR is assigned for "Author".
      *
-     * Returns 0 on success or sail_status_t on error.
+     * Returns SAIL_OK on success.
      */
     static sail_status_t meta_data_from_string(const char *str, enum SailMetaData *result);
 

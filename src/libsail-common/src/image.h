@@ -143,10 +143,10 @@ struct sail_image {
     struct sail_palette *palette;
 
     /*
-     * Image meta data. Codecs guarantee that keys and values are non-NULL.
+     * Image meta data. Codecs guarantee that values are non-NULL.
      *
-     * READ:  Set by SAIL to a valid linked list with simple meta data (like JPEG comments) or to NULL.
-     * WRITE: Must be allocated and set by a caller to a valid linked list with simple meta data
+     * READ:  Set by SAIL to a valid linked list with meta data (like JPEG comments) or to NULL.
+     * WRITE: Must be allocated and set by a caller to a valid linked list with meta data
      *        (like JPEG comments) if necessary.
      */
     struct sail_meta_data_node *meta_data_node;
