@@ -313,7 +313,8 @@ sail_status_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffe
     //
     if (write_options.io_options() & SAIL_IO_OPTION_META_DATA) {
         sail::meta_data meta_data;
-        meta_data.with_key(SAIL_META_DATA_SOFTWARE)
+        meta_data
+                .with_key(SAIL_META_DATA_SOFTWARE)
                 .with_value("SAIL");
 
         image.with_meta_data({ meta_data });

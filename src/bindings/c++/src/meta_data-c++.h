@@ -66,6 +66,11 @@ public:
     std::string key_unknown() const;
 
     /*
+     * Returns the meta data value type: string or data.
+     */
+    SailMetaDataType value_type() const;
+
+    /*
      * Returns the meta data value.
      */
     const char* value() const;
@@ -74,7 +79,7 @@ public:
      * Returns the length of the value. It's strlen(value) + 1 if the value is a string
      * or the length of the binary data otherwise.
      */
-    unsigned length() const;
+    unsigned value_length() const;
 
     /*
      * Sets a new known meta data key. Resets the saved unknown key to an empty string.
@@ -99,7 +104,7 @@ public:
     /*
      * Sets a new meta data binary value.
      */
-    meta_data& with_value(const char *value, unsigned value_length);
+    meta_data& with_value(const void *value, unsigned value_length);
 
     /*
      * Assigns a non-NULL string representation of the specified meta data key. See SailMetaData.
@@ -122,6 +127,8 @@ private:
      * Makes a deep copy of the specified meta data.
      */
     meta_data(const sail_meta_data_node *md);
+
+    meta_data& with_value_type(SailMetaDataType type);
 
     sail_status_t to_sail_meta_data_node(sail_meta_data_node *md) const;
 

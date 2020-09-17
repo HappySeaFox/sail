@@ -88,6 +88,9 @@ struct sail_meta_data_node {
     enum SailMetaData key;
     char *key_unknown;
 
+    /* Value type. */
+    enum SailMetaDataType value_type;
+
     /*
      * Actual meta data value. Any string or binary data. If it's binary,
      * use 'value_length' for its length.

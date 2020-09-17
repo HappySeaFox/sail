@@ -263,6 +263,15 @@ enum SailMetaData {
     SAIL_META_DATA_EXIF,
 };
 
+/* Meta data type. */
+enum SailMetaDataType {
+
+    /* Meta data string value like a JPEG comment. */
+    SAIL_META_DATA_TYPE_STRING,
+    /* Meta data binary value like a binary EXIF profile. */
+    SAIL_META_DATA_TYPE_DATA,
+};
+
 /* Resolution units. */
 enum SailResolutionUnit {
 
