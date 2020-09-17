@@ -55,6 +55,7 @@ Name: "Ukrainian"; MessagesFile: "compiler:Languages\Ukrainian.isl"
 
 [Files]
 Source: "C:\SAIL\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs
+Source: "vc_redist_2019.x64.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall
 
 [Tasks]
 
@@ -64,7 +65,8 @@ Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 [Registry]
 
 [Run]
-Filename: "{#MyAppURL}/blob/master/README.md"; Flags: nowait shellexec
+Filename: {tmp}\vc_redist_2019.x64.exe; Parameters: "/install /q /norestart"; StatusMsg: "Installing VC++ Redistributable..."
+Filename: "{#MyAppURL}/blob/master/README.md"; Description: "View README Online"; Flags: postinstall skipifsilent nowait shellexec
 
 [Code]
 procedure CurStepChanged(CurStep: TSetupStep);
