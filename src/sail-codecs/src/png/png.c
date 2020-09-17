@@ -477,17 +477,17 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v3(void *state, struct sail_io *
 
                 /* Copy all pixel values including alpha. */
                 if (png_state->current_frame == 1 || png_state->next_frame_blend_op == PNG_BLEND_OP_SOURCE) {
-                    SAIL_TRY(blend_source(png_state->bytes_per_pixel,
-                                            scanline,
-                                            png_state->next_frame_x_offset * png_state->bytes_per_pixel,
+                    SAIL_TRY(blend_source(scanline,
+                                            png_state->next_frame_x_offset,
                                             png_state->temp_scanline,
-                                            png_state->next_frame_width * png_state->bytes_per_pixel));
+                                            png_state->next_frame_width,
+                                            png_state->bytes_per_pixel));
                 } else { /* PNG_BLEND_OP_OVER */
-                    SAIL_TRY(blend_over(png_state->bytes_per_pixel,
-                                        png_state->next_frame_width,
+                    SAIL_TRY(blend_over(scanline,
+                                        png_state->next_frame_x_offset,
                                         png_state->temp_scanline,
-                                        scanline,
-                                        png_state->next_frame_x_offset * png_state->bytes_per_pixel));
+                                        png_state->next_frame_width,
+                                        png_state->bytes_per_pixel));
                 }
 
                 if (png_state->next_frame_dispose_op == PNG_DISPOSE_OP_BACKGROUND) {

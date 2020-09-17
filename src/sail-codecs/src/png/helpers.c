@@ -286,7 +286,7 @@ sail_status_t fetch_iccp(png_structp png_ptr, png_infop info_ptr, struct sail_ic
     return SAIL_OK;
 }
 
-SAIL_HIDDEN sail_status_t fetch_palette(png_structp png_ptr, png_infop info_ptr, struct sail_palette **palette) {
+sail_status_t fetch_palette(png_structp png_ptr, png_infop info_ptr, struct sail_palette **palette) {
 
     SAIL_CHECK_PTR(png_ptr);
     SAIL_CHECK_PTR(info_ptr);
@@ -319,30 +319,26 @@ SAIL_HIDDEN sail_status_t fetch_palette(png_structp png_ptr, png_infop info_ptr,
 
 #ifdef PNG_APNG_SUPPORTED
 
-sail_status_t blend_source(unsigned bytes_per_pixel, void *dst_raw, unsigned dst_offset, const void *src_raw, unsigned src_length) {
+sail_status_t blend_source(void *dst_raw, unsigned dst_offset, const void *src_raw, unsigned src_length, unsigned bytes_per_pixel) {
 
     SAIL_CHECK_PTR(dst_raw);
     SAIL_CHECK_PTR(src_raw);
 
-    if (bytes_per_pixel == 4) {
-        memcpy((uint8_t*)dst_raw + dst_offset, src_raw, src_length);
-    } else if (bytes_per_pixel == 8) {
-        memcpy((uint16_t*)dst_raw + dst_offset, src_raw, src_length);
-    } else {
-        return SAIL_ERROR_UNSUPPORTED_BIT_DEPTH;
-    }
+    memcpy((uint8_t *)dst_raw + dst_offset * bytes_per_pixel,
+            src_raw,
+            src_length * bytes_per_pixel);
 
     return SAIL_OK;
 }
 
-sail_status_t blend_over(unsigned bytes_per_pixel, unsigned width, const void *src_raw, void *dst_raw, unsigned dst_offset) {
+sail_status_t blend_over(void *dst_raw, unsigned dst_offset, const void *src_raw, unsigned width, unsigned bytes_per_pixel) {
 
     SAIL_CHECK_PTR(src_raw);
     SAIL_CHECK_PTR(dst_raw);
 
     if (bytes_per_pixel == 4) {
         const uint8_t *src = src_raw;
-        uint8_t *dst = (uint8_t *)dst_raw + dst_offset;
+        uint8_t *dst = (uint8_t *)dst_raw + dst_offset * bytes_per_pixel;
 
         while (width--) {
             const double src_a = *(src+3) / 255.0;
@@ -355,7 +351,7 @@ sail_status_t blend_over(unsigned bytes_per_pixel, unsigned width, const void *s
         }
     } else if (bytes_per_pixel == 8) {
         const uint16_t *src = src_raw;
-        uint16_t *dst = (uint16_t *)dst_raw + dst_offset;
+        uint16_t *dst = (uint16_t *)((uint8_t *)dst_raw + dst_offset * bytes_per_pixel);
 
         while (width--) {
             const double src_a = *(src+3) / 65535.0;
