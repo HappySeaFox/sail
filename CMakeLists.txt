@@ -138,11 +138,9 @@ endif()
 #
 if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
     string(APPEND CMAKE_SHARED_LINKER_FLAGS " " "-Wl,--no-undefined")
-    string(APPEND CMAKE_STATIC_LINKER_FLAGS " " "-Wl,--no-undefined")
     string(APPEND CMAKE_MODULE_LINKER_FLAGS " " "-Wl,--no-undefined")
 elseif (CMAKE_C_COMPILER_ID MATCHES "Clang")
     string(APPEND CMAKE_SHARED_LINKER_FLAGS " " "-Wl,-undefined,error")
-    string(APPEND CMAKE_STATIC_LINKER_FLAGS " " "-Wl,-undefined,error")
     string(APPEND CMAKE_MODULE_LINKER_FLAGS " " "-Wl,-undefined,error")
 endif()
 
