@@ -1,7 +1,5 @@
 ## Priority 1
 
-- Move back to DLLs for dependencies? Rename them as libpng16-sail.dll?
-
 - Read/write indexed PNGs with alpha
 
 - document c++ classes
