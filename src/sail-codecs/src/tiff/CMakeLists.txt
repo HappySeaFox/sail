@@ -25,13 +25,7 @@ endif()
 
 # Common codec configuration
 #
-if (WIN32)
-    set(TIFF_DEPS libtiff-4 libjpeg zlib libzstd)
-else()
-    set(TIFF_DEPS libtiff-4)
-endif()
-
-sail_codec(TARGET tiff SOURCES helpers.c io.c tiff.c PKGCONFIG ${TIFF_DEPS})
+sail_codec(TARGET tiff SOURCES helpers.c io.c tiff.c PKGCONFIG libtiff-4)
 
 if (HAVE_TIFF_41)
     target_compile_definitions(tiff PRIVATE HAVE_TIFF_41)
