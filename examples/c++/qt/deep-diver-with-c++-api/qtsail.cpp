@@ -205,7 +205,7 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
 
         meta = tr("%1: %2")
                 .arg(meta_data_str)
-                .arg(QString(first.value_string()).left(24).replace('\n', ' '));
+                .arg(QString::fromStdString(first.value_string()).left(24).replace('\n', ' '));
 
         for (const sail::meta_data &meta_data: meta_data) {
             meta_data_str = nullptr;

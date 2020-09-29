@@ -73,7 +73,7 @@ public:
     /*
      * Returns the meta data string value.
      */
-    const char* value_string() const;
+    std::string value_string() const;
 
     /*
      * Returns the meta data binary value.
