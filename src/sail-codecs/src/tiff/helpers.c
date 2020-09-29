@@ -235,34 +235,40 @@ sail_status_t write_meta_data(TIFF *tiff, const struct sail_meta_data_node *meta
     SAIL_CHECK_PTR(tiff);
 
     while (meta_data_node != NULL) {
-        int tiff_tag = -1;
+        const char *meta_data_str = NULL;
 
-        switch (meta_data_node->key) {
-            case SAIL_META_DATA_DOCUMENT:    tiff_tag = TIFFTAG_DOCUMENTNAME;     break;
-            case SAIL_META_DATA_DESCRIPTION: tiff_tag = TIFFTAG_IMAGEDESCRIPTION; break;
-            case SAIL_META_DATA_MAKE:        tiff_tag = TIFFTAG_MAKE;             break;
-            case SAIL_META_DATA_MODEL:       tiff_tag = TIFFTAG_MODEL;            break;
-            case SAIL_META_DATA_SOFTWARE:    tiff_tag = TIFFTAG_SOFTWARE;         break;
-            case SAIL_META_DATA_ARTIST:      tiff_tag = TIFFTAG_ARTIST;           break;
-            case SAIL_META_DATA_COPYRIGHT:   tiff_tag = TIFFTAG_COPYRIGHT;        break;
+        if (meta_data_node->value_type == SAIL_META_DATA_TYPE_STRING) {
+            int tiff_tag = -1;
 
-            case SAIL_META_DATA_UNKNOWN: {
-                SAIL_LOG_WARNING("TIFF: The codec doesn't support writing unknown meta data keys like '%s'", meta_data_node->key_unknown);
-                break;
+            switch (meta_data_node->key) {
+                case SAIL_META_DATA_DOCUMENT:    tiff_tag = TIFFTAG_DOCUMENTNAME;     break;
+                case SAIL_META_DATA_DESCRIPTION: tiff_tag = TIFFTAG_IMAGEDESCRIPTION; break;
+                case SAIL_META_DATA_MAKE:        tiff_tag = TIFFTAG_MAKE;             break;
+                case SAIL_META_DATA_MODEL:       tiff_tag = TIFFTAG_MODEL;            break;
+                case SAIL_META_DATA_SOFTWARE:    tiff_tag = TIFFTAG_SOFTWARE;         break;
+                case SAIL_META_DATA_ARTIST:      tiff_tag = TIFFTAG_ARTIST;           break;
+                case SAIL_META_DATA_COPYRIGHT:   tiff_tag = TIFFTAG_COPYRIGHT;        break;
+
+                case SAIL_META_DATA_UNKNOWN: {
+                    SAIL_LOG_WARNING("TIFF: Ignoring unsupported unknown meta data keys like '%s'", meta_data_node->key_unknown);
+                    break;
+                }
+
+                default: {
+                    SAIL_TRY_OR_SUPPRESS(sail_meta_data_to_string(meta_data_node->key, &meta_data_str));
+                    SAIL_LOG_WARNING("TIFF: Ignoring unsupported meta data key '%s'", meta_data_str);
+                }
             }
 
-            default: {
-                const char *meta_data_str = NULL;
-                SAIL_TRY_OR_SUPPRESS(sail_meta_data_to_string(meta_data_node->key, &meta_data_str));
-                SAIL_LOG_WARNING("TIFF: Ignoring unsupported meta data key '%s'", meta_data_str);
+            if (tiff_tag < 0) {
+                continue;
             }
-        }
 
-        if (tiff_tag < 0) {
-            continue;
+            TIFFSetField(tiff, tiff_tag, meta_data_node->value_string);
+        } else {
+            SAIL_TRY_OR_SUPPRESS(sail_meta_data_to_string(meta_data_node->key, &meta_data_str));
+            SAIL_LOG_WARNING("TIFF: Ignoring unsupported binary key '%s'", meta_data_str);
         }
-
-        TIFFSetField(tiff, tiff_tag, meta_data_node->value);
 
         meta_data_node = meta_data_node->next;
     }

@@ -72,7 +72,12 @@ static sail_status_t probe(const char *path) {
             SAIL_TRY_OR_SUPPRESS(sail_meta_data_to_string(node->key, &meta_data_str));
         }
 
-        printf("%-14s: %s\n", meta_data_str, node->value);
+        if (node->value_type == SAIL_META_DATA_TYPE_STRING) {
+            printf("%-14s: %s\n", meta_data_str, node->value_string);
+        } else {
+            printf("%-14s: <binary data, length: %u byte(s)>\n", meta_data_str, node->value_data_length);
+        }
+
         node = node->next;
     }
 

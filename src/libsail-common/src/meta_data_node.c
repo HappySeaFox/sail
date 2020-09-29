@@ -37,12 +37,13 @@ sail_status_t sail_alloc_meta_data_node(struct sail_meta_data_node **node) {
     SAIL_TRY(sail_malloc(&ptr, sizeof(struct sail_meta_data_node)));
     *node = ptr;
 
-    (*node)->key          = SAIL_META_DATA_UNKNOWN;
-    (*node)->key_unknown  = NULL;
-    (*node)->value_type   = SAIL_META_DATA_TYPE_STRING;
-    (*node)->value        = NULL;
-    (*node)->value_length = 0;
-    (*node)->next         = NULL;
+    (*node)->key               = SAIL_META_DATA_UNKNOWN;
+    (*node)->key_unknown       = NULL;
+    (*node)->value_type        = SAIL_META_DATA_TYPE_STRING;
+    (*node)->value_string      = NULL;
+    (*node)->value_data        = NULL;
+    (*node)->value_data_length = 0;
+    (*node)->next              = NULL;
 
     return SAIL_OK;
 }
@@ -58,11 +59,10 @@ sail_status_t sail_alloc_meta_data_node_from_known_string(enum SailMetaData key,
 
     SAIL_TRY(sail_alloc_meta_data_node(node));
 
-    (*node)->key          = key;
-    (*node)->value_type   = SAIL_META_DATA_TYPE_STRING;
-    (*node)->value_length = (unsigned)strlen(value) + 1;
+    (*node)->key        = key;
+    (*node)->value_type = SAIL_META_DATA_TYPE_STRING;
 
-    SAIL_TRY_OR_CLEANUP(sail_strdup(value, &(*node)->value),
+    SAIL_TRY_OR_CLEANUP(sail_strdup(value, &(*node)->value_string),
                         /* cleanup */ sail_destroy_meta_data_node(*node));
 
     return SAIL_OK;
@@ -79,11 +79,10 @@ sail_status_t sail_alloc_meta_data_node_from_unknown_string(const char *key_unkn
     SAIL_TRY_OR_CLEANUP(sail_strdup(key_unknown, &(*node)->key_unknown),
                         /* cleanup */ sail_destroy_meta_data_node(*node));
 
-    (*node)->key          = SAIL_META_DATA_UNKNOWN;
-    (*node)->value_type   = SAIL_META_DATA_TYPE_STRING;
-    (*node)->value_length = (unsigned)strlen(value) + 1;
+    (*node)->key        = SAIL_META_DATA_UNKNOWN;
+    (*node)->value_type = SAIL_META_DATA_TYPE_STRING;
 
-    SAIL_TRY_OR_CLEANUP(sail_strdup(value, &(*node)->value),
+    SAIL_TRY_OR_CLEANUP(sail_strdup(value, &(*node)->value_string),
                         /* cleanup */ sail_destroy_meta_data_node(*node));
 
     return SAIL_OK;
@@ -100,11 +99,11 @@ sail_status_t sail_alloc_meta_data_node_from_known_data(enum SailMetaData key, c
 
     SAIL_TRY(sail_alloc_meta_data_node(node));
 
-    (*node)->key          = key;
-    (*node)->value_type   = SAIL_META_DATA_TYPE_DATA;
-    (*node)->value_length = value_length;
+    (*node)->key               = key;
+    (*node)->value_type        = SAIL_META_DATA_TYPE_DATA;
+    (*node)->value_data_length = value_length;
 
-    SAIL_TRY_OR_CLEANUP(sail_memdup(value, value_length, &(*node)->value),
+    SAIL_TRY_OR_CLEANUP(sail_memdup(value, value_length, &(*node)->value_data),
                         /* cleanup */ sail_destroy_meta_data_node(*node));
 
     return SAIL_OK;
@@ -121,11 +120,11 @@ sail_status_t sail_alloc_meta_data_node_from_unknown_data(const char *key_unknow
     SAIL_TRY_OR_CLEANUP(sail_strdup(key_unknown, &(*node)->key_unknown),
                         /* cleanup */ sail_destroy_meta_data_node(*node));
 
-    (*node)->key          = SAIL_META_DATA_UNKNOWN;
-    (*node)->value_type   = SAIL_META_DATA_TYPE_DATA;
-    (*node)->value_length = value_length;
+    (*node)->key               = SAIL_META_DATA_UNKNOWN;
+    (*node)->value_type        = SAIL_META_DATA_TYPE_DATA;
+    (*node)->value_data_length = value_length;
 
-    SAIL_TRY_OR_CLEANUP(sail_memdup(value, value_length, &(*node)->value),
+    SAIL_TRY_OR_CLEANUP(sail_memdup(value, value_length, &(*node)->value_data),
                         /* cleanup */ sail_destroy_meta_data_node(*node));
 
     return SAIL_OK;
@@ -138,7 +137,8 @@ void sail_destroy_meta_data_node(struct sail_meta_data_node *node) {
     }
 
     sail_free(node->key_unknown);
-    sail_free(node->value);
+    sail_free(node->value_string);
+    sail_free(node->value_data);
     sail_free(node);
 }
 
@@ -158,10 +158,13 @@ sail_status_t sail_copy_meta_data_node(struct sail_meta_data_node *source, struc
 
     (*target)->value_type = source->value_type;
 
-    SAIL_TRY_OR_CLEANUP(sail_memdup(source->value, source->value_length, &(*target)->value),
+    SAIL_TRY_OR_CLEANUP(sail_strdup(source->value_string, &(*target)->value_string),
                         /* cleanup */ sail_destroy_meta_data_node(*target));
 
-    (*target)->value_length = source->value_length;
+    SAIL_TRY_OR_CLEANUP(sail_memdup(source->value_data, source->value_data_length, &(*target)->value_data),
+                        /* cleanup */ sail_destroy_meta_data_node(*target));
+
+    (*target)->value_data_length = source->value_data_length;
 
     return SAIL_OK;
 }

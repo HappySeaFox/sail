@@ -71,15 +71,20 @@ public:
     SailMetaDataType value_type() const;
 
     /*
-     * Returns the meta data value.
+     * Returns the meta data string value.
      */
-    const char* value() const;
+    const char* value_string() const;
+
+    /*
+     * Returns the meta data binary value.
+     */
+    const void* value_data() const;
 
     /*
      * Returns the length of the value. It's strlen(value) + 1 if the value is a string
      * or the length of the binary data otherwise.
      */
-    unsigned value_length() const;
+    unsigned value_data_length() const;
 
     /*
      * Sets a new known meta data key. Resets the saved unknown key to an empty string.

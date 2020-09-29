@@ -197,16 +197,20 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
         const sail::meta_data &first = *meta_data.begin();
         const char *meta_data_str = nullptr;
 
-        SAIL_TRY_OR_SUPPRESS(sail::meta_data::meta_data_to_string(first.key(), &meta_data_str));
+        if (first.key() == SAIL_META_DATA_UNKNOWN) {
+            meta_data_str = first.key_unknown().c_str();
+        } else {
+            SAIL_TRY_OR_SUPPRESS(sail::meta_data::meta_data_to_string(first.key(), &meta_data_str));
+        }
 
         meta = tr("%1: %2")
                 .arg(meta_data_str)
-                .arg(QString(first.value()).left(24).replace('\n', ' '));
+                .arg(QString(first.value_string()).left(24).replace('\n', ' '));
 
         for (const sail::meta_data &meta_data: meta_data) {
             meta_data_str = nullptr;
             SAIL_TRY_OR_SUPPRESS(sail::meta_data::meta_data_to_string(meta_data.key(), &meta_data_str));
-            SAIL_LOG_DEBUG("[META] %s: %s", meta_data_str, meta_data.value());
+            SAIL_LOG_DEBUG("[META] %s: %s", meta_data_str, meta_data.value_string());
         }
     }
 

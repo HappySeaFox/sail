@@ -225,12 +225,17 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
 
     if (node != nullptr) {
         const char *meta_data_str = nullptr;
-        SAIL_TRY_OR_SUPPRESS(sail_meta_data_to_string(node->key, &meta_data_str));
 
-        meta = tr("%1: %2").arg(meta_data_str).arg(QString(node->value).left(24).replace('\n', ' '));
+        if (node->key == SAIL_META_DATA_UNKNOWN) {
+            meta_data_str = node->key_unknown;
+        } else {
+            SAIL_TRY_OR_SUPPRESS(sail_meta_data_to_string(node->key, &meta_data_str));
+        }
+
+        meta = tr("%1: %2").arg(meta_data_str).arg(QString(node->value_string).left(24).replace('\n', ' '));
 
         while (node != nullptr) {
-            SAIL_LOG_DEBUG("[META] %s: %s", meta_data_str, node->value);
+            SAIL_LOG_DEBUG("[META] %s: %s", meta_data_str, node->value_string);
             node = node->next;
         }
     }

@@ -41,29 +41,35 @@ extern "C" {
 #endif
 
 /*
- * A simple key-pair structure representing meta data like a JPEG comment.
+ * A tructure representing meta data like a JPEG comment or a binary EXIF profile.
  *
  * For example:
  *
  * {
- *     key          = SAIL_META_DATA_UNKNOWN,
- *     key_unknown  = "My Data",
- *     value        = "Data",
- *     value_length = 4
+ *     key               = SAIL_META_DATA_UNKNOWN,
+ *     key_unknown       = "My Data",
+ *     value_type        = SAIL_META_DATA_TYPE_STRING,
+ *     value_string      = "Data",
+ *     value_data        = NULL,
+ *     value_data_length = 0
  * }
  *
  * {
- *     key          = SAIL_META_DATA_COMMENT,
- *     key_unknown  = NULL,
- *     value        = "Holidays",
- *     value_length = 8
+ *     key               = SAIL_META_DATA_COMMENT,
+ *     key_unknown       = NULL,
+ *     value_type        = SAIL_META_DATA_TYPE_STRING,
+ *     value_string      = "Holidays",
+ *     value_data        = NULL,
+ *     value_data_length = 0
  * }
  *
  * {
- *     key          = SAIL_META_DATA_EXIF,
- *     key_unknown  = NULL,
- *     value        = <binary data>,
- *     value_length = 2113
+ *     key               = SAIL_META_DATA_EXIF,
+ *     key_unknown       = NULL,
+ *     value_type        = SAIL_META_DATA_TYPE_DATA,
+ *     value_string      = NULL,
+ *     value_data        = <binary data>,
+ *     value_data_length = 2240
  * }
  *
  * Not every image codec supports key-values. For example:
@@ -92,16 +98,19 @@ struct sail_meta_data_node {
     enum SailMetaDataType value_type;
 
     /*
-     * Actual meta data value. Any string or binary data. If it's binary,
-     * use 'value_length' for its length.
+     * Actual meta data string value or NULL.
      */
-    char *value;
+    char *value_string;
 
     /*
-     * The length of the value. If the value is a string, it's just strlen(value) + 1.
-     * If the value is binary data (like binary EXIF profile), it's the data length.
+     * Actual meta data binary value or NULL. value_data_length holds its length.
      */
-    unsigned value_length;
+    void *value_data;
+
+    /*
+     * The length of the binary value or 0.
+     */
+    unsigned value_data_length;
 
     struct sail_meta_data_node *next;
 };

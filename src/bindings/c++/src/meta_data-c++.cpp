@@ -39,21 +39,33 @@ public:
     pimpl()
         : key(SAIL_META_DATA_UNKNOWN)
         , value_type(SAIL_META_DATA_TYPE_STRING)
-        , value(nullptr)
-        , value_length(0)
+        , value_string(nullptr)
+        , value_data(nullptr)
+        , value_data_length(0)
     {
     }
 
     ~pimpl()
     {
-        sail_free(const_cast<char *>(value));
+        free();
+    }
+
+    void free()
+    {
+        sail_free(const_cast<char *>(value_string));
+        sail_free(const_cast<void *>(value_data));
+
+        value_string      = nullptr;
+        value_data        = nullptr;
+        value_data_length = 0;
     }
 
     SailMetaData key;
     std::string key_unknown;
     SailMetaDataType value_type;
-    const char *value;
-    unsigned value_length;
+    const char *value_string;
+    const void *value_data;
+    unsigned value_data_length;
 };
 
 meta_data::meta_data()
@@ -69,10 +81,19 @@ meta_data::meta_data(const meta_data &md)
 
 meta_data& meta_data::operator=(const meta_data &md)
 {
-    with_key(md.key())
-        .with_key_unknown(md.key_unknown())
-        .with_value_type(md.value_type())
-        .with_value(md.value(), md.value_length());
+    if (md.key() == SAIL_META_DATA_UNKNOWN) {
+        with_key_unknown(md.key_unknown());
+    } else {
+        with_key(md.key());
+    }
+
+    with_value_type(md.value_type());
+
+    if (md.value_type() == SAIL_META_DATA_TYPE_STRING) {
+        with_value(md.value_string());
+    } else {
+        with_value(md.value_data(), md.value_data_length());
+    }
 
     return *this;
 }
@@ -97,27 +118,32 @@ SailMetaDataType meta_data::value_type() const
     return d->value_type;
 }
 
-const char* meta_data::value() const
+const char* meta_data::value_string() const
 {
-    return d->value;
+    return d->value_string;
 }
 
-unsigned meta_data::value_length() const
+const void* meta_data::value_data() const
 {
-    return d->value_length;
+    return d->value_data;
+}
+
+unsigned meta_data::value_data_length() const
+{
+    return d->value_data_length;
 }
 
 meta_data& meta_data::with_key(SailMetaData key)
 {
-    d->key = key;
-    d->key_unknown.clear();
+    d->key         = key;
+    d->key_unknown = std::string();
 
     return *this;
 }
 
 meta_data& meta_data::with_key_unknown(const std::string &key_unknown)
 {
-    d->key = SAIL_META_DATA_UNKNOWN;
+    d->key         = SAIL_META_DATA_UNKNOWN;
     d->key_unknown = key_unknown;
 
     return *this;
@@ -125,30 +151,33 @@ meta_data& meta_data::with_key_unknown(const std::string &key_unknown)
 
 meta_data& meta_data::with_value(const std::string &value)
 {
-    with_value(value.c_str(), (unsigned)value.length() + 1);
-    d->value_type = SAIL_META_DATA_TYPE_STRING;
-
+    with_value(value.c_str());
     return *this;
 }
 
 meta_data& meta_data::with_value(const char *value)
 {
-    with_value(value, (unsigned)strlen(value) + 1);
-    d->value_type = SAIL_META_DATA_TYPE_STRING;
+    d->free();
+
+    char *str = nullptr;
+    SAIL_TRY_OR_SUPPRESS(sail_strdup(value, &str));
+
+    d->value_type   = SAIL_META_DATA_TYPE_STRING;
+    d->value_string = str;
 
     return *this;
 }
 
 meta_data& meta_data::with_value(const void *value, unsigned value_length)
 {
-    sail_free(const_cast<char *>(d->value));
-    d->value = nullptr;
+    d->free();
 
-    d->value_type = SAIL_META_DATA_TYPE_DATA;
-
-    void *ptr;
+    void *ptr = nullptr;
     SAIL_TRY_OR_SUPPRESS(sail_memdup(value, value_length, &ptr));
-    d->value = reinterpret_cast<const char *>(ptr);
+
+    d->value_type        = SAIL_META_DATA_TYPE_DATA;
+    d->value_data        = ptr;
+    d->value_data_length = value_length;
 
     return *this;
 }
@@ -179,10 +208,19 @@ meta_data::meta_data(const sail_meta_data_node *md)
         return;
     }
 
-    with_key(md->key)
-        .with_key_unknown(empty_string_on_nullptr(md->key_unknown))
-        .with_value_type(md->value_type)
-        .with_value(md->value, md->value_length);
+    if (md->key == SAIL_META_DATA_UNKNOWN) {
+        with_key_unknown(empty_string_on_nullptr(md->key_unknown));
+    } else {
+        with_key(md->key);
+    }
+
+    with_value_type(md->value_type);
+
+    if (md->value_type == SAIL_META_DATA_TYPE_STRING) {
+        with_value(md->value_string);
+    } else {
+        with_value(md->value_data, md->value_data_length);
+    }
 }
 
 meta_data& meta_data::with_value_type(SailMetaDataType type)
@@ -201,12 +239,19 @@ sail_status_t meta_data::to_sail_meta_data_node(sail_meta_data_node *md) const
         SAIL_TRY(sail_strdup(d->key_unknown.c_str(), &md->key_unknown));
     }
 
-    void *ptr;
-    SAIL_TRY(sail_memdup(d->value, d->value_length, &ptr));
+    md->value_type = d->value_type;
 
-    md->value_type   = d->value_type;
-    md->value        = reinterpret_cast<char *>(ptr);
-    md->value_length = d->value_length;
+    char *str;
+    SAIL_TRY(sail_strdup(d->value_string, &str));
+
+    md->value_string = reinterpret_cast<char *>(str);
+
+    void *ptr;
+    SAIL_TRY_OR_CLEANUP(sail_memdup(d->value_data, d->value_data_length, &ptr),
+                        /* cleanup */ sail_free(str));
+
+    md->value_data        = ptr;
+    md->value_data_length = d->value_data_length;
 
     return SAIL_OK;
 }
