@@ -71,12 +71,13 @@ public:
     SailMetaDataType value_type() const;
 
     /*
-     * Returns the meta data string value.
+     * Returns the actual meta data string value when value_type is SAIL_META_DATA_TYPE_STRING.
      */
     std::string value_string() const;
 
     /*
-     * Returns the meta data binary value.
+     * Returns the actual meta data binary value when value_type is SAIL_META_DATA_TYPE_DATA.
+     * value_data_length holds its length.
      */
     const void* value_data() const;
 
@@ -97,7 +98,7 @@ public:
     meta_data& with_key_unknown(const std::string &key_unknown);
 
     /*
-     * Sets a new meta data string value.
+     * Sets a new meta data string value. Resets the saved binary value.
      */
     meta_data& with_value(const std::string &value);
 
@@ -107,7 +108,7 @@ public:
     meta_data& with_value(const char *value);
 
     /*
-     * Sets a new meta data binary value.
+     * Sets a new meta data binary value. Resets the saved string value.
      */
     meta_data& with_value(const void *value, unsigned value_length);
 

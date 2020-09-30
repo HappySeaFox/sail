@@ -89,7 +89,7 @@ struct sail_image {
      * Image resolution.
      *
      * READ:  Set by SAIL to a valid resolution or to NULL if this information is not available.
-     * WRITE: Must be allocated and set by a caller to a valid image resolution if necessary.
+     * WRITE: Must be set by a caller to a valid image resolution if necessary.
      */
     struct sail_resolution *resolution;
 

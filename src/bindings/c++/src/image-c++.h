@@ -107,7 +107,7 @@ public:
      * Image resolution.
      *
      * READ:  Set by SAIL to a valid resolution if this information is available.
-     * WRITE: Must set by a caller to a valid image resolution if necessary.
+     * WRITE: Must be set by a caller to a valid image resolution if necessary.
      */
     const sail::resolution& resolution() const;
 

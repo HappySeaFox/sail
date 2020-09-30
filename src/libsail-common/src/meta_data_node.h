@@ -98,12 +98,13 @@ struct sail_meta_data_node {
     enum SailMetaDataType value_type;
 
     /*
-     * Actual meta data string value or NULL.
+     * Actual meta data string value when value_type is SAIL_META_DATA_TYPE_STRING. NULL otherwise.
      */
     char *value_string;
 
     /*
-     * Actual meta data binary value or NULL. value_data_length holds its length.
+     * Actual meta data binary value when value_type is SAIL_META_DATA_TYPE_DATA.
+     * NULL otherwise. value_data_length holds its length.
      */
     void *value_data;
 
