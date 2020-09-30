@@ -52,9 +52,6 @@ class io;
 
 class SAIL_EXPORT context
 {
-    friend class image_reader;
-    friend class image_writer;
-
 public:
     context() = delete;
     context(const context&) = delete;
