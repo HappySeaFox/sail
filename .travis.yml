@@ -3,12 +3,14 @@ language: cpp
 addons:
   homebrew:
     packages:
+      - sdl2
       - jpeg-turbo
       - libpng
       - libtiff
     update: true
   apt:
     packages:
+      - libsdl2-dev
       - libjpeg-dev
       - libpng-dev
       - libtiff-dev
@@ -23,12 +25,12 @@ jobs:
       osx_image:
         - xcode11.3
       env:
-        - PKG_CONFIG_PATH="/usr/local/opt/jpeg-turbo/lib/pkgconfig:$PKG_CONFIG_PATH"
+        - PKG_CONFIG_PATH="/usr/local/opt/jpeg-turbo/lib/pkgconfig:/usr/local/opt/sdl2/lib/pkgconfig:$PKG_CONFIG_PATH"
     - os: osx
       osx_image:
         - xcode12
       env:
-        - PKG_CONFIG_PATH="/usr/local/opt/jpeg-turbo/lib/pkgconfig:$PKG_CONFIG_PATH"
+        - PKG_CONFIG_PATH="/usr/local/opt/jpeg-turbo/lib/pkgconfig:/usr/local/opt/sdl2/lib/pkgconfig:$PKG_CONFIG_PATH"
 
 before_script:
 - |-
