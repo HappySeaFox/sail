@@ -22,7 +22,7 @@ addons:
     update: true
 before_script:
 - |-
-  case "$TRAVIS_OS_NAME"
+  case "$TRAVIS_OS_NAME" in
     windows)
       cd extra
       ./build
@@ -31,17 +31,17 @@ before_script:
   esac
 script:
 - |-
-  case "$TRAVIS_OS_NAME"
+  case "$TRAVIS_OS_NAME" in
     windows)
       mkdir build
       cd build
       cmake -A x64 -DCMAKE_INSTALL_PREFIX="C:\SAIL" -DSAIL_DEV=ON ..
       cmake --build . --config Release
     ;;
-   osx | linux)
+    osx | linux)
       mkdir build
       cd build
       cmake -DSAIL_DEV=ON ..
       cmake --build .
-   ;;
+    ;;
   esac
