@@ -172,7 +172,12 @@ if (WIN32)
     set(PKG_CONFIG_EXECUTABLE "${PROJECT_SOURCE_DIR}/extra/bin/pkg-config.exe")
 endif()
 
-set(ENV{PKG_CONFIG_PATH} "${PROJECT_SOURCE_DIR}/extra/B/lib/pkgconfig")
+set(ENV_PKG_CONFIG_PATH $ENV{PKG_CONFIG_PATH})
+if (ENV_PKG_CONFIG_PATH)
+    set(ENV{PKG_CONFIG_PATH} "${ENV_PKG_CONFIG_PATH}:${PROJECT_SOURCE_DIR}/extra/B/lib/pkgconfig")
+else()
+    set(ENV{PKG_CONFIG_PATH} "${PROJECT_SOURCE_DIR}/extra/B/lib/pkgconfig")
+endif()
 
 find_package(PkgConfig REQUIRED)
 

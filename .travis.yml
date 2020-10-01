@@ -1,0 +1,63 @@
+language: cpp
+
+addons:
+  homebrew:
+    packages:
+      - sdl2
+      - jpeg-turbo
+      - libpng
+      - libtiff
+    update: true
+  apt:
+    packages:
+      - libsdl2-dev
+      - libjpeg-dev
+      - libpng-dev
+      - libtiff-dev
+    update: true
+
+jobs:
+  include:
+    - os: windows
+    - os: linux
+      dist: bionic
+    - os: osx
+      osx_image:
+        - xcode11.3
+      env:
+        - PKG_CONFIG_PATH="/usr/local/opt/jpeg-turbo/lib/pkgconfig:$PKG_CONFIG_PATH"
+    - os: osx
+      osx_image:
+        - xcode12
+      env:
+        - PKG_CONFIG_PATH="/usr/local/opt/jpeg-turbo/lib/pkgconfig:$PKG_CONFIG_PATH"
+
+before_script:
+- |-
+  case "$TRAVIS_OS_NAME" in
+    windows)
+      cd extra
+      ./build
+      cd -
+    ;;
+  esac
+
+script:
+- |-
+  case "$TRAVIS_OS_NAME" in
+    windows)
+      mkdir build
+      cd build
+      cmake -A x64 -DCMAKE_INSTALL_PREFIX="C:\SAIL" -DSAIL_DEV=ON ..
+      cmake --build . --config Release
+    ;;
+    osx | linux)
+      mkdir build
+      cd build
+      cmake -DSAIL_DEV=ON ..
+      cmake --build .
+      # We can run tests on UNIX w/o installation as CMake links binaries with RPATH
+      cd tests
+      ctest .
+    ;;
+  esac
