@@ -7,6 +7,7 @@ animated, multi-paged images along with their meta information and ICC profiles.
 
 **Latest release:** unreleased <br/>
 **Latest pre-release:** [v0.9.0-pre8](https://github.com/smoked-herring/sail/releases/tag/v0.9.0-pre8)<br/>
+**Continuous Integration:** [![Build Status](https://travis-ci.org/smoked-herring/sail.svg?branch=master)](https://travis-ci.org/smoked-herring/sail)<br/>
 **Programming language:** C<br/>
 **Bindings:** C++<br/>
 **License:** MIT
