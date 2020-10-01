@@ -56,6 +56,8 @@ script:
       cd build
       cmake -DSAIL_DEV=ON ..
       cmake --build .
+      # We can run tests on UNIX w/o installation as CMake links binaries with RPATH
+      cd tests
       ctest .
     ;;
   esac
