@@ -21,8 +21,12 @@ jobs:
       dist: bionic
     - os: osx
       osx_image:
-        - xcode12
         - xcode11.3
+      env:
+        - PKG_CONFIG_PATH="/usr/local/opt/jpeg-turbo/lib/pkgconfig:$PKG_CONFIG_PATH"
+    - os: osx
+      osx_image:
+        - xcode12
       env:
         - PKG_CONFIG_PATH="/usr/local/opt/jpeg-turbo/lib/pkgconfig:$PKG_CONFIG_PATH"
 
