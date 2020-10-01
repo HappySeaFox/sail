@@ -1,0 +1,24 @@
+language: cpp
+os:
+  - windows
+  - osx
+  - linux
+osx_image:
+  - xcode12
+  - xcode11.3
+dist: bionic
+addons:
+  homebrew:
+    packages:
+      - jpeg-turbo
+      - libpng
+      - libtiff
+    update: true
+  apt:
+    packages:
+      - libjpeg-dev
+      - libpng-dev
+      - libtiff-dev
+    update: true
+before_install:
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then cd extra; ./build; cd -; fi
