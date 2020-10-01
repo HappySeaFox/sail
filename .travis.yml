@@ -48,7 +48,7 @@ script:
     windows)
       mkdir build
       cd build
-      cmake -A x64 -DCMAKE_INSTALL_PREFIX="C:\SAIL" -DSAIL_DEV=ON ..
+      cmake -A x64 -DSAIL_DEV=ON ..
       cmake --build . --config Release
     ;;
     osx | linux)
@@ -56,5 +56,6 @@ script:
       cd build
       cmake -DSAIL_DEV=ON ..
       cmake --build .
+      ctest .
     ;;
   esac
