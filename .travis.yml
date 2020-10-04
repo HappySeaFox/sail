@@ -20,8 +20,10 @@ addons:
 jobs:
   include:
     - os: windows
+      name: "Windows Server"
     - os: linux
       dist: bionic
+      name: "Ubuntu 18.04 Bionic"
     - os: osx
       osx_image:
         - xcode11.3
