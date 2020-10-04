@@ -24,6 +24,7 @@ jobs:
     - os: linux
       dist: bionic
       name: "Ubuntu 18.04 Bionic"
+      cache: ccache
     - os: osx
       osx_image:
         - xcode11.3
