@@ -21,6 +21,8 @@ jobs:
   include:
     - os: windows
       name: "Windows Server"
+      env:
+        - PATH="/c/SAIL/bin:$PATH"
     - os: linux
       dist: bionic
       name: "Ubuntu 18.04 Bionic"
@@ -58,15 +60,20 @@ script:
     windows)
       mkdir build
       cd build
+
       cmake -A x64 -DCMAKE_INSTALL_PREFIX="C:\SAIL" -DSAIL_DEV=ON ..
-      cmake --build . --config Release
+      cmake --build . --config Release --target install
+
+      cd tests
+      ctest . -C Release
     ;;
     osx | linux)
       mkdir build
       cd build
+
       cmake -DSAIL_DEV=ON ..
       cmake --build .
-      # We can run tests on UNIX w/o installation as CMake links binaries with RPATH
+
       cd tests
       ctest .
     ;;
