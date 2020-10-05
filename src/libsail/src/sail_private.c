@@ -427,7 +427,7 @@ static sail_status_t init_context(struct sail_context *context, int flags) {
         node = node->next;
     }
 
-    SAIL_LOG_DEBUG("Initialized in %lld ms.", (unsigned long)(sail_now() - start_time));
+    SAIL_LOG_DEBUG("Initialized in %lu ms.", (unsigned long)(sail_now() - start_time));
 
     return SAIL_OK;
 }
