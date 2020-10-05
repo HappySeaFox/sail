@@ -80,6 +80,21 @@ write_features& write_features::operator=(const write_features &wf)
     return *this;
 }
 
+write_features::write_features(write_features &&wf) noexcept
+{
+    d = wf.d;
+    wf.d = nullptr;
+}
+
+write_features& write_features::operator=(write_features &&wf)
+{
+    delete d;
+    d = wf.d;
+    wf.d = nullptr;
+
+    return *this;
+}
+
 write_features::~write_features()
 {
     delete d;
