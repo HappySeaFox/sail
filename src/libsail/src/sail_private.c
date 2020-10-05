@@ -344,8 +344,9 @@ static sail_status_t init_context(struct sail_context *context, int flags) {
         char *full_path;
 
         /* Ignore errors and try to load as much as possible. */
-        SAIL_TRY_OR_EXECUTE(build_full_path(plugs_path, data.cFileName, &full_path),
-                            /* on error */ continue);
+        if (build_full_path(plugs_path, data.cFileName, &full_path) != SAIL_OK) {
+            continue;
+        }
 
         SAIL_LOG_DEBUG("Found codec info '%s'", data.cFileName);
 
@@ -378,8 +379,9 @@ static sail_status_t init_context(struct sail_context *context, int flags) {
         char *full_path;
 
         /* Ignore errors and try to load as much as possible. */
-        SAIL_TRY_OR_EXECUTE(build_full_path(plugs_path, dir->d_name, &full_path),
-                            /* on error */ continue);
+        if (build_full_path(plugs_path, dir->d_name, &full_path) != SAIL_OK) {
+            continue;
+        }
 
         /* Handle files only. */
         if (sail_is_file(full_path)) {
