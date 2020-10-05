@@ -135,10 +135,6 @@ void sail_log(enum SailLogLevel level, const char *file, int line, const char *f
 
     if (ansi_colors_supported) {
         switch (level) {
-            /* Something weird. */
-            case SAIL_LOG_LEVEL_SILENCE: return;
-
-            /* Normal log levels. */
             case SAIL_LOG_LEVEL_ERROR:   fprintf(SAIL_LOG_FPTR, "%s", SAIL_COLOR_BOLD_RED);    break;
             case SAIL_LOG_LEVEL_WARNING: fprintf(SAIL_LOG_FPTR, "%s", SAIL_COLOR_BOLD_YELLOW); break;
             case SAIL_LOG_LEVEL_INFO:    fprintf(SAIL_LOG_FPTR, "%s", SAIL_COLOR_BOLD_CYAN);   break;
