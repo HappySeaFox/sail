@@ -44,6 +44,7 @@ public:
         sail_destroy_source_image(source_image);
     }
 
+private:
     sail_status_t init()
     {
         SAIL_TRY(sail_alloc_source_image(&source_image));
@@ -51,6 +52,7 @@ public:
         return SAIL_OK;
     }
 
+public:
     sail_source_image *source_image;
 };
 
@@ -70,6 +72,21 @@ source_image& source_image::operator=(const source_image &si)
     with_pixel_format(si.pixel_format())
         .with_properties(si.properties())
         .with_compression(si.compression());
+
+    return *this;
+}
+
+source_image::source_image(source_image &&si) noexcept
+{
+    d = si.d;
+    si.d = nullptr;
+}
+
+source_image& source_image::operator=(source_image &&si)
+{
+    delete d;
+    d = si.d;
+    si.d = nullptr;
 
     return *this;
 }

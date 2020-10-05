@@ -103,6 +103,21 @@ image& image::operator=(const image &img)
     return *this;
 }
 
+image::image(image &&img) noexcept
+{
+    d = img.d;
+    img.d = nullptr;
+}
+
+image& image::operator=(image &&img)
+{
+    delete d;
+    d = img.d;
+    img.d = nullptr;
+
+    return *this;
+}
+
 image::~image()
 {
     delete d;

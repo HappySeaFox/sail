@@ -1,0 +1,80 @@
+language: cpp
+
+addons:
+  homebrew:
+    packages:
+      - ccache
+      - sdl2
+      - jpeg-turbo
+      - libpng
+      - libtiff
+    update: true
+  apt:
+    packages:
+      - libsdl2-dev
+      - libjpeg-dev
+      - libpng-dev
+      - libtiff-dev
+    update: true
+
+jobs:
+  include:
+    - os: windows
+      name: "Windows Server"
+      env:
+        - PATH="/c/SAIL/bin:$PATH"
+    - os: linux
+      dist: bionic
+      name: "Ubuntu 18.04 Bionic"
+      cache: ccache
+    - os: osx
+      osx_image:
+        - xcode11.3
+      name: "macOS 10.14.6"
+      env:
+        - PATH="/usr/local/opt/ccache/libexec:$PATH"
+        - PKG_CONFIG_PATH="/usr/local/opt/jpeg-turbo/lib/pkgconfig:$PKG_CONFIG_PATH"
+      cache: ccache
+    - os: osx
+      osx_image:
+        - xcode12
+      name: "macOS 10.15.5"
+      env:
+        - PATH="/usr/local/opt/ccache/libexec:$PATH"
+        - PKG_CONFIG_PATH="/usr/local/opt/jpeg-turbo/lib/pkgconfig:$PKG_CONFIG_PATH"
+      cache: ccache
+
+before_script:
+- |-
+  case "$TRAVIS_OS_NAME" in
+    windows)
+      cd extra
+      ./build
+      cd -
+    ;;
+  esac
+
+script:
+- |-
+  case "$TRAVIS_OS_NAME" in
+    windows)
+      mkdir build
+      cd build
+
+      cmake -A x64 -DCMAKE_INSTALL_PREFIX="C:\SAIL" -DSAIL_DEV=ON ..
+      cmake --build . --config Release --target install
+
+      cd tests
+      ctest . -C Release
+    ;;
+    osx | linux)
+      mkdir build
+      cd build
+
+      cmake -DCMAKE_BUILD_TYPE=Release -DSAIL_DEV=ON ..
+      cmake --build .
+
+      cd tests
+      ctest .
+    ;;
+  esac

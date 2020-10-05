@@ -56,8 +56,6 @@ struct sail_image;
 namespace sail
 {
 
-class codec_info;
-
 /*
  * Image representation with direct access to the pixel data.
  */
@@ -68,8 +66,10 @@ class SAIL_EXPORT image
 
 public:
     image();
-    image(const image &image);
-    image& operator=(const image &image);
+    image(const image &img);
+    image& operator=(const image &img);
+    image(image &&img) noexcept;
+    image& operator=(image &&img);
     ~image();
 
     /*
@@ -390,7 +390,7 @@ private:
 
 private:
     class pimpl;
-    pimpl * const d;
+    pimpl *d;
 };
 
 }

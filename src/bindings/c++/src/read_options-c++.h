@@ -47,16 +47,14 @@ namespace sail
 class SAIL_EXPORT read_options
 {
     friend class image_reader;
+    friend class read_features;
 
 public:
     read_options();
-    /*
-     * Makes a deep copy of the specified read options and stores the pointer for further use.
-     * When the SAIL context gets uninitialized, the pointer becomes dangling.
-     */
-    read_options(const sail_read_options *ro);
     read_options(const read_options &ro);
     read_options& operator=(const read_options &ro);
+    read_options(read_options &&ro) noexcept;
+    read_options& operator=(read_options &&ro);
     ~read_options();
 
     SailPixelFormat output_pixel_format() const;
@@ -66,11 +64,17 @@ public:
     read_options& with_io_options(int io_options);
 
 private:
+    /*
+     * Makes a deep copy of the specified read options and stores the pointer for further use.
+     * When the SAIL context gets uninitialized, the pointer becomes dangling.
+     */
+    read_options(const sail_read_options *ro);
+
     sail_status_t to_sail_read_options(sail_read_options *read_options) const;
 
 private:
     class pimpl;
-    pimpl * const d;
+    pimpl *d;
 };
 
 }

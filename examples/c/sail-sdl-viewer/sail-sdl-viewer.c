@@ -29,7 +29,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <SDL2/SDL.h>
+/* On macOS SDL2 is already included into the search path. */
+#ifdef SAIL_APPLE
+    #include <SDL.h>
+#else
+    #include <SDL2/SDL.h>
+#endif
 
 #include "sail-common.h"
 #include "sail.h"

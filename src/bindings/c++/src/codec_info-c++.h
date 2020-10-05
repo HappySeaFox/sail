@@ -58,8 +58,10 @@ class SAIL_EXPORT codec_info
 
 public:
     codec_info();
-    codec_info(const codec_info &pi);
-    codec_info& operator=(const codec_info &pi);
+    codec_info(const codec_info &ci);
+    codec_info& operator=(const codec_info &ci);
+    codec_info(codec_info &&ci) noexcept;
+    codec_info& operator=(codec_info &&ci);
     ~codec_info();
 
     const std::string& path() const;
@@ -199,7 +201,7 @@ private:
 
 private:
     class pimpl;
-    pimpl * const d;
+    pimpl *d;
 };
 
 }

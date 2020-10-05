@@ -81,6 +81,21 @@ write_options& write_options::operator=(const write_options &wo)
     return *this;
 }
 
+write_options::write_options(write_options &&wo) noexcept
+{
+    d = wo.d;
+    wo.d = nullptr;
+}
+
+write_options& write_options::operator=(write_options &&wo)
+{
+    delete d;
+    d = wo.d;
+    wo.d = nullptr;
+
+    return *this;
+}
+
 write_options::~write_options()
 {
     delete d;

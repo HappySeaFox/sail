@@ -47,16 +47,14 @@ namespace sail
 class SAIL_EXPORT write_options
 {
     friend class image_writer;
+    friend class write_features;
 
 public:
     write_options();
-    /*
-     * Makes a deep copy of the specified write options and stores the pointer for further use.
-     * When the SAIL context gets uninitialized, the pointer becomes dangling.
-     */
-    write_options(const sail_write_options *ro);
-    write_options(const write_options &ro);
-    write_options& operator=(const write_options &ro);
+    write_options(const write_options &wo);
+    write_options& operator=(const write_options &wo);
+    write_options(write_options &&wo) noexcept;
+    write_options& operator=(write_options &&wo);
     ~write_options();
 
     SailPixelFormat output_pixel_format() const;
@@ -70,11 +68,17 @@ public:
     write_options& with_compression_level(double compression_level);
 
 private:
+    /*
+     * Makes a deep copy of the specified write options and stores the pointer for further use.
+     * When the SAIL context gets uninitialized, the pointer becomes dangling.
+     */
+    write_options(const sail_write_options *wo);
+
     sail_status_t to_sail_write_options(sail_write_options *write_options) const;
 
 private:
     class pimpl;
-    pimpl * const d;
+    pimpl *d;
 };
 
 }

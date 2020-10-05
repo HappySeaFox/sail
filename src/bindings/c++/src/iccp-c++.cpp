@@ -37,9 +37,8 @@ class SAIL_HIDDEN iccp::pimpl
 {
 public:
     pimpl()
+        : iccp{nullptr, 0}
     {
-        iccp.data        = nullptr;
-        iccp.data_length = 0;
     }
 
     ~pimpl()
@@ -64,6 +63,21 @@ iccp::iccp(const iccp &ic)
 iccp& iccp::operator=(const iccp &ic)
 {
     with_data(ic.data(), ic.data_length());
+
+    return *this;
+}
+
+iccp::iccp(iccp &&ic) noexcept
+{
+    d = ic.d;
+    ic.d = nullptr;
+}
+
+iccp& iccp::operator=(iccp &&ic)
+{
+    delete d;
+    d = ic.d;
+    ic.d = nullptr;
 
     return *this;
 }
