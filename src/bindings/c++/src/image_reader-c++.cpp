@@ -38,6 +38,7 @@ class SAIL_HIDDEN image_reader::pimpl
 public:
     pimpl()
         : state(nullptr)
+        , sail_io{0, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr}
     {
     }
 
