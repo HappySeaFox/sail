@@ -172,6 +172,8 @@ void sail_log(enum SailLogLevel level, const char *file, int line, const char *f
     }
 
     fprintf(SAIL_LOG_FPTR, "\n");
+
+    va_end(args);
 }
 
 void sail_set_log_barrier(enum SailLogLevel max_level) {
