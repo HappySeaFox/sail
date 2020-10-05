@@ -478,8 +478,8 @@ sail_status_t control_tls_context(struct sail_context **context, enum SailContex
             break;
         }
         case SAIL_CONTEXT_DESTROY: {
-            destroy_context(tls_context);
             SAIL_LOG_DEBUG("Destroyed the thread-local context %p", tls_context);
+            destroy_context(tls_context);
             tls_context = NULL;
             break;
         }
