@@ -53,8 +53,6 @@ struct sail_image;
 namespace sail
 {
 
-class codec_info;
-
 /*
  * Image representation with direct access to the pixel data.
  */

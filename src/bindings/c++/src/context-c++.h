@@ -47,9 +47,6 @@
 namespace sail
 {
 
-class codec_info;
-class io;
-
 class SAIL_EXPORT context
 {
 public:
