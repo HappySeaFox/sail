@@ -10,8 +10,6 @@
 
 - remove SAIL_CHECK_xxx checks in codecs? Are they needed? libsail does them as well
 
-- C++ move ctors
-
 - add benchmarks to README
 
 - tests
