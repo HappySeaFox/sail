@@ -50,6 +50,8 @@ public:
     iccp();
     iccp(const iccp &ic);
     iccp& operator=(const iccp &ic);
+    iccp(iccp &&ic);
+    iccp& operator=(iccp &&ic);
     ~iccp();
 
     /*
@@ -82,7 +84,7 @@ private:
 
 private:
     class pimpl;
-    pimpl * const d;
+    pimpl *d;
 };
 
 }

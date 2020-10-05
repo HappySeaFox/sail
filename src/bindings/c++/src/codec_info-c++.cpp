@@ -55,25 +55,40 @@ codec_info::codec_info()
 {
 }
 
-codec_info::codec_info(const codec_info &pi)
+codec_info::codec_info(const codec_info &ci)
     : codec_info()
 {
-    *this = pi;
+    *this = ci;
 }
 
-codec_info& codec_info::operator=(const codec_info &pi)
+codec_info& codec_info::operator=(const codec_info &ci)
 {
-    d->sail_codec_info_c = pi.d->sail_codec_info_c;
+    d->sail_codec_info_c = ci.d->sail_codec_info_c;
 
-    with_path(pi.path())
-        .with_version(pi.version())
-        .with_name(pi.name())
-        .with_description(pi.description())
-        .with_magic_numbers(pi.magic_numbers())
-        .with_extensions(pi.extensions())
-        .with_mime_types(pi.mime_types())
-        .with_read_features(pi.read_features())
-        .with_write_features(pi.write_features());
+    with_path(ci.path())
+        .with_version(ci.version())
+        .with_name(ci.name())
+        .with_description(ci.description())
+        .with_magic_numbers(ci.magic_numbers())
+        .with_extensions(ci.extensions())
+        .with_mime_types(ci.mime_types())
+        .with_read_features(ci.read_features())
+        .with_write_features(ci.write_features());
+
+    return *this;
+}
+
+codec_info::codec_info(codec_info &&ci)
+{
+    d = ci.d;
+    ci.d = nullptr;
+}
+
+codec_info& codec_info::operator=(codec_info &&ci)
+{
+    delete d;
+    d = ci.d;
+    ci.d = nullptr;
 
     return *this;
 }

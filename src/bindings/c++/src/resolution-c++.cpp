@@ -66,6 +66,21 @@ resolution& resolution::operator=(const resolution &res)
     return *this;
 }
 
+resolution::resolution(resolution &&res)
+{
+    d = res.d;
+    res.d = nullptr;
+}
+
+resolution& resolution::operator=(resolution &&res)
+{
+    delete d;
+    d = res.d;
+    res.d = nullptr;
+
+    return *this;
+}
+
 resolution::~resolution()
 {
     delete d;

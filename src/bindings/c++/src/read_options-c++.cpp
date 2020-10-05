@@ -60,7 +60,6 @@ read_options::read_options(const sail_read_options *ro)
 }
 
 read_options::read_options(const read_options &ro)
-    : read_options()
 {
     *this = ro;
 }
@@ -69,6 +68,21 @@ read_options& read_options::operator=(const read_options &ro)
 {
     with_output_pixel_format(ro.output_pixel_format())
         .with_io_options(ro.io_options());
+
+    return *this;
+}
+
+read_options::read_options(read_options &&ro)
+{
+    d = ro.d;
+    ro.d = nullptr;
+}
+
+read_options& read_options::operator=(read_options &&ro)
+{
+    delete d;
+    d = ro.d;
+    ro.d = nullptr;
 
     return *this;
 }

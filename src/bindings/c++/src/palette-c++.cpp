@@ -72,6 +72,21 @@ palette& palette::operator=(const palette &pal)
     return *this;
 }
 
+palette::palette(palette &&pal)
+{
+    d = pal.d;
+    pal.d = nullptr;
+}
+
+palette& palette::operator=(palette &&pal)
+{
+    delete d;
+    d = pal.d;
+    pal.d = nullptr;
+
+    return *this;
+}
+
 palette::~palette()
 {
     delete d;

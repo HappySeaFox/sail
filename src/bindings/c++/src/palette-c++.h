@@ -50,6 +50,8 @@ public:
     palette();
     palette(const palette &pal);
     palette& operator=(const palette &pal);
+    palette(palette &&pal);
+    palette& operator=(palette &&pal);
     ~palette();
 
     /*
@@ -89,7 +91,7 @@ private:
 
 private:
     class pimpl;
-    pimpl * const d;
+    pimpl *d;
 };
 
 }

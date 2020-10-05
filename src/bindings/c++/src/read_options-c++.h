@@ -57,6 +57,8 @@ public:
     read_options(const sail_read_options *ro);
     read_options(const read_options &ro);
     read_options& operator=(const read_options &ro);
+    read_options(read_options &&ro);
+    read_options& operator=(read_options &&ro);
     ~read_options();
 
     SailPixelFormat output_pixel_format() const;
@@ -70,7 +72,7 @@ private:
 
 private:
     class pimpl;
-    pimpl * const d;
+    pimpl *d;
 };
 
 }

@@ -51,6 +51,8 @@ public:
     source_image();
     source_image(const source_image &si);
     source_image& operator=(const source_image &si);
+    source_image(source_image &&si);
+    source_image& operator=(source_image &&si);
     ~source_image();
 
     /*
@@ -98,7 +100,7 @@ private:
 
 private:
     class pimpl;
-    pimpl * const d;
+    pimpl *d;
 };
 
 }

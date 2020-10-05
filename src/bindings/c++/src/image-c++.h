@@ -63,8 +63,10 @@ class SAIL_EXPORT image
 
 public:
     image();
-    image(const image &image);
-    image& operator=(const image &image);
+    image(const image &img);
+    image& operator=(const image &img);
+    image(image &&img);
+    image& operator=(image &&img);
     ~image();
 
     /*
@@ -385,7 +387,7 @@ private:
 
 private:
     class pimpl;
-    pimpl * const d;
+    pimpl *d;
 };
 
 }
