@@ -51,9 +51,9 @@ public:
 
     void free()
     {
-        sail_free(const_cast<void *>(value_data));
-
         value_string = std::string();
+
+        sail_free(const_cast<void *>(value_data));
 
         value_data        = nullptr;
         value_data_length = 0;
@@ -93,6 +93,21 @@ meta_data& meta_data::operator=(const meta_data &md)
     } else {
         with_value(md.value_data(), md.value_data_length());
     }
+
+    return *this;
+}
+
+meta_data::meta_data(meta_data &&md) noexcept
+{
+    d = md.d;
+    md.d = nullptr;
+}
+
+meta_data& meta_data::operator=(meta_data &&md)
+{
+    delete d;
+    d = md.d;
+    md.d = nullptr;
 
     return *this;
 }

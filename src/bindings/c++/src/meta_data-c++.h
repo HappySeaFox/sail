@@ -52,6 +52,8 @@ public:
     meta_data();
     meta_data(const meta_data &md);
     meta_data& operator=(const meta_data &md);
+    meta_data(meta_data &&md) noexcept;
+    meta_data& operator=(meta_data &&md);
     ~meta_data();
 
     /*
@@ -140,7 +142,7 @@ private:
 
 private:
     class pimpl;
-    pimpl * const d;
+    pimpl *d;
 };
 
 }
