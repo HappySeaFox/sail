@@ -60,6 +60,7 @@ read_options::read_options(const sail_read_options *ro)
 }
 
 read_options::read_options(const read_options &ro)
+    : read_options()
 {
     *this = ro;
 }
