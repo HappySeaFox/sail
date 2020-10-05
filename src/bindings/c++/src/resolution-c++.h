@@ -50,7 +50,7 @@ public:
     resolution();
     resolution(const resolution &res);
     resolution& operator=(const resolution &res);
-    resolution(resolution &&res);
+    resolution(resolution &&res) noexcept;
     resolution& operator=(resolution &&res);
     ~resolution();
 

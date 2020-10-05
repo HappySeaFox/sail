@@ -72,7 +72,7 @@ palette& palette::operator=(const palette &pal)
     return *this;
 }
 
-palette::palette(palette &&pal)
+palette::palette(palette &&pal) noexcept
 {
     d = pal.d;
     pal.d = nullptr;

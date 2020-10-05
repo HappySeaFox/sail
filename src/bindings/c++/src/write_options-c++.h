@@ -57,7 +57,7 @@ public:
     write_options(const sail_write_options *wo);
     write_options(const write_options &wo);
     write_options& operator=(const write_options &wo);
-    write_options(write_options &&wo);
+    write_options(write_options &&wo) noexcept;
     write_options& operator=(write_options &&wo);
     ~write_options();
 

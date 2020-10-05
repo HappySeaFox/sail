@@ -50,7 +50,7 @@ public:
     iccp();
     iccp(const iccp &ic);
     iccp& operator=(const iccp &ic);
-    iccp(iccp &&ic);
+    iccp(iccp &&ic) noexcept;
     iccp& operator=(iccp &&ic);
     ~iccp();
 

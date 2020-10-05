@@ -50,7 +50,7 @@ public:
     palette();
     palette(const palette &pal);
     palette& operator=(const palette &pal);
-    palette(palette &&pal);
+    palette(palette &&pal) noexcept;
     palette& operator=(palette &&pal);
     ~palette();
 

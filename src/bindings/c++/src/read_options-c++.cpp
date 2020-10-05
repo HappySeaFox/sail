@@ -73,7 +73,7 @@ read_options& read_options::operator=(const read_options &ro)
     return *this;
 }
 
-read_options::read_options(read_options &&ro)
+read_options::read_options(read_options &&ro) noexcept
 {
     d = ro.d;
     ro.d = nullptr;

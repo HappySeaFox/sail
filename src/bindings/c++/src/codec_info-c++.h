@@ -60,7 +60,7 @@ public:
     codec_info();
     codec_info(const codec_info &ci);
     codec_info& operator=(const codec_info &ci);
-    codec_info(codec_info &&ci);
+    codec_info(codec_info &&ci) noexcept;
     codec_info& operator=(codec_info &&ci);
     ~codec_info();
 

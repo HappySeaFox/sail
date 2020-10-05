@@ -66,7 +66,7 @@ resolution& resolution::operator=(const resolution &res)
     return *this;
 }
 
-resolution::resolution(resolution &&res)
+resolution::resolution(resolution &&res) noexcept
 {
     d = res.d;
     res.d = nullptr;

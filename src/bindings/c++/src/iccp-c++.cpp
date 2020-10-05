@@ -67,7 +67,7 @@ iccp& iccp::operator=(const iccp &ic)
     return *this;
 }
 
-iccp::iccp(iccp &&ic)
+iccp::iccp(iccp &&ic) noexcept
 {
     d = ic.d;
     ic.d = nullptr;

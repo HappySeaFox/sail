@@ -65,7 +65,7 @@ public:
     image();
     image(const image &img);
     image& operator=(const image &img);
-    image(image &&img);
+    image(image &&img) noexcept;
     image& operator=(image &&img);
     ~image();
 

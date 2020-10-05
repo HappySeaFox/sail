@@ -103,7 +103,7 @@ image& image::operator=(const image &img)
     return *this;
 }
 
-image::image(image &&img)
+image::image(image &&img) noexcept
 {
     d = img.d;
     img.d = nullptr;

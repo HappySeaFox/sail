@@ -76,7 +76,7 @@ source_image& source_image::operator=(const source_image &si)
     return *this;
 }
 
-source_image::source_image(source_image &&si)
+source_image::source_image(source_image &&si) noexcept
 {
     d = si.d;
     si.d = nullptr;

@@ -78,7 +78,7 @@ codec_info& codec_info::operator=(const codec_info &ci)
     return *this;
 }
 
-codec_info::codec_info(codec_info &&ci)
+codec_info::codec_info(codec_info &&ci) noexcept
 {
     d = ci.d;
     ci.d = nullptr;
