@@ -1,5 +1,5 @@
 <h1 align="center">SAIL: Squirrel Abstract Image Library</h1>
-<h3 align="center">The missing lightweight and user-friendly C/C++ image decoding library.</h3>
+<h3 align="center">The missing clean and user-friendly C/C++ image decoding library.</h3>
 <p align="center">
   <a href="https://travis-ci.org/smoked-herring/sail">
     <img alt="Travis Build Status" src="https://travis-ci.org/smoked-herring/sail.svg?branch=master"/>
