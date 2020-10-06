@@ -1,5 +1,8 @@
 language: cpp
 
+notifications:
+  email: false
+
 addons:
   homebrew:
     packages:
