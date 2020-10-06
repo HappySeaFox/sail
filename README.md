@@ -1,4 +1,4 @@
-<h1 align="center">SAIL: Squirrel Abstract Image Library</h1>
+<h1 align="center">Squirrel Abstract Image Library</h1>
 <h3 align="center">The missing powerful C/C++ image decoding library for humans (not for machines).</h3>
 <p align="center">
   <a href="https://travis-ci.org/smoked-herring/sail">
