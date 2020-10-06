@@ -28,9 +28,6 @@ SAIL is a fast and lightweight cross-platform image decoding and encoding librar
 from one-liners to complex use cases with custom I/O sources. It enables a client to read and write static,
 animated, multi-paged images along with their meta information and ICC profiles. :sailboat:
 
-**Programming language:** C<br/>
-**Bindings:** C++
-
 ![Screenshot](.github/qt-demo.png?raw=true)
 
 ## Target audience
@@ -81,6 +78,11 @@ Currently, SAIL supports the following platforms:
 - Windows
 - macOS
 - Linux
+
+## Programming languages
+
+**Programming language:** C11<br/>
+**Bindings:** C++11
 
 ## Competitors
 
