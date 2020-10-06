@@ -2,10 +2,16 @@
 <h3 align="center">The missing user-friendly C/C++ image decoding library.</h3>
 <p align="center">
   <a href="https://travis-ci.org/smoked-herring/sail">
-    <img alt="Travis Build Status" src="https://travis-ci.org/smoked-herring/sail.svg?branch=master"/>
+    <img alt="Travis Build Status" src="https://img.shields.io/travis/smoked-herring/sail"/>
   </a>
   <a href="https://scan.coverity.com/projects/smoked-herring-sail">
-    <img alt="Coverity Scan Build Status" src="https://scan.coverity.com/projects/21306/badge.svg"/>
+    <img alt="Coverity Scan Build Status" src="https://img.shields.io/coverity/scan/21306"/>
+  </a>
+  <a href="https://opensource.org/licenses/MIT">
+    <img alt="License" src="https://img.shields.io/github/license/smoked-herring/sail?color=blue"/>
+  </a>
+  <a href="https://github.com/smoked-herring/sail/releases">
+    <img alt="Latest release" src="https://img.shields.io/github/v/release/smoked-herring/sail?include_prereleases"/>
   </a>
 </p>
 <p align="center">
@@ -22,11 +28,8 @@ SAIL is a fast and lightweight cross-platform image decoding and encoding librar
 from one-liners to complex use cases with custom I/O sources. It enables a client to read and write static,
 animated, multi-paged images along with their meta information and ICC profiles. :sailboat:
 
-**Latest release:** unreleased <br/>
-**Latest pre-release:** [v0.9.0-pre8](https://github.com/smoked-herring/sail/releases/tag/v0.9.0-pre8)<br/>
 **Programming language:** C<br/>
-**Bindings:** C++<br/>
-**License:** MIT
+**Bindings:** C++
 
 ![Screenshot](.github/qt-demo.png?raw=true)
 
