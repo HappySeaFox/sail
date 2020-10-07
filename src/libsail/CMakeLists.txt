@@ -4,8 +4,10 @@ add_library(sail
                 src/io_mem.c
                 src/io_noop.c
                 src/codec.c
+                src/codec_info.c
+                src/codec_info_node.c
                 src/codec_info_private.c
-                src/sail.c
+                src/context.c
                 src/sail_advanced.c
                 src/sail_deep_diver.c
                 src/sail_junior.c
@@ -18,6 +20,7 @@ add_library(sail
 set(PUBLIC_HEADERS "")
 list(APPEND PUBLIC_HEADERS "src/codec_info.h")
 list(APPEND PUBLIC_HEADERS "src/codec_info_node.h")
+list(APPEND PUBLIC_HEADERS "src/context.h")
 list(APPEND PUBLIC_HEADERS "src/sail.h")
 list(APPEND PUBLIC_HEADERS "src/sail_advanced.h")
 list(APPEND PUBLIC_HEADERS "src/sail_deep_diver.h")

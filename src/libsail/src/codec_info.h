@@ -26,12 +26,15 @@
 #ifndef SAIL_CODEC_INFO_H
 #define SAIL_CODEC_INFO_H
 
-struct sail_string_node;
+#ifdef __cplusplus
+extern "C" {
+#endif
 
+struct sail_io;
 struct sail_read_features;
 struct sail_write_features;
 
-struct sail_codec;
+struct sail_codec_info_node;
 
 /*
  * A structure representing codec information.
@@ -77,5 +80,117 @@ struct sail_codec_info {
 };
 
 typedef struct sail_codec_info sail_codec_info_t;
+
+/*
+ * Finds a first codec info object that supports reading or writing the specified file path by its file extension.
+ * For example: "/test.jpg". The path might not exist.
+ *
+ * The assigned codec info MUST NOT be destroyed. It is a pointer to an internal data structure.
+ *
+ * Typical usage: sail_codec_info_from_path() ->
+ *                sail_start_reading_file()   ->
+ *                sail_read_next_frame()      ->
+ *                sail_stop_reading().
+ *
+ * Or:            sail_codec_info_from_path() ->
+ *                sail_start_writing()        ->
+ *                sail_read_next_frame()      ->
+ *                sail_stop_writing().
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_codec_info_from_path(const char *path, const struct sail_codec_info **codec_info);
+
+/*
+ * Finds a first codec info object that supports the magic number read from the specified file.
+ * The comparison algorithm is case insensitive.
+ *
+ * The assigned codec info MUST NOT be destroyed. It is a pointer to an internal data structure.
+ *
+ * Typical usage: sail_codec_info_by_magic_number_from_path() ->
+ *                sail_start_reading_file()                   ->
+ *                sail_read_next_frame()                      ->
+ *                sail_stop_reading().
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_path(const char *path, const struct sail_codec_info **codec_info);
+
+/*
+ * Finds a first codec info object that supports the magic number read from the specified memory buffer.
+ * The comparison algorithm is case insensitive.
+ *
+ * The assigned codec info MUST NOT be destroyed. It is a pointer to an internal data structure.
+ *
+ * Typical usage: sail_codec_info_by_magic_number_from_mem() ->
+ *                sail_start_reading_file()                  ->
+ *                sail_read_next_frame()                     ->
+ *                sail_stop_reading().
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_mem(const void *buffer, size_t buffer_length,
+                                                                   const struct sail_codec_info **codec_info);
+
+/*
+ * Finds a first codec info object that supports the magic number read from the specified I/O data source.
+ * The comparison algorithm is case insensitive. After reading a magic number, this function rewinds the I/O
+ * cursor position back to the beginning. That's why the I/O source must be seekable.
+ *
+ * The assigned codec info MUST NOT be destroyed. It is a pointer to an internal data structure.
+ *
+ * Typical usage: sail_codec_info_by_magic_number_from_io() ->
+ *                sail_start_reading_file()                 ->
+ *                sail_read_next_frame()                    ->
+ *                sail_stop_reading().
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_io(struct sail_io *io, const struct sail_codec_info **codec_info);
+
+/*
+ * Finds a first codec info object that supports the specified file extension.
+ * The comparison algorithm is case insensitive. For example: "jpg".
+ *
+ * The assigned codec info MUST NOT be destroyed. It is a pointer to an internal data structure.
+ *
+ * Typical usage: sail_codec_info_from_extension() ->
+ *                sail_start_reading_file()        ->
+ *                sail_read_next_frame()           ->
+ *                sail_stop_reading().
+ *
+ * Or:            sail_codec_info_from_extension() ->
+ *                sail_start_writing()             ->
+ *                sail_read_next_frame()           ->
+ *                sail_stop_writing().
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_codec_info_from_extension(const char *extension, const struct sail_codec_info **codec_info);
+
+/*
+ * Finds a first codec info object that supports the specified mime type.
+ * The comparison algorithm is case insensitive. For example: "image/jpeg".
+ *
+ * The assigned codec info MUST NOT be destroyed. It is a pointer to an internal data structure.
+ *
+ * Typical usage: sail_codec_info_from_mime_type() ->
+ *                sail_start_reading_file()        ->
+ *                sail_read_next_frame()           ->
+ *                sail_stop_reading().
+ *
+ * Or:            sail_codec_info_from_mime_type() ->
+ *                sail_start_writing()             ->
+ *                sail_read_next_frame()           ->
+ *                sail_stop_writing().
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_codec_info_from_mime_type(const char *mime_type, const struct sail_codec_info **codec_info);
+
+/* extern "C" */
+#ifdef __cplusplus
+}
+#endif
 
 #endif

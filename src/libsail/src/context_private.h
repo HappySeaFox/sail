@@ -23,50 +23,26 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_CODEC_INFO_NODE_H
-#define SAIL_CODEC_INFO_NODE_H
+#ifndef SAIL_CONTEXT_PRIVATE_H
+#define SAIL_CONTEXT_PRIVATE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <stdbool.h>
 
-#ifdef SAIL_BUILD
-    #include "export.h"
-#else
-    #include <sail-common/export.h>
-#endif
-
-struct sail_codec_info;
-struct sail_codec;
+struct sail_codec_info_node;
 
 /*
- * A structure representing a codec information linked list.
+ * Context is a main entry point to start working with SAIL. It enumerates codec info objects which could be
+ * used later in reading and writing operations.
  */
-struct sail_codec_info_node {
+struct sail_context {
 
-    /* Codec information. */
-    struct sail_codec_info *codec_info;
+    /* Context is already initialized. */
+    bool initialized;
 
-    /* Codec instance. */
-    struct sail_codec *codec;
-
-    struct sail_codec_info_node *next;
+    /* Linked list of found codec info objects. */
+    struct sail_codec_info_node *codec_info_node;
 };
 
-typedef struct sail_codec_info_node sail_codec_info_node_t;
-
-/*
- * Returns a linked list of found codec info nodes. Use it to determine the list of possible image formats,
- * file extensions, and mime types that could be hypothetically read or written by SAIL.
- *
- * Returns a pointer to the first codec info node or NULL when no SAIL codecs were found.
- * Use sail_codec_info_node.next to iterate.
- */
-SAIL_EXPORT const struct sail_codec_info_node* sail_codec_info_list(void);
-
-/* extern "C" */
-#ifdef __cplusplus
-}
-#endif
+typedef struct sail_context sail_context_t;
 
 #endif
