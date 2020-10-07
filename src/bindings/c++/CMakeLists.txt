@@ -43,6 +43,10 @@ set_target_properties(sail-c++ PROPERTIES
                                SOVERSION 0
                                PUBLIC_HEADER "${PUBLIC_HEADERS}")
 
+if (${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.16.0")
+    target_precompile_headers(sail-c++ PRIVATE src/sail-c++.h)
+endif()
+
 # Definitions, includes, link
 #
 target_link_libraries(sail-c++ PUBLIC sail)
