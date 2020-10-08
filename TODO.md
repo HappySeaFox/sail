@@ -10,23 +10,11 @@
 
 - remove SAIL_CHECK_xxx checks in codecs? Are they needed? libsail does them as well
 
-- add benchmarks to README
-
-- tests
-  - check all codecs have the same layout version
-  - check all codecs could be loaded
-  - decode/encode with reference data
-  - all codecs have RGB and RGBA output
-
 ## Priority 2
 
-- Add `sail` command line tool? Usa-case: `sail list -v` to list all the installed codecs
-
-- Print more errors on 'return SAIL_XXX'
+- Print more errors on 'return SAIL_ERROR_XXX'
 
 - initializer lists in C++
-
-- distribute cmake rules along with .pc files
 
 - macros to hide boilerplate code in codecs
 
