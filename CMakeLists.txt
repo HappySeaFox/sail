@@ -18,6 +18,7 @@ include(CMakePushCheckState)
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 include(sail_codec)
 include(sail_enable_asan)
+include(sail_enable_pch)
 include(sail_test)
 include(sail_check_build_essential)
 

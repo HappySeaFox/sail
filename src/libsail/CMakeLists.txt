@@ -33,9 +33,7 @@ set_target_properties(sail PROPERTIES
                            SOVERSION 0
                            PUBLIC_HEADER "${PUBLIC_HEADERS}")
 
-if (${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.16.0")
-    target_precompile_headers(sail PRIVATE src/sail.h)
-endif()
+sail_enable_pch(TARGET sail HEADER src/sail.h)
 
 # Definitions, includes, link
 #
