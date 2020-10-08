@@ -56,7 +56,7 @@ sail_enable_pch(TARGET sail-common HEADER src/sail-common.h)
 if (SAIL_COLORED_OUTPUT)
     target_compile_definitions(sail-common PRIVATE SAIL_COLORED_OUTPUT=1)
 endif()
-target_include_directories(sail-common PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_include_directories(sail-common PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>)
 
 # pkg-config integration
 #
@@ -71,4 +71,8 @@ install(TARGETS sail-common
         LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
         RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
         PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/sail/sail-common")
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/libsail-common.pc" DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
+
+# Install development packages
+#
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/libsail-common.pc"
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")

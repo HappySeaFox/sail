@@ -37,7 +37,7 @@ sail_enable_pch(TARGET sail HEADER src/sail.h)
 
 # Definitions, includes, link
 #
-target_include_directories(sail PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_include_directories(sail PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>)
 target_compile_definitions(sail PRIVATE INI_STOP_ON_FIRST_ERROR=1)
 target_link_libraries(sail PUBLIC sail-common)
 
@@ -58,4 +58,8 @@ install(TARGETS sail
         LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
         RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
         PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/sail/sail")
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/libsail.pc" DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
+
+# Install development packages
+#
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/libsail.pc"
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")

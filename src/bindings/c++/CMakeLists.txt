@@ -62,4 +62,8 @@ install(TARGETS sail-c++
         LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
         RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
         PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/sail/sail-c++")
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/libsail-c++.pc" DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
+
+# Install development packages
+#
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/libsail-c++.pc"
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
