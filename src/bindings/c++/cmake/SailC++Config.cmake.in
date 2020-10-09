@@ -1,3 +1,3 @@
 include(CMakeFindDependencyMacro)
 find_dependency(Sail REQUIRED)
-include("${CMAKE_CURRENT_LIST_DIR}/SailCppTargets.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/SailC++Targets.cmake")
