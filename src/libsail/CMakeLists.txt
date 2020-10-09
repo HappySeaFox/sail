@@ -53,6 +53,7 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/pkgconfig/libsail.pc.in"
 # Installation
 #
 install(TARGETS sail
+        EXPORT SailTargets
         ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
         LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
         RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
@@ -62,3 +63,5 @@ install(TARGETS sail
 #
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/libsail.pc"
         DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
+
+sail_install_cmake_config(TARGET "Sail" VERSION "${VERSION}")

@@ -15,10 +15,11 @@ include(CMakePushCheckState)
 
 # Our own cmake scripts
 #
-set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
+set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" "${CMAKE_MODULE_PATH}")
 include(sail_codec)
 include(sail_enable_asan)
 include(sail_enable_pch)
+include(sail_install_cmake_config)
 include(sail_test)
 include(sail_check_build_essential)
 
@@ -26,10 +27,10 @@ include(sail_check_build_essential)
 #
 string(FIND "${CMAKE_INSTALL_PREFIX}" " " SPACE_INDEX)
 if (SPACE_INDEX GREATER_EQUAL 0)
-    message(FATAL_ERROR "The current CMAKE_INSTALL_PREFIX contains spaces: '${CMAKE_INSTALL_PREFIX}'. \
+    message(WARNING "The current CMAKE_INSTALL_PREFIX contains spaces: '${CMAKE_INSTALL_PREFIX}'. \
 The generated pkg-config files will also have spaces in paths. Pkg-config doesn't support that \
-and will fail to generate CFLAGS and LIBS for client applications. Please use a different CMAKE_INSTALL_PREFIX \
-without spaces.")
+and will fail to generate CFLAGS and LIBS for client applications. Please use CMAKE_INSTALL_PREFIX \
+without spaces if you're going to use pkg-config.")
 endif()
 
 # Check for required includes
