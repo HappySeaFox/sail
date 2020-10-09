@@ -37,7 +37,6 @@
 #include <QPushButton>
 #include <QTimer>
 
-#include <sail/sail.h>
 #include <sail-c++/sail-c++.h>
 
 //#include <sail/layouts/v3.h>
