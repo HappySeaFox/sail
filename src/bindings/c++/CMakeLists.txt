@@ -18,25 +18,24 @@ add_library(sail-c++
 
 # Build a list of public headers to install
 #
-set(PUBLIC_HEADERS "")
-list(APPEND PUBLIC_HEADERS "src/at_scope_exit-c++.h"
-                           "src/context-c++.h"
-                           "src/iccp-c++.h"
-                           "src/image-c++.h"
-                           "src/image_reader-c++.h"
-                           "src/image_writer-c++.h"
-                           "src/io_common-c++.h"
-                           "src/log-c++.h"
-                           "src/palette-c++.h"
-                           "src/codec_info-c++.h"
-                           "src/read_features-c++.h"
-                           "src/read_options-c++.h"
-                           "src/resolution-c++.h"
-                           "src/sail-c++.h"
-                           "src/source_image-c++.h"
-                           "src/write_features-c++.h"
-                           "src/write_options-c++.h"
-                           "src/utils-c++.h")
+set(PUBLIC_HEADERS "src/at_scope_exit-c++.h"
+                   "src/context-c++.h"
+                   "src/iccp-c++.h"
+                   "src/image-c++.h"
+                   "src/image_reader-c++.h"
+                   "src/image_writer-c++.h"
+                   "src/io_common-c++.h"
+                   "src/log-c++.h"
+                   "src/palette-c++.h"
+                   "src/codec_info-c++.h"
+                   "src/read_features-c++.h"
+                   "src/read_options-c++.h"
+                   "src/resolution-c++.h"
+                   "src/sail-c++.h"
+                   "src/source_image-c++.h"
+                   "src/write_features-c++.h"
+                   "src/write_options-c++.h"
+                   "src/utils-c++.h")
 
 set_target_properties(sail-c++ PROPERTIES
                                VERSION "0.5.0"

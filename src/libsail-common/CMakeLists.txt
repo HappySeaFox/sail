@@ -24,25 +24,24 @@ add_library(sail-common
 
 # Build a list of public headers to install
 #
-set(PUBLIC_HEADERS "")
-list(APPEND PUBLIC_HEADERS "src/common.h"
-                           "src/error.h"
-                           "src/export.h"
-                           "src/iccp.h"
-                           "src/image.h"
-                           "src/io_common.h"
-                           "src/log.h"
-                           "src/meta_entry_node.h"
-                           "src/palette.h"
-                           "src/pixel_formats_mapping_node.h"
-                           "src/read_features.h"
-                           "src/read_options.h"
-                           "src/resolution.h"
-                           "src/source_image.h"
-                           "src/sail-common.h"
-                           "src/utils.h"
-                           "src/write_features.h"
-                           "src/write_options.h")
+set(PUBLIC_HEADERS "src/common.h"
+                   "src/error.h"
+                   "src/export.h"
+                   "src/iccp.h"
+                   "src/image.h"
+                   "src/io_common.h"
+                   "src/log.h"
+                   "src/meta_entry_node.h"
+                   "src/palette.h"
+                   "src/pixel_formats_mapping_node.h"
+                   "src/read_features.h"
+                   "src/read_options.h"
+                   "src/resolution.h"
+                   "src/source_image.h"
+                   "src/sail-common.h"
+                   "src/utils.h"
+                   "src/write_features.h"
+                   "src/write_options.h")
 
 set_target_properties(sail-common PROPERTIES
                                   VERSION "0.7.2"

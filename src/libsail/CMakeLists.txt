@@ -17,16 +17,15 @@ add_library(sail
 
 # Build a list of public headers to install
 #
-set(PUBLIC_HEADERS "")
-list(APPEND PUBLIC_HEADERS "src/codec_info.h"
-                           "src/codec_info_node.h"
-                           "src/context.h"
-                           "src/sail.h"
-                           "src/sail_advanced.h"
-                           "src/sail_deep_diver.h"
-                           "src/sail_junior.h"
-                           "src/sail_technical_diver.h"
-                           "src/string_node.h")
+set(PUBLIC_HEADERS "src/codec_info.h"
+                   "src/codec_info_node.h"
+                   "src/context.h"
+                   "src/sail.h"
+                   "src/sail_advanced.h"
+                   "src/sail_deep_diver.h"
+                   "src/sail_junior.h"
+                   "src/sail_technical_diver.h"
+                   "src/string_node.h")
 
 set_target_properties(sail PROPERTIES
                            VERSION "0.7.0"
