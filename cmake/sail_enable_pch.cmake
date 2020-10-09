@@ -1,7 +1,7 @@
 # Intended to be included by SAIL libraries to enable precompiled headers with CMake >= 3.16
 #
 macro(sail_enable_pch)
-    cmake_parse_arguments(SAIL_PCH "" "TARGET" "HEADER" ${ARGN})
+    cmake_parse_arguments(SAIL_PCH "" "TARGET;HEADER" "" ${ARGN})
 
     # Enable precompiled headers on the specified target
     #
