@@ -22,5 +22,5 @@ macro(sail_install_cmake_config)
 
     install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${SAIL_CMAKE_CONFIG_TARGET}Config.cmake"
                   "${CMAKE_CURRENT_BINARY_DIR}/${SAIL_CMAKE_CONFIG_TARGET}ConfigVersion.cmake"
-        DESTINATION lib/cmake/sail)
+            DESTINATION lib/cmake/sail)
 endmacro()
