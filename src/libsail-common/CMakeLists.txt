@@ -25,24 +25,24 @@ add_library(sail-common
 # Build a list of public headers to install
 #
 set(PUBLIC_HEADERS "")
-list(APPEND PUBLIC_HEADERS "src/common.h")
-list(APPEND PUBLIC_HEADERS "src/error.h")
-list(APPEND PUBLIC_HEADERS "src/export.h")
-list(APPEND PUBLIC_HEADERS "src/iccp.h")
-list(APPEND PUBLIC_HEADERS "src/image.h")
-list(APPEND PUBLIC_HEADERS "src/io_common.h")
-list(APPEND PUBLIC_HEADERS "src/log.h")
-list(APPEND PUBLIC_HEADERS "src/meta_entry_node.h")
-list(APPEND PUBLIC_HEADERS "src/palette.h")
-list(APPEND PUBLIC_HEADERS "src/pixel_formats_mapping_node.h")
-list(APPEND PUBLIC_HEADERS "src/read_features.h")
-list(APPEND PUBLIC_HEADERS "src/read_options.h")
-list(APPEND PUBLIC_HEADERS "src/resolution.h")
-list(APPEND PUBLIC_HEADERS "src/source_image.h")
-list(APPEND PUBLIC_HEADERS "src/sail-common.h")
-list(APPEND PUBLIC_HEADERS "src/utils.h")
-list(APPEND PUBLIC_HEADERS "src/write_features.h")
-list(APPEND PUBLIC_HEADERS "src/write_options.h")
+list(APPEND PUBLIC_HEADERS "src/common.h"
+                           "src/error.h"
+                           "src/export.h"
+                           "src/iccp.h"
+                           "src/image.h"
+                           "src/io_common.h"
+                           "src/log.h"
+                           "src/meta_entry_node.h"
+                           "src/palette.h"
+                           "src/pixel_formats_mapping_node.h"
+                           "src/read_features.h"
+                           "src/read_options.h"
+                           "src/resolution.h"
+                           "src/source_image.h"
+                           "src/sail-common.h"
+                           "src/utils.h"
+                           "src/write_features.h"
+                           "src/write_options.h")
 
 set_target_properties(sail-common PROPERTIES
                                   VERSION "0.7.2"

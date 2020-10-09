@@ -19,24 +19,24 @@ add_library(sail-c++
 # Build a list of public headers to install
 #
 set(PUBLIC_HEADERS "")
-list(APPEND PUBLIC_HEADERS "src/at_scope_exit-c++.h")
-list(APPEND PUBLIC_HEADERS "src/context-c++.h")
-list(APPEND PUBLIC_HEADERS "src/iccp-c++.h")
-list(APPEND PUBLIC_HEADERS "src/image-c++.h")
-list(APPEND PUBLIC_HEADERS "src/image_reader-c++.h")
-list(APPEND PUBLIC_HEADERS "src/image_writer-c++.h")
-list(APPEND PUBLIC_HEADERS "src/io_common-c++.h")
-list(APPEND PUBLIC_HEADERS "src/log-c++.h")
-list(APPEND PUBLIC_HEADERS "src/palette-c++.h")
-list(APPEND PUBLIC_HEADERS "src/codec_info-c++.h")
-list(APPEND PUBLIC_HEADERS "src/read_features-c++.h")
-list(APPEND PUBLIC_HEADERS "src/read_options-c++.h")
-list(APPEND PUBLIC_HEADERS "src/resolution-c++.h")
-list(APPEND PUBLIC_HEADERS "src/sail-c++.h")
-list(APPEND PUBLIC_HEADERS "src/source_image-c++.h")
-list(APPEND PUBLIC_HEADERS "src/write_features-c++.h")
-list(APPEND PUBLIC_HEADERS "src/write_options-c++.h")
-list(APPEND PUBLIC_HEADERS "src/utils-c++.h")
+list(APPEND PUBLIC_HEADERS "src/at_scope_exit-c++.h"
+                           "src/context-c++.h"
+                           "src/iccp-c++.h"
+                           "src/image-c++.h"
+                           "src/image_reader-c++.h"
+                           "src/image_writer-c++.h"
+                           "src/io_common-c++.h"
+                           "src/log-c++.h"
+                           "src/palette-c++.h"
+                           "src/codec_info-c++.h"
+                           "src/read_features-c++.h"
+                           "src/read_options-c++.h"
+                           "src/resolution-c++.h"
+                           "src/sail-c++.h"
+                           "src/source_image-c++.h"
+                           "src/write_features-c++.h"
+                           "src/write_options-c++.h"
+                           "src/utils-c++.h")
 
 set_target_properties(sail-c++ PROPERTIES
                                VERSION "0.5.0"
