@@ -52,7 +52,6 @@ endif()
 
 # Add SAIL dependency
 #
-set(CMAKE_PREFIX_PATH "C:/SAIL/lib/cmake/sail" "${CMAKE_PREFIX_PATH}")
 find_package(Sail REQUIRED)
 target_link_libraries(deep-diver-with-c-api SAIL::sail)
 
