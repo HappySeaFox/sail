@@ -314,7 +314,7 @@ Debian rules are provided as well.
 
 ## Philosophy
 
-Philosophy of SAIL is modularization.
+Philosophy of SAIL is modularization and simplicity.
 
 Image codecs are architectured to be standalone dynamically loaded files. Any future hypothetical improvements
 will be implemented as separate client libraries. So a user is always able to choose what to use (i.e. to link against)
