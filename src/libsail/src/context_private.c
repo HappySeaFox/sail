@@ -34,9 +34,9 @@
 #include <string.h>
 
 #ifdef SAIL_WIN32
-    #include <windows.h>
+    #include <windows.h> /* FindFirstFile */
 #else
-    #include <dirent.h>
+    #include <dirent.h> /* opendir */
     #include <sys/types.h>
 #endif
 
