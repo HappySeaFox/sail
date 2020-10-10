@@ -8,6 +8,7 @@ add_library(sail
                 src/codec_info_node.c
                 src/codec_info_private.c
                 src/context.c
+                src/context_private.c
                 src/sail_advanced.c
                 src/sail_deep_diver.c
                 src/sail_junior.c
