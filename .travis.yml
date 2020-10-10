@@ -3,6 +3,9 @@ language: cpp
 notifications:
   email: false
 
+git:
+  depth: 1
+
 addons:
   homebrew:
     packages:
