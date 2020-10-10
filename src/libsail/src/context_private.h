@@ -28,6 +28,14 @@
 
 #include <stdbool.h>
 
+#ifdef SAIL_BUILD
+    #include "error.h"
+    #include "export.h"
+#else
+    #include <sail-common/error.h>
+    #include <sail-common/export.h>
+#endif
+
 struct sail_codec_info_node;
 
 /*
@@ -44,5 +52,31 @@ struct sail_context {
 };
 
 typedef struct sail_context sail_context_t;
+
+enum SailContextAction {
+    /* Allocates a new TLS context if it's not allocated yet. */
+    SAIL_CONTEXT_ALLOCATE,
+
+    /* fetches the current TLS context or NULL if it's not allocated yet. */
+    SAIL_CONTEXT_FETCH,
+
+    /* Destroys the currently existing TLS context. */
+    SAIL_CONTEXT_DESTROY,
+};
+
+/*
+ * Allocates or destroyes the current SAIL TLS context.
+ * Doesn't re-allocate it if it's already allocated.
+ */
+SAIL_HIDDEN sail_status_t control_tls_context(struct sail_context **context, enum SailContextAction action);
+
+/* Returns the allocated and initialized TLS context. */
+SAIL_HIDDEN sail_status_t current_tls_context(struct sail_context **context);
+
+/*
+ * Returns the allocated and initialized TLS context. The specified flags are used to initialize it.
+ * See SailInitFlags.
+ */
+SAIL_HIDDEN sail_status_t current_tls_context_with_flags(struct sail_context **context, int flags);
 
 #endif

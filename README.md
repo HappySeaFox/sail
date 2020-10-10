@@ -2,7 +2,7 @@
 <h3 align="center">The missing powerful C/C++ image decoding library for humans (not for machines).</h3>
 <p align="center">
   <a href="https://travis-ci.org/smoked-herring/sail">
-    <img alt="Travis Build Status" src="https://img.shields.io/travis/smoked-herring/sail"/>
+    <img alt="Travis Build Status" src="https://img.shields.io/travis/smoked-herring/sail/master"/>
   </a>
   <a href="https://scan.coverity.com/projects/smoked-herring-sail">
     <img alt="Coverity Scan Build Status" src="https://img.shields.io/coverity/scan/21306"/>
@@ -314,7 +314,7 @@ Debian rules are provided as well.
 
 ## Philosophy
 
-Philosophy of SAIL is modularization.
+Philosophy of SAIL is modularization and simplicity.
 
 Image codecs are architectured to be standalone dynamically loaded files. Any future hypothetical improvements
 will be implemented as separate client libraries. So a user is always able to choose what to use (i.e. to link against)

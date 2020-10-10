@@ -27,22 +27,20 @@
 #define SAIL_SAIL_PRIVATE_H
 
 #include <stdbool.h>
-#include <stddef.h>
+#include <stddef.h> /* size_t */
 
 #ifdef SAIL_BUILD
+    #include "common.h"
     #include "error.h"
     #include "export.h"
 #else
+    #include <sail-common/common.h>
     #include <sail-common/error.h>
     #include <sail-common/export.h>
 #endif
 
-struct sail_context;
-struct sail_io;
 struct sail_codec_info;
-struct sail_codec_info_node;
 struct sail_codec;
-struct sail_read_features;
 struct sail_write_features;
 
 struct hidden_state {
@@ -63,32 +61,6 @@ struct hidden_state {
     const struct sail_codec_info *codec_info;
     const struct sail_codec *codec;
 };
-
-enum SailContextAction {
-    /* Allocates a new TLS context if it's not allocated yet. */
-    SAIL_CONTEXT_ALLOCATE,
-
-    /* fetches the current TLS context or NULL if it's not allocated yet. */
-    SAIL_CONTEXT_FETCH,
-
-    /* Destroyes the currently existing TLS context. */
-    SAIL_CONTEXT_DESTROY,
-};
-
-/*
- * Allocates or destroyes the current SAIL TLS context.
- * If it's already allocated, just returns it.
- */
-SAIL_HIDDEN sail_status_t control_tls_context(struct sail_context **context, enum SailContextAction action);
-
-/* Returns the allocated and initialized TLS context. */
-SAIL_HIDDEN sail_status_t current_tls_context(struct sail_context **context);
-
-/*
- * Returns the allocated and initialized TLS context. The specified flags are used to initialize it.
- * See SailInitFlags.
- */
-SAIL_HIDDEN sail_status_t current_tls_context_with_flags(struct sail_context **context, int flags);
 
 SAIL_HIDDEN sail_status_t load_codec_by_codec_info(const struct sail_codec_info *codec_info,
                                                     const struct sail_codec **codec);
