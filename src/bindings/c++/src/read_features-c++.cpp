@@ -63,6 +63,21 @@ read_features& read_features::operator=(const read_features &rf)
     return *this;
 }
 
+read_features::read_features(read_features &&rf) noexcept
+{
+    d = rf.d;
+    rf.d = nullptr;
+}
+
+read_features& read_features::operator=(read_features &&rf)
+{
+    delete d;
+    d = rf.d;
+    rf.d = nullptr;
+
+    return *this;
+}
+
 read_features::~read_features()
 {
     delete d;

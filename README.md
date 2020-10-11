@@ -1,20 +1,32 @@
-# SAIL: Squirrel Abstract Image Library
+<h1 align="center">Squirrel Abstract Image Library</h1>
+<h3 align="center">The missing powerful C/C++ image decoding library for humans (not for machines).</h3>
+<p align="center">
+  <a href="https://travis-ci.org/smoked-herring/sail">
+    <img alt="Travis Build Status" src="https://img.shields.io/travis/smoked-herring/sail/master"/>
+  </a>
+  <a href="https://scan.coverity.com/projects/smoked-herring-sail">
+    <img alt="Coverity Scan Build Status" src="https://img.shields.io/coverity/scan/21306"/>
+  </a>
+  <a href="#license">
+    <img alt="License" src="https://img.shields.io/github/license/smoked-herring/sail?color=blue"/>
+  </a>
+  <a href="https://github.com/smoked-herring/sail/releases">
+    <img alt="Latest release" src="https://img.shields.io/github/v/release/smoked-herring/sail?include_prereleases"/>
+  </a>
+</p>
+<p align="center">
+  <a href="#target-audience">Target Audience</a> •
+  <a href="#features-overview">Features</a> •
+  <a href="#supported-image-formats">Image Formats</a> •
+  <a href="#apis-overview">Getting Started</a> •
+  <a href="#support">Support</a>
+</p>
+
+#
 
 SAIL is a fast and lightweight cross-platform image decoding and encoding library providing rich APIs,
 from one-liners to complex use cases with custom I/O sources. It enables a client to read and write static,
 animated, multi-paged images along with their meta data and ICC profiles. :sailboat:
-
-
-**Latest release:** unreleased <br/>
-**Latest pre-release:** [v0.9.0-pre8](https://github.com/smoked-herring/sail/releases/tag/v0.9.0-pre8)<br/>
-**Continuous integration:** [![Build Status](https://travis-ci.org/smoked-herring/sail.svg?branch=master)](https://travis-ci.org/smoked-herring/sail)<br/>
-**Programming language:** C<br/>
-**Bindings:** C++<br/>
-**License:** MIT
-
-See [FAQ](FAQ.md) for more.
-
-Author: Dmitry Baryshev
 
 ![Screenshot](.github/qt-demo.png?raw=true)
 
@@ -22,32 +34,31 @@ Author: Dmitry Baryshev
 
 - Image viewers
 - Game developers
-- Anyone who needs to load or save images in different image formats and who requires
-  a lightweight and comprehensive API for that
+- Anyone who needs to load or save images in different image formats and who needs
+  a clean and comprehensive API for that
 
 ## Features overview
 
-- Easy-to-use C and C++ interfaces
-- Four levels of APIs, depending on your needs: `junior`, `advanced`, `deep diver`, and `technical diver`.
-  See [EXAMPLES](EXAMPLES.md) for more
-- Reading images from file, memory, and custom I/O streams
-- Writing images to file, memory, and custom I/O streams
-- Detecting image types by file path, file extension, and [magic numbers](https://en.wikipedia.org/wiki/File_format#Magic_number)
-- Reading operations output `BPP32-RGBA` pixels by default
-- Most image format codecs are able to output the `SOURCE` pixel format for those who want
-  to kick the hell out of images manually. For example, one may want to work with `CMYK` pixels in a print image
-- Read and write ICC profiles
-- Read and write meta data like JPEG comments
-- Image formats are supported through dynamically loaded SAIL codecs
-- Qt, SDL, and pure C examples
-- The best MIME icons in the computer industry
+- [x] Easy-to-use C and C++ interfaces
+- [x] Four levels of APIs: `junior`, `advanced`, `deep diver`, and `technical diver`
+- [x] Read images from a file, memory, and custom I/O streams
+- [x] Write images to a file, memory, and custom I/O streams
+- [x] Detect image types by file suffixes and [magic numbers](https://en.wikipedia.org/wiki/File_format#Magic_number)
+- [x] Reading operations output `RGBA` pixels by default
+- [x] Most image codecs are also able to output pixels as-is
+- [x] Read and write ICC profiles
+- [x] Read and write meta data like JPEG comments or EXIF
+- [x] Access to the image properties w/o decoding the whole pixel data (probing)
+- [x] Access to the source image properties
+- [x] Image formats are supported through dynamically loaded codecs
+- [x] The best MIME icons in the computer industry :smile:
 
 ## Features NOT provided
 
-- Image editing capabilities (filtering, distortion, scaling, etc.)
-- Color space conversion functions
-- Color management functions (applying ICC profiles etc.)
-- EXIF rotation
+- [ ] Image editing capabilities (filtering, distortion, scaling, etc.)
+- [ ] Color space conversion functions
+- [ ] Color management functions (applying ICC profiles etc.)
+- [ ] EXIF rotation
 
 ## Supported image formats
 
@@ -67,6 +78,11 @@ Currently, SAIL supports the following platforms:
 - Windows
 - macOS
 - Linux
+
+## Programming languages
+
+**Programming language:** C11<br/>
+**Bindings:** C++11
 
 ## Competitors
 
@@ -145,7 +161,7 @@ SAIL_TRY(reader.read(path, &image));
 // image.pixel_format(), and image.pixels() for that.
 ```
 
-It's pretty easy, isn't it? :smile: See [EXAMPLES](EXAMPLES.md) for more.
+It's pretty easy, isn't it? :smile: See [EXAMPLES](EXAMPLES.md) and [FAQ](FAQ.md) for more.
 
 ### 2. `Advanced`: I want to load this damn animated GIF from a file or memory
 
@@ -295,6 +311,22 @@ make
 ```
 
 Debian rules are provided as well.
+
+## Philosophy
+
+Philosophy of SAIL is modularization and simplicity.
+
+Image codecs are architectured to be standalone dynamically loaded files. Any future hypothetical improvements
+will be implemented as separate client libraries. So a user is always able to choose what to use (i.e. to link against)
+and what not to use.
+
+## Support
+
+If you like the project, please consider starring the repository.
+
+## Author
+
+Dmitry Baryshev
 
 ## License
 

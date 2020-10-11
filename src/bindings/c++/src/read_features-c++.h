@@ -53,6 +53,8 @@ class SAIL_EXPORT read_features
 public:
     read_features(const read_features &rf);
     read_features& operator=(const read_features &rf);
+    read_features(read_features &&rf) noexcept;
+    read_features& operator=(read_features &&rf);
     ~read_features();
 
     const std::vector<SailPixelFormat>& output_pixel_formats() const;
@@ -77,7 +79,7 @@ private:
 
 private:
     class pimpl;
-    pimpl * const d;
+    pimpl *d;
 };
 
 }

@@ -19,31 +19,32 @@ add_library(sail-c++
 
 # Build a list of public headers to install
 #
-set(PUBLIC_HEADERS "")
-list(APPEND PUBLIC_HEADERS "src/at_scope_exit-c++.h")
-list(APPEND PUBLIC_HEADERS "src/context-c++.h")
-list(APPEND PUBLIC_HEADERS "src/iccp-c++.h")
-list(APPEND PUBLIC_HEADERS "src/image-c++.h")
-list(APPEND PUBLIC_HEADERS "src/image_reader-c++.h")
-list(APPEND PUBLIC_HEADERS "src/image_writer-c++.h")
-list(APPEND PUBLIC_HEADERS "src/io_common-c++.h")
-list(APPEND PUBLIC_HEADERS "src/log-c++.h")
-list(APPEND PUBLIC_HEADERS "src/meta_data-c++.h")
-list(APPEND PUBLIC_HEADERS "src/palette-c++.h")
-list(APPEND PUBLIC_HEADERS "src/codec_info-c++.h")
-list(APPEND PUBLIC_HEADERS "src/read_features-c++.h")
-list(APPEND PUBLIC_HEADERS "src/read_options-c++.h")
-list(APPEND PUBLIC_HEADERS "src/resolution-c++.h")
-list(APPEND PUBLIC_HEADERS "src/sail-c++.h")
-list(APPEND PUBLIC_HEADERS "src/source_image-c++.h")
-list(APPEND PUBLIC_HEADERS "src/write_features-c++.h")
-list(APPEND PUBLIC_HEADERS "src/write_options-c++.h")
-list(APPEND PUBLIC_HEADERS "src/utils-c++.h")
+set(PUBLIC_HEADERS "src/at_scope_exit-c++.h"
+                   "src/context-c++.h"
+                   "src/iccp-c++.h"
+                   "src/image-c++.h"
+                   "src/image_reader-c++.h"
+                   "src/image_writer-c++.h"
+                   "src/io_common-c++.h"
+                   "src/log-c++.h"
+                   "src/meta_data-c++.h"
+                   "src/palette-c++.h"
+                   "src/codec_info-c++.h"
+                   "src/read_features-c++.h"
+                   "src/read_options-c++.h"
+                   "src/resolution-c++.h"
+                   "src/sail-c++.h"
+                   "src/source_image-c++.h"
+                   "src/write_features-c++.h"
+                   "src/write_options-c++.h"
+                   "src/utils-c++.h")
 
 set_target_properties(sail-c++ PROPERTIES
                                VERSION "0.5.0"
                                SOVERSION 0
                                PUBLIC_HEADER "${PUBLIC_HEADERS}")
+
+sail_enable_pch(TARGET sail-c++ HEADER src/sail-c++.h)
 
 # Definitions, includes, link
 #
@@ -62,4 +63,8 @@ install(TARGETS sail-c++
         LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
         RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
         PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/sail/sail-c++")
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/libsail-c++.pc" DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
+
+# Install development packages
+#
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/libsail-c++.pc"
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")

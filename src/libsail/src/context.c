@@ -23,50 +23,52 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_CODEC_INFO_NODE_H
-#define SAIL_CODEC_INFO_NODE_H
+#include "config.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-#ifdef SAIL_BUILD
-    #include "export.h"
-#else
-    #include <sail-common/export.h>
-#endif
+#include "sail-common.h"
+#include "sail.h"
 
-struct sail_codec_info;
-struct sail_codec;
+sail_status_t sail_init_with_flags(int flags) {
 
-/*
- * A structure representing a codec information linked list.
- */
-struct sail_codec_info_node {
+    struct sail_context *context;
+    SAIL_TRY(current_tls_context_with_flags(&context, flags));
 
-    /* Codec information. */
-    struct sail_codec_info *codec_info;
-
-    /* Codec instance. */
-    struct sail_codec *codec;
-
-    struct sail_codec_info_node *next;
-};
-
-typedef struct sail_codec_info_node sail_codec_info_node_t;
-
-/*
- * Returns a linked list of found codec info nodes. Use it to determine the list of possible image formats,
- * file extensions, and mime types that could be hypothetically read or written by SAIL.
- *
- * Returns a pointer to the first codec info node or NULL when no SAIL codecs were found.
- * Use sail_codec_info_node.next to iterate.
- */
-SAIL_EXPORT const struct sail_codec_info_node* sail_codec_info_list(void);
-
-/* extern "C" */
-#ifdef __cplusplus
+    return SAIL_OK;
 }
-#endif
 
-#endif
+void sail_finish(void) {
+
+    SAIL_LOG_INFO("Finish");
+
+    control_tls_context(/* context - not needed */ NULL, SAIL_CONTEXT_DESTROY);
+}
+
+sail_status_t sail_unload_codecs(void) {
+
+    SAIL_LOG_DEBUG("Unloading cached codecs");
+
+    struct sail_context *context;
+    SAIL_TRY(current_tls_context(&context));
+
+    struct sail_codec_info_node *node = context->codec_info_node;
+    int counter = 0;
+
+    while (node != NULL) {
+        if (node->codec != NULL) {
+            destroy_codec(node->codec);
+            counter++;
+        }
+
+        node->codec = NULL;
+
+        node = node->next;
+    }
+
+    SAIL_LOG_DEBUG("Unloaded codecs: %d", counter);
+
+    return SAIL_OK;
+}

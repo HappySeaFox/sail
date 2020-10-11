@@ -23,54 +23,60 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_SAIL_PRIVATE_H
-#define SAIL_SAIL_PRIVATE_H
+#ifndef SAIL_CONTEXT_PRIVATE_H
+#define SAIL_CONTEXT_PRIVATE_H
 
 #include <stdbool.h>
-#include <stddef.h> /* size_t */
 
 #ifdef SAIL_BUILD
-    #include "common.h"
     #include "error.h"
     #include "export.h"
 #else
-    #include <sail-common/common.h>
     #include <sail-common/error.h>
     #include <sail-common/export.h>
 #endif
 
-struct sail_codec_info;
-struct sail_codec;
-struct sail_write_features;
+struct sail_codec_info_node;
 
-struct hidden_state {
+/*
+ * Context is a main entry point to start working with SAIL. It enumerates codec info objects which could be
+ * used later in reading and writing operations.
+ */
+struct sail_context {
 
-    struct sail_io *io;
-    bool own_io;
+    /* Context is already initialized. */
+    bool initialized;
 
-    /*
-     * Write operations save write options to check if the interlaced mode was requested on later stages.
-     * It's also used to check if the supplied pixel format is supported.
-     */
-    struct sail_write_options *write_options;
-
-    /* Local state passed to codec reading and writing functions. */
-    void *state;
-
-    /* Pointers to internal data structures so no need to free these. */
-    const struct sail_codec_info *codec_info;
-    const struct sail_codec *codec;
+    /* Linked list of found codec info objects. */
+    struct sail_codec_info_node *codec_info_node;
 };
 
-SAIL_HIDDEN sail_status_t load_codec_by_codec_info(const struct sail_codec_info *codec_info,
-                                                    const struct sail_codec **codec);
+typedef struct sail_context sail_context_t;
 
-SAIL_HIDDEN void destroy_hidden_state(struct hidden_state *state);
+enum SailContextAction {
+    /* Allocates a new TLS context if it's not allocated yet. */
+    SAIL_CONTEXT_ALLOCATE,
 
-SAIL_HIDDEN sail_status_t stop_writing(void *state, size_t *written);
+    /* fetches the current TLS context or NULL if it's not allocated yet. */
+    SAIL_CONTEXT_FETCH,
 
-SAIL_HIDDEN sail_status_t allowed_write_output_pixel_format(const struct sail_write_features *write_features,
-                                                            enum SailPixelFormat input_pixel_format,
-                                                            enum SailPixelFormat output_pixel_format);
+    /* Destroys the currently existing TLS context. */
+    SAIL_CONTEXT_DESTROY,
+};
+
+/*
+ * Allocates or destroyes the current SAIL TLS context.
+ * Doesn't re-allocate it if it's already allocated.
+ */
+SAIL_HIDDEN sail_status_t control_tls_context(struct sail_context **context, enum SailContextAction action);
+
+/* Returns the allocated and initialized TLS context. */
+SAIL_HIDDEN sail_status_t current_tls_context(struct sail_context **context);
+
+/*
+ * Returns the allocated and initialized TLS context. The specified flags are used to initialize it.
+ * See SailInitFlags.
+ */
+SAIL_HIDDEN sail_status_t current_tls_context_with_flags(struct sail_context **context, int flags);
 
 #endif

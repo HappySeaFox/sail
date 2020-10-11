@@ -32,30 +32,6 @@
 #include "sail-common.h"
 #include "sail.h"
 
-sail_status_t sail_init_with_flags(int flags) {
-
-    struct sail_context *context;
-    SAIL_TRY(current_tls_context_with_flags(&context, flags));
-
-    return SAIL_OK;
-}
-
-void sail_finish(void) {
-
-    SAIL_LOG_INFO("Finish");
-
-    control_tls_context(/* context - not needed */ NULL, SAIL_CONTEXT_DESTROY);
-}
-
-const struct sail_codec_info_node* sail_codec_info_list(void) {
-
-    struct sail_context *context;
-    SAIL_TRY_OR_EXECUTE(current_tls_context(&context),
-                        /* on error */ return NULL);
-
-    return context->codec_info_node;
-}
-
 sail_status_t sail_codec_info_from_path(const char *path, const struct sail_codec_info **codec_info) {
 
     SAIL_CHECK_PATH_PTR(path);
@@ -242,30 +218,4 @@ sail_status_t sail_codec_info_from_mime_type(const char *mime_type, const struct
 
     sail_free(mime_type_copy);
     return SAIL_ERROR_CODEC_NOT_FOUND;
-}
-
-sail_status_t sail_unload_codecs(void) {
-
-    SAIL_LOG_DEBUG("Unloading cached codecs");
-
-    struct sail_context *context;
-    SAIL_TRY(current_tls_context(&context));
-
-    struct sail_codec_info_node *node = context->codec_info_node;
-    int counter = 0;
-
-    while (node != NULL) {
-        if (node->codec != NULL) {
-            destroy_codec(node->codec);
-            counter++;
-        }
-
-        node->codec = NULL;
-
-        node = node->next;
-    }
-
-    SAIL_LOG_DEBUG("Unloaded codecs: %d", counter);
-
-    return SAIL_OK;
 }

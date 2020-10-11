@@ -24,37 +24,38 @@ add_library(sail-common
 
 # Build a list of public headers to install
 #
-set(PUBLIC_HEADERS "")
-list(APPEND PUBLIC_HEADERS "src/common.h")
-list(APPEND PUBLIC_HEADERS "src/error.h")
-list(APPEND PUBLIC_HEADERS "src/export.h")
-list(APPEND PUBLIC_HEADERS "src/iccp.h")
-list(APPEND PUBLIC_HEADERS "src/image.h")
-list(APPEND PUBLIC_HEADERS "src/io_common.h")
-list(APPEND PUBLIC_HEADERS "src/log.h")
-list(APPEND PUBLIC_HEADERS "src/meta_data_node.h")
-list(APPEND PUBLIC_HEADERS "src/palette.h")
-list(APPEND PUBLIC_HEADERS "src/pixel_formats_mapping_node.h")
-list(APPEND PUBLIC_HEADERS "src/read_features.h")
-list(APPEND PUBLIC_HEADERS "src/read_options.h")
-list(APPEND PUBLIC_HEADERS "src/resolution.h")
-list(APPEND PUBLIC_HEADERS "src/source_image.h")
-list(APPEND PUBLIC_HEADERS "src/sail-common.h")
-list(APPEND PUBLIC_HEADERS "src/utils.h")
-list(APPEND PUBLIC_HEADERS "src/write_features.h")
-list(APPEND PUBLIC_HEADERS "src/write_options.h")
+set(PUBLIC_HEADERS "src/common.h"
+                   "src/error.h"
+                   "src/export.h"
+                   "src/iccp.h"
+                   "src/image.h"
+                   "src/io_common.h"
+                   "src/log.h"
+                   "src/meta_data_node.h"
+                   "src/palette.h"
+                   "src/pixel_formats_mapping_node.h"
+                   "src/read_features.h"
+                   "src/read_options.h"
+                   "src/resolution.h"
+                   "src/source_image.h"
+                   "src/sail-common.h"
+                   "src/utils.h"
+                   "src/write_features.h"
+                   "src/write_options.h")
 
 set_target_properties(sail-common PROPERTIES
                                   VERSION "0.7.2"
                                   SOVERSION 0
                                   PUBLIC_HEADER "${PUBLIC_HEADERS}")
 
+sail_enable_pch(TARGET sail-common HEADER src/sail-common.h)
+
 # Definitions, includes, link
 #
 if (SAIL_COLORED_OUTPUT)
     target_compile_definitions(sail-common PRIVATE SAIL_COLORED_OUTPUT=1)
 endif()
-target_include_directories(sail-common PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_include_directories(sail-common PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>)
 
 # pkg-config integration
 #
@@ -69,4 +70,8 @@ install(TARGETS sail-common
         LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
         RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
         PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/sail/sail-common")
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/libsail-common.pc" DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
+
+# Install development packages
+#
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/libsail-common.pc"
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")

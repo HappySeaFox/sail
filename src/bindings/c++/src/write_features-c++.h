@@ -54,6 +54,8 @@ class SAIL_EXPORT write_features
 public:
     write_features(const write_features &wf);
     write_features& operator=(const write_features &wf);
+    write_features(write_features &&wf) noexcept;
+    write_features& operator=(write_features &&wf);
     ~write_features();
 
     const std::map<SailPixelFormat, std::vector<SailPixelFormat>>& pixel_formats_mappings() const;
@@ -90,7 +92,7 @@ private:
 
 private:
     class pimpl;
-    pimpl * const d;
+    pimpl *d;
 };
 
 }
