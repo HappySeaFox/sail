@@ -2,8 +2,6 @@
 
 - Read/write indexed PNGs with alpha
 
-- Make meta info keys as enum
-
 - static compilation
 
 - remove SAIL_CHECK_xxx checks in codecs? Are they needed? libsail does them as well

@@ -220,6 +220,58 @@ enum SailCompression {
     SAIL_COMPRESSION_ZSTD,          /* ZSTD. */
 };
 
+/* Meta data. */
+enum SailMetaData {
+
+    /* Some unknown meta_data type. */
+    SAIL_META_DATA_UNKNOWN,
+
+    /*
+     * Keys pointing to zero-terminated strings. Meta data nodes holding strings MUST be allocated with
+     * sail_alloc_meta_data_node_from_string(). Failing to do so may lead to corrupted
+     * meta data entries in the resulting file.
+     */
+    SAIL_META_DATA_ARTIST,
+    SAIL_META_DATA_AUTHOR,
+    SAIL_META_DATA_COMMENT,
+    SAIL_META_DATA_COMPUTER,
+    SAIL_META_DATA_COPYRIGHT,
+    SAIL_META_DATA_CREATION_TIME,
+    SAIL_META_DATA_DESCRIPTION,
+    SAIL_META_DATA_DISCLAIMER,
+    SAIL_META_DATA_DOCUMENT,
+    SAIL_META_DATA_HEX_EXIF,
+    SAIL_META_DATA_HEX_IPTC,
+    SAIL_META_DATA_HEX_XMP,
+    SAIL_META_DATA_LABEL,
+    SAIL_META_DATA_MAKE,
+    SAIL_META_DATA_MODEL,
+    SAIL_META_DATA_NAME,
+    SAIL_META_DATA_PRINTER,
+    SAIL_META_DATA_SOFTWARE,
+    SAIL_META_DATA_SOURCE,
+    SAIL_META_DATA_TITLE,
+    SAIL_META_DATA_URL,
+    SAIL_META_DATA_WARNING,
+    SAIL_META_DATA_XMP,
+
+    /*
+     * Keys pointing to binary data. Meta data nodes holding binary data MUST be allocated with
+     * sail_alloc_meta_data_node_from_data(). Failing to do so may lead to corrupted
+     * meta data entries in the resulting file.
+     */
+    SAIL_META_DATA_EXIF,
+};
+
+/* Meta data type. */
+enum SailMetaDataType {
+
+    /* Meta data string value like a JPEG comment. */
+    SAIL_META_DATA_TYPE_STRING,
+    /* Meta data binary value like a binary EXIF profile. */
+    SAIL_META_DATA_TYPE_DATA,
+};
+
 /* Resolution units. */
 enum SailResolutionUnit {
 
@@ -242,10 +294,10 @@ enum SailCodecFeature {
     /* Ability to read or write multi-frame (but not animated) images. */
     SAIL_CODEC_FEATURE_MULTI_FRAME = 1 << 2,
 
-    /* Ability to read or write simple image meta information like JPEG comments. */
-    SAIL_CODEC_FEATURE_META_INFO   = 1 << 3,
+    /* Ability to read or write simple image meta data like JPEG comments. */
+    SAIL_CODEC_FEATURE_META_DATA   = 1 << 3,
 
-    /* Ability to read or write EXIF meta information. */
+    /* Ability to read or write EXIF meta data. */
     SAIL_CODEC_FEATURE_EXIF        = 1 << 4,
 
     /* Ability to read or write interlaced images. */
@@ -258,10 +310,10 @@ enum SailCodecFeature {
 /* Read or write options. */
 enum SailIoOption {
 
-    /* Instruction to read or write simple image meta information like JPEG comments. */
-    SAIL_IO_OPTION_META_INFO  = 1 << 0,
+    /* Instruction to read or write simple image meta data like JPEG comments. */
+    SAIL_IO_OPTION_META_DATA  = 1 << 0,
 
-    /* Instruction to read or write EXIF meta information. */
+    /* Instruction to read or write EXIF meta data. */
     SAIL_IO_OPTION_EXIF       = 1 << 1,
 
     /* Instruction to write interlaced images. Specifying this option for reading operations has no effect. */

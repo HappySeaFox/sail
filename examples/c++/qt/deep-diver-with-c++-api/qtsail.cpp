@@ -76,7 +76,7 @@ sail_status_t QtSail::init()
                                                           "<ul>"
                                                           "<li>Selecting pixel format to output</li>"
                                                           "<li>Displaying indexed images (if SOURCE is selected)</li>"
-                                                          "<li>Printing all meta info entries into stderr</li>"
+                                                          "<li>Printing all meta data entries into stderr</li>"
                                                           "</ul>"
                                                           "This demo doesn't include:"
                                                           "<ul>"
@@ -190,16 +190,26 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
     SAIL_LOG_INFO("Loaded in %lld ms.", elapsed.elapsed() + beforeDialog);
 
     QString meta;
-    const std::map<std::string, std::string> meta_entries = image.meta_entries();
+    const std::vector<sail::meta_data> &meta_data = image.meta_data();
 
-    if (!meta_entries.empty()) {
-        const std::pair<std::string, std::string> first_pair = *meta_entries.begin();
+    if (!meta_data.empty()) {
+        const sail::meta_data &first = *meta_data.begin();
+        const char *meta_data_str = nullptr;
+
+        if (first.key() == SAIL_META_DATA_UNKNOWN) {
+            meta_data_str = first.key_unknown().c_str();
+        } else {
+            SAIL_TRY_OR_SUPPRESS(sail::meta_data::meta_data_to_string(first.key(), &meta_data_str));
+        }
+
         meta = tr("%1: %2")
-                .arg(first_pair.first.c_str())
-                .arg(QString(first_pair.second.c_str()).left(24).replace('\n', ' '));
+                .arg(meta_data_str)
+                .arg(QString::fromStdString(first.value_string()).left(24).replace('\n', ' '));
 
-        for (const std::pair<std::string, std::string> &pair: meta_entries) {
-            SAIL_LOG_DEBUG("[META] %s: %s", pair.first.c_str(), pair.second.c_str());
+        for (const sail::meta_data &meta_data: meta_data) {
+            meta_data_str = nullptr;
+            SAIL_TRY_OR_SUPPRESS(sail::meta_data::meta_data_to_string(meta_data.key(), &meta_data_str));
+            SAIL_LOG_DEBUG("[META] %s: %s", meta_data_str, meta_data.value_string().c_str());
         }
     }
 
@@ -302,13 +312,15 @@ sail_status_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffe
     //
     SAIL_TRY(writer.start_writing(buffer, buffer_length, codec_info, write_options));
 
-    // Save some meta info...
+    // Save some meta data...
     //
-    if (write_options.io_options() & SAIL_IO_OPTION_META_INFO) {
-        std::map<std::string, std::string> meta_entries {
-            { "Software", "SAIL" }
-        };
-        image.with_meta_entries(meta_entries);
+    if (write_options.io_options() & SAIL_IO_OPTION_META_DATA) {
+        sail::meta_data meta_data;
+        meta_data
+                .with_key(SAIL_META_DATA_SOFTWARE)
+                .with_value("SAIL");
+
+        image.with_meta_data({ meta_data });
     }
 
     const char *output_pixel_format_str;

@@ -35,8 +35,7 @@
 #include "common.h"
 #include "export.h"
 
-struct sail_iccp;
-struct sail_meta_entry_node;
+struct sail_meta_data_node;
 struct sail_resolution;
 
 struct my_error_context {
@@ -56,7 +55,9 @@ SAIL_HIDDEN sail_status_t auto_output_color_space(enum SailPixelFormat input_pix
 
 SAIL_HIDDEN sail_status_t convert_cmyk(unsigned char *pixels_source, unsigned char *pixels_target, unsigned width, enum SailPixelFormat target_pixel_format);
 
-SAIL_HIDDEN sail_status_t fetch_meta_info(struct jpeg_decompress_struct *decompress_context, struct sail_meta_entry_node **last_meta_entry_node);
+SAIL_HIDDEN sail_status_t fetch_meta_data(struct jpeg_decompress_struct *decompress_context, struct sail_meta_data_node **last_meta_data_node);
+
+SAIL_HIDDEN sail_status_t write_meta_data(struct jpeg_compress_struct *compress_context, const struct sail_meta_data_node *meta_data_node);
 
 #ifdef HAVE_JPEG_ICCP
 SAIL_HIDDEN sail_status_t fetch_iccp(struct jpeg_decompress_struct *decompress_context, struct sail_iccp **iccp);

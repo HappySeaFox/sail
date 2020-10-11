@@ -10,12 +10,12 @@ extensions=jpg;jpeg;jpe;jif;jfif;jfi
 mime-types=image/jpeg
 
 [read-features]
-features=STATIC;META-INFO@CODEC_INFO_FEATURE_ICCP@
+features=STATIC;META-DATA@CODEC_INFO_FEATURE_ICCP@
 output-pixel-formats=SOURCE;BPP24-RGB;BPP24-BGR;BPP32-RGBA;BPP32-BGRA
 default-output-pixel-format=@SAIL_DEFAULT_READ_OUTPUT_PIXEL_FORMAT@
 
 [write-features]
-features=STATIC;META-INFO@CODEC_INFO_FEATURE_ICCP@
+features=STATIC;META-DATA@CODEC_INFO_FEATURE_ICCP@
 properties=
 interlaced-passes=0
 compression-types=JPEG

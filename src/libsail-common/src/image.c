@@ -47,7 +47,7 @@ sail_status_t sail_alloc_image(struct sail_image **image) {
     (*image)->animated                = false;
     (*image)->delay                   = 0;
     (*image)->palette                 = NULL;
-    (*image)->meta_entry_node         = NULL;
+    (*image)->meta_data_node          = NULL;
     (*image)->iccp                    = NULL;
     (*image)->properties              = 0;
     (*image)->source_image            = NULL;
@@ -65,7 +65,7 @@ void sail_destroy_image(struct sail_image *image) {
 
     sail_destroy_resolution(image->resolution);
     sail_destroy_palette(image->palette);
-    sail_destroy_meta_entry_node_chain(image->meta_entry_node);
+    sail_destroy_meta_data_node_chain(image->meta_data_node);
     sail_destroy_iccp(image->iccp);
     sail_destroy_source_image(image->source_image);
 
@@ -110,7 +110,7 @@ sail_status_t sail_copy_image(const struct sail_image *source, struct sail_image
 
     }
 
-    SAIL_TRY_OR_CLEANUP(sail_copy_meta_entry_node_chain(source->meta_entry_node, &(*target)->meta_entry_node),
+    SAIL_TRY_OR_CLEANUP(sail_copy_meta_data_node_chain(source->meta_data_node, &(*target)->meta_data_node),
                         /* cleanup */ sail_destroy_image(*target));
 
     if (source->iccp != NULL) {

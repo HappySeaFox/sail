@@ -315,9 +315,9 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v3(struct sail_io *io, const stru
         png_state->first_image->source_image->properties |= SAIL_IMAGE_PROPERTY_INTERLACED;
     }
 
-    /* Fetch meta info. */
-    if (png_state->read_options->io_options & SAIL_IO_OPTION_META_INFO) {
-        SAIL_TRY(read_png_text(png_state->png_ptr, png_state->info_ptr, &png_state->first_image->meta_entry_node));
+    /* Read meta data. */
+    if (png_state->read_options->io_options & SAIL_IO_OPTION_META_DATA) {
+        SAIL_TRY(fetch_meta_data(png_state->png_ptr, png_state->info_ptr, &png_state->first_image->meta_data_node));
     }
 
     /* Fetch ICC profile. */
@@ -615,10 +615,10 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v3(void *state, struc
     int bit_depth;
     SAIL_TRY(pixel_format_to_png_color_type(image->pixel_format, &color_type, &bit_depth));
 
-    /* Write meta info. */
-    if (png_state->write_options->io_options & SAIL_IO_OPTION_META_INFO && image->meta_entry_node != NULL) {
-        SAIL_LOG_DEBUG("PNG: Writing meta info");
-        SAIL_TRY(write_png_text(png_state->png_ptr, png_state->info_ptr, image->meta_entry_node));
+    /* Write meta data. */
+    if (png_state->write_options->io_options & SAIL_IO_OPTION_META_DATA && image->meta_data_node != NULL) {
+        SAIL_LOG_DEBUG("PNG: Writing meta data");
+        SAIL_TRY(write_meta_data(png_state->png_ptr, png_state->info_ptr, image->meta_data_node));
     }
 
     png_set_IHDR(png_state->png_ptr,

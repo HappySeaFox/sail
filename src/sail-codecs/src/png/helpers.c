@@ -199,41 +199,75 @@ sail_status_t supported_write_output_pixel_format(enum SailPixelFormat pixel_for
     }
 }
 
-sail_status_t read_png_text(png_structp png_ptr, png_infop info_ptr, struct sail_meta_entry_node **target_meta_entry_node) {
+sail_status_t fetch_meta_data(png_structp png_ptr, png_infop info_ptr, struct sail_meta_data_node **target_meta_data_node) {
 
     SAIL_CHECK_PTR(png_ptr);
     SAIL_CHECK_PTR(info_ptr);
-    SAIL_CHECK_PTR(target_meta_entry_node);
+    SAIL_CHECK_PTR(target_meta_data_node);
+
+#if defined PNG_TEXT_SUPPORTED || defined PNG_eXIf_SUPPORTED
+    struct sail_meta_data_node **last_meta_data_node = target_meta_data_node;
 
 #ifdef PNG_TEXT_SUPPORTED
-    struct sail_meta_entry_node **last_meta_entry_node = target_meta_entry_node;
-
     png_textp lines;
     int num_text;
 
     png_get_text(png_ptr, info_ptr, &lines, &num_text);
 
     for (int i = 0; i < num_text; i++) {
-        struct sail_meta_entry_node *meta_entry_node;
+        struct sail_meta_data_node *meta_data_node;
 
-        SAIL_TRY(sail_alloc_meta_entry_node(&meta_entry_node));
-        SAIL_TRY_OR_CLEANUP(sail_strdup(lines[i].key, &meta_entry_node->key),
-                            /* cleanup */ sail_destroy_meta_entry_node(meta_entry_node));
-        SAIL_TRY_OR_CLEANUP(sail_strdup_length(lines[i].text, strlen(lines[i].text), &meta_entry_node->value),
-                            /* cleanup */ sail_destroy_meta_entry_node(meta_entry_node));
+        enum SailMetaData meta_data;
 
-        *last_meta_entry_node = meta_entry_node;
-        last_meta_entry_node = &meta_entry_node->next;
+        /* Legacy EXIF and friends. */
+        if (strcmp(lines[i].key, "Raw profile type exif") == 0) {
+            meta_data = SAIL_META_DATA_HEX_EXIF;
+        } else if (strcmp(lines[i].key, "Raw profile type iptc") == 0) {
+            meta_data = SAIL_META_DATA_HEX_IPTC;
+        } else if (strcmp(lines[i].key, "Raw profile type xmp") == 0) {
+            meta_data = SAIL_META_DATA_HEX_XMP;
+        } else if (strcmp(lines[i].key, "XML:com.adobe.xmp") == 0) {
+            meta_data = SAIL_META_DATA_XMP;
+        } else {
+            SAIL_TRY(sail_meta_data_from_string(lines[i].key, &meta_data));
+        }
+
+        if (meta_data == SAIL_META_DATA_UNKNOWN) {
+            SAIL_TRY(sail_alloc_meta_data_node_from_unknown_string(lines[i].key, lines[i].text, &meta_data_node));
+        } else {
+            SAIL_TRY(sail_alloc_meta_data_node_from_known_string(meta_data, lines[i].text, &meta_data_node));
+        }
+
+        *last_meta_data_node = meta_data_node;
+        last_meta_data_node = &meta_data_node->next;
     }
+#endif
+
+#ifdef PNG_eXIf_SUPPORTED
+    png_bytep exif;
+    png_uint_32 exif_length;
+
+    if (png_get_eXIf_1(png_ptr, info_ptr, &exif_length, &exif) != 0) {
+        struct sail_meta_data_node *meta_data_node;
+
+        SAIL_TRY(sail_alloc_meta_data_node_from_known_data(SAIL_META_DATA_EXIF, exif, exif_length, &meta_data_node));
+
+        *last_meta_data_node = meta_data_node;
+        last_meta_data_node = &meta_data_node->next;
+    }
+#endif
 #endif
 
     return SAIL_OK;
 }
 
-sail_status_t write_png_text(png_structp png_ptr, png_infop info_ptr, const struct sail_meta_entry_node *meta_entry_node) {
+sail_status_t write_meta_data(png_structp png_ptr, png_infop info_ptr, const struct sail_meta_data_node *meta_data_node) {
 
     SAIL_CHECK_PTR(png_ptr);
     SAIL_CHECK_PTR(info_ptr);
+
+#if defined PNG_TEXT_SUPPORTED || defined PNG_eXIf_SUPPORTED
+    const struct sail_meta_data_node *first_meta_data_node = meta_data_node;
 
 #ifdef PNG_TEXT_SUPPORTED
     /* To avoid allocating dynamic arrays, allow only 32 text pairs. */
@@ -241,18 +275,67 @@ sail_status_t write_png_text(png_structp png_ptr, png_infop info_ptr, const stru
     int count = 0;
 
     /* Build PNG lines. */
-    while (meta_entry_node != NULL && count < 32) {
-        lines[count].compression = PNG_TEXT_COMPRESSION_zTXt;
-        lines[count].key         = meta_entry_node->key;
-        lines[count].text        = meta_entry_node->value;
+    while (meta_data_node != NULL && count < 32) {
+        const char *meta_data_str = NULL;
 
-        count++;
-        meta_entry_node = meta_entry_node->next;
+        if (meta_data_node->value_type == SAIL_META_DATA_TYPE_STRING) {
+            if (meta_data_node->key == SAIL_META_DATA_UNKNOWN) {
+                meta_data_str = meta_data_node->key_unknown;
+            } else {
+                /* Legacy EXIF and friends. */
+                switch (meta_data_node->key) {
+                    case SAIL_META_DATA_HEX_EXIF: meta_data_str = "Raw profile type exif"; break;
+                    case SAIL_META_DATA_HEX_IPTC: meta_data_str = "Raw profile type iptc"; break;
+                    case SAIL_META_DATA_HEX_XMP:  meta_data_str = "Raw profile type xmp";  break;
+                    case SAIL_META_DATA_XMP:      meta_data_str = "XML:com.adobe.xmp";     break;
+
+                    default: {
+                        SAIL_TRY(sail_meta_data_to_string(meta_data_node->key, &meta_data_str));
+                    }
+                }
+            }
+
+            lines[count].compression = PNG_TEXT_COMPRESSION_zTXt;
+            lines[count].key         = (char *)meta_data_str;
+            lines[count].text        = meta_data_node->value_string;
+
+            count++;
+        } else {
+            SAIL_TRY_OR_SUPPRESS(sail_meta_data_to_string(meta_data_node->key, &meta_data_str));
+            SAIL_LOG_WARNING("PNG: Ignoring unsupported binary key '%s'", meta_data_str);
+        }
+
+        meta_data_node = meta_data_node->next;
     }
 
     png_set_text(png_ptr, info_ptr, lines, count);
-#else
-    (void)meta_entry_node;
+#endif
+
+#ifdef PNG_eXIf_SUPPORTED
+    /* Go back to the list head and look for EXIF. */
+    meta_data_node = first_meta_data_node;
+    bool exif_found = false;
+
+    while (meta_data_node != NULL) {
+        if (exif_found) {
+            break;
+        }
+
+        switch (meta_data_node->key) {
+            case SAIL_META_DATA_EXIF: {
+                png_set_eXIf_1(png_ptr, info_ptr, meta_data_node->value_data_length, (png_bytep)meta_data_node->value_data);
+                exif_found = true;
+                break;
+            }
+
+            default: {
+                break;
+            }
+        }
+
+        meta_data_node = meta_data_node->next;
+    }
+#endif
 #endif
 
     return SAIL_OK;
@@ -296,7 +379,7 @@ sail_status_t fetch_palette(png_structp png_ptr, png_infop info_ptr, struct sail
     int png_palette_color_count;
 
     if (png_get_PLTE(png_ptr, info_ptr, &png_palette, &png_palette_color_count) == 0) {
-        SAIL_LOG_ERROR("The indexed image has no palette");
+        SAIL_LOG_ERROR("PNG: The indexed image has no palette");
         return SAIL_ERROR_MISSING_PALETTE;
     }
 
@@ -318,7 +401,6 @@ sail_status_t fetch_palette(png_structp png_ptr, png_infop info_ptr, struct sail
 }
 
 #ifdef PNG_APNG_SUPPORTED
-
 sail_status_t blend_source(void *dst_raw, unsigned dst_offset, const void *src_raw, unsigned src_length, unsigned bytes_per_pixel) {
 
     SAIL_CHECK_PTR(dst_raw);
@@ -423,7 +505,6 @@ void destroy_rows(png_bytep **A, unsigned height) {
     sail_free(*A);
     *A = NULL;
 }
-
 #endif
 
 sail_status_t fetch_resolution(png_structp png_ptr, png_infop info_ptr, struct sail_resolution **resolution) {
