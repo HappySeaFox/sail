@@ -405,7 +405,7 @@ static MunitResult test_meta_data_from_string(const MunitParameter params[], voi
     (void)params;
     (void)user_data;
 
-    enum SailCompression result;
+    enum SailMetaData result;
 
 #define TEST_SAIL_CONVERSION(s, e)          \
     result = SAIL_META_DATA_UNKNOWN;        \
