@@ -48,6 +48,9 @@ set_target_properties(sail-common PROPERTIES
                                   SOVERSION 0
                                   PUBLIC_HEADER "${PUBLIC_HEADERS}")
 
+# fileno
+sail_enable_posix_source(TARGET sail-common VERSION 200112L)
+
 sail_enable_pch(TARGET sail-common HEADER src/sail-common.h)
 
 # Definitions, includes, link

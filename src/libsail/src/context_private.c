@@ -25,8 +25,6 @@
 
 #include "config.h"
 
-#define _POSIX_C_SOURCE 200112L /* setenv */
-
 #include <errno.h>
 #include <stdbool.h>
 #include <stdio.h>

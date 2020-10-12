@@ -33,7 +33,6 @@
         #define SAIL_ISATTY _isatty
         #define SAIL_FILENO _fileno
     #else
-        #define _POSIX_SOURCE
         #include <unistd.h>
         #define SAIL_ISATTY isatty
         #define SAIL_FILENO fileno
