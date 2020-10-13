@@ -31,16 +31,19 @@ jobs:
     - os: linux
       dist: bionic
       name: "Ubuntu 18.04 Bionic"
+    - os: linux
+      dist: focal
+      name: "Ubuntu 20.04 Focal"
     - os: osx
       osx_image:
         - xcode11.3
-      name: "macOS 10.14.6"
+      name: "macOS 10.14"
       env:
         - PKG_CONFIG_PATH="/usr/local/opt/jpeg-turbo/lib/pkgconfig:$PKG_CONFIG_PATH"
     - os: osx
       osx_image:
-        - xcode12
-      name: "macOS 10.15.5"
+        - xcode12.2
+      name: "macOS 10.15"
       env:
         - PKG_CONFIG_PATH="/usr/local/opt/jpeg-turbo/lib/pkgconfig:$PKG_CONFIG_PATH"
 

@@ -11,7 +11,7 @@ add_library(sail-common
                 src/image.c
                 src/io_common.c
                 src/log.c
-                src/meta_entry_node.c
+                src/meta_data_node.c
                 src/palette.c
                 src/pixel_formats_mapping_node.c
                 src/read_features.c
@@ -31,14 +31,14 @@ set(PUBLIC_HEADERS "src/common.h"
                    "src/image.h"
                    "src/io_common.h"
                    "src/log.h"
-                   "src/meta_entry_node.h"
+                   "src/meta_data_node.h"
                    "src/palette.h"
                    "src/pixel_formats_mapping_node.h"
                    "src/read_features.h"
                    "src/read_options.h"
                    "src/resolution.h"
-                   "src/source_image.h"
                    "src/sail-common.h"
+                   "src/source_image.h"
                    "src/utils.h"
                    "src/write_features.h"
                    "src/write_options.h")
@@ -47,6 +47,9 @@ set_target_properties(sail-common PROPERTIES
                                   VERSION "0.7.2"
                                   SOVERSION 0
                                   PUBLIC_HEADER "${PUBLIC_HEADERS}")
+
+# fileno
+sail_enable_posix_source(TARGET sail-common VERSION 200112L)
 
 sail_enable_pch(TARGET sail-common HEADER src/sail-common.h)
 

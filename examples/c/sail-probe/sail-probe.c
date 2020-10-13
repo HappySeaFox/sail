@@ -61,10 +61,23 @@ static sail_status_t probe(const char *path) {
     printf("Interlaced    : %s\n", (image->source_image->properties & SAIL_IMAGE_PROPERTY_INTERLACED) ? "yes" : "no");
     printf("Flipped Vert. : %s\n", (image->source_image->properties & SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY) ? "yes" : "no");
 
-    struct sail_meta_entry_node *node = image->meta_entry_node;
+    struct sail_meta_data_node *node = image->meta_data_node;
 
     while (node != NULL) {
-        printf("%-14s: %s\n", node->key, node->value);
+        const char *meta_data_str = NULL;
+
+        if (node->key == SAIL_META_DATA_UNKNOWN) {
+            meta_data_str = node->key_unknown;
+        } else {
+            SAIL_TRY_OR_SUPPRESS(sail_meta_data_to_string(node->key, &meta_data_str));
+        }
+
+        if (node->value_type == SAIL_META_DATA_TYPE_STRING) {
+            printf("%-14s: %s\n", meta_data_str, node->value_string);
+        } else {
+            printf("%-14s: <binary data, length: %u byte(s)>\n", meta_data_str, node->value_data_length);
+        }
+
         node = node->next;
     }
 

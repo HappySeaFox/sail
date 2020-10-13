@@ -175,27 +175,47 @@ sail_status_t convert_cmyk(unsigned char *pixels_source, unsigned char *pixels_t
     }
 }
 
-sail_status_t fetch_meta_info(struct jpeg_decompress_struct *decompress_context, struct sail_meta_entry_node **last_meta_entry_node) {
+sail_status_t fetch_meta_data(struct jpeg_decompress_struct *decompress_context, struct sail_meta_data_node **last_meta_data_node) {
 
-    SAIL_CHECK_META_ENTRY_NODE_PTR(last_meta_entry_node);
+    SAIL_CHECK_META_DATA_NODE_PTR(last_meta_data_node);
 
     jpeg_saved_marker_ptr it = decompress_context->marker_list;
 
     while(it != NULL) {
         if(it->marker == JPEG_COM) {
-            struct sail_meta_entry_node *meta_entry_node;
+            struct sail_meta_data_node *meta_data_node;
 
-            SAIL_TRY(sail_alloc_meta_entry_node(&meta_entry_node));
-            SAIL_TRY_OR_CLEANUP(sail_strdup("Comment", &meta_entry_node->key),
-                                /* cleanup */ sail_destroy_meta_entry_node(meta_entry_node));
-            SAIL_TRY_OR_CLEANUP(sail_strdup_length((const char *)it->data, it->data_length, &meta_entry_node->value),
-                                /* cleanup */ sail_destroy_meta_entry_node(meta_entry_node));
+            SAIL_TRY(sail_alloc_meta_data_node(&meta_data_node));
+            meta_data_node->key = SAIL_META_DATA_COMMENT;
+            SAIL_TRY_OR_CLEANUP(sail_strdup_length((const char *)it->data, it->data_length, &meta_data_node->value_string),
+                                /* cleanup */ sail_destroy_meta_data_node(meta_data_node));
 
-            *last_meta_entry_node = meta_entry_node;
-            last_meta_entry_node = &meta_entry_node->next;
+            *last_meta_data_node = meta_data_node;
+            last_meta_data_node = &meta_data_node->next;
         }
 
         it = it->next;
+    }
+
+    return SAIL_OK;
+}
+
+sail_status_t write_meta_data(struct jpeg_compress_struct *compress_context, const struct sail_meta_data_node *meta_data_node) {
+
+    while (meta_data_node != NULL) {
+        if (meta_data_node->value_type == SAIL_META_DATA_TYPE_STRING) {
+            jpeg_write_marker(compress_context,
+                                JPEG_COM,
+                                (JOCTET *)meta_data_node->value_string,
+                                (unsigned int)strlen(meta_data_node->value_string));
+        } else {
+            const char *meta_data_str = NULL;
+            SAIL_TRY_OR_SUPPRESS(sail_meta_data_to_string(meta_data_node->key, &meta_data_str));
+
+            SAIL_LOG_WARNING("JPEG: Ignoring unsupported binary key '%s'", meta_data_str);
+        }
+
+        meta_data_node = meta_data_node->next;
     }
 
     return SAIL_OK;

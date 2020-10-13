@@ -6,6 +6,7 @@ add_library(sail-c++
                 src/image_writer-c++.cpp
                 src/io_common-c++.cpp
                 src/log-c++.cpp
+                src/meta_data-c++.cpp
                 src/palette-c++.cpp
                 src/codec_info-c++.cpp
                 src/read_features-c++.cpp
@@ -26,6 +27,7 @@ set(PUBLIC_HEADERS "src/at_scope_exit-c++.h"
                    "src/image_writer-c++.h"
                    "src/io_common-c++.h"
                    "src/log-c++.h"
+                   "src/meta_data-c++.h"
                    "src/palette-c++.h"
                    "src/codec_info-c++.h"
                    "src/read_features-c++.h"

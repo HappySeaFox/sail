@@ -248,7 +248,7 @@ SAIL_TRY_OR_CLEANUP(sail_stop_reading(state),
                     /* cleanup */ sail_destroy_image(image));
 
 /*
- * Print the image meta information if any (JPEG comments etc.).
+ * Print the image meta data if any (JPEG comments etc.).
  */
 struct sail_meta_entry_node *node = image->meta_entry_node;
 
@@ -317,7 +317,7 @@ SAIL_TRY(reader.read_next_frame(&image));
 //
 SAIL_TRY(reader.stop_reading());
 
-// Print the image meta information if any (JPEG comments etc.).
+// Print the image meta data if any (JPEG comments etc.).
 //
 const std::map<std::string, std::string> meta_entries = image.meta_entries();
 
@@ -437,7 +437,7 @@ SAIL_TRY_OR_CLEANUP(sail_stop_reading(state),
 sail_destroy_io(io);
 
 /*
- * Print the image meta information if any (JPEG comments etc.).
+ * Print the image meta data if any (JPEG comments etc.).
  */
 struct sail_meta_entry_node *node = image->meta_entry_node;
 
@@ -527,7 +527,7 @@ SAIL_TRY(reader.read_next_frame(&image));
 //
 SAIL_TRY(reader.stop_reading());
 
-// Print the image meta information if any (JPEG comments etc.).
+// Print the image meta data if any (JPEG comments etc.).
 //
 const std::map<std::string, std::string> meta_entries = image.meta_entries();
 
