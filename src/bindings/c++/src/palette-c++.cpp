@@ -140,7 +140,7 @@ sail_status_t palette::to_sail_palette(sail_palette *pal) const
 {
     SAIL_CHECK_PALETTE_PTR(pal);
 
-    SAIL_TRY(sail_malloc(&pal->data, d->palette_size));
+    SAIL_TRY(sail_malloc(d->palette_size, &pal->data));
 
     memcpy(pal->data, d->data, d->palette_size);
 
@@ -157,7 +157,7 @@ sail_status_t palette::copy(SailPixelFormat pixel_format, const void *data, unsi
 
     d->palette_size = color_count * bits_per_pixel / 8;
 
-    SAIL_TRY(sail_malloc(&d->data, d->palette_size));
+    SAIL_TRY(sail_malloc(d->palette_size, &d->data));
 
     d->pixel_format = pixel_format;
     d->color_count  = color_count;

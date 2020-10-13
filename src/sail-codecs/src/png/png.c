@@ -90,7 +90,7 @@ struct png_state {
 static sail_status_t alloc_png_state(struct png_state **png_state) {
 
     void *ptr;
-    SAIL_TRY(sail_malloc(&ptr, sizeof(struct png_state)));
+    SAIL_TRY(sail_malloc(sizeof(struct png_state), &ptr));
     *png_state = ptr;
 
     (*png_state)->png_ptr        = NULL;
@@ -326,7 +326,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v3(struct sail_io *io, const stru
     }
 
 #ifdef PNG_APNG_SUPPORTED
-    SAIL_TRY(sail_malloc(&png_state->temp_scanline, png_state->first_image->width * png_state->bytes_per_pixel));
+    SAIL_TRY(sail_malloc(png_state->first_image->width * png_state->bytes_per_pixel, &png_state->temp_scanline));
 #endif
 
     const char *pixel_format_str = NULL;

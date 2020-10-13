@@ -68,7 +68,7 @@ struct jpeg_state {
 static sail_status_t alloc_jpeg_state(struct jpeg_state **jpeg_state) {
 
     void *ptr;
-    SAIL_TRY(sail_malloc(&ptr, sizeof(struct jpeg_state)));
+    SAIL_TRY(sail_malloc(sizeof(struct jpeg_state), &ptr));
     *jpeg_state = ptr;
 
     (*jpeg_state)->decompress_context              = NULL;
@@ -125,7 +125,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v3(struct sail_io *io, const stru
 
     /* Create decompress context. */
     void *ptr;
-    SAIL_TRY(sail_malloc(&ptr, sizeof(struct jpeg_decompress_struct)));
+    SAIL_TRY(sail_malloc(sizeof(struct jpeg_decompress_struct), &ptr));
     jpeg_state->decompress_context = ptr;
 
     /* Error handling setup. */
@@ -231,7 +231,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
                                         (*image)->source_image->pixel_format,
                                         &src_bytes_per_line));
 
-        SAIL_TRY(sail_malloc(&jpeg_state->extra_scan_line, src_bytes_per_line));
+        SAIL_TRY(sail_malloc(src_bytes_per_line, &jpeg_state->extra_scan_line));
     }
 
     /* Read meta data. */
@@ -355,7 +355,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_init_v3(struct sail_io *io, const str
 
     /* Create compress context. */
     void *ptr;
-    SAIL_TRY(sail_malloc(&ptr, sizeof(struct jpeg_compress_struct)));
+    SAIL_TRY(sail_malloc(sizeof(struct jpeg_compress_struct), &ptr));
     jpeg_state->compress_context = ptr;
 
     /* Sanity check. */

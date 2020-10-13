@@ -52,7 +52,7 @@ struct tiff_state {
 static sail_status_t alloc_tiff_state(struct tiff_state **tiff_state) {
 
     void *ptr;
-    SAIL_TRY(sail_malloc(&ptr, sizeof(struct tiff_state)));
+    SAIL_TRY(sail_malloc(sizeof(struct tiff_state), &ptr));
     *tiff_state = ptr;
 
     if (*tiff_state == NULL) {

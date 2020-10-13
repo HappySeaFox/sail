@@ -45,7 +45,7 @@ sail_status_t alloc_and_load_codec(const struct sail_codec_info *codec_info, str
     SAIL_CHECK_CODEC_PTR(codec);
 
     void *ptr;
-    SAIL_TRY(sail_malloc(&ptr, sizeof(struct sail_codec)));
+    SAIL_TRY(sail_malloc(sizeof(struct sail_codec), &ptr));
     *codec = ptr;
 
     (*codec)->layout = codec_info->layout;
@@ -99,7 +99,7 @@ sail_status_t alloc_and_load_codec(const struct sail_codec_info *codec_info, str
     while(0)
 
     if ((*codec)->layout == SAIL_CODEC_LAYOUT_V3) {
-        SAIL_TRY_OR_CLEANUP(sail_malloc(&ptr, sizeof(struct sail_codec_layout_v3)),
+        SAIL_TRY_OR_CLEANUP(sail_malloc(sizeof(struct sail_codec_layout_v3), &ptr),
                             /* cleanup */ destroy_codec(*codec));
         (*codec)->v3 = ptr;
 

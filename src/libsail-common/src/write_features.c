@@ -33,7 +33,7 @@ sail_status_t sail_alloc_write_features(struct sail_write_features **write_featu
     SAIL_CHECK_WRITE_FEATURES_PTR(write_features);
 
     void *ptr;
-    SAIL_TRY(sail_malloc(&ptr, sizeof(struct sail_write_features)));
+    SAIL_TRY(sail_malloc(sizeof(struct sail_write_features), &ptr));
     *write_features = ptr;
 
     (*write_features)->pixel_formats_mapping_node = NULL;

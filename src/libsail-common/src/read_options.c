@@ -34,7 +34,7 @@ sail_status_t sail_alloc_read_options(struct sail_read_options **read_options) {
     SAIL_CHECK_READ_OPTIONS_PTR(read_options);
 
     void *ptr;
-    SAIL_TRY(sail_malloc(&ptr, sizeof(struct sail_read_options)));
+    SAIL_TRY(sail_malloc(sizeof(struct sail_read_options), &ptr));
     *read_options = ptr;
 
     (*read_options)->output_pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;
@@ -93,7 +93,7 @@ sail_status_t sail_copy_read_options(const struct sail_read_options *source, str
     SAIL_CHECK_READ_OPTIONS_PTR(target);
 
     void *ptr;
-    SAIL_TRY(sail_malloc(&ptr, sizeof(struct sail_read_options)));
+    SAIL_TRY(sail_malloc(sizeof(struct sail_read_options), &ptr));
     *target = ptr;
 
     memcpy(*target, source, sizeof(struct sail_read_options));

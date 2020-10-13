@@ -207,7 +207,7 @@ static sail_status_t alloc_context(struct sail_context **context) {
     SAIL_CHECK_CONTEXT_PTR(context);
 
     void *ptr;
-    SAIL_TRY(sail_malloc(&ptr, sizeof(struct sail_context)));
+    SAIL_TRY(sail_malloc(sizeof(struct sail_context), &ptr));
 
     *context = ptr;
 
@@ -336,8 +336,9 @@ static sail_status_t init_context(struct sail_context *context, int flags) {
 
         size_t codecs_path_with_mask_length = strlen(codecs_path) + strlen(plugs_info_mask) + 1;
 
-        char *codecs_path_with_mask;
-        SAIL_TRY(sail_malloc(&codecs_path_with_mask, codecs_path_with_mask_length));
+        void *ptr;
+        SAIL_TRY(sail_malloc(codecs_path_with_mask_length, &ptr));
+        char *codecs_path_with_mask = ptr;
 
         strcpy_s(codecs_path_with_mask, codecs_path_with_mask_length, codecs_path);
         strcat_s(codecs_path_with_mask, codecs_path_with_mask_length, plugs_info_mask);

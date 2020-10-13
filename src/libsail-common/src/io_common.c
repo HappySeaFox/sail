@@ -34,7 +34,7 @@ sail_status_t sail_alloc_io(struct sail_io **io) {
     SAIL_CHECK_IO_PTR(io);
 
     void *ptr;
-    SAIL_TRY(sail_malloc(&ptr, sizeof(struct sail_io)));
+    SAIL_TRY(sail_malloc(sizeof(struct sail_io), &ptr));
     *io = ptr;
 
     (*io)->id     = 0;

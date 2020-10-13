@@ -34,7 +34,7 @@ sail_status_t sail_alloc_meta_data_node(struct sail_meta_data_node **node) {
     SAIL_CHECK_META_DATA_NODE_PTR(node);
 
     void *ptr;
-    SAIL_TRY(sail_malloc(&ptr, sizeof(struct sail_meta_data_node)));
+    SAIL_TRY(sail_malloc(sizeof(struct sail_meta_data_node), &ptr));
     *node = ptr;
 
     (*node)->key               = SAIL_META_DATA_UNKNOWN;

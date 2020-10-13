@@ -223,21 +223,21 @@ SAIL_EXPORT sail_status_t sail_print_errno(const char *format);
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_malloc(void **ptr, size_t size);
+SAIL_EXPORT sail_status_t sail_malloc(size_t size, void **ptr);
 
 /*
  * Interface to realloc().
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_realloc(void **ptr, size_t size);
+SAIL_EXPORT sail_status_t sail_realloc(size_t size, void **ptr);
 
 /*
  * Interface to calloc().
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_calloc(void **ptr, size_t nmemb, size_t size);
+SAIL_EXPORT sail_status_t sail_calloc(size_t nmemb, size_t size, void **ptr);
 
 /*
  * Interface to free().

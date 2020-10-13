@@ -387,7 +387,7 @@ sail_status_t fetch_palette(png_structp png_ptr, png_infop info_ptr, struct sail
     SAIL_TRY(sail_alloc_palette(palette));
     (*palette)->pixel_format = SAIL_PIXEL_FORMAT_BPP24_RGB;
     (*palette)->color_count = png_palette_color_count;
-    SAIL_TRY(sail_malloc(&(*palette)->data, png_palette_color_count * 3));
+    SAIL_TRY(sail_malloc(png_palette_color_count * 3, &(*palette)->data));
 
     unsigned char *palette_ptr = (*palette)->data;
 
@@ -457,7 +457,7 @@ sail_status_t skip_hidden_frame(unsigned bytes_per_line, unsigned height, png_st
     SAIL_CHECK_PTR(info_ptr);
     SAIL_CHECK_PTR(row);
 
-    SAIL_TRY(sail_malloc(row, bytes_per_line));
+    SAIL_TRY(sail_malloc(bytes_per_line, row));
 
     png_read_frame_head(png_ptr, info_ptr);
 
@@ -473,18 +473,18 @@ sail_status_t skip_hidden_frame(unsigned bytes_per_line, unsigned height, png_st
 
 sail_status_t alloc_rows(png_bytep **A, unsigned row_length, unsigned height) {
 
-    void *temp_ptr;
-    SAIL_TRY(sail_malloc(&temp_ptr, height * sizeof(png_bytep)));
+    void *ptr;
+    SAIL_TRY(sail_malloc(height * sizeof(png_bytep), &ptr));
 
-    *A = temp_ptr;
+    *A = ptr;
 
     for (unsigned row = 0; row < height; row++) {
         (*A)[row] = NULL;
     }
 
     for (unsigned row = 0; row < height; row++) {
-        SAIL_TRY(sail_malloc(&temp_ptr, row_length));
-        (*A)[row] = temp_ptr;
+        SAIL_TRY(sail_malloc(row_length, &ptr));
+        (*A)[row] = ptr;
 
         memset((*A)[row], 0, row_length);
     }

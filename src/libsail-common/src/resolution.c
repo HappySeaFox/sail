@@ -40,7 +40,7 @@ sail_status_t sail_alloc_resolution_from_data(struct sail_resolution **resolutio
     SAIL_CHECK_RESOLUTION_PTR(resolution);
 
     void *ptr;
-    SAIL_TRY(sail_malloc(&ptr, sizeof(struct sail_resolution)));
+    SAIL_TRY(sail_malloc(sizeof(struct sail_resolution), &ptr));
     *resolution = ptr;
 
     (*resolution)->unit = unit;

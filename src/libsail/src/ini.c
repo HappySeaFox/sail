@@ -109,7 +109,7 @@ int ini_parse_stream(ini_reader reader, void* stream, ini_handler handler,
     int error = 0;
 
 #if !INI_USE_STACK
-    SAIL_TRY_OR_EXECUTE(sail_malloc(&line, INI_INITIAL_ALLOC),
+    SAIL_TRY_OR_EXECUTE(sail_malloc(INI_INITIAL_ALLOC, &line),
                         /* on error */ return -2);
 #endif
 
