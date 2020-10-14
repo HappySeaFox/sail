@@ -69,6 +69,7 @@ private: // slots
     void onFit(bool fit);
     void onPrevious();
     void onNext();
+    void onStop();
 
 private:
     QScopedPointer<Ui::QtSail> m_ui;

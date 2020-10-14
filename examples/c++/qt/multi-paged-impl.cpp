@@ -45,6 +45,7 @@ QtSail::QtSail(QWidget *parent)
     connect(m_ui->checkFit,     &QCheckBox::toggled,   this, &QtSail::onFit);
     connect(m_ui->pushPrevious, &QPushButton::clicked, this, &QtSail::onPrevious);
     connect(m_ui->pushNext,     &QPushButton::clicked, this, &QtSail::onNext);
+    connect(m_ui->pushStop,     &QPushButton::clicked, this, &QtSail::onStop);
 
     init();
 }
@@ -109,6 +110,12 @@ void QtSail::onNext()
     if (m_animated) {
         m_animationTimer->start(m_delays[m_currentIndex]);
     }
+}
+
+void QtSail::onStop()
+{
+    m_animationTimer->stop();
+    m_animated = false;
 }
 
 void QtSail::detectAnimated()
