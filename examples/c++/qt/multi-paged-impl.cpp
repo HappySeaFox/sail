@@ -90,6 +90,8 @@ void QtSail::onPrevious()
 
     SAIL_LOG_DEBUG("Image index: %d", m_currentIndex);
     onFit(m_ui->checkFit->isChecked());
+
+    updateCurrentFrameLabel();
 }
 
 void QtSail::onNext()
@@ -110,6 +112,8 @@ void QtSail::onNext()
     if (m_animated) {
         m_animationTimer->start(m_delays[m_currentIndex]);
     }
+
+    updateCurrentFrameLabel();
 }
 
 void QtSail::onStop()
@@ -127,4 +131,11 @@ void QtSail::detectAnimated()
     if (m_animated) {
         m_animationTimer->start(m_delays.first());
     }
+
+    updateCurrentFrameLabel();
+}
+
+void QtSail::updateCurrentFrameLabel()
+{
+    m_ui->labelFrame->setText(QString("%1/%2").arg(m_currentIndex+1).arg(m_qimages.size()));
 }

@@ -53,6 +53,7 @@ private:
     sail_status_t saveImage(const QString &path, const QImage &qimage);
     QStringList filters() const;
     void detectAnimated();
+    void updateCurrentFrameLabel();
 
 private: // slots
     void onOpenFile();

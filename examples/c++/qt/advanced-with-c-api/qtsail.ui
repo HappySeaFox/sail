@@ -61,6 +61,16 @@
       </spacer>
      </item>
      <item>
+      <widget class="QLabel" name="labelFrame">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QToolButton" name="pushStop">
        <property name="text">
         <string>Stop</string>

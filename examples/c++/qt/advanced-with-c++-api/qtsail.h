@@ -61,6 +61,7 @@ private:
     sail_status_t codecInfo(const sail::codec_info &codec_info) const;
     QStringList filters() const;
     void detectAnimated();
+    void updateCurrentFrameLabel();
 
 private: // slots
     void onOpenFile();
