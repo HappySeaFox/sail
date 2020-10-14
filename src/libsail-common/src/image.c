@@ -43,7 +43,7 @@ sail_status_t sail_alloc_image(struct sail_image **image) {
     (*image)->bytes_per_line          = 0;
     (*image)->resolution              = NULL;
     (*image)->pixel_format            = SAIL_PIXEL_FORMAT_UNKNOWN;
-    (*image)->interlaced_passes       = 0;
+    (*image)->interlaced_passes       = 1;
     (*image)->animated                = false;
     (*image)->delay                   = 0;
     (*image)->palette                 = NULL;
