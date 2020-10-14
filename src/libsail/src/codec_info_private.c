@@ -39,7 +39,7 @@ static sail_status_t alloc_string_node(struct sail_string_node **string_node) {
     SAIL_CHECK_STRING_NODE_PTR(string_node);
 
     void *ptr;
-    SAIL_TRY(sail_malloc(&ptr, sizeof(struct sail_string_node)));
+    SAIL_TRY(sail_malloc(sizeof(struct sail_string_node), &ptr));
     *string_node = ptr;
 
     (*string_node)->value = NULL;
@@ -127,7 +127,7 @@ static sail_status_t parse_serialized_ints(const char *value, int **target, unsi
 
     if (*length > 0) {
         void *ptr;
-        SAIL_TRY_OR_CLEANUP(sail_malloc(&ptr, (size_t)*length * sizeof(int)),
+        SAIL_TRY_OR_CLEANUP(sail_malloc((size_t)*length * sizeof(int), &ptr),
                             /* cleanup */ destroy_string_node_chain(string_node));
         *target = ptr;
 
@@ -368,7 +368,7 @@ static sail_status_t alloc_codec_info(struct sail_codec_info **codec_info) {
     SAIL_CHECK_CODEC_INFO_PTR(codec_info);
 
     void *ptr;
-    SAIL_TRY(sail_malloc(&ptr, sizeof(struct sail_codec_info)));
+    SAIL_TRY(sail_malloc(sizeof(struct sail_codec_info), &ptr));
     *codec_info = ptr;
 
     (*codec_info)->path              = NULL;
@@ -415,7 +415,7 @@ sail_status_t alloc_codec_info_node(struct sail_codec_info_node **codec_info_nod
     SAIL_CHECK_CODEC_INFO_NODE_PTR(codec_info_node);
 
     void *ptr;
-    SAIL_TRY(sail_malloc(&ptr, sizeof(struct sail_codec_info_node)));
+    SAIL_TRY(sail_malloc(sizeof(struct sail_codec_info_node), &ptr));
     *codec_info_node = ptr;
 
     (*codec_info_node)->codec_info = NULL;

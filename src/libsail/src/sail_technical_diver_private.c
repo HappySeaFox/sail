@@ -106,7 +106,7 @@ sail_status_t start_reading_io_with_options(struct sail_io *io, bool own_io,
     }
 
     void *ptr;
-    SAIL_TRY_OR_CLEANUP(sail_malloc(&ptr, sizeof(struct hidden_state)),
+    SAIL_TRY_OR_CLEANUP(sail_malloc(sizeof(struct hidden_state), &ptr),
                         /* cleanup */ if (own_io) sail_destroy_io(io));
     struct hidden_state *state_of_mind = ptr;
 
@@ -161,7 +161,7 @@ sail_status_t start_writing_io_with_options(struct sail_io *io, bool own_io,
     }
 
     void *ptr;
-    SAIL_TRY_OR_CLEANUP(sail_malloc(&ptr, sizeof(struct hidden_state)),
+    SAIL_TRY_OR_CLEANUP(sail_malloc(sizeof(struct hidden_state), &ptr),
                         /* cleanup */ if (own_io) sail_destroy_io(io));
     struct hidden_state *state_of_mind = ptr;
 

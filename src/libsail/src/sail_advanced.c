@@ -121,7 +121,7 @@ sail_status_t sail_read_next_frame(void *state, struct sail_image **image) {
     SAIL_TRY_OR_CLEANUP(sail_bytes_per_image(*image, &pixels_size),
                         /* cleanup */ sail_destroy_image(*image));
 
-    SAIL_TRY_OR_CLEANUP(sail_malloc(&(*image)->pixels, pixels_size),
+    SAIL_TRY_OR_CLEANUP(sail_malloc(pixels_size, &(*image)->pixels),
                         /* cleanup */ sail_destroy_image(*image));
 
     for (int pass = 0; pass < interlaced_passes; pass++) {

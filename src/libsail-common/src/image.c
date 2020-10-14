@@ -34,7 +34,7 @@ sail_status_t sail_alloc_image(struct sail_image **image) {
     SAIL_CHECK_IMAGE_PTR(image);
 
     void *ptr;
-    SAIL_TRY(sail_malloc(&ptr, sizeof(struct sail_image)));
+    SAIL_TRY(sail_malloc(sizeof(struct sail_image), &ptr));
     *image = ptr;
 
     (*image)->pixels                  = NULL;
@@ -83,7 +83,7 @@ sail_status_t sail_copy_image(const struct sail_image *source, struct sail_image
     SAIL_TRY(sail_alloc_image(target));
 
     if (source->pixels != NULL) {
-        SAIL_TRY_OR_CLEANUP(sail_malloc(&(*target)->pixels, pixels_size),
+        SAIL_TRY_OR_CLEANUP(sail_malloc(pixels_size, &(*target)->pixels),
                             /* cleanup */ sail_destroy_image(*target));
 
         memcpy((*target)->pixels, source->pixels, pixels_size);

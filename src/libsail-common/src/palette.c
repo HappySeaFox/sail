@@ -34,7 +34,7 @@ sail_status_t sail_alloc_palette(struct sail_palette **palette) {
     SAIL_CHECK_PALETTE_PTR(palette);
 
     void *ptr;
-    SAIL_TRY(sail_malloc(&ptr, sizeof(struct sail_palette)));
+    SAIL_TRY(sail_malloc(sizeof(struct sail_palette), &ptr));
     *palette = ptr;
 
     (*palette)->pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;
@@ -67,7 +67,7 @@ sail_status_t sail_copy_palette(const struct sail_palette *source_palette, struc
 
     unsigned palette_size = source_palette->color_count * bits_per_pixel / 8;
 
-    SAIL_TRY_OR_CLEANUP(sail_malloc(&(*target_palette)->data, palette_size),
+    SAIL_TRY_OR_CLEANUP(sail_malloc(palette_size, &(*target_palette)->data),
                         /* cleanup */ sail_destroy_palette(*target_palette));
 
     (*target_palette)->pixel_format = source_palette->pixel_format;

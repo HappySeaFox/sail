@@ -281,7 +281,7 @@ image& image::with_pixels(const void *pixels, unsigned pixels_size)
         return *this;
     }
 
-    SAIL_TRY_OR_EXECUTE(sail_malloc(&d->pixels, pixels_size),
+    SAIL_TRY_OR_EXECUTE(sail_malloc(pixels_size, &d->pixels),
                         /* on error */ return *this);
 
     d->pixels_size = pixels_size;

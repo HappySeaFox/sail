@@ -79,7 +79,7 @@ else()
     set(SAIL_DEFAULT_READ_OUTPUT_PIXEL_FORMAT "BPP32-RGBA")
 endif()
 
-set(SAIL_MAGIC_BUFFER_SIZE 10)
+set(SAIL_MAGIC_BUFFER_SIZE 16)
 
 # TODO Move to a Debian patch
 # Set arch-specific include/lib dirs

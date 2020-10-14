@@ -55,7 +55,7 @@ sail_status_t sail_memdup(const void *input, size_t input_size, void **output) {
         return SAIL_ERROR_INVALID_ARGUMENT;
     }
 
-    SAIL_TRY(sail_malloc(output, input_size));
+    SAIL_TRY(sail_malloc(input_size, output));
 
     memcpy(*output, input, input_size);
 
@@ -88,7 +88,7 @@ sail_status_t sail_strdup_length(const char *input, size_t length, char **output
     }
 
     void *ptr;
-    SAIL_TRY(sail_malloc(&ptr, length+1));
+    SAIL_TRY(sail_malloc(length+1, &ptr));
     *output = ptr;
 
     memcpy(*output, input, length);
@@ -121,7 +121,7 @@ sail_status_t sail_concat(char **output, int num, ...) {
     va_end(args);
 
     void *ptr;
-    SAIL_TRY(sail_malloc(&ptr, length));
+    SAIL_TRY(sail_malloc(length, &ptr));
     *output = ptr;
 
     (*output)[0] = '\0';
@@ -165,7 +165,7 @@ sail_status_t sail_to_wchar(const char *input, wchar_t **output) {
     size_t length = strlen(input);
 
     void *ptr;
-    SAIL_TRY(sail_malloc(&ptr, (length+1) * sizeof(wchar_t)));
+    SAIL_TRY(sail_malloc((length+1) * sizeof(wchar_t), &ptr));
     *output = ptr;
 
 #ifdef SAIL_WIN32
@@ -765,7 +765,7 @@ sail_status_t sail_print_errno(const char *format) {
     return SAIL_OK;
 }
 
-sail_status_t sail_malloc(void **ptr, size_t size) {
+sail_status_t sail_malloc(size_t size, void **ptr) {
 
     SAIL_CHECK_PTR(ptr);
 
@@ -778,7 +778,7 @@ sail_status_t sail_malloc(void **ptr, size_t size) {
     return SAIL_OK;
 }
 
-sail_status_t sail_realloc(void **ptr, size_t size) {
+sail_status_t sail_realloc(size_t size, void **ptr) {
 
     SAIL_CHECK_PTR(ptr);
 
@@ -791,7 +791,7 @@ sail_status_t sail_realloc(void **ptr, size_t size) {
     return SAIL_OK;
 }
 
-sail_status_t sail_calloc(void **ptr, size_t nmemb, size_t size) {
+sail_status_t sail_calloc(size_t nmemb, size_t size, void **ptr) {
 
     SAIL_CHECK_PTR(ptr);
 

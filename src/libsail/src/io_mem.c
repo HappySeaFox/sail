@@ -229,7 +229,7 @@ sail_status_t alloc_io_read_mem(const void *buffer, size_t length, struct sail_i
     SAIL_TRY(sail_alloc_io(io));
 
     void *ptr;
-    SAIL_TRY_OR_CLEANUP(sail_malloc(&ptr, sizeof(struct mem_io_read_stream)),
+    SAIL_TRY_OR_CLEANUP(sail_malloc(sizeof(struct mem_io_read_stream), &ptr),
                         /* cleanup */ sail_destroy_io(*io));
     struct mem_io_read_stream *mem_io_read_stream = ptr;
 
@@ -261,7 +261,7 @@ sail_status_t alloc_io_write_mem(void *buffer, size_t length, struct sail_io **i
     SAIL_TRY(sail_alloc_io(io));
 
     void *ptr;
-    SAIL_TRY_OR_CLEANUP(sail_malloc(&ptr, sizeof(struct mem_io_write_stream)),
+    SAIL_TRY_OR_CLEANUP(sail_malloc(sizeof(struct mem_io_write_stream), &ptr),
                         /* cleanup */ sail_destroy_io(*io));
     struct mem_io_write_stream *mem_io_write_stream = ptr;
 

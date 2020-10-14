@@ -34,7 +34,7 @@ sail_status_t sail_alloc_write_options(struct sail_write_options **write_options
     SAIL_CHECK_WRITE_OPTIONS_PTR(write_options);
 
     void *ptr;
-    SAIL_TRY(sail_malloc(&ptr, sizeof(struct sail_write_options)));
+    SAIL_TRY(sail_malloc(sizeof(struct sail_write_options), &ptr));
     *write_options = ptr;
 
     (*write_options)->output_pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;
@@ -95,7 +95,7 @@ sail_status_t sail_copy_write_options(const struct sail_write_options *write_opt
     SAIL_CHECK_WRITE_OPTIONS_PTR(write_options_target);
 
     void *ptr;
-    SAIL_TRY(sail_malloc(&ptr, sizeof(struct sail_write_options)));
+    SAIL_TRY(sail_malloc(sizeof(struct sail_write_options), &ptr));
     *write_options_target = ptr;
 
     memcpy(*write_options_target, write_options_source, sizeof(struct sail_write_options));

@@ -113,7 +113,7 @@ iccp& iccp::with_data(const void *data, unsigned data_length)
         return *this;
     }
 
-    SAIL_TRY_OR_EXECUTE(sail_malloc(&d->iccp.data, data_length),
+    SAIL_TRY_OR_EXECUTE(sail_malloc(data_length, &d->iccp.data),
                         /* on error */ return *this);
 
     d->iccp.data_length = data_length;
@@ -138,7 +138,7 @@ sail_status_t iccp::to_sail_iccp(sail_iccp *ic) const
 {
     SAIL_CHECK_ICCP_PTR(ic);
 
-    SAIL_TRY(sail_malloc(&ic->data, d->iccp.data_length));
+    SAIL_TRY(sail_malloc(d->iccp.data_length, &ic->data));
     memcpy(ic->data, d->iccp.data, d->iccp.data_length);
 
     ic->data_length = d->iccp.data_length;
