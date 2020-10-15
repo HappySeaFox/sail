@@ -69,7 +69,7 @@ animated, multi-paged images along with their meta data and ICC profiles. :sailb
 | 3  | [PNG (Portable Network Graphics)](https://wikipedia.org/wiki/Portable_Network_Graphics) | RW            | libpng            |
 | 4  | [TIFF (Tagged Image File Format)](https://wikipedia.org/wiki/TIFF)                      | RW            | libtiff           |
 
-Work to add more image formats is ongoing.
+See the full list [here](FORMATS.md). Work to add more image formats is ongoing.
 
 ## Supported platforms
 
