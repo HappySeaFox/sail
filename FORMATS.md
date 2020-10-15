@@ -5,9 +5,9 @@
 | 3  | [PNG](https://wikipedia.org/wiki/Portable_Network_Graphics) | SDI           | SDI               | libpng            |
 | 4  | [TIFF](https://wikipedia.org/wiki/TIFF)                     | SMDI          | SMDI              | libtiff           |
 
-**S** - Static images
-**M** - Multi-framed images
-**A** - Animated images
-**D** - Meta data
-**I** - ICC profiles
+**S** - Static images<br/>
+**M** - Multi-framed images<br/>
+**A** - Animated images<br/>
+**D** - Meta data<br/>
+**I** - ICC profiles<br/>
 **-** - Unsupported
