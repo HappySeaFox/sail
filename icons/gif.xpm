@@ -1,0 +1,34 @@
+/* XPM */
+static const char *codec_gif[] = {
+/* columns rows colors chars-per-pixel */
+"16 16 12 1",
+"  c gray27",
+". c #4C4C4C",
+"X c #008000",
+"o c #CF0008",
+"O c #AEAEAE",
+"+ c gray69",
+"@ c #B1B1B1",
+"# c #C8C8C8",
+"$ c #DDDDDD",
+"% c #F3F3F3",
+"& c gray100",
+"* c None",
+/* pixels */
+"..........+*****",
+".########.$O****",
+".#&&&&&&#.%$+***",
+".#&&&&&&#....***",
+".#&&&&&&####.***",
+".               ",
+".XXXXXXXXXXXXXX ",
+".XXX&&&X&X&&&XX ",
+".XX&XXXX&X&XXXX ",
+".XX&X&&X&X&&XXX ",
+".XX&XX&X&X&XXXX ",
+".XXX&&&X&X&XXXX ",
+".XXXXXXXXXXXXXX ",
+".               ",
+".###########.***",
+"*............***"
+};
