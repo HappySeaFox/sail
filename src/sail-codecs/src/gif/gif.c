@@ -400,50 +400,48 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v3(void *state, struct sail_io *
                 SAIL_LOG_ERROR("GIF: %s", GifErrorString(gif_state->gif->Error));
                 return SAIL_ERROR_UNDERLYING_CODEC;
             }
-            else
+
+            gif_state->j += InterlacedJumps[gif_state->layer];
+
+            for(unsigned i = 0;i < gif_state->Width;i++)
             {
-                gif_state->j += InterlacedJumps[gif_state->layer];
+                int index = gif_state->Col + i;
 
-                for(unsigned i = 0;i < gif_state->Width;i++)
+                if(gif_state->buf[i] == gif_state->transIndex && gif_state->transIndex != -1)
                 {
-                    int index = gif_state->Col + i;
+                    unsigned char rgb[3];
+                    memcpy(rgb, &(gif_state->map->Colors[gif_state->buf[i]]), 3);
 
-                    if(gif_state->buf[i] == gif_state->transIndex && gif_state->transIndex != -1)
+                    if(gif_state->back[0] == rgb[0] && gif_state->back[1] == rgb[1] && gif_state->back[2] == rgb[2] && gif_state->currentImage == 0)
+                        (scan+index*4)[3] = 0;
+                    else if(gif_state->back[0] == rgb[0] && gif_state->back[1] == rgb[1] && gif_state->back[2] == rgb[2] && gif_state->lastDisposal != DISPOSE_BACKGROUND && gif_state->currentImage > 0)
                     {
-                        unsigned char rgb[3];
-                        memcpy(rgb, &(gif_state->map->Colors[gif_state->buf[i]]), 3);
-
-                        if(gif_state->back[0] == rgb[0] && gif_state->back[1] == rgb[1] && gif_state->back[2] == rgb[2] && gif_state->currentImage == 0)
-                            (scan+index*4)[3] = 0;
-                        else if(gif_state->back[0] == rgb[0] && gif_state->back[1] == rgb[1] && gif_state->back[2] == rgb[2] && gif_state->lastDisposal != DISPOSE_BACKGROUND && gif_state->currentImage > 0)
-                        {
-                            memcpy(scan+index*4, gif_state->Last[cc] + index*4, 4);
-                        }
-                        else if(gif_state->back[0] == rgb[0] && gif_state->back[1] == rgb[1] && gif_state->back[2] == rgb[2] && gif_state->lastDisposal == DISPOSE_BACKGROUND && gif_state->currentImage > 0)
-                        {
-                            (scan+index*4)[3] = 0;
-                        }
-                        else if(gif_state->currentImage > 0)
-                        {
-                            if(gif_state->lastDisposal == DISPOSE_BACKGROUND)
-                            {
-                                memcpy(scan+index*4, &gif_state->back, 4);//(scan+index)->a=0;
-
-                                if((gif_state->Last[cc] + index*4)[3] == 0)
-                                (scan+index*4)[3]=0;
-                            }
-                        }
+                        memcpy(scan+index*4, gif_state->Last[cc] + index*4, 4);
                     }
-                    else
+                    else if(gif_state->back[0] == rgb[0] && gif_state->back[1] == rgb[1] && gif_state->back[2] == rgb[2] && gif_state->lastDisposal == DISPOSE_BACKGROUND && gif_state->currentImage > 0)
                     {
-                        memcpy(scan+index*4, &(gif_state->map->Colors[gif_state->buf[i]]), 3);
-                        (scan+index*4)[3] = 255;
+                        (scan+index*4)[3] = 0;
+                    }
+                    else if(gif_state->currentImage > 0)
+                    {
+                        if(gif_state->lastDisposal == DISPOSE_BACKGROUND)
+                        {
+                            memcpy(scan+index*4, &gif_state->back, 4);//(scan+index)->a=0;
+
+                            if((gif_state->Last[cc] + index*4)[3] == 0)
+                            (scan+index*4)[3]=0;
+                        }
                     }
                 }
-
-                SAIL_TRY(sail_realloc(image->width * 4, &gif_state->Lines[gif_state->line]));
-                memcpy(gif_state->Lines[gif_state->line], scan, image->width * 4);
+                else
+                {
+                    memcpy(scan+index*4, &(gif_state->map->Colors[gif_state->buf[i]]), 3);
+                    (scan+index*4)[3] = 255;
+                }
             }
+
+            SAIL_TRY(sail_realloc(image->width * 4, &gif_state->Lines[gif_state->line]));
+            memcpy(gif_state->Lines[gif_state->line], scan, image->width * 4);
         } // if(line == j)
         else
         {
@@ -465,55 +463,53 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v3(void *state, struct sail_io *
             SAIL_LOG_ERROR("GIF: %s", GifErrorString(gif_state->gif->Error));
             return SAIL_ERROR_UNDERLYING_CODEC;
         }
-        else
+
+        memcpy(scan, gif_state->Last[cc], image->width * 4);
+
+        if(gif_state->lastDisposal == DISPOSE_BACKGROUND)
         {
-            memcpy(scan, gif_state->Last[cc], image->width * 4);
-
-            if(gif_state->lastDisposal == DISPOSE_BACKGROUND)
-            {
-                if(cc >= gif_state->lastRow && cc < gif_state->lastRow+gif_state->lastHeight)
-                    memcpy(scan+gif_state->lastCol*4, gif_state->saved, gif_state->lastWidth * 4);
-            }
-
-            for(unsigned i = 0; i < gif_state->Width; i++)
-            {
-                int index = gif_state->Col + i;
-
-                if(gif_state->buf[i] == gif_state->transIndex && gif_state->transIndex != -1)
-                {
-                    unsigned char rgb[3];
-                    memcpy(rgb, &(gif_state->map->Colors[gif_state->buf[i]]), 3);
-
-                    if(gif_state->back[0] == rgb[0] && gif_state->back[1] == rgb[1] && gif_state->back[2] == rgb[2] && gif_state->currentImage == 0)
-                        (scan+index*4)[3] = 0;
-                    else if(gif_state->back[0] == rgb[0] && gif_state->back[1] == rgb[1] && gif_state->back[2] == rgb[2] && gif_state->lastDisposal != DISPOSE_BACKGROUND && gif_state->currentImage > 0)
-                    {
-                        memcpy(scan+index*4, gif_state->Last[cc] + index*4, 4);// = 255;
-                    }
-                    else if(gif_state->back[0] == rgb[0] && gif_state->back[1] == rgb[1] && gif_state->back[2] == rgb[2] && gif_state->lastDisposal == DISPOSE_BACKGROUND && gif_state->currentImage > 0)
-                    {
-                        (scan+index*4)[3] = 0;
-                    }
-                    else if(gif_state->currentImage > 0)
-                    {
-                        if(gif_state->lastDisposal == DISPOSE_BACKGROUND)
-                        {
-                            memcpy(scan+index*4, &gif_state->back, 4);//(scan+index)->a=0;
-
-                            if((gif_state->Last[cc] + index*4)[3] == 0)
-                                (scan+index*4)[3]=0;
-                        }
-                    }
-                }// if transIndex
-                else
-                {
-                    memcpy(scan+index*4, &(gif_state->map->Colors[gif_state->buf[i]]), 3);
-                    (scan+index*4)[3] = 255;
-                }
-            } // for
-
-            memcpy(gif_state->Last[cc], scan, image->width * 4);
+            if(cc >= gif_state->lastRow && cc < gif_state->lastRow+gif_state->lastHeight)
+                memcpy(scan+gif_state->lastCol*4, gif_state->saved, gif_state->lastWidth * 4);
         }
+
+        for(unsigned i = 0; i < gif_state->Width; i++)
+        {
+            int index = gif_state->Col + i;
+
+            if(gif_state->buf[i] == gif_state->transIndex && gif_state->transIndex != -1)
+            {
+                unsigned char rgb[3];
+                memcpy(rgb, &(gif_state->map->Colors[gif_state->buf[i]]), 3);
+
+                if(gif_state->back[0] == rgb[0] && gif_state->back[1] == rgb[1] && gif_state->back[2] == rgb[2] && gif_state->currentImage == 0)
+                    (scan+index*4)[3] = 0;
+                else if(gif_state->back[0] == rgb[0] && gif_state->back[1] == rgb[1] && gif_state->back[2] == rgb[2] && gif_state->lastDisposal != DISPOSE_BACKGROUND && gif_state->currentImage > 0)
+                {
+                    memcpy(scan+index*4, gif_state->Last[cc] + index*4, 4);// = 255;
+                }
+                else if(gif_state->back[0] == rgb[0] && gif_state->back[1] == rgb[1] && gif_state->back[2] == rgb[2] && gif_state->lastDisposal == DISPOSE_BACKGROUND && gif_state->currentImage > 0)
+                {
+                    (scan+index*4)[3] = 0;
+                }
+                else if(gif_state->currentImage > 0)
+                {
+                    if(gif_state->lastDisposal == DISPOSE_BACKGROUND)
+                    {
+                        memcpy(scan+index*4, &gif_state->back, 4);//(scan+index)->a=0;
+
+                        if((gif_state->Last[cc] + index*4)[3] == 0)
+                            (scan+index*4)[3]=0;
+                    }
+                }
+            }// if transIndex
+            else
+            {
+                memcpy(scan+index*4, &(gif_state->map->Colors[gif_state->buf[i]]), 3);
+                (scan+index*4)[3] = 255;
+            }
+        } // for
+
+        memcpy(gif_state->Last[cc], scan, image->width * 4);
     }
     }
     return SAIL_OK;
