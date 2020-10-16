@@ -49,9 +49,9 @@ struct gif_state {
     GifByteType *Extension;
     unsigned char *buf;
     unsigned char *saved;
-    int layer, line;
-    int j,
-        transIndex, Lines_h, linesz, disposal, lastDisposal, currentImage, currentPass;
+    int layer;
+    unsigned j;
+    int transIndex, Lines_h, linesz, disposal, lastDisposal, currentImage, currentPass;
     unsigned Row, Col, Width, Height, lastRow, lastCol, lastWidth, lastHeight;
     unsigned char **Lines, **Last;
     unsigned char back[4]; /* RGBA */
@@ -76,13 +76,11 @@ static sail_status_t alloc_gif_state(struct gif_state **gif_state) {
     (*gif_state)->buf           = NULL;
     (*gif_state)->saved         = NULL;
     (*gif_state)->transIndex    = -1;
-    (*gif_state)->Lines         = NULL;
-    (*gif_state)->Last          = NULL;
-    (*gif_state)->map           = NULL;
     (*gif_state)->layer         = -1;
-    (*gif_state)->line          = 0;
     (*gif_state)->lastDisposal  = DISPOSAL_UNSPECIFIED;
     (*gif_state)->currentImage  = -1;
+    (*gif_state)->Last          = NULL;
+    (*gif_state)->map           = NULL;
 
     return SAIL_OK;
 }
@@ -98,14 +96,6 @@ static void destroy_gif_state(struct gif_state *gif_state) {
 
     sail_free(gif_state->buf);
     sail_free(gif_state->saved);
-
-    if (gif_state->Lines != NULL) {
-        for(int i = 0; i < gif_state->Lines_h; i++) {
-            sail_free(gif_state->Lines[i]);
-        }
-
-        sail_free(gif_state->Lines);
-    }
 
     if (gif_state->Last != NULL) {
         for(int i = 0; i < gif_state->Lines_h; i++) {
@@ -153,14 +143,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v3(struct sail_io *io, const stru
     /* Initialize internal structs. */
     gif_state->linesz = gif_state->gif->SWidth * sizeof(GifPixelType);
 
-    void *ptr;
-
-    SAIL_TRY(sail_malloc(gif_state->linesz, &ptr));
-    gif_state->buf = ptr;
-
-    SAIL_TRY(sail_malloc(gif_state->linesz * 4, &ptr)); /* 4 = RGBA */
-    gif_state->saved = ptr;
-
     if (gif_state->gif->SColorMap != NULL) {
         gif_state->back[0] = gif_state->gif->SColorMap->Colors[gif_state->gif->SBackGroundColor].Red;
         gif_state->back[1] = gif_state->gif->SColorMap->Colors[gif_state->gif->SBackGroundColor].Green;
@@ -170,23 +152,26 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v3(struct sail_io *io, const stru
         memset(&gif_state->back, 0, sizeof(gif_state->back));
     }
 
+    void *ptr;
+
+    SAIL_TRY(sail_malloc(gif_state->linesz, &ptr));
+    gif_state->buf = ptr;
+
+    SAIL_TRY(sail_malloc(gif_state->linesz * 4, &ptr)); /* 4 = RGBA */
+    gif_state->saved = ptr;
+
     gif_state->Lines_h = gif_state->gif->SHeight;
-
-    SAIL_TRY(sail_malloc(gif_state->Lines_h * sizeof(unsigned char *), &ptr));
-    gif_state->Lines = ptr;
-
-    for (int i = 0; i < gif_state->Lines_h; i++) {
-        gif_state->Lines[i] = NULL;
-    }
-
-    gif_state->map = (gif_state->gif->Image.ColorMap != NULL) ? gif_state->gif->Image.ColorMap : gif_state->gif->SColorMap;
 
     SAIL_TRY(sail_malloc(gif_state->Lines_h * sizeof(unsigned char *), &ptr));
     gif_state->Last = ptr;
 
     for (int i = 0; i < gif_state->Lines_h; i++) {
-        SAIL_TRY(sail_calloc(gif_state->gif->SWidth, 4, &ptr)); /* 4 = RGBA */
+        SAIL_TRY(sail_malloc(gif_state->gif->SWidth * 4, &ptr)); /* 4 = RGBA */
         gif_state->Last[i] = ptr;
+
+        for (int k = 0; k < gif_state->gif->SWidth; k++) {
+            memcpy(gif_state->Last[i] + k*4, &gif_state->back, 4); /* 4 = RGBA */
+        }
     }
 
     return SAIL_OK;
@@ -207,15 +192,16 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
     (*image)->source_image->compression = SAIL_COMPRESSION_LZW;
     (*image)->source_image->pixel_format = SAIL_PIXEL_FORMAT_BPP8_INDEXED;
 
-    /* Loop through records. */
-    bool foundExt = false;
-
     gif_state->currentImage++;
 
-    GifRecordType record;
+    gif_state->lastDisposal = gif_state->disposal;
+    gif_state->disposal     = DISPOSAL_UNSPECIFIED;
+    gif_state->transIndex   = -1;
+    gif_state->disposal     = DISPOSAL_UNSPECIFIED;
 
+    /* Loop through records. */
     while (true) {
-        int ExtCode;
+        GifRecordType record;
 
         if (DGifGetRecordType(gif_state->gif, &record) == GIF_ERROR) {
             SAIL_LOG_ERROR("GIF: %s", GifErrorString(gif_state->gif->Error));
@@ -227,13 +213,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
                 if (DGifGetImageDesc(gif_state->gif) == GIF_ERROR) {
                     SAIL_LOG_ERROR("GIF: %s", GifErrorString(gif_state->gif->Error));
                     return SAIL_ERROR_UNDERLYING_CODEC;
-                }
-
-                if (!foundExt) {
-                    gif_state->lastDisposal = gif_state->disposal;
-                    gif_state->disposal = DISPOSAL_UNSPECIFIED;
-                    gif_state->transIndex = -1;
-                    (*image)->delay = 100;
                 }
 
                 (*image)->width = gif_state->gif->SWidth;
@@ -255,47 +234,68 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
             }
             break;
 
-            case EXTENSION_RECORD_TYPE:
+            case EXTENSION_RECORD_TYPE: {
+                int ExtCode;
+
                 if (DGifGetExtension(gif_state->gif, &ExtCode, &gif_state->Extension) == GIF_ERROR) {
                     SAIL_LOG_ERROR("GIF: %s", GifErrorString(gif_state->gif->Error));
                     return SAIL_ERROR_UNDERLYING_CODEC;
                 }
 
-                if (ExtCode == 249) {
-                    foundExt = true;
+                switch (ExtCode) {
+                    case GRAPHICS_EXT_FUNC_CODE: {
+                        /* Disposal method. */
+                        gif_state->disposal = (gif_state->Extension[1] >> 2) & 7;
 
-                    gif_state->lastDisposal = gif_state->disposal;
-                    gif_state->disposal = (gif_state->Extension[1] >> 2) & 7;
-                    bool b = gif_state->Extension[1] & 1;
-                    int u = (unsigned)(*(gif_state->Extension + 2));
-                    (*image)->delay = (u == 0) ? 100 : (u * 10);
+                        /* Delay in 1/100 of seconds. */
+                        unsigned delay = *(uint16_t *)(gif_state->Extension + 2);
+                        (*image)->delay = delay * 10;
 
-                    if (b) {
-                        gif_state->transIndex = gif_state->Extension[4];
+                        /* Transparent index. */
+                        if (gif_state->Extension[1] & 1) {
+                            gif_state->transIndex = gif_state->Extension[4];
+                        }
+                        break;
                     }
-                } else if(ExtCode == 254) {
-                    const int length = gif_state->Extension[0];
 
-                    if (gif_state->read_options->io_options & SAIL_IO_OPTION_META_DATA && length > 0) {
-                        struct sail_meta_data_node *meta_data_node;
+                    case COMMENT_EXT_FUNC_CODE: {
+                        const int length = gif_state->Extension[0];
 
-                        SAIL_TRY(sail_alloc_meta_data_node(&meta_data_node));
-                        meta_data_node->key = SAIL_META_DATA_COMMENT;
-                        meta_data_node->value_type = SAIL_META_DATA_TYPE_STRING;
-                        SAIL_TRY_OR_CLEANUP(sail_strdup_length((const char *)(gif_state->Extension + 1), length, &meta_data_node->value_string),
-                                            /* cleanup */ sail_destroy_meta_data_node(meta_data_node));
+                        if (gif_state->read_options->io_options & SAIL_IO_OPTION_META_DATA && length > 0) {
+                            /* Allocate a new meta data entry. */
+                            struct sail_meta_data_node *meta_data_node;
 
-                        (*image)->meta_data_node = meta_data_node;
+                            SAIL_TRY(sail_alloc_meta_data_node(&meta_data_node));
+
+                            meta_data_node->key = SAIL_META_DATA_COMMENT;
+                            meta_data_node->value_type = SAIL_META_DATA_TYPE_STRING;
+
+                            SAIL_TRY_OR_CLEANUP(sail_strdup_length((const char *)(gif_state->Extension + 1), length, &meta_data_node->value_string),
+                                                /* cleanup */ sail_destroy_meta_data_node(meta_data_node));
+
+                            /* Save it as a last meta data node in the image. */
+                            struct sail_meta_data_node **last_meta_data_node = &(*image)->meta_data_node;
+
+                            while (*last_meta_data_node != NULL) {
+                                *last_meta_data_node = (*last_meta_data_node)->next;
+                            }
+
+                            *last_meta_data_node = meta_data_node;
+                        }
+                        break;
                     }
                 }
 
+                /* We don't support other extension types, so just skip them. */
                 while (gif_state->Extension != NULL) {
                     if (DGifGetExtensionNext(gif_state->gif, &gif_state->Extension) == GIF_ERROR) {
                         SAIL_LOG_ERROR("GIF: %s", GifErrorString(gif_state->gif->Error));
                         return SAIL_ERROR_UNDERLYING_CODEC;
                     }
                 }
-            break;
+
+                break;
+            }
 
             case TERMINATE_RECORD_TYPE: {
                  return SAIL_ERROR_NO_MORE_FRAMES;
@@ -312,6 +312,11 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
             }
 
             gif_state->map = (gif_state->gif->Image.ColorMap != NULL) ? gif_state->gif->Image.ColorMap : gif_state->gif->SColorMap;
+
+            if (gif_state->map == NULL) {
+                return SAIL_ERROR_MISSING_PALETTE;
+            }
+
             gif_state->back[3] = (gif_state->transIndex == -1) ? 255 : 0;
 
             for (int k = 0; k < gif_state->gif->SWidth; k++) {
@@ -353,7 +358,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_pass_v3(void *state, struct 
 
     gif_state->layer++;
     gif_state->currentPass++;
-    gif_state->line = 0;
 
     return SAIL_OK;
 }
@@ -369,18 +373,20 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v3(void *state, struct sail_io *
     for (unsigned cc = 0; cc < image->height; cc++) {
     unsigned char *scan = (unsigned char *)image->pixels + image->width*4*cc;
 
+    /* Apply disposal method on the previous frame. */
     if(cc < gif_state->Row || cc >= gif_state->Row + gif_state->Height)
     {
-        if (gif_state->currentPass == image->interlaced_passes-1)
+        if(gif_state->currentPass == image->interlaced_passes-1 && cc >= gif_state->lastRow && cc < gif_state->lastRow + gif_state->lastHeight)
         {
-            memcpy(scan, gif_state->Last[cc], image->width * 4);
-
             if(gif_state->lastDisposal == DISPOSE_BACKGROUND)
-                if(cc >= gif_state->lastRow && cc < gif_state->lastRow + gif_state->lastHeight)
-                {
-                    memcpy(scan + gif_state->lastCol*4, gif_state->saved, gif_state->lastWidth * 4);
-                    memcpy(gif_state->Last[cc], scan, image->width * 4);
-                }
+            {
+                memcpy(scan + gif_state->lastCol*4, gif_state->saved, gif_state->lastWidth * 4);
+                memcpy(gif_state->Last[cc], scan, image->width * 4);
+            }
+            else
+            {
+                memcpy(scan, gif_state->Last[cc], image->width * 4);
+            }
         }
 
         continue;
@@ -388,12 +394,14 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v3(void *state, struct sail_io *
 
     if(gif_state->gif->Image.Interlace)
     {
-        memcpy(scan, gif_state->Last[cc], image->width * 4);
-
-        if(gif_state->line == 0)
+        if(cc == 0)
             gif_state->j = InterlacedOffset[gif_state->layer];
 
-        if(gif_state->line == gif_state->j)
+/* TODO */
+            if (gif_state->currentPass == 0)
+                memset(scan, 0, image->width * 4);
+
+        if(cc == gif_state->j)
         {
             if(DGifGetLine(gif_state->gif, gif_state->buf, gif_state->Width) == GIF_ERROR)
             {
@@ -439,22 +447,10 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v3(void *state, struct sail_io *
                     (scan+index*4)[3] = 255;
                 }
             }
-
-            SAIL_TRY(sail_realloc(image->width * 4, &gif_state->Lines[gif_state->line]));
-            memcpy(gif_state->Lines[gif_state->line], scan, image->width * 4);
         } // if(line == j)
-        else
-        {
-            if(gif_state->Lines[gif_state->line] != NULL)
-                memcpy(scan, gif_state->Lines[gif_state->line], image->width * 4);
-            else
-                memset(scan, 255, image->width * 4);
-        }
 
         if(gif_state->currentPass == image->interlaced_passes-1)
             memcpy(gif_state->Last[cc], scan, image->width * 4);
-
-        gif_state->line++;
     }
     else // !s32erlaced
     {
