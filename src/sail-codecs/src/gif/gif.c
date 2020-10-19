@@ -270,28 +270,15 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
                     }
 
                     case COMMENT_EXT_FUNC_CODE: {
-                        const int length = gif_state->Extension[0];
+                        if (gif_state->read_options->io_options & SAIL_IO_OPTION_META_DATA) {
+                            SAIL_TRY(fetch_comment(gif_state->Extension, &(*image)->meta_data_node));
+                        }
+                        break;
+                    }
 
-                        if (gif_state->read_options->io_options & SAIL_IO_OPTION_META_DATA && length > 0) {
-                            /* Allocate a new meta data entry. */
-                            struct sail_meta_data_node *meta_data_node;
-
-                            SAIL_TRY(sail_alloc_meta_data_node(&meta_data_node));
-
-                            meta_data_node->key = SAIL_META_DATA_COMMENT;
-                            meta_data_node->value_type = SAIL_META_DATA_TYPE_STRING;
-
-                            SAIL_TRY_OR_CLEANUP(sail_strdup_length((const char *)(gif_state->Extension + 1), length, &meta_data_node->value_string),
-                                                /* cleanup */ sail_destroy_meta_data_node(meta_data_node));
-
-                            /* Save it as a last meta data node in the image. */
-                            struct sail_meta_data_node **last_meta_data_node = &(*image)->meta_data_node;
-
-                            while (*last_meta_data_node != NULL) {
-                                *last_meta_data_node = (*last_meta_data_node)->next;
-                            }
-
-                            *last_meta_data_node = meta_data_node;
+                    case APPLICATION_EXT_FUNC_CODE: {
+                        if (gif_state->read_options->io_options & SAIL_IO_OPTION_META_DATA) {
+                            SAIL_TRY(fetch_application(gif_state->Extension, &(*image)->meta_data_node));
                         }
                         break;
                     }

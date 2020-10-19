@@ -26,9 +26,6 @@
 #ifndef SAIL_GIF_HELPERS_H
 #define SAIL_GIF_HELPERS_H
 
-#include <stdarg.h>
-#include <stdio.h>
-
 #include <gif_lib.h>
 
 #include "common.h"
@@ -39,16 +36,8 @@ struct sail_meta_data_node;
 
 SAIL_HIDDEN sail_status_t supported_read_output_pixel_format(enum SailPixelFormat pixel_format);
 
-#if 0
-SAIL_HIDDEN enum SailCompression gif_compression_to_sail_compression(int compression);
+SAIL_HIDDEN sail_status_t fetch_comment(const GifByteType *extension, struct sail_meta_data_node **image_meta_data_node);
 
-SAIL_HIDDEN sail_status_t sail_compression_to_gif_compression(enum SailCompression compression, int *gif_compression);
-
-SAIL_HIDDEN sail_status_t fetch_meta_data(TIFF *gif, struct sail_meta_data_node ***last_meta_data_node);
-
-SAIL_HIDDEN sail_status_t write_meta_data(TIFF *gif, const struct sail_meta_data_node *meta_data_node);
-
-SAIL_HIDDEN sail_status_t supported_write_output_pixel_format(enum SailPixelFormat pixel_format);
-#endif
+SAIL_HIDDEN sail_status_t fetch_application(const GifByteType *extension, struct sail_meta_data_node **image_meta_data_node);
 
 #endif
