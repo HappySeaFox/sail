@@ -77,8 +77,18 @@ static sail_status_t alloc_gif_state(struct gif_state **gif_state) {
     (*gif_state)->saved         = NULL;
     (*gif_state)->transIndex    = -1;
     (*gif_state)->layer         = -1;
+    (*gif_state)->disposal      = DISPOSAL_UNSPECIFIED;
     (*gif_state)->lastDisposal  = DISPOSAL_UNSPECIFIED;
     (*gif_state)->currentImage  = -1;
+    (*gif_state)->currentPass   = -1;
+    (*gif_state)->Row           = 0;
+    (*gif_state)->Col           = 0;
+    (*gif_state)->Width         = 0;
+    (*gif_state)->Height        = 0;
+    (*gif_state)->lastRow       = 0;
+    (*gif_state)->lastCol       = 0;
+    (*gif_state)->lastWidth     = 0;
+    (*gif_state)->lastHeight    = 0;
     (*gif_state)->Last          = NULL;
     (*gif_state)->map           = NULL;
 
@@ -166,12 +176,13 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v3(struct sail_io *io, const stru
     gif_state->Last = ptr;
 
     for (int i = 0; i < gif_state->Lines_h; i++) {
-        SAIL_TRY(sail_malloc(gif_state->gif->SWidth * 4, &ptr)); /* 4 = RGBA */
+        SAIL_TRY(sail_calloc(gif_state->gif->SWidth, 4, &ptr)); /* 4 = RGBA */
         gif_state->Last[i] = ptr;
-
+#if 0
         for (int k = 0; k < gif_state->gif->SWidth; k++) {
             memcpy(gif_state->Last[i] + k*4, &gif_state->back, 4); /* 4 = RGBA */
         }
+#endif
     }
 
     return SAIL_OK;
@@ -197,7 +208,11 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
     gif_state->lastDisposal = gif_state->disposal;
     gif_state->disposal     = DISPOSAL_UNSPECIFIED;
     gif_state->transIndex   = -1;
-    gif_state->disposal     = DISPOSAL_UNSPECIFIED;
+
+    gif_state->lastRow    = gif_state->Row;
+    gif_state->lastCol    = gif_state->Col;
+    gif_state->lastWidth  = gif_state->Width;
+    gif_state->lastHeight = gif_state->Height;
 
     /* Loop through records. */
     while (true) {
@@ -218,21 +233,17 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
                 (*image)->width = gif_state->gif->SWidth;
                 (*image)->height = gif_state->gif->SHeight;
 
-                gif_state->lastRow = (gif_state->currentImage > 0) ? gif_state->Row : gif_state->gif->Image.Top;
-                gif_state->lastCol = (gif_state->currentImage > 0) ? gif_state->Col : gif_state->gif->Image.Left;
-                gif_state->Row = gif_state->gif->Image.Top;
-                gif_state->Col = gif_state->gif->Image.Left;
-                gif_state->lastWidth = (gif_state->currentImage > 0) ? gif_state->Width : gif_state->gif->Image.Width;
-                gif_state->lastHeight = (gif_state->currentImage > 0) ? gif_state->Height : gif_state->gif->Image.Height;
-                gif_state->Width = gif_state->gif->Image.Width;
+                gif_state->Row    = gif_state->gif->Image.Top;
+                gif_state->Col    = gif_state->gif->Image.Left;
+                gif_state->Width  = gif_state->gif->Image.Width;
                 gif_state->Height = gif_state->gif->Image.Height;
 
                 if (gif_state->gif->Image.Left + gif_state->gif->Image.Width > gif_state->gif->SWidth ||
                         gif_state->gif->Image.Top + gif_state->gif->Image.Height > gif_state->gif->SHeight) {
-                    return SAIL_ERROR_UNDERLYING_CODEC;
+                    return SAIL_ERROR_INCORRECT_IMAGE_DIMENSIONS;
                 }
+                break;
             }
-            break;
 
             case EXTENSION_RECORD_TYPE: {
                 int ExtCode;
@@ -249,7 +260,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
 
                         /* Delay in 1/100 of seconds. */
                         unsigned delay = *(uint16_t *)(gif_state->Extension + 2);
-                        (*image)->delay = delay * 10;
+                        (*image)->delay = (delay == 0) ? 100 : delay * 10;
 
                         /* Transparent index. */
                         if (gif_state->Extension[1] & 1) {
@@ -298,7 +309,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
             }
 
             case TERMINATE_RECORD_TYPE: {
-                 return SAIL_ERROR_NO_MORE_FRAMES;
+                return SAIL_ERROR_NO_MORE_FRAMES;
             }
 
             default: {
@@ -370,13 +381,11 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v3(void *state, struct sail_io *
 
     struct gif_state *gif_state = (struct gif_state *)state;
 
-    for (unsigned cc = 0; cc < image->height; cc++) {
-    unsigned char *scan = (unsigned char *)image->pixels + image->width*4*cc;
-
     /* Apply disposal method on the previous frame. */
-    if(cc < gif_state->Row || cc >= gif_state->Row + gif_state->Height)
-    {
-        if(gif_state->currentPass == image->interlaced_passes-1 && cc >= gif_state->lastRow && cc < gif_state->lastRow + gif_state->lastHeight)
+    for (unsigned cc = gif_state->lastRow; cc < gif_state->lastRow+gif_state->lastHeight; cc++) {
+        unsigned char *scan = (unsigned char *)image->pixels + image->width*4*cc;
+
+        if(gif_state->currentImage > 0 && gif_state->currentPass == 0)
         {
             if(gif_state->lastDisposal == DISPOSE_BACKGROUND)
             {
@@ -388,126 +397,67 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v3(void *state, struct sail_io *
                 memcpy(scan, gif_state->Last[cc], image->width * 4);
             }
         }
-
-        continue;
     }
 
-    if(gif_state->gif->Image.Interlace)
-    {
-        if(cc == 0)
-            gif_state->j = InterlacedOffset[gif_state->layer];
+    /* Read lines. */
+    for (unsigned cc = 0; cc < image->height; cc++) {
+        unsigned char *scan = (unsigned char *)image->pixels + image->width*4*cc;
 
-/* TODO */
-            if (gif_state->currentPass == 0)
-                memset(scan, 0, image->width * 4);
-
-        if(cc == gif_state->j)
+        if(cc < gif_state->Row || cc >= gif_state->Row + gif_state->Height)
         {
+            if (gif_state->currentPass == 0) {
+                memcpy(scan, gif_state->Last[cc], image->width * 4);
+            }
+
+            continue;
+        }
+
+        /* In interlaced mode we skip some lines. */
+        bool do_read = false;
+
+        if(gif_state->gif->Image.Interlace)
+        {
+            if(cc == gif_state->Row)
+                gif_state->j = InterlacedOffset[gif_state->layer] + gif_state->Row;
+
+            if(cc == gif_state->j)
+            {
+                do_read = true;
+                gif_state->j += InterlacedJumps[gif_state->layer];
+            }
+        }
+        else // !s32erlaced
+        {
+            do_read = true;
+        }
+
+        if (do_read) {
             if(DGifGetLine(gif_state->gif, gif_state->buf, gif_state->Width) == GIF_ERROR)
             {
                 SAIL_LOG_ERROR("GIF: %s", GifErrorString(gif_state->gif->Error));
                 return SAIL_ERROR_UNDERLYING_CODEC;
             }
 
-            gif_state->j += InterlacedJumps[gif_state->layer];
+            memcpy(scan, gif_state->Last[cc], image->width * 4);
 
-            for(unsigned i = 0;i < gif_state->Width;i++)
+            for(unsigned i = 0; i < gif_state->Width; i++)
             {
-                int index = gif_state->Col + i;
-
-                if(gif_state->buf[i] == gif_state->transIndex && gif_state->transIndex != -1)
+                if(gif_state->buf[i] != gif_state->transIndex)
                 {
-                    unsigned char rgb[3];
-                    memcpy(rgb, &(gif_state->map->Colors[gif_state->buf[i]]), 3);
+                    const int index = gif_state->Col + i;
 
-                    if(gif_state->back[0] == rgb[0] && gif_state->back[1] == rgb[1] && gif_state->back[2] == rgb[2] && gif_state->currentImage == 0)
-                        (scan+index*4)[3] = 0;
-                    else if(gif_state->back[0] == rgb[0] && gif_state->back[1] == rgb[1] && gif_state->back[2] == rgb[2] && gif_state->lastDisposal != DISPOSE_BACKGROUND && gif_state->currentImage > 0)
-                    {
-                        memcpy(scan+index*4, gif_state->Last[cc] + index*4, 4);
-                    }
-                    else if(gif_state->back[0] == rgb[0] && gif_state->back[1] == rgb[1] && gif_state->back[2] == rgb[2] && gif_state->lastDisposal == DISPOSE_BACKGROUND && gif_state->currentImage > 0)
-                    {
-                        (scan+index*4)[3] = 0;
-                    }
-                    else if(gif_state->currentImage > 0)
-                    {
-                        if(gif_state->lastDisposal == DISPOSE_BACKGROUND)
-                        {
-                            memcpy(scan+index*4, &gif_state->back, 4);//(scan+index)->a=0;
-
-                            if((gif_state->Last[cc] + index*4)[3] == 0)
-                            (scan+index*4)[3]=0;
-                        }
-                    }
-                }
-                else
-                {
                     memcpy(scan+index*4, &(gif_state->map->Colors[gif_state->buf[i]]), 3);
                     (scan+index*4)[3] = 255;
                 }
-            }
-        } // if(line == j)
+            } // for
+        }
 
         if(gif_state->currentPass == image->interlaced_passes-1)
+        {
             memcpy(gif_state->Last[cc], scan, image->width * 4);
-    }
-    else // !s32erlaced
-    {
-        if(DGifGetLine(gif_state->gif, gif_state->buf, gif_state->Width) == GIF_ERROR)
-        {
-            SAIL_LOG_ERROR("GIF: %s", GifErrorString(gif_state->gif->Error));
-            return SAIL_ERROR_UNDERLYING_CODEC;
         }
-
-        memcpy(scan, gif_state->Last[cc], image->width * 4);
-
-        if(gif_state->lastDisposal == DISPOSE_BACKGROUND)
-        {
-            if(cc >= gif_state->lastRow && cc < gif_state->lastRow+gif_state->lastHeight)
-                memcpy(scan+gif_state->lastCol*4, gif_state->saved, gif_state->lastWidth * 4);
-        }
-
-        for(unsigned i = 0; i < gif_state->Width; i++)
-        {
-            int index = gif_state->Col + i;
-
-            if(gif_state->buf[i] == gif_state->transIndex && gif_state->transIndex != -1)
-            {
-                unsigned char rgb[3];
-                memcpy(rgb, &(gif_state->map->Colors[gif_state->buf[i]]), 3);
-
-                if(gif_state->back[0] == rgb[0] && gif_state->back[1] == rgb[1] && gif_state->back[2] == rgb[2] && gif_state->currentImage == 0)
-                    (scan+index*4)[3] = 0;
-                else if(gif_state->back[0] == rgb[0] && gif_state->back[1] == rgb[1] && gif_state->back[2] == rgb[2] && gif_state->lastDisposal != DISPOSE_BACKGROUND && gif_state->currentImage > 0)
-                {
-                    memcpy(scan+index*4, gif_state->Last[cc] + index*4, 4);// = 255;
-                }
-                else if(gif_state->back[0] == rgb[0] && gif_state->back[1] == rgb[1] && gif_state->back[2] == rgb[2] && gif_state->lastDisposal == DISPOSE_BACKGROUND && gif_state->currentImage > 0)
-                {
-                    (scan+index*4)[3] = 0;
-                }
-                else if(gif_state->currentImage > 0)
-                {
-                    if(gif_state->lastDisposal == DISPOSE_BACKGROUND)
-                    {
-                        memcpy(scan+index*4, &gif_state->back, 4);//(scan+index)->a=0;
-
-                        if((gif_state->Last[cc] + index*4)[3] == 0)
-                            (scan+index*4)[3]=0;
-                    }
-                }
-            }// if transIndex
-            else
-            {
-                memcpy(scan+index*4, &(gif_state->map->Colors[gif_state->buf[i]]), 3);
-                (scan+index*4)[3] = 255;
-            }
-        } // for
-
-        memcpy(gif_state->Last[cc], scan, image->width * 4);
     }
-    }
+
     return SAIL_OK;
 }
 
