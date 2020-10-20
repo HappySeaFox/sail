@@ -48,7 +48,6 @@ struct gif_state {
     GifFileType *gif;
     GifByteType *Extension;
     unsigned char *buf;
-    unsigned char *saved;
     int layer;
     unsigned j;
     int transIndex, Lines_h, linesz, disposal, lastDisposal, currentImage, currentPass;
@@ -74,7 +73,6 @@ static sail_status_t alloc_gif_state(struct gif_state **gif_state) {
     (*gif_state)->gif           = NULL;
     (*gif_state)->Extension     = NULL;
     (*gif_state)->buf           = NULL;
-    (*gif_state)->saved         = NULL;
     (*gif_state)->transIndex    = -1;
     (*gif_state)->layer         = -1;
     (*gif_state)->disposal      = DISPOSAL_UNSPECIFIED;
@@ -105,7 +103,6 @@ static void destroy_gif_state(struct gif_state *gif_state) {
     sail_destroy_write_options(gif_state->write_options);
 
     sail_free(gif_state->buf);
-    sail_free(gif_state->saved);
 
     if (gif_state->Last != NULL) {
         for(int i = 0; i < gif_state->Lines_h; i++) {
@@ -166,9 +163,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v3(struct sail_io *io, const stru
 
     SAIL_TRY(sail_malloc(gif_state->linesz, &ptr));
     gif_state->buf = ptr;
-
-    SAIL_TRY(sail_malloc(gif_state->linesz * 4, &ptr)); /* 4 = RGBA */
-    gif_state->saved = ptr;
 
     gif_state->Lines_h = gif_state->gif->SHeight;
 
@@ -315,12 +309,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
                 return SAIL_ERROR_MISSING_PALETTE;
             }
 
-            gif_state->back[3] = (gif_state->transIndex == -1) ? 255 : 0;
-
-            for (int k = 0; k < gif_state->gif->SWidth; k++) {
-                memcpy(gif_state->saved + k*4, &gif_state->back, 4); /* 4 = RGBA */
-            }
-
             if (gif_state->gif->Image.Interlace) {
                 (*image)->source_image->properties |= SAIL_IMAGE_PROPERTY_INTERLACED;
                 (*image)->interlaced_passes = 4;
@@ -376,7 +364,17 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v3(void *state, struct sail_io *
         {
             if(gif_state->lastDisposal == DISPOSE_BACKGROUND)
             {
-                memcpy(scan + gif_state->lastCol*4, gif_state->saved, gif_state->lastWidth * 4);
+                /*
+                 * Spec:
+                 *     2 - Restore to background color. The area used by the
+                 *         graphic must be restored to the background color.
+                 *
+                 * The meaning of the background color is not quite clear here. My idea was that
+                 * it's the color specified by the background color index in the global color map.
+                 * However, other decoders like XnView treat "background" as a transparent color here.
+                 * Let's do the same.
+                 */
+                memset(scan + gif_state->lastCol*4, 0, gif_state->lastWidth*4); /* 4 = RGBA */
                 memcpy(gif_state->Last[cc], scan, image->width * 4);
             }
             else
