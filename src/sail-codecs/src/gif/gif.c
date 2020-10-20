@@ -254,6 +254,11 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
 
                         /* Delay in 1/100 of seconds. */
                         unsigned delay = *(uint16_t *)(gif_state->Extension + 2);
+                        /*
+                         * 0 means as fast as possible. However, this makes the frame
+                         * almost invisible on modern CPUs. Let's make a small delay of 100 ms
+                         * in this case.
+                         */
                         (*image)->delay = (delay == 0) ? 100 : delay * 10;
 
                         /* Transparent index. */
