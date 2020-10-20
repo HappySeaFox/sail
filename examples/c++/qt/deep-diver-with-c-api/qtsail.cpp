@@ -79,6 +79,7 @@ sail_status_t QtSail::init()
     QTimer::singleShot(0, this, [&]{
         QMessageBox::information(this, tr("Features"), tr("This demo includes:"
                                                           "<ul>"
+                                                          "<li>Linking against SAIL CMake packages</li>"
                                                           "<li>Selecting pixel format to output</li>"
                                                           "<li>Displaying indexed images (if SOURCE is selected)</li>"
                                                           "<li>Printing all meta data entries into stderr</li>"

@@ -19,8 +19,6 @@ if (CMAKE_VERSION VERSION_LESS "3.7.0")
     set(CMAKE_INCLUDE_CURRENT_DIR ON)
 endif()
 
-find_package(PkgConfig REQUIRED)
-
 # Manifest to support Windows 10 is embedded into our RC file
 #
 set(RC_FILE "")
@@ -54,10 +52,8 @@ endif()
 
 # Add SAIL dependency
 #
-pkg_check_modules(SAIL IMPORTED_TARGET REQUIRED libsail)
-target_compile_options(deep-diver-with-c-api     PRIVATE "${SAIL_CFLAGS}")
-target_include_directories(deep-diver-with-c-api PRIVATE "${SAIL_INCLUDE_DIRS}")
-target_link_libraries(deep-diver-with-c-api      PkgConfig::SAIL)
+find_package(Sail REQUIRED)
+target_link_libraries(deep-diver-with-c-api SAIL::sail)
 
 # Add Qt5 dependency
 #
