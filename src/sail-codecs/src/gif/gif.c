@@ -151,9 +151,16 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v3(struct sail_io *io, const stru
     gif_state->linesz = gif_state->gif->SWidth * sizeof(GifPixelType);
 
     if (gif_state->gif->SColorMap != NULL) {
-        gif_state->back[0] = gif_state->gif->SColorMap->Colors[gif_state->gif->SBackGroundColor].Red;
-        gif_state->back[1] = gif_state->gif->SColorMap->Colors[gif_state->gif->SBackGroundColor].Green;
-        gif_state->back[2] = gif_state->gif->SColorMap->Colors[gif_state->gif->SBackGroundColor].Blue;
+        if (gif_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_RGBA) {
+            gif_state->back[0] = gif_state->gif->SColorMap->Colors[gif_state->gif->SBackGroundColor].Red;
+            gif_state->back[1] = gif_state->gif->SColorMap->Colors[gif_state->gif->SBackGroundColor].Green;
+            gif_state->back[2] = gif_state->gif->SColorMap->Colors[gif_state->gif->SBackGroundColor].Blue;
+        } else if (gif_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_BGRA) {
+            gif_state->back[0] = gif_state->gif->SColorMap->Colors[gif_state->gif->SBackGroundColor].Blue;
+            gif_state->back[1] = gif_state->gif->SColorMap->Colors[gif_state->gif->SBackGroundColor].Green;
+            gif_state->back[2] = gif_state->gif->SColorMap->Colors[gif_state->gif->SBackGroundColor].Red;
+        }
+
         gif_state->back[3] = 255;
     } else {
         memset(&gif_state->back, 0, sizeof(gif_state->back));
@@ -319,7 +326,11 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
                 (*image)->interlaced_passes = 4;
             }
 
-            (*image)->pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;
+            if (gif_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_RGBA) {
+                (*image)->pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;
+            } else if (gif_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_BGRA) {
+                (*image)->pixel_format = SAIL_PIXEL_FORMAT_BPP32_BGRA;
+            }
             SAIL_TRY_OR_CLEANUP(sail_bytes_per_line((*image)->width, (*image)->pixel_format, &(*image)->bytes_per_line),
                                 /* cleanup */ sail_destroy_image(*image));
 
@@ -432,13 +443,25 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v3(void *state, struct sail_io *
 
             for(unsigned i = 0; i < gif_state->Width; i++)
             {
-                if(gif_state->buf[i] != gif_state->transIndex)
+                if(gif_state->buf[i] == gif_state->transIndex)
                 {
-                    const int index = gif_state->Col + i;
-
-                    memcpy(scan+index*4, &(gif_state->map->Colors[gif_state->buf[i]]), 3);
-                    (scan+index*4)[3] = 255;
+                    continue;
                 }
+
+                const int index = gif_state->Col + i;
+                unsigned char *pixel = scan + index*4;
+
+                if (gif_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_RGBA) {
+                    pixel[0] = gif_state->map->Colors[gif_state->buf[i]].Red;
+                    pixel[1] = gif_state->map->Colors[gif_state->buf[i]].Green;
+                    pixel[2] = gif_state->map->Colors[gif_state->buf[i]].Blue;
+                } else if (gif_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_BGRA) {
+                    pixel[0] = gif_state->map->Colors[gif_state->buf[i]].Blue;
+                    pixel[1] = gif_state->map->Colors[gif_state->buf[i]].Green;
+                    pixel[2] = gif_state->map->Colors[gif_state->buf[i]].Red;
+                }
+
+                pixel[3] = 255;
             } // for
         }
 
