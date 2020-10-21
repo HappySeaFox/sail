@@ -141,7 +141,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v3(struct sail_io *io, const stru
     /* Initialize GIF. */
     int error_code;
     gif_state->gif = DGifOpen(io, my_read_proc, &error_code);
-    //gif_state->gif = DGifOpenFileName("D:\\images\\gif\\2.gif", &error_code);
 
     if (gif_state->gif == NULL) {
         SAIL_LOG_ERROR("GIF: Failed to initialize. GIFLIB error code: %d", error_code);
@@ -222,6 +221,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
 
         if (DGifGetRecordType(gif_state->gif, &record) == GIF_ERROR) {
             SAIL_LOG_ERROR("GIF: %s", GifErrorString(gif_state->gif->Error));
+            sail_destroy_image(*image);
             return SAIL_ERROR_UNDERLYING_CODEC;
         }
 
@@ -229,6 +229,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
             case IMAGE_DESC_RECORD_TYPE: {
                 if (DGifGetImageDesc(gif_state->gif) == GIF_ERROR) {
                     SAIL_LOG_ERROR("GIF: %s", GifErrorString(gif_state->gif->Error));
+                    sail_destroy_image(*image);
                     return SAIL_ERROR_UNDERLYING_CODEC;
                 }
 
@@ -242,6 +243,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
 
                 if (gif_state->gif->Image.Left + gif_state->gif->Image.Width > gif_state->gif->SWidth ||
                         gif_state->gif->Image.Top + gif_state->gif->Image.Height > gif_state->gif->SHeight) {
+                    sail_destroy_image(*image);
                     return SAIL_ERROR_INCORRECT_IMAGE_DIMENSIONS;
                 }
                 break;
@@ -252,6 +254,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
 
                 if (DGifGetExtension(gif_state->gif, &ExtCode, &gif_state->Extension) == GIF_ERROR) {
                     SAIL_LOG_ERROR("GIF: %s", GifErrorString(gif_state->gif->Error));
+                    sail_destroy_image(*image);
                     return SAIL_ERROR_UNDERLYING_CODEC;
                 }
 
@@ -278,14 +281,16 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
 
                     case COMMENT_EXT_FUNC_CODE: {
                         if (gif_state->read_options->io_options & SAIL_IO_OPTION_META_DATA) {
-                            SAIL_TRY(fetch_comment(gif_state->Extension, &(*image)->meta_data_node));
+                            SAIL_TRY_OR_CLEANUP(fetch_comment(gif_state->Extension, &(*image)->meta_data_node),
+                                                /* cleanup*/ sail_destroy_image(*image));
                         }
                         break;
                     }
 
                     case APPLICATION_EXT_FUNC_CODE: {
                         if (gif_state->read_options->io_options & SAIL_IO_OPTION_META_DATA) {
-                            SAIL_TRY(fetch_application(gif_state->Extension, &(*image)->meta_data_node));
+                            SAIL_TRY_OR_CLEANUP(fetch_application(gif_state->Extension, &(*image)->meta_data_node),
+                                                /* cleanup */ sail_destroy_image(*image));
                         }
                         break;
                     }
@@ -295,6 +300,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
                 while (gif_state->Extension != NULL) {
                     if (DGifGetExtensionNext(gif_state->gif, &gif_state->Extension) == GIF_ERROR) {
                         SAIL_LOG_ERROR("GIF: %s", GifErrorString(gif_state->gif->Error));
+                        sail_destroy_image(*image);
                         return SAIL_ERROR_UNDERLYING_CODEC;
                     }
                 }
@@ -303,6 +309,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
             }
 
             case TERMINATE_RECORD_TYPE: {
+                sail_destroy_image(*image);
                 return SAIL_ERROR_NO_MORE_FRAMES;
             }
 
@@ -319,6 +326,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
             gif_state->map = (gif_state->gif->Image.ColorMap != NULL) ? gif_state->gif->Image.ColorMap : gif_state->gif->SColorMap;
 
             if (gif_state->map == NULL) {
+                sail_destroy_image(*image);
                 return SAIL_ERROR_MISSING_PALETTE;
             }
 
