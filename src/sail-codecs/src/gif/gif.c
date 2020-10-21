@@ -350,11 +350,13 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
         }
     }
 
-    const char *pixel_format_str = NULL;
-    SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string((*image)->source_image->pixel_format, &pixel_format_str));
-    SAIL_LOG_DEBUG("GIF: Input pixel format is %s", pixel_format_str);
-    SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(gif_state->read_options->output_pixel_format, &pixel_format_str));
-    SAIL_LOG_DEBUG("GIF: Output pixel format is %s", pixel_format_str);
+    if (gif_state->currentImage == 0) {
+        const char *pixel_format_str = NULL;
+        SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string((*image)->source_image->pixel_format, &pixel_format_str));
+        SAIL_LOG_DEBUG("GIF: Input pixel format is %s", pixel_format_str);
+        SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(gif_state->read_options->output_pixel_format, &pixel_format_str));
+        SAIL_LOG_DEBUG("GIF: Output pixel format is %s", pixel_format_str);
+    }
 
     return SAIL_OK;
 }
@@ -505,34 +507,10 @@ SAIL_EXPORT sail_status_t sail_codec_read_finish_v3(void **state, struct sail_io
 SAIL_EXPORT sail_status_t sail_codec_write_init_v3(struct sail_io *io, const struct sail_write_options *write_options, void **state) {
 
     SAIL_CHECK_STATE_PTR(state);
-    *state = NULL;
-
     SAIL_CHECK_IO(io);
     SAIL_CHECK_WRITE_OPTIONS_PTR(write_options);
 
-    struct gif_state *gif_state;
-    SAIL_TRY(alloc_gif_state(&gif_state));
-
-    *state = gif_state;
-
-    /* Deep copy write options. */
-    SAIL_TRY(sail_copy_write_options(write_options, &gif_state->write_options));
-
-#if 0
-    /* Sanity check. */
-    SAIL_TRY(supported_write_output_pixel_format(gif_state->write_options->output_pixel_format));
-    SAIL_TRY(sail_compression_to_tiff_compression(gif_state->write_options->compression, &gif_state->write_compression));
-
-    /* Initialize GIF.
-     */
-    /* TODO */
-#endif
-
-    if (gif_state->gif == NULL) {
-        return SAIL_ERROR_UNDERLYING_CODEC;
-    }
-
-    return SAIL_OK;
+    return SAIL_ERROR_NOT_IMPLEMENTED;
 }
 
 SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v3(void *state, struct sail_io *io, const struct sail_image *image) {
@@ -541,23 +519,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v3(void *state, struc
     SAIL_CHECK_IO(io);
     SAIL_CHECK_IMAGE(image);
 
-    struct gif_state *gif_state = (struct gif_state *)state;
-
-#if 0
-    /* Write meta data. */
-    if (gif_state->write_options->io_options & SAIL_IO_OPTION_META_DATA && image->meta_data_node != NULL) {
-        /* TODO */
-        SAIL_LOG_DEBUG("GIF: Writing meta data");
-    }
-#endif
-
-    const char *pixel_format_str = NULL;
-    SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(image->pixel_format, &pixel_format_str));
-    SAIL_LOG_DEBUG("GIF: Input pixel format is %s", pixel_format_str);
-    SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(gif_state->write_options->output_pixel_format, &pixel_format_str));
-    SAIL_LOG_DEBUG("GIF: Output pixel format is %s", pixel_format_str);
-
-    return SAIL_OK;
+    return SAIL_ERROR_NOT_IMPLEMENTED;
 }
 
 SAIL_EXPORT sail_status_t sail_codec_write_seek_next_pass_v3(void *state, struct sail_io *io, const struct sail_image *image) {
@@ -566,7 +528,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_pass_v3(void *state, struct
     SAIL_CHECK_IO(io);
     SAIL_CHECK_IMAGE(image);
 
-    return SAIL_OK;
+    return SAIL_ERROR_NOT_IMPLEMENTED;
 }
 
 SAIL_EXPORT sail_status_t sail_codec_write_frame_v3(void *state, struct sail_io *io, const struct sail_image *image) {
@@ -575,9 +537,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_frame_v3(void *state, struct sail_io 
     SAIL_CHECK_IO(io);
     SAIL_CHECK_IMAGE(image);
 
-    struct gif_state *gif_state = (struct gif_state *)state;
-
-    return SAIL_OK;
+    return SAIL_ERROR_NOT_IMPLEMENTED;
 }
 
 SAIL_EXPORT sail_status_t sail_codec_write_finish_v3(void **state, struct sail_io *io) {
@@ -585,19 +545,5 @@ SAIL_EXPORT sail_status_t sail_codec_write_finish_v3(void **state, struct sail_i
     SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IO(io);
 
-    struct gif_state *gif_state = (struct gif_state *)(*state);
-
-    /* Subsequent calls to finish() will expectedly fail in the above line. */
-    *state = NULL;
-
-#if 0
-    /* Destroy internal TIFF objects. */
-    if (gif_state->tiff != NULL) {
-        /* TODO */
-    }
-#endif
-
-    destroy_gif_state(gif_state);
-
-    return SAIL_OK;
+    return SAIL_ERROR_NOT_IMPLEMENTED;
 }
