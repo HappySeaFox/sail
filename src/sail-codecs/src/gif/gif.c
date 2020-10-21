@@ -382,11 +382,11 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v3(void *state, struct sail_io *
     struct gif_state *gif_state = (struct gif_state *)state;
 
     /* Apply disposal method on the previous frame. */
-    for (unsigned cc = gif_state->lastRow; cc < gif_state->lastRow+gif_state->lastHeight; cc++) {
-        unsigned char *scan = (unsigned char *)image->pixels + image->width*4*cc;
+    if(gif_state->currentImage > 0 && gif_state->currentPass == 0)
+    {
+       for (unsigned cc = gif_state->lastRow; cc < gif_state->lastRow+gif_state->lastHeight; cc++) {
+            unsigned char *scan = (unsigned char *)image->pixels + image->width*4*cc;
 
-        if(gif_state->currentImage > 0 && gif_state->currentPass == 0)
-        {
             if(gif_state->lastDisposal == DISPOSE_BACKGROUND)
             {
                 /*
@@ -399,13 +399,10 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v3(void *state, struct sail_io *
                  * However, other decoders like XnView treat "background" as a transparent color here.
                  * Let's do the same.
                  */
-                memset(scan + gif_state->lastCol*4, 0, gif_state->lastWidth*4); /* 4 = RGBA */
-                memcpy(gif_state->Last[cc], scan, image->width * 4);
+                memset(gif_state->Last[cc] + gif_state->lastCol*4, 0, gif_state->lastWidth*4); /* 4 = RGBA */
             }
-            else
-            {
-                memcpy(scan, gif_state->Last[cc], image->width * 4);
-            }
+
+            memcpy(scan, gif_state->Last[cc], image->width * 4);
         }
     }
 
@@ -457,8 +454,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v3(void *state, struct sail_io *
                     continue;
                 }
 
-                const int index = gif_state->Col + i;
-                unsigned char *pixel = scan + index*4;
+                unsigned char *pixel = scan + (gif_state->Col + i)*4;
 
                 if (gif_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_RGBA) {
                     pixel[0] = gif_state->map->Colors[gif_state->buf[i]].Red;
