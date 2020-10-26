@@ -47,7 +47,6 @@ struct gif_state {
     struct sail_write_options *write_options;
 
     GifFileType *gif;
-    GifByteType *Extension;
     unsigned char *buf;
     int layer;
     unsigned j;
@@ -72,7 +71,6 @@ static sail_status_t alloc_gif_state(struct gif_state **gif_state) {
     (*gif_state)->write_options = NULL;
 
     (*gif_state)->gif           = NULL;
-    (*gif_state)->Extension     = NULL;
     (*gif_state)->buf           = NULL;
     (*gif_state)->transIndex    = -1;
     (*gif_state)->layer         = -1;
@@ -251,8 +249,9 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
 
             case EXTENSION_RECORD_TYPE: {
                 int ExtCode;
+                GifByteType *Extension;
 
-                if (DGifGetExtension(gif_state->gif, &ExtCode, &gif_state->Extension) == GIF_ERROR) {
+                if (DGifGetExtension(gif_state->gif, &ExtCode, &Extension) == GIF_ERROR) {
                     SAIL_LOG_ERROR("GIF: %s", GifErrorString(gif_state->gif->Error));
                     sail_destroy_image(*image);
                     return SAIL_ERROR_UNDERLYING_CODEC;
@@ -261,10 +260,10 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
                 switch (ExtCode) {
                     case GRAPHICS_EXT_FUNC_CODE: {
                         /* Disposal method. */
-                        gif_state->disposal = (gif_state->Extension[1] >> 2) & 7;
+                        gif_state->disposal = (Extension[1] >> 2) & 7;
 
                         /* Delay in 1/100 of seconds. */
-                        unsigned delay = *(uint16_t *)(gif_state->Extension + 2);
+                        unsigned delay = *(uint16_t *)(Extension + 2);
                         /*
                          * 0 means as fast as possible. However, this makes the frame
                          * almost invisible on modern CPUs. Let's make a small delay of 100 ms
@@ -273,15 +272,15 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
                         (*image)->delay = (delay == 0) ? 100 : delay * 10;
 
                         /* Transparent index. */
-                        if (gif_state->Extension[1] & 1) {
-                            gif_state->transIndex = gif_state->Extension[4];
+                        if (Extension[1] & 1) {
+                            gif_state->transIndex = Extension[4];
                         }
                         break;
                     }
 
                     case COMMENT_EXT_FUNC_CODE: {
                         if (gif_state->read_options->io_options & SAIL_IO_OPTION_META_DATA) {
-                            SAIL_TRY_OR_CLEANUP(fetch_comment(gif_state->Extension, &(*image)->meta_data_node),
+                            SAIL_TRY_OR_CLEANUP(fetch_comment(Extension, &(*image)->meta_data_node),
                                                 /* cleanup*/ sail_destroy_image(*image));
                         }
                         break;
@@ -289,7 +288,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
 
                     case APPLICATION_EXT_FUNC_CODE: {
                         if (gif_state->read_options->io_options & SAIL_IO_OPTION_META_DATA) {
-                            SAIL_TRY_OR_CLEANUP(fetch_application(gif_state->Extension, &(*image)->meta_data_node),
+                            SAIL_TRY_OR_CLEANUP(fetch_application(Extension, &(*image)->meta_data_node),
                                                 /* cleanup */ sail_destroy_image(*image));
                         }
                         break;
@@ -297,8 +296,8 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
                 }
 
                 /* We don't support other extension types, so just skip them. */
-                while (gif_state->Extension != NULL) {
-                    if (DGifGetExtensionNext(gif_state->gif, &gif_state->Extension) == GIF_ERROR) {
+                while (Extension != NULL) {
+                    if (DGifGetExtensionNext(gif_state->gif, &Extension) == GIF_ERROR) {
                         SAIL_LOG_ERROR("GIF: %s", GifErrorString(gif_state->gif->Error));
                         sail_destroy_image(*image);
                         return SAIL_ERROR_UNDERLYING_CODEC;
