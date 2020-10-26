@@ -53,7 +53,7 @@ struct gif_state {
     unsigned j;
     int transIndex, Lines_h, linesz, disposal, lastDisposal, currentImage, currentPass;
     unsigned Row, Col, Width, Height, lastRow, lastCol, lastWidth, lastHeight;
-    unsigned char **Lines, **Last;
+    unsigned char **Last;
     unsigned char back[4]; /* RGBA */
     const ColorMapObject *map;
 };
