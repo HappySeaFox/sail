@@ -28,7 +28,9 @@ SAIL is a fast and lightweight cross-platform image decoding and encoding librar
 from one-liners to complex use cases with custom I/O sources. It enables a client to read and write static,
 animated, multi-paged images along with their meta data and ICC profiles. :sailboat:
 
-![Screenshot](.github/qt-demo.png?raw=true)
+<p align="center">
+  <a href=".github/qt-demo.gif"><img src=".github/qt-demo.gif?raw=true" alt="GIF Demo Screenshot"/></a>
+</p>
 
 ## Target audience
 
