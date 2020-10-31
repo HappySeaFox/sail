@@ -123,48 +123,57 @@ enum SailStatus {
 typedef enum SailStatus sail_status_t;
 
 /*
+ * Log failure and return (internal).
+ */
+#define __SAIL_LFAR(code)        \
+do {                             \
+    SAIL_LOG_ERROR("%s", #code); \
+    return code;                 \
+} while(0)
+
+/*
  * Helper macros.
  */
-#define SAIL_CHECK_IO(io)              \
-do {                                   \
-    if (io == NULL) {                  \
-        return SAIL_ERROR_IO_NULL_PTR; \
-    }                                  \
-    if (io->read == NULL      ||       \
-            io->seek == NULL  ||       \
-            io->tell == NULL  ||       \
-            io->write == NULL ||       \
-            io->flush == NULL ||       \
-            io->close == NULL ||       \
-            io->eof == NULL) {         \
-        return SAIL_ERROR_INVALID_IO;  \
-    }                                  \
+#define SAIL_CHECK_IO(io)                    \
+do {                                         \
+    if (io == NULL) {                        \
+        __SAIL_LFAR(SAIL_ERROR_IO_NULL_PTR); \
+    }                                        \
+    if (io->read == NULL      ||             \
+            io->seek == NULL  ||             \
+            io->tell == NULL  ||             \
+            io->write == NULL ||             \
+            io->flush == NULL ||             \
+            io->close == NULL ||             \
+            io->eof == NULL) {               \
+        __SAIL_LFAR(SAIL_ERROR_INVALID_IO);  \
+    }                                        \
 } while(0)
 
-#define SAIL_CHECK_IMAGE(image)                       \
-do {                                                  \
-    if (image == NULL) {                              \
-        return SAIL_ERROR_IMAGE_NULL_PTR;             \
-    }                                                 \
-    if (image->width == 0 || image->height == 0) {    \
-        return SAIL_ERROR_INCORRECT_IMAGE_DIMENSIONS; \
-    }                                                 \
-    if (image->bytes_per_line == 0) {                 \
-        return SAIL_ERROR_INCORRECT_BYTES_PER_LINE;   \
-    }                                                 \
+#define SAIL_CHECK_IMAGE(image)                             \
+do {                                                        \
+    if (image == NULL) {                                    \
+        __SAIL_LFAR(SAIL_ERROR_IMAGE_NULL_PTR);             \
+    }                                                       \
+    if (image->width == 0 || image->height == 0) {          \
+        __SAIL_LFAR(SAIL_ERROR_INCORRECT_IMAGE_DIMENSIONS); \
+    }                                                       \
+    if (image->bytes_per_line == 0) {                       \
+        __SAIL_LFAR(SAIL_ERROR_INCORRECT_BYTES_PER_LINE);   \
+    }                                                       \
 } while(0)
 
-#define SAIL_CHECK_PTR(ptr)         \
-do {                                \
-    if (ptr == NULL) {              \
-        return SAIL_ERROR_NULL_PTR; \
-    }                               \
+#define SAIL_CHECK_PTR(ptr)               \
+do {                                      \
+    if (ptr == NULL) {                    \
+        __SAIL_LFAR(SAIL_ERROR_NULL_PTR); \
+    }                                     \
 } while(0)
 
 #define SAIL_CHECK_PTR2(ptr, ret) \
 do {                              \
     if (ptr == NULL) {            \
-        return ret;               \
+        __SAIL_LFAR(ret);         \
     }                             \
 } while(0)
 
