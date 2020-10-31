@@ -1,14 +1,7 @@
 | N  | Image format                                                | Read Features | Write features    | Dependencies      |
 | -- | ----------------------------------------------------------- | ------------- | ----------------- | ----------------- |
-| 1  | [APNG](https://wikipedia.org/wiki/APNG)                     | SADI          | -                 | libpng+APNG patch |
-| 1  | [GIF](https://wikipedia.org/wiki/GIF)                       | SAD           | -                 | giflib            |
-| 2  | [JPEG](https://wikipedia.org/wiki/JPEG)                     | SDI           | SDI               | libjpeg-turbo     |
-| 3  | [PNG](https://wikipedia.org/wiki/Portable_Network_Graphics) | SDI           | SDI               | libpng            |
-| 4  | [TIFF](https://wikipedia.org/wiki/TIFF)                     | SMDI          | SMDI              | libtiff           |
-
-**S** - Static images<br/>
-**M** - Multi-framed images<br/>
-**A** - Animated images<br/>
-**D** - Meta data<br/>
-**I** - ICC profiles<br/>
-**-** - Unsupported
+| 1  | [APNG](https://wikipedia.org/wiki/APNG)                     | <ul><li> - [x] Static</li><li> - [x] Animated</li><li> - [x] Meta data</li><li> - [x] ICC profiles</li></ul>     | Unsupported                                                                                                      | libpng+APNG patch |
+| 1  | [GIF](https://wikipedia.org/wiki/GIF)                       | <ul><li> - [x] Static</li><li> - [x] Animated</li><li> - [x] Meta data</li></ul>                                 | Unsupported                                                                                                      | giflib            |
+| 2  | [JPEG](https://wikipedia.org/wiki/JPEG)                     | <ul><li> - [x] Static</li><li> - [x] Meta data</li></ul>                                                         | <ul><li> - [x] Static</li><li> - [x] Meta data</li></ul>                                                         | libjpeg-turbo     |
+| 3  | [PNG](https://wikipedia.org/wiki/Portable_Network_Graphics) | <ul><li> - [x] Static</li><li> - [x] Meta data</li></ul>                                                         | <ul><li> - [x] Static</li><li> - [x] Meta data</li></ul>                                                         | libpng            |
+| 4  | [TIFF](https://wikipedia.org/wiki/TIFF)                     | <ul><li> - [x] Static</li><li> - [x] Multi-framed</li><li> - [x] Meta data</li><li> - [x] ICC profiles</li></ul> | <ul><li> - [x] Static</li><li> - [x] Multi-framed</li><li> - [x] Meta data</li><li> - [x] ICC profiles</li></ul> | libtiff           |
