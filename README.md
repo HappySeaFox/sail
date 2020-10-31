@@ -64,13 +64,13 @@ animated, multi-paged images along with their meta data and ICC profiles. :sailb
 
 ## Supported image formats
 
-| N  | Image format                                                                            | Operations    | Dependencies      |
-| -- | --------------------------------------------------------------------------------------- | ------------- | ----------------- |
-| 1  | [APNG (Animated Portable Network Graphics)](https://wikipedia.org/wiki/APNG)            | R             | libpng+APNG patch |
-| 2  | [GIF (Graphics Interchange Format)](https://wikipedia.org/wiki/GIF)                     | R             | giflib            |
-| 3  | [JPEG (Joint Photographic Experts Group)](https://wikipedia.org/wiki/JPEG)              | RW            | libjpeg-turbo     |
-| 4  | [PNG (Portable Network Graphics)](https://wikipedia.org/wiki/Portable_Network_Graphics) | RW            | libpng            |
-| 5  | [TIFF (Tagged Image File Format)](https://wikipedia.org/wiki/TIFF)                      | RW            | libtiff           |
+| N  | Image format                                                | Operations    | Dependencies      |
+| -- | ------------------------------------------------------------| ------------- | ----------------- |
+| 1  | [APNG](https://wikipedia.org/wiki/APNG)                     | R             | libpng+APNG patch |
+| 2  | [GIF](https://wikipedia.org/wiki/GIF)                       | R             | giflib            |
+| 3  | [JPEG](https://wikipedia.org/wiki/JPEG)                     | RW            | libjpeg-turbo     |
+| 4  | [PNG](https://wikipedia.org/wiki/Portable_Network_Graphics) | RW            | libpng            |
+| 5  | [TIFF](https://wikipedia.org/wiki/TIFF)                     | RW            | libtiff           |
 
 See the full list [here](FORMATS.md). Work to add more image formats is ongoing.
 
