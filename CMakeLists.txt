@@ -175,11 +175,26 @@ if (WIN32)
     set(PKG_CONFIG_EXECUTABLE "${PROJECT_SOURCE_DIR}/extra/bin/pkg-config.exe")
 endif()
 
+# Our pkg-config search path to append to the system-wide search path
+#
+# Some development packages (like giflib) have no pkg-config integration. We provide
+# our own pkg-config files for system-wide packages in extra/missing
+#
+if (WIN32)
+    set(SAIL_PKGCONFIG_PATH "${PROJECT_SOURCE_DIR}/extra/missing/pkgconfig/${CMAKE_SYSTEM_NAME}\;${PROJECT_SOURCE_DIR}/extra/B/lib/pkgconfig")
+else()
+    set(SAIL_PKGCONFIG_PATH "${PROJECT_SOURCE_DIR}/extra/missing/pkgconfig/${CMAKE_SYSTEM_NAME}:${PROJECT_SOURCE_DIR}/extra/B/lib/pkgconfig")
+endif()
+
 set(ENV_PKG_CONFIG_PATH $ENV{PKG_CONFIG_PATH})
 if (ENV_PKG_CONFIG_PATH)
-    set(ENV{PKG_CONFIG_PATH} "${ENV_PKG_CONFIG_PATH}:${PROJECT_SOURCE_DIR}/extra/B/lib/pkgconfig")
+    if (WIN32)
+        set(ENV{PKG_CONFIG_PATH} "${ENV_PKG_CONFIG_PATH}\;${SAIL_PKGCONFIG_PATH}")
+    else()
+        set(ENV{PKG_CONFIG_PATH} "${ENV_PKG_CONFIG_PATH}:${SAIL_PKGCONFIG_PATH}")
+    endif()
 else()
-    set(ENV{PKG_CONFIG_PATH} "${PROJECT_SOURCE_DIR}/extra/B/lib/pkgconfig")
+    set(ENV{PKG_CONFIG_PATH} ${SAIL_PKGCONFIG_PATH})
 endif()
 
 find_package(PkgConfig REQUIRED)

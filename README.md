@@ -28,7 +28,9 @@ SAIL is a fast and lightweight cross-platform image decoding and encoding librar
 from one-liners to complex use cases with custom I/O sources. It enables a client to read and write static,
 animated, multi-paged images along with their meta data and ICC profiles. :sailboat:
 
-![Screenshot](.github/qt-demo.png?raw=true)
+<p align="center">
+  <a href=".github/qt-demo.gif"><img src=".github/qt-demo.gif?raw=true" alt="GIF Demo Screenshot"/></a>
+</p>
 
 ## Target audience
 
@@ -65,9 +67,10 @@ animated, multi-paged images along with their meta data and ICC profiles. :sailb
 | N  | Image format                                                                            | Operations    | Dependencies      |
 | -- | --------------------------------------------------------------------------------------- | ------------- | ----------------- |
 | 1  | [APNG (Animated Portable Network Graphics)](https://wikipedia.org/wiki/APNG)            | R             | libpng+APNG patch |
-| 2  | [JPEG (Joint Photographic Experts Group)](https://wikipedia.org/wiki/JPEG)              | RW            | libjpeg-turbo     |
-| 3  | [PNG (Portable Network Graphics)](https://wikipedia.org/wiki/Portable_Network_Graphics) | RW            | libpng            |
-| 4  | [TIFF (Tagged Image File Format)](https://wikipedia.org/wiki/TIFF)                      | RW            | libtiff           |
+| 2  | [GIF (Graphics Interchange Format)](https://wikipedia.org/wiki/GIF)                     | R             | giflib            |
+| 3  | [JPEG (Joint Photographic Experts Group)](https://wikipedia.org/wiki/JPEG)              | RW            | libjpeg-turbo     |
+| 4  | [PNG (Portable Network Graphics)](https://wikipedia.org/wiki/Portable_Network_Graphics) | RW            | libpng            |
+| 5  | [TIFF (Tagged Image File Format)](https://wikipedia.org/wiki/TIFF)                      | RW            | libtiff           |
 
 See the full list [here](FORMATS.md). Work to add more image formats is ongoing.
 

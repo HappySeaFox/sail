@@ -6,11 +6,11 @@ list(SORT CODECS)
 
 # Conditional codecs that require external dependencies like libjpeg
 #
-set(CONDITIONAL_CODECS jpeg png tiff)
+set(CONDITIONAL_CODECS gif jpeg png tiff)
 
 # Actual dependencies. Will use pkg_check_modules() to find them. Nested lists must use \; as a separator like that: "a\;b"
 #
-set(CONDITIONAL_DEPENDENCIES libjpeg libpng16 libtiff-4)
+set(CONDITIONAL_DEPENDENCIES giflib libjpeg libpng16 libtiff-4)
 
 ################################################################################
 
