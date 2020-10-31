@@ -90,13 +90,13 @@ Additionally, `SAIL_MY_CODECS_PATH` environment variable is always searched so y
 
 ## I'd like to reorganize the standard SAIL folder layout on Windows
 
-You surely do that. However, with the standard layout SAIL detects the codecs' location automatically.
+You can surely do that. However, with the standard layout SAIL detects the codecs' location automatically.
 If you reorganize the standard SAIL folder layout, you'll need to specify the new codecs' location by
 setting the `SAIL_CODECGS_PATH` environment variable.
 
 ## I moved SAIL codecs. How can I point SAIL to the new location?
 
-Set `SAIL_CODECS_PATH` environment variable to a desired location of the prebuilt SAIL codecs.
+Set the `SAIL_CODECS_PATH` environment variable to a desired location of the prebuilt SAIL codecs.
 `SAIL_CODECS_PATH/lib` is added to the DLL search path, so you can store DLL dependencies there.
 
 ## How can I point SAIL to my custom codecs?
