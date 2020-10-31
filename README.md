@@ -15,16 +15,16 @@
   </a>
 </p>
 <p align="center">
-  <a href="#target-audience">Target Audience</a> •
-  <a href="#features-overview">Features</a> •
-  <a href="#supported-image-formats">Image Formats</a> •
-  <a href="#apis-overview">Getting Started</a> •
+  <a href="#target-audience">Target Audience</a> â€¢
+  <a href="#features-overview">Features</a> â€¢
+  <a href="#supported-image-formats">Image Formats</a> â€¢
+  <a href="#apis-overview">Getting Started</a> â€¢
   <a href="#support">Support</a>
 </p>
 
 #
 
-SAIL is a fast and lightweight cross-platform image decoding and encoding library providing rich APIs,
+SAIL is a fast and lightweight cross-platform image decoding library providing rich APIs,
 from one-liners to complex use cases with custom I/O sources. It enables a client to read and write static,
 animated, multi-paged images along with their meta data and ICC profiles. :sailboat:
 
@@ -42,17 +42,14 @@ animated, multi-paged images along with their meta data and ICC profiles. :sailb
 ## Features overview
 
 - [x] Easy-to-use C and C++ interfaces
-- [x] Four levels of APIs: `junior`, `advanced`, `deep diver`, and `technical diver`
-- [x] Read images from a file, memory, and custom I/O streams
-- [x] Write images to a file, memory, and custom I/O streams
-- [x] Detect image types by file suffixes and [magic numbers](https://en.wikipedia.org/wiki/File_format#Magic_number)
-- [x] Reading operations output `RGBA` pixels by default
-- [x] Most image codecs are also able to output pixels as-is
-- [x] Read and write ICC profiles
-- [x] Read and write meta data like JPEG comments or EXIF
-- [x] Access to the image properties w/o decoding the whole pixel data (probing)
+- [x] Versatile APIs: `junior`, `advanced`, `deep diver`, and `technical diver`
+- [x] Input/output: files, memory, custom I/O streams
+- [x] Load by file suffixes, paths, and [magic numbers](https://en.wikipedia.org/wiki/File_format#Magic_number)
+- [x] Output `RGBA` pixels and more
+- [x] Output source pixels
+- [x] Meta data support: text comments, EXIF, ICC profiles
+- [x] Access to the image properties w/o decoding pixels (probing)
 - [x] Access to the source image properties
-- [x] Image formats are supported through dynamically loaded codecs
 - [x] The best MIME icons in the computer industry :smile:
 
 ## Features NOT provided
