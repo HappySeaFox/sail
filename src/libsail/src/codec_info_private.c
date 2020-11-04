@@ -108,7 +108,7 @@ static sail_status_t compression_from_string(const char *str, int *result) {
 
 static sail_status_t parse_serialized_ints(const char *value, int **target, unsigned *length, sail_status_t (*converter)(const char *str, int *result)) {
 
-    SAIL_CHECK_PTR(value);
+    SAIL_CHECK_STRING_PTR(value);
     SAIL_CHECK_PTR(target);
     SAIL_CHECK_PTR(length);
 

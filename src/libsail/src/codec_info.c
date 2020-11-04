@@ -183,7 +183,7 @@ sail_status_t sail_codec_info_from_extension(const char *extension, const struct
 
 sail_status_t sail_codec_info_from_mime_type(const char *mime_type, const struct sail_codec_info **codec_info) {
 
-    SAIL_CHECK_PTR(mime_type);
+    SAIL_CHECK_STRING_PTR(mime_type);
     SAIL_CHECK_CODEC_INFO_PTR(codec_info);
 
     SAIL_LOG_DEBUG("Finding codec info for mime type '%s'", mime_type);

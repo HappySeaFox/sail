@@ -46,7 +46,7 @@ sail_status_t sail_alloc_iccp(struct sail_iccp **iccp) {
 sail_status_t sail_alloc_iccp_from_data(struct sail_iccp **iccp, const void *data, unsigned data_length) {
 
     SAIL_CHECK_ICCP_PTR(iccp);
-    SAIL_CHECK_PTR(data);
+    SAIL_CHECK_DATA_PTR(data);
 
     SAIL_TRY(sail_alloc_iccp(iccp));
 

@@ -103,7 +103,7 @@ sail_status_t sail_concat(char **output, int num, ...) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 
-    SAIL_CHECK_PTR(output);
+    SAIL_CHECK_STRING_PTR(output);
 
     va_list args;
 
@@ -159,8 +159,8 @@ void sail_to_lower(char *str) {
 
 sail_status_t sail_to_wchar(const char *input, wchar_t **output) {
 
-    SAIL_CHECK_PTR(input);
-    SAIL_CHECK_PTR(output);
+    SAIL_CHECK_STRING_PTR(input);
+    SAIL_CHECK_STRING_PTR(output);
 
     size_t length = strlen(input);
 

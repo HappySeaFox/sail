@@ -145,7 +145,7 @@ static sail_status_t io_file_eof(void *stream, bool *result) {
 static sail_status_t alloc_io_file(const char *path, const char *mode, struct sail_io **io) {
 
     SAIL_CHECK_PATH_PTR(path);
-    SAIL_CHECK_PTR(mode);
+    SAIL_CHECK_STRING_PTR(mode);
     SAIL_CHECK_IO_PTR(io);
 
     SAIL_LOG_DEBUG("Opening file '%s' in '%s' mode", path, mode);
