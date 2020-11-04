@@ -60,7 +60,7 @@ sail_status_t alloc_and_load_codec(const struct sail_codec_info *codec_info, str
     if (handle == NULL) {
         SAIL_LOG_ERROR("Failed to load '%s'. Error: %d", codec_info->path, GetLastError());
         destroy_codec(*codec);
-        return SAIL_ERROR_CODEC_LOAD;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_LOAD);
     }
 
     (*codec)->handle = handle;
@@ -70,7 +70,7 @@ sail_status_t alloc_and_load_codec(const struct sail_codec_info *codec_info, str
     if (handle == NULL) {
         SAIL_LOG_ERROR("Failed to load '%s': %s", codec_info->path, dlerror());
         destroy_codec(*codec);
-        return SAIL_ERROR_CODEC_LOAD;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_LOAD);
     }
 
     (*codec)->handle = handle;
@@ -86,17 +86,16 @@ sail_status_t alloc_and_load_codec(const struct sail_codec_info *codec_info, str
         SAIL_LOG_ERROR("Failed to resolve '%s' in '%s': %s", #symbol, codec_info->path, dlerror())
 #endif
 
-#define SAIL_RESOLVE(target, handle, symbol)                     \
-    do {                                                         \
-        target = (symbol##_t)SAIL_RESOLVE_FUNC(handle, #symbol); \
-                                                                 \
-        if (target == NULL) {                                    \
-            SAIL_RESOLVE_LOG_ERROR(symbol);                      \
-            destroy_codec(*codec);                             \
-            return SAIL_ERROR_CODEC_SYMBOL_RESOLVE;             \
-        }                                                        \
-    }                                                            \
-    while(0)
+#define SAIL_RESOLVE(target, handle, symbol)                      \
+    {                                                             \
+        target = (symbol##_t)SAIL_RESOLVE_FUNC(handle, #symbol);  \
+                                                                  \
+        if (target == NULL) {                                     \
+            SAIL_RESOLVE_LOG_ERROR(symbol);                       \
+            destroy_codec(*codec);                                \
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_SYMBOL_RESOLVE); \
+        }                                                         \
+    } while(0)
 
     if ((*codec)->layout == SAIL_CODEC_LAYOUT_V3) {
         SAIL_TRY_OR_CLEANUP(sail_malloc(sizeof(struct sail_codec_layout_v3), &ptr),
@@ -116,7 +115,7 @@ sail_status_t alloc_and_load_codec(const struct sail_codec_info *codec_info, str
         SAIL_RESOLVE((*codec)->v3->write_finish,          handle, sail_codec_write_finish_v3);
     } else {
         destroy_codec(*codec);
-        return SAIL_ERROR_UNSUPPORTED_CODEC_LAYOUT;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_CODEC_LAYOUT);
     }
 
     return SAIL_OK;

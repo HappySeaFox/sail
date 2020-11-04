@@ -140,7 +140,7 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
 
     if (!file.open(QIODevice::ReadOnly)) {
         QMessageBox::critical(this, tr("Error"), tr("Failed to open the file: %1").arg(file.errorString()));
-        return SAIL_ERROR_EOF;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_EOF);
     }
 
     const QByteArray buf = file.readAll();
@@ -173,7 +173,7 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
     if (qimageFormat == QImage::Format_Invalid) {
         sail_stop_reading(state);
         sail_destroy_image(image);
-        return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
     }
 
     /*
@@ -199,7 +199,7 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
         if (image->palette->pixel_format != SAIL_PIXEL_FORMAT_BPP24_RGB) {
             sail_stop_reading(state);
             sail_destroy_image(image);
-            return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
         }
 
         QVector<QRgb> colorTable;
@@ -307,7 +307,7 @@ sail_status_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffe
 
         if (image->palette->data == NULL) {
             sail_destroy_image(image);
-            return SAIL_ERROR_MEMORY_ALLOCATION;
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_MEMORY_ALLOCATION);
         }
 
         unsigned char *rgbData = reinterpret_cast<unsigned char *>(image->palette->data);
@@ -323,7 +323,7 @@ sail_status_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffe
 
     if (image->pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN) {
         sail_destroy_image(image);
-        return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
     }
 
     // Time counter.
@@ -448,7 +448,7 @@ sail_status_t QtSail::onProbe()
 
     if (!file.open(QIODevice::ReadOnly)) {
         QMessageBox::critical(this, tr("Error"), tr("Failed to open the file. Error: %1").arg(file.errorString()));
-        return SAIL_ERROR_OPEN_FILE;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_OPEN_FILE);
     }
 
     const QByteArray buffer = file.readAll();

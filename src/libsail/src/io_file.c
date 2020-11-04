@@ -64,7 +64,7 @@ static sail_status_t io_file_seek(void *stream, long offset, int whence) {
 
     if (fseek(fptr, offset, whence) != 0) {
         sail_print_errno("Failed to seek: %s");
-        return SAIL_ERROR_SEEK_IO;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_SEEK_IO);
     }
 
     return SAIL_OK;
@@ -81,7 +81,7 @@ static sail_status_t io_file_tell(void *stream, size_t *offset) {
 
     if (offset_local < 0) {
         sail_print_errno("Failed to get the current I/O position: %s");
-        return SAIL_ERROR_TELL_IO;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_TELL_IO);
     }
 
     *offset = offset_local;
@@ -110,7 +110,7 @@ static sail_status_t io_file_flush(void *stream) {
 
     if (fflush(fptr) != 0) {
         sail_print_errno("Failed to flush file buffers: %s");
-        return SAIL_ERROR_FLUSH_IO;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_FLUSH_IO);
     }
 
     return SAIL_OK;
@@ -124,7 +124,7 @@ static sail_status_t io_file_close(void *stream) {
 
     if (fclose(fptr) != 0) {
         sail_print_errno("Failed to close the file: %s");
-        return SAIL_ERROR_CLOSE_IO;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_CLOSE_IO);
     }
 
     return SAIL_OK;
@@ -162,7 +162,7 @@ static sail_status_t alloc_io_file(const char *path, const char *mode, struct sa
 
     if (fptr == NULL) {
         sail_print_errno("Failed to open the specified file: %s");
-        return SAIL_ERROR_OPEN_FILE;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_OPEN_FILE);
     }
 
     SAIL_TRY_OR_CLEANUP(sail_alloc_io(io),

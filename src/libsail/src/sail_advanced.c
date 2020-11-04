@@ -110,7 +110,7 @@ sail_status_t sail_read_next_frame(void *state, struct sail_image **image) {
 
         if (interlaced_passes < 1) {
             sail_destroy_image(*image);
-            return SAIL_ERROR_INTERLACING_UNSUPPORTED;
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INTERLACING_UNSUPPORTED);
         }
     } else {
         interlaced_passes = 1;
@@ -197,7 +197,7 @@ sail_status_t sail_write_next_frame(void *state, const struct sail_image *image)
         interlaced_passes = state_of_mind->codec_info->write_features->interlaced_passes;
 
         if (interlaced_passes < 1) {
-            return SAIL_ERROR_INTERLACING_UNSUPPORTED;
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INTERLACING_UNSUPPORTED);
         }
     } else {
         interlaced_passes = 1;

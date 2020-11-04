@@ -180,18 +180,18 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v3(struct sail_io *io, const stru
     /* Initialize PNG. */
     if ((png_state->png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, my_error_fn, my_warning_fn)) == NULL) {
         png_state->libpng_error = true;
-        return SAIL_ERROR_UNDERLYING_CODEC;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
     if ((png_state->info_ptr = png_create_info_struct(png_state->png_ptr)) == NULL) {
         png_state->libpng_error = true;
-        return SAIL_ERROR_UNDERLYING_CODEC;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
     /* Error handling setup. */
     if (setjmp(png_jmpbuf(png_state->png_ptr))) {
         png_state->libpng_error = true;
-        return SAIL_ERROR_UNDERLYING_CODEC;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
     png_set_read_fn(png_state->png_ptr, io, my_read_fn);
@@ -299,7 +299,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v3(struct sail_io *io, const stru
     png_state->frames = png_state->is_apng ? png_get_num_frames(png_state->png_ptr, png_state->info_ptr) : 1;
 
     if (png_state->frames == 0) {
-        return SAIL_ERROR_NO_MORE_FRAMES;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
     }
 
     if (png_state->is_apng) {
@@ -347,17 +347,17 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
     struct png_state *png_state = (struct png_state *)state;
 
     if (png_state->libpng_error) {
-        return SAIL_ERROR_UNDERLYING_CODEC;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
     if (png_state->current_frame == png_state->frames) {
-        return SAIL_ERROR_NO_MORE_FRAMES;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
     }
 
     if (setjmp(png_jmpbuf(png_state->png_ptr))) {
         png_state->libpng_error = true;
         sail_destroy_image(*image);
-        return SAIL_ERROR_UNDERLYING_CODEC;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
     SAIL_TRY(sail_copy_image(png_state->first_image, image));
@@ -393,7 +393,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
                 png_state->next_frame_width  = png_state->first_image->width;
                 png_state->next_frame_height = png_state->first_image->height;
             } else if (png_state->frames == 0) {
-                return SAIL_ERROR_NO_MORE_FRAMES;
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
             }
         } else {
             png_state->skipped_hidden = true;
@@ -416,7 +416,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
 
             if (png_state->next_frame_width + png_state->next_frame_x_offset > (*image)->width ||
                     png_state->next_frame_height + png_state->next_frame_y_offset > (*image)->height) {
-                return SAIL_ERROR_INCORRECT_IMAGE_DIMENSIONS;
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_INCORRECT_IMAGE_DIMENSIONS);
             }
 
             if (!png_state->next_frame_delay_den) {
@@ -442,7 +442,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_pass_v3(void *state, struct 
     struct png_state *png_state = (struct png_state *)state;
 
     if (png_state->libpng_error) {
-        return SAIL_ERROR_UNDERLYING_CODEC;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
     return SAIL_OK;
@@ -457,12 +457,12 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v3(void *state, struct sail_io *
     struct png_state *png_state = (struct png_state *)state;
 
     if (png_state->libpng_error) {
-        return SAIL_ERROR_UNDERLYING_CODEC;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
     if (setjmp(png_jmpbuf(png_state->png_ptr))) {
         png_state->libpng_error = true;
-        return SAIL_ERROR_UNDERLYING_CODEC;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
 #ifdef PNG_APNG_SUPPORTED
@@ -529,7 +529,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_finish_v3(void **state, struct sail_io
     if (png_state->png_ptr != NULL) {
         if (setjmp(png_jmpbuf(png_state->png_ptr))) {
             destroy_png_state(png_state);
-            return SAIL_ERROR_UNDERLYING_CODEC;
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
         }
     }
 
@@ -566,24 +566,24 @@ SAIL_EXPORT sail_status_t sail_codec_write_init_v3(struct sail_io *io, const str
     SAIL_TRY(supported_write_output_pixel_format(png_state->write_options->output_pixel_format));
 
     if (png_state->write_options->compression != SAIL_COMPRESSION_DEFLATE) {
-        return SAIL_ERROR_UNSUPPORTED_COMPRESSION;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_COMPRESSION);
     }
 
     /* Initialize PNG. */
     if ((png_state->png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, my_error_fn, my_warning_fn)) == NULL) {
         png_state->libpng_error = true;
-        return SAIL_ERROR_UNDERLYING_CODEC;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
     if ((png_state->info_ptr = png_create_info_struct(png_state->png_ptr)) == NULL) {
         png_state->libpng_error = true;
-        return SAIL_ERROR_UNDERLYING_CODEC;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
     /* Error handling setup. */
     if (setjmp(png_jmpbuf(png_state->png_ptr))) {
         png_state->libpng_error = true;
-        return SAIL_ERROR_UNDERLYING_CODEC;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
     png_set_write_fn(png_state->png_ptr, io, my_write_fn, my_flush_fn);
@@ -600,7 +600,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v3(void *state, struc
     struct png_state *png_state = (struct png_state *)state;
 
     if (png_state->frame_written) {
-        return SAIL_ERROR_NO_MORE_FRAMES;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
     }
 
     png_state->frame_written = true;
@@ -608,7 +608,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v3(void *state, struc
     /* Error handling setup. */
     if (setjmp(png_jmpbuf(png_state->png_ptr))) {
         png_state->libpng_error = true;
-        return SAIL_ERROR_UNDERLYING_CODEC;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
     int color_type;
@@ -653,12 +653,12 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v3(void *state, struc
             image->pixel_format == SAIL_PIXEL_FORMAT_BPP8_INDEXED) {
         if (image->palette == NULL) {
             SAIL_LOG_ERROR("The indexed image has no palette");
-            return SAIL_ERROR_MISSING_PALETTE;
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_MISSING_PALETTE);
         }
 
         if (image->palette->pixel_format != SAIL_PIXEL_FORMAT_BPP24_RGB) {
             SAIL_LOG_ERROR("Palettes not in BPP24-RGB format are not supported");
-            return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
         }
 
         /* Palette is deep copied. */
@@ -721,13 +721,13 @@ SAIL_EXPORT sail_status_t sail_codec_write_frame_v3(void *state, struct sail_io 
     struct png_state *png_state = (struct png_state *)state;
 
     if (png_state->libpng_error) {
-        return SAIL_ERROR_UNDERLYING_CODEC;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
     /* Error handling setup. */
     if (setjmp(png_jmpbuf(png_state->png_ptr))) {
         png_state->libpng_error = true;
-        return SAIL_ERROR_UNDERLYING_CODEC;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
     for (unsigned row = 0; row < image->height; row++) {
@@ -751,7 +751,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_finish_v3(void **state, struct sail_i
     if (png_state->png_ptr != NULL) {
         if (setjmp(png_jmpbuf(png_state->png_ptr))) {
             destroy_png_state(png_state);
-            return SAIL_ERROR_UNDERLYING_CODEC;
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
         }
     }
 

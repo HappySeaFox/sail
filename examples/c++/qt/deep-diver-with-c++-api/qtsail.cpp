@@ -127,7 +127,7 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
 
     if (!file.open(QIODevice::ReadOnly)) {
         QMessageBox::critical(this, tr("Error"), tr("Failed to open the file: %1").arg(file.errorString()));
-        return SAIL_ERROR_EOF;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_EOF);
     }
 
     const QByteArray buf = file.readAll();
@@ -147,7 +147,7 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
     const QImage::Format qimageFormat = sailPixelFormatToQImageFormat(image.pixel_format());
 
     if (qimageFormat == QImage::Format_Invalid) {
-        return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
     }
 
     // Convert to QImage.
@@ -170,7 +170,7 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
         const sail::palette &palette = image.palette();
 
         if (palette.pixel_format() != SAIL_PIXEL_FORMAT_BPP24_RGB) {
-            return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
         }
 
         QVector<QRgb> colorTable;
@@ -275,7 +275,7 @@ sail_status_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffe
          .with_palette(palette);
 
     if (image.pixel_format() == SAIL_PIXEL_FORMAT_UNKNOWN) {
-        return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
     }
 
     // Time counter.
@@ -392,7 +392,7 @@ sail_status_t QtSail::onProbe()
 
     if (!file.open(QIODevice::ReadOnly)) {
         QMessageBox::critical(this, tr("Error"), tr("Failed to open the file. Error: %1").arg(file.errorString()));
-        return SAIL_ERROR_OPEN_FILE;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_OPEN_FILE);
     }
 
     const QByteArray buffer = file.readAll();

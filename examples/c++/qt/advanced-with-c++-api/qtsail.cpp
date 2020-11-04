@@ -91,7 +91,7 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
         const QImage::Format qimageFormat = sailPixelFormatToQImageFormat(image.pixel_format());
 
         if (qimageFormat == QImage::Format_Invalid) {
-            return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
         }
 
         // Convert to QImage.

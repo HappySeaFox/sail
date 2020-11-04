@@ -71,7 +71,7 @@ sail_status_t supported_read_output_pixel_format(enum SailPixelFormat pixel_form
         }
 
         default: {
-            return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
         }
     }
 }
@@ -142,7 +142,7 @@ sail_status_t sail_compression_to_tiff_compression(enum SailCompression compress
 #endif
 
         default: {
-            return SAIL_ERROR_UNSUPPORTED_COMPRESSION;
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_COMPRESSION);
         }
     }
 }
@@ -285,7 +285,7 @@ sail_status_t supported_write_output_pixel_format(enum SailPixelFormat pixel_for
         }
 
         default: {
-            return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
         }
     }
 }

@@ -52,7 +52,7 @@ sail_status_t sail_memdup(const void *input, size_t input_size, void **output) {
     }
 
     if (input_size == 0) {
-        return SAIL_ERROR_INVALID_ARGUMENT;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 
     SAIL_TRY(sail_malloc(input_size, output));
@@ -84,7 +84,7 @@ sail_status_t sail_strdup_length(const char *input, size_t length, char **output
     }
 
     if (length == 0) {
-        return SAIL_ERROR_INVALID_ARGUMENT;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 
     void *ptr;
@@ -100,7 +100,7 @@ sail_status_t sail_strdup_length(const char *input, size_t length, char **output
 sail_status_t sail_concat(char **output, int num, ...) {
 
     if (num < 1) {
-        return SAIL_ERROR_INVALID_ARGUMENT;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 
     SAIL_CHECK_PTR(output);
@@ -173,12 +173,12 @@ sail_status_t sail_to_wchar(const char *input, wchar_t **output) {
 
     if (mbstowcs_s(&ret, *output, length+1, input, length) != 0) {
         sail_free(*output);
-        return SAIL_ERROR_INVALID_ARGUMENT;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 #else
     if (mbstowcs(*output, input, length) == (size_t)-1) {
         sail_free(*output);
-        return SAIL_ERROR_INVALID_ARGUMENT;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 #endif
 
@@ -281,7 +281,7 @@ sail_status_t sail_pixel_format_to_string(enum SailPixelFormat pixel_format, con
         case SAIL_PIXEL_FORMAT_BPP48_CIE_LAB:         *result = "BPP48-CIE-LAB";         return SAIL_OK;
     }
 
-    return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
 }
 
 sail_status_t sail_pixel_format_from_string(const char *str, enum SailPixelFormat *result) {
@@ -290,7 +290,7 @@ sail_status_t sail_pixel_format_from_string(const char *str, enum SailPixelForma
     SAIL_CHECK_RESULT_PTR(result);
 
     if (strlen(str) == 0) {
-        return SAIL_ERROR_EMPTY_STRING;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_EMPTY_STRING);
     }
 
     uint64_t hash;
@@ -378,7 +378,7 @@ sail_status_t sail_pixel_format_from_string(const char *str, enum SailPixelForma
         case UINT64_C(13237367887476509101): *result = SAIL_PIXEL_FORMAT_BPP48_CIE_LAB;         return SAIL_OK;
     }
 
-    return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
 }
 
 sail_status_t sail_image_property_to_string(enum SailImageProperty image_property, const char **result) {
@@ -390,7 +390,7 @@ sail_status_t sail_image_property_to_string(enum SailImageProperty image_propert
         case SAIL_IMAGE_PROPERTY_INTERLACED:         *result = "INTERLACED";         return SAIL_OK;
     }
 
-    return SAIL_ERROR_UNSUPPORTED_IMAGE_PROPERTY;
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_IMAGE_PROPERTY);
 }
 
 sail_status_t sail_image_property_from_string(const char *str, enum SailImageProperty *result) {
@@ -399,7 +399,7 @@ sail_status_t sail_image_property_from_string(const char *str, enum SailImagePro
     SAIL_CHECK_RESULT_PTR(result);
 
     if (strlen(str) == 0) {
-        return SAIL_ERROR_EMPTY_STRING;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_EMPTY_STRING);
     }
 
     uint64_t hash;
@@ -410,7 +410,7 @@ sail_status_t sail_image_property_from_string(const char *str, enum SailImagePro
         case UINT64_C(8244927930303708800):  *result = SAIL_IMAGE_PROPERTY_INTERLACED;         return SAIL_OK;
     }
 
-    return SAIL_ERROR_UNSUPPORTED_IMAGE_PROPERTY;
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_IMAGE_PROPERTY);
 }
 
 sail_status_t sail_compression_to_string(enum SailCompression compression, const char **result) {
@@ -455,7 +455,7 @@ sail_status_t sail_compression_to_string(enum SailCompression compression, const
         case SAIL_COMPRESSION_ZSTD:          *result = "ZSTD";          return SAIL_OK;
     }
 
-    return SAIL_ERROR_UNSUPPORTED_COMPRESSION;
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_COMPRESSION);
 }
 
 sail_status_t sail_compression_from_string(const char *str, enum SailCompression *result) {
@@ -464,7 +464,7 @@ sail_status_t sail_compression_from_string(const char *str, enum SailCompression
     SAIL_CHECK_RESULT_PTR(result);
 
     if (strlen(str) == 0) {
-        return SAIL_ERROR_EMPTY_STRING;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_EMPTY_STRING);
     }
 
     uint64_t hash;
@@ -508,7 +508,7 @@ sail_status_t sail_compression_from_string(const char *str, enum SailCompression
         case UINT64_C(6384768458):           *result = SAIL_COMPRESSION_ZSTD;          return SAIL_OK;
     }
 
-    return SAIL_ERROR_UNSUPPORTED_COMPRESSION;
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_COMPRESSION);
 }
 
 sail_status_t sail_meta_data_to_string(enum SailMetaData meta_data, const char **result) {
@@ -554,7 +554,7 @@ sail_status_t sail_meta_data_from_string(const char *str, enum SailMetaData *res
     SAIL_CHECK_RESULT_PTR(result);
 
     if (strlen(str) == 0) {
-        return SAIL_ERROR_EMPTY_STRING;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_EMPTY_STRING);
     }
 
     uint64_t hash;
@@ -605,7 +605,7 @@ sail_status_t sail_codec_feature_to_string(enum SailCodecFeature codec_feature, 
         case SAIL_CODEC_FEATURE_ICCP:        *result = "ICCP";        return SAIL_OK;
     }
 
-    return SAIL_ERROR_UNSUPPORTED_CODEC_FEATURE;
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_CODEC_FEATURE);
 }
 
 sail_status_t sail_codec_feature_from_string(const char *str, enum SailCodecFeature *result) {
@@ -614,7 +614,7 @@ sail_status_t sail_codec_feature_from_string(const char *str, enum SailCodecFeat
     SAIL_CHECK_RESULT_PTR(result);
 
     if (strlen(str) == 0) {
-        return SAIL_ERROR_EMPTY_STRING;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_EMPTY_STRING);
     }
 
     uint64_t hash;
@@ -630,7 +630,7 @@ sail_status_t sail_codec_feature_from_string(const char *str, enum SailCodecFeat
         case UINT64_C(6384139556):           *result = SAIL_CODEC_FEATURE_ICCP;        return SAIL_OK;
     }
 
-    return SAIL_ERROR_UNSUPPORTED_CODEC_FEATURE;
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_CODEC_FEATURE);
 }
 
 sail_status_t sail_bits_per_pixel(enum SailPixelFormat pixel_format, unsigned *result) {
@@ -638,9 +638,9 @@ sail_status_t sail_bits_per_pixel(enum SailPixelFormat pixel_format, unsigned *r
     SAIL_CHECK_RESULT_PTR(result);
 
     switch (pixel_format) {
-        case SAIL_PIXEL_FORMAT_UNKNOWN:   return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
-        case SAIL_PIXEL_FORMAT_AUTO:      return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
-        case SAIL_PIXEL_FORMAT_SOURCE:    return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
+        case SAIL_PIXEL_FORMAT_UNKNOWN:   SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+        case SAIL_PIXEL_FORMAT_AUTO:      SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+        case SAIL_PIXEL_FORMAT_SOURCE:    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
 
         case SAIL_PIXEL_FORMAT_BPP1:   *result = 1;   return SAIL_OK;
         case SAIL_PIXEL_FORMAT_BPP2:   *result = 2;   return SAIL_OK;
@@ -712,13 +712,13 @@ sail_status_t sail_bits_per_pixel(enum SailPixelFormat pixel_format, unsigned *r
         case SAIL_PIXEL_FORMAT_BPP48_CIE_LAB: *result = 48; return SAIL_OK;
     }
 
-    return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
 }
 
 sail_status_t sail_bytes_per_line(unsigned width, enum SailPixelFormat pixel_format, unsigned *result) {
 
     if (width == 0) {
-        return SAIL_ERROR_INVALID_ARGUMENT;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 
     SAIL_CHECK_RESULT_PTR(result);
@@ -751,7 +751,7 @@ sail_status_t sail_print_errno(const char *format) {
     SAIL_CHECK_STRING_PTR(format);
 
     if (strstr(format, "%s") == NULL) {
-        return SAIL_ERROR_INVALID_ARGUMENT;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 
 #ifdef SAIL_WIN32
@@ -772,7 +772,7 @@ sail_status_t sail_malloc(size_t size, void **ptr) {
     *ptr = malloc(size);
 
     if (*ptr == NULL) {
-        return SAIL_ERROR_MEMORY_ALLOCATION;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_MEMORY_ALLOCATION);
     }
 
     return SAIL_OK;
@@ -785,7 +785,7 @@ sail_status_t sail_realloc(size_t size, void **ptr) {
     *ptr = realloc(*ptr, size);
 
     if (*ptr == NULL) {
-        return SAIL_ERROR_MEMORY_ALLOCATION;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_MEMORY_ALLOCATION);
     }
 
     return SAIL_OK;
@@ -798,7 +798,7 @@ sail_status_t sail_calloc(size_t nmemb, size_t size, void **ptr) {
     *ptr = calloc(nmemb, size);
 
     if (*ptr == NULL) {
-        return SAIL_ERROR_MEMORY_ALLOCATION;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_MEMORY_ALLOCATION);
     }
 
     return SAIL_OK;

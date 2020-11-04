@@ -70,7 +70,7 @@ sail_status_t WriteOptions::init(const sail::write_features &write_features, int
 {
     if (write_features.pixel_formats_mappings().empty()) {
         disable();
-        return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
     }
     d->ui->labelColor->setText(tr("Output color:"));
 
@@ -97,7 +97,7 @@ sail_status_t WriteOptions::init(const sail::write_features &write_features, int
 
     if (!allowedInputPixelFormat) {
         disable();
-        return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
     }
 
     // Codecs support compression levels only when they support just a single compression.

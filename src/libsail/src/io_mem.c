@@ -84,7 +84,7 @@ static sail_status_t io_mem_read(void *stream, void *buf, size_t object_size, si
     *read_objects_count = 0;
 
     if (mem_io_buffer_info->pos >= mem_io_buffer_info->accessible_length) {
-        return SAIL_ERROR_EOF;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_EOF);
     }
 
     while (mem_io_buffer_info->pos <= mem_io_buffer_info->accessible_length - object_size && objects_count > 0) {
@@ -125,7 +125,7 @@ static sail_status_t io_mem_seek(void *stream, long offset, int whence) {
         }
 
         default: {
-            return SAIL_ERROR_UNSUPPORTED_SEEK_WHENCE;
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_SEEK_WHENCE);
         }
     }
 
@@ -166,7 +166,7 @@ static sail_status_t io_mem_write(void *stream, const void *buf, size_t object_s
     *written_objects_count = 0;
 
     if (mem_io_buffer_info->pos >= mem_io_buffer_info->length) {
-        return SAIL_ERROR_EOF;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_EOF);
     }
 
     while (mem_io_buffer_info->pos <= mem_io_buffer_info->length - object_size && objects_count > 0) {

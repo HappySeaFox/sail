@@ -161,7 +161,7 @@ sail_status_t pixel_format_to_png_color_type(enum SailPixelFormat pixel_format, 
         }
 
         default: {
-            return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
         }
     }
 }
@@ -180,7 +180,7 @@ sail_status_t supported_read_output_pixel_format(enum SailPixelFormat pixel_form
         }
 
         default: {
-            return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
         }
     }
 }
@@ -194,7 +194,7 @@ sail_status_t supported_write_output_pixel_format(enum SailPixelFormat pixel_for
         }
 
         default: {
-            return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
         }
     }
 }
@@ -380,7 +380,7 @@ sail_status_t fetch_palette(png_structp png_ptr, png_infop info_ptr, struct sail
 
     if (png_get_PLTE(png_ptr, info_ptr, &png_palette, &png_palette_color_count) == 0) {
         SAIL_LOG_ERROR("PNG: The indexed image has no palette");
-        return SAIL_ERROR_MISSING_PALETTE;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_MISSING_PALETTE);
     }
 
     /* Always use RGB palette. */
@@ -445,7 +445,7 @@ sail_status_t blend_over(void *dst_raw, unsigned dst_offset, const void *src_raw
             *dst = (uint16_t)((src_a + (1-src_a) * dst_a) * 65535);         src++; dst++;
         }
     } else {
-        return SAIL_ERROR_UNSUPPORTED_BIT_DEPTH;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_BIT_DEPTH);
     }
 
     return SAIL_OK;

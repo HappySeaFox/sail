@@ -251,7 +251,7 @@ static sail_status_t inih_handler_sail_error(void *data, const char *section, co
             }
         } else {
             SAIL_LOG_ERROR("Unsupported codec info key '%s' in [%s]", name, section);
-            return SAIL_ERROR_PARSE_FILE;
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_PARSE_FILE);
         }
     } else if (strcmp(section, "read-features") == 0) {
         if (strcmp(name, "output-pixel-formats") == 0) {
@@ -268,7 +268,7 @@ static sail_status_t inih_handler_sail_error(void *data, const char *section, co
                                 /* cleanup */ SAIL_LOG_ERROR("Failed to parse codec features: '%s'", value));
         } else {
             SAIL_LOG_ERROR("Unsupported codec info key '%s' in [%s]", name, section);
-            return SAIL_ERROR_PARSE_FILE;
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_PARSE_FILE);
         }
     } else if (strcmp(section, "write-features") == 0) {
         if (strcmp(name, "features") == 0) {
@@ -298,7 +298,7 @@ static sail_status_t inih_handler_sail_error(void *data, const char *section, co
             codec_info->write_features->compression_level_step = atof(value);
         } else {
             SAIL_LOG_ERROR("Unsupported codec info key '%s' in [%s]", name, section);
-            return SAIL_ERROR_PARSE_FILE;
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_PARSE_FILE);
         }
     } else if (strcmp(section, "write-pixel-formats-mapping") == 0) {
         struct sail_pixel_formats_mapping_node *node;
@@ -321,7 +321,7 @@ static sail_status_t inih_handler_sail_error(void *data, const char *section, co
         init_data->last_mapping_node = &node->next;
     } else {
         SAIL_LOG_ERROR("Unsupported codec info section '%s'", section);
-        return SAIL_ERROR_PARSE_FILE;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_PARSE_FILE);
     }
 
     return SAIL_OK;
@@ -345,19 +345,19 @@ static sail_status_t check_codec_info(const char *path, const struct sail_codec_
             write_features->features & SAIL_CODEC_FEATURE_ANIMATED ||
             write_features->features & SAIL_CODEC_FEATURE_MULTI_FRAME) && write_features->pixel_formats_mapping_node == NULL) {
         SAIL_LOG_ERROR("The codec '%s' is able to write images, but output pixel formats mappings are not specified", path);
-        return SAIL_ERROR_INCOMPLETE_CODEC_INFO;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INCOMPLETE_CODEC_INFO);
     }
 
     /* Compressions must always exist.*/
     if (write_features->compressions == NULL || write_features->compressions_length < 1) {
         SAIL_LOG_ERROR("The codec '%s' specifies an empty compressions list", path);
-        return SAIL_ERROR_INCOMPLETE_CODEC_INFO;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INCOMPLETE_CODEC_INFO);
     }
 
     /* Compression levels and types are mutually exclusive.*/
     if (write_features->compressions_length > 1 && (write_features->compression_level_min != 0 || write_features->compression_level_max != 0)) {
         SAIL_LOG_ERROR("The codec '%s' specifies more than two compression types and non-zero compression levels which is unsupported", path);
-        return SAIL_ERROR_INCOMPLETE_CODEC_INFO;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INCOMPLETE_CODEC_INFO);
     }
 
     return SAIL_OK;
@@ -479,7 +479,7 @@ sail_status_t codec_read_info(const char *path, struct sail_codec_info **codec_i
         if ((*codec_info)->layout != SAIL_CODEC_LAYOUT_V3) {
             SAIL_LOG_ERROR("Unsupported codec layout version %d in '%s'", (*codec_info)->layout, path);
             destroy_codec_info(*codec_info);
-            return SAIL_ERROR_UNSUPPORTED_CODEC_LAYOUT;
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_CODEC_LAYOUT);
         }
 
         /* Paranoid error checks. */
@@ -491,10 +491,10 @@ sail_status_t codec_read_info(const char *path, struct sail_codec_info **codec_i
         destroy_codec_info(*codec_info);
 
         switch (code) {
-            case -1: return SAIL_ERROR_OPEN_FILE;
-            case -2: return SAIL_ERROR_MEMORY_ALLOCATION;
+            case -1: SAIL_LOG_AND_RETURN(SAIL_ERROR_OPEN_FILE);
+            case -2: SAIL_LOG_AND_RETURN(SAIL_ERROR_MEMORY_ALLOCATION);
 
-            default: return SAIL_ERROR_PARSE_FILE;
+            default: SAIL_LOG_AND_RETURN(SAIL_ERROR_PARSE_FILE);
         }
     }
 }

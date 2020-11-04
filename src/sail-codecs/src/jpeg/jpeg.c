@@ -135,7 +135,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v3(struct sail_io *io, const stru
 
     if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0) {
         jpeg_state->libjpeg_error = true;
-        return SAIL_ERROR_UNDERLYING_CODEC;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
     /* JPEG setup. */
@@ -158,7 +158,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v3(struct sail_io *io, const stru
         J_COLOR_SPACE requested_color_space = pixel_format_to_color_space(jpeg_state->read_options->output_pixel_format);
 
         if (requested_color_space == JCS_UNKNOWN) {
-            return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
         }
 
         if (jpeg_state->decompress_context->jpeg_color_space == JCS_YCCK || jpeg_state->decompress_context->jpeg_color_space == JCS_CMYK) {
@@ -188,7 +188,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
     struct jpeg_state *jpeg_state = (struct jpeg_state *)state;
 
     if (jpeg_state->frame_read) {
-        return SAIL_ERROR_NO_MORE_FRAMES;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
     }
 
     jpeg_state->frame_read = true;
@@ -200,7 +200,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
     if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0) {
         jpeg_state->libjpeg_error = true;
         sail_destroy_image(*image);
-        return SAIL_ERROR_UNDERLYING_CODEC;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
     /* Image properties. */
@@ -283,12 +283,12 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v3(void *state, struct sail_io *
     struct jpeg_state *jpeg_state = (struct jpeg_state *)state;
 
     if (jpeg_state->libjpeg_error) {
-        return SAIL_ERROR_UNDERLYING_CODEC;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
     if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0) {
         jpeg_state->libjpeg_error = true;
-        return SAIL_ERROR_UNDERLYING_CODEC;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
     for (unsigned row = 0; row < image->height; row++) {
@@ -320,7 +320,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_finish_v3(void **state, struct sail_io
 
     if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0) {
         destroy_jpeg_state(jpeg_state);
-        return SAIL_ERROR_UNDERLYING_CODEC;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
     if (jpeg_state->decompress_context != NULL) {
@@ -360,7 +360,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_init_v3(struct sail_io *io, const str
 
     /* Sanity check. */
     if (jpeg_state->write_options->compression != SAIL_COMPRESSION_JPEG) {
-        return SAIL_ERROR_UNSUPPORTED_COMPRESSION;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_COMPRESSION);
     }
 
     /* Error handling setup. */
@@ -370,7 +370,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_init_v3(struct sail_io *io, const str
 
     if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0) {
         jpeg_state->libjpeg_error = true;
-        return SAIL_ERROR_UNDERLYING_CODEC;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
     /* JPEG setup. */
@@ -389,7 +389,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v3(void *state, struc
     struct jpeg_state *jpeg_state = (struct jpeg_state *)state;
 
     if (jpeg_state->frame_written) {
-        return SAIL_ERROR_NO_MORE_FRAMES;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
     }
 
     jpeg_state->frame_written = true;
@@ -397,7 +397,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v3(void *state, struc
     /* Error handling setup. */
     if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0) {
         jpeg_state->libjpeg_error = true;
-        return SAIL_ERROR_UNDERLYING_CODEC;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
     unsigned bits_per_pixel;
@@ -419,7 +419,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v3(void *state, struc
         J_COLOR_SPACE output_color_space = pixel_format_to_color_space(image->pixel_format);
 
         if (output_color_space == JCS_UNKNOWN) {
-            return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
         }
 
         jpeg_set_colorspace(jpeg_state->compress_context, output_color_space);
@@ -483,12 +483,12 @@ SAIL_EXPORT sail_status_t sail_codec_write_frame_v3(void *state, struct sail_io 
     struct jpeg_state *jpeg_state = (struct jpeg_state *)state;
 
     if (jpeg_state->libjpeg_error) {
-        return SAIL_ERROR_UNDERLYING_CODEC;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
     if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0) {
         jpeg_state->libjpeg_error = true;
-        return SAIL_ERROR_UNDERLYING_CODEC;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
     for (unsigned row = 0; row < image->height; row++) {
@@ -511,7 +511,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_finish_v3(void **state, struct sail_i
 
     if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0) {
         destroy_jpeg_state(jpeg_state);
-        return SAIL_ERROR_UNDERLYING_CODEC;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
     if (jpeg_state->compress_context != NULL) {

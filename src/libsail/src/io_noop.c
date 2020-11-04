@@ -36,7 +36,7 @@ sail_status_t io_noop_read(void *stream, void *buf, size_t object_size, size_t o
     (void)objects_count;
     (void)read_objects_count;
 
-    return SAIL_ERROR_NOT_IMPLEMENTED;
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
 sail_status_t io_noop_seek(void *stream, long offset, int whence) {
@@ -45,7 +45,7 @@ sail_status_t io_noop_seek(void *stream, long offset, int whence) {
     (void)offset;
     (void)whence;
 
-    return SAIL_ERROR_NOT_IMPLEMENTED;
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
 sail_status_t io_noop_tell(void *stream, size_t *offset) {
@@ -53,7 +53,7 @@ sail_status_t io_noop_tell(void *stream, size_t *offset) {
     (void)stream;
     (void)offset;
 
-    return SAIL_ERROR_NOT_IMPLEMENTED;
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
 sail_status_t io_noop_write(void *stream, const void *buf, size_t object_size, size_t objects_count, size_t *written_objects_count) {
@@ -64,21 +64,21 @@ sail_status_t io_noop_write(void *stream, const void *buf, size_t object_size, s
     (void)objects_count;
     (void)written_objects_count;
 
-    return SAIL_ERROR_NOT_IMPLEMENTED;
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
 sail_status_t io_noop_flush(void *stream) {
 
     (void)stream;
 
-    return SAIL_ERROR_NOT_IMPLEMENTED;
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
 sail_status_t io_noop_close(void *stream) {
 
     (void)stream;
 
-    return SAIL_ERROR_NOT_IMPLEMENTED;
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
 sail_status_t io_noop_eof(void *stream, bool *result) {
@@ -86,5 +86,5 @@ sail_status_t io_noop_eof(void *stream, bool *result) {
     (void)stream;
     (void)result;
 
-    return SAIL_ERROR_NOT_IMPLEMENTED;
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }

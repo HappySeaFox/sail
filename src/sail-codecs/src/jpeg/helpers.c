@@ -110,7 +110,7 @@ sail_status_t auto_output_color_space(enum SailPixelFormat input_pixel_format, J
         case SAIL_PIXEL_FORMAT_BPP32_CMYK:     *output_color_space = JCS_CMYK;      return SAIL_OK;
         case SAIL_PIXEL_FORMAT_BPP32_YCCK:     *output_color_space = JCS_YCCK;      return SAIL_OK;
 
-        default: return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
+        default: SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
     }
 }
 
@@ -170,7 +170,7 @@ sail_status_t convert_cmyk(unsigned char *pixels_source, unsigned char *pixels_t
         }
 
         default: {
-            return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
         }
     }
 }

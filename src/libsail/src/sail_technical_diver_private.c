@@ -66,7 +66,7 @@ static sail_status_t allowed_read_output_pixel_format(const struct sail_read_fea
     }
 
     print_unsupported_read_output_pixel_format(pixel_format);
-    return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
 }
 
 static sail_status_t allowed_write_compression(const struct sail_write_features *write_features,
@@ -80,7 +80,7 @@ static sail_status_t allowed_write_compression(const struct sail_write_features 
         }
     }
 
-    return SAIL_ERROR_UNSUPPORTED_COMPRESSION;
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_COMPRESSION);
 }
 
 /*

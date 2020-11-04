@@ -28,6 +28,44 @@
 #include "munit.h"
 
 /*
+ * Error macros.
+ */
+static sail_status_t check_value_is_2(int value) {
+    if (value == 2) {
+        return SAIL_OK;
+    } else {
+        return SAIL_ERROR_INVALID_ARGUMENT;
+    }
+}
+
+static MunitResult test_error_macros(const MunitParameter params[], void *user_data) {
+    (void)params;
+    (void)user_data;
+
+    /* Check if SAIL_TRY_OR_EXECUTE() is able to continue loops. */
+    {
+        int result = 0;
+
+        for (int i = 0; i < 4; i++) {
+            SAIL_TRY_OR_EXECUTE(check_value_is_2(i),
+                                /* on error */ continue);
+
+            result++;
+        }
+
+        munit_assert_int(result, ==, 1);
+    }
+
+    /* Check SAIL_TRY_OR_SUPPRESS(). */
+    {
+        SAIL_TRY_OR_SUPPRESS(check_value_is_2(5));
+
+    }
+
+    return MUNIT_OK;
+}
+
+/*
  * Pixel formats.
  */
 static MunitResult test_pixel_format_to_string(const MunitParameter params[], void *user_data) {
@@ -497,6 +535,8 @@ static MunitResult test_codec_feature_from_string(const MunitParameter params[],
 }
 
 static MunitTest test_suite_tests[] = {
+    { (char *)"/error-macros", test_error_macros, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+
     { (char *)"/pixel-format-to-string",   test_pixel_format_to_string,     NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/pixel-format-from-string", test_pixel_format_from_string,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 

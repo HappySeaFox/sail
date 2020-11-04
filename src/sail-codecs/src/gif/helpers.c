@@ -38,7 +38,7 @@ sail_status_t supported_read_output_pixel_format(enum SailPixelFormat pixel_form
         }
 
         default: {
-            return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
         }
     }
 }

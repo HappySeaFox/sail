@@ -123,57 +123,57 @@ enum SailStatus {
 typedef enum SailStatus sail_status_t;
 
 /*
- * Log failure and return (internal).
+ * Log failure and return.
  */
-#define __SAIL_LFAR(code)        \
-do {                             \
-    SAIL_LOG_ERROR("%s", #code); \
-    return code;                 \
+#define SAIL_LOG_AND_RETURN(code) \
+{                                 \
+    SAIL_LOG_ERROR("%s", #code);  \
+    return code;                  \
 } while(0)
 
 /*
  * Helper macros.
  */
-#define SAIL_CHECK_IO(io)                    \
-do {                                         \
-    if (io == NULL) {                        \
-        __SAIL_LFAR(SAIL_ERROR_IO_NULL_PTR); \
-    }                                        \
-    if (io->read == NULL      ||             \
-            io->seek == NULL  ||             \
-            io->tell == NULL  ||             \
-            io->write == NULL ||             \
-            io->flush == NULL ||             \
-            io->close == NULL ||             \
-            io->eof == NULL) {               \
-        __SAIL_LFAR(SAIL_ERROR_INVALID_IO);  \
-    }                                        \
+#define SAIL_CHECK_IO(io)                            \
+{                                                    \
+    if (io == NULL) {                                \
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_IO_NULL_PTR); \
+    }                                                \
+    if (io->read == NULL      ||                     \
+            io->seek == NULL  ||                     \
+            io->tell == NULL  ||                     \
+            io->write == NULL ||                     \
+            io->flush == NULL ||                     \
+            io->close == NULL ||                     \
+            io->eof == NULL) {                       \
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IO);  \
+    }                                                \
 } while(0)
 
-#define SAIL_CHECK_IMAGE(image)                             \
-do {                                                        \
-    if (image == NULL) {                                    \
-        __SAIL_LFAR(SAIL_ERROR_IMAGE_NULL_PTR);             \
-    }                                                       \
-    if (image->width == 0 || image->height == 0) {          \
-        __SAIL_LFAR(SAIL_ERROR_INCORRECT_IMAGE_DIMENSIONS); \
-    }                                                       \
-    if (image->bytes_per_line == 0) {                       \
-        __SAIL_LFAR(SAIL_ERROR_INCORRECT_BYTES_PER_LINE);   \
-    }                                                       \
+#define SAIL_CHECK_IMAGE(image)                                     \
+{                                                                   \
+    if (image == NULL) {                                            \
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_IMAGE_NULL_PTR);             \
+    }                                                               \
+    if (image->width == 0 || image->height == 0) {                  \
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INCORRECT_IMAGE_DIMENSIONS); \
+    }                                                               \
+    if (image->bytes_per_line == 0) {                               \
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INCORRECT_BYTES_PER_LINE);   \
+    }                                                               \
 } while(0)
 
-#define SAIL_CHECK_PTR(ptr)               \
-do {                                      \
-    if (ptr == NULL) {                    \
-        __SAIL_LFAR(SAIL_ERROR_NULL_PTR); \
-    }                                     \
+#define SAIL_CHECK_PTR(ptr)                       \
+{                                                 \
+    if (ptr == NULL) {                            \
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_NULL_PTR); \
+    }                                             \
 } while(0)
 
 #define SAIL_CHECK_PTR2(ptr, ret) \
-do {                              \
+{                                 \
     if (ptr == NULL) {            \
-        __SAIL_LFAR(ret);         \
+        SAIL_LOG_AND_RETURN(ret); \
     }                             \
 } while(0)
 
@@ -207,42 +207,42 @@ do {                              \
 
 /*
  * Try to execute the specified SAIL function. If it fails, execute the rest of arguments.
- * Use do/while to require ';' at the end of a SAIL_TRY_OR_EXECUTE() expression.
+ * Use while(0) to require ';' at the end of a SAIL_TRY_OR_EXECUTE() expression.
  */
-#define SAIL_TRY_OR_EXECUTE(sail_func, ...)       \
-do {                                              \
-    sail_status_t __sail_error_result;            \
-                                                  \
-    if ((__sail_error_result = sail_func) != 0) { \
-        __VA_ARGS__;                              \
-    }                                             \
+#define SAIL_TRY_OR_EXECUTE(sail_func, ...)             \
+{                                                       \
+    sail_status_t __sail_error_result;                  \
+                                                        \
+    if ((__sail_error_result = sail_func) != SAIL_OK) { \
+        __VA_ARGS__;                                    \
+    }                                                   \
 } while(0)
 
 /*
  * Try to execute the specified SAIL function. If it fails, return the error code.
- * Use do/while to require ';' at the end of a SAIL_TRY() expression.
+ * Use while(0) to require ';' at the end of a SAIL_TRY() expression.
  */
 #define SAIL_TRY(sail_func) SAIL_TRY_OR_EXECUTE(sail_func, return __sail_error_result)
 
 /*
  * Try to execute the specified SAIL function. If it fails, ignore the error and continue execution.
- * Use do/while to require ';' at the end of a SAIL_TRY_OR_SUPPRESS() expression.
+ * Use while(0) to require ';' at the end of a SAIL_TRY_OR_SUPPRESS() expression.
  */
 #define SAIL_TRY_OR_SUPPRESS(sail_func) SAIL_TRY_OR_EXECUTE(sail_func, (void)0)
 
 /*
  * Try to execute the specified SAIL function. If it fails, execute the rest of arguments
- * (so called cleanup), and return the error code. Use do/while to require ';' at the end
+ * (so called cleanup), and return the error code. Use while(0) to require ';' at the end
  * of a SAIL_TRY_OR_CLEANUP() expression.
  */
-#define SAIL_TRY_OR_CLEANUP(sail_func, ...) \
-do {                                        \
-    sail_status_t res;                      \
-                                            \
-    if ((res = sail_func) != 0) {           \
-        __VA_ARGS__;                        \
-        return res;                         \
-    }                                       \
+#define SAIL_TRY_OR_CLEANUP(sail_func, ...)             \
+{                                                       \
+    sail_status_t __sail_error_result;                  \
+                                                        \
+    if ((__sail_error_result = sail_func) != SAIL_OK) { \
+        __VA_ARGS__;                                    \
+        return __sail_error_result;                     \
+    }                                                   \
 } while(0)
 
 #endif

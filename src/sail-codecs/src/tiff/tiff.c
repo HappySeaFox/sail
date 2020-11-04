@@ -56,7 +56,7 @@ static sail_status_t alloc_tiff_state(struct tiff_state **tiff_state) {
     *tiff_state = ptr;
 
     if (*tiff_state == NULL) {
-        return SAIL_ERROR_MEMORY_ALLOCATION;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_MEMORY_ALLOCATION);
     }
 
     (*tiff_state)->tiff              = NULL;
@@ -131,7 +131,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v3(struct sail_io *io, const stru
 
     if (tiff_state->tiff == NULL) {
         tiff_state->libtiff_error = true;
-        return SAIL_ERROR_UNDERLYING_CODEC;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
     return SAIL_OK;
@@ -146,7 +146,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
     struct tiff_state *tiff_state = (struct tiff_state *)state;
 
     if (tiff_state->libtiff_error) {
-        return SAIL_ERROR_UNDERLYING_CODEC;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
     SAIL_TRY(sail_alloc_image(image));
@@ -156,7 +156,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
     /* Start reading the next directory. */
     if (!TIFFSetDirectory(tiff_state->tiff, tiff_state->current_frame++)) {
         sail_destroy_image(*image);
-        return SAIL_ERROR_NO_MORE_FRAMES;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
     }
 
     /* Start reading the next image. */
@@ -164,7 +164,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
     if (!TIFFRGBAImageBegin(&tiff_state->image, tiff_state->tiff, /* stop */ 1, emsg)) {
         SAIL_LOG_ERROR("TIFF: %s", emsg);
         sail_destroy_image(*image);
-        return SAIL_ERROR_UNDERLYING_CODEC;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
     tiff_state->image.req_orientation = ORIENTATION_TOPLEFT;
@@ -173,7 +173,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
     if (!TIFFGetField(tiff_state->tiff, TIFFTAG_IMAGEWIDTH,  &(*image)->width) || !TIFFGetField(tiff_state->tiff, TIFFTAG_IMAGELENGTH, &(*image)->height)) {
         SAIL_LOG_ERROR("Failed to get the image dimensions");
         sail_destroy_image(*image);
-        return SAIL_ERROR_UNDERLYING_CODEC;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
     /* Fetch meta data. */
@@ -203,7 +203,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
     if (!TIFFGetField(tiff_state->tiff, TIFFTAG_COMPRESSION, &compression)) {
         SAIL_LOG_ERROR("Failed to get the image compression type");
         sail_destroy_image(*image);
-        return SAIL_ERROR_UNDERLYING_CODEC;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
     (*image)->source_image->compression = tiff_compression_to_sail_compression(compression);
@@ -236,11 +236,11 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v3(void *state, struct sail_io *
     struct tiff_state *tiff_state = (struct tiff_state *)state;
 
     if (tiff_state->libtiff_error) {
-        return SAIL_ERROR_UNDERLYING_CODEC;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
     if (!TIFFRGBAImageGet(&tiff_state->image, image->pixels, image->width, image->height)) {
-        return SAIL_ERROR_UNDERLYING_CODEC;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
     TIFFRGBAImageEnd(&tiff_state->image);
@@ -325,7 +325,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_init_v3(struct sail_io *io, const str
 
     if (tiff_state->tiff == NULL) {
         tiff_state->libtiff_error = true;
-        return SAIL_ERROR_UNDERLYING_CODEC;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
     return SAIL_OK;
@@ -340,7 +340,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v3(void *state, struc
     struct tiff_state *tiff_state = (struct tiff_state *)state;
 
     if (tiff_state->libtiff_error) {
-        return SAIL_ERROR_UNDERLYING_CODEC;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
     tiff_state->line = 0;
@@ -397,17 +397,17 @@ SAIL_EXPORT sail_status_t sail_codec_write_frame_v3(void *state, struct sail_io 
     struct tiff_state *tiff_state = (struct tiff_state *)state;
 
     if (tiff_state->libtiff_error) {
-        return SAIL_ERROR_UNDERLYING_CODEC;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
     for (unsigned row = 0; row < image->height; row++) {
         if (TIFFWriteScanline(tiff_state->tiff, (unsigned char *)image->pixels + row * image->bytes_per_line, tiff_state->line++, 0) < 0) {
-            return SAIL_ERROR_UNDERLYING_CODEC;
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
         }
     }
 
     if (!TIFFWriteDirectory(tiff_state->tiff)) {
-        return SAIL_ERROR_UNDERLYING_CODEC;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
     return SAIL_OK;

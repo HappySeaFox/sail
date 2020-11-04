@@ -161,7 +161,7 @@ static sail_status_t update_lib_path(const char *codecs_path) {
         SAIL_LOG_ERROR("Failed to update library search path with '%s'. Error: %d", full_path_to_lib, GetLastError());
         sail_free(full_path_to_lib_w);
         sail_free(full_path_to_lib);
-        return SAIL_ERROR_ENV_UPDATE;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_ENV_UPDATE);
     }
 
     sail_free(full_path_to_lib_w);
@@ -193,7 +193,7 @@ static sail_status_t update_lib_path(const char *codecs_path) {
     if (setenv("LD_LIBRARY_PATH", combined_ld_library_path, true) != 0) {
         SAIL_LOG_ERROR("Failed to update library search path: %s", strerror(errno));
         sail_free(combined_ld_library_path);
-        return SAIL_ERROR_ENV_UPDATE;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_ENV_UPDATE);
     }
 
     sail_free(combined_ld_library_path);
@@ -238,7 +238,7 @@ static sail_status_t build_codec_from_codec_info(const char *codec_info_full_pat
     char *codec_info_part = strstr(codec_info_full_path, ".codec.info");
 
     if (codec_info_part == NULL) {
-        return SAIL_ERROR_MEMORY_ALLOCATION;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_MEMORY_ALLOCATION);
     }
 
     /* The length of "/path/jpeg". */
@@ -349,7 +349,7 @@ static sail_status_t init_context(struct sail_context *context, int flags) {
         if (hFind == INVALID_HANDLE_VALUE) {
             SAIL_LOG_ERROR("Failed to list files in '%s'. Error: %d", codecs_path, GetLastError());
             sail_free(codecs_path_with_mask);
-            return SAIL_ERROR_LIST_DIR;
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_LIST_DIR);
         }
 
         do {
@@ -357,9 +357,8 @@ static sail_status_t init_context(struct sail_context *context, int flags) {
             char *full_path;
 
             /* Ignore errors and try to load as much as possible. */
-            if (build_full_path(codecs_path, data.cFileName, &full_path) != SAIL_OK) {
-                continue;
-            }
+            SAIL_TRY_OR_EXECUTE(build_full_path(codecs_path, data.cFileName, &full_path),
+                                /* on error */ continue);
 
             SAIL_LOG_DEBUG("Found codec info '%s'", data.cFileName);
 
@@ -392,9 +391,8 @@ static sail_status_t init_context(struct sail_context *context, int flags) {
             char *full_path;
 
             /* Ignore errors and try to load as much as possible. */
-            if (build_full_path(codecs_path, dir->d_name, &full_path) != SAIL_OK) {
-                continue;
-            }
+            SAIL_TRY_OR_EXECUTE(build_full_path(codecs_path, dir->d_name, &full_path),
+                                /* on error */ continue);
 
             /* Handle files only. */
             if (sail_is_file(full_path)) {

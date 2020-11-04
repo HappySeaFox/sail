@@ -40,7 +40,7 @@ sail_status_t sail_codec_info_from_path(const char *path, const struct sail_code
     const char *dot = strrchr(path, '.');
 
     if (dot == NULL || *dot == '\0' || *(dot+1) == '\0') {
-        return SAIL_ERROR_INVALID_ARGUMENT;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 
     SAIL_LOG_DEBUG("Finding codec info for path '%s'", path);
@@ -97,7 +97,7 @@ sail_status_t sail_codec_info_by_magic_number_from_io(struct sail_io *io, const 
 
     if (nbytes != SAIL_MAGIC_BUFFER_SIZE) {
         SAIL_LOG_ERROR("Failed to read %d bytes from the I/O source", SAIL_MAGIC_BUFFER_SIZE);
-        return SAIL_ERROR_READ_IO;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_READ_IO);
     }
 
     /* Seek back. */
@@ -139,7 +139,7 @@ sail_status_t sail_codec_info_by_magic_number_from_io(struct sail_io *io, const 
         node = node->next;
     }
 
-    return SAIL_ERROR_CODEC_NOT_FOUND;
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_NOT_FOUND);
 }
 
 sail_status_t sail_codec_info_from_extension(const char *extension, const struct sail_codec_info **codec_info) {
@@ -178,7 +178,7 @@ sail_status_t sail_codec_info_from_extension(const char *extension, const struct
     }
 
     sail_free(extension_copy);
-    return SAIL_ERROR_CODEC_NOT_FOUND;
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_NOT_FOUND);
 }
 
 sail_status_t sail_codec_info_from_mime_type(const char *mime_type, const struct sail_codec_info **codec_info) {
@@ -217,5 +217,5 @@ sail_status_t sail_codec_info_from_mime_type(const char *mime_type, const struct
     }
 
     sail_free(mime_type_copy);
-    return SAIL_ERROR_CODEC_NOT_FOUND;
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_NOT_FOUND);
 }

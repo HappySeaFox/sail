@@ -76,7 +76,7 @@ static sail_status_t alloc_gif_state(struct gif_state **gif_state) {
     *gif_state = ptr;
 
     if (*gif_state == NULL) {
-        return SAIL_ERROR_MEMORY_ALLOCATION;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_MEMORY_ALLOCATION);
     }
 
     (*gif_state)->read_options  = NULL;
@@ -154,7 +154,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v3(struct sail_io *io, const stru
 
     if (gif_state->gif == NULL) {
         SAIL_LOG_ERROR("GIF: Failed to initialize. GIFLIB error code: %d", error_code);
-        return SAIL_ERROR_UNDERLYING_CODEC;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
     /* Initialize internal structs. */
@@ -225,7 +225,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
         if (DGifGetRecordType(gif_state->gif, &record) == GIF_ERROR) {
             SAIL_LOG_ERROR("GIF: %s", GifErrorString(gif_state->gif->Error));
             sail_destroy_image(*image);
-            return SAIL_ERROR_UNDERLYING_CODEC;
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
         }
 
         switch (record) {
@@ -233,7 +233,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
                 if (DGifGetImageDesc(gif_state->gif) == GIF_ERROR) {
                     SAIL_LOG_ERROR("GIF: %s", GifErrorString(gif_state->gif->Error));
                     sail_destroy_image(*image);
-                    return SAIL_ERROR_UNDERLYING_CODEC;
+                    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
                 }
 
                 (*image)->width = gif_state->gif->SWidth;
@@ -247,7 +247,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
                 if (gif_state->column + gif_state->width > (unsigned)gif_state->gif->SWidth ||
                         gif_state->row + gif_state->height > (unsigned)gif_state->gif->SHeight) {
                     sail_destroy_image(*image);
-                    return SAIL_ERROR_INCORRECT_IMAGE_DIMENSIONS;
+                    SAIL_LOG_AND_RETURN(SAIL_ERROR_INCORRECT_IMAGE_DIMENSIONS);
                 }
                 break;
             }
@@ -259,7 +259,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
                 if (DGifGetExtension(gif_state->gif, &ext_code, &extension) == GIF_ERROR) {
                     SAIL_LOG_ERROR("GIF: %s", GifErrorString(gif_state->gif->Error));
                     sail_destroy_image(*image);
-                    return SAIL_ERROR_UNDERLYING_CODEC;
+                    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
                 }
 
                 if (extension == NULL) {
@@ -309,7 +309,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
                     if (DGifGetExtensionNext(gif_state->gif, &extension) == GIF_ERROR) {
                         SAIL_LOG_ERROR("GIF: %s", GifErrorString(gif_state->gif->Error));
                         sail_destroy_image(*image);
-                        return SAIL_ERROR_UNDERLYING_CODEC;
+                        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
                     }
                 }
 
@@ -318,7 +318,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
 
             case TERMINATE_RECORD_TYPE: {
                 sail_destroy_image(*image);
-                return SAIL_ERROR_NO_MORE_FRAMES;
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
             }
 
             default: {
@@ -335,7 +335,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
 
             if (gif_state->map == NULL) {
                 sail_destroy_image(*image);
-                return SAIL_ERROR_MISSING_PALETTE;
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_MISSING_PALETTE);
             }
 
             if (gif_state->gif->Image.Interlace) {
@@ -446,7 +446,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v3(void *state, struct sail_io *
         if (do_read) {
             if (DGifGetLine(gif_state->gif, gif_state->buf, gif_state->width) == GIF_ERROR) {
                 SAIL_LOG_ERROR("GIF: %s", GifErrorString(gif_state->gif->Error));
-                return SAIL_ERROR_UNDERLYING_CODEC;
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
             }
 
             memcpy(scan, gif_state->first_frame[cc], image->width * 4);
@@ -509,7 +509,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_init_v3(struct sail_io *io, const str
     SAIL_CHECK_IO(io);
     SAIL_CHECK_WRITE_OPTIONS_PTR(write_options);
 
-    return SAIL_ERROR_NOT_IMPLEMENTED;
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
 SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v3(void *state, struct sail_io *io, const struct sail_image *image) {
@@ -518,7 +518,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v3(void *state, struc
     SAIL_CHECK_IO(io);
     SAIL_CHECK_IMAGE(image);
 
-    return SAIL_ERROR_NOT_IMPLEMENTED;
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
 SAIL_EXPORT sail_status_t sail_codec_write_seek_next_pass_v3(void *state, struct sail_io *io, const struct sail_image *image) {
@@ -527,7 +527,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_pass_v3(void *state, struct
     SAIL_CHECK_IO(io);
     SAIL_CHECK_IMAGE(image);
 
-    return SAIL_ERROR_NOT_IMPLEMENTED;
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
 SAIL_EXPORT sail_status_t sail_codec_write_frame_v3(void *state, struct sail_io *io, const struct sail_image *image) {
@@ -536,7 +536,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_frame_v3(void *state, struct sail_io 
     SAIL_CHECK_IO(io);
     SAIL_CHECK_IMAGE(image);
 
-    return SAIL_ERROR_NOT_IMPLEMENTED;
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
 SAIL_EXPORT sail_status_t sail_codec_write_finish_v3(void **state, struct sail_io *io) {
@@ -544,5 +544,5 @@ SAIL_EXPORT sail_status_t sail_codec_write_finish_v3(void **state, struct sail_i
     SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IO(io);
 
-    return SAIL_ERROR_NOT_IMPLEMENTED;
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }

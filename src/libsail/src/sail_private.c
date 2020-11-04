@@ -100,7 +100,7 @@ sail_status_t load_codec_by_codec_info(const struct sail_codec_info *codec_info,
 
     /* Something weird. The pointer to the codec info is not found the cache. */
     if (found_node == NULL) {
-        return SAIL_ERROR_CODEC_NOT_FOUND;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_NOT_FOUND);
     }
 
     SAIL_TRY(load_codec(found_node));
@@ -194,12 +194,12 @@ sail_status_t allowed_write_output_pixel_format(const struct sail_write_features
             }
 
             print_unsupported_write_output_pixel_format(input_pixel_format, output_pixel_format);
-            return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
         }
 
         node = node->next;
     }
 
     print_unsupported_write_input_pixel_format(input_pixel_format);
-    return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
 }
