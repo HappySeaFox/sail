@@ -95,7 +95,7 @@ sail_status_t alloc_and_load_codec(const struct sail_codec_info *codec_info, str
             destroy_codec(*codec);                                \
             SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_SYMBOL_RESOLVE); \
         }                                                         \
-    } while(0)
+    } do{} while(0)
 
     if ((*codec)->layout == SAIL_CODEC_LAYOUT_V3) {
         SAIL_TRY_OR_CLEANUP(sail_malloc(sizeof(struct sail_codec_layout_v3), &ptr),

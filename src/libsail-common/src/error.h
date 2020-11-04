@@ -126,7 +126,7 @@ typedef enum SailStatus sail_status_t;
  * Log failure and return.
  */
 #define SAIL_LOG_AND_RETURN(code) \
-{                                 \
+do {                              \
     SAIL_LOG_ERROR("%s", #code);  \
     return code;                  \
 } while(0)
@@ -135,7 +135,7 @@ typedef enum SailStatus sail_status_t;
  * Helper macros.
  */
 #define SAIL_CHECK_IO(io)                            \
-{                                                    \
+do {                                                 \
     if (io == NULL) {                                \
         SAIL_LOG_AND_RETURN(SAIL_ERROR_IO_NULL_PTR); \
     }                                                \
@@ -151,7 +151,7 @@ typedef enum SailStatus sail_status_t;
 } while(0)
 
 #define SAIL_CHECK_IMAGE(image)                                     \
-{                                                                   \
+do {                                                                \
     if (image == NULL) {                                            \
         SAIL_LOG_AND_RETURN(SAIL_ERROR_IMAGE_NULL_PTR);             \
     }                                                               \
@@ -164,14 +164,14 @@ typedef enum SailStatus sail_status_t;
 } while(0)
 
 #define SAIL_CHECK_PTR(ptr)                       \
-{                                                 \
+do {                                              \
     if (ptr == NULL) {                            \
         SAIL_LOG_AND_RETURN(SAIL_ERROR_NULL_PTR); \
     }                                             \
 } while(0)
 
 #define SAIL_CHECK_PTR2(ptr, ret) \
-{                                 \
+do {                              \
     if (ptr == NULL) {            \
         SAIL_LOG_AND_RETURN(ret); \
     }                             \
@@ -207,7 +207,7 @@ typedef enum SailStatus sail_status_t;
 
 /*
  * Try to execute the specified SAIL function. If it fails, execute the rest of arguments.
- * Use while(0) to require ';' at the end of a SAIL_TRY_OR_EXECUTE() expression.
+ * Use do/while to require ';' at the end of a SAIL_TRY_OR_EXECUTE() expression.
  */
 #define SAIL_TRY_OR_EXECUTE(sail_func, ...)             \
 {                                                       \
@@ -216,23 +216,21 @@ typedef enum SailStatus sail_status_t;
     if ((__sail_error_result = sail_func) != SAIL_OK) { \
         __VA_ARGS__;                                    \
     }                                                   \
-} while(0)
+} do{} while(0)
 
 /*
  * Try to execute the specified SAIL function. If it fails, return the error code.
- * Use while(0) to require ';' at the end of a SAIL_TRY() expression.
  */
 #define SAIL_TRY(sail_func) SAIL_TRY_OR_EXECUTE(sail_func, return __sail_error_result)
 
 /*
  * Try to execute the specified SAIL function. If it fails, ignore the error and continue execution.
- * Use while(0) to require ';' at the end of a SAIL_TRY_OR_SUPPRESS() expression.
  */
 #define SAIL_TRY_OR_SUPPRESS(sail_func) SAIL_TRY_OR_EXECUTE(sail_func, (void)0)
 
 /*
  * Try to execute the specified SAIL function. If it fails, execute the rest of arguments
- * (so called cleanup), and return the error code. Use while(0) to require ';' at the end
+ * (so called cleanup), and return the error code. Use do/while to require ';' at the end
  * of a SAIL_TRY_OR_CLEANUP() expression.
  */
 #define SAIL_TRY_OR_CLEANUP(sail_func, ...)             \
@@ -243,6 +241,6 @@ typedef enum SailStatus sail_status_t;
         __VA_ARGS__;                                    \
         return __sail_error_result;                     \
     }                                                   \
-} while(0)
+} do{} while(0)
 
 #endif
