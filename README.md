@@ -124,7 +124,7 @@ See [FAQ](FAQ.md) for more.
 
 SAIL provides four levels of APIs, depending on your needs. Let's have a quick look at them.
 
-### 1. `Junior`: I just want to load this damn JPEG from a file or memory
+### 1. `Junior`: I just want to load this JPEG from a file or memory
 
 #### C:
 ```C
@@ -164,11 +164,11 @@ SAIL_TRY(reader.read(path, &image));
 
 It's pretty easy, isn't it? :smile: See [EXAMPLES](EXAMPLES.md) and [FAQ](FAQ.md) for more.
 
-### 2. `Advanced`: I want to load this damn animated GIF from a file or memory
+### 2. `Advanced`: I want to load this animated GIF from a file or memory
 
 See [EXAMPLES](EXAMPLES.md) for more.
 
-### 3. `Deep diver`: I want to load this damn animated GIF from a file or memory and have control over selected codecs and output pixel formats
+### 3. `Deep diver`: I want to load this animated GIF from a file or memory and have control over selected codecs and output pixel formats
 
 See [EXAMPLES](EXAMPLES.md) for more.
 

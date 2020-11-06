@@ -108,9 +108,9 @@ Set the `SAIL_MY_CODECS_PATH` environment variable to a desired location of your
 
 SAIL provides four levels of high-level APIs:
 
-- `Junior`: I just want to load this damn JPEG from a file or memory
-- `Advanced`: I want to load this damn animated GIF from a file or memory
-- `Deep diver`: I want to load this damn animated GIF from a file or memory and have control over selected codecs and output pixel formats
+- `Junior`: I just want to load this JPEG from a file or memory
+- `Advanced`: I want to load this animated GIF from a file or memory
+- `Deep diver`: I want to load this animated GIF from a file or memory and have control over selected codecs and output pixel formats
 - `Technical diver`: I want everything above and my custom I/O source
 
 See [EXAMPLES](EXAMPLES.md) for more.
