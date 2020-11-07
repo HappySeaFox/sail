@@ -144,12 +144,13 @@ void sail_log(enum SailLogLevel level, const char *file, int line, const char *f
         }
     }
 
+    /* Print log level. */
     va_list(args);
     va_start(args, format);
 
     fprintf(SAIL_LOG_FPTR, "SAIL: [%s] ", level_string);
 
-#ifdef SAIL_DEV
+    /* Print file and line. */
 #ifdef SAIL_WIN32
     const char *name = strrchr(file, '\\');
 #else
@@ -157,11 +158,8 @@ void sail_log(enum SailLogLevel level, const char *file, int line, const char *f
 #endif
 
     fprintf(SAIL_LOG_FPTR, "[%s:%d] ", name == NULL ? file : name+1, line);
-#else
-    (void)file;
-    (void)line;
-#endif
 
+    /* Print the rest of arguments. */
     vfprintf(SAIL_LOG_FPTR, format, args);
 
     if (ansi_colors_supported) {
