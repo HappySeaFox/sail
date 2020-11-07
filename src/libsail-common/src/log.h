@@ -26,6 +26,8 @@
 #ifndef SAIL_LOG_H
 #define SAIL_LOG_H
 
+#include <stdarg.h>
+
 #ifdef SAIL_BUILD
     #include "export.h"
 #else
@@ -49,6 +51,8 @@ enum SailLogLevel {
     SAIL_LOG_LEVEL_DEBUG,
 };
 
+typedef void (*sail_logger)(enum SailLogLevel level, const char *file, int line, const char *format, va_list args);
+
 SAIL_EXPORT void sail_log(enum SailLogLevel level, const char *file, int line, const char *format, ...);
 
 /*
@@ -58,6 +62,14 @@ SAIL_EXPORT void sail_log(enum SailLogLevel level, const char *file, int line, c
  * before initializing SAIL.
  */
 SAIL_EXPORT void sail_set_log_barrier(enum SailLogLevel max_level);
+
+/*
+ * Sets an external logger to pass all filtered log messages into.
+ *
+ * This function is not thread-safe. It's recommended to call it in the main thread
+ * before initializing SAIL.
+ */
+SAIL_EXPORT void sail_set_logger(sail_logger logger);
 
 /*
  * Log an error message.

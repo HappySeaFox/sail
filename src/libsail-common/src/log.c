@@ -66,6 +66,8 @@
 
 static enum SailLogLevel sail_max_log_level = SAIL_LOG_LEVEL_DEBUG;
 
+static sail_logger sail_external_logger = NULL;
+
 static bool check_ansi_colors_supported(void) {
 
     SAIL_THREAD_LOCAL static bool ansi_colors_supported_called = false;
@@ -116,6 +118,16 @@ void sail_log(enum SailLogLevel level, const char *file, int line, const char *f
         return;
     }
 
+    if (sail_external_logger != NULL) {
+        va_list args;
+        va_start(args, format);
+
+        sail_external_logger(level, file, line, format, args);
+
+        va_end(args);
+        return;
+    }
+
     const char *level_string = NULL;
 
     switch (level) {
@@ -145,7 +157,7 @@ void sail_log(enum SailLogLevel level, const char *file, int line, const char *f
     }
 
     /* Print log level. */
-    va_list(args);
+    va_list args;
     va_start(args, format);
 
     fprintf(SAIL_LOG_FPTR, "SAIL: [%s] ", level_string);
@@ -174,4 +186,9 @@ void sail_log(enum SailLogLevel level, const char *file, int line, const char *f
 void sail_set_log_barrier(enum SailLogLevel max_level) {
 
     sail_max_log_level = max_level;
+}
+
+void sail_set_logger(sail_logger logger) {
+
+    sail_external_logger = logger;
 }
