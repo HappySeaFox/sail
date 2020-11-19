@@ -56,12 +56,19 @@ sail_status_t sail_start_reading_mem_with_options(const void *buffer, size_t buf
                                                  const struct sail_read_options *read_options, void **state) {
 
     SAIL_CHECK_BUFFER_PTR(buffer);
-    SAIL_CHECK_CODEC_INFO_PTR(codec_info);
+
+    const struct sail_codec_info *codec_info_local;
+
+    if (codec_info == NULL) {
+        SAIL_TRY(sail_codec_info_by_magic_number_from_mem(buffer, buffer_length, &codec_info_local));
+    } else {
+        codec_info_local = codec_info;
+    }
 
     struct sail_io *io;
     SAIL_TRY(alloc_io_read_mem(buffer, buffer_length, &io));
 
-    SAIL_TRY(start_reading_io_with_options(io, true, codec_info, read_options, state));
+    SAIL_TRY(start_reading_io_with_options(io, true, codec_info_local, read_options, state));
 
     return SAIL_OK;
 }
