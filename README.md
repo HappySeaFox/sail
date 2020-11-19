@@ -19,6 +19,7 @@
   <a href="#features-overview">Features</a> •
   <a href="#supported-image-formats">Image Formats</a> •
   <a href="#apis-overview">Getting Started</a> •
+  <a href="EXAMPLES.md">Examples</a> •
   <a href="FAQ.md">FAQ</a> •
   <a href="#support">Support</a>
 </p>
