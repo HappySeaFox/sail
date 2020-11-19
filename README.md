@@ -99,14 +99,11 @@ Currently, SAIL supports the following platforms:
 
 ## Differences from other image decoding libraries
 
-- Simple yet powerful API providing expected business entities - images, delays, palettes, pixels etc.
-- Access to source pixel data w/o converting it to a different format (supported by the most codecs)
-- Reading and writing images in multiple pixel formats, not only RGB and friends
-- Access to the image properties w/o decoding the whole pixel data (probing)
-- Access to the source image properties (source pixel format etc.)
-- Image formats are supported through dynamically loaded codecs which means you can add or remove codecs
-  without re-compiling the whole library
-- Image codecs can be implemented in any programming language
+- Easily extensible with new image format plugins
+- Easy-to-use API providing expected business entities - images, palettes, pixels etc.
+- Access to source pixel data (supported by the most codecs)
+- Output in multiple pixel formats, not only RGB
+- Access to the image properties w/o decoding pixel data (probing)
 
 ## Development status
 
