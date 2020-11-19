@@ -94,6 +94,7 @@ Currently, SAIL supports the following platforms:
 - [Boost.GIL](https://www.boost.org/doc/libs/1_68_0/libs/gil/doc/html/index.html)
 - [gdk-pixbuf](https://developer.gnome.org/gdk-pixbuf)
 - [imlib2](https://docs.enlightenment.org/api/imlib2/html)
+- [CImg](https://github.com/dtschump/CImg)
 - [WIC (Windows only)](https://docs.microsoft.com/en-us/windows/win32/wic/-wic-about-windows-imaging-codec)
 
 ## Differences from other image decoding libraries
