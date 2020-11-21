@@ -51,7 +51,16 @@ animated, multi-paged images along with their meta data and ICC profiles. :sailb
 - [x] Meta data support: text comments, EXIF, ICC profiles
 - [x] Access to the image properties w/o decoding pixels (probing)
 - [x] Access to the source image properties
+- [x] Adding or updating image codecs with ease demonstrated by Intel \[[*](#intel)\]
 - [x] The best MIME icons in the computer industry :smile:
+
+<a id="intel"></a>
+
+\* One day Intel demonstrated the advantages of their [IPP](https://wikipedia.org/wiki/Integrated_Performance_Primitives) technology in speeding up decoding
+[JPEG](https://web.archive.org/web/20091009223918/http://software.intel.com/en-us/articles/intel-integrated-performance-primitives-intel-ipp-for-linux-optimizing-jpeg-coding-in-the-ksquirrel-application-with-intel-ipp)
+and
+[JPEG2000](https://web.archive.org/web/20091009224048/http://software.intel.com/en-us/articles/performance-tools-for-software-developers-application-notes-intel-ipp-jpeg2000-and-jasper-in-ksquirrel)
+images with the help of [ksquirrel-libs](FAQ.md#how-old-is-sail), the predecessor of SAIL.
 
 ## Features NOT provided
 
