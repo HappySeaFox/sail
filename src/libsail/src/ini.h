@@ -11,8 +11,8 @@ https://github.com/benhoyt/inih
 
 */
 
-#ifndef __INI_H__
-#define __INI_H__
+#ifndef INI_H
+#define INI_H
 
 /* Make this header file easier to include in C++ code */
 #ifdef __cplusplus
@@ -106,7 +106,7 @@ int ini_parse_string(const char* string, ini_handler handler, void* user);
 /* Maximum line length for any line in INI file (stack or heap). Note that
    this must be 3 more than the longest line (due to '\r', '\n', and '\0'). */
 #ifndef INI_MAX_LINE
-#define INI_MAX_LINE 1024
+#define INI_MAX_LINE 200
 #endif
 
 /* Nonzero to allow heap line buffer to grow via realloc(), zero for a
@@ -141,8 +141,17 @@ int ini_parse_string(const char* string, ini_handler handler, void* user);
 #define INI_ALLOW_NO_VALUE 0
 #endif
 
+/* Nonzero to use custom ini_malloc, ini_free, and ini_realloc memory
+   allocation functions (INI_USE_STACK must also be 0). These functions must
+   have the same signatures as malloc/free/realloc and behave in a similar
+   way. ini_realloc is only needed if INI_ALLOW_REALLOC is set. */
+#ifndef INI_CUSTOM_ALLOCATOR
+#define INI_CUSTOM_ALLOCATOR 0
+#endif
+
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __INI_H__ */
+#endif /* INI_H */
