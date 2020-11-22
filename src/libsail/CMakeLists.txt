@@ -41,7 +41,7 @@ sail_enable_pch(TARGET sail HEADER src/sail.h)
 # Definitions, includes, link
 #
 target_include_directories(sail PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>)
-target_compile_definitions(sail PRIVATE INI_STOP_ON_FIRST_ERROR=1)
+target_compile_definitions(sail PRIVATE INI_ALLOW_MULTILINE=0 INI_ALLOW_INLINE_COMMENTS=0 INI_STOP_ON_FIRST_ERROR=1)
 target_link_libraries(sail PUBLIC sail-common)
 
 if (UNIX)
