@@ -18,7 +18,8 @@ Table of Contents
 | **Libraries Under Test (LUT)** | [Boost.GIL](https://www.boost.org/doc/libs/1_68_0/libs/gil/doc/html/index.html), [CImg](https://github.com/dtschump/CImg), [DevIL](http://openil.sourceforge.net), [FreeImage](https://freeimage.sourceforge.io), [OpenImageIO](https://github.com/OpenImageIO/oiio.git), [SAIL](https://github.com/smoked-herring/sail), [SDL_Image](https://www.libsdl.org/projects/SDL_image), [stb_image](https://github.com/nothings/stb), [WIC](https://docs.microsoft.com/en-us/windows/win32/wic/-wic-about-windows-imaging-codec) |
 | **LUT Installation Mode**      | vcpkg                |
 | **Benchmarks**                 | [sail-benchmark](https://github.com/smoked-herring/sail-benchmark) |
-| **Measurement Unit**           | Microseconds         |
+| **Measured Time**              | Real (wall clock)    |
+| **Measurement Units**          | Microseconds         |
 | **Output Pixels**              | RGBA8888 or similar  |
 | **Hardware**                   | Lenovo Thinkpad W540 |
 | **CPU**                        | Intel Core i7-4800MQ |
