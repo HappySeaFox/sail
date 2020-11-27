@@ -326,7 +326,9 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v3(struct sail_io *io, const stru
     }
 
 #ifdef PNG_APNG_SUPPORTED
-    SAIL_TRY(sail_malloc(png_state->first_image->width * png_state->bytes_per_pixel, &png_state->temp_scanline));
+    if (png_state->is_apng) {
+        SAIL_TRY(sail_malloc(png_state->first_image->width * png_state->bytes_per_pixel, &png_state->temp_scanline));
+    }
 #endif
 
     const char *pixel_format_str = NULL;
