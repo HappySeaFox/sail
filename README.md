@@ -81,6 +81,14 @@ images with the help of [ksquirrel-libs](FAQ.md#how-old-is-sail), the predecesso
 
 See the full list [here](FORMATS.md). Work to add more image formats is ongoing.
 
+## Benchmarks
+
+<p align="center">
+  <a href="BENCHMARKS.md"><img src=".github/benchmarks/JPEG-YCbCr-1000x669.png?raw=true" alt="Benchmark"/></a>
+</p>
+
+See [more](BENCHMARKS.md).
+
 ## Supported platforms
 
 Currently, SAIL supports the following platforms:
