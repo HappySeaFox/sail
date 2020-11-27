@@ -1,6 +1,6 @@
 # ChangeLog
 
-SAIL is a rebranded ksquirrel-libs rewritten in C, enchanced and with high-level APIs. Ksquirrel-libs was a set of C++ image codecs
+SAIL is rebranded ksquirrel-libs rewritten in C, improved and with high-level APIs. Ksquirrel-libs was a set of C++ image codecs
 for the KSquirrel image viewer. See [http://ksquirrel.sourceforge.net](http://ksquirrel.sourceforge.net).
 
 See [README](README.md) for more.
