@@ -25,8 +25,8 @@
 
 #
 
-SAIL is a fast and lightweight cross-platform image decoding library providing rich APIs,
-from one-liners to complex use cases with custom I/O sources. It enables a client to read and write static,
+SAIL is a small and fast cross-platform image decoding library providing rich APIs, from one-liners
+to complex use cases with custom I/O sources. It enables a client to read and write static,
 animated, multi-paged images along with their meta data and ICC profiles. :sailboat:
 
 <p align="center">
