@@ -84,7 +84,7 @@ See the full list [here](FORMATS.md). Work to add more image formats is ongoing.
 ## Benchmarks
 
 <p align="center">
-  <a href="BENCHMARKS.md"><img src=".github/benchmarks/JPEG-YCbCr-1000x669.png?raw=true" alt="Benchmark"/></a>
+  <a href="BENCHMARKS.md"><img src=".github/benchmarks/JPEG-YCbCr-1000x669.png?raw=true" alt="Benchmark" width="500px"/></a>
 </p>
 
 See [more](BENCHMARKS.md).

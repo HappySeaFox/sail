@@ -28,25 +28,25 @@ Table of Contents
 ## Results
 
 ### JPEG Gray
-<img alt="JPEG-Gray-100x67" src=".github/benchmarks/JPEG-Gray-100x67.png" width="752px" />
-<img alt="JPEG-Gray-1000x669" src=".github/benchmarks/JPEG-Gray-1000x669.png" width="752px" />
-<img alt="JPEG-Gray-6000x4016" src=".github/benchmarks/JPEG-Gray-6000x4016.png" width="752px" />
-<img alt="JPEG-Gray-15000x10040" src=".github/benchmarks/JPEG-Gray-15000x10040.png" width="752px" />
+<img alt="JPEG-Gray-100x67" src=".github/benchmarks/JPEG-Gray-100x67.png" width="500px" />
+<img alt="JPEG-Gray-1000x669" src=".github/benchmarks/JPEG-Gray-1000x669.png" width="500px" />
+<img alt="JPEG-Gray-6000x4016" src=".github/benchmarks/JPEG-Gray-6000x4016.png" width="500px" />
+<img alt="JPEG-Gray-15000x10040" src=".github/benchmarks/JPEG-Gray-15000x10040.png" width="500px" />
 
 ### JPEG YCbCr
-<img alt="JPEG-YCbCr-100x67" src=".github/benchmarks/JPEG-YCbCr-100x67.png" width="752px" />
-<img alt="JPEG-YCbCr-1000x669" src=".github/benchmarks/JPEG-YCbCr-1000x669.png" width="752px" />
-<img alt="JPEG-YCbCr-6000x4016" src=".github/benchmarks/JPEG-YCbCr-6000x4016.png" width="752px" />
-<img alt="JPEG-YCbCr-15000x10040" src=".github/benchmarks/JPEG-YCbCr-15000x10040.png" width="752px" />
+<img alt="JPEG-YCbCr-100x67" src=".github/benchmarks/JPEG-YCbCr-100x67.png" width="500px" />
+<img alt="JPEG-YCbCr-1000x669" src=".github/benchmarks/JPEG-YCbCr-1000x669.png" width="500px" />
+<img alt="JPEG-YCbCr-6000x4016" src=".github/benchmarks/JPEG-YCbCr-6000x4016.png" width="500px" />
+<img alt="JPEG-YCbCr-15000x10040" src=".github/benchmarks/JPEG-YCbCr-15000x10040.png" width="500px" />
 
 ### PNG Gray
-<img alt="PNG-Gray-100x71" src=".github/benchmarks/PNG-Gray-100x71.png" width="752px" />
-<img alt="PNG-Gray-1000x709" src=".github/benchmarks/PNG-Gray-1000x709.png" width="752px" />
-<img alt="PNG-Gray-6000x4256" src=".github/benchmarks/PNG-Gray-6000x4256.png" width="752px" />
-<img alt="PNG-Gray-15000x10640" src=".github/benchmarks/PNG-Gray-15000x10640.png" width="752px" />
+<img alt="PNG-Gray-100x71" src=".github/benchmarks/PNG-Gray-100x71.png" width="500px" />
+<img alt="PNG-Gray-1000x709" src=".github/benchmarks/PNG-Gray-1000x709.png" width="500px" />
+<img alt="PNG-Gray-6000x4256" src=".github/benchmarks/PNG-Gray-6000x4256.png" width="500px" />
+<img alt="PNG-Gray-15000x10640" src=".github/benchmarks/PNG-Gray-15000x10640.png" width="500px" />
 
 ### PNG RGBA
-<img alt="PNG-RGBA-100x71" src=".github/benchmarks/PNG-RGBA-100x71.png" width="752px" />
-<img alt="PNG-RGBA-1000x709" src=".github/benchmarks/PNG-RGBA-1000x709.png" width="752px" />
-<img alt="PNG-RGBA-6000x4256" src=".github/benchmarks/PNG-RGBA-6000x4256.png" width="752px" />
-<img alt="PNG-RGBA-15000x10640" src=".github/benchmarks/PNG-RGBA-15000x10640.png" width="752px" />
+<img alt="PNG-RGBA-100x71" src=".github/benchmarks/PNG-RGBA-100x71.png" width="500px" />
+<img alt="PNG-RGBA-1000x709" src=".github/benchmarks/PNG-RGBA-1000x709.png" width="500px" />
+<img alt="PNG-RGBA-6000x4256" src=".github/benchmarks/PNG-RGBA-6000x4256.png" width="500px" />
+<img alt="PNG-RGBA-15000x10640" src=".github/benchmarks/PNG-RGBA-15000x10640.png" width="500px" />
