@@ -12,7 +12,6 @@ Table of Contents
 
 | Condition                      | Value                |
 | ------------------------------ | -------------------- |
-| **Date**                       | Oct 27, 2020         |
 | **Operating System**           | Windows 7 x64        |
 | **Compiler**                   | MSVC 2019 x64        |
 | **Libraries Under Test (LUT)** | [Boost.GIL](https://www.boost.org/doc/libs/1_68_0/libs/gil/doc/html/index.html), [CImg](https://github.com/dtschump/CImg), [DevIL](http://openil.sourceforge.net), [FreeImage](https://freeimage.sourceforge.io), [OpenImageIO](https://github.com/OpenImageIO/oiio.git), [SAIL](https://github.com/smoked-herring/sail), [SDL_Image](https://www.libsdl.org/projects/SDL_image), [stb_image](https://github.com/nothings/stb), [WIC](https://docs.microsoft.com/en-us/windows/win32/wic/-wic-about-windows-imaging-codec) |
