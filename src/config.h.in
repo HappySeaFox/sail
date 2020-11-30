@@ -38,7 +38,12 @@
 
 #cmakedefine SAIL_CODECS_PATH "@SAIL_CODECS_PATH@"
 
-#cmakedefine SAIL_THREAD_LOCAL @SAIL_THREAD_LOCAL@
+/* Thread local flag used with static variables. */
+#if _MSC_VER
+    #define SAIL_THREAD_LOCAL __declspec(thread)
+#else
+    #define SAIL_THREAD_LOCAL _Thread_local
+#endif
 
 #cmakedefine SAIL_UNIX
 #cmakedefine SAIL_WIN32

@@ -131,14 +131,6 @@ elseif (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID MATCHES "Clang
     endif()
 endif()
 
-# Thread local flag used with static variables
-#
-if (MSVC)
-    set(SAIL_THREAD_LOCAL "__declspec(thread)")
-else()
-    set(SAIL_THREAD_LOCAL "_Thread_local")
-endif()
-
 # Disable undefined symbols
 #
 if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
