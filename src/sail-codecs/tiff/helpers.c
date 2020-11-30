@@ -63,10 +63,9 @@ void my_warning_fn(const char *module, const char *format, va_list ap) {
 sail_status_t supported_read_output_pixel_format(enum SailPixelFormat pixel_format) {
 
     switch (pixel_format) {
-        case SAIL_PIXEL_FORMAT_BPP24_RGB:
-        case SAIL_PIXEL_FORMAT_BPP24_BGR:
         case SAIL_PIXEL_FORMAT_BPP32_RGBA:
-        case SAIL_PIXEL_FORMAT_BPP32_BGRA: {
+        case SAIL_PIXEL_FORMAT_BPP32_BGRA:
+        case SAIL_PIXEL_FORMAT_SOURCE: {
             return SAIL_OK;
         }
 

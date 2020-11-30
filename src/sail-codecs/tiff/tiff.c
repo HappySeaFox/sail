@@ -194,7 +194,21 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v3(void *state, struct
     SAIL_TRY_OR_CLEANUP(fetch_resolution(tiff_state->tiff, &(*image)->resolution),
                             /* cleanup */ sail_destroy_image(*image));
 
-    (*image)->pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;
+    switch (tiff_state->read_options->output_pixel_format) {
+        case SAIL_PIXEL_FORMAT_BPP32_RGBA:
+        case SAIL_PIXEL_FORMAT_BPP32_BGRA: {
+            (*image)->pixel_format = tiff_state->read_options->output_pixel_format;
+            break;
+        }
+        case SAIL_PIXEL_FORMAT_SOURCE: {
+            (*image)->pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;
+            break;
+        }
+        default: {
+            break;
+        }
+    }
+
     SAIL_TRY_OR_CLEANUP(sail_bytes_per_line((*image)->width, (*image)->pixel_format, &(*image)->bytes_per_line),
                         /* cleanup */ sail_destroy_image(*image));
 
