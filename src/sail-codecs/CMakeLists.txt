@@ -96,13 +96,13 @@ list(SORT DISABLED_CONDITIONAL_CODECS)
 # Add unconditional subdirs
 #
 foreach(codec ${CODECS})
-    add_subdirectory(src/${codec})
+    add_subdirectory(${codec})
 endforeach()
 
 # Add conditional subdirs
 #
 foreach(codec ${ENABLED_CONDITIONAL_CODECS})
-    add_subdirectory(src/${codec})
+    add_subdirectory(${codec})
 endforeach()
 
 # Modify the lists for displaying
@@ -115,7 +115,3 @@ string(TOUPPER "${DISABLED_CONDITIONAL_CODECS}" DISABLED_CONDITIONAL_CODECS)
 set(CODECS ${CODECS} PARENT_SCOPE)
 set(ENABLED_CONDITIONAL_CODECS ${ENABLED_CONDITIONAL_CODECS} PARENT_SCOPE)
 set(DISABLED_CONDITIONAL_CODECS ${DISABLED_CONDITIONAL_CODECS} PARENT_SCOPE)
-
-# Installation
-#
-install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/layouts/" DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/sail/layouts")

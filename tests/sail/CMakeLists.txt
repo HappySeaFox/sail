@@ -1,1 +1,1 @@
-sail_test(TARGET integrity SOURCES src/integrity.c)
+sail_test(TARGET integrity SOURCES integrity.c)

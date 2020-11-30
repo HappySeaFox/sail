@@ -7,41 +7,41 @@ option(SAIL_COLORED_OUTPUT "Enable colored console output on supported platforms
 set(SAIL_COLORED_OUTPUT ${SAIL_COLORED_OUTPUT} PARENT_SCOPE)
 
 add_library(sail-common
-                src/iccp.c
-                src/image.c
-                src/io_common.c
-                src/log.c
-                src/meta_data_node.c
-                src/palette.c
-                src/pixel_formats_mapping_node.c
-                src/read_features.c
-                src/read_options.c
-                src/resolution.c
-                src/source_image.c
-                src/utils.c
-                src/write_features.c
-                src/write_options.c)
+                iccp.c
+                image.c
+                io_common.c
+                log.c
+                meta_data_node.c
+                palette.c
+                pixel_formats_mapping_node.c
+                read_features.c
+                read_options.c
+                resolution.c
+                source_image.c
+                utils.c
+                write_features.c
+                write_options.c)
 
 # Build a list of public headers to install
 #
-set(PUBLIC_HEADERS "src/common.h"
-                   "src/error.h"
-                   "src/export.h"
-                   "src/iccp.h"
-                   "src/image.h"
-                   "src/io_common.h"
-                   "src/log.h"
-                   "src/meta_data_node.h"
-                   "src/palette.h"
-                   "src/pixel_formats_mapping_node.h"
-                   "src/read_features.h"
-                   "src/read_options.h"
-                   "src/resolution.h"
-                   "src/sail-common.h"
-                   "src/source_image.h"
-                   "src/utils.h"
-                   "src/write_features.h"
-                   "src/write_options.h")
+set(PUBLIC_HEADERS "common.h"
+                   "error.h"
+                   "export.h"
+                   "iccp.h"
+                   "image.h"
+                   "io_common.h"
+                   "log.h"
+                   "meta_data_node.h"
+                   "palette.h"
+                   "pixel_formats_mapping_node.h"
+                   "read_features.h"
+                   "read_options.h"
+                   "resolution.h"
+                   "sail-common.h"
+                   "source_image.h"
+                   "utils.h"
+                   "write_features.h"
+                   "write_options.h")
 
 set_target_properties(sail-common PROPERTIES
                                   VERSION "0.7.2"
@@ -51,7 +51,7 @@ set_target_properties(sail-common PROPERTIES
 # fileno
 sail_enable_posix_source(TARGET sail-common VERSION 200112L)
 
-sail_enable_pch(TARGET sail-common HEADER src/sail-common.h)
+sail_enable_pch(TARGET sail-common HEADER sail-common.h)
 
 # Definitions, includes, link
 #
@@ -59,7 +59,7 @@ if (SAIL_COLORED_OUTPUT)
     target_compile_definitions(sail-common PRIVATE SAIL_COLORED_OUTPUT=1)
 endif()
 target_include_directories(sail-common
-                            PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+                            PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
                                    $<INSTALL_INTERFACE:include/sail>)
 
 # pkg-config integration
