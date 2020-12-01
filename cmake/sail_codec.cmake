@@ -1,6 +1,16 @@
 # Intended to be included by every codec. Sets up necessary dependencies,
 # installation targets, codec info.
 #
+# Usage:
+#
+#   1. When SAIL_VCPKG is ON and SYSTEM_HEADERS and SYSTEM_LIBS are specified, they are used to search
+#      system headers and libs.
+#   2. When SAIL_VCPKG is ON and SYSTEM_HEADERS and SYSTEM_LIBS are not specified, CMAKE is included
+#      and sail_find_vcpkg_dependencies() is called to search CMake packages.
+#   3. When SAIL_VCPKG is OFF, PKGCONFIG is used to search pkg-config dependencies.
+#   4. When CMAKE is specified (regardless SAIL_VCPKG), sail_codec_post_add() is called right after a new target
+#      is added. sail_codec_post_add() could be used for tests like check_c_source_compiles().
+#
 macro(sail_codec)
     cmake_parse_arguments(SAIL_CODEC "" "NAME" "SOURCES;PKGCONFIG;SYSTEM_HEADERS;SYSTEM_LIBS;CMAKE" ${ARGN})
 
@@ -17,6 +27,10 @@ macro(sail_codec)
     # Check the pkg-config/vcpkg dependencies
     #
     if (SAIL_VCPKG)
+        if (NOT SAIL_CODEC_CMAKE AND NOT SAIL_CODEC_SYSTEM_HEADERS AND NOT SAIL_CODEC_SYSTEM_LIBS)
+            message(FATAL_ERROR "Use CMAKE or SYSTEM_HEADERS SYSTEM_LIBS arguments to search dependencies")
+        endif()
+
         foreach(vcpkg ${SAIL_CODEC_SYSTEM_HEADERS})
             find_path(sail_include_dir_${vcpkg} ${vcpkg})
 
@@ -41,7 +55,7 @@ macro(sail_codec)
             list(APPEND sail_${SAIL_CODEC_NAME}_libs ${sail_lib_${vcpkg}})
         endforeach()
 
-        if (SAIL_CODEC_CMAKE AND NOT SAIL_CODEC_SYSTEM_LIBS AND NOT SAIL_CODEC_SYSTEM_HEADERS AND COMMAND sail_find_vcpkg_dependencies)
+        if (SAIL_CODEC_CMAKE AND NOT SAIL_CODEC_SYSTEM_HEADERS AND NOT SAIL_CODEC_SYSTEM_LIBS AND COMMAND sail_find_vcpkg_dependencies)
             sail_find_vcpkg_dependencies()
         endif()
     else()
