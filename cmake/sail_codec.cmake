@@ -72,6 +72,10 @@ macro(sail_codec)
     #
     add_library(${TARGET} MODULE ${SAIL_CODEC_SOURCES})
 
+    # Disable a "lib" prefix on Unix
+    #
+    set_target_properties(${TARGET} PROPERTIES PREFIX "")
+
     # Rename to just 'png.dll'
     #
     set_target_properties(${TARGET} PROPERTIES OUTPUT_NAME ${SAIL_CODEC_NAME})
