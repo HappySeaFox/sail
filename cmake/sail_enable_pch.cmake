@@ -6,6 +6,6 @@ macro(sail_enable_pch)
     # Enable precompiled headers on the specified target
     #
     if (${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.16.0")
-        target_precompile_headers("${SAIL_PCH_TARGET}" PRIVATE "${SAIL_PCH_HEADER}")
+        target_precompile_headers(${SAIL_PCH_TARGET} PRIVATE ${SAIL_PCH_HEADER})
     endif()
 endmacro()

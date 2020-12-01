@@ -1,32 +1,3 @@
-cmake_push_check_state(RESET)
-    set(CMAKE_REQUIRED_INCLUDES "${libtiff-4_INCLUDE_DIRS}")
-
-    check_c_source_compiles(
-        "
-        #include <tiff.h>
-
-        int main(int argc, char *argv[]) {
-            int compression = COMPRESSION_WEBP;
-            return 0;
-        }
-    "
-    HAVE_TIFF_41
-    )
-cmake_pop_check_state()
-
-if (HAVE_TIFF_41)
-    # We compile libtiff w/o WEBP support on Windows
-    if (WIN32)
-        set(CODEC_INFO_COMPRESSIONS_41 "ZSTD")
-    else()
-        set(CODEC_INFO_COMPRESSIONS_41 "WEBP;ZSTD")
-    endif()
-endif()
-
 # Common codec configuration
 #
-sail_codec(TARGET tiff SOURCES helpers.c io.c tiff.c PKGCONFIG libtiff-4)
-
-if (HAVE_TIFF_41)
-    target_compile_definitions(tiff PRIVATE HAVE_TIFF_41)
-endif()
+sail_codec(NAME tiff SOURCES helpers.c io.c tiff.c PKGCONFIG libtiff-4 SYSTEM_HEADERS tiff.h SYSTEM_LIBS tiff CMAKE ${CMAKE_CURRENT_LIST_DIR}/tiff.cmake)

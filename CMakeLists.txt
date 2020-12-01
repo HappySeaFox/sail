@@ -72,6 +72,7 @@ Codecs with missing dependencies will be disabled regardless this setting")
 set(SAIL_EXCEPT_CODECS "" CACHE STRING "Enable all codecs except the codecs specified in this ';'-separated list. \
 Codecs with missing dependencies will be disabled regardless this setting")
 option(SAIL_READ_OUTPUT_BPP32_BGRA "Make the read operations output BPP32-BGRA pixels instead of BPP32-RGBA." OFF)
+option(SAIL_VCPKG "Enable VCPKG dependency manager instead of pkg-config. When enabled, please specify CMAKE_TOOLCHAIN_FILE and CMAKE_BUILD_TYPE. See the vcpkg tutorial for more." OFF)
 
 if (SAIL_READ_OUTPUT_BPP32_BGRA)
     set(SAIL_DEFAULT_READ_OUTPUT_PIXEL_FORMAT "BPP32-BGRA")
@@ -163,35 +164,37 @@ if (APPLE)
     set(SAIL_APPLE ON)
 endif()
 
-# Common required packages
+# pkg-config setup
 #
-if (WIN32)
-    set(PKG_CONFIG_EXECUTABLE "${PROJECT_SOURCE_DIR}/extra/bin/pkg-config.exe")
-endif()
-
-# Our pkg-config search path to append to the system-wide search path
-#
-# Some development packages (like giflib) have no pkg-config integration. We provide
-# our own pkg-config files for system-wide packages in extra/missing
-#
-if (WIN32)
-    set(SAIL_PKGCONFIG_PATH "${PROJECT_SOURCE_DIR}/extra/missing/pkgconfig/${CMAKE_SYSTEM_NAME}\;${PROJECT_SOURCE_DIR}/extra/B/lib/pkgconfig")
-else()
-    set(SAIL_PKGCONFIG_PATH "${PROJECT_SOURCE_DIR}/extra/missing/pkgconfig/${CMAKE_SYSTEM_NAME}:${PROJECT_SOURCE_DIR}/extra/B/lib/pkgconfig")
-endif()
-
-set(ENV_PKG_CONFIG_PATH $ENV{PKG_CONFIG_PATH})
-if (ENV_PKG_CONFIG_PATH)
+if (NOT SAIL_VCPKG)
     if (WIN32)
-        set(ENV{PKG_CONFIG_PATH} "${ENV_PKG_CONFIG_PATH}\;${SAIL_PKGCONFIG_PATH}")
-    else()
-        set(ENV{PKG_CONFIG_PATH} "${ENV_PKG_CONFIG_PATH}:${SAIL_PKGCONFIG_PATH}")
+        set(PKG_CONFIG_EXECUTABLE "${PROJECT_SOURCE_DIR}/extra/bin/pkg-config.exe")
     endif()
-else()
-    set(ENV{PKG_CONFIG_PATH} ${SAIL_PKGCONFIG_PATH})
-endif()
 
-find_package(PkgConfig REQUIRED)
+    # Our pkg-config search path to append to the system-wide search path
+    #
+    # Some development packages (like giflib) have no pkg-config integration. We provide
+    # our own pkg-config files for system-wide packages in extra/missing
+    #
+    if (WIN32)
+        set(SAIL_PKGCONFIG_PATH "${PROJECT_SOURCE_DIR}/extra/missing/pkgconfig/${CMAKE_SYSTEM_NAME}\;${PROJECT_SOURCE_DIR}/extra/B/lib/pkgconfig")
+    else()
+        set(SAIL_PKGCONFIG_PATH "${PROJECT_SOURCE_DIR}/extra/missing/pkgconfig/${CMAKE_SYSTEM_NAME}:${PROJECT_SOURCE_DIR}/extra/B/lib/pkgconfig")
+    endif()
+
+    set(ENV_PKG_CONFIG_PATH $ENV{PKG_CONFIG_PATH})
+    if (ENV_PKG_CONFIG_PATH)
+        if (WIN32)
+            set(ENV{PKG_CONFIG_PATH} "${ENV_PKG_CONFIG_PATH}\;${SAIL_PKGCONFIG_PATH}")
+        else()
+            set(ENV{PKG_CONFIG_PATH} "${ENV_PKG_CONFIG_PATH}:${SAIL_PKGCONFIG_PATH}")
+        endif()
+    else()
+        set(ENV{PKG_CONFIG_PATH} ${SAIL_PKGCONFIG_PATH})
+    endif()
+
+    find_package(PkgConfig REQUIRED)
+endif()
 
 # Common configuration file
 #
@@ -270,6 +273,7 @@ message("* CMake module link flags:     ${CMAKE_MODULE_LINKER_FLAGS}")
 message("*")
 message("* SAIL version:                ${PROJECT_VERSION}")
 message("* Developer mode:              ${SAIL_DEV}")
+message("* VCPKG mode:                  ${SAIL_VCPKG}")
 message("* SDL example:                 ${SAIL_SDL_EXAMPLE}")
 message("*")
 message("* Install prefix:              ${CMAKE_INSTALL_PREFIX}")
@@ -278,9 +282,8 @@ message("* INCLUDEDIR:                  ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_
 message("* DATADIR:                     ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}")
 message("*")
 message("* Colored output:              ${SAIL_COLORED_OUTPUT}${SAIL_COLORED_OUTPUT_CLARIFY}")
-message("* Enabled codecs:              ${CODECS}")
-message("* Enabled conditional codecs:  ${ENABLED_CONDITIONAL_CODECS}")
-message("* Disabled conditional codecs: ${DISABLED_CONDITIONAL_CODECS}")
+message("* Enabled codecs:              ${ENABLED_CODECS}")
+message("* Disabled codecs:             ${DISABLED_CODECS}")
 message("* Default read output format:  ${SAIL_DEFAULT_READ_OUTPUT_PIXEL_FORMAT}")
 message("*")
 message("***************************************")
