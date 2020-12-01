@@ -73,6 +73,7 @@ set(SAIL_EXCEPT_CODECS "" CACHE STRING "Enable all codecs except the codecs spec
 Codecs with missing dependencies will be disabled regardless this setting")
 option(SAIL_READ_OUTPUT_BPP32_BGRA "Make the read operations output BPP32-BGRA pixels instead of BPP32-RGBA." OFF)
 option(SAIL_VCPKG "Enable VCPKG dependency manager instead of pkg-config on Windows. When enabled, please specify CMAKE_TOOLCHAIN_FILE and CMAKE_BUILD_TYPE. See the vcpkg tutorial for more." OFF)
+option(SAIL_BUILD_EXAMPLES "Build examples." ON)
 
 if (SAIL_VCPKG AND NOT WIN32)
     message(FATAL_ERROR "VCPKG support is Windows-only")
@@ -228,19 +229,24 @@ configure_file("${PROJECT_SOURCE_DIR}/dist/win/sail.iss" "${PROJECT_BINARY_DIR}/
 # Configure subdirs
 #
 
-find_package(SDL2)
-set(SAIL_SDL_EXAMPLE OFF)
-
 add_subdirectory(src/libsail-common)
 add_subdirectory(src/libsail)
 add_subdirectory(src/sail-codecs)
 add_subdirectory(src/bindings/c++)
-add_subdirectory(examples/c/sail-convert)
-add_subdirectory(examples/c/sail-probe)
-if (SDL2_FOUND)
-    set(SAIL_SDL_EXAMPLE ON)
-    add_subdirectory(examples/c/sail-sdl-viewer)
+
+if (SAIL_BUILD_EXAMPLES)
+    add_subdirectory(examples/c/sail-convert)
+    add_subdirectory(examples/c/sail-probe)
+
+    find_package(SDL2)
+    set(SAIL_SDL_EXAMPLE OFF)
+
+    if (SDL2_FOUND)
+        set(SAIL_SDL_EXAMPLE ON)
+        add_subdirectory(examples/c/sail-sdl-viewer)
+    endif()
 endif()
+
 add_subdirectory(tests)
 
 # Installation
