@@ -67,13 +67,33 @@ static sail_status_t add_dll_directory(const char *path) {
 }
 #endif
 
+static const char* sail_codecs_path_env(void) {
+
+    SAIL_THREAD_LOCAL static bool codecs_path_env_called = false;
+    SAIL_THREAD_LOCAL static const char *env = NULL;
+
+    if (codecs_path_env_called) {
+        return env;
+    }
+
+    codecs_path_env_called = true;
+
+#ifdef SAIL_WIN32
+    _dupenv_s((char **)&env, NULL, "SAIL_CODECS_PATH");
+#else
+    env = getenv("SAIL_CODECS_PATH");
+#endif
+
+    return env;
+}
+
 static const char* sail_codecs_path(void) {
 
     SAIL_THREAD_LOCAL static bool codecs_path_called = false;
-    SAIL_THREAD_LOCAL static const char *env = NULL;
+    SAIL_THREAD_LOCAL static const char *path = NULL;
 
     if (codecs_path_called) {
-        return env;
+        return path;
     }
 
     codecs_path_called = true;
@@ -86,8 +106,10 @@ static const char* sail_codecs_path(void) {
     if (GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
             (LPCSTR)&sail_codecs_path, &thisModule) == 0) {
         dll_path_found = false;
+        SAIL_LOG_ERROR("GetModuleHandleEx() failed with error code %d. sail.dll location will not be added as a DLL search path", GetLastError());
     } else if (GetModuleFileName(thisModule, dll_path, sizeof(dll_path)) == 0) {
         dll_path_found = false;
+        SAIL_LOG_ERROR("GetModuleFileName() failed with error code %d. sail.dll location will not be added as a DLL search path", GetLastError());
     } else {
         /* "\bin\sail.dll" -> "\bin". */
         char *last_sep = strrchr(dll_path, '\\');
@@ -102,47 +124,33 @@ static const char* sail_codecs_path(void) {
         }
     }
 
-    _dupenv_s((char **)&env, NULL, "SAIL_CODECS_PATH");
-
     /* Construct "\bin\..\lib\sail\codecs" from "\bin\sail.dll". */
-    if (env == NULL) {
-        if (dll_path_found) {
-            char *lib_sail_codecs_path;
+    if (dll_path_found) {
+        char *lib_sail_codecs_path;
 
-            #ifdef SAIL_VCPKG_PORT
-                /* "\bin" -> "\bin\sail\codecs" */
-                const char *CODECS_RELATIVE_PATH = "\\sail\\codecs";
-            #else
-                /* "\bin" -> "\bin\..\lib\sail\codecs" */
-                const char *CODECS_RELATIVE_PATH = "\\..\\lib\\sail\\codecs";
-            #endif
+        #ifdef SAIL_VCPKG_PORT
+            /* "\bin" -> "\bin\sail\codecs" */
+            const char *CODECS_RELATIVE_PATH = "\\sail\\codecs";
+        #else
+            /* "\bin" -> "\bin\..\lib\sail\codecs" */
+            const char *CODECS_RELATIVE_PATH = "\\..\\lib\\sail\\codecs";
+        #endif
 
-            SAIL_TRY_OR_EXECUTE(sail_concat(&lib_sail_codecs_path, 2, dll_path, CODECS_RELATIVE_PATH),
-                                /* on error */ SAIL_LOG_ERROR("Failed to concat strings. Falling back to loading codecs from '%s'",
-                                                                SAIL_CODECS_PATH),
-                                env = SAIL_CODECS_PATH);
-            env = lib_sail_codecs_path;
-            SAIL_LOG_DEBUG("SAIL_CODECS_PATH environment variable is not set. Loading codecs from '%s'", env);
+        if (sail_concat(&lib_sail_codecs_path, 2, dll_path, CODECS_RELATIVE_PATH) != SAIL_OK) {
+            SAIL_LOG_ERROR("Failed to concat strings. Falling back to loading codecs from '%s'", SAIL_CODECS_PATH);
+            path = SAIL_CODECS_PATH;
         } else {
-            SAIL_LOG_ERROR("GetModuleHandleEx() failed with an error code %d. Falling back to loading codecs from '%s'",
-                            GetLastError(), SAIL_CODECS_PATH);
-            env = SAIL_CODECS_PATH;
+            path = lib_sail_codecs_path;
         }
     } else {
-        SAIL_LOG_DEBUG("SAIL_CODECS_PATH environment variable is set. Loading codecs from '%s'", env);
+        path = SAIL_CODECS_PATH;
+        SAIL_LOG_ERROR("Failed to get the sail.dll path. Falling back to loading codecs from '%s'", path);
     }
 #else
-    env = getenv("SAIL_CODECS_PATH");
-
-    if (env == NULL) {
-        SAIL_LOG_DEBUG("SAIL_CODECS_PATH environment variable is not set. Loading codecs from '%s'", SAIL_CODECS_PATH);
-        env = SAIL_CODECS_PATH;
-    } else {
-        SAIL_LOG_DEBUG("SAIL_CODECS_PATH environment variable is set. Loading codecs from '%s'", env);
-    }
+    path = SAIL_CODECS_PATH;
 #endif
 
-    return env;
+    return path;
 }
 
 static const char* client_codecs_path(void) {
@@ -330,7 +338,17 @@ static sail_status_t init_context(struct sail_context *context, int flags) {
     SAIL_LOG_INFO("Version %s", SAIL_VERSION_STRING);
 
     /* Our own codecs. */
-    const char *our_codecs_path = sail_codecs_path();
+    const char *env = sail_codecs_path_env();
+    const char *our_codecs_path;
+
+    if (env == NULL) {
+        our_codecs_path = sail_codecs_path();
+        SAIL_LOG_DEBUG("SAIL_CODECS_PATH environment variable is not set. Loading codecs from '%s'", our_codecs_path);
+    } else {
+        our_codecs_path = env;
+        SAIL_LOG_DEBUG("SAIL_CODECS_PATH environment variable is set. Loading codecs from '%s'", env);
+    }
+
     SAIL_TRY(update_lib_path(our_codecs_path));
 
     /* Client codecs. */
