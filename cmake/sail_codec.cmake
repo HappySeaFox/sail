@@ -92,7 +92,7 @@ macro(sail_codec)
 
     # Rename to just 'png.dll'
     #
-    set_target_properties(${TARGET} PROPERTIES OUTPUT_NAME ${SAIL_CODEC_NAME})
+    set_target_properties(${TARGET} PROPERTIES OUTPUT_NAME sail-${SAIL_CODEC_NAME})
 
     # Depend on sail-common
     #
@@ -111,13 +111,13 @@ macro(sail_codec)
     # Copy .codec.info into the build dir
     #
     configure_file("${CMAKE_CURRENT_SOURCE_DIR}/${SAIL_CODEC_NAME}.codec.info.in"
-                   "${CMAKE_CURRENT_BINARY_DIR}/${SAIL_CODEC_NAME}.codec.info"
+                   "${CMAKE_CURRENT_BINARY_DIR}/sail-${SAIL_CODEC_NAME}.codec.info"
                    @ONLY)
 
     # Installation
     #
     install(TARGETS ${TARGET} DESTINATION "${CMAKE_INSTALL_LIBDIR}/sail/codecs")
-    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${SAIL_CODEC_NAME}.codec.info"
+    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/sail-${SAIL_CODEC_NAME}.codec.info"
             DESTINATION "${CMAKE_INSTALL_LIBDIR}/sail/codecs")
 
     # Export this codec name into the parent scope
