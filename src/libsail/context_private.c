@@ -65,6 +65,31 @@ static sail_status_t add_dll_directory(const char *path) {
 
     return SAIL_OK;
 }
+
+static sail_status_t get_sail_dll_path(char dll_path[MAX_PATH]) {
+
+    HMODULE thisModule;
+
+    if (GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+            (LPCSTR)&get_sail_dll_path, &thisModule) == 0) {
+        SAIL_LOG_ERROR("GetModuleHandleEx() failed with error code %d. sail.dll location will not be added as a DLL search path", GetLastError());
+        return SAIL_ERROR_GET_DLL_PATH;
+    } else if (GetModuleFileName(thisModule, dll_path, sizeof(dll_path)) == 0) {
+        SAIL_LOG_ERROR("GetModuleFileName() failed with error code %d. sail.dll location will not be added as a DLL search path", GetLastError());
+        return SAIL_ERROR_GET_DLL_PATH;
+    } else {
+        /* "\bin\sail.dll" -> "\bin". */
+        char *last_sep = strrchr(dll_path, '\\');
+
+        if (last_sep == NULL) {
+            return SAIL_ERROR_GET_DLL_PATH;
+        } else {
+            *last_sep = '\0';
+        }
+    }
+
+    return SAIL_OK;
+}
 #endif
 
 static const char* sail_codecs_path_env(void) {
@@ -100,32 +125,9 @@ static const char* sail_codecs_path(void) {
 
 #ifdef SAIL_WIN32
     char dll_path[MAX_PATH];
-    HMODULE thisModule;
-    bool dll_path_found;
-
-    if (GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-            (LPCSTR)&sail_codecs_path, &thisModule) == 0) {
-        dll_path_found = false;
-        SAIL_LOG_ERROR("GetModuleHandleEx() failed with error code %d. sail.dll location will not be added as a DLL search path", GetLastError());
-    } else if (GetModuleFileName(thisModule, dll_path, sizeof(dll_path)) == 0) {
-        dll_path_found = false;
-        SAIL_LOG_ERROR("GetModuleFileName() failed with error code %d. sail.dll location will not be added as a DLL search path", GetLastError());
-    } else {
-        /* "\bin\sail.dll" -> "\bin". */
-        char *last_sep = strrchr(dll_path, '\\');
-
-        if (last_sep == NULL) {
-            dll_path_found = false;
-        } else {
-            dll_path_found = true;
-
-            *last_sep = '\0';
-            SAIL_TRY_OR_SUPPRESS(add_dll_directory(dll_path));
-        }
-    }
 
     /* Construct "\bin\..\lib\sail\codecs" from "\bin\sail.dll". */
-    if (dll_path_found) {
+    if (get_sail_dll_path(dll_path) == SAIL_OK) {
         char *lib_sail_codecs_path;
 
         #ifdef SAIL_VCPKG_PORT
@@ -347,6 +349,11 @@ static sail_status_t init_context(struct sail_context *context, int flags) {
     } else {
         our_codecs_path = env;
         SAIL_LOG_DEBUG("SAIL_CODECS_PATH environment variable is set. Loading codecs from '%s'", env);
+    }
+
+    char dll_path[MAX_PATH];
+    if (get_sail_dll_path(dll_path) == SAIL_OK) {
+        SAIL_TRY_OR_SUPPRESS(add_dll_directory(dll_path));
     }
 
     SAIL_TRY(update_lib_path(our_codecs_path));
