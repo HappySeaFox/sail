@@ -86,8 +86,15 @@ static const char* sail_codecs_path(void) {
             } else {
                 *last_sep = '\0';
 
-                /* "\bin" -> "\bin\..\lib\sail\codecs". */
-                SAIL_TRY_OR_EXECUTE(sail_concat(&lib_sail_codecs_path, 2, path, "\\..\\lib\\sail\\codecs"),
+                #ifdef SAIL_VCPKG_PORT
+                    /* "\bin" -> "\bin\sail\codecs" */
+                    const char *CODECS_RELATIVE_PATH = "\\sail\\codecs";
+                #else
+                    /* "\bin" -> "\bin\..\lib\sail\codecs" */
+                    const char *CODECS_RELATIVE_PATH = "\\..\\lib\\sail\\codecs";
+                #endif
+
+                SAIL_TRY_OR_EXECUTE(sail_concat(&lib_sail_codecs_path, 2, path, CODECS_RELATIVE_PATH),
                                     /* on error */ SAIL_LOG_ERROR("Failed to concat strings. Falling back to loading codecs from '%s'",
                                                                     SAIL_CODECS_PATH),
                                     env = SAIL_CODECS_PATH);

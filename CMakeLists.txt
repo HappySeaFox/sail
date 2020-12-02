@@ -72,8 +72,8 @@ Codecs with missing dependencies will be disabled regardless this setting")
 set(SAIL_EXCEPT_CODECS "" CACHE STRING "Enable all codecs except the codecs specified in this ';'-separated list. \
 Codecs with missing dependencies will be disabled regardless this setting")
 option(SAIL_READ_OUTPUT_BPP32_BGRA "Make the read operations output BPP32-BGRA pixels instead of BPP32-RGBA." OFF)
+option(SAIL_VCPKG_PORT "Compile as a VCPKG port. Intended to be used only by VCPKG." OFF)
 option(SAIL_VCPKG "Enable VCPKG dependency manager instead of pkg-config on Windows. When enabled, please specify CMAKE_TOOLCHAIN_FILE and CMAKE_BUILD_TYPE. See the vcpkg tutorial for more." OFF)
-option(SAIL_BUILD_EXAMPLES "Build examples." ON)
 
 if (SAIL_VCPKG AND NOT WIN32)
     message(FATAL_ERROR "VCPKG support is Windows-only")
