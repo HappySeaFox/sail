@@ -66,7 +66,7 @@ static sail_status_t add_dll_directory(const char *path) {
     return SAIL_OK;
 }
 
-static sail_status_t get_sail_dll_path(char dll_path[MAX_PATH]) {
+static sail_status_t get_sail_dll_path(char *dll_path, int dll_path_size) {
 
     HMODULE thisModule;
 
@@ -74,11 +74,11 @@ static sail_status_t get_sail_dll_path(char dll_path[MAX_PATH]) {
             (LPCSTR)&get_sail_dll_path, &thisModule) == 0) {
         SAIL_LOG_ERROR("GetModuleHandleEx() failed with error code %d. sail.dll location will not be added as a DLL search path", GetLastError());
         return SAIL_ERROR_GET_DLL_PATH;
-    } else if (GetModuleFileName(thisModule, dll_path, sizeof(dll_path)) == 0) {
+    } else if (GetModuleFileName(thisModule, dll_path, dll_path_size) == 0) {
         SAIL_LOG_ERROR("GetModuleFileName() failed with error code %d. sail.dll location will not be added as a DLL search path", GetLastError());
         return SAIL_ERROR_GET_DLL_PATH;
     } else {
-        /* "\bin\sail.dll" -> "\bin". */
+        /* "...\bin\sail.dll" -> "...\bin". */
         char *last_sep = strrchr(dll_path, '\\');
 
         if (last_sep == NULL) {
@@ -127,7 +127,7 @@ static const char* sail_codecs_path(void) {
     char dll_path[MAX_PATH];
 
     /* Construct "\bin\..\lib\sail\codecs" from "\bin\sail.dll". */
-    if (get_sail_dll_path(dll_path) == SAIL_OK) {
+    if (get_sail_dll_path(dll_path, sizeof(dll_path)) == SAIL_OK) {
         char *lib_sail_codecs_path;
 
         #ifdef SAIL_VCPKG_PORT
@@ -352,7 +352,7 @@ static sail_status_t init_context(struct sail_context *context, int flags) {
     }
 
     char dll_path[MAX_PATH];
-    if (get_sail_dll_path(dll_path) == SAIL_OK) {
+    if (get_sail_dll_path(dll_path, sizeof(dll_path)) == SAIL_OK) {
         SAIL_TRY_OR_SUPPRESS(add_dll_directory(dll_path));
     }
 
