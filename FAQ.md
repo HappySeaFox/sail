@@ -94,8 +94,6 @@ Codecs path search algorithm (first found path wins):
 
 Additionally, `SAIL_MY_CODECS_PATH` environment variable is always searched so you can load your own codecs from there.
 
-You can store DLL dependencies (like jpeg62.dll) in `<FOUND PATH>/lib`.
-
 On Windows, `sail.dll location` and `<FOUND PATH>/lib` are the only places where DLL dependencies are searched. No standard paths are searched.
 On other platforms, `<FOUND PATH>/lib` is added to the DLL search path.
 
@@ -109,16 +107,12 @@ setting the `SAIL_CODECS_PATH` environment variable.
 
 Set the `SAIL_CODECS_PATH` environment variable to a desired location of the prebuilt SAIL codecs.
 
-You can store DLL dependencies (like jpeg62.dll) in `SAIL_CODECS_PATH/lib`.
-
 On Windows, `sail.dll location` and `SAIL_CODECS_PATH/lib` are the only places where DLL dependencies are searched. No standard paths are searched.
 On other platforms, `SAIL_CODECS_PATH/lib` is added to the DLL search path.
 
 ## How can I point SAIL to my custom codecs?
 
 Set the `SAIL_MY_CODECS_PATH` environment variable to a desired location of your custom SAIL codecs.
-
-You can store DLL dependencies (like jpeg62.dll) in `SAIL_MY_CODECS_PATH/lib`.
 
 On Windows, `sail.dll location` and `SAIL_MY_CODECS_PATH/lib` are the only places where DLL dependencies are searched. No standard paths are searched.
 On other platforms, `SAIL_MY_CODECS_PATH/lib` is added to the DLL search path.
