@@ -231,6 +231,7 @@ Consider [EXAMPLES](EXAMPLES.md) after building and installing.
 ### CMake options overview
 
 - `SAIL_BUILD_EXAMPLES=ON|OFF` - Build examples. Default: `ON`
+- `SAIL_BUILD_TESTS=ON|OFF` - Build tests. Default: `ON`
 - `SAIL_COLORED_OUTPUT=ON|OFF` - Enable colored console output on Windows >= 10 and Unix platforms. Default: `ON`
 - `SAIL_DEV=ON|OFF` - Enable developer mode with pedantic warnings and possible `ASAN` enabled for examples. Default: `OFF`
 - `SAIL_EXCEPT_CODECS="a;b;c"` - Enable all codecs except the codecs specified in this ';'-separated list.

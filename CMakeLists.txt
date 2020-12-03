@@ -66,10 +66,12 @@ endif()
 
 # Options
 #
+option(SAIL_BUILD_EXAMPLES "Build examples." ON)
+option(SAIL_BUILD_TESTS "Build tests." ON)
 option(SAIL_DEV "Enable developer mode. Be more strict when compiling source code, for example." OFF)
-set(SAIL_ONLY_CODECS "" CACHE STRING "Enable only the codecs specified in this ';'-separated list. \
-Codecs with missing dependencies will be disabled regardless this setting")
 set(SAIL_EXCEPT_CODECS "" CACHE STRING "Enable all codecs except the codecs specified in this ';'-separated list. \
+Codecs with missing dependencies will be disabled regardless this setting")
+set(SAIL_ONLY_CODECS "" CACHE STRING "Enable only the codecs specified in this ';'-separated list. \
 Codecs with missing dependencies will be disabled regardless this setting")
 option(SAIL_READ_OUTPUT_BPP32_BGRA "Make the read operations output BPP32-BGRA pixels instead of BPP32-RGBA." OFF)
 option(SAIL_VCPKG_PORT "Compile as a VCPKG port. Intended to be used only by VCPKG." OFF)
@@ -247,7 +249,9 @@ if (SAIL_BUILD_EXAMPLES)
     endif()
 endif()
 
-add_subdirectory(tests)
+if (SAIL_BUILD_TESTS)
+    add_subdirectory(tests)
+endif()
 
 # Installation
 #
