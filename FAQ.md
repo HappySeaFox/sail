@@ -9,7 +9,8 @@ Table of Contents
   * [Can I implement an image decoding codec in C\+\+?](#can-i-implement-an-image-decoding-codec-in-c)
   * [Does SAIL preload all codecs in the initialization routine?](#does-sail-preload-all-codecs-in-the-initialization-routine)
   * [How does SAIL look for codecs?](#how-does-sail-look-for-codecs)
-    * [Windows](#windows)
+    * [Windows (VCPKG port)](#windows-vcpkg-port)
+    * [Windows (standalone build)](#windows-standalone-build)
     * [Unix (including macOS)](#unix-including-macos)
   * [I'd like to reorganize the standard SAIL folder layout on Windows](#id-like-to-reorganize-the-standard-sail-folder-layout-on-windows)
   * [I moved SAIL codecs\. How can I point SAIL to the new location?](#i-moved-sail-codecs-how-can-i-point-sail-to-the-new-location)
@@ -94,7 +95,8 @@ Codecs path search algorithm (first found path wins):
 
 Additionally, `SAIL_MY_CODECS_PATH` environment variable is always searched so you can load your own codecs from there.
 
-On Windows, `sail.dll location` and `<FOUND PATH>/lib` are the only places where DLL dependencies are searched. No standard paths are searched.
+On Windows, `sail.dll location` and `<FOUND PATH>/lib` are the only places where codecs DLL dependencies are searched. No other paths are searched.
+Use WIN32 API `AddDllDirectory` to add your own DLL dependencies search path.
 On other platforms, `<FOUND PATH>/lib` is added to the DLL search path.
 
 ## I'd like to reorganize the standard SAIL folder layout on Windows
@@ -107,14 +109,16 @@ setting the `SAIL_CODECS_PATH` environment variable.
 
 Set the `SAIL_CODECS_PATH` environment variable to a desired location of the prebuilt SAIL codecs.
 
-On Windows, `sail.dll location` and `SAIL_CODECS_PATH/lib` are the only places where DLL dependencies are searched. No standard paths are searched.
+On Windows, `sail.dll location` and `SAIL_CODECS_PATH/lib` are the only places where codecs DLL dependencies are searched. No other paths are searched.
+Use WIN32 API `AddDllDirectory` to add your own DLL dependencies search path.
 On other platforms, `SAIL_CODECS_PATH/lib` is added to the DLL search path.
 
 ## How can I point SAIL to my custom codecs?
 
 Set the `SAIL_MY_CODECS_PATH` environment variable to a desired location of your custom SAIL codecs.
 
-On Windows, `sail.dll location` and `SAIL_MY_CODECS_PATH/lib` are the only places where DLL dependencies are searched. No standard paths are searched.
+On Windows, `sail.dll location` and `SAIL_MY_CODECS_PATH/lib` are the only places where codecs DLL dependencies are searched. No other paths are searched.
+Use WIN32 API `AddDllDirectory` to add your own DLL dependencies search path.
 On other platforms, `SAIL_MY_CODECS_PATH/lib` is added to the DLL search path.
 
 ## Describe the high-level APIs
