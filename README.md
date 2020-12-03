@@ -240,7 +240,15 @@ Consider [EXAMPLES](EXAMPLES.md) after building and installing.
   Codecs with missing dependencies will be disabled regardless this setting. Default: empty list
 - `SAIL_READ_OUTPUT_BPP32_BGRA=ON|OFF` - Make the read operations output BPP32-BGRA pixels instead of BPP32-RGBA. Default: `OFF`
 
-### Windows
+### Windows (VCPKG)
+
+SAIL is available in VCPKG:
+
+```
+vcpkg install sail
+```
+
+### Windows (standalone bundle)
 
 #### Tested environments
 
@@ -249,8 +257,8 @@ Consider [EXAMPLES](EXAMPLES.md) after building and installing.
 #### Build requirements
 
 - git
-- cmake 3.6 or later
-- MSVC 2017 or later
+- cmake 3.10 or later
+- MSVC 2019 or later
 
 #### Build steps
 
