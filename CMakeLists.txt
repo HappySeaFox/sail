@@ -16,13 +16,13 @@ include(CMakePushCheckState)
 # Our own cmake scripts
 #
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" "${CMAKE_MODULE_PATH}")
+include(sail_check_include)
 include(sail_codec)
 include(sail_enable_asan)
 include(sail_enable_pch)
 include(sail_enable_posix_source)
 include(sail_install_cmake_config)
 include(sail_test)
-include(sail_check_build_essential)
 
 # Sanity checks
 #
