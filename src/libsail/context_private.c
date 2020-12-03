@@ -351,10 +351,12 @@ static sail_status_t init_context(struct sail_context *context, int flags) {
         SAIL_LOG_DEBUG("SAIL_CODECS_PATH environment variable is set. Loading codecs from '%s'", env);
     }
 
+#ifdef SAIL_WIN32
     char dll_path[MAX_PATH];
     if (get_sail_dll_path(dll_path, sizeof(dll_path)) == SAIL_OK) {
         SAIL_TRY_OR_SUPPRESS(add_dll_directory(dll_path));
     }
+#endif
 
     SAIL_TRY(update_lib_path(our_codecs_path));
 
