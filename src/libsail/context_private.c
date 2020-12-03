@@ -138,11 +138,11 @@ static const char* sail_codecs_path(void) {
             const char *CODECS_RELATIVE_PATH = "\\..\\lib\\sail\\codecs";
         #endif
 
-        if (sail_concat(&lib_sail_codecs_path, 2, dll_path, CODECS_RELATIVE_PATH) != SAIL_OK) {
+        if (sail_concat(&lib_sail_codecs_path, 2, dll_path, CODECS_RELATIVE_PATH) == SAIL_OK) {
+            path = lib_sail_codecs_path;
+        } else {
             SAIL_LOG_ERROR("Failed to concat strings. Falling back to loading codecs from '%s'", SAIL_CODECS_PATH);
             path = SAIL_CODECS_PATH;
-        } else {
-            path = lib_sail_codecs_path;
         }
     } else {
         path = SAIL_CODECS_PATH;
