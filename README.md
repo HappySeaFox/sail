@@ -239,6 +239,7 @@ Consider [EXAMPLES](EXAMPLES.md) after building and installing.
 - `SAIL_ONLY_CODECS="a;b;c"` - Enable only the codecs specified in this ';'-separated list.
   Codecs with missing dependencies will be disabled regardless this setting. Default: empty list
 - `SAIL_READ_OUTPUT_BPP32_BGRA=ON|OFF` - Make the read operations output BPP32-BGRA pixels instead of BPP32-RGBA. Default: `OFF`
+- `SAIL_VCPKG=ON|OFF` - Enable VCPKG dependency manager instead of pkg-config on Windows. See the option documentation for more. Default: `OFF`
 
 ### Windows (VCPKG)
 
