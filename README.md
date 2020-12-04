@@ -97,6 +97,8 @@ Currently, SAIL supports the following platforms:
 - macOS
 - Linux
 
+See [BUILDING](BUILDING.md).
+
 ## Programming languages
 
 **Programming language:** C11<br/>
