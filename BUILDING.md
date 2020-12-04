@@ -82,11 +82,12 @@ brew upgrade sail
 #### Tested environments
 
 - LUbuntu 18.04 64-bit
+- LUbuntu 20.04 64-bit
 
 #### Build requirements
 
 - git
-- cmake 3.6 or later
+- cmake 3.10 or later
 - pkg-config
 - GCC and G++ 7.5 or later
 - standard C/C++ development files installed (usually installed by metapackages like `build-essential`)
