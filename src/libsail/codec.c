@@ -46,11 +46,11 @@ sail_status_t alloc_and_load_codec(const struct sail_codec_info *codec_info, str
 
     void *ptr;
     SAIL_TRY(sail_malloc(sizeof(struct sail_codec), &ptr));
-    *codec = ptr;
+    struct sail_codec *codec_local = ptr;
 
-    (*codec)->layout = codec_info->layout;
-    (*codec)->handle = NULL;
-    (*codec)->v3     = NULL;
+    codec_local->layout = codec_info->layout;
+    codec_local->handle = NULL;
+    codec_local->v3     = NULL;
 
     SAIL_LOG_DEBUG("Loading codec '%s'", codec_info->path);
 
@@ -59,21 +59,21 @@ sail_status_t alloc_and_load_codec(const struct sail_codec_info *codec_info, str
 
     if (handle == NULL) {
         SAIL_LOG_ERROR("Failed to load '%s'. Error: %d", codec_info->path, GetLastError());
-        destroy_codec(*codec);
+        destroy_codec(codec_local);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_LOAD);
     }
 
-    (*codec)->handle = handle;
+    codec_local->handle = handle;
 #else
     void *handle = dlopen(codec_info->path, RTLD_LAZY | RTLD_LOCAL);
 
     if (handle == NULL) {
         SAIL_LOG_ERROR("Failed to load '%s': %s", codec_info->path, dlerror());
-        destroy_codec(*codec);
+        destroy_codec(codec_local);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_LOAD);
     }
 
-    (*codec)->handle = handle;
+    codec_local->handle = handle;
 #endif
 
 #ifdef SAIL_WIN32
@@ -92,31 +92,33 @@ sail_status_t alloc_and_load_codec(const struct sail_codec_info *codec_info, str
                                                                   \
         if (target == NULL) {                                     \
             SAIL_RESOLVE_LOG_ERROR(symbol);                       \
-            destroy_codec(*codec);                                \
+            destroy_codec(codec_local);                           \
             SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_SYMBOL_RESOLVE); \
         }                                                         \
     } do{} while(0)
 
-    if ((*codec)->layout == SAIL_CODEC_LAYOUT_V3) {
+    if (codec_local->layout == SAIL_CODEC_LAYOUT_V3) {
         SAIL_TRY_OR_CLEANUP(sail_malloc(sizeof(struct sail_codec_layout_v3), &ptr),
-                            /* cleanup */ destroy_codec(*codec));
-        (*codec)->v3 = ptr;
+                            /* cleanup */ destroy_codec(codec_local));
+        codec_local->v3 = ptr;
 
-        SAIL_RESOLVE((*codec)->v3->read_init,            handle, sail_codec_read_init_v3);
-        SAIL_RESOLVE((*codec)->v3->read_seek_next_frame, handle, sail_codec_read_seek_next_frame_v3);
-        SAIL_RESOLVE((*codec)->v3->read_seek_next_pass,  handle, sail_codec_read_seek_next_pass_v3);
-        SAIL_RESOLVE((*codec)->v3->read_frame,           handle, sail_codec_read_frame_v3);
-        SAIL_RESOLVE((*codec)->v3->read_finish,          handle, sail_codec_read_finish_v3);
+        SAIL_RESOLVE(codec_local->v3->read_init,            handle, sail_codec_read_init_v3);
+        SAIL_RESOLVE(codec_local->v3->read_seek_next_frame, handle, sail_codec_read_seek_next_frame_v3);
+        SAIL_RESOLVE(codec_local->v3->read_seek_next_pass,  handle, sail_codec_read_seek_next_pass_v3);
+        SAIL_RESOLVE(codec_local->v3->read_frame,           handle, sail_codec_read_frame_v3);
+        SAIL_RESOLVE(codec_local->v3->read_finish,          handle, sail_codec_read_finish_v3);
 
-        SAIL_RESOLVE((*codec)->v3->write_init,            handle, sail_codec_write_init_v3);
-        SAIL_RESOLVE((*codec)->v3->write_seek_next_frame, handle, sail_codec_write_seek_next_frame_v3);
-        SAIL_RESOLVE((*codec)->v3->write_seek_next_pass,  handle, sail_codec_write_seek_next_pass_v3);
-        SAIL_RESOLVE((*codec)->v3->write_frame,           handle, sail_codec_write_frame_v3);
-        SAIL_RESOLVE((*codec)->v3->write_finish,          handle, sail_codec_write_finish_v3);
+        SAIL_RESOLVE(codec_local->v3->write_init,            handle, sail_codec_write_init_v3);
+        SAIL_RESOLVE(codec_local->v3->write_seek_next_frame, handle, sail_codec_write_seek_next_frame_v3);
+        SAIL_RESOLVE(codec_local->v3->write_seek_next_pass,  handle, sail_codec_write_seek_next_pass_v3);
+        SAIL_RESOLVE(codec_local->v3->write_frame,           handle, sail_codec_write_frame_v3);
+        SAIL_RESOLVE(codec_local->v3->write_finish,          handle, sail_codec_write_finish_v3);
     } else {
-        destroy_codec(*codec);
+        destroy_codec(codec_local);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_CODEC_LAYOUT);
     }
+
+    *codec = codec_local;
 
     return SAIL_OK;
 }

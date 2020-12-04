@@ -5,15 +5,15 @@ macro(sail_test)
 
     # Add a test
     #
-    add_executable("${SAIL_TEST_TARGET}" "${SAIL_TEST_SOURCES}")
+    add_executable(${SAIL_TEST_TARGET} ${SAIL_TEST_SOURCES})
 
-    add_test(NAME "${SAIL_TEST_TARGET}" COMMAND "${SAIL_TEST_TARGET}")
+    add_test(NAME ${SAIL_TEST_TARGET} COMMAND ${SAIL_TEST_TARGET})
 
     # Depend on sail
     #
-    target_link_libraries("${SAIL_TEST_TARGET}" sail)
+    target_link_libraries(${SAIL_TEST_TARGET} sail)
 
     # Depend on sail-munit
     #
-    target_link_libraries("${SAIL_TEST_TARGET}" sail-munit)
+    target_link_libraries(${SAIL_TEST_TARGET} sail-munit)
 endmacro()

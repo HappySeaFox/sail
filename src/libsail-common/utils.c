@@ -31,13 +31,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #ifdef SAIL_WIN32
+    #include <io.h>
     #include <windows.h>
 #else
     #include <errno.h>
-    #include <sys/types.h>
-    #include <sys/stat.h>
     #include <sys/time.h>
     #include <unistd.h>
 #endif
@@ -851,10 +852,9 @@ bool sail_path_exists(const char *path) {
     SAIL_CHECK_PATH_PTR(path);
 
 #ifdef SAIL_WIN32
-    return GetFileAttributes(path) != INVALID_FILE_ATTRIBUTES;
+    return _access(path, 0) == 0;
 #else
-    struct stat lib_attribs;
-    return stat(path, &lib_attribs) == 0;
+    return access(path, 0) == 0;
 #endif
 }
 
@@ -863,23 +863,21 @@ bool sail_is_dir(const char *path) {
     SAIL_CHECK_PATH_PTR(path);
 
 #ifdef SAIL_WIN32
-    const DWORD lib_attribs = GetFileAttributes(path);
+    struct _stat attrs;
 
-    if (lib_attribs == INVALID_FILE_ATTRIBUTES) {
-        SAIL_LOG_DEBUG("Failed to get the attributes of '%s'. Error: %d", path, GetLastError());
+    if (_stat(path, &attrs) != 0) {
         return false;
     }
 
-    return lib_attribs & FILE_ATTRIBUTE_DIRECTORY;
+    return (attrs.st_mode & _S_IFMT) == _S_IFDIR;
 #else
-    struct stat lib_attribs;
+    struct stat attrs;
 
-    if (stat(path, &lib_attribs) != 0) {
-        SAIL_LOG_DEBUG("Failed to get the attributes of '%s': %s", path, strerror(errno));
+    if (stat(path, &attrs) != 0) {
         return false;
     }
 
-    return S_ISDIR(lib_attribs.st_mode);
+    return S_ISDIR(attrs.st_mode);
 #endif
 }
 
@@ -888,19 +886,17 @@ bool sail_is_file(const char *path) {
     SAIL_CHECK_PATH_PTR(path);
 
 #ifdef SAIL_WIN32
-    const DWORD lib_attribs = GetFileAttributes(path);
+    struct _stat attrs;
 
-    if (lib_attribs == INVALID_FILE_ATTRIBUTES) {
-        SAIL_LOG_DEBUG("Failed to get the attributes of '%s'. Error: %d", path, GetLastError());
+    if (_stat(path, &attrs) != 0) {
         return false;
     }
 
-    return !(lib_attribs & FILE_ATTRIBUTE_DIRECTORY);
+    return (attrs.st_mode & _S_IFMT) == _S_IFREG;
 #else
     struct stat lib_attribs;
 
     if (stat(path, &lib_attribs) != 0) {
-        SAIL_LOG_DEBUG("Failed to get the attributes of '%s': %s", path, strerror(errno));
         return false;
     }
 

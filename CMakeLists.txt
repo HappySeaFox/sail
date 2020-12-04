@@ -16,13 +16,13 @@ include(CMakePushCheckState)
 # Our own cmake scripts
 #
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" "${CMAKE_MODULE_PATH}")
+include(sail_check_include)
 include(sail_codec)
 include(sail_enable_asan)
 include(sail_enable_pch)
 include(sail_enable_posix_source)
 include(sail_install_cmake_config)
 include(sail_test)
-include(sail_check_build_essential)
 
 # Sanity checks
 #
@@ -46,14 +46,14 @@ sail_check_include(stdint.h)
 sail_check_include(stdio.h)
 sail_check_include(stdlib.h)
 sail_check_include(string.h)
+sail_check_include(sys/stat.h)
+sail_check_include(sys/types.h)
 sail_check_include(wchar.h)
 
 if (UNIX)
     sail_check_include(dirent.h)
     sail_check_include(dlfcn.h)
-    sail_check_include(sys/stat.h)
     sail_check_include(sys/time.h)
-    sail_check_include(sys/types.h)
     sail_check_include(unistd.h)
 endif()
 
@@ -66,12 +66,24 @@ endif()
 
 # Options
 #
+option(SAIL_BUILD_EXAMPLES "Build examples." ON)
+option(SAIL_BUILD_TESTS "Build tests." ON)
 option(SAIL_DEV "Enable developer mode. Be more strict when compiling source code, for example." OFF)
-set(SAIL_ONLY_CODECS "" CACHE STRING "Enable only the codecs specified in this ';'-separated list. \
-Codecs with missing dependencies will be disabled regardless this setting")
 set(SAIL_EXCEPT_CODECS "" CACHE STRING "Enable all codecs except the codecs specified in this ';'-separated list. \
 Codecs with missing dependencies will be disabled regardless this setting")
+set(SAIL_ONLY_CODECS "" CACHE STRING "Enable only the codecs specified in this ';'-separated list. \
+Codecs with missing dependencies will be disabled regardless this setting")
 option(SAIL_READ_OUTPUT_BPP32_BGRA "Make the read operations output BPP32-BGRA pixels instead of BPP32-RGBA." OFF)
+option(SAIL_VCPKG_PORT "Build as a VCPKG port. Intended to be used only by VCPKG. When enabled, sets SAIL_VCPKG to ON" OFF)
+option(SAIL_VCPKG "Enable VCPKG dependency manager instead of pkg-config on Windows. When enabled, please specify CMAKE_TOOLCHAIN_FILE and CMAKE_BUILD_TYPE. See the vcpkg tutorial for more." OFF)
+
+if (SAIL_VCPKG_PORT)
+    set(SAIL_VCPKG ON)
+endif()
+
+if (SAIL_VCPKG AND NOT WIN32)
+    message(FATAL_ERROR "VCPKG support is Windows-only")
+endif()
 
 if (SAIL_READ_OUTPUT_BPP32_BGRA)
     set(SAIL_DEFAULT_READ_OUTPUT_PIXEL_FORMAT "BPP32-BGRA")
@@ -163,35 +175,37 @@ if (APPLE)
     set(SAIL_APPLE ON)
 endif()
 
-# Common required packages
+# pkg-config setup
 #
-if (WIN32)
-    set(PKG_CONFIG_EXECUTABLE "${PROJECT_SOURCE_DIR}/extra/bin/pkg-config.exe")
-endif()
-
-# Our pkg-config search path to append to the system-wide search path
-#
-# Some development packages (like giflib) have no pkg-config integration. We provide
-# our own pkg-config files for system-wide packages in extra/missing
-#
-if (WIN32)
-    set(SAIL_PKGCONFIG_PATH "${PROJECT_SOURCE_DIR}/extra/missing/pkgconfig/${CMAKE_SYSTEM_NAME}\;${PROJECT_SOURCE_DIR}/extra/B/lib/pkgconfig")
-else()
-    set(SAIL_PKGCONFIG_PATH "${PROJECT_SOURCE_DIR}/extra/missing/pkgconfig/${CMAKE_SYSTEM_NAME}:${PROJECT_SOURCE_DIR}/extra/B/lib/pkgconfig")
-endif()
-
-set(ENV_PKG_CONFIG_PATH $ENV{PKG_CONFIG_PATH})
-if (ENV_PKG_CONFIG_PATH)
+if (NOT SAIL_VCPKG)
     if (WIN32)
-        set(ENV{PKG_CONFIG_PATH} "${ENV_PKG_CONFIG_PATH}\;${SAIL_PKGCONFIG_PATH}")
-    else()
-        set(ENV{PKG_CONFIG_PATH} "${ENV_PKG_CONFIG_PATH}:${SAIL_PKGCONFIG_PATH}")
+        set(PKG_CONFIG_EXECUTABLE "${PROJECT_SOURCE_DIR}/extra/bin/pkg-config.exe")
     endif()
-else()
-    set(ENV{PKG_CONFIG_PATH} ${SAIL_PKGCONFIG_PATH})
-endif()
 
-find_package(PkgConfig REQUIRED)
+    # Our pkg-config search path to append to the system-wide search path
+    #
+    # Some development packages (like giflib) have no pkg-config integration. We provide
+    # our own pkg-config files for system-wide packages in extra/missing
+    #
+    if (WIN32)
+        set(SAIL_PKGCONFIG_PATH "${PROJECT_SOURCE_DIR}/extra/missing/pkgconfig/${CMAKE_SYSTEM_NAME}\;${PROJECT_SOURCE_DIR}/extra/B/lib/pkgconfig")
+    else()
+        set(SAIL_PKGCONFIG_PATH "${PROJECT_SOURCE_DIR}/extra/missing/pkgconfig/${CMAKE_SYSTEM_NAME}:${PROJECT_SOURCE_DIR}/extra/B/lib/pkgconfig")
+    endif()
+
+    set(ENV_PKG_CONFIG_PATH $ENV{PKG_CONFIG_PATH})
+    if (ENV_PKG_CONFIG_PATH)
+        if (WIN32)
+            set(ENV{PKG_CONFIG_PATH} "${ENV_PKG_CONFIG_PATH}\;${SAIL_PKGCONFIG_PATH}")
+        else()
+            set(ENV{PKG_CONFIG_PATH} "${ENV_PKG_CONFIG_PATH}:${SAIL_PKGCONFIG_PATH}")
+        endif()
+    else()
+        set(ENV{PKG_CONFIG_PATH} ${SAIL_PKGCONFIG_PATH})
+    endif()
+
+    find_package(PkgConfig REQUIRED)
+endif()
 
 # Common configuration file
 #
@@ -221,20 +235,27 @@ configure_file("${PROJECT_SOURCE_DIR}/dist/win/sail.iss" "${PROJECT_BINARY_DIR}/
 # Configure subdirs
 #
 
-find_package(SDL2)
-set(SAIL_SDL_EXAMPLE OFF)
-
 add_subdirectory(src/libsail-common)
 add_subdirectory(src/libsail)
 add_subdirectory(src/sail-codecs)
 add_subdirectory(src/bindings/c++)
-add_subdirectory(examples/c/sail-convert)
-add_subdirectory(examples/c/sail-probe)
-if (SDL2_FOUND)
-    set(SAIL_SDL_EXAMPLE ON)
-    add_subdirectory(examples/c/sail-sdl-viewer)
+
+if (SAIL_BUILD_EXAMPLES)
+    add_subdirectory(examples/c/sail-convert)
+    add_subdirectory(examples/c/sail-probe)
+
+    find_package(SDL2)
+    set(SAIL_SDL_EXAMPLE OFF)
+
+    if (SDL2_FOUND)
+        set(SAIL_SDL_EXAMPLE ON)
+        add_subdirectory(examples/c/sail-sdl-viewer)
+    endif()
 endif()
-add_subdirectory(tests)
+
+if (SAIL_BUILD_TESTS)
+    add_subdirectory(tests)
+endif()
 
 # Installation
 #
@@ -270,6 +291,7 @@ message("* CMake module link flags:     ${CMAKE_MODULE_LINKER_FLAGS}")
 message("*")
 message("* SAIL version:                ${PROJECT_VERSION}")
 message("* Developer mode:              ${SAIL_DEV}")
+message("* VCPKG mode:                  ${SAIL_VCPKG}")
 message("* SDL example:                 ${SAIL_SDL_EXAMPLE}")
 message("*")
 message("* Install prefix:              ${CMAKE_INSTALL_PREFIX}")
@@ -278,9 +300,8 @@ message("* INCLUDEDIR:                  ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_
 message("* DATADIR:                     ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}")
 message("*")
 message("* Colored output:              ${SAIL_COLORED_OUTPUT}${SAIL_COLORED_OUTPUT_CLARIFY}")
-message("* Enabled codecs:              ${CODECS}")
-message("* Enabled conditional codecs:  ${ENABLED_CONDITIONAL_CODECS}")
-message("* Disabled conditional codecs: ${DISABLED_CONDITIONAL_CODECS}")
+message("* Enabled codecs:              ${ENABLED_CODECS}")
+message("* Disabled codecs:             ${DISABLED_CODECS}")
 message("* Default read output format:  ${SAIL_DEFAULT_READ_OUTPUT_PIXEL_FORMAT}")
 message("*")
 message("***************************************")

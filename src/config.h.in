@@ -51,6 +51,12 @@
 #cmakedefine SAIL_CYGWIN
 #cmakedefine SAIL_APPLE
 
+/* Do we compile a VCPKG port (vcpkg install)? */
+#cmakedefine SAIL_VCPKG_PORT
+
+/* Do we compile for VCPKG (port or client)? */
+#cmakedefine SAIL_VCPKG
+
 /* Buffer size to read from I/O sources to detect file types by magic numbers. */
 #cmakedefine SAIL_MAGIC_BUFFER_SIZE @SAIL_MAGIC_BUFFER_SIZE@
 
