@@ -278,6 +278,15 @@ install(DIRECTORY "${PROJECT_SOURCE_DIR}/icons/" DESTINATION "${CMAKE_INSTALL_DA
 if (SAIL_COLORED_OUTPUT)
     set(SAIL_COLORED_OUTPUT_CLARIFY " (on Windows >= 10 and Unix)")
 endif()
+
+if (ENABLED_CODECS)
+    string(TOUPPER "${ENABLED_CODECS}" ENABLED_CODECS)
+endif()
+
+if (DISABLED_CODECS)
+    string(TOUPPER "${DISABLED_CODECS}" DISABLED_CODECS)
+endif()
+
 message("")
 message("***************************************")
 message("*")
