@@ -23,44 +23,10 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_CONFIG_H
-#define SAIL_CONFIG_H
+#include "config.h"
 
-#define SAIL_VERSION_MAJOR @PROJECT_VERSION_MAJOR@
-#define SAIL_VERSION_MINOR @PROJECT_VERSION_MINOR@
-#define SAIL_VERSION_PATCH @PROJECT_VERSION_PATCH@
+#include "sail-common.h"
 
-#define SAIL_VERSION_STRING "@PROJECT_VERSION@"
+SAIL_EXPORT const char *sail_enabled_codecs = "@SAIL_ENABLED_CODECS@";
 
-#define SAIL_BUILD_VERSION(major, minor, patch) ((major << 16) | (minor << 8) | (patch))
-
-#define SAIL_VERSION SAIL_BUILD_VERSION(@PROJECT_VERSION_MAJOR@, @PROJECT_VERSION_MINOR@, @PROJECT_VERSION_PATCH@)
-
-#cmakedefine SAIL_CODECS_PATH "@SAIL_CODECS_PATH@"
-
-/* Thread local flag used with static variables. */
-#if _MSC_VER
-    #define SAIL_THREAD_LOCAL __declspec(thread)
-#else
-    #define SAIL_THREAD_LOCAL _Thread_local
-#endif
-
-#cmakedefine SAIL_UNIX
-#cmakedefine SAIL_WIN32
-#cmakedefine SAIL_MINGW
-#cmakedefine SAIL_CYGWIN
-#cmakedefine SAIL_APPLE
-
-/* Do we compile a VCPKG port (vcpkg install)? */
-#cmakedefine SAIL_VCPKG_PORT
-
-/* Do we compile for VCPKG (port or client)? */
-#cmakedefine SAIL_VCPKG
-
-/* Build static libs. */
-#cmakedefine SAIL_STATIC
-
-/* Buffer size to read from I/O sources to detect file types by magic numbers. */
-#cmakedefine SAIL_MAGIC_BUFFER_SIZE @SAIL_MAGIC_BUFFER_SIZE@
-
-#endif
+@SAIL_EXTERN_FUNCTIONS@

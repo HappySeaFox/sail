@@ -74,8 +74,15 @@ Codecs with missing dependencies will be disabled regardless this setting")
 set(SAIL_ONLY_CODECS "" CACHE STRING "Enable only the codecs specified in this ';'-separated list. \
 Codecs with missing dependencies will be disabled regardless this setting")
 option(SAIL_READ_OUTPUT_BPP32_BGRA "Make the read operations output BPP32-BGRA pixels instead of BPP32-RGBA." OFF)
+option(SAIL_STATIC "Build static libs." OFF)
 option(SAIL_VCPKG_PORT "Build as a VCPKG port. Intended to be used only by VCPKG. When enabled, sets SAIL_VCPKG to ON" OFF)
 option(SAIL_VCPKG "Enable VCPKG dependency manager instead of pkg-config on Windows. When enabled, please specify CMAKE_TOOLCHAIN_FILE and CMAKE_BUILD_TYPE. See the vcpkg tutorial for more." OFF)
+
+if (SAIL_STATIC)
+    set(BUILD_SHARED_LIBS OFF)
+else()
+    set(BUILD_SHARED_LIBS ON)
+endif()
 
 if (SAIL_VCPKG_PORT)
     set(SAIL_VCPKG ON)
@@ -98,10 +105,6 @@ set(SAIL_MAGIC_BUFFER_SIZE 16)
 #
 #set(CMAKE_INSTALL_INCLUDEDIR "include/${CMAKE_LIBRARY_ARCHITECTURE}")
 #set(CMAKE_INSTALL_LIBDIR "lib/${CMAKE_LIBRARY_ARCHITECTURE}")
-
-# Enable shared libs by default
-#
-set(BUILD_SHARED_LIBS ON)
 
 # Enable strict C11
 #
@@ -236,8 +239,11 @@ configure_file("${PROJECT_SOURCE_DIR}/dist/win/sail.iss" "${PROJECT_BINARY_DIR}/
 #
 
 add_subdirectory(src/libsail-common)
-add_subdirectory(src/libsail)
 add_subdirectory(src/sail-codecs)
+if (SAIL_STATIC)
+    add_subdirectory(src/sail-codecs-archive)
+endif()
+add_subdirectory(src/libsail)
 add_subdirectory(src/bindings/c++)
 
 if (SAIL_BUILD_EXAMPLES)
@@ -302,6 +308,7 @@ message("* SAIL version:                ${PROJECT_VERSION}")
 message("* Developer mode:              ${SAIL_DEV}")
 message("* VCPKG mode:                  ${SAIL_VCPKG}")
 message("* SDL example:                 ${SAIL_SDL_EXAMPLE}")
+message("* Shared libs:                 ${BUILD_SHARED_LIBS}")
 message("*")
 message("* Install prefix:              ${CMAKE_INSTALL_PREFIX}")
 message("* LIBDIR:                      ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")

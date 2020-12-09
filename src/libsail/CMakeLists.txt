@@ -49,6 +49,12 @@ if (UNIX)
     target_link_libraries(sail PRIVATE dl)
 endif()
 
+if (SAIL_STATIC)
+    # Transfer user requirements
+    #
+    target_link_libraries(sail PRIVATE sail-codecs-archive)
+endif()
+
 # pkg-config integration
 #
 get_target_property(VERSION sail VERSION)
@@ -72,5 +78,9 @@ install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/layouts/" DESTINATION "${CMAKE_IN
 #
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/libsail.pc"
         DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
+
+if (SAIL_STATIC)
+    set(SAIL_CODECS_ARCHIVE_FIND_DEPENDENCY "find_dependency(SailCodecsArchive REQUIRED PATHS \${CMAKE_CURRENT_LIST_DIR})")
+endif()
 
 sail_install_cmake_config(TARGET "Sail" VERSION "${VERSION}")

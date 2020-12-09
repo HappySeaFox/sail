@@ -1,12 +1,12 @@
 macro(sail_find_vcpkg_dependencies)
-    find_package(libpng CONFIG)
+    find_package(PNG)
 
-    if (NOT libpng_FOUND)
+    if (NOT PNG_FOUND)
         return()
     endif()
 
-    set(sail_${SAIL_CODEC_NAME}_libs png)
-    set(sail_${SAIL_CODEC_NAME}_include_dirs "")
+    set(sail_png_libs ${PNG_LIBRARIES})
+    set(sail_png_include_dirs ${PNG_INCLUDE_DIRS})
 endmacro()
 
 macro(sail_codec_post_add)
