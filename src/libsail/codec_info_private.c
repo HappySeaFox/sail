@@ -34,64 +34,6 @@
  * Private functions.
  */
 
-static sail_status_t alloc_string_node(struct sail_string_node **string_node) {
-
-    SAIL_CHECK_STRING_NODE_PTR(string_node);
-
-    void *ptr;
-    SAIL_TRY(sail_malloc(sizeof(struct sail_string_node), &ptr));
-    *string_node = ptr;
-
-    (*string_node)->value = NULL;
-    (*string_node)->next  = NULL;
-
-    return SAIL_OK;
-}
-
-static void destroy_string_node(struct sail_string_node *string_node) {
-
-    if (string_node == NULL) {
-        return;
-    }
-
-    sail_free(string_node->value);
-    sail_free(string_node);
-}
-
-static void destroy_string_node_chain(struct sail_string_node *string_node) {
-
-    while (string_node != NULL) {
-        struct sail_string_node *string_node_next = string_node->next;
-
-        destroy_string_node(string_node);
-
-        string_node = string_node_next;
-    }
-}
-
-static sail_status_t split_into_string_node_chain(const char *value, struct sail_string_node **target_string_node) {
-
-    struct sail_string_node **last_string_node = target_string_node;
-
-    while (*(value += strspn(value, ";")) != '\0') {
-        size_t length = strcspn(value, ";");
-
-        struct sail_string_node *string_node;
-
-        SAIL_TRY(alloc_string_node(&string_node));
-
-        SAIL_TRY_OR_CLEANUP(sail_strdup_length(value, length, &string_node->value),
-                            /* cleanup */ destroy_string_node(string_node));
-
-        *last_string_node = string_node;
-        last_string_node = &string_node->next;
-
-        value += length;
-    }
-
-    return SAIL_OK;
-}
-
 static sail_status_t pixel_format_from_string(const char *str, int *result) {
 
     SAIL_TRY(sail_pixel_format_from_string(str, (enum SailPixelFormat*)result));
@@ -336,7 +278,7 @@ static int inih_handler(void *data, const char *section, const char *name, const
     return 1;
 }
 
-static sail_status_t check_codec_info(const char *path, const struct sail_codec_info *codec_info) {
+static sail_status_t check_codec_info(const struct sail_codec_info *codec_info) {
 
     const struct sail_write_features *write_features = codec_info->write_features;
 
@@ -344,19 +286,19 @@ static sail_status_t check_codec_info(const char *path, const struct sail_codec_
     if ((write_features->features & SAIL_CODEC_FEATURE_STATIC ||
             write_features->features & SAIL_CODEC_FEATURE_ANIMATED ||
             write_features->features & SAIL_CODEC_FEATURE_MULTI_FRAME) && write_features->pixel_formats_mapping_node == NULL) {
-        SAIL_LOG_ERROR("The codec '%s' is able to write images, but output pixel formats mappings are not specified", path);
+        SAIL_LOG_ERROR("The codec '%s' is able to write images, but output pixel formats mappings are not specified", codec_info->name);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INCOMPLETE_CODEC_INFO);
     }
 
     /* Compressions must always exist.*/
     if (write_features->compressions == NULL || write_features->compressions_length < 1) {
-        SAIL_LOG_ERROR("The codec '%s' specifies an empty compressions list", path);
+        SAIL_LOG_ERROR("The codec '%s' specifies an empty compressions list", codec_info->name);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INCOMPLETE_CODEC_INFO);
     }
 
     /* Compression levels and types are mutually exclusive.*/
     if (write_features->compressions_length > 1 && (write_features->compression_level_min != 0 || write_features->compression_level_max != 0)) {
-        SAIL_LOG_ERROR("The codec '%s' specifies more than two compression types and non-zero compression levels which is unsupported", path);
+        SAIL_LOG_ERROR("The codec '%s' specifies more than two compression types and non-zero compression levels which is unsupported", codec_info->name);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INCOMPLETE_CODEC_INFO);
     }
 
@@ -448,12 +390,7 @@ void destroy_codec_info_node_chain(struct sail_codec_info_node *codec_info_node)
     }
 }
 
-sail_status_t codec_read_info(const char *path, struct sail_codec_info **codec_info) {
-
-    SAIL_CHECK_PATH_PTR(path);
-    SAIL_CHECK_CODEC_INFO_PTR(codec_info);
-
-    SAIL_LOG_DEBUG("Loading codec info '%s'", path);
+static sail_status_t codec_read_info_from_input(const char *input, int (*ini_parser)(const char*, ini_handler, void*), struct sail_codec_info **codec_info) {
 
     SAIL_TRY(alloc_codec_info(codec_info));
     SAIL_TRY_OR_CLEANUP(sail_alloc_read_features(&(*codec_info)->read_features),
@@ -472,18 +409,18 @@ sail_status_t codec_read_info(const char *path, struct sail_codec_info **codec_i
      *  - -1 on file open error
      *  - -2 on memory allocation error (only when INI_USE_STACK is zero).
      */
-    const int code = ini_parse(path, inih_handler, &init_data);
+    const int code = ini_parser(input, inih_handler, &init_data);
 
     /* Success. */
     if (code == 0) {
         if ((*codec_info)->layout != SAIL_CODEC_LAYOUT_V4) {
-            SAIL_LOG_ERROR("Unsupported codec layout version %d in '%s'", (*codec_info)->layout, path);
+            SAIL_LOG_ERROR("Unsupported codec layout version %d. Please check your codec info files", (*codec_info)->layout);
             destroy_codec_info(*codec_info);
             SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_CODEC_LAYOUT);
         }
 
         /* Paranoid error checks. */
-        SAIL_TRY_OR_CLEANUP(check_codec_info(path, *codec_info),
+        SAIL_TRY_OR_CLEANUP(check_codec_info(*codec_info),
                             /* cleanup */ destroy_codec_info(*codec_info));
 
         return SAIL_OK;
@@ -497,4 +434,26 @@ sail_status_t codec_read_info(const char *path, struct sail_codec_info **codec_i
             default: SAIL_LOG_AND_RETURN(SAIL_ERROR_PARSE_FILE);
         }
     }
+}
+
+sail_status_t codec_read_info_from_file(const char *path, struct sail_codec_info **codec_info) {
+
+    SAIL_CHECK_PATH_PTR(path);
+    SAIL_CHECK_CODEC_INFO_PTR(codec_info);
+
+    SAIL_LOG_DEBUG("Loading codec info '%s'", path);
+
+    SAIL_TRY(codec_read_info_from_input(path, ini_parse, codec_info));
+
+    return SAIL_OK;
+}
+
+sail_status_t codec_read_info_from_string(const char *str, struct sail_codec_info **codec_info) {
+
+    SAIL_CHECK_STRING_PTR(str);
+    SAIL_CHECK_CODEC_INFO_PTR(codec_info);
+
+    SAIL_TRY(codec_read_info_from_input(str, ini_parse_string, codec_info));
+
+    return SAIL_OK;
 }

@@ -28,5 +28,3 @@
 #include "sail-common.h"
 
 SAIL_EXPORT const char *sail_enabled_codecs = "@SAIL_ENABLED_CODECS@";
-
-@SAIL_EXTERN_FUNCTIONS@

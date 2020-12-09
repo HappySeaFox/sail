@@ -41,6 +41,7 @@
 
 struct sail_codec_info;
 struct sail_codec;
+struct sail_string_node;
 struct sail_write_features;
 
 struct hidden_state {
@@ -72,5 +73,13 @@ SAIL_HIDDEN sail_status_t stop_writing(void *state, size_t *written);
 SAIL_HIDDEN sail_status_t allowed_write_output_pixel_format(const struct sail_write_features *write_features,
                                                             enum SailPixelFormat input_pixel_format,
                                                             enum SailPixelFormat output_pixel_format);
+
+SAIL_HIDDEN sail_status_t alloc_string_node(struct sail_string_node **string_node);
+
+SAIL_HIDDEN void destroy_string_node(struct sail_string_node *string_node);
+
+SAIL_HIDDEN void destroy_string_node_chain(struct sail_string_node *string_node);
+
+SAIL_HIDDEN sail_status_t split_into_string_node_chain(const char *value, struct sail_string_node **target_string_node);
 
 #endif
