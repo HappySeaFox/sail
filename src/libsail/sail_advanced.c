@@ -48,15 +48,15 @@ sail_status_t sail_probe_io(struct sail_io *io, struct sail_image **image, const
     SAIL_TRY_OR_CLEANUP(sail_alloc_read_options_from_features((*codec_info_local)->read_features, &read_options_local),
                         /* cleanup */ sail_destroy_read_options(read_options_local));
 
-    SAIL_TRY_OR_CLEANUP(codec->v3->read_init(io, read_options_local, &state),
-                        /* cleanup */ codec->v3->read_finish(&state, io),
+    SAIL_TRY_OR_CLEANUP(codec->v4->read_init(io, read_options_local, &state),
+                        /* cleanup */ codec->v4->read_finish(&state, io),
                                       sail_destroy_read_options(read_options_local));
 
     sail_destroy_read_options(read_options_local);
 
-    SAIL_TRY_OR_CLEANUP(codec->v3->read_seek_next_frame(state, io, image),
-                        /* cleanup */ codec->v3->read_finish(&state, io));
-    SAIL_TRY(codec->v3->read_finish(&state, io));
+    SAIL_TRY_OR_CLEANUP(codec->v4->read_seek_next_frame(state, io, image),
+                        /* cleanup */ codec->v4->read_finish(&state, io));
+    SAIL_TRY(codec->v4->read_finish(&state, io));
 
     return SAIL_OK;
 }
@@ -101,7 +101,7 @@ sail_status_t sail_read_next_frame(void *state, struct sail_image **image) {
     SAIL_CHECK_STATE_PTR(state_of_mind->state);
     SAIL_CHECK_CODEC_PTR(state_of_mind->codec);
 
-    SAIL_TRY(state_of_mind->codec->v3->read_seek_next_frame(state_of_mind->state, state_of_mind->io, image));
+    SAIL_TRY(state_of_mind->codec->v4->read_seek_next_frame(state_of_mind->state, state_of_mind->io, image));
 
     /* Detect the number of passes needed to write an interlaced image. */
     int interlaced_passes;
@@ -125,10 +125,10 @@ sail_status_t sail_read_next_frame(void *state, struct sail_image **image) {
                         /* cleanup */ sail_destroy_image(*image));
 
     for (int pass = 0; pass < interlaced_passes; pass++) {
-        SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v3->read_seek_next_pass(state_of_mind->state, state_of_mind->io, *image),
+        SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v4->read_seek_next_pass(state_of_mind->state, state_of_mind->io, *image),
                             /* cleanup */ sail_destroy_image(*image));
 
-        SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v3->read_frame(state_of_mind->state,
+        SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v4->read_frame(state_of_mind->state,
                                                                     state_of_mind->io,
                                                                     *image),
                             /* cleanup */ sail_destroy_image(*image));
@@ -152,7 +152,7 @@ sail_status_t sail_stop_reading(void *state) {
         return SAIL_OK;
     }
 
-    SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v3->read_finish(&state_of_mind->state, state_of_mind->io),
+    SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v4->read_finish(&state_of_mind->state, state_of_mind->io),
                         /* cleanup */ destroy_hidden_state(state_of_mind));
 
     destroy_hidden_state(state_of_mind);
@@ -206,12 +206,12 @@ sail_status_t sail_write_next_frame(void *state, const struct sail_image *image)
     unsigned bytes_per_line;
     SAIL_TRY(sail_bytes_per_line(image->width, image->pixel_format, &bytes_per_line));
 
-    SAIL_TRY(state_of_mind->codec->v3->write_seek_next_frame(state_of_mind->state, state_of_mind->io, image));
+    SAIL_TRY(state_of_mind->codec->v4->write_seek_next_frame(state_of_mind->state, state_of_mind->io, image));
 
     for (int pass = 0; pass < interlaced_passes; pass++) {
-        SAIL_TRY(state_of_mind->codec->v3->write_seek_next_pass(state_of_mind->state, state_of_mind->io, image));
+        SAIL_TRY(state_of_mind->codec->v4->write_seek_next_pass(state_of_mind->state, state_of_mind->io, image));
 
-        SAIL_TRY(state_of_mind->codec->v3->write_frame(state_of_mind->state,
+        SAIL_TRY(state_of_mind->codec->v4->write_frame(state_of_mind->state,
                                                         state_of_mind->io,
                                                         image));
     }

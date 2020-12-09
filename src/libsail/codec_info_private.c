@@ -476,7 +476,7 @@ sail_status_t codec_read_info(const char *path, struct sail_codec_info **codec_i
 
     /* Success. */
     if (code == 0) {
-        if ((*codec_info)->layout != SAIL_CODEC_LAYOUT_V3) {
+        if ((*codec_info)->layout != SAIL_CODEC_LAYOUT_V4) {
             SAIL_LOG_ERROR("Unsupported codec layout version %d in '%s'", (*codec_info)->layout, path);
             destroy_codec_info(*codec_info);
             SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_CODEC_LAYOUT);

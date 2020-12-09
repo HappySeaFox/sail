@@ -40,7 +40,8 @@
 
 #include <sail-c++/sail-c++.h>
 
-//#include <sail/layouts/v3.h>
+//#define SAIL_CODEC_NAME jpeg
+//#include <sail/layouts/v4.h>
 
 #include "qtsail.h"
 #include "ui_qtsail.h"

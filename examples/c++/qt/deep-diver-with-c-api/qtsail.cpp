@@ -39,7 +39,8 @@
 #include <sail-common/sail-common.h>
 #include <sail/sail.h>
 
-//#include <sail/layouts/v3.h>
+//#define SAIL_CODEC_NAME jpeg
+//#include <sail/layouts/v4.h>
 
 #include "qtsail.h"
 #include "readoptions.h"
