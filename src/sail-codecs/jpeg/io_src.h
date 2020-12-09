@@ -45,6 +45,6 @@ struct sail_jpeg_source_mgr {
     boolean start_of_file;        /* have we gotten any data yet? */
 };
 
-SAIL_HIDDEN void jpeg_sail_io_src(j_decompress_ptr cinfo, struct sail_io *io);
+SAIL_HIDDEN void jpeg_private_sail_io_src(j_decompress_ptr cinfo, struct sail_io *io);
 
 #endif

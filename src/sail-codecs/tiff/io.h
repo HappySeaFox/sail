@@ -30,14 +30,14 @@
 
 #include "export.h"
 
-SAIL_HIDDEN tmsize_t my_read_proc(thandle_t client_data, void *buffer, tmsize_t buffer_size);
+SAIL_HIDDEN tmsize_t tiff_private_my_read_proc(thandle_t client_data, void *buffer, tmsize_t buffer_size);
 
-SAIL_HIDDEN tmsize_t my_write_proc(thandle_t client_data, void *buffer, tmsize_t buffer_size);
+SAIL_HIDDEN tmsize_t tiff_private_my_write_proc(thandle_t client_data, void *buffer, tmsize_t buffer_size);
 
-SAIL_HIDDEN toff_t my_seek_proc(thandle_t client_data, toff_t offset, int whence);
+SAIL_HIDDEN toff_t tiff_private_my_seek_proc(thandle_t client_data, toff_t offset, int whence);
 
-SAIL_HIDDEN int my_dummy_close_proc(thandle_t client_data);
+SAIL_HIDDEN int tiff_private_my_dummy_close_proc(thandle_t client_data);
 
-SAIL_HIDDEN toff_t my_dummy_size_proc(thandle_t client_data);
+SAIL_HIDDEN toff_t tiff_private_my_dummy_size_proc(thandle_t client_data);
 
 #endif

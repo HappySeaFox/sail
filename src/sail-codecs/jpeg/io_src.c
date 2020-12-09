@@ -167,7 +167,7 @@ static void term_source(j_decompress_ptr cinfo)
  * The caller must have already opened the stream, and is responsible
  * for closing it after finishing decompression.
  */
-void jpeg_sail_io_src(j_decompress_ptr cinfo, struct sail_io *io) {
+void jpeg_private_sail_io_src(j_decompress_ptr cinfo, struct sail_io *io) {
 
     struct sail_jpeg_source_mgr *src;
 

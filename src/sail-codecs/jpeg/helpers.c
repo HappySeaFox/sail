@@ -32,7 +32,7 @@
 
 #include "helpers.h"
 
-void my_output_message(j_common_ptr cinfo) {
+void jpeg_private_my_output_message(j_common_ptr cinfo) {
     char buffer[JMSG_LENGTH_MAX];
 
     (*cinfo->err->format_message)(cinfo, buffer);
@@ -40,15 +40,15 @@ void my_output_message(j_common_ptr cinfo) {
     SAIL_LOG_ERROR("JPEG: %s", buffer);
 }
 
-void my_error_exit(j_common_ptr cinfo) {
-    struct my_error_context *myerr = (struct my_error_context *)cinfo->err;
+void jpeg_private_my_error_exit(j_common_ptr cinfo) {
+    struct jpeg_private_my_error_context *myerr = (struct jpeg_private_my_error_context *)cinfo->err;
 
     (*cinfo->err->output_message)(cinfo);
 
     longjmp(myerr->setjmp_buffer, 1);
 }
 
-enum SailPixelFormat color_space_to_pixel_format(J_COLOR_SPACE color_space) {
+enum SailPixelFormat jpeg_private_color_space_to_pixel_format(J_COLOR_SPACE color_space) {
     switch (color_space) {
         case JCS_GRAYSCALE: return SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE;
 
@@ -71,7 +71,7 @@ enum SailPixelFormat color_space_to_pixel_format(J_COLOR_SPACE color_space) {
     }
 }
 
-J_COLOR_SPACE pixel_format_to_color_space(enum SailPixelFormat pixel_format) {
+J_COLOR_SPACE jpeg_private_pixel_format_to_color_space(enum SailPixelFormat pixel_format) {
     switch (pixel_format) {
         case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE:  return JCS_GRAYSCALE;
 
@@ -93,7 +93,7 @@ J_COLOR_SPACE pixel_format_to_color_space(enum SailPixelFormat pixel_format) {
     }
 }
 
-sail_status_t auto_output_color_space(enum SailPixelFormat input_pixel_format, J_COLOR_SPACE *output_color_space) {
+sail_status_t jpeg_private_auto_output_color_space(enum SailPixelFormat input_pixel_format, J_COLOR_SPACE *output_color_space) {
 
     SAIL_CHECK_PTR(output_color_space);
 
@@ -122,7 +122,7 @@ static void get_cmyk(unsigned char **pixels, unsigned char *C, unsigned char *M,
     *K = (unsigned char)(*(*pixels)++ / 100.0);
 }
 
-sail_status_t convert_cmyk(unsigned char *pixels_source, unsigned char *pixels_target, unsigned width, enum SailPixelFormat target_pixel_format) {
+sail_status_t jpeg_private_convert_cmyk(unsigned char *pixels_source, unsigned char *pixels_target, unsigned width, enum SailPixelFormat target_pixel_format) {
     unsigned char C, M, Y, K;
 
     switch (target_pixel_format) {
@@ -175,7 +175,7 @@ sail_status_t convert_cmyk(unsigned char *pixels_source, unsigned char *pixels_t
     }
 }
 
-sail_status_t fetch_meta_data(struct jpeg_decompress_struct *decompress_context, struct sail_meta_data_node **last_meta_data_node) {
+sail_status_t jpeg_private_fetch_meta_data(struct jpeg_decompress_struct *decompress_context, struct sail_meta_data_node **last_meta_data_node) {
 
     SAIL_CHECK_META_DATA_NODE_PTR(last_meta_data_node);
 
@@ -200,7 +200,7 @@ sail_status_t fetch_meta_data(struct jpeg_decompress_struct *decompress_context,
     return SAIL_OK;
 }
 
-sail_status_t write_meta_data(struct jpeg_compress_struct *compress_context, const struct sail_meta_data_node *meta_data_node) {
+sail_status_t jpeg_private_write_meta_data(struct jpeg_compress_struct *compress_context, const struct sail_meta_data_node *meta_data_node) {
 
     while (meta_data_node != NULL) {
         if (meta_data_node->value_type == SAIL_META_DATA_TYPE_STRING) {
@@ -222,7 +222,7 @@ sail_status_t write_meta_data(struct jpeg_compress_struct *compress_context, con
 }
 
 #ifdef HAVE_JPEG_ICCP
-sail_status_t fetch_iccp(struct jpeg_decompress_struct *decompress_context, struct sail_iccp **iccp) {
+sail_status_t jpeg_private_fetch_iccp(struct jpeg_decompress_struct *decompress_context, struct sail_iccp **iccp) {
 
     SAIL_CHECK_ICCP_PTR(iccp);
 
@@ -244,7 +244,7 @@ sail_status_t fetch_iccp(struct jpeg_decompress_struct *decompress_context, stru
 }
 #endif
 
-sail_status_t fetch_resolution(struct jpeg_decompress_struct *decompress_context, struct sail_resolution **resolution) {
+sail_status_t jpeg_private_fetch_resolution(struct jpeg_decompress_struct *decompress_context, struct sail_resolution **resolution) {
 
     SAIL_CHECK_RESOLUTION_PTR(resolution);
 
@@ -272,7 +272,7 @@ sail_status_t fetch_resolution(struct jpeg_decompress_struct *decompress_context
     return SAIL_OK;
 }
 
-sail_status_t write_resolution(struct jpeg_compress_struct *compress_context, const struct sail_resolution *resolution) {
+sail_status_t jpeg_private_write_resolution(struct jpeg_compress_struct *compress_context, const struct sail_resolution *resolution) {
 
     /* Not an error. */
     if (resolution == NULL) {

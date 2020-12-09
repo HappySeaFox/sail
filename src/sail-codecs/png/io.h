@@ -32,10 +32,10 @@
 
 #include "export.h"
 
-SAIL_HIDDEN void my_read_fn(png_structp png_ptr, png_bytep bytes, png_size_t bytes_size);
+SAIL_HIDDEN void png_private_my_read_fn(png_structp png_ptr, png_bytep bytes, png_size_t bytes_size);
 
-SAIL_HIDDEN void my_write_fn(png_structp png_ptr, png_bytep bytes, png_size_t bytes_size);
+SAIL_HIDDEN void png_private_my_write_fn(png_structp png_ptr, png_bytep bytes, png_size_t bytes_size);
 
-SAIL_HIDDEN void my_flush_fn(png_structp png_ptr);
+SAIL_HIDDEN void png_private_my_flush_fn(png_structp png_ptr);
 
 #endif

@@ -29,7 +29,7 @@
 
 #include "helpers.h"
 
-sail_status_t supported_read_output_pixel_format(enum SailPixelFormat pixel_format) {
+sail_status_t gif_private_supported_read_output_pixel_format(enum SailPixelFormat pixel_format) {
 
     switch (pixel_format) {
         case SAIL_PIXEL_FORMAT_BPP32_RGBA:
@@ -43,7 +43,7 @@ sail_status_t supported_read_output_pixel_format(enum SailPixelFormat pixel_form
     }
 }
 
-sail_status_t fetch_comment(const GifByteType *extension, struct sail_meta_data_node **image_meta_data_node) {
+sail_status_t gif_private_fetch_comment(const GifByteType *extension, struct sail_meta_data_node **image_meta_data_node) {
 
     SAIL_CHECK_PTR(extension);
 
@@ -74,7 +74,7 @@ sail_status_t fetch_comment(const GifByteType *extension, struct sail_meta_data_
     return SAIL_OK;
 }
 
-sail_status_t fetch_application(const GifByteType *extension, struct sail_meta_data_node **image_meta_data_node) {
+sail_status_t gif_private_fetch_application(const GifByteType *extension, struct sail_meta_data_node **image_meta_data_node) {
 
     SAIL_CHECK_PTR(extension);
 
