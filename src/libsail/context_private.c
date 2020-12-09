@@ -478,9 +478,24 @@ static sail_status_t init_context_impl(struct sail_context *context) {
 
     SAIL_CHECK_CONTEXT_PTR(context);
 
+#ifdef SAIL_WIN32
+    HMODULE handle = GetModuleHandle(NULL);
+
+    if (handle == NULL) {
+        SAIL_LOG_ERROR("Failed to open the current executable. Error: %d", GetLastError());
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_SYMBOL_RESOLVE);
+    }
+#else
+    void *handle = dlopen(NULL, RTLD_LAZY | RTLD_LOCAL);
+
+    if (handle == NULL) {
+        SAIL_LOG_ERROR("Failed to open the current executable: %s", dlerror());
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_SYMBOL_RESOLVE);
+    }
+#endif
+
     /* Load our codecs. */
     struct sail_codec_info_node **last_codec_info_node = &context->codec_info_node;
-    struct sail_codec_info_node *codec_info_node;
 
     /* Extern from sail-codecs-archive. For example: "gif;jpeg;png". */
     extern const char *sail_enabled_codecs;
@@ -499,8 +514,6 @@ static sail_status_t init_context_impl(struct sail_context *context) {
                             /* cleanup */ destroy_string_node_chain(string_node));
 
 #ifdef SAIL_WIN32
-        HMODULE handle = GetModuleHandle(NULL);
-
         const char **sail_codec_info_var = (const char **)GetProcAddress(handle, sail_codec_info_var_name);
 
         if (*sail_codec_info_var == NULL) {
@@ -508,21 +521,29 @@ static sail_status_t init_context_impl(struct sail_context *context) {
             continue;
         }
 #else
-        const char **sail_codec_info_var = (const char **)dlsym(RTLD_DEFAULT, sail_codec_info_var_name);
+        const char **sail_codec_info_var = (const char **)dlsym(handle, sail_codec_info_var_name);
 
         if (*sail_codec_info_var == NULL) {
             SAIL_LOG_ERROR("Failed to resolve '%s'. Error: %s", sail_codec_info_var_name, dlerror());
+            dlclose(handle);
+            node = node->next;
             continue;
         }
 #endif
+        struct sail_codec_info_node *codec_info_node;
+
         /* Parse codec info. */
-        SAIL_TRY_OR_CLEANUP(alloc_codec_info_node(&codec_info_node),
-                            /* cleanup */ destroy_string_node_chain(string_node));
+        if (alloc_codec_info_node(&codec_info_node) != SAIL_OK) {
+            node = node->next;
+            continue;
+        }
 
         struct sail_codec_info *codec_info;
-        SAIL_TRY_OR_CLEANUP(codec_read_info_from_string(*sail_codec_info_var, &codec_info),
-                            /* cleanup */ destroy_codec_info_node(codec_info_node),
-                                          destroy_string_node_chain(string_node));
+        if (codec_read_info_from_string(*sail_codec_info_var, &codec_info) != SAIL_OK) {
+            destroy_codec_info_node(codec_info_node);
+            node = node->next;
+            continue;
+        };
 
         /* Save the parsed codec info into the SAIL context. */
         codec_info_node->codec_info = codec_info;
@@ -532,6 +553,10 @@ static sail_status_t init_context_impl(struct sail_context *context) {
 
         node = node->next;
     }
+
+#ifndef SAIL_WIN32
+    dlclose(handle);
+#endif
 
     destroy_string_node_chain(string_node);
 
