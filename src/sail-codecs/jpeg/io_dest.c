@@ -124,7 +124,7 @@ static void term_destination(j_compress_ptr cinfo)
  * The caller must have already opened the stream, and is responsible
  * for closing it after finishing compression.
  */
-void jpeg_sail_io_dest(j_compress_ptr cinfo, struct sail_io *io)
+void jpeg_private_sail_io_dest(j_compress_ptr cinfo, struct sail_io *io)
 {
     struct sail_jpeg_destination_mgr *dest;
 

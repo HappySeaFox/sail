@@ -67,7 +67,7 @@ static sail_status_t alloc_tiff_state(struct tiff_state **tiff_state) {
     (*tiff_state)->write_compression = COMPRESSION_NONE;
     (*tiff_state)->line              = 0;
 
-    zero_tiff_image(&(*tiff_state)->image);
+    tiff_private_zero_tiff_image(&(*tiff_state)->image);
 
     return SAIL_OK;
 }
@@ -98,10 +98,10 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v4_tiff(struct sail_io *io, const
     SAIL_CHECK_IO(io);
     SAIL_CHECK_READ_OPTIONS_PTR(read_options);
 
-    TIFFSetWarningHandler(my_warning_fn);
-    TIFFSetErrorHandler(my_error_fn);
+    TIFFSetWarningHandler(tiff_private_my_warning_fn);
+    TIFFSetErrorHandler(tiff_private_my_error_fn);
 
-    SAIL_TRY(supported_read_output_pixel_format(read_options->output_pixel_format));
+    SAIL_TRY(tiff_private_supported_read_output_pixel_format(read_options->output_pixel_format));
 
     /* Allocate a new state. */
     struct tiff_state *tiff_state;
@@ -121,11 +121,11 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v4_tiff(struct sail_io *io, const
     tiff_state->tiff = TIFFClientOpen("tiff-sail-codec",
                                       "rhm",
                                       io,
-                                      my_read_proc,
-                                      my_write_proc,
-                                      my_seek_proc,
-                                      my_dummy_close_proc,
-                                      my_dummy_size_proc,
+                                      tiff_private_my_read_proc,
+                                      tiff_private_my_write_proc,
+                                      tiff_private_my_seek_proc,
+                                      tiff_private_my_dummy_close_proc,
+                                      tiff_private_my_dummy_size_proc,
                                       /* map */ NULL,
                                       /* unmap */ NULL);
 
@@ -180,18 +180,18 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v4_tiff(void *state, s
     if (tiff_state->read_options->io_options & SAIL_IO_OPTION_META_DATA) {
         struct sail_meta_data_node **last_meta_data_node = &(*image)->meta_data_node;
 
-        SAIL_TRY_OR_CLEANUP(fetch_meta_data(tiff_state->tiff, &last_meta_data_node),
+        SAIL_TRY_OR_CLEANUP(tiff_private_fetch_meta_data(tiff_state->tiff, &last_meta_data_node),
                             /* cleanup */ sail_destroy_image(*image));
     }
 
     /* Fetch ICC profile. */
     if (tiff_state->read_options->io_options & SAIL_IO_OPTION_ICCP) {
-        SAIL_TRY_OR_CLEANUP(fetch_iccp(tiff_state->tiff, &(*image)->iccp),
+        SAIL_TRY_OR_CLEANUP(tiff_private_fetch_iccp(tiff_state->tiff, &(*image)->iccp),
                             /* cleanup */ sail_destroy_image(*image));
     }
 
     /* Fetch resolution. */
-    SAIL_TRY_OR_CLEANUP(fetch_resolution(tiff_state->tiff, &(*image)->resolution),
+    SAIL_TRY_OR_CLEANUP(tiff_private_fetch_resolution(tiff_state->tiff, &(*image)->resolution),
                             /* cleanup */ sail_destroy_image(*image));
 
     switch (tiff_state->read_options->output_pixel_format) {
@@ -220,8 +220,8 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v4_tiff(void *state, s
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
-    (*image)->source_image->compression = tiff_compression_to_sail_compression(compression);
-    (*image)->source_image->pixel_format = bpp_to_pixel_format(tiff_state->image.bitspersample * tiff_state->image.samplesperpixel);
+    (*image)->source_image->compression = tiff_private_compression_to_sail_compression(compression);
+    (*image)->source_image->pixel_format = tiff_private_bpp_to_pixel_format(tiff_state->image.bitspersample * tiff_state->image.samplesperpixel);
 
     const char *pixel_format_str = NULL;
     SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string((*image)->source_image->pixel_format, &pixel_format_str));
@@ -315,11 +315,11 @@ SAIL_EXPORT sail_status_t sail_codec_write_init_v4_tiff(struct sail_io *io, cons
     SAIL_TRY(sail_copy_write_options(write_options, &tiff_state->write_options));
 
     /* Sanity check. */
-    SAIL_TRY(supported_write_output_pixel_format(tiff_state->write_options->output_pixel_format));
-    SAIL_TRY(sail_compression_to_tiff_compression(tiff_state->write_options->compression, &tiff_state->write_compression));
+    SAIL_TRY(tiff_private_supported_write_output_pixel_format(tiff_state->write_options->output_pixel_format));
+    SAIL_TRY(tiff_private_sail_compression_to_compression(tiff_state->write_options->compression, &tiff_state->write_compression));
 
-    TIFFSetWarningHandler(my_warning_fn);
-    TIFFSetErrorHandler(my_error_fn);
+    TIFFSetWarningHandler(tiff_private_my_warning_fn);
+    TIFFSetErrorHandler(tiff_private_my_error_fn);
 
     /* Initialize TIFF.
      *
@@ -329,11 +329,11 @@ SAIL_EXPORT sail_status_t sail_codec_write_init_v4_tiff(struct sail_io *io, cons
     tiff_state->tiff = TIFFClientOpen("tiff-sail-codec",
                                       "wm",
                                       io,
-                                      my_read_proc,
-                                      my_write_proc,
-                                      my_seek_proc,
-                                      /* libsail will close for us. */ my_dummy_close_proc,
-                                      my_dummy_size_proc,
+                                      tiff_private_my_read_proc,
+                                      tiff_private_my_write_proc,
+                                      tiff_private_my_seek_proc,
+                                      /* libsail will close for us. */ tiff_private_my_dummy_close_proc,
+                                      tiff_private_my_dummy_size_proc,
                                       /* map */ NULL,
                                       /* unmap */ NULL);
 
@@ -378,11 +378,11 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v4_tiff(void *state, 
     /* Write meta data. */
     if (tiff_state->write_options->io_options & SAIL_IO_OPTION_META_DATA && image->meta_data_node != NULL) {
         SAIL_LOG_DEBUG("TIFF: Writing meta data");
-        SAIL_TRY(write_meta_data(tiff_state->tiff, image->meta_data_node));
+        SAIL_TRY(tiff_private_write_meta_data(tiff_state->tiff, image->meta_data_node));
     }
 
     /* Write resolution. */
-    SAIL_TRY(write_resolution(tiff_state->tiff, image->resolution));
+    SAIL_TRY(tiff_private_write_resolution(tiff_state->tiff, image->resolution));
 
     const char *pixel_format_str = NULL;
     SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(image->pixel_format, &pixel_format_str));

@@ -27,7 +27,7 @@
 
 #include "io.h"
 
-tmsize_t my_read_proc(thandle_t client_data, void *buffer, tmsize_t buffer_size) {
+tmsize_t tiff_private_my_read_proc(thandle_t client_data, void *buffer, tmsize_t buffer_size) {
 
     struct sail_io *io = (struct sail_io *)client_data;
     size_t nbytes;
@@ -42,7 +42,7 @@ tmsize_t my_read_proc(thandle_t client_data, void *buffer, tmsize_t buffer_size)
     return (tmsize_t)nbytes;
 }
 
-tmsize_t my_write_proc(thandle_t client_data, void *buffer, tmsize_t buffer_size) {
+tmsize_t tiff_private_my_write_proc(thandle_t client_data, void *buffer, tmsize_t buffer_size) {
 
     struct sail_io *io = (struct sail_io *)client_data;
     size_t nbytes;
@@ -57,7 +57,7 @@ tmsize_t my_write_proc(thandle_t client_data, void *buffer, tmsize_t buffer_size
     return (tmsize_t)nbytes;
 }
 
-toff_t my_seek_proc(thandle_t client_data, toff_t offset, int whence) {
+toff_t tiff_private_my_seek_proc(thandle_t client_data, toff_t offset, int whence) {
 
     struct sail_io *io = (struct sail_io *)client_data;
 
@@ -79,14 +79,14 @@ toff_t my_seek_proc(thandle_t client_data, toff_t offset, int whence) {
     return (toff_t)new_offset;
 }
 
-int my_dummy_close_proc(thandle_t client_data) {
+int tiff_private_my_dummy_close_proc(thandle_t client_data) {
 
     (void)client_data;
 
     return 0;
 }
 
-toff_t my_dummy_size_proc(thandle_t client_data) {
+toff_t tiff_private_my_dummy_size_proc(thandle_t client_data) {
 
     (void)client_data;
 

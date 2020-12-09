@@ -138,7 +138,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v4_gif(struct sail_io *io, const 
     SAIL_CHECK_IO(io);
     SAIL_CHECK_READ_OPTIONS_PTR(read_options);
 
-    SAIL_TRY(supported_read_output_pixel_format(read_options->output_pixel_format));
+    SAIL_TRY(gif_private_supported_read_output_pixel_format(read_options->output_pixel_format));
 
     /* Allocate a new state. */
     struct gif_state *gif_state;
@@ -289,7 +289,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v4_gif(void *state, st
 
                     case COMMENT_EXT_FUNC_CODE: {
                         if (gif_state->read_options->io_options & SAIL_IO_OPTION_META_DATA) {
-                            SAIL_TRY_OR_CLEANUP(fetch_comment(extension, &(*image)->meta_data_node),
+                            SAIL_TRY_OR_CLEANUP(gif_private_fetch_comment(extension, &(*image)->meta_data_node),
                                                 /* cleanup*/ sail_destroy_image(*image));
                         }
                         break;
@@ -297,7 +297,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v4_gif(void *state, st
 
                     case APPLICATION_EXT_FUNC_CODE: {
                         if (gif_state->read_options->io_options & SAIL_IO_OPTION_META_DATA) {
-                            SAIL_TRY_OR_CLEANUP(fetch_application(extension, &(*image)->meta_data_node),
+                            SAIL_TRY_OR_CLEANUP(gif_private_fetch_application(extension, &(*image)->meta_data_node),
                                                 /* cleanup */ sail_destroy_image(*image));
                         }
                         break;

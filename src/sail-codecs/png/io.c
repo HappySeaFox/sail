@@ -32,7 +32,7 @@
 
 #include "io.h"
 
-void my_read_fn(png_structp png_ptr, png_bytep bytes, png_size_t bytes_size) {
+void png_private_my_read_fn(png_structp png_ptr, png_bytep bytes, png_size_t bytes_size) {
 
     if (png_ptr == NULL) {
         return;
@@ -48,7 +48,7 @@ void my_read_fn(png_structp png_ptr, png_bytep bytes, png_size_t bytes_size) {
     }
 }
 
-void my_write_fn(png_structp png_ptr, png_bytep bytes, png_size_t bytes_size) {
+void png_private_my_write_fn(png_structp png_ptr, png_bytep bytes, png_size_t bytes_size) {
 
     if (png_ptr == NULL) {
         return;
@@ -64,7 +64,7 @@ void my_write_fn(png_structp png_ptr, png_bytep bytes, png_size_t bytes_size) {
     }
 }
 
-void my_flush_fn(png_structp png_ptr) {
+void png_private_my_flush_fn(png_structp png_ptr) {
 
     if (png_ptr == NULL) {
         return;

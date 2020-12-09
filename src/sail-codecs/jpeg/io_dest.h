@@ -41,6 +41,6 @@ struct sail_jpeg_destination_mgr {
     JOCTET *buffer;             /* start of buffer */
 };
 
-SAIL_HIDDEN void jpeg_sail_io_dest(j_compress_ptr cinfo, struct sail_io *io);
+SAIL_HIDDEN void jpeg_private_sail_io_dest(j_compress_ptr cinfo, struct sail_io *io);
 
 #endif

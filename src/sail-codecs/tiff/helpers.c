@@ -34,7 +34,7 @@
 
 #include "helpers.h"
 
-void my_error_fn(const char *module, const char *format, va_list ap) {
+void tiff_private_my_error_fn(const char *module, const char *format, va_list ap) {
 
     char buffer[160];
 
@@ -47,7 +47,7 @@ void my_error_fn(const char *module, const char *format, va_list ap) {
     }
 }
 
-void my_warning_fn(const char *module, const char *format, va_list ap) {
+void tiff_private_my_warning_fn(const char *module, const char *format, va_list ap) {
 
     char buffer[160];
 
@@ -60,7 +60,7 @@ void my_warning_fn(const char *module, const char *format, va_list ap) {
     }
 }
 
-sail_status_t supported_read_output_pixel_format(enum SailPixelFormat pixel_format) {
+sail_status_t tiff_private_supported_read_output_pixel_format(enum SailPixelFormat pixel_format) {
 
     switch (pixel_format) {
         case SAIL_PIXEL_FORMAT_BPP32_RGBA:
@@ -75,7 +75,7 @@ sail_status_t supported_read_output_pixel_format(enum SailPixelFormat pixel_form
     }
 }
 
-enum SailCompression tiff_compression_to_sail_compression(int compression) {
+enum SailCompression tiff_private_compression_to_sail_compression(int compression) {
 
     switch (compression) {
         case COMPRESSION_ADOBE_DEFLATE: return SAIL_COMPRESSION_ADOBE_DEFLATE;
@@ -121,7 +121,7 @@ enum SailCompression tiff_compression_to_sail_compression(int compression) {
     }
 }
 
-sail_status_t sail_compression_to_tiff_compression(enum SailCompression compression, int *tiff_compression) {
+sail_status_t tiff_private_sail_compression_to_compression(enum SailCompression compression, int *tiff_compression) {
 
     SAIL_CHECK_PTR(tiff_compression);
 
@@ -146,7 +146,7 @@ sail_status_t sail_compression_to_tiff_compression(enum SailCompression compress
     }
 }
 
-enum SailPixelFormat bpp_to_pixel_format(int bpp) {
+enum SailPixelFormat tiff_private_bpp_to_pixel_format(int bpp) {
 
     switch (bpp) {
         case 1:   return SAIL_PIXEL_FORMAT_BPP1;
@@ -168,7 +168,7 @@ enum SailPixelFormat bpp_to_pixel_format(int bpp) {
     }
 }
 
-void zero_tiff_image(TIFFRGBAImage *img) {
+void tiff_private_zero_tiff_image(TIFFRGBAImage *img) {
 
     if (img == NULL) {
         return;
@@ -186,7 +186,7 @@ void zero_tiff_image(TIFFRGBAImage *img) {
     img->bluecmap      = NULL;
 }
 
-sail_status_t fetch_iccp(TIFF *tiff, struct sail_iccp **iccp) {
+sail_status_t tiff_private_fetch_iccp(TIFF *tiff, struct sail_iccp **iccp) {
 
     unsigned char *data;
     unsigned data_length;
@@ -214,7 +214,7 @@ static sail_status_t fetch_single_meta_data(TIFF *tiff, int tag, enum SailMetaDa
     return SAIL_OK;
 }
 
-sail_status_t fetch_meta_data(TIFF *tiff, struct sail_meta_data_node ***last_meta_data_node) {
+sail_status_t tiff_private_fetch_meta_data(TIFF *tiff, struct sail_meta_data_node ***last_meta_data_node) {
 
     SAIL_CHECK_META_DATA_NODE_PTR(last_meta_data_node);
 
@@ -229,7 +229,7 @@ sail_status_t fetch_meta_data(TIFF *tiff, struct sail_meta_data_node ***last_met
     return SAIL_OK;
 }
 
-sail_status_t write_meta_data(TIFF *tiff, const struct sail_meta_data_node *meta_data_node) {
+sail_status_t tiff_private_write_meta_data(TIFF *tiff, const struct sail_meta_data_node *meta_data_node) {
 
     SAIL_CHECK_PTR(tiff);
 
@@ -275,7 +275,7 @@ sail_status_t write_meta_data(TIFF *tiff, const struct sail_meta_data_node *meta
     return SAIL_OK;
 }
 
-sail_status_t supported_write_output_pixel_format(enum SailPixelFormat pixel_format) {
+sail_status_t tiff_private_supported_write_output_pixel_format(enum SailPixelFormat pixel_format) {
 
     switch (pixel_format) {
         case SAIL_PIXEL_FORMAT_AUTO:
@@ -289,7 +289,7 @@ sail_status_t supported_write_output_pixel_format(enum SailPixelFormat pixel_for
     }
 }
 
-sail_status_t fetch_resolution(TIFF *tiff, struct sail_resolution **resolution) {
+sail_status_t tiff_private_fetch_resolution(TIFF *tiff, struct sail_resolution **resolution) {
 
     SAIL_CHECK_RESOLUTION_PTR(resolution);
 
@@ -324,7 +324,7 @@ sail_status_t fetch_resolution(TIFF *tiff, struct sail_resolution **resolution) 
     return SAIL_OK;
 }
 
-sail_status_t write_resolution(TIFF *tiff, const struct sail_resolution *resolution) {
+sail_status_t tiff_private_write_resolution(TIFF *tiff, const struct sail_resolution *resolution) {
 
     /* Not an error. */
     if (resolution == NULL) {

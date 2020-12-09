@@ -40,40 +40,40 @@ struct sail_meta_data_node;
 struct sail_palette;
 struct sail_resolution;
 
-SAIL_HIDDEN void my_error_fn(png_structp png_ptr, png_const_charp text);
+SAIL_HIDDEN void png_private_my_error_fn(png_structp png_ptr, png_const_charp text);
 
-SAIL_HIDDEN void my_warning_fn(png_structp png_ptr, png_const_charp text);
+SAIL_HIDDEN void png_private_my_warning_fn(png_structp png_ptr, png_const_charp text);
 
-SAIL_HIDDEN enum SailPixelFormat png_color_type_to_pixel_format(int color_type, int bit_depth);
+SAIL_HIDDEN enum SailPixelFormat png_private_png_color_type_to_pixel_format(int color_type, int bit_depth);
 
-SAIL_HIDDEN sail_status_t pixel_format_to_png_color_type(enum SailPixelFormat pixel_format, int *color_type, int *bit_depth);
+SAIL_HIDDEN sail_status_t png_private_pixel_format_to_png_color_type(enum SailPixelFormat pixel_format, int *color_type, int *bit_depth);
 
-SAIL_HIDDEN sail_status_t supported_read_output_pixel_format(enum SailPixelFormat pixel_format);
+SAIL_HIDDEN sail_status_t png_private_supported_read_output_pixel_format(enum SailPixelFormat pixel_format);
 
-SAIL_HIDDEN sail_status_t supported_write_output_pixel_format(enum SailPixelFormat pixel_format);
+SAIL_HIDDEN sail_status_t png_private_supported_write_output_pixel_format(enum SailPixelFormat pixel_format);
 
-SAIL_HIDDEN sail_status_t fetch_meta_data(png_structp png_ptr, png_infop info_ptr, struct sail_meta_data_node **target_meta_data_node);
+SAIL_HIDDEN sail_status_t png_private_fetch_meta_data(png_structp png_ptr, png_infop info_ptr, struct sail_meta_data_node **target_meta_data_node);
 
-SAIL_HIDDEN sail_status_t write_meta_data(png_structp png_ptr, png_infop info_ptr, const struct sail_meta_data_node *meta_data_node);
+SAIL_HIDDEN sail_status_t png_private_write_meta_data(png_structp png_ptr, png_infop info_ptr, const struct sail_meta_data_node *meta_data_node);
 
-SAIL_HIDDEN sail_status_t fetch_iccp(png_structp png_ptr, png_infop info_ptr, struct sail_iccp **iccp);
+SAIL_HIDDEN sail_status_t png_private_fetch_iccp(png_structp png_ptr, png_infop info_ptr, struct sail_iccp **iccp);
 
-SAIL_HIDDEN sail_status_t fetch_palette(png_structp png_ptr, png_infop info_ptr, struct sail_palette **palette);
+SAIL_HIDDEN sail_status_t png_private_fetch_palette(png_structp png_ptr, png_infop info_ptr, struct sail_palette **palette);
 
 #ifdef PNG_APNG_SUPPORTED
-SAIL_HIDDEN sail_status_t blend_source(void *dst_raw, unsigned dst_offset, const void *src_raw, unsigned src_length, unsigned bytes_per_pixel);
+SAIL_HIDDEN sail_status_t png_private_blend_source(void *dst_raw, unsigned dst_offset, const void *src_raw, unsigned src_length, unsigned bytes_per_pixel);
 
-SAIL_HIDDEN sail_status_t blend_over(void *dst_raw, unsigned dst_offset, const void *src_raw, unsigned width, unsigned bytes_per_pixel);
+SAIL_HIDDEN sail_status_t png_private_blend_over(void *dst_raw, unsigned dst_offset, const void *src_raw, unsigned width, unsigned bytes_per_pixel);
 
-SAIL_HIDDEN sail_status_t skip_hidden_frame(unsigned bytes_per_line, unsigned height, png_structp png_ptr, png_infop info_ptr, void **row);
+SAIL_HIDDEN sail_status_t png_private_skip_hidden_frame(unsigned bytes_per_line, unsigned height, png_structp png_ptr, png_infop info_ptr, void **row);
 
-SAIL_HIDDEN sail_status_t alloc_rows(png_bytep **A, unsigned row_length, unsigned height);
+SAIL_HIDDEN sail_status_t png_private_alloc_rows(png_bytep **A, unsigned row_length, unsigned height);
 
-SAIL_HIDDEN void destroy_rows(png_bytep **A, unsigned height);
+SAIL_HIDDEN void png_private_destroy_rows(png_bytep **A, unsigned height);
 #endif
 
-SAIL_HIDDEN sail_status_t fetch_resolution(png_structp png_ptr, png_infop info_ptr, struct sail_resolution **resolution);
+SAIL_HIDDEN sail_status_t png_private_fetch_resolution(png_structp png_ptr, png_infop info_ptr, struct sail_resolution **resolution);
 
-SAIL_HIDDEN sail_status_t write_resolution(png_structp png_ptr, png_infop info_ptr, const struct sail_resolution *resolution);
+SAIL_HIDDEN sail_status_t png_private_write_resolution(png_structp png_ptr, png_infop info_ptr, const struct sail_resolution *resolution);
 
 #endif

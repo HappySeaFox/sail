@@ -32,21 +32,21 @@
 
 #include "helpers.h"
 
-void my_error_fn(png_structp png_ptr, png_const_charp text) {
+void png_private_my_error_fn(png_structp png_ptr, png_const_charp text) {
 
     (void)png_ptr;
 
     SAIL_LOG_ERROR("PNG: %s", text);
 }
 
-void my_warning_fn(png_structp png_ptr, png_const_charp text) {
+void png_private_my_warning_fn(png_structp png_ptr, png_const_charp text) {
 
     (void)png_ptr;
 
     SAIL_LOG_WARNING("PNG: %s", text);
 }
 
-enum SailPixelFormat png_color_type_to_pixel_format(int color_type, int bit_depth) {
+enum SailPixelFormat png_private_png_color_type_to_pixel_format(int color_type, int bit_depth) {
 
     switch (color_type) {
         case PNG_COLOR_TYPE_GRAY: {
@@ -98,7 +98,7 @@ enum SailPixelFormat png_color_type_to_pixel_format(int color_type, int bit_dept
     return SAIL_PIXEL_FORMAT_UNKNOWN;
 }
 
-sail_status_t pixel_format_to_png_color_type(enum SailPixelFormat pixel_format, int *color_type, int *bit_depth) {
+sail_status_t png_private_pixel_format_to_png_color_type(enum SailPixelFormat pixel_format, int *color_type, int *bit_depth) {
 
     SAIL_CHECK_PTR(color_type);
     SAIL_CHECK_PTR(bit_depth);
@@ -166,7 +166,7 @@ sail_status_t pixel_format_to_png_color_type(enum SailPixelFormat pixel_format, 
     }
 }
 
-sail_status_t supported_read_output_pixel_format(enum SailPixelFormat pixel_format) {
+sail_status_t png_private_supported_read_output_pixel_format(enum SailPixelFormat pixel_format) {
 
     switch (pixel_format) {
         case SAIL_PIXEL_FORMAT_SOURCE:
@@ -185,7 +185,7 @@ sail_status_t supported_read_output_pixel_format(enum SailPixelFormat pixel_form
     }
 }
 
-sail_status_t supported_write_output_pixel_format(enum SailPixelFormat pixel_format) {
+sail_status_t png_private_supported_write_output_pixel_format(enum SailPixelFormat pixel_format) {
 
     switch (pixel_format) {
         case SAIL_PIXEL_FORMAT_AUTO:
@@ -199,7 +199,7 @@ sail_status_t supported_write_output_pixel_format(enum SailPixelFormat pixel_for
     }
 }
 
-sail_status_t fetch_meta_data(png_structp png_ptr, png_infop info_ptr, struct sail_meta_data_node **target_meta_data_node) {
+sail_status_t png_private_fetch_meta_data(png_structp png_ptr, png_infop info_ptr, struct sail_meta_data_node **target_meta_data_node) {
 
     SAIL_CHECK_PTR(png_ptr);
     SAIL_CHECK_PTR(info_ptr);
@@ -261,7 +261,7 @@ sail_status_t fetch_meta_data(png_structp png_ptr, png_infop info_ptr, struct sa
     return SAIL_OK;
 }
 
-sail_status_t write_meta_data(png_structp png_ptr, png_infop info_ptr, const struct sail_meta_data_node *meta_data_node) {
+sail_status_t png_private_write_meta_data(png_structp png_ptr, png_infop info_ptr, const struct sail_meta_data_node *meta_data_node) {
 
     SAIL_CHECK_PTR(png_ptr);
     SAIL_CHECK_PTR(info_ptr);
@@ -341,7 +341,7 @@ sail_status_t write_meta_data(png_structp png_ptr, png_infop info_ptr, const str
     return SAIL_OK;
 }
 
-sail_status_t fetch_iccp(png_structp png_ptr, png_infop info_ptr, struct sail_iccp **iccp) {
+sail_status_t png_private_fetch_iccp(png_structp png_ptr, png_infop info_ptr, struct sail_iccp **iccp) {
 
     SAIL_CHECK_PTR(png_ptr);
     SAIL_CHECK_PTR(info_ptr);
@@ -369,7 +369,7 @@ sail_status_t fetch_iccp(png_structp png_ptr, png_infop info_ptr, struct sail_ic
     return SAIL_OK;
 }
 
-sail_status_t fetch_palette(png_structp png_ptr, png_infop info_ptr, struct sail_palette **palette) {
+sail_status_t png_private_fetch_palette(png_structp png_ptr, png_infop info_ptr, struct sail_palette **palette) {
 
     SAIL_CHECK_PTR(png_ptr);
     SAIL_CHECK_PTR(info_ptr);
@@ -401,7 +401,7 @@ sail_status_t fetch_palette(png_structp png_ptr, png_infop info_ptr, struct sail
 }
 
 #ifdef PNG_APNG_SUPPORTED
-sail_status_t blend_source(void *dst_raw, unsigned dst_offset, const void *src_raw, unsigned src_length, unsigned bytes_per_pixel) {
+sail_status_t png_private_blend_source(void *dst_raw, unsigned dst_offset, const void *src_raw, unsigned src_length, unsigned bytes_per_pixel) {
 
     SAIL_CHECK_PTR(dst_raw);
     SAIL_CHECK_PTR(src_raw);
@@ -413,7 +413,7 @@ sail_status_t blend_source(void *dst_raw, unsigned dst_offset, const void *src_r
     return SAIL_OK;
 }
 
-sail_status_t blend_over(void *dst_raw, unsigned dst_offset, const void *src_raw, unsigned width, unsigned bytes_per_pixel) {
+sail_status_t png_private_blend_over(void *dst_raw, unsigned dst_offset, const void *src_raw, unsigned width, unsigned bytes_per_pixel) {
 
     SAIL_CHECK_PTR(src_raw);
     SAIL_CHECK_PTR(dst_raw);
@@ -451,7 +451,7 @@ sail_status_t blend_over(void *dst_raw, unsigned dst_offset, const void *src_raw
     return SAIL_OK;
 }
 
-sail_status_t skip_hidden_frame(unsigned bytes_per_line, unsigned height, png_structp png_ptr, png_infop info_ptr, void **row) {
+sail_status_t png_private_skip_hidden_frame(unsigned bytes_per_line, unsigned height, png_structp png_ptr, png_infop info_ptr, void **row) {
 
     SAIL_CHECK_PTR(png_ptr);
     SAIL_CHECK_PTR(info_ptr);
@@ -471,7 +471,7 @@ sail_status_t skip_hidden_frame(unsigned bytes_per_line, unsigned height, png_st
     return SAIL_OK;
 }
 
-sail_status_t alloc_rows(png_bytep **A, unsigned row_length, unsigned height) {
+sail_status_t png_private_alloc_rows(png_bytep **A, unsigned row_length, unsigned height) {
 
     void *ptr;
     SAIL_TRY(sail_malloc(height * sizeof(png_bytep), &ptr));
@@ -492,7 +492,7 @@ sail_status_t alloc_rows(png_bytep **A, unsigned row_length, unsigned height) {
     return SAIL_OK;
 }
 
-void destroy_rows(png_bytep **A, unsigned height) {
+void png_private_destroy_rows(png_bytep **A, unsigned height) {
 
     if (*A == NULL) {
         return;
@@ -507,7 +507,7 @@ void destroy_rows(png_bytep **A, unsigned height) {
 }
 #endif
 
-sail_status_t fetch_resolution(png_structp png_ptr, png_infop info_ptr, struct sail_resolution **resolution) {
+sail_status_t png_private_fetch_resolution(png_structp png_ptr, png_infop info_ptr, struct sail_resolution **resolution) {
 
     SAIL_CHECK_RESOLUTION_PTR(resolution);
 
@@ -536,7 +536,7 @@ sail_status_t fetch_resolution(png_structp png_ptr, png_infop info_ptr, struct s
     return SAIL_OK;
 }
 
-sail_status_t write_resolution(png_structp png_ptr, png_infop info_ptr, const struct sail_resolution *resolution) {
+sail_status_t png_private_write_resolution(png_structp png_ptr, png_infop info_ptr, const struct sail_resolution *resolution) {
 
     /* Not an error. */
     if (resolution == NULL) {
