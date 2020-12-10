@@ -51,17 +51,19 @@ void jpeg_private_my_error_exit(j_common_ptr cinfo) {
 enum SailPixelFormat jpeg_private_color_space_to_pixel_format(J_COLOR_SPACE color_space) {
     switch (color_space) {
         case JCS_GRAYSCALE: return SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE;
+        case JCS_RGB:       return SAIL_PIXEL_FORMAT_BPP24_RGB;
 
+#ifdef HAVE_JPEG_JCS_EXT
         case JCS_RGB565:    return SAIL_PIXEL_FORMAT_BPP16_RGB565;
 
-        case JCS_EXT_RGB:
-        case JCS_RGB:       return SAIL_PIXEL_FORMAT_BPP24_RGB;
+        case JCS_EXT_RGB:   return SAIL_PIXEL_FORMAT_BPP24_RGB;
         case JCS_EXT_BGR:   return SAIL_PIXEL_FORMAT_BPP24_BGR;
 
         case JCS_EXT_RGBA:  return SAIL_PIXEL_FORMAT_BPP32_RGBA;
         case JCS_EXT_BGRA:  return SAIL_PIXEL_FORMAT_BPP32_BGRA;
         case JCS_EXT_ABGR:  return SAIL_PIXEL_FORMAT_BPP32_ABGR;
         case JCS_EXT_ARGB:  return SAIL_PIXEL_FORMAT_BPP32_ARGB;
+#endif
 
         case JCS_YCbCr:     return SAIL_PIXEL_FORMAT_BPP24_YCBCR;
         case JCS_CMYK:      return SAIL_PIXEL_FORMAT_BPP32_CMYK;
@@ -74,16 +76,17 @@ enum SailPixelFormat jpeg_private_color_space_to_pixel_format(J_COLOR_SPACE colo
 J_COLOR_SPACE jpeg_private_pixel_format_to_color_space(enum SailPixelFormat pixel_format) {
     switch (pixel_format) {
         case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE:  return JCS_GRAYSCALE;
-
-        case SAIL_PIXEL_FORMAT_BPP16_RGB565:    return JCS_RGB565;
-
         case SAIL_PIXEL_FORMAT_BPP24_RGB:       return JCS_RGB;
+
+#ifdef HAVE_JPEG_JCS_EXT
+        case SAIL_PIXEL_FORMAT_BPP16_RGB565:    return JCS_RGB565;
         case SAIL_PIXEL_FORMAT_BPP24_BGR:       return JCS_EXT_BGR;
 
         case SAIL_PIXEL_FORMAT_BPP32_RGBA:      return JCS_EXT_RGBA;
         case SAIL_PIXEL_FORMAT_BPP32_BGRA:      return JCS_EXT_BGRA;
         case SAIL_PIXEL_FORMAT_BPP32_ABGR:      return JCS_EXT_ABGR;
         case SAIL_PIXEL_FORMAT_BPP32_ARGB:      return JCS_EXT_ARGB;
+#endif
 
         case SAIL_PIXEL_FORMAT_BPP24_YCBCR:     return JCS_YCbCr;
         case SAIL_PIXEL_FORMAT_BPP32_CMYK:      return JCS_CMYK;
