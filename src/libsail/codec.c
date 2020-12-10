@@ -61,7 +61,7 @@ sail_status_t alloc_and_load_codec(const struct sail_codec_info *codec_info, str
     HMODULE handle = GetModuleHandle(NULL);
 
     if (handle == NULL) {
-        SAIL_LOG_ERROR("Failed to get module handle. Error: %d", GetLastError());
+        SAIL_LOG_ERROR("Failed to open the current executable. Error: %d", GetLastError());
     }
 #else
     HMODULE handle = LoadLibraryEx(codec_info->path, NULL, LOAD_LIBRARY_SEARCH_SYSTEM32 | LOAD_LIBRARY_SEARCH_USER_DIRS);
@@ -82,7 +82,7 @@ sail_status_t alloc_and_load_codec(const struct sail_codec_info *codec_info, str
     void *handle = dlopen(NULL, RTLD_LAZY | RTLD_LOCAL);
 
     if (handle == NULL) {
-        SAIL_LOG_ERROR("Failed open this module: %s", dlerror());
+        SAIL_LOG_ERROR("Failed to open the current executable: %s", dlerror());
     }
 #else
     void *handle = dlopen(codec_info->path, RTLD_LAZY | RTLD_LOCAL);
