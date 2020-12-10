@@ -1,4 +1,4 @@
-macro(sail_find_vcpkg_dependencies)
+macro(sail_find_dependencies)
     find_package(JPEG)
 
     if (NOT JPEG_FOUND)
@@ -37,5 +37,29 @@ macro(sail_codec_post_add)
 
     if (HAVE_JPEG_ICCP)
         target_compile_definitions(${TARGET} PRIVATE HAVE_JPEG_ICCP)
+    endif()
+
+    # Check for libjpeg-turbo
+    #
+    cmake_push_check_state(RESET)
+        set(CMAKE_REQUIRED_INCLUDES ${sail_jpeg_include_dirs})
+        set(CMAKE_REQUIRED_LIBRARIES ${sail_jpeg_libs})
+
+        check_c_source_compiles(
+            "
+            #include <stdio.h>
+            #include <jpeglib.h>
+
+            int main(int argc, char *argv[]) {
+                J_COLOR_SPACE ext = JCS_EXT_RGB;
+                return 0;
+            }
+        "
+        HAVE_JPEG_JCS_EXT
+        )
+    cmake_pop_check_state()
+
+    if (HAVE_JPEG_JCS_EXT)
+        target_compile_definitions(${TARGET} PRIVATE HAVE_JPEG_JCS_EXT)
     endif()
 endmacro()

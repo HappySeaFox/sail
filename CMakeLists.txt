@@ -24,16 +24,6 @@ include(sail_enable_posix_source)
 include(sail_install_cmake_config)
 include(sail_test)
 
-# Sanity checks
-#
-string(FIND "${CMAKE_INSTALL_PREFIX}" " " SPACE_INDEX)
-if (SPACE_INDEX GREATER_EQUAL 0)
-    message(WARNING "The current CMAKE_INSTALL_PREFIX contains spaces: '${CMAKE_INSTALL_PREFIX}'. \
-The generated pkg-config files will also have spaces in paths. Pkg-config doesn't support that \
-and will fail to generate CFLAGS and LIBS for client applications. Please use CMAKE_INSTALL_PREFIX \
-without spaces if you're going to use pkg-config.")
-endif()
-
 # Check for required includes
 #
 sail_check_include(ctype.h)
@@ -76,7 +66,7 @@ Codecs with missing dependencies will be disabled regardless this setting")
 option(SAIL_READ_OUTPUT_BPP32_BGRA "Make the read operations output BPP32-BGRA pixels instead of BPP32-RGBA." OFF)
 option(SAIL_STATIC "Build static libs." OFF)
 option(SAIL_VCPKG_PORT "Build as a VCPKG port. Intended to be used only by VCPKG. When enabled, sets SAIL_VCPKG to ON" OFF)
-option(SAIL_VCPKG "Enable VCPKG dependency manager instead of pkg-config on Windows. When enabled, please specify CMAKE_TOOLCHAIN_FILE and CMAKE_BUILD_TYPE. See the vcpkg tutorial for more." OFF)
+option(SAIL_VCPKG "Enable VCPKG dependency manager on Windows. When enabled, please specify CMAKE_TOOLCHAIN_FILE and CMAKE_BUILD_TYPE. See the vcpkg tutorial for more." OFF)
 
 if (SAIL_STATIC)
     set(BUILD_SHARED_LIBS OFF)
@@ -99,6 +89,12 @@ else()
 endif()
 
 set(SAIL_MAGIC_BUFFER_SIZE 16)
+
+# Our bundled libs
+#
+if (WIN32 AND NOT SAIL_VCPKG)
+    set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${PROJECT_SOURCE_DIR}/extra/B)
+endif()
 
 # TODO Move to a Debian patch
 # Set arch-specific include/lib dirs
@@ -176,38 +172,6 @@ endif()
 
 if (APPLE)
     set(SAIL_APPLE ON)
-endif()
-
-# pkg-config setup
-#
-if (NOT SAIL_VCPKG)
-    if (WIN32)
-        set(PKG_CONFIG_EXECUTABLE "${PROJECT_SOURCE_DIR}/extra/bin/pkg-config.exe")
-    endif()
-
-    # Our pkg-config search path to append to the system-wide search path
-    #
-    # Some development packages (like giflib) have no pkg-config integration. We provide
-    # our own pkg-config files for system-wide packages in extra/missing
-    #
-    if (WIN32)
-        set(SAIL_PKGCONFIG_PATH "${PROJECT_SOURCE_DIR}/extra/missing/pkgconfig/${CMAKE_SYSTEM_NAME}\;${PROJECT_SOURCE_DIR}/extra/B/lib/pkgconfig")
-    else()
-        set(SAIL_PKGCONFIG_PATH "${PROJECT_SOURCE_DIR}/extra/missing/pkgconfig/${CMAKE_SYSTEM_NAME}:${PROJECT_SOURCE_DIR}/extra/B/lib/pkgconfig")
-    endif()
-
-    set(ENV_PKG_CONFIG_PATH $ENV{PKG_CONFIG_PATH})
-    if (ENV_PKG_CONFIG_PATH)
-        if (WIN32)
-            set(ENV{PKG_CONFIG_PATH} "${ENV_PKG_CONFIG_PATH}\;${SAIL_PKGCONFIG_PATH}")
-        else()
-            set(ENV{PKG_CONFIG_PATH} "${ENV_PKG_CONFIG_PATH}:${SAIL_PKGCONFIG_PATH}")
-        endif()
-    else()
-        set(ENV{PKG_CONFIG_PATH} ${SAIL_PKGCONFIG_PATH})
-    endif()
-
-    find_package(PkgConfig REQUIRED)
 endif()
 
 # Common configuration file

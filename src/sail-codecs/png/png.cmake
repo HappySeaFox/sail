@@ -1,4 +1,4 @@
-macro(sail_find_vcpkg_dependencies)
+macro(sail_find_dependencies)
     find_package(PNG)
 
     if (NOT PNG_FOUND)

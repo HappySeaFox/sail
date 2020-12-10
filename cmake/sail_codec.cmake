@@ -3,16 +3,15 @@
 #
 # Usage:
 #
-#   1. When SAIL_VCPKG is ON and SYSTEM_HEADERS and SYSTEM_LIBS are specified, they are used to search
+#   1. When SYSTEM_HEADERS and SYSTEM_LIBS are specified, they are used to search
 #      system headers and libs.
-#   2. When SAIL_VCPKG is ON and SYSTEM_HEADERS and SYSTEM_LIBS are not specified, CMAKE is included
-#      and sail_find_vcpkg_dependencies() is called to search CMake packages.
-#   3. When SAIL_VCPKG is OFF, PKGCONFIG is used to search pkg-config dependencies.
-#   4. When CMAKE is specified (regardless SAIL_VCPKG), sail_codec_post_add() is called right after a new target
+#   2. When SYSTEM_HEADERS and SYSTEM_LIBS are not specified, CMAKE is included
+#      and sail_find_dependencies() is called to search CMake packages.
+#   3. When CMAKE is specified, sail_codec_post_add() is called right after a new target
 #      is added. sail_codec_post_add() could be used for tests like check_c_source_compiles().
 #
 macro(sail_codec)
-    cmake_parse_arguments(SAIL_CODEC "" "NAME" "SOURCES;PKGCONFIG;SYSTEM_HEADERS;SYSTEM_LIBS;CMAKE" ${ARGN})
+    cmake_parse_arguments(SAIL_CODEC "" "NAME" "SOURCES;SYSTEM_HEADERS;SYSTEM_LIBS;CMAKE" ${ARGN})
 
     # Put this codec into the disabled list so when we return from here
     # on error it's get automatically marked as disabled. If no errors were found,
@@ -24,53 +23,39 @@ macro(sail_codec)
         include(${SAIL_CODEC_CMAKE})
     endif()
 
-    # Check the pkg-config/vcpkg dependencies
+    # Check dependencies
     #
-    if (SAIL_VCPKG)
-        if (NOT SAIL_CODEC_CMAKE AND NOT SAIL_CODEC_SYSTEM_HEADERS AND NOT SAIL_CODEC_SYSTEM_LIBS)
-            message(FATAL_ERROR "Use CMAKE or SYSTEM_HEADERS SYSTEM_LIBS arguments to search dependencies")
-        endif()
+	if (NOT SAIL_CODEC_CMAKE AND NOT SAIL_CODEC_SYSTEM_HEADERS AND NOT SAIL_CODEC_SYSTEM_LIBS)
+		message(FATAL_ERROR "Use CMAKE or SYSTEM_HEADERS SYSTEM_LIBS arguments to search dependencies")
+	endif()
 
-        foreach(vcpkg ${SAIL_CODEC_SYSTEM_HEADERS})
-            find_path(sail_include_dir_${vcpkg} ${vcpkg})
+	foreach(header ${SAIL_CODEC_SYSTEM_HEADERS})
+		find_path(sail_include_dir_${header} ${header})
 
-            if (NOT sail_include_dir_${vcpkg})
-                string(TOUPPER ${SAIL_CODEC_NAME} SAIL_CODEC_NAME)
-                message("*** CODECS: ${vcpkg} header file is not found. ${SAIL_CODEC_NAME} codec is disabled.")
-                return()
-            endif()
+		if (NOT sail_include_dir_${header})
+			string(TOUPPER ${SAIL_CODEC_NAME} SAIL_CODEC_NAME)
+			message("*** CODECS: ${header} header file is not found. ${SAIL_CODEC_NAME} codec is disabled.")
+			return()
+		endif()
 
-            list(APPEND sail_${SAIL_CODEC_NAME}_include_dirs ${sail_include_dir_${vcpkg}})
-        endforeach()
+		list(APPEND sail_${SAIL_CODEC_NAME}_include_dirs ${sail_include_dir_${header}})
+	endforeach()
 
-        foreach(vcpkg ${SAIL_CODEC_SYSTEM_LIBS})
-            find_library(sail_lib_${vcpkg} NAMES ${vcpkg})
+	foreach(lib ${SAIL_CODEC_SYSTEM_LIBS})
+		find_library(sail_lib_${lib} NAMES ${lib})
 
-            if (NOT sail_lib_${vcpkg})
-                string(TOUPPER "${SAIL_CODEC_NAME}" SAIL_CODEC_NAME)
-                message("*** CODECS: ${vcpkg} library is not found. ${SAIL_CODEC_NAME} codec is disabled.")
-                return()
-            endif()
+		if (NOT sail_lib_${lib})
+			string(TOUPPER "${SAIL_CODEC_NAME}" SAIL_CODEC_NAME)
+			message("*** CODECS: ${lib} library is not found. ${SAIL_CODEC_NAME} codec is disabled.")
+			return()
+		endif()
 
-            list(APPEND sail_${SAIL_CODEC_NAME}_libs ${sail_lib_${vcpkg}})
-        endforeach()
+		list(APPEND sail_${SAIL_CODEC_NAME}_libs ${sail_lib_${lib}})
+	endforeach()
 
-        if (SAIL_CODEC_CMAKE AND NOT SAIL_CODEC_SYSTEM_HEADERS AND NOT SAIL_CODEC_SYSTEM_LIBS AND COMMAND sail_find_vcpkg_dependencies)
-            sail_find_vcpkg_dependencies()
-        endif()
-    else()
-        foreach(pkgconfig ${SAIL_CODEC_PKGCONFIG})
-            pkg_check_modules(${pkgconfig} IMPORTED_TARGET ${pkgconfig})
-
-            if (${pkgconfig}_FOUND)
-                set(sail_${SAIL_CODEC_NAME}_cflags       ${${pkgconfig}_CFLAGS} ${${pkgconfig}_CFLAGS_OTHER})
-                set(sail_${SAIL_CODEC_NAME}_include_dirs ${${pkgconfig}_INCLUDE_DIRS})
-                set(sail_${SAIL_CODEC_NAME}_libs         PkgConfig::${pkgconfig})
-            else()
-                return()
-            endif()
-        endforeach()
-    endif()
+	if (SAIL_CODEC_CMAKE AND NOT SAIL_CODEC_SYSTEM_HEADERS AND NOT SAIL_CODEC_SYSTEM_LIBS AND COMMAND sail_find_dependencies)
+		sail_find_dependencies()
+	endif()
 
     set(sail_${SAIL_CODEC_NAME}_cflags       ${sail_${SAIL_CODEC_NAME}_cflags}       CACHE INTERNAL "List of ${SAIL_CODEC_NAME} CFLAGS")
     set(sail_${SAIL_CODEC_NAME}_include_dirs ${sail_${SAIL_CODEC_NAME}_include_dirs} CACHE INTERNAL "List of ${SAIL_CODEC_NAME} include dirs")
@@ -112,7 +97,7 @@ macro(sail_codec)
         sail_codec_post_add()
     endif()
 
-    # Link against the found pkg-config/vcpkg libs
+    # Link against the found libs
     #
     target_compile_options(${TARGET}     PRIVATE ${sail_${SAIL_CODEC_NAME}_cflags})
     target_include_directories(${TARGET} PRIVATE ${sail_${SAIL_CODEC_NAME}_include_dirs})
