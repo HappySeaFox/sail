@@ -514,25 +514,30 @@ static sail_status_t init_context_impl(struct sail_context *context) {
                             /* cleanup */ destroy_string_node_chain(string_node));
 
 #ifdef SAIL_WIN32
-        const char **sail_codec_info_var = (const char **)GetProcAddress(handle, sail_codec_info_var_name);
+        FARPROC sail_codec_info_sym = GetProcAddress(handle, sail_codec_info_var_name);
 
-        if (*sail_codec_info_var == NULL) {
+        if (sail_codec_info_sym == NULL) {
             SAIL_LOG_ERROR("Failed to resolve '%s'. Error: %d", sail_codec_info_var_name, GetLastError());
-            continue;
         }
 #else
-        const char **sail_codec_info_var = (const char **)dlsym(handle, sail_codec_info_var_name);
+        void *sail_codec_info_sym = dlsym(handle, sail_codec_info_var_name);
 
-        if (*sail_codec_info_var == NULL) {
+        if (sail_codec_info_sym == NULL) {
             SAIL_LOG_ERROR("Failed to resolve '%s'. Error: %s", sail_codec_info_var_name, dlerror());
-            dlclose(handle);
+        }
+#endif
+
+        sail_free(sail_codec_info_var_name);
+
+        if (sail_codec_info_sym == NULL) {
             node = node->next;
             continue;
         }
-#endif
-        struct sail_codec_info_node *codec_info_node;
+
+        const char **sail_codec_info_var = (const char **)sail_codec_info_sym;
 
         /* Parse codec info. */
+        struct sail_codec_info_node *codec_info_node;
         if (alloc_codec_info_node(&codec_info_node) != SAIL_OK) {
             node = node->next;
             continue;
