@@ -43,16 +43,17 @@ sail_enable_pch(TARGET sail HEADER sail.h)
 target_include_directories(sail PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
 # Simplify the INIH parser
 target_compile_definitions(sail PRIVATE INI_ALLOW_MULTILINE=0 INI_ALLOW_INLINE_COMMENTS=0 INI_CUSTOM_ALLOCATOR=0 INI_STOP_ON_FIRST_ERROR=1)
-target_link_libraries(sail PUBLIC sail-common)
-
-if (UNIX)
-    target_link_libraries(sail PRIVATE dl)
-endif()
 
 if (SAIL_STATIC)
     # Transfer user requirements
     #
     target_link_libraries(sail PRIVATE sail-codecs-archive)
+endif()
+
+target_link_libraries(sail PUBLIC sail-common)
+
+if (UNIX)
+    target_link_libraries(sail PRIVATE dl)
 endif()
 
 # pkg-config integration
