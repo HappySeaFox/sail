@@ -41,7 +41,9 @@
 sail_status_t alloc_and_load_codec(const struct sail_codec_info *codec_info, struct sail_codec **codec) {
 
     SAIL_CHECK_CODEC_INFO_PTR(codec_info);
+#ifndef SAIL_STATIC
     SAIL_CHECK_PATH_PTR(codec_info->path);
+#endif
     SAIL_CHECK_CODEC_PTR(codec);
 
     void *ptr;
@@ -55,20 +57,42 @@ sail_status_t alloc_and_load_codec(const struct sail_codec_info *codec_info, str
     SAIL_LOG_DEBUG("Loading codec '%s'", codec_info->path);
 
 #ifdef SAIL_WIN32
+#ifdef SAIL_STATIC
+    HMODULE handle = GetModuleHandle(NULL);
+
+    if (handle == NULL) {
+        SAIL_LOG_ERROR("Failed to get module handle. Error: %d", GetLastError());
+    }
+#else
     HMODULE handle = LoadLibraryEx(codec_info->path, NULL, LOAD_LIBRARY_SEARCH_SYSTEM32 | LOAD_LIBRARY_SEARCH_USER_DIRS);
 
     if (handle == NULL) {
         SAIL_LOG_ERROR("Failed to load '%s'. Error: %d", codec_info->path, GetLastError());
+    }
+#endif
+
+    if (handle == NULL) {
         destroy_codec(codec_local);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_LOAD);
     }
 
     codec_local->handle = handle;
 #else
+#ifdef SAIL_STATIC
+    void *handle = dlopen(NULL, RTLD_LAZY | RTLD_LOCAL);
+
+    if (handle == NULL) {
+        SAIL_LOG_ERROR("Failed open this module: %s", dlerror());
+    }
+#else
     void *handle = dlopen(codec_info->path, RTLD_LAZY | RTLD_LOCAL);
 
     if (handle == NULL) {
         SAIL_LOG_ERROR("Failed to load '%s': %s", codec_info->path, dlerror());
+    }
+#endif
+
+    if (handle == NULL) {
         destroy_codec(codec_local);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_LOAD);
     }
@@ -141,7 +165,10 @@ void destroy_codec(struct sail_codec *codec) {
 
     if (codec->handle != NULL) {
 #ifdef SAIL_WIN32
+    /* With static builds this handle is returned by GetModuleHandle, and the official docs don't recommend freeing it. */
+    #ifdef SAIL_STATIC
         FreeLibrary((HMODULE)codec->handle);
+    #endif
 #else
         dlclose(codec->handle);
 #endif
