@@ -67,7 +67,7 @@ target_link_libraries(
         $<$<C_COMPILER_ID:GNU>:-Wl,--whole-archive $<TARGET_FILE:sail-codecs-objects> -Wl,--no-whole-archive>
 )
 
-# Link all the enabled codecs dependencies into sail-codecs-archive
+# Link all the enabled codecs dependencies into sail-codecs-archive interface
 #
 foreach(codec ${ENABLED_CODECS})
     get_target_property(CODEC_LINK_LIBRARIES sail-codec-${codec} LINK_LIBRARIES)
