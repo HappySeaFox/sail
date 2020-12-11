@@ -60,6 +60,9 @@
 /* Build static libs. */
 #cmakedefine SAIL_STATIC
 
+/* Combine all codecs into a single library. */
+#cmakedefine SAIL_COMBINE_CODECS
+
 /* Buffer size to read from I/O sources to detect file types by magic numbers. */
 #cmakedefine SAIL_MAGIC_BUFFER_SIZE @SAIL_MAGIC_BUFFER_SIZE@
 

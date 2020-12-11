@@ -75,7 +75,7 @@ macro(sail_codec)
 
     # Add a codec
     #
-    if (SAIL_STATIC)
+    if (SAIL_COMBINE_CODECS)
         add_library(${TARGET} OBJECT ${SAIL_CODEC_SOURCES})
     else()
         add_library(${TARGET} MODULE ${SAIL_CODEC_SOURCES})
@@ -105,7 +105,7 @@ macro(sail_codec)
 
     # Installation
     #
-    if (NOT SAIL_STATIC)
+    if (NOT SAIL_COMBINE_CODECS)
         install(TARGETS ${TARGET} DESTINATION "${CMAKE_INSTALL_LIBDIR}/sail/codecs")
 
         install(FILES "${CMAKE_CURRENT_BINARY_DIR}/sail-${SAIL_CODEC_NAME}.codec.info"

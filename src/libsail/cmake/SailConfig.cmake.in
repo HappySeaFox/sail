@@ -1,5 +1,5 @@
 include(CMakeFindDependencyMacro)
 find_dependency(SailCommon REQUIRED PATHS ${CMAKE_CURRENT_LIST_DIR})
-# Libsail static build depends on sail-codecs
-@SAIL_CODECS_ARCHIVE_FIND_DEPENDENCY@
+# sail depends on sail-codecs if it's enabled
+@SAIL_CODECS_FIND_DEPENDENCY@
 include(${CMAKE_CURRENT_LIST_DIR}/SailTargets.cmake)

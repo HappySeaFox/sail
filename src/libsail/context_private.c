@@ -93,7 +93,7 @@ static sail_status_t get_sail_dll_path(char *dll_path, int dll_path_size) {
 }
 #endif
 
-#ifndef SAIL_STATIC
+#ifndef SAIL_COMBINE_CODECS
 static const char* sail_codecs_path_env(void) {
 
     SAIL_THREAD_LOCAL static bool codecs_path_env_called = false;
@@ -113,6 +113,7 @@ static const char* sail_codecs_path_env(void) {
 
     return env;
 }
+#endif
 
 static const char* sail_codecs_path(void) {
 
@@ -156,7 +157,6 @@ static const char* sail_codecs_path(void) {
 
     return path;
 }
-#endif
 
 static const char* client_codecs_path(void) {
 
@@ -473,16 +473,20 @@ static sail_status_t enumerate_codecs_in_paths(struct sail_context *context, con
 }
 
 /* Initializes the context and loads all the codec info files. */
-#ifdef SAIL_STATIC
+#ifdef SAIL_COMBINE_CODECS
 static sail_status_t init_context_impl(struct sail_context *context) {
 
     SAIL_CHECK_CONTEXT_PTR(context);
 
 #ifdef SAIL_WIN32
+#ifdef SAIL_STATIC
     HMODULE handle = GetModuleHandle(NULL);
+#else
+    HMODULE handle = GetModuleHandle("sail-codecs");
+#endif
 
     if (handle == NULL) {
-        SAIL_LOG_ERROR("Failed to open the current executable. Error: %d", GetLastError());
+        SAIL_LOG_ERROR("Failed to get module handle. Error: %d", GetLastError());
         SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_SYMBOL_RESOLVE);
     }
 #else
@@ -494,14 +498,19 @@ static sail_status_t init_context_impl(struct sail_context *context) {
     }
 #endif
 
-    /* Load our codecs. */
-    struct sail_codec_info_node **last_codec_info_node = &context->codec_info_node;
-
-    /* Extern from sail-codecs-archive. For example: "gif;jpeg;png". */
+    /* Extern from sail-codecs. For example: "gif;jpeg;png". */
+#ifdef SAIL_STATIC
     extern const char *sail_enabled_codecs;
+#else
+    SAIL_IMPORT extern const char *sail_enabled_codecs;
+#endif
+
+    /* Load codec info objects. */
+    struct sail_codec_info_node **last_codec_info_node = &context->codec_info_node;
 
     struct sail_string_node *string_node = NULL;
 
+    /* Split "gif;jpeg;png" into "gif", "jpeg", "png". */
     SAIL_TRY_OR_CLEANUP(split_into_string_node_chain(sail_enabled_codecs, &string_node),
                         /* cleanup */ destroy_string_node_chain(string_node));
 
@@ -513,6 +522,7 @@ static sail_status_t init_context_impl(struct sail_context *context) {
         SAIL_TRY_OR_CLEANUP(sail_concat(&sail_codec_info_var_name, 2, "sail_codec_info_", node->value),
                             /* cleanup */ destroy_string_node_chain(string_node));
 
+    /* Resolve sail_codec_info_gif. */
 #ifdef SAIL_WIN32
         FARPROC sail_codec_info_sym = GetProcAddress(handle, sail_codec_info_var_name);
 
@@ -565,6 +575,11 @@ static sail_status_t init_context_impl(struct sail_context *context) {
 
     destroy_string_node_chain(string_node);
 
+    /* Add our lib path in standalone mode. */
+#ifndef SAIL_VCPKG
+    SAIL_TRY(update_lib_path(sail_codecs_path()));
+#endif
+
     /* Load client codecs. */
     SAIL_TRY(enumerate_codecs_in_paths(context, (const char* []){ client_codecs_path() }, 1));
 
@@ -609,7 +624,7 @@ static sail_status_t init_context(struct sail_context *context, int flags) {
 
     SAIL_LOG_INFO("Version %s", SAIL_VERSION_STRING);
 
-#ifdef SAIL_WIN32
+#if defined SAIL_WIN32 && !defined SAIL_COMBINE_CODECS
     char dll_path[MAX_PATH];
     if (get_sail_dll_path(dll_path, sizeof(dll_path)) == SAIL_OK) {
         SAIL_TRY_OR_SUPPRESS(add_dll_directory(dll_path));
@@ -618,11 +633,11 @@ static sail_status_t init_context(struct sail_context *context, int flags) {
 
     SAIL_TRY(init_context_impl(context));
 
+    SAIL_TRY(print_enumerated_codecs(context));
+
     if (flags & SAIL_FLAG_PRELOAD_CODECS) {
         SAIL_TRY(preload_codecs(context));
     }
-
-    SAIL_TRY(print_enumerated_codecs(context));
 
     SAIL_LOG_DEBUG("Initialized in %lu ms.", (unsigned long)(sail_now() - start_time));
 

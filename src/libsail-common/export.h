@@ -33,9 +33,12 @@
         #define SAIL_EXPORT __declspec(dllimport)
     #endif
 
+    #define SAIL_IMPORT __declspec(dllimport)
+
     #define SAIL_HIDDEN
 #else
     #define SAIL_EXPORT __attribute__((visibility("default")))
+    #define SAIL_IMPORT
     #define SAIL_HIDDEN __attribute__((visibility("hidden")))
 #endif
 
