@@ -401,9 +401,9 @@ static sail_status_t enumerate_codecs_in_paths(struct sail_context *context, con
         HANDLE hFind = FindFirstFile(codecs_path_with_mask, &data);
 
         if (hFind == INVALID_HANDLE_VALUE) {
-            SAIL_LOG_ERROR("Failed to list files in '%s'. Error: %d", codecs_path, GetLastError());
+            SAIL_LOG_ERROR("Failed to list files in '%s'. Error: %d. No codecs loaded from it", codecs_path, GetLastError());
             sail_free(codecs_path_with_mask);
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_LIST_DIR);
+            continue;
         }
 
         do {
@@ -425,7 +425,7 @@ static sail_status_t enumerate_codecs_in_paths(struct sail_context *context, con
         } while (FindNextFile(hFind, &data));
 
         if (GetLastError() != ERROR_NO_MORE_FILES) {
-            SAIL_LOG_ERROR("Failed to list files in '%s'. Error: %d. Some codecs may be ignored", codecs_path, GetLastError());
+            SAIL_LOG_ERROR("Failed to list files in '%s'. Error: %d. Some codecs may not be loaded from it", codecs_path, GetLastError());
         }
 
         sail_free(codecs_path_with_mask);
@@ -608,6 +608,19 @@ static sail_status_t init_context_impl(struct sail_context *context) {
 }
 #endif
 
+static void print_no_codecs_found(void) {
+
+    const char *message = "\n\n*** No codecs were found. Please check the installation directory. ***"
+#if defined SAIL_UNIX && defined SAIL_COMBINE_CODECS
+        "\n*** Additionally, please make sure the application is compiled with -rdynamic ***"
+        "\n*** or an equivalent. If you use CMake, this could be achieved by setting     ***"
+        "\n*** CMAKE_ENABLE_EXPORTS to ON. ***"
+#endif
+        "\n";
+
+    SAIL_LOG_ERROR("%s", message);
+}
+
 /* Initializes the context and loads all the codec info files if the context is not initialized. */
 static sail_status_t init_context(struct sail_context *context, int flags) {
 
@@ -632,6 +645,10 @@ static sail_status_t init_context(struct sail_context *context, int flags) {
 #endif
 
     SAIL_TRY(init_context_impl(context));
+
+    if (context->codec_info_node == NULL) {
+        print_no_codecs_found();
+    }
 
     SAIL_TRY(print_enumerated_codecs(context));
 
