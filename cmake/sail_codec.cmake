@@ -4,7 +4,7 @@
 # Usage:
 #
 #   1. When SYSTEM_HEADERS and SYSTEM_LIBS are specified, they are used to search
-#      system headers and libs.
+#      system headers and libs. Use them if CMake has no corresponding Find* module.
 #   2. When SYSTEM_HEADERS and SYSTEM_LIBS are not specified, CMAKE is included
 #      and sail_find_dependencies() is called to search CMake packages.
 #   3. When CMAKE is specified, sail_codec_post_add() is called right after a new target

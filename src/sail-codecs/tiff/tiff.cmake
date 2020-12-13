@@ -1,3 +1,14 @@
+macro(sail_find_dependencies)
+    find_package(TIFF)
+
+    if (NOT TIFF_FOUND)
+        return()
+    endif()
+
+    set(sail_tiff_include_dirs ${TIFF_INCLUDE_DIRS})
+    set(sail_tiff_libs ${TIFF_LIBRARIES})
+endmacro()
+
 macro(sail_codec_post_add)
     cmake_push_check_state(RESET)
         set(CMAKE_REQUIRED_INCLUDES ${sail_tiff_include_dirs})

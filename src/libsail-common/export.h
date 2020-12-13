@@ -27,13 +27,17 @@
 #define SAIL_EXPORT_H
 
 #if defined _WIN32 || defined __CYGWIN__
+    #ifdef SAIL_STATIC
+        #define SAIL_IMPORT
+    #else
+        #define SAIL_IMPORT __declspec(dllimport)
+    #endif
+
     #ifdef SAIL_BUILD
         #define SAIL_EXPORT __declspec(dllexport)
     #else
-        #define SAIL_EXPORT __declspec(dllimport)
+        #define SAIL_EXPORT SAIL_IMPORT
     #endif
-
-    #define SAIL_IMPORT __declspec(dllimport)
 
     #define SAIL_HIDDEN
 #else

@@ -5,8 +5,8 @@ macro(sail_find_dependencies)
         return()
     endif()
 
-    set(sail_jpeg_libs ${JPEG_LIBRARIES})
     set(sail_jpeg_include_dirs ${JPEG_INCLUDE_DIR})
+    set(sail_jpeg_libs ${JPEG_LIBRARIES})
 endmacro()
 
 macro(sail_codec_post_add)
