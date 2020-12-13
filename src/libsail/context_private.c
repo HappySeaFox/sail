@@ -113,7 +113,6 @@ static const char* sail_codecs_path_env(void) {
 
     return env;
 }
-#endif
 
 static const char* sail_codecs_path(void) {
 
@@ -157,6 +156,7 @@ static const char* sail_codecs_path(void) {
 
     return path;
 }
+#endif
 
 static const char* client_codecs_path(void) {
 
