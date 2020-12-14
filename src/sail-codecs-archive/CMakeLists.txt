@@ -65,10 +65,10 @@ if (SAIL_STATIC)
         PRIVATE
             $<BUILD_INTERFACE:$<$<C_COMPILER_ID:MSVC>:-WHOLEARCHIVE:$<TARGET_FILE:sail-codecs-objects>>>
             $<BUILD_INTERFACE:$<$<C_COMPILER_ID:Clang>:-Wl,-force_load,$<TARGET_FILE:sail-codecs-objects>>>
-            $<BUILD_INTERFACE:$<$<C_COMPILER_ID:GNU>:-Wl,--whole-archive,$<TARGET_FILE:sail-codecs-objects>,-Wl,--no-whole-archive>>
+            $<BUILD_INTERFACE:$<$<C_COMPILER_ID:GNU>:-Wl,--whole-archive\ $<TARGET_FILE:sail-codecs-objects>\ -Wl,--no-whole-archive>>
             $<INSTALL_INTERFACE:$<$<C_COMPILER_ID:MSVC>:-WHOLEARCHIVE:$<TARGET_FILE:SAIL::sail-codecs-objects>>>
             $<INSTALL_INTERFACE:$<$<C_COMPILER_ID:Clang>:-Wl,-force_load,$<TARGET_FILE:SAIL::sail-codecs-objects>>>
-            $<INSTALL_INTERFACE:$<$<C_COMPILER_ID:GNU>:-Wl,--whole-archive,$<TARGET_FILE:SAIL::sail-codecs-objects>,-Wl,--no-whole-archive>>
+            $<INSTALL_INTERFACE:$<$<C_COMPILER_ID:GNU>:-Wl,--whole-archive\ $<TARGET_FILE:SAIL::sail-codecs-objects>\ -Wl,--no-whole-archive>>
     )
 
     # Link all the enabled codecs dependencies into sail-codecs
