@@ -113,7 +113,9 @@ static const char* sail_codecs_path_env(void) {
 
     return env;
 }
+#endif
 
+#if !defined SAIL_COMBINE_CODECS || !defined SAIL_VCPKG
 static const char* sail_codecs_path(void) {
 
     SAIL_THREAD_LOCAL static bool codecs_path_called = false;
