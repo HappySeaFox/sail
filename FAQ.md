@@ -6,7 +6,7 @@ Table of Contents
   * [How old is SAIL?](#how-old-is-sail)
   * [Is SAIL cross\-platform?](#is-sail-cross-platform)
   * [How does SAIL support image formats?](#how-does-sail-support-image-formats)
-  * [Can I implement an image decoding codec in C\+\+?](#can-i-implement-an-image-decoding-codec-in-c)
+  * [Can I implement an image codec in C\+\+?](#can-i-implement-an-image-codec-in-c)
   * [Does SAIL preload all codecs in the initialization routine?](#does-sail-preload-all-codecs-in-the-initialization-routine)
   * [How does SAIL look for codecs?](#how-does-sail-look-for-codecs)
     * [VCPKG port on any platform](#vcpkg-port-on-any-platform)
@@ -65,7 +65,7 @@ are currently supported. Pull requests to support more platforms are highly welc
 SAIL supports image formats through dynamically loaded SAIL codecs. End-users never work
 with the codecs directly. They always work with the abstract high-level APIs.
 
-## Can I implement an image decoding codec in C++?
+## Can I implement an image codec in C++?
 
 Yes. Your codec just needs to export a set of public functions so SAIL can recognize and use it.
 Theoretically, you can implement your codec in any programming language.
