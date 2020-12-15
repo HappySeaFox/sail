@@ -80,10 +80,6 @@ else()
     set(BUILD_SHARED_LIBS ON)
 endif()
 
-if (SAIL_VCPKG AND NOT WIN32)
-    message(FATAL_ERROR "VCPKG support is Windows-only")
-endif()
-
 if (SAIL_READ_OUTPUT_BPP32_BGRA)
     set(SAIL_DEFAULT_READ_OUTPUT_PIXEL_FORMAT "BPP32-BGRA")
 else()
