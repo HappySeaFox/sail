@@ -9,9 +9,9 @@ Table of Contents
   * [Can I implement an image decoding codec in C\+\+?](#can-i-implement-an-image-decoding-codec-in-c)
   * [Does SAIL preload all codecs in the initialization routine?](#does-sail-preload-all-codecs-in-the-initialization-routine)
   * [How does SAIL look for codecs?](#how-does-sail-look-for-codecs)
-    * [Windows (VCPKG port)](#windows-vcpkg-port)
+    * [VCPKG port on any platform](#vcpkg-port-on-any-platform)
     * [Windows (standalone build)](#windows-standalone-build)
-    * [Unix (including macOS)](#unix-including-macos)
+    * [Unix including macOS (standalone build)](#unix-including-macos-standalone-build)
   * [I'd like to reorganize the standard SAIL folder layout on Windows](#id-like-to-reorganize-the-standard-sail-folder-layout-on-windows)
   * [I moved SAIL codecs\. How can I point SAIL to the new location?](#i-moved-sail-codecs-how-can-i-point-sail-to-the-new-location)
   * [How can I point SAIL to my custom codecs?](#how-can-i-point-sail-to-my-custom-codecs)
@@ -19,7 +19,6 @@ Table of Contents
   * [Does SAIL provide simple one\-line APIs?](#does-sail-provide-simple-one-line-apis)
   * [How many image formats do you plan to implement?](#how-many-image-formats-do-you-plan-to-implement)
   * [Does SAIL support static linking?](#does-sail-support-static-linking)
-  * [I have questions, issues, or proposals](#i-have-questions-issues-or-proposals)
   * [Please describe memory management techniques implemented in SAIL](#please-describe-memory-management-techniques-implemented-in-sail)
     * [The memory management technique implemented in SAIL](#the-memory-management-technique-implemented-in-sail)
     * [Convention to call SAIL functions](#convention-to-call-sail-functions)
@@ -33,6 +32,7 @@ Table of Contents
   * [Does SAIL support reading from memory?](#does-sail-support-reading-from-memory)
   * [Are there any C/C\+\+ examples?](#are-there-any-cc-examples)
   * [Are there any bindings to other programming languages?](#are-there-any-bindings-to-other-programming-languages)
+  * [I have questions, issues, or proposals](#i-have-questions-issues-or-proposals)
 
 # SAIL Frequently Asked Questions (FAQ)
 
@@ -79,17 +79,20 @@ However, you can preload them explicitly with `sail_init_with_flags(SAIL_FLAG_PR
 
 Codecs path search algorithm (first found path wins):
 
-### Windows (VCPKG port)
-1. `SAIL_CODECS_PATH` environment variable
-2. `<SAIL DEPLOYMENT FOLDER>\sail\codecs`
-3. Hardcoded `SAIL_CODECS_PATH` in config.h
+### VCPKG port on any platform
+
+Codecs are combined into a standalone library, so no need to search them.
+
+Note for Unix platforms: the client application must be built with `-rdynamic` or an equivalent
+to enable `dlopen` and `dlsym` on the same binary. If you use CMake, this could be achieved by
+setting `CMAKE_ENABLE_EXPORTS` to `ON`.
 
 ### Windows (standalone build)
 1. `SAIL_CODECS_PATH` environment variable
 2. `<SAIL DEPLOYMENT FOLDER>\lib\sail\codecs`
 3. Hardcoded `SAIL_CODECS_PATH` in config.h
 
-### Unix (including macOS)
+### Unix including macOS (standalone build)
 1. `SAIL_CODECS_PATH` environment variable
 2. Hardcoded `SAIL_CODECS_PATH` in config.h
 
@@ -144,14 +147,11 @@ the most popular image formats will be definitely ported from ksquirrel-libs.
 
 ## Does SAIL support static linking?
 
-No. You're able to build `libsail` statically, however SAIL codecs are still standalone dynamically loaded files.
+Yes. Compile with `-DSAIL_STATIC=ON`.
 
-## I have questions, issues, or proposals
-
-Opening a GitHub [issue](https://github.com/smoked-herring/sail/issues) is the preferred way
-of communicating and solving problems.
-
-Pull requests are always welcomed.
+Note for Unix platforms: the client application must be built with `-rdynamic` or an equivalent
+to enable `dlopen` and `dlsym` on the same binary. If you use CMake, this could be achieved by
+setting `CMAKE_ENABLE_EXPORTS` to `ON`.
 
 ## Please describe memory management techniques implemented in SAIL
 
@@ -286,3 +286,10 @@ Yes. Currently SAIL supports the following bindings:
 1. C++
 
 Pull requests to support more programming languages are highly welcomed.
+
+## I have questions, issues, or proposals
+
+Opening a GitHub [issue](https://github.com/smoked-herring/sail/issues) is the preferred way
+of communicating and solving problems.
+
+Pull requests are always welcomed.
