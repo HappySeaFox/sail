@@ -68,7 +68,7 @@ option(SAIL_READ_OUTPUT_BPP32_BGRA "Make the read operations output BPP32-BGRA p
 option(SAIL_STATIC "Build static libs. When enabled, sets SAIL_COMBINE_CODECS to ON." OFF)
 cmake_dependent_option(SAIL_COMBINE_CODECS "Combine all codecs into a single library." OFF "NOT SAIL_STATIC" ON)
 option(SAIL_VCPKG_PORT "Build as a VCPKG port. Intended to be used only by VCPKG. When enabled, sets SAIL_VCPKG to ON." OFF)
-cmake_dependent_option(SAIL_VCPKG "Enable VCPKG dependency manager on Windows. When enabled, please specify CMAKE_TOOLCHAIN_FILE and CMAKE_BUILD_TYPE. See the vcpkg tutorial for more." OFF "NOT SAIL_VCPKG_PORT" ON)
+cmake_dependent_option(SAIL_VCPKG "Enable VCPKG dependency manager. When enabled, please specify CMAKE_TOOLCHAIN_FILE and CMAKE_BUILD_TYPE. See the vcpkg tutorial for more." OFF "NOT SAIL_VCPKG_PORT" ON)
 
 if (SAIL_STATIC)
     set(BUILD_SHARED_LIBS OFF)
