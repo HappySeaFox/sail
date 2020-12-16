@@ -639,7 +639,8 @@ static sail_status_t init_context(struct sail_context *context, int flags) {
 
     SAIL_LOG_INFO("Version %s", SAIL_VERSION_STRING);
 
-#if defined SAIL_WIN32 && !defined SAIL_COMBINE_CODECS
+    /* Always search DLLs in the sail.dll location so custom codecs can hold dependencies there. */
+#ifdef SAIL_WIN32
     char dll_path[MAX_PATH];
     if (get_sail_dll_path(dll_path, sizeof(dll_path)) == SAIL_OK) {
         SAIL_TRY_OR_SUPPRESS(add_dll_directory(dll_path));
