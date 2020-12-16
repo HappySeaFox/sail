@@ -2,10 +2,10 @@ Table of Contents
 =================
 
 * [SAIL Frequently Asked Questions (FAQ)](#sail-frequently-asked-questions-faq)
-  * [What are the competitors of SAIL?](#what-are-the-competitors-of-sail)
   * [How old is SAIL?](#how-old-is-sail)
   * [Is SAIL cross\-platform?](#is-sail-cross-platform)
   * [Does SAIL support static linking?](#does-sail-support-static-linking)
+  * [What are the competitors of SAIL?](#what-are-the-competitors-of-sail)
   * [Describe the high\-level APIs](#describe-the-high-level-apis)
   * [Does SAIL provide simple one\-line APIs?](#does-sail-provide-simple-one-line-apis)
   * [I'd like to reorganize the standard SAIL folder layout on Windows (for standalone bundle)](#id-like-to-reorganize-the-standard-sail-folder-layout-on-windows-for-standalone-bundle)
@@ -38,18 +38,6 @@ Table of Contents
 
 # SAIL Frequently Asked Questions (FAQ)
 
-## What are the competitors of SAIL?
-
-- [FreeImage](https://freeimage.sourceforge.io)
-- [DevIL](http://openil.sourceforge.net)
-- [SDL_Image](https://www.libsdl.org/projects/SDL_image)
-- [stb_image](https://github.com/nothings/stb)
-- [Boost.GIL](https://www.boost.org/doc/libs/1_68_0/libs/gil/doc/html/index.html)
-- [gdk-pixbuf](https://developer.gnome.org/gdk-pixbuf)
-- [imlib2](https://docs.enlightenment.org/api/imlib2/html)
-- [CImg](https://github.com/dtschump/CImg)
-- [WIC (Windows only)](https://docs.microsoft.com/en-us/windows/win32/wic/-wic-about-windows-imaging-codec)
-
 ## How old is SAIL?
 
 SAIL is rebranded ksquirrel-libs rewritten in C, improved and with high-level APIs. Ksquirrel-libs was a set of C++ image codecs
@@ -69,6 +57,18 @@ Yes. Compile with `-DSAIL_STATIC=ON`. This automatically enables `SAIL_COMBINE_C
 Note for Unix platforms: the client application must be built with `-rdynamic` or an equivalent
 to enable `dlopen` and `dlsym` on the same binary. If you use CMake, this could be achieved by
 setting `CMAKE_ENABLE_EXPORTS` to `ON`.
+
+## What are the competitors of SAIL?
+
+- [FreeImage](https://freeimage.sourceforge.io)
+- [DevIL](http://openil.sourceforge.net)
+- [SDL_Image](https://www.libsdl.org/projects/SDL_image)
+- [stb_image](https://github.com/nothings/stb)
+- [Boost.GIL](https://www.boost.org/doc/libs/1_68_0/libs/gil/doc/html/index.html)
+- [gdk-pixbuf](https://developer.gnome.org/gdk-pixbuf)
+- [imlib2](https://docs.enlightenment.org/api/imlib2/html)
+- [CImg](https://github.com/dtschump/CImg)
+- [WIC (Windows only)](https://docs.microsoft.com/en-us/windows/win32/wic/-wic-about-windows-imaging-codec)
 
 ## Describe the high-level APIs
 
