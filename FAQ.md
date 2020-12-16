@@ -5,6 +5,10 @@ Table of Contents
   * [What are the competitors of SAIL?](#what-are-the-competitors-of-sail)
   * [How old is SAIL?](#how-old-is-sail)
   * [Is SAIL cross\-platform?](#is-sail-cross-platform)
+  * [Does SAIL support static linking?](#does-sail-support-static-linking)
+  * [Describe the high\-level APIs](#describe-the-high-level-apis)
+  * [Does SAIL provide simple one\-line APIs?](#does-sail-provide-simple-one-line-apis)
+  * [I'd like to reorganize the standard SAIL folder layout on Windows (for standalone bundle)](#id-like-to-reorganize-the-standard-sail-folder-layout-on-windows-for-standalone-bundle)
   * [How does SAIL support image formats?](#how-does-sail-support-image-formats)
   * [Can I implement an image codec in C\+\+?](#can-i-implement-an-image-codec-in-c)
   * [Does SAIL preload codecs in the initialization routine?](#does-sail-preload-codecs-in-the-initialization-routine)
@@ -12,25 +16,22 @@ Table of Contents
     * [SAIL\_COMBINE\_CODECS is ON](#sail_combine_codecs-is-on)
   * [How does SAIL look for codecs?](#how-does-sail-look-for-codecs)
     * [VCPKG port on any platform](#vcpkg-port-on-any-platform)
+    * [Standalone bundle compiled with SAIL\_COMBINE\_CODECS=ON on any platform](#standalone-bundle-compiled-with-sail_combine_codecson-on-any-platform)
     * [Windows (standalone bundle)](#windows-standalone-bundle)
     * [Unix including macOS (standalone bundle)](#unix-including-macos-standalone-bundle)
-  * [I'd like to reorganize the standard SAIL folder layout on Windows (for standalone bundle)](#id-like-to-reorganize-the-standard-sail-folder-layout-on-windows-for-standalone-bundle)
   * [How can I point SAIL to my custom codecs?](#how-can-i-point-sail-to-my-custom-codecs)
-  * [Describe the high\-level APIs](#describe-the-high-level-apis)
-  * [Does SAIL provide simple one\-line APIs?](#does-sail-provide-simple-one-line-apis)
   * [How many image formats do you plan to implement?](#how-many-image-formats-do-you-plan-to-implement)
-  * [Does SAIL support static linking?](#does-sail-support-static-linking)
-  * [Please describe the memory management techniques implemented in SAIL](#please-describe-the-memory-management-techniques-implemented-in-sail)
-    * [The memory management technique implemented in SAIL](#the-memory-management-technique-implemented-in-sail)
-    * [Convention to call SAIL functions](#convention-to-call-sail-functions)
-    * [Pointers to images, pixels, etc\. are always freed on error](#pointers-to-images-pixels-etc-are-always-freed-on-error)
-    * [Always set a pointer to state to NULL (C only)](#always-set-a-pointer-to-state-to-null-c-only)
   * [What pixel formats SAIL is able to read?](#what-pixel-formats-sail-is-able-to-read)
   * [What pixel formats SAIL is able to output after reading an image file?](#what-pixel-formats-sail-is-able-to-output-after-reading-an-image-file)
   * [What pixel formats SAIL is able to write?](#what-pixel-formats-sail-is-able-to-write)
   * [How can I read an image and output pixels in different formats?](#how-can-i-read-an-image-and-output-pixels-in-different-formats)
   * [Does SAIL support animated and multi\-paged images?](#does-sail-support-animated-and-multi-paged-images)
   * [Does SAIL support reading from memory?](#does-sail-support-reading-from-memory)
+  * [Please describe the memory management techniques implemented in SAIL](#please-describe-the-memory-management-techniques-implemented-in-sail)
+    * [The memory management technique implemented in SAIL](#the-memory-management-technique-implemented-in-sail)
+    * [Convention to call SAIL functions](#convention-to-call-sail-functions)
+    * [Pointers to images, pixels, etc\. are always freed on error](#pointers-to-images-pixels-etc-are-always-freed-on-error)
+    * [Always set a pointer to state to NULL (C only)](#always-set-a-pointer-to-state-to-null-c-only)
   * [Are there any C/C\+\+ examples?](#are-there-any-cc-examples)
   * [Are there any bindings to other programming languages?](#are-there-any-bindings-to-other-programming-languages)
   * [I have questions, issues, or proposals](#i-have-questions-issues-or-proposals)
@@ -60,6 +61,36 @@ Technically, SAIL (ksquirrel-libs) was founded in 2003 making it one of the olde
 
 Yes. It's written in pure C11 and is highly portable. However, only the Windows, macOS, and Linux platforms
 are currently supported. Pull requests to support more platforms are highly welcomed.
+
+## Does SAIL support static linking?
+
+Yes. Compile with `-DSAIL_STATIC=ON`. This automatically enables `SAIL_COMBINE_CODECS`.
+
+Note for Unix platforms: the client application must be built with `-rdynamic` or an equivalent
+to enable `dlopen` and `dlsym` on the same binary. If you use CMake, this could be achieved by
+setting `CMAKE_ENABLE_EXPORTS` to `ON`.
+
+## Describe the high-level APIs
+
+SAIL provides four levels of high-level APIs:
+
+- `Junior`: I just want to load this JPEG from a file or memory
+- `Advanced`: I want to load this animated GIF from a file or memory
+- `Deep diver`: I want to load this animated GIF from a file or memory and have control over selected codecs and output pixel formats
+- `Technical diver`: I want everything above and my custom I/O source
+
+See [EXAMPLES](EXAMPLES.md) for more.
+
+## Does SAIL provide simple one-line APIs?
+
+Yes. SAIL provides four levels of APIs, depending on your needs: `junior`, `advanced`, `deep diver`, and `technical diver`.
+See [EXAMPLES](EXAMPLES.md) for more.
+
+## I'd like to reorganize the standard SAIL folder layout on Windows (for standalone bundle)
+
+You can surely do that. However, with the standard layout SAIL detects the codecs' location automatically.
+If you reorganize the standard SAIL folder layout, you'll need to specify the new codecs' location by
+setting the `SAIL_CODECS_PATH` environment variable.
 
 ## How does SAIL support image formats?
 
@@ -94,27 +125,22 @@ Note for Unix platforms: the client application must be built with `-rdynamic` o
 to enable `dlopen` and `dlsym` on the same binary. If you use CMake, this could be achieved by
 setting `CMAKE_ENABLE_EXPORTS` to `ON`.
 
+### Standalone bundle compiled with SAIL_COMBINE_CODECS=ON on any platform
+
+Same to VCPKG port.
+
 ### Windows (standalone bundle)
 1. `SAIL_CODECS_PATH` environment variable
 2. `<SAIL DEPLOYMENT FOLDER>\lib\sail\codecs`
 3. Hardcoded `SAIL_CODECS_PATH` in config.h
 
-`sail.dll location` and `<FOUND PATH>/lib` are the only places where codecs DLL dependencies are searched. No other paths are searched.
-Use WIN32 API `AddDllDirectory` to add your own DLL dependencies search path.
-
 ### Unix including macOS (standalone bundle)
 1. `SAIL_CODECS_PATH` environment variable
 2. Hardcoded `SAIL_CODECS_PATH` in config.h
 
-`<FOUND PATH>/lib` is added to the DLL search path.
+`<FOUND PATH>/lib` is added to `LD_LIBRARY_PATH`.
 
 Additionally, `SAIL_MY_CODECS_PATH` environment variable is always searched so you can load your own codecs from there.
-
-## I'd like to reorganize the standard SAIL folder layout on Windows (for standalone bundle)
-
-You can surely do that. However, with the standard layout SAIL detects the codecs' location automatically.
-If you reorganize the standard SAIL folder layout, you'll need to specify the new codecs' location by
-setting the `SAIL_CODECS_PATH` environment variable.
 
 ## How can I point SAIL to my custom codecs?
 
@@ -122,89 +148,12 @@ Set the `SAIL_MY_CODECS_PATH` environment variable to the location of your custo
 
 On Windows, `sail.dll location` and `SAIL_MY_CODECS_PATH/lib` are the only places where codecs DLL dependencies are searched
 if SAIL is compiled as a standalone bundle. No other paths are searched. Use WIN32 API `AddDllDirectory` to add your own DLL
-dependencies search path. On other platforms, `SAIL_MY_CODECS_PATH/lib` is added to the DLL search path.
-
-## Describe the high-level APIs
-
-SAIL provides four levels of high-level APIs:
-
-- `Junior`: I just want to load this JPEG from a file or memory
-- `Advanced`: I want to load this animated GIF from a file or memory
-- `Deep diver`: I want to load this animated GIF from a file or memory and have control over selected codecs and output pixel formats
-- `Technical diver`: I want everything above and my custom I/O source
-
-See [EXAMPLES](EXAMPLES.md) for more.
-
-## Does SAIL provide simple one-line APIs?
-
-Yes. SAIL provides four levels of APIs, depending on your needs: `junior`, `advanced`, `deep diver`, and `technical diver`.
-See [EXAMPLES](EXAMPLES.md) for more.
+dependencies search path. On other platforms, `SAIL_MY_CODECS_PATH/lib` is added to `LD_LIBRARY_PATH`.
 
 ## How many image formats do you plan to implement?
 
 Ksquirrel-libs supported around 60 image formats. I don't plan to port all of them. However,
 the most popular image formats will be definitely ported from ksquirrel-libs.
-
-## Does SAIL support static linking?
-
-Yes. Compile with `-DSAIL_STATIC=ON`. This automatically enables `SAIL_COMBINE_CODECS`.
-
-Note for Unix platforms: the client application must be built with `-rdynamic` or an equivalent
-to enable `dlopen` and `dlsym` on the same binary. If you use CMake, this could be achieved by
-setting `CMAKE_ENABLE_EXPORTS` to `ON`.
-
-## Please describe the memory management techniques implemented in SAIL
-
-### The memory management technique implemented in SAIL
-
-Internally, SAIL always tries to clean up on errors. If you encounter a memory leak on error, please report it.
-
-**C only:** However, if an engineer encounters an error in the middle of reading or writing an image with the `advanced`
-or a deeper API, it's always a responsibility of the engineer to stop reading or writing with
-`sail_stop_reading()` or `sail_stop_writing()`. These functions execute a proper cleanup in the underlying codec.
-If you don't call `sail_stop_reading()` or `sail_stop_writing()` in this situation, be prepared for memory leaks.
-
-**C++ only:** C++ engineers are more lucky. The C++ binding executes the necessary cleanup automatically in this
-situation in `~image_reader()` or `~image_writer()`.
-
-### Convention to call SAIL functions
-
-It's always recommended to use the `SAIL_TRY()` macro to call SAIL functions. It's also always recommended
-to clean up in your code with the `SAIL_TRY_OR_CLEANUP()` macro if you need to.
-
-### Pointers to images, pixels, etc. are always freed on error
-
-Pointers that are modified by SAIL functions are always freed on error but may be left set
-to a non-NULL value. SAIL does not reset them to a NULL value on error. For example:
-
-```C
-void *state = NULL;
-struct sail_image *image;
-
-SAIL_TRY(sail_start_reading_file(..., &state));
-
-/*
- * SAIL frees the 'image' or error, but doesn't reset its value.
- * This code sample prints a non-NULL address on error.
- */
-SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, &image),
-                    /* cleanup */ printf("%p\n", image),
-                                  sail_stop_reading(state));
-```
-
-### Always set a pointer to state to NULL (C only)
-
-C reading and writing functions require a local void pointer to state. Always set it to NULL before
-reading or writing. For example:
-
-```C
-void *state = NULL;
-
-SAIL_TRY(sail_start_reading_file(..., &state));
-
-SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, ...),
-                    /* cleanup */ sail_stop_reading(state));
-```
 
 ## What pixel formats SAIL is able to read?
 
@@ -274,6 +223,59 @@ Yes. SAIL supports reading/writing from/to files and memory. For technical diver
 it's also possible to use custom I/O sources.
 
 See `sail_start_reading_file()`, `sail_start_reading_mem()`, and `sail_start_reading_io()`.
+
+## Please describe the memory management techniques implemented in SAIL
+
+### The memory management technique implemented in SAIL
+
+Internally, SAIL always tries to clean up on errors. If you encounter a memory leak on error, please report it.
+
+**C only:** However, if an engineer encounters an error in the middle of reading or writing an image with the `advanced`
+or a deeper API, it's always a responsibility of the engineer to stop reading or writing with
+`sail_stop_reading()` or `sail_stop_writing()`. These functions execute a proper cleanup in the underlying codec.
+If you don't call `sail_stop_reading()` or `sail_stop_writing()` in this situation, be prepared for memory leaks.
+
+**C++ only:** C++ engineers are more lucky. The C++ binding executes the necessary cleanup automatically in this
+situation in `~image_reader()` or `~image_writer()`.
+
+### Convention to call SAIL functions
+
+It's always recommended to use the `SAIL_TRY()` macro to call SAIL functions. It's also always recommended
+to clean up in your code with the `SAIL_TRY_OR_CLEANUP()` macro if you need to.
+
+### Pointers to images, pixels, etc. are always freed on error
+
+Pointers that are modified by SAIL functions are always freed on error but may be left set
+to a non-NULL value. SAIL does not reset them to a NULL value on error. For example:
+
+```C
+void *state = NULL;
+struct sail_image *image;
+
+SAIL_TRY(sail_start_reading_file(..., &state));
+
+/*
+ * SAIL frees the 'image' or error, but doesn't reset its value.
+ * This code sample prints a non-NULL address on error.
+ */
+SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, &image),
+                    /* cleanup */ printf("%p\n", image),
+                                  sail_stop_reading(state));
+```
+
+### Always set a pointer to state to NULL (C only)
+
+C reading and writing functions require a local void pointer to state. Always set it to NULL before
+reading or writing. For example:
+
+```C
+void *state = NULL;
+
+SAIL_TRY(sail_start_reading_file(..., &state));
+
+SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, ...),
+                    /* cleanup */ sail_stop_reading(state));
+```
 
 ## Are there any C/C++ examples?
 

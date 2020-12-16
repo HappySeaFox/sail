@@ -2,6 +2,12 @@
 
 Consider [EXAMPLES](EXAMPLES.md) after building and installing.
 
+### Terminology and build types
+
+**Standalone bundle** - manually compiled with `cmake` and respective build commands. This also includes native Linux packages.
+
+**VCPKG port** - installed with `vcpkg install sail`.
+
 ### CMake options overview
 
 - `SAIL_BUILD_EXAMPLES=ON|OFF` - Build examples. Default: `ON`
@@ -16,9 +22,9 @@ Consider [EXAMPLES](EXAMPLES.md) after building and installing.
 - `SAIL_READ_OUTPUT_BPP32_BGRA=ON|OFF` - Make the read operations output BPP32-BGRA pixels instead of BPP32-RGBA. Default: `OFF`
 - `SAIL_STATIC=ON|OFF` - Enable static build. Default: `OFF`
 
-### Windows (VCPKG)
+### VCPKG
 
-SAIL is available in VCPKG:
+SAIL is available in VCPKG on Windows, Linux, and macOS:
 
 ```
 vcpkg install sail
@@ -59,7 +65,7 @@ cmake --build . --config Release
 cmake --build . --config Release --target install
 ```
 
-### macOS
+### macOS (standalone bundle)
 
 #### Tested environments
 
@@ -78,7 +84,7 @@ Or
 brew upgrade sail
 ```
 
-### Linux
+### Linux (standalone bundle)
 
 #### Tested environments
 
