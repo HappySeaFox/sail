@@ -76,6 +76,7 @@ if (SAIL_STATIC)
     endif()
 else()
     set(BUILD_SHARED_LIBS ON)
+endif()
 
 # When we compile for VCPKG, VCPKG_TARGET_TRIPLET is defined
 #
