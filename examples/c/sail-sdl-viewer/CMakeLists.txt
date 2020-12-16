@@ -3,7 +3,11 @@ add_executable(sail-sdl-viewer sail-sdl-viewer.c)
 # Add SDL2 dependencies
 #
 if (SAIL_VCPKG)
-    target_link_libraries(sail-sdl-viewer PRIVATE SDL2::SDL2 SDL2::SDL2main)
+    if (UNIX)
+        target_link_libraries(sail-sdl-viewer PRIVATE SDL2::SDL2-static SDL2::SDL2main)
+    else()
+        target_link_libraries(sail-sdl-viewer PRIVATE SDL2::SDL2 SDL2::SDL2main)
+    endif()
 else()
     target_include_directories(sail-sdl-viewer PRIVATE ${SDL2_INCLUDE_DIRS})
     target_link_libraries(sail-sdl-viewer PRIVATE ${SDL2_LIBRARIES})
