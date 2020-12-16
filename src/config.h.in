@@ -51,9 +51,6 @@
 #cmakedefine SAIL_CYGWIN
 #cmakedefine SAIL_APPLE
 
-/* Do we compile a VCPKG port (vcpkg install)? */
-#cmakedefine SAIL_VCPKG_PORT
-
 /* Do we compile for VCPKG (port or client)? */
 #cmakedefine SAIL_VCPKG
 
