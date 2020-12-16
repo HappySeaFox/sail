@@ -84,7 +84,7 @@ See [EXAMPLES](EXAMPLES.md) for more.
 ## Does SAIL provide simple one-line APIs?
 
 Yes. SAIL provides four levels of APIs, depending on your needs: `junior`, `advanced`, `deep diver`, and `technical diver`.
-See [EXAMPLES](EXAMPLES.md) for more.
+`junior` is your choice. See [EXAMPLES](EXAMPLES.md) for more.
 
 ## I'd like to reorganize the standard SAIL folder layout on Windows (for standalone bundle)
 
