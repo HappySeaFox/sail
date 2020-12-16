@@ -130,7 +130,7 @@ static const char* sail_codecs_path(void) {
     if (get_sail_dll_path(dll_path, sizeof(dll_path)) == SAIL_OK) {
         char *lib_sail_codecs_path;
 
-        #ifdef SAIL_VCPKG_PORT
+        #ifdef SAIL_VCPKG
             /* "\bin" -> "\bin\sail\codecs" */
             const char *CODECS_RELATIVE_PATH = "\\sail\\codecs";
         #else
