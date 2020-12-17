@@ -23,9 +23,6 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_CODEC_LAYOUT_V4_H
-#define SAIL_CODEC_LAYOUT_V4_H
-
 /*
  * This is a codec layout definition file.
  *
@@ -34,7 +31,11 @@
  * to simplify debugging.
  */
 
+#ifdef SAIL_BUILD
+#include "error.h"
+#else
 #include <sail-common/error.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -160,6 +161,4 @@ sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_write_finish_v4)(void **state
 /* extern "C" */
 #ifdef __cplusplus
 }
-#endif
-
 #endif

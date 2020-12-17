@@ -29,8 +29,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-/* On macOS SDL2 is already included into the search path. */
-#ifdef SAIL_APPLE
+/* On macOS with brew SDL2 is already included into the search path. */
+#if defined SAIL_APPLE && !defined SAIL_VCPKG
     #include <SDL.h>
 #else
     #include <SDL2/SDL.h>

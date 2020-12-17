@@ -34,6 +34,7 @@
 #ifdef SAIL_WIN32
     #include <windows.h> /* FindFirstFile */
 #else
+    #include <dlfcn.h> /* dlsym */
     #include <dirent.h> /* opendir */
     #include <sys/types.h>
 #endif
@@ -92,6 +93,7 @@ static sail_status_t get_sail_dll_path(char *dll_path, int dll_path_size) {
 }
 #endif
 
+#ifndef SAIL_COMBINE_CODECS
 static const char* sail_codecs_path_env(void) {
 
     SAIL_THREAD_LOCAL static bool codecs_path_env_called = false;
@@ -111,7 +113,9 @@ static const char* sail_codecs_path_env(void) {
 
     return env;
 }
+#endif
 
+#if !defined SAIL_COMBINE_CODECS || !defined SAIL_VCPKG
 static const char* sail_codecs_path(void) {
 
     SAIL_THREAD_LOCAL static bool codecs_path_called = false;
@@ -154,6 +158,7 @@ static const char* sail_codecs_path(void) {
 
     return path;
 }
+#endif
 
 static const char* client_codecs_path(void) {
 
@@ -300,7 +305,7 @@ static sail_status_t build_codec_from_codec_info(const char *codec_info_full_pat
                         sail_free(codec_full_path));
 
     struct sail_codec_info *codec_info;
-    SAIL_TRY_OR_CLEANUP(codec_read_info(codec_info_full_path, &codec_info),
+    SAIL_TRY_OR_CLEANUP(codec_read_info_from_file(codec_info_full_path, &codec_info),
                         destroy_codec_info_node(*codec_info_node),
                         sail_free(codec_full_path));
 
@@ -323,55 +328,53 @@ static sail_status_t destroy_context(struct sail_context *context) {
     return SAIL_OK;
 }
 
-/* Initializes the context and loads all the codec info files if the context is not initialized. */
-static sail_status_t init_context(struct sail_context *context, int flags) {
+/* Preload all codecs. */
+static sail_status_t preload_codecs(struct sail_context *context) {
 
     SAIL_CHECK_CONTEXT_PTR(context);
 
-    if (context->initialized) {
-        return SAIL_OK;
+    SAIL_LOG_DEBUG("Preloading codecs");
+
+    struct sail_codec_info_node *codec_info_node = context->codec_info_node;
+
+    while (codec_info_node != NULL) {
+        const struct sail_codec *codec;
+
+        /* Ignore loading errors on purpose. */
+        load_codec_by_codec_info(codec_info_node->codec_info, &codec);
+
+        codec_info_node = codec_info_node->next;
     }
 
-    context->initialized = true;
+    return SAIL_OK;
+}
 
-    /* Time counter. */
-    uint64_t start_time = sail_now();
+/* Preload all codecs. */
+static sail_status_t print_enumerated_codecs(struct sail_context *context) {
 
-    SAIL_LOG_INFO("Version %s", SAIL_VERSION_STRING);
+    SAIL_CHECK_CONTEXT_PTR(context);
 
-    /* Our own codecs. */
-    const char *env = sail_codecs_path_env();
-    const char *our_codecs_path;
+    SAIL_LOG_DEBUG("Enumerated codecs:");
 
-    if (env == NULL) {
-        our_codecs_path = sail_codecs_path();
-        SAIL_LOG_DEBUG("SAIL_CODECS_PATH environment variable is not set. Loading codecs from '%s'", our_codecs_path);
-    } else {
-        our_codecs_path = env;
-        SAIL_LOG_DEBUG("SAIL_CODECS_PATH environment variable is set. Loading codecs from '%s'", env);
+    /* Print the found codec infos. */
+    struct sail_codec_info_node *node = context->codec_info_node;
+    int counter = 1;
+
+    while (node != NULL) {
+        SAIL_LOG_DEBUG("%d. %s [%s] %s", counter++, node->codec_info->name, node->codec_info->description, node->codec_info->version);
+        node = node->next;
     }
 
-#ifdef SAIL_WIN32
-    char dll_path[MAX_PATH];
-    if (get_sail_dll_path(dll_path, sizeof(dll_path)) == SAIL_OK) {
-        SAIL_TRY_OR_SUPPRESS(add_dll_directory(dll_path));
-    }
-#endif
+    return SAIL_OK;
+}
 
-    SAIL_TRY(update_lib_path(our_codecs_path));
+static sail_status_t enumerate_codecs_in_paths(struct sail_context *context, const char* codec_search_paths[], int codec_search_paths_length) {
 
-    /* Client codecs. */
-    const char *their_codecs_path = client_codecs_path();
-    if (their_codecs_path != NULL) {
-        SAIL_TRY(update_lib_path(their_codecs_path));
-    }
+    SAIL_CHECK_CONTEXT_PTR(context);
 
     /* Used to load and store codec info objects. */
     struct sail_codec_info_node **last_codec_info_node = &context->codec_info_node;
     struct sail_codec_info_node *codec_info_node;
-
-    const int codec_search_paths_length = 2;
-    const char* codec_search_paths[2] = { our_codecs_path, their_codecs_path };
 
     for (int i = 0; i < codec_search_paths_length; i++) {
         const char *codecs_path = codec_search_paths[i];
@@ -379,6 +382,8 @@ static sail_status_t init_context(struct sail_context *context, int flags) {
         if (codecs_path == NULL) {
             continue;
         }
+
+        SAIL_TRY(update_lib_path(codecs_path));
 
         SAIL_LOG_DEBUG("Enumerating codecs in '%s'", codecs_path);
 
@@ -398,9 +403,9 @@ static sail_status_t init_context(struct sail_context *context, int flags) {
         HANDLE hFind = FindFirstFile(codecs_path_with_mask, &data);
 
         if (hFind == INVALID_HANDLE_VALUE) {
-            SAIL_LOG_ERROR("Failed to list files in '%s'. Error: %d", codecs_path, GetLastError());
+            SAIL_LOG_ERROR("Failed to list files in '%s'. Error: %d. No codecs loaded from it", codecs_path, GetLastError());
             sail_free(codecs_path_with_mask);
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_LIST_DIR);
+            continue;
         }
 
         do {
@@ -422,7 +427,7 @@ static sail_status_t init_context(struct sail_context *context, int flags) {
         } while (FindNextFile(hFind, &data));
 
         if (GetLastError() != ERROR_NO_MORE_FILES) {
-            SAIL_LOG_ERROR("Failed to list files in '%s'. Error: %d. Some codecs may be ignored", codecs_path, GetLastError());
+            SAIL_LOG_ERROR("Failed to list files in '%s'. Error: %d. Some codecs may not be loaded from it", codecs_path, GetLastError());
         }
 
         sail_free(codecs_path_with_mask);
@@ -466,30 +471,192 @@ static sail_status_t init_context(struct sail_context *context, int flags) {
 #endif
     }
 
-    if (flags & SAIL_FLAG_PRELOAD_CODECS) {
-        SAIL_LOG_DEBUG("Preloading codecs");
+    return SAIL_OK;
+}
 
-        codec_info_node = context->codec_info_node;
+/* Initializes the context and loads all the codec info files. */
+#ifdef SAIL_COMBINE_CODECS
+static sail_status_t init_context_impl(struct sail_context *context) {
 
-        while (codec_info_node != NULL) {
-            const struct sail_codec *codec;
+    SAIL_CHECK_CONTEXT_PTR(context);
 
-            /* Ignore loading errors on purpose. */
-            load_codec_by_codec_info(codec_info_node->codec_info, &codec);
+#ifdef SAIL_WIN32
+#ifdef SAIL_STATIC
+    HMODULE handle = GetModuleHandle(NULL);
+#else
+    HMODULE handle = GetModuleHandle("sail-codecs");
+#endif
 
-            codec_info_node = codec_info_node->next;
-        }
+    if (handle == NULL) {
+        SAIL_LOG_ERROR("Failed to get module handle. Error: %d", GetLastError());
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_SYMBOL_RESOLVE);
     }
+#else
+    void *handle = dlopen(NULL, RTLD_LAZY | RTLD_LOCAL);
 
-    SAIL_LOG_DEBUG("Enumerated codecs:");
+    if (handle == NULL) {
+        SAIL_LOG_ERROR("Failed to open the current executable: %s", dlerror());
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_SYMBOL_RESOLVE);
+    }
+#endif
 
-    /* Print the found codec infos. */
-    struct sail_codec_info_node *node = context->codec_info_node;
-    int counter = 1;
+    /* Extern from sail-codecs. For example: "gif;jpeg;png". */
+#ifdef SAIL_STATIC
+    extern const char *sail_enabled_codecs;
+#else
+    SAIL_IMPORT extern const char *sail_enabled_codecs;
+#endif
+
+    /* Load codec info objects. */
+    struct sail_codec_info_node **last_codec_info_node = &context->codec_info_node;
+
+    struct sail_string_node *string_node = NULL;
+
+    /* Split "gif;jpeg;png" into "gif", "jpeg", "png". */
+    SAIL_TRY_OR_CLEANUP(split_into_string_node_chain(sail_enabled_codecs, &string_node),
+                        /* cleanup */ destroy_string_node_chain(string_node));
+
+    struct sail_string_node *node = string_node;
 
     while (node != NULL) {
-        SAIL_LOG_DEBUG("%d. %s [%s] %s", counter++, node->codec_info->name, node->codec_info->description, node->codec_info->version);
+        /* Construct "sail_codec_info_gif". */
+        char *sail_codec_info_var_name;
+        SAIL_TRY_OR_CLEANUP(sail_concat(&sail_codec_info_var_name, 2, "sail_codec_info_", node->value),
+                            /* cleanup */ destroy_string_node_chain(string_node));
+
+    /* Resolve sail_codec_info_gif. */
+#ifdef SAIL_WIN32
+        FARPROC sail_codec_info_sym = GetProcAddress(handle, sail_codec_info_var_name);
+
+        if (sail_codec_info_sym == NULL) {
+            SAIL_LOG_ERROR("Failed to resolve '%s'. Error: %d", sail_codec_info_var_name, GetLastError());
+        }
+#else
+        void *sail_codec_info_sym = dlsym(handle, sail_codec_info_var_name);
+
+        if (sail_codec_info_sym == NULL) {
+            SAIL_LOG_ERROR("Failed to resolve '%s'. Error: %s", sail_codec_info_var_name, dlerror());
+        }
+#endif
+
+        sail_free(sail_codec_info_var_name);
+
+        if (sail_codec_info_sym == NULL) {
+            node = node->next;
+            continue;
+        }
+
+        const char **sail_codec_info_var = (const char **)sail_codec_info_sym;
+
+        /* Parse codec info. */
+        struct sail_codec_info_node *codec_info_node;
+        if (alloc_codec_info_node(&codec_info_node) != SAIL_OK) {
+            node = node->next;
+            continue;
+        }
+
+        struct sail_codec_info *codec_info;
+        if (codec_read_info_from_string(*sail_codec_info_var, &codec_info) != SAIL_OK) {
+            destroy_codec_info_node(codec_info_node);
+            node = node->next;
+            continue;
+        };
+
+        /* Save the parsed codec info into the SAIL context. */
+        codec_info_node->codec_info = codec_info;
+
+        *last_codec_info_node = codec_info_node;
+        last_codec_info_node = &codec_info_node->next;
+
         node = node->next;
+    }
+
+#ifndef SAIL_WIN32
+    dlclose(handle);
+#endif
+
+    destroy_string_node_chain(string_node);
+
+    /* Add our lib path in standalone mode. */
+#ifndef SAIL_VCPKG
+    SAIL_TRY(update_lib_path(sail_codecs_path()));
+#endif
+
+    /* Load client codecs. */
+    SAIL_TRY(enumerate_codecs_in_paths(context, (const char* []){ client_codecs_path() }, 1));
+
+    return SAIL_OK;
+}
+#else
+static sail_status_t init_context_impl(struct sail_context *context) {
+
+    SAIL_CHECK_CONTEXT_PTR(context);
+
+    /* Our own codecs. */
+    const char *env = sail_codecs_path_env();
+    const char *our_codecs_path;
+
+    if (env == NULL) {
+        our_codecs_path = sail_codecs_path();
+        SAIL_LOG_DEBUG("SAIL_CODECS_PATH environment variable is not set. Loading codecs from '%s'", our_codecs_path);
+    } else {
+        our_codecs_path = env;
+        SAIL_LOG_DEBUG("SAIL_CODECS_PATH environment variable is set. Loading codecs from '%s'", env);
+    }
+
+    SAIL_TRY(enumerate_codecs_in_paths(context, (const char* []){ our_codecs_path, client_codecs_path() }, 2));
+
+    return SAIL_OK;
+}
+#endif
+
+static void print_no_codecs_found(void) {
+
+    const char *message = "\n\n*** No codecs were found. Please check the installation directory. ***"
+#if defined SAIL_UNIX && defined SAIL_COMBINE_CODECS
+        "\n*** Additionally, please make sure the application is compiled with -rdynamic ***"
+        "\n*** or an equivalent. If you use CMake, this could be achieved by setting     ***"
+        "\n*** CMAKE_ENABLE_EXPORTS to ON. ***"
+#endif
+        "\n";
+
+    SAIL_LOG_ERROR("%s", message);
+}
+
+/* Initializes the context and loads all the codec info files if the context is not initialized. */
+static sail_status_t init_context(struct sail_context *context, int flags) {
+
+    SAIL_CHECK_CONTEXT_PTR(context);
+
+    if (context->initialized) {
+        return SAIL_OK;
+    }
+
+    context->initialized = true;
+
+    /* Time counter. */
+    uint64_t start_time = sail_now();
+
+    SAIL_LOG_INFO("Version %s", SAIL_VERSION_STRING);
+
+    /* Always search DLLs in the sail.dll location so custom codecs can hold dependencies there. */
+#ifdef SAIL_WIN32
+    char dll_path[MAX_PATH];
+    if (get_sail_dll_path(dll_path, sizeof(dll_path)) == SAIL_OK) {
+        SAIL_TRY_OR_SUPPRESS(add_dll_directory(dll_path));
+    }
+#endif
+
+    SAIL_TRY(init_context_impl(context));
+
+    if (context->codec_info_node == NULL) {
+        print_no_codecs_found();
+    }
+
+    SAIL_TRY(print_enumerated_codecs(context));
+
+    if (flags & SAIL_FLAG_PRELOAD_CODECS) {
+        SAIL_TRY(preload_codecs(context));
     }
 
     SAIL_LOG_DEBUG("Initialized in %lu ms.", (unsigned long)(sail_now() - start_time));

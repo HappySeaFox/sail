@@ -11,6 +11,7 @@ set(SAIL_DEV_VERSION_SUFFIX "pre10")
 include(GNUInstallDirs)
 include(CheckIncludeFiles)
 include(CheckCSourceCompiles)
+include(CMakeDependentOption)
 include(CMakePushCheckState)
 
 # Our own cmake scripts
@@ -60,10 +61,22 @@ option(SAIL_BUILD_EXAMPLES "Build examples." ON)
 option(SAIL_BUILD_TESTS "Build tests." ON)
 option(SAIL_DEV "Enable developer mode. Be more strict when compiling source code, for example." OFF)
 set(SAIL_EXCEPT_CODECS "" CACHE STRING "Enable all codecs except the codecs specified in this ';'-separated list. \
-Codecs with missing dependencies will be disabled regardless this setting")
+Codecs with missing dependencies will be disabled regardless this setting.")
 set(SAIL_ONLY_CODECS "" CACHE STRING "Enable only the codecs specified in this ';'-separated list. \
-Codecs with missing dependencies will be disabled regardless this setting")
+Codecs with missing dependencies will be disabled regardless this setting.")
 option(SAIL_READ_OUTPUT_BPP32_BGRA "Make the read operations output BPP32-BGRA pixels instead of BPP32-RGBA." OFF)
+option(SAIL_STATIC "Build static libs. When enabled, sets SAIL_COMBINE_CODECS to ON." OFF)
+cmake_dependent_option(SAIL_COMBINE_CODECS "Combine all codecs into a single library." OFF "NOT SAIL_STATIC" ON)
+
+if (SAIL_STATIC)
+    set(BUILD_SHARED_LIBS OFF)
+    if (UNIX)
+        # For dlsym'ing the same module
+        set(CMAKE_ENABLE_EXPORTS ON)
+    endif()
+else()
+    set(BUILD_SHARED_LIBS ON)
+endif()
 
 # When we compile for VCPKG, VCPKG_TARGET_TRIPLET is defined
 #
@@ -71,10 +84,6 @@ if (VCPKG_TARGET_TRIPLET)
     set(SAIL_VCPKG ON)
 else()
     set(SAIL_VCPKG OFF)
-endif()
-
-if (SAIL_VCPKG AND NOT WIN32)
-    message(FATAL_ERROR "VCPKG support is Windows-only")
 endif()
 
 if (SAIL_READ_OUTPUT_BPP32_BGRA)
@@ -96,10 +105,6 @@ endif()
 #
 #set(CMAKE_INSTALL_INCLUDEDIR "include/${CMAKE_LIBRARY_ARCHITECTURE}")
 #set(CMAKE_INSTALL_LIBDIR "lib/${CMAKE_LIBRARY_ARCHITECTURE}")
-
-# Enable shared libs by default
-#
-set(BUILD_SHARED_LIBS ON)
 
 # Enable strict C11
 #
@@ -202,8 +207,11 @@ configure_file("${PROJECT_SOURCE_DIR}/dist/win/sail.iss" "${PROJECT_BINARY_DIR}/
 #
 
 add_subdirectory(src/libsail-common)
-add_subdirectory(src/libsail)
 add_subdirectory(src/sail-codecs)
+if (SAIL_COMBINE_CODECS)
+    add_subdirectory(src/sail-codecs-archive)
+endif()
+add_subdirectory(src/libsail)
 add_subdirectory(src/bindings/c++)
 
 if (SAIL_BUILD_EXAMPLES)
@@ -247,10 +255,12 @@ endif()
 
 if (ENABLED_CODECS)
     string(TOUPPER "${ENABLED_CODECS}" ENABLED_CODECS)
+    string(REPLACE ";" "," ENABLED_CODECS "${ENABLED_CODECS}")
 endif()
 
 if (DISABLED_CODECS)
     string(TOUPPER "${DISABLED_CODECS}" DISABLED_CODECS)
+    string(REPLACE ";" "," DISABLED_CODECS "${DISABLED_CODECS}")
 endif()
 
 message("")
@@ -267,14 +277,22 @@ message("*")
 message("* SAIL version:                ${PROJECT_VERSION}")
 message("* Developer mode:              ${SAIL_DEV}")
 message("* VCPKG mode:                  ${SAIL_VCPKG}")
-message("* SDL example:                 ${SAIL_SDL_EXAMPLE}")
+message("* Static build:                ${SAIL_STATIC}")
+message("*   Combine codecs [*]:        ${SAIL_COMBINE_CODECS}")
+message("* Build examples:              ${SAIL_BUILD_EXAMPLES}")
+message("* Build SDL example:           ${SAIL_SDL_EXAMPLE}")
+message("* Build tests:                 ${SAIL_BUILD_TESTS}")
+message("* Colored output:              ${SAIL_COLORED_OUTPUT}${SAIL_COLORED_OUTPUT_CLARIFY}")
+message("*")
+message("* [*] - these options depend on other options, their values may be altered by CMake.")
+message("*       For example, if you configure with -DSAIL_STATIC=ON -DSAIL_COMBINE_CODECS=OFF,")
+message("*       the final value of SAIL_COMBINE_CODECS will be ON.")
 message("*")
 message("* Install prefix:              ${CMAKE_INSTALL_PREFIX}")
 message("* LIBDIR:                      ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 message("* INCLUDEDIR:                  ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}")
 message("* DATADIR:                     ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}")
 message("*")
-message("* Colored output:              ${SAIL_COLORED_OUTPUT}${SAIL_COLORED_OUTPUT_CLARIFY}")
 message("* Enabled codecs:              ${ENABLED_CODECS}")
 message("* Disabled codecs:             ${DISABLED_CODECS}")
 message("* Default read output format:  ${SAIL_DEFAULT_READ_OUTPUT_PIXEL_FORMAT}")

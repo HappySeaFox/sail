@@ -43,6 +43,13 @@ sail_enable_pch(TARGET sail HEADER sail.h)
 target_include_directories(sail PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
 # Simplify the INIH parser
 target_compile_definitions(sail PRIVATE INI_ALLOW_MULTILINE=0 INI_ALLOW_INLINE_COMMENTS=0 INI_CUSTOM_ALLOCATOR=0 INI_STOP_ON_FIRST_ERROR=1)
+
+if (SAIL_COMBINE_CODECS)
+    # Transfer user requirements
+    #
+    target_link_libraries(sail PRIVATE sail-codecs)
+endif()
+
 target_link_libraries(sail PUBLIC sail-common)
 
 if (UNIX)
@@ -72,5 +79,9 @@ install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/layouts/" DESTINATION "${CMAKE_IN
 #
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/libsail.pc"
         DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
+
+if (SAIL_COMBINE_CODECS)
+    set(SAIL_CODECS_FIND_DEPENDENCY "find_dependency(SailCodecs REQUIRED PATHS \${CMAKE_CURRENT_LIST_DIR})")
+endif()
 
 sail_install_cmake_config(TARGET "Sail" VERSION "${VERSION}")

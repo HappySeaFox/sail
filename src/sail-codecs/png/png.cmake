@@ -5,8 +5,8 @@ macro(sail_find_dependencies)
         return()
     endif()
 
-    set(sail_png_libs ${PNG_LIBRARIES})
     set(sail_png_include_dirs ${PNG_INCLUDE_DIRS})
+    set(sail_png_libs ${PNG_LIBRARIES})
 endmacro()
 
 macro(sail_codec_post_add)

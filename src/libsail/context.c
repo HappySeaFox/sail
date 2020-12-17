@@ -60,10 +60,9 @@ sail_status_t sail_unload_codecs(void) {
     while (node != NULL) {
         if (node->codec != NULL) {
             destroy_codec(node->codec);
+            node->codec = NULL;
             counter++;
         }
-
-        node->codec = NULL;
 
         node = node->next;
     }

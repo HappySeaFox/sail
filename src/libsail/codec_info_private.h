@@ -66,6 +66,14 @@ SAIL_HIDDEN void destroy_codec_info_node_chain(struct sail_codec_info_node *code
  *
  * Returns SAIL_OK on success.
  */
-SAIL_HIDDEN sail_status_t codec_read_info(const char *path, struct sail_codec_info **codec_info);
+SAIL_HIDDEN sail_status_t codec_read_info_from_file(const char *path, struct sail_codec_info **codec_info);
+
+/*
+ * Reads SAIL codec info from the specified string and stores the parsed information into the specified
+ * codec info object. The assigned codec info MUST be destroyed later with destroy_codec_info().
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_HIDDEN sail_status_t codec_read_info_from_string(const char *str, struct sail_codec_info **codec_info);
 
 #endif

@@ -41,7 +41,9 @@
 sail_status_t alloc_and_load_codec(const struct sail_codec_info *codec_info, struct sail_codec **codec) {
 
     SAIL_CHECK_CODEC_INFO_PTR(codec_info);
+#ifndef SAIL_COMBINE_CODECS
     SAIL_CHECK_PATH_PTR(codec_info->path);
+#endif
     SAIL_CHECK_CODEC_PTR(codec);
 
     void *ptr;
@@ -52,38 +54,70 @@ sail_status_t alloc_and_load_codec(const struct sail_codec_info *codec_info, str
     codec_local->handle = NULL;
     codec_local->v4     = NULL;
 
+#ifndef SAIL_COMBINE_CODECS
     SAIL_LOG_DEBUG("Loading codec '%s'", codec_info->path);
+#endif
 
 #ifdef SAIL_WIN32
+#ifdef SAIL_COMBINE_CODECS
+#ifdef SAIL_STATIC
+    HMODULE handle = GetModuleHandle(NULL);
+#else
+    HMODULE handle = GetModuleHandle("sail-codecs");
+#endif
+
+    if (handle == NULL) {
+        SAIL_LOG_ERROR("Failed to get module handle. Error: %d", GetLastError());
+    }
+#else
     HMODULE handle = LoadLibraryEx(codec_info->path, NULL, LOAD_LIBRARY_SEARCH_SYSTEM32 | LOAD_LIBRARY_SEARCH_USER_DIRS);
 
     if (handle == NULL) {
         SAIL_LOG_ERROR("Failed to load '%s'. Error: %d", codec_info->path, GetLastError());
-        destroy_codec(codec_local);
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_LOAD);
     }
+#endif
+#else
+#ifdef SAIL_COMBINE_CODECS
+    void *handle = dlopen(NULL, RTLD_LAZY | RTLD_LOCAL);
 
-    codec_local->handle = handle;
+    if (handle == NULL) {
+        SAIL_LOG_ERROR("Failed to open the current executable: %s", dlerror());
+    }
 #else
     void *handle = dlopen(codec_info->path, RTLD_LAZY | RTLD_LOCAL);
 
     if (handle == NULL) {
         SAIL_LOG_ERROR("Failed to load '%s': %s", codec_info->path, dlerror());
+    }
+#endif
+#endif
+
+    if (handle == NULL) {
         destroy_codec(codec_local);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_LOAD);
     }
 
     codec_local->handle = handle;
-#endif
 
 #ifdef SAIL_WIN32
     #define SAIL_RESOLVE_FUNC GetProcAddress
-    #define SAIL_RESOLVE_LOG_ERROR(symbol) \
-        SAIL_LOG_ERROR("Failed to resolve '%s' in '%s'. Error: %d", symbol, codec_info->path, GetLastError())
+    #ifdef SAIL_COMBINE_CODECS
+        #define SAIL_RESOLVE_LOG_ERROR(symbol) \
+            SAIL_LOG_ERROR("Failed to resolve '%s'. Error: %d", symbol, GetLastError())
+    #else
+        #define SAIL_RESOLVE_LOG_ERROR(symbol) \
+            SAIL_LOG_ERROR("Failed to resolve '%s' in '%s'. Error: %d", symbol, codec_info->path, GetLastError())
+    #endif
 #else
     #define SAIL_RESOLVE_FUNC dlsym
-    #define SAIL_RESOLVE_LOG_ERROR(symbol) \
-        SAIL_LOG_ERROR("Failed to resolve '%s' in '%s': %s", symbol, codec_info->path, dlerror())
+
+    #ifdef SAIL_COMBINE_CODECS
+        #define SAIL_RESOLVE_LOG_ERROR(symbol) \
+            SAIL_LOG_ERROR("Failed to resolve '%s': %s", symbol, dlerror())
+    #else
+        #define SAIL_RESOLVE_LOG_ERROR(symbol) \
+            SAIL_LOG_ERROR("Failed to resolve '%s' in '%s': %s", symbol, codec_info->path, dlerror())
+    #endif
 #endif
 
 #define SAIL_RESOLVE(target, handle, symbol, name)                                 \
@@ -141,7 +175,10 @@ void destroy_codec(struct sail_codec *codec) {
 
     if (codec->handle != NULL) {
 #ifdef SAIL_WIN32
+    /* In "combine codecs" mode this handle is returned by GetModuleHandle, and the official docs don't recommend freeing it. */
+    #ifndef SAIL_COMBINE_CODECS
         FreeLibrary((HMODULE)codec->handle);
+    #endif
 #else
         dlclose(codec->handle);
 #endif
