@@ -8,7 +8,7 @@ Table of Contents
   * [What are the competitors of SAIL?](#what-are-the-competitors-of-sail)
   * [Describe the high\-level APIs](#describe-the-high-level-apis)
   * [Does SAIL provide simple one\-line APIs?](#does-sail-provide-simple-one-line-apis)
-  * [I'd like to reorganize the standard SAIL folder layout on Windows (for standalone bundle)](#id-like-to-reorganize-the-standard-sail-folder-layout-on-windows-for-standalone-bundle)
+  * [I'd like to reorganize the standard SAIL folder layout on Windows (for standalone build or bundle)](#id-like-to-reorganize-the-standard-sail-folder-layout-on-windows-for-standalone-build-or-bundle)
   * [How does SAIL support image formats?](#how-does-sail-support-image-formats)
   * [Can I implement an image codec in C\+\+?](#can-i-implement-an-image-codec-in-c)
   * [Does SAIL preload codecs in the initialization routine?](#does-sail-preload-codecs-in-the-initialization-routine)
@@ -16,9 +16,9 @@ Table of Contents
     * [SAIL\_COMBINE\_CODECS is ON](#sail_combine_codecs-is-on)
   * [How does SAIL look for codecs?](#how-does-sail-look-for-codecs)
     * [VCPKG port on any platform](#vcpkg-port-on-any-platform)
-    * [Standalone bundle compiled with SAIL\_COMBINE\_CODECS=ON on any platform](#standalone-bundle-compiled-with-sail_combine_codecson-on-any-platform)
-    * [Windows (standalone bundle)](#windows-standalone-bundle)
-    * [Unix including macOS (standalone bundle)](#unix-including-macos-standalone-bundle)
+    * [Standalone build/bundle compiled with SAIL\_COMBINE\_CODECS=ON](#standalone-buildbundle-compiled-with-sail_combine_codecson)
+    * [Windows (standalone build or bundle)](#windows-standalone-build-or-bundle)
+    * [Unix including macOS (standalone build)](#unix-including-macos-standalone-build)
   * [How can I point SAIL to my custom codecs?](#how-can-i-point-sail-to-my-custom-codecs)
   * [How many image formats do you plan to implement?](#how-many-image-formats-do-you-plan-to-implement)
   * [What pixel formats SAIL is able to read?](#what-pixel-formats-sail-is-able-to-read)
@@ -86,7 +86,7 @@ See [EXAMPLES](EXAMPLES.md) for more.
 Yes. SAIL provides four levels of APIs, depending on your needs: `junior`, `advanced`, `deep diver`, and `technical diver`.
 `junior` is your choice. See [EXAMPLES](EXAMPLES.md) for more.
 
-## I'd like to reorganize the standard SAIL folder layout on Windows (for standalone bundle)
+## I'd like to reorganize the standard SAIL folder layout on Windows (for standalone build or bundle)
 
 You can surely do that. However, with the standard layout SAIL detects the codecs' location automatically.
 If you reorganize the standard SAIL folder layout, you'll need to specify the new codecs' location by
@@ -125,16 +125,16 @@ Note for Unix platforms: the client application must be built with `-rdynamic` o
 to enable `dlopen` and `dlsym` on the same binary. If you use CMake, this could be achieved by
 setting `CMAKE_ENABLE_EXPORTS` to `ON`.
 
-### Standalone bundle compiled with SAIL_COMBINE_CODECS=ON on any platform
+### Standalone build/bundle compiled with SAIL_COMBINE_CODECS=ON
 
 Same to VCPKG port.
 
-### Windows (standalone bundle)
+### Windows (standalone build or bundle)
 1. `SAIL_CODECS_PATH` environment variable
 2. `<SAIL DEPLOYMENT FOLDER>\lib\sail\codecs`
 3. Hardcoded `SAIL_CODECS_PATH` in config.h
 
-### Unix including macOS (standalone bundle)
+### Unix including macOS (standalone build)
 1. `SAIL_CODECS_PATH` environment variable
 2. Hardcoded `SAIL_CODECS_PATH` in config.h
 
@@ -146,9 +146,9 @@ Additionally, `SAIL_MY_CODECS_PATH` environment variable is always searched so y
 
 Set the `SAIL_MY_CODECS_PATH` environment variable to the location of your custom SAIL codecs.
 
-On Windows, `sail.dll location` and `SAIL_MY_CODECS_PATH/lib` are the only places where codecs DLL dependencies are searched
-if SAIL is compiled as a standalone bundle. No other paths are searched. Use WIN32 API `AddDllDirectory` to add your own DLL
-dependencies search path. On other platforms, `SAIL_MY_CODECS_PATH/lib` is added to `LD_LIBRARY_PATH`.
+On Windows, `sail.dll location` and `SAIL_MY_CODECS_PATH/lib` are the only places where codecs DLL dependencies are searched.
+No other paths are searched. Use WIN32 API `AddDllDirectory` to add your own DLL dependencies search path.
+On other platforms, `SAIL_MY_CODECS_PATH/lib` is added to `LD_LIBRARY_PATH`.
 
 ## How many image formats do you plan to implement?
 

@@ -4,7 +4,9 @@ Consider [EXAMPLES](EXAMPLES.md) after building and installing.
 
 ### Terminology and build types
 
-**Standalone bundle** - manually compiled with `cmake` and respective build commands. This also includes native Linux packages.
+**Standalone build** - manually compiled with `cmake` and respective build commands. Extra dependencies like libjpeg ARE NOT included into the build. macOS brew package is a good example of a standalone build.
+
+**Standalone bundle** - manually compiled with `cmake` and respective build commands. Extra dependencies like libjpeg ARE included into the build.
 
 **VCPKG port** - installed with `vcpkg install sail`.
 
@@ -65,7 +67,7 @@ cmake --build . --config Release
 cmake --build . --config Release --target install
 ```
 
-### macOS (standalone bundle)
+### macOS (standalone build)
 
 #### Tested environments
 
@@ -84,7 +86,7 @@ Or
 brew upgrade sail
 ```
 
-### Linux (standalone bundle)
+### Linux (standalone build)
 
 #### Tested environments
 
