@@ -4,6 +4,7 @@ Table of Contents
 * [SAIL Frequently Asked Questions (FAQ)](#sail-frequently-asked-questions-faq)
   * [How old is SAIL?](#how-old-is-sail)
   * [Is SAIL cross\-platform?](#is-sail-cross-platform)
+  * [What's the preferred way of installation?](#whats-the-preferred-way-of-installation)
   * [Does SAIL support static linking?](#does-sail-support-static-linking)
   * [What are the competitors of SAIL?](#what-are-the-competitors-of-sail)
   * [Describe the high\-level APIs](#describe-the-high-level-apis)
@@ -49,6 +50,14 @@ Technically, SAIL (ksquirrel-libs) was founded in 2003 making it one of the olde
 
 Yes. It's written in pure C11 and is highly portable. However, only the Windows, macOS, and Linux platforms
 are currently supported. Pull requests to support more platforms are highly welcomed.
+
+## What's the preferred way of installation?
+
+- Windows: `vcpkg`
+- macOS: `brew`
+- Linux: native packages if available
+
+See [BUILDING](BUILDING.md).
 
 ## Does SAIL support static linking?
 
