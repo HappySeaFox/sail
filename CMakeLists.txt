@@ -235,13 +235,17 @@ endif()
 #
 install(FILES "${PROJECT_BINARY_DIR}/include/config.h" DESTINATION include/sail/sail-common)
 
-if (WIN32)
-    if (EXISTS "${PROJECT_SOURCE_DIR}/extra/B/bin")
-        install(DIRECTORY "${PROJECT_SOURCE_DIR}/extra/B/bin/" DESTINATION lib/sail/codecs/lib)
-    endif()
-else()
-    if (EXISTS "${PROJECT_SOURCE_DIR}/extra/B/lib")
-        install(DIRECTORY "${PROJECT_SOURCE_DIR}/extra/B/lib/" DESTINATION lib/sail/codecs/lib)
+# Install our bundled libs if they exist and when VCPKG is not used
+#
+if (NOT SAIL_VCPKG)
+    if (WIN32)
+        if (EXISTS "${PROJECT_SOURCE_DIR}/extra/B/bin")
+            install(DIRECTORY "${PROJECT_SOURCE_DIR}/extra/B/bin/" DESTINATION lib/sail/codecs/lib)
+        endif()
+    else()
+        if (EXISTS "${PROJECT_SOURCE_DIR}/extra/B/lib")
+            install(DIRECTORY "${PROJECT_SOURCE_DIR}/extra/B/lib/" DESTINATION lib/sail/codecs/lib)
+        endif()
     endif()
 endif()
 
