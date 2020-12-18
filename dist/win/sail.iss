@@ -1,7 +1,7 @@
 #define MyAppName "SAIL"
 #define MyAppPublisher "Dmitry Baryshev"
 #define MyAppURL "https://github.com/smoked-herring/sail"
-#define MyAppVersion "0.9.0@SAIL_DIST_VERSION_SUFFIX@"
+#define MyAppVersion "@PROJECT_VERSION@@SAIL_DIST_VERSION_SUFFIX@"
 
 [Setup]
 AppId={{62D4D6DD-890E-43CE-9CC9-FB6DE5023DE9}
