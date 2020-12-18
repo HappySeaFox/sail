@@ -113,7 +113,7 @@ sudo apt install ...
 # Compile SAIL
 mkdir build
 cd build
-cmake ..
+cmake -DCMAKE_BUILD_TYPE=Release ..
 make
 
 # Install
