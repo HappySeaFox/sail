@@ -4,7 +4,7 @@ set(SAIL_CODEC_INFO_SOURCES "")
 foreach(codec ${ENABLED_CODECS})
     get_target_property(CODEC_BINARY_DIR sail-codec-${codec} BINARY_DIR)
 
-    file(READ ${CODEC_BINARY_DIR}/sail-${codec}.codec.info SAIL_CODEC_INFO_CONTENTS)
+    file(READ ${CODEC_BINARY_DIR}/sail-codec-${codec}.codec.info SAIL_CODEC_INFO_CONTENTS)
     string(REPLACE "\"" "\\\"" SAIL_CODEC_INFO_CONTENTS "${SAIL_CODEC_INFO_CONTENTS}")
     # Add \n\ on every line
     string(REGEX REPLACE "\n" "\\\\n\\\\\n" SAIL_CODEC_INFO_CONTENTS "${SAIL_CODEC_INFO_CONTENTS}")
