@@ -4,10 +4,6 @@ project(SAIL VERSION 0.9.0
              DESCRIPTION "Squirrel Abstract Image Library"
              LANGUAGES C CXX)
 
-# Used only when SAIL_DEV is ON
-#
-set(SAIL_DEV_VERSION_SUFFIX "pre10")
-
 include(GNUInstallDirs)
 include(CheckIncludeFiles)
 include(CheckCSourceCompiles)
@@ -191,17 +187,6 @@ endif()
 
 configure_file("${PROJECT_SOURCE_DIR}/src/config.h.in" "${PROJECT_BINARY_DIR}/include/config.h" @ONLY)
 include_directories("${PROJECT_BINARY_DIR}/include")
-
-# Version suffix for pre-release versions used in dist utils to build installers
-#
-if (SAIL_DEV)
-    set(SAIL_DIST_VERSION_SUFFIX "-${SAIL_DEV_VERSION_SUFFIX}")
-endif()
-
-# INNO Setup
-#
-configure_file("${PROJECT_SOURCE_DIR}/LICENSE.txt" "${PROJECT_BINARY_DIR}/LICENSE.txt" COPYONLY)
-configure_file("${PROJECT_SOURCE_DIR}/dist/win/sail.iss" "${PROJECT_BINARY_DIR}/sail.iss" @ONLY)
 
 # Configure subdirs
 #
