@@ -96,12 +96,6 @@ if (WIN32 AND NOT SAIL_VCPKG)
     set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${PROJECT_SOURCE_DIR}/extra/B)
 endif()
 
-# TODO Move to a Debian patch
-# Set arch-specific include/lib dirs
-#
-#set(CMAKE_INSTALL_INCLUDEDIR "include/${CMAKE_LIBRARY_ARCHITECTURE}")
-#set(CMAKE_INSTALL_LIBDIR "lib/${CMAKE_LIBRARY_ARCHITECTURE}")
-
 # Enable strict C11
 #
 set(CMAKE_C_STANDARD 11)
