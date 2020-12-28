@@ -7,6 +7,8 @@ macro(sail_find_dependencies)
 
     set(sail_jpeg_include_dirs ${JPEG_INCLUDE_DIR})
     set(sail_jpeg_libs ${JPEG_LIBRARIES})
+
+    set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "JPEG,JPEG::JPEG" PARENT_SCOPE)
 endmacro()
 
 macro(sail_codec_post_add)

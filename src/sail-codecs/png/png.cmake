@@ -7,6 +7,8 @@ macro(sail_find_dependencies)
 
     set(sail_png_include_dirs ${PNG_INCLUDE_DIRS})
     set(sail_png_libs ${PNG_LIBRARIES})
+
+    set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "PNG,PNG::PNG" PARENT_SCOPE)
 endmacro()
 
 macro(sail_codec_post_add)

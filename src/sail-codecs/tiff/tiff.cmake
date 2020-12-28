@@ -7,6 +7,8 @@ macro(sail_find_dependencies)
 
     set(sail_tiff_include_dirs ${TIFF_INCLUDE_DIRS})
     set(sail_tiff_libs ${TIFF_LIBRARIES})
+
+    set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "TIFF,TIFF::TIFF" PARENT_SCOPE)
 endmacro()
 
 macro(sail_codec_post_add)
