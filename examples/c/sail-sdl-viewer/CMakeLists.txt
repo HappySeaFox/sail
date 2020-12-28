@@ -9,6 +9,15 @@ if (SAIL_VCPKG)
         target_link_libraries(sail-sdl-viewer PRIVATE SDL2::SDL2 SDL2::SDL2main)
     endif()
 else()
+    # On OSX and brew, SDL2_INCLUDE_DIRS points to .../SDL2 which makes impossible
+    # inclusion of SDL2/SDL.h. For some reason, /usr/local/include is not included
+    # into the search paths, so we do it explicitly.
+    #
+    if (APPLE)
+        find_path(SAIL_SDL2_INCLUDE_DIR NAMES SDL2/SDL.h)
+        target_include_directories(sail-sdl-viewer PRIVATE ${SAIL_SDL2_INCLUDE_DIR})
+    endif()
+
     target_include_directories(sail-sdl-viewer PRIVATE ${SDL2_INCLUDE_DIRS})
     target_link_libraries(sail-sdl-viewer PRIVATE ${SDL2_LIBRARIES})
 endif()
