@@ -7,6 +7,7 @@ project(SAIL VERSION 0.9.0
 include(GNUInstallDirs)
 include(CheckIncludeFiles)
 include(CheckCSourceCompiles)
+include(CheckCSourceRuns)
 include(CMakeDependentOption)
 include(CMakePushCheckState)
 
@@ -94,6 +95,13 @@ set(SAIL_MAGIC_BUFFER_SIZE 16)
 #
 if (WIN32 AND NOT SAIL_VCPKG)
     set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${PROJECT_SOURCE_DIR}/extra/B)
+
+    # For check_c_source_runs() we need to update PATH
+    # so checks are able to find bundled libs
+    #
+    set(EXTRA_LIBS "${PROJECT_SOURCE_DIR}/extra/B/bin")
+    string(REPLACE "/" "\\" EXTRA_LIBS "${EXTRA_LIBS}")
+    set(ENV{PATH} "$ENV{PATH};${EXTRA_LIBS}")
 endif()
 
 # Enable strict C11

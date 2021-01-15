@@ -67,12 +67,6 @@ macro(sail_codec)
     #
     set(TARGET sail-codec-${SAIL_CODEC_NAME})
 
-    # Generate and copy .codec.info into the build dir
-    #
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${SAIL_CODEC_NAME}.codec.info.in
-                   ${CMAKE_CURRENT_BINARY_DIR}/sail-codec-${SAIL_CODEC_NAME}.codec.info
-                   @ONLY)
-
     # Add a codec
     #
     if (SAIL_COMBINE_CODECS)
@@ -102,6 +96,12 @@ macro(sail_codec)
     target_compile_options(${TARGET}     PRIVATE ${sail_${SAIL_CODEC_NAME}_cflags})
     target_include_directories(${TARGET} PRIVATE ${sail_${SAIL_CODEC_NAME}_include_dirs})
     target_link_libraries(${TARGET}      PRIVATE ${sail_${SAIL_CODEC_NAME}_libs})
+
+    # Generate and copy .codec.info into the build dir
+    #
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${SAIL_CODEC_NAME}.codec.info.in
+                   ${CMAKE_CURRENT_BINARY_DIR}/sail-codec-${SAIL_CODEC_NAME}.codec.info
+                   @ONLY)
 
     # Installation
     #

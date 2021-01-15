@@ -12,32 +12,97 @@ macro(sail_find_dependencies)
 endmacro()
 
 macro(sail_codec_post_add)
-    cmake_push_check_state(RESET)
-        set(CMAKE_REQUIRED_INCLUDES ${sail_tiff_include_dirs})
+    set(TIFF_CODECS ADOBE_DEFLATE CCITTRLE CCITTRLEW CCITT_T4 CCITT_T6 DCS DEFLATE IT8BL IT8CTPAD IT8LW
+                    IT8MP JBIG JPEG JP2000 LERC LZMA LZW NEXT NONE OJPEG PACKBITS PIXARFILM PIXARLOG
+                    SGILOG24 SGILOG T43 T85 THUNDERSCAN WEBP ZSTD)
 
-        check_c_source_compiles(
+    foreach (tiff_codec IN LISTS TIFF_CODECS)
+        # Check compression definitions
+        #
+        cmake_push_check_state(RESET)
+            set(CMAKE_REQUIRED_INCLUDES ${sail_tiff_include_dirs})
+
+            check_c_source_compiles(
+                "
+                #include <tiff.h>
+
+                int main(int argc, char *argv[]) {
+                    int compression = COMPRESSION_${tiff_codec};
+                    return 0;
+                }
             "
-            #include <tiff.h>
+            HAVE_TIFF_${tiff_codec}
+            )
+        cmake_pop_check_state()
 
-            int main(int argc, char *argv[]) {
-                int compression = COMPRESSION_WEBP;
-                return 0;
-            }
-        "
-        HAVE_TIFF_41
-        )
-    cmake_pop_check_state()
-
-    if (HAVE_TIFF_41)
-        # We compile libtiff w/o WEBP support on Windows
-        if (WIN32)
-            set(CODEC_INFO_COMPRESSIONS_41 "ZSTD")
-        else()
-            set(CODEC_INFO_COMPRESSIONS_41 "WEBP;ZSTD")
+        if (HAVE_TIFF_${tiff_codec})
+            target_compile_definitions(${TARGET} PRIVATE HAVE_TIFF_${tiff_codec})
         endif()
-    endif()
 
-    if (HAVE_TIFF_41)
-        target_compile_definitions(${TARGET} PRIVATE HAVE_TIFF_41)
+        # Check if we can actually write defined compressions
+        #
+        cmake_push_check_state(RESET)
+            set(CMAKE_REQUIRED_INCLUDES ${sail_tiff_include_dirs})
+            set(CMAKE_REQUIRED_LIBRARIES ${sail_tiff_libs})
+
+            check_c_source_runs(
+                "
+                #include <stdlib.h>
+                #include <string.h>
+                #include <tiffio.h>
+
+                int main(int argc, char *argv[]) {
+
+                    TIFF *tiff = TIFFOpen(\"file.tiff\", \"w\");
+
+                    if (tiff == NULL) {
+                        return 1;
+                    }
+
+                    TIFFSetField(tiff, TIFFTAG_IMAGEWIDTH,  1);
+                    TIFFSetField(tiff, TIFFTAG_IMAGELENGTH, 1);
+                    TIFFSetField(tiff, TIFFTAG_ORIENTATION, ORIENTATION_TOPLEFT);
+                    TIFFSetField(tiff, TIFFTAG_SAMPLESPERPIXEL, 4);
+                    TIFFSetField(tiff, TIFFTAG_BITSPERSAMPLE, 8);
+                    TIFFSetField(tiff, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
+                    TIFFSetField(tiff, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_RGB);
+                    TIFFSetField(tiff, TIFFTAG_COMPRESSION, COMPRESSION_${tiff_codec});
+                    TIFFSetField(tiff, TIFFTAG_ROWSPERSTRIP, TIFFDefaultStripSize(tiff, (uint32)-1));
+
+                    unsigned char *scan = malloc(4);
+                    memset(scan, 255, 4);
+
+                    if (TIFFWriteScanline(tiff, scan, 0, 0) < 0) {
+                        return 2;
+                    }
+
+                    TIFFClose(tiff);
+
+                    free(scan);
+
+                    return 0;
+                }
+            "
+            HAVE_TIFF_WRITE_${tiff_codec}
+            )
+        cmake_pop_check_state()
+
+        if (HAVE_TIFF_WRITE_${tiff_codec})
+            # ADOBE_DEFLATE -> ADOBE-DEFLATE
+            # JP2000 -> JPEG2000
+            string(REPLACE "_" "-" tiff_codec_fixed ${tiff_codec})
+            string(REPLACE "JP2000" "JPEG2000" tiff_codec_fixed ${tiff_codec_fixed})
+            list(APPEND CODEC_INFO_COMPRESSIONS ${tiff_codec_fixed})
+
+            target_compile_definitions(${TARGET} PRIVATE HAVE_TIFF_WRITE_${tiff_codec})
+        endif()
+    endforeach()
+
+    # Default compression
+    #
+    if (JPEG IN_LIST CODEC_INFO_COMPRESSIONS)
+        set(CODEC_INFO_DEFAULT_COMPRESSION JPEG)
+    else()
+        set(CODEC_INFO_DEFAULT_COMPRESSION NONE)
     endif()
 endmacro()

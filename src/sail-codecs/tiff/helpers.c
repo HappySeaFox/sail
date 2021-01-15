@@ -78,40 +78,94 @@ sail_status_t tiff_private_supported_read_output_pixel_format(enum SailPixelForm
 enum SailCompression tiff_private_compression_to_sail_compression(int compression) {
 
     switch (compression) {
+#ifdef HAVE_TIFF_ADOBE_DEFLATE
         case COMPRESSION_ADOBE_DEFLATE: return SAIL_COMPRESSION_ADOBE_DEFLATE;
+#endif
+#ifdef HAVE_TIFF_CCITTRLE
         case COMPRESSION_CCITTRLE:      return SAIL_COMPRESSION_CCITT_RLE;
+#endif
+#ifdef HAVE_TIFF_CCITTRLEW
         case COMPRESSION_CCITTRLEW:     return SAIL_COMPRESSION_CCITT_RLEW;
+#endif
+#ifdef HAVE_TIFF_CCITT_T4
         case COMPRESSION_CCITT_T4:      return SAIL_COMPRESSION_CCITT_T4;
+#endif
+#ifdef HAVE_TIFF_CCITT_T6
         case COMPRESSION_CCITT_T6:      return SAIL_COMPRESSION_CCITT_T6;
+#endif
+#ifdef HAVE_TIFF_DCS
         case COMPRESSION_DCS:           return SAIL_COMPRESSION_DCS;
+#endif
+#ifdef HAVE_TIFF_DEFLATE
         case COMPRESSION_DEFLATE:       return SAIL_COMPRESSION_DEFLATE;
+#endif
+#ifdef HAVE_TIFF_IT8BL
         case COMPRESSION_IT8BL:         return SAIL_COMPRESSION_IT8_BL;
+#endif
+#ifdef HAVE_TIFF_IT8CTPAD
         case COMPRESSION_IT8CTPAD:      return SAIL_COMPRESSION_IT8_CTPAD;
+#endif
+#ifdef HAVE_TIFF_IT8LW
         case COMPRESSION_IT8LW:         return SAIL_COMPRESSION_IT8_LW;
+#endif
+#ifdef HAVE_TIFF_IT8MP
         case COMPRESSION_IT8MP:         return SAIL_COMPRESSION_IT8_MP;
+#endif
+#ifdef HAVE_TIFF_JBIG
         case COMPRESSION_JBIG:          return SAIL_COMPRESSION_JBIG;
+#endif
+#ifdef HAVE_TIFF_JPEG
         case COMPRESSION_JPEG:          return SAIL_COMPRESSION_JPEG;
+#endif
+#ifdef HAVE_TIFF_JP2000
         case COMPRESSION_JP2000:        return SAIL_COMPRESSION_JPEG2000;
-#ifdef HAVE_TIFF_41
+#endif
+#ifdef HAVE_TIFF_LERC
         case COMPRESSION_LERC:          return SAIL_COMPRESSION_LERC;
 #endif
+#ifdef HAVE_TIFF_LZMA
         case COMPRESSION_LZMA:          return SAIL_COMPRESSION_LZMA;
+#endif
+#ifdef HAVE_TIFF_LZW
         case COMPRESSION_LZW:           return SAIL_COMPRESSION_LZW;
+#endif
+#ifdef HAVE_TIFF_NEXT
         case COMPRESSION_NEXT:          return SAIL_COMPRESSION_NEXT;
+#endif
+#ifdef HAVE_TIFF_NONE
         case COMPRESSION_NONE:          return SAIL_COMPRESSION_NONE;
+#endif
+#ifdef HAVE_TIFF_OJPEG
         case COMPRESSION_OJPEG:         return SAIL_COMPRESSION_OJPEG;
+#endif
+#ifdef HAVE_TIFF_PACKBITS
         case COMPRESSION_PACKBITS:      return SAIL_COMPRESSION_PACKBITS;
+#endif
+#ifdef HAVE_TIFF_PIXARFILM
         case COMPRESSION_PIXARFILM:     return SAIL_COMPRESSION_PIXAR_FILM;
+#endif
+#ifdef HAVE_TIFF_PIXARLOG
         case COMPRESSION_PIXARLOG:      return SAIL_COMPRESSION_PIXAR_LOG;
+#endif
+#ifdef HAVE_TIFF_SGILOG24
         case COMPRESSION_SGILOG24:      return SAIL_COMPRESSION_RLE;
+#endif
+#ifdef HAVE_TIFF_SGILOG
         case COMPRESSION_SGILOG:        return SAIL_COMPRESSION_SGI_LOG;
+#endif
+#ifdef HAVE_TIFF_T43
         case COMPRESSION_T43:           return SAIL_COMPRESSION_SGI_LOG24;
+#endif
+#ifdef HAVE_TIFF_T85
         case COMPRESSION_T85:           return SAIL_COMPRESSION_T43;
+#endif
+#ifdef HAVE_TIFF_THUNDERSCAN
         case COMPRESSION_THUNDERSCAN:   return SAIL_COMPRESSION_THUNDERSCAN;
-#if defined HAVE_TIFF_41 && !defined SAIL_WIN32
+#endif
+#ifdef HAVE_TIFF_WEBP
         case COMPRESSION_WEBP:          return SAIL_COMPRESSION_WEBP;
 #endif
-#ifdef HAVE_TIFF_41
+#ifdef HAVE_TIFF_ZSTD
         case COMPRESSION_ZSTD:          return SAIL_COMPRESSION_ZSTD;
 #endif
 
@@ -126,18 +180,95 @@ sail_status_t tiff_private_sail_compression_to_compression(enum SailCompression 
     SAIL_CHECK_PTR(tiff_compression);
 
     switch (compression) {
+#ifdef HAVE_TIFF_WRITE_ADOBE_DEFLATE
         case SAIL_COMPRESSION_ADOBE_DEFLATE: *tiff_compression = COMPRESSION_ADOBE_DEFLATE; return SAIL_OK;
-        case SAIL_COMPRESSION_DEFLATE:       *tiff_compression = COMPRESSION_DEFLATE;       return SAIL_OK;
-        case SAIL_COMPRESSION_JPEG:          *tiff_compression = COMPRESSION_JPEG;          return SAIL_OK;
-        case SAIL_COMPRESSION_LZW:           *tiff_compression = COMPRESSION_LZW;           return SAIL_OK;
-        case SAIL_COMPRESSION_NONE:          *tiff_compression = COMPRESSION_NONE;          return SAIL_OK;
-        case SAIL_COMPRESSION_PACKBITS:      *tiff_compression = COMPRESSION_PACKBITS;      return SAIL_OK;
-        case SAIL_COMPRESSION_PIXAR_LOG:     *tiff_compression = COMPRESSION_PIXARLOG;      return SAIL_OK;
-#ifdef HAVE_TIFF_41
-#if !defined SAIL_WIN32
-        case SAIL_COMPRESSION_WEBP:          *tiff_compression = COMPRESSION_WEBP;          return SAIL_OK;
 #endif
-        case SAIL_COMPRESSION_ZSTD:          *tiff_compression = COMPRESSION_ZSTD;          return SAIL_OK;
+#ifdef HAVE_TIFF_WRITE_CCITTRLE
+        case SAIL_COMPRESSION_CCITT_RLE:     *tiff_compression = COMPRESSION_CCITTRLE;     return SAIL_OK;
+#endif
+#ifdef HAVE_TIFF_WRITE_CCITTRLEW
+        case SAIL_COMPRESSION_CCITT_RLEW:    *tiff_compression = COMPRESSION_CCITTRLEW;    return SAIL_OK;
+#endif
+#ifdef HAVE_TIFF_WRITE_CCITT_T4
+        case SAIL_COMPRESSION_CCITT_T4:      *tiff_compression = COMPRESSION_CCITT_T4;     return SAIL_OK;
+#endif
+#ifdef HAVE_TIFF_WRITE_CCITT_T6
+        case SAIL_COMPRESSION_CCITT_T6:      *tiff_compression = COMPRESSION_CCITT_T6;     return SAIL_OK;
+#endif
+#ifdef HAVE_TIFF_WRITE_DCS
+        case SAIL_COMPRESSION_DCS:           *tiff_compression = COMPRESSION_DCS;          return SAIL_OK;
+#endif
+#ifdef HAVE_TIFF_WRITE_DEFLATE
+        case SAIL_COMPRESSION_DEFLATE:       *tiff_compression = COMPRESSION_DEFLATE;      return SAIL_OK;
+#endif
+#ifdef HAVE_TIFF_WRITE_IT8BL
+        case SAIL_COMPRESSION_IT8_BL:        *tiff_compression = COMPRESSION_IT8BL;        return SAIL_OK;
+#endif
+#ifdef HAVE_TIFF_WRITE_IT8CTPAD
+        case SAIL_COMPRESSION_IT8_CTPAD:     *tiff_compression = COMPRESSION_IT8CTPAD;     return SAIL_OK;
+#endif
+#ifdef HAVE_TIFF_WRITE_IT8LW
+        case SAIL_COMPRESSION_IT8_LW:        *tiff_compression = COMPRESSION_IT8LW;        return SAIL_OK;
+#endif
+#ifdef HAVE_TIFF_WRITE_IT8MP
+        case SAIL_COMPRESSION_IT8_MP:        *tiff_compression = COMPRESSION_IT8MP;        return SAIL_OK;
+#endif
+#ifdef HAVE_TIFF_WRITE_JBIG
+        case SAIL_COMPRESSION_JBIG:          *tiff_compression = COMPRESSION_JBIG;         return SAIL_OK;
+#endif
+#ifdef HAVE_TIFF_WRITE_JPEG
+        case SAIL_COMPRESSION_JPEG:          *tiff_compression = COMPRESSION_JPEG;         return SAIL_OK;
+#endif
+#ifdef HAVE_TIFF_WRITE_JP2000
+        case SAIL_COMPRESSION_JPEG2000:      *tiff_compression = COMPRESSION_JP2000;       return SAIL_OK;
+#endif
+#ifdef HAVE_TIFF_WRITE_LERC
+        case SAIL_COMPRESSION_LERC:          *tiff_compression = COMPRESSION_LERC;         return SAIL_OK;
+#endif
+#ifdef HAVE_TIFF_WRITE_LZMA
+        case SAIL_COMPRESSION_LZMA:          *tiff_compression = COMPRESSION_LZMA;         return SAIL_OK;
+#endif
+#ifdef HAVE_TIFF_WRITE_LZW
+        case SAIL_COMPRESSION_LZW:           *tiff_compression = COMPRESSION_LZW;          return SAIL_OK;
+#endif
+#ifdef HAVE_TIFF_WRITE_NEXT
+        case SAIL_COMPRESSION_NEXT:          *tiff_compression = COMPRESSION_NEXT;         return SAIL_OK;
+#endif
+#ifdef HAVE_TIFF_WRITE_NONE
+        case SAIL_COMPRESSION_NONE:          *tiff_compression = COMPRESSION_NONE;         return SAIL_OK;
+#endif
+#ifdef HAVE_TIFF_WRITE_OJPEG
+        case SAIL_COMPRESSION_OJPEG:         *tiff_compression = COMPRESSION_OJPEG;        return SAIL_OK;
+#endif
+#ifdef HAVE_TIFF_WRITE_PACKBITS
+        case SAIL_COMPRESSION_PACKBITS:      *tiff_compression = COMPRESSION_PACKBITS;     return SAIL_OK;
+#endif
+#ifdef HAVE_TIFF_WRITE_PIXARFILM
+        case SAIL_COMPRESSION_PIXAR_FILM:    *tiff_compression = COMPRESSION_PIXARFILM;    return SAIL_OK;
+#endif
+#ifdef HAVE_TIFF_WRITE_PIXARLOG
+        case SAIL_COMPRESSION_PIXAR_LOG:     *tiff_compression = COMPRESSION_PIXARLOG;     return SAIL_OK;
+#endif
+#ifdef HAVE_TIFF_WRITE_SGILOG24
+        case SAIL_COMPRESSION_RLE:           *tiff_compression = COMPRESSION_SGILOG24;     return SAIL_OK;
+#endif
+#ifdef HAVE_TIFF_WRITE_SGILOG
+        case SAIL_COMPRESSION_SGI_LOG:       *tiff_compression = COMPRESSION_SGILOG;       return SAIL_OK;
+#endif
+#ifdef HAVE_TIFF_WRITE_T43
+        case SAIL_COMPRESSION_SGI_LOG24:     *tiff_compression = COMPRESSION_T43;          return SAIL_OK;
+#endif
+#ifdef HAVE_TIFF_WRITE_T85
+        case SAIL_COMPRESSION_T43:           *tiff_compression = COMPRESSION_T85;          return SAIL_OK;
+#endif
+#ifdef HAVE_TIFF_WRITE_THUNDERSCAN
+        case SAIL_COMPRESSION_THUNDERSCAN:   *tiff_compression = COMPRESSION_THUNDERSCAN;  return SAIL_OK;
+#endif
+#ifdef HAVE_TIFF_WRITE_WEBP
+        case SAIL_COMPRESSION_WEBP:          *tiff_compression = COMPRESSION_WEBP;         return SAIL_OK;
+#endif
+#ifdef HAVE_TIFF_WRITE_ZSTD
+        case SAIL_COMPRESSION_ZSTD:          *tiff_compression = COMPRESSION_ZSTD;         return SAIL_OK;
 #endif
 
         default: {
