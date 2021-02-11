@@ -56,6 +56,17 @@ public:
         }
     }
 
+    void reset_pixels()
+    {
+        if (!shallow_pixels) {
+            sail_free(pixels);
+        }
+
+        pixels         = nullptr;
+        pixels_size    = 0;
+        shallow_pixels = false;
+    }
+
     unsigned width;
     unsigned height;
     unsigned bytes_per_line;
@@ -271,11 +282,7 @@ image& image::with_pixels(const void *pixels)
 
 image& image::with_pixels(const void *pixels, unsigned pixels_size)
 {
-    sail_free(d->pixels);
-
-    d->pixels         = nullptr;
-    d->pixels_size    = 0;
-    d->shallow_pixels = false;
+    d->reset_pixels();
 
     if (pixels == nullptr || pixels_size == 0) {
         return *this;
@@ -284,9 +291,9 @@ image& image::with_pixels(const void *pixels, unsigned pixels_size)
     SAIL_TRY_OR_EXECUTE(sail_malloc(pixels_size, &d->pixels),
                         /* on error */ return *this);
 
-    d->pixels_size = pixels_size;
-
     memcpy(d->pixels, pixels, pixels_size);
+    d->pixels_size    = pixels_size;
+    d->shallow_pixels = false;
 
     return *this;
 }
@@ -303,14 +310,9 @@ image& image::with_shallow_pixels(void *pixels)
 
 image& image::with_shallow_pixels(void *pixels, unsigned pixels_size)
 {
-    sail_free(d->pixels);
+    d->reset_pixels();
 
-    d->pixels         = nullptr;
-    d->pixels_size    = 0;
-    d->shallow_pixels = false;
-
-    if (pixels == nullptr) {
-        SAIL_LOG_ERROR("Not assigning invalid pixels. pixels pointer: %p", pixels);
+    if (pixels == nullptr || pixels_size == 0) {
         return *this;
     }
 
