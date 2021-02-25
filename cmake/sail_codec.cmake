@@ -23,12 +23,6 @@ macro(sail_codec)
         include(${SAIL_CODEC_CMAKE})
     endif()
 
-    # Check dependencies
-    #
-	if (NOT SAIL_CODEC_CMAKE AND NOT SAIL_CODEC_SYSTEM_HEADERS AND NOT SAIL_CODEC_SYSTEM_LIBS)
-		message(FATAL_ERROR "Use CMAKE or SYSTEM_HEADERS SYSTEM_LIBS arguments to search dependencies")
-	endif()
-
 	foreach(header ${SAIL_CODEC_SYSTEM_HEADERS})
 		find_path(sail_include_dir_${header} ${header})
 
