@@ -28,13 +28,21 @@
 #include "sail-common.h"
 #include "sail.h"
 
-sail_status_t io_noop_read(void *stream, void *buf, size_t object_size, size_t objects_count, size_t *read_objects_count) {
+sail_status_t io_noop_tolerant_read(void *stream, void *buf, size_t size_to_read, size_t *read_size) {
 
     (void)stream;
     (void)buf;
-    (void)object_size;
-    (void)objects_count;
-    (void)read_objects_count;
+    (void)size_to_read;
+    (void)read_size;
+
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
+}
+
+sail_status_t io_noop_strict_read(void *stream, void *buf, size_t size_to_read) {
+
+    (void)stream;
+    (void)buf;
+    (void)size_to_read;
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
@@ -56,13 +64,21 @@ sail_status_t io_noop_tell(void *stream, size_t *offset) {
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-sail_status_t io_noop_write(void *stream, const void *buf, size_t object_size, size_t objects_count, size_t *written_objects_count) {
+sail_status_t io_noop_tolerant_write(void *stream, const void *buf, size_t size_to_write, size_t *written_size) {
 
     (void)stream;
     (void)buf;
-    (void)object_size;
-    (void)objects_count;
-    (void)written_objects_count;
+    (void)size_to_write;
+    (void)written_size;
+
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
+}
+
+sail_status_t io_noop_strict_write(void *stream, const void *buf, size_t size_to_write) {
+
+    (void)stream;
+    (void)buf;
+    (void)size_to_write;
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }

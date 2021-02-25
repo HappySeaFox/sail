@@ -78,10 +78,9 @@ static boolean empty_output_buffer(j_compress_ptr cinfo)
 {
     struct sail_jpeg_destination_mgr *dest = (struct sail_jpeg_destination_mgr *)cinfo->dest;
 
-    size_t written;
-    sail_status_t err = dest->io->write(dest->io->stream, dest->buffer, 1, OUTPUT_BUF_SIZE, &written);
+    sail_status_t err = dest->io->strict_write(dest->io->stream, dest->buffer, OUTPUT_BUF_SIZE);
 
-    if (err != SAIL_OK || written != (size_t)OUTPUT_BUF_SIZE)
+    if (err != SAIL_OK)
         ERREXIT(cinfo, JERR_FILE_WRITE);
 
     dest->pub.next_output_byte = dest->buffer;
@@ -105,10 +104,9 @@ static void term_destination(j_compress_ptr cinfo)
 
     /* Write any data remaining in the buffer */
     if (datacount > 0) {
-        size_t written;
-        sail_status_t err = dest->io->write(dest->io->stream, dest->buffer, 1, datacount, &written);
+        sail_status_t err = dest->io->strict_write(dest->io->stream, dest->buffer, datacount);
 
-        if (err != SAIL_OK || written != datacount)
+        if (err != SAIL_OK)
             ERREXIT(cinfo, JERR_FILE_WRITE);
     }
 

@@ -60,10 +60,12 @@ public:
 
     io& with_id(uint64_t id);
     io& with_stream(void *stream);
-    io& with_read(sail_io_read_t read);
+    io& with_tolerant_read(sail_io_tolerant_read_t read);
+    io& with_strict_read(sail_io_strict_read_t read);
     io& with_seek(sail_io_seek_t seek);
     io& with_tell(sail_io_tell_t tell);
-    io& with_write(sail_io_write_t write);
+    io& with_tolerant_write(sail_io_tolerant_write_t write);
+    io& with_strict_write(sail_io_strict_write_t write);
     io& with_flush(sail_io_flush_t flush);
     io& with_close(sail_io_close_t close);
     io& with_eof(sail_io_eof_t eof);

@@ -48,15 +48,17 @@ public:
 
 void io::pimpl::empty_sail_io()
 {
-    sail_io.id     = 0;
-    sail_io.stream = nullptr;
-    sail_io.read   = nullptr;
-    sail_io.seek   = nullptr;
-    sail_io.tell   = nullptr;
-    sail_io.write  = nullptr;
-    sail_io.flush  = nullptr;
-    sail_io.close  = nullptr;
-    sail_io.eof    = nullptr;
+    sail_io.id             = 0;
+    sail_io.stream         = nullptr;
+    sail_io.tolerant_read  = nullptr;
+    sail_io.strict_read    = nullptr;
+    sail_io.seek           = nullptr;
+    sail_io.tell           = nullptr;
+    sail_io.tolerant_write = nullptr;
+    sail_io.strict_write   = nullptr;
+    sail_io.flush          = nullptr;
+    sail_io.close          = nullptr;
+    sail_io.eof            = nullptr;
 }
 
 io::io()
@@ -119,9 +121,15 @@ io& io::with_stream(void *stream)
     return *this;
 }
 
-io& io::with_read(sail_io_read_t read)
+io& io::with_tolerant_read(sail_io_tolerant_read_t read)
 {
-    d->sail_io.read = read;
+    d->sail_io.tolerant_read = read;
+    return *this;
+}
+
+io& io::with_strict_read(sail_io_strict_read_t read)
+{
+    d->sail_io.strict_read = read;
     return *this;
 }
 
@@ -137,9 +145,15 @@ io& io::with_tell(sail_io_tell_t tell)
     return *this;
 }
 
-io& io::with_write(sail_io_write_t write)
+io& io::with_tolerant_write(sail_io_tolerant_write_t write)
 {
-    d->sail_io.write = write;
+    d->sail_io.tolerant_write = write;
+    return *this;
+}
+
+io& io::with_strict_write(sail_io_strict_write_t write)
+{
+    d->sail_io.strict_write = write;
     return *this;
 }
 

@@ -37,15 +37,17 @@ sail_status_t sail_alloc_io(struct sail_io **io) {
     SAIL_TRY(sail_malloc(sizeof(struct sail_io), &ptr));
     *io = ptr;
 
-    (*io)->id     = 0;
-    (*io)->stream = NULL;
-    (*io)->read   = NULL;
-    (*io)->seek   = NULL;
-    (*io)->tell   = NULL;
-    (*io)->write  = NULL;
-    (*io)->flush  = NULL;
-    (*io)->close  = NULL;
-    (*io)->eof    = NULL;
+    (*io)->id             = 0;
+    (*io)->stream         = NULL;
+    (*io)->tolerant_read  = NULL;
+    (*io)->strict_read    = NULL;
+    (*io)->seek           = NULL;
+    (*io)->tell           = NULL;
+    (*io)->tolerant_write = NULL;
+    (*io)->strict_write   = NULL;
+    (*io)->flush          = NULL;
+    (*io)->close          = NULL;
+    (*io)->eof            = NULL;
 
     return SAIL_OK;
 }

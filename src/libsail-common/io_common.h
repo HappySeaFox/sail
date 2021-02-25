@@ -42,12 +42,76 @@
 extern "C" {
 #endif
 
-typedef sail_status_t (*sail_io_read_t)(void *stream, void *buf, size_t object_size, size_t objects_count, size_t *read_objects_count);
+/*
+ * Reads from the underlying I/O object into the specified buffer. In contrast to sail_io_strict_read_t,
+ * doesn't fail when the actual number of bytes read is smaller than requested.
+ * Assigns the number of bytes actually read to read_size.
+ *
+ * Returns SAIL_OK on success.
+ */
+typedef sail_status_t (*sail_io_tolerant_read_t)(void *stream, void *buf, size_t size_to_read, size_t *read_size);
+
+/*
+ * Reads from the underlying I/O object into the specified buffer. In contrast to sail_io_tolerant_read_t,
+ * fails when the actual number of bytes read is smaller than requested.
+ *
+ * Returns SAIL_OK on success.
+ */
+typedef sail_status_t (*sail_io_strict_read_t)(void *stream, void *buf, size_t size_to_read);
+
+/*
+ * Sets the I/O position in the underlying I/O object.
+ *
+ * whence possible values: SEEK_SET, SEEK_CUR, or SEEK_END declared in <stdio.h>.
+ *
+ * Returns SAIL_OK on success.
+ */
 typedef sail_status_t (*sail_io_seek_t)(void *stream, long offset, int whence);
+
+/*
+ * Assigns the current I/O position in the underlying I/O object.
+ *
+ * Returns SAIL_OK on success.
+ */
 typedef sail_status_t (*sail_io_tell_t)(void *stream, size_t *offset);
-typedef sail_status_t (*sail_io_write_t)(void *stream, const void *buf, size_t object_size, size_t objects_count, size_t *written_objects_count);
+
+/*
+ * Writes the specified buffer to the underlying I/O object. In contrast to sail_io_strict_write_t,
+ * doesn't fail when the actual number of bytes written is smaller than requested.
+ * Assigns the number of bytes actually written to written_size.
+ *
+ * Returns SAIL_OK on success.
+ */
+typedef sail_status_t (*sail_io_tolerant_write_t)(void *stream, const void *buf, size_t size_to_write, size_t *written_size);
+
+/*
+ * Writes the specified buffer to the underlying I/O object. In contrast to sail_io_tolerant_write_t,
+ * fails when the actual number of bytes written is smaller than requested.
+ *
+ * Returns SAIL_OK on success.
+ */
+typedef sail_status_t (*sail_io_strict_write_t)(void *stream, const void *buf, size_t size_to_write);
+
+/*
+ * Flushes buffers of the underlying I/O object. Has no effect if the underlying I/O object
+ * is opened for reading.
+ *
+ * Returns SAIL_OK on success.
+ */
 typedef sail_status_t (*sail_io_flush_t)(void *stream);
+
+/*
+ * Closes the underlying I/O object.
+ *
+ * Returns SAIL_OK on success.
+ */
 typedef sail_status_t (*sail_io_close_t)(void *stream);
+
+/*
+ * Assigns true to the specified result if the underlying I/O object reached the end-of-file indicator.
+ *
+ * Returns SAIL_OK on success.
+ */
 typedef sail_status_t (*sail_io_eof_t)(void *stream, bool *result);
 
 /*
@@ -84,56 +148,47 @@ struct sail_io {
     void *stream;
 
     /*
-     * Reads from the underlying I/O object into the specified buffer. Assigns the number of objects
-     * actually read to read_objects_count.
-     *
-     * Returns SAIL_OK on success.
+     * Tolerant read callback.
      */
-    sail_io_read_t read;
+    sail_io_tolerant_read_t tolerant_read;
 
     /*
-     * Sets the I/O position in the underlying I/O object.
-     *
-     * whence possible values: SEEK_SET, SEEK_CUR, or SEEK_END declared in <stdio.h>.
-     *
-     * Returns SAIL_OK on success.
+     * Strict read callback.
+     */
+    sail_io_strict_read_t strict_read;
+
+    /*
+     * Seek callback.
      */
     sail_io_seek_t seek;
 
     /*
-     * Assigns the current I/O position in the underlying I/O object.
-     *
-     * Returns SAIL_OK on success.
+     * Tell callback.
      */
     sail_io_tell_t tell;
 
     /*
-     * Writes the specified buffer to the underlying I/O object. Assigns the number of objects
-     * actually written to written_objects_count.
-     *
-     * Returns SAIL_OK on success.
+     * Tolerant write callback.
      */
-    sail_io_write_t write;
+    sail_io_tolerant_write_t tolerant_write;
 
     /*
-     * Flushes buffers of the underlying I/O object. Has no effect if the underlying I/O object
-     * is opened for reading.
-     *
-     * Returns SAIL_OK on success.
+     * Strict write callback.
+     */
+    sail_io_strict_write_t strict_write;
+
+    /*
+     * Flush callback.
      */
     sail_io_flush_t flush;
 
     /*
-     * Closes the underlying I/O object.
-     *
-     * Returns SAIL_OK on success.
+     * Close callback.
      */
     sail_io_close_t close;
 
     /*
-     * Assigns true to the specified result if the underlying I/O object reached the end-of-file indicator.
-     *
-     * Returns SAIL_OK on success.
+     * EOF callback.
      */
     sail_io_eof_t eof;
 };

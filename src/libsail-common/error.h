@@ -140,13 +140,15 @@ do {                                                 \
     if (io == NULL) {                                \
         SAIL_LOG_AND_RETURN(SAIL_ERROR_IO_NULL_PTR); \
     }                                                \
-    if (io->read == NULL      ||                     \
-            io->seek == NULL  ||                     \
-            io->tell == NULL  ||                     \
-            io->write == NULL ||                     \
-            io->flush == NULL ||                     \
-            io->close == NULL ||                     \
-            io->eof == NULL) {                       \
+    if (io->tolerant_read      == NULL ||            \
+            io->strict_read    == NULL ||            \
+            io->seek           == NULL ||            \
+            io->tell           == NULL ||            \
+            io->tolerant_write == NULL ||            \
+            io->strict_write   == NULL ||            \
+            io->flush          == NULL ||            \
+            io->close          == NULL ||            \
+            io->eof            == NULL) {            \
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IO);  \
     }                                                \
 } while(0)

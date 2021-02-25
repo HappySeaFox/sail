@@ -39,11 +39,10 @@ void png_private_my_read_fn(png_structp png_ptr, png_bytep bytes, png_size_t byt
     }
 
     struct sail_io *io = (struct sail_io *)png_get_io_ptr(png_ptr);
-    size_t nbytes;
 
-    sail_status_t err = io->read(io->stream, bytes, 1, bytes_size, &nbytes);
+    sail_status_t err = io->strict_read(io->stream, bytes, bytes_size);
 
-    if (err != SAIL_OK || nbytes != bytes_size) {
+    if (err != SAIL_OK) {
         png_error(png_ptr, "Failed to read from the I/O stream");
     }
 }
@@ -55,11 +54,10 @@ void png_private_my_write_fn(png_structp png_ptr, png_bytep bytes, png_size_t by
     }
 
     struct sail_io *io = (struct sail_io *)png_get_io_ptr(png_ptr);
-    size_t nbytes;
 
-    sail_status_t err = io->write(io->stream, bytes, 1, bytes_size, &nbytes);
+    sail_status_t err = io->strict_write(io->stream, bytes, bytes_size);
 
-    if (err != SAIL_OK || nbytes != bytes_size) {
+    if (err != SAIL_OK) {
         png_error(png_ptr, "Failed to write to the I/O stream");
     }
 }

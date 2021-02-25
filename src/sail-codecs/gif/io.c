@@ -32,7 +32,7 @@ int my_read_proc(GifFileType *gif, GifByteType *buffer, int buffer_size) {
     struct sail_io *io = (struct sail_io *)gif->UserData;
     size_t nbytes;
 
-    sail_status_t err = io->read(io->stream, buffer, 1, buffer_size, &nbytes);
+    sail_status_t err = io->tolerant_read(io->stream, buffer, buffer_size, &nbytes);
 
     if (err != SAIL_OK) {
         SAIL_LOG_ERROR("GIF: Failed to read from the I/O stream: %d", err);
@@ -47,7 +47,7 @@ int my_write_proc(GifFileType *gif, GifByteType *buffer, int buffer_size) {
     struct sail_io *io = (struct sail_io *)gif->UserData;
     size_t nbytes;
 
-    sail_status_t err = io->write(io->stream, buffer, 1, buffer_size, &nbytes);
+    sail_status_t err = io->tolerant_write(io->stream, buffer, buffer_size, &nbytes);
 
     if (err != SAIL_OK) {
         SAIL_LOG_ERROR("GIF: Failed to write to the I/O stream: %d", err);

@@ -87,9 +87,9 @@ static boolean fill_input_buffer(j_decompress_ptr cinfo)
     struct sail_jpeg_source_mgr *src = (struct sail_jpeg_source_mgr *)cinfo->src;
     size_t nbytes;
 
-    sail_status_t err = src->io->read(src->io->stream, src->buffer, 1, INPUT_BUF_SIZE, &nbytes);
+    sail_status_t err = src->io->tolerant_read(src->io->stream, src->buffer, INPUT_BUF_SIZE, &nbytes);
 
-    if (err != SAIL_OK || nbytes <= 0) {
+    if (err != SAIL_OK || nbytes == 0) {
         if (src->start_of_file)     /* Treat empty input file as fatal error */
             ERREXIT(cinfo, JERR_INPUT_EMPTY);
 
