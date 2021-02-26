@@ -5,8 +5,8 @@ layout=4
 version=1.1.2
 name=BMP
 description=Bitmap Picture
-magic-numbers=42 4d;02 00
-extensions=bmp;ddb;dib
+magic-numbers=42 4d
+extensions=bmp;dib
 mime-types=image/bmp;image/x-bmp
 
 [read-features]
@@ -15,7 +15,7 @@ output-pixel-formats=BPP32-RGBA;BPP32-BGRA
 default-output-pixel-format=@SAIL_DEFAULT_READ_OUTPUT_PIXEL_FORMAT@
 
 [write-features]
-features=STATIC;META-DATA
+features=
 properties=
 interlaced-passes=
 compression-types=NONE

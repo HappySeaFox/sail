@@ -35,16 +35,16 @@
 #include "io.h"
 
 /*  Compression types.  */
-static const int SAIL_BI_RGB            = 0;
-static const int SAIL_BI_RLE8           = 1;
-static const int SAIL_BI_RLE4           = 2;
-static const int SAIL_BI_BITFIELDS      = 3;
-static const int SAIL_BI_JPEG           = 4;
-static const int SAIL_BI_PNG            = 5;
-static const int SAIL_BI_ALPHABITFIELDS = 6;
-static const int SAIL_BI_CMYK           = 11;
-static const int SAIL_BI_CMYKRLE8       = 12;
-static const int SAIL_BI_CMYKRLE4       = 13;
+static const uint32_t SAIL_BI_RGB            = 0;
+static const uint32_t SAIL_BI_RLE8           = 1;
+static const uint32_t SAIL_BI_RLE4           = 2;
+static const uint32_t SAIL_BI_BITFIELDS      = 3;
+static const uint32_t SAIL_BI_JPEG           = 4;
+static const uint32_t SAIL_BI_PNG            = 5;
+static const uint32_t SAIL_BI_ALPHABITFIELDS = 6;
+static const uint32_t SAIL_BI_CMYK           = 11;
+static const uint32_t SAIL_BI_CMYKRLE8       = 12;
+static const uint32_t SAIL_BI_CMYKRLE4       = 13;
 
 /* BMP identifiers. */
 static const uint16_t SAIL_DDB_IDENTIFIER = 0x02;
@@ -98,7 +98,7 @@ struct SailBmpDibHeaderV2
     uint32_t size;
     int32_t  width;
     int32_t  height;
-    uint16_t planes;
+    uint16_t planes; /* Always 1. */
     uint16_t bit_count;
 };
 
@@ -146,25 +146,58 @@ SAIL_HIDDEN sail_status_t bmp_private_read_v3(struct sail_io *io, struct SailBmp
     return SAIL_OK;
 }
 
+SAIL_HIDDEN sail_status_t bmp_private_bit_count_to_pixel_format(uint16_t bit_count, enum SailPixelFormat *pixel_format) {
+
+    switch (bit_count) {
+        case 1: {
+            *pixel_format = SAIL_PIXEL_FORMAT_BPP1_INDEXED;
+            return SAIL_OK;
+        }
+        case 4: {
+            *pixel_format = SAIL_PIXEL_FORMAT_BPP4_INDEXED;
+            return SAIL_OK;
+        }
+        case 8: {
+            *pixel_format = SAIL_PIXEL_FORMAT_BPP8_INDEXED;
+            return SAIL_OK;
+        }
+        case 16: {
+            // TODO 555, 565 etc.
+            *pixel_format = SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE;
+            return SAIL_OK;
+        }
+        case 24: {
+            *pixel_format = SAIL_PIXEL_FORMAT_BPP24_RGB;
+            return SAIL_OK;
+        }
+        case 32: {
+            *pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;
+            return SAIL_OK;
+        }
+    }
+
+    return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
+}
+
 struct SailBmpDibHeaderV4
 {
-	uint32_t red_mask;
-	uint32_t green_mask;
-	uint32_t blue_mask;
-	uint32_t alpha_mask;
-	uint32_t color_space_type;
-	int32_t  red_x;
-	int32_t  red_y;
-	int32_t  red_z;
-	int32_t  green_x;
-	int32_t  green_y;
-	int32_t  green_z;
-	int32_t  blue_x;
-	int32_t  blue_y;
-	int32_t  blue_z;
-	uint32_t gamma_red;
-	uint32_t gamma_green;
-	uint32_t gamma_blue;
+    uint32_t red_mask;
+    uint32_t green_mask;
+    uint32_t blue_mask;
+    uint32_t alpha_mask;
+    uint32_t color_space_type;
+    int32_t  red_x;
+    int32_t  red_y;
+    int32_t  red_z;
+    int32_t  green_x;
+    int32_t  green_y;
+    int32_t  green_z;
+    int32_t  blue_x;
+    int32_t  blue_y;
+    int32_t  blue_z;
+    uint32_t gamma_red;
+    uint32_t gamma_green;
+    uint32_t gamma_blue;
 };
 
 struct SailBmpDibHeaderV5
@@ -173,13 +206,6 @@ struct SailBmpDibHeaderV5
     uint32_t profile_data;
     uint32_t profile_size;
     uint32_t reserved;
-};
-
-struct SailBmpRgb
-{
-    uint8_t r;
-    uint8_t g;
-    uint8_t b;
 };
 
 enum SailBmpVersion
@@ -198,6 +224,8 @@ struct bmp_state {
     struct sail_read_options *read_options;
     struct sail_write_options *write_options;
 
+    enum SailPixelFormat source_pixel_format;
+
     enum SailBmpVersion version;
 
     struct SailBmpDdbFileHeader ddb_file_header;
@@ -209,9 +237,10 @@ struct bmp_state {
     struct SailBmpDibHeaderV4 v4;
     struct SailBmpDibHeaderV5 v5;
 
-    struct SailBmpRgb *palette;
-    int pal_entr;
-    int filler;
+    sail_rgba_t *palette;
+    int palette_count;
+    /* Number of bytes to pad scan lines to 4-byte boundary. */
+    unsigned pad_bytes;
 
     bool frame_read;
     bool frame_written;
@@ -241,8 +270,8 @@ static sail_status_t alloc_bmp_state(struct bmp_state **bmp_state) {
 #endif
 
     (*bmp_state)->palette         = NULL;
-    (*bmp_state)->pal_entr        = 0;
-    (*bmp_state)->filler          = 0;
+    (*bmp_state)->palette_count   = 0;
+    (*bmp_state)->pad_bytes       = 0;
 
     (*bmp_state)->frame_read    = false;
     (*bmp_state)->frame_written = false;
@@ -307,7 +336,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v4_bmp(struct sail_io *io, const 
         SAIL_TRY(io->strict_read(io->stream, &bmp_state->ddb_file_header, sizeof(bmp_state->ddb_file_header)));
         SAIL_TRY(io->strict_read(io->stream, &bmp_state->v1, sizeof(bmp_state->v1)));
 
-        // FIXME
+        // TODO Support DDB
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_FORMAT);
     } else if (magic == SAIL_DIB_IDENTIFIER) {
         SAIL_TRY(bmp_private_read_dib_file_header(io, &bmp_state->dib_file_header));
@@ -315,10 +344,27 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v4_bmp(struct sail_io *io, const 
 
         switch (bmp_state->v2.size) {
             case SAIL_BITMAP_DIB_HEADER_V2_SIZE: {
+                bmp_state->version = SAIL_BMP_V2;
                 break;
             }
             case SAIL_BITMAP_DIB_HEADER_V3_SIZE: {
                 SAIL_TRY(bmp_private_read_v3(io, &bmp_state->v3));
+                bmp_state->version = SAIL_BMP_V3;
+                break;
+            }
+            case SAIL_BITMAP_DIB_HEADER_V4_SIZE: {
+                SAIL_TRY(bmp_private_read_v3(io, &bmp_state->v3));
+                // TODO
+                //SAIL_TRY(bmp_private_read_v4(io, &bmp_state->v4));
+                bmp_state->version = SAIL_BMP_V4;
+                break;
+            }
+            case SAIL_BITMAP_DIB_HEADER_V5_SIZE: {
+                SAIL_TRY(bmp_private_read_v3(io, &bmp_state->v3));
+                // TODO
+                //SAIL_TRY(bmp_private_read_v4(io, &bmp_state->v4));
+                //SAIL_TRY(bmp_private_read_v5(io, &bmp_state->v5));
+                bmp_state->version = SAIL_BMP_V5;
                 break;
             }
             default: {
@@ -327,11 +373,78 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v4_bmp(struct sail_io *io, const 
             }
         }
     } else {
-        SAIL_LOG_ERROR("0x%x is not a valid BMP magic number", magic);
+        SAIL_LOG_ERROR("BMP: 0x%x is not a valid magic number", magic);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_FORMAT);
     }
 
-SAIL_LOG_DEBUG("BMP: %ux%u", bmp_state->v2.width, bmp_state->v2.height);
+    /* Check BMP restrictions. */
+    if (bmp_state->version >= SAIL_BMP_V3) {
+        if ((bmp_state->v2.bit_count == 16 || bmp_state->v2.bit_count == 32) && bmp_state->v3.compression != SAIL_BI_BITFIELDS) {
+            return SAIL_ERROR_UNSUPPORTED_COMPRESSION;
+        }
+    }
+
+    if (bmp_state->v2.bit_count != 16 && bmp_state->v3.compression != SAIL_BI_RGB) {
+        return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
+    }
+
+    SAIL_TRY(bmp_private_bit_count_to_pixel_format(bmp_state->v2.bit_count, &bmp_state->source_pixel_format));
+
+    /*  Read palette.  */
+    if (bmp_state->v2.bit_count < 16) {
+        bmp_state->palette_count = 1 << bmp_state->v2.bit_count;
+
+        void *ptr;
+        SAIL_TRY(sail_malloc(sizeof(sail_rgba_t) * bmp_state->palette_count, &ptr));
+        bmp_state->palette = ptr;
+
+        sail_rgba_t rgba;
+
+        for (int i = 0; i < bmp_state->palette_count; i++) {
+            SAIL_TRY(sail_read_sail_pixel4_uint8(io, &rgba));
+
+            bmp_state->palette[i].component1 = rgba.component3;
+            bmp_state->palette[i].component2 = rgba.component2;
+            bmp_state->palette[i].component3 = rgba.component1;
+            bmp_state->palette[i].component4 = 255;
+        }
+    }
+
+    /* Calculate the number of pad bytes to align scan lines to 4-byte boundary. */
+    unsigned bytes_in_row = 0;
+
+    switch (bmp_state->v2.bit_count) {
+        case 1: {
+            bytes_in_row = (bmp_state->v2.width + 7) / 8;
+            break;
+        }
+        case 4: {
+            bytes_in_row = (bmp_state->v2.width + 3) / 4;
+            break;
+        }
+        case 8: {
+            bytes_in_row = bmp_state->v2.width;
+            break;
+        }
+        case 16: {
+            bytes_in_row = bmp_state->v2.width * 2;
+            break;
+        }
+        case 24: {
+            bytes_in_row = bmp_state->v2.width * 3;
+            break;
+        }
+        case 32: {
+            bytes_in_row = bmp_state->v2.width * 4;
+            break;
+        }
+        default: {
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_FORMAT);
+        }
+    }
+
+    unsigned remainder = bytes_in_row % 4;
+    bmp_state->pad_bytes = (remainder == 0) ? 0 : (4 - remainder);
 
     return SAIL_OK;
 }
@@ -342,7 +455,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v4_bmp(void *state, st
     SAIL_CHECK_IO(io);
     SAIL_CHECK_IMAGE_PTR(image);
 
-#if 0
     struct bmp_state *bmp_state = (struct bmp_state *)state;
 
     if (bmp_state->frame_read) {
@@ -356,167 +468,27 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v4_bmp(void *state, st
                         /* cleanup */ sail_destroy_image(*image));
 
     (*image)->source_image->compression = SAIL_COMPRESSION_NONE;
-    (*image)->source_image->pixel_format = SAIL_PIXEL_FORMAT_BPP8_INDEXED;
+    (*image)->source_image->pixel_format = bmp_state->source_pixel_format;
+    (*image)->width = bmp_state->v2.width;
+    (*image)->height = bmp_state->v2.height;
+    (*image)->properties = SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY;
 
-    bmp_state->current_image++;
-
-    bmp_state->prev_disposal      = bmp_state->disposal;
-    bmp_state->disposal           = DISPOSAL_UNSPECIFIED;
-    bmp_state->transparency_index = -1;
-
-    bmp_state->prev_row    = bmp_state->row;
-    bmp_state->prev_column = bmp_state->column;
-    bmp_state->prev_width  = bmp_state->width;
-    bmp_state->prev_height = bmp_state->height;
-
-    /* Loop through records. */
-    while (true) {
-        GifRecordType record;
-
-        if (DGifGetRecordType(bmp_state->bmp, &record) == GIF_ERROR) {
-            SAIL_LOG_ERROR("GIF: %s", GifErrorString(bmp_state->bmp->Error));
-            sail_destroy_image(*image);
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
-        }
-
-        switch (record) {
-            case IMAGE_DESC_RECORD_TYPE: {
-                if (DGifGetImageDesc(bmp_state->bmp) == GIF_ERROR) {
-                    SAIL_LOG_ERROR("GIF: %s", GifErrorString(bmp_state->bmp->Error));
-                    sail_destroy_image(*image);
-                    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
-                }
-
-                (*image)->width = bmp_state->bmp->SWidth;
-                (*image)->height = bmp_state->bmp->SHeight;
-
-                bmp_state->row    = bmp_state->bmp->Image.Top;
-                bmp_state->column = bmp_state->bmp->Image.Left;
-                bmp_state->width  = bmp_state->bmp->Image.Width;
-                bmp_state->height = bmp_state->bmp->Image.Height;
-
-                if (bmp_state->column + bmp_state->width > (unsigned)bmp_state->bmp->SWidth ||
-                        bmp_state->row + bmp_state->height > (unsigned)bmp_state->bmp->SHeight) {
-                    sail_destroy_image(*image);
-                    SAIL_LOG_AND_RETURN(SAIL_ERROR_INCORRECT_IMAGE_DIMENSIONS);
-                }
-                break;
-            }
-
-            case EXTENSION_RECORD_TYPE: {
-                int ext_code;
-                GifByteType *extension;
-
-                if (DGifGetExtension(bmp_state->bmp, &ext_code, &extension) == GIF_ERROR) {
-                    SAIL_LOG_ERROR("GIF: %s", GifErrorString(bmp_state->bmp->Error));
-                    sail_destroy_image(*image);
-                    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
-                }
-
-                if (extension == NULL) {
-                    break;
-                }
-
-                switch (ext_code) {
-                    case GRAPHICS_EXT_FUNC_CODE: {
-                        /* Disposal method. */
-                        bmp_state->disposal = (extension[1] >> 2) & 7;
-
-                        /* Delay in 1/100 of seconds. */
-                        unsigned delay = *(uint16_t *)(extension + 2);
-                        /*
-                         * 0 means as fast as possible. However, this makes the frame
-                         * almost invisible on modern CPUs. Let's make a small delay of 100 ms
-                         * in this case.
-                         */
-                        (*image)->delay = (delay == 0) ? 100 : delay * 10;
-
-                        /* Transparent index. */
-                        if (extension[1] & 1) {
-                            bmp_state->transparency_index = extension[4];
-                        }
-                        break;
-                    }
-
-                    case COMMENT_EXT_FUNC_CODE: {
-                        if (bmp_state->read_options->io_options & SAIL_IO_OPTION_META_DATA) {
-                            SAIL_TRY_OR_CLEANUP(bmp_private_fetch_comment(extension, &(*image)->meta_data_node),
-                                                /* cleanup*/ sail_destroy_image(*image));
-                        }
-                        break;
-                    }
-
-                    case APPLICATION_EXT_FUNC_CODE: {
-                        if (bmp_state->read_options->io_options & SAIL_IO_OPTION_META_DATA) {
-                            SAIL_TRY_OR_CLEANUP(bmp_private_fetch_application(extension, &(*image)->meta_data_node),
-                                                /* cleanup */ sail_destroy_image(*image));
-                        }
-                        break;
-                    }
-                }
-
-                /* We don't support other extension types, so just skip them. */
-                while (extension != NULL) {
-                    if (DGifGetExtensionNext(bmp_state->bmp, &extension) == GIF_ERROR) {
-                        SAIL_LOG_ERROR("GIF: %s", GifErrorString(bmp_state->bmp->Error));
-                        sail_destroy_image(*image);
-                        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
-                    }
-                }
-
-                break;
-            }
-
-            case TERMINATE_RECORD_TYPE: {
-                sail_destroy_image(*image);
-                SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
-            }
-
-            default: {
-                break;
-            }
-        }
-
-        if (record == IMAGE_DESC_RECORD_TYPE) {
-            if (bmp_state->current_image > 0) {
-                (*image)->animated = true;
-            }
-
-            bmp_state->map = (bmp_state->bmp->Image.ColorMap != NULL) ? bmp_state->bmp->Image.ColorMap : bmp_state->bmp->SColorMap;
-
-            if (bmp_state->map == NULL) {
-                sail_destroy_image(*image);
-                SAIL_LOG_AND_RETURN(SAIL_ERROR_MISSING_PALETTE);
-            }
-
-            if (bmp_state->bmp->Image.Interlace) {
-                (*image)->source_image->properties |= SAIL_IMAGE_PROPERTY_INTERLACED;
-                (*image)->interlaced_passes = 4;
-            }
-
-            if (bmp_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_RGBA) {
-                (*image)->pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;
-            } else if (bmp_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_BGRA) {
-                (*image)->pixel_format = SAIL_PIXEL_FORMAT_BPP32_BGRA;
-            }
-            SAIL_TRY_OR_CLEANUP(sail_bytes_per_line((*image)->width, (*image)->pixel_format, &(*image)->bytes_per_line),
-                                /* cleanup */ sail_destroy_image(*image));
-
-            bmp_state->layer = -1;
-            bmp_state->current_pass = -1;
-
-            break;
-        }
+    if (bmp_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_RGBA) {
+        (*image)->pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;
+    } else if (bmp_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_BGRA) {
+        (*image)->pixel_format = SAIL_PIXEL_FORMAT_BPP32_BGRA;
     }
+    SAIL_TRY_OR_CLEANUP(sail_bytes_per_line((*image)->width, (*image)->pixel_format, &(*image)->bytes_per_line),
+                        /* cleanup */ sail_destroy_image(*image));
 
-    if (bmp_state->current_image == 0) {
-        const char *pixel_format_str = NULL;
-        SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string((*image)->source_image->pixel_format, &pixel_format_str));
-        SAIL_LOG_DEBUG("GIF: Input pixel format is %s", pixel_format_str);
-        SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(bmp_state->read_options->output_pixel_format, &pixel_format_str));
-        SAIL_LOG_DEBUG("GIF: Output pixel format is %s", pixel_format_str);
-    }
-#endif
+    SAIL_TRY_OR_CLEANUP(io->seek(io->stream, bmp_state->dib_file_header.offset, SEEK_SET),
+                        /* cleanup */ sail_destroy_image(*image));
+
+    const char *pixel_format_str = NULL;
+    SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string((*image)->source_image->pixel_format, &pixel_format_str));
+    SAIL_LOG_DEBUG("BMP: Input pixel format is %s", pixel_format_str);
+    SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(bmp_state->read_options->output_pixel_format, &pixel_format_str));
+    SAIL_LOG_DEBUG("BMP: Output pixel format is %s", pixel_format_str);
 
     return SAIL_OK;
 }
@@ -527,13 +499,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_pass_v4_bmp(void *state, str
     SAIL_CHECK_IO(io);
     SAIL_CHECK_IMAGE(image);
 
-#if 0
-    struct bmp_state *bmp_state = (struct bmp_state *)state;
-
-    bmp_state->layer++;
-    bmp_state->current_pass++;
-#endif
-
     return SAIL_OK;
 }
 
@@ -543,95 +508,35 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v4_bmp(void *state, struct sail_
     SAIL_CHECK_IO(io);
     SAIL_CHECK_IMAGE(image);
 
-#if 0
     struct bmp_state *bmp_state = (struct bmp_state *)state;
 
-    /* Apply disposal method on the previous frame. */
-    if (bmp_state->current_image > 0 && bmp_state->current_pass == 0) {
-       for (unsigned cc = bmp_state->prev_row; cc < bmp_state->prev_row+bmp_state->prev_height; cc++) {
-            unsigned char *scan = (unsigned char *)image->pixels + image->width*4*cc;
+    switch (bmp_state->v2.bit_count) {
+        case 24: {
+            uint8_t rgb[3];
 
-            if (bmp_state->prev_disposal == DISPOSE_BACKGROUND) {
-                /*
-                 * Spec:
-                 *     2 - Restore to background color. The area used by the
-                 *         graphic must be restored to the background color.
-                 *
-                 * The meaning of the background color is not quite clear here. My idea was that
-                 * it's the color specified by the background color index in the global color map.
-                 * However, other decoders like XnView treat "background" as a transparent color here.
-                 * Let's do the same.
-                 */
-                memset(bmp_state->first_frame[cc] + bmp_state->prev_column*4, 0, bmp_state->prev_width*4); /* 4 = RGBA */
-            }
+            for (unsigned i = 0; i < image->height; i++) {
+                unsigned char *scan = (unsigned char *)image->pixels + image->width * i * 4;
 
-            memcpy(scan, bmp_state->first_frame[cc], image->width * 4);
-        }
-    }
+                for (unsigned j = 0; j < image->width; j++) {
+                    SAIL_TRY(io->strict_read(io->stream, rgb, sizeof(rgb)));
 
-    /* Read lines. */
-    for (unsigned cc = 0; cc < image->height; cc++) {
-        unsigned char *scan = (unsigned char *)image->pixels + image->width*4*cc;
-
-        if (cc < bmp_state->row || cc >= bmp_state->row + bmp_state->height) {
-            if (bmp_state->current_pass == 0) {
-                memcpy(scan, bmp_state->first_frame[cc], image->width * 4);
-            }
-
-            continue;
-        }
-
-        /* In interlaced mode we skip some lines. */
-        bool do_read = false;
-
-        if (bmp_state->bmp->Image.Interlace) {
-            if (cc == bmp_state->row) {
-                bmp_state->next_interlaced_row = InterlacedOffset[bmp_state->layer] + bmp_state->row;
-            }
-
-            if (cc == bmp_state->next_interlaced_row) {
-                do_read = true;
-                bmp_state->next_interlaced_row += InterlacedJumps[bmp_state->layer];
-            }
-        }
-        else { // !s32erlaced
-            do_read = true;
-        }
-
-        if (do_read) {
-            if (DGifGetLine(bmp_state->bmp, bmp_state->buf, bmp_state->width) == GIF_ERROR) {
-                SAIL_LOG_ERROR("GIF: %s", GifErrorString(bmp_state->bmp->Error));
-                SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
-            }
-
-            memcpy(scan, bmp_state->first_frame[cc], image->width * 4);
-
-            for (unsigned i = 0; i < bmp_state->width; i++) {
-                if (bmp_state->buf[i] == bmp_state->transparency_index) {
-                    continue;
+                    *scan++ = rgb[2];
+                    *scan++ = rgb[1];
+                    *scan++ = rgb[0];
+                    *scan++ = 255;
                 }
 
-                unsigned char *pixel = scan + (bmp_state->column + i)*4;
-
-                if (bmp_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_RGBA) {
-                    pixel[0] = bmp_state->map->Colors[bmp_state->buf[i]].Red;
-                    pixel[1] = bmp_state->map->Colors[bmp_state->buf[i]].Green;
-                    pixel[2] = bmp_state->map->Colors[bmp_state->buf[i]].Blue;
-                } else if (bmp_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_BGRA) {
-                    pixel[0] = bmp_state->map->Colors[bmp_state->buf[i]].Blue;
-                    pixel[1] = bmp_state->map->Colors[bmp_state->buf[i]].Green;
-                    pixel[2] = bmp_state->map->Colors[bmp_state->buf[i]].Red;
+                for (unsigned j = 0; j < bmp_state->pad_bytes; j++) {
+                    char byte;
+                    SAIL_TRY(io->strict_read(io->stream, &byte, sizeof(byte)));
                 }
-
-                pixel[3] = 255;
-            } // for
+            }
+            break;
         }
-
-        if (bmp_state->current_pass == image->interlaced_passes-1) {
-            memcpy(bmp_state->first_frame[cc], scan, image->width * 4);
+        case 32:
+        {
         }
     }
-#endif
 
     return SAIL_OK;
 }
