@@ -176,7 +176,7 @@ SAIL_HIDDEN sail_status_t bmp_private_bit_count_to_pixel_format(uint16_t bit_cou
         }
     }
 
-    return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_FORMAT);
 }
 
 struct SailBmpDibHeaderV4
@@ -348,25 +348,27 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v4_bmp(struct sail_io *io, const 
                 break;
             }
             case SAIL_BITMAP_DIB_HEADER_V3_SIZE: {
-                SAIL_TRY(bmp_private_read_v3(io, &bmp_state->v3));
                 bmp_state->version = SAIL_BMP_V3;
+                SAIL_TRY(bmp_private_read_v3(io, &bmp_state->v3));
                 break;
             }
+#if 0
             case SAIL_BITMAP_DIB_HEADER_V4_SIZE: {
+                bmp_state->version = SAIL_BMP_V4;
                 SAIL_TRY(bmp_private_read_v3(io, &bmp_state->v3));
                 // TODO
                 //SAIL_TRY(bmp_private_read_v4(io, &bmp_state->v4));
-                bmp_state->version = SAIL_BMP_V4;
                 break;
             }
             case SAIL_BITMAP_DIB_HEADER_V5_SIZE: {
+                bmp_state->version = SAIL_BMP_V5;
                 SAIL_TRY(bmp_private_read_v3(io, &bmp_state->v3));
                 // TODO
                 //SAIL_TRY(bmp_private_read_v4(io, &bmp_state->v4));
                 //SAIL_TRY(bmp_private_read_v5(io, &bmp_state->v5));
-                bmp_state->version = SAIL_BMP_V5;
                 break;
             }
+#endif
             default: {
                 SAIL_LOG_ERROR("BMP: Unsupported file header size %u", bmp_state->dib_file_header.size);
                 SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_FORMAT);
@@ -380,33 +382,54 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v4_bmp(struct sail_io *io, const 
     /* Check BMP restrictions. */
     if (bmp_state->version >= SAIL_BMP_V3) {
         if ((bmp_state->v2.bit_count == 16 || bmp_state->v2.bit_count == 32) && bmp_state->v3.compression != SAIL_BI_BITFIELDS) {
-            return SAIL_ERROR_UNSUPPORTED_COMPRESSION;
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_COMPRESSION);
         }
     }
 
     if (bmp_state->v2.bit_count != 16 && bmp_state->v3.compression != SAIL_BI_RGB) {
-        return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_COMPRESSION);
     }
 
     SAIL_TRY(bmp_private_bit_count_to_pixel_format(bmp_state->v2.bit_count, &bmp_state->source_pixel_format));
 
     /*  Read palette.  */
-    if (bmp_state->v2.bit_count < 16) {
+    if (bmp_state->version == SAIL_BMP_V1 || bmp_state->v2.bit_count < 16) {
         bmp_state->palette_count = 1 << bmp_state->v2.bit_count;
 
         void *ptr;
         SAIL_TRY(sail_malloc(sizeof(sail_rgba_t) * bmp_state->palette_count, &ptr));
         bmp_state->palette = ptr;
 
-        sail_rgba_t rgba;
+        switch (bmp_state->version) {
+            case SAIL_BMP_V1: {
+                // TODO
+                break;
+            }
+            case SAIL_BMP_V2: {
+                uint8_t rgb[3];
 
-        for (int i = 0; i < bmp_state->palette_count; i++) {
-            SAIL_TRY(sail_read_sail_pixel4_uint8(io, &rgba));
+                for (int i = 0; i < bmp_state->palette_count; i++) {
+                    SAIL_TRY(io->strict_read(io->stream, rgb, sizeof(rgb)));
 
-            bmp_state->palette[i].component1 = rgba.component3;
-            bmp_state->palette[i].component2 = rgba.component2;
-            bmp_state->palette[i].component3 = rgba.component1;
-            bmp_state->palette[i].component4 = 255;
+                    bmp_state->palette[i].component1 = rgb[0];
+                    bmp_state->palette[i].component2 = rgb[1];
+                    bmp_state->palette[i].component3 = rgb[2];
+                    bmp_state->palette[i].component4 = 255;
+                }
+                break;
+            }
+            default: {
+                uint8_t rgba[4];
+
+                for (int i = 0; i < bmp_state->palette_count; i++) {
+                    SAIL_TRY(io->strict_read(io->stream, rgba, sizeof(rgba)));
+
+                    bmp_state->palette[i].component1 = rgba[0];
+                    bmp_state->palette[i].component2 = rgba[1];
+                    bmp_state->palette[i].component3 = rgba[2];
+                    bmp_state->palette[i].component4 = 255;
+                }
+            }
         }
     }
 
@@ -469,9 +492,9 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v4_bmp(void *state, st
 
     (*image)->source_image->compression = SAIL_COMPRESSION_NONE;
     (*image)->source_image->pixel_format = bmp_state->source_pixel_format;
+    (*image)->source_image->properties = SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY;
     (*image)->width = bmp_state->v2.width;
     (*image)->height = bmp_state->v2.height;
-    (*image)->properties = SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY;
 
     if (bmp_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_RGBA) {
         (*image)->pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;
@@ -510,31 +533,50 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v4_bmp(void *state, struct sail_
 
     struct bmp_state *bmp_state = (struct bmp_state *)state;
 
-    switch (bmp_state->v2.bit_count) {
-        case 24: {
-            uint8_t rgb[3];
+    for (int i = image->height-1; i >= 0; i--) {
+        unsigned char *scan = (unsigned char *)image->pixels + image->bytes_per_line * i;
 
-            for (unsigned i = 0; i < image->height; i++) {
-                unsigned char *scan = (unsigned char *)image->pixels + image->width * i * 4;
+        for (unsigned j = 0; j < image->width; j++) {
+            switch (bmp_state->v2.bit_count) {
+                case 8: {
+                    uint8_t index;
+                    SAIL_TRY(io->strict_read(io->stream, &index, sizeof(index)));
 
-                for (unsigned j = 0; j < image->width; j++) {
+                    *scan++ = bmp_state->palette[index].component3;
+                    *scan++ = bmp_state->palette[index].component2;
+                    *scan++ = bmp_state->palette[index].component1;
+                    *scan++ = 255;
+                    break;
+                }
+                case 24: {
+                    uint8_t rgb[3];
                     SAIL_TRY(io->strict_read(io->stream, rgb, sizeof(rgb)));
 
                     *scan++ = rgb[2];
                     *scan++ = rgb[1];
                     *scan++ = rgb[0];
                     *scan++ = 255;
+                    break;
                 }
+                case 32: {
+                    uint8_t rgba[4];
+                    SAIL_TRY(io->strict_read(io->stream, rgba, sizeof(rgba)));
 
-                for (unsigned j = 0; j < bmp_state->pad_bytes; j++) {
-                    char byte;
-                    SAIL_TRY(io->strict_read(io->stream, &byte, sizeof(byte)));
+                    *scan++ = rgba[2];
+                    *scan++ = rgba[1];
+                    *scan++ = rgba[0];
+                    *scan++ = rgba[3];
+                    break;
+                }
+                default: {
+                    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
                 }
             }
-            break;
         }
-        case 32:
-        {
+
+        for (unsigned j = 0; j < bmp_state->pad_bytes; j++) {
+            uint8_t byte;
+            SAIL_TRY(io->strict_read(io->stream, &byte, sizeof(byte)));
         }
     }
 
