@@ -354,10 +354,15 @@ static sail_status_t print_enumerated_codecs(struct sail_context *context) {
 
     SAIL_CHECK_CONTEXT_PTR(context);
 
-    SAIL_LOG_DEBUG("Enumerated codecs:");
+    const struct sail_codec_info_node *node = context->codec_info_node;
+
+    if (node == NULL) {
+        return SAIL_OK;
+    }
 
     /* Print the found codec infos. */
-    struct sail_codec_info_node *node = context->codec_info_node;
+    SAIL_LOG_DEBUG("Enumerated codecs:");
+
     int counter = 1;
 
     while (node != NULL) {
