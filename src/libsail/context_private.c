@@ -622,7 +622,7 @@ static void print_no_codecs_found(void) {
         "\n*** - Inspect the error messages printed in stderr.                          ***"
 #ifdef SAIL_STATIC
         "\n*** - Make sure the application is linked against the sail-codecs            ***"
-        "\n***   and sail-codecs-objects libraries.                                     ***"
+        "\n***   and sail-codecs-objects libraries using the 'whole archive' option.    ***"
 #elif defined SAIL_COMBINE_CODECS
         "\n*** - Make sure the application is linked against the sail-codecs library.   ***"
 #else
