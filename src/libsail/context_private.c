@@ -354,10 +354,15 @@ static sail_status_t print_enumerated_codecs(struct sail_context *context) {
 
     SAIL_CHECK_CONTEXT_PTR(context);
 
-    SAIL_LOG_DEBUG("Enumerated codecs:");
+    const struct sail_codec_info_node *node = context->codec_info_node;
+
+    if (node == NULL) {
+        return SAIL_OK;
+    }
 
     /* Print the found codec infos. */
-    struct sail_codec_info_node *node = context->codec_info_node;
+    SAIL_LOG_DEBUG("Enumerated codecs:");
+
     int counter = 1;
 
     while (node != NULL) {
@@ -612,11 +617,21 @@ static sail_status_t init_context_impl(struct sail_context *context) {
 
 static void print_no_codecs_found(void) {
 
-    const char *message = "\n\n*** No codecs were found. Please check the installation directory. ***"
+    const char *message = "\n"
+        "\n*** No codecs were found. You could try the following:                       ***"
+        "\n*** - Inspect the error messages printed in stderr.                          ***"
+#ifdef SAIL_STATIC
+        "\n*** - Make sure the application is linked against the sail-codecs            ***"
+        "\n***   and sail-codecs-objects libraries using the 'whole archive' option.    ***"
+#elif defined SAIL_COMBINE_CODECS
+        "\n*** - Make sure the application is linked against the sail-codecs library.   ***"
+#else
+        "\n*** - Check the installation directory.                                      ***"
+#endif
 #if defined SAIL_UNIX && defined SAIL_COMBINE_CODECS
-        "\n*** Additionally, please make sure the application is compiled with -rdynamic ***"
-        "\n*** or an equivalent. If you use CMake, this could be achieved by setting     ***"
-        "\n*** CMAKE_ENABLE_EXPORTS to ON. ***"
+        "\n*** - Make sure the application is compiled with -rdynamic or an equivalent. ***"
+        "\n***   If you use CMake, this could be achieved by setting                    ***"
+        "\n***   CMAKE_ENABLE_EXPORTS to ON.                                            ***"
 #endif
         "\n";
 
