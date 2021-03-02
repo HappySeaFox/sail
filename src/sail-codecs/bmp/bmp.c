@@ -643,10 +643,8 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v4_bmp(void *state, struct sail_
             }
         }
 
-        for (unsigned j = 0; j < bmp_state->pad_bytes; j++) {
-            uint8_t byte;
-            SAIL_TRY(io->strict_read(io->stream, &byte, sizeof(byte)));
-        }
+        /* Skip pad bytes. */
+        SAIL_TRY(io->seek(io->stream, bmp_state->pad_bytes, SEEK_CUR));
     }
 
     return SAIL_OK;
