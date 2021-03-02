@@ -50,6 +50,9 @@ static const uint32_t SAIL_BI_CMYKRLE4       = 13;
 static const uint16_t SAIL_DDB_IDENTIFIER = 0x02;
 static const uint16_t SAIL_DIB_IDENTIFIER = 0x4D42;
 
+static const char SAIL_PROFILE_LINKED[4]   = { 'L', 'I', 'N', 'K' };
+static const char SAIL_PROFILE_EMBEDDED[4] = { 'M', 'B', 'E', 'D' };
+
 /* Sizes of DIB header structs. */
 #define SAIL_BITMAP_DIB_HEADER_V2_SIZE 12
 #define SAIL_BITMAP_DIB_HEADER_V3_SIZE 40
@@ -112,73 +115,6 @@ struct SailBmpDibHeaderV3
     uint32_t colors_important;
 };
 
-SAIL_HIDDEN sail_status_t bmp_private_read_dib_file_header(struct sail_io *io, struct SailBmpDibFileHeader *fh) {
-
-    SAIL_TRY(io->strict_read(io->stream, &fh->type,      sizeof(fh->type)));
-    SAIL_TRY(io->strict_read(io->stream, &fh->size,      sizeof(fh->size)));
-    SAIL_TRY(io->strict_read(io->stream, &fh->reserved1, sizeof(fh->reserved1)));
-    SAIL_TRY(io->strict_read(io->stream, &fh->reserved2, sizeof(fh->reserved2)));
-    SAIL_TRY(io->strict_read(io->stream, &fh->offset,    sizeof(fh->offset)));
-
-    return SAIL_OK;
-}
-
-SAIL_HIDDEN sail_status_t bmp_private_read_v2(struct sail_io *io, struct SailBmpDibHeaderV2 *v2) {
-
-    SAIL_TRY(io->strict_read(io->stream, &v2->size,      sizeof(v2->size)));
-    SAIL_TRY(io->strict_read(io->stream, &v2->width,     sizeof(v2->width)));
-    SAIL_TRY(io->strict_read(io->stream, &v2->height,    sizeof(v2->height)));
-    SAIL_TRY(io->strict_read(io->stream, &v2->planes,    sizeof(v2->planes)));
-    SAIL_TRY(io->strict_read(io->stream, &v2->bit_count, sizeof(v2->bit_count)));
-
-    return SAIL_OK;
-}
-
-SAIL_HIDDEN sail_status_t bmp_private_read_v3(struct sail_io *io, struct SailBmpDibHeaderV3 *v3) {
-
-    SAIL_TRY(io->strict_read(io->stream, &v3->compression,        sizeof(v3->compression)));
-    SAIL_TRY(io->strict_read(io->stream, &v3->bitmap_size,        sizeof(v3->bitmap_size)));
-    SAIL_TRY(io->strict_read(io->stream, &v3->x_pixels_per_meter, sizeof(v3->x_pixels_per_meter)));
-    SAIL_TRY(io->strict_read(io->stream, &v3->y_pixels_per_meter, sizeof(v3->y_pixels_per_meter)));
-    SAIL_TRY(io->strict_read(io->stream, &v3->colors_used,        sizeof(v3->colors_used)));
-    SAIL_TRY(io->strict_read(io->stream, &v3->colors_important,   sizeof(v3->colors_important)));
-
-    return SAIL_OK;
-}
-
-SAIL_HIDDEN sail_status_t bmp_private_bit_count_to_pixel_format(uint16_t bit_count, enum SailPixelFormat *pixel_format) {
-
-    switch (bit_count) {
-        case 1: {
-            *pixel_format = SAIL_PIXEL_FORMAT_BPP1_INDEXED;
-            return SAIL_OK;
-        }
-        case 4: {
-            *pixel_format = SAIL_PIXEL_FORMAT_BPP4_INDEXED;
-            return SAIL_OK;
-        }
-        case 8: {
-            *pixel_format = SAIL_PIXEL_FORMAT_BPP8_INDEXED;
-            return SAIL_OK;
-        }
-        case 16: {
-            // TODO 555, 565 etc.
-            *pixel_format = SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE;
-            return SAIL_OK;
-        }
-        case 24: {
-            *pixel_format = SAIL_PIXEL_FORMAT_BPP24_RGB;
-            return SAIL_OK;
-        }
-        case 32: {
-            *pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;
-            return SAIL_OK;
-        }
-    }
-
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_FORMAT);
-}
-
 struct SailBmpDibHeaderV4
 {
     uint32_t red_mask;
@@ -217,6 +153,129 @@ enum SailBmpVersion
     SAIL_BMP_V5,
 };
 
+SAIL_HIDDEN sail_status_t bmp_private_read_dib_file_header(struct sail_io *io, struct SailBmpDibFileHeader *fh) {
+
+    SAIL_TRY(io->strict_read(io->stream, &fh->type,      sizeof(fh->type)));
+    SAIL_TRY(io->strict_read(io->stream, &fh->size,      sizeof(fh->size)));
+    SAIL_TRY(io->strict_read(io->stream, &fh->reserved1, sizeof(fh->reserved1)));
+    SAIL_TRY(io->strict_read(io->stream, &fh->reserved2, sizeof(fh->reserved2)));
+    SAIL_TRY(io->strict_read(io->stream, &fh->offset,    sizeof(fh->offset)));
+
+    return SAIL_OK;
+}
+
+SAIL_HIDDEN sail_status_t bmp_private_read_v2(struct sail_io *io, struct SailBmpDibHeaderV2 *v2) {
+
+    SAIL_TRY(io->strict_read(io->stream, &v2->size,      sizeof(v2->size)));
+    SAIL_TRY(io->strict_read(io->stream, &v2->width,     sizeof(v2->width)));
+    SAIL_TRY(io->strict_read(io->stream, &v2->height,    sizeof(v2->height)));
+    SAIL_TRY(io->strict_read(io->stream, &v2->planes,    sizeof(v2->planes)));
+    SAIL_TRY(io->strict_read(io->stream, &v2->bit_count, sizeof(v2->bit_count)));
+
+    return SAIL_OK;
+}
+
+SAIL_HIDDEN sail_status_t bmp_private_read_v3(struct sail_io *io, struct SailBmpDibHeaderV3 *v3) {
+
+    SAIL_TRY(io->strict_read(io->stream, &v3->compression,        sizeof(v3->compression)));
+    SAIL_TRY(io->strict_read(io->stream, &v3->bitmap_size,        sizeof(v3->bitmap_size)));
+    SAIL_TRY(io->strict_read(io->stream, &v3->x_pixels_per_meter, sizeof(v3->x_pixels_per_meter)));
+    SAIL_TRY(io->strict_read(io->stream, &v3->y_pixels_per_meter, sizeof(v3->y_pixels_per_meter)));
+    SAIL_TRY(io->strict_read(io->stream, &v3->colors_used,        sizeof(v3->colors_used)));
+    SAIL_TRY(io->strict_read(io->stream, &v3->colors_important,   sizeof(v3->colors_important)));
+
+    return SAIL_OK;
+}
+
+SAIL_HIDDEN sail_status_t bmp_private_read_v4(struct sail_io *io, struct SailBmpDibHeaderV4 *v4) {
+
+    SAIL_TRY(io->strict_read(io->stream, &v4->red_mask,         sizeof(v4->red_mask)));
+    SAIL_TRY(io->strict_read(io->stream, &v4->green_mask,       sizeof(v4->green_mask)));
+    SAIL_TRY(io->strict_read(io->stream, &v4->blue_mask,        sizeof(v4->blue_mask)));
+    SAIL_TRY(io->strict_read(io->stream, &v4->alpha_mask,       sizeof(v4->alpha_mask)));
+    SAIL_TRY(io->strict_read(io->stream, &v4->color_space_type, sizeof(v4->color_space_type)));
+    SAIL_TRY(io->strict_read(io->stream, &v4->red_x,            sizeof(v4->red_x)));
+    SAIL_TRY(io->strict_read(io->stream, &v4->red_y,            sizeof(v4->red_y)));
+    SAIL_TRY(io->strict_read(io->stream, &v4->red_z,            sizeof(v4->red_z)));
+    SAIL_TRY(io->strict_read(io->stream, &v4->green_x,          sizeof(v4->green_x)));
+    SAIL_TRY(io->strict_read(io->stream, &v4->green_y,          sizeof(v4->green_y)));
+    SAIL_TRY(io->strict_read(io->stream, &v4->green_z,          sizeof(v4->green_z)));
+    SAIL_TRY(io->strict_read(io->stream, &v4->blue_x,           sizeof(v4->blue_x)));
+    SAIL_TRY(io->strict_read(io->stream, &v4->blue_y,           sizeof(v4->blue_y)));
+    SAIL_TRY(io->strict_read(io->stream, &v4->blue_z,           sizeof(v4->blue_z)));
+    SAIL_TRY(io->strict_read(io->stream, &v4->gamma_red,        sizeof(v4->gamma_red)));
+    SAIL_TRY(io->strict_read(io->stream, &v4->gamma_green,      sizeof(v4->gamma_green)));
+    SAIL_TRY(io->strict_read(io->stream, &v4->gamma_blue,       sizeof(v4->gamma_blue)));
+
+    return SAIL_OK;
+}
+
+SAIL_HIDDEN sail_status_t bmp_private_read_v5(struct sail_io *io, struct SailBmpDibHeaderV5 *v5) {
+
+    SAIL_TRY(io->strict_read(io->stream, &v5->intent,       sizeof(v5->intent)));
+    SAIL_TRY(io->strict_read(io->stream, &v5->profile_data, sizeof(v5->profile_data)));
+    SAIL_TRY(io->strict_read(io->stream, &v5->profile_size, sizeof(v5->profile_size)));
+    SAIL_TRY(io->strict_read(io->stream, &v5->reserved,     sizeof(v5->reserved)));
+
+    return SAIL_OK;
+}
+
+SAIL_HIDDEN sail_status_t bmp_private_bit_count_to_pixel_format(uint16_t bit_count, enum SailPixelFormat *pixel_format) {
+
+    switch (bit_count) {
+        case 1: {
+            *pixel_format = SAIL_PIXEL_FORMAT_BPP1_INDEXED;
+            return SAIL_OK;
+        }
+        case 4: {
+            *pixel_format = SAIL_PIXEL_FORMAT_BPP4_INDEXED;
+            return SAIL_OK;
+        }
+        case 8: {
+            *pixel_format = SAIL_PIXEL_FORMAT_BPP8_INDEXED;
+            return SAIL_OK;
+        }
+        case 16: {
+            // TODO 555, 565 etc.
+            *pixel_format = SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE;
+            return SAIL_OK;
+        }
+        case 24: {
+            *pixel_format = SAIL_PIXEL_FORMAT_BPP24_RGB;
+            return SAIL_OK;
+        }
+        case 32: {
+            *pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;
+            return SAIL_OK;
+        }
+    }
+
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_FORMAT);
+}
+
+SAIL_HIDDEN sail_status_t bmp_private_fetch_iccp(struct sail_io *io, long offset_of_data, uint32_t profile_size, struct sail_iccp **iccp) {
+
+    SAIL_CHECK_IO_PTR(io);
+    SAIL_CHECK_ICCP_PTR(iccp);
+
+    SAIL_TRY(io->seek(io->stream, offset_of_data, SEEK_SET));
+
+    void *profile_data;
+    SAIL_TRY(sail_malloc(profile_size, &profile_data));
+
+    SAIL_TRY_OR_CLEANUP(io->strict_read(io->stream, profile_data, profile_size),
+                        /* cleanup */ sail_free(profile_data));
+
+    struct sail_iccp *local_iccp;
+
+    SAIL_TRY_OR_CLEANUP(sail_alloc_iccp_from_shallow_data(&local_iccp, profile_data, profile_size),
+                        /* cleanup */ sail_free(profile_data));
+
+    *iccp = local_iccp;
+
+    return SAIL_OK;
+}
+
 /*
  * Codec-specific state.
  */
@@ -236,6 +295,8 @@ struct bmp_state {
     struct SailBmpDibHeaderV3 v3;
     struct SailBmpDibHeaderV4 v4;
     struct SailBmpDibHeaderV5 v5;
+
+    struct sail_iccp *iccp;
 
     sail_rgba_t *palette;
     int palette_count;
@@ -269,6 +330,7 @@ static sail_status_t alloc_bmp_state(struct bmp_state **bmp_state) {
     (*bmp_state)->v5              = NULL;
 #endif
 
+    (*bmp_state)->iccp            = NULL;
     (*bmp_state)->palette         = NULL;
     (*bmp_state)->palette_count   = 0;
     (*bmp_state)->pad_bytes       = 0;
@@ -297,6 +359,8 @@ static void destroy_bmp_state(struct bmp_state *bmp_state) {
     sail_free(bmp_state->v4);
     sail_free(bmp_state->v5);
 #endif
+
+    sail_destroy_iccp(bmp_state->iccp);
 
     sail_free(bmp_state->palette);
 
@@ -340,6 +404,10 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v4_bmp(struct sail_io *io, const 
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_FORMAT);
     } else if (magic == SAIL_DIB_IDENTIFIER) {
         SAIL_TRY(bmp_private_read_dib_file_header(io, &bmp_state->dib_file_header));
+
+        size_t offset_of_bitmap_header;
+        SAIL_TRY(io->tell(io->stream, &offset_of_bitmap_header));
+
         SAIL_TRY(bmp_private_read_v2(io, &bmp_state->v2));
 
         switch (bmp_state->v2.size) {
@@ -352,23 +420,24 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v4_bmp(struct sail_io *io, const 
                 SAIL_TRY(bmp_private_read_v3(io, &bmp_state->v3));
                 break;
             }
-#if 0
             case SAIL_BITMAP_DIB_HEADER_V4_SIZE: {
                 bmp_state->version = SAIL_BMP_V4;
                 SAIL_TRY(bmp_private_read_v3(io, &bmp_state->v3));
-                // TODO
-                //SAIL_TRY(bmp_private_read_v4(io, &bmp_state->v4));
+                SAIL_TRY(bmp_private_read_v4(io, &bmp_state->v4));
                 break;
             }
             case SAIL_BITMAP_DIB_HEADER_V5_SIZE: {
                 bmp_state->version = SAIL_BMP_V5;
                 SAIL_TRY(bmp_private_read_v3(io, &bmp_state->v3));
-                // TODO
-                //SAIL_TRY(bmp_private_read_v4(io, &bmp_state->v4));
-                //SAIL_TRY(bmp_private_read_v5(io, &bmp_state->v5));
+                SAIL_TRY(bmp_private_read_v4(io, &bmp_state->v4));
+                SAIL_TRY(bmp_private_read_v5(io, &bmp_state->v5));
+
+                if (memcmp(&bmp_state->v4.color_space_type, SAIL_PROFILE_EMBEDDED, sizeof(SAIL_PROFILE_EMBEDDED)) == 0) {
+                    SAIL_TRY(bmp_private_fetch_iccp(io, (long)(offset_of_bitmap_header + bmp_state->v5.profile_data), bmp_state->v5.profile_size, &bmp_state->iccp));
+                }
+
                 break;
             }
-#endif
             default: {
                 SAIL_LOG_ERROR("BMP: Unsupported file header size %u", bmp_state->dib_file_header.size);
                 SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_FORMAT);
