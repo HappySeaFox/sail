@@ -511,7 +511,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v4_bmp(struct sail_io *io, const 
             break;
         }
         case 4: {
-            bytes_in_row = (bmp_state->v2.width + 3) / 4;
+            bytes_in_row = (bmp_state->v2.width + 1) / 2;
             break;
         }
         case 8: {
@@ -602,10 +602,10 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v4_bmp(void *state, struct sail_
 
     struct bmp_state *bmp_state = (struct bmp_state *)state;
 
-    for (int i = image->height-1; i >= 0; i--) {
-        unsigned char *scan = (unsigned char *)image->pixels + image->bytes_per_line * i;
+    for (unsigned i = image->height; i > 0; i--) {
+        unsigned char *scan = (unsigned char *)image->pixels + image->bytes_per_line * (i - 1);
 
-        for (unsigned pixel_counter = 0; pixel_counter < image->width;) {
+        for (unsigned pixel_index = 0; pixel_index < image->width;) {
             switch (bmp_state->v2.bit_count) {
                 case 4: {
                     uint8_t byte;
@@ -618,8 +618,8 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v4_bmp(void *state, struct sail_
                     *scan++ = bmp_state->palette[index1].component1;
                     *scan++ = 255;
 
-                    /* Do we actually have the second index? */
-                    if (pixel_counter + 1 <= image->width - 1) {
+                     /* Do we actually have the second index? */
+                    if (pixel_index + 1 <= image->width - 1) {
                         uint8_t index2 = byte & 0xf;
 
                         *scan++ = bmp_state->palette[index2].component3;
@@ -628,7 +628,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v4_bmp(void *state, struct sail_
                         *scan++ = 255;
                     }
 
-                    pixel_counter += 2;
+                    pixel_index += 2;
                     break;
                 }
                 case 8: {
@@ -640,7 +640,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v4_bmp(void *state, struct sail_
                     *scan++ = bmp_state->palette[index].component1;
                     *scan++ = 255;
 
-                    pixel_counter++;
+                    pixel_index++;
                     break;
                 }
                 case 24: {
@@ -652,7 +652,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v4_bmp(void *state, struct sail_
                     *scan++ = rgb[0];
                     *scan++ = 255;
 
-                    pixel_counter++;
+                    pixel_index++;
                     break;
                 }
                 case 32: {
@@ -664,7 +664,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v4_bmp(void *state, struct sail_
                     *scan++ = rgba[0];
                     *scan++ = rgba[3];
 
-                    pixel_counter++;
+                    pixel_index++;
                     break;
                 }
                 default: {
