@@ -146,7 +146,7 @@ struct SailBmpDibHeaderV5
 
 enum SailBmpVersion
 {
-    SAIL_BMP_V1,
+    SAIL_BMP_V1 = 1,
     SAIL_BMP_V2,
     SAIL_BMP_V3,
     SAIL_BMP_V4,
@@ -237,7 +237,7 @@ SAIL_HIDDEN sail_status_t bmp_private_bit_count_to_pixel_format(uint16_t bit_cou
         }
         case 16: {
             // TODO 555, 565 etc.
-            *pixel_format = SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE;
+            *pixel_format = SAIL_PIXEL_FORMAT_BPP16;
             return SAIL_OK;
         }
         case 24: {
@@ -450,7 +450,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v4_bmp(struct sail_io *io, const 
 
     /* Check BMP restrictions. */
     if (bmp_state->version >= SAIL_BMP_V3) {
-        if (bmp_state->v3.compression == SAIL_BI_BITFIELDS && (bmp_state->v2.bit_count != 16 && bmp_state->v2.bit_count != 32)) {
+        if (bmp_state->v3.compression == SAIL_BI_BITFIELDS && bmp_state->v2.bit_count != 16 && bmp_state->v2.bit_count != 32) {
             SAIL_LOG_ERROR("BMP: BitFields compression is allowed only for 16 or 32 bpp");
             SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_COMPRESSION);
         }
@@ -462,6 +462,8 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v4_bmp(struct sail_io *io, const 
     }
 
     SAIL_TRY(bmp_private_bit_count_to_pixel_format(bmp_state->v2.bit_count, &bmp_state->source_pixel_format));
+
+    SAIL_LOG_DEBUG("BMP: Version is %d", bmp_state->version);
 
     /*  Read palette.  */
     if (bmp_state->version > SAIL_BMP_V1 && bmp_state->v2.bit_count < 16) {
@@ -675,6 +677,25 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v4_bmp(void *state, struct sail_
                     *(scan+r) = bmp_state->palette[index].component3;
                     *(scan+g) = bmp_state->palette[index].component2;
                     *(scan+b) = bmp_state->palette[index].component1;
+                    *(scan+a) = 255;
+                    scan += 4;
+
+                    pixel_index++;
+                    break;
+                }
+                case 16: {
+                    uint16_t rgb16;
+                    SAIL_TRY(io->strict_read(io->stream, &rgb16, sizeof(rgb16)));
+
+                    // TODO Other compressions
+                    if (bmp_state->v3.compression == SAIL_BI_RGB) {
+                        *(scan+r) = ((rgb16 >> 10) & 0x1f) << 3;
+                        *(scan+g) = ((rgb16 >> 5)  & 0x1f) << 3;
+                        *(scan+b) = ((rgb16 >> 0)  & 0x1f) << 3;
+                    } else {
+                        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_COMPRESSION);
+                    }
+
                     *(scan+a) = 255;
                     scan += 4;
 
