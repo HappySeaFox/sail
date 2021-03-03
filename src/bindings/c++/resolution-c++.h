@@ -67,12 +67,12 @@ public:
     /*
      * Returns the resolution x value.
      */
-    float x() const;
+    double x() const;
 
     /*
      * Returns the resolution y value.
      */
-    float y() const;
+    double y() const;
 
     /*
      * Sets a new resolution units.
@@ -82,12 +82,12 @@ public:
     /*
      * Sets a new resolution x value.
      */
-    resolution& with_x(float x);
+    resolution& with_x(double x);
 
     /*
      * Sets a new resolution y value.
      */
-    resolution& with_y(float y);
+    resolution& with_y(double y);
 
 private:
     /*
