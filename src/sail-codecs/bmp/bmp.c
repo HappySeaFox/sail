@@ -614,28 +614,46 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v4_bmp(void *state, struct sail_
 
         for (unsigned pixel_index = 0; pixel_index < image->width;) {
             switch (bmp_state->v2.bit_count) {
+                case 1: {
+                    uint8_t byte;
+                    SAIL_TRY(io->strict_read(io->stream, &byte, sizeof(byte)));
+
+                    unsigned bit_shift = 7;
+                    unsigned bit_mask = 1 << 7;
+
+                    while (bit_mask > 0 && pixel_index < image->width) {
+                        uint8_t index = (byte & bit_mask) >> bit_shift;
+
+                        *scan++ = bmp_state->palette[index].component3;
+                        *scan++ = bmp_state->palette[index].component2;
+                        *scan++ = bmp_state->palette[index].component1;
+                        *scan++ = 255;
+
+                        bit_shift--;
+                        bit_mask >>= 1;
+                        pixel_index++;
+                    }
+                    break;
+                }
                 case 4: {
                     uint8_t byte;
                     SAIL_TRY(io->strict_read(io->stream, &byte, sizeof(byte)));
 
-                    uint8_t index1 = byte >> 4;
+                    unsigned bit_shift = 4;
+                    unsigned bit_mask = 0xf0;
 
-                    *scan++ = bmp_state->palette[index1].component3;
-                    *scan++ = bmp_state->palette[index1].component2;
-                    *scan++ = bmp_state->palette[index1].component1;
-                    *scan++ = 255;
+                    while (bit_mask > 0 && pixel_index < image->width) {
+                        uint8_t index = (byte & bit_mask) >> bit_shift;
 
-                     /* Do we actually have the second index? */
-                    if (pixel_index + 1 <= image->width - 1) {
-                        uint8_t index2 = byte & 0xf;
-
-                        *scan++ = bmp_state->palette[index2].component3;
-                        *scan++ = bmp_state->palette[index2].component2;
-                        *scan++ = bmp_state->palette[index2].component1;
+                        *scan++ = bmp_state->palette[index].component3;
+                        *scan++ = bmp_state->palette[index].component2;
+                        *scan++ = bmp_state->palette[index].component1;
                         *scan++ = 255;
-                    }
 
-                    pixel_index += 2;
+                        bit_shift -= 4;
+                        bit_mask >>= 4;
+                        pixel_index++;
+                    }
                     break;
                 }
                 case 8: {
