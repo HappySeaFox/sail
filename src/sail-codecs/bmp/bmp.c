@@ -298,7 +298,7 @@ struct bmp_state {
 
     struct sail_iccp *iccp;
 
-    sail_rgba_t *palette;
+    sail_rgba8_t *palette;
     int palette_count;
     /* Number of bytes to pad scan lines to 4-byte boundary. */
     unsigned pad_bytes;
@@ -462,11 +462,11 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v4_bmp(struct sail_io *io, const 
     SAIL_TRY(bmp_private_bit_count_to_pixel_format(bmp_state->v2.bit_count, &bmp_state->source_pixel_format));
 
     /*  Read palette.  */
-    if (bmp_state->version == SAIL_BMP_V1 || bmp_state->v2.bit_count < 16) {
+    if (bmp_state->version > SAIL_BMP_V1 && bmp_state->v2.bit_count < 16) {
         bmp_state->palette_count = 1 << bmp_state->v2.bit_count;
 
         void *ptr;
-        SAIL_TRY(sail_malloc(sizeof(sail_rgba_t) * bmp_state->palette_count, &ptr));
+        SAIL_TRY(sail_malloc(sizeof(sail_rgba8_t) * bmp_state->palette_count, &ptr));
         bmp_state->palette = ptr;
 
         switch (bmp_state->version) {
@@ -475,27 +475,27 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v4_bmp(struct sail_io *io, const 
                 break;
             }
             case SAIL_BMP_V2: {
-                uint8_t rgb[3];
+                sail_rgb8_t rgb;
 
                 for (int i = 0; i < bmp_state->palette_count; i++) {
-                    SAIL_TRY(io->strict_read(io->stream, rgb, sizeof(rgb)));
+                    SAIL_TRY(sail_read_pixel3_uint8(io, &rgb));
 
-                    bmp_state->palette[i].component1 = rgb[0];
-                    bmp_state->palette[i].component2 = rgb[1];
-                    bmp_state->palette[i].component3 = rgb[2];
+                    bmp_state->palette[i].component1 = rgb.component1;
+                    bmp_state->palette[i].component2 = rgb.component2;
+                    bmp_state->palette[i].component3 = rgb.component3;
                     bmp_state->palette[i].component4 = 255;
                 }
                 break;
             }
             default: {
-                uint8_t rgba[4];
+                sail_rgba8_t rgba;
 
                 for (int i = 0; i < bmp_state->palette_count; i++) {
-                    SAIL_TRY(io->strict_read(io->stream, rgba, sizeof(rgba)));
+                    SAIL_TRY(sail_read_pixel4_uint8(io, &rgba));
 
-                    bmp_state->palette[i].component1 = rgba[0];
-                    bmp_state->palette[i].component2 = rgba[1];
-                    bmp_state->palette[i].component3 = rgba[2];
+                    bmp_state->palette[i].component1 = rgba.component1;
+                    bmp_state->palette[i].component2 = rgba.component2;
+                    bmp_state->palette[i].component3 = rgba.component3;
                     bmp_state->palette[i].component4 = 255;
                 }
             }
@@ -569,7 +569,10 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v4_bmp(void *state, st
         (*image)->pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;
     } else if (bmp_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_BGRA) {
         (*image)->pixel_format = SAIL_PIXEL_FORMAT_BPP32_BGRA;
+    } else {
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
     }
+
     SAIL_TRY_OR_CLEANUP(sail_bytes_per_line((*image)->width, (*image)->pixel_format, &(*image)->bytes_per_line),
                         /* cleanup */ sail_destroy_image(*image));
 
@@ -609,6 +612,11 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v4_bmp(void *state, struct sail_
 
     struct bmp_state *bmp_state = (struct bmp_state *)state;
 
+    const unsigned r = bmp_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_RGBA ? 0 : 2;
+    const unsigned g = 1;
+    const unsigned b = bmp_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_RGBA ? 2 : 0;
+    const unsigned a = 3;
+
     for (unsigned i = image->height; i > 0; i--) {
         unsigned char *scan = (unsigned char *)image->pixels + image->bytes_per_line * (i - 1);
 
@@ -624,10 +632,11 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v4_bmp(void *state, struct sail_
                     while (bit_mask > 0 && pixel_index < image->width) {
                         uint8_t index = (byte & bit_mask) >> bit_shift;
 
-                        *scan++ = bmp_state->palette[index].component3;
-                        *scan++ = bmp_state->palette[index].component2;
-                        *scan++ = bmp_state->palette[index].component1;
-                        *scan++ = 255;
+                        *(scan+r) = bmp_state->palette[index].component3;
+                        *(scan+g) = bmp_state->palette[index].component2;
+                        *(scan+b) = bmp_state->palette[index].component1;
+                        *(scan+a) = 255;
+                        scan += 4;
 
                         bit_shift--;
                         bit_mask >>= 1;
@@ -645,10 +654,11 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v4_bmp(void *state, struct sail_
                     while (bit_mask > 0 && pixel_index < image->width) {
                         uint8_t index = (byte & bit_mask) >> bit_shift;
 
-                        *scan++ = bmp_state->palette[index].component3;
-                        *scan++ = bmp_state->palette[index].component2;
-                        *scan++ = bmp_state->palette[index].component1;
-                        *scan++ = 255;
+                        *(scan+r) = bmp_state->palette[index].component3;
+                        *(scan+g) = bmp_state->palette[index].component2;
+                        *(scan+b) = bmp_state->palette[index].component1;
+                        *(scan+a) = 255;
+                        scan += 4;
 
                         bit_shift -= 4;
                         bit_mask >>= 4;
@@ -660,34 +670,37 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v4_bmp(void *state, struct sail_
                     uint8_t index;
                     SAIL_TRY(io->strict_read(io->stream, &index, sizeof(index)));
 
-                    *scan++ = bmp_state->palette[index].component3;
-                    *scan++ = bmp_state->palette[index].component2;
-                    *scan++ = bmp_state->palette[index].component1;
-                    *scan++ = 255;
+                    *(scan+r) = bmp_state->palette[index].component3;
+                    *(scan+g) = bmp_state->palette[index].component2;
+                    *(scan+b) = bmp_state->palette[index].component1;
+                    *(scan+a) = 255;
+                    scan += 4;
 
                     pixel_index++;
                     break;
                 }
                 case 24: {
-                    uint8_t rgb[3];
-                    SAIL_TRY(io->strict_read(io->stream, rgb, sizeof(rgb)));
+                    sail_rgb8_t rgb;
+                    SAIL_TRY(sail_read_pixel3_uint8(io, &rgb));
 
-                    *scan++ = rgb[2];
-                    *scan++ = rgb[1];
-                    *scan++ = rgb[0];
-                    *scan++ = 255;
+                    *(scan+r) = rgb.component3;
+                    *(scan+g) = rgb.component2;
+                    *(scan+b) = rgb.component1;
+                    *(scan+a) = 255;
+                    scan += 4;
 
                     pixel_index++;
                     break;
                 }
                 case 32: {
-                    uint8_t rgba[4];
-                    SAIL_TRY(io->strict_read(io->stream, rgba, sizeof(rgba)));
+                    sail_rgba8_t rgba;
+                    SAIL_TRY(sail_read_pixel4_uint8(io, &rgba));
 
-                    *scan++ = rgba[2];
-                    *scan++ = rgba[1];
-                    *scan++ = rgba[0];
-                    *scan++ = rgba[3];
+                    *(scan+r) = rgba.component3;
+                    *(scan+g) = rgba.component2;
+                    *(scan+b) = rgba.component1;
+                    *(scan+a) = rgba.component4;
+                    scan += 4;
 
                     pixel_index++;
                     break;

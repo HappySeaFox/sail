@@ -27,7 +27,19 @@
 
 #include "sail-common.h"
 
-sail_status_t sail_read_sail_pixel4_uint8(struct sail_io *io, struct sail_pixel4_uint8 *pixel) {
+sail_status_t sail_read_pixel3_uint8(struct sail_io *io, struct sail_pixel3_uint8 *pixel) {
+
+    SAIL_CHECK_IO_PTR(io);
+    SAIL_CHECK_PIXEL_PTR(pixel);
+
+    SAIL_TRY(io->strict_read(io->stream, &pixel->component1, sizeof(pixel->component1)));
+    SAIL_TRY(io->strict_read(io->stream, &pixel->component2, sizeof(pixel->component2)));
+    SAIL_TRY(io->strict_read(io->stream, &pixel->component3, sizeof(pixel->component3)));
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_read_pixel4_uint8(struct sail_io *io, struct sail_pixel4_uint8 *pixel) {
 
     SAIL_CHECK_IO_PTR(io);
     SAIL_CHECK_PIXEL_PTR(pixel);

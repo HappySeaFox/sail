@@ -41,6 +41,19 @@ extern "C" {
 #endif
 
 /*
+ * A structure representing a pixel with 3 8-bit components. Typically, it's RGB.
+ */
+struct sail_pixel3_uint8
+{
+    uint8_t component1;
+    uint8_t component2;
+    uint8_t component3;
+};
+
+typedef struct sail_pixel3_uint8 sail_rgb8_t;
+typedef struct sail_pixel3_uint8 sail_bgr8_t;
+
+/*
  * A structure representing a pixel with 4 8-bit components. Typically, it's RGBA.
  */
 struct sail_pixel4_uint8
@@ -51,14 +64,22 @@ struct sail_pixel4_uint8
     uint8_t component4;
 };
 
-typedef struct sail_pixel4_uint8 sail_rgba_t;
+typedef struct sail_pixel4_uint8 sail_rgba8_t;
+typedef struct sail_pixel4_uint8 sail_bgra8_t;
+
+/*
+ * Reads a sail_pixel3_uint8 pixel byte by byte from the I/O stream.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_read_pixel3_uint8(struct sail_io *io, struct sail_pixel3_uint8 *pixel);
 
 /*
  * Reads a sail_pixel4_uint8 pixel byte by byte from the I/O stream.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_read_sail_pixel4_uint8(struct sail_io *io, struct sail_pixel4_uint8 *pixel);
+SAIL_EXPORT sail_status_t sail_read_pixel4_uint8(struct sail_io *io, struct sail_pixel4_uint8 *pixel);
 
 /* extern "C" */
 #ifdef __cplusplus
