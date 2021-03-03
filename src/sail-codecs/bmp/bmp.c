@@ -450,12 +450,14 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v4_bmp(struct sail_io *io, const 
 
     /* Check BMP restrictions. */
     if (bmp_state->version >= SAIL_BMP_V3) {
-        if ((bmp_state->v2.bit_count == 16 || bmp_state->v2.bit_count == 32) && bmp_state->v3.compression != SAIL_BI_BITFIELDS) {
+        if (bmp_state->v3.compression == SAIL_BI_BITFIELDS && (bmp_state->v2.bit_count != 16 && bmp_state->v2.bit_count != 32)) {
+            SAIL_LOG_ERROR("BMP: BitFields compression is allowed only for 16 or 32 bpp");
             SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_COMPRESSION);
         }
     }
 
-    if (bmp_state->v2.bit_count != 16 && bmp_state->v3.compression != SAIL_BI_RGB) {
+    if (bmp_state->v3.compression != SAIL_BI_RGB) {
+        SAIL_LOG_ERROR("BMP: Only RGB compression is supported");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_COMPRESSION);
     }
 
