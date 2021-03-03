@@ -573,6 +573,14 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v4_bmp(void *state, st
     SAIL_TRY_OR_CLEANUP(sail_bytes_per_line((*image)->width, (*image)->pixel_format, &(*image)->bytes_per_line),
                         /* cleanup */ sail_destroy_image(*image));
 
+    /* Resolution. */
+    if (bmp_state->version >= SAIL_BMP_V3) {
+        struct sail_resolution *resolution;
+        SAIL_TRY_OR_CLEANUP(sail_alloc_resolution_from_data(&resolution, SAIL_RESOLUTION_UNIT_METER, bmp_state->v3.x_pixels_per_meter, bmp_state->v3.y_pixels_per_meter),
+                        /* cleanup */ sail_destroy_image(*image));
+        (*image)->resolution = resolution;
+    }
+
     SAIL_TRY_OR_CLEANUP(io->seek(io->stream, bmp_state->dib_file_header.offset, SEEK_SET),
                         /* cleanup */ sail_destroy_image(*image));
 
