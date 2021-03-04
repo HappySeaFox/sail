@@ -302,6 +302,7 @@ struct bmp_state {
     int palette_count;
     /* Number of bytes to pad scan lines to 4-byte boundary. */
     unsigned pad_bytes;
+    bool flipped;
 
     bool frame_read;
     bool frame_written;
@@ -334,6 +335,7 @@ static sail_status_t alloc_bmp_state(struct bmp_state **bmp_state) {
     (*bmp_state)->palette         = NULL;
     (*bmp_state)->palette_count   = 0;
     (*bmp_state)->pad_bytes       = 0;
+    (*bmp_state)->flipped         = false;
 
     (*bmp_state)->frame_read    = false;
     (*bmp_state)->frame_written = false;
@@ -409,6 +411,14 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v4_bmp(struct sail_io *io, const 
         SAIL_TRY(io->tell(io->stream, &offset_of_bitmap_header));
 
         SAIL_TRY(bmp_private_read_v2(io, &bmp_state->v2));
+
+        /* If the height is negative, the bitmap is top-to-bottom. */
+        if (bmp_state->v2.height < 0) {
+            bmp_state->v2.height = -bmp_state->v2.height;
+            bmp_state->flipped = false;
+        } else {
+            bmp_state->flipped = true;
+        }
 
         switch (bmp_state->v2.size) {
             case SAIL_BITMAP_DIB_HEADER_V2_SIZE: {
@@ -622,7 +632,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v4_bmp(void *state, struct sail_
     const unsigned a = 3;
 
     for (unsigned i = image->height; i > 0; i--) {
-        unsigned char *scan = (unsigned char *)image->pixels + image->bytes_per_line * (i - 1);
+        unsigned char *scan = (unsigned char *)image->pixels + image->bytes_per_line * (bmp_state->flipped ? (i - 1) : (image->height - i));
 
         for (unsigned pixel_index = 0; pixel_index < image->width;) {
             switch (bmp_state->v2.bit_count) {
