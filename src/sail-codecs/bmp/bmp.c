@@ -597,6 +597,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v4_bmp(void *state, st
                         /* cleanup */ sail_destroy_image(*image));
     }
 
+    /* Seek to the bitmap data. */
     SAIL_TRY_OR_CLEANUP(io->seek(io->stream, bmp_state->dib_file_header.offset, SEEK_SET),
                         /* cleanup */ sail_destroy_image(*image));
 
