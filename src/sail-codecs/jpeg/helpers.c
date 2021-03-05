@@ -53,7 +53,7 @@ enum SailPixelFormat jpeg_private_color_space_to_pixel_format(J_COLOR_SPACE colo
         case JCS_GRAYSCALE: return SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE;
         case JCS_RGB:       return SAIL_PIXEL_FORMAT_BPP24_RGB;
 
-#ifdef HAVE_JPEG_JCS_EXT
+#ifdef SAIL_HAVE_JPEG_JCS_EXT
         case JCS_RGB565:    return SAIL_PIXEL_FORMAT_BPP16_RGB565;
 
         case JCS_EXT_RGB:   return SAIL_PIXEL_FORMAT_BPP24_RGB;
@@ -78,7 +78,7 @@ J_COLOR_SPACE jpeg_private_pixel_format_to_color_space(enum SailPixelFormat pixe
         case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE:  return JCS_GRAYSCALE;
         case SAIL_PIXEL_FORMAT_BPP24_RGB:       return JCS_RGB;
 
-#ifdef HAVE_JPEG_JCS_EXT
+#ifdef SAIL_HAVE_JPEG_JCS_EXT
         case SAIL_PIXEL_FORMAT_BPP16_RGB565:    return JCS_RGB565;
         case SAIL_PIXEL_FORMAT_BPP24_BGR:       return JCS_EXT_BGR;
 
@@ -224,7 +224,7 @@ sail_status_t jpeg_private_write_meta_data(struct jpeg_compress_struct *compress
     return SAIL_OK;
 }
 
-#ifdef HAVE_JPEG_ICCP
+#ifdef SAIL_HAVE_JPEG_ICCP
 sail_status_t jpeg_private_fetch_iccp(struct jpeg_decompress_struct *decompress_context, struct sail_iccp **iccp) {
 
     SAIL_CHECK_ICCP_PTR(iccp);
