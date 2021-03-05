@@ -31,12 +31,12 @@ macro(sail_codec_post_add)
                     return 0;
                 }
             "
-            HAVE_TIFF_${tiff_codec}
+            SAIL_HAVE_TIFF_${tiff_codec}
             )
         cmake_pop_check_state()
 
-        if (HAVE_TIFF_${tiff_codec})
-            target_compile_definitions(${TARGET} PRIVATE HAVE_TIFF_${tiff_codec})
+        if (SAIL_HAVE_TIFF_${tiff_codec})
+            target_compile_definitions(${TARGET} PRIVATE SAIL_HAVE_TIFF_${tiff_codec})
         endif()
 
         # Check if we can actually write defined compressions
@@ -83,11 +83,11 @@ macro(sail_codec_post_add)
                     return 0;
                 }
             "
-            HAVE_TIFF_WRITE_${tiff_codec}
+            SAIL_HAVE_TIFF_WRITE_${tiff_codec}
             )
         cmake_pop_check_state()
 
-        if (HAVE_TIFF_WRITE_${tiff_codec})
+        if (SAIL_HAVE_TIFF_WRITE_${tiff_codec})
             # Match the SAIL namings
             #
             string(REPLACE "_"         "-"          tiff_codec_fixed ${tiff_codec})
@@ -104,7 +104,7 @@ macro(sail_codec_post_add)
             string(REPLACE "SGILOG"    "SGI-LOG"    tiff_codec_fixed ${tiff_codec_fixed})
             list(APPEND CODEC_INFO_COMPRESSIONS ${tiff_codec_fixed})
 
-            target_compile_definitions(${TARGET} PRIVATE HAVE_TIFF_WRITE_${tiff_codec})
+            target_compile_definitions(${TARGET} PRIVATE SAIL_HAVE_TIFF_WRITE_${tiff_codec})
         endif()
     endforeach()
 

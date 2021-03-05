@@ -245,7 +245,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v4_jpeg(void *state, s
                             /* cleanup */ sail_destroy_image(*image));
 
     /* Fetch ICC profile. */
-#ifdef HAVE_JPEG_ICCP
+#ifdef SAIL_HAVE_JPEG_ICCP
     if (jpeg_state->read_options->io_options & SAIL_IO_OPTION_ICCP) {
         if (jpeg_state->extra_scan_line_needed_for_cmyk) {
             SAIL_LOG_DEBUG("JPEG: Skipping the ICC profile (if any) as we convert from CMYK");
@@ -449,7 +449,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v4_jpeg(void *state, 
     }
 
     /* Write ICC profile. */
-#ifdef HAVE_JPEG_ICCP
+#ifdef SAIL_HAVE_JPEG_ICCP
     if (jpeg_state->write_options->io_options & SAIL_IO_OPTION_ICCP && image->iccp != NULL) {
         SAIL_LOG_DEBUG("JPEG: Writing ICC profile");
         jpeg_write_icc_profile(jpeg_state->compress_context, image->iccp->data, image->iccp->data_length);

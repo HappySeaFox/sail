@@ -28,11 +28,11 @@ macro(sail_codec_post_add)
                 return 0;
             }
         "
-        HAVE_APNG
+        SAIL_HAVE_APNG
         )
     cmake_pop_check_state()
 
-    if (HAVE_APNG)
+    if (SAIL_HAVE_APNG)
         set(CODEC_INFO_EXTENSION_APNG   ";apng")
         set(CODEC_INFO_FEATURE_ANIMATED ";ANIMATED")
     endif()

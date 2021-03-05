@@ -29,16 +29,16 @@ macro(sail_codec_post_add)
                 return 0;
             }
         "
-        HAVE_JPEG_ICCP
+        SAIL_HAVE_JPEG_ICCP
         )
     cmake_pop_check_state()
 
-    if (HAVE_JPEG_ICCP)
+    if (SAIL_HAVE_JPEG_ICCP)
         set(CODEC_INFO_FEATURE_ICCP ";ICCP")
     endif()
 
-    if (HAVE_JPEG_ICCP)
-        target_compile_definitions(${TARGET} PRIVATE HAVE_JPEG_ICCP)
+    if (SAIL_HAVE_JPEG_ICCP)
+        target_compile_definitions(${TARGET} PRIVATE SAIL_HAVE_JPEG_ICCP)
     endif()
 
     # Check for libjpeg-turbo
@@ -57,11 +57,11 @@ macro(sail_codec_post_add)
                 return 0;
             }
         "
-        HAVE_JPEG_JCS_EXT
+        SAIL_HAVE_JPEG_JCS_EXT
         )
     cmake_pop_check_state()
 
-    if (HAVE_JPEG_JCS_EXT)
-        target_compile_definitions(${TARGET} PRIVATE HAVE_JPEG_JCS_EXT)
+    if (SAIL_HAVE_JPEG_JCS_EXT)
+        target_compile_definitions(${TARGET} PRIVATE SAIL_HAVE_JPEG_JCS_EXT)
     endif()
 endmacro()

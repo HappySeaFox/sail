@@ -59,7 +59,7 @@ SAIL_HIDDEN sail_status_t jpeg_private_fetch_meta_data(struct jpeg_decompress_st
 
 SAIL_HIDDEN sail_status_t jpeg_private_write_meta_data(struct jpeg_compress_struct *compress_context, const struct sail_meta_data_node *meta_data_node);
 
-#ifdef HAVE_JPEG_ICCP
+#ifdef SAIL_HAVE_JPEG_ICCP
 SAIL_HIDDEN sail_status_t jpeg_private_fetch_iccp(struct jpeg_decompress_struct *decompress_context, struct sail_iccp **iccp);
 #endif
 
