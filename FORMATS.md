@@ -1,4 +1,4 @@
-| N  | Image format                                                | Supported Read Features  | Unsupported Read Features | Supported write features | Unsupported write features | Dependencies |
+| N  | Image Format                                                | Supported Read Features  | Unsupported Read Features | Supported Write Features | Unsupported Write Features | Dependencies |
 | -- | ----------------------------------------------------------- | ------------------------ | ------------------------- | ------------------------ | -------------------------- | ------------ |
 | 1  | [APNG](https://wikipedia.org/wiki/APNG)                     | **Grayscale:** 1-bit, 2-bit, 4-bit, 8-bit, 16-bit. **Indexed:** 1-bit, 2-bit, 4-bit, 8-bit. **RGB:** 24-bit, 48-bit. **RGBA:** 32-bit, 64-bit. <br/><br/>**Content:** Static, Animated, Meta data, ICC profiles | - | Unsupported | - | libpng+APNG patch |
 | 2  | [GIF](https://wikipedia.org/wiki/GIF)                       | **Indexed:** 8-bit. <br/><br/>**Content:** Static, Animated, Meta data | - | Unsupported | - | giflib |
