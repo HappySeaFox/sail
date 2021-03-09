@@ -99,6 +99,7 @@ enum SailStatus {
     SAIL_ERROR_UNSUPPORTED_BIT_DEPTH,
     SAIL_ERROR_MISSING_PALETTE,
     SAIL_ERROR_UNSUPPORTED_FORMAT,
+    SAIL_ERROR_BROKEN_IMAGE,
 
     /*
      * Codecs-specific errors.
