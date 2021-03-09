@@ -283,6 +283,24 @@ SAIL_HIDDEN sail_status_t bmp_private_fetch_iccp(struct sail_io *io, long offset
     return SAIL_OK;
 }
 
+SAIL_HIDDEN sail_status_t bmp_private_skip_end_of_scan_line(struct sail_io *io) {
+
+    uint8_t marker;
+    SAIL_TRY(io->strict_read(io->stream, &marker, sizeof(marker)));
+
+    if (marker == SAIL_UNENCODED_RUN_MARKER) {
+        SAIL_TRY(io->strict_read(io->stream, &marker, sizeof(marker)));
+
+        if (marker != SAIL_END_OF_SCAN_LINE_MARKER) {
+            SAIL_TRY(io->seek(io->stream, -2, SEEK_CUR));
+        }
+    } else {
+        SAIL_TRY(io->seek(io->stream, -1, SEEK_CUR));
+    }
+
+    return SAIL_OK;
+}
+
 SAIL_HIDDEN unsigned bmp_private_pad_bytes(unsigned bytes_in_row) {
 
     unsigned remainder = bytes_in_row % 4;
@@ -758,19 +776,10 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v4_bmp(void *state, struct sail_
 
                         /* Read a possible end-of-scan-line marker at the end of line. */
                         if (pixel_index == image->width) {
-                            SAIL_TRY(io->strict_read(io->stream, &marker, sizeof(marker)));
-
-                            if (marker == SAIL_UNENCODED_RUN_MARKER) {
-                                SAIL_TRY(io->strict_read(io->stream, &marker, sizeof(marker)));
-
-                                if (marker != SAIL_END_OF_SCAN_LINE_MARKER) {
-                                    SAIL_TRY(io->seek(io->stream, -2, SEEK_CUR));
-                                }
-                            } else {
-                                SAIL_TRY(io->seek(io->stream, -1, SEEK_CUR));
-                            }
+                            SAIL_TRY(bmp_private_skip_end_of_scan_line(io));
                         }
                     } else {
+                        /* Normal RLE: count + value. */
                         uint8_t index;
                         SAIL_TRY(io->strict_read(io->stream, &index, sizeof(index)));
 
