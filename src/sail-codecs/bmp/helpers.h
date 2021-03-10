@@ -162,6 +162,8 @@ SAIL_HIDDEN sail_status_t bmp_private_bytes_in_row(unsigned width, unsigned bit_
 
 SAIL_HIDDEN unsigned bmp_private_pad_bytes(unsigned bytes_in_row);
 
-SAIL_HIDDEN sail_status_t bmp_private_fill_system_palette(sail_rgba8_t **palette, unsigned *palette_count);
+SAIL_HIDDEN sail_status_t bmp_private_fill_system_palette(unsigned bit_count, sail_rgba8_t **palette, unsigned *palette_count);
+
+SAIL_HIDDEN sail_status_t bmp_private_get_palette_color(const sail_rgba8_t *palette, unsigned palette_count, unsigned index, sail_rgba8_t *color);
 
 #endif
