@@ -5,8 +5,8 @@ layout=4
 version=1.1.2
 name=BMP
 description=Bitmap Picture
-magic-numbers=42 4d
-extensions=bmp;dib
+magic-numbers=42 4d;02 00
+extensions=bmp;ddb;dib
 mime-types=image/bmp;image/x-bmp
 
 [read-features]
