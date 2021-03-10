@@ -496,8 +496,8 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v4_bmp(struct sail_io *io, const 
             SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_COMPRESSION);
         }
 
-        if (bmp_state->v3.compression != SAIL_BI_RGB && bmp_state->v3.compression != SAIL_BI_RLE8) {
-            SAIL_LOG_ERROR("BMP: Only RGB and RLE8 compressions are supported");
+        if (bmp_state->v3.compression != SAIL_BI_RGB && bmp_state->v3.compression != SAIL_BI_RLE4 && bmp_state->v3.compression != SAIL_BI_RLE8) {
+            SAIL_LOG_ERROR("BMP: Only RGB, RLE4, and RLE8 compressions are supported");
             SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_COMPRESSION);
         }
 
@@ -698,24 +698,105 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v4_bmp(void *state, struct sail_
                     break;
                 }
                 case 4: {
-                    uint8_t byte;
-                    SAIL_TRY(io->strict_read(io->stream, &byte, sizeof(byte)));
+                    if (bmp_state->version >= SAIL_BMP_V3 && bmp_state->v3.compression == SAIL_BI_RLE4) {
+                        skip_pad_bytes = false;
 
-                    unsigned bit_shift = 4;
-                    unsigned bit_mask = 0xf0;
+                        uint8_t marker;
+                        SAIL_TRY(io->strict_read(io->stream, &marker, sizeof(marker)));
 
-                    while (bit_mask > 0 && pixel_index < image->width) {
-                        uint8_t index = (byte & bit_mask) >> bit_shift;
+                        if (marker == SAIL_UNENCODED_RUN_MARKER) {
+                            uint8_t count_or_marker;
+                            SAIL_TRY(io->strict_read(io->stream, &count_or_marker, sizeof(count_or_marker)));
 
-                        *(scan+r) = bmp_state->palette[index].component3;
-                        *(scan+g) = bmp_state->palette[index].component2;
-                        *(scan+b) = bmp_state->palette[index].component1;
-                        *(scan+a) = 255;
-                        scan += 4;
+                            if (count_or_marker == SAIL_END_OF_SCAN_LINE_MARKER) {
+                                /* Jump to the end of scan line. +1 to avoid reading end-of-scan-line marker twice below. */
+                                pixel_index = image->width + 1;
+                            } else if (count_or_marker == SAIL_END_OF_RLE_DATA_MARKER) {
+                                SAIL_LOG_ERROR("BMP: Unexpected end-of-rle-data marker");
+                                SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+                            } else if (count_or_marker == SAIL_DELTA_MARKER) {
+                                SAIL_LOG_ERROR("BMP: Delta marker is not supported");
+                                SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_FORMAT);
+                            } else {
+                                bool read_byte = true;
+                                uint8_t byte = 0;
+                                uint8_t index;
 
-                        bit_shift -= 4;
-                        bit_mask >>= 4;
-                        pixel_index++;
+                                for (uint8_t k = 0; k < count_or_marker; k++) {
+                                    if (read_byte) {
+                                        SAIL_TRY(io->strict_read(io->stream, &byte, sizeof(byte)));
+                                        index = (byte >> 4) & 0xf;
+                                        read_byte = false;
+                                    } else {
+                                        index = byte & 0xf;
+                                        read_byte = true;
+                                    }
+
+                                    *(scan+r) = bmp_state->palette[index].component3;
+                                    *(scan+g) = bmp_state->palette[index].component2;
+                                    *(scan+b) = bmp_state->palette[index].component1;
+                                    *(scan+a) = 255;
+                                    scan += 4;
+                                }
+
+                                /* Odd number of bytes is accompanied with an additional byte. */
+                                uint8_t number_of_unencoded_bytes = (count_or_marker + 1) / 2;
+                                if ((number_of_unencoded_bytes % 2) != 0) {
+                                    SAIL_TRY(io->seek(io->stream, 1, SEEK_CUR));
+                                }
+
+                                pixel_index += count_or_marker;
+                            }
+
+                        } else {
+                            /* Normal RLE: count + value. */
+                            bool high_4_bits = true;
+                            uint8_t index;
+
+                            uint8_t byte;
+                            SAIL_TRY(io->strict_read(io->stream, &byte, sizeof(byte)));
+
+                            for (uint8_t k = 0; k < marker; k++) {
+                                if (high_4_bits) {
+                                    index = (byte >> 4) & 0xf;
+                                    high_4_bits = false;
+                                } else {
+                                    index = byte & 0xf;
+                                    high_4_bits = true;
+                                }
+
+                                *(scan+r) = bmp_state->palette[index].component3;
+                                *(scan+g) = bmp_state->palette[index].component2;
+                                *(scan+b) = bmp_state->palette[index].component1;
+                                *(scan+a) = 255;
+                                scan += 4;
+                            }
+
+                            pixel_index += marker;
+                        }
+
+                        /* Read a possible end-of-scan-line marker at the end of line. */
+                        if (pixel_index == image->width) {
+                            SAIL_TRY(bmp_private_skip_end_of_scan_line(io));
+                        }
+                    } else {
+                        uint8_t byte;
+                        SAIL_TRY(io->strict_read(io->stream, &byte, sizeof(byte)));
+
+                        int bit_shift = 4;
+
+                        while (bit_shift >= 0 && pixel_index < image->width) {
+                            uint8_t index = (byte >> bit_shift) & 0xf;
+
+                            *(scan+r) = bmp_state->palette[index].component3;
+                            *(scan+g) = bmp_state->palette[index].component2;
+                            *(scan+b) = bmp_state->palette[index].component1;
+                            *(scan+a) = 255;
+                            scan += 4;
+
+                            bit_shift -= 4;
+                            pixel_index++;
+                        }
                     }
                     break;
                 }
@@ -760,6 +841,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v4_bmp(void *state, struct sail_
                             }
 
                         } else {
+                            /* Normal RLE: count + value. */
                             uint8_t index;
                             SAIL_TRY(io->strict_read(io->stream, &index, sizeof(index)));
 
@@ -779,7 +861,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v4_bmp(void *state, struct sail_
                             SAIL_TRY(bmp_private_skip_end_of_scan_line(io));
                         }
                     } else {
-                        /* Normal RLE: count + value. */
                         uint8_t index;
                         SAIL_TRY(io->strict_read(io->stream, &index, sizeof(index)));
 
@@ -797,7 +878,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v4_bmp(void *state, struct sail_
                     uint16_t rgb16;
                     SAIL_TRY(io->strict_read(io->stream, &rgb16, sizeof(rgb16)));
 
-                    // TODO Other compressions
                     if (bmp_state->v3.compression == SAIL_BI_RGB) {
                         *(scan+r) = ((rgb16 >> 10) & 0x1f) << 3;
                         *(scan+g) = ((rgb16 >> 5)  & 0x1f) << 3;
