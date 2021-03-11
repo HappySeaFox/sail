@@ -355,7 +355,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v4_bmp(void *state, st
 
     (*image)->source_image->compression = SAIL_COMPRESSION_NONE;
     (*image)->source_image->pixel_format = bmp_state->source_pixel_format;
-    (*image)->source_image->properties = SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY;
+    (*image)->source_image->properties = bmp_state->flipped ? SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY : 0;
     (*image)->width = (bmp_state->version == SAIL_BMP_V1) ? bmp_state->v1.width : bmp_state->v2.width;
     (*image)->height = (bmp_state->version == SAIL_BMP_V1) ? bmp_state->v1.height : bmp_state->v2.height;
 
