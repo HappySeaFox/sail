@@ -101,3 +101,21 @@ sail_status_t sail_alloc_palette_for_data(enum SailPixelFormat pixel_format, uns
 
     return SAIL_OK;
 }
+
+sail_status_t sail_alloc_palette_from_data(enum SailPixelFormat pixel_format, const void *data, unsigned color_count, struct sail_palette **palette) {
+
+    SAIL_CHECK_PALETTE_PTR(palette);
+
+    struct sail_palette *pal;
+    SAIL_TRY(sail_alloc_palette_for_data(pixel_format, color_count, &pal));
+
+    unsigned palette_size;
+    SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(color_count, pixel_format, &palette_size),
+                        /* cleanup */ sail_destroy_palette(pal));
+
+    memcpy(pal->data, data, palette_size);
+
+    *palette = pal;
+
+    return SAIL_OK;
+}

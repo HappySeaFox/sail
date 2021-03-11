@@ -102,6 +102,14 @@ SAIL_EXPORT sail_status_t sail_copy_palette(const struct sail_palette *source_pa
  */
 SAIL_EXPORT sail_status_t sail_alloc_palette_for_data(enum SailPixelFormat pixel_format, unsigned color_count, struct sail_palette **palette);
 
+/*
+ * Allocates a new palette and deep copies the specified data. The allocated palette MUST be destroyed later
+ * with sail_destroy_palette().
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_alloc_palette_from_data(enum SailPixelFormat pixel_format, const void *data, unsigned color_count, struct sail_palette **palette);
+
 /* extern "C" */
 #ifdef __cplusplus
 }
