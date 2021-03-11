@@ -136,10 +136,9 @@ sail_status_t bmp_private_bit_count_to_pixel_format(uint16_t bit_count, enum Sai
         case 1:  *pixel_format = SAIL_PIXEL_FORMAT_BPP1_INDEXED; return SAIL_OK;
         case 4:  *pixel_format = SAIL_PIXEL_FORMAT_BPP4_INDEXED; return SAIL_OK;
         case 8:  *pixel_format = SAIL_PIXEL_FORMAT_BPP8_INDEXED; return SAIL_OK;
-        // TODO 555, 565 etc.
-        case 16: *pixel_format = SAIL_PIXEL_FORMAT_BPP16;        return SAIL_OK;
-        case 24: *pixel_format = SAIL_PIXEL_FORMAT_BPP24_RGB;    return SAIL_OK;
-        case 32: *pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;   return SAIL_OK;
+        case 16: *pixel_format = SAIL_PIXEL_FORMAT_BPP16_BGR555; return SAIL_OK;
+        case 24: *pixel_format = SAIL_PIXEL_FORMAT_BPP24_BGR;    return SAIL_OK;
+        case 32: *pixel_format = SAIL_PIXEL_FORMAT_BPP32_BGRA;   return SAIL_OK;
     }
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_BIT_DEPTH);
