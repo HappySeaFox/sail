@@ -11,7 +11,7 @@ mime-types=image/bmp;image/x-bmp
 
 [read-features]
 features=STATIC;META-DATA
-output-pixel-formats=BPP32-RGBA;BPP32-BGRA
+output-pixel-formats=SOURCE;BPP32-RGBA;BPP32-BGRA
 default-output-pixel-format=@SAIL_DEFAULT_READ_OUTPUT_PIXEL_FORMAT@
 
 [write-features]

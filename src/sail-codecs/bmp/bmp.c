@@ -84,6 +84,7 @@ struct bmp_state {
 
     sail_rgba8_t *palette;
     unsigned palette_count;
+    unsigned bytes_in_row;
     /* Number of bytes to pad scan lines to 4-byte boundary. */
     unsigned pad_bytes;
     bool flipped;
@@ -118,6 +119,7 @@ static sail_status_t alloc_bmp_state(struct bmp_state **bmp_state) {
     (*bmp_state)->iccp            = NULL;
     (*bmp_state)->palette         = NULL;
     (*bmp_state)->palette_count   = 0;
+    (*bmp_state)->bytes_in_row    = 0;
     (*bmp_state)->pad_bytes       = 0;
     (*bmp_state)->flipped         = false;
 
@@ -285,7 +287,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v4_bmp(struct sail_io *io, const 
     /*  Read palette.  */
     if (bmp_state->version == SAIL_BMP_V1) {
         SAIL_TRY(bmp_private_fill_system_palette(bmp_state->v1.bit_count, &bmp_state->palette, &bmp_state->palette_count));
-    } else if (bmp_state->version > SAIL_BMP_V1 && bmp_state->v2.bit_count < 16) {
+    } else if (bmp_state->v2.bit_count < 16) {
         bmp_state->palette_count = 1 << bmp_state->v2.bit_count;
 
         void *ptr;
@@ -322,14 +324,12 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v4_bmp(struct sail_io *io, const 
     }
 
     /* Calculate the number of pad bytes to align scan lines to 4-byte boundary. */
-    unsigned bytes_in_row;
-
     if (bmp_state->version == SAIL_BMP_V1) {
-        SAIL_TRY(bmp_private_bytes_in_row(bmp_state->v1.width, bmp_state->v1.bit_count, &bytes_in_row));
-        bmp_state->pad_bytes = bmp_state->v1.byte_width - bytes_in_row;
+        SAIL_TRY(bmp_private_bytes_in_row(bmp_state->v1.width, bmp_state->v1.bit_count, &bmp_state->bytes_in_row));
+        bmp_state->pad_bytes = bmp_state->v1.byte_width - bmp_state->bytes_in_row;
     } else {
-        SAIL_TRY(bmp_private_bytes_in_row(bmp_state->v2.width, bmp_state->v2.bit_count, &bytes_in_row));
-        bmp_state->pad_bytes = bmp_private_pad_bytes(bytes_in_row);
+        SAIL_TRY(bmp_private_bytes_in_row(bmp_state->v2.width, bmp_state->v2.bit_count, &bmp_state->bytes_in_row));
+        bmp_state->pad_bytes = bmp_private_pad_bytes(bmp_state->bytes_in_row);
     }
 
     return SAIL_OK;
@@ -359,16 +359,38 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v4_bmp(void *state, st
     (*image)->width = (bmp_state->version == SAIL_BMP_V1) ? bmp_state->v1.width : bmp_state->v2.width;
     (*image)->height = (bmp_state->version == SAIL_BMP_V1) ? bmp_state->v1.height : bmp_state->v2.height;
 
-    if (bmp_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_RGBA) {
-        (*image)->pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;
-    } else if (bmp_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_BGRA) {
-        (*image)->pixel_format = SAIL_PIXEL_FORMAT_BPP32_BGRA;
-    } else {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
-    }
+    if (bmp_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_SOURCE) {
+        (*image)->pixel_format = bmp_state->source_pixel_format;
+        (*image)->bytes_per_line = bmp_state->bytes_in_row;
 
-    SAIL_TRY_OR_CLEANUP(sail_bytes_per_line((*image)->width, (*image)->pixel_format, &(*image)->bytes_per_line),
-                        /* cleanup */ sail_destroy_image(*image));
+        if (bmp_state->palette != NULL) {
+            struct sail_palette *palette;
+            SAIL_TRY_OR_CLEANUP(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP32_RGBA, bmp_state->palette_count, &palette),
+                                /* cleanup */ sail_destroy_image(*image));
+
+            unsigned char *palette_ptr = palette->data;
+
+            for (unsigned i = 0; i < bmp_state->palette_count; i++) {
+                *palette_ptr++ = bmp_state->palette[i].component3;
+                *palette_ptr++ = bmp_state->palette[i].component2;
+                *palette_ptr++ = bmp_state->palette[i].component1;
+                *palette_ptr++ = bmp_state->palette[i].component4;
+            }
+
+            (*image)->palette = palette;
+        }
+    } else {
+        if (bmp_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_RGBA) {
+            (*image)->pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;
+        } else if (bmp_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_BGRA) {
+            (*image)->pixel_format = SAIL_PIXEL_FORMAT_BPP32_BGRA;
+        } else {
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+        }
+
+        SAIL_TRY_OR_CLEANUP(sail_bytes_per_line((*image)->width, (*image)->pixel_format, &(*image)->bytes_per_line),
+                            /* cleanup */ sail_destroy_image(*image));
+    }
 
     /* Resolution. */
     if (bmp_state->version >= SAIL_BMP_V3) {
@@ -418,6 +440,41 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v4_bmp(void *state, struct sail_
     bool skip_pad_bytes = true;
     const unsigned bit_count = (bmp_state->version == SAIL_BMP_V1) ? bmp_state->v1.bit_count : bmp_state->v2.bit_count;
     sail_rgba8_t rgba;
+
+    /* Unobvious if/else branching: if+return. */
+    if (bmp_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_SOURCE) {
+        switch (bit_count) {
+            case 4: {
+                if (bmp_state->version >= SAIL_BMP_V3 && bmp_state->v3.compression == SAIL_BI_RLE4) {
+                    SAIL_LOG_ERROR("BMP: SOURCE pixel format is not compatible with RLE-encoded images");
+                    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_COMPRESSION);
+                }
+                break;
+            }
+            case 8: {
+                if (bmp_state->version >= SAIL_BMP_V3 && bmp_state->v3.compression == SAIL_BI_RLE8) {
+                    SAIL_LOG_ERROR("BMP: SOURCE pixel format is not compatible with RLE-encoded images");
+                    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_COMPRESSION);
+                }
+                break;
+            }
+        }
+
+        for (unsigned i = image->height; i > 0; i--) {
+            unsigned char *scan = (unsigned char *)image->pixels + image->bytes_per_line * (bmp_state->flipped ? (i - 1) : (image->height - i));
+
+            for (unsigned pixel_index = 0; pixel_index < image->width;) {
+                /* Read whole scan line. */
+                SAIL_TRY(io->strict_read(io->stream, scan, bmp_state->bytes_in_row));
+                pixel_index += image->width;
+            }
+
+            /* Skip pad bytes. */
+            SAIL_TRY(io->seek(io->stream, bmp_state->pad_bytes, SEEK_CUR));
+        }
+
+        return SAIL_OK;
+    }
 
     for (unsigned i = image->height; i > 0; i--) {
         unsigned char *scan = (unsigned char *)image->pixels + image->bytes_per_line * (bmp_state->flipped ? (i - 1) : (image->height - i));
@@ -499,7 +556,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v4_bmp(void *state, struct sail_
 
                                 pixel_index += count_or_marker;
                             }
-
                         } else {
                             /* Normal RLE: count + value. */
                             bool high_4_bits = true;
@@ -595,7 +651,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v4_bmp(void *state, struct sail_
 
                                 pixel_index += count_or_marker;
                             }
-
                         } else {
                             /* Normal RLE: count + value. */
                             uint8_t index;
@@ -677,7 +732,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v4_bmp(void *state, struct sail_
                     break;
                 }
                 default: {
-                    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+                    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_BIT_DEPTH);
                 }
             }
         }

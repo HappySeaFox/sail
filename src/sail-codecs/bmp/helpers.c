@@ -32,6 +32,7 @@
 sail_status_t bmp_private_supported_read_output_pixel_format(enum SailPixelFormat pixel_format) {
 
     switch (pixel_format) {
+        case SAIL_PIXEL_FORMAT_SOURCE:
         case SAIL_PIXEL_FORMAT_BPP32_RGBA:
         case SAIL_PIXEL_FORMAT_BPP32_BGRA: {
             return SAIL_OK;
