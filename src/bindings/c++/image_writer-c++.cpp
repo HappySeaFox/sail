@@ -38,7 +38,7 @@ class SAIL_HIDDEN image_writer::pimpl
 public:
     pimpl()
         : state(nullptr)
-        , sail_io{0, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr}
+        , sail_io{0, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr}
     {
     }
 
