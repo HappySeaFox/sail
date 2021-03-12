@@ -36,6 +36,7 @@
 
 #define SAIL_VERSION SAIL_BUILD_VERSION(@PROJECT_VERSION_MAJOR@, @PROJECT_VERSION_MINOR@, @PROJECT_VERSION_PATCH@)
 
+/* Unused when SAIL_COMBINE_CODECS is ON. */
 #cmakedefine SAIL_CODECS_PATH "@SAIL_CODECS_PATH@"
 
 /* Thread local flag used with static variables. */
