@@ -13,6 +13,7 @@ add_library(sail-common
                 log.c
                 meta_data_node.c
                 palette.c
+                pixel.c
                 pixel_formats_mapping_node.c
                 read_features.c
                 read_options.c
@@ -33,6 +34,7 @@ set(PUBLIC_HEADERS "common.h"
                    "log.h"
                    "meta_data_node.h"
                    "palette.h"
+                   "pixel.h"
                    "pixel_formats_mapping_node.h"
                    "read_features.h"
                    "read_options.h"

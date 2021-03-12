@@ -23,53 +23,67 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_SAIL_COMMON_H
-#define SAIL_SAIL_COMMON_H
+#ifndef SAIL_PIXEL_H
+#define SAIL_PIXEL_H
 
-/* Universal libsail-common include. */
+#include <stdint.h>
 
 #ifdef SAIL_BUILD
-    #include "config.h"
-
-    #include "common.h"
     #include "error.h"
     #include "export.h"
-    #include "iccp.h"
-    #include "image.h"
-    #include "io_common.h"
-    #include "log.h"
-    #include "meta_data_node.h"
-    #include "palette.h"
-    #include "pixel.h"
-    #include "pixel_formats_mapping_node.h"
-    #include "read_features.h"
-    #include "read_options.h"
-    #include "resolution.h"
-    #include "source_image.h"
-    #include "utils.h"
-    #include "write_features.h"
-    #include "write_options.h"
 #else
-    #include <sail-common/config.h>
-
-    #include <sail-common/common.h>
     #include <sail-common/error.h>
     #include <sail-common/export.h>
-    #include <sail-common/iccp.h>
-    #include <sail-common/image.h>
-    #include <sail-common/io_common.h>
-    #include <sail-common/log.h>
-    #include <sail-common/meta_data_node.h>
-    #include <sail-common/palette.h>
-    #include <sail-common/pixel.h>
-    #include <sail-common/pixel_formats_mapping_node.h>
-    #include <sail-common/read_features.h>
-    #include <sail-common/read_options.h>
-    #include <sail-common/resolution.h>
-    #include <sail-common/source_image.h>
-    #include <sail-common/utils.h>
-    #include <sail-common/write_features.h>
-    #include <sail-common/write_options.h>
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/*
+ * A structure representing a pixel with 3 8-bit components. Typically, it's RGB.
+ */
+struct sail_pixel3_uint8
+{
+    uint8_t component1;
+    uint8_t component2;
+    uint8_t component3;
+};
+
+typedef struct sail_pixel3_uint8 sail_rgb8_t;
+typedef struct sail_pixel3_uint8 sail_bgr8_t;
+
+/*
+ * A structure representing a pixel with 4 8-bit components. Typically, it's RGBA.
+ */
+struct sail_pixel4_uint8
+{
+    uint8_t component1;
+    uint8_t component2;
+    uint8_t component3;
+    uint8_t component4;
+};
+
+typedef struct sail_pixel4_uint8 sail_rgba8_t;
+typedef struct sail_pixel4_uint8 sail_bgra8_t;
+
+/*
+ * Reads a sail_pixel3_uint8 pixel byte by byte from the I/O stream.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_read_pixel3_uint8(struct sail_io *io, struct sail_pixel3_uint8 *pixel);
+
+/*
+ * Reads a sail_pixel4_uint8 pixel byte by byte from the I/O stream.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_read_pixel4_uint8(struct sail_io *io, struct sail_pixel4_uint8 *pixel);
+
+/* extern "C" */
+#ifdef __cplusplus
+}
 #endif
 
 #endif

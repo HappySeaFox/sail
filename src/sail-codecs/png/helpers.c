@@ -384,10 +384,7 @@ sail_status_t png_private_fetch_palette(png_structp png_ptr, png_infop info_ptr,
     }
 
     /* Always use RGB palette. */
-    SAIL_TRY(sail_alloc_palette(palette));
-    (*palette)->pixel_format = SAIL_PIXEL_FORMAT_BPP24_RGB;
-    (*palette)->color_count = png_palette_color_count;
-    SAIL_TRY(sail_malloc(png_palette_color_count * 3, &(*palette)->data));
+    SAIL_TRY(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP24_RGB, png_palette_color_count, palette));
 
     unsigned char *palette_ptr = (*palette)->data;
 

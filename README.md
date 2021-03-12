@@ -74,10 +74,11 @@ images with the help of [ksquirrel-libs](FAQ.md#how-old-is-sail), the predecesso
 | N  | Image format                                                | Operations    | Dependencies      |
 | -- | ------------------------------------------------------------| ------------- | ----------------- |
 | 1  | [APNG](https://wikipedia.org/wiki/APNG)                     | R             | libpng+APNG patch |
-| 2  | [GIF](https://wikipedia.org/wiki/GIF)                       | R             | giflib            |
-| 3  | [JPEG](https://wikipedia.org/wiki/JPEG)                     | RW            | libjpeg-turbo     |
-| 4  | [PNG](https://wikipedia.org/wiki/Portable_Network_Graphics) | RW            | libpng            |
-| 5  | [TIFF](https://wikipedia.org/wiki/TIFF)                     | RW            | libtiff           |
+| 2  | [BMP](https://wikipedia.org/wiki/BMP_file_format)           | R             |                   |
+| 3  | [GIF](https://wikipedia.org/wiki/GIF)                       | R             | giflib            |
+| 4  | [JPEG](https://wikipedia.org/wiki/JPEG)                     | RW            | libjpeg-turbo     |
+| 5  | [PNG](https://wikipedia.org/wiki/Portable_Network_Graphics) | RW            | libpng            |
+| 6  | [TIFF](https://wikipedia.org/wiki/TIFF)                     | RW            | libtiff           |
 
 See the full list [here](FORMATS.md). Work to add more image formats is ongoing.
 
