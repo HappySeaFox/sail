@@ -32,7 +32,6 @@
 #include "sail-common.h"
 
 #include "helpers.h"
-#include "io.h"
 
 /*  Compression types.  */
 static const uint32_t SAIL_BI_RGB            = 0;
