@@ -134,7 +134,7 @@ private:
     /*
      * Makes a deep copy of the specified meta data.
      */
-    meta_data(const sail_meta_data_node *md);
+    explicit meta_data(const sail_meta_data_node *md);
 
     meta_data& with_value_type(SailMetaDataType type);
 

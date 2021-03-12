@@ -422,7 +422,7 @@ image::image(const sail_image *sail_image)
     with_width(sail_image->width)
         .with_height(sail_image->height)
         .with_bytes_per_line(sail_image->bytes_per_line)
-        .with_resolution(sail_image->resolution)
+        .with_resolution(sail::resolution(sail_image->resolution))
         .with_pixel_format(sail_image->pixel_format)
         .with_animated(sail_image->animated)
         .with_delay(sail_image->delay)
@@ -430,7 +430,7 @@ image::image(const sail_image *sail_image)
         .with_meta_data(meta_data)
         .with_iccp(sail::iccp(sail_image->iccp))
         .with_properties(sail_image->properties)
-        .with_source_image(sail_image->source_image);
+        .with_source_image(sail::source_image(sail_image->source_image));
 
     if (sail_image->pixels != nullptr) {
         SAIL_TRY_OR_EXECUTE(transfer_pixels_pointer(sail_image),
@@ -504,7 +504,7 @@ sail_status_t image::to_sail_image(sail_image *sail_image) const
                             /* cleanup */ sail_destroy_meta_data_node_chain(sail_image->meta_data_node));
 
         SAIL_TRY_OR_CLEANUP(d->palette.to_sail_palette(sail_image->palette),
-                            /* cleanup */ sail_destroy_palette(sail_image->palette);
+                            /* cleanup */ sail_destroy_palette(sail_image->palette),
                                           sail_destroy_meta_data_node_chain(sail_image->meta_data_node));
     }
 
@@ -517,7 +517,7 @@ sail_status_t image::to_sail_image(sail_image *sail_image) const
 
         SAIL_TRY_OR_CLEANUP(d->iccp.to_sail_iccp(sail_image->iccp),
                             /* cleanup */ sail_destroy_iccp(sail_image->iccp),
-                                          sail_destroy_palette(sail_image->palette);
+                                          sail_destroy_palette(sail_image->palette),
                                           sail_destroy_meta_data_node_chain(sail_image->meta_data_node));
     }
 
@@ -526,13 +526,13 @@ sail_status_t image::to_sail_image(sail_image *sail_image) const
     if (d->source_image.is_valid()) {
         SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&sail_image->source_image),
                             /* cleanup */ sail_destroy_iccp(sail_image->iccp),
-                                          sail_destroy_palette(sail_image->palette);
+                                          sail_destroy_palette(sail_image->palette),
                                           sail_destroy_meta_data_node_chain(sail_image->meta_data_node));
 
         SAIL_TRY_OR_CLEANUP(d->source_image.to_sail_source_image(sail_image->source_image),
                             /* cleanup */ sail_destroy_source_image(sail_image->source_image),
                                           sail_destroy_iccp(sail_image->iccp),
-                                          sail_destroy_palette(sail_image->palette);
+                                          sail_destroy_palette(sail_image->palette),
                                           sail_destroy_meta_data_node_chain(sail_image->meta_data_node));
     }
 

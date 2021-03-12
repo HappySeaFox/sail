@@ -57,35 +57,51 @@ public:
     context& operator=(const context&) = delete;
 
     /*
-     * Initializes a new SAIL thread-local static context with the specific flags. Does nothing if the thread-local static context
-     * already exists. Builds a list of available SAIL codecs. See SailInitFlags.
+     * Initializes a new SAIL thread-local static context with the specific flags. Does nothing
+     * if a thread-local static context already exists. Builds a list of available SAIL codecs.
+     * See SailInitFlags.
      *
-     * If you don't need specific features like preloading codecs, just don't use this method at all.
-     * All reading or writing methods allocate a thread-local static context implicitly when they need it
-     * and when it doesn't exist already.
+     * Use this function when you need specific features like preloading codecs. If you don't need specific
+     * features, using this function is optional. All reading or writing functions allocate a thread-local
+     * static context implicitly when they need it and when it doesn't exist already.
      *
-     * It's always recommended to destroy the implicitly or explicitly allocated SAIL thread-local static context
-     * with finish() when you're done with calling SAIL methods in the current thread.
+     * It's recommended to destroy the implicitly or explicitly allocated SAIL thread-local static context
+     * by calling sail_finish() when you're done with using SAIL functions in the current thread.
      *
-     * Codecs paths search algorithm (first found path wins):
+     * Codecs path search algorithm (first found path wins):
      *
-     *   Windows:
-     *     1. SAIL_CODECS_PATH environment variable
-     *     2. <SAIL DEPLOYMENT FOLDER>\lib\sail\codecs
-     *     3. Hardcoded SAIL_CODECS_PATH in config.h
+     * 1. VCPKG port on any platform
+     *   Codecs are combined into a dynamically linked library, so no need to search them.
      *
-     *   Unix (including macOS):
-     *     1. SAIL_CODECS_PATH environment variable
-     *     2. Hardcoded SAIL_CODECS_PATH in config.h
+     *   Note for Unix platforms: the client application must be built with -rdynamic or an equivalent
+     *   to enable dlopen and dlsym on the same binary. If you use CMake, this could be achieved by
+     *   setting CMAKE_ENABLE_EXPORTS to ON.
+     *
+     * 2. Standalone build or bundle compiled with SAIL_COMBINE_CODECS=ON
+     *   Same to VCPKG port.
+     *
+     * 3. Windows (standalone build or bundle)
+     *   1. SAIL_CODECS_PATH environment variable
+     *   2. <SAIL DEPLOYMENT FOLDER>\lib\sail\codecs
+     *   3. Hardcoded SAIL_CODECS_PATH in config.h
+     *
+     * 4. Unix including macOS (standalone build)
+     *   1. SAIL_CODECS_PATH environment variable
+     *   2. Hardcoded SAIL_CODECS_PATH in config.h
+     *
+     *   <FOUND PATH>/lib is added to LD_LIBRARY_PATH.
+     *
+     * Additionally, SAIL_MY_CODECS_PATH environment variable is always searched
+     * so you can load your own codecs from there.
      *
      * Returns SAIL_OK on success.
      */
     static sail_status_t init(int flags);
 
     /*
-     * Unloads all the loaded codecs from the cache to release memory occupied by them. Use it if you want
-     * to release some memory but do not want to deinitialize SAIL with sail_finish(). Subsequent attempts
-     * to read or write images will reload necessary SAIL codecs from disk.
+     * Unloads all the loaded codecs from the cache to release memory occupied by them. Use this method
+     * if you want to release some memory but do not want to deinitialize SAIL with finish().
+     * Subsequent attempts to read or write images will reload necessary SAIL codecs from disk.
      *
      * Returns SAIL_OK on success.
      */
@@ -95,7 +111,7 @@ public:
      * Finalizes working with the thread-local static context that was implicitly or explicitly allocated by
      * reading or writing functions.
      *
-     * Unloads all codecs. All pointers to codec info objects, read and write features get invalidated. 
+     * Unloads all codecs. All pointers to codec info objects, read and write features get invalidated.
      * Using them after calling finish() will lead to a crash.
      *
      * It's possible to initialize a new SAIL thread-local static context afterwards, implicitly or explicitly.

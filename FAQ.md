@@ -17,7 +17,7 @@ Table of Contents
     * [SAIL\_COMBINE\_CODECS is ON](#sail_combine_codecs-is-on)
   * [How does SAIL look for codecs?](#how-does-sail-look-for-codecs)
     * [VCPKG port on any platform](#vcpkg-port-on-any-platform)
-    * [Standalone build/bundle compiled with SAIL\_COMBINE\_CODECS=ON](#standalone-buildbundle-compiled-with-sail_combine_codecson)
+    * [Standalone build or bundle compiled with SAIL\_COMBINE\_CODECS=ON](#standalone-build-or-bundle-compiled-with-sail_combine_codecson)
     * [Windows (standalone build or bundle)](#windows-standalone-build-or-bundle)
     * [Unix including macOS (standalone build)](#unix-including-macos-standalone-build)
   * [How can I point SAIL to my custom codecs?](#how-can-i-point-sail-to-my-custom-codecs)
@@ -134,7 +134,7 @@ Note for Unix platforms: the client application must be built with `-rdynamic` o
 to enable `dlopen` and `dlsym` on the same binary. If you use CMake, this could be achieved by
 setting `CMAKE_ENABLE_EXPORTS` to `ON`.
 
-### Standalone build/bundle compiled with SAIL_COMBINE_CODECS=ON
+### Standalone build or bundle compiled with SAIL_COMBINE_CODECS=ON
 
 Same to VCPKG port.
 

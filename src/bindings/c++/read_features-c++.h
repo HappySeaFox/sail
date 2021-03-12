@@ -69,7 +69,7 @@ private:
      * Makes a deep copy of the specified read features and stores the pointer for further use.
      * When the SAIL context gets uninitialized, the pointer becomes dangling.
      */
-    read_features(const sail_read_features *rf);
+    explicit read_features(const sail_read_features *rf);
 
     read_features& with_output_pixel_formats(const std::vector<SailPixelFormat> &output_pixel_formats);
     read_features& with_default_output_pixel_format(SailPixelFormat default_output_pixel_format);

@@ -185,7 +185,7 @@ private:
      * Makes a deep copy of the specified codec info and stores the pointer for further use.
      * When the SAIL context gets uninitialized, the pointer becomes dangling.
      */
-    codec_info(const sail_codec_info *pi);
+    explicit codec_info(const sail_codec_info *ci);
 
     codec_info& with_path(const std::string &path);
     codec_info& with_version(const std::string &version);

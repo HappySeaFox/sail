@@ -78,7 +78,7 @@ private:
     /*
      * Makes a deep copy of the specified ICC profile.
      */
-    iccp(const sail_iccp *ic);
+    explicit iccp(const sail_iccp *ic);
 
     sail_status_t to_sail_iccp(sail_iccp *ic) const;
 

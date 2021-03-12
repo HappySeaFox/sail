@@ -849,7 +849,10 @@ uint64_t sail_now(void) {
 
 bool sail_path_exists(const char *path) {
 
-    SAIL_CHECK_PATH_PTR(path);
+    if (path == NULL) {
+        SAIL_LOG_ERROR("Path is NULL");
+        return false;
+    }
 
 #ifdef SAIL_WIN32
     return _access(path, 0) == 0;
@@ -860,7 +863,10 @@ bool sail_path_exists(const char *path) {
 
 bool sail_is_dir(const char *path) {
 
-    SAIL_CHECK_PATH_PTR(path);
+    if (path == NULL) {
+        SAIL_LOG_ERROR("Path is NULL");
+        return false;
+    }
 
 #ifdef SAIL_WIN32
     struct _stat attrs;
@@ -883,7 +889,10 @@ bool sail_is_dir(const char *path) {
 
 bool sail_is_file(const char *path) {
 
-    SAIL_CHECK_PATH_PTR(path);
+    if (path == NULL) {
+        SAIL_LOG_ERROR("Path is NULL");
+        return false;
+    }
 
 #ifdef SAIL_WIN32
     struct _stat attrs;

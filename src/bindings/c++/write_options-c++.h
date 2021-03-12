@@ -72,7 +72,7 @@ private:
      * Makes a deep copy of the specified write options and stores the pointer for further use.
      * When the SAIL context gets uninitialized, the pointer becomes dangling.
      */
-    write_options(const sail_write_options *wo);
+    explicit write_options(const sail_write_options *wo);
 
     sail_status_t to_sail_write_options(sail_write_options *write_options) const;
 

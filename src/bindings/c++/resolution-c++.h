@@ -93,7 +93,7 @@ private:
     /*
      * Makes a deep copy of the specified resolution.
      */
-    resolution(const sail_resolution *res);
+    explicit resolution(const sail_resolution *res);
 
     sail_status_t to_sail_resolution(sail_resolution *res) const;
 

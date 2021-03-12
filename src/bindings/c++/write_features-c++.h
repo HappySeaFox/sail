@@ -76,7 +76,7 @@ private:
      * Makes a deep copy of the specified write features and stores the pointer for further use.
      * When the SAIL context gets uninitialized, the pointer becomes dangling.
      */
-    write_features(const sail_write_features *wf);
+    explicit write_features(const sail_write_features *wf);
 
     write_features& with_pixel_formats_mappings(const std::map<SailPixelFormat, std::vector<SailPixelFormat>> &pixel_formats_mappings);
     write_features& with_features(int features);
