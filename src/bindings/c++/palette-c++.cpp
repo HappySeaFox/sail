@@ -120,7 +120,9 @@ palette& palette::with_data(SailPixelFormat pixel_format, const void *data, unsi
     d->pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;
     d->color_count  = 0;
 
-    SAIL_TRY_OR_SUPPRESS(copy(pixel_format, data, color_count));
+    if (pixel_format != SAIL_PIXEL_FORMAT_UNKNOWN) {
+        SAIL_TRY_OR_SUPPRESS(copy(pixel_format, data, color_count));
+    }
 
     return *this;
 }
