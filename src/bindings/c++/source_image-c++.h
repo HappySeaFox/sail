@@ -90,7 +90,7 @@ private:
     /*
      * Makes a deep copy of the specified source image.
      */
-    source_image(const sail_source_image *si);
+    explicit source_image(const sail_source_image *si);
 
     sail_status_t to_sail_source_image(sail_source_image *si) const;
 

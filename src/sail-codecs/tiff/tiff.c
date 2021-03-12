@@ -263,10 +263,9 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v4_tiff(void *state, struct sail
     if (tiff_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_BGRA) {
         unsigned char *pixels = image->pixels;
         const unsigned pixels_count = image->width * image->height;
-        unsigned char tmp;
 
         for (unsigned i = 0; i < pixels_count; i++, pixels += 4) {
-            tmp = *pixels;
+            unsigned char tmp = *pixels;
             *pixels = *(pixels+2);
             *(pixels+2) = tmp;
         }

@@ -33,7 +33,7 @@ template<typename F>
 class scope_cleanup
 {
 public:
-    scope_cleanup(F f)
+    explicit scope_cleanup(F f)
         : m_f(f)
     {
     }

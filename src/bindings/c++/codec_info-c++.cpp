@@ -274,22 +274,22 @@ std::vector<codec_info> codec_info::list()
     return codec_info_list;
 }
 
-codec_info::codec_info(const sail_codec_info *pi)
+codec_info::codec_info(const sail_codec_info *ci)
     : codec_info()
 {
-    if (pi == nullptr) {
+    if (ci == nullptr) {
         SAIL_LOG_DEBUG("NULL pointer has been passed to sail::codec_info(). The object is untouched");
         return;
     }
 
-    d->sail_codec_info_c = pi;
+    d->sail_codec_info_c = ci;
 
     std::vector<std::string> magic_numbers;
     std::vector<std::string> extensions;
     std::vector<std::string> mime_types;
 
     // magic numbers
-    const sail_string_node *magic_number_node = pi->magic_number_node;
+    const sail_string_node *magic_number_node = ci->magic_number_node;
 
     while (magic_number_node != nullptr) {
         magic_numbers.push_back(magic_number_node->value);
@@ -297,7 +297,7 @@ codec_info::codec_info(const sail_codec_info *pi)
     }
 
     // extensions
-    const sail_string_node *extension_node = pi->extension_node;
+    const sail_string_node *extension_node = ci->extension_node;
 
     while (extension_node != nullptr) {
         extensions.push_back(extension_node->value);
@@ -305,22 +305,22 @@ codec_info::codec_info(const sail_codec_info *pi)
     }
 
     // mime types
-    const sail_string_node *mime_type_node = pi->mime_type_node;
+    const sail_string_node *mime_type_node = ci->mime_type_node;
 
     while (mime_type_node != nullptr) {
         mime_types.push_back(mime_type_node->value);
         mime_type_node = mime_type_node->next;
     }
 
-    with_path(pi->path)
-        .with_version(pi->version)
-        .with_name(pi->name)
-        .with_description(pi->description)
+    with_path(ci->path)
+        .with_version(ci->version)
+        .with_name(ci->name)
+        .with_description(ci->description)
         .with_magic_numbers(magic_numbers)
         .with_extensions(extensions)
         .with_mime_types(mime_types)
-        .with_read_features(pi->read_features)
-        .with_write_features(pi->write_features);
+        .with_read_features(sail::read_features(ci->read_features))
+        .with_write_features(sail::write_features(ci->write_features));
 }
 
 codec_info& codec_info::with_path(const std::string &path)
