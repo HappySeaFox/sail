@@ -80,10 +80,12 @@ static MunitResult test_realloc(const MunitParameter params[], void *user_data) 
     void *ptr = NULL;
 
     while (iteration++ < iterations) {
-        current_size = (size_t)(current_size * factor);
-
         munit_assert(sail_realloc(current_size, &ptr) == SAIL_OK);
         munit_assert_not_null(ptr);
+
+        memset(ptr, 0, current_size);
+
+        current_size = (size_t)(current_size * factor);
     }
 
     sail_free(ptr);
