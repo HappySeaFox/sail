@@ -26,4 +26,3 @@ compression-level-default=0
 compression-level-step=0
 
 [write-pixel-formats-mapping]
-BPP32-RGBA=SOURCE
