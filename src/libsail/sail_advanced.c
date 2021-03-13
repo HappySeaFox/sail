@@ -100,15 +100,16 @@ sail_status_t sail_read_next_frame(void *state, struct sail_image **image) {
     SAIL_CHECK_STATE_PTR(state_of_mind->state);
     SAIL_CHECK_CODEC_PTR(state_of_mind->codec);
 
-    SAIL_TRY(state_of_mind->codec->v4->read_seek_next_frame(state_of_mind->state, state_of_mind->io, image));
+    struct sail_image *image_local;
+    SAIL_TRY(state_of_mind->codec->v4->read_seek_next_frame(state_of_mind->state, state_of_mind->io, &image_local));
 
     /* Detect the number of passes needed to write an interlaced image. */
     int interlaced_passes;
-    if ((*image)->source_image->properties & SAIL_IMAGE_PROPERTY_INTERLACED) {
-        interlaced_passes = (*image)->interlaced_passes;
+    if (image_local->source_image->properties & SAIL_IMAGE_PROPERTY_INTERLACED) {
+        interlaced_passes = image_local->interlaced_passes;
 
         if (interlaced_passes < 1) {
-            sail_destroy_image(*image);
+            sail_destroy_image(image_local);
             SAIL_LOG_AND_RETURN(SAIL_ERROR_INTERLACING_UNSUPPORTED);
         }
     } else {
@@ -117,21 +118,20 @@ sail_status_t sail_read_next_frame(void *state, struct sail_image **image) {
 
     /* Allocate pixels. */
     unsigned pixels_size;
-    SAIL_TRY_OR_CLEANUP(sail_bytes_per_image(*image, &pixels_size),
-                        /* cleanup */ sail_destroy_image(*image));
+    SAIL_TRY_OR_CLEANUP(sail_bytes_per_image(image_local, &pixels_size),
+                        /* cleanup */ sail_destroy_image(image_local));
 
-    SAIL_TRY_OR_CLEANUP(sail_malloc(pixels_size, &(*image)->pixels),
-                        /* cleanup */ sail_destroy_image(*image));
+    SAIL_TRY_OR_CLEANUP(sail_malloc(pixels_size, &image_local->pixels),
+                        /* cleanup */ sail_destroy_image(image_local));
 
     for (int pass = 0; pass < interlaced_passes; pass++) {
-        SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v4->read_seek_next_pass(state_of_mind->state, state_of_mind->io, *image),
-                            /* cleanup */ sail_destroy_image(*image));
-
-        SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v4->read_frame(state_of_mind->state,
-                                                                    state_of_mind->io,
-                                                                    *image),
-                            /* cleanup */ sail_destroy_image(*image));
+        SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v4->read_seek_next_pass(state_of_mind->state, state_of_mind->io, image_local),
+                            /* cleanup */ sail_destroy_image(image_local));
+        SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v4->read_frame(state_of_mind->state, state_of_mind->io, image_local),
+                            /* cleanup */ sail_destroy_image(image_local));
     }
+
+    *image = image_local;
 
     return SAIL_OK;
 }
