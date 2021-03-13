@@ -1,2 +1,4 @@
-sail_test(TARGET integrity SOURCES integrity.c)
-sail_test(TARGET malloc    SOURCES malloc.c)
+sail_test(TARGET integrity     SOURCES integrity.c)
+sail_test(TARGET malloc        SOURCES malloc.c)
+sail_test(TARGET read_options  SOURCES read_options.c)
+sail_test(TARGET write_options SOURCES write_options.c)
