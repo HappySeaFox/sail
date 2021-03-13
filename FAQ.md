@@ -31,7 +31,7 @@ Table of Contents
   * [Please describe the memory management techniques implemented in SAIL](#please-describe-the-memory-management-techniques-implemented-in-sail)
     * [The memory management technique implemented in SAIL](#the-memory-management-technique-implemented-in-sail)
     * [Convention to call SAIL functions](#convention-to-call-sail-functions)
-    * [Pointers to images, pixels, etc\. are always freed on error](#pointers-to-images-pixels-etc-are-always-freed-on-error)
+    * [External pointers stay untouched on error](#external-pointers-stay-untouched-on-error)
     * [Always set a pointer to state to NULL (C only)](#always-set-a-pointer-to-state-to-null-c-only)
   * [Are there any C/C\+\+ examples?](#are-there-any-cc-examples)
   * [Are there any bindings to other programming languages?](#are-there-any-bindings-to-other-programming-languages)
@@ -237,7 +237,7 @@ See `sail_start_reading_file()`, `sail_start_reading_mem()`, and `sail_start_rea
 
 ### The memory management technique implemented in SAIL
 
-Internally, SAIL always tries to clean up on errors. If you encounter a memory leak on error, please report it.
+Internally, SAIL always cleans up on errors. If you encounter a memory leak on error, please report it.
 
 **C only:** However, if an engineer encounters an error in the middle of reading or writing an image with the `advanced`
 or a deeper API, it's always a responsibility of the engineer to stop reading or writing with
@@ -252,20 +252,34 @@ situation in `~image_reader()` or `~image_writer()`.
 It's always recommended to use the `SAIL_TRY()` macro to call SAIL functions. It's also always recommended
 to clean up in your code with the `SAIL_TRY_OR_CLEANUP()` macro if you need to.
 
-### Pointers to images, pixels, etc. are always freed on error
+### External pointers stay untouched on error
 
-Pointers that are modified by SAIL functions are always freed on error but may be left set
-to a non-NULL value. SAIL does not reset them to a NULL value on error. For example:
+External pointers that are allocated or modified by SAIL functions stay untouched on error. For example:
+
+```C
+struct sail_image *image = NULL;
+SAIL_TRY(sail_alloc_image(&image));
+
+/*
+ * If sail_alloc_palette_for_data() fails, the palette pointer stays untouched (NULL).
+ * This code prints NULL value on error.
+ */
+SAIL_TRY_OR_CLEANUP(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP24_RGB, color_count, &image->palette));
+                    /* cleanup */ printf("%p\n", image->palette),
+                                  sail_destroy_image(image));
+```
+
+Or:
 
 ```C
 void *state = NULL;
-struct sail_image *image;
+struct sail_image *image = NULL;
 
 SAIL_TRY(sail_start_reading_file(..., &state));
 
 /*
- * SAIL frees the 'image' or error, but doesn't reset its value.
- * This code sample prints a non-NULL address on error.
+ * If sail_read_next_frame() fails, the image pointer stays untouched (NULL).
+ * This code prints NULL value on error.
  */
 SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, &image),
                     /* cleanup */ printf("%p\n", image),
