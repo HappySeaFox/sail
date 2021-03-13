@@ -290,8 +290,8 @@ static sail_status_t check_codec_info(const struct sail_codec_info *codec_info) 
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INCOMPLETE_CODEC_INFO);
     }
 
-    /* Compressions must always exist.*/
-    if (write_features->compressions == NULL || write_features->compressions_length < 1) {
+    /* Compressions must exist if we're able to write this image format.*/
+    if (write_features->features != 0 && (write_features->compressions == NULL || write_features->compressions_length < 1)) {
         SAIL_LOG_ERROR("The codec '%s' specifies an empty compressions list", codec_info->name);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INCOMPLETE_CODEC_INFO);
     }
