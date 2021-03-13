@@ -82,9 +82,12 @@ sail_status_t sail_write_options_from_features(const struct sail_write_features 
 
 sail_status_t sail_alloc_write_options_from_features(const struct sail_write_features *write_features, struct sail_write_options **write_options) {
 
-    SAIL_TRY(sail_alloc_write_options(write_options));
-    SAIL_TRY_OR_CLEANUP(sail_write_options_from_features(write_features, *write_options),
-                        /* cleanup */ sail_destroy_write_options(*write_options));
+    struct sail_write_options *write_options_local;
+    SAIL_TRY(sail_alloc_write_options(&write_options_local));
+    SAIL_TRY_OR_CLEANUP(sail_write_options_from_features(write_features, write_options_local),
+                        /* cleanup */ sail_destroy_write_options(write_options_local));
+
+    *write_options = write_options_local;
 
     return SAIL_OK;
 }

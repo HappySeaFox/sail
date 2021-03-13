@@ -59,21 +59,24 @@ sail_status_t sail_copy_palette(const struct sail_palette *source_palette, struc
     SAIL_CHECK_PALETTE_PTR(source_palette);
     SAIL_CHECK_PALETTE_PTR(target_palette);
 
-    SAIL_TRY(sail_alloc_palette(target_palette));
+    struct sail_palette *palette_local;
+    SAIL_TRY(sail_alloc_palette(&palette_local));
 
     unsigned bits_per_pixel;
     SAIL_TRY_OR_CLEANUP(sail_bits_per_pixel(source_palette->pixel_format, &bits_per_pixel),
-                        /* cleanup */ sail_destroy_palette(*target_palette));
+                        /* cleanup */ sail_destroy_palette(palette_local));
 
     unsigned palette_size = source_palette->color_count * bits_per_pixel / 8;
 
-    SAIL_TRY_OR_CLEANUP(sail_malloc(palette_size, &(*target_palette)->data),
-                        /* cleanup */ sail_destroy_palette(*target_palette));
+    SAIL_TRY_OR_CLEANUP(sail_malloc(palette_size, &palette_local->data),
+                        /* cleanup */ sail_destroy_palette(palette_local));
 
-    (*target_palette)->pixel_format = source_palette->pixel_format;
-    (*target_palette)->color_count  = source_palette->color_count;
+    palette_local->pixel_format = source_palette->pixel_format;
+    palette_local->color_count  = source_palette->color_count;
 
-    memcpy((*target_palette)->data, source_palette->data, palette_size);
+    memcpy(palette_local->data, source_palette->data, palette_size);
+
+    *target_palette = palette_local;
 
     return SAIL_OK;
 }
@@ -82,22 +85,22 @@ sail_status_t sail_alloc_palette_for_data(enum SailPixelFormat pixel_format, uns
 
     SAIL_CHECK_PALETTE_PTR(palette);
 
-    struct sail_palette *pal;
-    SAIL_TRY(sail_alloc_palette(&pal));
+    struct sail_palette *palette_local;
+    SAIL_TRY(sail_alloc_palette(&palette_local));
 
-    pal->pixel_format = pixel_format;
-    pal->color_count = color_count;
+    palette_local->pixel_format = pixel_format;
+    palette_local->color_count = color_count;
 
     unsigned palette_size;
     SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(color_count, pixel_format, &palette_size),
-                        /* cleanup */ sail_destroy_palette(pal));
+                        /* cleanup */ sail_destroy_palette(palette_local));
 
     void *ptr;
     SAIL_TRY_OR_CLEANUP(sail_malloc(palette_size, &ptr),
-                        /* cleanup */ sail_destroy_palette(pal));
-    pal->data = ptr;
+                        /* cleanup */ sail_destroy_palette(palette_local));
+    palette_local->data = ptr;
 
-    *palette = pal;
+    *palette = palette_local;
 
     return SAIL_OK;
 }
@@ -106,16 +109,16 @@ sail_status_t sail_alloc_palette_from_data(enum SailPixelFormat pixel_format, co
 
     SAIL_CHECK_PALETTE_PTR(palette);
 
-    struct sail_palette *pal;
-    SAIL_TRY(sail_alloc_palette_for_data(pixel_format, color_count, &pal));
+    struct sail_palette *palette_local;
+    SAIL_TRY(sail_alloc_palette_for_data(pixel_format, color_count, &palette_local));
 
     unsigned palette_size;
     SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(color_count, pixel_format, &palette_size),
-                        /* cleanup */ sail_destroy_palette(pal));
+                        /* cleanup */ sail_destroy_palette(palette_local));
 
-    memcpy(pal->data, data, palette_size);
+    memcpy(palette_local->data, data, palette_size);
 
-    *palette = pal;
+    *palette = palette_local;
 
     return SAIL_OK;
 }

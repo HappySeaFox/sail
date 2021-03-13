@@ -323,7 +323,7 @@ sail_status_t tiff_private_fetch_iccp(TIFF *tiff, struct sail_iccp **iccp) {
     unsigned data_length;
 
     if (TIFFGetField(tiff, TIFFTAG_ICCPROFILE, &data_length, &data)) {
-        SAIL_TRY(sail_alloc_iccp_from_data(iccp, data, data_length));
+        SAIL_TRY(sail_alloc_iccp_from_data(data, data_length, iccp));
     }
 
     return SAIL_OK;

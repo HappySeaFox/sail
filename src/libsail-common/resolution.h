@@ -64,7 +64,7 @@ SAIL_EXPORT sail_status_t sail_alloc_resolution(struct sail_resolution **resolut
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_resolution_from_data(struct sail_resolution **resolution, enum SailResolutionUnit unit, double x, double y);
+SAIL_EXPORT sail_status_t sail_alloc_resolution_from_data(enum SailResolutionUnit unit, double x, double y, struct sail_resolution **resolution);
 
 /*
  * Destroys the specified resolution.

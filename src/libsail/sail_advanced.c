@@ -45,8 +45,7 @@ sail_status_t sail_probe_io(struct sail_io *io, struct sail_image **image, const
     struct sail_read_options *read_options_local = NULL;
     void *state = NULL;
 
-    SAIL_TRY_OR_CLEANUP(sail_alloc_read_options_from_features((*codec_info_local)->read_features, &read_options_local),
-                        /* cleanup */ sail_destroy_read_options(read_options_local));
+    SAIL_TRY(sail_alloc_read_options_from_features((*codec_info_local)->read_features, &read_options_local));
 
     SAIL_TRY_OR_CLEANUP(codec->v4->read_init(io, read_options_local, &state),
                         /* cleanup */ codec->v4->read_finish(&state, io),

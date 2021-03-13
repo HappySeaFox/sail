@@ -360,7 +360,7 @@ sail_status_t png_private_fetch_iccp(png_structp png_ptr, png_infop info_ptr, st
                            &data_length) == PNG_INFO_iCCP;
 
     if (ok) {
-        SAIL_TRY(sail_alloc_iccp_from_data(iccp, data, data_length));
+        SAIL_TRY(sail_alloc_iccp_from_data(data, data_length, iccp));
         SAIL_LOG_DEBUG("PNG: Found ICC profile '%s' %u bytes long", name, data_length);
     } else {
         SAIL_LOG_DEBUG("PNG: ICC profile is not found");

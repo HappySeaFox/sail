@@ -358,31 +358,33 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v4_png(void *state, st
 
     if (setjmp(png_jmpbuf(png_state->png_ptr))) {
         png_state->libpng_error = true;
-        sail_destroy_image(*image);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
-    SAIL_TRY(sail_copy_image(png_state->first_image, image));
+    struct sail_image *image_local;
+    SAIL_TRY(sail_copy_image(png_state->first_image, &image_local));
 
     /* Only the first frame can have ICCP (if any). */
     if (png_state->current_frame == 0) {
         if (png_state->iccp != NULL) {
-            SAIL_TRY(sail_copy_iccp(png_state->iccp, &(*image)->iccp));
+            SAIL_TRY_OR_CLEANUP(sail_copy_iccp(png_state->iccp, &image_local->iccp),
+                                /* cleanup */ sail_destroy_image(image_local));
         }
     }
 
 #ifdef PNG_APNG_SUPPORTED
     if (png_state->is_apng) {
-        (*image)->animated = true;
+        image_local->animated = true;
 
         /* APNG feature: a hidden frame. */
         if (!png_state->skipped_hidden && png_get_first_frame_is_hidden(png_state->png_ptr, png_state->info_ptr)) {
             SAIL_LOG_DEBUG("PNG: Skipping hidden frame");
-            SAIL_TRY(png_private_skip_hidden_frame(png_state->first_image->bytes_per_line,
-                                       png_state->first_image->height,
-                                       png_state->png_ptr,
-                                       png_state->info_ptr,
-                                       &png_state->scanline_for_skipping));
+            SAIL_TRY_OR_CLEANUP(png_private_skip_hidden_frame(png_state->first_image->bytes_per_line,
+                                                                png_state->first_image->height,
+                                                               png_state->png_ptr,
+                                                               png_state->info_ptr,
+                                                               &png_state->scanline_for_skipping),
+                                /* cleanup */ sail_destroy_image(image_local));
 
             png_state->skipped_hidden = true;
             png_state->frames--;
@@ -390,11 +392,12 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v4_png(void *state, st
             /* We have just a single frame left - continue to reading scan lines. */
             if (png_state->frames == 1) {
                 png_read_frame_head(png_state->png_ptr, png_state->info_ptr);
-                (*image)->animated = false;
+                image_local->animated = false;
 
                 png_state->next_frame_width  = png_state->first_image->width;
                 png_state->next_frame_height = png_state->first_image->height;
             } else if (png_state->frames == 0) {
+                sail_destroy_image(image_local);
                 SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
             }
         } else {
@@ -408,16 +411,17 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v4_png(void *state, st
                                         &png_state->next_frame_delay_num, &png_state->next_frame_delay_den,
                                         &png_state->next_frame_dispose_op, &png_state->next_frame_blend_op);
             } else {
-                png_state->next_frame_width      = (*image)->width;
-                png_state->next_frame_height     = (*image)->height;
+                png_state->next_frame_width      = image_local->width;
+                png_state->next_frame_height     = image_local->height;
                 png_state->next_frame_x_offset   = 0;
                 png_state->next_frame_y_offset   = 0;
                 png_state->next_frame_dispose_op = PNG_DISPOSE_OP_BACKGROUND;
                 png_state->next_frame_blend_op   = PNG_BLEND_OP_SOURCE;
             }
 
-            if (png_state->next_frame_width + png_state->next_frame_x_offset > (*image)->width ||
-                    png_state->next_frame_height + png_state->next_frame_y_offset > (*image)->height) {
+            if (png_state->next_frame_width + png_state->next_frame_x_offset > image_local->width ||
+                    png_state->next_frame_height + png_state->next_frame_y_offset > image_local->height) {
+                sail_destroy_image(image_local);
                 SAIL_LOG_AND_RETURN(SAIL_ERROR_INCORRECT_IMAGE_DIMENSIONS);
             }
 
@@ -425,10 +429,12 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v4_png(void *state, st
                 png_state->next_frame_delay_den = 100;
             }
 
-            (*image)->delay = (int)(((double)png_state->next_frame_delay_num / png_state->next_frame_delay_den) * 1000);
+            image_local->delay = (int)(((double)png_state->next_frame_delay_num / png_state->next_frame_delay_den) * 1000);
         }
     }
 #endif
+
+    *image = image_local;
 
     png_state->current_frame++;
 

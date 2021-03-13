@@ -80,9 +80,12 @@ sail_status_t sail_alloc_read_options_from_features(const struct sail_read_featu
 
     SAIL_CHECK_READ_OPTIONS_PTR(read_options);
 
-    SAIL_TRY(sail_alloc_read_options(read_options));
-    SAIL_TRY_OR_CLEANUP(sail_read_options_from_features(read_features, *read_options),
-                        /* cleanup */ sail_destroy_read_options(*read_options));
+    struct sail_read_options *read_options_local;
+    SAIL_TRY(sail_alloc_read_options(&read_options_local));
+    SAIL_TRY_OR_CLEANUP(sail_read_options_from_features(read_features, read_options_local),
+                        /* cleanup */ sail_destroy_read_options(read_options_local));
+
+    *read_options = read_options_local;
 
     return SAIL_OK;
 }
