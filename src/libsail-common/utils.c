@@ -948,3 +948,38 @@ sail_status_t sail_file_size(const char *path, size_t *size) {
 
     return SAIL_OK;
 }
+
+sail_status_t sail_read_file_contents(const char *path, void **buffer, unsigned *buffer_length) {
+
+    SAIL_CHECK_BUFFER_PTR(buffer);
+    SAIL_CHECK_PTR(buffer_length);
+
+    size_t size;
+    SAIL_TRY(sail_file_size(path, &size));
+
+#ifdef SAIL_WIN32
+    FILE *f = _fsopen(path, "rb", _SH_DENYWR);
+#else
+    FILE *f = fopen(path, "rb");
+#endif
+
+    if (f == NULL) {
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_OPEN_FILE);
+    }
+
+    void *buffer_local;
+    SAIL_TRY(sail_malloc(size, &buffer_local));
+
+    if (fread(buffer_local, 1, size, f) != size) {
+        sail_free(buffer_local);
+        fclose(f);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_READ_FILE);
+    }
+
+    fclose(f);
+
+    *buffer = buffer_local;
+    *buffer_length = (unsigned)size;
+
+    return SAIL_OK;
+}

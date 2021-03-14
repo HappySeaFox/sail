@@ -276,6 +276,13 @@ SAIL_EXPORT bool sail_is_file(const char *path);
  */
 SAIL_EXPORT sail_status_t sail_file_size(const char *path, size_t *size);
 
+/*
+ * Reads the specified file into a memory buffer.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_read_file_contents(const char *path, void **buffer, unsigned *buffer_length);
+
 /* extern "C" */
 #ifdef __cplusplus
 }
