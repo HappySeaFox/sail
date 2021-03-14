@@ -27,6 +27,7 @@
 #define SAIL_UTILS_H
 
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <wchar.h>
 
@@ -267,6 +268,13 @@ SAIL_EXPORT bool sail_is_dir(const char *path);
  * Returns true if the specified file system path is a regular file.
  */
 SAIL_EXPORT bool sail_is_file(const char *path);
+
+/*
+ * Retrieves the file size.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_file_size(const char *path, size_t *size);
 
 /* extern "C" */
 #ifdef __cplusplus

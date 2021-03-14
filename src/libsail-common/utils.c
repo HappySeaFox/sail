@@ -903,12 +903,48 @@ bool sail_is_file(const char *path) {
 
     return (attrs.st_mode & _S_IFMT) == _S_IFREG;
 #else
-    struct stat lib_attribs;
+    struct stat attrs;
 
-    if (stat(path, &lib_attribs) != 0) {
+    if (stat(path, &attrs) != 0) {
         return false;
     }
 
-    return S_ISREG(lib_attribs.st_mode);
+    return S_ISREG(attrs.st_mode);
 #endif
+}
+
+sail_status_t sail_file_size(const char *path, size_t *size) {
+
+    if (path == NULL) {
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_OPEN_FILE);
+    }
+
+    bool is_file;
+
+#ifdef SAIL_WIN32
+    struct _stat attrs;
+
+    if (_stat(path, &attrs) != 0) {
+        return false;
+    }
+
+    is_file = (attrs.st_mode & _S_IFMT) == _S_IFREG;
+#else
+    struct stat attrs;
+
+    if (stat(path, &attrs) != 0) {
+        return false;
+    }
+
+    is_file = S_ISREG(attrs.st_mode);
+#endif
+
+    if (!is_file) {
+        SAIL_LOG_ERROR("'%s' is not a file", path);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_OPEN_FILE);
+    }
+
+    *size = attrs.st_size;
+
+    return SAIL_OK;
 }
