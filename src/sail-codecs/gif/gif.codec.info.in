@@ -15,15 +15,14 @@ output-pixel-formats=BPP32-RGBA;BPP32-BGRA
 default-output-pixel-format=@SAIL_DEFAULT_READ_OUTPUT_PIXEL_FORMAT@
 
 [write-features]
-features=STATIC;ANIMATED;META-DATA
+features=
 properties=
-interlaced-passes=4
-compression-types=LZW
-default-compression=LZW
+interlaced-passes=0
+compression-types=
+default-compression=
 compression-level-min=0
 compression-level-max=0
 compression-level-default=0
 compression-level-step=0
 
 [write-pixel-formats-mapping]
-BPP32-RGBA=SOURCE

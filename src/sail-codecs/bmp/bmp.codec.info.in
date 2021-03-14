@@ -18,12 +18,11 @@ default-output-pixel-format=@SAIL_DEFAULT_READ_OUTPUT_PIXEL_FORMAT@
 features=
 properties=
 interlaced-passes=
-compression-types=NONE
-default-compression=NONE
+compression-types=
+default-compression=
 compression-level-min=0
 compression-level-max=0
 compression-level-default=0
 compression-level-step=0
 
 [write-pixel-formats-mapping]
-BPP32-RGBA=SOURCE

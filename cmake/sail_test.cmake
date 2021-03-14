@@ -7,7 +7,11 @@ macro(sail_test)
     #
     add_executable(${SAIL_TEST_TARGET} ${SAIL_TEST_SOURCES})
 
-    add_test(NAME ${SAIL_TEST_TARGET} COMMAND ${SAIL_TEST_TARGET})
+    if (WIN32)
+        add_test(NAME ${SAIL_TEST_TARGET} WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/bin COMMAND ${SAIL_TEST_TARGET})
+    else()
+        add_test(NAME ${SAIL_TEST_TARGET} COMMAND ${SAIL_TEST_TARGET})
+    endif()
 
     # Depend on sail
     #

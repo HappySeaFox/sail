@@ -38,19 +38,23 @@ static const uint32_t SAIL_BI_RGB            = 0;
 static const uint32_t SAIL_BI_RLE8           = 1;
 static const uint32_t SAIL_BI_RLE4           = 2;
 static const uint32_t SAIL_BI_BITFIELDS      = 3;
+#if 0
 static const uint32_t SAIL_BI_JPEG           = 4;
 static const uint32_t SAIL_BI_PNG            = 5;
 static const uint32_t SAIL_BI_ALPHABITFIELDS = 6;
 static const uint32_t SAIL_BI_CMYK           = 11;
 static const uint32_t SAIL_BI_CMYKRLE8       = 12;
 static const uint32_t SAIL_BI_CMYKRLE4       = 13;
+#endif
 
 /* BMP identifiers. */
 static const uint16_t SAIL_DDB_IDENTIFIER = 0x02;
 static const uint16_t SAIL_DIB_IDENTIFIER = 0x4D42;
 
 /* ICC profile types. */
+#if 0
 static const char SAIL_PROFILE_LINKED[4]   = { 'L', 'I', 'N', 'K' };
+#endif
 static const char SAIL_PROFILE_EMBEDDED[4] = { 'M', 'B', 'E', 'D' };
 
 /* Sizes of DIB header structs. */
@@ -104,24 +108,12 @@ static sail_status_t alloc_bmp_state(struct bmp_state **bmp_state) {
 
     (*bmp_state)->read_options  = NULL;
     (*bmp_state)->write_options = NULL;
-
-#if 0
-    (*bmp_state)->ddb_file_header = NULL;
-    (*bmp_state)->v1              = NULL;
-    (*bmp_state)->dib_file_header = NULL;
-    (*bmp_state)->v2              = NULL;
-    (*bmp_state)->v3              = NULL;
-    (*bmp_state)->v4              = NULL;
-    (*bmp_state)->v5              = NULL;
-#endif
-
-    (*bmp_state)->iccp            = NULL;
-    (*bmp_state)->palette         = NULL;
-    (*bmp_state)->palette_count   = 0;
-    (*bmp_state)->bytes_in_row    = 0;
-    (*bmp_state)->pad_bytes       = 0;
-    (*bmp_state)->flipped         = false;
-
+    (*bmp_state)->iccp          = NULL;
+    (*bmp_state)->palette       = NULL;
+    (*bmp_state)->palette_count = 0;
+    (*bmp_state)->bytes_in_row  = 0;
+    (*bmp_state)->pad_bytes     = 0;
+    (*bmp_state)->flipped       = false;
     (*bmp_state)->frame_read    = false;
     (*bmp_state)->frame_written = false;
 
@@ -136,16 +128,6 @@ static void destroy_bmp_state(struct bmp_state *bmp_state) {
 
     sail_destroy_read_options(bmp_state->read_options);
     sail_destroy_write_options(bmp_state->write_options);
-
-#if 0
-    sail_free(bmp_state->ddb_file_header);
-    sail_free(bmp_state->v1);
-    sail_free(bmp_state->dib_file_header);
-    sail_free(bmp_state->v2);
-    sail_free(bmp_state->v3);
-    sail_free(bmp_state->v4);
-    sail_free(bmp_state->v5);
-#endif
 
     sail_destroy_iccp(bmp_state->iccp);
 
