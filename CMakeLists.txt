@@ -14,6 +14,7 @@ include(CMakePushCheckState)
 # Our own cmake scripts
 #
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" "${CMAKE_MODULE_PATH}")
+include(sail_check_c11_thread_local)
 include(sail_check_include)
 include(sail_codec)
 include(sail_enable_asan)
@@ -176,7 +177,7 @@ if (APPLE)
     set(SAIL_APPLE ON)
 endif()
 
-# Common configuration file
+# Codecs & icons paths
 #
 set(SAIL_CODECS_PATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/sail/codecs")
 if (WIN32)
@@ -188,12 +189,17 @@ if (WIN32)
     string(REPLACE "/" "\\\\" SAIL_ICONS_PATH "${SAIL_ICONS_PATH}")
 endif()
 
+# Common configuration file
+#
 configure_file("${PROJECT_SOURCE_DIR}/src/config.h.in" "${PROJECT_BINARY_DIR}/include/config.h" @ONLY)
 include_directories("${PROJECT_BINARY_DIR}/include")
 
+# Execute tests that depend on config.h
+#
+sail_check_c11_thread_local()
+
 # Configure subdirs
 #
-
 add_subdirectory(src/libsail-common)
 add_subdirectory(src/sail-codecs)
 if (SAIL_COMBINE_CODECS)
