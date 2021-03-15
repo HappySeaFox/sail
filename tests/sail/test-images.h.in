@@ -1,0 +1,14 @@
+#ifndef SAIL_TEST_IMAGES_H
+#define SAIL_TEST_IMAGES_H
+
+#include <stddef.h>
+
+static const char * const SAIL_TEST_IMAGES[] = {
+    "@SAIL_TEST_IMAGES_PATH@/bmp/bpp4-indexed.bmp",
+
+    "@SAIL_TEST_IMAGES_PATH@/png/bpp4-indexed.png",
+
+    NULL,
+};
+
+#endif
