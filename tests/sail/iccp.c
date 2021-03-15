@@ -67,7 +67,7 @@ static MunitResult test_iccp_from_data(const MunitParameter params[], void *user
     munit_assert_not_null(data);
 
     struct sail_iccp *iccp = NULL;
-    munit_assert(sail_alloc_iccp_from_data(&iccp, data, data_length) == SAIL_OK);
+    munit_assert(sail_alloc_iccp_from_data(data, data_length, &iccp) == SAIL_OK);
     munit_assert_not_null(iccp);
 
     munit_assert(iccp->data_length == data_length);
@@ -90,7 +90,7 @@ static MunitResult test_iccp_from_shallow_data(const MunitParameter params[], vo
     munit_assert_not_null(data);
 
     struct sail_iccp *iccp = NULL;
-    munit_assert(sail_alloc_iccp_from_shallow_data(&iccp, data, data_length) == SAIL_OK);
+    munit_assert(sail_alloc_iccp_move_data(data, data_length, &iccp) == SAIL_OK);
     munit_assert_not_null(iccp);
 
     munit_assert(iccp->data_length == data_length);

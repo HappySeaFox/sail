@@ -55,11 +55,15 @@ sail_status_t sail_read_file(const char *path, struct sail_image **image) {
     SAIL_TRY_OR_CLEANUP(sail_start_reading_file(path, NULL /* codec info */, &state),
                         /* cleanup */ sail_stop_reading(state));
 
-    SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, image),
+    struct sail_image *image_local;
+
+    SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, &image_local),
                         /* cleanup */ sail_stop_reading(state));
 
     SAIL_TRY_OR_CLEANUP(sail_stop_reading(state),
-                        /* cleanup */ sail_destroy_image(*image));
+                        /* cleanup */ sail_destroy_image(image_local));
+
+    *image = image_local;
 
     return SAIL_OK;
 }

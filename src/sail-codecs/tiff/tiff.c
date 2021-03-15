@@ -118,7 +118,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v4_tiff(struct sail_io *io, const
      * 'h': read TIFF header only
      * 'm': disable use of memory-mapped files
      */
-    tiff_state->tiff = TIFFClientOpen("tiff-sail-codec",
+    tiff_state->tiff = TIFFClientOpen("sail-codec-tiff",
                                       "rhm",
                                       io,
                                       tiff_private_my_read_proc,
@@ -149,13 +149,14 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v4_tiff(void *state, s
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
-    SAIL_TRY(sail_alloc_image(image));
-    SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&(*image)->source_image),
-                        /* cleanup */ sail_destroy_image(*image));
+    struct sail_image *image_local;
+    SAIL_TRY(sail_alloc_image(&image_local));
+    SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
+                        /* cleanup */ sail_destroy_image(image_local));
 
     /* Start reading the next directory. */
     if (!TIFFSetDirectory(tiff_state->tiff, tiff_state->current_frame++)) {
-        sail_destroy_image(*image);
+        sail_destroy_image(image_local);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
     }
 
@@ -163,45 +164,45 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v4_tiff(void *state, s
     char emsg[1024];
     if (!TIFFRGBAImageBegin(&tiff_state->image, tiff_state->tiff, /* stop */ 1, emsg)) {
         SAIL_LOG_ERROR("TIFF: %s", emsg);
-        sail_destroy_image(*image);
+        sail_destroy_image(image_local);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
     tiff_state->image.req_orientation = ORIENTATION_TOPLEFT;
 
     /* Fill the image properties. */
-    if (!TIFFGetField(tiff_state->tiff, TIFFTAG_IMAGEWIDTH,  &(*image)->width) || !TIFFGetField(tiff_state->tiff, TIFFTAG_IMAGELENGTH, &(*image)->height)) {
-        SAIL_LOG_ERROR("Failed to get the image dimensions");
-        sail_destroy_image(*image);
+    if (!TIFFGetField(tiff_state->tiff, TIFFTAG_IMAGEWIDTH,  &image_local->width) || !TIFFGetField(tiff_state->tiff, TIFFTAG_IMAGELENGTH, &image_local->height)) {
+        SAIL_LOG_ERROR("TIFF: Failed to get the image dimensions");
+        sail_destroy_image(image_local);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
     /* Fetch meta data. */
     if (tiff_state->read_options->io_options & SAIL_IO_OPTION_META_DATA) {
-        struct sail_meta_data_node **last_meta_data_node = &(*image)->meta_data_node;
+        struct sail_meta_data_node **last_meta_data_node = &image_local->meta_data_node;
 
         SAIL_TRY_OR_CLEANUP(tiff_private_fetch_meta_data(tiff_state->tiff, &last_meta_data_node),
-                            /* cleanup */ sail_destroy_image(*image));
+                            /* cleanup */ sail_destroy_image(image_local));
     }
 
     /* Fetch ICC profile. */
     if (tiff_state->read_options->io_options & SAIL_IO_OPTION_ICCP) {
-        SAIL_TRY_OR_CLEANUP(tiff_private_fetch_iccp(tiff_state->tiff, &(*image)->iccp),
-                            /* cleanup */ sail_destroy_image(*image));
+        SAIL_TRY_OR_CLEANUP(tiff_private_fetch_iccp(tiff_state->tiff, &image_local->iccp),
+                            /* cleanup */ sail_destroy_image(image_local));
     }
 
     /* Fetch resolution. */
-    SAIL_TRY_OR_CLEANUP(tiff_private_fetch_resolution(tiff_state->tiff, &(*image)->resolution),
-                            /* cleanup */ sail_destroy_image(*image));
+    SAIL_TRY_OR_CLEANUP(tiff_private_fetch_resolution(tiff_state->tiff, &image_local->resolution),
+                            /* cleanup */ sail_destroy_image(image_local));
 
     switch (tiff_state->read_options->output_pixel_format) {
         case SAIL_PIXEL_FORMAT_BPP32_RGBA:
         case SAIL_PIXEL_FORMAT_BPP32_BGRA: {
-            (*image)->pixel_format = tiff_state->read_options->output_pixel_format;
+            image_local->pixel_format = tiff_state->read_options->output_pixel_format;
             break;
         }
         case SAIL_PIXEL_FORMAT_SOURCE: {
-            (*image)->pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;
+            image_local->pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;
             break;
         }
         default: {
@@ -209,22 +210,24 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v4_tiff(void *state, s
         }
     }
 
-    SAIL_TRY_OR_CLEANUP(sail_bytes_per_line((*image)->width, (*image)->pixel_format, &(*image)->bytes_per_line),
-                        /* cleanup */ sail_destroy_image(*image));
+    SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(image_local->width, image_local->pixel_format, &image_local->bytes_per_line),
+                        /* cleanup */ sail_destroy_image(image_local));
 
     /* Fill the source image properties. */
     int compression = COMPRESSION_NONE;
     if (!TIFFGetField(tiff_state->tiff, TIFFTAG_COMPRESSION, &compression)) {
-        SAIL_LOG_ERROR("Failed to get the image compression type");
-        sail_destroy_image(*image);
+        SAIL_LOG_ERROR("TIFF: Failed to get the image compression type");
+        sail_destroy_image(image_local);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
-    (*image)->source_image->compression = tiff_private_compression_to_sail_compression(compression);
-    (*image)->source_image->pixel_format = tiff_private_bpp_to_pixel_format(tiff_state->image.bitspersample * tiff_state->image.samplesperpixel);
+    image_local->source_image->compression = tiff_private_compression_to_sail_compression(compression);
+    image_local->source_image->pixel_format = tiff_private_bpp_to_pixel_format(tiff_state->image.bitspersample * tiff_state->image.samplesperpixel);
+
+    *image = image_local;
 
     const char *pixel_format_str = NULL;
-    SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string((*image)->source_image->pixel_format, &pixel_format_str));
+    SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(image_local->source_image->pixel_format, &pixel_format_str));
     SAIL_LOG_DEBUG("TIFF: Input pixel format is %s", pixel_format_str);
     SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(tiff_state->read_options->output_pixel_format, &pixel_format_str));
     SAIL_LOG_DEBUG("TIFF: Output pixel format is %s", pixel_format_str);

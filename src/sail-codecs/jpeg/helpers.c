@@ -239,7 +239,7 @@ sail_status_t jpeg_private_fetch_iccp(struct jpeg_decompress_struct *decompress_
                    ? "" : "not ");
 
     if (data != NULL && data_length > 0) {
-        SAIL_TRY_OR_CLEANUP(sail_alloc_iccp_from_shallow_data(iccp, data, data_length),
+        SAIL_TRY_OR_CLEANUP(sail_alloc_iccp_move_data(data, data_length, iccp),
                             /* cleanup */ sail_free(data));
     }
 

@@ -124,8 +124,7 @@ sail_status_t start_reading_io_with_options(struct sail_io *io, bool own_io,
         struct sail_read_options *read_options_local = NULL;
 
         SAIL_TRY_OR_CLEANUP(sail_alloc_read_options_from_features(state_of_mind->codec_info->read_features, &read_options_local),
-                            /* cleanup */ sail_destroy_read_options(read_options_local),
-                                          destroy_hidden_state(state_of_mind));
+                            /* cleanup */ destroy_hidden_state(state_of_mind));
         SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v4->read_init(state_of_mind->io, read_options_local, &state_of_mind->state),
                             /* cleanup */ sail_destroy_read_options(read_options_local),
                                           state_of_mind->codec->v4->read_finish(&state_of_mind->state, state_of_mind->io),

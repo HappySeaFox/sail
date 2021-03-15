@@ -200,12 +200,13 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v4_gif(void *state, st
 
     struct gif_state *gif_state = (struct gif_state *)state;
 
-    SAIL_TRY(sail_alloc_image(image));
-    SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&(*image)->source_image),
-                        /* cleanup */ sail_destroy_image(*image));
+    struct sail_image *image_local;
+    SAIL_TRY(sail_alloc_image(&image_local));
+    SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
+                        /* cleanup */ sail_destroy_image(image_local));
 
-    (*image)->source_image->compression = SAIL_COMPRESSION_LZW;
-    (*image)->source_image->pixel_format = SAIL_PIXEL_FORMAT_BPP8_INDEXED;
+    image_local->source_image->compression = SAIL_COMPRESSION_LZW;
+    image_local->source_image->pixel_format = SAIL_PIXEL_FORMAT_BPP8_INDEXED;
 
     gif_state->current_image++;
 
@@ -224,7 +225,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v4_gif(void *state, st
 
         if (DGifGetRecordType(gif_state->gif, &record) == GIF_ERROR) {
             SAIL_LOG_ERROR("GIF: %s", GifErrorString(gif_state->gif->Error));
-            sail_destroy_image(*image);
+            sail_destroy_image(image_local);
             SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
         }
 
@@ -232,12 +233,12 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v4_gif(void *state, st
             case IMAGE_DESC_RECORD_TYPE: {
                 if (DGifGetImageDesc(gif_state->gif) == GIF_ERROR) {
                     SAIL_LOG_ERROR("GIF: %s", GifErrorString(gif_state->gif->Error));
-                    sail_destroy_image(*image);
+                    sail_destroy_image(image_local);
                     SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
                 }
 
-                (*image)->width = gif_state->gif->SWidth;
-                (*image)->height = gif_state->gif->SHeight;
+                image_local->width = gif_state->gif->SWidth;
+                image_local->height = gif_state->gif->SHeight;
 
                 gif_state->row    = gif_state->gif->Image.Top;
                 gif_state->column = gif_state->gif->Image.Left;
@@ -246,7 +247,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v4_gif(void *state, st
 
                 if (gif_state->column + gif_state->width > (unsigned)gif_state->gif->SWidth ||
                         gif_state->row + gif_state->height > (unsigned)gif_state->gif->SHeight) {
-                    sail_destroy_image(*image);
+                    sail_destroy_image(image_local);
                     SAIL_LOG_AND_RETURN(SAIL_ERROR_INCORRECT_IMAGE_DIMENSIONS);
                 }
                 break;
@@ -258,7 +259,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v4_gif(void *state, st
 
                 if (DGifGetExtension(gif_state->gif, &ext_code, &extension) == GIF_ERROR) {
                     SAIL_LOG_ERROR("GIF: %s", GifErrorString(gif_state->gif->Error));
-                    sail_destroy_image(*image);
+                    sail_destroy_image(image_local);
                     SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
                 }
 
@@ -278,7 +279,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v4_gif(void *state, st
                          * almost invisible on modern CPUs. Let's make a small delay of 100 ms
                          * in this case.
                          */
-                        (*image)->delay = (delay == 0) ? 100 : delay * 10;
+                        image_local->delay = (delay == 0) ? 100 : delay * 10;
 
                         /* Transparent index. */
                         if (extension[1] & 1) {
@@ -289,16 +290,16 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v4_gif(void *state, st
 
                     case COMMENT_EXT_FUNC_CODE: {
                         if (gif_state->read_options->io_options & SAIL_IO_OPTION_META_DATA) {
-                            SAIL_TRY_OR_CLEANUP(gif_private_fetch_comment(extension, &(*image)->meta_data_node),
-                                                /* cleanup*/ sail_destroy_image(*image));
+                            SAIL_TRY_OR_CLEANUP(gif_private_fetch_comment(extension, &image_local->meta_data_node),
+                                                /* cleanup*/ sail_destroy_image(image_local));
                         }
                         break;
                     }
 
                     case APPLICATION_EXT_FUNC_CODE: {
                         if (gif_state->read_options->io_options & SAIL_IO_OPTION_META_DATA) {
-                            SAIL_TRY_OR_CLEANUP(gif_private_fetch_application(extension, &(*image)->meta_data_node),
-                                                /* cleanup */ sail_destroy_image(*image));
+                            SAIL_TRY_OR_CLEANUP(gif_private_fetch_application(extension, &image_local->meta_data_node),
+                                                /* cleanup */ sail_destroy_image(image_local));
                         }
                         break;
                     }
@@ -308,7 +309,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v4_gif(void *state, st
                 while (extension != NULL) {
                     if (DGifGetExtensionNext(gif_state->gif, &extension) == GIF_ERROR) {
                         SAIL_LOG_ERROR("GIF: %s", GifErrorString(gif_state->gif->Error));
-                        sail_destroy_image(*image);
+                        sail_destroy_image(image_local);
                         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
                     }
                 }
@@ -317,7 +318,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v4_gif(void *state, st
             }
 
             case TERMINATE_RECORD_TYPE: {
-                sail_destroy_image(*image);
+                sail_destroy_image(image_local);
                 SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
             }
 
@@ -328,28 +329,28 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v4_gif(void *state, st
 
         if (record == IMAGE_DESC_RECORD_TYPE) {
             if (gif_state->current_image > 0) {
-                (*image)->animated = true;
+                image_local->animated = true;
             }
 
             gif_state->map = (gif_state->gif->Image.ColorMap != NULL) ? gif_state->gif->Image.ColorMap : gif_state->gif->SColorMap;
 
             if (gif_state->map == NULL) {
-                sail_destroy_image(*image);
+                sail_destroy_image(image_local);
                 SAIL_LOG_AND_RETURN(SAIL_ERROR_MISSING_PALETTE);
             }
 
             if (gif_state->gif->Image.Interlace) {
-                (*image)->source_image->properties |= SAIL_IMAGE_PROPERTY_INTERLACED;
-                (*image)->interlaced_passes = 4;
+                image_local->source_image->properties |= SAIL_IMAGE_PROPERTY_INTERLACED;
+                image_local->interlaced_passes = 4;
             }
 
             if (gif_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_RGBA) {
-                (*image)->pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;
+                image_local->pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;
             } else if (gif_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_BGRA) {
-                (*image)->pixel_format = SAIL_PIXEL_FORMAT_BPP32_BGRA;
+                image_local->pixel_format = SAIL_PIXEL_FORMAT_BPP32_BGRA;
             }
-            SAIL_TRY_OR_CLEANUP(sail_bytes_per_line((*image)->width, (*image)->pixel_format, &(*image)->bytes_per_line),
-                                /* cleanup */ sail_destroy_image(*image));
+            SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(image_local->width, image_local->pixel_format, &image_local->bytes_per_line),
+                                /* cleanup */ sail_destroy_image(image_local));
 
             gif_state->layer = -1;
             gif_state->current_pass = -1;
@@ -358,9 +359,11 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v4_gif(void *state, st
         }
     }
 
+    *image = image_local;
+
     if (gif_state->current_image == 0) {
         const char *pixel_format_str = NULL;
-        SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string((*image)->source_image->pixel_format, &pixel_format_str));
+        SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(image_local->source_image->pixel_format, &pixel_format_str));
         SAIL_LOG_DEBUG("GIF: Input pixel format is %s", pixel_format_str);
         SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(gif_state->read_options->output_pixel_format, &pixel_format_str));
         SAIL_LOG_DEBUG("GIF: Output pixel format is %s", pixel_format_str);

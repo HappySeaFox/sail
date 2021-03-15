@@ -330,26 +330,26 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v4_bmp(void *state, st
 
     bmp_state->frame_read = true;
 
-    SAIL_TRY(sail_alloc_image(image));
-    SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&(*image)->source_image),
-                        /* cleanup */ sail_destroy_image(*image));
+    struct sail_image *image_local;
+    SAIL_TRY(sail_alloc_image(&image_local));
+    SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
+                        /* cleanup */ sail_destroy_image(image_local));
 
-    (*image)->source_image->compression = SAIL_COMPRESSION_NONE;
-    (*image)->source_image->pixel_format = bmp_state->source_pixel_format;
-    (*image)->source_image->properties = bmp_state->flipped ? SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY : 0;
-    (*image)->width = (bmp_state->version == SAIL_BMP_V1) ? bmp_state->v1.width : bmp_state->v2.width;
-    (*image)->height = (bmp_state->version == SAIL_BMP_V1) ? bmp_state->v1.height : bmp_state->v2.height;
+    image_local->source_image->compression = SAIL_COMPRESSION_NONE;
+    image_local->source_image->pixel_format = bmp_state->source_pixel_format;
+    image_local->source_image->properties = bmp_state->flipped ? SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY : 0;
+    image_local->width = (bmp_state->version == SAIL_BMP_V1) ? bmp_state->v1.width : bmp_state->v2.width;
+    image_local->height = (bmp_state->version == SAIL_BMP_V1) ? bmp_state->v1.height : bmp_state->v2.height;
 
     if (bmp_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_SOURCE) {
-        (*image)->pixel_format = bmp_state->source_pixel_format;
-        (*image)->bytes_per_line = bmp_state->bytes_in_row;
+        image_local->pixel_format = bmp_state->source_pixel_format;
+        image_local->bytes_per_line = bmp_state->bytes_in_row;
 
         if (bmp_state->palette != NULL) {
-            struct sail_palette *palette;
-            SAIL_TRY_OR_CLEANUP(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP32_RGBA, bmp_state->palette_count, &palette),
-                                /* cleanup */ sail_destroy_image(*image));
+            SAIL_TRY_OR_CLEANUP(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP32_RGBA, bmp_state->palette_count, &image_local->palette),
+                                /* cleanup */ sail_destroy_image(image_local));
 
-            unsigned char *palette_ptr = palette->data;
+            unsigned char *palette_ptr = image_local->palette->data;
 
             for (unsigned i = 0; i < bmp_state->palette_count; i++) {
                 *palette_ptr++ = bmp_state->palette[i].component3;
@@ -357,37 +357,37 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v4_bmp(void *state, st
                 *palette_ptr++ = bmp_state->palette[i].component1;
                 *palette_ptr++ = bmp_state->palette[i].component4;
             }
-
-            (*image)->palette = palette;
         }
     } else {
         if (bmp_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_RGBA) {
-            (*image)->pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;
+            image_local->pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;
         } else if (bmp_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_BGRA) {
-            (*image)->pixel_format = SAIL_PIXEL_FORMAT_BPP32_BGRA;
+            image_local->pixel_format = SAIL_PIXEL_FORMAT_BPP32_BGRA;
         } else {
             SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
         }
 
-        SAIL_TRY_OR_CLEANUP(sail_bytes_per_line((*image)->width, (*image)->pixel_format, &(*image)->bytes_per_line),
-                            /* cleanup */ sail_destroy_image(*image));
+        SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(image_local->width, image_local->pixel_format, &image_local->bytes_per_line),
+                            /* cleanup */ sail_destroy_image(image_local));
     }
 
     /* Resolution. */
     if (bmp_state->version >= SAIL_BMP_V3) {
         SAIL_TRY_OR_CLEANUP(
-            sail_alloc_resolution_from_data(&(*image)->resolution, SAIL_RESOLUTION_UNIT_METER, bmp_state->v3.x_pixels_per_meter, bmp_state->v3.y_pixels_per_meter),
-                        /* cleanup */ sail_destroy_image(*image));
+            sail_alloc_resolution_from_data(SAIL_RESOLUTION_UNIT_METER, bmp_state->v3.x_pixels_per_meter, bmp_state->v3.y_pixels_per_meter, &image_local->resolution),
+                        /* cleanup */ sail_destroy_image(image_local));
     }
 
     /* Seek to the bitmap data. */
     if (bmp_state->version > SAIL_BMP_V1) {
         SAIL_TRY_OR_CLEANUP(io->seek(io->stream, bmp_state->dib_file_header.offset, SEEK_SET),
-                            /* cleanup */ sail_destroy_image(*image));
+                            /* cleanup */ sail_destroy_image(image_local));
     }
 
+    *image = image_local;
+
     const char *pixel_format_str = NULL;
-    SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string((*image)->source_image->pixel_format, &pixel_format_str));
+    SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(image_local->source_image->pixel_format, &pixel_format_str));
     SAIL_LOG_DEBUG("BMP: Input pixel format is %s", pixel_format_str);
     SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(bmp_state->read_options->output_pixel_format, &pixel_format_str));
     SAIL_LOG_DEBUG("BMP: Output pixel format is %s", pixel_format_str);

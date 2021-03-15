@@ -43,23 +43,26 @@ sail_status_t sail_alloc_iccp(struct sail_iccp **iccp) {
     return SAIL_OK;
 }
 
-sail_status_t sail_alloc_iccp_from_data(struct sail_iccp **iccp, const void *data, unsigned data_length) {
+sail_status_t sail_alloc_iccp_from_data(const void *data, unsigned data_length, struct sail_iccp **iccp) {
 
     SAIL_CHECK_ICCP_PTR(iccp);
     SAIL_CHECK_DATA_PTR(data);
 
-    SAIL_TRY(sail_alloc_iccp(iccp));
+    struct sail_iccp *iccp_local;
+    SAIL_TRY(sail_alloc_iccp(&iccp_local));
 
-    SAIL_TRY_OR_CLEANUP(sail_malloc(data_length, &(*iccp)->data),
-                        /* cleanup */ sail_destroy_iccp(*iccp));
+    SAIL_TRY_OR_CLEANUP(sail_malloc(data_length, &iccp_local->data),
+                        /* cleanup */ sail_destroy_iccp(iccp_local));
 
-    memcpy((*iccp)->data, data, data_length);
-    (*iccp)->data_length = data_length;
+    memcpy(iccp_local->data, data, data_length);
+    iccp_local->data_length = data_length;
+
+    *iccp = iccp_local;
 
     return SAIL_OK;
 }
 
-sail_status_t sail_alloc_iccp_from_shallow_data(struct sail_iccp **iccp, void *data, unsigned data_length) {
+sail_status_t sail_alloc_iccp_move_data(void *data, unsigned data_length, struct sail_iccp **iccp) {
 
     SAIL_CHECK_ICCP_PTR(iccp);
 
@@ -86,14 +89,16 @@ sail_status_t sail_copy_iccp(const struct sail_iccp *source_iccp, struct sail_ic
     SAIL_CHECK_ICCP_PTR(source_iccp);
     SAIL_CHECK_ICCP_PTR(target_iccp);
 
-    SAIL_TRY(sail_alloc_iccp(target_iccp));
+    struct sail_iccp *iccp_local;
+    SAIL_TRY(sail_alloc_iccp(&iccp_local));
 
-    SAIL_TRY_OR_CLEANUP(sail_malloc(source_iccp->data_length, &(*target_iccp)->data),
-                        /* cleanup */ sail_destroy_iccp(*target_iccp));
+    SAIL_TRY_OR_CLEANUP(sail_malloc(source_iccp->data_length, &iccp_local->data),
+                        /* cleanup */ sail_destroy_iccp(iccp_local));
 
-    memcpy((*target_iccp)->data, source_iccp->data, source_iccp->data_length);
+    memcpy(iccp_local->data, source_iccp->data, source_iccp->data_length);
+    iccp_local->data_length = source_iccp->data_length;
 
-    (*target_iccp)->data_length = source_iccp->data_length;
+    *target_iccp = iccp_local;
 
     return SAIL_OK;
 }

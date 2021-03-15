@@ -30,12 +30,12 @@
 
 sail_status_t sail_alloc_resolution(struct sail_resolution **resolution) {
 
-    SAIL_TRY(sail_alloc_resolution_from_data(resolution, SAIL_RESOLUTION_UNIT_UNKNOWN, 0, 0));
+    SAIL_TRY(sail_alloc_resolution_from_data(SAIL_RESOLUTION_UNIT_UNKNOWN, 0, 0, resolution));
 
     return SAIL_OK;
 }
 
-sail_status_t sail_alloc_resolution_from_data(struct sail_resolution **resolution, enum SailResolutionUnit unit, double x, double y) {
+sail_status_t sail_alloc_resolution_from_data(enum SailResolutionUnit unit, double x, double y, struct sail_resolution **resolution) {
 
     SAIL_CHECK_RESOLUTION_PTR(resolution);
 

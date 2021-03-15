@@ -158,12 +158,8 @@ sail_status_t bmp_private_fetch_iccp(struct sail_io *io, long offset_of_data, ui
     SAIL_TRY_OR_CLEANUP(io->strict_read(io->stream, profile_data, profile_size),
                         /* cleanup */ sail_free(profile_data));
 
-    struct sail_iccp *local_iccp;
-
-    SAIL_TRY_OR_CLEANUP(sail_alloc_iccp_from_shallow_data(&local_iccp, profile_data, profile_size),
+    SAIL_TRY_OR_CLEANUP(sail_alloc_iccp_move_data(profile_data, profile_size, iccp),
                         /* cleanup */ sail_free(profile_data));
-
-    *iccp = local_iccp;
 
     return SAIL_OK;
 }
