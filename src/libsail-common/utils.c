@@ -167,21 +167,23 @@ sail_status_t sail_to_wchar(const char *input, wchar_t **output) {
 
     void *ptr;
     SAIL_TRY(sail_malloc((length+1) * sizeof(wchar_t), &ptr));
-    *output = ptr;
+    wchar_t *output_local = ptr;
 
 #ifdef SAIL_WIN32
     size_t ret;
 
-    if (mbstowcs_s(&ret, *output, length+1, input, length) != 0) {
-        sail_free(*output);
+    if (mbstowcs_s(&ret, output_local, length+1, input, length) != 0) {
+        sail_free(output_local);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 #else
-    if (mbstowcs(*output, input, length) == (size_t)-1) {
-        sail_free(*output);
+    if (mbstowcs(output_local, input, length) == (size_t)-1) {
+        sail_free(output_local);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 #endif
+
+    *output = output_local;
 
     return SAIL_OK;
 }
