@@ -47,6 +47,7 @@ static MunitResult test_alloc_copy_iccp(const MunitParameter params[], void *use
     munit_assert(sail_copy_iccp(iccp, &iccp_copy) == SAIL_OK);
     munit_assert_not_null(iccp_copy);
 
+    munit_assert(iccp_copy->data != iccp->data);
     munit_assert(iccp_copy->data_length == iccp->data_length);
     munit_assert(memcmp(iccp_copy->data, iccp->data, iccp->data_length) == 0);
 
