@@ -297,7 +297,7 @@ sail_status_t png_private_write_meta_data(png_structp png_ptr, png_infop info_pt
 
             lines[count].compression = PNG_TEXT_COMPRESSION_zTXt;
             lines[count].key         = (char *)meta_data_str;
-            lines[count].text        = meta_data_node->value_string;
+            lines[count].text        = (char *)meta_data_node->value;
 
             count++;
         } else {
@@ -323,7 +323,7 @@ sail_status_t png_private_write_meta_data(png_structp png_ptr, png_infop info_pt
 
         switch (meta_data_node->key) {
             case SAIL_META_DATA_EXIF: {
-                png_set_eXIf_1(png_ptr, info_ptr, meta_data_node->value_data_length, (png_bytep)meta_data_node->value_data);
+                png_set_eXIf_1(png_ptr, info_ptr, (png_uint_32)meta_data_node->value_length, (png_bytep)meta_data_node->value);
                 exif_found = true;
                 break;
             }
