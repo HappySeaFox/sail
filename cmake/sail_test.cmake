@@ -1,7 +1,7 @@
 # Intended to be included by every test.
 #
 macro(sail_test)
-    cmake_parse_arguments(SAIL_TEST "" "TARGET" "SOURCES" ${ARGN})
+    cmake_parse_arguments(SAIL_TEST "" "TARGET" "SOURCES;LINK" ${ARGN})
 
     # Add a test
     #
@@ -20,4 +20,10 @@ macro(sail_test)
     # Depend on sail-munit
     #
     target_link_libraries(${SAIL_TEST_TARGET} sail-munit)
+
+    # Depend on LINK
+    #
+    if (SAIL_TEST_LINK)
+        target_link_libraries(${SAIL_TEST_TARGET} ${SAIL_TEST_LINK})
+    endif()
 endmacro()

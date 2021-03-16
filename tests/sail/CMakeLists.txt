@@ -3,7 +3,7 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/test-images.h.in" "${PROJECT_BINARY_
 
 sail_test(TARGET iccp                   SOURCES iccp.c)
 sail_test(TARGET integrity              SOURCES integrity.c)
-sail_test(TARGET io-produce-same-images SOURCES io-produce-same-images.c)
+sail_test(TARGET io-produce-same-images SOURCES io-produce-same-images.c LINK sail-comparators)
 sail_test(TARGET malloc                 SOURCES malloc.c)
 sail_test(TARGET palette                SOURCES palette.c)
 sail_test(TARGET read_options           SOURCES read_options.c)
