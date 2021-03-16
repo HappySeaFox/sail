@@ -73,9 +73,9 @@ static sail_status_t probe(const char *path) {
         }
 
         if (node->value_type == SAIL_META_DATA_TYPE_STRING) {
-            printf("%-14s: %s\n", meta_data_str, node->value_string);
+            printf("%-14s: %s\n", meta_data_str, (const char *)node->value);
         } else {
-            printf("%-14s: <binary data, length: %u byte(s)>\n", meta_data_str, node->value_data_length);
+            printf("%-14s: <binary data, length: %u byte(s)>\n", meta_data_str, (unsigned)node->value_length);
         }
 
         node = node->next;
