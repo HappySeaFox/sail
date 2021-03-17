@@ -155,12 +155,6 @@ inline const sail::arbitrary_data& meta_data::value<sail::arbitrary_data>() cons
     return value_arbitrary_data();
 }
 
-template<typename T>
-const T& meta_data::value() const
-{
-    static_assert(false, "meta_data::value() instantiation is limited to std::string and sail::arbitrary_data types");
-}
-
 }
 
 #endif
