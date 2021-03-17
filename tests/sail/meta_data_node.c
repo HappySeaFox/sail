@@ -204,8 +204,8 @@ static MunitTest test_suite_tests[] = {
     { (char *)"/copy-unknown-string", test_copy_unknown_string_meta_data_node, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/from-known-string", test_meta_data_node_from_known_string, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/from-unknown-string", test_meta_data_node_from_unknown_string, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/from-known-data", test_meta_data_node_from_known_string, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/from-unknown-data", test_meta_data_node_from_unknown_string, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/from-known-data", test_meta_data_node_from_known_data, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/from-unknown-data", test_meta_data_node_from_unknown_data, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };
