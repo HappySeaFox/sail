@@ -74,7 +74,8 @@ script:
       cd build
 
       cmake -DCMAKE_BUILD_TYPE=Release -DSAIL_DEV=ON ..
-      cmake --build . --target install
+      cmake --build .
+      sudo make install
 
       cd tests
       ctest --verbose
