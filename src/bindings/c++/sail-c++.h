@@ -31,6 +31,7 @@
 #ifdef SAIL_BUILD
     #include "sail-common.h"
 
+    #include "arbitrary_data-c++.h"
     #include "at_scope_exit-c++.h"
     #include "context-c++.h"
     #include "iccp-c++.h"
@@ -52,6 +53,7 @@
 #else
     #include <sail-common/sail-common.h>
 
+    #include <sail-c++/arbitrary_data-c++.h>
     #include <sail-c++/at_scope_exit-c++.h>
     #include <sail-c++/context-c++.h>
     #include <sail-c++/iccp-c++.h>

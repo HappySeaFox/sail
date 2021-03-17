@@ -93,7 +93,9 @@ struct sail_meta_data_node {
     enum SailMetaData key;
     char *key_unknown;
 
-    /* Value type. */
+    /*
+     * Value type.
+     */
     enum SailMetaDataType value_type;
 
     /*
@@ -106,6 +108,9 @@ struct sail_meta_data_node {
      */
     size_t value_length;
 
+    /*
+     * Pointer to the next node or NULL.
+     */
     struct sail_meta_data_node *next;
 };
 
@@ -119,9 +124,8 @@ struct sail_meta_data_node {
 SAIL_EXPORT sail_status_t sail_alloc_meta_data_node(struct sail_meta_data_node **node);
 
 /*
- * Allocates a new meta data node from the specified string. The value of 'value_length' is set to strlen(value) + 1.
- * The key must not be SAIL_META_DATA_UNKNOWN. This is the key purpose of this function. The assigned node MUST be destroyed
- * later with sail_destroy_meta_data_node().
+ * Allocates a new meta data node from the specified string. The key must not be SAIL_META_DATA_UNKNOWN.
+ * This is the key purpose of this function. The assigned node MUST be destroyed later with sail_destroy_meta_data_node().
  *
  * Returns SAIL_OK on success.
  */
@@ -130,9 +134,8 @@ SAIL_EXPORT sail_status_t sail_alloc_meta_data_node_from_known_string(enum SailM
                                                                         struct sail_meta_data_node **node);
 
 /*
- * Allocates a new meta data node from the specified string. The value of 'value_length' is set to strlen(value) + 1.
- * Sets the key to SAIL_META_DATA_UNKNOWN. This is the key purpose of this function. The assigned node MUST be destroyed
- * later with sail_destroy_meta_data_node().
+ * Allocates a new meta data node from the specified string. Sets the key to SAIL_META_DATA_UNKNOWN.
+ * This is the key purpose of this function. The assigned node MUST be destroyed later with sail_destroy_meta_data_node().
  *
  * Returns SAIL_OK on success.
  */

@@ -28,7 +28,7 @@
 
 #include <string>
 
-#include <stdint.h>
+#include <cstdint>
 
 #ifdef SAIL_BUILD
     #include "error.h"

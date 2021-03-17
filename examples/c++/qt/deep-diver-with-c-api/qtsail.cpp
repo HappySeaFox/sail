@@ -240,7 +240,7 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
         }
 
         if (meta.isEmpty() && node->value_type == SAIL_META_DATA_TYPE_STRING) {
-            meta = tr("%1: %2").arg(meta_data_str).arg(QString(node->value_string).left(24).replace('\n', ' '));
+            meta = tr("%1: %2").arg(meta_data_str).arg(QString((const char *)node->value).left(24).replace('\n', ' '));
         }
 
         while (node != nullptr) {
