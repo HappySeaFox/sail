@@ -29,13 +29,27 @@
 
 #include "munit.h"
 
-static MunitResult test_alloc_copy_iccp(const MunitParameter params[], void *user_data) {
+static MunitResult test_alloc_iccp(const MunitParameter params[], void *user_data) {
     (void)params;
     (void)user_data;
 
     struct sail_iccp *iccp = NULL;
     munit_assert(sail_alloc_iccp(&iccp) == SAIL_OK);
     munit_assert_not_null(iccp);
+    munit_assert_null(iccp->data);
+    munit_assert(iccp->data_length == 0);
+
+    sail_destroy_iccp(iccp);
+
+    return MUNIT_OK;
+}
+
+static MunitResult test_copy_iccp(const MunitParameter params[], void *user_data) {
+    (void)params;
+    (void)user_data;
+
+    struct sail_iccp *iccp = NULL;
+    munit_assert(sail_alloc_iccp(&iccp) == SAIL_OK);
 
     iccp->data_length = 1024;
     munit_assert(sail_malloc(iccp->data_length, &iccp->data) == SAIL_OK);
@@ -104,7 +118,8 @@ static MunitResult test_iccp_from_shallow_data(const MunitParameter params[], vo
 }
 
 static MunitTest test_suite_tests[] = {
-    { (char *)"/alloc-copy", test_alloc_copy_iccp, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/alloc", test_alloc_iccp, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/copy", test_copy_iccp, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/from-data", test_iccp_from_data, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/from-shallow-data", test_iccp_from_shallow_data, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 

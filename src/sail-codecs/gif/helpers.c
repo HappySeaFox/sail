@@ -23,6 +23,8 @@
     SOFTWARE.
 */
 
+#include <string.h>
+
 #include <gif_lib.h>
 
 #include "sail-common.h"
