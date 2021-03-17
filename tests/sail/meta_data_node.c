@@ -27,6 +27,8 @@
 
 #include "sail-common.h"
 
+#include "sail-comparators.h"
+
 #include "munit.h"
 
 static MunitResult test_alloc_meta_data_node(const MunitParameter params[], void *user_data) {
@@ -46,31 +48,59 @@ static MunitResult test_alloc_meta_data_node(const MunitParameter params[], void
     return MUNIT_OK;
 }
 
-static MunitResult test_copy_meta_data_node(const MunitParameter params[], void *user_data) {
+static MunitResult test_copy_known_string_meta_data_node(const MunitParameter params[], void *user_data) {
     (void)params;
     (void)user_data;
+
+    const char *value = "Comment 1";
 
     struct sail_meta_data_node *meta_data_node = NULL;
     munit_assert(sail_alloc_meta_data_node(&meta_data_node) == SAIL_OK);
 
     meta_data_node->key = SAIL_META_DATA_COMMENT;
-    meta_data_node->value_type = SAIL_META_DATA_TYPE_DATA;
-    meta_data_node->value_length = 1024;
+    meta_data_node->value_type = SAIL_META_DATA_TYPE_STRING;
+    meta_data_node->value_length = strlen(value) + 1;
     munit_assert(sail_malloc(meta_data_node->value_length, &meta_data_node->value) == SAIL_OK);
     munit_assert_not_null(meta_data_node->value);
 
-    memset(meta_data_node->value, 15, meta_data_node->value_length);
+    memcpy(meta_data_node->value, value, meta_data_node->value_length);
 
     struct sail_meta_data_node *meta_data_node_copy = NULL;
     munit_assert(sail_copy_meta_data_node(meta_data_node, &meta_data_node_copy) == SAIL_OK);
     munit_assert_not_null(meta_data_node_copy);
 
-    munit_assert(meta_data_node_copy->key == meta_data_node->key);
-    munit_assert_null(meta_data_node_copy->key_unknown);
-    munit_assert(meta_data_node_copy->value_type == meta_data_node->value_type);
-    munit_assert(meta_data_node_copy->value != meta_data_node->value);
-    munit_assert(meta_data_node_copy->value_length == meta_data_node->value_length);
-    munit_assert(memcmp(meta_data_node_copy->value, meta_data_node->value, meta_data_node->value_length) == 0);
+    munit_assert(sail_compare_meta_data_nodes(meta_data_node_copy, meta_data_node) == SAIL_OK);
+
+    sail_destroy_meta_data_node(meta_data_node_copy);
+    sail_destroy_meta_data_node(meta_data_node);
+
+    return MUNIT_OK;
+}
+
+static MunitResult test_copy_unknown_string_meta_data_node(const MunitParameter params[], void *user_data) {
+    (void)params;
+    (void)user_data;
+
+    const char *key = "Some Key";
+    const char *value = "Comment 1";
+
+    struct sail_meta_data_node *meta_data_node = NULL;
+    munit_assert(sail_alloc_meta_data_node(&meta_data_node) == SAIL_OK);
+
+    meta_data_node->key = SAIL_META_DATA_UNKNOWN;
+    munit_assert(sail_strdup(key, &meta_data_node->key_unknown) == SAIL_OK);
+    meta_data_node->value_type = SAIL_META_DATA_TYPE_STRING;
+    meta_data_node->value_length = strlen(value) + 1;
+    munit_assert(sail_malloc(meta_data_node->value_length, &meta_data_node->value) == SAIL_OK);
+    munit_assert_not_null(meta_data_node->value);
+
+    memcpy(meta_data_node->value, value, meta_data_node->value_length);
+
+    struct sail_meta_data_node *meta_data_node_copy = NULL;
+    munit_assert(sail_copy_meta_data_node(meta_data_node, &meta_data_node_copy) == SAIL_OK);
+    munit_assert_not_null(meta_data_node_copy);
+
+    munit_assert(sail_compare_meta_data_nodes(meta_data_node_copy, meta_data_node) == SAIL_OK);
 
     sail_destroy_meta_data_node(meta_data_node_copy);
     sail_destroy_meta_data_node(meta_data_node);
@@ -170,7 +200,8 @@ static MunitResult test_meta_data_node_from_unknown_data(const MunitParameter pa
 
 static MunitTest test_suite_tests[] = {
     { (char *)"/alloc", test_alloc_meta_data_node, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/copy", test_copy_meta_data_node, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/copy-known-string", test_copy_known_string_meta_data_node, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/copy-unknown-string", test_copy_unknown_string_meta_data_node, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/from-known-string", test_meta_data_node_from_known_string, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/from-unknown-string", test_meta_data_node_from_unknown_string, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/from-known-data", test_meta_data_node_from_known_string, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
