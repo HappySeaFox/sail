@@ -29,13 +29,29 @@
 
 #include "munit.h"
 
-static MunitResult test_alloc_copy_options(const MunitParameter params[], void *user_data) {
+static MunitResult test_alloc_options(const MunitParameter params[], void *user_data) {
     (void)params;
     (void)user_data;
 
     struct sail_write_options *write_options = NULL;
     munit_assert(sail_alloc_write_options(&write_options) == SAIL_OK);
     munit_assert_not_null(write_options);
+    munit_assert(write_options->output_pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN);
+    munit_assert(write_options->io_options == 0);
+    munit_assert(write_options->compression == SAIL_COMPRESSION_UNSUPPORTED);
+    munit_assert(write_options->compression_level == 0);
+
+    sail_destroy_write_options(write_options);
+
+    return MUNIT_OK;
+}
+
+static MunitResult test_copy_options(const MunitParameter params[], void *user_data) {
+    (void)params;
+    (void)user_data;
+
+    struct sail_write_options *write_options = NULL;
+    munit_assert(sail_alloc_write_options(&write_options) == SAIL_OK);
 
     write_options->output_pixel_format = SAIL_PIXEL_FORMAT_BPP24_RGB;
     write_options->io_options          = SAIL_IO_OPTION_EXIF;
@@ -85,7 +101,8 @@ static MunitResult test_options_from_features(const MunitParameter params[], voi
 }
 
 static MunitTest test_suite_tests[] = {
-    { (char *)"/alloc-copy", test_alloc_copy_options, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/alloc", test_alloc_options, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/copy", test_copy_options, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/from-features", test_options_from_features, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
