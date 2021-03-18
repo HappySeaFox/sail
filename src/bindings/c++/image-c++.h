@@ -26,7 +26,7 @@
 #ifndef SAIL_IMAGE_CPP_H
 #define SAIL_IMAGE_CPP_H
 
-#include <string>
+#include <string_view>
 #include <vector>
 
 #ifdef SAIL_BUILD
@@ -339,7 +339,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    static sail_status_t pixel_format_from_string(const char *str, SailPixelFormat *result);
+    static sail_status_t pixel_format_from_string(std::string_view str, SailPixelFormat *result);
 
     /*
      * Assigns a non-NULL string representation of the specified image property. See SailImageProperty.
@@ -355,7 +355,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    static sail_status_t image_property_from_string(const char *str, SailImageProperty *result);
+    static sail_status_t image_property_from_string(std::string_view str, SailImageProperty *result);
 
     /*
      * Assigns a non-NULL string representation of the specified compression type. See SailCompression.
@@ -371,7 +371,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    static sail_status_t compression_from_string(const char *str, SailCompression *result);
+    static sail_status_t compression_from_string(std::string_view str, SailCompression *result);
 
 private:
     /*

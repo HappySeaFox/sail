@@ -141,19 +141,13 @@ meta_data& meta_data::with_key_unknown(const std::string &key_unknown)
     return *this;
 }
 
-meta_data& meta_data::with_value(const std::string &value)
+meta_data& meta_data::with_value(const std::string_view value)
 {
     d->free();
 
     d->value_type   = SAIL_META_DATA_TYPE_STRING;
     d->value_string = value;
 
-    return *this;
-}
-
-meta_data& meta_data::with_value(const char *value)
-{
-    with_value(std::string(value));
     return *this;
 }
 
@@ -174,9 +168,9 @@ sail_status_t meta_data::meta_data_to_string(enum SailMetaData meta_data, const 
     return SAIL_OK;
 }
 
-sail_status_t meta_data::meta_data_from_string(const char *str, enum SailMetaData *result) {
+sail_status_t meta_data::meta_data_from_string(const std::string_view str, enum SailMetaData *result) {
 
-    SAIL_TRY(sail_meta_data_from_string(str, result));
+    SAIL_TRY(sail_meta_data_from_string(str.data(), result));
 
     return SAIL_OK;
 }

@@ -368,9 +368,9 @@ sail_status_t image::pixel_format_to_string(SailPixelFormat pixel_format, const 
     return SAIL_OK;
 }
 
-sail_status_t image::pixel_format_from_string(const char *str, SailPixelFormat *result)
+sail_status_t image::pixel_format_from_string(const std::string_view str, SailPixelFormat *result)
 {
-    SAIL_TRY(sail_pixel_format_from_string(str, result));
+    SAIL_TRY(sail_pixel_format_from_string(str.data(), result));
 
     return SAIL_OK;
 }
@@ -382,9 +382,9 @@ sail_status_t image::image_property_to_string(SailImageProperty image_property, 
     return SAIL_OK;
 }
 
-sail_status_t image::image_property_from_string(const char *str, SailImageProperty *result)
+sail_status_t image::image_property_from_string(const std::string_view str, SailImageProperty *result)
 {
-    SAIL_TRY(sail_image_property_from_string(str, result));
+    SAIL_TRY(sail_image_property_from_string(str.data(), result));
 
     return SAIL_OK;
 }
@@ -396,9 +396,9 @@ sail_status_t image::compression_to_string(SailCompression compression, const ch
     return SAIL_OK;
 }
 
-sail_status_t image::compression_from_string(const char *str, SailCompression *result)
+sail_status_t image::compression_from_string(const std::string_view str, SailCompression *result)
 {
-    SAIL_TRY(sail_compression_from_string(str, result));
+    SAIL_TRY(sail_compression_from_string(str.data(), result));
 
     return SAIL_OK;
 }

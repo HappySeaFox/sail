@@ -26,7 +26,7 @@
 #ifndef SAIL_CODEC_INFO_CPP_H
 #define SAIL_CODEC_INFO_CPP_H
 
-#include <string>
+#include <string_view>
 #include <vector>
 
 #ifdef SAIL_BUILD
@@ -75,7 +75,7 @@ public:
     const sail::write_features& write_features() const;
 
     static sail_status_t codec_feature_to_string(SailCodecFeature codec_feature, const char **result);
-    static sail_status_t codec_feature_from_string(const char *str, SailCodecFeature *result);
+    static sail_status_t codec_feature_from_string(std::string_view str, SailCodecFeature *result);
 
     /*
      * Finds a first codec info object that supports the magic number read from the specified file.
@@ -88,8 +88,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    static sail_status_t from_magic_number(const std::string &path, codec_info *scodec_info);
-    static sail_status_t from_magic_number(const char *path, codec_info *scodec_info);
+    static sail_status_t from_magic_number(std::string_view path, codec_info *scodec_info);
 
     /*
      * Finds a first codec info object that supports the magic number read from the specified memory buffer.
@@ -133,8 +132,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    static sail_status_t from_path(const std::string &path, codec_info *scodec_info);
-    static sail_status_t from_path(const char *path, codec_info *scodec_info);
+    static sail_status_t from_path(std::string_view path, codec_info *scodec_info);
 
     /*
      * Finds a first codec info object that supports the specified file extension. The comparison
@@ -152,8 +150,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    static sail_status_t from_extension(const std::string &suffix, codec_info *scodec_info);
-    static sail_status_t from_extension(const char *suffix, codec_info *scodec_info);
+    static sail_status_t from_extension(std::string_view suffix, codec_info *scodec_info);
 
     /*
      * Finds a first codec info object that supports the specified mime type. The comparison
@@ -171,8 +168,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    static sail_status_t from_mime_type(const std::string &mime_type, codec_info *scodec_info);
-    static sail_status_t from_mime_type(const char *mime_type, codec_info *scodec_info);
+    static sail_status_t from_mime_type(std::string_view mime_type, codec_info *scodec_info);
 
     /*
      * Returns a list of found codec info objects. Use it to determine the list of possible

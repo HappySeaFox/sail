@@ -102,7 +102,7 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
     // See https://en.wikipedia.org/wiki/File_format#Magic_number.
     //
     sail::codec_info codec_info;
-    SAIL_TRY(sail::codec_info::from_magic_number(path.toLocal8Bit(), &codec_info));
+    SAIL_TRY(sail::codec_info::from_magic_number(path.toLocal8Bit().constData(), &codec_info));
 
     // Allocate new read options and copy defaults from the read features
     // (preferred output pixel format etc.).
@@ -296,7 +296,7 @@ sail_status_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffe
     elapsed.start();
 
     sail::codec_info codec_info;
-    SAIL_TRY(sail::codec_info::from_extension(m_suffix.toUtf8(), &codec_info));
+    SAIL_TRY(sail::codec_info::from_extension(m_suffix.toLocal8Bit().constData(), &codec_info));
 
     // Allocate new write options and copy defaults from the write features
     // (preferred output pixel format etc.).

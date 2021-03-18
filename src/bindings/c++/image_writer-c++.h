@@ -27,7 +27,7 @@
 #define SAIL_IMAGE_WRITER_CPP_H
 
 #include <cstddef>
-#include <string>
+#include <string_view>
 
 #ifdef SAIL_BUILD
     #include "error.h"
@@ -57,8 +57,7 @@ public:
     /*
      * An interface to sail_write_file(). See sail_write_file() for more.
      */
-    sail_status_t write(const std::string &path, const image &simage);
-    sail_status_t write(const char *path, const image &simage);
+    sail_status_t write(std::string_view path, const image &simage);
 
     /*
      * An interface to sail_write_mem(). See sail_write_mem() for more.
@@ -69,26 +68,22 @@ public:
     /*
      * An interface to sail_start_writing(). See sail_start_writing() for more.
      */
-    sail_status_t start_writing(const std::string &path);
-    sail_status_t start_writing(const char *path);
+    sail_status_t start_writing(std::string_view path);
 
     /*
      * An interface to sail_start_writing(). See sail_start_writing() for more.
      */
-    sail_status_t start_writing(const std::string &path, const codec_info &scodec_info);
-    sail_status_t start_writing(const char *path, const codec_info &scodec_info);
+    sail_status_t start_writing(std::string_view path, const codec_info &scodec_info);
 
     /*
      * An interface to sail_start_writing_with_options(). See sail_start_writing_with_options() for more.
      */
-    sail_status_t start_writing(const std::string &path, const write_options &swrite_options);
-    sail_status_t start_writing(const char *path, const write_options &swrite_options);
+    sail_status_t start_writing(std::string_view path, const write_options &swrite_options);
 
     /*
      * An interface to sail_start_writing_with_options(). See sail_start_writing_with_options() for more.
      */
-    sail_status_t start_writing(const std::string &path, const codec_info &scodec_info, const write_options &swrite_options);
-    sail_status_t start_writing(const char *path, const codec_info &scodec_info, const write_options &swrite_options);
+    sail_status_t start_writing(std::string_view path, const codec_info &scodec_info, const write_options &swrite_options);
 
     /*
      * An interface to sail_start_writing_mem(). See sail_start_writing_mem() for more.

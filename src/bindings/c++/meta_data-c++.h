@@ -26,6 +26,9 @@
 #ifndef SAIL_META_DATA_CPP_H
 #define SAIL_META_DATA_CPP_H
 
+#include <string>
+#include <string_view>
+
 #ifdef SAIL_BUILD
     #include "error.h"
     #include "export.h"
@@ -37,8 +40,6 @@
 
     #include <sail-c++/arbitrary_data-c++.h>
 #endif
-
-#include <string>
 
 struct sail_meta_data;
 
@@ -94,14 +95,9 @@ public:
     meta_data& with_key_unknown(const std::string &key_unknown);
 
     /*
-     * Sets a new meta data string value. Resets the saved binary value.
-     */
-    meta_data& with_value(const std::string &value);
-
-    /*
      * Sets a new meta data string value.
      */
-    meta_data& with_value(const char *value);
+    meta_data& with_value(std::string_view value);
 
     /*
      * Sets a new meta data binary value. Resets the saved string value.
@@ -122,7 +118,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    static sail_status_t meta_data_from_string(const char *str, enum SailMetaData *result);
+    static sail_status_t meta_data_from_string(std::string_view str, enum SailMetaData *result);
 
 private:
     /*
