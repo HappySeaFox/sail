@@ -68,7 +68,7 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
 
     // read() reads the image and outputs pixels in in the BPP32-RGBA pixel format.
     //
-    SAIL_TRY(reader.read(path.toLocal8Bit(), &image));
+    SAIL_TRY(reader.read(path.toLocal8Bit().constData(), &image));
 
     // Construct QImage from the read image.
     //
@@ -98,7 +98,7 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
          .with_bytes_per_line_auto()
          .with_shallow_pixels(const_cast<uchar *>(qimage.bits()));
 
-    SAIL_TRY(writer.write(path.toLocal8Bit(), image));
+    SAIL_TRY(writer.write(path.toLocal8Bit().constData(), image));
 
     return SAIL_OK;
 }
