@@ -957,10 +957,10 @@ sail_status_t sail_file_size(const char *path, size_t *size) {
     return SAIL_OK;
 }
 
-sail_status_t sail_read_file_contents(const char *path, void **buffer, unsigned *buffer_length) {
+sail_status_t sail_read_file_contents(const char *path, void *buffer) {
 
+    SAIL_CHECK_PATH_PTR(path);
     SAIL_CHECK_BUFFER_PTR(buffer);
-    SAIL_CHECK_PTR(buffer_length);
 
     size_t size;
     SAIL_TRY(sail_file_size(path, &size));
@@ -975,19 +975,32 @@ sail_status_t sail_read_file_contents(const char *path, void **buffer, unsigned 
         SAIL_LOG_AND_RETURN(SAIL_ERROR_OPEN_FILE);
     }
 
-    void *buffer_local;
-    SAIL_TRY(sail_malloc(size, &buffer_local));
-
-    if (fread(buffer_local, 1, size, f) != size) {
-        sail_free(buffer_local);
+    if (fread(buffer, 1, size, f) != size) {
         fclose(f);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_READ_FILE);
     }
 
     fclose(f);
 
+    return SAIL_OK;
+}
+
+sail_status_t sail_alloc_buffer_from_file_contents(const char *path, void **buffer, size_t *buffer_length) {
+
+    SAIL_CHECK_BUFFER_PTR(buffer);
+    SAIL_CHECK_PTR(buffer_length);
+
+    size_t size;
+    SAIL_TRY(sail_file_size(path, &size));
+
+    void *buffer_local;
+    SAIL_TRY(sail_malloc(size, &buffer_local));
+
+    SAIL_TRY_OR_CLEANUP(sail_read_file_contents(path, buffer_local),
+                        /* cleanup */ sail_free(buffer_local));
+
     *buffer = buffer_local;
-    *buffer_length = (unsigned)size;
+    *buffer_length = size;
 
     return SAIL_OK;
 }

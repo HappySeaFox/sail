@@ -201,7 +201,7 @@ meta_data::meta_data(const sail_meta_data_node *md)
     } else {
         arbitrary_data ad;
         ad.resize(md->value_length);
-        memcpy(&ad.front(), md->value, md->value_length);
+        memcpy(ad.data(), md->value, md->value_length);
         with_value(ad);
     }
 }

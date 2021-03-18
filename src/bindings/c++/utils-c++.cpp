@@ -56,4 +56,24 @@ bool is_file(const std::string_view path)
     return sail_is_file(path.data());
 }
 
+sail_status_t file_size(const std::string_view path, size_t *size) {
+
+    SAIL_TRY(sail_file_size(path.data(), size));
+
+    return SAIL_OK;
+}
+
+sail_status_t read_file_contents(const std::string_view path, sail::arbitrary_data *contents) {
+
+    SAIL_CHECK_PTR(contents);
+
+    size_t size;
+    SAIL_TRY(file_size(path, &size));
+
+    contents->resize(size);
+    SAIL_TRY(sail_read_file_contents(path.data(), contents->data()));
+
+    return SAIL_OK;
+}
+
 }
