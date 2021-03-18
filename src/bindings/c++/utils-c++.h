@@ -26,9 +26,8 @@
 #ifndef SAIL_UTILS_CPP_H
 #define SAIL_UTILS_CPP_H
 
-#include <string>
-
 #include <cstdint>
+#include <string_view>
 
 #ifdef SAIL_BUILD
     #include "error.h"
@@ -48,20 +47,17 @@ SAIL_EXPORT uint64_t now();
 /*
  * Returns true if the specified file system path exists.
  */
-SAIL_EXPORT bool path_exists(const std::string &path);
-SAIL_EXPORT bool path_exists(const char *path);
+SAIL_EXPORT bool path_exists(std::string_view path);
 
 /*
  * Returns true if the specified file system path is a directory.
  */
-SAIL_EXPORT bool is_dir(const std::string &path);
-SAIL_EXPORT bool is_dir(const char *path);
+SAIL_EXPORT bool is_dir(std::string_view path);
 
 /*
  * Returns true if the specified file system path is a regular file.
  */
-SAIL_EXPORT bool is_file(const std::string &path);
-SAIL_EXPORT bool is_file(const char *path);
+SAIL_EXPORT bool is_file(std::string_view path);
 
 }
 

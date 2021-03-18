@@ -57,22 +57,14 @@ image_reader::~image_reader()
     delete d;
 }
 
-sail_status_t image_reader::probe(const std::string &path, image *simage, codec_info *scodec_info)
+sail_status_t image_reader::probe(const std::string_view path, image *simage, codec_info *scodec_info)
 {
-    SAIL_TRY(probe(path.c_str(), simage, scodec_info));
-
-    return SAIL_OK;
-}
-
-sail_status_t image_reader::probe(const char *path, image *simage, codec_info *scodec_info)
-{
-    SAIL_CHECK_PATH_PTR(path);
     SAIL_CHECK_IMAGE_PTR(simage);
 
     const sail_codec_info *sail_codec_info;
     sail_image *sail_image;
 
-    SAIL_TRY(sail_probe_file(path,
+    SAIL_TRY(sail_probe_file(path.data(),
                              &sail_image,
                              &sail_codec_info));
 
@@ -134,21 +126,13 @@ sail_status_t image_reader::probe(const sail::io &io, image *simage, codec_info 
     return SAIL_OK;
 }
 
-sail_status_t image_reader::read(const std::string &path, image *simage)
+sail_status_t image_reader::read(const std::string_view path, image *simage)
 {
-    SAIL_TRY(read(path.c_str(), simage));
-
-    return SAIL_OK;
-}
-
-sail_status_t image_reader::read(const char *path, image *simage)
-{
-    SAIL_CHECK_PATH_PTR(path);
     SAIL_CHECK_IMAGE_PTR(simage);
 
     sail_image *sail_image;
 
-    SAIL_TRY(sail_read_file(path, &sail_image));
+    SAIL_TRY(sail_read_file(path.data(), &sail_image));
 
     *simage = image(sail_image);
     sail_image->pixels = NULL;
@@ -175,53 +159,26 @@ sail_status_t image_reader::read(const void *buffer, size_t buffer_length, image
     return SAIL_OK;
 }
 
-sail_status_t image_reader::start_reading(const std::string &path)
+sail_status_t image_reader::start_reading(const std::string_view path)
 {
-    SAIL_TRY(start_reading(path.c_str()));
+    SAIL_TRY(sail_start_reading_file(path.data(), nullptr, &d->state));
 
     return SAIL_OK;
 }
 
-sail_status_t image_reader::start_reading(const char *path)
+sail_status_t image_reader::start_reading(const std::string_view path, const codec_info &scodec_info)
 {
-    SAIL_CHECK_PATH_PTR(path);
-
-    SAIL_TRY(sail_start_reading_file(path, nullptr, &d->state));
+    SAIL_TRY(sail_start_reading_file(path.data(), scodec_info.sail_codec_info_c(), &d->state));
 
     return SAIL_OK;
 }
 
-sail_status_t image_reader::start_reading(const std::string &path, const codec_info &scodec_info)
+sail_status_t image_reader::start_reading(const std::string_view path, const codec_info &scodec_info, const read_options &sread_options)
 {
-    SAIL_TRY(start_reading(path.c_str(), scodec_info));
-
-    return SAIL_OK;
-}
-
-sail_status_t image_reader::start_reading(const char *path, const codec_info &scodec_info)
-{
-    SAIL_CHECK_PATH_PTR(path);
-
-    SAIL_TRY(sail_start_reading_file(path, scodec_info.sail_codec_info_c(), &d->state));
-
-    return SAIL_OK;
-}
-
-sail_status_t image_reader::start_reading(const std::string &path, const codec_info &scodec_info, const read_options &sread_options)
-{
-    SAIL_TRY(start_reading(path.c_str(), scodec_info, sread_options));
-
-    return SAIL_OK;
-}
-
-sail_status_t image_reader::start_reading(const char *path, const codec_info &scodec_info, const read_options &sread_options)
-{
-    SAIL_CHECK_PATH_PTR(path);
-
     sail_read_options sail_read_options;
     SAIL_TRY(sread_options.to_sail_read_options(&sail_read_options));
 
-    SAIL_TRY(sail_start_reading_file_with_options(path,
+    SAIL_TRY(sail_start_reading_file_with_options(path.data(),
                                                   scodec_info.sail_codec_info_c(),
                                                   &sail_read_options,
                                                   &d->state));

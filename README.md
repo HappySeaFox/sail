@@ -103,7 +103,7 @@ See [BUILDING](BUILDING.md).
 ## Programming languages
 
 **Programming language:** C11<br/>
-**Bindings:** C++11
+**Bindings:** C++17
 
 ## Competitors
 

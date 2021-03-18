@@ -27,7 +27,7 @@
 #define SAIL_IMAGE_READER_CPP_H
 
 #include <cstddef>
-#include <string>
+#include <string_view>
 
 #ifdef SAIL_BUILD
     #include "error.h"
@@ -57,8 +57,7 @@ public:
     /*
      * An interface to sail_probe_file(). See sail_probe_file() for more.
      */
-    sail_status_t probe(const std::string &path, image *simage, codec_info *scodec_info = nullptr);
-    sail_status_t probe(const char *path, image *simage, codec_info *scodec_info = nullptr);
+    sail_status_t probe(std::string_view path, image *simage, codec_info *scodec_info = nullptr);
 
     /*
      * An interface to sail_probe_mem(). See sail_probe_mem() for more.
@@ -73,8 +72,7 @@ public:
     /*
      * An interface to sail_read_file(). See sail_read_file() for more.
      */
-    sail_status_t read(const std::string &path, image *simage);
-    sail_status_t read(const char *path, image *simage);
+    sail_status_t read(std::string_view path, image *simage);
 
     /*
      * An interface to sail_read_mem(). See sail_read_mem() for more.
@@ -84,26 +82,22 @@ public:
     /*
      * An interface to sail_start_reading_file(). See sail_start_reading() for more.
      */
-    sail_status_t start_reading(const std::string &path);
-    sail_status_t start_reading(const char *path);
+    sail_status_t start_reading(std::string_view path);
 
     /*
      * An interface to sail_start_reading_file(). See sail_start_reading_file() for more.
      */
-    sail_status_t start_reading(const std::string &path, const codec_info &scodec_info);
-    sail_status_t start_reading(const char *path, const codec_info &scodec_info);
+    sail_status_t start_reading(std::string_view path, const codec_info &scodec_info);
 
     /*
      * An interface to sail_start_reading_file_with_options(). See sail_start_reading_file_with_options() for more.
      */
-    sail_status_t start_reading(const std::string &path, const read_options &sread_options);
-    sail_status_t start_reading(const char *path, const read_options &sread_options);
+    sail_status_t start_reading(std::string_view path, const read_options &sread_options);
 
     /*
      * An interface to sail_start_reading_file_with_options(). See sail_start_reading_file_with_options() for more.
      */
-    sail_status_t start_reading(const std::string &path, const codec_info &scodec_info, const read_options &sread_options);
-    sail_status_t start_reading(const char *path, const codec_info &scodec_info, const read_options &sread_options);
+    sail_status_t start_reading(std::string_view path, const codec_info &scodec_info, const read_options &sread_options);
 
     /*
      * An interface to sail_start_reading_mem(). See sail_start_reading_mem() for more.
