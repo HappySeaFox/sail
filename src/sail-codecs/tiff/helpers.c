@@ -394,7 +394,7 @@ sail_status_t tiff_private_write_meta_data(TIFF *tiff, const struct sail_meta_da
                 continue;
             }
 
-            TIFFSetField(tiff, tiff_tag, meta_data_node->value_string);
+            TIFFSetField(tiff, tiff_tag, (char *)meta_data_node->value);
         } else {
             SAIL_TRY_OR_SUPPRESS(sail_meta_data_to_string(meta_data_node->key, &meta_data_str));
             SAIL_LOG_WARNING("TIFF: Ignoring unsupported binary key '%s'", meta_data_str);

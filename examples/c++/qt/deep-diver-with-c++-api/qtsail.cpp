@@ -202,20 +202,27 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
         const sail::meta_data &first = *meta_data.begin();
         const char *meta_data_str = nullptr;
 
-        if (first.key() == SAIL_META_DATA_UNKNOWN) {
-            meta_data_str = first.key_unknown().c_str();
-        } else {
-            SAIL_TRY_OR_SUPPRESS(sail::meta_data::meta_data_to_string(first.key(), &meta_data_str));
-        }
+        if (meta.isEmpty() && first.value_type() == SAIL_META_DATA_TYPE_STRING) {
+            if (first.key() == SAIL_META_DATA_UNKNOWN) {
+                meta_data_str = first.key_unknown().c_str();
+            } else {
+                SAIL_TRY_OR_SUPPRESS(sail::meta_data::meta_data_to_string(first.key(), &meta_data_str));
+            }
 
-        meta = tr("%1: %2")
-                .arg(meta_data_str)
-                .arg(QString::fromStdString(first.value_string()).left(24).replace('\n', ' '));
+            meta = tr("%1: %2")
+                    .arg(meta_data_str)
+                    .arg(QString::fromStdString(first.value<std::string>()).left(24).replace('\n', ' '));
+        }
 
         for (const sail::meta_data &meta_data: meta_data) {
             meta_data_str = nullptr;
             SAIL_TRY_OR_SUPPRESS(sail::meta_data::meta_data_to_string(meta_data.key(), &meta_data_str));
-            SAIL_LOG_DEBUG("[META] %s: %s", meta_data_str, meta_data.value_string().c_str());
+
+            if (first.value_type() == SAIL_META_DATA_TYPE_STRING) {
+                SAIL_LOG_DEBUG("[META] %s: %s", meta_data_str, meta_data.value<std::string>().c_str());
+            } else {
+                SAIL_LOG_DEBUG("[META] %s: <%u bytes>", meta_data_str, (unsigned)meta_data.value<sail::arbitrary_data>().size());
+            }
         }
     }
 

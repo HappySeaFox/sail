@@ -45,26 +45,24 @@ sail_status_t gif_private_supported_read_output_pixel_format(enum SailPixelForma
     }
 }
 
-sail_status_t gif_private_fetch_comment(const GifByteType *extension, struct sail_meta_data_node **image_meta_data_node) {
+static sail_status_t save_str_in_meta_data(const char *str, unsigned length_wo_null, enum SailMetaData key, struct sail_meta_data_node **image_meta_data_node) {
 
-    SAIL_CHECK_PTR(extension);
-
-    const int length = extension[0];
-
-    if (length <= 0) {
-        return SAIL_OK;
-    }
+    SAIL_CHECK_STRING_PTR(str);
 
     /* Allocate a new meta data entry. */
     struct sail_meta_data_node *meta_data_node;
 
     SAIL_TRY(sail_alloc_meta_data_node(&meta_data_node));
 
-    meta_data_node->key = SAIL_META_DATA_COMMENT;
+    meta_data_node->key = key;
     meta_data_node->value_type = SAIL_META_DATA_TYPE_STRING;
+    meta_data_node->value_length = length_wo_null + 1;
 
-    SAIL_TRY_OR_CLEANUP(sail_strdup_length((const char *)(extension + 1), length, &meta_data_node->value_string),
+    SAIL_TRY_OR_CLEANUP(sail_malloc(meta_data_node->value_length, &meta_data_node->value),
                         /* cleanup */ sail_destroy_meta_data_node(meta_data_node));
+
+    memcpy(meta_data_node->value, str, meta_data_node->value_length - 1);
+    *((char *)meta_data_node->value + meta_data_node->value_length - 1) = '\0';
 
     /* Save it as a last meta data node in the image. */
     while (*image_meta_data_node != NULL) {
@@ -76,28 +74,27 @@ sail_status_t gif_private_fetch_comment(const GifByteType *extension, struct sai
     return SAIL_OK;
 }
 
+sail_status_t gif_private_fetch_comment(const GifByteType *extension, struct sail_meta_data_node **image_meta_data_node) {
+
+    SAIL_CHECK_PTR(extension);
+
+    const int length = extension[0];
+
+    if (length <= 0) {
+        return SAIL_OK;
+    }
+
+    SAIL_TRY(save_str_in_meta_data((const char *)extension + 1, length, SAIL_META_DATA_COMMENT, image_meta_data_node));
+
+    return SAIL_OK;
+}
+
 sail_status_t gif_private_fetch_application(const GifByteType *extension, struct sail_meta_data_node **image_meta_data_node) {
 
     SAIL_CHECK_PTR(extension);
 
-    /* Allocate a new meta data entry. */
-    struct sail_meta_data_node *meta_data_node;
-
-    SAIL_TRY(sail_alloc_meta_data_node(&meta_data_node));
-
-    meta_data_node->key = SAIL_META_DATA_SOFTWARE;
-    meta_data_node->value_type = SAIL_META_DATA_TYPE_STRING;
-
     /* 8 bytes as per the spec. */
-    SAIL_TRY_OR_CLEANUP(sail_strdup_length((const char *)(extension + 1), 8, &meta_data_node->value_string),
-                        /* cleanup */ sail_destroy_meta_data_node(meta_data_node));
-
-    /* Save it as a last meta data node in the image. */
-    while (*image_meta_data_node != NULL) {
-        *image_meta_data_node = (*image_meta_data_node)->next;
-    }
-
-    *image_meta_data_node = meta_data_node;
+    SAIL_TRY(save_str_in_meta_data((const char *)extension + 1, 8, SAIL_META_DATA_SOFTWARE, image_meta_data_node));
 
     return SAIL_OK;
 }

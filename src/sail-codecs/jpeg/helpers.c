@@ -189,9 +189,16 @@ sail_status_t jpeg_private_fetch_meta_data(struct jpeg_decompress_struct *decomp
             struct sail_meta_data_node *meta_data_node;
 
             SAIL_TRY(sail_alloc_meta_data_node(&meta_data_node));
+
             meta_data_node->key = SAIL_META_DATA_COMMENT;
-            SAIL_TRY_OR_CLEANUP(sail_strdup_length((const char *)it->data, it->data_length, &meta_data_node->value_string),
+            meta_data_node->value_type = SAIL_META_DATA_TYPE_STRING;
+            meta_data_node->value_length = it->data_length + 1;
+
+            SAIL_TRY_OR_CLEANUP(sail_malloc(meta_data_node->value_length, &meta_data_node->value),
                                 /* cleanup */ sail_destroy_meta_data_node(meta_data_node));
+
+            memcpy(meta_data_node->value, it->data, meta_data_node->value_length - 1);
+            *((char *)meta_data_node->value + meta_data_node->value_length - 1) = '\0';
 
             *last_meta_data_node = meta_data_node;
             last_meta_data_node = &meta_data_node->next;
@@ -209,8 +216,8 @@ sail_status_t jpeg_private_write_meta_data(struct jpeg_compress_struct *compress
         if (meta_data_node->value_type == SAIL_META_DATA_TYPE_STRING) {
             jpeg_write_marker(compress_context,
                                 JPEG_COM,
-                                (JOCTET *)meta_data_node->value_string,
-                                (unsigned int)strlen(meta_data_node->value_string));
+                                (JOCTET *)meta_data_node->value,
+                                (unsigned)meta_data_node->value_length - 1);
         } else {
             const char *meta_data_str = NULL;
             SAIL_TRY_OR_SUPPRESS(sail_meta_data_to_string(meta_data_node->key, &meta_data_str));

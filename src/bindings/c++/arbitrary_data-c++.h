@@ -23,18 +23,17 @@
     SOFTWARE.
 */
 
-#include "sail-common.h"
+#ifndef SAIL_ARBITRARY_DATA_CPP_H
+#define SAIL_ARBITRARY_DATA_CPP_H
 
-SAIL_EXPORT sail_status_t sail_compare_resolutions(const struct sail_resolution *resolution1, const struct sail_resolution *resolution2);
+#include <cstdint>
+#include <vector>
 
-SAIL_EXPORT sail_status_t sail_compare_palettes(const struct sail_palette *palette1, const struct sail_palette *palette2);
+namespace sail
+{
 
-SAIL_EXPORT sail_status_t sail_compare_meta_data_nodes(const struct sail_meta_data_node *meta_data_node1, const struct sail_meta_data_node *meta_data_node2);
+using arbitrary_data = std::vector<std::uint8_t>;
 
-SAIL_EXPORT sail_status_t sail_compare_meta_data_node_chains(const struct sail_meta_data_node *meta_data_node1, const struct sail_meta_data_node *meta_data_node2);
+}
 
-SAIL_EXPORT sail_status_t sail_compare_iccps(const struct sail_iccp *iccp1, const struct sail_iccp *iccp2);
-
-SAIL_EXPORT sail_status_t sail_compare_source_images(const struct sail_source_image *source_image1, const struct sail_source_image *source_image2);
-
-SAIL_EXPORT sail_status_t sail_compare_images(const struct sail_image *image1, const struct sail_image *image2);
+#endif

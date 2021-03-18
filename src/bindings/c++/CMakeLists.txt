@@ -19,7 +19,8 @@ add_library(sail-c++
 
 # Build a list of public headers to install
 #
-set(PUBLIC_HEADERS "at_scope_exit-c++.h"
+set(PUBLIC_HEADERS "arbitrary_data-c++.h"
+                   "at_scope_exit-c++.h"
                    "context-c++.h"
                    "iccp-c++.h"
                    "image-c++.h"

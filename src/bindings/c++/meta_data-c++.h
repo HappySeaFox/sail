@@ -29,9 +29,13 @@
 #ifdef SAIL_BUILD
     #include "error.h"
     #include "export.h"
+
+    #include "arbitrary_data-c++.h"
 #else
     #include <sail-common/error.h>
     #include <sail-common/export.h>
+
+    #include <sail-c++/arbitrary_data-c++.h>
 #endif
 
 #include <string>
@@ -65,7 +69,7 @@ public:
     /*
      * Returns the meta data string key representation when key() is SAIL_META_DATA_UNKNOWN.
      */
-    std::string key_unknown() const;
+    const std::string& key_unknown() const;
 
     /*
      * Returns the meta data value type: string or data.
@@ -73,21 +77,11 @@ public:
     SailMetaDataType value_type() const;
 
     /*
-     * Returns the actual meta data string value when value_type is SAIL_META_DATA_TYPE_STRING.
+     * Returns the actual meta data value based on value_type. Only std::string and sail::arbitrary_data template
+     * parameters are allowed.
      */
-    std::string value_string() const;
-
-    /*
-     * Returns the actual meta data binary value when value_type is SAIL_META_DATA_TYPE_DATA.
-     * value_data_length holds its length.
-     */
-    const void* value_data() const;
-
-    /*
-     * Returns the length of the value. It's strlen(value) + 1 if the value is a string
-     * or the length of the binary data otherwise.
-     */
-    unsigned value_data_length() const;
+    template<typename T>
+    const T& value() const;
 
     /*
      * Sets a new known meta data key. Resets the saved unknown key to an empty string.
@@ -112,7 +106,7 @@ public:
     /*
      * Sets a new meta data binary value. Resets the saved string value.
      */
-    meta_data& with_value(const void *value, unsigned value_length);
+    meta_data& with_value(const arbitrary_data &value);
 
     /*
      * Assigns a non-NULL string representation of the specified meta data key. See SailMetaData.
@@ -136,6 +130,10 @@ private:
      */
     explicit meta_data(const sail_meta_data_node *md);
 
+    const std::string& value_string() const;
+
+    const sail::arbitrary_data& value_arbitrary_data() const;
+
     meta_data& with_value_type(SailMetaDataType type);
 
     sail_status_t to_sail_meta_data_node(sail_meta_data_node *md) const;
@@ -144,6 +142,18 @@ private:
     class pimpl;
     pimpl *d;
 };
+
+template<>
+inline const std::string& meta_data::value<std::string>() const
+{
+    return value_string();
+}
+
+template<>
+inline const sail::arbitrary_data& meta_data::value<sail::arbitrary_data>() const
+{
+    return value_arbitrary_data();
+}
 
 }
 

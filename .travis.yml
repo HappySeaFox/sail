@@ -67,7 +67,7 @@ script:
       cmake --build . --config Release --target install
 
       cd tests
-      ctest . -C Release
+      ctest --verbose -C Release
     ;;
     osx | linux)
       mkdir build
@@ -75,8 +75,9 @@ script:
 
       cmake -DCMAKE_BUILD_TYPE=Release -DSAIL_DEV=ON ..
       cmake --build .
+      sudo make install
 
       cd tests
-      ctest .
+      ctest --verbose
     ;;
   esac
