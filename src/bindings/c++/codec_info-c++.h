@@ -64,7 +64,6 @@ public:
     codec_info& operator=(codec_info &&ci);
     ~codec_info();
 
-    const std::string& path() const;
     const std::string& version() const;
     const std::string& name() const;
     const std::string& description() const;
@@ -183,7 +182,6 @@ private:
      */
     explicit codec_info(const sail_codec_info *ci);
 
-    codec_info& with_path(const std::string &path);
     codec_info& with_version(const std::string &version);
     codec_info& with_name(const std::string &name);
     codec_info& with_description(const std::string &description);

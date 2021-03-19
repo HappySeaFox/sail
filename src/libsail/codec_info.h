@@ -41,7 +41,7 @@ struct sail_codec_info_node;
  */
 struct sail_codec_info {
 
-    /* Full path to the codec. */
+    /* Full path to the codec. NULL when SAIL_COMBINE_CODECS is ON. */
     char *path;
 
     /*

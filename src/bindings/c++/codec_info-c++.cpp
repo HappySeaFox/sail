@@ -39,7 +39,6 @@ public:
 
     const sail_codec_info *sail_codec_info_c;
 
-    std::string path;
     std::string version;
     std::string name;
     std::string description;
@@ -65,8 +64,7 @@ codec_info& codec_info::operator=(const codec_info &ci)
 {
     d->sail_codec_info_c = ci.d->sail_codec_info_c;
 
-    with_path(ci.path())
-        .with_version(ci.version())
+    with_version(ci.version())
         .with_name(ci.name())
         .with_description(ci.description())
         .with_magic_numbers(ci.magic_numbers())
@@ -96,11 +94,6 @@ codec_info& codec_info::operator=(codec_info &&ci)
 codec_info::~codec_info()
 {
     delete d;
-}
-
-const std::string& codec_info::path() const
-{
-    return d->path;
 }
 
 const std::string& codec_info::version() const
@@ -284,8 +277,7 @@ codec_info::codec_info(const sail_codec_info *ci)
         mime_type_node = mime_type_node->next;
     }
 
-    with_path(ci->path)
-        .with_version(ci->version)
+    with_version(ci->version)
         .with_name(ci->name)
         .with_description(ci->description)
         .with_magic_numbers(magic_numbers)
@@ -293,12 +285,6 @@ codec_info::codec_info(const sail_codec_info *ci)
         .with_mime_types(mime_types)
         .with_read_features(sail::read_features(ci->read_features))
         .with_write_features(sail::write_features(ci->write_features));
-}
-
-codec_info& codec_info::with_path(const std::string &path)
-{
-    d->path = path;
-    return *this;
 }
 
 codec_info& codec_info::with_version(const std::string &version)
