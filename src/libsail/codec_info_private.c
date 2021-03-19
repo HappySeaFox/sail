@@ -280,6 +280,26 @@ static int inih_handler(void *data, const char *section, const char *name, const
 
 static sail_status_t check_codec_info(const struct sail_codec_info *codec_info) {
 
+    if (codec_info->version == NULL || strlen(codec_info->version) == 0) {
+        SAIL_LOG_ERROR("The currently being parsed codec info has empty version");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INCOMPLETE_CODEC_INFO);
+    }
+
+    if (codec_info->name == NULL || strlen(codec_info->name) == 0) {
+        SAIL_LOG_ERROR("The currently being parsed codec info has empty name");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INCOMPLETE_CODEC_INFO);
+    }
+
+    if (codec_info->description == NULL || strlen(codec_info->description) == 0) {
+        SAIL_LOG_ERROR("The codec '%s' has empty description", codec_info->name);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INCOMPLETE_CODEC_INFO);
+    }
+
+    if (codec_info->magic_number_node == NULL && codec_info->extension_node == NULL && codec_info->mime_type_node == NULL) {
+        SAIL_LOG_ERROR("The codec '%s' has no identification method (magic number or extension or mime type)", codec_info->name);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INCOMPLETE_CODEC_INFO);
+    }
+
     const struct sail_write_features *write_features = codec_info->write_features;
 
     /* Check write features. */
