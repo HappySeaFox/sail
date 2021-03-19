@@ -1,5 +1,5 @@
 set(SAIL_TEST_IMAGES_PATH "${CMAKE_CURRENT_SOURCE_DIR}/images")
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/test-images.h.in" "${PROJECT_BINARY_DIR}/include/test-images.h" @ONLY)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/images/test-images.h.in" "${PROJECT_BINARY_DIR}/include/test-images.h" @ONLY)
 
 sail_test(TARGET iccp                   SOURCES iccp.c)
 sail_test(TARGET integrity              SOURCES integrity.c)
