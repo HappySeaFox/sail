@@ -59,12 +59,11 @@ sail_status_t QtSail::init()
         QMessageBox::information(this, tr("Features"), tr("This demo includes:"
                                                           "<ul>"
                                                           "<li>Linking against SAIL pkg-config packages</li>"
-                                                          "<li>Output RGB or RGBA pixels only</li>"
                                                           "<li>Playing animations</li>"
                                                           "</ul>"
                                                           "This demo doesn't include:"
                                                           "<ul>"
-                                                          "<li>Selecting pixel format to output</li>"
+                                                          "<li>Displaying indexed images</li>"
                                                           "<li>Printing all meta data entries into stderr</li>"
                                                           "</ul>"));
     });

@@ -35,7 +35,7 @@ inline QImage::Format sailPixelFormatToQImageFormat(SailPixelFormat pixel_format
         case SAIL_PIXEL_FORMAT_BPP1_INDEXED:   return QImage::Format_Mono;
         case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE: return QImage::Format_Grayscale8;
         case SAIL_PIXEL_FORMAT_BPP8_INDEXED:   return QImage::Format_Indexed8;
-        case SAIL_PIXEL_FORMAT_BPP16_BGR555:   return QImage::Format_RGB16;
+        case SAIL_PIXEL_FORMAT_BPP16_BGR555:   return QImage::Format_RGB555;
         case SAIL_PIXEL_FORMAT_BPP24_RGB:      return QImage::Format_RGB888;
         case SAIL_PIXEL_FORMAT_BPP32_RGBX:     return QImage::Format_RGBX8888;
         case SAIL_PIXEL_FORMAT_BPP32_RGBA:     return QImage::Format_RGBA8888;

@@ -43,8 +43,6 @@
 //#include <sail/layouts/v4.h>
 
 #include "qtsail.h"
-#include "readoptions.h"
-#include "writeoptions.h"
 #include "ui_qtsail.h"
 #include "qimage_sail_pixel_formats.h"
 
@@ -76,8 +74,6 @@ sail_status_t QtSail::init()
         QMessageBox::information(this, tr("Features"), tr("This demo includes:"
                                                           "<ul>"
                                                           "<li>Linking against SAIL CMake packages</li>"
-                                                          "<li>Selecting pixel format to output</li>"
-                                                          "<li>Displaying indexed images (if SOURCE is selected)</li>"
                                                           "<li>Printing all meta data entries into stderr</li>"
                                                           "</ul>"
                                                           "This demo doesn't include:"
@@ -111,14 +107,6 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
     SAIL_TRY(codec_info.read_features().to_read_options(&read_options));
 
     const qint64 beforeDialog = elapsed.elapsed();
-
-    // Ask the user to provide his/her preferred output options.
-    //
-    ReadOptions readOptions(codec_info.description().c_str(), codec_info.read_features(), this);
-
-    if (readOptions.exec() == QDialog::Accepted) {
-        read_options.with_output_pixel_format(readOptions.pixelFormat());
-    }
 
     elapsed.restart();
 
@@ -306,19 +294,6 @@ sail_status_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffe
 
     const qint64 beforeDialog = elapsed.elapsed();
 
-    // Ask the user to provide his/her preferred output options.
-    //
-    WriteOptions writeOptions(QString::fromUtf8(codec_info.description().c_str()),
-                              codec_info.write_features(),
-                              image.pixel_format(),
-                              this);
-
-    if (writeOptions.exec() == QDialog::Accepted) {
-        write_options
-                .with_output_pixel_format(writeOptions.pixelFormat())
-                .with_compression_level(writeOptions.compressionLevel());
-    }
-
     elapsed.restart();
 
     // Initialize writing with our options.
@@ -336,11 +311,7 @@ sail_status_t QtSail::saveImage(const QImage &qimage, void *buffer, size_t buffe
         image.with_meta_data({ meta_data });
     }
 
-    const char *output_pixel_format_str;
-    SAIL_TRY(sail::image::pixel_format_to_string(write_options.output_pixel_format(), &output_pixel_format_str));
-
     SAIL_LOG_DEBUG("Image size: %dx%d", image.width(), image.height());
-    SAIL_LOG_DEBUG("Output pixel format: %s", output_pixel_format_str);
 
     // Seek and write the next image frame into the file.
     //
