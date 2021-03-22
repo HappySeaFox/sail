@@ -101,8 +101,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v5_tiff(struct sail_io *io, const
     TIFFSetWarningHandler(tiff_private_my_warning_fn);
     TIFFSetErrorHandler(tiff_private_my_error_fn);
 
-    SAIL_TRY(tiff_private_supported_read_output_pixel_format(read_options->output_pixel_format));
-
     /* Allocate a new state. */
     struct tiff_state *tiff_state;
     SAIL_TRY(alloc_tiff_state(&tiff_state));
@@ -195,20 +193,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_tiff(void *state, s
     SAIL_TRY_OR_CLEANUP(tiff_private_fetch_resolution(tiff_state->tiff, &image_local->resolution),
                             /* cleanup */ sail_destroy_image(image_local));
 
-    switch (tiff_state->read_options->output_pixel_format) {
-        case SAIL_PIXEL_FORMAT_BPP32_RGBA:
-        case SAIL_PIXEL_FORMAT_BPP32_BGRA: {
-            image_local->pixel_format = tiff_state->read_options->output_pixel_format;
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_SOURCE: {
-            image_local->pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;
-            break;
-        }
-        default: {
-            break;
-        }
-    }
+    image_local->pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;
 
     SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(image_local->width, image_local->pixel_format, &image_local->bytes_per_line),
                         /* cleanup */ sail_destroy_image(image_local));
@@ -225,12 +210,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_tiff(void *state, s
     image_local->source_image->pixel_format = tiff_private_bpp_to_pixel_format(tiff_state->image.bitspersample * tiff_state->image.samplesperpixel);
 
     *image = image_local;
-
-    const char *pixel_format_str = NULL;
-    SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(image_local->source_image->pixel_format, &pixel_format_str));
-    SAIL_LOG_DEBUG("TIFF: Input pixel format is %s", pixel_format_str);
-    SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(tiff_state->read_options->output_pixel_format, &pixel_format_str));
-    SAIL_LOG_DEBUG("TIFF: Output pixel format is %s", pixel_format_str);
 
     return SAIL_OK;
 }
@@ -261,18 +240,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v5_tiff(void *state, struct sail
     }
 
     TIFFRGBAImageEnd(&tiff_state->image);
-
-    /* Swap colors. */
-    if (tiff_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_BGRA) {
-        unsigned char *pixels = image->pixels;
-        const unsigned pixels_count = image->width * image->height;
-
-        for (unsigned i = 0; i < pixels_count; i++, pixels += 4) {
-            unsigned char tmp = *pixels;
-            *pixels = *(pixels+2);
-            *(pixels+2) = tmp;
-        }
-    }
 
     return SAIL_OK;
 }
@@ -317,7 +284,6 @@ SAIL_EXPORT sail_status_t sail_codec_write_init_v5_tiff(struct sail_io *io, cons
     SAIL_TRY(sail_copy_write_options(write_options, &tiff_state->write_options));
 
     /* Sanity check. */
-    SAIL_TRY(tiff_private_supported_write_output_pixel_format(tiff_state->write_options->output_pixel_format));
     SAIL_TRY(tiff_private_sail_compression_to_compression(tiff_state->write_options->compression, &tiff_state->write_compression));
 
     TIFFSetWarningHandler(tiff_private_my_warning_fn);
@@ -385,12 +351,6 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v5_tiff(void *state, 
 
     /* Write resolution. */
     SAIL_TRY(tiff_private_write_resolution(tiff_state->tiff, image->resolution));
-
-    const char *pixel_format_str = NULL;
-    SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(image->pixel_format, &pixel_format_str));
-    SAIL_LOG_DEBUG("TIFF: Input pixel format is %s", pixel_format_str);
-    SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(tiff_state->write_options->output_pixel_format, &pixel_format_str));
-    SAIL_LOG_DEBUG("TIFF: Output pixel format is %s", pixel_format_str);
 
     return SAIL_OK;
 }

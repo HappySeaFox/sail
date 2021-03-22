@@ -60,21 +60,6 @@ void tiff_private_my_warning_fn(const char *module, const char *format, va_list 
     }
 }
 
-sail_status_t tiff_private_supported_read_output_pixel_format(enum SailPixelFormat pixel_format) {
-
-    switch (pixel_format) {
-        case SAIL_PIXEL_FORMAT_BPP32_RGBA:
-        case SAIL_PIXEL_FORMAT_BPP32_BGRA:
-        case SAIL_PIXEL_FORMAT_SOURCE: {
-            return SAIL_OK;
-        }
-
-        default: {
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
-        }
-    }
-}
-
 enum SailCompression tiff_private_compression_to_sail_compression(int compression) {
 
     switch (compression) {
@@ -404,20 +389,6 @@ sail_status_t tiff_private_write_meta_data(TIFF *tiff, const struct sail_meta_da
     }
 
     return SAIL_OK;
-}
-
-sail_status_t tiff_private_supported_write_output_pixel_format(enum SailPixelFormat pixel_format) {
-
-    switch (pixel_format) {
-        case SAIL_PIXEL_FORMAT_AUTO:
-        case SAIL_PIXEL_FORMAT_SOURCE: {
-            return SAIL_OK;
-        }
-
-        default: {
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
-        }
-    }
 }
 
 sail_status_t tiff_private_fetch_resolution(TIFF *tiff, struct sail_resolution **resolution) {
