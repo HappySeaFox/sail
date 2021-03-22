@@ -46,12 +46,12 @@ struct sail_pixel_formats_mapping_node;
 struct sail_write_features {
 
     /*
-     * A mapping of supported pixel formats that can be written by this codec.
-     *
-     * Outputting SOURCE pixels is always supported. Some codecs may provide even more
-     * pixel formats to output.
+     * A list of supported pixel formats that can be written by this codec.
      */
-    struct sail_pixel_formats_mapping_node *pixel_formats_mapping_node;
+    enum SailPixelFormat *output_pixel_formats;
+
+    /* The length of output_pixel_formats. */
+    unsigned output_pixel_formats_length;
 
     /* Supported or-ed features of writing operations. See SailCodecFeature. */
     int features;

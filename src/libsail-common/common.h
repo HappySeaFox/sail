@@ -47,20 +47,6 @@ enum SailPixelFormat {
     SAIL_PIXEL_FORMAT_UNKNOWN,
 
     /*
-     * Pixel format used to write images with default parameters. Codecs detect an actual
-     * pixel format to write automatically in this case.
-     */
-    SAIL_PIXEL_FORMAT_AUTO,
-
-    /*
-     * Copy the source pixels as is without converting them to a different pixel format.
-     * This pixel format can be used in reading and writing operations.
-     * If pixels are compressed with some compression algorithm (e.g. RLE),
-     * reading operations still unpack them.
-     */
-    SAIL_PIXEL_FORMAT_SOURCE,
-
-    /*
      * Formats with unknown pixel representation/model.
      */
     SAIL_PIXEL_FORMAT_BPP1,

@@ -211,8 +211,6 @@ sail_status_t sail_pixel_format_to_string(enum SailPixelFormat pixel_format, con
 
     switch (pixel_format) {
         case SAIL_PIXEL_FORMAT_UNKNOWN:               *result = "UNKNOWN";               return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_AUTO:                  *result = "AUTO";                  return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_SOURCE:                *result = "SOURCE";                return SAIL_OK;
 
         case SAIL_PIXEL_FORMAT_BPP1:                  *result = "BPP1";                  return SAIL_OK;
         case SAIL_PIXEL_FORMAT_BPP2:                  *result = "BPP2";                  return SAIL_OK;
@@ -308,8 +306,6 @@ sail_status_t sail_pixel_format_from_string(const char *str, enum SailPixelForma
      */
     switch (hash) {
         case UINT64_C(229442760833397):      *result = SAIL_PIXEL_FORMAT_UNKNOWN;               return SAIL_OK;
-        case UINT64_C(6383872222):           *result = SAIL_PIXEL_FORMAT_AUTO;                  return SAIL_OK;
-        case UINT64_C(6952734212790):        *result = SAIL_PIXEL_FORMAT_SOURCE;                return SAIL_OK;
 
         case UINT64_C(6383902552):           *result = SAIL_PIXEL_FORMAT_BPP1;                  return SAIL_OK;
         case UINT64_C(6383902553):           *result = SAIL_PIXEL_FORMAT_BPP2;                  return SAIL_OK;
@@ -642,8 +638,6 @@ sail_status_t sail_bits_per_pixel(enum SailPixelFormat pixel_format, unsigned *r
 
     switch (pixel_format) {
         case SAIL_PIXEL_FORMAT_UNKNOWN:   SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
-        case SAIL_PIXEL_FORMAT_AUTO:      SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
-        case SAIL_PIXEL_FORMAT_SOURCE:    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
 
         case SAIL_PIXEL_FORMAT_BPP1:   *result = 1;   return SAIL_OK;
         case SAIL_PIXEL_FORMAT_BPP2:   *result = 2;   return SAIL_OK;

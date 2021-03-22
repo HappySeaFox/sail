@@ -29,21 +29,6 @@
 
 #include "helpers.h"
 
-sail_status_t bmp_private_supported_read_output_pixel_format(enum SailPixelFormat pixel_format) {
-
-    switch (pixel_format) {
-        case SAIL_PIXEL_FORMAT_SOURCE:
-        case SAIL_PIXEL_FORMAT_BPP32_RGBA:
-        case SAIL_PIXEL_FORMAT_BPP32_BGRA: {
-            return SAIL_OK;
-        }
-
-        default: {
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
-        }
-    }
-}
-
 sail_status_t bmp_private_read_ddb_file_header(struct sail_io *io, struct SailBmpDdbFileHeader *ddb_file_header) {
 
     SAIL_TRY(io->strict_read(io->stream, &ddb_file_header->type, sizeof(ddb_file_header->type)));

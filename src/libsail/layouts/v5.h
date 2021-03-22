@@ -48,7 +48,7 @@ extern "C" {
  * Usage:
  *
  * #define SAIL_CODEC_NAME jpeg
- * #include <sail/layouts/v4.h>
+ * #include <sail/layouts/v5.h>
  */
 Please define SAIL_CODEC_NAME before including this header.
 #endif
@@ -71,7 +71,7 @@ Please define SAIL_CODEC_NAME before including this header.
  *
  * Returns SAIL_OK on success.
  */
-sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_read_init_v4)(struct sail_io *io, const struct sail_read_options *read_options, void **state);
+sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_read_init_v5)(struct sail_io *io, const struct sail_read_options *read_options, void **state);
 
 /*
  * Seeks to the next frame. The frame is NOT immediately read or decoded by most SAIL codecs.
@@ -86,21 +86,21 @@ sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_read_init_v4)(struct sail_io 
  *
  * Returns SAIL_OK on success.
  */
-sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_read_seek_next_frame_v4)(void *state, struct sail_io *io, struct sail_image **image);
+sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_read_seek_next_frame_v5)(void *state, struct sail_io *io, struct sail_image **image);
 
 /*
  * Seeks to the next pass if the specified image has multiple passes. Does nothing otherwise.
  *
  * Returns SAIL_OK on success.
  */
-sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_read_seek_next_pass_v4)(void *state, struct sail_io *io, const struct sail_image *image);
+sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_read_seek_next_pass_v5)(void *state, struct sail_io *io, const struct sail_image *image);
 
 /*
  * Reads the next frame of the current image in the current pass. The image pixels are pre-allocated by libsail.
  *
  * Returns SAIL_OK on success.
  */
-sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_read_frame_v4)(void *state, struct sail_io *io, struct sail_image *image);
+sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_read_frame_v5)(void *state, struct sail_io *io, struct sail_image *image);
 
 /*
  * Finilizes reading operation. No more readings are possible after calling this function.
@@ -109,7 +109,7 @@ sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_read_frame_v4)(void *state, s
  *
  * Returns SAIL_OK on success.
  */
-sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_read_finish_v4)(void **state, struct sail_io *io);
+sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_read_finish_v5)(void **state, struct sail_io *io);
 
 /*
  * Encoding functions.
@@ -125,7 +125,7 @@ sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_read_finish_v4)(void **state,
  *
  * Returns SAIL_OK on success.
  */
-sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_write_init_v4)(struct sail_io *io, const struct sail_write_options *write_options, void **state);
+sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_write_init_v5)(struct sail_io *io, const struct sail_write_options *write_options, void **state);
 
 /*
  * Seeks to a next frame before writing it. The frame is NOT immediately written. Use sail_codec_write_seek_next_pass()
@@ -133,21 +133,21 @@ sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_write_init_v4)(struct sail_io
  *
  * Returns SAIL_OK on success.
  */
-sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_write_seek_next_frame_v4)(void *state, struct sail_io *io, const struct sail_image *image);
+sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_write_seek_next_frame_v5)(void *state, struct sail_io *io, const struct sail_image *image);
 
 /*
  * Seeks to a next pass before writing it if the specified image is interlaced. Does nothing otherwise.
  *
  * Returns SAIL_OK on success.
  */
-sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_write_seek_next_pass_v4)(void *state, struct sail_io *io, const struct sail_image *image);
+sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_write_seek_next_pass_v5)(void *state, struct sail_io *io, const struct sail_image *image);
 
 /*
  * Writes a next frame of the current image in the current pass.
  *
  * Returns SAIL_OK on success.
  */
-sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_write_frame_v4)(void *state, struct sail_io *io, const struct sail_image *image);
+sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_write_frame_v5)(void *state, struct sail_io *io, const struct sail_image *image);
 
 /*
  * Finilizes writing operation. No more writings are possible after calling this function.
@@ -156,7 +156,7 @@ sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_write_frame_v4)(void *state, 
  *
  * Returns SAIL_OK on success.
  */
-sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_write_finish_v4)(void **state, struct sail_io *io);
+sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_write_finish_v5)(void **state, struct sail_io *io);
 
 /* extern "C" */
 #ifdef __cplusplus

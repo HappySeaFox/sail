@@ -136,8 +136,6 @@ enum SailBmpVersion
     SAIL_BMP_V5,
 };
 
-SAIL_HIDDEN sail_status_t bmp_private_supported_read_output_pixel_format(enum SailPixelFormat pixel_format);
-
 SAIL_HIDDEN sail_status_t bmp_private_read_ddb_file_header(struct sail_io *io, struct SailBmpDdbFileHeader *ddb_file_header);
 
 SAIL_HIDDEN sail_status_t bmp_private_read_v1(struct sail_io *io, struct SailBmpDdbBitmap *v1);

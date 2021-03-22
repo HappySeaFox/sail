@@ -36,7 +36,6 @@ static MunitResult test_alloc_options(const MunitParameter params[], void *user_
     struct sail_read_options *read_options = NULL;
     munit_assert(sail_alloc_read_options(&read_options) == SAIL_OK);
     munit_assert_not_null(read_options);
-    munit_assert(read_options->output_pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN);
     munit_assert(read_options->io_options == 0);
 
     sail_destroy_read_options(read_options);
@@ -51,14 +50,12 @@ static MunitResult test_copy_options(const MunitParameter params[], void *user_d
     struct sail_read_options *read_options = NULL;
     munit_assert(sail_alloc_read_options(&read_options) == SAIL_OK);
 
-    read_options->output_pixel_format = SAIL_PIXEL_FORMAT_BPP24_RGB;
-    read_options->io_options          = SAIL_IO_OPTION_EXIF;
+    read_options->io_options = SAIL_IO_OPTION_EXIF;
 
     struct sail_read_options *read_options_copy = NULL;
     munit_assert(sail_copy_read_options(read_options, &read_options_copy) == SAIL_OK);
     munit_assert_not_null(read_options_copy);
 
-    munit_assert(read_options_copy->output_pixel_format == read_options->output_pixel_format);
     munit_assert(read_options_copy->io_options == read_options->io_options);
 
     sail_destroy_read_options(read_options_copy);
@@ -76,11 +73,9 @@ static MunitResult test_options_from_features(const MunitParameter params[], voi
     munit_assert_not_null(read_options);
 
     struct sail_read_features read_features;
-    read_features.default_output_pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;
     read_features.features = SAIL_CODEC_FEATURE_META_DATA | SAIL_CODEC_FEATURE_INTERLACED | SAIL_CODEC_FEATURE_ICCP;
     munit_assert(sail_read_options_from_features(&read_features, read_options) == SAIL_OK);
 
-    munit_assert(read_options->output_pixel_format == read_features.default_output_pixel_format);
     munit_assert(read_options->io_options == (SAIL_IO_OPTION_META_DATA | SAIL_IO_OPTION_INTERLACED | SAIL_IO_OPTION_ICCP));
 
     sail_destroy_read_options(read_options);

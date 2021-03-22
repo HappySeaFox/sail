@@ -52,7 +52,7 @@ sail_status_t alloc_and_load_codec(const struct sail_codec_info *codec_info, str
 
     codec_local->layout = codec_info->layout;
     codec_local->handle = NULL;
-    codec_local->v4     = NULL;
+    codec_local->v5     = NULL;
 
 #ifndef SAIL_COMBINE_CODECS
     SAIL_LOG_DEBUG("Loading codec '%s'", codec_info->path);
@@ -141,22 +141,22 @@ sail_status_t alloc_and_load_codec(const struct sail_codec_info *codec_info, str
         sail_free(full_symbol_name);                                               \
     } do{} while(0)
 
-    if (codec_local->layout == SAIL_CODEC_LAYOUT_V4) {
-        SAIL_TRY_OR_CLEANUP(sail_malloc(sizeof(struct sail_codec_layout_v4), &ptr),
+    if (codec_local->layout == SAIL_CODEC_LAYOUT_V5) {
+        SAIL_TRY_OR_CLEANUP(sail_malloc(sizeof(struct sail_codec_layout_v5), &ptr),
                             /* cleanup */ destroy_codec(codec_local));
-        codec_local->v4 = ptr;
+        codec_local->v5 = ptr;
 
-        SAIL_RESOLVE(codec_local->v4->read_init,            handle, sail_codec_read_init_v4,            codec_info->name);
-        SAIL_RESOLVE(codec_local->v4->read_seek_next_frame, handle, sail_codec_read_seek_next_frame_v4, codec_info->name);
-        SAIL_RESOLVE(codec_local->v4->read_seek_next_pass,  handle, sail_codec_read_seek_next_pass_v4,  codec_info->name);
-        SAIL_RESOLVE(codec_local->v4->read_frame,           handle, sail_codec_read_frame_v4,           codec_info->name);
-        SAIL_RESOLVE(codec_local->v4->read_finish,          handle, sail_codec_read_finish_v4,          codec_info->name);
+        SAIL_RESOLVE(codec_local->v5->read_init,            handle, sail_codec_read_init_v5,            codec_info->name);
+        SAIL_RESOLVE(codec_local->v5->read_seek_next_frame, handle, sail_codec_read_seek_next_frame_v5, codec_info->name);
+        SAIL_RESOLVE(codec_local->v5->read_seek_next_pass,  handle, sail_codec_read_seek_next_pass_v5,  codec_info->name);
+        SAIL_RESOLVE(codec_local->v5->read_frame,           handle, sail_codec_read_frame_v5,           codec_info->name);
+        SAIL_RESOLVE(codec_local->v5->read_finish,          handle, sail_codec_read_finish_v5,          codec_info->name);
 
-        SAIL_RESOLVE(codec_local->v4->write_init,            handle, sail_codec_write_init_v4,            codec_info->name);
-        SAIL_RESOLVE(codec_local->v4->write_seek_next_frame, handle, sail_codec_write_seek_next_frame_v4, codec_info->name);
-        SAIL_RESOLVE(codec_local->v4->write_seek_next_pass,  handle, sail_codec_write_seek_next_pass_v4,  codec_info->name);
-        SAIL_RESOLVE(codec_local->v4->write_frame,           handle, sail_codec_write_frame_v4,           codec_info->name);
-        SAIL_RESOLVE(codec_local->v4->write_finish,          handle, sail_codec_write_finish_v4,          codec_info->name);
+        SAIL_RESOLVE(codec_local->v5->write_init,            handle, sail_codec_write_init_v5,            codec_info->name);
+        SAIL_RESOLVE(codec_local->v5->write_seek_next_frame, handle, sail_codec_write_seek_next_frame_v5, codec_info->name);
+        SAIL_RESOLVE(codec_local->v5->write_seek_next_pass,  handle, sail_codec_write_seek_next_pass_v5,  codec_info->name);
+        SAIL_RESOLVE(codec_local->v5->write_frame,           handle, sail_codec_write_frame_v5,           codec_info->name);
+        SAIL_RESOLVE(codec_local->v5->write_finish,          handle, sail_codec_write_finish_v5,          codec_info->name);
     } else {
         destroy_codec(codec_local);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_CODEC_LAYOUT);
@@ -184,6 +184,6 @@ void destroy_codec(struct sail_codec *codec) {
 #endif
     }
 
-    sail_free(codec->v4);
+    sail_free(codec->v5);
     sail_free(codec);
 }

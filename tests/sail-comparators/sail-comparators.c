@@ -48,8 +48,6 @@ sail_status_t sail_compare_palettes(const struct sail_palette *palette1, const s
 
     munit_assert(palette1 != palette2);
 
-    munit_assert(palette1->pixel_format != SAIL_PIXEL_FORMAT_AUTO);
-    munit_assert(palette1->pixel_format != SAIL_PIXEL_FORMAT_SOURCE);
     munit_assert(palette1->pixel_format != SAIL_PIXEL_FORMAT_UNKNOWN);
 
     munit_assert(palette1->pixel_format == palette2->pixel_format);
@@ -170,8 +168,6 @@ sail_status_t sail_compare_images(const struct sail_image *image1, const struct 
         munit_assert(sail_compare_resolutions(image1->resolution, image2->resolution) == SAIL_OK);
     }
 
-    munit_assert(image1->pixel_format != SAIL_PIXEL_FORMAT_AUTO);
-    munit_assert(image1->pixel_format != SAIL_PIXEL_FORMAT_SOURCE);
     munit_assert(image1->pixel_format != SAIL_PIXEL_FORMAT_UNKNOWN);
     munit_assert(image1->pixel_format == image2->pixel_format);
 

@@ -37,8 +37,7 @@ sail_status_t sail_alloc_read_options(struct sail_read_options **read_options) {
     SAIL_TRY(sail_malloc(sizeof(struct sail_read_options), &ptr));
     *read_options = ptr;
 
-    (*read_options)->output_pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;
-    (*read_options)->io_options          = 0;
+    (*read_options)->io_options = 0;
 
     return SAIL_OK;
 }
@@ -56,8 +55,6 @@ sail_status_t sail_read_options_from_features(const struct sail_read_features *r
 
     SAIL_CHECK_READ_FEATURES_PTR(read_features);
     SAIL_CHECK_READ_OPTIONS_PTR(read_options);
-
-    read_options->output_pixel_format = read_features->default_output_pixel_format;
 
     read_options->io_options = 0;
 

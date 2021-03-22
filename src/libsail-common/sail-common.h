@@ -41,7 +41,6 @@
     #include "meta_data_node.h"
     #include "palette.h"
     #include "pixel.h"
-    #include "pixel_formats_mapping_node.h"
     #include "read_features.h"
     #include "read_options.h"
     #include "resolution.h"
@@ -62,7 +61,6 @@
     #include <sail-common/meta_data_node.h>
     #include <sail-common/palette.h>
     #include <sail-common/pixel.h>
-    #include <sail-common/pixel_formats_mapping_node.h>
     #include <sail-common/read_features.h>
     #include <sail-common/read_options.h>
     #include <sail-common/resolution.h>

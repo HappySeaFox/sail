@@ -134,7 +134,6 @@ static sail_status_t parse_flags(const char *value, int *features, sail_status_t
 
 struct init_data {
     struct sail_codec_info *codec_info;
-    struct sail_pixel_formats_mapping_node **last_mapping_node;
 };
 
 static sail_status_t inih_handler_sail_error(void *data, const char *section, const char *name, const char *value) {
@@ -196,16 +195,7 @@ static sail_status_t inih_handler_sail_error(void *data, const char *section, co
             SAIL_LOG_AND_RETURN(SAIL_ERROR_PARSE_FILE);
         }
     } else if (strcmp(section, "read-features") == 0) {
-        if (strcmp(name, "output-pixel-formats") == 0) {
-            SAIL_TRY_OR_CLEANUP(parse_serialized_ints(value,
-                                                        (int **)&codec_info->read_features->output_pixel_formats,
-                                                        &codec_info->read_features->output_pixel_formats_length,
-                                                        pixel_format_from_string),
-                                /* cleanup */ SAIL_LOG_ERROR("Failed to parse output pixel formats: '%s'", value));
-        } else if (strcmp(name, "default-output-pixel-format") == 0) {
-            SAIL_TRY_OR_CLEANUP(sail_pixel_format_from_string(value, &codec_info->read_features->default_output_pixel_format),
-                                /* cleanup */ SAIL_LOG_ERROR("Failed to parse preferred output pixel format: '%s'", value));
-        } else if (strcmp(name, "features") == 0) {
+        if (strcmp(name, "features") == 0) {
             SAIL_TRY_OR_CLEANUP(parse_flags(value, &codec_info->read_features->features, codec_feature_from_string),
                                 /* cleanup */ SAIL_LOG_ERROR("Failed to parse codec features: '%s'", value));
         } else {
@@ -216,6 +206,12 @@ static sail_status_t inih_handler_sail_error(void *data, const char *section, co
         if (strcmp(name, "features") == 0) {
             SAIL_TRY_OR_CLEANUP(parse_flags(value, &codec_info->write_features->features, codec_feature_from_string),
                                 /* cleanup */ SAIL_LOG_ERROR("Failed to parse codec features: '%s'", value));
+        } else if (strcmp(name, "output-pixel-formats") == 0) {
+            SAIL_TRY_OR_CLEANUP(parse_serialized_ints(value,
+                                                        (int **)&codec_info->write_features->output_pixel_formats,
+                                                        &codec_info->write_features->output_pixel_formats_length,
+                                                        pixel_format_from_string),
+                                /* cleanup */ SAIL_LOG_ERROR("Failed to parse output pixel formats: '%s'", value));
         } else if (strcmp(name, "properties") == 0) {
             SAIL_TRY_OR_CLEANUP(parse_flags(value, &codec_info->write_features->properties, image_property_from_string),
                                 /* cleanup */ SAIL_LOG_ERROR("Failed to parse image properties: '%s'", value));
@@ -242,25 +238,6 @@ static sail_status_t inih_handler_sail_error(void *data, const char *section, co
             SAIL_LOG_ERROR("Unsupported codec info key '%s' in [%s]", name, section);
             SAIL_LOG_AND_RETURN(SAIL_ERROR_PARSE_FILE);
         }
-    } else if (strcmp(section, "write-pixel-formats-mapping") == 0) {
-        struct sail_pixel_formats_mapping_node *node;
-
-        SAIL_TRY_OR_CLEANUP(sail_alloc_pixel_formats_mapping_node(&node),
-                            /* cleanup */ SAIL_LOG_ERROR("Failed to allocate a new write mapping node"));
-
-        SAIL_TRY_OR_CLEANUP(sail_pixel_format_from_string(name, &node->input_pixel_format),
-                            /* cleanup */ SAIL_LOG_ERROR("Failed to parse write pixel format: '%s'", name),
-                                          sail_destroy_pixel_formats_mapping_node(node));
-
-        SAIL_TRY_OR_CLEANUP(parse_serialized_ints(value,
-                                                    (int **)&node->output_pixel_formats,
-                                                    &node->output_pixel_formats_length,
-                                                    pixel_format_from_string),
-                            /* cleanup */ SAIL_LOG_ERROR("Failed to parse mapped write pixel formats: '%s'", value),
-                                          sail_destroy_pixel_formats_mapping_node(node));
-
-        *(init_data->last_mapping_node) = node;
-        init_data->last_mapping_node = &node->next;
     } else {
         SAIL_LOG_ERROR("Unsupported codec info section '%s'", section);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_PARSE_FILE);
@@ -305,8 +282,9 @@ static sail_status_t check_codec_info(const struct sail_codec_info *codec_info) 
     /* Check write features. */
     if ((write_features->features & SAIL_CODEC_FEATURE_STATIC ||
             write_features->features & SAIL_CODEC_FEATURE_ANIMATED ||
-            write_features->features & SAIL_CODEC_FEATURE_MULTI_FRAME) && write_features->pixel_formats_mapping_node == NULL) {
-        SAIL_LOG_ERROR("The codec '%s' is able to write images, but output pixel formats mappings are not specified", codec_info->name);
+            write_features->features & SAIL_CODEC_FEATURE_MULTI_FRAME) &&
+            (write_features->output_pixel_formats == NULL || write_features->output_pixel_formats_length == 0)) {
+        SAIL_LOG_ERROR("The codec '%s' is able to write images, but output pixel formats are not specified", codec_info->name);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INCOMPLETE_CODEC_INFO);
     }
 
@@ -412,15 +390,15 @@ void destroy_codec_info_node_chain(struct sail_codec_info_node *codec_info_node)
 
 static sail_status_t codec_read_info_from_input(const char *input, int (*ini_parser)(const char*, ini_handler, void*), struct sail_codec_info **codec_info) {
 
-    SAIL_TRY(alloc_codec_info(codec_info));
-    SAIL_TRY_OR_CLEANUP(sail_alloc_read_features(&(*codec_info)->read_features),
-                        destroy_codec_info(*codec_info));
-    SAIL_TRY_OR_CLEANUP(sail_alloc_write_features(&(*codec_info)->write_features),
-                        destroy_codec_info(*codec_info));
+    struct sail_codec_info *codec_info_local;
+    SAIL_TRY(alloc_codec_info(&codec_info_local));
+    SAIL_TRY_OR_CLEANUP(sail_alloc_read_features(&codec_info_local->read_features),
+                        destroy_codec_info(codec_info_local));
+    SAIL_TRY_OR_CLEANUP(sail_alloc_write_features(&codec_info_local->write_features),
+                        destroy_codec_info(codec_info_local));
 
     struct init_data init_data;
-    init_data.codec_info = *codec_info;
-    init_data.last_mapping_node = &(*codec_info)->write_features->pixel_formats_mapping_node;
+    init_data.codec_info = codec_info_local;
 
     /*
      * Returns:
@@ -433,19 +411,21 @@ static sail_status_t codec_read_info_from_input(const char *input, int (*ini_par
 
     /* Success. */
     if (code == 0) {
-        if ((*codec_info)->layout != SAIL_CODEC_LAYOUT_V4) {
-            SAIL_LOG_ERROR("Unsupported codec layout version %d. Please check your codec info files", (*codec_info)->layout);
-            destroy_codec_info(*codec_info);
+        if (codec_info_local->layout != SAIL_CODEC_LAYOUT_V5) {
+            SAIL_LOG_ERROR("Unsupported codec layout version %d. Please check your codec info files", codec_info_local->layout);
+            destroy_codec_info(codec_info_local);
             SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_CODEC_LAYOUT);
         }
 
         /* Paranoid error checks. */
-        SAIL_TRY_OR_CLEANUP(check_codec_info(*codec_info),
-                            /* cleanup */ destroy_codec_info(*codec_info));
+        SAIL_TRY_OR_CLEANUP(check_codec_info(codec_info_local),
+                            /* cleanup */ destroy_codec_info(codec_info_local));
+
+        *codec_info = codec_info_local;
 
         return SAIL_OK;
     } else {
-        destroy_codec_info(*codec_info);
+        destroy_codec_info(codec_info_local);
 
         switch (code) {
             case -1: SAIL_LOG_AND_RETURN(SAIL_ERROR_OPEN_FILE);

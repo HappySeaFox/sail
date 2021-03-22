@@ -43,14 +43,6 @@ struct sail_write_features;
 /* Options to modify writing operations. */
 struct sail_write_options {
 
-    /*
-     * Request to modify the output pixel format. The list of possible output pixel formats
-     * can be obtained from sail_write_features.pixel_formats_mapping_node.
-     *
-     * The SOURCE output pixel format is always supported.
-     */
-    enum SailPixelFormat output_pixel_format;
-
     /* Or-ed IO manipulation options. See SailIoOption. */
     int io_options;
 

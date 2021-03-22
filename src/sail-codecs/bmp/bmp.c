@@ -140,15 +140,13 @@ static void destroy_bmp_state(struct bmp_state *bmp_state) {
  * Decoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_read_init_v4_bmp(struct sail_io *io, const struct sail_read_options *read_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_read_init_v5_bmp(struct sail_io *io, const struct sail_read_options *read_options, void **state) {
 
     SAIL_CHECK_STATE_PTR(state);
     *state = NULL;
 
     SAIL_CHECK_IO(io);
     SAIL_CHECK_READ_OPTIONS_PTR(read_options);
-
-    SAIL_TRY(bmp_private_supported_read_output_pixel_format(read_options->output_pixel_format));
 
     /* Allocate a new state. */
     struct bmp_state *bmp_state;
@@ -316,7 +314,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v4_bmp(struct sail_io *io, const 
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v4_bmp(void *state, struct sail_io *io, struct sail_image **image) {
+SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_bmp(void *state, struct sail_io *io, struct sail_image **image) {
 
     SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IO(io);
@@ -395,7 +393,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v4_bmp(void *state, st
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_read_seek_next_pass_v4_bmp(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_read_seek_next_pass_v5_bmp(void *state, struct sail_io *io, const struct sail_image *image) {
 
     SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IO(io);
@@ -404,7 +402,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_pass_v4_bmp(void *state, str
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_read_frame_v4_bmp(void *state, struct sail_io *io, struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_read_frame_v5_bmp(void *state, struct sail_io *io, struct sail_image *image) {
 
     SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IO(io);
@@ -727,7 +725,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v4_bmp(void *state, struct sail_
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_read_finish_v4_bmp(void **state, struct sail_io *io) {
+SAIL_EXPORT sail_status_t sail_codec_read_finish_v5_bmp(void **state, struct sail_io *io) {
 
     SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IO(io);
@@ -746,7 +744,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_finish_v4_bmp(void **state, struct sai
  * Encoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_write_init_v4_bmp(struct sail_io *io, const struct sail_write_options *write_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_write_init_v5_bmp(struct sail_io *io, const struct sail_write_options *write_options, void **state) {
 
     SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IO(io);
@@ -755,7 +753,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_init_v4_bmp(struct sail_io *io, const
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v4_bmp(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v5_bmp(void *state, struct sail_io *io, const struct sail_image *image) {
 
     SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IO(io);
@@ -764,7 +762,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v4_bmp(void *state, s
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-SAIL_EXPORT sail_status_t sail_codec_write_seek_next_pass_v4_bmp(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_write_seek_next_pass_v5_bmp(void *state, struct sail_io *io, const struct sail_image *image) {
 
     SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IO(io);
@@ -773,7 +771,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_pass_v4_bmp(void *state, st
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-SAIL_EXPORT sail_status_t sail_codec_write_frame_v4_bmp(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_write_frame_v5_bmp(void *state, struct sail_io *io, const struct sail_image *image) {
 
     SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IO(io);
@@ -782,7 +780,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_frame_v4_bmp(void *state, struct sail
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-SAIL_EXPORT sail_status_t sail_codec_write_finish_v4_bmp(void **state, struct sail_io *io) {
+SAIL_EXPORT sail_status_t sail_codec_write_finish_v5_bmp(void **state, struct sail_io *io) {
 
     SAIL_CHECK_STATE_PTR(state);
     SAIL_CHECK_IO(io);

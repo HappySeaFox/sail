@@ -84,12 +84,6 @@ else()
     set(SAIL_VCPKG OFF)
 endif()
 
-if (SAIL_READ_OUTPUT_BPP32_BGRA)
-    set(SAIL_DEFAULT_READ_OUTPUT_PIXEL_FORMAT "BPP32-BGRA")
-else()
-    set(SAIL_DEFAULT_READ_OUTPUT_PIXEL_FORMAT "BPP32-RGBA")
-endif()
-
 set(SAIL_MAGIC_BUFFER_SIZE 16)
 
 # Our bundled libs
@@ -293,7 +287,6 @@ message("* DATADIR:                     ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_
 message("*")
 message("* Enabled codecs:              ${ENABLED_CODECS}")
 message("* Disabled codecs:             ${DISABLED_CODECS}")
-message("* Default read output format:  ${SAIL_DEFAULT_READ_OUTPUT_PIXEL_FORMAT}")
 message("*")
 message("***************************************")
 message("")

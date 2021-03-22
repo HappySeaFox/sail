@@ -14,7 +14,6 @@ add_library(sail-common
                 meta_data_node.c
                 palette.c
                 pixel.c
-                pixel_formats_mapping_node.c
                 read_features.c
                 read_options.c
                 resolution.c
@@ -35,7 +34,6 @@ set(PUBLIC_HEADERS "common.h"
                    "meta_data_node.h"
                    "palette.h"
                    "pixel.h"
-                   "pixel_formats_mapping_node.h"
                    "read_features.h"
                    "read_options.h"
                    "resolution.h"

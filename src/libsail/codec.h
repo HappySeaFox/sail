@@ -37,7 +37,7 @@
 /*
  * Currently supported codec layout version.
  */
-#define SAIL_CODEC_LAYOUT_V4 4
+#define SAIL_CODEC_LAYOUT_V5 5
 
 struct sail_codec_info;
 
@@ -49,30 +49,30 @@ struct sail_image;
 struct sail_io;
 
 /* Codec interface declarations. */
-typedef sail_status_t (*sail_codec_read_init_v4_t)           (struct sail_io *io, const struct sail_read_options *read_options, void **state);
-typedef sail_status_t (*sail_codec_read_seek_next_frame_v4_t)(void *state, struct sail_io *io, struct sail_image **image);
-typedef sail_status_t (*sail_codec_read_seek_next_pass_v4_t) (void *state, struct sail_io *io, struct sail_image *image);
-typedef sail_status_t (*sail_codec_read_frame_v4_t)          (void *state, struct sail_io *io, const struct sail_image *image);
-typedef sail_status_t (*sail_codec_read_finish_v4_t)         (void **state, struct sail_io *io);
+typedef sail_status_t (*sail_codec_read_init_v5_t)           (struct sail_io *io, const struct sail_read_options *read_options, void **state);
+typedef sail_status_t (*sail_codec_read_seek_next_frame_v5_t)(void *state, struct sail_io *io, struct sail_image **image);
+typedef sail_status_t (*sail_codec_read_seek_next_pass_v5_t) (void *state, struct sail_io *io, struct sail_image *image);
+typedef sail_status_t (*sail_codec_read_frame_v5_t)          (void *state, struct sail_io *io, const struct sail_image *image);
+typedef sail_status_t (*sail_codec_read_finish_v5_t)         (void **state, struct sail_io *io);
 
-typedef sail_status_t (*sail_codec_write_init_v4_t)           (struct sail_io *io, const struct sail_write_options *write_options, void **state);
-typedef sail_status_t (*sail_codec_write_seek_next_frame_v4_t)(void *state, struct sail_io *io, const struct sail_image *image);
-typedef sail_status_t (*sail_codec_write_seek_next_pass_v4_t) (void *state, struct sail_io *io, const struct sail_image *image);
-typedef sail_status_t (*sail_codec_write_frame_v4_t)          (void *state, struct sail_io *io, const struct sail_image *image);
-typedef sail_status_t (*sail_codec_write_finish_v4_t)         (void **state, struct sail_io *io);
+typedef sail_status_t (*sail_codec_write_init_v5_t)           (struct sail_io *io, const struct sail_write_options *write_options, void **state);
+typedef sail_status_t (*sail_codec_write_seek_next_frame_v5_t)(void *state, struct sail_io *io, const struct sail_image *image);
+typedef sail_status_t (*sail_codec_write_seek_next_pass_v5_t) (void *state, struct sail_io *io, const struct sail_image *image);
+typedef sail_status_t (*sail_codec_write_frame_v5_t)          (void *state, struct sail_io *io, const struct sail_image *image);
+typedef sail_status_t (*sail_codec_write_finish_v5_t)         (void **state, struct sail_io *io);
 
-struct sail_codec_layout_v4 {
-    sail_codec_read_init_v4_t            read_init;
-    sail_codec_read_seek_next_frame_v4_t read_seek_next_frame;
-    sail_codec_read_seek_next_pass_v4_t  read_seek_next_pass;
-    sail_codec_read_frame_v4_t           read_frame;
-    sail_codec_read_finish_v4_t          read_finish;
+struct sail_codec_layout_v5 {
+    sail_codec_read_init_v5_t            read_init;
+    sail_codec_read_seek_next_frame_v5_t read_seek_next_frame;
+    sail_codec_read_seek_next_pass_v5_t  read_seek_next_pass;
+    sail_codec_read_frame_v5_t           read_frame;
+    sail_codec_read_finish_v5_t          read_finish;
 
-    sail_codec_write_init_v4_t            write_init;
-    sail_codec_write_seek_next_frame_v4_t write_seek_next_frame;
-    sail_codec_write_seek_next_pass_v4_t  write_seek_next_pass;
-    sail_codec_write_frame_v4_t           write_frame;
-    sail_codec_write_finish_v4_t          write_finish;
+    sail_codec_write_init_v5_t            write_init;
+    sail_codec_write_seek_next_frame_v5_t write_seek_next_frame;
+    sail_codec_write_seek_next_pass_v5_t  write_seek_next_pass;
+    sail_codec_write_frame_v5_t           write_frame;
+    sail_codec_write_finish_v5_t          write_finish;
 };
 
 /*
@@ -87,7 +87,7 @@ struct sail_codec {
     void *handle;
 
     /* Codec interface. */
-    struct sail_codec_layout_v4 *v4;
+    struct sail_codec_layout_v5 *v5;
 };
 
 typedef struct sail_codec sail_codec_t;
