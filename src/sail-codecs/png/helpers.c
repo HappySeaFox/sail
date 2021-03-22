@@ -62,8 +62,8 @@ enum SailPixelFormat png_private_png_color_type_to_pixel_format(int color_type, 
 
         case PNG_COLOR_TYPE_GRAY_ALPHA: {
             switch (bit_depth) {
-                case 8:  return SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE_ALPHA;
-                case 16: return SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA;
+                case 8:  return SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA;
+                case 16: return SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA;
             }
             break;
         }
