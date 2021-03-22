@@ -258,22 +258,22 @@ static int inih_handler(void *data, const char *section, const char *name, const
 static sail_status_t check_codec_info(const struct sail_codec_info *codec_info) {
 
     if (codec_info->version == NULL || strlen(codec_info->version) == 0) {
-        SAIL_LOG_ERROR("The currently being parsed codec info has empty version");
+        SAIL_LOG_ERROR("The codec currently being parsed has empty version");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INCOMPLETE_CODEC_INFO);
     }
 
     if (codec_info->name == NULL || strlen(codec_info->name) == 0) {
-        SAIL_LOG_ERROR("The currently being parsed codec info has empty name");
+        SAIL_LOG_ERROR("The codec currently being parsed has empty name");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INCOMPLETE_CODEC_INFO);
     }
 
     if (codec_info->description == NULL || strlen(codec_info->description) == 0) {
-        SAIL_LOG_ERROR("The codec '%s' has empty description", codec_info->name);
+        SAIL_LOG_ERROR("'%s' codec has empty description", codec_info->name);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INCOMPLETE_CODEC_INFO);
     }
 
     if (codec_info->magic_number_node == NULL && codec_info->extension_node == NULL && codec_info->mime_type_node == NULL) {
-        SAIL_LOG_ERROR("The codec '%s' has no identification method (magic number or extension or mime type)", codec_info->name);
+        SAIL_LOG_ERROR("'%s' codec has no identification method (magic number or extension or mime type)", codec_info->name);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INCOMPLETE_CODEC_INFO);
     }
 
@@ -284,19 +284,19 @@ static sail_status_t check_codec_info(const struct sail_codec_info *codec_info) 
             write_features->features & SAIL_CODEC_FEATURE_ANIMATED ||
             write_features->features & SAIL_CODEC_FEATURE_MULTI_FRAME) &&
             (write_features->output_pixel_formats == NULL || write_features->output_pixel_formats_length == 0)) {
-        SAIL_LOG_ERROR("The codec '%s' is able to write images, but output pixel formats are not specified", codec_info->name);
+        SAIL_LOG_ERROR("'%s' codec is able to write images, but output pixel formats are not specified", codec_info->name);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INCOMPLETE_CODEC_INFO);
     }
 
     /* Compressions must exist if we're able to write this image format.*/
-    if (write_features->features != 0 && (write_features->compressions == NULL || write_features->compressions_length < 1)) {
-        SAIL_LOG_ERROR("The codec '%s' specifies an empty compressions list", codec_info->name);
+    if (write_features->features != 0 && (write_features->compressions == NULL || write_features->compressions_length == 0)) {
+        SAIL_LOG_ERROR("'%s' codec specifies an empty compressions list", codec_info->name);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INCOMPLETE_CODEC_INFO);
     }
 
     /* Compression levels and types are mutually exclusive.*/
     if (write_features->compressions_length > 1 && (write_features->compression_level_min != 0 || write_features->compression_level_max != 0)) {
-        SAIL_LOG_ERROR("The codec '%s' specifies more than two compression types and non-zero compression levels which is unsupported", codec_info->name);
+        SAIL_LOG_ERROR("'%s' codec specifies more than two compression types and non-zero compression levels which is unsupported", codec_info->name);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INCOMPLETE_CODEC_INFO);
     }
 
