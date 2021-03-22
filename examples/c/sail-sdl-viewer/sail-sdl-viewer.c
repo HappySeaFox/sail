@@ -59,6 +59,12 @@ int main(int argc, char *argv[]) {
     unsigned bytes_per_line;
     SAIL_TRY(sail_bytes_per_line(image->width, image->pixel_format, &bytes_per_line));
 
+    if (image->pixel_format != SAIL_PIXEL_FORMAT_BPP32_RGBA && image->pixel_format != SAIL_PIXEL_FORMAT_BPP24_RGB) {
+        fprintf(stderr, "Only BPP32-RGBA and BPP24-RGB images are supported by this demo\n");
+        sail_finish();
+        return 1;
+    }
+
     const bool is_rgba = image->pixel_format == SAIL_PIXEL_FORMAT_BPP32_RGBA;
 
     SDL_Surface *surface = SDL_CreateRGBSurfaceFrom(image->pixels,
