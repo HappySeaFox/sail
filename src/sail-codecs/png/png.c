@@ -166,8 +166,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v5_png(struct sail_io *io, const 
     SAIL_CHECK_IO(io);
     SAIL_CHECK_READ_OPTIONS_PTR(read_options);
 
-    SAIL_TRY(png_private_supported_read_output_pixel_format(read_options->output_pixel_format));
-
     /* Allocate a new state. */
     struct png_state *png_state;
     SAIL_TRY(alloc_png_state(&png_state));
@@ -210,76 +208,19 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v5_png(struct sail_io *io, const 
                     /* compression type */ NULL,
                     /* filter method */ NULL);
 
+    if (png_get_valid(png_state->png_ptr, png_state->info_ptr, PNG_INFO_tRNS) != 0) {
+        png_set_tRNS_to_alpha(png_state->png_ptr);
+    }
+
     /* Fetch resolution. */
     SAIL_TRY(png_private_fetch_resolution(png_state->png_ptr, png_state->info_ptr, &png_state->first_image->resolution));
 
     /* Transform the PNG stream. */
-    if (png_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_SOURCE) {
-        /* Expand 1, 2, and 4 bpp images to 8 bpp. */
-        if (png_state->color_type == PNG_COLOR_TYPE_GRAY && png_state->bit_depth < 8) {
-            png_set_expand_gray_1_2_4_to_8(png_state->png_ptr);
-            png_state->first_image->pixel_format = SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE;
-        } else {
-            png_state->first_image->pixel_format = png_private_png_color_type_to_pixel_format(png_state->color_type, png_state->bit_depth);
-        }
+    png_state->first_image->pixel_format = png_private_png_color_type_to_pixel_format(png_state->color_type, png_state->bit_depth);
 
-        /* Fetch palette. */
-        if (png_state->color_type == PNG_COLOR_TYPE_PALETTE) {
-            SAIL_TRY(png_private_fetch_palette(png_state->png_ptr, png_state->info_ptr, &png_state->first_image->palette));
-        }
-    } else {
-        if (png_state->bit_depth == 16) {
-            png_set_strip_16(png_state->png_ptr);
-        }
-
-        /* Unpack packed pixels. */
-        if (png_state->bit_depth < 8) {
-            png_set_packing(png_state->png_ptr);
-        }
-
-        if (png_state->color_type == PNG_COLOR_TYPE_GRAY && png_state->bit_depth < 8) {
-            png_set_expand_gray_1_2_4_to_8(png_state->png_ptr);
-        }
-
-        if (png_state->color_type == PNG_COLOR_TYPE_PALETTE) {
-            png_set_palette_to_rgb(png_state->png_ptr);
-        }
-
-        if (png_state->color_type == PNG_COLOR_TYPE_GRAY || png_state->color_type == PNG_COLOR_TYPE_GRAY_ALPHA) {
-            png_set_gray_to_rgb(png_state->png_ptr);
-        }
-
-        if (png_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_ARGB ||
-                 png_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_ABGR) {
-            png_set_swap_alpha(png_state->png_ptr);
-        }
-
-        if (png_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP24_BGR ||
-                png_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_ABGR ||
-                png_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_BGRA) {
-            png_set_bgr(png_state->png_ptr);
-        }
-
-        if (png_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_RGBA ||
-                png_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_BGRA) {
-            png_set_filler(png_state->png_ptr, 0xff, PNG_FILLER_AFTER);
-        }
-
-        if (png_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_ARGB ||
-                png_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_ABGR) {
-            png_set_filler(png_state->png_ptr, 0xff, PNG_FILLER_BEFORE);
-        }
-
-        if (png_get_valid(png_state->png_ptr, png_state->info_ptr, PNG_INFO_tRNS) != 0) {
-            png_set_tRNS_to_alpha(png_state->png_ptr);
-        }
-
-        if (png_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP24_RGB ||
-                png_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP24_BGR) {
-            png_set_strip_alpha(png_state->png_ptr);
-        }
-
-        png_state->first_image->pixel_format = png_state->read_options->output_pixel_format;
+    /* Fetch palette. */
+    if (png_state->color_type == PNG_COLOR_TYPE_PALETTE) {
+        SAIL_TRY(png_private_fetch_palette(png_state->png_ptr, png_state->info_ptr, &png_state->first_image->palette));
     }
 
     png_state->first_image->interlaced_passes = png_set_interlace_handling(png_state->png_ptr);
@@ -287,6 +228,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v5_png(struct sail_io *io, const 
     SAIL_TRY(sail_bytes_per_line(png_state->first_image->width,
                                  png_state->first_image->pixel_format,
                                  &png_state->first_image->bytes_per_line));
+
     /* Apply requested transformations. */
     png_read_update_info(png_state->png_ptr, png_state->info_ptr);
 
@@ -330,12 +272,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v5_png(struct sail_io *io, const 
         SAIL_TRY(sail_malloc(png_state->first_image->width * png_state->bytes_per_pixel, &png_state->temp_scanline));
     }
 #endif
-
-    const char *pixel_format_str = NULL;
-    SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(png_state->first_image->source_image->pixel_format, &pixel_format_str));
-    SAIL_LOG_DEBUG("PNG: Input pixel format is %s", pixel_format_str);
-    SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(png_state->read_options->output_pixel_format, &pixel_format_str));
-    SAIL_LOG_DEBUG("PNG: Output pixel format is %s", pixel_format_str);
 
     return SAIL_OK;
 }
@@ -434,9 +370,9 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_png(void *state, st
     }
 #endif
 
-    *image = image_local;
-
     png_state->current_frame++;
+
+    *image = image_local;
 
     return SAIL_OK;
 }
@@ -570,9 +506,6 @@ SAIL_EXPORT sail_status_t sail_codec_write_init_v5_png(struct sail_io *io, const
     /* Deep copy write options. */
     SAIL_TRY(sail_copy_write_options(write_options, &png_state->write_options));
 
-    /* Sanity check. */
-    SAIL_TRY(png_private_supported_write_output_pixel_format(png_state->write_options->output_pixel_format));
-
     if (png_state->write_options->compression != SAIL_COMPRESSION_DEFLATE) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_COMPRESSION);
     }
@@ -701,12 +634,6 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v5_png(void *state, s
     if (png_state->write_options->io_options & SAIL_IO_OPTION_INTERLACED) {
         png_set_interlace_handling(png_state->png_ptr);
     }
-
-    const char *pixel_format_str;
-    SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(image->pixel_format, &pixel_format_str));
-    SAIL_LOG_DEBUG("PNG: Input pixel format is %s", pixel_format_str);
-    SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(png_state->write_options->output_pixel_format, &pixel_format_str));
-    SAIL_LOG_DEBUG("PNG: Output pixel format is %s", pixel_format_str);
 
     return SAIL_OK;
 }

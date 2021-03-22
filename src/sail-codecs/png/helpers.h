@@ -48,10 +48,6 @@ SAIL_HIDDEN enum SailPixelFormat png_private_png_color_type_to_pixel_format(int 
 
 SAIL_HIDDEN sail_status_t png_private_pixel_format_to_png_color_type(enum SailPixelFormat pixel_format, int *color_type, int *bit_depth);
 
-SAIL_HIDDEN sail_status_t png_private_supported_read_output_pixel_format(enum SailPixelFormat pixel_format);
-
-SAIL_HIDDEN sail_status_t png_private_supported_write_output_pixel_format(enum SailPixelFormat pixel_format);
-
 SAIL_HIDDEN sail_status_t png_private_fetch_meta_data(png_structp png_ptr, png_infop info_ptr, struct sail_meta_data_node **target_meta_data_node);
 
 SAIL_HIDDEN sail_status_t png_private_write_meta_data(png_structp png_ptr, png_infop info_ptr, const struct sail_meta_data_node *meta_data_node);
