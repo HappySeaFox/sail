@@ -46,8 +46,7 @@ animated, multi-paged images along with their meta data and ICC profiles. :sailb
 - [x] Versatile APIs: `junior`, `advanced`, `deep diver`, and `technical diver`
 - [x] Input/output: files, memory, custom I/O streams
 - [x] Load by file suffixes, paths, and [magic numbers](https://en.wikipedia.org/wiki/File_format#Magic_number)
-- [x] Output `RGBA` pixels and more
-- [x] Output source pixels
+- [x] Output pixels close to source as much as possible
 - [x] Meta data support: text comments, EXIF, ICC profiles
 - [x] Access to the image properties w/o decoding pixels (probing)
 - [x] Access to the source image properties
@@ -119,11 +118,10 @@ See [BUILDING](BUILDING.md).
 
 ## Differences from other image decoding libraries
 
-- Easily extensible with new image format plugins
 - Easy-to-use API providing expected business entities - images, palettes, pixels etc.
-- Access to source pixel data (supported by the most codecs)
-- Output in multiple pixel formats, not only RGB
 - Access to the image properties w/o decoding pixel data (probing)
+- Access to the source image properties
+- Easily extensible with new image format plugins
 
 ## Development status
 
@@ -147,12 +145,6 @@ SAIL provides four levels of APIs, depending on your needs. Let's have a quick l
 #### C:
 ```C
 struct sail_image *image;
-
-/*
- * sail_read_file() reads the image and outputs pixels in the BPP32-RGBA pixel format by default.
- * If SAIL is compiled with SAIL_READ_OUTPUT_BPP32_BGRA=ON, it outputs BPP32-BGRA pixels.
- * If you need to control output pixel formats, consider switching to the deep diver API.
- */
 SAIL_TRY(sail_read_file(path, &image));
 
 /*
@@ -169,10 +161,6 @@ sail_destroy_image(image);
 sail::image_reader reader;
 sail::image image;
 
-// read() reads the image and outputs pixels in the BPP32-RGBA pixel format by default.
-// If SAIL is compiled with SAIL_READ_OUTPUT_BPP32_BGRA=ON, it outputs BPP32-BGRA pixels.
-// If you need to control output pixel formats, consider switching to the deep diver API.
-//
 SAIL_TRY(reader.read(path, &image));
 
 // Handle the image and its pixels here.
@@ -186,7 +174,7 @@ It's pretty easy, isn't it? :smile: See [EXAMPLES](EXAMPLES.md) and [FAQ](FAQ.md
 
 See [EXAMPLES](EXAMPLES.md) for more.
 
-### 3. `Deep diver`: I want to load this animated GIF from a file or memory and have control over selected codecs and output pixel formats
+### 3. `Deep diver`: I want to load this animated GIF from a file or memory and have control over selected codecs and meta data
 
 See [EXAMPLES](EXAMPLES.md) for more.
 
@@ -203,18 +191,18 @@ bindings to C++.
 
 SAIL codecs is the deepest level. This is a set of standalone, dynamically loaded codecs (SO on Linux
 and DLL on Windows). They implement actual decoding and encoding capabilities. End-users never work with
-codecs directly. They always use abstract, high-level APIs for that.
+codecs directly. They always use abstract, high-level APIs in `libsail` for that.
 
 Every codec is accompanied with a so called codec info (description) file which is just a plain text file.
 It describes what the codec can actually do: what pixel formats it can read and output, what compression types
-does it support, specifies a preferred output pixel format, and more.
+it supports, and more.
 
 By default, SAIL loads codecs on demand. To preload them, use `sail_init_with_flags(SAIL_FLAG_PRELOAD_CODECS)`.
 
 ### libsail-common
 
 libsail-common holds common data types (images, pixel formats, I/O abstractions etc.) and a small set
-of functions shared between SAIL codecs and the high-level APIs.
+of functions shared between SAIL codecs and the high-level APIs in `libsail`.
 
 ### libsail
 

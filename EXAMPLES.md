@@ -109,7 +109,7 @@ SAIL_TRY_OR_CLEANUP(sail_start_reading_file(path, NULL, &state),
 
 /*
  * Read just a single frame. It's possible to read more frames if any. Just continue
- * reading frames till sail_read_next_frame() returns 0. If no more frames are available,
+ * reading frames till sail_read_next_frame() returns SAIL_OK. If no more frames are available,
  * it returns SAIL_ERROR_NO_MORE_FRAMES.
  */
 SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, &image),
@@ -157,7 +157,7 @@ SAIL_AT_SCOPE_EXIT (
 SAIL_TRY(reader.start_reading(path));
 
 // Read just a single frame. It's possible to read more frames if any. Just continue
-// reading frames till read_next_frame() returns 0. If no more frames are available,
+// reading frames till read_next_frame() returns SAIL_OK. If no more frames are available,
 // it returns SAIL_ERROR_NO_MORE_FRAMES.
 //
 // read_next_frame() outputs pixels in the BPP32-RGBA pixel format by default.
@@ -180,7 +180,7 @@ sail::context::finish();
 ### 3. `deep diver`
 
 **Purpose:** read a single-paged or multi-paged image from a file or memory. Specify a concrete codec to use.
-             Possibly specify a desired pixel format to output.
+             Possibly specify I/O controlling options.
 
 #### C:
 ```C
@@ -233,7 +233,7 @@ sail_destroy_read_options(read_options);
 
 /*
  * Read just a single frame. It's possible to read more frames if any. Just continue
- * reading frames till sail_read_next_frame() returns 0. If no more frames are available,
+ * reading frames till sail_read_next_frame() returns SAIL_OK. If no more frames are available,
  * it returns SAIL_ERROR_NO_MORE_FRAMES.
  *
  * sail_read_next_frame() outputs pixels in the requested pixel format (BPP32-RGBA by default).
@@ -305,7 +305,7 @@ size_t buffer_length = ...
 SAIL_TRY(reader.start_reading(buffer, buffer_length, codec_info, read_options));
 
 // Read just a single frame. It's possible to read more frames if any. Just continue
-// reading frames till read_next_frame() returns 0. If no more frames are available,
+// reading frames till read_next_frame() returns SAIL_OK. If no more frames are available,
 // it returns SAIL_ERROR_NO_MORE_FRAMES.
 //
 // read_next_frame() outputs pixels in the requested pixel format (BPP32-RGBA by default).
@@ -342,7 +342,7 @@ sail::context::finish();
 
 #### C:
 
-Instead of using `sail_start_reading_file_with_options()` in the `deep diver` example create your own I/O stream
+Instead of using `sail_start_reading_file_with_options()` in the `deep diver` example, create your own I/O stream
 and call `sail_start_reading_io_with_options()`.
 
 ```C
@@ -418,7 +418,7 @@ sail_destroy_read_options(read_options);
 
 /*
  * Read just a single frame. It's possible to read more frames if any. Just continue
- * reading frames till sail_read_next_frame() returns 0. If no more frames are available,
+ * reading frames till sail_read_next_frame() returns SAIL_OK. If no more frames are available,
  * it returns SAIL_ERROR_NO_MORE_FRAMES.
  *
  * sail_read_next_frame() outputs pixels in the requested pixel format (BPP32-RGBA by default).
@@ -515,7 +515,7 @@ SAIL_TRY(codec_info.read_features().to_read_options(&read_options));
 SAIL_TRY(reader.start_reading(io, codec_info, read_options));
 
 // Read just a single frame. It's possible to read more frames if any. Just continue
-// reading frames till read_next_frame() returns 0. If no more frames are available,
+// reading frames till read_next_frame() returns SAIL_OK. If no more frames are available,
 // it returns SAIL_ERROR_NO_MORE_FRAMES.
 //
 // read_next_frame() outputs pixels in the requested pixel format (BPP32-RGBA by default).
