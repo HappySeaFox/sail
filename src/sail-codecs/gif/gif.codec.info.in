@@ -1,7 +1,7 @@
 # GIF codec information
 #
 [codec]
-layout=4
+layout=5
 version=1.3.1
 name=GIF
 description=Graphics Interchange Format
@@ -11,11 +11,10 @@ mime-types=image/gif
 
 [read-features]
 features=STATIC;ANIMATED;META-DATA
-output-pixel-formats=BPP32-RGBA;BPP32-BGRA
-default-output-pixel-format=@SAIL_DEFAULT_READ_OUTPUT_PIXEL_FORMAT@
 
 [write-features]
 features=
+output-pixel-formats=
 properties=
 interlaced-passes=0
 compression-types=
@@ -24,5 +23,3 @@ compression-level-min=0
 compression-level-max=0
 compression-level-default=0
 compression-level-step=0
-
-[write-pixel-formats-mapping]
