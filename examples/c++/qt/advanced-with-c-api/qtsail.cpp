@@ -61,11 +61,6 @@ sail_status_t QtSail::init()
                                                           "<ul>"
                                                           "<li>Linking against SAIL pkg-config packages</li>"
                                                           "<li>Playing animations</li>"
-                                                          "</ul>"
-                                                          "This demo doesn't include:"
-                                                          "<ul>"
-                                                          "<li>Displaying indexed images</li>"
-                                                          "<li>Printing all meta data entries into stderr</li>"
                                                           "</ul>"));
     });
 
@@ -125,6 +120,35 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
                                image->height,
                                image->bytes_per_line,
                                qimageFormat).copy();
+
+        /*
+         * Apply palette.
+         */
+        if (qimageFormat == QImage::Format_Indexed8) {
+            /*
+             * Assume palette is BPP24-RGB or BPP32-RGBA.
+             */
+            unsigned palette_shift;
+            if (image->palette->pixel_format == SAIL_PIXEL_FORMAT_BPP24_RGB) {
+                palette_shift = 3;
+            } else if (image->palette->pixel_format == SAIL_PIXEL_FORMAT_BPP32_RGBA) {
+                palette_shift = 4;
+            } else {
+                sail_stop_reading(state);
+                sail_destroy_image(image);
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+            }
+
+            QVector<QRgb> colorTable;
+            const unsigned char *palette = reinterpret_cast<const unsigned char *>(image->palette->data);
+
+            for (unsigned i = 0; i < image->palette->color_count; i++) {
+                colorTable.append(qRgb(*palette, *(palette+1), *(palette+2)));
+                palette += palette_shift;
+            }
+
+            qimage.setColorTable(colorTable);
+        }
 
         qimages->append(qimage);
         delays->append(image->delay);
