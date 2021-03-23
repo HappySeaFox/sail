@@ -29,9 +29,13 @@
 #ifdef SAIL_BUILD
     #include "error.h"
     #include "export.h"
+
+    #include "arbitrary_data-c++.h"
 #else
     #include <sail-common/error.h>
     #include <sail-common/export.h>
+
+    #include <sail-c++/arbitrary_data-c++.h>
 #endif
 
 struct sail_palette;
@@ -67,7 +71,7 @@ public:
     /*
      * Returns the palette binary data.
      */
-    const void* data() const;
+    const arbitrary_data& data() const;
 
     /*
      * Returns the number of colors in the palette.
@@ -78,6 +82,8 @@ public:
      * Sets a new palette data, pixel format, and colors count.
      */
     palette& with_data(SailPixelFormat pixel_format, const void *data, unsigned color_count);
+
+    palette& with_data(SailPixelFormat pixel_format, const arbitrary_data &data);
 
 private:
     /*
