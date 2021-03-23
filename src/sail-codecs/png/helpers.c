@@ -353,12 +353,14 @@ sail_status_t png_private_fetch_palette(png_structp png_ptr, png_infop info_ptr,
     png_bytep transparency = NULL;
     int transparency_length = 0;
 
+#ifdef PNG_tRNS_SUPPORTED
     if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS) != 0) {
         if (png_get_tRNS(png_ptr, info_ptr, &transparency, &transparency_length, NULL) == 0) {
             SAIL_LOG_ERROR("PNG: The image has invalid transparency block");
             SAIL_LOG_AND_RETURN(SAIL_ERROR_MISSING_PALETTE);
         }
     }
+#endif
 
     if (transparency == NULL) {
         SAIL_TRY(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP24_RGB, png_palette_color_count, palette));
