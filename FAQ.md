@@ -96,7 +96,7 @@ Yes. SAIL provides four levels of APIs, depending on your needs: `junior`, `adva
 
 ## What pixel formats SAIL is able to read?
 
-SAIL codecs always try to support as much input pixel formats as possible. The list of
+SAIL codecs always try to support as many input pixel formats as possible. The list of
 pixel formats that can be read by SAIL is codec-specific and is not publicly available.
 
 For example, some codecs may be able to read just 3 input pixel formats. Other may be able to read 10.
@@ -106,7 +106,7 @@ For example, some codecs may be able to read just 3 input pixel formats. Other m
 SAIL always tries to output pixel format close to the source pixel format as much as possible.
 Ideally (but not always), it outputs the same pixel format as stored in the image.
 
-For example, SAIL outputs indexed RGB images from indexed BMP files.
+For example, SAIL outputs BPP24-BGR images from full-color BMP files without transparency.
 
 ## What pixel formats SAIL is able to write?
 
@@ -117,7 +117,7 @@ output_pixel_formats`.
 
 ## Does SAIL support animated and multi-paged images?
 
-Yes. Just continue reading the image file until the reading functions return `0`.
+Yes. Just continue reading the image file until the reading functions return `SAIL_OK`.
 If no more frames are available, the reading functions return `SAIL_ERROR_NO_MORE_FRAMES`.
 
 ## Does SAIL support reading from memory?
@@ -202,7 +202,7 @@ situation in `~image_reader()` or `~image_writer()`.
 
 ### Convention to call SAIL functions
 
-It's always recommended to use the `SAIL_TRY()` macro to call SAIL functions. It's also always recommended
+It's always recommended (but not required) to use the `SAIL_TRY()` macro to call SAIL functions. It's also always recommended
 to clean up in your code with the `SAIL_TRY_OR_CLEANUP()` macro if you need to.
 
 ### External pointers stay untouched on error

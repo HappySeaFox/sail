@@ -62,7 +62,6 @@ set(SAIL_EXCEPT_CODECS "" CACHE STRING "Enable all codecs except the codecs spec
 Codecs with missing dependencies will be disabled regardless this setting.")
 set(SAIL_ONLY_CODECS "" CACHE STRING "Enable only the codecs specified in this ';'-separated list. \
 Codecs with missing dependencies will be disabled regardless this setting.")
-option(SAIL_READ_OUTPUT_BPP32_BGRA "Make the read operations output BPP32-BGRA pixels instead of BPP32-RGBA." OFF)
 option(SAIL_STATIC "Build static libs. When enabled, sets SAIL_COMBINE_CODECS to ON." OFF)
 cmake_dependent_option(SAIL_COMBINE_CODECS "Combine all codecs into a single library." OFF "NOT SAIL_STATIC" ON)
 

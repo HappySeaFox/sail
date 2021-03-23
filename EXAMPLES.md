@@ -48,13 +48,7 @@ SAIL provides 4 levels of APIs depending on your needs. Let's have a look at the
 ```C
 struct sail_image *image;
 
-/*
- * sail_read_file() reads the image and outputs pixels in the BPP32-RGBA pixel format by default.
- * If SAIL is compiled with SAIL_READ_OUTPUT_BPP32_BGRA=ON, it outputs BPP32-BGRA pixels.
- */
-SAIL_TRY(sail_read_file(path,
-                        NULL,
-                        &image));
+SAIL_TRY(sail_read_file(path, &image));
 
 /*
  * Handle the image pixels here.
@@ -62,6 +56,9 @@ SAIL_TRY(sail_read_file(path,
  * image->pixel_format, and image->pixels for that.
  */
 
+/*
+ * Destroy the image when it's not needed anymore.
+ */
 sail_destroy_image(image);
 
 /*
@@ -76,9 +73,6 @@ sail_finish();
 sail::image_reader reader;
 sail::image image;
 
-// read() reads the image and outputs pixels in the BPP32-RGBA pixel format by default.
-// If SAIL is compiled with SAIL_READ_OUTPUT_BPP32_BGRA=ON, it outputs BPP32-BGRA pixels.
-//
 SAIL_TRY(reader.read(path, &image));
 
 // Handle the image and its pixels here.
@@ -101,8 +95,6 @@ struct sail_image *image;
 
 /*
  * Starts reading the specified file.
- * The subsequent calls to sail_read_next_frame() output pixels in the BPP32-RGBA pixel format by default.
- * If SAIL is compiled with SAIL_READ_OUTPUT_BPP32_BGRA=ON, they output BPP32-BGRA pixels.
  */
 SAIL_TRY_OR_CLEANUP(sail_start_reading_file(path, NULL, &state),
                     /* cleanup */ sail_stop_reading(state));
@@ -128,6 +120,9 @@ SAIL_TRY_OR_CLEANUP(sail_stop_reading(state),
  * image->pixel_format, and image->pixels for that.
  */
 
+/*
+ * Destroy the image when it's not needed anymore.
+ */
 sail_destroy_image(image);
 
 /*
@@ -151,17 +146,12 @@ SAIL_AT_SCOPE_EXIT (
 );
 
 // Starts reading the specified file.
-// The subsequent calls to read_next_frame() outputs pixels in the BPP32-RGBA pixel format by default.
-// If SAIL is compiled with SAIL_READ_OUTPUT_BPP32_BGRA=ON, they output BPP32-BGRA pixels.
 //
 SAIL_TRY(reader.start_reading(path));
 
 // Read just a single frame. It's possible to read more frames if any. Just continue
 // reading frames till read_next_frame() returns SAIL_OK. If no more frames are available,
 // it returns SAIL_ERROR_NO_MORE_FRAMES.
-//
-// read_next_frame() outputs pixels in the BPP32-RGBA pixel format by default.
-// If SAIL is compiled with SAIL_READ_OUTPUT_BPP32_BGRA=ON, it outputs BPP32-BGRA pixels.
 //
 SAIL_TRY(reader.read_next_frame(&image));
 
@@ -262,6 +252,9 @@ if (node != NULL) {
  * image->pixel_format, and image->pixels for that.
  */
 
+/*
+ * Destroy the image when it's not needed anymore.
+ */
 sail_destroy_image(image);
 
 /*
@@ -451,6 +444,9 @@ if (node != NULL) {
  * image->pixel_format, and image->pixels for that.
  */
 
+/*
+ * Destroy the image when it's not needed anymore.
+ */
 sail_destroy_image(image);
 
 /*
