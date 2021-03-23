@@ -29,9 +29,13 @@
 #ifdef SAIL_BUILD
     #include "error.h"
     #include "export.h"
+
+    #include "arbitrary_data-c++.h"
 #else
     #include <sail-common/error.h>
     #include <sail-common/export.h>
+
+    #include <sail-c++/arbitrary_data-c++.h>
 #endif
 
 struct sail_iccp;
@@ -62,17 +66,14 @@ public:
     /*
      * Returns the ICC profile binary data.
      */
-    const void* data() const;
-
-    /*
-     * Returns the length of the ICC binary data.
-     */
-    unsigned data_length() const;
+    const arbitrary_data& data() const;
 
     /*
      * Sets new ICC profile binary data.
      */
     iccp& with_data(const void *data, unsigned data_length);
+
+    iccp& with_data(const arbitrary_data &data);
 
 private:
     /*
