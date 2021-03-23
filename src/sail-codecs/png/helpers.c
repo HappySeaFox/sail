@@ -350,8 +350,21 @@ sail_status_t png_private_fetch_palette(png_structp png_ptr, png_infop info_ptr,
         SAIL_LOG_AND_RETURN(SAIL_ERROR_MISSING_PALETTE);
     }
 
-    /* Always use RGB palette. */
-    SAIL_TRY(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP24_RGB, png_palette_color_count, palette));
+    png_bytep transparency = NULL;
+    int transparency_length = 0;
+
+    if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS) != 0) {
+        if (png_get_tRNS(png_ptr, info_ptr, &transparency, &transparency_length, NULL) == 0) {
+            SAIL_LOG_ERROR("PNG: The image has invalid transparency block");
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_MISSING_PALETTE);
+        }
+    }
+
+    if (transparency == NULL) {
+        SAIL_TRY(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP24_RGB, png_palette_color_count, palette));
+    } else {
+        SAIL_TRY(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP32_RGBA, png_palette_color_count, palette));
+    }
 
     unsigned char *palette_ptr = (*palette)->data;
 
@@ -359,6 +372,10 @@ sail_status_t png_private_fetch_palette(png_structp png_ptr, png_infop info_ptr,
         *palette_ptr++ = png_palette[i].red;
         *palette_ptr++ = png_palette[i].green;
         *palette_ptr++ = png_palette[i].blue;
+
+        if (transparency != NULL) {
+            *palette_ptr++ = (i < transparency_length) ? transparency[i] : 255;
+        }
     }
 
     return SAIL_OK;

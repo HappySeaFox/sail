@@ -103,21 +103,23 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
             // Assume palette is BPP24-RGB or BPP32-RGBA.
             //
             const sail::palette &palette = image.palette();
-            unsigned palette_shift;
-            if (palette.pixel_format() == SAIL_PIXEL_FORMAT_BPP24_RGB) {
-                palette_shift = 3;
-            } else if (palette.pixel_format() == SAIL_PIXEL_FORMAT_BPP32_RGBA) {
-                palette_shift = 4;
-            } else {
+
+            if (palette.pixel_format() != SAIL_PIXEL_FORMAT_BPP24_RGB
+                    && palette.pixel_format() != SAIL_PIXEL_FORMAT_BPP32_RGBA) {
                 SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
             }
 
             QVector<QRgb> colorTable;
-            const unsigned char *palette_data = reinterpret_cast<const unsigned char *>(palette.data());
+            const unsigned char *palette_data = reinterpret_cast<const unsigned char *>(palette.data().data());
 
             for (unsigned i = 0; i < palette.color_count(); i++) {
-                colorTable.append(qRgb(*palette_data, *(palette_data+1), *(palette_data+2)));
-                palette_data += palette_shift;
+                if (palette.pixel_format() == SAIL_PIXEL_FORMAT_BPP24_RGB) {
+                    colorTable.append(qRgb(*palette_data, *(palette_data+1), *(palette_data+2)));
+                    palette_data += 3;
+                } else {
+                    colorTable.append(qRgba(*palette_data, *(palette_data+1), *(palette_data+2), *(palette_data+3)));
+                    palette_data += 4;
+                }
             }
 
             qimage.setColorTable(colorTable);

@@ -208,29 +208,22 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v5_png(struct sail_io *io, const 
                     /* compression type */ NULL,
                     /* filter method */ NULL);
 
-    if (png_get_valid(png_state->png_ptr, png_state->info_ptr, PNG_INFO_tRNS) != 0) {
-        png_set_tRNS_to_alpha(png_state->png_ptr);
-    }
-
-    /* Fetch resolution. */
-    SAIL_TRY(png_private_fetch_resolution(png_state->png_ptr, png_state->info_ptr, &png_state->first_image->resolution));
-
-    /* Transform the PNG stream. */
+    /* Pixel format. */
     png_state->first_image->pixel_format = png_private_png_color_type_to_pixel_format(png_state->color_type, png_state->bit_depth);
+
+    SAIL_TRY(sail_bytes_per_line(png_state->first_image->width,
+                                 png_state->first_image->pixel_format,
+                                 &png_state->first_image->bytes_per_line));
 
     /* Fetch palette. */
     if (png_state->color_type == PNG_COLOR_TYPE_PALETTE) {
         SAIL_TRY(png_private_fetch_palette(png_state->png_ptr, png_state->info_ptr, &png_state->first_image->palette));
     }
 
+    /* Fetch resolution. */
+    SAIL_TRY(png_private_fetch_resolution(png_state->png_ptr, png_state->info_ptr, &png_state->first_image->resolution));
+
     png_state->first_image->interlaced_passes = png_set_interlace_handling(png_state->png_ptr);
-
-    SAIL_TRY(sail_bytes_per_line(png_state->first_image->width,
-                                 png_state->first_image->pixel_format,
-                                 &png_state->first_image->bytes_per_line));
-
-    /* Apply requested transformations. */
-    png_read_update_info(png_state->png_ptr, png_state->info_ptr);
 
 #ifdef PNG_APNG_SUPPORTED
     unsigned bits_per_pixel;
@@ -316,7 +309,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_png(void *state, st
         if (!png_state->skipped_hidden && png_get_first_frame_is_hidden(png_state->png_ptr, png_state->info_ptr)) {
             SAIL_LOG_DEBUG("PNG: Skipping hidden frame");
             SAIL_TRY_OR_CLEANUP(png_private_skip_hidden_frame(png_state->first_image->bytes_per_line,
-                                                                png_state->first_image->height,
+                                                               png_state->first_image->height,
                                                                png_state->png_ptr,
                                                                png_state->info_ptr,
                                                                &png_state->scanline_for_skipping),
@@ -593,12 +586,12 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v5_png(void *state, s
             image->pixel_format == SAIL_PIXEL_FORMAT_BPP4_INDEXED ||
             image->pixel_format == SAIL_PIXEL_FORMAT_BPP8_INDEXED) {
         if (image->palette == NULL) {
-            SAIL_LOG_ERROR("The indexed image has no palette");
+            SAIL_LOG_ERROR("PNG: The indexed image has no palette");
             SAIL_LOG_AND_RETURN(SAIL_ERROR_MISSING_PALETTE);
         }
 
         if (image->palette->pixel_format != SAIL_PIXEL_FORMAT_BPP24_RGB) {
-            SAIL_LOG_ERROR("Palettes not in BPP24-RGB format are not supported");
+            SAIL_LOG_ERROR("PNG: Palette not in BPP24-RGB format is not supported");
             SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
         }
 
