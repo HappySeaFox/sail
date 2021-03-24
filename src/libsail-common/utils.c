@@ -712,6 +712,61 @@ sail_status_t sail_bits_per_pixel(enum SailPixelFormat pixel_format, unsigned *r
     SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
 }
 
+enum SailPixelFormatComparisonPrivate {
+    SAIL_PIXEL_FORMAT_COMPARISON_PRIVATE_LESS,
+    SAIL_PIXEL_FORMAT_COMPARISON_PRIVATE_EQUAL,
+    SAIL_PIXEL_FORMAT_COMPARISON_PRIVATE_GREATER,
+};
+
+static sail_status_t sail_compare_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPixelFormat pixel_format2,
+                                                    enum SailPixelFormatComparisonPrivate op, bool *result) {
+
+    SAIL_CHECK_PTR(result);
+
+    unsigned pixel_format_bits1;
+    SAIL_TRY(sail_bits_per_pixel(pixel_format1, &pixel_format_bits1));
+
+    unsigned pixel_format_bits2;
+    SAIL_TRY(sail_bits_per_pixel(pixel_format2, &pixel_format_bits2));
+
+    switch(op) {
+        case SAIL_PIXEL_FORMAT_COMPARISON_PRIVATE_LESS:
+            *result = pixel_format_bits1 < pixel_format_bits2;
+        break;
+
+        case SAIL_PIXEL_FORMAT_COMPARISON_PRIVATE_EQUAL:
+            *result = pixel_format_bits1 == pixel_format_bits2;
+        break;
+
+        case SAIL_PIXEL_FORMAT_COMPARISON_PRIVATE_GREATER:
+            *result = pixel_format_bits1 > pixel_format_bits2;
+        break;
+    }
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_equal_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPixelFormat pixel_format2, bool *result) {
+
+    SAIL_TRY(sail_compare_bits_per_pixel(pixel_format1, pixel_format2, SAIL_PIXEL_FORMAT_COMPARISON_PRIVATE_EQUAL, result));
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_greater_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPixelFormat pixel_format2, bool *result) {
+
+    SAIL_TRY(sail_compare_bits_per_pixel(pixel_format1, pixel_format2, SAIL_PIXEL_FORMAT_COMPARISON_PRIVATE_GREATER, result));
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_less_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPixelFormat pixel_format2, bool *result) {
+
+    SAIL_TRY(sail_compare_bits_per_pixel(pixel_format1, pixel_format2, SAIL_PIXEL_FORMAT_COMPARISON_PRIVATE_LESS, result));
+
+    return SAIL_OK;
+}
+
 sail_status_t sail_bytes_per_line(unsigned width, enum SailPixelFormat pixel_format, unsigned *result) {
 
     if (width == 0) {
