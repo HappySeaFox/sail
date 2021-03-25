@@ -23,8 +23,6 @@
     SOFTWARE.
 */
 
-#include <string.h>
-
 #include "sail-common.h"
 
 #include "munit.h"

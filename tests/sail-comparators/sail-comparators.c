@@ -57,7 +57,7 @@ sail_status_t sail_compare_palettes(const struct sail_palette *palette1, const s
     munit_assert_not_null(palette2->data);
     unsigned palette_size;
     munit_assert(sail_bytes_per_line(palette1->color_count, palette1->pixel_format, &palette_size) == SAIL_OK);
-    munit_assert(memcmp(palette1->data, palette2->data, palette_size) == 0);
+    munit_assert_memory_equal(palette_size, palette1->data, palette2->data);
 
     return SAIL_OK;
 }
@@ -86,7 +86,7 @@ sail_status_t sail_compare_meta_data_nodes(const struct sail_meta_data_node *met
     } else if (meta_data_node1->value_type == SAIL_META_DATA_TYPE_DATA) {
         munit_assert(meta_data_node1->value_length > 0);
         munit_assert(meta_data_node1->value_length == meta_data_node2->value_length);
-        munit_assert(memcmp(meta_data_node1->value, meta_data_node2->value, meta_data_node1->value_length) == 0);
+        munit_assert_memory_equal(meta_data_node1->value_length, meta_data_node1->value, meta_data_node2->value);
     } else {
         munit_assert(false);
     }
@@ -124,7 +124,7 @@ sail_status_t sail_compare_iccps(const struct sail_iccp *iccp1, const struct sai
 
     munit_assert(iccp1->data_length > 0);
     munit_assert(iccp1->data_length == iccp2->data_length);
-    munit_assert(memcmp(iccp1->data, iccp2->data, iccp1->data_length) == 0);
+    munit_assert_memory_equal(iccp1->data_length, iccp1->data, iccp2->data);
 
     return SAIL_OK;
 }
@@ -160,7 +160,7 @@ sail_status_t sail_compare_images(const struct sail_image *image1, const struct 
     munit_assert_not_null(image1->pixels);
     munit_assert_not_null(image2->pixels);
     const unsigned pixels_size = image1->height * image1->bytes_per_line;
-    munit_assert(memcmp(image1->pixels, image2->pixels, pixels_size) == 0);
+    munit_assert_memory_equal(pixels_size, image1->pixels, image2->pixels);
 
     if (image1->resolution == NULL) {
         munit_assert_null(image2->resolution);

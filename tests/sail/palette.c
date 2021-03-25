@@ -66,7 +66,7 @@ static MunitResult test_copy_palette(const MunitParameter params[], void *user_d
 
     munit_assert(palette_copy->data != palette->data);
     munit_assert(palette_copy->pixel_format == palette->pixel_format);
-    munit_assert(memcmp(palette_copy->data, palette->data, data_length) == 0);
+    munit_assert_memory_equal(data_length, palette_copy->data, palette->data);
     munit_assert(palette_copy->color_count == palette->color_count);
 
     sail_destroy_palette(palette_copy);
@@ -93,7 +93,7 @@ static MunitResult test_palette_from_data(const MunitParameter params[], void *u
     munit_assert_not_null(palette);
 
     munit_assert(palette->pixel_format == pixel_format);
-    munit_assert(memcmp(palette->data, data, data_length) == 0);
+    munit_assert_memory_equal(data_length, palette->data, data);
     munit_assert(palette->color_count == color_count);
 
     sail_destroy_palette(palette);
