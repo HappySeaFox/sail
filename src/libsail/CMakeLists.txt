@@ -29,7 +29,7 @@ set(PUBLIC_HEADERS "codec_info.h"
                    "string_node.h")
 
 set_target_properties(sail PROPERTIES
-                           VERSION "0.7.0"
+                           VERSION "0.8.0"
                            SOVERSION 0
                            PUBLIC_HEADER "${PUBLIC_HEADERS}")
 
