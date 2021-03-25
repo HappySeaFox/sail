@@ -85,7 +85,7 @@ struct bmp_state {
 
     struct sail_iccp *iccp;
 
-    sail_rgba8_t *palette;
+    sail_rgb8_t *palette;
     unsigned palette_count;
     unsigned bytes_in_row;
     /* Number of bytes to pad scan lines to 4-byte boundary. */
@@ -270,7 +270,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v5_bmp(struct sail_io *io, const 
         bmp_state->palette_count = 1 << bmp_state->v2.bit_count;
 
         void *ptr;
-        SAIL_TRY(sail_malloc(sizeof(sail_rgba8_t) * bmp_state->palette_count, &ptr));
+        SAIL_TRY(sail_malloc(sizeof(sail_rgb8_t) * bmp_state->palette_count, &ptr));
         bmp_state->palette = ptr;
 
         switch (bmp_state->version) {
@@ -283,7 +283,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v5_bmp(struct sail_io *io, const 
                     bmp_state->palette[i].component1 = rgb.component1;
                     bmp_state->palette[i].component2 = rgb.component2;
                     bmp_state->palette[i].component3 = rgb.component3;
-                    bmp_state->palette[i].component4 = 255;
                 }
                 break;
             }
@@ -296,7 +295,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v5_bmp(struct sail_io *io, const 
                     bmp_state->palette[i].component1 = rgba.component1;
                     bmp_state->palette[i].component2 = rgba.component2;
                     bmp_state->palette[i].component3 = rgba.component3;
-                    bmp_state->palette[i].component4 = 255;
                 }
             }
         }
@@ -338,11 +336,17 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_bmp(void *state, st
     image_local->source_image->properties = bmp_state->flipped ? SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY : 0;
     image_local->width = (bmp_state->version == SAIL_BMP_V1) ? bmp_state->v1.width : bmp_state->v2.width;
     image_local->height = (bmp_state->version == SAIL_BMP_V1) ? bmp_state->v1.height : bmp_state->v2.height;
-    image_local->pixel_format = bmp_state->source_pixel_format;
-    image_local->bytes_per_line = bmp_state->bytes_in_row;
+    if (bmp_state->version >= SAIL_BMP_V3 && bmp_state->v3.compression == SAIL_BI_RLE4) {
+        /* We expand RLE-encoded 4-bit pixels to 8-bit. TODO: Unpack into 4-bit indexed image. */
+        image_local->pixel_format = SAIL_PIXEL_FORMAT_BPP8_INDEXED;
+        image_local->bytes_per_line = bmp_state->bytes_in_row * 2;
+    } else {
+        image_local->pixel_format = bmp_state->source_pixel_format;
+        image_local->bytes_per_line = bmp_state->bytes_in_row;
+    }
 
     if (bmp_state->palette != NULL) {
-        SAIL_TRY_OR_CLEANUP(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP32_RGBA, bmp_state->palette_count, &image_local->palette),
+        SAIL_TRY_OR_CLEANUP(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP24_RGB, bmp_state->palette_count, &image_local->palette),
                             /* cleanup */ sail_destroy_image(image_local));
 
         unsigned char *palette_ptr = image_local->palette->data;
@@ -351,7 +355,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_bmp(void *state, st
             *palette_ptr++ = bmp_state->palette[i].component3;
             *palette_ptr++ = bmp_state->palette[i].component2;
             *palette_ptr++ = bmp_state->palette[i].component1;
-            *palette_ptr++ = bmp_state->palette[i].component4;
         }
     }
 
@@ -390,36 +393,146 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v5_bmp(void *state, struct sail_
 
     struct bmp_state *bmp_state = (struct bmp_state *)state;
 
-    const unsigned bit_count = (bmp_state->version == SAIL_BMP_V1) ? bmp_state->v1.bit_count : bmp_state->v2.bit_count;
-
-    switch (bit_count) {
-        case 4: {
-            if (bmp_state->version >= SAIL_BMP_V3 && bmp_state->v3.compression == SAIL_BI_RLE4) {
-                SAIL_LOG_ERROR("BMP: RLE-encoded images are not supported");
-                SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_COMPRESSION);
-            }
-            break;
-        }
-        case 8: {
-            if (bmp_state->version >= SAIL_BMP_V3 && bmp_state->v3.compression == SAIL_BI_RLE8) {
-                SAIL_LOG_ERROR("BMP: RLE-encoded images are not supported");
-                SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_COMPRESSION);
-            }
-            break;
-        }
-    }
+    /* RLE-encoded images don't need to skip pad bytes. */
+    bool skip_pad_bytes = true;
 
     for (unsigned i = image->height; i > 0; i--) {
         unsigned char *scan = (unsigned char *)image->pixels + image->bytes_per_line * (bmp_state->flipped ? (i - 1) : (image->height - i));
 
         for (unsigned pixel_index = 0; pixel_index < image->width;) {
-            /* Read whole scan line. */
-            SAIL_TRY(io->strict_read(io->stream, scan, bmp_state->bytes_in_row));
-            pixel_index += image->width;
+            if (bmp_state->version >= SAIL_BMP_V3 && bmp_state->v3.compression == SAIL_BI_RLE4) {
+                skip_pad_bytes = false;
+
+                uint8_t marker;
+                SAIL_TRY(io->strict_read(io->stream, &marker, sizeof(marker)));
+
+                if (marker == SAIL_UNENCODED_RUN_MARKER) {
+                    uint8_t count_or_marker;
+                    SAIL_TRY(io->strict_read(io->stream, &count_or_marker, sizeof(count_or_marker)));
+
+                    if (count_or_marker == SAIL_END_OF_SCAN_LINE_MARKER) {
+                        /* Jump to the end of scan line. +1 to avoid reading end-of-scan-line marker twice below. */
+                        pixel_index = image->width + 1;
+                    } else if (count_or_marker == SAIL_END_OF_RLE_DATA_MARKER) {
+                        SAIL_LOG_ERROR("BMP: Unexpected end-of-rle-data marker");
+                        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+                    } else if (count_or_marker == SAIL_DELTA_MARKER) {
+                        SAIL_LOG_ERROR("BMP: Delta marker is not supported");
+                        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_FORMAT);
+                    } else {
+                        bool read_byte = true;
+                        uint8_t byte = 0;
+                        uint8_t index;
+
+                        for (uint8_t k = 0; k < count_or_marker; k++) {
+                            if (read_byte) {
+                                SAIL_TRY(io->strict_read(io->stream, &byte, sizeof(byte)));
+                                index = (byte >> 4) & 0xf;
+                                read_byte = false;
+                            } else {
+                                index = byte & 0xf;
+                                read_byte = true;
+                            }
+
+                            *scan++ = index;
+                        }
+
+                        /* Odd number of bytes is accompanied with an additional byte. */
+                        uint8_t number_of_unencoded_bytes = (count_or_marker + 1) / 2;
+                        if ((number_of_unencoded_bytes % 2) != 0) {
+                            SAIL_TRY(io->seek(io->stream, 1, SEEK_CUR));
+                        }
+
+                        pixel_index += count_or_marker;
+                    }
+                } else {
+                    /* Normal RLE: count + value. */
+                    bool high_4_bits = true;
+                    uint8_t index;
+
+                    uint8_t byte;
+                    SAIL_TRY(io->strict_read(io->stream, &byte, sizeof(byte)));
+
+                    for (uint8_t k = 0; k < marker; k++) {
+                        if (high_4_bits) {
+                            index = (byte >> 4) & 0xf;
+                            high_4_bits = false;
+                        } else {
+                            index = byte & 0xf;
+                            high_4_bits = true;
+                        }
+
+                        *scan++ = index;
+                    }
+
+                    pixel_index += marker;
+                }
+
+                /* Read a possible end-of-scan-line marker at the end of line. */
+                if (pixel_index == image->width) {
+                    SAIL_TRY(bmp_private_skip_end_of_scan_line(io));
+                }
+            } else if (bmp_state->version >= SAIL_BMP_V3 && bmp_state->v3.compression == SAIL_BI_RLE8) {
+                skip_pad_bytes = false;
+
+                uint8_t marker;
+                SAIL_TRY(io->strict_read(io->stream, &marker, sizeof(marker)));
+
+                if (marker == SAIL_UNENCODED_RUN_MARKER) {
+                    uint8_t count_or_marker;
+                    SAIL_TRY(io->strict_read(io->stream, &count_or_marker, sizeof(count_or_marker)));
+
+                    if (count_or_marker == SAIL_END_OF_SCAN_LINE_MARKER) {
+                        /* Jump to the end of scan line. +1 to avoid reading end-of-scan-line marker twice below. */
+                        pixel_index = image->width + 1;
+                    } else if (count_or_marker == SAIL_END_OF_RLE_DATA_MARKER) {
+                        SAIL_LOG_ERROR("BMP: Unexpected end-of-rle-data marker");
+                        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+                    } else if (count_or_marker == SAIL_DELTA_MARKER) {
+                        SAIL_LOG_ERROR("BMP: Delta marker is not supported");
+                        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_FORMAT);
+                    } else {
+                        for (uint8_t k = 0; k < count_or_marker; k++) {
+                            uint8_t index;
+                            SAIL_TRY(io->strict_read(io->stream, &index, sizeof(index)));
+
+                            *scan++ = index;
+                        }
+
+                        /* Odd number of pixels is accompanied with an additional byte. */
+                        if ((count_or_marker % 2) != 0) {
+                            SAIL_TRY(io->seek(io->stream, 1, SEEK_CUR));
+                        }
+
+                        pixel_index += count_or_marker;
+                    }
+                } else {
+                    /* Normal RLE: count + value. */
+                    uint8_t index;
+                    SAIL_TRY(io->strict_read(io->stream, &index, sizeof(index)));
+
+                    for (uint8_t k = 0; k < marker; k++) {
+                        *scan++ = index;
+                    }
+
+                    pixel_index += marker;
+                }
+
+                /* Read a possible end-of-scan-line marker at the end of line. */
+                if (pixel_index == image->width) {
+                    SAIL_TRY(bmp_private_skip_end_of_scan_line(io));
+                }
+            } else {
+                /* Read a whole scan line. */
+                SAIL_TRY(io->strict_read(io->stream, scan, bmp_state->bytes_in_row));
+                pixel_index += image->width;
+            }
         }
 
         /* Skip pad bytes. */
-        SAIL_TRY(io->seek(io->stream, bmp_state->pad_bytes, SEEK_CUR));
+        if (skip_pad_bytes) {
+            SAIL_TRY(io->seek(io->stream, bmp_state->pad_bytes, SEEK_CUR));
+        }
     }
 
     return SAIL_OK;

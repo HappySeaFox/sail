@@ -187,18 +187,18 @@ unsigned bmp_private_pad_bytes(unsigned bytes_in_row) {
     return (remainder == 0) ? 0 : (4 - remainder);
 }
 
-sail_status_t bmp_private_fill_system_palette(unsigned bit_count, sail_rgba8_t **palette, unsigned *palette_count) {
+sail_status_t bmp_private_fill_system_palette(unsigned bit_count, sail_rgb8_t **palette, unsigned *palette_count) {
 
     switch (bit_count) {
         case 1: {
             *palette_count = 2;
 
             void *ptr;
-            SAIL_TRY(sail_malloc(sizeof(sail_rgba8_t) * (*palette_count), &ptr));
+            SAIL_TRY(sail_malloc(sizeof(sail_rgb8_t) * (*palette_count), &ptr));
             *palette = ptr;
 
-            (*palette)[0] = (sail_rgba8_t) { 0,   0,   0,   255 };
-            (*palette)[1] = (sail_rgba8_t) { 255, 255, 255, 255 };
+            (*palette)[0] = (sail_rgb8_t) { 0,   0,   0   };
+            (*palette)[1] = (sail_rgb8_t) { 255, 255, 255 };
 
             return SAIL_OK;
         }
@@ -206,40 +206,29 @@ sail_status_t bmp_private_fill_system_palette(unsigned bit_count, sail_rgba8_t *
             *palette_count = 16;
 
             void *ptr;
-            SAIL_TRY(sail_malloc(sizeof(sail_rgba8_t) * (*palette_count), &ptr));
+            SAIL_TRY(sail_malloc(sizeof(sail_rgb8_t) * (*palette_count), &ptr));
             *palette = ptr;
 
-            (*palette)[0]  = (sail_rgba8_t) { 0,   0,   0,   255 };
-            (*palette)[1]  = (sail_rgba8_t) { 128, 0,   0,   255 };
-            (*palette)[2]  = (sail_rgba8_t) { 0,   128, 0,   255 };
-            (*palette)[3]  = (sail_rgba8_t) { 128, 128, 0,   255 };
-            (*palette)[4]  = (sail_rgba8_t) { 0,   0,   128, 255 };
-            (*palette)[5]  = (sail_rgba8_t) { 128, 0,   128, 255 };
-            (*palette)[6]  = (sail_rgba8_t) { 0,   128, 128, 255 };
-            (*palette)[7]  = (sail_rgba8_t) { 192, 192, 192, 255 };
-            (*palette)[8]  = (sail_rgba8_t) { 128, 128, 128, 255 };
-            (*palette)[9]  = (sail_rgba8_t) { 255, 0,   0,   255 };
-            (*palette)[10] = (sail_rgba8_t) { 0,   255, 0,   255 };
-            (*palette)[11] = (sail_rgba8_t) { 255, 255, 0,   255 };
-            (*palette)[12] = (sail_rgba8_t) { 0,   0,   255, 255 };
-            (*palette)[13] = (sail_rgba8_t) { 255, 0,   255, 255 };
-            (*palette)[14] = (sail_rgba8_t) { 0,   255, 255, 255 };
-            (*palette)[15] = (sail_rgba8_t) { 255, 255, 255, 255 };
+            (*palette)[0]  = (sail_rgb8_t) { 0,   0,   0   };
+            (*palette)[1]  = (sail_rgb8_t) { 128, 0,   0   };
+            (*palette)[2]  = (sail_rgb8_t) { 0,   128, 0   };
+            (*palette)[3]  = (sail_rgb8_t) { 128, 128, 0   };
+            (*palette)[4]  = (sail_rgb8_t) { 0,   0,   128 };
+            (*palette)[5]  = (sail_rgb8_t) { 128, 0,   128 };
+            (*palette)[6]  = (sail_rgb8_t) { 0,   128, 128 };
+            (*palette)[7]  = (sail_rgb8_t) { 192, 192, 192 };
+            (*palette)[8]  = (sail_rgb8_t) { 128, 128, 128 };
+            (*palette)[9]  = (sail_rgb8_t) { 255, 0,   0   };
+            (*palette)[10] = (sail_rgb8_t) { 0,   255, 0   };
+            (*palette)[11] = (sail_rgb8_t) { 255, 255, 0   };
+            (*palette)[12] = (sail_rgb8_t) { 0,   0,   255 };
+            (*palette)[13] = (sail_rgb8_t) { 255, 0,   255 };
+            (*palette)[14] = (sail_rgb8_t) { 0,   255, 255 };
+            (*palette)[15] = (sail_rgb8_t) { 255, 255, 255 };
 
             return SAIL_OK;
         }
     }
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_BIT_DEPTH);
-}
-
-sail_status_t bmp_private_get_palette_color(const sail_rgba8_t *palette, unsigned palette_count, unsigned index, sail_rgba8_t *color) {
-
-    if (index >= palette_count) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
-    }
-
-    *color = palette[index];
-
-    return SAIL_OK;
 }
