@@ -53,7 +53,6 @@ struct sail_pixel3_uint8
 typedef struct sail_pixel3_uint8 sail_rgb8_t;
 typedef struct sail_pixel3_uint8 sail_bgr8_t;
 typedef struct sail_pixel3_uint8 sail_ycbcr8_t;
-typedef struct sail_pixel3_uint8 sail_cie_lab8_t;
 
 /*
  * A structure representing a pixel with 4 8-bit components. Typically, it's RGBA.
