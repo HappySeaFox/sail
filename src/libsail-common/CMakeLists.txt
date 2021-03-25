@@ -44,7 +44,7 @@ set(PUBLIC_HEADERS "common.h"
                    "write_options.h")
 
 set_target_properties(sail-common PROPERTIES
-                                  VERSION "0.7.2"
+                                  VERSION "0.9.1"
                                   SOVERSION 0
                                   PUBLIC_HEADER "${PUBLIC_HEADERS}")
 
