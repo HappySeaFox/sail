@@ -52,6 +52,8 @@ struct sail_pixel3_uint8
 
 typedef struct sail_pixel3_uint8 sail_rgb8_t;
 typedef struct sail_pixel3_uint8 sail_bgr8_t;
+typedef struct sail_pixel3_uint8 sail_ycbcr8_t;
+typedef struct sail_pixel3_uint8 sail_cie_lab8_t;
 
 /*
  * A structure representing a pixel with 4 8-bit components. Typically, it's RGBA.
@@ -64,8 +66,16 @@ struct sail_pixel4_uint8
     uint8_t component4;
 };
 
+typedef struct sail_pixel4_uint8 sail_rgbx8_t;
+typedef struct sail_pixel4_uint8 sail_bgrx8_t;
+typedef struct sail_pixel4_uint8 sail_xrgb8_t;
+typedef struct sail_pixel4_uint8 sail_xbgr8_t;
 typedef struct sail_pixel4_uint8 sail_rgba8_t;
 typedef struct sail_pixel4_uint8 sail_bgra8_t;
+typedef struct sail_pixel4_uint8 sail_argb8_t;
+typedef struct sail_pixel4_uint8 sail_abgr8_t;
+typedef struct sail_pixel4_uint8 sail_cmyk8_t;
+typedef struct sail_pixel4_uint8 sail_ycck8_t;
 
 /*
  * Reads a sail_pixel3_uint8 pixel byte by byte from the I/O stream.
