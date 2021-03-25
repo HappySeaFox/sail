@@ -184,6 +184,20 @@ SAIL_EXPORT sail_status_t sail_codec_feature_from_string(const char *str, enum S
 SAIL_EXPORT sail_status_t sail_bits_per_pixel(enum SailPixelFormat pixel_format, unsigned *result);
 
 /*
+ * Sets the result to true if the first pixel format occupies less bits than the second one.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_less_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPixelFormat pixel_format2, bool *result);
+
+/*
+ * Sets the result to true if the first pixel format occupies less or the same number of bits than the second one.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_less_equal_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPixelFormat pixel_format2, bool *result);
+
+/*
  * Sets the result to true if both the pixel formats occupy the same number of bits.
  *
  * Returns SAIL_OK on success.
@@ -191,18 +205,18 @@ SAIL_EXPORT sail_status_t sail_bits_per_pixel(enum SailPixelFormat pixel_format,
 SAIL_EXPORT sail_status_t sail_equal_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPixelFormat pixel_format2, bool *result);
 
 /*
+ * Sets the result to true if the first pixel format occupies more or the same number of bits than the second one.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_greater_equal_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPixelFormat pixel_format2, bool *result);
+
+/*
  * Sets the result to true if the first pixel format occupies more bits than the second one.
  *
  * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_greater_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPixelFormat pixel_format2, bool *result);
-
-/*
- * Sets the result to true if the first pixel format occupies less bits than the second one.
- *
- * Returns SAIL_OK on success.
- */
-SAIL_EXPORT sail_status_t sail_less_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPixelFormat pixel_format2, bool *result);
 
 /*
  * Calculates the number of bytes per line needed to hold a scan line without padding.
