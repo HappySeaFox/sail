@@ -1,12 +1,4 @@
 set(SAIL_TEST_IMAGES_PATH "${CMAKE_CURRENT_SOURCE_DIR}/images")
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/images/test-images.h.in" "${PROJECT_BINARY_DIR}/include/test-images.h" @ONLY)
 
-sail_test(TARGET bytes-per-line         SOURCES bytes_per_line.c)
-sail_test(TARGET iccp                   SOURCES iccp.c)
-sail_test(TARGET integrity              SOURCES integrity.c)
 sail_test(TARGET io-produce-same-images SOURCES io-produce-same-images.c LINK sail-comparators)
-sail_test(TARGET malloc                 SOURCES malloc.c)
-sail_test(TARGET meta-data-node         SOURCES meta_data_node.c LINK sail-comparators)
-sail_test(TARGET palette                SOURCES palette.c)
-sail_test(TARGET read-options           SOURCES read_options.c)
-sail_test(TARGET write-options          SOURCES write_options.c)
