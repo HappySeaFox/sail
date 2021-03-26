@@ -77,18 +77,38 @@ sail_status_t sail_copy_image(const struct sail_image *source, struct sail_image
     SAIL_CHECK_IMAGE_PTR(source);
     SAIL_CHECK_IMAGE_PTR(target);
 
-    unsigned pixels_size;
-    SAIL_TRY(sail_bytes_per_image(source, &pixels_size));
-
     struct sail_image *image_local;
-    SAIL_TRY(sail_alloc_image(&image_local));
+    SAIL_TRY(sail_copy_image_skeleton(source, &image_local));
 
+    /* Pixels. */
     if (source->pixels != NULL) {
+        const unsigned pixels_size = source->height * source->bytes_per_line;
+
         SAIL_TRY_OR_CLEANUP(sail_malloc(pixels_size, &image_local->pixels),
                             /* cleanup */ sail_destroy_image(image_local));
 
         memcpy(image_local->pixels, source->pixels, pixels_size);
     }
+
+    /* Palette. */
+    if (source->palette != NULL) {
+        SAIL_TRY_OR_CLEANUP(sail_copy_palette(source->palette, &image_local->palette),
+                            /* cleanup */ sail_destroy_image(image_local));
+
+    }
+
+    *target = image_local;
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_copy_image_skeleton(const struct sail_image *source, struct sail_image **target) {
+
+    SAIL_CHECK_IMAGE(source);
+    SAIL_CHECK_IMAGE_PTR(target);
+
+    struct sail_image *image_local;
+    SAIL_TRY(sail_alloc_image(&image_local));
 
     image_local->width                = source->width;
     image_local->height               = source->height;
@@ -100,16 +120,10 @@ sail_status_t sail_copy_image(const struct sail_image *source, struct sail_image
 
     }
 
-    image_local->pixel_format         = source->pixel_format;
-    image_local->interlaced_passes    = source->interlaced_passes;
-    image_local->animated             = source->animated;
-    image_local->delay                = source->delay;
-
-    if (source->palette != NULL) {
-        SAIL_TRY_OR_CLEANUP(sail_copy_palette(source->palette, &image_local->palette),
-                            /* cleanup */ sail_destroy_image(image_local));
-
-    }
+    image_local->pixel_format      = source->pixel_format;
+    image_local->interlaced_passes = source->interlaced_passes;
+    image_local->animated          = source->animated;
+    image_local->delay             = source->delay;
 
     SAIL_TRY_OR_CLEANUP(sail_copy_meta_data_node_chain(source->meta_data_node, &image_local->meta_data_node),
                         /* cleanup */ sail_destroy_image(image_local));
