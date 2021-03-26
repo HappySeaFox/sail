@@ -272,11 +272,15 @@ image& image::with_meta_data(const std::vector<sail::meta_data> &meta_data)
 
 image& image::with_pixels(const void *pixels)
 {
-    unsigned bytes_per_image;
-    SAIL_TRY_OR_EXECUTE(image::bytes_per_image(*this, &bytes_per_image),
-                        /* on error */ return *this);
+    const unsigned bytes_per_image = height() * bytes_per_line();
+
+    if (bytes_per_image == 0) {
+        SAIL_LOG_ERROR("Cannot assign pixels as the image height or bytes_per_line is 0");
+        return *this;
+    }
 
     with_pixels(pixels, bytes_per_image);
+
     return *this;
 }
 
@@ -300,9 +304,12 @@ image& image::with_pixels(const void *pixels, unsigned pixels_size)
 
 image& image::with_shallow_pixels(void *pixels)
 {
-    unsigned bytes_per_image;
-    SAIL_TRY_OR_EXECUTE(image::bytes_per_image(*this, &bytes_per_image),
-                        /* on error */ return *this);
+    const unsigned bytes_per_image = height() * bytes_per_line();
+
+    if (bytes_per_image == 0) {
+        SAIL_LOG_ERROR("Cannot assign shallow pixels as the image height or bytes_per_line is 0");
+        return *this;
+    }
 
     with_shallow_pixels(pixels, bytes_per_image);
     return *this;
@@ -342,21 +349,6 @@ sail_status_t image::bytes_per_line(unsigned width, SailPixelFormat pixel_format
     SAIL_CHECK_PTR(result);
 
     SAIL_TRY(sail_bytes_per_line(width, pixel_format, result));
-
-    return SAIL_OK;
-}
-
-sail_status_t image::bytes_per_image(const image &simage, unsigned *result)
-{
-    SAIL_CHECK_PTR(result);
-
-    sail_image sail_image;
-
-    sail_image.width        = simage.width();
-    sail_image.height       = simage.height();
-    sail_image.pixel_format = simage.pixel_format();
-
-    SAIL_TRY(sail_bytes_per_image(&sail_image, result));
 
     return SAIL_OK;
 }
@@ -452,11 +444,8 @@ sail_status_t image::transfer_pixels_pointer(const sail_image *sail_image)
         return SAIL_OK;
     }
 
-    unsigned bytes_per_image;
-    SAIL_TRY(sail_bytes_per_image(sail_image, &bytes_per_image));
-
     d->pixels      = sail_image->pixels;
-    d->pixels_size = bytes_per_image;
+    d->pixels_size = sail_image->height * sail_image->bytes_per_line;
 
     return SAIL_OK;
 }

@@ -240,14 +240,6 @@ SAIL_EXPORT sail_status_t sail_greater_bits_per_pixel(enum SailPixelFormat pixel
 SAIL_EXPORT sail_status_t sail_bytes_per_line(unsigned width, enum SailPixelFormat pixel_format, unsigned *result);
 
 /*
- * Calculates the number of bytes needed to hold an entire image in memory without padding.
- * It is effectively bytes per line * image height.
- *
- * Returns SAIL_OK on success.
- */
-SAIL_EXPORT sail_status_t sail_bytes_per_image(const struct sail_image *image, unsigned *result);
-
-/*
  * Prints the recent errno value with SAIL_LOG_ERROR(). The specified format must include '%s'.
  *
  * Returns SAIL_OK on success.

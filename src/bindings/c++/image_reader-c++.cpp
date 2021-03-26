@@ -254,10 +254,6 @@ sail_status_t image_reader::read_next_frame(image *simage)
     sail_image *sail_image;
     SAIL_TRY(sail_read_next_frame(d->state, &sail_image));
 
-    unsigned bytes_per_image;
-    SAIL_TRY_OR_CLEANUP(sail_bytes_per_image(sail_image, &bytes_per_image),
-                        /* cleanup */ sail_destroy_image(sail_image));
-
     *simage = image(sail_image);
     sail_image->pixels = NULL;
     sail_destroy_image(sail_image);

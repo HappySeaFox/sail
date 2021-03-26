@@ -816,19 +816,6 @@ sail_status_t sail_bytes_per_line(unsigned width, enum SailPixelFormat pixel_for
     return SAIL_OK;
 }
 
-sail_status_t sail_bytes_per_image(const struct sail_image *image, unsigned *result) {
-
-    SAIL_CHECK_IMAGE_PTR(image);
-    SAIL_CHECK_RESULT_PTR(result);
-
-    unsigned bytes_per_line;
-    SAIL_TRY(sail_bytes_per_line(image->width, image->pixel_format, &bytes_per_line));
-
-    *result = bytes_per_line * image->height;
-
-    return SAIL_OK;
-}
-
 sail_status_t sail_print_errno(const char *format) {
 
     SAIL_CHECK_STRING_PTR(format);

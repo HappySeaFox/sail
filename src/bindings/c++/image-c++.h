@@ -318,14 +318,6 @@ public:
     static sail_status_t bytes_per_line(unsigned width, SailPixelFormat pixel_format, unsigned *result);
 
     /*
-     * Calculates the number of bytes needed to hold an entire image in memory without padding.
-     * It is effectively bytes per line * image height.
-     *
-     * Returns SAIL_OK on success.
-     */
-    static sail_status_t bytes_per_image(const image &simage, unsigned *result);
-
-    /*
      * Assigns a non-NULL string representation of the specified pixel format.
      * The assigned string MUST NOT be destroyed. For example: "RGB".
      *

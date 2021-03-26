@@ -117,10 +117,7 @@ sail_status_t sail_read_next_frame(void *state, struct sail_image **image) {
     }
 
     /* Allocate pixels. */
-    unsigned pixels_size;
-    SAIL_TRY_OR_CLEANUP(sail_bytes_per_image(image_local, &pixels_size),
-                        /* cleanup */ sail_destroy_image(image_local));
-
+    const unsigned pixels_size = image_local->height * image_local->bytes_per_line;
     SAIL_TRY_OR_CLEANUP(sail_malloc(pixels_size, &image_local->pixels),
                         /* cleanup */ sail_destroy_image(image_local));
 
