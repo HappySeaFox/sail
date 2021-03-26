@@ -40,6 +40,8 @@
 
 #include <sail/sail.h>
 
+#include <sail-manip/sail-manip.h>
+
 //#define SAIL_CODEC_NAME jpeg
 //#include <sail/layouts/v4.h>
 
@@ -99,61 +101,32 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
 
     while ((res = sail_read_next_frame(state, &image)) == SAIL_OK) {
 
-        const QImage::Format qimageFormat = sailPixelFormatToQImageFormat(image->pixel_format);
-
-        if (qimageFormat == QImage::Format_Invalid) {
-            sail_stop_reading(state);
-            sail_destroy_image(image);
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
-        }
+        struct sail_image *image_converted;
+        SAIL_TRY_OR_CLEANUP(sail_convert_image_to_bpp64_rgba_variant(image,
+                                                                     SAIL_PIXEL_FORMAT_BPP64_RGBA,
+                                                                     &image_converted),
+                            /* cleanup */ sail_stop_reading(state),
+                                          sail_destroy_image(image));
+        const QImage::Format qimageFormat = QImage::Format_RGBA64;
 
         source_pixel_format = image->source_image->pixel_format;
-        pixel_format = image->pixel_format;
-        width = image->width;
-        height = image->height;
+        pixel_format = image_converted->pixel_format;
+        width = image_converted->width;
+        height = image_converted->height;
 
         /*
          * Convert to QImage.
          */
-        QImage qimage = QImage(reinterpret_cast<uchar *>(image->pixels),
-                               image->width,
-                               image->height,
-                               image->bytes_per_line,
+        QImage qimage = QImage(reinterpret_cast<uchar *>(image_converted->pixels),
+                               image_converted->width,
+                               image_converted->height,
+                               image_converted->bytes_per_line,
                                qimageFormat).copy();
-
-        /*
-         * Apply palette.
-         */
-        if (qimageFormat == QImage::Format_Indexed8) {
-            /*
-             * Assume palette is BPP24-RGB or BPP32-RGBA.
-             */
-            if (image->palette->pixel_format != SAIL_PIXEL_FORMAT_BPP24_RGB
-                    && image->palette->pixel_format != SAIL_PIXEL_FORMAT_BPP32_RGBA) {
-                sail_stop_reading(state);
-                sail_destroy_image(image);
-                SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
-            }
-
-            QVector<QRgb> colorTable;
-            const unsigned char *palette = reinterpret_cast<const unsigned char *>(image->palette->data);
-
-            for (unsigned i = 0; i < image->palette->color_count; i++) {
-                if (image->palette->pixel_format == SAIL_PIXEL_FORMAT_BPP24_RGB) {
-                    colorTable.append(qRgb(*palette, *(palette+1), *(palette+2)));
-                    palette += 3;
-                } else {
-                    colorTable.append(qRgba(*palette, *(palette+1), *(palette+2), *(palette+3)));
-                    palette += 4;
-                }
-            }
-
-            qimage.setColorTable(colorTable);
-        }
 
         qimages->append(qimage);
         delays->append(image->delay);
 
+        sail_destroy_image(image_converted);
         sail_destroy_image(image);
     }
 

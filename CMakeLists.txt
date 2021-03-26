@@ -194,6 +194,7 @@ sail_check_c11_thread_local()
 # Configure subdirs
 #
 add_subdirectory(src/libsail-common)
+add_subdirectory(src/libsail-manip)
 add_subdirectory(src/sail-codecs)
 if (SAIL_COMBINE_CODECS)
     add_subdirectory(src/sail-codecs-archive)

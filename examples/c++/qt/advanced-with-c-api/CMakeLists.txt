@@ -51,6 +51,9 @@ endif()
 find_package(Sail REQUIRED)
 target_link_libraries(advanced-with-c-api SAIL::sail)
 
+find_package(SailManip REQUIRED)
+target_link_libraries(advanced-with-c-api SAIL::sail-manip)
+
 # Add Qt5 dependency
 #
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
