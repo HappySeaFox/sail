@@ -140,10 +140,16 @@ enum SailPixelFormat {
     SAIL_PIXEL_FORMAT_BPP32_YCCK,
 
     /*
-     * LAB formats.
+     * CIE LAB formats.
      */
     SAIL_PIXEL_FORMAT_BPP24_CIE_LAB,
     SAIL_PIXEL_FORMAT_BPP48_CIE_LAB,
+
+    /*
+     * CIE LUV formats.
+     */
+    SAIL_PIXEL_FORMAT_BPP24_CIE_LUV, /* 8/8/8   */
+    SAIL_PIXEL_FORMAT_BPP40_CIE_LUV, /* 8/16/16 */
 };
 
 /* Image properties. */
