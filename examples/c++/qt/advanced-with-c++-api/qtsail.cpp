@@ -58,7 +58,7 @@ sail_status_t QtSail::init()
     QTimer::singleShot(0, this, [&]{
         QMessageBox::information(this, tr("Features"), tr("This demo includes:"
                                                           "<ul>"
-                                                          "<li>Linking against SAIL pkg-config packages</li>"
+                                                          "<li>Linking against SAIL CMake packages</li>"
                                                           "<li>Playing animations</li>"
                                                           "</ul>"));
     });
