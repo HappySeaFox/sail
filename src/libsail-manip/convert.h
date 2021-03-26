@@ -55,9 +55,9 @@ extern "C" {
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_convert_image_to_bpp64_rgba_variant(const struct sail_image *image_input,
-                                                                    enum SailPixelFormat output_pixel_format,
-                                                                    struct sail_image **image_output);
+SAIL_EXPORT sail_status_t sail_convert_image_to_bpp64_rgba_kind(const struct sail_image *image_input,
+                                                                enum SailPixelFormat output_pixel_format,
+                                                                struct sail_image **image_output);
 
 /* extern "C" */
 #ifdef __cplusplus

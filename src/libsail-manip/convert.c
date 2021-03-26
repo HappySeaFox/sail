@@ -31,8 +31,9 @@
 #include "sail-manip.h"
 
 /*
- * Private.
+ * Private functions.
  */
+
 static sail_status_t get_palette_rgba32_color(const sail_rgba8_t *palette, unsigned palette_count, unsigned index, sail_rgba8_t *color) {
 
     if (index >= palette_count) {
@@ -45,9 +46,10 @@ static sail_status_t get_palette_rgba32_color(const sail_rgba8_t *palette, unsig
 }
 
 /*
- * Public.
+ * Public functions.
  */
-sail_status_t sail_convert_image_to_bpp64_rgba_variant(const struct sail_image *image_input, enum SailPixelFormat output_pixel_format, struct sail_image **image_output) {
+
+sail_status_t sail_convert_image_to_bpp64_rgba_kind(const struct sail_image *image_input, enum SailPixelFormat output_pixel_format, struct sail_image **image_output) {
 
     SAIL_CHECK_IMAGE(image_input);
     SAIL_CHECK_IMAGE_PTR(image_output);
