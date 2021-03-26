@@ -45,6 +45,15 @@ static sail_status_t get_palette_rgba32_color(const sail_rgba8_t *palette, unsig
     return SAIL_OK;
 }
 
+static void fill_scan_from_values(uint16_t *scan, int r, int g, int b, int a, uint16_t rv, uint16_t gv, uint16_t bv, uint16_t av) {
+
+    *(scan+r) = rv;
+    *(scan+g) = gv;
+    *(scan+b) = bv;
+    if (a >= 0) {
+        *(scan+a) = av;
+    }
+}
 /*
  * Public functions.
  */
@@ -92,12 +101,8 @@ sail_status_t sail_convert_image_to_bpp64_rgba_kind(const struct sail_image *ima
                 const uint8_t *scan_input = (uint8_t *)image_input->pixels + image_input->bytes_per_line * i;
 
                 for (unsigned pixel_index = 0; pixel_index < image_input->width; pixel_index++) {
-                    *(scan_output+r) = *scan_input++;
-                    *(scan_output+g) = *scan_input++;
-                    *(scan_output+b) = *scan_input++;
-                    if (a >= 0) {
-                        *(scan_output+a) = 255 * 255;
-                    }
+                    fill_scan_from_values(scan_output, r, g, b, a, *(scan_input+0) * 255, *(scan_input+1) * 255, *(scan_input+2) * 255, 255 * 255);
+                    scan_input += 3;
                     scan_output += 4;
                 }
                 break;
@@ -106,12 +111,8 @@ sail_status_t sail_convert_image_to_bpp64_rgba_kind(const struct sail_image *ima
                 const uint8_t *scan_input = (uint8_t *)image_input->pixels + image_input->bytes_per_line * i;
 
                 for (unsigned pixel_index = 0; pixel_index < image_input->width; pixel_index++) {
-                    *(scan_output+b) = *scan_input++;
-                    *(scan_output+g) = *scan_input++;
-                    *(scan_output+r) = *scan_input++;
-                    if (a >= 0) {
-                        *(scan_output+a) = 255 * 255;
-                    }
+                    fill_scan_from_values(scan_output, r, g, b, a, *(scan_input+2) * 255, *(scan_input+1) * 255, *(scan_input+0) * 255, 255 * 255);
+                    scan_input += 3;
                     scan_output += 4;
                 }
                 break;
@@ -120,12 +121,8 @@ sail_status_t sail_convert_image_to_bpp64_rgba_kind(const struct sail_image *ima
                 const uint16_t *scan_input = (uint16_t *)((uint8_t *)image_input->pixels + image_input->bytes_per_line * i);
 
                 for (unsigned pixel_index = 0; pixel_index < image_input->width; pixel_index++) {
-                    *(scan_output+r) = *scan_input++;
-                    *(scan_output+g) = *scan_input++;
-                    *(scan_output+b) = *scan_input++;
-                    if (a >= 0) {
-                        *(scan_output+a) = 255 * 255;
-                    }
+                    fill_scan_from_values(scan_output, r, g, b, a, *(scan_input+0), *(scan_input+1), *(scan_input+2), 255 * 255);
+                    scan_input += 3;
                     scan_output += 4;
                 }
                 break;
@@ -134,12 +131,8 @@ sail_status_t sail_convert_image_to_bpp64_rgba_kind(const struct sail_image *ima
                 const uint16_t *scan_input = (uint16_t *)((uint8_t *)image_input->pixels + image_input->bytes_per_line * i);
 
                 for (unsigned pixel_index = 0; pixel_index < image_input->width; pixel_index++) {
-                    *(scan_output+b) = *scan_input++;
-                    *(scan_output+g) = *scan_input++;
-                    *(scan_output+r) = *scan_input++;
-                    if (a >= 0) {
-                        *(scan_output+a) = 255 * 255;
-                    }
+                    fill_scan_from_values(scan_output, r, g, b, a, *(scan_input+2) * 255, *(scan_input+1) * 255, *(scan_input+0) * 255, 255 * 255);
+                    scan_input += 3;
                     scan_output += 4;
                 }
                 break;
@@ -153,12 +146,9 @@ sail_status_t sail_convert_image_to_bpp64_rgba_kind(const struct sail_image *ima
                     const uint8_t Y =  (uint8_t)(*scan_input++ / 100.0);
                     const uint8_t K =  (uint8_t)(*scan_input++ / 100.0);
 
-                    *(scan_output+r) = (uint16_t)((1-C) * (1-K) * 255 * 255);
-                    *(scan_output+g) = (uint16_t)((1-M) * (1-K) * 255 * 255);
-                    *(scan_output+b) = (uint16_t)((1-Y) * (1-K) * 255 * 255);
-                    if (a >= 0) {
-                        *(scan_output+a) = 255 * 255;
-                    }
+                    fill_scan_from_values(scan_output, r, g, b, a,
+                                            (uint16_t)((1-C) * (1-K) * 255 * 255), (uint16_t)((1-M) * (1-K) * 255 * 255),
+                                            (uint16_t)((1-Y) * (1-K) * 255 * 255), 255 * 255);
                     scan_output += 4;
                 }
                 break;
@@ -175,12 +165,9 @@ sail_status_t sail_convert_image_to_bpp64_rgba_kind(const struct sail_image *ima
                     const int gv = (int)(Y - 0.34414 * (Cb - 128) - 0.71414 * (Cr - 128));
                     const int bv = (int)(Y + 1.772   * (Cb - 128));
 
-                    *(scan_output+r) = (uint16_t)(max(0, min(255, rv)) * 255);
-                    *(scan_output+g) = (uint16_t)(max(0, min(255, gv)) * 255);
-                    *(scan_output+b) = (uint16_t)(max(0, min(255, bv)) * 255);
-                    if (a >= 0) {
-                        *(scan_output+a) = 255 * 255;
-                    }
+                    fill_scan_from_values(scan_output, r, g, b, a,
+                                            (uint16_t)(max(0, min(255, rv)) * 255), (uint16_t)(max(0, min(255, gv)) * 255),
+                                            (uint16_t)(max(0, min(255, bv)) * 255), 255 * 255);
                     scan_output += 4;
                 }
                 break;
