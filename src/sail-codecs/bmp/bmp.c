@@ -85,7 +85,7 @@ struct bmp_state {
 
     struct sail_iccp *iccp;
 
-    sail_rgb8_t *palette;
+    sail_rgb24_t *palette;
     unsigned palette_count;
     unsigned bytes_in_row;
     /* Number of bytes to pad scan lines to 4-byte boundary. */
@@ -270,12 +270,12 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v5_bmp(struct sail_io *io, const 
         bmp_state->palette_count = 1 << bmp_state->v2.bit_count;
 
         void *ptr;
-        SAIL_TRY(sail_malloc(sizeof(sail_rgb8_t) * bmp_state->palette_count, &ptr));
+        SAIL_TRY(sail_malloc(sizeof(sail_rgb24_t) * bmp_state->palette_count, &ptr));
         bmp_state->palette = ptr;
 
         switch (bmp_state->version) {
             case SAIL_BMP_V2: {
-                sail_rgb8_t rgb;
+                sail_rgb24_t rgb;
 
                 for (unsigned i = 0; i < bmp_state->palette_count; i++) {
                     SAIL_TRY(sail_read_pixel3_uint8(io, &rgb));
@@ -287,7 +287,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v5_bmp(struct sail_io *io, const 
                 break;
             }
             default: {
-                sail_rgba8_t rgba;
+                sail_rgba32_t rgba;
 
                 for (unsigned i = 0; i < bmp_state->palette_count; i++) {
                     SAIL_TRY(sail_read_pixel4_uint8(io, &rgba));

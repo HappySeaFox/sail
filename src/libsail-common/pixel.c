@@ -59,3 +59,36 @@ sail_status_t sail_read_pixel4_uint8(struct sail_io *io, struct sail_pixel4_uint
 
     return SAIL_OK;
 }
+
+sail_status_t sail_read_pixel3_uint16(struct sail_io *io, struct sail_pixel3_uint16 *pixel) {
+
+    SAIL_CHECK_IO_PTR(io);
+    SAIL_CHECK_PIXEL_PTR(pixel);
+
+    uint16_t a[3];
+
+    SAIL_TRY(io->strict_read(io->stream, a, sizeof(a)));
+
+    pixel->component1 = a[0];
+    pixel->component2 = a[1];
+    pixel->component3 = a[2];
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_read_pixel4_uint16(struct sail_io *io, struct sail_pixel4_uint16 *pixel) {
+
+    SAIL_CHECK_IO_PTR(io);
+    SAIL_CHECK_PIXEL_PTR(pixel);
+
+    uint16_t a[4];
+
+    SAIL_TRY(io->strict_read(io->stream, a, sizeof(a)));
+
+    pixel->component1 = a[0];
+    pixel->component2 = a[1];
+    pixel->component3 = a[2];
+    pixel->component4 = a[3];
+
+    return SAIL_OK;
+}

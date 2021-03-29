@@ -50,9 +50,9 @@ struct sail_pixel3_uint8
     uint8_t component3;
 };
 
-typedef struct sail_pixel3_uint8 sail_rgb8_t;
-typedef struct sail_pixel3_uint8 sail_bgr8_t;
-typedef struct sail_pixel3_uint8 sail_ycbcr8_t;
+typedef struct sail_pixel3_uint8 sail_rgb24_t;
+typedef struct sail_pixel3_uint8 sail_bgr24_t;
+typedef struct sail_pixel3_uint8 sail_ycbcr24_t;
 
 /*
  * A structure representing a pixel with 4 8-bit components. Typically, it's RGBA.
@@ -65,16 +65,50 @@ struct sail_pixel4_uint8
     uint8_t component4;
 };
 
-typedef struct sail_pixel4_uint8 sail_rgbx8_t;
-typedef struct sail_pixel4_uint8 sail_bgrx8_t;
-typedef struct sail_pixel4_uint8 sail_xrgb8_t;
-typedef struct sail_pixel4_uint8 sail_xbgr8_t;
-typedef struct sail_pixel4_uint8 sail_rgba8_t;
-typedef struct sail_pixel4_uint8 sail_bgra8_t;
-typedef struct sail_pixel4_uint8 sail_argb8_t;
-typedef struct sail_pixel4_uint8 sail_abgr8_t;
-typedef struct sail_pixel4_uint8 sail_cmyk8_t;
-typedef struct sail_pixel4_uint8 sail_ycck8_t;
+typedef struct sail_pixel4_uint8 sail_rgbx32_t;
+typedef struct sail_pixel4_uint8 sail_bgrx32_t;
+typedef struct sail_pixel4_uint8 sail_xrgb32_t;
+typedef struct sail_pixel4_uint8 sail_xbgr32_t;
+typedef struct sail_pixel4_uint8 sail_rgba32_t;
+typedef struct sail_pixel4_uint8 sail_bgra32_t;
+typedef struct sail_pixel4_uint8 sail_argb32_t;
+typedef struct sail_pixel4_uint8 sail_abgr32_t;
+typedef struct sail_pixel4_uint8 sail_cmyk32_t;
+typedef struct sail_pixel4_uint8 sail_ycck32_t;
+
+/*
+ * A structure representing a pixel with 3 16-bit components. Typically, it's RGB.
+ */
+struct sail_pixel3_uint16
+{
+    uint16_t component1;
+    uint16_t component2;
+    uint16_t component3;
+};
+
+typedef struct sail_pixel3_uint16 sail_rgb48_t;
+typedef struct sail_pixel3_uint16 sail_bgr48_t;
+
+/*
+ * A structure representing a pixel with 4 16-bit components. Typically, it's RGBA.
+ */
+struct sail_pixel4_uint16
+{
+    uint16_t component1;
+    uint16_t component2;
+    uint16_t component3;
+    uint16_t component4;
+};
+
+typedef struct sail_pixel4_uint16 sail_rgbx64_t;
+typedef struct sail_pixel4_uint16 sail_bgrx64_t;
+typedef struct sail_pixel4_uint16 sail_xrgb64_t;
+typedef struct sail_pixel4_uint16 sail_xbgr64_t;
+typedef struct sail_pixel4_uint16 sail_rgba64_t;
+typedef struct sail_pixel4_uint16 sail_bgra64_t;
+typedef struct sail_pixel4_uint16 sail_argb64_t;
+typedef struct sail_pixel4_uint16 sail_abgr64_t;
+typedef struct sail_pixel4_uint16 sail_cmyk64_t;
 
 /*
  * Reads a sail_pixel3_uint8 pixel byte by byte from the I/O stream.
@@ -89,6 +123,20 @@ SAIL_EXPORT sail_status_t sail_read_pixel3_uint8(struct sail_io *io, struct sail
  * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_read_pixel4_uint8(struct sail_io *io, struct sail_pixel4_uint8 *pixel);
+
+/*
+ * Reads a sail_pixel3_uint16 pixel byte by byte from the I/O stream.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_read_pixel3_uint16(struct sail_io *io, struct sail_pixel3_uint16 *pixel);
+
+/*
+ * Reads a sail_pixel4_uint16 pixel byte by byte from the I/O stream.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_read_pixel4_uint16(struct sail_io *io, struct sail_pixel4_uint16 *pixel);
 
 /* extern "C" */
 #ifdef __cplusplus
