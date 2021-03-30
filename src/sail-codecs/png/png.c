@@ -351,6 +351,10 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_png(void *state, st
             if (png_state->next_frame_width + png_state->next_frame_x_offset > image_local->width ||
                     png_state->next_frame_height + png_state->next_frame_y_offset > image_local->height) {
                 sail_destroy_image(image_local);
+                SAIL_LOG_ERROR("PNG: Frame (%u,%u %ux%u) doesn't fit into the image (%ux%u)",
+                                png_state->next_frame_x_offset, png_state->next_frame_y_offset,
+                                png_state->next_frame_width, png_state->next_frame_height,
+                                image_local->width, image_local->height);
                 SAIL_LOG_AND_RETURN(SAIL_ERROR_INCORRECT_IMAGE_DIMENSIONS);
             }
 
@@ -500,6 +504,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_init_v5_png(struct sail_io *io, const
     SAIL_TRY(sail_copy_write_options(write_options, &png_state->write_options));
 
     if (png_state->write_options->compression != SAIL_COMPRESSION_DEFLATE) {
+        SAIL_LOG_ERROR("PNG: Only DEFLATE compression is allowed for writing");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_COMPRESSION);
     }
 
@@ -547,12 +552,16 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v5_png(void *state, s
 
     int color_type;
     int bit_depth;
-    SAIL_TRY(png_private_pixel_format_to_png_color_type(image->pixel_format, &color_type, &bit_depth));
+    SAIL_TRY_OR_EXECUTE(png_private_pixel_format_to_png_color_type(image->pixel_format, &color_type, &bit_depth),
+                        /* cleanup */ const char *pixel_format_str = NULL;
+                                      SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(image->pixel_format, &pixel_format_str));
+                                      SAIL_LOG_ERROR("PNG: %s pixel format is not currently supported for writing", pixel_format_str);
+                                      return __sail_error_result);
 
     /* Write meta data. */
     if (png_state->write_options->io_options & SAIL_IO_OPTION_META_DATA && image->meta_data_node != NULL) {
-        SAIL_LOG_DEBUG("PNG: Writing meta data");
         SAIL_TRY(png_private_write_meta_data(png_state->png_ptr, png_state->info_ptr, image->meta_data_node));
+        SAIL_LOG_DEBUG("PNG: Meta data has been written");
     }
 
     png_set_IHDR(png_state->png_ptr,
@@ -577,7 +586,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v5_png(void *state, s
                         (const png_bytep)image->iccp->data,
                         image->iccp->data_length);
 
-        SAIL_LOG_DEBUG("PNG: ICC profile has been set");
+        SAIL_LOG_DEBUG("PNG: ICC profile has been written");
     }
 
     /* Write palette. */

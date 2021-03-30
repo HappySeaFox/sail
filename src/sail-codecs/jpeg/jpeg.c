@@ -299,6 +299,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_init_v5_jpeg(struct sail_io *io, cons
 
     /* Sanity check. */
     if (jpeg_state->write_options->compression != SAIL_COMPRESSION_JPEG) {
+        SAIL_LOG_ERROR("JPEG: Only JPEG compression is allowed for writing");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_COMPRESSION);
     }
 
@@ -342,25 +343,28 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v5_jpeg(void *state, 
     unsigned bits_per_pixel;
     SAIL_TRY(sail_bits_per_pixel(image->pixel_format, &bits_per_pixel));
 
+    /* Compute output pixel format. */
+    const J_COLOR_SPACE color_space = jpeg_private_pixel_format_to_color_space(image->pixel_format);
+
+    if (color_space == JCS_UNKNOWN) {
+        const char *pixel_format_str = NULL;
+        SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(image->pixel_format, &pixel_format_str));
+        SAIL_LOG_ERROR("JPEG: %s pixel format is not currently supported for writing", pixel_format_str);
+
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+    }
+
     /* Initialize compression. */
     jpeg_state->compress_context->image_width = image->width;
     jpeg_state->compress_context->image_height = image->height;
     jpeg_state->compress_context->input_components = bits_per_pixel / 8;
-    jpeg_state->compress_context->in_color_space = jpeg_private_pixel_format_to_color_space(image->pixel_format);
+    jpeg_state->compress_context->in_color_space = color_space;
 
     jpeg_set_defaults(jpeg_state->compress_context);
+    jpeg_set_colorspace(jpeg_state->compress_context, color_space);
 
     /* Write resolution. */
     SAIL_TRY(jpeg_private_write_resolution(jpeg_state->compress_context, image->resolution));
-
-    /* Compute output pixel format. */
-    J_COLOR_SPACE output_color_space = jpeg_private_pixel_format_to_color_space(image->pixel_format);
-
-    if (output_color_space == JCS_UNKNOWN) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
-    }
-
-    jpeg_set_colorspace(jpeg_state->compress_context, output_color_space);
 
     /* Compute image quality. */
     const double compression = (jpeg_state->write_options->compression_level < COMPRESSION_MIN ||
@@ -376,13 +380,14 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v5_jpeg(void *state, 
     /* Write meta data. */
     if (jpeg_state->write_options->io_options & SAIL_IO_OPTION_META_DATA && image->meta_data_node != NULL) {
         SAIL_TRY(jpeg_private_write_meta_data(jpeg_state->compress_context, image->meta_data_node));
+        SAIL_LOG_DEBUG("JPEG: Meta data has been written");
     }
 
     /* Write ICC profile. */
 #ifdef SAIL_HAVE_JPEG_ICCP
     if (jpeg_state->write_options->io_options & SAIL_IO_OPTION_ICCP && image->iccp != NULL) {
-        SAIL_LOG_DEBUG("JPEG: Writing ICC profile");
         jpeg_write_icc_profile(jpeg_state->compress_context, image->iccp->data, image->iccp->data_length);
+        SAIL_LOG_DEBUG("JPEG: ICC profile has been written");
     }
 #endif
 

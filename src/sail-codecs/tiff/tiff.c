@@ -55,10 +55,6 @@ static sail_status_t alloc_tiff_state(struct tiff_state **tiff_state) {
     SAIL_TRY(sail_malloc(sizeof(struct tiff_state), &ptr));
     *tiff_state = ptr;
 
-    if (*tiff_state == NULL) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_MEMORY_ALLOCATION);
-    }
-
     (*tiff_state)->tiff              = NULL;
     (*tiff_state)->current_frame     = 0;
     (*tiff_state)->libtiff_error     = false;
@@ -284,7 +280,11 @@ SAIL_EXPORT sail_status_t sail_codec_write_init_v5_tiff(struct sail_io *io, cons
     SAIL_TRY(sail_copy_write_options(write_options, &tiff_state->write_options));
 
     /* Sanity check. */
-    SAIL_TRY(tiff_private_sail_compression_to_compression(tiff_state->write_options->compression, &tiff_state->write_compression));
+    SAIL_TRY_OR_EXECUTE(tiff_private_sail_compression_to_compression(tiff_state->write_options->compression, &tiff_state->write_compression),
+                        /* cleanup */ const char *compression_str = NULL;
+                                      SAIL_TRY_OR_SUPPRESS(sail_compression_to_string(tiff_state->write_options->compression, &compression_str));
+                                      SAIL_LOG_ERROR("TIFF: %s compression is not supported for writing", compression_str);
+                                      return __sail_error_result);
 
     TIFFSetWarningHandler(tiff_private_my_warning_fn);
     TIFFSetErrorHandler(tiff_private_my_error_fn);

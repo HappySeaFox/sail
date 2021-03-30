@@ -45,7 +45,7 @@ macro(sail_codec_post_add)
             # Hardcode compressions as check_c_source_runs() fails in VCPKG mode.
             # It fails because it cannot find tiff.dll.
             #
-            set(CODEC_INFO_COMPRESSIONS ADOBE-DEFLATE DEFLATE JPEG LZW NONE PACKBITS)
+            set(SAIL_TIFF_CODEC_INFO_COMPRESSIONS ADOBE-DEFLATE DEFLATE JPEG LZW NONE PACKBITS)
             target_compile_definitions(${TARGET} PRIVATE SAIL_HAVE_TIFF_WRITE_ADOBE_DEFLATE)
             target_compile_definitions(${TARGET} PRIVATE SAIL_HAVE_TIFF_WRITE_DEFLATE)
             target_compile_definitions(${TARGET} PRIVATE SAIL_HAVE_TIFF_WRITE_JPEG)
@@ -114,7 +114,7 @@ macro(sail_codec_post_add)
                 string(REPLACE "PIXARFILM" "PIXAR-FILM" tiff_codec_fixed ${tiff_codec_fixed})
                 string(REPLACE "SGILOG24"  "SGI-LOG24"  tiff_codec_fixed ${tiff_codec_fixed})
                 string(REPLACE "SGILOG"    "SGI-LOG"    tiff_codec_fixed ${tiff_codec_fixed})
-                list(APPEND CODEC_INFO_COMPRESSIONS ${tiff_codec_fixed})
+                list(APPEND SAIL_TIFF_CODEC_INFO_COMPRESSIONS ${tiff_codec_fixed})
 
                 target_compile_definitions(${TARGET} PRIVATE SAIL_HAVE_TIFF_WRITE_${tiff_codec})
             endif()
@@ -123,9 +123,9 @@ macro(sail_codec_post_add)
 
     # Default compression
     #
-    if (JPEG IN_LIST CODEC_INFO_COMPRESSIONS)
-        set(CODEC_INFO_DEFAULT_COMPRESSION JPEG)
+    if (JPEG IN_LIST SAIL_TIFF_CODEC_INFO_COMPRESSIONS)
+        set(SAIL_TIFF_CODEC_INFO_DEFAULT_COMPRESSION JPEG)
     else()
-        set(CODEC_INFO_DEFAULT_COMPRESSION NONE)
+        set(SAIL_TIFF_CODEC_INFO_DEFAULT_COMPRESSION NONE)
     endif()
 endmacro()
