@@ -47,7 +47,7 @@ struct sail_image;
  * The output image MUST be destroyed later with sail_destroy_image().
  *
  * Allowed input pixel formats:
- *   - Everything except LUV and LAB
+ *   - Anything except LUV and LAB
  *
  * Allowed output pixel formats:
  *   - SAIL_PIXEL_FORMAT_BPP64_RGBX
@@ -69,7 +69,7 @@ SAIL_EXPORT sail_status_t sail_convert_image_to_bpp64_rgba_kind(const struct sai
  * Converts the specified input image to the BPP64-RGBA-ish format. If the function fails, the image pixels may be left partially converted.
  *
  * Allowed input pixel formats:
- *   - Everything with 64 bits per pixel except LUV and LAB
+ *   - Anything with 64 bits per pixel except LUV and LAB
  *
  * Allowed output pixel formats:
  *   - SAIL_PIXEL_FORMAT_BPP64_RGBX
