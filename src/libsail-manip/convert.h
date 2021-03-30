@@ -27,9 +27,11 @@
 #define SAIL_CONVERT_H
 
 #ifdef SAIL_BUILD
+    #include "common.h"
     #include "error.h"
     #include "export.h"
 #else
+    #include <sail-common/common.h>
     #include <sail-common/error.h>
     #include <sail-common/export.h>
 #endif
@@ -38,26 +40,57 @@
 extern "C" {
 #endif
 
+struct sail_image;
+
 /*
  * Converts the specified input image to the BPP64-RGBA-ish format and saves the result in the output image.
  * The output image MUST be destroyed later with sail_destroy_image().
  *
- * Allowed output pixel formats:
+ * Allowed input pixel formats:
+ *   - Everything except LUV and LAB
  *
- *    SAIL_PIXEL_FORMAT_BPP64_RGBX
- *    SAIL_PIXEL_FORMAT_BPP64_BGRX
- *    SAIL_PIXEL_FORMAT_BPP64_XRGB
- *    SAIL_PIXEL_FORMAT_BPP64_XBGR
- *    SAIL_PIXEL_FORMAT_BPP64_RGBA
- *    SAIL_PIXEL_FORMAT_BPP64_BGRA
- *    SAIL_PIXEL_FORMAT_BPP64_ARGB
- *    SAIL_PIXEL_FORMAT_BPP64_ABGR
+ * Allowed output pixel formats:
+ *   - SAIL_PIXEL_FORMAT_BPP64_RGBX
+ *   - SAIL_PIXEL_FORMAT_BPP64_BGRX
+ *   - SAIL_PIXEL_FORMAT_BPP64_XRGB
+ *   - SAIL_PIXEL_FORMAT_BPP64_XBGR
+ *   - SAIL_PIXEL_FORMAT_BPP64_RGBA
+ *   - SAIL_PIXEL_FORMAT_BPP64_BGRA
+ *   - SAIL_PIXEL_FORMAT_BPP64_ARGB
+ *   - SAIL_PIXEL_FORMAT_BPP64_ABGR
  *
  * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_convert_image_to_bpp64_rgba_kind(const struct sail_image *image_input,
                                                                 enum SailPixelFormat output_pixel_format,
                                                                 struct sail_image **image_output);
+
+/*
+ * Converts the specified input image to the BPP64-RGBA-ish format. If the function fails, the image pixels may be left partially converted.
+ *
+ * Allowed input pixel formats:
+ *   - SAIL_PIXEL_FORMAT_BPP64_RGBX
+ *   - SAIL_PIXEL_FORMAT_BPP64_BGRX
+ *   - SAIL_PIXEL_FORMAT_BPP64_XRGB
+ *   - SAIL_PIXEL_FORMAT_BPP64_XBGR
+ *   - SAIL_PIXEL_FORMAT_BPP64_RGBA
+ *   - SAIL_PIXEL_FORMAT_BPP64_BGRA
+ *   - SAIL_PIXEL_FORMAT_BPP64_ARGB
+ *   - SAIL_PIXEL_FORMAT_BPP64_ABGR
+ *
+ * Allowed output pixel formats:
+ *   - SAIL_PIXEL_FORMAT_BPP64_RGBX
+ *   - SAIL_PIXEL_FORMAT_BPP64_BGRX
+ *   - SAIL_PIXEL_FORMAT_BPP64_XRGB
+ *   - SAIL_PIXEL_FORMAT_BPP64_XBGR
+ *   - SAIL_PIXEL_FORMAT_BPP64_RGBA
+ *   - SAIL_PIXEL_FORMAT_BPP64_BGRA
+ *   - SAIL_PIXEL_FORMAT_BPP64_ARGB
+ *   - SAIL_PIXEL_FORMAT_BPP64_ABGR
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_convert_image_to_bpp64_rgba_kind_in_place(struct sail_image *image, enum SailPixelFormat output_pixel_format);
 
 /* extern "C" */
 #ifdef __cplusplus

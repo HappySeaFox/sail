@@ -23,6 +23,7 @@
     SOFTWARE.
 */
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -92,14 +93,7 @@ static void fill_rgba64_pixel(uint16_t *scan, int r, int g, int b, int a, uint16
     }
 }
 
-/*
- * Public functions.
- */
-
-sail_status_t sail_convert_image_to_bpp64_rgba_kind(const struct sail_image *image_input, enum SailPixelFormat output_pixel_format, struct sail_image **image_output) {
-
-    SAIL_CHECK_IMAGE(image_input);
-    SAIL_CHECK_IMAGE_PTR(image_output);
+static sail_status_t to_bpp64_rgba_kind(const struct sail_image *image_input, enum SailPixelFormat output_pixel_format, struct sail_image *image_output) {
 
     int r, g, b, a;
 
@@ -121,24 +115,11 @@ sail_status_t sail_convert_image_to_bpp64_rgba_kind(const struct sail_image *ima
         }
     }
 
-    struct sail_image *image_local;
-    SAIL_TRY(sail_copy_image_skeleton(image_input, &image_local));
-
-    /* Setup new properties. */
-    image_local->pixel_format = output_pixel_format;
-
-    SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(image_local->width, image_local->pixel_format, &image_local->bytes_per_line),
-                        /* cleanup */ sail_destroy_image(image_local));
-
-    const unsigned pixels_size = image_local->height * image_local->bytes_per_line;
-    SAIL_TRY_OR_CLEANUP(sail_malloc(pixels_size, &image_local->pixels),
-                        /* cleanup */ sail_destroy_image(image_local));
-
     sail_rgba64_t rgba;
 
     /* Convert image. */
     for (unsigned row = 0; row < image_input->height; row++) {
-        uint16_t *scan_output = (uint16_t *)((uint8_t *)image_local->pixels + image_local->bytes_per_line * row);
+        uint16_t *scan_output = (uint16_t *)((uint8_t *)image_output->pixels + image_output->bytes_per_line * row);
 
         switch (image_input->pixel_format) {
             case SAIL_PIXEL_FORMAT_BPP1_INDEXED:
@@ -394,6 +375,86 @@ sail_status_t sail_convert_image_to_bpp64_rgba_kind(const struct sail_image *ima
                 }
                 break;
             }
+            case SAIL_PIXEL_FORMAT_BPP64_RGBX: {
+                const uint16_t *scan_input = (uint16_t *)((uint8_t *)image_input->pixels + image_input->bytes_per_line * row);
+
+                for (unsigned pixel_index = 0; pixel_index < image_input->width; pixel_index++) {
+                    fill_rgba64_pixel(scan_output, r, g, b, a, *(scan_input+0), *(scan_input+1), *(scan_input+2), 65535);
+                    scan_input += 4;
+                    scan_output += 4;
+                }
+                break;
+            }
+            case SAIL_PIXEL_FORMAT_BPP64_BGRX: {
+                const uint16_t *scan_input = (uint16_t *)((uint8_t *)image_input->pixels + image_input->bytes_per_line * row);
+
+                for (unsigned pixel_index = 0; pixel_index < image_input->width; pixel_index++) {
+                    fill_rgba64_pixel(scan_output, r, g, b, a, *(scan_input+2), *(scan_input+1), *(scan_input+0), 65535);
+                    scan_input += 4;
+                    scan_output += 4;
+                }
+                break;
+            }
+            case SAIL_PIXEL_FORMAT_BPP64_XRGB: {
+                const uint16_t *scan_input = (uint16_t *)((uint8_t *)image_input->pixels + image_input->bytes_per_line * row);
+
+                for (unsigned pixel_index = 0; pixel_index < image_input->width; pixel_index++) {
+                    fill_rgba64_pixel(scan_output, r, g, b, a, *(scan_input+1), *(scan_input+2), *(scan_input+3), 65535);
+                    scan_input += 4;
+                    scan_output += 4;
+                }
+                break;
+            }
+            case SAIL_PIXEL_FORMAT_BPP64_XBGR: {
+                const uint16_t *scan_input = (uint16_t *)((uint8_t *)image_input->pixels + image_input->bytes_per_line * row);
+
+                for (unsigned pixel_index = 0; pixel_index < image_input->width; pixel_index++) {
+                    fill_rgba64_pixel(scan_output, r, g, b, a, *(scan_input+3), *(scan_input+2), *(scan_input+1), 65535);
+                    scan_input += 4;
+                    scan_output += 4;
+                }
+                break;
+            }
+            case SAIL_PIXEL_FORMAT_BPP64_RGBA: {
+                const uint16_t *scan_input = (uint16_t *)((uint8_t *)image_input->pixels + image_input->bytes_per_line * row);
+
+                for (unsigned pixel_index = 0; pixel_index < image_input->width; pixel_index++) {
+                    fill_rgba64_pixel(scan_output, r, g, b, a, *(scan_input+0), *(scan_input+1), *(scan_input+2), *(scan_input+3));
+                    scan_input += 4;
+                    scan_output += 4;
+                }
+                break;
+            }
+            case SAIL_PIXEL_FORMAT_BPP64_BGRA: {
+                const uint16_t *scan_input = (uint16_t *)((uint8_t *)image_input->pixels + image_input->bytes_per_line * row);
+
+                for (unsigned pixel_index = 0; pixel_index < image_input->width; pixel_index++) {
+                    fill_rgba64_pixel(scan_output, r, g, b, a, *(scan_input+2), *(scan_input+1), *(scan_input+0), *(scan_input+3));
+                    scan_input += 4;
+                    scan_output += 4;
+                }
+                break;
+            }
+            case SAIL_PIXEL_FORMAT_BPP64_ARGB: {
+                const uint16_t *scan_input = (uint16_t *)((uint8_t *)image_input->pixels + image_input->bytes_per_line * row);
+
+                for (unsigned pixel_index = 0; pixel_index < image_input->width; pixel_index++) {
+                    fill_rgba64_pixel(scan_output, r, g, b, a, *(scan_input+1), *(scan_input+2), *(scan_input+3), *(scan_input+0));
+                    scan_input += 4;
+                    scan_output += 4;
+                }
+                break;
+            }
+            case SAIL_PIXEL_FORMAT_BPP64_ABGR: {
+                const uint16_t *scan_input = (uint16_t *)((uint8_t *)image_input->pixels + image_input->bytes_per_line * row);
+
+                for (unsigned pixel_index = 0; pixel_index < image_input->width; pixel_index++) {
+                    fill_rgba64_pixel(scan_output, r, g, b, a, *(scan_input+3), *(scan_input+2), *(scan_input+1), *(scan_input+0));
+                    scan_input += 4;
+                    scan_output += 4;
+                }
+                break;
+            }
             case SAIL_PIXEL_FORMAT_BPP32_CMYK: {
                 const uint8_t *scan_input = (uint8_t *)image_input->pixels + image_input->bytes_per_line * row;
 
@@ -446,8 +507,6 @@ sail_status_t sail_convert_image_to_bpp64_rgba_kind(const struct sail_image *ima
                 break;
             }
             default: {
-                sail_destroy_image(image_local);
-
                 const char *pixel_format_str = NULL;
                 SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(image_input->pixel_format, &pixel_format_str));
                 SAIL_LOG_ERROR("Conversion %s -> kind of BPP64-RGBA is not currently supported", pixel_format_str);
@@ -457,7 +516,59 @@ sail_status_t sail_convert_image_to_bpp64_rgba_kind(const struct sail_image *ima
         }
     }
 
+    return SAIL_OK;
+}
+
+/*
+ * Public functions.
+ */
+
+sail_status_t sail_convert_image_to_bpp64_rgba_kind(const struct sail_image *image_input, enum SailPixelFormat output_pixel_format, struct sail_image **image_output) {
+
+    SAIL_CHECK_IMAGE(image_input);
+    SAIL_CHECK_IMAGE_PTR(image_output);
+
+    struct sail_image *image_local;
+    SAIL_TRY(sail_copy_image_skeleton(image_input, &image_local));
+
+    image_local->pixel_format = output_pixel_format;
+
+    SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(image_local->width, image_local->pixel_format, &image_local->bytes_per_line),
+                        /* cleanup */ sail_destroy_image(image_local));
+
+    const unsigned pixels_size = image_local->height * image_local->bytes_per_line;
+    SAIL_TRY_OR_CLEANUP(sail_malloc(pixels_size, &image_local->pixels),
+                        /* cleanup */ sail_destroy_image(image_local));
+
+    SAIL_TRY_OR_CLEANUP(to_bpp64_rgba_kind(image_input, output_pixel_format, image_local),
+                        /* cleanup */ sail_destroy_image(image_local));
+
     *image_output = image_local;
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_convert_image_to_bpp64_rgba_kind_in_place(struct sail_image *image, enum SailPixelFormat output_pixel_format) {
+
+    SAIL_CHECK_IMAGE(image);
+
+    bool equal;
+    SAIL_TRY(sail_equal_bits_per_pixel(image->pixel_format, output_pixel_format, &equal));
+
+    if (!equal) {
+        const char *input_pixel_format_str = NULL;
+        SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(image->pixel_format, &input_pixel_format_str));
+        const char *output_pixel_format_str = NULL;
+        SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(image->pixel_format, &output_pixel_format_str));
+
+        SAIL_LOG_ERROR("Conversion from %s to %s pixel format is not supported by this function", input_pixel_format_str, output_pixel_format_str);
+
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+    }
+
+    SAIL_TRY(to_bpp64_rgba_kind(image, output_pixel_format, image));
+
+    image->pixel_format = output_pixel_format;
 
     return SAIL_OK;
 }
