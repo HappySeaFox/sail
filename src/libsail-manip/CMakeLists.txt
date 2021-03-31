@@ -1,6 +1,10 @@
 add_library(sail-manip
                 convert_to_32.c
-                convert_to_64.c)
+                convert_to_32.h
+                convert_to_64.c
+                convert_to_64.h
+                ycbcr.c
+                ycbcr.h)
 
 # Build a list of public headers to install
 #

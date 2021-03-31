@@ -31,6 +31,8 @@
 
 #include "sail-manip.h"
 
+#include "ycbcr.h"
+
 /*
  * Private functions.
  */
@@ -455,19 +457,13 @@ static sail_status_t to_bpp32_rgba_kind(const struct sail_image *image_input, in
             }
             case SAIL_PIXEL_FORMAT_BPP24_YCBCR: {
                 const uint8_t *scan_input = (uint8_t *)image_input->pixels + image_input->bytes_per_line * row;
+                uint8_t rv, gv, bv;
 
                 for (unsigned pixel_index = 0; pixel_index < image_input->width; pixel_index++) {
-                    const double Y  = *scan_input++;
-                    const double Cb = *scan_input++;
-                    const double Cr = *scan_input++;
+                    convert_ycbcr_to_rgb(*(scan_input+0), *(scan_input+1), *(scan_input+2), &rv, &gv, &bv);
+                    fill_rgba32_pixel(scan_output, r, g, b, a, rv, gv, bv, 255);
 
-                    const int rv = (int)(Y                        + 1.402   * (Cr - 128));
-                    const int gv = (int)(Y - 0.34414 * (Cb - 128) - 0.71414 * (Cr - 128));
-                    const int bv = (int)(Y + 1.772   * (Cb - 128));
-
-                    fill_rgba32_pixel(scan_output, r, g, b, a,
-                                        (uint8_t)(max(0, min(255, rv))), (uint8_t)(max(0, min(255, gv))),
-                                        (uint8_t)(max(0, min(255, bv))), 255);
+                    scan_input += 3;
                     scan_output += 4;
                 }
                 break;
