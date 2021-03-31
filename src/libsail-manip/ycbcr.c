@@ -23,7 +23,10 @@
     SOFTWARE.
 */
 
+#include <stdbool.h>
 #include <stdlib.h>
+
+#include "config.h"
 
 #include "sail-common.h"
 
@@ -31,11 +34,25 @@
 
 void convert_ycbcr_to_rgb(uint8_t y, uint8_t cb, uint8_t cr, uint8_t *r, uint8_t *g, uint8_t *b) {
 
-    const int rv = (int)(y                        + 1.40200 * (cr - 128));
-    const int gv = (int)(y - 0.34414 * (cb - 128) - 0.71414 * (cr - 128));
-    const int bv = (int)(y + 1.77200 * (cb - 128));
+    SAIL_THREAD_LOCAL static int R_CR[256];
+    SAIL_THREAD_LOCAL static int G_CB[256];
+    SAIL_THREAD_LOCAL static int G_CR[256];
+    SAIL_THREAD_LOCAL static int B_CB[256];
 
-    *r = (uint8_t)(max(0, min(255, rv)));
-    *g = (uint8_t)(max(0, min(255, gv)));
-    *b = (uint8_t)(max(0, min(255, bv)));
+    SAIL_THREAD_LOCAL static bool cache_initialized = false;
+
+    if (!cache_initialized) {
+        for (int i = 0; i < 256; i++) {
+            R_CR[i] = (int)(1.40200 * (i - 128));
+            G_CB[i] = (int)(0.34414 * (i - 128));
+            G_CR[i] = (int)(0.71414 * (i - 128));
+            B_CB[i] = (int)(1.77200 * (i - 128));
+        }
+
+        cache_initialized = true;
+    }
+
+    *r = (uint8_t)(max(0, min(255, y            + R_CR[cr])));
+    *g = (uint8_t)(max(0, min(255, y - G_CB[cb] - G_CR[cr])));
+    *b = (uint8_t)(max(0, min(255, y + B_CB[cb])));
 }
