@@ -1,9 +1,11 @@
 add_library(sail-manip
-                convert.c)
+                convert_to_32.c
+                convert_to_64.c)
 
 # Build a list of public headers to install
 #
-set(PUBLIC_HEADERS "convert.h"
+set(PUBLIC_HEADERS "convert_to_32.h"
+                   "convert_to_64.h"
                    "sail-manip.h")
 
 set_target_properties(sail-manip PROPERTIES

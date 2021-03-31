@@ -31,11 +31,13 @@
 #ifdef SAIL_BUILD
     #include "sail-common.h"
 
-    #include "convert.h"
+    #include "convert_to_32.h"
+    #include "convert_to_64.h"
 #else
     #include <sail-common/sail-common.h>
 
-    #include <sail-manip/convert.h>
+    #include <sail-manip/convert_to_32.h>
+    #include <sail-manip/convert_to_64.h>
 #endif
 
 #endif
