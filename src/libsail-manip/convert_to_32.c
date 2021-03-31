@@ -94,19 +94,19 @@ static sail_status_t get_palette_rgba32(const struct sail_palette *palette, unsi
     return SAIL_OK;
 }
 
-static inline void spread_gray8_to_rgba32(uint8_t value, sail_rgba32_t *color) {
+static void spread_gray8_to_rgba32(uint8_t value, sail_rgba32_t *color) {
 
     color->component1 = color->component2 = color->component3 = value;
     color->component4 = 255;
 }
 
-static inline void spread_gray16_to_rgba32(uint16_t value, sail_rgba32_t *color) {
+static void spread_gray16_to_rgba32(uint16_t value, sail_rgba32_t *color) {
 
     color->component1 = color->component2 = color->component3 = (uint8_t)(value / 257.0);
     color->component4 = 255;
 }
 
-static inline void fill_rgba32_pixel(uint8_t *scan, int r, int g, int b, int a, uint8_t rv, uint8_t gv, uint8_t bv, uint8_t av) {
+static void fill_rgba32_pixel(uint8_t *scan, int r, int g, int b, int a, uint8_t rv, uint8_t gv, uint8_t bv, uint8_t av) {
 
     *(scan+r) = rv;
     *(scan+g) = gv;
@@ -116,7 +116,7 @@ static inline void fill_rgba32_pixel(uint8_t *scan, int r, int g, int b, int a, 
     }
 }
 
-static inline void fill_rgba32_scan_from_rgb24_kind(const uint8_t **scan_input, unsigned width, int ri, int gi, int bi, uint8_t **scan_output, int r, int g, int b, int a) {
+static void fill_rgba32_scan_from_rgb24_kind(const uint8_t **scan_input, unsigned width, int ri, int gi, int bi, uint8_t **scan_output, int r, int g, int b, int a) {
 
     for (unsigned pixel_index = 0; pixel_index < width; pixel_index++) {
         fill_rgba32_pixel(*scan_output, r, g, b, a, *(*scan_input+ri), *(*scan_input+gi), *(*scan_input+bi), 255);
@@ -125,7 +125,7 @@ static inline void fill_rgba32_scan_from_rgb24_kind(const uint8_t **scan_input, 
     }
 }
 
-static inline void fill_rgba32_scan_from_rgba32_kind(const uint8_t **scan_input, unsigned width, int ri, int gi, int bi, int ai, uint8_t **scan_output, int r, int g, int b, int a) {
+static void fill_rgba32_scan_from_rgba32_kind(const uint8_t **scan_input, unsigned width, int ri, int gi, int bi, int ai, uint8_t **scan_output, int r, int g, int b, int a) {
 
     for (unsigned pixel_index = 0; pixel_index < width; pixel_index++) {
         fill_rgba32_pixel(*scan_output, r, g, b, a, *(*scan_input+ri), *(*scan_input+gi), *(*scan_input+bi), *(*scan_input+ai));
@@ -134,7 +134,7 @@ static inline void fill_rgba32_scan_from_rgba32_kind(const uint8_t **scan_input,
     }
 }
 
-static inline void fill_rgba32_scan_from_rgbx32_kind(const uint8_t **scan_input, unsigned width, int ri, int gi, int bi, uint8_t **scan_output, int r, int g, int b, int a) {
+static void fill_rgba32_scan_from_rgbx32_kind(const uint8_t **scan_input, unsigned width, int ri, int gi, int bi, uint8_t **scan_output, int r, int g, int b, int a) {
 
     for (unsigned pixel_index = 0; pixel_index < width; pixel_index++) {
         fill_rgba32_pixel(*scan_output, r, g, b, a, *(*scan_input+ri), *(*scan_input+gi), *(*scan_input+bi), 255);
@@ -143,7 +143,7 @@ static inline void fill_rgba32_scan_from_rgbx32_kind(const uint8_t **scan_input,
     }
 }
 
-static inline void fill_rgba32_scan_from_rgb48_kind(const uint16_t **scan_input, unsigned width, int ri, int gi, int bi, uint8_t **scan_output, int r, int g, int b, int a) {
+static void fill_rgba32_scan_from_rgb48_kind(const uint16_t **scan_input, unsigned width, int ri, int gi, int bi, uint8_t **scan_output, int r, int g, int b, int a) {
 
     for (unsigned pixel_index = 0; pixel_index < width; pixel_index++) {
         fill_rgba32_pixel(*scan_output, r, g, b, a, (uint8_t)(*(*scan_input+ri) / 257.0), (uint8_t)(*(*scan_input+gi) / 257.0), (uint8_t)(*(*scan_input+bi) / 257.0), 255);
@@ -152,7 +152,7 @@ static inline void fill_rgba32_scan_from_rgb48_kind(const uint16_t **scan_input,
     }
 }
 
-static inline void fill_rgba32_scan_from_rgba64_kind(const uint16_t **scan_input, unsigned width, int ri, int gi, int bi, int ai, uint8_t **scan_output, int r, int g, int b, int a) {
+static void fill_rgba32_scan_from_rgba64_kind(const uint16_t **scan_input, unsigned width, int ri, int gi, int bi, int ai, uint8_t **scan_output, int r, int g, int b, int a) {
 
     for (unsigned pixel_index = 0; pixel_index < width; pixel_index++) {
         fill_rgba32_pixel(*scan_output, r, g, b, a, (uint8_t)(*(*scan_input+ri) / 257.0), (uint8_t)(*(*scan_input+gi) / 257.0), (uint8_t)(*(*scan_input+bi) / 257.0), (uint8_t)(*(*scan_input+ai) / 257.0));
@@ -161,7 +161,7 @@ static inline void fill_rgba32_scan_from_rgba64_kind(const uint16_t **scan_input
     }
 }
 
-static inline void fill_rgba32_scan_from_rgbx64_kind(const uint16_t **scan_input, unsigned width, int ri, int gi, int bi, uint8_t **scan_output, int r, int g, int b, int a) {
+static void fill_rgba32_scan_from_rgbx64_kind(const uint16_t **scan_input, unsigned width, int ri, int gi, int bi, uint8_t **scan_output, int r, int g, int b, int a) {
 
     for (unsigned pixel_index = 0; pixel_index < width; pixel_index++) {
         fill_rgba32_pixel(*scan_output, r, g, b, a, (uint8_t)(*(*scan_input+ri) / 257.0), (uint8_t)(*(*scan_input+gi) / 257.0), (uint8_t)(*(*scan_input+bi) / 257.0), 255);
