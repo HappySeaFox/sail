@@ -31,6 +31,7 @@
 
 #include "sail-manip.h"
 
+#include "cmyk.h"
 #include "ycbcr.h"
 
 /*
@@ -425,32 +426,13 @@ static sail_status_t to_bpp64_rgba_kind(const struct sail_image *image_input, in
             }
             case SAIL_PIXEL_FORMAT_BPP32_CMYK: {
                 const uint8_t *scan_input = (uint8_t *)image_input->pixels + image_input->bytes_per_line * row;
+                uint8_t rv, gv, bv;
 
                 for (unsigned pixel_index = 0; pixel_index < image_input->width; pixel_index++) {
-                    const uint8_t C =  (uint8_t)(*scan_input++ / 100.0);
-                    const uint8_t M =  (uint8_t)(*scan_input++ / 100.0);
-                    const uint8_t Y =  (uint8_t)(*scan_input++ / 100.0);
-                    const uint8_t K =  (uint8_t)(*scan_input++ / 100.0);
+                    convert_cmyk32_to_rgb24(*(scan_input+0), *(scan_input+1), *(scan_input+2), *(scan_input+3), &rv, &gv, &bv);
+                    fill_rgba64_pixel(scan_output, r, g, b, a, rv * 257, gv * 257, bv * 257, 65535);
 
-                    fill_rgba64_pixel(scan_output, r, g, b, a,
-                                        (uint16_t)((1-C) * (1-K) * 65535), (uint16_t)((1-M) * (1-K) * 65535),
-                                        (uint16_t)((1-Y) * (1-K) * 65535), 65535);
-                    scan_output += 4;
-                }
-                break;
-            }
-            case SAIL_PIXEL_FORMAT_BPP64_CMYK: {
-                const uint16_t *scan_input = (uint16_t *)((uint8_t *)image_input->pixels + image_input->bytes_per_line * row);
-
-                for (unsigned pixel_index = 0; pixel_index < image_input->width; pixel_index++) {
-                    const uint16_t C =  (uint16_t)(*scan_input++ / 100.0);
-                    const uint16_t M =  (uint16_t)(*scan_input++ / 100.0);
-                    const uint16_t Y =  (uint16_t)(*scan_input++ / 100.0);
-                    const uint16_t K =  (uint16_t)(*scan_input++ / 100.0);
-
-                    fill_rgba64_pixel(scan_output, r, g, b, a,
-                                        (uint16_t)((1-C) * (1-K) * 255), (uint16_t)((1-M) * (1-K) * 255),
-                                        (uint16_t)((1-Y) * (1-K) * 255), 255);
+                    scan_input += 4;
                     scan_output += 4;
                 }
                 break;
