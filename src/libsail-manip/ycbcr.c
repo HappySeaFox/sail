@@ -23,8 +23,6 @@
     SOFTWARE.
 */
 
-#include <stdlib.h>
-
 #include "sail-common.h"
 
 #include "ycbcr.h"
@@ -46,7 +44,7 @@ static const int B_CB[256] = { -226, -225, -223, -221, -219, -217, -216, -214, -
 
 void convert_ycbcr_to_rgb(uint8_t y, uint8_t cb, uint8_t cr, uint8_t *r, uint8_t *g, uint8_t *b) {
 
-    *r = (uint8_t)(max(0, min(255, y            + R_CR[cr])));
-    *g = (uint8_t)(max(0, min(255, y - G_CB[cb] - G_CR[cr])));
-    *b = (uint8_t)(max(0, min(255, y + B_CB[cb])));
+    *r = (uint8_t)(SAIL_MAX(0, SAIL_MIN(255, y            + R_CR[cr])));
+    *g = (uint8_t)(SAIL_MAX(0, SAIL_MIN(255, y - G_CB[cb] - G_CR[cr])));
+    *b = (uint8_t)(SAIL_MAX(0, SAIL_MIN(255, y + B_CB[cb])));
 }

@@ -41,6 +41,10 @@
 
 struct sail_image;
 
+/* Min/max macros. */
+#define SAIL_MIN(a, b) (((a) < (b)) ? (a) : (b))
+#define SAIL_MAX(a, b) (((a) > (b)) ? (a) : (b))
+
 #ifdef __cplusplus
 extern "C" {
 #endif
