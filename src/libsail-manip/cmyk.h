@@ -34,6 +34,9 @@
     #include <sail-common/export.h>
 #endif
 
+/*
+ * CMYK to RGB conversion. It's known for being not 1:1 exact by design. See https://sourceforge.net/p/libjpeg-turbo/patches/15
+ */
 SAIL_HIDDEN void convert_cmyk32_to_rgb24(uint8_t c, uint8_t m, uint8_t y, uint8_t k, uint8_t *r, uint8_t *g, uint8_t *b);
 
 #endif
