@@ -182,6 +182,12 @@ See [EXAMPLES](EXAMPLES.md) for more.
 
 See [EXAMPLES](EXAMPLES.md) for more.
 
+## Preferred installation method
+
+- Windows: `vcpkg`
+- macOS: `brew`
+- Linux: native packages if available
+
 ## Architecture overview
 
 SAIL is written in pure C11 w/o using any third-party libraries (except for codecs). It also provides
