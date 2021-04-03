@@ -209,6 +209,11 @@ of functions shared between SAIL codecs and the high-level APIs in `libsail`.
 libsail is a feature-rich, high-level API. It provides comprehensive and lightweight interfaces to decode
 and encode images. End-users implementing C applications always work with libsail.
 
+### libsail-manip
+
+libsail-manip is a collection of image manipulation functions. For example, conversion functions from one pixel
+format to another.
+
 ### libsail-c++
 
 libsail-c++ is a C++ binding to libsail. End-users implementing C++ applications may choose
