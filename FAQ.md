@@ -110,8 +110,10 @@ For example, SAIL outputs BPP24-BGR images from full-color BMP files without tra
 
 ## What pixel formats SAIL is able to write?
 
-SAIL codecs always try to support as much output pixel formats as possible. The list of
-pixel formats that can be written by SAIL is codec-specific and is publicly available in every
+SAIL codecs always try to support as much output pixel formats as possible. SAIL doesn't convert
+one pixel format to another in writing operations. Images are always written as is.
+
+The list of pixel formats that can be written by SAIL is codec-specific and is publicly available in every
 .codec.info file. It can be accessed through `sail_codec_info_from_extension() -> codec_info -> write_features ->
 output_pixel_formats`.
 
