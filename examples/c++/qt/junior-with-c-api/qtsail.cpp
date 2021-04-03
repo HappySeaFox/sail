@@ -37,6 +37,8 @@
 
 #include <sail/sail.h>
 
+#include <sail-manip/sail-manip.h>
+
 //#define SAIL_CODEC_NAME jpeg
 //#include <sail/layouts/v4.h>
 
@@ -70,19 +72,27 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
      */
     SAIL_TRY(sail_read_file(path.toLocal8Bit(), &image));
 
+    struct sail_image *image_converted;
+    SAIL_TRY_OR_CLEANUP(sail_convert_image_to_bpp32_rgba_kind(image,
+                                                              SAIL_PIXEL_FORMAT_BPP32_RGBA,
+                                                              &image_converted),
+                        /* cleanup */ sail_destroy_image(image));
+
     // Construct QImage from the read image pixels.
     //
-    *qimage = QImage(reinterpret_cast<const uchar *>(image->pixels),
-                     image->width,
-                     image->height,
-                     image->bytes_per_line,
-                     sailPixelFormatToQImageFormat(image->pixel_format)).copy();
+    *qimage = QImage(reinterpret_cast<const uchar *>(image_converted->pixels),
+                     image_converted->width,
+                     image_converted->height,
+                     image_converted->bytes_per_line,
+                     sailPixelFormatToQImageFormat(image_converted->pixel_format)).copy();
 
     m_ui->labelStatus->setText(tr("%1  [%2x%3]")
                                 .arg(QFileInfo(path).fileName())
-                                .arg(image->width)
-                                .arg(image->height)
+                                .arg(image_converted->width)
+                                .arg(image_converted->height)
                                 );
+
+    sail_destroy_image(image_converted);
     sail_destroy_image(image);
 
     return SAIL_OK;
