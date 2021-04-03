@@ -144,7 +144,13 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v5_jpeg(struct sail_io *io, const
     jpeg_read_header(jpeg_state->decompress_context, true);
 
     /* Handle the requested color space. */
-    jpeg_state->decompress_context->out_color_space = jpeg_state->decompress_context->jpeg_color_space;
+    if (jpeg_state->read_options->io_options & SAIL_IO_OPTION_CLOSE_TO_SOURCE) {
+        jpeg_state->decompress_context->out_color_space = jpeg_state->decompress_context->jpeg_color_space;
+    } else if (jpeg_state->decompress_context->jpeg_color_space == JCS_YCbCr) {
+        jpeg_state->decompress_context->out_color_space = JCS_RGB;
+    } else {
+        jpeg_state->decompress_context->out_color_space = jpeg_state->decompress_context->jpeg_color_space;
+    }
 
     /* We don't want colormapped output. */
     jpeg_state->decompress_context->quantize_colors = false;
