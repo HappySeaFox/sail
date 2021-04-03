@@ -108,6 +108,8 @@ Ideally (but not always), it outputs the same pixel format as stored in the imag
 
 For example, SAIL outputs BPP24-BGR images from full-color BMP files without transparency.
 
+You can also consider conversion functions from `libsail-manip`.
+
 ## What pixel formats SAIL is able to write?
 
 SAIL codecs always try to support as much output pixel formats as possible. SAIL doesn't convert
