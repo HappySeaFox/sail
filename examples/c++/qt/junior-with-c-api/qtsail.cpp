@@ -40,7 +40,7 @@
 #include <sail-manip/sail-manip.h>
 
 //#define SAIL_CODEC_NAME jpeg
-//#include <sail/layouts/v4.h>
+//#include <sail/layouts/v5.h>
 
 #include "qtsail.h"
 #include "ui_qtsail.h"
