@@ -63,6 +63,6 @@ macro(sail_codec_post_add)
 
     if (SAIL_HAVE_JPEG_JCS_EXT)
         target_compile_definitions(${TARGET} PRIVATE SAIL_HAVE_JPEG_JCS_EXT)
-        set(SAIL_JPEG_CODEC_INFO_WRITE_EXT "BPP16-RGB565;BPP24-BGR;BPP32-RGBA;BPP32-BGRA;BPP32-ABGR;BPP32-ARGB;")
+        set(SAIL_JPEG_CODEC_INFO_WRITE_EXT "BPP24-RGB;")
     endif()
 endmacro()
