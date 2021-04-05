@@ -161,7 +161,7 @@ sail_status_t image_writer::start_writing(void *buffer, size_t buffer_length, co
 sail_status_t image_writer::start_writing(const io &sio, const codec_info &scodec_info)
 {
     SAIL_TRY(sio.to_sail_io(&d->sail_io));
-    SAIL_CHECK_IO(d->sail_io);
+    SAIL_TRY(sail_check_io_valid(d->sail_io));
 
     SAIL_TRY(sail_start_writing_io_with_options(d->sail_io,
                                                 scodec_info.sail_codec_info_c(),
@@ -174,7 +174,7 @@ sail_status_t image_writer::start_writing(const io &sio, const codec_info &scode
 sail_status_t image_writer::start_writing(const io &sio, const codec_info &scodec_info, const write_options &swrite_options)
 {
     SAIL_TRY(sio.to_sail_io(&d->sail_io));
-    SAIL_CHECK_IO(d->sail_io);
+    SAIL_TRY(sail_check_io_valid(d->sail_io));
 
     sail_write_options sail_write_options;
     SAIL_TRY(swrite_options.to_sail_write_options(&sail_write_options));
