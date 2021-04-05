@@ -816,6 +816,42 @@ sail_status_t sail_bytes_per_line(unsigned width, enum SailPixelFormat pixel_for
     return SAIL_OK;
 }
 
+bool sail_is_indexed(enum SailPixelFormat pixel_format) {
+
+    switch (pixel_format) {
+        case SAIL_PIXEL_FORMAT_BPP1_INDEXED:
+        case SAIL_PIXEL_FORMAT_BPP2_INDEXED:
+        case SAIL_PIXEL_FORMAT_BPP4_INDEXED:
+        case SAIL_PIXEL_FORMAT_BPP8_INDEXED:
+        case SAIL_PIXEL_FORMAT_BPP16_INDEXED: {
+            return true;
+        }
+        default: {
+            return false;
+        }
+    }
+}
+
+bool sail_is_grayscale(enum SailPixelFormat pixel_format) {
+
+    switch (pixel_format) {
+        case SAIL_PIXEL_FORMAT_BPP1_GRAYSCALE:
+        case SAIL_PIXEL_FORMAT_BPP2_GRAYSCALE:
+        case SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE:
+        case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE:
+        case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE:
+        case SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE_ALPHA:
+        case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE_ALPHA:
+        case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA:
+        case SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA: {
+            return true;
+        }
+        default: {
+            return false;
+        }
+    }
+}
+
 sail_status_t sail_print_errno(const char *format) {
 
     SAIL_CHECK_STRING_PTR(format);

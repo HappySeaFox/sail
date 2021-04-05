@@ -244,6 +244,16 @@ SAIL_EXPORT sail_status_t sail_greater_bits_per_pixel(enum SailPixelFormat pixel
 SAIL_EXPORT sail_status_t sail_bytes_per_line(unsigned width, enum SailPixelFormat pixel_format, unsigned *result);
 
 /*
+ * Returns true if the given pixel format is indexed and assumes having a palette.
+ */
+SAIL_EXPORT bool sail_is_indexed(enum SailPixelFormat pixel_format);
+
+/*
+ * Returns true if the given pixel format is grayscale (with or without alpha).
+ */
+SAIL_EXPORT bool sail_is_grayscale(enum SailPixelFormat pixel_format);
+
+/*
  * Prints the recent errno value with SAIL_LOG_ERROR(). The specified format must include '%s'.
  *
  * Returns SAIL_OK on success.
