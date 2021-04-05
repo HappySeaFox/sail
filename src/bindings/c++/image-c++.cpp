@@ -136,7 +136,7 @@ image::~image()
 
 bool image::is_valid() const
 {
-    return d->width > 0 && d->height > 0 && d->bytes_per_line > 0 && d->pixels != nullptr;
+    return d->width > 0 && d->height > 0 && d->bytes_per_line > 0 && d->pixels != nullptr && d->pixel_format != SAIL_PIXEL_FORMAT_UNKNOWN;
 }
 
 unsigned image::width() const
