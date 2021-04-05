@@ -219,7 +219,7 @@ sail_status_t image_reader::start_reading(const io &sio, const codec_info &scode
     SAIL_TRY(sio.to_sail_io(&d->sail_io));
 
     sail_io *sail_io = &d->sail_io;
-    SAIL_CHECK_IO(sail_io);
+    SAIL_TRY(sail_check_io_valid(sail_io));
 
     SAIL_TRY(sail_start_reading_io_with_options(&d->sail_io,
                                                 scodec_info.sail_codec_info_c(),
@@ -234,7 +234,7 @@ sail_status_t image_reader::start_reading(const io &sio, const codec_info &scode
     SAIL_TRY(sio.to_sail_io(&d->sail_io));
 
     sail_io *sail_io = &d->sail_io;
-    SAIL_CHECK_IO(sail_io);
+    SAIL_TRY(sail_check_io_valid(sail_io));
 
     sail_read_options sail_read_options;
     SAIL_TRY(sread_options.to_sail_read_options(&sail_read_options));

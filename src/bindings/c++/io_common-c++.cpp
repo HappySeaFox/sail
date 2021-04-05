@@ -179,7 +179,7 @@ sail_status_t io::is_valid_private() const
 {
     sail_io *sail_io = &d->sail_io;
 
-    SAIL_CHECK_IO(sail_io);
+    SAIL_TRY(sail_check_io_valid(sail_io));
 
     return SAIL_OK;
 }

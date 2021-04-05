@@ -214,6 +214,20 @@ SAIL_EXPORT sail_status_t sail_copy_image(const struct sail_image *source, struc
  */
 SAIL_EXPORT sail_status_t sail_copy_image_skeleton(const struct sail_image *source, struct sail_image **target);
 
+/*
+ * Returns SAIL_OK if the given image has valid pixel_format, dimensions, and bytes per line.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_check_image_skeleton_valid(const struct sail_image *image);
+
+/*
+ * Returns SAIL_OK if the given image has valid dimensions and pixels.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_check_image_valid(const struct sail_image *image);
+
 /* extern "C" */
 #ifdef __cplusplus
 }

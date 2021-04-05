@@ -141,37 +141,6 @@ do {                              \
 /*
  * Helper macros.
  */
-#define SAIL_CHECK_IO(io)                            \
-do {                                                 \
-    if (io == NULL) {                                \
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_IO_NULL_PTR); \
-    }                                                \
-    if (io->tolerant_read      == NULL ||            \
-            io->strict_read    == NULL ||            \
-            io->seek           == NULL ||            \
-            io->tell           == NULL ||            \
-            io->tolerant_write == NULL ||            \
-            io->strict_write   == NULL ||            \
-            io->flush          == NULL ||            \
-            io->close          == NULL ||            \
-            io->eof            == NULL) {            \
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IO);  \
-    }                                                \
-} while(0)
-
-#define SAIL_CHECK_IMAGE(image)                                     \
-do {                                                                \
-    if (image == NULL) {                                            \
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_IMAGE_NULL_PTR);             \
-    }                                                               \
-    if (image->width == 0 || image->height == 0) {                  \
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_INCORRECT_IMAGE_DIMENSIONS); \
-    }                                                               \
-    if (image->bytes_per_line == 0) {                               \
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_INCORRECT_BYTES_PER_LINE);   \
-    }                                                               \
-} while(0)
-
 #define SAIL_CHECK_PTR(ptr)                       \
 do {                                              \
     if (ptr == NULL) {                            \

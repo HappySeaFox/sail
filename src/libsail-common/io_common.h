@@ -213,6 +213,13 @@ SAIL_EXPORT sail_status_t sail_alloc_io(struct sail_io **io);
  */
 SAIL_EXPORT void sail_destroy_io(struct sail_io *io);
 
+/*
+ * Returns SAIL_OK if the given I/O object has valid callbacks.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_check_io_valid(const struct sail_io *io);
+
 /* extern "C" */
 #ifdef __cplusplus
 }

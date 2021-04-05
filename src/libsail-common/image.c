@@ -104,7 +104,7 @@ sail_status_t sail_copy_image(const struct sail_image *source, struct sail_image
 
 sail_status_t sail_copy_image_skeleton(const struct sail_image *source, struct sail_image **target) {
 
-    SAIL_CHECK_IMAGE(source);
+    SAIL_CHECK_IMAGE_PTR(source);
     SAIL_CHECK_IMAGE_PTR(target);
 
     struct sail_image *image_local;
@@ -141,6 +141,38 @@ sail_status_t sail_copy_image_skeleton(const struct sail_image *source, struct s
     }
 
     *target = image_local;
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_check_image_skeleton_valid(const struct sail_image *image)
+{
+    SAIL_CHECK_IMAGE_PTR(image);
+
+    if (image->pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN) {
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_PIXEL_FORMAT);
+    }
+    if (image->width == 0 || image->height == 0) {
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INCORRECT_IMAGE_DIMENSIONS);
+    }
+    if (image->bytes_per_line == 0) {
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INCORRECT_BYTES_PER_LINE);
+    }
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_check_image_valid(const struct sail_image *image)
+{
+    SAIL_CHECK_IMAGE_PTR(image);
+
+    SAIL_TRY(sail_check_image_skeleton_valid(image));
+
+    if (sail_is_indexed(image->pixel_format)) {
+        SAIL_CHECK_PALETTE_PTR(image->palette);
+    }
+
+    SAIL_CHECK_PIXELS_PTR(image->pixels);
 
     return SAIL_OK;
 }

@@ -163,7 +163,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v5_png(struct sail_io *io, const 
     SAIL_CHECK_STATE_PTR(state);
     *state = NULL;
 
-    SAIL_CHECK_IO(io);
+    SAIL_TRY(sail_check_io_valid(io));
     SAIL_CHECK_READ_OPTIONS_PTR(read_options);
 
     /* Allocate a new state. */
@@ -272,7 +272,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v5_png(struct sail_io *io, const 
 SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_png(void *state, struct sail_io *io, struct sail_image **image) {
 
     SAIL_CHECK_STATE_PTR(state);
-    SAIL_CHECK_IO(io);
+    SAIL_TRY(sail_check_io_valid(io));
     SAIL_CHECK_IMAGE_PTR(image);
 
     struct png_state *png_state = (struct png_state *)state;
@@ -377,8 +377,8 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_png(void *state, st
 SAIL_EXPORT sail_status_t sail_codec_read_seek_next_pass_v5_png(void *state, struct sail_io *io, const struct sail_image *image) {
 
     SAIL_CHECK_STATE_PTR(state);
-    SAIL_CHECK_IO(io);
-    SAIL_CHECK_IMAGE(image);
+    SAIL_TRY(sail_check_io_valid(io));
+    SAIL_TRY(sail_check_image_skeleton_valid(image));
 
     struct png_state *png_state = (struct png_state *)state;
 
@@ -392,8 +392,8 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_pass_v5_png(void *state, str
 SAIL_EXPORT sail_status_t sail_codec_read_frame_v5_png(void *state, struct sail_io *io, struct sail_image *image) {
 
     SAIL_CHECK_STATE_PTR(state);
-    SAIL_CHECK_IO(io);
-    SAIL_CHECK_IMAGE(image);
+    SAIL_TRY(sail_check_io_valid(io));
+    SAIL_TRY(sail_check_image_skeleton_valid(image));
 
     struct png_state *png_state = (struct png_state *)state;
 
@@ -460,7 +460,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v5_png(void *state, struct sail_
 SAIL_EXPORT sail_status_t sail_codec_read_finish_v5_png(void **state, struct sail_io *io) {
 
     SAIL_CHECK_STATE_PTR(state);
-    SAIL_CHECK_IO(io);
+    SAIL_TRY(sail_check_io_valid(io));
 
     struct png_state *png_state = (struct png_state *)(*state);
 
@@ -492,7 +492,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_init_v5_png(struct sail_io *io, const
     SAIL_CHECK_STATE_PTR(state);
     *state = NULL;
 
-    SAIL_CHECK_IO(io);
+    SAIL_TRY(sail_check_io_valid(io));
     SAIL_CHECK_WRITE_OPTIONS_PTR(write_options);
 
     struct png_state *png_state;
@@ -533,8 +533,8 @@ SAIL_EXPORT sail_status_t sail_codec_write_init_v5_png(struct sail_io *io, const
 SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v5_png(void *state, struct sail_io *io, const struct sail_image *image) {
 
     SAIL_CHECK_STATE_PTR(state);
-    SAIL_CHECK_IO(io);
-    SAIL_CHECK_IMAGE(image);
+    SAIL_TRY(sail_check_io_valid(io));
+    SAIL_TRY(sail_check_image_valid(image));
 
     struct png_state *png_state = (struct png_state *)state;
 
@@ -643,8 +643,8 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v5_png(void *state, s
 SAIL_EXPORT sail_status_t sail_codec_write_seek_next_pass_v5_png(void *state, struct sail_io *io, const struct sail_image *image) {
 
     SAIL_CHECK_STATE_PTR(state);
-    SAIL_CHECK_IO(io);
-    SAIL_CHECK_IMAGE(image);
+    SAIL_TRY(sail_check_io_valid(io));
+    SAIL_TRY(sail_check_image_valid(image));
 
     return SAIL_OK;
 }
@@ -652,8 +652,8 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_pass_v5_png(void *state, st
 SAIL_EXPORT sail_status_t sail_codec_write_frame_v5_png(void *state, struct sail_io *io, const struct sail_image *image) {
 
     SAIL_CHECK_STATE_PTR(state);
-    SAIL_CHECK_IO(io);
-    SAIL_CHECK_IMAGE(image);
+    SAIL_TRY(sail_check_io_valid(io));
+    SAIL_TRY(sail_check_image_valid(image));
 
     struct png_state *png_state = (struct png_state *)state;
 
@@ -677,7 +677,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_frame_v5_png(void *state, struct sail
 SAIL_EXPORT sail_status_t sail_codec_write_finish_v5_png(void **state, struct sail_io *io) {
 
     SAIL_CHECK_STATE_PTR(state);
-    SAIL_CHECK_IO(io);
+    SAIL_TRY(sail_check_io_valid(io));
 
     struct png_state *png_state = (struct png_state *)(*state);
 

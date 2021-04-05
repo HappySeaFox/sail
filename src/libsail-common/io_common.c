@@ -65,3 +65,22 @@ void sail_destroy_io(struct sail_io *io) {
 
     sail_free(io);
 }
+
+sail_status_t sail_check_io_valid(const struct sail_io *io)
+{
+    SAIL_CHECK_IO_PTR(io);
+
+    if (io->tolerant_read      == NULL ||
+            io->strict_read    == NULL ||
+            io->seek           == NULL ||
+            io->tell           == NULL ||
+            io->tolerant_write == NULL ||
+            io->strict_write   == NULL ||
+            io->flush          == NULL ||
+            io->close          == NULL ||
+            io->eof            == NULL) {
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IO);
+    }
+
+    return SAIL_OK;
+}
