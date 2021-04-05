@@ -38,12 +38,12 @@ class SAIL_HIDDEN image_writer::pimpl
 public:
     pimpl()
         : state(nullptr)
-        , sail_io{0, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr}
+        , sail_io(nullptr)
     {
     }
 
     void *state;
-    struct sail_io sail_io;
+    struct sail_io *sail_io;
 };
 
 image_writer::image_writer()
@@ -60,18 +60,13 @@ image_writer::~image_writer()
 sail_status_t image_writer::write(const std::string_view path, const image &simage)
 {
     sail_image *sail_image;
-    SAIL_TRY(sail_alloc_image(&sail_image));
+    SAIL_TRY(simage.to_sail_image(&sail_image));
 
-    SAIL_TRY_OR_CLEANUP(simage.to_sail_image(sail_image),
-                        /* cleanup */ sail_image->pixels = NULL,
+    SAIL_TRY_OR_CLEANUP(sail_write_file(path.data(), sail_image),
+                        /* cleanup */ sail_image->pixels = nullptr,
                                       sail_destroy_image(sail_image));
 
-    SAIL_TRY_OR_CLEANUP(sail_write_file(path.data(),
-                                        sail_image),
-                                        /* cleanup */ sail_image->pixels = NULL,
-                                        sail_destroy_image(sail_image));
-
-    sail_image->pixels = NULL;
+    sail_image->pixels = nullptr;
     sail_destroy_image(sail_image);
 
     return SAIL_OK;
@@ -89,20 +84,13 @@ sail_status_t image_writer::write(void *buffer, size_t buffer_length, const imag
     SAIL_CHECK_BUFFER_PTR(buffer);
 
     sail_image *sail_image;
-    SAIL_TRY(sail_alloc_image(&sail_image));
+    SAIL_TRY(simage.to_sail_image(&sail_image));
 
-    SAIL_TRY_OR_CLEANUP(simage.to_sail_image(sail_image),
-                        /* cleanup */ sail_image->pixels = NULL,
+    SAIL_TRY_OR_CLEANUP(sail_write_mem(buffer, buffer_length, sail_image, written),
+                        /* cleanup */ sail_image->pixels = nullptr,
                                       sail_destroy_image(sail_image));
 
-    SAIL_TRY_OR_CLEANUP(sail_write_mem(buffer,
-                                        buffer_length,
-                                        sail_image,
-                                        written),
-                        /* cleanup */ sail_image->pixels = NULL,
-                                      sail_destroy_image(sail_image));
-
-    sail_image->pixels = NULL;
+    sail_image->pixels = nullptr;
     sail_destroy_image(sail_image);
 
     return SAIL_OK;
@@ -172,11 +160,10 @@ sail_status_t image_writer::start_writing(void *buffer, size_t buffer_length, co
 
 sail_status_t image_writer::start_writing(const io &sio, const codec_info &scodec_info)
 {
-    SAIL_TRY(sio.verify_valid());
-
     SAIL_TRY(sio.to_sail_io(&d->sail_io));
+    SAIL_CHECK_IO(d->sail_io);
 
-    SAIL_TRY(sail_start_writing_io_with_options(&d->sail_io,
+    SAIL_TRY(sail_start_writing_io_with_options(d->sail_io,
                                                 scodec_info.sail_codec_info_c(),
                                                 NULL,
                                                 &d->state));
@@ -186,14 +173,13 @@ sail_status_t image_writer::start_writing(const io &sio, const codec_info &scode
 
 sail_status_t image_writer::start_writing(const io &sio, const codec_info &scodec_info, const write_options &swrite_options)
 {
-    SAIL_TRY(sio.verify_valid());
-
     SAIL_TRY(sio.to_sail_io(&d->sail_io));
+    SAIL_CHECK_IO(d->sail_io);
 
     sail_write_options sail_write_options;
     SAIL_TRY(swrite_options.to_sail_write_options(&sail_write_options));
 
-    SAIL_TRY(sail_start_writing_io_with_options(&d->sail_io,
+    SAIL_TRY(sail_start_writing_io_with_options(d->sail_io,
                                                 scodec_info.sail_codec_info_c(),
                                                 &sail_write_options,
                                                 &d->state));
@@ -204,17 +190,13 @@ sail_status_t image_writer::start_writing(const io &sio, const codec_info &scode
 sail_status_t image_writer::write_next_frame(const image &simage)
 {
     sail_image *sail_image;
-    SAIL_TRY(sail_alloc_image(&sail_image));
-
-    SAIL_TRY_OR_CLEANUP(simage.to_sail_image(sail_image),
-                        /* cleanup */ sail_image->pixels = NULL,
-                                      sail_destroy_image(sail_image));
+    SAIL_TRY(simage.to_sail_image(&sail_image));
 
     SAIL_TRY_OR_CLEANUP(sail_write_next_frame(d->state, sail_image),
-                        /* cleanup */ sail_image->pixels = NULL,
+                        /* cleanup */ sail_image->pixels = nullptr,
                                       sail_destroy_image(sail_image));
 
-    sail_image->pixels = NULL;
+    sail_image->pixels = nullptr;
     sail_destroy_image(sail_image);
 
     return SAIL_OK;
@@ -222,9 +204,10 @@ sail_status_t image_writer::write_next_frame(const image &simage)
 
 sail_status_t image_writer::stop_writing()
 {
-    SAIL_TRY(sail_stop_writing(d->state));
+    size_t written;
+    SAIL_TRY(stop_writing(&written));
 
-    d->state = nullptr;
+    (void)written;
 
     return SAIL_OK;
 }
@@ -232,8 +215,10 @@ sail_status_t image_writer::stop_writing()
 sail_status_t image_writer::stop_writing(size_t *written)
 {
     SAIL_TRY(sail_stop_writing_with_written(d->state, written));
-
     d->state = nullptr;
+
+    sail_destroy_io(d->sail_io);
+    d->sail_io = nullptr;
 
     return SAIL_OK;
 }

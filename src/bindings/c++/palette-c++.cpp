@@ -133,16 +133,11 @@ palette::palette(const sail_palette *pal)
     with_data(pal->pixel_format, pal->data, pal->color_count);
 }
 
-sail_status_t palette::to_sail_palette(sail_palette *pal) const
+sail_status_t palette::to_sail_palette(sail_palette **palette) const
 {
-    SAIL_CHECK_PALETTE_PTR(pal);
+    SAIL_CHECK_PALETTE_PTR(palette);
 
-    SAIL_TRY(sail_malloc(d->data.size(), &pal->data));
-
-    memcpy(pal->data, d->data.data(), d->data.size());
-
-    pal->pixel_format = d->pixel_format;
-    pal->color_count  = d->color_count;
+    SAIL_TRY(sail_alloc_palette_from_data(d->pixel_format, d->data.data(), d->color_count, palette));
 
     return SAIL_OK;
 }

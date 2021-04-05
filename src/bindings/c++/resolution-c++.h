@@ -95,7 +95,7 @@ private:
      */
     explicit resolution(const sail_resolution *res);
 
-    sail_status_t to_sail_resolution(sail_resolution *res) const;
+    sail_status_t to_sail_resolution(sail_resolution **resolution) const;
 
 private:
     class pimpl;

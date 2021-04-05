@@ -121,14 +121,14 @@ iccp::iccp(const sail_iccp *ic)
     with_data(ic->data, ic->data_length);
 }
 
-sail_status_t iccp::to_sail_iccp(sail_iccp *ic) const
+sail_status_t iccp::to_sail_iccp(sail_iccp **iccp) const
 {
-    SAIL_CHECK_ICCP_PTR(ic);
+    SAIL_CHECK_ICCP_PTR(iccp);
 
-    SAIL_TRY(sail_malloc(d->data.size(), &ic->data));
-    memcpy(ic->data, d->data.data(), d->data.size());
+    sail_iccp *iccp_local;
+    SAIL_TRY(sail_alloc_iccp_from_data(d->data.data(), static_cast<unsigned>(d->data.size()), &iccp_local));
 
-    ic->data_length = static_cast<unsigned>(d->data.size());
+    *iccp = iccp_local;
 
     return SAIL_OK;
 }

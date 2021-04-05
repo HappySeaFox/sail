@@ -384,7 +384,7 @@ private:
 
     sail_status_t transfer_pixels_pointer(const sail_image *sail_image);
 
-    sail_status_t to_sail_image(sail_image *sail_image) const;
+    sail_status_t to_sail_image(sail_image **image) const;
 
     image& with_animated(bool animated);
     image& with_properties(int properties);

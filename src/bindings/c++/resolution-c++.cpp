@@ -135,11 +135,12 @@ resolution::resolution(const sail_resolution *res)
     d->resolution = *res;
 }
 
-sail_status_t resolution::to_sail_resolution(sail_resolution *res) const
+sail_status_t resolution::to_sail_resolution(sail_resolution **resolution) const
 {
-    SAIL_CHECK_RESOLUTION_PTR(res);
+    SAIL_CHECK_RESOLUTION_PTR(resolution);
 
-    *res = d->resolution;
+    SAIL_TRY(sail_alloc_resolution(resolution));
+    **resolution = d->resolution;
 
     return SAIL_OK;
 }
