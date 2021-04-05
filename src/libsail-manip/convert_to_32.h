@@ -23,8 +23,8 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_CONVERT_H
-#define SAIL_CONVERT_H
+#ifndef SAIL_CONVERT_TO_32_H
+#define SAIL_CONVERT_TO_32_H
 
 #ifdef SAIL_BUILD
     #include "common.h"
