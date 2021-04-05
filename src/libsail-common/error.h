@@ -243,14 +243,6 @@ do {                              \
  * (so called cleanup), and return the error code. Use do/while to require ';' at the end
  * of a SAIL_TRY_OR_CLEANUP() expression.
  */
-#define SAIL_TRY_OR_CLEANUP(sail_func, ...)             \
-{                                                       \
-    sail_status_t __sail_error_result;                  \
-                                                        \
-    if ((__sail_error_result = sail_func) != SAIL_OK) { \
-        __VA_ARGS__;                                    \
-        return __sail_error_result;                     \
-    }                                                   \
-} do{} while(0)
+#define SAIL_TRY_OR_CLEANUP(sail_func, ...) SAIL_TRY_OR_EXECUTE(sail_func, __VA_ARGS__; return __sail_error_result)
 
 #endif
