@@ -86,7 +86,7 @@ palette::~palette()
 
 bool palette::is_valid() const
 {
-    return !d->data.empty();
+    return !d->data.empty() && d->pixel_format != SAIL_PIXEL_FORMAT_UNKNOWN && d->color_count > 0;
 }
 
 SailPixelFormat palette::pixel_format() const
