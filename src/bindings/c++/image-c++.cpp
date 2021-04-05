@@ -461,87 +461,65 @@ sail_status_t image::transfer_pixels_pointer(const sail_image *sail_image)
     return SAIL_OK;
 }
 
-sail_status_t image::to_sail_image(sail_image *sail_image) const
+sail_status_t image::to_sail_image(sail_image **image) const
 {
-    SAIL_CHECK_IMAGE_PTR(sail_image);
+    SAIL_CHECK_IMAGE_PTR(image);
+
+    sail_image *image_local = nullptr;
+
+    SAIL_AT_SCOPE_EXIT(
+        // Pixels are shallow copied
+        if (image_local != nullptr) {
+            image_local->pixels = nullptr;
+        }
+
+        sail_destroy_image(image_local);
+    );
+
+    SAIL_TRY(sail_alloc_image(&image_local));
+
+    // Pixels are shallow copied
+    image_local->pixels         = d->pixels;
+    image_local->width          = d->width;
+    image_local->height         = d->height;
+    image_local->bytes_per_line = d->bytes_per_line;
 
     // Resulting meta entries
-    sail_meta_data_node *image_meta_data_node = nullptr;
-    sail_meta_data_node **last_meta_data_node = &image_meta_data_node;
+    sail_meta_data_node **last_meta_data_node = &image_local->meta_data_node;
 
     for (const sail::meta_data &meta_data : d->meta_data) {
         sail_meta_data_node *meta_data_node;
 
-        SAIL_TRY(sail_alloc_meta_data_node(&meta_data_node));
-
-        SAIL_TRY_OR_CLEANUP(meta_data.to_sail_meta_data_node(meta_data_node),
-                            /* cleanup */ sail_destroy_meta_data_node(meta_data_node),
-                                          sail_destroy_meta_data_node_chain(image_meta_data_node));
+        SAIL_TRY(meta_data.to_sail_meta_data_node(&meta_data_node));
 
         *last_meta_data_node = meta_data_node;
         last_meta_data_node = &meta_data_node->next;
     }
 
-    sail_image->pixels         = d->pixels;
-    sail_image->width          = d->width;
-    sail_image->height         = d->height;
-    sail_image->bytes_per_line = d->bytes_per_line;
-
     if (d->resolution.is_valid()) {
-        SAIL_TRY_OR_CLEANUP(sail_alloc_resolution(&sail_image->resolution),
-                            /* cleanup */ sail_destroy_meta_data_node_chain(sail_image->meta_data_node));
-
-        SAIL_TRY_OR_CLEANUP(d->resolution.to_sail_resolution(sail_image->resolution),
-                            /* cleanup */ sail_destroy_resolution(sail_image->resolution),
-                                          sail_destroy_meta_data_node_chain(sail_image->meta_data_node));
+        SAIL_TRY(d->resolution.to_sail_resolution(&image_local->resolution));
     }
 
-    sail_image->pixel_format   = d->pixel_format;
-    sail_image->animated       = d->animated;
-    sail_image->delay          = d->delay;
+    image_local->pixel_format = d->pixel_format;
+    image_local->animated     = d->animated;
+    image_local->delay        = d->delay;
 
     if (d->palette.is_valid()) {
-        SAIL_TRY_OR_CLEANUP(sail_alloc_palette(&sail_image->palette),
-                            /* cleanup */ sail_destroy_resolution(sail_image->resolution),
-                                          sail_destroy_meta_data_node_chain(sail_image->meta_data_node));
-
-        SAIL_TRY_OR_CLEANUP(d->palette.to_sail_palette(sail_image->palette),
-                            /* cleanup */ sail_destroy_palette(sail_image->palette),
-                                          sail_destroy_resolution(sail_image->resolution),
-                                          sail_destroy_meta_data_node_chain(sail_image->meta_data_node));
+        SAIL_TRY(d->palette.to_sail_palette(&image_local->palette));
     }
-
-    sail_image->meta_data_node = image_meta_data_node;
 
     if (d->iccp.is_valid()) {
-        SAIL_TRY_OR_CLEANUP(sail_alloc_iccp(&sail_image->iccp),
-                            /* cleanup */ sail_destroy_palette(sail_image->palette),
-                                          sail_destroy_resolution(sail_image->resolution),
-                                          sail_destroy_meta_data_node_chain(sail_image->meta_data_node));
-
-        SAIL_TRY_OR_CLEANUP(d->iccp.to_sail_iccp(sail_image->iccp),
-                            /* cleanup */ sail_destroy_iccp(sail_image->iccp),
-                                          sail_destroy_palette(sail_image->palette),
-                                          sail_destroy_resolution(sail_image->resolution),
-                                          sail_destroy_meta_data_node_chain(sail_image->meta_data_node));
+        SAIL_TRY(d->iccp.to_sail_iccp(&image_local->iccp));
     }
 
-    sail_image->properties = d->properties;
+    image_local->properties = d->properties;
 
     if (d->source_image.is_valid()) {
-        SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&sail_image->source_image),
-                            /* cleanup */ sail_destroy_iccp(sail_image->iccp),
-                                          sail_destroy_palette(sail_image->palette),
-                                          sail_destroy_resolution(sail_image->resolution),
-                                          sail_destroy_meta_data_node_chain(sail_image->meta_data_node));
-
-        SAIL_TRY_OR_CLEANUP(d->source_image.to_sail_source_image(sail_image->source_image),
-                            /* cleanup */ sail_destroy_source_image(sail_image->source_image),
-                                          sail_destroy_iccp(sail_image->iccp),
-                                          sail_destroy_palette(sail_image->palette),
-                                          sail_destroy_resolution(sail_image->resolution),
-                                          sail_destroy_meta_data_node_chain(sail_image->meta_data_node));
+        SAIL_TRY_OR_CLEANUP(d->source_image.to_sail_source_image(&image_local->source_image));
     }
+
+    *image = image_local;
+    image_local = nullptr;
 
     return SAIL_OK;
 }

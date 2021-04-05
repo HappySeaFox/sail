@@ -92,7 +92,7 @@ private:
      */
     explicit source_image(const sail_source_image *si);
 
-    sail_status_t to_sail_source_image(sail_source_image *si) const;
+    sail_status_t to_sail_source_image(sail_source_image **source_image) const;
 
     source_image& with_pixel_format(SailPixelFormat pixel_format);
     source_image& with_properties(int properties);

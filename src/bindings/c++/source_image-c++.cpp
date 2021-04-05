@@ -129,13 +129,13 @@ source_image::source_image(const sail_source_image *si)
         .with_compression(si->compression);
 }
 
-sail_status_t source_image::to_sail_source_image(sail_source_image *si) const
+sail_status_t source_image::to_sail_source_image(sail_source_image **source_image) const
 {
-    SAIL_CHECK_SOURCE_IMAGE_PTR(si);
+    SAIL_CHECK_SOURCE_IMAGE_PTR(source_image);
 
-    si->pixel_format = d->source_image->pixel_format;
-    si->properties   = d->source_image->properties;
-    si->compression  = d->source_image->compression;
+    SAIL_TRY(sail_alloc_source_image(source_image));
+
+    **source_image = *d->source_image;
 
     return SAIL_OK;
 }

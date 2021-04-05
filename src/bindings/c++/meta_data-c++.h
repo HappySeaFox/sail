@@ -132,7 +132,7 @@ private:
 
     meta_data& with_value_type(SailMetaDataType type);
 
-    sail_status_t to_sail_meta_data_node(sail_meta_data_node *md) const;
+    sail_status_t to_sail_meta_data_node(sail_meta_data_node **md) const;
 
 private:
     class pimpl;

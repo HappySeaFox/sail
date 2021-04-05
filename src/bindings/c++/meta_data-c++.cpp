@@ -222,34 +222,41 @@ meta_data& meta_data::with_value_type(SailMetaDataType type)
     return *this;
 }
 
-sail_status_t meta_data::to_sail_meta_data_node(sail_meta_data_node *md) const
+sail_status_t meta_data::to_sail_meta_data_node(sail_meta_data_node **md) const
 {
     SAIL_CHECK_META_DATA_NODE_PTR(md);
 
-    md->key = d->key;
+    struct sail_meta_data_node *md_local = nullptr;
+    SAIL_TRY(sail_alloc_meta_data_node(&md_local));
+
+    SAIL_AT_SCOPE_EXIT(
+        sail_destroy_meta_data_node(md_local);
+    );
+
+    md_local->key = d->key;
 
     if (d->key == SAIL_META_DATA_UNKNOWN) {
-        SAIL_TRY(sail_strdup(d->key_unknown.c_str(), &md->key_unknown));
+        SAIL_TRY(sail_strdup(d->key_unknown.c_str(), &md_local->key_unknown));
     }
 
-    md->value_type = d->value_type;
+    md_local->value_type = d->value_type;
 
     if (d->value_type == SAIL_META_DATA_TYPE_STRING) {
-        md->value_length = d->value_string.length() + 1;
-
         void *ptr;
-        SAIL_TRY_OR_CLEANUP(sail_memdup(d->value_string.c_str(), md->value_length, &ptr),
-                            /* cleanup */ sail_free(md->key_unknown));
-        md->value = ptr;
+        SAIL_TRY(sail_memdup(d->value_string.c_str(), md_local->value_length, &ptr));
+
+        md_local->value = ptr;
+        md_local->value_length = d->value_string.length() + 1;
     } else {
-        md->value_length = d->value_data.size();
-
         void *ptr;
-        SAIL_TRY_OR_CLEANUP(sail_memdup(d->value_data.data(), md->value_length, &ptr),
-                            /* cleanup */ sail_free(md->key_unknown));
+        SAIL_TRY(sail_memdup(d->value_data.data(), md_local->value_length, &ptr));
 
-        md->value = ptr;
+        md_local->value = ptr;
+        md_local->value_length = d->value_data.size();
     }
+
+    *md = md_local;
+    md_local = nullptr;
 
     return SAIL_OK;
 }

@@ -95,15 +95,6 @@ bool io::is_valid() const
     return is_valid_private() == SAIL_OK;
 }
 
-sail_status_t io::to_sail_io(sail_io *io) const
-{
-    SAIL_CHECK_IO_PTR(io);
-
-    *io = d->sail_io;
-
-    return SAIL_OK;
-}
-
 uint64_t io::id() const
 {
     return d->sail_io.id;
@@ -180,6 +171,19 @@ sail_status_t io::is_valid_private() const
     sail_io *sail_io = &d->sail_io;
 
     SAIL_CHECK_IO(sail_io);
+
+    return SAIL_OK;
+}
+
+sail_status_t io::to_sail_io(sail_io **io) const
+{
+    SAIL_CHECK_IO_PTR(io);
+
+    sail_io *io_local;
+    SAIL_TRY(sail_alloc_io(&io_local));
+
+    *io_local = d->sail_io;
+    *io = io_local;
 
     return SAIL_OK;
 }

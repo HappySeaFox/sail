@@ -179,11 +179,16 @@ sail_status_t codec_info::from_magic_number(const sail::io &io, codec_info *scod
     SAIL_CHECK_CODEC_INFO_PTR(scodec_info);
     SAIL_TRY(io.verify_valid());
 
-    struct sail_io sail_io;
+    struct sail_io *sail_io = nullptr;
+
+    SAIL_AT_SCOPE_EXIT(
+        sail_destroy_io(sail_io);
+    );
+
     SAIL_TRY(io.to_sail_io(&sail_io));
 
     const struct sail_codec_info *sail_codec_info;
-    SAIL_TRY(sail_codec_info_by_magic_number_from_io(&sail_io, &sail_codec_info));
+    SAIL_TRY(sail_codec_info_by_magic_number_from_io(sail_io, &sail_codec_info));
 
     *scodec_info = codec_info(sail_codec_info);
 

@@ -44,6 +44,10 @@ namespace sail
  */
 class SAIL_EXPORT io
 {
+    // For to_sail_io().
+    friend class codec_info;
+    friend class image_reader;
+    friend class image_writer;
 public:
     io();
     io(const io &i);
@@ -53,8 +57,6 @@ public:
     sail_status_t verify_valid() const;
 
     bool is_valid() const;
-
-    sail_status_t to_sail_io(sail_io *io) const;
 
     uint64_t id() const;
 
@@ -72,6 +74,8 @@ public:
 
 private:
     sail_status_t is_valid_private() const;
+
+    sail_status_t to_sail_io(sail_io **io) const;
 
 private:
     class pimpl;
