@@ -515,7 +515,7 @@ sail_status_t image::to_sail_image(sail_image **image) const
     image_local->properties = d->properties;
 
     if (d->source_image.is_valid()) {
-        SAIL_TRY_OR_CLEANUP(d->source_image.to_sail_source_image(&image_local->source_image));
+        SAIL_TRY(d->source_image.to_sail_source_image(&image_local->source_image));
     }
 
     *image = image_local;
