@@ -84,7 +84,7 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
                      image_converted->width,
                      image_converted->height,
                      image_converted->bytes_per_line,
-                     sailPixelFormatToQImageFormat(image_converted->pixel_format)).copy();
+                     QImage::Format_RGBA8888).copy();
 
     m_ui->labelStatus->setText(tr("%1  [%2x%3]")
                                 .arg(QFileInfo(path).fileName())

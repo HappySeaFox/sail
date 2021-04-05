@@ -51,9 +51,7 @@ endif()
 # Add SAIL dependency
 #
 pkg_check_modules(SAIL_CXX IMPORTED_TARGET REQUIRED libsail-c++)
-target_compile_options(junior-with-c++-api     PRIVATE "${SAIL_CXX_CFLAGS}")
-target_include_directories(junior-with-c++-api PRIVATE "${SAIL_CXX_INCLUDE_DIRS}")
-target_link_libraries(junior-with-c++-api      PkgConfig::SAIL_CXX)
+target_link_libraries(junior-with-c++-api PkgConfig::SAIL_CXX)
 
 # Add Qt5 dependency
 #

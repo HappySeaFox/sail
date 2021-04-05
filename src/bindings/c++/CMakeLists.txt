@@ -49,7 +49,9 @@ sail_enable_pch(TARGET sail-c++ HEADER sail-c++.h)
 
 # Definitions, includes, link
 #
-target_link_libraries(sail-c++ PUBLIC sail)
+target_link_libraries(sail-c++ PUBLIC sail-common)
+target_link_libraries(sail-c++ PRIVATE sail)
+target_link_libraries(sail-c++ PRIVATE sail-manip)
 
 # pkg-config integration
 #

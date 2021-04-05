@@ -83,11 +83,7 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
     sail_status_t res;
     while ((res = reader.read_next_frame(&image)) == SAIL_OK) {
 
-        const QImage::Format qimageFormat = sailPixelFormatToQImageFormat(image.pixel_format());
-
-        if (qimageFormat == QImage::Format_Invalid) {
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
-        }
+        SAIL_TRY(image.convert(SAIL_PIXEL_FORMAT_BPP32_RGBA));
 
         // Convert to QImage.
         //
@@ -95,35 +91,7 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
                                image.width(),
                                image.height(),
                                image.bytes_per_line(),
-                               qimageFormat).copy();
-
-        // Apply palette.
-        //
-        if (qimageFormat == QImage::Format_Indexed8) {
-            // Assume palette is BPP24-RGB or BPP32-RGBA.
-            //
-            const sail::palette &palette = image.palette();
-
-            if (palette.pixel_format() != SAIL_PIXEL_FORMAT_BPP24_RGB
-                    && palette.pixel_format() != SAIL_PIXEL_FORMAT_BPP32_RGBA) {
-                SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
-            }
-
-            QVector<QRgb> colorTable;
-            const unsigned char *palette_data = reinterpret_cast<const unsigned char *>(palette.data().data());
-
-            for (unsigned i = 0; i < palette.color_count(); i++) {
-                if (palette.pixel_format() == SAIL_PIXEL_FORMAT_BPP24_RGB) {
-                    colorTable.append(qRgb(*palette_data, *(palette_data+1), *(palette_data+2)));
-                    palette_data += 3;
-                } else {
-                    colorTable.append(qRgba(*palette_data, *(palette_data+1), *(palette_data+2), *(palette_data+3)));
-                    palette_data += 4;
-                }
-            }
-
-            qimage.setColorTable(colorTable);
-        }
+                               QImage::Format_RGBA8888).copy();
 
         delays->append(image.delay());
         qimages->append(qimage);

@@ -28,6 +28,7 @@
 
 #include "sail-common.h"
 #include "sail.h"
+#include "sail-manip.h"
 #include "sail-c++.h"
 
 namespace sail
@@ -345,6 +346,86 @@ image& image::with_iccp(const sail::iccp &ic)
     d->iccp = ic;
 
     return *this;
+}
+
+sail_status_t image::convert(SailPixelFormat pixel_format) {
+
+    if (!is_valid()) {
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+    }
+
+    sail_image *sail_img;
+    SAIL_TRY(sail_alloc_image(&sail_img));
+
+    sail_img->width          = d->width;
+    sail_img->height         = d->height;
+    sail_img->bytes_per_line = d->bytes_per_line;
+    sail_img->pixel_format   = d->pixel_format;
+    sail_img->pixels         = d->pixels;
+
+    SAIL_AT_SCOPE_EXIT(
+        if (sail_img->palette != NULL) {
+            sail_img->palette->data = NULL;
+        }
+
+        sail_img->pixels = NULL;
+        sail_destroy_image(sail_img);
+    );
+
+    if (d->palette.is_valid()) {
+        SAIL_TRY(sail_alloc_palette(&sail_img->palette));
+
+        sail_img->palette->data         = const_cast<void *>(reinterpret_cast<const void *>(d->palette.data().data()));
+        sail_img->palette->color_count  = d->palette.color_count();
+        sail_img->palette->pixel_format = d->palette.pixel_format();
+    }
+
+    sail_image *sail_image_output = NULL;
+
+    switch (pixel_format) {
+        case SAIL_PIXEL_FORMAT_BPP32_RGBX:
+        case SAIL_PIXEL_FORMAT_BPP32_BGRX:
+        case SAIL_PIXEL_FORMAT_BPP32_XRGB:
+        case SAIL_PIXEL_FORMAT_BPP32_XBGR:
+        case SAIL_PIXEL_FORMAT_BPP32_RGBA:
+        case SAIL_PIXEL_FORMAT_BPP32_BGRA:
+        case SAIL_PIXEL_FORMAT_BPP32_ARGB:
+        case SAIL_PIXEL_FORMAT_BPP32_ABGR: {
+            SAIL_TRY(sail_convert_image_to_bpp32_rgba_kind(sail_img, pixel_format, &sail_image_output));
+            break;
+        }
+        case SAIL_PIXEL_FORMAT_BPP64_RGBX:
+        case SAIL_PIXEL_FORMAT_BPP64_BGRX:
+        case SAIL_PIXEL_FORMAT_BPP64_XRGB:
+        case SAIL_PIXEL_FORMAT_BPP64_XBGR:
+        case SAIL_PIXEL_FORMAT_BPP64_RGBA:
+        case SAIL_PIXEL_FORMAT_BPP64_BGRA:
+        case SAIL_PIXEL_FORMAT_BPP64_ARGB:
+        case SAIL_PIXEL_FORMAT_BPP64_ABGR: {
+            SAIL_TRY(sail_convert_image_to_bpp64_rgba_kind(sail_img, pixel_format, &sail_image_output));
+            break;
+        }
+        default: {
+            const char *pixel_format_str = NULL;
+            SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(pixel_format, &pixel_format_str));
+            SAIL_LOG_ERROR("Conversion to %s is not currently supported", pixel_format_str);
+
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+        }
+    }
+
+    d->reset_pixels();
+
+    d->bytes_per_line = sail_image_output->bytes_per_line;
+    d->pixel_format   = sail_image_output->pixel_format;
+    d->pixels         = sail_image_output->pixels;
+    d->pixels_size    = sail_image_output->height * sail_image_output->bytes_per_line;
+    d->shallow_pixels = false;
+
+    sail_image_output->pixels = NULL;
+    sail_destroy_image(sail_image_output);
+
+    return SAIL_OK;
 }
 
 sail_status_t image::bits_per_pixel(SailPixelFormat pixel_format, unsigned *result)

@@ -6,6 +6,6 @@ includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@/sail
 Name: libsail-c++
 Description: SAIL C++ client library
 Version: @VERSION@
-Requires: libsail
+Requires: libsail libsail-manip
 Libs: -L${libdir} -lsail-c++
 Cflags: -I${includedir}

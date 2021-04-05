@@ -70,13 +70,17 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
     //
     SAIL_TRY(reader.read(path.toLocal8Bit().constData(), &image));
 
+    // Convert to RGBA
+    //
+    SAIL_TRY(image.convert(SAIL_PIXEL_FORMAT_BPP32_RGBA));
+
     // Construct QImage from the read image.
     //
     *qimage = QImage(reinterpret_cast<const uchar *>(image.pixels()),
                      image.width(),
                      image.height(),
                      image.bytes_per_line(),
-                     sailPixelFormatToQImageFormat(image.pixel_format())).copy();
+                     QImage::Format_RGBA8888).copy();
 
     m_ui->labelStatus->setText(tr("%1  [%2x%3]")
                                 .arg(QFileInfo(path).fileName())

@@ -292,6 +292,8 @@ public:
      */
     image& with_iccp(const sail::iccp &ic);
 
+    sail_status_t convert(SailPixelFormat pixel_format);
+
     /*
      * Calculates the number of bits per pixel in the specified pixel format.
      * For example, for SAIL_PIXEL_FORMAT_RGB 24 is assigned.

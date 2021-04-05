@@ -107,7 +107,6 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
                                                                   &image_converted),
                             /* cleanup */ sail_stop_reading(state),
                                           sail_destroy_image(image));
-        const QImage::Format qimageFormat = QImage::Format_RGBA8888;
 
         source_pixel_format = image->source_image->pixel_format;
         pixel_format = image_converted->pixel_format;
@@ -121,7 +120,7 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
                                image_converted->width,
                                image_converted->height,
                                image_converted->bytes_per_line,
-                               qimageFormat).copy();
+                               QImage::Format_RGBA8888).copy();
 
         qimages->append(qimage);
         delays->append(image->delay);
