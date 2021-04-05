@@ -139,6 +139,16 @@ bool image::is_valid() const
     return d->width > 0 && d->height > 0 && d->bytes_per_line > 0 && d->pixels != nullptr && d->pixel_format != SAIL_PIXEL_FORMAT_UNKNOWN;
 }
 
+bool image::is_indexed() const
+{
+    return is_indexed(d->pixel_format);
+}
+
+bool image::is_grayscale() const
+{
+    return is_grayscale(d->pixel_format);
+}
+
 unsigned image::width() const
 {
     return d->width;
@@ -351,6 +361,16 @@ sail_status_t image::bytes_per_line(unsigned width, SailPixelFormat pixel_format
     SAIL_TRY(sail_bytes_per_line(width, pixel_format, result));
 
     return SAIL_OK;
+}
+
+bool image::is_indexed(SailPixelFormat pixel_format)
+{
+    return sail_is_indexed(pixel_format);
+}
+
+bool image::is_grayscale(SailPixelFormat pixel_format)
+{
+    return sail_is_grayscale(pixel_format);
 }
 
 sail_status_t image::pixel_format_to_string(SailPixelFormat pixel_format, const char **result)

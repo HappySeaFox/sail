@@ -78,6 +78,10 @@ public:
      */
     bool is_valid() const;
 
+    bool is_indexed() const;
+
+    bool is_grayscale() const;
+
     /*
      * Returns image width.
      *
@@ -316,6 +320,10 @@ public:
      * Returns SAIL_OK on success.
      */
     static sail_status_t bytes_per_line(unsigned width, SailPixelFormat pixel_format, unsigned *result);
+
+    static bool is_indexed(SailPixelFormat pixel_format);
+
+    static bool is_grayscale(SailPixelFormat pixel_format);
 
     /*
      * Assigns a non-NULL string representation of the specified pixel format.
