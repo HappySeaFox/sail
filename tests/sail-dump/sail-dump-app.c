@@ -23,20 +23,27 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_DUMP_H
-#define SAIL_DUMP_H
+#include <stdio.h>
 
-#include "error.h"
-#include "export.h"
+#include "sail-common.h"
 
-/*
- * Reads a dump file from path + ".dump".
- */
-SAIL_EXPORT sail_status_t sail_read_dump(const char *path, struct sail_image **image);
+#include "sail.h"
 
-/*
- * Prints the image dump.
- */
-SAIL_EXPORT sail_status_t sail_dump(const struct sail_image *image);
+#include "sail-dump.h"
 
-#endif
+int main(int argc, char *argv[])
+{
+    if (argc < 2) {
+        fprintf(stderr, "Usage: %s <path to image>", argv[0]);
+        return 1;
+    }
+
+    struct sail_image *image;
+    SAIL_TRY_OR_EXECUTE(sail_read_file(argv[1], &image),
+                        /* cleanup */ return 2);
+
+    SAIL_TRY_OR_EXECUTE(sail_dump(image),
+                        /* cleanup */ return 3);
+
+    return 0;
+}
