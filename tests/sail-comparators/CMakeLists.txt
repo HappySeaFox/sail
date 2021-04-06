@@ -4,7 +4,7 @@ add_library(sail-comparators STATIC
 
 set_target_properties(sail-comparators PROPERTIES
                                         VERSION "1.0.0"
-                                        SOVERSION 0)
+                                        SOVERSION 1)
 
 # Definitions, includes, link
 #

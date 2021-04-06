@@ -23,6 +23,8 @@
     SOFTWARE.
 */
 
+#include "sail-common.h"
+
 #include "sail-comparators.h"
 
 #include "munit.h"

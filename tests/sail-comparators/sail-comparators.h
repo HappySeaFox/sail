@@ -23,7 +23,11 @@
     SOFTWARE.
 */
 
-#include "sail-common.h"
+#ifndef SAIL_COMPARATORS_H
+#define SAIL_COMPARATORS_H
+
+#include "error.h"
+#include "export.h"
 
 SAIL_EXPORT sail_status_t sail_compare_resolutions(const struct sail_resolution *resolution1, const struct sail_resolution *resolution2);
 
@@ -38,3 +42,5 @@ SAIL_EXPORT sail_status_t sail_compare_iccps(const struct sail_iccp *iccp1, cons
 SAIL_EXPORT sail_status_t sail_compare_source_images(const struct sail_source_image *source_image1, const struct sail_source_image *source_image2);
 
 SAIL_EXPORT sail_status_t sail_compare_images(const struct sail_image *image1, const struct sail_image *image2);
+
+#endif
