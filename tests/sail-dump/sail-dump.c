@@ -557,6 +557,7 @@ sail_status_t sail_dump(const struct sail_image *image) {
         printf("PIXELS\n");
         const unsigned pixels_size = image->bytes_per_line * image->height;
         SAIL_TRY(print_hex(image->pixels, pixels_size));
+        printf("\n");
     }
 
     return SAIL_OK;

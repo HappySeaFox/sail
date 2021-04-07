@@ -38,12 +38,28 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    struct sail_image *image;
-    SAIL_TRY_OR_EXECUTE(sail_read_file(argv[1], &image),
-                        /* cleanup */ return 2);
+    void *state = NULL;
+    SAIL_TRY_OR_EXECUTE(sail_start_reading_file(argv[1], NULL, &state),
+                        /* on error */ return 2);
 
-    SAIL_TRY_OR_EXECUTE(sail_dump(image),
-                        /* cleanup */ return 3);
+    sail_status_t res;
+    struct sail_image *image;
+
+    while ((res = sail_read_next_frame(state, &image)) == SAIL_OK) {
+
+        SAIL_TRY_OR_EXECUTE(sail_dump(image),
+                            /* on error */ return 3);
+
+        sail_destroy_image(image);
+    }
+
+    if (res != SAIL_ERROR_NO_MORE_FRAMES) {
+        sail_stop_reading(state);
+        return res;
+    }
+
+    SAIL_TRY_OR_EXECUTE(sail_stop_reading(state),
+                        /* on error */ return 4);
 
     return 0;
 }
