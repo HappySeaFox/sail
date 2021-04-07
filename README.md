@@ -90,13 +90,11 @@ See the full list [here](FORMATS.md). Work to add more image formats is ongoing.
 
 Time to load and output RGBA8888 (or similar) pixels was measured. See [BENCHMARKS](BENCHMARKS.md).
 
-## Supported platforms
+## Preferred installation method
 
-Currently, SAIL supports the following platforms:
-
-- Windows
-- macOS
-- Linux
+- Windows: `vcpkg`
+- macOS: `brew`
+- Linux: native packages if available or `vcpkg`
 
 See [BUILDING](BUILDING.md).
 
