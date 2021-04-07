@@ -151,6 +151,9 @@ SAIL_TRY(sail_read_file(path, &image));
  * Handle the image pixels here.
  * Use image->width, image->height, image->bytes_per_line,
  * image->pixel_format, and image->pixels for that.
+ *
+ * In particular, you can convert it to a different pixel format with functions
+ * from libsail-manip. With sail_convert_image_to_bpp32_rgba_kind(), for example.
  */
 
 sail_destroy_image(image);
@@ -166,6 +169,8 @@ SAIL_TRY(reader.read(path, &image));
 // Handle the image and its pixels here.
 // Use image.width(), image.height(), image.bytes_per_line(),
 // image.pixel_format(), and image.pixels() for that.
+//
+// In particular, you can convert it to a different pixel format with image::convert().
 ```
 
 It's pretty easy, isn't it? :smile: See [EXAMPLES](EXAMPLES.md) and [FAQ](FAQ.md) for more.

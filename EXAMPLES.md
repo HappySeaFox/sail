@@ -54,6 +54,9 @@ SAIL_TRY(sail_read_file(path, &image));
  * Handle the image pixels here.
  * Use image->width, image->height, image->bytes_per_line,
  * image->pixel_format, and image->pixels for that.
+ *
+ * In particular, you can convert it to a different pixel format with functions
+ * from libsail-manip. With sail_convert_image_to_bpp32_rgba_kind(), for example.
  */
 
 /*
@@ -78,6 +81,8 @@ SAIL_TRY(reader.read(path, &image));
 // Handle the image and its pixels here.
 // Use image.width(), image.height(), image.bytes_per_line(),
 // image.pixel_format(), and image.pixels() for that.
+//
+// In particular, you can convert it to a different pixel format with image::convert().
 ```
 
 ### 2. `advanced`
@@ -175,7 +180,7 @@ sail::context::finish();
 #### C:
 ```C
 /*
- * Initialize a new SAIL thread-local static context explicitly and preload all codecs.
+ * Optional: Initialize a new SAIL thread-local static context explicitly and preload all codecs.
  * Codecs are lazy-loaded when SAIL_FLAG_PRELOAD_CODECS is not specified.
  */
 SAIL_TRY(sail_init_with_flags(SAIL_FLAG_PRELOAD_CODECS));
@@ -195,8 +200,7 @@ const struct sail_codec_info *codec_info;
 SAIL_TRY(sail_codec_info_from_extension("JPEG", &codec_info));
 
 /*
- * Allocate new read options and copy defaults from the codec-specific read features
- * (preferred output pixel format etc.).
+ * Allocate new read options and copy defaults from the codec-specific read features.
  */
 SAIL_TRY(sail_alloc_read_options_from_features(codec_info->read_features, &read_options));
 
@@ -238,15 +242,6 @@ SAIL_TRY_OR_CLEANUP(sail_stop_reading(state),
                     /* cleanup */ sail_destroy_image(image));
 
 /*
- * Print the image meta data if any (JPEG comments etc.).
- */
-struct sail_meta_entry_node *node = image->meta_entry_node;
-
-if (node != NULL) {
-    SAIL_LOG_DEBUG("%s: %s", node->key, node->value);
-}
-
-/*
  * Handle the image pixels here.
  * Use image->width, image->height, image->bytes_per_line,
  * image->pixel_format, and image->pixels for that.
@@ -271,7 +266,7 @@ sail_finish();
 
 #### C++:
 ```C++
-// Initialize a new SAIL thread-local static context explicitly and preload all codecs.
+// Optional: Initialize a new SAIL thread-local static context explicitly and preload all codecs.
 // Codecs are lazy-loaded when SAIL_FLAG_PRELOAD_CODECS is not specified.
 //
 sail::context::init(SAIL_FLAG_PRELOAD_CODECS);
@@ -282,8 +277,7 @@ sail::image_reader reader;
 sail::codec_info codec_info;
 SAIL_TRY(codec_info::from_extension("JPEG", &codec_info));
 
-// Instantiate new read options and copy defaults from the read features
-// (preferred output pixel format etc.).
+// Instantiate new read options and copy defaults from the read features.
 //
 sail::read_options read_options;
 SAIL_TRY(codec_info.read_features().to_read_options(&read_options));
@@ -310,15 +304,6 @@ SAIL_TRY(reader.read_next_frame(&image));
 //
 SAIL_TRY(reader.stop_reading());
 
-// Print the image meta data if any (JPEG comments etc.).
-//
-const std::map<std::string, std::string> meta_entries = image.meta_entries();
-
-if (!meta_entries.empty()) {
-    const std::pair<std::string, std::string> first_pair = *meta_entries.begin();
-    SAIL_LOG_DEBUG("%s: %s", first_pair.first.c_str(), first_pair.second.c_str());
-}
-
 // Handle the image and its pixels here.
 // Use image.width(), image.height(), image.bytes_per_line(),
 // image.pixel_format(), and image.pixels() for that.
@@ -340,7 +325,7 @@ and call `sail_start_reading_io_with_options()`.
 
 ```C
 /*
- * Initialize a new SAIL thread-local static context explicitly and preload all codecs.
+ * Optional: Initialize a new SAIL thread-local static context explicitly and preload all codecs.
  * Codecs are lazy-loaded when SAIL_FLAG_PRELOAD_CODECS is not specified.
  */
 SAIL_TRY(sail_init_with_flags(SAIL_FLAG_PRELOAD_CODECS));
@@ -387,8 +372,7 @@ io->close = io_my_data_source_close;
 io->eof   = io_my_data_source_eof;
 
 /*
- * Allocate new read options and copy defaults from the codec-specific read features
- * (preferred output pixel format etc.).
+ * Allocate new read options and copy defaults from the codec-specific read features.
  */
 SAIL_TRY_OR_CLEANUP(sail_alloc_read_options_from_features(codec_info->read_features,
                                                           &read_options),
@@ -430,15 +414,6 @@ SAIL_TRY_OR_CLEANUP(sail_stop_reading(state),
 sail_destroy_io(io);
 
 /*
- * Print the image meta data if any (JPEG comments etc.).
- */
-struct sail_meta_entry_node *node = image->meta_entry_node;
-
-if (node != NULL) {
-    SAIL_LOG_DEBUG("%s: %s", node->key, node->value);
-}
-
-/*
  * Handle the image pixels here.
  * Use image->width, image->height, image->bytes_per_line,
  * image->pixel_format, and image->pixels for that.
@@ -463,7 +438,7 @@ sail_finish();
 
 #### C++:
 ```C++
-// Initialize a new SAIL thread-local static context explicitly and preload all codecs.
+// Optional: Initialize a new SAIL thread-local static context explicitly and preload all codecs.
 // Codecs are lazy-loaded when SAIL_FLAG_PRELOAD_CODECS is not specified.
 //
 sail::context::init(SAIL_FLAG_PRELOAD_CODECS);
@@ -474,24 +449,22 @@ sail::image_reader reader;
 sail::codec_info codec_info;
 SAIL_TRY(codec_info::from_path(path, &codec_info));
 
-/*
- * Create our custom I/O source.
- */
+// Create our custom I/O source.
+//
 sail::io io;
 
-/*
- * Save a pointer to our data source. It will be passed back to the callback functions below.
- * You can free the data source in the close() callback.
- *
- * WARNING: If you don't call reader.stop_reading(), the close() callback is never called.
- *          Please make sure you always call reader.stop_reading().
- */
+//
+// Save a pointer to our data source. It will be passed back to the callback functions below.
+// You can free the data source in the close() callback.
+//
+// WARNING: If you don't call reader.stop_reading(), the close() callback is never called.
+//          Please make sure you always call reader.stop_reading().
+//
 io.with_stream(my_data_source_pointer);
 
-/*
- * Setup reading, seeking, flushing etc. callbacks for our custom I/O source.
- * All of them must be set.
- */
+// Setup reading, seeking, flushing etc. callbacks for our custom I/O source.
+// All of them must be set.
+//
 io.with_read(io_my_data_source_read)
   .with_seek(io_my_data_source_seek)
   .with_tell(io_my_data_source_tell)
@@ -500,8 +473,7 @@ io.with_read(io_my_data_source_read)
   .with_close(io_my_data_source_close)
   .with_eof(io_my_data_source_eof);
 
-// Instantiate new read options and copy defaults from the read features
-// (preferred output pixel format etc.).
+// Instantiate new read options and copy defaults from the read features.
 //
 sail::read_options read_options;
 SAIL_TRY(codec_info.read_features().to_read_options(&read_options));
@@ -522,15 +494,6 @@ SAIL_TRY(reader.read_next_frame(&image));
 // Finish reading.
 //
 SAIL_TRY(reader.stop_reading());
-
-// Print the image meta data if any (JPEG comments etc.).
-//
-const std::map<std::string, std::string> meta_entries = image.meta_entries();
-
-if (!meta_entries.empty()) {
-    const std::pair<std::string, std::string> first_pair = *meta_entries.begin();
-    SAIL_LOG_DEBUG("%s: %s", first_pair.first.c_str(), first_pair.second.c_str());
-}
 
 // Handle the image and its pixels here.
 // Use image.width(), image.height(), image.bytes_per_line(),
