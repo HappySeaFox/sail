@@ -23,24 +23,20 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_COMPARATORS_H
-#define SAIL_COMPARATORS_H
+#ifndef SAIL_DUMP_H
+#define SAIL_DUMP_H
 
 #include "error.h"
 #include "export.h"
 
-SAIL_EXPORT sail_status_t sail_compare_resolutions(const struct sail_resolution *resolution1, const struct sail_resolution *resolution2);
+/*
+ * Reads a dump file from path + ".dump".
+ */
+SAIL_EXPORT sail_status_t sail_read_dump(const char *path, struct sail_image *images[]);
 
-SAIL_EXPORT sail_status_t sail_compare_palettes(const struct sail_palette *palette1, const struct sail_palette *palette2);
-
-SAIL_EXPORT sail_status_t sail_compare_meta_data_nodes(const struct sail_meta_data_node *meta_data_node1, const struct sail_meta_data_node *meta_data_node2);
-
-SAIL_EXPORT sail_status_t sail_compare_meta_data_node_chains(const struct sail_meta_data_node *meta_data_node1, const struct sail_meta_data_node *meta_data_node2);
-
-SAIL_EXPORT sail_status_t sail_compare_iccps(const struct sail_iccp *iccp1, const struct sail_iccp *iccp2);
-
-SAIL_EXPORT sail_status_t sail_compare_source_images(const struct sail_source_image *source_image1, const struct sail_source_image *source_image2);
-
-SAIL_EXPORT sail_status_t sail_compare_images(const struct sail_image *image1, const struct sail_image *image2);
+/*
+ * Prints the image dump.
+ */
+SAIL_EXPORT sail_status_t sail_dump(const struct sail_image *image);
 
 #endif

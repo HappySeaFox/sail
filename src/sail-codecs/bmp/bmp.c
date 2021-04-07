@@ -267,35 +267,44 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v5_bmp(struct sail_io *io, const 
     if (bmp_state->version == SAIL_BMP_V1) {
         SAIL_TRY(bmp_private_fill_system_palette(bmp_state->v1.bit_count, &bmp_state->palette, &bmp_state->palette_count));
     } else if (bmp_state->v2.bit_count < 16) {
-        bmp_state->palette_count = 1 << bmp_state->v2.bit_count;
+        size_t offset;
+        SAIL_TRY(io->tell(io->stream, &offset));
+        const unsigned palette_size = (unsigned)(bmp_state->dib_file_header.offset - offset);
+
+        if (bmp_state->version == SAIL_BMP_V2) {
+            bmp_state->palette_count = palette_size / 3;
+        } else {
+            bmp_state->palette_count = palette_size / 4;
+        }
+
+        if (bmp_state->palette_count == 0) {
+            SAIL_LOG_ERROR("BMP: Indexed image has no palette");
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_MISSING_PALETTE);
+        }
 
         void *ptr;
-        SAIL_TRY(sail_malloc(sizeof(sail_rgb24_t) * bmp_state->palette_count, &ptr));
+        SAIL_TRY(sail_malloc(sizeof(sail_rgba32_t) * bmp_state->palette_count, &ptr));
         bmp_state->palette = ptr;
 
-        switch (bmp_state->version) {
-            case SAIL_BMP_V2: {
-                sail_rgb24_t rgb;
+        if (bmp_state->version == SAIL_BMP_V2) {
+            sail_rgb24_t rgb;
 
-                for (unsigned i = 0; i < bmp_state->palette_count; i++) {
-                    SAIL_TRY(sail_read_pixel3_uint8(io, &rgb));
+            for (unsigned i = 0; i < bmp_state->palette_count; i++) {
+                SAIL_TRY(sail_read_pixel3_uint8(io, &rgb));
 
-                    bmp_state->palette[i].component1 = rgb.component1;
-                    bmp_state->palette[i].component2 = rgb.component2;
-                    bmp_state->palette[i].component3 = rgb.component3;
-                }
-                break;
+                bmp_state->palette[i].component1 = rgb.component1;
+                bmp_state->palette[i].component2 = rgb.component2;
+                bmp_state->palette[i].component3 = rgb.component3;
             }
-            default: {
-                sail_rgba32_t rgba;
+        } else {
+            sail_rgba32_t rgba;
 
-                for (unsigned i = 0; i < bmp_state->palette_count; i++) {
-                    SAIL_TRY(sail_read_pixel4_uint8(io, &rgba));
+            for (unsigned i = 0; i < bmp_state->palette_count; i++) {
+                SAIL_TRY(sail_read_pixel4_uint8(io, &rgba));
 
-                    bmp_state->palette[i].component1 = rgba.component1;
-                    bmp_state->palette[i].component2 = rgba.component2;
-                    bmp_state->palette[i].component3 = rgba.component3;
-                }
+                bmp_state->palette[i].component1 = rgba.component1;
+                bmp_state->palette[i].component2 = rgba.component2;
+                bmp_state->palette[i].component3 = rgba.component3;
             }
         }
     }

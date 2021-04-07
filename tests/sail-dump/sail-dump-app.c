@@ -23,24 +23,43 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_COMPARATORS_H
-#define SAIL_COMPARATORS_H
+#include <stdio.h>
 
-#include "error.h"
-#include "export.h"
+#include "sail-common.h"
 
-SAIL_EXPORT sail_status_t sail_compare_resolutions(const struct sail_resolution *resolution1, const struct sail_resolution *resolution2);
+#include "sail.h"
 
-SAIL_EXPORT sail_status_t sail_compare_palettes(const struct sail_palette *palette1, const struct sail_palette *palette2);
+#include "sail-dump.h"
 
-SAIL_EXPORT sail_status_t sail_compare_meta_data_nodes(const struct sail_meta_data_node *meta_data_node1, const struct sail_meta_data_node *meta_data_node2);
+int main(int argc, char *argv[])
+{
+    if (argc < 2) {
+        fprintf(stderr, "Usage: %s <path to image>", argv[0]);
+        return 1;
+    }
 
-SAIL_EXPORT sail_status_t sail_compare_meta_data_node_chains(const struct sail_meta_data_node *meta_data_node1, const struct sail_meta_data_node *meta_data_node2);
+    void *state = NULL;
+    SAIL_TRY_OR_EXECUTE(sail_start_reading_file(argv[1], NULL, &state),
+                        /* on error */ return 2);
 
-SAIL_EXPORT sail_status_t sail_compare_iccps(const struct sail_iccp *iccp1, const struct sail_iccp *iccp2);
+    sail_status_t res;
+    struct sail_image *image;
 
-SAIL_EXPORT sail_status_t sail_compare_source_images(const struct sail_source_image *source_image1, const struct sail_source_image *source_image2);
+    while ((res = sail_read_next_frame(state, &image)) == SAIL_OK) {
 
-SAIL_EXPORT sail_status_t sail_compare_images(const struct sail_image *image1, const struct sail_image *image2);
+        SAIL_TRY_OR_EXECUTE(sail_dump(image),
+                            /* on error */ return 3);
 
-#endif
+        sail_destroy_image(image);
+    }
+
+    if (res != SAIL_ERROR_NO_MORE_FRAMES) {
+        sail_stop_reading(state);
+        return res;
+    }
+
+    SAIL_TRY_OR_EXECUTE(sail_stop_reading(state),
+                        /* on error */ return 4);
+
+    return 0;
+}
