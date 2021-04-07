@@ -465,7 +465,7 @@ sail_status_t sail_read_dump(const char *path, struct sail_image *images[]) {
 
 sail_status_t sail_dump(const struct sail_image *image) {
 
-    SAIL_CHECK_IMAGE(image);
+    SAIL_TRY(sail_check_image_valid(image));
 
     /*  To print dots in floats. */
     setlocale(LC_NUMERIC, "C");
