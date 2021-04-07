@@ -385,16 +385,17 @@ static sail_status_t read_pixels(FILE *fptr, struct sail_image *image) {
  * Public functions.
  */
 
-sail_status_t sail_read_dump(const char *path, struct sail_image **image) {
+sail_status_t sail_read_dump(const char *path, struct sail_image *images[]) {
 
     SAIL_CHECK_PATH_PTR(path);
-    SAIL_CHECK_IMAGE_PTR(image);
 
     /*  To scanf dots in floats. */
     setlocale(LC_NUMERIC, "C");
 
     char *path_dump;
     SAIL_TRY(sail_concat(&path_dump, 2, path, ".dump"));
+
+    SAIL_LOG_DEBUG("DUMP: Opening file '%s'", path_dump);
 
 #ifdef SAIL_WIN32
     FILE *fptr = _fsopen(path_dump, "r", _SH_DENYWR);
@@ -407,8 +408,8 @@ sail_status_t sail_read_dump(const char *path, struct sail_image **image) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_OPEN_FILE);
     }
 
-    struct sail_image *image_local;
-    SAIL_TRY(sail_alloc_image(&image_local));
+    struct sail_image *image_local = NULL;
+    size_t current_image = 0;
 
     /* For reading categories: IMAGE, PALETTE etc. */
     char buffer[32];
@@ -417,10 +418,16 @@ sail_status_t sail_read_dump(const char *path, struct sail_image **image) {
 #else
     while (fscanf(fptr, "%[^\n]%*[\r\n]", buffer) == 1) {
 #endif
-
         SAIL_LOG_DEBUG("DUMP: Found category '%s'", buffer);
 
         if (strcmp(buffer, "IMAGE") == 0) {
+            if (image_local != NULL) {
+                images[current_image]   = image_local;
+                images[current_image+1] = NULL;
+                current_image++;
+            }
+
+            SAIL_TRY(sail_alloc_image(&image_local));
             SAIL_TRY(read_image(fptr, image_local));
         } else if (strcmp(buffer, "SOURCE-IMAGE") == 0) {
             SAIL_TRY(read_source_image(fptr, image_local));
@@ -445,9 +452,11 @@ sail_status_t sail_read_dump(const char *path, struct sail_image **image) {
         skip_whitespaces(fptr);
     }
 
-    fclose(fptr);
+    /* Save the last read image. */
+    images[current_image]   = image_local;
+    images[current_image+1] = NULL;
 
-    *image = image_local;
+    fclose(fptr);
 
     return SAIL_OK;
 }
