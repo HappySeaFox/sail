@@ -100,44 +100,6 @@ Currently, SAIL supports the following platforms:
 
 See [BUILDING](BUILDING.md).
 
-## Programming languages
-
-**Programming language:** C11<br/>
-**Bindings:** C++17
-
-## Competitors
-
-- [FreeImage](https://freeimage.sourceforge.io)
-- [DevIL](http://openil.sourceforge.net)
-- [SDL_Image](https://www.libsdl.org/projects/SDL_image)
-- [stb_image](https://github.com/nothings/stb)
-- [Boost.GIL](https://www.boost.org/doc/libs/1_68_0/libs/gil/doc/html/index.html)
-- [gdk-pixbuf](https://developer.gnome.org/gdk-pixbuf)
-- [imlib2](https://docs.enlightenment.org/api/imlib2/html)
-- [CImg](https://github.com/dtschump/CImg)
-- [WIC (Windows only)](https://docs.microsoft.com/en-us/windows/win32/wic/-wic-about-windows-imaging-codec)
-
-## Differences from other image decoding libraries
-
-- Easily extensible with new image format plugins
-- Easy-to-use API providing expected business entities - images, palettes, pixels etc.
-- Access to source pixel data (supported by the most codecs)
-- Output in multiple pixel formats, not only RGB
-- Access to the image properties w/o decoding pixel data (probing)
-
-## Development status
-
-SAIL is ready for every day use. However, it's still under heavy development. The API can be changed at any time
-breaking binary and source compatibility. Consider opening a GitHub [issue](https://github.com/smoked-herring/sail/issues)
-if you have any feature requests or issue reports. Your help (pull requests etc.) is highly welcomed.
-
-## Have questions or issues?
-
-Opening a GitHub [issue](https://github.com/smoked-herring/sail/issues) is the preferred way
-of communicating and solving problems.
-
-See [FAQ](FAQ.md) for more.
-
 ## APIs overview
 
 SAIL provides four levels of APIs, depending on your needs. Let's have a quick look at the `junior` level.
@@ -179,6 +141,44 @@ SAIL_TRY(reader.read(path, &image));
 ```
 
 It's pretty easy, isn't it? :smile: See [EXAMPLES](EXAMPLES.md) and [FAQ](FAQ.md) for more.
+
+## Programming languages
+
+**Programming language:** C11<br/>
+**Bindings:** C++17
+
+## Competitors
+
+- [FreeImage](https://freeimage.sourceforge.io)
+- [DevIL](http://openil.sourceforge.net)
+- [SDL_Image](https://www.libsdl.org/projects/SDL_image)
+- [stb_image](https://github.com/nothings/stb)
+- [Boost.GIL](https://www.boost.org/doc/libs/1_68_0/libs/gil/doc/html/index.html)
+- [gdk-pixbuf](https://developer.gnome.org/gdk-pixbuf)
+- [imlib2](https://docs.enlightenment.org/api/imlib2/html)
+- [CImg](https://github.com/dtschump/CImg)
+- [WIC (Windows only)](https://docs.microsoft.com/en-us/windows/win32/wic/-wic-about-windows-imaging-codec)
+
+## Differences from other image decoding libraries
+
+- Easily extensible with new image format plugins
+- Easy-to-use API providing expected business entities - images, palettes, pixels etc.
+- Access to source pixel data (supported by the most codecs)
+- Output in multiple pixel formats, not only RGB
+- Access to the image properties w/o decoding pixel data (probing)
+
+## Development status
+
+SAIL is ready for every day use. However, it's still under heavy development. The API can be changed at any time
+breaking binary and source compatibility. Consider opening a GitHub [issue](https://github.com/smoked-herring/sail/issues)
+if you have any feature requests or issue reports. Your help (pull requests etc.) is highly welcomed.
+
+## Have questions or issues?
+
+Opening a GitHub [issue](https://github.com/smoked-herring/sail/issues) is the preferred way
+of communicating and solving problems.
+
+See [FAQ](FAQ.md) for more.
 
 ## Architecture overview
 
