@@ -44,10 +44,12 @@
 static void skip_whitespaces(FILE *fptr) {
 
 #ifdef SAIL_WIN32
-    (void)fscanf_s(fptr, "%*[ \r\n]");
+    int ret = fscanf_s(fptr, "%*[ \r\n]");
 #else
-    (void)fscanf(fptr, "%*[ \r\n]");
+    int ret = fscanf(fptr, "%*[ \r\n]");
 #endif
+
+    (void)ret;
 }
 
 static sail_status_t read_hex(FILE *fptr, size_t data_length, uint8_t **value) {
@@ -250,7 +252,7 @@ static sail_status_t read_meta_data(FILE *fptr, struct sail_image *image) {
 #ifdef SAIL_WIN32
         if (fscanf_s(fptr, "%[^\n]%*[\r\n]%[^\n]%*[\r\n]%s%u%*[\r\n]", key, (unsigned)sizeof(key), key_unknown, (unsigned)sizeof(key_unknown), type, (unsigned)sizeof(type), &data_length) != 4) {
 #else
-        if (fscanf_s(fptr, "%[^\n]%*[\r\n]%[^\n]%*[\r\n]%s%u%*[\r\n]", key, key_unknown, type, &data_length) != 4) {
+        if (fscanf(fptr, "%[^\n]%*[\r\n]%[^\n]%*[\r\n]%s%u%*[\r\n]", key, key_unknown, type, &data_length) != 4) {
 #endif
             SAIL_LOG_ERROR("DUMP: Failed to read META-DATA properties");
             SAIL_LOG_AND_RETURN(SAIL_ERROR_READ_FILE);
@@ -312,7 +314,7 @@ static sail_status_t read_iccp(FILE *fptr, struct sail_image *image) {
 #ifdef SAIL_WIN32
     if (fscanf_s(fptr, "%u%*[\r\n]", &data_length) != 1) {
 #else
-    if (fscanf_s(fptr, "%u%*[\r\n]", &data_length) != 1) {
+    if (fscanf(fptr, "%u%*[\r\n]", &data_length) != 1) {
 #endif
         SAIL_LOG_ERROR("DUMP: Failed to read ICCP data length");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_READ_FILE);
