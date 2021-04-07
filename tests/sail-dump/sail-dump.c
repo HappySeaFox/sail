@@ -44,9 +44,9 @@
 static void skip_whitespaces(FILE *fptr) {
 
 #ifdef SAIL_WIN32
-    fscanf_s(fptr, "%*[ \r\n]");
+    (void)fscanf_s(fptr, "%*[ \r\n]");
 #else
-    fscanf(fptr, "%*[ \r\n]");
+    (void)fscanf(fptr, "%*[ \r\n]");
 #endif
 }
 
@@ -59,7 +59,7 @@ static sail_status_t read_hex(FILE *fptr, size_t data_length, uint8_t **value) {
     for (unsigned i = 0; i < data_length; i++) {
         skip_whitespaces(fptr);
 
-        int v;
+        unsigned v;
 #ifdef SAIL_WIN32
         if (fscanf_s(fptr, "%2x%*[ \r\n]", &v) != 1) {
 #else
@@ -235,7 +235,7 @@ static sail_status_t read_meta_data(FILE *fptr, struct sail_image *image) {
 #ifdef SAIL_WIN32
     if (fscanf_s(fptr, "%u%*[\r\n]", &n_of_entries) != 1) {
 #else
-    if (fscanf_s(fptr, "%u%*[\r\n]", &n_of_entries) != 1) {
+    if (fscanf(fptr, "%u%*[\r\n]", &n_of_entries) != 1) {
 #endif
         SAIL_LOG_ERROR("DUMP: Failed to read META-DATA number of entries");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_READ_FILE);
