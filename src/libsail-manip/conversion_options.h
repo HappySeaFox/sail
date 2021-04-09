@@ -23,22 +23,35 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_MANIP_UTILS_H
-#define SAIL_MANIP_UTILS_H
+#ifndef SAIL_CONVERSION_OPTIONS_H
+#define SAIL_CONVERSION_OPTIONS_H
 
-#include <stdint.h>
+#ifdef SAIL_BUILD
+    #include "error.h"
+    #include "export.h"
+    #include "pixel.h"
 
-#include "error.h"
-#include "export.h"
+    #include "manip_common.h"
+#else
+    #include <sail-common/error.h>
+    #include <sail-common/export.h>
+    #include <sail-common/pixel.h>
 
-struct sail_conversion_options;
+    #include <sail-manip/manip_common.h>
+#endif
 
-SAIL_HIDDEN void fill_rgba32_pixel_from_uint8_values(uint8_t rv, uint8_t gv, uint8_t bv, uint8_t av, uint8_t *scan, int r, int g, int b, int a, const struct sail_conversion_options *options);
+struct sail_conversion_options {
 
-SAIL_HIDDEN void fill_rgba32_pixel_from_uint16_values(uint16_t rv, uint16_t gv, uint16_t bv, uint16_t av, uint8_t *scan, int r, int g, int b, int a, const struct sail_conversion_options *options);
+    /*
+     * Or-ed SailConversionOption-s.
+     */
+    int options;
 
-SAIL_HIDDEN void fill_rgba64_pixel_from_uint8_values(uint8_t rv, uint8_t gv, uint8_t bv, uint8_t av, uint16_t *scan, int r, int g, int b, int a, const struct sail_conversion_options *options);
-
-SAIL_HIDDEN void fill_rgba64_pixel_from_uint16_values(uint16_t rv, uint16_t gv, uint16_t bv, uint16_t av, uint16_t *scan, int r, int g, int b, int a, const struct sail_conversion_options *options);
+    /*
+     * Background color to blend into other color components instead of alpha
+     * when options has SAIL_CONVERSION_OPTION_BLEND_ALPHA.
+     */
+    sail_rgb48_t background;
+};
 
 #endif

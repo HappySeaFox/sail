@@ -40,11 +40,41 @@
 extern "C" {
 #endif
 
+struct sail_conversion_options;
 struct sail_image;
 
 /*
  * Converts the input image to the BPP64-RGBA-ish format and saves the result in the output image.
  * The output image MUST be destroyed later with sail_destroy_image().
+ *
+ * Options (which may be NULL) control the conversion behavior.
+ *
+ * Allowed input pixel formats:
+ *   - Anything except YCCK, LUV, and LAB
+ *
+ * Allowed output pixel formats:
+ *   - SAIL_PIXEL_FORMAT_BPP64_RGBX
+ *   - SAIL_PIXEL_FORMAT_BPP64_BGRX
+ *   - SAIL_PIXEL_FORMAT_BPP64_XRGB
+ *   - SAIL_PIXEL_FORMAT_BPP64_XBGR
+ *   - SAIL_PIXEL_FORMAT_BPP64_RGBA
+ *   - SAIL_PIXEL_FORMAT_BPP64_BGRA
+ *   - SAIL_PIXEL_FORMAT_BPP64_ARGB
+ *   - SAIL_PIXEL_FORMAT_BPP64_ABGR
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_convert_image_to_rgba64_kind_with_options(const struct sail_image *image_input,
+                                                                         enum SailPixelFormat output_pixel_format,
+                                                                         const struct sail_conversion_options *options,
+                                                                         struct sail_image **image_output);
+
+/*
+ * Converts the input image to the BPP64-RGBA-ish format and saves the result in the output image.
+ * The output image MUST be destroyed later with sail_destroy_image().
+ *
+ * Drops the input alpha channel if the output alpha channel doesn't exist. If you need to control
+ * this behavior, use sail_convert_image_to_rgba64_kind_with_options().
  *
  * Allowed input pixel formats:
  *   - Anything except YCCK, LUV, and LAB

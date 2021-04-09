@@ -23,22 +23,32 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_MANIP_UTILS_H
-#define SAIL_MANIP_UTILS_H
+#ifndef SAIL_MANIP_COMMON_H
+#define SAIL_MANIP_COMMON_H
 
-#include <stdint.h>
+/*
+ * Options to control color conversion behavior.
+ */
+enum SailConversionOption {
 
-#include "error.h"
-#include "export.h"
+    /*
+     * Drops the input alpha channel if the output alpha channel doesn't exist.
+     * For example, when we convert RGBA pixels to RGB.
+     *
+     * SAIL_CONVERSION_OPTION_DROP_ALPHA and SAIL_CONVERSION_OPTION_BLEND_ALPHA are mutually
+     * exclusive. If both are specified, SAIL_CONVERSION_OPTION_DROP_ALPHA wins.
+     */
+    SAIL_CONVERSION_OPTION_DROP_ALPHA     = 1 << 0,
 
-struct sail_conversion_options;
-
-SAIL_HIDDEN void fill_rgba32_pixel_from_uint8_values(uint8_t rv, uint8_t gv, uint8_t bv, uint8_t av, uint8_t *scan, int r, int g, int b, int a, const struct sail_conversion_options *options);
-
-SAIL_HIDDEN void fill_rgba32_pixel_from_uint16_values(uint16_t rv, uint16_t gv, uint16_t bv, uint16_t av, uint8_t *scan, int r, int g, int b, int a, const struct sail_conversion_options *options);
-
-SAIL_HIDDEN void fill_rgba64_pixel_from_uint8_values(uint8_t rv, uint8_t gv, uint8_t bv, uint8_t av, uint16_t *scan, int r, int g, int b, int a, const struct sail_conversion_options *options);
-
-SAIL_HIDDEN void fill_rgba64_pixel_from_uint16_values(uint16_t rv, uint16_t gv, uint16_t bv, uint16_t av, uint16_t *scan, int r, int g, int b, int a, const struct sail_conversion_options *options);
+    /*
+     * Blend the input alpha channel into the other color components if the output alpha channel
+     * doesn't exist. For example, when we convert RGBA pixels to RGB.
+     *
+     * Formula:
+     *   opacity = alpha / 100.0
+     *   output_pixel = opacity * input_pixel + (1 - opacity) * background
+     */
+    SAIL_CONVERSION_OPTION_BLEND_ALPHA = 1 << 1,
+};
 
 #endif

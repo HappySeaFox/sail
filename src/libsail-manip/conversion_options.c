@@ -23,22 +23,5 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_MANIP_UTILS_H
-#define SAIL_MANIP_UTILS_H
+#include "sail-manip.h"
 
-#include <stdint.h>
-
-#include "error.h"
-#include "export.h"
-
-struct sail_conversion_options;
-
-SAIL_HIDDEN void fill_rgba32_pixel_from_uint8_values(uint8_t rv, uint8_t gv, uint8_t bv, uint8_t av, uint8_t *scan, int r, int g, int b, int a, const struct sail_conversion_options *options);
-
-SAIL_HIDDEN void fill_rgba32_pixel_from_uint16_values(uint16_t rv, uint16_t gv, uint16_t bv, uint16_t av, uint8_t *scan, int r, int g, int b, int a, const struct sail_conversion_options *options);
-
-SAIL_HIDDEN void fill_rgba64_pixel_from_uint8_values(uint8_t rv, uint8_t gv, uint8_t bv, uint8_t av, uint16_t *scan, int r, int g, int b, int a, const struct sail_conversion_options *options);
-
-SAIL_HIDDEN void fill_rgba64_pixel_from_uint16_values(uint16_t rv, uint16_t gv, uint16_t bv, uint16_t av, uint16_t *scan, int r, int g, int b, int a, const struct sail_conversion_options *options);
-
-#endif
