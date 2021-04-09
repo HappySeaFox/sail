@@ -1,6 +1,6 @@
 /*  This file is part of SAIL (https://github.com/smoked-herring/sail)
 
-    Copyright (c) 2020-2021 Dmitry Baryshev
+    Copyright (c) 2021 Dmitry Baryshev
 
     The MIT License
 
@@ -23,22 +23,44 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_SAIL_MANIP_H
-#define SAIL_SAIL_MANIP_H
+#include "sail-manip.h"
 
-/* Universal libsail-manip include. */
+void fill_rgba32_pixel_from_uint8_values(uint8_t *scan, int r, int g, int b, int a, uint8_t rv, uint8_t gv, uint8_t bv, uint8_t av) {
 
-#ifdef SAIL_BUILD
-    #include "sail-common.h"
+    *(scan+r) = rv;
+    *(scan+g) = gv;
+    *(scan+b) = bv;
+    if (a >= 0) {
+        *(scan+a) = av;
+    }
+}
 
-    #include "convert_to_32.h"
-    #include "convert_to_64.h"
-    #include "pixel_utils.h"
-#else
-    #include <sail-common/sail-common.h>
+void fill_rgba32_pixel_from_uint16_values(uint8_t *scan, int r, int g, int b, int a, uint16_t rv, uint16_t gv, uint16_t bv, uint16_t av) {
 
-    #include <sail-manip/convert_to_32.h>
-    #include <sail-manip/convert_to_64.h>
-#endif
+    *(scan+r) = (uint8_t)(rv / 257.0);
+    *(scan+g) = (uint8_t)(gv / 257.0);
+    *(scan+b) = (uint8_t)(bv / 257.0);
+    if (a >= 0) {
+        *(scan+a) = (uint8_t)(av / 257.0);
+    }
+}
 
-#endif
+void fill_rgba64_pixel_from_uint8_values(uint16_t *scan, int r, int g, int b, int a, uint8_t rv, uint8_t gv, uint8_t bv, uint8_t av) {
+
+    *(scan+r) = rv * 257;
+    *(scan+g) = gv * 257;
+    *(scan+b) = bv * 257;
+    if (a >= 0) {
+        *(scan+a) = av * 257;
+    }
+}
+
+void fill_rgba64_pixel_from_uint16_values(uint16_t *scan, int r, int g, int b, int a, uint16_t rv, uint16_t gv, uint16_t bv, uint16_t av) {
+
+    *(scan+r) = rv;
+    *(scan+g) = gv;
+    *(scan+b) = bv;
+    if (a >= 0) {
+        *(scan+a) = av;
+    }
+}

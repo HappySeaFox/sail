@@ -5,6 +5,9 @@ add_library(sail-manip
                 convert_to_32.h
                 convert_to_64.c
                 convert_to_64.h
+                pixel_utils.c
+                pixel_utils.h
+                sail-manip.h
                 ycbcr.c
                 ycbcr.h)
 

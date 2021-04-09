@@ -1,6 +1,6 @@
 /*  This file is part of SAIL (https://github.com/smoked-herring/sail)
 
-    Copyright (c) 2020-2021 Dmitry Baryshev
+    Copyright (c) 2021 Dmitry Baryshev
 
     The MIT License
 
@@ -23,22 +23,25 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_SAIL_MANIP_H
-#define SAIL_SAIL_MANIP_H
+#ifndef SAIL_PIXEL_UTILS_H
+#define SAIL_PIXEL_UTILS_H
 
-/* Universal libsail-manip include. */
+#include <stdint.h>
 
 #ifdef SAIL_BUILD
-    #include "sail-common.h"
-
-    #include "convert_to_32.h"
-    #include "convert_to_64.h"
-    #include "pixel_utils.h"
+    #include "error.h"
+    #include "export.h"
 #else
-    #include <sail-common/sail-common.h>
-
-    #include <sail-manip/convert_to_32.h>
-    #include <sail-manip/convert_to_64.h>
+    #include <sail-common/error.h>
+    #include <sail-common/export.h>
 #endif
+
+SAIL_HIDDEN void fill_rgba32_pixel_from_uint8_values(uint8_t *scan, int r, int g, int b, int a, uint8_t rv, uint8_t gv, uint8_t bv, uint8_t av);
+
+SAIL_HIDDEN void fill_rgba32_pixel_from_uint16_values(uint8_t *scan, int r, int g, int b, int a, uint16_t rv, uint16_t gv, uint16_t bv, uint16_t av);
+
+SAIL_HIDDEN void fill_rgba64_pixel_from_uint8_values(uint16_t *scan, int r, int g, int b, int a, uint8_t rv, uint8_t gv, uint8_t bv, uint8_t av);
+
+SAIL_HIDDEN void fill_rgba64_pixel_from_uint16_values(uint16_t *scan, int r, int g, int b, int a, uint16_t rv, uint16_t gv, uint16_t bv, uint16_t av);
 
 #endif
