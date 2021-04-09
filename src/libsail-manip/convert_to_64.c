@@ -418,11 +418,11 @@ static sail_status_t to_bpp64_rgba_kind(const struct sail_image *image_input, in
             }
             case SAIL_PIXEL_FORMAT_BPP32_CMYK: {
                 const uint8_t *scan_input = (uint8_t *)image_input->pixels + image_input->bytes_per_line * row;
-                uint8_t rv, gv, bv;
+                sail_rgb24_t rgb;
 
                 for (unsigned pixel_index = 0; pixel_index < image_input->width; pixel_index++) {
-                    convert_cmyk32_to_rgb24(*(scan_input+0), *(scan_input+1), *(scan_input+2), *(scan_input+3), &rv, &gv, &bv);
-                    fill_rgba64_pixel_from_uint8_values(scan_output, r, g, b, a, rv, gv, bv, 255);
+                    SAIL_TRY(sail_convert_cmyk32_to_rgb24(*(scan_input+0), *(scan_input+1), *(scan_input+2), *(scan_input+3), &rgb));
+                    fill_rgba64_pixel_from_uint8_values(scan_output, r, g, b, a, rgb.component1, rgb.component2, rgb.component3, 255);
 
                     scan_input += 4;
                     scan_output += 4;
@@ -431,11 +431,11 @@ static sail_status_t to_bpp64_rgba_kind(const struct sail_image *image_input, in
             }
             case SAIL_PIXEL_FORMAT_BPP24_YCBCR: {
                 const uint8_t *scan_input = (uint8_t *)image_input->pixels + image_input->bytes_per_line * row;
-                uint8_t rv, gv, bv;
+                sail_rgb24_t rgb;
 
                 for (unsigned pixel_index = 0; pixel_index < image_input->width; pixel_index++) {
-                    convert_ycbcr_to_rgb(*(scan_input+0), *(scan_input+1), *(scan_input+2), &rv, &gv, &bv);
-                    fill_rgba64_pixel_from_uint8_values(scan_output, r, g, b, a, rv, gv, bv, 255);
+                    SAIL_TRY(sail_convert_ycbcr24_to_rgb24(*(scan_input+0), *(scan_input+1), *(scan_input+2), &rgb));
+                    fill_rgba64_pixel_from_uint8_values(scan_output, r, g, b, a, rgb.component1, rgb.component2, rgb.component3, 255);
 
                     scan_input += 3;
                     scan_output += 4;

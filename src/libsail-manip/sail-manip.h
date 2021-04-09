@@ -31,14 +31,18 @@
 #ifdef SAIL_BUILD
     #include "sail-common.h"
 
+    #include "cmyk.h"
     #include "convert_to_32.h"
     #include "convert_to_64.h"
     #include "pixel_utils.h"
+    #include "ycbcr.h"
 #else
     #include <sail-common/sail-common.h>
 
+    #include <sail-manip/cmyk.h>
     #include <sail-manip/convert_to_32.h>
     #include <sail-manip/convert_to_64.h>
+    #include <sail-manip/ycbcr.h>
 #endif
 
 #endif

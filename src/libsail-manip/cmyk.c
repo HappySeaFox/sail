@@ -23,9 +23,11 @@
     SOFTWARE.
 */
 
-#include "cmyk.h"
+#include "sail-manip.h"
 
-void convert_cmyk32_to_rgb24(uint8_t c, uint8_t m, uint8_t y, uint8_t k, uint8_t *r, uint8_t *g, uint8_t *b) {
+sail_status_t sail_convert_cmyk32_to_rgb24(uint8_t c, uint8_t m, uint8_t y, uint8_t k, sail_rgb24_t *rgb) {
+
+    SAIL_CHECK_PTR(rgb);
 
 #if 0
     const uint8_t C =  (uint8_t)(c / 100.0);
@@ -37,8 +39,10 @@ void convert_cmyk32_to_rgb24(uint8_t c, uint8_t m, uint8_t y, uint8_t k, uint8_t
     *g = (uint8_t)((1-M) * (1-K) * 255);
     *b = (uint8_t)((1-Y) * (1-K) * 255);
 #else
-    *r = (uint8_t)((double)c * k / 255.0 + 0.5);
-    *g = (uint8_t)((double)m * k / 255.0 + 0.5);
-    *b = (uint8_t)((double)y * k / 255.0 + 0.5);
+    rgb->component1 = (uint8_t)((double)c * k / 255.0 + 0.5);
+    rgb->component2 = (uint8_t)((double)m * k / 255.0 + 0.5);
+    rgb->component3 = (uint8_t)((double)y * k / 255.0 + 0.5);
 #endif
+
+    return SAIL_OK;
 }

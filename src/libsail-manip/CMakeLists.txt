@@ -13,9 +13,11 @@ add_library(sail-manip
 
 # Build a list of public headers to install
 #
-set(PUBLIC_HEADERS "convert_to_32.h"
+set(PUBLIC_HEADERS "cmyk.h"
+                   "convert_to_32.h"
                    "convert_to_64.h"
-                   "sail-manip.h")
+                   "sail-manip.h"
+                   "ycbcr.h")
 
 set_target_properties(sail-manip PROPERTIES
                                  VERSION "0.3.0"

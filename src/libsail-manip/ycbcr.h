@@ -29,11 +29,15 @@
 #include <stdint.h>
 
 #ifdef SAIL_BUILD
+    #include "error.h"
     #include "export.h"
+    #include "pixel.h"
 #else
+    #include <sail-common/error.h>
     #include <sail-common/export.h>
+    #include <sail-common/pixel.h>
 #endif
 
-SAIL_HIDDEN void convert_ycbcr_to_rgb(uint8_t y, uint8_t cb, uint8_t cr, uint8_t *r, uint8_t *g, uint8_t *b);
+SAIL_EXPORT sail_status_t sail_convert_ycbcr24_to_rgb24(uint8_t y, uint8_t cb, uint8_t cr, sail_rgb24_t *rgb);
 
 #endif
