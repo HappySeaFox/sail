@@ -34,7 +34,7 @@
     #include "cmyk.h"
     #include "convert_to_32.h"
     #include "convert_to_64.h"
-    #include "pixel_utils.h"
+    #include "manip_utils.h"
     #include "ycbcr.h"
 #else
     #include <sail-common/sail-common.h>

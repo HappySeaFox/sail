@@ -23,8 +23,8 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_PIXEL_UTILS_H
-#define SAIL_PIXEL_UTILS_H
+#ifndef SAIL_MANIP_UTILS_H
+#define SAIL_MANIP_UTILS_H
 
 #include <stdint.h>
 
