@@ -391,7 +391,7 @@ sail_status_t image::convert(SailPixelFormat pixel_format) {
         case SAIL_PIXEL_FORMAT_BPP32_BGRA:
         case SAIL_PIXEL_FORMAT_BPP32_ARGB:
         case SAIL_PIXEL_FORMAT_BPP32_ABGR: {
-            SAIL_TRY(sail_convert_image_to_bpp32_rgba_kind(sail_img, pixel_format, &sail_image_output));
+            SAIL_TRY(sail_convert_image_to_rgba32_kind(sail_img, pixel_format, &sail_image_output));
             break;
         }
         case SAIL_PIXEL_FORMAT_BPP64_RGBX:
@@ -402,7 +402,7 @@ sail_status_t image::convert(SailPixelFormat pixel_format) {
         case SAIL_PIXEL_FORMAT_BPP64_BGRA:
         case SAIL_PIXEL_FORMAT_BPP64_ARGB:
         case SAIL_PIXEL_FORMAT_BPP64_ABGR: {
-            SAIL_TRY(sail_convert_image_to_bpp64_rgba_kind(sail_img, pixel_format, &sail_image_output));
+            SAIL_TRY(sail_convert_image_to_rgba64_kind(sail_img, pixel_format, &sail_image_output));
             break;
         }
         default: {

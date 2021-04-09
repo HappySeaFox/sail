@@ -73,9 +73,9 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
     SAIL_TRY(sail_read_file(path.toLocal8Bit(), &image));
 
     struct sail_image *image_converted;
-    SAIL_TRY_OR_CLEANUP(sail_convert_image_to_bpp32_rgba_kind(image,
-                                                              SAIL_PIXEL_FORMAT_BPP32_RGBA,
-                                                              &image_converted),
+    SAIL_TRY_OR_CLEANUP(sail_convert_image_to_rgba32_kind(image,
+                                                          SAIL_PIXEL_FORMAT_BPP32_RGBA,
+                                                          &image_converted),
                         /* cleanup */ sail_destroy_image(image));
 
     // Construct QImage from the read image pixels.

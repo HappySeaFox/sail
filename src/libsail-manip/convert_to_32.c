@@ -459,7 +459,7 @@ static sail_status_t to_bpp32_rgba_kind(const struct sail_image *image_input, in
  * Public functions.
  */
 
-sail_status_t sail_convert_image_to_bpp32_rgba_kind(const struct sail_image *image_input, enum SailPixelFormat output_pixel_format, struct sail_image **image_output) {
+sail_status_t sail_convert_image_to_rgba32_kind(const struct sail_image *image_input, enum SailPixelFormat output_pixel_format, struct sail_image **image_output) {
 
     SAIL_TRY(sail_check_image_valid(image_input));
     SAIL_CHECK_IMAGE_PTR(image_output);
@@ -487,7 +487,7 @@ sail_status_t sail_convert_image_to_bpp32_rgba_kind(const struct sail_image *ima
     return SAIL_OK;
 }
 
-sail_status_t sail_convert_image_to_bpp32_rgba_kind_in_place(struct sail_image *image, enum SailPixelFormat output_pixel_format) {
+sail_status_t sail_convert_image_to_rgba32_kind_in_place(struct sail_image *image, enum SailPixelFormat output_pixel_format) {
 
     SAIL_TRY(sail_check_image_valid(image));
 

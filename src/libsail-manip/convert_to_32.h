@@ -61,9 +61,9 @@ struct sail_image;
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_convert_image_to_bpp32_rgba_kind(const struct sail_image *image_input,
-                                                                enum SailPixelFormat output_pixel_format,
-                                                                struct sail_image **image_output);
+SAIL_EXPORT sail_status_t sail_convert_image_to_rgba32_kind(const struct sail_image *image_input,
+                                                            enum SailPixelFormat output_pixel_format,
+                                                            struct sail_image **image_output);
 
 /*
  * Converts the specified input image to the BPP32-RGBA-ish format. If the function fails, the image pixels may be left partially converted.
@@ -83,7 +83,7 @@ SAIL_EXPORT sail_status_t sail_convert_image_to_bpp32_rgba_kind(const struct sai
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_convert_image_to_bpp32_rgba_kind_in_place(struct sail_image *image, enum SailPixelFormat output_pixel_format);
+SAIL_EXPORT sail_status_t sail_convert_image_to_rgba32_kind_in_place(struct sail_image *image, enum SailPixelFormat output_pixel_format);
 
 /* extern "C" */
 #ifdef __cplusplus
