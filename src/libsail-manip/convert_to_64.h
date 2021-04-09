@@ -43,7 +43,7 @@ extern "C" {
 struct sail_image;
 
 /*
- * Converts the specified input image to the BPP64-RGBA-ish format and saves the result in the output image.
+ * Converts the input image to the BPP64-RGBA-ish format and saves the result in the output image.
  * The output image MUST be destroyed later with sail_destroy_image().
  *
  * Allowed input pixel formats:
@@ -66,7 +66,7 @@ SAIL_EXPORT sail_status_t sail_convert_image_to_rgba64_kind(const struct sail_im
                                                             struct sail_image **image_output);
 
 /*
- * Converts the specified input image to the BPP64-RGBA-ish format. If the function fails, the image pixels may be left partially converted.
+ * Updates the specified image to the BPP64-RGBA-ish format. If the function fails, the image pixels may be left partially converted.
  *
  * Allowed input pixel formats:
  *   - Anything with 64 bits per pixel except YCCK, LUV, and LAB
@@ -83,7 +83,7 @@ SAIL_EXPORT sail_status_t sail_convert_image_to_rgba64_kind(const struct sail_im
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_convert_image_to_rgba64_kind_in_place(struct sail_image *image, enum SailPixelFormat output_pixel_format);
+SAIL_EXPORT sail_status_t sail_update_image_to_rgba64_kind(struct sail_image *image, enum SailPixelFormat output_pixel_format);
 
 /* extern "C" */
 #ifdef __cplusplus

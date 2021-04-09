@@ -487,7 +487,7 @@ sail_status_t sail_convert_image_to_rgba64_kind(const struct sail_image *image_i
     return SAIL_OK;
 }
 
-sail_status_t sail_convert_image_to_rgba64_kind_in_place(struct sail_image *image, enum SailPixelFormat output_pixel_format) {
+sail_status_t sail_update_image_to_rgba64_kind(struct sail_image *image, enum SailPixelFormat output_pixel_format) {
 
     SAIL_TRY(sail_check_image_valid(image));
 
