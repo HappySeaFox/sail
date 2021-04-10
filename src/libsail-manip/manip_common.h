@@ -45,7 +45,7 @@ enum SailConversionOption {
      * doesn't exist. For example, when we convert RGBA pixels to RGB.
      *
      * Formula:
-     *   opacity = alpha / 100.0
+     *   opacity = alpha / max_alpha (to convert to [0, 1])
      *   output_pixel = opacity * input_pixel + (1 - opacity) * background
      */
     SAIL_CONVERSION_OPTION_BLEND_ALPHA = 1 << 1,
