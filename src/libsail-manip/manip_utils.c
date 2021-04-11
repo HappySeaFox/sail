@@ -25,6 +25,30 @@
 
 #include "sail-manip.h"
 
+void spread_gray8_to_rgba32(uint8_t value, sail_rgba32_t *color) {
+
+    color->component1 = color->component2 = color->component3 = value;
+    color->component4 = 255;
+}
+
+void spread_gray16_to_rgba32(uint16_t value, sail_rgba32_t *color) {
+
+    color->component1 = color->component2 = color->component3 = (uint8_t)(value / 257.0);
+    color->component4 = 255;
+}
+
+void spread_gray8_to_rgba64(uint8_t value, sail_rgba64_t *color) {
+
+    color->component1 = color->component2 = color->component3 = (uint16_t)value * 257;
+    color->component4 = 65535;
+}
+
+void spread_gray16_to_rgba64(uint16_t value, sail_rgba64_t *color) {
+
+    color->component1 = color->component2 = color->component3 = value;
+    color->component4 = 65535;
+}
+
 sail_status_t get_palette_rgba32(const struct sail_palette *palette, unsigned index, sail_rgba32_t *color) {
 
     if (index >= palette->color_count) {

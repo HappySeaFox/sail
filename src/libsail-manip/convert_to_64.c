@@ -61,18 +61,6 @@ static sail_status_t verify_and_construct_rgba64_indexes(enum SailPixelFormat ou
     return SAIL_OK;
 }
 
-static void spread_gray8_to_rgba64(uint8_t value, sail_rgba64_t *color) {
-
-    color->component1 = color->component2 = color->component3 = (uint16_t)value * 257;
-    color->component4 = 65535;
-}
-
-static void spread_gray16_to_rgba64(uint16_t value, sail_rgba64_t *color) {
-
-    color->component1 = color->component2 = color->component3 = value;
-    color->component4 = 65535;
-}
-
 static void fill_rgba64_scan_from_rgb24_kind(const uint8_t **scan_input, unsigned width, int ri, int gi, int bi, uint16_t **scan_output, int r, int g, int b, int a) {
 
     for (unsigned pixel_index = 0; pixel_index < width; pixel_index++) {
