@@ -43,6 +43,6 @@
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_convert_cmyk32_to_rgb24(uint8_t c, uint8_t m, uint8_t y, uint8_t k, sail_rgb24_t *rgb);
+SAIL_EXPORT sail_status_t sail_convert_cmyk32_to_rgba32(uint8_t c, uint8_t m, uint8_t y, uint8_t k, sail_rgba32_t *rgba);
 
 #endif
