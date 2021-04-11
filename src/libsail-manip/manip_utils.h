@@ -44,8 +44,6 @@ SAIL_HIDDEN void spread_gray16_to_rgba64(uint16_t value, sail_rgba64_t *color);
 
 SAIL_HIDDEN sail_status_t get_palette_rgba32(const struct sail_palette *palette, unsigned index, sail_rgba32_t *color);
 
-SAIL_HIDDEN sail_status_t get_palette_rgba64(const struct sail_palette *palette, unsigned index, sail_rgba64_t *color);
-
 SAIL_HIDDEN void fill_rgba32_pixel_from_uint8_values(uint8_t rv, uint8_t gv, uint8_t bv, uint8_t av, uint8_t *scan, int r, int g, int b, int a, const struct sail_conversion_options *options);
 
 SAIL_HIDDEN void fill_rgba32_pixel_from_uint16_values(uint16_t rv, uint16_t gv, uint16_t bv, uint16_t av, uint8_t *scan, int r, int g, int b, int a, const struct sail_conversion_options *options);

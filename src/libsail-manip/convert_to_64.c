@@ -99,7 +99,8 @@ static void fill_rgba64_scan_from_rgba64_kind(const uint16_t **scan_input, unsig
 
 static sail_status_t to_bpp64_rgba_kind(const struct sail_image *image_input, int r, int g, int b, int a, const struct sail_conversion_options *options, struct sail_image *image_output) {
 
-    sail_rgba64_t rgba;
+    sail_rgba32_t rgba32;
+    sail_rgba64_t rgba64;
 
     /* Convert image. */
     for (unsigned row = 0; row < image_input->height; row++) {
@@ -119,12 +120,12 @@ static sail_status_t to_bpp64_rgba_kind(const struct sail_image *image_input, in
                         const uint8_t index = (byte & bit_mask) >> bit_shift;
 
                         if (image_input->pixel_format == SAIL_PIXEL_FORMAT_BPP1_INDEXED) {
-                            SAIL_TRY(get_palette_rgba64(image_input->palette, index, &rgba));
+                            SAIL_TRY(get_palette_rgba32(image_input->palette, index, &rgba32));
                         } else {
-                            spread_gray8_to_rgba64(index == 0 ? 0 : 255, &rgba);
+                            spread_gray8_to_rgba32(index == 0 ? 0 : 255, &rgba32);
                         }
 
-                        fill_rgba64_pixel_from_uint16_values(rgba.component1, rgba.component2, rgba.component3, rgba.component4, scan_output, r, g, b, a, options);
+                        fill_rgba64_pixel_from_uint8_values(rgba32.component1, rgba32.component2, rgba32.component3, rgba32.component4, scan_output, r, g, b, a, options);
                         scan_output += 4;
 
                         bit_shift--;
@@ -147,12 +148,12 @@ static sail_status_t to_bpp64_rgba_kind(const struct sail_image *image_input, in
                         const uint8_t index = (byte & bit_mask) >> bit_shift;
 
                         if (image_input->pixel_format == SAIL_PIXEL_FORMAT_BPP2_INDEXED) {
-                            SAIL_TRY(get_palette_rgba64(image_input->palette, index, &rgba));
+                            SAIL_TRY(get_palette_rgba32(image_input->palette, index, &rgba32));
                         } else {
-                            spread_gray8_to_rgba64(index * 85, &rgba);
+                            spread_gray8_to_rgba32(index * 85, &rgba32);
                         }
 
-                        fill_rgba64_pixel_from_uint16_values(rgba.component1, rgba.component2, rgba.component3, rgba.component4, scan_output, r, g, b, a, options);
+                        fill_rgba64_pixel_from_uint8_values(rgba32.component1, rgba32.component2, rgba32.component3, rgba32.component4, scan_output, r, g, b, a, options);
                         scan_output += 4;
 
                         bit_shift -= 2;
@@ -175,12 +176,12 @@ static sail_status_t to_bpp64_rgba_kind(const struct sail_image *image_input, in
                         const uint8_t index = (byte & bit_mask) >> bit_shift;
 
                         if (image_input->pixel_format == SAIL_PIXEL_FORMAT_BPP4_INDEXED) {
-                            SAIL_TRY(get_palette_rgba64(image_input->palette, index, &rgba));
+                            SAIL_TRY(get_palette_rgba32(image_input->palette, index, &rgba32));
                         } else {
-                            spread_gray8_to_rgba64(index * 17, &rgba);
+                            spread_gray8_to_rgba32(index * 17, &rgba32);
                         }
 
-                        fill_rgba64_pixel_from_uint16_values(rgba.component1, rgba.component2, rgba.component3, rgba.component4, scan_output, r, g, b, a, options);
+                        fill_rgba64_pixel_from_uint8_values(rgba32.component1, rgba32.component2, rgba32.component3, rgba32.component4, scan_output, r, g, b, a, options);
                         scan_output += 4;
 
                         bit_shift -= 4;
@@ -198,12 +199,12 @@ static sail_status_t to_bpp64_rgba_kind(const struct sail_image *image_input, in
                     const uint8_t index = *scan_input++;
 
                     if (image_input->pixel_format == SAIL_PIXEL_FORMAT_BPP8_INDEXED) {
-                        SAIL_TRY(get_palette_rgba64(image_input->palette, index, &rgba));
+                        SAIL_TRY(get_palette_rgba32(image_input->palette, index, &rgba32));
                     } else {
-                        spread_gray8_to_rgba64(index, &rgba);
+                        spread_gray8_to_rgba32(index, &rgba32);
                     }
 
-                    fill_rgba64_pixel_from_uint16_values(rgba.component1, rgba.component2, rgba.component3, rgba.component4, scan_output, r, g, b, a, options);
+                    fill_rgba64_pixel_from_uint8_values(rgba32.component1, rgba32.component2, rgba32.component3, rgba32.component4, scan_output, r, g, b, a, options);
                     scan_output += 4;
                 }
                 break;
@@ -212,8 +213,8 @@ static sail_status_t to_bpp64_rgba_kind(const struct sail_image *image_input, in
                 const uint16_t *scan_input = (uint16_t *)((uint8_t *)image_input->pixels + image_input->bytes_per_line * row);
 
                 for (unsigned pixel_index = 0; pixel_index < image_input->width; pixel_index++) {
-                    spread_gray16_to_rgba64(*scan_input++, &rgba);
-                    fill_rgba64_pixel_from_uint16_values(rgba.component1, rgba.component2, rgba.component3, rgba.component4, scan_output, r, g, b, a, options);
+                    spread_gray16_to_rgba32(*scan_input++, &rgba32);
+                    fill_rgba64_pixel_from_uint8_values(rgba32.component1, rgba32.component2, rgba32.component3, rgba32.component4, scan_output, r, g, b, a, options);
                     scan_output += 4;
                 }
                 break;
@@ -225,10 +226,10 @@ static sail_status_t to_bpp64_rgba_kind(const struct sail_image *image_input, in
                     const uint8_t value = *scan_input++;
                     const uint8_t alpha = *scan_input++;
 
-                    spread_gray8_to_rgba64(value, &rgba);
-                    rgba.component4 = alpha * 257;
+                    spread_gray8_to_rgba32(value, &rgba32);
+                    rgba32.component4 = alpha;
 
-                    fill_rgba64_pixel_from_uint16_values(rgba.component1, rgba.component2, rgba.component3, rgba.component4, scan_output, r, g, b, a, options);
+                    fill_rgba64_pixel_from_uint8_values(rgba32.component1, rgba32.component2, rgba32.component3, rgba32.component4, scan_output, r, g, b, a, options);
                     scan_output += 4;
                 }
                 break;
@@ -240,10 +241,10 @@ static sail_status_t to_bpp64_rgba_kind(const struct sail_image *image_input, in
                     const uint16_t value = *scan_input++;
                     const uint16_t alpha = *scan_input++;
 
-                    spread_gray16_to_rgba64(value, &rgba);
-                    rgba.component4 = alpha;
+                    spread_gray16_to_rgba64(value, &rgba64);
+                    rgba64.component4 = alpha;
 
-                    fill_rgba64_pixel_from_uint16_values(rgba.component1, rgba.component2, rgba.component3, rgba.component4, scan_output, r, g, b, a, options);
+                    fill_rgba64_pixel_from_uint16_values(rgba64.component1, rgba64.component2, rgba64.component3, rgba64.component4, scan_output, r, g, b, a, options);
                     scan_output += 4;
                 }
                 break;
