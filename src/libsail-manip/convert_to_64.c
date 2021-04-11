@@ -61,42 +61,6 @@ static sail_status_t verify_and_construct_rgba64_indexes(enum SailPixelFormat ou
     return SAIL_OK;
 }
 
-static sail_status_t get_palette_rgba64(const struct sail_palette *palette, unsigned index, sail_rgba64_t *color) {
-
-    if (index >= palette->color_count) {
-        SAIL_LOG_ERROR("Palette index %u is out of range [0; %u)", index, palette->color_count);
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
-    }
-
-    switch (palette->pixel_format) {
-        case SAIL_PIXEL_FORMAT_BPP24_RGB: {
-            const uint8_t *entry = (uint8_t *)palette->data + index * 3;
-
-            color->component1 = *(entry+0) * 257;
-            color->component2 = *(entry+1) * 257;
-            color->component3 = *(entry+2) * 257;
-            color->component4 = 65535;
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP32_RGBA: {
-            const uint8_t *entry = (uint8_t *)palette->data + index * 4;
-
-            color->component1 = *(entry+0) * 257;
-            color->component2 = *(entry+1) * 257;
-            color->component3 = *(entry+2) * 257;
-            color->component4 = *(entry+3) * 257;
-            break;
-        }
-        default: {
-            const char *pixel_format_str = NULL;
-            SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(palette->pixel_format, &pixel_format_str));
-            SAIL_LOG_ERROR("Palette pixel format %s is not currently supported", pixel_format_str);
-        }
-    }
-
-    return SAIL_OK;
-}
-
 static void spread_gray8_to_rgba64(uint8_t value, sail_rgba64_t *color) {
 
     color->component1 = color->component2 = color->component3 = (uint16_t)value * 257;
