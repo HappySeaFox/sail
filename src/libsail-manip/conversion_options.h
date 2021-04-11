@@ -43,15 +43,36 @@
 struct sail_conversion_options {
 
     /*
-     * Or-ed SailConversionOption-s.
+     * Or-ed SailConversionOption-s. If zero, SAIL_CONVERSION_OPTION_DROP_ALPHA is assumed.
      */
     int options;
 
     /*
-     * Background color to blend into other color components instead of alpha
+     * 48-bit background color to blend into other 16-bit color components instead of alpha
      * when options has SAIL_CONVERSION_OPTION_BLEND_ALPHA.
      */
-    sail_rgb48_t background;
+    sail_rgb48_t background48;
+
+    /*
+     * 24-bit background color to blend into other 8-bit color components instead of alpha
+     * when options has SAIL_CONVERSION_OPTION_BLEND_ALPHA.
+     */
+    sail_rgb24_t background24;
 };
+
+typedef struct sail_conversion_options sail_conversion_options_t;
+
+/*
+ * Allocates new conversion options. The assigned options MUST be destroyed later with sail_destroy_conversion_options().
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_alloc_conversion_options(struct sail_conversion_options **options);
+
+/*
+ * Destroys the specified conversion options and all its internal allocated memory buffers.
+ * The options MUST NOT be used anymore after calling this function. Does nothing if the options is NULL.
+ */
+SAIL_EXPORT void sail_destroy_conversion_options(struct sail_conversion_options *options);
 
 #endif

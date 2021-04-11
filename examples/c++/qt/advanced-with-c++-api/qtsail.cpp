@@ -60,6 +60,7 @@ sail_status_t QtSail::init()
                                                           "<ul>"
                                                           "<li>Linking against SAIL CMake packages</li>"
                                                           "<li>Playing animations</li>"
+                                                          "<li>Conversion with blending</li>"
                                                           "</ul>"));
     });
 

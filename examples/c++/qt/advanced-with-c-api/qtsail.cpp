@@ -63,6 +63,7 @@ sail_status_t QtSail::init()
                                                           "<ul>"
                                                           "<li>Linking against SAIL CMake packages</li>"
                                                           "<li>Playing animations</li>"
+                                                          "<li>Conversion with blending</li>"
                                                           "</ul>"));
     });
 
@@ -101,10 +102,18 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
 
     while ((res = sail_read_next_frame(state, &image)) == SAIL_OK) {
 
+        /* Mutate alpha into a green color. */
+        const struct sail_conversion_options options = {
+            SAIL_CONVERSION_OPTION_BLEND_ALPHA,
+            { 0, 255 * 257, 0 },
+            { 0, 255, 0 }
+        };
+
         struct sail_image *image_converted;
-        SAIL_TRY_OR_CLEANUP(sail_convert_image_to_rgba32_kind(image,
-                                                              SAIL_PIXEL_FORMAT_BPP32_RGBA,
-                                                              &image_converted),
+        SAIL_TRY_OR_CLEANUP(sail_convert_image_to_rgba32_kind_with_options(image,
+                                                                           SAIL_PIXEL_FORMAT_BPP32_RGBX,
+                                                                           &options,
+                                                                           &image_converted),
                             /* cleanup */ sail_stop_reading(state),
                                           sail_destroy_image(image));
 
@@ -120,7 +129,7 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
                                image_converted->width,
                                image_converted->height,
                                image_converted->bytes_per_line,
-                               QImage::Format_RGBA8888).copy();
+                               QImage::Format_RGBX8888).copy();
 
         qimages->append(qimage);
         delays->append(image->delay);
