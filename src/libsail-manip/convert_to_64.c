@@ -383,11 +383,10 @@ static sail_status_t to_bpp64_rgba_kind(const struct sail_image *image_input, in
             }
             case SAIL_PIXEL_FORMAT_BPP24_YCBCR: {
                 const uint8_t *scan_input = (uint8_t *)image_input->pixels + image_input->bytes_per_line * row;
-                sail_rgb24_t rgb;
 
                 for (unsigned pixel_index = 0; pixel_index < image_input->width; pixel_index++) {
-                    SAIL_TRY(sail_convert_ycbcr24_to_rgb24(*(scan_input+0), *(scan_input+1), *(scan_input+2), &rgb));
-                    fill_rgba64_pixel_from_uint8_values(rgb.component1, rgb.component2, rgb.component3, 255, scan_output, r, g, b, a, options);
+                    SAIL_TRY(sail_convert_ycbcr24_to_rgba32(*(scan_input+0), *(scan_input+1), *(scan_input+2), &rgba32));
+                    fill_rgba64_pixel_from_uint8_values(rgba32.component1, rgba32.component2, rgba32.component3, rgba32.component4, scan_output, r, g, b, a, options);
 
                     scan_input += 3;
                     scan_output += 4;
