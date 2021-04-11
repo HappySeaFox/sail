@@ -459,6 +459,15 @@ static sail_status_t to_bpp64_rgba_kind(const struct sail_image *image_input, in
  * Public functions.
  */
 
+sail_status_t sail_convert_image_to_rgba64_kind(const struct sail_image *image_input,
+                                                enum SailPixelFormat output_pixel_format,
+                                                struct sail_image **image_output) {
+
+    SAIL_TRY(sail_convert_image_to_rgba64_kind_with_options(image_input, output_pixel_format, NULL /* options */, image_output));
+
+    return SAIL_OK;
+}
+
 sail_status_t sail_convert_image_to_rgba64_kind_with_options(const struct sail_image *image_input,
                                                              enum SailPixelFormat output_pixel_format,
                                                              const struct sail_conversion_options *options,
@@ -486,15 +495,6 @@ sail_status_t sail_convert_image_to_rgba64_kind_with_options(const struct sail_i
                         /* cleanup */ sail_destroy_image(image_local));
 
     *image_output = image_local;
-
-    return SAIL_OK;
-}
-
-sail_status_t sail_convert_image_to_rgba64_kind(const struct sail_image *image_input,
-                                                enum SailPixelFormat output_pixel_format,
-                                                struct sail_image **image_output) {
-
-    SAIL_TRY(sail_convert_image_to_rgba64_kind_with_options(image_input, output_pixel_format, NULL /* options */, image_output));
 
     return SAIL_OK;
 }
