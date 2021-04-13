@@ -63,7 +63,7 @@ sail_status_t QtSail::init()
                                                           "<ul>"
                                                           "<li>Linking against SAIL CMake packages</li>"
                                                           "<li>Playing animations</li>"
-                                                          "<li>Conversion with blending</li>"
+                                                          "<li>Conversion with alpha blending</li>"
                                                           "</ul>"));
     });
 
@@ -110,10 +110,10 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
         };
 
         struct sail_image *image_converted;
-        SAIL_TRY_OR_CLEANUP(sail_convert_image_to_rgba32_kind_with_options(image,
-                                                                           SAIL_PIXEL_FORMAT_BPP32_RGBX,
-                                                                           &options,
-                                                                           &image_converted),
+        SAIL_TRY_OR_CLEANUP(sail_convert_image_to_rgba_kind_with_options(image,
+                                                                         SAIL_PIXEL_FORMAT_BPP32_RGBX,
+                                                                         &options,
+                                                                         &image_converted),
                             /* cleanup */ sail_stop_reading(state),
                                           sail_destroy_image(image));
 

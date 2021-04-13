@@ -381,38 +381,7 @@ sail_status_t image::convert(SailPixelFormat pixel_format) {
     }
 
     sail_image *sail_image_output = NULL;
-
-    switch (pixel_format) {
-        case SAIL_PIXEL_FORMAT_BPP32_RGBX:
-        case SAIL_PIXEL_FORMAT_BPP32_BGRX:
-        case SAIL_PIXEL_FORMAT_BPP32_XRGB:
-        case SAIL_PIXEL_FORMAT_BPP32_XBGR:
-        case SAIL_PIXEL_FORMAT_BPP32_RGBA:
-        case SAIL_PIXEL_FORMAT_BPP32_BGRA:
-        case SAIL_PIXEL_FORMAT_BPP32_ARGB:
-        case SAIL_PIXEL_FORMAT_BPP32_ABGR: {
-            SAIL_TRY(sail_convert_image_to_rgba32_kind(sail_img, pixel_format, &sail_image_output));
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP64_RGBX:
-        case SAIL_PIXEL_FORMAT_BPP64_BGRX:
-        case SAIL_PIXEL_FORMAT_BPP64_XRGB:
-        case SAIL_PIXEL_FORMAT_BPP64_XBGR:
-        case SAIL_PIXEL_FORMAT_BPP64_RGBA:
-        case SAIL_PIXEL_FORMAT_BPP64_BGRA:
-        case SAIL_PIXEL_FORMAT_BPP64_ARGB:
-        case SAIL_PIXEL_FORMAT_BPP64_ABGR: {
-            SAIL_TRY(sail_convert_image_to_rgba64_kind(sail_img, pixel_format, &sail_image_output));
-            break;
-        }
-        default: {
-            const char *pixel_format_str = NULL;
-            SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(pixel_format, &pixel_format_str));
-            SAIL_LOG_ERROR("Conversion to %s is not currently supported", pixel_format_str);
-
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
-        }
-    }
+    SAIL_TRY(sail_convert_image_to_rgba_kind(sail_img, pixel_format, &sail_image_output));
 
     d->reset_pixels();
 

@@ -3,10 +3,8 @@ add_library(sail-manip
                 cmyk.h
                 conversion_options.c
                 conversion_options.h
-                convert_to_32.c
-                convert_to_32.h
-                convert_to_64.c
-                convert_to_64.h
+                convert.c
+                convert.h
                 manip_common.h
                 manip_utils.c
                 manip_utils.h
@@ -18,8 +16,7 @@ add_library(sail-manip
 #
 set(PUBLIC_HEADERS "cmyk.h"
                    "conversion_options.h"
-                   "convert_to_32.h"
-                   "convert_to_64.h"
+                   "convert.h"
                    "manip_common.h"
                    "sail-manip.h"
                    "ycbcr.h")

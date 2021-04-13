@@ -23,8 +23,8 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_CONVERT_TO_64_H
-#define SAIL_CONVERT_TO_64_H
+#ifndef SAIL_CONVERT_H
+#define SAIL_CONVERT_H
 
 #ifdef SAIL_BUILD
     #include "common.h"
@@ -44,33 +44,22 @@ struct sail_conversion_options;
 struct sail_image;
 
 /*
- * Converts the input image to the BPP64-RGBA-ish format and saves the result in the output image.
+ * Converts the input image to the BPP32-RGBA-ish format and saves the result in the output image.
  * The output image MUST be destroyed later with sail_destroy_image().
  *
  * Drops the input alpha channel if the output alpha channel doesn't exist. If you need to control
- * this behavior, use sail_convert_image_to_rgba64_kind_with_options().
+ * this behavior, use sail_convert_image_to_rgba_kind_with_options().
  *
- * Allowed input pixel formats:
- *   - Anything except YCCK, LUV, and LAB
- *
- * Allowed output pixel formats:
- *   - SAIL_PIXEL_FORMAT_BPP64_RGBX
- *   - SAIL_PIXEL_FORMAT_BPP64_BGRX
- *   - SAIL_PIXEL_FORMAT_BPP64_XRGB
- *   - SAIL_PIXEL_FORMAT_BPP64_XBGR
- *   - SAIL_PIXEL_FORMAT_BPP64_RGBA
- *   - SAIL_PIXEL_FORMAT_BPP64_BGRA
- *   - SAIL_PIXEL_FORMAT_BPP64_ARGB
- *   - SAIL_PIXEL_FORMAT_BPP64_ABGR
+ * See sail_convert_image_to_rgba_kind_with_options() for more.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_convert_image_to_rgba64_kind(const struct sail_image *image_input,
-                                                            enum SailPixelFormat output_pixel_format,
-                                                            struct sail_image **image_output);
+SAIL_EXPORT sail_status_t sail_convert_image_to_rgba_kind(const struct sail_image *image_input,
+                                                          enum SailPixelFormat output_pixel_format,
+                                                          struct sail_image **image_output);
 
 /*
- * Converts the input image to the BPP64-RGBA-ish format and saves the result in the output image.
+ * Converts the input image to the BPP32-RGBA-ish format and saves the result in the output image.
  * The output image MUST be destroyed later with sail_destroy_image().
  *
  * Options (which may be NULL) control the conversion behavior.
@@ -79,6 +68,15 @@ SAIL_EXPORT sail_status_t sail_convert_image_to_rgba64_kind(const struct sail_im
  *   - Anything except YCCK, LUV, and LAB
  *
  * Allowed output pixel formats:
+ *   - SAIL_PIXEL_FORMAT_BPP32_RGBX
+ *   - SAIL_PIXEL_FORMAT_BPP32_BGRX
+ *   - SAIL_PIXEL_FORMAT_BPP32_XRGB
+ *   - SAIL_PIXEL_FORMAT_BPP32_XBGR
+ *   - SAIL_PIXEL_FORMAT_BPP32_RGBA
+ *   - SAIL_PIXEL_FORMAT_BPP32_BGRA
+ *   - SAIL_PIXEL_FORMAT_BPP32_ARGB
+ *   - SAIL_PIXEL_FORMAT_BPP32_ABGR
+ *
  *   - SAIL_PIXEL_FORMAT_BPP64_RGBX
  *   - SAIL_PIXEL_FORMAT_BPP64_BGRX
  *   - SAIL_PIXEL_FORMAT_BPP64_XRGB
@@ -90,43 +88,41 @@ SAIL_EXPORT sail_status_t sail_convert_image_to_rgba64_kind(const struct sail_im
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_convert_image_to_rgba64_kind_with_options(const struct sail_image *image_input,
-                                                                         enum SailPixelFormat output_pixel_format,
-                                                                         const struct sail_conversion_options *options,
-                                                                         struct sail_image **image_output);
+SAIL_EXPORT sail_status_t sail_convert_image_to_rgba_kind_with_options(const struct sail_image *image_input,
+                                                                       enum SailPixelFormat output_pixel_format,
+                                                                       const struct sail_conversion_options *options,
+                                                                       struct sail_image **image_output);
 
 /*
- * Updates the specified image to the BPP64-RGBA-ish format. If the function fails, the image pixels may be left partially converted.
+ * Updates the image to the BPP32-RGBA-ish format. If the function fails, the image pixels may be left partially converted.
  *
  * Drops the input alpha channel if the output alpha channel doesn't exist. If you need to control
- * this behavior, use sail_update_image_to_rgba64_kind_with_options().
+ * this behavior, use sail_update_image_to_rgba_kind_with_options().
  *
- * Allowed input pixel formats:
- *   - Anything with 64 bits per pixel except YCCK, LUV, and LAB
- *
- * Allowed output pixel formats:
- *   - SAIL_PIXEL_FORMAT_BPP64_RGBX
- *   - SAIL_PIXEL_FORMAT_BPP64_BGRX
- *   - SAIL_PIXEL_FORMAT_BPP64_XRGB
- *   - SAIL_PIXEL_FORMAT_BPP64_XBGR
- *   - SAIL_PIXEL_FORMAT_BPP64_RGBA
- *   - SAIL_PIXEL_FORMAT_BPP64_BGRA
- *   - SAIL_PIXEL_FORMAT_BPP64_ARGB
- *   - SAIL_PIXEL_FORMAT_BPP64_ABGR
+ * See sail_update_image_to_rgba_kind_with_options() for more.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_update_image_to_rgba64_kind(struct sail_image *image, enum SailPixelFormat output_pixel_format);
+SAIL_EXPORT sail_status_t sail_update_image_to_rgba_kind(struct sail_image *image, enum SailPixelFormat output_pixel_format);
 
 /*
- * Updates the specified image to the BPP64-RGBA-ish format. If the function fails, the image pixels may be left partially converted.
+ * Updates the image to the BPP32-RGBA-ish format. If the function fails, the image pixels may be left partially converted.
  *
  * Options (which may be NULL) control the conversion behavior.
  *
  * Allowed input pixel formats:
- *   - Anything with 64 bits per pixel except YCCK, LUV, and LAB
+ *   - Anything with 32 bits per pixel or greater except YCCK, LUV, and LAB
  *
  * Allowed output pixel formats:
+ *   - SAIL_PIXEL_FORMAT_BPP32_RGBX
+ *   - SAIL_PIXEL_FORMAT_BPP32_BGRX
+ *   - SAIL_PIXEL_FORMAT_BPP32_XRGB
+ *   - SAIL_PIXEL_FORMAT_BPP32_XBGR
+ *   - SAIL_PIXEL_FORMAT_BPP32_RGBA
+ *   - SAIL_PIXEL_FORMAT_BPP32_BGRA
+ *   - SAIL_PIXEL_FORMAT_BPP32_ARGB
+ *   - SAIL_PIXEL_FORMAT_BPP32_ABGR
+ *
  *   - SAIL_PIXEL_FORMAT_BPP64_RGBX
  *   - SAIL_PIXEL_FORMAT_BPP64_BGRX
  *   - SAIL_PIXEL_FORMAT_BPP64_XRGB
@@ -138,9 +134,9 @@ SAIL_EXPORT sail_status_t sail_update_image_to_rgba64_kind(struct sail_image *im
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_update_image_to_rgba64_kind_with_options(struct sail_image *image,
-                                                                        enum SailPixelFormat output_pixel_format,
-                                                                        const struct sail_conversion_options *options);
+SAIL_EXPORT sail_status_t sail_update_image_to_rgba_kind_with_options(struct sail_image *image,
+                                                                      enum SailPixelFormat output_pixel_format,
+                                                                      const struct sail_conversion_options *options);
 
 /* extern "C" */
 #ifdef __cplusplus
