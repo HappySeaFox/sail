@@ -310,19 +310,19 @@ static MunitResult test_cie_lab(const MunitParameter params[], void *user_data) 
 
     unsigned result;
 
-    /* 24-bit CIE_LAB. */
+    /* 24-bit CIE-LAB. */
     munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP24_CIE_LAB, &result) == SAIL_OK);
     munit_assert(result == 30);
 
     munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP24_CIE_LAB, &result) == SAIL_OK);
     munit_assert(result == 33);
 
-    /* 48-bit CIE_LAB. */
-    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP48_CIE_LAB, &result) == SAIL_OK);
-    munit_assert(result == 60);
+    /* 40-bit CIE-LAB. */
+    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP40_CIE_LAB, &result) == SAIL_OK);
+    munit_assert(result == 50);
 
-    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP48_CIE_LAB, &result) == SAIL_OK);
-    munit_assert(result == 66);
+    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP40_CIE_LAB, &result) == SAIL_OK);
+    munit_assert(result == 55);
 
     return MUNIT_OK;
 }
