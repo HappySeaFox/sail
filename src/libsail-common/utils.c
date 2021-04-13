@@ -279,7 +279,7 @@ sail_status_t sail_pixel_format_to_string(enum SailPixelFormat pixel_format, con
         case SAIL_PIXEL_FORMAT_BPP32_YCCK:            *result = "BPP32-YCCK";            return SAIL_OK;
 
         case SAIL_PIXEL_FORMAT_BPP24_CIE_LAB:         *result = "BPP24-CIE-LAB";         return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP48_CIE_LAB:         *result = "BPP48-CIE-LAB";         return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP40_CIE_LAB:         *result = "BPP40-CIE-LAB";         return SAIL_OK;
 
         case SAIL_PIXEL_FORMAT_BPP24_CIE_LUV:         *result = "BPP24-CIE-LUV";         return SAIL_OK;
         case SAIL_PIXEL_FORMAT_BPP40_CIE_LUV:         *result = "BPP40-CIE-LUV";         return SAIL_OK;
@@ -377,7 +377,7 @@ sail_status_t sail_pixel_format_from_string(const char *str, enum SailPixelForma
         case UINT64_C(8244605667721702563):  *result = SAIL_PIXEL_FORMAT_BPP32_YCCK;            return SAIL_OK;
 
         case UINT64_C(13237269438873232231): *result = SAIL_PIXEL_FORMAT_BPP24_CIE_LAB;         return SAIL_OK;
-        case UINT64_C(13237367887476509101): *result = SAIL_PIXEL_FORMAT_BPP48_CIE_LAB;         return SAIL_OK;
+        case UINT64_C(13237356636207563173): *result = SAIL_PIXEL_FORMAT_BPP40_CIE_LAB;         return SAIL_OK;
 
         case UINT64_C(13237269438873232911): *result = SAIL_PIXEL_FORMAT_BPP24_CIE_LUV;         return SAIL_OK;
         case UINT64_C(13237356636207563853): *result = SAIL_PIXEL_FORMAT_BPP40_CIE_LUV;         return SAIL_OK;
@@ -712,7 +712,7 @@ sail_status_t sail_bits_per_pixel(enum SailPixelFormat pixel_format, unsigned *r
         case SAIL_PIXEL_FORMAT_BPP32_YCCK: *result = 32; return SAIL_OK;
 
         case SAIL_PIXEL_FORMAT_BPP24_CIE_LAB: *result = 24; return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP48_CIE_LAB: *result = 48; return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP40_CIE_LAB: *result = 40; return SAIL_OK;
 
         case SAIL_PIXEL_FORMAT_BPP24_CIE_LUV: *result = 24; return SAIL_OK;
         case SAIL_PIXEL_FORMAT_BPP40_CIE_LUV: *result = 40; return SAIL_OK;
