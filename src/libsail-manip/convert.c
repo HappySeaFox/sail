@@ -49,6 +49,28 @@ struct output_context {
 
 typedef void (*pixel_consumer_t)(const struct output_context *output_context, unsigned row, unsigned column, const sail_rgba32_t *rgba32, const sail_rgba64_t *rgba64);
 
+static void pixel_consumer_rgb24_kind(const struct output_context *output_context, unsigned row, unsigned column, const sail_rgba32_t *rgba32, const sail_rgba64_t *rgba64) {
+
+    uint8_t *scan = (uint8_t *)output_context->image->pixels + output_context->image->bytes_per_line * row + column * 3;
+
+    if (rgba32 != NULL) {
+        fill_rgb24_pixel_from_uint8_values(rgba32, scan, output_context->r, output_context->g, output_context->b, output_context->options);
+    } else {
+        fill_rgb24_pixel_from_uint16_values(rgba64, scan, output_context->r, output_context->g, output_context->b, output_context->options);
+    }
+}
+
+static void pixel_consumer_rgb48_kind(const struct output_context *output_context, unsigned row, unsigned column, const sail_rgba32_t *rgba32, const sail_rgba64_t *rgba64) {
+
+    uint16_t *scan = (uint16_t *)((uint8_t *)output_context->image->pixels + output_context->image->bytes_per_line * row + column * 6);
+
+    if (rgba32 != NULL) {
+        fill_rgb48_pixel_from_uint8_values(rgba32, scan, output_context->r, output_context->g, output_context->b, output_context->options);
+    } else {
+        fill_rgb48_pixel_from_uint16_values(rgba64, scan, output_context->r, output_context->g, output_context->b, output_context->options);
+    }
+}
+
 static void pixel_consumer_rgba32_kind(const struct output_context *output_context, unsigned row, unsigned column, const sail_rgba32_t *rgba32, const sail_rgba64_t *rgba64) {
 
     uint8_t *scan = (uint8_t *)output_context->image->pixels + output_context->image->bytes_per_line * row + column * 4;
@@ -74,6 +96,12 @@ static void pixel_consumer_rgba64_kind(const struct output_context *output_conte
 static sail_status_t verify_and_construct_rgba_indexes(enum SailPixelFormat output_pixel_format, pixel_consumer_t *pixel_consumer, int *r, int *g, int *b, int *a) {
 
     switch (output_pixel_format) {
+        case SAIL_PIXEL_FORMAT_BPP24_RGB: { *pixel_consumer = pixel_consumer_rgb24_kind; *r = 0; *g = 1; *b = 2; *a = -1; break; }
+        case SAIL_PIXEL_FORMAT_BPP24_BGR: { *pixel_consumer = pixel_consumer_rgb24_kind; *r = 2; *g = 1; *b = 0; *a = -1; break; }
+
+        case SAIL_PIXEL_FORMAT_BPP48_RGB: { *pixel_consumer = pixel_consumer_rgb48_kind; *r = 0; *g = 1; *b = 2; *a = -1; break; }
+        case SAIL_PIXEL_FORMAT_BPP48_BGR: { *pixel_consumer = pixel_consumer_rgb48_kind; *r = 2; *g = 1; *b = 0; *a = -1; break; }
+
         case SAIL_PIXEL_FORMAT_BPP32_RGBX: { *pixel_consumer = pixel_consumer_rgba32_kind; *r = 0; *g = 1; *b = 2; *a = -1; break; }
         case SAIL_PIXEL_FORMAT_BPP32_BGRX: { *pixel_consumer = pixel_consumer_rgba32_kind; *r = 2; *g = 1; *b = 0; *a = -1; break; }
         case SAIL_PIXEL_FORMAT_BPP32_XRGB: { *pixel_consumer = pixel_consumer_rgba32_kind; *r = 1; *g = 2; *b = 3; *a = -1; break; }

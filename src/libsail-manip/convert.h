@@ -68,6 +68,12 @@ SAIL_EXPORT sail_status_t sail_convert_image_to_rgba_kind(const struct sail_imag
  *   - Anything except YCCK, LUV, and LAB
  *
  * Allowed output pixel formats:
+ *   - SAIL_PIXEL_FORMAT_BPP24_RGB
+ *   - SAIL_PIXEL_FORMAT_BPP24_BGR
+ *
+ *   - SAIL_PIXEL_FORMAT_BPP48_RGB
+ *   - SAIL_PIXEL_FORMAT_BPP48_BGR
+ *
  *   - SAIL_PIXEL_FORMAT_BPP32_RGBX
  *   - SAIL_PIXEL_FORMAT_BPP32_BGRX
  *   - SAIL_PIXEL_FORMAT_BPP32_XRGB
@@ -114,6 +120,12 @@ SAIL_EXPORT sail_status_t sail_update_image_to_rgba_kind(struct sail_image *imag
  *   - Anything with 32 bits per pixel or greater except YCCK, LUV, and LAB
  *
  * Allowed output pixel formats:
+ *   - SAIL_PIXEL_FORMAT_BPP24_RGB
+ *   - SAIL_PIXEL_FORMAT_BPP24_BGR
+ *
+ *   - SAIL_PIXEL_FORMAT_BPP48_RGB
+ *   - SAIL_PIXEL_FORMAT_BPP48_BGR
+ *
  *   - SAIL_PIXEL_FORMAT_BPP32_RGBX
  *   - SAIL_PIXEL_FORMAT_BPP32_BGRX
  *   - SAIL_PIXEL_FORMAT_BPP32_XRGB
