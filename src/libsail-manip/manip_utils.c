@@ -25,30 +25,6 @@
 
 #include "sail-manip.h"
 
-void spread_gray8_to_rgba32(uint8_t value, sail_rgba32_t *rgba32) {
-
-    rgba32->component1 = rgba32->component2 = rgba32->component3 = value;
-    rgba32->component4 = 255;
-}
-
-void spread_gray16_to_rgba32(uint16_t value, sail_rgba32_t *rgba32) {
-
-    rgba32->component1 = rgba32->component2 = rgba32->component3 = (uint8_t)(value / 257.0);
-    rgba32->component4 = 255;
-}
-
-void spread_gray8_to_rgba64(uint8_t value, sail_rgba64_t *rgba64) {
-
-    rgba64->component1 = rgba64->component2 = rgba64->component3 = (uint16_t)value * 257;
-    rgba64->component4 = 65535;
-}
-
-void spread_gray16_to_rgba64(uint16_t value, sail_rgba64_t *rgba64) {
-
-    rgba64->component1 = rgba64->component2 = rgba64->component3 = value;
-    rgba64->component4 = 65535;
-}
-
 sail_status_t get_palette_rgba32(const struct sail_palette *palette, unsigned index, sail_rgba32_t *rgba32) {
 
     if (index >= palette->color_count) {
@@ -83,6 +59,30 @@ sail_status_t get_palette_rgba32(const struct sail_palette *palette, unsigned in
     }
 
     return SAIL_OK;
+}
+
+void spread_gray8_to_rgba32(uint8_t value, sail_rgba32_t *rgba32) {
+
+    rgba32->component1 = rgba32->component2 = rgba32->component3 = value;
+    rgba32->component4 = 255;
+}
+
+void spread_gray16_to_rgba32(uint16_t value, sail_rgba32_t *rgba32) {
+
+    rgba32->component1 = rgba32->component2 = rgba32->component3 = (uint8_t)(value / 257.0);
+    rgba32->component4 = 255;
+}
+
+void spread_gray8_to_rgba64(uint8_t value, sail_rgba64_t *rgba64) {
+
+    rgba64->component1 = rgba64->component2 = rgba64->component3 = (uint16_t)value * 257;
+    rgba64->component4 = 65535;
+}
+
+void spread_gray16_to_rgba64(uint16_t value, sail_rgba64_t *rgba64) {
+
+    rgba64->component1 = rgba64->component2 = rgba64->component3 = value;
+    rgba64->component4 = 65535;
 }
 
 void fill_rgb24_pixel_from_uint8_values(const sail_rgba32_t *rgba32, uint8_t *scan, int r, int g, int b, const struct sail_conversion_options *options) {
