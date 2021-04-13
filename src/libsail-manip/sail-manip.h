@@ -31,20 +31,16 @@
 #ifdef SAIL_BUILD
     #include "sail-common.h"
 
-    #include "cmyk.h"
     #include "conversion_options.h"
     #include "convert.h"
     #include "manip_common.h"
     #include "manip_utils.h"
-    #include "ycbcr.h"
 #else
     #include <sail-common/sail-common.h>
 
-    #include <sail-manip/cmyk.h>
     #include <sail-manip/conversion_options.h>
     #include <sail-manip/convert.h>
     #include <sail-manip/manip_common.h>
-    #include <sail-manip/ycbcr.h>
 #endif
 
 #endif

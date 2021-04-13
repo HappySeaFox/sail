@@ -25,7 +25,7 @@
 
 #include "sail-manip.h"
 
-sail_status_t sail_convert_cmyk32_to_rgba32(uint8_t c, uint8_t m, uint8_t y, uint8_t k, sail_rgba32_t *rgba) {
+sail_status_t convert_cmyk32_to_rgba32(uint8_t c, uint8_t m, uint8_t y, uint8_t k, sail_rgba32_t *rgba) {
 
     SAIL_CHECK_PTR(rgba);
 
