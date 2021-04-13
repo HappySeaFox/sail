@@ -42,7 +42,7 @@ enum SailConversionOption {
 
     /*
      * Blend the input alpha channel into the other color components if the output alpha channel
-     * doesn't exist. For example, when we convert RGBA pixels to RGB or RGBX.
+     * doesn't exist. For example, when we convert RGBA pixels to RGB.
      *
      * Formula:
      *   opacity = alpha / max_alpha (to convert to [0, 1])
