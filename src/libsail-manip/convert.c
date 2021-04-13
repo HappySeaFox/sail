@@ -617,7 +617,7 @@ static sail_status_t to_bpp32_rgba_kind(
         default: {
             const char *pixel_format_str = NULL;
             SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(image_input->pixel_format, &pixel_format_str));
-            SAIL_LOG_ERROR("Conversion %s -> kind of BPP32-RGBA is not currently supported", pixel_format_str);
+            SAIL_LOG_ERROR("Conversion from %s is not currently supported", pixel_format_str);
 
             SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
         }
