@@ -48,15 +48,15 @@ struct sail_image;
  * The output image MUST be destroyed later with sail_destroy_image().
  *
  * Drops the input alpha channel if the output alpha channel doesn't exist. If you need to control
- * this behavior, use sail_convert_image_to_rgba_kind_with_options().
+ * this behavior, use sail_convert_image_with_options().
  *
- * See sail_convert_image_to_rgba_kind_with_options() for more.
+ * See sail_convert_image_with_options() for more.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_convert_image_to_rgba_kind(const struct sail_image *image_input,
-                                                          enum SailPixelFormat output_pixel_format,
-                                                          struct sail_image **image_output);
+SAIL_EXPORT sail_status_t sail_convert_image(const struct sail_image *image_input,
+                                             enum SailPixelFormat output_pixel_format,
+                                             struct sail_image **image_output);
 
 /*
  * Converts the input image to the BPP32-RGBA-ish format and saves the result in the output image.
@@ -92,24 +92,26 @@ SAIL_EXPORT sail_status_t sail_convert_image_to_rgba_kind(const struct sail_imag
  *   - SAIL_PIXEL_FORMAT_BPP64_ARGB
  *   - SAIL_PIXEL_FORMAT_BPP64_ABGR
  *
+ *   - SAIL_PIXEL_FORMAT_BPP24_YCBCR
+ *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_convert_image_to_rgba_kind_with_options(const struct sail_image *image_input,
-                                                                       enum SailPixelFormat output_pixel_format,
-                                                                       const struct sail_conversion_options *options,
-                                                                       struct sail_image **image_output);
+SAIL_EXPORT sail_status_t sail_convert_image_with_options(const struct sail_image *image_input,
+                                                          enum SailPixelFormat output_pixel_format,
+                                                          const struct sail_conversion_options *options,
+                                                          struct sail_image **image_output);
 
 /*
  * Updates the image to the BPP32-RGBA-ish format. If the function fails, the image pixels may be left partially converted.
  *
  * Drops the input alpha channel if the output alpha channel doesn't exist. If you need to control
- * this behavior, use sail_update_image_to_rgba_kind_with_options().
+ * this behavior, use sail_update_image_with_options().
  *
- * See sail_update_image_to_rgba_kind_with_options() for more.
+ * See sail_update_image_with_options() for more.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_update_image_to_rgba_kind(struct sail_image *image, enum SailPixelFormat output_pixel_format);
+SAIL_EXPORT sail_status_t sail_update_image(struct sail_image *image, enum SailPixelFormat output_pixel_format);
 
 /*
  * Updates the image to the BPP32-RGBA-ish format. If the function fails, the image pixels may be left partially converted.
@@ -144,11 +146,13 @@ SAIL_EXPORT sail_status_t sail_update_image_to_rgba_kind(struct sail_image *imag
  *   - SAIL_PIXEL_FORMAT_BPP64_ARGB
  *   - SAIL_PIXEL_FORMAT_BPP64_ABGR
  *
+ *   - SAIL_PIXEL_FORMAT_BPP24_YCBCR
+ *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_update_image_to_rgba_kind_with_options(struct sail_image *image,
-                                                                      enum SailPixelFormat output_pixel_format,
-                                                                      const struct sail_conversion_options *options);
+SAIL_EXPORT sail_status_t sail_update_image_with_options(struct sail_image *image,
+                                                         enum SailPixelFormat output_pixel_format,
+                                                         const struct sail_conversion_options *options);
 
 /* extern "C" */
 #ifdef __cplusplus

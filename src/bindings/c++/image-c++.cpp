@@ -381,7 +381,7 @@ sail_status_t image::convert(SailPixelFormat pixel_format) {
     }
 
     sail_image *sail_image_output = NULL;
-    SAIL_TRY(sail_convert_image_to_rgba_kind(sail_img, pixel_format, &sail_image_output));
+    SAIL_TRY(sail_convert_image(sail_img, pixel_format, &sail_image_output));
 
     d->reset_pixels();
 

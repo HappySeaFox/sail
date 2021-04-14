@@ -110,10 +110,10 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
         };
 
         struct sail_image *image_converted;
-        SAIL_TRY_OR_CLEANUP(sail_convert_image_to_rgba_kind_with_options(image,
-                                                                         SAIL_PIXEL_FORMAT_BPP24_RGB,
-                                                                         &options,
-                                                                         &image_converted),
+        SAIL_TRY_OR_CLEANUP(sail_convert_image_with_options(image,
+                                                            SAIL_PIXEL_FORMAT_BPP24_RGB,
+                                                            &options,
+                                                            &image_converted),
                             /* cleanup */ sail_stop_reading(state),
                                           sail_destroy_image(image));
 

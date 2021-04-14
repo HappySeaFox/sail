@@ -25,6 +25,8 @@
 
 #include "sail-manip.h"
 
+#include "ycbcr.h"
+
 sail_status_t get_palette_rgba32(const struct sail_palette *palette, unsigned index, sail_rgba32_t *rgba32) {
 
     if (index >= palette->color_count) {
@@ -219,4 +221,40 @@ void fill_rgba64_pixel_from_uint16_values(const sail_rgba64_t *rgba64, uint16_t 
     if (a >= 0) {
         *(scan+a) = rgba64->component4;
     }
+}
+
+void fill_ycbcr_pixel_from_uint8_values(const sail_rgba32_t *rgba32, uint8_t *scan, const struct sail_conversion_options *options) {
+
+    sail_rgba32_t rgba32_no_alpha;
+
+    if (rgba32->component4 < 255 && options != NULL && (options->options & SAIL_CONVERSION_OPTION_BLEND_ALPHA)) {
+        const double opacity = rgba32->component4 / 255.0;
+
+        rgba32_no_alpha.component1 = (uint8_t)(opacity * rgba32->component1 + (1 - opacity) * options->background24.component1);
+        rgba32_no_alpha.component2 = (uint8_t)(opacity * rgba32->component2 + (1 - opacity) * options->background24.component2);
+        rgba32_no_alpha.component3 = (uint8_t)(opacity * rgba32->component3 + (1 - opacity) * options->background24.component3);
+    } else {
+        rgba32_no_alpha = *rgba32;
+    }
+
+    convert_rgba32_to_ycbcr24(&rgba32_no_alpha, scan+0, scan+1, scan+2);
+}
+
+void fill_ycbcr_pixel_from_uint16_values(const sail_rgba64_t *rgba64, uint8_t *scan, const struct sail_conversion_options *options) {
+
+    sail_rgba32_t rgba32_no_alpha;
+
+    if (rgba64->component4 < 65535 && options != NULL && (options->options & SAIL_CONVERSION_OPTION_BLEND_ALPHA)) {
+        const double opacity = rgba64->component4 / 65535.0;
+
+        rgba32_no_alpha.component1 = (uint8_t)((opacity * rgba64->component1 + (1 - opacity) * options->background48.component1) / 257.0);
+        rgba32_no_alpha.component2 = (uint8_t)((opacity * rgba64->component2 + (1 - opacity) * options->background48.component2) / 257.0);
+        rgba32_no_alpha.component3 = (uint8_t)((opacity * rgba64->component3 + (1 - opacity) * options->background48.component3) / 257.0);
+    } else {
+        rgba32_no_alpha.component1 = (uint8_t)(rgba64->component1 / 257.0);
+        rgba32_no_alpha.component1 = (uint8_t)(rgba64->component2 / 257.0);
+        rgba32_no_alpha.component1 = (uint8_t)(rgba64->component3 / 257.0);
+    }
+
+    convert_rgba32_to_ycbcr24(&rgba32_no_alpha, scan+0, scan+1, scan+2);
 }

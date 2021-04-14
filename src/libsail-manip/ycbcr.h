@@ -38,6 +38,8 @@
     #include <sail-common/pixel.h>
 #endif
 
-SAIL_HIDDEN sail_status_t convert_ycbcr24_to_rgba32(uint8_t y, uint8_t cb, uint8_t cr, sail_rgba32_t *rgba);
+SAIL_HIDDEN sail_status_t convert_ycbcr24_to_rgba32(uint8_t y, uint8_t cb, uint8_t cr, sail_rgba32_t *rgba32);
+
+SAIL_HIDDEN sail_status_t convert_rgba32_to_ycbcr24(sail_rgba32_t *rgba32, uint8_t *y, uint8_t *cb, uint8_t *cr);
 
 #endif

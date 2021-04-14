@@ -60,4 +60,8 @@ SAIL_HIDDEN void fill_rgba64_pixel_from_uint8_values(const sail_rgba32_t *rgba32
 
 SAIL_HIDDEN void fill_rgba64_pixel_from_uint16_values(const sail_rgba64_t *rgba64, uint16_t *scan, int r, int g, int b, int a, const struct sail_conversion_options *options);
 
+SAIL_HIDDEN void fill_ycbcr_pixel_from_uint8_values(const sail_rgba32_t *rgba32, uint8_t *scan, const struct sail_conversion_options *options);
+
+SAIL_HIDDEN void fill_ycbcr_pixel_from_uint16_values(const sail_rgba64_t *rgba64, uint8_t *scan, const struct sail_conversion_options *options);
+
 #endif

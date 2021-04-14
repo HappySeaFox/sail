@@ -93,6 +93,17 @@ static void pixel_consumer_rgba64_kind(const struct output_context *output_conte
     }
 }
 
+static void pixel_consumer_ycbcr(const struct output_context *output_context, unsigned row, unsigned column, const sail_rgba32_t *rgba32, const sail_rgba64_t *rgba64) {
+
+    uint8_t *scan = (uint8_t *)output_context->image->pixels + output_context->image->bytes_per_line * row + column * 3;
+
+    if (rgba32 != NULL) {
+        fill_ycbcr_pixel_from_uint8_values(rgba32, scan, output_context->options);
+    } else {
+        fill_ycbcr_pixel_from_uint16_values(rgba64, scan, output_context->options);
+    }
+}
+
 static sail_status_t verify_and_construct_rgba_indexes(enum SailPixelFormat output_pixel_format, pixel_consumer_t *pixel_consumer, int *r, int *g, int *b, int *a) {
 
     switch (output_pixel_format) {
@@ -119,6 +130,8 @@ static sail_status_t verify_and_construct_rgba_indexes(enum SailPixelFormat outp
         case SAIL_PIXEL_FORMAT_BPP64_BGRA: { *pixel_consumer = pixel_consumer_rgba64_kind; *r = 2; *g = 1; *b = 0; *a = 3;  break; }
         case SAIL_PIXEL_FORMAT_BPP64_ARGB: { *pixel_consumer = pixel_consumer_rgba64_kind; *r = 1; *g = 2; *b = 3; *a = 0;  break; }
         case SAIL_PIXEL_FORMAT_BPP64_ABGR: { *pixel_consumer = pixel_consumer_rgba64_kind; *r = 3; *g = 2; *b = 1; *a = 0;  break; }
+
+        case SAIL_PIXEL_FORMAT_BPP24_YCBCR: { *pixel_consumer = pixel_consumer_ycbcr; *r = *g = *b = *a = -1; /* unused. */ break; }
 
         default: {
             const char *pixel_format_str = NULL;
@@ -463,7 +476,7 @@ static sail_status_t convert_from_bpp24_ycbcr(const struct sail_image *image_inp
         const uint8_t *scan_input = (uint8_t *)image_input->pixels + image_input->bytes_per_line * row;
 
         for (unsigned column = 0; column < image_input->width; column++) {
-            SAIL_TRY(convert_ycbcr24_to_rgba32(*(scan_input+0), *(scan_input+1), *(scan_input+2), &rgba32));
+            convert_ycbcr24_to_rgba32(*(scan_input+0), *(scan_input+1), *(scan_input+2), &rgba32);
 
             pixel_consumer(output_context, row, column, &rgba32, NULL);
             scan_input += 3;
@@ -630,19 +643,19 @@ static sail_status_t to_bpp32_rgba_kind(
  * Public functions.
  */
 
-sail_status_t sail_convert_image_to_rgba_kind(const struct sail_image *image_input,
-                                                enum SailPixelFormat output_pixel_format,
-                                                struct sail_image **image_output) {
+sail_status_t sail_convert_image(const struct sail_image *image_input,
+                                 enum SailPixelFormat output_pixel_format,
+                                 struct sail_image **image_output) {
 
-    SAIL_TRY(sail_convert_image_to_rgba_kind_with_options(image_input, output_pixel_format, NULL /* options */, image_output));
+    SAIL_TRY(sail_convert_image_with_options(image_input, output_pixel_format, NULL /* options */, image_output));
 
     return SAIL_OK;
 }
 
-sail_status_t sail_convert_image_to_rgba_kind_with_options(const struct sail_image *image_input,
-                                                             enum SailPixelFormat output_pixel_format,
-                                                             const struct sail_conversion_options *options,
-                                                             struct sail_image **image_output) {
+sail_status_t sail_convert_image_with_options(const struct sail_image *image_input,
+                                              enum SailPixelFormat output_pixel_format,
+                                              const struct sail_conversion_options *options,
+                                              struct sail_image **image_output) {
 
     SAIL_TRY(sail_check_image_valid(image_input));
     SAIL_CHECK_IMAGE_PTR(image_output);
@@ -671,16 +684,16 @@ sail_status_t sail_convert_image_to_rgba_kind_with_options(const struct sail_ima
     return SAIL_OK;
 }
 
-sail_status_t sail_update_image_to_rgba_kind(struct sail_image *image_input, enum SailPixelFormat output_pixel_format) {
+sail_status_t sail_update_image(struct sail_image *image_input, enum SailPixelFormat output_pixel_format) {
 
-    SAIL_TRY(sail_update_image_to_rgba_kind_with_options(image_input, output_pixel_format, NULL /* options */));
+    SAIL_TRY(sail_update_image_with_options(image_input, output_pixel_format, NULL /* options */));
 
     return SAIL_OK;
 }
 
-sail_status_t sail_update_image_to_rgba_kind_with_options(struct sail_image *image,
-                                                            enum SailPixelFormat output_pixel_format,
-                                                            const struct sail_conversion_options *options) {
+sail_status_t sail_update_image_with_options(struct sail_image *image,
+                                             enum SailPixelFormat output_pixel_format,
+                                             const struct sail_conversion_options *options) {
 
     SAIL_TRY(sail_check_image_valid(image));
 
