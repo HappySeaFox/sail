@@ -44,13 +44,42 @@ struct sail_conversion_options;
 struct sail_image;
 
 /*
- * Converts the input image to the BPP32-RGBA-ish format and saves the result in the output image.
+ * Converts the input image to the pixel format and saves the result in the output image.
  * The output image MUST be destroyed later with sail_destroy_image().
  *
- * Drops the input alpha channel if the output alpha channel doesn't exist. If you need to control
- * this behavior, use sail_convert_image_with_options().
+ * Drops the input alpha channel if the output alpha channel doesn't exist. For example,
+ * when converting RGBA pixels to RGB. If you need to control this behavior,
+ * use sail_convert_image_with_options().
  *
- * See sail_convert_image_with_options() for more.
+ * Allowed input pixel formats:
+ *   - Anything except YCCK, LUV, and LAB
+ *
+ * Allowed output pixel formats:
+ *   - SAIL_PIXEL_FORMAT_BPP24_RGB
+ *   - SAIL_PIXEL_FORMAT_BPP24_BGR
+ *
+ *   - SAIL_PIXEL_FORMAT_BPP48_RGB
+ *   - SAIL_PIXEL_FORMAT_BPP48_BGR
+ *
+ *   - SAIL_PIXEL_FORMAT_BPP32_RGBX
+ *   - SAIL_PIXEL_FORMAT_BPP32_BGRX
+ *   - SAIL_PIXEL_FORMAT_BPP32_XRGB
+ *   - SAIL_PIXEL_FORMAT_BPP32_XBGR
+ *   - SAIL_PIXEL_FORMAT_BPP32_RGBA
+ *   - SAIL_PIXEL_FORMAT_BPP32_BGRA
+ *   - SAIL_PIXEL_FORMAT_BPP32_ARGB
+ *   - SAIL_PIXEL_FORMAT_BPP32_ABGR
+ *
+ *   - SAIL_PIXEL_FORMAT_BPP64_RGBX
+ *   - SAIL_PIXEL_FORMAT_BPP64_BGRX
+ *   - SAIL_PIXEL_FORMAT_BPP64_XRGB
+ *   - SAIL_PIXEL_FORMAT_BPP64_XBGR
+ *   - SAIL_PIXEL_FORMAT_BPP64_RGBA
+ *   - SAIL_PIXEL_FORMAT_BPP64_BGRA
+ *   - SAIL_PIXEL_FORMAT_BPP64_ARGB
+ *   - SAIL_PIXEL_FORMAT_BPP64_ABGR
+ *
+ *   - SAIL_PIXEL_FORMAT_BPP24_YCBCR
  *
  * Returns SAIL_OK on success.
  */
@@ -59,7 +88,7 @@ SAIL_EXPORT sail_status_t sail_convert_image(const struct sail_image *image_inpu
                                              struct sail_image **image_output);
 
 /*
- * Converts the input image to the BPP32-RGBA-ish format and saves the result in the output image.
+ * Converts the input image to the pixel format and saves the result in the output image.
  * The output image MUST be destroyed later with sail_destroy_image().
  *
  * Options (which may be NULL) control the conversion behavior.
@@ -102,24 +131,61 @@ SAIL_EXPORT sail_status_t sail_convert_image_with_options(const struct sail_imag
                                                           struct sail_image **image_output);
 
 /*
- * Updates the image to the BPP32-RGBA-ish format. If the function fails, the image pixels may be left partially converted.
+ * Updates the image to the pixel format. If the function fails, the image pixels
+ * may be left partially converted.
  *
- * Drops the input alpha channel if the output alpha channel doesn't exist. If you need to control
- * this behavior, use sail_update_image_with_options().
+ * Drops the input alpha channel if the output alpha channel doesn't exist. For example,
+ * when converting RGBA pixels to RGB. If you need to control this behavior,
+ * use sail_update_image_with_options().
  *
- * See sail_update_image_with_options() for more.
+ * Doesn't reallocate pixels. For example, when updating 100x100 BPP32-RGBA image
+ * to BPP24-RGB, the resulting pixel data will have 10'000 unused bytes at the end.
+ *
+ * Allowed input pixel formats:
+ *   - Anything that produces equal or smaller image except YCCK, LUV, and LAB
+ *
+ * Allowed output pixel formats:
+ *   - SAIL_PIXEL_FORMAT_BPP24_RGB
+ *   - SAIL_PIXEL_FORMAT_BPP24_BGR
+ *
+ *   - SAIL_PIXEL_FORMAT_BPP48_RGB
+ *   - SAIL_PIXEL_FORMAT_BPP48_BGR
+ *
+ *   - SAIL_PIXEL_FORMAT_BPP32_RGBX
+ *   - SAIL_PIXEL_FORMAT_BPP32_BGRX
+ *   - SAIL_PIXEL_FORMAT_BPP32_XRGB
+ *   - SAIL_PIXEL_FORMAT_BPP32_XBGR
+ *   - SAIL_PIXEL_FORMAT_BPP32_RGBA
+ *   - SAIL_PIXEL_FORMAT_BPP32_BGRA
+ *   - SAIL_PIXEL_FORMAT_BPP32_ARGB
+ *   - SAIL_PIXEL_FORMAT_BPP32_ABGR
+ *
+ *   - SAIL_PIXEL_FORMAT_BPP64_RGBX
+ *   - SAIL_PIXEL_FORMAT_BPP64_BGRX
+ *   - SAIL_PIXEL_FORMAT_BPP64_XRGB
+ *   - SAIL_PIXEL_FORMAT_BPP64_XBGR
+ *   - SAIL_PIXEL_FORMAT_BPP64_RGBA
+ *   - SAIL_PIXEL_FORMAT_BPP64_BGRA
+ *   - SAIL_PIXEL_FORMAT_BPP64_ARGB
+ *   - SAIL_PIXEL_FORMAT_BPP64_ABGR
+ *
+ *   - SAIL_PIXEL_FORMAT_BPP24_YCBCR
  *
  * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_update_image(struct sail_image *image, enum SailPixelFormat output_pixel_format);
 
 /*
- * Updates the image to the BPP32-RGBA-ish format. If the function fails, the image pixels may be left partially converted.
+ * Updates the image to the pixel format. If the function fails, the image pixels
+ * may be left partially converted.
  *
  * Options (which may be NULL) control the conversion behavior.
  *
+ * Doesn't reallocate pixels. For example, when updating 100x100 BPP32-RGBA image
+ * to BPP24-RGB, the resulting pixel data will have 10'000 unused bytes at the end.
+ *
  * Allowed input pixel formats:
- *   - Anything with 32 bits per pixel or greater except YCCK, LUV, and LAB
+ *   - Anything that produces equal or smaller image except YCCK, LUV, and LAB
  *
  * Allowed output pixel formats:
  *   - SAIL_PIXEL_FORMAT_BPP24_RGB
