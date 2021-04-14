@@ -294,6 +294,10 @@ public:
 
     sail_status_t convert(SailPixelFormat pixel_format);
 
+    sail_status_t convert_to(SailPixelFormat pixel_format, sail::image *image);
+
+    image convert_to(SailPixelFormat pixel_format);
+
     /*
      * Calculates the number of bits per pixel in the specified pixel format.
      * For example, for SAIL_PIXEL_FORMAT_RGB 24 is assigned.

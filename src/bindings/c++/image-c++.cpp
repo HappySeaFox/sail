@@ -364,11 +364,11 @@ sail_status_t image::convert(SailPixelFormat pixel_format) {
     sail_img->pixels         = d->pixels;
 
     SAIL_AT_SCOPE_EXIT(
-        if (sail_img->palette != NULL) {
-            sail_img->palette->data = NULL;
+        if (sail_img->palette != nullptr) {
+            sail_img->palette->data = nullptr;
         }
 
-        sail_img->pixels = NULL;
+        sail_img->pixels = nullptr;
         sail_destroy_image(sail_img);
     );
 
@@ -380,7 +380,7 @@ sail_status_t image::convert(SailPixelFormat pixel_format) {
         sail_img->palette->pixel_format = d->palette.pixel_format();
     }
 
-    sail_image *sail_image_output = NULL;
+    sail_image *sail_image_output = nullptr;
     SAIL_TRY(sail_convert_image(sail_img, pixel_format, &sail_image_output));
 
     d->reset_pixels();
@@ -391,10 +391,46 @@ sail_status_t image::convert(SailPixelFormat pixel_format) {
     d->pixels_size    = sail_image_output->height * sail_image_output->bytes_per_line;
     d->shallow_pixels = false;
 
-    sail_image_output->pixels = NULL;
+    sail_image_output->pixels = nullptr;
     sail_destroy_image(sail_image_output);
 
     return SAIL_OK;
+}
+
+sail_status_t image::convert_to(SailPixelFormat pixel_format, sail::image *image)
+{
+    SAIL_CHECK_IMAGE_PTR(image);
+
+    if (!is_valid()) {
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+    }
+
+    sail_image *sail_img;
+    SAIL_TRY(to_sail_image(&sail_img));
+
+    SAIL_AT_SCOPE_EXIT(
+        sail_img->pixels = nullptr;
+        sail_destroy_image(sail_img);
+    );
+
+    sail_image *sail_image_output = nullptr;
+    SAIL_TRY(sail_convert_image(sail_img, pixel_format, &sail_image_output));
+
+    *image = sail::image(sail_image_output);
+
+    sail_image_output->pixels = nullptr;
+    sail_destroy_image(sail_image_output);
+
+    return SAIL_OK;
+}
+
+image image::convert_to(SailPixelFormat pixel_format)
+{
+    image img;
+    SAIL_TRY_OR_EXECUTE(convert_to(pixel_format, &img),
+                        /* on error */ return img);
+
+    return img;
 }
 
 sail_status_t image::bits_per_pixel(SailPixelFormat pixel_format, unsigned *result)
