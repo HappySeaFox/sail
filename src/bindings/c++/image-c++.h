@@ -47,14 +47,13 @@
     #include <sail-c++/resolution-c++.h>
 #endif
 
-namespace sail {
-    class meta_data;
-}
-
 struct sail_image;
 
 namespace sail
 {
+
+class conversion_options;
+class meta_data;
 
 /*
  * Image representation with direct access to the pixel data.
@@ -293,6 +292,8 @@ public:
     image& with_iccp(const sail::iccp &ic);
 
     sail_status_t convert(SailPixelFormat pixel_format);
+
+    sail_status_t convert(SailPixelFormat pixel_format, const conversion_options &options);
 
     sail_status_t convert_to(SailPixelFormat pixel_format, sail::image *image);
 

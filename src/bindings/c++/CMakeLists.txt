@@ -1,5 +1,6 @@
 add_library(sail-c++
                 context-c++.cpp
+                conversion_options-c++.cpp
                 iccp-c++.cpp
                 image-c++.cpp
                 image_reader-c++.cpp
@@ -22,6 +23,7 @@ add_library(sail-c++
 set(PUBLIC_HEADERS "arbitrary_data-c++.h"
                    "at_scope_exit-c++.h"
                    "context-c++.h"
+                   "conversion_options-c++.h"
                    "iccp-c++.h"
                    "image-c++.h"
                    "image_reader-c++.h"

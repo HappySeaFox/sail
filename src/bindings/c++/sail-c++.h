@@ -34,6 +34,7 @@
     #include "arbitrary_data-c++.h"
     #include "at_scope_exit-c++.h"
     #include "context-c++.h"
+    #include "conversion_options-c++.h"
     #include "iccp-c++.h"
     #include "image-c++.h"
     #include "image_reader-c++.h"
@@ -50,12 +51,15 @@
     #include "write_features-c++.h"
     #include "write_options-c++.h"
     #include "utils-c++.h"
+
+    #include "manip_common.h"
 #else
     #include <sail-common/sail-common.h>
 
     #include <sail-c++/arbitrary_data-c++.h>
     #include <sail-c++/at_scope_exit-c++.h>
     #include <sail-c++/context-c++.h>
+    #include <sail-c++/conversion_options-c++.h>
     #include <sail-c++/iccp-c++.h>
     #include <sail-c++/image-c++.h>
     #include <sail-c++/image_reader-c++.h>
@@ -72,6 +76,8 @@
     #include <sail-c++/write_features-c++.h>
     #include <sail-c++/write_options-c++.h>
     #include <sail-c++/utils-c++.h>
+
+    #include <sail-manip/manip_common.h>
 #endif
 
 #endif

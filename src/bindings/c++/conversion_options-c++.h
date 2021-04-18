@@ -1,6 +1,6 @@
 /*  This file is part of SAIL (https://github.com/smoked-herring/sail)
 
-    Copyright (c) 2021 Dmitry Baryshev
+    Copyright (c) 2020-2021 Dmitry Baryshev
 
     The MIT License
 
@@ -23,68 +23,77 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_CONVERSION_OPTIONS_H
-#define SAIL_CONVERSION_OPTIONS_H
+#ifndef SAIL_CONVERSION_OPTIONS_CPP_H
+#define SAIL_CONVERSION_OPTIONS_CPP_H
 
 #ifdef SAIL_BUILD
     #include "error.h"
     #include "export.h"
     #include "pixel.h"
-
-    #include "manip_common.h"
 #else
     #include <sail-common/error.h>
     #include <sail-common/export.h>
     #include <sail-common/pixel.h>
-
-    #include <sail-manip/manip_common.h>
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+struct sail_conversion_options;
+
+namespace sail
+{
 
 /*
- * Options to control image conversion behavior.
+ * Image conversion options.
  */
-struct sail_conversion_options {
+class SAIL_EXPORT conversion_options
+{
+    friend class image;
+
+public:
+    conversion_options();
+    conversion_options(const conversion_options &co);
+    conversion_options& operator=(const conversion_options &co);
+    conversion_options(conversion_options &&co) noexcept;
+    conversion_options& operator=(conversion_options &&co);
+    ~conversion_options();
 
     /*
-     * Or-ed SailConversionOption-s. If zero, SAIL_CONVERSION_OPTION_DROP_ALPHA is assumed.
+     * Returns the conversion options.
      */
-    int options;
+    int options() const;
 
     /*
-     * 48-bit background color to blend into other 16-bit color components instead of alpha
-     * when options has SAIL_CONVERSION_OPTION_BLEND_ALPHA.
+     * Returns the 48-bit background color to blend 48-bit images.
      */
-    sail_rgb48_t background48;
+    sail_rgb48_t background48() const;
 
     /*
-     * 24-bit background color to blend into other 8-bit color components instead of alpha
-     * when options has SAIL_CONVERSION_OPTION_BLEND_ALPHA.
+     * Returns the 24-bit background color to blend 24-bit images.
      */
-    sail_rgb24_t background24;
+    sail_rgb24_t background24() const;
+
+    /*
+     * Sets new conversion options.
+     */
+    conversion_options& with_options(int options);
+
+    /*
+     * Sets a new 48-bit background color to blend 48-bit images.
+     */
+    conversion_options& with_background(const sail_rgb48_t &rgb48);
+
+    /*
+     * Sets a new 24-bit background color to blend 24-bit images.
+     */
+    conversion_options& with_background(const sail_rgb24_t &rgb24);
+
+private:
+    sail_status_t to_sail_conversion_options(sail_conversion_options **conversion_options) const;
+
+private:
+    class pimpl;
+    pimpl *d;
 };
 
-typedef struct sail_conversion_options sail_conversion_options_t;
-
-/*
- * Allocates new conversion options. The assigned options MUST be destroyed later with sail_destroy_conversion_options().
- *
- * Returns SAIL_OK on success.
- */
-SAIL_EXPORT sail_status_t sail_alloc_conversion_options(struct sail_conversion_options **options);
-
-/*
- * Destroys the specified conversion options and all its internal allocated memory buffers.
- * The options MUST NOT be used anymore after calling this function. Does nothing if the options is NULL.
- */
-SAIL_EXPORT void sail_destroy_conversion_options(struct sail_conversion_options *options);
-
-/* extern "C" */
-#ifdef __cplusplus
 }
-#endif
 
 #endif

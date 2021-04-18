@@ -350,11 +350,35 @@ image& image::with_iccp(const sail::iccp &ic)
 
 sail_status_t image::convert(SailPixelFormat pixel_format) {
 
+    SAIL_TRY(convert(pixel_format, conversion_options{}));
+
+    return SAIL_OK;
+}
+
+sail_status_t image::convert(SailPixelFormat pixel_format, const conversion_options &options) {
+
     if (!is_valid()) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
     }
 
-    sail_image *sail_img;
+    sail_conversion_options *sail_conversion_options = nullptr;
+    sail_image *sail_img = nullptr;
+
+    SAIL_AT_SCOPE_EXIT(
+        if (sail_img != nullptr) {
+            if (sail_img->palette != nullptr) {
+                sail_img->palette->data = nullptr;
+            }
+
+            sail_img->pixels = nullptr;
+            sail_destroy_image(sail_img);
+        }
+
+        sail_destroy_conversion_options(sail_conversion_options);
+    );
+
+    SAIL_TRY(options.to_sail_conversion_options(&sail_conversion_options));
+
     SAIL_TRY(sail_alloc_image(&sail_img));
 
     sail_img->width          = d->width;
@@ -362,15 +386,6 @@ sail_status_t image::convert(SailPixelFormat pixel_format) {
     sail_img->bytes_per_line = d->bytes_per_line;
     sail_img->pixel_format   = d->pixel_format;
     sail_img->pixels         = d->pixels;
-
-    SAIL_AT_SCOPE_EXIT(
-        if (sail_img->palette != nullptr) {
-            sail_img->palette->data = nullptr;
-        }
-
-        sail_img->pixels = nullptr;
-        sail_destroy_image(sail_img);
-    );
 
     if (d->palette.is_valid()) {
         SAIL_TRY(sail_alloc_palette(&sail_img->palette));
@@ -381,7 +396,7 @@ sail_status_t image::convert(SailPixelFormat pixel_format) {
     }
 
     sail_image *sail_image_output = nullptr;
-    SAIL_TRY(sail_convert_image(sail_img, pixel_format, &sail_image_output));
+    SAIL_TRY(sail_convert_image_with_options(sail_img, pixel_format, sail_conversion_options, &sail_image_output));
 
     d->reset_pixels();
 

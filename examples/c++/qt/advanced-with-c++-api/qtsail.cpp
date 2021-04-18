@@ -84,7 +84,13 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
     sail_status_t res;
     while ((res = reader.read_next_frame(&image)) == SAIL_OK) {
 
-        SAIL_TRY(image.convert(SAIL_PIXEL_FORMAT_BPP32_RGBA));
+        /* Mutate alpha into a green color. */
+        sail::conversion_options options;
+        options.with_options(SAIL_CONVERSION_OPTION_BLEND_ALPHA)
+                .with_background(sail_rgb48_t{ 0, 255 * 257, 0 })
+                .with_background(sail_rgb24_t{ 0, 255, 0 });
+
+        SAIL_TRY(image.convert(SAIL_PIXEL_FORMAT_BPP24_RGB, options));
 
         // Convert to QImage.
         //
@@ -92,7 +98,7 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
                                image.width(),
                                image.height(),
                                image.bytes_per_line(),
-                               QImage::Format_RGBA8888).copy();
+                               QImage::Format_RGB888).copy();
 
         delays->append(image.delay());
         qimages->append(qimage);
