@@ -714,7 +714,7 @@ sail_status_t sail_update_image_with_options(struct sail_image *image,
         const char *output_pixel_format_str = NULL;
         SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(image->pixel_format, &output_pixel_format_str));
 
-        SAIL_LOG_ERROR("Conversion from %s to %s pixel format is not supported by this function", input_pixel_format_str, output_pixel_format_str);
+        SAIL_LOG_ERROR("Updating from %s to %s cannot be done as the output is larger than the input", input_pixel_format_str, output_pixel_format_str);
 
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
     }
