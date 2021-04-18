@@ -85,6 +85,7 @@ enum SailStatus {
     SAIL_ERROR_CODEC_INFO_NODE_NULL_PTR,
     SAIL_ERROR_PIXEL_FORMAT_NULL_PTR,
     SAIL_ERROR_RESOLUTION_NULL_PTR,
+    SAIL_ERROR_CONVERSION_OPTIONS_NULL_PTR,
 
     /*
      * Encoding/decoding specific errors.
@@ -160,6 +161,7 @@ do {                              \
 #define SAIL_CHECK_CODEC_INFO_PTR(codec_info)           SAIL_CHECK_PTR2(codec_info,      SAIL_ERROR_CODEC_INFO_NULL_PTR)
 #define SAIL_CHECK_CODEC_PTR(codec)                     SAIL_CHECK_PTR2(codec,           SAIL_ERROR_CODEC_NULL_PTR)
 #define SAIL_CHECK_CONTEXT_PTR(context)                 SAIL_CHECK_PTR2(context,         SAIL_ERROR_CONTEXT_NULL_PTR)
+#define SAIL_CHECK_CONVERSION_OPTIONS_PTR(options)      SAIL_CHECK_PTR2(options,         SAIL_ERROR_CONVERSION_OPTIONS_NULL_PTR)
 #define SAIL_CHECK_DATA_PTR(data)                       SAIL_CHECK_PTR2(data,            SAIL_ERROR_DATA_NULL_PTR)
 #define SAIL_CHECK_EXTENSION_PTR(extension)             SAIL_CHECK_PTR2(extension,       SAIL_ERROR_EXTENSION_NULL_PTR)
 #define SAIL_CHECK_ICCP_PTR(iccp)                       SAIL_CHECK_PTR2(iccp,            SAIL_ERROR_ICCP_NULL_PTR)
