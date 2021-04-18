@@ -297,6 +297,8 @@ public:
 
     sail_status_t convert_to(SailPixelFormat pixel_format, sail::image *image);
 
+    sail_status_t convert_to(SailPixelFormat pixel_format, const conversion_options &options, sail::image *image);
+
     image convert_to(SailPixelFormat pixel_format);
 
     /*

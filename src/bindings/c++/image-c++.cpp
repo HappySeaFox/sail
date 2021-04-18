@@ -414,11 +414,20 @@ sail_status_t image::convert(SailPixelFormat pixel_format, const conversion_opti
 
 sail_status_t image::convert_to(SailPixelFormat pixel_format, sail::image *image)
 {
+    SAIL_TRY(convert_to(pixel_format, conversion_options{}, image));
+
+    return SAIL_OK;
+}
+
+sail_status_t image::convert_to(SailPixelFormat pixel_format, const conversion_options &options, sail::image *image)
+{
     SAIL_CHECK_IMAGE_PTR(image);
 
     if (!is_valid()) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
     }
+
+    sail_conversion_options *sail_conversion_options = nullptr;
 
     sail_image *sail_img;
     SAIL_TRY(to_sail_image(&sail_img));
@@ -426,10 +435,14 @@ sail_status_t image::convert_to(SailPixelFormat pixel_format, sail::image *image
     SAIL_AT_SCOPE_EXIT(
         sail_img->pixels = nullptr;
         sail_destroy_image(sail_img);
+
+        sail_destroy_conversion_options(sail_conversion_options);
     );
 
+    SAIL_TRY(options.to_sail_conversion_options(&sail_conversion_options));
+
     sail_image *sail_image_output = nullptr;
-    SAIL_TRY(sail_convert_image(sail_img, pixel_format, &sail_image_output));
+    SAIL_TRY(sail_convert_image_with_options(sail_img, pixel_format, sail_conversion_options, &sail_image_output));
 
     *image = sail::image(sail_image_output);
 
