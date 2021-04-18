@@ -55,6 +55,8 @@ struct sail_image;
  *   - Anything except YCCK, LUV, and LAB
  *
  * Allowed output pixel formats:
+ *   - SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE
+ *
  *   - SAIL_PIXEL_FORMAT_BPP24_RGB
  *   - SAIL_PIXEL_FORMAT_BPP24_BGR
  *
@@ -97,6 +99,8 @@ SAIL_EXPORT sail_status_t sail_convert_image(const struct sail_image *image_inpu
  *   - Anything except YCCK, LUV, and LAB
  *
  * Allowed output pixel formats:
+ *   - SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE
+ *
  *   - SAIL_PIXEL_FORMAT_BPP24_RGB
  *   - SAIL_PIXEL_FORMAT_BPP24_BGR
  *
@@ -145,6 +149,8 @@ SAIL_EXPORT sail_status_t sail_convert_image_with_options(const struct sail_imag
  *   - Anything that produces equal or smaller image except YCCK, LUV, and LAB
  *
  * Allowed output pixel formats:
+ *   - SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE
+ *
  *   - SAIL_PIXEL_FORMAT_BPP24_RGB
  *   - SAIL_PIXEL_FORMAT_BPP24_BGR
  *
@@ -188,6 +194,8 @@ SAIL_EXPORT sail_status_t sail_update_image(struct sail_image *image, enum SailP
  *   - Anything that produces equal or smaller image except YCCK, LUV, and LAB
  *
  * Allowed output pixel formats:
+ *   - SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE
+ *
  *   - SAIL_PIXEL_FORMAT_BPP24_RGB
  *   - SAIL_PIXEL_FORMAT_BPP24_BGR
  *

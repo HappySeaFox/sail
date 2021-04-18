@@ -49,6 +49,17 @@ struct output_context {
 
 typedef void (*pixel_consumer_t)(const struct output_context *output_context, unsigned row, unsigned column, const sail_rgba32_t *rgba32, const sail_rgba64_t *rgba64);
 
+static void pixel_consumer_gray8(const struct output_context *output_context, unsigned row, unsigned column, const sail_rgba32_t *rgba32, const sail_rgba64_t *rgba64) {
+
+    uint8_t *scan = (uint8_t *)output_context->image->pixels + output_context->image->bytes_per_line * row + column;
+
+    if (rgba32 != NULL) {
+        fill_gray8_pixel_from_uint8_values(rgba32, scan, output_context->options);
+    } else {
+        fill_gray8_pixel_from_uint16_values(rgba64, scan, output_context->options);
+    }
+}
+
 static void pixel_consumer_rgb24_kind(const struct output_context *output_context, unsigned row, unsigned column, const sail_rgba32_t *rgba32, const sail_rgba64_t *rgba64) {
 
     uint8_t *scan = (uint8_t *)output_context->image->pixels + output_context->image->bytes_per_line * row + column * 3;
@@ -107,6 +118,8 @@ static void pixel_consumer_ycbcr(const struct output_context *output_context, un
 static sail_status_t verify_and_construct_rgba_indexes(enum SailPixelFormat output_pixel_format, pixel_consumer_t *pixel_consumer, int *r, int *g, int *b, int *a) {
 
     switch (output_pixel_format) {
+        case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE: { *pixel_consumer = pixel_consumer_gray8; *r = *g = *b = *a = -1; /* unused. */ break; }
+
         case SAIL_PIXEL_FORMAT_BPP24_RGB: { *pixel_consumer = pixel_consumer_rgb24_kind; *r = 0; *g = 1; *b = 2; *a = -1; break; }
         case SAIL_PIXEL_FORMAT_BPP24_BGR: { *pixel_consumer = pixel_consumer_rgb24_kind; *r = 2; *g = 1; *b = 0; *a = -1; break; }
 
