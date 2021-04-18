@@ -40,6 +40,10 @@
     #include <sail-manip/manip_common.h>
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct sail_conversion_options {
 
     /*
@@ -74,5 +78,10 @@ SAIL_EXPORT sail_status_t sail_alloc_conversion_options(struct sail_conversion_o
  * The options MUST NOT be used anymore after calling this function. Does nothing if the options is NULL.
  */
 SAIL_EXPORT void sail_destroy_conversion_options(struct sail_conversion_options *options);
+
+/* extern "C" */
+#ifdef __cplusplus
+}
+#endif
 
 #endif
