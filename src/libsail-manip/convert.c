@@ -486,7 +486,7 @@ static sail_status_t convert_from_bpp24_ycbcr(const struct sail_image *image_inp
     return SAIL_OK;
 }
 
-static sail_status_t to_bpp32_rgba_kind(
+static sail_status_t conversion_impl(
     const struct sail_image *image_input,
     struct sail_image *image_output,
     pixel_consumer_t pixel_consumer,
@@ -676,7 +676,7 @@ sail_status_t sail_convert_image_with_options(const struct sail_image *image_inp
     SAIL_TRY_OR_CLEANUP(sail_malloc(pixels_size, &image_local->pixels),
                         /* cleanup */ sail_destroy_image(image_local));
 
-    SAIL_TRY_OR_CLEANUP(to_bpp32_rgba_kind(image_input, image_local, pixel_consumer, r, g, b, a, options),
+    SAIL_TRY_OR_CLEANUP(conversion_impl(image_input, image_local, pixel_consumer, r, g, b, a, options),
                         /* cleanup */ sail_destroy_image(image_local));
 
     *image_output = image_local;
@@ -719,7 +719,7 @@ sail_status_t sail_update_image_with_options(struct sail_image *image,
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
     }
 
-    SAIL_TRY(to_bpp32_rgba_kind(image, image, pixel_consumer, r, g, b, a, options));
+    SAIL_TRY(conversion_impl(image, image, pixel_consumer, r, g, b, a, options));
 
     image->pixel_format = output_pixel_format;
 
