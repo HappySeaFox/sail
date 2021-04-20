@@ -126,7 +126,7 @@ static void pixel_consumer_ycbcr(const struct output_context *output_context, un
     }
 }
 
-static bool verify_and_construct_rgba_indexes(enum SailPixelFormat output_pixel_format, pixel_consumer_t *pixel_consumer, int *r, int *g, int *b, int *a) {
+static bool verify_and_construct_rgba_indexes_silent(enum SailPixelFormat output_pixel_format, pixel_consumer_t *pixel_consumer, int *r, int *g, int *b, int *a) {
 
     switch (output_pixel_format) {
         case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE:  { *pixel_consumer = pixel_consumer_gray8;  *r = *g = *b = *a = -1; /* unused. */ break; }
@@ -168,7 +168,7 @@ static bool verify_and_construct_rgba_indexes(enum SailPixelFormat output_pixel_
 
 static sail_status_t verify_and_construct_rgba_indexes_verbose(enum SailPixelFormat output_pixel_format, pixel_consumer_t *pixel_consumer, int *r, int *g, int *b, int *a) {
 
-    if (verify_and_construct_rgba_indexes(output_pixel_format, pixel_consumer, r, g, b, a)) {
+    if (verify_and_construct_rgba_indexes_silent(output_pixel_format, pixel_consumer, r, g, b, a)) {
         return SAIL_OK;
     } else {
         const char *pixel_format_str = NULL;
@@ -802,7 +802,7 @@ bool sail_can_convert(enum SailPixelFormat input_pixel_format, enum SailPixelFor
         case SAIL_PIXEL_FORMAT_BPP24_YCBCR: {
             int r, g, b, a;
             pixel_consumer_t pixel_consumer;
-            return verify_and_construct_rgba_indexes(output_pixel_format, &pixel_consumer, &r, &g, &b, &a);
+            return verify_and_construct_rgba_indexes_silent(output_pixel_format, &pixel_consumer, &r, &g, &b, &a);
         }
         default: {
             return false;
