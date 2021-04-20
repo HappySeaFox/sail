@@ -27,6 +27,11 @@
 
 #include "ycbcr.h"
 
+/* https://en.wikipedia.org/wiki/Grayscale */
+static const double R_TO_GRAY_COEFFICIENT = 0.299;
+static const double G_TO_GRAY_COEFFICIENT = 0.587;
+static const double B_TO_GRAY_COEFFICIENT = 0.114;
+
 sail_status_t get_palette_rgba32(const struct sail_palette *palette, unsigned index, sail_rgba32_t *rgba32) {
 
     if (index >= palette->color_count) {
@@ -103,7 +108,7 @@ void fill_gray8_pixel_from_uint8_values(const sail_rgba32_t *rgba32, uint8_t *sc
         rgb24.component3 = rgba32->component3;
     }
 
-    *scan = (uint8_t)((0.3 * rgb24.component1) + (0.59 * rgb24.component2) + (0.11 * rgb24.component3));
+    *scan = (uint8_t)((R_TO_GRAY_COEFFICIENT * rgb24.component1) + (G_TO_GRAY_COEFFICIENT * rgb24.component2) + (B_TO_GRAY_COEFFICIENT * rgb24.component3));
 }
 
 void fill_gray8_pixel_from_uint16_values(const sail_rgba64_t *rgba64, uint8_t *scan, const struct sail_conversion_options *options) {
@@ -122,7 +127,7 @@ void fill_gray8_pixel_from_uint16_values(const sail_rgba64_t *rgba64, uint8_t *s
         rgb24.component3 = (uint8_t)(rgba64->component3 / 257.0);
     }
 
-    *scan = (uint8_t)((0.3 * rgb24.component1) + (0.59 * rgb24.component2) + (0.11 * rgb24.component3));
+    *scan = (uint8_t)((R_TO_GRAY_COEFFICIENT * rgb24.component1) + (G_TO_GRAY_COEFFICIENT * rgb24.component2) + (B_TO_GRAY_COEFFICIENT * rgb24.component3));
 }
 
 void fill_gray16_pixel_from_uint8_values(const sail_rgba32_t *rgba32, uint16_t *scan, const struct sail_conversion_options *options) {
@@ -141,7 +146,7 @@ void fill_gray16_pixel_from_uint8_values(const sail_rgba32_t *rgba32, uint16_t *
         rgb48.component3 = rgba32->component3 * 257;
     }
 
-    *scan = (uint16_t)((0.3 * rgb48.component1) + (0.59 * rgb48.component2) + (0.11 * rgb48.component3));
+    *scan = (uint16_t)((R_TO_GRAY_COEFFICIENT * rgb48.component1) + (G_TO_GRAY_COEFFICIENT * rgb48.component2) + (B_TO_GRAY_COEFFICIENT * rgb48.component3));
 }
 
 void fill_gray16_pixel_from_uint16_values(const sail_rgba64_t *rgba64, uint16_t *scan, const struct sail_conversion_options *options) {
@@ -160,7 +165,7 @@ void fill_gray16_pixel_from_uint16_values(const sail_rgba64_t *rgba64, uint16_t 
         rgb48.component3 = rgba64->component3;
     }
 
-    *scan = (uint16_t)((0.3 * rgb48.component1) + (0.59 * rgb48.component2) + (0.11 * rgb48.component3));
+    *scan = (uint16_t)((R_TO_GRAY_COEFFICIENT * rgb48.component1) + (G_TO_GRAY_COEFFICIENT * rgb48.component2) + (B_TO_GRAY_COEFFICIENT * rgb48.component3));
 }
 
 void fill_rgb24_pixel_from_uint8_values(const sail_rgba32_t *rgba32, uint8_t *scan, int r, int g, int b, const struct sail_conversion_options *options) {
