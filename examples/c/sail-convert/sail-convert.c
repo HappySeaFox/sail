@@ -32,6 +32,7 @@
 
 #include "sail-common.h"
 #include "sail.h"
+#include "sail-manip.h"
 
 static sail_status_t convert(const char *input, const char *output, int compression) {
 
@@ -60,19 +61,39 @@ static sail_status_t convert(const char *input, const char *output, int compress
     SAIL_TRY(sail_codec_info_from_path(output, &codec_info));
     SAIL_LOG_INFO("Output codec: %s", codec_info->description);
 
+    /* Convert image. */
+    struct sail_image *image_converted = NULL;
+
+    for (unsigned i = 0; i < codec_info->write_features->output_pixel_formats_length; i++) {
+        if (sail_can_convert(image->pixel_format, codec_info->write_features->output_pixel_formats[i])) {
+            SAIL_TRY(sail_convert_image(image, codec_info->write_features->output_pixel_formats[i], &image_converted));
+            break;
+        }
+    }
+
+    if (image_converted == NULL) {
+        const char *pixel_format_str = NULL;
+        SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(image->pixel_format, &pixel_format_str));
+
+        SAIL_LOG_ERROR("No suitable output pixel formats found to convert from %s", pixel_format_str);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+    }
+
     struct sail_write_options *write_options;
     SAIL_TRY(sail_alloc_write_options_from_features(codec_info->write_features, &write_options));
 
     /* Apply our tuning. */
     SAIL_LOG_INFO("Compression: %d%s", compression, compression == -1 ? " (default)" : "");
-    write_options->compression = compression;
+    write_options->compression_level = compression;
 
     SAIL_TRY(sail_start_writing_file_with_options(output, codec_info, write_options, &state));
-    SAIL_TRY(sail_write_next_frame(state, image));
+    SAIL_TRY(sail_write_next_frame(state, image_converted));
     SAIL_TRY(sail_stop_writing(state));
 
     /* Clean up. */
     sail_destroy_write_options(write_options);
+
+    sail_destroy_image(image_converted);
     sail_destroy_image(image);
 
     SAIL_LOG_INFO("Success");
