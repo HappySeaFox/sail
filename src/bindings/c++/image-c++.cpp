@@ -461,6 +461,20 @@ image image::convert_to(SailPixelFormat pixel_format)
     return img;
 }
 
+bool image::can_convert(SailPixelFormat pixel_format)
+{
+    if (!is_valid()) {
+        return false;
+    }
+
+    return sail_can_convert(d->pixel_format, pixel_format);
+}
+
+bool image::can_convert(SailPixelFormat input_pixel_format, SailPixelFormat output_pixel_format) {
+
+    return sail_can_convert(input_pixel_format, output_pixel_format);
+}
+
 sail_status_t image::bits_per_pixel(SailPixelFormat pixel_format, unsigned *result)
 {
     SAIL_TRY(sail_bits_per_pixel(pixel_format, result));

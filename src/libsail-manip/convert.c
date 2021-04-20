@@ -523,6 +523,7 @@ static sail_status_t conversion_impl(
 
     const struct output_context output_context = { image_output, r, g, b, a, options };
 
+    /* After adding a new input pixel format, also update the switch in sail_can_convert(). */
     switch (image_input->pixel_format) {
         case SAIL_PIXEL_FORMAT_BPP1_INDEXED:
         case SAIL_PIXEL_FORMAT_BPP1_GRAYSCALE: {
@@ -749,4 +750,56 @@ sail_status_t sail_update_image_with_options(struct sail_image *image,
     image->pixel_format = output_pixel_format;
 
     return SAIL_OK;
+}
+
+bool sail_can_convert(enum SailPixelFormat input_pixel_format, enum SailPixelFormat output_pixel_format) {
+
+    /* After adding a new input pixel format, also update the switch in conversion_impl(). */
+    switch (input_pixel_format) {
+        case SAIL_PIXEL_FORMAT_BPP1_INDEXED:
+        case SAIL_PIXEL_FORMAT_BPP1_GRAYSCALE:
+        case SAIL_PIXEL_FORMAT_BPP2_INDEXED:
+        case SAIL_PIXEL_FORMAT_BPP2_GRAYSCALE:
+        case SAIL_PIXEL_FORMAT_BPP4_INDEXED:
+        case SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE:
+        case SAIL_PIXEL_FORMAT_BPP8_INDEXED:
+        case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE:
+        case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE:
+        case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA:
+        case SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA:
+        case SAIL_PIXEL_FORMAT_BPP16_RGB555:
+        case SAIL_PIXEL_FORMAT_BPP16_BGR555:
+        case SAIL_PIXEL_FORMAT_BPP24_RGB:
+        case SAIL_PIXEL_FORMAT_BPP24_BGR:
+        case SAIL_PIXEL_FORMAT_BPP48_RGB:
+        case SAIL_PIXEL_FORMAT_BPP48_BGR:
+        case SAIL_PIXEL_FORMAT_BPP32_RGBX:
+        case SAIL_PIXEL_FORMAT_BPP32_BGRX:
+        case SAIL_PIXEL_FORMAT_BPP32_XRGB:
+        case SAIL_PIXEL_FORMAT_BPP32_XBGR:
+        case SAIL_PIXEL_FORMAT_BPP32_RGBA:
+        case SAIL_PIXEL_FORMAT_BPP32_BGRA:
+        case SAIL_PIXEL_FORMAT_BPP32_ARGB:
+        case SAIL_PIXEL_FORMAT_BPP32_ABGR:
+        case SAIL_PIXEL_FORMAT_BPP64_RGBX:
+        case SAIL_PIXEL_FORMAT_BPP64_BGRX:
+        case SAIL_PIXEL_FORMAT_BPP64_XRGB:
+        case SAIL_PIXEL_FORMAT_BPP64_XBGR:
+        case SAIL_PIXEL_FORMAT_BPP64_RGBA:
+        case SAIL_PIXEL_FORMAT_BPP64_BGRA:
+        case SAIL_PIXEL_FORMAT_BPP64_ARGB:
+        case SAIL_PIXEL_FORMAT_BPP64_ABGR:
+        case SAIL_PIXEL_FORMAT_BPP32_CMYK:
+        case SAIL_PIXEL_FORMAT_BPP24_YCBCR: {
+            int r, g, b, a;
+            pixel_consumer_t pixel_consumer;
+            SAIL_TRY_OR_EXECUTE(verify_and_construct_rgba_indexes(output_pixel_format, &pixel_consumer, &r, &g, &b, &a),
+                                /* on error */ return false);
+
+            return true;
+        }
+        default: {
+            return false;
+        }
+    }
 }

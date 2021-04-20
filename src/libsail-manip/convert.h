@@ -26,6 +26,8 @@
 #ifndef SAIL_CONVERT_H
 #define SAIL_CONVERT_H
 
+#include <stdbool.h>
+
 #ifdef SAIL_BUILD
     #include "common.h"
     #include "error.h"
@@ -247,6 +249,12 @@ SAIL_EXPORT sail_status_t sail_update_image(struct sail_image *image, enum SailP
 SAIL_EXPORT sail_status_t sail_update_image_with_options(struct sail_image *image,
                                                          enum SailPixelFormat output_pixel_format,
                                                          const struct sail_conversion_options *options);
+
+/*
+ * Returns true if the conversion or updating functions can convert or update from the input
+ * pixel format to the output pixel format.
+ */
+SAIL_EXPORT bool sail_can_convert(enum SailPixelFormat input_pixel_format, enum SailPixelFormat output_pixel_format);
 
 /* extern "C" */
 #ifdef __cplusplus
