@@ -126,7 +126,7 @@ static void pixel_consumer_ycbcr(const struct output_context *output_context, un
     }
 }
 
-static sail_status_t verify_and_construct_rgba_indexes(enum SailPixelFormat output_pixel_format, pixel_consumer_t *pixel_consumer, int *r, int *g, int *b, int *a) {
+static bool verify_and_construct_rgba_indexes(enum SailPixelFormat output_pixel_format, pixel_consumer_t *pixel_consumer, int *r, int *g, int *b, int *a) {
 
     switch (output_pixel_format) {
         case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE:  { *pixel_consumer = pixel_consumer_gray8;  *r = *g = *b = *a = -1; /* unused. */ break; }
@@ -159,15 +159,24 @@ static sail_status_t verify_and_construct_rgba_indexes(enum SailPixelFormat outp
         case SAIL_PIXEL_FORMAT_BPP24_YCBCR: { *pixel_consumer = pixel_consumer_ycbcr; *r = *g = *b = *a = -1; /* unused. */ break; }
 
         default: {
-            const char *pixel_format_str = NULL;
-            SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(output_pixel_format, &pixel_format_str));
-            SAIL_LOG_ERROR("Conversion to %s is not supported", pixel_format_str);
-
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+            return false;
         }
     }
 
-    return SAIL_OK;
+    return true;
+}
+
+static sail_status_t verify_and_construct_rgba_indexes_verbose(enum SailPixelFormat output_pixel_format, pixel_consumer_t *pixel_consumer, int *r, int *g, int *b, int *a) {
+
+    if (verify_and_construct_rgba_indexes(output_pixel_format, pixel_consumer, r, g, b, a)) {
+        return SAIL_OK;
+    } else {
+        const char *pixel_format_str = NULL;
+        SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(output_pixel_format, &pixel_format_str));
+        SAIL_LOG_ERROR("Conversion to %s is not supported", pixel_format_str);
+
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+    }
 }
 
 static sail_status_t convert_from_bpp1_indexed_or_grayscale(const struct sail_image *image_input, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
@@ -688,7 +697,7 @@ sail_status_t sail_convert_image_with_options(const struct sail_image *image_inp
 
     int r, g, b, a;
     pixel_consumer_t pixel_consumer;
-    SAIL_TRY(verify_and_construct_rgba_indexes(output_pixel_format, &pixel_consumer, &r, &g, &b, &a));
+    SAIL_TRY(verify_and_construct_rgba_indexes_verbose(output_pixel_format, &pixel_consumer, &r, &g, &b, &a));
 
     struct sail_image *image_local;
     SAIL_TRY(sail_copy_image_skeleton(image_input, &image_local));
@@ -725,7 +734,7 @@ sail_status_t sail_update_image_with_options(struct sail_image *image,
 
     int r, g, b, a;
     pixel_consumer_t pixel_consumer;
-    SAIL_TRY(verify_and_construct_rgba_indexes(output_pixel_format, &pixel_consumer, &r, &g, &b, &a));
+    SAIL_TRY(verify_and_construct_rgba_indexes_verbose(output_pixel_format, &pixel_consumer, &r, &g, &b, &a));
 
     if (image->pixel_format == output_pixel_format) {
         return SAIL_OK;
@@ -793,10 +802,7 @@ bool sail_can_convert(enum SailPixelFormat input_pixel_format, enum SailPixelFor
         case SAIL_PIXEL_FORMAT_BPP24_YCBCR: {
             int r, g, b, a;
             pixel_consumer_t pixel_consumer;
-            SAIL_TRY_OR_EXECUTE(verify_and_construct_rgba_indexes(output_pixel_format, &pixel_consumer, &r, &g, &b, &a),
-                                /* on error */ return false);
-
-            return true;
+            return verify_and_construct_rgba_indexes(output_pixel_format, &pixel_consumer, &r, &g, &b, &a);
         }
         default: {
             return false;
