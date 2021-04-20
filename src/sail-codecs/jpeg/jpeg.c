@@ -246,7 +246,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v5_jpeg(void *state, struct sail
     for (unsigned row = 0; row < image->height; row++) {
         unsigned char *scanline = (unsigned char *)image->pixels + row * image->bytes_per_line;
 
-        /* Convert the CMYK image to BPP32-RGBA/BPP32-BGRA/etc. */
         JSAMPROW samprow = (JSAMPROW)scanline;
         (void)jpeg_read_scanlines(jpeg_state->decompress_context, &samprow, 1);
     }
