@@ -51,6 +51,10 @@ struct sail_image;
  * when converting RGBA pixels to RGB. If you need to control this behavior,
  * use sail_convert_image_with_options().
  *
+ * The conversion procedure may be slow. It converts every pixel into the BPP32-RGBA or
+ * BPP64-RGBA formats first, and only then to the requested output format. No platform-specific
+ * instructions (like AVX or SSE) are used.
+ *
  * Allowed input pixel formats:
  *   - Anything except YCCK, LUV, and LAB
  *
@@ -95,6 +99,10 @@ SAIL_EXPORT sail_status_t sail_convert_image(const struct sail_image *image_inpu
  * The output image MUST be destroyed later with sail_destroy_image().
  *
  * Options (which may be NULL) control the conversion behavior.
+ *
+ * The conversion procedure may be slow. It converts every pixel into the BPP32-RGBA or
+ * BPP64-RGBA formats first, and only then to the requested output format. No platform-specific
+ * instructions (like AVX or SSE) are used.
  *
  * Allowed input pixel formats:
  *   - Anything except YCCK, LUV, and LAB
@@ -147,6 +155,10 @@ SAIL_EXPORT sail_status_t sail_convert_image_with_options(const struct sail_imag
  * Doesn't reallocate pixels. For example, when updating 100x100 BPP32-RGBA image
  * to BPP24-RGB, the resulting pixel data will have 10'000 unused bytes at the end.
  *
+ * The updating procedure may be slow. It converts every pixel into the BPP32-RGBA or
+ * BPP64-RGBA formats first, and only then to the requested output format. No platform-specific
+ * instructions (like AVX or SSE) are used.
+ *
  * Allowed input pixel formats:
  *   - Anything that produces equal or smaller image except YCCK, LUV, and LAB
  *
@@ -192,6 +204,10 @@ SAIL_EXPORT sail_status_t sail_update_image(struct sail_image *image, enum SailP
  *
  * Doesn't reallocate pixels. For example, when updating 100x100 BPP32-RGBA image
  * to BPP24-RGB, the resulting pixel data will have 10'000 unused bytes at the end.
+ *
+ * The updating procedure may be slow. It converts every pixel into the BPP32-RGBA or
+ * BPP64-RGBA formats first, and only then to the requested output format. No platform-specific
+ * instructions (like AVX or SSE) are used.
  *
  * Allowed input pixel formats:
  *   - Anything that produces equal or smaller image except YCCK, LUV, and LAB
