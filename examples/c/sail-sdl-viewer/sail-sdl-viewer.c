@@ -33,6 +33,7 @@
 
 #include "sail-common.h"
 #include "sail.h"
+#include "sail-manip.h"
 
 int main(int argc, char *argv[]) {
 
@@ -48,38 +49,28 @@ int main(int argc, char *argv[]) {
 
     /* Load the image. */
     struct sail_image *image;
-
-    /*
-     * sail_read_file() reads the image and outputs pixels in the BPP32-RGBA pixel format.
-     * If you need to control output pixel formats, consider switching to the deep diver API.
-     */
     SAIL_TRY(sail_read_file(argv[1], &image));
 
-    /* Create an SDL surface from the image data. */
-    unsigned bytes_per_line;
-    SAIL_TRY(sail_bytes_per_line(image->width, image->pixel_format, &bytes_per_line));
+    /* Convert to BPP32-RGBA. */
+    struct sail_image *image_converted;
+    SAIL_TRY(sail_convert_image_with_options(image, SAIL_PIXEL_FORMAT_BPP32_RGBA, NULL, &image_converted));
 
-    if (image->pixel_format != SAIL_PIXEL_FORMAT_BPP32_RGBA && image->pixel_format != SAIL_PIXEL_FORMAT_BPP24_RGB) {
-        fprintf(stderr, "Only BPP32-RGBA and BPP24-RGB images are supported by this demo\n");
-        sail_finish();
-        return 1;
-    }
+    /* We don't need the original image anymore. */
+    sail_destroy_image(image);
+    image = NULL;
 
-    const bool is_rgba = image->pixel_format == SAIL_PIXEL_FORMAT_BPP32_RGBA;
-
-    SDL_Surface *surface = SDL_CreateRGBSurfaceFrom(image->pixels,
-                                                    image->width,
-                                                    image->height,
-                                                    is_rgba ? 32 : 24,
-                                                    bytes_per_line,
+    SDL_Surface *surface = SDL_CreateRGBSurfaceFrom(image_converted->pixels,
+                                                    image_converted->width,
+                                                    image_converted->height,
+                                                    32,
+                                                    image_converted->bytes_per_line,
                                                     0x000000ff,
                                                     0x0000ff00,
                                                     0x00ff0000,
-                                                    is_rgba ? 0xff000000 : 0);
+                                                    0xff000000);
 
     if (surface == NULL) {
         fprintf(stderr, "Failed to create surface: %s\n", SDL_GetError());
-        sail_finish();
         return 1;
     }
 
@@ -89,7 +80,6 @@ int main(int argc, char *argv[]) {
     /* Create a new window and a renderer. */
     if (SDL_CreateWindowAndRenderer(800, 500, SDL_WINDOW_RESIZABLE, &window, &renderer) != 0) {
         fprintf(stderr, "Failed to create a window: %s\n", SDL_GetError());
-        sail_finish();
         return 1;
     }
 
@@ -103,12 +93,11 @@ int main(int argc, char *argv[]) {
 
     if (texture == NULL) {
         fprintf(stderr, "Failed to create a texture: %s\n", SDL_GetError());
-        sail_finish();
         return 1;
     }
 
     /* We don't need the image data anymore. */
-    sail_destroy_image(image);
+    sail_destroy_image(image_converted);
 
     SDL_FreeSurface(surface);
 
@@ -127,8 +116,6 @@ int main(int argc, char *argv[]) {
         SDL_RenderCopy(renderer, texture, NULL, NULL);
         SDL_RenderPresent(renderer);
     }
-
-    sail_finish();
 
     SDL_DestroyTexture(texture);
     SDL_DestroyRenderer(renderer);

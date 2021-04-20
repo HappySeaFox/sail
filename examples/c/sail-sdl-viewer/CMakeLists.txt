@@ -26,6 +26,10 @@ endif()
 #
 target_link_libraries(sail-sdl-viewer PRIVATE sail)
 
+# Depend on sail-manip
+#
+target_link_libraries(sail-sdl-viewer PRIVATE sail-manip)
+
 # Enable ASAN if possible
 #
 sail_enable_asan(TARGET sail-sdl-viewer)
