@@ -7,21 +7,40 @@ option(SAIL_COLORED_OUTPUT "Enable colored console output on supported platforms
 set(SAIL_COLORED_OUTPUT ${SAIL_COLORED_OUTPUT} PARENT_SCOPE)
 
 add_library(sail-common
+                common.h
+                error.h
+                export.h
                 iccp.c
+                iccp.h
                 image.c
+                image.h
                 io_common.c
+                io_common.h
                 log.c
+                log.h
                 meta_data_node.c
+                meta_data_node.h
                 palette.c
+                palette.h
                 pixel.c
+                pixel.h
                 pixel_formats_mapping_node.c
+                pixel_formats_mapping_node.h
                 read_features.c
+                read_features.h
                 read_options.c
+                read_options.h
                 resolution.c
+                resolution.h
+                sail-common.h
                 source_image.c
+                source_image.h
                 utils.c
+                utils.h
                 write_features.c
-                write_options.c)
+                write_features.h
+                write_options.c
+                write_options.h)
 
 # Build a list of public headers to install
 #

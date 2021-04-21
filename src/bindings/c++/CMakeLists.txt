@@ -1,21 +1,41 @@
 add_library(sail-c++
-                context-c++.cpp
-                iccp-c++.cpp
-                image-c++.cpp
-                image_reader-c++.cpp
-                image_writer-c++.cpp
-                io_common-c++.cpp
-                log-c++.cpp
-                meta_data-c++.cpp
-                palette-c++.cpp
+                arbitrary_data-c++.h
+                at_scope_exit-c++.h
                 codec_info-c++.cpp
+                codec_info-c++.h
+                context-c++.cpp
+                context-c++.h
+                iccp-c++.cpp
+                iccp-c++.h
+                image-c++.cpp
+                image-c++.h
+                image_reader-c++.cpp
+                image_reader-c++.h
+                image_writer-c++.cpp
+                image_writer-c++.h
+                io_common-c++.cpp
+                io_common-c++.h
+                log-c++.cpp
+                log-c++.h
+                meta_data-c++.cpp
+                meta_data-c++.h
+                palette-c++.cpp
+                palette-c++.h
                 read_features-c++.cpp
+                read_features-c++.h
                 read_options-c++.cpp
+                read_options-c++.h
                 resolution-c++.cpp
+                resolution-c++.h
+                sail-c++.h
                 source_image-c++.cpp
+                source_image-c++.h
+                utils-c++.cpp
+                utils-c++.h
                 write_features-c++.cpp
+                write_features-c++.h
                 write_options-c++.cpp
-                utils-c++.cpp)
+                write_options-c++.h)
 
 # Build a list of public headers to install
 #

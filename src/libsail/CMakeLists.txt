@@ -1,20 +1,37 @@
 add_library(sail
-                ini.c
-                io_file.c
-                io_mem.c
-                io_noop.c
                 codec.c
                 codec_info.c
+                codec_info.h
                 codec_info_node.c
+                codec_info_node.h
                 codec_info_private.c
+                codec_info_private.h
                 context.c
+                context.h
                 context_private.c
+                context_private.h
+                ini.c
+                ini.h
+                io_file.c
+                io_file.h
+                io_mem.c
+                io_mem.h
+                io_noop.c
+                io_noop.h
+                sail.h
                 sail_advanced.c
+                sail_advanced.h
                 sail_deep_diver.c
+                sail_deep_diver.h
                 sail_junior.c
+                sail_junior.h
                 sail_private.c
+                sail_private.h
                 sail_technical_diver.c
-                sail_technical_diver_private.c)
+                sail_technical_diver.h
+                sail_technical_diver_private.c
+                sail_technical_diver_private.h
+                string_node.h)
 
 # Build a list of public headers to install
 #
