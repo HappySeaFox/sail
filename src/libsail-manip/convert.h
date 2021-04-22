@@ -265,8 +265,8 @@ SAIL_EXPORT bool sail_can_convert(enum SailPixelFormat input_pixel_format, enum 
  * If no candidates found at all, returns SAIL_PIXEL_FORMAT_UNKNOWN.
  */
 SAIL_EXPORT enum SailPixelFormat sail_closest_pixel_format(enum SailPixelFormat input_pixel_format,
-                                                           const enum SailPixelFormat output_pixel_formats[],
-                                                           size_t output_pixel_formats_length);
+                                                           const enum SailPixelFormat pixel_formats[],
+                                                           size_t pixel_formats_length);
 
 /*
  * Returns the closest to the input pixel format from the list in the write features.

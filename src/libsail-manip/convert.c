@@ -885,8 +885,8 @@ static const enum SailPixelFormat INDEXED_OR_FULL_COLOR_CANDIDATES[] = {
 static const size_t INDEXED_OR_FULL_COLOR_CANDIDATES_LENGTH = sizeof(INDEXED_OR_FULL_COLOR_CANDIDATES) / sizeof(INDEXED_OR_FULL_COLOR_CANDIDATES[0]);
 
 enum SailPixelFormat sail_closest_pixel_format(enum SailPixelFormat input_pixel_format,
-                                               const enum SailPixelFormat output_pixel_formats[],
-                                               size_t output_pixel_formats_length) {
+                                               const enum SailPixelFormat pixel_formats[],
+                                               size_t pixel_formats_length) {
 
     if (input_pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN) {
         return SAIL_PIXEL_FORMAT_UNKNOWN;
@@ -908,9 +908,9 @@ enum SailPixelFormat sail_closest_pixel_format(enum SailPixelFormat input_pixel_
     bool found = false;
 
     /* O(n^2) (sic!). */
-    for (size_t i = 0; i < output_pixel_formats_length; i++) {
+    for (size_t i = 0; i < pixel_formats_length; i++) {
         for (size_t k = 0; k < candidates_length; k++) {
-            if (output_pixel_formats[i] == candidates[k]) {
+            if (pixel_formats[i] == candidates[k]) {
                 if (k < best_index_candidate) {
                     best_index_candidate = k;
                     best_index_result = i;
@@ -921,7 +921,7 @@ enum SailPixelFormat sail_closest_pixel_format(enum SailPixelFormat input_pixel_
         }
     }
 
-    return found ? output_pixel_formats[best_index_result] : SAIL_PIXEL_FORMAT_UNKNOWN;
+    return found ? pixel_formats[best_index_result] : SAIL_PIXEL_FORMAT_UNKNOWN;
 }
 
 enum SailPixelFormat sail_closest_pixel_format_from_write_features(enum SailPixelFormat input_pixel_format, const struct sail_write_features *write_features) {
