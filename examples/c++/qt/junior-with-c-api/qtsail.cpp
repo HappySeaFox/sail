@@ -102,6 +102,9 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
 
 sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
 {
+    const struct sail_codec_info *codec_info;
+    SAIL_TRY(sail_codec_info_from_path(path.toLocal8Bit(), &codec_info));
+
     struct sail_image *image;
     SAIL_TRY(sail_alloc_image(&image));
 
@@ -112,6 +115,14 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
     image->pixel_format = qImageFormatToSailPixelFormat(qimage.format());
     SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(image->width, image->pixel_format, &image->bytes_per_line),
                         /* cleanup */ sail_destroy_image(image));
+
+    /* Convert to the best pixel format for saving. */
+    struct sail_image *image_converted;
+    SAIL_TRY_OR_CLEANUP(sail_convert_image_for_saving(image, codec_info->write_features, &image_converted),
+                        /* cleanup */ sail_destroy_image(image));
+
+    sail_destroy_image(image);
+    image = image_converted;
 
     SAIL_TRY_OR_CLEANUP(sail_write_file(path.toLocal8Bit(), image),
                                         /* cleanup */ sail_destroy_image(image));

@@ -93,7 +93,7 @@ struct sail_write_features;
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_convert_image(const struct sail_image *image_input,
+SAIL_EXPORT sail_status_t sail_convert_image(const struct sail_image *image,
                                              enum SailPixelFormat output_pixel_format,
                                              struct sail_image **image_output);
 
@@ -142,7 +142,7 @@ SAIL_EXPORT sail_status_t sail_convert_image(const struct sail_image *image_inpu
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_convert_image_with_options(const struct sail_image *image_input,
+SAIL_EXPORT sail_status_t sail_convert_image_with_options(const struct sail_image *image,
                                                           enum SailPixelFormat output_pixel_format,
                                                           const struct sail_conversion_options *options,
                                                           struct sail_image **image_output);
@@ -275,7 +275,18 @@ SAIL_EXPORT enum SailPixelFormat sail_closest_pixel_format(enum SailPixelFormat 
  *
  * If no candidates found at all, returns SAIL_PIXEL_FORMAT_UNKNOWN.
  */
-SAIL_EXPORT enum SailPixelFormat sail_closest_pixel_format_from_write_features(enum SailPixelFormat input_pixel_format, const struct sail_write_features *write_features);
+SAIL_EXPORT enum SailPixelFormat sail_closest_pixel_format_from_write_features(enum SailPixelFormat input_pixel_format,
+                                                                               const struct sail_write_features *write_features);
+
+/*
+ * Converts the image to be suitable for saving in the output format described by the write features
+ * (from the appropriate codec info).
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_convert_image_for_saving(const struct sail_image *image,
+                                                        const struct sail_write_features *write_features,
+                                                        struct sail_image **image_output);
 
 /* extern "C" */
 #ifdef __cplusplus
