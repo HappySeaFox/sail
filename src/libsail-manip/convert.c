@@ -23,7 +23,9 @@
     SOFTWARE.
 */
 
+#include <limits.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -808,4 +810,123 @@ bool sail_can_convert(enum SailPixelFormat input_pixel_format, enum SailPixelFor
             return false;
         }
     }
+}
+
+/* Sorted by priority. */
+static const enum SailPixelFormat GRAYSCALE_CANDIDATES[] = {
+
+    /* After adding a new output pixel format, also update this list. */
+    SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE,
+    SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE,
+
+    SAIL_PIXEL_FORMAT_BPP24_RGB,
+    SAIL_PIXEL_FORMAT_BPP24_BGR,
+
+    SAIL_PIXEL_FORMAT_BPP48_RGB,
+    SAIL_PIXEL_FORMAT_BPP48_BGR,
+
+    SAIL_PIXEL_FORMAT_BPP32_RGBA,
+    SAIL_PIXEL_FORMAT_BPP32_BGRA,
+    SAIL_PIXEL_FORMAT_BPP32_ARGB,
+    SAIL_PIXEL_FORMAT_BPP32_ABGR,
+    SAIL_PIXEL_FORMAT_BPP32_RGBX,
+    SAIL_PIXEL_FORMAT_BPP32_BGRX,
+    SAIL_PIXEL_FORMAT_BPP32_XRGB,
+    SAIL_PIXEL_FORMAT_BPP32_XBGR,
+
+    SAIL_PIXEL_FORMAT_BPP64_RGBA,
+    SAIL_PIXEL_FORMAT_BPP64_BGRA,
+    SAIL_PIXEL_FORMAT_BPP64_ARGB,
+    SAIL_PIXEL_FORMAT_BPP64_ABGR,
+    SAIL_PIXEL_FORMAT_BPP64_RGBX,
+    SAIL_PIXEL_FORMAT_BPP64_BGRX,
+    SAIL_PIXEL_FORMAT_BPP64_XRGB,
+    SAIL_PIXEL_FORMAT_BPP64_XBGR,
+
+    SAIL_PIXEL_FORMAT_BPP24_YCBCR,
+};
+
+static const size_t GRAYSCALE_CANDIDATES_LENGTH = sizeof(GRAYSCALE_CANDIDATES) / sizeof(GRAYSCALE_CANDIDATES[0]);
+
+/* Sorted by priority. */
+static const enum SailPixelFormat INDEXED_OR_FULL_COLOR_CANDIDATES[] = {
+
+    /* After adding a new output pixel format, also update this list. */
+    SAIL_PIXEL_FORMAT_BPP24_RGB,
+    SAIL_PIXEL_FORMAT_BPP24_BGR,
+
+    SAIL_PIXEL_FORMAT_BPP48_RGB,
+    SAIL_PIXEL_FORMAT_BPP48_BGR,
+
+    SAIL_PIXEL_FORMAT_BPP32_RGBA,
+    SAIL_PIXEL_FORMAT_BPP32_BGRA,
+    SAIL_PIXEL_FORMAT_BPP32_ARGB,
+    SAIL_PIXEL_FORMAT_BPP32_ABGR,
+    SAIL_PIXEL_FORMAT_BPP32_RGBX,
+    SAIL_PIXEL_FORMAT_BPP32_BGRX,
+    SAIL_PIXEL_FORMAT_BPP32_XRGB,
+    SAIL_PIXEL_FORMAT_BPP32_XBGR,
+
+    SAIL_PIXEL_FORMAT_BPP64_RGBA,
+    SAIL_PIXEL_FORMAT_BPP64_BGRA,
+    SAIL_PIXEL_FORMAT_BPP64_ARGB,
+    SAIL_PIXEL_FORMAT_BPP64_ABGR,
+    SAIL_PIXEL_FORMAT_BPP64_RGBX,
+    SAIL_PIXEL_FORMAT_BPP64_BGRX,
+    SAIL_PIXEL_FORMAT_BPP64_XRGB,
+    SAIL_PIXEL_FORMAT_BPP64_XBGR,
+
+    SAIL_PIXEL_FORMAT_BPP24_YCBCR,
+
+    SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE,
+    SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE,
+};
+
+static const size_t INDEXED_OR_FULL_COLOR_CANDIDATES_LENGTH = sizeof(INDEXED_OR_FULL_COLOR_CANDIDATES) / sizeof(INDEXED_OR_FULL_COLOR_CANDIDATES[0]);
+
+enum SailPixelFormat sail_closest_pixel_format(enum SailPixelFormat input_pixel_format,
+                                               const enum SailPixelFormat output_pixel_formats[],
+                                               size_t output_pixel_formats_length) {
+
+    if (input_pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN) {
+        return SAIL_PIXEL_FORMAT_UNKNOWN;
+    }
+
+    const enum SailPixelFormat *candidates;
+    size_t candidates_length;
+
+    if (sail_is_grayscale(input_pixel_format)) {
+        candidates = GRAYSCALE_CANDIDATES;
+        candidates_length = GRAYSCALE_CANDIDATES_LENGTH;
+    } else {
+        candidates = INDEXED_OR_FULL_COLOR_CANDIDATES;
+        candidates_length = INDEXED_OR_FULL_COLOR_CANDIDATES_LENGTH;
+    }
+
+    size_t best_index_candidate = UINT_MAX;
+    size_t best_index_result = 0;
+    bool found = false;
+
+    /* O(n^2) (sic!). */
+    for (size_t i = 0; i < output_pixel_formats_length; i++) {
+        for (size_t k = 0; k < candidates_length; k++) {
+            if (output_pixel_formats[i] == candidates[k]) {
+                if (k < best_index_candidate) {
+                    best_index_candidate = k;
+                    best_index_result = i;
+                    found = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    return found ? output_pixel_formats[best_index_result] : SAIL_PIXEL_FORMAT_UNKNOWN;
+}
+
+enum SailPixelFormat sail_closest_pixel_format_from_write_features(enum SailPixelFormat input_pixel_format, const struct sail_write_features *write_features) {
+
+    SAIL_CHECK_WRITE_FEATURES_PTR(write_features);
+
+    return sail_closest_pixel_format(input_pixel_format, write_features->output_pixel_formats, write_features->output_pixel_formats_length);
 }

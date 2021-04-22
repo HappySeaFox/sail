@@ -44,6 +44,7 @@ extern "C" {
 
 struct sail_conversion_options;
 struct sail_image;
+struct sail_write_features;
 
 /*
  * Converts the input image to the pixel format and saves the result in the output image.
@@ -255,6 +256,26 @@ SAIL_EXPORT sail_status_t sail_update_image_with_options(struct sail_image *imag
  * pixel format to the output pixel format.
  */
 SAIL_EXPORT bool sail_can_convert(enum SailPixelFormat input_pixel_format, enum SailPixelFormat output_pixel_format);
+
+/*
+ * Returns the closest to the input pixel format from the list.
+ *
+ * This function can be used to find the best pixel format to save an image into.
+ *
+ * If no candidates found at all, returns SAIL_PIXEL_FORMAT_UNKNOWN.
+ */
+SAIL_EXPORT enum SailPixelFormat sail_closest_pixel_format(enum SailPixelFormat input_pixel_format,
+                                                           const enum SailPixelFormat output_pixel_formats[],
+                                                           size_t output_pixel_formats_length);
+
+/*
+ * Returns the closest to the input pixel format from the list in the write features.
+ *
+ * This function can be used to find the best pixel format to save an image into.
+ *
+ * If no candidates found at all, returns SAIL_PIXEL_FORMAT_UNKNOWN.
+ */
+SAIL_EXPORT enum SailPixelFormat sail_closest_pixel_format_from_write_features(enum SailPixelFormat input_pixel_format, const struct sail_write_features *write_features);
 
 /* extern "C" */
 #ifdef __cplusplus
