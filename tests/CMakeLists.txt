@@ -10,3 +10,4 @@ add_subdirectory(sail-dump)
 #
 add_subdirectory(sail-common)
 add_subdirectory(sail)
+add_subdirectory(sail-manip)
