@@ -174,6 +174,14 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
 
 sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
 {
+    const sail_codec_info *codec_info;
+    SAIL_TRY(sail_codec_info_from_path(path.toLocal8Bit(), &codec_info));
+
+    SailPixelFormat bestPixelFormatForSaving =
+            sail_closest_pixel_format_from_write_features(
+                qImageFormatToSailPixelFormat(qimage.format()),
+                codec_info->write_features);
+
     /*
      * Always set the initial state to NULL in C or nullptr in C++.
      */
@@ -190,7 +198,17 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
     image->pixel_format = qImageFormatToSailPixelFormat(qimage.format());
 
     SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(image->width, image->pixel_format, &image->bytes_per_line),
-                        /* cleanup */sail_destroy_image(image));
+                        /* cleanup */ sail_destroy_image(image));
+
+    /* Convert to the best pixel format for saving. */
+    if (image->pixel_format != bestPixelFormatForSaving) {
+        struct sail_image *image_converted;
+        SAIL_TRY_OR_CLEANUP(sail_convert_image(image, bestPixelFormatForSaving, &image_converted),
+                            /* cleanup */ sail_destroy_image(image));
+
+        sail_destroy_image(image);
+        image = image_converted;
+    }
 
     SAIL_TRY_OR_CLEANUP(sail_start_writing_file(path.toLocal8Bit(), nullptr, &state),
                         /* cleanup */ sail_destroy_image(image));
