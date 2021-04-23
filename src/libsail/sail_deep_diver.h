@@ -102,9 +102,6 @@ SAIL_EXPORT sail_status_t sail_start_reading_mem_with_options(const void *buffer
  *
  * The write options are deep copied.
  *
- * If write options is NULL, the subsequent calls to sail_write_next_frame() output pixels in pixel format
- * as specified in sail_write_features.default_output_pixel_format.
- *
  * Typical usage: sail_start_writing_file_with_options() ->
  *                sail_write_next_frame()                ->
  *                sail_stop_writing().
@@ -129,9 +126,6 @@ SAIL_EXPORT sail_status_t sail_start_writing_file_with_options(const char *path,
  * write options, just pass NULL. Codec-specific defaults will be used in this case.
  *
  * The write options are deep copied.
- *
- * If write options is NULL, the subsequent calls to sail_write_next_frame() output pixels in pixel format
- * as specified in sail_write_features.default_output_pixel_format.
  *
  * Typical usage: sail_codec_info_from_extension()      ->
  *                sail_start_writing_mem_with_options() ->

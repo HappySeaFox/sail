@@ -82,7 +82,9 @@ SAIL_EXPORT sail_status_t sail_read_mem(const void *buffer, size_t buffer_length
 /*
  * Writes the pixels of the specified image file into the file.
  *
- * Outputs pixels in the pixel format as specified in sail_write_features.default_output_pixel_format.
+ * If the selected image format doesn't support the image pixel format, an error is returned.
+ * Consider converting the image into a supported image format in advance with functions
+ * from sail-manip.
  *
  * Typical usage: This is a standalone function that could be called at any time.
  *
@@ -93,7 +95,9 @@ SAIL_EXPORT sail_status_t sail_write_file(const char *path, const struct sail_im
 /*
  * Writes the pixels of the specified image file into the specified memory buffer.
  *
- * Outputs pixels in the pixel format as specified in sail_write_features.default_output_pixel_format.
+ * If the selected image format doesn't support the image pixel format, an error is returned.
+ * Consider converting the image into a supported image format in advance with functions
+ * from sail-manip.
  *
  * Saves the number of bytes written into the 'written' parameter if it's not NULL.
  *
