@@ -141,12 +141,12 @@ SAIL_EXPORT sail_status_t sail_stop_reading(void *state);
  * Starts writing into the specified image file. Pass codec info if you'd like to start writing
  * with a specific codec. If not, just pass NULL.
  *
- * Typical usage: sail_start_writing()    ->
- *                sail_write_next_frame() ->
+ * Typical usage: sail_start_writing_file() ->
+ *                sail_write_next_frame()   ->
  *                sail_stop_writing().
  *
  * Or:            sail_codec_info_from_extension() ->
- *                sail_start_writing()             ->
+ *                sail_start_writing_file()        ->
  *                sail_write_next_frame()          ->
  *                sail_stop_writing().
  *

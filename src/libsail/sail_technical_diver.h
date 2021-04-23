@@ -94,7 +94,7 @@ SAIL_EXPORT sail_status_t sail_start_reading_io_with_options(struct sail_io *io,
  * Typical usage: sail_alloc_io()                  ->
  *                set I/O callbacks                ->
  *                sail_codec_info_from_extension() ->
- *                sail_start_writing()             ->
+ *                sail_start_writing_file()        ->
  *                sail_write_next_frame()          ->
  *                sail_stop_writing()              ->
  *                sail_destroy_io().
