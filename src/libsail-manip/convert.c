@@ -935,6 +935,16 @@ sail_status_t sail_convert_image_for_saving(const struct sail_image *image,
                                             const struct sail_write_features *write_features,
                                             struct sail_image **image_output) {
 
+    SAIL_TRY(sail_convert_image_for_saving_with_options(image, write_features, NULL, image_output));
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_convert_image_for_saving_with_options(const struct sail_image *image,
+                                                         const struct sail_write_features *write_features,
+                                                         const struct sail_conversion_options *options,
+                                                         struct sail_image **image_output) {
+
     SAIL_TRY(sail_check_image_valid(image));
     SAIL_CHECK_WRITE_FEATURES_PTR(write_features);
     SAIL_CHECK_IMAGE_PTR(image_output);
@@ -943,7 +953,7 @@ sail_status_t sail_convert_image_for_saving(const struct sail_image *image,
 
     if (best_pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN) {
         const char *pixel_format_str = NULL;
-        SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(best_pixel_format, &pixel_format_str));
+        SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(image->pixel_format, &pixel_format_str));
         SAIL_LOG_ERROR("Failed to find the best output format for saving %s image", pixel_format_str);
 
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
@@ -952,7 +962,7 @@ sail_status_t sail_convert_image_for_saving(const struct sail_image *image,
     if (best_pixel_format == image->pixel_format) {
         SAIL_TRY(sail_copy_image(image, image_output));
     } else {
-        SAIL_TRY(sail_convert_image(image, best_pixel_format, image_output));
+        SAIL_TRY(sail_convert_image_with_options(image, best_pixel_format, options, image_output));
     }
 
     return SAIL_OK;
