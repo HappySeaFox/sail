@@ -348,6 +348,15 @@ image& image::with_iccp(const sail::iccp &ic)
     return *this;
 }
 
+bool image::can_convert(SailPixelFormat pixel_format)
+{
+    if (!is_valid()) {
+        return false;
+    }
+
+    return sail_can_convert(d->pixel_format, pixel_format);
+}
+
 sail_status_t image::convert(SailPixelFormat pixel_format) {
 
     SAIL_TRY(convert(pixel_format, conversion_options{}));
@@ -412,6 +421,38 @@ sail_status_t image::convert(SailPixelFormat pixel_format, const conversion_opti
     return SAIL_OK;
 }
 
+sail_status_t image::convert(const write_features &wf) {
+
+    SAIL_TRY(convert(wf, conversion_options{}));
+
+    return SAIL_OK;
+}
+
+sail_status_t image::convert(const write_features &wf, const conversion_options &options) {
+
+    if (!is_valid()) {
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+    }
+
+    SailPixelFormat best_pixel_format = closest_pixel_format(d->pixel_format, wf);
+
+    if (best_pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN) {
+        const char *pixel_format_str = NULL;
+        SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(d->pixel_format, &pixel_format_str));
+        SAIL_LOG_ERROR("Failed to find the best output format for saving %s image", pixel_format_str);
+
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+    }
+
+    if (best_pixel_format == d->pixel_format) {
+        return SAIL_OK;
+    } else {
+        SAIL_TRY(convert(best_pixel_format, options));
+    }
+
+    return SAIL_OK;
+}
+
 sail_status_t image::convert_to(SailPixelFormat pixel_format, sail::image *image)
 {
     SAIL_TRY(convert_to(pixel_format, conversion_options{}, image));
@@ -452,6 +493,39 @@ sail_status_t image::convert_to(SailPixelFormat pixel_format, const conversion_o
     return SAIL_OK;
 }
 
+sail_status_t image::convert_to(const write_features &wf, sail::image *image)
+{
+    SAIL_TRY(convert_to(wf, conversion_options{}, image));
+
+    return SAIL_OK;
+}
+
+sail_status_t image::convert_to(const write_features &wf, const conversion_options &options, sail::image *image)
+{
+    if (!is_valid()) {
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+    }
+
+    SailPixelFormat best_pixel_format = closest_pixel_format(d->pixel_format, wf);
+
+    if (best_pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN) {
+        const char *pixel_format_str = NULL;
+        SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(d->pixel_format, &pixel_format_str));
+        SAIL_LOG_ERROR("Failed to find the best output format for saving %s image", pixel_format_str);
+
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+    }
+
+    if (best_pixel_format == d->pixel_format) {
+        *image = *this;
+        return SAIL_OK;
+    } else {
+        SAIL_TRY(convert_to(best_pixel_format, options, image));
+    }
+
+    return SAIL_OK;
+}
+
 image image::convert_to(SailPixelFormat pixel_format)
 {
     image img;
@@ -461,18 +535,56 @@ image image::convert_to(SailPixelFormat pixel_format)
     return img;
 }
 
-bool image::can_convert(SailPixelFormat pixel_format)
+image image::convert_to(SailPixelFormat pixel_format, const conversion_options &options)
 {
-    if (!is_valid()) {
-        return false;
-    }
+    image img;
+    SAIL_TRY_OR_EXECUTE(convert_to(pixel_format, options, &img),
+                        /* on error */ return img);
 
-    return sail_can_convert(d->pixel_format, pixel_format);
+    return img;
+}
+
+image image::convert_to(const write_features &wf)
+{
+    image img;
+    SAIL_TRY_OR_EXECUTE(convert_to(wf, conversion_options{}, &img),
+                        /* on error */ return img);
+
+    return img;
+}
+
+image image::convert_to(const write_features &wf, const conversion_options &options)
+{
+    image img;
+    SAIL_TRY_OR_EXECUTE(convert_to(wf, options, &img),
+                        /* on error */ return img);
+
+    return img;
+}
+
+SailPixelFormat image::closest_pixel_format(const std::vector<SailPixelFormat> &pixel_formats)
+{
+    return sail_closest_pixel_format(d->pixel_format, pixel_formats.data(), pixel_formats.size());
+}
+
+SailPixelFormat image::closest_pixel_format(const write_features &wf)
+{
+    return sail_closest_pixel_format(d->pixel_format, wf.output_pixel_formats().data(), wf.output_pixel_formats().size());
 }
 
 bool image::can_convert(SailPixelFormat input_pixel_format, SailPixelFormat output_pixel_format) {
 
     return sail_can_convert(input_pixel_format, output_pixel_format);
+}
+
+SailPixelFormat image::closest_pixel_format(SailPixelFormat input_pixel_format, const std::vector<SailPixelFormat> &pixel_formats)
+{
+    return sail_closest_pixel_format(input_pixel_format, pixel_formats.data(), pixel_formats.size());
+}
+
+SailPixelFormat image::closest_pixel_format(SailPixelFormat input_pixel_format, const write_features &wf)
+{
+    return sail_closest_pixel_format(input_pixel_format, wf.output_pixel_formats().data(), wf.output_pixel_formats().size());
 }
 
 sail_status_t image::bits_per_pixel(SailPixelFormat pixel_format, unsigned *result)

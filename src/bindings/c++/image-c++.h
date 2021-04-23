@@ -54,6 +54,7 @@ namespace sail
 
 class conversion_options;
 class meta_data;
+class write_features;
 
 /*
  * Image representation with direct access to the pixel data.
@@ -291,19 +292,41 @@ public:
      */
     image& with_iccp(const sail::iccp &ic);
 
+    bool can_convert(SailPixelFormat pixel_format);
+
     sail_status_t convert(SailPixelFormat pixel_format);
 
     sail_status_t convert(SailPixelFormat pixel_format, const conversion_options &options);
+
+    sail_status_t convert(const write_features &wf);
+
+    sail_status_t convert(const write_features &wf, const conversion_options &options);
 
     sail_status_t convert_to(SailPixelFormat pixel_format, sail::image *image);
 
     sail_status_t convert_to(SailPixelFormat pixel_format, const conversion_options &options, sail::image *image);
 
+    sail_status_t convert_to(const write_features &wf, sail::image *image);
+
+    sail_status_t convert_to(const write_features &wf, const conversion_options &options, sail::image *image);
+
     image convert_to(SailPixelFormat pixel_format);
 
-    bool can_convert(SailPixelFormat pixel_format);
+    image convert_to(SailPixelFormat pixel_format, const conversion_options &options);
+
+    image convert_to(const write_features &wf);
+
+    image convert_to(const write_features &wf, const conversion_options &options);
+
+    SailPixelFormat closest_pixel_format(const std::vector<SailPixelFormat> &pixel_formats);
+
+    SailPixelFormat closest_pixel_format(const write_features &wf);
 
     static bool can_convert(SailPixelFormat input_pixel_format, SailPixelFormat output_pixel_format);
+
+    static SailPixelFormat closest_pixel_format(SailPixelFormat input_pixel_format, const std::vector<SailPixelFormat> &pixel_formats);
+
+    static SailPixelFormat closest_pixel_format(SailPixelFormat input_pixel_format, const write_features &wf);
 
     /*
      * Calculates the number of bits per pixel in the specified pixel format.
