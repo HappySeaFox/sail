@@ -116,7 +116,14 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
     SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(image->width, image->pixel_format, &image->bytes_per_line),
                         /* cleanup */ sail_destroy_image(image));
 
-    /* Convert to the best pixel format for saving. */
+    /*
+     * SAIL tries to save an image as is, preserving its pixel format.
+     * Particular image formats may support saving in different pixel formats:
+     * RGB, Grayscale, etc. Convert the image to the best pixel format for saving here.
+     *
+     * You can prepare the image for saving by converting its pixel format on your own,
+     * without using sail-manip.
+     */
     struct sail_image *image_converted;
     SAIL_TRY_OR_CLEANUP(sail_convert_image_for_saving(image, codec_info->write_features, &image_converted),
                         /* cleanup */ sail_destroy_image(image));

@@ -107,7 +107,12 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
          .with_bytes_per_line_auto()
          .with_shallow_pixels(const_cast<uchar *>(qimage.bits()));
 
-    // Convert to the best pixel format for saving.
+    // SAIL tries to save an image as is, preserving its pixel format.
+    // Particular image formats may support saving in different pixel formats:
+    // RGB, Grayscale, etc. Convert the image to the best pixel format for saving here.
+    //
+    // You can prepare the image for saving by converting its pixel format on your own,
+    // without using conversion methods.
     //
     SAIL_TRY(image.convert(codec_info.write_features()));
 
