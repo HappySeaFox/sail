@@ -82,6 +82,8 @@ public:
 
     bool is_grayscale() const;
 
+    bool is_rgb_family() const;
+
     /*
      * Returns image width.
      *
@@ -360,6 +362,8 @@ public:
     static bool is_indexed(SailPixelFormat pixel_format);
 
     static bool is_grayscale(SailPixelFormat pixel_format);
+
+    static bool is_rgb_family(SailPixelFormat pixel_format);
 
     /*
      * Assigns a non-NULL string representation of the specified pixel format.

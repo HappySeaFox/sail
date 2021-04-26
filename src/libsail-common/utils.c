@@ -852,6 +852,40 @@ bool sail_is_grayscale(enum SailPixelFormat pixel_format) {
     }
 }
 
+bool sail_is_rgb_family(enum SailPixelFormat pixel_format) {
+
+    switch (pixel_format) {
+        case SAIL_PIXEL_FORMAT_BPP24_RGB:
+        case SAIL_PIXEL_FORMAT_BPP24_BGR:
+
+        case SAIL_PIXEL_FORMAT_BPP48_RGB:
+        case SAIL_PIXEL_FORMAT_BPP48_BGR:
+
+        case SAIL_PIXEL_FORMAT_BPP32_RGBX:
+        case SAIL_PIXEL_FORMAT_BPP32_BGRX:
+        case SAIL_PIXEL_FORMAT_BPP32_XRGB:
+        case SAIL_PIXEL_FORMAT_BPP32_XBGR:
+        case SAIL_PIXEL_FORMAT_BPP32_RGBA:
+        case SAIL_PIXEL_FORMAT_BPP32_BGRA:
+        case SAIL_PIXEL_FORMAT_BPP32_ARGB:
+        case SAIL_PIXEL_FORMAT_BPP32_ABGR:
+
+        case SAIL_PIXEL_FORMAT_BPP64_RGBX:
+        case SAIL_PIXEL_FORMAT_BPP64_BGRX:
+        case SAIL_PIXEL_FORMAT_BPP64_XRGB:
+        case SAIL_PIXEL_FORMAT_BPP64_XBGR:
+        case SAIL_PIXEL_FORMAT_BPP64_RGBA:
+        case SAIL_PIXEL_FORMAT_BPP64_BGRA:
+        case SAIL_PIXEL_FORMAT_BPP64_ARGB:
+        case SAIL_PIXEL_FORMAT_BPP64_ABGR: {
+            return true;
+        }
+        default: {
+            return false;
+        }
+    }
+}
+
 sail_status_t sail_print_errno(const char *format) {
 
     SAIL_CHECK_STRING_PTR(format);

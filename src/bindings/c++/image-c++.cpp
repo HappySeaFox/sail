@@ -150,6 +150,11 @@ bool image::is_grayscale() const
     return is_grayscale(d->pixel_format);
 }
 
+bool image::is_rgb_family() const
+{
+    return is_rgb_family(d->pixel_format);
+}
+
 unsigned image::width() const
 {
     return d->width;
@@ -611,6 +616,11 @@ bool image::is_indexed(SailPixelFormat pixel_format)
 bool image::is_grayscale(SailPixelFormat pixel_format)
 {
     return sail_is_grayscale(pixel_format);
+}
+
+bool image::is_rgb_family(SailPixelFormat pixel_format)
+{
+    return sail_is_rgb_family(pixel_format);
 }
 
 sail_status_t image::pixel_format_to_string(SailPixelFormat pixel_format, const char **result)
