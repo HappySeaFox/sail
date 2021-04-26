@@ -32,7 +32,7 @@
  *
  *    for (int i = 0; i < 256; i++) {
  *        CR_R[i] = (int)round(1.40200 * (i - 128));
- *        G_CB[i] = (int)round(0.34414 * (i - 128));
+ *        CB_G[i] = (int)round(0.34414 * (i - 128));
  *        CR_G[i] = (int)round(0.71414 * (i - 128));
  *        CB_B[i] = (int)round(1.77200 * (i - 128));
  *    }
