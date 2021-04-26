@@ -25,7 +25,7 @@
 
 #include "sail-manip.h"
 
-sail_status_t convert_cmyk32_to_rgba32(uint8_t c, uint8_t m, uint8_t y, uint8_t k, sail_rgba32_t *rgba) {
+void convert_cmyk32_to_rgba32(uint8_t c, uint8_t m, uint8_t y, uint8_t k, sail_rgba32_t *rgba) {
 
 #if 0
     const uint8_t C =  (uint8_t)(c / 100.0);
@@ -42,6 +42,4 @@ sail_status_t convert_cmyk32_to_rgba32(uint8_t c, uint8_t m, uint8_t y, uint8_t 
     rgba->component3 = (uint8_t)((double)y * k / 255.0 + 0.5);
     rgba->component4 = 255;
 #endif
-
-    return SAIL_OK;
 }

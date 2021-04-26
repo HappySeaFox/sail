@@ -29,20 +29,16 @@
 #include <stdint.h>
 
 #ifdef SAIL_BUILD
-    #include "error.h"
     #include "export.h"
     #include "pixel.h"
 #else
-    #include <sail-common/error.h>
     #include <sail-common/export.h>
     #include <sail-common/pixel.h>
 #endif
 
 /*
  * CMYK to RGB conversion. It's known for being not 1:1 exact by design. See https://sourceforge.net/p/libjpeg-turbo/patches/15
- *
- * Returns SAIL_OK on success.
  */
-SAIL_HIDDEN sail_status_t convert_cmyk32_to_rgba32(uint8_t c, uint8_t m, uint8_t y, uint8_t k, sail_rgba32_t *rgba);
+SAIL_HIDDEN void convert_cmyk32_to_rgba32(uint8_t c, uint8_t m, uint8_t y, uint8_t k, sail_rgba32_t *rgba);
 
 #endif

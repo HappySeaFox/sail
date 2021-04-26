@@ -494,7 +494,7 @@ static sail_status_t convert_from_bpp32_cmyk(const struct sail_image *image, pix
         const uint8_t *scan_input = (uint8_t *)image->pixels + image->bytes_per_line * row;
 
         for (unsigned column = 0; column < image->width; column++) {
-            SAIL_TRY(convert_cmyk32_to_rgba32(*(scan_input+0), *(scan_input+1), *(scan_input+2), *(scan_input+3), &rgba32));
+            convert_cmyk32_to_rgba32(*(scan_input+0), *(scan_input+1), *(scan_input+2), *(scan_input+3), &rgba32);
 
             pixel_consumer(output_context, row, column, &rgba32, NULL);
             scan_input += 4;
