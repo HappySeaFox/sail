@@ -249,7 +249,7 @@ SAIL_EXPORT sail_status_t sail_bytes_per_line(unsigned width, enum SailPixelForm
 SAIL_EXPORT bool sail_is_indexed(enum SailPixelFormat pixel_format);
 
 /*
- * Returns true if the given pixel format is grayscale (with or without alpha).
+ * Returns true if the given pixel format is grayscale, with or without alpha.
  */
 SAIL_EXPORT bool sail_is_grayscale(enum SailPixelFormat pixel_format);
 
