@@ -855,6 +855,11 @@ bool sail_is_grayscale(enum SailPixelFormat pixel_format) {
 bool sail_is_rgb_family(enum SailPixelFormat pixel_format) {
 
     switch (pixel_format) {
+        case SAIL_PIXEL_FORMAT_BPP16_RGB555:
+        case SAIL_PIXEL_FORMAT_BPP16_BGR555:
+        case SAIL_PIXEL_FORMAT_BPP16_RGB565:
+        case SAIL_PIXEL_FORMAT_BPP16_BGR565:
+
         case SAIL_PIXEL_FORMAT_BPP24_RGB:
         case SAIL_PIXEL_FORMAT_BPP24_BGR:
 
