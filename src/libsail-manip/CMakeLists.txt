@@ -10,7 +10,9 @@ add_library(sail-manip
                 manip_utils.h
                 sail-manip.h
                 ycbcr.c
-                ycbcr.h)
+                ycbcr.h
+                ycck.c
+                ycck.h)
 
 # Build a list of public headers to install
 #

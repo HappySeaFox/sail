@@ -1,6 +1,6 @@
 /*  This file is part of SAIL (https://github.com/smoked-herring/sail)
 
-    Copyright (c) 2020-2021 Dmitry Baryshev
+    Copyright (c) 2021 Dmitry Baryshev
 
     The MIT License
 
@@ -23,27 +23,19 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_SAIL_MANIP_H
-#define SAIL_SAIL_MANIP_H
+#ifndef SAIL_YCCK_H
+#define SAIL_YCCK_H
 
-/* Universal libsail-manip include. */
+#include <stdint.h>
 
 #ifdef SAIL_BUILD
-    #include "sail-common.h"
-
-    #include "cmyk.h"
-    #include "conversion_options.h"
-    #include "convert.h"
-    #include "manip_common.h"
-    #include "manip_utils.h"
-    #include "ycbcr.h"
-    #include "ycck.h"
+    #include "export.h"
+    #include "pixel.h"
 #else
-    #include <sail-common/sail-common.h>
-
-    #include <sail-manip/conversion_options.h>
-    #include <sail-manip/convert.h>
-    #include <sail-manip/manip_common.h>
+    #include <sail-common/export.h>
+    #include <sail-common/pixel.h>
 #endif
+
+SAIL_HIDDEN void convert_ycck32_to_rgba32(uint8_t y, uint8_t cb, uint8_t cr, uint8_t k, sail_rgba32_t *rgba32);
 
 #endif

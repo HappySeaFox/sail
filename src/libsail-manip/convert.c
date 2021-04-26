@@ -33,9 +33,6 @@
 
 #include "sail-manip.h"
 
-#include "cmyk.h"
-#include "ycbcr.h"
-
 /*
  * Private functions.
  */
@@ -522,6 +519,24 @@ static sail_status_t convert_from_bpp24_ycbcr(const struct sail_image *image, pi
     return SAIL_OK;
 }
 
+static sail_status_t convert_from_bpp32_ycck(const struct sail_image *image, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
+
+    sail_rgba32_t rgba32;
+
+    for (unsigned row = 0; row < image->height; row++) {
+        const uint8_t *scan_input = (uint8_t *)image->pixels + image->bytes_per_line * row;
+
+        for (unsigned column = 0; column < image->width; column++) {
+            convert_ycck32_to_rgba32(*(scan_input+0), *(scan_input+1), *(scan_input+2), *(scan_input+3), &rgba32);
+
+            pixel_consumer(output_context, row, column, &rgba32, NULL);
+            scan_input += 4;
+        }
+    }
+
+    return SAIL_OK;
+}
+
 static sail_status_t conversion_impl(
     const struct sail_image *image,
     struct sail_image *image_output,
@@ -662,6 +677,10 @@ static sail_status_t conversion_impl(
         }
         case SAIL_PIXEL_FORMAT_BPP24_YCBCR: {
             SAIL_TRY(convert_from_bpp24_ycbcr(image, pixel_consumer, &output_context));
+            break;
+        }
+        case SAIL_PIXEL_FORMAT_BPP32_YCCK: {
+            SAIL_TRY(convert_from_bpp32_ycck(image, pixel_consumer, &output_context));
             break;
         }
         default: {

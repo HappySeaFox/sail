@@ -23,9 +23,9 @@
     SOFTWARE.
 */
 
-#include <stdint.h>
-
 #include "sail-manip.h"
+
+#include "cmyk.h"
 
 /*
  * Pre-compiled for YCbCr -> RGB conversion like that:
@@ -80,7 +80,7 @@ void convert_ycbcr24_to_rgba32(uint8_t y, uint8_t cb, uint8_t cr, sail_rgba32_t 
     rgba32->component4 = 255;
 }
 
-void convert_rgba32_to_ycbcr24(sail_rgba32_t *rgba32, uint8_t *y, uint8_t *cb, uint8_t *cr) {
+void convert_rgba32_to_ycbcr24(const sail_rgba32_t *rgba32, uint8_t *y, uint8_t *cb, uint8_t *cr) {
 
     *y =  (uint8_t)(  0 + R_Y[rgba32->component1]  + G_Y[rgba32->component2]  + B_Y[rgba32->component3]);
     *cb = (uint8_t)(128 - R_CB[rgba32->component1] - G_CB[rgba32->component2] + B_CB[rgba32->component3]);

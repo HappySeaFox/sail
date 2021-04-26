@@ -59,7 +59,7 @@ struct sail_write_features;
  * instructions (like AVX or SSE) are used.
  *
  * Allowed input pixel formats:
- *   - Anything except YCCK, LUV, and LAB
+ *   - Anything except LUV and LAB
  *
  * Allowed output pixel formats:
  *   - SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE
@@ -108,7 +108,7 @@ SAIL_EXPORT sail_status_t sail_convert_image(const struct sail_image *image,
  * instructions (like AVX or SSE) are used.
  *
  * Allowed input pixel formats:
- *   - Anything except YCCK, LUV, and LAB
+ *   - Anything except LUV and LAB
  *
  * Allowed output pixel formats:
  *   - SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE
@@ -163,7 +163,7 @@ SAIL_EXPORT sail_status_t sail_convert_image_with_options(const struct sail_imag
  * instructions (like AVX or SSE) are used.
  *
  * Allowed input pixel formats:
- *   - Anything that produces equal or smaller image except YCCK, LUV, and LAB
+ *   - Anything that produces equal or smaller image except LUV and LAB
  *
  * Allowed output pixel formats:
  *   - SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE
@@ -213,7 +213,7 @@ SAIL_EXPORT sail_status_t sail_update_image(struct sail_image *image, enum SailP
  * instructions (like AVX or SSE) are used.
  *
  * Allowed input pixel formats:
- *   - Anything that produces equal or smaller image except YCCK, LUV, and LAB
+ *   - Anything that produces equal or smaller image except LUV and LAB
  *
  * Allowed output pixel formats:
  *   - SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE

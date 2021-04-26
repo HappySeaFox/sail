@@ -25,8 +25,6 @@
 
 #include "sail-manip.h"
 
-#include "ycbcr.h"
-
 /* https://en.wikipedia.org/wiki/Grayscale */
 static const double R_TO_GRAY_COEFFICIENT = 0.299;
 static const double G_TO_GRAY_COEFFICIENT = 0.587;
