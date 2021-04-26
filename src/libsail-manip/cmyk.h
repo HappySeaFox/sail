@@ -39,6 +39,6 @@
 /*
  * CMYK to RGB conversion. It's known for being not 1:1 exact by design. See https://sourceforge.net/p/libjpeg-turbo/patches/15
  */
-SAIL_HIDDEN void convert_cmyk32_to_rgba32(uint8_t c, uint8_t m, uint8_t y, uint8_t k, sail_rgba32_t *rgba);
+SAIL_HIDDEN void convert_cmyk32_to_rgba32(uint8_t c, uint8_t m, uint8_t y, uint8_t k, sail_rgba32_t *rgba32);
 
 #endif
