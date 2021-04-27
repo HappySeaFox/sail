@@ -171,7 +171,7 @@ SAIL_EXPORT sail_status_t sail_convert_image_with_options(const struct sail_imag
  * The image gets updated pixel format and bytes per line. Other properties stay as is.
  *
  * Allowed input pixel formats:
- *   - Anything that produces equal or smaller image except LUV and LAB
+ *   - Anything that produces equal or smaller image except LUV and LAB which are not supported
  *
  * Allowed output pixel formats:
  *   - SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE
@@ -223,7 +223,7 @@ SAIL_EXPORT sail_status_t sail_update_image(struct sail_image *image, enum SailP
  * The image gets updated pixel format and bytes per line. Other properties stay as is.
  *
  * Allowed input pixel formats:
- *   - Anything that produces equal or smaller image except LUV and LAB
+ *   - Anything that produces equal or smaller image except LUV and LAB which are not supported
  *
  * Allowed output pixel formats:
  *   - SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE
