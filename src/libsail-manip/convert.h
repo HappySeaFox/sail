@@ -58,6 +58,8 @@ struct sail_write_features;
  * BPP64-RGBA formats first, and only then to the requested output format. No platform-specific
  * instructions (like AVX or SSE) are used.
  *
+ * The image ICC profile (if any) is not involved into the conversion procedure.
+ *
  * The resulting image gets updated pixel format and bytes per line. Other properties are copied from
  * the original image.
  *
@@ -109,6 +111,8 @@ SAIL_EXPORT sail_status_t sail_convert_image(const struct sail_image *image,
  * The conversion procedure may be slow. It converts every pixel into the BPP32-RGBA or
  * BPP64-RGBA formats first, and only then to the requested output format. No platform-specific
  * instructions (like AVX or SSE) are used.
+ *
+ * The image ICC profile (if any) is not involved into the conversion procedure.
  *
  * The resulting image gets updated pixel format and bytes per line. Other properties are copied from
  * the original image.
@@ -168,6 +172,8 @@ SAIL_EXPORT sail_status_t sail_convert_image_with_options(const struct sail_imag
  * BPP64-RGBA formats first, and only then to the requested output format. No platform-specific
  * instructions (like AVX or SSE) are used.
  *
+ * The image ICC profile (if any) is not involved into the conversion procedure.
+ *
  * The image gets updated pixel format and bytes per line. Other properties stay as is.
  *
  * Allowed input pixel formats:
@@ -219,6 +225,8 @@ SAIL_EXPORT sail_status_t sail_update_image(struct sail_image *image, enum SailP
  * The updating procedure may be slow. It converts every pixel into the BPP32-RGBA or
  * BPP64-RGBA formats first, and only then to the requested output format. No platform-specific
  * instructions (like AVX or SSE) are used.
+ *
+ * The image ICC profile (if any) is not involved into the conversion procedure.
  *
  * The image gets updated pixel format and bytes per line. Other properties stay as is.
  *
