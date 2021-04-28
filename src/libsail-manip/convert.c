@@ -359,16 +359,11 @@ static sail_status_t convert_from_bpp32_grayscale_alpha(const struct sail_image 
 
 static sail_status_t convert_from_bpp16_rgb555(const struct sail_image *image, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
 
-    sail_rgba32_t rgba32;
-    rgba32.component4 = 255;
-
     for (unsigned row = 0; row < image->height; row++) {
         const uint16_t *scan_input = (uint16_t *)((uint8_t *)image->pixels + image->bytes_per_line * row);
 
         for (unsigned column = 0; column < image->width; column++) {
-            rgba32.component1 = ((*scan_input >> 0)  & 0x1f) << 3;
-            rgba32.component2 = ((*scan_input >> 5)  & 0x1f) << 3;
-            rgba32.component3 = ((*scan_input >> 10) & 0x1f) << 3;
+            const sail_rgba32_t rgba32 = { ((*scan_input >> 0) & 0x1f) << 3, ((*scan_input >> 5) & 0x1f) << 3, ((*scan_input >> 10) & 0x1f) << 3, 255 };
 
             pixel_consumer(output_context, row, column, &rgba32, NULL);
             scan_input++;
@@ -380,16 +375,43 @@ static sail_status_t convert_from_bpp16_rgb555(const struct sail_image *image, p
 
 static sail_status_t convert_from_bpp16_bgr555(const struct sail_image *image, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
 
-    sail_rgba32_t rgba32;
-    rgba32.component4 = 255;
+    for (unsigned row = 0; row < image->height; row++) {
+        const uint16_t *scan_input = (uint16_t *)((uint8_t *)image->pixels + image->bytes_per_line * row);
+
+        for (unsigned column = 0; column < image->width; column++) {
+            const sail_rgba32_t rgba32 = { ((*scan_input >> 10) & 0x1f) << 3, ((*scan_input >> 5) & 0x1f) << 3, ((*scan_input >> 0) & 0x1f) << 3, 255 };
+
+            pixel_consumer(output_context, row, column, &rgba32, NULL);
+            scan_input++;
+        }
+    }
+
+    return SAIL_OK;
+}
+
+static sail_status_t convert_from_bpp16_rgb565(const struct sail_image *image, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
 
     for (unsigned row = 0; row < image->height; row++) {
         const uint16_t *scan_input = (uint16_t *)((uint8_t *)image->pixels + image->bytes_per_line * row);
 
         for (unsigned column = 0; column < image->width; column++) {
-            rgba32.component1 = ((*scan_input >> 10) & 0x1f) << 3;
-            rgba32.component2 = ((*scan_input >> 5)  & 0x1f) << 3;
-            rgba32.component3 = ((*scan_input >> 0)  & 0x1f) << 3;
+            const sail_rgba32_t rgba32 = { ((*scan_input >> 0) & 0x1f) << 3, ((*scan_input >> 5) & 0x3f) << 2, ((*scan_input >> 11) & 0x1f) << 3, 255 };
+
+            pixel_consumer(output_context, row, column, &rgba32, NULL);
+            scan_input++;
+        }
+    }
+
+    return SAIL_OK;
+}
+
+static sail_status_t convert_from_bpp16_bgr565(const struct sail_image *image, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
+
+    for (unsigned row = 0; row < image->height; row++) {
+        const uint16_t *scan_input = (uint16_t *)((uint8_t *)image->pixels + image->bytes_per_line * row);
+
+        for (unsigned column = 0; column < image->width; column++) {
+            const sail_rgba32_t rgba32 = { ((*scan_input >> 11) & 0x1f) << 3, ((*scan_input >> 5) & 0x3f) << 2, ((*scan_input >> 0) & 0x1f) << 3, 255 };
 
             pixel_consumer(output_context, row, column, &rgba32, NULL);
             scan_input++;
@@ -401,16 +423,11 @@ static sail_status_t convert_from_bpp16_bgr555(const struct sail_image *image, p
 
 static sail_status_t convert_from_bpp24_rgb_kind(const struct sail_image *image, int ri, int gi, int bi, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
 
-    sail_rgba32_t rgba32;
-    rgba32.component4 = 255;
-
     for (unsigned row = 0; row < image->height; row++) {
         const uint8_t *scan_input = (uint8_t *)image->pixels + image->bytes_per_line * row;
 
         for (unsigned column = 0; column < image->width; column++) {
-            rgba32.component1 = *(scan_input+ri);
-            rgba32.component2 = *(scan_input+gi);
-            rgba32.component3 = *(scan_input+bi);
+            const sail_rgba32_t rgba32 = { *(scan_input+ri), *(scan_input+gi), *(scan_input+bi), 255 };
 
             pixel_consumer(output_context, row, column, &rgba32, NULL);
             scan_input += 3;
@@ -422,16 +439,11 @@ static sail_status_t convert_from_bpp24_rgb_kind(const struct sail_image *image,
 
 static sail_status_t convert_from_bpp48_rgb_kind(const struct sail_image *image, int ri, int gi, int bi, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
 
-    sail_rgba64_t rgba64;
-    rgba64.component4 = 65535;
-
     for (unsigned row = 0; row < image->height; row++) {
         const uint16_t *scan_input = (uint16_t *)((uint8_t *)image->pixels + image->bytes_per_line * row);
 
         for (unsigned column = 0; column < image->width; column++) {
-            rgba64.component1 = *(scan_input+ri);
-            rgba64.component2 = *(scan_input+gi);
-            rgba64.component3 = *(scan_input+bi);
+            const sail_rgba64_t rgba64 = { *(scan_input+ri), *(scan_input+gi), *(scan_input+bi), 65535 };
 
             pixel_consumer(output_context, row, column, NULL, &rgba64);
             scan_input += 3;
@@ -443,16 +455,11 @@ static sail_status_t convert_from_bpp48_rgb_kind(const struct sail_image *image,
 
 static sail_status_t convert_from_bpp32_rgba_kind(const struct sail_image *image, int ri, int gi, int bi, int ai, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
 
-    sail_rgba32_t rgba32;
-
     for (unsigned row = 0; row < image->height; row++) {
         const uint8_t *scan_input = (uint8_t *)image->pixels + image->bytes_per_line * row;
 
         for (unsigned column = 0; column < image->width; column++) {
-            rgba32.component1 = *(scan_input+ri);
-            rgba32.component2 = *(scan_input+gi);
-            rgba32.component3 = *(scan_input+bi);
-            rgba32.component4 = ai >= 0 ? *(scan_input+ai) : 255;
+            const sail_rgba32_t rgba32 = { *(scan_input+ri), *(scan_input+gi), *(scan_input+bi), ai >= 0 ? *(scan_input+ai) : 255 };
 
             pixel_consumer(output_context, row, column, &rgba32, NULL);
             scan_input += 4;
@@ -464,16 +471,11 @@ static sail_status_t convert_from_bpp32_rgba_kind(const struct sail_image *image
 
 static sail_status_t convert_from_bpp64_rgba_kind(const struct sail_image *image, int ri, int gi, int bi, int ai, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
 
-    sail_rgba64_t rgba64;
-
     for (unsigned row = 0; row < image->height; row++) {
         const uint16_t *scan_input = (uint16_t *)((uint8_t *)image->pixels + image->bytes_per_line * row);
 
         for (unsigned column = 0; column < image->width; column++) {
-            rgba64.component1 = *(scan_input+ri);
-            rgba64.component2 = *(scan_input+gi);
-            rgba64.component3 = *(scan_input+bi);
-            rgba64.component4 = ai >= 0 ? *(scan_input+ai) : 65535;
+            const sail_rgba64_t rgba64 = { *(scan_input+ri), *(scan_input+gi), *(scan_input+bi), ai >= 0 ? *(scan_input+ai) : 65535 };
 
             pixel_consumer(output_context, row, column, NULL, &rgba64);
             scan_input += 4;
@@ -589,6 +591,14 @@ static sail_status_t conversion_impl(
         }
         case SAIL_PIXEL_FORMAT_BPP16_BGR555: {
             SAIL_TRY(convert_from_bpp16_bgr555(image, pixel_consumer, &output_context));
+            break;
+        }
+        case SAIL_PIXEL_FORMAT_BPP16_RGB565: {
+            SAIL_TRY(convert_from_bpp16_rgb565(image, pixel_consumer, &output_context));
+            break;
+        }
+        case SAIL_PIXEL_FORMAT_BPP16_BGR565: {
+            SAIL_TRY(convert_from_bpp16_bgr565(image, pixel_consumer, &output_context));
             break;
         }
         case SAIL_PIXEL_FORMAT_BPP24_RGB: {
@@ -799,6 +809,8 @@ bool sail_can_convert(enum SailPixelFormat input_pixel_format, enum SailPixelFor
         case SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA:
         case SAIL_PIXEL_FORMAT_BPP16_RGB555:
         case SAIL_PIXEL_FORMAT_BPP16_BGR555:
+        case SAIL_PIXEL_FORMAT_BPP16_RGB565:
+        case SAIL_PIXEL_FORMAT_BPP16_BGR565:
         case SAIL_PIXEL_FORMAT_BPP24_RGB:
         case SAIL_PIXEL_FORMAT_BPP24_BGR:
         case SAIL_PIXEL_FORMAT_BPP48_RGB:
