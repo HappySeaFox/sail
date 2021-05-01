@@ -211,8 +211,7 @@ do {                              \
 
 /*
  * Try to execute the specified SAIL function. If it fails, execute the rest of arguments
- * (so called cleanup), and return the error code. Use do/while to require ';' at the end
- * of a SAIL_TRY_OR_CLEANUP() expression.
+ * (so called cleanup), and return the error code.
  */
 #define SAIL_TRY_OR_CLEANUP(sail_func, ...) SAIL_TRY_OR_EXECUTE(sail_func, __VA_ARGS__; return __sail_error_result)
 
