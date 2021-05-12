@@ -84,7 +84,7 @@ See the full list [here](FORMATS.md). Work to add more image formats is ongoing.
 ## Benchmarks
 
 <p align="center">
-  <a href="BENCHMARKS.md"><img src=".github/benchmarks/JPEG-YCbCr-1000x669.png?raw=true" alt="Benchmark" width="500px"/></a>
+  <a href="BENCHMARKS.md"><img src=".github/benchmarks/PNG-RGBA-6000x4256.png?raw=true" alt="Benchmark" width="500px"/></a>
 </p>
 
 Time to load and output RGBA8888 (or similar) pixels was measured. See [BENCHMARKS](BENCHMARKS.md).
