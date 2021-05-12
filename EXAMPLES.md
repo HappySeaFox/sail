@@ -56,7 +56,7 @@ SAIL_TRY(sail_read_file(path, &image));
  * image->pixel_format, and image->pixels for that.
  *
  * In particular, you can convert it to a different pixel format with functions
- * from libsail-manip. With sail_convert_image_to_rgba32_kind(), for example.
+ * from libsail-manip. With sail_convert_image(), for example.
  */
 
 /*
