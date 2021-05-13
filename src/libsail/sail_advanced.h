@@ -71,6 +71,10 @@ SAIL_EXPORT sail_status_t sail_probe_mem(const void *buffer, size_t buffer_lengt
  * Starts reading the specified image file. Pass codec info if you would like to start reading
  * with a specific codec. If not, just pass NULL.
  *
+ * The subsequent calls to sail_read_next_frame() may convert specific pixel formats to be more prepared
+ * for displaying. Use SAIL_IO_OPTION_CLOSE_TO_SOURCE to output pixels as close as possible
+ * to the source.
+ *
  * Typical usage: sail_start_reading_file() ->
  *                sail_read_next_frame()    ->
  *                sail_stop_reading().
@@ -100,6 +104,10 @@ SAIL_EXPORT sail_status_t sail_start_reading_file(const char *path, const struct
 
 /*
  * Starts reading the specified memory buffer.
+ *
+ * The subsequent calls to sail_read_next_frame() may convert specific pixel formats to be more prepared
+ * for displaying. Use SAIL_IO_OPTION_CLOSE_TO_SOURCE to output pixels as close as possible
+ * to the source.
  *
  * Typical usage: sail_codec_info_from_extension() ->
  *                sail_start_reading_mem()         ->

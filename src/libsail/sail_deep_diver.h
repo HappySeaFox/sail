@@ -52,6 +52,10 @@ struct sail_write_options;
  *
  * The read options are deep copied.
  *
+ * The subsequent calls to sail_read_next_frame() may convert specific pixel formats to be more prepared
+ * for displaying. Use SAIL_IO_OPTION_CLOSE_TO_SOURCE to output pixels as close as possible
+ * to the source.
+ *
  * Typical usage: sail_start_reading_file_with_options() ->
  *                sail_read_next_frame()                 ->
  *                sail_stop_reading().
@@ -75,6 +79,10 @@ SAIL_EXPORT sail_status_t sail_start_reading_file_with_options(const char *path,
  * just pass NULL. Codec-specific defaults will be used in this case.
  *
  * The read options are deep copied.
+ *
+ * The subsequent calls to sail_read_next_frame() may convert specific pixel formats to be more prepared
+ * for displaying. Use SAIL_IO_OPTION_CLOSE_TO_SOURCE to output pixels as close as possible
+ * to the source.
  *
  * Typical usage: sail_codec_info_from_extension()      ->
  *                sail_start_reading_mem_with_options() ->

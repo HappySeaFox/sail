@@ -59,6 +59,9 @@ SAIL_EXPORT sail_status_t sail_probe_file(const char *path, struct sail_image **
  * Loads the specified image file and returns its properties and pixels. The assigned image
  * MUST be destroyed later with sail_destroy_image().
  *
+ * May convert specific pixel formats to be more prepared for displaying. Use the advanced API with
+ * SAIL_IO_OPTION_CLOSE_TO_SOURCE to output pixels as close as possible to the source.
+ *
  * Typical usage: This is a standalone function that could be called at any time.
  *
  * Returns SAIL_OK on success.
@@ -68,6 +71,9 @@ SAIL_EXPORT sail_status_t sail_read_file(const char *path, struct sail_image **i
 /*
  * Loads the specified image file from the specified memory buffer and returns its properties and pixels.
  * The assigned image MUST be destroyed later with sail_destroy_image().
+ *
+ * May convert specific pixel formats to be more prepared for displaying. Use the advanced API with
+ * SAIL_IO_OPTION_CLOSE_TO_SOURCE to output pixels as close as possible to the source.
  *
  * Typical usage: This is a standalone function that could be called at any time.
  *
