@@ -52,8 +52,6 @@ struct sail_write_options;
  *
  * The read options are deep copied.
  *
- * If read options is NULL, the subsequent calls to sail_read_next_frame() output pixels in the BPP32-RGBA pixel format.
- *
  * Typical usage: sail_start_reading_file_with_options() ->
  *                sail_read_next_frame()                 ->
  *                sail_stop_reading().
@@ -77,8 +75,6 @@ SAIL_EXPORT sail_status_t sail_start_reading_file_with_options(const char *path,
  * just pass NULL. Codec-specific defaults will be used in this case.
  *
  * The read options are deep copied.
- *
- * If read options is NULL, the subsequent calls to sail_read_next_frame() output pixels in the BPP32-RGBA pixel format.
  *
  * Typical usage: sail_codec_info_from_extension()      ->
  *                sail_start_reading_mem_with_options() ->

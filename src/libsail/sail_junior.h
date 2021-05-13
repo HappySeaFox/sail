@@ -59,8 +59,6 @@ SAIL_EXPORT sail_status_t sail_probe_file(const char *path, struct sail_image **
  * Loads the specified image file and returns its properties and pixels. The assigned image
  * MUST be destroyed later with sail_destroy_image().
  *
- * Outputs pixels in the BPP32-RGBA pixel format.
- *
  * Typical usage: This is a standalone function that could be called at any time.
  *
  * Returns SAIL_OK on success.
@@ -70,8 +68,6 @@ SAIL_EXPORT sail_status_t sail_read_file(const char *path, struct sail_image **i
 /*
  * Loads the specified image file from the specified memory buffer and returns its properties and pixels.
  * The assigned image MUST be destroyed later with sail_destroy_image().
- *
- * Outputs pixels in the BPP32-RGBA pixel format.
  *
  * Typical usage: This is a standalone function that could be called at any time.
  *

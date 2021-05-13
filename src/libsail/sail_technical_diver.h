@@ -46,8 +46,6 @@ struct sail_write_options;
 /*
  * Starts reading the specified I/O stream.
  *
- * Outputs pixels in the BPP32-RGBA pixel format.
- *
  * Typical usage: sail_alloc_io()                  ->
  *                set I/O callbacks                ->
  *                sail_codec_info_from_extension() ->
@@ -67,8 +65,6 @@ SAIL_EXPORT sail_status_t sail_start_reading_io(struct sail_io *io, const struct
 /*
  * Starts reading the specified I/O stream with the specified read options. If you don't need specific read options,
  * just pass NULL. Codec-specific defaults will be used in this case. The read options are deep copied.
- *
- * If read options is NULL, the subsequent calls to sail_read_next_frame() output pixels in the BPP32-RGBA pixel format.
  *
  * Typical usage: sail_alloc_io()                      ->
  *                set I/O callbacks                    ->
