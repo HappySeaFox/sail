@@ -1,6 +1,6 @@
 /*  This file is part of SAIL (https://github.com/smoked-herring/sail)
 
-    Copyright (c) 2020 Dmitry Baryshev
+    Copyright (c) 2021 Dmitry Baryshev
 
     The MIT License
 
@@ -23,35 +23,21 @@
     SOFTWARE.
 */
 
-#ifndef READOPTIONS_H
-#define READOPTIONS_H
+#ifndef SAIL_YCBCR_H
+#define SAIL_YCBCR_H
 
-#include <QDialog>
-#include <QScopedPointer>
+#include <stdint.h>
 
-#include <sail-common/common.h>
-#include <sail-common/error.h>
+#ifdef SAIL_BUILD
+    #include "export.h"
+    #include "pixel.h"
+#else
+    #include <sail-common/export.h>
+    #include <sail-common/pixel.h>
+#endif
 
-struct sail_read_features;
+SAIL_HIDDEN void convert_ycbcr24_to_rgba32(uint8_t y, uint8_t cb, uint8_t cr, sail_rgba32_t *rgba32);
 
-class ReadOptions : public QDialog
-{
-    Q_OBJECT
+SAIL_HIDDEN void convert_rgba32_to_ycbcr24(const sail_rgba32_t *rgba32, uint8_t *y, uint8_t *cb, uint8_t *cr);
 
-public:
-    explicit ReadOptions(const QString &codecDescription,
-                          const sail_read_features *read_features,
-                          QWidget *parent = nullptr);
-    ~ReadOptions();
-
-    SailPixelFormat pixelFormat() const;
-
-private:
-    sail_status_t init(const sail_read_features *read_features);
-
-private:
-    class Private;
-    const QScopedPointer<Private> d;
-};
-
-#endif // WRITEOPTIONS_H
+#endif

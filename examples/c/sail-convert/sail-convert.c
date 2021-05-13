@@ -32,6 +32,7 @@
 
 #include "sail-common.h"
 #include "sail.h"
+#include "sail-manip.h"
 
 static sail_status_t convert(const char *input, const char *output, int compression) {
 
@@ -60,12 +61,21 @@ static sail_status_t convert(const char *input, const char *output, int compress
     SAIL_TRY(sail_codec_info_from_path(output, &codec_info));
     SAIL_LOG_INFO("Output codec: %s", codec_info->description);
 
+    /* Convert to the best pixel format for saving. */
+    {
+        struct sail_image *image_converted;
+        SAIL_TRY(sail_convert_image_for_saving(image, codec_info->write_features, &image_converted));
+
+        sail_destroy_image(image);
+        image = image_converted;
+    }
+
     struct sail_write_options *write_options;
     SAIL_TRY(sail_alloc_write_options_from_features(codec_info->write_features, &write_options));
 
     /* Apply our tuning. */
     SAIL_LOG_INFO("Compression: %d%s", compression, compression == -1 ? " (default)" : "");
-    write_options->compression = compression;
+    write_options->compression_level = compression;
 
     SAIL_TRY(sail_start_writing_file_with_options(output, codec_info, write_options, &state));
     SAIL_TRY(sail_write_next_frame(state, image));
@@ -73,9 +83,10 @@ static sail_status_t convert(const char *input, const char *output, int compress
 
     /* Clean up. */
     sail_destroy_write_options(write_options);
+
     sail_destroy_image(image);
 
-    SAIL_LOG_INFO("Success");
+    SAIL_LOG_INFO("\n*** Success ***\n");
 
     return SAIL_OK;
 }

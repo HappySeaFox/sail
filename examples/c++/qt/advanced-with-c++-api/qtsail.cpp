@@ -41,7 +41,7 @@
 #include <sail-c++/sail-c++.h>
 
 //#define SAIL_CODEC_NAME jpeg
-//#include <sail/layouts/v4.h>
+//#include <sail/layouts/v5.h>
 
 #include "qtsail.h"
 #include "ui_qtsail.h"
@@ -58,14 +58,9 @@ sail_status_t QtSail::init()
     QTimer::singleShot(0, this, [&]{
         QMessageBox::information(this, tr("Features"), tr("This demo includes:"
                                                           "<ul>"
-                                                          "<li>Linking against SAIL pkg-config packages</li>"
-                                                          "<li>Output RGB or RGBA pixels only</li>"
+                                                          "<li>Linking against SAIL CMake packages</li>"
                                                           "<li>Playing animations</li>"
-                                                          "</ul>"
-                                                          "This demo doesn't include:"
-                                                          "<ul>"
-                                                          "<li>Selecting pixel format to output</li>"
-                                                          "<li>Printing all meta data entries into stderr</li>"
+                                                          "<li>Conversion with alpha blending</li>"
                                                           "</ul>"));
     });
 
@@ -84,16 +79,21 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
     //
     SAIL_TRY(reader.start_reading(path.toLocal8Bit().constData()));
 
-    // Read all the available image frames in the file.
+    // By default, read_next_frame() may convert specific pixel formats to be more prepared
+    // for displaying. Use SAIL_IO_OPTION_CLOSE_TO_SOURCE to output pixels as close as possible
+    // to the source.
     //
     sail_status_t res;
     while ((res = reader.read_next_frame(&image)) == SAIL_OK) {
 
-        const QImage::Format qimageFormat = sailPixelFormatToQImageFormat(image.pixel_format());
+        // Mutate alpha into a green color.
+        //
+        sail::conversion_options options;
+        options.with_options(SAIL_CONVERSION_OPTION_BLEND_ALPHA)
+                .with_background(sail_rgb48_t{ 0, 255 * 257, 0 })
+                .with_background(sail_rgb24_t{ 0, 255, 0 });
 
-        if (qimageFormat == QImage::Format_Invalid) {
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
-        }
+        SAIL_TRY(image.convert(SAIL_PIXEL_FORMAT_BPP24_RGB, options));
 
         // Convert to QImage.
         //
@@ -101,7 +101,7 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
                                image.width(),
                                image.height(),
                                image.bytes_per_line(),
-                               qimageFormat).copy();
+                               QImage::Format_RGB888).copy();
 
         delays->append(image.delay());
         qimages->append(qimage);
@@ -134,6 +134,9 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
 
 sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
 {
+    sail::codec_info codec_info;
+    SAIL_TRY(sail::codec_info::from_path(path.toLocal8Bit().constData(), &codec_info));
+
     sail::image_writer writer;
     sail::image image;
 
@@ -142,6 +145,15 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
          .with_pixel_format(qImageFormatToSailPixelFormat(qimage.format()))
          .with_bytes_per_line_auto()
          .with_shallow_pixels(const_cast<uchar *>(qimage.bits()));
+
+    // SAIL tries to save an image as is, preserving its pixel format.
+    // Particular image formats may support saving in different pixel formats:
+    // RGB, Grayscale, etc. Convert the image to the best pixel format for saving here.
+    //
+    // You can prepare the image for saving by converting its pixel format on your own,
+    // without using conversion methods.
+    //
+    SAIL_TRY(image.convert(codec_info.write_features()));
 
     SAIL_TRY(writer.start_writing(path.toLocal8Bit().constData()));
     SAIL_TRY(writer.write_next_frame(image));

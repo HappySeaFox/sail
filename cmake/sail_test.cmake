@@ -13,10 +13,6 @@ macro(sail_test)
         add_test(NAME ${SAIL_TEST_TARGET} COMMAND ${SAIL_TEST_TARGET})
     endif()
 
-    # Depend on sail
-    #
-    target_link_libraries(${SAIL_TEST_TARGET} sail)
-
     # Depend on sail-munit
     #
     target_link_libraries(${SAIL_TEST_TARGET} sail-munit)

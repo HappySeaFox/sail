@@ -5,6 +5,8 @@ add_library(sail-c++
                 codec_info-c++.h
                 context-c++.cpp
                 context-c++.h
+                conversion_options-c++.cpp
+                conversion_options-c++.h
                 iccp-c++.cpp
                 iccp-c++.h
                 image-c++.cpp
@@ -42,6 +44,7 @@ add_library(sail-c++
 set(PUBLIC_HEADERS "arbitrary_data-c++.h"
                    "at_scope_exit-c++.h"
                    "context-c++.h"
+                   "conversion_options-c++.h"
                    "iccp-c++.h"
                    "image-c++.h"
                    "image_reader-c++.h"
@@ -61,7 +64,7 @@ set(PUBLIC_HEADERS "arbitrary_data-c++.h"
                    "utils-c++.h")
 
 set_target_properties(sail-c++ PROPERTIES
-                               VERSION "0.5.0"
+                               VERSION "0.7.1"
                                SOVERSION 0
                                PUBLIC_HEADER "${PUBLIC_HEADERS}")
 
@@ -69,7 +72,9 @@ sail_enable_pch(TARGET sail-c++ HEADER sail-c++.h)
 
 # Definitions, includes, link
 #
-target_link_libraries(sail-c++ PUBLIC sail)
+target_link_libraries(sail-c++ PUBLIC sail-common)
+target_link_libraries(sail-c++ PRIVATE sail)
+target_link_libraries(sail-c++ PRIVATE sail-manip)
 
 # pkg-config integration
 #

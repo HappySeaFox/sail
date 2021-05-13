@@ -40,8 +40,10 @@
 
 #include <sail/sail.h>
 
+#include <sail-manip/sail-manip.h>
+
 //#define SAIL_CODEC_NAME jpeg
-//#include <sail/layouts/v4.h>
+//#include <sail/layouts/v5.h>
 
 #include "qtsail.h"
 #include "ui_qtsail.h"
@@ -59,14 +61,9 @@ sail_status_t QtSail::init()
     QTimer::singleShot(0, this, [&]{
         QMessageBox::information(this, tr("Features"), tr("This demo includes:"
                                                           "<ul>"
-                                                          "<li>Linking against SAIL pkg-config packages</li>"
-                                                          "<li>Output RGB or RGBA pixels only</li>"
+                                                          "<li>Linking against SAIL CMake packages</li>"
                                                           "<li>Playing animations</li>"
-                                                          "</ul>"
-                                                          "This demo doesn't include:"
-                                                          "<ul>"
-                                                          "<li>Selecting pixel format to output</li>"
-                                                          "<li>Printing all meta data entries into stderr</li>"
+                                                          "<li>Conversion with alpha blending</li>"
                                                           "</ul>"));
     });
 
@@ -103,33 +100,46 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
     sail_status_t res;
     struct sail_image *image;
 
+    /*
+     * By default, sail_read_next_frame() may convert specific pixel formats to be more prepared
+     * for displaying. Use SAIL_IO_OPTION_CLOSE_TO_SOURCE to output pixels as close as possible
+     * to the source.
+     */
     while ((res = sail_read_next_frame(state, &image)) == SAIL_OK) {
 
-        const QImage::Format qimageFormat = sailPixelFormatToQImageFormat(image->pixel_format);
+        /* Mutate alpha into a green color. */
+        const struct sail_conversion_options options = {
+            SAIL_CONVERSION_OPTION_BLEND_ALPHA,
+            { 0, 255 * 257, 0 },
+            { 0, 255, 0 }
+        };
 
-        if (qimageFormat == QImage::Format_Invalid) {
-            sail_stop_reading(state);
-            sail_destroy_image(image);
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
-        }
+        struct sail_image *image_converted;
+        SAIL_TRY_OR_CLEANUP(sail_convert_image_with_options(image,
+                                                            SAIL_PIXEL_FORMAT_BPP24_RGB,
+                                                            &options,
+                                                            &image_converted),
+                            /* cleanup */ sail_stop_reading(state),
+                                          sail_destroy_image(image));
 
         source_pixel_format = image->source_image->pixel_format;
-        pixel_format = image->pixel_format;
-        width = image->width;
-        height = image->height;
+        pixel_format = image_converted->pixel_format;
+        width = image_converted->width;
+        height = image_converted->height;
 
         /*
          * Convert to QImage.
          */
-        QImage qimage = QImage(reinterpret_cast<uchar *>(image->pixels),
-                               image->width,
-                               image->height,
-                               image->bytes_per_line,
-                               qimageFormat).copy();
+        QImage qimage = QImage(reinterpret_cast<uchar *>(image_converted->pixels),
+                               image_converted->width,
+                               image_converted->height,
+                               image_converted->bytes_per_line,
+                               QImage::Format_RGB888).copy();
 
         qimages->append(qimage);
         delays->append(image->delay);
 
+        sail_destroy_image(image_converted);
         sail_destroy_image(image);
     }
 
@@ -164,6 +174,9 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
 
 sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
 {
+    const struct sail_codec_info *codec_info;
+    SAIL_TRY(sail_codec_info_from_path(path.toLocal8Bit(), &codec_info));
+
     /*
      * Always set the initial state to NULL in C or nullptr in C++.
      */
@@ -180,7 +193,22 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
     image->pixel_format = qImageFormatToSailPixelFormat(qimage.format());
 
     SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(image->width, image->pixel_format, &image->bytes_per_line),
-                        /* cleanup */sail_destroy_image(image));
+                        /* cleanup */ sail_destroy_image(image));
+
+    /*
+     * SAIL tries to save an image as is, preserving its pixel format.
+     * Particular image formats may support saving in different pixel formats:
+     * RGB, Grayscale, etc. Convert the image to the best pixel format for saving here.
+     *
+     * You can prepare the image for saving by converting its pixel format on your own,
+     * without using sail-manip.
+     */
+    struct sail_image *image_converted;
+    SAIL_TRY_OR_CLEANUP(sail_convert_image_for_saving(image, codec_info->write_features, &image_converted),
+                        /* cleanup */ sail_destroy_image(image));
+
+    sail_destroy_image(image);
+    image = image_converted;
 
     SAIL_TRY_OR_CLEANUP(sail_start_writing_file(path.toLocal8Bit(), nullptr, &state),
                         /* cleanup */ sail_destroy_image(image));

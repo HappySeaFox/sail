@@ -46,8 +46,7 @@ animated, multi-paged images along with their meta data and ICC profiles. :sailb
 - [x] Versatile APIs: `junior`, `advanced`, `deep diver`, and `technical diver`
 - [x] Input/output: files, memory, custom I/O streams
 - [x] Load by file suffixes, paths, and [magic numbers](https://en.wikipedia.org/wiki/File_format#Magic_number)
-- [x] Output `RGBA` pixels and more
-- [x] Output source pixels
+- [x] Output pixels close to the source (see [FAQ](FAQ.md#in-what-pixel-format-sail-reading-functions-output-images))
 - [x] Meta data support: text comments, EXIF, ICC profiles
 - [x] Access to the image properties w/o decoding pixels (probing)
 - [x] Access to the source image properties
@@ -85,7 +84,7 @@ See the full list [here](FORMATS.md). Work to add more image formats is ongoing.
 ## Benchmarks
 
 <p align="center">
-  <a href="BENCHMARKS.md"><img src=".github/benchmarks/JPEG-YCbCr-1000x669.png?raw=true" alt="Benchmark" width="500px"/></a>
+  <a href="BENCHMARKS.md"><img src=".github/benchmarks/PNG-RGBA-6000x4256.png?raw=true" alt="Benchmark" width="500px"/></a>
 </p>
 
 Time to load and output RGBA8888 (or similar) pixels was measured. See [BENCHMARKS](BENCHMARKS.md).
@@ -106,17 +105,15 @@ SAIL provides four levels of APIs, depending on your needs. Let's have a quick l
 ```C
 struct sail_image *image;
 
-/*
- * sail_read_file() reads the image and outputs pixels in the BPP32-RGBA pixel format by default.
- * If SAIL is compiled with SAIL_READ_OUTPUT_BPP32_BGRA=ON, it outputs BPP32-BGRA pixels.
- * If you need to control output pixel formats, consider switching to the deep diver API.
- */
 SAIL_TRY(sail_read_file(path, &image));
 
 /*
  * Handle the image pixels here.
  * Use image->width, image->height, image->bytes_per_line,
  * image->pixel_format, and image->pixels for that.
+ *
+ * In particular, you can convert it to a different pixel format with functions
+ * from libsail-manip. With sail_convert_image(), for example.
  */
 
 sail_destroy_image(image);
@@ -127,15 +124,13 @@ sail_destroy_image(image);
 sail::image_reader reader;
 sail::image image;
 
-// read() reads the image and outputs pixels in the BPP32-RGBA pixel format by default.
-// If SAIL is compiled with SAIL_READ_OUTPUT_BPP32_BGRA=ON, it outputs BPP32-BGRA pixels.
-// If you need to control output pixel formats, consider switching to the deep diver API.
-//
 SAIL_TRY(reader.read(path, &image));
 
 // Handle the image and its pixels here.
 // Use image.width(), image.height(), image.bytes_per_line(),
 // image.pixel_format(), and image.pixels() for that.
+//
+// In particular, you can convert it to a different pixel format with image::convert().
 ```
 
 It's pretty easy, isn't it? :smile: See [EXAMPLES](EXAMPLES.md) and [FAQ](FAQ.md) for more.
@@ -187,23 +182,28 @@ bindings to C++.
 
 SAIL codecs is the deepest level. This is a set of standalone, dynamically loaded codecs (SO on Linux
 and DLL on Windows). They implement actual decoding and encoding capabilities. End-users never work with
-codecs directly. They always use abstract, high-level APIs for that.
+codecs directly. They always use abstract, high-level APIs in `libsail` for that.
 
 Every codec is accompanied with a so called codec info (description) file which is just a plain text file.
 It describes what the codec can actually do: what pixel formats it can read and output, what compression types
-does it support, specifies a preferred output pixel format, and more.
+it supports, and more.
 
 By default, SAIL loads codecs on demand. To preload them, use `sail_init_with_flags(SAIL_FLAG_PRELOAD_CODECS)`.
 
 ### libsail-common
 
 libsail-common holds common data types (images, pixel formats, I/O abstractions etc.) and a small set
-of functions shared between SAIL codecs and the high-level APIs.
+of functions shared between SAIL codecs and the high-level APIs in `libsail`.
 
 ### libsail
 
 libsail is a feature-rich, high-level API. It provides comprehensive and lightweight interfaces to decode
 and encode images. End-users implementing C applications always work with libsail.
+
+### libsail-manip
+
+libsail-manip is a collection of image manipulation functions. For example, conversion functions from one pixel
+format to another.
 
 ### libsail-c++
 

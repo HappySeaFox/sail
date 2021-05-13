@@ -86,7 +86,7 @@ palette::~palette()
 
 bool palette::is_valid() const
 {
-    return !d->data.empty();
+    return !d->data.empty() && d->pixel_format != SAIL_PIXEL_FORMAT_UNKNOWN && d->color_count > 0;
 }
 
 SailPixelFormat palette::pixel_format() const
@@ -144,10 +144,9 @@ sail_status_t palette::to_sail_palette(sail_palette **palette) const
 
 sail_status_t palette::copy(SailPixelFormat pixel_format, const void *data, unsigned color_count)
 {
-    unsigned bits_per_pixel;
-    SAIL_TRY(sail_bits_per_pixel(pixel_format, &bits_per_pixel));
+    unsigned palette_size;
+    SAIL_TRY(sail_bytes_per_line(color_count, pixel_format, &palette_size));
 
-    const size_t palette_size = color_count * bits_per_pixel / 8;
     d->data.resize(palette_size);
 
     d->pixel_format = pixel_format;

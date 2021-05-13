@@ -38,7 +38,7 @@
 #include <sail-c++/sail-c++.h>
 
 //#define SAIL_CODEC_NAME jpeg
-//#include <sail/layouts/v4.h>
+//#include <sail/layouts/v5.h>
 
 #include "qtsail.h"
 #include "ui_qtsail.h"
@@ -66,9 +66,15 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
     sail::image_reader reader;
     sail::image image;
 
-    // read() reads the image and outputs pixels in in the BPP32-RGBA pixel format.
+    // By default, read() may convert specific pixel formats to be more prepared
+    // for displaying. Use SAIL_IO_OPTION_CLOSE_TO_SOURCE to output pixels as close
+    // as possible to the source.
     //
     SAIL_TRY(reader.read(path.toLocal8Bit().constData(), &image));
+
+    // Convert to RGBA
+    //
+    SAIL_TRY(image.convert(SAIL_PIXEL_FORMAT_BPP32_RGBA));
 
     // Construct QImage from the read image.
     //
@@ -76,7 +82,7 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
                      image.width(),
                      image.height(),
                      image.bytes_per_line(),
-                     sailPixelFormatToQImageFormat(image.pixel_format())).copy();
+                     QImage::Format_RGBA8888).copy();
 
     m_ui->labelStatus->setText(tr("%1  [%2x%3]")
                                 .arg(QFileInfo(path).fileName())
@@ -89,6 +95,9 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
 
 sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
 {
+    sail::codec_info codec_info;
+    SAIL_TRY(sail::codec_info::from_path(path.toLocal8Bit().constData(), &codec_info));
+
     sail::image_writer writer;
     sail::image image;
 
@@ -97,6 +106,15 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
          .with_pixel_format(qImageFormatToSailPixelFormat(qimage.format()))
          .with_bytes_per_line_auto()
          .with_shallow_pixels(const_cast<uchar *>(qimage.bits()));
+
+    // SAIL tries to save an image as is, preserving its pixel format.
+    // Particular image formats may support saving in different pixel formats:
+    // RGB, Grayscale, etc. Convert the image to the best pixel format for saving here.
+    //
+    // You can prepare the image for saving by converting its pixel format on your own,
+    // without using conversion methods.
+    //
+    SAIL_TRY(image.convert(codec_info.write_features()));
 
     SAIL_TRY(writer.write(path.toLocal8Bit().constData(), image));
 

@@ -1,0 +1,11 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=@CMAKE_INSTALL_PREFIX@
+libdir=${exec_prefix}/@CMAKE_INSTALL_LIBDIR@
+includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@/sail
+
+Name: libsail-manip
+Description: SAIL image manipulation library
+Version: @VERSION@
+Requires: libsail-common
+Libs: -L${libdir} -lsail-manip
+Cflags: -I${includedir}

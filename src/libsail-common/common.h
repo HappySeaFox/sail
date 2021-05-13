@@ -47,20 +47,6 @@ enum SailPixelFormat {
     SAIL_PIXEL_FORMAT_UNKNOWN,
 
     /*
-     * Pixel format used to write images with default parameters. Codecs detect an actual
-     * pixel format to write automatically in this case.
-     */
-    SAIL_PIXEL_FORMAT_AUTO,
-
-    /*
-     * Copy the source pixels as is without converting them to a different pixel format.
-     * This pixel format can be used in reading and writing operations.
-     * If pixels are compressed with some compression algorithm (e.g. RLE),
-     * reading operations still unpack them.
-     */
-    SAIL_PIXEL_FORMAT_SOURCE,
-
-    /*
      * Formats with unknown pixel representation/model.
      */
     SAIL_PIXEL_FORMAT_BPP1,
@@ -316,7 +302,7 @@ enum SailCodecFeature {
 /* Read or write options. */
 enum SailIoOption {
 
-    /* Instruction to read or write simple image meta data like JPEG comments. */
+    /* Instruction to read or write image meta data like JPEG comments. */
     SAIL_IO_OPTION_META_DATA  = 1 << 0,
 
     /* Instruction to read or write EXIF meta data. */
@@ -327,6 +313,21 @@ enum SailIoOption {
 
     /* Instruction to read or write embedded ICC profile. */
     SAIL_IO_OPTION_ICCP       = 1 << 3,
+
+    /*
+     * Instruction for reading operations to output pixels as close as possible to the source.
+     * Off by default. By default, SAIL may convert specific pixel formats to be more prepared
+     * for displaying. For example, the SAIL JPEG codec outputs RGB pixels instead of YCbCr.
+     *
+     * Specify this option if you need to get pixels as close as possible to the source.
+     * For example, to get YCbCr pixels from a JPEG image.
+     *
+     * SAIL doesn't guarantee that codecs output true source pixels even with this option.
+     * They may output in a slightly different pixel format due to implementation peculiarities.
+     *
+     * Specifying this option for writing operations has no effect.
+     */
+    SAIL_IO_OPTION_CLOSE_TO_SOURCE = 1 << 4,
 };
 
 #endif

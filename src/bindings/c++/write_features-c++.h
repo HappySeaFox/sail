@@ -58,7 +58,7 @@ public:
     write_features& operator=(write_features &&wf);
     ~write_features();
 
-    const std::map<SailPixelFormat, std::vector<SailPixelFormat>>& pixel_formats_mappings() const;
+    const std::vector<SailPixelFormat>& output_pixel_formats() const;
     int features() const;
     int properties() const;
     const std::vector<SailCompression>& compressions() const;
@@ -78,7 +78,7 @@ private:
      */
     explicit write_features(const sail_write_features *wf);
 
-    write_features& with_pixel_formats_mappings(const std::map<SailPixelFormat, std::vector<SailPixelFormat>> &pixel_formats_mappings);
+    write_features& with_output_pixel_formats(const std::vector<SailPixelFormat> &output_pixel_formats);
     write_features& with_features(int features);
     write_features& with_properties(int properties);
     write_features& with_compressions(const std::vector<SailCompression> &compressions);

@@ -35,14 +35,11 @@ class SAIL_HIDDEN read_features::pimpl
 public:
     pimpl()
         : sail_read_features_c(nullptr)
-        , default_output_pixel_format(SAIL_PIXEL_FORMAT_UNKNOWN)
         , features(0)
     {}
 
     const sail_read_features *sail_read_features_c;
 
-    std::vector<SailPixelFormat> output_pixel_formats;
-    SailPixelFormat default_output_pixel_format;
     int features;
 };
 
@@ -56,9 +53,7 @@ read_features& read_features::operator=(const read_features &rf)
 {
     d->sail_read_features_c = rf.d->sail_read_features_c;
 
-    with_output_pixel_formats(rf.output_pixel_formats())
-        .with_default_output_pixel_format(rf.default_output_pixel_format())
-        .with_features(rf.features());
+    with_features(rf.features());
 
     return *this;
 }
@@ -81,16 +76,6 @@ read_features& read_features::operator=(read_features &&rf)
 read_features::~read_features()
 {
     delete d;
-}
-
-const std::vector<SailPixelFormat>& read_features::output_pixel_formats() const
-{
-    return d->output_pixel_formats;
-}
-
-SailPixelFormat read_features::default_output_pixel_format() const
-{
-    return d->default_output_pixel_format;
 }
 
 int read_features::features() const
@@ -129,31 +114,7 @@ read_features::read_features(const sail_read_features *rf)
 
     d->sail_read_features_c = rf;
 
-    std::vector<SailPixelFormat> output_pixel_formats;
-
-    if (rf->output_pixel_formats != nullptr && rf->output_pixel_formats_length > 0) {
-        output_pixel_formats.reserve(rf->output_pixel_formats_length);
-
-        for (unsigned i = 0; i < rf->output_pixel_formats_length; i++) {
-            output_pixel_formats.push_back(rf->output_pixel_formats[i]);
-        }
-    }
-
-    with_output_pixel_formats(output_pixel_formats)
-        .with_default_output_pixel_format(rf->default_output_pixel_format)
-        .with_features(rf->features);
-}
-
-read_features& read_features::with_output_pixel_formats(const std::vector<SailPixelFormat> &output_pixel_formats)
-{
-    d->output_pixel_formats = output_pixel_formats;
-    return *this;
-}
-
-read_features& read_features::with_default_output_pixel_format(SailPixelFormat default_output_pixel_format)
-{
-    d->default_output_pixel_format = default_output_pixel_format;
-    return *this;
+    with_features(rf->features);
 }
 
 read_features& read_features::with_features(int features)

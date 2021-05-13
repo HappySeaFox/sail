@@ -49,25 +49,13 @@ static sail_status_t load_codec(struct sail_codec_info_node *node) {
     return SAIL_OK;
 }
 
-static void print_unsupported_write_output_pixel_format(enum SailPixelFormat input_pixel_format, enum SailPixelFormat output_pixel_format) {
+static void print_unsupported_write_pixel_format(enum SailPixelFormat pixel_format) {
 
-    const char *input_pixel_format_str = NULL;
-    const char *output_pixel_format_str = NULL;
+    const char *pixel_format_str = NULL;
+    SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(pixel_format, &pixel_format_str));
 
-    SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(input_pixel_format, &input_pixel_format_str));
-    SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(output_pixel_format, &output_pixel_format_str));
-
-    SAIL_LOG_ERROR("This codec cannot output %s pixels from %s pixels. Use its write features to get the list of supported output pixel formats",
-                    input_pixel_format_str, output_pixel_format_str);
-}
-
-static void print_unsupported_write_input_pixel_format(enum SailPixelFormat input_pixel_format) {
-
-    const char *input_pixel_format_str = NULL;
-    SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(input_pixel_format, &input_pixel_format_str));
-
-    SAIL_LOG_ERROR("This codec cannot take %s pixels as input. Use its write features to get the list of supported input pixel formats",
-                    input_pixel_format_str);
+    SAIL_LOG_ERROR("This codec cannot write %s pixels. Use its write features to get the list of supported pixel formats for writing",
+                    pixel_format_str);
 }
 
 /*
@@ -149,7 +137,7 @@ sail_status_t stop_writing(void *state, size_t *written) {
         return SAIL_OK;
     }
 
-    SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v4->write_finish(&state_of_mind->state, state_of_mind->io),
+    SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v5->write_finish(&state_of_mind->state, state_of_mind->io),
                         /* cleanup */ destroy_hidden_state(state_of_mind));
 
     if (written != NULL) {
@@ -164,45 +152,17 @@ sail_status_t stop_writing(void *state, size_t *written) {
     return SAIL_OK;
 }
 
-sail_status_t allowed_write_output_pixel_format(const struct sail_write_features *write_features,
-                                                enum SailPixelFormat input_pixel_format,
-                                                enum SailPixelFormat output_pixel_format) {
+sail_status_t allowed_write_output_pixel_format(const struct sail_write_features *write_features, enum SailPixelFormat pixel_format) {
 
     SAIL_CHECK_WRITE_FEATURES_PTR(write_features);
 
-    /* Codecs will compute output pixel format automatically. */
-    if (output_pixel_format == SAIL_PIXEL_FORMAT_AUTO) {
-        return SAIL_OK;
-    }
-
-    /*
-     * For example:
-     *
-     * [write-pixel-formats-mapping]
-     * BPP8-GRAYSCALE=SOURCE
-     * BPP24-RGB=SOURCE;BPP24-YCBCR;BPP8-GRAYSCALE
-     *
-     * When input_pixel_format is BPP24-RGB and output_pixel_format is BPP24-YCBCR, success is returned.
-     * When input_pixel_format is BPP24-RGB and output_pixel_format is BPP32-CMYK, error is returned.
-     */
-    const struct sail_pixel_formats_mapping_node *node = write_features->pixel_formats_mapping_node;
-
-    while (node != NULL) {
-        if (node->input_pixel_format == input_pixel_format) {
-            for (unsigned i = 0; i < node->output_pixel_formats_length; i++) {
-                if (node->output_pixel_formats[i] == output_pixel_format) {
-                    return SAIL_OK;
-                }
-            }
-
-            print_unsupported_write_output_pixel_format(input_pixel_format, output_pixel_format);
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+    for (unsigned i = 0; i < write_features->output_pixel_formats_length; i++) {
+        if (write_features->output_pixel_formats[i] == pixel_format) {
+            return SAIL_OK;
         }
-
-        node = node->next;
     }
 
-    print_unsupported_write_input_pixel_format(input_pixel_format);
+    print_unsupported_write_pixel_format(pixel_format);
     SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
 }
 

@@ -52,7 +52,9 @@ struct sail_write_options;
  *
  * The read options are deep copied.
  *
- * If read options is NULL, the subsequent calls to sail_read_next_frame() output pixels in the BPP32-RGBA pixel format.
+ * The subsequent calls to sail_read_next_frame() may convert specific pixel formats to be more prepared
+ * for displaying. Use SAIL_IO_OPTION_CLOSE_TO_SOURCE to output pixels as close as possible
+ * to the source.
  *
  * Typical usage: sail_start_reading_file_with_options() ->
  *                sail_read_next_frame()                 ->
@@ -78,7 +80,9 @@ SAIL_EXPORT sail_status_t sail_start_reading_file_with_options(const char *path,
  *
  * The read options are deep copied.
  *
- * If read options is NULL, the subsequent calls to sail_read_next_frame() output pixels in the BPP32-RGBA pixel format.
+ * The subsequent calls to sail_read_next_frame() may convert specific pixel formats to be more prepared
+ * for displaying. Use SAIL_IO_OPTION_CLOSE_TO_SOURCE to output pixels as close as possible
+ * to the source.
  *
  * Typical usage: sail_codec_info_from_extension()      ->
  *                sail_start_reading_mem_with_options() ->
@@ -101,9 +105,6 @@ SAIL_EXPORT sail_status_t sail_start_reading_mem_with_options(const void *buffer
  * just pass NULL. Codec-specific defaults will be used in this case.
  *
  * The write options are deep copied.
- *
- * If write options is NULL, the subsequent calls to sail_write_next_frame() output pixels in pixel format
- * as specified in sail_write_features.default_output_pixel_format.
  *
  * Typical usage: sail_start_writing_file_with_options() ->
  *                sail_write_next_frame()                ->
@@ -129,9 +130,6 @@ SAIL_EXPORT sail_status_t sail_start_writing_file_with_options(const char *path,
  * write options, just pass NULL. Codec-specific defaults will be used in this case.
  *
  * The write options are deep copied.
- *
- * If write options is NULL, the subsequent calls to sail_write_next_frame() output pixels in pixel format
- * as specified in sail_write_features.default_output_pixel_format.
  *
  * Typical usage: sail_codec_info_from_extension()      ->
  *                sail_start_writing_mem_with_options() ->

@@ -90,7 +90,7 @@ sail_status_t sail_read_mem(const void *buffer, size_t buffer_length, struct sai
 sail_status_t sail_write_file(const char *path, const struct sail_image *image) {
 
     SAIL_CHECK_PATH_PTR(path);
-    SAIL_CHECK_IMAGE(image);
+    SAIL_TRY(sail_check_image_valid(image));
 
     void *state = NULL;
 
@@ -108,7 +108,7 @@ sail_status_t sail_write_file(const char *path, const struct sail_image *image) 
 sail_status_t sail_write_mem(void *buffer, size_t buffer_length, const struct sail_image *image, size_t *written) {
 
     SAIL_CHECK_BUFFER_PTR(buffer);
-    SAIL_CHECK_IMAGE(image);
+    SAIL_TRY(sail_check_image_valid(image));
 
     void *state = NULL;
 

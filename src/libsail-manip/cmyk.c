@@ -1,6 +1,6 @@
 /*  This file is part of SAIL (https://github.com/smoked-herring/sail)
 
-    Copyright (c) 2020 Dmitry Baryshev
+    Copyright (c) 2021 Dmitry Baryshev
 
     The MIT License
 
@@ -23,39 +23,23 @@
     SOFTWARE.
 */
 
-#ifndef WRITEOPTIONS_H
-#define WRITEOPTIONS_H
+#include "sail-manip.h"
 
-#include <QDialog>
-#include <QScopedPointer>
+void convert_cmyk32_to_rgba32(uint8_t c, uint8_t m, uint8_t y, uint8_t k, sail_rgba32_t *rgba32) {
 
-#include <sail-common/common.h>
-#include <sail-common/error.h>
+#if 0
+    const uint8_t C =  (uint8_t)(c / 100.0);
+    const uint8_t M =  (uint8_t)(m / 100.0);
+    const uint8_t Y =  (uint8_t)(y / 100.0);
+    const uint8_t K =  (uint8_t)(k / 100.0);
 
-struct sail_write_features;
-
-class WriteOptions : public QDialog
-{
-    Q_OBJECT
-
-public:
-    explicit WriteOptions(const QString &codecDescription,
-                          const sail_write_features *write_features,
-                          int input_pixel_format,
-                          QWidget *parent = nullptr);
-    ~WriteOptions();
-
-    SailPixelFormat pixelFormat() const;
-
-    int compressionLevel() const;
-
-private:
-    sail_status_t init(const sail_write_features *write_features, int input_pixel_format);
-    void disable();
-
-private:
-    class Private;
-    const QScopedPointer<Private> d;
-};
-
-#endif // WRITEOPTIONS_H
+    *r = (uint8_t)((1-C) * (1-K) * 255);
+    *g = (uint8_t)((1-M) * (1-K) * 255);
+    *b = (uint8_t)((1-Y) * (1-K) * 255);
+#else
+    rgba32->component1 = (uint8_t)((double)c * k / 255.0 + 0.5);
+    rgba32->component2 = (uint8_t)((double)m * k / 255.0 + 0.5);
+    rgba32->component3 = (uint8_t)((double)y * k / 255.0 + 0.5);
+    rgba32->component4 = 255;
+#endif
+}

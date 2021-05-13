@@ -47,14 +47,14 @@
     #include <sail-c++/resolution-c++.h>
 #endif
 
-namespace sail {
-    class meta_data;
-}
-
 struct sail_image;
 
 namespace sail
 {
+
+class conversion_options;
+class meta_data;
+class write_features;
 
 /*
  * Image representation with direct access to the pixel data.
@@ -77,6 +77,12 @@ public:
      * and the pixel data (deep copied or shallow).
      */
     bool is_valid() const;
+
+    bool is_indexed() const;
+
+    bool is_grayscale() const;
+
+    bool is_rgb_family() const;
 
     /*
      * Returns image width.
@@ -288,6 +294,42 @@ public:
      */
     image& with_iccp(const sail::iccp &ic);
 
+    bool can_convert(SailPixelFormat pixel_format);
+
+    sail_status_t convert(SailPixelFormat pixel_format);
+
+    sail_status_t convert(SailPixelFormat pixel_format, const conversion_options &options);
+
+    sail_status_t convert(const write_features &wf);
+
+    sail_status_t convert(const write_features &wf, const conversion_options &options);
+
+    sail_status_t convert_to(SailPixelFormat pixel_format, sail::image *image);
+
+    sail_status_t convert_to(SailPixelFormat pixel_format, const conversion_options &options, sail::image *image);
+
+    sail_status_t convert_to(const write_features &wf, sail::image *image);
+
+    sail_status_t convert_to(const write_features &wf, const conversion_options &options, sail::image *image);
+
+    image convert_to(SailPixelFormat pixel_format);
+
+    image convert_to(SailPixelFormat pixel_format, const conversion_options &options);
+
+    image convert_to(const write_features &wf);
+
+    image convert_to(const write_features &wf, const conversion_options &options);
+
+    SailPixelFormat closest_pixel_format(const std::vector<SailPixelFormat> &pixel_formats);
+
+    SailPixelFormat closest_pixel_format(const write_features &wf);
+
+    static bool can_convert(SailPixelFormat input_pixel_format, SailPixelFormat output_pixel_format);
+
+    static SailPixelFormat closest_pixel_format(SailPixelFormat input_pixel_format, const std::vector<SailPixelFormat> &pixel_formats);
+
+    static SailPixelFormat closest_pixel_format(SailPixelFormat input_pixel_format, const write_features &wf);
+
     /*
      * Calculates the number of bits per pixel in the specified pixel format.
      * For example, for SAIL_PIXEL_FORMAT_RGB 24 is assigned.
@@ -317,13 +359,11 @@ public:
      */
     static sail_status_t bytes_per_line(unsigned width, SailPixelFormat pixel_format, unsigned *result);
 
-    /*
-     * Calculates the number of bytes needed to hold an entire image in memory without padding.
-     * It is effectively bytes per line * image height.
-     *
-     * Returns SAIL_OK on success.
-     */
-    static sail_status_t bytes_per_image(const image &simage, unsigned *result);
+    static bool is_indexed(SailPixelFormat pixel_format);
+
+    static bool is_grayscale(SailPixelFormat pixel_format);
+
+    static bool is_rgb_family(SailPixelFormat pixel_format);
 
     /*
      * Assigns a non-NULL string representation of the specified pixel format.

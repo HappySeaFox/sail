@@ -70,9 +70,7 @@ SAIL_HIDDEN void destroy_hidden_state(struct hidden_state *state);
 
 SAIL_HIDDEN sail_status_t stop_writing(void *state, size_t *written);
 
-SAIL_HIDDEN sail_status_t allowed_write_output_pixel_format(const struct sail_write_features *write_features,
-                                                            enum SailPixelFormat input_pixel_format,
-                                                            enum SailPixelFormat output_pixel_format);
+SAIL_HIDDEN sail_status_t allowed_write_output_pixel_format(const struct sail_write_features *write_features, enum SailPixelFormat pixel_format);
 
 SAIL_HIDDEN sail_status_t alloc_string_node(struct sail_string_node **string_node);
 

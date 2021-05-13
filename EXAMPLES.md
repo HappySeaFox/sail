@@ -48,20 +48,20 @@ SAIL provides 4 levels of APIs depending on your needs. Let's have a look at the
 ```C
 struct sail_image *image;
 
-/*
- * sail_read_file() reads the image and outputs pixels in the BPP32-RGBA pixel format by default.
- * If SAIL is compiled with SAIL_READ_OUTPUT_BPP32_BGRA=ON, it outputs BPP32-BGRA pixels.
- */
-SAIL_TRY(sail_read_file(path,
-                        NULL,
-                        &image));
+SAIL_TRY(sail_read_file(path, &image));
 
 /*
  * Handle the image pixels here.
  * Use image->width, image->height, image->bytes_per_line,
  * image->pixel_format, and image->pixels for that.
+ *
+ * In particular, you can convert it to a different pixel format with functions
+ * from libsail-manip. With sail_convert_image(), for example.
  */
 
+/*
+ * Destroy the image when it's not needed anymore.
+ */
 sail_destroy_image(image);
 
 /*
@@ -76,14 +76,13 @@ sail_finish();
 sail::image_reader reader;
 sail::image image;
 
-// read() reads the image and outputs pixels in the BPP32-RGBA pixel format by default.
-// If SAIL is compiled with SAIL_READ_OUTPUT_BPP32_BGRA=ON, it outputs BPP32-BGRA pixels.
-//
 SAIL_TRY(reader.read(path, &image));
 
 // Handle the image and its pixels here.
 // Use image.width(), image.height(), image.bytes_per_line(),
 // image.pixel_format(), and image.pixels() for that.
+//
+// In particular, you can convert it to a different pixel format with image::convert().
 ```
 
 ### 2. `advanced`
@@ -101,15 +100,13 @@ struct sail_image *image;
 
 /*
  * Starts reading the specified file.
- * The subsequent calls to sail_read_next_frame() output pixels in the BPP32-RGBA pixel format by default.
- * If SAIL is compiled with SAIL_READ_OUTPUT_BPP32_BGRA=ON, they output BPP32-BGRA pixels.
  */
 SAIL_TRY_OR_CLEANUP(sail_start_reading_file(path, NULL, &state),
                     /* cleanup */ sail_stop_reading(state));
 
 /*
  * Read just a single frame. It's possible to read more frames if any. Just continue
- * reading frames till sail_read_next_frame() returns 0. If no more frames are available,
+ * reading frames till sail_read_next_frame() returns SAIL_OK. If no more frames are available,
  * it returns SAIL_ERROR_NO_MORE_FRAMES.
  */
 SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, &image),
@@ -128,6 +125,9 @@ SAIL_TRY_OR_CLEANUP(sail_stop_reading(state),
  * image->pixel_format, and image->pixels for that.
  */
 
+/*
+ * Destroy the image when it's not needed anymore.
+ */
 sail_destroy_image(image);
 
 /*
@@ -151,17 +151,12 @@ SAIL_AT_SCOPE_EXIT (
 );
 
 // Starts reading the specified file.
-// The subsequent calls to read_next_frame() outputs pixels in the BPP32-RGBA pixel format by default.
-// If SAIL is compiled with SAIL_READ_OUTPUT_BPP32_BGRA=ON, they output BPP32-BGRA pixels.
 //
 SAIL_TRY(reader.start_reading(path));
 
 // Read just a single frame. It's possible to read more frames if any. Just continue
-// reading frames till read_next_frame() returns 0. If no more frames are available,
+// reading frames till read_next_frame() returns SAIL_OK. If no more frames are available,
 // it returns SAIL_ERROR_NO_MORE_FRAMES.
-//
-// read_next_frame() outputs pixels in the BPP32-RGBA pixel format by default.
-// If SAIL is compiled with SAIL_READ_OUTPUT_BPP32_BGRA=ON, it outputs BPP32-BGRA pixels.
 //
 SAIL_TRY(reader.read_next_frame(&image));
 
@@ -180,12 +175,12 @@ sail::context::finish();
 ### 3. `deep diver`
 
 **Purpose:** read a single-paged or multi-paged image from a file or memory. Specify a concrete codec to use.
-             Possibly specify a desired pixel format to output.
+             Possibly specify I/O controlling options.
 
 #### C:
 ```C
 /*
- * Initialize a new SAIL thread-local static context explicitly and preload all codecs.
+ * Optional: Initialize a new SAIL thread-local static context explicitly and preload all codecs.
  * Codecs are lazy-loaded when SAIL_FLAG_PRELOAD_CODECS is not specified.
  */
 SAIL_TRY(sail_init_with_flags(SAIL_FLAG_PRELOAD_CODECS));
@@ -205,8 +200,7 @@ const struct sail_codec_info *codec_info;
 SAIL_TRY(sail_codec_info_from_extension("JPEG", &codec_info));
 
 /*
- * Allocate new read options and copy defaults from the codec-specific read features
- * (preferred output pixel format etc.).
+ * Allocate new read options and copy defaults from the codec-specific read features.
  */
 SAIL_TRY(sail_alloc_read_options_from_features(codec_info->read_features, &read_options));
 
@@ -233,10 +227,12 @@ sail_destroy_read_options(read_options);
 
 /*
  * Read just a single frame. It's possible to read more frames if any. Just continue
- * reading frames till sail_read_next_frame() returns 0. If no more frames are available,
+ * reading frames till sail_read_next_frame() returns SAIL_OK. If no more frames are available,
  * it returns SAIL_ERROR_NO_MORE_FRAMES.
  *
- * sail_read_next_frame() outputs pixels in the requested pixel format (BPP32-RGBA by default).
+ * By default, sail_read_next_frame() may convert specific pixel formats to be more prepared
+ * for displaying. Use SAIL_IO_OPTION_CLOSE_TO_SOURCE to output pixels as close as possible
+ * to the source.
  */
 SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, &image),
                     /* cleanup */ sail_stop_reading(state));
@@ -248,20 +244,14 @@ SAIL_TRY_OR_CLEANUP(sail_stop_reading(state),
                     /* cleanup */ sail_destroy_image(image));
 
 /*
- * Print the image meta data if any (JPEG comments etc.).
- */
-struct sail_meta_entry_node *node = image->meta_entry_node;
-
-if (node != NULL) {
-    SAIL_LOG_DEBUG("%s: %s", node->key, node->value);
-}
-
-/*
  * Handle the image pixels here.
  * Use image->width, image->height, image->bytes_per_line,
  * image->pixel_format, and image->pixels for that.
  */
 
+/*
+ * Destroy the image when it's not needed anymore.
+ */
 sail_destroy_image(image);
 
 /*
@@ -278,7 +268,7 @@ sail_finish();
 
 #### C++:
 ```C++
-// Initialize a new SAIL thread-local static context explicitly and preload all codecs.
+// Optional: Initialize a new SAIL thread-local static context explicitly and preload all codecs.
 // Codecs are lazy-loaded when SAIL_FLAG_PRELOAD_CODECS is not specified.
 //
 sail::context::init(SAIL_FLAG_PRELOAD_CODECS);
@@ -289,8 +279,7 @@ sail::image_reader reader;
 sail::codec_info codec_info;
 SAIL_TRY(codec_info::from_extension("JPEG", &codec_info));
 
-// Instantiate new read options and copy defaults from the read features
-// (preferred output pixel format etc.).
+// Instantiate new read options and copy defaults from the read features.
 //
 sail::read_options read_options;
 SAIL_TRY(codec_info.read_features().to_read_options(&read_options));
@@ -305,10 +294,12 @@ size_t buffer_length = ...
 SAIL_TRY(reader.start_reading(buffer, buffer_length, codec_info, read_options));
 
 // Read just a single frame. It's possible to read more frames if any. Just continue
-// reading frames till read_next_frame() returns 0. If no more frames are available,
+// reading frames till read_next_frame() returns SAIL_OK. If no more frames are available,
 // it returns SAIL_ERROR_NO_MORE_FRAMES.
 //
-// read_next_frame() outputs pixels in the requested pixel format (BPP32-RGBA by default).
+// By default, read_next_frame() may convert specific pixel formats to be more prepared
+// for displaying. Use SAIL_IO_OPTION_CLOSE_TO_SOURCE to output pixels as close as possible
+// to the source.
 //
 sail::image image;
 SAIL_TRY(reader.read_next_frame(&image));
@@ -316,15 +307,6 @@ SAIL_TRY(reader.read_next_frame(&image));
 // Finish reading.
 //
 SAIL_TRY(reader.stop_reading());
-
-// Print the image meta data if any (JPEG comments etc.).
-//
-const std::map<std::string, std::string> meta_entries = image.meta_entries();
-
-if (!meta_entries.empty()) {
-    const std::pair<std::string, std::string> first_pair = *meta_entries.begin();
-    SAIL_LOG_DEBUG("%s: %s", first_pair.first.c_str(), first_pair.second.c_str());
-}
 
 // Handle the image and its pixels here.
 // Use image.width(), image.height(), image.bytes_per_line(),
@@ -342,12 +324,12 @@ sail::context::finish();
 
 #### C:
 
-Instead of using `sail_start_reading_file_with_options()` in the `deep diver` example create your own I/O stream
+Instead of using `sail_start_reading_file_with_options()` in the `deep diver` example, create your own I/O stream
 and call `sail_start_reading_io_with_options()`.
 
 ```C
 /*
- * Initialize a new SAIL thread-local static context explicitly and preload all codecs.
+ * Optional: Initialize a new SAIL thread-local static context explicitly and preload all codecs.
  * Codecs are lazy-loaded when SAIL_FLAG_PRELOAD_CODECS is not specified.
  */
 SAIL_TRY(sail_init_with_flags(SAIL_FLAG_PRELOAD_CODECS));
@@ -394,8 +376,7 @@ io->close = io_my_data_source_close;
 io->eof   = io_my_data_source_eof;
 
 /*
- * Allocate new read options and copy defaults from the codec-specific read features
- * (preferred output pixel format etc.).
+ * Allocate new read options and copy defaults from the codec-specific read features.
  */
 SAIL_TRY_OR_CLEANUP(sail_alloc_read_options_from_features(codec_info->read_features,
                                                           &read_options),
@@ -418,10 +399,12 @@ sail_destroy_read_options(read_options);
 
 /*
  * Read just a single frame. It's possible to read more frames if any. Just continue
- * reading frames till sail_read_next_frame() returns 0. If no more frames are available,
+ * reading frames till sail_read_next_frame() returns SAIL_OK. If no more frames are available,
  * it returns SAIL_ERROR_NO_MORE_FRAMES.
  *
- * sail_read_next_frame() outputs pixels in the requested pixel format (BPP32-RGBA by default).
+ * By default, sail_read_next_frame() may convert specific pixel formats to be more prepared
+ * for displaying. Use SAIL_IO_OPTION_CLOSE_TO_SOURCE to output pixels as close as possible
+ * to the source.
  */
 SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, &image),
                     /* cleanup */ sail_stop_reading(state),
@@ -437,20 +420,14 @@ SAIL_TRY_OR_CLEANUP(sail_stop_reading(state),
 sail_destroy_io(io);
 
 /*
- * Print the image meta data if any (JPEG comments etc.).
- */
-struct sail_meta_entry_node *node = image->meta_entry_node;
-
-if (node != NULL) {
-    SAIL_LOG_DEBUG("%s: %s", node->key, node->value);
-}
-
-/*
  * Handle the image pixels here.
  * Use image->width, image->height, image->bytes_per_line,
  * image->pixel_format, and image->pixels for that.
  */
 
+/*
+ * Destroy the image when it's not needed anymore.
+ */
 sail_destroy_image(image);
 
 /*
@@ -467,7 +444,7 @@ sail_finish();
 
 #### C++:
 ```C++
-// Initialize a new SAIL thread-local static context explicitly and preload all codecs.
+// Optional: Initialize a new SAIL thread-local static context explicitly and preload all codecs.
 // Codecs are lazy-loaded when SAIL_FLAG_PRELOAD_CODECS is not specified.
 //
 sail::context::init(SAIL_FLAG_PRELOAD_CODECS);
@@ -478,24 +455,22 @@ sail::image_reader reader;
 sail::codec_info codec_info;
 SAIL_TRY(codec_info::from_path(path, &codec_info));
 
-/*
- * Create our custom I/O source.
- */
+// Create our custom I/O source.
+//
 sail::io io;
 
-/*
- * Save a pointer to our data source. It will be passed back to the callback functions below.
- * You can free the data source in the close() callback.
- *
- * WARNING: If you don't call reader.stop_reading(), the close() callback is never called.
- *          Please make sure you always call reader.stop_reading().
- */
+//
+// Save a pointer to our data source. It will be passed back to the callback functions below.
+// You can free the data source in the close() callback.
+//
+// WARNING: If you don't call reader.stop_reading(), the close() callback is never called.
+//          Please make sure you always call reader.stop_reading().
+//
 io.with_stream(my_data_source_pointer);
 
-/*
- * Setup reading, seeking, flushing etc. callbacks for our custom I/O source.
- * All of them must be set.
- */
+// Setup reading, seeking, flushing etc. callbacks for our custom I/O source.
+// All of them must be set.
+//
 io.with_read(io_my_data_source_read)
   .with_seek(io_my_data_source_seek)
   .with_tell(io_my_data_source_tell)
@@ -504,8 +479,7 @@ io.with_read(io_my_data_source_read)
   .with_close(io_my_data_source_close)
   .with_eof(io_my_data_source_eof);
 
-// Instantiate new read options and copy defaults from the read features
-// (preferred output pixel format etc.).
+// Instantiate new read options and copy defaults from the read features.
 //
 sail::read_options read_options;
 SAIL_TRY(codec_info.read_features().to_read_options(&read_options));
@@ -515,10 +489,12 @@ SAIL_TRY(codec_info.read_features().to_read_options(&read_options));
 SAIL_TRY(reader.start_reading(io, codec_info, read_options));
 
 // Read just a single frame. It's possible to read more frames if any. Just continue
-// reading frames till read_next_frame() returns 0. If no more frames are available,
+// reading frames till read_next_frame() returns SAIL_OK. If no more frames are available,
 // it returns SAIL_ERROR_NO_MORE_FRAMES.
 //
-// read_next_frame() outputs pixels in the requested pixel format (BPP32-RGBA by default).
+// By default, read_next_frame() may convert specific pixel formats to be more prepared
+// for displaying. Use SAIL_IO_OPTION_CLOSE_TO_SOURCE to output pixels as close as possible
+// to the source.
 //
 sail::image image;
 SAIL_TRY(reader.read_next_frame(&image));
@@ -526,15 +502,6 @@ SAIL_TRY(reader.read_next_frame(&image));
 // Finish reading.
 //
 SAIL_TRY(reader.stop_reading());
-
-// Print the image meta data if any (JPEG comments etc.).
-//
-const std::map<std::string, std::string> meta_entries = image.meta_entries();
-
-if (!meta_entries.empty()) {
-    const std::pair<std::string, std::string> first_pair = *meta_entries.begin();
-    SAIL_LOG_DEBUG("%s: %s", first_pair.first.c_str(), first_pair.second.c_str());
-}
 
 // Handle the image and its pixels here.
 // Use image.width(), image.height(), image.bytes_per_line(),

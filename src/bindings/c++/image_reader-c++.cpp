@@ -222,8 +222,7 @@ sail_status_t image_reader::start_reading(const void *buffer, size_t buffer_leng
 sail_status_t image_reader::start_reading(const io &sio, const codec_info &scodec_info)
 {
     SAIL_TRY(sio.to_sail_io(&d->sail_io));
-
-    SAIL_CHECK_IO(d->sail_io);
+    SAIL_TRY(sail_check_io_valid(d->sail_io));
 
     SAIL_TRY(sail_start_reading_io_with_options(d->sail_io,
                                                 scodec_info.sail_codec_info_c(),
@@ -236,8 +235,7 @@ sail_status_t image_reader::start_reading(const io &sio, const codec_info &scode
 sail_status_t image_reader::start_reading(const io &sio, const codec_info &scodec_info, const read_options &sread_options)
 {
     SAIL_TRY(sio.to_sail_io(&d->sail_io));
-
-    SAIL_CHECK_IO(d->sail_io);
+    SAIL_TRY(sail_check_io_valid(d->sail_io));
 
     sail_read_options sail_read_options;
     SAIL_TRY(sread_options.to_sail_read_options(&sail_read_options));
@@ -256,10 +254,6 @@ sail_status_t image_reader::read_next_frame(image *simage)
 
     sail_image *sail_image;
     SAIL_TRY(sail_read_next_frame(d->state, &sail_image));
-
-    unsigned bytes_per_image;
-    SAIL_TRY_OR_CLEANUP(sail_bytes_per_image(sail_image, &bytes_per_image),
-                        /* cleanup */ sail_destroy_image(sail_image));
 
     *simage = image(sail_image);
     sail_image->pixels = NULL;

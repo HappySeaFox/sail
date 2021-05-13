@@ -4,6 +4,10 @@ add_executable(sail-convert sail-convert.c)
 #
 target_link_libraries(sail-convert PRIVATE sail)
 
+# Depend on sail-manip
+#
+target_link_libraries(sail-convert PRIVATE sail-manip)
+
 # Enable ASAN if possible
 #
 sail_enable_asan(TARGET sail-convert)

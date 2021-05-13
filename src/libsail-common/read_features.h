@@ -45,22 +45,6 @@ struct sail_pixel_formats_mapping_node;
  */
 struct sail_read_features {
 
-    /*
-     * A list of supported pixel formats that can be output by this codec.
-     * The BPP32-RGBA and BPP32-BGRA output pixel formats are always supported. Most image format codecs
-     * are able to output the SOURCE pixel format as well. Some codecs may support even more output pixel formats.
-     */
-    enum SailPixelFormat *output_pixel_formats;
-
-    /* The length of output_pixel_formats. */
-    unsigned output_pixel_formats_length;
-
-    /*
-     * Output pixel format to use by default when no specific output pixel format was requested by a user.
-     * It's always BPP32-RGBA.
-     */
-    enum SailPixelFormat default_output_pixel_format;
-
     /* Supported or-ed features of reading operations. See SailCodecFeature. */
     int features;
 };

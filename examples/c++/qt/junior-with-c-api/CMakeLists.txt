@@ -51,9 +51,10 @@ endif()
 # Add SAIL dependency
 #
 pkg_check_modules(SAIL IMPORTED_TARGET REQUIRED libsail)
-target_compile_options(junior-with-c-api     PRIVATE "${SAIL_CFLAGS}")
-target_include_directories(junior-with-c-api PRIVATE "${SAIL_INCLUDE_DIRS}")
 target_link_libraries(junior-with-c-api      PkgConfig::SAIL)
+
+pkg_check_modules(SAIL-MANIP IMPORTED_TARGET REQUIRED libsail-manip)
+target_link_libraries(junior-with-c-api      PkgConfig::SAIL-MANIP)
 
 # Add Qt5 dependency
 #

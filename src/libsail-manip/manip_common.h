@@ -1,6 +1,6 @@
 /*  This file is part of SAIL (https://github.com/smoked-herring/sail)
 
-    Copyright (c) 2020 Dmitry Baryshev
+    Copyright (c) 2021 Dmitry Baryshev
 
     The MIT License
 
@@ -23,42 +23,32 @@
     SOFTWARE.
 */
 
-#ifndef WRITEOPTIONS_H
-#define WRITEOPTIONS_H
+#ifndef SAIL_MANIP_COMMON_H
+#define SAIL_MANIP_COMMON_H
 
-#include <QDialog>
-#include <QScopedPointer>
+/*
+ * Options to control color conversion behavior.
+ */
+enum SailConversionOption {
 
-#include <sail-common/common.h>
-#include <sail-common/error.h>
+    /*
+     * Drops the input alpha channel if the output alpha channel doesn't exist.
+     * For example, when we convert RGBA pixels to RGB.
+     *
+     * SAIL_CONVERSION_OPTION_DROP_ALPHA and SAIL_CONVERSION_OPTION_BLEND_ALPHA are mutually
+     * exclusive. If both are specified, SAIL_CONVERSION_OPTION_BLEND_ALPHA wins.
+     */
+    SAIL_CONVERSION_OPTION_DROP_ALPHA  = 1 << 0,
 
-namespace sail
-{
-class write_features;
-}
-
-class WriteOptions : public QDialog
-{
-    Q_OBJECT
-
-public:
-    explicit WriteOptions(const QString &codecDescription,
-                          const sail::write_features &write_features,
-                          int input_pixel_format,
-                          QWidget *parent = nullptr);
-    ~WriteOptions();
-
-    SailPixelFormat pixelFormat() const;
-
-    int compressionLevel() const;
-
-private:
-    sail_status_t init(const sail::write_features &write_features, int input_pixel_format);
-    void disable();
-
-private:
-    class Private;
-    const QScopedPointer<Private> d;
+    /*
+     * Blend the input alpha channel into the other color components if the output alpha channel
+     * doesn't exist. For example, when we convert RGBA pixels to RGB.
+     *
+     * Formula:
+     *   opacity = alpha / max_alpha (to convert to [0, 1])
+     *   output_pixel = opacity * input_pixel + (1 - opacity) * background
+     */
+    SAIL_CONVERSION_OPTION_BLEND_ALPHA = 1 << 1,
 };
 
-#endif // WRITEOPTIONS_H
+#endif

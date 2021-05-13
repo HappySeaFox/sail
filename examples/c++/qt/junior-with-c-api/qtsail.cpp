@@ -37,8 +37,10 @@
 
 #include <sail/sail.h>
 
+#include <sail-manip/sail-manip.h>
+
 //#define SAIL_CODEC_NAME jpeg
-//#include <sail/layouts/v4.h>
+//#include <sail/layouts/v5.h>
 
 #include "qtsail.h"
 #include "ui_qtsail.h"
@@ -66,23 +68,33 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
     struct sail_image *image;
 
     /*
-     * sail_read_file() reads the image and outputs pixels in the BPP32-RGBA pixel format.
+     * By default, sail_read_file() may convert specific pixel formats to be more prepared
+     * for displaying. Use SAIL_IO_OPTION_CLOSE_TO_SOURCE to output pixels as close as possible
+     * to the source.
      */
     SAIL_TRY(sail_read_file(path.toLocal8Bit(), &image));
 
+    struct sail_image *image_converted;
+    SAIL_TRY_OR_CLEANUP(sail_convert_image(image,
+                                           SAIL_PIXEL_FORMAT_BPP32_RGBA,
+                                           &image_converted),
+                        /* cleanup */ sail_destroy_image(image));
+
     // Construct QImage from the read image pixels.
     //
-    *qimage = QImage(reinterpret_cast<const uchar *>(image->pixels),
-                     image->width,
-                     image->height,
-                     image->bytes_per_line,
-                     sailPixelFormatToQImageFormat(image->pixel_format)).copy();
+    *qimage = QImage(reinterpret_cast<const uchar *>(image_converted->pixels),
+                     image_converted->width,
+                     image_converted->height,
+                     image_converted->bytes_per_line,
+                     QImage::Format_RGBA8888).copy();
 
     m_ui->labelStatus->setText(tr("%1  [%2x%3]")
                                 .arg(QFileInfo(path).fileName())
-                                .arg(image->width)
-                                .arg(image->height)
+                                .arg(image_converted->width)
+                                .arg(image_converted->height)
                                 );
+
+    sail_destroy_image(image_converted);
     sail_destroy_image(image);
 
     return SAIL_OK;
@@ -90,6 +102,9 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
 
 sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
 {
+    const struct sail_codec_info *codec_info;
+    SAIL_TRY(sail_codec_info_from_path(path.toLocal8Bit(), &codec_info));
+
     struct sail_image *image;
     SAIL_TRY(sail_alloc_image(&image));
 
@@ -100,6 +115,21 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
     image->pixel_format = qImageFormatToSailPixelFormat(qimage.format());
     SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(image->width, image->pixel_format, &image->bytes_per_line),
                         /* cleanup */ sail_destroy_image(image));
+
+    /*
+     * SAIL tries to save an image as is, preserving its pixel format.
+     * Particular image formats may support saving in different pixel formats:
+     * RGB, Grayscale, etc. Convert the image to the best pixel format for saving here.
+     *
+     * You can prepare the image for saving by converting its pixel format on your own,
+     * without using sail-manip.
+     */
+    struct sail_image *image_converted;
+    SAIL_TRY_OR_CLEANUP(sail_convert_image_for_saving(image, codec_info->write_features, &image_converted),
+                        /* cleanup */ sail_destroy_image(image));
+
+    sail_destroy_image(image);
+    image = image_converted;
 
     SAIL_TRY_OR_CLEANUP(sail_write_file(path.toLocal8Bit(), image),
                                         /* cleanup */ sail_destroy_image(image));

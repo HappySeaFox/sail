@@ -36,17 +36,18 @@ sail_status_t sail_alloc_write_features(struct sail_write_features **write_featu
     SAIL_TRY(sail_malloc(sizeof(struct sail_write_features), &ptr));
     *write_features = ptr;
 
-    (*write_features)->pixel_formats_mapping_node = NULL;
-    (*write_features)->features                   = 0;
-    (*write_features)->properties                 = 0;
-    (*write_features)->interlaced_passes          = 0;
-    (*write_features)->compressions               = NULL;
-    (*write_features)->compressions_length        = 0;
-    (*write_features)->default_compression        = SAIL_COMPRESSION_UNSUPPORTED;
-    (*write_features)->compression_level_min      = 0;
-    (*write_features)->compression_level_max      = 0;
-    (*write_features)->compression_level_default  = 0;
-    (*write_features)->compression_level_step     = 0;
+    (*write_features)->output_pixel_formats        = NULL;
+    (*write_features)->output_pixel_formats_length = 0;
+    (*write_features)->features                    = 0;
+    (*write_features)->properties                  = 0;
+    (*write_features)->interlaced_passes           = 0;
+    (*write_features)->compressions                = NULL;
+    (*write_features)->compressions_length         = 0;
+    (*write_features)->default_compression         = SAIL_COMPRESSION_UNSUPPORTED;
+    (*write_features)->compression_level_min       = 0;
+    (*write_features)->compression_level_max       = 0;
+    (*write_features)->compression_level_default   = 0;
+    (*write_features)->compression_level_step      = 0;
 
     return SAIL_OK;
 }
@@ -57,8 +58,7 @@ void sail_destroy_write_features(struct sail_write_features *write_features) {
         return;
     }
 
-    sail_destroy_pixel_formats_mapping_node_chain(write_features->pixel_formats_mapping_node);
-
+    sail_free(write_features->output_pixel_formats);
     sail_free(write_features->compressions);
     sail_free(write_features);
 }

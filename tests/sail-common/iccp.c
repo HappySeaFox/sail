@@ -63,7 +63,7 @@ static MunitResult test_copy_iccp(const MunitParameter params[], void *user_data
 
     munit_assert(iccp_copy->data != iccp->data);
     munit_assert(iccp_copy->data_length == iccp->data_length);
-    munit_assert(memcmp(iccp_copy->data, iccp->data, iccp->data_length) == 0);
+    munit_assert_memory_equal(iccp->data_length, iccp_copy->data, iccp->data);
 
     sail_destroy_iccp(iccp_copy);
     sail_destroy_iccp(iccp);
@@ -86,7 +86,7 @@ static MunitResult test_iccp_from_data(const MunitParameter params[], void *user
     munit_assert_not_null(iccp);
 
     munit_assert(iccp->data_length == data_length);
-    munit_assert(memcmp(iccp->data, data, data_length) == 0);
+    munit_assert_memory_equal(data_length, iccp->data, data);
 
     sail_destroy_iccp(iccp);
     sail_free(data);

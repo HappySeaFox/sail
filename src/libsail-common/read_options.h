@@ -43,14 +43,6 @@ struct sail_read_features;
 /* Options to modify reading operations. */
 struct sail_read_options {
 
-    /*
-     * Request to modify the output pixel format. The list of possible output pixel formats
-     * can be obtained from sail_read_features.output_pixel_formats.
-     *
-     * The BPP32-RGBA and BPP32-BGRA output pixel formats are always supported.
-     */
-    enum SailPixelFormat output_pixel_format;
-
     /* Or-ed IO manipulation options. See SailIoOption. */
     int io_options;
 };

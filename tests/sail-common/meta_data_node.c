@@ -167,7 +167,7 @@ static MunitResult test_meta_data_node_from_known_data(const MunitParameter para
     munit_assert(meta_data_node->value_type == SAIL_META_DATA_TYPE_DATA);
     munit_assert_not_null(meta_data_node->value);
     munit_assert(meta_data_node->value_length == value_length);
-    munit_assert(memcmp(meta_data_node->value, value, value_length) == 0);
+    munit_assert_memory_equal(value_length, meta_data_node->value, value);
 
     sail_destroy_meta_data_node(meta_data_node);
 
@@ -191,7 +191,7 @@ static MunitResult test_meta_data_node_from_unknown_data(const MunitParameter pa
     munit_assert(meta_data_node->value_type == SAIL_META_DATA_TYPE_DATA);
     munit_assert_not_null(meta_data_node->value);
     munit_assert(meta_data_node->value_length == value_length);
-    munit_assert(memcmp(meta_data_node->value, value, value_length) == 0);
+    munit_assert_memory_equal(value_length, meta_data_node->value, value);
 
     sail_destroy_meta_data_node(meta_data_node);
 

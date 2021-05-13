@@ -46,7 +46,9 @@ struct sail_write_options;
 /*
  * Starts reading the specified I/O stream.
  *
- * Outputs pixels in the BPP32-RGBA pixel format.
+ * The subsequent calls to sail_read_next_frame() may convert specific pixel formats to be more prepared
+ * for displaying. Use SAIL_IO_OPTION_CLOSE_TO_SOURCE to output pixels as close as possible
+ * to the source.
  *
  * Typical usage: sail_alloc_io()                  ->
  *                set I/O callbacks                ->
@@ -68,7 +70,9 @@ SAIL_EXPORT sail_status_t sail_start_reading_io(struct sail_io *io, const struct
  * Starts reading the specified I/O stream with the specified read options. If you don't need specific read options,
  * just pass NULL. Codec-specific defaults will be used in this case. The read options are deep copied.
  *
- * If read options is NULL, the subsequent calls to sail_read_next_frame() output pixels in the BPP32-RGBA pixel format.
+ * The subsequent calls to sail_read_next_frame() may convert specific pixel formats to be more prepared
+ * for displaying. Use SAIL_IO_OPTION_CLOSE_TO_SOURCE to output pixels as close as possible
+ * to the source.
  *
  * Typical usage: sail_alloc_io()                      ->
  *                set I/O callbacks                    ->
@@ -91,13 +95,10 @@ SAIL_EXPORT sail_status_t sail_start_reading_io_with_options(struct sail_io *io,
 /*
  * Starts writing into the specified I/O stream.
  *
- * The subsequent calls to sail_write_next_frame() output pixels in pixel format as specified
- * in sail_write_features.default_output_pixel_format.
- *
  * Typical usage: sail_alloc_io()                  ->
  *                set I/O callbacks                ->
  *                sail_codec_info_from_extension() ->
- *                sail_start_writing()             ->
+ *                sail_start_writing_file()        ->
  *                sail_write_next_frame()          ->
  *                sail_stop_writing()              ->
  *                sail_destroy_io().
@@ -113,9 +114,6 @@ SAIL_EXPORT sail_status_t sail_start_writing_io(struct sail_io *io, const struct
 /*
  * Starts writing the specified I/O stream with the specified write options. If you don't need specific write options,
  * just pass NULL. Codec-specific defaults will be used in this case. The write options are deep copied.
- *
- * If write options is NULL, the subsequent calls to sail_write_next_frame() output pixels in pixel format
- * as specified in sail_write_features.default_output_pixel_format.
  *
  * Typical usage: sail_alloc_io()                      ->
  *                set I/O callbacks                    ->

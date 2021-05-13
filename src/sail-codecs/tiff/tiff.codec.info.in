@@ -1,7 +1,7 @@
 # TIFF codec information
 #
 [codec]
-layout=4
+layout=5
 version=1.0.1
 name=TIFF
 description=Tagged Image File Format
@@ -11,19 +11,15 @@ mime-types=image/tiff;image/tiff-fx
 
 [read-features]
 features=STATIC;MULTI-FRAME;META-DATA;ICCP
-output-pixel-formats=BPP32-RGBA;BPP32-BGRA;SOURCE
-default-output-pixel-format=@SAIL_DEFAULT_READ_OUTPUT_PIXEL_FORMAT@
 
 [write-features]
 features=STATIC;MULTI-FRAME;META-DATA;ICCP
+output-pixel-formats=BPP32-RGBA
 properties=
 interlaced-passes=1
-compression-types=@CODEC_INFO_COMPRESSIONS@
-default-compression=@CODEC_INFO_DEFAULT_COMPRESSION@
+compression-types=@SAIL_TIFF_CODEC_INFO_COMPRESSIONS@
+default-compression=@SAIL_TIFF_CODEC_INFO_DEFAULT_COMPRESSION@
 compression-level-min=0
 compression-level-max=0
 compression-level-default=0
 compression-level-step=0
-
-[write-pixel-formats-mapping]
-BPP32-RGBA=SOURCE

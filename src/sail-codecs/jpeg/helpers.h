@@ -51,10 +51,6 @@ SAIL_HIDDEN enum SailPixelFormat jpeg_private_color_space_to_pixel_format(J_COLO
 
 SAIL_HIDDEN J_COLOR_SPACE jpeg_private_pixel_format_to_color_space(enum SailPixelFormat pixel_format);
 
-SAIL_HIDDEN sail_status_t jpeg_private_auto_output_color_space(enum SailPixelFormat input_pixel_format, J_COLOR_SPACE *output_color_space);
-
-SAIL_HIDDEN sail_status_t jpeg_private_convert_cmyk(unsigned char *pixels_source, unsigned char *pixels_target, unsigned width, enum SailPixelFormat target_pixel_format);
-
 SAIL_HIDDEN sail_status_t jpeg_private_fetch_meta_data(struct jpeg_decompress_struct *decompress_context, struct sail_meta_data_node **last_meta_data_node);
 
 SAIL_HIDDEN sail_status_t jpeg_private_write_meta_data(struct jpeg_compress_struct *compress_context, const struct sail_meta_data_node *meta_data_node);

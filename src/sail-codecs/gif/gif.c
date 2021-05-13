@@ -130,15 +130,13 @@ static void destroy_gif_state(struct gif_state *gif_state) {
  * Decoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_read_init_v4_gif(struct sail_io *io, const struct sail_read_options *read_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_read_init_v5_gif(struct sail_io *io, const struct sail_read_options *read_options, void **state) {
 
     SAIL_CHECK_STATE_PTR(state);
     *state = NULL;
 
-    SAIL_CHECK_IO(io);
+    SAIL_TRY(sail_check_io_valid(io));
     SAIL_CHECK_READ_OPTIONS_PTR(read_options);
-
-    SAIL_TRY(gif_private_supported_read_output_pixel_format(read_options->output_pixel_format));
 
     /* Allocate a new state. */
     struct gif_state *gif_state;
@@ -159,16 +157,9 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v4_gif(struct sail_io *io, const 
 
     /* Initialize internal structs. */
     if (gif_state->gif->SColorMap != NULL) {
-        if (gif_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_RGBA) {
-            gif_state->background[0] = gif_state->gif->SColorMap->Colors[gif_state->gif->SBackGroundColor].Red;
-            gif_state->background[1] = gif_state->gif->SColorMap->Colors[gif_state->gif->SBackGroundColor].Green;
-            gif_state->background[2] = gif_state->gif->SColorMap->Colors[gif_state->gif->SBackGroundColor].Blue;
-        } else if (gif_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_BGRA) {
-            gif_state->background[0] = gif_state->gif->SColorMap->Colors[gif_state->gif->SBackGroundColor].Blue;
-            gif_state->background[1] = gif_state->gif->SColorMap->Colors[gif_state->gif->SBackGroundColor].Green;
-            gif_state->background[2] = gif_state->gif->SColorMap->Colors[gif_state->gif->SBackGroundColor].Red;
-        }
-
+        gif_state->background[0] = gif_state->gif->SColorMap->Colors[gif_state->gif->SBackGroundColor].Red;
+        gif_state->background[1] = gif_state->gif->SColorMap->Colors[gif_state->gif->SBackGroundColor].Green;
+        gif_state->background[2] = gif_state->gif->SColorMap->Colors[gif_state->gif->SBackGroundColor].Blue;
         gif_state->background[3] = 255;
     } else {
         memset(&gif_state->background, 0, sizeof(gif_state->background));
@@ -192,10 +183,10 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v4_gif(struct sail_io *io, const 
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v4_gif(void *state, struct sail_io *io, struct sail_image **image) {
+SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_gif(void *state, struct sail_io *io, struct sail_image **image) {
 
     SAIL_CHECK_STATE_PTR(state);
-    SAIL_CHECK_IO(io);
+    SAIL_TRY(sail_check_io_valid(io));
     SAIL_CHECK_IMAGE_PTR(image);
 
     struct gif_state *gif_state = (struct gif_state *)state;
@@ -344,11 +335,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v4_gif(void *state, st
                 image_local->interlaced_passes = 4;
             }
 
-            if (gif_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_RGBA) {
-                image_local->pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;
-            } else if (gif_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_BGRA) {
-                image_local->pixel_format = SAIL_PIXEL_FORMAT_BPP32_BGRA;
-            }
+            image_local->pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;
             SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(image_local->width, image_local->pixel_format, &image_local->bytes_per_line),
                                 /* cleanup */ sail_destroy_image(image_local));
 
@@ -361,22 +348,14 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v4_gif(void *state, st
 
     *image = image_local;
 
-    if (gif_state->current_image == 0) {
-        const char *pixel_format_str = NULL;
-        SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(image_local->source_image->pixel_format, &pixel_format_str));
-        SAIL_LOG_DEBUG("GIF: Input pixel format is %s", pixel_format_str);
-        SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(gif_state->read_options->output_pixel_format, &pixel_format_str));
-        SAIL_LOG_DEBUG("GIF: Output pixel format is %s", pixel_format_str);
-    }
-
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_read_seek_next_pass_v4_gif(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_read_seek_next_pass_v5_gif(void *state, struct sail_io *io, const struct sail_image *image) {
 
     SAIL_CHECK_STATE_PTR(state);
-    SAIL_CHECK_IO(io);
-    SAIL_CHECK_IMAGE(image);
+    SAIL_TRY(sail_check_io_valid(io));
+    SAIL_TRY(sail_check_image_skeleton_valid(image));
 
     struct gif_state *gif_state = (struct gif_state *)state;
 
@@ -386,11 +365,11 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_pass_v4_gif(void *state, str
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_read_frame_v4_gif(void *state, struct sail_io *io, struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_read_frame_v5_gif(void *state, struct sail_io *io, struct sail_image *image) {
 
     SAIL_CHECK_STATE_PTR(state);
-    SAIL_CHECK_IO(io);
-    SAIL_CHECK_IMAGE(image);
+    SAIL_TRY(sail_check_io_valid(io));
+    SAIL_TRY(sail_check_image_skeleton_valid(image));
 
     struct gif_state *gif_state = (struct gif_state *)state;
 
@@ -461,17 +440,10 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v4_gif(void *state, struct sail_
 
                 unsigned char *pixel = scan + (gif_state->column + i)*4;
 
-                if (gif_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_RGBA) {
-                    pixel[0] = gif_state->map->Colors[gif_state->buf[i]].Red;
-                    pixel[1] = gif_state->map->Colors[gif_state->buf[i]].Green;
-                    pixel[2] = gif_state->map->Colors[gif_state->buf[i]].Blue;
-                } else if (gif_state->read_options->output_pixel_format == SAIL_PIXEL_FORMAT_BPP32_BGRA) {
-                    pixel[0] = gif_state->map->Colors[gif_state->buf[i]].Blue;
-                    pixel[1] = gif_state->map->Colors[gif_state->buf[i]].Green;
-                    pixel[2] = gif_state->map->Colors[gif_state->buf[i]].Red;
-                }
-
-                pixel[3] = 255;
+                *(pixel+0) = gif_state->map->Colors[gif_state->buf[i]].Red;
+                *(pixel+1) = gif_state->map->Colors[gif_state->buf[i]].Green;
+                *(pixel+2) = gif_state->map->Colors[gif_state->buf[i]].Blue;
+                *(pixel+3) = 255;
             } // for
         }
 
@@ -483,10 +455,10 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v4_gif(void *state, struct sail_
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_read_finish_v4_gif(void **state, struct sail_io *io) {
+SAIL_EXPORT sail_status_t sail_codec_read_finish_v5_gif(void **state, struct sail_io *io) {
 
     SAIL_CHECK_STATE_PTR(state);
-    SAIL_CHECK_IO(io);
+    SAIL_TRY(sail_check_io_valid(io));
 
     struct gif_state *gif_state = (struct gif_state *)(*state);
 
@@ -506,46 +478,46 @@ SAIL_EXPORT sail_status_t sail_codec_read_finish_v4_gif(void **state, struct sai
  * Encoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_write_init_v4_gif(struct sail_io *io, const struct sail_write_options *write_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_write_init_v5_gif(struct sail_io *io, const struct sail_write_options *write_options, void **state) {
 
     SAIL_CHECK_STATE_PTR(state);
-    SAIL_CHECK_IO(io);
+    SAIL_TRY(sail_check_io_valid(io));
     SAIL_CHECK_WRITE_OPTIONS_PTR(write_options);
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v4_gif(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v5_gif(void *state, struct sail_io *io, const struct sail_image *image) {
 
     SAIL_CHECK_STATE_PTR(state);
-    SAIL_CHECK_IO(io);
-    SAIL_CHECK_IMAGE(image);
+    SAIL_TRY(sail_check_io_valid(io));
+    SAIL_TRY(sail_check_image_valid(image));
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-SAIL_EXPORT sail_status_t sail_codec_write_seek_next_pass_v4_gif(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_write_seek_next_pass_v5_gif(void *state, struct sail_io *io, const struct sail_image *image) {
 
     SAIL_CHECK_STATE_PTR(state);
-    SAIL_CHECK_IO(io);
-    SAIL_CHECK_IMAGE(image);
+    SAIL_TRY(sail_check_io_valid(io));
+    SAIL_TRY(sail_check_image_valid(image));
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-SAIL_EXPORT sail_status_t sail_codec_write_frame_v4_gif(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_write_frame_v5_gif(void *state, struct sail_io *io, const struct sail_image *image) {
 
     SAIL_CHECK_STATE_PTR(state);
-    SAIL_CHECK_IO(io);
-    SAIL_CHECK_IMAGE(image);
+    SAIL_TRY(sail_check_io_valid(io));
+    SAIL_TRY(sail_check_image_valid(image));
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-SAIL_EXPORT sail_status_t sail_codec_write_finish_v4_gif(void **state, struct sail_io *io) {
+SAIL_EXPORT sail_status_t sail_codec_write_finish_v5_gif(void **state, struct sail_io *io) {
 
     SAIL_CHECK_STATE_PTR(state);
-    SAIL_CHECK_IO(io);
+    SAIL_TRY(sail_check_io_valid(io));
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }

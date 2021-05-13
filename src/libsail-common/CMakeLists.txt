@@ -24,8 +24,6 @@ add_library(sail-common
                 palette.h
                 pixel.c
                 pixel.h
-                pixel_formats_mapping_node.c
-                pixel_formats_mapping_node.h
                 read_features.c
                 read_features.h
                 read_options.c
@@ -54,7 +52,6 @@ set(PUBLIC_HEADERS "common.h"
                    "meta_data_node.h"
                    "palette.h"
                    "pixel.h"
-                   "pixel_formats_mapping_node.h"
                    "read_features.h"
                    "read_options.h"
                    "resolution.h"
@@ -65,7 +62,7 @@ set(PUBLIC_HEADERS "common.h"
                    "write_options.h")
 
 set_target_properties(sail-common PROPERTIES
-                                  VERSION "0.7.2"
+                                  VERSION "0.9.1"
                                   SOVERSION 0
                                   PUBLIC_HEADER "${PUBLIC_HEADERS}")
 

@@ -1,6 +1,6 @@
 /*  This file is part of SAIL (https://github.com/smoked-herring/sail)
 
-    Copyright (c) 2020 Dmitry Baryshev
+    Copyright (c) 2021 Dmitry Baryshev
 
     The MIT License
 
@@ -23,21 +23,19 @@
     SOFTWARE.
 */
 
-#include <QApplication>
+#ifndef SAIL_YCCK_H
+#define SAIL_YCCK_H
 
-#include "qtsail.h"
+#include <stdint.h>
 
-int main(int argc, char **argv)
-{
-    QApplication app(argc, argv);
+#ifdef SAIL_BUILD
+    #include "export.h"
+    #include "pixel.h"
+#else
+    #include <sail-common/export.h>
+    #include <sail-common/pixel.h>
+#endif
 
-    // You could point SAIL to search codecs in a different location
-    //qsetenv("SAIL_CODECS_PATH", "/some/other/location");
+SAIL_HIDDEN void convert_ycck32_to_rgba32(uint8_t y, uint8_t cb, uint8_t cr, uint8_t k, sail_rgba32_t *rgba32);
 
-    QtSail qt;
-
-    qt.resize(800, 500);
-    qt.show();
-
-    return app.exec();
-}
+#endif

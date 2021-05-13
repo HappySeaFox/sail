@@ -1,6 +1,6 @@
 /*  This file is part of SAIL (https://github.com/smoked-herring/sail)
 
-    Copyright (c) 2020 Dmitry Baryshev
+    Copyright (c) 2020-2021 Dmitry Baryshev
 
     The MIT License
 
@@ -23,44 +23,27 @@
     SOFTWARE.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
+#ifndef SAIL_SAIL_MANIP_H
+#define SAIL_SAIL_MANIP_H
 
-#include "sail-common.h"
+/* Universal libsail-manip include. */
 
-sail_status_t sail_alloc_pixel_formats_mapping_node(struct sail_pixel_formats_mapping_node **node) {
+#ifdef SAIL_BUILD
+    #include "sail-common.h"
 
-    SAIL_CHECK_PIXEL_FORMATS_MAPPING_NODE_PTR(node);
+    #include "cmyk.h"
+    #include "conversion_options.h"
+    #include "convert.h"
+    #include "manip_common.h"
+    #include "manip_utils.h"
+    #include "ycbcr.h"
+    #include "ycck.h"
+#else
+    #include <sail-common/sail-common.h>
 
-    void *ptr;
-    SAIL_TRY(sail_malloc(sizeof(struct sail_pixel_formats_mapping_node), &ptr));
-    *node = ptr;
+    #include <sail-manip/conversion_options.h>
+    #include <sail-manip/convert.h>
+    #include <sail-manip/manip_common.h>
+#endif
 
-    (*node)->input_pixel_format          = SAIL_PIXEL_FORMAT_UNKNOWN;
-    (*node)->output_pixel_formats        = NULL;
-    (*node)->output_pixel_formats_length = 0;
-    (*node)->next                        = NULL;
-
-    return SAIL_OK;
-}
-
-void sail_destroy_pixel_formats_mapping_node(struct sail_pixel_formats_mapping_node *node) {
-
-    if (node == NULL) {
-        return;
-    }
-
-    sail_free(node->output_pixel_formats);
-    sail_free(node);
-}
-
-void sail_destroy_pixel_formats_mapping_node_chain(struct sail_pixel_formats_mapping_node *node) {
-
-    while (node != NULL) {
-        struct sail_pixel_formats_mapping_node *node_next = node->next;
-
-        sail_destroy_pixel_formats_mapping_node(node);
-
-        node = node_next;
-    }
-}
+#endif

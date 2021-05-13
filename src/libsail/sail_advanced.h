@@ -71,7 +71,9 @@ SAIL_EXPORT sail_status_t sail_probe_mem(const void *buffer, size_t buffer_lengt
  * Starts reading the specified image file. Pass codec info if you would like to start reading
  * with a specific codec. If not, just pass NULL.
  *
- * The subsequent calls to sail_read_next_frame() output pixels in the BPP32-RGBA pixel format.
+ * The subsequent calls to sail_read_next_frame() may convert specific pixel formats to be more prepared
+ * for displaying. Use SAIL_IO_OPTION_CLOSE_TO_SOURCE to output pixels as close as possible
+ * to the source.
  *
  * Typical usage: sail_start_reading_file() ->
  *                sail_read_next_frame()    ->
@@ -103,7 +105,9 @@ SAIL_EXPORT sail_status_t sail_start_reading_file(const char *path, const struct
 /*
  * Starts reading the specified memory buffer.
  *
- * The subsequent calls to sail_read_next_frame() output pixels in the BPP32-RGBA pixel format.
+ * The subsequent calls to sail_read_next_frame() may convert specific pixel formats to be more prepared
+ * for displaying. Use SAIL_IO_OPTION_CLOSE_TO_SOURCE to output pixels as close as possible
+ * to the source.
  *
  * Typical usage: sail_codec_info_from_extension() ->
  *                sail_start_reading_mem()         ->
@@ -141,15 +145,12 @@ SAIL_EXPORT sail_status_t sail_stop_reading(void *state);
  * Starts writing into the specified image file. Pass codec info if you'd like to start writing
  * with a specific codec. If not, just pass NULL.
  *
- * The subsequent calls to sail_write_next_frame() output pixels in pixel format as specified
- * in sail_write_features.default_output_pixel_format.
- *
- * Typical usage: sail_start_writing()    ->
- *                sail_write_next_frame() ->
+ * Typical usage: sail_start_writing_file() ->
+ *                sail_write_next_frame()   ->
  *                sail_stop_writing().
  *
  * Or:            sail_codec_info_from_extension() ->
- *                sail_start_writing()             ->
+ *                sail_start_writing_file()        ->
  *                sail_write_next_frame()          ->
  *                sail_stop_writing().
  *
@@ -174,9 +175,6 @@ SAIL_EXPORT sail_status_t sail_start_writing_file(const char *path, const struct
 /*
  * Starts writing the specified memory buffer.
  *
- * The subsequent calls to sail_write_next_frame() output pixels in pixel format
- * as specified in sail_write_features.default_output_pixel_format.
- *
  * Typical usage: sail_codec_info_from_extension() ->
  *                sail_start_writing_mem()         ->
  *                sail_write_next_frame()          ->
@@ -193,6 +191,10 @@ SAIL_EXPORT sail_status_t sail_start_writing_mem(void *buffer, size_t buffer_len
 
 /*
  * Continues writing the file started by sail_start_writing_file() and brothers.
+ *
+ * If the selected image format doesn't support the image pixel format, an error is returned.
+ * Consider converting the image into a supported image format in advance with functions
+ * from sail-manip.
  *
  * Returns SAIL_OK on success.
  */

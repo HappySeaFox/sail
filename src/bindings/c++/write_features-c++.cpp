@@ -46,7 +46,7 @@ public:
 
     const sail_write_features *sail_write_features_c;
 
-    std::map<SailPixelFormat, std::vector<SailPixelFormat>> pixel_formats_mappings;
+    std::vector<SailPixelFormat> output_pixel_formats;
     int features;
     int properties;
     std::vector<SailCompression> compressions;
@@ -67,7 +67,7 @@ write_features& write_features::operator=(const write_features &wf)
 {
     d->sail_write_features_c = wf.d->sail_write_features_c;
 
-    with_pixel_formats_mappings(wf.pixel_formats_mappings())
+    with_output_pixel_formats(wf.output_pixel_formats())
         .with_features(wf.features())
         .with_properties(wf.properties())
         .with_compressions(wf.compressions())
@@ -100,9 +100,9 @@ write_features::~write_features()
     delete d;
 }
 
-const std::map<SailPixelFormat, std::vector<SailPixelFormat>>& write_features::pixel_formats_mappings() const
+const std::vector<SailPixelFormat>& write_features::output_pixel_formats() const
 {
-    return d->pixel_formats_mappings;
+    return d->output_pixel_formats;
 }
 
 int write_features::features() const
@@ -176,20 +176,14 @@ write_features::write_features(const sail_write_features *wf)
 
     d->sail_write_features_c = wf;
 
-    std::map<SailPixelFormat, std::vector<SailPixelFormat>> pixel_formats_mappings;
-    sail_pixel_formats_mapping_node *node = wf->pixel_formats_mapping_node;
+    std::vector<SailPixelFormat> output_pixel_formats;
 
-    while (node != nullptr) {
-        std::vector<SailPixelFormat> pixel_formats;
-        pixel_formats.reserve(node->output_pixel_formats_length);
+    if (wf->output_pixel_formats != nullptr && wf->output_pixel_formats_length > 0) {
+        output_pixel_formats.reserve(wf->output_pixel_formats_length);
 
-        for (unsigned i = 0; i < node->output_pixel_formats_length; i++) {
-            pixel_formats.push_back(node->output_pixel_formats[i]);
+        for (unsigned i = 0; i < wf->output_pixel_formats_length; i++) {
+            output_pixel_formats.push_back(wf->output_pixel_formats[i]);
         }
-
-        pixel_formats_mappings[node->input_pixel_format] = pixel_formats;
-
-        node = node->next;
     }
 
     std::vector<SailCompression> compressions;
@@ -202,7 +196,7 @@ write_features::write_features(const sail_write_features *wf)
         }
     }
 
-    with_pixel_formats_mappings(pixel_formats_mappings)
+    with_output_pixel_formats(output_pixel_formats)
         .with_features(wf->features)
         .with_properties(wf->properties)
         .with_compressions(compressions)
@@ -213,9 +207,9 @@ write_features::write_features(const sail_write_features *wf)
         .with_compression_level_step(wf->compression_level_step);
 }
 
-write_features &write_features::with_pixel_formats_mappings(const std::map<SailPixelFormat, std::vector<SailPixelFormat>> &pixel_formats_mappings)
+write_features& write_features::with_output_pixel_formats(const std::vector<SailPixelFormat> &output_pixel_formats)
 {
-    d->pixel_formats_mappings = pixel_formats_mappings;
+    d->output_pixel_formats = output_pixel_formats;
     return *this;
 }
 

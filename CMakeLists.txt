@@ -62,7 +62,6 @@ set(SAIL_EXCEPT_CODECS "" CACHE STRING "Enable all codecs except the codecs spec
 Codecs with missing dependencies will be disabled regardless this setting.")
 set(SAIL_ONLY_CODECS "" CACHE STRING "Enable only the codecs specified in this ';'-separated list. \
 Codecs with missing dependencies will be disabled regardless this setting.")
-option(SAIL_READ_OUTPUT_BPP32_BGRA "Make the read operations output BPP32-BGRA pixels instead of BPP32-RGBA." OFF)
 option(SAIL_STATIC "Build static libs. When enabled, sets SAIL_COMBINE_CODECS to ON." OFF)
 cmake_dependent_option(SAIL_COMBINE_CODECS "Combine all codecs into a single library." OFF "NOT SAIL_STATIC" ON)
 
@@ -82,12 +81,6 @@ if (VCPKG_TARGET_TRIPLET)
     set(SAIL_VCPKG ON)
 else()
     set(SAIL_VCPKG OFF)
-endif()
-
-if (SAIL_READ_OUTPUT_BPP32_BGRA)
-    set(SAIL_DEFAULT_READ_OUTPUT_PIXEL_FORMAT "BPP32-BGRA")
-else()
-    set(SAIL_DEFAULT_READ_OUTPUT_PIXEL_FORMAT "BPP32-RGBA")
 endif()
 
 set(SAIL_MAGIC_BUFFER_SIZE 16)
@@ -201,6 +194,7 @@ sail_check_c11_thread_local()
 # Configure subdirs
 #
 add_subdirectory(src/libsail-common)
+add_subdirectory(src/libsail-manip)
 add_subdirectory(src/sail-codecs)
 if (SAIL_COMBINE_CODECS)
     add_subdirectory(src/sail-codecs-archive)
@@ -293,7 +287,6 @@ message("* DATADIR:                     ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_
 message("*")
 message("* Enabled codecs:              ${ENABLED_CODECS}")
 message("* Disabled codecs:             ${DISABLED_CODECS}")
-message("* Default read output format:  ${SAIL_DEFAULT_READ_OUTPUT_PIXEL_FORMAT}")
 message("*")
 message("***************************************")
 message("")

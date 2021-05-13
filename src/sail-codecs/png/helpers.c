@@ -62,8 +62,8 @@ enum SailPixelFormat png_private_png_color_type_to_pixel_format(int color_type, 
 
         case PNG_COLOR_TYPE_GRAY_ALPHA: {
             switch (bit_depth) {
-                case 8:  return SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE_ALPHA;
-                case 16: return SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA;
+                case 8:  return SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA;
+                case 16: return SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA;
             }
             break;
         }
@@ -157,39 +157,6 @@ sail_status_t png_private_pixel_format_to_png_color_type(enum SailPixelFormat pi
         case SAIL_PIXEL_FORMAT_BPP64_ABGR: {
             *color_type = PNG_COLOR_TYPE_RGB_ALPHA;
             *bit_depth = 16;
-            return SAIL_OK;
-        }
-
-        default: {
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
-        }
-    }
-}
-
-sail_status_t png_private_supported_read_output_pixel_format(enum SailPixelFormat pixel_format) {
-
-    switch (pixel_format) {
-        case SAIL_PIXEL_FORMAT_SOURCE:
-        case SAIL_PIXEL_FORMAT_BPP24_RGB:
-        case SAIL_PIXEL_FORMAT_BPP24_BGR:
-        case SAIL_PIXEL_FORMAT_BPP32_RGBA:
-        case SAIL_PIXEL_FORMAT_BPP32_BGRA:
-        case SAIL_PIXEL_FORMAT_BPP32_ARGB:
-        case SAIL_PIXEL_FORMAT_BPP32_ABGR: {
-            return SAIL_OK;
-        }
-
-        default: {
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
-        }
-    }
-}
-
-sail_status_t png_private_supported_write_output_pixel_format(enum SailPixelFormat pixel_format) {
-
-    switch (pixel_format) {
-        case SAIL_PIXEL_FORMAT_AUTO:
-        case SAIL_PIXEL_FORMAT_SOURCE: {
             return SAIL_OK;
         }
 
@@ -383,8 +350,23 @@ sail_status_t png_private_fetch_palette(png_structp png_ptr, png_infop info_ptr,
         SAIL_LOG_AND_RETURN(SAIL_ERROR_MISSING_PALETTE);
     }
 
-    /* Always use RGB palette. */
-    SAIL_TRY(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP24_RGB, png_palette_color_count, palette));
+    png_bytep transparency = NULL;
+    int transparency_length = 0;
+
+#ifdef PNG_tRNS_SUPPORTED
+    if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS) != 0) {
+        if (png_get_tRNS(png_ptr, info_ptr, &transparency, &transparency_length, NULL) == 0) {
+            SAIL_LOG_ERROR("PNG: The image has invalid transparency block");
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_MISSING_PALETTE);
+        }
+    }
+#endif
+
+    if (transparency == NULL) {
+        SAIL_TRY(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP24_RGB, png_palette_color_count, palette));
+    } else {
+        SAIL_TRY(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP32_RGBA, png_palette_color_count, palette));
+    }
 
     unsigned char *palette_ptr = (*palette)->data;
 
@@ -392,6 +374,10 @@ sail_status_t png_private_fetch_palette(png_structp png_ptr, png_infop info_ptr,
         *palette_ptr++ = png_palette[i].red;
         *palette_ptr++ = png_palette[i].green;
         *palette_ptr++ = png_palette[i].blue;
+
+        if (transparency != NULL) {
+            *palette_ptr++ = (i < transparency_length) ? transparency[i] : 255;
+        }
     }
 
     return SAIL_OK;

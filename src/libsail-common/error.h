@@ -81,17 +81,18 @@ enum SailStatus {
     SAIL_ERROR_ICCP_NULL_PTR,
     SAIL_ERROR_PALETTE_NULL_PTR,
     SAIL_ERROR_SOURCE_IMAGE_NULL_PTR,
-    SAIL_ERROR_PIXEL_FORMATS_MAPPING_NODE_NULL_PTR,
     SAIL_ERROR_STRING_NODE_NULL_PTR,
     SAIL_ERROR_CODEC_INFO_NODE_NULL_PTR,
     SAIL_ERROR_PIXEL_FORMAT_NULL_PTR,
     SAIL_ERROR_RESOLUTION_NULL_PTR,
+    SAIL_ERROR_CONVERSION_OPTIONS_NULL_PTR,
 
     /*
      * Encoding/decoding specific errors.
      */
     SAIL_ERROR_INCORRECT_IMAGE_DIMENSIONS = 200,
     SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT,
+    SAIL_ERROR_INVALID_PIXEL_FORMAT,
     SAIL_ERROR_UNSUPPORTED_COMPRESSION,
     SAIL_ERROR_UNSUPPORTED_META_DATA,
     SAIL_ERROR_UNDERLYING_CODEC,
@@ -141,37 +142,6 @@ do {                              \
 /*
  * Helper macros.
  */
-#define SAIL_CHECK_IO(io)                            \
-do {                                                 \
-    if (io == NULL) {                                \
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_IO_NULL_PTR); \
-    }                                                \
-    if (io->tolerant_read      == NULL ||            \
-            io->strict_read    == NULL ||            \
-            io->seek           == NULL ||            \
-            io->tell           == NULL ||            \
-            io->tolerant_write == NULL ||            \
-            io->strict_write   == NULL ||            \
-            io->flush          == NULL ||            \
-            io->close          == NULL ||            \
-            io->eof            == NULL) {            \
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IO);  \
-    }                                                \
-} while(0)
-
-#define SAIL_CHECK_IMAGE(image)                                     \
-do {                                                                \
-    if (image == NULL) {                                            \
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_IMAGE_NULL_PTR);             \
-    }                                                               \
-    if (image->width == 0 || image->height == 0) {                  \
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_INCORRECT_IMAGE_DIMENSIONS); \
-    }                                                               \
-    if (image->bytes_per_line == 0) {                               \
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_INCORRECT_BYTES_PER_LINE);   \
-    }                                                               \
-} while(0)
-
 #define SAIL_CHECK_PTR(ptr)                       \
 do {                                              \
     if (ptr == NULL) {                            \
@@ -191,6 +161,7 @@ do {                              \
 #define SAIL_CHECK_CODEC_INFO_PTR(codec_info)           SAIL_CHECK_PTR2(codec_info,      SAIL_ERROR_CODEC_INFO_NULL_PTR)
 #define SAIL_CHECK_CODEC_PTR(codec)                     SAIL_CHECK_PTR2(codec,           SAIL_ERROR_CODEC_NULL_PTR)
 #define SAIL_CHECK_CONTEXT_PTR(context)                 SAIL_CHECK_PTR2(context,         SAIL_ERROR_CONTEXT_NULL_PTR)
+#define SAIL_CHECK_CONVERSION_OPTIONS_PTR(options)      SAIL_CHECK_PTR2(options,         SAIL_ERROR_CONVERSION_OPTIONS_NULL_PTR)
 #define SAIL_CHECK_DATA_PTR(data)                       SAIL_CHECK_PTR2(data,            SAIL_ERROR_DATA_NULL_PTR)
 #define SAIL_CHECK_EXTENSION_PTR(extension)             SAIL_CHECK_PTR2(extension,       SAIL_ERROR_EXTENSION_NULL_PTR)
 #define SAIL_CHECK_ICCP_PTR(iccp)                       SAIL_CHECK_PTR2(iccp,            SAIL_ERROR_ICCP_NULL_PTR)

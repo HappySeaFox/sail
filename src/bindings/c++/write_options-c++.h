@@ -57,12 +57,10 @@ public:
     write_options& operator=(write_options &&wo);
     ~write_options();
 
-    SailPixelFormat output_pixel_format() const;
     int io_options() const;
     SailCompression compression() const;
     double compression_level() const;
 
-    write_options& with_output_pixel_format(SailPixelFormat output_pixel_format);
     write_options& with_io_options(int io_options);
     write_options& with_compression(SailCompression compression);
     write_options& with_compression_level(double compression_level);

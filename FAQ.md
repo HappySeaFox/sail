@@ -9,9 +9,12 @@ Table of Contents
   * [What are the competitors of SAIL?](#what-are-the-competitors-of-sail)
   * [Describe the high\-level APIs](#describe-the-high-level-apis)
   * [Does SAIL provide simple one\-line APIs?](#does-sail-provide-simple-one-line-apis)
-  * [I'd like to reorganize the standard SAIL folder layout on Windows (for standalone build or bundle)](#id-like-to-reorganize-the-standard-sail-folder-layout-on-windows-for-standalone-build-or-bundle)
+  * [What pixel formats SAIL is able to read?](#what-pixel-formats-sail-is-able-to-read)
+  * [In what pixel format SAIL reading functions output images?](#in-what-pixel-format-sail-reading-functions-output-images)
+  * [What pixel formats SAIL is able to write?](#what-pixel-formats-sail-is-able-to-write)
+  * [Does SAIL support animated and multi\-paged images?](#does-sail-support-animated-and-multi-paged-images)
+  * [Does SAIL support reading from memory?](#does-sail-support-reading-from-memory)
   * [How does SAIL support image formats?](#how-does-sail-support-image-formats)
-  * [Can I implement an image codec in C\+\+?](#can-i-implement-an-image-codec-in-c)
   * [Does SAIL preload codecs in the initialization routine?](#does-sail-preload-codecs-in-the-initialization-routine)
     * [SAIL\_COMBINE\_CODECS is OFF](#sail_combine_codecs-is-off)
     * [SAIL\_COMBINE\_CODECS is ON](#sail_combine_codecs-is-on)
@@ -21,20 +24,16 @@ Table of Contents
     * [Windows (standalone build or bundle)](#windows-standalone-build-or-bundle)
     * [Unix including macOS (standalone build)](#unix-including-macos-standalone-build)
   * [How can I point SAIL to my custom codecs?](#how-can-i-point-sail-to-my-custom-codecs)
-  * [How many image formats do you plan to implement?](#how-many-image-formats-do-you-plan-to-implement)
-  * [What pixel formats SAIL is able to read?](#what-pixel-formats-sail-is-able-to-read)
-  * [What pixel formats SAIL is able to output after reading an image file?](#what-pixel-formats-sail-is-able-to-output-after-reading-an-image-file)
-  * [What pixel formats SAIL is able to write?](#what-pixel-formats-sail-is-able-to-write)
-  * [How can I read an image and output pixels in different formats?](#how-can-i-read-an-image-and-output-pixels-in-different-formats)
-  * [Does SAIL support animated and multi\-paged images?](#does-sail-support-animated-and-multi-paged-images)
-  * [Does SAIL support reading from memory?](#does-sail-support-reading-from-memory)
+  * [I'd like to reorganize the standard SAIL folder layout on Windows (for standalone build or bundle)](#id-like-to-reorganize-the-standard-sail-folder-layout-on-windows-for-standalone-build-or-bundle)
   * [Please describe the memory management techniques implemented in SAIL](#please-describe-the-memory-management-techniques-implemented-in-sail)
     * [The memory management technique implemented in SAIL](#the-memory-management-technique-implemented-in-sail)
     * [Convention to call SAIL functions](#convention-to-call-sail-functions)
     * [External pointers stay untouched on error](#external-pointers-stay-untouched-on-error)
     * [Always set a pointer to state to NULL (C only)](#always-set-a-pointer-to-state-to-null-c-only)
+  * [Can I implement an image codec in C\+\+?](#can-i-implement-an-image-codec-in-c)
   * [Are there any C/C\+\+ examples?](#are-there-any-cc-examples)
   * [Are there any bindings to other programming languages?](#are-there-any-bindings-to-other-programming-languages)
+  * [How many image formats do you plan to implement?](#how-many-image-formats-do-you-plan-to-implement)
   * [I have questions, issues, or proposals](#i-have-questions-issues-or-proposals)
 
 # SAIL Frequently Asked Questions (FAQ)
@@ -85,7 +84,7 @@ SAIL provides four levels of high-level APIs:
 
 - `Junior`: I just want to load this JPEG from a file or memory
 - `Advanced`: I want to load this animated GIF from a file or memory
-- `Deep diver`: I want to load this animated GIF from a file or memory and have control over selected codecs and output pixel formats
+- `Deep diver`: I want to load this animated GIF from a file or memory and have control over selected codecs and meta data
 - `Technical diver`: I want everything above and my custom I/O source
 
 See [EXAMPLES](EXAMPLES.md) for more.
@@ -95,21 +94,49 @@ See [EXAMPLES](EXAMPLES.md) for more.
 Yes. SAIL provides four levels of APIs, depending on your needs: `junior`, `advanced`, `deep diver`, and `technical diver`.
 `junior` is your choice. See [EXAMPLES](EXAMPLES.md) for more.
 
-## I'd like to reorganize the standard SAIL folder layout on Windows (for standalone build or bundle)
+## What pixel formats SAIL is able to read?
 
-You can surely do that. However, with the standard layout SAIL detects the codecs' location automatically.
-If you reorganize the standard SAIL folder layout, you'll need to specify the new codecs' location by
-setting the `SAIL_CODECS_PATH` environment variable.
+SAIL codecs always try to support as many input pixel formats as possible. The list of
+pixel formats that can be read by SAIL is codec-specific and is not publicly available.
+
+For example, some codecs may be able to read just 3 input pixel formats. Other may be able to read 10.
+
+## In what pixel format SAIL reading functions output images?
+
+By default, codecs output pixels close to the source but may convert some specific pixel formats (like YCbCr)
+to be more prepared for displaying. For example, JPEG converts YCbCr pixels to RGB. Another good example is when PNG
+always outputs pixels as is just because RGB or Grayscale images already rather good prepared for displaying.
+
+If you want to output pixels as close as possible to the source (for example, get YCbCr pixels from a JPEG),
+use the `SAIL_IO_OPTION_CLOSE_TO_SOURCE` read option.
+
+You can also consider conversion functions from `libsail-manip`.
+
+## What pixel formats SAIL is able to write?
+
+SAIL codecs always try to support as much output pixel formats as possible. SAIL doesn't convert
+one pixel format to another in writing operations. Images are always written as is.
+
+The list of pixel formats that can be written by SAIL is codec-specific and is publicly available in every
+.codec.info file. It can be accessed through `sail_codec_info_from_extension() -> codec_info -> write_features ->
+output_pixel_formats`.
+
+## Does SAIL support animated and multi-paged images?
+
+Yes. Just continue reading the image file until the reading functions return `SAIL_OK`.
+If no more frames are available, the reading functions return `SAIL_ERROR_NO_MORE_FRAMES`.
+
+## Does SAIL support reading from memory?
+
+Yes. SAIL supports reading/writing from/to files and memory. For technical divers,
+it's also possible to use custom I/O sources.
+
+See `sail_start_reading_file()`, `sail_start_reading_mem()`, and `sail_start_reading_io()`.
 
 ## How does SAIL support image formats?
 
 SAIL supports image formats through dynamically loaded SAIL codecs. End-users never work
 with the codecs directly. They always work with the abstract high-level APIs.
-
-## Can I implement an image codec in C++?
-
-Yes. Your codec just needs to export a set of public functions so SAIL can recognize and use it.
-Theoretically, you can implement your codec in any programming language.
 
 ## Does SAIL preload codecs in the initialization routine?
 
@@ -159,79 +186,11 @@ On Windows, `sail.dll location` and `SAIL_MY_CODECS_PATH/lib` are the only place
 No other paths are searched. Use WIN32 API `AddDllDirectory` to add your own DLL dependencies search path.
 On other platforms, `SAIL_MY_CODECS_PATH/lib` is added to `LD_LIBRARY_PATH`.
 
-## How many image formats do you plan to implement?
+## I'd like to reorganize the standard SAIL folder layout on Windows (for standalone build or bundle)
 
-Ksquirrel-libs supported around 60 image formats. I don't plan to port all of them. However,
-the most popular image formats will be definitely ported from ksquirrel-libs.
-
-## What pixel formats SAIL is able to read?
-
-SAIL codecs always try to support as much input pixel formats as possible. The list of
-pixel formats that can be read by SAIL is codec-specific and is not publicly available.
-
-For example, some codecs may be able to read just 3 input pixel formats. Other may be able to read 10.
-
-## What pixel formats SAIL is able to output after reading an image file?
-
-SAIL is always able to output pixels in the `BPP32-RGBA` and `BPP32-BGRA` pixel formats after reading.
-Most codecs are able to output the `SOURCE` pixel format as well. Some codecs support even more output pixel formats.
-Use `sail_codec_info_from_extension() -> codec_info -> read_features -> output_pixel_formats` to determine
-the list of supported output pixel formats per codec.
-
-Use the `SOURCE` pixel format (if it's supported by the codec) to request the original image pixels.
-For example, one may want to work with CMYK pixels in a print image without converting them to RGB.
-
-## What pixel formats SAIL is able to write?
-
-SAIL codecs always try to support as much output pixel formats as possible. The list of
-pixel formats that can be written by SAIL is codec-specific and is publicly available in every
-.codec.info file. It can be accessed through `sail_codec_info_from_extension() -> codec_info -> write_features ->
-pixel_formats_mapping_node`.
-
-`pixel_formats_mapping_node` is a map-like linked list describing what pixel formats SAIL is able to write from
-the given input pixel format. Consider the following structure of `pixel_formats_mapping_node`:
-
-| Input pixel format    | Output pixel formats                      |
-| --------------------- | ----------------------------------------- |
-| `BPP8-GRAYSCALE`      | `SOURCE`                                  |
-| `BPP24-RGB`           | `SOURCE`, `BPP24-YCBCR`, `BPP8-GRAYSCALE` |
-
-The structure above has the following meaning:
-
-1. When a user has an image in `BPP8-GRAYSCALE` format, he/she is able to save it as a `BPP8-GRAYSCALE` (`SOURCE`) image only
-2. When a user has an image in `BPP24-RGB` format, he/she is able to save it as a `BPP24-RGB` (`SOURCE`),
-   `BPP24-YCBCR`, and `BPP8-GRAYSCALE` image
-
-The `SOURCE` output pixel format is always supported.
-
-## How can I read an image and output pixels in different formats?
-
-Use read options for that. For example:
-
-```C
-sail_codec_info_from_extension(...);
-
-sail_read_options_from_features(...);
-
-read_options->output_pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;
-
-sail_start_reading_file_with_options(...);
-```
-
-The `BPP24-RGB` and `BPP32-RGBA` output pixel formats are always supported.
-See [EXAMPLES](EXAMPLES.md) for more.
-
-## Does SAIL support animated and multi-paged images?
-
-Yes. Just continue reading the image file until the reading functions return `0`.
-If no more frames are available, the reading functions return `SAIL_ERROR_NO_MORE_FRAMES`.
-
-## Does SAIL support reading from memory?
-
-Yes. SAIL supports reading/writing from/to files and memory. For technical divers,
-it's also possible to use custom I/O sources.
-
-See `sail_start_reading_file()`, `sail_start_reading_mem()`, and `sail_start_reading_io()`.
+You can surely do that. However, with the standard layout SAIL detects the codecs' location automatically.
+If you reorganize the standard SAIL folder layout, you'll need to specify the new codecs' location by
+setting the `SAIL_CODECS_PATH` environment variable.
 
 ## Please describe the memory management techniques implemented in SAIL
 
@@ -249,7 +208,7 @@ situation in `~image_reader()` or `~image_writer()`.
 
 ### Convention to call SAIL functions
 
-It's always recommended to use the `SAIL_TRY()` macro to call SAIL functions. It's also always recommended
+It's always recommended (but not required) to use the `SAIL_TRY()` macro to call SAIL functions. It's also always recommended
 to clean up in your code with the `SAIL_TRY_OR_CLEANUP()` macro if you need to.
 
 ### External pointers stay untouched on error
@@ -300,6 +259,11 @@ SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, ...),
                     /* cleanup */ sail_stop_reading(state));
 ```
 
+## Can I implement an image codec in C++?
+
+Yes. Your codec just needs to export a set of public functions so SAIL can recognize and use it.
+Theoretically, you can implement your codec in any programming language.
+
 ## Are there any C/C++ examples?
 
 Yes. See [EXAMPLES](EXAMPLES.md) for more.
@@ -311,6 +275,11 @@ Yes. Currently SAIL supports the following bindings:
 1. C++
 
 Pull requests to support more programming languages are highly welcomed.
+
+## How many image formats do you plan to implement?
+
+Ksquirrel-libs supported around 60 image formats. I don't plan to port all of them. However,
+the most popular image formats will be definitely ported from ksquirrel-libs.
 
 ## I have questions, issues, or proposals
 

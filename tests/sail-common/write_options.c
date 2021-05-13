@@ -23,8 +23,6 @@
     SOFTWARE.
 */
 
-#include <string.h>
-
 #include "sail-common.h"
 
 #include "munit.h"
@@ -36,7 +34,6 @@ static MunitResult test_alloc_options(const MunitParameter params[], void *user_
     struct sail_write_options *write_options = NULL;
     munit_assert(sail_alloc_write_options(&write_options) == SAIL_OK);
     munit_assert_not_null(write_options);
-    munit_assert(write_options->output_pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN);
     munit_assert(write_options->io_options == 0);
     munit_assert(write_options->compression == SAIL_COMPRESSION_UNSUPPORTED);
     munit_assert(write_options->compression_level == 0);
@@ -53,16 +50,14 @@ static MunitResult test_copy_options(const MunitParameter params[], void *user_d
     struct sail_write_options *write_options = NULL;
     munit_assert(sail_alloc_write_options(&write_options) == SAIL_OK);
 
-    write_options->output_pixel_format = SAIL_PIXEL_FORMAT_BPP24_RGB;
-    write_options->io_options          = SAIL_IO_OPTION_EXIF;
-    write_options->compression         = SAIL_COMPRESSION_JPEG;
-    write_options->compression_level   = 55;
+    write_options->io_options        = SAIL_IO_OPTION_EXIF;
+    write_options->compression       = SAIL_COMPRESSION_JPEG;
+    write_options->compression_level = 55;
 
     struct sail_write_options *write_options_copy = NULL;
     munit_assert(sail_copy_write_options(write_options, &write_options_copy) == SAIL_OK);
     munit_assert_not_null(write_options_copy);
 
-    munit_assert(write_options_copy->output_pixel_format == write_options->output_pixel_format);
     munit_assert(write_options_copy->io_options == write_options->io_options);
     munit_assert(write_options_copy->compression == write_options->compression);
     munit_assert(write_options_copy->compression_level == write_options->compression_level);
@@ -90,7 +85,6 @@ static MunitResult test_options_from_features(const MunitParameter params[], voi
     write_features.features = SAIL_CODEC_FEATURE_META_DATA | SAIL_CODEC_FEATURE_INTERLACED | SAIL_CODEC_FEATURE_ICCP;
     munit_assert(sail_write_options_from_features(&write_features, write_options) == SAIL_OK);
 
-    munit_assert(write_options->output_pixel_format == SAIL_PIXEL_FORMAT_AUTO);
     munit_assert(write_options->io_options == (SAIL_IO_OPTION_META_DATA | SAIL_IO_OPTION_INTERLACED | SAIL_IO_OPTION_ICCP));
     munit_assert(write_options->compression ==  write_features.default_compression);
     munit_assert(write_options->compression_level ==  write_features.compression_level_default);

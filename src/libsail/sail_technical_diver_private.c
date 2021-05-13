@@ -45,30 +45,6 @@ static sail_status_t check_io_arguments(struct sail_io *io,
     return SAIL_OK;
 }
 
-static void print_unsupported_read_output_pixel_format(enum SailPixelFormat output_pixel_format) {
-
-    const char *output_pixel_format_str = NULL;
-    SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(output_pixel_format, &output_pixel_format_str));
-
-    SAIL_LOG_ERROR("This codec cannot output %s pixels. Use its read features to get the list of supported output pixel formats",
-                    output_pixel_format_str);
-}
-
-static sail_status_t allowed_read_output_pixel_format(const struct sail_read_features *read_features,
-                                                      enum SailPixelFormat pixel_format) {
-
-    SAIL_CHECK_READ_FEATURES_PTR(read_features);
-
-    for (unsigned i = 0; i < read_features->output_pixel_formats_length; i++) {
-        if (read_features->output_pixel_formats[i] == pixel_format) {
-            return SAIL_OK;
-        }
-    }
-
-    print_unsupported_read_output_pixel_format(pixel_format);
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
-}
-
 static sail_status_t allowed_write_compression(const struct sail_write_features *write_features,
                                                enum SailCompression compression) {
 
@@ -96,15 +72,6 @@ sail_status_t start_reading_io_with_options(struct sail_io *io, bool own_io,
 
     *state = NULL;
 
-    /*
-     * When read options is not NULL, we need to check if we can actually output the requested pixel format.
-     * When read options is NULL, we use the default output pixel format which is always acceptable.
-     */
-    if (read_options != NULL) {
-        SAIL_TRY_OR_CLEANUP(allowed_read_output_pixel_format(codec_info->read_features, read_options->output_pixel_format),
-                            /* cleanup */ if (own_io) sail_destroy_io(io));
-    }
-
     void *ptr;
     SAIL_TRY_OR_CLEANUP(sail_malloc(sizeof(struct hidden_state), &ptr),
                         /* cleanup */ if (own_io) sail_destroy_io(io));
@@ -125,14 +92,14 @@ sail_status_t start_reading_io_with_options(struct sail_io *io, bool own_io,
 
         SAIL_TRY_OR_CLEANUP(sail_alloc_read_options_from_features(state_of_mind->codec_info->read_features, &read_options_local),
                             /* cleanup */ destroy_hidden_state(state_of_mind));
-        SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v4->read_init(state_of_mind->io, read_options_local, &state_of_mind->state),
+        SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v5->read_init(state_of_mind->io, read_options_local, &state_of_mind->state),
                             /* cleanup */ sail_destroy_read_options(read_options_local),
-                                          state_of_mind->codec->v4->read_finish(&state_of_mind->state, state_of_mind->io),
+                                          state_of_mind->codec->v5->read_finish(&state_of_mind->state, state_of_mind->io),
                                           destroy_hidden_state(state_of_mind));
         sail_destroy_read_options(read_options_local);
     } else {
-        SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v4->read_init(state_of_mind->io, read_options, &state_of_mind->state),
-                            /* cleanup */ state_of_mind->codec->v4->read_finish(&state_of_mind->state, state_of_mind->io),
+        SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v5->read_init(state_of_mind->io, read_options, &state_of_mind->state),
+                            /* cleanup */ state_of_mind->codec->v5->read_finish(&state_of_mind->state, state_of_mind->io),
                                           destroy_hidden_state(state_of_mind));
     }
 
@@ -182,8 +149,8 @@ sail_status_t start_writing_io_with_options(struct sail_io *io, bool own_io,
                             /* cleanup */ destroy_hidden_state(state_of_mind));
     }
 
-    SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v4->write_init(state_of_mind->io, state_of_mind->write_options, &state_of_mind->state),
-                        /* cleanup */ state_of_mind->codec->v4->write_finish(&state_of_mind->state, state_of_mind->io),
+    SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v5->write_init(state_of_mind->io, state_of_mind->write_options, &state_of_mind->state),
+                        /* cleanup */ state_of_mind->codec->v5->write_finish(&state_of_mind->state, state_of_mind->io),
                                       destroy_hidden_state(state_of_mind));
 
     *state = state_of_mind;

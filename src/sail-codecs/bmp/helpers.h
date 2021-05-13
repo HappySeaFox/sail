@@ -136,8 +136,6 @@ enum SailBmpVersion
     SAIL_BMP_V5,
 };
 
-SAIL_HIDDEN sail_status_t bmp_private_supported_read_output_pixel_format(enum SailPixelFormat pixel_format);
-
 SAIL_HIDDEN sail_status_t bmp_private_read_ddb_file_header(struct sail_io *io, struct SailBmpDdbFileHeader *ddb_file_header);
 
 SAIL_HIDDEN sail_status_t bmp_private_read_v1(struct sail_io *io, struct SailBmpDdbBitmap *v1);
@@ -162,8 +160,6 @@ SAIL_HIDDEN sail_status_t bmp_private_bytes_in_row(unsigned width, unsigned bit_
 
 SAIL_HIDDEN unsigned bmp_private_pad_bytes(unsigned bytes_in_row);
 
-SAIL_HIDDEN sail_status_t bmp_private_fill_system_palette(unsigned bit_count, sail_rgba8_t **palette, unsigned *palette_count);
-
-SAIL_HIDDEN sail_status_t bmp_private_get_palette_color(const sail_rgba8_t *palette, unsigned palette_count, unsigned index, sail_rgba8_t *color);
+SAIL_HIDDEN sail_status_t bmp_private_fill_system_palette(unsigned bit_count, sail_rgb24_t **palette, unsigned *palette_count);
 
 #endif

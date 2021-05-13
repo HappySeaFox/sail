@@ -1,6 +1,6 @@
 /*  This file is part of SAIL (https://github.com/smoked-herring/sail)
 
-    Copyright (c) 2020 Dmitry Baryshev
+    Copyright (c) 2021 Dmitry Baryshev
 
     The MIT License
 
@@ -23,38 +23,28 @@
     SOFTWARE.
 */
 
-#ifndef READOPTIONS_H
-#define READOPTIONS_H
+#include "sail-manip.h"
 
-#include <QDialog>
-#include <QScopedPointer>
+sail_status_t sail_alloc_conversion_options(struct sail_conversion_options **options) {
 
-#include <sail-common/common.h>
-#include <sail-common/error.h>
+    SAIL_CHECK_CONVERSION_OPTIONS_PTR(options);
 
-namespace sail
-{
-class read_features;
+    void *ptr;
+    SAIL_TRY(sail_malloc(sizeof(struct sail_conversion_options), &ptr));
+    *options = ptr;
+
+    (*options)->options      = SAIL_CONVERSION_OPTION_DROP_ALPHA;
+    (*options)->background48 = (sail_rgb48_t){ 0, 0, 0 };
+    (*options)->background24 = (sail_rgb24_t){ 0, 0, 0 };
+
+    return SAIL_OK;
 }
 
-class ReadOptions : public QDialog
-{
-    Q_OBJECT
+void sail_destroy_conversion_options(struct sail_conversion_options *options) {
 
-public:
-    explicit ReadOptions(const QString &codecDescription,
-                          const sail::read_features &read_features,
-                          QWidget *parent = nullptr);
-    ~ReadOptions();
+    if (options == NULL) {
+        return;
+    }
 
-    SailPixelFormat pixelFormat() const;
-
-private:
-    sail_status_t init(const sail::read_features &read_features);
-
-private:
-    class Private;
-    const QScopedPointer<Private> d;
-};
-
-#endif // WRITEOPTIONS_H
+    sail_free(options);
+}

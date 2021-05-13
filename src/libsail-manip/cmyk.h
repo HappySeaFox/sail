@@ -1,6 +1,6 @@
 /*  This file is part of SAIL (https://github.com/smoked-herring/sail)
 
-    Copyright (c) 2020 Dmitry Baryshev
+    Copyright (c) 2021 Dmitry Baryshev
 
     The MIT License
 
@@ -23,47 +23,22 @@
     SOFTWARE.
 */
 
-#ifndef QT_SAIL_H
-#define QT_SAIL_H
+#ifndef SAIL_CMYK_H
+#define SAIL_CMYK_H
 
-#include <cstddef>
+#include <stdint.h>
 
-#include <QWidget>
-#include <QScopedPointer>
-#include <QImage>
+#ifdef SAIL_BUILD
+    #include "export.h"
+    #include "pixel.h"
+#else
+    #include <sail-common/export.h>
+    #include <sail-common/pixel.h>
+#endif
 
-#include <sail-common/error.h>
-
-namespace Ui {
-    class QtSail;
-}
-
-class QtSail : public QWidget
-{
-    Q_OBJECT
-
-public:
-    QtSail(QWidget *parent = nullptr);
-    ~QtSail();
-
-private:
-    sail_status_t init();
-    sail_status_t loadImage(const QString &path, QImage *qimage);
-    sail_status_t saveImage(const QImage &qimage, void *buffer, size_t buffer_length,
-                           size_t *written);
-    QStringList filters() const;
-
-private: // slots
-    void onOpenFile();
-    sail_status_t onProbe();
-    void onSave();
-    void onFit(bool fit);
-
-private:
-    QScopedPointer<Ui::QtSail> m_ui;
-
-    QImage m_qimage;
-    QString m_suffix;
-};
+/*
+ * CMYK to RGB conversion. It's known for being not 1:1 exact by design. See https://sourceforge.net/p/libjpeg-turbo/patches/15
+ */
+SAIL_HIDDEN void convert_cmyk32_to_rgba32(uint8_t c, uint8_t m, uint8_t y, uint8_t k, sail_rgba32_t *rgba32);
 
 #endif

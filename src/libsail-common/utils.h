@@ -41,6 +41,10 @@
 
 struct sail_image;
 
+/* Min/max macros. */
+#define SAIL_MIN(a, b) (((a) < (b)) ? (a) : (b))
+#define SAIL_MAX(a, b) (((a) > (b)) ? (a) : (b))
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -184,6 +188,41 @@ SAIL_EXPORT sail_status_t sail_codec_feature_from_string(const char *str, enum S
 SAIL_EXPORT sail_status_t sail_bits_per_pixel(enum SailPixelFormat pixel_format, unsigned *result);
 
 /*
+ * Sets the result to true if the first pixel format occupies less bits than the second one.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_less_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPixelFormat pixel_format2, bool *result);
+
+/*
+ * Sets the result to true if the first pixel format occupies less or the same number of bits than the second one.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_less_equal_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPixelFormat pixel_format2, bool *result);
+
+/*
+ * Sets the result to true if both the pixel formats occupy the same number of bits.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_equal_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPixelFormat pixel_format2, bool *result);
+
+/*
+ * Sets the result to true if the first pixel format occupies more or the same number of bits than the second one.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_greater_equal_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPixelFormat pixel_format2, bool *result);
+
+/*
+ * Sets the result to true if the first pixel format occupies more bits than the second one.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_greater_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPixelFormat pixel_format2, bool *result);
+
+/*
  * Calculates the number of bytes per line needed to hold a scan line without padding.
  *
  * For example:
@@ -205,12 +244,19 @@ SAIL_EXPORT sail_status_t sail_bits_per_pixel(enum SailPixelFormat pixel_format,
 SAIL_EXPORT sail_status_t sail_bytes_per_line(unsigned width, enum SailPixelFormat pixel_format, unsigned *result);
 
 /*
- * Calculates the number of bytes needed to hold an entire image in memory without padding.
- * It is effectively bytes per line * image height.
- *
- * Returns SAIL_OK on success.
+ * Returns true if the given pixel format is indexed and assumes having a palette.
  */
-SAIL_EXPORT sail_status_t sail_bytes_per_image(const struct sail_image *image, unsigned *result);
+SAIL_EXPORT bool sail_is_indexed(enum SailPixelFormat pixel_format);
+
+/*
+ * Returns true if the given pixel format is grayscale, with or without alpha.
+ */
+SAIL_EXPORT bool sail_is_grayscale(enum SailPixelFormat pixel_format);
+
+/*
+ * Returns true if the given pixel format is a kind of RGB, packed or not. E.g. RGBA, BGRA, RGB555 etc.
+ */
+SAIL_EXPORT bool sail_is_rgb_family(enum SailPixelFormat pixel_format);
 
 /*
  * Prints the recent errno value with SAIL_LOG_ERROR(). The specified format must include '%s'.
