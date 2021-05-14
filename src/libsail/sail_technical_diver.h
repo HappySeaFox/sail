@@ -46,10 +46,6 @@ struct sail_write_options;
 /*
  * Starts reading the specified I/O stream.
  *
- * The subsequent calls to sail_read_next_frame() may convert specific pixel formats to be more prepared
- * for displaying. Use SAIL_IO_OPTION_CLOSE_TO_SOURCE to output pixels as close as possible
- * to the source.
- *
  * Typical usage: sail_alloc_io()                  ->
  *                set I/O callbacks                ->
  *                sail_codec_info_from_extension() ->
@@ -69,10 +65,6 @@ SAIL_EXPORT sail_status_t sail_start_reading_io(struct sail_io *io, const struct
 /*
  * Starts reading the specified I/O stream with the specified read options. If you don't need specific read options,
  * just pass NULL. Codec-specific defaults will be used in this case. The read options are deep copied.
- *
- * The subsequent calls to sail_read_next_frame() may convert specific pixel formats to be more prepared
- * for displaying. Use SAIL_IO_OPTION_CLOSE_TO_SOURCE to output pixels as close as possible
- * to the source.
  *
  * Typical usage: sail_alloc_io()                      ->
  *                set I/O callbacks                    ->
