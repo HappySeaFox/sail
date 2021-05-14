@@ -302,7 +302,7 @@ enum SailCodecFeature {
 /* Read or write options. */
 enum SailIoOption {
 
-    /* Instruction to read or write image meta data like JPEG comments. */
+    /* Instruction to read or write simple image meta data like JPEG comments. */
     SAIL_IO_OPTION_META_DATA  = 1 << 0,
 
     /* Instruction to read or write EXIF meta data. */
@@ -313,21 +313,6 @@ enum SailIoOption {
 
     /* Instruction to read or write embedded ICC profile. */
     SAIL_IO_OPTION_ICCP       = 1 << 3,
-
-    /*
-     * Instruction for reading operations to output pixels as close as possible to the source.
-     * Off by default. By default, SAIL outputs pixels close to the source but may convert some
-     * specific pixel formats (like YCbCr) to be more prepared for displaying. For example,
-     * JPEG converts YCbCr pixels to RGB.
-     *
-     * Specify this option if you need to get pixels as close as possible to the source.
-     * For now, SAIL cannot guarantee that codecs output true source pixels with this option.
-     * They may output in a slightly different pixel format which is close to the source,
-     * but not 1:1.
-     *
-     * Specifying this option for writing operations has no effect.
-     */
-    SAIL_IO_OPTION_CLOSE_TO_SOURCE = 1 << 4,
 };
 
 #endif

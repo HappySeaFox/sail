@@ -103,12 +103,10 @@ For example, some codecs may be able to read just 3 input pixel formats. Other m
 
 ## In what pixel format SAIL reading functions output images?
 
-By default, codecs output pixels close to the source but may convert some specific pixel formats (like YCbCr)
-to be more prepared for displaying. For example, JPEG converts YCbCr pixels to RGB. Another good example is when PNG
-always outputs pixels as is just because RGB or Grayscale images already rather good prepared for displaying.
+SAIL always tries to output pixel format close to the source pixel format as much as possible.
+Ideally (but not always), it outputs the same pixel format as stored in the image.
 
-If you want to output pixels as close as possible to the source (for example, get YCbCr pixels from a JPEG),
-use the `SAIL_IO_OPTION_CLOSE_TO_SOURCE` read option.
+For example, SAIL outputs BPP24-BGR images from full-color BMP files without transparency.
 
 You can also consider conversion functions from `libsail-manip`.
 

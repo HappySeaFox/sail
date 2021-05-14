@@ -46,7 +46,7 @@ animated, multi-paged images along with their meta data and ICC profiles. :sailb
 - [x] Versatile APIs: `junior`, `advanced`, `deep diver`, and `technical diver`
 - [x] Input/output: files, memory, custom I/O streams
 - [x] Load by file suffixes, paths, and [magic numbers](https://en.wikipedia.org/wiki/File_format#Magic_number)
-- [x] Output pixels close to the source (see [FAQ](FAQ.md#in-what-pixel-format-sail-reading-functions-output-images))
+- [x] Output pixels as close as possible to the source
 - [x] Meta data support: text comments, EXIF, ICC profiles
 - [x] Access to the image properties w/o decoding pixels (probing)
 - [x] Access to the source image properties
