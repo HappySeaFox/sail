@@ -53,6 +53,7 @@ sail_status_t sail_memdup(const void *input, size_t input_size, void **output) {
     }
 
     if (input_size == 0) {
+        SAIL_LOG_ERROR("Cannot duplicate 0 bytes");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 
@@ -85,6 +86,7 @@ sail_status_t sail_strdup_length(const char *input, size_t length, char **output
     }
 
     if (length == 0) {
+        SAIL_LOG_ERROR("Cannot duplicate 0 characters");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 
@@ -101,6 +103,7 @@ sail_status_t sail_strdup_length(const char *input, size_t length, char **output
 sail_status_t sail_concat(char **output, int num, ...) {
 
     if (num < 1) {
+        SAIL_LOG_ERROR("The second argument of %s() must be >= 1", __func__);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 
@@ -174,11 +177,13 @@ sail_status_t sail_to_wchar(const char *input, wchar_t **output) {
 
     if (mbstowcs_s(&ret, output_local, length+1, input, length) != 0) {
         sail_free(output_local);
+        SAIL_LOG_ERROR("Multibyte conversion failed");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 #else
     if (mbstowcs(output_local, input, length) == (size_t)-1) {
         sail_free(output_local);
+        SAIL_LOG_ERROR("Multibyte conversion failed");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 #endif
@@ -896,6 +901,7 @@ sail_status_t sail_print_errno(const char *format) {
     SAIL_CHECK_STRING_PTR(format);
 
     if (strstr(format, "%s") == NULL) {
+        SAIL_LOG_ERROR("Format argument must contain %%s");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 
@@ -1065,9 +1071,7 @@ bool sail_is_file(const char *path) {
 
 sail_status_t sail_file_size(const char *path, size_t *size) {
 
-    if (path == NULL) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_OPEN_FILE);
-    }
+    SAIL_CHECK_PATH_PTR(path);
 
     bool is_file;
 

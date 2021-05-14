@@ -372,6 +372,7 @@ sail_status_t image::convert(SailPixelFormat pixel_format) {
 sail_status_t image::convert(SailPixelFormat pixel_format, const conversion_options &options) {
 
     if (!is_valid()) {
+        SAIL_LOG_ERROR("Conversion failed as the input image is invalid");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
     }
 

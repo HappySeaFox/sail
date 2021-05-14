@@ -158,6 +158,7 @@ sail_status_t alloc_and_load_codec(const struct sail_codec_info *codec_info, str
         SAIL_RESOLVE(codec_local->v5->write_frame,           handle, sail_codec_write_frame_v5,           codec_info->name);
         SAIL_RESOLVE(codec_local->v5->write_finish,          handle, sail_codec_write_finish_v5,          codec_info->name);
     } else {
+        SAIL_LOG_ERROR("Skipping %s as it has an unsupported codec layout %d (!= %d)", codec_info->path, codec_local->layout, SAIL_CODEC_LAYOUT_V5);
         destroy_codec(codec_local);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_CODEC_LAYOUT);
     }

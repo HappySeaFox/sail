@@ -50,6 +50,7 @@ sail_status_t sail_alloc_meta_data_node(struct sail_meta_data_node **node) {
 sail_status_t sail_alloc_meta_data_node_from_known_string(enum SailMetaData key, const char *value, struct sail_meta_data_node **node) {
 
     if (key == SAIL_META_DATA_UNKNOWN) {
+        SAIL_LOG_ERROR("%s() accepts only known meta data keys", __func__);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 
@@ -102,6 +103,7 @@ sail_status_t sail_alloc_meta_data_node_from_unknown_string(const char *key_unkn
 sail_status_t sail_alloc_meta_data_node_from_known_data(enum SailMetaData key, const void *value, size_t value_length, struct sail_meta_data_node **node) {
 
     if (key == SAIL_META_DATA_UNKNOWN) {
+        SAIL_LOG_ERROR("%s() accepts only known meta data keys", __func__);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 

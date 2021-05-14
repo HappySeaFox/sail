@@ -8,8 +8,6 @@
 
 ## Priority 2
 
-- Print more errors on 'return SAIL_ERROR_XXX'
-
 - initializer lists in C++
 
 ## Priority 3
