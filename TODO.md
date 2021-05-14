@@ -1,7 +1,5 @@
 ## Priority 1
 
-- remove SAIL_CHECK_xxx checks in codecs? Are they needed? libsail does them as well
-
 - gamma in sail_image
 
 - background color in sail_image
