@@ -100,11 +100,6 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
     sail_status_t res;
     struct sail_image *image;
 
-    /*
-     * By default, sail_read_next_frame() may convert specific pixel formats to be more prepared
-     * for displaying. Use SAIL_IO_OPTION_CLOSE_TO_SOURCE to output pixels as close as possible
-     * to the source.
-     */
     while ((res = sail_read_next_frame(state, &image)) == SAIL_OK) {
 
         /* Mutate alpha into a green color. */

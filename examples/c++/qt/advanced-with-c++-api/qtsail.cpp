@@ -79,9 +79,7 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
     //
     SAIL_TRY(reader.start_reading(path.toLocal8Bit().constData()));
 
-    // By default, read_next_frame() may convert specific pixel formats to be more prepared
-    // for displaying. Use SAIL_IO_OPTION_CLOSE_TO_SOURCE to output pixels as close as possible
-    // to the source.
+    // Read all the available image frames in the file.
     //
     sail_status_t res;
     while ((res = reader.read_next_frame(&image)) == SAIL_OK) {

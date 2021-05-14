@@ -230,9 +230,7 @@ sail_destroy_read_options(read_options);
  * reading frames till sail_read_next_frame() returns SAIL_OK. If no more frames are available,
  * it returns SAIL_ERROR_NO_MORE_FRAMES.
  *
- * By default, sail_read_next_frame() may convert specific pixel formats to be more prepared
- * for displaying. Use SAIL_IO_OPTION_CLOSE_TO_SOURCE to output pixels as close as possible
- * to the source.
+ * sail_read_next_frame() outputs pixels in the requested pixel format (BPP32-RGBA by default).
  */
 SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, &image),
                     /* cleanup */ sail_stop_reading(state));
@@ -297,9 +295,7 @@ SAIL_TRY(reader.start_reading(buffer, buffer_length, codec_info, read_options));
 // reading frames till read_next_frame() returns SAIL_OK. If no more frames are available,
 // it returns SAIL_ERROR_NO_MORE_FRAMES.
 //
-// By default, read_next_frame() may convert specific pixel formats to be more prepared
-// for displaying. Use SAIL_IO_OPTION_CLOSE_TO_SOURCE to output pixels as close as possible
-// to the source.
+// read_next_frame() outputs pixels in the requested pixel format (BPP32-RGBA by default).
 //
 sail::image image;
 SAIL_TRY(reader.read_next_frame(&image));
@@ -402,9 +398,7 @@ sail_destroy_read_options(read_options);
  * reading frames till sail_read_next_frame() returns SAIL_OK. If no more frames are available,
  * it returns SAIL_ERROR_NO_MORE_FRAMES.
  *
- * By default, sail_read_next_frame() may convert specific pixel formats to be more prepared
- * for displaying. Use SAIL_IO_OPTION_CLOSE_TO_SOURCE to output pixels as close as possible
- * to the source.
+ * sail_read_next_frame() outputs pixels in the requested pixel format (BPP32-RGBA by default).
  */
 SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, &image),
                     /* cleanup */ sail_stop_reading(state),
@@ -492,9 +486,7 @@ SAIL_TRY(reader.start_reading(io, codec_info, read_options));
 // reading frames till read_next_frame() returns SAIL_OK. If no more frames are available,
 // it returns SAIL_ERROR_NO_MORE_FRAMES.
 //
-// By default, read_next_frame() may convert specific pixel formats to be more prepared
-// for displaying. Use SAIL_IO_OPTION_CLOSE_TO_SOURCE to output pixels as close as possible
-// to the source.
+// read_next_frame() outputs pixels in the requested pixel format (BPP32-RGBA by default).
 //
 sail::image image;
 SAIL_TRY(reader.read_next_frame(&image));

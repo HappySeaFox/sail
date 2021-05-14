@@ -316,14 +316,14 @@ enum SailIoOption {
 
     /*
      * Instruction for reading operations to output pixels as close as possible to the source.
-     * Off by default. By default, SAIL may convert specific pixel formats to be more prepared
-     * for displaying. For example, the SAIL JPEG codec outputs RGB pixels instead of YCbCr.
+     * Off by default. By default, SAIL outputs pixels close to the source but may convert some
+     * specific pixel formats (like YCbCr) to be more prepared for displaying. For example,
+     * JPEG converts YCbCr pixels to RGB.
      *
      * Specify this option if you need to get pixels as close as possible to the source.
-     * For example, to get YCbCr pixels from a JPEG image.
-     *
-     * SAIL doesn't guarantee that codecs output true source pixels even with this option.
-     * They may output in a slightly different pixel format due to implementation peculiarities.
+     * For now, SAIL cannot guarantee that codecs output true source pixels with this option.
+     * They may output in a slightly different pixel format which is close to the source,
+     * but not 1:1.
      *
      * Specifying this option for writing operations has no effect.
      */
