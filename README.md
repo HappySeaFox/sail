@@ -1,8 +1,8 @@
 <h1 align="center">Squirrel Abstract Image Library</h1>
 <h3 align="center">The missing fast and easy-to-use image decoding library for humans (not for machines).</h3>
 <p align="center">
-  <a href="https://travis-ci.org/smoked-herring/sail">
-    <img alt="Travis Build Status" src="https://img.shields.io/travis/smoked-herring/sail/master"/>
+  <a href="https://travis-ci.org/happy-sea-fox/sail">
+    <img alt="Travis Build Status" src="https://img.shields.io/travis/happy-sea-fox/sail/master"/>
   </a>
   <a href="https://scan.coverity.com/projects/smoked-herring-sail">
     <img alt="Coverity Scan Build Status" src="https://img.shields.io/coverity/scan/21306"/>
