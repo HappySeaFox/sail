@@ -73,8 +73,8 @@ public:
     const sail::read_features& read_features() const;
     const sail::write_features& write_features() const;
 
-    static sail_status_t codec_feature_to_string(SailCodecFeature codec_feature, const char **result);
-    static sail_status_t codec_feature_from_string(std::string_view str, SailCodecFeature *result);
+    static const char* codec_feature_to_string(SailCodecFeature codec_feature);
+    static SailCodecFeature codec_feature_from_string(std::string_view str);
 
     /*
      * Finds a first codec info object that supports the magic number read from the specified file.

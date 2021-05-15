@@ -382,20 +382,20 @@ public:
     static SailPixelFormat pixel_format_from_string(std::string_view str);
 
     /*
-     * Assigns a non-NULL string representation of the specified image property. See SailImageProperty.
-     * The assigned string MUST NOT be destroyed. For example: "FLIPPED-VERTICALLY".
+     * Returns a string representation of the specified image property. See SailImageProperty.
+     * For example: "FLIPPED-VERTICALLY" is returned for SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY.
      *
-     * Returns SAIL_OK on success.
+     * Returns NULL if the property is not known.
      */
-    static sail_status_t image_property_to_string(SailImageProperty image_property, const char **result);
+    static const char* image_property_to_string(SailImageProperty image_property);
 
     /*
-     * Assigns image property from a string representation. See SailImageProperty.
-     * For example: SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY is assigned for "FLIPPED-VERTICALLY".
+     * Returns an image property from the string representation. See SailImageProperty.
+     * For example: SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY is returned for "FLIPPED-VERTICALLY".
      *
-     * Returns SAIL_OK on success.
+     * Returns SAIL_IMAGE_PROPERTY_UNKNOWN if the property is not known.
      */
-    static sail_status_t image_property_from_string(std::string_view str, SailImageProperty *result);
+    static SailImageProperty image_property_from_string(std::string_view str);
 
     /*
      * Returns string representation of the specified compression type. See SailCompression.

@@ -630,18 +630,14 @@ SailPixelFormat image::pixel_format_from_string(const std::string_view str)
     return sail_pixel_format_from_string(str.data());
 }
 
-sail_status_t image::image_property_to_string(SailImageProperty image_property, const char **result)
+const char* image::image_property_to_string(SailImageProperty image_property)
 {
-    SAIL_TRY(sail_image_property_to_string(image_property, result));
-
-    return SAIL_OK;
+    return sail_image_property_to_string(image_property);
 }
 
-sail_status_t image::image_property_from_string(const std::string_view str, SailImageProperty *result)
+SailImageProperty image::image_property_from_string(const std::string_view str)
 {
-    SAIL_TRY(sail_image_property_from_string(str.data(), result));
-
-    return SAIL_OK;
+    return sail_image_property_from_string(str.data());
 }
 
 const char* image::compression_to_string(SailCompression compression)

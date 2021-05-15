@@ -153,7 +153,9 @@ static MunitResult test_pixel_format_from_string(const MunitParameter params[], 
     (void)params;
     (void)user_data;
 
+    munit_assert(sail_pixel_format_from_string(NULL)   == SAIL_PIXEL_FORMAT_UNKNOWN);
     munit_assert(sail_pixel_format_from_string("Some") == SAIL_PIXEL_FORMAT_UNKNOWN);
+
     munit_assert(sail_pixel_format_from_string("UNKNOWN") == SAIL_PIXEL_FORMAT_UNKNOWN);
 
     munit_assert(sail_pixel_format_from_string("BPP1") ==   SAIL_PIXEL_FORMAT_BPP1);
@@ -238,16 +240,9 @@ static MunitResult test_image_property_to_string(const MunitParameter params[], 
     (void)params;
     (void)user_data;
 
-    const char *result;
-
-#define TEST_SAIL_CONVERSION(e, s)             \
-    sail_image_property_to_string(e, &result); \
-    munit_assert_string_equal(result, s);
-
-    TEST_SAIL_CONVERSION(SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY, "FLIPPED-VERTICALLY");
-    TEST_SAIL_CONVERSION(SAIL_IMAGE_PROPERTY_INTERLACED,         "INTERLACED");
-
-#undef TEST_SAIL_CONVERSION
+    munit_assert_string_equal(sail_image_property_to_string(SAIL_IMAGE_PROPERTY_UNKNOWN),            "UNKNOWN");
+    munit_assert_string_equal(sail_image_property_to_string(SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY), "FLIPPED-VERTICALLY");
+    munit_assert_string_equal(sail_image_property_to_string(SAIL_IMAGE_PROPERTY_INTERLACED),         "INTERLACED");
 
     return MUNIT_OK;
 }
@@ -256,16 +251,12 @@ static MunitResult test_image_property_from_string(const MunitParameter params[]
     (void)params;
     (void)user_data;
 
-    enum SailImageProperty result;
+    munit_assert(sail_image_property_from_string(NULL)                 == SAIL_IMAGE_PROPERTY_UNKNOWN);
+    munit_assert(sail_image_property_from_string("Some")               == SAIL_IMAGE_PROPERTY_UNKNOWN);
 
-#define TEST_SAIL_CONVERSION(s, e)               \
-    sail_image_property_from_string(s, &result); \
-    munit_assert(result == e);
-
-    TEST_SAIL_CONVERSION("FLIPPED-VERTICALLY", SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY);
-    TEST_SAIL_CONVERSION("INTERLACED",         SAIL_IMAGE_PROPERTY_INTERLACED);
-
-#undef TEST_SAIL_CONVERSION
+    munit_assert(sail_image_property_from_string("UNKNOWN")            == SAIL_IMAGE_PROPERTY_UNKNOWN);
+    munit_assert(sail_image_property_from_string("FLIPPED-VERTICALLY") == SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY);
+    munit_assert(sail_image_property_from_string("INTERLACED")         == SAIL_IMAGE_PROPERTY_INTERLACED);
 
     return MUNIT_OK;
 }
@@ -277,6 +268,7 @@ static MunitResult test_compression_to_string(const MunitParameter params[], voi
     (void)params;
     (void)user_data;
 
+    munit_assert_string_equal(sail_compression_to_string(SAIL_COMPRESSION_UNKNOWN),       "UNKNOWN");
     munit_assert_string_equal(sail_compression_to_string(SAIL_COMPRESSION_UNSUPPORTED),   "UNSUPPORTED");
     munit_assert_string_equal(sail_compression_to_string(SAIL_COMPRESSION_NONE),          "NONE");
     munit_assert_string_equal(sail_compression_to_string(SAIL_COMPRESSION_ADOBE_DEFLATE), "ADOBE-DEFLATE");
@@ -319,6 +311,10 @@ static MunitResult test_compression_from_string(const MunitParameter params[], v
     (void)params;
     (void)user_data;
 
+    munit_assert(sail_compression_from_string(NULL)   == SAIL_COMPRESSION_UNKNOWN);
+    munit_assert(sail_compression_from_string("Some") == SAIL_COMPRESSION_UNKNOWN);
+
+    munit_assert(sail_compression_from_string("UNKNOWN")       == SAIL_COMPRESSION_UNKNOWN);
     munit_assert(sail_compression_from_string("UNSUPPORTED")   == SAIL_COMPRESSION_UNSUPPORTED);
     munit_assert(sail_compression_from_string("NONE")          == SAIL_COMPRESSION_NONE);
     munit_assert(sail_compression_from_string("ADOBE-DEFLATE") == SAIL_COMPRESSION_ADOBE_DEFLATE);
@@ -459,21 +455,14 @@ static MunitResult test_codec_feature_to_string(const MunitParameter params[], v
     (void)params;
     (void)user_data;
 
-    const char *result;
-
-#define TEST_SAIL_CONVERSION(e, s)             \
-    sail_codec_feature_to_string(e, &result); \
-    munit_assert_string_equal(result, s);
-
-    TEST_SAIL_CONVERSION(SAIL_CODEC_FEATURE_STATIC,      "STATIC");
-    TEST_SAIL_CONVERSION(SAIL_CODEC_FEATURE_ANIMATED,    "ANIMATED");
-    TEST_SAIL_CONVERSION(SAIL_CODEC_FEATURE_MULTI_FRAME, "MULTI-FRAME");
-    TEST_SAIL_CONVERSION(SAIL_CODEC_FEATURE_META_DATA,   "META-DATA");
-    TEST_SAIL_CONVERSION(SAIL_CODEC_FEATURE_EXIF,        "EXIF");
-    TEST_SAIL_CONVERSION(SAIL_CODEC_FEATURE_INTERLACED,  "INTERLACED");
-    TEST_SAIL_CONVERSION(SAIL_CODEC_FEATURE_ICCP,        "ICCP");
-
-#undef TEST_SAIL_CONVERSION
+    munit_assert_string_equal(sail_codec_feature_to_string(SAIL_CODEC_FEATURE_UNKNOWN),     "UNKNOWN");
+    munit_assert_string_equal(sail_codec_feature_to_string(SAIL_CODEC_FEATURE_STATIC),      "STATIC");
+    munit_assert_string_equal(sail_codec_feature_to_string(SAIL_CODEC_FEATURE_ANIMATED),    "ANIMATED");
+    munit_assert_string_equal(sail_codec_feature_to_string(SAIL_CODEC_FEATURE_MULTI_FRAME), "MULTI-FRAME");
+    munit_assert_string_equal(sail_codec_feature_to_string(SAIL_CODEC_FEATURE_META_DATA),   "META-DATA");
+    munit_assert_string_equal(sail_codec_feature_to_string(SAIL_CODEC_FEATURE_EXIF),        "EXIF");
+    munit_assert_string_equal(sail_codec_feature_to_string(SAIL_CODEC_FEATURE_INTERLACED),  "INTERLACED");
+    munit_assert_string_equal(sail_codec_feature_to_string(SAIL_CODEC_FEATURE_ICCP),        "ICCP");
 
     return MUNIT_OK;
 }
@@ -482,21 +471,17 @@ static MunitResult test_codec_feature_from_string(const MunitParameter params[],
     (void)params;
     (void)user_data;
 
-    enum SailCodecFeature result;
+    munit_assert(sail_codec_feature_from_string(NULL)   == SAIL_CODEC_FEATURE_UNKNOWN);
+    munit_assert(sail_codec_feature_from_string("Some") == SAIL_CODEC_FEATURE_UNKNOWN);
 
-#define TEST_SAIL_CONVERSION(s, e)               \
-    sail_codec_feature_from_string(s, &result); \
-    munit_assert(result == e);
-
-    TEST_SAIL_CONVERSION("STATIC",      SAIL_CODEC_FEATURE_STATIC);
-    TEST_SAIL_CONVERSION("ANIMATED",    SAIL_CODEC_FEATURE_ANIMATED);
-    TEST_SAIL_CONVERSION("MULTI-FRAME", SAIL_CODEC_FEATURE_MULTI_FRAME);
-    TEST_SAIL_CONVERSION("META-DATA",   SAIL_CODEC_FEATURE_META_DATA);
-    TEST_SAIL_CONVERSION("EXIF",        SAIL_CODEC_FEATURE_EXIF);
-    TEST_SAIL_CONVERSION("INTERLACED",  SAIL_CODEC_FEATURE_INTERLACED);
-    TEST_SAIL_CONVERSION("ICCP",        SAIL_CODEC_FEATURE_ICCP);
-
-#undef TEST_SAIL_CONVERSION
+    munit_assert(sail_codec_feature_from_string("UNKNOWN")     == SAIL_CODEC_FEATURE_UNKNOWN);
+    munit_assert(sail_codec_feature_from_string("STATIC")      == SAIL_CODEC_FEATURE_STATIC);
+    munit_assert(sail_codec_feature_from_string("ANIMATED")    == SAIL_CODEC_FEATURE_ANIMATED);
+    munit_assert(sail_codec_feature_from_string("MULTI-FRAME") == SAIL_CODEC_FEATURE_MULTI_FRAME);
+    munit_assert(sail_codec_feature_from_string("META-DATA")   == SAIL_CODEC_FEATURE_META_DATA);
+    munit_assert(sail_codec_feature_from_string("EXIF")        == SAIL_CODEC_FEATURE_EXIF);
+    munit_assert(sail_codec_feature_from_string("INTERLACED")  == SAIL_CODEC_FEATURE_INTERLACED);
+    munit_assert(sail_codec_feature_from_string("ICCP")        == SAIL_CODEC_FEATURE_ICCP);
 
     return MUNIT_OK;
 }

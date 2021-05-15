@@ -116,20 +116,20 @@ SAIL_EXPORT const char* sail_pixel_format_to_string(enum SailPixelFormat pixel_f
 SAIL_EXPORT enum SailPixelFormat sail_pixel_format_from_string(const char *str);
 
 /*
- * Assigns a non-NULL string representation of the specified image property. See SailImageProperty.
- * The assigned string MUST NOT be destroyed. For example: "FLIPPED-VERTICALLY".
+ * Returns a string representation of the specified image property. See SailImageProperty.
+ * For example: "FLIPPED-VERTICALLY" is returned for SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY.
  *
- * Returns SAIL_OK on success.
+ * Returns NULL if the property is not known.
  */
-SAIL_EXPORT sail_status_t sail_image_property_to_string(enum SailImageProperty image_property, const char **result);
+SAIL_EXPORT const char* sail_image_property_to_string(enum SailImageProperty image_property);
 
 /*
- * Assigns image property from a string representation. See SailImageProperty.
- * For example: SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY is assigned for "FLIPPED-VERTICALLY".
+ * Returns an image property from the string representation. See SailImageProperty.
+ * For example: SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY is returned for "FLIPPED-VERTICALLY".
  *
- * Returns SAIL_OK on success.
+ * Returns SAIL_IMAGE_PROPERTY_UNKNOWN if the property is not known.
  */
-SAIL_EXPORT sail_status_t sail_image_property_from_string(const char *str, enum SailImageProperty *result);
+SAIL_EXPORT enum SailImageProperty sail_image_property_from_string(const char *str);
 
 /*
  * Returns string representation of the specified compression type. See SailCompression.
@@ -164,20 +164,20 @@ SAIL_EXPORT sail_status_t sail_meta_data_to_string(enum SailMetaData meta_data, 
 SAIL_EXPORT sail_status_t sail_meta_data_from_string(const char *str, enum SailMetaData *result);
 
 /*
- * Assigns a non-NULL string representation of the specified codec feature. See SailCodecFeature.
- * The assigned string MUST NOT be destroyed. For example: "STATIC".
+ * Returns a string representation of the specified codec feature. See SailCodecFeature.
+ * For example: "STATIC" is returned for SAIL_CODEC_FEATURE_STATIC.
  *
- * Returns SAIL_OK on success.
+ * Returns NULL if the codec feature is not known.
  */
-SAIL_EXPORT sail_status_t sail_codec_feature_to_string(enum SailCodecFeature codec_feature, const char **result);
+SAIL_EXPORT const char* sail_codec_feature_to_string(enum SailCodecFeature codec_feature);
 
 /*
- * Assigns codec feature from a string representation. See SailCodecFeature.
+ * Returns a codec feature from the string representation. See SailCodecFeature.
  * For example: SAIL_CODEC_FEATURE_STATIC is assigned for "STATIC".
  *
- * Returns SAIL_OK on success.
+ * Returns SAIL_CODEC_FEATURE_UNKNOWN if the codec feature is not known.
  */
-SAIL_EXPORT sail_status_t sail_codec_feature_from_string(const char *str, enum SailCodecFeature *result);
+SAIL_EXPORT enum SailCodecFeature sail_codec_feature_from_string(const char *str);
 
 /*
  * Calculates the number of bits per pixel in the specified pixel format.

@@ -297,8 +297,6 @@ const char* sail_pixel_format_to_string(enum SailPixelFormat pixel_format) {
 
 enum SailPixelFormat sail_pixel_format_from_string(const char *str) {
 
-    SAIL_CHECK_STRING_PTR(str);
-
     uint64_t hash;
     SAIL_TRY_OR_EXECUTE(sail_string_hash(str, &hash),
                         /* cleanup */ return SAIL_PIXEL_FORMAT_UNKNOWN);
@@ -389,36 +387,30 @@ enum SailPixelFormat sail_pixel_format_from_string(const char *str) {
     return SAIL_PIXEL_FORMAT_UNKNOWN;
 }
 
-sail_status_t sail_image_property_to_string(enum SailImageProperty image_property, const char **result) {
-
-    SAIL_CHECK_STRING_PTR(result);
+const char* sail_image_property_to_string(enum SailImageProperty image_property) {
 
     switch (image_property) {
-        case SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY: *result = "FLIPPED-VERTICALLY"; return SAIL_OK;
-        case SAIL_IMAGE_PROPERTY_INTERLACED:         *result = "INTERLACED";         return SAIL_OK;
+        case SAIL_IMAGE_PROPERTY_UNKNOWN:            return "UNKNOWN";
+        case SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY: return "FLIPPED-VERTICALLY";
+        case SAIL_IMAGE_PROPERTY_INTERLACED:         return "INTERLACED";
     }
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_IMAGE_PROPERTY);
+    return NULL;
 }
 
-sail_status_t sail_image_property_from_string(const char *str, enum SailImageProperty *result) {
-
-    SAIL_CHECK_STRING_PTR(str);
-    SAIL_CHECK_RESULT_PTR(result);
-
-    if (strlen(str) == 0) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_EMPTY_STRING);
-    }
+enum SailImageProperty sail_image_property_from_string(const char *str) {
 
     uint64_t hash;
-    SAIL_TRY(sail_string_hash(str, &hash));
+    SAIL_TRY_OR_EXECUTE(sail_string_hash(str, &hash),
+                        /* cleanup */ return SAIL_IMAGE_PROPERTY_UNKNOWN);
 
     switch (hash) {
-        case UINT64_C(17202465669660106453): *result = SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY; return SAIL_OK;
-        case UINT64_C(8244927930303708800):  *result = SAIL_IMAGE_PROPERTY_INTERLACED;         return SAIL_OK;
+        case UINT64_C(229442760833397):      return SAIL_IMAGE_PROPERTY_UNKNOWN;
+        case UINT64_C(17202465669660106453): return SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY;
+        case UINT64_C(8244927930303708800):  return SAIL_IMAGE_PROPERTY_INTERLACED;
     }
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_IMAGE_PROPERTY);
+    return SAIL_IMAGE_PROPERTY_UNKNOWN;
 }
 
 const char* sail_compression_to_string(enum SailCompression compression) {
@@ -465,8 +457,6 @@ const char* sail_compression_to_string(enum SailCompression compression) {
 }
 
 enum SailCompression sail_compression_from_string(const char *str) {
-
-    SAIL_CHECK_STRING_PTR(str);
 
     uint64_t hash;
     SAIL_TRY_OR_EXECUTE(sail_string_hash(str, &hash),
@@ -593,46 +583,40 @@ sail_status_t sail_meta_data_from_string(const char *str, enum SailMetaData *res
     return SAIL_OK;
 }
 
-sail_status_t sail_codec_feature_to_string(enum SailCodecFeature codec_feature, const char **result) {
-
-    SAIL_CHECK_STRING_PTR(result);
+const char* sail_codec_feature_to_string(enum SailCodecFeature codec_feature) {
 
     switch (codec_feature) {
-        case SAIL_CODEC_FEATURE_STATIC:      *result = "STATIC";      return SAIL_OK;
-        case SAIL_CODEC_FEATURE_ANIMATED:    *result = "ANIMATED";    return SAIL_OK;
-        case SAIL_CODEC_FEATURE_MULTI_FRAME: *result = "MULTI-FRAME"; return SAIL_OK;
-        case SAIL_CODEC_FEATURE_META_DATA:   *result = "META-DATA";   return SAIL_OK;
-        case SAIL_CODEC_FEATURE_EXIF:        *result = "EXIF";        return SAIL_OK;
-        case SAIL_CODEC_FEATURE_INTERLACED:  *result = "INTERLACED";  return SAIL_OK;
-        case SAIL_CODEC_FEATURE_ICCP:        *result = "ICCP";        return SAIL_OK;
+        case SAIL_CODEC_FEATURE_UNKNOWN:     return "UNKNOWN";
+        case SAIL_CODEC_FEATURE_STATIC:      return "STATIC";
+        case SAIL_CODEC_FEATURE_ANIMATED:    return "ANIMATED";
+        case SAIL_CODEC_FEATURE_MULTI_FRAME: return "MULTI-FRAME";
+        case SAIL_CODEC_FEATURE_META_DATA:   return "META-DATA";
+        case SAIL_CODEC_FEATURE_EXIF:        return "EXIF";
+        case SAIL_CODEC_FEATURE_INTERLACED:  return "INTERLACED";
+        case SAIL_CODEC_FEATURE_ICCP:        return "ICCP";
     }
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_CODEC_FEATURE);
+    return NULL;
 }
 
-sail_status_t sail_codec_feature_from_string(const char *str, enum SailCodecFeature *result) {
-
-    SAIL_CHECK_STRING_PTR(str);
-    SAIL_CHECK_RESULT_PTR(result);
-
-    if (strlen(str) == 0) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_EMPTY_STRING);
-    }
+enum SailCodecFeature sail_codec_feature_from_string(const char *str) {
 
     uint64_t hash;
-    SAIL_TRY(sail_string_hash(str, &hash));
+    SAIL_TRY_OR_EXECUTE(sail_string_hash(str, &hash),
+                        /* cleanup */ return SAIL_CODEC_FEATURE_UNKNOWN);
 
     switch (hash) {
-        case UINT64_C(6952739426029):        *result = SAIL_CODEC_FEATURE_STATIC;      return SAIL_OK;
-        case UINT64_C(7570758658679240):     *result = SAIL_CODEC_FEATURE_ANIMATED;    return SAIL_OK;
-        case UINT64_C(13834645239598293736): *result = SAIL_CODEC_FEATURE_MULTI_FRAME; return SAIL_OK;
-        case UINT64_C(249851542786072787):   *result = SAIL_CODEC_FEATURE_META_DATA;   return SAIL_OK;
-        case UINT64_C(6384018865):           *result = SAIL_CODEC_FEATURE_EXIF;        return SAIL_OK;
-        case UINT64_C(8244927930303708800):  *result = SAIL_CODEC_FEATURE_INTERLACED;  return SAIL_OK;
-        case UINT64_C(6384139556):           *result = SAIL_CODEC_FEATURE_ICCP;        return SAIL_OK;
+        case UINT64_C(229442760833397):      return SAIL_CODEC_FEATURE_UNKNOWN;
+        case UINT64_C(6952739426029):        return SAIL_CODEC_FEATURE_STATIC;
+        case UINT64_C(7570758658679240):     return SAIL_CODEC_FEATURE_ANIMATED;
+        case UINT64_C(13834645239598293736): return SAIL_CODEC_FEATURE_MULTI_FRAME;
+        case UINT64_C(249851542786072787):   return SAIL_CODEC_FEATURE_META_DATA;
+        case UINT64_C(6384018865):           return SAIL_CODEC_FEATURE_EXIF;
+        case UINT64_C(8244927930303708800):  return SAIL_CODEC_FEATURE_INTERLACED;
+        case UINT64_C(6384139556):           return SAIL_CODEC_FEATURE_ICCP;
     }
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_CODEC_FEATURE);
+    return SAIL_CODEC_FEATURE_UNKNOWN;
 }
 
 sail_status_t sail_bits_per_pixel(enum SailPixelFormat pixel_format, unsigned *result) {

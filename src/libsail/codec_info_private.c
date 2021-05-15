@@ -83,21 +83,17 @@ static sail_status_t parse_serialized_ints(const char *value, int **target, unsi
     return SAIL_OK;
 }
 
-static sail_status_t codec_feature_from_string(const char *str, int *result) {
+static int codec_feature_from_string(const char *str) {
 
-    SAIL_TRY(sail_codec_feature_from_string(str, (enum SailCodecFeature *)result));
-
-    return SAIL_OK;
+    return sail_codec_feature_from_string(str);
 }
 
-static sail_status_t image_property_from_string(const char *str, int *result) {
+static int image_property_from_string(const char *str) {
 
-    SAIL_TRY(sail_image_property_from_string(str, (enum SailImageProperty *)result));
-
-    return SAIL_OK;
+    return sail_image_property_from_string(str);
 }
 
-static sail_status_t parse_flags(const char *value, int *features, sail_status_t (*converter)(const char *str, int *result)) {
+static sail_status_t parse_flags(const char *value, int *features, int (*converter)(const char *str)) {
 
     SAIL_CHECK_PTR(value);
     SAIL_CHECK_PTR(features);
@@ -112,11 +108,7 @@ static sail_status_t parse_flags(const char *value, int *features, sail_status_t
     struct sail_string_node *node = string_node;
 
     while (node != NULL) {
-        int flag;
-        SAIL_TRY_OR_CLEANUP(converter(node->value, &flag),
-                            /* cleanup */ SAIL_LOG_ERROR("Conversion of '%s' failed", node->value),
-                                          destroy_string_node_chain(string_node));
-        *features |= flag;
+        *features |= converter(node->value);
         node = node->next;
     }
 

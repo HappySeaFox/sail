@@ -136,18 +136,14 @@ const write_features& codec_info::write_features() const
     return d->write_features;
 }
 
-sail_status_t codec_info::codec_feature_to_string(SailCodecFeature codec_feature, const char **result)
+const char* codec_info::codec_feature_to_string(SailCodecFeature codec_feature)
 {
-    SAIL_TRY(sail_codec_feature_to_string(codec_feature, result));
-
-    return SAIL_OK;
+    return sail_codec_feature_to_string(codec_feature);
 }
 
-sail_status_t codec_info::codec_feature_from_string(const std::string_view str, SailCodecFeature *result)
+SailCodecFeature codec_info::codec_feature_from_string(const std::string_view str)
 {
-    SAIL_TRY(sail_codec_feature_from_string(str.data(), result));
-
-    return SAIL_OK;
+    return sail_codec_feature_from_string(str.data());
 }
 
 sail_status_t codec_info::from_magic_number(const std::string_view path, codec_info *scodec_info)
