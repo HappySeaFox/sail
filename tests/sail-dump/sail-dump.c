@@ -260,10 +260,9 @@ static sail_status_t read_meta_data(FILE *fptr, struct sail_image *image) {
         uint8_t *value;
         SAIL_TRY(read_hex(fptr, data_length, &value));
 
-        enum SailMetaData meta_data;
-        SAIL_TRY(sail_meta_data_from_string(key, &meta_data));
-
+        enum SailMetaData meta_data = sail_meta_data_from_string(key);
         enum SailMetaDataType value_type;
+
         if (strcmp(type, "STRING") == 0) {
             value_type = SAIL_META_DATA_TYPE_STRING;
         } else if (strcmp(type, "DATA") == 0) {
@@ -292,11 +291,8 @@ static sail_status_t read_meta_data(FILE *fptr, struct sail_image *image) {
         *last_meta_data_node = meta_data_node;
         last_meta_data_node = &meta_data_node->next;
 
-        const char *key_str = NULL;
-        SAIL_TRY(sail_meta_data_to_string(meta_data_node->key, &key_str));
-
         SAIL_LOG_DEBUG("DUMP: Meta data properties: key(%s) key_unknown(%s), type(%s), value_length(%u)",
-                        key_str, meta_data_node->key_unknown, type, meta_data_node->value_length);
+                        sail_meta_data_to_string(meta_data_node->key), meta_data_node->key_unknown, type, meta_data_node->value_length);
     }
 
     return SAIL_OK;
@@ -514,10 +510,7 @@ sail_status_t sail_dump(const struct sail_image *image) {
             meta_data_node = image->meta_data_node;
 
             while (meta_data_node != NULL) {
-                const char *key_str = NULL;
-                SAIL_TRY(sail_meta_data_to_string(meta_data_node->key, &key_str));
-
-                printf("%s\n", key_str);
+                printf("%s\n", sail_meta_data_to_string(meta_data_node->key));
                 printf("%s\n", meta_data_node->key_unknown == NULL ? "noop" : meta_data_node->key_unknown);
 
                 const char *value_type_str = NULL;

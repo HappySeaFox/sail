@@ -67,7 +67,7 @@ static sail_status_t probe(const char *path) {
         if (node->key == SAIL_META_DATA_UNKNOWN) {
             meta_data_str = node->key_unknown;
         } else {
-            SAIL_TRY_OR_SUPPRESS(sail_meta_data_to_string(node->key, &meta_data_str));
+            meta_data_str = sail_meta_data_to_string(node->key);
         }
 
         if (node->value_type == SAIL_META_DATA_TYPE_STRING) {

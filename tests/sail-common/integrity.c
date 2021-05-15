@@ -360,44 +360,35 @@ static MunitResult test_meta_data_to_string(const MunitParameter params[], void 
     (void)params;
     (void)user_data;
 
-    const char *result;
-
-#define TEST_SAIL_CONVERSION(e, s)        \
-    result = NULL;                        \
-    sail_meta_data_to_string(e, &result); \
-    munit_assert_string_equal(result, s);
-
-    TEST_SAIL_CONVERSION(SAIL_META_DATA_UNKNOWN,         "Unknown");
+    munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_UNKNOWN),       "Unknown");
 
     /* Strings. */
-    TEST_SAIL_CONVERSION(SAIL_META_DATA_ARTIST,          "Artist");
-    TEST_SAIL_CONVERSION(SAIL_META_DATA_AUTHOR,          "Author");
-    TEST_SAIL_CONVERSION(SAIL_META_DATA_COMMENT,         "Comment");
-    TEST_SAIL_CONVERSION(SAIL_META_DATA_COMPUTER,        "Computer");
-    TEST_SAIL_CONVERSION(SAIL_META_DATA_COPYRIGHT,       "Copyright");
-    TEST_SAIL_CONVERSION(SAIL_META_DATA_CREATION_TIME,   "Creation Time");
-    TEST_SAIL_CONVERSION(SAIL_META_DATA_DESCRIPTION,     "Description");
-    TEST_SAIL_CONVERSION(SAIL_META_DATA_DISCLAIMER,      "Disclaimer");
-    TEST_SAIL_CONVERSION(SAIL_META_DATA_DOCUMENT,        "Document");
-    TEST_SAIL_CONVERSION(SAIL_META_DATA_HEX_EXIF,        "Hex EXIF");
-    TEST_SAIL_CONVERSION(SAIL_META_DATA_HEX_IPTC,        "Hex IPTC");
-    TEST_SAIL_CONVERSION(SAIL_META_DATA_HEX_XMP,         "Hex XMP");
-    TEST_SAIL_CONVERSION(SAIL_META_DATA_LABEL,           "Label");
-    TEST_SAIL_CONVERSION(SAIL_META_DATA_MAKE,            "Make");
-    TEST_SAIL_CONVERSION(SAIL_META_DATA_MODEL,           "Model");
-    TEST_SAIL_CONVERSION(SAIL_META_DATA_NAME,            "Name");
-    TEST_SAIL_CONVERSION(SAIL_META_DATA_PRINTER,         "Printer");
-    TEST_SAIL_CONVERSION(SAIL_META_DATA_SOFTWARE,        "Software");
-    TEST_SAIL_CONVERSION(SAIL_META_DATA_SOURCE,          "Source");
-    TEST_SAIL_CONVERSION(SAIL_META_DATA_TITLE,           "Title");
-    TEST_SAIL_CONVERSION(SAIL_META_DATA_URL,             "URL");
-    TEST_SAIL_CONVERSION(SAIL_META_DATA_WARNING,         "Warning");
-    TEST_SAIL_CONVERSION(SAIL_META_DATA_XMP,             "XMP");
+    munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_ARTIST),        "Artist");
+    munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_AUTHOR),        "Author");
+    munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_COMMENT),       "Comment");
+    munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_COMPUTER),      "Computer");
+    munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_COPYRIGHT),     "Copyright");
+    munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_CREATION_TIME), "Creation Time");
+    munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_DESCRIPTION),   "Description");
+    munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_DISCLAIMER),    "Disclaimer");
+    munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_DOCUMENT),      "Document");
+    munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_HEX_EXIF),      "Hex EXIF");
+    munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_HEX_IPTC),      "Hex IPTC");
+    munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_HEX_XMP),       "Hex XMP");
+    munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_LABEL),         "Label");
+    munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_MAKE),          "Make");
+    munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_MODEL),         "Model");
+    munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_NAME),          "Name");
+    munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_PRINTER),       "Printer");
+    munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_SOFTWARE),      "Software");
+    munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_SOURCE),        "Source");
+    munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_TITLE),         "Title");
+    munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_URL),           "URL");
+    munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_WARNING),       "Warning");
+    munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_XMP),           "XMP");
 
     /* Binary data. */
-    TEST_SAIL_CONVERSION(SAIL_META_DATA_EXIF,            "EXIF");
-
-#undef TEST_SAIL_CONVERSION
+    munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_EXIF),          "EXIF");
 
     return MUNIT_OK;
 }
@@ -406,44 +397,38 @@ static MunitResult test_meta_data_from_string(const MunitParameter params[], voi
     (void)params;
     (void)user_data;
 
-    enum SailMetaData result;
+    munit_assert(sail_meta_data_from_string(NULL)   == SAIL_META_DATA_UNKNOWN);
+    munit_assert(sail_meta_data_from_string("Some") == SAIL_META_DATA_UNKNOWN);
 
-#define TEST_SAIL_CONVERSION(s, e)          \
-    result = SAIL_META_DATA_UNKNOWN;        \
-    sail_meta_data_from_string(s, &result); \
-    munit_assert(result == e);
-
-    TEST_SAIL_CONVERSION("Unknown",         SAIL_META_DATA_UNKNOWN);
+    munit_assert(sail_meta_data_from_string("Unknown") == SAIL_META_DATA_UNKNOWN);
 
     /* Strings. */
-    TEST_SAIL_CONVERSION("Artist",          SAIL_META_DATA_ARTIST);
-    TEST_SAIL_CONVERSION("Author",          SAIL_META_DATA_AUTHOR);
-    TEST_SAIL_CONVERSION("Comment",         SAIL_META_DATA_COMMENT);
-    TEST_SAIL_CONVERSION("Computer",        SAIL_META_DATA_COMPUTER);
-    TEST_SAIL_CONVERSION("Copyright",       SAIL_META_DATA_COPYRIGHT);
-    TEST_SAIL_CONVERSION("Creation Time",   SAIL_META_DATA_CREATION_TIME);
-    TEST_SAIL_CONVERSION("Description",     SAIL_META_DATA_DESCRIPTION);
-    TEST_SAIL_CONVERSION("Disclaimer",      SAIL_META_DATA_DISCLAIMER);
-    TEST_SAIL_CONVERSION("Document",        SAIL_META_DATA_DOCUMENT);
-    TEST_SAIL_CONVERSION("Hex EXIF",        SAIL_META_DATA_HEX_EXIF);
-    TEST_SAIL_CONVERSION("Hex IPTC",        SAIL_META_DATA_HEX_IPTC);
-    TEST_SAIL_CONVERSION("Hex XMP",         SAIL_META_DATA_HEX_XMP);
-    TEST_SAIL_CONVERSION("Label",           SAIL_META_DATA_LABEL);
-    TEST_SAIL_CONVERSION("Make",            SAIL_META_DATA_MAKE);
-    TEST_SAIL_CONVERSION("Model",           SAIL_META_DATA_MODEL);
-    TEST_SAIL_CONVERSION("Name",            SAIL_META_DATA_NAME);
-    TEST_SAIL_CONVERSION("Printer",         SAIL_META_DATA_PRINTER);
-    TEST_SAIL_CONVERSION("Software",        SAIL_META_DATA_SOFTWARE);
-    TEST_SAIL_CONVERSION("Source",          SAIL_META_DATA_SOURCE);
-    TEST_SAIL_CONVERSION("Title",           SAIL_META_DATA_TITLE);
-    TEST_SAIL_CONVERSION("URL",             SAIL_META_DATA_URL);
-    TEST_SAIL_CONVERSION("Warning",         SAIL_META_DATA_WARNING);
-    TEST_SAIL_CONVERSION("XMP",             SAIL_META_DATA_XMP);
+    munit_assert(sail_meta_data_from_string("Artist")        == SAIL_META_DATA_ARTIST);
+    munit_assert(sail_meta_data_from_string("Author")        == SAIL_META_DATA_AUTHOR);
+    munit_assert(sail_meta_data_from_string("Comment")       == SAIL_META_DATA_COMMENT);
+    munit_assert(sail_meta_data_from_string("Computer")      == SAIL_META_DATA_COMPUTER);
+    munit_assert(sail_meta_data_from_string("Copyright")     == SAIL_META_DATA_COPYRIGHT);
+    munit_assert(sail_meta_data_from_string("Creation Time") == SAIL_META_DATA_CREATION_TIME);
+    munit_assert(sail_meta_data_from_string("Description")   == SAIL_META_DATA_DESCRIPTION);
+    munit_assert(sail_meta_data_from_string("Disclaimer")    == SAIL_META_DATA_DISCLAIMER);
+    munit_assert(sail_meta_data_from_string("Document")      == SAIL_META_DATA_DOCUMENT);
+    munit_assert(sail_meta_data_from_string("Hex EXIF")      == SAIL_META_DATA_HEX_EXIF);
+    munit_assert(sail_meta_data_from_string("Hex IPTC")      == SAIL_META_DATA_HEX_IPTC);
+    munit_assert(sail_meta_data_from_string("Hex XMP")       == SAIL_META_DATA_HEX_XMP);
+    munit_assert(sail_meta_data_from_string("Label")         == SAIL_META_DATA_LABEL);
+    munit_assert(sail_meta_data_from_string("Make")          == SAIL_META_DATA_MAKE);
+    munit_assert(sail_meta_data_from_string("Model")         == SAIL_META_DATA_MODEL);
+    munit_assert(sail_meta_data_from_string("Name")          == SAIL_META_DATA_NAME);
+    munit_assert(sail_meta_data_from_string("Printer")       == SAIL_META_DATA_PRINTER);
+    munit_assert(sail_meta_data_from_string("Software")      == SAIL_META_DATA_SOFTWARE);
+    munit_assert(sail_meta_data_from_string("Source")        == SAIL_META_DATA_SOURCE);
+    munit_assert(sail_meta_data_from_string("Title")         == SAIL_META_DATA_TITLE);
+    munit_assert(sail_meta_data_from_string("URL")           == SAIL_META_DATA_URL);
+    munit_assert(sail_meta_data_from_string("Warning")       == SAIL_META_DATA_WARNING);
+    munit_assert(sail_meta_data_from_string("XMP")           == SAIL_META_DATA_XMP);
 
     /* Binary data. */
-    TEST_SAIL_CONVERSION("EXIF",            SAIL_META_DATA_EXIF);
-
-#undef TEST_SAIL_CONVERSION
+    munit_assert(sail_meta_data_from_string("EXIF")          == SAIL_META_DATA_EXIF);
 
     return MUNIT_OK;
 }

@@ -161,18 +161,14 @@ meta_data& meta_data::with_value(const arbitrary_data &value)
     return *this;
 }
 
-sail_status_t meta_data::meta_data_to_string(enum SailMetaData meta_data, const char **result) {
+const char* meta_data::meta_data_to_string(enum SailMetaData meta_data) {
 
-    SAIL_TRY(sail_meta_data_to_string(meta_data, result));
-
-    return SAIL_OK;
+    return sail_meta_data_to_string(meta_data);
 }
 
-sail_status_t meta_data::meta_data_from_string(const std::string_view str, enum SailMetaData *result) {
+SailMetaData meta_data::meta_data_from_string(const std::string_view str) {
 
-    SAIL_TRY(sail_meta_data_from_string(str.data(), result));
-
-    return SAIL_OK;
+    return sail_meta_data_from_string(str.data());
 }
 
 static inline std::string empty_string_on_nullptr(const char *str) {

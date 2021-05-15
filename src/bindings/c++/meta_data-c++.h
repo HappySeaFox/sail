@@ -105,20 +105,20 @@ public:
     meta_data& with_value(const arbitrary_data &value);
 
     /*
-     * Assigns a non-NULL string representation of the specified meta data key. See SailMetaData.
-     * The assigned string MUST NOT be destroyed. For example: "Author".
+     * Returns a string representation of the specified meta data key. See SailMetaData.
+     * For example: "Author" is returned for SAIL_META_DATA_AUTHOR.
      *
-     * Returns SAIL_OK on success.
+     * Returns NULL if the meta data key is not known.
      */
-    static sail_status_t meta_data_to_string(enum SailMetaData meta_data, const char **result);
+    static const char* meta_data_to_string(SailMetaData meta_data);
 
     /*
-     * Assigns meta data key from a string representation. See SailMetaData.
-     * For example: SAIL_META_DATA_AUTHOR is assigned for "Author".
+     * Returns a meta data key from the string representation. See SailMetaData.
+     * For example: SAIL_META_DATA_AUTHOR is returned for "Author".
      *
-     * Returns SAIL_OK on success.
+     * Returns SAIL_META_DATA_UNKNOWN if the meta data key is not known.
      */
-    static sail_status_t meta_data_from_string(std::string_view str, enum SailMetaData *result);
+    static SailMetaData meta_data_from_string(std::string_view str);
 
 private:
     /*

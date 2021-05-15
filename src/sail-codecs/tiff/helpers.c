@@ -350,8 +350,6 @@ sail_status_t tiff_private_write_meta_data(TIFF *tiff, const struct sail_meta_da
     SAIL_CHECK_PTR(tiff);
 
     while (meta_data_node != NULL) {
-        const char *meta_data_str = NULL;
-
         if (meta_data_node->value_type == SAIL_META_DATA_TYPE_STRING) {
             int tiff_tag = -1;
 
@@ -370,8 +368,7 @@ sail_status_t tiff_private_write_meta_data(TIFF *tiff, const struct sail_meta_da
                 }
 
                 default: {
-                    SAIL_TRY_OR_SUPPRESS(sail_meta_data_to_string(meta_data_node->key, &meta_data_str));
-                    SAIL_LOG_WARNING("TIFF: Ignoring unsupported meta data key '%s'", meta_data_str);
+                    SAIL_LOG_WARNING("TIFF: Ignoring unsupported meta data key '%s'", sail_meta_data_to_string(meta_data_node->key));
                 }
             }
 
@@ -381,8 +378,7 @@ sail_status_t tiff_private_write_meta_data(TIFF *tiff, const struct sail_meta_da
 
             TIFFSetField(tiff, tiff_tag, (char *)meta_data_node->value);
         } else {
-            SAIL_TRY_OR_SUPPRESS(sail_meta_data_to_string(meta_data_node->key, &meta_data_str));
-            SAIL_LOG_WARNING("TIFF: Ignoring unsupported binary key '%s'", meta_data_str);
+            SAIL_LOG_WARNING("TIFF: Ignoring unsupported binary key '%s'", sail_meta_data_to_string(meta_data_node->key));
         }
 
         meta_data_node = meta_data_node->next;
