@@ -170,10 +170,7 @@ static sail_status_t verify_and_construct_rgba_indexes_verbose(enum SailPixelFor
     if (verify_and_construct_rgba_indexes_silent(output_pixel_format, pixel_consumer, r, g, b, a)) {
         return SAIL_OK;
     } else {
-        const char *pixel_format_str = NULL;
-        SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(output_pixel_format, &pixel_format_str));
-        SAIL_LOG_ERROR("Conversion to %s is not supported", pixel_format_str);
-
+        SAIL_LOG_ERROR("Conversion to %s is not supported", sail_pixel_format_to_string(output_pixel_format));
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
     }
 }
@@ -694,10 +691,7 @@ static sail_status_t conversion_impl(
             break;
         }
         default: {
-            const char *pixel_format_str = NULL;
-            SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(image->pixel_format, &pixel_format_str));
-            SAIL_LOG_ERROR("Conversion from %s is not currently supported", pixel_format_str);
-
+            SAIL_LOG_ERROR("Conversion from %s is not currently supported", sail_pixel_format_to_string(image->pixel_format));
             SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
         }
     }
@@ -775,13 +769,8 @@ sail_status_t sail_update_image_with_options(struct sail_image *image,
     SAIL_TRY(sail_greater_equal_bits_per_pixel(image->pixel_format, output_pixel_format, &new_image_fits_into_existing));
 
     if (!new_image_fits_into_existing) {
-        const char *input_pixel_format_str = NULL;
-        SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(image->pixel_format, &input_pixel_format_str));
-        const char *output_pixel_format_str = NULL;
-        SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(image->pixel_format, &output_pixel_format_str));
-
-        SAIL_LOG_ERROR("Updating from %s to %s cannot be done as the output is larger than the input", input_pixel_format_str, output_pixel_format_str);
-
+        SAIL_LOG_ERROR("Updating from %s to %s cannot be done as the output is larger than the input",
+                        sail_pixel_format_to_string(image->pixel_format), sail_pixel_format_to_string(output_pixel_format));
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
     }
 
@@ -983,10 +972,7 @@ sail_status_t sail_convert_image_for_saving_with_options(const struct sail_image
     enum SailPixelFormat best_pixel_format = sail_closest_pixel_format_from_write_features(image->pixel_format, write_features);
 
     if (best_pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN) {
-        const char *pixel_format_str = NULL;
-        SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(image->pixel_format, &pixel_format_str));
-        SAIL_LOG_ERROR("Failed to find the best output format for saving %s image", pixel_format_str);
-
+        SAIL_LOG_ERROR("Failed to find the best output format for saving %s image", sail_pixel_format_to_string(image->pixel_format));
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
     }
 

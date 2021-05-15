@@ -54,9 +54,7 @@ static sail_status_t probe(const char *path) {
     } else {
         printf("Resolution:   : %.1fx%.1f\n", image->resolution->x, image->resolution->y);
     }
-    const char *pixel_format_str;
-    SAIL_TRY(sail_pixel_format_to_string(image->source_image->pixel_format, &pixel_format_str));
-    printf("Color         : %s\n", pixel_format_str);
+    printf("Color         : %s\n", sail_pixel_format_to_string(image->source_image->pixel_format));
     printf("ICC profile   : %s\n", image->iccp == NULL ? "no" : "yes");
     printf("Interlaced    : %s\n", (image->source_image->properties & SAIL_IMAGE_PROPERTY_INTERLACED) ? "yes" : "no");
     printf("Flipped Vert. : %s\n", (image->source_image->properties & SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY) ? "yes" : "no");

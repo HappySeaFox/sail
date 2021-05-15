@@ -149,18 +149,12 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
      */
     SAIL_TRY(sail_stop_reading(state));
 
-    const char *source_pixel_format_str = NULL;
-    const char *pixel_format_str = NULL;
-
-    sail_pixel_format_to_string(source_pixel_format, &source_pixel_format_str);
-    sail_pixel_format_to_string(pixel_format, &pixel_format_str);
-
     m_ui->labelStatus->setText(tr("%1  [%2x%3]  [%4 → %5]")
                                 .arg(QFileInfo(path).fileName())
                                 .arg(width)
                                 .arg(height)
-                                .arg(source_pixel_format_str)
-                                .arg(pixel_format_str)
+                                .arg(sail_pixel_format_to_string(source_pixel_format))
+                                .arg(sail_pixel_format_to_string(pixel_format))
                                 );
 
     return SAIL_OK;
@@ -264,12 +258,6 @@ sail_status_t QtSail::onProbe()
         return res;
     }
 
-    const char *source_pixel_format_str;
-    const char *pixel_format_str;
-
-    SAIL_TRY(sail_pixel_format_to_string(image->source_image->pixel_format, &source_pixel_format_str));
-    SAIL_TRY(sail_pixel_format_to_string(image->pixel_format, &pixel_format_str));
-
     QMessageBox::information(this,
                              tr("File info"),
                              tr("Probed in: %1 ms.\nCodec: %2\nSize: %3x%4\nSource pixel format: %5\nOutput pixel format: %6")
@@ -277,8 +265,8 @@ sail_status_t QtSail::onProbe()
                                 .arg(codec_info->description)
                                 .arg(image->width)
                                 .arg(image->height)
-                                .arg(source_pixel_format_str)
-                                .arg(pixel_format_str)
+                                .arg(sail_pixel_format_to_string(image->source_image->pixel_format))
+                                .arg(sail_pixel_format_to_string(image->pixel_format))
                              );
 
     sail_destroy_image(image);

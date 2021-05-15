@@ -100,20 +100,20 @@ SAIL_EXPORT sail_status_t sail_to_wchar(const char *input, wchar_t **output);
 SAIL_EXPORT sail_status_t sail_string_hash(const char *str, uint64_t *hash);
 
 /*
- * Assigns a non-NULL string representation of the specified pixel format.
- * The assigned string MUST NOT be destroyed. For example: "RGB".
+ * Returns a string representation of the specified pixel format.
+ * For example: "BPP32-RGBA" is returned for SAIL_PIXEL_FORMAT_BPP32_RGBA.
  *
- * Returns SAIL_OK on success.
+ * Returns NULL if the pixel format is not known.
  */
-SAIL_EXPORT sail_status_t sail_pixel_format_to_string(enum SailPixelFormat pixel_format, const char **result);
+SAIL_EXPORT const char* sail_pixel_format_to_string(enum SailPixelFormat pixel_format);
 
 /*
- * Assigns pixel format from a string representation.
- * For example: SAIL_PIXEL_FORMAT_SOURCE is assigned for "SOURCE".
+ * Returns a pixel format from the string representation.
+ * For example: SAIL_PIXEL_FORMAT_BPP32_RGBA is returned for "BPP32-RGBA".
  *
- * Returns SAIL_OK on success.
+ * Returns SAIL_PIXEL_FORMAT_UNKNOWN if the pixel format is not known.
  */
-SAIL_EXPORT sail_status_t sail_pixel_format_from_string(const char *str, enum SailPixelFormat *result);
+SAIL_EXPORT enum SailPixelFormat sail_pixel_format_from_string(const char *str);
 
 /*
  * Assigns a non-NULL string representation of the specified image property. See SailImageProperty.
@@ -132,20 +132,20 @@ SAIL_EXPORT sail_status_t sail_image_property_to_string(enum SailImageProperty i
 SAIL_EXPORT sail_status_t sail_image_property_from_string(const char *str, enum SailImageProperty *result);
 
 /*
- * Assigns a non-NULL string representation of the specified compression type. See SailCompression.
- * The assigned string MUST NOT be destroyed. For example: "RLE".
+ * Returns string representation of the specified compression type. See SailCompression.
+ * For example: "RLE" is returned for SAIL_COMPRESSION_RLE.
  *
- * Returns SAIL_OK on success.
+ * Returns NULL if the compression is not known.
  */
-SAIL_EXPORT sail_status_t sail_compression_to_string(enum SailCompression compression, const char **result);
+SAIL_EXPORT const char* sail_compression_to_string(enum SailCompression compression);
 
 /*
- * Assigns compression from a string representation. See SailCompression.
- * For example: SAIL_COMPRESSION_RLE is assigned for "RLE".
+ * Returns a compression from the string representation. See SailCompression.
+ * For example: SAIL_COMPRESSION_RLE is returned for "RLE".
  *
- * Returns SAIL_OK on success.
+ * Returns SAIL_COMPRESSION_UNKNOWN if the compression is not known.
  */
-SAIL_EXPORT sail_status_t sail_compression_from_string(const char *str, enum SailCompression *result);
+SAIL_EXPORT enum SailCompression sail_compression_from_string(const char *str);
 
 /*
  * Assigns a non-NULL string representation of the specified meta data key. See SailMetaData.

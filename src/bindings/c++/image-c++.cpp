@@ -443,9 +443,7 @@ sail_status_t image::convert(const write_features &wf, const conversion_options 
     SailPixelFormat best_pixel_format = closest_pixel_format(d->pixel_format, wf);
 
     if (best_pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN) {
-        const char *pixel_format_str = NULL;
-        SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(d->pixel_format, &pixel_format_str));
-        SAIL_LOG_ERROR("Failed to find the best output format for saving %s image", pixel_format_str);
+        SAIL_LOG_ERROR("Failed to find the best output format for saving %s image", sail_pixel_format_to_string(d->pixel_format));
 
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
     }
@@ -515,9 +513,7 @@ sail_status_t image::convert_to(const write_features &wf, const conversion_optio
     SailPixelFormat best_pixel_format = closest_pixel_format(d->pixel_format, wf);
 
     if (best_pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN) {
-        const char *pixel_format_str = NULL;
-        SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(d->pixel_format, &pixel_format_str));
-        SAIL_LOG_ERROR("Failed to find the best output format for saving %s image", pixel_format_str);
+        SAIL_LOG_ERROR("Failed to find the best output format for saving %s image", sail_pixel_format_to_string(d->pixel_format));
 
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
     }
@@ -624,18 +620,14 @@ bool image::is_rgb_family(SailPixelFormat pixel_format)
     return sail_is_rgb_family(pixel_format);
 }
 
-sail_status_t image::pixel_format_to_string(SailPixelFormat pixel_format, const char **result)
+const char* image::pixel_format_to_string(SailPixelFormat pixel_format)
 {
-    SAIL_TRY(sail_pixel_format_to_string(pixel_format, result));
-
-    return SAIL_OK;
+    return sail_pixel_format_to_string(pixel_format);
 }
 
-sail_status_t image::pixel_format_from_string(const std::string_view str, SailPixelFormat *result)
+SailPixelFormat image::pixel_format_from_string(const std::string_view str)
 {
-    SAIL_TRY(sail_pixel_format_from_string(str.data(), result));
-
-    return SAIL_OK;
+    return sail_pixel_format_from_string(str.data());
 }
 
 sail_status_t image::image_property_to_string(SailImageProperty image_property, const char **result)
@@ -652,18 +644,14 @@ sail_status_t image::image_property_from_string(const std::string_view str, Sail
     return SAIL_OK;
 }
 
-sail_status_t image::compression_to_string(SailCompression compression, const char **result)
+const char* image::compression_to_string(SailCompression compression)
 {
-    SAIL_TRY(sail_compression_to_string(compression, result));
-
-    return SAIL_OK;
+    return sail_compression_to_string(compression);
 }
 
-sail_status_t image::compression_from_string(const std::string_view str, SailCompression *result)
+SailCompression image::compression_from_string(const std::string_view str)
 {
-    SAIL_TRY(sail_compression_from_string(str.data(), result));
-
-    return SAIL_OK;
+    return sail_compression_from_string(str.data());
 }
 
 image::image(const sail_image *sail_image)

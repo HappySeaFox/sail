@@ -57,9 +57,8 @@ sail_status_t get_palette_rgba32(const struct sail_palette *palette, unsigned in
             break;
         }
         default: {
-            const char *pixel_format_str = NULL;
-            SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(palette->pixel_format, &pixel_format_str));
-            SAIL_LOG_ERROR("Palette pixel format %s is not currently supported", pixel_format_str);
+            SAIL_LOG_ERROR("Palette pixel format %s is not currently supported", sail_pixel_format_to_string(palette->pixel_format));
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
         }
     }
 

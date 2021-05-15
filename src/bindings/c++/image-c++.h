@@ -366,20 +366,20 @@ public:
     static bool is_rgb_family(SailPixelFormat pixel_format);
 
     /*
-     * Assigns a non-NULL string representation of the specified pixel format.
-     * The assigned string MUST NOT be destroyed. For example: "RGB".
+     * Returns a string representation of the specified pixel format.
+     * For example: "BPP32-RGBA" is returned for SAIL_PIXEL_FORMAT_BPP32_RGBA.
      *
-     * Returns SAIL_OK on success.
+     * Returns NULL if the pixel format is not known.
      */
-    static sail_status_t pixel_format_to_string(SailPixelFormat pixel_format, const char **result);
+    static const char* pixel_format_to_string(SailPixelFormat pixel_format);
 
     /*
-     * Assigns pixel format from a string representation.
-     * For example: SAIL_PIXEL_FORMAT_SOURCE is assigned for "SOURCE".
+     * Returns a pixel format from the string representation.
+     * For example: SAIL_PIXEL_FORMAT_BPP32_RGBA is returned for "BPP32-RGBA".
      *
-     * Returns SAIL_OK on success.
+     * Returns SAIL_PIXEL_FORMAT_UNKNOWN if the pixel format is not known.
      */
-    static sail_status_t pixel_format_from_string(std::string_view str, SailPixelFormat *result);
+    static SailPixelFormat pixel_format_from_string(std::string_view str);
 
     /*
      * Assigns a non-NULL string representation of the specified image property. See SailImageProperty.
@@ -398,20 +398,20 @@ public:
     static sail_status_t image_property_from_string(std::string_view str, SailImageProperty *result);
 
     /*
-     * Assigns a non-NULL string representation of the specified compression type. See SailCompression.
-     * The assigned string MUST NOT be destroyed. For example: "RLE".
+     * Returns string representation of the specified compression type. See SailCompression.
+     * For example: "RLE" is returned for SAIL_COMPRESSION_RLE.
      *
-     * Returns SAIL_OK on success.
+     * Returns NULL if the compression is not known.
      */
-    static sail_status_t compression_to_string(SailCompression compression, const char **result);
+    static const char* compression_to_string(SailCompression compression);
 
     /*
-     * Assigns compression from a string representation. See SailCompression.
-     * For example: SAIL_COMPRESSION_RLE is assigned for "RLE".
+     * Returns a compression from the string representation. See SailCompression.
+     * For example: SAIL_COMPRESSION_RLE is returned for "RLE".
      *
-     * Returns SAIL_OK on success.
+     * Returns SAIL_COMPRESSION_UNKNOWN if the compression is not known.
      */
-    static sail_status_t compression_from_string(std::string_view str, SailCompression *result);
+    static SailCompression compression_from_string(std::string_view str);
 
 private:
     /*
