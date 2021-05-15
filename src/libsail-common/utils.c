@@ -200,6 +200,10 @@ sail_status_t sail_string_hash(const char *str, uint64_t *hash) {
 
     const unsigned char *ustr = (const unsigned char *)str;
 
+    if (*ustr == '\0') {
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_EMPTY_STRING);
+    }
+
     *hash = 5381;
     unsigned c;
 
@@ -210,100 +214,92 @@ sail_status_t sail_string_hash(const char *str, uint64_t *hash) {
     return SAIL_OK;
 }
 
-sail_status_t sail_pixel_format_to_string(enum SailPixelFormat pixel_format, const char **result) {
-
-    SAIL_CHECK_STRING_PTR(result);
+const char* sail_pixel_format_to_string(enum SailPixelFormat pixel_format) {
 
     switch (pixel_format) {
-        case SAIL_PIXEL_FORMAT_UNKNOWN:               *result = "UNKNOWN";               return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_UNKNOWN:               return "UNKNOWN";
 
-        case SAIL_PIXEL_FORMAT_BPP1:                  *result = "BPP1";                  return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP2:                  *result = "BPP2";                  return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP4:                  *result = "BPP4";                  return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP8:                  *result = "BPP8";                  return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP16:                 *result = "BPP16";                 return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP24:                 *result = "BPP24";                 return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP32:                 *result = "BPP32";                 return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP48:                 *result = "BPP48";                 return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP64:                 *result = "BPP64";                 return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP72:                 *result = "BPP72";                 return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP96:                 *result = "BPP96";                 return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP128:                *result = "BPP128";                return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP1:                  return "BPP1";
+        case SAIL_PIXEL_FORMAT_BPP2:                  return "BPP2";
+        case SAIL_PIXEL_FORMAT_BPP4:                  return "BPP4";
+        case SAIL_PIXEL_FORMAT_BPP8:                  return "BPP8";
+        case SAIL_PIXEL_FORMAT_BPP16:                 return "BPP16";
+        case SAIL_PIXEL_FORMAT_BPP24:                 return "BPP24";
+        case SAIL_PIXEL_FORMAT_BPP32:                 return "BPP32";
+        case SAIL_PIXEL_FORMAT_BPP48:                 return "BPP48";
+        case SAIL_PIXEL_FORMAT_BPP64:                 return "BPP64";
+        case SAIL_PIXEL_FORMAT_BPP72:                 return "BPP72";
+        case SAIL_PIXEL_FORMAT_BPP96:                 return "BPP96";
+        case SAIL_PIXEL_FORMAT_BPP128:                return "BPP128";
 
-        case SAIL_PIXEL_FORMAT_BPP1_INDEXED:          *result = "BPP1-INDEXED";          return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP2_INDEXED:          *result = "BPP2-INDEXED";          return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP4_INDEXED:          *result = "BPP4-INDEXED";          return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP8_INDEXED:          *result = "BPP8-INDEXED";          return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP16_INDEXED:         *result = "BPP16-INDEXED";         return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP1_INDEXED:          return "BPP1-INDEXED";
+        case SAIL_PIXEL_FORMAT_BPP2_INDEXED:          return "BPP2-INDEXED";
+        case SAIL_PIXEL_FORMAT_BPP4_INDEXED:          return "BPP4-INDEXED";
+        case SAIL_PIXEL_FORMAT_BPP8_INDEXED:          return "BPP8-INDEXED";
+        case SAIL_PIXEL_FORMAT_BPP16_INDEXED:         return "BPP16-INDEXED";
 
-        case SAIL_PIXEL_FORMAT_BPP1_GRAYSCALE:        *result = "BPP1-GRAYSCALE";        return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP2_GRAYSCALE:        *result = "BPP2-GRAYSCALE";        return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE:        *result = "BPP4-GRAYSCALE";        return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE:        *result = "BPP8-GRAYSCALE";        return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE:       *result = "BPP16-GRAYSCALE";       return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP1_GRAYSCALE:        return "BPP1-GRAYSCALE";
+        case SAIL_PIXEL_FORMAT_BPP2_GRAYSCALE:        return "BPP2-GRAYSCALE";
+        case SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE:        return "BPP4-GRAYSCALE";
+        case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE:        return "BPP8-GRAYSCALE";
+        case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE:       return "BPP16-GRAYSCALE";
 
-        case SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE_ALPHA:  *result = "BPP4-GRAYSCALE-ALPHA";  return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE_ALPHA:  *result = "BPP8-GRAYSCALE-ALPHA";  return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA: *result = "BPP16-GRAYSCALE-ALPHA"; return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA: *result = "BPP32-GRAYSCALE-ALPHA"; return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE_ALPHA:  return "BPP4-GRAYSCALE-ALPHA";
+        case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE_ALPHA:  return "BPP8-GRAYSCALE-ALPHA";
+        case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA: return "BPP16-GRAYSCALE-ALPHA";
+        case SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA: return "BPP32-GRAYSCALE-ALPHA";
 
-        case SAIL_PIXEL_FORMAT_BPP16_RGB555:          *result = "BPP16-RGB555";          return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP16_BGR555:          *result = "BPP16-BGR555";          return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP16_RGB565:          *result = "BPP16-RGB565";          return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP16_BGR565:          *result = "BPP16-BGR565";          return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP16_RGB555:          return "BPP16-RGB555";
+        case SAIL_PIXEL_FORMAT_BPP16_BGR555:          return "BPP16-BGR555";
+        case SAIL_PIXEL_FORMAT_BPP16_RGB565:          return "BPP16-RGB565";
+        case SAIL_PIXEL_FORMAT_BPP16_BGR565:          return "BPP16-BGR565";
 
-        case SAIL_PIXEL_FORMAT_BPP24_RGB:             *result = "BPP24-RGB";             return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP24_BGR:             *result = "BPP24-BGR";             return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP24_RGB:             return "BPP24-RGB";
+        case SAIL_PIXEL_FORMAT_BPP24_BGR:             return "BPP24-BGR";
 
-        case SAIL_PIXEL_FORMAT_BPP48_RGB:             *result = "BPP48-RGB";             return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP48_BGR:             *result = "BPP48-BGR";             return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP48_RGB:             return "BPP48-RGB";
+        case SAIL_PIXEL_FORMAT_BPP48_BGR:             return "BPP48-BGR";
 
-        case SAIL_PIXEL_FORMAT_BPP32_RGBX:            *result = "BPP32-RGBX";            return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP32_BGRX:            *result = "BPP32-BGRX";            return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP32_XRGB:            *result = "BPP32-XRGB";            return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP32_XBGR:            *result = "BPP32-XBGR";            return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP32_RGBA:            *result = "BPP32-RGBA";            return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP32_BGRA:            *result = "BPP32-BGRA";            return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP32_ARGB:            *result = "BPP32-ARGB";            return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP32_ABGR:            *result = "BPP32-ABGR";            return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP32_RGBX:            return "BPP32-RGBX";
+        case SAIL_PIXEL_FORMAT_BPP32_BGRX:            return "BPP32-BGRX";
+        case SAIL_PIXEL_FORMAT_BPP32_XRGB:            return "BPP32-XRGB";
+        case SAIL_PIXEL_FORMAT_BPP32_XBGR:            return "BPP32-XBGR";
+        case SAIL_PIXEL_FORMAT_BPP32_RGBA:            return "BPP32-RGBA";
+        case SAIL_PIXEL_FORMAT_BPP32_BGRA:            return "BPP32-BGRA";
+        case SAIL_PIXEL_FORMAT_BPP32_ARGB:            return "BPP32-ARGB";
+        case SAIL_PIXEL_FORMAT_BPP32_ABGR:            return "BPP32-ABGR";
 
-        case SAIL_PIXEL_FORMAT_BPP64_RGBX:            *result = "BPP64-RGBX";            return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP64_BGRX:            *result = "BPP64-BGRX";            return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP64_XRGB:            *result = "BPP64-XRGB";            return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP64_XBGR:            *result = "BPP64-XBGR";            return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP64_RGBA:            *result = "BPP64-RGBA";            return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP64_BGRA:            *result = "BPP64-BGRA";            return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP64_ARGB:            *result = "BPP64-ARGB";            return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP64_ABGR:            *result = "BPP64-ABGR";            return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP64_RGBX:            return "BPP64-RGBX";
+        case SAIL_PIXEL_FORMAT_BPP64_BGRX:            return "BPP64-BGRX";
+        case SAIL_PIXEL_FORMAT_BPP64_XRGB:            return "BPP64-XRGB";
+        case SAIL_PIXEL_FORMAT_BPP64_XBGR:            return "BPP64-XBGR";
+        case SAIL_PIXEL_FORMAT_BPP64_RGBA:            return "BPP64-RGBA";
+        case SAIL_PIXEL_FORMAT_BPP64_BGRA:            return "BPP64-BGRA";
+        case SAIL_PIXEL_FORMAT_BPP64_ARGB:            return "BPP64-ARGB";
+        case SAIL_PIXEL_FORMAT_BPP64_ABGR:            return "BPP64-ABGR";
 
-        case SAIL_PIXEL_FORMAT_BPP32_CMYK:            *result = "BPP32-CMYK";            return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP64_CMYK:            *result = "BPP64-CMYK";            return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP32_CMYK:            return "BPP32-CMYK";
+        case SAIL_PIXEL_FORMAT_BPP64_CMYK:            return "BPP64-CMYK";
 
-        case SAIL_PIXEL_FORMAT_BPP24_YCBCR:           *result = "BPP24-YCBCR";           return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP24_YCBCR:           return "BPP24-YCBCR";
 
-        case SAIL_PIXEL_FORMAT_BPP32_YCCK:            *result = "BPP32-YCCK";            return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP32_YCCK:            return "BPP32-YCCK";
 
-        case SAIL_PIXEL_FORMAT_BPP24_CIE_LAB:         *result = "BPP24-CIE-LAB";         return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP40_CIE_LAB:         *result = "BPP40-CIE-LAB";         return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP24_CIE_LAB:         return "BPP24-CIE-LAB";
+        case SAIL_PIXEL_FORMAT_BPP40_CIE_LAB:         return "BPP40-CIE-LAB";
 
-        case SAIL_PIXEL_FORMAT_BPP24_CIE_LUV:         *result = "BPP24-CIE-LUV";         return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP40_CIE_LUV:         *result = "BPP40-CIE-LUV";         return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP24_CIE_LUV:         return "BPP24-CIE-LUV";
+        case SAIL_PIXEL_FORMAT_BPP40_CIE_LUV:         return "BPP40-CIE-LUV";
     }
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+    return NULL;
 }
 
-sail_status_t sail_pixel_format_from_string(const char *str, enum SailPixelFormat *result) {
-
-    SAIL_CHECK_STRING_PTR(str);
-    SAIL_CHECK_RESULT_PTR(result);
-
-    if (strlen(str) == 0) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_EMPTY_STRING);
-    }
+enum SailPixelFormat sail_pixel_format_from_string(const char *str) {
 
     uint64_t hash;
-    SAIL_TRY(sail_string_hash(str, &hash));
+    SAIL_TRY_OR_EXECUTE(sail_string_hash(str, &hash),
+                        /* cleanup */ return SAIL_PIXEL_FORMAT_UNKNOWN);
 
     /*
      * The switch doesn't look very nice, I know :) However, it's fast and doesn't require
@@ -313,334 +309,306 @@ sail_status_t sail_pixel_format_from_string(const char *str, enum SailPixelForma
      *     2. Use a single ugly looking switch/case.
      */
     switch (hash) {
-        case UINT64_C(229442760833397):      *result = SAIL_PIXEL_FORMAT_UNKNOWN;               return SAIL_OK;
+        case UINT64_C(229442760833397):      return SAIL_PIXEL_FORMAT_UNKNOWN;
 
-        case UINT64_C(6383902552):           *result = SAIL_PIXEL_FORMAT_BPP1;                  return SAIL_OK;
-        case UINT64_C(6383902553):           *result = SAIL_PIXEL_FORMAT_BPP2;                  return SAIL_OK;
-        case UINT64_C(6383902555):           *result = SAIL_PIXEL_FORMAT_BPP4;                  return SAIL_OK;
-        case UINT64_C(6383902559):           *result = SAIL_PIXEL_FORMAT_BPP8;                  return SAIL_OK;
-        case UINT64_C(210668784270):         *result = SAIL_PIXEL_FORMAT_BPP16;                 return SAIL_OK;
-        case UINT64_C(210668784301):         *result = SAIL_PIXEL_FORMAT_BPP24;                 return SAIL_OK;
-        case UINT64_C(210668784332):         *result = SAIL_PIXEL_FORMAT_BPP32;                 return SAIL_OK;
-        case UINT64_C(210668784371):         *result = SAIL_PIXEL_FORMAT_BPP48;                 return SAIL_OK;
-        case UINT64_C(210668784433):         *result = SAIL_PIXEL_FORMAT_BPP64;                 return SAIL_OK;
-        case UINT64_C(210668784464):         *result = SAIL_PIXEL_FORMAT_BPP72;                 return SAIL_OK;
-        case UINT64_C(210668784534):         *result = SAIL_PIXEL_FORMAT_BPP96;                 return SAIL_OK;
-        case UINT64_C(6952069880834):        *result = SAIL_PIXEL_FORMAT_BPP128;                return SAIL_OK;
+        case UINT64_C(6383902552):           return SAIL_PIXEL_FORMAT_BPP1;
+        case UINT64_C(6383902553):           return SAIL_PIXEL_FORMAT_BPP2;
+        case UINT64_C(6383902555):           return SAIL_PIXEL_FORMAT_BPP4;
+        case UINT64_C(6383902559):           return SAIL_PIXEL_FORMAT_BPP8;
+        case UINT64_C(210668784270):         return SAIL_PIXEL_FORMAT_BPP16;
+        case UINT64_C(210668784301):         return SAIL_PIXEL_FORMAT_BPP24;
+        case UINT64_C(210668784332):         return SAIL_PIXEL_FORMAT_BPP32;
+        case UINT64_C(210668784371):         return SAIL_PIXEL_FORMAT_BPP48;
+        case UINT64_C(210668784433):         return SAIL_PIXEL_FORMAT_BPP64;
+        case UINT64_C(210668784464):         return SAIL_PIXEL_FORMAT_BPP72;
+        case UINT64_C(210668784534):         return SAIL_PIXEL_FORMAT_BPP96;
+        case UINT64_C(6952069880834):        return SAIL_PIXEL_FORMAT_BPP128;
 
-        case UINT64_C(13257949335914442470): *result = SAIL_PIXEL_FORMAT_BPP1_INDEXED;          return SAIL_OK;
-        case UINT64_C(13257950742323060711): *result = SAIL_PIXEL_FORMAT_BPP2_INDEXED;          return SAIL_OK;
-        case UINT64_C(13257953555140297193): *result = SAIL_PIXEL_FORMAT_BPP4_INDEXED;          return SAIL_OK;
-        case UINT64_C(13257959180774770157): *result = SAIL_PIXEL_FORMAT_BPP8_INDEXED;          return SAIL_OK;
-        case UINT64_C(13237225848150241308): *result = SAIL_PIXEL_FORMAT_BPP16_INDEXED;         return SAIL_OK;
+        case UINT64_C(13257949335914442470): return SAIL_PIXEL_FORMAT_BPP1_INDEXED;
+        case UINT64_C(13257950742323060711): return SAIL_PIXEL_FORMAT_BPP2_INDEXED;
+        case UINT64_C(13257953555140297193): return SAIL_PIXEL_FORMAT_BPP4_INDEXED;
+        case UINT64_C(13257959180774770157): return SAIL_PIXEL_FORMAT_BPP8_INDEXED;
+        case UINT64_C(13237225848150241308): return SAIL_PIXEL_FORMAT_BPP16_INDEXED;
 
-        case UINT64_C(12552958524517323328): *result = SAIL_PIXEL_FORMAT_BPP1_GRAYSCALE;        return SAIL_OK;
-        case UINT64_C(12554490103502587777): *result = SAIL_PIXEL_FORMAT_BPP2_GRAYSCALE;        return SAIL_OK;
-        case UINT64_C(12557553261473116675): *result = SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE;        return SAIL_OK;
-        case UINT64_C(12563679577414174471): *result = SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE;        return SAIL_OK;
-        case UINT64_C(8431824423011809526):  *result = SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE;       return SAIL_OK;
+        case UINT64_C(12552958524517323328): return SAIL_PIXEL_FORMAT_BPP1_GRAYSCALE;
+        case UINT64_C(12554490103502587777): return SAIL_PIXEL_FORMAT_BPP2_GRAYSCALE;
+        case UINT64_C(12557553261473116675): return SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE;
+        case UINT64_C(12563679577414174471): return SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE;
+        case UINT64_C(8431824423011809526):  return SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE;
 
-        case UINT64_C(9367569596161118198):  *result = SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE_ALPHA;  return SAIL_OK;
-        case UINT64_C(12512997289017890810): *result = SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE_ALPHA;  return SAIL_OK;
-        case UINT64_C(3292614999547101481):  *result = SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA; return SAIL_OK;
-        case UINT64_C(5929884054553197927):  *result = SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA; return SAIL_OK;
+        case UINT64_C(9367569596161118198):  return SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE_ALPHA;
+        case UINT64_C(12512997289017890810): return SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE_ALPHA;
+        case UINT64_C(3292614999547101481):  return SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA;
+        case UINT64_C(5929884054553197927):  return SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA;
 
-        case UINT64_C(13257949683479278997): *result = SAIL_PIXEL_FORMAT_BPP16_RGB555;          return SAIL_OK;
-        case UINT64_C(13257949682853687701): *result = SAIL_PIXEL_FORMAT_BPP16_BGR555;          return SAIL_OK;
-        case UINT64_C(13257949683479279030): *result = SAIL_PIXEL_FORMAT_BPP16_RGB565;          return SAIL_OK;
-        case UINT64_C(13257949682853687734): *result = SAIL_PIXEL_FORMAT_BPP16_BGR565;          return SAIL_OK;
+        case UINT64_C(13257949683479278997): return SAIL_PIXEL_FORMAT_BPP16_RGB555;
+        case UINT64_C(13257949682853687701): return SAIL_PIXEL_FORMAT_BPP16_BGR555;
+        case UINT64_C(13257949683479279030): return SAIL_PIXEL_FORMAT_BPP16_RGB565;
+        case UINT64_C(13257949682853687734): return SAIL_PIXEL_FORMAT_BPP16_BGR565;
 
-        case UINT64_C(249836535348735093):   *result = SAIL_PIXEL_FORMAT_BPP24_RGB;             return SAIL_OK;
-        case UINT64_C(249836535348717685):   *result = SAIL_PIXEL_FORMAT_BPP24_BGR;             return SAIL_OK;
+        case UINT64_C(249836535348735093):   return SAIL_PIXEL_FORMAT_BPP24_RGB;
+        case UINT64_C(249836535348717685):   return SAIL_PIXEL_FORMAT_BPP24_BGR;
 
-        case UINT64_C(249836535431749563):   *result = SAIL_PIXEL_FORMAT_BPP48_RGB;             return SAIL_OK;
-        case UINT64_C(249836535431732155):   *result = SAIL_PIXEL_FORMAT_BPP48_BGR;             return SAIL_OK;
+        case UINT64_C(249836535431749563):   return SAIL_PIXEL_FORMAT_BPP48_RGB;
+        case UINT64_C(249836535431732155):   return SAIL_PIXEL_FORMAT_BPP48_BGR;
 
-        case UINT64_C(8244605667721455340):  *result = SAIL_PIXEL_FORMAT_BPP32_RGBX;            return SAIL_OK;
-        case UINT64_C(8244605667720880876):  *result = SAIL_PIXEL_FORMAT_BPP32_BGRX;            return SAIL_OK;
-        case UINT64_C(8244605667721683084):  *result = SAIL_PIXEL_FORMAT_BPP32_XRGB;            return SAIL_OK;
-        case UINT64_C(8244605667721665676):  *result = SAIL_PIXEL_FORMAT_BPP32_XBGR;            return SAIL_OK;
-        case UINT64_C(8244605667721455317):  *result = SAIL_PIXEL_FORMAT_BPP32_RGBA;            return SAIL_OK;
-        case UINT64_C(8244605667720880853):  *result = SAIL_PIXEL_FORMAT_BPP32_BGRA;            return SAIL_OK;
-        case UINT64_C(8244605667720856533):  *result = SAIL_PIXEL_FORMAT_BPP32_ARGB;            return SAIL_OK;
-        case UINT64_C(8244605667720839125):  *result = SAIL_PIXEL_FORMAT_BPP32_ABGR;            return SAIL_OK;
+        case UINT64_C(8244605667721455340):  return SAIL_PIXEL_FORMAT_BPP32_RGBX;
+        case UINT64_C(8244605667720880876):  return SAIL_PIXEL_FORMAT_BPP32_BGRX;
+        case UINT64_C(8244605667721683084):  return SAIL_PIXEL_FORMAT_BPP32_XRGB;
+        case UINT64_C(8244605667721665676):  return SAIL_PIXEL_FORMAT_BPP32_XBGR;
+        case UINT64_C(8244605667721455317):  return SAIL_PIXEL_FORMAT_BPP32_RGBA;
+        case UINT64_C(8244605667720880853):  return SAIL_PIXEL_FORMAT_BPP32_BGRA;
+        case UINT64_C(8244605667720856533):  return SAIL_PIXEL_FORMAT_BPP32_ARGB;
+        case UINT64_C(8244605667720839125):  return SAIL_PIXEL_FORMAT_BPP32_ABGR;
 
-        case UINT64_C(8244605671674130033):  *result = SAIL_PIXEL_FORMAT_BPP64_RGBX;            return SAIL_OK;
-        case UINT64_C(8244605671673555569):  *result = SAIL_PIXEL_FORMAT_BPP64_BGRX;            return SAIL_OK;
-        case UINT64_C(8244605671674357777):  *result = SAIL_PIXEL_FORMAT_BPP64_XRGB;            return SAIL_OK;
-        case UINT64_C(8244605671674340369):  *result = SAIL_PIXEL_FORMAT_BPP64_XBGR;            return SAIL_OK;
-        case UINT64_C(8244605671674130010):  *result = SAIL_PIXEL_FORMAT_BPP64_RGBA;            return SAIL_OK;
-        case UINT64_C(8244605671673555546):  *result = SAIL_PIXEL_FORMAT_BPP64_BGRA;            return SAIL_OK;
-        case UINT64_C(8244605671673531226):  *result = SAIL_PIXEL_FORMAT_BPP64_ARGB;            return SAIL_OK;
-        case UINT64_C(8244605671673513818):  *result = SAIL_PIXEL_FORMAT_BPP64_ABGR;            return SAIL_OK;
+        case UINT64_C(8244605671674130033):  return SAIL_PIXEL_FORMAT_BPP64_RGBX;
+        case UINT64_C(8244605671673555569):  return SAIL_PIXEL_FORMAT_BPP64_BGRX;
+        case UINT64_C(8244605671674357777):  return SAIL_PIXEL_FORMAT_BPP64_XRGB;
+        case UINT64_C(8244605671674340369):  return SAIL_PIXEL_FORMAT_BPP64_XBGR;
+        case UINT64_C(8244605671674130010):  return SAIL_PIXEL_FORMAT_BPP64_RGBA;
+        case UINT64_C(8244605671673555546):  return SAIL_PIXEL_FORMAT_BPP64_BGRA;
+        case UINT64_C(8244605671673531226):  return SAIL_PIXEL_FORMAT_BPP64_ARGB;
+        case UINT64_C(8244605671673513818):  return SAIL_PIXEL_FORMAT_BPP64_ABGR;
 
-        case UINT64_C(8244605667720923565):  *result = SAIL_PIXEL_FORMAT_BPP32_CMYK;            return SAIL_OK;
-        case UINT64_C(8244605671673598258):  *result = SAIL_PIXEL_FORMAT_BPP64_CMYK;            return SAIL_OK;
+        case UINT64_C(8244605667720923565):  return SAIL_PIXEL_FORMAT_BPP32_CMYK;
+        case UINT64_C(8244605671673598258):  return SAIL_PIXEL_FORMAT_BPP64_CMYK;
 
-        case UINT64_C(13817569962846953645): *result = SAIL_PIXEL_FORMAT_BPP24_YCBCR;           return SAIL_OK;
+        case UINT64_C(13817569962846953645): return SAIL_PIXEL_FORMAT_BPP24_YCBCR;
 
-        case UINT64_C(8244605667721702563):  *result = SAIL_PIXEL_FORMAT_BPP32_YCCK;            return SAIL_OK;
+        case UINT64_C(8244605667721702563):  return SAIL_PIXEL_FORMAT_BPP32_YCCK;
 
-        case UINT64_C(13237269438873232231): *result = SAIL_PIXEL_FORMAT_BPP24_CIE_LAB;         return SAIL_OK;
-        case UINT64_C(13237356636207563173): *result = SAIL_PIXEL_FORMAT_BPP40_CIE_LAB;         return SAIL_OK;
+        case UINT64_C(13237269438873232231): return SAIL_PIXEL_FORMAT_BPP24_CIE_LAB;
+        case UINT64_C(13237356636207563173): return SAIL_PIXEL_FORMAT_BPP40_CIE_LAB;
 
-        case UINT64_C(13237269438873232911): *result = SAIL_PIXEL_FORMAT_BPP24_CIE_LUV;         return SAIL_OK;
-        case UINT64_C(13237356636207563853): *result = SAIL_PIXEL_FORMAT_BPP40_CIE_LUV;         return SAIL_OK;
+        case UINT64_C(13237269438873232911): return SAIL_PIXEL_FORMAT_BPP24_CIE_LUV;
+        case UINT64_C(13237356636207563853): return SAIL_PIXEL_FORMAT_BPP40_CIE_LUV;
     }
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+    return SAIL_PIXEL_FORMAT_UNKNOWN;
 }
 
-sail_status_t sail_image_property_to_string(enum SailImageProperty image_property, const char **result) {
-
-    SAIL_CHECK_STRING_PTR(result);
+const char* sail_image_property_to_string(enum SailImageProperty image_property) {
 
     switch (image_property) {
-        case SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY: *result = "FLIPPED-VERTICALLY"; return SAIL_OK;
-        case SAIL_IMAGE_PROPERTY_INTERLACED:         *result = "INTERLACED";         return SAIL_OK;
+        case SAIL_IMAGE_PROPERTY_UNKNOWN:            return "UNKNOWN";
+        case SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY: return "FLIPPED-VERTICALLY";
+        case SAIL_IMAGE_PROPERTY_INTERLACED:         return "INTERLACED";
     }
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_IMAGE_PROPERTY);
+    return NULL;
 }
 
-sail_status_t sail_image_property_from_string(const char *str, enum SailImageProperty *result) {
-
-    SAIL_CHECK_STRING_PTR(str);
-    SAIL_CHECK_RESULT_PTR(result);
-
-    if (strlen(str) == 0) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_EMPTY_STRING);
-    }
+enum SailImageProperty sail_image_property_from_string(const char *str) {
 
     uint64_t hash;
-    SAIL_TRY(sail_string_hash(str, &hash));
+    SAIL_TRY_OR_EXECUTE(sail_string_hash(str, &hash),
+                        /* cleanup */ return SAIL_IMAGE_PROPERTY_UNKNOWN);
 
     switch (hash) {
-        case UINT64_C(17202465669660106453): *result = SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY; return SAIL_OK;
-        case UINT64_C(8244927930303708800):  *result = SAIL_IMAGE_PROPERTY_INTERLACED;         return SAIL_OK;
+        case UINT64_C(229442760833397):      return SAIL_IMAGE_PROPERTY_UNKNOWN;
+        case UINT64_C(17202465669660106453): return SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY;
+        case UINT64_C(8244927930303708800):  return SAIL_IMAGE_PROPERTY_INTERLACED;
     }
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_IMAGE_PROPERTY);
+    return SAIL_IMAGE_PROPERTY_UNKNOWN;
 }
 
-sail_status_t sail_compression_to_string(enum SailCompression compression, const char **result) {
-
-    SAIL_CHECK_STRING_PTR(result);
+const char* sail_compression_to_string(enum SailCompression compression) {
 
     switch (compression) {
-        case SAIL_COMPRESSION_UNSUPPORTED:   *result = "UNSUPPORTED";   return SAIL_OK;
-        case SAIL_COMPRESSION_UNKNOWN:       *result = "UNKNOWN";       return SAIL_OK;
-        case SAIL_COMPRESSION_NONE:          *result = "NONE";          return SAIL_OK;
-        case SAIL_COMPRESSION_ADOBE_DEFLATE: *result = "ADOBE-DEFLATE"; return SAIL_OK;
-        case SAIL_COMPRESSION_CCITT_FAX3:    *result = "CCITT-FAX3";    return SAIL_OK;
-        case SAIL_COMPRESSION_CCITT_FAX4:    *result = "CCITT-FAX4";    return SAIL_OK;
-        case SAIL_COMPRESSION_CCITT_RLE:     *result = "CCITT-RLE";     return SAIL_OK;
-        case SAIL_COMPRESSION_CCITT_RLEW:    *result = "CCITT-RLEW";    return SAIL_OK;
-        case SAIL_COMPRESSION_CCITT_T4:      *result = "CCITT-T4";      return SAIL_OK;
-        case SAIL_COMPRESSION_CCITT_T6:      *result = "CCITT-T6";      return SAIL_OK;
-        case SAIL_COMPRESSION_DCS:           *result = "DCS";           return SAIL_OK;
-        case SAIL_COMPRESSION_DEFLATE:       *result = "DEFLATE";       return SAIL_OK;
-        case SAIL_COMPRESSION_IT8_BL:        *result = "IT8-BL";        return SAIL_OK;
-        case SAIL_COMPRESSION_IT8_CTPAD:     *result = "IT8-CTPAD";     return SAIL_OK;
-        case SAIL_COMPRESSION_IT8_LW:        *result = "IT8-LW";        return SAIL_OK;
-        case SAIL_COMPRESSION_IT8_MP:        *result = "IT8-MP";        return SAIL_OK;
-        case SAIL_COMPRESSION_JBIG:          *result = "JBIG";          return SAIL_OK;
-        case SAIL_COMPRESSION_JPEG:          *result = "JPEG";          return SAIL_OK;
-        case SAIL_COMPRESSION_JPEG2000:      *result = "JPEG2000";      return SAIL_OK;
-        case SAIL_COMPRESSION_LERC:          *result = "LERC";          return SAIL_OK;
-        case SAIL_COMPRESSION_LZMA:          *result = "LZMA";          return SAIL_OK;
-        case SAIL_COMPRESSION_LZW:           *result = "LZW";           return SAIL_OK;
-        case SAIL_COMPRESSION_NEXT:          *result = "NEXT";          return SAIL_OK;
-        case SAIL_COMPRESSION_OJPEG:         *result = "OJPEG";         return SAIL_OK;
-        case SAIL_COMPRESSION_PACKBITS:      *result = "PACKBITS";      return SAIL_OK;
-        case SAIL_COMPRESSION_PIXAR_FILM:    *result = "PIXAR-FILM";    return SAIL_OK;
-        case SAIL_COMPRESSION_PIXAR_LOG:     *result = "PIXAR-LOG";     return SAIL_OK;
-        case SAIL_COMPRESSION_RLE:           *result = "RLE";           return SAIL_OK;
-        case SAIL_COMPRESSION_SGI_LOG:       *result = "SGI-LOG";       return SAIL_OK;
-        case SAIL_COMPRESSION_SGI_LOG24:     *result = "SGI-LOG24";     return SAIL_OK;
-        case SAIL_COMPRESSION_T43:           *result = "T43";           return SAIL_OK;
-        case SAIL_COMPRESSION_T85:           *result = "T85";           return SAIL_OK;
-        case SAIL_COMPRESSION_THUNDERSCAN:   *result = "THUNDERSCAN";   return SAIL_OK;
-        case SAIL_COMPRESSION_WEBP:          *result = "WEBP";          return SAIL_OK;
-        case SAIL_COMPRESSION_ZSTD:          *result = "ZSTD";          return SAIL_OK;
+        case SAIL_COMPRESSION_UNSUPPORTED:   return "UNSUPPORTED";
+        case SAIL_COMPRESSION_UNKNOWN:       return "UNKNOWN";
+        case SAIL_COMPRESSION_NONE:          return "NONE";
+        case SAIL_COMPRESSION_ADOBE_DEFLATE: return "ADOBE-DEFLATE";
+        case SAIL_COMPRESSION_CCITT_FAX3:    return "CCITT-FAX3";
+        case SAIL_COMPRESSION_CCITT_FAX4:    return "CCITT-FAX4";
+        case SAIL_COMPRESSION_CCITT_RLE:     return "CCITT-RLE";
+        case SAIL_COMPRESSION_CCITT_RLEW:    return "CCITT-RLEW";
+        case SAIL_COMPRESSION_CCITT_T4:      return "CCITT-T4";
+        case SAIL_COMPRESSION_CCITT_T6:      return "CCITT-T6";
+        case SAIL_COMPRESSION_DCS:           return "DCS";
+        case SAIL_COMPRESSION_DEFLATE:       return "DEFLATE";
+        case SAIL_COMPRESSION_IT8_BL:        return "IT8-BL";
+        case SAIL_COMPRESSION_IT8_CTPAD:     return "IT8-CTPAD";
+        case SAIL_COMPRESSION_IT8_LW:        return "IT8-LW";
+        case SAIL_COMPRESSION_IT8_MP:        return "IT8-MP";
+        case SAIL_COMPRESSION_JBIG:          return "JBIG";
+        case SAIL_COMPRESSION_JPEG:          return "JPEG";
+        case SAIL_COMPRESSION_JPEG2000:      return "JPEG2000";
+        case SAIL_COMPRESSION_LERC:          return "LERC";
+        case SAIL_COMPRESSION_LZMA:          return "LZMA";
+        case SAIL_COMPRESSION_LZW:           return "LZW";
+        case SAIL_COMPRESSION_NEXT:          return "NEXT";
+        case SAIL_COMPRESSION_OJPEG:         return "OJPEG";
+        case SAIL_COMPRESSION_PACKBITS:      return "PACKBITS";
+        case SAIL_COMPRESSION_PIXAR_FILM:    return "PIXAR-FILM";
+        case SAIL_COMPRESSION_PIXAR_LOG:     return "PIXAR-LOG";
+        case SAIL_COMPRESSION_RLE:           return "RLE";
+        case SAIL_COMPRESSION_SGI_LOG:       return "SGI-LOG";
+        case SAIL_COMPRESSION_SGI_LOG24:     return "SGI-LOG24";
+        case SAIL_COMPRESSION_T43:           return "T43";
+        case SAIL_COMPRESSION_T85:           return "T85";
+        case SAIL_COMPRESSION_THUNDERSCAN:   return "THUNDERSCAN";
+        case SAIL_COMPRESSION_WEBP:          return "WEBP";
+        case SAIL_COMPRESSION_ZSTD:          return "ZSTD";
     }
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_COMPRESSION);
+    return NULL;
 }
 
-sail_status_t sail_compression_from_string(const char *str, enum SailCompression *result) {
-
-    SAIL_CHECK_STRING_PTR(str);
-    SAIL_CHECK_RESULT_PTR(result);
-
-    if (strlen(str) == 0) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_EMPTY_STRING);
-    }
+enum SailCompression sail_compression_from_string(const char *str) {
 
     uint64_t hash;
-    SAIL_TRY(sail_string_hash(str, &hash));
+    SAIL_TRY_OR_EXECUTE(sail_string_hash(str, &hash),
+                        /* cleanup */ return SAIL_COMPRESSION_UNKNOWN);
 
     switch (hash) {
-        case UINT64_C(13846582888989074574): *result = SAIL_COMPRESSION_UNSUPPORTED;   return SAIL_OK;
-        case UINT64_C(229442760833397):      *result = SAIL_COMPRESSION_UNKNOWN;       return SAIL_OK;
-        case UINT64_C(6384332661):           *result = SAIL_COMPRESSION_NONE;          return SAIL_OK;
-        case UINT64_C(10962109560604417378): *result = SAIL_COMPRESSION_ADOBE_DEFLATE; return SAIL_OK;
-        case UINT64_C(8244633541513328571):  *result = SAIL_COMPRESSION_CCITT_FAX3;    return SAIL_OK;
-        case UINT64_C(8244633541513328572):  *result = SAIL_COMPRESSION_CCITT_FAX4;    return SAIL_OK;
-        case UINT64_C(249837380045871852):   *result = SAIL_COMPRESSION_CCITT_RLE;     return SAIL_OK;
-        case UINT64_C(8244633541513771203):  *result = SAIL_COMPRESSION_CCITT_RLEW;    return SAIL_OK;
-        case UINT64_C(7570829698359793):     *result = SAIL_COMPRESSION_CCITT_T4;      return SAIL_OK;
-        case UINT64_C(7570829698359795):     *result = SAIL_COMPRESSION_CCITT_T6;      return SAIL_OK;
-        case UINT64_C(193453343):            *result = SAIL_COMPRESSION_DCS;           return SAIL_OK;
-        case UINT64_C(229420447642554):      *result = SAIL_COMPRESSION_DEFLATE;       return SAIL_OK;
-        case UINT64_C(6952347705973):        *result = SAIL_COMPRESSION_IT8_BL;        return SAIL_OK;
-        case UINT64_C(249846519511114451):   *result = SAIL_COMPRESSION_IT8_CTPAD;     return SAIL_OK;
-        case UINT64_C(6952347706314):        *result = SAIL_COMPRESSION_IT8_LW;        return SAIL_OK;
-        case UINT64_C(6952347706340):        *result = SAIL_COMPRESSION_IT8_MP;        return SAIL_OK;
-        case UINT64_C(6384174593):           *result = SAIL_COMPRESSION_JBIG;          return SAIL_OK;
-        case UINT64_C(6384189707):           *result = SAIL_COMPRESSION_JPEG;          return SAIL_OK;
-        case UINT64_C(7571144643365901):     *result = SAIL_COMPRESSION_JPEG2000;      return SAIL_OK;
-        case UINT64_C(6384250027):           *result = SAIL_COMPRESSION_LERC;          return SAIL_OK;
-        case UINT64_C(6384272729):           *result = SAIL_COMPRESSION_LZMA;          return SAIL_OK;
-        case UINT64_C(193462818):            *result = SAIL_COMPRESSION_LZW;           return SAIL_OK;
-        case UINT64_C(6384322116):           *result = SAIL_COMPRESSION_NEXT;          return SAIL_OK;
-        case UINT64_C(210683986298):         *result = SAIL_COMPRESSION_OJPEG;         return SAIL_OK;
-        case UINT64_C(7571380909080566):     *result = SAIL_COMPRESSION_PACKBITS;      return SAIL_OK;
-        case UINT64_C(8245245943922754206):  *result = SAIL_COMPRESSION_PIXAR_FILM;    return SAIL_OK;
-        case UINT64_C(249855937694635640):   *result = SAIL_COMPRESSION_PIXAR_LOG;     return SAIL_OK;
-        case UINT64_C(193468872):            *result = SAIL_COMPRESSION_RLE;           return SAIL_OK;
-        case UINT64_C(229439900388407):      *result = SAIL_COMPRESSION_SGI_LOG;       return SAIL_OK;
-        case UINT64_C(249860051522976925):   *result = SAIL_COMPRESSION_SGI_LOG24;     return SAIL_OK;
-        case UINT64_C(193470240):            *result = SAIL_COMPRESSION_T43;           return SAIL_OK;
-        case UINT64_C(193470374):            *result = SAIL_COMPRESSION_T85;           return SAIL_OK;
-        case UINT64_C(13844775339661004164): *result = SAIL_COMPRESSION_THUNDERSCAN;   return SAIL_OK;
-        case UINT64_C(6384644819):           *result = SAIL_COMPRESSION_WEBP;          return SAIL_OK;
-        case UINT64_C(6384768458):           *result = SAIL_COMPRESSION_ZSTD;          return SAIL_OK;
+        case UINT64_C(13846582888989074574): return SAIL_COMPRESSION_UNSUPPORTED;
+        case UINT64_C(229442760833397):      return SAIL_COMPRESSION_UNKNOWN;
+        case UINT64_C(6384332661):           return SAIL_COMPRESSION_NONE;
+        case UINT64_C(10962109560604417378): return SAIL_COMPRESSION_ADOBE_DEFLATE;
+        case UINT64_C(8244633541513328571):  return SAIL_COMPRESSION_CCITT_FAX3;
+        case UINT64_C(8244633541513328572):  return SAIL_COMPRESSION_CCITT_FAX4;
+        case UINT64_C(249837380045871852):   return SAIL_COMPRESSION_CCITT_RLE;
+        case UINT64_C(8244633541513771203):  return SAIL_COMPRESSION_CCITT_RLEW;
+        case UINT64_C(7570829698359793):     return SAIL_COMPRESSION_CCITT_T4;
+        case UINT64_C(7570829698359795):     return SAIL_COMPRESSION_CCITT_T6;
+        case UINT64_C(193453343):            return SAIL_COMPRESSION_DCS;
+        case UINT64_C(229420447642554):      return SAIL_COMPRESSION_DEFLATE;
+        case UINT64_C(6952347705973):        return SAIL_COMPRESSION_IT8_BL;
+        case UINT64_C(249846519511114451):   return SAIL_COMPRESSION_IT8_CTPAD;
+        case UINT64_C(6952347706314):        return SAIL_COMPRESSION_IT8_LW;
+        case UINT64_C(6952347706340):        return SAIL_COMPRESSION_IT8_MP;
+        case UINT64_C(6384174593):           return SAIL_COMPRESSION_JBIG;
+        case UINT64_C(6384189707):           return SAIL_COMPRESSION_JPEG;
+        case UINT64_C(7571144643365901):     return SAIL_COMPRESSION_JPEG2000;
+        case UINT64_C(6384250027):           return SAIL_COMPRESSION_LERC;
+        case UINT64_C(6384272729):           return SAIL_COMPRESSION_LZMA;
+        case UINT64_C(193462818):            return SAIL_COMPRESSION_LZW;
+        case UINT64_C(6384322116):           return SAIL_COMPRESSION_NEXT;
+        case UINT64_C(210683986298):         return SAIL_COMPRESSION_OJPEG;
+        case UINT64_C(7571380909080566):     return SAIL_COMPRESSION_PACKBITS;
+        case UINT64_C(8245245943922754206):  return SAIL_COMPRESSION_PIXAR_FILM;
+        case UINT64_C(249855937694635640):   return SAIL_COMPRESSION_PIXAR_LOG;
+        case UINT64_C(193468872):            return SAIL_COMPRESSION_RLE;
+        case UINT64_C(229439900388407):      return SAIL_COMPRESSION_SGI_LOG;
+        case UINT64_C(249860051522976925):   return SAIL_COMPRESSION_SGI_LOG24;
+        case UINT64_C(193470240):            return SAIL_COMPRESSION_T43;
+        case UINT64_C(193470374):            return SAIL_COMPRESSION_T85;
+        case UINT64_C(13844775339661004164): return SAIL_COMPRESSION_THUNDERSCAN;
+        case UINT64_C(6384644819):           return SAIL_COMPRESSION_WEBP;
+        case UINT64_C(6384768458):           return SAIL_COMPRESSION_ZSTD;
     }
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_COMPRESSION);
+    return SAIL_COMPRESSION_UNKNOWN;
 }
 
-sail_status_t sail_meta_data_to_string(enum SailMetaData meta_data, const char **result) {
-
-    SAIL_CHECK_STRING_PTR(result);
+const char* sail_meta_data_to_string(enum SailMetaData meta_data) {
 
     switch (meta_data) {
-        case SAIL_META_DATA_UNKNOWN:         *result = "Unknown";         return SAIL_OK;
+        case SAIL_META_DATA_UNKNOWN:       return "Unknown";
 
-        case SAIL_META_DATA_ARTIST:          *result = "Artist";          return SAIL_OK;
-        case SAIL_META_DATA_AUTHOR:          *result = "Author";          return SAIL_OK;
-        case SAIL_META_DATA_COMMENT:         *result = "Comment";         return SAIL_OK;
-        case SAIL_META_DATA_COMPUTER:        *result = "Computer";        return SAIL_OK;
-        case SAIL_META_DATA_COPYRIGHT:       *result = "Copyright";       return SAIL_OK;
-        case SAIL_META_DATA_CREATION_TIME:   *result = "Creation Time";   return SAIL_OK;
-        case SAIL_META_DATA_DESCRIPTION:     *result = "Description";     return SAIL_OK;
-        case SAIL_META_DATA_DISCLAIMER:      *result = "Disclaimer";      return SAIL_OK;
-        case SAIL_META_DATA_DOCUMENT:        *result = "Document";        return SAIL_OK;
-        case SAIL_META_DATA_EXIF:            *result = "EXIF";            return SAIL_OK;
-        case SAIL_META_DATA_HEX_EXIF:        *result = "Hex EXIF";        return SAIL_OK;
-        case SAIL_META_DATA_HEX_IPTC:        *result = "Hex IPTC";        return SAIL_OK;
-        case SAIL_META_DATA_HEX_XMP:         *result = "Hex XMP";         return SAIL_OK;
-        case SAIL_META_DATA_LABEL:           *result = "Label";           return SAIL_OK;
-        case SAIL_META_DATA_MAKE:            *result = "Make";            return SAIL_OK;
-        case SAIL_META_DATA_MODEL:           *result = "Model";           return SAIL_OK;
-        case SAIL_META_DATA_NAME:            *result = "Name";            return SAIL_OK;
-        case SAIL_META_DATA_PRINTER:         *result = "Printer";         return SAIL_OK;
-        case SAIL_META_DATA_SOFTWARE:        *result = "Software";        return SAIL_OK;
-        case SAIL_META_DATA_SOURCE:          *result = "Source";          return SAIL_OK;
-        case SAIL_META_DATA_TITLE:           *result = "Title";           return SAIL_OK;
-        case SAIL_META_DATA_URL:             *result = "URL";             return SAIL_OK;
-        case SAIL_META_DATA_WARNING:         *result = "Warning";         return SAIL_OK;
-        case SAIL_META_DATA_XMP:             *result = "XMP";             return SAIL_OK;
+        case SAIL_META_DATA_ARTIST:        return "Artist";
+        case SAIL_META_DATA_AUTHOR:        return "Author";
+        case SAIL_META_DATA_COMMENT:       return "Comment";
+        case SAIL_META_DATA_COMPUTER:      return "Computer";
+        case SAIL_META_DATA_COPYRIGHT:     return "Copyright";
+        case SAIL_META_DATA_CREATION_TIME: return "Creation Time";
+        case SAIL_META_DATA_DESCRIPTION:   return "Description";
+        case SAIL_META_DATA_DISCLAIMER:    return "Disclaimer";
+        case SAIL_META_DATA_DOCUMENT:      return "Document";
+        case SAIL_META_DATA_EXIF:          return "EXIF";
+        case SAIL_META_DATA_HEX_EXIF:      return "Hex EXIF";
+        case SAIL_META_DATA_HEX_IPTC:      return "Hex IPTC";
+        case SAIL_META_DATA_HEX_XMP:       return "Hex XMP";
+        case SAIL_META_DATA_LABEL:         return "Label";
+        case SAIL_META_DATA_MAKE:          return "Make";
+        case SAIL_META_DATA_MODEL:         return "Model";
+        case SAIL_META_DATA_NAME:          return "Name";
+        case SAIL_META_DATA_PRINTER:       return "Printer";
+        case SAIL_META_DATA_SOFTWARE:      return "Software";
+        case SAIL_META_DATA_SOURCE:        return "Source";
+        case SAIL_META_DATA_TITLE:         return "Title";
+        case SAIL_META_DATA_URL:           return "URL";
+        case SAIL_META_DATA_WARNING:       return "Warning";
+        case SAIL_META_DATA_XMP:           return "XMP";
     }
 
-    *result = "UNKNOWN";
-    return SAIL_OK;
+    return NULL;
 }
 
-sail_status_t sail_meta_data_from_string(const char *str, enum SailMetaData *result) {
-
-    SAIL_CHECK_STRING_PTR(str);
-    SAIL_CHECK_RESULT_PTR(result);
-
-    if (strlen(str) == 0) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_EMPTY_STRING);
-    }
+enum SailMetaData sail_meta_data_from_string(const char *str) {
 
     uint64_t hash;
-    SAIL_TRY(sail_string_hash(str, &hash));
+    SAIL_TRY_OR_EXECUTE(sail_string_hash(str, &hash),
+                        /* cleanup */ return SAIL_META_DATA_UNKNOWN);
 
     switch (hash) {
-        case UINT64_C(6952072423676):        *result = SAIL_META_DATA_ARTIST;          return SAIL_OK;
-        case UINT64_C(6952075980216):        *result = SAIL_META_DATA_AUTHOR;          return SAIL_OK;
-        case UINT64_C(229420847338040):      *result = SAIL_META_DATA_COMMENT;         return SAIL_OK;
-        case UINT64_C(7570887966294228):     *result = SAIL_META_DATA_COMPUTER;        return SAIL_OK;
-        case UINT64_C(249839307110380862):   *result = SAIL_META_DATA_COPYRIGHT;       return SAIL_OK;
-        case UINT64_C(16658027699238675945): *result = SAIL_META_DATA_CREATION_TIME;   return SAIL_OK;
-        case UINT64_C(13821659157043486569): *result = SAIL_META_DATA_DESCRIPTION;     return SAIL_OK;
-        case UINT64_C(8244735206874071778):  *result = SAIL_META_DATA_DISCLAIMER;      return SAIL_OK;
-        case UINT64_C(7570930199009348):     *result = SAIL_META_DATA_DOCUMENT;        return SAIL_OK;
-        case UINT64_C(6384018865):           *result = SAIL_META_DATA_EXIF;            return SAIL_OK;
-        case UINT64_C(7571088477688630):     *result = SAIL_META_DATA_HEX_EXIF;        return SAIL_OK;
-        case UINT64_C(7571088477824026):     *result = SAIL_META_DATA_HEX_IPTC;        return SAIL_OK;
-        case UINT64_C(229426923586655):      *result = SAIL_META_DATA_HEX_XMP;         return SAIL_OK;
-        case UINT64_C(210681275781):         *result = SAIL_META_DATA_LABEL;           return SAIL_OK;
-        case UINT64_C(6384317315):           *result = SAIL_META_DATA_MAKE;            return SAIL_OK;
-        case UINT64_C(210682966998):         *result = SAIL_META_DATA_MODEL;           return SAIL_OK;
-        case UINT64_C(6384353318):           *result = SAIL_META_DATA_NAME;            return SAIL_OK;
-        case UINT64_C(229437749136105):      *result = SAIL_META_DATA_PRINTER;         return SAIL_OK;
-        case UINT64_C(7571569592229392):     *result = SAIL_META_DATA_SOFTWARE;        return SAIL_OK;
-        case UINT64_C(6952773348182):        *result = SAIL_META_DATA_SOURCE;          return SAIL_OK;
-        case UINT64_C(210691070471):         *result = SAIL_META_DATA_TITLE;           return SAIL_OK;
-        case UINT64_C(193472344):            *result = SAIL_META_DATA_URL;             return SAIL_OK;
-        case UINT64_C(229446134771803):      *result = SAIL_META_DATA_WARNING;         return SAIL_OK;
-        case UINT64_C(193475450):            *result = SAIL_META_DATA_XMP;             return SAIL_OK;
+        case UINT64_C(229444052301365):      return SAIL_META_DATA_UNKNOWN;
+
+        case UINT64_C(6952072423676):        return SAIL_META_DATA_ARTIST;
+        case UINT64_C(6952075980216):        return SAIL_META_DATA_AUTHOR;
+        case UINT64_C(229420847338040):      return SAIL_META_DATA_COMMENT;
+        case UINT64_C(7570887966294228):     return SAIL_META_DATA_COMPUTER;
+        case UINT64_C(249839307110380862):   return SAIL_META_DATA_COPYRIGHT;
+        case UINT64_C(16658027699238675945): return SAIL_META_DATA_CREATION_TIME;
+        case UINT64_C(13821659157043486569): return SAIL_META_DATA_DESCRIPTION;
+        case UINT64_C(8244735206874071778):  return SAIL_META_DATA_DISCLAIMER;
+        case UINT64_C(7570930199009348):     return SAIL_META_DATA_DOCUMENT;
+        case UINT64_C(6384018865):           return SAIL_META_DATA_EXIF;
+        case UINT64_C(7571088477688630):     return SAIL_META_DATA_HEX_EXIF;
+        case UINT64_C(7571088477824026):     return SAIL_META_DATA_HEX_IPTC;
+        case UINT64_C(229426923586655):      return SAIL_META_DATA_HEX_XMP;
+        case UINT64_C(210681275781):         return SAIL_META_DATA_LABEL;
+        case UINT64_C(6384317315):           return SAIL_META_DATA_MAKE;
+        case UINT64_C(210682966998):         return SAIL_META_DATA_MODEL;
+        case UINT64_C(6384353318):           return SAIL_META_DATA_NAME;
+        case UINT64_C(229437749136105):      return SAIL_META_DATA_PRINTER;
+        case UINT64_C(7571569592229392):     return SAIL_META_DATA_SOFTWARE;
+        case UINT64_C(6952773348182):        return SAIL_META_DATA_SOURCE;
+        case UINT64_C(210691070471):         return SAIL_META_DATA_TITLE;
+        case UINT64_C(193472344):            return SAIL_META_DATA_URL;
+        case UINT64_C(229446134771803):      return SAIL_META_DATA_WARNING;
+        case UINT64_C(193475450):            return SAIL_META_DATA_XMP;
     }
 
-    *result = SAIL_META_DATA_UNKNOWN;
-    return SAIL_OK;
+    return SAIL_META_DATA_UNKNOWN;
 }
 
-sail_status_t sail_codec_feature_to_string(enum SailCodecFeature codec_feature, const char **result) {
-
-    SAIL_CHECK_STRING_PTR(result);
+const char* sail_codec_feature_to_string(enum SailCodecFeature codec_feature) {
 
     switch (codec_feature) {
-        case SAIL_CODEC_FEATURE_STATIC:      *result = "STATIC";      return SAIL_OK;
-        case SAIL_CODEC_FEATURE_ANIMATED:    *result = "ANIMATED";    return SAIL_OK;
-        case SAIL_CODEC_FEATURE_MULTI_FRAME: *result = "MULTI-FRAME"; return SAIL_OK;
-        case SAIL_CODEC_FEATURE_META_DATA:   *result = "META-DATA";   return SAIL_OK;
-        case SAIL_CODEC_FEATURE_EXIF:        *result = "EXIF";        return SAIL_OK;
-        case SAIL_CODEC_FEATURE_INTERLACED:  *result = "INTERLACED";  return SAIL_OK;
-        case SAIL_CODEC_FEATURE_ICCP:        *result = "ICCP";        return SAIL_OK;
+        case SAIL_CODEC_FEATURE_UNKNOWN:     return "UNKNOWN";
+        case SAIL_CODEC_FEATURE_STATIC:      return "STATIC";
+        case SAIL_CODEC_FEATURE_ANIMATED:    return "ANIMATED";
+        case SAIL_CODEC_FEATURE_MULTI_FRAME: return "MULTI-FRAME";
+        case SAIL_CODEC_FEATURE_META_DATA:   return "META-DATA";
+        case SAIL_CODEC_FEATURE_EXIF:        return "EXIF";
+        case SAIL_CODEC_FEATURE_INTERLACED:  return "INTERLACED";
+        case SAIL_CODEC_FEATURE_ICCP:        return "ICCP";
     }
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_CODEC_FEATURE);
+    return NULL;
 }
 
-sail_status_t sail_codec_feature_from_string(const char *str, enum SailCodecFeature *result) {
-
-    SAIL_CHECK_STRING_PTR(str);
-    SAIL_CHECK_RESULT_PTR(result);
-
-    if (strlen(str) == 0) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_EMPTY_STRING);
-    }
+enum SailCodecFeature sail_codec_feature_from_string(const char *str) {
 
     uint64_t hash;
-    SAIL_TRY(sail_string_hash(str, &hash));
+    SAIL_TRY_OR_EXECUTE(sail_string_hash(str, &hash),
+                        /* cleanup */ return SAIL_CODEC_FEATURE_UNKNOWN);
 
     switch (hash) {
-        case UINT64_C(6952739426029):        *result = SAIL_CODEC_FEATURE_STATIC;      return SAIL_OK;
-        case UINT64_C(7570758658679240):     *result = SAIL_CODEC_FEATURE_ANIMATED;    return SAIL_OK;
-        case UINT64_C(13834645239598293736): *result = SAIL_CODEC_FEATURE_MULTI_FRAME; return SAIL_OK;
-        case UINT64_C(249851542786072787):   *result = SAIL_CODEC_FEATURE_META_DATA;   return SAIL_OK;
-        case UINT64_C(6384018865):           *result = SAIL_CODEC_FEATURE_EXIF;        return SAIL_OK;
-        case UINT64_C(8244927930303708800):  *result = SAIL_CODEC_FEATURE_INTERLACED;  return SAIL_OK;
-        case UINT64_C(6384139556):           *result = SAIL_CODEC_FEATURE_ICCP;        return SAIL_OK;
+        case UINT64_C(229442760833397):      return SAIL_CODEC_FEATURE_UNKNOWN;
+        case UINT64_C(6952739426029):        return SAIL_CODEC_FEATURE_STATIC;
+        case UINT64_C(7570758658679240):     return SAIL_CODEC_FEATURE_ANIMATED;
+        case UINT64_C(13834645239598293736): return SAIL_CODEC_FEATURE_MULTI_FRAME;
+        case UINT64_C(249851542786072787):   return SAIL_CODEC_FEATURE_META_DATA;
+        case UINT64_C(6384018865):           return SAIL_CODEC_FEATURE_EXIF;
+        case UINT64_C(8244927930303708800):  return SAIL_CODEC_FEATURE_INTERLACED;
+        case UINT64_C(6384139556):           return SAIL_CODEC_FEATURE_ICCP;
     }
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_CODEC_FEATURE);
+    return SAIL_CODEC_FEATURE_UNKNOWN;
 }
 
 sail_status_t sail_bits_per_pixel(enum SailPixelFormat pixel_format, unsigned *result) {

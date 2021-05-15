@@ -553,9 +553,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v5_png(void *state, s
     int color_type;
     int bit_depth;
     SAIL_TRY_OR_EXECUTE(png_private_pixel_format_to_png_color_type(image->pixel_format, &color_type, &bit_depth),
-                        /* cleanup */ const char *pixel_format_str = NULL;
-                                      SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(image->pixel_format, &pixel_format_str));
-                                      SAIL_LOG_ERROR("PNG: %s pixel format is not currently supported for writing", pixel_format_str);
+                        /* cleanup */ SAIL_LOG_ERROR("PNG: %s pixel format is not currently supported for writing", sail_pixel_format_to_string(image->pixel_format));
                                       return __sail_error_result);
 
     /* Write meta data. */

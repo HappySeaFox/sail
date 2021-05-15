@@ -155,15 +155,18 @@ enum SailPixelFormat {
 /* Image properties. */
 enum SailImageProperty {
 
+    /* Unknown image property used to indicate an error in parsing functions. */
+    SAIL_IMAGE_PROPERTY_UNKNOWN            = 1 << 0,
+
     /* Image needs flipping vertically. */
-    SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY = 1 << 0,
+    SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY = 1 << 1,
 
     /*
      * Image is interlaced. Only sail_image.source_properties can have this property.
      * Reading operations never output interlaced images, that's why sail_image.properties
      * never has it.
      */
-    SAIL_IMAGE_PROPERTY_INTERLACED         = 1 << 1,
+    SAIL_IMAGE_PROPERTY_INTERLACED         = 1 << 2,
 };
 
 /* Pixels compression types. */
@@ -277,26 +280,29 @@ enum SailResolutionUnit {
 /* Codec features. */
 enum SailCodecFeature {
 
+    /* Unknown codec feature used to indicate an error in parsing functions. */
+    SAIL_CODEC_FEATURE_UNKNOWN     = 1 << 0,
+
     /* Ability to read or write static images. */
-    SAIL_CODEC_FEATURE_STATIC      = 1 << 0,
+    SAIL_CODEC_FEATURE_STATIC      = 1 << 1,
 
     /* Ability to read or write animated images. */
-    SAIL_CODEC_FEATURE_ANIMATED    = 1 << 1,
+    SAIL_CODEC_FEATURE_ANIMATED    = 1 << 2,
 
     /* Ability to read or write multi-frame (but not animated) images. */
-    SAIL_CODEC_FEATURE_MULTI_FRAME = 1 << 2,
+    SAIL_CODEC_FEATURE_MULTI_FRAME = 1 << 3,
 
     /* Ability to read or write simple image meta data like JPEG comments. */
-    SAIL_CODEC_FEATURE_META_DATA   = 1 << 3,
+    SAIL_CODEC_FEATURE_META_DATA   = 1 << 4,
 
     /* Ability to read or write EXIF meta data. */
-    SAIL_CODEC_FEATURE_EXIF        = 1 << 4,
+    SAIL_CODEC_FEATURE_EXIF        = 1 << 5,
 
     /* Ability to read or write interlaced images. */
-    SAIL_CODEC_FEATURE_INTERLACED  = 1 << 5,
+    SAIL_CODEC_FEATURE_INTERLACED  = 1 << 6,
 
     /* Ability to read or write embedded ICC profiles. */
-    SAIL_CODEC_FEATURE_ICCP        = 1 << 6,
+    SAIL_CODEC_FEATURE_ICCP        = 1 << 7,
 };
 
 /* Read or write options. */

@@ -113,12 +113,15 @@ static sail_status_t read_image(FILE *fptr, struct sail_image *image) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_READ_FILE);
     }
 
-    SAIL_TRY(sail_pixel_format_from_string(pixel_format, &image->pixel_format));
-    const char *pixel_format_str = NULL;
-    SAIL_TRY(sail_pixel_format_to_string(image->pixel_format, &pixel_format_str));
+    image->pixel_format = sail_pixel_format_from_string(pixel_format);
+
+    if (image->pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN) {
+        SAIL_LOG_ERROR("DUMP: Read image with unknown pixel format: '%s'", pixel_format);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+    }
 
     SAIL_LOG_DEBUG("DUMP: Image properties: %ux%u bytes_per_line(%u), pixel_format(%s), properties(%d)",
-                    image->width, image->height, image->bytes_per_line, pixel_format_str, image->properties);
+                    image->width, image->height, image->bytes_per_line, sail_pixel_format_to_string(image->pixel_format), image->properties);
 
     return SAIL_OK;
 }
@@ -142,16 +145,12 @@ static sail_status_t read_source_image(FILE *fptr, struct sail_image *image) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_READ_FILE);
     }
 
-    SAIL_TRY(sail_pixel_format_from_string(pixel_format, &image->source_image->pixel_format));
-    const char *pixel_format_str = NULL;
-    SAIL_TRY(sail_pixel_format_to_string(image->source_image->pixel_format, &pixel_format_str));
-
-    SAIL_TRY(sail_compression_from_string(compression, &image->source_image->compression));
-    const char *compression_str = NULL;
-    SAIL_TRY(sail_compression_to_string(image->source_image->compression, &compression_str));
+    image->source_image->pixel_format = sail_pixel_format_from_string(pixel_format);
+    image->source_image->compression = sail_compression_from_string(compression);
 
     SAIL_LOG_DEBUG("DUMP: Source image properties: pixel_format(%s), properties(%d), compression(%s)",
-                    pixel_format_str, image->source_image->properties, compression_str);
+                    sail_pixel_format_to_string(image->source_image->pixel_format), image->source_image->properties,
+                    sail_compression_to_string(image->source_image->compression));
 
     return SAIL_OK;
 }
@@ -261,10 +260,9 @@ static sail_status_t read_meta_data(FILE *fptr, struct sail_image *image) {
         uint8_t *value;
         SAIL_TRY(read_hex(fptr, data_length, &value));
 
-        enum SailMetaData meta_data;
-        SAIL_TRY(sail_meta_data_from_string(key, &meta_data));
-
+        enum SailMetaData meta_data = sail_meta_data_from_string(key);
         enum SailMetaDataType value_type;
+
         if (strcmp(type, "STRING") == 0) {
             value_type = SAIL_META_DATA_TYPE_STRING;
         } else if (strcmp(type, "DATA") == 0) {
@@ -293,11 +291,8 @@ static sail_status_t read_meta_data(FILE *fptr, struct sail_image *image) {
         *last_meta_data_node = meta_data_node;
         last_meta_data_node = &meta_data_node->next;
 
-        const char *key_str = NULL;
-        SAIL_TRY(sail_meta_data_to_string(meta_data_node->key, &key_str));
-
         SAIL_LOG_DEBUG("DUMP: Meta data properties: key(%s) key_unknown(%s), type(%s), value_length(%u)",
-                        key_str, meta_data_node->key_unknown, type, meta_data_node->value_length);
+                        sail_meta_data_to_string(meta_data_node->key), meta_data_node->key_unknown, type, meta_data_node->value_length);
     }
 
     return SAIL_OK;
@@ -352,16 +347,17 @@ static sail_status_t read_palette(FILE *fptr, struct sail_image *image) {
     uint8_t *value;
     SAIL_TRY(read_hex(fptr, data_length, &value));
 
-    enum SailPixelFormat pixel_format_enum;
-    SAIL_TRY(sail_pixel_format_from_string(pixel_format, &pixel_format_enum));
+    enum SailPixelFormat pixel_format_enum = sail_pixel_format_from_string(pixel_format);
+
+    if (pixel_format_enum == SAIL_PIXEL_FORMAT_UNKNOWN) {
+        SAIL_LOG_ERROR("DUMP: Read palette with unknown pixel format: '%s'", pixel_format);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+    }
 
     SAIL_TRY(sail_alloc_palette_from_data(pixel_format_enum, value, color_count, &image->palette));
 
-    const char *pixel_format_str = NULL;
-    SAIL_TRY(sail_pixel_format_to_string(pixel_format_enum, &pixel_format_str));
-
     SAIL_LOG_DEBUG("DUMP: Palette properties: pixel_format(%s), color_count(%u), data_length(%u)",
-                    pixel_format_str, color_count, data_length);
+                    sail_pixel_format_to_string(pixel_format_enum), color_count, data_length);
 
     return SAIL_OK;
 }
@@ -470,18 +466,11 @@ sail_status_t sail_dump(const struct sail_image *image) {
     /*  To print dots in floats. */
     setlocale(LC_NUMERIC, "C");
 
-    {
-        const char *pixel_format_str = NULL;
-        SAIL_TRY(sail_pixel_format_to_string(image->pixel_format, &pixel_format_str));
-        printf("IMAGE\n%u %u %u %s %d\n\n", image->width, image->height, image->bytes_per_line, pixel_format_str, image->properties);
-    }
+    printf("IMAGE\n%u %u %u %s %d\n\n", image->width, image->height, image->bytes_per_line, sail_pixel_format_to_string(image->pixel_format), image->properties);
 
     if (image->source_image != NULL) {
-        const char *pixel_format_str = NULL;
-        SAIL_TRY(sail_pixel_format_to_string(image->source_image->pixel_format, &pixel_format_str));
-        const char *compression_str = NULL;
-        SAIL_TRY(sail_compression_to_string(image->source_image->compression, &compression_str));
-        printf("SOURCE-IMAGE\n%s %d %s\n\n", pixel_format_str, image->properties, compression_str);
+        printf("SOURCE-IMAGE\n%s %d %s\n\n", sail_pixel_format_to_string(image->source_image->pixel_format), image->properties,
+                sail_compression_to_string(image->source_image->compression));
     }
 
     if (image->resolution != NULL) {
@@ -521,10 +510,7 @@ sail_status_t sail_dump(const struct sail_image *image) {
             meta_data_node = image->meta_data_node;
 
             while (meta_data_node != NULL) {
-                const char *key_str = NULL;
-                SAIL_TRY(sail_meta_data_to_string(meta_data_node->key, &key_str));
-
-                printf("%s\n", key_str);
+                printf("%s\n", sail_meta_data_to_string(meta_data_node->key));
                 printf("%s\n", meta_data_node->key_unknown == NULL ? "noop" : meta_data_node->key_unknown);
 
                 const char *value_type_str = NULL;
@@ -553,13 +539,10 @@ sail_status_t sail_dump(const struct sail_image *image) {
     }
 
     if (image->palette != NULL) {
-        const char *pixel_format_str = NULL;
-        SAIL_TRY(sail_pixel_format_to_string(image->palette->pixel_format, &pixel_format_str));
-
         unsigned palette_size;
         SAIL_TRY(sail_bytes_per_line(image->palette->color_count, image->palette->pixel_format, &palette_size));
 
-        printf("PALETTE\n%s %u %u\n", pixel_format_str, image->palette->color_count, palette_size);
+        printf("PALETTE\n%s %u %u\n", sail_pixel_format_to_string(image->palette->pixel_format), image->palette->color_count, palette_size);
         SAIL_TRY(print_hex(image->palette->data, palette_size));
         printf("\n");
     }

@@ -196,7 +196,7 @@ sail_status_t png_private_fetch_meta_data(png_structp png_ptr, png_infop info_pt
         } else if (strcmp(lines[i].key, "XML:com.adobe.xmp") == 0) {
             meta_data = SAIL_META_DATA_XMP;
         } else {
-            SAIL_TRY(sail_meta_data_from_string(lines[i].key, &meta_data));
+            meta_data = sail_meta_data_from_string(lines[i].key);
         }
 
         if (meta_data == SAIL_META_DATA_UNKNOWN) {
@@ -257,7 +257,7 @@ sail_status_t png_private_write_meta_data(png_structp png_ptr, png_infop info_pt
                     case SAIL_META_DATA_XMP:      meta_data_str = "XML:com.adobe.xmp";     break;
 
                     default: {
-                        SAIL_TRY(sail_meta_data_to_string(meta_data_node->key, &meta_data_str));
+                        meta_data_str = sail_meta_data_to_string(meta_data_node->key);
                     }
                 }
             }
@@ -268,8 +268,7 @@ sail_status_t png_private_write_meta_data(png_structp png_ptr, png_infop info_pt
 
             count++;
         } else {
-            SAIL_TRY_OR_SUPPRESS(sail_meta_data_to_string(meta_data_node->key, &meta_data_str));
-            SAIL_LOG_WARNING("PNG: Ignoring unsupported binary key '%s'", meta_data_str);
+            SAIL_LOG_WARNING("PNG: Ignoring unsupported binary key '%s'", sail_meta_data_to_string(meta_data_node->key));
         }
 
         meta_data_node = meta_data_node->next;

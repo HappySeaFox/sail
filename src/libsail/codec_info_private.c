@@ -34,21 +34,17 @@
  * Private functions.
  */
 
-static sail_status_t pixel_format_from_string(const char *str, int *result) {
+static int pixel_format_from_string(const char *str) {
 
-    SAIL_TRY(sail_pixel_format_from_string(str, (enum SailPixelFormat*)result));
-
-    return SAIL_OK;
+    return sail_pixel_format_from_string(str);
 }
 
-static sail_status_t compression_from_string(const char *str, int *result) {
+static int compression_from_string(const char *str) {
 
-    SAIL_TRY(sail_compression_from_string(str, (enum SailCompression*)result));
-
-    return SAIL_OK;
+    return sail_compression_from_string(str);
 }
 
-static sail_status_t parse_serialized_ints(const char *value, int **target, unsigned *length, sail_status_t (*converter)(const char *str, int *result)) {
+static sail_status_t parse_serialized_ints(const char *value, int **target, unsigned *length, int (*converter)(const char *str)) {
 
     SAIL_CHECK_STRING_PTR(value);
     SAIL_CHECK_PTR(target);
@@ -77,10 +73,7 @@ static sail_status_t parse_serialized_ints(const char *value, int **target, unsi
         int i = 0;
 
         while (node != NULL) {
-            SAIL_TRY_OR_CLEANUP(converter(node->value, *target + i),
-                                /* cleanup */ SAIL_LOG_ERROR("Conversion of '%s' failed", node->value),
-                                              destroy_string_node_chain(string_node));
-            i++;
+            *(*target + i++) = converter(node->value);
             node = node->next;
         }
     }
@@ -90,21 +83,17 @@ static sail_status_t parse_serialized_ints(const char *value, int **target, unsi
     return SAIL_OK;
 }
 
-static sail_status_t codec_feature_from_string(const char *str, int *result) {
+static int codec_feature_from_string(const char *str) {
 
-    SAIL_TRY(sail_codec_feature_from_string(str, (enum SailCodecFeature *)result));
-
-    return SAIL_OK;
+    return sail_codec_feature_from_string(str);
 }
 
-static sail_status_t image_property_from_string(const char *str, int *result) {
+static int image_property_from_string(const char *str) {
 
-    SAIL_TRY(sail_image_property_from_string(str, (enum SailImageProperty *)result));
-
-    return SAIL_OK;
+    return sail_image_property_from_string(str);
 }
 
-static sail_status_t parse_flags(const char *value, int *features, sail_status_t (*converter)(const char *str, int *result)) {
+static sail_status_t parse_flags(const char *value, int *features, int (*converter)(const char *str)) {
 
     SAIL_CHECK_PTR(value);
     SAIL_CHECK_PTR(features);
@@ -119,11 +108,7 @@ static sail_status_t parse_flags(const char *value, int *features, sail_status_t
     struct sail_string_node *node = string_node;
 
     while (node != NULL) {
-        int flag;
-        SAIL_TRY_OR_CLEANUP(converter(node->value, &flag),
-                            /* cleanup */ SAIL_LOG_ERROR("Conversion of '%s' failed", node->value),
-                                          destroy_string_node_chain(string_node));
-        *features |= flag;
+        *features |= converter(node->value);
         node = node->next;
     }
 
@@ -224,8 +209,7 @@ static sail_status_t inih_handler_sail_error(void *data, const char *section, co
                                                         compression_from_string),
                                 /* cleanup */ SAIL_LOG_ERROR("Failed to parse compressions: '%s'", value));
         } else if (strcmp(name, "default-compression") == 0) {
-            SAIL_TRY_OR_CLEANUP(sail_compression_from_string(value, &codec_info->write_features->default_compression),
-                                /* cleanup */ SAIL_LOG_ERROR("Failed to parse compression: '%s'", value));
+            codec_info->write_features->default_compression = sail_compression_from_string(value);
         } else if (strcmp(name, "compression-level-min") == 0) {
             codec_info->write_features->compression_level_min = atof(value);
         } else if (strcmp(name, "compression-level-max") == 0) {
@@ -297,6 +281,18 @@ static sail_status_t check_codec_info(const struct sail_codec_info *codec_info) 
     /* Compression levels and types are mutually exclusive.*/
     if (write_features->compressions_length > 1 && (write_features->compression_level_min != 0 || write_features->compression_level_max != 0)) {
         SAIL_LOG_ERROR("'%s' codec specifies more than two compression types and non-zero compression levels which is unsupported", codec_info->name);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INCOMPLETE_CODEC_INFO);
+    }
+
+    for (unsigned i = 0; i < write_features->compressions_length; i++) {
+        if (write_features->compressions[i] == SAIL_COMPRESSION_UNKNOWN) {
+            SAIL_LOG_ERROR("'%s' codec specifies an unsupported compression", codec_info->name);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INCOMPLETE_CODEC_INFO);
+        }
+    }
+
+    if (write_features->default_compression == SAIL_COMPRESSION_UNKNOWN) {
+        SAIL_LOG_ERROR("'%s' codec specifies an unsupported default compression", codec_info->name);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INCOMPLETE_CODEC_INFO);
     }
 

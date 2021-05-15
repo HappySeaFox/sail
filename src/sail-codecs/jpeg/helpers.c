@@ -137,10 +137,7 @@ sail_status_t jpeg_private_write_meta_data(struct jpeg_compress_struct *compress
                                 (JOCTET *)meta_data_node->value,
                                 (unsigned)meta_data_node->value_length - 1);
         } else {
-            const char *meta_data_str = NULL;
-            SAIL_TRY_OR_SUPPRESS(sail_meta_data_to_string(meta_data_node->key, &meta_data_str));
-
-            SAIL_LOG_WARNING("JPEG: Ignoring unsupported binary key '%s'", meta_data_str);
+            SAIL_LOG_WARNING("JPEG: Ignoring unsupported binary key '%s'", sail_meta_data_to_string(meta_data_node->key));
         }
 
         meta_data_node = meta_data_node->next;

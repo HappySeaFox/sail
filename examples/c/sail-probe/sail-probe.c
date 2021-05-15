@@ -54,9 +54,7 @@ static sail_status_t probe(const char *path) {
     } else {
         printf("Resolution:   : %.1fx%.1f\n", image->resolution->x, image->resolution->y);
     }
-    const char *pixel_format_str;
-    SAIL_TRY(sail_pixel_format_to_string(image->source_image->pixel_format, &pixel_format_str));
-    printf("Color         : %s\n", pixel_format_str);
+    printf("Color         : %s\n", sail_pixel_format_to_string(image->source_image->pixel_format));
     printf("ICC profile   : %s\n", image->iccp == NULL ? "no" : "yes");
     printf("Interlaced    : %s\n", (image->source_image->properties & SAIL_IMAGE_PROPERTY_INTERLACED) ? "yes" : "no");
     printf("Flipped Vert. : %s\n", (image->source_image->properties & SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY) ? "yes" : "no");
@@ -69,7 +67,7 @@ static sail_status_t probe(const char *path) {
         if (node->key == SAIL_META_DATA_UNKNOWN) {
             meta_data_str = node->key_unknown;
         } else {
-            SAIL_TRY_OR_SUPPRESS(sail_meta_data_to_string(node->key, &meta_data_str));
+            meta_data_str = sail_meta_data_to_string(node->key);
         }
 
         if (node->value_type == SAIL_META_DATA_TYPE_STRING) {

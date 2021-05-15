@@ -51,11 +51,8 @@ static sail_status_t load_codec(struct sail_codec_info_node *node) {
 
 static void print_unsupported_write_pixel_format(enum SailPixelFormat pixel_format) {
 
-    const char *pixel_format_str = NULL;
-    SAIL_TRY_OR_SUPPRESS(sail_pixel_format_to_string(pixel_format, &pixel_format_str));
-
     SAIL_LOG_ERROR("This codec cannot write %s pixels. Use its write features to get the list of supported pixel formats for writing",
-                    pixel_format_str);
+                    sail_pixel_format_to_string(pixel_format));
 }
 
 /*
