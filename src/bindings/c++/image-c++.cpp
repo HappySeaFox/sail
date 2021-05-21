@@ -90,6 +90,26 @@ image::image()
 {
 }
 
+image::image(void *pixels, SailPixelFormat pixel_format, unsigned width, unsigned height)
+    : image()
+{
+    with_width(width)
+        .with_height(height)
+        .with_pixel_format(pixel_format)
+        .with_bytes_per_line_auto()
+        .with_shallow_pixels(pixels);
+}
+
+image::image(void *pixels, SailPixelFormat pixel_format, unsigned width, unsigned height, unsigned bytes_per_line)
+    : image()
+{
+    with_width(width)
+        .with_height(height)
+        .with_pixel_format(pixel_format)
+        .with_bytes_per_line(bytes_per_line)
+        .with_shallow_pixels(pixels);
+}
+
 image::image(const image &img)
     : image()
 {

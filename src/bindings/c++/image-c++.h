@@ -66,6 +66,8 @@ class SAIL_EXPORT image
 
 public:
     image();
+    image(void *pixels, SailPixelFormat pixel_format, unsigned width, unsigned height);
+    image(void *pixels, SailPixelFormat pixel_format, unsigned width, unsigned height, unsigned bytes_per_line);
     image(const image &img);
     image& operator=(const image &img);
     image(image &&img) noexcept;
