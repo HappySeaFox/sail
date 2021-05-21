@@ -101,4 +101,4 @@ if (SAIL_COMBINE_CODECS)
     set(SAIL_CODECS_FIND_DEPENDENCY "find_dependency(SailCodecs REQUIRED PATHS \${CMAKE_CURRENT_LIST_DIR})")
 endif()
 
-sail_install_cmake_config(TARGET "Sail" VERSION "${VERSION}")
+sail_install_cmake_config(TARGET "Sail" FOLDER "sail" VERSION "${VERSION}")

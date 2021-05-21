@@ -100,4 +100,4 @@ install(TARGETS sail-common
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/libsail-common.pc"
         DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 
-sail_install_cmake_config(TARGET "SailCommon" VERSION "${VERSION}")
+sail_install_cmake_config(TARGET "SailCommon" FOLDER "sailcommon" VERSION "${VERSION}")

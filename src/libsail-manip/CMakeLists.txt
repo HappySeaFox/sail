@@ -54,4 +54,4 @@ install(TARGETS sail-manip
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/libsail-manip.pc"
         DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 
-sail_install_cmake_config(TARGET "SailManip" VERSION "${VERSION}")
+sail_install_cmake_config(TARGET "SailManip" FOLDER "sailmanip" VERSION "${VERSION}")
