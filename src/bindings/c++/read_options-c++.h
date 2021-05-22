@@ -57,7 +57,6 @@ public:
     read_options& operator=(read_options &&ro);
     ~read_options();
 
-    SailPixelFormat output_pixel_format() const;
     int io_options() const;
 
     read_options& with_io_options(int io_options);
