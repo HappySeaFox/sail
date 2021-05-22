@@ -31,7 +31,9 @@
 
 namespace sail
 {
-
+/*
+ * A list of bytes of arbitrary data. Used to hold binary EXIF data, for example.
+ */
 using arbitrary_data = std::vector<std::uint8_t>;
 
 }
