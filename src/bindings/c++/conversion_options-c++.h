@@ -49,11 +49,34 @@ class SAIL_EXPORT conversion_options
     friend class image;
 
 public:
+    /*
+     * Constructs an empty conversion options object.
+     */
     conversion_options();
+
+    /*
+     * Copies the conversion options object.
+     */
     conversion_options(const conversion_options &co);
+
+    /*
+     * Copies the conversion options object.
+     */
     conversion_options& operator=(const conversion_options &co);
+
+    /*
+     * Moves the conversion options object.
+     */
     conversion_options(conversion_options &&co) noexcept;
+
+    /*
+     * Moves the conversion options object.
+     */
     conversion_options& operator=(conversion_options &&co);
+
+    /*
+     * Destroys the conversion options object.
+     */
     ~conversion_options();
 
     /*

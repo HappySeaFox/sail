@@ -84,7 +84,7 @@ public:
     codec_info& operator=(codec_info &&ci);
 
     /*
-     * Destructs the codec info object.
+     * Destroys the codec info object.
      */
     ~codec_info();
 
