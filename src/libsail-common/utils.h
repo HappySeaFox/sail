@@ -173,7 +173,7 @@ SAIL_EXPORT const char* sail_codec_feature_to_string(enum SailCodecFeature codec
 
 /*
  * Returns a codec feature from the string representation. See SailCodecFeature.
- * For example: SAIL_CODEC_FEATURE_STATIC is assigned for "STATIC".
+ * For example: SAIL_CODEC_FEATURE_STATIC is returned for "STATIC".
  *
  * Returns SAIL_CODEC_FEATURE_UNKNOWN if the codec feature is not known.
  */

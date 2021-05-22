@@ -91,8 +91,11 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
 
 sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
 {
-    sail::codec_info codec_info;
-    SAIL_TRY(sail::codec_info::from_path(path.toLocal8Bit().constData(), &codec_info));
+    const sail::codec_info codec_info = sail::codec_info::from_path(path.toLocal8Bit().constData());
+
+    if (!codec_info.is_valid()) {
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_NOT_FOUND);
+    }
 
     sail::image_writer writer;
     sail::image image(const_cast<uchar *>(qimage.bits()), qImageFormatToSailPixelFormat(qimage.format()), qimage.width(), qimage.height());

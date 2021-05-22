@@ -61,15 +61,15 @@ struct sail_codec_info {
     char *description;
 
     /*
-     * A linked list of supported magic numbers. For example: "FF D8" for JPEGs.
+     * A linked list of supported magic numbers. It can be NULL. For example: "FF D8" for JPEGs.
      * See https://en.wikipedia.org/wiki/File_format#Magic_number.
      */
     struct sail_string_node *magic_number_node;
 
-    /* A linked list of supported file extensions. For example: "jpg", "jpeg". */
+    /* A linked list of supported file extensions. It can be NULL. For example: "jpg", "jpeg". */
     struct sail_string_node *extension_node;
 
-    /* A linked list of supported mime types. For example: "image/jpeg". */
+    /* A linked list of supported mime types. It can be NULL. For example: "image/jpeg". */
     struct sail_string_node *mime_type_node;
 
     /* Read features of the codec. */

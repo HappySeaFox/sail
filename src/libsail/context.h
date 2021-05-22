@@ -80,15 +80,15 @@ enum SailInitFlags {
  *   to enable dlopen and dlsym on the same binary. If you use CMake, this could be achieved by
  *   setting CMAKE_ENABLE_EXPORTS to ON.
  *
- * 2. Standalone build or bundle compiled with SAIL_COMBINE_CODECS=ON
+ * 2. Standalone build or bundle, both compiled with SAIL_COMBINE_CODECS=ON
  *   Same to VCPKG port.
  *
- * 3. Windows (standalone build or bundle)
+ * 3. Windows standalone build or bundle, both compiled with SAIL_COMBINE_CODECS=OFF (the default)
  *   1. SAIL_CODECS_PATH environment variable
  *   2. <SAIL DEPLOYMENT FOLDER>\lib\sail\codecs
  *   3. Hardcoded SAIL_CODECS_PATH in config.h
  *
- * 4. Unix including macOS (standalone build)
+ * 4. Unix including macOS (standalone build), compiled with SAIL_COMBINE_CODECS=OFF (the default)
  *   1. SAIL_CODECS_PATH environment variable
  *   2. Hardcoded SAIL_CODECS_PATH in config.h
  *
