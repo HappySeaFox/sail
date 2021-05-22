@@ -29,6 +29,9 @@
 namespace sail
 {
 
+/*
+ * Helper class for SAIL_AT_SCOPE_EXIT. Not intended to be used by developers.
+ */
 template<typename F>
 class scope_cleanup
 {
@@ -54,21 +57,25 @@ private:
  *
  * For example:
  *
- *    SAIL_AT_SCOPE_EXIT (
- *        delete data1;
- *        delete data2;
- *    );
+ *    void do_something() {
+ *        acquire_resources();
  *
- *    SAIL_TRY(...);
- *    SAIL_TRY(...);
+ *        SAIL_AT_SCOPE_EXIT(
+ *            release_resources();
+ *        );
+ *
+ *        SAIL_TRY(...);
+ *        SAIL_TRY(...);
+ *    }
  */
-#define SAIL_AT_SCOPE_EXIT(code)                           \
-    auto lambda = [&] {                                    \
-        code                                               \
-    };                                                     \
-    sail::scope_cleanup<decltype(lambda)> scp_ext(lambda); \
-do {                                                       \
-    (void)scp_ext;                                         \
+#define SAIL_AT_SCOPE_EXIT(code)                                       \
+    auto sail_local_cleanup_lambda = [&] {                             \
+        code                                                           \
+    };                                                                 \
+    sail::scope_cleanup<decltype(sail_local_cleanup_lambda)>           \
+        sail_local_cleanup_lambda_executor(sail_local_cleanup_lambda); \
+do {                                                                   \
+    (void)sail_local_cleanup_lambda_executor;                          \
 } while(0)
 
 #endif
