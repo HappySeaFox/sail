@@ -165,7 +165,7 @@ sail_status_t image_writer::start_writing(const io &sio, const codec_info &scode
 
     SAIL_TRY(sail_start_writing_io_with_options(d->sail_io,
                                                 scodec_info.sail_codec_info_c(),
-                                                NULL,
+                                                nullptr,
                                                 &d->state));
 
     return SAIL_OK;

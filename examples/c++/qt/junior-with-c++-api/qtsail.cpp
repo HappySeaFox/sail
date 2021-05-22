@@ -64,9 +64,11 @@ QtSail::~QtSail()
 sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
 {
     sail::image_reader reader;
-    sail::image image;
+    sail::image image = reader.read(path.toLocal8Bit().constData());
 
-    SAIL_TRY(reader.read(path.toLocal8Bit().constData(), &image));
+    if (!image.is_valid()) {
+        return SAIL_ERROR_BROKEN_IMAGE;
+    }
 
     // Convert to RGBA
     //

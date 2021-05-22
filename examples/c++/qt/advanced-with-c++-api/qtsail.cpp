@@ -190,15 +190,7 @@ sail_status_t QtSail::onProbe()
     elapsedTimer.start();
 
     sail::image_reader reader;
-    sail::image image;
-    sail::codec_info codec_info;
-
-    sail_status_t res;
-
-    if ((res = reader.probe(path.toLocal8Bit().constData(), &image, &codec_info)) != SAIL_OK) {
-        QMessageBox::critical(this, tr("Error"), tr("Failed to probe the image. Error: %1").arg(res));
-        return res;
-    }
+    auto [image, codec_info] = reader.probe(path.toLocal8Bit().constData());
 
     QMessageBox::information(this,
                              tr("File info"),

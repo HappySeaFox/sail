@@ -28,6 +28,7 @@
 
 #include <cstddef>
 #include <string_view>
+#include <tuple>
 
 #ifdef SAIL_BUILD
     #include "error.h"
@@ -46,78 +47,306 @@ class codec_info;
 class read_options;
 
 /*
- * A C++ interface to the SAIL image reading functions.
+ * Class to probe and read images.
  */
 class SAIL_EXPORT image_reader
 {
 public:
+    /*
+     * Constructs a new image reader.
+     */
     image_reader();
+
+    /*
+     * Destroys the image reader.
+     */
     ~image_reader();
 
     /*
-     * An interface to sail_probe_file(). See sail_probe_file() for more.
+     * Disables copying image readers.
      */
-    sail_status_t probe(std::string_view path, image *simage, codec_info *scodec_info = nullptr);
+    image_reader(const image_reader&) = delete;
 
     /*
-     * An interface to sail_probe_mem(). See sail_probe_mem() for more.
+     * Disables copying image readers.
      */
-    sail_status_t probe(const void *buffer, size_t buffer_length, image *simage, codec_info *scodec_info = nullptr);
+    image_reader& operator=(const image_reader&) = delete;
 
     /*
-     * An interface to sail_probe_io(). See sail_probe_io() for more.
+     * Disables moving image readers.
      */
-    sail_status_t probe(const sail::io &io, image *simage, codec_info *scodec_info = nullptr);
+    image_reader(image_reader&&) = delete;
 
     /*
-     * An interface to sail_read_file(). See sail_read_file() for more.
+     * Disables moving image readers.
      */
-    sail_status_t read(std::string_view path, image *simage);
+    image_reader& operator=(image_reader&&) = delete;
 
     /*
-     * An interface to sail_read_mem(). See sail_read_mem() for more.
+     * Loads the specified image file and returns its properties without pixels and the corresponding
+     * codec info.
+     *
+     * This method is pretty fast because it doesn't decode whole image data for most image formats.
+     *
+     * Returns an invalid image on error.
      */
-    sail_status_t read(const void *buffer, size_t buffer_length, image *simage);
+    std::tuple<image, codec_info> probe(std::string_view path) const;
 
     /*
-     * An interface to sail_start_reading_file(). See sail_start_reading() for more.
+     * Loads an image from the specified memory buffer and returns its properties without pixels
+     * and the corresponding codec info.
+     *
+     * This method is pretty fast because it doesn't decode whole image data for most image formats.
+     *
+     * Returns an invalid image on error.
+     */
+    std::tuple<image, codec_info> probe(const void *buffer, size_t buffer_length) const;
+
+    /*
+     * Loads an image from the specified I/O source and returns its properties without pixels
+     * and the corresponding codec info.
+     *
+     * This method is pretty fast because it doesn't decode whole image data for most image formats.
+     *
+     * Returns an invalid image on error.
+     */
+    std::tuple<image, codec_info> probe(const sail::io &io) const;
+
+    /*
+     * Loads the specified image file.
+     *
+     * Returns an invalid image on error.
+     */
+    image read(std::string_view path) const;
+
+    /*
+     * Loads an image from the specified memory buffer.
+     *
+     * Returns an invalid image on error.
+     */
+    image read(const void *buffer, size_t buffer_length) const;
+
+    /*
+     * Starts reading the specified image file.
+     *
+     * Typical usage: start_reading()   ->
+     *                read_next_frame() ->
+     *                stop_reading().
+     *
+     * For example:
+     *
+     * SAIL_TRY(start_reading(...);
+     * SAIL_TRY(read_next_frame(...));
+     * SAIL_TRY(stop_reading());
+     *
+     * Returns SAIL_OK on success.
      */
     sail_status_t start_reading(std::string_view path);
 
     /*
-     * An interface to sail_start_reading_file(). See sail_start_reading_file() for more.
+     * Starts reading the specified image file with the specified codec.
+     *
+     * Typical usage: start_reading()   ->
+     *                read_next_frame() ->
+     *                stop_reading().
+     *
+     * For example:
+     *
+     * SAIL_TRY(start_reading(...);
+     * SAIL_TRY(read_next_frame(...));
+     * SAIL_TRY(stop_reading());
+     *
+     * Returns SAIL_OK on success.
      */
-    sail_status_t start_reading(std::string_view path, const codec_info &scodec_info);
+    sail_status_t start_reading(std::string_view path, const sail::codec_info &codec_info);
 
     /*
-     * An interface to sail_start_reading_file_with_options(). See sail_start_reading_file_with_options() for more.
+     * Starts reading the specified image file with the specified read options.
+     *
+     * Typical usage: start_reading()   ->
+     *                read_next_frame() ->
+     *                stop_reading().
+     *
+     * For example:
+     *
+     * SAIL_TRY(start_reading(...);
+     * SAIL_TRY(read_next_frame(...));
+     * SAIL_TRY(stop_reading());
+     *
+     * Returns SAIL_OK on success.
      */
-    sail_status_t start_reading(std::string_view path, const read_options &sread_options);
+    sail_status_t start_reading(std::string_view path, const sail::read_options &read_options);
 
     /*
-     * An interface to sail_start_reading_file_with_options(). See sail_start_reading_file_with_options() for more.
+     * Starts reading the specified image file with the specified codec and read options.
+     *
+     * Typical usage: start_reading()   ->
+     *                read_next_frame() ->
+     *                stop_reading().
+     *
+     * For example:
+     *
+     * SAIL_TRY(start_reading(...);
+     * SAIL_TRY(read_next_frame(...));
+     * SAIL_TRY(stop_reading());
+     *
+     * Returns SAIL_OK on success.
      */
-    sail_status_t start_reading(std::string_view path, const codec_info &scodec_info, const read_options &sread_options);
+    sail_status_t start_reading(std::string_view path, const sail::codec_info &codec_info, const sail::read_options &read_options);
 
     /*
-     * An interface to sail_start_reading_mem(). See sail_start_reading_mem() for more.
+     * Starts reading the specified memory buffer.
+     *
+     * Typical usage: start_reading()   ->
+     *                read_next_frame() ->
+     *                stop_reading().
+     *
+     * For example:
+     *
+     * SAIL_TRY(start_reading(...);
+     * SAIL_TRY(read_next_frame(...));
+     * SAIL_TRY(stop_reading());
+     *
+     * Returns SAIL_OK on success.
      */
-    sail_status_t start_reading(const void *buffer, size_t buffer_length, const codec_info &scodec_info);
-    sail_status_t start_reading(const void *buffer, size_t buffer_length, const codec_info &scodec_info, const read_options &sread_options);
+    sail_status_t start_reading(const void *buffer, size_t buffer_length);
 
     /*
-     * An interface to sail_start_reading_io(). See sail_start_reading_io() for more.
+     * Starts reading the specified memory buffer with the specified codec.
+     *
+     * Typical usage: start_reading()   ->
+     *                read_next_frame() ->
+     *                stop_reading().
+     *
+     * For example:
+     *
+     * SAIL_TRY(start_reading(...);
+     * SAIL_TRY(read_next_frame(...));
+     * SAIL_TRY(stop_reading());
+     *
+     * Returns SAIL_OK on success.
      */
-    sail_status_t start_reading(const io &sio, const codec_info &scodec_info);
-    sail_status_t start_reading(const io &sio, const codec_info &scodec_info, const read_options &sread_options);
+    sail_status_t start_reading(const void *buffer, size_t buffer_length, const sail::codec_info &codec_info);
 
     /*
-     * An interface to sail_read_next_frame(). See sail_read_next_frame() for more.
+     * Starts reading the specified memory buffer with the specified read options.
+     *
+     * Typical usage: start_reading()   ->
+     *                read_next_frame() ->
+     *                stop_reading().
+     *
+     * For example:
+     *
+     * SAIL_TRY(start_reading(...);
+     * SAIL_TRY(read_next_frame(...));
+     * SAIL_TRY(stop_reading());
+     *
+     * Returns SAIL_OK on success.
      */
-    sail_status_t read_next_frame(image *simage);
+    sail_status_t start_reading(const void *buffer, size_t buffer_length, const sail::read_options &read_options);
 
     /*
-     * An interface to sail_stop_reading(). See sail_stop_reading() for more.
+     * Starts reading the specified memory buffer with the specified codec and read options.
+     *
+     * Typical usage: start_reading()   ->
+     *                read_next_frame() ->
+     *                stop_reading().
+     *
+     * For example:
+     *
+     * SAIL_TRY(start_reading(...);
+     * SAIL_TRY(read_next_frame(...));
+     * SAIL_TRY(stop_reading());
+     *
+     * Returns SAIL_OK on success.
+     */
+    sail_status_t start_reading(const void *buffer, size_t buffer_length, const sail::codec_info &codec_info, const sail::read_options &read_options);
+
+    /*
+     * Starts reading the specified I/O source.
+     *
+     * Typical usage: start_reading()   ->
+     *                read_next_frame() ->
+     *                stop_reading().
+     *
+     * For example:
+     *
+     * SAIL_TRY(start_reading(...);
+     * SAIL_TRY(read_next_frame(...));
+     * SAIL_TRY(stop_reading());
+     *
+     * Returns SAIL_OK on success.
+     */
+    sail_status_t start_reading(const sail::io &io);
+
+    /*
+     * Starts reading the specified I/O source with the specified codec.
+     *
+     * Typical usage: start_reading()   ->
+     *                read_next_frame() ->
+     *                stop_reading().
+     *
+     * For example:
+     *
+     * SAIL_TRY(start_reading(...);
+     * SAIL_TRY(read_next_frame(...));
+     * SAIL_TRY(stop_reading());
+     *
+     * Returns SAIL_OK on success.
+     */
+    sail_status_t start_reading(const sail::io &io, const sail::codec_info &codec_info);
+
+    /*
+     * Starts reading the specified I/O source with the specified read options.
+     *
+     * Typical usage: start_reading()   ->
+     *                read_next_frame() ->
+     *                stop_reading().
+     *
+     * For example:
+     *
+     * SAIL_TRY(start_reading(...);
+     * SAIL_TRY(read_next_frame(...));
+     * SAIL_TRY(stop_reading());
+     *
+     * Returns SAIL_OK on success.
+     */
+    sail_status_t start_reading(const sail::io &io, const sail::read_options &read_options);
+
+    /*
+     * Starts reading the specified I/O source with the specified codec and read options.
+     *
+     * Typical usage: start_reading()   ->
+     *                read_next_frame() ->
+     *                stop_reading().
+     *
+     * For example:
+     *
+     * SAIL_TRY(start_reading(...);
+     * SAIL_TRY(read_next_frame(...));
+     * SAIL_TRY(stop_reading());
+     *
+     * Returns SAIL_OK on success.
+     */
+    sail_status_t start_reading(const sail::io &io, const sail::codec_info &codec_info, const sail::read_options &read_options);
+
+    /*
+     * Continues reading the source started by the previous call to start_reading().
+     * Assigns the read image to the 'image' argument.
+     *
+     * Returns SAIL_OK on success.
+     * Returns SAIL_ERROR_NO_MORE_FRAMES when no more frames are available.
+     */
+    sail_status_t read_next_frame(sail::image *image);
+
+    /*
+     * Stops reading the source started by the previous call to start_reading(). Does nothing
+     * if no reading was started.
+     *
+     * It is essential to always stop writing to free memory resources. Failure to do so
+     * will lead to memory leaks.
+     *
+     * Returns SAIL_OK on success.
      */
     sail_status_t stop_reading();
 
