@@ -59,7 +59,7 @@ class SAIL_EXPORT codec_info
 public:
     /*
      * Constructs an invalid codec info object that can be later initialized with,
-     * for exmaple, from_magic_number.
+     * for exmaple, from_magic_number().
      */
     codec_info();
 
