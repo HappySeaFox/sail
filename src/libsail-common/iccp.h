@@ -41,7 +41,7 @@ extern "C" {
 struct sail_meta_data_node;
 
 /*
- * A structure representing an ICC profile.
+ * ICCP represents an ICC profile.
  */
 struct sail_iccp {
 

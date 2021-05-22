@@ -44,22 +44,55 @@ namespace sail
 {
 
 /*
- * ICC profile representation. It provides access to raw ICC profile data.
+ * ICC profile.
  */
 class SAIL_EXPORT iccp
 {
     friend class image;
 
 public:
+    /*
+     * Constructs an invalid ICC profile.
+     */
     iccp();
+
+    /*
+     * Constructs a new ICC profile from the binary data. The data is deep copied.
+     */
+    iccp(const void *data, unsigned data_length);
+
+    /*
+     * Constructs a new ICC profile from the binary data.
+     */
+    iccp(const arbitrary_data &data);
+
+    /*
+     * Copies the ICC profile.
+     */
     iccp(const iccp &ic);
+
+    /*
+     * Copies the ICC profile.
+     */
     iccp& operator=(const iccp &ic);
+
+    /*
+     * Moves the ICC profile.
+     */
     iccp(iccp &&ic) noexcept;
+
+    /*
+     * Moves the ICC profile.
+     */
     iccp& operator=(iccp &&ic);
+
+    /*
+     * Destroys the ICC profile.
+     */
     ~iccp();
 
     /*
-     * Returns true if the ICC profile has non-NULL data. It doesn't validate the data.
+     * Returns true if the ICC profile data is not empty. It doesn't validate the data.
      */
     bool is_valid() const;
 
@@ -69,10 +102,13 @@ public:
     const arbitrary_data& data() const;
 
     /*
-     * Sets new ICC profile binary data.
+     * Sets new ICC profile binary data. The data is deep copied.
      */
     iccp& with_data(const void *data, unsigned data_length);
 
+    /*
+     * Sets new ICC profile binary data.
+     */
     iccp& with_data(const arbitrary_data &data);
 
 private:

@@ -48,6 +48,18 @@ iccp::iccp()
 {
 }
 
+iccp::iccp(const void *data, unsigned data_length)
+    : iccp()
+{
+    with_data(data, data_length);
+}
+
+iccp::iccp(const arbitrary_data &data)
+    : iccp()
+{
+    with_data(data);
+}
+
 iccp::iccp(const iccp &ic)
     : iccp()
 {
