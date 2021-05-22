@@ -58,7 +58,7 @@ struct sail_write_features;
  * BPP64-RGBA formats first, and only then to the requested output format. No platform-specific
  * instructions (like AVX or SSE) are used.
  *
- * The image ICC profile (if any) is not involved into the conversion procedure.
+ * The image ICC profile is not involved in the conversion procedure.
  *
  * The resulting image gets updated pixel format and bytes per line. Other properties are copied from
  * the original image.
@@ -276,22 +276,22 @@ SAIL_EXPORT sail_status_t sail_update_image_with_options(struct sail_image *imag
 SAIL_EXPORT bool sail_can_convert(enum SailPixelFormat input_pixel_format, enum SailPixelFormat output_pixel_format);
 
 /*
- * Returns the closest to the input pixel format from the list.
+ * Returns the closest pixel format to the input pixel format from the list.
  *
  * This function can be used to find the best pixel format to save an image into.
  *
- * If no candidates found at all, returns SAIL_PIXEL_FORMAT_UNKNOWN.
+ * Returns SAIL_PIXEL_FORMAT_UNKNOWN if no candidates found at all.
  */
 SAIL_EXPORT enum SailPixelFormat sail_closest_pixel_format(enum SailPixelFormat input_pixel_format,
                                                            const enum SailPixelFormat pixel_formats[],
                                                            size_t pixel_formats_length);
 
 /*
- * Returns the closest to the input pixel format from the list in the write features.
+ * Returns the closest pixel format to the input pixel format from the write features.
  *
  * This function can be used to find the best pixel format to save an image into.
  *
- * If no candidates found at all, returns SAIL_PIXEL_FORMAT_UNKNOWN.
+ * Returns SAIL_PIXEL_FORMAT_UNKNOWN if no candidates found at all.
  */
 SAIL_EXPORT enum SailPixelFormat sail_closest_pixel_format_from_write_features(enum SailPixelFormat input_pixel_format,
                                                                                const struct sail_write_features *write_features);

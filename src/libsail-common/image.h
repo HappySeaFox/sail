@@ -77,7 +77,7 @@ struct sail_image {
     unsigned height;
 
     /*
-     * Bytes per line. Some image formats (like BMP) pad rows of pixels to some boundary.
+     * Bytes per line.
      *
      * READ:  Set by SAIL to a positive length of a row of pixels in bytes.
      * WRITE: Must be set by a caller to a positive number of bytes per line. A caller could set
@@ -115,7 +115,7 @@ struct sail_image {
     int interlaced_passes;
 
     /*
-     * Is the image a frame in an animation.
+     * Is the image a frame in an animation or not.
      *
      * READ:  Set by SAIL to true if the image is a frame in an animation.
      * WRITE: Must be set by a caller to true if the image is a frame in an animation.
@@ -127,8 +127,10 @@ struct sail_image {
      * Delay in milliseconds to display the image on the screen if the image is a frame
      * in an animation or 0 otherwise.
      *
-     * READ:  Set by SAIL to a non-negative number of milliseconds.
-     * WRITE: Must be set by a caller to a non-negative number of milliseconds.
+     * READ:  Set by SAIL to a non-negative number of milliseconds if the image is a frame
+     *        in an animation.
+     * WRITE: Must be set by a caller to a non-negative number of milliseconds if the image is a frame
+     *        in an animation.
      */
     int delay;
 
@@ -163,7 +165,7 @@ struct sail_image {
     struct sail_iccp *iccp;
 
     /*
-     * Or-ed decoded image properties. See SailImageProperty.
+     * Or-ed image properties. See SailImageProperty.
      *
      * READ:  Set by SAIL to valid image properties. For example, some image formats store images flipped.
      *        A caller must use this field to manipulate the output image accordingly (e.g., flip back etc.).

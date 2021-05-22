@@ -65,29 +65,69 @@ class SAIL_EXPORT image
     friend class image_writer;
 
 public:
+    /*
+     * Constructs an invalid image.
+     */
     image();
+
+    /*
+     * Constructs a new image out of the specified image properties and pixels.
+     */
     image(void *pixels, SailPixelFormat pixel_format, unsigned width, unsigned height);
+
+    /*
+     * Constructs a new image out of the specified image properties and pixels.
+     */
     image(void *pixels, SailPixelFormat pixel_format, unsigned width, unsigned height, unsigned bytes_per_line);
+
+    /*
+     * Copies the image.
+     */
     image(const image &img);
+
+    /*
+     * Copies the image.
+     */
     image& operator=(const image &img);
+
+    /*
+     * Moves the image.
+     */
     image(image &&img) noexcept;
+
+    /*
+     * Moves the image.
+     */
     image& operator=(image &&img);
+
+    /*
+     * Destroys the imagea and the deep copied pixel data.
+     */
     ~image();
 
     /*
-     * Returns true if the image has valid dimensions, bytes-per-line,
+     * Returns true if the image has valid dimensions, pixel format, bytes per line,
      * and the pixel data (deep copied or shallow).
      */
     bool is_valid() const;
 
+    /*
+     * Returns true if the image pixel format is indexed with palette.
+     */
     bool is_indexed() const;
 
+    /*
+     * Returns true if the image pixel format is grayscale.
+     */
     bool is_grayscale() const;
 
+    /*
+     * Returns true if the image pixel format is RGB-like (RGBA, BGR, etc.).
+     */
     bool is_rgb_family() const;
 
     /*
-     * Returns image width.
+     * Returns the image width.
      *
      * READ:  Set by SAIL to a positive image width in pixels.
      * WRITE: Must be set by a caller to a positive image width in pixels.
@@ -95,7 +135,7 @@ public:
     unsigned width() const;
 
     /*
-     * Returns image height.
+     * Returns the image height.
      *
      * READ:  Set by SAIL to a positive image height in pixels.
      * WRITE: Must be set by a caller to a positive image height in pixels.
@@ -103,7 +143,7 @@ public:
     unsigned height() const;
 
     /*
-     * Returns bytes per line. Some image formats (like BMP) pad rows of pixels to some boundary.
+     * Returns the bytes per line.
      *
      * READ:  Set by SAIL to a positive length of a row of pixels in bytes.
      * WRITE: Must be set by a caller to a positive number of bytes per line. A caller could set
@@ -112,7 +152,7 @@ public:
     unsigned bytes_per_line() const;
 
     /*
-     * Image resolution.
+     * Returns the image resolution.
      *
      * READ:  Set by SAIL to a valid resolution if this information is available.
      * WRITE: Must be set by a caller to a valid image resolution if necessary.
@@ -120,7 +160,7 @@ public:
     const sail::resolution& resolution() const;
 
     /*
-     * Returns image pixel format. See SailPixelFormat.
+     * Returns the image pixel format. See SailPixelFormat.
      *
      * READ:  Set by SAIL to a valid output image pixel format. The list of supported output pixel formats
      *        by a certain codec can be obtained from read_features.input_pixel_formats.
@@ -131,7 +171,7 @@ public:
     SailPixelFormat pixel_format() const;
 
     /*
-     * Returns true if the image a frame in an animation.
+     * Returns true if the image is a frame in an animation.
      *
      * READ:  Set by SAIL to true if the image is a frame in an animation.
      * WRITE: Must be set by a caller to true if the image is a frame in an animation.
@@ -140,16 +180,18 @@ public:
     bool animated() const;
 
     /*
-     * Returns delay in milliseconds to display the image on the screen if the image is a frame
+     * Returns the delay in milliseconds to display the image on the screen if the image is a frame
      * in an animation or 0 otherwise.
      *
-     * READ:  Set by SAIL to a non-negative number of milliseconds.
-     * WRITE: Must be set by a caller to a non-negative number of milliseconds.
+     * READ:  Set by SAIL to a non-negative number of milliseconds if the image is a frame
+     *        in an animation.
+     * WRITE: Must be set by a caller to a non-negative number of milliseconds if the image is a frame
+     *        in an animation.
      */
     int delay() const;
 
     /*
-     * Returns palette if the image has a palette and the requested pixel format assumes having a palette.
+     * Returns the image palette if the image has it.
      *
      * READ:  Set by SAIL to a valid palette if the image is indexed and the requested pixel format
      *        assumes having a palette.
@@ -158,16 +200,15 @@ public:
     const sail::palette& palette() const;
 
     /*
-     * Returns image meta data.
+     * Returns the image meta data.
      *
      * READ:  Set by SAIL to a valid map with meta data (like JPEG comments).
-     * WRITE: Must be set by a caller to a valid map with meta data
-     *        (like JPEG comments) if necessary.
+     * WRITE: Must be set by a caller to a valid map with meta data (like JPEG comments) if necessary.
      */
     const std::vector<sail::meta_data>& meta_data() const;
 
     /*
-     * Returns embedded ICC profile.
+     * Returns the embedded ICC profile.
      *
      * Note for animated/multi-paged images: only the first image in an animated/multi-paged
      * sequence might have an ICC profile.
@@ -178,7 +219,7 @@ public:
     const sail::iccp& iccp() const;
 
     /*
-     * Returns or-ed decoded image properties. See SailImageProperty.
+     * Returns the or-ed image properties. See SailImageProperty.
      *
      * READ:  Set by SAIL to valid image properties. For example, some image formats store images flipped.
      *        A caller must use this field to manipulate the output image accordingly (e.g., flip back etc.).
@@ -187,7 +228,7 @@ public:
     int properties() const;
 
     /*
-     * Source image properties.
+     * Returns the source image properties.
      *
      * READ:  Set by SAIL to valid source image properties of the original image.
      * WRITE: Ignored.
@@ -211,7 +252,7 @@ public:
     const void* pixels() const;
 
     /*
-     * Returns the size of deep copied pixel data in bytes.
+     * Returns the size of the deep copied pixel data in bytes.
      */
     unsigned pixels_size() const;
 
@@ -252,18 +293,18 @@ public:
     image& with_delay(int delay);
 
     /*
-     * Deep copies the specified palette.
+     * Sets a new palette.
      */
     image& with_palette(const sail::palette &pal);
 
     /*
-     * Sets new meta entries.
+     * Sets new meta data.
      */
     image& with_meta_data(const std::vector<sail::meta_data> &md);
 
     /*
      * Deep copies the specified pixel data. The data can be accessed later with pixels().
-     * The size of the pixel data is calculated based on the image width, height, and the pixel
+     * The size of the pixel data is calculated based on the image height, bytes per line, and the pixel
      * format which must be set beforehand. The deep copied data is deleted upon image destruction.
      */
     image& with_pixels(const void *pixels);
@@ -279,7 +320,7 @@ public:
      * The pixel data must remain valid until the image exists. The shallow data is not deleted upon
      * image destruction.
      *
-     * The size of the pixel data is calculated based on the image width, height, and the pixel
+     * The size of the pixel data is calculated based on the image height, bytes per line, and the pixel
      * format which must be set beforehand.
      */
     image& with_shallow_pixels(void *pixels);
@@ -296,40 +337,255 @@ public:
      */
     image& with_iccp(const sail::iccp &ic);
 
+    /*
+     * Returns true if the image can be converted into the specified pixel format.
+     */
     bool can_convert(SailPixelFormat pixel_format);
 
+    /*
+     * Converts the image to the specified pixel format. Use can_convert() to quickly check if the conversion
+     * can actually be done.
+     *
+     * Updates the image pixel format and bytes per line.
+     *
+     * Drops the input alpha channel if the output alpha channel doesn't exist. For example,
+     * when converting RGBA pixels to RGB. If you need to control this behavior,
+     * use the overloaded method with conversion_options.
+     *
+     * The conversion procedure may be slow. It converts every pixel into the BPP32-RGBA or
+     * BPP64-RGBA formats first, and only then to the requested output format. No platform-specific
+     * instructions (like AVX or SSE) are used.
+     *
+     * The image ICC profile is not involved in the conversion procedure.
+     *
+     * Returns SAIL_OK on success.
+     */
     sail_status_t convert(SailPixelFormat pixel_format);
 
+    /*
+     * Converts the image to the specified pixel format using the specified conversion options.
+     * Use can_convert() to quickly check if the conversion can actually be done.
+     *
+     * Updates the image pixel format and bytes per line.
+     *
+     * The conversion procedure may be slow. It converts every pixel into the BPP32-RGBA or
+     * BPP64-RGBA formats first, and only then to the requested output format. No platform-specific
+     * instructions (like AVX or SSE) are used.
+     *
+     * The image ICC profile is not involved in the conversion procedure.
+     *
+     * Returns SAIL_OK on success.
+     */
     sail_status_t convert(SailPixelFormat pixel_format, const conversion_options &options);
 
+    /*
+     * Converts the image to the best pixel format for saving. Use can_convert()
+     * to quickly check if the conversion can actually be done.
+     *
+     * Updates the image pixel format and bytes per line.
+     *
+     * Drops the input alpha channel if the output alpha channel doesn't exist. For example,
+     * when converting RGBA pixels to RGB. If you need to control this behavior,
+     * use the overloaded method with conversion_options.
+     *
+     * The conversion procedure may be slow. It converts every pixel into the BPP32-RGBA or
+     * BPP64-RGBA formats first, and only then to the requested output format. No platform-specific
+     * instructions (like AVX or SSE) are used.
+     *
+     * The image ICC profile is not involved in the conversion procedure.
+     *
+     * Returns SAIL_OK on success.
+     */
     sail_status_t convert(const write_features &wf);
 
+    /*
+     * Converts the image to the best pixel format for saving using the specified conversion options.
+     * Use can_convert() to quickly check if the conversion can actually be done.
+     *
+     * Updates the image pixel format and bytes per line.
+     *
+     * The conversion procedure may be slow. It converts every pixel into the BPP32-RGBA or
+     * BPP64-RGBA formats first, and only then to the requested output format. No platform-specific
+     * instructions (like AVX or SSE) are used.
+     *
+     * The image ICC profile is not involved in the conversion procedure.
+     *
+     * Returns SAIL_OK on success.
+     */
     sail_status_t convert(const write_features &wf, const conversion_options &options);
 
-    sail_status_t convert_to(SailPixelFormat pixel_format, sail::image *image);
+    /*
+     * Converts the image to the specified pixel format and assigns the resulting image to the 'image' argument.
+     * Use can_convert() to quickly check if the conversion can actually be done.
+     *
+     * Drops the input alpha channel if the output alpha channel doesn't exist. For example,
+     * when converting RGBA pixels to RGB. If you need to control this behavior,
+     * use the overloaded method with conversion_options.
+     *
+     * The conversion procedure may be slow. It converts every pixel into the BPP32-RGBA or
+     * BPP64-RGBA formats first, and only then to the requested output format. No platform-specific
+     * instructions (like AVX or SSE) are used.
+     *
+     * The image ICC profile is not involved in the conversion procedure.
+     *
+     * Returns SAIL_OK on success.
+     */
+    sail_status_t convert_to(SailPixelFormat pixel_format, sail::image *image) const;
 
-    sail_status_t convert_to(SailPixelFormat pixel_format, const conversion_options &options, sail::image *image);
+    /*
+     * Converts the image to the specified pixel format using the specified conversion options
+     * and assigns the resulting image to the 'image' argument.
+     * Use can_convert() to quickly check if the conversion can actually be done.
+     *
+     * The conversion procedure may be slow. It converts every pixel into the BPP32-RGBA or
+     * BPP64-RGBA formats first, and only then to the requested output format. No platform-specific
+     * instructions (like AVX or SSE) are used.
+     *
+     * The image ICC profile is not involved in the conversion procedure.
+     *
+     * Returns SAIL_OK on success.
+     */
+    sail_status_t convert_to(SailPixelFormat pixel_format, const conversion_options &options, sail::image *image) const;
 
-    sail_status_t convert_to(const write_features &wf, sail::image *image);
+    /*
+     * Converts the image to the best pixel format for saving and assigns the resulting image to the 'image' argument.
+     * Use can_convert() to quickly check if the conversion can actually be done.
+     *
+     * Drops the input alpha channel if the output alpha channel doesn't exist. For example,
+     * when converting RGBA pixels to RGB. If you need to control this behavior,
+     * use the overloaded method with conversion_options.
+     *
+     * The conversion procedure may be slow. It converts every pixel into the BPP32-RGBA or
+     * BPP64-RGBA formats first, and only then to the requested output format. No platform-specific
+     * instructions (like AVX or SSE) are used.
+     *
+     * The image ICC profile is not involved in the conversion procedure.
+     *
+     * Returns SAIL_OK on success.
+     */
+    sail_status_t convert_to(const write_features &wf, sail::image *image) const;
 
-    sail_status_t convert_to(const write_features &wf, const conversion_options &options, sail::image *image);
+    /*
+     * Converts the image to the best pixel format for saving using the specified conversion options
+     * and assigns the resulting image to the 'image' argument.
+     * Use can_convert() to quickly check if the conversion can actually be done.
+     *
+     * The conversion procedure may be slow. It converts every pixel into the BPP32-RGBA or
+     * BPP64-RGBA formats first, and only then to the requested output format. No platform-specific
+     * instructions (like AVX or SSE) are used.
+     *
+     * The image ICC profile is not involved in the conversion procedure.
+     *
+     * Returns SAIL_OK on success.
+     */
+    sail_status_t convert_to(const write_features &wf, const conversion_options &options, sail::image *image) const;
 
-    image convert_to(SailPixelFormat pixel_format);
+    /*
+     * Converts the image to the specified pixel format and returns the resulting image.
+     * Use can_convert() to quickly check if the conversion can actually be done.
+     *
+     * Drops the input alpha channel if the output alpha channel doesn't exist. For example,
+     * when converting RGBA pixels to RGB. If you need to control this behavior,
+     * use the overloaded method with conversion_options.
+     *
+     * The conversion procedure may be slow. It converts every pixel into the BPP32-RGBA or
+     * BPP64-RGBA formats first, and only then to the requested output format. No platform-specific
+     * instructions (like AVX or SSE) are used.
+     *
+     * The image ICC profile is not involved in the conversion procedure.
+     *
+     * Returns an invalid image on error.
+     */
+    image convert_to(SailPixelFormat pixel_format) const;
 
-    image convert_to(SailPixelFormat pixel_format, const conversion_options &options);
+    /*
+     * Converts the image to the specified pixel format using the specified conversion options
+     * and returns the resulting image.
+     * Use can_convert() to quickly check if the conversion can actually be done.
+     *
+     * The conversion procedure may be slow. It converts every pixel into the BPP32-RGBA or
+     * BPP64-RGBA formats first, and only then to the requested output format. No platform-specific
+     * instructions (like AVX or SSE) are used.
+     *
+     * The image ICC profile is not involved in the conversion procedure.
+     *
+     * Returns an invalid image on error.
+     */
+    image convert_to(SailPixelFormat pixel_format, const conversion_options &options) const;
 
-    image convert_to(const write_features &wf);
+    /*
+     * Converts the image to the best pixel format for saving and returns the resulting image.
+     * Use can_convert() to quickly check if the conversion can actually be done.
+     *
+     * Drops the input alpha channel if the output alpha channel doesn't exist. For example,
+     * when converting RGBA pixels to RGB. If you need to control this behavior,
+     * use the overloaded method with conversion_options.
+     *
+     * The conversion procedure may be slow. It converts every pixel into the BPP32-RGBA or
+     * BPP64-RGBA formats first, and only then to the requested output format. No platform-specific
+     * instructions (like AVX or SSE) are used.
+     *
+     * The image ICC profile is not involved in the conversion procedure.
+     *
+     * Returns an invalid image on error.
+     */
+    image convert_to(const write_features &wf) const;
 
-    image convert_to(const write_features &wf, const conversion_options &options);
+    /*
+     * Converts the image to the best pixel format for saving using the specified conversion options
+     * and returns the resulting image.
+     * Use can_convert() to quickly check if the conversion can actually be done.
+     *
+     * The conversion procedure may be slow. It converts every pixel into the BPP32-RGBA or
+     * BPP64-RGBA formats first, and only then to the requested output format. No platform-specific
+     * instructions (like AVX or SSE) are used.
+     *
+     * The image ICC profile is not involved in the conversion procedure.
+     *
+     * Returns an invalid image on error.
+     */
+    image convert_to(const write_features &wf, const conversion_options &options) const;
 
-    SailPixelFormat closest_pixel_format(const std::vector<SailPixelFormat> &pixel_formats);
+    /*
+     * Returns the closest pixel format from the list.
+     *
+     * This method can be used to find the best pixel format to save the image into.
+     *
+     * Returns SAIL_PIXEL_FORMAT_UNKNOWN if no candidates found at all.
+     */
+    SailPixelFormat closest_pixel_format(const std::vector<SailPixelFormat> &pixel_formats) const;
 
-    SailPixelFormat closest_pixel_format(const write_features &wf);
+    /*
+     * Returns the closest pixel format from the write features.
+     *
+     * This method can be used to find the best pixel format to save the image into.
+     *
+     * Returns SAIL_PIXEL_FORMAT_UNKNOWN if no candidates found at all.
+     */
+    SailPixelFormat closest_pixel_format(const write_features &wf) const;
 
+    /*
+     * Returns true if the conversion or updating functions can convert or update from the input
+     * pixel format to the output pixel format.
+     */
     static bool can_convert(SailPixelFormat input_pixel_format, SailPixelFormat output_pixel_format);
 
+    /*
+     * Returns the closest pixel format to the input pixel format from the list.
+     *
+     * This method can be used to find the best pixel format to save an image into.
+     *
+     * Returns SAIL_PIXEL_FORMAT_UNKNOWN if no candidates found at all.
+     */
     static SailPixelFormat closest_pixel_format(SailPixelFormat input_pixel_format, const std::vector<SailPixelFormat> &pixel_formats);
 
+    /*
+     * Returns the closest pixel format to the input pixel format from the write features.
+     *
+     * This method can be used to find the best pixel format to save an image into.
+     *
+     * Returns SAIL_PIXEL_FORMAT_UNKNOWN if no candidates found at all.
+     */
     static SailPixelFormat closest_pixel_format(SailPixelFormat input_pixel_format, const write_features &wf);
 
     /*
@@ -361,10 +617,19 @@ public:
      */
     static sail_status_t bytes_per_line(unsigned width, SailPixelFormat pixel_format, unsigned *result);
 
+    /*
+     * Returns true if the specified pixel format is indexed with palette.
+     */
     static bool is_indexed(SailPixelFormat pixel_format);
 
+    /*
+     * Returns true if the specified pixel format is grayscale.
+     */
     static bool is_grayscale(SailPixelFormat pixel_format);
 
+    /*
+     * Returns true if the specified pixel format is RGB-like (RGBA, BGR, etc.).
+     */
     static bool is_rgb_family(SailPixelFormat pixel_format);
 
     /*

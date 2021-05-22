@@ -477,14 +477,14 @@ sail_status_t image::convert(const write_features &wf, const conversion_options 
     return SAIL_OK;
 }
 
-sail_status_t image::convert_to(SailPixelFormat pixel_format, sail::image *image)
+sail_status_t image::convert_to(SailPixelFormat pixel_format, sail::image *image) const
 {
     SAIL_TRY(convert_to(pixel_format, conversion_options{}, image));
 
     return SAIL_OK;
 }
 
-sail_status_t image::convert_to(SailPixelFormat pixel_format, const conversion_options &options, sail::image *image)
+sail_status_t image::convert_to(SailPixelFormat pixel_format, const conversion_options &options, sail::image *image) const
 {
     SAIL_CHECK_IMAGE_PTR(image);
 
@@ -517,14 +517,14 @@ sail_status_t image::convert_to(SailPixelFormat pixel_format, const conversion_o
     return SAIL_OK;
 }
 
-sail_status_t image::convert_to(const write_features &wf, sail::image *image)
+sail_status_t image::convert_to(const write_features &wf, sail::image *image) const
 {
     SAIL_TRY(convert_to(wf, conversion_options{}, image));
 
     return SAIL_OK;
 }
 
-sail_status_t image::convert_to(const write_features &wf, const conversion_options &options, sail::image *image)
+sail_status_t image::convert_to(const write_features &wf, const conversion_options &options, sail::image *image) const
 {
     if (!is_valid()) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
@@ -548,7 +548,7 @@ sail_status_t image::convert_to(const write_features &wf, const conversion_optio
     return SAIL_OK;
 }
 
-image image::convert_to(SailPixelFormat pixel_format)
+image image::convert_to(SailPixelFormat pixel_format) const
 {
     image img;
     SAIL_TRY_OR_EXECUTE(convert_to(pixel_format, &img),
@@ -557,7 +557,7 @@ image image::convert_to(SailPixelFormat pixel_format)
     return img;
 }
 
-image image::convert_to(SailPixelFormat pixel_format, const conversion_options &options)
+image image::convert_to(SailPixelFormat pixel_format, const conversion_options &options) const
 {
     image img;
     SAIL_TRY_OR_EXECUTE(convert_to(pixel_format, options, &img),
@@ -566,7 +566,7 @@ image image::convert_to(SailPixelFormat pixel_format, const conversion_options &
     return img;
 }
 
-image image::convert_to(const write_features &wf)
+image image::convert_to(const write_features &wf) const
 {
     image img;
     SAIL_TRY_OR_EXECUTE(convert_to(wf, conversion_options{}, &img),
@@ -575,7 +575,7 @@ image image::convert_to(const write_features &wf)
     return img;
 }
 
-image image::convert_to(const write_features &wf, const conversion_options &options)
+image image::convert_to(const write_features &wf, const conversion_options &options) const
 {
     image img;
     SAIL_TRY_OR_EXECUTE(convert_to(wf, options, &img),
@@ -584,18 +584,18 @@ image image::convert_to(const write_features &wf, const conversion_options &opti
     return img;
 }
 
-SailPixelFormat image::closest_pixel_format(const std::vector<SailPixelFormat> &pixel_formats)
+SailPixelFormat image::closest_pixel_format(const std::vector<SailPixelFormat> &pixel_formats) const
 {
     return sail_closest_pixel_format(d->pixel_format, pixel_formats.data(), pixel_formats.size());
 }
 
-SailPixelFormat image::closest_pixel_format(const write_features &wf)
+SailPixelFormat image::closest_pixel_format(const write_features &wf) const
 {
     return sail_closest_pixel_format(d->pixel_format, wf.output_pixel_formats().data(), wf.output_pixel_formats().size());
 }
 
-bool image::can_convert(SailPixelFormat input_pixel_format, SailPixelFormat output_pixel_format) {
-
+bool image::can_convert(SailPixelFormat input_pixel_format, SailPixelFormat output_pixel_format)
+{
     return sail_can_convert(input_pixel_format, output_pixel_format);
 }
 
