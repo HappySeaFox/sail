@@ -133,12 +133,6 @@ public:
      *                read_next_frame() ->
      *                stop_reading().
      *
-     * For example:
-     *
-     * SAIL_TRY(start_reading(...);
-     * SAIL_TRY(read_next_frame(...));
-     * SAIL_TRY(stop_reading());
-     *
      * Returns SAIL_OK on success.
      */
     sail_status_t start_reading(std::string_view path);
@@ -146,15 +140,10 @@ public:
     /*
      * Starts reading the specified image file with the specified codec.
      *
-     * Typical usage: start_reading()   ->
-     *                read_next_frame() ->
+     * Typical usage: codec_info::from_extension() ->
+     *                start_reading()              ->
+     *                read_next_frame()            ->
      *                stop_reading().
-     *
-     * For example:
-     *
-     * SAIL_TRY(start_reading(...);
-     * SAIL_TRY(read_next_frame(...));
-     * SAIL_TRY(stop_reading());
      *
      * Returns SAIL_OK on success.
      */
@@ -167,12 +156,6 @@ public:
      *                read_next_frame() ->
      *                stop_reading().
      *
-     * For example:
-     *
-     * SAIL_TRY(start_reading(...);
-     * SAIL_TRY(read_next_frame(...));
-     * SAIL_TRY(stop_reading());
-     *
      * Returns SAIL_OK on success.
      */
     sail_status_t start_reading(std::string_view path, const sail::read_options &read_options);
@@ -180,15 +163,10 @@ public:
     /*
      * Starts reading the specified image file with the specified codec and read options.
      *
-     * Typical usage: start_reading()   ->
-     *                read_next_frame() ->
+     * Typical usage: codec_info::from_extension() ->
+     *                start_reading()              ->
+     *                read_next_frame()            ->
      *                stop_reading().
-     *
-     * For example:
-     *
-     * SAIL_TRY(start_reading(...);
-     * SAIL_TRY(read_next_frame(...));
-     * SAIL_TRY(stop_reading());
      *
      * Returns SAIL_OK on success.
      */
@@ -201,12 +179,6 @@ public:
      *                read_next_frame() ->
      *                stop_reading().
      *
-     * For example:
-     *
-     * SAIL_TRY(start_reading(...);
-     * SAIL_TRY(read_next_frame(...));
-     * SAIL_TRY(stop_reading());
-     *
      * Returns SAIL_OK on success.
      */
     sail_status_t start_reading(const void *buffer, size_t buffer_length);
@@ -214,15 +186,10 @@ public:
     /*
      * Starts reading the specified memory buffer with the specified codec.
      *
-     * Typical usage: start_reading()   ->
-     *                read_next_frame() ->
+     * Typical usage: codec_info::from_extension() ->
+     *                start_reading()              ->
+     *                read_next_frame()            ->
      *                stop_reading().
-     *
-     * For example:
-     *
-     * SAIL_TRY(start_reading(...);
-     * SAIL_TRY(read_next_frame(...));
-     * SAIL_TRY(stop_reading());
      *
      * Returns SAIL_OK on success.
      */
@@ -235,12 +202,6 @@ public:
      *                read_next_frame() ->
      *                stop_reading().
      *
-     * For example:
-     *
-     * SAIL_TRY(start_reading(...);
-     * SAIL_TRY(read_next_frame(...));
-     * SAIL_TRY(stop_reading());
-     *
      * Returns SAIL_OK on success.
      */
     sail_status_t start_reading(const void *buffer, size_t buffer_length, const sail::read_options &read_options);
@@ -248,15 +209,10 @@ public:
     /*
      * Starts reading the specified memory buffer with the specified codec and read options.
      *
-     * Typical usage: start_reading()   ->
-     *                read_next_frame() ->
+     * Typical usage: codec_info::from_extension() ->
+     *                start_reading()              ->
+     *                read_next_frame()            ->
      *                stop_reading().
-     *
-     * For example:
-     *
-     * SAIL_TRY(start_reading(...);
-     * SAIL_TRY(read_next_frame(...));
-     * SAIL_TRY(stop_reading());
      *
      * Returns SAIL_OK on success.
      */
@@ -269,12 +225,6 @@ public:
      *                read_next_frame() ->
      *                stop_reading().
      *
-     * For example:
-     *
-     * SAIL_TRY(start_reading(...);
-     * SAIL_TRY(read_next_frame(...));
-     * SAIL_TRY(stop_reading());
-     *
      * Returns SAIL_OK on success.
      */
     sail_status_t start_reading(const sail::io &io);
@@ -282,15 +232,10 @@ public:
     /*
      * Starts reading the specified I/O source with the specified codec.
      *
-     * Typical usage: start_reading()   ->
-     *                read_next_frame() ->
+     * Typical usage: codec_info::from_extension() ->
+     *                start_reading()              ->
+     *                read_next_frame()            ->
      *                stop_reading().
-     *
-     * For example:
-     *
-     * SAIL_TRY(start_reading(...);
-     * SAIL_TRY(read_next_frame(...));
-     * SAIL_TRY(stop_reading());
      *
      * Returns SAIL_OK on success.
      */
@@ -303,12 +248,6 @@ public:
      *                read_next_frame() ->
      *                stop_reading().
      *
-     * For example:
-     *
-     * SAIL_TRY(start_reading(...);
-     * SAIL_TRY(read_next_frame(...));
-     * SAIL_TRY(stop_reading());
-     *
      * Returns SAIL_OK on success.
      */
     sail_status_t start_reading(const sail::io &io, const sail::read_options &read_options);
@@ -316,15 +255,10 @@ public:
     /*
      * Starts reading the specified I/O source with the specified codec and read options.
      *
-     * Typical usage: start_reading()   ->
-     *                read_next_frame() ->
+     * Typical usage: codec_info::from_extension() ->
+     *                start_reading()              ->
+     *                read_next_frame()            ->
      *                stop_reading().
-     *
-     * For example:
-     *
-     * SAIL_TRY(start_reading(...);
-     * SAIL_TRY(read_next_frame(...));
-     * SAIL_TRY(stop_reading());
      *
      * Returns SAIL_OK on success.
      */
