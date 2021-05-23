@@ -43,7 +43,7 @@ public:
     }
 
     void *state;
-    sail_io *sail_io;
+    struct sail_io *sail_io;
 };
 
 image_reader::image_reader()
