@@ -40,10 +40,12 @@ extern "C" {
 
 struct sail_read_features;
 
-/* Options to modify reading operations. */
+/*
+ * sail_read_options represents options to modify reading operations.
+ */
 struct sail_read_options {
 
-    /* Or-ed IO manipulation options. See SailIoOption. */
+    /* Or-ed I/O manipulation options for reading operations. See SailIoOption. */
     int io_options;
 };
 

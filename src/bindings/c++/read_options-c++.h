@@ -42,7 +42,7 @@ namespace sail
 {
 
 /*
- * A C++ interface to struct sail_read_options.
+ * read_options represents options to modify reading operations. See image_reader.
  */
 class SAIL_EXPORT read_options
 {
@@ -50,15 +50,44 @@ class SAIL_EXPORT read_options
     friend class read_features;
 
 public:
+    /*
+     * Constructs empty read options.
+     */
     read_options();
+
+    /*
+     * Copies the read options.
+     */
     read_options(const read_options &ro);
+
+    /*
+     * Copies the read options.
+     */
     read_options& operator=(const read_options &ro);
+
+    /*
+     * Moves the read options.
+     */
     read_options(read_options &&ro) noexcept;
+
+    /*
+     * Moves the read options.
+     */
     read_options& operator=(read_options &&ro);
+
+    /*
+     * Destroys the read options.
+     */
     ~read_options();
 
+    /*
+     * Returns or-ed I/O manipulation options for reading operations. See SailIoOption.
+     */
     int io_options() const;
 
+    /*
+     * Sets new read options.
+     */
     read_options& with_io_options(int io_options);
 
 private:
