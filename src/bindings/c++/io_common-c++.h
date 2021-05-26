@@ -40,36 +40,112 @@ namespace sail
 {
 
 /*
- * A C++ interface to struct sail_io.
+ * IO represents an input/output abstraction.
  */
 class SAIL_EXPORT io
 {
-    // For to_sail_io().
     friend class codec_info;
     friend class image_reader;
     friend class image_writer;
+
 public:
+    /*
+     * Constructs a new I/O stream.
+     */
     io();
+
+    /*
+     * Copies the I/O stream.
+     */
     io(const io &i);
+
+    /*
+     * Copies the I/O stream.
+     */
     io& operator=(const io &i);
+
+    /*
+     * Destroys the I/O stream.
+     */
     ~io();
 
+    /*
+     * Returns SAIL_OK if the I/O stream has valid callbacks and a non-zero id.
+     */
     sail_status_t verify_valid() const;
 
+    /*
+     * Returns true if the I/O stream has valid callbacks and a non-zero id.
+     */
     bool is_valid() const;
 
+    /*
+     * Returns the I/O stream id.
+     *
+     * The same I/O classes (file, memory, etc.) share the same ids. This way
+     * a client can known the exact type of the I/O object. For example, a client can distinguish between
+     * file and memory I/O streams.
+     *
+     * You MUST use your own unique id for custom I/O classes. For example, you can use sail_hash()
+     * to generate a unique id and assign it with with_id().
+     *
+     * Well-known I/O ids for file and memory I/O classes: SAIL_FILE_IO_ID and SAIL_MEMORY_IO_ID.
+     */
     uint64_t id() const;
 
+    /*
+     * Sets a new I/O stream id.
+     */
     io& with_id(uint64_t id);
+
+    /*
+     * Sets a new I/O-specific data object. For example, a pointer to a FILE.
+     */
     io& with_stream(void *stream);
+
+    /*
+     * Sets a new tolerant read callback.
+     */
     io& with_tolerant_read(sail_io_tolerant_read_t read);
+
+    /*
+     * Sets a new strict read callback.
+     */
     io& with_strict_read(sail_io_strict_read_t read);
+
+    /*
+     * Sets a new seek callback.
+     */
     io& with_seek(sail_io_seek_t seek);
+
+    /*
+     * Sets a new tell callback.
+     */
     io& with_tell(sail_io_tell_t tell);
+
+    /*
+     * Sets a new tolerant write callback.
+     */
     io& with_tolerant_write(sail_io_tolerant_write_t write);
+
+    /*
+     * Sets a new strict write callback.
+     */
     io& with_strict_write(sail_io_strict_write_t write);
+
+    /*
+     * Sets a new flush callback.
+     */
     io& with_flush(sail_io_flush_t flush);
+
+    /*
+     * Sets a new close callback.
+     */
     io& with_close(sail_io_close_t close);
+
+    /*
+     * Sets a new EOF callback.
+     */
     io& with_eof(sail_io_eof_t eof);
 
 private:
