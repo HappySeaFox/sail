@@ -47,7 +47,7 @@ class codec_info;
 class read_options;
 
 /*
- * Class to probe and read images.
+ * Class to probe and read images form files, memory, and custom I/O sources.
  */
 class SAIL_EXPORT image_reader
 {
