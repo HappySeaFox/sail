@@ -42,6 +42,16 @@ public:
     {
     }
 
+    sail_status_t ensure_state_is_null()
+    {
+        if (state != nullptr) {
+            SAIL_LOG_ERROR("Writing operation is in progress. Stop it before starting a new one");
+            return SAIL_ERROR_CONFLICTING_OPERATION;
+        }
+
+        return SAIL_OK;
+    }
+
     void *state;
     struct sail_io *sail_io;
 };
@@ -98,6 +108,8 @@ sail_status_t image_writer::write(void *buffer, size_t buffer_length, const sail
 
 sail_status_t image_writer::start_writing(const std::string_view path)
 {
+    SAIL_TRY(d->ensure_state_is_null());
+
     SAIL_TRY(sail_start_writing_file(path.data(), nullptr, &d->state));
 
     return SAIL_OK;
@@ -105,6 +117,8 @@ sail_status_t image_writer::start_writing(const std::string_view path)
 
 sail_status_t image_writer::start_writing(const std::string_view path, const sail::codec_info &codec_info)
 {
+    SAIL_TRY(d->ensure_state_is_null());
+
     SAIL_TRY(sail_start_writing_file(path.data(), codec_info.sail_codec_info_c(), &d->state));
 
     return SAIL_OK;
@@ -112,6 +126,8 @@ sail_status_t image_writer::start_writing(const std::string_view path, const sai
 
 sail_status_t image_writer::start_writing(const std::string_view path, const sail::write_options &write_options)
 {
+    SAIL_TRY(d->ensure_state_is_null());
+
     sail_write_options sail_write_options;
     SAIL_TRY(write_options.to_sail_write_options(&sail_write_options));
 
@@ -122,6 +138,8 @@ sail_status_t image_writer::start_writing(const std::string_view path, const sai
 
 sail_status_t image_writer::start_writing(const std::string_view path, const sail::codec_info &codec_info, const sail::write_options &write_options)
 {
+    SAIL_TRY(d->ensure_state_is_null());
+
     sail_write_options sail_write_options;
     SAIL_TRY(write_options.to_sail_write_options(&sail_write_options));
 
@@ -132,7 +150,7 @@ sail_status_t image_writer::start_writing(const std::string_view path, const sai
 
 sail_status_t image_writer::start_writing(void *buffer, size_t buffer_length, const sail::codec_info &codec_info)
 {
-    SAIL_CHECK_BUFFER_PTR(buffer);
+    SAIL_TRY(d->ensure_state_is_null());
 
     SAIL_TRY(sail_start_writing_mem(buffer,
                                     buffer_length,
@@ -144,7 +162,7 @@ sail_status_t image_writer::start_writing(void *buffer, size_t buffer_length, co
 
 sail_status_t image_writer::start_writing(void *buffer, size_t buffer_length, const sail::codec_info &codec_info, const sail::write_options &write_options)
 {
-    SAIL_CHECK_BUFFER_PTR(buffer);
+    SAIL_TRY(d->ensure_state_is_null());
 
     sail_write_options sail_write_options;
     SAIL_TRY(write_options.to_sail_write_options(&sail_write_options));

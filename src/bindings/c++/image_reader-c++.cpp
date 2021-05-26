@@ -42,6 +42,16 @@ public:
     {
     }
 
+    sail_status_t ensure_state_is_null()
+    {
+        if (state != nullptr) {
+            SAIL_LOG_ERROR("Reading operation is in progress. Stop it before starting a new one");
+            return SAIL_ERROR_CONFLICTING_OPERATION;
+        }
+
+        return SAIL_OK;
+    }
+
     void *state;
     struct sail_io *sail_io;
 };
@@ -146,6 +156,8 @@ image image_reader::read(const void *buffer, size_t buffer_length) const
 
 sail_status_t image_reader::start_reading(const std::string_view path)
 {
+    SAIL_TRY(d->ensure_state_is_null());
+
     SAIL_TRY(sail_start_reading_file(path.data(), nullptr, &d->state));
 
     return SAIL_OK;
@@ -153,6 +165,8 @@ sail_status_t image_reader::start_reading(const std::string_view path)
 
 sail_status_t image_reader::start_reading(const std::string_view path, const sail::codec_info &codec_info)
 {
+    SAIL_TRY(d->ensure_state_is_null());
+
     SAIL_TRY(sail_start_reading_file(path.data(), codec_info.sail_codec_info_c(), &d->state));
 
     return SAIL_OK;
@@ -160,6 +174,8 @@ sail_status_t image_reader::start_reading(const std::string_view path, const sai
 
 sail_status_t image_reader::start_reading(const std::string_view path, const sail::codec_info &codec_info, const sail::read_options &read_options)
 {
+    SAIL_TRY(d->ensure_state_is_null());
+
     sail_read_options sail_read_options;
     SAIL_TRY(read_options.to_sail_read_options(&sail_read_options));
 
@@ -170,7 +186,7 @@ sail_status_t image_reader::start_reading(const std::string_view path, const sai
 
 sail_status_t image_reader::start_reading(const void *buffer, size_t buffer_length)
 {
-    SAIL_CHECK_BUFFER_PTR(buffer);
+    SAIL_TRY(d->ensure_state_is_null());
 
     SAIL_TRY(sail_start_reading_mem(buffer, buffer_length, nullptr, &d->state));
 
@@ -179,7 +195,7 @@ sail_status_t image_reader::start_reading(const void *buffer, size_t buffer_leng
 
 sail_status_t image_reader::start_reading(const void *buffer, size_t buffer_length, const sail::codec_info &codec_info)
 {
-    SAIL_CHECK_BUFFER_PTR(buffer);
+    SAIL_TRY(d->ensure_state_is_null());
 
     SAIL_TRY(sail_start_reading_mem(buffer, buffer_length, codec_info.sail_codec_info_c(), &d->state));
 
@@ -188,7 +204,7 @@ sail_status_t image_reader::start_reading(const void *buffer, size_t buffer_leng
 
 sail_status_t image_reader::start_reading(const void *buffer, size_t buffer_length, const sail::read_options &read_options)
 {
-    SAIL_CHECK_BUFFER_PTR(buffer);
+    SAIL_TRY(d->ensure_state_is_null());
 
     sail_read_options sail_read_options;
     SAIL_TRY(read_options.to_sail_read_options(&sail_read_options));
@@ -200,7 +216,7 @@ sail_status_t image_reader::start_reading(const void *buffer, size_t buffer_leng
 
 sail_status_t image_reader::start_reading(const void *buffer, size_t buffer_length, const sail::codec_info &codec_info, const sail::read_options &read_options)
 {
-    SAIL_CHECK_BUFFER_PTR(buffer);
+    SAIL_TRY(d->ensure_state_is_null());
 
     sail_read_options sail_read_options;
     SAIL_TRY(read_options.to_sail_read_options(&sail_read_options));
@@ -212,6 +228,8 @@ sail_status_t image_reader::start_reading(const void *buffer, size_t buffer_leng
 
 sail_status_t image_reader::start_reading(const sail::io &io)
 {
+    SAIL_TRY(d->ensure_state_is_null());
+
     SAIL_TRY(io.to_sail_io(&d->sail_io));
     SAIL_TRY(sail_check_io_valid(d->sail_io));
 
@@ -222,6 +240,8 @@ sail_status_t image_reader::start_reading(const sail::io &io)
 
 sail_status_t image_reader::start_reading(const sail::io &io, const sail::codec_info &codec_info)
 {
+    SAIL_TRY(d->ensure_state_is_null());
+
     SAIL_TRY(io.to_sail_io(&d->sail_io));
     SAIL_TRY(sail_check_io_valid(d->sail_io));
 
@@ -232,6 +252,8 @@ sail_status_t image_reader::start_reading(const sail::io &io, const sail::codec_
 
 sail_status_t image_reader::start_reading(const sail::io &io, const sail::read_options &read_options)
 {
+    SAIL_TRY(d->ensure_state_is_null());
+
     SAIL_TRY(io.to_sail_io(&d->sail_io));
     SAIL_TRY(sail_check_io_valid(d->sail_io));
 
@@ -245,6 +267,8 @@ sail_status_t image_reader::start_reading(const sail::io &io, const sail::read_o
 
 sail_status_t image_reader::start_reading(const sail::io &io, const sail::codec_info &codec_info, const sail::read_options &read_options)
 {
+    SAIL_TRY(d->ensure_state_is_null());
+
     SAIL_TRY(io.to_sail_io(&d->sail_io));
     SAIL_TRY(sail_check_io_valid(d->sail_io));
 

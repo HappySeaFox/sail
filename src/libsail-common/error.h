@@ -126,6 +126,7 @@ enum SailStatus {
     SAIL_ERROR_ENV_UPDATE,
     SAIL_ERROR_CONTEXT_UNINITIALIZED,
     SAIL_ERROR_GET_DLL_PATH,
+    SAIL_ERROR_CONFLICTING_OPERATION,
 };
 
 typedef enum SailStatus sail_status_t;
