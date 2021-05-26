@@ -40,7 +40,7 @@ namespace sail
 {
 
 /*
- * A C++ interface to logging functions.
+ * Logging functions.
  */
 namespace log
 {
