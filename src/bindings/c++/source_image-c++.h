@@ -40,7 +40,7 @@ namespace sail
 {
 
 /*
- * A source image properties representation. The class is used in reading operations only
+ * source_image represents source image properties. The class is used in reading operations only
  * to preserve the source image properties. It's ignored in writing operations.
  */
 class SAIL_EXPORT source_image
@@ -48,15 +48,39 @@ class SAIL_EXPORT source_image
     friend class image;
 
 public:
+    /*
+     * Constructs an empty source image with unknown pixel format and zero properties.
+     */
     source_image();
+
+    /*
+     * Copies the source image.
+     */
     source_image(const source_image &si);
+
+    /*
+     * Copies the source image.
+     */
     source_image& operator=(const source_image &si);
+
+    /*
+     * Moves the source image.
+     */
     source_image(source_image &&si) noexcept;
+
+    /*
+     * Moves the source image.
+     */
     source_image& operator=(source_image &&si);
+
+    /*
+     * Destroys the source image.
+     */
     ~source_image();
 
     /*
-     * Returns true if the source image is valid.
+     * Returns true if the source image is valid. The source image is always valid
+     * except when a memory allocation failure occurs.
      */
     bool is_valid() const;
 

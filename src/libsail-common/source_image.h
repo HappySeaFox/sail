@@ -41,8 +41,8 @@ extern "C" {
 #endif
 
 /*
- * Source image properties. The structure is used in reading operations only
- * to preserve the source image properties which are usually lost during decoding.
+ * sail_source_image represents source image properties. The structure is used in reading
+ * operations only to preserve the source image properties which are usually lost during decoding.
  * For example, one might want to know the source image pixel format.
  * It's ignored in writing operations.
  */
