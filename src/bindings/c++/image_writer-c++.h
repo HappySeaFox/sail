@@ -46,69 +46,191 @@ class codec_info;
 class write_options;
 
 /*
- * A C++ interface to the SAIL image writing functions.
+ * Class to write images into files, memory, and custom I/O targets.
  */
 class SAIL_EXPORT image_writer
 {
 public:
+    /*
+     * Constructs a new image writer.
+     */
     image_writer();
+
+    /*
+     * Stops writing if it was started and destroys the image writer.
+     */
     ~image_writer();
 
     /*
-     * An interface to sail_write_file(). See sail_write_file() for more.
+     * Disables copying image writers.
      */
-    sail_status_t write(std::string_view path, const image &simage);
+    image_writer(const image_writer&) = delete;
 
     /*
-     * An interface to sail_write_mem(). See sail_write_mem() for more.
+     * Disables copying image writers.
      */
-    sail_status_t write(void *buffer, size_t buffer_length, const image &simage);
-    sail_status_t write(void *buffer, size_t buffer_length, const image &simage, size_t *written);
+    image_writer& operator=(const image_writer&) = delete;
 
     /*
-     * An interface to sail_start_writing(). See sail_start_writing() for more.
+     * Disables moving image writers.
+     */
+    image_writer(image_writer&&) = delete;
+
+    /*
+     * Disables moving image writers.
+     */
+    image_writer& operator=(image_writer&&) = delete;
+
+    /*
+     * Writes the specified image into the file.
+     *
+     * If the selected image format doesn't support the image pixel format, an error is returned.
+     * Consider converting the image into a supported image format beforehand.
+     *
+     * Returns SAIL_OK on success.
+     */
+    sail_status_t write(std::string_view path, const sail::image &image);
+
+    /*
+     * Writes the specified image into the specified memory buffer.
+     *
+     * If the selected image format doesn't support the image pixel format, an error is returned.
+     * Consider converting the image into a supported image format beforehand.
+     *
+     * Returns SAIL_OK on success.
+     */
+    sail_status_t write(void *buffer, size_t buffer_length, const sail::image &image);
+
+    /*
+     * Writes the specified image into the specified memory buffer.
+     *
+     * If the selected image format doesn't support the image pixel format, an error is returned.
+     * Consider converting the image into a supported image format beforehand.
+     *
+     * Saves the number of bytes written into the 'written' argument if it's not nullptr.
+     *
+     * Returns SAIL_OK on success.
+     */
+    sail_status_t write(void *buffer, size_t buffer_length, const sail::image &image, size_t *written);
+
+    /*
+     * Starts writing into the specified image file.
+     *
+     * Typical usage: start_writing()        ->
+     *                write_next_frame() x n ->
+     *                stop_writing().
+     *
+     * Returns SAIL_OK on success.
      */
     sail_status_t start_writing(std::string_view path);
 
     /*
-     * An interface to sail_start_writing(). See sail_start_writing() for more.
+     * Starts writing into the specified image file with the specified codec.
+     *
+     * Typical usage: codec_info::from_extension() ->
+     *                start_writing()              ->
+     *                write_next_frame() x n       ->
+     *                stop_writing().
+     *
+     * Returns SAIL_OK on success.
      */
-    sail_status_t start_writing(std::string_view path, const codec_info &scodec_info);
+    sail_status_t start_writing(std::string_view path, const sail::codec_info &codec_info);
 
     /*
-     * An interface to sail_start_writing_with_options(). See sail_start_writing_with_options() for more.
+     * Starts writing into the specified image file with the specified write options.
+     *
+     * Typical usage: start_writing()              ->
+     *                write_next_frame() x n       ->
+     *                stop_writing().
+     *
+     * Returns SAIL_OK on success.
      */
-    sail_status_t start_writing(std::string_view path, const write_options &swrite_options);
+    sail_status_t start_writing(std::string_view path, const sail::write_options &write_options);
 
     /*
-     * An interface to sail_start_writing_with_options(). See sail_start_writing_with_options() for more.
+     * Starts writing into the specified image file with the specified codec and write options.
+     *
+     * Typical usage: codec_info::from_extension() ->
+     *                start_writing()              ->
+     *                write_next_frame() x n       ->
+     *                stop_writing().
+     *
+     * Returns SAIL_OK on success.
      */
-    sail_status_t start_writing(std::string_view path, const codec_info &scodec_info, const write_options &swrite_options);
+    sail_status_t start_writing(std::string_view path, const sail::codec_info &codec_info, const sail::write_options &write_options);
 
     /*
-     * An interface to sail_start_writing_mem(). See sail_start_writing_mem() for more.
+     * Starts writing into the specified memory buffer with the specified codec.
+     *
+     * Typical usage: codec_info::from_extension() ->
+     *                start_writing()              ->
+     *                write_next_frame() x n       ->
+     *                stop_writing().
+     *
+     * Returns SAIL_OK on success.
      */
-    sail_status_t start_writing(void *buffer, size_t buffer_length, const codec_info &scodec_info);
-    sail_status_t start_writing(void *buffer, size_t buffer_length, const codec_info &scodec_info, const write_options &swrite_options);
+    sail_status_t start_writing(void *buffer, size_t buffer_length, const sail::codec_info &codec_info);
 
     /*
-     * An interface to sail_start_writing_io(). See sail_start_writing_io() for more.
+     * Starts writing into the specified memory buffer with the specified codec and write options.
+     *
+     * Typical usage: codec_info::from_extension() ->
+     *                start_writing()              ->
+     *                write_next_frame() x n       ->
+     *                stop_writing().
+     *
+     * Returns SAIL_OK on success.
      */
-    sail_status_t start_writing(const io &sio, const codec_info &scodec_info);
-    sail_status_t start_writing(const io &sio, const codec_info &scodec_info, const write_options &swrite_options);
+    sail_status_t start_writing(void *buffer, size_t buffer_length, const sail::codec_info &codec_info, const sail::write_options &write_options);
 
     /*
-     * An interface to sail_write_next_frame(). See sail_write_next_frame() for more.
+     * Starts writing into the specified I/O target with the specified codec.
+     *
+     * Typical usage: codec_info::from_extension() ->
+     *                start_writing()              ->
+     *                write_next_frame() x n       ->
+     *                stop_writing().
+     *
+     * Returns SAIL_OK on success.
      */
-    sail_status_t write_next_frame(const image &simage);
+    sail_status_t start_writing(const sail::io &io, const sail::codec_info &codec_info);
 
     /*
-     * An interface to sail_stop_writing(). See sail_stop_writing() for more.
+     * Starts writing into the specified I/O target with the specified codec and write options.
+     *
+     * Typical usage: codec_info::from_extension() ->
+     *                start_writing()              ->
+     *                write_next_frame() x n       ->
+     *                stop_writing().
+     *
+     * Returns SAIL_OK on success.
+     */
+    sail_status_t start_writing(const sail::io &io, const sail::codec_info &codec_info, const sail::write_options &write_options);
+
+    /*
+     * Continues writing started by start_writing(). Writes the specified image into the underlying I/O target.
+     *
+     * If the selected image format doesn't support the image pixel format, an error is returned.
+     * Consider converting the image into a supported image format beforehand.
+     *
+     * Returns SAIL_OK on success.
+     */
+    sail_status_t write_next_frame(const sail::image &image);
+
+    /*
+     * Stops writing started by start_writing() and closes the underlying I/O target.
+     *
+     * It is essential to always stop writing to free memory resources. Failure to do so will lead to memory leaks.
+     *
+     * Returns SAIL_OK on success.
      */
     sail_status_t stop_writing();
 
     /*
-     * An interface to sail_stop_writing_with_written(). See sail_stop_writing_with_written() for more.
+     * Stops writing started by start_writing() and closes the underlying I/O target.
+     * Assigns the number of bytes written to the 'written' argument.
+     *
+     * Returns SAIL_OK on success.
      */
     sail_status_t stop_writing(size_t *written);
 

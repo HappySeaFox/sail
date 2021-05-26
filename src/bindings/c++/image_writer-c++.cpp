@@ -57,41 +57,41 @@ image_writer::~image_writer()
     delete d;
 }
 
-sail_status_t image_writer::write(const std::string_view path, const image &simage)
+sail_status_t image_writer::write(const std::string_view path, const sail::image &image)
 {
-    sail_image *sail_image;
-    SAIL_TRY(simage.to_sail_image(&sail_image));
+    sail_image *sail_image = nullptr;
+    SAIL_TRY(image.to_sail_image(&sail_image));
 
-    SAIL_TRY_OR_CLEANUP(sail_write_file(path.data(), sail_image),
-                        /* cleanup */ sail_image->pixels = nullptr,
-                                      sail_destroy_image(sail_image));
+    SAIL_AT_SCOPE_EXIT(
+        sail_image->pixels = nullptr;
+        sail_destroy_image(sail_image);
+    );
 
-    sail_image->pixels = nullptr;
-    sail_destroy_image(sail_image);
+    SAIL_TRY(sail_write_file(path.data(), sail_image));
 
     return SAIL_OK;
 }
 
-sail_status_t image_writer::write(void *buffer, size_t buffer_length, const image &simage)
+sail_status_t image_writer::write(void *buffer, size_t buffer_length, const sail::image &image)
 {
-    SAIL_TRY(write(buffer, buffer_length, simage, nullptr));
+    SAIL_TRY(write(buffer, buffer_length, image, nullptr));
 
     return SAIL_OK;
 }
 
-sail_status_t image_writer::write(void *buffer, size_t buffer_length, const image &simage, size_t *written)
+sail_status_t image_writer::write(void *buffer, size_t buffer_length, const sail::image &image, size_t *written)
 {
     SAIL_CHECK_BUFFER_PTR(buffer);
 
-    sail_image *sail_image;
-    SAIL_TRY(simage.to_sail_image(&sail_image));
+    sail_image *sail_image = nullptr;
+    SAIL_TRY(image.to_sail_image(&sail_image));
 
-    SAIL_TRY_OR_CLEANUP(sail_write_mem(buffer, buffer_length, sail_image, written),
-                        /* cleanup */ sail_image->pixels = nullptr,
-                                      sail_destroy_image(sail_image));
+    SAIL_AT_SCOPE_EXIT(
+        sail_image->pixels = nullptr;
+        sail_destroy_image(sail_image);
+    );
 
-    sail_image->pixels = nullptr;
-    sail_destroy_image(sail_image);
+    SAIL_TRY(sail_write_mem(buffer, buffer_length, sail_image, written));
 
     return SAIL_OK;
 }
@@ -103,101 +103,101 @@ sail_status_t image_writer::start_writing(const std::string_view path)
     return SAIL_OK;
 }
 
-sail_status_t image_writer::start_writing(const std::string_view path, const codec_info &scodec_info)
+sail_status_t image_writer::start_writing(const std::string_view path, const sail::codec_info &codec_info)
 {
-    SAIL_TRY(sail_start_writing_file(path.data(), scodec_info.sail_codec_info_c(), &d->state));
+    SAIL_TRY(sail_start_writing_file(path.data(), codec_info.sail_codec_info_c(), &d->state));
 
     return SAIL_OK;
 }
 
-sail_status_t image_writer::start_writing(const std::string_view path, const write_options &swrite_options)
+sail_status_t image_writer::start_writing(const std::string_view path, const sail::write_options &write_options)
 {
     sail_write_options sail_write_options;
-    SAIL_TRY(swrite_options.to_sail_write_options(&sail_write_options));
+    SAIL_TRY(write_options.to_sail_write_options(&sail_write_options));
 
     SAIL_TRY(sail_start_writing_file_with_options(path.data(), nullptr, &sail_write_options, &d->state));
 
     return SAIL_OK;
 }
 
-sail_status_t image_writer::start_writing(const std::string_view path, const codec_info &scodec_info, const write_options &swrite_options)
+sail_status_t image_writer::start_writing(const std::string_view path, const sail::codec_info &codec_info, const sail::write_options &write_options)
 {
     sail_write_options sail_write_options;
-    SAIL_TRY(swrite_options.to_sail_write_options(&sail_write_options));
+    SAIL_TRY(write_options.to_sail_write_options(&sail_write_options));
 
-    SAIL_TRY(sail_start_writing_file_with_options(path.data(), scodec_info.sail_codec_info_c(), &sail_write_options, &d->state));
+    SAIL_TRY(sail_start_writing_file_with_options(path.data(), codec_info.sail_codec_info_c(), &sail_write_options, &d->state));
 
     return SAIL_OK;
 }
 
-sail_status_t image_writer::start_writing(void *buffer, size_t buffer_length, const codec_info &scodec_info)
+sail_status_t image_writer::start_writing(void *buffer, size_t buffer_length, const sail::codec_info &codec_info)
 {
     SAIL_CHECK_BUFFER_PTR(buffer);
 
     SAIL_TRY(sail_start_writing_mem(buffer,
                                     buffer_length,
-                                    scodec_info.sail_codec_info_c(),
+                                    codec_info.sail_codec_info_c(),
                                     &d->state));
 
     return SAIL_OK;
 }
 
-sail_status_t image_writer::start_writing(void *buffer, size_t buffer_length, const codec_info &scodec_info, const write_options &swrite_options)
+sail_status_t image_writer::start_writing(void *buffer, size_t buffer_length, const sail::codec_info &codec_info, const sail::write_options &write_options)
 {
     SAIL_CHECK_BUFFER_PTR(buffer);
 
     sail_write_options sail_write_options;
-    SAIL_TRY(swrite_options.to_sail_write_options(&sail_write_options));
+    SAIL_TRY(write_options.to_sail_write_options(&sail_write_options));
 
     SAIL_TRY(sail_start_writing_mem_with_options(buffer,
                                                  buffer_length,
-                                                 scodec_info.sail_codec_info_c(),
+                                                 codec_info.sail_codec_info_c(),
                                                  &sail_write_options,
                                                  &d->state));
 
     return SAIL_OK;
 }
 
-sail_status_t image_writer::start_writing(const io &sio, const codec_info &scodec_info)
+sail_status_t image_writer::start_writing(const sail::io &io, const sail::codec_info &codec_info)
 {
-    SAIL_TRY(sio.to_sail_io(&d->sail_io));
+    SAIL_TRY(io.to_sail_io(&d->sail_io));
     SAIL_TRY(sail_check_io_valid(d->sail_io));
 
     SAIL_TRY(sail_start_writing_io_with_options(d->sail_io,
-                                                scodec_info.sail_codec_info_c(),
+                                                codec_info.sail_codec_info_c(),
                                                 nullptr,
                                                 &d->state));
 
     return SAIL_OK;
 }
 
-sail_status_t image_writer::start_writing(const io &sio, const codec_info &scodec_info, const write_options &swrite_options)
+sail_status_t image_writer::start_writing(const sail::io &io, const sail::codec_info &codec_info, const sail::write_options &write_options)
 {
-    SAIL_TRY(sio.to_sail_io(&d->sail_io));
+    SAIL_TRY(io.to_sail_io(&d->sail_io));
     SAIL_TRY(sail_check_io_valid(d->sail_io));
 
     sail_write_options sail_write_options;
-    SAIL_TRY(swrite_options.to_sail_write_options(&sail_write_options));
+    SAIL_TRY(write_options.to_sail_write_options(&sail_write_options));
 
     SAIL_TRY(sail_start_writing_io_with_options(d->sail_io,
-                                                scodec_info.sail_codec_info_c(),
+                                                codec_info.sail_codec_info_c(),
                                                 &sail_write_options,
                                                 &d->state));
 
     return SAIL_OK;
 }
 
-sail_status_t image_writer::write_next_frame(const image &simage)
+sail_status_t image_writer::write_next_frame(const sail::image &image)
 {
-    sail_image *sail_image;
-    SAIL_TRY(simage.to_sail_image(&sail_image));
+    sail_image *sail_image = nullptr;
+    SAIL_TRY(image.to_sail_image(&sail_image));
 
-    SAIL_TRY_OR_CLEANUP(sail_write_next_frame(d->state, sail_image),
-                        /* cleanup */ sail_image->pixels = nullptr,
-                                      sail_destroy_image(sail_image));
+    SAIL_AT_SCOPE_EXIT(
+        sail_image->pixels = nullptr;
+        sail_destroy_image(sail_image);
+    );
 
-    sail_image->pixels = nullptr;
-    sail_destroy_image(sail_image);
+    SAIL_TRY(sail_write_next_frame(d->state, sail_image));
 
     return SAIL_OK;
 }
