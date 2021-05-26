@@ -58,7 +58,7 @@ public:
     image_reader();
 
     /*
-     * Destroys the image reader.
+     * Stops reading if it was started and destroys the image reader.
      */
     ~image_reader();
 
