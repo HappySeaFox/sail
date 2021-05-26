@@ -129,8 +129,8 @@ public:
     /*
      * Starts reading the specified image file.
      *
-     * Typical usage: start_reading()   ->
-     *                read_next_frame() ->
+     * Typical usage: start_reading()       ->
+     *                read_next_frame() x n ->
      *                stop_reading().
      *
      * Returns SAIL_OK on success.
@@ -142,7 +142,7 @@ public:
      *
      * Typical usage: codec_info::from_extension() ->
      *                start_reading()              ->
-     *                read_next_frame()            ->
+     *                read_next_frame() x n        ->
      *                stop_reading().
      *
      * Returns SAIL_OK on success.
@@ -152,8 +152,8 @@ public:
     /*
      * Starts reading the specified image file with the specified read options.
      *
-     * Typical usage: start_reading()   ->
-     *                read_next_frame() ->
+     * Typical usage: start_reading()       ->
+     *                read_next_frame() x n ->
      *                stop_reading().
      *
      * Returns SAIL_OK on success.
@@ -165,7 +165,7 @@ public:
      *
      * Typical usage: codec_info::from_extension() ->
      *                start_reading()              ->
-     *                read_next_frame()            ->
+     *                read_next_frame() x n        ->
      *                stop_reading().
      *
      * Returns SAIL_OK on success.
@@ -175,8 +175,8 @@ public:
     /*
      * Starts reading the specified memory buffer.
      *
-     * Typical usage: start_reading()   ->
-     *                read_next_frame() ->
+     * Typical usage: start_reading()       ->
+     *                read_next_frame() x n ->
      *                stop_reading().
      *
      * Returns SAIL_OK on success.
@@ -188,7 +188,7 @@ public:
      *
      * Typical usage: codec_info::from_extension() ->
      *                start_reading()              ->
-     *                read_next_frame()            ->
+     *                read_next_frame() x n        ->
      *                stop_reading().
      *
      * Returns SAIL_OK on success.
@@ -198,8 +198,8 @@ public:
     /*
      * Starts reading the specified memory buffer with the specified read options.
      *
-     * Typical usage: start_reading()   ->
-     *                read_next_frame() ->
+     * Typical usage: start_reading()       ->
+     *                read_next_frame() x n ->
      *                stop_reading().
      *
      * Returns SAIL_OK on success.
@@ -211,7 +211,7 @@ public:
      *
      * Typical usage: codec_info::from_extension() ->
      *                start_reading()              ->
-     *                read_next_frame()            ->
+     *                read_next_frame() x n        ->
      *                stop_reading().
      *
      * Returns SAIL_OK on success.
@@ -221,8 +221,8 @@ public:
     /*
      * Starts reading the specified I/O source.
      *
-     * Typical usage: start_reading()   ->
-     *                read_next_frame() ->
+     * Typical usage: start_reading()       ->
+     *                read_next_frame() x n ->
      *                stop_reading().
      *
      * Returns SAIL_OK on success.
@@ -234,7 +234,7 @@ public:
      *
      * Typical usage: codec_info::from_extension() ->
      *                start_reading()              ->
-     *                read_next_frame()            ->
+     *                read_next_frame() x n        ->
      *                stop_reading().
      *
      * Returns SAIL_OK on success.
@@ -244,8 +244,8 @@ public:
     /*
      * Starts reading the specified I/O source with the specified read options.
      *
-     * Typical usage: start_reading()   ->
-     *                read_next_frame() ->
+     * Typical usage: start_reading()       ->
+     *                read_next_frame() x n ->
      *                stop_reading().
      *
      * Returns SAIL_OK on success.
@@ -257,7 +257,7 @@ public:
      *
      * Typical usage: codec_info::from_extension() ->
      *                start_reading()              ->
-     *                read_next_frame()            ->
+     *                read_next_frame() x n        ->
      *                stop_reading().
      *
      * Returns SAIL_OK on success.
