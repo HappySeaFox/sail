@@ -82,6 +82,12 @@ public:
      */
     int features() const;
 
+    /*
+     * Builds default read options from the read features. Can be used to build
+     * default read options and then slightly modify them before passing to image_reader.
+     *
+     * Returns SAIL_OK on success.
+     */
     sail_status_t to_read_options(read_options *sread_options) const;
 
 private:
