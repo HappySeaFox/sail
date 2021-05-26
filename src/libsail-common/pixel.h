@@ -41,7 +41,7 @@ extern "C" {
 #endif
 
 /*
- * A structure representing a pixel with 3 8-bit components. Typically, it's RGB.
+ * sail_pixel3_uint8 represents a pixel with 3 8-bit components. Typically, it's RGB.
  */
 struct sail_pixel3_uint8
 {
@@ -55,7 +55,7 @@ typedef struct sail_pixel3_uint8 sail_bgr24_t;
 typedef struct sail_pixel3_uint8 sail_ycbcr24_t;
 
 /*
- * A structure representing a pixel with 4 8-bit components. Typically, it's RGBA.
+ * sail_pixel4_uint8 represents a pixel with 4 8-bit components. Typically, it's RGBA.
  */
 struct sail_pixel4_uint8
 {
@@ -77,7 +77,7 @@ typedef struct sail_pixel4_uint8 sail_cmyk32_t;
 typedef struct sail_pixel4_uint8 sail_ycck32_t;
 
 /*
- * A structure representing a pixel with 3 16-bit components. Typically, it's RGB.
+ * sail_pixel3_uint16 represents a pixel with 3 16-bit components. Typically, it's RGB.
  */
 struct sail_pixel3_uint16
 {
@@ -90,7 +90,7 @@ typedef struct sail_pixel3_uint16 sail_rgb48_t;
 typedef struct sail_pixel3_uint16 sail_bgr48_t;
 
 /*
- * A structure representing a pixel with 4 16-bit components. Typically, it's RGBA.
+ * sail_pixel4_uint16 represents a pixel with 4 16-bit components. Typically, it's RGBA.
  */
 struct sail_pixel4_uint16
 {

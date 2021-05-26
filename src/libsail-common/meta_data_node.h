@@ -43,7 +43,7 @@ extern "C" {
 #endif
 
 /*
- * A structure representing meta data element like a JPEG comment or a binary EXIF profile.
+ * sail_meta_data_node represents a meta data element like a JPEG comment or a binary EXIF profile.
  *
  * For example:
  *

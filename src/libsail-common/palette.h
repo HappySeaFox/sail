@@ -39,7 +39,7 @@ extern "C" {
 #endif
 
 /*
- * A structure representing an ICC profile.
+ * sail_palette represents an image palette used in indexed images.
  */
 struct sail_palette {
 
