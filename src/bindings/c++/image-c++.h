@@ -101,7 +101,7 @@ public:
     image& operator=(image &&img);
 
     /*
-     * Destroys the imagea and the deep copied pixel data.
+     * Destroys the image and the deep copied pixel data.
      */
     ~image();
 
