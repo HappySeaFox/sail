@@ -44,25 +44,49 @@ namespace sail
 class read_options;
 
 /*
- * A C++ interface to struct sail_read_features.
+ * Read features. Use this class to determine what a codec can actually read.
+ * See codec_info.
  */
 class SAIL_EXPORT read_features
 {
     friend class codec_info;
 
 public:
+    /*
+     * Copies the read features.
+     */
     read_features(const read_features &rf);
+
+    /*
+     * Copies the read features.
+     */
     read_features& operator=(const read_features &rf);
+
+    /*
+     * Moves the read features.
+     */
     read_features(read_features &&rf) noexcept;
+
+    /*
+     * Moves the read features.
+     */
     read_features& operator=(read_features &&rf);
+
+    /*
+     * Destroys the read features.
+     */
     ~read_features();
 
+    /*
+     * Returns the supported or-ed features of reading operations. See SailCodecFeature.
+     */
     int features() const;
 
     sail_status_t to_read_options(read_options *sread_options) const;
 
 private:
     read_features();
+
     /*
      * Makes a deep copy of the specified read features and stores the pointer for further use.
      * When the SAIL context gets uninitialized, the pointer becomes dangling.
