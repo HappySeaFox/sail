@@ -80,16 +80,6 @@ SAIL_EXPORT sail_status_t sail_probe_mem(const void *buffer, size_t buffer_lengt
  *                sail_read_next_frame()           ->
  *                sail_stop_reading().
  *
- * For example:
- *
- * void *state = NULL;
- *
- * SAIL_TRY_OR_CLEANUP(sail_start_reading_file(..., &state),
- *                     sail_stop_reading(state));
- * SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, ...),
- *                     sail_stop_reading(state));
- * SAIL_TRY(sail_stop_reading(state));
- *
  * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
  * in it and destroy it in sail_stop_reading. States must be used per image. DO NOT use the same state
  * to start reading multiple images at the same time.
@@ -145,16 +135,6 @@ SAIL_EXPORT sail_status_t sail_stop_reading(void *state);
  *                sail_start_writing_file()        ->
  *                sail_write_next_frame()          ->
  *                sail_stop_writing().
- *
- * For example:
- *
- * void *state = NULL;
- *
- * SAIL_TRY_OR_CLEANUP(sail_start_writing(..., &state),
- *                     sail_stop_writing(state));
- * SAIL_TRY_OR_CLEANUP(sail_write_next_frame(state, ...),
- *                     sail_stop_writing(state));
- * SAIL_TRY(sail_stop_writing(state));
  *
  * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
  * in it and destroy it in sail_stop_writing. States must be used per image. DO NOT use the same state

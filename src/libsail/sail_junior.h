@@ -95,7 +95,7 @@ SAIL_EXPORT sail_status_t sail_write_file(const char *path, const struct sail_im
  * Consider converting the image into a supported image format beforehand with functions
  * from sail-manip.
  *
- * Saves the number of bytes written into the 'written' parameter if it's not NULL.
+ * Saves the number of bytes written into the 'written' argument if it's not NULL.
  *
  * Typical usage: This is a standalone function that could be called at any time.
  *
