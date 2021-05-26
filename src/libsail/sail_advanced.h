@@ -174,7 +174,8 @@ SAIL_EXPORT sail_status_t sail_start_writing_mem(void *buffer, size_t buffer_len
 SAIL_EXPORT sail_status_t sail_write_next_frame(void *state, const struct sail_image *image);
 
 /*
- * Stops writing started by sail_start_writing_file() and brothers. Does nothing if the state is NULL.
+ * Stops writing started by sail_start_writing_file() and brothers. Closes the underlying I/O target.
+ * Does nothing if the state is NULL.
  *
  * It is essential to always stop writing to free memory resources. Failure to do so will lead to memory leaks.
  *
