@@ -44,22 +44,45 @@ namespace sail
 {
 
 /*
- * ICC profile representation. It provides access to raw ICC profile data.
+ * palette represents an image palette used in indexed images.
  */
 class SAIL_EXPORT palette
 {
     friend class image;
 
 public:
+    /*
+     * Constructs an empty palette.
+     */
     palette();
+
+    /*
+     * Copies the palette.
+     */
     palette(const palette &pal);
+
+    /*
+     * Copies the palette.
+     */
     palette& operator=(const palette &pal);
+
+    /*
+     * Moves the palette.
+     */
     palette(palette &&pal) noexcept;
+
+    /*
+     * Moves the palette.
+     */
     palette& operator=(palette &&pal);
+
+    /*
+     * Destroys the palette.
+     */
     ~palette();
 
     /*
-     * Returns true if the palette has non-NULL data and a positive color count.
+     * Returns true if the palette has non-empty data, known pixel format, and a positive color count.
      */
     bool is_valid() const;
 
@@ -79,10 +102,13 @@ public:
     unsigned color_count() const;
 
     /*
-     * Sets a new palette data, pixel format, and colors count.
+     * Sets new palette data, pixel format, and colors count.
      */
     palette& with_data(SailPixelFormat pixel_format, const void *data, unsigned color_count);
 
+    /*
+     * Sets new palette data, pixel format, and colors count.
+     */
     palette& with_data(SailPixelFormat pixel_format, const arbitrary_data &data);
 
 private:
