@@ -42,7 +42,7 @@ namespace sail
 {
 
 /*
- * A C++ interface to struct sail_write_options.
+ * Options to modify writing operations.
  */
 class SAIL_EXPORT write_options
 {
@@ -50,19 +50,76 @@ class SAIL_EXPORT write_options
     friend class write_features;
 
 public:
+    /*
+     * Constructs empty write options.
+     */
     write_options();
+
+    /*
+     * Copies the write options.
+     */
     write_options(const write_options &wo);
+
+    /*
+     * Copies the write options.
+     */
     write_options& operator=(const write_options &wo);
+
+    /*
+     * Moves the write options.
+     */
     write_options(write_options &&wo) noexcept;
+
+    /*
+     * Moves the write options.
+     */
     write_options& operator=(write_options &&wo);
+
+    /*
+     * Destroys the write options.
+     */
     ~write_options();
 
+    /*
+     * Returns the or-ed I/O manipulation options for writing operations. See SailIoOption.
+     */
     int io_options() const;
+
+    /*
+     * Returns the compression type. For example: SAIL_COMPRESSION_RLE. See SailCompression.
+     * Use write_features to determine what compression types or values are supported by a particular codec.
+     *
+     * If a codec supports more than two compression types, compression levels are ignored in this case.
+     *
+     * For example:
+     *
+     *     1. The JPEG codec supports only one compression, JPEG. compression_level_min, compression_level_max,
+     *        compression_level_default can be used to select a compression level.
+     *     2. The TIFF codec supports more than two compression types (PACKBITS, JPEG, etc.). Compression levels
+     *        are ignored.
+     */
     SailCompression compression() const;
+
+    /*
+     * Returns the requested compression level. Must be in the range specified by compression_level_min()
+     * and compression_level_max() in write_features. If compression_level() < compression_level_min() or
+     * compression_level() > compression_level_max(), compression_level_default() will be used.
+     */
     double compression_level() const;
 
+    /*
+     * Sets new or-ed I/O manipulation options for writing operations. See SailIoOption.
+     */
     write_options& with_io_options(int io_options);
+
+    /*
+     * Sets a new compression type.
+     */
     write_options& with_compression(SailCompression compression);
+
+    /*
+     * Sets a new compression level.
+     */
     write_options& with_compression_level(double compression_level);
 
 private:

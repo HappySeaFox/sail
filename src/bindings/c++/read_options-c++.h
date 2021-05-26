@@ -81,12 +81,12 @@ public:
     ~read_options();
 
     /*
-     * Returns or-ed I/O manipulation options for reading operations. See SailIoOption.
+     * Returns the or-ed I/O manipulation options for reading operations. See SailIoOption.
      */
     int io_options() const;
 
     /*
-     * Sets new read options.
+     * Sets new or-ed I/O manipulation options for reading operations. See SailIoOption.
      */
     read_options& with_io_options(int io_options);
 

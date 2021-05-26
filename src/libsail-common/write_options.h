@@ -43,26 +43,26 @@ struct sail_write_features;
 /* Options to modify writing operations. */
 struct sail_write_options {
 
-    /* Or-ed IO manipulation options. See SailIoOption. */
+    /* Or-ed I/O manipulation options. See SailIoOption. */
     int io_options;
 
     /*
      * Compression type. For example: SAIL_COMPRESSION_RLE. See SailCompression.
      * Use sail_write_features to determine what compression types or values are supported by a particular codec.
      *
-     * If a codec supports more than two compression types, compression levels are not supported in this case.
+     * If a codec supports more than two compression types, compression levels are ignored in this case.
      *
      * For example:
      *
      *     1. The JPEG codec supports only one compression, JPEG. compression_level_min, compression_level_max,
      *        compression_level_default can be used to select a compression level.
      *     2. The TIFF codec supports more than two compression types (PACKBITS, JPEG, etc.). Compression levels
-     *        are not supported.
+     *        are ignored.
      */
     enum SailCompression compression;
 
     /*
-     * Requested compression value. Must be in the range specified by compression_level_min and compression_level_max
+     * Requested compression level. Must be in the range specified by compression_level_min and compression_level_max
      * in sail_write_features. If compression_level < compression_level_min, compression_level_default will be used.
      */
     double compression_level;
