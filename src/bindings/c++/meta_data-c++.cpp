@@ -161,7 +161,7 @@ meta_data& meta_data::with_value(const arbitrary_data &value)
     return *this;
 }
 
-const char* meta_data::meta_data_to_string(enum SailMetaData meta_data) {
+const char* meta_data::meta_data_to_string(SailMetaData meta_data) {
 
     return sail_meta_data_to_string(meta_data);
 }

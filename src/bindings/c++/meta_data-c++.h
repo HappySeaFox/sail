@@ -47,28 +47,53 @@ namespace sail
 {
 
 /*
- * Image meta data.
+ * meta_data represents a meta data element like a JPEG comment or a binary EXIF profile.
  */
 class SAIL_EXPORT meta_data
 {
     friend class image;
 
 public:
+    /*
+     * Constructs an empty meta data entry.
+     */
     meta_data();
+
+    /*
+     * Copies the meta data entry.
+     */
     meta_data(const meta_data &md);
+
+    /*
+     * Copies the meta data entry.
+     */
     meta_data& operator=(const meta_data &md);
+
+    /*
+     * Moves the meta data entry.
+     */
     meta_data(meta_data &&md) noexcept;
+
+    /*
+     * Moves the meta data entry.
+     */
     meta_data& operator=(meta_data &&md);
+
+    /*
+     * Destroys the meta data entry.
+     */
     ~meta_data();
 
     /*
-     * Returns the meta data key. See SailMetaData to know which keys can point to strings
-     * and which to binary data.
+     * Returns the meta data key when it's well known like Artist or Comment.
+     * When key() returns SAIL_META_DATA_UNKNOWN, use key_unknown() to get the
+     * key string representation.
      */
     SailMetaData key() const;
 
     /*
-     * Returns the meta data string key representation when key() is SAIL_META_DATA_UNKNOWN.
+     * Returns the meta data string key representation when key() returns SAIL_META_DATA_UNKNOWN.
+     * For example: "Person on the Image".
      */
     const std::string& key_unknown() const;
 
@@ -78,24 +103,25 @@ public:
     SailMetaDataType value_type() const;
 
     /*
-     * Returns the actual meta data value based on value_type. Only std::string and sail::arbitrary_data template
+     * Returns the actual meta data value based on value_type(). Only std::string and sail::arbitrary_data template
      * parameters are allowed.
      */
     template<typename T>
     const T& value() const;
 
     /*
-     * Sets a new known meta data key. Resets the saved unknown key to an empty string.
+     * Sets a new known meta data key like Artist or Comment. Resets the saved unknown key to an empty string.
      */
     meta_data& with_key(SailMetaData key);
 
     /*
      * Sets a new unknown meta data string key representation. Resets the saved key to SAIL_META_DATA_UNKNOWN.
+     * For example: "Person on the Image".
      */
     meta_data& with_key_unknown(const std::string &key_unknown);
 
     /*
-     * Sets a new meta data string value.
+     * Sets a new meta data string value. Resets the saved data value.
      */
     meta_data& with_value(std::string_view value);
 
@@ -108,7 +134,7 @@ public:
      * Returns a string representation of the specified meta data key. See SailMetaData.
      * For example: "Author" is returned for SAIL_META_DATA_AUTHOR.
      *
-     * Returns NULL if the meta data key is not known.
+     * Returns nullptr if the meta data key is not known.
      */
     static const char* meta_data_to_string(SailMetaData meta_data);
 
