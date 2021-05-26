@@ -40,22 +40,45 @@ namespace sail
 {
 
 /*
- * Image resolution unit and values.
+ * resolution represents image resolution unit and values.
  */
 class SAIL_EXPORT resolution
 {
     friend class image;
 
 public:
+    /*
+     * Constructs a new resolution with unknown units and zero values.
+     */
     resolution();
+
+    /*
+     * Copies the resolution.
+     */
     resolution(const resolution &res);
+
+    /*
+     * Copies the resolution.
+     */
     resolution& operator=(const resolution &res);
+
+    /*
+     * Moves the resolution.
+     */
     resolution(resolution &&res) noexcept;
+
+    /*
+     * Moves the resolution.
+     */
     resolution& operator=(resolution &&res);
+
+    /*
+     * Destroys the resolution.
+     */
     ~resolution();
 
     /*
-     * Returns true if the resolution has valid units and x/y values.
+     * Returns true if the resolution has known units and positive x/y values.
      */
     bool is_valid() const;
 
