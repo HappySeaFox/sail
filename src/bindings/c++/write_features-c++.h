@@ -45,30 +45,110 @@ namespace sail
 class write_options;
 
 /*
- * A C++ interface to struct sail_write_features.
+ * Write features. Use this structure to determine what a codec can actually write.
+ * See codec_info.
  */
 class SAIL_EXPORT write_features
 {
     friend class codec_info;
 
 public:
+    /*
+     * Copies the write features.
+     */
     write_features(const write_features &wf);
+
+    /*
+     * Copies the write features.
+     */
     write_features& operator=(const write_features &wf);
+
+    /*
+     * Moves the write features.
+     */
     write_features(write_features &&wf) noexcept;
+
+    /*
+     * Moves the write features.
+     */
     write_features& operator=(write_features &&wf);
+
+    /*
+     * Destroys the write features.
+     */
     ~write_features();
 
+    /*
+     * Returns the list of supported pixel formats that can be written by this codec.
+     */
     const std::vector<SailPixelFormat>& output_pixel_formats() const;
+
+    /*
+     * Returns the supported or-ed features of writing operations. See SailCodecFeature.
+     */
     int features() const;
+
+    /*
+     * Returns the required or-ed image properties. For example, an input image must be flipped
+     * by a caller before writing it with SAIL. See SailImageProperty.
+     */
     int properties() const;
+
+    /*
+     * Returns the list of supported pixels compression types by this codec. If the list has more than
+     * two entries, compression levels are ignored.
+     *
+     * For example:
+     *
+     *     1. The JPEG codec supports only one compression, JPEG. compression_level_min, compression_level_max,
+     *        compression_level_default can be used to select its compression level.
+     *     2. The TIFF codec supports more than two compression types (PACKBITS, JPEG, etc.).
+     *        Compression levels are ignored.
+     */
     const std::vector<SailCompression>& compressions() const;
+
+    /*
+     * Returns the compression type to use by default.
+     */
     SailCompression default_compression() const;
+
+    /*
+     * Returns the minimum compression value. For lossy codecs, more compression means less
+     * quality and vice versa. For lossless codecs, more compression means nothing but a smaller
+     * file size. The value is codec-specific.
+     *
+     * If compression_level_min() == compression_level_max() == 0, no compression tuning is available.
+     *
+     * For example: 0.
+     */
     double compression_level_min() const;
+
+    /*
+     * Returns the maximum compression value. This field is codec-specific.
+     *
+     * If compression_level_min() == compression_level_max() == 0, no compression tuning is available.
+     *
+     * For example: 100.
+     */
     double compression_level_max() const;
+
+    /*
+     * Returns the default compression value. For example: 15.
+     */
     double compression_level_default() const;
+
+    /*
+     * Returns the step to increase or decrease compression levels. For example: 1.
+     */
     double compression_level_step() const;
 
-    sail_status_t to_write_options(write_options *swrite_options) const;
+    /*
+     * Builds default write options from the write features. Can be used to build
+     * default write options and then slightly modify them before passing to image_writer.
+     *
+     * Returns SAIL_OK on success.
+     */
+    sail_status_t to_write_options(sail::write_options *write_options) const;
 
 private:
     write_features();
