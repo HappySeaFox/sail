@@ -89,7 +89,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t write(std::string_view path, const sail::image &image);
+    sail_status_t write(std::string_view path, const sail::image &image) const;
 
     /*
      * Writes the specified image into the specified memory buffer.
@@ -99,7 +99,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t write(void *buffer, size_t buffer_length, const sail::image &image);
+    sail_status_t write(void *buffer, size_t buffer_length, const sail::image &image) const;
 
     /*
      * Writes the specified image into the specified memory buffer.
@@ -111,7 +111,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t write(void *buffer, size_t buffer_length, const sail::image &image, size_t *written);
+    sail_status_t write(void *buffer, size_t buffer_length, const sail::image &image, size_t *written) const;
 
     /*
      * Starts writing into the specified image file.
@@ -215,7 +215,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t write_next_frame(const sail::image &image);
+    sail_status_t write_next_frame(const sail::image &image) const;
 
     /*
      * Stops writing started by start_writing() and closes the underlying I/O target.

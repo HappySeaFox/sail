@@ -67,7 +67,7 @@ image_writer::~image_writer()
     delete d;
 }
 
-sail_status_t image_writer::write(const std::string_view path, const sail::image &image)
+sail_status_t image_writer::write(const std::string_view path, const sail::image &image) const
 {
     sail_image *sail_image = nullptr;
     SAIL_TRY(image.to_sail_image(&sail_image));
@@ -82,14 +82,14 @@ sail_status_t image_writer::write(const std::string_view path, const sail::image
     return SAIL_OK;
 }
 
-sail_status_t image_writer::write(void *buffer, size_t buffer_length, const sail::image &image)
+sail_status_t image_writer::write(void *buffer, size_t buffer_length, const sail::image &image) const
 {
     SAIL_TRY(write(buffer, buffer_length, image, nullptr));
 
     return SAIL_OK;
 }
 
-sail_status_t image_writer::write(void *buffer, size_t buffer_length, const sail::image &image, size_t *written)
+sail_status_t image_writer::write(void *buffer, size_t buffer_length, const sail::image &image, size_t *written) const
 {
     SAIL_CHECK_BUFFER_PTR(buffer);
 
@@ -205,7 +205,7 @@ sail_status_t image_writer::start_writing(const sail::io &io, const sail::codec_
     return SAIL_OK;
 }
 
-sail_status_t image_writer::write_next_frame(const sail::image &image)
+sail_status_t image_writer::write_next_frame(const sail::image &image) const
 {
     sail_image *sail_image = nullptr;
     SAIL_TRY(image.to_sail_image(&sail_image));
