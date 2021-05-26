@@ -162,10 +162,11 @@ SAIL_EXPORT sail_status_t sail_start_writing_mem(void *buffer, size_t buffer_len
                                                 const struct sail_codec_info *codec_info, void **state);
 
 /*
- * Continues writing the file started by sail_start_writing_file() and brothers.
+ * Continues writing started by sail_start_writing_file() and brothers. Writes the specified
+ * image into the underlying I/O target.
  *
  * If the selected image format doesn't support the image pixel format, an error is returned.
- * Consider converting the image into a supported image format in advance with functions
+ * Consider converting the image into a supported image format beforehand with functions
  * from sail-manip.
  *
  * Returns SAIL_OK on success.
