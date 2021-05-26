@@ -45,7 +45,7 @@ extern "C" {
 /*
  * Reads from the underlying I/O object into the specified buffer. In contrast to sail_io_strict_read_t,
  * doesn't fail when the actual number of bytes read is smaller than requested.
- * Assigns the number of bytes actually read to read_size.
+ * Assigns the number of bytes actually read to the 'read_size' argument.
  *
  * Returns SAIL_OK on success.
  */
@@ -78,7 +78,7 @@ typedef sail_status_t (*sail_io_tell_t)(void *stream, size_t *offset);
 /*
  * Writes the specified buffer to the underlying I/O object. In contrast to sail_io_strict_write_t,
  * doesn't fail when the actual number of bytes written is smaller than requested.
- * Assigns the number of bytes actually written to written_size.
+ * Assigns the number of bytes actually written to the 'written_size' argument.
  *
  * Returns SAIL_OK on success.
  */
@@ -127,7 +127,7 @@ static const uint64_t SAIL_FILE_IO_ID   = UINT64_C(5820790535323209114);
 static const uint64_t SAIL_MEMORY_IO_ID = UINT64_C(11955407548648566675);
 
 /*
- * A structure representing an input/output abstraction. Use sail_alloc_io_read_file() and brothers to
+ * sail_io represents an input/output abstraction. Use sail_alloc_io_read_file() and brothers to
  * allocate I/O objects.
  */
 struct sail_io {
@@ -143,7 +143,7 @@ struct sail_io {
     uint64_t id;
 
     /*
-     * I/O specific data object. For example, a pointer to FILE.
+     * I/O-specific data object. For example, a pointer to a FILE.
      */
     void *stream;
 
@@ -214,7 +214,7 @@ SAIL_EXPORT sail_status_t sail_alloc_io(struct sail_io **io);
 SAIL_EXPORT void sail_destroy_io(struct sail_io *io);
 
 /*
- * Returns SAIL_OK if the given I/O object has valid callbacks.
+ * Returns SAIL_OK if the given I/O object has valid callbacks and a non-zero id.
  *
  * Returns SAIL_OK on success.
  */

@@ -70,7 +70,8 @@ sail_status_t sail_check_io_valid(const struct sail_io *io)
 {
     SAIL_CHECK_IO_PTR(io);
 
-    if (io->tolerant_read      == NULL ||
+    if (io->id == 0U                   ||
+            io->tolerant_read  == NULL ||
             io->strict_read    == NULL ||
             io->seek           == NULL ||
             io->tell           == NULL ||
