@@ -61,8 +61,8 @@ class write_features;
  */
 class SAIL_EXPORT image
 {
-    friend class image_reader;
-    friend class image_writer;
+    friend class image_input;
+    friend class image_output;
 
 public:
     /*

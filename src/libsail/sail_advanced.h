@@ -115,9 +115,11 @@ SAIL_EXPORT sail_status_t sail_start_reading_mem(const void *buffer, size_t buff
 SAIL_EXPORT sail_status_t sail_read_next_frame(void *state, struct sail_image **image);
 
 /*
- * Stops reading the file started by sail_start_reading_file() and brothers. Does nothing if the state is NULL.
+ * Stops reading the file started by sail_start_reading_file() and brothers.
+ * Does nothing if the state is NULL.
  *
- * It is essential to always stop writing to free memory resources. Failure to do so will lead to memory leaks.
+ * It is essential to always stop writing to free memory and I/O resources. Failure to do so
+ * will lead to memory leaks.
  *
  * Returns SAIL_OK on success.
  */
@@ -177,7 +179,8 @@ SAIL_EXPORT sail_status_t sail_write_next_frame(void *state, const struct sail_i
  * Stops writing started by sail_start_writing_file() and brothers. Closes the underlying I/O target.
  * Does nothing if the state is NULL.
  *
- * It is essential to always stop writing to free memory resources. Failure to do so will lead to memory leaks.
+ * It is essential to always stop writing to free memory and I/O resources. Failure to do so
+ * will lead to memory leaks.
  *
  * Returns SAIL_OK on success.
  */

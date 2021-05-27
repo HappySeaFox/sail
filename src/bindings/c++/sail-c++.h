@@ -37,8 +37,8 @@
     #include "conversion_options-c++.h"
     #include "iccp-c++.h"
     #include "image-c++.h"
-    #include "image_reader-c++.h"
-    #include "image_writer-c++.h"
+    #include "image_input-c++.h"
+    #include "image_output-c++.h"
     #include "io_common-c++.h"
     #include "log-c++.h"
     #include "meta_data-c++.h"
@@ -62,8 +62,8 @@
     #include <sail-c++/conversion_options-c++.h>
     #include <sail-c++/iccp-c++.h>
     #include <sail-c++/image-c++.h>
-    #include <sail-c++/image_reader-c++.h>
-    #include <sail-c++/image_writer-c++.h>
+    #include <sail-c++/image_input-c++.h>
+    #include <sail-c++/image_output-c++.h>
     #include <sail-c++/io_common-c++.h>
     #include <sail-c++/log-c++.h>
     #include <sail-c++/meta_data-c++.h>

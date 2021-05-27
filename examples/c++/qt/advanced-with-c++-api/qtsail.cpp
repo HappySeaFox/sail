@@ -72,17 +72,17 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
     qimages->clear();
     delays->clear();
 
-    sail::image_reader reader;
+    sail::image_input image_input;
     sail::image image;
 
     // Initialize reading.
     //
-    SAIL_TRY(reader.start_reading(path.toLocal8Bit().constData()));
+    SAIL_TRY(image_input.start(path.toLocal8Bit().constData()));
 
     // Read all the available image frames in the file.
     //
     sail_status_t res;
-    while ((res = reader.read_next_frame(&image)) == SAIL_OK) {
+    while ((res = image_input.next_frame(&image)) == SAIL_OK) {
 
         // Mutate alpha into a green color.
         //
@@ -111,7 +111,7 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
 
     SAIL_LOG_DEBUG("Read images: %d", qimages->size());
 
-    SAIL_TRY(reader.stop_reading());
+    SAIL_TRY(image_input.stop());
 
     m_ui->labelStatus->setText(tr("%1  [%2x%3]  [%4 → %5]")
                                 .arg(QFileInfo(path).fileName())
@@ -132,7 +132,7 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
         SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_NOT_FOUND);
     }
 
-    sail::image_writer writer;
+    sail::image_output image_output;
     sail::image image(const_cast<uchar *>(qimage.bits()), qImageFormatToSailPixelFormat(qimage.format()), qimage.width(), qimage.height());
 
     // SAIL tries to save an image as is, preserving its pixel format.
@@ -144,9 +144,9 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
     //
     SAIL_TRY(image.convert(codec_info.write_features()));
 
-    SAIL_TRY(writer.start_writing(path.toLocal8Bit().constData()));
-    SAIL_TRY(writer.write_next_frame(image));
-    SAIL_TRY(writer.stop_writing());
+    SAIL_TRY(image_output.start(path.toLocal8Bit().constData()));
+    SAIL_TRY(image_output.next_frame(image));
+    SAIL_TRY(image_output.stop());
 
     return SAIL_OK;
 }
@@ -189,8 +189,8 @@ sail_status_t QtSail::onProbe()
     QElapsedTimer elapsedTimer;
     elapsedTimer.start();
 
-    sail::image_reader reader;
-    auto [image, codec_info] = reader.probe(path.toLocal8Bit().constData());
+    sail::image_input image_input;
+    auto [image, codec_info] = image_input.probe(path.toLocal8Bit().constData());
 
     QMessageBox::information(this,
                              tr("File info"),

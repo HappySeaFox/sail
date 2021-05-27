@@ -84,7 +84,7 @@ public:
 
     /*
      * Builds default read options from the read features. Can be used to build
-     * default read options and then slightly modify them before passing to image_reader.
+     * default read options and then slightly modify them before passing to image_input.
      *
      * Returns SAIL_OK on success.
      */

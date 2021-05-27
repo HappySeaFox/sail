@@ -45,8 +45,8 @@ namespace sail
 class SAIL_EXPORT io
 {
     friend class codec_info;
-    friend class image_reader;
-    friend class image_writer;
+    friend class image_input;
+    friend class image_output;
 
 public:
     /*
