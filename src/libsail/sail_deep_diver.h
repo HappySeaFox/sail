@@ -143,7 +143,8 @@ SAIL_EXPORT sail_status_t sail_start_writing_mem_with_options(void *buffer, size
  * Stops writing started by sail_start_writing_file() and brothers. Closes the underlying I/O target.
  * Assigns the number of bytes written to the 'written' argument. Does nothing if the state is NULL.
  *
- * It is essential to always stop writing to free memory resources. Failure to do so will lead to memory leaks.
+ * It is essential to always stop writing to free memory and I/O resources. Failure to do so
+ * will lead to memory leaks.
  *
  * Returns SAIL_OK on success.
  */

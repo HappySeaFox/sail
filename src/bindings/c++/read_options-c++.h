@@ -42,11 +42,11 @@ namespace sail
 {
 
 /*
- * read_options represents options to modify reading operations. See image_reader.
+ * read_options represents options to modify reading operations. See image_input.
  */
 class SAIL_EXPORT read_options
 {
-    friend class image_reader;
+    friend class image_input;
     friend class read_features;
 
 public:

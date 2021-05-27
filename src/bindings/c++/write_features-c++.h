@@ -144,7 +144,7 @@ public:
 
     /*
      * Builds default write options from the write features. Can be used to build
-     * default write options and then slightly modify them before passing to image_writer.
+     * default write options and then slightly modify them before passing to image_output.
      *
      * Returns SAIL_OK on success.
      */

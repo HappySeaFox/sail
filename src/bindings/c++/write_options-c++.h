@@ -46,7 +46,7 @@ namespace sail
  */
 class SAIL_EXPORT write_options
 {
-    friend class image_writer;
+    friend class image_output;
     friend class write_features;
 
 public:

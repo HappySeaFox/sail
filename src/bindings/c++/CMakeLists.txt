@@ -11,10 +11,10 @@ add_library(sail-c++
                 iccp-c++.h
                 image-c++.cpp
                 image-c++.h
-                image_reader-c++.cpp
-                image_reader-c++.h
-                image_writer-c++.cpp
-                image_writer-c++.h
+                image_input-c++.cpp
+                image_input-c++.h
+                image_output-c++.cpp
+                image_output-c++.h
                 io_common-c++.cpp
                 io_common-c++.h
                 log-c++.cpp
@@ -47,8 +47,8 @@ set(PUBLIC_HEADERS "arbitrary_data-c++.h"
                    "conversion_options-c++.h"
                    "iccp-c++.h"
                    "image-c++.h"
-                   "image_reader-c++.h"
-                   "image_writer-c++.h"
+                   "image_input-c++.h"
+                   "image_output-c++.h"
                    "io_common-c++.h"
                    "log-c++.h"
                    "meta_data-c++.h"

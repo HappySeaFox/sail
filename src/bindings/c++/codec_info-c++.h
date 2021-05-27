@@ -53,8 +53,8 @@ namespace sail
  */
 class SAIL_EXPORT codec_info
 {
-    friend class image_reader;
-    friend class image_writer;
+    friend class image_input;
+    friend class image_output;
 
 public:
     /*
@@ -156,9 +156,9 @@ public:
      * The comparison algorithm is case insensitive.
      *
      * Typical usage: codec_info::from_magic_number() ->
-     *                image_reader::start_reading()   ->
-     *                image_reader::read_next_frame() ->
-     *                image_reader::stop_reading().
+     *                image_input::start()            ->
+     *                image_input::next_frame()       ->
+     *                image_input::stop().
      */
     static codec_info from_magic_number(std::string_view path);
 
@@ -168,9 +168,9 @@ public:
      * The comparison algorithm is case insensitive.
      *
      * Typical usage: codec_info::from_magic_number() ->
-     *                image_reader::start_reading()   ->
-     *                image_reader::read_next_frame() ->
-     *                image_reader::stop_reading().
+     *                image_input::start()            ->
+     *                image_input::next_frame()       ->
+     *                image_input::stop().
      */
     static codec_info from_magic_number(const void *buffer, size_t buffer_length);
 
@@ -180,9 +180,9 @@ public:
      * The comparison algorithm is case insensitive.
      *
      * Typical usage: codec_info::from_magic_number() ->
-     *                image_reader::start_reading()   ->
-     *                image_reader::read_next_frame() ->
-     *                image_reader::stop_reading().
+     *                image_input::start()            ->
+     *                image_input::next_frame()       ->
+     *                image_input::stop().
      */
     static codec_info from_magic_number(const sail::io &io);
 
@@ -191,15 +191,15 @@ public:
      * Returns an invalid codec info object if no suitable codecs were found.
      * The comparison algorithm is case insensitive. For example: "/test.jpg". The path might not exist.
      *
-     * Typical usage: codec_info::from_path()         ->
-     *                image_reader::start_reading()   ->
-     *                image_reader::read_next_frame() ->
-     *                image_reader::stop_reading().
+     * Typical usage: codec_info::from_path()   ->
+     *                image_input::start()      ->
+     *                image_input::next_frame() ->
+     *                image_input::stop().
      *
-     * Or:            codec_info::from_path()         ->
-     *                image_writer::start_writing()   ->
-     *                image_writer::read_next_frame() ->
-     *                image_writer::stop_writing().
+     * Or:            codec_info::from_path()    ->
+     *                image_output::start()      ->
+     *                image_output::next_frame() ->
+     *                image_output::stop().
      */
     static codec_info from_path(std::string_view path);
 
@@ -208,15 +208,15 @@ public:
      * Returns an invalid codec info object if no suitable codecs were found.
      * The comparison algorithm is case-insensitive. For example: "jpg".
      *
-     * Typical usage: codec_info::from_extension()    ->
-     *                image_reader::start_reading()   ->
-     *                image_reader::read_next_frame() ->
-     *                image_reader::stop_reading().
+     * Typical usage: codec_info::from_extension() ->
+     *                image_input::start()         ->
+     *                image_input::next_frame()    ->
+     *                image_input::stop().
      *
-     * Or:            codec_info::from_extension()    ->
-     *                image_writer::start_writing()   ->
-     *                image_writer::read_next_frame() ->
-     *                image_writer::stop_writing().
+     * Or:            codec_info::from_extension() ->
+     *                image_output::start()        ->
+     *                image_output::next_frame()   ->
+     *                image_output::stop().
      */
     static codec_info from_extension(std::string_view suffix);
 
@@ -225,15 +225,15 @@ public:
      * Returns an invalid codec info object if no suitable codecs were found.
      * The comparison algorithm is case-insensitive. For example: "image/jpeg".
      *
-     * Typical usage: codec_info::from_mime_type()    ->
-     *                image_reader::start_reading()   ->
-     *                image_reader::read_next_frame() ->
-     *                image_reader::stop_reading().
+     * Typical usage: codec_info::from_mime_type() ->
+     *                image_input::start()         ->
+     *                image_input::next_frame()    ->
+     *                image_input::stop().
      *
-     * Or:            codec_info::from_mime_type()    ->
-     *                image_writer::start_writing()   ->
-     *                image_writer::read_next_frame() ->
-     *                image_writer::stop_writing().
+     * Or:            codec_info::from_mime_type() ->
+     *                image_output::start()        ->
+     *                image_output::next_frame()   ->
+     *                image_output::stop().
      */
     static codec_info from_mime_type(std::string_view mime_type);
 

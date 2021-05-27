@@ -33,7 +33,7 @@
 namespace sail
 {
 
-class SAIL_HIDDEN image_reader::pimpl
+class SAIL_HIDDEN image_input::pimpl
 {
 public:
     pimpl()
@@ -56,18 +56,18 @@ public:
     struct sail_io *sail_io;
 };
 
-image_reader::image_reader()
+image_input::image_input()
     : d(new pimpl)
 {
 }
 
-image_reader::~image_reader()
+image_input::~image_input()
 {
-    stop_reading();
+    stop();
     delete d;
 }
 
-std::tuple<image, codec_info> image_reader::probe(const std::string_view path) const
+std::tuple<image, codec_info> image_input::probe(const std::string_view path) const
 {
     const sail_codec_info *sail_codec_info;
     sail_image *sail_image = nullptr;
@@ -82,7 +82,7 @@ std::tuple<image, codec_info> image_reader::probe(const std::string_view path) c
     return { image(sail_image), codec_info(sail_codec_info) };
 }
 
-std::tuple<image, codec_info> image_reader::probe(const void *buffer, size_t buffer_length) const
+std::tuple<image, codec_info> image_input::probe(const void *buffer, size_t buffer_length) const
 {
     const sail_codec_info *sail_codec_info;
     sail_image *sail_image = nullptr;
@@ -97,7 +97,7 @@ std::tuple<image, codec_info> image_reader::probe(const void *buffer, size_t buf
     return { image(sail_image), codec_info(sail_codec_info) };
 }
 
-std::tuple<image, codec_info> image_reader::probe(const sail::io &io) const
+std::tuple<image, codec_info> image_input::probe(const sail::io &io) const
 {
     SAIL_TRY_OR_EXECUTE(io.verify_valid(),
                         /* on error */ return {});
@@ -120,7 +120,7 @@ std::tuple<image, codec_info> image_reader::probe(const sail::io &io) const
     return { image(sail_image), codec_info(sail_codec_info) };
 }
 
-image image_reader::read(const std::string_view path) const
+image image_input::read(const std::string_view path) const
 {
     sail_image *sail_image = nullptr;
 
@@ -137,7 +137,7 @@ image image_reader::read(const std::string_view path) const
     return image;
 }
 
-image image_reader::read(const void *buffer, size_t buffer_length) const
+image image_input::read(const void *buffer, size_t buffer_length) const
 {
     sail_image *sail_image = nullptr;
 
@@ -154,7 +154,7 @@ image image_reader::read(const void *buffer, size_t buffer_length) const
     return image;
 }
 
-sail_status_t image_reader::start_reading(const std::string_view path)
+sail_status_t image_input::start(const std::string_view path)
 {
     SAIL_TRY(d->ensure_state_is_null());
 
@@ -163,7 +163,7 @@ sail_status_t image_reader::start_reading(const std::string_view path)
     return SAIL_OK;
 }
 
-sail_status_t image_reader::start_reading(const std::string_view path, const sail::codec_info &codec_info)
+sail_status_t image_input::start(const std::string_view path, const sail::codec_info &codec_info)
 {
     SAIL_TRY(d->ensure_state_is_null());
 
@@ -172,7 +172,7 @@ sail_status_t image_reader::start_reading(const std::string_view path, const sai
     return SAIL_OK;
 }
 
-sail_status_t image_reader::start_reading(const std::string_view path, const sail::codec_info &codec_info, const sail::read_options &read_options)
+sail_status_t image_input::start(const std::string_view path, const sail::codec_info &codec_info, const sail::read_options &read_options)
 {
     SAIL_TRY(d->ensure_state_is_null());
 
@@ -184,7 +184,7 @@ sail_status_t image_reader::start_reading(const std::string_view path, const sai
     return SAIL_OK;
 }
 
-sail_status_t image_reader::start_reading(const void *buffer, size_t buffer_length)
+sail_status_t image_input::start(const void *buffer, size_t buffer_length)
 {
     SAIL_TRY(d->ensure_state_is_null());
 
@@ -193,7 +193,7 @@ sail_status_t image_reader::start_reading(const void *buffer, size_t buffer_leng
     return SAIL_OK;
 }
 
-sail_status_t image_reader::start_reading(const void *buffer, size_t buffer_length, const sail::codec_info &codec_info)
+sail_status_t image_input::start(const void *buffer, size_t buffer_length, const sail::codec_info &codec_info)
 {
     SAIL_TRY(d->ensure_state_is_null());
 
@@ -202,7 +202,7 @@ sail_status_t image_reader::start_reading(const void *buffer, size_t buffer_leng
     return SAIL_OK;
 }
 
-sail_status_t image_reader::start_reading(const void *buffer, size_t buffer_length, const sail::read_options &read_options)
+sail_status_t image_input::start(const void *buffer, size_t buffer_length, const sail::read_options &read_options)
 {
     SAIL_TRY(d->ensure_state_is_null());
 
@@ -214,7 +214,7 @@ sail_status_t image_reader::start_reading(const void *buffer, size_t buffer_leng
     return SAIL_OK;
 }
 
-sail_status_t image_reader::start_reading(const void *buffer, size_t buffer_length, const sail::codec_info &codec_info, const sail::read_options &read_options)
+sail_status_t image_input::start(const void *buffer, size_t buffer_length, const sail::codec_info &codec_info, const sail::read_options &read_options)
 {
     SAIL_TRY(d->ensure_state_is_null());
 
@@ -226,7 +226,7 @@ sail_status_t image_reader::start_reading(const void *buffer, size_t buffer_leng
     return SAIL_OK;
 }
 
-sail_status_t image_reader::start_reading(const sail::io &io)
+sail_status_t image_input::start(const sail::io &io)
 {
     SAIL_TRY(d->ensure_state_is_null());
 
@@ -238,7 +238,7 @@ sail_status_t image_reader::start_reading(const sail::io &io)
     return SAIL_OK;
 }
 
-sail_status_t image_reader::start_reading(const sail::io &io, const sail::codec_info &codec_info)
+sail_status_t image_input::start(const sail::io &io, const sail::codec_info &codec_info)
 {
     SAIL_TRY(d->ensure_state_is_null());
 
@@ -250,7 +250,7 @@ sail_status_t image_reader::start_reading(const sail::io &io, const sail::codec_
     return SAIL_OK;
 }
 
-sail_status_t image_reader::start_reading(const sail::io &io, const sail::read_options &read_options)
+sail_status_t image_input::start(const sail::io &io, const sail::read_options &read_options)
 {
     SAIL_TRY(d->ensure_state_is_null());
 
@@ -265,7 +265,7 @@ sail_status_t image_reader::start_reading(const sail::io &io, const sail::read_o
     return SAIL_OK;
 }
 
-sail_status_t image_reader::start_reading(const sail::io &io, const sail::codec_info &codec_info, const sail::read_options &read_options)
+sail_status_t image_input::start(const sail::io &io, const sail::codec_info &codec_info, const sail::read_options &read_options)
 {
     SAIL_TRY(d->ensure_state_is_null());
 
@@ -280,7 +280,7 @@ sail_status_t image_reader::start_reading(const sail::io &io, const sail::codec_
     return SAIL_OK;
 }
 
-sail_status_t image_reader::read_next_frame(sail::image *image)
+sail_status_t image_input::next_frame(sail::image *image)
 {
     SAIL_CHECK_IMAGE_PTR(image);
 
@@ -298,15 +298,17 @@ sail_status_t image_reader::read_next_frame(sail::image *image)
     return SAIL_OK;
 }
 
-sail_status_t image_reader::stop_reading()
+sail_status_t image_input::stop()
 {
-    SAIL_TRY(sail_stop_reading(d->state));
+    sail_status_t saved_status = SAIL_OK;
+    SAIL_TRY_OR_EXECUTE(sail_stop_reading(d->state),
+                        /* on error */ saved_status = __sail_error_result);
     d->state = nullptr;
 
     sail_destroy_io(d->sail_io);
     d->sail_io = nullptr;
 
-    return SAIL_OK;
+    return saved_status;
 }
 
 }
