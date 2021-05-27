@@ -333,7 +333,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v5_tiff(void *state, 
     TIFFSetField(tiff_state->tiff, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
     TIFFSetField(tiff_state->tiff, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_RGB);
     TIFFSetField(tiff_state->tiff, TIFFTAG_COMPRESSION, tiff_state->write_compression);
-    TIFFSetField(tiff_state->tiff, TIFFTAG_ROWSPERSTRIP, TIFFDefaultStripSize(tiff_state->tiff, (uint32)-1));
+    TIFFSetField(tiff_state->tiff, TIFFTAG_ROWSPERSTRIP, TIFFDefaultStripSize(tiff_state->tiff, (uint32_t)-1));
 
     /* Write ICC profile. */
     if (tiff_state->write_options->io_options & SAIL_IO_OPTION_ICCP && image->iccp != NULL) {
