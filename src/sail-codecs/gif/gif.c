@@ -75,10 +75,6 @@ static sail_status_t alloc_gif_state(struct gif_state **gif_state) {
     SAIL_TRY(sail_malloc(sizeof(struct gif_state), &ptr));
     *gif_state = ptr;
 
-    if (*gif_state == NULL) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_MEMORY_ALLOCATION);
-    }
-
     (*gif_state)->read_options  = NULL;
     (*gif_state)->write_options = NULL;
 
