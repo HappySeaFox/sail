@@ -23,53 +23,52 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_SAIL_COMMON_H
-#define SAIL_SAIL_COMMON_H
-
-/* Universal libsail-common include. */
+#ifndef SAIL_MEMORY_H
+#define SAIL_MEMORY_H
 
 #ifdef SAIL_BUILD
-    #include "config.h"
-
-    #include "common.h"
     #include "error.h"
     #include "export.h"
-    #include "iccp.h"
-    #include "image.h"
-    #include "io_common.h"
-    #include "log.h"
-    #include "memory.h"
-    #include "meta_data_node.h"
-    #include "palette.h"
-    #include "pixel.h"
-    #include "read_features.h"
-    #include "read_options.h"
-    #include "resolution.h"
-    #include "source_image.h"
-    #include "utils.h"
-    #include "write_features.h"
-    #include "write_options.h"
 #else
-    #include <sail-common/config.h>
-
-    #include <sail-common/common.h>
     #include <sail-common/error.h>
     #include <sail-common/export.h>
-    #include <sail-common/iccp.h>
-    #include <sail-common/image.h>
-    #include <sail-common/io_common.h>
-    #include <sail-common/log.h>
-    #include <sail-common/memory.h>
-    #include <sail-common/meta_data_node.h>
-    #include <sail-common/palette.h>
-    #include <sail-common/pixel.h>
-    #include <sail-common/read_features.h>
-    #include <sail-common/read_options.h>
-    #include <sail-common/resolution.h>
-    #include <sail-common/source_image.h>
-    #include <sail-common/utils.h>
-    #include <sail-common/write_features.h>
-    #include <sail-common/write_options.h>
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/*
+ * Interface to malloc().
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_malloc(size_t size, void **ptr);
+
+/*
+ * Interface to realloc().
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_realloc(size_t size, void **ptr);
+
+/*
+ * Interface to calloc().
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_calloc(size_t nmemb, size_t size, void **ptr);
+
+/*
+ * Interface to free().
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT void sail_free(void *ptr);
+
+/* extern "C" */
+#ifdef __cplusplus
+}
 #endif
 
 #endif

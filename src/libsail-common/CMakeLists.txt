@@ -18,6 +18,8 @@ add_library(sail-common
                 io_common.h
                 log.c
                 log.h
+                memory.c
+                memory.h
                 meta_data_node.c
                 meta_data_node.h
                 palette.c
@@ -49,6 +51,7 @@ set(PUBLIC_HEADERS "common.h"
                    "image.h"
                    "io_common.h"
                    "log.h"
+                   "memory.h"
                    "meta_data_node.h"
                    "palette.h"
                    "pixel.h"
@@ -62,7 +65,7 @@ set(PUBLIC_HEADERS "common.h"
                    "write_options.h")
 
 set_target_properties(sail-common PROPERTIES
-                                  VERSION "0.9.1"
+                                  VERSION "0.9.2"
                                   SOVERSION 0
                                   PUBLIC_HEADER "${PUBLIC_HEADERS}")
 

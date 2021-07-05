@@ -266,34 +266,6 @@ SAIL_EXPORT bool sail_is_rgb_family(enum SailPixelFormat pixel_format);
 SAIL_EXPORT sail_status_t sail_print_errno(const char *format);
 
 /*
- * Interface to malloc().
- *
- * Returns SAIL_OK on success.
- */
-SAIL_EXPORT sail_status_t sail_malloc(size_t size, void **ptr);
-
-/*
- * Interface to realloc().
- *
- * Returns SAIL_OK on success.
- */
-SAIL_EXPORT sail_status_t sail_realloc(size_t size, void **ptr);
-
-/*
- * Interface to calloc().
- *
- * Returns SAIL_OK on success.
- */
-SAIL_EXPORT sail_status_t sail_calloc(size_t nmemb, size_t size, void **ptr);
-
-/*
- * Interface to free().
- *
- * Returns SAIL_OK on success.
- */
-SAIL_EXPORT void sail_free(void *ptr);
-
-/*
  * Assigns the current number of milliseconds since Epoch.
  *
  * Returns SAIL_OK on success.

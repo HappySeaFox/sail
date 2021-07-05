@@ -884,56 +884,6 @@ sail_status_t sail_print_errno(const char *format) {
     return SAIL_OK;
 }
 
-sail_status_t sail_malloc(size_t size, void **ptr) {
-
-    SAIL_CHECK_PTR(ptr);
-
-    void *ptr_local = malloc(size);
-
-    if (ptr_local == NULL) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_MEMORY_ALLOCATION);
-    }
-
-    *ptr = ptr_local;
-
-    return SAIL_OK;
-}
-
-sail_status_t sail_realloc(size_t size, void **ptr) {
-
-    SAIL_CHECK_PTR(ptr);
-
-    void *ptr_local = realloc(*ptr, size);
-
-    if (ptr_local == NULL) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_MEMORY_ALLOCATION);
-    }
-
-    *ptr = ptr_local;
-
-    return SAIL_OK;
-}
-
-sail_status_t sail_calloc(size_t nmemb, size_t size, void **ptr) {
-
-    SAIL_CHECK_PTR(ptr);
-
-    void *ptr_local = calloc(nmemb, size);
-
-    if (ptr_local == NULL) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_MEMORY_ALLOCATION);
-    }
-
-    *ptr = ptr_local;
-
-    return SAIL_OK;
-}
-
-void sail_free(void *ptr) {
-
-    free(ptr);
-}
-
 uint64_t sail_now(void) {
 
 #ifdef SAIL_WIN32
