@@ -173,7 +173,6 @@ sail_status_t sail_compare_images(const struct sail_image *image1, const struct 
     munit_assert(image1->pixel_format != SAIL_PIXEL_FORMAT_UNKNOWN);
     munit_assert(image1->pixel_format == image2->pixel_format);
 
-    munit_assert(image1->animated == image2->animated);
     munit_assert(image1->delay == image2->delay);
 
     if (image1->palette == NULL) {

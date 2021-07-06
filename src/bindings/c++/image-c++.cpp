@@ -42,7 +42,6 @@ public:
         , height(0)
         , bytes_per_line(0)
         , pixel_format(SAIL_PIXEL_FORMAT_UNKNOWN)
-        , animated(false)
         , delay(0)
         , properties(0)
         , pixels(nullptr)
@@ -73,7 +72,6 @@ public:
     unsigned bytes_per_line;
     sail::resolution resolution;
     SailPixelFormat pixel_format;
-    bool animated;
     int delay;
     sail::palette palette;
     std::vector<sail::meta_data> meta_data;
@@ -123,7 +121,6 @@ image& image::operator=(const image &img)
         .with_bytes_per_line(img.bytes_per_line())
         .with_resolution(img.resolution())
         .with_pixel_format(img.pixel_format())
-        .with_animated(img.animated())
         .with_delay(img.delay())
         .with_palette(img.palette())
         .with_meta_data(img.meta_data())
@@ -198,11 +195,6 @@ const sail::resolution& image::resolution() const
 SailPixelFormat image::pixel_format() const
 {
     return d->pixel_format;
-}
-
-bool image::animated() const
-{
-    return d->animated;
 }
 
 int image::delay() const
@@ -691,7 +683,6 @@ image::image(const sail_image *sail_image)
         .with_bytes_per_line(sail_image->bytes_per_line)
         .with_resolution(sail::resolution(sail_image->resolution))
         .with_pixel_format(sail_image->pixel_format)
-        .with_animated(sail_image->animated)
         .with_delay(sail_image->delay)
         .with_palette(sail::palette(sail_image->palette))
         .with_meta_data(meta_data)
@@ -765,7 +756,6 @@ sail_status_t image::to_sail_image(sail_image **image) const
     }
 
     image_local->pixel_format = d->pixel_format;
-    image_local->animated     = d->animated;
     image_local->delay        = d->delay;
 
     if (d->palette.is_valid()) {
@@ -786,12 +776,6 @@ sail_status_t image::to_sail_image(sail_image **image) const
     image_local = nullptr;
 
     return SAIL_OK;
-}
-
-image& image::with_animated(bool animated)
-{
-    d->animated = animated;
-    return *this;
 }
 
 image& image::with_properties(int properties)

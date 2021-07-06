@@ -303,8 +303,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_png(void *state, st
 
 #ifdef PNG_APNG_SUPPORTED
     if (png_state->is_apng) {
-        image_local->animated = true;
-
         /* APNG feature: a hidden frame. */
         if (!png_state->skipped_hidden && png_get_first_frame_is_hidden(png_state->png_ptr, png_state->info_ptr)) {
             SAIL_LOG_DEBUG("PNG: Skipping hidden frame");
@@ -321,8 +319,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_png(void *state, st
             /* We have just a single frame left - continue to reading scan lines. */
             if (png_state->frames == 1) {
                 png_read_frame_head(png_state->png_ptr, png_state->info_ptr);
-                image_local->animated = false;
-
                 png_state->next_frame_width  = png_state->first_image->width;
                 png_state->next_frame_height = png_state->first_image->height;
             } else if (png_state->frames == 0) {

@@ -171,20 +171,14 @@ public:
     SailPixelFormat pixel_format() const;
 
     /*
-     * Returns true if the image is a frame in an animation.
-     *
-     * READ:  Set by SAIL to true if the image is a frame in an animation.
-     * WRITE: Must be set by a caller to true if the image is a frame in an animation.
-     *        Codecs may need to know if they write a static or an animated image.
-     */
-    bool animated() const;
-
-    /*
      * Returns the delay in milliseconds to display the image on the screen if the image is a frame
-     * in an animation or 0 otherwise.
+     * in an animation or -1 otherwise.
+     *
+     * For animations, it's guaranteed that all the frames have non-negative delays. For multi-paged
+     * images, it's guaranteed that all the pages have delays equal to -1.
      *
      * READ:  Set by SAIL to a non-negative number of milliseconds if the image is a frame
-     *        in an animation.
+     *        in an animation or to -1 otherwise.
      * WRITE: Must be set by a caller to a non-negative number of milliseconds if the image is a frame
      *        in an animation.
      */
@@ -691,7 +685,6 @@ private:
 
     sail_status_t to_sail_image(sail_image **image) const;
 
-    image& with_animated(bool animated);
     image& with_properties(int properties);
     image& with_source_image(const sail::source_image &si);
 

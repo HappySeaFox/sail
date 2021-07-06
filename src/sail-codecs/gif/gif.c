@@ -315,10 +315,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_gif(void *state, st
         }
 
         if (record == IMAGE_DESC_RECORD_TYPE) {
-            if (gif_state->current_image > 0) {
-                image_local->animated = true;
-            }
-
             gif_state->map = (gif_state->gif->Image.ColorMap != NULL) ? gif_state->gif->Image.ColorMap : gif_state->gif->SColorMap;
 
             if (gif_state->map == NULL) {
