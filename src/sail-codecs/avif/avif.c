@@ -42,6 +42,9 @@
 struct avif_state {
     struct sail_read_options *read_options;
     struct sail_write_options *write_options;
+
+    struct avifIO *avif_io;
+    struct avifDecoder *avif_decoder;
 };
 
 static sail_status_t alloc_avif_state(struct avif_state **avif_state) {
@@ -56,6 +59,11 @@ static sail_status_t alloc_avif_state(struct avif_state **avif_state) {
 
     (*avif_state)->read_options  = NULL;
     (*avif_state)->write_options = NULL;
+    (*avif_state)->avif_io       = NULL;
+    (*avif_state)->avif_decoder  = NULL;
+
+    SAIL_TRY(sail_malloc(sizeof(struct avifIO), &ptr));
+    (*avif_state)->avif_io = ptr;
 
     return SAIL_OK;
 }
@@ -69,15 +77,9 @@ static void destroy_avif_state(struct avif_state *avif_state) {
     sail_destroy_read_options(avif_state->read_options);
     sail_destroy_write_options(avif_state->write_options);
 
-    sail_free(avif_state->buf);
+    sail_free(avif_state->avif_io);
 
-    if (avif_state->first_frame != NULL) {
-        for(int i = 0; i < avif_state->first_frame_height; i++) {
-            sail_free(avif_state->first_frame[i]);
-        }
-
-        sail_free(avif_state->first_frame);
-    }
+    avifDecoderDestroy(avif_state->avif_decoder);
 
     sail_free(avif_state);
 }
