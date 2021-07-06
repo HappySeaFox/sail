@@ -49,6 +49,7 @@ enum SailLogLevel {
     SAIL_LOG_LEVEL_INFO,
     SAIL_LOG_LEVEL_MESSAGE,
     SAIL_LOG_LEVEL_DEBUG,
+    SAIL_LOG_LEVEL_TRACE,
 };
 
 typedef void (*sail_logger)(enum SailLogLevel level, const char *file, int line, const char *format, va_list args);
@@ -95,6 +96,11 @@ SAIL_EXPORT void sail_set_logger(sail_logger logger);
  * Log a debug message.
  */
 #define SAIL_LOG_DEBUG(...) sail_log(SAIL_LOG_LEVEL_DEBUG, __FILE__, __LINE__, __VA_ARGS__)
+
+/*
+ * Log a verbose trace message which is usually interesting only for developers.
+ */
+#define SAIL_LOG_TRACE(...) sail_log(SAIL_LOG_LEVEL_TRACE, __FILE__, __LINE__, __VA_ARGS__)
 
 /* extern "C" */
 #ifdef __cplusplus

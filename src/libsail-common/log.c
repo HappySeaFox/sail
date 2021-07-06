@@ -59,6 +59,8 @@
 #define SAIL_COLOR_BOLD_MAGENTA "\033[1;35m"
 #define SAIL_COLOR_CYAN         "\033[0;36m"
 #define SAIL_COLOR_BOLD_CYAN    "\033[1;36m"
+#define SAIL_COLOR_WHITE        "\033[0;37m"
+#define SAIL_COLOR_BOLD_WHITE   "\033[1;37m"
 #define SAIL_COLOR_RESET        "\033[0m"
 
 #define SAIL_LOG_FPTR       stderr
@@ -80,7 +82,6 @@ static bool check_ansi_colors_supported(void) {
     ansi_colors_supported_called = true;
 
 #ifdef SAIL_COLORED_OUTPUT
-
     bool is_atty = (SAIL_ISATTY(SAIL_FILENO(SAIL_LOG_FPTR)) != 0);
 
     if (is_atty) {
@@ -140,6 +141,7 @@ void sail_log(enum SailLogLevel level, const char *file, int line, const char *f
         case SAIL_LOG_LEVEL_INFO:    level_string = "I"; break;
         case SAIL_LOG_LEVEL_MESSAGE: level_string = "M"; break;
         case SAIL_LOG_LEVEL_DEBUG:   level_string = "D"; break;
+        case SAIL_LOG_LEVEL_TRACE:   level_string = "T"; break;
     }
 
     const bool ansi_colors_supported = check_ansi_colors_supported();
@@ -153,6 +155,7 @@ void sail_log(enum SailLogLevel level, const char *file, int line, const char *f
             case SAIL_LOG_LEVEL_INFO:    fprintf(SAIL_LOG_FPTR, "%s", SAIL_COLOR_BOLD_CYAN);   break;
             case SAIL_LOG_LEVEL_MESSAGE:                                                       break;
             case SAIL_LOG_LEVEL_DEBUG:   fprintf(SAIL_LOG_FPTR, "%s", SAIL_COLOR_BOLD_BLUE);   break;
+            case SAIL_LOG_LEVEL_TRACE:   fprintf(SAIL_LOG_FPTR, "%s", SAIL_COLOR_BOLD_WHITE);  break;
         }
     }
 
