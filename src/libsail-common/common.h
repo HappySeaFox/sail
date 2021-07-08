@@ -150,6 +150,15 @@ enum SailPixelFormat {
      */
     SAIL_PIXEL_FORMAT_BPP24_CIE_LUV, /* 8/8/8   */
     SAIL_PIXEL_FORMAT_BPP40_CIE_LUV, /* 8/16/16 */
+
+    /*
+     * YUV formats.
+     */
+    SAIL_PIXEL_FORMAT_BPP24_YUV,
+    SAIL_PIXEL_FORMAT_BPP48_YUV,
+
+    SAIL_PIXEL_FORMAT_BPP32_YUVA,
+    SAIL_PIXEL_FORMAT_BPP64_YUVA,
 };
 
 /* Image properties. */
