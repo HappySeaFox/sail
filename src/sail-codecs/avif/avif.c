@@ -110,6 +110,8 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v5_avif(struct sail_io *io, const
     /* Deep copy read options. */
     SAIL_TRY(sail_copy_read_options(read_options, &avif_state->read_options));
 
+    avif_state->avif_decoder->ignoreExif = avif_state->avif_decoder->ignoreXMP = (avif_state->read_options->io_options & SAIL_IO_OPTION_EXIF) == 0;
+
     /* Initialize AVIF. */
     avif_state->avif_io->data = io;
 
@@ -145,11 +147,10 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_avif(void *state, s
     SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
                         /* cleanup */ sail_destroy_image(image_local));
 
-    image_local->source_image->compression = SAIL_COMPRESSION_LZW;
     image_local->source_image->pixel_format = SAIL_PIXEL_FORMAT_BPP8_INDEXED;
 
-    //image_local->width = avif_state->gif->SWidth;
-    //image_local->height = avif_state->gif->SHeight;
+    image_local->width = avif_state->avif_decoder->image->width;
+    image_local->height = avif_state->avif_decoder->image->height;
 
     *image = image_local;
 
