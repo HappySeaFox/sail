@@ -26,8 +26,18 @@
 #ifndef SAIL_AVIF_HELPERS_H
 #define SAIL_AVIF_HELPERS_H
 
-#include "common.h"
+#include <stdbool.h>
+#include <stdint.h>
+
+#include <avif/avif.h>
+
 #include "error.h"
 #include "export.h"
+
+SAIL_HIDDEN enum SailPixelFormat avif_private_sail_pixel_format(enum avifPixelFormat avif_pixel_format, uint32_t depth, bool has_alpha);
+
+SAIL_HIDDEN enum SailPixelFormat avif_private_rgb_sail_pixel_format(enum avifRGBFormat rgb_pixel_format, uint32_t depth);
+
+SAIL_HIDDEN uint32_t avif_private_round_depth(uint32_t depth);
 
 #endif

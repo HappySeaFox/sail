@@ -27,7 +27,6 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #include <avif/avif.h>
 
@@ -45,6 +44,7 @@ struct avif_state {
 
     struct avifIO *avif_io;
     struct avifDecoder *avif_decoder;
+    struct avifRGBImage rgb_image;
 };
 
 static sail_status_t alloc_avif_state(struct avif_state **avif_state) {
@@ -115,6 +115,13 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v5_avif(struct sail_io *io, const
     /* Initialize AVIF. */
     avif_state->avif_io->data = io;
 
+    avifResult avif_result = avifDecoderParse(avif_state->avif_decoder);
+
+    if (avif_result != AVIF_RESULT_OK) {
+        SAIL_LOG_ERROR("AVIF: %s", avifResultToString(avif_result));
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+    }
+
     return SAIL_OK;
 }
 
@@ -126,31 +133,36 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_avif(void *state, s
 
     struct avif_state *avif_state = (struct avif_state *)state;
 
-    avifResult avif_result = avifDecoderParse(avif_state->avif_decoder);
+    avifResult avif_result = avifDecoderNextImage(avif_state->avif_decoder);
+
+    if (avif_result == AVIF_RESULT_NO_IMAGES_REMAINING) {
+        return SAIL_ERROR_NO_MORE_FRAMES;
+    }
 
     if (avif_result != AVIF_RESULT_OK) {
         SAIL_LOG_ERROR("AVIF: %s", avifResultToString(avif_result));
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
-
-    avif_result = avifDecoderNextImage(avif_state->avif_decoder);
-
-    if (avif_result != AVIF_RESULT_OK) {
-        SAIL_LOG_ERROR("AVIF: %s", avifResultToString(avif_result));
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
-    }
-
-    SAIL_LOG_DEBUG("AVIF: Image %ux%u@%u", avif_state->avif_decoder->image->width, avif_state->avif_decoder->image->height, avif_state->avif_decoder->image->depth);
 
     struct sail_image *image_local;
     SAIL_TRY(sail_alloc_image(&image_local));
     SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
                         /* cleanup */ sail_destroy_image(image_local));
 
-    image_local->source_image->pixel_format = SAIL_PIXEL_FORMAT_BPP8_INDEXED;
+    avifRGBImageSetDefaults(&avif_state->rgb_image, avif_state->avif_decoder->image);
+    avif_state->rgb_image.depth = avif_private_round_depth(avif_state->rgb_image.depth);
+
+    image_local->source_image->pixel_format =
+        avif_private_sail_pixel_format(
+            avif_state->avif_decoder->image->yuvFormat, avif_state->avif_decoder->image->depth, avif_state->avif_decoder->image->alphaPlane != NULL);
 
     image_local->width = avif_state->avif_decoder->image->width;
     image_local->height = avif_state->avif_decoder->image->height;
+    image_local->pixel_format = avif_private_rgb_sail_pixel_format(avif_state->rgb_image.format, avif_state->rgb_image.depth);
+    image_local->delay = (int)(avif_state->avif_decoder->duration * 1000);
+
+    SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(image_local->width, image_local->pixel_format, &image_local->bytes_per_line),
+                        /* cleanup */ sail_destroy_image(image_local));
 
     *image = image_local;
 
@@ -173,6 +185,16 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v5_avif(void *state, struct sail
     SAIL_TRY(sail_check_image_skeleton_valid(image));
 
     struct avif_state *avif_state = (struct avif_state *)state;
+
+    avif_state->rgb_image.pixels = image->pixels;
+    avif_state->rgb_image.rowBytes = image->bytes_per_line;
+
+    avifResult avif_result = avifImageYUVToRGB(avif_state->avif_decoder->image, &avif_state->rgb_image);
+
+    if (avif_result != AVIF_RESULT_OK) {
+        SAIL_LOG_ERROR("AVIF: %s", avifResultToString(avif_result));
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+    }
 
     return SAIL_OK;
 }
