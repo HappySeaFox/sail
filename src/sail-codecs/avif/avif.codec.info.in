@@ -10,7 +10,7 @@ extensions=avif;avifs
 mime-types=image/avif;image/avif-sequence
 
 [read-features]
-features=STATIC;ANIMATED;META-DATA
+features=STATIC;ANIMATED;META-DATA;ICCP
 
 [write-features]
 features=

@@ -144,27 +144,32 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_avif(void *state, s
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
+    const struct avifImage *avif_image = avif_state->avif_decoder->image;
+
     struct sail_image *image_local;
     SAIL_TRY(sail_alloc_image(&image_local));
     SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
                         /* cleanup */ sail_destroy_image(image_local));
 
-    avifRGBImageSetDefaults(&avif_state->rgb_image, avif_state->avif_decoder->image);
+    avifRGBImageSetDefaults(&avif_state->rgb_image, avif_image);
     avif_state->rgb_image.depth = avif_private_round_depth(avif_state->rgb_image.depth);
 
     image_local->source_image->pixel_format =
-        avif_private_sail_pixel_format(
-            avif_state->avif_decoder->image->yuvFormat, avif_state->avif_decoder->image->depth, avif_state->avif_decoder->image->alphaPlane != NULL);
+        avif_private_sail_pixel_format(avif_image->yuvFormat, avif_image->depth, avif_image->alphaPlane != NULL);
 
-    image_local->width = avif_state->avif_decoder->image->width;
-    image_local->height = avif_state->avif_decoder->image->height;
+    image_local->width = avif_image->width;
+    image_local->height = avif_image->height;
     image_local->pixel_format = avif_private_rgb_sail_pixel_format(avif_state->rgb_image.format, avif_state->rgb_image.depth);
     image_local->delay = (int)(avif_state->avif_decoder->duration * 1000);
 
     SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(image_local->width, image_local->pixel_format, &image_local->bytes_per_line),
                         /* cleanup */ sail_destroy_image(image_local));
 
-    // TODO ICC
+    /* Fetch ICC profile. */
+    if (avif_state->read_options->io_options & SAIL_IO_OPTION_ICCP) {
+        SAIL_TRY_OR_CLEANUP(avif_private_fetch_iccp(&avif_image->icc, &image_local->iccp),
+                            /* cleanup */ sail_destroy_image(image_local));
+    }
 
     *image = image_local;
 
@@ -187,11 +192,12 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v5_avif(void *state, struct sail
     SAIL_TRY(sail_check_image_skeleton_valid(image));
 
     struct avif_state *avif_state = (struct avif_state *)state;
+    const struct avifImage *avif_image = avif_state->avif_decoder->image;
 
     avif_state->rgb_image.pixels = image->pixels;
     avif_state->rgb_image.rowBytes = image->bytes_per_line;
 
-    avifResult avif_result = avifImageYUVToRGB(avif_state->avif_decoder->image, &avif_state->rgb_image);
+    avifResult avif_result = avifImageYUVToRGB(avif_image, &avif_state->rgb_image);
 
     if (avif_result != AVIF_RESULT_OK) {
         SAIL_LOG_ERROR("AVIF: %s", avifResultToString(avif_result));
