@@ -39,8 +39,11 @@ enum SailPixelFormat avif_private_sail_pixel_format(enum avifPixelFormat avif_pi
                 case 8: {
                     return has_alpha ? SAIL_PIXEL_FORMAT_BPP32_YUVA : SAIL_PIXEL_FORMAT_BPP24_YUV;
                 }
-                case 16: {
-                    return has_alpha ? SAIL_PIXEL_FORMAT_BPP64_YUVA : SAIL_PIXEL_FORMAT_BPP48_YUV;
+                case 10: {
+                    return has_alpha ? SAIL_PIXEL_FORMAT_BPP40_YUVA : SAIL_PIXEL_FORMAT_BPP30_YUV;
+                }
+                case 12: {
+                    return has_alpha ? SAIL_PIXEL_FORMAT_BPP48_YUVA : SAIL_PIXEL_FORMAT_BPP36_YUV;
                 }
                 default: {
                     return SAIL_PIXEL_FORMAT_UNKNOWN;
@@ -81,9 +84,9 @@ enum SailPixelFormat avif_private_rgb_sail_pixel_format(enum avifRGBFormat rgb_p
 
 uint32_t avif_private_round_depth(uint32_t depth) {
 
-    if (depth <= 8) {
-        return 8;
-    } else {
+    if (depth > 8) {
         return 16;
+    } else {
+        return 8;
     }
 }
