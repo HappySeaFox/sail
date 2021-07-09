@@ -45,6 +45,7 @@ struct avif_state {
     struct avifIO *avif_io;
     struct avifDecoder *avif_decoder;
     struct avifRGBImage rgb_image;
+    struct sail_avif_context avif_context;
 };
 
 static sail_status_t alloc_avif_state(struct avif_state **avif_state) {
@@ -57,6 +58,7 @@ static sail_status_t alloc_avif_state(struct avif_state **avif_state) {
     (*avif_state)->write_options = NULL;
     (*avif_state)->avif_io       = NULL;
     (*avif_state)->avif_decoder  = NULL;
+    (*avif_state)->avif_io       = NULL;
 
     SAIL_TRY(sail_malloc(sizeof(struct avifIO), &ptr));
     (*avif_state)->avif_io = ptr;
@@ -65,8 +67,17 @@ static sail_status_t alloc_avif_state(struct avif_state **avif_state) {
     (*avif_state)->avif_io->read       = avif_private_read_proc;
     (*avif_state)->avif_io->write      = NULL;
     (*avif_state)->avif_io->sizeHint   = 0;
-    (*avif_state)->avif_io->persistent = AVIF_TRUE;
+    (*avif_state)->avif_io->persistent = AVIF_FALSE;
     (*avif_state)->avif_io->data       = NULL;
+
+    (*avif_state)->avif_context.io          = NULL;
+    (*avif_state)->avif_context.buffer      = NULL;
+    (*avif_state)->avif_context.buffer_size = 0;
+
+    const size_t initial_buffer_size = 10*1024;
+    SAIL_TRY(sail_malloc(initial_buffer_size, &ptr));
+    (*avif_state)->avif_context.buffer      = ptr;
+    (*avif_state)->avif_context.buffer_size = initial_buffer_size;
 
     (*avif_state)->avif_decoder = avifDecoderCreate();
     avifDecoderSetIO((*avif_state)->avif_decoder, (*avif_state)->avif_io);
@@ -80,12 +91,14 @@ static void destroy_avif_state(struct avif_state *avif_state) {
         return;
     }
 
-    sail_destroy_read_options(avif_state->read_options);
-    sail_destroy_write_options(avif_state->write_options);
-
     avifDecoderDestroy(avif_state->avif_decoder);
 
+    sail_free(avif_state->avif_context.buffer);
+
     sail_free(avif_state->avif_io);
+
+    sail_destroy_read_options(avif_state->read_options);
+    sail_destroy_write_options(avif_state->write_options);
 
     sail_free(avif_state);
 }
@@ -113,7 +126,8 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v5_avif(struct sail_io *io, const
     avif_state->avif_decoder->ignoreExif = avif_state->avif_decoder->ignoreXMP = (avif_state->read_options->io_options & SAIL_IO_OPTION_EXIF) == 0;
 
     /* Initialize AVIF. */
-    avif_state->avif_io->data = io;
+    avif_state->avif_context.io = io;
+    avif_state->avif_io->data = &avif_state->avif_context;
 
     avifResult avif_result = avifDecoderParse(avif_state->avif_decoder);
 

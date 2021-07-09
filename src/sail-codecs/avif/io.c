@@ -32,60 +32,27 @@
 avifResult avif_private_read_proc(struct avifIO *io, uint32_t read_flags, uint64_t offset, size_t size, avifROData *out) {
 
     if (read_flags != 0) {
-        SAIL_LOG_ERROR("AVIF: Unsupported read flags #%u", read_flags);
+        SAIL_LOG_ERROR("AVIF: Read flags must be #0, but got #%u", read_flags);
         return AVIF_RESULT_IO_ERROR;
     }
-
-#if 0
-    // * If offset exceeds the size of the content (past EOF), return AVIF_RESULT_IO_ERROR.
-    if (offset > reader->rodata.size) {
-        return AVIF_RESULT_IO_ERROR;
-    }
-
-    // * If offset is *exactly* at EOF, provide any 0-byte buffer and return AVIF_RESULT_OK.
-    if (offset == reader->rodata.size) {
-        out->data = reader->rodata.data;
-        out->size = 0;
-        return AVIF_RESULT_OK;
-    }
-
-    // * If (offset+size) exceeds the contents' size, it must provide a truncated buffer that provides
-    //   all bytes from the offset to EOF, and return AVIF_RESULT_OK.
-    uint64_t availableSize = reader->rodata.size - offset;
-    if (size > availableSize) {
-        size = (size_t)availableSize;
-    }
-
-    // * If (offset+size) does not exceed the contents' size but the *entire range* is unavailable yet
-    //   (due to network conditions or any other reason), return AVIF_RESULT_WAITING_ON_IO.
-    if (offset > reader->downloadedBytes) {
-        return AVIF_RESULT_WAITING_ON_IO;
-    }
-    if (size > (reader->downloadedBytes - offset)) {
-        return AVIF_RESULT_WAITING_ON_IO;
-    }
-
-    // * If (offset+size) does not exceed the contents' size, it must provide the *entire range* and
-    //   return AVIF_RESULT_OK.
-    out->data = reader->rodata.data + offset;
-    out->size = size;
-#endif
 
     SAIL_LOG_TRACE("AVIF: Read at offset %ld size %lu", (long)offset, (unsigned long)size);
 
-    struct sail_io *sail_io = (struct sail_io *)io->data;
-    SAIL_TRY_OR_EXECUTE(sail_io->seek(sail_io->stream, (long)offset, SEEK_SET),
+    struct sail_avif_context *avif_context = (struct sail_avif_context *)io->data;
+    SAIL_TRY_OR_EXECUTE(avif_context->io->seek(avif_context->io->stream, (long)offset, SEEK_SET),
                         /* on error */ return AVIF_RESULT_IO_ERROR);
 
-    // FIXME
-    uint8_t *buf;
-    SAIL_TRY_OR_EXECUTE(sail_malloc(size, &buf),
-                        /* on error */ return AVIF_RESULT_IO_ERROR);
+    /* Realloc internal buffer if necessary. */
+    if (size > avif_context->buffer_size) {
+        SAIL_TRY_OR_EXECUTE(sail_realloc(size, &avif_context->buffer),
+                            /* on error */ return AVIF_RESULT_IO_ERROR);
+        avif_context->buffer_size = size;
+    }
 
     size_t size_read;
-    SAIL_TRY_OR_EXECUTE(sail_io->tolerant_read(sail_io->stream, buf, size, &size_read),
+    SAIL_TRY_OR_EXECUTE(avif_context->io->tolerant_read(avif_context->io->stream, avif_context->buffer, size, &size_read),
                         /* on error */ return AVIF_RESULT_IO_ERROR);
-    out->data = buf;
+    out->data = avif_context->buffer;
     out->size = size_read;
 
     SAIL_LOG_TRACE("AVIF: Actually read: %lu", (unsigned long)size_read);
