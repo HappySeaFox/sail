@@ -115,20 +115,13 @@ struct sail_image {
     int interlaced_passes;
 
     /*
-     * Is the image a frame in an animation or not.
-     *
-     * READ:  Set by SAIL to true if the image is a frame in an animation.
-     * WRITE: Must be set by a caller to true if the image is a frame in an animation.
-     *        Codecs may need to know if they write a static or an animated image.
-     */
-    bool animated;
-
-    /*
      * Delay in milliseconds to display the image on the screen if the image is a frame
-     * in an animation or 0 otherwise.
+     * in an animation or -1 otherwise.
      *
      * READ:  Set by SAIL to a non-negative number of milliseconds if the image is a frame
-     *        in an animation.
+     *        in an animation or to -1 otherwise.
+     *        For animations, it's guaranteed that all the frames have non-negative delays.
+     *        For multi-paged sequences, it's guaranteed that all the pages have delays equal to -1.
      * WRITE: Must be set by a caller to a non-negative number of milliseconds if the image is a frame
      *        in an animation.
      */

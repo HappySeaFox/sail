@@ -157,7 +157,6 @@ It's pretty easy, isn't it? :smile: See [EXAMPLES](EXAMPLES.md) and [FAQ](FAQ.md
 - Easily extensible with new image format plugins
 - Easy-to-use API providing expected business entities - images, palettes, pixels etc.
 - Access to source pixel data (supported by the most codecs)
-- Output in multiple pixel formats, not only RGB
 - Access to the image properties w/o decoding pixel data (probing)
 
 ## Development status

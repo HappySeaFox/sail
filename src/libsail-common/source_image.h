@@ -51,8 +51,7 @@ struct sail_source_image {
     /*
      * Source image pixel format. See SailPixelFormat.
      *
-     * READ:  Set by SAIL to a valid source image pixel format of the image file before converting it
-     *        to a requested pixel format in sail_read_options.pixel_format.
+     * READ:  Set by SAIL to a source image pixel format of the original image.
      * WRITE: Ignored.
      */
     enum SailPixelFormat pixel_format;

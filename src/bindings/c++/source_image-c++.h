@@ -87,8 +87,7 @@ public:
     /*
      * Returns the source image pixel format. See SailPixelFormat.
      *
-     * READ:  Set by SAIL to a valid source image pixel format of the image file before converting it
-     *        to a requested pixel format in read_options.pixel_format.
+     * READ:  Set by SAIL to a source image pixel format of the original image.
      * WRITE: Ignored.
      */
     SailPixelFormat pixel_format() const;

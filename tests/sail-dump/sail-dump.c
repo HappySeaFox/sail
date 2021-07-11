@@ -197,22 +197,18 @@ static sail_status_t read_resolution(FILE *fptr, struct sail_image *image) {
 static sail_status_t read_animation(FILE *fptr, struct sail_image *image) {
 
     /*
-     * false 0(delay)
+     * 0(delay)
      */
-    char animated[16];
-
 #ifdef SAIL_WIN32
-    if (fscanf_s(fptr, "%s %d", animated, (unsigned)sizeof(animated), &image->delay) != 2) {
+    if (fscanf_s(fptr, "%d", &image->delay) != 1) {
 #else
-    if (fscanf(fptr, "%s %d", animated, &image->delay) != 2) {
+    if (fscanf(fptr, "%d", &image->delay) != 1) {
 #endif
         SAIL_LOG_ERROR("DUMP: Failed to read ANIMATED properties");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_READ_FILE);
     }
 
-    image->animated = (strcmp(animated, "true") == 0);
-
-    SAIL_LOG_DEBUG("DUMP: Animated properties: animated(%s) delay(%d)", (image->animated ? "true" : "false"), image->delay);
+    SAIL_LOG_DEBUG("DUMP: Animated properties: delay(%d)", image->delay);
 
     return SAIL_OK;
 }
@@ -492,7 +488,7 @@ sail_status_t sail_dump(const struct sail_image *image) {
     }
 
     {
-        printf("ANIMATION\n%s %d\n\n", (image->animated ? "true" : "false"), image->delay);
+        printf("ANIMATION\n%d\n\n", image->delay);
     }
 
     {
