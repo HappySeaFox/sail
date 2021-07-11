@@ -170,6 +170,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_avif(void *state, s
 
     image_local->source_image->pixel_format =
         avif_private_sail_pixel_format(avif_image->yuvFormat, avif_image->depth, avif_image->alphaPlane != NULL);
+    image_local->source_image->chroma_subsampling = avif_private_sail_chroma_subsampling(avif_image->yuvFormat);
 
     image_local->width = avif_image->width;
     image_local->height = avif_image->height;

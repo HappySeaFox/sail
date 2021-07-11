@@ -53,6 +53,20 @@ enum SailPixelFormat avif_private_sail_pixel_format(enum avifPixelFormat avif_pi
     }
 }
 
+enum SailChromaSubsampling avif_private_sail_chroma_subsampling(enum avifPixelFormat avif_pixel_format) {
+
+    switch (avif_pixel_format) {
+        case AVIF_PIXEL_FORMAT_YUV444: return SAIL_CHROMA_SUBSAMPLING_444;
+        case AVIF_PIXEL_FORMAT_YUV422: return SAIL_CHROMA_SUBSAMPLING_422;
+        case AVIF_PIXEL_FORMAT_YUV420: return SAIL_CHROMA_SUBSAMPLING_420;
+        case AVIF_PIXEL_FORMAT_YUV400: return SAIL_CHROMA_SUBSAMPLING_400;
+
+        default: {
+            return SAIL_CHROMA_SUBSAMPLING_UNKNOWN;
+        }
+    }
+}
+
 enum SailPixelFormat avif_private_rgb_sail_pixel_format(enum avifRGBFormat rgb_pixel_format, uint32_t depth) {
 
     switch (depth) {

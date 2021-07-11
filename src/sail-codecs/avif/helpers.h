@@ -31,10 +31,13 @@
 
 #include <avif/avif.h>
 
+#include "common.h"
 #include "error.h"
 #include "export.h"
 
 SAIL_HIDDEN enum SailPixelFormat avif_private_sail_pixel_format(enum avifPixelFormat avif_pixel_format, uint32_t depth, bool has_alpha);
+
+SAIL_HIDDEN enum SailChromaSubsampling avif_private_sail_chroma_subsampling(enum avifPixelFormat avif_pixel_format);
 
 SAIL_HIDDEN enum SailPixelFormat avif_private_rgb_sail_pixel_format(enum avifRGBFormat rgb_pixel_format, uint32_t depth);
 
