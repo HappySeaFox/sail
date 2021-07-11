@@ -37,9 +37,10 @@ sail_status_t sail_alloc_source_image(struct sail_source_image **source_image) {
     SAIL_TRY(sail_malloc(sizeof(struct sail_source_image), &ptr));
     *source_image = ptr;
 
-    (*source_image)->pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;
-    (*source_image)->properties   = 0;
-    (*source_image)->compression  = SAIL_COMPRESSION_UNSUPPORTED;
+    (*source_image)->pixel_format       = SAIL_PIXEL_FORMAT_UNKNOWN;
+    (*source_image)->chroma_subsampling = SAIL_CHROMA_SUBSAMPLING_UNKNOWN;
+    (*source_image)->properties         = 0;
+    (*source_image)->compression        = SAIL_COMPRESSION_UNSUPPORTED;
 
     return SAIL_OK;
 }
@@ -60,9 +61,10 @@ sail_status_t sail_copy_source_image(const struct sail_source_image *source, str
 
     SAIL_TRY(sail_alloc_source_image(target));
 
-    (*target)->pixel_format = source->pixel_format;
-    (*target)->properties   = source->properties;
-    (*target)->compression  = source->compression;
+    (*target)->pixel_format       = source->pixel_format;
+    (*target)->chroma_subsampling = source->chroma_subsampling;
+    (*target)->properties         = source->properties;
+    (*target)->compression        = source->compression;
 
     return SAIL_OK;
 }

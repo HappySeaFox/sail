@@ -57,6 +57,14 @@ struct sail_source_image {
     enum SailPixelFormat pixel_format;
 
     /*
+     * Source image chroma subsampling. See SailChromaSubsampling.
+     *
+     * READ:  Set by SAIL to a source image chroma subsampling of the original image.
+     * WRITE: Ignored.
+     */
+    enum SailChromaSubsampling chroma_subsampling;
+
+    /*
      * Or-ed source image properties. Set by SAIL to a valid source image properties of the image file.
      * For example, it can be interlaced. See SailImageProperty.
      *

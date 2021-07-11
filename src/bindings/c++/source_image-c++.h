@@ -93,6 +93,14 @@ public:
     SailPixelFormat pixel_format() const;
 
     /*
+     * Returns the source image chroma subsampling. See SailChromaSubsampling.
+     *
+     * READ:  Set by SAIL to a source image chroma subsampling of the original image.
+     * WRITE: Ignored.
+     */
+    SailChromaSubsampling chroma_subsampling() const;
+
+    /*
      * Returns the or-ed source image properties. Set by SAIL to a valid source image properties of the image file.
      * For example, it can be interlaced. See SailImageProperty.
      *
@@ -118,6 +126,7 @@ private:
     sail_status_t to_sail_source_image(sail_source_image **source_image) const;
 
     source_image& with_pixel_format(SailPixelFormat pixel_format);
+    source_image& with_chroma_subsampling(SailChromaSubsampling chroma_subsampling);
     source_image& with_properties(int properties);
     source_image& with_compression(SailCompression compression);
 
