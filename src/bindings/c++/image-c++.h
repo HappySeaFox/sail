@@ -174,11 +174,10 @@ public:
      * Returns the delay in milliseconds to display the image on the screen if the image is a frame
      * in an animation or -1 otherwise.
      *
-     * For animations, it's guaranteed that all the frames have non-negative delays. For multi-paged
-     * images, it's guaranteed that all the pages have delays equal to -1.
-     *
      * READ:  Set by SAIL to a non-negative number of milliseconds if the image is a frame
      *        in an animation or to -1 otherwise.
+     *        For animations, it's guaranteed that all the frames have non-negative delays.
+     *        For multi-paged sequences, it's guaranteed that all the pages have delays equal to -1.
      * WRITE: Must be set by a caller to a non-negative number of milliseconds if the image is a frame
      *        in an animation.
      */
