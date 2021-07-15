@@ -1,4 +1,4 @@
 usr/include/sail/sail-common/
 usr/lib/*/libsail-common.so
 usr/lib/*/pkgconfig/libsail-common.pc
-usr/lib/cmake/sail/SailCommon*.cmake
+usr/lib/cmake/sailcommon/SailCommon*.cmake
