@@ -80,7 +80,9 @@ static sail_status_t alloc_avif_state(struct avif_state **avif_state) {
     (*avif_state)->avif_context.buffer_size = initial_buffer_size;
 
     (*avif_state)->avif_decoder = avifDecoderCreate();
+#if AVIF_VERSION_MAJOR > 0 || AVIF_VERSION_MINOR >= 9
     (*avif_state)->avif_decoder->strictFlags = AVIF_STRICT_DISABLED;
+#endif
     avifDecoderSetIO((*avif_state)->avif_decoder, (*avif_state)->avif_io);
 
     return SAIL_OK;
