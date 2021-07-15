@@ -78,6 +78,8 @@ enum SailPixelFormat avif_private_rgb_sail_pixel_format(enum avifRGBFormat rgb_p
                 case AVIF_RGB_FORMAT_BGR:  return SAIL_PIXEL_FORMAT_BPP24_BGR;
                 case AVIF_RGB_FORMAT_BGRA: return SAIL_PIXEL_FORMAT_BPP32_BGRA;
                 case AVIF_RGB_FORMAT_ABGR: return SAIL_PIXEL_FORMAT_BPP32_ABGR;
+
+                default: return SAIL_PIXEL_FORMAT_UNKNOWN;
             }
         }
         case 16: {
@@ -88,6 +90,8 @@ enum SailPixelFormat avif_private_rgb_sail_pixel_format(enum avifRGBFormat rgb_p
                 case AVIF_RGB_FORMAT_BGR:  return SAIL_PIXEL_FORMAT_BPP48_BGR;
                 case AVIF_RGB_FORMAT_BGRA: return SAIL_PIXEL_FORMAT_BPP64_BGRA;
                 case AVIF_RGB_FORMAT_ABGR: return SAIL_PIXEL_FORMAT_BPP64_ABGR;
+
+                default: return SAIL_PIXEL_FORMAT_UNKNOWN;
             }
         }
         default: {
