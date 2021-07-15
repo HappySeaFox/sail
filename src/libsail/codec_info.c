@@ -128,7 +128,7 @@ sail_status_t sail_codec_info_by_magic_number_from_io(struct sail_io *io, const 
          * matches both "00 20 66 74" and "20 30 66 74".
          */
         while (magic_number_node != NULL) {
-            int buffer_index = 0;
+            size_t buffer_index = 0;
             const char *magic = magic_number_node->value;
             char hex_byte[3];
             int bytes_consumed = 0;
