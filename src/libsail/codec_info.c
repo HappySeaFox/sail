@@ -139,7 +139,7 @@ sail_status_t sail_codec_info_by_magic_number_from_io(struct sail_io *io, const 
 #ifdef SAIL_WIN32
             while (buffer_index < sizeof(buffer) && sscanf_s(magic, "%2s%n", hex_byte, (unsigned)sizeof(hex_byte), &bytes_consumed) == 1) {
 #else
-            while (buffer_index < sizeof(buffer) && sscanf(magic, "%2s%n", hex_byte, bytes_consumed) == 1) {
+            while (buffer_index < sizeof(buffer) && sscanf(magic, "%2s%n", hex_byte, &bytes_consumed) == 1) {
 #endif
                 if (hex_byte[0] == '?') {
                     SAIL_LOG_TRACE("Skipping ? character");
