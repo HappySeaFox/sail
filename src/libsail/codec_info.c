@@ -90,47 +90,87 @@ sail_status_t sail_codec_info_by_magic_number_from_io(struct sail_io *io, const 
     struct sail_context *context;
     SAIL_TRY(current_tls_context(&context));
 
-    /* Read the file magic. */
+    /* Read the image magic. */
     unsigned char buffer[SAIL_MAGIC_BUFFER_SIZE];
-    SAIL_TRY(io->strict_read(io->stream, buffer, SAIL_MAGIC_BUFFER_SIZE));
+    SAIL_TRY(io->strict_read(io->stream, buffer, sizeof(buffer)));
 
     /* Seek back. */
     SAIL_TRY(io->seek(io->stream, 0, SEEK_SET));
 
-    /* \xFF\xDD => "FF DD" + string terminator. */
-    char hex_numbers[SAIL_MAGIC_BUFFER_SIZE * 3 + 1];
-    char *hex_numbers_ptr = hex_numbers;
+    /* Debug print. */
+    {
+        /* \xFF\xDD => "FF DD" + string terminator. */
+        char hex_numbers[sizeof(buffer) * 3 + 1];
+        char *hex_numbers_ptr = hex_numbers;
 
-    for (size_t i = 0; i < sizeof(buffer); i++, hex_numbers_ptr += 3) {
+        for (size_t i = 0; i < sizeof(buffer); i++, hex_numbers_ptr += 3) {
 #ifdef SAIL_WIN32
-        sprintf_s(hex_numbers_ptr, 4, "%02x ", buffer[i]);
+            sprintf_s(hex_numbers_ptr, 4, "%02x ", buffer[i]);
 #else
-        sprintf(hex_numbers_ptr, "%02x ", buffer[i]);
+            sprintf(hex_numbers_ptr, "%02x ", buffer[i]);
 #endif
+        }
+
+        *(hex_numbers_ptr-1) = '\0';
+
+        SAIL_LOG_DEBUG("Read magic number: '%s'", hex_numbers);
     }
 
-    hex_numbers_ptr--;
-    *hex_numbers_ptr = '\0';
-
-    SAIL_LOG_DEBUG("Read magic number: '%s'", hex_numbers);
-
     /* Find the codec info. */
-    struct sail_codec_info_node *node = context->codec_info_node;
+    const struct sail_codec_info_node *codec_info_node = context->codec_info_node;
 
-    while (node != NULL) {
-        struct sail_string_node *string_node = node->codec_info->magic_number_node;
+    while (codec_info_node != NULL) {
+        const struct sail_string_node *magic_number_node = codec_info_node->codec_info->magic_number_node;
 
-        while (string_node != NULL) {
-            if (strncmp(hex_numbers, string_node->value, strlen(string_node->value)) == 0) {
-                *codec_info = node->codec_info;
+        /*
+         * Split "ab cd" into bytes and compare individual bytes against the read magic number.
+         * Additionally, we support "??" pattern matching any byte. For example, "?? ?? 66 74"
+         * matches both "00 20 66 74" and "20 30 66 74".
+         */
+        while (magic_number_node != NULL) {
+            int buffer_index = 0;
+            const char *magic = magic_number_node->value;
+            char hex_byte[3];
+            int bytes_consumed = 0;
+            bool mismatch = false;
+
+            SAIL_LOG_TRACE("Check against %s magic '%s'", codec_info_node->codec_info->name, magic);
+
+#ifdef SAIL_WIN32
+            while (buffer_index < sizeof(buffer) && sscanf_s(magic, "%2s%n", hex_byte, (unsigned)sizeof(hex_byte), &bytes_consumed) == 1) {
+#else
+            while (buffer_index < sizeof(buffer) && sscanf(magic, "%2s%n", hex_byte, bytes_consumed) == 1) {
+#endif
+                if (hex_byte[0] == '?') {
+                    SAIL_LOG_TRACE("Skipping ? character");
+                } else {
+                    unsigned byte = 0;
+
+#ifdef SAIL_WIN32
+                    if (sscanf_s(hex_byte, "%02x", &byte) != 1 || byte != buffer[buffer_index]) {
+#else
+                    if (sscanf(hex_byte, "%02x", &byte) != 1 || byte != buffer[buffer_index]) {
+#endif
+                        SAIL_LOG_TRACE("Character mismatch %02x != %02x", buffer[buffer_index], byte);
+                        mismatch = true;
+                        break;
+                    }
+                }
+
+                magic += bytes_consumed;
+                buffer_index++;
+            }
+
+            if (mismatch) {
+                magic_number_node = magic_number_node->next;
+            } else {
+                *codec_info = codec_info_node->codec_info;
                 SAIL_LOG_DEBUG("Found codec info: '%s'", (*codec_info)->name);
                 return SAIL_OK;
             }
-
-            string_node = string_node->next;
         }
 
-        node = node->next;
+        codec_info_node = codec_info_node->next;
     }
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_NOT_FOUND);
@@ -152,23 +192,27 @@ sail_status_t sail_codec_info_from_extension(const char *extension, const struct
     /* Will compare in lower case. */
     sail_to_lower(extension_copy);
 
-    struct sail_codec_info_node *node = context->codec_info_node;
+    const struct sail_codec_info_node *codec_info_node = context->codec_info_node;
 
-    while (node != NULL) {
-        struct sail_string_node *string_node = node->codec_info->extension_node;
+    while (codec_info_node != NULL) {
+        const struct sail_string_node *extension_node = codec_info_node->codec_info->extension_node;
 
-        while (string_node != NULL) {
-            if (strcmp(string_node->value, extension_copy) == 0) {
+        while (extension_node != NULL) {
+            SAIL_LOG_TRACE("Check against %s extension '%s'", codec_info_node->codec_info->name, extension_node->value);
+
+            if (strcmp(extension_node->value, extension_copy) == 0) {
                 sail_free(extension_copy);
-                *codec_info = node->codec_info;
+                *codec_info = codec_info_node->codec_info;
                 SAIL_LOG_DEBUG("Found codec info: '%s'", (*codec_info)->name);
                 return SAIL_OK;
+            } else {
+                SAIL_LOG_TRACE("Extension mismatch '%s' != '%s'", extension_copy, extension_node->value);
             }
 
-            string_node = string_node->next;
+            extension_node = extension_node->next;
         }
 
-        node = node->next;
+        codec_info_node = codec_info_node->next;
     }
 
     sail_free(extension_copy);
@@ -191,23 +235,27 @@ sail_status_t sail_codec_info_from_mime_type(const char *mime_type, const struct
     /* Will compare in lower case. */
     sail_to_lower(mime_type_copy);
 
-    struct sail_codec_info_node *node = context->codec_info_node;
+    const struct sail_codec_info_node *codec_info_node = context->codec_info_node;
 
-    while (node != NULL) {
-        struct sail_string_node *string_node = node->codec_info->mime_type_node;
+    while (codec_info_node != NULL) {
+        const struct sail_string_node *mime_type_node = codec_info_node->codec_info->mime_type_node;
 
-        while (string_node != NULL) {
-            if (strcmp(string_node->value, mime_type_copy) == 0) {
+        while (mime_type_node != NULL) {
+            SAIL_LOG_TRACE("Check against %s MIME type '%s'", codec_info_node->codec_info->name, mime_type_node->value);
+
+            if (strcmp(mime_type_node->value, mime_type_copy) == 0) {
                 sail_free(mime_type_copy);
-                *codec_info = node->codec_info;
+                *codec_info = codec_info_node->codec_info;
                 SAIL_LOG_DEBUG("Found codec info: '%s'", (*codec_info)->name);
                 return SAIL_OK;
+            } else {
+                SAIL_LOG_TRACE("MIME type mismatch '%s' != '%s'", mime_type_copy, mime_type_node->value);
             }
 
-            string_node = string_node->next;
+            mime_type_node = mime_type_node->next;
         }
 
-        node = node->next;
+        codec_info_node = codec_info_node->next;
     }
 
     sail_free(mime_type_copy);
