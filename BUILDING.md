@@ -48,7 +48,7 @@ vcpkg install sail
 Open `Git Bash` (installed along with `git`) and execute the following commands:
 
 ```
-git clone --recursive https://github.com/smoked-herring/sail.git
+git clone --recursive https://github.com/HappySeaFox/sail.git
 cd sail
 
 # Compile third-party dependencies
@@ -103,7 +103,7 @@ brew upgrade sail
 #### Build steps
 
 ```
-git clone --recursive https://github.com/smoked-herring/sail.git
+git clone --recursive https://github.com/HappySeaFox/sail.git
 cd sail
 
 # Install the required dependencies grabbed from debian/control
