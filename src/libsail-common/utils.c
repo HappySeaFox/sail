@@ -709,6 +709,16 @@ sail_status_t sail_bits_per_pixel(enum SailPixelFormat pixel_format, unsigned *r
 
         case SAIL_PIXEL_FORMAT_BPP24_CIE_LUV: *result = 24; return SAIL_OK;
         case SAIL_PIXEL_FORMAT_BPP40_CIE_LUV: *result = 40; return SAIL_OK;
+
+        case SAIL_PIXEL_FORMAT_BPP24_YUV: *result = 24; return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP30_YUV: *result = 30; return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP36_YUV: *result = 36; return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP48_YUV: *result = 48; return SAIL_OK;
+
+        case SAIL_PIXEL_FORMAT_BPP32_YUVA: *result = 32; return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP40_YUVA: *result = 40; return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP48_YUVA: *result = 48; return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP64_YUVA: *result = 64; return SAIL_OK;
     }
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
