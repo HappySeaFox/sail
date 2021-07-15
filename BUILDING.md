@@ -76,7 +76,7 @@ cmake --build . --config Release --target install
 #### Installation steps
 
 ```
-brew install smoked-herring/sail/sail
+brew install happyseafox/sail/sail
 ```
 
 Or
