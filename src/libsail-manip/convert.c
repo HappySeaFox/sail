@@ -946,8 +946,6 @@ enum SailPixelFormat sail_closest_pixel_format(enum SailPixelFormat input_pixel_
 
 enum SailPixelFormat sail_closest_pixel_format_from_write_features(enum SailPixelFormat input_pixel_format, const struct sail_write_features *write_features) {
 
-    SAIL_CHECK_WRITE_FEATURES_PTR(write_features);
-
     return sail_closest_pixel_format(input_pixel_format, write_features->output_pixel_formats, write_features->output_pixel_formats_length);
 }
 
