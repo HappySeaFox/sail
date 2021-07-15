@@ -5,8 +5,8 @@ layout=5
 version=0.9.0
 name=AVIF
 description=AV1 Still Image File Format
-# FIXME
-magic-numbers=
+# ????ftypavif;????ftypavis
+magic-numbers=?? ?? ?? ?? 66 74 79 70 61 76 69 66;?? ?? ?? ?? 66 74 79 70 61 76 69 73
 extensions=avif;avifs
 mime-types=image/avif;image/avif-sequence
 
