@@ -96,9 +96,6 @@ if (WIN32 AND NOT SAIL_VCPKG)
     set(EXTRA_LIBS "${PROJECT_SOURCE_DIR}/extra/B/bin")
     string(REPLACE "/" "\\" EXTRA_LIBS "${EXTRA_LIBS}")
     set(ENV{PATH} "$ENV{PATH};${EXTRA_LIBS}")
-
-    # For includes w/o pkg-config or CMake
-    include_directories("${PROJECT_SOURCE_DIR}/extra/B/include")
 endif()
 
 # Enable strict C11
