@@ -105,4 +105,4 @@ else()
             PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/sail/sail-codecs)
 endif()
 
-sail_install_cmake_config(TARGET "SailCodecs" VERSION 1.0.0)
+sail_install_cmake_config(TARGET "SailCodecs" FOLDER "sailcodecs" VERSION 1.0.0)
