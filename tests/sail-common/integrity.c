@@ -146,6 +146,16 @@ static MunitResult test_pixel_format_to_string(const MunitParameter params[], vo
     munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP24_CIE_LUV), "BPP24-CIE-LUV");
     munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP40_CIE_LUV), "BPP40-CIE-LUV");
 
+    munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP24_YUV), "BPP24-YUV");
+    munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP30_YUV), "BPP30-YUV");
+    munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP36_YUV), "BPP36-YUV");
+    munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP48_YUV), "BPP48-YUV");
+
+    munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP32_YUVA), "BPP32-YUVA");
+    munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP40_YUVA), "BPP40-YUVA");
+    munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP48_YUVA), "BPP48-YUVA");
+    munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP64_YUVA), "BPP64-YUVA");
+
     return MUNIT_OK;
 }
 
@@ -229,6 +239,16 @@ static MunitResult test_pixel_format_from_string(const MunitParameter params[], 
 
     munit_assert(sail_pixel_format_from_string("BPP24-CIE-LUV") == SAIL_PIXEL_FORMAT_BPP24_CIE_LUV);
     munit_assert(sail_pixel_format_from_string("BPP40-CIE-LUV") == SAIL_PIXEL_FORMAT_BPP40_CIE_LUV);
+
+    munit_assert(sail_pixel_format_from_string("BPP24-YUV") == SAIL_PIXEL_FORMAT_BPP24_YUV);
+    munit_assert(sail_pixel_format_from_string("BPP30-YUV") == SAIL_PIXEL_FORMAT_BPP30_YUV);
+    munit_assert(sail_pixel_format_from_string("BPP36-YUV") == SAIL_PIXEL_FORMAT_BPP36_YUV);
+    munit_assert(sail_pixel_format_from_string("BPP48-YUV") == SAIL_PIXEL_FORMAT_BPP48_YUV);
+
+    munit_assert(sail_pixel_format_from_string("BPP32-YUVA") == SAIL_PIXEL_FORMAT_BPP32_YUVA);
+    munit_assert(sail_pixel_format_from_string("BPP40-YUVA") == SAIL_PIXEL_FORMAT_BPP40_YUVA);
+    munit_assert(sail_pixel_format_from_string("BPP48-YUVA") == SAIL_PIXEL_FORMAT_BPP48_YUVA);
+    munit_assert(sail_pixel_format_from_string("BPP64-YUVA") == SAIL_PIXEL_FORMAT_BPP64_YUVA);
 
     return MUNIT_OK;
 }

@@ -1,0 +1,26 @@
+# AVIF codec information
+#
+[codec]
+layout=5
+version=0.9.0
+name=AVIF
+description=AV1 Still Image File Format
+# ????ftypavif;????ftypavis
+magic-numbers=?? ?? ?? ?? 66 74 79 70 61 76 69 66;?? ?? ?? ?? 66 74 79 70 61 76 69 73
+extensions=avif;avifs
+mime-types=image/avif;image/avif-sequence
+
+[read-features]
+features=STATIC;ANIMATED;META-DATA;ICCP
+
+[write-features]
+features=
+output-pixel-formats=
+properties=
+interlaced-passes=0
+compression-types=
+default-compression=
+compression-level-min=0
+compression-level-max=0
+compression-level-default=0
+compression-level-step=0

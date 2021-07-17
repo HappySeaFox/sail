@@ -290,6 +290,16 @@ const char* sail_pixel_format_to_string(enum SailPixelFormat pixel_format) {
 
         case SAIL_PIXEL_FORMAT_BPP24_CIE_LUV:         return "BPP24-CIE-LUV";
         case SAIL_PIXEL_FORMAT_BPP40_CIE_LUV:         return "BPP40-CIE-LUV";
+
+        case SAIL_PIXEL_FORMAT_BPP24_YUV:             return "BPP24-YUV";
+        case SAIL_PIXEL_FORMAT_BPP30_YUV:             return "BPP30-YUV";
+        case SAIL_PIXEL_FORMAT_BPP36_YUV:             return "BPP36-YUV";
+        case SAIL_PIXEL_FORMAT_BPP48_YUV:             return "BPP48-YUV";
+
+        case SAIL_PIXEL_FORMAT_BPP32_YUVA:            return "BPP32-YUVA";
+        case SAIL_PIXEL_FORMAT_BPP40_YUVA:            return "BPP40-YUVA";
+        case SAIL_PIXEL_FORMAT_BPP48_YUVA:            return "BPP48-YUVA";
+        case SAIL_PIXEL_FORMAT_BPP64_YUVA:            return "BPP64-YUVA";
     }
 
     return NULL;
@@ -382,6 +392,16 @@ enum SailPixelFormat sail_pixel_format_from_string(const char *str) {
 
         case UINT64_C(13237269438873232911): return SAIL_PIXEL_FORMAT_BPP24_CIE_LUV;
         case UINT64_C(13237356636207563853): return SAIL_PIXEL_FORMAT_BPP40_CIE_LUV;
+
+        case UINT64_C(249836535348743198):   return SAIL_PIXEL_FORMAT_BPP24_YUV;
+        case UINT64_C(249836535383134907):   return SAIL_PIXEL_FORMAT_BPP30_YUV;
+        case UINT64_C(249836535390250433):   return SAIL_PIXEL_FORMAT_BPP36_YUV;
+        case UINT64_C(249836535431757668):   return SAIL_PIXEL_FORMAT_BPP48_YUV;
+
+        case UINT64_C(8244605667721722782):  return SAIL_PIXEL_FORMAT_BPP32_YUVA;
+        case UINT64_C(8244605668934919965):  return SAIL_PIXEL_FORMAT_BPP40_YUVA;
+        case UINT64_C(8244605669248003109):  return SAIL_PIXEL_FORMAT_BPP48_YUVA;
+        case UINT64_C(8244605671674397475):  return SAIL_PIXEL_FORMAT_BPP64_YUVA;
     }
 
     return SAIL_PIXEL_FORMAT_UNKNOWN;
@@ -689,6 +709,16 @@ sail_status_t sail_bits_per_pixel(enum SailPixelFormat pixel_format, unsigned *r
 
         case SAIL_PIXEL_FORMAT_BPP24_CIE_LUV: *result = 24; return SAIL_OK;
         case SAIL_PIXEL_FORMAT_BPP40_CIE_LUV: *result = 40; return SAIL_OK;
+
+        case SAIL_PIXEL_FORMAT_BPP24_YUV: *result = 24; return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP30_YUV: *result = 30; return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP36_YUV: *result = 36; return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP48_YUV: *result = 48; return SAIL_OK;
+
+        case SAIL_PIXEL_FORMAT_BPP32_YUVA: *result = 32; return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP40_YUVA: *result = 40; return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP48_YUVA: *result = 48; return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP64_YUVA: *result = 64; return SAIL_OK;
     }
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);

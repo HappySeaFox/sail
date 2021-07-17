@@ -70,6 +70,7 @@ source_image::source_image(const source_image &si)
 source_image& source_image::operator=(const source_image &si)
 {
     with_pixel_format(si.pixel_format())
+        .with_chroma_subsampling(si.chroma_subsampling())
         .with_properties(si.properties())
         .with_compression(si.compression());
 
@@ -106,6 +107,11 @@ SailPixelFormat source_image::pixel_format() const
     return d->source_image->pixel_format;
 }
 
+SailChromaSubsampling source_image::chroma_subsampling() const
+{
+    return d->source_image->chroma_subsampling;
+}
+
 int source_image::properties() const
 {
     return d->source_image->properties;
@@ -125,6 +131,7 @@ source_image::source_image(const sail_source_image *si)
     }
 
     with_pixel_format(si->pixel_format)
+        .with_chroma_subsampling(si->chroma_subsampling)
         .with_properties(si->properties)
         .with_compression(si->compression);
 }
@@ -143,6 +150,12 @@ sail_status_t source_image::to_sail_source_image(sail_source_image **source_imag
 source_image& source_image::with_pixel_format(SailPixelFormat pixel_format)
 {
     d->source_image->pixel_format = pixel_format;
+    return *this;
+}
+
+source_image& source_image::with_chroma_subsampling(SailChromaSubsampling chroma_subsampling)
+{
+    d->source_image->chroma_subsampling = chroma_subsampling;
     return *this;
 }
 

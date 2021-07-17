@@ -1,6 +1,6 @@
 # List of codecs
 #
-set(CODECS bmp gif jpeg png tiff)
+set(CODECS avif bmp gif jpeg png tiff)
 
 list(SORT CODECS)
 
