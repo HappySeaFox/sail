@@ -30,14 +30,14 @@ if (SAIL_EXCEPT_CODECS)
     set(CODECS ${ENABLED_CODECS})
 endif()
 
-# Add enabled codecs (but codecs still can disable themselves due to missing dependencies).
-# Every codec updates the value of ENABLED_CODECS.
+# Add enabled codecs (but codecs still can disable themselves later due to missing dependencies).
+# Every codec CMake script updates the value of ENABLED_CODECS.
 #
 foreach(codec ${CODECS})
     add_subdirectory(${codec})
 endforeach()
 
-# Handle and export extra dependencies like giflib for static builds to the parent scope
+# Export extra dependencies like giflib for static builds to the parent scope
 #
 foreach (dependency IN LISTS SAIL_CODECS_FIND_DEPENDENCIES)
     string(REPLACE "," ";" dependency ${dependency})
@@ -52,7 +52,7 @@ endforeach()
 
 set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES_EXPANDED} PARENT_SCOPE)
 
-# Export codecs to the parent cmake file to print statistics
+# Export the list of codecs to the parent CMake file to print statistics
 #
 set(ENABLED_CODECS ${ENABLED_CODECS} PARENT_SCOPE)
 set(DISABLED_CODECS ${DISABLED_CODECS} PARENT_SCOPE)

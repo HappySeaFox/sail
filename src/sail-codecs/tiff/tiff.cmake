@@ -8,6 +8,12 @@ macro(sail_find_dependencies)
     set(sail_tiff_include_dirs ${TIFF_INCLUDE_DIRS})
     set(sail_tiff_libs ${TIFF_LIBRARIES})
 
+    # This will add the following CMake rules to the CMake config for static builds so a client
+    # application links against the required dependencies:
+    #
+    # find_dependency(TIFF REQUIRED)
+    # set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES TIFF::TIFF)
+    #
     set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "TIFF,TIFF::TIFF" PARENT_SCOPE)
 endmacro()
 

@@ -8,6 +8,12 @@ macro(sail_find_dependencies)
     set(sail_png_include_dirs ${PNG_INCLUDE_DIRS})
     set(sail_png_libs ${PNG_LIBRARIES})
 
+    # This will add the following CMake rules to the CMake config for static builds so a client
+    # application links against the required dependencies:
+    #
+    # find_dependency(PNG REQUIRED)
+    # set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES PNG::PNG)
+    #
     set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "PNG,PNG::PNG" PARENT_SCOPE)
 endmacro()
 

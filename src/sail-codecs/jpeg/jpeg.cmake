@@ -8,6 +8,12 @@ macro(sail_find_dependencies)
     set(sail_jpeg_include_dirs ${JPEG_INCLUDE_DIR})
     set(sail_jpeg_libs ${JPEG_LIBRARIES})
 
+    # This will add the following CMake rules to the CMake config for static builds so a client
+    # application links against the required dependencies:
+    #
+    # find_dependency(JPEG REQUIRED)
+    # set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES JPEG::JPEG)
+    #
     set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "JPEG,JPEG::JPEG" PARENT_SCOPE)
 endmacro()
 

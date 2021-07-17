@@ -9,5 +9,11 @@ macro(sail_find_dependencies)
     set(sail_avif_include_dirs ${AVIF_INCLUDE_DIRS})
     set(sail_avif_libs ${AVIF_LIBRARY})
 
+    # This will add the following CMake rules to the CMake config for static builds so a client
+    # application links against the required dependencies:
+    #
+    # find_dependency(LIBAVIF REQUIRED)
+    # set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES ${AVIF_LIBRARY})
+    #
     set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "LIBAVIF,${AVIF_LIBRARY}" PARENT_SCOPE)
 endmacro()
