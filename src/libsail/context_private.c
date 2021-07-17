@@ -115,51 +115,6 @@ static const char* sail_codecs_path_env(void) {
 }
 #endif
 
-#if !defined SAIL_COMBINE_CODECS || !defined SAIL_VCPKG
-static const char* sail_codecs_path(void) {
-
-    SAIL_THREAD_LOCAL static bool codecs_path_called = false;
-    SAIL_THREAD_LOCAL static const char *path = NULL;
-
-    if (codecs_path_called) {
-        return path;
-    }
-
-    codecs_path_called = true;
-
-#ifdef SAIL_WIN32
-    char dll_path[MAX_PATH];
-
-    /* Construct "\bin\..\lib\sail\codecs" from "\bin\sail.dll". */
-    if (get_sail_dll_path(dll_path, sizeof(dll_path)) == SAIL_OK) {
-        char *lib_sail_codecs_path;
-
-        #ifdef SAIL_VCPKG
-            /* "\bin" -> "\bin\sail\codecs" */
-            const char *CODECS_RELATIVE_PATH = "\\sail\\codecs";
-        #else
-            /* "\bin" -> "\bin\..\lib\sail\codecs" */
-            const char *CODECS_RELATIVE_PATH = "\\..\\lib\\sail\\codecs";
-        #endif
-
-        if (sail_concat(&lib_sail_codecs_path, 2, dll_path, CODECS_RELATIVE_PATH) == SAIL_OK) {
-            path = lib_sail_codecs_path;
-        } else {
-            SAIL_LOG_ERROR("Failed to concat strings. Falling back to loading codecs from '%s'", SAIL_CODECS_PATH);
-            path = SAIL_CODECS_PATH;
-        }
-    } else {
-        path = SAIL_CODECS_PATH;
-        SAIL_LOG_ERROR("Failed to get the sail.dll path. Falling back to loading codecs from '%s'", path);
-    }
-#else
-    path = SAIL_CODECS_PATH;
-#endif
-
-    return path;
-}
-#endif
-
 static const char* client_codecs_path(void) {
 
     SAIL_THREAD_LOCAL static bool codecs_path_called = false;
@@ -186,8 +141,8 @@ static const char* client_codecs_path(void) {
     return env;
 }
 
-/* Add "sail/codecs/lib" to the DLL/SO search path. */
-static sail_status_t update_lib_path(const char *codecs_path) {
+/* Add codecs_path/lib to the DLL/SO search path. */
+static sail_status_t add_lib_subdir_to_dll_search_path(const char *codecs_path) {
 
 #ifdef SAIL_WIN32
     char *full_path_to_lib;
@@ -388,7 +343,7 @@ static sail_status_t enumerate_codecs_in_paths(struct sail_context *context, con
             continue;
         }
 
-        SAIL_TRY(update_lib_path(codecs_path));
+        SAIL_TRY(add_lib_subdir_to_dll_search_path(codecs_path));
 
         SAIL_LOG_DEBUG("Enumerating codecs in '%s'", codecs_path);
 
@@ -582,17 +537,55 @@ static sail_status_t init_context_impl(struct sail_context *context) {
 
     destroy_string_node_chain(string_node);
 
-    /* Add our lib path in standalone mode. */
-#ifndef SAIL_VCPKG
-    SAIL_TRY(update_lib_path(sail_codecs_path()));
-#endif
-
     /* Load client codecs. */
     SAIL_TRY(enumerate_codecs_in_paths(context, (const char* []){ client_codecs_path() }, 1));
 
     return SAIL_OK;
 }
+#else /* SAIL_COMBINE_CODECS=OFF. */
+static const char* sail_codecs_path(void) {
+
+    SAIL_THREAD_LOCAL static bool codecs_path_called = false;
+    SAIL_THREAD_LOCAL static const char *path = NULL;
+
+    if (codecs_path_called) {
+        return path;
+    }
+
+    codecs_path_called = true;
+
+#ifdef SAIL_WIN32
+    char dll_path[MAX_PATH];
+
+    /* Construct "\bin\..\lib\sail\codecs" from "\bin\sail.dll". */
+    if (get_sail_dll_path(dll_path, sizeof(dll_path)) == SAIL_OK) {
+        char *lib_sail_codecs_path;
+
+        #ifdef SAIL_VCPKG
+            /* "\bin" -> "\bin\sail\codecs" */
+            const char *CODECS_RELATIVE_PATH = "\\sail\\codecs";
+        #else
+            /* "\bin" -> "\bin\..\lib\sail\codecs" */
+            const char *CODECS_RELATIVE_PATH = "\\..\\lib\\sail\\codecs";
+        #endif
+
+        if (sail_concat(&lib_sail_codecs_path, 2, dll_path, CODECS_RELATIVE_PATH) == SAIL_OK) {
+            path = lib_sail_codecs_path;
+        } else {
+            SAIL_LOG_ERROR("Failed to concat strings. Falling back to loading codecs from '%s'", SAIL_CODECS_PATH);
+            path = SAIL_CODECS_PATH;
+        }
+    } else {
+        path = SAIL_CODECS_PATH;
+        SAIL_LOG_ERROR("Failed to get the sail.dll path. Falling back to loading codecs from '%s'", path);
+    }
 #else
+    path = SAIL_CODECS_PATH;
+#endif
+
+    return path;
+}
+
 static sail_status_t init_context_impl(struct sail_context *context) {
 
     SAIL_CHECK_CONTEXT_PTR(context);

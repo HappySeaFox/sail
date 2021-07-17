@@ -226,13 +226,25 @@ install(FILES "${PROJECT_BINARY_DIR}/include/config.h" DESTINATION include/sail/
 # Install our bundled libs if they exist and when VCPKG is not used
 #
 if (NOT SAIL_VCPKG)
+    # When SAIL_COMBINE_CODECS is ON, sail-codecs.dll directly depends on extra libs.
+    # Copy them into the bin directory. Otherwise, client applications will fail to run.
+    #
+    # When SAIL_COMBINE_CODECS is OFF, SAIL loads codecs in runtime. In this case we can put
+    # extra libs in a separate directory and update the DLL search path.
+    #
+    if (SAIL_COMBINE_CODECS)
+        set(SAIL_EXTRA_LIBS_INSTALL_PATH "bin")
+    else()
+        set(SAIL_EXTRA_LIBS_INSTALL_PATH "lib/sail/codecs/lib")
+    endif()
+
     if (WIN32)
         if (EXISTS "${PROJECT_SOURCE_DIR}/extra/B/bin")
-            install(DIRECTORY "${PROJECT_SOURCE_DIR}/extra/B/bin/" DESTINATION lib/sail/codecs/lib)
+            install(DIRECTORY "${PROJECT_SOURCE_DIR}/extra/B/bin/" DESTINATION ${SAIL_EXTRA_LIBS_INSTALL_PATH})
         endif()
     else()
         if (EXISTS "${PROJECT_SOURCE_DIR}/extra/B/lib")
-            install(DIRECTORY "${PROJECT_SOURCE_DIR}/extra/B/lib/" DESTINATION lib/sail/codecs/lib)
+            install(DIRECTORY "${PROJECT_SOURCE_DIR}/extra/B/lib/" DESTINATION ${SAIL_EXTRA_LIBS_INSTALL_PATH})
         endif()
     endif()
 endif()
