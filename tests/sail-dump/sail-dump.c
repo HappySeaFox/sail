@@ -56,7 +56,7 @@ static sail_status_t read_hex(FILE *fptr, size_t data_length, uint8_t **value) {
 
     void *ptr;
     SAIL_TRY(sail_malloc(data_length, &ptr));
-    *value = ptr;
+    uint8_t *value_local = ptr;
 
     for (unsigned i = 0; i < data_length; i++) {
         skip_whitespaces(fptr);
@@ -67,12 +67,15 @@ static sail_status_t read_hex(FILE *fptr, size_t data_length, uint8_t **value) {
 #else
         if (fscanf(fptr, "%2x%*[ \r\n]", &v) != 1) {
 #endif
+            sail_free(value_local);
             SAIL_LOG_ERROR("DUMP: Failed to read hex element at index %u", i);
             SAIL_LOG_AND_RETURN(SAIL_ERROR_READ_FILE);
         }
 
-        *(*value + i) = (uint8_t)v;
+        *(value_local + i) = (uint8_t)v;
     }
+
+    *value = value_local;
 
     return SAIL_OK;
 }
