@@ -29,9 +29,13 @@
 #ifdef SAIL_BUILD
     #include "error.h"
     #include "export.h"
+
+    #include "layout/v5_pointers.h"
 #else
     #include <sail-common/error.h>
     #include <sail-common/export.h>
+
+    #include <sail/layout/v5_pointers.h>
 #endif
 
 /*
@@ -47,19 +51,6 @@ struct sail_write_features;
 struct sail_write_options;
 struct sail_image;
 struct sail_io;
-
-/* Codec interface declarations. */
-typedef sail_status_t (*sail_codec_read_init_v5_t)           (struct sail_io *io, const struct sail_read_options *read_options, void **state);
-typedef sail_status_t (*sail_codec_read_seek_next_frame_v5_t)(void *state, struct sail_io *io, struct sail_image **image);
-typedef sail_status_t (*sail_codec_read_seek_next_pass_v5_t) (void *state, struct sail_io *io, struct sail_image *image);
-typedef sail_status_t (*sail_codec_read_frame_v5_t)          (void *state, struct sail_io *io, const struct sail_image *image);
-typedef sail_status_t (*sail_codec_read_finish_v5_t)         (void **state, struct sail_io *io);
-
-typedef sail_status_t (*sail_codec_write_init_v5_t)           (struct sail_io *io, const struct sail_write_options *write_options, void **state);
-typedef sail_status_t (*sail_codec_write_seek_next_frame_v5_t)(void *state, struct sail_io *io, const struct sail_image *image);
-typedef sail_status_t (*sail_codec_write_seek_next_pass_v5_t) (void *state, struct sail_io *io, const struct sail_image *image);
-typedef sail_status_t (*sail_codec_write_frame_v5_t)          (void *state, struct sail_io *io, const struct sail_image *image);
-typedef sail_status_t (*sail_codec_write_finish_v5_t)         (void **state, struct sail_io *io);
 
 struct sail_codec_layout_v5 {
     sail_codec_read_init_v5_t            read_init;

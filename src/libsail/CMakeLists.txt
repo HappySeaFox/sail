@@ -90,7 +90,7 @@ install(TARGETS sail
 
 # Install layouts for debugging codecs
 #
-install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/layouts/" DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/sail/sail/layouts")
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/layout/" DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/sail/sail/layout")
 
 # Install development packages
 #

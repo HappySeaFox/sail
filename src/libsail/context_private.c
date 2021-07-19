@@ -34,7 +34,6 @@
 #ifdef SAIL_WIN32
     #include <windows.h> /* FindFirstFile */
 #else
-    #include <dlfcn.h> /* dlsym */
     #include <dirent.h> /* opendir */
     #include <sys/types.h>
 #endif
@@ -440,73 +439,29 @@ static sail_status_t init_context_impl(struct sail_context *context) {
 
     SAIL_CHECK_CONTEXT_PTR(context);
 
-#ifdef SAIL_WIN32
+    /* Externs from sail-codecs. */
 #ifdef SAIL_STATIC
-    HMODULE handle = GetModuleHandle(NULL);
+    /* For example: "gif;jpeg;png". */
+    extern const char * const sail_enabled_codecs;
+    extern const char * const sail_enabled_codecs_info[];
 #else
-    HMODULE handle = GetModuleHandle("sail-codecs");
-#endif
-
-    if (handle == NULL) {
-        SAIL_LOG_ERROR("Failed to get module handle. Error: %d", GetLastError());
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_SYMBOL_RESOLVE);
-    }
-#else
-    void *handle = dlopen(NULL, RTLD_LAZY | RTLD_LOCAL);
-
-    if (handle == NULL) {
-        SAIL_LOG_ERROR("Failed to open the current executable: %s", dlerror());
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_SYMBOL_RESOLVE);
-    }
-#endif
-
-    /* Extern from sail-codecs. For example: "gif;jpeg;png". */
-#ifdef SAIL_STATIC
-    extern const char *sail_enabled_codecs;
-#else
-    SAIL_IMPORT extern const char *sail_enabled_codecs;
+    SAIL_IMPORT extern const char * const sail_enabled_codecs;
+    SAIL_IMPORT extern const char * const sail_enabled_codecs_info[];
 #endif
 
     /* Load codec info objects. */
     struct sail_codec_info_node **last_codec_info_node = &context->codec_info_node;
 
-    struct sail_string_node *string_node = NULL;
-
     /* Split "gif;jpeg;png" into "gif", "jpeg", "png". */
+    struct sail_string_node *string_node = NULL;
     SAIL_TRY_OR_CLEANUP(split_into_string_node_chain(sail_enabled_codecs, &string_node),
                         /* cleanup */ destroy_string_node_chain(string_node));
 
     struct sail_string_node *node = string_node;
+    int index = 0;
 
     while (node != NULL) {
-        /* Construct "sail_codec_info_gif". */
-        char *sail_codec_info_var_name;
-        SAIL_TRY_OR_CLEANUP(sail_concat(&sail_codec_info_var_name, 2, "sail_codec_info_", node->value),
-                            /* cleanup */ destroy_string_node_chain(string_node));
-
-    /* Resolve sail_codec_info_gif. */
-#ifdef SAIL_WIN32
-        FARPROC sail_codec_info_sym = GetProcAddress(handle, sail_codec_info_var_name);
-
-        if (sail_codec_info_sym == NULL) {
-            SAIL_LOG_ERROR("Failed to resolve '%s'. Error: %d", sail_codec_info_var_name, GetLastError());
-        }
-#else
-        void *sail_codec_info_sym = dlsym(handle, sail_codec_info_var_name);
-
-        if (sail_codec_info_sym == NULL) {
-            SAIL_LOG_ERROR("Failed to resolve '%s'. Error: %s", sail_codec_info_var_name, dlerror());
-        }
-#endif
-
-        sail_free(sail_codec_info_var_name);
-
-        if (sail_codec_info_sym == NULL) {
-            node = node->next;
-            continue;
-        }
-
-        const char **sail_codec_info_var = (const char **)sail_codec_info_sym;
+        const char *sail_codec_info = sail_enabled_codecs_info[index++];
 
         /* Parse codec info. */
         struct sail_codec_info_node *codec_info_node;
@@ -516,7 +471,7 @@ static sail_status_t init_context_impl(struct sail_context *context) {
         }
 
         struct sail_codec_info *codec_info;
-        if (codec_read_info_from_string(*sail_codec_info_var, &codec_info) != SAIL_OK) {
+        if (codec_read_info_from_string(sail_codec_info, &codec_info) != SAIL_OK) {
             destroy_codec_info_node(codec_info_node);
             node = node->next;
             continue;
@@ -530,10 +485,6 @@ static sail_status_t init_context_impl(struct sail_context *context) {
 
         node = node->next;
     }
-
-#ifndef SAIL_WIN32
-    dlclose(handle);
-#endif
 
     destroy_string_node_chain(string_node);
 
