@@ -1,6 +1,5 @@
-# Generate built-in codec info as C source files and compile it into the combined library
+# Generate built-in codecs info as a string and compile it into the combined library
 #
-set(SAIL_CODEC_INFO_SOURCES "")
 foreach(codec ${ENABLED_CODECS})
     get_target_property(CODEC_BINARY_DIR sail-codec-${codec} BINARY_DIR)
 
@@ -8,14 +7,8 @@ foreach(codec ${ENABLED_CODECS})
     string(REPLACE "\"" "\\\"" SAIL_CODEC_INFO_CONTENTS "${SAIL_CODEC_INFO_CONTENTS}")
     # Add \n\ on every line
     string(REGEX REPLACE "\n" "\\\\n\\\\\n" SAIL_CODEC_INFO_CONTENTS "${SAIL_CODEC_INFO_CONTENTS}")
-
-    set(SAIL_CODEC_NAME ${codec})
-
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/codec_info.c.in
-                   ${CMAKE_CURRENT_BINARY_DIR}/codec_info_${codec}.c
-                   @ONLY)
-
-    list(APPEND SAIL_CODEC_INFO_SOURCES ${CMAKE_CURRENT_BINARY_DIR}/codec_info_${codec}.c)
+    set(SAIL_CODEC_INFO_CONTENTS "\"${SAIL_CODEC_INFO_CONTENTS}\",\n")
+    set(SAIL_ENABLED_CODECS_INFO "${SAIL_ENABLED_CODECS_INFO}${SAIL_CODEC_INFO_CONTENTS}")
 endforeach()
 
 # Needed for the configure_file() command below
@@ -41,7 +34,7 @@ endforeach()
 # Add a combined library
 #
 if (SAIL_STATIC)
-    add_library(sail-codecs-objects ${SAIL_CODEC_INFO_SOURCES} ${SAIL_CODECS_LIBS})
+    add_library(sail-codecs-objects ${SAIL_CODECS_LIBS})
     target_link_libraries(sail-codecs-objects PRIVATE sail-common)
 
     # Add an extra library to link against it with a special 'whole archive' option.
@@ -87,7 +80,7 @@ if (SAIL_STATIC)
             RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
             PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/sail/sail-codecs)
 else()
-    add_library(sail-codecs ${CMAKE_CURRENT_BINARY_DIR}/enabled_codecs.c ${SAIL_CODEC_INFO_SOURCES} ${SAIL_CODECS_LIBS})
+    add_library(sail-codecs ${CMAKE_CURRENT_BINARY_DIR}/enabled_codecs.c ${SAIL_CODECS_LIBS})
     target_link_libraries(sail-codecs PRIVATE sail-common)
 
     # Link all the enabled codecs dependencies into sail-codecs
