@@ -58,8 +58,8 @@ static MunitResult test_calloc(const MunitParameter params[], void *user_data) {
 
     unsigned char *cptr = ptr;
 
-    for (size_t i = 0; i < size * members; i++) {
-        munit_assert(*cptr++ == 0);
+    for (size_t i = 0; i < size * members; i++, cptr++) {
+        munit_assert(*cptr == 0);
     }
 
     sail_free(ptr);
