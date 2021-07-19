@@ -34,11 +34,6 @@ jobs:
       dist: focal
       name: "Ubuntu 20.04 Focal"
     - os: osx
-      osx_image: xcode11.3
-      name: "macOS 10.14"
-      env:
-        - CMAKE_PREFIX_PATH="/usr/local/opt/jpeg-turbo:$CMAKE_PREFIX_PATH"
-    - os: osx
       osx_image: xcode12.2
       name: "macOS 10.15"
       env:
