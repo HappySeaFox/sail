@@ -15,4 +15,4 @@ target_link_libraries(sail-dump PRIVATE sail-common)
 # Application to dump images
 #
 add_executable(sail-dump-app sail-dump-app.c)
-target_link_libraries(sail-dump-app PRIVATE sail-dump sail)
+target_link_libraries(sail-dump-app PRIVATE sail sail-dump)
