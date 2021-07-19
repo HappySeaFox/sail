@@ -330,8 +330,8 @@ void fill_ycbcr_pixel_from_uint16_values(const sail_rgba64_t *rgba64, uint8_t *s
         rgba32_no_alpha.component3 = (uint8_t)((opacity * rgba64->component3 + (1 - opacity) * options->background48.component3) / 257.0);
     } else {
         rgba32_no_alpha.component1 = (uint8_t)(rgba64->component1 / 257.0);
-        rgba32_no_alpha.component1 = (uint8_t)(rgba64->component2 / 257.0);
-        rgba32_no_alpha.component1 = (uint8_t)(rgba64->component3 / 257.0);
+        rgba32_no_alpha.component2 = (uint8_t)(rgba64->component2 / 257.0);
+        rgba32_no_alpha.component3 = (uint8_t)(rgba64->component3 / 257.0);
     }
 
     convert_rgba32_to_ycbcr24(&rgba32_no_alpha, scan+0, scan+1, scan+2);
