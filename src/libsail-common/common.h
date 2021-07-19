@@ -325,14 +325,11 @@ enum SailCodecFeature {
     /* Ability to read or write simple image meta data like JPEG comments. */
     SAIL_CODEC_FEATURE_META_DATA   = 1 << 4,
 
-    /* Ability to read or write EXIF meta data. */
-    SAIL_CODEC_FEATURE_EXIF        = 1 << 5,
-
     /* Ability to read or write interlaced images. */
-    SAIL_CODEC_FEATURE_INTERLACED  = 1 << 6,
+    SAIL_CODEC_FEATURE_INTERLACED  = 1 << 5,
 
     /* Ability to read or write embedded ICC profiles. */
-    SAIL_CODEC_FEATURE_ICCP        = 1 << 7,
+    SAIL_CODEC_FEATURE_ICCP        = 1 << 6,
 };
 
 /* Read or write options. */
@@ -341,14 +338,11 @@ enum SailIoOption {
     /* Instruction to read or write simple image meta data like JPEG comments. */
     SAIL_IO_OPTION_META_DATA  = 1 << 0,
 
-    /* Instruction to read or write EXIF meta data. */
-    SAIL_IO_OPTION_EXIF       = 1 << 1,
-
     /* Instruction to write interlaced images. Specifying this option for reading operations has no effect. */
-    SAIL_IO_OPTION_INTERLACED = 1 << 2,
+    SAIL_IO_OPTION_INTERLACED = 1 << 1,
 
     /* Instruction to read or write embedded ICC profile. */
-    SAIL_IO_OPTION_ICCP       = 1 << 3,
+    SAIL_IO_OPTION_ICCP       = 1 << 2,
 };
 
 #endif

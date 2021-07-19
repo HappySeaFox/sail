@@ -126,7 +126,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v5_avif(struct sail_io *io, const
     /* Deep copy read options. */
     SAIL_TRY(sail_copy_read_options(read_options, &avif_state->read_options));
 
-    avif_state->avif_decoder->ignoreExif = avif_state->avif_decoder->ignoreXMP = (avif_state->read_options->io_options & SAIL_IO_OPTION_EXIF) == 0;
+    avif_state->avif_decoder->ignoreExif = avif_state->avif_decoder->ignoreXMP = (avif_state->read_options->io_options & SAIL_IO_OPTION_META_DATA) == 0;
 
     /* Initialize AVIF. */
     avif_state->avif_context.io = io;

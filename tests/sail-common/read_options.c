@@ -48,7 +48,7 @@ static MunitResult test_copy_options(const MunitParameter params[], void *user_d
     struct sail_read_options *read_options = NULL;
     munit_assert(sail_alloc_read_options(&read_options) == SAIL_OK);
 
-    read_options->io_options = SAIL_IO_OPTION_EXIF;
+    read_options->io_options = SAIL_IO_OPTION_ICCP;
 
     struct sail_read_options *read_options_copy = NULL;
     munit_assert(sail_copy_read_options(read_options, &read_options_copy) == SAIL_OK);
