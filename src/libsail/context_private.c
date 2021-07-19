@@ -446,7 +446,7 @@ static sail_status_t init_context_impl(struct sail_context *context) {
     extern const char * const sail_enabled_codecs_info[];
 #else
     SAIL_IMPORT extern const char * const sail_enabled_codecs;
-    SAIL_IMPORT const char * const sail_enabled_codecs_info[];
+    SAIL_IMPORT extern const char * const sail_enabled_codecs_info[];
 #endif
 
     /* Load codec info objects. */
