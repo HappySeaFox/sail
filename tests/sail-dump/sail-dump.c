@@ -272,20 +272,26 @@ static sail_status_t read_meta_data(FILE *fptr, struct sail_image *image) {
 
         if (meta_data == SAIL_META_DATA_UNKNOWN) {
             if (value_type == SAIL_META_DATA_TYPE_STRING) {
-                SAIL_TRY(sail_alloc_meta_data_node_from_unknown_string(key_unknown, (char *)value, &meta_data_node));
+                SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_node_from_unknown_string(key_unknown, (char *)value, &meta_data_node),
+                                    /* on error */ sail_free(value));
             } else {
-                SAIL_TRY(sail_alloc_meta_data_node_from_unknown_data(key_unknown, value, data_length, &meta_data_node));
+                SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_node_from_unknown_data(key_unknown, value, data_length, &meta_data_node),
+                                    /* on error */ sail_free(value));
             }
         } else {
             if (value_type == SAIL_META_DATA_TYPE_STRING) {
-                SAIL_TRY(sail_alloc_meta_data_node_from_known_string(meta_data, (char *)value, &meta_data_node));
+                SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_node_from_known_string(meta_data, (char *)value, &meta_data_node),
+                                    /* on error */ sail_free(value));
             } else {
-                SAIL_TRY(sail_alloc_meta_data_node_from_known_data(meta_data, value, data_length, &meta_data_node));
+                SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_node_from_known_data(meta_data, value, data_length, &meta_data_node),
+                                    /* on error */ sail_free(value));
             }
         }
 
         *last_meta_data_node = meta_data_node;
         last_meta_data_node = &meta_data_node->next;
+
+        sail_free(value);
 
         SAIL_LOG_DEBUG("DUMP: Meta data properties: key(%s) key_unknown(%s), type(%s), value_length(%u)",
                         sail_meta_data_to_string(meta_data_node->key), meta_data_node->key_unknown, type, meta_data_node->value_length);
@@ -314,7 +320,10 @@ static sail_status_t read_iccp(FILE *fptr, struct sail_image *image) {
     uint8_t *value;
     SAIL_TRY(read_hex(fptr, data_length, &value));
 
-    SAIL_TRY(sail_alloc_iccp_from_data(value, data_length, &image->iccp));
+    SAIL_TRY_OR_CLEANUP(sail_alloc_iccp_from_data(value, data_length, &image->iccp),
+                        /* on error */ sail_free(value));
+
+    sail_free(value);
 
     SAIL_LOG_DEBUG("DUMP: ICCP properties: data_length(%u)", data_length);
 
@@ -346,11 +355,15 @@ static sail_status_t read_palette(FILE *fptr, struct sail_image *image) {
     enum SailPixelFormat pixel_format_enum = sail_pixel_format_from_string(pixel_format);
 
     if (pixel_format_enum == SAIL_PIXEL_FORMAT_UNKNOWN) {
+        sail_free(value);
         SAIL_LOG_ERROR("DUMP: Read palette with unknown pixel format: '%s'", pixel_format);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
     }
 
-    SAIL_TRY(sail_alloc_palette_from_data(pixel_format_enum, value, color_count, &image->palette));
+    SAIL_TRY_OR_CLEANUP(sail_alloc_palette_from_data(pixel_format_enum, value, color_count, &image->palette),
+                        /* on error */ sail_free(value));
+
+    sail_free(value);
 
     SAIL_LOG_DEBUG("DUMP: Palette properties: pixel_format(%s), color_count(%u), data_length(%u)",
                     sail_pixel_format_to_string(pixel_format_enum), color_count, data_length);
