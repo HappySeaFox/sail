@@ -484,7 +484,7 @@ static sail_status_t init_context_impl(struct sail_context *context) {
         SAIL_TRY_OR_CLEANUP(sail_concat(&sail_codec_info_var_name, 2, "sail_codec_info_", node->value),
                             /* cleanup */ destroy_string_node_chain(string_node));
 
-    /* Resolve sail_codec_info_gif. */
+        /* Resolve sail_codec_info_gif. */
 #ifdef SAIL_WIN32
         FARPROC sail_codec_info_sym = GetProcAddress(handle, sail_codec_info_var_name);
 

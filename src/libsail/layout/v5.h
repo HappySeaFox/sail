@@ -26,9 +26,12 @@
 /*
  * This is a codec layout definition file.
  *
- * It's intedened to be used as a reference how codecs V4 are organized. It's also could
+ * It's intedened to be used as a reference how codecs V5 are organized. It's also could
  * be used by codecs' developers to compile their codecs directly into a test application
  * to simplify debugging.
+ *
+ * Include guards are not used as the header may be included multiple times with different
+ * SAIL_CODEC_NAME definitions.
  */
 
 #ifdef SAIL_BUILD
@@ -53,9 +56,9 @@ extern "C" {
 Please define SAIL_CODEC_NAME before including this header.
 #endif
 
-#define _SAIL_CONSTRUCT_CODEC_FUNC_CONCAT2(a, b) a##_##b
-#define _SAIL_CONSTRUCT_CODEC_FUNC_CONCAT(a, b) _SAIL_CONSTRUCT_CODEC_FUNC_CONCAT2(a, b)
-#define SAIL_CONSTRUCT_CODEC_FUNC(name) _SAIL_CONSTRUCT_CODEC_FUNC_CONCAT(name, SAIL_CODEC_NAME)
+#define SAIL_CONSTRUCT_CODEC_FUNC_CONCAT2_IMPL(a, b) a##_##b
+#define SAIL_CONSTRUCT_CODEC_FUNC_CONCAT2(a, b)      SAIL_CONSTRUCT_CODEC_FUNC_CONCAT2_IMPL(a, b)
+#define SAIL_CONSTRUCT_CODEC_FUNC(name)              SAIL_CONSTRUCT_CODEC_FUNC_CONCAT2(name, SAIL_CODEC_NAME)
 
 /*
  * Decoding functions.
