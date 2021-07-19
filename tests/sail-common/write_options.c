@@ -50,7 +50,7 @@ static MunitResult test_copy_options(const MunitParameter params[], void *user_d
     struct sail_write_options *write_options = NULL;
     munit_assert(sail_alloc_write_options(&write_options) == SAIL_OK);
 
-    write_options->io_options        = SAIL_IO_OPTION_EXIF;
+    write_options->io_options        = SAIL_IO_OPTION_ICCP;
     write_options->compression       = SAIL_COMPRESSION_JPEG;
     write_options->compression_level = 55;
 

@@ -603,7 +603,6 @@ const char* sail_codec_feature_to_string(enum SailCodecFeature codec_feature) {
         case SAIL_CODEC_FEATURE_ANIMATED:    return "ANIMATED";
         case SAIL_CODEC_FEATURE_MULTI_FRAME: return "MULTI-FRAME";
         case SAIL_CODEC_FEATURE_META_DATA:   return "META-DATA";
-        case SAIL_CODEC_FEATURE_EXIF:        return "EXIF";
         case SAIL_CODEC_FEATURE_INTERLACED:  return "INTERLACED";
         case SAIL_CODEC_FEATURE_ICCP:        return "ICCP";
     }
@@ -623,7 +622,6 @@ enum SailCodecFeature sail_codec_feature_from_string(const char *str) {
         case UINT64_C(7570758658679240):     return SAIL_CODEC_FEATURE_ANIMATED;
         case UINT64_C(13834645239598293736): return SAIL_CODEC_FEATURE_MULTI_FRAME;
         case UINT64_C(249851542786072787):   return SAIL_CODEC_FEATURE_META_DATA;
-        case UINT64_C(6384018865):           return SAIL_CODEC_FEATURE_EXIF;
         case UINT64_C(8244927930303708800):  return SAIL_CODEC_FEATURE_INTERLACED;
         case UINT64_C(6384139556):           return SAIL_CODEC_FEATURE_ICCP;
     }
