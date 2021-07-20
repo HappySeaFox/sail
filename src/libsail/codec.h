@@ -38,12 +38,8 @@
     #include <sail/layout/v5_pointers.h>
 #endif
 
-/*
- * Currently supported codec layout version.
- */
-#define SAIL_CODEC_LAYOUT_V5 5
-
 struct sail_codec_info;
+struct sail_codec_layout_v5;
 
 struct sail_read_features;
 struct sail_read_options;
@@ -51,20 +47,6 @@ struct sail_write_features;
 struct sail_write_options;
 struct sail_image;
 struct sail_io;
-
-struct sail_codec_layout_v5 {
-    sail_codec_read_init_v5_t            read_init;
-    sail_codec_read_seek_next_frame_v5_t read_seek_next_frame;
-    sail_codec_read_seek_next_pass_v5_t  read_seek_next_pass;
-    sail_codec_read_frame_v5_t           read_frame;
-    sail_codec_read_finish_v5_t          read_finish;
-
-    sail_codec_write_init_v5_t            write_init;
-    sail_codec_write_seek_next_frame_v5_t write_seek_next_frame;
-    sail_codec_write_seek_next_pass_v5_t  write_seek_next_pass;
-    sail_codec_write_frame_v5_t           write_frame;
-    sail_codec_write_finish_v5_t          write_finish;
-};
 
 /*
  * SAIL codec.

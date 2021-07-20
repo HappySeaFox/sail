@@ -1,7 +1,10 @@
-# Generate built-in codecs info as a string and compile it into the combined library
+# Generate built-in codecs info and compile it into the combined library.
+# Needed for the configure_file() command below.
 #
 foreach(codec ${ENABLED_CODECS})
     get_target_property(CODEC_BINARY_DIR sail-codec-${codec} BINARY_DIR)
+
+    set(SAIL_ENABLED_CODECS "${SAIL_ENABLED_CODECS}\"${codec}\", ")
 
     file(READ ${CODEC_BINARY_DIR}/sail-codec-${codec}.codec.info SAIL_CODEC_INFO_CONTENTS)
     string(REPLACE "\"" "\\\"" SAIL_CODEC_INFO_CONTENTS "${SAIL_CODEC_INFO_CONTENTS}")
@@ -9,16 +12,35 @@ foreach(codec ${ENABLED_CODECS})
     string(REGEX REPLACE "\n" "\\\\n\\\\\n" SAIL_CODEC_INFO_CONTENTS "${SAIL_CODEC_INFO_CONTENTS}")
     set(SAIL_CODEC_INFO_CONTENTS "\"${SAIL_CODEC_INFO_CONTENTS}\",\n")
     set(SAIL_ENABLED_CODECS_INFO "${SAIL_ENABLED_CODECS_INFO}${SAIL_CODEC_INFO_CONTENTS}")
+
+    set(SAIL_ENABLED_CODECS_DECLARE_FUNCTIONS "${SAIL_ENABLED_CODECS_DECLARE_FUNCTIONS}
+#define SAIL_CODEC_NAME ${codec}
+#include \"layout/v5.h\"
+#undef SAIL_CODEC_NAME
+")
+
+    set(SAIL_ENABLED_CODECS_LAYOUTS "${SAIL_ENABLED_CODECS_LAYOUTS}
+    {
+        #define SAIL_CODEC_NAME ${codec}
+        .read_init            = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_read_init_v5),
+        .read_seek_next_frame = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_read_seek_next_frame_v5),
+        .read_seek_next_pass  = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_read_seek_next_pass_v5),
+        .read_frame           = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_read_frame_v5),
+        .read_finish          = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_read_finish_v5),
+
+        .write_init            = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_write_init_v5),
+        .write_seek_next_frame = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_write_seek_next_frame_v5),
+        .write_seek_next_pass  = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_write_seek_next_pass_v5),
+        .write_frame           = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_write_frame_v5),
+        .write_finish          = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_write_finish_v5)
+        #undef SAIL_CODEC_NAME
+    },\n")
 endforeach()
 
-# Needed for the configure_file() command below
-#
-set(SAIL_ENABLED_CODECS "")
-foreach(codec ${ENABLED_CODECS})
-    list(APPEND SAIL_ENABLED_CODECS ${codec})
-endforeach()
+string(TOUPPER ${SAIL_ENABLED_CODECS} SAIL_ENABLED_CODECS)
+set(SAIL_ENABLED_CODECS "${SAIL_ENABLED_CODECS}NULL")
 
-# List of enabled codecs
+# List of enabled codecs and their info
 #
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/enabled_codecs.c.in
                ${CMAKE_CURRENT_BINARY_DIR}/enabled_codecs.c
@@ -97,5 +119,7 @@ else()
             RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
             PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/sail/sail-codecs)
 endif()
+
+target_include_directories(sail-codecs PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../libsail)
 
 sail_install_cmake_config(TARGET "SailCodecs" FOLDER "sailcodecs" VERSION 1.0.0)

@@ -441,39 +441,29 @@ static sail_status_t init_context_impl(struct sail_context *context) {
 
     /* Externs from sail-codecs. */
 #ifdef SAIL_STATIC
-    /* For example: "gif;jpeg;png". */
-    extern const char * const sail_enabled_codecs;
+    /* For example: [ "gif", "jpeg", "png" ]. */
+    extern const char * const sail_enabled_codecs[];
     extern const char * const sail_enabled_codecs_info[];
 #else
-    SAIL_IMPORT extern const char * const sail_enabled_codecs;
+    SAIL_IMPORT extern const char * const sail_enabled_codecs[];
     SAIL_IMPORT extern const char * const sail_enabled_codecs_info[];
 #endif
 
     /* Load codec info objects. */
     struct sail_codec_info_node **last_codec_info_node = &context->codec_info_node;
 
-    /* Split "gif;jpeg;png" into "gif", "jpeg", "png". */
-    struct sail_string_node *string_node = NULL;
-    SAIL_TRY_OR_CLEANUP(split_into_string_node_chain(sail_enabled_codecs, &string_node),
-                        /* cleanup */ destroy_string_node_chain(string_node));
-
-    struct sail_string_node *node = string_node;
-    int index = 0;
-
-    while (node != NULL) {
-        const char *sail_codec_info = sail_enabled_codecs_info[index++];
+    for (size_t i = 0; sail_enabled_codecs[i] != NULL; i++) {
+        const char *sail_codec_info = sail_enabled_codecs_info[i];
 
         /* Parse codec info. */
         struct sail_codec_info_node *codec_info_node;
         if (alloc_codec_info_node(&codec_info_node) != SAIL_OK) {
-            node = node->next;
             continue;
         }
 
         struct sail_codec_info *codec_info;
         if (codec_read_info_from_string(sail_codec_info, &codec_info) != SAIL_OK) {
             destroy_codec_info_node(codec_info_node);
-            node = node->next;
             continue;
         };
 
@@ -482,11 +472,7 @@ static sail_status_t init_context_impl(struct sail_context *context) {
 
         *last_codec_info_node = codec_info_node;
         last_codec_info_node = &codec_info_node->next;
-
-        node = node->next;
     }
-
-    destroy_string_node_chain(string_node);
 
     /* Load client codecs. */
     SAIL_TRY(enumerate_codecs_in_paths(context, (const char* []){ client_codecs_path() }, 1));
@@ -572,14 +558,32 @@ static void print_no_codecs_found(void) {
 #else
         "\n*** - Check the installation directory.                                      ***"
 #endif
-#if defined SAIL_UNIX && defined SAIL_COMBINE_CODECS
-        "\n*** - Make sure the application is compiled with -rdynamic or an equivalent. ***"
-        "\n***   If you use CMake, this could be achieved by setting                    ***"
-        "\n***   CMAKE_ENABLE_EXPORTS to ON.                                            ***"
-#endif
         "\n";
 
     SAIL_LOG_ERROR("%s", message);
+}
+
+static void print_build_statistics(void) {
+
+    SAIL_LOG_INFO("Version: %s", SAIL_VERSION_STRING);
+
+#ifdef SAIL_VCPKG
+    SAIL_LOG_INFO("Build type: VCPKG");
+#else
+    SAIL_LOG_INFO("Build type: Standalone");
+#endif
+
+#ifdef SAIL_STATIC
+    SAIL_LOG_INFO("Static build: yes");
+#else
+    SAIL_LOG_INFO("Static build: no");
+#endif
+
+#ifdef SAIL_COMBINE_CODECS
+    SAIL_LOG_INFO("Combine codecs: yes");
+#else
+    SAIL_LOG_INFO("Combine codecs: no");
+#endif
 }
 
 /* Initializes the context and loads all the codec info files if the context is not initialized. */
@@ -596,7 +600,7 @@ static sail_status_t init_context(struct sail_context *context, int flags) {
     /* Time counter. */
     uint64_t start_time = sail_now();
 
-    SAIL_LOG_INFO("Version %s", SAIL_VERSION_STRING);
+    print_build_statistics();
 
     /* Always search DLLs in the sail.dll location so custom codecs can hold dependencies there. */
 #ifdef SAIL_WIN32

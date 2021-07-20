@@ -27,8 +27,18 @@
 
 #include "sail-common.h"
 
-SAIL_EXPORT const char * const sail_enabled_codecs = "@SAIL_ENABLED_CODECS@";
+#include "codec_layout.h"
+
+SAIL_EXPORT const char * const sail_enabled_codecs[] = {
+    @SAIL_ENABLED_CODECS@
+};
 
 SAIL_EXPORT const char * const sail_enabled_codecs_info[] = {
     @SAIL_ENABLED_CODECS_INFO@
+};
+
+@SAIL_ENABLED_CODECS_DECLARE_FUNCTIONS@
+
+SAIL_EXPORT struct sail_codec_layout_v5 const sail_enabled_codecs_layouts[] = {
+    @SAIL_ENABLED_CODECS_LAYOUTS@
 };
