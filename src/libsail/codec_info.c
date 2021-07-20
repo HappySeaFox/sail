@@ -165,7 +165,7 @@ sail_status_t sail_codec_info_by_magic_number_from_io(struct sail_io *io, const 
                 magic_number_node = magic_number_node->next;
             } else {
                 *codec_info = codec_info_node->codec_info;
-                SAIL_LOG_DEBUG("Found codec info: '%s'", (*codec_info)->name);
+                SAIL_LOG_DEBUG("Found codec info: %s", (*codec_info)->name);
                 return SAIL_OK;
             }
         }
@@ -203,7 +203,7 @@ sail_status_t sail_codec_info_from_extension(const char *extension, const struct
             if (strcmp(extension_node->value, extension_copy) == 0) {
                 sail_free(extension_copy);
                 *codec_info = codec_info_node->codec_info;
-                SAIL_LOG_DEBUG("Found codec info: '%s'", (*codec_info)->name);
+                SAIL_LOG_DEBUG("Found codec info: %s", (*codec_info)->name);
                 return SAIL_OK;
             } else {
                 SAIL_LOG_TRACE("Extension mismatch '%s' != '%s'", extension_copy, extension_node->value);
@@ -246,7 +246,7 @@ sail_status_t sail_codec_info_from_mime_type(const char *mime_type, const struct
             if (strcmp(mime_type_node->value, mime_type_copy) == 0) {
                 sail_free(mime_type_copy);
                 *codec_info = codec_info_node->codec_info;
-                SAIL_LOG_DEBUG("Found codec info: '%s'", (*codec_info)->name);
+                SAIL_LOG_DEBUG("Found codec info: %s", (*codec_info)->name);
                 return SAIL_OK;
             } else {
                 SAIL_LOG_TRACE("MIME type mismatch '%s' != '%s'", mime_type_copy, mime_type_node->value);

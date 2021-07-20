@@ -23,43 +23,32 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_SAIL_H
-#define SAIL_SAIL_H
-
-/* Universal libsail include. */
+#ifndef SAIL_CODEC_LAYOUT_H
+#define SAIL_CODEC_LAYOUT_H
 
 #ifdef SAIL_BUILD
-    #include "sail-common.h"
-
-    #include "codec.h"
-    #include "codec_info.h"
-    #include "codec_info_node.h"
-    #include "codec_info_private.h"
-    #include "codec_layout.h"
-    #include "context.h"
-    #include "context_private.h"
-    #include "ini.h"
-    #include "io_file.h"
-    #include "io_mem.h"
-    #include "io_noop.h"
-    #include "sail_advanced.h"
-    #include "sail_deep_diver.h"
-    #include "sail_junior.h"
-    #include "sail_private.h"
-    #include "sail_technical_diver.h"
-    #include "sail_technical_diver_private.h"
-    #include "string_node.h"
+    #include "layout/v5_pointers.h"
 #else
-    #include <sail-common/sail-common.h>
-
-    #include <sail/codec_info.h>
-    #include <sail/codec_info_node.h>
-    #include <sail/context.h>
-    #include <sail/sail_advanced.h>
-    #include <sail/sail_deep_diver.h>
-    #include <sail/sail_junior.h>
-    #include <sail/sail_technical_diver.h>
-    #include <sail/string_node.h>
+    #include <sail/layout/v5_pointers.h>
 #endif
+
+/*
+ * Currently supported codec layout version.
+ */
+#define SAIL_CODEC_LAYOUT_V5 5
+
+struct sail_codec_layout_v5 {
+    sail_codec_read_init_v5_t            read_init;
+    sail_codec_read_seek_next_frame_v5_t read_seek_next_frame;
+    sail_codec_read_seek_next_pass_v5_t  read_seek_next_pass;
+    sail_codec_read_frame_v5_t           read_frame;
+    sail_codec_read_finish_v5_t          read_finish;
+
+    sail_codec_write_init_v5_t            write_init;
+    sail_codec_write_seek_next_frame_v5_t write_seek_next_frame;
+    sail_codec_write_seek_next_pass_v5_t  write_seek_next_pass;
+    sail_codec_write_frame_v5_t           write_frame;
+    sail_codec_write_finish_v5_t          write_finish;
+};
 
 #endif

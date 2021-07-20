@@ -73,10 +73,6 @@ public:
      * 1. VCPKG port on any platform
      *   Codecs are combined into a dynamically linked library, so no need to search them.
      *
-     *   Note for Unix platforms: the client application must be built with -rdynamic or an equivalent
-     *   to enable dlopen and dlsym on the same binary. If you use CMake, this could be achieved by
-     *   setting CMAKE_ENABLE_EXPORTS to ON.
-     *
      * 2. Standalone build or bundle, both compiled with SAIL_COMBINE_CODECS=ON
      *   Same to VCPKG port.
      *

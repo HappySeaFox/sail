@@ -67,10 +67,6 @@ cmake_dependent_option(SAIL_COMBINE_CODECS "Combine all codecs into a single lib
 
 if (SAIL_STATIC)
     set(BUILD_SHARED_LIBS OFF)
-    if (UNIX)
-        # For dlsym'ing the same module
-        set(CMAKE_ENABLE_EXPORTS ON)
-    endif()
 else()
     set(BUILD_SHARED_LIBS ON)
 endif()

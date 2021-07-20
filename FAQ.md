@@ -62,10 +62,6 @@ See [BUILDING](BUILDING.md).
 
 Yes. Compile with `-DSAIL_STATIC=ON`. This automatically enables `SAIL_COMBINE_CODECS`.
 
-Note for Unix platforms: the client application must be built with `-rdynamic` or an equivalent
-to enable `dlopen` and `dlsym` on the same binary. If you use CMake, this could be achieved by
-setting `CMAKE_ENABLE_EXPORTS` to `ON`.
-
 ## What are the competitors of SAIL?
 
 - [FreeImage](https://freeimage.sourceforge.io)
@@ -154,10 +150,6 @@ Codecs path search algorithm (first found path wins):
 ### VCPKG port on any platform
 
 Codecs are combined into a dynamically linked library, so no need to search them.
-
-Note for Unix platforms: the client application must be built with `-rdynamic` or an equivalent
-to enable `dlopen` and `dlsym` on the same binary. If you use CMake, this could be achieved by
-setting `CMAKE_ENABLE_EXPORTS` to `ON`.
 
 ### Standalone build or bundle, both compiled with SAIL_COMBINE_CODECS=ON
 

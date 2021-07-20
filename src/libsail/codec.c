@@ -25,6 +25,7 @@
 
 #include "config.h"
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -38,50 +39,55 @@
 #include "sail-common.h"
 #include "sail.h"
 
-sail_status_t alloc_and_load_codec(const struct sail_codec_info *codec_info, struct sail_codec **codec) {
+/*
+ * Private functions.
+ */
 
-    SAIL_CHECK_CODEC_INFO_PTR(codec_info);
-#ifndef SAIL_COMBINE_CODECS
-    SAIL_CHECK_PATH_PTR(codec_info->path);
-#endif
+static sail_status_t alloc_codec(struct sail_codec **codec) {
+
     SAIL_CHECK_CODEC_PTR(codec);
 
     void *ptr;
     SAIL_TRY(sail_malloc(sizeof(struct sail_codec), &ptr));
-    struct sail_codec *codec_local = ptr;
+    *codec = ptr;
 
-    codec_local->layout = codec_info->layout;
-    codec_local->handle = NULL;
-    codec_local->v5     = NULL;
+    (*codec)->layout = 0;
+    (*codec)->handle = NULL;
+    (*codec)->v5     = NULL;
 
-#ifndef SAIL_COMBINE_CODECS
-    SAIL_LOG_DEBUG("Loading codec '%s'", codec_info->path);
+    return SAIL_OK;
+}
+
+#ifdef SAIL_COMBINE_CODECS
+static sail_status_t load_combined_codec(const struct sail_codec_info *codec_info, struct sail_codec *codec) {
+
+#ifdef SAIL_STATIC
+    /* For example: [ "gif", "jpeg", "png" ]. */
+    extern const char * const sail_enabled_codecs[];
+    extern struct sail_codec_layout_v5 const sail_enabled_codecs_layouts[];
+#else
+    SAIL_IMPORT extern const char * const sail_enabled_codecs[];
+    SAIL_IMPORT extern struct sail_codec_layout_v5 const sail_enabled_codecs_layouts[];
 #endif
+    for (size_t i = 0; sail_enabled_codecs[i] != NULL; i++) {
+        if (strcmp(sail_enabled_codecs[i], codec_info->name) == 0) {
+            *codec->v5 = sail_enabled_codecs_layouts[i];
+            return SAIL_OK;
+        }
+    }
+
+    SAIL_LOG_ERROR("Failed to find combined %s codec", codec_info->name);
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_NOT_FOUND);
+}
+#endif
+
+static sail_status_t load_codec_from_file(const struct sail_codec_info *codec_info, struct sail_codec *codec) {
 
 #ifdef SAIL_WIN32
-#ifdef SAIL_COMBINE_CODECS
-#ifdef SAIL_STATIC
-    HMODULE handle = GetModuleHandle(NULL);
-#else
-    HMODULE handle = GetModuleHandle("sail-codecs");
-#endif
-
-    if (handle == NULL) {
-        SAIL_LOG_ERROR("Failed to get module handle. Error: %d", GetLastError());
-    }
-#else
     HMODULE handle = LoadLibraryEx(codec_info->path, NULL, LOAD_LIBRARY_SEARCH_SYSTEM32 | LOAD_LIBRARY_SEARCH_USER_DIRS);
 
     if (handle == NULL) {
-        SAIL_LOG_ERROR("Failed to load '%s'. Error: %d", codec_info->path, GetLastError());
-    }
-#endif
-#else
-#ifdef SAIL_COMBINE_CODECS
-    void *handle = dlopen(NULL, RTLD_LAZY | RTLD_LOCAL);
-
-    if (handle == NULL) {
-        SAIL_LOG_ERROR("Failed to open the current executable: %s", dlerror());
+        SAIL_LOG_ERROR("Failed to load '%s'. Error: 0x%X", codec_info->path, GetLastError());
     }
 #else
     void *handle = dlopen(codec_info->path, RTLD_LAZY | RTLD_LOCAL);
@@ -90,41 +96,27 @@ sail_status_t alloc_and_load_codec(const struct sail_codec_info *codec_info, str
         SAIL_LOG_ERROR("Failed to load '%s': %s", codec_info->path, dlerror());
     }
 #endif
-#endif
 
     if (handle == NULL) {
-        destroy_codec(codec_local);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_LOAD);
     }
 
-    codec_local->handle = handle;
+    codec->handle = handle;
 
 #ifdef SAIL_WIN32
     #define SAIL_RESOLVE_FUNC GetProcAddress
-    #ifdef SAIL_COMBINE_CODECS
-        #define SAIL_RESOLVE_LOG_ERROR(symbol) \
-            SAIL_LOG_ERROR("Failed to resolve '%s'. Error: %d", symbol, GetLastError())
-    #else
-        #define SAIL_RESOLVE_LOG_ERROR(symbol) \
-            SAIL_LOG_ERROR("Failed to resolve '%s' in '%s'. Error: %d", symbol, codec_info->path, GetLastError())
-    #endif
+    #define SAIL_RESOLVE_LOG_ERROR(symbol) \
+        SAIL_LOG_ERROR("Failed to resolve '%s' in '%s'. Error: %d", symbol, codec_info->path, GetLastError())
 #else
     #define SAIL_RESOLVE_FUNC dlsym
-
-    #ifdef SAIL_COMBINE_CODECS
-        #define SAIL_RESOLVE_LOG_ERROR(symbol) \
-            SAIL_LOG_ERROR("Failed to resolve '%s': %s", symbol, dlerror())
-    #else
-        #define SAIL_RESOLVE_LOG_ERROR(symbol) \
-            SAIL_LOG_ERROR("Failed to resolve '%s' in '%s': %s", symbol, codec_info->path, dlerror())
-    #endif
+    #define SAIL_RESOLVE_LOG_ERROR(symbol) \
+        SAIL_LOG_ERROR("Failed to resolve '%s' in '%s': %s", symbol, codec_info->path, dlerror())
 #endif
 
 #define SAIL_RESOLVE(target, handle, symbol, name)                                 \
     {                                                                              \
         char *full_symbol_name;                                                    \
-        SAIL_TRY_OR_CLEANUP(sail_concat(&full_symbol_name, 3, #symbol, "_", name), \
-                            /* cleanup */ destroy_codec(codec_local));             \
+        SAIL_TRY(sail_concat(&full_symbol_name, 3, #symbol, "_", name));           \
                                                                                    \
         /* To avoid copying name, make the whole string lower-case. */             \
         sail_to_lower(full_symbol_name);                                           \
@@ -134,34 +126,83 @@ sail_status_t alloc_and_load_codec(const struct sail_codec_info *codec_info, str
         if (target == NULL) {                                                      \
             SAIL_RESOLVE_LOG_ERROR(full_symbol_name);                              \
             sail_free(full_symbol_name);                                           \
-            destroy_codec(codec_local);                                            \
             SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_SYMBOL_RESOLVE);                  \
         }                                                                          \
                                                                                    \
         sail_free(full_symbol_name);                                               \
     } do{} while(0)
 
-    if (codec_local->layout == SAIL_CODEC_LAYOUT_V5) {
-        SAIL_TRY_OR_CLEANUP(sail_malloc(sizeof(struct sail_codec_layout_v5), &ptr),
-                            /* cleanup */ destroy_codec(codec_local));
-        codec_local->v5 = ptr;
+    SAIL_RESOLVE(codec->v5->read_init,            handle, sail_codec_read_init_v5,            codec_info->name);
+    SAIL_RESOLVE(codec->v5->read_seek_next_frame, handle, sail_codec_read_seek_next_frame_v5, codec_info->name);
+    SAIL_RESOLVE(codec->v5->read_seek_next_pass,  handle, sail_codec_read_seek_next_pass_v5,  codec_info->name);
+    SAIL_RESOLVE(codec->v5->read_frame,           handle, sail_codec_read_frame_v5,           codec_info->name);
+    SAIL_RESOLVE(codec->v5->read_finish,          handle, sail_codec_read_finish_v5,          codec_info->name);
 
-        SAIL_RESOLVE(codec_local->v5->read_init,            handle, sail_codec_read_init_v5,            codec_info->name);
-        SAIL_RESOLVE(codec_local->v5->read_seek_next_frame, handle, sail_codec_read_seek_next_frame_v5, codec_info->name);
-        SAIL_RESOLVE(codec_local->v5->read_seek_next_pass,  handle, sail_codec_read_seek_next_pass_v5,  codec_info->name);
-        SAIL_RESOLVE(codec_local->v5->read_frame,           handle, sail_codec_read_frame_v5,           codec_info->name);
-        SAIL_RESOLVE(codec_local->v5->read_finish,          handle, sail_codec_read_finish_v5,          codec_info->name);
+    SAIL_RESOLVE(codec->v5->write_init,            handle, sail_codec_write_init_v5,            codec_info->name);
+    SAIL_RESOLVE(codec->v5->write_seek_next_frame, handle, sail_codec_write_seek_next_frame_v5, codec_info->name);
+    SAIL_RESOLVE(codec->v5->write_seek_next_pass,  handle, sail_codec_write_seek_next_pass_v5,  codec_info->name);
+    SAIL_RESOLVE(codec->v5->write_frame,           handle, sail_codec_write_frame_v5,           codec_info->name);
+    SAIL_RESOLVE(codec->v5->write_finish,          handle, sail_codec_write_finish_v5,          codec_info->name);
 
-        SAIL_RESOLVE(codec_local->v5->write_init,            handle, sail_codec_write_init_v5,            codec_info->name);
-        SAIL_RESOLVE(codec_local->v5->write_seek_next_frame, handle, sail_codec_write_seek_next_frame_v5, codec_info->name);
-        SAIL_RESOLVE(codec_local->v5->write_seek_next_pass,  handle, sail_codec_write_seek_next_pass_v5,  codec_info->name);
-        SAIL_RESOLVE(codec_local->v5->write_frame,           handle, sail_codec_write_frame_v5,           codec_info->name);
-        SAIL_RESOLVE(codec_local->v5->write_finish,          handle, sail_codec_write_finish_v5,          codec_info->name);
-    } else {
-        SAIL_LOG_ERROR("Skipping %s as it has an unsupported codec layout %d (!= %d)", codec_info->path, codec_local->layout, SAIL_CODEC_LAYOUT_V5);
-        destroy_codec(codec_local);
+    return SAIL_OK;
+}
+
+/*
+ * Public functions.
+ */
+
+sail_status_t alloc_and_load_codec(const struct sail_codec_info *codec_info, struct sail_codec **codec) {
+
+    SAIL_CHECK_CODEC_INFO_PTR(codec_info);
+    SAIL_CHECK_CODEC_PTR(codec);
+
+    if (codec_info->layout != SAIL_CODEC_LAYOUT_V5) {
+        SAIL_LOG_ERROR("Failed to load %s codec with unsupported layout V%d (expected V%d)", codec_info->name, codec_info->layout, SAIL_CODEC_LAYOUT_V5);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_CODEC_LAYOUT);
     }
+
+    /*
+     * When SAIL_COMBINE_CODECS is ON, we can load built-in codecs with empty paths,
+     * and client codecs with non-empty paths from disk.
+     *
+     * When SAIL_COMBINE_CODECS is OFF, we can load only codecs with non-empty paths from disk.
+     */
+#ifndef SAIL_COMBINE_CODECS
+    if (codec_info->path == NULL) {
+        SAIL_LOG_ERROR("Failed to load %s codec with empty path when SAIL_COMBINE_CODECS is disabled", codec_info->name);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_NOT_FOUND);
+    }
+#endif
+
+    const bool fetch_combined_codec = codec_info->path == NULL;
+
+    struct sail_codec *codec_local;
+    SAIL_TRY(alloc_codec(&codec_local));
+    codec_local->layout = codec_info->layout;
+
+    if (fetch_combined_codec) {
+        SAIL_LOG_DEBUG("Fetching V%d functions for %s codec", codec_info->layout, codec_info->name);
+    } else {
+        SAIL_LOG_DEBUG("Loading %s codec from %s", codec_info->name, codec_info->path);
+    }
+
+    void *ptr;
+    SAIL_TRY_OR_CLEANUP(sail_malloc(sizeof(struct sail_codec_layout_v5), &ptr),
+                        /* cleanup */ destroy_codec(codec_local));
+    codec_local->v5 = ptr;
+
+#ifdef SAIL_COMBINE_CODECS
+    if (fetch_combined_codec) {
+        SAIL_TRY_OR_CLEANUP(load_combined_codec(codec_info, codec_local),
+                            /* cleanup */ destroy_codec(codec_local));
+    } else {
+        SAIL_TRY_OR_CLEANUP(load_codec_from_file(codec_info, codec_local),
+                            /* cleanup */ destroy_codec(codec_local));
+    }
+#else
+    SAIL_TRY_OR_CLEANUP(load_codec_from_file(codec_info, codec_local),
+                        /* cleanup */ destroy_codec(codec_local));
+#endif
 
     *codec = codec_local;
 
@@ -176,10 +217,7 @@ void destroy_codec(struct sail_codec *codec) {
 
     if (codec->handle != NULL) {
 #ifdef SAIL_WIN32
-    /* In "combine codecs" mode this handle is returned by GetModuleHandle, and the official docs don't recommend freeing it. */
-    #ifndef SAIL_COMBINE_CODECS
         FreeLibrary((HMODULE)codec->handle);
-    #endif
 #else
         dlclose(codec->handle);
 #endif
