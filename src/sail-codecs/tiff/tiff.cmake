@@ -18,6 +18,22 @@ macro(sail_find_dependencies)
 endmacro()
 
 macro(sail_codec_post_add)
+	cmake_push_check_state(RESET)
+		set(CMAKE_REQUIRED_INCLUDES ${TIFF_INCLUDE_DIRS})
+		set(CMAKE_REQUIRED_LIBRARIES ${TIFF_LIBRARIES})
+
+		check_c_source_runs(
+			"
+			#include <tiffio.h>
+            int main(int argc, char *argv[]) {
+                TIFF *tiff = TIFFOpen(\"file.tiff\", \"r\");
+                return 0;
+            }
+		   "
+		HAVE_TIFF_RUNTIME_FEATURE
+		)
+	cmake_pop_check_state()
+
     set(TIFF_CODECS ADOBE_DEFLATE CCITTRLE CCITTRLEW CCITT_T4 CCITT_T6 DCS DEFLATE IT8BL IT8CTPAD IT8LW IT8MP
                     JBIG JPEG JP2000 LERC LZMA LZW NEXT NONE OJPEG PACKBITS PIXARFILM PIXARLOG SGILOG24 SGILOG
                     T43 T85 THUNDERSCAN WEBP ZSTD)
