@@ -27,6 +27,9 @@ jobs:
       name: "Windows Server"
       env:
         - PATH="/c/SAIL/bin:$PATH"
+      cache:
+        directories:
+          - extra/B
     - os: linux
       dist: focal
       name: "Ubuntu 20.04 Focal"
@@ -40,9 +43,10 @@ before_script:
 - |-
   case "$TRAVIS_OS_NAME" in
     windows)
-      cd extra
-      ./build
-      cd -
+      # Build non-existing extra libs
+      if [ ! -d extra/B/bin ]; then
+        extra/build
+      fi
     ;;
   esac
 
