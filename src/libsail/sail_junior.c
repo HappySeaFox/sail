@@ -30,9 +30,11 @@
 #include "sail-common.h"
 #include "sail.h"
 
-sail_status_t sail_probe_file(const char *path, struct sail_image **image, const struct sail_codec_info **codec_info) {
+/*
+ * Private functions.
+ */
 
-    SAIL_CHECK_PATH_PTR(path);
+static sail_status_t probe_file_with_io(const char *path, struct sail_image **image, const struct sail_codec_info **codec_info) {
 
     struct sail_io *io;
     SAIL_TRY(alloc_io_read_file(path, &io));
@@ -41,6 +43,55 @@ sail_status_t sail_probe_file(const char *path, struct sail_image **image, const
                         /* cleanup */ sail_destroy_io(io));
 
     sail_destroy_io(io);
+
+    return SAIL_OK;
+}
+
+/*
+ * Public functions.
+ */
+
+sail_status_t sail_probe_file(const char *path, struct sail_image **image, const struct sail_codec_info **codec_info) {
+
+    SAIL_CHECK_PATH_PTR(path);
+
+    const struct sail_codec_info *codec_info_noop;
+    const struct sail_codec_info **codec_info_local = codec_info == NULL ? &codec_info_noop : codec_info;
+
+    SAIL_TRY_OR_EXECUTE(sail_codec_info_from_path(path, codec_info_local),
+                        /* cleanup */ SAIL_TRY(probe_file_with_io(path, image, codec_info)));
+
+    const struct sail_codec *codec;
+    SAIL_TRY(load_codec_by_codec_info(*codec_info_local, &codec));
+
+    struct sail_read_options *read_options_local;
+    SAIL_TRY(sail_alloc_read_options_from_features((*codec_info_local)->read_features, &read_options_local));
+
+    struct sail_io *io;
+    SAIL_TRY_OR_CLEANUP(alloc_io_read_file(path, &io),
+                        /* cleanup */ sail_destroy_read_options(read_options_local));
+
+    void *state = NULL;
+    SAIL_TRY_OR_CLEANUP(codec->v5->read_init(io, read_options_local, &state),
+                        /* cleanup */ codec->v5->read_finish(&state, io),
+                                      sail_destroy_io(io),
+                                      sail_destroy_read_options(read_options_local));
+
+    sail_destroy_read_options(read_options_local);
+
+    struct sail_image *image_local;
+
+    SAIL_TRY_OR_CLEANUP(codec->v5->read_seek_next_frame(state, io, &image_local),
+                        /* cleanup */ codec->v5->read_finish(&state, io),
+                                      sail_destroy_io(io));
+
+    SAIL_TRY_OR_CLEANUP(codec->v5->read_finish(&state, io),
+                        /* cleanup */ sail_destroy_image(image_local),
+                                      sail_destroy_io(io));
+
+    sail_destroy_io(io);
+
+    *image = image_local;
 
     return SAIL_OK;
 }
