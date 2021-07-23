@@ -44,7 +44,14 @@ before_script:
   case "$TRAVIS_OS_NAME" in
     windows)
       # Build non-existing extra libs
-      if [ ! -d extra/B/bin ]; then
+      if [ -d extra/B/bin ]; then
+        extra_bin_time=$(stat -c %Y extra/B/bin)
+        build_script_time=$(git log --pretty=format:%cd -n 1 --date=unix --date-order -- extra/build)
+
+        if [ $build_script_time -gt $extra_bin_time ]; then
+          extra/build
+        fi
+      else
         extra/build
       fi
     ;;
