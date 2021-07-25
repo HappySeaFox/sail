@@ -301,6 +301,7 @@ sail_status_t alloc_io_write_mem(void *buffer, size_t length, struct sail_io **i
     mem_io_write_stream->buffer                               = buffer;
 
     io_local->id             = SAIL_MEMORY_IO_ID;
+    io_local->features       = SAIL_IO_FEATURE_SEEKABLE;
     io_local->stream         = mem_io_write_stream;
     io_local->tolerant_read  = io_mem_tolerant_read;
     io_local->strict_read    = io_mem_strict_read;

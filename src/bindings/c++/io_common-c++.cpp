@@ -49,6 +49,7 @@ public:
 void io::pimpl::empty_sail_io()
 {
     sail_io.id             = 0;
+    sail_io.features       = 0;
     sail_io.stream         = nullptr;
     sail_io.tolerant_read  = nullptr;
     sail_io.strict_read    = nullptr;
@@ -100,9 +101,20 @@ uint64_t io::id() const
     return d->sail_io.id;
 }
 
+int io::features() const
+{
+    return d->sail_io.features;
+}
+
 io& io::with_id(uint64_t id)
 {
     d->sail_io.id = id;
+    return *this;
+}
+
+io& io::with_features(int features)
+{
+    d->sail_io.features = features;
     return *this;
 }
 

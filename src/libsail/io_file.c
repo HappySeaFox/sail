@@ -208,6 +208,7 @@ sail_status_t alloc_io_read_file(const char *path, struct sail_io **io) {
 
     SAIL_TRY(alloc_io_file(path, "rb", io));
 
+    (*io)->features       = SAIL_IO_FEATURE_SEEKABLE;
     (*io)->tolerant_read  = io_file_tolerant_read;
     (*io)->strict_read    = io_file_strict_read;
     (*io)->seek           = io_file_seek;
