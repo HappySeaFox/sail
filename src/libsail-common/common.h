@@ -322,7 +322,7 @@ enum SailCodecFeature {
     /* Ability to read or write multi-frame (but not animated) images. */
     SAIL_CODEC_FEATURE_MULTI_FRAME = 1 << 3,
 
-    /* Ability to read or write simple image meta data like JPEG comments. */
+    /* Ability to read or write image meta data like JPEG comments of EXIF. */
     SAIL_CODEC_FEATURE_META_DATA   = 1 << 4,
 
     /* Ability to read or write interlaced images. */
@@ -335,7 +335,7 @@ enum SailCodecFeature {
 /* Read or write options. */
 enum SailIoOption {
 
-    /* Instruction to read or write simple image meta data like JPEG comments. */
+    /* Instruction to read or write image meta data like JPEG comments of EXIF. */
     SAIL_IO_OPTION_META_DATA  = 1 << 0,
 
     /* Instruction to write interlaced images. Specifying this option for reading operations has no effect. */
