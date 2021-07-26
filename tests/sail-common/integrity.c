@@ -308,6 +308,7 @@ static MunitResult test_compression_to_string(const MunitParameter params[], voi
     munit_assert_string_equal(sail_compression_to_string(SAIL_COMPRESSION_JPEG),          "JPEG");
     munit_assert_string_equal(sail_compression_to_string(SAIL_COMPRESSION_JPEG_2000),     "JPEG-2000");
     munit_assert_string_equal(sail_compression_to_string(SAIL_COMPRESSION_JPEG_XL),       "JPEG-XL");
+    munit_assert_string_equal(sail_compression_to_string(SAIL_COMPRESSION_JPEG_XR),       "JPEG-XR");
     munit_assert_string_equal(sail_compression_to_string(SAIL_COMPRESSION_LERC),          "LERC");
     munit_assert_string_equal(sail_compression_to_string(SAIL_COMPRESSION_LZMA),          "LZMA");
     munit_assert_string_equal(sail_compression_to_string(SAIL_COMPRESSION_LZW),           "LZW");
@@ -355,6 +356,7 @@ static MunitResult test_compression_from_string(const MunitParameter params[], v
     munit_assert(sail_compression_from_string("JPEG")          == SAIL_COMPRESSION_JPEG);
     munit_assert(sail_compression_from_string("JPEG-2000")     == SAIL_COMPRESSION_JPEG_2000);
     munit_assert(sail_compression_from_string("JPEG-XL")       == SAIL_COMPRESSION_JPEG_XL);
+    munit_assert(sail_compression_from_string("JPEG-XR")       == SAIL_COMPRESSION_JPEG_XR);
     munit_assert(sail_compression_from_string("LERC")          == SAIL_COMPRESSION_LERC);
     munit_assert(sail_compression_from_string("LZMA")          == SAIL_COMPRESSION_LZMA);
     munit_assert(sail_compression_from_string("LZW")           == SAIL_COMPRESSION_LZW);
