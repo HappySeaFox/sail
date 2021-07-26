@@ -226,7 +226,7 @@ enum SailCompression {
     SAIL_COMPRESSION_IT8_MP,        /* IT8 Monochrome picture. */
     SAIL_COMPRESSION_JBIG,          /* ISO JBIG. */
     SAIL_COMPRESSION_JPEG,          /* %JPEG DCT compression. */
-    SAIL_COMPRESSION_JPEG2000,      /* Leadtools JPEG2000. */
+    SAIL_COMPRESSION_JPEG_2000,     /* Leadtools JPEG 2000. */
     SAIL_COMPRESSION_LERC,          /* ESRI Lerc codec. */
     SAIL_COMPRESSION_LZMA,          /* LZMA2. */
     SAIL_COMPRESSION_LZW,           /* Lempel-Ziv  & Welch. */

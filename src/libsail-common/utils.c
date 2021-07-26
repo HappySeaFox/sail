@@ -454,7 +454,7 @@ const char* sail_compression_to_string(enum SailCompression compression) {
         case SAIL_COMPRESSION_IT8_MP:        return "IT8-MP";
         case SAIL_COMPRESSION_JBIG:          return "JBIG";
         case SAIL_COMPRESSION_JPEG:          return "JPEG";
-        case SAIL_COMPRESSION_JPEG2000:      return "JPEG2000";
+        case SAIL_COMPRESSION_JPEG_2000:     return "JPEG-2000";
         case SAIL_COMPRESSION_LERC:          return "LERC";
         case SAIL_COMPRESSION_LZMA:          return "LZMA";
         case SAIL_COMPRESSION_LZW:           return "LZW";
@@ -501,7 +501,7 @@ enum SailCompression sail_compression_from_string(const char *str) {
         case UINT64_C(6952347706340):        return SAIL_COMPRESSION_IT8_MP;
         case UINT64_C(6384174593):           return SAIL_COMPRESSION_JBIG;
         case UINT64_C(6384189707):           return SAIL_COMPRESSION_JPEG;
-        case UINT64_C(7571144643365901):     return SAIL_COMPRESSION_JPEG2000;
+        case UINT64_C(249847773225217050):   return SAIL_COMPRESSION_JPEG_2000;
         case UINT64_C(6384250027):           return SAIL_COMPRESSION_LERC;
         case UINT64_C(6384272729):           return SAIL_COMPRESSION_LZMA;
         case UINT64_C(193462818):            return SAIL_COMPRESSION_LZW;
