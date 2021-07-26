@@ -94,9 +94,19 @@ public:
     uint64_t id() const;
 
     /*
+     * Returns the I/O stream features. See SailIoFeature.
+     */
+    int features() const;
+
+    /*
      * Sets a new I/O stream id.
      */
     io& with_id(uint64_t id);
+
+    /*
+     * Sets new I/O stream features. See SailIoFeature.
+     */
+    io& with_features(int features);
 
     /*
      * Sets a new I/O-specific data object. For example, a pointer to a FILE.

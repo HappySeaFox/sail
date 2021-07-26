@@ -19,7 +19,7 @@ endmacro()
 
 macro(sail_codec_post_add)
     set(TIFF_CODECS ADOBE_DEFLATE CCITTRLE CCITTRLEW CCITT_T4 CCITT_T6 DCS DEFLATE IT8BL IT8CTPAD IT8LW IT8MP
-                    JBIG JPEG JP2000 LERC LZMA LZW NEXT NONE OJPEG PACKBITS PIXARFILM PIXARLOG SGILOG24 SGILOG
+                    JBIG JPEG JP2000 JXL LERC LZMA LZW NEXT NONE OJPEG PACKBITS PIXARFILM PIXARLOG SGILOG24 SGILOG
                     T43 T85 THUNDERSCAN WEBP ZSTD)
 
     foreach (tiff_codec IN LISTS TIFF_CODECS)
@@ -115,7 +115,8 @@ macro(sail_codec_post_add)
                 string(REPLACE "IT8CTPAD"  "IT8-CTPAD"  tiff_codec_fixed ${tiff_codec_fixed})
                 string(REPLACE "IT8LW"     "IT8-LW"     tiff_codec_fixed ${tiff_codec_fixed})
                 string(REPLACE "IT8MP"     "IT8-MP"     tiff_codec_fixed ${tiff_codec_fixed})
-                string(REPLACE "JP2000"    "JPEG2000"   tiff_codec_fixed ${tiff_codec_fixed})
+                string(REPLACE "JP2000"    "JPEG-2000"  tiff_codec_fixed ${tiff_codec_fixed})
+                string(REPLACE "JXL"       "JPEG-XL"    tiff_codec_fixed ${tiff_codec_fixed})
                 string(REPLACE "PIXARLOG"  "PIXAR-LOG"  tiff_codec_fixed ${tiff_codec_fixed})
                 string(REPLACE "PIXARFILM" "PIXAR-FILM" tiff_codec_fixed ${tiff_codec_fixed})
                 string(REPLACE "SGILOG24"  "SGI-LOG24"  tiff_codec_fixed ${tiff_codec_fixed})

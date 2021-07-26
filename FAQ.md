@@ -25,12 +25,13 @@ Table of Contents
     * [Unix including macOS (standalone build), compiled with SAIL\_COMBINE\_CODECS=OFF (the default)](#unix-including-macos-standalone-build-compiled-with-sail_combine_codecsoff-the-default)
   * [How can I point SAIL to my custom codecs?](#how-can-i-point-sail-to-my-custom-codecs)
   * [I'd like to reorganize the standard SAIL folder layout on Windows (for standalone build or bundle)](#id-like-to-reorganize-the-standard-sail-folder-layout-on-windows-for-standalone-build-or-bundle)
-  * [Please describe the memory management techniques implemented in SAIL](#please-describe-the-memory-management-techniques-implemented-in-sail)
+  * [Describe the memory management techniques implemented in SAIL](#describe-the-memory-management-techniques-implemented-in-sail)
     * [The memory management technique implemented in SAIL](#the-memory-management-technique-implemented-in-sail)
     * [Convention to call SAIL functions](#convention-to-call-sail-functions)
     * [External pointers stay untouched on error](#external-pointers-stay-untouched-on-error)
     * [Always set a pointer to state to NULL (C only)](#always-set-a-pointer-to-state-to-null-c-only)
   * [Can I implement an image codec in C\+\+?](#can-i-implement-an-image-codec-in-c)
+  * [Describe codec info file format](#describe-codec-info-file-format)
   * [Are there any C/C\+\+ examples?](#are-there-any-cc-examples)
   * [Are there any bindings to other programming languages?](#are-there-any-bindings-to-other-programming-languages)
   * [How many image formats do you plan to implement?](#how-many-image-formats-do-you-plan-to-implement)
@@ -182,7 +183,7 @@ You can surely do that. However, with the standard layout SAIL detects the codec
 If you reorganize the standard SAIL folder layout, you'll need to specify the new codecs' location by
 setting the `SAIL_CODECS_PATH` environment variable.
 
-## Please describe the memory management techniques implemented in SAIL
+## Describe the memory management techniques implemented in SAIL
 
 ### The memory management technique implemented in SAIL
 
@@ -253,6 +254,143 @@ SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, ...),
 
 Yes. Your codec just needs to export a set of public functions so SAIL can recognize and use it.
 Theoretically, you can implement your codec in any programming language.
+
+## Describe codec info file format
+
+Let's take a hypothetical codec info:
+
+```
+# This section describes the codec per se.
+#
+[codec]
+
+# Codec layout is a set of functions it exports. Different layouts generations are not compatible.
+# libsail supports just a single (current) layout. Cannot be empty.
+#
+layout=5
+
+# Semantic codec version. Cannot be empty.
+#
+version=1.0.0
+
+# Short codec name. Must be uppercase. Cannot be empty.
+#
+name=ABC
+
+# Codec description. Any human-readable string. Cannot be empty.
+#
+description=Some ABC Format
+
+# ';'-separated list of hex-encoded magic numbers indentifying this image format.
+# Can be empty only if the list of file extensions below is not empty.
+#
+magic-numbers=34 AB
+
+# ';'-separated list of file extensions indentifying this image format.
+# Can be empty only if the list of magic numbers above is not empty.
+#
+extensions=abc;bca
+
+# ';'-separated list of MIME types indentifying this image format. Can be empty.
+#
+mime-types=image/abc
+
+# Section of various features describing what the image codec can actually read.
+#
+[read-features]
+
+# ';'-separated list of what the image codec can actually read.
+# Can be empty if the image codec cannot read images.
+#
+# Possible values:
+#    STATIC      - Can read static images.
+#    ANIMATED    - Can read animated images.
+#    MULTI-FRAME - Can read multi-frame (but not animated) images.
+#    META-DATA   - Can read image meta data like JPEG comments or EXIF.
+#    INTERLACED  - Can read interlaced images.
+#    ICCP        - Can read embedded ICC profiles.
+#
+features=STATIC;META-DATA;INTERLACED;ICCP
+
+# Section of various features describing what the image codec can actually write.
+#
+[write-features]
+
+# ';'-separated list of what the image codec can actually write.
+# Can be empty if the image codec cannot write images.
+#
+# Possible values:
+#    STATIC      - Can write static images.
+#    ANIMATED    - Can write animated images.
+#    MULTI-FRAME - Can write multi-frame (but not animated) images.
+#    META-DATA   - Can write image meta data like JPEG comments or EXIF.
+#    INTERLACED  - Can write interlaced images.
+#    ICCP        - Can write embedded ICC profiles.
+#
+features=STATIC;META-DATA;INTERLACED;ICCP
+
+# ';'-separated list of pixel formats the image codec can write.
+# Can be empty if the image codec cannot write images.
+#
+# Note: SAIL doesn't convert images while saving. It writes them 1:1. The image codec
+# can take as input and save 8-bit indexed, 24-bit RGB, and 32-bit RGBA images.
+#
+output-pixel-formats=BPP8-INDEXED;BPP24-RGB;BPP32-BGRA
+
+# ';'-separated list of required properties input images must have. Can be empty.
+#
+properties=
+
+# Number of interlaced passes to use to write interlaced images. Can be empty or 0 if the image
+# codec cannot write interlaced images.
+#
+interlaced-passes=7
+
+# ';'-separated list of compressions the image codec can write. Cannot be empty if the image codec
+# can write images. If the image codec cannot select compressions, specify UNSUPPORTED.
+#
+compression-types=DEFLATE;RLE
+
+# Default compression from the list above to use when no explicit compression was selected
+# by a client application. Can be empty if the image codec cannot write images.
+#
+default-compression=DEFLATE
+
+# Minimum compression level. This parameter is not used and must be 0 if the list
+# of supported compressions has more than one compression or if the list is empty.
+#
+# The data type is double. C function atof() is used to convert the value to double.
+# Decimal-point character is determined by the current C locale.
+#
+compression-level-min=1
+
+# Maximum compression level. This parameter is not used and must be 0 if the list
+# of supported compressions has more than one compression or if the list is empty.
+#
+# The data type is double. C function atof() is used to convert the value to double.
+# Decimal-point character is determined by the current C locale.
+#
+compression-level-max=9
+
+# Default compression level to use when no explicit compression level was selected
+# by a client application. This parameter is not used and must be 0 if the list
+# of supported compressions has more than one compression or if the list is empty.
+# Must be in the range of the min/max limits above.
+#
+# The data type is double. C function atof() is used to convert the value to double.
+# Decimal-point character is determined by the current C locale.
+#
+compression-level-default=6
+
+# Step to increment or decrement compression level. This parameter is not used
+# and must be 0 if the list of supported compressions has more than one compression
+# or if the list is empty.
+#
+# The data type is double. C function atof() is used to convert the value to double.
+# Decimal-point character is determined by the current C locale.
+#
+compression-level-step=1
+```
 
 ## Are there any C/C++ examples?
 

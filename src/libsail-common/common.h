@@ -226,7 +226,9 @@ enum SailCompression {
     SAIL_COMPRESSION_IT8_MP,        /* IT8 Monochrome picture. */
     SAIL_COMPRESSION_JBIG,          /* ISO JBIG. */
     SAIL_COMPRESSION_JPEG,          /* %JPEG DCT compression. */
-    SAIL_COMPRESSION_JPEG2000,      /* Leadtools JPEG2000. */
+    SAIL_COMPRESSION_JPEG_2000,     /* Leadtools JPEG 2000. */
+    SAIL_COMPRESSION_JPEG_XL,       /* JPEG XL. */
+    SAIL_COMPRESSION_JPEG_XR,       /* JPEG XR. */
     SAIL_COMPRESSION_LERC,          /* ESRI Lerc codec. */
     SAIL_COMPRESSION_LZMA,          /* LZMA2. */
     SAIL_COMPRESSION_LZW,           /* Lempel-Ziv  & Welch. */
@@ -313,29 +315,29 @@ enum SailCodecFeature {
     /* Unknown codec feature used to indicate an error in parsing functions. */
     SAIL_CODEC_FEATURE_UNKNOWN     = 1 << 0,
 
-    /* Ability to read or write static images. */
+    /* Can read or write static images. */
     SAIL_CODEC_FEATURE_STATIC      = 1 << 1,
 
-    /* Ability to read or write animated images. */
+    /* Can read or write animated images. */
     SAIL_CODEC_FEATURE_ANIMATED    = 1 << 2,
 
-    /* Ability to read or write multi-frame (but not animated) images. */
+    /* Can read or write multi-frame (but not animated) images. */
     SAIL_CODEC_FEATURE_MULTI_FRAME = 1 << 3,
 
-    /* Ability to read or write simple image meta data like JPEG comments. */
+    /* Can read or write image meta data like JPEG comments or EXIF. */
     SAIL_CODEC_FEATURE_META_DATA   = 1 << 4,
 
-    /* Ability to read or write interlaced images. */
+    /* Can read or write interlaced images. */
     SAIL_CODEC_FEATURE_INTERLACED  = 1 << 5,
 
-    /* Ability to read or write embedded ICC profiles. */
+    /* Can read or write embedded ICC profiles. */
     SAIL_CODEC_FEATURE_ICCP        = 1 << 6,
 };
 
 /* Read or write options. */
 enum SailIoOption {
 
-    /* Instruction to read or write simple image meta data like JPEG comments. */
+    /* Instruction to read or write image meta data like JPEG comments or EXIF. */
     SAIL_IO_OPTION_META_DATA  = 1 << 0,
 
     /* Instruction to write interlaced images. Specifying this option for reading operations has no effect. */

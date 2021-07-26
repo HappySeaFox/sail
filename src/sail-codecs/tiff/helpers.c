@@ -103,7 +103,10 @@ enum SailCompression tiff_private_compression_to_sail_compression(int compressio
         case COMPRESSION_JPEG:          return SAIL_COMPRESSION_JPEG;
 #endif
 #ifdef SAIL_HAVE_TIFF_JP2000
-        case COMPRESSION_JP2000:        return SAIL_COMPRESSION_JPEG2000;
+        case COMPRESSION_JP2000:        return SAIL_COMPRESSION_JPEG_2000;
+#endif
+#ifdef SAIL_HAVE_TIFF_JXL
+        case COMPRESSION_JXL:           return SAIL_COMPRESSION_JPEG_XL;
 #endif
 #ifdef SAIL_HAVE_TIFF_LERC
         case COMPRESSION_LERC:          return SAIL_COMPRESSION_LERC;
@@ -205,7 +208,10 @@ sail_status_t tiff_private_sail_compression_to_compression(enum SailCompression 
         case SAIL_COMPRESSION_JPEG:          *tiff_compression = COMPRESSION_JPEG;         return SAIL_OK;
 #endif
 #ifdef SAIL_HAVE_TIFF_WRITE_JP2000
-        case SAIL_COMPRESSION_JPEG2000:      *tiff_compression = COMPRESSION_JP2000;       return SAIL_OK;
+        case SAIL_COMPRESSION_JPEG_2000:     *tiff_compression = COMPRESSION_JP2000;       return SAIL_OK;
+#endif
+#ifdef SAIL_HAVE_TIFF_WRITE_JXL
+        case SAIL_COMPRESSION_JPEG_XL:       *tiff_compression = COMPRESSION_JXL;          return SAIL_OK;
 #endif
 #ifdef SAIL_HAVE_TIFF_WRITE_LERC
         case SAIL_COMPRESSION_LERC:          *tiff_compression = COMPRESSION_LERC;         return SAIL_OK;

@@ -38,6 +38,7 @@ sail_status_t sail_alloc_io(struct sail_io **io) {
     *io = ptr;
 
     (*io)->id             = 0;
+    (*io)->features       = 0;
     (*io)->stream         = NULL;
     (*io)->tolerant_read  = NULL;
     (*io)->strict_read    = NULL;

@@ -363,7 +363,7 @@ sail_status_t alloc_codec_info_node(struct sail_codec_info_node **codec_info_nod
 
     (*codec_info_node)->codec_info = NULL;
     (*codec_info_node)->codec      = NULL;
-    (*codec_info_node)->next        = NULL;
+    (*codec_info_node)->next       = NULL;
 
     return SAIL_OK;
 }

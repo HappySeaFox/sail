@@ -126,6 +126,16 @@ typedef sail_status_t (*sail_io_eof_t)(void *stream, bool *result);
 static const uint64_t SAIL_FILE_IO_ID   = UINT64_C(5820790535323209114);
 static const uint64_t SAIL_MEMORY_IO_ID = UINT64_C(11955407548648566675);
 
+/* I/O features. */
+enum SailIoFeature {
+
+    /*
+     * The I/O object is seekable. When this flag is off, the seek callback
+     * must return SAIL_ERROR_NOT_IMPLEMENTED.
+     */
+    SAIL_IO_FEATURE_SEEKABLE = 1 << 0,
+};
+
 /*
  * sail_io represents an input/output abstraction. Use sail_alloc_io_read_file() and brothers to
  * allocate I/O objects.
@@ -141,6 +151,11 @@ struct sail_io {
      * to generate a unique id and assign it to this field.
      */
     uint64_t id;
+
+    /*
+     * Or-ed I/O features. See SailIoFeature.
+     */
+    int features;
 
     /*
      * I/O-specific data object. For example, a pointer to a FILE.
