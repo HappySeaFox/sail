@@ -26,8 +26,13 @@
 #ifndef SAIL_WEBP_HELPERS_H
 #define SAIL_WEBP_HELPERS_H
 
+#include <stdint.h>
+
 #include "common.h"
 #include "error.h"
 #include "export.h"
+
+SAIL_HIDDEN void webp_private_fill_color(uint8_t *pixels, unsigned bytes_per_line, unsigned bytes_per_pixel,
+                                            uint32_t color, unsigned x, unsigned y, unsigned width, unsigned height);
 
 #endif

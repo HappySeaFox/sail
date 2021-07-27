@@ -26,3 +26,15 @@
 #include "sail-common.h"
 
 #include "helpers.h"
+
+void webp_private_fill_color(uint8_t *pixels, unsigned bytes_per_line, unsigned bytes_per_pixel,
+                                uint32_t color, unsigned x, unsigned y, unsigned width, unsigned height) {
+
+    uint8_t *scanline = pixels + y * bytes_per_line + x * bytes_per_pixel;
+
+    for (unsigned row = 0; row < height; row++, scanline += bytes_per_line) {
+        for (unsigned column = 0; column < width * bytes_per_pixel; column += bytes_per_pixel) {
+            memcpy(scanline + column, &color, sizeof(color));
+        }
+    }
+}
