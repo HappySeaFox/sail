@@ -23,6 +23,8 @@
     SOFTWARE.
 */
 
+#include <string.h>
+
 #include "sail-common.h"
 
 #include "helpers.h"
@@ -37,4 +39,29 @@ void webp_private_fill_color(uint8_t *pixels, unsigned bytes_per_line, unsigned 
             memcpy(scanline + column, &color, sizeof(color));
         }
     }
+}
+
+sail_status_t webp_private_blend_over(void *dst_raw, unsigned dst_offset, const void *src_raw, unsigned width, unsigned bytes_per_pixel) {
+
+    SAIL_CHECK_PTR(src_raw);
+    SAIL_CHECK_PTR(dst_raw);
+
+    if (bytes_per_pixel == 4) {
+        const uint8_t *src = src_raw;
+        uint8_t *dst = (uint8_t *)dst_raw + dst_offset * bytes_per_pixel;
+
+        while (width--) {
+            const double src_a = *(src+3) / 255.0;
+            const double dst_a = *(dst+3) / 255.0;
+
+            *dst = (uint8_t)(src_a * (*src) + (1-src_a) * dst_a * (*dst)); src++; dst++;
+            *dst = (uint8_t)(src_a * (*src) + (1-src_a) * dst_a * (*dst)); src++; dst++;
+            *dst = (uint8_t)(src_a * (*src) + (1-src_a) * dst_a * (*dst)); src++; dst++;
+            *dst = (uint8_t)((src_a + (1-src_a) * dst_a) * 255);           src++; dst++;
+        }
+    } else {
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_BIT_DEPTH);
+    }
+
+    return SAIL_OK;
 }
