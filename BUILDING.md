@@ -72,6 +72,7 @@ cmake --build . --config Release --target install
 
 - macOS 10.14 Mojave
 - macOS 10.15 Catalina
+- macOS 11.3 Big Sur
 
 #### Installation steps
 
