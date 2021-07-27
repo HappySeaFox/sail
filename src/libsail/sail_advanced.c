@@ -107,6 +107,12 @@ sail_status_t sail_read_next_frame(void *state, struct sail_image **image) {
     struct sail_image *image_local;
     SAIL_TRY(state_of_mind->codec->v5->read_seek_next_frame(state_of_mind->state, state_of_mind->io, &image_local));
 
+    if (image_local->pixels != NULL) {
+        SAIL_LOG_ERROR("Internal error in %s codec: codecs must not allocate pixels", state_of_mind->codec_info->name);
+        sail_destroy_image(image_local);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_CONFLICTING_OPERATION);
+    }
+
     /* Detect the number of passes needed to write an interlaced image. */
     int interlaced_passes;
     if (image_local->source_image->properties & SAIL_IMAGE_PROPERTY_INTERLACED) {
