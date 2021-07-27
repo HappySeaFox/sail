@@ -239,7 +239,8 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_webp(void *state, s
     image_local->bytes_per_line = webp_state->canvas_bytes_per_line;
     image_local->pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;
     if (webp_state->frame_count > 1) {
-        image_local->delay = webp_state->webp_iterator->duration;
+        /* Fall back to 100 ms. when the duration is <= 0. */
+        image_local->delay = webp_state->webp_iterator->duration <= 0 ? 100 : webp_state->webp_iterator->duration;
     }
 
 #if 0
