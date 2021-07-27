@@ -321,8 +321,8 @@ enum SailCodecFeature {
     /* Can read or write animated images. */
     SAIL_CODEC_FEATURE_ANIMATED    = 1 << 2,
 
-    /* Can read or write multi-frame (but not animated) images. */
-    SAIL_CODEC_FEATURE_MULTI_FRAME = 1 << 3,
+    /* Can read or write multi-paged (but not animated) images. */
+    SAIL_CODEC_FEATURE_MULTI_PAGED = 1 << 3,
 
     /* Can read or write image meta data like JPEG comments or EXIF. */
     SAIL_CODEC_FEATURE_META_DATA   = 1 << 4,
