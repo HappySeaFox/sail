@@ -56,7 +56,6 @@ struct png_state {
     int interlace_type;
 
     struct sail_image *first_image;
-    struct sail_iccp *iccp;
     bool libpng_error;
     struct sail_read_options *read_options;
     struct sail_write_options *write_options;
@@ -99,7 +98,6 @@ static sail_status_t alloc_png_state(struct png_state **png_state) {
     (*png_state)->bit_depth      = 0;
     (*png_state)->interlace_type = 0;
     (*png_state)->first_image    = NULL;
-    (*png_state)->iccp           = NULL;
     (*png_state)->libpng_error   = false;
     (*png_state)->read_options   = NULL;
     (*png_state)->write_options  = NULL;
@@ -149,7 +147,6 @@ static void destroy_png_state(struct png_state *png_state) {
 #endif
 
     sail_destroy_image(png_state->first_image);
-    sail_destroy_iccp(png_state->iccp);
 
     sail_free(png_state);
 }
@@ -257,7 +254,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v5_png(struct sail_io *io, const 
 
     /* Fetch ICC profile. */
     if (png_state->read_options->io_options & SAIL_IO_OPTION_ICCP) {
-        SAIL_TRY(png_private_fetch_iccp(png_state->png_ptr, png_state->info_ptr, &png_state->iccp));
+        SAIL_TRY(png_private_fetch_iccp(png_state->png_ptr, png_state->info_ptr, &png_state->first_image->iccp));
     }
 
 #ifdef PNG_APNG_SUPPORTED
@@ -292,14 +289,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_png(void *state, st
 
     struct sail_image *image_local;
     SAIL_TRY(sail_copy_image(png_state->first_image, &image_local));
-
-    /* Only the first frame can have ICCP (if any). */
-    if (png_state->current_frame == 0) {
-        if (png_state->iccp != NULL) {
-            SAIL_TRY_OR_CLEANUP(sail_copy_iccp(png_state->iccp, &image_local->iccp),
-                                /* cleanup */ sail_destroy_image(image_local));
-        }
-    }
 
 #ifdef PNG_APNG_SUPPORTED
     if (png_state->is_apng) {
