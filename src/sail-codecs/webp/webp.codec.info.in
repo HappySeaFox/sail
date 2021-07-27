@@ -10,7 +10,7 @@ extensions=webp
 mime-types=image/webp
 
 [read-features]
-features=STATIC;META-DATA;ICCP
+features=STATIC;ANIMATED;META-DATA;ICCP
 
 [write-features]
 features=
