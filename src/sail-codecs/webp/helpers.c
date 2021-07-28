@@ -99,7 +99,7 @@ sail_status_t webp_private_fetch_meta_data(WebPDemuxer *webp_demux, struct sail_
         if (WebPDemuxGetChunk(webp_demux, "XMP ", 1, &chunk_iterator)) {
             struct sail_meta_data_node *meta_data_node;
 
-            SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_node_from_known_string(SAIL_META_DATA_XMP, (const char *)chunk_iterator.chunk.bytes, &meta_data_node),
+            SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_node_from_known_substring(SAIL_META_DATA_XMP, (const char *)chunk_iterator.chunk.bytes, chunk_iterator.chunk.size, &meta_data_node),
                         /* cleanup */ WebPDemuxReleaseChunkIterator(&chunk_iterator));
             WebPDemuxReleaseChunkIterator(&chunk_iterator);
 
