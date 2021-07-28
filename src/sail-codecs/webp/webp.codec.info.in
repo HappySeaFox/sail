@@ -1,0 +1,25 @@
+# WEBP codec information
+#
+[codec]
+layout=5
+version=0.7.1
+name=WEBP
+description=Web Picture
+magic-numbers=52 49 46 46 ?? ?? ?? ?? 57 45 42 50
+extensions=webp
+mime-types=image/webp
+
+[read-features]
+features=STATIC;ANIMATED;META-DATA;ICCP
+
+[write-features]
+features=
+output-pixel-formats=
+properties=
+interlaced-passes=0
+compression-types=
+default-compression=
+compression-level-min=0
+compression-level-max=0
+compression-level-default=0
+compression-level-step=0

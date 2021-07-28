@@ -49,6 +49,24 @@ sail_status_t sail_alloc_meta_data_node(struct sail_meta_data_node **node) {
 
 sail_status_t sail_alloc_meta_data_node_from_known_string(enum SailMetaData key, const char *value, struct sail_meta_data_node **node) {
 
+    SAIL_CHECK_STRING_PTR(value);
+
+    SAIL_TRY(sail_alloc_meta_data_node_from_known_substring(key, value, strlen(value), node));
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_alloc_meta_data_node_from_unknown_string(const char *key_unknown, const char *value, struct sail_meta_data_node **node) {
+
+    SAIL_CHECK_STRING_PTR(value);
+
+    SAIL_TRY(sail_alloc_meta_data_node_from_unknown_substring(key_unknown, value, strlen(value), node));
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_alloc_meta_data_node_from_known_substring(enum SailMetaData key, const char *value, size_t size, struct sail_meta_data_node **node) {
+
     if (key == SAIL_META_DATA_UNKNOWN) {
         SAIL_LOG_ERROR("%s() accepts only known meta data keys", __func__);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
@@ -62,19 +80,20 @@ sail_status_t sail_alloc_meta_data_node_from_known_string(enum SailMetaData key,
 
     node_local->key          = key;
     node_local->value_type   = SAIL_META_DATA_TYPE_STRING;
-    node_local->value_length = strlen(value) + 1;
+    node_local->value_length = size + 1;
 
     SAIL_TRY_OR_CLEANUP(sail_malloc(node_local->value_length, &node_local->value),
                         /* cleanup */ sail_destroy_meta_data_node(node_local));
 
-    memcpy(node_local->value, value, node_local->value_length);
+    memcpy(node_local->value, value, node_local->value_length - 1);
+    *((char *)node_local->value + node_local->value_length - 1) = '\0';
 
     *node = node_local;
 
     return SAIL_OK;
 }
 
-sail_status_t sail_alloc_meta_data_node_from_unknown_string(const char *key_unknown, const char *value, struct sail_meta_data_node **node) {
+sail_status_t sail_alloc_meta_data_node_from_unknown_substring(const char *key_unknown, const char *value, size_t size, struct sail_meta_data_node **node) {
 
     SAIL_CHECK_STRING_PTR(key_unknown);
     SAIL_CHECK_STRING_PTR(value);
@@ -88,12 +107,13 @@ sail_status_t sail_alloc_meta_data_node_from_unknown_string(const char *key_unkn
 
     node_local->key          = SAIL_META_DATA_UNKNOWN;
     node_local->value_type   = SAIL_META_DATA_TYPE_STRING;
-    node_local->value_length = strlen(value) + 1;
+    node_local->value_length = size + 1;
 
     SAIL_TRY_OR_CLEANUP(sail_malloc(node_local->value_length, &node_local->value),
                         /* cleanup */ sail_destroy_meta_data_node(node_local));
 
-    memcpy(node_local->value, value, node_local->value_length);
+    memcpy(node_local->value, value, node_local->value_length - 1);
+    *((char *)node_local->value + node_local->value_length - 1) = '\0';
 
     *node = node_local;
 

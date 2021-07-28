@@ -143,6 +143,28 @@ SAIL_EXPORT sail_status_t sail_alloc_meta_data_node_from_unknown_string(const ch
                                                                         const char *value,
                                                                         struct sail_meta_data_node **node);
 /*
+ * Allocates a new meta data node from the specified string. Copies only 'size' bytes. The key must not be SAIL_META_DATA_UNKNOWN.
+ * This is the key purpose of this function. The assigned node MUST be destroyed later with sail_destroy_meta_data_node().
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_alloc_meta_data_node_from_known_substring(enum SailMetaData key,
+                                                                            const char *value,
+                                                                            size_t size,
+                                                                            struct sail_meta_data_node **node);
+
+/*
+ * Allocates a new meta data node from the specified string. Copies only 'size' bytes. Sets the key to SAIL_META_DATA_UNKNOWN.
+ * This is the key purpose of this function. The assigned node MUST be destroyed later with sail_destroy_meta_data_node().
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_alloc_meta_data_node_from_unknown_substring(const char *key_unknown,
+                                                                            const char *value,
+                                                                            size_t size,
+                                                                            struct sail_meta_data_node **node);
+
+/*
  * Allocates a new meta data node from the specified data. The key must not be SAIL_META_DATA_UNKNOWN.
  * This is the key purpose of this function. The assigned node MUST be destroyed later with sail_destroy_meta_data_node().
  *
