@@ -305,7 +305,7 @@ mime-types=image/abc
 # Possible values:
 #    STATIC      - Can read static images.
 #    ANIMATED    - Can read animated images.
-#    MULTI-FRAME - Can read multi-frame (but not animated) images.
+#    MULTI-PAGED - Can read multi-paged (but not animated) images.
 #    META-DATA   - Can read image meta data like JPEG comments or EXIF.
 #    INTERLACED  - Can read interlaced images.
 #    ICCP        - Can read embedded ICC profiles.
@@ -322,7 +322,7 @@ features=STATIC;META-DATA;INTERLACED;ICCP
 # Possible values:
 #    STATIC      - Can write static images.
 #    ANIMATED    - Can write animated images.
-#    MULTI-FRAME - Can write multi-frame (but not animated) images.
+#    MULTI-PAGED - Can write multi-paged (but not animated) images.
 #    META-DATA   - Can write image meta data like JPEG comments or EXIF.
 #    INTERLACED  - Can write interlaced images.
 #    ICCP        - Can write embedded ICC profiles.

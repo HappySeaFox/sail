@@ -10,10 +10,10 @@ extensions=tif;tiff
 mime-types=image/tiff;image/tiff-fx
 
 [read-features]
-features=STATIC;MULTI-FRAME;META-DATA;ICCP
+features=STATIC;MULTI-PAGED;META-DATA;ICCP
 
 [write-features]
-features=STATIC;MULTI-FRAME;META-DATA;ICCP
+features=STATIC;MULTI-PAGED;META-DATA;ICCP
 output-pixel-formats=BPP32-RGBA
 properties=
 interlaced-passes=1

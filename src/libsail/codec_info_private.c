@@ -273,7 +273,7 @@ static sail_status_t check_codec_info(const struct sail_codec_info *codec_info) 
     /* Check write features. */
     if ((write_features->features & SAIL_CODEC_FEATURE_STATIC ||
             write_features->features & SAIL_CODEC_FEATURE_ANIMATED ||
-            write_features->features & SAIL_CODEC_FEATURE_MULTI_FRAME) &&
+            write_features->features & SAIL_CODEC_FEATURE_MULTI_PAGED) &&
             (write_features->output_pixel_formats == NULL || write_features->output_pixel_formats_length == 0)) {
         SAIL_LOG_ERROR("Codec validation error: %s codec is able to write images, but output pixel formats are not specified", codec_info->name);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INCOMPLETE_CODEC_INFO);
