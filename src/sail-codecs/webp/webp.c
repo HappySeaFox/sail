@@ -172,9 +172,17 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v5_webp(struct sail_io *io, const
                         /* cleanup */ sail_destroy_image(image_local));
     webp_state->bytes_per_pixel = image_local->bytes_per_line / image_local->width;
 
-    /* Meta data. */
-    SAIL_TRY_OR_CLEANUP(webp_private_fetch_meta_data(webp_state->webp_demux, image_local),
-                        /* cleanup */ sail_destroy_image(image_local));
+    /* Fetch ICCP. */
+    if (webp_state->read_options->io_options & SAIL_IO_OPTION_ICCP) {
+        SAIL_TRY_OR_CLEANUP(webp_private_fetch_iccp(webp_state->webp_demux, &image_local->iccp),
+                            /* cleanup */ sail_destroy_image(image_local));
+    }
+
+    /* Fetch meta data. */
+    if (webp_state->read_options->io_options & SAIL_IO_OPTION_META_DATA) {
+        SAIL_TRY_OR_CLEANUP(webp_private_fetch_meta_data(webp_state->webp_demux, image_local),
+                            /* cleanup */ sail_destroy_image(image_local));
+    }
 
     webp_state->canvas_image = image_local;
 

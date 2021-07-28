@@ -66,10 +66,10 @@ sail_status_t webp_private_blend_over(void *dst_raw, unsigned dst_offset, const 
     return SAIL_OK;
 }
 
-sail_status_t webp_private_fetch_meta_data(WebPDemuxer *webp_demux, struct sail_image *image) {
+sail_status_t webp_private_fetch_iccp(WebPDemuxer *webp_demux, struct sail_iccp **iccp) {
 
     SAIL_CHECK_PTR(webp_demux);
-    SAIL_CHECK_IMAGE_PTR(image);
+    SAIL_CHECK_ICCP_PTR(iccp);
 
     const uint32_t webp_flags = WebPDemuxGetI(webp_demux, WEBP_FF_FORMAT_FLAGS);
 
@@ -77,20 +77,51 @@ sail_status_t webp_private_fetch_meta_data(WebPDemuxer *webp_demux, struct sail_
         WebPChunkIterator chunk_iterator;
 
         if (WebPDemuxGetChunk(webp_demux, "ICCP", 1, &chunk_iterator)) {
-            SAIL_TRY_OR_CLEANUP(sail_alloc_iccp_from_data(chunk_iterator.chunk.bytes, (unsigned)chunk_iterator.chunk.size, &image->iccp),
+            SAIL_TRY_OR_CLEANUP(sail_alloc_iccp_from_data(chunk_iterator.chunk.bytes, (unsigned)chunk_iterator.chunk.size, iccp),
                         /* cleanup */ WebPDemuxReleaseChunkIterator(&chunk_iterator));
             WebPDemuxReleaseChunkIterator(&chunk_iterator);
         }
     }
 
-#if 0
-    if (webp_flags & EXIF_FLAG) WebPDemuxGetChunk(webp_demux, "EXIF", 1, &chunk_iterator);
-    // ... (Consume the EXIF metadata in 'chunk_iterator.chunk').
-    WebPDemuxReleaseChunkIterator(&chunk_iterator);
-    if (webp_flags & XMP_FLAG) WebPDemuxGetChunk(webp_demux, "XMP ", 1, &chunk_iterator);
-    // ... (Consume the XMP metadata in 'chunk_iterator.chunk.[bytes, size]').
-    WebPDemuxReleaseChunkIterator(&chunk_iterator);
-#endif
+    return SAIL_OK;
+}
+
+sail_status_t webp_private_fetch_meta_data(WebPDemuxer *webp_demux, struct sail_meta_data_node **last_meta_data_node) {
+
+    SAIL_CHECK_PTR(webp_demux);
+    SAIL_CHECK_META_DATA_NODE_PTR(last_meta_data_node);
+
+    const uint32_t webp_flags = WebPDemuxGetI(webp_demux, WEBP_FF_FORMAT_FLAGS);
+
+    if (webp_flags & XMP_FLAG) {
+        WebPChunkIterator chunk_iterator;
+
+        if (WebPDemuxGetChunk(webp_demux, "XMP ", 1, &chunk_iterator)) {
+            struct sail_meta_data_node *meta_data_node;
+
+            SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_node_from_known_string(SAIL_META_DATA_XMP, (const char *)chunk_iterator.chunk.bytes, &meta_data_node),
+                        /* cleanup */ WebPDemuxReleaseChunkIterator(&chunk_iterator));
+            WebPDemuxReleaseChunkIterator(&chunk_iterator);
+
+            *last_meta_data_node = meta_data_node;
+            last_meta_data_node = &meta_data_node->next;
+        }
+    }
+
+    if (webp_flags & EXIF_FLAG) {
+        WebPChunkIterator chunk_iterator;
+
+        if (WebPDemuxGetChunk(webp_demux, "EXIF", 1, &chunk_iterator)) {
+            struct sail_meta_data_node *meta_data_node;
+
+            SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_node_from_known_data(SAIL_META_DATA_EXIF, chunk_iterator.chunk.bytes, chunk_iterator.chunk.size, &meta_data_node),
+                        /* cleanup */ WebPDemuxReleaseChunkIterator(&chunk_iterator));
+            WebPDemuxReleaseChunkIterator(&chunk_iterator);
+
+            *last_meta_data_node = meta_data_node;
+            last_meta_data_node = &meta_data_node->next;
+        }
+    }
 
     return SAIL_OK;
 }

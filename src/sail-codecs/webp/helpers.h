@@ -40,6 +40,8 @@ SAIL_HIDDEN void webp_private_fill_color(uint8_t *pixels, unsigned bytes_per_lin
 SAIL_HIDDEN sail_status_t webp_private_blend_over(void *dst_raw, unsigned dst_offset, const void *src_raw,
                                                     unsigned width, unsigned bytes_per_pixel);
 
-SAIL_HIDDEN sail_status_t webp_private_fetch_meta_data(WebPDemuxer *webp_demux, struct sail_image *image);
+SAIL_HIDDEN sail_status_t webp_private_fetch_iccp(WebPDemuxer *webp_demux, struct sail_iccp **iccp);
+
+SAIL_HIDDEN sail_status_t webp_private_fetch_meta_data(WebPDemuxer *webp_demux, struct sail_meta_data_node **last_meta_data_node);
 
 #endif
