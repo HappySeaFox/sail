@@ -43,16 +43,13 @@ struct webp_state {
     struct sail_read_options *read_options;
     struct sail_write_options *write_options;
 
+    struct sail_image *canvas_image;
     WebPDemuxer *webp_demux;
     WebPIterator *webp_iterator;
     unsigned frame_number;
     uint32_t background_color;
     uint32_t frame_count;
-    unsigned canvas_width;
-    unsigned canvas_height;
-    unsigned canvas_bytes_per_line;
     unsigned bytes_per_pixel;
-    uint8_t *canvas_pixels;
     unsigned frame_x;
     unsigned frame_y;
     unsigned frame_width;
@@ -72,17 +69,14 @@ static sail_status_t alloc_webp_state(struct webp_state **webp_state) {
 
     (*webp_state)->read_options  = NULL;
     (*webp_state)->write_options = NULL;
+    (*webp_state)->canvas_image  = NULL;
 
     (*webp_state)->webp_demux            = NULL;
     (*webp_state)->webp_iterator         = NULL;
     (*webp_state)->frame_number          = 0;
     (*webp_state)->background_color      = 0;
     (*webp_state)->frame_count           = 0;
-    (*webp_state)->canvas_width          = 0;
-    (*webp_state)->canvas_height         = 0;
-    (*webp_state)->canvas_bytes_per_line = 0;
     (*webp_state)->bytes_per_pixel       = 0;
-    (*webp_state)->canvas_pixels         = NULL;
     (*webp_state)->frame_x               = 0;
     (*webp_state)->frame_y               = 0;
     (*webp_state)->frame_width           = 0;
@@ -107,13 +101,13 @@ static void destroy_webp_state(struct webp_state *webp_state) {
         sail_free(webp_state->webp_iterator);
     }
 
-    sail_free(webp_state->canvas_pixels);
     sail_free(webp_state->image_data);
 
     WebPDemuxDelete(webp_state->webp_demux);
 
     sail_destroy_read_options(webp_state->read_options);
     sail_destroy_write_options(webp_state->write_options);
+    sail_destroy_image(webp_state->canvas_image);
 
     sail_free(webp_state);
 }
@@ -162,11 +156,23 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v5_webp(struct sail_io *io, const
     /* Frame count and other image info. */
     webp_state->background_color = WebPDemuxGetI(webp_state->webp_demux, WEBP_FF_BACKGROUND_COLOR);
     webp_state->frame_count      = WebPDemuxGetI(webp_state->webp_demux, WEBP_FF_FRAME_COUNT);
-    webp_state->canvas_width     = WebPDemuxGetI(webp_state->webp_demux, WEBP_FF_CANVAS_WIDTH);
-    webp_state->canvas_height    = WebPDemuxGetI(webp_state->webp_demux, WEBP_FF_CANVAS_HEIGHT);
 
-    SAIL_TRY(sail_bytes_per_line(webp_state->canvas_width, SAIL_PIXEL_FORMAT_BPP32_RGBA, &webp_state->canvas_bytes_per_line));
-    webp_state->bytes_per_pixel = webp_state->canvas_bytes_per_line / webp_state->canvas_width;
+    /* Construct a canvas image. */
+    struct sail_image *image_local;
+    SAIL_TRY(sail_alloc_image(&image_local));
+    SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
+                        /* cleanup */ sail_destroy_image(image_local));
+
+    image_local->source_image->chroma_subsampling = SAIL_CHROMA_SUBSAMPLING_420;
+
+    image_local->width = WebPDemuxGetI(webp_state->webp_demux, WEBP_FF_CANVAS_WIDTH);
+    image_local->height = WebPDemuxGetI(webp_state->webp_demux, WEBP_FF_CANVAS_HEIGHT);
+    image_local->pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;
+    SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(image_local->width, image_local->pixel_format, &image_local->bytes_per_line),
+                        /* cleanup */ sail_destroy_image(image_local));
+    webp_state->bytes_per_pixel = image_local->bytes_per_line / image_local->width;
+
+    webp_state->canvas_image = image_local;
 
     return SAIL_OK;
 }
@@ -187,19 +193,19 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_webp(void *state, s
         }
 
         /* Allocate a canvas frame to apply disposal later. */
-        size_t image_size = webp_state->canvas_bytes_per_line * webp_state->canvas_height;
+        size_t image_size = webp_state->canvas_image->bytes_per_line * webp_state->canvas_image->height;
 
         void *ptr;
         SAIL_TRY(sail_malloc(image_size, &ptr));
-        webp_state->canvas_pixels = ptr;
+        webp_state->canvas_image->pixels = ptr;
 
         /* Fill background. */
-        webp_private_fill_color(webp_state->canvas_pixels, webp_state->canvas_bytes_per_line, webp_state->bytes_per_pixel,
-                                webp_state->background_color, 0, 0, webp_state->canvas_width, webp_state->canvas_height);
+        webp_private_fill_color(webp_state->canvas_image->pixels, webp_state->canvas_image->bytes_per_line, webp_state->bytes_per_pixel,
+                                webp_state->background_color, 0, 0, webp_state->canvas_image->width, webp_state->canvas_image->height);
     } else {
         switch (webp_state->frame_dispose_method) {
             case WEBP_MUX_DISPOSE_BACKGROUND: {
-                webp_private_fill_color(webp_state->canvas_pixels, webp_state->canvas_bytes_per_line, webp_state->bytes_per_pixel,
+                webp_private_fill_color(webp_state->canvas_image->pixels, webp_state->canvas_image->bytes_per_line, webp_state->bytes_per_pixel,
                                         webp_state->background_color, webp_state->frame_x, webp_state->frame_y,
                                         webp_state->frame_width, webp_state->frame_height);
                 break;
@@ -226,18 +232,12 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_webp(void *state, s
     webp_state->frame_dispose_method = webp_state->webp_iterator->dispose_method;
     webp_state->frame_blend_method   = webp_state->webp_iterator->blend_method;
 
+    /* Construct image. */
     struct sail_image *image_local;
-    SAIL_TRY(sail_alloc_image(&image_local));
-    SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
-                        /* cleanup */ sail_destroy_image(image_local));
+    SAIL_TRY(sail_copy_image_skeleton(webp_state->canvas_image, &image_local));
 
     image_local->source_image->pixel_format = webp_state->webp_iterator->has_alpha ? SAIL_PIXEL_FORMAT_BPP32_YUVA : SAIL_PIXEL_FORMAT_BPP24_YUV;
-    image_local->source_image->chroma_subsampling = SAIL_CHROMA_SUBSAMPLING_420;
 
-    image_local->width = webp_state->canvas_width;
-    image_local->height = webp_state->canvas_height;
-    image_local->bytes_per_line = webp_state->canvas_bytes_per_line;
-    image_local->pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;
     if (webp_state->frame_count > 1) {
         /* Fall back to 100 ms. when the duration is <= 0. */
         image_local->delay = webp_state->webp_iterator->duration <= 0 ? 100 : webp_state->webp_iterator->duration;
@@ -277,10 +277,10 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v5_webp(void *state, struct sail
         case WEBP_MUX_NO_BLEND: {
             if (WebPDecodeRGBAInto(webp_state->webp_iterator->fragment.bytes,
                                     webp_state->webp_iterator->fragment.size,
-                                    webp_state->canvas_pixels + webp_state->canvas_bytes_per_line * webp_state->frame_y +
+                                    (uint8_t *)webp_state->canvas_image->pixels + webp_state->canvas_image->bytes_per_line * webp_state->frame_y +
                                         webp_state->frame_x * webp_state->bytes_per_pixel,
-                                    webp_state->canvas_bytes_per_line * webp_state->canvas_height,
-                                    webp_state->canvas_bytes_per_line) == NULL) {
+                                    webp_state->canvas_image->bytes_per_line * webp_state->canvas_image->height,
+                                    webp_state->canvas_image->bytes_per_line) == NULL) {
                 SAIL_LOG_ERROR("WEBP: Failed to decode image");
                 SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
             }
@@ -296,10 +296,11 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v5_webp(void *state, struct sail
                 SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
             }
 
-            uint8_t *dst_scanline = webp_state->canvas_pixels + webp_state->frame_y * image->bytes_per_line + webp_state->frame_x * webp_state->bytes_per_pixel;
+            uint8_t *dst_scanline = (uint8_t *)webp_state->canvas_image->pixels + webp_state->frame_y * image->bytes_per_line + webp_state->frame_x * webp_state->bytes_per_pixel;
             uint8_t *src_scanline = image->pixels;
 
-            for (unsigned row = 0; row < webp_state->frame_height; row++, dst_scanline += webp_state->canvas_bytes_per_line, src_scanline += webp_state->frame_width * webp_state->bytes_per_pixel) {
+            for (unsigned row = 0; row < webp_state->frame_height; row++, dst_scanline += webp_state->canvas_image->bytes_per_line,
+                                                                          src_scanline += webp_state->frame_width * webp_state->bytes_per_pixel) {
                 SAIL_TRY(webp_private_blend_over(dst_scanline, 0, src_scanline, webp_state->frame_width, webp_state->bytes_per_pixel));
             }
             break;
@@ -310,7 +311,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v5_webp(void *state, struct sail
         }
     }
 
-    memcpy(image->pixels, webp_state->canvas_pixels, image->bytes_per_line * image->height);
+    memcpy(image->pixels, webp_state->canvas_image->pixels, image->bytes_per_line * image->height);
 
     return SAIL_OK;
 }
