@@ -180,7 +180,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v5_webp(struct sail_io *io, const
 
     /* Fetch meta data. */
     if (webp_state->read_options->io_options & SAIL_IO_OPTION_META_DATA) {
-        SAIL_TRY_OR_CLEANUP(webp_private_fetch_meta_data(webp_state->webp_demux, image_local),
+        SAIL_TRY_OR_CLEANUP(webp_private_fetch_meta_data(webp_state->webp_demux, &image_local->meta_data_node),
                             /* cleanup */ sail_destroy_image(image_local));
     }
 
