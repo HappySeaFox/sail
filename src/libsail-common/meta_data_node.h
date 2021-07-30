@@ -124,8 +124,9 @@ struct sail_meta_data_node {
 SAIL_EXPORT sail_status_t sail_alloc_meta_data_node(struct sail_meta_data_node **node);
 
 /*
- * Allocates a new meta data node from the specified string. The key must not be SAIL_META_DATA_UNKNOWN.
- * This is the key purpose of this function. The assigned node MUST be destroyed later with sail_destroy_meta_data_node().
+ * Allocates a new meta data node from the specified string. Makes a deep copy of the value.
+ * The key must not be SAIL_META_DATA_UNKNOWN. This is the key purpose of this function.
+ * The assigned node MUST be destroyed later with sail_destroy_meta_data_node().
  *
  * Returns SAIL_OK on success.
  */
@@ -134,8 +135,9 @@ SAIL_EXPORT sail_status_t sail_alloc_meta_data_node_from_known_string(enum SailM
                                                                         struct sail_meta_data_node **node);
 
 /*
- * Allocates a new meta data node from the specified string. Sets the key to SAIL_META_DATA_UNKNOWN.
- * This is the key purpose of this function. The assigned node MUST be destroyed later with sail_destroy_meta_data_node().
+ * Allocates a new meta data node from the specified string. Makes a deep copy of the value.
+ * Sets the key to SAIL_META_DATA_UNKNOWN. This is the key purpose of this function.
+ * The assigned node MUST be destroyed later with sail_destroy_meta_data_node().
  *
  * Returns SAIL_OK on success.
  */
@@ -143,8 +145,9 @@ SAIL_EXPORT sail_status_t sail_alloc_meta_data_node_from_unknown_string(const ch
                                                                         const char *value,
                                                                         struct sail_meta_data_node **node);
 /*
- * Allocates a new meta data node from the specified string. Copies only 'size' bytes. The key must not be SAIL_META_DATA_UNKNOWN.
- * This is the key purpose of this function. The assigned node MUST be destroyed later with sail_destroy_meta_data_node().
+ * Allocates a new meta data node from the specified string. Makes a deep copy of the value.
+ * Copies only 'size' bytes. The key must not be SAIL_META_DATA_UNKNOWN. This is the key purpose
+ * of this function. The assigned node MUST be destroyed later with sail_destroy_meta_data_node().
  *
  * Returns SAIL_OK on success.
  */
@@ -154,8 +157,9 @@ SAIL_EXPORT sail_status_t sail_alloc_meta_data_node_from_known_substring(enum Sa
                                                                             struct sail_meta_data_node **node);
 
 /*
- * Allocates a new meta data node from the specified string. Copies only 'size' bytes. Sets the key to SAIL_META_DATA_UNKNOWN.
- * This is the key purpose of this function. The assigned node MUST be destroyed later with sail_destroy_meta_data_node().
+ * Allocates a new meta data node from the specified string. Makes a deep copy of the value.
+ * Copies only 'size' bytes. Sets the key to SAIL_META_DATA_UNKNOWN. This is the key purpose
+ * of this function. The assigned node MUST be destroyed later with sail_destroy_meta_data_node().
  *
  * Returns SAIL_OK on success.
  */
@@ -165,8 +169,9 @@ SAIL_EXPORT sail_status_t sail_alloc_meta_data_node_from_unknown_substring(const
                                                                             struct sail_meta_data_node **node);
 
 /*
- * Allocates a new meta data node from the specified data. The key must not be SAIL_META_DATA_UNKNOWN.
- * This is the key purpose of this function. The assigned node MUST be destroyed later with sail_destroy_meta_data_node().
+ * Allocates a new meta data node from the specified data. Makes a deep copy of the value.
+ * The key must not be SAIL_META_DATA_UNKNOWN. This is the key purpose of this function.
+ * The assigned node MUST be destroyed later with sail_destroy_meta_data_node().
  *
  * Returns SAIL_OK on success.
  */
@@ -176,8 +181,9 @@ SAIL_EXPORT sail_status_t sail_alloc_meta_data_node_from_known_data(enum SailMet
                                                                     struct sail_meta_data_node **node);
 
 /*
- * Allocates a new meta data node from the specified data. Sets the key to SAIL_META_DATA_UNKNOWN.
- * This is the key purpose of this function. The assigned node MUST be destroyed later with sail_destroy_meta_data_node().
+ * Allocates a new meta data node from the specified data. Makes a deep copy of the value.
+ * Sets the key to SAIL_META_DATA_UNKNOWN. This is the key purpose of this function.
+ * The assigned node MUST be destroyed later with sail_destroy_meta_data_node().
  *
  * Returns SAIL_OK on success.
  */
