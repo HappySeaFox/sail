@@ -386,7 +386,6 @@ static MunitResult test_meta_data_to_string(const MunitParameter params[], void 
 
     munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_UNKNOWN),       "Unknown");
 
-    /* Strings. */
     munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_ARTIST),        "Artist");
     munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_AUTHOR),        "Author");
     munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_COMMENT),       "Comment");
@@ -396,9 +395,8 @@ static MunitResult test_meta_data_to_string(const MunitParameter params[], void 
     munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_DESCRIPTION),   "Description");
     munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_DISCLAIMER),    "Disclaimer");
     munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_DOCUMENT),      "Document");
-    munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_HEX_EXIF),      "Hex EXIF");
-    munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_HEX_IPTC),      "Hex IPTC");
-    munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_HEX_XMP),       "Hex XMP");
+    munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_EXIF),          "EXIF");
+    munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_IPTC),          "IPTC");
     munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_LABEL),         "Label");
     munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_MAKE),          "Make");
     munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_MODEL),         "Model");
@@ -410,9 +408,6 @@ static MunitResult test_meta_data_to_string(const MunitParameter params[], void 
     munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_URL),           "URL");
     munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_WARNING),       "Warning");
     munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_XMP),           "XMP");
-
-    /* Binary data. */
-    munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_EXIF),          "EXIF");
 
     return MUNIT_OK;
 }
@@ -426,7 +421,6 @@ static MunitResult test_meta_data_from_string(const MunitParameter params[], voi
 
     munit_assert(sail_meta_data_from_string("Unknown") == SAIL_META_DATA_UNKNOWN);
 
-    /* Strings. */
     munit_assert(sail_meta_data_from_string("Artist")        == SAIL_META_DATA_ARTIST);
     munit_assert(sail_meta_data_from_string("Author")        == SAIL_META_DATA_AUTHOR);
     munit_assert(sail_meta_data_from_string("Comment")       == SAIL_META_DATA_COMMENT);
@@ -436,9 +430,8 @@ static MunitResult test_meta_data_from_string(const MunitParameter params[], voi
     munit_assert(sail_meta_data_from_string("Description")   == SAIL_META_DATA_DESCRIPTION);
     munit_assert(sail_meta_data_from_string("Disclaimer")    == SAIL_META_DATA_DISCLAIMER);
     munit_assert(sail_meta_data_from_string("Document")      == SAIL_META_DATA_DOCUMENT);
-    munit_assert(sail_meta_data_from_string("Hex EXIF")      == SAIL_META_DATA_HEX_EXIF);
-    munit_assert(sail_meta_data_from_string("Hex IPTC")      == SAIL_META_DATA_HEX_IPTC);
-    munit_assert(sail_meta_data_from_string("Hex XMP")       == SAIL_META_DATA_HEX_XMP);
+    munit_assert(sail_meta_data_from_string("EXIF")          == SAIL_META_DATA_EXIF);
+    munit_assert(sail_meta_data_from_string("IPTC")          == SAIL_META_DATA_IPTC);
     munit_assert(sail_meta_data_from_string("Label")         == SAIL_META_DATA_LABEL);
     munit_assert(sail_meta_data_from_string("Make")          == SAIL_META_DATA_MAKE);
     munit_assert(sail_meta_data_from_string("Model")         == SAIL_META_DATA_MODEL);
@@ -450,9 +443,6 @@ static MunitResult test_meta_data_from_string(const MunitParameter params[], voi
     munit_assert(sail_meta_data_from_string("URL")           == SAIL_META_DATA_URL);
     munit_assert(sail_meta_data_from_string("Warning")       == SAIL_META_DATA_WARNING);
     munit_assert(sail_meta_data_from_string("XMP")           == SAIL_META_DATA_XMP);
-
-    /* Binary data. */
-    munit_assert(sail_meta_data_from_string("EXIF")          == SAIL_META_DATA_EXIF);
 
     return MUNIT_OK;
 }

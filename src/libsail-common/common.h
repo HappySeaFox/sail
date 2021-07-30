@@ -253,11 +253,6 @@ enum SailMetaData {
     /* Some unknown meta_data type. */
     SAIL_META_DATA_UNKNOWN,
 
-    /*
-     * Keys pointing to zero-terminated strings. Meta data nodes holding strings MUST be allocated with
-     * sail_alloc_meta_data_node_from_string(). Failing to do so may lead to corrupted
-     * meta data entries in the resulting file.
-     */
     SAIL_META_DATA_ARTIST,
     SAIL_META_DATA_AUTHOR,
     SAIL_META_DATA_COMMENT,
@@ -267,9 +262,8 @@ enum SailMetaData {
     SAIL_META_DATA_DESCRIPTION,
     SAIL_META_DATA_DISCLAIMER,
     SAIL_META_DATA_DOCUMENT,
-    SAIL_META_DATA_HEX_EXIF,
-    SAIL_META_DATA_HEX_IPTC,
-    SAIL_META_DATA_HEX_XMP,
+    SAIL_META_DATA_EXIF,
+    SAIL_META_DATA_IPTC,
     SAIL_META_DATA_LABEL,
     SAIL_META_DATA_MAKE,
     SAIL_META_DATA_MODEL,
@@ -281,13 +275,6 @@ enum SailMetaData {
     SAIL_META_DATA_URL,
     SAIL_META_DATA_WARNING,
     SAIL_META_DATA_XMP,
-
-    /*
-     * Keys pointing to binary data. Meta data nodes holding binary data MUST be allocated with
-     * sail_alloc_meta_data_node_from_data(). Failing to do so may lead to corrupted
-     * meta data entries in the resulting file.
-     */
-    SAIL_META_DATA_EXIF,
 };
 
 /* Meta data type. */

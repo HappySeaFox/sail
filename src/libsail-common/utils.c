@@ -573,9 +573,7 @@ const char* sail_meta_data_to_string(enum SailMetaData meta_data) {
         case SAIL_META_DATA_DISCLAIMER:    return "Disclaimer";
         case SAIL_META_DATA_DOCUMENT:      return "Document";
         case SAIL_META_DATA_EXIF:          return "EXIF";
-        case SAIL_META_DATA_HEX_EXIF:      return "Hex EXIF";
-        case SAIL_META_DATA_HEX_IPTC:      return "Hex IPTC";
-        case SAIL_META_DATA_HEX_XMP:       return "Hex XMP";
+        case SAIL_META_DATA_IPTC:          return "IPTC";
         case SAIL_META_DATA_LABEL:         return "Label";
         case SAIL_META_DATA_MAKE:          return "Make";
         case SAIL_META_DATA_MODEL:         return "Model";
@@ -611,9 +609,7 @@ enum SailMetaData sail_meta_data_from_string(const char *str) {
         case UINT64_C(8244735206874071778):  return SAIL_META_DATA_DISCLAIMER;
         case UINT64_C(7570930199009348):     return SAIL_META_DATA_DOCUMENT;
         case UINT64_C(6384018865):           return SAIL_META_DATA_EXIF;
-        case UINT64_C(7571088477688630):     return SAIL_META_DATA_HEX_EXIF;
-        case UINT64_C(7571088477824026):     return SAIL_META_DATA_HEX_IPTC;
-        case UINT64_C(229426923586655):      return SAIL_META_DATA_HEX_XMP;
+        case UINT64_C(6384154261):           return SAIL_META_DATA_IPTC;
         case UINT64_C(210681275781):         return SAIL_META_DATA_LABEL;
         case UINT64_C(6384317315):           return SAIL_META_DATA_MAKE;
         case UINT64_C(210682966998):         return SAIL_META_DATA_MODEL;
