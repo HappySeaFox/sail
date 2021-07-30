@@ -45,6 +45,37 @@
 
 #include "sail-common.h"
 
+/*
+ * Private functions.
+ */
+
+static sail_status_t hex_string_into_data(const char *str, size_t str_length, void *data, size_t *data_saved) {
+
+    if (str_length % 2 != 0) {
+        SAIL_LOG_ERROR("HEX-encoded string must have even length");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+    }
+
+    unsigned char *data_local = data;
+    *data_saved = 0;
+    unsigned byte;
+
+#ifdef SAIL_WIN32
+    while (sscanf_s(str, "%02x", &byte) == 1) {
+#else
+    while (sscanf(str, "%02x", &byte) == 1) {
+#endif
+        str += 2;
+        data_local[(*data_saved)++] = (unsigned char)byte;
+    }
+
+    return SAIL_OK;
+}
+
+/*
+ * Public functions.
+ */
+
 sail_status_t sail_memdup(const void *input, size_t input_size, void **output) {
 
     if (input == NULL) {
@@ -1097,6 +1128,78 @@ sail_status_t sail_file_contents_to_data(const char *path, void **data, size_t *
 
     *data = data_local;
     *data_size = size;
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_hex_string_into_data(const char *str, void *data) {
+
+    SAIL_CHECK_STRING_PTR(str);
+    SAIL_CHECK_BUFFER_PTR(data);
+
+    const size_t str_length = strlen(str);
+
+    size_t data_saved;
+    SAIL_TRY(hex_string_into_data(str, str_length, data, &data_saved));
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_hex_string_to_data(const char *str, void **data, size_t *data_size) {
+
+    SAIL_CHECK_STRING_PTR(str);
+    SAIL_CHECK_BUFFER_PTR(data);
+    SAIL_CHECK_PTR(data_size);
+
+    const size_t str_length = strlen(str);
+
+    unsigned char *data_local;
+    SAIL_TRY(sail_malloc(str_length / 2, &data_local));
+
+    size_t data_saved;
+    SAIL_TRY_OR_CLEANUP(hex_string_into_data(str, str_length, data_local, &data_saved),
+                        /* cleanup */ sail_free(data_local));
+
+    *data = data_local;
+    *data_size = data_saved;
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_data_into_hex_string(const void *data, size_t data_size, char *str) {
+
+    SAIL_CHECK_BUFFER_PTR(data);
+    SAIL_CHECK_STRING_PTR(str);
+
+    char *str_local_copy = str;
+
+    const unsigned char *data_local = data;
+    size_t data_local_index = 0;
+
+    for (size_t i = 0; i < data_size; i++) {
+#ifdef SAIL_WIN32
+        sprintf_s(str_local_copy, SIZE_MAX, "%02X", data_local[data_local_index++]);
+#else
+        sprintf(str_local_copy, "%02X", data_local[data_local_index++]);
+#endif
+        str_local_copy += 2;
+    }
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_data_to_hex_string(const void *data, size_t data_size, char **str) {
+
+    SAIL_CHECK_BUFFER_PTR(data);
+    SAIL_CHECK_STRING_PTR(str);
+
+    char *str_local;
+    SAIL_TRY(sail_malloc(data_size * 2 + 1, &str_local));
+
+    SAIL_TRY_OR_CLEANUP(sail_data_into_hex_string(data, data_size, str_local),
+                        /* cleanup */ sail_free(str_local));
+
+    *str = str_local;
 
     return SAIL_OK;
 }
