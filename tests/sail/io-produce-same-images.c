@@ -43,19 +43,19 @@ static MunitResult test_io_produce_same_images(const MunitParameter params[], vo
     munit_assert(sail_read_file(path, &image_file) == SAIL_OK);
     munit_assert_not_null(image_file);
 
-    void *buffer;
-    size_t buffer_length;
-    munit_assert(sail_alloc_buffer_from_file_contents(path, &buffer, &buffer_length) == SAIL_OK);
-    munit_assert_not_null(buffer);
-    munit_assert(buffer_length > 0);
+    void *data;
+    size_t data_length;
+    munit_assert(sail_file_contents_to_data(path, &data, &data_length) == SAIL_OK);
+    munit_assert_not_null(data);
+    munit_assert(data_length > 0);
 
     struct sail_image *image_mem;
-    munit_assert(sail_read_mem(buffer, buffer_length, &image_mem) == SAIL_OK);
+    munit_assert(sail_read_mem(data, data_length, &image_mem) == SAIL_OK);
     munit_assert_not_null(image_mem);
 
     munit_assert(sail_compare_images(image_file, image_mem) == SAIL_OK);
 
-    sail_free(buffer);
+    sail_free(data);
     sail_destroy_image(image_mem);
     sail_destroy_image(image_file);
 

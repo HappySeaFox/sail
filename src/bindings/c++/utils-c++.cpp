@@ -71,7 +71,7 @@ sail_status_t read_file_contents(const std::string_view path, sail::arbitrary_da
     SAIL_TRY(file_size(path, &size));
 
     contents->resize(size);
-    SAIL_TRY(sail_read_file_contents(path.data(), contents->data()));
+    SAIL_TRY(sail_file_contents_into_data(path.data(), contents->data()));
 
     return SAIL_OK;
 }

@@ -299,14 +299,15 @@ SAIL_EXPORT sail_status_t sail_file_size(const char *path, size_t *size);
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_read_file_contents(const char *path, void *data);
+SAIL_EXPORT sail_status_t sail_file_contents_into_data(const char *path, void *data);
 
 /*
  * Allocates a memory buffer and reads the specified file into it.
+ * The size of the memory buffer is stored in 'data_size'.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_data_from_file_contents(const char *path, void **data, size_t *data_length);
+SAIL_EXPORT sail_status_t sail_file_contents_to_data(const char *path, void **data, size_t *data_size);
 
 /* extern "C" */
 #ifdef __cplusplus
