@@ -61,6 +61,36 @@ static sail_status_t skip_raw_profile_header(const char *data, const char **star
     return SAIL_OK;
 }
 
+static sail_status_t write_raw_profile_header(char *str, size_t str_size, enum SailMetaData key, size_t hex_data_length) {
+
+    SAIL_CHECK_STRING_PTR(str);
+
+    const char *key_str;
+
+    switch (key) {
+        case SAIL_META_DATA_EXIF: key_str = "exif"; break;
+        case SAIL_META_DATA_IPTC: key_str = "iptc"; break;
+        case SAIL_META_DATA_XMP:  key_str = "xmp";  break;
+
+        default: {
+            SAIL_LOG_ERROR("PNG: Cannot write '%s' meta data key as a raw profile", sail_meta_data_to_string(key));
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+        }
+    }
+
+    /* Write "\nexif\n    1234\n" before the actual HEX-encoded data. */
+#ifdef SAIL_WIN32
+    if (sprintf_s(str, str_size, "\n%s\n    %u\n", key_str, (unsigned)hex_data_length) < 0) {
+#else
+    if (sprintf(str, "\n%s\n    %u\n", key_str, (unsigned)hex_data_length) < 0) {
+#endif
+        SAIL_LOG_ERROR("PNG: Failed to write raw profile header");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+    }
+
+    return SAIL_OK;
+}
+
 static sail_status_t hex_string_to_meta_data(const char *hex_str, enum SailMetaData key, struct sail_meta_data_node **meta_data_node) {
 
     const char *start;
