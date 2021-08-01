@@ -183,6 +183,10 @@ endif()
 configure_file("${PROJECT_SOURCE_DIR}/src/config.h.in" "${PROJECT_BINARY_DIR}/include/config.h" @ONLY)
 include_directories("${PROJECT_BINARY_DIR}/include")
 
+# Windows deployment script
+#
+configure_file("${PROJECT_SOURCE_DIR}/dist/windows/make-portable.sh.in" "${PROJECT_BINARY_DIR}/make-portable.sh" @ONLY)
+
 # Execute tests that depend on config.h
 #
 sail_check_c11_thread_local()
