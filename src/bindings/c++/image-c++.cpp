@@ -388,7 +388,7 @@ sail_status_t image::save(const std::string_view path)
 {
     image_output output;
 
-    SAIL_TRY(output.write(path, *this));
+    SAIL_TRY(output.save(path, *this));
 
     return SAIL_OK;
 }

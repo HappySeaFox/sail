@@ -82,27 +82,27 @@ public:
     image_output& operator=(image_output&&) = delete;
 
     /*
-     * Writes the specified image into the file.
+     * Saves the specified image into the file.
      *
      * If the selected image format doesn't support the image pixel format, an error is returned.
      * Consider converting the image into a supported image format beforehand.
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t write(std::string_view path, const sail::image &image) const;
+    sail_status_t save(std::string_view path, const sail::image &image) const;
 
     /*
-     * Writes the specified image into the specified memory buffer.
+     * Saves the specified image into the specified memory buffer.
      *
      * If the selected image format doesn't support the image pixel format, an error is returned.
      * Consider converting the image into a supported image format beforehand.
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t write(void *buffer, size_t buffer_length, const sail::image &image) const;
+    sail_status_t save(void *buffer, size_t buffer_length, const sail::image &image) const;
 
     /*
-     * Writes the specified image into the specified memory buffer.
+     * Saves the specified image into the specified memory buffer.
      *
      * If the selected image format doesn't support the image pixel format, an error is returned.
      * Consider converting the image into a supported image format beforehand.
@@ -111,7 +111,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t write(void *buffer, size_t buffer_length, const sail::image &image, size_t *written) const;
+    sail_status_t save(void *buffer, size_t buffer_length, const sail::image &image, size_t *written) const;
 
     /*
      * Starts writing into the specified image file.
@@ -208,7 +208,7 @@ public:
     sail_status_t start(const sail::io &io, const sail::codec_info &codec_info, const sail::write_options &write_options);
 
     /*
-     * Continues writing started by start(). Writes the specified image into the underlying I/O target.
+     * Continues writing started by start(). Saves the specified image into the underlying I/O target.
      *
      * If the selected image format doesn't support the image pixel format, an error is returned.
      * Consider converting the image into a supported image format beforehand.

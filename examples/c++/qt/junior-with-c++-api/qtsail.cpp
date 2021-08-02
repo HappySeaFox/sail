@@ -64,7 +64,7 @@ QtSail::~QtSail()
 sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
 {
     sail::image_input image_input;
-    sail::image image = image_input.read(path.toLocal8Bit().constData());
+    sail::image image = image_input.load(path.toLocal8Bit().constData());
 
     if (!image.is_valid()) {
         return SAIL_ERROR_BROKEN_IMAGE;
@@ -111,7 +111,7 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
     //
     SAIL_TRY(image.convert(codec_info.write_features()));
 
-    SAIL_TRY(image_output.write(path.toLocal8Bit().constData(), image));
+    SAIL_TRY(image_output.save(path.toLocal8Bit().constData(), image));
 
     return SAIL_OK;
 }
