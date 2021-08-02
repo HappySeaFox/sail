@@ -117,14 +117,14 @@ public:
      *
      * Returns an invalid image on error.
      */
-    image read(std::string_view path) const;
+    image load(std::string_view path) const;
 
     /*
      * Loads an image from the specified memory buffer.
      *
      * Returns an invalid image on error.
      */
-    image read(const void *buffer, size_t buffer_length) const;
+    image load(const void *buffer, size_t buffer_length) const;
 
     /*
      * Starts reading the specified image file.

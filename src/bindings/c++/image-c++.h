@@ -71,6 +71,12 @@ public:
     image();
 
     /*
+     * Constructs a new image out of the specified file path. Reads just a single frame
+     * from the file.
+     */
+    image(std::string_view path);
+
+    /*
      * Constructs a new image out of the specified image properties and pixels.
      */
     image(void *pixels, SailPixelFormat pixel_format, unsigned width, unsigned height);
@@ -329,6 +335,21 @@ public:
      * Sets a new ICC profile.
      */
     image& with_iccp(const sail::iccp &ic);
+
+    /*
+     * Replaces the image with the image from the specified file path. Reads just a single frame
+     * from the file.
+     *
+     * Returns SAIL_OK on success.
+     */
+    sail_status_t load(std::string_view path);
+
+    /*
+     * Saves the image with into the specified file path.
+     *
+     * Returns SAIL_OK on success.
+     */
+    sail_status_t save(std::string_view path);
 
     /*
      * Returns true if the image can be converted into the specified pixel format.
