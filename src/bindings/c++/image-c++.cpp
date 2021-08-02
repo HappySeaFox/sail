@@ -25,6 +25,7 @@
 
 #include <cstdlib>
 #include <cstring>
+#include <utility>
 
 #include "sail-common.h"
 #include "sail.h"
@@ -86,6 +87,11 @@ public:
 image::image()
     : d(new pimpl)
 {
+}
+
+image::image(const std::string_view path)
+{
+    load(path);
 }
 
 image::image(void *pixels, SailPixelFormat pixel_format, unsigned width, unsigned height)
@@ -363,6 +369,28 @@ image& image::with_iccp(const sail::iccp &ic)
     d->iccp = ic;
 
     return *this;
+}
+
+sail_status_t image::load(const std::string_view path)
+{
+    image_input input;
+    SAIL_TRY(input.start(path));
+
+    image img;
+    SAIL_TRY(input.next_frame(&img));
+
+    *this = std::move(img);
+
+    return SAIL_OK;
+}
+
+sail_status_t image::save(const std::string_view path)
+{
+    image_output output;
+
+    SAIL_TRY(output.write(path, *this));
+
+    return SAIL_OK;
 }
 
 bool image::can_convert(SailPixelFormat pixel_format)
