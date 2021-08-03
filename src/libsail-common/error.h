@@ -26,6 +26,12 @@
 #ifndef SAIL_ERROR_H
 #define SAIL_ERROR_H
 
+#ifdef SAIL_BUILD
+    #include "compiler_specifics.h"
+#else
+    #include <sail-common/compiler_specifics.h>
+#endif
+
 /*
  * Common status type to return from all SAIL functions.
  */
@@ -145,16 +151,16 @@ do {                              \
  */
 #define SAIL_CHECK_PTR(ptr)                       \
 do {                                              \
-    if (ptr == NULL) {                            \
+    if (SAIL_UNLIKELY(ptr == NULL)) {             \
         SAIL_LOG_AND_RETURN(SAIL_ERROR_NULL_PTR); \
     }                                             \
 } while(0)
 
-#define SAIL_CHECK_PTR2(ptr, ret) \
-do {                              \
-    if (ptr == NULL) {            \
-        SAIL_LOG_AND_RETURN(ret); \
-    }                             \
+#define SAIL_CHECK_PTR2(ptr, ret)     \
+do {                                  \
+    if (SAIL_UNLIKELY(ptr == NULL)) { \
+        SAIL_LOG_AND_RETURN(ret);     \
+    }                                 \
 } while(0)
 
 #define SAIL_CHECK_BUFFER_PTR(buffer)                   SAIL_CHECK_PTR2(buffer,          SAIL_ERROR_BUFFER_NULL_PTR)
@@ -191,13 +197,13 @@ do {                              \
  * Try to execute the specified SAIL function. If it fails, execute the rest of arguments.
  * Use do/while to require ';' at the end of a SAIL_TRY_OR_EXECUTE() expression.
  */
-#define SAIL_TRY_OR_EXECUTE(sail_func, ...)             \
-{                                                       \
-    sail_status_t __sail_error_result;                  \
-                                                        \
-    if ((__sail_error_result = sail_func) != SAIL_OK) { \
-        __VA_ARGS__;                                    \
-    }                                                   \
+#define SAIL_TRY_OR_EXECUTE(sail_func, ...)              \
+{                                                        \
+    const sail_status_t __sail_error_result = sail_func; \
+                                                         \
+    if (SAIL_UNLIKELY(__sail_error_result != SAIL_OK)) { \
+        __VA_ARGS__;                                     \
+    }                                                    \
 } do{} while(0)
 
 /*

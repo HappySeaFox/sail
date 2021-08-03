@@ -32,6 +32,7 @@
     #include "config.h"
 
     #include "common.h"
+    #include "compiler_specifics.h"
     #include "error.h"
     #include "export.h"
     #include "iccp.h"
@@ -53,6 +54,7 @@
     #include <sail-common/config.h>
 
     #include <sail-common/common.h>
+    #include <sail-common/compiler_specifics.h>
     #include <sail-common/error.h>
     #include <sail-common/export.h>
     #include <sail-common/iccp.h>
