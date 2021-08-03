@@ -6,7 +6,7 @@ Consider [EXAMPLES](EXAMPLES.md) after building and installing.
 
 **Standalone build** - manually compiled with `cmake` and respective build commands. Extra dependencies like libjpeg ARE NOT shipped with the build. macOS brew package is a good example of a standalone build.
 
-**Standalone bundle** - manually compiled with `cmake` and respective build commands. Extra dependencies like libjpeg ARE shipped with the build. Frequently used on Windows.
+**Standalone bundle** - manually compiled with `cmake` and respective build commands. Extra dependencies like libjpeg ARE shipped with the build. Portable archive for Windows on the releases page on GitHub is a good example of a standalone bundle.
 
 **VCPKG port** - installed with `vcpkg install sail`.
 

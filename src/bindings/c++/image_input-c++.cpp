@@ -120,7 +120,7 @@ std::tuple<image, codec_info> image_input::probe(const sail::io &io) const
     return { image(sail_image), codec_info(sail_codec_info) };
 }
 
-image image_input::read(const std::string_view path) const
+image image_input::load(const std::string_view path) const
 {
     sail_image *sail_image = nullptr;
 
@@ -137,7 +137,7 @@ image image_input::read(const std::string_view path) const
     return image;
 }
 
-image image_input::read(const void *buffer, size_t buffer_length) const
+image image_input::load(const void *buffer, size_t buffer_length) const
 {
     sail_image *sail_image = nullptr;
 
