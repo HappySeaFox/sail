@@ -8,6 +8,7 @@ set(SAIL_COLORED_OUTPUT ${SAIL_COLORED_OUTPUT} PARENT_SCOPE)
 
 add_library(sail-common
                 common.h
+                compiler_specifics.h
                 error.h
                 export.h
                 iccp.c
@@ -45,6 +46,7 @@ add_library(sail-common
 # Build a list of public headers to install
 #
 set(PUBLIC_HEADERS "common.h"
+                   "compiler_specifics.h"
                    "error.h"
                    "export.h"
                    "iccp.h"

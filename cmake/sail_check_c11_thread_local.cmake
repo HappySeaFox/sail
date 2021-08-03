@@ -2,11 +2,11 @@
 #
 function(sail_check_c11_thread_local)
 	cmake_push_check_state(RESET)
-		set(CMAKE_REQUIRED_INCLUDES ${PROJECT_BINARY_DIR}/include)
+		set(CMAKE_REQUIRED_INCLUDES ${PROJECT_SOURCE_DIR}/src)
 
 		check_c_source_compiles(
 			"
-			#include \"config.h\"
+			#include \"libsail-common/compiler_specifics.h\"
 
 			int main(int argc, char *argv[]) {
 				SAIL_THREAD_LOCAL static int i = 0;

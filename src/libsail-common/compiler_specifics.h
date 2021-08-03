@@ -1,6 +1,6 @@
 /*  This file is part of SAIL (https://github.com/smoked-herring/sail)
 
-    Copyright (c) 2020 Dmitry Baryshev
+    Copyright (c) 2021 Dmitry Baryshev
 
     The MIT License
 
@@ -23,38 +23,23 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_CONFIG_H
-#define SAIL_CONFIG_H
+#ifndef SAIL_COMPILER_SPECIFICS_H
+#define SAIL_COMPILER_SPECIFICS_H
 
-#define SAIL_VERSION_MAJOR @PROJECT_VERSION_MAJOR@
-#define SAIL_VERSION_MINOR @PROJECT_VERSION_MINOR@
-#define SAIL_VERSION_PATCH @PROJECT_VERSION_PATCH@
+/* Thread local flag used with static variables. */
+#if _MSC_VER
+    #define SAIL_THREAD_LOCAL __declspec(thread)
+#else
+    #define SAIL_THREAD_LOCAL _Thread_local
+#endif
 
-#define SAIL_VERSION_STRING "@PROJECT_VERSION@"
-
-#define SAIL_BUILD_VERSION(major, minor, patch) ((major << 16) | (minor << 8) | (patch))
-
-#define SAIL_VERSION SAIL_BUILD_VERSION(@PROJECT_VERSION_MAJOR@, @PROJECT_VERSION_MINOR@, @PROJECT_VERSION_PATCH@)
-
-/* Unused when SAIL_COMBINE_CODECS is ON. */
-#cmakedefine SAIL_CODECS_PATH "@SAIL_CODECS_PATH@"
-
-#cmakedefine SAIL_UNIX
-#cmakedefine SAIL_WIN32
-#cmakedefine SAIL_MINGW
-#cmakedefine SAIL_CYGWIN
-#cmakedefine SAIL_APPLE
-
-/* Do we compile for VCPKG (port or client)? */
-#cmakedefine SAIL_VCPKG
-
-/* Build static libs. */
-#cmakedefine SAIL_STATIC
-
-/* Combine all codecs into a single library. */
-#cmakedefine SAIL_COMBINE_CODECS
-
-/* Buffer size to read from I/O sources to detect file types by magic numbers. */
-#cmakedefine SAIL_MAGIC_BUFFER_SIZE @SAIL_MAGIC_BUFFER_SIZE@
+/* Branch predictions. */
+#ifdef __GNUC__
+    #define SAIL_LIKELY(x)   (__builtin_expect((x), 1))
+    #define SAIL_UNLIKELY(x) (__builtin_expect((x), 0))
+#else
+    #define SAIL_LIKELY(x)   (x)
+    #define SAIL_UNLIKELY(x) (x)
+#endif
 
 #endif
