@@ -104,7 +104,7 @@ sail_status_t sail_codec_info_by_magic_number_from_io(struct sail_io *io, const 
         char *hex_numbers_ptr = hex_numbers;
 
         for (size_t i = 0; i < sizeof(buffer); i++, hex_numbers_ptr += 3) {
-#ifdef SAIL_WIN32
+#ifdef _MSC_VER
             sprintf_s(hex_numbers_ptr, 4, "%02x ", buffer[i]);
 #else
             sprintf(hex_numbers_ptr, "%02x ", buffer[i]);
@@ -136,7 +136,7 @@ sail_status_t sail_codec_info_by_magic_number_from_io(struct sail_io *io, const 
 
             SAIL_LOG_TRACE("Check against %s magic '%s'", codec_info_node->codec_info->name, magic);
 
-#ifdef SAIL_WIN32
+#ifdef _MSC_VER
             while (buffer_index < sizeof(buffer) && sscanf_s(magic, "%2s%n", hex_byte, (unsigned)sizeof(hex_byte), &bytes_consumed) == 1) {
 #else
             while (buffer_index < sizeof(buffer) && sscanf(magic, "%2s%n", hex_byte, &bytes_consumed) == 1) {
@@ -146,7 +146,7 @@ sail_status_t sail_codec_info_by_magic_number_from_io(struct sail_io *io, const 
                 } else {
                     unsigned byte = 0;
 
-#ifdef SAIL_WIN32
+#ifdef _MSC_VER
                     if (sscanf_s(hex_byte, "%02x", &byte) != 1 || byte != buffer[buffer_index]) {
 #else
                     if (sscanf(hex_byte, "%02x", &byte) != 1 || byte != buffer[buffer_index]) {
