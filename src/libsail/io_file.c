@@ -31,8 +31,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef SAIL_WIN32
-    /* _fsopen() */
+#ifdef _MSC_VER
+    /* _SH_DENYWR */
     #include <share.h>
 #endif
 
@@ -179,7 +179,7 @@ static sail_status_t alloc_io_file(const char *path, const char *mode, struct sa
     /* Try to open the file first */
     FILE *fptr;
 
-#ifdef SAIL_WIN32
+#ifdef _MSC_VER
     fptr = _fsopen(path, mode, _SH_DENYWR);
 #else
     /* Fallback to a regular fopen() */

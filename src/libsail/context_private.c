@@ -104,7 +104,7 @@ static const char* sail_codecs_path_env(void) {
 
     codecs_path_env_called = true;
 
-#ifdef SAIL_WIN32
+#ifdef _MSC_VER
     _dupenv_s((char **)&env, NULL, "SAIL_CODECS_PATH");
 #else
     env = getenv("SAIL_CODECS_PATH");
@@ -125,7 +125,7 @@ static const char* client_codecs_path(void) {
 
     codecs_path_called = true;
 
-#ifdef SAIL_WIN32
+#ifdef _MSC_VER
     _dupenv_s((char **)&env, NULL, "SAIL_MY_CODECS_PATH");
 #else
     env = getenv("SAIL_MY_CODECS_PATH");
@@ -246,7 +246,7 @@ static sail_status_t build_codec_from_codec_info(const char *codec_info_full_pat
     SAIL_TRY(sail_strdup_length(codec_info_full_path,
                                 codec_full_path_length + strlen(LIB_SUFFIX) + 1, &codec_full_path));
 
-#ifdef SAIL_WIN32
+#ifdef _MSC_VER
     /* Overwrite the end of the path with "dll". */
     strcpy_s(codec_full_path + codec_full_path_length + 1, strlen(LIB_SUFFIX) + 1, LIB_SUFFIX);
 #else
@@ -355,8 +355,13 @@ static sail_status_t enumerate_codecs_in_paths(struct sail_context *context, con
         SAIL_TRY(sail_malloc(codecs_path_with_mask_length, &ptr));
         char *codecs_path_with_mask = ptr;
 
+#ifdef _MSC_VER
         strcpy_s(codecs_path_with_mask, codecs_path_with_mask_length, codecs_path);
         strcat_s(codecs_path_with_mask, codecs_path_with_mask_length, plugs_info_mask);
+#else
+        strcpy(codecs_path_with_mask, codecs_path);
+        strcat(codecs_path_with_mask, plugs_info_mask);
+#endif
 
         WIN32_FIND_DATA data;
         HANDLE hFind = FindFirstFile(codecs_path_with_mask, &data);
