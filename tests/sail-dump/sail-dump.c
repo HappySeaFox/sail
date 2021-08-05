@@ -43,7 +43,7 @@
 
 static void skip_whitespaces(FILE *fptr) {
 
-#ifdef SAIL_WIN32
+#ifdef _MSC_VER
     int ret = fscanf_s(fptr, "%*[ \r\n]");
 #else
     int ret = fscanf(fptr, "%*[ \r\n]");
@@ -62,7 +62,7 @@ static sail_status_t read_hex(FILE *fptr, size_t data_length, uint8_t **value) {
         skip_whitespaces(fptr);
 
         unsigned v;
-#ifdef SAIL_WIN32
+#ifdef _MSC_VER
         if (fscanf_s(fptr, "%2x%*[ \r\n]", &v) != 1) {
 #else
         if (fscanf(fptr, "%2x%*[ \r\n]", &v) != 1) {
@@ -107,7 +107,7 @@ static sail_status_t read_image(FILE *fptr, struct sail_image *image) {
      */
     char pixel_format[64];
 
-#ifdef SAIL_WIN32
+#ifdef _MSC_VER
     if (fscanf_s(fptr, "%u %u %u %s %d", &image->width, &image->height, &image->bytes_per_line, pixel_format, (unsigned)sizeof(pixel_format), &image->properties) != 5) {
 #else
     if (fscanf(fptr, "%u %u %u %s %d", &image->width, &image->height, &image->bytes_per_line, pixel_format, &image->properties) != 5) {
@@ -139,7 +139,7 @@ static sail_status_t read_source_image(FILE *fptr, struct sail_image *image) {
     char pixel_format[64];
     char compression[64];
 
-#ifdef SAIL_WIN32
+#ifdef _MSC_VER
     if (fscanf_s(fptr, "%s %d %s", pixel_format, (unsigned)sizeof(pixel_format), &image->source_image->properties, compression, (unsigned)sizeof(compression)) != 3) {
 #else
     if (fscanf(fptr, "%s %d %s", pixel_format, &image->source_image->properties, compression) != 3) {
@@ -167,7 +167,7 @@ static sail_status_t read_resolution(FILE *fptr, struct sail_image *image) {
 
     char unit[32];
 
-#ifdef SAIL_WIN32
+#ifdef _MSC_VER
     if (fscanf_s(fptr, "%lf %lf %s", &image->resolution->x, &image->resolution->y, unit, (unsigned)sizeof(unit)) != 3) {
 #else
     if (fscanf(fptr, "%lf %lf %s", &image->resolution->x, &image->resolution->y, unit) != 3) {
@@ -202,7 +202,7 @@ static sail_status_t read_animation(FILE *fptr, struct sail_image *image) {
     /*
      * 0(delay)
      */
-#ifdef SAIL_WIN32
+#ifdef _MSC_VER
     if (fscanf_s(fptr, "%d", &image->delay) != 1) {
 #else
     if (fscanf(fptr, "%d", &image->delay) != 1) {
@@ -232,7 +232,7 @@ static sail_status_t read_meta_data(FILE *fptr, struct sail_image *image) {
     struct sail_meta_data_node **last_meta_data_node = &image->meta_data_node;
 
     unsigned n_of_entries;
-#ifdef SAIL_WIN32
+#ifdef _MSC_VER
     if (fscanf_s(fptr, "%u%*[\r\n]", &n_of_entries) != 1) {
 #else
     if (fscanf(fptr, "%u%*[\r\n]", &n_of_entries) != 1) {
@@ -247,7 +247,7 @@ static sail_status_t read_meta_data(FILE *fptr, struct sail_image *image) {
         char type[16];
         unsigned data_length;
 
-#ifdef SAIL_WIN32
+#ifdef _MSC_VER
         if (fscanf_s(fptr, "%[^\n]%*[\r\n]%[^\n]%*[\r\n]%s%u%*[\r\n]", key, (unsigned)sizeof(key), key_unknown, (unsigned)sizeof(key_unknown), type, (unsigned)sizeof(type), &data_length) != 4) {
 #else
         if (fscanf(fptr, "%[^\n]%*[\r\n]%[^\n]%*[\r\n]%s%u%*[\r\n]", key, key_unknown, type, &data_length) != 4) {
@@ -311,7 +311,7 @@ static sail_status_t read_iccp(FILE *fptr, struct sail_image *image) {
      * 00 11 22...
      */
     unsigned data_length;
-#ifdef SAIL_WIN32
+#ifdef _MSC_VER
     if (fscanf_s(fptr, "%u%*[\r\n]", &data_length) != 1) {
 #else
     if (fscanf(fptr, "%u%*[\r\n]", &data_length) != 1) {
@@ -343,7 +343,7 @@ static sail_status_t read_palette(FILE *fptr, struct sail_image *image) {
     unsigned color_count;
     char pixel_format[64];
 
-#ifdef SAIL_WIN32
+#ifdef _MSC_VER
     if (fscanf_s(fptr, "%s%u%u%*[ \r\n]", pixel_format, (unsigned)sizeof(pixel_format), &color_count, &data_length) != 3) {
 #else
     if (fscanf(fptr, "%s%u%u%*[ \r\n]", pixel_format, &color_count, &data_length) != 3) {
@@ -407,7 +407,7 @@ sail_status_t sail_read_dump(const char *path, struct sail_image *images[]) {
 
     SAIL_LOG_DEBUG("DUMP: Opening file '%s'", path_dump);
 
-#ifdef SAIL_WIN32
+#ifdef _MSC_VER
     FILE *fptr = _fsopen(path_dump, "r", _SH_DENYWR);
 #else
     FILE *fptr = fopen(path_dump, "r");
@@ -423,7 +423,7 @@ sail_status_t sail_read_dump(const char *path, struct sail_image *images[]) {
 
     /* For reading categories: IMAGE, PALETTE etc. */
     char buffer[32];
-#ifdef SAIL_WIN32
+#ifdef _MSC_VER
     while (fscanf_s(fptr, "%[^\n]%*[\r\n]", buffer, (unsigned)sizeof(buffer)) == 1) {
 #else
     while (fscanf(fptr, "%[^\n]%*[\r\n]", buffer) == 1) {
