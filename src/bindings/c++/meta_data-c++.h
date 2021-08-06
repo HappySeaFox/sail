@@ -62,7 +62,7 @@ public:
     /*
      * Copies the meta data entry.
      */
-    meta_data(const sail::meta_data &meta_data);
+    meta_data(const meta_data &md);
 
     /*
      * Copies the meta data entry.

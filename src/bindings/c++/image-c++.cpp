@@ -106,7 +106,7 @@ image::image(void *pixels, SailPixelFormat pixel_format, unsigned width, unsigne
         .with_shallow_pixels(pixels);
 }
 
-image::image(const sail::image &img)
+image::image(const image &img)
     : image()
 {
     *this = img;

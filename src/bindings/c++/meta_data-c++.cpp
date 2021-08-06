@@ -65,10 +65,10 @@ meta_data::meta_data()
 {
 }
 
-meta_data::meta_data(const sail::meta_data &meta_data)
+meta_data::meta_data(const sail::meta_data &md)
     : meta_data()
 {
-    *this = meta_data;
+    *this = md;
 }
 
 meta_data& meta_data::operator=(const sail::meta_data &meta_data)

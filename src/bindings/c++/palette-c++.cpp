@@ -56,10 +56,10 @@ palette::palette()
 {
 }
 
-palette::palette(const sail::palette &palette)
+palette::palette(const palette &pal)
     : palette()
 {
-    *this = palette;
+    *this = pal;
 }
 
 palette& palette::operator=(const sail::palette &palette)
@@ -127,15 +127,15 @@ palette& palette::with_data(SailPixelFormat pixel_format, const arbitrary_data &
     return with_data(pixel_format, data.data(), static_cast<unsigned>(data.size()));
 }
 
-palette::palette(const sail_palette *pal)
+palette::palette(const sail_palette *palette)
     : palette()
 {
-    if (pal == nullptr) {
+    if (palette == nullptr) {
         SAIL_LOG_DEBUG("NULL pointer has been passed to sail::palette(). The object is untouched");
         return;
     }
 
-    with_data(pal->pixel_format, pal->data, pal->color_count);
+    with_data(palette->pixel_format, palette->data, palette->color_count);
 }
 
 sail_status_t palette::to_sail_palette(sail_palette **palette) const

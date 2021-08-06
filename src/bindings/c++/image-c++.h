@@ -89,7 +89,7 @@ public:
     /*
      * Copies the image.
      */
-    image(const sail::image &image);
+    image(const image &img);
 
     /*
      * Copies the image.

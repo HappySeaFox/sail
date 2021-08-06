@@ -59,7 +59,7 @@ public:
     /*
      * Copies the palette.
      */
-    palette(const sail::palette &palette);
+    palette(const palette &pal);
 
     /*
      * Copies the palette.
@@ -115,7 +115,7 @@ private:
     /*
      * Makes a deep copy of the specified palette.
      */
-    explicit palette(const sail_palette *pal);
+    explicit palette(const sail_palette *palette);
 
     sail_status_t to_sail_palette(sail_palette **palette) const;
 
