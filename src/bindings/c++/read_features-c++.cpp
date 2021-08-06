@@ -35,12 +35,9 @@ class SAIL_HIDDEN read_features::pimpl
 public:
     pimpl()
         : sail_read_features_c(nullptr)
-        , features(0)
     {}
 
     const sail_read_features *sail_read_features_c;
-
-    int features;
 };
 
 read_features::read_features(const read_features &rf)
@@ -49,26 +46,24 @@ read_features::read_features(const read_features &rf)
     *this = rf;
 }
 
-read_features& read_features::operator=(const read_features &rf)
+read_features& read_features::operator=(const sail::read_features &read_features)
 {
-    d->sail_read_features_c = rf.d->sail_read_features_c;
-
-    with_features(rf.features());
+    d->sail_read_features_c = read_features.d->sail_read_features_c;
 
     return *this;
 }
 
-read_features::read_features(read_features &&rf) noexcept
+read_features::read_features(sail::read_features &&read_features) noexcept
 {
-    d = rf.d;
-    rf.d = nullptr;
+    d = read_features.d;
+    read_features.d = nullptr;
 }
 
-read_features& read_features::operator=(read_features &&rf)
+read_features& read_features::operator=(sail::read_features &&read_features)
 {
     delete d;
-    d = rf.d;
-    rf.d = nullptr;
+    d = read_features.d;
+    read_features.d = nullptr;
 
     return *this;
 }
@@ -80,19 +75,19 @@ read_features::~read_features()
 
 int read_features::features() const
 {
-    return d->features;
+    return d->sail_read_features_c->features;
 }
 
-sail_status_t read_features::to_read_options(read_options *sread_options) const
+sail_status_t read_features::to_read_options(sail::read_options *read_options) const
 {
     SAIL_CHECK_READ_FEATURES_PTR(d->sail_read_features_c);
-    SAIL_CHECK_READ_OPTIONS_PTR(sread_options);
+    SAIL_CHECK_READ_OPTIONS_PTR(read_options);
 
     sail_read_options *sail_read_options;
 
     SAIL_TRY(sail_alloc_read_options_from_features(d->sail_read_features_c, &sail_read_options));
 
-    *sread_options = read_options(sail_read_options);
+    *read_options = sail::read_options(sail_read_options);
 
     sail_destroy_read_options(sail_read_options);
 
@@ -104,23 +99,15 @@ read_features::read_features()
 {
 }
 
-read_features::read_features(const sail_read_features *rf)
+read_features::read_features(const sail_read_features *read_features)
     : read_features()
 {
-    if (rf == nullptr) {
+    if (read_features == nullptr) {
         SAIL_LOG_DEBUG("NULL pointer has been passed to sail::read_features(). The object is untouched");
         return;
     }
 
-    d->sail_read_features_c = rf;
-
-    with_features(rf->features);
-}
-
-read_features& read_features::with_features(int features)
-{
-    d->features = features;
-    return *this;
+    d->sail_read_features_c = read_features;
 }
 
 const sail_read_features* read_features::sail_read_features_c() const

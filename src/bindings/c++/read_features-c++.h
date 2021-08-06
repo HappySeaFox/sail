@@ -60,17 +60,17 @@ public:
     /*
      * Copies the read features.
      */
-    read_features& operator=(const read_features &rf);
+    read_features& operator=(const sail::read_features &read_features);
 
     /*
      * Moves the read features.
      */
-    read_features(read_features &&rf) noexcept;
+    read_features(sail::read_features &&read_features) noexcept;
 
     /*
      * Moves the read features.
      */
-    read_features& operator=(read_features &&rf);
+    read_features& operator=(sail::read_features &&read_features);
 
     /*
      * Destroys the read features.
@@ -88,7 +88,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t to_read_options(read_options *sread_options) const;
+    sail_status_t to_read_options(sail::read_options *read_options) const;
 
 private:
     read_features();
@@ -97,9 +97,7 @@ private:
      * Makes a deep copy of the specified read features and stores the pointer for further use.
      * When the SAIL context gets uninitialized, the pointer becomes dangling.
      */
-    explicit read_features(const sail_read_features *rf);
-
-    read_features& with_features(int features);
+    explicit read_features(const sail_read_features *read_features);
 
     const sail_read_features* sail_read_features_c() const;
 
