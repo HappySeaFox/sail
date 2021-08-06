@@ -59,22 +59,22 @@ public:
     /*
      * Copies the palette.
      */
-    palette(const palette &pal);
+    palette(const sail::palette &palette);
 
     /*
      * Copies the palette.
      */
-    palette& operator=(const palette &pal);
+    palette& operator=(const sail::palette &palette);
 
     /*
      * Moves the palette.
      */
-    palette(palette &&pal) noexcept;
+    palette(sail::palette &&palette) noexcept;
 
     /*
      * Moves the palette.
      */
-    palette& operator=(palette &&pal);
+    palette& operator=(sail::palette &&palette);
 
     /*
      * Destroys the palette.
