@@ -63,17 +63,17 @@ public:
     /*
      * Copies the write options.
      */
-    write_options& operator=(const write_options &wo);
+    write_options& operator=(const sail::write_options &write_options);
 
     /*
      * Moves the write options.
      */
-    write_options(write_options &&wo) noexcept;
+    write_options(sail::write_options &&write_options) noexcept;
 
     /*
      * Moves the write options.
      */
-    write_options& operator=(write_options &&wo);
+    write_options& operator=(sail::write_options &&write_options);
 
     /*
      * Destroys the write options.
@@ -127,7 +127,7 @@ private:
      * Makes a deep copy of the specified write options and stores the pointer for further use.
      * When the SAIL context gets uninitialized, the pointer becomes dangling.
      */
-    explicit write_options(const sail_write_options *wo);
+    explicit write_options(const sail_write_options *write_options);
 
     sail_status_t to_sail_write_options(sail_write_options *write_options) const;
 

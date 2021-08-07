@@ -34,32 +34,22 @@ class SAIL_HIDDEN write_options::pimpl
 {
 public:
     pimpl()
-        : io_options(0)
-        , compression(SAIL_COMPRESSION_UNSUPPORTED)
-        , compression_level(0)
-    {}
+        : sail_write_options(nullptr)
+    {
+        SAIL_TRY_OR_SUPPRESS(sail_alloc_write_options(&sail_write_options));
+    }
 
-    int io_options;
-    SailCompression compression;
-    double compression_level;
+    ~pimpl()
+    {
+        sail_destroy_write_options(sail_write_options);
+    }
+
+    struct sail_write_options *sail_write_options;
 };
 
 write_options::write_options()
     : d(new pimpl)
 {
-}
-
-write_options::write_options(const sail_write_options *wo)
-    : write_options()
-{
-    if (wo == nullptr) {
-        SAIL_LOG_DEBUG("NULL pointer has been passed to sail::write_options(). The object is untouched");
-        return;
-    }
-
-    with_io_options(wo->io_options)
-        .with_compression(wo->compression)
-        .with_compression_level(wo->compression_level);
 }
 
 write_options::write_options(const write_options &wo)
@@ -68,26 +58,26 @@ write_options::write_options(const write_options &wo)
     *this = wo;
 }
 
-write_options& write_options::operator=(const write_options &wo)
+write_options& write_options::operator=(const sail::write_options &write_options)
 {
-    with_io_options(wo.io_options())
-        .with_compression(wo.compression())
-        .with_compression_level(wo.compression_level());
+    with_io_options(write_options.io_options())
+        .with_compression(write_options.compression())
+        .with_compression_level(write_options.compression_level());
 
     return *this;
 }
 
-write_options::write_options(write_options &&wo) noexcept
+write_options::write_options(sail::write_options &&write_options) noexcept
 {
-    d = wo.d;
-    wo.d = nullptr;
+    d = write_options.d;
+    write_options.d = nullptr;
 }
 
-write_options& write_options::operator=(write_options &&wo)
+write_options& write_options::operator=(sail::write_options &&write_options)
 {
     delete d;
-    d = wo.d;
-    wo.d = nullptr;
+    d = write_options.d;
+    write_options.d = nullptr;
 
     return *this;
 }
@@ -99,44 +89,57 @@ write_options::~write_options()
 
 int write_options::io_options() const
 {
-    return d->io_options;
+    return d->sail_write_options->io_options;
 }
 
 SailCompression write_options::compression() const
 {
-    return d->compression;
+    return d->sail_write_options->compression;
 }
 
 double write_options::compression_level() const
 {
-    return d->compression_level;
+    return d->sail_write_options->compression_level;
 }
 
 write_options& write_options::with_io_options(int io_options)
 {
-    d->io_options = io_options;
+    d->sail_write_options->io_options = io_options;
     return *this;
 }
 
 write_options& write_options::with_compression(SailCompression compression)
 {
-    d->compression = compression;
+    d->sail_write_options->compression = compression;
     return *this;
 }
 
 write_options& write_options::with_compression_level(double compression_level)
 {
-    d->compression_level = compression_level;
+    d->sail_write_options->compression_level = compression_level;
     return *this;
+}
+
+write_options::write_options(const sail_write_options *write_options)
+    : write_options()
+{
+    if (write_options == nullptr) {
+        SAIL_LOG_DEBUG("NULL pointer has been passed to sail::write_options(). The object is untouched");
+        return;
+    }
+
+    with_io_options(write_options->io_options)
+        .with_compression(write_options->compression)
+        .with_compression_level(write_options->compression_level);
 }
 
 sail_status_t write_options::to_sail_write_options(sail_write_options *write_options) const
 {
     SAIL_CHECK_WRITE_OPTIONS_PTR(write_options);
 
-    write_options->io_options        = d->io_options;
-    write_options->compression       = d->compression;
-    write_options->compression_level = d->compression_level;
+    write_options->io_options        = d->sail_write_options->io_options;
+    write_options->compression       = d->sail_write_options->compression;
+    write_options->compression_level = d->sail_write_options->compression_level;
 
     return SAIL_OK;
 }
