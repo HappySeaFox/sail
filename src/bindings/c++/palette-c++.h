@@ -115,7 +115,7 @@ private:
     /*
      * Makes a deep copy of the specified palette.
      */
-    explicit palette(const sail_palette *palette);
+    explicit palette(const sail_palette *pal);
 
     sail_status_t to_sail_palette(sail_palette **palette) const;
 
