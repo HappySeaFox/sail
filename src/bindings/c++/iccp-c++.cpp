@@ -60,30 +60,30 @@ iccp::iccp(const arbitrary_data &data)
     with_data(data);
 }
 
-iccp::iccp(const iccp &ic)
+iccp::iccp(const sail::iccp &ic)
     : iccp()
 {
     *this = ic;
 }
 
-iccp& iccp::operator=(const iccp &ic)
+iccp& iccp::operator=(const sail::iccp &iccp)
 {
-    with_data(ic.data());
+    with_data(iccp.data());
 
     return *this;
 }
 
-iccp::iccp(iccp &&ic) noexcept
+iccp::iccp(sail::iccp &&iccp) noexcept
 {
-    d = ic.d;
-    ic.d = nullptr;
+    d = iccp.d;
+    iccp.d = nullptr;
 }
 
-iccp& iccp::operator=(iccp &&ic)
+iccp& iccp::operator=(sail::iccp &&iccp)
 {
     delete d;
-    d = ic.d;
-    ic.d = nullptr;
+    d = iccp.d;
+    iccp.d = nullptr;
 
     return *this;
 }

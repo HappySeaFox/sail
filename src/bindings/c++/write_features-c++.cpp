@@ -35,26 +35,12 @@ class SAIL_HIDDEN write_features::pimpl
 public:
     pimpl()
         : sail_write_features_c(nullptr)
-        , features(0)
-        , properties(0)
-        , default_compression(SAIL_COMPRESSION_UNSUPPORTED)
-        , compression_level_min(0)
-        , compression_level_max(0)
-        , compression_level_default(0)
-        , compression_level_step(0)
     {}
 
     const sail_write_features *sail_write_features_c;
 
     std::vector<SailPixelFormat> output_pixel_formats;
-    int features;
-    int properties;
     std::vector<SailCompression> compressions;
-    SailCompression default_compression;
-    double compression_level_min;
-    double compression_level_max;
-    double compression_level_default;
-    double compression_level_step;
 };
 
 write_features::write_features(const write_features &wf)
@@ -63,34 +49,26 @@ write_features::write_features(const write_features &wf)
     *this = wf;
 }
 
-write_features& write_features::operator=(const write_features &wf)
+write_features& write_features::operator=(const sail::write_features &write_features)
 {
-    d->sail_write_features_c = wf.d->sail_write_features_c;
-
-    with_output_pixel_formats(wf.output_pixel_formats())
-        .with_features(wf.features())
-        .with_properties(wf.properties())
-        .with_compressions(wf.compressions())
-        .with_default_compression(wf.default_compression())
-        .with_compression_level_min(wf.compression_level_min())
-        .with_compression_level_max(wf.compression_level_max())
-        .with_compression_level_default(wf.compression_level_default())
-        .with_compression_level_step(wf.compression_level_step());
+    d->sail_write_features_c = write_features.d->sail_write_features_c;
+    d->output_pixel_formats  = write_features.d->output_pixel_formats;
+    d->compressions          = write_features.d->compressions;
 
     return *this;
 }
 
-write_features::write_features(write_features &&wf) noexcept
+write_features::write_features(sail::write_features &&write_features) noexcept
 {
-    d = wf.d;
-    wf.d = nullptr;
+    d = write_features.d;
+    write_features.d = nullptr;
 }
 
-write_features& write_features::operator=(write_features &&wf)
+write_features& write_features::operator=(sail::write_features &&write_features)
 {
     delete d;
-    d = wf.d;
-    wf.d = nullptr;
+    d = write_features.d;
+    write_features.d = nullptr;
 
     return *this;
 }
@@ -107,12 +85,12 @@ const std::vector<SailPixelFormat>& write_features::output_pixel_formats() const
 
 int write_features::features() const
 {
-    return d->features;
+    return d->sail_write_features_c->features;
 }
 
 int write_features::properties() const
 {
-    return d->properties;
+    return d->sail_write_features_c->properties;
 }
 
 const std::vector<SailCompression>& write_features::compressions() const
@@ -122,27 +100,27 @@ const std::vector<SailCompression>& write_features::compressions() const
 
 SailCompression write_features::default_compression() const
 {
-    return d->default_compression;
+    return d->sail_write_features_c->default_compression;
 }
 
 double write_features::compression_level_min() const
 {
-    return d->compression_level_min;
+    return d->sail_write_features_c->compression_level_min;
 }
 
 double write_features::compression_level_max() const
 {
-    return d->compression_level_max;
+    return d->sail_write_features_c->compression_level_max;
 }
 
 double write_features::compression_level_default() const
 {
-    return d->compression_level_default;
+    return d->sail_write_features_c->compression_level_default;
 }
 
 double write_features::compression_level_step() const
 {
-    return d->compression_level_step;
+    return d->sail_write_features_c->compression_level_step;
 }
 
 sail_status_t write_features::to_write_options(sail::write_options *write_options) const
@@ -176,89 +154,31 @@ write_features::write_features(const sail_write_features *wf)
 
     d->sail_write_features_c = wf;
 
+    // Output pixel formats
     std::vector<SailPixelFormat> output_pixel_formats;
 
-    if (wf->output_pixel_formats != nullptr && wf->output_pixel_formats_length > 0) {
-        output_pixel_formats.reserve(wf->output_pixel_formats_length);
+    if (d->sail_write_features_c->output_pixel_formats != nullptr && d->sail_write_features_c->output_pixel_formats_length > 0) {
+        output_pixel_formats.reserve(d->sail_write_features_c->output_pixel_formats_length);
 
-        for (unsigned i = 0; i < wf->output_pixel_formats_length; i++) {
-            output_pixel_formats.push_back(wf->output_pixel_formats[i]);
+        for (unsigned i = 0; i < d->sail_write_features_c->output_pixel_formats_length; i++) {
+            output_pixel_formats.push_back(d->sail_write_features_c->output_pixel_formats[i]);
         }
     }
 
+    d->output_pixel_formats = output_pixel_formats;
+
+    // Compressions
     std::vector<SailCompression> compressions;
 
-    if (wf->compressions != nullptr && wf->compressions_length > 0) {
-        compressions.reserve(wf->compressions_length);
+    if (d->sail_write_features_c->compressions != nullptr && d->sail_write_features_c->compressions_length > 0) {
+        compressions.reserve(d->sail_write_features_c->compressions_length);
 
-        for (unsigned i = 0; i < wf->compressions_length; i++) {
-            compressions.push_back(wf->compressions[i]);
+        for (unsigned i = 0; i < d->sail_write_features_c->compressions_length; i++) {
+            compressions.push_back(d->sail_write_features_c->compressions[i]);
         }
     }
 
-    with_output_pixel_formats(output_pixel_formats)
-        .with_features(wf->features)
-        .with_properties(wf->properties)
-        .with_compressions(compressions)
-        .with_default_compression(wf->default_compression)
-        .with_compression_level_min(wf->compression_level_min)
-        .with_compression_level_max(wf->compression_level_max)
-        .with_compression_level_default(wf->compression_level_default)
-        .with_compression_level_step(wf->compression_level_step);
-}
-
-write_features& write_features::with_output_pixel_formats(const std::vector<SailPixelFormat> &output_pixel_formats)
-{
-    d->output_pixel_formats = output_pixel_formats;
-    return *this;
-}
-
-write_features& write_features::with_features(int features)
-{
-    d->features = features;
-    return *this;
-}
-
-write_features& write_features::with_properties(int properties)
-{
-    d->properties = properties;
-    return *this;
-}
-
-write_features& write_features::with_compressions(const std::vector<SailCompression> &compressions)
-{
     d->compressions = compressions;
-    return *this;
-}
-
-write_features& write_features::with_default_compression(SailCompression default_compression)
-{
-    d->default_compression = default_compression;
-    return *this;
-}
-
-write_features& write_features::with_compression_level_min(double compression_level_min)
-{
-    d->compression_level_min = compression_level_min;
-    return *this;
-}
-
-write_features& write_features::with_compression_level_max(double compression_level_max)
-{
-    d->compression_level_max = compression_level_max;
-    return *this;
-}
-
-write_features& write_features::with_compression_level_default(double compression_level_default)
-{
-    d->compression_level_default = compression_level_default;
-    return *this;
-}
-
-write_features& write_features::with_compression_level_step(double compression_level_step)
-{
-    d->compression_level_step = compression_level_step;
-    return *this;
 }
 
 const sail_write_features* write_features::sail_write_features_c() const

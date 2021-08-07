@@ -63,17 +63,17 @@ public:
     /*
      * Copies the write options.
      */
-    write_options& operator=(const write_options &wo);
+    write_options& operator=(const sail::write_options &write_options);
 
     /*
      * Moves the write options.
      */
-    write_options(write_options &&wo) noexcept;
+    write_options(sail::write_options &&write_options) noexcept;
 
     /*
      * Moves the write options.
      */
-    write_options& operator=(write_options &&wo);
+    write_options& operator=(sail::write_options &&write_options);
 
     /*
      * Destroys the write options.

@@ -37,14 +37,15 @@ class SAIL_HIDDEN meta_data::pimpl
 {
 public:
     pimpl()
-        : key(SAIL_META_DATA_UNKNOWN)
-        , value_type(SAIL_META_DATA_TYPE_STRING)
+        : sail_meta_data_node(nullptr)
     {
+        SAIL_TRY_OR_SUPPRESS(sail_alloc_meta_data_node(&sail_meta_data_node));
     }
 
     ~pimpl()
     {
         free();
+        sail_destroy_meta_data_node(sail_meta_data_node);
     }
 
     void free()
@@ -53,9 +54,8 @@ public:
         value_data.clear();
     }
 
-    SailMetaData key;
+    struct sail_meta_data_node *sail_meta_data_node;
     std::string key_unknown;
-    SailMetaDataType value_type;
     std::string value_string;
     arbitrary_data value_data;
 };
@@ -65,42 +65,42 @@ meta_data::meta_data()
 {
 }
 
-meta_data::meta_data(const meta_data &md)
+meta_data::meta_data(const sail::meta_data &md)
     : meta_data()
 {
     *this = md;
 }
 
-meta_data& meta_data::operator=(const meta_data &md)
+meta_data& meta_data::operator=(const sail::meta_data &meta_data)
 {
-    if (md.key() == SAIL_META_DATA_UNKNOWN) {
-        with_key_unknown(md.key_unknown());
+    if (meta_data.key() == SAIL_META_DATA_UNKNOWN) {
+        with_key_unknown(meta_data.key_unknown());
     } else {
-        with_key(md.key());
+        with_key(meta_data.key());
     }
 
-    with_value_type(md.value_type());
+    with_value_type(meta_data.value_type());
 
-    if (md.value_type() == SAIL_META_DATA_TYPE_STRING) {
-        with_value(md.value<std::string>());
+    if (meta_data.value_type() == SAIL_META_DATA_TYPE_STRING) {
+        with_value(meta_data.value<std::string>());
     } else {
-        with_value(md.value<sail::arbitrary_data>());
+        with_value(meta_data.value<sail::arbitrary_data>());
     }
 
     return *this;
 }
 
-meta_data::meta_data(meta_data &&md) noexcept
+meta_data::meta_data(sail::meta_data &&meta_data) noexcept
 {
-    d = md.d;
-    md.d = nullptr;
+    d = meta_data.d;
+    meta_data.d = nullptr;
 }
 
-meta_data& meta_data::operator=(meta_data &&md)
+meta_data& meta_data::operator=(sail::meta_data &&meta_data)
 {
     delete d;
-    d = md.d;
-    md.d = nullptr;
+    d = meta_data.d;
+    meta_data.d = nullptr;
 
     return *this;
 }
@@ -112,7 +112,7 @@ meta_data::~meta_data()
 
 SailMetaData meta_data::key() const
 {
-    return d->key;
+    return d->sail_meta_data_node->key;
 }
 
 const std::string& meta_data::key_unknown() const
@@ -122,21 +122,21 @@ const std::string& meta_data::key_unknown() const
 
 SailMetaDataType meta_data::value_type() const
 {
-    return d->value_type;
+    return d->sail_meta_data_node->value_type;
 }
 
 meta_data& meta_data::with_key(SailMetaData key)
 {
-    d->key         = key;
-    d->key_unknown = std::string();
+    d->sail_meta_data_node->key = key;
+    d->key_unknown              = std::string{};
 
     return *this;
 }
 
 meta_data& meta_data::with_key_unknown(const std::string &key_unknown)
 {
-    d->key         = SAIL_META_DATA_UNKNOWN;
-    d->key_unknown = key_unknown;
+    d->sail_meta_data_node->key = SAIL_META_DATA_UNKNOWN;
+    d->key_unknown              = key_unknown;
 
     return *this;
 }
@@ -145,8 +145,8 @@ meta_data& meta_data::with_value(const std::string_view value)
 {
     d->free();
 
-    d->value_type   = SAIL_META_DATA_TYPE_STRING;
-    d->value_string = value;
+    d->sail_meta_data_node->value_type = SAIL_META_DATA_TYPE_STRING;
+    d->value_string                    = value;
 
     return *this;
 }
@@ -155,8 +155,8 @@ meta_data& meta_data::with_value(const arbitrary_data &value)
 {
     d->free();
 
-    d->value_type = SAIL_META_DATA_TYPE_DATA;
-    d->value_data = value;
+    d->sail_meta_data_node->value_type = SAIL_META_DATA_TYPE_DATA;
+    d->value_data                      = value;
 
     return *this;
 }
@@ -173,31 +173,31 @@ SailMetaData meta_data::meta_data_from_string(const std::string_view str) {
 
 static inline std::string empty_string_on_nullptr(const char *str) {
 
-    return str == nullptr ? std::string() : str;
+    return str == nullptr ? std::string{} : str;
 }
 
-meta_data::meta_data(const sail_meta_data_node *md)
+meta_data::meta_data(const sail_meta_data_node *meta_data_node)
     : meta_data()
 {
-    if (md == nullptr) {
+    if (meta_data_node == nullptr) {
         SAIL_LOG_DEBUG("NULL pointer has been passed to sail::meta_data(). The object is untouched");
         return;
     }
 
-    if (md->key == SAIL_META_DATA_UNKNOWN) {
-        with_key_unknown(empty_string_on_nullptr(md->key_unknown));
+    if (meta_data_node->key == SAIL_META_DATA_UNKNOWN) {
+        with_key_unknown(empty_string_on_nullptr(meta_data_node->key_unknown));
     } else {
-        with_key(md->key);
+        with_key(meta_data_node->key);
     }
 
-    with_value_type(md->value_type);
+    with_value_type(meta_data_node->value_type);
 
-    if (md->value_type == SAIL_META_DATA_TYPE_STRING) {
-        with_value(reinterpret_cast<const char *>(md->value));
+    if (meta_data_node->value_type == SAIL_META_DATA_TYPE_STRING) {
+        with_value(reinterpret_cast<const char *>(meta_data_node->value));
     } else {
         arbitrary_data ad;
-        ad.resize(md->value_length);
-        memcpy(ad.data(), md->value, md->value_length);
+        ad.resize(meta_data_node->value_length);
+        memcpy(ad.data(), meta_data_node->value, meta_data_node->value_length);
         with_value(ad);
     }
 }
@@ -214,47 +214,45 @@ const sail::arbitrary_data& meta_data::value_arbitrary_data() const
 
 meta_data& meta_data::with_value_type(SailMetaDataType type)
 {
-    d->value_type = type;
+    d->sail_meta_data_node->value_type = type;
     return *this;
 }
 
-sail_status_t meta_data::to_sail_meta_data_node(sail_meta_data_node **md) const
+sail_status_t meta_data::to_sail_meta_data_node(sail_meta_data_node **meta_data_node) const
 {
-    SAIL_CHECK_META_DATA_NODE_PTR(md);
+    SAIL_CHECK_META_DATA_NODE_PTR(meta_data_node);
 
-    struct sail_meta_data_node *md_local = nullptr;
-    SAIL_TRY(sail_alloc_meta_data_node(&md_local));
+    struct sail_meta_data_node *meta_data_node_local = nullptr;
+    SAIL_TRY(sail_alloc_meta_data_node(&meta_data_node_local));
 
     SAIL_AT_SCOPE_EXIT(
-        sail_destroy_meta_data_node(md_local);
+        sail_destroy_meta_data_node(meta_data_node_local);
     );
 
-    md_local->key = d->key;
+    meta_data_node_local->key = d->sail_meta_data_node->key;
 
-    if (d->key == SAIL_META_DATA_UNKNOWN) {
-        SAIL_TRY(sail_strdup(d->key_unknown.c_str(), &md_local->key_unknown));
+    if (d->sail_meta_data_node->key == SAIL_META_DATA_UNKNOWN) {
+        SAIL_TRY(sail_strdup(d->key_unknown.c_str(), &meta_data_node_local->key_unknown));
     }
 
-    md_local->value_type = d->value_type;
+    meta_data_node_local->value_type = d->sail_meta_data_node->value_type;
 
-    if (d->value_type == SAIL_META_DATA_TYPE_STRING) {
-        md_local->value_length = d->value_string.length() + 1;
+    if (d->sail_meta_data_node->value_type == SAIL_META_DATA_TYPE_STRING) {
+        meta_data_node_local->value_length = d->value_string.length() + 1;
 
         void *ptr;
-        SAIL_TRY(sail_memdup(d->value_string.c_str(), md_local->value_length, &ptr));
-
-        md_local->value = ptr;
+        SAIL_TRY(sail_memdup(d->value_string.c_str(), meta_data_node_local->value_length, &ptr));
+        meta_data_node_local->value = ptr;
     } else {
-        md_local->value_length = d->value_data.size();
+        meta_data_node_local->value_length = d->value_data.size();
 
         void *ptr;
-        SAIL_TRY(sail_memdup(d->value_data.data(), md_local->value_length, &ptr));
-
-        md_local->value = ptr;
+        SAIL_TRY(sail_memdup(d->value_data.data(), meta_data_node_local->value_length, &ptr));
+        meta_data_node_local->value = ptr;
     }
 
-    *md = md_local;
-    md_local = nullptr;
+    *meta_data_node = meta_data_node_local;
+    meta_data_node_local = nullptr;
 
     return SAIL_OK;
 }

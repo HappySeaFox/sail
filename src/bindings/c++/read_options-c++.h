@@ -63,17 +63,17 @@ public:
     /*
      * Copies the read options.
      */
-    read_options& operator=(const read_options &ro);
+    read_options& operator=(const sail::read_options &read_options);
 
     /*
      * Moves the read options.
      */
-    read_options(read_options &&ro) noexcept;
+    read_options(sail::read_options &&read_options) noexcept;
 
     /*
      * Moves the read options.
      */
-    read_options& operator=(read_options &&ro);
+    read_options& operator=(sail::read_options &&read_options);
 
     /*
      * Destroys the read options.
