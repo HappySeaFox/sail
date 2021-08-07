@@ -60,10 +60,10 @@ iccp::iccp(const arbitrary_data &data)
     with_data(data);
 }
 
-iccp::iccp(const sail::iccp &iccp)
+iccp::iccp(const sail::iccp &ic)
     : iccp()
 {
-    *this = iccp;
+    *this = ic;
 }
 
 iccp& iccp::operator=(const sail::iccp &iccp)

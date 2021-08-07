@@ -69,7 +69,7 @@ public:
     /*
      * Copies the ICC profile.
      */
-    iccp(const sail::iccp &iccp);
+    iccp(const sail::iccp &ic);
 
     /*
      * Copies the ICC profile.
