@@ -38,11 +38,6 @@ static MunitResult test_write_features(const MunitParameter params[], void *user
 
     const sail::codec_info first_codec = codecs.front();
 
-    // Access features
-    {
-        const int features = first_codec.write_features().features();
-    }
-
     // Copy
     {
         const sail::write_features write_features = first_codec.write_features();

@@ -38,11 +38,6 @@ static MunitResult test_read_features(const MunitParameter params[], void *user_
 
     const sail::codec_info first_codec = codecs.front();
 
-    // Access features
-    {
-        const int features = first_codec.read_features().features();
-    }
-
     // Copy
     {
         const sail::read_features read_features = first_codec.read_features();
