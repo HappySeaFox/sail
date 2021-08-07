@@ -63,17 +63,17 @@ public:
     /*
      * Copies the read options.
      */
-    read_options& operator=(const read_options &ro);
+    read_options& operator=(const sail::read_options &read_options);
 
     /*
      * Moves the read options.
      */
-    read_options(read_options &&ro) noexcept;
+    read_options(sail::read_options &&read_options) noexcept;
 
     /*
      * Moves the read options.
      */
-    read_options& operator=(read_options &&ro);
+    read_options& operator=(sail::read_options &&read_options);
 
     /*
      * Destroys the read options.
@@ -95,7 +95,7 @@ private:
      * Makes a deep copy of the specified read options and stores the pointer for further use.
      * When the SAIL context gets uninitialized, the pointer becomes dangling.
      */
-    explicit read_options(const sail_read_options *ro);
+    explicit read_options(const sail_read_options *read_options);
 
     sail_status_t to_sail_read_options(sail_read_options *read_options) const;
 
