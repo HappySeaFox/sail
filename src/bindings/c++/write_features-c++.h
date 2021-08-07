@@ -155,7 +155,7 @@ private:
      * Makes a deep copy of the specified write features and stores the pointer for further use.
      * When the SAIL context gets uninitialized, the pointer becomes dangling.
      */
-    explicit write_features(const sail_write_features *write_features);
+    explicit write_features(const sail_write_features *wf);
 
     const sail_write_features* sail_write_features_c() const;
 

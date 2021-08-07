@@ -97,7 +97,7 @@ private:
      * Makes a deep copy of the specified read features and stores the pointer for further use.
      * When the SAIL context gets uninitialized, the pointer becomes dangling.
      */
-    explicit read_features(const sail_read_features *read_features);
+    explicit read_features(const sail_read_features *rf);
 
     const sail_read_features* sail_read_features_c() const;
 

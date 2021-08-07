@@ -99,15 +99,15 @@ read_features::read_features()
 {
 }
 
-read_features::read_features(const sail_read_features *read_features)
+read_features::read_features(const sail_read_features *rf)
     : read_features()
 {
-    if (read_features == nullptr) {
+    if (rf == nullptr) {
         SAIL_LOG_DEBUG("NULL pointer has been passed to sail::read_features(). The object is untouched");
         return;
     }
 
-    d->sail_read_features_c = read_features;
+    d->sail_read_features_c = rf;
 }
 
 const sail_read_features* read_features::sail_read_features_c() const

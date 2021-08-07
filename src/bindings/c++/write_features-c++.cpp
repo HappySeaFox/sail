@@ -144,24 +144,24 @@ write_features::write_features()
 {
 }
 
-write_features::write_features(const sail_write_features *write_features)
+write_features::write_features(const sail_write_features *wf)
     : write_features()
 {
-    if (write_features == nullptr) {
+    if (wf == nullptr) {
         SAIL_LOG_DEBUG("NULL pointer has been passed to sail::write_features(). The object is untouched");
         return;
     }
 
-    d->sail_write_features_c = write_features;
+    d->sail_write_features_c = wf;
 
     // Output pixel formats
     std::vector<SailPixelFormat> output_pixel_formats;
 
-    if (write_features->output_pixel_formats != nullptr && write_features->output_pixel_formats_length > 0) {
-        output_pixel_formats.reserve(write_features->output_pixel_formats_length);
+    if (d->sail_write_features_c->output_pixel_formats != nullptr && d->sail_write_features_c->output_pixel_formats_length > 0) {
+        output_pixel_formats.reserve(d->sail_write_features_c->output_pixel_formats_length);
 
-        for (unsigned i = 0; i < write_features->output_pixel_formats_length; i++) {
-            output_pixel_formats.push_back(write_features->output_pixel_formats[i]);
+        for (unsigned i = 0; i < d->sail_write_features_c->output_pixel_formats_length; i++) {
+            output_pixel_formats.push_back(d->sail_write_features_c->output_pixel_formats[i]);
         }
     }
 
@@ -170,11 +170,11 @@ write_features::write_features(const sail_write_features *write_features)
     // Compressions
     std::vector<SailCompression> compressions;
 
-    if (write_features->compressions != nullptr && write_features->compressions_length > 0) {
-        compressions.reserve(write_features->compressions_length);
+    if (d->sail_write_features_c->compressions != nullptr && d->sail_write_features_c->compressions_length > 0) {
+        compressions.reserve(d->sail_write_features_c->compressions_length);
 
-        for (unsigned i = 0; i < write_features->compressions_length; i++) {
-            compressions.push_back(write_features->compressions[i]);
+        for (unsigned i = 0; i < d->sail_write_features_c->compressions_length; i++) {
+            compressions.push_back(d->sail_write_features_c->compressions[i]);
         }
     }
 

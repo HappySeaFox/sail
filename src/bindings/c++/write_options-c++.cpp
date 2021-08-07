@@ -120,17 +120,17 @@ write_options& write_options::with_compression_level(double compression_level)
     return *this;
 }
 
-write_options::write_options(const sail_write_options *write_options)
+write_options::write_options(const sail_write_options *wo)
     : write_options()
 {
-    if (write_options == nullptr) {
+    if (wo == nullptr) {
         SAIL_LOG_DEBUG("NULL pointer has been passed to sail::write_options(). The object is untouched");
         return;
     }
 
-    with_io_options(write_options->io_options)
-        .with_compression(write_options->compression)
-        .with_compression_level(write_options->compression_level);
+    with_io_options(wo->io_options)
+        .with_compression(wo->compression)
+        .with_compression_level(wo->compression_level);
 }
 
 sail_status_t write_options::to_sail_write_options(sail_write_options *write_options) const

@@ -95,15 +95,15 @@ read_options& read_options::with_io_options(int io_options)
     return *this;
 }
 
-read_options::read_options(const sail_read_options *read_options)
+read_options::read_options(const sail_read_options *ro)
     : read_options()
 {
-    if (read_options == nullptr) {
+    if (ro == nullptr) {
         SAIL_LOG_DEBUG("NULL pointer has been passed to sail::read_options(). The object is untouched");
         return;
     }
 
-    with_io_options(read_options->io_options);
+    with_io_options(ro->io_options);
 }
 
 sail_status_t read_options::to_sail_read_options(sail_read_options *read_options) const

@@ -95,7 +95,7 @@ private:
      * Makes a deep copy of the specified read options and stores the pointer for further use.
      * When the SAIL context gets uninitialized, the pointer becomes dangling.
      */
-    explicit read_options(const sail_read_options *read_options);
+    explicit read_options(const sail_read_options *ro);
 
     sail_status_t to_sail_read_options(sail_read_options *read_options) const;
 
