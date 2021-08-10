@@ -101,6 +101,7 @@ static MunitResult test_data_to_hex_string(const MunitParameter params[], void *
     (void)user_data;
 
     char *str;
+    void *ptr;
 
     {
         str = NULL;
@@ -124,7 +125,8 @@ static MunitResult test_data_to_hex_string(const MunitParameter params[], void *
 
     {
         const char *data = "abc";
-        munit_assert(sail_malloc(3*2+1, &str) == SAIL_OK);
+        munit_assert(sail_malloc(3*2+1, &ptr) == SAIL_OK);
+        str = ptr;
         munit_assert(sail_data_into_hex_string(data, strlen(data), str) == SAIL_OK);
         munit_assert(strlen(str) == 3*2);
         munit_assert_string_equal(str, "616263");
@@ -133,7 +135,8 @@ static MunitResult test_data_to_hex_string(const MunitParameter params[], void *
 
     {
         const char *data = "\nA\n";
-        munit_assert(sail_malloc(3*2+1, &str) == SAIL_OK);
+        munit_assert(sail_malloc(3*2+1, &ptr) == SAIL_OK);
+        str = ptr;
         munit_assert(sail_data_into_hex_string(data, strlen(data), str) == SAIL_OK);
         munit_assert(strlen(str) == 3*2);
         munit_assert_string_equal(str, "0A410A");

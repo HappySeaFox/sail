@@ -82,6 +82,7 @@ static sail_status_t write_raw_profile_header(char *str, size_t str_size, enum S
 #ifdef SAIL_WIN32
     if (sprintf_s(str, str_size, "\n%s\n    %u\n", key_str, (unsigned)hex_data_length) < 0) {
 #else
+    (void)str_size;
     if (sprintf(str, "\n%s\n    %u\n", key_str, (unsigned)hex_data_length) < 0) {
 #endif
         SAIL_LOG_ERROR("PNG: Failed to write raw profile header");

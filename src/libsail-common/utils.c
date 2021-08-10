@@ -1143,8 +1143,9 @@ sail_status_t sail_hex_string_to_data(const char *str, void **data, size_t *data
 
     const size_t str_length = strlen(str);
 
-    unsigned char *data_local;
-    SAIL_TRY(sail_malloc(str_length / 2, &data_local));
+    void *ptr;
+    SAIL_TRY(sail_malloc(str_length / 2, &ptr));
+    unsigned char *data_local = ptr;
 
     size_t data_saved;
     SAIL_TRY_OR_CLEANUP(hex_string_into_data(str, data_local, &data_saved),
@@ -1183,8 +1184,9 @@ sail_status_t sail_data_to_hex_string(const void *data, size_t data_size, char *
     SAIL_CHECK_BUFFER_PTR(data);
     SAIL_CHECK_STRING_PTR(str);
 
-    char *str_local;
-    SAIL_TRY(sail_malloc(data_size * 2 + 1, &str_local));
+    void *ptr;
+    SAIL_TRY(sail_malloc(data_size * 2 + 1, &ptr));
+    char *str_local = ptr;
 
     SAIL_TRY_OR_CLEANUP(sail_data_into_hex_string(data, data_size, str_local),
                         /* cleanup */ sail_free(str_local));
