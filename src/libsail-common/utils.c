@@ -49,23 +49,19 @@
  * Private functions.
  */
 
-static sail_status_t hex_string_into_data(const char *str, size_t str_length, void *data, size_t *data_saved) {
-
-    if (str_length % 2 != 0) {
-        SAIL_LOG_ERROR("HEX-encoded string must have even length");
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
-    }
+static sail_status_t hex_string_into_data(const char *str, void *data, size_t *data_saved) {
 
     unsigned char *data_local = data;
     *data_saved = 0;
     unsigned byte;
+    int bytes_consumed;
 
 #ifdef SAIL_WIN32
-    while (sscanf_s(str, "%02x", &byte) == 1) {
+    while (sscanf_s(str, "%02x%n", &byte, &bytes_consumed) == 1) {
 #else
-    while (sscanf(str, "%02x", &byte) == 1) {
+    while (sscanf(str, "%02x%n", &byte, &bytes_consumed) == 1) {
 #endif
-        str += 2;
+        str += bytes_consumed;
         data_local[(*data_saved)++] = (unsigned char)byte;
     }
 
@@ -1133,10 +1129,8 @@ sail_status_t sail_hex_string_into_data(const char *str, void *data) {
     SAIL_CHECK_STRING_PTR(str);
     SAIL_CHECK_BUFFER_PTR(data);
 
-    const size_t str_length = strlen(str);
-
     size_t data_saved;
-    SAIL_TRY(hex_string_into_data(str, str_length, data, &data_saved));
+    SAIL_TRY(hex_string_into_data(str, data, &data_saved));
 
     return SAIL_OK;
 }
@@ -1153,7 +1147,7 @@ sail_status_t sail_hex_string_to_data(const char *str, void **data, size_t *data
     SAIL_TRY(sail_malloc(str_length / 2, &data_local));
 
     size_t data_saved;
-    SAIL_TRY_OR_CLEANUP(hex_string_into_data(str, str_length, data_local, &data_saved),
+    SAIL_TRY_OR_CLEANUP(hex_string_into_data(str, data_local, &data_saved),
                         /* cleanup */ sail_free(data_local));
 
     *data = data_local;
