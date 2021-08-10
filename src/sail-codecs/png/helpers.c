@@ -258,10 +258,7 @@ sail_status_t png_private_fetch_meta_data(png_structp png_ptr, png_infop info_pt
     SAIL_CHECK_PTR(info_ptr);
     SAIL_CHECK_PTR(target_meta_data_node);
 
-#if defined PNG_TEXT_SUPPORTED || defined PNG_eXIf_SUPPORTED
     struct sail_meta_data_node **last_meta_data_node = target_meta_data_node;
-
-#ifdef PNG_TEXT_SUPPORTED
     png_textp lines;
     int num_text;
 
@@ -296,9 +293,7 @@ sail_status_t png_private_fetch_meta_data(png_structp png_ptr, png_infop info_pt
         *last_meta_data_node = meta_data_node;
         last_meta_data_node = &meta_data_node->next;
     }
-#endif
 
-#ifdef PNG_eXIf_SUPPORTED
     png_bytep exif;
     png_uint_32 exif_length;
 
@@ -310,8 +305,6 @@ sail_status_t png_private_fetch_meta_data(png_structp png_ptr, png_infop info_pt
         *last_meta_data_node = meta_data_node;
         last_meta_data_node = &meta_data_node->next;
     }
-#endif
-#endif
 
     return SAIL_OK;
 }
@@ -321,20 +314,13 @@ sail_status_t png_private_write_meta_data(png_structp png_ptr, png_infop info_pt
     SAIL_CHECK_PTR(png_ptr);
     SAIL_CHECK_PTR(info_ptr);
 
-#if defined PNG_TEXT_SUPPORTED || defined PNG_eXIf_SUPPORTED
     const struct sail_meta_data_node *first_meta_data_node = meta_data_node;
 
-#ifdef PNG_TEXT_SUPPORTED
-    int count = 0;
-
     /* Count PNG lines. */
-    while (meta_data_node != NULL) {
-        if (meta_data_node->value_type == SAIL_META_DATA_TYPE_STRING) {
-            count++;
-        } else {
-            SAIL_LOG_WARNING("PNG: Binary key '%s' is ignored as only string keys are supported by this codec", sail_meta_data_to_string(meta_data_node->key));
-        }
+    unsigned count = 0;
 
+    while (meta_data_node != NULL) {
+        count++;
         meta_data_node = meta_data_node->next;
     }
 
@@ -343,36 +329,66 @@ sail_status_t png_private_write_meta_data(png_structp png_ptr, png_infop info_pt
         SAIL_TRY(sail_malloc(count * sizeof(png_text), &ptr));
         png_text *lines = ptr;
 
-        int index = 0;
+        /* Indexes in 'lines' that must be freed. 1 = free, 0 = don't free. */
+        SAIL_TRY(sail_malloc(count * sizeof(bool), &ptr));
+        int *lines_to_free = ptr;
+        memset(lines_to_free, 0, count);
+
+        unsigned index = 0;
 
         /* Go back to the list head. */
         meta_data_node = first_meta_data_node;
 
         /* Build PNG lines. */
         while (meta_data_node != NULL) {
-            const char *meta_data_str = NULL;
-
-            if (meta_data_node->value_type == SAIL_META_DATA_TYPE_STRING) {
-                if (meta_data_node->key == SAIL_META_DATA_UNKNOWN) {
-                    meta_data_str = meta_data_node->key_unknown;
+            if (meta_data_node->key == SAIL_META_DATA_EXIF) {
+                if (meta_data_node->value_type == SAIL_META_DATA_TYPE_DATA) {
+                    /* Skip "Exif\0\0" if any. */
+                    if (memcmp(meta_data_node->value, "Exif", 4) == 0) {
+                        SAIL_LOG_DEBUG("PNG: Writing raw EXIF %u bytes long w/o header", (unsigned)meta_data_node->value_length - 6);
+                        png_set_eXIf_1(png_ptr, info_ptr, (png_uint_32)meta_data_node->value_length-6, ((png_bytep)meta_data_node->value)+6);
+                    } else {
+                        SAIL_LOG_DEBUG("PNG: Writing raw EXIF %u bytes long", (unsigned)meta_data_node->value_length);
+                        png_set_eXIf_1(png_ptr, info_ptr, (png_uint_32)meta_data_node->value_length, meta_data_node->value);
+                    }
                 } else {
-                    /* Legacy EXIF and friends. */
-                    switch (meta_data_node->key) {
-#if 0
-                        case SAIL_META_DATA_HEX_EXIF: meta_data_str = "Raw profile type exif"; break;
-                        case SAIL_META_DATA_HEX_IPTC: meta_data_str = "Raw profile type iptc"; break;
-                        case SAIL_META_DATA_HEX_XMP:  meta_data_str = "Raw profile type xmp";  break;
-                        case SAIL_META_DATA_XMP:      meta_data_str = "XML:com.adobe.xmp";     break;
-#endif
-                        default: {
-                            meta_data_str = sail_meta_data_to_string(meta_data_node->key);
-                        }
+                    SAIL_LOG_ERROR("PNG: EXIF meta data must have DATA type");
+                }
+            } else {
+                const char *meta_data_key = NULL;
+                char *meta_data_value = NULL;
+
+                if (meta_data_node->key == SAIL_META_DATA_UNKNOWN) {
+                    meta_data_key = meta_data_node->key_unknown;
+                    meta_data_value = (char *)meta_data_node->value;
+                } else {
+                    if (meta_data_node->key == SAIL_META_DATA_IPTC) {
+                        meta_data_key = "Raw profile type iptc";
+
+                        char raw_profile_header[64];
+                        SAIL_TRY_OR_EXECUTE(write_raw_profile_header(raw_profile_header,
+                                                                        sizeof(raw_profile_header),
+                                                                        meta_data_node->key,
+                                                                        (meta_data_node->value_length - 1) * 2),
+                                            /* on error */ meta_data_node = meta_data_node->next; continue);
+
+                        char *hex_string;
+                        SAIL_TRY_OR_EXECUTE(sail_data_to_hex_string(meta_data_node->value, meta_data_node->value_length, &hex_string),
+                                            /* on error */ meta_data_node = meta_data_node->next; continue);
+
+                        SAIL_TRY_OR_EXECUTE(sail_concat(&meta_data_value, 2, raw_profile_header, hex_string),
+                                            /* on error */ sail_free(hex_string); meta_data_node = meta_data_node->next; continue);
+
+                        lines_to_free[index] = 1;
+                    } else {
+                        meta_data_key = sail_meta_data_to_string(meta_data_node->key);
+                        meta_data_value = (char *)meta_data_node->value;
                     }
                 }
 
                 lines[index].compression = PNG_TEXT_COMPRESSION_zTXt;
-                lines[index].key         = (char *)meta_data_str;
-                lines[index].text        = (char *)meta_data_node->value;
+                lines[index].key         = (char *)meta_data_key;
+                lines[index].text        = meta_data_value;
 
                 index++;
             }
@@ -380,37 +396,18 @@ sail_status_t png_private_write_meta_data(png_structp png_ptr, png_infop info_pt
             meta_data_node = meta_data_node->next;
         }
 
-        png_set_text(png_ptr, info_ptr, lines, count);
+        png_set_text(png_ptr, info_ptr, lines, index);
+
+        /* Cleanup. */
+        for (unsigned i = 0; i < index; i++) {
+            if (lines_to_free[i] == 1) {
+                sail_free(lines[i].text);
+            }
+        }
+
+        sail_free(lines_to_free);
         sail_free(lines);
     }
-#endif
-
-#ifdef PNG_eXIf_SUPPORTED
-    /* Go back to the list head and look for EXIF. */
-    meta_data_node = first_meta_data_node;
-    bool exif_found = false;
-
-    while (meta_data_node != NULL) {
-        if (exif_found) {
-            break;
-        }
-
-        switch (meta_data_node->key) {
-            case SAIL_META_DATA_EXIF: {
-                png_set_eXIf_1(png_ptr, info_ptr, (png_uint_32)meta_data_node->value_length, (png_bytep)meta_data_node->value);
-                exif_found = true;
-                break;
-            }
-
-            default: {
-                break;
-            }
-        }
-
-        meta_data_node = meta_data_node->next;
-    }
-#endif
-#endif
 
     return SAIL_OK;
 }
