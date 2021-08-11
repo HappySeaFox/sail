@@ -45,6 +45,33 @@
 
 #include "sail-common.h"
 
+/*
+ * Private functions.
+ */
+
+static sail_status_t hex_string_into_data(const char *str, void *data, size_t *data_saved) {
+
+    unsigned char *data_local = data;
+    *data_saved = 0;
+    unsigned byte;
+    int bytes_consumed;
+
+#ifdef SAIL_WIN32
+    while (sscanf_s(str, "%02x%n", &byte, &bytes_consumed) == 1) {
+#else
+    while (sscanf(str, "%02x%n", &byte, &bytes_consumed) == 1) {
+#endif
+        str += bytes_consumed;
+        data_local[(*data_saved)++] = (unsigned char)byte;
+    }
+
+    return SAIL_OK;
+}
+
+/*
+ * Public functions.
+ */
+
 sail_status_t sail_memdup(const void *input, size_t input_size, void **output) {
 
     if (input == NULL) {
@@ -542,9 +569,7 @@ const char* sail_meta_data_to_string(enum SailMetaData meta_data) {
         case SAIL_META_DATA_DISCLAIMER:    return "Disclaimer";
         case SAIL_META_DATA_DOCUMENT:      return "Document";
         case SAIL_META_DATA_EXIF:          return "EXIF";
-        case SAIL_META_DATA_HEX_EXIF:      return "Hex EXIF";
-        case SAIL_META_DATA_HEX_IPTC:      return "Hex IPTC";
-        case SAIL_META_DATA_HEX_XMP:       return "Hex XMP";
+        case SAIL_META_DATA_IPTC:          return "IPTC";
         case SAIL_META_DATA_LABEL:         return "Label";
         case SAIL_META_DATA_MAKE:          return "Make";
         case SAIL_META_DATA_MODEL:         return "Model";
@@ -580,9 +605,7 @@ enum SailMetaData sail_meta_data_from_string(const char *str) {
         case UINT64_C(8244735206874071778):  return SAIL_META_DATA_DISCLAIMER;
         case UINT64_C(7570930199009348):     return SAIL_META_DATA_DOCUMENT;
         case UINT64_C(6384018865):           return SAIL_META_DATA_EXIF;
-        case UINT64_C(7571088477688630):     return SAIL_META_DATA_HEX_EXIF;
-        case UINT64_C(7571088477824026):     return SAIL_META_DATA_HEX_IPTC;
-        case UINT64_C(229426923586655):      return SAIL_META_DATA_HEX_XMP;
+        case UINT64_C(6384154261):           return SAIL_META_DATA_IPTC;
         case UINT64_C(210681275781):         return SAIL_META_DATA_LABEL;
         case UINT64_C(6384317315):           return SAIL_META_DATA_MAKE;
         case UINT64_C(210682966998):         return SAIL_META_DATA_MODEL;
@@ -1097,6 +1120,78 @@ sail_status_t sail_file_contents_to_data(const char *path, void **data, size_t *
 
     *data = data_local;
     *data_size = size;
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_hex_string_into_data(const char *str, void *data) {
+
+    SAIL_CHECK_STRING_PTR(str);
+    SAIL_CHECK_BUFFER_PTR(data);
+
+    size_t data_saved;
+    SAIL_TRY(hex_string_into_data(str, data, &data_saved));
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_hex_string_to_data(const char *str, void **data, size_t *data_size) {
+
+    SAIL_CHECK_STRING_PTR(str);
+    SAIL_CHECK_BUFFER_PTR(data);
+    SAIL_CHECK_PTR(data_size);
+
+    const size_t str_length = strlen(str);
+
+    void *ptr;
+    SAIL_TRY(sail_malloc(str_length / 2, &ptr));
+    unsigned char *data_local = ptr;
+
+    size_t data_saved;
+    SAIL_TRY_OR_CLEANUP(hex_string_into_data(str, data_local, &data_saved),
+                        /* cleanup */ sail_free(data_local));
+
+    *data = data_local;
+    *data_size = data_saved;
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_data_into_hex_string(const void *data, size_t data_size, char *str) {
+
+    SAIL_CHECK_BUFFER_PTR(data);
+    SAIL_CHECK_STRING_PTR(str);
+
+    char *str_local_copy = str;
+
+    const unsigned char *data_local = data;
+    size_t data_local_index = 0;
+
+    for (size_t i = 0; i < data_size; i++) {
+#ifdef SAIL_WIN32
+        sprintf_s(str_local_copy, SIZE_MAX, "%02X", data_local[data_local_index++]);
+#else
+        sprintf(str_local_copy, "%02X", data_local[data_local_index++]);
+#endif
+        str_local_copy += 2;
+    }
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_data_to_hex_string(const void *data, size_t data_size, char **str) {
+
+    SAIL_CHECK_BUFFER_PTR(data);
+    SAIL_CHECK_STRING_PTR(str);
+
+    void *ptr;
+    SAIL_TRY(sail_malloc(data_size * 2 + 1, &ptr));
+    char *str_local = ptr;
+
+    SAIL_TRY_OR_CLEANUP(sail_data_into_hex_string(data, data_size, str_local),
+                        /* cleanup */ sail_free(str_local));
+
+    *str = str_local;
 
     return SAIL_OK;
 }

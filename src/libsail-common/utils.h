@@ -309,6 +309,40 @@ SAIL_EXPORT sail_status_t sail_file_contents_into_data(const char *path, void *d
  */
 SAIL_EXPORT sail_status_t sail_file_contents_to_data(const char *path, void **data, size_t *data_size);
 
+/*
+ * Decodes the specified HEX-encoded string into the specified memory buffer.
+ * The memory buffer must be large enough. Every encoded byte must be in form of two HEX characters.
+ * For example: 04 or 5A. Skips any white spaces.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_hex_string_into_data(const char *str, void *data);
+
+/*
+ * Allocates a memory buffer and decodes the specified HEX-encoded string into it.
+ * Every encoded byte must be in form of two HEX characters. For example: 04 or 5A.
+ * Skips any white spaces. The size of the decoded block is stored in 'data_size'.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_hex_string_to_data(const char *str, void **data, size_t *data_size);
+
+/*
+ * Encodes the specified memory buffer into the HEX-encoded string. The string must be large enough.
+ * Every encoded byte will be in form of two HEX characters. For example: 04 or 5A.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_data_into_hex_string(const void *data, size_t data_size, char *str);
+
+/*
+ * Allocates a string and HEX-encodes the specified memory buffer into it.
+ * Every encoded byte will be in form of two HEX characters. For example: 04 or 5A.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_data_to_hex_string(const void *data, size_t data_size, char **str);
+
 /* extern "C" */
 #ifdef __cplusplus
 }
