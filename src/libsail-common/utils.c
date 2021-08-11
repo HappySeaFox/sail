@@ -942,8 +942,8 @@ sail_status_t sail_print_errno(const char *format) {
 uint64_t sail_now(void) {
 
 #ifdef SAIL_WIN32
-    SAIL_THREAD_LOCAL static bool initialized = false;
-    SAIL_THREAD_LOCAL static double frequency = 0;
+    static SAIL_THREAD_LOCAL bool initialized = false;
+    static SAIL_THREAD_LOCAL double frequency = 0;
 
     LARGE_INTEGER li;
 

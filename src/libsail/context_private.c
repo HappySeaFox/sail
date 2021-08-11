@@ -95,8 +95,8 @@ static sail_status_t get_sail_dll_path(char *dll_path, int dll_path_size) {
 #ifndef SAIL_COMBINE_CODECS
 static const char* sail_codecs_path_env(void) {
 
-    SAIL_THREAD_LOCAL static bool codecs_path_env_called = false;
-    SAIL_THREAD_LOCAL static const char *env = NULL;
+    static SAIL_THREAD_LOCAL bool codecs_path_env_called = false;
+    static SAIL_THREAD_LOCAL const char *env = NULL;
 
     if (codecs_path_env_called) {
         return env;
@@ -116,8 +116,8 @@ static const char* sail_codecs_path_env(void) {
 
 static const char* client_codecs_path(void) {
 
-    SAIL_THREAD_LOCAL static bool codecs_path_called = false;
-    SAIL_THREAD_LOCAL static const char *env = NULL;
+    static SAIL_THREAD_LOCAL bool codecs_path_called = false;
+    static SAIL_THREAD_LOCAL const char *env = NULL;
 
     if (codecs_path_called) {
         return env;
@@ -487,8 +487,8 @@ static sail_status_t init_context_impl(struct sail_context *context) {
 #else /* SAIL_COMBINE_CODECS=OFF. */
 static const char* sail_codecs_path(void) {
 
-    SAIL_THREAD_LOCAL static bool codecs_path_called = false;
-    SAIL_THREAD_LOCAL static const char *path = NULL;
+    static SAIL_THREAD_LOCAL bool codecs_path_called = false;
+    static SAIL_THREAD_LOCAL const char *path = NULL;
 
     if (codecs_path_called) {
         return path;
@@ -638,7 +638,7 @@ static sail_status_t init_context(struct sail_context *context, int flags) {
 
 sail_status_t control_tls_context(struct sail_context **context, enum SailContextAction action) {
 
-    SAIL_THREAD_LOCAL static struct sail_context *tls_context = NULL;
+    static SAIL_THREAD_LOCAL struct sail_context *tls_context = NULL;
 
     switch (action) {
         case SAIL_CONTEXT_ALLOCATE: {

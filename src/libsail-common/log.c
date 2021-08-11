@@ -72,8 +72,8 @@ static sail_logger sail_external_logger = NULL;
 
 static bool check_ansi_colors_supported(void) {
 
-    SAIL_THREAD_LOCAL static bool ansi_colors_supported_called = false;
-    SAIL_THREAD_LOCAL static bool ansi_colors_supported = false;
+    static SAIL_THREAD_LOCAL bool ansi_colors_supported_called = false;
+    static SAIL_THREAD_LOCAL bool ansi_colors_supported = false;
 
     if (ansi_colors_supported_called) {
         return ansi_colors_supported;
