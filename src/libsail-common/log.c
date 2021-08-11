@@ -44,7 +44,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "log.h"
+#include "sail-common.h"
 
 /* ANSI terminal color escapes. */
 #define SAIL_COLOR_RED          "\033[0;31m"
@@ -91,6 +91,11 @@ static bool check_ansi_colors_supported(void) {
          * See https://docs.microsoft.com/ru-ru/windows/win32/sysinfo/targeting-your-application-at-windows-8-1
          */
         #ifdef SAIL_WIN32
+            /* MinGW 8.1 in particular doesn't define this flag. */
+            #ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
+            #define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
+            #endif
+
             if (IsWindows10OrGreater()) {
                 HANDLE stderrHandle = GetStdHandle(SAIL_LOG_STD_HANDLE);
                 DWORD consoleMode;

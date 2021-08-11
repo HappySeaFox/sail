@@ -34,26 +34,18 @@ class SAIL_HIDDEN source_image::pimpl
 {
 public:
     pimpl()
-        : source_image(nullptr)
+        : sail_source_image(nullptr)
     {
-        SAIL_TRY_OR_SUPPRESS(init());
+        SAIL_TRY_OR_SUPPRESS(sail_alloc_source_image(&sail_source_image));
     }
 
     ~pimpl()
     {
-        sail_destroy_source_image(source_image);
-    }
-
-private:
-    sail_status_t init()
-    {
-        SAIL_TRY(sail_alloc_source_image(&source_image));
-
-        return SAIL_OK;
+        sail_destroy_source_image(sail_source_image);
     }
 
 public:
-    sail_source_image *source_image;
+    struct sail_source_image *sail_source_image;
 };
 
 source_image::source_image()
@@ -99,27 +91,27 @@ source_image::~source_image()
 
 bool source_image::is_valid() const
 {
-    return d->source_image != nullptr;
+    return d->sail_source_image != nullptr;
 }
 
 SailPixelFormat source_image::pixel_format() const
 {
-    return d->source_image->pixel_format;
+    return d->sail_source_image->pixel_format;
 }
 
 SailChromaSubsampling source_image::chroma_subsampling() const
 {
-    return d->source_image->chroma_subsampling;
+    return d->sail_source_image->chroma_subsampling;
 }
 
 int source_image::properties() const
 {
-    return d->source_image->properties;
+    return d->sail_source_image->properties;
 }
 
 SailCompression source_image::compression() const
 {
-    return d->source_image->compression;
+    return d->sail_source_image->compression;
 }
 
 source_image::source_image(const sail_source_image *si)
@@ -142,32 +134,32 @@ sail_status_t source_image::to_sail_source_image(sail_source_image **source_imag
 
     SAIL_TRY(sail_alloc_source_image(source_image));
 
-    **source_image = *d->source_image;
+    **source_image = *d->sail_source_image;
 
     return SAIL_OK;
 }
 
 source_image& source_image::with_pixel_format(SailPixelFormat pixel_format)
 {
-    d->source_image->pixel_format = pixel_format;
+    d->sail_source_image->pixel_format = pixel_format;
     return *this;
 }
 
 source_image& source_image::with_chroma_subsampling(SailChromaSubsampling chroma_subsampling)
 {
-    d->source_image->chroma_subsampling = chroma_subsampling;
+    d->sail_source_image->chroma_subsampling = chroma_subsampling;
     return *this;
 }
 
 source_image& source_image::with_properties(int properties)
 {
-    d->source_image->properties = properties;
+    d->sail_source_image->properties = properties;
     return *this;
 }
 
 source_image& source_image::with_compression(SailCompression compression)
 {
-    d->source_image->compression = compression;
+    d->sail_source_image->compression = compression;
     return *this;
 }
 

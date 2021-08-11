@@ -94,17 +94,17 @@ public:
     /*
      * Copies the image.
      */
-    image& operator=(const image &img);
+    image& operator=(const sail::image &image);
 
     /*
      * Moves the image.
      */
-    image(image &&img) noexcept;
+    image(sail::image &&image) noexcept;
 
     /*
      * Moves the image.
      */
-    image& operator=(image &&img);
+    image& operator=(sail::image &&image);
 
     /*
      * Destroys the image and the deep copied pixel data.
@@ -279,7 +279,7 @@ public:
     /*
      * Sets a new resolution.
      */
-    image& with_resolution(const sail::resolution &res);
+    image& with_resolution(const sail::resolution &resolution);
 
     /*
      * Sets a new pixel format. See SailPixelFormat.
@@ -294,12 +294,12 @@ public:
     /*
      * Sets a new palette.
      */
-    image& with_palette(const sail::palette &pal);
+    image& with_palette(const sail::palette &palette);
 
     /*
      * Sets new meta data.
      */
-    image& with_meta_data(const std::vector<sail::meta_data> &md);
+    image& with_meta_data(const std::vector<sail::meta_data> &meta_data);
 
     /*
      * Deep copies the specified pixel data. The data can be accessed later with pixels().
@@ -334,7 +334,7 @@ public:
     /*
      * Sets a new ICC profile.
      */
-    image& with_iccp(const sail::iccp &ic);
+    image& with_iccp(const sail::iccp &iccp);
 
     /*
      * Replaces the image with the image from the specified file path. Reads just a single frame
@@ -410,7 +410,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t convert(const write_features &wf);
+    sail_status_t convert(const sail::write_features &write_features);
 
     /*
      * Converts the image to the best pixel format for saving using the specified conversion options.
@@ -426,7 +426,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t convert(const write_features &wf, const conversion_options &options);
+    sail_status_t convert(const sail::write_features &write_features, const conversion_options &options);
 
     /*
      * Converts the image to the specified pixel format and assigns the resulting image to the 'image' argument.
@@ -477,7 +477,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t convert_to(const write_features &wf, sail::image *image) const;
+    sail_status_t convert_to(const sail::write_features &write_features, sail::image *image) const;
 
     /*
      * Converts the image to the best pixel format for saving using the specified conversion options
@@ -492,7 +492,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t convert_to(const write_features &wf, const conversion_options &options, sail::image *image) const;
+    sail_status_t convert_to(const sail::write_features &write_features, const conversion_options &options, sail::image *image) const;
 
     /*
      * Converts the image to the specified pixel format and returns the resulting image.
@@ -543,7 +543,7 @@ public:
      *
      * Returns an invalid image on error.
      */
-    image convert_to(const write_features &wf) const;
+    image convert_to(const sail::write_features &write_features) const;
 
     /*
      * Converts the image to the best pixel format for saving using the specified conversion options
@@ -558,7 +558,7 @@ public:
      *
      * Returns an invalid image on error.
      */
-    image convert_to(const write_features &wf, const conversion_options &options) const;
+    image convert_to(const sail::write_features &write_features, const conversion_options &options) const;
 
     /*
      * Returns the closest pixel format from the list.
@@ -576,7 +576,7 @@ public:
      *
      * Returns SAIL_PIXEL_FORMAT_UNKNOWN if no candidates found at all.
      */
-    SailPixelFormat closest_pixel_format(const write_features &wf) const;
+    SailPixelFormat closest_pixel_format(const sail::write_features &write_features) const;
 
     /*
      * Returns true if the conversion or updating functions can convert or update from the input
@@ -600,7 +600,7 @@ public:
      *
      * Returns SAIL_PIXEL_FORMAT_UNKNOWN if no candidates found at all.
      */
-    static SailPixelFormat closest_pixel_format(SailPixelFormat input_pixel_format, const write_features &wf);
+    static SailPixelFormat closest_pixel_format(SailPixelFormat input_pixel_format, const sail::write_features &write_features);
 
     /*
      * Calculates the number of bits per pixel in the specified pixel format.
@@ -706,7 +706,7 @@ private:
     sail_status_t to_sail_image(sail_image **image) const;
 
     image& with_properties(int properties);
-    image& with_source_image(const sail::source_image &si);
+    image& with_source_image(const sail::source_image &source_image);
 
 private:
     class pimpl;

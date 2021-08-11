@@ -302,7 +302,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_png(void *state, st
                                                                &png_state->scanline_for_skipping),
                                 /* cleanup */ sail_destroy_image(image_local));
 
-            png_state->skipped_hidden = true;
             png_state->frames--;
 
             /* We have just a single frame left - continue to reading scan lines. */
@@ -314,41 +313,41 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_png(void *state, st
                 sail_destroy_image(image_local);
                 SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
             }
-        } else {
-            png_state->skipped_hidden = true;
-            png_read_frame_head(png_state->png_ptr, png_state->info_ptr);
-
-            if (png_get_valid(png_state->png_ptr, png_state->info_ptr, PNG_INFO_fcTL) != 0) {
-                png_get_next_frame_fcTL(png_state->png_ptr, png_state->info_ptr,
-                                        &png_state->next_frame_width, &png_state->next_frame_height,
-                                        &png_state->next_frame_x_offset, &png_state->next_frame_y_offset,
-                                        &png_state->next_frame_delay_num, &png_state->next_frame_delay_den,
-                                        &png_state->next_frame_dispose_op, &png_state->next_frame_blend_op);
-            } else {
-                png_state->next_frame_width      = image_local->width;
-                png_state->next_frame_height     = image_local->height;
-                png_state->next_frame_x_offset   = 0;
-                png_state->next_frame_y_offset   = 0;
-                png_state->next_frame_dispose_op = PNG_DISPOSE_OP_BACKGROUND;
-                png_state->next_frame_blend_op   = PNG_BLEND_OP_SOURCE;
-            }
-
-            if (png_state->next_frame_width + png_state->next_frame_x_offset > image_local->width ||
-                    png_state->next_frame_height + png_state->next_frame_y_offset > image_local->height) {
-                sail_destroy_image(image_local);
-                SAIL_LOG_ERROR("PNG: Frame (%u,%u %ux%u) doesn't fit into the image (%ux%u)",
-                                png_state->next_frame_x_offset, png_state->next_frame_y_offset,
-                                png_state->next_frame_width, png_state->next_frame_height,
-                                image_local->width, image_local->height);
-                SAIL_LOG_AND_RETURN(SAIL_ERROR_INCORRECT_IMAGE_DIMENSIONS);
-            }
-
-            if (!png_state->next_frame_delay_den) {
-                png_state->next_frame_delay_den = 100;
-            }
-
-            image_local->delay = (int)(((double)png_state->next_frame_delay_num / png_state->next_frame_delay_den) * 1000);
         }
+
+        png_state->skipped_hidden = true;
+        png_read_frame_head(png_state->png_ptr, png_state->info_ptr);
+
+        if (png_get_valid(png_state->png_ptr, png_state->info_ptr, PNG_INFO_fcTL) != 0) {
+            png_get_next_frame_fcTL(png_state->png_ptr, png_state->info_ptr,
+                                    &png_state->next_frame_width, &png_state->next_frame_height,
+                                    &png_state->next_frame_x_offset, &png_state->next_frame_y_offset,
+                                    &png_state->next_frame_delay_num, &png_state->next_frame_delay_den,
+                                    &png_state->next_frame_dispose_op, &png_state->next_frame_blend_op);
+        } else {
+            png_state->next_frame_width      = image_local->width;
+            png_state->next_frame_height     = image_local->height;
+            png_state->next_frame_x_offset   = 0;
+            png_state->next_frame_y_offset   = 0;
+            png_state->next_frame_dispose_op = PNG_DISPOSE_OP_BACKGROUND;
+            png_state->next_frame_blend_op   = PNG_BLEND_OP_SOURCE;
+        }
+
+        if (png_state->next_frame_width + png_state->next_frame_x_offset > image_local->width ||
+                png_state->next_frame_height + png_state->next_frame_y_offset > image_local->height) {
+            sail_destroy_image(image_local);
+            SAIL_LOG_ERROR("PNG: Frame (%u,%u %ux%u) doesn't fit into the image (%ux%u)",
+                            png_state->next_frame_x_offset, png_state->next_frame_y_offset,
+                            png_state->next_frame_width, png_state->next_frame_height,
+                            image_local->width, image_local->height);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INCORRECT_IMAGE_DIMENSIONS);
+        }
+
+        if (!png_state->next_frame_delay_den) {
+            png_state->next_frame_delay_den = 100;
+        }
+
+        image_local->delay = (int)(((double)png_state->next_frame_delay_num / png_state->next_frame_delay_den) * 1000);
     }
 #endif
 

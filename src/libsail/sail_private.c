@@ -34,21 +34,6 @@
  * Private functions.
  */
 
-static sail_status_t load_codec(struct sail_codec_info_node *node) {
-
-    SAIL_CHECK_PTR(node);
-
-    /* Already loaded. */
-    if (node->codec != NULL) {
-        return SAIL_OK;
-    }
-
-    /* Codec is not loaded. Let's load it. */
-    SAIL_TRY(alloc_and_load_codec(node->codec_info, &node->codec));
-
-    return SAIL_OK;
-}
-
 static void print_unsupported_write_pixel_format(enum SailPixelFormat pixel_format) {
 
     SAIL_LOG_ERROR("This codec cannot write %s pixels. Use its write features to get the list of supported pixel formats for writing",
@@ -90,7 +75,9 @@ sail_status_t load_codec_by_codec_info(const struct sail_codec_info *codec_info,
         SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_NOT_FOUND);
     }
 
-    SAIL_TRY(load_codec(found_node));
+    if (found_node->codec == NULL) {
+        SAIL_TRY(alloc_and_load_codec(found_node->codec_info, &found_node->codec));
+    }
 
     *codec = found_node->codec;
 

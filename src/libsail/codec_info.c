@@ -97,14 +97,15 @@ sail_status_t sail_codec_info_by_magic_number_from_io(struct sail_io *io, const 
     /* Seek back. */
     SAIL_TRY(io->seek(io->stream, 0, SEEK_SET));
 
+    /* \xFF\xDD => "FF DD" + string terminator. */
+    char hex_numbers[sizeof(buffer) * 3 + 1];
+
     /* Debug print. */
     {
-        /* \xFF\xDD => "FF DD" + string terminator. */
-        char hex_numbers[sizeof(buffer) * 3 + 1];
         char *hex_numbers_ptr = hex_numbers;
 
         for (size_t i = 0; i < sizeof(buffer); i++, hex_numbers_ptr += 3) {
-#ifdef SAIL_WIN32
+#ifdef _MSC_VER
             sprintf_s(hex_numbers_ptr, 4, "%02x ", buffer[i]);
 #else
             sprintf(hex_numbers_ptr, "%02x ", buffer[i]);
@@ -112,7 +113,6 @@ sail_status_t sail_codec_info_by_magic_number_from_io(struct sail_io *io, const 
         }
 
         *(hex_numbers_ptr-1) = '\0';
-
         SAIL_LOG_DEBUG("Read magic number: '%s'", hex_numbers);
     }
 
@@ -136,7 +136,7 @@ sail_status_t sail_codec_info_by_magic_number_from_io(struct sail_io *io, const 
 
             SAIL_LOG_TRACE("Check against %s magic '%s'", codec_info_node->codec_info->name, magic);
 
-#ifdef SAIL_WIN32
+#ifdef _MSC_VER
             while (buffer_index < sizeof(buffer) && sscanf_s(magic, "%2s%n", hex_byte, (unsigned)sizeof(hex_byte), &bytes_consumed) == 1) {
 #else
             while (buffer_index < sizeof(buffer) && sscanf(magic, "%2s%n", hex_byte, &bytes_consumed) == 1) {
@@ -146,7 +146,7 @@ sail_status_t sail_codec_info_by_magic_number_from_io(struct sail_io *io, const 
                 } else {
                     unsigned byte = 0;
 
-#ifdef SAIL_WIN32
+#ifdef _MSC_VER
                     if (sscanf_s(hex_byte, "%02x", &byte) != 1 || byte != buffer[buffer_index]) {
 #else
                     if (sscanf(hex_byte, "%02x", &byte) != 1 || byte != buffer[buffer_index]) {
@@ -173,6 +173,7 @@ sail_status_t sail_codec_info_by_magic_number_from_io(struct sail_io *io, const 
         codec_info_node = codec_info_node->next;
     }
 
+    SAIL_LOG_ERROR("Magic number '%s' is not supported by any codec", hex_numbers);
     SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_NOT_FOUND);
 }
 
@@ -216,6 +217,7 @@ sail_status_t sail_codec_info_from_extension(const char *extension, const struct
     }
 
     sail_free(extension_copy);
+    SAIL_LOG_ERROR("Extension %s is not supported by any codec", extension);
     SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_NOT_FOUND);
 }
 
@@ -259,5 +261,6 @@ sail_status_t sail_codec_info_from_mime_type(const char *mime_type, const struct
     }
 
     sail_free(mime_type_copy);
+    SAIL_LOG_ERROR("MIME type %s is not supported by any codec", mime_type);
     SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_NOT_FOUND);
 }

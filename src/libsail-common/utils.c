@@ -163,7 +163,7 @@ sail_status_t sail_concat(char **output, int num, ...) {
 
     while (counter--) {
         arg = va_arg(args, const char *);
-#ifdef SAIL_WIN32
+#ifdef _MSC_VER
         strcat_s(*output, length, arg);
 #else
         strcat(*output, arg);
@@ -199,7 +199,7 @@ sail_status_t sail_to_wchar(const char *input, wchar_t **output) {
     SAIL_TRY(sail_malloc((length+1) * sizeof(wchar_t), &ptr));
     wchar_t *output_local = ptr;
 
-#ifdef SAIL_WIN32
+#ifdef _MSC_VER
     size_t ret;
 
     if (mbstowcs_s(&ret, output_local, length+1, input, length) != 0) {
@@ -928,7 +928,7 @@ sail_status_t sail_print_errno(const char *format) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 
-#ifdef SAIL_WIN32
+#ifdef _MSC_VER
     char buffer[80];
     strerror_s(buffer, sizeof(buffer), errno);
     SAIL_LOG_ERROR(format, buffer);
@@ -983,7 +983,7 @@ bool sail_path_exists(const char *path) {
         return false;
     }
 
-#ifdef SAIL_WIN32
+#ifdef _MSC_VER
     return _access(path, 0) == 0;
 #else
     return access(path, 0) == 0;
@@ -997,7 +997,7 @@ bool sail_is_dir(const char *path) {
         return false;
     }
 
-#ifdef SAIL_WIN32
+#ifdef _MSC_VER
     struct _stat attrs;
 
     if (_stat(path, &attrs) != 0) {
@@ -1023,7 +1023,7 @@ bool sail_is_file(const char *path) {
         return false;
     }
 
-#ifdef SAIL_WIN32
+#ifdef _MSC_VER
     struct _stat attrs;
 
     if (_stat(path, &attrs) != 0) {
@@ -1048,7 +1048,7 @@ sail_status_t sail_file_size(const char *path, size_t *size) {
 
     bool is_file;
 
-#ifdef SAIL_WIN32
+#ifdef _MSC_VER
     struct _stat attrs;
 
     if (_stat(path, &attrs) != 0) {
@@ -1084,7 +1084,7 @@ sail_status_t sail_file_contents_into_data(const char *path, void *data) {
     size_t size;
     SAIL_TRY(sail_file_size(path, &size));
 
-#ifdef SAIL_WIN32
+#ifdef _MSC_VER
     FILE *f = _fsopen(path, "rb", _SH_DENYWR);
 #else
     FILE *f = fopen(path, "rb");

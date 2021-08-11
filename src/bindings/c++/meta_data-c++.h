@@ -67,17 +67,17 @@ public:
     /*
      * Copies the meta data entry.
      */
-    meta_data& operator=(const meta_data &md);
+    meta_data& operator=(const sail::meta_data &meta_data);
 
     /*
      * Moves the meta data entry.
      */
-    meta_data(meta_data &&md) noexcept;
+    meta_data(sail::meta_data &&meta_data) noexcept;
 
     /*
      * Moves the meta data entry.
      */
-    meta_data& operator=(meta_data &&md);
+    meta_data& operator=(sail::meta_data &&meta_data);
 
     /*
      * Destroys the meta data entry.
@@ -150,7 +150,7 @@ private:
     /*
      * Makes a deep copy of the specified meta data.
      */
-    explicit meta_data(const sail_meta_data_node *md);
+    explicit meta_data(const sail_meta_data_node *meta_data_node);
 
     const std::string& value_string() const;
 
@@ -158,7 +158,7 @@ private:
 
     meta_data& with_value_type(SailMetaDataType type);
 
-    sail_status_t to_sail_meta_data_node(sail_meta_data_node **md) const;
+    sail_status_t to_sail_meta_data_node(sail_meta_data_node **meta_data_node) const;
 
 private:
     class pimpl;

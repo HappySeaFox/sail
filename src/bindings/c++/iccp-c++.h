@@ -69,22 +69,22 @@ public:
     /*
      * Copies the ICC profile.
      */
-    iccp(const iccp &ic);
+    iccp(const sail::iccp &ic);
 
     /*
      * Copies the ICC profile.
      */
-    iccp& operator=(const iccp &ic);
+    iccp& operator=(const sail::iccp &iccp);
 
     /*
      * Moves the ICC profile.
      */
-    iccp(iccp &&ic) noexcept;
+    iccp(sail::iccp &&iccp) noexcept;
 
     /*
      * Moves the ICC profile.
      */
-    iccp& operator=(iccp &&ic);
+    iccp& operator=(sail::iccp &&iccp);
 
     /*
      * Destroys the ICC profile.

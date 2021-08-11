@@ -34,26 +34,22 @@ class SAIL_HIDDEN read_options::pimpl
 {
 public:
     pimpl()
-        : io_options(0)
-    {}
+        : sail_read_options(nullptr)
+    {
+        SAIL_TRY_OR_SUPPRESS(sail_alloc_read_options(&sail_read_options));
+    }
 
-    int io_options;
+    ~pimpl()
+    {
+        sail_destroy_read_options(sail_read_options);
+    }
+
+    struct sail_read_options *sail_read_options;
 };
 
 read_options::read_options()
     : d(new pimpl)
 {
-}
-
-read_options::read_options(const sail_read_options *ro)
-    : read_options()
-{
-    if (ro == nullptr) {
-        SAIL_LOG_DEBUG("NULL pointer has been passed to sail::read_options(). The object is untouched");
-        return;
-    }
-
-    with_io_options(ro->io_options);
 }
 
 read_options::read_options(const read_options &ro)
@@ -62,16 +58,16 @@ read_options::read_options(const read_options &ro)
     *this = ro;
 }
 
-read_options& read_options::operator=(const read_options &ro)
+read_options& read_options::operator=(const sail::read_options &read_options)
 {
-    with_io_options(ro.io_options());
+    with_io_options(read_options.io_options());
     return *this;
 }
 
-read_options::read_options(read_options &&ro) noexcept
+read_options::read_options(sail::read_options &&read_options) noexcept
 {
-    d = ro.d;
-    ro.d = nullptr;
+    d = read_options.d;
+    read_options.d = nullptr;
 }
 
 read_options& read_options::operator=(read_options &&ro)
@@ -90,20 +86,31 @@ read_options::~read_options()
 
 int read_options::io_options() const
 {
-    return d->io_options;
+    return d->sail_read_options->io_options;
 }
 
 read_options& read_options::with_io_options(int io_options)
 {
-    d->io_options = io_options;
+    d->sail_read_options->io_options = io_options;
     return *this;
+}
+
+read_options::read_options(const sail_read_options *ro)
+    : read_options()
+{
+    if (ro == nullptr) {
+        SAIL_LOG_DEBUG("NULL pointer has been passed to sail::read_options(). The object is untouched");
+        return;
+    }
+
+    with_io_options(ro->io_options);
 }
 
 sail_status_t read_options::to_sail_read_options(sail_read_options *read_options) const
 {
     SAIL_CHECK_READ_OPTIONS_PTR(read_options);
 
-    read_options->io_options = d->io_options;
+    read_options->io_options = d->sail_read_options->io_options;
 
     return SAIL_OK;
 }
