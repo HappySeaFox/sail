@@ -250,7 +250,7 @@ enum SailCompression {
 /* Meta data. */
 enum SailMetaData {
 
-    /* Some unknown meta_data type. */
+    /* Unknown meta data type. */
     SAIL_META_DATA_UNKNOWN,
 
     SAIL_META_DATA_ARTIST,
