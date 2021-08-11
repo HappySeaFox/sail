@@ -379,6 +379,7 @@ sail_status_t png_private_write_meta_data(png_structp png_ptr, png_infop info_pt
 
                         SAIL_TRY_OR_EXECUTE(sail_concat(&meta_data_value, 2, raw_profile_header, hex_string),
                                             /* on error */ sail_free(hex_string); meta_data_node = meta_data_node->next; continue);
+                        sail_free(hex_string);
 
                         lines_to_free[index] = 1;
                     } else {
