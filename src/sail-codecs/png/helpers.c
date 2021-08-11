@@ -345,7 +345,7 @@ sail_status_t png_private_write_meta_data(png_structp png_ptr, png_infop info_pt
             if (meta_data_node->key == SAIL_META_DATA_EXIF) {
                 if (meta_data_node->value_type == SAIL_META_DATA_TYPE_DATA) {
                     /* Skip "Exif\0\0" if any. */
-                    if (memcmp(meta_data_node->value, "Exif", 4) == 0) {
+                    if (meta_data_node->value_length >= 4 && memcmp(meta_data_node->value, "Exif", 4) == 0) {
                         SAIL_LOG_DEBUG("PNG: Writing raw EXIF %u bytes long w/o header", (unsigned)meta_data_node->value_length - 6);
                         png_set_eXIf_1(png_ptr, info_ptr, (png_uint_32)meta_data_node->value_length-6, ((png_bytep)meta_data_node->value)+6);
                     } else {
