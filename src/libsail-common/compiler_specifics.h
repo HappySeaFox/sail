@@ -27,17 +27,17 @@
 #define SAIL_COMPILER_SPECIFICS_H
 
 /* Thread local flag used with static variables. */
-#ifdef __STDC_NO_THREADS__
-    #if defined __GNUC__
-        #define SAIL_THREAD_LOCAL __thread
-    #elif defined _MSC_VER
-        #define SAIL_THREAD_LOCAL __declspec(thread)
-    #else
-        /* Syntax error. */
-        Do not know how to define thread local variables for this compiler.
-    #endif
-#else
+#if defined __GNUC__
+    #define SAIL_THREAD_LOCAL __thread
+#elif defined _MSC_VER
+    #define SAIL_THREAD_LOCAL __declspec(thread)
+#elif defined __STDC_VERSION__  && __STDC_VERSION__ >= 201112L
     #define SAIL_THREAD_LOCAL _Thread_local
+#elif defined _Thread_local
+    #define SAIL_THREAD_LOCAL _Thread_local
+#else
+    /* Syntax error. */
+    Do not know how to define thread local variables for this compiler.
 #endif
 
 /* Branch predictions. */
