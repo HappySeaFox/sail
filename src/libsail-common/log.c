@@ -44,7 +44,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "log.h"
+#include "sail-common.h"
 
 /* ANSI terminal color escapes. */
 #define SAIL_COLOR_RED          "\033[0;31m"
