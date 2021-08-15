@@ -9,7 +9,7 @@ function(sail_check_c11_thread_local)
 			#include \"libsail-common/compiler_specifics.h\"
 
 			int main(int argc, char *argv[]) {
-				SAIL_THREAD_LOCAL static int i = 0;
+				static SAIL_THREAD_LOCAL int i = 0;
 				return 0;
 			}
 		"
