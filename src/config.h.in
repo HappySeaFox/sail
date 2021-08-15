@@ -57,4 +57,7 @@
 /* Buffer size to read from I/O sources to detect file types by magic numbers. */
 #cmakedefine SAIL_MAGIC_BUFFER_SIZE @SAIL_MAGIC_BUFFER_SIZE@
 
+/* Load third-party codecs from SAIL_THIRD_PARTY_CODECS_PATH. */
+#cmakedefine SAIL_THIRD_PARTY_CODECS
+
 #endif
