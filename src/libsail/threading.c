@@ -40,7 +40,7 @@
 #ifdef SAIL_WIN32
 struct callback_holder
 {
-    sail_status_t (*callback)(void);
+    void (*callback)(void);
 };
 
 static BOOL CALLBACK OnceHandler(PINIT_ONCE InitOnce, PVOID Parameter, PVOID *lpContext)
@@ -50,11 +50,13 @@ static BOOL CALLBACK OnceHandler(PINIT_ONCE InitOnce, PVOID Parameter, PVOID *lp
 
     const struct callback_holder *callback_holder = (struct callback_holder *)Parameter;
 
-    return callback_holder->callback() == SAIL_OK;
+    callback_holder->callback();
+
+    return TRUE;
 }
 #endif
 
-sail_status_t threading_call_once(sail_once_flag_t *once_flag, sail_status_t (*callback)(void))
+sail_status_t threading_call_once(sail_once_flag_t *once_flag, void (*callback)(void))
 {
     SAIL_CHECK_PTR(once_flag);
 
@@ -69,7 +71,7 @@ sail_status_t threading_call_once(sail_once_flag_t *once_flag, sail_status_t (*c
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 #else
-    if (SAIL_LIKELY((errno = pthread_once(once_flag, (void (*)(void))callback)) == 0)) {
+    if (SAIL_LIKELY((errno = pthread_once(once_flag, callback)) == 0)) {
         return SAIL_OK;
     } else {
         SAIL_TRY(sail_print_errno("Failed to execute call_once: %s"));
