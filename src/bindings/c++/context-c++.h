@@ -87,8 +87,8 @@ public:
      *
      *   <FOUND PATH>/lib is added to LD_LIBRARY_PATH.
      *
-     * Additionally, SAIL_MY_CODECS_PATH environment variable is always searched
-     * so you can load your own codecs from there.
+     * Additionally, SAIL_THIRD_PARTY_CODECS_PATH environment variable is searched if SAIL_THIRD_PARTY_CODECS is ON,
+     * (the default) so you can load your own codecs from there.
      *
      * Returns SAIL_OK on success.
      */

@@ -64,6 +64,8 @@ set(SAIL_ONLY_CODECS "" CACHE STRING "Enable only the codecs specified in this '
 Codecs with missing dependencies will be disabled regardless this setting.")
 option(SAIL_STATIC "Build static libs. When enabled, sets SAIL_COMBINE_CODECS to ON." OFF)
 cmake_dependent_option(SAIL_COMBINE_CODECS "Combine all codecs into a single library." OFF "NOT SAIL_STATIC" ON)
+option(SAIL_THIRD_PARTY_CODECS "Enable loading third-party codecs from the path specified in \
+the SAIL_THIRD_PARTY_CODECS_PATH environment variable." ON)
 
 if (SAIL_STATIC)
     set(BUILD_SHARED_LIBS OFF)
@@ -283,6 +285,7 @@ message("* Developer mode:              ${SAIL_DEV}")
 message("* VCPKG mode:                  ${SAIL_VCPKG}")
 message("* Static build:                ${SAIL_STATIC}")
 message("*   Combine codecs [*]:        ${SAIL_COMBINE_CODECS}")
+message("* SAIL_THIRD_PARTY_CODECS:     ${SAIL_THIRD_PARTY_CODECS}")
 message("* Build examples:              ${SAIL_BUILD_EXAMPLES}")
 message("* Build SDL example:           ${SAIL_SDL_EXAMPLE}")
 message("* Build tests:                 ${SAIL_BUILD_TESTS}")

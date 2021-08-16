@@ -167,15 +167,19 @@ Same to VCPKG port.
 
 `<FOUND PATH>/lib` is added to `LD_LIBRARY_PATH`.
 
-Additionally, `SAIL_MY_CODECS_PATH` environment variable is always searched so you can load your own codecs from there.
+Additionally, `SAIL_THIRD_PARTY_CODECS_PATH` environment variable is searched if `SAIL_THIRD_PARTY_CODECS` is `ON`,
+(the default) so you can load your own codecs from there.
 
 ## How can I point SAIL to my custom codecs?
 
-Set the `SAIL_MY_CODECS_PATH` environment variable to the location of your custom SAIL codecs.
+If `SAIL_THIRD_PARTY_CODECS` is `ON` (the default), you can set the `SAIL_THIRD_PARTY_CODECS_PATH` environment variable
+to the location of your custom SAIL codecs.
 
-On Windows, `sail.dll location` and `SAIL_MY_CODECS_PATH/lib` are the only places where codecs DLL dependencies are searched.
+On Windows, `sail.dll location` and `SAIL_THIRD_PARTY_CODECS_PATH/lib` are the only places where codecs DLL dependencies are searched.
 No other paths are searched. Use WIN32 API `AddDllDirectory` to add your own DLL dependencies search path.
-On other platforms, `SAIL_MY_CODECS_PATH/lib` is added to `LD_LIBRARY_PATH`.
+On other platforms, `SAIL_THIRD_PARTY_CODECS_PATH/lib` is added to `LD_LIBRARY_PATH`.
+
+If `SAIL_THIRD_PARTY_CODECS` is `OFF`, loading custom codecs is disabled.
 
 ## I'd like to reorganize the standard SAIL folder layout on Windows (for standalone build or bundle)
 
