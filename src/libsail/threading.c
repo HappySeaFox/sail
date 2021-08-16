@@ -1,6 +1,6 @@
 /*  This file is part of SAIL (https://github.com/smoked-herring/sail)
 
-    Copyright (c) 2020 Dmitry Baryshev
+    Copyright (c) 2021 Dmitry Baryshev
 
     The MIT License
 
@@ -23,44 +23,45 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_SAIL_H
-#define SAIL_SAIL_H
+#include "sail.h"
 
-/* Universal libsail include. */
+#ifdef _MSC_VER
+struct callback_holder
+{
+    sail_status_t (*callback)(void);
+};
 
-#ifdef SAIL_BUILD
-    #include "sail-common.h"
+static BOOL CALLBACK OnceHandler(PINIT_ONCE InitOnce, PVOID Parameter, PVOID *lpContext)
+{
+    (void)InitOnce;
+    (void)lpContext;
 
-    #include "codec.h"
-    #include "codec_info.h"
-    #include "codec_info_node.h"
-    #include "codec_info_private.h"
-    #include "codec_layout.h"
-    #include "context.h"
-    #include "context_private.h"
-    #include "ini.h"
-    #include "io_file.h"
-    #include "io_mem.h"
-    #include "io_noop.h"
-    #include "sail_advanced.h"
-    #include "sail_deep_diver.h"
-    #include "sail_junior.h"
-    #include "sail_private.h"
-    #include "sail_technical_diver.h"
-    #include "sail_technical_diver_private.h"
-    #include "string_node.h"
-    #include "threading.h"
+    struct callback_holder *callback_holder = (struct callback_holder *)Parameter;
+
+    return callback_holder->callback() == SAIL_OK;
+}
+#endif
+
+sail_status_t sail_call_once(sail_once_flag_t *once_flag, sail_status_t (*callback)(void))
+{
+    SAIL_CHECK_PTR(once_flag);
+
+#ifdef _MSC_VER
+    struct callback_holder callback_holder = { callback };
+    PVOID lpContext;
+
+    if (InitOnceExecuteOnce(once_flag, OnceHandler, &callback_holder, &lpContext)) {
+        return SAIL_OK;
+    } else {
+        SAIL_LOG_ERROR("Failed to execute call_once. Error: 0x%X", GetLastError());
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+    }
 #else
-    #include <sail-common/sail-common.h>
-
-    #include <sail/codec_info.h>
-    #include <sail/codec_info_node.h>
-    #include <sail/context.h>
-    #include <sail/sail_advanced.h>
-    #include <sail/sail_deep_diver.h>
-    #include <sail/sail_junior.h>
-    #include <sail/sail_technical_diver.h>
-    #include <sail/string_node.h>
+    if (pthread_once(once_flag, callback) == 0) {
+        return SAIL_OK;
+    } else {
+        SAIL_TRY(sail_print_errno("Failed to execute call_once: %s"));
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+    }
 #endif
-
-#endif
+}

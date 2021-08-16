@@ -1,6 +1,6 @@
 /*  This file is part of SAIL (https://github.com/smoked-herring/sail)
 
-    Copyright (c) 2020 Dmitry Baryshev
+    Copyright (c) 2021 Dmitry Baryshev
 
     The MIT License
 
@@ -23,44 +23,40 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_SAIL_H
-#define SAIL_SAIL_H
-
-/* Universal libsail include. */
+#ifndef SAIL_THREADING_H
+#define SAIL_THREADING_H
 
 #ifdef SAIL_BUILD
-    #include "sail-common.h"
-
-    #include "codec.h"
-    #include "codec_info.h"
-    #include "codec_info_node.h"
-    #include "codec_info_private.h"
-    #include "codec_layout.h"
-    #include "context.h"
-    #include "context_private.h"
-    #include "ini.h"
-    #include "io_file.h"
-    #include "io_mem.h"
-    #include "io_noop.h"
-    #include "sail_advanced.h"
-    #include "sail_deep_diver.h"
-    #include "sail_junior.h"
-    #include "sail_private.h"
-    #include "sail_technical_diver.h"
-    #include "sail_technical_diver_private.h"
-    #include "string_node.h"
-    #include "threading.h"
+    #include "error.h"
+    #include "export.h"
 #else
-    #include <sail-common/sail-common.h>
+    #include <sail-common/error.h>
+    #include <sail-common/export.h>
+#endif
 
-    #include <sail/codec_info.h>
-    #include <sail/codec_info_node.h>
-    #include <sail/context.h>
-    #include <sail/sail_advanced.h>
-    #include <sail/sail_deep_diver.h>
-    #include <sail/sail_junior.h>
-    #include <sail/sail_technical_diver.h>
-    #include <sail/string_node.h>
+#ifdef _MSC_VER
+    #include <Windows.h>
+#else
+    #include <pthread.h>
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifdef _MSC_VER
+    typedef INIT_ONCE sail_once_flag_t;
+    #define SAIL_ONCE_DEFAULT_VALUE INIT_ONCE_STATIC_INIT
+#else
+    typedef pthread_once_t sail_once_flag_t;
+    #define SAIL_ONCE_DEFAULT_VALUE PTHREAD_ONCE_INIT
+#endif
+
+SAIL_HIDDEN sail_status_t sail_call_once(sail_once_flag_t *once_flag, sail_status_t (*callback)(void));
+
+/* extern "C" */
+#ifdef __cplusplus
+}
 #endif
 
 #endif
