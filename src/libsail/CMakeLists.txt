@@ -77,9 +77,12 @@ if (WIN32)
 endif()
 
 if (UNIX)
-    # pthread_once
+    # pthread_once()
     find_package(Threads REQUIRED)
     target_link_libraries(sail PUBLIC ${CMAKE_THREAD_LIBS_INIT})
+
+    # pthread_mutexattr_settype()
+    target_compile_definitions(sail PRIVATE _XOPEN_SOURCE=500)
 
     target_link_libraries(sail PRIVATE dl)
 endif()
