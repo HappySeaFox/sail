@@ -57,7 +57,7 @@ sail_status_t sail_call_once(sail_once_flag_t *once_flag, sail_status_t (*callba
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 #else
-    if (pthread_once(once_flag, callback) == 0) {
+    if (pthread_once(once_flag, (void (*)(void))callback) == 0) {
         return SAIL_OK;
     } else {
         SAIL_TRY(sail_print_errno("Failed to execute call_once: %s"));
