@@ -26,6 +26,8 @@
 #ifndef SAIL_THREADING_H
 #define SAIL_THREADING_H
 
+#include "config.h"
+
 #ifdef SAIL_BUILD
     #include "error.h"
     #include "export.h"
@@ -34,7 +36,7 @@
     #include <sail-common/export.h>
 #endif
 
-#ifdef _MSC_VER
+#ifdef SAIL_WIN32
     #include <Windows.h>
 #else
     #include <pthread.h>
@@ -44,7 +46,9 @@
 extern "C" {
 #endif
 
-#ifdef _MSC_VER
+/* Call once. */
+
+#ifdef SAIL_WIN32
     typedef INIT_ONCE sail_once_flag_t;
     #define SAIL_ONCE_DEFAULT_VALUE INIT_ONCE_STATIC_INIT
 #else
@@ -53,7 +57,19 @@ extern "C" {
 #endif
 
 /* The return value of the callback is ignored with pthread. */
-SAIL_HIDDEN sail_status_t sail_call_once(sail_once_flag_t *once_flag, sail_status_t (*callback)(void));
+SAIL_HIDDEN sail_status_t threading_call_once(sail_once_flag_t *once_flag, sail_status_t (*callback)(void));
+
+/* Mutexes. */
+
+#ifdef SAIL_WIN32
+    typedef HANDLE sail_mutex_t;
+#else
+    typedef pthread_mutex_t sail_mutex_t;
+#endif
+
+SAIL_HIDDEN sail_status_t threading_init_mutex(sail_mutex_t *mutex);
+
+SAIL_HIDDEN sail_status_t threading_destroy_mutex(sail_mutex_t *mutex);
 
 /* extern "C" */
 #ifdef __cplusplus

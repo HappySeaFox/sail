@@ -23,9 +23,11 @@
     SOFTWARE.
 */
 
+#include <errno.h>
+
 #include "sail.h"
 
-#ifdef _MSC_VER
+#ifdef SAIL_WIN32
 struct callback_holder
 {
     sail_status_t (*callback)(void);
@@ -42,25 +44,70 @@ static BOOL CALLBACK OnceHandler(PINIT_ONCE InitOnce, PVOID Parameter, PVOID *lp
 }
 #endif
 
-sail_status_t sail_call_once(sail_once_flag_t *once_flag, sail_status_t (*callback)(void))
+sail_status_t threading_call_once(sail_once_flag_t *once_flag, sail_status_t (*callback)(void))
 {
     SAIL_CHECK_PTR(once_flag);
 
-#ifdef _MSC_VER
+#ifdef SAIL_WIN32
     struct callback_holder callback_holder = { callback };
     PVOID lpContext;
 
-    if (InitOnceExecuteOnce(once_flag, OnceHandler, &callback_holder, &lpContext)) {
+    if (SAIL_LIKELY(InitOnceExecuteOnce(once_flag, OnceHandler, &callback_holder, &lpContext))) {
         return SAIL_OK;
     } else {
         SAIL_LOG_ERROR("Failed to execute call_once. Error: 0x%X", GetLastError());
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 #else
-    if (pthread_once(once_flag, (void (*)(void))callback) == 0) {
+    if (SAIL_LIKELY((errno = pthread_once(once_flag, (void (*)(void))callback)) == 0)) {
         return SAIL_OK;
     } else {
         SAIL_TRY(sail_print_errno("Failed to execute call_once: %s"));
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+    }
+#endif
+}
+
+sail_status_t threading_init_mutex(sail_mutex_t *mutex)
+{
+    SAIL_CHECK_PTR(mutex);
+
+#ifdef SAIL_WIN32
+    sail_mutex_t local_mutex = CreateMutex(NULL, FALSE, NULL);
+
+    if (SAIL_LIKELY(local_mutex != NULL)) {
+        *mutex = local_mutex;
+        return SAIL_OK;
+    } else {
+        SAIL_LOG_ERROR("Failed to initialize mutex. Error: 0x%X", GetLastError());
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+    }
+#else
+    if (SAIL_LIKELY((errno = pthread_mutex_init(mutex, NULL)) == 0)) {
+        return SAIL_OK;
+    } else {
+        SAIL_TRY(sail_print_errno("Failed to initialize mutex: %s"));
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+    }
+#endif
+}
+
+sail_status_t threading_destroy_mutex(sail_mutex_t *mutex)
+{
+    SAIL_CHECK_PTR(mutex);
+
+#ifdef SAIL_WIN32
+    if (SAIL_LIKELY(CloseHandle(*mutex))) {
+        return SAIL_OK;
+    } else {
+        SAIL_LOG_ERROR("Failed to destroy mutex. Error: 0x%X", GetLastError());
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+    }
+#else
+    if (SAIL_LIKELY((errno = pthread_mutex_destroy(mutex)) == 0)) {
+        return SAIL_OK;
+    } else {
+        SAIL_TRY(sail_print_errno("Failed to initialize mutex: %s"));
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 #endif
