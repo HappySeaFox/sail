@@ -21,6 +21,7 @@ include(sail_codec)
 include(sail_enable_asan)
 include(sail_enable_pch)
 include(sail_enable_posix_source)
+include(sail_enable_xopen_source)
 include(sail_install_cmake_config)
 include(sail_test)
 

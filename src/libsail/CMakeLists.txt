@@ -82,7 +82,7 @@ if (UNIX)
     target_link_libraries(sail PUBLIC ${CMAKE_THREAD_LIBS_INIT})
 
     # pthread_mutexattr_settype()
-    target_compile_definitions(sail PRIVATE _XOPEN_SOURCE=500)
+    sail_enable_xopen_source(TARGET sail VERSION 500)
 
     target_link_libraries(sail PRIVATE dl)
 endif()
