@@ -73,15 +73,8 @@ sail_status_t threading_init_mutex(sail_mutex_t *mutex)
     SAIL_CHECK_PTR(mutex);
 
 #ifdef SAIL_WIN32
-    sail_mutex_t local_mutex = CreateMutex(NULL, FALSE, NULL);
-
-    if (SAIL_LIKELY(local_mutex != NULL)) {
-        *mutex = local_mutex;
-        return SAIL_OK;
-    } else {
-        SAIL_LOG_ERROR("Failed to initialize mutex. Error: 0x%X", GetLastError());
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
-    }
+    InitializeCriticalSection(mutex);
+    return SAIL_OK;
 #else
     if (SAIL_LIKELY((errno = pthread_mutex_init(mutex, NULL)) == 0)) {
         return SAIL_OK;
@@ -97,12 +90,8 @@ sail_status_t threading_destroy_mutex(sail_mutex_t *mutex)
     SAIL_CHECK_PTR(mutex);
 
 #ifdef SAIL_WIN32
-    if (SAIL_LIKELY(CloseHandle(*mutex))) {
-        return SAIL_OK;
-    } else {
-        SAIL_LOG_ERROR("Failed to destroy mutex. Error: 0x%X", GetLastError());
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
-    }
+    DeleteCriticalSection(mutex);
+    return SAIL_OK;
 #else
     if (SAIL_LIKELY((errno = pthread_mutex_destroy(mutex)) == 0)) {
         return SAIL_OK;

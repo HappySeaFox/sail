@@ -62,7 +62,7 @@ SAIL_HIDDEN sail_status_t threading_call_once(sail_once_flag_t *once_flag, sail_
 /* Mutexes. */
 
 #ifdef SAIL_WIN32
-    typedef HANDLE sail_mutex_t;
+    typedef CRITICAL_SECTION sail_mutex_t;
 #else
     typedef pthread_mutex_t sail_mutex_t;
 #endif
