@@ -69,6 +69,10 @@ SAIL_HIDDEN sail_status_t threading_call_once(sail_once_flag_t *once_flag, sail_
 
 SAIL_HIDDEN sail_status_t threading_init_mutex(sail_mutex_t *mutex);
 
+SAIL_HIDDEN sail_status_t threading_lock_mutex(sail_mutex_t *mutex);
+
+SAIL_HIDDEN sail_status_t threading_unlock_mutex(sail_mutex_t *mutex);
+
 SAIL_HIDDEN sail_status_t threading_destroy_mutex(sail_mutex_t *mutex);
 
 /* extern "C" */

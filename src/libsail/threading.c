@@ -76,10 +76,60 @@ sail_status_t threading_init_mutex(sail_mutex_t *mutex)
     InitializeCriticalSection(mutex);
     return SAIL_OK;
 #else
-    if (SAIL_LIKELY((errno = pthread_mutex_init(mutex, NULL)) == 0)) {
+    pthread_mutexattr_t attr;
+
+    if (SAIL_LIKELY((errno = pthread_mutexattr_init(&attr)) == 0)) {
+        if (SAIL_LIKELY((errno = pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE)) == 0)) {
+            errno = pthread_mutex_init(mutex, &attr);
+            pthread_mutexattr_destroy(attr);
+
+            if (SAIL_LIKELY(errno == 0)) {
+                return SAIL_OK;
+            } else {
+                SAIL_TRY(sail_print_errno("Failed to initialize mutex: %s"));
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+            }
+        } else {
+            pthread_mutexattr_destroy(attr);
+            SAIL_TRY(sail_print_errno("Failed to set mutex attributes: %s"));
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+        }
+    } else {
+        SAIL_TRY(sail_print_errno("Failed to initialize mutex attributes: %s"));
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+    }
+#endif
+}
+
+sail_status_t threading_lock_mutex(sail_mutex_t *mutex)
+{
+    SAIL_CHECK_PTR(mutex);
+
+#ifdef SAIL_WIN32
+    EnterCriticalSection(mutex);
+    return SAIL_OK;
+#else
+    if (SAIL_LIKELY((errno = pthread_mutex_lock(mutex)) == 0)) {
         return SAIL_OK;
     } else {
-        SAIL_TRY(sail_print_errno("Failed to initialize mutex: %s"));
+        SAIL_TRY(sail_print_errno("Failed to lock mutex: %s"));
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+    }
+#endif
+}
+
+sail_status_t threading_unlock_mutex(sail_mutex_t *mutex)
+{
+    SAIL_CHECK_PTR(mutex);
+
+#ifdef SAIL_WIN32
+    LeaveCriticalSection(mutex);
+    return SAIL_OK;
+#else
+    if (SAIL_LIKELY((errno = pthread_mutex_unlock(mutex)) == 0)) {
+        return SAIL_OK;
+    } else {
+        SAIL_TRY(sail_print_errno("Failed to unlock mutex: %s"));
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 #endif
