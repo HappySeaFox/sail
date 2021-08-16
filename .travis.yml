@@ -61,39 +61,38 @@ before_script:
 
 script:
 - |-
-  set -ex
-
-  failsafe_cd()
+  fail_on_error()
   {
-    if [ -z "$1" ]; then
-      echo "Error: No arguments given for failsafe_cd()" >&2
+    if [ $# -eq 0 ]; then
+      echo "Error: No arguments given for fail_on_error()" >&2
       exit 1
     fi
 
-    # cd may fail in Travis on macOS
-    cd "$1" || true
+    set -e
+    "$@"
+    set +e
   }
 
   case "$TRAVIS_OS_NAME" in
     windows)
       mkdir build
-      failsafe_cd build
+      cd build
 
-      cmake -A x64 -DCMAKE_INSTALL_PREFIX="C:\SAIL" -DSAIL_DEV=ON ..
-      cmake --build . --config Release --target install
+      fail_on_error cmake -A x64 -DCMAKE_INSTALL_PREFIX="C:\SAIL" -DSAIL_DEV=ON ..
+      fail_on_error cmake --build . --config Release --target install
 
-      failsafe_cd tests
-      ctest --verbose -C Release
+      cd tests
+      fail_on_error ctest --verbose -C Release
     ;;
     osx | linux)
       mkdir build
-      failsafe_cd build
+      cd build
 
-      cmake -DCMAKE_BUILD_TYPE=Release -DSAIL_DEV=ON ..
-      cmake --build .
-      sudo make install
+      fail_on_error cmake -DCMAKE_BUILD_TYPE=Release -DSAIL_DEV=ON ..
+      fail_on_error cmake --build .
+      fail_on_error sudo make install
 
-      failsafe_cd tests
-      ctest --verbose
+      cd tests
+      fail_on_error ctest --verbose
     ;;
   esac
