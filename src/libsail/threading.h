@@ -42,10 +42,6 @@
     #include <pthread.h>
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* Call once. */
 
 #ifdef SAIL_WIN32
@@ -74,10 +70,5 @@ SAIL_HIDDEN sail_status_t threading_lock_mutex(sail_mutex_t *mutex);
 SAIL_HIDDEN sail_status_t threading_unlock_mutex(sail_mutex_t *mutex);
 
 SAIL_HIDDEN sail_status_t threading_destroy_mutex(sail_mutex_t *mutex);
-
-/* extern "C" */
-#ifdef __cplusplus
-}
-#endif
 
 #endif
