@@ -61,7 +61,7 @@ before_script:
 
 script:
 - |-
-  set -e
+  set -ex
 
   failsafe_cd()
   {
