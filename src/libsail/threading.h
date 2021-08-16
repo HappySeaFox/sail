@@ -52,6 +52,7 @@ extern "C" {
     #define SAIL_ONCE_DEFAULT_VALUE PTHREAD_ONCE_INIT
 #endif
 
+/* The return value of the callback is ignored with pthread. */
 SAIL_HIDDEN sail_status_t sail_call_once(sail_once_flag_t *once_flag, sail_status_t (*callback)(void));
 
 /* extern "C" */
