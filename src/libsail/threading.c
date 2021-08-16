@@ -23,6 +23,16 @@
     SOFTWARE.
 */
 
+#include "config.h"
+
+/* To enable pthread_mutexattr_settype(). */
+#ifdef SAIL_UNIX
+    #if !defined _XOPEN_SOURCE || _XOPEN_SOURCE < 500
+        #undef _XOPEN_SOURCE
+        #define _XOPEN_SOURCE 500
+    #endif
+#endif
+
 #include <errno.h>
 
 #include "sail.h"
@@ -81,7 +91,7 @@ sail_status_t threading_init_mutex(sail_mutex_t *mutex)
     if (SAIL_LIKELY((errno = pthread_mutexattr_init(&attr)) == 0)) {
         if (SAIL_LIKELY((errno = pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE)) == 0)) {
             errno = pthread_mutex_init(mutex, &attr);
-            pthread_mutexattr_destroy(attr);
+            pthread_mutexattr_destroy(&attr);
 
             if (SAIL_LIKELY(errno == 0)) {
                 return SAIL_OK;
@@ -90,7 +100,7 @@ sail_status_t threading_init_mutex(sail_mutex_t *mutex)
                 SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
             }
         } else {
-            pthread_mutexattr_destroy(attr);
+            pthread_mutexattr_destroy(&attr);
             SAIL_TRY(sail_print_errno("Failed to set mutex attributes: %s"));
             SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
         }
