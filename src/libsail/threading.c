@@ -48,7 +48,7 @@ static BOOL CALLBACK OnceHandler(PINIT_ONCE InitOnce, PVOID Parameter, PVOID *lp
     (void)InitOnce;
     (void)lpContext;
 
-    struct callback_holder *callback_holder = (struct callback_holder *)Parameter;
+    const struct callback_holder *callback_holder = (struct callback_holder *)Parameter;
 
     return callback_holder->callback() == SAIL_OK;
 }
