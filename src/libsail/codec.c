@@ -106,7 +106,7 @@ static sail_status_t load_codec_from_file(const struct sail_codec_info *codec_in
 #ifdef SAIL_WIN32
     #define SAIL_RESOLVE_FUNC GetProcAddress
     #define SAIL_RESOLVE_LOG_ERROR(symbol) \
-        SAIL_LOG_ERROR("Failed to resolve '%s' in '%s'. Error: %d", symbol, codec_info->path, GetLastError())
+        SAIL_LOG_ERROR("Failed to resolve '%s' in '%s'. Error: 0x%X", symbol, codec_info->path, GetLastError())
 #else
     #define SAIL_RESOLVE_FUNC dlsym
     #define SAIL_RESOLVE_LOG_ERROR(symbol) \

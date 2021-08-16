@@ -951,7 +951,7 @@ uint64_t sail_now(void) {
         initialized = true;
 
         if (!QueryPerformanceFrequency(&li)) {
-            SAIL_LOG_ERROR("Failed to get the current time. Error: %d", GetLastError());
+            SAIL_LOG_ERROR("Failed to get the current time. Error: 0x%X", GetLastError());
             return SAIL_OK;
         }
 
@@ -959,7 +959,7 @@ uint64_t sail_now(void) {
     }
 
     if (!QueryPerformanceCounter(&li)) {
-        SAIL_LOG_ERROR("Failed to get the current time. Error: %d", GetLastError());
+        SAIL_LOG_ERROR("Failed to get the current time. Error: 0x%X", GetLastError());
         return SAIL_OK;
     }
 

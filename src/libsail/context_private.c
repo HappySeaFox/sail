@@ -56,7 +56,7 @@ static sail_status_t add_dll_directory(const char *path) {
     SAIL_TRY(sail_to_wchar(path, &path_w));
 
     if (!AddDllDirectory(path_w)) {
-        SAIL_LOG_ERROR("Failed to update library search path with '%s'. Error: %d", path, GetLastError());
+        SAIL_LOG_ERROR("Failed to update library search path with '%s'. Error: 0x%X", path, GetLastError());
         sail_free(path_w);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_ENV_UPDATE);
     }
@@ -72,10 +72,10 @@ static sail_status_t get_sail_dll_path(char *dll_path, int dll_path_size) {
 
     if (GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
             (LPCSTR)&get_sail_dll_path, &thisModule) == 0) {
-        SAIL_LOG_ERROR("GetModuleHandleEx() failed with error code %d. sail.dll location will not be added as a DLL search path", GetLastError());
+        SAIL_LOG_ERROR("GetModuleHandleEx() failed with error code 0x%X. sail.dll location will not be added as a DLL search path", GetLastError());
         return SAIL_ERROR_GET_DLL_PATH;
     } else if (GetModuleFileName(thisModule, dll_path, dll_path_size) == 0) {
-        SAIL_LOG_ERROR("GetModuleFileName() failed with error code %d. sail.dll location will not be added as a DLL search path", GetLastError());
+        SAIL_LOG_ERROR("GetModuleFileName() failed with error code 0x%X. sail.dll location will not be added as a DLL search path", GetLastError());
         return SAIL_ERROR_GET_DLL_PATH;
     } else {
         /* "...\bin\sail.dll" -> "...\bin". */
@@ -368,7 +368,7 @@ static sail_status_t enumerate_codecs_in_paths(struct sail_context *context, con
         HANDLE hFind = FindFirstFile(codecs_path_with_mask, &data);
 
         if (hFind == INVALID_HANDLE_VALUE) {
-            SAIL_LOG_ERROR("Failed to list files in '%s'. Error: %d. No codecs loaded from it", codecs_path, GetLastError());
+            SAIL_LOG_ERROR("Failed to list files in '%s'. Error: 0x%X. No codecs loaded from it", codecs_path, GetLastError());
             sail_free(codecs_path_with_mask);
             continue;
         }
@@ -392,7 +392,7 @@ static sail_status_t enumerate_codecs_in_paths(struct sail_context *context, con
         } while (FindNextFile(hFind, &data));
 
         if (GetLastError() != ERROR_NO_MORE_FILES) {
-            SAIL_LOG_ERROR("Failed to list files in '%s'. Error: %d. Some codecs may not be loaded from it", codecs_path, GetLastError());
+            SAIL_LOG_ERROR("Failed to list files in '%s'. Error: 0x%X. Some codecs may not be loaded from it", codecs_path, GetLastError());
         }
 
         sail_free(codecs_path_with_mask);
