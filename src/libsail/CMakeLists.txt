@@ -72,7 +72,15 @@ endif()
 
 target_link_libraries(sail PUBLIC sail-common)
 
+if (WIN32)
+    sail_check_init_once_execute_once()
+endif()
+
 if (UNIX)
+    # pthread_once
+    find_package(Threads REQUIRED)
+    target_link_libraries(sail PUBLIC ${CMAKE_THREAD_LIBS_INIT})
+
     target_link_libraries(sail PRIVATE dl)
 endif()
 
