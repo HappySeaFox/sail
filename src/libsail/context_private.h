@@ -57,9 +57,6 @@ enum SailContextAction {
     /* Allocates a new TLS context if it's not allocated yet. */
     SAIL_CONTEXT_ALLOCATE,
 
-    /* fetches the current TLS context or NULL if it's not allocated yet. */
-    SAIL_CONTEXT_FETCH,
-
     /* Destroys the currently existing TLS context. */
     SAIL_CONTEXT_DESTROY,
 };

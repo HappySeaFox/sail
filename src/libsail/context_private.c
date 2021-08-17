@@ -691,10 +691,6 @@ static sail_status_t control_tls_context_impl(struct sail_context **context, enu
             *context = global_context;
             break;
         }
-        case SAIL_CONTEXT_FETCH: {
-            *context = global_context;
-            break;
-        }
         case SAIL_CONTEXT_DESTROY: {
             SAIL_LOG_DEBUG("Destroyed context %p", global_context);
             destroy_context(global_context);
