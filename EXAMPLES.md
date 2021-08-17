@@ -184,7 +184,7 @@ sail::context::finish();
 #### C:
 ```C
 /*
- * Optional: Initialize a new SAIL thread-local static context explicitly and preload all codecs.
+ * Optional: Initialize a new SAIL context explicitly and preload all codecs.
  * Codecs are lazy-loaded when SAIL_FLAG_PRELOAD_CODECS is not specified.
  */
 SAIL_TRY(sail_init_with_flags(SAIL_FLAG_PRELOAD_CODECS));
@@ -270,7 +270,7 @@ sail_finish();
 
 #### C++:
 ```C++
-// Optional: Initialize a new SAIL thread-local static context explicitly and preload all codecs.
+// Optional: Initialize a new SAIL context explicitly and preload all codecs.
 // Codecs are lazy-loaded when SAIL_FLAG_PRELOAD_CODECS is not specified.
 //
 sail::context::init(SAIL_FLAG_PRELOAD_CODECS);
@@ -329,7 +329,7 @@ and call `sail_start_reading_io_with_options()`.
 
 ```C
 /*
- * Optional: Initialize a new SAIL thread-local static context explicitly and preload all codecs.
+ * Optional: Initialize a new SAIL context explicitly and preload all codecs.
  * Codecs are lazy-loaded when SAIL_FLAG_PRELOAD_CODECS is not specified.
  */
 SAIL_TRY(sail_init_with_flags(SAIL_FLAG_PRELOAD_CODECS));
@@ -442,7 +442,7 @@ sail_finish();
 
 #### C++:
 ```C++
-// Optional: Initialize a new SAIL thread-local static context explicitly and preload all codecs.
+// Optional: Initialize a new SAIL context explicitly and preload all codecs.
 // Codecs are lazy-loaded when SAIL_FLAG_PRELOAD_CODECS is not specified.
 //
 sail::context::init(SAIL_FLAG_PRELOAD_CODECS);

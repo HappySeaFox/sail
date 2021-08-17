@@ -53,15 +53,15 @@ struct sail_context {
 
 typedef struct sail_context sail_context_t;
 
-SAIL_HIDDEN sail_status_t destroy_tls_context(void);
+SAIL_HIDDEN sail_status_t destroy_global_context(void);
 
-SAIL_HIDDEN sail_status_t current_tls_context_guarded(struct sail_context **context);
+SAIL_HIDDEN sail_status_t fetch_global_context_guarded(struct sail_context **context);
 
-SAIL_HIDDEN sail_status_t current_tls_context_unsafe(struct sail_context **context);
+SAIL_HIDDEN sail_status_t fetch_global_context_unsafe(struct sail_context **context);
 
-SAIL_HIDDEN sail_status_t current_tls_context_guarded_with_flags(struct sail_context **context, int flags);
+SAIL_HIDDEN sail_status_t fetch_global_context_guarded_with_flags(struct sail_context **context, int flags);
 
-SAIL_HIDDEN sail_status_t current_tls_context_unsafe_with_flags(struct sail_context **context, int flags);
+SAIL_HIDDEN sail_status_t fetch_global_context_unsafe_with_flags(struct sail_context **context, int flags);
 
 SAIL_HIDDEN sail_status_t sail_unload_codecs_private(void);
 

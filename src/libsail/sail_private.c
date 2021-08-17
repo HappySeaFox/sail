@@ -52,7 +52,7 @@ sail_status_t load_codec_by_codec_info(const struct sail_codec_info *codec_info,
     SAIL_TRY(lock_context());
 
     struct sail_context *context;
-    SAIL_TRY_OR_CLEANUP(current_tls_context_unsafe(&context),
+    SAIL_TRY_OR_CLEANUP(fetch_global_context_unsafe(&context),
                         /* cleanup */ unlock_context());
 
     /* Find the codec in the cache. */

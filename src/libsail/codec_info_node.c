@@ -35,7 +35,7 @@
 const struct sail_codec_info_node* sail_codec_info_list(void) {
 
     struct sail_context *context;
-    SAIL_TRY_OR_EXECUTE(current_tls_context_guarded(&context),
+    SAIL_TRY_OR_EXECUTE(fetch_global_context_guarded(&context),
                         /* on error */ return NULL);
 
     return context->codec_info_node;

@@ -35,16 +35,14 @@
 sail_status_t sail_init_with_flags(int flags) {
 
     struct sail_context *context;
-    SAIL_TRY(current_tls_context_guarded_with_flags(&context, flags));
+    SAIL_TRY(fetch_global_context_guarded_with_flags(&context, flags));
 
     return SAIL_OK;
 }
 
 void sail_finish(void) {
 
-    SAIL_LOG_INFO("Finish");
-
-    destroy_tls_context();
+    destroy_global_context();
 }
 
 sail_status_t sail_unload_codecs(void) {

@@ -184,7 +184,7 @@ static sail_status_t alloc_context(struct sail_context **context) {
     return SAIL_OK;
 }
 
-static sail_status_t allocate_tls_context(struct sail_context **context) {
+static sail_status_t allocate_global_context(struct sail_context **context) {
 
     SAIL_CHECK_CONTEXT_PTR(context);
 
@@ -700,7 +700,7 @@ static sail_status_t init_context(struct sail_context *context, int flags) {
  * Public functions.
  */
 
-sail_status_t destroy_tls_context(void) {
+sail_status_t destroy_global_context(void) {
 
     SAIL_TRY(lock_context());
 
@@ -713,27 +713,27 @@ sail_status_t destroy_tls_context(void) {
     return SAIL_OK;
 }
 
-sail_status_t current_tls_context_guarded(struct sail_context **context) {
+sail_status_t fetch_global_context_guarded(struct sail_context **context) {
 
-    SAIL_TRY(current_tls_context_guarded_with_flags(context, /* flags */ 0));
-
-    return SAIL_OK;
-}
-
-sail_status_t current_tls_context_unsafe(struct sail_context **context) {
-
-    SAIL_TRY(current_tls_context_unsafe_with_flags(context, /* flags */ 0));
+    SAIL_TRY(fetch_global_context_guarded_with_flags(context, /* flags */ 0));
 
     return SAIL_OK;
 }
 
-sail_status_t current_tls_context_guarded_with_flags(struct sail_context **context, int flags) {
+sail_status_t fetch_global_context_unsafe(struct sail_context **context) {
+
+    SAIL_TRY(fetch_global_context_unsafe_with_flags(context, /* flags */ 0));
+
+    return SAIL_OK;
+}
+
+sail_status_t fetch_global_context_guarded_with_flags(struct sail_context **context, int flags) {
 
     SAIL_CHECK_CONTEXT_PTR(context);
 
     SAIL_TRY(lock_context());
 
-    SAIL_TRY_OR_CLEANUP(current_tls_context_unsafe_with_flags(context, flags),
+    SAIL_TRY_OR_CLEANUP(fetch_global_context_unsafe_with_flags(context, flags),
                         /* cleanup */ unlock_context());
 
     SAIL_TRY(unlock_context());
@@ -741,13 +741,13 @@ sail_status_t current_tls_context_guarded_with_flags(struct sail_context **conte
     return SAIL_OK;
 }
 
-sail_status_t current_tls_context_unsafe_with_flags(struct sail_context **context, int flags) {
+sail_status_t fetch_global_context_unsafe_with_flags(struct sail_context **context, int flags) {
 
     SAIL_CHECK_CONTEXT_PTR(context);
 
     struct sail_context *local_context;
 
-    SAIL_TRY(allocate_tls_context(&local_context));
+    SAIL_TRY(allocate_global_context(&local_context));
     SAIL_TRY(init_context(local_context, flags));
 
     *context = local_context;
@@ -766,7 +766,7 @@ sail_status_t sail_unload_codecs_private(void) {
     }
 
     struct sail_context *context;
-    SAIL_TRY_OR_CLEANUP(current_tls_context_unsafe(&context),
+    SAIL_TRY_OR_CLEANUP(fetch_global_context_unsafe(&context),
                 /* cleanup */ unlock_context());
 
     struct sail_codec_info_node *node = context->codec_info_node;
