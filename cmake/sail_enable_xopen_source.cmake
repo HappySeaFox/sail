@@ -1,6 +1,6 @@
 # Intended to be included by SAIL libraries to enable _XOPEN_SOURCE on UNIX
 #
-macro(sail_enable_posix_source)
+macro(sail_enable_xopen_source)
     cmake_parse_arguments(SAIL_XOPEN_SOURCE "" "TARGET;VERSION" "" ${ARGN})
 
     # Enable _XOPEN_SOURCE on the specified target
