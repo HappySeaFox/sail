@@ -53,15 +53,6 @@ struct sail_context {
 
 typedef struct sail_context sail_context_t;
 
-enum SailContextAction {
-
-    /* Allocates a new context if it's not allocated yet. */
-    SAIL_CONTEXT_ALLOCATE,
-
-    /* Destroys the currently existing context. */
-    SAIL_CONTEXT_DESTROY,
-};
-
 SAIL_HIDDEN sail_status_t destroy_tls_context(void);
 
 SAIL_HIDDEN sail_status_t current_tls_context_guarded(struct sail_context **context);
