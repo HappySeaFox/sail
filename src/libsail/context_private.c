@@ -706,7 +706,7 @@ static sail_status_t control_tls_context_impl(struct sail_context **context, enu
  * Public functions.
  */
 
-sail_status_t control_tls_context_guarded(struct sail_context **context, enum SailContextAction action) {
+sail_status_t control_tls_context(struct sail_context **context, enum SailContextAction action) {
 
     SAIL_TRY(lock_context());
 
@@ -731,7 +731,7 @@ sail_status_t current_tls_context_with_flags(struct sail_context **context, int 
 
     SAIL_TRY(lock_context());
 
-    SAIL_TRY_OR_CLEANUP(control_tls_context_guarded(context, SAIL_CONTEXT_ALLOCATE),
+    SAIL_TRY_OR_CLEANUP(control_tls_context(context, SAIL_CONTEXT_ALLOCATE),
                         /* cleanup */ unlock_context());
     SAIL_TRY_OR_CLEANUP(init_context(*context, flags),
                         /* cleanup */ unlock_context());

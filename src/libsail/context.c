@@ -44,7 +44,7 @@ void sail_finish(void) {
 
     SAIL_LOG_INFO("Finish");
 
-    control_tls_context_guarded(/* context - not needed */ NULL, SAIL_CONTEXT_DESTROY);
+    control_tls_context(/* context - not needed */ NULL, SAIL_CONTEXT_DESTROY);
 }
 
 sail_status_t sail_unload_codecs(void) {

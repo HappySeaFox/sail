@@ -55,22 +55,21 @@ typedef struct sail_context sail_context_t;
 
 enum SailContextAction {
 
-    /* Allocates a new TLS context if it's not allocated yet. */
+    /* Allocates a new context if it's not allocated yet. */
     SAIL_CONTEXT_ALLOCATE,
 
-    /* Destroys the currently existing TLS context. */
+    /* Destroys the currently existing context. */
     SAIL_CONTEXT_DESTROY,
 };
 
 /*
- * Allocates or destroyes the current SAIL TLS context.
- * Doesn't re-allocate it if it's already allocated.
+ * Allocates or destroys the current context. Doesn't re-allocate it if it's already allocated.
  */
-SAIL_HIDDEN sail_status_t control_tls_context_guarded(struct sail_context **context, enum SailContextAction action);
+SAIL_HIDDEN sail_status_t control_tls_context(struct sail_context **context, enum SailContextAction action);
 
 /*
  * Allocates and returns a context on demand. Doesn't re-allocate it if it's already allocated.
- * If the caller is going to use the context, he/she must lock it beforehand.
+ * If the caller is going to use the context, he/she must lock it beforehand with lock_context().
  */
 SAIL_HIDDEN sail_status_t current_tls_context(struct sail_context **context);
 
