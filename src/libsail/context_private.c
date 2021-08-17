@@ -750,7 +750,7 @@ sail_status_t sail_unload_codecs_private(void) {
     SAIL_TRY(lock_context());
 
     if (global_context == NULL) {
-        SAIL_TRY(unlock_context());
+        unlock_context();
         SAIL_LOG_DEBUG("Context doesn't exist so not unloading codecs from it");
         return SAIL_OK;
     }
