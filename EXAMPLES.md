@@ -73,10 +73,7 @@ sail_finish();
 
 #### C++:
 ```C++
-sail::image_reader reader;
-sail::image image;
-
-SAIL_TRY(reader.read(path, &image));
+sail::image image(path);
 
 // Handle the image and its pixels here.
 // Use image.width(), image.height(), image.bytes_per_line(),
@@ -141,20 +138,12 @@ sail_finish();
 
 #### C++:
 ```C++
-sail::image_reader reader;
+sail::image_input input;
 sail::image image;
-
-// It's essential to ALWAYS stop reading to free memory resources.
-// Avoiding doing so will lead to memory leaks. This code gets executed
-// when the outer scope exits.
-//
-SAIL_AT_SCOPE_EXIT (
-    reader.stop_reading();
-);
 
 // Starts reading the specified file.
 //
-SAIL_TRY(reader.start_reading(path));
+SAIL_TRY(input.start(path));
 
 // Read just a single frame. It's possible to read more frames if any. Just continue
 // reading frames till read_next_frame() returns SAIL_OK. If no more frames are available,
@@ -162,9 +151,13 @@ SAIL_TRY(reader.start_reading(path));
 //
 // SAIL always outputs frames of the same size.
 //
-SAIL_TRY(reader.read_next_frame(&image));
+SAIL_TRY(input.next_frame(&image));
 
-SAIL_TRY(reader.stop_reading());
+// It's essential to ALWAYS stop reading to free memory resources.
+// Avoiding doing so will lead to memory leaks. ~image_input() always
+// stops reading.
+//
+SAIL_TRY(input.stop());
 
 // Handle the image and its pixels here.
 // Use image.width(), image.height(), image.bytes_per_line(),
@@ -274,7 +267,7 @@ sail_finish();
 // Codecs are lazy-loaded when SAIL_FLAG_PRELOAD_CODECS is not specified.
 //
 sail::context::init(SAIL_FLAG_PRELOAD_CODECS);
-sail::image_reader reader;
+sail::image_input input;
 
 // Find the codec to read JPEGs.
 //
@@ -293,7 +286,7 @@ size_t buffer_length = ...
 
 // Initialize reading from memory with our options. The options will be deep copied.
 //
-SAIL_TRY(reader.start_reading(buffer, buffer_length, codec_info, read_options));
+SAIL_TRY(input.start(buffer, buffer_length, codec_info, read_options));
 
 // Read just a single frame. It's possible to read more frames if any. Just continue
 // reading frames till read_next_frame() returns SAIL_OK. If no more frames are available,
@@ -302,11 +295,13 @@ SAIL_TRY(reader.start_reading(buffer, buffer_length, codec_info, read_options));
 // SAIL always outputs frames of the same size.
 //
 sail::image image;
-SAIL_TRY(reader.read_next_frame(&image));
+SAIL_TRY(input.next_frame(&image));
 
-// Finish reading.
+// It's essential to ALWAYS stop reading to free memory resources.
+// Avoiding doing so will lead to memory leaks. ~image_input() always
+// stops reading.
 //
-SAIL_TRY(reader.stop_reading());
+SAIL_TRY(input.stop());
 
 // Handle the image and its pixels here.
 // Use image.width(), image.height(), image.bytes_per_line(),
@@ -446,7 +441,7 @@ sail_finish();
 // Codecs are lazy-loaded when SAIL_FLAG_PRELOAD_CODECS is not specified.
 //
 sail::context::init(SAIL_FLAG_PRELOAD_CODECS);
-sail::image_reader reader;
+sail::image_input input;
 
 // Find the codec info by a file extension.
 //
@@ -461,8 +456,8 @@ sail::io io;
 // Save a pointer to our data source. It will be passed back to the callback functions below.
 // You can free the data source in the close() callback.
 //
-// WARNING: If you don't call reader.stop_reading(), the close() callback is never called.
-//          Please make sure you always call reader.stop_reading().
+// WARNING: If you don't call input.stop(), the close() callback is never called.
+//          Please make sure you always call input.stop().
 //
 io.with_stream(my_data_source_pointer);
 
@@ -484,7 +479,7 @@ SAIL_TRY(codec_info.read_features().to_read_options(&read_options));
 
 // Initialize reading with our I/O stream and options.
 //
-SAIL_TRY(reader.start_reading(io, codec_info, read_options));
+SAIL_TRY(input.start(io, codec_info, read_options));
 
 // Read just a single frame. It's possible to read more frames if any. Just continue
 // reading frames till read_next_frame() returns SAIL_OK. If no more frames are available,
@@ -493,11 +488,13 @@ SAIL_TRY(reader.start_reading(io, codec_info, read_options));
 // SAIL always outputs frames of the same size.
 //
 sail::image image;
-SAIL_TRY(reader.read_next_frame(&image));
+SAIL_TRY(input.next_frame(&image));
 
-// Finish reading.
+// It's essential to ALWAYS stop reading to free memory resources.
+// Avoiding doing so will lead to memory leaks. ~image_input() always
+// stops reading.
 //
-SAIL_TRY(reader.stop_reading());
+SAIL_TRY(input.stop());
 
 // Handle the image and its pixels here.
 // Use image.width(), image.height(), image.bytes_per_line(),

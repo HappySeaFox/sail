@@ -123,10 +123,7 @@ sail_destroy_image(image);
 
 #### C++:
 ```C++
-sail::image_reader reader;
-sail::image image;
-
-SAIL_TRY(reader.read(path, &image));
+sail::image image(path);
 
 // Handle the image and its pixels here.
 // Use image.width(), image.height(), image.bytes_per_line(),
