@@ -39,11 +39,9 @@
 /*
  * SAIL contexts.
  *
- * All SAIL functions allocate a thread-local static context per thread when necessary. The context enumerates and holds
- * a list of available codec info objects.
- *
- * If you call SAIL functions from three different threads, three different contexts are allocated.
- * You can destroy them with calling sail_finish() in each thread.
+ * All SAIL functions allocate a global static context when necessary. The context enumerates
+ * and holds a list of available codec info objects. The context is guarded with a mutex to avoid
+ * unpredictable errors in a multi-threaded environment.
  */
 
 namespace sail
@@ -57,16 +55,12 @@ public:
     context& operator=(const context&) = delete;
 
     /*
-     * Initializes a new SAIL thread-local static context with the specific flags. Does nothing
-     * if a thread-local static context already exists. Builds a list of available SAIL codecs.
-     * See SailInitFlags.
+     * Initializes a new SAIL context with the specific flags. Does nothing if a global context
+     * already exists. Builds a list of available SAIL codecs. See SailInitFlags.
      *
-     * Use this function when you need specific features like preloading codecs. If you don't need specific
-     * features, using this function is optional. All reading or writing functions allocate a thread-local
-     * static context implicitly when they need it and when it doesn't exist already.
-     *
-     * It's recommended to destroy the implicitly or explicitly allocated SAIL thread-local static context
-     * by calling sail_finish() when you're done with using SAIL functions in the current thread.
+     * Use this method when you need specific features like preloading codecs. If you don't need specific
+     * features, using this function is optional. All reading or writing functions allocate a global
+     * static context implicitly when they need it and when it doesn't exist yet.
      *
      * Codecs path search algorithm (first found path wins):
      *
@@ -95,22 +89,29 @@ public:
     static sail_status_t init(int flags);
 
     /*
-     * Unloads all the loaded codecs from the cache to release memory occupied by them. Use this method
-     * if you want to release some memory but do not want to deinitialize SAIL with finish().
-     * Subsequent attempts to read or write images will reload necessary SAIL codecs from disk.
+     * Unloads all the loaded codecs from the global static context to release memory occupied by them.
+     * Use this function if you want to release some memory but do not want to deinitialize SAIL
+     * with finish(). Subsequent attempts to read or write images will reload necessary SAIL codecs
+     * from disk.
+     *
+     * Make sure no reading or writing operations are in progress before calling unload_codecs().
+     *
+     * Typical usage: This is a standalone function that can be called at any time.
      *
      * Returns SAIL_OK on success.
      */
     static sail_status_t unload_codecs();
 
     /*
-     * Finalizes working with the thread-local static context that was implicitly or explicitly allocated by
+     * Destroys the global static context that was implicitly or explicitly allocated by
      * reading or writing functions.
      *
-     * Unloads all codecs. All pointers to codec info objects, read and write features get invalidated.
-     * Using them after calling finish() will lead to a crash.
+     * Unloads all codecs. All pointers to codec info objects, read and write features, and codecs
+     * get invalidated. Using them after calling finish() will lead to a crash.
      *
-     * It's possible to initialize a new SAIL thread-local static context afterwards, implicitly or explicitly.
+     * Make sure no reading or writing operations are in progress before calling finish().
+     *
+     * It's possible to initialize a new global static context afterwards, implicitly or explicitly.
      */
     static void finish();
 

@@ -40,14 +40,14 @@ sail_status_t sail_init_with_flags(int flags) {
     return SAIL_OK;
 }
 
-void sail_finish(void) {
-
-    destroy_global_context();
-}
-
 sail_status_t sail_unload_codecs(void) {
 
     SAIL_TRY(sail_unload_codecs_private());
 
     return SAIL_OK;
+}
+
+void sail_finish(void) {
+
+    destroy_global_context();
 }
