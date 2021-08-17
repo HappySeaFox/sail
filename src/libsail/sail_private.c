@@ -49,8 +49,11 @@ sail_status_t load_codec_by_codec_info(const struct sail_codec_info *codec_info,
     SAIL_CHECK_CODEC_INFO_PTR(codec_info);
     SAIL_CHECK_CODEC_PTR(codec);
 
+    SAIL_TRY(lock_context());
+
     struct sail_context *context;
-    SAIL_TRY(current_tls_context(&context));
+    SAIL_TRY_OR_CLEANUP(current_tls_context(&context),
+                        /* cleanup */ unlock_context());
 
     /* Find the codec in the cache. */
     struct sail_codec_info_node *node = context->codec_info_node;
@@ -70,16 +73,20 @@ sail_status_t load_codec_by_codec_info(const struct sail_codec_info *codec_info,
         node = node->next;
     }
 
-    /* Something weird. The pointer to the codec info is not found the cache. */
+    /* Something weird. The pointer to the codec info is not found in the cache. */
     if (found_node == NULL) {
+        unlock_context();
         SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_NOT_FOUND);
     }
 
     if (found_node->codec == NULL) {
-        SAIL_TRY(alloc_and_load_codec(found_node->codec_info, &found_node->codec));
+        SAIL_TRY_OR_CLEANUP(alloc_and_load_codec(found_node->codec_info, &found_node->codec),
+                            /* cleanup */ unlock_context());
     }
 
     *codec = found_node->codec;
+
+    SAIL_TRY(unlock_context());
 
     return SAIL_OK;
 }

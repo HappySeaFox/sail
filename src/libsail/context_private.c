@@ -73,22 +73,6 @@ static sail_status_t initialize_global_context_guard_mutex(void) {
     return SAIL_OK;
 }
 
-static sail_status_t lock_context(void) {
-
-    SAIL_TRY(initialize_global_context_guard_mutex());
-
-    SAIL_TRY(threading_lock_mutex(&global_context_guard_mutex));
-
-    return SAIL_OK;
-}
-
-static sail_status_t unlock_context(void) {
-
-    SAIL_TRY(threading_unlock_mutex(&global_context_guard_mutex));
-
-    return SAIL_OK;
-}
-
 #ifdef SAIL_WIN32
 static sail_status_t add_dll_directory(const char *path) {
 
@@ -216,6 +200,8 @@ static sail_status_t preload_codecs(struct sail_context *context) {
 
     SAIL_CHECK_CONTEXT_PTR(context);
 
+    SAIL_TRY(lock_context());
+
     SAIL_LOG_DEBUG("Preloading codecs");
 
     struct sail_codec_info_node *codec_info_node = context->codec_info_node;
@@ -228,6 +214,8 @@ static sail_status_t preload_codecs(struct sail_context *context) {
 
         codec_info_node = codec_info_node->next;
     }
+
+    SAIL_TRY(unlock_context());
 
     return SAIL_OK;
 }
@@ -789,6 +777,22 @@ sail_status_t sail_unload_codecs_private(void) {
     SAIL_LOG_DEBUG("Unloaded codecs number: %d", counter);
 
     SAIL_TRY(unlock_context());
+
+    return SAIL_OK;
+}
+
+sail_status_t lock_context(void) {
+
+    SAIL_TRY(initialize_global_context_guard_mutex());
+
+    SAIL_TRY(threading_lock_mutex(&global_context_guard_mutex));
+
+    return SAIL_OK;
+}
+
+sail_status_t unlock_context(void) {
+
+    SAIL_TRY(threading_unlock_mutex(&global_context_guard_mutex));
 
     return SAIL_OK;
 }
