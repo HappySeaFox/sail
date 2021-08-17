@@ -52,9 +52,8 @@ sail_status_t threading_call_once(sail_once_flag_t *once_flag, void (*callback)(
 
 #ifdef SAIL_WIN32
     struct callback_holder callback_holder = { callback };
-    PVOID lpContext;
 
-    if (SAIL_LIKELY(InitOnceExecuteOnce(once_flag, OnceHandler, &callback_holder, &lpContext))) {
+    if (SAIL_LIKELY(InitOnceExecuteOnce(once_flag, OnceHandler, &callback_holder, NULL))) {
         return SAIL_OK;
     } else {
         SAIL_LOG_ERROR("Failed to execute call_once. Error: 0x%X", GetLastError());

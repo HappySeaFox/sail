@@ -38,12 +38,56 @@
     #include <sys/types.h>
 #endif
 
-#include "sail-common.h"
 #include "sail.h"
 
 /*
  * Private functions.
  */
+
+struct sail_context *global_context = NULL;
+
+static sail_mutex_t global_context_guard_mutex;
+
+static bool global_context_guard_mutex_initialized = false;
+
+/* Must be called by threading_call_once() to guarantee atomic operation. */
+static void initialize_global_context_guard_mutex_callback(void) {
+
+    SAIL_TRY_OR_EXECUTE(threading_init_mutex(&global_context_guard_mutex),
+                        /* on error */ return);
+
+    SAIL_LOG_DEBUG("Allocated new global context mutex");
+
+    global_context_guard_mutex_initialized = true;
+}
+
+static sail_status_t initialize_global_context_guard_mutex(void) {
+
+    static sail_once_flag_t once_flag = SAIL_ONCE_DEFAULT_VALUE;
+    SAIL_TRY(threading_call_once(&once_flag, initialize_global_context_guard_mutex_callback));
+
+    if (!global_context_guard_mutex_initialized) {
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_CONTEXT_UNINITIALIZED);
+    }
+
+    return SAIL_OK;
+}
+
+static sail_status_t lock_context(void) {
+
+    SAIL_TRY(initialize_global_context_guard_mutex());
+
+    SAIL_TRY(threading_lock_mutex(&global_context_guard_mutex));
+
+    return SAIL_OK;
+}
+
+static sail_status_t unlock_context(void) {
+
+    SAIL_TRY(threading_unlock_mutex(&global_context_guard_mutex));
+
+    return SAIL_OK;
+}
 
 #ifdef SAIL_WIN32
 static sail_status_t add_dll_directory(const char *path) {
@@ -148,10 +192,9 @@ static sail_status_t alloc_context(struct sail_context **context) {
 
     void *ptr;
     SAIL_TRY(sail_malloc(sizeof(struct sail_context), &ptr));
-
     *context = ptr;
 
-    (*context)->initialized      = false;
+    (*context)->initialized     = false;
     (*context)->codec_info_node = NULL;
 
     return SAIL_OK;
@@ -646,37 +689,47 @@ static sail_status_t init_context(struct sail_context *context, int flags) {
     return SAIL_OK;
 }
 
-/*
- * Public functions.
- */
-
-sail_status_t control_tls_context(struct sail_context **context, enum SailContextAction action) {
-
-    static SAIL_THREAD_LOCAL struct sail_context *tls_context = NULL;
+static sail_status_t control_tls_context_impl(struct sail_context **context, enum SailContextAction action) {
 
     switch (action) {
         case SAIL_CONTEXT_ALLOCATE: {
             SAIL_CHECK_CONTEXT_PTR(context);
 
-            if (tls_context == NULL) {
-                SAIL_TRY(alloc_context(&tls_context));
-                SAIL_LOG_DEBUG("Allocated a new thread-local context %p", tls_context);
+            if (global_context == NULL) {
+                SAIL_TRY(alloc_context(&global_context));
+                SAIL_LOG_DEBUG("Allocated new context %p", global_context);
             }
 
-            *context = tls_context;
+            *context = global_context;
             break;
         }
         case SAIL_CONTEXT_FETCH: {
-            *context = tls_context;
+            *context = global_context;
             break;
         }
         case SAIL_CONTEXT_DESTROY: {
-            SAIL_LOG_DEBUG("Destroyed the thread-local context %p", tls_context);
-            destroy_context(tls_context);
-            tls_context = NULL;
+            SAIL_LOG_DEBUG("Destroyed context %p", global_context);
+            destroy_context(global_context);
+            global_context = NULL;
             break;
         }
     }
+
+    return SAIL_OK;
+}
+
+/*
+ * Public functions.
+ */
+
+sail_status_t control_tls_context_guarded(struct sail_context **context, enum SailContextAction action) {
+
+    SAIL_TRY(lock_context());
+
+    SAIL_TRY_OR_CLEANUP(control_tls_context_impl(context, action),
+                        /* cleanup */ unlock_context());
+
+    SAIL_TRY(unlock_context());
 
     return SAIL_OK;
 }
@@ -692,8 +745,50 @@ sail_status_t current_tls_context_with_flags(struct sail_context **context, int 
 
     SAIL_CHECK_CONTEXT_PTR(context);
 
-    SAIL_TRY(control_tls_context(context, SAIL_CONTEXT_ALLOCATE));
-    SAIL_TRY(init_context(*context, flags));
+    SAIL_TRY(lock_context());
+
+    SAIL_TRY_OR_CLEANUP(control_tls_context_guarded(context, SAIL_CONTEXT_ALLOCATE),
+                        /* cleanup */ unlock_context());
+    SAIL_TRY_OR_CLEANUP(init_context(*context, flags),
+                        /* cleanup */ unlock_context());
+
+    SAIL_TRY(unlock_context());
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_unload_codecs_private(void) {
+
+    SAIL_TRY(lock_context());
+
+    if (global_context == NULL) {
+        SAIL_TRY(unlock_context());
+        SAIL_LOG_DEBUG("Context doesn't exist so not unloading codecs from it");
+        return SAIL_OK;
+    }
+
+    SAIL_LOG_DEBUG("Unloading codecs");
+
+    struct sail_context *context;
+    SAIL_TRY_OR_CLEANUP(current_tls_context(&context),
+                /* cleanup */ unlock_context());
+
+    struct sail_codec_info_node *node = context->codec_info_node;
+    int counter = 0;
+
+    while (node != NULL) {
+        if (node->codec != NULL) {
+            destroy_codec(node->codec);
+            node->codec = NULL;
+            counter++;
+        }
+
+        node = node->next;
+    }
+
+    SAIL_LOG_DEBUG("Unloaded codecs number: %d", counter);
+
+    SAIL_TRY(unlock_context());
 
     return SAIL_OK;
 }

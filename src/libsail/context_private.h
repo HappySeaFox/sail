@@ -68,7 +68,7 @@ enum SailContextAction {
  * Allocates or destroyes the current SAIL TLS context.
  * Doesn't re-allocate it if it's already allocated.
  */
-SAIL_HIDDEN sail_status_t control_tls_context(struct sail_context **context, enum SailContextAction action);
+SAIL_HIDDEN sail_status_t control_tls_context_guarded(struct sail_context **context, enum SailContextAction action);
 
 /* Returns the allocated and initialized TLS context. */
 SAIL_HIDDEN sail_status_t current_tls_context(struct sail_context **context);
@@ -78,5 +78,7 @@ SAIL_HIDDEN sail_status_t current_tls_context(struct sail_context **context);
  * See SailInitFlags.
  */
 SAIL_HIDDEN sail_status_t current_tls_context_with_flags(struct sail_context **context, int flags);
+
+SAIL_HIDDEN sail_status_t sail_unload_codecs_private(void);
 
 #endif
