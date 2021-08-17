@@ -188,15 +188,10 @@ static sail_status_t allocate_global_context(struct sail_context **context) {
 
     SAIL_CHECK_CONTEXT_PTR(context);
 
-    SAIL_TRY(lock_context());
-
     if (global_context == NULL) {
-        SAIL_TRY_OR_CLEANUP(alloc_context(&global_context),
-                            /* cleanup */ unlock_context());
+        SAIL_TRY(alloc_context(&global_context));
         SAIL_LOG_DEBUG("Allocated new context %p", global_context);
     }
-
-    SAIL_TRY(unlock_context());
 
     *context = global_context;
 
