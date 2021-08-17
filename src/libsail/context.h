@@ -58,7 +58,15 @@ enum SailInitFlags {
 };
 
 /*
- * Initializes a new SAIL context with the specific flags. Does nothing if a global context
+ * Initializes a new SAIL global context with default flags. Does nothing if a global context
+ * already exists. See also sail_init_with_flags().
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_init(void);
+
+/*
+ * Initializes a new SAIL global context with the specific flags. Does nothing if a global context
  * already exists. Builds a list of available SAIL codecs. See SailInitFlags.
  *
  * Use this function when you need specific features like preloading codecs. If you don't need specific

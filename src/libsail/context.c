@@ -32,6 +32,13 @@
 #include "sail-common.h"
 #include "sail.h"
 
+sail_status_t sail_init(void) {
+
+    SAIL_TRY(sail_init_with_flags(0));
+
+    return SAIL_OK;
+}
+
 sail_status_t sail_init_with_flags(int flags) {
 
     struct sail_context *context;
