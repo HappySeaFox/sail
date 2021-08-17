@@ -199,7 +199,7 @@ or a deeper API, it's always a responsibility of the engineer to stop reading or
 If you don't call `sail_stop_reading()` or `sail_stop_writing()` in this situation, be prepared for memory leaks.
 
 **C++ only:** C++ engineers are more lucky. The C++ binding executes the necessary cleanup automatically in this
-situation in `~image_reader()` or `~image_writer()`.
+situation in `~image_input()` or `~image_output()`.
 
 ### Convention to call SAIL functions
 
