@@ -40,20 +40,13 @@ static void print_unsupported_write_pixel_format(enum SailPixelFormat pixel_form
                     sail_pixel_format_to_string(pixel_format));
 }
 
-/*
- * Public functions.
- */
-
-sail_status_t load_codec_by_codec_info(const struct sail_codec_info *codec_info, const struct sail_codec **codec) {
+static sail_status_t load_codec_by_codec_info_unsafe(const struct sail_codec_info *codec_info, const struct sail_codec **codec) {
 
     SAIL_CHECK_CODEC_INFO_PTR(codec_info);
     SAIL_CHECK_CODEC_PTR(codec);
 
-    SAIL_TRY(lock_context());
-
     struct sail_context *context;
-    SAIL_TRY_OR_CLEANUP(fetch_global_context_unsafe(&context),
-                        /* cleanup */ unlock_context());
+    SAIL_TRY(fetch_global_context_unsafe(&context));
 
     /* Find the codec in the cache. */
     struct sail_codec_info_node *node = context->codec_info_node;
@@ -75,16 +68,31 @@ sail_status_t load_codec_by_codec_info(const struct sail_codec_info *codec_info,
 
     /* Something weird. The pointer to the codec info is not found in the cache. */
     if (found_node == NULL) {
-        unlock_context();
         SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_NOT_FOUND);
     }
 
     if (found_node->codec == NULL) {
-        SAIL_TRY_OR_CLEANUP(alloc_and_load_codec(found_node->codec_info, &found_node->codec),
-                            /* cleanup */ unlock_context());
+        SAIL_TRY(alloc_and_load_codec(found_node->codec_info, &found_node->codec));
     }
 
     *codec = found_node->codec;
+
+    return SAIL_OK;
+}
+
+/*
+ * Public functions.
+ */
+
+sail_status_t load_codec_by_codec_info(const struct sail_codec_info *codec_info, const struct sail_codec **codec) {
+
+    SAIL_CHECK_CODEC_INFO_PTR(codec_info);
+    SAIL_CHECK_CODEC_PTR(codec);
+
+    SAIL_TRY(lock_context());
+
+    SAIL_TRY_OR_CLEANUP(load_codec_by_codec_info_unsafe(codec_info, codec),
+                        /* cleanup */ unlock_context());
 
     SAIL_TRY(unlock_context());
 
