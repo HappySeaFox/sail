@@ -35,7 +35,7 @@
 sail_status_t sail_init_with_flags(int flags) {
 
     struct sail_context *context;
-    SAIL_TRY(current_tls_context_with_flags(&context, flags));
+    SAIL_TRY(current_tls_context_guarded_with_flags(&context, flags));
 
     return SAIL_OK;
 }
@@ -44,7 +44,7 @@ void sail_finish(void) {
 
     SAIL_LOG_INFO("Finish");
 
-    control_tls_context(/* context - not needed */ NULL, SAIL_CONTEXT_DESTROY);
+    destroy_tls_context();
 }
 
 sail_status_t sail_unload_codecs(void) {

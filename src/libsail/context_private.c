@@ -184,6 +184,25 @@ static sail_status_t alloc_context(struct sail_context **context) {
     return SAIL_OK;
 }
 
+static sail_status_t allocate_tls_context(struct sail_context **context) {
+
+    SAIL_CHECK_CONTEXT_PTR(context);
+
+    SAIL_TRY(lock_context());
+
+    if (global_context == NULL) {
+        SAIL_TRY_OR_CLEANUP(alloc_context(&global_context),
+                            /* cleanup */ unlock_context());
+        SAIL_LOG_DEBUG("Allocated new context %p", global_context);
+    }
+
+    SAIL_TRY(unlock_context());
+
+    *context = global_context;
+
+    return SAIL_OK;
+}
+
 static sail_status_t destroy_context(struct sail_context *context) {
 
     if (context == NULL) {
@@ -677,66 +696,61 @@ static sail_status_t init_context(struct sail_context *context, int flags) {
     return SAIL_OK;
 }
 
-static sail_status_t control_tls_context_impl(struct sail_context **context, enum SailContextAction action) {
-
-    switch (action) {
-        case SAIL_CONTEXT_ALLOCATE: {
-            SAIL_CHECK_CONTEXT_PTR(context);
-
-            if (global_context == NULL) {
-                SAIL_TRY(alloc_context(&global_context));
-                SAIL_LOG_DEBUG("Allocated new context %p", global_context);
-            }
-
-            *context = global_context;
-            break;
-        }
-        case SAIL_CONTEXT_DESTROY: {
-            SAIL_LOG_DEBUG("Destroyed context %p", global_context);
-            destroy_context(global_context);
-            global_context = NULL;
-            break;
-        }
-    }
-
-    return SAIL_OK;
-}
-
 /*
  * Public functions.
  */
 
-sail_status_t control_tls_context(struct sail_context **context, enum SailContextAction action) {
+sail_status_t destroy_tls_context(void) {
 
     SAIL_TRY(lock_context());
 
-    SAIL_TRY_OR_CLEANUP(control_tls_context_impl(context, action),
-                        /* cleanup */ unlock_context());
+    SAIL_LOG_DEBUG("Destroyed context %p", global_context);
+    destroy_context(global_context);
+    global_context = NULL;
 
     SAIL_TRY(unlock_context());
 
     return SAIL_OK;
 }
 
-sail_status_t current_tls_context(struct sail_context **context) {
+sail_status_t current_tls_context_guarded(struct sail_context **context) {
 
-    SAIL_TRY(current_tls_context_with_flags(context, /* flags */ 0));
+    SAIL_TRY(current_tls_context_guarded_with_flags(context, /* flags */ 0));
 
     return SAIL_OK;
 }
 
-sail_status_t current_tls_context_with_flags(struct sail_context **context, int flags) {
+sail_status_t current_tls_context_unsafe(struct sail_context **context) {
+
+    SAIL_TRY(current_tls_context_unsafe_with_flags(context, /* flags */ 0));
+
+    return SAIL_OK;
+}
+
+sail_status_t current_tls_context_guarded_with_flags(struct sail_context **context, int flags) {
 
     SAIL_CHECK_CONTEXT_PTR(context);
 
     SAIL_TRY(lock_context());
 
-    SAIL_TRY_OR_CLEANUP(control_tls_context(context, SAIL_CONTEXT_ALLOCATE),
-                        /* cleanup */ unlock_context());
-    SAIL_TRY_OR_CLEANUP(init_context(*context, flags),
+    SAIL_TRY_OR_CLEANUP(current_tls_context_unsafe_with_flags(context, flags),
                         /* cleanup */ unlock_context());
 
     SAIL_TRY(unlock_context());
+
+    return SAIL_OK;
+}
+
+sail_status_t current_tls_context_unsafe_with_flags(struct sail_context **context, int flags) {
+
+    SAIL_CHECK_CONTEXT_PTR(context);
+
+    struct sail_context *local_context;
+
+    SAIL_TRY(allocate_tls_context(&local_context));
+    SAIL_TRY(init_context(local_context, flags));
+
+    *context = local_context;
 
     return SAIL_OK;
 }
@@ -751,10 +765,8 @@ sail_status_t sail_unload_codecs_private(void) {
         return SAIL_OK;
     }
 
-    SAIL_LOG_DEBUG("Unloading codecs");
-
     struct sail_context *context;
-    SAIL_TRY_OR_CLEANUP(current_tls_context(&context),
+    SAIL_TRY_OR_CLEANUP(current_tls_context_unsafe(&context),
                 /* cleanup */ unlock_context());
 
     struct sail_codec_info_node *node = context->codec_info_node;
@@ -770,9 +782,9 @@ sail_status_t sail_unload_codecs_private(void) {
         node = node->next;
     }
 
-    SAIL_LOG_DEBUG("Unloaded codecs number: %d", counter);
-
     SAIL_TRY(unlock_context());
+
+    SAIL_LOG_DEBUG("Unloaded codecs number: %d", counter);
 
     return SAIL_OK;
 }
