@@ -422,7 +422,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v5_png(void *state, struct sail_
                 } else if (png_state->next_frame_dispose_op == PNG_DISPOSE_OP_NONE) {
                     memcpy(png_state->prev[row] + png_state->next_frame_x_offset * png_state->bytes_per_pixel,
                             scanline,
-                            png_state->next_frame_width * png_state->bytes_per_pixel);
+                            (size_t)png_state->next_frame_width * png_state->bytes_per_pixel);
                 } else { /* PNG_DISPOSE_OP_PREVIOUS */
                 }
             }
