@@ -205,7 +205,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_webp(void *state, s
         }
 
         /* Allocate a canvas frame to apply disposal later. */
-        size_t image_size = webp_state->canvas_image->bytes_per_line * webp_state->canvas_image->height;
+        size_t image_size = (size_t)webp_state->canvas_image->bytes_per_line * webp_state->canvas_image->height;
 
         void *ptr;
         SAIL_TRY(sail_malloc(image_size, &ptr));
