@@ -74,6 +74,10 @@ sail_enable_pch(TARGET sail-c++ HEADER sail-c++.h)
 #
 target_include_directories(sail-c++ PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
 
+if (MSVC)
+    target_compile_options(sail-c++ PRIVATE "/EHsc")
+endif()
+
 target_link_libraries(sail-c++ PUBLIC sail-common sail sail-manip)
 
 # pkg-config integration
