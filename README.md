@@ -10,9 +10,6 @@
   <a href="https://scan.coverity.com/projects/smoked-herring-sail">
     <img alt="Coverity Scan Build Status" src="https://img.shields.io/coverity/scan/21306"/>
   </a>
-  <a href="#license">
-    <img alt="License" src="https://img.shields.io/github/license/smoked-herring/sail?color=blue"/>
-  </a>
   <a href="https://github.com/smoked-herring/sail/releases">
     <img alt="Latest release" src="https://img.shields.io/github/v/release/smoked-herring/sail?include_prereleases"/>
   </a>
