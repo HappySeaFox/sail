@@ -205,7 +205,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_webp(void *state, s
         }
 
         /* Allocate a canvas frame to apply disposal later. */
-        size_t image_size = webp_state->canvas_image->bytes_per_line * webp_state->canvas_image->height;
+        size_t image_size = (size_t)webp_state->canvas_image->bytes_per_line * webp_state->canvas_image->height;
 
         void *ptr;
         SAIL_TRY(sail_malloc(image_size, &ptr));
@@ -283,7 +283,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v5_webp(void *state, struct sail
                                     webp_state->webp_iterator->fragment.size,
                                     (uint8_t *)webp_state->canvas_image->pixels + webp_state->canvas_image->bytes_per_line * webp_state->frame_y +
                                         webp_state->frame_x * webp_state->bytes_per_pixel,
-                                    webp_state->canvas_image->bytes_per_line * webp_state->canvas_image->height,
+                                    (size_t)webp_state->canvas_image->bytes_per_line * webp_state->canvas_image->height,
                                     webp_state->canvas_image->bytes_per_line) == NULL) {
                 SAIL_LOG_ERROR("WEBP: Failed to decode image");
                 SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
@@ -294,7 +294,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v5_webp(void *state, struct sail
             if (WebPDecodeRGBAInto(webp_state->webp_iterator->fragment.bytes,
                                     webp_state->webp_iterator->fragment.size,
                                     image->pixels,
-                                    image->bytes_per_line * image->height,
+                                    (size_t)image->bytes_per_line * image->height,
                                     webp_state->frame_width * webp_state->bytes_per_pixel) == NULL) {
                 SAIL_LOG_ERROR("WEBP: Failed to decode image");
                 SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
@@ -315,7 +315,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v5_webp(void *state, struct sail
         }
     }
 
-    memcpy(image->pixels, webp_state->canvas_image->pixels, image->bytes_per_line * image->height);
+    memcpy(image->pixels, webp_state->canvas_image->pixels, (size_t)image->bytes_per_line * image->height);
 
     return SAIL_OK;
 }

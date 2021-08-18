@@ -4,11 +4,11 @@
   <a href="https://travis-ci.org/HappySeaFox/sail">
     <img alt="Travis Build Status" src="https://img.shields.io/travis/HappySeaFox/sail/master"/>
   </a>
+  <a href="https://lgtm.com/projects/g/HappySeaFox/sail/context:cpp">
+    <img alt="Language grade: C/C++" src="https://img.shields.io/lgtm/grade/cpp/g/HappySeaFox/sail.svg?logo=lgtm&logoWidth=18"/>
+  </a>
   <a href="https://scan.coverity.com/projects/smoked-herring-sail">
     <img alt="Coverity Scan Build Status" src="https://img.shields.io/coverity/scan/21306"/>
-  </a>
-  <a href="#license">
-    <img alt="License" src="https://img.shields.io/github/license/smoked-herring/sail?color=blue"/>
   </a>
   <a href="https://github.com/smoked-herring/sail/releases">
     <img alt="Latest release" src="https://img.shields.io/github/v/release/smoked-herring/sail?include_prereleases"/>

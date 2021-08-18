@@ -497,7 +497,7 @@ sail_status_t png_private_blend_source(void *dst_raw, unsigned dst_offset, const
 
     memcpy((uint8_t *)dst_raw + dst_offset * bytes_per_pixel,
             src_raw,
-            src_length * bytes_per_pixel);
+            (size_t)src_length * bytes_per_pixel);
 
     return SAIL_OK;
 }
