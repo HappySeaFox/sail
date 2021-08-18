@@ -395,7 +395,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v5_png(void *state, struct sail_
         for (unsigned row = 0; row < image->height; row++) {
             unsigned char *scanline = (unsigned char *)image->pixels + row * image->bytes_per_line;
 
-            memcpy(scanline, png_state->prev[row], png_state->first_image->width * png_state->bytes_per_pixel);
+            memcpy(scanline, png_state->prev[row], (size_t)png_state->first_image->width * png_state->bytes_per_pixel);
 
             if (row >= png_state->next_frame_y_offset && row < png_state->next_frame_y_offset + png_state->next_frame_height) {
                 png_read_row(png_state->png_ptr, (png_bytep)png_state->temp_scanline, NULL);
