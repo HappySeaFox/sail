@@ -67,7 +67,7 @@ public:
      * already exists. Builds a list of available SAIL codecs. See SailInitFlags.
      *
      * Use this method when you need specific features like preloading codecs. If you don't need specific
-     * features, using this function is optional. All reading or writing functions allocate a global
+     * features, using this method is optional. All reading or writing functions allocate a global
      * static context implicitly when they need it and when it doesn't exist yet.
      *
      * Codecs path search algorithm (first found path wins):
@@ -98,13 +98,14 @@ public:
 
     /*
      * Unloads all the loaded codecs from the global static context to release memory occupied by them.
-     * Use this function if you want to release some memory but do not want to deinitialize SAIL
+     * Use this method if you want to release some memory but do not want to deinitialize SAIL
      * with finish(). Subsequent attempts to read or write images will reload necessary SAIL codecs
      * from disk.
      *
      * Warning: Make sure no reading or writing operations are in progress before calling unload_codecs().
+     *          Failure to do so may lead to a crash.
      *
-     * Typical usage: This is a standalone function that can be called at any time.
+     * Typical usage: This is a standalone method that can be called at any time.
      *
      * Returns SAIL_OK on success.
      */
@@ -117,9 +118,12 @@ public:
      * Unloads all codecs. All pointers to codec info objects, read and write features, and codecs
      * get invalidated. Using them after calling finish() will lead to a crash.
      *
-     * Warning: Make sure no reading or writing operations are in progress before calling finish().
-     *
      * It's possible to initialize a new global static context afterwards, implicitly or explicitly.
+     *
+     * Warning: Make sure no reading or writing operations are in progress before calling finish().
+     *          Failure to do so may lead to a crash.
+     *
+     * Typical usage: This is a standalone method that can be called at any time.
      */
     static void finish();
 
