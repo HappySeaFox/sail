@@ -42,7 +42,7 @@ animated, multi-paged images along with their meta data and ICC profiles. :sailb
 
 ## Features overview
 
-- [x] Easy-to-use C and C++ interfaces
+- [x] Easy-to-use thread-safe C and C++ interfaces
 - [x] Versatile APIs: `junior`, `advanced`, `deep diver`, and `technical diver`
 - [x] Input/output: files, memory, custom I/O streams
 - [x] Load by file suffixes, paths, and [magic numbers](https://en.wikipedia.org/wiki/File_format#Magic_number)
