@@ -1,0 +1,13 @@
+path_classifiers:
+  test:
+    - "/tests"
+extraction:
+  cpp:
+    prepare:
+      packages:
+        - build-essential
+        - libgif-dev
+        - libjpeg-dev
+        - libpng-dev
+        - libtiff-dev
+        - libwebp-dev
