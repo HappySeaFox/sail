@@ -73,7 +73,7 @@ macro(sail_codec)
     #
     set_target_properties(${TARGET} PROPERTIES PREFIX "")
 
-    # Rename to just 'sail-png.dll'
+    # Rename to 'sail-codec-png.dll'
     #
     set_target_properties(${TARGET} PROPERTIES OUTPUT_NAME sail-codec-${SAIL_CODEC_NAME})
 
