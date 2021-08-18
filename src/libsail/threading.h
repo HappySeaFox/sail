@@ -42,6 +42,14 @@
     #include <pthread.h>
 #endif
 
+/*
+ * Threading support.
+ *
+ * Why this file is needed: C11 introduces threading support with mutexes, atomics, threads etc.
+ * However, the most popular C compiler for Windows, MSVC, still supports nothing from it. We need
+ * to implement our own threading support based on OS-specific APIs.
+ */
+
 /* Call once. */
 
 #ifdef SAIL_WIN32
