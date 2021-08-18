@@ -315,7 +315,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v5_webp(void *state, struct sail
         }
     }
 
-    memcpy(image->pixels, webp_state->canvas_image->pixels, image->bytes_per_line * image->height);
+    memcpy(image->pixels, webp_state->canvas_image->pixels, (size_t)image->bytes_per_line * image->height);
 
     return SAIL_OK;
 }
