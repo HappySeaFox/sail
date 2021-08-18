@@ -294,7 +294,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v5_webp(void *state, struct sail
             if (WebPDecodeRGBAInto(webp_state->webp_iterator->fragment.bytes,
                                     webp_state->webp_iterator->fragment.size,
                                     image->pixels,
-                                    image->bytes_per_line * image->height,
+                                    (size_t)image->bytes_per_line * image->height,
                                     webp_state->frame_width * webp_state->bytes_per_pixel) == NULL) {
                 SAIL_LOG_ERROR("WEBP: Failed to decode image");
                 SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
