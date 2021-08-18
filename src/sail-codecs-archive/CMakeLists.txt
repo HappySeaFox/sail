@@ -37,7 +37,7 @@ foreach(codec ${ENABLED_CODECS})
     },\n")
 endforeach()
 
-string(TOUPPER ${SAIL_ENABLED_CODECS} SAIL_ENABLED_CODECS)
+string(TOUPPER "${SAIL_ENABLED_CODECS}" SAIL_ENABLED_CODECS)
 set(SAIL_ENABLED_CODECS "${SAIL_ENABLED_CODECS}NULL")
 
 # List of enabled codecs and their info
