@@ -102,7 +102,7 @@ public:
      * with finish(). Subsequent attempts to read or write images will reload necessary SAIL codecs
      * from disk.
      *
-     * Make sure no reading or writing operations are in progress before calling unload_codecs().
+     * Warning: Make sure no reading or writing operations are in progress before calling unload_codecs().
      *
      * Typical usage: This is a standalone function that can be called at any time.
      *
@@ -117,7 +117,7 @@ public:
      * Unloads all codecs. All pointers to codec info objects, read and write features, and codecs
      * get invalidated. Using them after calling finish() will lead to a crash.
      *
-     * Make sure no reading or writing operations are in progress before calling finish().
+     * Warning: Make sure no reading or writing operations are in progress before calling finish().
      *
      * It's possible to initialize a new global static context afterwards, implicitly or explicitly.
      */
