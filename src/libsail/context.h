@@ -39,11 +39,15 @@ extern "C" {
 #endif
 
 /*
- * SAIL contexts.
+ * SAIL context.
  *
- * All SAIL functions allocate a global static context when necessary. The context enumerates
- * and holds a list of available codec info objects. The context is guarded with a mutex to avoid
- * unpredictable errors in a multi-threaded environment.
+ * SAIL context enumerates and holds a list of available codec info objects and a list of loaded codecs.
+ * It's a global static object being created on demand by all SAIL reading, writing, and probing functions.
+ * If you want to allocate SAIL context explicitly, use sail_init() or sail_init_with_flags().
+ * All SAIL reading, writing, and probing functions will re-use it then.
+ *
+ * SAIL context modification (creating, destroying, loading and unloading codecs) is guarded with a mutex
+ * to avoid unpredictable errors in a multi-threaded environment.
  */
 
 /*
