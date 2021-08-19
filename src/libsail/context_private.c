@@ -44,7 +44,7 @@
  * Private functions.
  */
 
-struct sail_context *global_context = NULL;
+static struct sail_context *global_context = NULL;
 
 static sail_mutex_t global_context_guard_mutex;
 
