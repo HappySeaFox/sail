@@ -16,6 +16,8 @@ macro(sail_codec)
     # Put this codec into the disabled list so when we return from here
     # on error it's get automatically marked as disabled. If no errors were found,
     # we remove the codec from the disabled list at the end.
+    list(REMOVE_ITEM ENABLED_CODECS ${SAIL_CODEC_NAME})
+    set(ENABLED_CODECS ${ENABLED_CODECS} PARENT_SCOPE)
     set(DISABLED_CODECS ${DISABLED_CODECS} ${SAIL_CODEC_NAME} PARENT_SCOPE)
     set(DISABLED_CODECS ${DISABLED_CODECS} ${SAIL_CODEC_NAME})
 
