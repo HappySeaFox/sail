@@ -3,15 +3,12 @@
 #
 # Usage:
 #
-#   1. When SYSTEM_HEADERS and SYSTEM_LIBS are specified, they are used to search
-#      system headers and libs. Use them if CMake has no corresponding Find* module.
-#   2. When SYSTEM_HEADERS and SYSTEM_LIBS are not specified, CMAKE is included
-#      and sail_find_dependencies() is called to search CMake packages.
-#   3. When CMAKE is specified, sail_codec_post_add() is called right after a new target
+#   1. When CMAKE is specified, sail_find_dependencies() is called to search CMake packages.
+#   2. When CMAKE is specified, sail_codec_post_add() is called right after a new target
 #      is added. sail_codec_post_add() could be used for tests like check_c_source_compiles().
 #
 macro(sail_codec)
-    cmake_parse_arguments(SAIL_CODEC "" "NAME" "SOURCES;SYSTEM_HEADERS;SYSTEM_LIBS;CMAKE" ${ARGN})
+    cmake_parse_arguments(SAIL_CODEC "" "NAME" "SOURCES;CMAKE" ${ARGN})
 
     # Put this codec into the disabled list so when we return from here
     # on error it's get automatically marked as disabled. If no errors were found,
@@ -23,35 +20,11 @@ macro(sail_codec)
 
     if (SAIL_CODEC_CMAKE)
         include(${SAIL_CODEC_CMAKE})
+
+        if (COMMAND sail_find_dependencies)
+            sail_find_dependencies()
+        endif()
     endif()
-
-	foreach(header ${SAIL_CODEC_SYSTEM_HEADERS})
-		find_path(sail_include_dir_${header} ${header})
-
-		if (NOT sail_include_dir_${header})
-			string(TOUPPER ${SAIL_CODEC_NAME} SAIL_CODEC_NAME)
-			message("*** CODECS: ${header} header file is not found. ${SAIL_CODEC_NAME} codec is disabled.")
-			return()
-		endif()
-
-		list(APPEND sail_${SAIL_CODEC_NAME}_include_dirs ${sail_include_dir_${header}})
-	endforeach()
-
-	foreach(lib ${SAIL_CODEC_SYSTEM_LIBS})
-		find_library(sail_lib_${lib} NAMES ${lib})
-
-		if (NOT sail_lib_${lib})
-			string(TOUPPER "${SAIL_CODEC_NAME}" SAIL_CODEC_NAME)
-			message("*** CODECS: ${lib} library is not found. ${SAIL_CODEC_NAME} codec is disabled.")
-			return()
-		endif()
-
-		list(APPEND sail_${SAIL_CODEC_NAME}_libs ${sail_lib_${lib}})
-	endforeach()
-
-	if (SAIL_CODEC_CMAKE AND NOT SAIL_CODEC_SYSTEM_HEADERS AND NOT SAIL_CODEC_SYSTEM_LIBS AND COMMAND sail_find_dependencies)
-		sail_find_dependencies()
-	endif()
 
     set(sail_${SAIL_CODEC_NAME}_cflags       ${sail_${SAIL_CODEC_NAME}_cflags}       CACHE INTERNAL "List of ${SAIL_CODEC_NAME} CFLAGS")
     set(sail_${SAIL_CODEC_NAME}_include_dirs ${sail_${SAIL_CODEC_NAME}_include_dirs} CACHE INTERNAL "List of ${SAIL_CODEC_NAME} include dirs")
@@ -59,7 +32,7 @@ macro(sail_codec)
 
     # Use 'sail-codec-png' instead of just 'png' to avoid conflicts
     # with libpng cmake configs (they also export a 'png' target)
-    # and possibly other libs in the future
+    # and possibly other libs in the future.
     #
     set(TARGET sail-codec-${SAIL_CODEC_NAME})
 
