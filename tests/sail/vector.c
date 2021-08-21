@@ -75,6 +75,11 @@ static MunitResult test_vector_push_pop(const MunitParameter params[], void *use
     return MUNIT_OK;
 }
 
+static void free_image_item(void *item) {
+
+    sail_destroy_image(item);
+}
+
 static MunitResult test_vector_item_destroy(const MunitParameter params[], void *user_data) {
 
     (void)params;
@@ -83,7 +88,7 @@ static MunitResult test_vector_item_destroy(const MunitParameter params[], void 
     struct sail_vector *vector;
 
     const size_t capacity = 10;
-    munit_assert(sail_alloc_vector(capacity, sail_destroy_image, &vector) == SAIL_OK);
+    munit_assert(sail_alloc_vector(capacity, free_image_item, &vector) == SAIL_OK);
 
     for (size_t i = 0; i < capacity; i++) {
         struct sail_image *image;
