@@ -60,8 +60,8 @@ endif()
 option(SAIL_BUILD_EXAMPLES "Build examples." ON)
 option(SAIL_BUILD_TESTS "Build tests." ON)
 option(SAIL_DEV "Enable developer mode. Be more strict when compiling source code, for example." OFF)
-set(SAIL_EXCEPT_CODECS "" CACHE STRING "Enable all codecs except the codecs specified in this ';'-separated list. \
-Codecs with missing dependencies will be disabled regardless this setting.")
+set(SAIL_EXCEPT_CODECS "" CACHE STRING "Disable the codecs specified in this ';'-separated list. \
+A codec specified in this setting remains disabled even if it's also specified in SAIL_ONLY_CODECS.")
 set(SAIL_ONLY_CODECS "" CACHE STRING "Enable only the codecs specified in this ';'-separated list. \
 Codecs with missing dependencies will be disabled regardless this setting.")
 option(SAIL_STATIC "Build static libs. When enabled, sets SAIL_COMBINE_CODECS to ON." OFF)
@@ -221,6 +221,12 @@ endif()
 
 if (SAIL_BUILD_TESTS)
     add_subdirectory(tests)
+endif()
+
+# Error check: This particular build of SAIL cannot load any image
+#
+if (NOT ENABLED_CODECS AND NOT SAIL_THIRD_PARTY_CODECS)
+    message(FATAL_ERROR "Error: No codecs are enabled and SAIL_THIRD_PARTY_CODECS is disabled.\nThis particular build of SAIL cannot load any image.")
 endif()
 
 # Installation

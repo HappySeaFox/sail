@@ -12,28 +12,27 @@ if (SAIL_ONLY_CODECS)
     foreach (codec IN LISTS CODECS)
         if (${codec} IN_LIST SAIL_ONLY_CODECS)
             list(APPEND ENABLED_CODECS ${codec})
+        else()
+            list(APPEND DISABLED_CODECS ${codec})
         endif()
     endforeach()
-
-    set(CODECS ${ENABLED_CODECS})
+else()
+    set(ENABLED_CODECS ${CODECS})
 endif()
 
 if (SAIL_EXCEPT_CODECS)
-    set(ENABLED_CODECS "")
-
-    foreach (codec IN LISTS CODECS)
-        if (NOT ${codec} IN_LIST SAIL_EXCEPT_CODECS)
-            list(APPEND ENABLED_CODECS ${codec})
+    foreach (codec IN LISTS ENABLED_CODECS)
+        if (${codec} IN_LIST SAIL_EXCEPT_CODECS)
+            list(REMOVE_ITEM ENABLED_CODECS ${codec})
+            list(APPEND DISABLED_CODECS ${codec})
         endif()
     endforeach()
-
-    set(CODECS ${ENABLED_CODECS})
 endif()
 
 # Add enabled codecs (but codecs still can disable themselves later due to missing dependencies).
 # Every codec CMake script updates the value of ENABLED_CODECS.
 #
-foreach(codec ${CODECS})
+foreach(codec ${ENABLED_CODECS})
     add_subdirectory(${codec})
 endforeach()
 
