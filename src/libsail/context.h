@@ -62,20 +62,20 @@ enum SailInitFlags {
 };
 
 /*
- * Initializes a new SAIL global context with default flags. Does nothing if a global context
- * already exists. See also sail_init_with_flags().
+ * Initializes a new SAIL global static context with default flags. Does nothing
+ * if a global context already exists. See also sail_init_with_flags().
  *
  * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_init(void);
 
 /*
- * Initializes a new SAIL global context with the specific flags. Does nothing if a global context
- * already exists. Builds a list of available SAIL codecs. See SailInitFlags.
+ * Initializes a new SAIL global static context with the specific flags. Does nothing
+ * if a global context already exists. Builds a list of available SAIL codecs. See SailInitFlags.
  *
- * Use this function when you need specific features like preloading codecs. If you don't need specific
- * features, using this function is optional. All reading or writing functions allocate a global
- * static context implicitly when they need it and when it doesn't exist yet.
+ * Use this method when you need specific features like preloading codecs. If you don't need
+ * specific features, using this method is optional. All reading or writing functions allocate
+ * a global static context implicitly when they need it and when it doesn't exist yet.
  *
  * Codecs path search algorithm (first found path wins):
  *
@@ -96,8 +96,9 @@ SAIL_EXPORT sail_status_t sail_init(void);
  *
  *   <FOUND PATH>/lib is added to LD_LIBRARY_PATH.
  *
- * Additionally, SAIL_THIRD_PARTY_CODECS_PATH environment variable is searched if SAIL_THIRD_PARTY_CODECS is ON,
- * (the default) so you can load your own codecs from there.
+ * Additionally, SAIL_THIRD_PARTY_CODECS_PATH environment variable is searched
+ * if SAIL_THIRD_PARTY_CODECS is ON, (the default) so you can load your own codecs
+ * from there.
  *
  * Returns SAIL_OK on success.
  */
