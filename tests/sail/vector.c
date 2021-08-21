@@ -39,10 +39,23 @@ static MunitResult test_vector_alloc_destroy(const MunitParameter params[], void
     munit_assert(sail_vector_size(vector) == 0);
     sail_destroy_vector(vector);
 
-    vector = NULL;
+    return MUNIT_OK;
+}
+
+static MunitResult test_vector_clear(const MunitParameter params[], void *user_data) {
+
+    (void)params;
+    (void)user_data;
+
+    struct sail_vector *vector = NULL;
+
     munit_assert(sail_alloc_vector(5, NULL, &vector) == SAIL_OK);
     munit_assert_not_null(vector);
     munit_assert(sail_vector_size(vector) == 0);
+
+    int item = 5;
+    munit_assert(sail_push_vector(vector, &item) == SAIL_OK);
+    sail_clear_vector(vector);
     sail_destroy_vector(vector);
 
     return MUNIT_OK;
@@ -103,6 +116,7 @@ static MunitResult test_vector_item_destroy(const MunitParameter params[], void 
 
 static MunitTest test_suite_tests[] = {
     { (char *)"/alloc-destroy", test_vector_alloc_destroy, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/clear",         test_vector_clear,         NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/push-pop",      test_vector_push_pop,      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/item-destroy",  test_vector_item_destroy,  NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
