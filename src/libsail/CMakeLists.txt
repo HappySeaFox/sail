@@ -32,7 +32,9 @@ add_library(sail
                 sail_technical_diver.h
                 sail_technical_diver_private.c
                 sail_technical_diver_private.h
-                string_node.h)
+                string_node.h
+                vector.c
+                vector.h)
 
 # Build a list of public headers to install
 #

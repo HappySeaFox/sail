@@ -49,6 +49,7 @@
     #include "sail_technical_diver.h"
     #include "sail_technical_diver_private.h"
     #include "string_node.h"
+    #include "vector.h"
 #else
     #include <sail-common/sail-common.h>
 
@@ -60,6 +61,7 @@
     #include <sail/sail_junior.h>
     #include <sail/sail_technical_diver.h>
     #include <sail/string_node.h>
+    #include <sail/vector.h>
 #endif
 
 #endif

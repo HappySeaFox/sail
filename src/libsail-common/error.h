@@ -133,6 +133,7 @@ enum SailStatus {
     SAIL_ERROR_CONTEXT_UNINITIALIZED,
     SAIL_ERROR_GET_DLL_PATH,
     SAIL_ERROR_CONFLICTING_OPERATION,
+    SAIL_ERROR_VECTOR_NULL_PTR,
 };
 
 typedef enum SailStatus sail_status_t;
@@ -192,6 +193,7 @@ do {                                  \
 #define SAIL_CHECK_STRING_PTR(str)                      SAIL_CHECK_PTR2(str,             SAIL_ERROR_STRING_NULL_PTR)
 #define SAIL_CHECK_WRITE_FEATURES_PTR(write_features)   SAIL_CHECK_PTR2(write_features,  SAIL_ERROR_WRITE_FEATURES_NULL_PTR)
 #define SAIL_CHECK_WRITE_OPTIONS_PTR(write_options)     SAIL_CHECK_PTR2(write_options,   SAIL_ERROR_WRITE_FEATURES_NULL_PTR)
+#define SAIL_CHECK_VECTOR_PTR(vector)                   SAIL_CHECK_PTR2(vector,          SAIL_ERROR_VECTOR_NULL_PTR)
 
 /*
  * Try to execute the specified SAIL function. If it fails, execute the rest of arguments.
