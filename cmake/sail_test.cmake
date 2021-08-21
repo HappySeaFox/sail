@@ -7,6 +7,8 @@ macro(sail_test)
     #
     add_executable(${SAIL_TEST_TARGET} ${SAIL_TEST_SOURCES})
 
+    sail_enable_asan(TARGET ${SAIL_TEST_TARGET})
+
     if (WIN32)
         add_test(NAME ${SAIL_TEST_TARGET} WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/bin COMMAND ${SAIL_TEST_TARGET})
     else()
