@@ -17,11 +17,11 @@ macro(sail_test)
 
     # Depend on sail-munit
     #
-    target_link_libraries(${SAIL_TEST_TARGET} sail-munit)
+    target_link_libraries(${SAIL_TEST_TARGET} PRIVATE sail-munit)
 
     # Depend on LINK
     #
     if (SAIL_TEST_LINK)
-        target_link_libraries(${SAIL_TEST_TARGET} ${SAIL_TEST_LINK})
+        target_link_libraries(${SAIL_TEST_TARGET} PRIVATE ${SAIL_TEST_LINK})
     endif()
 endmacro()
