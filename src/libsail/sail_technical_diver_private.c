@@ -50,8 +50,10 @@ static sail_status_t allowed_write_compression(const struct sail_write_features 
 
     SAIL_CHECK_WRITE_FEATURES_PTR(write_features);
 
-    for (unsigned i = 0; i < write_features->compressions_length; i++) {
-        if (write_features->compressions[i] == compression) {
+    for (size_t i = 0; i < sail_vector_size(write_features->compressions); i++) {
+        const enum SailCompression *supported_compression = sail_get_vector_item(write_features->compressions, i);
+
+        if (*supported_compression == compression) {
             return SAIL_OK;
         }
     }

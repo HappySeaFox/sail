@@ -156,12 +156,13 @@ write_features::write_features(const sail_write_features *wf)
 
     // Output pixel formats
     std::vector<SailPixelFormat> output_pixel_formats;
+    const size_t c_output_pixel_formats_size = sail_vector_size(d->sail_write_features_c->output_pixel_formats);
 
-    if (d->sail_write_features_c->output_pixel_formats != nullptr && d->sail_write_features_c->output_pixel_formats_length > 0) {
-        output_pixel_formats.reserve(d->sail_write_features_c->output_pixel_formats_length);
+    if (c_output_pixel_formats_size > 0U) {
+        output_pixel_formats.reserve(c_output_pixel_formats_size);
 
-        for (unsigned i = 0; i < d->sail_write_features_c->output_pixel_formats_length; i++) {
-            output_pixel_formats.push_back(d->sail_write_features_c->output_pixel_formats[i]);
+        for (unsigned i = 0; i < c_output_pixel_formats_size; i++) {
+            output_pixel_formats.push_back(*reinterpret_cast<SailPixelFormat*>(sail_get_vector_item(d->sail_write_features_c->output_pixel_formats, i)));
         }
     }
 
@@ -169,12 +170,13 @@ write_features::write_features(const sail_write_features *wf)
 
     // Compressions
     std::vector<SailCompression> compressions;
+    const size_t c_compressions_size = sail_vector_size(d->sail_write_features_c->compressions);
 
-    if (d->sail_write_features_c->compressions != nullptr && d->sail_write_features_c->compressions_length > 0) {
-        compressions.reserve(d->sail_write_features_c->compressions_length);
+    if (c_compressions_size > 0U) {
+        compressions.reserve(c_compressions_size);
 
-        for (unsigned i = 0; i < d->sail_write_features_c->compressions_length; i++) {
-            compressions.push_back(d->sail_write_features_c->compressions[i]);
+        for (size_t i = 0; i < c_compressions_size; i++) {
+            compressions.push_back(*reinterpret_cast<SailCompression*>(sail_get_vector_item(d->sail_write_features_c->compressions, i)));
         }
     }
 

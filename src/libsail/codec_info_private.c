@@ -44,38 +44,42 @@ static int compression_from_string(const char *str) {
     return sail_compression_from_string(str);
 }
 
-static sail_status_t parse_serialized_ints(const char *value, int **target, unsigned *length, int (*converter)(const char *str)) {
+static sail_status_t parse_serialized_ints(const char *value, struct sail_vector **vector, int (*converter)(const char *str)) {
 
     SAIL_CHECK_STRING_PTR(value);
-    SAIL_CHECK_PTR(target);
-    SAIL_CHECK_PTR(length);
+    SAIL_CHECK_VECTOR_PTR(vector);
 
     struct sail_string_node *string_node = NULL;
 
     SAIL_TRY_OR_CLEANUP(split_into_string_node_chain(value, &string_node),
                         /* cleanup */ destroy_string_node_chain(string_node));
 
-    *length = 0;
-    struct sail_string_node *node = string_node;
+    unsigned length = 0;
+    *vector = NULL;
 
-    while (node != NULL) {
-        (*length)++;
-        node = node->next;
+    for (struct sail_string_node *node = string_node; node != NULL; node = node->next) {
+        length++;
     }
 
-    if (*length > 0) {
-        void *ptr;
-        SAIL_TRY_OR_CLEANUP(sail_malloc((size_t)*length * sizeof(int), &ptr),
+    if (length > 0) {
+        struct sail_vector *local_vector;
+        SAIL_TRY_OR_CLEANUP(sail_alloc_vector(length, NULL, &local_vector),
                             /* cleanup */ destroy_string_node_chain(string_node));
-        *target = ptr;
 
-        node = string_node;
-        int i = 0;
+        for (struct sail_string_node *node = string_node; node != NULL; node = node->next) {
+            void *ptr;
+            SAIL_TRY_OR_CLEANUP(sail_malloc(sizeof(int), &ptr),
+                            /* cleanup */ sail_destroy_vector(local_vector),
+                                          destroy_string_node_chain(string_node));
+            int *item = ptr;
+            *item = converter(node->value);
 
-        while (node != NULL) {
-            *(*target + i++) = converter(node->value);
-            node = node->next;
+            SAIL_TRY_OR_CLEANUP(sail_push_vector(local_vector, item),
+                            /* cleanup */ sail_destroy_vector(local_vector),
+                                          destroy_string_node_chain(string_node));
         }
+
+        *vector = local_vector;
     }
 
     destroy_string_node_chain(string_node);
@@ -193,8 +197,7 @@ static sail_status_t inih_handler_sail_error(void *data, const char *section, co
                                 /* cleanup */ SAIL_LOG_ERROR("Failed to parse codec features: '%s'", value));
         } else if (strcmp(name, "output-pixel-formats") == 0) {
             SAIL_TRY_OR_CLEANUP(parse_serialized_ints(value,
-                                                        (int **)&codec_info->write_features->output_pixel_formats,
-                                                        &codec_info->write_features->output_pixel_formats_length,
+                                                        &codec_info->write_features->output_pixel_formats,
                                                         pixel_format_from_string),
                                 /* cleanup */ SAIL_LOG_ERROR("Failed to parse output pixel formats: '%s'", value));
         } else if (strcmp(name, "properties") == 0) {
@@ -204,8 +207,7 @@ static sail_status_t inih_handler_sail_error(void *data, const char *section, co
             codec_info->write_features->interlaced_passes = atoi(value);
         } else if (strcmp(name, "compression-types") == 0) {
             SAIL_TRY_OR_CLEANUP(parse_serialized_ints(value,
-                                                        (int **)&codec_info->write_features->compressions,
-                                                        &codec_info->write_features->compressions_length,
+                                                        &codec_info->write_features->compressions,
                                                         compression_from_string),
                                 /* cleanup */ SAIL_LOG_ERROR("Failed to parse compressions: '%s'", value));
         } else if (strcmp(name, "default-compression") == 0) {
@@ -274,25 +276,27 @@ static sail_status_t check_codec_info(const struct sail_codec_info *codec_info) 
     if ((write_features->features & SAIL_CODEC_FEATURE_STATIC ||
             write_features->features & SAIL_CODEC_FEATURE_ANIMATED ||
             write_features->features & SAIL_CODEC_FEATURE_MULTI_PAGED) &&
-            (write_features->output_pixel_formats == NULL || write_features->output_pixel_formats_length == 0)) {
+            sail_vector_size(write_features->output_pixel_formats) == 0U) {
         SAIL_LOG_ERROR("Codec validation error: %s codec is able to write images, but output pixel formats are not specified", codec_info->name);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INCOMPLETE_CODEC_INFO);
     }
 
     /* Compressions must exist if we're able to write this image format.*/
-    if (write_features->features != 0 && (write_features->compressions == NULL || write_features->compressions_length == 0)) {
+    if (write_features->features != 0 && sail_vector_size(write_features->compressions) == 0U) {
         SAIL_LOG_ERROR("Codec validation error: %s codec has empty compressions list", codec_info->name);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INCOMPLETE_CODEC_INFO);
     }
 
     /* Compression levels and types are mutually exclusive.*/
-    if (write_features->compressions_length > 1 && (write_features->compression_level_min != 0 || write_features->compression_level_max != 0)) {
+    if (sail_vector_size(write_features->compressions) > 1U && (write_features->compression_level_min != 0 || write_features->compression_level_max != 0)) {
         SAIL_LOG_ERROR("Codec validation error: %s codec has more than two compression types and non-zero compression levels which is unsupported", codec_info->name);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INCOMPLETE_CODEC_INFO);
     }
 
-    for (unsigned i = 0; i < write_features->compressions_length; i++) {
-        if (write_features->compressions[i] == SAIL_COMPRESSION_UNKNOWN) {
+    for (size_t i = 0; i < sail_vector_size(write_features->compressions); i++) {
+        const enum SailCompression *compression = sail_get_vector_item(write_features->compressions, i);
+
+        if (compression == NULL || *compression == SAIL_COMPRESSION_UNKNOWN) {
             SAIL_LOG_ERROR("Codec validation error: %s codec has UNKNOWN compression", codec_info->name);
             SAIL_LOG_AND_RETURN(SAIL_ERROR_INCOMPLETE_CODEC_INFO);
         }

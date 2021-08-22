@@ -26,10 +26,25 @@
 #include <stdio.h>
 
 #include "sail-common.h"
-#include "sail.h"
 #include "sail-manip.h"
 
 #include "munit.h"
+
+static struct sail_vector* vector_from_pixel_formats(const enum SailPixelFormat pixel_formats[], size_t pixel_formats_length) {
+
+    struct sail_vector *vector;
+    sail_alloc_vector(pixel_formats_length, NULL, &vector);
+
+    for (size_t i = 0; i < pixel_formats_length; i++) {
+        enum SailPixelFormat *item;
+        munit_assert(sail_malloc(sizeof(enum SailPixelFormat), &item) == SAIL_OK);
+        *item = pixel_formats[i];
+
+        sail_push_vector(vector, item);
+    }
+
+    return vector;
+}
 
 static MunitResult test_best_conversion_grayscale(const MunitParameter params[], void *user_data) {
 
@@ -39,22 +54,31 @@ static MunitResult test_best_conversion_grayscale(const MunitParameter params[],
     {
         const enum SailPixelFormat output_pixel_formats[] = { SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE, SAIL_PIXEL_FORMAT_BPP24_RGB };
         const size_t output_pixel_formats_length = sizeof(output_pixel_formats) / sizeof(output_pixel_formats[0]);
+        struct sail_vector *output_pixel_formats_vector = vector_from_pixel_formats(output_pixel_formats, output_pixel_formats_length);
 
-        munit_assert_int(sail_closest_pixel_format(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE, output_pixel_formats, output_pixel_formats_length), ==, SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE);
+        munit_assert_int(sail_closest_pixel_format_from_vector(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE, output_pixel_formats_vector), ==, SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE);
+
+        sail_destroy_vector(output_pixel_formats_vector);
     }
 
     {
         const enum SailPixelFormat output_pixel_formats[] = { SAIL_PIXEL_FORMAT_BPP24_RGB, SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE };
         const size_t output_pixel_formats_length = sizeof(output_pixel_formats) / sizeof(output_pixel_formats[0]);
+        struct sail_vector *output_pixel_formats_vector = vector_from_pixel_formats(output_pixel_formats, output_pixel_formats_length);
 
-        munit_assert_int(sail_closest_pixel_format(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE, output_pixel_formats, output_pixel_formats_length), ==, SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE);
+        munit_assert_int(sail_closest_pixel_format_from_vector(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE, output_pixel_formats_vector), ==, SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE);
+
+        sail_destroy_vector(output_pixel_formats_vector);
     }
 
     {
         const enum SailPixelFormat output_pixel_formats[] = { SAIL_PIXEL_FORMAT_BPP1_INDEXED, SAIL_PIXEL_FORMAT_BPP2_INDEXED };
         const size_t output_pixel_formats_length = sizeof(output_pixel_formats) / sizeof(output_pixel_formats[0]);
+        struct sail_vector *output_pixel_formats_vector = vector_from_pixel_formats(output_pixel_formats, output_pixel_formats_length);
 
-        munit_assert_int(sail_closest_pixel_format(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE, output_pixel_formats, output_pixel_formats_length), ==, SAIL_PIXEL_FORMAT_UNKNOWN);
+        munit_assert_int(sail_closest_pixel_format_from_vector(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE, output_pixel_formats_vector), ==, SAIL_PIXEL_FORMAT_UNKNOWN);
+
+        sail_destroy_vector(output_pixel_formats_vector);
     }
 
     return MUNIT_OK;
@@ -68,22 +92,31 @@ static MunitResult test_best_conversion_indexed(const MunitParameter params[], v
     {
         const enum SailPixelFormat output_pixel_formats[] = { SAIL_PIXEL_FORMAT_BPP24_RGB, SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE };
         const size_t output_pixel_formats_length = sizeof(output_pixel_formats) / sizeof(output_pixel_formats[0]);
+        struct sail_vector *output_pixel_formats_vector = vector_from_pixel_formats(output_pixel_formats, output_pixel_formats_length);
 
-        munit_assert_int(sail_closest_pixel_format(SAIL_PIXEL_FORMAT_BPP8_INDEXED, output_pixel_formats, output_pixel_formats_length), ==, SAIL_PIXEL_FORMAT_BPP24_RGB);
+        munit_assert_int(sail_closest_pixel_format_from_array(SAIL_PIXEL_FORMAT_BPP8_INDEXED, output_pixel_formats, output_pixel_formats_length), ==, SAIL_PIXEL_FORMAT_BPP24_RGB);
+
+        sail_destroy_vector(output_pixel_formats_vector);
     }
 
     {
         const enum SailPixelFormat output_pixel_formats[] = { SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE, SAIL_PIXEL_FORMAT_BPP24_RGB };
         const size_t output_pixel_formats_length = sizeof(output_pixel_formats) / sizeof(output_pixel_formats[0]);
+        struct sail_vector *output_pixel_formats_vector = vector_from_pixel_formats(output_pixel_formats, output_pixel_formats_length);
 
-        munit_assert_int(sail_closest_pixel_format(SAIL_PIXEL_FORMAT_BPP1_INDEXED, output_pixel_formats, output_pixel_formats_length), ==, SAIL_PIXEL_FORMAT_BPP24_RGB);
+        munit_assert_int(sail_closest_pixel_format_from_array(SAIL_PIXEL_FORMAT_BPP1_INDEXED, output_pixel_formats, output_pixel_formats_length), ==, SAIL_PIXEL_FORMAT_BPP24_RGB);
+
+        sail_destroy_vector(output_pixel_formats_vector);
     }
 
     {
         const enum SailPixelFormat output_pixel_formats[] = { SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE, SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE };
         const size_t output_pixel_formats_length = sizeof(output_pixel_formats) / sizeof(output_pixel_formats[0]);
+        struct sail_vector *output_pixel_formats_vector = vector_from_pixel_formats(output_pixel_formats, output_pixel_formats_length);
 
-        munit_assert_int(sail_closest_pixel_format(SAIL_PIXEL_FORMAT_BPP1_INDEXED, output_pixel_formats, output_pixel_formats_length), ==, SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE);
+        munit_assert_int(sail_closest_pixel_format_from_array(SAIL_PIXEL_FORMAT_BPP1_INDEXED, output_pixel_formats, output_pixel_formats_length), ==, SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE);
+
+        sail_destroy_vector(output_pixel_formats_vector);
     }
 
     return MUNIT_OK;
@@ -97,22 +130,28 @@ static MunitResult test_best_conversion_rgb(const MunitParameter params[], void 
     {
         const enum SailPixelFormat output_pixel_formats[] = { SAIL_PIXEL_FORMAT_BPP32_RGBA, SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE };
         const size_t output_pixel_formats_length = sizeof(output_pixel_formats) / sizeof(output_pixel_formats[0]);
+        struct sail_vector *output_pixel_formats_vector = vector_from_pixel_formats(output_pixel_formats, output_pixel_formats_length);
 
-        munit_assert_int(sail_closest_pixel_format(SAIL_PIXEL_FORMAT_BPP24_RGB, output_pixel_formats, output_pixel_formats_length), ==, SAIL_PIXEL_FORMAT_BPP32_RGBA);
+        munit_assert_int(sail_closest_pixel_format_from_array(SAIL_PIXEL_FORMAT_BPP24_RGB, output_pixel_formats, output_pixel_formats_length), ==, SAIL_PIXEL_FORMAT_BPP32_RGBA);
+
+        sail_destroy_vector(output_pixel_formats_vector);
     }
 
     {
         const enum SailPixelFormat output_pixel_formats[] = { SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE, SAIL_PIXEL_FORMAT_BPP32_RGBA };
         const size_t output_pixel_formats_length = sizeof(output_pixel_formats) / sizeof(output_pixel_formats[0]);
+        struct sail_vector *output_pixel_formats_vector = vector_from_pixel_formats(output_pixel_formats, output_pixel_formats_length);
 
-        munit_assert_int(sail_closest_pixel_format(SAIL_PIXEL_FORMAT_BPP24_RGB, output_pixel_formats, output_pixel_formats_length), ==, SAIL_PIXEL_FORMAT_BPP32_RGBA);
+        munit_assert_int(sail_closest_pixel_format_from_array(SAIL_PIXEL_FORMAT_BPP24_RGB, output_pixel_formats, output_pixel_formats_length), ==, SAIL_PIXEL_FORMAT_BPP32_RGBA);
+
+        sail_destroy_vector(output_pixel_formats_vector);
     }
 
     {
         const enum SailPixelFormat output_pixel_formats[] = { SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE, SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE };
         const size_t output_pixel_formats_length = sizeof(output_pixel_formats) / sizeof(output_pixel_formats[0]);
 
-        munit_assert_int(sail_closest_pixel_format(SAIL_PIXEL_FORMAT_BPP24_RGB, output_pixel_formats, output_pixel_formats_length), ==, SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE);
+        munit_assert_int(sail_closest_pixel_format_from_array(SAIL_PIXEL_FORMAT_BPP24_RGB, output_pixel_formats, output_pixel_formats_length), ==, SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE);
     }
 
     return MUNIT_OK;

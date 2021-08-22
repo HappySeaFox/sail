@@ -140,8 +140,10 @@ sail_status_t allowed_write_output_pixel_format(const struct sail_write_features
 
     SAIL_CHECK_WRITE_FEATURES_PTR(write_features);
 
-    for (unsigned i = 0; i < write_features->output_pixel_formats_length; i++) {
-        if (write_features->output_pixel_formats[i] == pixel_format) {
+    for (size_t i = 0; i < sail_vector_size(write_features->output_pixel_formats); i++) {
+        const enum SailPixelFormat *output_pixel_format = sail_get_vector_item(write_features->output_pixel_formats, i);
+
+        if (*output_pixel_format == pixel_format) {
             return SAIL_OK;
         }
     }

@@ -39,6 +39,7 @@ extern "C" {
 #endif
 
 struct sail_pixel_formats_mapping_node;
+struct sail_vector;
 
 /*
  * Write features. Use this structure to determine what a codec can actually write.
@@ -47,11 +48,9 @@ struct sail_write_features {
 
     /*
      * A list of supported pixel formats that can be written by this codec.
+     * Each item is of type enum SailPixelFormat*.
      */
-    enum SailPixelFormat *output_pixel_formats;
-
-    /* The length of output_pixel_formats. */
-    unsigned output_pixel_formats_length;
+    struct sail_vector *output_pixel_formats;
 
     /* Supported or-ed features of writing operations. See SailCodecFeature. */
     int features;
@@ -67,7 +66,7 @@ struct sail_write_features {
 
     /*
      * A list of supported pixels compression types by this codec. If the list has more than
-     * two entries, compression levels are ignored.
+     * two entries, compression levels are ignored. Each item is of type enum SailCompression*.
      *
      * For example:
      *
@@ -76,10 +75,7 @@ struct sail_write_features {
      *     2. The TIFF codec supports more than two compression types (PACKBITS, JPEG, etc.).
      *        Compression levels are ignored.
      */
-    enum SailCompression *compressions;
-
-    /* The length of compressions. */
-    unsigned compressions_length;
+    struct sail_vector *compressions;
 
     /* Compression type to use by default. */
     enum SailCompression default_compression;

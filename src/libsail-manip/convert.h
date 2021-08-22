@@ -45,6 +45,7 @@ extern "C" {
 struct sail_conversion_options;
 struct sail_image;
 struct sail_write_features;
+struct sail_vector;
 
 /*
  * Converts the input image to the pixel format and saves the result in the output image.
@@ -276,15 +277,26 @@ SAIL_EXPORT sail_status_t sail_update_image_with_options(struct sail_image *imag
 SAIL_EXPORT bool sail_can_convert(enum SailPixelFormat input_pixel_format, enum SailPixelFormat output_pixel_format);
 
 /*
- * Returns the closest pixel format to the input pixel format from the list.
+ * Returns the closest pixel format to the input pixel format from the array.
  *
  * This function can be used to find the best pixel format to save an image into.
  *
  * Returns SAIL_PIXEL_FORMAT_UNKNOWN if no candidates found at all.
  */
-SAIL_EXPORT enum SailPixelFormat sail_closest_pixel_format(enum SailPixelFormat input_pixel_format,
-                                                           const enum SailPixelFormat pixel_formats[],
-                                                           size_t pixel_formats_length);
+SAIL_EXPORT enum SailPixelFormat sail_closest_pixel_format_from_array(enum SailPixelFormat input_pixel_format,
+                                                                        const enum SailPixelFormat pixel_formats[],
+                                                                        size_t pixel_formats_length);
+
+/*
+ * Returns the closest pixel format to the input pixel format from the vector.
+ * Makes a deep copy of the vector.
+ *
+ * This function can be used to find the best pixel format to save an image into.
+ *
+ * Returns SAIL_PIXEL_FORMAT_UNKNOWN if no candidates found at all.
+ */
+SAIL_EXPORT enum SailPixelFormat sail_closest_pixel_format_from_vector(enum SailPixelFormat input_pixel_format,
+                                                                        const struct sail_vector *pixel_formats);
 
 /*
  * Returns the closest pixel format to the input pixel format from the write features.

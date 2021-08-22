@@ -904,9 +904,9 @@ static const enum SailPixelFormat INDEXED_OR_FULL_COLOR_CANDIDATES[] = {
 
 static const size_t INDEXED_OR_FULL_COLOR_CANDIDATES_LENGTH = sizeof(INDEXED_OR_FULL_COLOR_CANDIDATES) / sizeof(INDEXED_OR_FULL_COLOR_CANDIDATES[0]);
 
-enum SailPixelFormat sail_closest_pixel_format(enum SailPixelFormat input_pixel_format,
-                                               const enum SailPixelFormat pixel_formats[],
-                                               size_t pixel_formats_length) {
+enum SailPixelFormat sail_closest_pixel_format_from_array(enum SailPixelFormat input_pixel_format,
+                                                            const enum SailPixelFormat pixel_formats[],
+                                                            size_t pixel_formats_length) {
 
     if (input_pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN) {
         return SAIL_PIXEL_FORMAT_UNKNOWN;
@@ -924,8 +924,7 @@ enum SailPixelFormat sail_closest_pixel_format(enum SailPixelFormat input_pixel_
     }
 
     size_t best_index_candidate = UINT_MAX;
-    size_t best_index_result = 0;
-    bool found = false;
+    enum SailPixelFormat best_result = SAIL_PIXEL_FORMAT_UNKNOWN;
 
     /* O(n^2) (sic!). */
     for (size_t i = 0; i < pixel_formats_length; i++) {
@@ -933,20 +932,47 @@ enum SailPixelFormat sail_closest_pixel_format(enum SailPixelFormat input_pixel_
             if (pixel_formats[i] == candidates[k]) {
                 if (k < best_index_candidate) {
                     best_index_candidate = k;
-                    best_index_result = i;
-                    found = true;
+                    best_result = pixel_formats[i];
                     break;
                 }
             }
         }
     }
 
-    return found ? pixel_formats[best_index_result] : SAIL_PIXEL_FORMAT_UNKNOWN;
+    return best_result;
+}
+
+enum SailPixelFormat sail_closest_pixel_format_from_vector(enum SailPixelFormat input_pixel_format,
+                                                            const struct sail_vector *pixel_formats) {
+
+    const size_t pixel_formats_size = sail_vector_size(pixel_formats);
+
+    if (pixel_formats_size == 0U) {
+        return SAIL_PIXEL_FORMAT_UNKNOWN;
+    } else {
+        enum SailPixelFormat *pixel_formats_array;
+
+        void *ptr;
+        SAIL_TRY_OR_EXECUTE(sail_malloc(sizeof(enum SailPixelFormat) * pixel_formats_size, &ptr),
+                            /* on error */ return SAIL_PIXEL_FORMAT_UNKNOWN);
+        pixel_formats_array = ptr;
+
+        for (size_t i = 0; i < pixel_formats_size; i++) {
+            const enum SailPixelFormat *pf = sail_get_vector_item(pixel_formats, i);
+            pixel_formats_array[i] = (pf == NULL) ? SAIL_PIXEL_FORMAT_UNKNOWN : *pf;
+        }
+
+        const enum SailPixelFormat result = sail_closest_pixel_format_from_array(input_pixel_format, pixel_formats_array, pixel_formats_size);
+
+        sail_free(pixel_formats_array);
+
+        return result;
+    }
 }
 
 enum SailPixelFormat sail_closest_pixel_format_from_write_features(enum SailPixelFormat input_pixel_format, const struct sail_write_features *write_features) {
 
-    return sail_closest_pixel_format(input_pixel_format, write_features->output_pixel_formats, write_features->output_pixel_formats_length);
+    return sail_closest_pixel_format_from_vector(input_pixel_format, write_features->output_pixel_formats);
 }
 
 sail_status_t sail_convert_image_for_saving(const struct sail_image *image,
