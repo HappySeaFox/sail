@@ -56,7 +56,7 @@ static sail_status_t hex_string_into_data(const char *str, void *data, size_t *d
     unsigned byte;
     int bytes_consumed;
 
-#ifdef SAIL_WIN32
+#ifdef _MSC_VER
     while (sscanf_s(str, "%02x%n", &byte, &bytes_consumed) == 1) {
 #else
     while (sscanf(str, "%02x%n", &byte, &bytes_consumed) == 1) {
@@ -1168,7 +1168,7 @@ sail_status_t sail_data_into_hex_string(const void *data, size_t data_size, char
     size_t data_local_index = 0;
 
     for (size_t i = 0; i < data_size; i++) {
-#ifdef SAIL_WIN32
+#ifdef _MSC_VER
         sprintf_s(str_local_copy, SIZE_MAX, "%02X", data_local[data_local_index++]);
 #else
         sprintf(str_local_copy, "%02X", data_local[data_local_index++]);

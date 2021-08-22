@@ -47,7 +47,7 @@ static sail_status_t skip_raw_profile_header(const char *data, const char **star
     int bytes_consumed;
 
     /* Skip "\nexif\n    1234 " before the actual HEX-encoded data. */
-#ifdef SAIL_WIN32
+#ifdef _MSC_VER
     if (sscanf_s(data, "%s %d %c %n", key, (unsigned)sizeof(key), &n, &c, 1, &bytes_consumed) != 3) {
 #else
     if (sscanf(data, "%s %d %c %n", key, &n, &c, &bytes_consumed) != 3) {
@@ -79,7 +79,7 @@ static sail_status_t write_raw_profile_header(char *str, size_t str_size, enum S
     }
 
     /* Write "\nexif\n    1234\n" before the actual HEX-encoded data. */
-#ifdef SAIL_WIN32
+#ifdef _MSC_VER
     if (sprintf_s(str, str_size, "\n%s\n    %u\n", key_str, (unsigned)hex_data_length) < 0) {
 #else
     (void)str_size;
