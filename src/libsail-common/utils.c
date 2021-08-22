@@ -49,7 +49,7 @@
  * Private functions.
  */
 
-static sail_status_t hex_string_into_data(const char *str, void *data, size_t *data_saved) {
+static sail_status_t hex_string_into_data(const char *str, size_t str_length, void *data, size_t *data_saved) {
 
     unsigned char *data_local = data;
     *data_saved = 0;
@@ -57,11 +57,12 @@ static sail_status_t hex_string_into_data(const char *str, void *data, size_t *d
     int bytes_consumed;
 
 #ifdef _MSC_VER
-    while (sscanf_s(str, "%02x%n", &byte, &bytes_consumed) == 1) {
+    while (str_length > 1U && sscanf_s(str, "%02x%n", &byte, &bytes_consumed) == 1) {
 #else
-    while (sscanf(str, "%02x%n", &byte, &bytes_consumed) == 1) {
+    while (str_length > 1U && sscanf(str, "%02x%n", &byte, &bytes_consumed) == 1) {
 #endif
         str += bytes_consumed;
+        str_length -= bytes_consumed;
         data_local[(*data_saved)++] = (unsigned char)byte;
     }
 
@@ -1130,7 +1131,7 @@ sail_status_t sail_hex_string_into_data(const char *str, void *data) {
     SAIL_CHECK_BUFFER_PTR(data);
 
     size_t data_saved;
-    SAIL_TRY(hex_string_into_data(str, data, &data_saved));
+    SAIL_TRY(hex_string_into_data(str, strlen(str), data, &data_saved));
 
     return SAIL_OK;
 }
@@ -1148,7 +1149,7 @@ sail_status_t sail_hex_string_to_data(const char *str, void **data, size_t *data
     unsigned char *data_local = ptr;
 
     size_t data_saved;
-    SAIL_TRY_OR_CLEANUP(hex_string_into_data(str, data_local, &data_saved),
+    SAIL_TRY_OR_CLEANUP(hex_string_into_data(str, str_length, data_local, &data_saved),
                         /* cleanup */ sail_free(data_local));
 
     *data = data_local;
