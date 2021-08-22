@@ -23,10 +23,8 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_CONTEXT_PRIVATE_H
-#define SAIL_CONTEXT_PRIVATE_H
-
-#include <stdbool.h>
+#ifndef SAIL_CODEC_BUNDLE_PRIVATE_H
+#define SAIL_CODEC_BUNDLE_PRIVATE_H
 
 #ifdef SAIL_BUILD
     #include "error.h"
@@ -36,37 +34,28 @@
     #include <sail-common/export.h>
 #endif
 
-struct sail_vector;
+struct sail_codec_bundle;
 
 /*
- * Context is a main entry point to start working with SAIL. It enumerates codec info objects which could be
- * used later in reading and writing operations.
+ * Private codec bundle functions.
  */
-struct sail_context {
 
-    /* Context is already initialized. */
-    bool initialized;
+/*
+ * Allocates a new codec bundle. The assigned bundle MUST be destroyed later
+ * with destroy_codec_bundle().
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_HIDDEN sail_status_t alloc_codec_bundle(struct sail_codec_bundle **codec_bundle);
 
-    /* List of found codecs. */
-    struct sail_vector *codec_bundles;
-};
+/*
+ * Destroys the specified codec bundle and all its internal allocated memory buffers.
+ */
+SAIL_HIDDEN void destroy_codec_bundle(struct sail_codec_bundle *codec_bundle);
 
-typedef struct sail_context sail_context_t;
-
-SAIL_HIDDEN sail_status_t destroy_global_context(void);
-
-SAIL_HIDDEN sail_status_t fetch_global_context_guarded(struct sail_context **context);
-
-SAIL_HIDDEN sail_status_t fetch_global_context_unsafe(struct sail_context **context);
-
-SAIL_HIDDEN sail_status_t fetch_global_context_guarded_with_flags(struct sail_context **context, int flags);
-
-SAIL_HIDDEN sail_status_t fetch_global_context_unsafe_with_flags(struct sail_context **context, int flags);
-
-SAIL_HIDDEN sail_status_t sail_unload_codecs_private(void);
-
-SAIL_HIDDEN sail_status_t lock_context(void);
-
-SAIL_HIDDEN sail_status_t unlock_context(void);
+/*
+ * Callback for clearing sail_vector.
+ */
+SAIL_HIDDEN void destroy_codec_bundle_item(void *item);
 
 #endif

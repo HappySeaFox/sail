@@ -23,50 +23,43 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_CONTEXT_PRIVATE_H
-#define SAIL_CONTEXT_PRIVATE_H
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-#include <stdbool.h>
-
-#ifdef SAIL_BUILD
-    #include "error.h"
-    #include "export.h"
-#else
-    #include <sail-common/error.h>
-    #include <sail-common/export.h>
-#endif
-
-struct sail_vector;
+#include "sail.h"
 
 /*
- * Context is a main entry point to start working with SAIL. It enumerates codec info objects which could be
- * used later in reading and writing operations.
+ * Public functions.
  */
-struct sail_context {
 
-    /* Context is already initialized. */
-    bool initialized;
+sail_status_t alloc_codec_bundle(struct sail_codec_bundle **codec_bundle) {
 
-    /* List of found codecs. */
-    struct sail_vector *codec_bundles;
-};
+    SAIL_CHECK_CODEC_BUNDLE_PTR(codec_bundle);
 
-typedef struct sail_context sail_context_t;
+    void *ptr;
+    SAIL_TRY(sail_malloc(sizeof(struct sail_codec_bundle), &ptr));
+    *codec_bundle = ptr;
 
-SAIL_HIDDEN sail_status_t destroy_global_context(void);
+    (*codec_bundle)->codec_info = NULL;
+    (*codec_bundle)->codec      = NULL;
 
-SAIL_HIDDEN sail_status_t fetch_global_context_guarded(struct sail_context **context);
+    return SAIL_OK;
+}
 
-SAIL_HIDDEN sail_status_t fetch_global_context_unsafe(struct sail_context **context);
+void destroy_codec_bundle(struct sail_codec_bundle *codec_bundle) {
 
-SAIL_HIDDEN sail_status_t fetch_global_context_guarded_with_flags(struct sail_context **context, int flags);
+    if (codec_bundle == NULL) {
+        return;
+    }
 
-SAIL_HIDDEN sail_status_t fetch_global_context_unsafe_with_flags(struct sail_context **context, int flags);
+    destroy_codec_info(codec_bundle->codec_info);
+    destroy_codec(codec_bundle->codec);
 
-SAIL_HIDDEN sail_status_t sail_unload_codecs_private(void);
+    sail_free(codec_bundle);
+}
 
-SAIL_HIDDEN sail_status_t lock_context(void);
+void destroy_codec_bundle_item(void *item) {
 
-SAIL_HIDDEN sail_status_t unlock_context(void);
-
-#endif
+    destroy_codec_bundle(item);
+}

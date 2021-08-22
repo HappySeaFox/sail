@@ -117,10 +117,9 @@ sail_status_t sail_codec_info_by_magic_number_from_io(struct sail_io *io, const 
     }
 
     /* Find the codec info. */
-    const struct sail_codec_info_node *codec_info_node = context->codec_info_node;
-
-    while (codec_info_node != NULL) {
-        const struct sail_string_node *magic_number_node = codec_info_node->codec_info->magic_number_node;
+    for (size_t i = 0; i < sail_vector_size(context->codec_bundles); i++) {
+        const struct sail_codec_bundle *codec_bundle = sail_get_vector_item(context->codec_bundles, i);
+        const struct sail_string_node *magic_number_node = codec_bundle->codec_info->magic_number_node;
 
         /*
          * Split "ab cd" into bytes and compare individual bytes against the read magic number.
@@ -134,7 +133,7 @@ sail_status_t sail_codec_info_by_magic_number_from_io(struct sail_io *io, const 
             int bytes_consumed = 0;
             bool mismatch = false;
 
-            SAIL_LOG_TRACE("Check against %s magic '%s'", codec_info_node->codec_info->name, magic);
+            SAIL_LOG_TRACE("Check against %s magic '%s'", codec_bundle->codec_info->name, magic);
 
 #ifdef _MSC_VER
             while (buffer_index < sizeof(buffer) && sscanf_s(magic, "%2s%n", hex_byte, (unsigned)sizeof(hex_byte), &bytes_consumed) == 1) {
@@ -164,13 +163,11 @@ sail_status_t sail_codec_info_by_magic_number_from_io(struct sail_io *io, const 
             if (mismatch) {
                 magic_number_node = magic_number_node->next;
             } else {
-                *codec_info = codec_info_node->codec_info;
+                *codec_info = codec_bundle->codec_info;
                 SAIL_LOG_DEBUG("Found codec info: %s", (*codec_info)->name);
                 return SAIL_OK;
             }
         }
-
-        codec_info_node = codec_info_node->next;
     }
 
     SAIL_LOG_ERROR("Magic number '%s' is not supported by any codec", hex_numbers);
@@ -193,17 +190,16 @@ sail_status_t sail_codec_info_from_extension(const char *extension, const struct
     /* Will compare in lower case. */
     sail_to_lower(extension_copy);
 
-    const struct sail_codec_info_node *codec_info_node = context->codec_info_node;
-
-    while (codec_info_node != NULL) {
-        const struct sail_string_node *extension_node = codec_info_node->codec_info->extension_node;
+    for (size_t i = 0; i < sail_vector_size(context->codec_bundles); i++) {
+        const struct sail_codec_bundle *codec_bundle = sail_get_vector_item(context->codec_bundles, i);
+        const struct sail_string_node *extension_node = codec_bundle->codec_info->extension_node;
 
         while (extension_node != NULL) {
-            SAIL_LOG_TRACE("Check against %s extension '%s'", codec_info_node->codec_info->name, extension_node->value);
+            SAIL_LOG_TRACE("Check against %s extension '%s'", codec_bundle->codec_info->name, extension_node->value);
 
             if (strcmp(extension_node->value, extension_copy) == 0) {
                 sail_free(extension_copy);
-                *codec_info = codec_info_node->codec_info;
+                *codec_info = codec_bundle->codec_info;
                 SAIL_LOG_DEBUG("Found codec info: %s", (*codec_info)->name);
                 return SAIL_OK;
             } else {
@@ -212,8 +208,6 @@ sail_status_t sail_codec_info_from_extension(const char *extension, const struct
 
             extension_node = extension_node->next;
         }
-
-        codec_info_node = codec_info_node->next;
     }
 
     sail_free(extension_copy);
@@ -237,17 +231,16 @@ sail_status_t sail_codec_info_from_mime_type(const char *mime_type, const struct
     /* Will compare in lower case. */
     sail_to_lower(mime_type_copy);
 
-    const struct sail_codec_info_node *codec_info_node = context->codec_info_node;
-
-    while (codec_info_node != NULL) {
-        const struct sail_string_node *mime_type_node = codec_info_node->codec_info->mime_type_node;
+    for (size_t i = 0; i < sail_vector_size(context->codec_bundles); i++) {
+        const struct sail_codec_bundle *codec_bundle = sail_get_vector_item(context->codec_bundles, i);
+        const struct sail_string_node *mime_type_node = codec_bundle->codec_info->mime_type_node;
 
         while (mime_type_node != NULL) {
-            SAIL_LOG_TRACE("Check against %s MIME type '%s'", codec_info_node->codec_info->name, mime_type_node->value);
+            SAIL_LOG_TRACE("Check against %s MIME type '%s'", codec_bundle->codec_info->name, mime_type_node->value);
 
             if (strcmp(mime_type_node->value, mime_type_copy) == 0) {
                 sail_free(mime_type_copy);
-                *codec_info = codec_info_node->codec_info;
+                *codec_info = codec_bundle->codec_info;
                 SAIL_LOG_DEBUG("Found codec info: %s", (*codec_info)->name);
                 return SAIL_OK;
             } else {
@@ -256,8 +249,6 @@ sail_status_t sail_codec_info_from_mime_type(const char *mime_type, const struct
 
             mime_type_node = mime_type_node->next;
         }
-
-        codec_info_node = codec_info_node->next;
     }
 
     sail_free(mime_type_copy);

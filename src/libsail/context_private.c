@@ -178,8 +178,8 @@ static sail_status_t alloc_context(struct sail_context **context) {
     SAIL_TRY(sail_malloc(sizeof(struct sail_context), &ptr));
     *context = ptr;
 
-    (*context)->initialized     = false;
-    (*context)->codec_info_node = NULL;
+    (*context)->initialized   = false;
+    (*context)->codec_bundles = NULL;
 
     return SAIL_OK;
 }
@@ -204,7 +204,7 @@ static sail_status_t destroy_context(struct sail_context *context) {
         return SAIL_OK;
     }
 
-    destroy_codec_info_node_chain(context->codec_info_node);
+    sail_destroy_vector(context->codec_bundles);
     sail_free(context);
 
     return SAIL_OK;
@@ -218,15 +218,12 @@ static sail_status_t preload_codecs(struct sail_context *context) {
 
     SAIL_LOG_DEBUG("Preloading codecs");
 
-    struct sail_codec_info_node *codec_info_node = context->codec_info_node;
-
-    while (codec_info_node != NULL) {
+    for (size_t i = 0; i < sail_vector_size(context->codec_bundles); i++) {
+        const struct sail_codec_bundle *codec_bundle = sail_get_vector_item(context->codec_bundles, i);
         const struct sail_codec *codec;
 
         /* Ignore loading errors on purpose. */
-        load_codec_by_codec_info(codec_info_node->codec_info, &codec);
-
-        codec_info_node = codec_info_node->next;
+        load_codec_by_codec_info(codec_bundle->codec_info, &codec);
     }
 
     SAIL_TRY(unlock_context());
@@ -238,20 +235,19 @@ static sail_status_t print_enumerated_codecs(struct sail_context *context) {
 
     SAIL_CHECK_CONTEXT_PTR(context);
 
-    const struct sail_codec_info_node *node = context->codec_info_node;
-
-    if (node == NULL) {
-        return SAIL_OK;
-    }
+    const size_t codec_bundles_size = sail_vector_size(context->codec_bundles);
 
     /* Print the found codec infos. */
-    SAIL_LOG_DEBUG("Enumerated codecs:");
+    if (codec_bundles_size > 0U) {
+        SAIL_LOG_DEBUG("Enumerated codecs:");
 
-    int counter = 1;
+        int counter = 1;
 
-    while (node != NULL) {
-        SAIL_LOG_DEBUG("%d. %s [%s] %s", counter++, node->codec_info->name, node->codec_info->description, node->codec_info->version);
-        node = node->next;
+        for (size_t i = 0; i < codec_bundles_size; i++) {
+            const struct sail_codec_bundle *codec_bundle = sail_get_vector_item(context->codec_bundles, i);
+
+            SAIL_LOG_DEBUG("%d. %s [%s] %s", counter++, codec_bundle->codec_info->name, codec_bundle->codec_info->description, codec_bundle->codec_info->version);
+        }
     }
 
     return SAIL_OK;
@@ -323,10 +319,10 @@ static sail_status_t build_full_path(const char *sail_codecs_path, const char *n
 }
 
 static sail_status_t build_codec_from_codec_info(const char *codec_info_full_path,
-                                                    struct sail_codec_info_node **codec_info_node) {
+                                                    struct sail_codec_bundle **codec_bundle) {
 
     SAIL_CHECK_PATH_PTR(codec_info_full_path);
-    SAIL_CHECK_CODEC_INFO_PTR(codec_info_node);
+    SAIL_CHECK_CODEC_BUNDLE_PTR(codec_bundle);
 
     /* Build "/path/jpeg.so" from "/path/jpeg.codec.info". */
     char *codec_info_part = strstr(codec_info_full_path, ".codec.info");
@@ -358,17 +354,21 @@ static sail_status_t build_codec_from_codec_info(const char *codec_info_full_pat
 #endif
 
     /* Parse codec info. */
-    SAIL_TRY_OR_CLEANUP(alloc_codec_info_node(codec_info_node),
+    struct sail_codec_bundle *local_codec_bundle;
+
+    SAIL_TRY_OR_CLEANUP(alloc_codec_bundle(&local_codec_bundle),
                         sail_free(codec_full_path));
 
     struct sail_codec_info *codec_info;
     SAIL_TRY_OR_CLEANUP(codec_read_info_from_file(codec_info_full_path, &codec_info),
-                        destroy_codec_info_node(*codec_info_node),
+                        destroy_codec_bundle(local_codec_bundle),
                         sail_free(codec_full_path));
 
-    /* Save the parsed codec info into the SAIL context. */
-    (*codec_info_node)->codec_info = codec_info;
     codec_info->path = codec_full_path;
+
+    /* Save the parsed codec info into the SAIL context. */
+    local_codec_bundle->codec_info = codec_info;
+    *codec_bundle = local_codec_bundle;
 
     return SAIL_OK;
 }
@@ -376,10 +376,6 @@ static sail_status_t build_codec_from_codec_info(const char *codec_info_full_pat
 static sail_status_t enumerate_codecs_in_paths(struct sail_context *context, const char* codec_search_paths[], int codec_search_paths_length) {
 
     SAIL_CHECK_CONTEXT_PTR(context);
-
-    /* Used to load and store codec info objects. */
-    struct sail_codec_info_node **last_codec_info_node = &context->codec_info_node;
-    struct sail_codec_info_node *codec_info_node;
 
     for (int i = 0; i < codec_search_paths_length; i++) {
         const char *codecs_path = codec_search_paths[i];
@@ -428,9 +424,16 @@ static sail_status_t enumerate_codecs_in_paths(struct sail_context *context, con
 
             SAIL_LOG_DEBUG("Found codec info '%s'", data.cFileName);
 
-            if (build_codec_from_codec_info(full_path, &codec_info_node) == SAIL_OK) {
-                *last_codec_info_node = codec_info_node;
-                last_codec_info_node = &codec_info_node->next;
+            struct sail_codec_bundle *codec_bundle;
+
+            if (build_codec_from_codec_info(full_path, &codec_bundle) == SAIL_OK) {
+                if (context->codec_bundles == NULL) {
+                    SAIL_TRY_OR_EXECUTE(sail_alloc_vector(0, destroy_codec_bundle_item, &context->codec_bundles),
+                                        /* on error */ destroy_codec_bundle(codec_bundle));
+                }
+
+                SAIL_TRY_OR_EXECUTE(sail_push_vector(context->codec_bundles, codec_bundle),
+                                    /* on error */ destroy_codec_bundle(codec_bundle));
             }
 
             sail_free(full_path);
@@ -467,9 +470,16 @@ static sail_status_t enumerate_codecs_in_paths(struct sail_context *context, con
                 if (is_codec_info) {
                     SAIL_LOG_DEBUG("Found codec info '%s'", dir->d_name);
 
-                    if (build_codec_from_codec_info(full_path, &codec_info_node) == SAIL_OK) {
-                        *last_codec_info_node = codec_info_node;
-                        last_codec_info_node = &codec_info_node->next;
+                    struct sail_codec_bundle *codec_bundle;
+
+                    if (build_codec_from_codec_info(full_path, &codec_bundle) == SAIL_OK) {
+                        if (context->codec_bundles == NULL) {
+                            SAIL_TRY_OR_EXECUTE(sail_alloc_vector(0, destroy_codec_bundle_item, &context->codec_bundles),
+                                                /* on error */ destroy_codec_bundle(codec_bundle));
+                        }
+
+                        SAIL_TRY_OR_EXECUTE(sail_vector_push(context->codec_bundles, codec_bundle),
+                                            /* on error */ destroy_codec_bundle(codec_bundle));
                     }
                 }
             }
@@ -502,28 +512,28 @@ static sail_status_t init_context_impl(struct sail_context *context) {
 #endif
 
     /* Load codec info objects. */
-    struct sail_codec_info_node **last_codec_info_node = &context->codec_info_node;
-
     for (size_t i = 0; sail_enabled_codecs[i] != NULL; i++) {
         const char *sail_codec_info = sail_enabled_codecs_info[i];
 
+        struct sail_codec_bundle *codec_bundle;
+        SAIL_TRY_OR_EXECUTE(alloc_codec_bundle(&codec_bundle),
+                            /* on error */ continue);
+
         /* Parse codec info. */
-        struct sail_codec_info_node *codec_info_node;
-        if (alloc_codec_info_node(&codec_info_node) != SAIL_OK) {
-            continue;
+        SAIL_TRY_OR_EXECUTE(codec_read_info_from_string(sail_codec_info, &codec_bundle->codec_info),
+            /* on error */ destroy_codec_bundle(codec_bundle);
+                           continue);
+
+        /* Save bundle. */
+        if (context->codec_bundles == NULL) {
+            SAIL_TRY_OR_EXECUTE(sail_alloc_vector(0, destroy_codec_bundle_item, &context->codec_bundles),
+                                /* on error */ destroy_codec_bundle(codec_bundle);
+                                               continue);
         }
 
-        struct sail_codec_info *codec_info;
-        if (codec_read_info_from_string(sail_codec_info, &codec_info) != SAIL_OK) {
-            destroy_codec_info_node(codec_info_node);
-            continue;
-        };
-
-        /* Save the parsed codec info into the SAIL context. */
-        codec_info_node->codec_info = codec_info;
-
-        *last_codec_info_node = codec_info_node;
-        last_codec_info_node = &codec_info_node->next;
+        SAIL_TRY_OR_EXECUTE(sail_push_vector(context->codec_bundles, codec_bundle),
+                            /* on error */ destroy_codec_bundle(codec_bundle);
+                                           continue);
     }
 
 #ifdef SAIL_THIRD_PARTY_CODECS
@@ -582,7 +592,7 @@ static sail_status_t init_context_impl(struct sail_context *context) {
     SAIL_CHECK_CONTEXT_PTR(context);
 
     /* Our own codecs. */
-    const char *env = sail_codecs_path_env();
+    const char * const env = sail_codecs_path_env();
     const char *our_codecs_path;
 
     if (env == NULL) {
@@ -676,7 +686,7 @@ static sail_status_t init_context(struct sail_context *context, int flags) {
 
     SAIL_TRY(init_context_impl(context));
 
-    if (context->codec_info_node == NULL) {
+    if (sail_vector_size(context->codec_bundles) == 0U) {
         print_no_codecs_found();
     }
 
@@ -764,22 +774,16 @@ sail_status_t sail_unload_codecs_private(void) {
     SAIL_TRY_OR_CLEANUP(fetch_global_context_unsafe(&context),
                 /* cleanup */ unlock_context());
 
-    struct sail_codec_info_node *node = context->codec_info_node;
-    int counter = 0;
+    for (size_t i = 0; i < sail_vector_size(context->codec_bundles); i++) {
+        struct sail_codec_bundle *codec_bundle = sail_get_vector_item(context->codec_bundles, i);
 
-    while (node != NULL) {
-        if (node->codec != NULL) {
-            destroy_codec(node->codec);
-            node->codec = NULL;
-            counter++;
-        }
-
-        node = node->next;
+        destroy_codec(codec_bundle->codec);
+        codec_bundle->codec = NULL;
     }
 
     SAIL_TRY(unlock_context());
 
-    SAIL_LOG_DEBUG("Unloaded codecs number: %d", counter);
+    SAIL_LOG_DEBUG("Unloaded codecs number: %u", (unsigned)sail_vector_size(context->codec_bundles));
 
     return SAIL_OK;
 }

@@ -23,20 +23,47 @@
     SOFTWARE.
 */
 
-#include "config.h"
+#ifndef SAIL_CODEC_BUNDLE_H
+#define SAIL_CODEC_BUNDLE_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#include "sail-common.h"
-#include "sail.h"
+#ifdef SAIL_BUILD
+    #include "export.h"
+#else
+    #include <sail-common/export.h>
+#endif
 
-const struct sail_codec_info_node* sail_codec_info_list(void) {
+struct sail_codec_info;
+struct sail_codec;
+struct sail_vector;
 
-    struct sail_context *context;
-    SAIL_TRY_OR_EXECUTE(fetch_global_context_guarded(&context),
-                        /* on error */ return NULL);
+/*
+ * A structure representing a codec information and a codec interface (functions).
+ */
+struct sail_codec_bundle {
 
-    return context->codec_info_node;
+    /* Codec information. */
+    struct sail_codec_info *codec_info;
+
+    /* Codec instance. */
+    struct sail_codec *codec;
+};
+
+typedef struct sail_codec_info_bundle sail_codec_info_bundle_t;
+
+/*
+ * Returns a vector of found codecs. Use it to determine the list of possible image formats,
+ * file extensions, and mime types that could be hypothetically read or written by SAIL.
+ * Each item is of type struct sail_codec_info_bundle*.
+ */
+SAIL_EXPORT const struct sail_vector* sail_codec_bundles(void);
+
+/* extern "C" */
+#ifdef __cplusplus
 }
+#endif
+
+#endif
