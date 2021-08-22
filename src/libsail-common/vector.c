@@ -35,13 +35,14 @@
 
 struct sail_vector {
 
-    void (*item_destroy)(void *item);
+    /* Data comes first, so it's allowed to cast sail_vector to int**. */
+    void **data;
 
     size_t capacity;
 
     size_t size;
 
-    void **data;
+    void (*item_destroy)(void *item);
 };
 
 static sail_status_t grow_vector_to(struct sail_vector *vector, size_t capacity) {
@@ -92,10 +93,10 @@ sail_status_t sail_alloc_vector(size_t capacity, void (*item_destroy)(void *item
     struct sail_vector *local_vector = ptr;
 
     *local_vector = (struct sail_vector){
-        .item_destroy = item_destroy,
+        .data         = NULL,
         .capacity     = 0,
         .size         = 0,
-        .data         = NULL,
+        .item_destroy = item_destroy,
     };
 
     SAIL_TRY_OR_CLEANUP(grow_vector_to(local_vector, capacity),
@@ -154,7 +155,7 @@ void sail_clear_vector(struct sail_vector *vector) {
 
 size_t sail_vector_size(const struct sail_vector *vector) {
 
-    return vector->size;
+    return vector == NULL ? 0 : vector->size;
 }
 
 void sail_foreach_vector(const struct sail_vector *vector, void (*item_visit)(void *item)) {

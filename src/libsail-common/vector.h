@@ -36,6 +36,10 @@
     #include <sail-common/export.h>
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct sail_vector;
 
 /*
@@ -88,7 +92,7 @@ SAIL_EXPORT void* sail_pop_vector(struct sail_vector *vector);
 SAIL_EXPORT void sail_clear_vector(struct sail_vector *vector);
 
 /*
- * Returns the number of items in the vector. The vector must not be NULL.
+ * Returns the number of items in the vector. Returns 0 if the vector is NULL.
  */
 SAIL_EXPORT size_t sail_vector_size(const struct sail_vector *vector);
 
@@ -101,5 +105,10 @@ SAIL_EXPORT size_t sail_vector_size(const struct sail_vector *vector);
  *  - the visitor is NULL
  */
 SAIL_EXPORT void sail_foreach_vector(const struct sail_vector *vector, void (*item_visit)(void *item));
+
+/* extern "C" */
+#ifdef __cplusplus
+}
+#endif
 
 #endif
