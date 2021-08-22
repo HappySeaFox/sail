@@ -152,7 +152,7 @@ void sail_clear_vector(struct sail_vector *vector) {
     vector->data = NULL;
 }
 
-size_t sail_vector_size(struct sail_vector *vector) {
+size_t sail_vector_size(const struct sail_vector *vector) {
 
     return vector->size;
 }
