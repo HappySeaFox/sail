@@ -32,7 +32,9 @@ add_library(sail
                 sail_technical_diver.h
                 sail_technical_diver_private.c
                 sail_technical_diver_private.h
-                string_node.h)
+                string_node.h
+                threading.h
+                threading.c)
 
 # Build a list of public headers to install
 #
@@ -70,7 +72,18 @@ endif()
 
 target_link_libraries(sail PUBLIC sail-common)
 
+if (WIN32)
+    sail_check_init_once_execute_once()
+endif()
+
 if (UNIX)
+    # pthread_once()
+    find_package(Threads REQUIRED)
+    target_link_libraries(sail PUBLIC ${CMAKE_THREAD_LIBS_INIT})
+
+    # pthread_mutexattr_settype()
+    sail_enable_xopen_source(TARGET sail VERSION 500)
+
     target_link_libraries(sail PRIVATE dl)
 endif()
 

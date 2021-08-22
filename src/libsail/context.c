@@ -32,42 +32,29 @@
 #include "sail-common.h"
 #include "sail.h"
 
+sail_status_t sail_init(void) {
+
+    SAIL_TRY(sail_init_with_flags(0));
+
+    return SAIL_OK;
+}
+
 sail_status_t sail_init_with_flags(int flags) {
 
     struct sail_context *context;
-    SAIL_TRY(current_tls_context_with_flags(&context, flags));
+    SAIL_TRY(fetch_global_context_guarded_with_flags(&context, flags));
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_unload_codecs(void) {
+
+    SAIL_TRY(sail_unload_codecs_private());
 
     return SAIL_OK;
 }
 
 void sail_finish(void) {
 
-    SAIL_LOG_INFO("Finish");
-
-    control_tls_context(/* context - not needed */ NULL, SAIL_CONTEXT_DESTROY);
-}
-
-sail_status_t sail_unload_codecs(void) {
-
-    SAIL_LOG_DEBUG("Unloading cached codecs");
-
-    struct sail_context *context;
-    SAIL_TRY(current_tls_context(&context));
-
-    struct sail_codec_info_node *node = context->codec_info_node;
-    int counter = 0;
-
-    while (node != NULL) {
-        if (node->codec != NULL) {
-            destroy_codec(node->codec);
-            node->codec = NULL;
-            counter++;
-        }
-
-        node = node->next;
-    }
-
-    SAIL_LOG_DEBUG("Unloaded codecs: %d", counter);
-
-    return SAIL_OK;
+    destroy_global_context();
 }

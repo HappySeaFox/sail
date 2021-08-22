@@ -63,12 +63,6 @@ SAIL_TRY(sail_read_file(path, &image));
  * Destroy the image when it's not needed anymore.
  */
 sail_destroy_image(image);
-
-/*
- * Recommended: finish working with the implicitly allocated SAIL context in this thread
- * and unload all loaded codecs attached to it.
- */
-sail_finish();
 ```
 
 #### C++:
@@ -128,12 +122,6 @@ SAIL_TRY_OR_CLEANUP(sail_stop_reading(state),
  * Destroy the image when it's not needed anymore.
  */
 sail_destroy_image(image);
-
-/*
- * Recommended: finish working with the implicitly allocated SAIL context in this thread
- * and unload all loaded codecs attached to it.
- */
-sail_finish();
 ```
 
 #### C++:
@@ -162,11 +150,6 @@ SAIL_TRY(input.stop());
 // Handle the image and its pixels here.
 // Use image.width(), image.height(), image.bytes_per_line(),
 // image.pixel_format(), and image.pixels() for that.
-
-// Recommended: finish working with the implicitly allocated SAIL context in this thread
-// and unload all loaded codecs attached to it.
-//
-sail::context::finish();
 ```
 
 ### 3. `deep diver`
@@ -177,7 +160,7 @@ sail::context::finish();
 #### C:
 ```C
 /*
- * Optional: Initialize a new SAIL thread-local static context explicitly and preload all codecs.
+ * Optional: Initialize a new SAIL context explicitly and preload all codecs.
  * Codecs are lazy-loaded when SAIL_FLAG_PRELOAD_CODECS is not specified.
  */
 SAIL_TRY(sail_init_with_flags(SAIL_FLAG_PRELOAD_CODECS));
@@ -253,17 +236,11 @@ sail_destroy_image(image);
  * Optional: unload all codecs to free up some memory.
  */
 sail_unload_codecs();
-
-/*
- * Recommended: finish working with the explicitly allocated SAIL context in this thread
- * and unload all loaded codecs attached to it.
- */
-sail_finish();
 ```
 
 #### C++:
 ```C++
-// Optional: Initialize a new SAIL thread-local static context explicitly and preload all codecs.
+// Optional: Initialize a new SAIL context explicitly and preload all codecs.
 // Codecs are lazy-loaded when SAIL_FLAG_PRELOAD_CODECS is not specified.
 //
 sail::context::init(SAIL_FLAG_PRELOAD_CODECS);
@@ -306,11 +283,6 @@ SAIL_TRY(input.stop());
 // Handle the image and its pixels here.
 // Use image.width(), image.height(), image.bytes_per_line(),
 // image.pixel_format(), and image.pixels() for that.
-
-// Recommended: finish working with the implicitly allocated SAIL context in this thread
-// and unload all loaded codecs attached to it.
-//
-sail::context::finish();
 ```
 
 ### 4. `technical diver`
@@ -324,7 +296,7 @@ and call `sail_start_reading_io_with_options()`.
 
 ```C
 /*
- * Optional: Initialize a new SAIL thread-local static context explicitly and preload all codecs.
+ * Optional: Initialize a new SAIL context explicitly and preload all codecs.
  * Codecs are lazy-loaded when SAIL_FLAG_PRELOAD_CODECS is not specified.
  */
 SAIL_TRY(sail_init_with_flags(SAIL_FLAG_PRELOAD_CODECS));
@@ -427,17 +399,11 @@ sail_destroy_image(image);
  * Optional: unload all codecs to free up some memory.
  */
 sail_unload_codecs();
-
-/*
- * Recommended: finish working with the explicitly allocated SAIL context in this thread
- * and unload all loaded codecs attached to it.
- */
-sail_finish();
 ```
 
 #### C++:
 ```C++
-// Optional: Initialize a new SAIL thread-local static context explicitly and preload all codecs.
+// Optional: Initialize a new SAIL context explicitly and preload all codecs.
 // Codecs are lazy-loaded when SAIL_FLAG_PRELOAD_CODECS is not specified.
 //
 sail::context::init(SAIL_FLAG_PRELOAD_CODECS);
@@ -499,9 +465,4 @@ SAIL_TRY(input.stop());
 // Handle the image and its pixels here.
 // Use image.width(), image.height(), image.bytes_per_line(),
 // image.pixel_format(), and image.pixels() for that.
-
-// Recommended: finish working with the implicitly allocated SAIL context in this thread
-// and unload all loaded codecs attached to it.
-//
-sail::context::finish();
 ```

@@ -88,7 +88,7 @@ sail_status_t sail_codec_info_by_magic_number_from_io(struct sail_io *io, const 
     SAIL_CHECK_CODEC_INFO_PTR(codec_info);
 
     struct sail_context *context;
-    SAIL_TRY(current_tls_context(&context));
+    SAIL_TRY(fetch_global_context_guarded(&context));
 
     /* Read the image magic. */
     unsigned char buffer[SAIL_MAGIC_BUFFER_SIZE];
@@ -185,7 +185,7 @@ sail_status_t sail_codec_info_from_extension(const char *extension, const struct
     SAIL_LOG_DEBUG("Finding codec info for extension '%s'", extension);
 
     struct sail_context *context;
-    SAIL_TRY(current_tls_context(&context));
+    SAIL_TRY(fetch_global_context_guarded(&context));
 
     char *extension_copy;
     SAIL_TRY(sail_strdup(extension, &extension_copy));
@@ -229,7 +229,7 @@ sail_status_t sail_codec_info_from_mime_type(const char *mime_type, const struct
     SAIL_LOG_DEBUG("Finding codec info for mime type '%s'", mime_type);
 
     struct sail_context *context;
-    SAIL_TRY(current_tls_context(&context));
+    SAIL_TRY(fetch_global_context_guarded(&context));
 
     char *mime_type_copy;
     SAIL_TRY(sail_strdup(mime_type, &mime_type_copy));

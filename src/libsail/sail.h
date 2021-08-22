@@ -49,6 +49,7 @@
     #include "sail_technical_diver.h"
     #include "sail_technical_diver_private.h"
     #include "string_node.h"
+    #include "threading.h"
 #else
     #include <sail-common/sail-common.h>
 
