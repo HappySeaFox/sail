@@ -1,6 +1,6 @@
 /*  This file is part of SAIL (https://github.com/smoked-herring/sail)
 
-    Copyright (c) 2020 Dmitry Baryshev
+    Copyright (c) 2021 Dmitry Baryshev
 
     The MIT License
 
@@ -23,10 +23,10 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_CONTEXT_PRIVATE_H
-#define SAIL_CONTEXT_PRIVATE_H
+#ifndef SAIL_THREADING_H
+#define SAIL_THREADING_H
 
-#include <stdbool.h>
+#include "config.h"
 
 #ifdef SAIL_BUILD
     #include "error.h"
@@ -36,37 +36,46 @@
     #include <sail-common/export.h>
 #endif
 
-struct sail_codec_info_node;
+#ifdef SAIL_WIN32
+    #include <Windows.h>
+#else
+    #include <pthread.h>
+#endif
 
 /*
- * Context is a main entry point to start working with SAIL. It enumerates codec info objects which could be
- * used later in reading and writing operations.
+ * Threading support.
+ *
+ * Why this file is needed: C11 introduces threading support with mutexes, atomics, threads etc.
+ * However, the most popular C compiler for Windows, MSVC, still supports nothing from it. We need
+ * to implement our own threading support based on OS-specific APIs.
  */
-struct sail_context {
 
-    /* Context is already initialized. */
-    bool initialized;
+/* Call once. */
 
-    /* Linked list of found codec info objects. */
-    struct sail_codec_info_node *codec_info_node;
-};
+#ifdef SAIL_WIN32
+    typedef INIT_ONCE sail_once_flag_t;
+    #define SAIL_ONCE_DEFAULT_VALUE INIT_ONCE_STATIC_INIT
+#else
+    typedef pthread_once_t sail_once_flag_t;
+    #define SAIL_ONCE_DEFAULT_VALUE PTHREAD_ONCE_INIT
+#endif
 
-typedef struct sail_context sail_context_t;
+SAIL_HIDDEN sail_status_t threading_call_once(sail_once_flag_t *once_flag, void (*callback)(void));
 
-SAIL_HIDDEN sail_status_t destroy_global_context(void);
+/* Mutexes. */
 
-SAIL_HIDDEN sail_status_t fetch_global_context_guarded(struct sail_context **context);
+#ifdef SAIL_WIN32
+    typedef CRITICAL_SECTION sail_mutex_t;
+#else
+    typedef pthread_mutex_t sail_mutex_t;
+#endif
 
-SAIL_HIDDEN sail_status_t fetch_global_context_unsafe(struct sail_context **context);
+SAIL_HIDDEN sail_status_t threading_init_mutex(sail_mutex_t *mutex);
 
-SAIL_HIDDEN sail_status_t fetch_global_context_guarded_with_flags(struct sail_context **context, int flags);
+SAIL_HIDDEN sail_status_t threading_lock_mutex(sail_mutex_t *mutex);
 
-SAIL_HIDDEN sail_status_t fetch_global_context_unsafe_with_flags(struct sail_context **context, int flags);
+SAIL_HIDDEN sail_status_t threading_unlock_mutex(sail_mutex_t *mutex);
 
-SAIL_HIDDEN sail_status_t sail_unload_codecs_private(void);
-
-SAIL_HIDDEN sail_status_t lock_context(void);
-
-SAIL_HIDDEN sail_status_t unlock_context(void);
+SAIL_HIDDEN sail_status_t threading_destroy_mutex(sail_mutex_t *mutex);
 
 #endif

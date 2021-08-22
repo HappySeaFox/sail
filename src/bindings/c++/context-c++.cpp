@@ -35,6 +35,13 @@ class SAIL_HIDDEN context::pimpl
 public:
 };
 
+sail_status_t context::init()
+{
+    SAIL_TRY(init(0));
+
+    return SAIL_OK;
+}
+
 sail_status_t context::init(int flags)
 {
     SAIL_TRY(sail_init_with_flags(flags));
