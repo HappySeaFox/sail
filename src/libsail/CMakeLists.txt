@@ -33,6 +33,8 @@ add_library(sail
                 sail_technical_diver_private.c
                 sail_technical_diver_private.h
                 string_node.h
+                string_node_private.c
+                string_node_private.h
                 threading.h
                 threading.c)
 
