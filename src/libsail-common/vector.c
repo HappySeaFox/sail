@@ -74,6 +74,11 @@ static sail_status_t grow_vector(struct sail_vector *vector) {
     return SAIL_OK;
 }
 
+static void free_item(void *item) {
+
+    sail_free(item);
+}
+
 /*
  * Public functions.
  */
@@ -134,7 +139,9 @@ void* sail_pop_vector(struct sail_vector *vector) {
 
 void sail_clear_vector(struct sail_vector *vector) {
 
-    if (vector->item_destroy != NULL) {
+    if (vector->item_destroy == NULL) {
+        sail_foreach_vector(vector, free_item);
+    } else {
         sail_foreach_vector(vector, vector->item_destroy);
     }
 

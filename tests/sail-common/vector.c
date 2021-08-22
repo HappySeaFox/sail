@@ -53,8 +53,11 @@ static MunitResult test_vector_clear(const MunitParameter params[], void *user_d
     munit_assert_not_null(vector);
     munit_assert(sail_vector_size(vector) == 0);
 
-    int item = 5;
-    munit_assert(sail_push_vector(vector, &item) == SAIL_OK);
+    int *item;
+    munit_assert(sail_malloc(sizeof(int), &item) == SAIL_OK);
+    *item = 5;
+
+    munit_assert(sail_push_vector(vector, item) == SAIL_OK);
     sail_clear_vector(vector);
     sail_destroy_vector(vector);
 
@@ -70,13 +73,14 @@ static MunitResult test_vector_push_pop(const MunitParameter params[], void *use
 
     munit_assert(sail_alloc_vector(0, NULL, &vector) == SAIL_OK);
 
-    int item = 5;
-    munit_assert(sail_push_vector(vector, &item) == SAIL_OK);
-    munit_assert(sail_vector_size(vector) == 1);
-    munit_assert(sail_push_vector(vector, &item) == SAIL_OK);
-    munit_assert(sail_vector_size(vector) == 2);
-    munit_assert(sail_push_vector(vector, &item) == SAIL_OK);
-    munit_assert(sail_vector_size(vector) == 3);
+    for (size_t i = 0; i < 3; i++) {
+        int *item;
+        munit_assert(sail_malloc(sizeof(int), &item) == SAIL_OK);
+        *item = 5;
+
+        munit_assert(sail_push_vector(vector, item) == SAIL_OK);
+        munit_assert(sail_vector_size(vector) == i+1);
+    }
 
     sail_pop_vector(vector);
     munit_assert(sail_vector_size(vector) == 2);

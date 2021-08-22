@@ -45,15 +45,17 @@ struct sail_vector;
 
 /*
  * Allocates a new vector. The assigned vector MUST be destroyed later with sail_destroy_vector().
- * An optional item_destroy() callback can be specified to destroy vector elements.
+ * An optional item_destroy() callback can be specified to destroy vector items. If it's NULL,
+ * the vector items are destroyed with sail_free().
  *
  * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_alloc_vector(size_t capacity, void (*item_destroy)(void *item), struct sail_vector **vector);
 
 /*
- * Destroys the specified vector. Calls the destructor specified by sail_alloc_vector() on each item.
- * Does nothing if the vector is NULL.
+ * Destroys the specified vector. Does nothing if the vector is NULL.
+ * Calls the destructor specified by sail_alloc_vector() on each item. If no destructor was specified,
+ * calls sail_free() on each item.
  */
 SAIL_EXPORT void sail_destroy_vector(struct sail_vector *vector);
 
@@ -64,16 +66,16 @@ SAIL_EXPORT void sail_destroy_vector(struct sail_vector *vector);
 SAIL_EXPORT void* sail_get_vector_item(const struct sail_vector *vector, size_t index);
 
 /*
- * Pushes the element to the end of the vector. The vector must not be NULL.
- * Transfers the ownership of the element to the vector.
+ * Pushes the item to the end of the vector. The vector must not be NULL.
+ * Transfers the ownership of the item to the vector.
  *
  * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_push_vector(struct sail_vector *vector, void *item);
 
 /*
- * Pops the last element from the vector. The vector must not be NULL and empty.
- * Transfers the ownership of the element to the caller.
+ * Pops the last item from the vector. The vector must not be NULL and empty.
+ * Transfers the ownership of the item to the caller.
  */
 SAIL_EXPORT void* sail_pop_vector(struct sail_vector *vector);
 
