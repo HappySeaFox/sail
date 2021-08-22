@@ -27,7 +27,7 @@
 
 #include <string.h>
 
-#include "sail.h"
+#include "sail-common.h"
 
 /*
  * Private functions.

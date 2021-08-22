@@ -38,6 +38,8 @@ add_library(sail-common
                 source_image.h
                 utils.c
                 utils.h
+                vector.c
+                vector.h
                 write_features.c
                 write_features.h
                 write_options.c
@@ -63,6 +65,7 @@ set(PUBLIC_HEADERS "common.h"
                    "sail-common.h"
                    "source_image.h"
                    "utils.h"
+                   "vector.h"
                    "write_features.h"
                    "write_options.h")
 

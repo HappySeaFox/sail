@@ -48,6 +48,7 @@
     #include "resolution.h"
     #include "source_image.h"
     #include "utils.h"
+    #include "vector.h"
     #include "write_features.h"
     #include "write_options.h"
 #else
@@ -70,6 +71,7 @@
     #include <sail-common/resolution.h>
     #include <sail-common/source_image.h>
     #include <sail-common/utils.h>
+    #include <sail-common/vector.h>
     #include <sail-common/write_features.h>
     #include <sail-common/write_options.h>
 #endif
