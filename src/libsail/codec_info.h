@@ -34,8 +34,6 @@ struct sail_io;
 struct sail_read_features;
 struct sail_write_features;
 
-struct sail_codec_info_node;
-
 /*
  * A structure representing codec information.
  */

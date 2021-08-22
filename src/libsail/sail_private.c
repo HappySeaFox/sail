@@ -44,33 +44,32 @@ static sail_status_t load_codec_by_codec_info_unsafe(const struct sail_codec_inf
     SAIL_TRY(fetch_global_context_unsafe(&context));
 
     /* Find the codec in the cache. */
-    struct sail_codec_info_node *node = context->codec_info_node;
-    struct sail_codec_info_node *found_node = NULL;
+    struct sail_codec_bundle *found_codec_bundle = NULL;
 
-    while (node != NULL) {
-        if (node->codec_info == codec_info) {
-            if (node->codec != NULL) {
-                *codec = node->codec;
+    for (struct sail_codec_bundle_node *codec_bundle_node = context->codec_bundle_node; codec_bundle_node != NULL; codec_bundle_node = codec_bundle_node->next) {
+        struct sail_codec_bundle *codec_bundle = codec_bundle_node->codec_bundle;
+
+        if (codec_bundle->codec_info == codec_info) {
+            if (codec_bundle->codec != NULL) {
+                *codec = codec_bundle->codec;
                 return SAIL_OK;
             }
 
-            found_node = node;
+            found_codec_bundle = codec_bundle_node->codec_bundle;
             break;
         }
-
-        node = node->next;
     }
 
     /* Something weird. The pointer to the codec info is not found in the cache. */
-    if (found_node == NULL) {
+    if (found_codec_bundle == NULL) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_NOT_FOUND);
     }
 
-    if (found_node->codec == NULL) {
-        SAIL_TRY(alloc_and_load_codec(found_node->codec_info, &found_node->codec));
+    if (found_codec_bundle->codec == NULL) {
+        SAIL_TRY(alloc_and_load_codec(found_codec_bundle->codec_info, &found_codec_bundle->codec));
     }
 
-    *codec = found_node->codec;
+    *codec = found_codec_bundle->codec;
 
     return SAIL_OK;
 }

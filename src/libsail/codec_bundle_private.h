@@ -23,20 +23,34 @@
     SOFTWARE.
 */
 
-#include "config.h"
+#ifndef SAIL_CODEC_BUNDLE_PRIVATE_H
+#define SAIL_CODEC_BUNDLE_PRIVATE_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#ifdef SAIL_BUILD
+    #include "error.h"
+    #include "export.h"
+#else
+    #include <sail-common/error.h>
+    #include <sail-common/export.h>
+#endif
 
-#include "sail-common.h"
-#include "sail.h"
+struct sail_codec_bundle;
 
-const struct sail_codec_info_node* sail_codec_info_list(void) {
+/*
+ * Private codec bundle functions.
+ */
 
-    struct sail_context *context;
-    SAIL_TRY_OR_EXECUTE(fetch_global_context_guarded(&context),
-                        /* on error */ return NULL);
+/*
+ * Allocates a new codec bundle. The assigned bundle MUST be destroyed later
+ * with destroy_codec_bundle().
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_HIDDEN sail_status_t alloc_codec_bundle(struct sail_codec_bundle **codec_bundle);
 
-    return context->codec_info_node;
-}
+/*
+ * Destroys the specified codec bundle and all its internal allocated memory buffers.
+ */
+SAIL_HIDDEN void destroy_codec_bundle(struct sail_codec_bundle *codec_bundle);
+
+#endif

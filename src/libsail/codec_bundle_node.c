@@ -23,49 +23,13 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_SAIL_H
-#define SAIL_SAIL_H
+#include "sail.h"
 
-/* Universal libsail include. */
+const struct sail_codec_bundle_node* sail_codec_bundle_list(void) {
 
-#ifdef SAIL_BUILD
-    #include "sail-common.h"
+    struct sail_context *context;
+    SAIL_TRY_OR_EXECUTE(fetch_global_context_guarded(&context),
+                        /* on error */ return NULL);
 
-    #include "codec.h"
-    #include "codec_bundle.h"
-    #include "codec_bundle_node.h"
-    #include "codec_bundle_node_private.h"
-    #include "codec_bundle_private.h"
-    #include "codec_info.h"
-    #include "codec_info_private.h"
-    #include "codec_layout.h"
-    #include "context.h"
-    #include "context_private.h"
-    #include "ini.h"
-    #include "io_file.h"
-    #include "io_mem.h"
-    #include "io_noop.h"
-    #include "sail_advanced.h"
-    #include "sail_deep_diver.h"
-    #include "sail_junior.h"
-    #include "sail_private.h"
-    #include "sail_technical_diver.h"
-    #include "sail_technical_diver_private.h"
-    #include "string_node.h"
-    #include "string_node_private.h"
-    #include "threading.h"
-#else
-    #include <sail-common/sail-common.h>
-
-    #include <sail/codec_bundle.h>
-    #include <sail/codec_bundle_node.h>
-    #include <sail/codec_info.h>
-    #include <sail/context.h>
-    #include <sail/sail_advanced.h>
-    #include <sail/sail_deep_diver.h>
-    #include <sail/sail_junior.h>
-    #include <sail/sail_technical_diver.h>
-    #include <sail/string_node.h>
-#endif
-
-#endif
+    return context->codec_bundle_node;
+}

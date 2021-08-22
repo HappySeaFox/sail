@@ -23,49 +23,47 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_SAIL_H
-#define SAIL_SAIL_H
-
-/* Universal libsail include. */
+#ifndef SAIL_CODEC_BUNDLE_NODE_H
+#define SAIL_CODEC_BUNDLE_NODE_H
 
 #ifdef SAIL_BUILD
-    #include "sail-common.h"
-
-    #include "codec.h"
-    #include "codec_bundle.h"
-    #include "codec_bundle_node.h"
-    #include "codec_bundle_node_private.h"
-    #include "codec_bundle_private.h"
-    #include "codec_info.h"
-    #include "codec_info_private.h"
-    #include "codec_layout.h"
-    #include "context.h"
-    #include "context_private.h"
-    #include "ini.h"
-    #include "io_file.h"
-    #include "io_mem.h"
-    #include "io_noop.h"
-    #include "sail_advanced.h"
-    #include "sail_deep_diver.h"
-    #include "sail_junior.h"
-    #include "sail_private.h"
-    #include "sail_technical_diver.h"
-    #include "sail_technical_diver_private.h"
-    #include "string_node.h"
-    #include "string_node_private.h"
-    #include "threading.h"
+    #include "export.h"
 #else
-    #include <sail-common/sail-common.h>
+    #include <sail-common/export.h>
+#endif
 
-    #include <sail/codec_bundle.h>
-    #include <sail/codec_bundle_node.h>
-    #include <sail/codec_info.h>
-    #include <sail/context.h>
-    #include <sail/sail_advanced.h>
-    #include <sail/sail_deep_diver.h>
-    #include <sail/sail_junior.h>
-    #include <sail/sail_technical_diver.h>
-    #include <sail/string_node.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+struct sail_codec_info;
+struct sail_codec;
+
+/*
+ * A structure representing a codec information linked list.
+ */
+struct sail_codec_bundle_node {
+
+    /* Codec bundle. */
+    struct sail_codec_bundle *codec_bundle;
+
+    struct sail_codec_bundle_node *next;
+};
+
+typedef struct sail_codec_bundle_node sail_codec_bundle_node_t;
+
+/*
+ * Returns a linked list of found codec info nodes. Use it to determine the list of possible image formats,
+ * file extensions, and mime types that could be hypothetically read or written by SAIL.
+ *
+ * Returns a pointer to the first codec info node or NULL when no SAIL codecs were found.
+ * Use sail_codec_bundle_node.next to iterate.
+ */
+SAIL_EXPORT const struct sail_codec_bundle_node* sail_codec_bundle_list(void);
+
+/* extern "C" */
+#ifdef __cplusplus
+}
 #endif
 
 #endif

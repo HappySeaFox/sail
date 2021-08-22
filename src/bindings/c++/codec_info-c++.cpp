@@ -220,11 +220,9 @@ codec_info codec_info::from_mime_type(const std::string_view mime_type)
 std::vector<codec_info> codec_info::list()
 {
     std::vector<codec_info> codec_info_list;
-    const sail_codec_info_node *codec_info_node = sail_codec_info_list();
 
-    while (codec_info_node != nullptr) {
-        codec_info_list.push_back(codec_info(codec_info_node->codec_info));
-        codec_info_node = codec_info_node->next;
+    for (const sail_codec_bundle_node *codec_bundle_node = sail_codec_bundle_list(); codec_bundle_node != nullptr; codec_bundle_node = codec_bundle_node->next) {
+        codec_info_list.push_back(codec_info(codec_bundle_node->codec_bundle->codec_info));
     }
 
     return codec_info_list;

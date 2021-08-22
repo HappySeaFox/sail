@@ -23,27 +23,30 @@
     SOFTWARE.
 */
 
-QStringList QtSail::filters() const
-{
-    QStringList filters { QStringLiteral("All Files (*.*)") };
+#include "sail.h"
 
-    for (const sail_codec_bundle_node *codec_bundle_node = sail_codec_bundle_list(); codec_bundle_node != nullptr; codec_bundle_node = codec_bundle_node->next) {
-        const sail_codec_info *codec_info = codec_bundle_node->codec_bundle->codec_info;
+sail_status_t alloc_codec_bundle(struct sail_codec_bundle **codec_bundle) {
 
-        QStringList masks;
+    SAIL_CHECK_CODEC_BUNDLE_PTR(codec_bundle);
 
-        sail_string_node *extension_node = codec_info->extension_node;
+    void *ptr;
+    SAIL_TRY(sail_malloc(sizeof(struct sail_codec_bundle), &ptr));
+    *codec_bundle = ptr;
 
-        while (extension_node != nullptr) {
-            masks.append(QStringLiteral("*.%1").arg(extension_node->value));
-            extension_node = extension_node->next;
-        }
+    (*codec_bundle)->codec_info = NULL;
+    (*codec_bundle)->codec      = NULL;
 
-        filters.append(QStringLiteral("%1: %2 (%3)")
-                       .arg(codec_info->name)
-                       .arg(codec_info->description)
-                       .arg(masks.join(QStringLiteral(" "))));
+    return SAIL_OK;
+}
+
+void destroy_codec_bundle(struct sail_codec_bundle *codec_bundle) {
+
+    if (codec_bundle == NULL) {
+        return;
     }
 
-    return filters;
+    destroy_codec_info(codec_bundle->codec_info);
+    destroy_codec(codec_bundle->codec);
+
+    sail_free(codec_bundle);
 }

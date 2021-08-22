@@ -23,49 +23,43 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_SAIL_H
-#define SAIL_SAIL_H
-
-/* Universal libsail include. */
+#ifndef SAIL_CODEC_BUNDLE_NODE_PRIVATE_H
+#define SAIL_CODEC_BUNDLE_NODE_PRIVATE_H
 
 #ifdef SAIL_BUILD
-    #include "sail-common.h"
-
-    #include "codec.h"
-    #include "codec_bundle.h"
-    #include "codec_bundle_node.h"
-    #include "codec_bundle_node_private.h"
-    #include "codec_bundle_private.h"
-    #include "codec_info.h"
-    #include "codec_info_private.h"
-    #include "codec_layout.h"
-    #include "context.h"
-    #include "context_private.h"
-    #include "ini.h"
-    #include "io_file.h"
-    #include "io_mem.h"
-    #include "io_noop.h"
-    #include "sail_advanced.h"
-    #include "sail_deep_diver.h"
-    #include "sail_junior.h"
-    #include "sail_private.h"
-    #include "sail_technical_diver.h"
-    #include "sail_technical_diver_private.h"
-    #include "string_node.h"
-    #include "string_node_private.h"
-    #include "threading.h"
+    #include "export.h"
 #else
-    #include <sail-common/sail-common.h>
+    #include <sail-common/export.h>
+#endif
 
-    #include <sail/codec_bundle.h>
-    #include <sail/codec_bundle_node.h>
-    #include <sail/codec_info.h>
-    #include <sail/context.h>
-    #include <sail/sail_advanced.h>
-    #include <sail/sail_deep_diver.h>
-    #include <sail/sail_junior.h>
-    #include <sail/sail_technical_diver.h>
-    #include <sail/string_node.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+struct sail_codec_bundle_node;
+
+/*
+ * Allocates a new codec bundle node. The assigned node MUST be destroyed later
+ * with destroy_codec_bundle_node().
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_HIDDEN sail_status_t alloc_codec_bundle_node(struct sail_codec_bundle_node **codec_bundle_node);
+
+/*
+ * Destroys the specified codec bundle node and all its internal allocated memory buffers.
+ */
+SAIL_HIDDEN void destroy_codec_bundle_node(struct sail_codec_bundle_node *codec_bundle_node);
+
+/*
+ * Destroys the specified codec bundle node and all its internal allocated memory buffers.
+ * Repeats the destruction procedure recursively for the next stored pointer.
+ */
+SAIL_HIDDEN void destroy_codec_bundle_node_chain(struct sail_codec_bundle_node *codec_bundle_node);
+
+/* extern "C" */
+#ifdef __cplusplus
+}
 #endif
 
 #endif
