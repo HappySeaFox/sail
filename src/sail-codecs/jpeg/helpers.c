@@ -140,17 +140,15 @@ sail_status_t jpeg_private_fetch_iccp(struct jpeg_decompress_struct *decompress_
 
     SAIL_CHECK_ICCP_PTR(iccp);
 
-    void *data = NULL;
+    JOCTET *data = NULL;
     unsigned data_length = 0;
 
     SAIL_LOG_DEBUG("JPEG: ICC profile is %sfound",
-                   jpeg_read_icc_profile(decompress_context,
-                                         (JOCTET **)&data,
-                                         &data_length)
+                   jpeg_read_icc_profile(decompress_context, &data, &data_length)
                    ? "" : "not ");
 
     if (data != NULL && data_length > 0) {
-        SAIL_TRY_OR_CLEANUP(sail_alloc_iccp_move_data(data, data_length, iccp),
+        SAIL_TRY_OR_CLEANUP(sail_alloc_iccp_from_data(data, data_length, iccp),
                             /* cleanup */ sail_free(data));
     }
 
