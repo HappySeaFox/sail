@@ -59,24 +59,21 @@ static sail_status_t probe(const char *path) {
     printf("Interlaced    : %s\n", (image->source_image->properties & SAIL_IMAGE_PROPERTY_INTERLACED) ? "yes" : "no");
     printf("Flipped Vert. : %s\n", (image->source_image->properties & SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY) ? "yes" : "no");
 
-    struct sail_meta_data_node *node = image->meta_data_node;
-
-    while (node != NULL) {
+    for (const struct sail_meta_data_node *meta_data_node = image->meta_data_node; meta_data_node != NULL; meta_data_node = meta_data_node->next) {
+        const struct sail_meta_data *meta_data = meta_data_node->meta_data;
         const char *meta_data_str = NULL;
 
-        if (node->key == SAIL_META_DATA_UNKNOWN) {
-            meta_data_str = node->key_unknown;
+        if (meta_data->key == SAIL_META_DATA_UNKNOWN) {
+            meta_data_str = meta_data->key_unknown;
         } else {
-            meta_data_str = sail_meta_data_to_string(node->key);
+            meta_data_str = sail_meta_data_to_string(meta_data->key);
         }
 
-        if (node->value_type == SAIL_META_DATA_TYPE_STRING) {
-            printf("%-14s: %s\n", meta_data_str, (const char *)node->value);
+        if (meta_data->value_type == SAIL_META_DATA_TYPE_STRING) {
+            printf("%-14s: %s\n", meta_data_str, (const char *)meta_data->value);
         } else {
-            printf("%-14s: <binary data, length: %u byte(s)>\n", meta_data_str, (unsigned)node->value_length);
+            printf("%-14s: <binary data, length: %u byte(s)>\n", meta_data_str, (unsigned)meta_data->value_length);
         }
-
-        node = node->next;
     }
 
     sail_destroy_image(image);

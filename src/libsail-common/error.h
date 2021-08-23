@@ -83,6 +83,7 @@ enum SailStatus {
     SAIL_ERROR_BUFFER_NULL_PTR,
     SAIL_ERROR_INVALID_IO,
     SAIL_ERROR_RESULT_NULL_PTR,
+    SAIL_ERROR_META_DATA_NULL_PTR,
     SAIL_ERROR_META_DATA_NODE_NULL_PTR,
     SAIL_ERROR_ICCP_NULL_PTR,
     SAIL_ERROR_PALETTE_NULL_PTR,
@@ -176,6 +177,7 @@ do {                                  \
 #define SAIL_CHECK_ICCP_PTR(iccp)                       SAIL_CHECK_PTR2(iccp,            SAIL_ERROR_ICCP_NULL_PTR)
 #define SAIL_CHECK_IMAGE_PTR(image)                     SAIL_CHECK_PTR2(image,           SAIL_ERROR_IMAGE_NULL_PTR)
 #define SAIL_CHECK_IO_PTR(io)                           SAIL_CHECK_PTR2(io,              SAIL_ERROR_IO_NULL_PTR)
+#define SAIL_CHECK_META_DATA_PTR(meta_data)             SAIL_CHECK_PTR2(meta_data,       SAIL_ERROR_META_DATA_NULL_PTR)
 #define SAIL_CHECK_META_DATA_NODE_PTR(meta_data_node)   SAIL_CHECK_PTR2(meta_data_node,  SAIL_ERROR_META_DATA_NODE_NULL_PTR)
 #define SAIL_CHECK_PALETTE_PTR(palette)                 SAIL_CHECK_PTR2(palette,         SAIL_ERROR_PALETTE_NULL_PTR)
 #define SAIL_CHECK_PATH_PTR(path)                       SAIL_CHECK_PTR2(path,            SAIL_ERROR_PATH_NULL_PTR)

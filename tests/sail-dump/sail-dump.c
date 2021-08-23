@@ -273,21 +273,28 @@ static sail_status_t read_meta_data(FILE *fptr, struct sail_image *image) {
 
         struct sail_meta_data_node *meta_data_node;
 
+        SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_node(&meta_data_node),
+                            /* on error */ sail_free(value));
+
         if (meta_data == SAIL_META_DATA_UNKNOWN) {
             if (value_type == SAIL_META_DATA_TYPE_STRING) {
-                SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_node_from_unknown_string(key_unknown, (char *)value, &meta_data_node),
-                                    /* on error */ sail_free(value));
+                SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_from_unknown_string(key_unknown, (char *)value, &meta_data_node->meta_data),
+                                    /* on error */ sail_destroy_meta_data_node(meta_data_node),
+                                                   sail_free(value));
             } else {
-                SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_node_from_unknown_data(key_unknown, value, data_length, &meta_data_node),
-                                    /* on error */ sail_free(value));
+                SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_from_unknown_data(key_unknown, value, data_length, &meta_data_node->meta_data),
+                                    /* on error */ sail_destroy_meta_data_node(meta_data_node),
+                                                   sail_free(value));
             }
         } else {
             if (value_type == SAIL_META_DATA_TYPE_STRING) {
-                SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_node_from_known_string(meta_data, (char *)value, &meta_data_node),
-                                    /* on error */ sail_free(value));
+                SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_from_known_string(meta_data, (char *)value, &meta_data_node->meta_data),
+                                    /* on error */ sail_destroy_meta_data_node(meta_data_node),
+                                                   sail_free(value));
             } else {
-                SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_node_from_known_data(meta_data, value, data_length, &meta_data_node),
-                                    /* on error */ sail_free(value));
+                SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_from_known_data(meta_data, value, data_length, &meta_data_node->meta_data),
+                                    /* on error */ sail_destroy_meta_data_node(meta_data_node),
+                                                   sail_free(value));
             }
         }
 
@@ -297,7 +304,7 @@ static sail_status_t read_meta_data(FILE *fptr, struct sail_image *image) {
         sail_free(value);
 
         SAIL_LOG_DEBUG("DUMP: Meta data properties: key(%s) key_unknown(%s), type(%s), value_length(%u)",
-                        sail_meta_data_to_string(meta_data_node->key), meta_data_node->key_unknown, type, meta_data_node->value_length);
+                        sail_meta_data_to_string(meta_data_node->meta_data->key), meta_data_node->meta_data->key_unknown, type, meta_data_node->meta_data->value_length);
     }
 
     return SAIL_OK;
@@ -509,35 +516,31 @@ sail_status_t sail_dump(const struct sail_image *image) {
 
     {
         unsigned meta_data_count = 0;
-        struct sail_meta_data_node *meta_data_node = image->meta_data_node;
 
-        while (meta_data_node != NULL) {
+        for (const struct sail_meta_data_node *meta_data_node = image->meta_data_node; meta_data_node != NULL; meta_data_node = meta_data_node->next) {
             meta_data_count++;
-            meta_data_node = meta_data_node->next;
         }
 
         if (meta_data_count > 0) {
             printf("META-DATA\n%d\n", meta_data_count);
 
-            meta_data_node = image->meta_data_node;
+            for (const struct sail_meta_data_node *meta_data_node = image->meta_data_node; meta_data_node != NULL; meta_data_node = meta_data_node->next) {
+                const struct sail_meta_data *meta_data = meta_data_node->meta_data;
 
-            while (meta_data_node != NULL) {
-                printf("%s\n", sail_meta_data_to_string(meta_data_node->key));
-                printf("%s\n", meta_data_node->key_unknown == NULL ? "noop" : meta_data_node->key_unknown);
+                printf("%s\n", sail_meta_data_to_string(meta_data->key));
+                printf("%s\n", meta_data->key_unknown == NULL ? "noop" : meta_data->key_unknown);
 
                 const char *value_type_str = NULL;
-                switch (meta_data_node->value_type) {
+                switch (meta_data->value_type) {
                     case SAIL_META_DATA_TYPE_STRING: value_type_str = "STRING"; break;
                     case SAIL_META_DATA_TYPE_DATA:   value_type_str = "DATA";   break;
                     default: {
-                        SAIL_LOG_ERROR("DUMP: Unknown meta data value type #%d", meta_data_node->value_type);
+                        SAIL_LOG_ERROR("DUMP: Unknown meta data value type #%d", meta_data->value_type);
                         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
                     }
                 }
-                printf("%s %u\n", value_type_str, (unsigned)meta_data_node->value_length);
-                SAIL_TRY(print_hex(meta_data_node->value, meta_data_node->value_length));
-
-                meta_data_node = meta_data_node->next;
+                printf("%s %u\n", value_type_str, (unsigned)meta_data->value_length);
+                SAIL_TRY(print_hex(meta_data->value, meta_data->value_length));
             }
 
             printf("\n");

@@ -92,7 +92,7 @@ static sail_status_t write_raw_profile_header(char *str, size_t str_size, enum S
     return SAIL_OK;
 }
 
-static sail_status_t hex_string_to_meta_data(const char *hex_str, enum SailMetaData key, struct sail_meta_data_node **meta_data_node) {
+static sail_status_t hex_string_to_meta_data_node(const char *hex_str, enum SailMetaData key, struct sail_meta_data_node **meta_data_node) {
 
     const char *start;
     SAIL_TRY(skip_raw_profile_header(hex_str, &start));
@@ -104,11 +104,9 @@ static sail_status_t hex_string_to_meta_data(const char *hex_str, enum SailMetaD
     struct sail_meta_data_node *meta_data_node_local;
     SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_node(&meta_data_node_local),
                         /* cleanup */ sail_free(data));
-
-    meta_data_node_local->key          = key;
-    meta_data_node_local->value_type   = SAIL_META_DATA_TYPE_DATA;
-    meta_data_node_local->value        = data;
-    meta_data_node_local->value_length = data_size;
+    SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_from_known_data(key, data, data_size, &meta_data_node_local->meta_data),
+                        /* cleanup */ sail_destroy_meta_data_node(meta_data_node_local),
+                                      sail_free(data));
 
     *meta_data_node = meta_data_node_local;
 
@@ -270,11 +268,11 @@ sail_status_t png_private_fetch_meta_data(png_structp png_ptr, png_infop info_pt
 
         /* Legacy EXIF and friends. */
         if (strcmp(lines[i].key, "Raw profile type exif") == 0) {
-            SAIL_TRY(hex_string_to_meta_data(lines[i].text, SAIL_META_DATA_EXIF, &meta_data_node));
+            SAIL_TRY(hex_string_to_meta_data_node(lines[i].text, SAIL_META_DATA_EXIF, &meta_data_node));
         } else if (strcmp(lines[i].key, "Raw profile type iptc") == 0) {
-            SAIL_TRY(hex_string_to_meta_data(lines[i].text, SAIL_META_DATA_IPTC, &meta_data_node));
+            SAIL_TRY(hex_string_to_meta_data_node(lines[i].text, SAIL_META_DATA_IPTC, &meta_data_node));
         } else if (strcmp(lines[i].key, "Raw profile type xmp") == 0) {
-            SAIL_TRY(hex_string_to_meta_data(lines[i].text, SAIL_META_DATA_XMP, &meta_data_node));
+            SAIL_TRY(hex_string_to_meta_data_node(lines[i].text, SAIL_META_DATA_XMP, &meta_data_node));
         } else {
             enum SailMetaData meta_data;
 
@@ -284,10 +282,14 @@ sail_status_t png_private_fetch_meta_data(png_structp png_ptr, png_infop info_pt
                 meta_data = sail_meta_data_from_string(lines[i].key);
             }
 
+            SAIL_TRY(sail_alloc_meta_data_node(&meta_data_node));
+
             if (meta_data == SAIL_META_DATA_UNKNOWN) {
-                SAIL_TRY(sail_alloc_meta_data_node_from_unknown_string(lines[i].key, lines[i].text, &meta_data_node));
+                SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_from_unknown_string(lines[i].key, lines[i].text, &meta_data_node->meta_data),
+                                    /* cleanup */ sail_destroy_meta_data_node(meta_data_node));
             } else {
-                SAIL_TRY(sail_alloc_meta_data_node_from_known_string(meta_data, lines[i].text, &meta_data_node));
+                SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_from_known_string(meta_data, lines[i].text, &meta_data_node->meta_data),
+                                    /* cleanup */ sail_destroy_meta_data_node(meta_data_node));
             }
         }
 
@@ -301,7 +303,9 @@ sail_status_t png_private_fetch_meta_data(png_structp png_ptr, png_infop info_pt
     if (png_get_eXIf_1(png_ptr, info_ptr, &exif_length, &exif) != 0) {
         struct sail_meta_data_node *meta_data_node;
 
-        SAIL_TRY(sail_alloc_meta_data_node_from_known_data(SAIL_META_DATA_EXIF, exif, exif_length, &meta_data_node));
+        SAIL_TRY(sail_alloc_meta_data_node(&meta_data_node));
+        SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_from_known_data(SAIL_META_DATA_EXIF, exif, exif_length, &meta_data_node->meta_data),
+                            /* cleanup */ sail_destroy_meta_data_node(meta_data_node));
 
         *last_meta_data_node = meta_data_node;
         last_meta_data_node = &meta_data_node->next;
@@ -315,14 +319,11 @@ sail_status_t png_private_write_meta_data(png_structp png_ptr, png_infop info_pt
     SAIL_CHECK_PTR(png_ptr);
     SAIL_CHECK_PTR(info_ptr);
 
-    const struct sail_meta_data_node *first_meta_data_node = meta_data_node;
-
     /* Count PNG lines. */
     unsigned count = 0;
 
-    while (meta_data_node != NULL) {
+    for (const struct sail_meta_data_node *meta_data_node_it = meta_data_node; meta_data_node_it != NULL; meta_data_node_it = meta_data_node_it->next) {
         count++;
-        meta_data_node = meta_data_node->next;
     }
 
     if (count > 0) {
@@ -337,20 +338,19 @@ sail_status_t png_private_write_meta_data(png_structp png_ptr, png_infop info_pt
 
         unsigned index = 0;
 
-        /* Go back to the list head. */
-        meta_data_node = first_meta_data_node;
-
         /* Build PNG lines. */
-        while (meta_data_node != NULL) {
-            if (meta_data_node->key == SAIL_META_DATA_EXIF) {
-                if (meta_data_node->value_type == SAIL_META_DATA_TYPE_DATA) {
+        for (; meta_data_node != NULL; meta_data_node = meta_data_node->next) {
+            const struct sail_meta_data *meta_data = meta_data_node->meta_data;
+
+            if (meta_data->key == SAIL_META_DATA_EXIF) {
+                if (meta_data->value_type == SAIL_META_DATA_TYPE_DATA) {
                     /* Skip "Exif\0\0" if any. */
-                    if (meta_data_node->value_length >= 4 && memcmp(meta_data_node->value, "Exif", 4) == 0) {
-                        SAIL_LOG_DEBUG("PNG: Writing raw EXIF %u bytes long w/o header", (unsigned)meta_data_node->value_length - 6);
-                        png_set_eXIf_1(png_ptr, info_ptr, (png_uint_32)meta_data_node->value_length-6, ((png_bytep)meta_data_node->value)+6);
+                    if (meta_data->value_length >= 4 && memcmp(meta_data->value, "Exif", 4) == 0) {
+                        SAIL_LOG_DEBUG("PNG: Writing raw EXIF %u bytes long w/o header", (unsigned)meta_data->value_length - 6);
+                        png_set_eXIf_1(png_ptr, info_ptr, (png_uint_32)meta_data->value_length-6, ((png_bytep)meta_data->value)+6);
                     } else {
-                        SAIL_LOG_DEBUG("PNG: Writing raw EXIF %u bytes long", (unsigned)meta_data_node->value_length);
-                        png_set_eXIf_1(png_ptr, info_ptr, (png_uint_32)meta_data_node->value_length, meta_data_node->value);
+                        SAIL_LOG_DEBUG("PNG: Writing raw EXIF %u bytes long", (unsigned)meta_data->value_length);
+                        png_set_eXIf_1(png_ptr, info_ptr, (png_uint_32)meta_data->value_length, meta_data->value);
                     }
                 } else {
                     SAIL_LOG_ERROR("PNG: EXIF meta data must have DATA type");
@@ -359,32 +359,32 @@ sail_status_t png_private_write_meta_data(png_structp png_ptr, png_infop info_pt
                 const char *meta_data_key = NULL;
                 char *meta_data_value = NULL;
 
-                if (meta_data_node->key == SAIL_META_DATA_UNKNOWN) {
-                    meta_data_key = meta_data_node->key_unknown;
-                    meta_data_value = (char *)meta_data_node->value;
+                if (meta_data->key == SAIL_META_DATA_UNKNOWN) {
+                    meta_data_key = meta_data->key_unknown;
+                    meta_data_value = (char *)meta_data->value;
                 } else {
-                    if (meta_data_node->key == SAIL_META_DATA_IPTC) {
+                    if (meta_data->key == SAIL_META_DATA_IPTC) {
                         meta_data_key = "Raw profile type iptc";
 
                         char raw_profile_header[64];
                         SAIL_TRY_OR_EXECUTE(write_raw_profile_header(raw_profile_header,
                                                                         sizeof(raw_profile_header),
-                                                                        meta_data_node->key,
-                                                                        (meta_data_node->value_length - 1) * 2),
-                                            /* on error */ meta_data_node = meta_data_node->next; continue);
+                                                                        meta_data->key,
+                                                                        (meta_data->value_length - 1) * 2),
+                                            /* on error */ continue);
 
                         char *hex_string;
-                        SAIL_TRY_OR_EXECUTE(sail_data_to_hex_string(meta_data_node->value, meta_data_node->value_length, &hex_string),
-                                            /* on error */ meta_data_node = meta_data_node->next; continue);
+                        SAIL_TRY_OR_EXECUTE(sail_data_to_hex_string(meta_data->value, meta_data->value_length, &hex_string),
+                                            /* on error */ continue);
 
                         SAIL_TRY_OR_EXECUTE(sail_concat(&meta_data_value, 2, raw_profile_header, hex_string),
-                                            /* on error */ sail_free(hex_string); meta_data_node = meta_data_node->next; continue);
+                                            /* on error */ sail_free(hex_string); continue);
                         sail_free(hex_string);
 
                         lines_to_free[index] = 1;
                     } else {
-                        meta_data_key = sail_meta_data_to_string(meta_data_node->key);
-                        meta_data_value = (char *)meta_data_node->value;
+                        meta_data_key = sail_meta_data_to_string(meta_data->key);
+                        meta_data_value = (char *)meta_data->value;
                     }
                 }
 
@@ -394,8 +394,6 @@ sail_status_t png_private_write_meta_data(png_structp png_ptr, png_infop info_pt
 
                 index++;
             }
-
-            meta_data_node = meta_data_node->next;
         }
 
         png_set_text(png_ptr, info_ptr, lines, index);
