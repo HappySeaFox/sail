@@ -177,7 +177,7 @@ static inline std::string empty_string_on_nullptr(const char *str) {
 }
 
 meta_data::meta_data(const sail_meta_data *meta_data)
-    : meta_data()
+    : sail::meta_data()
 {
     if (meta_data == nullptr) {
         SAIL_LOG_DEBUG("NULL pointer has been passed to sail::meta_data(). The object is untouched");
