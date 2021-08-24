@@ -142,7 +142,7 @@ static const char* sail_codecs_path_env(void) {
 }
 #endif
 
-#ifdef SAIL_THIRD_PARTY_CODECS
+#ifdef SAIL_THIRD_PARTY_CODECS_PATH
 static const char* client_codecs_path(void) {
 
     static SAIL_THREAD_LOCAL bool codecs_path_called = false;
@@ -252,7 +252,7 @@ static sail_status_t print_enumerated_codecs(struct sail_context *context) {
     return SAIL_OK;
 }
 
-#if !defined SAIL_COMBINE_CODECS || defined SAIL_THIRD_PARTY_CODECS
+#if !defined SAIL_COMBINE_CODECS || defined SAIL_THIRD_PARTY_CODECS_PATH
 /* Add codecs_path/lib to the DLL/SO search path. */
 static sail_status_t add_lib_subdir_to_dll_search_path(const char *codecs_path) {
 
@@ -523,7 +523,7 @@ static sail_status_t init_context_impl(struct sail_context *context) {
         last_codec_bundle_node = &codec_bundle_node->next;
     }
 
-#ifdef SAIL_THIRD_PARTY_CODECS
+#ifdef SAIL_THIRD_PARTY_CODECS_PATH
     /* Load client codecs. */
     SAIL_TRY(enumerate_codecs_in_paths(context, (const char* []){ client_codecs_path() }, 1));
 #endif
@@ -590,7 +590,7 @@ static sail_status_t init_context_impl(struct sail_context *context) {
         SAIL_LOG_DEBUG("SAIL_CODECS_PATH environment variable is set. Loading codecs from '%s'", env);
     }
 
-#ifdef SAIL_THIRD_PARTY_CODECS
+#ifdef SAIL_THIRD_PARTY_CODECS_PATH
     SAIL_TRY(enumerate_codecs_in_paths(context, (const char* []){ our_codecs_path, client_codecs_path() }, 2));
 #else
     SAIL_TRY(enumerate_codecs_in_paths(context, (const char* []){ our_codecs_path }, 1));
@@ -640,7 +640,7 @@ static void print_build_statistics(void) {
     SAIL_LOG_INFO("Combine codecs: no");
 #endif
 
-#ifdef SAIL_THIRD_PARTY_CODECS
+#ifdef SAIL_THIRD_PARTY_CODECS_PATH
     SAIL_LOG_INFO("SAIL_THIRD_PARTY_CODECS_PATH: enabled");
 #else
     SAIL_LOG_INFO("SAIL_THIRD_PARTY_CODECS_PATH: disabled");
