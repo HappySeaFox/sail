@@ -42,6 +42,9 @@ SAIL_HIDDEN void destroy_string_node(struct sail_string_node *string_node);
 
 SAIL_HIDDEN void destroy_string_node_chain(struct sail_string_node *string_node);
 
+/*
+ * Split a ';'-separated list of strings.
+ */
 SAIL_HIDDEN sail_status_t split_into_string_node_chain(const char *value, struct sail_string_node **target_string_node);
 
 #endif
