@@ -7,7 +7,7 @@ macro(sail_enable_asan)
     #
     if (SAIL_DEV)
         if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID MATCHES "Clang")
-            message("ASAN is enabled")
+            message("${SAIL_ASAN_TARGET}: ASAN is enabled")
             target_compile_options(${SAIL_ASAN_TARGET} PRIVATE "-fsanitize=address")
             target_link_libraries(${SAIL_ASAN_TARGET} PRIVATE "-fsanitize=address")
         else()
