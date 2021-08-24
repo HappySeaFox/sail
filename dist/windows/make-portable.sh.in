@@ -35,3 +35,5 @@ cp -a "@CMAKE_INSTALL_PREFIX@" "$name"
 powershell Compress-Archive "$name" "$name.zip"
 
 rm -rf "$name"
+
+echo "Successfully created $name.zip"
