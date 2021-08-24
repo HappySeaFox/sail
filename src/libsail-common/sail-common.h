@@ -41,6 +41,7 @@
     #include "io_common.h"
     #include "log.h"
     #include "memory.h"
+    #include "meta_data.h"
     #include "meta_data_node.h"
     #include "palette.h"
     #include "pixel.h"
@@ -64,6 +65,7 @@
     #include <sail-common/io_common.h>
     #include <sail-common/log.h>
     #include <sail-common/memory.h>
+    #include <sail-common/meta_data.h>
     #include <sail-common/meta_data_node.h>
     #include <sail-common/palette.h>
     #include <sail-common/pixel.h>

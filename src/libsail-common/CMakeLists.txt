@@ -23,6 +23,8 @@ add_library(sail-common
                 log.h
                 memory.c
                 memory.h
+                meta_data.c
+                meta_data.h
                 meta_data_node.c
                 meta_data_node.h
                 palette.c
@@ -57,6 +59,7 @@ set(PUBLIC_HEADERS "common.h"
                    "io_common.h"
                    "log.h"
                    "memory.h"
+                   "meta_data.h"
                    "meta_data_node.h"
                    "palette.h"
                    "pixel.h"

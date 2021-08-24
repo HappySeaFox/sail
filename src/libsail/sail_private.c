@@ -23,11 +23,6 @@
     SOFTWARE.
 */
 
-#include "config.h"
-
-#include <string.h>
-
-#include "sail-common.h"
 #include "sail.h"
 
 /*
@@ -49,33 +44,32 @@ static sail_status_t load_codec_by_codec_info_unsafe(const struct sail_codec_inf
     SAIL_TRY(fetch_global_context_unsafe(&context));
 
     /* Find the codec in the cache. */
-    struct sail_codec_info_node *node = context->codec_info_node;
-    struct sail_codec_info_node *found_node = NULL;
+    struct sail_codec_bundle *found_codec_bundle = NULL;
 
-    while (node != NULL) {
-        if (node->codec_info == codec_info) {
-            if (node->codec != NULL) {
-                *codec = node->codec;
+    for (struct sail_codec_bundle_node *codec_bundle_node = context->codec_bundle_node; codec_bundle_node != NULL; codec_bundle_node = codec_bundle_node->next) {
+        struct sail_codec_bundle *codec_bundle = codec_bundle_node->codec_bundle;
+
+        if (codec_bundle->codec_info == codec_info) {
+            if (codec_bundle->codec != NULL) {
+                *codec = codec_bundle->codec;
                 return SAIL_OK;
             }
 
-            found_node = node;
+            found_codec_bundle = codec_bundle_node->codec_bundle;
             break;
         }
-
-        node = node->next;
     }
 
     /* Something weird. The pointer to the codec info is not found in the cache. */
-    if (found_node == NULL) {
+    if (found_codec_bundle == NULL) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_NOT_FOUND);
     }
 
-    if (found_node->codec == NULL) {
-        SAIL_TRY(alloc_and_load_codec(found_node->codec_info, &found_node->codec));
+    if (found_codec_bundle->codec == NULL) {
+        SAIL_TRY(alloc_and_load_codec(found_codec_bundle->codec_info, &found_codec_bundle->codec));
     }
 
-    *codec = found_node->codec;
+    *codec = found_codec_bundle->codec;
 
     return SAIL_OK;
 }
@@ -163,62 +157,4 @@ sail_status_t allowed_write_output_pixel_format(const struct sail_write_features
 
     print_unsupported_write_pixel_format(pixel_format);
     SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
-}
-
-sail_status_t alloc_string_node(struct sail_string_node **string_node) {
-
-    SAIL_CHECK_STRING_NODE_PTR(string_node);
-
-    void *ptr;
-    SAIL_TRY(sail_malloc(sizeof(struct sail_string_node), &ptr));
-    *string_node = ptr;
-
-    (*string_node)->value = NULL;
-    (*string_node)->next  = NULL;
-
-    return SAIL_OK;
-}
-
-void destroy_string_node(struct sail_string_node *string_node) {
-
-    if (string_node == NULL) {
-        return;
-    }
-
-    sail_free(string_node->value);
-    sail_free(string_node);
-}
-
-void destroy_string_node_chain(struct sail_string_node *string_node) {
-
-    while (string_node != NULL) {
-        struct sail_string_node *string_node_next = string_node->next;
-
-        destroy_string_node(string_node);
-
-        string_node = string_node_next;
-    }
-}
-
-sail_status_t split_into_string_node_chain(const char *value, struct sail_string_node **target_string_node) {
-
-    struct sail_string_node **last_string_node = target_string_node;
-
-    while (*(value += strspn(value, ";")) != '\0') {
-        size_t length = strcspn(value, ";");
-
-        struct sail_string_node *string_node;
-
-        SAIL_TRY(alloc_string_node(&string_node));
-
-        SAIL_TRY_OR_CLEANUP(sail_strdup_length(value, length, &string_node->value),
-                            /* cleanup */ destroy_string_node(string_node));
-
-        *last_string_node = string_node;
-        last_string_node = &string_node->next;
-
-        value += length;
-    }
-
-    return SAIL_OK;
 }

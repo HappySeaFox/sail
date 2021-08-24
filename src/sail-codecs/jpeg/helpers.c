@@ -105,7 +105,9 @@ sail_status_t jpeg_private_fetch_meta_data(struct jpeg_decompress_struct *decomp
     while(it != NULL) {
         if(it->marker == JPEG_COM) {
             struct sail_meta_data_node *meta_data_node;
-            SAIL_TRY(sail_alloc_meta_data_node_from_known_substring(SAIL_META_DATA_COMMENT, (const char *)it->data, it->data_length, &meta_data_node));
+            SAIL_TRY(sail_alloc_meta_data_node(&meta_data_node));
+            SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_from_known_substring(SAIL_META_DATA_COMMENT, (const char *)it->data, it->data_length, &meta_data_node->meta_data),
+                                /* cleanup */ sail_destroy_meta_data_node(meta_data_node));
 
             *last_meta_data_node = meta_data_node;
             last_meta_data_node = &meta_data_node->next;
@@ -120,13 +122,13 @@ sail_status_t jpeg_private_fetch_meta_data(struct jpeg_decompress_struct *decomp
 sail_status_t jpeg_private_write_meta_data(struct jpeg_compress_struct *compress_context, const struct sail_meta_data_node *meta_data_node) {
 
     while (meta_data_node != NULL) {
-        if (meta_data_node->value_type == SAIL_META_DATA_TYPE_STRING) {
+        if (meta_data_node->meta_data->value_type == SAIL_META_DATA_TYPE_STRING) {
             jpeg_write_marker(compress_context,
                                 JPEG_COM,
-                                (JOCTET *)meta_data_node->value,
-                                (unsigned)meta_data_node->value_length - 1);
+                                (JOCTET *)meta_data_node->meta_data->value,
+                                (unsigned)meta_data_node->meta_data->value_length - 1);
         } else {
-            SAIL_LOG_WARNING("JPEG: Ignoring unsupported binary key '%s'", sail_meta_data_to_string(meta_data_node->key));
+            SAIL_LOG_WARNING("JPEG: Ignoring unsupported binary key '%s'", sail_meta_data_to_string(meta_data_node->meta_data->key));
         }
 
         meta_data_node = meta_data_node->next;

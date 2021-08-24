@@ -150,7 +150,7 @@ private:
     /*
      * Makes a deep copy of the specified meta data.
      */
-    explicit meta_data(const sail_meta_data_node *meta_data_node);
+    explicit meta_data(const sail_meta_data *meta_data);
 
     const std::string& value_string() const;
 
@@ -158,7 +158,7 @@ private:
 
     meta_data& with_value_type(SailMetaDataType type);
 
-    sail_status_t to_sail_meta_data_node(sail_meta_data_node **meta_data_node) const;
+    sail_status_t to_sail_meta_data(sail_meta_data **meta_data) const;
 
 private:
     class pimpl;

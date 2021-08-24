@@ -23,19 +23,13 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_GIF_HELPERS_H
-#define SAIL_GIF_HELPERS_H
+#include "sail.h"
 
-#include <gif_lib.h>
+const struct sail_codec_bundle_node* sail_codec_bundle_list(void) {
 
-#include "common.h"
-#include "error.h"
-#include "export.h"
+    struct sail_context *context;
+    SAIL_TRY_OR_EXECUTE(fetch_global_context_guarded(&context),
+                        /* on error */ return NULL);
 
-struct sail_meta_data_node;
-
-SAIL_HIDDEN sail_status_t gif_private_fetch_comment(const GifByteType *extension, struct sail_meta_data_node **meta_data_node);
-
-SAIL_HIDDEN sail_status_t gif_private_fetch_application(const GifByteType *extension, struct sail_meta_data_node **meta_data_node);
-
-#endif
+    return context->codec_bundle_node;
+}

@@ -23,19 +23,39 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_GIF_HELPERS_H
-#define SAIL_GIF_HELPERS_H
+#include "sail.h"
 
-#include <gif_lib.h>
+sail_status_t alloc_codec_bundle_node(struct sail_codec_bundle_node **codec_bundle_node) {
 
-#include "common.h"
-#include "error.h"
-#include "export.h"
+    SAIL_CHECK_CODEC_BUNDLE_NODE_PTR(codec_bundle_node);
 
-struct sail_meta_data_node;
+    void *ptr;
+    SAIL_TRY(sail_malloc(sizeof(struct sail_codec_bundle_node), &ptr));
+    *codec_bundle_node = ptr;
 
-SAIL_HIDDEN sail_status_t gif_private_fetch_comment(const GifByteType *extension, struct sail_meta_data_node **meta_data_node);
+    (*codec_bundle_node)->codec_bundle = NULL;
+    (*codec_bundle_node)->next         = NULL;
 
-SAIL_HIDDEN sail_status_t gif_private_fetch_application(const GifByteType *extension, struct sail_meta_data_node **meta_data_node);
+    return SAIL_OK;
+}
 
-#endif
+void destroy_codec_bundle_node(struct sail_codec_bundle_node *codec_bundle_node) {
+
+    if (codec_bundle_node == NULL) {
+        return;
+    }
+
+    destroy_codec_bundle(codec_bundle_node->codec_bundle);
+    sail_free(codec_bundle_node);
+}
+
+void destroy_codec_bundle_node_chain(struct sail_codec_bundle_node *codec_bundle_node) {
+
+    while (codec_bundle_node != NULL) {
+        struct sail_codec_bundle_node *codec_bundle_node_next = codec_bundle_node->next;
+
+        destroy_codec_bundle_node(codec_bundle_node);
+
+        codec_bundle_node = codec_bundle_node_next;
+    }
+}

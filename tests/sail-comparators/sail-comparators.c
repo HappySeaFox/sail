@@ -64,6 +64,38 @@ sail_status_t sail_compare_palettes(const struct sail_palette *palette1, const s
     return SAIL_OK;
 }
 
+sail_status_t sail_compare_meta_datas(const struct sail_meta_data *meta_data1, const struct sail_meta_data *meta_data2) {
+
+    munit_assert_not_null(meta_data1);
+    munit_assert_not_null(meta_data2);
+
+    munit_assert(meta_data1 != meta_data2);
+
+    munit_assert(meta_data1->key == meta_data2->key);
+
+    if (meta_data1->key == SAIL_META_DATA_UNKNOWN) {
+        munit_assert_not_null(meta_data1->key_unknown);
+        munit_assert_not_null(meta_data2->key_unknown);
+        munit_assert_string_equal(meta_data1->key_unknown, meta_data2->key_unknown);
+    }
+
+    munit_assert(meta_data1->value_type == meta_data2->value_type);
+
+    if (meta_data1->value_type == SAIL_META_DATA_TYPE_STRING) {
+        munit_assert_not_null(meta_data1->value);
+        munit_assert_not_null(meta_data2->value);
+        munit_assert_string_equal((const char *)meta_data1->value, (const char *)meta_data2->value);
+    } else if (meta_data1->value_type == SAIL_META_DATA_TYPE_DATA) {
+        munit_assert(meta_data1->value_length > 0);
+        munit_assert(meta_data1->value_length == meta_data2->value_length);
+        munit_assert_memory_equal(meta_data1->value_length, meta_data1->value, meta_data2->value);
+    } else {
+        munit_assert(false);
+    }
+
+    return SAIL_OK;
+}
+
 sail_status_t sail_compare_meta_data_nodes(const struct sail_meta_data_node *meta_data_node1, const struct sail_meta_data_node *meta_data_node2) {
 
     munit_assert_not_null(meta_data_node1);
@@ -71,27 +103,7 @@ sail_status_t sail_compare_meta_data_nodes(const struct sail_meta_data_node *met
 
     munit_assert(meta_data_node1 != meta_data_node2);
 
-    munit_assert(meta_data_node1->key == meta_data_node2->key);
-
-    if (meta_data_node1->key == SAIL_META_DATA_UNKNOWN) {
-        munit_assert_not_null(meta_data_node1->key_unknown);
-        munit_assert_not_null(meta_data_node2->key_unknown);
-        munit_assert_string_equal(meta_data_node1->key_unknown, meta_data_node2->key_unknown);
-    }
-
-    munit_assert(meta_data_node1->value_type == meta_data_node2->value_type);
-
-    if (meta_data_node1->value_type == SAIL_META_DATA_TYPE_STRING) {
-        munit_assert_not_null(meta_data_node1->value);
-        munit_assert_not_null(meta_data_node2->value);
-        munit_assert_string_equal((const char *)meta_data_node1->value, (const char *)meta_data_node2->value);
-    } else if (meta_data_node1->value_type == SAIL_META_DATA_TYPE_DATA) {
-        munit_assert(meta_data_node1->value_length > 0);
-        munit_assert(meta_data_node1->value_length == meta_data_node2->value_length);
-        munit_assert_memory_equal(meta_data_node1->value_length, meta_data_node1->value, meta_data_node2->value);
-    } else {
-        munit_assert(false);
-    }
+    munit_assert(sail_compare_meta_datas(meta_data_node1->meta_data, meta_data_node2->meta_data) == SAIL_OK);
 
     return SAIL_OK;
 }

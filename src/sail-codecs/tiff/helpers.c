@@ -327,7 +327,9 @@ static sail_status_t fetch_single_meta_data(TIFF *tiff, int tag, enum SailMetaDa
     if (TIFFGetField(tiff, tag, &data)) {
         struct sail_meta_data_node *meta_data_node;
 
-        SAIL_TRY(sail_alloc_meta_data_node_from_known_string(key, data, &meta_data_node));
+        SAIL_TRY(sail_alloc_meta_data_node(&meta_data_node));
+        SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_from_known_string(key, data, &meta_data_node->meta_data),
+                            /* cleanup */ sail_destroy_meta_data_node(meta_data_node));
 
         **last_meta_data_node = meta_data_node;
         *last_meta_data_node = &meta_data_node->next;
@@ -355,11 +357,13 @@ sail_status_t tiff_private_write_meta_data(TIFF *tiff, const struct sail_meta_da
 
     SAIL_CHECK_PTR(tiff);
 
-    while (meta_data_node != NULL) {
-        if (meta_data_node->value_type == SAIL_META_DATA_TYPE_STRING) {
+    for (; meta_data_node != NULL; meta_data_node = meta_data_node->next) {
+        const struct sail_meta_data *meta_data = meta_data_node->meta_data;
+
+        if (meta_data->value_type == SAIL_META_DATA_TYPE_STRING) {
             int tiff_tag = -1;
 
-            switch (meta_data_node->key) {
+            switch (meta_data->key) {
                 case SAIL_META_DATA_DOCUMENT:    tiff_tag = TIFFTAG_DOCUMENTNAME;     break;
                 case SAIL_META_DATA_DESCRIPTION: tiff_tag = TIFFTAG_IMAGEDESCRIPTION; break;
                 case SAIL_META_DATA_MAKE:        tiff_tag = TIFFTAG_MAKE;             break;
@@ -369,12 +373,12 @@ sail_status_t tiff_private_write_meta_data(TIFF *tiff, const struct sail_meta_da
                 case SAIL_META_DATA_COPYRIGHT:   tiff_tag = TIFFTAG_COPYRIGHT;        break;
 
                 case SAIL_META_DATA_UNKNOWN: {
-                    SAIL_LOG_WARNING("TIFF: Ignoring unsupported unknown meta data keys like '%s'", meta_data_node->key_unknown);
+                    SAIL_LOG_WARNING("TIFF: Ignoring unsupported unknown meta data keys like '%s'", meta_data->key_unknown);
                     break;
                 }
 
                 default: {
-                    SAIL_LOG_WARNING("TIFF: Ignoring unsupported meta data key '%s'", sail_meta_data_to_string(meta_data_node->key));
+                    SAIL_LOG_WARNING("TIFF: Ignoring unsupported meta data key '%s'", sail_meta_data_to_string(meta_data->key));
                 }
             }
 
@@ -382,12 +386,10 @@ sail_status_t tiff_private_write_meta_data(TIFF *tiff, const struct sail_meta_da
                 continue;
             }
 
-            TIFFSetField(tiff, tiff_tag, (char *)meta_data_node->value);
+            TIFFSetField(tiff, tiff_tag, (char *)meta_data->value);
         } else {
-            SAIL_LOG_WARNING("TIFF: Ignoring unsupported binary key '%s'", sail_meta_data_to_string(meta_data_node->key));
+            SAIL_LOG_WARNING("TIFF: Ignoring unsupported binary key '%s'", sail_meta_data_to_string(meta_data->key));
         }
-
-        meta_data_node = meta_data_node->next;
     }
 
     return SAIL_OK;

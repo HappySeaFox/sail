@@ -328,69 +328,6 @@ static sail_status_t alloc_codec_info(struct sail_codec_info **codec_info) {
     return SAIL_OK;
 }
 
-static void destroy_codec_info(struct sail_codec_info *codec_info) {
-
-    if (codec_info == NULL) {
-        return;
-    }
-
-    sail_free(codec_info->path);
-    sail_free(codec_info->version);
-    sail_free(codec_info->name);
-    sail_free(codec_info->description);
-
-    destroy_string_node_chain(codec_info->magic_number_node);
-    destroy_string_node_chain(codec_info->extension_node);
-    destroy_string_node_chain(codec_info->mime_type_node);
-
-    sail_destroy_read_features(codec_info->read_features);
-    sail_destroy_write_features(codec_info->write_features);
-
-    sail_free(codec_info);
-}
-
-/*
- * Public functions.
- */
-
-sail_status_t alloc_codec_info_node(struct sail_codec_info_node **codec_info_node) {
-
-    SAIL_CHECK_CODEC_INFO_NODE_PTR(codec_info_node);
-
-    void *ptr;
-    SAIL_TRY(sail_malloc(sizeof(struct sail_codec_info_node), &ptr));
-    *codec_info_node = ptr;
-
-    (*codec_info_node)->codec_info = NULL;
-    (*codec_info_node)->codec      = NULL;
-    (*codec_info_node)->next       = NULL;
-
-    return SAIL_OK;
-}
-
-void destroy_codec_info_node(struct sail_codec_info_node *codec_info_node) {
-
-    if (codec_info_node == NULL) {
-        return;
-    }
-
-    destroy_codec_info(codec_info_node->codec_info);
-    destroy_codec(codec_info_node->codec);
-
-    sail_free(codec_info_node);
-}
-
-void destroy_codec_info_node_chain(struct sail_codec_info_node *codec_info_node) {
-
-    while (codec_info_node != NULL) {
-        struct sail_codec_info_node *codec_info_node_next = codec_info_node->next;
-
-        destroy_codec_info_node(codec_info_node);
-
-        codec_info_node = codec_info_node_next;
-    }
-}
-
 static sail_status_t codec_read_info_from_input(const char *input, int (*ini_parser)(const char*, ini_handler, void*), struct sail_codec_info **codec_info) {
 
     struct sail_codec_info *codec_info_local;
@@ -437,6 +374,31 @@ static sail_status_t codec_read_info_from_input(const char *input, int (*ini_par
             default: SAIL_LOG_AND_RETURN(SAIL_ERROR_PARSE_FILE);
         }
     }
+}
+
+/*
+ * Public functions.
+ */
+
+void destroy_codec_info(struct sail_codec_info *codec_info) {
+
+    if (codec_info == NULL) {
+        return;
+    }
+
+    sail_free(codec_info->path);
+    sail_free(codec_info->version);
+    sail_free(codec_info->name);
+    sail_free(codec_info->description);
+
+    destroy_string_node_chain(codec_info->magic_number_node);
+    destroy_string_node_chain(codec_info->extension_node);
+    destroy_string_node_chain(codec_info->mime_type_node);
+
+    sail_destroy_read_features(codec_info->read_features);
+    sail_destroy_write_features(codec_info->write_features);
+
+    sail_free(codec_info);
 }
 
 sail_status_t codec_read_info_from_file(const char *path, struct sail_codec_info **codec_info) {

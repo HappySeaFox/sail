@@ -1,9 +1,14 @@
 add_library(sail
                 codec.c
+                codec_bundle.h
+                codec_bundle_node.c
+                codec_bundle_node.h
+                codec_bundle_node_private.c
+                codec_bundle_node_private.h
+                codec_bundle_private.c
+                codec_bundle_private.h
                 codec_info.c
                 codec_info.h
-                codec_info_node.c
-                codec_info_node.h
                 codec_info_private.c
                 codec_info_private.h
                 codec_layout.h
@@ -33,13 +38,16 @@ add_library(sail
                 sail_technical_diver_private.c
                 sail_technical_diver_private.h
                 string_node.h
+                string_node_private.c
+                string_node_private.h
                 threading.h
                 threading.c)
 
 # Build a list of public headers to install
 #
-set(PUBLIC_HEADERS "codec_info.h"
-                   "codec_info_node.h"
+set(PUBLIC_HEADERS "codec_bundle.h"
+                   "codec_bundle_node.h"
+                   "codec_info.h"
                    "context.h"
                    "sail.h"
                    "sail_advanced.h"

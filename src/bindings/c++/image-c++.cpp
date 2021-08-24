@@ -690,11 +690,9 @@ image::image(const sail_image *sail_image)
     }
 
     std::vector<sail::meta_data> meta_data;
-    sail_meta_data_node *node = sail_image->meta_data_node;
 
-    while (node != nullptr) {
-        meta_data.push_back(sail::meta_data(node));
-        node = node->next;
+    for(const sail_meta_data_node *node = sail_image->meta_data_node; node != nullptr; node = node->next) {
+        meta_data.push_back(sail::meta_data(node->meta_data));
     }
 
     with_width(sail_image->width)
@@ -764,7 +762,9 @@ sail_status_t image::to_sail_image(sail_image **image) const
     for (const sail::meta_data &meta_data : d->meta_data) {
         sail_meta_data_node *meta_data_node;
 
-        SAIL_TRY(meta_data.to_sail_meta_data_node(&meta_data_node));
+        SAIL_TRY(sail_alloc_meta_data_node(&meta_data_node));
+        SAIL_TRY_OR_CLEANUP(meta_data.to_sail_meta_data(&meta_data_node->meta_data),
+                            /* cleanup */ sail_destroy_meta_data_node(meta_data_node));
 
         *last_meta_data_node = meta_data_node;
         last_meta_data_node = &meta_data_node->next;

@@ -23,52 +23,25 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_SAIL_PRIVATE_H
-#define SAIL_SAIL_PRIVATE_H
-
-#include <stdbool.h>
-#include <stddef.h> /* size_t */
+#ifndef SAIL_STRING_NODE_PRIVATE_H
+#define SAIL_STRING_NODE_PRIVATE_H
 
 #ifdef SAIL_BUILD
-    #include "common.h"
     #include "error.h"
     #include "export.h"
 #else
-    #include <sail-common/common.h>
     #include <sail-common/error.h>
     #include <sail-common/export.h>
 #endif
 
-struct sail_codec_info;
-struct sail_codec;
-struct sail_write_features;
+struct sail_string_node;
 
-struct hidden_state {
+SAIL_HIDDEN sail_status_t alloc_string_node(struct sail_string_node **string_node);
 
-    struct sail_io *io;
-    bool own_io;
+SAIL_HIDDEN void destroy_string_node(struct sail_string_node *string_node);
 
-    /*
-     * Write operations save write options to check if the interlaced mode was requested on later stages.
-     * It's also used to check if the supplied pixel format is supported.
-     */
-    struct sail_write_options *write_options;
+SAIL_HIDDEN void destroy_string_node_chain(struct sail_string_node *string_node);
 
-    /* Local state passed to codec reading and writing functions. */
-    void *state;
-
-    /* Pointers to internal data structures so no need to free these. */
-    const struct sail_codec_info *codec_info;
-    const struct sail_codec *codec;
-};
-
-SAIL_HIDDEN sail_status_t load_codec_by_codec_info(const struct sail_codec_info *codec_info,
-                                                    const struct sail_codec **codec);
-
-SAIL_HIDDEN void destroy_hidden_state(struct hidden_state *state);
-
-SAIL_HIDDEN sail_status_t stop_writing(void *state, size_t *written);
-
-SAIL_HIDDEN sail_status_t allowed_write_output_pixel_format(const struct sail_write_features *write_features, enum SailPixelFormat pixel_format);
+SAIL_HIDDEN sail_status_t split_into_string_node_chain(const char *value, struct sail_string_node **target_string_node);
 
 #endif

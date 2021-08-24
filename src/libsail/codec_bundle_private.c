@@ -23,19 +23,30 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_GIF_HELPERS_H
-#define SAIL_GIF_HELPERS_H
+#include "sail.h"
 
-#include <gif_lib.h>
+sail_status_t alloc_codec_bundle(struct sail_codec_bundle **codec_bundle) {
 
-#include "common.h"
-#include "error.h"
-#include "export.h"
+    SAIL_CHECK_CODEC_BUNDLE_PTR(codec_bundle);
 
-struct sail_meta_data_node;
+    void *ptr;
+    SAIL_TRY(sail_malloc(sizeof(struct sail_codec_bundle), &ptr));
+    *codec_bundle = ptr;
 
-SAIL_HIDDEN sail_status_t gif_private_fetch_comment(const GifByteType *extension, struct sail_meta_data_node **meta_data_node);
+    (*codec_bundle)->codec_info = NULL;
+    (*codec_bundle)->codec      = NULL;
 
-SAIL_HIDDEN sail_status_t gif_private_fetch_application(const GifByteType *extension, struct sail_meta_data_node **meta_data_node);
+    return SAIL_OK;
+}
 
-#endif
+void destroy_codec_bundle(struct sail_codec_bundle *codec_bundle) {
+
+    if (codec_bundle == NULL) {
+        return;
+    }
+
+    destroy_codec_info(codec_bundle->codec_info);
+    destroy_codec(codec_bundle->codec);
+
+    sail_free(codec_bundle);
+}

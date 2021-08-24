@@ -34,31 +34,13 @@
     #include <sail-common/export.h>
 #endif
 
-struct sail_codec_info_node;
 struct sail_codec_info;
 
 /*
  * Private codec info functions.
  */
 
-/*
- * Allocates a new codec info node. The assigned node MUST be destroyed later
- * with destroy_codec_info_node().
- *
- * Returns SAIL_OK on success.
- */
-SAIL_HIDDEN sail_status_t alloc_codec_info_node(struct sail_codec_info_node **codec_info_node);
-
-/*
- * Destroys the specified codec info node and all its internal allocated memory buffers.
- */
-SAIL_HIDDEN void destroy_codec_info_node(struct sail_codec_info_node *codec_info_node);
-
-/*
- * Destroys the specified codec info node and all its internal allocated memory buffers.
- * Repeats the destruction procedure recursively for the next stored pointer.
- */
-SAIL_HIDDEN void destroy_codec_info_node_chain(struct sail_codec_info_node *codec_info_node);
+SAIL_HIDDEN void destroy_codec_info(struct sail_codec_info *codec_info);
 
 /*
  * Reads SAIL codec info from the specified file and stores the parsed information into the specified

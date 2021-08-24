@@ -23,12 +23,8 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_CODEC_INFO_NODE_H
-#define SAIL_CODEC_INFO_NODE_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#ifndef SAIL_CODEC_BUNDLE_H
+#define SAIL_CODEC_BUNDLE_H
 
 #ifdef SAIL_BUILD
     #include "export.h"
@@ -36,33 +32,26 @@ extern "C" {
     #include <sail-common/export.h>
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct sail_codec_info;
 struct sail_codec;
 
 /*
- * A structure representing a codec information linked list.
+ * A structure representing a codec information and a codec interface (functions).
  */
-struct sail_codec_info_node {
+struct sail_codec_bundle {
 
     /* Codec information. */
     struct sail_codec_info *codec_info;
 
     /* Codec instance. */
     struct sail_codec *codec;
-
-    struct sail_codec_info_node *next;
 };
 
-typedef struct sail_codec_info_node sail_codec_info_node_t;
-
-/*
- * Returns a linked list of found codec info nodes. Use it to determine the list of possible image formats,
- * file extensions, and mime types that could be hypothetically read or written by SAIL.
- *
- * Returns a pointer to the first codec info node or NULL when no SAIL codecs were found.
- * Use sail_codec_info_node.next to iterate.
- */
-SAIL_EXPORT const struct sail_codec_info_node* sail_codec_info_list(void);
+typedef struct sail_codec_bundle sail_codec_bundle_t;
 
 /* extern "C" */
 #ifdef __cplusplus

@@ -23,52 +23,47 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_SAIL_PRIVATE_H
-#define SAIL_SAIL_PRIVATE_H
-
-#include <stdbool.h>
-#include <stddef.h> /* size_t */
+#ifndef SAIL_CODEC_BUNDLE_NODE_H
+#define SAIL_CODEC_BUNDLE_NODE_H
 
 #ifdef SAIL_BUILD
-    #include "common.h"
-    #include "error.h"
     #include "export.h"
 #else
-    #include <sail-common/common.h>
-    #include <sail-common/error.h>
     #include <sail-common/export.h>
+#endif
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 struct sail_codec_info;
 struct sail_codec;
-struct sail_write_features;
 
-struct hidden_state {
+/*
+ * A structure representing a codec information linked list.
+ */
+struct sail_codec_bundle_node {
 
-    struct sail_io *io;
-    bool own_io;
+    /* Codec bundle. */
+    struct sail_codec_bundle *codec_bundle;
 
-    /*
-     * Write operations save write options to check if the interlaced mode was requested on later stages.
-     * It's also used to check if the supplied pixel format is supported.
-     */
-    struct sail_write_options *write_options;
-
-    /* Local state passed to codec reading and writing functions. */
-    void *state;
-
-    /* Pointers to internal data structures so no need to free these. */
-    const struct sail_codec_info *codec_info;
-    const struct sail_codec *codec;
+    struct sail_codec_bundle_node *next;
 };
 
-SAIL_HIDDEN sail_status_t load_codec_by_codec_info(const struct sail_codec_info *codec_info,
-                                                    const struct sail_codec **codec);
+typedef struct sail_codec_bundle_node sail_codec_bundle_node_t;
 
-SAIL_HIDDEN void destroy_hidden_state(struct hidden_state *state);
+/*
+ * Returns a linked list of found codec info nodes. Use it to determine the list of possible image formats,
+ * file extensions, and mime types that could be hypothetically read or written by SAIL.
+ *
+ * Returns a pointer to the first codec info node or NULL when no SAIL codecs were found.
+ * Use sail_codec_bundle_node.next to iterate.
+ */
+SAIL_EXPORT const struct sail_codec_bundle_node* sail_codec_bundle_list(void);
 
-SAIL_HIDDEN sail_status_t stop_writing(void *state, size_t *written);
-
-SAIL_HIDDEN sail_status_t allowed_write_output_pixel_format(const struct sail_write_features *write_features, enum SailPixelFormat pixel_format);
+/* extern "C" */
+#ifdef __cplusplus
+}
+#endif
 
 #endif

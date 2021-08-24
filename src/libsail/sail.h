@@ -32,8 +32,11 @@
     #include "sail-common.h"
 
     #include "codec.h"
+    #include "codec_bundle.h"
+    #include "codec_bundle_node.h"
+    #include "codec_bundle_node_private.h"
+    #include "codec_bundle_private.h"
     #include "codec_info.h"
-    #include "codec_info_node.h"
     #include "codec_info_private.h"
     #include "codec_layout.h"
     #include "context.h"
@@ -49,12 +52,14 @@
     #include "sail_technical_diver.h"
     #include "sail_technical_diver_private.h"
     #include "string_node.h"
+    #include "string_node_private.h"
     #include "threading.h"
 #else
     #include <sail-common/sail-common.h>
 
+    #include <sail/codec_bundle.h>
+    #include <sail/codec_bundle_node.h>
     #include <sail/codec_info.h>
-    #include <sail/codec_info_node.h>
     #include <sail/context.h>
     #include <sail/sail_advanced.h>
     #include <sail/sail_deep_diver.h>
