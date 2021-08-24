@@ -58,6 +58,6 @@
 #cmakedefine SAIL_MAGIC_BUFFER_SIZE @SAIL_MAGIC_BUFFER_SIZE@
 
 /* Load third-party codecs from SAIL_THIRD_PARTY_CODECS_PATH. */
-#cmakedefine SAIL_THIRD_PARTY_CODECS
+#cmakedefine SAIL_THIRD_PARTY_CODECS_PATH
 
 #endif

@@ -64,23 +64,31 @@ void destroy_string_node_chain(struct sail_string_node *string_node) {
 
 sail_status_t split_into_string_node_chain(const char *value, struct sail_string_node **target_string_node) {
 
-    struct sail_string_node **last_string_node = target_string_node;
+    SAIL_CHECK_STRING_PTR(value);
+    SAIL_CHECK_STRING_NODE_PTR(target_string_node);
 
-    while (*(value += strspn(value, ";")) != '\0') {
-        size_t length = strcspn(value, ";");
+    struct sail_string_node *result_string_node = NULL;
+    struct sail_string_node **last_string_node = &result_string_node;
+
+    const char *separator = ";";
+
+    while (*(value += strspn(value, separator)) != '\0') {
+        size_t length = strcspn(value, separator);
 
         struct sail_string_node *string_node;
-
         SAIL_TRY(alloc_string_node(&string_node));
 
         SAIL_TRY_OR_CLEANUP(sail_strdup_length(value, length, &string_node->value),
-                            /* cleanup */ destroy_string_node(string_node));
+                            /* cleanup */ destroy_string_node_chain(result_string_node),
+                                          destroy_string_node(string_node));
 
         *last_string_node = string_node;
         last_string_node = &string_node->next;
 
         value += length;
     }
+
+    *target_string_node = result_string_node;
 
     return SAIL_OK;
 }

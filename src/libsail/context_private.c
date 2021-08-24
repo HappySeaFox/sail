@@ -142,7 +142,7 @@ static const char* sail_codecs_path_env(void) {
 }
 #endif
 
-#ifdef SAIL_THIRD_PARTY_CODECS
+#ifdef SAIL_THIRD_PARTY_CODECS_PATH
 static const char* client_codecs_path(void) {
 
     static SAIL_THREAD_LOCAL bool codecs_path_called = false;
@@ -167,6 +167,19 @@ static const char* client_codecs_path(void) {
     }
 
     return env;
+}
+
+static sail_status_t client_codecs_paths_to_string_node_chain(struct sail_string_node **string_node) {
+
+    const char *client_codecs_path_value = client_codecs_path();
+
+    if (client_codecs_path_value == NULL) {
+        *string_node = NULL;
+    } else {
+        SAIL_TRY(split_into_string_node_chain(client_codecs_path_value, string_node));
+    }
+
+    return SAIL_OK;
 }
 #endif
 
@@ -252,7 +265,7 @@ static sail_status_t print_enumerated_codecs(struct sail_context *context) {
     return SAIL_OK;
 }
 
-#if !defined SAIL_COMBINE_CODECS || defined SAIL_THIRD_PARTY_CODECS
+#if !defined SAIL_COMBINE_CODECS || defined SAIL_THIRD_PARTY_CODECS_PATH
 /* Add codecs_path/lib to the DLL/SO search path. */
 static sail_status_t add_lib_subdir_to_dll_search_path(const char *codecs_path) {
 
@@ -372,20 +385,17 @@ static sail_status_t build_codec_bundle_from_codec_info_path(const char *codec_i
     return SAIL_OK;
 }
 
-static sail_status_t enumerate_codecs_in_paths(struct sail_context *context, const char* codec_search_paths[], int codec_search_paths_length) {
+static sail_status_t enumerate_codecs_in_paths(struct sail_context *context, const struct sail_string_node *string_node) {
 
     SAIL_CHECK_CONTEXT_PTR(context);
+    SAIL_CHECK_STRING_NODE_PTR(string_node);
 
     /* Used to load and store codec info objects. */
     struct sail_codec_bundle_node **last_codec_bundle_node = &context->codec_bundle_node;
     struct sail_codec_bundle_node *codec_bundle_node;
 
-    for (int i = 0; i < codec_search_paths_length; i++) {
-        const char *codecs_path = codec_search_paths[i];
-
-        if (codecs_path == NULL) {
-            continue;
-        }
+    for (; string_node != NULL; string_node = string_node->next) {
+        const char *codecs_path = string_node->value;
 
         SAIL_TRY(add_lib_subdir_to_dll_search_path(codecs_path));
 
@@ -523,9 +533,15 @@ static sail_status_t init_context_impl(struct sail_context *context) {
         last_codec_bundle_node = &codec_bundle_node->next;
     }
 
-#ifdef SAIL_THIRD_PARTY_CODECS
+#ifdef SAIL_THIRD_PARTY_CODECS_PATH
     /* Load client codecs. */
-    SAIL_TRY(enumerate_codecs_in_paths(context, (const char* []){ client_codecs_path() }, 1));
+    struct sail_string_node *client_codecs_paths;
+    SAIL_TRY(client_codecs_paths_to_string_node_chain(&client_codecs_paths));
+
+    SAIL_TRY_OR_CLEANUP(enumerate_codecs_in_paths(context, client_codecs_paths),
+                        /* cleanup */ destroy_string_node_chain(client_codecs_paths));
+
+    destroy_string_node_chain(client_codecs_paths);
 #endif
 
     return SAIL_OK;
@@ -590,11 +606,21 @@ static sail_status_t init_context_impl(struct sail_context *context) {
         SAIL_LOG_DEBUG("SAIL_CODECS_PATH environment variable is set. Loading codecs from '%s'", env);
     }
 
-#ifdef SAIL_THIRD_PARTY_CODECS
-    SAIL_TRY(enumerate_codecs_in_paths(context, (const char* []){ our_codecs_path, client_codecs_path() }, 2));
-#else
-    SAIL_TRY(enumerate_codecs_in_paths(context, (const char* []){ our_codecs_path }, 1));
+    /* Construct a list of paths to search. */
+    struct sail_string_node *codecs_paths;
+    SAIL_TRY(alloc_string_node(&codecs_paths));
+
+    SAIL_TRY_OR_CLEANUP(sail_strdup(our_codecs_path, &codecs_paths->value),
+                        /* cleanup */ destroy_string_node(codecs_paths));
+
+#ifdef SAIL_THIRD_PARTY_CODECS_PATH
+    SAIL_TRY(client_codecs_paths_to_string_node_chain(&codecs_paths->next));
 #endif
+
+    SAIL_TRY_OR_CLEANUP(enumerate_codecs_in_paths(context, codecs_paths),
+                        /* cleanup */ destroy_string_node_chain(codecs_paths));
+
+    destroy_string_node_chain(codecs_paths);
 
     return SAIL_OK;
 }
@@ -640,7 +666,7 @@ static void print_build_statistics(void) {
     SAIL_LOG_INFO("Combine codecs: no");
 #endif
 
-#ifdef SAIL_THIRD_PARTY_CODECS
+#ifdef SAIL_THIRD_PARTY_CODECS_PATH
     SAIL_LOG_INFO("SAIL_THIRD_PARTY_CODECS_PATH: enabled");
 #else
     SAIL_LOG_INFO("SAIL_THIRD_PARTY_CODECS_PATH: disabled");

@@ -96,9 +96,9 @@ SAIL_EXPORT sail_status_t sail_init(void);
  *
  *   <FOUND PATH>/lib is added to LD_LIBRARY_PATH.
  *
- * Additionally, SAIL_THIRD_PARTY_CODECS_PATH environment variable is searched
- * if SAIL_THIRD_PARTY_CODECS is ON, (the default) so you can load your own codecs
- * from there.
+ * Additionally, SAIL_THIRD_PARTY_CODECS_PATH environment variable with a list of ';'-separated paths
+ * is searched if SAIL_THIRD_PARTY_CODECS_PATH is enabled in CMake, (the default) so you can load
+ * your own codecs from there.
  *
  * Returns SAIL_OK on success.
  */
