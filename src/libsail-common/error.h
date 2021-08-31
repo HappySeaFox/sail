@@ -198,7 +198,8 @@ do {                                  \
 #define SAIL_CHECK_WRITE_OPTIONS_PTR(write_options)     SAIL_CHECK_PTR2(write_options,   SAIL_ERROR_WRITE_FEATURES_NULL_PTR)
 
 /*
- * Try to execute the specified SAIL function. If it fails, execute the rest of arguments.
+ * Tries to execute the specified SAIL function. If it fails, executes the rest of the arguments which
+ * can be separated by commas or by semicolons.
  * Use do/while to require ';' at the end of a SAIL_TRY_OR_EXECUTE() expression.
  */
 #define SAIL_TRY_OR_EXECUTE(sail_func, ...)              \
@@ -211,18 +212,18 @@ do {                                  \
 } do{} while(0)
 
 /*
- * Try to execute the specified SAIL function. If it fails, return the error code.
+ * Tries to execute the specified SAIL function. If it fails, returns the error code.
  */
 #define SAIL_TRY(sail_func) SAIL_TRY_OR_EXECUTE(sail_func, return __sail_error_result)
 
 /*
- * Try to execute the specified SAIL function. If it fails, ignore the error and continue execution.
+ * Tries to execute the specified SAIL function. If it fails, ignores the error and continues execution.
  */
 #define SAIL_TRY_OR_SUPPRESS(sail_func) SAIL_TRY_OR_EXECUTE(sail_func, (void)0)
 
 /*
- * Try to execute the specified SAIL function. If it fails, execute the rest of arguments
- * (so called cleanup), and return the error code.
+ * Tries to execute the specified SAIL function. If it fails, executes the rest of the arguments which
+ * can be separated by commas or by semicolons (so called cleanup), and returns the error code.
  */
 #define SAIL_TRY_OR_CLEANUP(sail_func, ...) SAIL_TRY_OR_EXECUTE(sail_func, __VA_ARGS__; return __sail_error_result)
 
