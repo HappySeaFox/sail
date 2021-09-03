@@ -220,7 +220,7 @@ meta_data& meta_data::with_value_type(SailMetaDataType type)
 
 sail_status_t meta_data::to_sail_meta_data(sail_meta_data **meta_data) const
 {
-    SAIL_CHECK_META_DATA_PTR(meta_data);
+    SAIL_CHECK_PTR(meta_data);
 
     struct sail_meta_data *meta_data_local = nullptr;
     SAIL_TRY(sail_alloc_meta_data(&meta_data_local));

@@ -498,7 +498,7 @@ sail_status_t image::convert_to(SailPixelFormat pixel_format, sail::image *image
 
 sail_status_t image::convert_to(SailPixelFormat pixel_format, const conversion_options &options, sail::image *image) const
 {
-    SAIL_CHECK_IMAGE_PTR(image);
+    SAIL_CHECK_PTR(image);
 
     if (!is_valid()) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
@@ -715,7 +715,7 @@ image::image(const sail_image *sail_image)
 
 sail_status_t image::transfer_pixels_pointer(const sail_image *sail_image)
 {
-    SAIL_CHECK_IMAGE_PTR(sail_image);
+    SAIL_CHECK_PTR(sail_image);
 
     sail_free(d->sail_image->pixels);
 
@@ -735,7 +735,7 @@ sail_status_t image::transfer_pixels_pointer(const sail_image *sail_image)
 
 sail_status_t image::to_sail_image(sail_image **image) const
 {
-    SAIL_CHECK_IMAGE_PTR(image);
+    SAIL_CHECK_PTR(image);
 
     sail_image *image_local = nullptr;
 

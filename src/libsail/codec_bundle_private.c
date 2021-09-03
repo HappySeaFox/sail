@@ -27,7 +27,7 @@
 
 sail_status_t alloc_codec_bundle(struct sail_codec_bundle **codec_bundle) {
 
-    SAIL_CHECK_CODEC_BUNDLE_PTR(codec_bundle);
+    SAIL_CHECK_PTR(codec_bundle);
 
     void *ptr;
     SAIL_TRY(sail_malloc(sizeof(struct sail_codec_bundle), &ptr));

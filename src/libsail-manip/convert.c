@@ -718,7 +718,7 @@ sail_status_t sail_convert_image_with_options(const struct sail_image *image,
                                               struct sail_image **image_output) {
 
     SAIL_TRY(sail_check_image_valid(image));
-    SAIL_CHECK_IMAGE_PTR(image_output);
+    SAIL_CHECK_PTR(image_output);
 
     int r, g, b, a;
     pixel_consumer_t pixel_consumer;
@@ -964,8 +964,8 @@ sail_status_t sail_convert_image_for_saving_with_options(const struct sail_image
                                                          struct sail_image **image_output) {
 
     SAIL_TRY(sail_check_image_valid(image));
-    SAIL_CHECK_WRITE_FEATURES_PTR(write_features);
-    SAIL_CHECK_IMAGE_PTR(image_output);
+    SAIL_CHECK_PTR(write_features);
+    SAIL_CHECK_PTR(image_output);
 
     enum SailPixelFormat best_pixel_format = sail_closest_pixel_format_from_write_features(image->pixel_format, write_features);
 

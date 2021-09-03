@@ -29,8 +29,8 @@
 
 sail_status_t sail_read_pixel3_uint8(struct sail_io *io, struct sail_pixel3_uint8 *pixel) {
 
-    SAIL_CHECK_IO_PTR(io);
-    SAIL_CHECK_PIXEL_PTR(pixel);
+    SAIL_CHECK_PTR(io);
+    SAIL_CHECK_PTR(pixel);
 
     uint8_t a[3];
 
@@ -45,8 +45,8 @@ sail_status_t sail_read_pixel3_uint8(struct sail_io *io, struct sail_pixel3_uint
 
 sail_status_t sail_read_pixel4_uint8(struct sail_io *io, struct sail_pixel4_uint8 *pixel) {
 
-    SAIL_CHECK_IO_PTR(io);
-    SAIL_CHECK_PIXEL_PTR(pixel);
+    SAIL_CHECK_PTR(io);
+    SAIL_CHECK_PTR(pixel);
 
     uint8_t a[4];
 
@@ -62,8 +62,8 @@ sail_status_t sail_read_pixel4_uint8(struct sail_io *io, struct sail_pixel4_uint
 
 sail_status_t sail_read_pixel3_uint16(struct sail_io *io, struct sail_pixel3_uint16 *pixel) {
 
-    SAIL_CHECK_IO_PTR(io);
-    SAIL_CHECK_PIXEL_PTR(pixel);
+    SAIL_CHECK_PTR(io);
+    SAIL_CHECK_PTR(pixel);
 
     uint16_t a[3];
 
@@ -78,8 +78,8 @@ sail_status_t sail_read_pixel3_uint16(struct sail_io *io, struct sail_pixel3_uin
 
 sail_status_t sail_read_pixel4_uint16(struct sail_io *io, struct sail_pixel4_uint16 *pixel) {
 
-    SAIL_CHECK_IO_PTR(io);
-    SAIL_CHECK_PIXEL_PTR(pixel);
+    SAIL_CHECK_PTR(io);
+    SAIL_CHECK_PTR(pixel);
 
     uint16_t a[4];
 

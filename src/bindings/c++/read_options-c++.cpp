@@ -108,7 +108,7 @@ read_options::read_options(const sail_read_options *ro)
 
 sail_status_t read_options::to_sail_read_options(sail_read_options *read_options) const
 {
-    SAIL_CHECK_READ_OPTIONS_PTR(read_options);
+    SAIL_CHECK_PTR(read_options);
 
     read_options->io_options = d->sail_read_options->io_options;
 

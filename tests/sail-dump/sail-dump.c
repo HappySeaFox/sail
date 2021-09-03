@@ -404,7 +404,7 @@ static sail_status_t read_pixels(FILE *fptr, struct sail_image *image) {
 
 sail_status_t sail_read_dump(const char *path, struct sail_image *images[]) {
 
-    SAIL_CHECK_PATH_PTR(path);
+    SAIL_CHECK_PTR(path);
 
     /*  To scanf dots in floats. */
     setlocale(LC_NUMERIC, "C");

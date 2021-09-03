@@ -32,7 +32,7 @@
 
 sail_status_t sail_probe_io(struct sail_io *io, struct sail_image **image, const struct sail_codec_info **codec_info) {
 
-    SAIL_CHECK_IO_PTR(io);
+    SAIL_CHECK_PTR(io);
 
     const struct sail_codec_info *codec_info_noop;
     const struct sail_codec_info **codec_info_local = codec_info == NULL ? &codec_info_noop : codec_info;
@@ -66,7 +66,7 @@ sail_status_t sail_probe_io(struct sail_io *io, struct sail_image **image, const
 
 sail_status_t sail_probe_mem(const void *buffer, size_t buffer_length, struct sail_image **image, const struct sail_codec_info **codec_info) {
 
-    SAIL_CHECK_BUFFER_PTR(buffer);
+    SAIL_CHECK_PTR(buffer);
 
     struct sail_io *io;
     SAIL_TRY(alloc_io_read_mem(buffer, buffer_length, &io));
@@ -95,14 +95,14 @@ sail_status_t sail_start_reading_mem(const void *buffer, size_t buffer_length, c
 
 sail_status_t sail_read_next_frame(void *state, struct sail_image **image) {
 
-    SAIL_CHECK_STATE_PTR(state);
-    SAIL_CHECK_IMAGE_PTR(image);
+    SAIL_CHECK_PTR(state);
+    SAIL_CHECK_PTR(image);
 
     struct hidden_state *state_of_mind = (struct hidden_state *)state;
 
     SAIL_TRY(sail_check_io_valid(state_of_mind->io));
-    SAIL_CHECK_STATE_PTR(state_of_mind->state);
-    SAIL_CHECK_CODEC_PTR(state_of_mind->codec);
+    SAIL_CHECK_PTR(state_of_mind->state);
+    SAIL_CHECK_PTR(state_of_mind->codec);
 
     struct sail_image *image_local;
     SAIL_TRY(state_of_mind->codec->v5->read_seek_next_frame(state_of_mind->state, state_of_mind->io, &image_local));
@@ -182,15 +182,15 @@ sail_status_t sail_start_writing_mem(void *buffer, size_t buffer_length, const s
 
 sail_status_t sail_write_next_frame(void *state, const struct sail_image *image) {
 
-    SAIL_CHECK_STATE_PTR(state);
-    SAIL_CHECK_IMAGE_PTR(image);
+    SAIL_CHECK_PTR(state);
+    SAIL_CHECK_PTR(image);
 
     struct hidden_state *state_of_mind = (struct hidden_state *)state;
 
     SAIL_TRY(sail_check_io_valid(state_of_mind->io));
-    SAIL_CHECK_STATE_PTR(state_of_mind->state);
-    SAIL_CHECK_CODEC_INFO_PTR(state_of_mind->codec_info);
-    SAIL_CHECK_CODEC_PTR(state_of_mind->codec);
+    SAIL_CHECK_PTR(state_of_mind->state);
+    SAIL_CHECK_PTR(state_of_mind->codec_info);
+    SAIL_CHECK_PTR(state_of_mind->codec);
 
     /* Check if we actually able to write the requested pixel format. */
     SAIL_TRY(allowed_write_output_pixel_format(state_of_mind->codec_info->write_features,

@@ -46,7 +46,7 @@ static int compression_from_string(const char *str) {
 
 static sail_status_t parse_serialized_ints(const char *value, int **target, unsigned *length, int (*converter)(const char *str)) {
 
-    SAIL_CHECK_STRING_PTR(value);
+    SAIL_CHECK_PTR(value);
     SAIL_CHECK_PTR(target);
     SAIL_CHECK_PTR(length);
 
@@ -308,7 +308,7 @@ static sail_status_t check_codec_info(const struct sail_codec_info *codec_info) 
 
 static sail_status_t alloc_codec_info(struct sail_codec_info **codec_info) {
 
-    SAIL_CHECK_CODEC_INFO_PTR(codec_info);
+    SAIL_CHECK_PTR(codec_info);
 
     void *ptr;
     SAIL_TRY(sail_malloc(sizeof(struct sail_codec_info), &ptr));
@@ -403,8 +403,8 @@ void destroy_codec_info(struct sail_codec_info *codec_info) {
 
 sail_status_t codec_read_info_from_file(const char *path, struct sail_codec_info **codec_info) {
 
-    SAIL_CHECK_PATH_PTR(path);
-    SAIL_CHECK_CODEC_INFO_PTR(codec_info);
+    SAIL_CHECK_PTR(path);
+    SAIL_CHECK_PTR(codec_info);
 
     SAIL_LOG_DEBUG("Loading codec info '%s'", path);
 
@@ -415,8 +415,8 @@ sail_status_t codec_read_info_from_file(const char *path, struct sail_codec_info
 
 sail_status_t codec_read_info_from_string(const char *str, struct sail_codec_info **codec_info) {
 
-    SAIL_CHECK_STRING_PTR(str);
-    SAIL_CHECK_CODEC_INFO_PTR(codec_info);
+    SAIL_CHECK_PTR(str);
+    SAIL_CHECK_PTR(codec_info);
 
     SAIL_TRY(codec_read_info_from_input(str, ini_parse_string, codec_info));
 

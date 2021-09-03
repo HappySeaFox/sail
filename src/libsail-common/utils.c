@@ -135,7 +135,7 @@ sail_status_t sail_concat(char **output, int num, ...) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 
-    SAIL_CHECK_STRING_PTR(output);
+    SAIL_CHECK_PTR(output);
 
     va_list args;
 
@@ -191,8 +191,8 @@ void sail_to_lower(char *str) {
 
 sail_status_t sail_to_wchar(const char *input, wchar_t **output) {
 
-    SAIL_CHECK_STRING_PTR(input);
-    SAIL_CHECK_STRING_PTR(output);
+    SAIL_CHECK_PTR(input);
+    SAIL_CHECK_PTR(output);
 
     size_t length = strlen(input);
 
@@ -223,8 +223,8 @@ sail_status_t sail_to_wchar(const char *input, wchar_t **output) {
 
 sail_status_t sail_string_hash(const char *str, uint64_t *hash) {
 
-    SAIL_CHECK_STRING_PTR(str);
-    SAIL_CHECK_RESULT_PTR(hash);
+    SAIL_CHECK_PTR(str);
+    SAIL_CHECK_PTR(hash);
 
     const unsigned char *ustr = (const unsigned char *)str;
 
@@ -244,7 +244,7 @@ sail_status_t sail_string_hash(const char *str, uint64_t *hash) {
 
 sail_status_t sail_bits_per_pixel(enum SailPixelFormat pixel_format, unsigned *result) {
 
-    SAIL_CHECK_RESULT_PTR(result);
+    SAIL_CHECK_PTR(result);
 
     switch (pixel_format) {
         case SAIL_PIXEL_FORMAT_UNKNOWN:   SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
@@ -420,7 +420,7 @@ sail_status_t sail_bytes_per_line(unsigned width, enum SailPixelFormat pixel_for
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 
-    SAIL_CHECK_RESULT_PTR(result);
+    SAIL_CHECK_PTR(result);
 
     unsigned bits_per_pixel;
     SAIL_TRY(sail_bits_per_pixel(pixel_format, &bits_per_pixel));
@@ -507,7 +507,7 @@ bool sail_is_rgb_family(enum SailPixelFormat pixel_format) {
 
 sail_status_t sail_print_errno(const char *format) {
 
-    SAIL_CHECK_STRING_PTR(format);
+    SAIL_CHECK_PTR(format);
 
     if (strstr(format, "%s") == NULL) {
         SAIL_LOG_ERROR("Format argument must contain %%s");
@@ -630,7 +630,7 @@ bool sail_is_file(const char *path) {
 
 sail_status_t sail_file_size(const char *path, size_t *size) {
 
-    SAIL_CHECK_PATH_PTR(path);
+    SAIL_CHECK_PTR(path);
 
     bool is_file;
 
@@ -664,8 +664,8 @@ sail_status_t sail_file_size(const char *path, size_t *size) {
 
 sail_status_t sail_file_contents_into_data(const char *path, void *data) {
 
-    SAIL_CHECK_PATH_PTR(path);
-    SAIL_CHECK_BUFFER_PTR(data);
+    SAIL_CHECK_PTR(path);
+    SAIL_CHECK_PTR(data);
 
     size_t size;
     SAIL_TRY(sail_file_size(path, &size));
@@ -692,7 +692,7 @@ sail_status_t sail_file_contents_into_data(const char *path, void *data) {
 
 sail_status_t sail_file_contents_to_data(const char *path, void **data, size_t *data_size) {
 
-    SAIL_CHECK_BUFFER_PTR(data);
+    SAIL_CHECK_PTR(data);
     SAIL_CHECK_PTR(data_size);
 
     size_t size;
@@ -712,8 +712,8 @@ sail_status_t sail_file_contents_to_data(const char *path, void **data, size_t *
 
 sail_status_t sail_hex_string_into_data(const char *str, void *data) {
 
-    SAIL_CHECK_STRING_PTR(str);
-    SAIL_CHECK_BUFFER_PTR(data);
+    SAIL_CHECK_PTR(str);
+    SAIL_CHECK_PTR(data);
 
     size_t data_saved;
     SAIL_TRY(hex_string_into_data(str, strlen(str), data, &data_saved));
@@ -723,8 +723,8 @@ sail_status_t sail_hex_string_into_data(const char *str, void *data) {
 
 sail_status_t sail_hex_string_to_data(const char *str, void **data, size_t *data_size) {
 
-    SAIL_CHECK_STRING_PTR(str);
-    SAIL_CHECK_BUFFER_PTR(data);
+    SAIL_CHECK_PTR(str);
+    SAIL_CHECK_PTR(data);
     SAIL_CHECK_PTR(data_size);
 
     const size_t str_length = strlen(str);
@@ -745,8 +745,8 @@ sail_status_t sail_hex_string_to_data(const char *str, void **data, size_t *data
 
 sail_status_t sail_data_into_hex_string(const void *data, size_t data_size, char *str) {
 
-    SAIL_CHECK_BUFFER_PTR(data);
-    SAIL_CHECK_STRING_PTR(str);
+    SAIL_CHECK_PTR(data);
+    SAIL_CHECK_PTR(str);
 
     char *str_local_copy = str;
 
@@ -767,8 +767,8 @@ sail_status_t sail_data_into_hex_string(const void *data, size_t data_size, char
 
 sail_status_t sail_data_to_hex_string(const void *data, size_t data_size, char **str) {
 
-    SAIL_CHECK_BUFFER_PTR(data);
-    SAIL_CHECK_STRING_PTR(str);
+    SAIL_CHECK_PTR(data);
+    SAIL_CHECK_PTR(str);
 
     void *ptr;
     SAIL_TRY(sail_malloc(data_size * 2 + 1, &ptr));

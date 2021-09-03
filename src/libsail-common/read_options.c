@@ -31,7 +31,7 @@
 
 sail_status_t sail_alloc_read_options(struct sail_read_options **read_options) {
 
-    SAIL_CHECK_READ_OPTIONS_PTR(read_options);
+    SAIL_CHECK_PTR(read_options);
 
     void *ptr;
     SAIL_TRY(sail_malloc(sizeof(struct sail_read_options), &ptr));
@@ -53,8 +53,8 @@ void sail_destroy_read_options(struct sail_read_options *read_options) {
 
 sail_status_t sail_read_options_from_features(const struct sail_read_features *read_features, struct sail_read_options *read_options) {
 
-    SAIL_CHECK_READ_FEATURES_PTR(read_features);
-    SAIL_CHECK_READ_OPTIONS_PTR(read_options);
+    SAIL_CHECK_PTR(read_features);
+    SAIL_CHECK_PTR(read_options);
 
     read_options->io_options = 0;
 
@@ -75,7 +75,7 @@ sail_status_t sail_read_options_from_features(const struct sail_read_features *r
 
 sail_status_t sail_alloc_read_options_from_features(const struct sail_read_features *read_features, struct sail_read_options **read_options) {
 
-    SAIL_CHECK_READ_OPTIONS_PTR(read_options);
+    SAIL_CHECK_PTR(read_options);
 
     struct sail_read_options *read_options_local;
     SAIL_TRY(sail_alloc_read_options(&read_options_local));
@@ -89,8 +89,8 @@ sail_status_t sail_alloc_read_options_from_features(const struct sail_read_featu
 
 sail_status_t sail_copy_read_options(const struct sail_read_options *source, struct sail_read_options **target) {
 
-    SAIL_CHECK_READ_OPTIONS_PTR(source);
-    SAIL_CHECK_READ_OPTIONS_PTR(target);
+    SAIL_CHECK_PTR(source);
+    SAIL_CHECK_PTR(target);
 
     void *ptr;
     SAIL_TRY(sail_malloc(sizeof(struct sail_read_options), &ptr));

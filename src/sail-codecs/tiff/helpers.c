@@ -340,7 +340,7 @@ static sail_status_t fetch_single_meta_data(TIFF *tiff, int tag, enum SailMetaDa
 
 sail_status_t tiff_private_fetch_meta_data(TIFF *tiff, struct sail_meta_data_node ***last_meta_data_node) {
 
-    SAIL_CHECK_META_DATA_NODE_PTR(last_meta_data_node);
+    SAIL_CHECK_PTR(last_meta_data_node);
 
     SAIL_TRY(fetch_single_meta_data(tiff, TIFFTAG_DOCUMENTNAME,     SAIL_META_DATA_DOCUMENT,    last_meta_data_node));
     SAIL_TRY(fetch_single_meta_data(tiff, TIFFTAG_IMAGEDESCRIPTION, SAIL_META_DATA_DESCRIPTION, last_meta_data_node));
@@ -397,7 +397,7 @@ sail_status_t tiff_private_write_meta_data(TIFF *tiff, const struct sail_meta_da
 
 sail_status_t tiff_private_fetch_resolution(TIFF *tiff, struct sail_resolution **resolution) {
 
-    SAIL_CHECK_RESOLUTION_PTR(resolution);
+    SAIL_CHECK_PTR(resolution);
 
     int unit = RESUNIT_NONE;
     float x = 0, y = 0;

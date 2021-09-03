@@ -53,7 +53,7 @@ static sail_status_t probe_file_with_io(const char *path, struct sail_image **im
 
 sail_status_t sail_probe_file(const char *path, struct sail_image **image, const struct sail_codec_info **codec_info) {
 
-    SAIL_CHECK_PATH_PTR(path);
+    SAIL_CHECK_PTR(path);
 
     const struct sail_codec_info *codec_info_noop;
     const struct sail_codec_info **codec_info_local = codec_info == NULL ? &codec_info_noop : codec_info;
@@ -98,8 +98,8 @@ sail_status_t sail_probe_file(const char *path, struct sail_image **image, const
 
 sail_status_t sail_read_file(const char *path, struct sail_image **image) {
 
-    SAIL_CHECK_PATH_PTR(path);
-    SAIL_CHECK_IMAGE_PTR(image);
+    SAIL_CHECK_PTR(path);
+    SAIL_CHECK_PTR(image);
 
     void *state = NULL;
 
@@ -121,8 +121,8 @@ sail_status_t sail_read_file(const char *path, struct sail_image **image) {
 
 sail_status_t sail_read_mem(const void *buffer, size_t buffer_length, struct sail_image **image) {
 
-    SAIL_CHECK_BUFFER_PTR(buffer);
-    SAIL_CHECK_IMAGE_PTR(image);
+    SAIL_CHECK_PTR(buffer);
+    SAIL_CHECK_PTR(image);
 
     void *state = NULL;
 
@@ -140,7 +140,7 @@ sail_status_t sail_read_mem(const void *buffer, size_t buffer_length, struct sai
 
 sail_status_t sail_write_file(const char *path, const struct sail_image *image) {
 
-    SAIL_CHECK_PATH_PTR(path);
+    SAIL_CHECK_PTR(path);
     SAIL_TRY(sail_check_image_valid(image));
 
     void *state = NULL;
@@ -158,7 +158,7 @@ sail_status_t sail_write_file(const char *path, const struct sail_image *image) 
 
 sail_status_t sail_write_mem(void *buffer, size_t buffer_length, const struct sail_image *image, size_t *written) {
 
-    SAIL_CHECK_BUFFER_PTR(buffer);
+    SAIL_CHECK_PTR(buffer);
     SAIL_TRY(sail_check_image_valid(image));
 
     void *state = NULL;

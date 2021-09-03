@@ -91,7 +91,7 @@ sail_status_t image_output::save(void *buffer, size_t buffer_length, const sail:
 
 sail_status_t image_output::save(void *buffer, size_t buffer_length, const sail::image &image, size_t *written) const
 {
-    SAIL_CHECK_BUFFER_PTR(buffer);
+    SAIL_CHECK_PTR(buffer);
 
     sail_image *sail_image = nullptr;
     SAIL_TRY(image.to_sail_image(&sail_image));

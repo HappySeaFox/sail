@@ -135,7 +135,7 @@ iccp::iccp(const sail_iccp *ic)
 
 sail_status_t iccp::to_sail_iccp(sail_iccp **iccp) const
 {
-    SAIL_CHECK_ICCP_PTR(iccp);
+    SAIL_CHECK_PTR(iccp);
 
     sail_iccp *iccp_local;
     SAIL_TRY(sail_alloc_iccp_from_data(d->data.data(), static_cast<unsigned>(d->data.size()), &iccp_local));

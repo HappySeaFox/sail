@@ -34,8 +34,8 @@
 
 sail_status_t sail_codec_info_from_path(const char *path, const struct sail_codec_info **codec_info) {
 
-    SAIL_CHECK_PATH_PTR(path);
-    SAIL_CHECK_CODEC_INFO_PTR(codec_info);
+    SAIL_CHECK_PTR(path);
+    SAIL_CHECK_PTR(codec_info);
 
     const char *dot = strrchr(path, '.');
 
@@ -52,8 +52,8 @@ sail_status_t sail_codec_info_from_path(const char *path, const struct sail_code
 
 sail_status_t sail_codec_info_by_magic_number_from_path(const char *path, const struct sail_codec_info **codec_info) {
 
-    SAIL_CHECK_PATH_PTR(path);
-    SAIL_CHECK_CODEC_INFO_PTR(codec_info);
+    SAIL_CHECK_PTR(path);
+    SAIL_CHECK_PTR(codec_info);
 
     struct sail_io *io;
     SAIL_TRY(alloc_io_read_file(path, &io));
@@ -68,8 +68,8 @@ sail_status_t sail_codec_info_by_magic_number_from_path(const char *path, const 
 
 sail_status_t sail_codec_info_by_magic_number_from_mem(const void *buffer, size_t buffer_length, const struct sail_codec_info **codec_info) {
 
-    SAIL_CHECK_BUFFER_PTR(buffer);
-    SAIL_CHECK_CODEC_INFO_PTR(codec_info);
+    SAIL_CHECK_PTR(buffer);
+    SAIL_CHECK_PTR(codec_info);
 
     struct sail_io *io;
     SAIL_TRY(alloc_io_read_mem(buffer, buffer_length, &io));
@@ -84,8 +84,8 @@ sail_status_t sail_codec_info_by_magic_number_from_mem(const void *buffer, size_
 
 sail_status_t sail_codec_info_by_magic_number_from_io(struct sail_io *io, const struct sail_codec_info **codec_info) {
 
-    SAIL_CHECK_IO_PTR(io);
-    SAIL_CHECK_CODEC_INFO_PTR(codec_info);
+    SAIL_CHECK_PTR(io);
+    SAIL_CHECK_PTR(codec_info);
 
     struct sail_context *context;
     SAIL_TRY(fetch_global_context_guarded(&context));
@@ -176,8 +176,8 @@ sail_status_t sail_codec_info_by_magic_number_from_io(struct sail_io *io, const 
 
 sail_status_t sail_codec_info_from_extension(const char *extension, const struct sail_codec_info **codec_info) {
 
-    SAIL_CHECK_EXTENSION_PTR(extension);
-    SAIL_CHECK_CODEC_INFO_PTR(codec_info);
+    SAIL_CHECK_PTR(extension);
+    SAIL_CHECK_PTR(codec_info);
 
     SAIL_LOG_DEBUG("Finding codec info for extension '%s'", extension);
 
@@ -217,8 +217,8 @@ sail_status_t sail_codec_info_from_extension(const char *extension, const struct
 
 sail_status_t sail_codec_info_from_mime_type(const char *mime_type, const struct sail_codec_info **codec_info) {
 
-    SAIL_CHECK_STRING_PTR(mime_type);
-    SAIL_CHECK_CODEC_INFO_PTR(codec_info);
+    SAIL_CHECK_PTR(mime_type);
+    SAIL_CHECK_PTR(codec_info);
 
     SAIL_LOG_DEBUG("Finding codec info for mime type '%s'", mime_type);
 

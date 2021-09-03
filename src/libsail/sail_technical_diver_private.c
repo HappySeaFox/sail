@@ -38,9 +38,9 @@ static sail_status_t check_io_arguments(struct sail_io *io,
                                         const struct sail_codec_info *codec_info,
                                         void **state) {
 
-    SAIL_CHECK_IO_PTR(io);
-    SAIL_CHECK_CODEC_INFO_PTR(codec_info);
-    SAIL_CHECK_STATE_PTR(state);
+    SAIL_CHECK_PTR(io);
+    SAIL_CHECK_PTR(codec_info);
+    SAIL_CHECK_PTR(state);
 
     return SAIL_OK;
 }
@@ -48,7 +48,7 @@ static sail_status_t check_io_arguments(struct sail_io *io,
 static sail_status_t allowed_write_compression(const struct sail_write_features *write_features,
                                                enum SailCompression compression) {
 
-    SAIL_CHECK_WRITE_FEATURES_PTR(write_features);
+    SAIL_CHECK_PTR(write_features);
 
     for (unsigned i = 0; i < write_features->compressions_length; i++) {
         if (write_features->compressions[i] == compression) {

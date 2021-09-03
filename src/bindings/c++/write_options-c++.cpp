@@ -135,7 +135,7 @@ write_options::write_options(const sail_write_options *wo)
 
 sail_status_t write_options::to_sail_write_options(sail_write_options *write_options) const
 {
-    SAIL_CHECK_WRITE_OPTIONS_PTR(write_options);
+    SAIL_CHECK_PTR(write_options);
 
     write_options->io_options        = d->sail_write_options->io_options;
     write_options->compression       = d->sail_write_options->compression;

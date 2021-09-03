@@ -36,8 +36,8 @@
 
 static sail_status_t convert(const char *input, const char *output, int compression) {
 
-    SAIL_CHECK_PATH_PTR(input);
-    SAIL_CHECK_PATH_PTR(output);
+    SAIL_CHECK_PTR(input);
+    SAIL_CHECK_PTR(output);
 
     const struct sail_codec_info *codec_info;
     void *state;

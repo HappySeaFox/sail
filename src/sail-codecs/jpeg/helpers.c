@@ -98,7 +98,7 @@ J_COLOR_SPACE jpeg_private_pixel_format_to_color_space(enum SailPixelFormat pixe
 
 sail_status_t jpeg_private_fetch_meta_data(struct jpeg_decompress_struct *decompress_context, struct sail_meta_data_node **last_meta_data_node) {
 
-    SAIL_CHECK_META_DATA_NODE_PTR(last_meta_data_node);
+    SAIL_CHECK_PTR(last_meta_data_node);
 
     jpeg_saved_marker_ptr it = decompress_context->marker_list;
 
@@ -140,7 +140,7 @@ sail_status_t jpeg_private_write_meta_data(struct jpeg_compress_struct *compress
 #ifdef SAIL_HAVE_JPEG_ICCP
 sail_status_t jpeg_private_fetch_iccp(struct jpeg_decompress_struct *decompress_context, struct sail_iccp **iccp) {
 
-    SAIL_CHECK_ICCP_PTR(iccp);
+    SAIL_CHECK_PTR(iccp);
 
     JOCTET *data = NULL;
     unsigned data_length = 0;
@@ -160,7 +160,7 @@ sail_status_t jpeg_private_fetch_iccp(struct jpeg_decompress_struct *decompress_
 
 sail_status_t jpeg_private_fetch_resolution(struct jpeg_decompress_struct *decompress_context, struct sail_resolution **resolution) {
 
-    SAIL_CHECK_RESOLUTION_PTR(resolution);
+    SAIL_CHECK_PTR(resolution);
 
     /* Resolution information is not valid. */
     if (decompress_context->X_density == 0 && decompress_context->Y_density == 0) {

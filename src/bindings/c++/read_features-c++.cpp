@@ -80,8 +80,8 @@ int read_features::features() const
 
 sail_status_t read_features::to_read_options(sail::read_options *read_options) const
 {
-    SAIL_CHECK_READ_FEATURES_PTR(d->sail_read_features_c);
-    SAIL_CHECK_READ_OPTIONS_PTR(read_options);
+    SAIL_CHECK_PTR(d->sail_read_features_c);
+    SAIL_CHECK_PTR(read_options);
 
     sail_read_options *sail_read_options;
 

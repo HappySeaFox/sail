@@ -189,7 +189,7 @@ sail_status_t io::is_valid_private() const
 
 sail_status_t io::to_sail_io(sail_io **io) const
 {
-    SAIL_CHECK_IO_PTR(io);
+    SAIL_CHECK_PTR(io);
 
     sail_io *io_local;
     SAIL_TRY(sail_alloc_io(&io_local));

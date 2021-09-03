@@ -132,8 +132,8 @@ sail_status_t bmp_private_bit_count_to_pixel_format(uint16_t bit_count, enum Sai
 
 sail_status_t bmp_private_fetch_iccp(struct sail_io *io, long offset_of_data, uint32_t profile_size, struct sail_iccp **iccp) {
 
-    SAIL_CHECK_IO_PTR(io);
-    SAIL_CHECK_ICCP_PTR(iccp);
+    SAIL_CHECK_PTR(io);
+    SAIL_CHECK_PTR(iccp);
 
     SAIL_TRY(io->seek(io->stream, offset_of_data, SEEK_SET));
 

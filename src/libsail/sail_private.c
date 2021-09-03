@@ -37,8 +37,8 @@ static void print_unsupported_write_pixel_format(enum SailPixelFormat pixel_form
 
 static sail_status_t load_codec_by_codec_info_unsafe(const struct sail_codec_info *codec_info, const struct sail_codec **codec) {
 
-    SAIL_CHECK_CODEC_INFO_PTR(codec_info);
-    SAIL_CHECK_CODEC_PTR(codec);
+    SAIL_CHECK_PTR(codec_info);
+    SAIL_CHECK_PTR(codec);
 
     struct sail_context *context;
     SAIL_TRY(fetch_global_context_unsafe(&context));
@@ -80,8 +80,8 @@ static sail_status_t load_codec_by_codec_info_unsafe(const struct sail_codec_inf
 
 sail_status_t load_codec_by_codec_info(const struct sail_codec_info *codec_info, const struct sail_codec **codec) {
 
-    SAIL_CHECK_CODEC_INFO_PTR(codec_info);
-    SAIL_CHECK_CODEC_PTR(codec);
+    SAIL_CHECK_PTR(codec_info);
+    SAIL_CHECK_PTR(codec);
 
     SAIL_TRY(lock_context());
 
@@ -147,7 +147,7 @@ sail_status_t stop_writing(void *state, size_t *written) {
 
 sail_status_t allowed_write_output_pixel_format(const struct sail_write_features *write_features, enum SailPixelFormat pixel_format) {
 
-    SAIL_CHECK_WRITE_FEATURES_PTR(write_features);
+    SAIL_CHECK_PTR(write_features);
 
     for (unsigned i = 0; i < write_features->output_pixel_formats_length; i++) {
         if (write_features->output_pixel_formats[i] == pixel_format) {

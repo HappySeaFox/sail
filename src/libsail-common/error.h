@@ -68,31 +68,7 @@ enum SailStatus {
      * Encoding/decoding common errors.
      */
     SAIL_ERROR_NULL_PTR = 100,
-    SAIL_ERROR_STATE_NULL_PTR,
-    SAIL_ERROR_IMAGE_NULL_PTR,
-    SAIL_ERROR_PIXEL_NULL_PTR,
-    SAIL_ERROR_PIXELS_NULL_PTR,
-    SAIL_ERROR_READ_FEATURES_NULL_PTR,
-    SAIL_ERROR_READ_OPTIONS_NULL_PTR,
-    SAIL_ERROR_WRITE_FEATURES_NULL_PTR,
-    SAIL_ERROR_WRITE_OPTIONS_NULL_PTR,
-    SAIL_ERROR_STRING_NULL_PTR,
-    SAIL_ERROR_IO_NULL_PTR,
-    SAIL_ERROR_STREAM_NULL_PTR,
-    SAIL_ERROR_DATA_NULL_PTR,
-    SAIL_ERROR_BUFFER_NULL_PTR,
     SAIL_ERROR_INVALID_IO,
-    SAIL_ERROR_RESULT_NULL_PTR,
-    SAIL_ERROR_META_DATA_NULL_PTR,
-    SAIL_ERROR_META_DATA_NODE_NULL_PTR,
-    SAIL_ERROR_ICCP_NULL_PTR,
-    SAIL_ERROR_PALETTE_NULL_PTR,
-    SAIL_ERROR_SOURCE_IMAGE_NULL_PTR,
-    SAIL_ERROR_STRING_NODE_NULL_PTR,
-    SAIL_ERROR_CODEC_BUNDLE_NODE_NULL_PTR,
-    SAIL_ERROR_PIXEL_FORMAT_NULL_PTR,
-    SAIL_ERROR_RESOLUTION_NULL_PTR,
-    SAIL_ERROR_CONVERSION_OPTIONS_NULL_PTR,
 
     /*
      * Encoding/decoding specific errors.
@@ -125,13 +101,7 @@ enum SailStatus {
     /*
      * libsail errors.
      */
-    SAIL_ERROR_CONTEXT_NULL_PTR = 400,
-    SAIL_ERROR_PATH_NULL_PTR,
-    SAIL_ERROR_EXTENSION_NULL_PTR,
-    SAIL_ERROR_CODEC_INFO_NULL_PTR,
-    SAIL_ERROR_CODEC_NULL_PTR,
-    SAIL_ERROR_CODEC_BUNDLE_NULL_PTR,
-    SAIL_ERROR_ENV_UPDATE,
+    SAIL_ERROR_ENV_UPDATE = 400,
     SAIL_ERROR_CONTEXT_UNINITIALIZED,
     SAIL_ERROR_GET_DLL_PATH,
     SAIL_ERROR_CONFLICTING_OPERATION,
@@ -151,51 +121,13 @@ do {                              \
 /*
  * Helper macros.
  */
-#define SAIL_CHECK_PTR(ptr)                       \
-do {                                              \
-    if (SAIL_UNLIKELY(ptr == NULL)) {             \
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_NULL_PTR); \
-    }                                             \
+#define SAIL_CHECK_PTR(ptr)                            \
+do {                                                   \
+    if (SAIL_UNLIKELY(ptr == NULL)) {                  \
+        SAIL_LOG_ERROR("'%s' argument is NULL", #ptr); \
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_NULL_PTR);      \
+    }                                                  \
 } while(0)
-
-#define SAIL_CHECK_PTR2(ptr, ret)     \
-do {                                  \
-    if (SAIL_UNLIKELY(ptr == NULL)) { \
-        SAIL_LOG_AND_RETURN(ret);     \
-    }                                 \
-} while(0)
-
-#define SAIL_CHECK_BUFFER_PTR(buffer)                   SAIL_CHECK_PTR2(buffer,          SAIL_ERROR_BUFFER_NULL_PTR)
-#define SAIL_CHECK_CODEC_BUNDLE_NODE_PTR(node)          SAIL_CHECK_PTR2(node,            SAIL_ERROR_CODEC_BUNDLE_NODE_NULL_PTR)
-#define SAIL_CHECK_CODEC_INFO_PTR(codec_info)           SAIL_CHECK_PTR2(codec_info,      SAIL_ERROR_CODEC_INFO_NULL_PTR)
-#define SAIL_CHECK_CODEC_PTR(codec)                     SAIL_CHECK_PTR2(codec,           SAIL_ERROR_CODEC_NULL_PTR)
-#define SAIL_CHECK_CODEC_BUNDLE_PTR(codec_bundle)       SAIL_CHECK_PTR2(codec_bundle,    SAIL_ERROR_CODEC_BUNDLE_NULL_PTR)
-#define SAIL_CHECK_CONTEXT_PTR(context)                 SAIL_CHECK_PTR2(context,         SAIL_ERROR_CONTEXT_NULL_PTR)
-#define SAIL_CHECK_CONVERSION_OPTIONS_PTR(options)      SAIL_CHECK_PTR2(options,         SAIL_ERROR_CONVERSION_OPTIONS_NULL_PTR)
-#define SAIL_CHECK_DATA_PTR(data)                       SAIL_CHECK_PTR2(data,            SAIL_ERROR_DATA_NULL_PTR)
-#define SAIL_CHECK_EXTENSION_PTR(extension)             SAIL_CHECK_PTR2(extension,       SAIL_ERROR_EXTENSION_NULL_PTR)
-#define SAIL_CHECK_ICCP_PTR(iccp)                       SAIL_CHECK_PTR2(iccp,            SAIL_ERROR_ICCP_NULL_PTR)
-#define SAIL_CHECK_IMAGE_PTR(image)                     SAIL_CHECK_PTR2(image,           SAIL_ERROR_IMAGE_NULL_PTR)
-#define SAIL_CHECK_IO_PTR(io)                           SAIL_CHECK_PTR2(io,              SAIL_ERROR_IO_NULL_PTR)
-#define SAIL_CHECK_META_DATA_PTR(meta_data)             SAIL_CHECK_PTR2(meta_data,       SAIL_ERROR_META_DATA_NULL_PTR)
-#define SAIL_CHECK_META_DATA_NODE_PTR(meta_data_node)   SAIL_CHECK_PTR2(meta_data_node,  SAIL_ERROR_META_DATA_NODE_NULL_PTR)
-#define SAIL_CHECK_PALETTE_PTR(palette)                 SAIL_CHECK_PTR2(palette,         SAIL_ERROR_PALETTE_NULL_PTR)
-#define SAIL_CHECK_PATH_PTR(path)                       SAIL_CHECK_PTR2(path,            SAIL_ERROR_PATH_NULL_PTR)
-#define SAIL_CHECK_PIXEL_PTR(pixel)                     SAIL_CHECK_PTR2(pixel ,          SAIL_ERROR_PIXEL_NULL_PTR)
-#define SAIL_CHECK_PIXELS_PTR(pixels)                   SAIL_CHECK_PTR2(pixels,          SAIL_ERROR_PIXELS_NULL_PTR)
-#define SAIL_CHECK_PIXEL_FORMATS_MAPPING_NODE_PTR(node) SAIL_CHECK_PTR2(node,            SAIL_ERROR_PIXEL_FORMATS_MAPPING_NODE_NULL_PTR)
-#define SAIL_CHECK_PIXEL_FORMAT_PTR(pixel_format)       SAIL_CHECK_PTR2(pixel_format,    SAIL_ERROR_PIXEL_FORMAT_NULL_PTR)
-#define SAIL_CHECK_READ_FEATURES_PTR(read_features)     SAIL_CHECK_PTR2(read_features,   SAIL_ERROR_READ_FEATURES_NULL_PTR)
-#define SAIL_CHECK_READ_OPTIONS_PTR(read_options)       SAIL_CHECK_PTR2(read_options,    SAIL_ERROR_READ_OPTIONS_NULL_PTR)
-#define SAIL_CHECK_RESOLUTION_PTR(resolution)           SAIL_CHECK_PTR2(resolution,      SAIL_ERROR_RESOLUTION_NULL_PTR)
-#define SAIL_CHECK_RESULT_PTR(result)                   SAIL_CHECK_PTR2(result,          SAIL_ERROR_RESULT_NULL_PTR)
-#define SAIL_CHECK_SOURCE_IMAGE_PTR(source_image)       SAIL_CHECK_PTR2(source_image,    SAIL_ERROR_SOURCE_IMAGE_NULL_PTR)
-#define SAIL_CHECK_STATE_PTR(state)                     SAIL_CHECK_PTR2(state,           SAIL_ERROR_STATE_NULL_PTR)
-#define SAIL_CHECK_STREAM_PTR(stream)                   SAIL_CHECK_PTR2(stream,          SAIL_ERROR_STREAM_NULL_PTR)
-#define SAIL_CHECK_STRING_NODE_PTR(node)                SAIL_CHECK_PTR2(node,            SAIL_ERROR_STRING_NODE_NULL_PTR)
-#define SAIL_CHECK_STRING_PTR(str)                      SAIL_CHECK_PTR2(str,             SAIL_ERROR_STRING_NULL_PTR)
-#define SAIL_CHECK_WRITE_FEATURES_PTR(write_features)   SAIL_CHECK_PTR2(write_features,  SAIL_ERROR_WRITE_FEATURES_NULL_PTR)
-#define SAIL_CHECK_WRITE_OPTIONS_PTR(write_options)     SAIL_CHECK_PTR2(write_options,   SAIL_ERROR_WRITE_FEATURES_NULL_PTR)
 
 /*
  * Tries to execute the specified SAIL function. If it fails, executes the rest of the arguments which

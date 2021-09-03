@@ -282,7 +282,7 @@ sail_status_t image_input::start(const sail::io &io, const sail::codec_info &cod
 
 sail_status_t image_input::next_frame(sail::image *image)
 {
-    SAIL_CHECK_IMAGE_PTR(image);
+    SAIL_CHECK_PTR(image);
 
     sail_image *sail_image = nullptr;
 

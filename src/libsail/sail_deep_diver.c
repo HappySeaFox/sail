@@ -33,7 +33,7 @@
 sail_status_t sail_start_reading_file_with_options(const char *path, const struct sail_codec_info *codec_info,
                                                   const struct sail_read_options *read_options, void **state) {
 
-    SAIL_CHECK_PATH_PTR(path);
+    SAIL_CHECK_PTR(path);
 
     const struct sail_codec_info *codec_info_local;
 
@@ -55,7 +55,7 @@ sail_status_t sail_start_reading_mem_with_options(const void *buffer, size_t buf
                                                  const struct sail_codec_info *codec_info,
                                                  const struct sail_read_options *read_options, void **state) {
 
-    SAIL_CHECK_BUFFER_PTR(buffer);
+    SAIL_CHECK_PTR(buffer);
 
     const struct sail_codec_info *codec_info_local;
 
@@ -76,7 +76,7 @@ sail_status_t sail_start_reading_mem_with_options(const void *buffer, size_t buf
 sail_status_t sail_start_writing_file_with_options(const char *path, const struct sail_codec_info *codec_info,
                                                   const struct sail_write_options *write_options, void **state) {
 
-    SAIL_CHECK_PATH_PTR(path);
+    SAIL_CHECK_PTR(path);
 
     const struct sail_codec_info *codec_info_local;
 
@@ -98,8 +98,8 @@ sail_status_t sail_start_writing_file_with_options(const char *path, const struc
 sail_status_t sail_start_writing_mem_with_options(void *buffer, size_t buffer_length,
                                                  const struct sail_codec_info *codec_info,
                                                  const struct sail_write_options *write_options, void **state) {
-    SAIL_CHECK_BUFFER_PTR(buffer);
-    SAIL_CHECK_CODEC_INFO_PTR(codec_info);
+    SAIL_CHECK_PTR(buffer);
+    SAIL_CHECK_PTR(codec_info);
 
     struct sail_io *io;
     SAIL_TRY(alloc_io_write_mem(buffer, buffer_length, &io));

@@ -30,7 +30,7 @@
 
 sail_status_t sail_alloc_read_features(struct sail_read_features **read_features) {
 
-    SAIL_CHECK_READ_FEATURES_PTR(read_features);
+    SAIL_CHECK_PTR(read_features);
 
     void *ptr;
     SAIL_TRY(sail_malloc(sizeof(struct sail_read_features), &ptr));

@@ -137,7 +137,7 @@ resolution::resolution(const sail_resolution *res)
 
 sail_status_t resolution::to_sail_resolution(sail_resolution **resolution) const
 {
-    SAIL_CHECK_RESOLUTION_PTR(resolution);
+    SAIL_CHECK_PTR(resolution);
 
     SAIL_TRY(sail_alloc_resolution(resolution));
     **resolution = d->resolution;

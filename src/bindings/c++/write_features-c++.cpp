@@ -125,8 +125,8 @@ double write_features::compression_level_step() const
 
 sail_status_t write_features::to_write_options(sail::write_options *write_options) const
 {
-    SAIL_CHECK_WRITE_FEATURES_PTR(d->sail_write_features_c);
-    SAIL_CHECK_WRITE_OPTIONS_PTR(write_options);
+    SAIL_CHECK_PTR(d->sail_write_features_c);
+    SAIL_CHECK_PTR(write_options);
 
     sail_write_options *sail_write_options;
 

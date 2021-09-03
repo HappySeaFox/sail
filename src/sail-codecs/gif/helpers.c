@@ -33,8 +33,8 @@
 
 static sail_status_t save_str_in_meta_data(const char *str, unsigned length_wo_null, enum SailMetaData key, struct sail_meta_data_node **meta_data_node) {
 
-    SAIL_CHECK_STRING_PTR(str);
-    SAIL_CHECK_META_DATA_NODE_PTR(meta_data_node);
+    SAIL_CHECK_PTR(str);
+    SAIL_CHECK_PTR(meta_data_node);
 
     struct sail_meta_data_node *meta_data_node_local;
 

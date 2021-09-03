@@ -76,7 +76,7 @@ static sail_status_t initialize_global_context_guard_mutex(void) {
 #ifdef SAIL_WIN32
 static sail_status_t add_dll_directory(const char *path) {
 
-    SAIL_CHECK_STRING_PTR(path);
+    SAIL_CHECK_PTR(path);
 
     SAIL_LOG_DEBUG("Add '%s' to the DLL search paths", path);
 
@@ -185,7 +185,7 @@ static sail_status_t client_codecs_paths_to_string_node_chain(struct sail_string
 
 static sail_status_t alloc_context(struct sail_context **context) {
 
-    SAIL_CHECK_CONTEXT_PTR(context);
+    SAIL_CHECK_PTR(context);
 
     void *ptr;
     SAIL_TRY(sail_malloc(sizeof(struct sail_context), &ptr));
@@ -199,7 +199,7 @@ static sail_status_t alloc_context(struct sail_context **context) {
 
 static sail_status_t allocate_global_context(struct sail_context **context) {
 
-    SAIL_CHECK_CONTEXT_PTR(context);
+    SAIL_CHECK_PTR(context);
 
     if (global_context == NULL) {
         SAIL_TRY(alloc_context(&global_context));
@@ -225,7 +225,7 @@ static sail_status_t destroy_context(struct sail_context *context) {
 
 static sail_status_t preload_codecs(struct sail_context *context) {
 
-    SAIL_CHECK_CONTEXT_PTR(context);
+    SAIL_CHECK_PTR(context);
 
     SAIL_TRY(lock_context());
 
@@ -245,7 +245,7 @@ static sail_status_t preload_codecs(struct sail_context *context) {
 
 static sail_status_t print_enumerated_codecs(struct sail_context *context) {
 
-    SAIL_CHECK_CONTEXT_PTR(context);
+    SAIL_CHECK_PTR(context);
 
     const struct sail_codec_bundle_node *codec_bundle_node = context->codec_bundle_node;
 
@@ -333,8 +333,8 @@ static sail_status_t build_full_path(const char *sail_codecs_path, const char *n
 static sail_status_t build_codec_bundle_from_codec_info_path(const char *codec_info_full_path,
                                                              struct sail_codec_bundle_node **codec_bundle_node) {
 
-    SAIL_CHECK_PATH_PTR(codec_info_full_path);
-    SAIL_CHECK_CODEC_BUNDLE_NODE_PTR(codec_bundle_node);
+    SAIL_CHECK_PTR(codec_info_full_path);
+    SAIL_CHECK_PTR(codec_bundle_node);
 
     /* Build "/path/jpeg.so" from "/path/jpeg.codec.info". */
     char *codec_info_part = strstr(codec_info_full_path, ".codec.info");
@@ -387,8 +387,8 @@ static sail_status_t build_codec_bundle_from_codec_info_path(const char *codec_i
 
 static sail_status_t enumerate_codecs_in_paths(struct sail_context *context, const struct sail_string_node *string_node) {
 
-    SAIL_CHECK_CONTEXT_PTR(context);
-    SAIL_CHECK_STRING_NODE_PTR(string_node);
+    SAIL_CHECK_PTR(context);
+    SAIL_CHECK_PTR(string_node);
 
     /* Used to load and store codec info objects. */
     struct sail_codec_bundle_node **last_codec_bundle_node = &context->codec_bundle_node;
@@ -498,7 +498,7 @@ static sail_status_t enumerate_codecs_in_paths(struct sail_context *context, con
 #ifdef SAIL_COMBINE_CODECS
 static sail_status_t init_context_impl(struct sail_context *context) {
 
-    SAIL_CHECK_CONTEXT_PTR(context);
+    SAIL_CHECK_PTR(context);
 
     /* Externs from sail-codecs. */
 #ifdef SAIL_STATIC
@@ -592,7 +592,7 @@ static const char* sail_codecs_path(void) {
 
 static sail_status_t init_context_impl(struct sail_context *context) {
 
-    SAIL_CHECK_CONTEXT_PTR(context);
+    SAIL_CHECK_PTR(context);
 
     /* Our own codecs. */
     const char *env = sail_codecs_path_env();
@@ -676,7 +676,7 @@ static void print_build_statistics(void) {
 /* Initializes the context and loads all the codec info files if the context is not initialized. */
 static sail_status_t init_context(struct sail_context *context, int flags) {
 
-    SAIL_CHECK_CONTEXT_PTR(context);
+    SAIL_CHECK_PTR(context);
 
     if (context->initialized) {
         return SAIL_OK;
@@ -747,7 +747,7 @@ sail_status_t fetch_global_context_unsafe(struct sail_context **context) {
 
 sail_status_t fetch_global_context_guarded_with_flags(struct sail_context **context, int flags) {
 
-    SAIL_CHECK_CONTEXT_PTR(context);
+    SAIL_CHECK_PTR(context);
 
     SAIL_TRY(lock_context());
 
@@ -761,7 +761,7 @@ sail_status_t fetch_global_context_guarded_with_flags(struct sail_context **cont
 
 sail_status_t fetch_global_context_unsafe_with_flags(struct sail_context **context, int flags) {
 
-    SAIL_CHECK_CONTEXT_PTR(context);
+    SAIL_CHECK_PTR(context);
 
     struct sail_context *local_context;
 

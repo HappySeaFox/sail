@@ -130,7 +130,7 @@ source_image::source_image(const sail_source_image *si)
 
 sail_status_t source_image::to_sail_source_image(sail_source_image **source_image) const
 {
-    SAIL_CHECK_SOURCE_IMAGE_PTR(source_image);
+    SAIL_CHECK_PTR(source_image);
 
     SAIL_TRY(sail_alloc_source_image(source_image));
 

@@ -38,8 +38,8 @@
 
 static sail_status_t skip_raw_profile_header(const char *data, const char **start) {
 
-    SAIL_CHECK_STRING_PTR(data);
-    SAIL_CHECK_STRING_PTR(start);
+    SAIL_CHECK_PTR(data);
+    SAIL_CHECK_PTR(start);
 
     char key[16];
     int n;
@@ -63,7 +63,7 @@ static sail_status_t skip_raw_profile_header(const char *data, const char **star
 
 static sail_status_t write_raw_profile_header(char *str, size_t str_size, enum SailMetaData key, size_t hex_data_length) {
 
-    SAIL_CHECK_STRING_PTR(str);
+    SAIL_CHECK_PTR(str);
 
     const char *key_str;
 
@@ -416,7 +416,7 @@ sail_status_t png_private_fetch_iccp(png_structp png_ptr, png_infop info_ptr, st
 
     SAIL_CHECK_PTR(png_ptr);
     SAIL_CHECK_PTR(info_ptr);
-    SAIL_CHECK_ICCP_PTR(iccp);
+    SAIL_CHECK_PTR(iccp);
 
     char *name;
     int compression;
@@ -444,7 +444,7 @@ sail_status_t png_private_fetch_palette(png_structp png_ptr, png_infop info_ptr,
 
     SAIL_CHECK_PTR(png_ptr);
     SAIL_CHECK_PTR(info_ptr);
-    SAIL_CHECK_PALETTE_PTR(palette);
+    SAIL_CHECK_PTR(palette);
 
     png_colorp png_palette;
     int png_palette_color_count;
@@ -596,7 +596,7 @@ void png_private_destroy_rows(png_bytep **A, unsigned height) {
 
 sail_status_t png_private_fetch_resolution(png_structp png_ptr, png_infop info_ptr, struct sail_resolution **resolution) {
 
-    SAIL_CHECK_RESOLUTION_PTR(resolution);
+    SAIL_CHECK_PTR(resolution);
 
     int unit = PNG_RESOLUTION_UNKNOWN;
     unsigned x = 0, y = 0;

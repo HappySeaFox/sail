@@ -34,7 +34,7 @@
 
 static sail_status_t probe(const char *path) {
 
-    SAIL_CHECK_PATH_PTR(path);
+    SAIL_CHECK_PTR(path);
 
     /* Time counter. */
     uint64_t start_time = sail_now();

@@ -37,7 +37,7 @@ sail_status_t sail_alloc_resolution(struct sail_resolution **resolution) {
 
 sail_status_t sail_alloc_resolution_from_data(enum SailResolutionUnit unit, double x, double y, struct sail_resolution **resolution) {
 
-    SAIL_CHECK_RESOLUTION_PTR(resolution);
+    SAIL_CHECK_PTR(resolution);
 
     void *ptr;
     SAIL_TRY(sail_malloc(sizeof(struct sail_resolution), &ptr));
@@ -61,8 +61,8 @@ void sail_destroy_resolution(struct sail_resolution *resolution) {
 
 sail_status_t sail_copy_resolution(struct sail_resolution *source, struct sail_resolution **target) {
 
-    SAIL_CHECK_RESOLUTION_PTR(source);
-    SAIL_CHECK_RESOLUTION_PTR(target);
+    SAIL_CHECK_PTR(source);
+    SAIL_CHECK_PTR(target);
 
     SAIL_TRY(sail_alloc_resolution(target));
 

@@ -31,7 +31,7 @@
 
 sail_status_t sail_alloc_meta_data_node(struct sail_meta_data_node **node) {
 
-    SAIL_CHECK_META_DATA_NODE_PTR(node);
+    SAIL_CHECK_PTR(node);
 
     void *ptr;
     SAIL_TRY(sail_malloc(sizeof(struct sail_meta_data_node), &ptr));
@@ -45,7 +45,7 @@ sail_status_t sail_alloc_meta_data_node(struct sail_meta_data_node **node) {
 
 sail_status_t sail_alloc_meta_data_node_and_value(struct sail_meta_data_node **node) {
 
-    SAIL_CHECK_META_DATA_NODE_PTR(node);
+    SAIL_CHECK_PTR(node);
 
     struct sail_meta_data_node *node_local;
     SAIL_TRY(sail_alloc_meta_data_node(&node_local));
@@ -70,8 +70,8 @@ void sail_destroy_meta_data_node(struct sail_meta_data_node *node) {
 
 sail_status_t sail_copy_meta_data_node(const struct sail_meta_data_node *source, struct sail_meta_data_node **target) {
 
-    SAIL_CHECK_META_DATA_NODE_PTR(source);
-    SAIL_CHECK_META_DATA_NODE_PTR(target);
+    SAIL_CHECK_PTR(source);
+    SAIL_CHECK_PTR(target);
 
     struct sail_meta_data_node *node_local;
     SAIL_TRY(sail_alloc_meta_data_node(&node_local));
@@ -99,7 +99,7 @@ void sail_destroy_meta_data_node_chain(struct sail_meta_data_node *node) {
 
 sail_status_t sail_copy_meta_data_node_chain(const struct sail_meta_data_node *source, struct sail_meta_data_node **target) {
 
-    SAIL_CHECK_META_DATA_NODE_PTR(target);
+    SAIL_CHECK_PTR(target);
 
     if (source == NULL) {
         *target = NULL;

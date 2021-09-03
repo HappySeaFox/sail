@@ -125,7 +125,7 @@ conversion_options& conversion_options::with_background(const sail_rgb24_t &rgb2
 
 sail_status_t conversion_options::to_sail_conversion_options(sail_conversion_options **conversion_options) const
 {
-    SAIL_CHECK_CONVERSION_OPTIONS_PTR(conversion_options);
+    SAIL_CHECK_PTR(conversion_options);
 
     SAIL_TRY(sail_alloc_conversion_options(conversion_options));
     **conversion_options = *d->conversion_options;

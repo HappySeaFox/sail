@@ -29,7 +29,7 @@
 
 sail_status_t alloc_string_node(struct sail_string_node **string_node) {
 
-    SAIL_CHECK_STRING_NODE_PTR(string_node);
+    SAIL_CHECK_PTR(string_node);
 
     void *ptr;
     SAIL_TRY(sail_malloc(sizeof(struct sail_string_node), &ptr));
@@ -64,8 +64,8 @@ void destroy_string_node_chain(struct sail_string_node *string_node) {
 
 sail_status_t split_into_string_node_chain(const char *value, struct sail_string_node **target_string_node) {
 
-    SAIL_CHECK_STRING_PTR(value);
-    SAIL_CHECK_STRING_NODE_PTR(target_string_node);
+    SAIL_CHECK_PTR(value);
+    SAIL_CHECK_PTR(target_string_node);
 
     struct sail_string_node *result_string_node = NULL;
     struct sail_string_node **last_string_node = &result_string_node;

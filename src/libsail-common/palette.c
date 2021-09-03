@@ -31,7 +31,7 @@
 
 sail_status_t sail_alloc_palette(struct sail_palette **palette) {
 
-    SAIL_CHECK_PALETTE_PTR(palette);
+    SAIL_CHECK_PTR(palette);
 
     void *ptr;
     SAIL_TRY(sail_malloc(sizeof(struct sail_palette), &ptr));
@@ -56,8 +56,8 @@ void sail_destroy_palette(struct sail_palette *palette) {
 
 sail_status_t sail_copy_palette(const struct sail_palette *source_palette, struct sail_palette **target_palette) {
 
-    SAIL_CHECK_PALETTE_PTR(source_palette);
-    SAIL_CHECK_PALETTE_PTR(target_palette);
+    SAIL_CHECK_PTR(source_palette);
+    SAIL_CHECK_PTR(target_palette);
 
     struct sail_palette *palette_local;
     SAIL_TRY(sail_alloc_palette(&palette_local));
@@ -83,7 +83,7 @@ sail_status_t sail_copy_palette(const struct sail_palette *source_palette, struc
 
 sail_status_t sail_alloc_palette_for_data(enum SailPixelFormat pixel_format, unsigned color_count, struct sail_palette **palette) {
 
-    SAIL_CHECK_PALETTE_PTR(palette);
+    SAIL_CHECK_PTR(palette);
 
     struct sail_palette *palette_local;
     SAIL_TRY(sail_alloc_palette(&palette_local));
@@ -107,7 +107,7 @@ sail_status_t sail_alloc_palette_for_data(enum SailPixelFormat pixel_format, uns
 
 sail_status_t sail_alloc_palette_from_data(enum SailPixelFormat pixel_format, const void *data, unsigned color_count, struct sail_palette **palette) {
 
-    SAIL_CHECK_PALETTE_PTR(palette);
+    SAIL_CHECK_PTR(palette);
 
     struct sail_palette *palette_local;
     SAIL_TRY(sail_alloc_palette_for_data(pixel_format, color_count, &palette_local));

@@ -27,7 +27,7 @@
 
 sail_status_t sail_alloc_conversion_options(struct sail_conversion_options **options) {
 
-    SAIL_CHECK_CONVERSION_OPTIONS_PTR(options);
+    SAIL_CHECK_PTR(options);
 
     void *ptr;
     SAIL_TRY(sail_malloc(sizeof(struct sail_conversion_options), &ptr));

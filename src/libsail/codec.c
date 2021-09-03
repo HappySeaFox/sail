@@ -45,7 +45,7 @@
 
 static sail_status_t alloc_codec(struct sail_codec **codec) {
 
-    SAIL_CHECK_CODEC_PTR(codec);
+    SAIL_CHECK_PTR(codec);
 
     void *ptr;
     SAIL_TRY(sail_malloc(sizeof(struct sail_codec), &ptr));
@@ -153,8 +153,8 @@ static sail_status_t load_codec_from_file(const struct sail_codec_info *codec_in
 
 sail_status_t alloc_and_load_codec(const struct sail_codec_info *codec_info, struct sail_codec **codec) {
 
-    SAIL_CHECK_CODEC_INFO_PTR(codec_info);
-    SAIL_CHECK_CODEC_PTR(codec);
+    SAIL_CHECK_PTR(codec_info);
+    SAIL_CHECK_PTR(codec);
 
     if (codec_info->layout != SAIL_CODEC_LAYOUT_V5) {
         SAIL_LOG_ERROR("Failed to load %s codec with unsupported layout V%d (expected V%d)", codec_info->name, codec_info->layout, SAIL_CODEC_LAYOUT_V5);

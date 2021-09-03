@@ -69,7 +69,7 @@ sail_status_t webp_private_blend_over(void *dst_raw, unsigned dst_offset, const 
 sail_status_t webp_private_fetch_iccp(WebPDemuxer *webp_demux, struct sail_iccp **iccp) {
 
     SAIL_CHECK_PTR(webp_demux);
-    SAIL_CHECK_ICCP_PTR(iccp);
+    SAIL_CHECK_PTR(iccp);
 
     const uint32_t webp_flags = WebPDemuxGetI(webp_demux, WEBP_FF_FORMAT_FLAGS);
 
@@ -89,7 +89,7 @@ sail_status_t webp_private_fetch_iccp(WebPDemuxer *webp_demux, struct sail_iccp 
 sail_status_t webp_private_fetch_meta_data(WebPDemuxer *webp_demux, struct sail_meta_data_node **last_meta_data_node) {
 
     SAIL_CHECK_PTR(webp_demux);
-    SAIL_CHECK_META_DATA_NODE_PTR(last_meta_data_node);
+    SAIL_CHECK_PTR(last_meta_data_node);
 
     const uint32_t webp_flags = WebPDemuxGetI(webp_demux, WEBP_FF_FORMAT_FLAGS);
 

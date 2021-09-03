@@ -45,9 +45,9 @@
 
 static sail_status_t io_file_tolerant_read(void *stream, void *buf, size_t size_to_read, size_t *read_size) {
 
-    SAIL_CHECK_STREAM_PTR(stream);
-    SAIL_CHECK_BUFFER_PTR(buf);
-    SAIL_CHECK_RESULT_PTR(read_size);
+    SAIL_CHECK_PTR(stream);
+    SAIL_CHECK_PTR(buf);
+    SAIL_CHECK_PTR(read_size);
 
     FILE *fptr = (FILE *)stream;
 
@@ -71,7 +71,7 @@ static sail_status_t io_file_strict_read(void *stream, void *buf, size_t size_to
 
 static sail_status_t io_file_seek(void *stream, long offset, int whence) {
 
-    SAIL_CHECK_STREAM_PTR(stream);
+    SAIL_CHECK_PTR(stream);
 
     FILE *fptr = (FILE *)stream;
 
@@ -85,7 +85,7 @@ static sail_status_t io_file_seek(void *stream, long offset, int whence) {
 
 static sail_status_t io_file_tell(void *stream, size_t *offset) {
 
-    SAIL_CHECK_STREAM_PTR(stream);
+    SAIL_CHECK_PTR(stream);
     SAIL_CHECK_PTR(offset);
 
     FILE *fptr = (FILE *)stream;
@@ -104,9 +104,9 @@ static sail_status_t io_file_tell(void *stream, size_t *offset) {
 
 static sail_status_t io_file_tolerant_write(void *stream, const void *buf, size_t size_to_write, size_t *written_size) {
 
-    SAIL_CHECK_STREAM_PTR(stream);
-    SAIL_CHECK_BUFFER_PTR(buf);
-    SAIL_CHECK_RESULT_PTR(written_size);
+    SAIL_CHECK_PTR(stream);
+    SAIL_CHECK_PTR(buf);
+    SAIL_CHECK_PTR(written_size);
 
     FILE *fptr = (FILE *)stream;
 
@@ -130,7 +130,7 @@ static sail_status_t io_file_strict_write(void *stream, const void *buf, size_t 
 
 static sail_status_t io_file_flush(void *stream) {
 
-    SAIL_CHECK_STREAM_PTR(stream);
+    SAIL_CHECK_PTR(stream);
 
     FILE *fptr = (FILE *)stream;
 
@@ -144,7 +144,7 @@ static sail_status_t io_file_flush(void *stream) {
 
 static sail_status_t io_file_close(void *stream) {
 
-    SAIL_CHECK_STREAM_PTR(stream);
+    SAIL_CHECK_PTR(stream);
 
     FILE *fptr = (FILE *)stream;
 
@@ -158,8 +158,8 @@ static sail_status_t io_file_close(void *stream) {
 
 static sail_status_t io_file_eof(void *stream, bool *result) {
 
-    SAIL_CHECK_STREAM_PTR(stream);
-    SAIL_CHECK_RESULT_PTR(result);
+    SAIL_CHECK_PTR(stream);
+    SAIL_CHECK_PTR(result);
 
     FILE *fptr = (FILE *)stream;
 
@@ -170,9 +170,9 @@ static sail_status_t io_file_eof(void *stream, bool *result) {
 
 static sail_status_t alloc_io_file(const char *path, const char *mode, struct sail_io **io) {
 
-    SAIL_CHECK_PATH_PTR(path);
-    SAIL_CHECK_STRING_PTR(mode);
-    SAIL_CHECK_IO_PTR(io);
+    SAIL_CHECK_PTR(path);
+    SAIL_CHECK_PTR(mode);
+    SAIL_CHECK_PTR(io);
 
     SAIL_LOG_DEBUG("Opening file '%s' in '%s' mode", path, mode);
 

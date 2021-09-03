@@ -31,7 +31,7 @@
 
 sail_status_t sail_alloc_meta_data(struct sail_meta_data **meta_data) {
 
-    SAIL_CHECK_META_DATA_PTR(meta_data);
+    SAIL_CHECK_PTR(meta_data);
 
     void *ptr;
     SAIL_TRY(sail_malloc(sizeof(struct sail_meta_data), &ptr));
@@ -48,7 +48,7 @@ sail_status_t sail_alloc_meta_data(struct sail_meta_data **meta_data) {
 
 sail_status_t sail_alloc_meta_data_from_known_string(enum SailMetaData key, const char *value, struct sail_meta_data **meta_data) {
 
-    SAIL_CHECK_STRING_PTR(value);
+    SAIL_CHECK_PTR(value);
 
     SAIL_TRY(sail_alloc_meta_data_from_known_substring(key, value, strlen(value), meta_data));
 
@@ -57,7 +57,7 @@ sail_status_t sail_alloc_meta_data_from_known_string(enum SailMetaData key, cons
 
 sail_status_t sail_alloc_meta_data_from_unknown_string(const char *key_unknown, const char *value, struct sail_meta_data **meta_data) {
 
-    SAIL_CHECK_STRING_PTR(value);
+    SAIL_CHECK_PTR(value);
 
     SAIL_TRY(sail_alloc_meta_data_from_unknown_substring(key_unknown, value, strlen(value), meta_data));
 
@@ -71,8 +71,8 @@ sail_status_t sail_alloc_meta_data_from_known_substring(enum SailMetaData key, c
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 
-    SAIL_CHECK_STRING_PTR(value);
-    SAIL_CHECK_META_DATA_PTR(meta_data);
+    SAIL_CHECK_PTR(value);
+    SAIL_CHECK_PTR(meta_data);
 
     struct sail_meta_data *meta_data_local;
     SAIL_TRY(sail_alloc_meta_data(&meta_data_local));
@@ -94,9 +94,9 @@ sail_status_t sail_alloc_meta_data_from_known_substring(enum SailMetaData key, c
 
 sail_status_t sail_alloc_meta_data_from_unknown_substring(const char *key_unknown, const char *value, size_t size, struct sail_meta_data **meta_data) {
 
-    SAIL_CHECK_STRING_PTR(key_unknown);
-    SAIL_CHECK_STRING_PTR(value);
-    SAIL_CHECK_META_DATA_PTR(meta_data);
+    SAIL_CHECK_PTR(key_unknown);
+    SAIL_CHECK_PTR(value);
+    SAIL_CHECK_PTR(meta_data);
 
     struct sail_meta_data *meta_data_local;
     SAIL_TRY(sail_alloc_meta_data(&meta_data_local));
@@ -126,8 +126,8 @@ sail_status_t sail_alloc_meta_data_from_known_data(enum SailMetaData key, const 
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 
-    SAIL_CHECK_DATA_PTR(value);
-    SAIL_CHECK_META_DATA_PTR(meta_data);
+    SAIL_CHECK_PTR(value);
+    SAIL_CHECK_PTR(meta_data);
 
     struct sail_meta_data *meta_data_local;
     SAIL_TRY(sail_alloc_meta_data(&meta_data_local));
@@ -146,9 +146,9 @@ sail_status_t sail_alloc_meta_data_from_known_data(enum SailMetaData key, const 
 
 sail_status_t sail_alloc_meta_data_from_unknown_data(const char *key_unknown, const void *value, size_t value_length, struct sail_meta_data **meta_data) {
 
-    SAIL_CHECK_STRING_PTR(key_unknown);
-    SAIL_CHECK_DATA_PTR(value);
-    SAIL_CHECK_META_DATA_PTR(meta_data);
+    SAIL_CHECK_PTR(key_unknown);
+    SAIL_CHECK_PTR(value);
+    SAIL_CHECK_PTR(meta_data);
 
     struct sail_meta_data *meta_data_local;
     SAIL_TRY(sail_alloc_meta_data(&meta_data_local));
@@ -181,8 +181,8 @@ void sail_destroy_meta_data(struct sail_meta_data *meta_data) {
 
 sail_status_t sail_copy_meta_data(const struct sail_meta_data *source, struct sail_meta_data **target) {
 
-    SAIL_CHECK_META_DATA_PTR(source);
-    SAIL_CHECK_META_DATA_PTR(target);
+    SAIL_CHECK_PTR(source);
+    SAIL_CHECK_PTR(target);
 
     struct sail_meta_data *meta_data_local;
     SAIL_TRY(sail_alloc_meta_data(&meta_data_local));

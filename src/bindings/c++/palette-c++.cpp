@@ -140,7 +140,7 @@ palette::palette(const sail_palette *pal)
 
 sail_status_t palette::to_sail_palette(sail_palette **palette) const
 {
-    SAIL_CHECK_PALETTE_PTR(palette);
+    SAIL_CHECK_PTR(palette);
 
     SAIL_TRY(sail_alloc_palette_from_data(d->sail_palette->pixel_format, d->data.data(), d->sail_palette->color_count, palette));
 
