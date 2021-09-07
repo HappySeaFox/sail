@@ -75,8 +75,6 @@ sail_status_t sail_copy_meta_data_node(const struct sail_meta_data_node *source,
 
     struct sail_meta_data_node *node_local;
     SAIL_TRY(sail_alloc_meta_data_node(&node_local));
-    SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data(&node_local->meta_data),
-                        /* cleanup */ sail_destroy_meta_data_node(node_local));
 
     SAIL_TRY_OR_CLEANUP(sail_copy_meta_data(source->meta_data, &node_local->meta_data),
                         /* cleanup */ sail_destroy_meta_data_node(node_local));
