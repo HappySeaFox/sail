@@ -43,10 +43,6 @@ static sail_status_t save_str_in_meta_data(const char *str, unsigned length_wo_n
     SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_from_known_substring(key, str, length_wo_null, &meta_data_node_local->meta_data),
                         /* cleanup */ sail_destroy_meta_data_node(meta_data_node_local));
 
-    while (*meta_data_node != NULL) {
-        *meta_data_node = (*meta_data_node)->next;
-    }
-
     *meta_data_node = meta_data_node_local;
 
     return SAIL_OK;
