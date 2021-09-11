@@ -388,7 +388,6 @@ static sail_status_t build_codec_bundle_from_codec_info_path(const char *codec_i
 static sail_status_t enumerate_codecs_in_paths(struct sail_context *context, const struct sail_string_node *string_node) {
 
     SAIL_CHECK_PTR(context);
-    SAIL_CHECK_PTR(string_node);
 
     /* Used to load and store codec info objects. */
     struct sail_codec_bundle_node **last_codec_bundle_node = &context->codec_bundle_node;
