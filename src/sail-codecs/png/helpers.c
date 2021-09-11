@@ -108,6 +108,8 @@ static sail_status_t hex_string_to_meta_data_node(const char *hex_str, enum Sail
                         /* cleanup */ sail_destroy_meta_data_node(meta_data_node_local),
                                       sail_free(data));
 
+    sail_free(data);
+
     *meta_data_node = meta_data_node_local;
 
     return SAIL_OK;
