@@ -52,9 +52,9 @@ sail_status_t gif_private_fetch_comment(const GifByteType *extension, struct sai
 
     SAIL_CHECK_PTR(extension);
 
-    const int length = extension[0];
+    const unsigned length = *(unsigned char *)(extension);
 
-    if (length <= 0) {
+    if (length == 0) {
         return SAIL_OK;
     }
 
