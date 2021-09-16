@@ -134,6 +134,19 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_tga(void *state, st
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
     }
 
+    switch (tga_state->file_header.image_type) {
+        case TGA_INDEXED_RLE:
+        case TGA_TRUE_COLOR_RLE:
+        case TGA_MONO_RLE: {
+            image_local->source_image->compression = SAIL_COMPRESSION_RLE;
+            break;
+        }
+
+        default: {
+            break;
+        }
+    }
+
     image_local->width = tga_state->file_header.width;
     image_local->height = tga_state->file_header.height;
     image_local->pixel_format = image_local->source_image->pixel_format;
