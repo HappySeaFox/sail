@@ -164,7 +164,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_tga(void *state, st
     if (tga_state->file_header.color_map_type == TGA_HAS_COLOR_MAP) {
         SAIL_TRY_OR_CLEANUP(tga_private_fetch_palette(io, &tga_state->file_header, &image_local->palette),
                             /* cleanup */ sail_destroy_image(image_local));
-    } else if (tga_state->file_header.image_type == TGA_MONO || tga_state->file_header.image_type == TGA_MONO_RLE) {
+    } else if ((tga_state->file_header.image_type == TGA_MONO || tga_state->file_header.image_type == TGA_MONO_RLE) && tga_state->file_header.bpp == 1) {
         /* Allocate B&W palette. */
         SAIL_TRY_OR_CLEANUP(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP24_RGB, 2, &image_local->palette),
                             /* cleanup */ sail_destroy_image(image_local));
@@ -179,6 +179,8 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_tga(void *state, st
         *palette_data++ = 255;
         *palette_data++ = 255;
     }
+
+    /* FIXME alpha bits, flip state. */
 
     *image = image_local;
 
@@ -201,6 +203,18 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v5_tga(void *state, struct sail_
     SAIL_TRY(sail_check_image_skeleton_valid(image));
 
     struct tga_state *tga_state = (struct tga_state *)state;
+
+    switch (tga_state->file_header.image_type) {
+        case TGA_INDEXED:
+        case TGA_TRUE_COLOR:
+        case TGA_MONO: {
+            SAIL_TRY(io->strict_read(io->stream, image->pixels, image->bytes_per_line * image->height));
+            break;
+        }
+
+        default: {
+        }
+    }
 
     return SAIL_OK;
 }
