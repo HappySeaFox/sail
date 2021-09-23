@@ -221,9 +221,10 @@ enum SailPixelFormat sail_pixel_format_from_string(const char *str) {
 const char* sail_image_property_to_string(enum SailImageProperty image_property) {
 
     switch (image_property) {
-        case SAIL_IMAGE_PROPERTY_UNKNOWN:            return "UNKNOWN";
-        case SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY: return "FLIPPED-VERTICALLY";
-        case SAIL_IMAGE_PROPERTY_INTERLACED:         return "INTERLACED";
+        case SAIL_IMAGE_PROPERTY_UNKNOWN:              return "UNKNOWN";
+        case SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY:   return "FLIPPED-VERTICALLY";
+        case SAIL_IMAGE_PROPERTY_FLIPPED_HORIZONTALLY: return "FLIPPED-HORIZONTALLY";
+        case SAIL_IMAGE_PROPERTY_INTERLACED:           return "INTERLACED";
     }
 
     return NULL;
@@ -238,6 +239,7 @@ enum SailImageProperty sail_image_property_from_string(const char *str) {
     switch (hash) {
         case UINT64_C(229442760833397):      return SAIL_IMAGE_PROPERTY_UNKNOWN;
         case UINT64_C(17202465669660106453): return SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY;
+        case UINT64_C(9347591013355692325):  return SAIL_IMAGE_PROPERTY_FLIPPED_HORIZONTALLY;
         case UINT64_C(8244927930303708800):  return SAIL_IMAGE_PROPERTY_INTERLACED;
     }
 

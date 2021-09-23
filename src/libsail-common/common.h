@@ -186,17 +186,20 @@ enum SailChromaSubsampling {
 enum SailImageProperty {
 
     /* Unknown image property used to indicate an error in parsing functions. */
-    SAIL_IMAGE_PROPERTY_UNKNOWN            = 1 << 0,
+    SAIL_IMAGE_PROPERTY_UNKNOWN              = 1 << 0,
 
-    /* Image needs flipping vertically. */
-    SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY = 1 << 1,
+    /* Image is flipped vertically. */
+    SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY   = 1 << 1,
+
+    /* Image is flipped vertically. */
+    SAIL_IMAGE_PROPERTY_FLIPPED_HORIZONTALLY = 1 << 2,
 
     /*
      * Image is interlaced. Only sail_image.source_properties can have this property.
      * Reading operations never output interlaced images, that's why sail_image.properties
      * never has it.
      */
-    SAIL_IMAGE_PROPERTY_INTERLACED         = 1 << 2,
+    SAIL_IMAGE_PROPERTY_INTERLACED           = 1 << 3,
 };
 
 /* Pixels compression types. */
