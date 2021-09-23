@@ -24,9 +24,9 @@
 */
 
 #include <stdbool.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "sail-common.h"
 
@@ -98,7 +98,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v5_tga(struct sail_io *io, const 
     SAIL_TRY(io->seek(io->stream, -(long)(sizeof(tga_state->footer.signature)), SEEK_END));
     SAIL_TRY(io->strict_read(io->stream, tga_state->footer.signature, sizeof(tga_state->footer.signature)));
 
-    tga_state->tga2 = strcmp(TGA_SIGNATURE, tga_state->footer.signature) == 0;
+    tga_state->tga2 = strcmp(TGA_SIGNATURE, (const char *)tga_state->footer.signature) == 0;
 
     SAIL_TRY(io->seek(io->stream, 0, SEEK_SET));
 
