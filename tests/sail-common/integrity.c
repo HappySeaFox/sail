@@ -260,9 +260,10 @@ static MunitResult test_image_property_to_string(const MunitParameter params[], 
     (void)params;
     (void)user_data;
 
-    munit_assert_string_equal(sail_image_property_to_string(SAIL_IMAGE_PROPERTY_UNKNOWN),            "UNKNOWN");
-    munit_assert_string_equal(sail_image_property_to_string(SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY), "FLIPPED-VERTICALLY");
-    munit_assert_string_equal(sail_image_property_to_string(SAIL_IMAGE_PROPERTY_INTERLACED),         "INTERLACED");
+    munit_assert_string_equal(sail_image_property_to_string(SAIL_IMAGE_PROPERTY_UNKNOWN),              "UNKNOWN");
+    munit_assert_string_equal(sail_image_property_to_string(SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY),   "FLIPPED-VERTICALLY");
+    munit_assert_string_equal(sail_image_property_to_string(SAIL_IMAGE_PROPERTY_FLIPPED_HORIZONTALLY), "FLIPPED-HORIZONTALLY");
+    munit_assert_string_equal(sail_image_property_to_string(SAIL_IMAGE_PROPERTY_INTERLACED),           "INTERLACED");
 
     return MUNIT_OK;
 }
@@ -274,9 +275,10 @@ static MunitResult test_image_property_from_string(const MunitParameter params[]
     munit_assert(sail_image_property_from_string(NULL)                 == SAIL_IMAGE_PROPERTY_UNKNOWN);
     munit_assert(sail_image_property_from_string("Some")               == SAIL_IMAGE_PROPERTY_UNKNOWN);
 
-    munit_assert(sail_image_property_from_string("UNKNOWN")            == SAIL_IMAGE_PROPERTY_UNKNOWN);
-    munit_assert(sail_image_property_from_string("FLIPPED-VERTICALLY") == SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY);
-    munit_assert(sail_image_property_from_string("INTERLACED")         == SAIL_IMAGE_PROPERTY_INTERLACED);
+    munit_assert(sail_image_property_from_string("UNKNOWN")              == SAIL_IMAGE_PROPERTY_UNKNOWN);
+    munit_assert(sail_image_property_from_string("FLIPPED-VERTICALLY")   == SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY);
+    munit_assert(sail_image_property_from_string("FLIPPED-HORIZONTALLY") == SAIL_IMAGE_PROPERTY_FLIPPED_HORIZONTALLY);
+    munit_assert(sail_image_property_from_string("INTERLACED")           == SAIL_IMAGE_PROPERTY_INTERLACED);
 
     return MUNIT_OK;
 }
@@ -396,6 +398,7 @@ static MunitResult test_meta_data_to_string(const MunitParameter params[], void 
     munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_DISCLAIMER),    "Disclaimer");
     munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_DOCUMENT),      "Document");
     munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_EXIF),          "EXIF");
+    munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_ID),            "ID");
     munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_IPTC),          "IPTC");
     munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_LABEL),         "Label");
     munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_MAKE),          "Make");
@@ -431,6 +434,7 @@ static MunitResult test_meta_data_from_string(const MunitParameter params[], voi
     munit_assert(sail_meta_data_from_string("Disclaimer")    == SAIL_META_DATA_DISCLAIMER);
     munit_assert(sail_meta_data_from_string("Document")      == SAIL_META_DATA_DOCUMENT);
     munit_assert(sail_meta_data_from_string("EXIF")          == SAIL_META_DATA_EXIF);
+    munit_assert(sail_meta_data_from_string("ID")            == SAIL_META_DATA_ID);
     munit_assert(sail_meta_data_from_string("IPTC")          == SAIL_META_DATA_IPTC);
     munit_assert(sail_meta_data_from_string("Label")         == SAIL_META_DATA_LABEL);
     munit_assert(sail_meta_data_from_string("Make")          == SAIL_META_DATA_MAKE);
