@@ -46,6 +46,9 @@ struct tga_state {
 
     bool frame_read;
     bool tga2;
+    int attribute_bits;
+    bool flipped_h;
+    bool flipped_v;
 };
 
 static sail_status_t alloc_tga_state(struct tga_state **tga_state) {
@@ -57,8 +60,11 @@ static sail_status_t alloc_tga_state(struct tga_state **tga_state) {
     (*tga_state)->read_options  = NULL;
     (*tga_state)->write_options = NULL;
 
-    (*tga_state)->frame_read    = false;
-    (*tga_state)->tga2          = false;
+    (*tga_state)->frame_read     = false;
+    (*tga_state)->tga2           = false;
+    (*tga_state)->attribute_bits = 0;
+    (*tga_state)->flipped_h      = false;
+    (*tga_state)->flipped_v      = false;
 
     return SAIL_OK;
 }
@@ -127,7 +133,18 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_tga(void *state, st
     SAIL_TRY_OR_CLEANUP(tga_private_read_file_header(io, &tga_state->file_header),
                         /* cleanup */ sail_destroy_image(image_local));
 
-    image_local->source_image->pixel_format = tga_private_sail_pixel_format(tga_state->file_header.image_type, tga_state->file_header.bpp);
+    tga_state->attribute_bits = tga_state->file_header.descriptor & 0xF;         /* Bits 0-3.                  */
+    tga_state->flipped_h      = tga_state->file_header.descriptor & 0x10;        /* 4th bit set = flipped H.   */
+    tga_state->flipped_v      = (tga_state->file_header.descriptor & 0x20) == 0; /* 5th bit unset = flipped V. */
+
+    image_local->source_image->pixel_format = tga_private_sail_pixel_format(tga_state->file_header.image_type, tga_state->file_header.bpp, tga_state->attribute_bits);
+
+    if (tga_state->flipped_h) {
+        image_local->source_image->properties &= SAIL_IMAGE_PROPERTY_FLIPPED_HORIZONTALLY;
+    }
+    if (tga_state->flipped_v) {
+        image_local->source_image->properties &= SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY;
+    }
 
     if (image_local->source_image->pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN) {
         sail_destroy_image(image_local);
@@ -141,9 +158,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_tga(void *state, st
             image_local->source_image->compression = SAIL_COMPRESSION_RLE;
             break;
         }
-
         default: {
-            break;
         }
     }
 
@@ -180,7 +195,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_tga(void *state, st
         *palette_data++ = 255;
     }
 
-    /* FIXME alpha bits, flip state. */
+    /* flip state. */
 
     *image = image_local;
 
@@ -211,7 +226,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v5_tga(void *state, struct sail_
             SAIL_TRY(io->strict_read(io->stream, image->pixels, image->bytes_per_line * image->height));
             break;
         }
-
         default: {
         }
     }

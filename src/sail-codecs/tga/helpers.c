@@ -47,7 +47,7 @@ sail_status_t tga_private_read_file_header(struct sail_io *io, struct TgaFileHea
     return SAIL_OK;
 }
 
-enum SailPixelFormat tga_private_sail_pixel_format(int image_type, int bpp) {
+enum SailPixelFormat tga_private_sail_pixel_format(int image_type, int bpp, int attribute_bits) {
 
     switch (image_type) {
         case TGA_INDEXED:
@@ -58,7 +58,13 @@ enum SailPixelFormat tga_private_sail_pixel_format(int image_type, int bpp) {
         case TGA_TRUE_COLOR:
         case TGA_TRUE_COLOR_RLE: {
             switch (bpp) {
-                case 16: return SAIL_PIXEL_FORMAT_BPP16_RGB555;
+                case 16: {
+                    switch (attribute_bits) {
+                        case 0: return SAIL_PIXEL_FORMAT_BPP16_BGR555;
+                        case 1: return SAIL_PIXEL_FORMAT_BPP16_BGR555;
+                        default: return SAIL_PIXEL_FORMAT_UNKNOWN;
+                    }
+                }
                 case 24: return SAIL_PIXEL_FORMAT_BPP24_BGR;
                 case 32: return SAIL_PIXEL_FORMAT_BPP32_BGRA;
                 default: return SAIL_PIXEL_FORMAT_UNKNOWN;
@@ -158,17 +164,17 @@ sail_status_t tga_private_fetch_palette(struct sail_io *io, const struct TgaFile
             }
 
             case 24: {
-                *palette_data++ = data[0];
-                *palette_data++ = data[1];
                 *palette_data++ = data[2];
+                *palette_data++ = data[1];
+                *palette_data++ = data[0];
                 break;
             }
 
             case 32: {
-                *palette_data++ = data[1];
                 *palette_data++ = data[2];
-                *palette_data++ = data[3];
+                *palette_data++ = data[1];
                 *palette_data++ = data[0];
+                *palette_data++ = data[3];
                 break;
             }
 
