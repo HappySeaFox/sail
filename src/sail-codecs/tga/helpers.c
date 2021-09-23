@@ -60,7 +60,7 @@ enum SailPixelFormat tga_private_sail_pixel_format(int image_type, int bpp) {
             switch (bpp) {
                 case 16: return SAIL_PIXEL_FORMAT_BPP16_RGB555;
                 case 24: return SAIL_PIXEL_FORMAT_BPP24_BGR;
-                case 32: return SAIL_PIXEL_FORMAT_BPP32_ABGR;
+                case 32: return SAIL_PIXEL_FORMAT_BPP32_BGRA;
                 default: return SAIL_PIXEL_FORMAT_UNKNOWN;
             }
         }
