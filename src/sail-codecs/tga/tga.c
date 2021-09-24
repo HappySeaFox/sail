@@ -156,6 +156,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_tga(void *state, st
             break;
         }
         default: {
+            image_local->source_image->compression = SAIL_COMPRESSION_NONE;
         }
     }
 
