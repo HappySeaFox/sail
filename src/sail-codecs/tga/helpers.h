@@ -74,7 +74,7 @@ struct TgaFooter
 
 SAIL_HIDDEN sail_status_t tga_private_read_file_header(struct sail_io *io, struct TgaFileHeader *file_header);
 
-SAIL_HIDDEN enum SailPixelFormat tga_private_sail_pixel_format(int image_type, int bpp, int attribute_bits);
+SAIL_HIDDEN enum SailPixelFormat tga_private_sail_pixel_format(int image_type, int bpp);
 
 SAIL_HIDDEN enum SailPixelFormat tga_private_palette_bpp_to_sail_pixel_format(int bpp);
 

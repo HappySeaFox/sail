@@ -47,7 +47,7 @@ sail_status_t tga_private_read_file_header(struct sail_io *io, struct TgaFileHea
     return SAIL_OK;
 }
 
-enum SailPixelFormat tga_private_sail_pixel_format(int image_type, int bpp, int attribute_bits) {
+enum SailPixelFormat tga_private_sail_pixel_format(int image_type, int bpp) {
 
     switch (image_type) {
         case TGA_INDEXED:
@@ -58,13 +58,7 @@ enum SailPixelFormat tga_private_sail_pixel_format(int image_type, int bpp, int 
         case TGA_TRUE_COLOR:
         case TGA_TRUE_COLOR_RLE: {
             switch (bpp) {
-                case 16: {
-                    switch (attribute_bits) {
-                        case 0: return SAIL_PIXEL_FORMAT_BPP16_BGR555;
-                        case 1: return SAIL_PIXEL_FORMAT_BPP16_BGR555;
-                        default: return SAIL_PIXEL_FORMAT_UNKNOWN;
-                    }
-                }
+                case 16: return SAIL_PIXEL_FORMAT_BPP16_BGR555;
                 case 24: return SAIL_PIXEL_FORMAT_BPP24_BGR;
                 case 32: return SAIL_PIXEL_FORMAT_BPP32_BGRA;
                 default: return SAIL_PIXEL_FORMAT_UNKNOWN;
