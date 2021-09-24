@@ -340,9 +340,10 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_bmp(void *state, st
     SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
                         /* cleanup */ sail_destroy_image(image_local));
 
-    image_local->source_image->compression = SAIL_COMPRESSION_NONE;
     image_local->source_image->pixel_format = bmp_state->source_pixel_format;
     image_local->source_image->properties = bmp_state->flipped ? SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY : 0;
+    image_local->source_image->compression = (bmp_state->v3.compression == SAIL_BI_RLE4 || bmp_state->v3.compression == SAIL_BI_RLE8)
+                                             ? SAIL_COMPRESSION_RLE : SAIL_COMPRESSION_NONE;
     image_local->width = (bmp_state->version == SAIL_BMP_V1) ? bmp_state->v1.width : bmp_state->v2.width;
     image_local->height = (bmp_state->version == SAIL_BMP_V1) ? bmp_state->v1.height : bmp_state->v2.height;
     if (bmp_state->version >= SAIL_BMP_V3 && bmp_state->v3.compression == SAIL_BI_RLE4) {

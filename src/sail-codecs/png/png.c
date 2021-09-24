@@ -242,6 +242,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v5_png(struct sail_io *io, const 
 #endif
 
     png_state->first_image->source_image->pixel_format = png_private_png_color_type_to_pixel_format(png_state->color_type, png_state->bit_depth);
+    png_state->first_image->source_image->compression = SAIL_COMPRESSION_DEFLATE;
 
     if (png_state->first_image->interlaced_passes > 1) {
         png_state->first_image->source_image->properties |= SAIL_IMAGE_PROPERTY_INTERLACED;

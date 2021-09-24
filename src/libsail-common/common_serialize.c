@@ -253,6 +253,7 @@ const char* sail_compression_to_string(enum SailCompression compression) {
         case SAIL_COMPRESSION_UNKNOWN:       return "UNKNOWN";
         case SAIL_COMPRESSION_NONE:          return "NONE";
         case SAIL_COMPRESSION_ADOBE_DEFLATE: return "ADOBE-DEFLATE";
+        case SAIL_COMPRESSION_AV1:           return "AV1";
         case SAIL_COMPRESSION_CCITT_FAX3:    return "CCITT-FAX3";
         case SAIL_COMPRESSION_CCITT_FAX4:    return "CCITT-FAX4";
         case SAIL_COMPRESSION_CCITT_RLE:     return "CCITT-RLE";
@@ -302,6 +303,7 @@ enum SailCompression sail_compression_from_string(const char *str) {
         case UINT64_C(229442760833397):      return SAIL_COMPRESSION_UNKNOWN;
         case UINT64_C(6384332661):           return SAIL_COMPRESSION_NONE;
         case UINT64_C(10962109560604417378): return SAIL_COMPRESSION_ADOBE_DEFLATE;
+        case UINT64_C(193450669):            return SAIL_COMPRESSION_AV1;
         case UINT64_C(8244633541513328571):  return SAIL_COMPRESSION_CCITT_FAX3;
         case UINT64_C(8244633541513328572):  return SAIL_COMPRESSION_CCITT_FAX4;
         case UINT64_C(249837380045871852):   return SAIL_COMPRESSION_CCITT_RLE;

@@ -164,6 +164,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v5_webp(struct sail_io *io, const
                         /* cleanup */ sail_destroy_image(image_local));
 
     image_local->source_image->chroma_subsampling = SAIL_CHROMA_SUBSAMPLING_420;
+    image_local->source_image->compression = SAIL_COMPRESSION_WEBP;
 
     image_local->width = WebPDemuxGetI(webp_state->webp_demux, WEBP_FF_CANVAS_WIDTH);
     image_local->height = WebPDemuxGetI(webp_state->webp_demux, WEBP_FF_CANVAS_HEIGHT);

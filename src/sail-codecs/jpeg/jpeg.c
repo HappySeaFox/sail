@@ -187,8 +187,9 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_jpeg(void *state, s
     /* Image properties. */
     image_local->width                      = jpeg_state->decompress_context->output_width;
     image_local->height                     = jpeg_state->decompress_context->output_height;
-    image_local->source_image->pixel_format = jpeg_private_color_space_to_pixel_format(jpeg_state->decompress_context->jpeg_color_space);
     image_local->pixel_format               = jpeg_private_color_space_to_pixel_format(jpeg_state->decompress_context->out_color_space);
+    image_local->source_image->pixel_format = jpeg_private_color_space_to_pixel_format(jpeg_state->decompress_context->jpeg_color_space);
+    image_local->source_image->compression  = SAIL_COMPRESSION_JPEG;
 
     SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(image_local->width, image_local->pixel_format, &image_local->bytes_per_line),
                         /* cleanup */ sail_destroy_image(image_local));

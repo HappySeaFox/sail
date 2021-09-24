@@ -294,6 +294,7 @@ static MunitResult test_compression_to_string(const MunitParameter params[], voi
     munit_assert_string_equal(sail_compression_to_string(SAIL_COMPRESSION_UNSUPPORTED),   "UNSUPPORTED");
     munit_assert_string_equal(sail_compression_to_string(SAIL_COMPRESSION_NONE),          "NONE");
     munit_assert_string_equal(sail_compression_to_string(SAIL_COMPRESSION_ADOBE_DEFLATE), "ADOBE-DEFLATE");
+    munit_assert_string_equal(sail_compression_to_string(SAIL_COMPRESSION_AV1),           "AV1");
     munit_assert_string_equal(sail_compression_to_string(SAIL_COMPRESSION_CCITT_FAX3),    "CCITT-FAX3");
     munit_assert_string_equal(sail_compression_to_string(SAIL_COMPRESSION_CCITT_FAX4),    "CCITT-FAX4");
     munit_assert_string_equal(sail_compression_to_string(SAIL_COMPRESSION_CCITT_RLE),     "CCITT-RLE");
@@ -342,6 +343,7 @@ static MunitResult test_compression_from_string(const MunitParameter params[], v
     munit_assert(sail_compression_from_string("UNSUPPORTED")   == SAIL_COMPRESSION_UNSUPPORTED);
     munit_assert(sail_compression_from_string("NONE")          == SAIL_COMPRESSION_NONE);
     munit_assert(sail_compression_from_string("ADOBE-DEFLATE") == SAIL_COMPRESSION_ADOBE_DEFLATE);
+    munit_assert(sail_compression_from_string("AV1")           == SAIL_COMPRESSION_AV1);
     munit_assert(sail_compression_from_string("CCITT-FAX3")    == SAIL_COMPRESSION_CCITT_FAX3);
     munit_assert(sail_compression_from_string("CCITT-FAX4")    == SAIL_COMPRESSION_CCITT_FAX4);
     munit_assert(sail_compression_from_string("CCITT-RLE")     == SAIL_COMPRESSION_CCITT_RLE);
