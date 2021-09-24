@@ -192,8 +192,8 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_gif(void *state, st
     SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
                         /* cleanup */ sail_destroy_image(image_local));
 
-    image_local->source_image->compression = SAIL_COMPRESSION_LZW;
     image_local->source_image->pixel_format = SAIL_PIXEL_FORMAT_BPP8_INDEXED;
+    image_local->source_image->compression = SAIL_COMPRESSION_LZW;
 
     gif_state->current_image++;
 

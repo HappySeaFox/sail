@@ -202,8 +202,8 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_tiff(void *state, s
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
-    image_local->source_image->compression = tiff_private_compression_to_sail_compression(compression);
     image_local->source_image->pixel_format = tiff_private_bpp_to_pixel_format(tiff_state->image.bitspersample * tiff_state->image.samplesperpixel);
+    image_local->source_image->compression = tiff_private_compression_to_sail_compression(compression);
 
     *image = image_local;
 
