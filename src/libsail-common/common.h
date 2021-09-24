@@ -212,6 +212,7 @@ enum SailCompression {
     SAIL_COMPRESSION_NONE,
 
     SAIL_COMPRESSION_ADOBE_DEFLATE, /* Deflate compression, as recognized by Adobe. */
+    SAIL_COMPRESSION_AV1,           /* AOMedia Video 1. */
     SAIL_COMPRESSION_CCITT_FAX3,    /* CCITT Group 3 fax encoding. */
     SAIL_COMPRESSION_CCITT_FAX4,    /* CCITT Group 4 fax encoding. */
     SAIL_COMPRESSION_CCITT_RLE,     /* CCITT modified Huffman RLE. */
