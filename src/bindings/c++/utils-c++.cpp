@@ -23,7 +23,6 @@
     SOFTWARE.
 */
 
-#include "sail-common.h"
 #include "sail-c++.h"
 
 namespace sail

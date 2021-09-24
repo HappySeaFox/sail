@@ -27,10 +27,9 @@
 #include <cstring>
 #include <utility>
 
-#include "sail-common.h"
+#include "sail-c++.h"
 #include "sail.h"
 #include "sail-manip.h"
-#include "sail-c++.h"
 
 namespace sail
 {

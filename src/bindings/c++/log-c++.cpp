@@ -23,12 +23,8 @@
     SOFTWARE.
 */
 
-#include <cstdlib>
-#include <cstring>
-
-#include "sail-common.h"
-#include "sail.h"
 #include "sail-c++.h"
+#include "sail.h"
 
 namespace sail
 {
