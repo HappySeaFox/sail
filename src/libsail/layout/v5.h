@@ -96,6 +96,8 @@ sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_read_init_v5)(struct sail_io 
  *
  * This function MUST:
  *   - Allocate the image and the source image (sail_image.sail_source_image).
+ *   - Fill the expected image properties (width, height, pixel format, image properties etc.) and meta data.
+ *     The image pixel format must be as close to the source as possible.
  *   - Seek to the next image frame.
  *
  * This function MUST NOT:
@@ -113,7 +115,7 @@ sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_read_seek_next_frame_v5)(void
  *   - The state points to the state allocated by sail_codec_read_init_vx().
  *   - The IO is valid and open.
  *   - The image points to the image allocated by sail_codec_read_seek_next_frame_vx().
- *   - The image has pixels allocated
+ *   - The image pixels are allocated.
  *
  * This function MUST:
  *   - Seek to the next pass.
@@ -129,10 +131,12 @@ sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_read_seek_next_pass_v5)(void 
  *   - The state is valid and points to the state allocated by sail_codec_read_init_vx().
  *   - The IO is valid and open.
  *   - The image points to the image allocated by sail_codec_read_seek_next_frame_vx().
- *   - The image has pixels allocated
+ *   - The image pixels are allocated.
  *
  * This function MUST:
  *   - Read the image pixels into sail_image.pixels.
+ *   - Output pixels with the origin in the top left corner (i.e. not flipped).
+ *   - Output pixels in format as close to the source as possible.
  *
  * Returns SAIL_OK on success.
  */
