@@ -179,20 +179,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_tga(void *state, st
     if (tga_state->file_header.color_map_type == TGA_HAS_COLOR_MAP) {
         SAIL_TRY_OR_CLEANUP(tga_private_fetch_palette(io, &tga_state->file_header, &image_local->palette),
                             /* cleanup */ sail_destroy_image(image_local));
-    } else if ((tga_state->file_header.image_type == TGA_MONO || tga_state->file_header.image_type == TGA_MONO_RLE) && tga_state->file_header.bpp == 1) {
-        /* Allocate B&W palette. */
-        SAIL_TRY_OR_CLEANUP(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP24_RGB, 2, &image_local->palette),
-                            /* cleanup */ sail_destroy_image(image_local));
-
-        unsigned char *palette_data = image_local->palette->data;
-
-        *palette_data++ = 0;
-        *palette_data++ = 0;
-        *palette_data++ = 0;
-
-        *palette_data++ = 255;
-        *palette_data++ = 255;
-        *palette_data++ = 255;
     }
 
     /* flip state. */
