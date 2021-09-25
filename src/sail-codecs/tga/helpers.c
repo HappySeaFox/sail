@@ -65,8 +65,8 @@ enum SailPixelFormat tga_private_sail_pixel_format(int image_type, int bpp) {
             }
         }
 
-        case TGA_MONO:
-        case TGA_MONO_RLE: {
+        case TGA_GRAY:
+        case TGA_GRAY_RLE: {
             switch (bpp) {
                 case 8: return SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE;
                 default: return SAIL_PIXEL_FORMAT_UNKNOWN;

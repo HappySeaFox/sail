@@ -151,7 +151,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_tga(void *state, st
     switch (tga_state->file_header.image_type) {
         case TGA_INDEXED_RLE:
         case TGA_TRUE_COLOR_RLE:
-        case TGA_MONO_RLE: {
+        case TGA_GRAY_RLE: {
             image_local->source_image->compression = SAIL_COMPRESSION_RLE;
             break;
         }
@@ -206,11 +206,42 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v5_tga(void *state, struct sail_
     switch (tga_state->file_header.image_type) {
         case TGA_INDEXED:
         case TGA_TRUE_COLOR:
-        case TGA_MONO: {
+        case TGA_GRAY: {
             SAIL_TRY(io->strict_read(io->stream, image->pixels, image->bytes_per_line * image->height));
             break;
         }
-        default: {
+        case TGA_INDEXED_RLE:
+        case TGA_TRUE_COLOR_RLE:
+        case TGA_GRAY_RLE: {
+            const unsigned pixel_size = (tga_state->file_header.bpp + 7) / 8;
+            const unsigned pixels_num = image->width * image->height;
+
+            unsigned char *pixels = image->pixels;
+
+            for (unsigned i = 0; i < pixels_num;) {
+                unsigned char marker;
+                SAIL_TRY(io->strict_read(io->stream, &marker, 1));
+
+                unsigned count = (marker & 0x7F) + 1;
+
+                /* 7th bit set = RLE packet. */
+                if (marker & 0x80) {
+                    unsigned char pixel[4];
+
+                    SAIL_TRY(io->strict_read(io->stream, pixel, pixel_size));
+
+                    for (unsigned j = 0; j < count; j++, i++) {
+                        memcpy(pixels, pixel, pixel_size);
+                        pixels += pixel_size;
+                    }
+                } else {
+                    for (unsigned j = 0; j < count; j++, i++) {
+                        SAIL_TRY(io->strict_read(io->stream, pixels, pixel_size));
+                        pixels += pixel_size;
+                    }
+                }
+            }
+            break;
         }
     }
 

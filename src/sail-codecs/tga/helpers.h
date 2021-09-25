@@ -43,10 +43,10 @@ enum TgaImageType {
     TGA_NO_IMAGE       = 0,
     TGA_INDEXED        = 1,
     TGA_TRUE_COLOR     = 2,
-    TGA_MONO           = 3,
+    TGA_GRAY           = 3,
     TGA_INDEXED_RLE    = 9,
     TGA_TRUE_COLOR_RLE = 10,
-    TGA_MONO_RLE       = 11,
+    TGA_GRAY_RLE       = 11,
 };
 
 struct TgaFileHeader
