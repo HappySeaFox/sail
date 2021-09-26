@@ -131,21 +131,23 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_tga(void *state, st
     SAIL_TRY_OR_CLEANUP(tga_private_read_file_header(io, &tga_state->file_header),
                         /* cleanup */ sail_destroy_image(image_local));
 
-    tga_state->flipped_h      = tga_state->file_header.descriptor & 0x10;        /* 4th bit set = flipped H.   */
-    tga_state->flipped_v      = (tga_state->file_header.descriptor & 0x20) == 0; /* 5th bit unset = flipped V. */
+    tga_state->flipped_h = tga_state->file_header.descriptor & 0x10;        /* 4th bit set = flipped H.   */
+    tga_state->flipped_v = (tga_state->file_header.descriptor & 0x20) == 0; /* 5th bit unset = flipped V. */
 
     image_local->source_image->pixel_format = tga_private_sail_pixel_format(tga_state->file_header.image_type, tga_state->file_header.bpp);
-
-    if (tga_state->flipped_h) {
-        image_local->source_image->properties &= SAIL_IMAGE_PROPERTY_FLIPPED_HORIZONTALLY;
-    }
-    if (tga_state->flipped_v) {
-        image_local->source_image->properties &= SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY;
-    }
 
     if (image_local->source_image->pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN) {
         sail_destroy_image(image_local);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+    }
+
+    if (tga_state->flipped_h) {
+        image_local->properties               |= SAIL_IMAGE_PROPERTY_FLIPPED_HORIZONTALLY;
+        image_local->source_image->properties |= SAIL_IMAGE_PROPERTY_FLIPPED_HORIZONTALLY;
+    }
+    if (tga_state->flipped_v) {
+        image_local->properties               |= SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY;
+        image_local->source_image->properties |= SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY;
     }
 
     switch (tga_state->file_header.image_type) {
