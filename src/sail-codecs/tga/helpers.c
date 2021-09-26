@@ -47,6 +47,15 @@ sail_status_t tga_private_read_file_header(struct sail_io *io, struct TgaFileHea
     return SAIL_OK;
 }
 
+sail_status_t tga_private_read_file_footer(struct sail_io *io, struct TgaFooter *footer) {
+
+    SAIL_TRY(io->strict_read(io->stream, &footer->extension_area_offset, sizeof(footer->extension_area_offset)));
+    SAIL_TRY(io->strict_read(io->stream, &footer->developer_area_offset, sizeof(footer->developer_area_offset)));
+    SAIL_TRY(io->strict_read(io->stream, &footer->signature,             sizeof(footer->signature)));
+
+    return SAIL_OK;
+}
+
 enum SailPixelFormat tga_private_sail_pixel_format(int image_type, int bpp) {
 
     switch (image_type) {

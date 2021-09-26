@@ -32,7 +32,8 @@
 
 #include "helpers.h"
 
-static const char * const TGA_SIGNATURE = "TRUEVISION-XFILE.";
+static const char * const TGA_SIGNATURE   = "TRUEVISION-XFILE.";
+static const int          TGA_FOOTER_SIZE = 26;
 
 /*
  * Codec-specific state.
@@ -100,12 +101,11 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v5_tga(struct sail_io *io, const 
     SAIL_TRY(sail_copy_read_options(read_options, &tga_state->read_options));
 
     /* Read TGA footer. */
-    SAIL_TRY(io->seek(io->stream, -(long)(sizeof(tga_state->footer.signature)), SEEK_END));
-    SAIL_TRY(io->strict_read(io->stream, tga_state->footer.signature, sizeof(tga_state->footer.signature)));
+    SAIL_TRY(io->seek(io->stream, -TGA_FOOTER_SIZE, SEEK_END));
+    SAIL_TRY(tga_private_read_file_footer(io, &tga_state->footer));
+    SAIL_TRY(io->seek(io->stream, 0, SEEK_SET));
 
     tga_state->tga2 = strcmp(TGA_SIGNATURE, (const char *)tga_state->footer.signature) == 0;
-
-    SAIL_TRY(io->seek(io->stream, 0, SEEK_SET));
 
     return SAIL_OK;
 }
