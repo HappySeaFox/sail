@@ -179,8 +179,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_tga(void *state, st
                             /* cleanup */ sail_destroy_image(image_local));
     }
 
-    /* flip state. */
-
     *image = image_local;
 
     return SAIL_OK;
@@ -243,6 +241,13 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v5_tga(void *state, struct sail_
             }
             break;
         }
+    }
+
+    if (tga_state->flipped_v) {
+        sail_flip_vertically(image);
+    }
+    if (tga_state->flipped_h) {
+        sail_flip_horizontally(image);
     }
 
     return SAIL_OK;
