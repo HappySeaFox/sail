@@ -32,6 +32,10 @@
 #include "error.h"
 #include "export.h"
 
+struct sail_io;
+struct sail_meta_data_node;
+struct sail_palette;
+
 enum TgaColorMapType {
 
     TGA_HAS_NO_COLOR_MAP = 0,
@@ -81,6 +85,8 @@ SAIL_HIDDEN enum SailPixelFormat tga_private_sail_pixel_format(int image_type, i
 SAIL_HIDDEN enum SailPixelFormat tga_private_palette_bpp_to_sail_pixel_format(int bpp);
 
 SAIL_HIDDEN sail_status_t tga_private_fetch_id(struct sail_io *io, const struct TgaFileHeader *file_header, struct sail_meta_data_node **meta_data_node);
+
+SAIL_HIDDEN sail_status_t tga_private_fetch_extension(struct sail_io *io, struct sail_meta_data_node **meta_data_node);
 
 SAIL_HIDDEN sail_status_t tga_private_fetch_palette(struct sail_io *io, const struct TgaFileHeader *file_header, struct sail_palette **palette);
 

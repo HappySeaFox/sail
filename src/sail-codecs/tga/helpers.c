@@ -23,11 +23,14 @@
     SOFTWARE.
 */
 
+#include <stddef.h>
 #include <stdio.h>
 
 #include "sail-common.h"
 
 #include "helpers.h"
+
+static const uint16_t TGA2_EXTENSION_AREA_LENGTH = 495;
 
 sail_status_t tga_private_read_file_header(struct sail_io *io, struct TgaFileHeader *file_header) {
 
@@ -122,6 +125,61 @@ sail_status_t tga_private_fetch_id(struct sail_io *io, const struct TgaFileHeade
     ((char *)meta_data->value)[meta_data->value_length - 1] = '\0';
 
     *meta_data_node = meta_data_node_local;
+
+    return SAIL_OK;
+}
+
+sail_status_t tga_private_fetch_extension(struct sail_io *io, struct sail_meta_data_node **meta_data_node) {
+
+    /* Find the last node. */
+    struct sail_meta_data_node **last_meta_data_node = meta_data_node;
+
+    while (*last_meta_data_node != NULL) {
+        last_meta_data_node = &(*last_meta_data_node)->next;
+    }
+
+    /* Extension area length. */
+    uint16_t length;
+    SAIL_TRY(io->strict_read(io->stream, &length, sizeof(length)));
+
+    if (length != TGA2_EXTENSION_AREA_LENGTH) {
+        SAIL_LOG_WARNING("TGA: Don't know how to handle extension area length of %u bytes (expected %u)", length, TGA2_EXTENSION_AREA_LENGTH);
+        return SAIL_OK;
+    }
+
+    /* Author. */
+    char author[41];
+    SAIL_TRY(io->strict_read(io->stream, author, sizeof(author)));
+
+    SAIL_TRY(sail_alloc_meta_data_node(last_meta_data_node));
+    SAIL_TRY(sail_alloc_meta_data_from_known_string(SAIL_META_DATA_AUTHOR, author, &(*last_meta_data_node)->meta_data));
+    last_meta_data_node = &(*last_meta_data_node)->next;
+
+    /* Comments. */
+    char comments[80*4 + 1];
+    SAIL_TRY(io->strict_read(io->stream, comments,                    81));
+    SAIL_TRY(io->strict_read(io->stream, comments + strlen(comments), 81));
+    SAIL_TRY(io->strict_read(io->stream, comments + strlen(comments), 81));
+    SAIL_TRY(io->strict_read(io->stream, comments + strlen(comments), 81));
+
+    SAIL_TRY(sail_alloc_meta_data_node(last_meta_data_node));
+    SAIL_TRY(sail_alloc_meta_data_from_known_string(SAIL_META_DATA_COMMENT, comments, &(*last_meta_data_node)->meta_data));
+    last_meta_data_node = &(*last_meta_data_node)->next;
+
+    /* Date/time stamp. YYYY.MM.DD hh:mm:ss. */
+    uint16_t month, day, year, hour, minute, second;
+    SAIL_TRY(io->strict_read(io->stream, &month,  sizeof(month)));
+    SAIL_TRY(io->strict_read(io->stream, &day,    sizeof(day)));
+    SAIL_TRY(io->strict_read(io->stream, &year,   sizeof(year)));
+    SAIL_TRY(io->strict_read(io->stream, &hour,   sizeof(hour)));
+    SAIL_TRY(io->strict_read(io->stream, &minute, sizeof(minute)));
+    SAIL_TRY(io->strict_read(io->stream, &second, sizeof(second)));
+    char timestamp[20];
+    snprintf(timestamp, sizeof(timestamp), "%04d.%02d.%02d %02d:%02d:%02d", year, month, day, hour, minute, second);
+
+    SAIL_TRY(sail_alloc_meta_data_node(last_meta_data_node));
+    SAIL_TRY(sail_alloc_meta_data_from_known_string(SAIL_META_DATA_CREATION_TIME, timestamp, &(*last_meta_data_node)->meta_data));
+    last_meta_data_node = &(*last_meta_data_node)->next;
 
     return SAIL_OK;
 }

@@ -176,6 +176,30 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_tga(void *state, st
                             /* cleanup */ sail_destroy_image(image_local));
     }
 
+    /* Extension area. */
+    if (tga_state->tga2 && tga_state->footer.extension_area_offset > 0) {
+        /* Seek to offset. */
+        size_t offset;
+        SAIL_TRY_OR_CLEANUP(io->tell(io->stream, &offset),
+                            /* cleanup */ sail_destroy_image(image_local));
+        SAIL_TRY_OR_CLEANUP(io->seek(io->stream, (long)tga_state->footer.extension_area_offset, SEEK_SET),
+                            /* cleanup */ sail_destroy_image(image_local));
+
+        SAIL_TRY_OR_CLEANUP(tga_private_fetch_extension(io, &image_local->meta_data_node),
+                            /* cleanup */ sail_destroy_image(image_local));
+
+        SAIL_TRY_OR_CLEANUP(io->seek(io->stream, (long)offset, SEEK_SET),
+                            /* cleanup */ sail_destroy_image(image_local));
+
+        for (const struct sail_meta_data_node *meta_data_node = image_local->meta_data_node; meta_data_node!= NULL; meta_data_node = meta_data_node->next) {
+            const struct sail_meta_data *meta_data = meta_data_node->meta_data;
+
+            if (meta_data->value_type == SAIL_META_DATA_TYPE_STRING) {
+                SAIL_LOG_DEBUG("+++ META '%s'", (const char *)meta_data->value);
+            }
+        }
+    }
+
     /* Palette. */
     if (tga_state->file_header.color_map_type == TGA_HAS_COLOR_MAP) {
         SAIL_TRY_OR_CLEANUP(tga_private_fetch_palette(io, &tga_state->file_header, &image_local->palette),
