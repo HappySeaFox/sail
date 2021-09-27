@@ -78,7 +78,7 @@ images with the help of [ksquirrel-libs](FAQ.md#how-old-is-sail), the predecesso
 | 4  | [GIF](https://wikipedia.org/wiki/GIF)                               | R             | giflib            |
 | 5  | [JPEG](https://wikipedia.org/wiki/JPEG)                             | RW            | libjpeg-turbo     |
 | 6  | [PNG](https://wikipedia.org/wiki/Portable_Network_Graphics)         | RW            | libpng            |
-| 7  | [TGA](https://wikipedia.org/wiki/Truevision_TGA)                    | RW            |                   |
+| 7  | [TGA](https://wikipedia.org/wiki/Truevision_TGA)                    | R             |                   |
 | 8  | [TIFF](https://wikipedia.org/wiki/TIFF)                             | RW            | libtiff           |
 | 9  | [WEBP](https://wikipedia.org/wiki/WebP)                             | R             | libwebp           |
 
