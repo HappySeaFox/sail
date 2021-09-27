@@ -258,6 +258,11 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v5_png(struct sail_io *io, const 
         SAIL_TRY(png_private_fetch_iccp(png_state->png_ptr, png_state->info_ptr, &png_state->first_image->iccp));
     }
 
+    /* Fetch gamma. */
+    if (png_get_gAMA(png_state->png_ptr, png_state->info_ptr, &png_state->first_image->gamma) == 0) {
+        SAIL_LOG_ERROR("PNG: Failed to read the image gamma so it stays default");
+    }
+
 #ifdef PNG_APNG_SUPPORTED
     if (png_state->is_apng) {
         SAIL_TRY(sail_malloc((size_t)png_state->first_image->width * png_state->bytes_per_pixel, &png_state->temp_scanline));
@@ -591,6 +596,10 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v5_png(void *state, s
         png_set_PLTE(png_state->png_ptr, png_state->info_ptr, image->palette->data, image->palette->color_count);
     }
 
+    /* Save gamma. */
+    png_set_gAMA(png_state->png_ptr, png_state->info_ptr, image->gamma);
+
+    /* Set compression. */
     const double compression = (png_state->write_options->compression_level < COMPRESSION_MIN ||
                                 png_state->write_options->compression_level > COMPRESSION_MAX)
                                 ? COMPRESSION_DEFAULT
