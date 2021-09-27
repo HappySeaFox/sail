@@ -190,14 +190,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_tga(void *state, st
 
         SAIL_TRY_OR_CLEANUP(io->seek(io->stream, (long)offset, SEEK_SET),
                             /* cleanup */ sail_destroy_image(image_local));
-
-        for (const struct sail_meta_data_node *meta_data_node = image_local->meta_data_node; meta_data_node!= NULL; meta_data_node = meta_data_node->next) {
-            const struct sail_meta_data *meta_data = meta_data_node->meta_data;
-
-            if (meta_data->value_type == SAIL_META_DATA_TYPE_STRING) {
-                SAIL_LOG_DEBUG("+++ META '%s'", (const char *)meta_data->value);
-            }
-        }
     }
 
     /* Palette. */
