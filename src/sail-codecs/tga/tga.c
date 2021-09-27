@@ -224,7 +224,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v5_tga(void *state, struct sail_
         case TGA_INDEXED:
         case TGA_TRUE_COLOR:
         case TGA_GRAY: {
-            SAIL_TRY(io->strict_read(io->stream, image->pixels, image->bytes_per_line * image->height));
+            SAIL_TRY(io->strict_read(io->stream, image->pixels, (size_t)image->bytes_per_line * image->height));
             break;
         }
         case TGA_INDEXED_RLE:
