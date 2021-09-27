@@ -129,7 +129,7 @@ sail_status_t tga_private_fetch_id(struct sail_io *io, const struct TgaFileHeade
     return SAIL_OK;
 }
 
-sail_status_t tga_private_fetch_extension(struct sail_io *io, struct sail_meta_data_node **meta_data_node) {
+sail_status_t tga_private_fetch_extension(struct sail_io *io, double *gamma, struct sail_meta_data_node **meta_data_node) {
 
     /* Find the last node. */
     struct sail_meta_data_node **last_meta_data_node = meta_data_node;
@@ -151,9 +151,11 @@ sail_status_t tga_private_fetch_extension(struct sail_io *io, struct sail_meta_d
     char author[41];
     SAIL_TRY(io->strict_read(io->stream, author, sizeof(author)));
 
-    SAIL_TRY(sail_alloc_meta_data_node(last_meta_data_node));
-    SAIL_TRY(sail_alloc_meta_data_from_known_string(SAIL_META_DATA_AUTHOR, author, &(*last_meta_data_node)->meta_data));
-    last_meta_data_node = &(*last_meta_data_node)->next;
+    if (strlen(author) > 0) {
+        SAIL_TRY(sail_alloc_meta_data_node(last_meta_data_node));
+        SAIL_TRY(sail_alloc_meta_data_from_known_string(SAIL_META_DATA_AUTHOR, author, &(*last_meta_data_node)->meta_data));
+        last_meta_data_node = &(*last_meta_data_node)->next;
+    }
 
     /* Comments. */
     char comments[80*4 + 1];
@@ -162,9 +164,11 @@ sail_status_t tga_private_fetch_extension(struct sail_io *io, struct sail_meta_d
     SAIL_TRY(io->strict_read(io->stream, comments + strlen(comments), 81));
     SAIL_TRY(io->strict_read(io->stream, comments + strlen(comments), 81));
 
-    SAIL_TRY(sail_alloc_meta_data_node(last_meta_data_node));
-    SAIL_TRY(sail_alloc_meta_data_from_known_string(SAIL_META_DATA_COMMENT, comments, &(*last_meta_data_node)->meta_data));
-    last_meta_data_node = &(*last_meta_data_node)->next;
+    if (strlen(comments) > 0) {
+        SAIL_TRY(sail_alloc_meta_data_node(last_meta_data_node));
+        SAIL_TRY(sail_alloc_meta_data_from_known_string(SAIL_META_DATA_COMMENT, comments, &(*last_meta_data_node)->meta_data));
+        last_meta_data_node = &(*last_meta_data_node)->next;
+    }
 
     /* Date/time stamp. YYYY.MM.DD hh:mm:ss. */
     uint16_t month, day, year, hour, minute, second;
@@ -174,12 +178,85 @@ sail_status_t tga_private_fetch_extension(struct sail_io *io, struct sail_meta_d
     SAIL_TRY(io->strict_read(io->stream, &hour,   sizeof(hour)));
     SAIL_TRY(io->strict_read(io->stream, &minute, sizeof(minute)));
     SAIL_TRY(io->strict_read(io->stream, &second, sizeof(second)));
-    char timestamp[20];
-    snprintf(timestamp, sizeof(timestamp), "%04d.%02d.%02d %02d:%02d:%02d", year, month, day, hour, minute, second);
 
-    SAIL_TRY(sail_alloc_meta_data_node(last_meta_data_node));
-    SAIL_TRY(sail_alloc_meta_data_from_known_string(SAIL_META_DATA_CREATION_TIME, timestamp, &(*last_meta_data_node)->meta_data));
-    last_meta_data_node = &(*last_meta_data_node)->next;
+    if (month != 0 || day != 0 || year != 0 || hour != 0 || minute != 0 || second != 0) {
+        char timestamp[20];
+        snprintf(timestamp, sizeof(timestamp), "%04d.%02d.%02d %02d:%02d:%02d", year, month, day, hour, minute, second);
+
+        SAIL_TRY(sail_alloc_meta_data_node(last_meta_data_node));
+        SAIL_TRY(sail_alloc_meta_data_from_known_string(SAIL_META_DATA_CREATION_TIME, timestamp, &(*last_meta_data_node)->meta_data));
+        last_meta_data_node = &(*last_meta_data_node)->next;
+    }
+
+    /* Job Id. */
+    char job[41];
+    SAIL_TRY(io->strict_read(io->stream, job, sizeof(job)));
+
+    if (strlen(job) > 0) {
+        SAIL_TRY(sail_alloc_meta_data_node(last_meta_data_node));
+        SAIL_TRY(sail_alloc_meta_data_from_known_string(SAIL_META_DATA_JOB, job, &(*last_meta_data_node)->meta_data));
+        last_meta_data_node = &(*last_meta_data_node)->next;
+    }
+
+    /* Job Time. */
+    SAIL_TRY(io->strict_read(io->stream, &hour,   sizeof(hour)));
+    SAIL_TRY(io->strict_read(io->stream, &minute, sizeof(minute)));
+    SAIL_TRY(io->strict_read(io->stream, &second, sizeof(second)));
+
+    if (hour != 0 || minute != 0 || second != 0) {
+        char timestamp[20];
+        snprintf(timestamp, sizeof(timestamp), "%05d:%02d:%02d", hour, minute, second);
+
+        SAIL_TRY(sail_alloc_meta_data_node(last_meta_data_node));
+        SAIL_TRY(sail_alloc_meta_data_from_known_string(SAIL_META_DATA_TIME_CONSUMED, timestamp, &(*last_meta_data_node)->meta_data));
+        last_meta_data_node = &(*last_meta_data_node)->next;
+    }
+
+    /* Software. */
+    char software[41];
+    SAIL_TRY(io->strict_read(io->stream, software, sizeof(software)));
+
+    if (strlen(software) > 0) {
+        SAIL_TRY(sail_alloc_meta_data_node(last_meta_data_node));
+        SAIL_TRY(sail_alloc_meta_data_from_known_string(SAIL_META_DATA_SOFTWARE, software, &(*last_meta_data_node)->meta_data));
+        last_meta_data_node = &(*last_meta_data_node)->next;
+    }
+
+    /* Software Version. */
+    uint16_t version;
+    uint8_t version_letter;
+    SAIL_TRY(io->strict_read(io->stream, &version, sizeof(version)));
+    SAIL_TRY(io->strict_read(io->stream, &version_letter, sizeof(version_letter)));
+
+    if (version != 0) {
+        char version_string[10];
+        const double version_divided = version / 100.0;
+
+        if (version_letter == ' ') {
+            snprintf(version_string, sizeof(version_string), "%.2f", version_divided);
+        } else {
+            snprintf(version_string, sizeof(version_string), "%.2f.%c", version_divided, version_letter);
+        }
+
+        SAIL_TRY(sail_alloc_meta_data_node(last_meta_data_node));
+        SAIL_TRY(sail_alloc_meta_data_from_known_string(SAIL_META_DATA_SOFTWARE_VERSION, version_string, &(*last_meta_data_node)->meta_data));
+        last_meta_data_node = &(*last_meta_data_node)->next;
+    }
+
+    /* Key Color. */
+    SAIL_TRY(io->seek(io->stream, 4, SEEK_CUR));
+
+    /* Pixel Aspect Ratio. */
+    SAIL_TRY(io->seek(io->stream, 4, SEEK_CUR));
+
+    /* Gamma. */
+    uint16_t gamma_num, gamma_denom;
+    SAIL_TRY(io->strict_read(io->stream, &gamma_num, sizeof(gamma_num)));
+    SAIL_TRY(io->strict_read(io->stream, &gamma_denom, sizeof(gamma_denom)));
+
+    if (gamma_denom != 0) {
+        *gamma = (double)gamma_num / gamma_denom;
+    }
 
     return SAIL_OK;
 }

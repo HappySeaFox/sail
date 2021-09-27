@@ -185,7 +185,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_tga(void *state, st
         SAIL_TRY_OR_CLEANUP(io->seek(io->stream, (long)tga_state->footer.extension_area_offset, SEEK_SET),
                             /* cleanup */ sail_destroy_image(image_local));
 
-        SAIL_TRY_OR_CLEANUP(tga_private_fetch_extension(io, &image_local->meta_data_node),
+        SAIL_TRY_OR_CLEANUP(tga_private_fetch_extension(io, &image_local->gamma, &image_local->meta_data_node),
                             /* cleanup */ sail_destroy_image(image_local));
 
         SAIL_TRY_OR_CLEANUP(io->seek(io->stream, (long)offset, SEEK_SET),
