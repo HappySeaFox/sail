@@ -105,6 +105,15 @@ struct sail_image {
     enum SailPixelFormat pixel_format;
 
     /*
+     * Image gamma.
+     *
+     * READ:  Set by SAIL to a valid gamma if it's available. 1 by default.
+     * WRITE: Must be set by a caller to a valid gamma. Not all codecs support saving
+     *        gamma.
+     */
+    double gamma;
+
+    /*
      * Number of passes needed to read or write an entire image frame if it's interlaced. 1 by default.
      *
      * This field is used internally by SAIL. DO NOT alter its value.

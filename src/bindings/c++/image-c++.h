@@ -177,6 +177,15 @@ public:
     SailPixelFormat pixel_format() const;
 
     /*
+     * Returns the image gamma.
+     *
+     * READ:  Set by SAIL to a valid gamma if it's available. 1 by default.
+     * WRITE: Must be set by a caller to a valid gamma. Not all codecs support saving
+     *        gamma.
+     */
+    double gamma() const;
+
+    /*
      * Returns the delay in milliseconds to display the image on the screen if the image is a frame
      * in an animation or -1 otherwise.
      *
@@ -285,6 +294,11 @@ public:
      * Sets a new pixel format. See SailPixelFormat.
      */
     image& with_pixel_format(SailPixelFormat pixel_format);
+
+    /*
+     * Sets a new gamma.
+     */
+    image& with_gamma(double gamma);
 
     /*
      * Sets a new delay for an animated frame in a sequence.
