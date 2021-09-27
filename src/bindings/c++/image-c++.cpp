@@ -296,6 +296,13 @@ image& image::with_meta_data(const std::vector<sail::meta_data> &meta_data)
     return *this;
 }
 
+image& image::with_meta_data(const sail::meta_data &meta_data)
+{
+    d->meta_data.push_back(meta_data);
+
+    return *this;
+}
+
 image& image::with_pixels(const void *pixels)
 {
     const unsigned bytes_per_image = height() * bytes_per_line();

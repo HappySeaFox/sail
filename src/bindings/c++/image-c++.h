@@ -302,6 +302,11 @@ public:
     image& with_meta_data(const std::vector<sail::meta_data> &meta_data);
 
     /*
+     * Appends the meta data entry to the image meta data.
+     */
+    image& with_meta_data(const sail::meta_data &meta_data);
+
+    /*
      * Deep copies the specified pixel data. The data can be accessed later with pixels().
      * The size of the pixel data is calculated based on the image height, bytes per line, and the pixel
      * format which must be set beforehand. The deep copied data is deleted upon image destruction.
