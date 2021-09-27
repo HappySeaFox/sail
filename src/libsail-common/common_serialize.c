@@ -345,31 +345,34 @@ enum SailCompression sail_compression_from_string(const char *str) {
 const char* sail_meta_data_to_string(enum SailMetaData meta_data) {
 
     switch (meta_data) {
-        case SAIL_META_DATA_UNKNOWN:       return "Unknown";
+        case SAIL_META_DATA_UNKNOWN:          return "Unknown";
 
-        case SAIL_META_DATA_ARTIST:        return "Artist";
-        case SAIL_META_DATA_AUTHOR:        return "Author";
-        case SAIL_META_DATA_COMMENT:       return "Comment";
-        case SAIL_META_DATA_COMPUTER:      return "Computer";
-        case SAIL_META_DATA_COPYRIGHT:     return "Copyright";
-        case SAIL_META_DATA_CREATION_TIME: return "Creation Time";
-        case SAIL_META_DATA_DESCRIPTION:   return "Description";
-        case SAIL_META_DATA_DISCLAIMER:    return "Disclaimer";
-        case SAIL_META_DATA_DOCUMENT:      return "Document";
-        case SAIL_META_DATA_EXIF:          return "EXIF";
-        case SAIL_META_DATA_ID:            return "ID";
-        case SAIL_META_DATA_IPTC:          return "IPTC";
-        case SAIL_META_DATA_LABEL:         return "Label";
-        case SAIL_META_DATA_MAKE:          return "Make";
-        case SAIL_META_DATA_MODEL:         return "Model";
-        case SAIL_META_DATA_NAME:          return "Name";
-        case SAIL_META_DATA_PRINTER:       return "Printer";
-        case SAIL_META_DATA_SOFTWARE:      return "Software";
-        case SAIL_META_DATA_SOURCE:        return "Source";
-        case SAIL_META_DATA_TITLE:         return "Title";
-        case SAIL_META_DATA_URL:           return "URL";
-        case SAIL_META_DATA_WARNING:       return "Warning";
-        case SAIL_META_DATA_XMP:           return "XMP";
+        case SAIL_META_DATA_ARTIST:           return "Artist";
+        case SAIL_META_DATA_AUTHOR:           return "Author";
+        case SAIL_META_DATA_COMMENT:          return "Comment";
+        case SAIL_META_DATA_COMPUTER:         return "Computer";
+        case SAIL_META_DATA_COPYRIGHT:        return "Copyright";
+        case SAIL_META_DATA_CREATION_TIME:    return "Creation Time";
+        case SAIL_META_DATA_DESCRIPTION:      return "Description";
+        case SAIL_META_DATA_DISCLAIMER:       return "Disclaimer";
+        case SAIL_META_DATA_DOCUMENT:         return "Document";
+        case SAIL_META_DATA_EXIF:             return "EXIF";
+        case SAIL_META_DATA_ID:               return "ID";
+        case SAIL_META_DATA_IPTC:             return "IPTC";
+        case SAIL_META_DATA_JOB:              return "Job";
+        case SAIL_META_DATA_LABEL:            return "Label";
+        case SAIL_META_DATA_MAKE:             return "Make";
+        case SAIL_META_DATA_MODEL:            return "Model";
+        case SAIL_META_DATA_NAME:             return "Name";
+        case SAIL_META_DATA_PRINTER:          return "Printer";
+        case SAIL_META_DATA_SOFTWARE:         return "Software";
+        case SAIL_META_DATA_SOFTWARE_VERSION: return "Software Version";
+        case SAIL_META_DATA_SOURCE:           return "Source";
+        case SAIL_META_DATA_TIME_CONSUMED:    return "Time Consumed";
+        case SAIL_META_DATA_TITLE:            return "Title";
+        case SAIL_META_DATA_URL:              return "URL";
+        case SAIL_META_DATA_WARNING:          return "Warning";
+        case SAIL_META_DATA_XMP:              return "XMP";
     }
 
     return NULL;
@@ -396,13 +399,16 @@ enum SailMetaData sail_meta_data_from_string(const char *str) {
         case UINT64_C(6384018865):           return SAIL_META_DATA_EXIF;
         case UINT64_C(5862386):              return SAIL_META_DATA_ID;
         case UINT64_C(6384154261):           return SAIL_META_DATA_IPTC;
+        case UINT64_C(193461344):            return SAIL_META_DATA_JOB;
         case UINT64_C(210681275781):         return SAIL_META_DATA_LABEL;
         case UINT64_C(6384317315):           return SAIL_META_DATA_MAKE;
         case UINT64_C(210682966998):         return SAIL_META_DATA_MODEL;
         case UINT64_C(6384353318):           return SAIL_META_DATA_NAME;
         case UINT64_C(229437749136105):      return SAIL_META_DATA_PRINTER;
         case UINT64_C(7571569592229392):     return SAIL_META_DATA_SOFTWARE;
+        case UINT64_C(7030316421278646518):  return SAIL_META_DATA_SOFTWARE_VERSION;
         case UINT64_C(6952773348182):        return SAIL_META_DATA_SOURCE;
+        case UINT64_C(7676100867491355186):  return SAIL_META_DATA_TIME_CONSUMED;
         case UINT64_C(210691070471):         return SAIL_META_DATA_TITLE;
         case UINT64_C(193472344):            return SAIL_META_DATA_URL;
         case UINT64_C(229446134771803):      return SAIL_META_DATA_WARNING;
