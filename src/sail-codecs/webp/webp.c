@@ -261,15 +261,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_webp(void *state, s
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_read_seek_next_pass_v6_webp(void *state, struct sail_io *io, const struct sail_image *image) {
-
-    SAIL_CHECK_PTR(state);
-    SAIL_TRY(sail_check_io_valid(io));
-    SAIL_TRY(sail_check_image_skeleton_valid(image));
-
-    return SAIL_OK;
-}
-
 SAIL_EXPORT sail_status_t sail_codec_read_frame_v6_webp(void *state, struct sail_io *io, struct sail_image *image) {
 
     SAIL_CHECK_PTR(state);
@@ -350,15 +341,6 @@ SAIL_EXPORT sail_status_t sail_codec_write_init_v6_webp(struct sail_io *io, cons
 }
 
 SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v6_webp(void *state, struct sail_io *io, const struct sail_image *image) {
-
-    SAIL_CHECK_PTR(state);
-    SAIL_TRY(sail_check_io_valid(io));
-    SAIL_TRY(sail_check_image_valid(image));
-
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
-}
-
-SAIL_EXPORT sail_status_t sail_codec_write_seek_next_pass_v6_webp(void *state, struct sail_io *io, const struct sail_image *image) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));

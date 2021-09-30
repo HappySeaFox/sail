@@ -40,7 +40,6 @@ sail_status_t sail_alloc_write_features(struct sail_write_features **write_featu
     (*write_features)->output_pixel_formats_length = 0;
     (*write_features)->features                    = 0;
     (*write_features)->properties                  = 0;
-    (*write_features)->interlaced_passes           = 0;
     (*write_features)->compressions                = NULL;
     (*write_features)->compressions_length         = 0;
     (*write_features)->default_compression         = SAIL_COMPRESSION_UNSUPPORTED;

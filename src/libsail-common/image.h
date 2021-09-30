@@ -114,16 +114,6 @@ struct sail_image {
     double gamma;
 
     /*
-     * Number of passes needed to read or write an entire image frame if it's interlaced. 1 by default.
-     *
-     * This field is used internally by SAIL. DO NOT alter its value.
-     *
-     * READ:  N/A.
-     * WRITE: N/A.
-     */
-    int interlaced_passes;
-
-    /*
      * Delay in milliseconds to display the image on the screen if the image is a frame
      * in an animation or -1 otherwise.
      *

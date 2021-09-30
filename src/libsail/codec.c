@@ -134,13 +134,11 @@ static sail_status_t load_codec_from_file(const struct sail_codec_info *codec_in
 
     SAIL_RESOLVE(codec->v6->read_init,            handle, sail_codec_read_init_v6,            codec_info->name);
     SAIL_RESOLVE(codec->v6->read_seek_next_frame, handle, sail_codec_read_seek_next_frame_v6, codec_info->name);
-    SAIL_RESOLVE(codec->v6->read_seek_next_pass,  handle, sail_codec_read_seek_next_pass_v6,  codec_info->name);
     SAIL_RESOLVE(codec->v6->read_frame,           handle, sail_codec_read_frame_v6,           codec_info->name);
     SAIL_RESOLVE(codec->v6->read_finish,          handle, sail_codec_read_finish_v6,          codec_info->name);
 
     SAIL_RESOLVE(codec->v6->write_init,            handle, sail_codec_write_init_v6,            codec_info->name);
     SAIL_RESOLVE(codec->v6->write_seek_next_frame, handle, sail_codec_write_seek_next_frame_v6, codec_info->name);
-    SAIL_RESOLVE(codec->v6->write_seek_next_pass,  handle, sail_codec_write_seek_next_pass_v6,  codec_info->name);
     SAIL_RESOLVE(codec->v6->write_frame,           handle, sail_codec_write_frame_v6,           codec_info->name);
     SAIL_RESOLVE(codec->v6->write_finish,          handle, sail_codec_write_finish_v6,          codec_info->name);
 

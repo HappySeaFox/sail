@@ -346,11 +346,6 @@ output-pixel-formats=BPP8-INDEXED;BPP24-RGB;BPP32-BGRA
 #
 properties=
 
-# Number of interlaced passes to use to write interlaced images. Can be empty or 0 if the image
-# codec cannot write interlaced images.
-#
-interlaced-passes=7
-
 # ';'-separated list of compressions the image codec can write. Cannot be empty if the image codec
 # can write images. If the image codec cannot select compressions, specify UNSUPPORTED.
 #

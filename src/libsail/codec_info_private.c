@@ -200,8 +200,6 @@ static sail_status_t inih_handler_sail_error(void *data, const char *section, co
         } else if (strcmp(name, "properties") == 0) {
             SAIL_TRY_OR_CLEANUP(parse_flags(value, &codec_info->write_features->properties, image_property_from_string),
                                 /* cleanup */ SAIL_LOG_ERROR("Failed to parse image properties: '%s'", value));
-        } else if (strcmp(name, "interlaced-passes") == 0) {
-            codec_info->write_features->interlaced_passes = atoi(value);
         } else if (strcmp(name, "compression-types") == 0) {
             SAIL_TRY_OR_CLEANUP(parse_serialized_ints(value,
                                                         (int **)&codec_info->write_features->compressions,

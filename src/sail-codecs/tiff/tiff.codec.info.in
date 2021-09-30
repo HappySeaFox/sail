@@ -16,7 +16,6 @@ features=STATIC;MULTI-PAGED;META-DATA;ICCP
 features=STATIC;MULTI-PAGED;META-DATA;ICCP
 output-pixel-formats=BPP32-RGBA
 properties=
-interlaced-passes=1
 compression-types=@SAIL_TIFF_CODEC_INFO_COMPRESSIONS@
 default-compression=@SAIL_TIFF_CODEC_INFO_DEFAULT_COMPRESSION@
 compression-level-min=0

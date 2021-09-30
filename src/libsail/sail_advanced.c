@@ -114,30 +114,13 @@ sail_status_t sail_read_next_frame(void *state, struct sail_image **image) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_CONFLICTING_OPERATION);
     }
 
-    /* Detect the number of passes needed to write an interlaced image. */
-    int interlaced_passes;
-    if (image_local->source_image->properties & SAIL_IMAGE_PROPERTY_INTERLACED) {
-        interlaced_passes = image_local->interlaced_passes;
-
-        if (interlaced_passes < 1) {
-            sail_destroy_image(image_local);
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_INTERLACING_UNSUPPORTED);
-        }
-    } else {
-        interlaced_passes = 1;
-    }
-
     /* Allocate pixels. */
     const size_t pixels_size = (size_t)image_local->height * image_local->bytes_per_line;
     SAIL_TRY_OR_CLEANUP(sail_malloc(pixels_size, &image_local->pixels),
                         /* cleanup */ sail_destroy_image(image_local));
 
-    for (int pass = 0; pass < interlaced_passes; pass++) {
-        SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v6->read_seek_next_pass(state_of_mind->state, state_of_mind->io, image_local),
-                            /* cleanup */ sail_destroy_image(image_local));
-        SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v6->read_frame(state_of_mind->state, state_of_mind->io, image_local),
-                            /* cleanup */ sail_destroy_image(image_local));
-    }
+    SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v6->read_frame(state_of_mind->state, state_of_mind->io, image_local),
+                        /* cleanup */ sail_destroy_image(image_local));
 
     *image = image_local;
 
@@ -197,30 +180,11 @@ sail_status_t sail_write_next_frame(void *state, const struct sail_image *image)
     SAIL_TRY(allowed_write_output_pixel_format(state_of_mind->codec_info->write_features,
                                                 image->pixel_format));
 
-    /* Detect the number of passes needed to write an interlaced image. */
-    int interlaced_passes;
-    if (state_of_mind->write_options->io_options & SAIL_IO_OPTION_INTERLACED) {
-        interlaced_passes = state_of_mind->codec_info->write_features->interlaced_passes;
-
-        if (interlaced_passes < 1) {
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_INTERLACING_UNSUPPORTED);
-        }
-    } else {
-        interlaced_passes = 1;
-    }
-
     unsigned bytes_per_line;
     SAIL_TRY(sail_bytes_per_line(image->width, image->pixel_format, &bytes_per_line));
 
     SAIL_TRY(state_of_mind->codec->v6->write_seek_next_frame(state_of_mind->state, state_of_mind->io, image));
-
-    for (int pass = 0; pass < interlaced_passes; pass++) {
-        SAIL_TRY(state_of_mind->codec->v6->write_seek_next_pass(state_of_mind->state, state_of_mind->io, image));
-
-        SAIL_TRY(state_of_mind->codec->v6->write_frame(state_of_mind->state,
-                                                        state_of_mind->io,
-                                                        image));
-    }
+    SAIL_TRY(state_of_mind->codec->v6->write_frame(state_of_mind->state, state_of_mind->io, image));
 
     return SAIL_OK;
 }

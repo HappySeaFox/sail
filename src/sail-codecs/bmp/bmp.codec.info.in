@@ -16,7 +16,6 @@ features=STATIC;META-DATA
 features=
 output-pixel-formats=
 properties=
-interlaced-passes=
 compression-types=
 default-compression=
 compression-level-min=0

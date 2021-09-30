@@ -40,13 +40,11 @@
 struct sail_codec_layout_v6 {
     sail_codec_read_init_v6_t            read_init;
     sail_codec_read_seek_next_frame_v6_t read_seek_next_frame;
-    sail_codec_read_seek_next_pass_v6_t  read_seek_next_pass;
     sail_codec_read_frame_v6_t           read_frame;
     sail_codec_read_finish_v6_t          read_finish;
 
     sail_codec_write_init_v6_t            write_init;
     sail_codec_write_seek_next_frame_v6_t write_seek_next_frame;
-    sail_codec_write_seek_next_pass_v6_t  write_seek_next_pass;
     sail_codec_write_frame_v6_t           write_frame;
     sail_codec_write_finish_v6_t          write_finish;
 };
