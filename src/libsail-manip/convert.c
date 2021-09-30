@@ -732,7 +732,7 @@ sail_status_t sail_convert_image_with_options(const struct sail_image *image,
     SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(image_local->width, image_local->pixel_format, &image_local->bytes_per_line),
                         /* cleanup */ sail_destroy_image(image_local));
 
-    const unsigned pixels_size = image_local->height * image_local->bytes_per_line;
+    const size_t pixels_size = (size_t)image_local->height * image_local->bytes_per_line;
     SAIL_TRY_OR_CLEANUP(sail_malloc(pixels_size, &image_local->pixels),
                         /* cleanup */ sail_destroy_image(image_local));
 
