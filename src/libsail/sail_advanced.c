@@ -47,17 +47,17 @@ sail_status_t sail_probe_io(struct sail_io *io, struct sail_image **image, const
     SAIL_TRY(sail_alloc_read_options_from_features((*codec_info_local)->read_features, &read_options_local));
 
     void *state = NULL;
-    SAIL_TRY_OR_CLEANUP(codec->v5->read_init(io, read_options_local, &state),
-                        /* cleanup */ codec->v5->read_finish(&state, io),
+    SAIL_TRY_OR_CLEANUP(codec->v6->read_init(io, read_options_local, &state),
+                        /* cleanup */ codec->v6->read_finish(&state, io),
                                       sail_destroy_read_options(read_options_local));
 
     sail_destroy_read_options(read_options_local);
 
     struct sail_image *image_local;
 
-    SAIL_TRY_OR_CLEANUP(codec->v5->read_seek_next_frame(state, io, &image_local),
-                        /* cleanup */ codec->v5->read_finish(&state, io));
-    SAIL_TRY_OR_CLEANUP(codec->v5->read_finish(&state, io),
+    SAIL_TRY_OR_CLEANUP(codec->v6->read_seek_next_frame(state, io, &image_local),
+                        /* cleanup */ codec->v6->read_finish(&state, io));
+    SAIL_TRY_OR_CLEANUP(codec->v6->read_finish(&state, io),
                         /* ceanup */ sail_destroy_image(image_local));
 
     *image = image_local;
@@ -106,7 +106,7 @@ sail_status_t sail_read_next_frame(void *state, struct sail_image **image) {
     SAIL_CHECK_PTR(state_of_mind->codec);
 
     struct sail_image *image_local;
-    SAIL_TRY(state_of_mind->codec->v5->read_seek_next_frame(state_of_mind->state, state_of_mind->io, &image_local));
+    SAIL_TRY(state_of_mind->codec->v6->read_seek_next_frame(state_of_mind->state, state_of_mind->io, &image_local));
 
     if (image_local->pixels != NULL) {
         SAIL_LOG_ERROR("Internal error in %s codec: codecs must not allocate pixels", state_of_mind->codec_info->name);
@@ -133,9 +133,9 @@ sail_status_t sail_read_next_frame(void *state, struct sail_image **image) {
                         /* cleanup */ sail_destroy_image(image_local));
 
     for (int pass = 0; pass < interlaced_passes; pass++) {
-        SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v5->read_seek_next_pass(state_of_mind->state, state_of_mind->io, image_local),
+        SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v6->read_seek_next_pass(state_of_mind->state, state_of_mind->io, image_local),
                             /* cleanup */ sail_destroy_image(image_local));
-        SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v5->read_frame(state_of_mind->state, state_of_mind->io, image_local),
+        SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v6->read_frame(state_of_mind->state, state_of_mind->io, image_local),
                             /* cleanup */ sail_destroy_image(image_local));
     }
 
@@ -159,7 +159,7 @@ sail_status_t sail_stop_reading(void *state) {
         return SAIL_OK;
     }
 
-    SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v5->read_finish(&state_of_mind->state, state_of_mind->io),
+    SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v6->read_finish(&state_of_mind->state, state_of_mind->io),
                         /* cleanup */ destroy_hidden_state(state_of_mind));
 
     destroy_hidden_state(state_of_mind);
@@ -212,12 +212,12 @@ sail_status_t sail_write_next_frame(void *state, const struct sail_image *image)
     unsigned bytes_per_line;
     SAIL_TRY(sail_bytes_per_line(image->width, image->pixel_format, &bytes_per_line));
 
-    SAIL_TRY(state_of_mind->codec->v5->write_seek_next_frame(state_of_mind->state, state_of_mind->io, image));
+    SAIL_TRY(state_of_mind->codec->v6->write_seek_next_frame(state_of_mind->state, state_of_mind->io, image));
 
     for (int pass = 0; pass < interlaced_passes; pass++) {
-        SAIL_TRY(state_of_mind->codec->v5->write_seek_next_pass(state_of_mind->state, state_of_mind->io, image));
+        SAIL_TRY(state_of_mind->codec->v6->write_seek_next_pass(state_of_mind->state, state_of_mind->io, image));
 
-        SAIL_TRY(state_of_mind->codec->v5->write_frame(state_of_mind->state,
+        SAIL_TRY(state_of_mind->codec->v6->write_frame(state_of_mind->state,
                                                         state_of_mind->io,
                                                         image));
     }

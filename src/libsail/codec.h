@@ -30,16 +30,16 @@
     #include "error.h"
     #include "export.h"
 
-    #include "layout/v5_pointers.h"
+    #include "layout/v6_pointers.h"
 #else
     #include <sail-common/error.h>
     #include <sail-common/export.h>
 
-    #include <sail/layout/v5_pointers.h>
+    #include <sail/layout/v6_pointers.h>
 #endif
 
 struct sail_codec_info;
-struct sail_codec_layout_v5;
+struct sail_codec_layout_v6;
 
 struct sail_read_features;
 struct sail_read_options;
@@ -60,7 +60,7 @@ struct sail_codec {
     void *handle;
 
     /* Codec interface. */
-    struct sail_codec_layout_v5 *v5;
+    struct sail_codec_layout_v6 *v6;
 };
 
 typedef struct sail_codec sail_codec_t;

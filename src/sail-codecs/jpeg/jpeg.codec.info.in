@@ -1,7 +1,7 @@
 # JPEG codec information
 #
 [codec]
-layout=5
+layout=6
 version=1.3.4.1
 name=JPEG
 description=Joint Photographic Experts Group
