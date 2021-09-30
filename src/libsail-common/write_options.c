@@ -64,10 +64,6 @@ sail_status_t sail_write_options_from_features(const struct sail_write_features 
         write_options->io_options |= SAIL_IO_OPTION_META_DATA;
     }
 
-    if (write_features->features & SAIL_CODEC_FEATURE_INTERLACED) {
-        write_options->io_options |= SAIL_IO_OPTION_INTERLACED;
-    }
-
     if (write_features->features & SAIL_CODEC_FEATURE_ICCP) {
         write_options->io_options |= SAIL_IO_OPTION_ICCP;
     }
