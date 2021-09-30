@@ -85,7 +85,7 @@ static MunitResult test_options_from_features(const MunitParameter params[], voi
     write_features.features = SAIL_CODEC_FEATURE_META_DATA | SAIL_CODEC_FEATURE_INTERLACED | SAIL_CODEC_FEATURE_ICCP;
     munit_assert(sail_write_options_from_features(&write_features, write_options) == SAIL_OK);
 
-    munit_assert(write_options->io_options == (SAIL_IO_OPTION_META_DATA | SAIL_IO_OPTION_INTERLACED | SAIL_IO_OPTION_ICCP));
+    munit_assert(write_options->io_options == (SAIL_IO_OPTION_META_DATA | SAIL_IO_OPTION_ICCP));
     munit_assert(write_options->compression ==  write_features.default_compression);
     munit_assert(write_options->compression_level ==  write_features.compression_level_default);
 
