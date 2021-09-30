@@ -118,6 +118,7 @@ image& image::operator=(const sail::image &image)
         .with_bytes_per_line(image.bytes_per_line())
         .with_resolution(image.resolution())
         .with_pixel_format(image.pixel_format())
+        .with_gamma(image.gamma())
         .with_delay(image.delay())
         .with_palette(image.palette())
         .with_meta_data(image.meta_data())
@@ -193,6 +194,11 @@ const sail::resolution& image::resolution() const
 SailPixelFormat image::pixel_format() const
 {
     return d->sail_image->pixel_format;
+}
+
+double image::gamma() const
+{
+    return d->sail_image->gamma;
 }
 
 int image::delay() const
@@ -275,6 +281,12 @@ image& image::with_resolution(const sail::resolution &resolution)
 image& image::with_pixel_format(SailPixelFormat pixel_format)
 {
     d->sail_image->pixel_format = pixel_format;
+    return *this;
+}
+
+image& image::with_gamma(double gamma)
+{
+    d->sail_image->gamma = gamma;
     return *this;
 }
 
@@ -706,6 +718,7 @@ image::image(const sail_image *sail_image)
         .with_bytes_per_line(sail_image->bytes_per_line)
         .with_resolution(sail::resolution(sail_image->resolution))
         .with_pixel_format(sail_image->pixel_format)
+        .with_gamma(sail_image->gamma)
         .with_delay(sail_image->delay)
         .with_palette(sail::palette(sail_image->palette))
         .with_meta_data(meta_data)

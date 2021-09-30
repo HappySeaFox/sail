@@ -186,17 +186,20 @@ enum SailChromaSubsampling {
 enum SailImageProperty {
 
     /* Unknown image property used to indicate an error in parsing functions. */
-    SAIL_IMAGE_PROPERTY_UNKNOWN            = 1 << 0,
+    SAIL_IMAGE_PROPERTY_UNKNOWN              = 1 << 0,
 
-    /* Image needs flipping vertically. */
-    SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY = 1 << 1,
+    /* Image is flipped vertically. */
+    SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY   = 1 << 1,
+
+    /* Image is flipped vertically. */
+    SAIL_IMAGE_PROPERTY_FLIPPED_HORIZONTALLY = 1 << 2,
 
     /*
      * Image is interlaced. Only sail_image.source_properties can have this property.
      * Reading operations never output interlaced images, that's why sail_image.properties
      * never has it.
      */
-    SAIL_IMAGE_PROPERTY_INTERLACED         = 1 << 2,
+    SAIL_IMAGE_PROPERTY_INTERLACED           = 1 << 3,
 };
 
 /* Pixels compression types. */
@@ -264,14 +267,18 @@ enum SailMetaData {
     SAIL_META_DATA_DISCLAIMER,
     SAIL_META_DATA_DOCUMENT,
     SAIL_META_DATA_EXIF, /* This one may or may not start with "Exif\0\0". */
+    SAIL_META_DATA_ID,
     SAIL_META_DATA_IPTC,
+    SAIL_META_DATA_JOB,
     SAIL_META_DATA_LABEL,
     SAIL_META_DATA_MAKE,
     SAIL_META_DATA_MODEL,
     SAIL_META_DATA_NAME,
     SAIL_META_DATA_PRINTER,
     SAIL_META_DATA_SOFTWARE,
+    SAIL_META_DATA_SOFTWARE_VERSION,
     SAIL_META_DATA_SOURCE,
+    SAIL_META_DATA_TIME_CONSUMED,
     SAIL_META_DATA_TITLE,
     SAIL_META_DATA_URL,
     SAIL_META_DATA_WARNING,

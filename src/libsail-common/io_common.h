@@ -27,8 +27,9 @@
 #define SAIL_IO_COMMON_H
 
 #include <stdbool.h>
-#include <stddef.h>
+#include <stddef.h> /* size_t */
 #include <stdint.h>
+#include <stdio.h>  /* SEEK_CUR */
 
 #ifdef SAIL_BUILD
     #include "error.h"

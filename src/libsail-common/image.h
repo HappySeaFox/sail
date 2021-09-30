@@ -105,6 +105,15 @@ struct sail_image {
     enum SailPixelFormat pixel_format;
 
     /*
+     * Image gamma.
+     *
+     * READ:  Set by SAIL to a valid gamma if it's available. 1 by default.
+     * WRITE: Must be set by a caller to a valid gamma. Not all codecs support saving
+     *        gamma.
+     */
+    double gamma;
+
+    /*
      * Number of passes needed to read or write an entire image frame if it's interlaced. 1 by default.
      *
      * This field is used internally by SAIL. DO NOT alter its value.
@@ -222,6 +231,20 @@ SAIL_EXPORT sail_status_t sail_check_image_skeleton_valid(const struct sail_imag
  * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_check_image_valid(const struct sail_image *image);
+
+/*
+ * Flips the image vertically.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_flip_vertically(struct sail_image *image);
+
+/*
+ * Flips the image horizontally.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_flip_horizontally(struct sail_image *image);
 
 /* extern "C" */
 #ifdef __cplusplus

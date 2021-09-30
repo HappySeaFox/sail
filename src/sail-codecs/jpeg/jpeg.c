@@ -358,10 +358,11 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v5_jpeg(void *state, 
     }
 
     /* Initialize compression. */
-    jpeg_state->compress_context->image_width = image->width;
-    jpeg_state->compress_context->image_height = image->height;
+    jpeg_state->compress_context->image_width      = image->width;
+    jpeg_state->compress_context->image_height     = image->height;
     jpeg_state->compress_context->input_components = bits_per_pixel / 8;
-    jpeg_state->compress_context->in_color_space = color_space;
+    jpeg_state->compress_context->in_color_space   = color_space;
+    jpeg_state->compress_context->input_gamma      = image->gamma;
 
     jpeg_set_defaults(jpeg_state->compress_context);
     jpeg_set_colorspace(jpeg_state->compress_context, color_space);
