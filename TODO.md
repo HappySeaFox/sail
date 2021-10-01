@@ -1,7 +1,5 @@
 ## Priority 1
 
-- gamma in sail_image
-
 - background color in sail_image
 
 ## Priority 2
