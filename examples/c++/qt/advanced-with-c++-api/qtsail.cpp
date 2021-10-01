@@ -88,7 +88,6 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
         //
         sail::conversion_options options;
         options.with_options(SAIL_CONVERSION_OPTION_BLEND_ALPHA)
-                .with_background(sail_rgb48_t{ 0, 255 * 257, 0 })
                 .with_background(sail_rgb24_t{ 0, 255, 0 });
 
         SAIL_TRY(image.convert(SAIL_PIXEL_FORMAT_BPP24_RGB, options));

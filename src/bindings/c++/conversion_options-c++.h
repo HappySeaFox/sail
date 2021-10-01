@@ -101,11 +101,13 @@ public:
 
     /*
      * Sets a new 48-bit background color to blend 48-bit images.
+     * Additionally, calculates and sets a new 24-bit background color to blend 24-bit images.
      */
     conversion_options& with_background(const sail_rgb48_t &rgb48);
 
     /*
      * Sets a new 24-bit background color to blend 24-bit images.
+     * Additionally, calculates and sets a new 48-bit background color to blend 48-bit images.
      */
     conversion_options& with_background(const sail_rgb24_t &rgb24);
 

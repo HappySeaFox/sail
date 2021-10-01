@@ -23,6 +23,8 @@
     SOFTWARE.
 */
 
+#include <cstdint>
+
 #include "sail-c++.h"
 #include "sail-manip.h"
 
@@ -109,12 +111,26 @@ conversion_options& conversion_options::with_options(int options)
 conversion_options& conversion_options::with_background(const sail_rgb48_t &rgb48)
 {
     d->conversion_options->background48 = rgb48;
+
+    d->conversion_options->background24 = {
+        static_cast<std::uint8_t>(rgb48.component1 / 257),
+        static_cast<std::uint8_t>(rgb48.component2 / 257),
+        static_cast<std::uint8_t>(rgb48.component3 / 257)
+    };
+
     return *this;
 }
 
 conversion_options& conversion_options::with_background(const sail_rgb24_t &rgb24)
 {
     d->conversion_options->background24 = rgb24;
+
+    d->conversion_options->background48 = {
+        static_cast<std::uint16_t>(rgb24.component1 * 257),
+        static_cast<std::uint16_t>(rgb24.component2 * 257),
+        static_cast<std::uint16_t>(rgb24.component3 * 257)
+    };
+
     return *this;
 }
 
