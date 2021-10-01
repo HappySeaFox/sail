@@ -123,7 +123,7 @@ write_options::write_options(const sail_write_options *wo)
     : write_options()
 {
     if (wo == nullptr) {
-        SAIL_LOG_DEBUG("NULL pointer has been passed to sail::write_options(). The object is untouched");
+        SAIL_LOG_TRACE("NULL pointer has been passed to sail::write_options(). The object is untouched");
         return;
     }
 

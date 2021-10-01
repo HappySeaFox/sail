@@ -124,7 +124,7 @@ resolution::resolution(const sail_resolution *res)
     : resolution()
 {
     if (res == nullptr) {
-        SAIL_LOG_DEBUG("NULL pointer has been passed to sail::resolution(). The object is untouched");
+        SAIL_LOG_TRACE("NULL pointer has been passed to sail::resolution(). The object is untouched");
         return;
     }
 

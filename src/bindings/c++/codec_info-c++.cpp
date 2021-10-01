@@ -231,7 +231,7 @@ codec_info::codec_info(const sail_codec_info *ci)
     : codec_info()
 {
     if (ci == nullptr) {
-        SAIL_LOG_DEBUG("NULL pointer has been passed to sail::codec_info(). The object is untouched");
+        SAIL_LOG_TRACE("NULL pointer has been passed to sail::codec_info(). The object is untouched");
         return;
     }
 

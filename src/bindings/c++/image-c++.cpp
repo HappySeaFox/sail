@@ -703,7 +703,7 @@ image::image(const sail_image *sail_image)
     : image()
 {
     if (sail_image == nullptr) {
-        SAIL_LOG_DEBUG("NULL pointer has been passed to sail::image(). The object is untouched");
+        SAIL_LOG_TRACE("NULL pointer has been passed to sail::image(). The object is untouched");
         return;
     }
 

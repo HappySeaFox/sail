@@ -102,7 +102,7 @@ read_features::read_features(const sail_read_features *rf)
     : read_features()
 {
     if (rf == nullptr) {
-        SAIL_LOG_DEBUG("NULL pointer has been passed to sail::read_features(). The object is untouched");
+        SAIL_LOG_TRACE("NULL pointer has been passed to sail::read_features(). The object is untouched");
         return;
     }
 

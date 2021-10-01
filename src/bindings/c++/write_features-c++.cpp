@@ -147,7 +147,7 @@ write_features::write_features(const sail_write_features *wf)
     : write_features()
 {
     if (wf == nullptr) {
-        SAIL_LOG_DEBUG("NULL pointer has been passed to sail::write_features(). The object is untouched");
+        SAIL_LOG_TRACE("NULL pointer has been passed to sail::write_features(). The object is untouched");
         return;
     }
 

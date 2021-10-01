@@ -117,7 +117,7 @@ source_image::source_image(const sail_source_image *si)
     : source_image()
 {
     if (si == nullptr) {
-        SAIL_LOG_DEBUG("NULL pointer has been passed to sail::source_image(). The object is untouched");
+        SAIL_LOG_TRACE("NULL pointer has been passed to sail::source_image(). The object is untouched");
         return;
     }
 
