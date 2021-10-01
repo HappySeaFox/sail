@@ -86,7 +86,7 @@ static void destroy_tiff_state(struct tiff_state *tiff_state) {
  * Decoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_read_init_v5_tiff(struct sail_io *io, const struct sail_read_options *read_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_read_init_v6_tiff(struct sail_io *io, const struct sail_read_options *read_options, void **state) {
 
     SAIL_CHECK_PTR(state);
     *state = NULL;
@@ -131,7 +131,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v5_tiff(struct sail_io *io, const
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_tiff(void *state, struct sail_io *io, struct sail_image **image) {
+SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_tiff(void *state, struct sail_io *io, struct sail_image **image) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
@@ -210,16 +210,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v5_tiff(void *state, s
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_read_seek_next_pass_v5_tiff(void *state, struct sail_io *io, const struct sail_image *image) {
-
-    SAIL_CHECK_PTR(state);
-    SAIL_TRY(sail_check_io_valid(io));
-    SAIL_TRY(sail_check_image_skeleton_valid(image));
-
-    return SAIL_OK;
-}
-
-SAIL_EXPORT sail_status_t sail_codec_read_frame_v5_tiff(void *state, struct sail_io *io, struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_read_frame_v6_tiff(void *state, struct sail_io *io, struct sail_image *image) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
@@ -240,7 +231,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v5_tiff(void *state, struct sail
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_read_finish_v5_tiff(void **state, struct sail_io *io) {
+SAIL_EXPORT sail_status_t sail_codec_read_finish_v6_tiff(void **state, struct sail_io *io) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
@@ -263,7 +254,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_finish_v5_tiff(void **state, struct sa
  * Encoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_write_init_v5_tiff(struct sail_io *io, const struct sail_write_options *write_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_write_init_v6_tiff(struct sail_io *io, const struct sail_write_options *write_options, void **state) {
 
     SAIL_CHECK_PTR(state);
     *state = NULL;
@@ -311,7 +302,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_init_v5_tiff(struct sail_io *io, cons
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v5_tiff(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v6_tiff(void *state, struct sail_io *io, const struct sail_image *image) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
@@ -353,16 +344,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v5_tiff(void *state, 
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_write_seek_next_pass_v5_tiff(void *state, struct sail_io *io, const struct sail_image *image) {
-
-    SAIL_CHECK_PTR(state);
-    SAIL_TRY(sail_check_io_valid(io));
-    SAIL_TRY(sail_check_image_valid(image));
-
-    return SAIL_OK;
-}
-
-SAIL_EXPORT sail_status_t sail_codec_write_frame_v5_tiff(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_write_frame_v6_tiff(void *state, struct sail_io *io, const struct sail_image *image) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
@@ -387,7 +369,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_frame_v5_tiff(void *state, struct sai
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_write_finish_v5_tiff(void **state, struct sail_io *io) {
+SAIL_EXPORT sail_status_t sail_codec_write_finish_v6_tiff(void **state, struct sail_io *io) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));

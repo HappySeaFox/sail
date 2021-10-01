@@ -1,7 +1,7 @@
 # JPEG codec information
 #
 [codec]
-layout=5
+layout=6
 version=1.3.4.1
 name=JPEG
 description=Joint Photographic Experts Group
@@ -16,7 +16,6 @@ features=STATIC;META-DATA@CODEC_INFO_FEATURE_ICCP@
 features=STATIC;META-DATA@CODEC_INFO_FEATURE_ICCP@
 output-pixel-formats=BPP8-GRAYSCALE;@SAIL_JPEG_CODEC_INFO_WRITE_EXT@BPP24-YCBCR;BPP32-CMYK;BPP32-YCCK
 properties=
-interlaced-passes=0
 compression-types=JPEG
 default-compression=JPEG
 compression-level-min=0

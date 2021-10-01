@@ -1,7 +1,7 @@
 # TGA codec information
 #
 [codec]
-layout=5
+layout=6
 version=0.7.2
 name=TGA
 description=Truevision TGA
@@ -16,7 +16,6 @@ features=STATIC;META-DATA
 features=
 output-pixel-formats=
 properties=
-interlaced-passes=0
 compression-types=
 default-compression=
 compression-level-min=0

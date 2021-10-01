@@ -44,7 +44,6 @@ sail_status_t sail_alloc_image(struct sail_image **image) {
     (*image)->resolution              = NULL;
     (*image)->pixel_format            = SAIL_PIXEL_FORMAT_UNKNOWN;
     (*image)->gamma                   = 1;
-    (*image)->interlaced_passes       = 1;
     (*image)->delay                   = -1;
     (*image)->palette                 = NULL;
     (*image)->meta_data_node          = NULL;
@@ -120,10 +119,9 @@ sail_status_t sail_copy_image_skeleton(const struct sail_image *source, struct s
 
     }
 
-    image_local->pixel_format      = source->pixel_format;
-    image_local->gamma             = source->gamma;
-    image_local->interlaced_passes = source->interlaced_passes;
-    image_local->delay             = source->delay;
+    image_local->pixel_format = source->pixel_format;
+    image_local->gamma        = source->gamma;
+    image_local->delay        = source->delay;
 
     SAIL_TRY_OR_CLEANUP(sail_copy_meta_data_node_chain(source->meta_data_node, &image_local->meta_data_node),
                         /* cleanup */ sail_destroy_image(image_local));

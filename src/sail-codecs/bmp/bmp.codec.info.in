@@ -1,7 +1,7 @@
 # BMP codec information
 #
 [codec]
-layout=5
+layout=6
 version=1.1.2
 name=BMP
 description=Bitmap Picture
@@ -16,7 +16,6 @@ features=STATIC;META-DATA
 features=
 output-pixel-formats=
 properties=
-interlaced-passes=
 compression-types=
 default-compression=
 compression-level-min=0

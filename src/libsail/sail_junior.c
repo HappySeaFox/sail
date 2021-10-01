@@ -72,8 +72,8 @@ sail_status_t sail_probe_file(const char *path, struct sail_image **image, const
                         /* cleanup */ sail_destroy_read_options(read_options_local));
 
     void *state = NULL;
-    SAIL_TRY_OR_CLEANUP(codec->v5->read_init(io, read_options_local, &state),
-                        /* cleanup */ codec->v5->read_finish(&state, io),
+    SAIL_TRY_OR_CLEANUP(codec->v6->read_init(io, read_options_local, &state),
+                        /* cleanup */ codec->v6->read_finish(&state, io),
                                       sail_destroy_io(io),
                                       sail_destroy_read_options(read_options_local));
 
@@ -81,11 +81,11 @@ sail_status_t sail_probe_file(const char *path, struct sail_image **image, const
 
     struct sail_image *image_local;
 
-    SAIL_TRY_OR_CLEANUP(codec->v5->read_seek_next_frame(state, io, &image_local),
-                        /* cleanup */ codec->v5->read_finish(&state, io),
+    SAIL_TRY_OR_CLEANUP(codec->v6->read_seek_next_frame(state, io, &image_local),
+                        /* cleanup */ codec->v6->read_finish(&state, io),
                                       sail_destroy_io(io));
 
-    SAIL_TRY_OR_CLEANUP(codec->v5->read_finish(&state, io),
+    SAIL_TRY_OR_CLEANUP(codec->v6->read_finish(&state, io),
                         /* cleanup */ sail_destroy_image(image_local),
                                       sail_destroy_io(io));
 

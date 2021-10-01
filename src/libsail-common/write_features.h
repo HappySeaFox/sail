@@ -62,9 +62,6 @@ struct sail_write_features {
      */
     int properties;
 
-    /* Number of passes to write an interlaced image or 0. */
-    int interlaced_passes;
-
     /*
      * A list of supported pixels compression types by this codec. If the list has more than
      * two entries, compression levels are ignored.

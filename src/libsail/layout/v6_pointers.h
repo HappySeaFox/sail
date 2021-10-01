@@ -36,20 +36,18 @@
  * Decoding functions.
  */
 
-typedef sail_status_t (*sail_codec_read_init_v5_t)(struct sail_io *io, const struct sail_read_options *read_options, void **state);
-typedef sail_status_t (*sail_codec_read_seek_next_frame_v5_t)(void *state, struct sail_io *io, struct sail_image **image);
-typedef sail_status_t (*sail_codec_read_seek_next_pass_v5_t)(void *state, struct sail_io *io, const struct sail_image *image);
-typedef sail_status_t (*sail_codec_read_frame_v5_t)(void *state, struct sail_io *io, struct sail_image *image);
-typedef sail_status_t (*sail_codec_read_finish_v5_t)(void **state, struct sail_io *io);
+typedef sail_status_t (*sail_codec_read_init_v6_t)(struct sail_io *io, const struct sail_read_options *read_options, void **state);
+typedef sail_status_t (*sail_codec_read_seek_next_frame_v6_t)(void *state, struct sail_io *io, struct sail_image **image);
+typedef sail_status_t (*sail_codec_read_frame_v6_t)(void *state, struct sail_io *io, struct sail_image *image);
+typedef sail_status_t (*sail_codec_read_finish_v6_t)(void **state, struct sail_io *io);
 
 /*
  * Encoding functions.
  */
 
-typedef sail_status_t (*sail_codec_write_init_v5_t)(struct sail_io *io, const struct sail_write_options *write_options, void **state);
-typedef sail_status_t (*sail_codec_write_seek_next_frame_v5_t)(void *state, struct sail_io *io, const struct sail_image *image);
-typedef sail_status_t (*sail_codec_write_seek_next_pass_v5_t)(void *state, struct sail_io *io, const struct sail_image *image);
-typedef sail_status_t (*sail_codec_write_frame_v5_t)(void *state, struct sail_io *io, const struct sail_image *image);
-typedef sail_status_t (*sail_codec_write_finish_v5_t)(void **state, struct sail_io *io);
+typedef sail_status_t (*sail_codec_write_init_v6_t)(struct sail_io *io, const struct sail_write_options *write_options, void **state);
+typedef sail_status_t (*sail_codec_write_seek_next_frame_v6_t)(void *state, struct sail_io *io, const struct sail_image *image);
+typedef sail_status_t (*sail_codec_write_frame_v6_t)(void *state, struct sail_io *io, const struct sail_image *image);
+typedef sail_status_t (*sail_codec_write_finish_v6_t)(void **state, struct sail_io *io);
 
 #endif

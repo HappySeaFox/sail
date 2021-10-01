@@ -15,24 +15,22 @@ foreach(codec ${ENABLED_CODECS})
 
     set(SAIL_ENABLED_CODECS_DECLARE_FUNCTIONS "${SAIL_ENABLED_CODECS_DECLARE_FUNCTIONS}
 #define SAIL_CODEC_NAME ${codec}
-#include \"layout/v5.h\"
+#include \"layout/v6.h\"
 #undef SAIL_CODEC_NAME
 ")
 
     set(SAIL_ENABLED_CODECS_LAYOUTS "${SAIL_ENABLED_CODECS_LAYOUTS}
     {
         #define SAIL_CODEC_NAME ${codec}
-        .read_init            = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_read_init_v5),
-        .read_seek_next_frame = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_read_seek_next_frame_v5),
-        .read_seek_next_pass  = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_read_seek_next_pass_v5),
-        .read_frame           = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_read_frame_v5),
-        .read_finish          = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_read_finish_v5),
+        .read_init            = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_read_init_v6),
+        .read_seek_next_frame = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_read_seek_next_frame_v6),
+        .read_frame           = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_read_frame_v6),
+        .read_finish          = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_read_finish_v6),
 
-        .write_init            = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_write_init_v5),
-        .write_seek_next_frame = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_write_seek_next_frame_v5),
-        .write_seek_next_pass  = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_write_seek_next_pass_v5),
-        .write_frame           = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_write_frame_v5),
-        .write_finish          = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_write_finish_v5)
+        .write_init            = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_write_init_v6),
+        .write_seek_next_frame = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_write_seek_next_frame_v6),
+        .write_frame           = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_write_frame_v6),
+        .write_finish          = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_write_finish_v6)
         #undef SAIL_CODEC_NAME
     },\n")
 endforeach()

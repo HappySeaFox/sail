@@ -1,7 +1,7 @@
 # AVIF codec information
 #
 [codec]
-layout=5
+layout=6
 version=0.9.0
 name=AVIF
 description=AV1 Still Image File Format
@@ -17,7 +17,6 @@ features=STATIC;ANIMATED;META-DATA;ICCP
 features=
 output-pixel-formats=
 properties=
-interlaced-passes=0
 compression-types=
 default-compression=
 compression-level-min=0
