@@ -81,7 +81,7 @@ public:
     /*
      * Moves the codec info object.
      */
-    codec_info& operator=(codec_info &&ci);
+    codec_info& operator=(codec_info &&ci) noexcept;
 
     /*
      * Destroys the codec info object.

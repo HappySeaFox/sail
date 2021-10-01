@@ -70,7 +70,7 @@ public:
     /*
      * Moves the read features.
      */
-    read_features& operator=(sail::read_features &&read_features);
+    read_features& operator=(sail::read_features &&read_features) noexcept;
 
     /*
      * Destroys the read features.

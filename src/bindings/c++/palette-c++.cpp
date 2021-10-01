@@ -73,7 +73,7 @@ palette::palette(sail::palette &&palette) noexcept
     palette.d = nullptr;
 }
 
-palette& palette::operator=(sail::palette &&palette)
+palette& palette::operator=(sail::palette &&palette) noexcept
 {
     delete d;
     d = palette.d;

@@ -84,7 +84,7 @@ public:
     /*
      * Moves the ICC profile.
      */
-    iccp& operator=(sail::iccp &&iccp);
+    iccp& operator=(sail::iccp &&iccp) noexcept;
 
     /*
      * Destroys the ICC profile.

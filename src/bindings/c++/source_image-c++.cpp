@@ -74,7 +74,7 @@ source_image::source_image(source_image &&si) noexcept
     si.d = nullptr;
 }
 
-source_image& source_image::operator=(source_image &&si)
+source_image& source_image::operator=(source_image &&si) noexcept
 {
     delete d;
     d = si.d;

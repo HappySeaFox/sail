@@ -73,7 +73,7 @@ public:
     /*
      * Moves the write options.
      */
-    write_options& operator=(sail::write_options &&write_options);
+    write_options& operator=(sail::write_options &&write_options) noexcept;
 
     /*
      * Destroys the write options.

@@ -81,7 +81,7 @@ codec_info::codec_info(codec_info &&ci) noexcept
     ci.d = nullptr;
 }
 
-codec_info& codec_info::operator=(codec_info &&ci)
+codec_info& codec_info::operator=(codec_info &&ci) noexcept
 {
     delete d;
     d = ci.d;

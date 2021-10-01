@@ -136,7 +136,7 @@ image::image(sail::image &&image) noexcept
     image.d = nullptr;
 }
 
-image& image::operator=(sail::image &&image)
+image& image::operator=(sail::image &&image) noexcept
 {
     delete d;
     d = image.d;

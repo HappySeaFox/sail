@@ -63,7 +63,7 @@ write_features::write_features(sail::write_features &&write_features) noexcept
     write_features.d = nullptr;
 }
 
-write_features& write_features::operator=(sail::write_features &&write_features)
+write_features& write_features::operator=(sail::write_features &&write_features) noexcept
 {
     delete d;
     d = write_features.d;

@@ -77,7 +77,7 @@ public:
     /*
      * Moves the meta data entry.
      */
-    meta_data& operator=(sail::meta_data &&meta_data);
+    meta_data& operator=(sail::meta_data &&meta_data) noexcept;
 
     /*
      * Destroys the meta data entry.

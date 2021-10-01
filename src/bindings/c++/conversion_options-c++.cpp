@@ -71,7 +71,7 @@ conversion_options::conversion_options(conversion_options &&co) noexcept
     co.d = nullptr;
 }
 
-conversion_options& conversion_options::operator=(conversion_options &&co)
+conversion_options& conversion_options::operator=(conversion_options &&co) noexcept
 {
     delete d;
     d = co.d;

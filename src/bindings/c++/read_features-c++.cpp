@@ -58,7 +58,7 @@ read_features::read_features(sail::read_features &&read_features) noexcept
     read_features.d = nullptr;
 }
 
-read_features& read_features::operator=(sail::read_features &&read_features)
+read_features& read_features::operator=(sail::read_features &&read_features) noexcept
 {
     delete d;
     d = read_features.d;

@@ -70,7 +70,7 @@ public:
     /*
      * Moves the resolution.
      */
-    resolution& operator=(resolution &&res);
+    resolution& operator=(resolution &&res) noexcept;
 
     /*
      * Destroys the resolution.

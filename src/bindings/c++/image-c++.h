@@ -104,7 +104,7 @@ public:
     /*
      * Moves the image.
      */
-    image& operator=(sail::image &&image);
+    image& operator=(sail::image &&image) noexcept;
 
     /*
      * Destroys the image and the deep copied pixel data.

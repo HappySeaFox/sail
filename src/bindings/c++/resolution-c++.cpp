@@ -68,7 +68,7 @@ resolution::resolution(resolution &&res) noexcept
     res.d = nullptr;
 }
 
-resolution& resolution::operator=(resolution &&res)
+resolution& resolution::operator=(resolution &&res) noexcept
 {
     delete d;
     d = res.d;

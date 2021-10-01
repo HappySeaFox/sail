@@ -69,7 +69,7 @@ read_options::read_options(sail::read_options &&read_options) noexcept
     read_options.d = nullptr;
 }
 
-read_options& read_options::operator=(read_options &&ro)
+read_options& read_options::operator=(read_options &&ro) noexcept
 {
     delete d;
     d = ro.d;

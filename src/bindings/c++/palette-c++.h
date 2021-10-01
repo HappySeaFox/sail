@@ -74,7 +74,7 @@ public:
     /*
      * Moves the palette.
      */
-    palette& operator=(sail::palette &&palette);
+    palette& operator=(sail::palette &&palette) noexcept;
 
     /*
      * Destroys the palette.

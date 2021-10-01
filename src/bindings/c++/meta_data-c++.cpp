@@ -94,7 +94,7 @@ meta_data::meta_data(sail::meta_data &&meta_data) noexcept
     meta_data.d = nullptr;
 }
 
-meta_data& meta_data::operator=(sail::meta_data &&meta_data)
+meta_data& meta_data::operator=(sail::meta_data &&meta_data) noexcept
 {
     delete d;
     d = meta_data.d;

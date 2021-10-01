@@ -70,7 +70,7 @@ public:
     /*
      * Moves the write features.
      */
-    write_features& operator=(sail::write_features &&write_features);
+    write_features& operator=(sail::write_features &&write_features) noexcept;
 
     /*
      * Destroys the write features.

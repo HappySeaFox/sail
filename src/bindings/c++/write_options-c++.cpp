@@ -72,7 +72,7 @@ write_options::write_options(sail::write_options &&write_options) noexcept
     write_options.d = nullptr;
 }
 
-write_options& write_options::operator=(sail::write_options &&write_options)
+write_options& write_options::operator=(sail::write_options &&write_options) noexcept
 {
     delete d;
     d = write_options.d;

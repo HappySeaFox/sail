@@ -77,7 +77,7 @@ iccp::iccp(sail::iccp &&iccp) noexcept
     iccp.d = nullptr;
 }
 
-iccp& iccp::operator=(sail::iccp &&iccp)
+iccp& iccp::operator=(sail::iccp &&iccp) noexcept
 {
     delete d;
     d = iccp.d;

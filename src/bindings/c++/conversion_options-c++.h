@@ -72,7 +72,7 @@ public:
     /*
      * Moves the conversion options object.
      */
-    conversion_options& operator=(conversion_options &&co);
+    conversion_options& operator=(conversion_options &&co) noexcept;
 
     /*
      * Destroys the conversion options object.

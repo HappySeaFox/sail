@@ -73,7 +73,7 @@ public:
     /*
      * Moves the read options.
      */
-    read_options& operator=(sail::read_options &&read_options);
+    read_options& operator=(sail::read_options &&read_options) noexcept;
 
     /*
      * Destroys the read options.

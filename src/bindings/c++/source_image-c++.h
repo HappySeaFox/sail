@@ -71,7 +71,7 @@ public:
     /*
      * Moves the source image.
      */
-    source_image& operator=(source_image &&si);
+    source_image& operator=(source_image &&si) noexcept;
 
     /*
      * Destroys the source image.
