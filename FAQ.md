@@ -278,11 +278,12 @@ layout=5
 #
 version=1.0.0
 
-# Codec priority from 1 to 3. SAIL sorts the enumerated codecs by priority.
+# Codec priority from 1 to 4. SAIL sorts the enumerated codecs by priority.
 #
 # 1 = popular image format like JPEG or PNG
 # 2 = moderate popularity
 # 3 = rare image format
+# 4 = very rare, ancient image format
 #
 priority=1
 
