@@ -272,7 +272,7 @@ Let's take a hypothetical codec info:
 # Codec layout is a set of functions it exports. Different layouts generations are not compatible.
 # libsail supports just a single (current) layout. Cannot be empty.
 #
-layout=5
+layout=6
 
 # Semantic codec version. Cannot be empty.
 #
