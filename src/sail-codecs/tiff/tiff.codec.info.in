@@ -3,6 +3,7 @@
 [codec]
 layout=6
 version=1.0.1
+priority=1
 name=TIFF
 description=Tagged Image File Format
 magic-numbers=49 49 2A 00;4D 4D 00 2A
