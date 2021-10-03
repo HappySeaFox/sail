@@ -136,6 +136,8 @@ static sail_status_t inih_handler_sail_error(void *data, const char *section, co
             codec_info->layout = atoi(value);
         } else if (strcmp(name, "version") == 0) {
             SAIL_TRY(sail_strdup(value, &codec_info->version));
+        } else if (strcmp(name, "priority") == 0) {
+            codec_info->priority = atoi(value);
         } else if (strcmp(name, "name") == 0) {
             SAIL_TRY(sail_strdup(value, &codec_info->name));
         } else if (strcmp(name, "description") == 0) {
