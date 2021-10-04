@@ -49,6 +49,16 @@ struct sail_codec_info {
      */
     int layout;
 
+    /*
+     * Codec priority from 0 to 3. SAIL sorts the enumerated codecs by priority.
+     *
+     * 0 = popular image format like JPEG or PNG
+     * 1 = moderate popularity
+     * 2 = rare image format
+     * 3 = Very rare, ancient image format
+     */
+    int priority;
+
     /* Codec version. For example: "1.5.2". */
     char *version;
 

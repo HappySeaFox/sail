@@ -243,6 +243,67 @@ static sail_status_t preload_codecs(struct sail_context *context) {
     return SAIL_OK;
 }
 
+static int codec_bundle_priority_comparator(const void *elem1, const void *elem2) {
+
+    const int priority1 = (*(struct sail_codec_bundle_node **)elem1)->codec_bundle->codec_info->priority;
+    const int priority2 = (*(struct sail_codec_bundle_node **)elem2)->codec_bundle->codec_info->priority;
+
+    return priority1 - priority2;
+}
+
+/*
+ * Space complexity: O(n)
+ * Time complexity: O(n * log(n))
+ */
+static sail_status_t sort_enumerated_codecs(struct sail_context *context) {
+
+    /* 0 or 1 elements - nothing to sort. */
+    if (context->codec_bundle_node == NULL || context->codec_bundle_node->next == NULL) {
+        return SAIL_OK;
+    }
+
+    /* Count the number of codecs. */
+    unsigned codecs_num = 0;
+
+    for (struct sail_codec_bundle_node *codec_bundle_node = context->codec_bundle_node; codec_bundle_node != NULL; codec_bundle_node = codec_bundle_node->next) {
+        codecs_num++;
+    }
+
+    /* Copy codecs to an array. */
+    struct sail_codec_bundle_node **codec_bundle_array;
+    void *ptr;
+    SAIL_TRY(sail_malloc(sizeof(struct sail_codec_bundle_node *) * codecs_num, &ptr));
+    codec_bundle_array = ptr;
+
+    {
+        unsigned i = 0;
+        for (struct sail_codec_bundle_node *codec_bundle_node = context->codec_bundle_node; codec_bundle_node != NULL; codec_bundle_node = codec_bundle_node->next) {
+            codec_bundle_array[i++] = codec_bundle_node;
+        }
+    }
+
+    /* Sort the array. */
+    qsort(codec_bundle_array, codecs_num, sizeof(struct sail_codec_bundle_node *), codec_bundle_priority_comparator);
+
+    /* Reconstruct the linked list. */
+    struct sail_codec_bundle_node *codec_bundle_node_sorted_it = codec_bundle_array[0];
+    struct sail_codec_bundle_node *codec_bundle_node_sorted = codec_bundle_node_sorted_it;
+
+    for (unsigned i = 1; i < codecs_num; i++) {
+        codec_bundle_node_sorted_it->next = codec_bundle_array[i];
+        codec_bundle_node_sorted_it = codec_bundle_node_sorted_it->next;
+    }
+
+    codec_bundle_node_sorted_it->next = NULL;
+
+    context->codec_bundle_node = codec_bundle_node_sorted;
+
+    /* Cleanup */
+    sail_free(codec_bundle_array);
+
+    return SAIL_OK;
+}
+
 static sail_status_t print_enumerated_codecs(struct sail_context *context) {
 
     SAIL_CHECK_PTR(context);
@@ -259,7 +320,7 @@ static sail_status_t print_enumerated_codecs(struct sail_context *context) {
     for (int counter = 1; codec_bundle_node != NULL; codec_bundle_node = codec_bundle_node->next, counter++) {
         const struct sail_codec_info *codec_info = codec_bundle_node->codec_bundle->codec_info;
 
-        SAIL_LOG_DEBUG("%d. %s [%s] %s", counter, codec_info->name, codec_info->description, codec_info->version);
+        SAIL_LOG_DEBUG("%d. [p%d] %s [%s] %s", counter, codec_info->priority, codec_info->name, codec_info->description, codec_info->version);
     }
 
     return SAIL_OK;
@@ -701,6 +762,8 @@ static sail_status_t init_context(struct sail_context *context, int flags) {
     if (context->codec_bundle_node == NULL) {
         print_no_codecs_found();
     }
+
+    SAIL_TRY(sort_enumerated_codecs(context));
 
     SAIL_TRY(print_enumerated_codecs(context));
 
