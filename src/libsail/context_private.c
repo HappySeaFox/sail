@@ -251,6 +251,10 @@ static int codec_bundle_priority_comparator(const void *elem1, const void *elem2
     return priority1 - priority2;
 }
 
+/*
+ * Space complexity: O(n)
+ * Time complexity: O(n * log(n))
+ */
 static sail_status_t sort_enumerated_codecs(struct sail_context *context) {
 
     /* 0 or 1 elements - nothing to sort. */
