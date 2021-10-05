@@ -137,7 +137,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_webp(struct sail_io *io, const
     SAIL_TRY(io->strict_read(io->stream, signature_and_size, sizeof(signature_and_size)));
     webp_state->image_data_size = *(uint32_t *)(signature_and_size + 4) + sizeof(signature_and_size);
 
-    SAIL_TRY(io->seek(io->stream, SEEK_SET, 0));
+    SAIL_TRY(io->seek(io->stream, 0, SEEK_SET));
 
     void *ptr;
     SAIL_TRY(sail_malloc(webp_state->image_data_size, &ptr));
