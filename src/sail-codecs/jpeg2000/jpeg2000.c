@@ -321,23 +321,9 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v6_jpeg2000(void *state, struct 
             }
         }
 
-        switch (jpeg2000_state->jas_color_space_family) {
-            case JAS_CLRSPC_FAM_GRAY: {
-                for (unsigned column = 0; column < image->width; column++) {
-                    *scan++ = (unsigned char)*(raw_data[0] + column);
-                }
-                break;
-            }
-            case JAS_CLRSPC_FAM_RGB:
-            case JAS_CLRSPC_FAM_YCBCR: {
-                for (unsigned column = 0; column < image->width; column++) {
-                    if (jpeg2000_state->number_channels == 3) {
-                        *scan++ = (unsigned char)*(raw_data[0] + column + 0);
-                        *scan++ = (unsigned char)*(raw_data[1] + column + 1);
-                        *scan++ = (unsigned char)*(raw_data[2] + column + 2);
-                    }
-                }
-                break;
+        for (unsigned column = 0; column < image->width; column++) {
+            for (int i = 0; i < jpeg2000_state->number_channels; i++) {
+                *scan++ = (unsigned char)(jas_matrix_getv(jpeg2000_state->matrix[i], column + i));
             }
         }
     }
