@@ -1,0 +1,25 @@
+# JPEG2000 codec information
+#
+[codec]
+layout=6
+version=0.4.0
+priority=0
+name=JPEG2000
+description=JPEG 2000
+magic-numbers=00 00 00 0C 6A 50 20 20 0D 0A 87 0A;FF 4F FF 51
+extensions=jp2;j2k;jpf;jpm;jpg2;j2c;jpc;jpx
+mime-types=image/jp2;image/jpm
+
+[read-features]
+features=STATIC
+
+[write-features]
+features=
+output-pixel-formats=
+properties=
+compression-types=
+default-compression=
+compression-level-min=0
+compression-level-max=0
+compression-level-default=0
+compression-level-step=0
