@@ -32,6 +32,6 @@
 #include "error.h"
 #include "export.h"
 
-SAIL_HIDDEN enum SailPixelFormat jpeg2000_private_sail_pixel_format(jas_clrspc_t jasper_color_space, int number_channels);
+SAIL_HIDDEN enum SailPixelFormat jpeg2000_private_sail_pixel_format(jas_clrspc_t jasper_color_space, int bpp);
 
 #endif

@@ -27,14 +27,25 @@
 
 #include "helpers.h"
 
-enum SailPixelFormat jpeg2000_private_sail_pixel_format(jas_clrspc_t jasper_color_space, int number_channels) {
+enum SailPixelFormat jpeg2000_private_sail_pixel_format(jas_clrspc_t jasper_color_space, int bpp) {
 
     switch (jasper_color_space) {
-        case JAS_CLRSPC_FAM_GRAY:  return SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE;
+        case JAS_CLRSPC_FAM_GRAY: {
+            switch (bpp) {
+                case 8:  return SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE;
+                case 16: return SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE;
+
+                default: {
+                    return SAIL_PIXEL_FORMAT_UNKNOWN;
+                }
+            }
+        }
         case JAS_CLRSPC_FAM_RGB: {
-            switch (number_channels) {
-                case 3: return SAIL_PIXEL_FORMAT_BPP24_RGB;
-                case 4: return SAIL_PIXEL_FORMAT_BPP32_RGBA;
+            switch (bpp) {
+                case 24: return SAIL_PIXEL_FORMAT_BPP24_RGB;
+                case 32: return SAIL_PIXEL_FORMAT_BPP32_RGBA;
+                case 48: return SAIL_PIXEL_FORMAT_BPP48_RGB;
+                case 64: return SAIL_PIXEL_FORMAT_BPP64_RGBA;
 
                 default: {
                     return SAIL_PIXEL_FORMAT_UNKNOWN;

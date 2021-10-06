@@ -25,6 +25,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #include <jasper/jasper.h>
 
@@ -49,6 +50,9 @@ struct jpeg2000_state {
     int channels[4];
     int number_channels;
     jas_matrix_t *matrix[4];
+    /* Channel depth in bits scaled to a byte boundary. For example, 12 bit images are scaled to 16 bit. */
+    unsigned channel_depth_scaled;
+    unsigned shift;
 };
 
 static sail_status_t alloc_jpeg2000_state(struct jpeg2000_state **jpeg2000_state) {
@@ -71,6 +75,8 @@ static sail_status_t alloc_jpeg2000_state(struct jpeg2000_state **jpeg2000_state
     for (int i = 0; i < 4; i++) {
         (*jpeg2000_state)->matrix[i] = NULL;
     }
+
+    (*jpeg2000_state)->shift = 0;
 
     return SAIL_OK;
 }
@@ -167,7 +173,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_jpeg2000(void *stat
     jpeg2000_state->jas_image = jas_image_decode(jpeg2000_state->jas_stream, -1 /* format */, NULL /* options */);
 
     if (jpeg2000_state->jas_image == NULL) {
-        SAIL_LOG_ERROR("JPEG2000: Failed to read an image");
+        SAIL_LOG_ERROR("JPEG2000: Failed to read image");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
@@ -226,13 +232,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_jpeg2000(void *stat
             SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
         }
 
-        const int bpc = jas_image_cmptprec(jpeg2000_state->jas_image, jpeg2000_state->channels[i]);
-
-        if (bpc != 8) {
-            SAIL_LOG_ERROR("JPEG2000: Channel #%d has bit depth %d, but only 8 bits is supported", i, bpc);
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
-        }
-
         if (jas_image_cmptsgnd(jpeg2000_state->jas_image, jpeg2000_state->channels[i]) != 0) {
             SAIL_LOG_ERROR("JPEG2000: Channel #%d has signed data type", i);
             SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
@@ -260,7 +259,19 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_jpeg2000(void *stat
     }
 
     /* Detect image format. */
-    const enum SailPixelFormat pixel_format = jpeg2000_private_sail_pixel_format(jpeg2000_state->jas_color_space_family, jpeg2000_state->number_channels);
+    const unsigned channel_depth = jas_image_cmptprec(jpeg2000_state->jas_image, 0);
+    jpeg2000_state->channel_depth_scaled = ((channel_depth + 7) / 8) * 8;
+
+    if (jpeg2000_state->channel_depth_scaled != 8 && jpeg2000_state->channel_depth_scaled != 16) {
+        SAIL_LOG_ERROR("JPEG2000: Unsupported bit depth %u scaled from %u", jpeg2000_state->channel_depth_scaled, channel_depth);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_BIT_DEPTH);
+    }
+
+    jpeg2000_state->shift = jpeg2000_state->channel_depth_scaled - channel_depth;
+    SAIL_LOG_TRACE("JPEG2000: Channels: %d, Channel depth %d (scaled to %d), shift samples by %u",
+                    jpeg2000_state->number_channels, channel_depth, jpeg2000_state->channel_depth_scaled, jpeg2000_state->shift);
+    const enum SailPixelFormat pixel_format =
+        jpeg2000_private_sail_pixel_format(jpeg2000_state->jas_color_space_family, jpeg2000_state->channel_depth_scaled * jpeg2000_state->number_channels);
 
     if (pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN) {
         SAIL_LOG_ERROR("JPEG2000: Unsupported pixel format");
@@ -302,13 +313,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v6_jpeg2000(void *state, struct 
     SAIL_TRY(sail_check_io_valid(io));
     SAIL_TRY(sail_check_image_skeleton_valid(image));
 
-    struct jpeg2000_state *jpeg2000_state = (struct jpeg2000_state *)state;
-
-    jas_seqent_t *raw_data[4];
-
-    for (int i = 0; i < jpeg2000_state->number_channels; i++) {
-        raw_data[i] = jas_matrix_getref(jpeg2000_state->matrix[i], 0, 0);
-    }
+    const struct jpeg2000_state *jpeg2000_state = (struct jpeg2000_state *)state;
 
     for (unsigned row = 0; row < image->height; row++) {
         unsigned char *scan = (unsigned char *)image->pixels + row * image->bytes_per_line;
@@ -323,7 +328,12 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v6_jpeg2000(void *state, struct 
 
         for (unsigned column = 0; column < image->width; column++) {
             for (int i = 0; i < jpeg2000_state->number_channels; i++) {
-                *scan++ = (unsigned char)(jas_matrix_getv(jpeg2000_state->matrix[i], column + i));
+                if (jpeg2000_state->channel_depth_scaled == 8) {
+                    *scan++ = (unsigned char)(jas_matrix_getv(jpeg2000_state->matrix[i], column + i) << jpeg2000_state->shift);
+                } else {
+                    uint16_t **scan16 = (uint16_t **)&scan;
+                    *(*scan16)++ = (uint16_t)(jas_matrix_getv(jpeg2000_state->matrix[i], column + i) << jpeg2000_state->shift);
+                }
             }
         }
     }
