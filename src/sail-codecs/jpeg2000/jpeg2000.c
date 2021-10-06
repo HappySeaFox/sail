@@ -294,14 +294,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_jpeg2000(void *stat
     SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(image_local->width, image_local->pixel_format, &image_local->bytes_per_line),
                         /* cleanup */ sail_destroy_image(image_local));
 
-    /* Fetch ICC profile. */
-#if 0
-    if (jpeg2000_state->read_options->io_options & SAIL_IO_OPTION_ICCP) {
-        SAIL_TRY_OR_CLEANUP(jpeg2000_private_fetch_iccp(&jpeg2000_image->icc, &image_local->iccp),
-                            /* cleanup */ sail_destroy_image(image_local));
-    }
-#endif
-
     *image = image_local;
 
     return SAIL_OK;

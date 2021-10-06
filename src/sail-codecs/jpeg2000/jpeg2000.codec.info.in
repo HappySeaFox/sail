@@ -11,7 +11,7 @@ extensions=jp2;j2k;jpf;jpm;jpg2;j2c;jpc;jpx
 mime-types=image/jp2;image/jpm
 
 [read-features]
-features=STATIC;META-DATA;ICCP
+features=STATIC
 
 [write-features]
 features=
