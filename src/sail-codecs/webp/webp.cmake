@@ -16,5 +16,5 @@ macro(sail_find_dependencies)
     # find_dependency(WebP REQUIRED)
     # set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES WebP::webp WebP::webpdemux)
     #
-    set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "WebP,WebP::webp WebP::webpdemux" PARENT_SCOPE)
+    set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_dependency,WebP,WebP::webp WebP::webpdemux" PARENT_SCOPE)
 endmacro()

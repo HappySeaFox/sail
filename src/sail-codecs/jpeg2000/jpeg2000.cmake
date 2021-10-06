@@ -12,8 +12,8 @@ macro(sail_find_dependencies)
     # This will add the following CMake rules to the CMake config for static builds so a client
     # application links against the required dependencies:
     #
-    # find_dependency(JPEG2000 REQUIRED)
-    # set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES ${JPEG2000_LIBRARY})
+    # find_library(jasper_LIBRARY jasper REQUIRED)
+    # set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES ${jasper_LIBRARY})
     #
-    set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "JASPER,${JPEG2000_LIBRARY}" PARENT_SCOPE)
+    set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,jasper," PARENT_SCOPE)
 endmacro()

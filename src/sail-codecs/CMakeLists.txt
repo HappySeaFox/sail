@@ -41,13 +41,23 @@ endforeach()
 if (SAIL_STATIC)
     foreach (dependency IN LISTS SAIL_CODECS_FIND_DEPENDENCIES)
         string(REPLACE "," ";" dependency ${dependency})
-        list(GET dependency 0 dependency_name)
-        list(GET dependency 1 dependency_link_target)
+        list(GET dependency 0 dependency_search_mechanism)
+        list(GET dependency 1 dependency_name)
+        list(GET dependency 2 dependency_link_target)
 
-        set(SAIL_CODECS_FIND_DEPENDENCIES_EXPANDED "${SAIL_CODECS_FIND_DEPENDENCIES_EXPANDED}
+        if (dependency_search_mechanism STREQUAL "find_dependency")
+            set(SAIL_CODECS_FIND_DEPENDENCIES_EXPANDED "${SAIL_CODECS_FIND_DEPENDENCIES_EXPANDED}
 find_dependency(${dependency_name} REQUIRED)
 set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES ${dependency_link_target})
 ")
+        elseif(dependency_search_mechanism STREQUAL "find_library")
+            set(SAIL_CODECS_FIND_DEPENDENCIES_EXPANDED "${SAIL_CODECS_FIND_DEPENDENCIES_EXPANDED}
+find_library(${dependency_name}_LIBRARY ${dependency_name} REQUIRED)
+set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES \${${dependency_name}_LIBRARY})
+")
+        else()
+            message(FATAL_ERROR "Unsupported dependencies search mechanism '${dependency_search_mechanism}'")
+        endif()
     endforeach()
 
     set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES_EXPANDED} PARENT_SCOPE)

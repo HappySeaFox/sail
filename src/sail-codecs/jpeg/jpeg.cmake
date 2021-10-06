@@ -14,7 +14,7 @@ macro(sail_find_dependencies)
     # find_dependency(JPEG REQUIRED)
     # set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES JPEG::JPEG)
     #
-    set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "JPEG,JPEG::JPEG" PARENT_SCOPE)
+    set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_dependency,JPEG,JPEG::JPEG" PARENT_SCOPE)
 endmacro()
 
 macro(sail_codec_post_add)

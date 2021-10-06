@@ -14,7 +14,7 @@ macro(sail_find_dependencies)
     # find_dependency(TIFF REQUIRED)
     # set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES TIFF::TIFF)
     #
-    set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "TIFF,TIFF::TIFF" PARENT_SCOPE)
+    set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_dependency,TIFF,TIFF::TIFF" PARENT_SCOPE)
 endmacro()
 
 macro(sail_codec_post_add)

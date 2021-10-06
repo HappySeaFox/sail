@@ -15,5 +15,5 @@ macro(sail_find_dependencies)
     # find_dependency(LIBAVIF REQUIRED)
     # set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES avif)
     #
-    set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "LIBAVIF,avif" PARENT_SCOPE)
+    set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_dependency,LIBAVIF,avif" PARENT_SCOPE)
 endmacro()
