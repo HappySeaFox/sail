@@ -23,6 +23,7 @@ include(sail_enable_pch)
 include(sail_enable_posix_source)
 include(sail_enable_xopen_source)
 include(sail_install_cmake_config)
+include(sail_install_pdb)
 include(sail_test)
 
 # Check for required includes

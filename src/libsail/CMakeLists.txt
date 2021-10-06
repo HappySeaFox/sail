@@ -66,6 +66,8 @@ sail_enable_posix_source(TARGET sail VERSION 200112L)
 
 sail_enable_pch(TARGET sail HEADER sail.h)
 
+sail_install_pdb(TARGET sail)
+
 # Definitions, includes, link
 #
 target_include_directories(sail PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)

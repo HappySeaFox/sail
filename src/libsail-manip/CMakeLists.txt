@@ -28,6 +28,8 @@ set_target_properties(sail-manip PROPERTIES
 
 sail_enable_pch(TARGET sail-manip HEADER sail-manip.h)
 
+sail_install_pdb(TARGET sail-manip)
+
 # Definitions, includes, link
 #
 target_include_directories(sail-manip PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)

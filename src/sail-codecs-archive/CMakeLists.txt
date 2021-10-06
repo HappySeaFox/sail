@@ -57,12 +57,16 @@ if (SAIL_STATIC)
     add_library(sail-codecs-objects ${SAIL_CODECS_LIBS})
     target_link_libraries(sail-codecs-objects PRIVATE sail-common)
 
+    sail_install_pdb(TARGET sail-codecs-objects)
+
     # Add an extra library to link against it with a special 'whole archive' option.
     # Without that option compilers throw functions away as they think they're unreferenced.
     # We use dlsym/GetProcAddress to access them.
     #
     add_library(sail-codecs ${CMAKE_CURRENT_BINARY_DIR}/enabled_codecs.c)
     target_link_libraries(sail-codecs PRIVATE sail-common)
+
+    sail_install_pdb(TARGET sail-codecs)
 
     # Generate a 'whole archive' expression per compiler
     #
@@ -102,6 +106,8 @@ if (SAIL_STATIC)
 else()
     add_library(sail-codecs ${CMAKE_CURRENT_BINARY_DIR}/enabled_codecs.c ${SAIL_CODECS_LIBS})
     target_link_libraries(sail-codecs PRIVATE sail-common)
+
+    sail_install_pdb(TARGET sail-codecs)
 
     # Link all the enabled codecs dependencies into sail-codecs
     #

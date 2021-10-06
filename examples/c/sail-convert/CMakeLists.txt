@@ -12,6 +12,10 @@ target_link_libraries(sail-convert PRIVATE sail-manip)
 #
 sail_enable_asan(TARGET sail-convert)
 
+# Install PDB
+#
+sail_install_pdb(TARGET sail-convert)
+
 # Installation
 #
 install(TARGETS sail-convert DESTINATION "${CMAKE_INSTALL_BINDIR}")

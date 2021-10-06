@@ -8,6 +8,10 @@ target_link_libraries(sail-probe PRIVATE sail)
 #
 sail_enable_asan(TARGET sail-probe)
 
+# Install PDB
+#
+sail_install_pdb(TARGET sail-probe)
+
 # Installation
 #
 install(TARGETS sail-probe DESTINATION "${CMAKE_INSTALL_BINDIR}")
