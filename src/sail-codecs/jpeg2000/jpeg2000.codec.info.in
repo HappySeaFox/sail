@@ -3,7 +3,7 @@
 [codec]
 layout=6
 version=0.4.0
-priority=0
+priority=1
 name=JPEG2000
 description=JPEG 2000
 magic-numbers=00 00 00 0C 6A 50 20 20 0D 0A 87 0A;FF 4F FF 51

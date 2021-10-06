@@ -3,7 +3,7 @@
 [codec]
 layout=6
 version=0.7.2
-priority=1
+priority=2
 name=TGA
 description=Truevision TGA
 magic-numbers=
