@@ -25,8 +25,6 @@
 
 #include <stdio.h>
 
-#include "sail-common.h"
-
 #include "sail.h"
 
 #include "sail-dump.h"
