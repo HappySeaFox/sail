@@ -79,9 +79,10 @@ images with the help of [ksquirrel-libs](FAQ.md#how-old-is-sail), the predecesso
 | 5  | [JPEG](https://wikipedia.org/wiki/JPEG)                             | RW            | libjpeg-turbo     |
 | 6  | [JPEG2000](https://wikipedia.org/wiki/JPEG_2000)                    | R             | jasper            |
 | 7  | [PNG](https://wikipedia.org/wiki/Portable_Network_Graphics)         | RW            | libpng            |
-| 8  | [TGA](https://wikipedia.org/wiki/Truevision_TGA)                    | R             |                   |
-| 9  | [TIFF](https://wikipedia.org/wiki/TIFF)                             | RW            | libtiff           |
-| 10 | [WEBP](https://wikipedia.org/wiki/WebP)                             | R             | libwebp           |
+| 8  | [SVG](https://wikipedia.org/wiki/Scalable_Vector_Graphics)          | R             | resvg             |
+| 9  | [TGA](https://wikipedia.org/wiki/Truevision_TGA)                    | R             |                   |
+| 10 | [TIFF](https://wikipedia.org/wiki/TIFF)                             | RW            | libtiff           |
+| 11 | [WEBP](https://wikipedia.org/wiki/WebP)                             | R             | libwebp           |
 
 See the full list [here](FORMATS.md). Work to add more image formats is ongoing.
 
