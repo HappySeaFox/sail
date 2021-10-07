@@ -81,6 +81,7 @@ image::image()
 }
 
 image::image(const std::string_view path)
+    : image()
 {
     load(path);
 }
