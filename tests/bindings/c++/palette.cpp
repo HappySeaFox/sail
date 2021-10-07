@@ -1,6 +1,6 @@
 /*  This file is part of SAIL (https://github.com/smoked-herring/sail)
 
-    Copyright (c) 2020-2021 Dmitry Baryshev
+    Copyright (c) 2021 Dmitry Baryshev
 
     The MIT License
 
@@ -27,32 +27,57 @@
 
 #include "munit.h"
 
-#include "test-images.h"
-
-static MunitResult test_able_to_load(const MunitParameter params[], void *user_data) {
+static MunitResult test_palette_create(const MunitParameter params[], void *user_data) {
+    (void)params;
     (void)user_data;
 
-    const char *path = munit_parameters_get(params, "path");
+    sail::arbitrary_data data(8092);
 
-    const sail::image image(path);
-    munit_assert(image.is_valid());
+    for (std::size_t i = 0; i < data.size(); i++) {
+        data[i] = 50;
+    }
+
+    const unsigned color_count = static_cast<unsigned>(data.size() / 2);
+
+    sail::palette palette(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE, data.data(), color_count);
+    munit_assert(palette.pixel_format() == SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE);
+    munit_assert(palette.data()         == data);
+    munit_assert(palette.color_count()  == color_count);
 
     return MUNIT_OK;
 }
 
-static MunitParameterEnum test_params[] = {
-    { (char *)"path", (char **)SAIL_TEST_IMAGES },
-    { NULL, NULL },
-};
+static MunitResult test_palette_copy(const MunitParameter params[], void *user_data) {
+    (void)params;
+    (void)user_data;
+
+    sail::arbitrary_data data(8092);
+
+    for (std::size_t i = 0; i < data.size(); i++) {
+        data[i] = 50;
+    }
+
+    const unsigned color_count = static_cast<unsigned>(data.size() / 2);
+
+    sail::palette palette(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE, data.data(), color_count);
+
+    sail::palette palette_copy = palette;
+    munit_assert(palette_copy.color_count()  == palette.color_count());
+    munit_assert(palette_copy.data()         == palette.data());
+    munit_assert(palette_copy.pixel_format() == palette.pixel_format());
+
+    return MUNIT_OK;
+}
 
 static MunitTest test_suite_tests[] = {
-    { (char *)"/able-to-load", test_able_to_load, NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
+    { (char *)"/create", test_palette_create, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/copy",   test_palette_copy,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };
 
 static const MunitSuite test_suite = {
-    (char *)"/able-to-load",
+    (char *)"/palette",
     test_suite_tests,
     NULL,
     1,
