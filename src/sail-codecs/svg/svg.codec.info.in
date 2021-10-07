@@ -1,0 +1,25 @@
+# SVG codec information
+#
+[codec]
+layout=6
+version=0.1.2
+priority=1
+name=SVG
+description=Scalable Vector Graphics
+magic-numbers=3C 3F 78 6D 6C
+extensions=svg;svgz
+mime-types=image/svg+xml
+
+[read-features]
+features=STATIC
+
+[write-features]
+features=
+output-pixel-formats=
+properties=
+compression-types=
+default-compression=
+compression-level-min=0
+compression-level-max=0
+compression-level-default=0
+compression-level-step=0
