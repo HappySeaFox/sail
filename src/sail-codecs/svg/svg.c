@@ -146,6 +146,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_svg(void *state, st
     const resvg_size image_size = resvg_get_image_size(svg_state->resvg_tree);
 
     image_local->source_image->pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;
+    image_local->source_image->compression = SAIL_COMPRESSION_NONE;
 
     image_local->width = (unsigned)image_size.width;
     image_local->height = (unsigned)image_size.height;
