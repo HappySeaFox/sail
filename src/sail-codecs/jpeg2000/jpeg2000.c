@@ -137,9 +137,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_jpeg2000(struct sail_io *io, c
     SAIL_TRY(io->tell(io->stream, &image_size));
     SAIL_TRY(io->seek(io->stream, 0, SEEK_SET));
 
-    void *ptr;
-    SAIL_TRY(sail_malloc(image_size, &ptr));
-    jpeg2000_state->image_data = ptr;
+    SAIL_TRY(sail_malloc(image_size, &jpeg2000_state->image_data));
 
     SAIL_LOG_TRACE("JPEG2000: Reading %lu bytes", (unsigned long)image_size);
     SAIL_TRY(io->strict_read(io->stream, jpeg2000_state->image_data, image_size));
