@@ -178,11 +178,6 @@ if (WIN32)
     string(REPLACE "/" "\\\\" SAIL_CODECS_PATH "${SAIL_CODECS_PATH}")
 endif()
 
-set(SAIL_ICONS_PATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/sail/icons")
-if (WIN32)
-    string(REPLACE "/" "\\\\" SAIL_ICONS_PATH "${SAIL_ICONS_PATH}")
-endif()
-
 # Common configuration file
 #
 configure_file("${PROJECT_SOURCE_DIR}/src/config.h.in" "${PROJECT_BINARY_DIR}/include/config.h" @ONLY)
@@ -259,8 +254,6 @@ if (NOT SAIL_VCPKG)
         endif()
     endif()
 endif()
-
-install(DIRECTORY "${PROJECT_SOURCE_DIR}/icons/" DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/sail/icons")
 
 # Print configuration statistics
 #

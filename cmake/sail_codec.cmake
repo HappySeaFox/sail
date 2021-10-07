@@ -81,6 +81,10 @@ macro(sail_codec)
                 DESTINATION "${CMAKE_INSTALL_LIBDIR}/sail/codecs")
     endif()
 
+    # Install icon
+    #
+    install(FILES "${PROJECT_SOURCE_DIR}/icons/${SAIL_CODEC_NAME}.xpm" DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/sail/icons")
+
     # Export this codec name into the parent scope
     #
     set(ENABLED_CODECS ${ENABLED_CODECS} ${SAIL_CODEC_NAME} PARENT_SCOPE)
