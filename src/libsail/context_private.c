@@ -235,7 +235,7 @@ static sail_status_t preload_codecs(struct sail_context *context) {
         const struct sail_codec *codec;
 
         /* Ignore loading errors on purpose. */
-        load_codec_by_codec_info(codec_bundle_node->codec_bundle->codec_info, &codec);
+        (void)load_codec_by_codec_info(codec_bundle_node->codec_bundle->codec_info, &codec);
     }
 
     SAIL_TRY(unlock_context());
