@@ -122,7 +122,12 @@ palette& palette::with_data(SailPixelFormat pixel_format, const void *data, unsi
 
 palette& palette::with_data(SailPixelFormat pixel_format, const arbitrary_data &data)
 {
-    return with_data(pixel_format, data.data(), static_cast<unsigned>(data.size()));
+    unsigned bits_per_pixel;
+    SAIL_TRY_OR_SUPPRESS(sail_bits_per_pixel(pixel_format, &bits_per_pixel));
+
+    const unsigned bytes_per_pixel = (bits_per_pixel + 7) / 8;
+
+    return with_data(pixel_format, data.data(), data.size() / bytes_per_pixel);
 }
 
 palette::palette(const sail_palette *pal)
