@@ -1,3 +1,4 @@
+sail_test(TARGET able-to-load-c++   SOURCES able-to-load.cpp   LINK sail-c++)
 sail_test(TARGET read-features-c++  SOURCES read_features.cpp  LINK sail-c++)
 sail_test(TARGET read-options-c++   SOURCES read_options.cpp   LINK sail-c++)
 sail_test(TARGET write-features-c++ SOURCES write_features.cpp LINK sail-c++)
