@@ -57,6 +57,11 @@ public:
     palette();
 
     /*
+     * Constructs palette from the data.
+     */
+    palette(SailPixelFormat pixel_format, const void *data, unsigned color_count);
+
+    /*
      * Copies the palette.
      */
     palette(const palette &pal);
