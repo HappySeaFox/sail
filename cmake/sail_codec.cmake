@@ -83,7 +83,7 @@ macro(sail_codec)
 
     # Install icon
     #
-    install(FILES "${PROJECT_SOURCE_DIR}/icons/${SAIL_CODEC_NAME}.xpm" DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/sail/icons")
+    install(FILES "${PROJECT_SOURCE_DIR}/icons/${SAIL_CODEC_NAME}.png" DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/sail/icons")
 
     # Export this codec name into the parent scope
     #
