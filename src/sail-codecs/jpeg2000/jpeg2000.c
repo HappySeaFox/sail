@@ -142,8 +142,8 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_jpeg2000(struct sail_io *io, c
     SAIL_LOG_TRACE("JPEG2000: Reading %lu bytes", (unsigned long)image_size);
     SAIL_TRY(io->strict_read(io->stream, jpeg2000_state->image_data, image_size));
 
-    /* Init decoder. */
-    jpeg2000_state->jas_stream = jas_stream_memopen2(jpeg2000_state->image_data, image_size);
+    /* This function may generate a warning on old versions of Jasper: conversion from size_t to int. */
+    jpeg2000_state->jas_stream = jas_stream_memopen(jpeg2000_state->image_data, image_size);
 
     if (jpeg2000_state->jas_stream == NULL) {
         SAIL_LOG_ERROR("JPEG2000: Failed to open the specified file");
