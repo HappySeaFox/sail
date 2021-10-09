@@ -32,7 +32,6 @@
 #include "sail-common.h"
 
 #include "helpers.h"
-#include "io.h"
 
 /*
  * Codec-specific state.
