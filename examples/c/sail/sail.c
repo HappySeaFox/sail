@@ -104,7 +104,7 @@ static sail_status_t convert(int argc, const char *argv[]) {
     int compression = -1;
 
     /* Start parsing CLI options from the third argument. */
-    int i = 3;
+    int i = 4;
 
     while (i < argc) {
         if (strcmp(argv[i], "-c") == 0 || strcmp(argv[i], "--compression") == 0) {
@@ -122,7 +122,7 @@ static sail_status_t convert(int argc, const char *argv[]) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 
-    SAIL_TRY(convert_impl(argv[1], argv[2], compression));
+    SAIL_TRY(convert_impl(argv[2], argv[3], compression));
 
     return SAIL_OK;
 }
@@ -153,6 +153,7 @@ static sail_status_t probe_impl(const char *path) {
     printf("ICC profile   : %s\n", image->iccp == NULL ? "no" : "yes");
     printf("Interlaced    : %s\n", (image->source_image->properties & SAIL_IMAGE_PROPERTY_INTERLACED) ? "yes" : "no");
     printf("Flipped Vert. : %s\n", (image->source_image->properties & SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY) ? "yes" : "no");
+    printf("Flipped Horiz.: %s\n", (image->source_image->properties & SAIL_IMAGE_PROPERTY_FLIPPED_HORIZONTALLY) ? "yes" : "no");
 
     for (const struct sail_meta_data_node *meta_data_node = image->meta_data_node; meta_data_node != NULL; meta_data_node = meta_data_node->next) {
         const struct sail_meta_data *meta_data = meta_data_node->meta_data;
@@ -233,20 +234,20 @@ static void help(char *app) {
 
 int main(int argc, char *argv[]) {
 
-    if (argc != 2) {
+    if (argc < 2) {
         help(argv[0]);
         return 1;
     }
 
     if (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0) {
         help(argv[0]);
-        return SAIL_OK;
+        return 0;
     }
 
     if (strcmp(argv[1], "-v") == 0 || strcmp(argv[1], "--version") == 0) {
         fprintf(stderr, "SAIL command-line utility 1.3.0\n");
         fprintf(stderr, "SAIL library %s\n", SAIL_VERSION_STRING);
-        return SAIL_OK;
+        return 0;
     }
 
     sail_set_log_barrier(SAIL_LOG_LEVEL_WARNING);
@@ -262,7 +263,9 @@ int main(int argc, char *argv[]) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 
+    printf("Success\n");
+
     sail_finish();
 
-    return SAIL_OK;
+    return 0;
 }
