@@ -136,6 +136,8 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_wal(void *state, st
                         /* cleanup */ sail_destroy_image(image_local));
     SAIL_TRY_OR_CLEANUP(wal_private_assign_palette(image_local),
                         /* cleanup */ sail_destroy_image(image_local));
+    SAIL_TRY_OR_CLEANUP(wal_private_assign_meta_data(&wal_state->wal_header, &image_local->meta_data_node),
+                        /* cleanup */ sail_destroy_image(image_local));
 
     SAIL_TRY_OR_CLEANUP(io->seek(io->stream, wal_state->wal_header.offset[wal_state->frame_number], SEEK_SET),
                         /* cleanup */ sail_destroy_image(image_local));

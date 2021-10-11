@@ -290,16 +290,16 @@ static const unsigned char WAL_PALETTE[256 * 3] =
 	159, 91, 83
 };
 
-sail_status_t wal_private_read_file_header(struct sail_io *io, struct WalFileHeader *file_header) {
+sail_status_t wal_private_read_file_header(struct sail_io *io, struct WalFileHeader *wal_header) {
 
-    SAIL_TRY(io->strict_read(io->stream, &file_header->name,      sizeof(file_header->name)));
-    SAIL_TRY(io->strict_read(io->stream, &file_header->width,     sizeof(file_header->width)));
-    SAIL_TRY(io->strict_read(io->stream, &file_header->height,    sizeof(file_header->height)));
-    SAIL_TRY(io->strict_read(io->stream, &file_header->offset,    sizeof(file_header->offset)));
-    SAIL_TRY(io->strict_read(io->stream, &file_header->next_name, sizeof(file_header->next_name)));
-    SAIL_TRY(io->strict_read(io->stream, &file_header->flags,     sizeof(file_header->flags)));
-    SAIL_TRY(io->strict_read(io->stream, &file_header->contents,  sizeof(file_header->contents)));
-    SAIL_TRY(io->strict_read(io->stream, &file_header->value,     sizeof(file_header->value)));
+    SAIL_TRY(io->strict_read(io->stream, &wal_header->name,      sizeof(wal_header->name)));
+    SAIL_TRY(io->strict_read(io->stream, &wal_header->width,     sizeof(wal_header->width)));
+    SAIL_TRY(io->strict_read(io->stream, &wal_header->height,    sizeof(wal_header->height)));
+    SAIL_TRY(io->strict_read(io->stream, &wal_header->offset,    sizeof(wal_header->offset)));
+    SAIL_TRY(io->strict_read(io->stream, &wal_header->next_name, sizeof(wal_header->next_name)));
+    SAIL_TRY(io->strict_read(io->stream, &wal_header->flags,     sizeof(wal_header->flags)));
+    SAIL_TRY(io->strict_read(io->stream, &wal_header->contents,  sizeof(wal_header->contents)));
+    SAIL_TRY(io->strict_read(io->stream, &wal_header->value,     sizeof(wal_header->value)));
 
     return SAIL_OK;
 }
@@ -311,3 +311,15 @@ sail_status_t wal_private_assign_palette(struct sail_image *image) {
     return SAIL_OK;
 }
 
+
+sail_status_t wal_private_assign_meta_data(const struct WalFileHeader *wal_header, struct sail_meta_data_node **meta_data_node) {
+
+    struct sail_meta_data_node *meta_data_node_local;
+    SAIL_TRY(sail_alloc_meta_data_node(&meta_data_node_local));
+    SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_from_known_string(SAIL_META_DATA_NAME, wal_header->name, &meta_data_node_local->meta_data),
+                        /* cleanup */ sail_destroy_meta_data_node(meta_data_node_local));
+
+    *meta_data_node = meta_data_node_local;
+
+    return SAIL_OK;
+}

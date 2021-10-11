@@ -42,8 +42,10 @@ struct WalFileHeader
     unsigned value;
 };
 
-SAIL_HIDDEN sail_status_t wal_private_read_file_header(struct sail_io *io, struct WalFileHeader *file_header);
+SAIL_HIDDEN sail_status_t wal_private_read_file_header(struct sail_io *io, struct WalFileHeader *wal_header);
 
 SAIL_HIDDEN sail_status_t wal_private_assign_palette(struct sail_image *image);
+
+SAIL_HIDDEN sail_status_t wal_private_assign_meta_data(const struct WalFileHeader *wal_header, struct sail_meta_data_node **meta_data_node);
 
 #endif
