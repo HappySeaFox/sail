@@ -1,0 +1,25 @@
+# WAL codec information
+#
+[codec]
+layout=6
+version=0.2.0
+priority=3
+name=WAL
+description=Quake2 Texture
+magic-numbers=
+extensions=wal
+mime-types=
+
+[read-features]
+features=STATIC;MULTI-PAGED
+
+[write-features]
+features=
+output-pixel-formats=
+properties=
+compression-types=
+default-compression=
+compression-level-min=0
+compression-level-max=0
+compression-level-default=0
+compression-level-step=0
