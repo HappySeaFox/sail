@@ -85,7 +85,7 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
      */
     SailPixelFormat source_pixel_format;
     SailPixelFormat pixel_format;
-    unsigned width, height;
+    unsigned width = 0, height = 0;
 
     /*
      * Starts reading the specified file.
@@ -116,10 +116,12 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
                             /* cleanup */ sail_stop_reading(state),
                                           sail_destroy_image(image));
 
-        source_pixel_format = image->source_image->pixel_format;
-        pixel_format = image_converted->pixel_format;
-        width = image_converted->width;
-        height = image_converted->height;
+        if (width == 0) {
+            source_pixel_format = image->source_image->pixel_format;
+            pixel_format = image_converted->pixel_format;
+            width = image_converted->width;
+            height = image_converted->height;
+        }
 
         /*
          * Convert to QImage.

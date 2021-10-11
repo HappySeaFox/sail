@@ -74,6 +74,7 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
 
     sail::image_input image_input;
     sail::image image;
+    sail::image first_image;
 
     // Initialize reading.
     //
@@ -89,6 +90,10 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
         sail::conversion_options options;
         options.with_options(SAIL_CONVERSION_OPTION_BLEND_ALPHA)
                 .with_background(sail_rgb24_t{ 0, 255, 0 });
+
+        if (!first_image.is_valid()) {
+            first_image = image;
+        }
 
         SAIL_TRY(image.convert(SAIL_PIXEL_FORMAT_BPP24_RGB, options));
 
@@ -110,14 +115,15 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
 
     SAIL_LOG_DEBUG("Read images: %d", qimages->size());
 
+    // Optional
     SAIL_TRY(image_input.stop());
 
     m_ui->labelStatus->setText(tr("%1  [%2x%3]  [%4 → %5]")
                                 .arg(QFileInfo(path).fileName())
-                                .arg(image.width())
-                                .arg(image.height())
-                                .arg(sail::image::pixel_format_to_string(image.source_image().pixel_format()))
-                                .arg(sail::image::pixel_format_to_string(image.pixel_format()))
+                                .arg(first_image.width())
+                                .arg(first_image.height())
+                                .arg(sail::image::pixel_format_to_string(first_image.source_image().pixel_format()))
+                                .arg(sail::image::pixel_format_to_string(first_image.pixel_format()))
                                 );
 
     return SAIL_OK;
