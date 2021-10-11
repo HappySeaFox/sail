@@ -37,13 +37,35 @@ sail_status_t sail_codec_info_from_path(const char *path, const struct sail_code
     SAIL_CHECK_PTR(path);
     SAIL_CHECK_PTR(codec_info);
 
-    const char *dot = strrchr(path, '.');
+    SAIL_LOG_DEBUG("Finding codec info for path '%s'", path);
 
-    if (dot == NULL || *dot == '\0' || *(dot+1) == '\0') {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+    const char *file_name;
+
+    /*
+     * Consider only the file name component:
+     *   - For "/home/rob/1.jpeg" we check for dots starting from "1.jpeg".
+     *   - For "scr.png" we check for dots starting from the beginning of the path.
+     */
+    const char *path_separator = strrchr(path, '/');
+
+    if (path_separator == NULL) {
+        path_separator = strrchr(path, '\\');
+
+        if (path_separator == NULL) {
+            file_name = path;
+        } else {
+            file_name = path_separator + 1;
+        }
+    } else {
+        file_name = path_separator + 1;
     }
 
-    SAIL_LOG_DEBUG("Finding codec info for path '%s'", path);
+    const char *dot = strrchr(file_name, '.');
+
+    if (dot == NULL || *(dot+1) == '\0') {
+        SAIL_LOG_ERROR("Path '%s' has no extension", path);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+    }
 
     SAIL_TRY(sail_codec_info_from_extension(dot+1, codec_info));
 

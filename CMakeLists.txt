@@ -58,6 +58,7 @@ endif()
 
 # Options
 #
+option(SAIL_BUILD_APPS "Build applications." ON)
 option(SAIL_BUILD_EXAMPLES "Build examples." ON)
 option(SAIL_BUILD_TESTS "Build tests." ON)
 option(SAIL_DEV "Enable developer mode. Be more strict when compiling source code, for example." OFF)
@@ -202,10 +203,11 @@ endif()
 add_subdirectory(src/libsail)
 add_subdirectory(src/bindings/c++)
 
-if (SAIL_BUILD_EXAMPLES)
-    add_subdirectory(examples/c/sail-convert)
-    add_subdirectory(examples/c/sail-probe)
+if (SAIL_BUILD_APPS)
+    add_subdirectory(examples/c/sail)
+endif()
 
+if (SAIL_BUILD_EXAMPLES)
     find_package(SDL2)
     set(SAIL_SDL_EXAMPLE OFF)
 
@@ -288,6 +290,7 @@ message("* VCPKG mode:                   ${SAIL_VCPKG}")
 message("* Static build:                 ${SAIL_STATIC}")
 message("*   Combine codecs [*]:         ${SAIL_COMBINE_CODECS}")
 message("* SAIL_THIRD_PARTY_CODECS_PATH: ${SAIL_THIRD_PARTY_CODECS_PATH}")
+message("* Build apps:                   ${SAIL_BUILD_APPS}")
 message("* Build examples:               ${SAIL_BUILD_EXAMPLES}")
 message("* Build SDL example:            ${SAIL_SDL_EXAMPLE}")
 message("* Build tests:                  ${SAIL_BUILD_TESTS}")
