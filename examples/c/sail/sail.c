@@ -93,7 +93,7 @@ static sail_status_t convert_impl(const char *input, const char *output, int com
     return SAIL_OK;
 }
 
-static sail_status_t convert(int argc, const char *argv[]) {
+static sail_status_t convert(int argc, char *argv[]) {
 
     if (argc < 4 || argc > 6) {
         print_invalid_argument();
@@ -177,7 +177,7 @@ static sail_status_t probe_impl(const char *path) {
     return SAIL_OK;
 }
 
-static sail_status_t probe(int argc, const char *argv[]) {
+static sail_status_t probe(int argc, char *argv[]) {
 
     if (argc != 3) {
         print_invalid_argument();
@@ -206,7 +206,7 @@ static sail_status_t list_impl(void) {
     return SAIL_OK;
 }
 
-static sail_status_t list(int argc, const char *argv[]) {
+static sail_status_t list(int argc, char *argv[]) {
 
     (void)argv;
 
@@ -220,7 +220,7 @@ static sail_status_t list(int argc, const char *argv[]) {
     return SAIL_OK;
 }
 
-static void help(char *app) {
+static void help(const char *app) {
 
     fprintf(stderr, "sail: SAIL command-line utility.\n\n");
     fprintf(stderr, "Usage: %s <command> <command arguments>\n", app);
