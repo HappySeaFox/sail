@@ -222,14 +222,14 @@ static sail_status_t list(int argc, char *argv[]) {
 
 static void help(const char *app) {
 
-    fprintf(stderr, "sail: SAIL command-line utility.\n\n");
+    fprintf(stderr, "SAIL command-line utility.\n\n");
     fprintf(stderr, "Usage: %s <command> <command arguments>\n", app);
     fprintf(stderr, "       %s [-v | --version]\n", app);
     fprintf(stderr, "       %s [-h | --help]\n", app);
     fprintf(stderr, "Commands:\n");
-    fprintf(stderr, "    convert <INPUT PATH> <OUTPUT PATH> [-c | --compression <value>] - Convert one image format to another\n");
-    fprintf(stderr, "    list - List supported codecs\n");
-    fprintf(stderr, "    probe <PATH> - Retrieve image information\n");
+    fprintf(stderr, "    convert <INPUT PATH> <OUTPUT PATH> [-c | --compression <value>] - Convert one image format to another.\n");
+    fprintf(stderr, "    list - List supported codecs.\n");
+    fprintf(stderr, "    probe <PATH> - Retrieve image information.\n");
 }
 
 int main(int argc, char *argv[]) {
