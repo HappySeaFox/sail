@@ -31,18 +31,28 @@ static MunitResult test_palette_create(const MunitParameter params[], void *user
     (void)params;
     (void)user_data;
 
-    sail::arbitrary_data data(8092);
+    {
+        sail::arbitrary_data data(8092);
 
-    for (std::size_t i = 0; i < data.size(); i++) {
-        data[i] = 50;
+        for (std::size_t i = 0; i < data.size(); i++) {
+            data[i] = 50;
+        }
+
+        const unsigned color_count = static_cast<unsigned>(data.size() / 2);
+
+        sail::palette palette(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE, data.data(), color_count);
+        munit_assert(palette.pixel_format() == SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE);
+        munit_assert(palette.data()         == data);
+        munit_assert(palette.color_count()  == color_count);
     }
 
-    const unsigned color_count = static_cast<unsigned>(data.size() / 2);
+    {
+        sail::palette palette;
 
-    sail::palette palette(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE, data.data(), color_count);
-    munit_assert(palette.pixel_format() == SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE);
-    munit_assert(palette.data()         == data);
-    munit_assert(palette.color_count()  == color_count);
+        munit_assert(palette.color_count() == 0);
+        munit_assert(palette.data().empty());
+        munit_assert(palette.pixel_format() == SAIL_PIXEL_FORMAT_UNKNOWN);
+    }
 
     return MUNIT_OK;
 }
@@ -51,20 +61,31 @@ static MunitResult test_palette_copy(const MunitParameter params[], void *user_d
     (void)params;
     (void)user_data;
 
-    sail::arbitrary_data data(8092);
+    {
+        sail::arbitrary_data data(8092);
 
-    for (std::size_t i = 0; i < data.size(); i++) {
-        data[i] = 50;
+        for (std::size_t i = 0; i < data.size(); i++) {
+            data[i] = 50;
+        }
+
+        const unsigned color_count = static_cast<unsigned>(data.size() / 2);
+
+        sail::palette palette(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE, data.data(), color_count);
+
+        sail::palette palette_copy = palette;
+        munit_assert(palette_copy.color_count()  == palette.color_count());
+        munit_assert(palette_copy.data()         == palette.data());
+        munit_assert(palette_copy.pixel_format() == palette.pixel_format());
     }
 
-    const unsigned color_count = static_cast<unsigned>(data.size() / 2);
+    {
+        sail::palette palette;
 
-    sail::palette palette(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE, data.data(), color_count);
-
-    sail::palette palette_copy = palette;
-    munit_assert(palette_copy.color_count()  == palette.color_count());
-    munit_assert(palette_copy.data()         == palette.data());
-    munit_assert(palette_copy.pixel_format() == palette.pixel_format());
+        sail::palette palette_copy = palette;
+        munit_assert(palette_copy.color_count() == 0);
+        munit_assert(palette_copy.data().empty());
+        munit_assert(palette_copy.pixel_format() == palette.pixel_format());
+    }
 
     return MUNIT_OK;
 }
