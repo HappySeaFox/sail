@@ -417,6 +417,7 @@ sail_status_t sail_greater_bits_per_pixel(enum SailPixelFormat pixel_format1, en
 sail_status_t sail_bytes_per_line(unsigned width, enum SailPixelFormat pixel_format, unsigned *result) {
 
     if (width == 0) {
+        SAIL_LOG_ERROR("Line width is 0");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 
