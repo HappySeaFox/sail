@@ -51,6 +51,7 @@ static MunitResult test_palette_create(const MunitParameter params[], void *user
         munit_assert(palette.pixel_format() == SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE);
         munit_assert(palette.data()         == data);
         munit_assert(palette.color_count()  == color_count);
+        munit_assert(palette.is_valid());
     }
 
     {
@@ -59,6 +60,7 @@ static MunitResult test_palette_create(const MunitParameter params[], void *user
         munit_assert(palette.color_count() == 0);
         munit_assert(palette.data().empty());
         munit_assert(palette.pixel_format() == SAIL_PIXEL_FORMAT_UNKNOWN);
+        munit_assert(!palette.is_valid());
     }
 
     return MUNIT_OK;
@@ -80,6 +82,7 @@ static MunitResult test_palette_copy(const MunitParameter params[], void *user_d
         munit_assert(palette_copy.color_count()  == palette.color_count());
         munit_assert(palette_copy.data()         == palette.data());
         munit_assert(palette_copy.pixel_format() == palette.pixel_format());
+        munit_assert(palette_copy.is_valid());
     }
 
     {
@@ -88,22 +91,24 @@ static MunitResult test_palette_copy(const MunitParameter params[], void *user_d
         const unsigned color_count = static_cast<unsigned>(data.size() / 2);
 
         sail::palette palette(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE, data.data(), color_count);
-        munit_assert(palette.pixel_format() != SAIL_PIXEL_FORMAT_UNKNOWN);
+        munit_assert(palette.is_valid());
 
         palette = sail::palette{};
         munit_assert(palette.color_count() == 0);
         munit_assert(palette.data().empty());
         munit_assert(palette.pixel_format() == SAIL_PIXEL_FORMAT_UNKNOWN);
+        munit_assert(!palette.is_valid());
     }
 
     {
         sail::palette palette;
-        munit_assert(palette.pixel_format() == SAIL_PIXEL_FORMAT_UNKNOWN);
+        munit_assert(!palette.is_valid());
 
         sail::palette palette_copy = palette;
         munit_assert(palette_copy.color_count() == 0);
         munit_assert(palette_copy.data().empty());
         munit_assert(palette_copy.pixel_format() == palette.pixel_format());
+        munit_assert(!palette_copy.is_valid());
     }
 
     return MUNIT_OK;
