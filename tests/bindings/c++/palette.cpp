@@ -27,16 +27,23 @@
 
 #include "munit.h"
 
+static sail::arbitrary_data construct_data() {
+
+    sail::arbitrary_data data(8092);
+
+    for (std::size_t i = 0; i < data.size(); i++) {
+        data[i] = 50;
+    }
+
+    return data;
+}
+
 static MunitResult test_palette_create(const MunitParameter params[], void *user_data) {
     (void)params;
     (void)user_data;
 
     {
-        sail::arbitrary_data data(8092);
-
-        for (std::size_t i = 0; i < data.size(); i++) {
-            data[i] = 50;
-        }
+        sail::arbitrary_data data = construct_data();
 
         const unsigned color_count = static_cast<unsigned>(data.size() / 2);
 
@@ -62,15 +69,12 @@ static MunitResult test_palette_copy(const MunitParameter params[], void *user_d
     (void)user_data;
 
     {
-        sail::arbitrary_data data(8092);
-
-        for (std::size_t i = 0; i < data.size(); i++) {
-            data[i] = 50;
-        }
+        sail::arbitrary_data data = construct_data();
 
         const unsigned color_count = static_cast<unsigned>(data.size() / 2);
 
         sail::palette palette(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE, data.data(), color_count);
+        munit_assert(palette.pixel_format() != SAIL_PIXEL_FORMAT_UNKNOWN);
 
         sail::palette palette_copy = palette;
         munit_assert(palette_copy.color_count()  == palette.color_count());
@@ -79,7 +83,22 @@ static MunitResult test_palette_copy(const MunitParameter params[], void *user_d
     }
 
     {
+        sail::arbitrary_data data = construct_data();
+
+        const unsigned color_count = static_cast<unsigned>(data.size() / 2);
+
+        sail::palette palette(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE, data.data(), color_count);
+        munit_assert(palette.pixel_format() != SAIL_PIXEL_FORMAT_UNKNOWN);
+
+        palette = sail::palette{};
+        munit_assert(palette.color_count() == 0);
+        munit_assert(palette.data().empty());
+        munit_assert(palette.pixel_format() == SAIL_PIXEL_FORMAT_UNKNOWN);
+    }
+
+    {
         sail::palette palette;
+        munit_assert(palette.pixel_format() == SAIL_PIXEL_FORMAT_UNKNOWN);
 
         sail::palette palette_copy = palette;
         munit_assert(palette_copy.color_count() == 0);

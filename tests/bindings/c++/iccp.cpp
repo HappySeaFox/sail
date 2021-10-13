@@ -27,9 +27,7 @@
 
 #include "munit.h"
 
-static MunitResult test_iccp_create(const MunitParameter params[], void *user_data) {
-    (void)params;
-    (void)user_data;
+static sail::arbitrary_data construct_data() {
 
     sail::arbitrary_data data(8092);
 
@@ -37,7 +35,17 @@ static MunitResult test_iccp_create(const MunitParameter params[], void *user_da
         data[i] = 50;
     }
 
+    return data;
+}
+
+static MunitResult test_iccp_create(const MunitParameter params[], void *user_data) {
+    (void)params;
+    (void)user_data;
+
+    sail::arbitrary_data data = construct_data();
+
     sail::iccp iccp(data.data(), static_cast<unsigned>(data.size()));
+    munit_assert(iccp.is_valid());
     munit_assert(iccp.data() == data);
 
     return MUNIT_OK;
@@ -47,16 +55,26 @@ static MunitResult test_iccp_copy(const MunitParameter params[], void *user_data
     (void)params;
     (void)user_data;
 
-    sail::arbitrary_data data(8092);
+    {
+        sail::arbitrary_data data = construct_data();
 
-    for (std::size_t i = 0; i < data.size(); i++) {
-        data[i] = 50;
+        sail::iccp iccp(data.data(), static_cast<unsigned>(data.size()));
+        munit_assert(iccp.is_valid());
+
+        sail::iccp iccp_copy = iccp;
+        munit_assert(iccp_copy.data() == iccp.data());
     }
 
-    sail::iccp iccp(data.data(), static_cast<unsigned>(data.size()));
+    {
+        sail::arbitrary_data data = construct_data();
 
-    sail::iccp iccp_copy = iccp;
-    munit_assert(iccp_copy.data() == iccp.data());
+        sail::iccp iccp(data.data(), static_cast<unsigned>(data.size()));
+        munit_assert(iccp.is_valid());
+
+        iccp = sail::iccp{};
+        munit_assert(!iccp.is_valid());
+        munit_assert(iccp.data().empty());
+    }
 
     return MUNIT_OK;
 }
