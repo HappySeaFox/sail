@@ -75,7 +75,11 @@ palette::palette(const palette &pal)
 
 palette& palette::operator=(const sail::palette &palette)
 {
-    with_data(palette.pixel_format(), palette.data());
+    d->reset();
+
+    if (palette.is_valid()) {
+        with_data(palette.pixel_format(), palette.data());
+    }
 
     return *this;
 }
@@ -102,7 +106,7 @@ palette::~palette()
 
 bool palette::is_valid() const
 {
-    return !d->data.empty() && d->sail_palette->pixel_format != SAIL_PIXEL_FORMAT_UNKNOWN && d->sail_palette->color_count > 0;
+    return d->sail_palette->pixel_format != SAIL_PIXEL_FORMAT_UNKNOWN && d->sail_palette->color_count > 0 && !d->data.empty();
 }
 
 SailPixelFormat palette::pixel_format() const
