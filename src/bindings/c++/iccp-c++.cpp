@@ -122,8 +122,6 @@ iccp& iccp::with_data(const void *data, unsigned data_length)
 
 iccp& iccp::with_data(const arbitrary_data &data)
 {
-    d->reset();
-
     with_data(data.data(), static_cast<unsigned>(data.size()));
 
     return *this;
