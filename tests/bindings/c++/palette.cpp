@@ -23,6 +23,8 @@
     SOFTWARE.
 */
 
+#include <utility> /* move */
+
 #include "sail-c++.h"
 
 #include "munit.h"
@@ -76,28 +78,13 @@ static MunitResult test_palette_copy(const MunitParameter params[], void *user_d
         const unsigned color_count = static_cast<unsigned>(data.size() / 2);
 
         sail::palette palette(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE, data.data(), color_count);
-        munit_assert(palette.pixel_format() != SAIL_PIXEL_FORMAT_UNKNOWN);
+        munit_assert(palette.is_valid());
 
         sail::palette palette_copy = palette;
         munit_assert(palette_copy.color_count()  == palette.color_count());
         munit_assert(palette_copy.data()         == palette.data());
         munit_assert(palette_copy.pixel_format() == palette.pixel_format());
         munit_assert(palette_copy.is_valid());
-    }
-
-    {
-        sail::arbitrary_data data = construct_data();
-
-        const unsigned color_count = static_cast<unsigned>(data.size() / 2);
-
-        sail::palette palette(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE, data.data(), color_count);
-        munit_assert(palette.is_valid());
-
-        palette = sail::palette{};
-        munit_assert(palette.color_count() == 0);
-        munit_assert(palette.data().empty());
-        munit_assert(palette.pixel_format() == SAIL_PIXEL_FORMAT_UNKNOWN);
-        munit_assert(!palette.is_valid());
     }
 
     {
@@ -114,9 +101,40 @@ static MunitResult test_palette_copy(const MunitParameter params[], void *user_d
     return MUNIT_OK;
 }
 
+static MunitResult test_palette_move(const MunitParameter params[], void *user_data) {
+    (void)params;
+    (void)user_data;
+
+    {
+        sail::arbitrary_data data = construct_data();
+
+        const unsigned color_count = static_cast<unsigned>(data.size() / 2);
+
+        sail::palette palette(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE, data.data(), color_count);
+        munit_assert(palette.is_valid());
+
+        sail::palette palette_copy = std::move(palette);
+        munit_assert(palette_copy.color_count()  == color_count);
+        munit_assert(palette_copy.data()         == data);
+        munit_assert(palette_copy.pixel_format() == SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE);
+        munit_assert(palette_copy.is_valid());
+    }
+
+    {
+        sail::palette palette = sail::palette{};
+        munit_assert(palette.color_count() == 0);
+        munit_assert(palette.data().empty());
+        munit_assert(palette.pixel_format() == SAIL_PIXEL_FORMAT_UNKNOWN);
+        munit_assert(!palette.is_valid());
+    }
+
+    return MUNIT_OK;
+}
+
 static MunitTest test_suite_tests[] = {
     { (char *)"/create", test_palette_create, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/copy",   test_palette_copy,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/move",   test_palette_move,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };
