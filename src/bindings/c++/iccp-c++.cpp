@@ -71,7 +71,11 @@ iccp::iccp(const sail::iccp &ic)
 
 iccp& iccp::operator=(const sail::iccp &iccp)
 {
-    with_data(iccp.data());
+    d->reset();
+
+    if (iccp.is_valid()) {
+        with_data(iccp.data());
+    }
 
     return *this;
 }
@@ -110,12 +114,8 @@ iccp& iccp::with_data(const void *data, unsigned data_length)
 {
     d->reset();
 
-    if (data == nullptr || data_length == 0) {
-        return *this;
-    }
-
-    d->data.resize(data_length);
-    memcpy(d->data.data(), data, data_length);
+    SAIL_TRY_OR_EXECUTE(copy(data, data_length),
+                        /* on error */ return *this);
 
     return *this;
 }
@@ -148,6 +148,21 @@ sail_status_t iccp::to_sail_iccp(sail_iccp **iccp) const
     SAIL_TRY(sail_alloc_iccp_from_data(d->data.data(), static_cast<unsigned>(d->data.size()), &iccp_local));
 
     *iccp = iccp_local;
+
+    return SAIL_OK;
+}
+
+sail_status_t iccp::copy(const void *data, unsigned data_length)
+{
+    SAIL_CHECK_PTR(data);
+
+    if (data_length == 0) {
+        SAIL_LOG_ERROR("ICCP data length is 0");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+    }
+
+    d->data.resize(data_length);
+    memcpy(d->data.data(), data, data_length);
 
     return SAIL_OK;
 }
