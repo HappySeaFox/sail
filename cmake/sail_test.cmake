@@ -10,9 +10,9 @@ macro(sail_test)
     sail_enable_asan(TARGET ${SAIL_TEST_TARGET})
 
     if (WIN32)
-        add_test(NAME ${SAIL_TEST_TARGET} WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/bin COMMAND ${SAIL_TEST_TARGET})
+        add_test(NAME "${SAIL_TEST_TARGET}" WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/bin COMMAND ${SAIL_TEST_TARGET})
     else()
-        add_test(NAME ${SAIL_TEST_TARGET} COMMAND ${SAIL_TEST_TARGET})
+        add_test(NAME "${SAIL_TEST_TARGET}" COMMAND ${SAIL_TEST_TARGET})
     endif()
 
     # Depend on sail-munit

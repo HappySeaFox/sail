@@ -312,20 +312,12 @@ image& image::with_meta_data(const std::vector<sail::meta_data> &meta_data)
 image& image::with_meta_data(const sail::meta_data &meta_data)
 {
     d->meta_data.push_back(meta_data);
-
     return *this;
 }
 
 image& image::with_pixels(const void *pixels)
 {
-    const unsigned bytes_per_image = height() * bytes_per_line();
-
-    if (bytes_per_image == 0) {
-        SAIL_LOG_ERROR("Cannot assign pixels as the image height or bytes_per_line is 0");
-        return *this;
-    }
-
-    with_pixels(pixels, bytes_per_image);
+    with_pixels(pixels, height() * bytes_per_line());
 
     return *this;
 }
@@ -350,14 +342,8 @@ image& image::with_pixels(const void *pixels, unsigned pixels_size)
 
 image& image::with_shallow_pixels(void *pixels)
 {
-    const unsigned bytes_per_image = height() * bytes_per_line();
+    with_shallow_pixels(pixels, height() * bytes_per_line());
 
-    if (bytes_per_image == 0) {
-        SAIL_LOG_ERROR("Cannot assign shallow pixels as the image height or bytes_per_line is 0");
-        return *this;
-    }
-
-    with_shallow_pixels(pixels, bytes_per_image);
     return *this;
 }
 
