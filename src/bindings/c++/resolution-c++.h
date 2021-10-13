@@ -53,6 +53,11 @@ public:
     resolution();
 
     /*
+     * Constructs a new resolution with the specified unit and values.
+     */
+    resolution(SailResolutionUnit unit, double x, double y);
+
+    /*
      * Copies the resolution.
      */
     resolution(const resolution &res);

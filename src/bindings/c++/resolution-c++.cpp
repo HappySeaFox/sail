@@ -47,6 +47,14 @@ resolution::resolution()
 {
 }
 
+resolution::resolution(SailResolutionUnit unit, double x, double y)
+    : resolution()
+{
+    with_unit(unit)
+        .with_x(x)
+        .with_y(y);
+}
+
 resolution::resolution(const resolution &res)
     : resolution()
 {
