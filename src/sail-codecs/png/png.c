@@ -264,7 +264,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_png(struct sail_io *io, const 
 
     /* Fetch gamma. */
     if (png_get_gAMA(png_state->png_ptr, png_state->info_ptr, &png_state->first_image->gamma) == 0) {
-        SAIL_LOG_ERROR("PNG: Failed to read the image gamma so it stays default");
+        SAIL_LOG_TRACE("PNG: Failed to read the image gamma so it stays default");
     }
 
 #ifdef PNG_APNG_SUPPORTED
