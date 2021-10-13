@@ -126,7 +126,7 @@ SailMetaDataType meta_data::value_type() const
 meta_data& meta_data::with_key(SailMetaData key)
 {
     d->sail_meta_data->key = key;
-    d->key_unknown              = std::string{};
+    d->key_unknown         = std::string{};
 
     return *this;
 }
@@ -134,7 +134,7 @@ meta_data& meta_data::with_key(SailMetaData key)
 meta_data& meta_data::with_key_unknown(const std::string &key_unknown)
 {
     d->sail_meta_data->key = SAIL_META_DATA_UNKNOWN;
-    d->key_unknown              = key_unknown;
+    d->key_unknown         = key_unknown;
 
     return *this;
 }
@@ -144,7 +144,7 @@ meta_data& meta_data::with_value(const std::string_view value)
     d->free();
 
     d->sail_meta_data->value_type = SAIL_META_DATA_TYPE_STRING;
-    d->value_string                    = value;
+    d->value_string               = value;
 
     return *this;
 }
@@ -154,7 +154,7 @@ meta_data& meta_data::with_value(const arbitrary_data &value)
     d->free();
 
     d->sail_meta_data->value_type = SAIL_META_DATA_TYPE_DATA;
-    d->value_data                      = value;
+    d->value_data                 = value;
 
     return *this;
 }

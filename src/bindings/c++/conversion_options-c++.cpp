@@ -105,6 +105,7 @@ sail_rgb24_t conversion_options::background24() const
 conversion_options& conversion_options::with_options(int options)
 {
     d->conversion_options->options = options;
+
     return *this;
 }
 

@@ -38,6 +38,11 @@ public:
     {
     }
 
+    void reset()
+    {
+        data.clear();
+    }
+
     arbitrary_data data;
 };
 
@@ -103,7 +108,7 @@ const arbitrary_data& iccp::data() const
 
 iccp& iccp::with_data(const void *data, unsigned data_length)
 {
-    d->data.clear();
+    d->reset();
 
     if (data == nullptr || data_length == 0) {
         return *this;
@@ -117,7 +122,11 @@ iccp& iccp::with_data(const void *data, unsigned data_length)
 
 iccp& iccp::with_data(const arbitrary_data &data)
 {
-    return with_data(data.data(), static_cast<unsigned>(data.size()));
+    d->reset();
+
+    with_data(data.data(), static_cast<unsigned>(data.size()));
+
+    return *this;
 }
 
 iccp::iccp(const sail_iccp *ic)
