@@ -107,12 +107,14 @@ public:
     unsigned color_count() const;
 
     /*
-     * Sets new palette data, pixel format, and colors count.
+     * Sets new palette data, pixel format, and colors count. Does nothing if the pixel format
+     * is SAIL_PIXEL_FORMAT_UNKNOWN, or the color count is 0, or the data is null.
      */
     palette& with_data(SailPixelFormat pixel_format, const void *data, unsigned color_count);
 
     /*
-     * Sets new palette data, pixel format, and colors count.
+     * Sets new palette data, pixel format, and colors count. Does nothing if the pixel format
+     * is SAIL_PIXEL_FORMAT_UNKNOWN, or the color count is 0, or the data is null.
      */
     palette& with_data(SailPixelFormat pixel_format, const arbitrary_data &data);
 
