@@ -52,14 +52,22 @@ class SAIL_EXPORT palette
 
 public:
     /*
-     * Constructs an empty palette.
+     * Constructs an invalid palette.
      */
     palette();
 
     /*
-     * Constructs palette from the data.
+     * Constructs palette from the data. The palette stays invalid if the pixel format
+     * is SAIL_PIXEL_FORMAT_UNKNOWN, or the color count is 0, or the data is null.
      */
     palette(SailPixelFormat pixel_format, const void *data, unsigned color_count);
+
+    /*
+     * Constructs palette from the data. Calculates the color count from the data size
+     * and the pixel format. The palette stays invalid if the pixel format
+     * is SAIL_PIXEL_FORMAT_UNKNOWN or the data is empty.
+     */
+    palette(SailPixelFormat pixel_format, const arbitrary_data &data);
 
     /*
      * Copies the palette.
@@ -107,14 +115,16 @@ public:
     unsigned color_count() const;
 
     /*
-     * Sets new palette data, pixel format, and colors count. Does nothing if the pixel format
-     * is SAIL_PIXEL_FORMAT_UNKNOWN, or the color count is 0, or the data is null.
+     * Sets new palette data, pixel format, and colors count. Makes the palette invalid
+     * if the pixel format is SAIL_PIXEL_FORMAT_UNKNOWN, or the color count is 0,
+     * or the data is null.
      */
     palette& with_data(SailPixelFormat pixel_format, const void *data, unsigned color_count);
 
     /*
-     * Sets new palette data, pixel format, and colors count. Does nothing if the pixel format
-     * is SAIL_PIXEL_FORMAT_UNKNOWN, or the color count is 0, or the data is null.
+     * Sets new palette data, pixel format, and colors count. Calculates the color count
+     * from the data size and the pixel format. Makes the palette invalid if the pixel
+     * format is SAIL_PIXEL_FORMAT_UNKNOWN or the data is empty.
      */
     palette& with_data(SailPixelFormat pixel_format, const arbitrary_data &data);
 

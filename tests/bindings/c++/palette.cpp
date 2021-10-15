@@ -57,6 +57,16 @@ static MunitResult test_palette_create(const MunitParameter params[], void *user
     }
 
     {
+        sail::arbitrary_data data = construct_data();
+
+        sail::palette palette(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE, data);
+        munit_assert(palette.pixel_format() == SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE);
+        munit_assert(palette.data()         == data);
+        munit_assert(palette.color_count()  == (data.size() / 2));
+        munit_assert(palette.is_valid());
+    }
+
+    {
         sail::palette palette;
 
         munit_assert(palette.color_count() == 0);

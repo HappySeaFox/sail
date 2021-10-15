@@ -67,6 +67,12 @@ palette::palette(SailPixelFormat pixel_format, const void *data, unsigned color_
     with_data(pixel_format, data, color_count);
 }
 
+palette::palette(SailPixelFormat pixel_format, const arbitrary_data &data)
+    : palette()
+{
+    with_data(pixel_format, data);
+}
+
 palette::palette(const palette &pal)
     : palette()
 {
