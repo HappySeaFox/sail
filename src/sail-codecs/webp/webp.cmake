@@ -1,8 +1,8 @@
 macro(sail_find_dependencies)
     find_library(WEBP_RELEASE_LIBRARY NAMES webp)
     find_library(WEBP_DEBUG_LIBRARY NAMES webpd webp)
-    find_library(WEBP_DEMUX_RELEASE_LIBRARY webpdemux)
-    find_library(WEBP_DEMUX_DEBUG_LIBRARY webpdemuxd webpdemux)
+    find_library(WEBP_DEMUX_RELEASE_LIBRARY NAMES webpdemux)
+    find_library(WEBP_DEMUX_DEBUG_LIBRARY NAMES webpdemuxd webpdemux)
     find_path(WEBP_INCLUDE_DIRS webp/decode.h)
 
     if ((NOT WEBP_RELEASE_LIBRARY AND NOT WEBP_DEBUG_LIBRARY) OR (NOT WEBP_DEMUX_RELEASE_LIBRARY AND NOT WEBP_DEMUX_DEBUG_LIBRARY) OR NOT WEBP_INCLUDE_DIRS)
