@@ -17,8 +17,7 @@ macro(sail_find_dependencies)
     #
     # find_library(jasper_RELEASE_LIBRARY NAMES jasper)
     # find_library(jasper_DEBUG_LIBRARY NAMES jasperd jasper)
-    # set(jasper_LIBRARY optimized ${jasper_RELEASE_LIBRARY} debug ${jasper_DEBUG_LIBRARY})
-    # set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES ${jasper_LIBRARY})
+    # set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES $<$<CONFIG:Release>:${jasper_RELEASE_LIBRARY}> $<$<CONFIG:Debug>:${jasper_DEBUG_LIBRARY}>)
     #
     set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,jasper,jasperd" PARENT_SCOPE)
 endmacro()

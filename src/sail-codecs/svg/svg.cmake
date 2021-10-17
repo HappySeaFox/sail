@@ -14,8 +14,7 @@ macro(sail_find_dependencies)
     #
     # find_library(resvg_RELEASE_LIBRARY NAMES resvg)
     # find_library(resvg_DEBUG_LIBRARY NAMES resvg)
-    # set(resvg_LIBRARY optimized ${resvg_RELEASE_LIBRARY} debug ${resvg_DEBUG_LIBRARY})
-    # set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES ${resvg_LIBRARY})
+    # set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES $<$<CONFIG:Release>:${resvg_RELEASE_LIBRARY}> $<$<CONFIG:Debug>:${resvg_DEBUG_LIBRARY}>)
     #
     set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,resvg,resvg" PARENT_SCOPE)
 endmacro()
