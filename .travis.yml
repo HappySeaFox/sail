@@ -78,21 +78,29 @@ script:
       mkdir build
       cd build
 
-      fail_on_error cmake -A x64 -DCMAKE_INSTALL_PREFIX="C:\SAIL" -DSAIL_DEV=ON ..
+      CMAKE_INSTALL_PREFIX="C:/SAIL"
+
+      fail_on_error cmake -A x64 -DCMAKE_INSTALL_PREFIX="$CMAKE_INSTALL_PREFIX" -DSAIL_DEV=ON ..
       fail_on_error cmake --build . --config Debug --target install
 
       cd tests
       fail_on_error ctest --verbose -C Debug
+
+      fail_on_error "$CMAKE_INSTALL_PREFIX/bin/sail" --version
     ;;
     osx | linux)
       mkdir build
       cd build
 
-      fail_on_error cmake -DCMAKE_BUILD_TYPE=Debug -DSAIL_DEV=ON ..
+      CMAKE_INSTALL_PREFIX="/usr/local"
+
+      fail_on_error cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX="$CMAKE_INSTALL_PREFIX" -DSAIL_DEV=ON ..
       fail_on_error cmake --build .
       fail_on_error sudo make install
 
       cd tests
       fail_on_error ctest --verbose
+
+      fail_on_error "$CMAKE_INSTALL_PREFIX/bin/sail" --version
     ;;
   esac
