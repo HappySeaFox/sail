@@ -23,6 +23,8 @@
     SOFTWARE.
 */
 
+#include <new> // bad_alloc
+
 #include "sail-c++.h"
 #include "sail.h"
 
@@ -35,7 +37,8 @@ public:
     pimpl()
         : sail_write_options(nullptr)
     {
-        SAIL_TRY_OR_SUPPRESS(sail_alloc_write_options(&sail_write_options));
+        SAIL_TRY_OR_EXECUTE(sail_alloc_write_options(&sail_write_options),
+                            /* on error */ throw std::bad_alloc());
     }
 
     ~pimpl()
@@ -68,22 +71,18 @@ write_options& write_options::operator=(const sail::write_options &write_options
 
 write_options::write_options(sail::write_options &&write_options) noexcept
 {
-    d = write_options.d;
-    write_options.d = nullptr;
+    *this = std::move(write_options);
 }
 
 write_options& write_options::operator=(sail::write_options &&write_options) noexcept
 {
-    delete d;
-    d = write_options.d;
-    write_options.d = nullptr;
+    d = std::move(write_options.d);
 
     return *this;
 }
 
 write_options::~write_options()
 {
-    delete d;
 }
 
 int write_options::io_options() const

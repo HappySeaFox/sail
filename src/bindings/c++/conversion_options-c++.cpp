@@ -24,6 +24,7 @@
 */
 
 #include <cstdint>
+#include <new> // bad_alloc
 
 #include "sail-c++.h"
 #include "sail-manip.h"
@@ -37,7 +38,8 @@ public:
     pimpl()
         : conversion_options(nullptr)
     {
-        SAIL_TRY_OR_SUPPRESS(sail_alloc_conversion_options(&conversion_options));
+        SAIL_TRY_OR_EXECUTE(sail_alloc_conversion_options(&conversion_options),
+                            /* on error */ throw std::bad_alloc());
     }
     ~pimpl()
     {
@@ -69,22 +71,18 @@ conversion_options& conversion_options::operator=(const conversion_options &co)
 
 conversion_options::conversion_options(conversion_options &&co) noexcept
 {
-    d = co.d;
-    co.d = nullptr;
+    *this = std::move(co);
 }
 
 conversion_options& conversion_options::operator=(conversion_options &&co) noexcept
 {
-    delete d;
-    d = co.d;
-    co.d = nullptr;
+    d = std::move(co.d);
 
     return *this;
 }
 
 conversion_options::~conversion_options()
 {
-    delete d;
 }
 
 int conversion_options::options() const

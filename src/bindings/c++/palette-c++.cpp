@@ -24,6 +24,7 @@
 */
 
 #include <cstring>
+#include <new> // bad_alloc
 
 #include "sail-c++.h"
 #include "sail.h"
@@ -37,7 +38,8 @@ public:
     pimpl()
         : sail_palette(nullptr)
     {
-        SAIL_TRY_OR_SUPPRESS(sail_alloc_palette(&sail_palette));
+        SAIL_TRY_OR_EXECUTE(sail_alloc_palette(&sail_palette),
+                            /* on error */ throw std::bad_alloc());
     }
 
     ~pimpl()
@@ -92,22 +94,18 @@ palette& palette::operator=(const sail::palette &palette)
 
 palette::palette(sail::palette &&palette) noexcept
 {
-    d = palette.d;
-    palette.d = nullptr;
+    *this = std::move(palette);
 }
 
 palette& palette::operator=(sail::palette &&palette) noexcept
 {
-    delete d;
-    d = palette.d;
-    palette.d = nullptr;
+    d = std::move(palette.d);
 
     return *this;
 }
 
 palette::~palette()
 {
-    delete d;
 }
 
 bool palette::is_valid() const

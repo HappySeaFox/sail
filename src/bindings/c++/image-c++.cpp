@@ -25,6 +25,7 @@
 
 #include <cstdlib>
 #include <cstring>
+#include <new> // bad_alloc
 #include <utility>
 
 #include "sail-c++.h"
@@ -42,7 +43,8 @@ public:
         , pixels_size(0)
         , shallow_pixels(false)
     {
-        SAIL_TRY_OR_SUPPRESS(sail_alloc_image(&sail_image));
+        SAIL_TRY_OR_EXECUTE(sail_alloc_image(&sail_image),
+                            /* on error */ throw std::bad_alloc());
     }
 
     ~pimpl()
@@ -133,22 +135,18 @@ image& image::operator=(const sail::image &image)
 
 image::image(sail::image &&image) noexcept
 {
-    d = image.d;
-    image.d = nullptr;
+    *this = std::move(image);
 }
 
 image& image::operator=(sail::image &&image) noexcept
 {
-    delete d;
-    d = image.d;
-    image.d = nullptr;
+    d = std::move(image.d);
 
     return *this;
 }
 
 image::~image()
 {
-    delete d;
 }
 
 bool image::is_valid() const

@@ -26,6 +26,7 @@
 #ifndef SAIL_META_DATA_CPP_H
 #define SAIL_META_DATA_CPP_H
 
+#include <memory>
 #include <string>
 #include <string_view>
 
@@ -162,7 +163,7 @@ private:
 
 private:
     class pimpl;
-    pimpl *d;
+    std::unique_ptr<pimpl> d;
 };
 
 template<>

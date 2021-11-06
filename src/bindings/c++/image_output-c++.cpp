@@ -60,7 +60,6 @@ image_output::image_output()
 image_output::~image_output()
 {
     stop();
-    delete d;
 }
 
 sail_status_t image_output::save(const std::string_view path, const sail::image &image) const

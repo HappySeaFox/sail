@@ -26,6 +26,8 @@
 #ifndef SAIL_PALETTE_CPP_H
 #define SAIL_PALETTE_CPP_H
 
+#include <memory>
+
 #ifdef SAIL_BUILD
     #include "error.h"
     #include "export.h"
@@ -140,7 +142,7 @@ private:
 
 private:
     class pimpl;
-    pimpl *d;
+    std::unique_ptr<pimpl> d;
 };
 
 }

@@ -27,6 +27,7 @@
 #define SAIL_IMAGE_INPUT_CPP_H
 
 #include <cstddef>
+#include <memory>
 #include <string_view>
 #include <tuple>
 
@@ -286,7 +287,7 @@ public:
 
 private:
     class pimpl;
-    pimpl * const d;
+    const std::unique_ptr<pimpl> d;
 };
 
 }

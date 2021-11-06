@@ -26,6 +26,7 @@
 #ifndef SAIL_WRITE_OPTIONS_CPP_H
 #define SAIL_WRITE_OPTIONS_CPP_H
 
+#include <memory>
 #include <vector>
 
 #ifdef SAIL_BUILD
@@ -133,7 +134,7 @@ private:
 
 private:
     class pimpl;
-    pimpl *d;
+    std::unique_ptr<pimpl> d;
 };
 
 }

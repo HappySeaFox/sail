@@ -72,22 +72,18 @@ resolution& resolution::operator=(const resolution &res)
 
 resolution::resolution(resolution &&res) noexcept
 {
-    d = res.d;
-    res.d = nullptr;
+    *this = std::move(res);
 }
 
 resolution& resolution::operator=(resolution &&res) noexcept
 {
-    delete d;
-    d = res.d;
-    res.d = nullptr;
+    d = std::move(res.d);
 
     return *this;
 }
 
 resolution::~resolution()
 {
-    delete d;
 }
 
 bool resolution::is_valid() const
