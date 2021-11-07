@@ -97,7 +97,10 @@ script:
       fail_on_error cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX="$CMAKE_INSTALL_PREFIX" -DSAIL_DEV=ON ..
       fail_on_error cmake --build .
       fail_on_error sudo make install
-      fail_on_error sudo ldconfig
+
+      if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+          fail_on_error sudo ldconfig
+      fi
 
       cd tests
       fail_on_error ctest --verbose
