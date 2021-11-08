@@ -27,6 +27,7 @@
 #define SAIL_IMAGE_OUTPUT_CPP_H
 
 #include <cstddef>
+#include <memory>
 #include <string_view>
 
 #ifdef SAIL_BUILD
@@ -240,7 +241,7 @@ public:
 
 private:
     class pimpl;
-    pimpl * const d;
+    const std::unique_ptr<pimpl> d;
 };
 
 }

@@ -131,10 +131,6 @@ public:
      * Typical usage: This is a standalone method that can be called at any time.
      */
     static void finish();
-
-private:
-    class pimpl;
-    pimpl * const d;
 };
 
 }

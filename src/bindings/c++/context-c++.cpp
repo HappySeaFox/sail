@@ -29,11 +29,6 @@
 namespace sail
 {
 
-class SAIL_HIDDEN context::pimpl
-{
-public:
-};
-
 sail_status_t context::init()
 {
     SAIL_TRY(init(0));

@@ -24,6 +24,7 @@
 */
 
 #include <cstring>
+#include <new> // bad_alloc
 
 #include "sail-c++.h"
 #include "sail.h"
@@ -37,12 +38,12 @@ public:
     pimpl()
         : sail_meta_data(nullptr)
     {
-        SAIL_TRY_OR_SUPPRESS(sail_alloc_meta_data(&sail_meta_data));
+        SAIL_TRY_OR_EXECUTE(sail_alloc_meta_data(&sail_meta_data),
+                            /* on error */ throw std::bad_alloc());
     }
 
     ~pimpl()
     {
-        free();
         sail_destroy_meta_data(sail_meta_data);
     }
 
@@ -90,22 +91,18 @@ meta_data& meta_data::operator=(const sail::meta_data &meta_data)
 
 meta_data::meta_data(sail::meta_data &&meta_data) noexcept
 {
-    d = meta_data.d;
-    meta_data.d = nullptr;
+    *this = std::move(meta_data);
 }
 
 meta_data& meta_data::operator=(sail::meta_data &&meta_data) noexcept
 {
-    delete d;
-    d = meta_data.d;
-    meta_data.d = nullptr;
+    d = std::move(meta_data.d);
 
     return *this;
 }
 
 meta_data::~meta_data()
 {
-    delete d;
 }
 
 SailMetaData meta_data::key() const

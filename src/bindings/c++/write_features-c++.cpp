@@ -59,22 +59,18 @@ write_features& write_features::operator=(const sail::write_features &write_feat
 
 write_features::write_features(sail::write_features &&write_features) noexcept
 {
-    d = write_features.d;
-    write_features.d = nullptr;
+    *this = std::move(write_features);
 }
 
 write_features& write_features::operator=(sail::write_features &&write_features) noexcept
 {
-    delete d;
-    d = write_features.d;
-    write_features.d = nullptr;
+    d = std::move(write_features.d);
 
     return *this;
 }
 
 write_features::~write_features()
 {
-    delete d;
 }
 
 const std::vector<SailPixelFormat>& write_features::output_pixel_formats() const

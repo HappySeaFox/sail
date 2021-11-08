@@ -82,22 +82,18 @@ iccp& iccp::operator=(const sail::iccp &iccp)
 
 iccp::iccp(sail::iccp &&iccp) noexcept
 {
-    d = iccp.d;
-    iccp.d = nullptr;
+    *this = std::move(iccp);
 }
 
 iccp& iccp::operator=(sail::iccp &&iccp) noexcept
 {
-    delete d;
-    d = iccp.d;
-    iccp.d = nullptr;
+    d = std::move(iccp.d);
 
     return *this;
 }
 
 iccp::~iccp()
 {
-    delete d;
 }
 
 bool iccp::is_valid() const

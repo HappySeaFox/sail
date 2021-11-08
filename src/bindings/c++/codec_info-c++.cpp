@@ -77,22 +77,18 @@ codec_info& codec_info::operator=(const codec_info &ci)
 
 codec_info::codec_info(codec_info &&ci) noexcept
 {
-    d = ci.d;
-    ci.d = nullptr;
+    *this = std::move(ci);
 }
 
 codec_info& codec_info::operator=(codec_info &&ci) noexcept
 {
-    delete d;
-    d = ci.d;
-    ci.d = nullptr;
+    d = std::move(ci.d);
 
     return *this;
 }
 
 codec_info::~codec_info()
 {
-    delete d;
 }
 
 bool codec_info::is_valid() const

@@ -60,7 +60,6 @@ image_input::image_input()
 image_input::~image_input()
 {
     stop();
-    delete d;
 }
 
 std::tuple<image, codec_info> image_input::probe(const std::string_view path) const

@@ -77,7 +77,6 @@ io& io::operator=(const io &i)
 
 io::~io()
 {
-    delete d;
 }
 
 sail_status_t io::verify_valid() const

@@ -26,6 +26,7 @@
 #ifndef SAIL_IMAGE_CPP_H
 #define SAIL_IMAGE_CPP_H
 
+#include <memory>
 #include <string_view>
 #include <vector>
 
@@ -729,7 +730,7 @@ private:
 
 private:
     class pimpl;
-    pimpl *d;
+    std::unique_ptr<pimpl> d;
 };
 
 }

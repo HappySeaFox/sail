@@ -54,22 +54,18 @@ read_features& read_features::operator=(const sail::read_features &read_features
 
 read_features::read_features(sail::read_features &&read_features) noexcept
 {
-    d = read_features.d;
-    read_features.d = nullptr;
+    *this = std::move(read_features);
 }
 
 read_features& read_features::operator=(sail::read_features &&read_features) noexcept
 {
-    delete d;
-    d = read_features.d;
-    read_features.d = nullptr;
+    d = std::move(read_features.d);
 
     return *this;
 }
 
 read_features::~read_features()
 {
-    delete d;
 }
 
 int read_features::features() const

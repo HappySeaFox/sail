@@ -23,6 +23,8 @@
     SOFTWARE.
 */
 
+#include <new> // bad_alloc
+
 #include "sail-c++.h"
 #include "sail.h"
 
@@ -35,7 +37,8 @@ public:
     pimpl()
         : sail_source_image(nullptr)
     {
-        SAIL_TRY_OR_SUPPRESS(sail_alloc_source_image(&sail_source_image));
+        SAIL_TRY_OR_EXECUTE(sail_alloc_source_image(&sail_source_image),
+                            /* on error */ throw std::bad_alloc());
     }
 
     ~pimpl()
@@ -70,22 +73,18 @@ source_image& source_image::operator=(const source_image &si)
 
 source_image::source_image(source_image &&si) noexcept
 {
-    d = si.d;
-    si.d = nullptr;
+    *this = std::move(si);
 }
 
 source_image& source_image::operator=(source_image &&si) noexcept
 {
-    delete d;
-    d = si.d;
-    si.d = nullptr;
+    d = std::move(si.d);
 
     return *this;
 }
 
 source_image::~source_image()
 {
-    delete d;
 }
 
 bool source_image::is_valid() const
