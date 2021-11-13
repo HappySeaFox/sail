@@ -8,7 +8,7 @@
 #      is added. sail_codec_post_add() could be used for tests like check_c_source_compiles().
 #
 macro(sail_codec)
-    cmake_parse_arguments(SAIL_CODEC "" "NAME" "SOURCES;CMAKE" ${ARGN})
+    cmake_parse_arguments(SAIL_CODEC "" "NAME;ICON" "SOURCES;CMAKE" ${ARGN})
 
     # Put this codec into the disabled list so when we return from here
     # on error it's get automatically marked as disabled. If no errors were found,
@@ -83,7 +83,7 @@ macro(sail_codec)
 
     # Install icon
     #
-    install(FILES "${PROJECT_SOURCE_DIR}/icons/${SAIL_CODEC_NAME}.png" DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/sail/icons")
+    install(FILES "${SAIL_CODEC_ICON}" DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/sail/icons")
 
     # Export this codec name into the parent scope
     #
