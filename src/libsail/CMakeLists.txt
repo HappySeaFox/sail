@@ -12,6 +12,7 @@ add_library(sail
                 codec_info_private.c
                 codec_info_private.h
                 codec_layout.h
+                codec_priority.h
                 context.c
                 context.h
                 context_private.c
@@ -48,6 +49,7 @@ add_library(sail
 set(PUBLIC_HEADERS "codec_bundle.h"
                    "codec_bundle_node.h"
                    "codec_info.h"
+                   "codec_priority.h"
                    "context.h"
                    "sail.h"
                    "sail_advanced.h"

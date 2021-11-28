@@ -278,14 +278,16 @@ layout=6
 #
 version=1.0.0
 
-# Codec priority from 0 to 3. SAIL sorts the enumerated codecs by priority.
+# Codec priority. SAIL uses this property to sort the enumerated codecs by priority
+# to speed up search of popular image formats by functions like sail_codec_info_from_path().
 #
-# 0 = popular image format like JPEG or PNG
-# 1 = moderate popularity
-# 2 = rare image format
-# 3 = very rare, ancient image format
+# HIGHEST = one of the most popular image formats like JPEG
+# HIGH    = pretty popular and common image format like SVG
+# MEDIUM  = moderate popularity
+# LOW     = rare image format
+# LOWEST  = very rare and/or too specific and/or ancient image format
 #
-priority=1
+priority=MEDIUM
 
 # Short codec name. Must be uppercase. Cannot be empty.
 #

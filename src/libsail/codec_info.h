@@ -26,6 +26,8 @@
 #ifndef SAIL_CODEC_INFO_H
 #define SAIL_CODEC_INFO_H
 
+#include "codec_priority.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -50,14 +52,10 @@ struct sail_codec_info {
     int layout;
 
     /*
-     * Codec priority from 0 to 3. SAIL sorts the enumerated codecs by priority.
-     *
-     * 0 = popular image format like JPEG or PNG
-     * 1 = moderate popularity
-     * 2 = rare image format
-     * 3 = Very rare, ancient image format
+     * Codec priority. SAIL uses this property to sort the enumerated codecs by priority
+     * to speed up search of popular image formats by functions like sail_codec_info_from_path().
      */
-    int priority;
+    enum SailCodecPriority priority;
 
     /* Codec version. For example: "1.5.2". */
     char *version;

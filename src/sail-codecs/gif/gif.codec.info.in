@@ -3,7 +3,7 @@
 [codec]
 layout=6
 version=1.3.1
-priority=0
+priority=HIGHEST
 name=GIF
 description=Graphics Interchange Format
 magic-numbers=47 49 46 38 37 61;47 49 46 38 39 61

@@ -121,6 +121,23 @@ struct init_data {
     struct sail_codec_info *codec_info;
 };
 
+static sail_status_t codec_priority_from_string(const char *str, enum SailCodecPriority *result) {
+
+    uint64_t hash;
+    SAIL_TRY_OR_EXECUTE(sail_string_hash(str, &hash),
+                        /* cleanup */ return SAIL_ERROR_UNSUPPORTED_CODEC_PRIORITY);
+
+    switch (hash) {
+        case UINT64_C(229425771102513): *result = SAIL_CODEC_PRIORITY_HIGHEST; return SAIL_OK;
+        case UINT64_C(6384110277):      *result = SAIL_CODEC_PRIORITY_HIGH;    return SAIL_OK;
+        case UINT64_C(6952486921094):   *result = SAIL_CODEC_PRIORITY_MEDIUM;  return SAIL_OK;
+        case UINT64_C(193462455):       *result = SAIL_CODEC_PRIORITY_LOW;     return SAIL_OK;
+        case UINT64_C(6952460323299):   *result = SAIL_CODEC_PRIORITY_LOWEST;  return SAIL_OK;
+
+        default: return SAIL_ERROR_UNSUPPORTED_CODEC_PRIORITY;
+    }
+}
+
 static sail_status_t inih_handler_sail_error(void *data, const char *section, const char *name, const char *value) {
 
     /* Silently ignore empty values. */
@@ -137,7 +154,8 @@ static sail_status_t inih_handler_sail_error(void *data, const char *section, co
         } else if (strcmp(name, "version") == 0) {
             SAIL_TRY(sail_strdup(value, &codec_info->version));
         } else if (strcmp(name, "priority") == 0) {
-            codec_info->priority = atoi(value);
+            SAIL_TRY_OR_CLEANUP(codec_priority_from_string(value, &codec_info->priority),
+                                /* cleanup */ SAIL_LOG_ERROR("Failed to parse codec priority: '%s'", value));
         } else if (strcmp(name, "name") == 0) {
             SAIL_TRY(sail_strdup(value, &codec_info->name));
         } else if (strcmp(name, "description") == 0) {

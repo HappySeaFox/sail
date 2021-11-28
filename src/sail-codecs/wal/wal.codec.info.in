@@ -3,7 +3,7 @@
 [codec]
 layout=6
 version=0.2.0
-priority=3
+priority=LOWEST
 name=WAL
 description=Quake2 Texture
 magic-numbers=

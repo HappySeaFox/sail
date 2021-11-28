@@ -3,7 +3,7 @@
 [codec]
 layout=6
 version=0.1.2
-priority=1
+priority=HIGH
 name=SVG
 description=Scalable Vector Graphics
 magic-numbers=3C 3F 78 6D 6C

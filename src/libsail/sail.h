@@ -39,6 +39,7 @@
     #include "codec_info.h"
     #include "codec_info_private.h"
     #include "codec_layout.h"
+    #include "codec_priority.h"
     #include "context.h"
     #include "context_private.h"
     #include "ini.h"
@@ -60,6 +61,7 @@
     #include <sail/codec_bundle.h>
     #include <sail/codec_bundle_node.h>
     #include <sail/codec_info.h>
+    #include <sail/codec_priority.h>
     #include <sail/context.h>
     #include <sail/sail_advanced.h>
     #include <sail/sail_deep_diver.h>
