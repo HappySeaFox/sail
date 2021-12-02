@@ -1,0 +1,25 @@
+# PCX codec information
+#
+[codec]
+layout=6
+version=0.8.1
+priority=LOW
+name=PCX
+description=Picture Exchange
+magic-numbers=
+extensions=pcx
+mime-types=image/x-pcx;image/vnd.zbrush.pcx
+
+[read-features]
+features=STATIC
+
+[write-features]
+features=
+output-pixel-formats=
+properties=
+compression-types=
+default-compression=
+compression-level-min=0
+compression-level-max=0
+compression-level-default=0
+compression-level-step=0
