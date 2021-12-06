@@ -43,6 +43,7 @@ struct pcx_state {
     struct sail_write_options *write_options;
 
     struct SailPcxHeader pcx_header;
+    unsigned char *scan; /* buffer to read a single plane scan line. */
 
     bool frame_read;
 };
@@ -56,6 +57,7 @@ static sail_status_t alloc_pcx_state(struct pcx_state **pcx_state) {
     (*pcx_state)->read_options  = NULL;
     (*pcx_state)->write_options = NULL;
 
+    (*pcx_state)->scan          = NULL;
     (*pcx_state)->frame_read    = false;
 
     return SAIL_OK;
@@ -69,6 +71,8 @@ static void destroy_pcx_state(struct pcx_state *pcx_state) {
 
     sail_destroy_read_options(pcx_state->read_options);
     sail_destroy_write_options(pcx_state->write_options);
+
+    sail_free(pcx_state->scan);
 
     sail_free(pcx_state);
 }
@@ -98,6 +102,11 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_pcx(struct sail_io *io, const 
 
     if (pcx_state->pcx_header.id != SAIL_PCX_SIGNATURE) {
         SAIL_LOG_ERROR("PCX: ID is %u, but must be %u", pcx_state->pcx_header.id, SAIL_PCX_SIGNATURE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+    }
+
+    if (pcx_state->pcx_header.bytes_per_line == 0) {
+        SAIL_LOG_ERROR("PCX: Bytes per line is 0");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
     }
 
@@ -139,6 +148,18 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_pcx(void *state, st
     SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(image_local->width, image_local->pixel_format, &image_local->bytes_per_line),
                         /* cleanup */ sail_destroy_image(image_local));
 
+    /* Temporary scan line buffer. */
+    switch (image_local->pixel_format) {
+        case SAIL_PIXEL_FORMAT_BPP24_RGB:
+        case SAIL_PIXEL_FORMAT_BPP16_RGBA:
+        case SAIL_PIXEL_FORMAT_BPP32_RGBA: {
+            SAIL_TRY_OR_CLEANUP(sail_malloc(image_local->bytes_per_line, &pcx_state->scan),
+                                /* cleanup */ sail_destroy_image(image_local));
+
+            break;
+        }
+    }
+
     /* Build palette if needed. */
     SAIL_TRY_OR_CLEANUP(pcx_private_build_palette(image_local->pixel_format, io, pcx_state->pcx_header.palette, &image_local->palette),
                         /* cleanup */ sail_destroy_image(image_local));
@@ -155,6 +176,49 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v6_pcx(void *state, struct sail_
     SAIL_TRY(sail_check_image_skeleton_valid(image));
 
     const struct pcx_state *pcx_state = (struct pcx_state *)state;
+
+    if (pcx_state->pcx_header.encoding == SAIL_PCX_NO_ENCODING) {
+        switch (image->pixel_format) {
+            case SAIL_PIXEL_FORMAT_BPP1_INDEXED:
+            case SAIL_PIXEL_FORMAT_BPP4_INDEXED:
+            case SAIL_PIXEL_FORMAT_BPP8_INDEXED:
+            case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE: {
+                const unsigned line_padding = pcx_state->pcx_header.bytes_per_line - image->bytes_per_line;
+
+                for (unsigned row = 0; row < image->height; row++) {
+                    unsigned char *scan = (unsigned char *)image->pixels + image->bytes_per_line * row;
+
+                    SAIL_TRY(io->strict_read(io->stream, scan, image->bytes_per_line));
+                    SAIL_TRY(io->seek(io->stream, line_padding, SEEK_CUR));
+                }
+
+                break;
+            }
+            case SAIL_PIXEL_FORMAT_BPP24_RGB: {
+                const unsigned line_padding = pcx_state->pcx_header.bytes_per_line - image->width;
+
+                for (unsigned row = 0; row < image->height; row++) {
+                    unsigned char *target_scan = (unsigned char *)image->pixels + image->bytes_per_line * row;
+
+                    for (unsigned component = 0; component < 3; component++) {
+                        SAIL_TRY(io->strict_read(io->stream, pcx_state->scan, image->width));
+                        SAIL_TRY(io->seek(io->stream, line_padding, SEEK_CUR));
+
+                        for (unsigned column = 0; column < image->width; column++) {
+                            *(target_scan + column * 3 + component) = *(pcx_state->scan + column);
+                        }
+                    }
+                }
+
+                break;
+            }
+            case SAIL_PIXEL_FORMAT_BPP16_RGBA:
+            case SAIL_PIXEL_FORMAT_BPP32_RGBA: {
+                break;
+            }
+        }
+    } else {
+    }
 
     return SAIL_OK;
 }
