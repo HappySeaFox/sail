@@ -164,6 +164,14 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_pcx(void *state, st
     SAIL_TRY_OR_CLEANUP(pcx_private_build_palette(image_local->pixel_format, io, pcx_state->pcx_header.palette, &image_local->palette),
                         /* cleanup */ sail_destroy_image(image_local));
 
+    if (pcx_state->pcx_header.hdpi > 0 && pcx_state->pcx_header.vdpi > 0) {
+        SAIL_TRY_OR_CLEANUP(sail_alloc_resolution_from_data(SAIL_RESOLUTION_UNIT_INCH,
+                                                            pcx_state->pcx_header.hdpi,
+                                                            pcx_state->pcx_header.vdpi,
+                                                            &image_local->resolution),
+                            /* cleanup */ sail_destroy_image(image_local));
+    }
+
     *image = image_local;
 
     return SAIL_OK;
