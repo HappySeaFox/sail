@@ -68,7 +68,7 @@ struct SailPcxHeader
     uint8_t  palette[48];
     uint8_t  reserved;
     uint8_t  planes; /* 1, 3, 4. */
-    uint16_t bytes_per_line;
+    uint16_t bytes_per_line; /* Per plane. */
     uint16_t palette_info;
     uint16_t hscreen_size;
     uint16_t vscreen_size;
@@ -80,5 +80,8 @@ SAIL_HIDDEN sail_status_t pcx_private_read_header(struct sail_io *io, struct Sai
 SAIL_HIDDEN sail_status_t pcx_private_sail_pixel_format(unsigned bits_per_plane, unsigned planes, enum SailPcxPaletteInfo palette_info, enum SailPixelFormat *result);
 
 SAIL_HIDDEN sail_status_t pcx_private_build_palette(enum SailPixelFormat pixel_format, struct sail_io *io, uint8_t palette16[48], struct sail_palette **palette);
+
+SAIL_HIDDEN sail_status_t pcx_private_read_uncompressed(struct sail_io *io, unsigned bytes_per_line_to_read, unsigned line_padding, unsigned components,
+                                                        unsigned char *buffer, struct sail_image *image);
 
 #endif

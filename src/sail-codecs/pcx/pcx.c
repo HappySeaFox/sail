@@ -185,46 +185,39 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v6_pcx(void *state, struct sail_
 
     const struct pcx_state *pcx_state = (struct pcx_state *)state;
 
+    unsigned line_padding;
+    unsigned bytes_per_line_to_read;
+    unsigned components;
+
     if (pcx_state->pcx_header.encoding == SAIL_PCX_NO_ENCODING) {
         switch (image->pixel_format) {
             case SAIL_PIXEL_FORMAT_BPP1_INDEXED:
             case SAIL_PIXEL_FORMAT_BPP4_INDEXED:
             case SAIL_PIXEL_FORMAT_BPP8_INDEXED:
             case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE: {
-                const unsigned line_padding = pcx_state->pcx_header.bytes_per_line - image->bytes_per_line;
-
-                for (unsigned row = 0; row < image->height; row++) {
-                    unsigned char *scan = (unsigned char *)image->pixels + image->bytes_per_line * row;
-
-                    SAIL_TRY(io->strict_read(io->stream, scan, image->bytes_per_line));
-                    SAIL_TRY(io->seek(io->stream, line_padding, SEEK_CUR));
-                }
-
+                line_padding = pcx_state->pcx_header.bytes_per_line - image->bytes_per_line;
+                bytes_per_line_to_read = image->bytes_per_line;
+                components = 1;
                 break;
             }
             case SAIL_PIXEL_FORMAT_BPP24_RGB: {
-                const unsigned line_padding = pcx_state->pcx_header.bytes_per_line - image->width;
-
-                for (unsigned row = 0; row < image->height; row++) {
-                    unsigned char *target_scan = (unsigned char *)image->pixels + image->bytes_per_line * row;
-
-                    for (unsigned component = 0; component < 3; component++) {
-                        SAIL_TRY(io->strict_read(io->stream, pcx_state->scan, image->width));
-                        SAIL_TRY(io->seek(io->stream, line_padding, SEEK_CUR));
-
-                        for (unsigned column = 0; column < image->width; column++) {
-                            *(target_scan + column * 3 + component) = *(pcx_state->scan + column);
-                        }
-                    }
-                }
-
+                line_padding = pcx_state->pcx_header.bytes_per_line - image->width;
+                bytes_per_line_to_read = image->width;
+                components = 3;
                 break;
             }
-            case SAIL_PIXEL_FORMAT_BPP16_RGBA:
             case SAIL_PIXEL_FORMAT_BPP32_RGBA: {
+                line_padding = pcx_state->pcx_header.bytes_per_line - image->width;
+                bytes_per_line_to_read = image->width;
+                components = 4;
                 break;
+            }
+            default: {
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
             }
         }
+
+        SAIL_TRY(pcx_private_read_uncompressed(io, bytes_per_line_to_read, line_padding, components, pcx_state->scan, image));
     } else {
     }
 

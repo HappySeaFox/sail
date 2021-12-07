@@ -76,7 +76,6 @@ sail_status_t pcx_private_sail_pixel_format(unsigned bits_per_plane, unsigned pl
         case 4: {
             switch (bits_per_plane) {
                 case 1: *result = SAIL_PIXEL_FORMAT_BPP4_INDEXED; return SAIL_OK;
-                case 4: *result = SAIL_PIXEL_FORMAT_BPP16_RGBA;   return SAIL_OK;
                 case 8: *result = SAIL_PIXEL_FORMAT_BPP32_RGBA;   return SAIL_OK;
             }
         }
@@ -140,6 +139,25 @@ sail_status_t pcx_private_build_palette(enum SailPixelFormat pixel_format, struc
         }
         default: {
             break;
+        }
+    }
+
+    return SAIL_OK;
+}
+
+sail_status_t pcx_private_read_uncompressed(struct sail_io *io, unsigned bytes_per_line_to_read, unsigned line_padding, unsigned components,
+                                            unsigned char *buffer, struct sail_image *image) {
+
+    for (unsigned row = 0; row < image->height; row++) {
+        unsigned char *target_scan = (unsigned char *)image->pixels + image->bytes_per_line * row;
+
+        for (unsigned component = 0; component < components; component++) {
+            SAIL_TRY(io->strict_read(io->stream, buffer, bytes_per_line_to_read));
+            SAIL_TRY(io->seek(io->stream, line_padding, SEEK_CUR));
+
+            for (unsigned column = 0; column < image->width; column++) {
+                *(target_scan + column * 3 + component) = *(buffer + column);
+            }
         }
     }
 
