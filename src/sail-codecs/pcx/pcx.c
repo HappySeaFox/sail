@@ -146,7 +146,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_pcx(void *state, st
                             &image_local->source_image->pixel_format),
                         /* cleanup */ sail_destroy_image(image_local));
 
-    image_local->source_image->compression = SAIL_COMPRESSION_RLE;
+    image_local->source_image->compression = (pcx_state->pcx_header.encoding == SAIL_PCX_NO_ENCODING) ? SAIL_COMPRESSION_NONE : SAIL_COMPRESSION_RLE;
 
     image_local->width = pcx_state->pcx_header.xmax - pcx_state->pcx_header.xmin + 1;
     image_local->height = pcx_state->pcx_header.ymax - pcx_state->pcx_header.ymin + 1;
