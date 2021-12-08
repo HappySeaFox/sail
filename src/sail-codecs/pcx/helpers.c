@@ -67,17 +67,20 @@ sail_status_t pcx_private_sail_pixel_format(unsigned bits_per_plane, unsigned pl
                 case 4: *result = SAIL_PIXEL_FORMAT_BPP4_INDEXED; return SAIL_OK;
                 case 8: *result = (palette_info == SAIL_PCX_PALETTE_COLOR) ? SAIL_PIXEL_FORMAT_BPP8_INDEXED : SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE; return SAIL_OK;
             }
+            break;
         }
         case 3: {
             switch (bits_per_plane) {
                 case 8: *result = SAIL_PIXEL_FORMAT_BPP24_RGB; return SAIL_OK;
             }
+            break;
         }
         case 4: {
             switch (bits_per_plane) {
                 case 1: *result = SAIL_PIXEL_FORMAT_BPP4_INDEXED; return SAIL_OK;
                 case 8: *result = SAIL_PIXEL_FORMAT_BPP32_RGBA;   return SAIL_OK;
             }
+            break;
         }
     }
 
@@ -85,7 +88,7 @@ sail_status_t pcx_private_sail_pixel_format(unsigned bits_per_plane, unsigned pl
     SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
 }
 
-sail_status_t pcx_private_build_palette(enum SailPixelFormat pixel_format, struct sail_io *io, uint8_t palette16[48], struct sail_palette **palette) {
+sail_status_t pcx_private_build_palette(enum SailPixelFormat pixel_format, struct sail_io *io, uint8_t palette16[], struct sail_palette **palette) {
 
     switch (pixel_format) {
         case SAIL_PIXEL_FORMAT_BPP1_INDEXED: {
@@ -103,8 +106,11 @@ sail_status_t pcx_private_build_palette(enum SailPixelFormat pixel_format, struc
             break;
         }
         case SAIL_PIXEL_FORMAT_BPP4_INDEXED: {
-            SAIL_TRY(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP24_RGB, 16, palette));
-            memcpy((*palette)->data, palette16, sizeof(palette16));
+            const int palette_colors = 16; /* 256 RGB entries. */
+            const int palette_size = 16 * 3; /* 256 RGB entries. */
+
+            SAIL_TRY(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP24_RGB, palette_colors, palette));
+            memcpy((*palette)->data, palette16, palette_size);
             break;
         }
         case SAIL_PIXEL_FORMAT_BPP8_INDEXED: {
