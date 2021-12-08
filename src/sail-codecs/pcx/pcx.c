@@ -149,16 +149,8 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_pcx(void *state, st
                         /* cleanup */ sail_destroy_image(image_local));
 
     /* Temporary scan line buffer. */
-    switch (image_local->pixel_format) {
-        case SAIL_PIXEL_FORMAT_BPP24_RGB:
-        case SAIL_PIXEL_FORMAT_BPP16_RGBA:
-        case SAIL_PIXEL_FORMAT_BPP32_RGBA: {
-            SAIL_TRY_OR_CLEANUP(sail_malloc(image_local->bytes_per_line, &pcx_state->scan),
-                                /* cleanup */ sail_destroy_image(image_local));
-
-            break;
-        }
-    }
+    SAIL_TRY_OR_CLEANUP(sail_malloc(image_local->bytes_per_line, &pcx_state->scan),
+                        /* cleanup */ sail_destroy_image(image_local));
 
     /* Build palette if needed. */
     SAIL_TRY_OR_CLEANUP(pcx_private_build_palette(image_local->pixel_format, io, pcx_state->pcx_header.palette, &image_local->palette),
