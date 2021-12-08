@@ -154,8 +154,10 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_pcx(void *state, st
     image_local->bytes_per_line = pcx_state->pcx_header.bytes_per_line * pcx_state->pcx_header.planes;
 
     /* Temporary scan line buffer. */
-    SAIL_TRY_OR_CLEANUP(sail_malloc(image_local->bytes_per_line, &pcx_state->scanline_buffer),
+    void *ptr;
+    SAIL_TRY_OR_CLEANUP(sail_malloc(image_local->bytes_per_line, &ptr),
                         /* cleanup */ sail_destroy_image(image_local));
+    pcx_state->scanline_buffer = ptr;
 
     /* Build palette if needed. */
     SAIL_TRY_OR_CLEANUP(pcx_private_build_palette(image_local->pixel_format, io, pcx_state->pcx_header.palette, &image_local->palette),
