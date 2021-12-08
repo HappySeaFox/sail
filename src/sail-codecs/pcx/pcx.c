@@ -27,6 +27,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "sail-common.h"
 
@@ -34,6 +35,10 @@
 
 /* PCX signature. */
 static const unsigned SAIL_PCX_SIGNATURE = 0x0A;
+
+/* RLE markers. */
+static const uint8_t SAIL_PCX_RLE_MARKER     = 0xC0;
+static const uint8_t SAIL_PCX_RLE_COUNT_MASK = 0x3F;
 
 /*
  * Codec-specific state.
@@ -43,7 +48,7 @@ struct pcx_state {
     struct sail_write_options *write_options;
 
     struct SailPcxHeader pcx_header;
-    unsigned char *scan; /* buffer to read a single plane scan line. */
+    unsigned char *scanline_buffer; /* buffer to read a single plane scan line. */
 
     bool frame_read;
 };
@@ -57,8 +62,8 @@ static sail_status_t alloc_pcx_state(struct pcx_state **pcx_state) {
     (*pcx_state)->read_options  = NULL;
     (*pcx_state)->write_options = NULL;
 
-    (*pcx_state)->scan          = NULL;
-    (*pcx_state)->frame_read    = false;
+    (*pcx_state)->scanline_buffer = NULL;
+    (*pcx_state)->frame_read      = false;
 
     return SAIL_OK;
 }
@@ -72,7 +77,7 @@ static void destroy_pcx_state(struct pcx_state *pcx_state) {
     sail_destroy_read_options(pcx_state->read_options);
     sail_destroy_write_options(pcx_state->write_options);
 
-    sail_free(pcx_state->scan);
+    sail_free(pcx_state->scanline_buffer);
 
     sail_free(pcx_state);
 }
@@ -110,6 +115,8 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_pcx(struct sail_io *io, const 
         SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
     }
 
+    SAIL_LOG_TRACE("PCX: Compressed(%s)", (pcx_state->pcx_header.encoding == SAIL_PCX_NO_ENCODING) ? "no" : "yes");
+
     return SAIL_OK;
 }
 
@@ -144,12 +151,10 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_pcx(void *state, st
     image_local->width = pcx_state->pcx_header.xmax - pcx_state->pcx_header.xmin + 1;
     image_local->height = pcx_state->pcx_header.ymax - pcx_state->pcx_header.ymin + 1;
     image_local->pixel_format = image_local->source_image->pixel_format;
-
-    SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(image_local->width, image_local->pixel_format, &image_local->bytes_per_line),
-                        /* cleanup */ sail_destroy_image(image_local));
+    image_local->bytes_per_line = pcx_state->pcx_header.bytes_per_line * pcx_state->pcx_header.planes;
 
     /* Temporary scan line buffer. */
-    SAIL_TRY_OR_CLEANUP(sail_malloc(image_local->bytes_per_line, &pcx_state->scan),
+    SAIL_TRY_OR_CLEANUP(sail_malloc(image_local->bytes_per_line, &pcx_state->scanline_buffer),
                         /* cleanup */ sail_destroy_image(image_local));
 
     /* Build palette if needed. */
@@ -177,40 +182,71 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v6_pcx(void *state, struct sail_
 
     const struct pcx_state *pcx_state = (struct pcx_state *)state;
 
-    unsigned line_padding;
-    unsigned bytes_per_line_to_read;
+    unsigned bits_per_pixel;
+    SAIL_TRY(sail_bits_per_pixel(image->pixel_format, &bits_per_pixel));
+    const unsigned bytes_per_pixel = (bits_per_pixel + 7) / 8;
+
     unsigned components;
 
+    switch (image->pixel_format) {
+        case SAIL_PIXEL_FORMAT_BPP1_INDEXED:
+        case SAIL_PIXEL_FORMAT_BPP4_INDEXED:
+        case SAIL_PIXEL_FORMAT_BPP8_INDEXED:
+        case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE: {
+            components = 1;
+            break;
+        }
+        case SAIL_PIXEL_FORMAT_BPP24_RGB: {
+            components = 3;
+            break;
+        }
+        case SAIL_PIXEL_FORMAT_BPP32_RGBA: {
+            components = 4;
+            break;
+        }
+        default: {
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+        }
+    }
+
     if (pcx_state->pcx_header.encoding == SAIL_PCX_NO_ENCODING) {
-        switch (image->pixel_format) {
-            case SAIL_PIXEL_FORMAT_BPP1_INDEXED:
-            case SAIL_PIXEL_FORMAT_BPP4_INDEXED:
-            case SAIL_PIXEL_FORMAT_BPP8_INDEXED:
-            case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE: {
-                line_padding = pcx_state->pcx_header.bytes_per_line - image->bytes_per_line;
-                bytes_per_line_to_read = image->bytes_per_line;
-                components = 1;
-                break;
-            }
-            case SAIL_PIXEL_FORMAT_BPP24_RGB: {
-                line_padding = pcx_state->pcx_header.bytes_per_line - image->width;
-                bytes_per_line_to_read = image->width;
-                components = 3;
-                break;
-            }
-            case SAIL_PIXEL_FORMAT_BPP32_RGBA: {
-                line_padding = pcx_state->pcx_header.bytes_per_line - image->width;
-                bytes_per_line_to_read = image->width;
-                components = 4;
-                break;
-            }
-            default: {
-                SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+        SAIL_TRY(pcx_private_read_uncompressed(io, pcx_state->pcx_header.bytes_per_line, components, pcx_state->scanline_buffer, image));
+    } else {
+        for (unsigned row = 0; row < image->height; row++) {
+            unsigned char * const scan = (unsigned char *)image->pixels + image->bytes_per_line * row;
+
+            for (unsigned component = 0; component < components; component++) {
+                unsigned buffer_offset = 0;
+
+                /* Decode an entire plane and then merge it into the image pixels. */
+                for (unsigned bytes = 0; bytes < pcx_state->pcx_header.bytes_per_line;) {
+                    uint8_t marker;
+                    SAIL_TRY(io->strict_read(io->stream, &marker, sizeof(marker)));
+
+                    uint8_t count;
+                    uint8_t value;
+
+                    /* RLE marker set. */
+                    if ((marker & SAIL_PCX_RLE_MARKER) == SAIL_PCX_RLE_MARKER) {
+                        count = marker & SAIL_PCX_RLE_COUNT_MASK;
+                        SAIL_TRY(io->strict_read(io->stream, &value, sizeof(value)));
+                    } else {
+                        /* Pixel value. */
+                        count = 1;
+                        value = marker;
+                    }
+
+                    bytes += count;
+
+                    memset(pcx_state->scanline_buffer + buffer_offset, value, count);
+                    buffer_offset += count;
+                }
+
+                for (unsigned column = 0; column < pcx_state->pcx_header.bytes_per_line; column++) {
+                    *(scan + column * bytes_per_pixel + component) = *(pcx_state->scanline_buffer + column);
+                }
             }
         }
-
-        SAIL_TRY(pcx_private_read_uncompressed(io, bytes_per_line_to_read, line_padding, components, pcx_state->scan, image));
-    } else {
     }
 
     return SAIL_OK;
