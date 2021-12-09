@@ -151,21 +151,17 @@ sail_status_t pcx_private_build_palette(enum SailPixelFormat pixel_format, struc
     return SAIL_OK;
 }
 
-sail_status_t pcx_private_read_uncompressed(struct sail_io *io, unsigned bytes_per_plane_to_read, unsigned components, unsigned char *buffer, struct sail_image *image) {
-
-    unsigned bits_per_pixel;
-    SAIL_TRY(sail_bits_per_pixel(image->pixel_format, &bits_per_pixel));
-    const unsigned bytes_per_pixel = (bits_per_pixel + 7) / 8;
+sail_status_t pcx_private_read_uncompressed(struct sail_io *io, unsigned bytes_per_plane_to_read, unsigned planes, unsigned char *buffer, struct sail_image *image) {
 
     for (unsigned row = 0; row < image->height; row++) {
         unsigned char *target_scan = (unsigned char *)image->pixels + image->bytes_per_line * row;
 
         /* Read plane by plane and then merge them into the image pixels. */
-        for (unsigned component = 0; component < components; component++) {
+        for (unsigned plane = 0; plane < planes; plane++) {
             SAIL_TRY(io->strict_read(io->stream, buffer, bytes_per_plane_to_read));
 
             for (unsigned column = 0; column < bytes_per_plane_to_read; column++) {
-                *(target_scan + column * bytes_per_pixel + component) = *(buffer + column);
+                *(target_scan + column * planes + plane) = *(buffer + column);
             }
         }
     }
