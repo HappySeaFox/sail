@@ -71,6 +71,15 @@ const char* sail_pixel_format_to_string(enum SailPixelFormat pixel_format) {
         case SAIL_PIXEL_FORMAT_BPP48_RGB:             return "BPP48-RGB";
         case SAIL_PIXEL_FORMAT_BPP48_BGR:             return "BPP48-BGR";
 
+        case SAIL_PIXEL_FORMAT_BPP16_RGBX:            return "BPP16-RGBX";
+        case SAIL_PIXEL_FORMAT_BPP16_BGRX:            return "BPP16-BGRX";
+        case SAIL_PIXEL_FORMAT_BPP16_XRGB:            return "BPP16-XRGB";
+        case SAIL_PIXEL_FORMAT_BPP16_XBGR:            return "BPP16-XBGR";
+        case SAIL_PIXEL_FORMAT_BPP16_RGBA:            return "BPP16-RGBA";
+        case SAIL_PIXEL_FORMAT_BPP16_BGRA:            return "BPP16-BGRA";
+        case SAIL_PIXEL_FORMAT_BPP16_ARGB:            return "BPP16-ARGB";
+        case SAIL_PIXEL_FORMAT_BPP16_ABGR:            return "BPP16-ABGR";
+
         case SAIL_PIXEL_FORMAT_BPP32_RGBX:            return "BPP32-RGBX";
         case SAIL_PIXEL_FORMAT_BPP32_BGRX:            return "BPP32-BGRX";
         case SAIL_PIXEL_FORMAT_BPP32_XRGB:            return "BPP32-XRGB";
@@ -172,6 +181,15 @@ enum SailPixelFormat sail_pixel_format_from_string(const char *str) {
 
         case UINT64_C(249836535431749563):   return SAIL_PIXEL_FORMAT_BPP48_RGB;
         case UINT64_C(249836535431732155):   return SAIL_PIXEL_FORMAT_BPP48_BGR;
+
+        case UINT64_C(8244605665295060974):  return SAIL_PIXEL_FORMAT_BPP16_RGBX;
+        case UINT64_C(8244605665294486510):  return SAIL_PIXEL_FORMAT_BPP16_BGRX;
+        case UINT64_C(8244605665295288718):  return SAIL_PIXEL_FORMAT_BPP16_XRGB;
+        case UINT64_C(8244605665295271310):  return SAIL_PIXEL_FORMAT_BPP16_XBGR;
+        case UINT64_C(8244605665295060951):  return SAIL_PIXEL_FORMAT_BPP16_RGBA;
+        case UINT64_C(8244605665294486487):  return SAIL_PIXEL_FORMAT_BPP16_BGRA;
+        case UINT64_C(8244605665294462167):  return SAIL_PIXEL_FORMAT_BPP16_ARGB;
+        case UINT64_C(8244605665294444759):  return SAIL_PIXEL_FORMAT_BPP16_ABGR;
 
         case UINT64_C(8244605667721455340):  return SAIL_PIXEL_FORMAT_BPP32_RGBX;
         case UINT64_C(8244605667720880876):  return SAIL_PIXEL_FORMAT_BPP32_BGRX;
