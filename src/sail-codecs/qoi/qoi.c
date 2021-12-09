@@ -217,6 +217,12 @@ SAIL_EXPORT sail_status_t sail_codec_write_init_v6_qoi(struct sail_io *io, const
     /* Deep copy write options. */
     SAIL_TRY(sail_copy_write_options(write_options, &qoi_state->write_options));
 
+    /* Sanity check. */
+    if (qoi_state->write_options->compression != SAIL_COMPRESSION_QOI) {
+        SAIL_LOG_ERROR("QOI: Only QOI compression is allowed for writing");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_COMPRESSION);
+    }
+
     return SAIL_OK;
 }
 
