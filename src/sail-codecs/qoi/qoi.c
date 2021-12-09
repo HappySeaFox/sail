@@ -241,9 +241,9 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v6_qoi(void *state, s
 
     int written;
     qoi_state->pixels = qoi_encode(image->pixels, &(qoi_desc){
-    	                    .width = image->width,
-                    	    .height = image->height, 
-                        	.channels = channels,
+    	                    .width      = image->width,
+                    	    .height     = image->height,
+                        	.channels   = channels,
                         	.colorspace = QOI_SRGB
                         }, &written);
 
