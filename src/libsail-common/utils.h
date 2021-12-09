@@ -188,9 +188,7 @@ SAIL_EXPORT bool sail_is_rgb_family(enum SailPixelFormat pixel_format);
 SAIL_EXPORT sail_status_t sail_print_errno(const char *format);
 
 /*
- * Assigns the current number of milliseconds since Epoch.
- *
- * Returns SAIL_OK on success.
+ * Returns the current number of milliseconds since Epoch or 0 on error.
  */
 SAIL_EXPORT uint64_t sail_now(void);
 

@@ -539,7 +539,7 @@ uint64_t sail_now(void) {
 
         if (!QueryPerformanceFrequency(&li)) {
             SAIL_LOG_ERROR("Failed to get the current time. Error: 0x%X", GetLastError());
-            return SAIL_OK;
+            return 0;
         }
 
         frequency = (double)li.QuadPart / 1000;
@@ -547,7 +547,7 @@ uint64_t sail_now(void) {
 
     if (!QueryPerformanceCounter(&li)) {
         SAIL_LOG_ERROR("Failed to get the current time. Error: 0x%X", GetLastError());
-        return SAIL_OK;
+        return 0;
     }
 
     return (uint64_t)((double)li.QuadPart / frequency);
@@ -556,7 +556,7 @@ uint64_t sail_now(void) {
 
     if (gettimeofday(&tv, NULL) != 0) {
         sail_print_errno("Failed to get the current time: %s");
-        return SAIL_OK;
+        return 0;
     }
 
     return (uint64_t)tv.tv_sec * 1000 + (uint64_t)tv.tv_usec / 1000;
