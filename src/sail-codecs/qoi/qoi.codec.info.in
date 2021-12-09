@@ -1,0 +1,25 @@
+# QOI codec information
+#
+[codec]
+layout=6
+version=0.9.0
+priority=LOW
+name=QOI
+description=Quite OK Image
+magic-numbers=71 6F 69 66
+extensions=qoi
+mime-types=
+
+[read-features]
+features=STATIC
+
+[write-features]
+features=STATIC
+output-pixel-formats=BPP24-RGB;BPP32-RGBA
+properties=
+compression-types=QOI
+default-compression=QOI
+compression-level-min=0
+compression-level-max=0
+compression-level-default=0
+compression-level-step=0

@@ -297,6 +297,7 @@ const char* sail_compression_to_string(enum SailCompression compression) {
         case SAIL_COMPRESSION_PACKBITS:      return "PACKBITS";
         case SAIL_COMPRESSION_PIXAR_FILM:    return "PIXAR-FILM";
         case SAIL_COMPRESSION_PIXAR_LOG:     return "PIXAR-LOG";
+        case SAIL_COMPRESSION_QOI:           return "QOI";
         case SAIL_COMPRESSION_RLE:           return "RLE";
         case SAIL_COMPRESSION_SGI_LOG:       return "SGI-LOG";
         case SAIL_COMPRESSION_SGI_LOG24:     return "SGI-LOG24";
@@ -347,6 +348,7 @@ enum SailCompression sail_compression_from_string(const char *str) {
         case UINT64_C(7571380909080566):     return SAIL_COMPRESSION_PACKBITS;
         case UINT64_C(8245245943922754206):  return SAIL_COMPRESSION_PIXAR_FILM;
         case UINT64_C(249855937694635640):   return SAIL_COMPRESSION_PIXAR_LOG;
+        case UINT64_C(193467886):            return SAIL_COMPRESSION_QOI;
         case UINT64_C(193468872):            return SAIL_COMPRESSION_RLE;
         case UINT64_C(229439900388407):      return SAIL_COMPRESSION_SGI_LOG;
         case UINT64_C(249860051522976925):   return SAIL_COMPRESSION_SGI_LOG24;
