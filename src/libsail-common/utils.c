@@ -247,7 +247,7 @@ sail_status_t sail_bits_per_pixel(enum SailPixelFormat pixel_format, unsigned *r
     SAIL_CHECK_PTR(result);
 
     switch (pixel_format) {
-        case SAIL_PIXEL_FORMAT_UNKNOWN:   SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+        case SAIL_PIXEL_FORMAT_UNKNOWN: SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
 
         case SAIL_PIXEL_FORMAT_BPP1:   *result = 1;   return SAIL_OK;
         case SAIL_PIXEL_FORMAT_BPP2:   *result = 2;   return SAIL_OK;
@@ -289,6 +289,15 @@ sail_status_t sail_bits_per_pixel(enum SailPixelFormat pixel_format, unsigned *r
 
         case SAIL_PIXEL_FORMAT_BPP48_RGB:
         case SAIL_PIXEL_FORMAT_BPP48_BGR: *result = 48; return SAIL_OK;
+
+        case SAIL_PIXEL_FORMAT_BPP16_RGBX:
+        case SAIL_PIXEL_FORMAT_BPP16_BGRX:
+        case SAIL_PIXEL_FORMAT_BPP16_XRGB:
+        case SAIL_PIXEL_FORMAT_BPP16_XBGR:
+        case SAIL_PIXEL_FORMAT_BPP16_RGBA:
+        case SAIL_PIXEL_FORMAT_BPP16_BGRA:
+        case SAIL_PIXEL_FORMAT_BPP16_ARGB:
+        case SAIL_PIXEL_FORMAT_BPP16_ABGR: *result = 16; return SAIL_OK;
 
         case SAIL_PIXEL_FORMAT_BPP32_RGBX:
         case SAIL_PIXEL_FORMAT_BPP32_BGRX:

@@ -1,6 +1,6 @@
 # List of codecs
 #
-set(CODECS avif bmp gif jpeg jpeg2000 png qoi svg tga tiff wal webp)
+set(CODECS avif bmp gif jpeg jpeg2000 pcx png qoi svg tga tiff wal webp)
 
 list(SORT CODECS)
 
