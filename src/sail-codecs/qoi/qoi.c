@@ -153,7 +153,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_qoi(void *state, st
         }
     }
 
-    image_local->source_image->compression = SAIL_COMPRESSION_NONE;
+    image_local->source_image->compression = SAIL_COMPRESSION_QOI;
 
     image_local->width = qoi_state->qoi_desc.width;
     image_local->height = qoi_state->qoi_desc.height;
