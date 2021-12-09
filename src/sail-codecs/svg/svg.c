@@ -99,18 +99,10 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_svg(struct sail_io *io, const 
     /* Deep copy read options. */
     SAIL_TRY(sail_copy_read_options(read_options, &svg_state->read_options));
 
-    /* Read image. */
-    size_t image_size;
-    SAIL_TRY(io->seek(io->stream, 0, SEEK_END));
-    SAIL_TRY(io->tell(io->stream, &image_size));
-    SAIL_TRY(io->seek(io->stream, 0, SEEK_SET));
-
+    /* Read the entire image as the resvg API requires. */
     void *image_data;
-    SAIL_TRY(sail_malloc(image_size, &image_data));
-
-    SAIL_LOG_TRACE("SVG: Reading %lu bytes", (unsigned long)image_size);
-    SAIL_TRY_OR_CLEANUP(io->strict_read(io->stream, image_data, image_size),
-                        /* cleanup */ sail_free(image_data));
+    size_t image_size;
+    SAIL_TRY(sail_io_contents_to_data(io, &image_data, &image_size));
 
     svg_state->resvg_options = resvg_options_create();
 

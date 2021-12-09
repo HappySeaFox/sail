@@ -663,6 +663,70 @@ sail_status_t sail_file_size(const char *path, size_t *size) {
     return SAIL_OK;
 }
 
+sail_status_t sail_io_contents_into_data(struct sail_io *io, void *data) {
+
+    SAIL_CHECK_PTR(io);
+    SAIL_CHECK_PTR(data);
+
+    /* Save the current position. */
+    size_t saved_position;
+    SAIL_TRY(io->tell(io->stream, &saved_position));
+
+    unsigned char buffer[4096];
+    unsigned char *data_ptr = data;
+    size_t actually_read;
+
+    sail_status_t status;
+
+    /* Read stream. */
+    while ((status = io->tolerant_read(io->stream, buffer, sizeof(buffer), &actually_read)) == SAIL_OK) {
+        memcpy(data_ptr, buffer, actually_read);
+        data_ptr += actually_read;
+    }
+
+    SAIL_TRY(io->seek(io->stream, (long)saved_position, SEEK_SET));
+
+    if (status != SAIL_ERROR_EOF) {
+        SAIL_LOG_ERROR("Failed to read from the I/O stream, error #%d", status);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_READ_IO);
+    }
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_io_contents_to_data(struct sail_io *io, void **data, size_t *data_size) {
+
+    SAIL_CHECK_PTR(io);
+    SAIL_CHECK_PTR(data);
+    SAIL_CHECK_PTR(data_size);
+
+    /* Save the current position. */
+    size_t saved_position;
+    SAIL_TRY(io->tell(io->stream, &saved_position));
+
+    size_t data_size_local;
+    SAIL_TRY(io->seek(io->stream, 0, SEEK_END));
+    SAIL_TRY(io->tell(io->stream, &data_size_local));
+    SAIL_TRY(io->seek(io->stream, (long)saved_position, SEEK_SET));
+
+    data_size_local -= saved_position;
+
+    /* Read stream. */
+    void *data_local;
+    SAIL_TRY(sail_malloc(data_size_local, &data_local));
+
+    SAIL_TRY_OR_CLEANUP(io->strict_read(io->stream, data_local, data_size_local),
+                        /* cleanup */ io->seek(io->stream, (long)saved_position, SEEK_SET),
+                                      sail_free(data_local));
+
+    SAIL_TRY(io->seek(io->stream, (long)saved_position, SEEK_SET));
+
+    *data = data_local;
+    *data_size = data_size_local;
+
+    return SAIL_OK;
+}
+
 sail_status_t sail_file_contents_into_data(const char *path, void *data) {
 
     SAIL_CHECK_PTR(path);

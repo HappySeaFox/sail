@@ -130,16 +130,9 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_jpeg2000(struct sail_io *io, c
     /* Deep copy read options. */
     SAIL_TRY(sail_copy_read_options(read_options, &jpeg2000_state->read_options));
 
-    /* Read image. */
+    /* Read the entire image to use the JasPer memory API. */
     size_t image_size;
-    SAIL_TRY(io->seek(io->stream, 0, SEEK_END));
-    SAIL_TRY(io->tell(io->stream, &image_size));
-    SAIL_TRY(io->seek(io->stream, 0, SEEK_SET));
-
-    SAIL_TRY(sail_malloc(image_size, &jpeg2000_state->image_data));
-
-    SAIL_LOG_TRACE("JPEG2000: Reading %lu bytes", (unsigned long)image_size);
-    SAIL_TRY(io->strict_read(io->stream, jpeg2000_state->image_data, image_size));
+    SAIL_TRY(sail_io_contents_to_data(io, &jpeg2000_state->image_data, &image_size));
 
     /* This function may generate a warning on old versions of Jasper: conversion from size_t to int. */
     jpeg2000_state->jas_stream = jas_stream_memopen(jpeg2000_state->image_data, image_size);
