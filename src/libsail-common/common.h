@@ -241,6 +241,7 @@ enum SailCompression {
     SAIL_COMPRESSION_PACKBITS,      /* Macintosh RLE. */
     SAIL_COMPRESSION_PIXAR_FILM,    /* Pixar companded 10bit LZW. */
     SAIL_COMPRESSION_PIXAR_LOG,     /* Pixar companded 11bit ZIP. */
+    SAIL_COMPRESSION_QOI,           /* Quite OK Image. */
     SAIL_COMPRESSION_RLE,           /* RLE compression. */
     SAIL_COMPRESSION_SGI_LOG,       /* SGI Log Luminance RLE. */
     SAIL_COMPRESSION_SGI_LOG24,     /* SGI Log 24-bit packed. */
