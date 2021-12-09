@@ -125,7 +125,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_qoi(void *state, st
     qoi_state->frame_read = true;
 
     /* Decode the image. */
-    /* FIXME Remove (int) when QOI supports size_t. */
+    /* TODO Remove (int) when QOI supports size_t. */
     qoi_state->pixels = qoi_decode(qoi_state->image_data, (int)qoi_state->image_data_size, &qoi_state->qoi_desc, 0);
 
     if (qoi_state->pixels == NULL) {
