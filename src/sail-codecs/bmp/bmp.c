@@ -31,7 +31,7 @@
 
 #include "sail-common.h"
 
-#include "bmp.h"
+#include "common/bmp/bmp.h"
 
 /*
  * Decoding functions.

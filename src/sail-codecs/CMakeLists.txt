@@ -1,3 +1,5 @@
+# Common dependencies that can be re-used by different codecs
+#
 add_subdirectory(common/bmp)
 
 # List of codecs
