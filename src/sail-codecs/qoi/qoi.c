@@ -189,7 +189,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_finish_v6_qoi(void **state, struct sai
 
     struct qoi_state *qoi_state = (struct qoi_state *)(*state);
 
-    /* Subsequent calls to finish() will expectedly fail in the above line. */
     *state = NULL;
 
     destroy_qoi_state(qoi_state);

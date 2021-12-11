@@ -167,7 +167,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_finish_v6_wal(void **state, struct sai
 
     struct wal_state *wal_state = (struct wal_state *)(*state);
 
-    /* Subsequent calls to finish() will expectedly fail in the above line. */
     *state = NULL;
 
     destroy_wal_state(wal_state);

@@ -238,7 +238,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_finish_v6_tiff(void **state, struct sa
 
     struct tiff_state *tiff_state = (struct tiff_state *)(*state);
 
-    /* Subsequent calls to finish() will expectedly fail in the above line. */
     *state = NULL;
 
     if (tiff_state->tiff != NULL) {

@@ -319,7 +319,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_finish_v6_webp(void **state, struct sa
 
     struct webp_state *webp_state = (struct webp_state *)(*state);
 
-    /* Subsequent calls to finish() will expectedly fail in the above line. */
     *state = NULL;
 
     destroy_webp_state(webp_state);

@@ -330,7 +330,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_finish_v6_jpeg2000(void **state, struc
 
     struct jpeg2000_state *jpeg2000_state = (struct jpeg2000_state *)(*state);
 
-    /* Subsequent calls to finish() will expectedly fail in the above line. */
     *state = NULL;
 
     destroy_jpeg2000_state(jpeg2000_state);

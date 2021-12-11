@@ -270,7 +270,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_finish_v6_tga(void **state, struct sai
 
     struct tga_state *tga_state = (struct tga_state *)(*state);
 
-    /* Subsequent calls to finish() will expectedly fail in the above line. */
     *state = NULL;
 
     destroy_tga_state(tga_state);

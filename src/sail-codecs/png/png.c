@@ -445,7 +445,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_finish_v6_png(void **state, struct sai
 
     struct png_state *png_state = (struct png_state *)(*state);
 
-    /* Subsequent calls to finish() will expectedly fail in the above line. */
     *state = NULL;
 
     if (png_state->png_ptr != NULL) {

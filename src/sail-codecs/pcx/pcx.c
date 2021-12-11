@@ -238,7 +238,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_finish_v6_pcx(void **state, struct sai
 
     struct pcx_state *pcx_state = (struct pcx_state *)(*state);
 
-    /* Subsequent calls to finish() will expectedly fail in the above line. */
     *state = NULL;
 
     destroy_pcx_state(pcx_state);
