@@ -143,7 +143,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_ico(void *state, st
 
     /*
      * The contained image is twice the height declared in the directory.
-     * The second half is a mask. We need just an image.
+     * The second half is a mask. We need just the image.
      */
     (*image)->height /= 2;
 
