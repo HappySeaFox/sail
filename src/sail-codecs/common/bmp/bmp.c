@@ -68,8 +68,9 @@ static const char SAIL_PROFILE_EMBEDDED[4] = { 'M', 'B', 'E', 'D' };
  * Codec-specific state.
  */
 struct bmp_state {
-    struct sail_read_options *read_options;
-    struct sail_write_options *write_options;
+    /* These two are external. */
+    const struct sail_read_options *read_options;
+    const struct sail_write_options *write_options;
 
     int bmp_read_options;
 
@@ -94,9 +95,6 @@ struct bmp_state {
     /* Number of bytes to pad scan lines to 4-byte boundary. */
     unsigned pad_bytes;
     bool flipped;
-
-    bool frame_read;
-    bool frame_written;
 };
 
 static sail_status_t alloc_bmp_state(struct bmp_state **bmp_state) {
@@ -118,8 +116,6 @@ static sail_status_t alloc_bmp_state(struct bmp_state **bmp_state) {
     (*bmp_state)->bytes_in_row     = 0;
     (*bmp_state)->pad_bytes        = 0;
     (*bmp_state)->flipped          = false;
-    (*bmp_state)->frame_read       = false;
-    (*bmp_state)->frame_written    = false;
 
     return SAIL_OK;
 }
@@ -129,9 +125,6 @@ static void destroy_bmp_state(struct bmp_state *bmp_state) {
     if (bmp_state == NULL) {
         return;
     }
-
-    sail_destroy_read_options(bmp_state->read_options);
-    sail_destroy_write_options(bmp_state->write_options);
 
     sail_destroy_iccp(bmp_state->iccp);
 
@@ -203,8 +196,8 @@ sail_status_t bmp_private_read_init(struct sail_io *io, const struct sail_read_o
     SAIL_TRY(alloc_bmp_state(&bmp_state));
     *state = bmp_state;
 
-    /* Deep copy read options. */
-    SAIL_TRY(sail_copy_read_options(read_options, &bmp_state->read_options));
+    /* Shallow copy read options. */
+    bmp_state->read_options = read_options;
 
     bmp_state->bmp_read_options = bmp_read_options;
 
@@ -270,7 +263,11 @@ sail_status_t bmp_private_read_init(struct sail_io *io, const struct sail_read_o
     SAIL_TRY(bmp_private_bit_count_to_pixel_format(bmp_state->version == SAIL_BMP_V1 ? bmp_state->v1.bit_count : bmp_state->v2.bit_count,
                                                     &bmp_state->source_pixel_format));
 
-    SAIL_LOG_DEBUG("BMP: Version is %d", bmp_state->version);
+    if (bmp_state->version < SAIL_BMP_V3) {
+        SAIL_LOG_DEBUG("BMP: Version(%d)", bmp_state->version);
+    } else {
+        SAIL_LOG_DEBUG("BMP: Version(%d), compression(%u)", bmp_state->version, bmp_state->v3.compression);
+    }
 
     /*  Read palette.  */
     if (bmp_state->version == SAIL_BMP_V1) {
@@ -329,12 +326,6 @@ sail_status_t bmp_private_read_init(struct sail_io *io, const struct sail_read_o
 sail_status_t bmp_private_read_seek_next_frame(void *state, struct sail_io *io, struct sail_image **image) {
 
     struct bmp_state *bmp_state = (struct bmp_state *)state;
-
-    if (bmp_state->frame_read) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
-    }
-
-    bmp_state->frame_read = true;
 
     struct sail_image *image_local;
     SAIL_TRY(sail_alloc_image(&image_local));

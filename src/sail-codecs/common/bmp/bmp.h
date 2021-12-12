@@ -36,6 +36,12 @@ struct sail_read_options;
 enum SailBmpReadOptions {
 
     /*
+     * No specific BMP flags. This will:
+     *   1. Skip the BMP file header
+     */
+    SAIL_NO_BMP_FLAGS = 0,
+
+    /*
      * Read BMP file header. BMP files have file headers, while
      * ICO files have no BMP file headers.
      */
