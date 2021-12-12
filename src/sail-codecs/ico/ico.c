@@ -122,20 +122,19 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_ico(void *state, st
 
     struct ico_state *ico_state = (struct ico_state *)state;
 
-    if (ico_state->current_frame >= ico_state->ico_header.images_count) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
-    }
-
-    SAIL_TRY(io->seek(io->stream, (long)ico_state->ico_dir_entries[ico_state->current_frame++].image_offset, SEEK_SET));
-
-    /* Check the image is not PNG. */
+    /* Skip non-BMP images. */
     enum SailIcoImageType ico_image_type;
-    SAIL_TRY(ico_private_probe_image_type(io, &ico_image_type));
 
-    if (ico_image_type != SAIL_ICO_IMAGE_BMP) {
-        SAIL_LOG_ERROR("ICO: Only BMP contained images are supported");
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_COMPRESSION);
-    }
+    do {
+        if (ico_state->current_frame >= ico_state->ico_header.images_count) {
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+        }
+
+        SAIL_TRY(io->seek(io->stream, (long)ico_state->ico_dir_entries[ico_state->current_frame++].image_offset, SEEK_SET));
+
+        /* Check the image is not PNG. */
+        SAIL_TRY(ico_private_probe_image_type(io, &ico_image_type));
+    } while (ico_image_type != SAIL_ICO_IMAGE_BMP);
 
     /* Continue to reading BMP. */
     SAIL_TRY(bmp_private_read_init(io, ico_state->read_options, &ico_state->common_bmp_state, SAIL_NO_BMP_FLAGS));
