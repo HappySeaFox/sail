@@ -276,7 +276,7 @@ sail_status_t bmp_private_read_init(struct sail_io *io, const struct sail_read_o
         if (bmp_state->version == SAIL_BMP_V2) {
             bmp_state->palette_count = 1 << bmp_state->v2.bit_count;
         } else {
-            bmp_state->palette_count = (bmp_state->v3.colors_used == 0) ? 1 << bmp_state->v2.bit_count : bmp_state->v3.colors_used;
+            bmp_state->palette_count = (bmp_state->v3.colors_used == 0) ? (1U << bmp_state->v2.bit_count) : bmp_state->v3.colors_used;
         }
 
         if (bmp_state->palette_count == 0) {
