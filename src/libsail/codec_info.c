@@ -112,12 +112,15 @@ sail_status_t sail_codec_info_by_magic_number_from_io(struct sail_io *io, const 
     struct sail_context *context;
     SAIL_TRY(fetch_global_context_guarded(&context));
 
+    size_t saved_offset;
+    SAIL_TRY(io->tell(io->stream, &saved_offset));
+
     /* Read the image magic. */
     unsigned char buffer[SAIL_MAGIC_BUFFER_SIZE];
     SAIL_TRY(io->strict_read(io->stream, buffer, sizeof(buffer)));
 
     /* Seek back. */
-    SAIL_TRY(io->seek(io->stream, 0, SEEK_SET));
+    SAIL_TRY(io->seek(io->stream, (long)saved_offset, SEEK_SET));
 
     /* \xFF\xDD => "FF DD" + string terminator. */
     char hex_numbers[sizeof(buffer) * 3 + 1];
