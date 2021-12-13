@@ -1,6 +1,10 @@
+# Common dependencies that can be re-used by different codecs
+#
+add_subdirectory(common/bmp)
+
 # List of codecs
 #
-set(CODECS avif bmp gif jpeg jpeg2000 pcx png qoi svg tga tiff wal webp)
+set(CODECS avif bmp gif ico jpeg jpeg2000 pcx png qoi svg tga tiff wal webp)
 
 list(SORT CODECS)
 

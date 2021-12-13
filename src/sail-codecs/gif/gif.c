@@ -441,7 +441,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_finish_v6_gif(void **state, struct sai
 
     struct gif_state *gif_state = (struct gif_state *)(*state);
 
-    /* Subsequent calls to finish() will expectedly fail in the above line. */
     *state = NULL;
 
     if (gif_state->gif != NULL) {

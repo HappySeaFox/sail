@@ -224,7 +224,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_finish_v6_avif(void **state, struct sa
 
     struct avif_state *avif_state = (struct avif_state *)(*state);
 
-    /* Subsequent calls to finish() will expectedly fail in the above line. */
     *state = NULL;
 
     destroy_avif_state(avif_state);

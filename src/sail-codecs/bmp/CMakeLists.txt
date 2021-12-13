@@ -1,3 +1,3 @@
 # Common codec configuration
 #
-sail_codec(NAME bmp SOURCES helpers.c bmp.c ICON bmp.png)
+sail_codec(NAME bmp SOURCES bmp.c LINK bmp-common ICON bmp.png)

@@ -132,9 +132,6 @@ sail_status_t bmp_private_bit_count_to_pixel_format(uint16_t bit_count, enum Sai
 
 sail_status_t bmp_private_fetch_iccp(struct sail_io *io, long offset_of_data, uint32_t profile_size, struct sail_iccp **iccp) {
 
-    SAIL_CHECK_PTR(io);
-    SAIL_CHECK_PTR(iccp);
-
     SAIL_TRY(io->seek(io->stream, offset_of_data, SEEK_SET));
 
     void *profile_data;
@@ -183,7 +180,7 @@ sail_status_t bmp_private_bytes_in_row(unsigned width, unsigned bit_count, unsig
 
 unsigned bmp_private_pad_bytes(unsigned bytes_in_row) {
 
-    unsigned remainder = bytes_in_row % 4;
+    const unsigned remainder = bytes_in_row % 4;
     return (remainder == 0) ? 0 : (4 - remainder);
 }
 

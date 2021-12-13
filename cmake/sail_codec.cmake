@@ -8,7 +8,7 @@
 #      is added. sail_codec_post_add() could be used for tests like check_c_source_compiles().
 #
 macro(sail_codec)
-    cmake_parse_arguments(SAIL_CODEC "" "NAME;ICON" "SOURCES;CMAKE" ${ARGN})
+    cmake_parse_arguments(SAIL_CODEC "" "NAME;ICON" "SOURCES;LINK;CMAKE" ${ARGN})
 
     # Put this codec into the disabled list so when we return from here
     # on error it's get automatically marked as disabled. If no errors were found,
@@ -55,6 +55,10 @@ macro(sail_codec)
     # Depend on sail-common
     #
     target_link_libraries(${TARGET} PRIVATE sail-common)
+
+    # Depend on user-defined targets
+    #
+    target_link_libraries(${TARGET} PRIVATE ${SAIL_CODEC_LINK})
 
     if (COMMAND sail_codec_post_add)
         sail_codec_post_add()

@@ -251,7 +251,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_finish_v6_jpeg(void **state, struct sa
 
     struct jpeg_state *jpeg_state = (struct jpeg_state *)(*state);
 
-    /* Subsequent calls to finish() will expectedly fail in the above line. */
     *state = NULL;
 
     if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0) {
