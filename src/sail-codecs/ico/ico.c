@@ -35,6 +35,9 @@
 
 #include "helpers.h"
 
+#define SAIL_ICO_TYPE_ICO 1
+#define SAIL_ICO_TYPE_CUR 2
+
 /*
  * Codec-specific state.
  */
@@ -101,6 +104,16 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_ico(struct sail_io *io, const 
     if (ico_state->ico_header.images_count == 0) {
         SAIL_LOG_ERROR("ICO: No images found");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+    }
+
+    /* Check the image type. */
+    switch (ico_state->ico_header.type) {
+        case SAIL_ICO_TYPE_ICO:
+        case SAIL_ICO_TYPE_CUR: break;
+        default: {
+            SAIL_LOG_ERROR("ICO: Invalid image type %u", ico_state->ico_header.type);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        }
     }
 
     void *ptr;
