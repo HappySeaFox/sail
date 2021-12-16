@@ -78,7 +78,8 @@ public:
     image(std::string_view path);
 
     /*
-     * Constructs a new image out of the specified image properties and pixels.
+     * Constructs a new image out of the specified image properties and pixels. This constructor
+     * assumes the image data has no extra bytes in the end of every scan line.
      */
     image(void *pixels, SailPixelFormat pixel_format, unsigned width, unsigned height);
 
