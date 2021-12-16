@@ -75,4 +75,21 @@ sail_status_t read_file_contents(const std::string_view path, sail::arbitrary_da
     return SAIL_OK;
 }
 
+sail_status_t read_io_contents(const sail::io &io, sail::arbitrary_data *contents) {
+
+    SAIL_TRY(io.verify_valid());
+    SAIL_CHECK_PTR(contents);
+
+    /* Resize the buffer to the I/O size. */
+    size_t data_size_local;
+    SAIL_TRY(sail_io_size(&io.d->sail_io, &data_size_local));
+
+    contents->resize(data_size_local);
+
+    /* Read the contents. */
+    SAIL_TRY(sail_io_contents_into_data(&io.d->sail_io, contents->data()));
+
+    return SAIL_OK;
+}
+
 }

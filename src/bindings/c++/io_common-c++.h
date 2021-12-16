@@ -32,10 +32,14 @@
     #include "error.h"
     #include "export.h"
     #include "io_common.h"
+
+    #include "arbitrary_data-c++.h"
 #else
     #include <sail-common/error.h>
     #include <sail-common/export.h>
     #include <sail-common/io_common.h>
+
+    #include <sail-c++/arbitrary_data-c++.h>
 #endif
 
 namespace sail
@@ -46,10 +50,6 @@ namespace sail
  */
 class SAIL_EXPORT io
 {
-    friend class codec_info;
-    friend class image_input;
-    friend class image_output;
-
 public:
     /*
      * Constructs a new I/O stream.
@@ -163,9 +163,12 @@ public:
 private:
     sail_status_t is_valid_private() const;
 
-    sail_status_t to_sail_io(sail_io **io) const;
-
 private:
+    friend class codec_info;
+    friend class image_input;
+    friend class image_output;
+    friend SAIL_EXPORT sail_status_t read_io_contents(const sail::io &, sail::arbitrary_data *);
+
     class pimpl;
     const std::unique_ptr<pimpl> d;
 };

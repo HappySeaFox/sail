@@ -17,6 +17,7 @@ add_library(sail-c++
                 image_output-c++.h
                 io_common-c++.cpp
                 io_common-c++.h
+                io_common_p-c++.h
                 log-c++.cpp
                 log-c++.h
                 meta_data-c++.cpp

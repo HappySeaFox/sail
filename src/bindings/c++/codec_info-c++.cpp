@@ -169,17 +169,8 @@ codec_info codec_info::from_magic_number(const sail::io &io)
     SAIL_TRY_OR_EXECUTE(io.verify_valid(),
                         /* on error */ return codec_info{});
 
-    struct sail_io *sail_io = nullptr;
-
-    SAIL_AT_SCOPE_EXIT(
-        sail_destroy_io(sail_io);
-    );
-
-    SAIL_TRY_OR_EXECUTE(io.to_sail_io(&sail_io),
-                        /* on error */ return codec_info{});
-
     const struct sail_codec_info *sail_codec_info;
-    SAIL_TRY_OR_EXECUTE(sail_codec_info_by_magic_number_from_io(sail_io, &sail_codec_info),
+    SAIL_TRY_OR_EXECUTE(sail_codec_info_by_magic_number_from_io(&io.d->sail_io, &sail_codec_info),
                         /* on error */ return codec_info{});
 
     return codec_info(sail_codec_info);

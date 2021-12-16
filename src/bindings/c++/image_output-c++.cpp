@@ -173,7 +173,7 @@ sail_status_t image_output::start(void *buffer, size_t buffer_length, const sail
 
 sail_status_t image_output::start(const sail::io &io, const sail::codec_info &codec_info)
 {
-    SAIL_TRY(io.to_sail_io(&d->sail_io));
+    d->sail_io = &io.d->sail_io;
     SAIL_TRY(sail_check_io_valid(d->sail_io));
 
     SAIL_TRY(sail_start_writing_io_with_options(d->sail_io,
@@ -186,7 +186,7 @@ sail_status_t image_output::start(const sail::io &io, const sail::codec_info &co
 
 sail_status_t image_output::start(const sail::io &io, const sail::codec_info &codec_info, const sail::write_options &write_options)
 {
-    SAIL_TRY(io.to_sail_io(&d->sail_io));
+    d->sail_io = &io.d->sail_io;
     SAIL_TRY(sail_check_io_valid(d->sail_io));
 
     sail_write_options sail_write_options;

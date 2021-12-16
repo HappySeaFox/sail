@@ -52,6 +52,7 @@
     #include "image_input-c++.h"
     #include "image_output-c++.h"
     #include "io_common-c++.h"
+    #include "io_common_p-c++.h"
     #include "log-c++.h"
     #include "meta_data-c++.h"
     #include "palette-c++.h"

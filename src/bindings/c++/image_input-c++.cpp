@@ -97,19 +97,14 @@ std::tuple<image, codec_info> image_input::probe(const sail::io &io) const
     SAIL_TRY_OR_EXECUTE(io.verify_valid(),
                         /* on error */ return {});
 
-    struct sail_io *sail_io = nullptr;
     const sail_codec_info *sail_codec_info;
     sail_image *sail_image = nullptr;
 
-    SAIL_TRY_OR_EXECUTE(io.to_sail_io(&sail_io),
-                        /* on error */ return {});
-
     SAIL_AT_SCOPE_EXIT(
         sail_destroy_image(sail_image);
-        sail_destroy_io(sail_io);
     );
 
-    SAIL_TRY_OR_EXECUTE(sail_probe_io(sail_io, &sail_image, &sail_codec_info),
+    SAIL_TRY_OR_EXECUTE(sail_probe_io(&io.d->sail_io, &sail_image, &sail_codec_info),
                         /* on error */ return {});
 
     return { image(sail_image), codec_info(sail_codec_info) };
@@ -225,7 +220,7 @@ sail_status_t image_input::start(const sail::io &io)
 {
     SAIL_TRY(d->ensure_state_is_null());
 
-    SAIL_TRY(io.to_sail_io(&d->sail_io));
+    d->sail_io = &io.d->sail_io;
     SAIL_TRY(sail_check_io_valid(d->sail_io));
 
     SAIL_TRY(sail_start_reading_io(d->sail_io, nullptr, &d->state));
@@ -237,7 +232,7 @@ sail_status_t image_input::start(const sail::io &io, const sail::codec_info &cod
 {
     SAIL_TRY(d->ensure_state_is_null());
 
-    SAIL_TRY(io.to_sail_io(&d->sail_io));
+    d->sail_io = &io.d->sail_io;
     SAIL_TRY(sail_check_io_valid(d->sail_io));
 
     SAIL_TRY(sail_start_reading_io(d->sail_io, codec_info.sail_codec_info_c(), &d->state));
@@ -249,7 +244,7 @@ sail_status_t image_input::start(const sail::io &io, const sail::read_options &r
 {
     SAIL_TRY(d->ensure_state_is_null());
 
-    SAIL_TRY(io.to_sail_io(&d->sail_io));
+    d->sail_io = &io.d->sail_io;
     SAIL_TRY(sail_check_io_valid(d->sail_io));
 
     sail_read_options sail_read_options;
@@ -264,7 +259,7 @@ sail_status_t image_input::start(const sail::io &io, const sail::codec_info &cod
 {
     SAIL_TRY(d->ensure_state_is_null());
 
-    SAIL_TRY(io.to_sail_io(&d->sail_io));
+    d->sail_io = &io.d->sail_io;
     SAIL_TRY(sail_check_io_valid(d->sail_io));
 
     sail_read_options sail_read_options;

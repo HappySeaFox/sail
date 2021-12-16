@@ -85,6 +85,13 @@ SAIL_EXPORT sail_status_t file_size(std::string_view path, size_t *size);
  */
 SAIL_EXPORT sail_status_t read_file_contents(std::string_view path, sail::arbitrary_data *contents);
 
+/*
+ * Reads the specified I/O stream into the memory buffer. The memory buffer is resized to fit the contents.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t read_io_contents(const sail::io &io, sail::arbitrary_data *contents);
+
 }
 
 #endif

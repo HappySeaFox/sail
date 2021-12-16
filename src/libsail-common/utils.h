@@ -208,6 +208,13 @@ SAIL_EXPORT bool sail_is_dir(const char *path);
 SAIL_EXPORT bool sail_is_file(const char *path);
 
 /*
+ * Retrieves the I/O stream size. The stream must be seekable.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_io_size(struct sail_io *io, size_t *size);
+
+/*
  * Retrieves the file size.
  *
  * Returns SAIL_OK on success.

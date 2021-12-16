@@ -638,6 +638,25 @@ bool sail_is_file(const char *path) {
 #endif
 }
 
+sail_status_t sail_io_size(struct sail_io *io, size_t *size) {
+
+    SAIL_TRY(sail_check_io_valid(io));
+    SAIL_CHECK_PTR(size);
+
+    /* Save the current position. */
+    size_t saved_position;
+    SAIL_TRY(io->tell(io->stream, &saved_position));
+
+    size_t size_local;
+    SAIL_TRY(io->seek(io->stream, 0, SEEK_END));
+    SAIL_TRY(io->tell(io->stream, &size_local));
+    SAIL_TRY(io->seek(io->stream, (long)saved_position, SEEK_SET));
+
+    *size = size_local - saved_position;
+
+    return SAIL_OK;
+}
+
 sail_status_t sail_file_size(const char *path, size_t *size) {
 
     SAIL_CHECK_PTR(path);
@@ -714,20 +733,16 @@ sail_status_t sail_io_contents_to_data(struct sail_io *io, void **data, size_t *
     SAIL_TRY(io->tell(io->stream, &saved_position));
 
     size_t data_size_local;
-    SAIL_TRY(io->seek(io->stream, 0, SEEK_END));
-    SAIL_TRY(io->tell(io->stream, &data_size_local));
-    SAIL_TRY(io->seek(io->stream, (long)saved_position, SEEK_SET));
-
-    data_size_local -= saved_position;
+    SAIL_TRY(sail_io_size(io, &data_size_local));
 
     /* Read stream. */
     void *data_local;
     SAIL_TRY(sail_malloc(data_size_local, &data_local));
 
     SAIL_TRY_OR_CLEANUP(io->strict_read(io->stream, data_local, data_size_local),
-                        /* cleanup */ io->seek(io->stream, (long)saved_position, SEEK_SET),
-                                      sail_free(data_local));
+                        /* cleanup */ sail_free(data_local));
 
+    /* Seek back. */
     SAIL_TRY(io->seek(io->stream, (long)saved_position, SEEK_SET));
 
     *data = data_local;

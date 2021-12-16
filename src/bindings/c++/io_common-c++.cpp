@@ -29,35 +29,6 @@
 namespace sail
 {
 
-class SAIL_HIDDEN io::pimpl
-{
-public:
-    pimpl()
-    {
-        empty_sail_io();
-    }
-
-    void empty_sail_io();
-
-    struct sail_io sail_io;
-};
-
-void io::pimpl::empty_sail_io()
-{
-    sail_io.id             = 0;
-    sail_io.features       = 0;
-    sail_io.stream         = nullptr;
-    sail_io.tolerant_read  = nullptr;
-    sail_io.strict_read    = nullptr;
-    sail_io.seek           = nullptr;
-    sail_io.tell           = nullptr;
-    sail_io.tolerant_write = nullptr;
-    sail_io.strict_write   = nullptr;
-    sail_io.flush          = nullptr;
-    sail_io.close          = nullptr;
-    sail_io.eof            = nullptr;
-}
-
 io::io()
     : d(new pimpl)
 {
@@ -178,19 +149,6 @@ sail_status_t io::is_valid_private() const
     sail_io *sail_io = &d->sail_io;
 
     SAIL_TRY(sail_check_io_valid(sail_io));
-
-    return SAIL_OK;
-}
-
-sail_status_t io::to_sail_io(sail_io **io) const
-{
-    SAIL_CHECK_PTR(io);
-
-    sail_io *io_local;
-    SAIL_TRY(sail_alloc_io(&io_local));
-
-    *io_local = d->sail_io;
-    *io = io_local;
 
     return SAIL_OK;
 }
