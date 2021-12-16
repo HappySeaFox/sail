@@ -138,7 +138,7 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
     }
 
     sail::image_output image_output;
-    sail::image image(const_cast<uchar *>(qimage.bits()), qImageFormatToSailPixelFormat(qimage.format()), qimage.width(), qimage.height());
+    sail::image image(const_cast<uchar *>(qimage.bits()), qImageFormatToSailPixelFormat(qimage.format()), qimage.width(), qimage.height(), qimage.bytesPerLine());
 
     // SAIL tries to save an image as is, preserving its pixel format.
     // Particular image formats may support saving in different pixel formats:
