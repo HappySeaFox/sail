@@ -151,6 +151,7 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
 
     SAIL_TRY(image_output.start(path.toLocal8Bit().constData()));
     SAIL_TRY(image_output.next_frame(image));
+    // Optional
     SAIL_TRY(image_output.stop());
 
     return SAIL_OK;
