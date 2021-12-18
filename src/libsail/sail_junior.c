@@ -37,7 +37,7 @@
 static sail_status_t probe_file_with_io(const char *path, struct sail_image **image, const struct sail_codec_info **codec_info) {
 
     struct sail_io *io;
-    SAIL_TRY(alloc_io_read_file(path, &io));
+    SAIL_TRY(sail_alloc_io_read_file(path, &io));
 
     SAIL_TRY_OR_CLEANUP(sail_probe_io(io, image, codec_info),
                         /* cleanup */ sail_destroy_io(io));
@@ -68,7 +68,7 @@ sail_status_t sail_probe_file(const char *path, struct sail_image **image, const
     SAIL_TRY(sail_alloc_read_options_from_features((*codec_info_local)->read_features, &read_options_local));
 
     struct sail_io *io;
-    SAIL_TRY_OR_CLEANUP(alloc_io_read_file(path, &io),
+    SAIL_TRY_OR_CLEANUP(sail_alloc_io_read_file(path, &io),
                         /* cleanup */ sail_destroy_read_options(read_options_local));
 
     void *state = NULL;

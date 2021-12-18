@@ -70,7 +70,7 @@ sail_status_t sail_probe_mem(const void *buffer, size_t buffer_length, struct sa
     SAIL_CHECK_PTR(buffer);
 
     struct sail_io *io;
-    SAIL_TRY(alloc_io_read_mem(buffer, buffer_length, &io));
+    SAIL_TRY(sail_alloc_io_read_mem(buffer, buffer_length, &io));
 
     SAIL_TRY_OR_CLEANUP(sail_probe_io(io, image, codec_info),
                         /* cleanup */ sail_destroy_io(io));

@@ -36,7 +36,6 @@
     #include <share.h>
 #endif
 
-#include "sail-common.h"
 #include "sail.h"
 
 /*
@@ -204,7 +203,7 @@ static sail_status_t alloc_io_file(const char *path, const char *mode, struct sa
  * Public functions.
  */
 
-sail_status_t alloc_io_read_file(const char *path, struct sail_io **io) {
+sail_status_t sail_alloc_io_read_file(const char *path, struct sail_io **io) {
 
     SAIL_TRY(alloc_io_file(path, "rb", io));
 
@@ -213,16 +212,16 @@ sail_status_t alloc_io_read_file(const char *path, struct sail_io **io) {
     (*io)->strict_read    = io_file_strict_read;
     (*io)->seek           = io_file_seek;
     (*io)->tell           = io_file_tell;
-    (*io)->tolerant_write = io_noop_tolerant_write;
-    (*io)->strict_write   = io_noop_strict_write;
-    (*io)->flush          = io_noop_flush;
+    (*io)->tolerant_write = sail_io_noop_tolerant_write;
+    (*io)->strict_write   = sail_io_noop_strict_write;
+    (*io)->flush          = sail_io_noop_flush;
     (*io)->close          = io_file_close;
     (*io)->eof            = io_file_eof;
 
     return SAIL_OK;
 }
 
-sail_status_t alloc_io_write_file(const char *path, struct sail_io **io) {
+sail_status_t sail_alloc_io_write_file(const char *path, struct sail_io **io) {
 
     SAIL_TRY(alloc_io_file(path, "w+b", io));
 

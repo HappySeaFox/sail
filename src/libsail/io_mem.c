@@ -30,7 +30,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "sail-common.h"
 #include "sail.h"
 
 struct mem_io_buffer_info {
@@ -243,7 +242,7 @@ static sail_status_t io_mem_eof(void *stream, bool *result) {
  * Public functions.
  */
 
-sail_status_t alloc_io_read_mem(const void *buffer, size_t length, struct sail_io **io) {
+sail_status_t sail_alloc_io_read_mem(const void *buffer, size_t length, struct sail_io **io) {
 
     SAIL_CHECK_PTR(buffer);
     SAIL_CHECK_PTR(io);
@@ -269,9 +268,9 @@ sail_status_t alloc_io_read_mem(const void *buffer, size_t length, struct sail_i
     io_local->strict_read    = io_mem_strict_read;
     io_local->seek           = io_mem_seek;
     io_local->tell           = io_mem_tell;
-    io_local->tolerant_write = io_noop_tolerant_write;
-    io_local->strict_write   = io_noop_strict_write;
-    io_local->flush          = io_noop_flush;
+    io_local->tolerant_write = sail_io_noop_tolerant_write;
+    io_local->strict_write   = sail_io_noop_strict_write;
+    io_local->flush          = sail_io_noop_flush;
     io_local->close          = io_mem_close;
     io_local->eof            = io_mem_eof;
 
@@ -280,7 +279,7 @@ sail_status_t alloc_io_read_mem(const void *buffer, size_t length, struct sail_i
     return SAIL_OK;
 }
 
-sail_status_t alloc_io_write_mem(void *buffer, size_t length, struct sail_io **io) {
+sail_status_t sail_alloc_io_write_mem(void *buffer, size_t length, struct sail_io **io) {
 
     SAIL_CHECK_PTR(buffer);
     SAIL_CHECK_PTR(io);

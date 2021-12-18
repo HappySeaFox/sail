@@ -78,7 +78,7 @@ sail_status_t sail_codec_info_by_magic_number_from_path(const char *path, const 
     SAIL_CHECK_PTR(codec_info);
 
     struct sail_io *io;
-    SAIL_TRY(alloc_io_read_file(path, &io));
+    SAIL_TRY(sail_alloc_io_read_file(path, &io));
 
     SAIL_TRY_OR_CLEANUP(sail_codec_info_by_magic_number_from_io(io, codec_info),
                         /* cleanup */ sail_destroy_io(io));
@@ -94,7 +94,7 @@ sail_status_t sail_codec_info_by_magic_number_from_mem(const void *buffer, size_
     SAIL_CHECK_PTR(codec_info);
 
     struct sail_io *io;
-    SAIL_TRY(alloc_io_read_mem(buffer, buffer_length, &io));
+    SAIL_TRY(sail_alloc_io_read_mem(buffer, buffer_length, &io));
 
     SAIL_TRY_OR_CLEANUP(sail_codec_info_by_magic_number_from_io(io, codec_info),
                         /* cleanup */ sail_destroy_io(io));
