@@ -66,7 +66,7 @@ public:
     /*
      * Constructs a new ICC profile from the binary data.
      */
-    iccp(const arbitrary_data &data);
+    explicit iccp(const arbitrary_data &data);
 
     /*
      * Copies the ICC profile.

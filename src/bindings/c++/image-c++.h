@@ -75,7 +75,7 @@ public:
      * Constructs a new image out of the specified file path. Reads just a single frame
      * from the file.
      */
-    image(std::string_view path);
+    explicit image(std::string_view path);
 
     /*
      * Constructs a new image out of the specified image properties and pixels. This constructor
