@@ -82,7 +82,7 @@ public:
     ~conversion_options();
 
     /*
-     * Returns the conversion options.
+     * Returns the or-ed SailConversionOption-s.
      */
     int options() const;
 
@@ -97,7 +97,7 @@ public:
     sail_rgb24_t background24() const;
 
     /*
-     * Sets new conversion options.
+     * Sets new or-ed SailConversionOption-s. If zero, SAIL_CONVERSION_OPTION_DROP_ALPHA is assumed.
      */
     conversion_options& with_options(int options);
 
