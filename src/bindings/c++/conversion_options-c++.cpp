@@ -24,7 +24,7 @@
 */
 
 #include <cstdint>
-#include <new> // bad_alloc
+#include <stdexcept>
 
 #include "sail-c++.h"
 #include "sail-manip.h"
