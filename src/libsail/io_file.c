@@ -68,6 +68,32 @@ static sail_status_t io_file_strict_read(void *stream, void *buf, size_t size_to
     return SAIL_OK;
 }
 
+static sail_status_t io_file_tolerant_write(void *stream, const void *buf, size_t size_to_write, size_t *written_size) {
+
+    SAIL_CHECK_PTR(stream);
+    SAIL_CHECK_PTR(buf);
+    SAIL_CHECK_PTR(written_size);
+
+    FILE *fptr = (FILE *)stream;
+
+    *written_size = fwrite(buf, 1, size_to_write, fptr);
+
+    return SAIL_OK;
+}
+
+static sail_status_t io_file_strict_write(void *stream, const void *buf, size_t size_to_write) {
+
+    size_t written_size;
+
+    SAIL_TRY(io_file_tolerant_write(stream, buf, size_to_write, &written_size));
+
+    if (written_size != size_to_write) {
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_WRITE_IO);
+    }
+
+    return SAIL_OK;
+}
+
 static sail_status_t io_file_seek(void *stream, long offset, int whence) {
 
     SAIL_CHECK_PTR(stream);
@@ -97,32 +123,6 @@ static sail_status_t io_file_tell(void *stream, size_t *offset) {
     }
 
     *offset = offset_local;
-
-    return SAIL_OK;
-}
-
-static sail_status_t io_file_tolerant_write(void *stream, const void *buf, size_t size_to_write, size_t *written_size) {
-
-    SAIL_CHECK_PTR(stream);
-    SAIL_CHECK_PTR(buf);
-    SAIL_CHECK_PTR(written_size);
-
-    FILE *fptr = (FILE *)stream;
-
-    *written_size = fwrite(buf, 1, size_to_write, fptr);
-
-    return SAIL_OK;
-}
-
-static sail_status_t io_file_strict_write(void *stream, const void *buf, size_t size_to_write) {
-
-    size_t written_size;
-
-    SAIL_TRY(io_file_tolerant_write(stream, buf, size_to_write, &written_size));
-
-    if (written_size != size_to_write) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_WRITE_IO);
-    }
 
     return SAIL_OK;
 }
@@ -210,10 +210,10 @@ sail_status_t sail_alloc_io_read_file(const char *path, struct sail_io **io) {
     (*io)->features       = SAIL_IO_FEATURE_SEEKABLE;
     (*io)->tolerant_read  = io_file_tolerant_read;
     (*io)->strict_read    = io_file_strict_read;
-    (*io)->seek           = io_file_seek;
-    (*io)->tell           = io_file_tell;
     (*io)->tolerant_write = sail_io_noop_tolerant_write;
     (*io)->strict_write   = sail_io_noop_strict_write;
+    (*io)->seek           = io_file_seek;
+    (*io)->tell           = io_file_tell;
     (*io)->flush          = sail_io_noop_flush;
     (*io)->close          = io_file_close;
     (*io)->eof            = io_file_eof;
@@ -227,10 +227,10 @@ sail_status_t sail_alloc_io_write_file(const char *path, struct sail_io **io) {
 
     (*io)->tolerant_read  = io_file_tolerant_read;
     (*io)->strict_read    = io_file_strict_read;
-    (*io)->seek           = io_file_seek;
-    (*io)->tell           = io_file_tell;
     (*io)->tolerant_write = io_file_tolerant_write;
     (*io)->strict_write   = io_file_strict_write;
+    (*io)->seek           = io_file_seek;
+    (*io)->tell           = io_file_tell;
     (*io)->flush          = io_file_flush;
     (*io)->close          = io_file_close;
     (*io)->eof            = io_file_eof;

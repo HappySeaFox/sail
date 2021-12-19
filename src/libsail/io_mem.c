@@ -111,6 +111,51 @@ static sail_status_t io_mem_strict_read(void *stream, void *buf, size_t size_to_
     return SAIL_OK;
 }
 
+static sail_status_t io_mem_tolerant_write(void *stream, const void *buf, size_t size_to_write, size_t *written_size) {
+
+    SAIL_CHECK_PTR(stream);
+    SAIL_CHECK_PTR(buf);
+    SAIL_CHECK_PTR(written_size);
+
+    struct mem_io_write_stream *mem_io_write_stream = (struct mem_io_write_stream *)stream;
+    struct mem_io_buffer_info *mem_io_buffer_info = &mem_io_write_stream->mem_io_buffer_info;
+
+    *written_size = 0;
+
+    if (mem_io_buffer_info->pos >= mem_io_buffer_info->length) {
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_EOF);
+    }
+
+    size_t actual_size_to_write = (mem_io_buffer_info->pos + size_to_write > mem_io_buffer_info->length)
+                                  ? mem_io_buffer_info->length - mem_io_buffer_info->pos
+                                  : size_to_write;
+
+    memcpy((char *)mem_io_write_stream->buffer + mem_io_buffer_info->pos, buf, actual_size_to_write);
+    mem_io_buffer_info->pos += actual_size_to_write;
+
+    *written_size = actual_size_to_write;
+
+    /* Update the accessible length in case of overflow. */
+    if (mem_io_buffer_info->pos >= mem_io_buffer_info->accessible_length) {
+        mem_io_buffer_info->accessible_length = mem_io_buffer_info->pos;
+    }
+
+    return SAIL_OK;
+}
+
+static sail_status_t io_mem_strict_write(void *stream, const void *buf, size_t size_to_write) {
+
+    size_t written_size;
+
+    SAIL_TRY(io_mem_tolerant_write(stream, buf, size_to_write, &written_size));
+
+    if (written_size != size_to_write) {
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_WRITE_IO);
+    }
+
+    return SAIL_OK;
+}
+
 static sail_status_t io_mem_seek(void *stream, long offset, int whence) {
 
     SAIL_CHECK_PTR(stream);
@@ -161,51 +206,6 @@ static sail_status_t io_mem_tell(void *stream, size_t *offset) {
     struct mem_io_buffer_info *mem_io_buffer_info = (struct mem_io_buffer_info *)stream;
 
     *offset = mem_io_buffer_info->pos;
-
-    return SAIL_OK;
-}
-
-static sail_status_t io_mem_tolerant_write(void *stream, const void *buf, size_t size_to_write, size_t *written_size) {
-
-    SAIL_CHECK_PTR(stream);
-    SAIL_CHECK_PTR(buf);
-    SAIL_CHECK_PTR(written_size);
-
-    struct mem_io_write_stream *mem_io_write_stream = (struct mem_io_write_stream *)stream;
-    struct mem_io_buffer_info *mem_io_buffer_info = &mem_io_write_stream->mem_io_buffer_info;
-
-    *written_size = 0;
-
-    if (mem_io_buffer_info->pos >= mem_io_buffer_info->length) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_EOF);
-    }
-
-    size_t actual_size_to_write = (mem_io_buffer_info->pos + size_to_write > mem_io_buffer_info->length)
-                                  ? mem_io_buffer_info->length - mem_io_buffer_info->pos
-                                  : size_to_write;
-
-    memcpy((char *)mem_io_write_stream->buffer + mem_io_buffer_info->pos, buf, actual_size_to_write);
-    mem_io_buffer_info->pos += actual_size_to_write;
-
-    *written_size = actual_size_to_write;
-
-    /* Update the accessible length in case of overflow. */
-    if (mem_io_buffer_info->pos >= mem_io_buffer_info->accessible_length) {
-        mem_io_buffer_info->accessible_length = mem_io_buffer_info->pos;
-    }
-
-    return SAIL_OK;
-}
-
-static sail_status_t io_mem_strict_write(void *stream, const void *buf, size_t size_to_write) {
-
-    size_t written_size;
-
-    SAIL_TRY(io_mem_tolerant_write(stream, buf, size_to_write, &written_size));
-
-    if (written_size != size_to_write) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_WRITE_IO);
-    }
 
     return SAIL_OK;
 }
@@ -266,10 +266,10 @@ sail_status_t sail_alloc_io_read_mem(const void *buffer, size_t length, struct s
     io_local->stream         = mem_io_read_stream;
     io_local->tolerant_read  = io_mem_tolerant_read;
     io_local->strict_read    = io_mem_strict_read;
-    io_local->seek           = io_mem_seek;
-    io_local->tell           = io_mem_tell;
     io_local->tolerant_write = sail_io_noop_tolerant_write;
     io_local->strict_write   = sail_io_noop_strict_write;
+    io_local->seek           = io_mem_seek;
+    io_local->tell           = io_mem_tell;
     io_local->flush          = sail_io_noop_flush;
     io_local->close          = io_mem_close;
     io_local->eof            = io_mem_eof;
@@ -304,10 +304,10 @@ sail_status_t sail_alloc_io_write_mem(void *buffer, size_t length, struct sail_i
     io_local->stream         = mem_io_write_stream;
     io_local->tolerant_read  = io_mem_tolerant_read;
     io_local->strict_read    = io_mem_strict_read;
-    io_local->seek           = io_mem_seek;
-    io_local->tell           = io_mem_tell;
     io_local->tolerant_write = io_mem_tolerant_write;
     io_local->strict_write   = io_mem_strict_write;
+    io_local->seek           = io_mem_seek;
+    io_local->tell           = io_mem_tell;
     io_local->flush          = io_mem_flush;
     io_local->close          = io_mem_close;
     io_local->eof            = io_mem_eof;

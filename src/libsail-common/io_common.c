@@ -42,10 +42,10 @@ sail_status_t sail_alloc_io(struct sail_io **io) {
     (*io)->stream         = NULL;
     (*io)->tolerant_read  = NULL;
     (*io)->strict_read    = NULL;
-    (*io)->seek           = NULL;
-    (*io)->tell           = NULL;
     (*io)->tolerant_write = NULL;
     (*io)->strict_write   = NULL;
+    (*io)->seek           = NULL;
+    (*io)->tell           = NULL;
     (*io)->flush          = NULL;
     (*io)->close          = NULL;
     (*io)->eof            = NULL;
@@ -74,10 +74,10 @@ sail_status_t sail_check_io_valid(const struct sail_io *io)
     if (io->id == 0U                   ||
             io->tolerant_read  == NULL ||
             io->strict_read    == NULL ||
-            io->seek           == NULL ||
-            io->tell           == NULL ||
             io->tolerant_write == NULL ||
             io->strict_write   == NULL ||
+            io->seek           == NULL ||
+            io->tell           == NULL ||
             io->flush          == NULL ||
             io->close          == NULL ||
             io->eof            == NULL) {
