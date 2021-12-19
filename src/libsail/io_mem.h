@@ -36,6 +36,10 @@
     #include <sail-common/export.h>
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct sail_io;
 
 /*
@@ -53,5 +57,10 @@ SAIL_EXPORT sail_status_t sail_alloc_io_read_mem(const void *buffer, size_t leng
  * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_alloc_io_write_mem(void *buffer, size_t length, struct sail_io **io);
+
+/* extern "C" */
+#ifdef __cplusplus
+}
+#endif
 
 #endif

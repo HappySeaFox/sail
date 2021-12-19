@@ -37,6 +37,10 @@
     #include <sail-common/export.h>
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
  * No-op callbacks for I/O streams when specific operations cannot be executed.
  * For example, when we open a file for reading, its tolerant_write callback is set to
@@ -87,5 +91,10 @@ SAIL_EXPORT sail_status_t sail_io_noop_close(void *stream);
  * No-op callback that just returns SAIL_ERROR_NOT_IMPLEMENTED.
  */
 SAIL_EXPORT sail_status_t sail_io_noop_eof(void *stream, bool *result);
+
+/* extern "C" */
+#ifdef __cplusplus
+}
+#endif
 
 #endif
