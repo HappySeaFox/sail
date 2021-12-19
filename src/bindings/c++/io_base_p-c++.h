@@ -26,7 +26,6 @@
 #ifndef SAIL_IO_BASE_PRIVATE_CPP_H
 #define SAIL_IO_BASE_PRIVATE_CPP_H
 
-#include "error.h"
 #include "export.h"
 
 struct sail_io;
