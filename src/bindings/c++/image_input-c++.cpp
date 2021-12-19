@@ -222,7 +222,10 @@ sail_status_t image_input::start(sail::abstract_io &abstract_io)
 
     d->abstract_io_adapter.reset(new sail::abstract_io_adapter(abstract_io));
 
-    SAIL_TRY(sail_start_reading_io(&d->abstract_io_adapter->sail_io(), nullptr, &d->state));
+    const struct sail_codec_info *codec_info;
+    SAIL_TRY(sail_codec_info_by_magic_number_from_io(&d->abstract_io_adapter->sail_io(), &codec_info));
+
+    SAIL_TRY(sail_start_reading_io(&d->abstract_io_adapter->sail_io(), codec_info, &d->state));
 
     return SAIL_OK;
 }

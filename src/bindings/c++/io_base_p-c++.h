@@ -23,39 +23,32 @@
     SOFTWARE.
 */
 
-#include <stdexcept>
+#ifndef SAIL_IO_BASE_PRIVATE_CPP_H
+#define SAIL_IO_BASE_PRIVATE_CPP_H
 
-#include "sail-c++.h"
-#include "sail.h"
+#include "error.h"
+#include "export.h"
+
+struct sail_io;
 
 namespace sail
 {
 
-io_file::io_file(std::string_view path)
-    : io_file(path, Operation::Read)
+class SAIL_HIDDEN io_base::pimpl
 {
-}
-
-io_file::io_file(std::string_view path, io_file::Operation operation)
-    : io_base()
-{
-    switch (operation) {
-        case Operation::Read:
-            SAIL_TRY_OR_EXECUTE(sail_alloc_io_read_file(path.data(), &d->sail_io),
-                                /* on error */ throw std::bad_alloc());
-        break;
-        case Operation::Write:
-            SAIL_TRY_OR_EXECUTE(sail_alloc_io_write_file(path.data(), &d->sail_io),
-                                /* on error */ throw std::bad_alloc());
-        break;
-        default: {
-            throw std::runtime_error("Unknown file operation");
-        }
+public:
+    pimpl()
+        : sail_io(nullptr)
+    {
     }
+    ~pimpl()
+    {
+        sail_destroy_io(sail_io);
+    }
+
+    struct sail_io *sail_io;
+};
+
 }
 
-io_file::~io_file()
-{
-}
-
-}
+#endif

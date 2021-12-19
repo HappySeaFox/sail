@@ -23,34 +23,36 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_ABSTRACT_IO_CPP_H
-#define SAIL_ABSTRACT_IO_CPP_H
+#ifndef SAIL_IO_BASE_CPP_H
+#define SAIL_IO_BASE_CPP_H
 
-#include <cstddef>
-#include <cstdint>
-#include <cstdio> /* seek whence */
+#include <memory>
 
 #ifdef SAIL_BUILD
-    #include "error.h"
-    #include "export.h"
+    #include "abstract_io-c++.h"
 #else
-    #include <sail-common/error.h>
-    #include <sail-common/export.h>
+    #include <sail-c++/abstract_io-c++.h>
 #endif
 
 namespace sail
 {
 
 /*
- * Abstract I/O represents an input/output abstraction.
+ * Base I/O object.
  */
-class SAIL_EXPORT abstract_io
+class SAIL_EXPORT io_base : public abstract_io
 {
 public:
+    enum class Operation
+    {
+        Read,
+        Write,
+    };
+
     /*
-     * Destroys the I/O stream.
+     * Construct a new base I/O object.
      */
-    virtual ~abstract_io() = default;
+    io_base();
 
     /*
      * Returns the I/O stream id.
@@ -64,12 +66,12 @@ public:
      *
      * Well-known I/O ids for file and memory I/O classes: SAIL_FILE_IO_ID and SAIL_MEMORY_IO_ID.
      */
-    virtual std::uint64_t id() const = 0;
+    std::uint64_t id() const override;
 
     /*
      * Returns the I/O stream features. See SailIoFeature.
      */
-    virtual int features() const = 0;
+    int features() const override;
 
     /*
      * Reads from the underlying I/O object into the specified buffer. In contrast to strict_read(),
@@ -78,7 +80,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    virtual sail_status_t tolerant_read(void *buf, std::size_t size_to_read, std::size_t *read_size) = 0;
+    sail_status_t tolerant_read(void *buf, std::size_t size_to_read, std::size_t *read_size) override;
 
     /*
      * Reads from the underlying I/O object into the specified buffer. In contrast to tolerant_read(),
@@ -86,7 +88,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    virtual sail_status_t strict_read(void *buf, std::size_t size_to_read) = 0;
+    sail_status_t strict_read(void *buf, std::size_t size_to_read) override;
 
     /*
      * Writes the specified buffer to the underlying I/O object. In contrast to strict_write(),
@@ -95,7 +97,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    virtual sail_status_t tolerant_write(const void *buf, std::size_t size_to_write, std::size_t *written_size) = 0;
+    sail_status_t tolerant_write(const void *buf, std::size_t size_to_write, std::size_t *written_size) override;
 
     /*
      * Writes the specified buffer to the underlying I/O object. In contrast to tolerant_write(),
@@ -103,7 +105,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    virtual sail_status_t strict_write(const void *buf, std::size_t size_to_write) = 0;
+    sail_status_t strict_write(const void *buf, std::size_t size_to_write) override;
 
     /*
      * Sets the I/O position in the underlying I/O object.
@@ -112,14 +114,14 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    virtual sail_status_t seek(long offset, int whence) = 0;
+    sail_status_t seek(long offset, int whence) override;
 
     /*
      * Assigns the current I/O position in the underlying I/O object.
      *
      * Returns SAIL_OK on success.
      */
-    virtual sail_status_t tell(std::size_t *offset) = 0;
+    sail_status_t tell(std::size_t *offset) override;
 
     /*
      * Flushes buffers of the underlying I/O object. Has no effect if the underlying I/O object
@@ -127,21 +129,25 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    virtual sail_status_t flush() = 0;
+    sail_status_t flush() override;
 
     /*
      * Closes the underlying I/O object.
      *
      * Returns SAIL_OK on success.
      */
-    virtual sail_status_t close() = 0;
+    sail_status_t close() override;
 
     /*
      * Assigns true to the specified result if the underlying I/O object reached the end-of-file indicator.
      *
      * Returns SAIL_OK on success.
      */
-    virtual sail_status_t eof(bool *result) = 0;
+    sail_status_t eof(bool *result) override;
+
+protected:
+    class pimpl;
+    std::unique_ptr<pimpl> d;
 };
 
 }

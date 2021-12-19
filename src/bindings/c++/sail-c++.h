@@ -53,6 +53,8 @@
     #include "image-c++.h"
     #include "image_input-c++.h"
     #include "image_output-c++.h"
+    #include "io_base-c++.h"
+    #include "io_base_p-c++.h"
     #include "io_file-c++.h"
     #include "log-c++.h"
     #include "meta_data-c++.h"
@@ -82,6 +84,7 @@
     #include <sail-c++/image-c++.h>
     #include <sail-c++/image_input-c++.h>
     #include <sail-c++/image_output-c++.h>
+    #include <sail-c++/io_base-c++.h>
     #include <sail-c++/io_file-c++.h>
     #include <sail-c++/log-c++.h>
     #include <sail-c++/meta_data-c++.h>
