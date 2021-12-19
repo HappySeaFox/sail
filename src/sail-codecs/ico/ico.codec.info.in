@@ -6,7 +6,7 @@ version=0.4.2
 priority=LOW
 name=ICO
 description=Windows Icon
-magic-numbers=00 00 00 01;00 00 00 02
+magic-numbers=00 00 01 00;00 00 02 00
 extensions=ico;cur
 mime-types=image/x-icon;image/vnd.microsoft.icon
 
