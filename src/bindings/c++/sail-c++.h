@@ -43,6 +43,8 @@
     #pragma warning(disable: 4251)
     #endif
 
+    #include "abstract_io-c++.h"
+    #include "abstract_io_adapter-c++.h"
     #include "arbitrary_data-c++.h"
     #include "at_scope_exit-c++.h"
     #include "context-c++.h"
@@ -51,8 +53,6 @@
     #include "image-c++.h"
     #include "image_input-c++.h"
     #include "image_output-c++.h"
-    #include "io_common-c++.h"
-    #include "io_common_p-c++.h"
     #include "log-c++.h"
     #include "meta_data-c++.h"
     #include "palette-c++.h"
@@ -81,7 +81,6 @@
     #include <sail-c++/image-c++.h>
     #include <sail-c++/image_input-c++.h>
     #include <sail-c++/image_output-c++.h>
-    #include <sail-c++/io_common-c++.h>
     #include <sail-c++/log-c++.h>
     #include <sail-c++/meta_data-c++.h>
     #include <sail-c++/palette-c++.h>

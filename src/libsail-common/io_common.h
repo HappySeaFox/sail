@@ -63,7 +63,7 @@ typedef sail_status_t (*sail_io_strict_read_t)(void *stream, void *buf, size_t s
 /*
  * Sets the I/O position in the underlying I/O object.
  *
- * whence possible values: SEEK_SET, SEEK_CUR, or SEEK_END declared in <stdio.h>.
+ * Possible 'whence' values: SEEK_SET, SEEK_CUR, or SEEK_END declared in <stdio.h>.
  *
  * Returns SAIL_OK on success.
  */

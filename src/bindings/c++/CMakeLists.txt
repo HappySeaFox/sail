@@ -1,4 +1,7 @@
 add_library(sail-c++
+                abstract_io-c++.h
+                abstract_io_adapter-c++.cpp
+                abstract_io_adapter-c++.h
                 arbitrary_data-c++.h
                 at_scope_exit-c++.h
                 codec_info-c++.cpp
@@ -15,9 +18,6 @@ add_library(sail-c++
                 image_input-c++.h
                 image_output-c++.cpp
                 image_output-c++.h
-                io_common-c++.cpp
-                io_common-c++.h
-                io_common_p-c++.h
                 log-c++.cpp
                 log-c++.h
                 meta_data-c++.cpp
@@ -42,7 +42,8 @@ add_library(sail-c++
 
 # Build a list of public headers to install
 #
-set(PUBLIC_HEADERS "arbitrary_data-c++.h"
+set(PUBLIC_HEADERS "abstract_io-c++.h"
+                   "arbitrary_data-c++.h"
                    "at_scope_exit-c++.h"
                    "context-c++.h"
                    "conversion_options-c++.h"

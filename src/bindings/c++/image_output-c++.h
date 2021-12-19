@@ -41,8 +41,8 @@
 namespace sail
 {
 
+class abstract_io;
 class image;
-class io;
 class codec_info;
 class write_options;
 
@@ -194,7 +194,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t start(const sail::io &io, const sail::codec_info &codec_info);
+    sail_status_t start(sail::abstract_io &abstract_io, const sail::codec_info &codec_info);
 
     /*
      * Starts writing into the specified I/O target with the specified codec and write options.
@@ -206,7 +206,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t start(const sail::io &io, const sail::codec_info &codec_info, const sail::write_options &write_options);
+    sail_status_t start(sail::abstract_io &abstract_io, const sail::codec_info &codec_info, const sail::write_options &write_options);
 
     /*
      * Continues writing started by start(). Saves the specified image into the underlying I/O target.

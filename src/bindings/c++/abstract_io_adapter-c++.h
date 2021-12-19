@@ -1,6 +1,6 @@
 /*  This file is part of SAIL (https://github.com/smoked-herring/sail)
 
-    Copyright (c) 2020 Dmitry Baryshev
+    Copyright (c) 2021 Dmitry Baryshev
 
     The MIT License
 
@@ -23,43 +23,51 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_IO_PRIVATE_CPP_H
-#define SAIL_IO_PRIVATE_CPP_H
+#ifndef SAIL_ABSTRACT_IO_ADAPTER_CPP_H
+#define SAIL_ABSTRACT_IO_ADAPTER_CPP_H
 
-#include "sail-c++.h"
-#include "sail.h"
+#include <memory>
+
+#ifdef SAIL_BUILD
+    #include "error.h"
+    #include "export.h"
+#else
+    #include <sail-common/error.h>
+    #include <sail-common/export.h>
+#endif
+
+struct sail_io;
 
 namespace sail
 {
 
-class SAIL_HIDDEN io::pimpl
+class abstract_io;
+
+/*
+ * Adapter to make abstract I/O streams suitable for C functions.
+ */
+class SAIL_EXPORT abstract_io_adapter
 {
 public:
-    pimpl()
-    {
-        empty_sail_io();
-    }
+    /*
+     * Constructs a new I/O wrapper with the specified abstract I/O stream to wrap.
+     */
+    explicit abstract_io_adapter(sail::abstract_io &abstract_io);
 
-    inline void empty_sail_io();
+    /*
+     * Destroys the I/O wrapper.
+     */
+    ~abstract_io_adapter();
 
-    struct sail_io sail_io;
+    /*
+     * Returns the I/O stream suitable for passing it to C functions.
+     */
+    struct sail_io& sail_io() const;
+
+private:
+    class pimpl;
+    std::unique_ptr<pimpl> d;
 };
-
-void io::pimpl::empty_sail_io()
-{
-    sail_io.id             = 0;
-    sail_io.features       = 0;
-    sail_io.stream         = nullptr;
-    sail_io.tolerant_read  = nullptr;
-    sail_io.strict_read    = nullptr;
-    sail_io.seek           = nullptr;
-    sail_io.tell           = nullptr;
-    sail_io.tolerant_write = nullptr;
-    sail_io.strict_write   = nullptr;
-    sail_io.flush          = nullptr;
-    sail_io.close          = nullptr;
-    sail_io.eof            = nullptr;
-}
 
 }
 

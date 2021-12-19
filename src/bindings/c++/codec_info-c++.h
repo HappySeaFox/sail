@@ -28,26 +28,25 @@
 
 #include <memory>
 #include <string_view>
+#include <string>
 #include <vector>
 
 #ifdef SAIL_BUILD
     #include "error.h"
     #include "export.h"
-
-    #include "read_features-c++.h"
-    #include "write_features-c++.h"
 #else
     #include <sail-common/error.h>
     #include <sail-common/export.h>
-
-    #include <sail-c++/read_features-c++.h>
-    #include <sail-c++/write_features-c++.h>
 #endif
 
 struct sail_codec_info;
 
 namespace sail
 {
+
+class abstract_io;
+class read_features;
+class write_features;
 
 /*
  * codec_info represents codec information.
@@ -185,7 +184,7 @@ public:
      *                image_input::next_frame()       ->
      *                image_input::stop().
      */
-    static codec_info from_magic_number(const sail::io &io);
+    static codec_info from_magic_number(sail::abstract_io &abstract_io);
 
     /*
      * Returns a first codec info object that supports reading or writing the specified file path by its file extension.

@@ -44,6 +44,8 @@
 namespace sail
 {
 
+class abstract_io;
+
 /*
  * Prints the recent errno value with SAIL_LOG_ERROR(). The specified format must include '%s'.
  *
@@ -54,7 +56,7 @@ SAIL_EXPORT sail_status_t print_errno(const char *format);
 /*
  * Returns the current number of milliseconds since Epoch or 0 on error.
  */
-SAIL_EXPORT uint64_t now();
+SAIL_EXPORT std::uint64_t now();
 
 /*
  * Returns true if the specified file system path exists.
@@ -90,7 +92,7 @@ SAIL_EXPORT sail_status_t read_file_contents(std::string_view path, sail::arbitr
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t read_io_contents(const sail::io &io, sail::arbitrary_data *contents);
+SAIL_EXPORT sail_status_t read_io_contents(sail::abstract_io &abstract_io, sail::arbitrary_data *contents);
 
 }
 
