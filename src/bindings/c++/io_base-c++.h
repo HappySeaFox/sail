@@ -38,7 +38,7 @@ namespace sail
 {
 
 /*
- * Base I/O object.
+ * Base I/O stream.
  */
 class SAIL_EXPORT io_base : public abstract_io
 {
@@ -50,7 +50,7 @@ public:
     };
 
     /*
-     * Construct a new base I/O object.
+     * Construct a new base I/O stream.
      */
     io_base();
 
@@ -58,7 +58,7 @@ public:
      * Returns the I/O stream id.
      *
      * The same I/O classes (file, memory, etc.) share the same ids. This way
-     * a client can known the exact type of the I/O object. For example, a client can distinguish between
+     * a client can known the exact type of the I/O stream. For example, a client can distinguish between
      * file and memory I/O streams.
      *
      * You MUST use your own unique id for custom I/O classes. For example, you can use sail_hash()

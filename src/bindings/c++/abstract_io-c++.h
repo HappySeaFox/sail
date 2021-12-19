@@ -42,7 +42,7 @@ namespace sail
 {
 
 /*
- * Abstract I/O represents an input/output abstraction.
+ * Abstract I/O stream represents an input/output abstraction.
  */
 class SAIL_EXPORT abstract_io
 {
@@ -56,7 +56,7 @@ public:
      * Returns the I/O stream id.
      *
      * The same I/O classes (file, memory, etc.) share the same ids. This way
-     * a client can known the exact type of the I/O object. For example, a client can distinguish between
+     * a client can known the exact type of the I/O stream. For example, a client can distinguish between
      * file and memory I/O streams.
      *
      * You MUST use your own unique id for custom I/O classes. For example, you can use sail_hash()

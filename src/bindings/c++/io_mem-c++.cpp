@@ -23,42 +23,30 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_IO_FILE_CPP_H
-#define SAIL_IO_FILE_CPP_H
+#include <stdexcept>
 
-#include <string_view>
-
-#ifdef SAIL_BUILD
-    #include "io_base-c++.h"
-#else
-    #include <sail-c++/io_base-c++.h>
-#endif
+#include "sail-c++.h"
+#include "sail.h"
 
 namespace sail
 {
 
-/*
- * File I/O stream.
- */
-class SAIL_EXPORT io_file : public io_base
+io_mem::io_mem(const void *buffer, std::size_t buffer_length)
+    : io_base()
 {
-public:
-    /*
-     * Opens the specified file path for reading.
-     */
-    explicit io_file(std::string_view path);
-
-    /*
-     * Opens the specified file path for reading or writing operation.
-     */
-    io_file(std::string_view path, Operation operation);
-
-    /*
-     * Destroys the file I/O stream.
-     */
-    ~io_file() override;
-};
-
+    SAIL_TRY_OR_EXECUTE(sail_alloc_io_read_mem(buffer, buffer_length, &d->sail_io),
+                        /* on error */ throw std::bad_alloc());
 }
 
-#endif
+io_mem::io_mem(void *buffer, std::size_t buffer_length)
+    : io_base()
+{
+    SAIL_TRY_OR_EXECUTE(sail_alloc_io_write_mem(buffer, buffer_length, &d->sail_io),
+                        /* on error */ throw std::bad_alloc());
+}
+
+io_mem::~io_mem()
+{
+}
+
+}
