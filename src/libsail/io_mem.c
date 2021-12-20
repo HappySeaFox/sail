@@ -242,7 +242,7 @@ static sail_status_t io_mem_eof(void *stream, bool *result) {
  * Public functions.
  */
 
-sail_status_t sail_alloc_io_read_mem(const void *buffer, size_t length, struct sail_io **io) {
+sail_status_t sail_alloc_io_read_memory(const void *buffer, size_t length, struct sail_io **io) {
 
     SAIL_CHECK_PTR(buffer);
     SAIL_CHECK_PTR(io);
@@ -279,7 +279,7 @@ sail_status_t sail_alloc_io_read_mem(const void *buffer, size_t length, struct s
     return SAIL_OK;
 }
 
-sail_status_t sail_alloc_io_write_mem(void *buffer, size_t length, struct sail_io **io) {
+sail_status_t sail_alloc_io_read_write_memory(void *buffer, size_t length, struct sail_io **io) {
 
     SAIL_CHECK_PTR(buffer);
     SAIL_CHECK_PTR(io);

@@ -48,15 +48,15 @@ struct sail_io;
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_io_read_mem(const void *buffer, size_t length, struct sail_io **io);
+SAIL_EXPORT sail_status_t sail_alloc_io_read_memory(const void *buffer, size_t length, struct sail_io **io);
 
 /*
- * Opens the specified memory buffer for writing and allocates a new I/O object for it.
+ * Opens the specified memory buffer for reading and writing, and allocates a new I/O object for it.
  * The assigned I/O object MUST be destroyed later with sail_destroy_io().
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_io_write_mem(void *buffer, size_t length, struct sail_io **io);
+SAIL_EXPORT sail_status_t sail_alloc_io_read_write_memory(void *buffer, size_t length, struct sail_io **io);
 
 /* extern "C" */
 #ifdef __cplusplus

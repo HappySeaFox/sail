@@ -221,7 +221,7 @@ sail_status_t sail_alloc_io_read_file(const char *path, struct sail_io **io) {
     return SAIL_OK;
 }
 
-sail_status_t sail_alloc_io_write_file(const char *path, struct sail_io **io) {
+sail_status_t sail_alloc_io_read_write_file(const char *path, struct sail_io **io) {
 
     SAIL_TRY(alloc_io_file(path, "w+b", io));
 
