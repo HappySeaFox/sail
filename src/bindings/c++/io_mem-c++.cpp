@@ -31,18 +31,39 @@
 namespace sail
 {
 
-io_mem::io_mem(const void *buffer, std::size_t buffer_length)
-    : io_base()
+template<typename BufferType>
+static struct sail_io *construct_sail_io(BufferType buffer, std::size_t buffer_length);
+
+template<>
+struct sail_io *construct_sail_io<void *>(void *buffer, std::size_t buffer_length)
 {
-    SAIL_TRY_OR_EXECUTE(sail_alloc_io_read_mem(buffer, buffer_length, &d->sail_io),
+    struct sail_io *sail_io;
+
+    SAIL_TRY_OR_EXECUTE(sail_alloc_io_read_write_memory(buffer, buffer_length, &sail_io),
                         /* on error */ throw std::bad_alloc());
+
+    return sail_io;
+}
+
+template<>
+struct sail_io *construct_sail_io<const void *>(const void *buffer, std::size_t buffer_length)
+{
+    struct sail_io *sail_io;
+
+    SAIL_TRY_OR_EXECUTE(sail_alloc_io_read_memory(buffer, buffer_length, &sail_io),
+                        /* on error */ throw std::bad_alloc());
+
+    return sail_io;
 }
 
 io_mem::io_mem(void *buffer, std::size_t buffer_length)
-    : io_base()
+    : io_base(construct_sail_io(buffer, buffer_length))
 {
-    SAIL_TRY_OR_EXECUTE(sail_alloc_io_write_mem(buffer, buffer_length, &d->sail_io),
-                        /* on error */ throw std::bad_alloc());
+}
+
+io_mem::io_mem(const void *buffer, std::size_t buffer_length)
+    : io_base(construct_sail_io(buffer, buffer_length))
+{
 }
 
 io_mem::~io_mem()

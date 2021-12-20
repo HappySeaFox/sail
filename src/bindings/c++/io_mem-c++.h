@@ -44,14 +44,14 @@ class SAIL_EXPORT io_mem : public io_base
 {
 public:
     /*
+     * Opens the specified memory buffer for reading and writing.
+     */
+    io_mem(void *buffer, std::size_t buffer_length);
+
+    /*
      * Opens the specified memory buffer for reading.
      */
     io_mem(const void *buffer, std::size_t buffer_length);
-
-    /*
-     * Opens the specified memory buffer for writing.
-     */
-    io_mem(void *buffer, std::size_t buffer_length);
 
     /*
      * Destroys the memory I/O stream.

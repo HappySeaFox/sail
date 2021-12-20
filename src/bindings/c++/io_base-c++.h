@@ -43,16 +43,26 @@ namespace sail
 class SAIL_EXPORT io_base : public abstract_io
 {
 public:
+    /*
+     * Operations on I/O streams.
+     */
     enum class Operation
     {
+        /*
+         * Reading only.
+         */
         Read,
-        Write,
+
+        /*
+         * Reading and writing.
+         */
+        ReadWrite,
     };
 
     /*
      * Construct a new base I/O stream.
      */
-    io_base();
+    io_base(struct sail_io *sail_io);
 
     /*
      * Returns the I/O stream id.

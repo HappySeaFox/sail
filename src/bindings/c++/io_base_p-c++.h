@@ -26,9 +26,9 @@
 #ifndef SAIL_IO_BASE_PRIVATE_CPP_H
 #define SAIL_IO_BASE_PRIVATE_CPP_H
 
-#include "export.h"
+#include <memory>
 
-struct sail_io;
+#include "sail-common.h"
 
 namespace sail
 {
@@ -36,16 +36,15 @@ namespace sail
 class SAIL_HIDDEN io_base::pimpl
 {
 public:
-    pimpl()
-        : sail_io(nullptr)
+    pimpl(struct sail_io *other_sail_io)
+        : sail_io(other_sail_io, sail_destroy_io)
     {
     }
     ~pimpl()
     {
-        sail_destroy_io(sail_io);
     }
 
-    struct sail_io *sail_io;
+    std::unique_ptr<struct sail_io, decltype(&sail_destroy_io)> sail_io;
 };
 
 }

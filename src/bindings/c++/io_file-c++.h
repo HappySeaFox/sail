@@ -44,12 +44,12 @@ class SAIL_EXPORT io_file : public io_base
 {
 public:
     /*
-     * Opens the specified file path for reading.
+     * Opens the specified file for reading.
      */
     explicit io_file(std::string_view path);
 
     /*
-     * Opens the specified file path for reading or writing operation.
+     * Opens the specified memory buffer for the specified I/O operations.
      */
     io_file(std::string_view path, Operation operation);
 

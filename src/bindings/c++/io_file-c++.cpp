@@ -31,27 +31,35 @@
 namespace sail
 {
 
-io_file::io_file(std::string_view path)
-    : io_file(path, Operation::Read)
+static struct sail_io *construct_sail_io(const std::string_view path, io_file::Operation operation)
 {
-}
+    struct sail_io *sail_io;
 
-io_file::io_file(std::string_view path, io_file::Operation operation)
-    : io_base()
-{
     switch (operation) {
-        case Operation::Read:
-            SAIL_TRY_OR_EXECUTE(sail_alloc_io_read_file(path.data(), &d->sail_io),
+        case io_file::Operation::Read:
+            SAIL_TRY_OR_EXECUTE(sail_alloc_io_read_file(path.data(), &sail_io),
                                 /* on error */ throw std::bad_alloc());
         break;
-        case Operation::Write:
-            SAIL_TRY_OR_EXECUTE(sail_alloc_io_write_file(path.data(), &d->sail_io),
+        case io_file::Operation::ReadWrite:
+            SAIL_TRY_OR_EXECUTE(sail_alloc_io_read_write_file(path.data(), &sail_io),
                                 /* on error */ throw std::bad_alloc());
         break;
         default: {
             throw std::runtime_error("Unknown file operation");
         }
     }
+
+    return sail_io;
+}
+
+io_file::io_file(const std::string_view path)
+    : io_file(path, Operation::Read)
+{
+}
+
+io_file::io_file(const std::string_view path, io_file::Operation operation)
+    : io_base(construct_sail_io(path, operation))
+{
 }
 
 io_file::~io_file()

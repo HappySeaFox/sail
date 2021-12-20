@@ -28,8 +28,8 @@
 namespace sail
 {
 
-io_base::io_base()
-    : d(new pimpl)
+io_base::io_base(struct sail_io *sail_io)
+    : d(new pimpl(sail_io))
 {
 }
 
