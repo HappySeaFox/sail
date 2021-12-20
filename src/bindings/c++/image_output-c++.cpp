@@ -178,7 +178,7 @@ sail_status_t image_output::start(sail::abstract_io &abstract_io, const sail::co
 
     d->abstract_io_adapter.reset(new sail::abstract_io_adapter(abstract_io));
 
-    SAIL_TRY(sail_start_writing_io_with_options(&d->abstract_io_adapter->sail_io(),
+    SAIL_TRY(sail_start_writing_io_with_options(&d->abstract_io_adapter->sail_io_c(),
                                                 codec_info.sail_codec_info_c(),
                                                 nullptr,
                                                 &d->state));
@@ -195,7 +195,7 @@ sail_status_t image_output::start(sail::abstract_io &abstract_io, const sail::co
     sail_write_options sail_write_options;
     SAIL_TRY(write_options.to_sail_write_options(&sail_write_options));
 
-    SAIL_TRY(sail_start_writing_io_with_options(&d->abstract_io_adapter->sail_io(),
+    SAIL_TRY(sail_start_writing_io_with_options(&d->abstract_io_adapter->sail_io_c(),
                                                 codec_info.sail_codec_info_c(),
                                                 &sail_write_options,
                                                 &d->state));

@@ -104,7 +104,7 @@ std::tuple<image, codec_info> image_input::probe(sail::abstract_io &abstract_io)
         sail_destroy_image(sail_image);
     );
 
-    SAIL_TRY_OR_EXECUTE(sail_probe_io(&abstract_io_adapter.sail_io(), &sail_image, &sail_codec_info),
+    SAIL_TRY_OR_EXECUTE(sail_probe_io(&abstract_io_adapter.sail_io_c(), &sail_image, &sail_codec_info),
                         /* on error */ return {});
 
     return { image(sail_image), codec_info(sail_codec_info) };
@@ -223,9 +223,9 @@ sail_status_t image_input::start(sail::abstract_io &abstract_io)
     d->abstract_io_adapter.reset(new sail::abstract_io_adapter(abstract_io));
 
     const struct sail_codec_info *codec_info;
-    SAIL_TRY(sail_codec_info_by_magic_number_from_io(&d->abstract_io_adapter->sail_io(), &codec_info));
+    SAIL_TRY(sail_codec_info_by_magic_number_from_io(&d->abstract_io_adapter->sail_io_c(), &codec_info));
 
-    SAIL_TRY(sail_start_reading_io(&d->abstract_io_adapter->sail_io(), codec_info, &d->state));
+    SAIL_TRY(sail_start_reading_io(&d->abstract_io_adapter->sail_io_c(), codec_info, &d->state));
 
     return SAIL_OK;
 }
@@ -236,7 +236,7 @@ sail_status_t image_input::start(sail::abstract_io &abstract_io, const sail::cod
 
     d->abstract_io_adapter.reset(new sail::abstract_io_adapter(abstract_io));
 
-    SAIL_TRY(sail_start_reading_io(&d->abstract_io_adapter->sail_io(), codec_info.sail_codec_info_c(), &d->state));
+    SAIL_TRY(sail_start_reading_io(&d->abstract_io_adapter->sail_io_c(), codec_info.sail_codec_info_c(), &d->state));
 
     return SAIL_OK;
 }
@@ -250,7 +250,7 @@ sail_status_t image_input::start(sail::abstract_io &abstract_io, const sail::rea
     sail_read_options sail_read_options;
     SAIL_TRY(read_options.to_sail_read_options(&sail_read_options));
 
-    SAIL_TRY(sail_start_reading_io_with_options(&d->abstract_io_adapter->sail_io(), nullptr, &sail_read_options, &d->state));
+    SAIL_TRY(sail_start_reading_io_with_options(&d->abstract_io_adapter->sail_io_c(), nullptr, &sail_read_options, &d->state));
 
     return SAIL_OK;
 }
@@ -264,7 +264,7 @@ sail_status_t image_input::start(sail::abstract_io &abstract_io, const sail::cod
     sail_read_options sail_read_options;
     SAIL_TRY(read_options.to_sail_read_options(&sail_read_options));
 
-    SAIL_TRY(sail_start_reading_io_with_options(&d->abstract_io_adapter->sail_io(), codec_info.sail_codec_info_c(), &sail_read_options, &d->state));
+    SAIL_TRY(sail_start_reading_io_with_options(&d->abstract_io_adapter->sail_io_c(), codec_info.sail_codec_info_c(), &sail_read_options, &d->state));
 
     return SAIL_OK;
 }

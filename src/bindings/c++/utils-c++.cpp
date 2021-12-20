@@ -83,12 +83,12 @@ sail_status_t read_io_contents(sail::abstract_io &abstract_io, sail::arbitrary_d
 
     /* Resize the buffer to the I/O size. */
     size_t data_size_local;
-    SAIL_TRY(sail_io_size(&abstract_io_adapter.sail_io(), &data_size_local));
+    SAIL_TRY(sail_io_size(&abstract_io_adapter.sail_io_c(), &data_size_local));
 
     contents->resize(data_size_local);
 
     /* Read the contents. */
-    SAIL_TRY(sail_io_contents_into_data(&abstract_io_adapter.sail_io(), contents->data()));
+    SAIL_TRY(sail_io_contents_into_data(&abstract_io_adapter.sail_io_c(), contents->data()));
 
     return SAIL_OK;
 }

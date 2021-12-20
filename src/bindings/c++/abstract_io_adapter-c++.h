@@ -62,7 +62,7 @@ public:
     /*
      * Returns the I/O stream suitable for passing it to C functions.
      */
-    struct sail_io& sail_io() const;
+    struct sail_io& sail_io_c() const;
 
 private:
     class pimpl;

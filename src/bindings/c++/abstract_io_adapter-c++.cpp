@@ -147,7 +147,7 @@ abstract_io_adapter::~abstract_io_adapter()
 {
 }
 
-struct sail_io& abstract_io_adapter::sail_io() const
+struct sail_io& abstract_io_adapter::sail_io_c() const
 {
     return d->sail_io;
 }
