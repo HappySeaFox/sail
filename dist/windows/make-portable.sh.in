@@ -14,6 +14,9 @@ case $CMAKE_C_COMPILER_ID in
             142)
                 id="msvc-2019-${CMAKE_VS_PLATFORM_NAME}"
             ;;
+            143)
+                id="msvc-2022-${CMAKE_VS_PLATFORM_NAME}"
+            ;;
             *)
                 echo "Unsupported MSVC version $MSVC_TOOLSET_VERSION" >&2
                 exit 1
