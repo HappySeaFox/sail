@@ -26,6 +26,7 @@
 #ifndef SAIL_IO_FILE_CPP_H
 #define SAIL_IO_FILE_CPP_H
 
+#include <memory>
 #include <string_view>
 
 #ifdef SAIL_BUILD
@@ -57,6 +58,12 @@ public:
      * Destroys the file I/O stream.
      */
     ~io_file() override;
+
+    sail::codec_info codec_info() override;
+
+private:
+    class file_pimpl;
+    std::unique_ptr<file_pimpl> file_d;
 };
 
 }

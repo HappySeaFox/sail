@@ -57,6 +57,8 @@ public:
      * Destroys the memory I/O stream.
      */
     ~io_mem() override;
+
+    sail::codec_info codec_info() override;
 };
 
 }

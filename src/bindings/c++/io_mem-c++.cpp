@@ -70,4 +70,9 @@ io_mem::~io_mem()
 {
 }
 
+codec_info io_mem::codec_info()
+{
+    return sail::codec_info::from_magic_number(*this);
+}
+
 }

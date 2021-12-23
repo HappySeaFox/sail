@@ -222,10 +222,13 @@ sail_status_t image_input::start(sail::abstract_io &abstract_io)
 
     d->abstract_io_adapter.reset(new sail::abstract_io_adapter(abstract_io));
 
-    const struct sail_codec_info *codec_info;
-    SAIL_TRY(sail_codec_info_by_magic_number_from_io(&d->abstract_io_adapter->sail_io_c(), &codec_info));
+    const sail::codec_info codec_info = abstract_io.codec_info();
 
-    SAIL_TRY(sail_start_reading_io(&d->abstract_io_adapter->sail_io_c(), codec_info, &d->state));
+    if (!codec_info.is_valid()) {
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_NOT_FOUND);
+    }
+
+    SAIL_TRY(sail_start_reading_io(&d->abstract_io_adapter->sail_io_c(), codec_info.sail_codec_info_c(), &d->state));
 
     return SAIL_OK;
 }
@@ -247,10 +250,16 @@ sail_status_t image_input::start(sail::abstract_io &abstract_io, const sail::rea
 
     d->abstract_io_adapter.reset(new sail::abstract_io_adapter(abstract_io));
 
+    const sail::codec_info codec_info = abstract_io.codec_info();
+
+    if (!codec_info.is_valid()) {
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_NOT_FOUND);
+    }
+
     sail_read_options sail_read_options;
     SAIL_TRY(read_options.to_sail_read_options(&sail_read_options));
 
-    SAIL_TRY(sail_start_reading_io_with_options(&d->abstract_io_adapter->sail_io_c(), nullptr, &sail_read_options, &d->state));
+    SAIL_TRY(sail_start_reading_io_with_options(&d->abstract_io_adapter->sail_io_c(), codec_info.sail_codec_info_c(), &sail_read_options, &d->state));
 
     return SAIL_OK;
 }

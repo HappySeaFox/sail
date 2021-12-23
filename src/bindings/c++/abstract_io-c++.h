@@ -33,9 +33,13 @@
 #ifdef SAIL_BUILD
     #include "error.h"
     #include "export.h"
+
+    #include "codec_info-c++.h"
 #else
     #include <sail-common/error.h>
     #include <sail-common/export.h>
+
+    #include <sail-c++/codec_info-c++.h>
 #endif
 
 namespace sail
@@ -142,6 +146,14 @@ public:
      * Returns SAIL_OK on success.
      */
     virtual sail_status_t eof(bool *result) = 0;
+
+    /*
+     * Finds and returns a first codec info object that can theoretically read the underlying
+     * I/O stream into a valid image.
+     *
+     * Returns an invalid codec info object if no suitable codecs are found.
+     */
+    virtual sail::codec_info codec_info() = 0;
 };
 
 }
