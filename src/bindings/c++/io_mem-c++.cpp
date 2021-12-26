@@ -32,10 +32,10 @@ namespace sail
 {
 
 template<typename BufferType>
-static struct sail_io *construct_sail_io(BufferType buffer, std::size_t buffer_length);
+static sail_io *construct_sail_io(BufferType buffer, std::size_t buffer_length);
 
 template<>
-struct sail_io *construct_sail_io<void *>(void *buffer, std::size_t buffer_length)
+sail_io *construct_sail_io<void *>(void *buffer, std::size_t buffer_length)
 {
     struct sail_io *sail_io;
 
@@ -46,7 +46,7 @@ struct sail_io *construct_sail_io<void *>(void *buffer, std::size_t buffer_lengt
 }
 
 template<>
-struct sail_io *construct_sail_io<const void *>(const void *buffer, std::size_t buffer_length)
+sail_io *construct_sail_io<const void *>(const void *buffer, std::size_t buffer_length)
 {
     struct sail_io *sail_io;
 
