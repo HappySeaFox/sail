@@ -143,6 +143,9 @@ SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_mem(const void *b
  * The comparison algorithm is case insensitive. After reading a magic number, this function rewinds the I/O
  * cursor position back to the previous position. That's why the I/O source must be seekable.
  *
+ * Not all codecs support magic numbers. That's why it's not guaranteed that this function
+ * returns a valid codec info object.
+ *
  * The assigned codec info MUST NOT be destroyed. It is a pointer to an internal data structure.
  *
  * Typical usage: sail_codec_info_by_magic_number_from_io() ->

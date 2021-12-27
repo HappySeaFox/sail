@@ -59,6 +59,12 @@ public:
      */
     ~io_file() override;
 
+    /*
+     * Finds and returns a first codec info object that supports the file extension of the path.
+     * The comparison algorithm is case insensitive.
+     *
+     * Returns an invalid codec info object on error.
+     */
     sail::codec_info codec_info() override;
 
 private:

@@ -58,6 +58,16 @@ public:
      */
     ~io_mem() override;
 
+    /*
+     * Finds and returns a first codec info object that supports the magic number read
+     * from the memory buffer. The comparison algorithm is case insensitive. After reading
+     * a magic number, rewinds the I/O cursor position back to the previous position.
+     *
+     * Not all codecs support magic numbers. That's why it's not guaranteed that this method
+     * returns a valid codec info object.
+     *
+     * Returns an invalid codec info object on error.
+     */
     sail::codec_info codec_info() override;
 };
 
