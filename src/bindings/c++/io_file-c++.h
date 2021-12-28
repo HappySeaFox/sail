@@ -68,8 +68,8 @@ public:
     sail::codec_info codec_info() override;
 
 private:
-    class file_pimpl;
-    std::unique_ptr<file_pimpl> file_d;
+    class io_file_pimpl;
+    std::unique_ptr<io_file_pimpl> file_d;
 };
 
 }

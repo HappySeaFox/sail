@@ -31,10 +31,10 @@
 namespace sail
 {
 
-class SAIL_HIDDEN io_file::file_pimpl
+class SAIL_HIDDEN io_file::io_file_pimpl
 {
 public:
-    file_pimpl(const std::string_view path)
+    io_file_pimpl(const std::string_view path)
         : codec_info(sail::codec_info::from_path(path))
     {
     }
@@ -70,7 +70,7 @@ io_file::io_file(const std::string_view path)
 
 io_file::io_file(const std::string_view path, io_file::Operation operation)
     : io_base(construct_sail_io(path, operation))
-    , file_d(new file_pimpl(path))
+    , file_d(new io_file_pimpl(path))
 {
 }
 
