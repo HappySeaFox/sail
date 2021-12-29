@@ -23,8 +23,8 @@ add_library(sail-c++
                 io_base_p-c++.h
                 io_file-c++.cpp
                 io_file-c++.h
-                io_mem-c++.cpp
-                io_mem-c++.h
+                io_memory-c++.cpp
+                io_memory-c++.h
                 log-c++.cpp
                 log-c++.h
                 meta_data-c++.cpp
@@ -60,7 +60,7 @@ set(PUBLIC_HEADERS "abstract_io-c++.h"
                    "image_output-c++.h"
                    "io_base-c++.h"
                    "io_file-c++.h"
-                   "io_mem-c++.h"
+                   "io_memory-c++.h"
                    "log-c++.h"
                    "meta_data-c++.h"
                    "palette-c++.h"

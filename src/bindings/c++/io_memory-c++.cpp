@@ -56,21 +56,21 @@ sail_io *construct_sail_io<const void *>(const void *buffer, std::size_t buffer_
     return sail_io;
 }
 
-io_mem::io_mem(void *buffer, std::size_t buffer_length)
+io_memory::io_memory(void *buffer, std::size_t buffer_length)
     : io_base(construct_sail_io(buffer, buffer_length))
 {
 }
 
-io_mem::io_mem(const void *buffer, std::size_t buffer_length)
+io_memory::io_memory(const void *buffer, std::size_t buffer_length)
     : io_base(construct_sail_io(buffer, buffer_length))
 {
 }
 
-io_mem::~io_mem()
+io_memory::~io_memory()
 {
 }
 
-codec_info io_mem::codec_info()
+codec_info io_memory::codec_info()
 {
     return sail::codec_info::from_magic_number(*this);
 }

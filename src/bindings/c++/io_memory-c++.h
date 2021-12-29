@@ -23,8 +23,8 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_IO_MEM_CPP_H
-#define SAIL_IO_MEM_CPP_H
+#ifndef SAIL_IO_MEMORY_CPP_H
+#define SAIL_IO_MEMORY_CPP_H
 
 #include <cstddef>
 
@@ -40,23 +40,23 @@ namespace sail
 /*
  * Memory I/O stream.
  */
-class SAIL_EXPORT io_mem : public io_base
+class SAIL_EXPORT io_memory : public io_base
 {
 public:
     /*
      * Opens the specified memory buffer for reading and writing.
      */
-    io_mem(void *buffer, std::size_t buffer_length);
+    io_memory(void *buffer, std::size_t buffer_length);
 
     /*
      * Opens the specified memory buffer for reading.
      */
-    io_mem(const void *buffer, std::size_t buffer_length);
+    io_memory(const void *buffer, std::size_t buffer_length);
 
     /*
      * Destroys the memory I/O stream.
      */
-    ~io_mem() override;
+    ~io_memory() override;
 
     /*
      * Finds and returns a first codec info object that supports the magic number read
