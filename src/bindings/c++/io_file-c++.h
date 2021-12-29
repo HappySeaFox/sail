@@ -69,7 +69,7 @@ public:
 
 private:
     class io_file_pimpl;
-    std::unique_ptr<io_file_pimpl> file_d;
+    const std::unique_ptr<io_file_pimpl> file_d;
 };
 
 }

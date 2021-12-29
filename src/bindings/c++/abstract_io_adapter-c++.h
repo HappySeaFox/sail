@@ -66,7 +66,7 @@ public:
 
 private:
     class pimpl;
-    std::unique_ptr<pimpl> d;
+    const std::unique_ptr<pimpl> d;
 };
 
 }
