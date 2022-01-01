@@ -63,45 +63,6 @@ image_output::~image_output()
     stop();
 }
 
-sail_status_t image_output::save(const std::string_view path, const sail::image &image) const
-{
-    sail_image *sail_image = nullptr;
-    SAIL_TRY(image.to_sail_image(&sail_image));
-
-    SAIL_AT_SCOPE_EXIT(
-        sail_image->pixels = nullptr;
-        sail_destroy_image(sail_image);
-    );
-
-    SAIL_TRY(sail_write_file(path.data(), sail_image));
-
-    return SAIL_OK;
-}
-
-sail_status_t image_output::save(void *buffer, size_t buffer_length, const sail::image &image) const
-{
-    SAIL_TRY(save(buffer, buffer_length, image, nullptr));
-
-    return SAIL_OK;
-}
-
-sail_status_t image_output::save(void *buffer, size_t buffer_length, const sail::image &image, size_t *written) const
-{
-    SAIL_CHECK_PTR(buffer);
-
-    sail_image *sail_image = nullptr;
-    SAIL_TRY(image.to_sail_image(&sail_image));
-
-    SAIL_AT_SCOPE_EXIT(
-        sail_image->pixels = nullptr;
-        sail_destroy_image(sail_image);
-    );
-
-    SAIL_TRY(sail_write_mem(buffer, buffer_length, sail_image, written));
-
-    return SAIL_OK;
-}
-
 sail_status_t image_output::start(const std::string_view path)
 {
     SAIL_TRY(d->ensure_not_started());
@@ -144,7 +105,7 @@ sail_status_t image_output::start(const std::string_view path, const sail::codec
     return SAIL_OK;
 }
 
-sail_status_t image_output::start(void *buffer, size_t buffer_length, const sail::codec_info &codec_info)
+sail_status_t image_output::start(void *buffer, std::size_t buffer_length, const sail::codec_info &codec_info)
 {
     SAIL_TRY(d->ensure_not_started());
 
@@ -156,7 +117,7 @@ sail_status_t image_output::start(void *buffer, size_t buffer_length, const sail
     return SAIL_OK;
 }
 
-sail_status_t image_output::start(void *buffer, size_t buffer_length, const sail::codec_info &codec_info, const sail::write_options &write_options)
+sail_status_t image_output::start(void *buffer, std::size_t buffer_length, const sail::codec_info &codec_info, const sail::write_options &write_options)
 {
     SAIL_TRY(d->ensure_not_started());
 
@@ -168,6 +129,20 @@ sail_status_t image_output::start(void *buffer, size_t buffer_length, const sail
                                                  codec_info.sail_codec_info_c(),
                                                  &sail_write_options,
                                                  &d->state));
+
+    return SAIL_OK;
+}
+
+sail_status_t image_output::start(sail::arbitrary_data *arbitrary_data, const sail::codec_info &codec_info)
+{
+    SAIL_TRY(start(arbitrary_data->data(), arbitrary_data->size(), codec_info));
+
+    return SAIL_OK;
+}
+
+sail_status_t image_output::start(sail::arbitrary_data *arbitrary_data, const sail::codec_info &codec_info, const sail::write_options &write_options)
+{
+    SAIL_TRY(start(arbitrary_data->data(), arbitrary_data->size(), codec_info, write_options));
 
     return SAIL_OK;
 }
@@ -220,7 +195,7 @@ sail_status_t image_output::next_frame(const sail::image &image) const
 
 sail_status_t image_output::stop()
 {
-    size_t written;
+    std::size_t written;
     SAIL_TRY(stop(&written));
 
     (void)written;
@@ -228,7 +203,7 @@ sail_status_t image_output::stop()
     return SAIL_OK;
 }
 
-sail_status_t image_output::stop(size_t *written)
+sail_status_t image_output::stop(std::size_t *written)
 {
     sail_status_t saved_status = SAIL_OK;
     SAIL_TRY_OR_EXECUTE(sail_stop_writing_with_written(d->state, written),
@@ -238,6 +213,59 @@ sail_status_t image_output::stop(size_t *written)
     d->abstract_io_adapter.reset();
 
     return saved_status;
+}
+
+sail_status_t image_output::save(const std::string_view path, const sail::image &image)
+{
+    sail_image *sail_image = nullptr;
+    SAIL_TRY(image.to_sail_image(&sail_image));
+
+    SAIL_AT_SCOPE_EXIT(
+        sail_image->pixels = nullptr;
+        sail_destroy_image(sail_image);
+    );
+
+    SAIL_TRY(sail_write_file(path.data(), sail_image));
+
+    return SAIL_OK;
+}
+
+sail_status_t image_output::save(void *buffer, std::size_t buffer_length, const sail::image &image)
+{
+    SAIL_TRY(save(buffer, buffer_length, image, nullptr));
+
+    return SAIL_OK;
+}
+
+sail_status_t image_output::save(void *buffer, std::size_t buffer_length, const sail::image &image, std::size_t *written)
+{
+    SAIL_CHECK_PTR(buffer);
+
+    sail_image *sail_image = nullptr;
+    SAIL_TRY(image.to_sail_image(&sail_image));
+
+    SAIL_AT_SCOPE_EXIT(
+        sail_image->pixels = nullptr;
+        sail_destroy_image(sail_image);
+    );
+
+    SAIL_TRY(sail_write_mem(buffer, buffer_length, sail_image, written));
+
+    return SAIL_OK;
+}
+
+sail_status_t image_output::save(sail::arbitrary_data *arbitrary_data, const sail::image &image)
+{
+    SAIL_TRY(save(arbitrary_data->data(), arbitrary_data->size(), image));
+
+    return SAIL_OK;
+}
+
+sail_status_t image_output::save(sail::arbitrary_data *arbitrary_data, const sail::image &image, std::size_t *written)
+{
+    SAIL_TRY(save(arbitrary_data->data(), arbitrary_data->size(), image, written));
+
+    return SAIL_OK;
 }
 
 }

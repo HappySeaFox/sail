@@ -33,9 +33,13 @@
 #ifdef SAIL_BUILD
     #include "error.h"
     #include "export.h"
+
+    #include "arbitrary_data-c++.h"
 #else
     #include <sail-common/error.h>
     #include <sail-common/export.h>
+
+    #include <sail-c++/arbitrary_data-c++.h>
 #endif
 
 namespace sail
@@ -81,38 +85,6 @@ public:
      * Disables moving image writers.
      */
     image_output& operator=(image_output&&) = delete;
-
-    /*
-     * Saves the specified image into the file.
-     *
-     * If the selected image format doesn't support the image pixel format, an error is returned.
-     * Consider converting the image into a supported image format beforehand.
-     *
-     * Returns SAIL_OK on success.
-     */
-    sail_status_t save(std::string_view path, const sail::image &image) const;
-
-    /*
-     * Saves the specified image into the specified memory buffer.
-     *
-     * If the selected image format doesn't support the image pixel format, an error is returned.
-     * Consider converting the image into a supported image format beforehand.
-     *
-     * Returns SAIL_OK on success.
-     */
-    sail_status_t save(void *buffer, size_t buffer_length, const sail::image &image) const;
-
-    /*
-     * Saves the specified image into the specified memory buffer.
-     *
-     * If the selected image format doesn't support the image pixel format, an error is returned.
-     * Consider converting the image into a supported image format beforehand.
-     *
-     * Saves the number of bytes written into the 'written' argument if it's not nullptr.
-     *
-     * Returns SAIL_OK on success.
-     */
-    sail_status_t save(void *buffer, size_t buffer_length, const sail::image &image, size_t *written) const;
 
     /*
      * Starts writing into the specified image file.
@@ -170,7 +142,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t start(void *buffer, size_t buffer_length, const sail::codec_info &codec_info);
+    sail_status_t start(void *buffer, std::size_t buffer_length, const sail::codec_info &codec_info);
 
     /*
      * Starts writing into the specified memory buffer with the specified codec and write options.
@@ -182,7 +154,31 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t start(void *buffer, size_t buffer_length, const sail::codec_info &codec_info, const sail::write_options &write_options);
+    sail_status_t start(void *buffer, std::size_t buffer_length, const sail::codec_info &codec_info, const sail::write_options &write_options);
+
+    /*
+     * Starts writing into the specified memory buffer with the specified codec.
+     *
+     * Typical usage: codec_info::from_extension() ->
+     *                start()                      ->
+     *                next_frame() x n             ->
+     *                stop().
+     *
+     * Returns SAIL_OK on success.
+     */
+    sail_status_t start(sail::arbitrary_data *arbitrary_data, const sail::codec_info &codec_info);
+
+    /*
+     * Starts writing into the specified memory buffer with the specified codec and write options.
+     *
+     * Typical usage: codec_info::from_extension() ->
+     *                start()                      ->
+     *                next_frame() x n             ->
+     *                stop().
+     *
+     * Returns SAIL_OK on success.
+     */
+    sail_status_t start(sail::arbitrary_data *arbitrary_data, const sail::codec_info &codec_info, const sail::write_options &write_options);
 
     /*
      * Starts writing into the specified I/O target with the specified codec.
@@ -237,7 +233,61 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t stop(size_t *written);
+    sail_status_t stop(std::size_t *written);
+
+    /*
+     * Saves the specified image into the file.
+     *
+     * If the selected image format doesn't support the image pixel format, an error is returned.
+     * Consider converting the image into a supported image format beforehand.
+     *
+     * Returns SAIL_OK on success.
+     */
+    static sail_status_t save(std::string_view path, const sail::image &image);
+
+    /*
+     * Saves the specified image into the specified memory buffer.
+     *
+     * If the selected image format doesn't support the image pixel format, an error is returned.
+     * Consider converting the image into a supported image format beforehand.
+     *
+     * Returns SAIL_OK on success.
+     */
+    static sail_status_t save(void *buffer, std::size_t buffer_length, const sail::image &image);
+
+    /*
+     * Saves the specified image into the specified memory buffer.
+     *
+     * If the selected image format doesn't support the image pixel format, an error is returned.
+     * Consider converting the image into a supported image format beforehand.
+     *
+     * Saves the number of bytes written into the 'written' argument if it's not nullptr.
+     *
+     * Returns SAIL_OK on success.
+     */
+    static sail_status_t save(void *buffer, std::size_t buffer_length, const sail::image &image, std::size_t *written);
+
+    /*
+     * Saves the specified image into the specified memory buffer.
+     *
+     * If the selected image format doesn't support the image pixel format, an error is returned.
+     * Consider converting the image into a supported image format beforehand.
+     *
+     * Returns SAIL_OK on success.
+     */
+    static sail_status_t save(sail::arbitrary_data *arbitrary_data, const sail::image &image);
+
+    /*
+     * Saves the specified image into the specified memory buffer.
+     *
+     * If the selected image format doesn't support the image pixel format, an error is returned.
+     * Consider converting the image into a supported image format beforehand.
+     *
+     * Saves the number of bytes written into the 'written' argument if it's not nullptr.
+     *
+     * Returns SAIL_OK on success.
+     */
+    static sail_status_t save(sail::arbitrary_data *arbitrary_data, const sail::image &image, std::size_t *written);
 
 private:
     class pimpl;

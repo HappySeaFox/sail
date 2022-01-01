@@ -63,87 +63,6 @@ image_input::~image_input()
     stop();
 }
 
-std::tuple<image, codec_info> image_input::probe(const std::string_view path) const
-{
-    const sail_codec_info *sail_codec_info;
-    sail_image *sail_image = nullptr;
-
-    SAIL_AT_SCOPE_EXIT(
-        sail_destroy_image(sail_image);
-    );
-
-    SAIL_TRY_OR_EXECUTE(sail_probe_file(path.data(), &sail_image, &sail_codec_info),
-                        /* on error */ return {});
-
-    return { image(sail_image), codec_info(sail_codec_info) };
-}
-
-std::tuple<image, codec_info> image_input::probe(const void *buffer, size_t buffer_length) const
-{
-    const sail_codec_info *sail_codec_info;
-    sail_image *sail_image = nullptr;
-
-    SAIL_AT_SCOPE_EXIT(
-        sail_destroy_image(sail_image);
-    );
-
-    SAIL_TRY_OR_EXECUTE(sail_probe_mem(buffer, buffer_length, &sail_image, &sail_codec_info),
-                        /* on error */ return {});
-
-    return { image(sail_image), codec_info(sail_codec_info) };
-}
-
-std::tuple<image, codec_info> image_input::probe(sail::abstract_io &abstract_io) const
-{
-    sail::abstract_io_adapter abstract_io_adapter(abstract_io);
-
-    const sail_codec_info *sail_codec_info;
-    sail_image *sail_image = nullptr;
-
-    SAIL_AT_SCOPE_EXIT(
-        sail_destroy_image(sail_image);
-    );
-
-    SAIL_TRY_OR_EXECUTE(sail_probe_io(&abstract_io_adapter.sail_io_c(), &sail_image, &sail_codec_info),
-                        /* on error */ return {});
-
-    return { image(sail_image), codec_info(sail_codec_info) };
-}
-
-image image_input::load(const std::string_view path) const
-{
-    sail_image *sail_image = nullptr;
-
-    SAIL_AT_SCOPE_EXIT(
-        sail_destroy_image(sail_image);
-    );
-
-    SAIL_TRY_OR_EXECUTE(sail_read_file(path.data(), &sail_image),
-                        /* on error */ return {});
-
-    const sail::image image(sail_image);
-    sail_image->pixels = nullptr;
-
-    return image;
-}
-
-image image_input::load(const void *buffer, size_t buffer_length) const
-{
-    sail_image *sail_image = nullptr;
-
-    SAIL_AT_SCOPE_EXIT(
-        sail_destroy_image(sail_image);
-    );
-
-    SAIL_TRY_OR_EXECUTE(sail_read_mem(buffer, buffer_length, &sail_image),
-                        /* on error */ return {});
-
-    const sail::image image(sail_image);
-    sail_image->pixels = nullptr;
-
-    return image;
-}
-
 sail_status_t image_input::start(const std::string_view path)
 {
     SAIL_TRY(d->ensure_not_started());
@@ -174,7 +93,7 @@ sail_status_t image_input::start(const std::string_view path, const sail::codec_
     return SAIL_OK;
 }
 
-sail_status_t image_input::start(const void *buffer, size_t buffer_length)
+sail_status_t image_input::start(const void *buffer, std::size_t buffer_length)
 {
     SAIL_TRY(d->ensure_not_started());
 
@@ -183,7 +102,7 @@ sail_status_t image_input::start(const void *buffer, size_t buffer_length)
     return SAIL_OK;
 }
 
-sail_status_t image_input::start(const void *buffer, size_t buffer_length, const sail::codec_info &codec_info)
+sail_status_t image_input::start(const void *buffer, std::size_t buffer_length, const sail::codec_info &codec_info)
 {
     SAIL_TRY(d->ensure_not_started());
 
@@ -192,7 +111,7 @@ sail_status_t image_input::start(const void *buffer, size_t buffer_length, const
     return SAIL_OK;
 }
 
-sail_status_t image_input::start(const void *buffer, size_t buffer_length, const sail::read_options &read_options)
+sail_status_t image_input::start(const void *buffer, std::size_t buffer_length, const sail::read_options &read_options)
 {
     SAIL_TRY(d->ensure_not_started());
 
@@ -204,7 +123,7 @@ sail_status_t image_input::start(const void *buffer, size_t buffer_length, const
     return SAIL_OK;
 }
 
-sail_status_t image_input::start(const void *buffer, size_t buffer_length, const sail::codec_info &codec_info, const sail::read_options &read_options)
+sail_status_t image_input::start(const void *buffer, std::size_t buffer_length, const sail::codec_info &codec_info, const sail::read_options &read_options)
 {
     SAIL_TRY(d->ensure_not_started());
 
@@ -212,6 +131,34 @@ sail_status_t image_input::start(const void *buffer, size_t buffer_length, const
     SAIL_TRY(read_options.to_sail_read_options(&sail_read_options));
 
     SAIL_TRY(sail_start_reading_mem_with_options(buffer, buffer_length, codec_info.sail_codec_info_c(), &sail_read_options, &d->state));
+
+    return SAIL_OK;
+}
+
+sail_status_t image_input::start(const sail::arbitrary_data &arbitrary_data)
+{
+    SAIL_TRY(start(arbitrary_data.data(), arbitrary_data.size()));
+
+    return SAIL_OK;
+}
+
+sail_status_t image_input::start(const sail::arbitrary_data &arbitrary_data, const sail::codec_info &codec_info)
+{
+    SAIL_TRY(start(arbitrary_data.data(), arbitrary_data.size(), codec_info));
+
+    return SAIL_OK;
+}
+
+sail_status_t image_input::start(const sail::arbitrary_data &arbitrary_data, const sail::read_options &read_options)
+{
+    SAIL_TRY(start(arbitrary_data.data(), arbitrary_data.size(), read_options));
+
+    return SAIL_OK;
+}
+
+sail_status_t image_input::start(const sail::arbitrary_data &arbitrary_data, const sail::codec_info &codec_info, const sail::read_options &read_options)
+{
+    SAIL_TRY(start(arbitrary_data.data(), arbitrary_data.size(), codec_info, read_options));
 
     return SAIL_OK;
 }
@@ -296,6 +243,16 @@ sail_status_t image_input::next_frame(sail::image *image)
     return SAIL_OK;
 }
 
+image image_input::next_frame()
+{
+    sail::image image;
+
+    SAIL_TRY_OR_EXECUTE(next_frame(&image),
+                        /* on error */ return {});
+
+    return image;
+}
+
 sail_status_t image_input::stop()
 {
     sail_status_t saved_status = SAIL_OK;
@@ -306,6 +263,97 @@ sail_status_t image_input::stop()
     d->abstract_io_adapter.reset();
 
     return saved_status;
+}
+
+std::tuple<image, codec_info> image_input::probe(const std::string_view path)
+{
+    const sail_codec_info *sail_codec_info;
+    sail_image *sail_image = nullptr;
+
+    SAIL_AT_SCOPE_EXIT(
+        sail_destroy_image(sail_image);
+    );
+
+    SAIL_TRY_OR_EXECUTE(sail_probe_file(path.data(), &sail_image, &sail_codec_info),
+                        /* on error */ return {});
+
+    return { image(sail_image), codec_info(sail_codec_info) };
+}
+
+std::tuple<image, codec_info> image_input::probe(const void *buffer, std::size_t buffer_length)
+{
+    const sail_codec_info *sail_codec_info;
+    sail_image *sail_image = nullptr;
+
+    SAIL_AT_SCOPE_EXIT(
+        sail_destroy_image(sail_image);
+    );
+
+    SAIL_TRY_OR_EXECUTE(sail_probe_mem(buffer, buffer_length, &sail_image, &sail_codec_info),
+                        /* on error */ return {});
+
+    return { image(sail_image), codec_info(sail_codec_info) };
+}
+
+std::tuple<image, codec_info> image_input::probe(const sail::arbitrary_data &arbitrary_data)
+{
+    return probe(arbitrary_data.data(), arbitrary_data.size());
+}
+
+std::tuple<image, codec_info> image_input::probe(sail::abstract_io &abstract_io)
+{
+    sail::abstract_io_adapter abstract_io_adapter(abstract_io);
+
+    const sail_codec_info *sail_codec_info;
+    sail_image *sail_image = nullptr;
+
+    SAIL_AT_SCOPE_EXIT(
+        sail_destroy_image(sail_image);
+    );
+
+    SAIL_TRY_OR_EXECUTE(sail_probe_io(&abstract_io_adapter.sail_io_c(), &sail_image, &sail_codec_info),
+                        /* on error */ return {});
+
+    return { image(sail_image), codec_info(sail_codec_info) };
+}
+
+image image_input::load(const std::string_view path)
+{
+    sail_image *sail_image = nullptr;
+
+    SAIL_AT_SCOPE_EXIT(
+        sail_destroy_image(sail_image);
+    );
+
+    SAIL_TRY_OR_EXECUTE(sail_read_file(path.data(), &sail_image),
+                        /* on error */ return {});
+
+    const sail::image image(sail_image);
+    sail_image->pixels = nullptr;
+
+    return image;
+}
+
+image image_input::load(const void *buffer, std::size_t buffer_length)
+{
+    sail_image *sail_image = nullptr;
+
+    SAIL_AT_SCOPE_EXIT(
+        sail_destroy_image(sail_image);
+    );
+
+    SAIL_TRY_OR_EXECUTE(sail_read_mem(buffer, buffer_length, &sail_image),
+                        /* on error */ return {});
+
+    const sail::image image(sail_image);
+    sail_image->pixels = nullptr;
+
+    return image;
+}
+
+image image_input::load(const sail::arbitrary_data &arbitrary_data)
+{
+    return load(arbitrary_data.data(), arbitrary_data.size());
 }
 
 }
