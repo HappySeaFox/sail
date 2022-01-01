@@ -34,9 +34,13 @@
 #ifdef SAIL_BUILD
     #include "error.h"
     #include "export.h"
+
+    #include "arbitrary_data-c++.h"
 #else
     #include <sail-common/error.h>
     #include <sail-common/export.h>
+
+    #include <sail-c++/arbitrary_data-c++.h>
 #endif
 
 namespace sail
@@ -82,50 +86,6 @@ public:
      * Disables moving image readers.
      */
     image_input& operator=(image_input&&) = delete;
-
-    /*
-     * Loads the specified image file and returns its properties without pixels and the corresponding
-     * codec info.
-     *
-     * This method is pretty fast because it doesn't decode whole image data for most image formats.
-     *
-     * Returns an invalid image on error.
-     */
-    std::tuple<image, codec_info> probe(std::string_view path) const;
-
-    /*
-     * Loads an image from the specified memory buffer and returns its properties without pixels
-     * and the corresponding codec info.
-     *
-     * This method is pretty fast because it doesn't decode whole image data for most image formats.
-     *
-     * Returns an invalid image on error.
-     */
-    std::tuple<image, codec_info> probe(const void *buffer, size_t buffer_length) const;
-
-    /*
-     * Loads an image from the specified I/O source and returns its properties without pixels
-     * and the corresponding codec info.
-     *
-     * This method is pretty fast because it doesn't decode whole image data for most image formats.
-     *
-     * Returns an invalid image on error.
-     */
-    std::tuple<image, codec_info> probe(const sail::io &io) const;
-
-    /*
-     * Loads the specified image file.
-     *
-     * Returns an invalid image on error.
-     */
-    image load(std::string_view path) const;
-
-    /*
-     * Loads an image from the specified memory buffer.
-     *
-     * Returns an invalid image on error.
-     */
-    image load(const void *buffer, size_t buffer_length) const;
 
     /*
      * Starts reading the specified image file.
@@ -182,7 +142,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t start(const void *buffer, size_t buffer_length);
+    sail_status_t start(const void *buffer, std::size_t buffer_length);
 
     /*
      * Starts reading the specified memory buffer with the specified codec.
@@ -194,7 +154,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t start(const void *buffer, size_t buffer_length, const sail::codec_info &codec_info);
+    sail_status_t start(const void *buffer, std::size_t buffer_length, const sail::codec_info &codec_info);
 
     /*
      * Starts reading the specified memory buffer with the specified read options.
@@ -205,7 +165,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t start(const void *buffer, size_t buffer_length, const sail::read_options &read_options);
+    sail_status_t start(const void *buffer, std::size_t buffer_length, const sail::read_options &read_options);
 
     /*
      * Starts reading the specified memory buffer with the specified codec and read options.
@@ -217,7 +177,53 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t start(const void *buffer, size_t buffer_length, const sail::codec_info &codec_info, const sail::read_options &read_options);
+    sail_status_t start(const void *buffer, std::size_t buffer_length, const sail::codec_info &codec_info, const sail::read_options &read_options);
+
+    /*
+     * Starts reading the specified memory buffer.
+     *
+     * Typical usage: start()          ->
+     *                next_frame() x n ->
+     *                stop().
+     *
+     * Returns SAIL_OK on success.
+     */
+    sail_status_t start(const sail::arbitrary_data &arbitrary_data);
+
+    /*
+     * Starts reading the specified memory buffer with the specified codec.
+     *
+     * Typical usage: codec_info::from_extension() ->
+     *                start()                      ->
+     *                next_frame() x n             ->
+     *                stop().
+     *
+     * Returns SAIL_OK on success.
+     */
+    sail_status_t start(const sail::arbitrary_data &arbitrary_data, const sail::codec_info &codec_info);
+
+    /*
+     * Starts reading the specified memory buffer with the specified read options.
+     *
+     * Typical usage: start()          ->
+     *                next_frame() x n ->
+     *                stop().
+     *
+     * Returns SAIL_OK on success.
+     */
+    sail_status_t start(const sail::arbitrary_data &arbitrary_data, const sail::read_options &read_options);
+
+    /*
+     * Starts reading the specified memory buffer with the specified codec and read options.
+     *
+     * Typical usage: codec_info::from_extension() ->
+     *                start()                      ->
+     *                next_frame() x n             ->
+     *                stop().
+     *
+     * Returns SAIL_OK on success.
+     */
+    sail_status_t start(const sail::arbitrary_data &arbitrary_data, const sail::codec_info &codec_info, const sail::read_options &read_options);
 
     /*
      * Starts reading the specified I/O source.
@@ -275,6 +281,13 @@ public:
     sail_status_t next_frame(sail::image *image);
 
     /*
+     * Continues reading the source started by the previous call to start().
+     *
+     * Returns an invalid image on error.
+     */
+    image next_frame();
+
+    /*
      * Stops reading the source started by the previous call to start(). Does nothing
      * if no reading was started.
      *
@@ -284,6 +297,67 @@ public:
      * Returns SAIL_OK on success.
      */
     sail_status_t stop();
+
+    /*
+     * Loads the specified image file and returns its properties without pixels and the corresponding
+     * codec info.
+     *
+     * This method is pretty fast because it doesn't decode whole image data for most image formats.
+     *
+     * Returns an invalid image on error.
+     */
+    static std::tuple<image, codec_info> probe(std::string_view path);
+
+    /*
+     * Loads an image from the specified memory buffer and returns its properties without pixels
+     * and the corresponding codec info.
+     *
+     * This method is pretty fast because it doesn't decode whole image data for most image formats.
+     *
+     * Returns an invalid image on error.
+     */
+    static std::tuple<image, codec_info> probe(const void *buffer, std::size_t buffer_length);
+
+    /*
+     * Loads an image from the specified memory buffer and returns its properties without pixels
+     * and the corresponding codec info.
+     *
+     * This method is pretty fast because it doesn't decode whole image data for most image formats.
+     *
+     * Returns an invalid image on error.
+     */
+    static std::tuple<image, codec_info> probe(const sail::arbitrary_data &arbitrary_data);
+
+    /*
+     * Loads an image from the specified I/O source and returns its properties without pixels
+     * and the corresponding codec info.
+     *
+     * This method is pretty fast because it doesn't decode whole image data for most image formats.
+     *
+     * Returns an invalid image on error.
+     */
+    static std::tuple<image, codec_info> probe(const sail::io &io);
+
+    /*
+     * Loads the specified image file.
+     *
+     * Returns an invalid image on error.
+     */
+    static image load(std::string_view path);
+
+    /*
+     * Loads an image from the specified memory buffer.
+     *
+     * Returns an invalid image on error.
+     */
+    static image load(const void *buffer, std::size_t buffer_length);
+
+    /*
+     * Loads an image from the specified memory buffer.
+     *
+     * Returns an invalid image on error.
+     */
+    static image load(const sail::arbitrary_data &arbitrary_data);
 
 private:
     class pimpl;
