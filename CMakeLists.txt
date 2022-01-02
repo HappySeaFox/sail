@@ -268,12 +268,12 @@ endif()
 
 if (ENABLED_CODECS)
     string(TOUPPER "${ENABLED_CODECS}" ENABLED_CODECS)
-    string(REPLACE ";" "," ENABLED_CODECS "${ENABLED_CODECS}")
+    string(REPLACE ";" " " ENABLED_CODECS "${ENABLED_CODECS}")
 endif()
 
 if (DISABLED_CODECS)
     string(TOUPPER "${DISABLED_CODECS}" DISABLED_CODECS)
-    string(REPLACE ";" "," DISABLED_CODECS "${DISABLED_CODECS}")
+    string(REPLACE ";" " " DISABLED_CODECS "${DISABLED_CODECS}")
 endif()
 
 message("")
