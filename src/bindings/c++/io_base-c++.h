@@ -62,7 +62,7 @@ public:
     /*
      * Construct a new base I/O stream.
      */
-    io_base(struct sail_io *sail_io);
+    explicit io_base(struct sail_io *sail_io);
 
     /*
      * Returns the I/O stream id.
