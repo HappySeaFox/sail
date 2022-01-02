@@ -78,23 +78,25 @@ public:
     explicit image(std::string_view path);
 
     /*
-     * Constructs a new image out of the specified image properties and pixels. This constructor
-     * assumes the image data has no extra bytes in the end of every scan line.
+     * Constructs a new image out of the specified image properties and the shallow pixels.
+     * Assumes the pixels have no extra bytes in the end of every scan line. The pixels
+     * must remain valid as long as the image exists.
      */
     image(void *pixels, SailPixelFormat pixel_format, unsigned width, unsigned height);
 
     /*
-     * Constructs a new image out of the specified image properties and pixels.
+     * Constructs a new image out of the specified image properties and the shallow pixels.
+     * The pixels must remain valid as long as the image exists.
      */
     image(void *pixels, SailPixelFormat pixel_format, unsigned width, unsigned height, unsigned bytes_per_line);
 
     /*
-     * Copies the image.
+     * Makes a deep copy of the image.
      */
     image(const image &img);
 
     /*
-     * Copies the image.
+     * Makes a deep copy of the image.
      */
     image& operator=(const sail::image &image);
 
