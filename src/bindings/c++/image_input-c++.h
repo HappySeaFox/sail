@@ -46,8 +46,8 @@
 namespace sail
 {
 
+class abstract_io;
 class image;
-class io;
 class codec_info;
 class read_options;
 
@@ -234,7 +234,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t start(const sail::io &io);
+    sail_status_t start(sail::abstract_io &abstract_io);
 
     /*
      * Starts reading the specified I/O source with the specified codec.
@@ -246,7 +246,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t start(const sail::io &io, const sail::codec_info &codec_info);
+    sail_status_t start(sail::abstract_io &abstract_io, const sail::codec_info &codec_info);
 
     /*
      * Starts reading the specified I/O source with the specified read options.
@@ -257,7 +257,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t start(const sail::io &io, const sail::read_options &read_options);
+    sail_status_t start(sail::abstract_io &abstract_io, const sail::read_options &read_options);
 
     /*
      * Starts reading the specified I/O source with the specified codec and read options.
@@ -269,7 +269,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t start(const sail::io &io, const sail::codec_info &codec_info, const sail::read_options &read_options);
+    sail_status_t start(sail::abstract_io &abstract_io, const sail::codec_info &codec_info, const sail::read_options &read_options);
 
     /*
      * Continues reading the source started by the previous call to start().
@@ -336,7 +336,7 @@ public:
      *
      * Returns an invalid image on error.
      */
-    static std::tuple<image, codec_info> probe(const sail::io &io);
+    static std::tuple<image, codec_info> probe(sail::abstract_io &abstract_io);
 
     /*
      * Loads the specified image file.

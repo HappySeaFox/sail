@@ -1,6 +1,6 @@
 /*  This file is part of SAIL (https://github.com/smoked-herring/sail)
 
-    Copyright (c) 2020 Dmitry Baryshev
+    Copyright (c) 2021 Dmitry Baryshev
 
     The MIT License
 
@@ -23,44 +23,55 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_IO_MEM_H
-#define SAIL_IO_MEM_H
+#ifndef SAIL_IO_FILE_CPP_H
+#define SAIL_IO_FILE_CPP_H
 
-#include <stddef.h>
+#include <memory>
+#include <string_view>
 
 #ifdef SAIL_BUILD
-    #include "error.h"
-    #include "export.h"
+    #include "io_base-c++.h"
 #else
-    #include <sail-common/error.h>
-    #include <sail-common/export.h>
+    #include <sail-c++/io_base-c++.h>
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-struct sail_io;
+namespace sail
+{
 
 /*
- * Opens the specified memory buffer for reading and allocates a new I/O object for it.
- * The assigned I/O object MUST be destroyed later with sail_destroy_io().
- *
- * Returns SAIL_OK on success.
+ * File I/O stream.
  */
-SAIL_EXPORT sail_status_t sail_alloc_io_read_memory(const void *buffer, size_t length, struct sail_io **io);
+class SAIL_EXPORT io_file : public io_base
+{
+public:
+    /*
+     * Opens the specified file for reading.
+     */
+    explicit io_file(std::string_view path);
 
-/*
- * Opens the specified memory buffer for reading and writing, and allocates a new I/O object for it.
- * The assigned I/O object MUST be destroyed later with sail_destroy_io().
- *
- * Returns SAIL_OK on success.
- */
-SAIL_EXPORT sail_status_t sail_alloc_io_read_write_memory(void *buffer, size_t length, struct sail_io **io);
+    /*
+     * Opens the specified memory buffer for the specified I/O operations.
+     */
+    io_file(std::string_view path, Operation operation);
 
-/* extern "C" */
-#ifdef __cplusplus
+    /*
+     * Destroys the file I/O stream.
+     */
+    ~io_file() override;
+
+    /*
+     * Finds and returns a first codec info object that supports the file extension of the path.
+     * The comparison algorithm is case insensitive.
+     *
+     * Returns an invalid codec info object on error.
+     */
+    sail::codec_info codec_info() override;
+
+private:
+    class io_file_pimpl;
+    const std::unique_ptr<io_file_pimpl> file_d;
+};
+
 }
-#endif
 
 #endif

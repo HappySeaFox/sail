@@ -164,13 +164,12 @@ codec_info codec_info::from_magic_number(const void *buffer, size_t buffer_lengt
     return codec_info(sail_codec_info);
 }
 
-codec_info codec_info::from_magic_number(const sail::io &io)
+codec_info codec_info::from_magic_number(sail::abstract_io &abstract_io)
 {
-    SAIL_TRY_OR_EXECUTE(io.verify_valid(),
-                        /* on error */ return codec_info{});
+    sail::abstract_io_adapter abstract_io_adapter(abstract_io);
 
     const struct sail_codec_info *sail_codec_info;
-    SAIL_TRY_OR_EXECUTE(sail_codec_info_by_magic_number_from_io(&io.d->sail_io, &sail_codec_info),
+    SAIL_TRY_OR_EXECUTE(sail_codec_info_by_magic_number_from_io(&abstract_io_adapter.sail_io_c(), &sail_codec_info),
                         /* on error */ return codec_info{});
 
     return codec_info(sail_codec_info);

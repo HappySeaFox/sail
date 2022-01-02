@@ -43,27 +43,31 @@
     #pragma warning(disable: 4251)
     #endif
 
+    #include "abstract_io-c++.h"
+    #include "abstract_io_adapter-c++.h"
     #include "arbitrary_data-c++.h"
     #include "at_scope_exit-c++.h"
+    #include "codec_info-c++.h"
     #include "context-c++.h"
     #include "conversion_options-c++.h"
     #include "iccp-c++.h"
     #include "image-c++.h"
     #include "image_input-c++.h"
     #include "image_output-c++.h"
-    #include "io_common-c++.h"
-    #include "io_common_p-c++.h"
+    #include "io_base-c++.h"
+    #include "io_base_p-c++.h"
+    #include "io_file-c++.h"
+    #include "io_memory-c++.h"
     #include "log-c++.h"
     #include "meta_data-c++.h"
     #include "palette-c++.h"
-    #include "codec_info-c++.h"
     #include "read_features-c++.h"
     #include "read_options-c++.h"
     #include "resolution-c++.h"
     #include "source_image-c++.h"
+    #include "utils-c++.h"
     #include "write_features-c++.h"
     #include "write_options-c++.h"
-    #include "utils-c++.h"
 
     #ifdef _MSC_VER
     #pragma warning(pop)
@@ -75,24 +79,26 @@
 
     #include <sail-c++/arbitrary_data-c++.h>
     #include <sail-c++/at_scope_exit-c++.h>
+    #include <sail-c++/codec_info-c++.h>
     #include <sail-c++/context-c++.h>
     #include <sail-c++/conversion_options-c++.h>
     #include <sail-c++/iccp-c++.h>
     #include <sail-c++/image-c++.h>
     #include <sail-c++/image_input-c++.h>
     #include <sail-c++/image_output-c++.h>
-    #include <sail-c++/io_common-c++.h>
+    #include <sail-c++/io_base-c++.h>
+    #include <sail-c++/io_file-c++.h>
+    #include <sail-c++/io_memory-c++.h>
     #include <sail-c++/log-c++.h>
     #include <sail-c++/meta_data-c++.h>
     #include <sail-c++/palette-c++.h>
-    #include <sail-c++/codec_info-c++.h>
     #include <sail-c++/read_features-c++.h>
     #include <sail-c++/read_options-c++.h>
     #include <sail-c++/resolution-c++.h>
     #include <sail-c++/source_image-c++.h>
+    #include <sail-c++/utils-c++.h>
     #include <sail-c++/write_features-c++.h>
     #include <sail-c++/write_options-c++.h>
-    #include <sail-c++/utils-c++.h>
 
     #include <sail-manip/manip_common.h>
 #endif

@@ -78,7 +78,8 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
 
     // Initialize reading.
     //
-    SAIL_TRY(image_input.start(path.toLocal8Bit().constData()));
+    sail::io_file io_file(path.toLocal8Bit().constData());
+    SAIL_TRY(image_input.start(io_file));
 
     // Read all the available image frames in the file.
     //

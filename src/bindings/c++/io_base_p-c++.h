@@ -1,6 +1,6 @@
 /*  This file is part of SAIL (https://github.com/smoked-herring/sail)
 
-    Copyright (c) 2020 Dmitry Baryshev
+    Copyright (c) 2021 Dmitry Baryshev
 
     The MIT License
 
@@ -23,43 +23,29 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_IO_PRIVATE_CPP_H
-#define SAIL_IO_PRIVATE_CPP_H
+#ifndef SAIL_IO_BASE_PRIVATE_CPP_H
+#define SAIL_IO_BASE_PRIVATE_CPP_H
 
-#include "sail-c++.h"
-#include "sail.h"
+#include <memory>
+
+#include "sail-common.h"
 
 namespace sail
 {
 
-class SAIL_HIDDEN io::pimpl
+class SAIL_HIDDEN io_base::pimpl
 {
 public:
-    pimpl()
+    pimpl(struct sail_io *other_sail_io)
+        : sail_io(other_sail_io, sail_destroy_io)
     {
-        empty_sail_io();
+    }
+    ~pimpl()
+    {
     }
 
-    inline void empty_sail_io();
-
-    struct sail_io sail_io;
+    std::unique_ptr<struct sail_io, decltype(&sail_destroy_io)> sail_io;
 };
-
-void io::pimpl::empty_sail_io()
-{
-    sail_io.id             = 0;
-    sail_io.features       = 0;
-    sail_io.stream         = nullptr;
-    sail_io.tolerant_read  = nullptr;
-    sail_io.strict_read    = nullptr;
-    sail_io.seek           = nullptr;
-    sail_io.tell           = nullptr;
-    sail_io.tolerant_write = nullptr;
-    sail_io.strict_write   = nullptr;
-    sail_io.flush          = nullptr;
-    sail_io.close          = nullptr;
-    sail_io.eof            = nullptr;
-}
 
 }
 

@@ -61,22 +61,6 @@ typedef sail_status_t (*sail_io_tolerant_read_t)(void *stream, void *buf, size_t
 typedef sail_status_t (*sail_io_strict_read_t)(void *stream, void *buf, size_t size_to_read);
 
 /*
- * Sets the I/O position in the underlying I/O object.
- *
- * whence possible values: SEEK_SET, SEEK_CUR, or SEEK_END declared in <stdio.h>.
- *
- * Returns SAIL_OK on success.
- */
-typedef sail_status_t (*sail_io_seek_t)(void *stream, long offset, int whence);
-
-/*
- * Assigns the current I/O position in the underlying I/O object.
- *
- * Returns SAIL_OK on success.
- */
-typedef sail_status_t (*sail_io_tell_t)(void *stream, size_t *offset);
-
-/*
  * Writes the specified buffer to the underlying I/O object. In contrast to sail_io_strict_write_t,
  * doesn't fail when the actual number of bytes written is smaller than requested.
  * Assigns the number of bytes actually written to the 'written_size' argument.
@@ -92,6 +76,22 @@ typedef sail_status_t (*sail_io_tolerant_write_t)(void *stream, const void *buf,
  * Returns SAIL_OK on success.
  */
 typedef sail_status_t (*sail_io_strict_write_t)(void *stream, const void *buf, size_t size_to_write);
+
+/*
+ * Sets the I/O position in the underlying I/O object.
+ *
+ * Possible 'whence' values: SEEK_SET, SEEK_CUR, or SEEK_END declared in <stdio.h>.
+ *
+ * Returns SAIL_OK on success.
+ */
+typedef sail_status_t (*sail_io_seek_t)(void *stream, long offset, int whence);
+
+/*
+ * Assigns the current I/O position in the underlying I/O object.
+ *
+ * Returns SAIL_OK on success.
+ */
+typedef sail_status_t (*sail_io_tell_t)(void *stream, size_t *offset);
 
 /*
  * Flushes buffers of the underlying I/O object. Has no effect if the underlying I/O object
@@ -174,16 +174,6 @@ struct sail_io {
     sail_io_strict_read_t strict_read;
 
     /*
-     * Seek callback.
-     */
-    sail_io_seek_t seek;
-
-    /*
-     * Tell callback.
-     */
-    sail_io_tell_t tell;
-
-    /*
      * Tolerant write callback.
      */
     sail_io_tolerant_write_t tolerant_write;
@@ -192,6 +182,16 @@ struct sail_io {
      * Strict write callback.
      */
     sail_io_strict_write_t strict_write;
+
+    /*
+     * Seek callback.
+     */
+    sail_io_seek_t seek;
+
+    /*
+     * Tell callback.
+     */
+    sail_io_tell_t tell;
 
     /*
      * Flush callback.

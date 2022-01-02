@@ -25,7 +25,7 @@
 
 #include <cstdlib>
 #include <cstring>
-#include <new> // bad_alloc
+#include <stdexcept>
 #include <utility>
 
 #include "sail-c++.h"

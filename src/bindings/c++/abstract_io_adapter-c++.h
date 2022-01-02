@@ -1,6 +1,6 @@
 /*  This file is part of SAIL (https://github.com/smoked-herring/sail)
 
-    Copyright (c) 2020 Dmitry Baryshev
+    Copyright (c) 2021 Dmitry Baryshev
 
     The MIT License
 
@@ -23,10 +23,10 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_IO_MEM_H
-#define SAIL_IO_MEM_H
+#ifndef SAIL_ABSTRACT_IO_ADAPTER_CPP_H
+#define SAIL_ABSTRACT_IO_ADAPTER_CPP_H
 
-#include <stddef.h>
+#include <memory>
 
 #ifdef SAIL_BUILD
     #include "error.h"
@@ -36,31 +36,39 @@
     #include <sail-common/export.h>
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 struct sail_io;
 
-/*
- * Opens the specified memory buffer for reading and allocates a new I/O object for it.
- * The assigned I/O object MUST be destroyed later with sail_destroy_io().
- *
- * Returns SAIL_OK on success.
- */
-SAIL_EXPORT sail_status_t sail_alloc_io_read_memory(const void *buffer, size_t length, struct sail_io **io);
+namespace sail
+{
+
+class abstract_io;
 
 /*
- * Opens the specified memory buffer for reading and writing, and allocates a new I/O object for it.
- * The assigned I/O object MUST be destroyed later with sail_destroy_io().
- *
- * Returns SAIL_OK on success.
+ * Adapter to make abstract I/O streams suitable for C functions.
  */
-SAIL_EXPORT sail_status_t sail_alloc_io_read_write_memory(void *buffer, size_t length, struct sail_io **io);
+class SAIL_EXPORT abstract_io_adapter
+{
+public:
+    /*
+     * Constructs a new I/O wrapper with the specified abstract I/O stream to wrap.
+     */
+    explicit abstract_io_adapter(sail::abstract_io &abstract_io);
 
-/* extern "C" */
-#ifdef __cplusplus
+    /*
+     * Destroys the I/O wrapper.
+     */
+    ~abstract_io_adapter();
+
+    /*
+     * Returns the I/O stream suitable for passing it to C functions.
+     */
+    struct sail_io& sail_io_c() const;
+
+private:
+    class pimpl;
+    const std::unique_ptr<pimpl> d;
+};
+
 }
-#endif
 
 #endif
