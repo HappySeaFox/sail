@@ -64,8 +64,8 @@ SAIL_EXPORT sail_status_t sail_probe_io(struct sail_io *io, struct sail_image **
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_probe_mem(const void *buffer, size_t buffer_length,
-                                        struct sail_image **image, const struct sail_codec_info **codec_info);
+SAIL_EXPORT sail_status_t sail_probe_memory(const void *buffer, size_t buffer_length,
+                                            struct sail_image **image, const struct sail_codec_info **codec_info);
 
 /*
  * Starts reading the specified image file. Pass codec info if you would like to start reading
@@ -92,7 +92,7 @@ SAIL_EXPORT sail_status_t sail_start_reading_file(const char *path, const struct
  * Starts reading the specified memory buffer.
  *
  * Typical usage: sail_codec_info_from_extension() ->
- *                sail_start_reading_mem()         ->
+ *                sail_start_reading_memory()      ->
  *                sail_read_next_frame()           ->
  *                sail_stop_reading().
  *
@@ -102,8 +102,8 @@ SAIL_EXPORT sail_status_t sail_start_reading_file(const char *path, const struct
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_start_reading_mem(const void *buffer, size_t buffer_length,
-                                                const struct sail_codec_info *codec_info, void **state);
+SAIL_EXPORT sail_status_t sail_start_reading_memory(const void *buffer, size_t buffer_length,
+                                                    const struct sail_codec_info *codec_info, void **state);
 
 /*
  * Continues reading the file started by sail_start_reading_file() and brothers. The assigned image
@@ -150,7 +150,7 @@ SAIL_EXPORT sail_status_t sail_start_writing_file(const char *path, const struct
  * Starts writing the specified memory buffer.
  *
  * Typical usage: sail_codec_info_from_extension() ->
- *                sail_start_writing_mem()         ->
+ *                sail_start_writing_memory()      ->
  *                sail_write_next_frame()          ->
  *                sail_stop_writing().
  *
@@ -160,8 +160,8 @@ SAIL_EXPORT sail_status_t sail_start_writing_file(const char *path, const struct
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_start_writing_mem(void *buffer, size_t buffer_length,
-                                                const struct sail_codec_info *codec_info, void **state);
+SAIL_EXPORT sail_status_t sail_start_writing_memory(void *buffer, size_t buffer_length,
+                                                   const struct sail_codec_info *codec_info, void **state);
 
 /*
  * Continues writing started by sail_start_writing_file() and brothers. Writes the specified

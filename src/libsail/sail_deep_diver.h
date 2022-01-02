@@ -76,9 +76,9 @@ SAIL_EXPORT sail_status_t sail_start_reading_file_with_options(const char *path,
  *
  * The read options are deep copied.
  *
- * Typical usage: sail_codec_info_from_extension()      ->
- *                sail_start_reading_mem_with_options() ->
- *                sail_read_next_frame()                ->
+ * Typical usage: sail_codec_info_from_extension()         ->
+ *                sail_start_reading_memory_with_options() ->
+ *                sail_read_next_frame()                   ->
  *                sail_stop_reading().
  *
  * STATE explanation: Passes the address of a local void* pointer. SAIL will store an internal state
@@ -87,9 +87,9 @@ SAIL_EXPORT sail_status_t sail_start_reading_file_with_options(const char *path,
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_start_reading_mem_with_options(const void *buffer, size_t buffer_length,
-                                                             const struct sail_codec_info *codec_info,
-                                                             const struct sail_read_options *read_options, void **state);
+SAIL_EXPORT sail_status_t sail_start_reading_memory_with_options(const void *buffer, size_t buffer_length,
+                                                                 const struct sail_codec_info *codec_info,
+                                                                 const struct sail_read_options *read_options, void **state);
 
 /*
  * Starts writing the specified image file with the specified write options. Pass codec info if you would like
@@ -123,9 +123,9 @@ SAIL_EXPORT sail_status_t sail_start_writing_file_with_options(const char *path,
  *
  * The write options are deep copied.
  *
- * Typical usage: sail_codec_info_from_extension()      ->
- *                sail_start_writing_mem_with_options() ->
- *                sail_write_next_frame()               ->
+ * Typical usage: sail_codec_info_from_extension()         ->
+ *                sail_start_writing_memory_with_options() ->
+ *                sail_write_next_frame()                  ->
  *                sail_stop_writing().
  *
  * STATE explanation: Passes the address of a local void* pointer. SAIL will store an internal state
@@ -134,8 +134,8 @@ SAIL_EXPORT sail_status_t sail_start_writing_file_with_options(const char *path,
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_start_writing_mem_with_options(void *buffer, size_t buffer_length,
-                                                             const struct sail_codec_info *codec_info,
+SAIL_EXPORT sail_status_t sail_start_writing_memory_with_options(void *buffer, size_t buffer_length,
+                                                                 const struct sail_codec_info *codec_info,
                                                              const struct sail_write_options *write_options, void **state);
 
 

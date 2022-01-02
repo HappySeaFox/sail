@@ -97,7 +97,7 @@ sail_status_t image_input::start(const void *buffer, std::size_t buffer_length)
 {
     SAIL_TRY(d->ensure_not_started());
 
-    SAIL_TRY(sail_start_reading_mem(buffer, buffer_length, nullptr, &d->state));
+    SAIL_TRY(sail_start_reading_memory(buffer, buffer_length, nullptr, &d->state));
 
     return SAIL_OK;
 }
@@ -106,7 +106,7 @@ sail_status_t image_input::start(const void *buffer, std::size_t buffer_length, 
 {
     SAIL_TRY(d->ensure_not_started());
 
-    SAIL_TRY(sail_start_reading_mem(buffer, buffer_length, codec_info.sail_codec_info_c(), &d->state));
+    SAIL_TRY(sail_start_reading_memory(buffer, buffer_length, codec_info.sail_codec_info_c(), &d->state));
 
     return SAIL_OK;
 }
@@ -118,7 +118,7 @@ sail_status_t image_input::start(const void *buffer, std::size_t buffer_length, 
     sail_read_options sail_read_options;
     SAIL_TRY(read_options.to_sail_read_options(&sail_read_options));
 
-    SAIL_TRY(sail_start_reading_mem_with_options(buffer, buffer_length, nullptr, &sail_read_options, &d->state));
+    SAIL_TRY(sail_start_reading_memory_with_options(buffer, buffer_length, nullptr, &sail_read_options, &d->state));
 
     return SAIL_OK;
 }
@@ -130,7 +130,7 @@ sail_status_t image_input::start(const void *buffer, std::size_t buffer_length, 
     sail_read_options sail_read_options;
     SAIL_TRY(read_options.to_sail_read_options(&sail_read_options));
 
-    SAIL_TRY(sail_start_reading_mem_with_options(buffer, buffer_length, codec_info.sail_codec_info_c(), &sail_read_options, &d->state));
+    SAIL_TRY(sail_start_reading_memory_with_options(buffer, buffer_length, codec_info.sail_codec_info_c(), &sail_read_options, &d->state));
 
     return SAIL_OK;
 }
@@ -289,7 +289,7 @@ std::tuple<image, codec_info> image_input::probe(const void *buffer, std::size_t
         sail_destroy_image(sail_image);
     );
 
-    SAIL_TRY_OR_EXECUTE(sail_probe_mem(buffer, buffer_length, &sail_image, &sail_codec_info),
+    SAIL_TRY_OR_EXECUTE(sail_probe_memory(buffer, buffer_length, &sail_image, &sail_codec_info),
                         /* on error */ return {});
 
     return { image(sail_image), codec_info(sail_codec_info) };
@@ -342,7 +342,7 @@ image image_input::load(const void *buffer, std::size_t buffer_length)
         sail_destroy_image(sail_image);
     );
 
-    SAIL_TRY_OR_EXECUTE(sail_read_mem(buffer, buffer_length, &sail_image),
+    SAIL_TRY_OR_EXECUTE(sail_read_memory(buffer, buffer_length, &sail_image),
                         /* on error */ return {});
 
     const sail::image image(sail_image);

@@ -128,15 +128,15 @@ SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_path(const char *
  *
  * The assigned codec info MUST NOT be destroyed. It is a pointer to an internal data structure.
  *
- * Typical usage: sail_codec_info_by_magic_number_from_mem() ->
- *                sail_start_reading_file()                  ->
- *                sail_read_next_frame()                     ->
+ * Typical usage: sail_codec_info_by_magic_number_from_memory() ->
+ *                sail_start_reading_file()                     ->
+ *                sail_read_next_frame()                        ->
  *                sail_stop_reading().
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_mem(const void *buffer, size_t buffer_length,
-                                                                   const struct sail_codec_info **codec_info);
+SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_memory(const void *buffer, size_t buffer_length,
+                                                                      const struct sail_codec_info **codec_info);
 
 /*
  * Finds a first codec info object that supports the magic number read from the specified I/O data source.

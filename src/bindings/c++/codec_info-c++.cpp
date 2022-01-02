@@ -158,7 +158,7 @@ codec_info codec_info::from_magic_number(const std::string_view path)
 codec_info codec_info::from_magic_number(const void *buffer, size_t buffer_length)
 {
     const struct sail_codec_info *sail_codec_info;
-    SAIL_TRY_OR_EXECUTE(sail_codec_info_by_magic_number_from_mem(buffer, buffer_length, &sail_codec_info),
+    SAIL_TRY_OR_EXECUTE(sail_codec_info_by_magic_number_from_memory(buffer, buffer_length, &sail_codec_info),
                         /* on error */ return codec_info{});
 
     return codec_info(sail_codec_info);

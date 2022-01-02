@@ -73,7 +73,7 @@ SAIL_EXPORT sail_status_t sail_read_file(const char *path, struct sail_image **i
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_read_mem(const void *buffer, size_t buffer_length, struct sail_image **image);
+SAIL_EXPORT sail_status_t sail_read_memory(const void *buffer, size_t buffer_length, struct sail_image **image);
 
 /*
  * Writes the specified image into the file.
@@ -101,7 +101,7 @@ SAIL_EXPORT sail_status_t sail_write_file(const char *path, const struct sail_im
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_write_mem(void *buffer, size_t buffer_length, const struct sail_image *image, size_t *written);
+SAIL_EXPORT sail_status_t sail_write_memory(void *buffer, size_t buffer_length, const struct sail_image *image, size_t *written);
 
 /* extern "C" */
 #ifdef __cplusplus

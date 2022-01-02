@@ -23,8 +23,8 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_IO_MEM_H
-#define SAIL_IO_MEM_H
+#ifndef SAIL_IO_MEMORY_H
+#define SAIL_IO_MEMORY_H
 
 #include <stddef.h>
 

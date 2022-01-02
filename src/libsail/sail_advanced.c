@@ -65,7 +65,7 @@ sail_status_t sail_probe_io(struct sail_io *io, struct sail_image **image, const
     return SAIL_OK;
 }
 
-sail_status_t sail_probe_mem(const void *buffer, size_t buffer_length, struct sail_image **image, const struct sail_codec_info **codec_info) {
+sail_status_t sail_probe_memory(const void *buffer, size_t buffer_length, struct sail_image **image, const struct sail_codec_info **codec_info) {
 
     SAIL_CHECK_PTR(buffer);
 
@@ -87,9 +87,9 @@ sail_status_t sail_start_reading_file(const char *path, const struct sail_codec_
     return SAIL_OK;
 }
 
-sail_status_t sail_start_reading_mem(const void *buffer, size_t buffer_length, const struct sail_codec_info *codec_info, void **state) {
+sail_status_t sail_start_reading_memory(const void *buffer, size_t buffer_length, const struct sail_codec_info *codec_info, void **state) {
 
-    SAIL_TRY(sail_start_reading_mem_with_options(buffer, buffer_length, codec_info, NULL, state));
+    SAIL_TRY(sail_start_reading_memory_with_options(buffer, buffer_length, codec_info, NULL, state));
 
     return SAIL_OK;
 }
@@ -157,9 +157,9 @@ sail_status_t sail_start_writing_file(const char *path, const struct sail_codec_
     return SAIL_OK;
 }
 
-sail_status_t sail_start_writing_mem(void *buffer, size_t buffer_length, const struct sail_codec_info *codec_info, void **state) {
+sail_status_t sail_start_writing_memory(void *buffer, size_t buffer_length, const struct sail_codec_info *codec_info, void **state) {
 
-    SAIL_TRY(sail_start_writing_mem_with_options(buffer, buffer_length, codec_info, NULL, state));
+    SAIL_TRY(sail_start_writing_memory_with_options(buffer, buffer_length, codec_info, NULL, state));
 
     return SAIL_OK;
 }

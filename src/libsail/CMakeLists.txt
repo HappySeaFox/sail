@@ -21,8 +21,8 @@ add_library(sail
                 ini.h
                 io_file.c
                 io_file.h
-                io_mem.c
-                io_mem.h
+                io_memory.c
+                io_memory.h
                 io_noop.c
                 io_noop.h
                 sail.h
@@ -52,7 +52,7 @@ set(PUBLIC_HEADERS "codec_bundle.h"
                    "codec_priority.h"
                    "context.h"
                    "io_file.h"
-                   "io_mem.h"
+                   "io_memory.h"
                    "io_noop.h"
                    "sail.h"
                    "sail_advanced.h"

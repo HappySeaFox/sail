@@ -51,16 +51,16 @@ sail_status_t sail_start_reading_file_with_options(const char *path, const struc
     return SAIL_OK;
 }
 
-sail_status_t sail_start_reading_mem_with_options(const void *buffer, size_t buffer_length,
-                                                 const struct sail_codec_info *codec_info,
-                                                 const struct sail_read_options *read_options, void **state) {
+sail_status_t sail_start_reading_memory_with_options(const void *buffer, size_t buffer_length,
+                                                     const struct sail_codec_info *codec_info,
+                                                     const struct sail_read_options *read_options, void **state) {
 
     SAIL_CHECK_PTR(buffer);
 
     const struct sail_codec_info *codec_info_local;
 
     if (codec_info == NULL) {
-        SAIL_TRY(sail_codec_info_by_magic_number_from_mem(buffer, buffer_length, &codec_info_local));
+        SAIL_TRY(sail_codec_info_by_magic_number_from_memory(buffer, buffer_length, &codec_info_local));
     } else {
         codec_info_local = codec_info;
     }
@@ -95,9 +95,9 @@ sail_status_t sail_start_writing_file_with_options(const char *path, const struc
     return SAIL_OK;
 }
 
-sail_status_t sail_start_writing_mem_with_options(void *buffer, size_t buffer_length,
-                                                 const struct sail_codec_info *codec_info,
-                                                 const struct sail_write_options *write_options, void **state) {
+sail_status_t sail_start_writing_memory_with_options(void *buffer, size_t buffer_length,
+                                                     const struct sail_codec_info *codec_info,
+                                                     const struct sail_write_options *write_options, void **state) {
     SAIL_CHECK_PTR(buffer);
     SAIL_CHECK_PTR(codec_info);
 

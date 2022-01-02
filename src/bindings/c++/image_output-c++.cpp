@@ -109,10 +109,10 @@ sail_status_t image_output::start(void *buffer, std::size_t buffer_length, const
 {
     SAIL_TRY(d->ensure_not_started());
 
-    SAIL_TRY(sail_start_writing_mem(buffer,
-                                    buffer_length,
-                                    codec_info.sail_codec_info_c(),
-                                    &d->state));
+    SAIL_TRY(sail_start_writing_memory(buffer,
+                                       buffer_length,
+                                       codec_info.sail_codec_info_c(),
+                                       &d->state));
 
     return SAIL_OK;
 }
@@ -124,11 +124,11 @@ sail_status_t image_output::start(void *buffer, std::size_t buffer_length, const
     sail_write_options sail_write_options;
     SAIL_TRY(write_options.to_sail_write_options(&sail_write_options));
 
-    SAIL_TRY(sail_start_writing_mem_with_options(buffer,
-                                                 buffer_length,
-                                                 codec_info.sail_codec_info_c(),
-                                                 &sail_write_options,
-                                                 &d->state));
+    SAIL_TRY(sail_start_writing_memory_with_options(buffer,
+                                                    buffer_length,
+                                                    codec_info.sail_codec_info_c(),
+                                                    &sail_write_options,
+                                                    &d->state));
 
     return SAIL_OK;
 }
@@ -249,7 +249,7 @@ sail_status_t image_output::save(void *buffer, std::size_t buffer_length, const 
         sail_destroy_image(sail_image);
     );
 
-    SAIL_TRY(sail_write_mem(buffer, buffer_length, sail_image, written));
+    SAIL_TRY(sail_write_memory(buffer, buffer_length, sail_image, written));
 
     return SAIL_OK;
 }
