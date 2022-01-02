@@ -36,9 +36,24 @@ class SAIL_HIDDEN image_output::pimpl
 public:
     pimpl()
         : state(nullptr)
+        , written(0)
     {
     }
 
+    sail_status_t start()
+    {
+        SAIL_TRY(ensure_not_started());
+
+        written = 0;
+
+        return SAIL_OK;
+    }
+
+    void *state;
+    std::unique_ptr<sail::abstract_io_adapter> abstract_io_adapter;
+    std::size_t written;
+
+private:
     sail_status_t ensure_not_started()
     {
         if (state != nullptr) {
@@ -48,9 +63,6 @@ public:
 
         return SAIL_OK;
     }
-
-    void *state;
-    std::unique_ptr<sail::abstract_io_adapter> abstract_io_adapter;
 };
 
 image_output::image_output()
@@ -65,7 +77,7 @@ image_output::~image_output()
 
 sail_status_t image_output::start(const std::string_view path)
 {
-    SAIL_TRY(d->ensure_not_started());
+    SAIL_TRY(d->start());
 
     SAIL_TRY(sail_start_writing_file(path.data(), nullptr, &d->state));
 
@@ -74,7 +86,7 @@ sail_status_t image_output::start(const std::string_view path)
 
 sail_status_t image_output::start(const std::string_view path, const sail::codec_info &codec_info)
 {
-    SAIL_TRY(d->ensure_not_started());
+    SAIL_TRY(d->start());
 
     SAIL_TRY(sail_start_writing_file(path.data(), codec_info.sail_codec_info_c(), &d->state));
 
@@ -83,7 +95,7 @@ sail_status_t image_output::start(const std::string_view path, const sail::codec
 
 sail_status_t image_output::start(const std::string_view path, const sail::write_options &write_options)
 {
-    SAIL_TRY(d->ensure_not_started());
+    SAIL_TRY(d->start());
 
     sail_write_options sail_write_options;
     SAIL_TRY(write_options.to_sail_write_options(&sail_write_options));
@@ -95,7 +107,7 @@ sail_status_t image_output::start(const std::string_view path, const sail::write
 
 sail_status_t image_output::start(const std::string_view path, const sail::codec_info &codec_info, const sail::write_options &write_options)
 {
-    SAIL_TRY(d->ensure_not_started());
+    SAIL_TRY(d->start());
 
     sail_write_options sail_write_options;
     SAIL_TRY(write_options.to_sail_write_options(&sail_write_options));
@@ -107,7 +119,7 @@ sail_status_t image_output::start(const std::string_view path, const sail::codec
 
 sail_status_t image_output::start(void *buffer, std::size_t buffer_length, const sail::codec_info &codec_info)
 {
-    SAIL_TRY(d->ensure_not_started());
+    SAIL_TRY(d->start());
 
     SAIL_TRY(sail_start_writing_memory(buffer,
                                        buffer_length,
@@ -119,7 +131,7 @@ sail_status_t image_output::start(void *buffer, std::size_t buffer_length, const
 
 sail_status_t image_output::start(void *buffer, std::size_t buffer_length, const sail::codec_info &codec_info, const sail::write_options &write_options)
 {
-    SAIL_TRY(d->ensure_not_started());
+    SAIL_TRY(d->start());
 
     sail_write_options sail_write_options;
     SAIL_TRY(write_options.to_sail_write_options(&sail_write_options));
@@ -149,7 +161,7 @@ sail_status_t image_output::start(sail::arbitrary_data *arbitrary_data, const sa
 
 sail_status_t image_output::start(sail::abstract_io &abstract_io, const sail::codec_info &codec_info)
 {
-    SAIL_TRY(d->ensure_not_started());
+    SAIL_TRY(d->start());
 
     d->abstract_io_adapter.reset(new sail::abstract_io_adapter(abstract_io));
 
@@ -163,7 +175,7 @@ sail_status_t image_output::start(sail::abstract_io &abstract_io, const sail::co
 
 sail_status_t image_output::start(sail::abstract_io &abstract_io, const sail::codec_info &codec_info, const sail::write_options &write_options)
 {
-    SAIL_TRY(d->ensure_not_started());
+    SAIL_TRY(d->start());
 
     d->abstract_io_adapter.reset(new sail::abstract_io_adapter(abstract_io));
 
@@ -195,24 +207,19 @@ sail_status_t image_output::next_frame(const sail::image &image) const
 
 sail_status_t image_output::stop()
 {
-    std::size_t written;
-    SAIL_TRY(stop(&written));
-
-    (void)written;
-
-    return SAIL_OK;
-}
-
-sail_status_t image_output::stop(std::size_t *written)
-{
     sail_status_t saved_status = SAIL_OK;
-    SAIL_TRY_OR_EXECUTE(sail_stop_writing_with_written(d->state, written),
+    SAIL_TRY_OR_EXECUTE(sail_stop_writing_with_written(d->state, &d->written),
                         /* on error */ saved_status = __sail_error_result);
 
     d->state = nullptr;
     d->abstract_io_adapter.reset();
 
     return saved_status;
+}
+
+std::size_t image_output::written() const
+{
+    return d->written;
 }
 
 sail_status_t image_output::save(const std::string_view path, const sail::image &image)

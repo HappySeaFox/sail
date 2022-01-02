@@ -217,23 +217,14 @@ public:
     /*
      * Stops writing started by the previous call to start() and closes the underlying I/O target.
      *
-     * It is essential to always stop writing to free memory and I/O resources. Failure to do so
-     * will lead to memory leaks.
-     *
      * Returns SAIL_OK on success.
      */
     sail_status_t stop();
 
     /*
-     * Stops writing started by the previous call to start() and closes the underlying I/O target.
-     * Assigns the number of bytes written to the 'written' argument.
-     *
-     * It is essential to always stop writing to free memory and I/O resources. Failure to do so
-     * will lead to memory leaks.
-     *
-     * Returns SAIL_OK on success.
+     * Returns the number of bytes written by the last stop() operation.
      */
-    sail_status_t stop(std::size_t *written);
+    std::size_t written() const;
 
     /*
      * Saves the specified image into the file.
