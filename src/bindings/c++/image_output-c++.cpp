@@ -232,7 +232,7 @@ sail_status_t image_output::save(const std::string_view path, const sail::image 
         sail_destroy_image(sail_image);
     );
 
-    SAIL_TRY(sail_write_file(path.data(), sail_image));
+    SAIL_TRY(sail_save_image_into_file(path.data(), sail_image));
 
     return SAIL_OK;
 }
@@ -256,7 +256,7 @@ sail_status_t image_output::save(void *buffer, std::size_t buffer_length, const 
         sail_destroy_image(sail_image);
     );
 
-    SAIL_TRY(sail_write_memory(buffer, buffer_length, sail_image, written));
+    SAIL_TRY(sail_save_image_into_memory(buffer, buffer_length, sail_image, written));
 
     return SAIL_OK;
 }

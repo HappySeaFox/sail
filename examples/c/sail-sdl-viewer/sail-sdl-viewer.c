@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
 
     /* Load the image. */
     struct sail_image *image;
-    SAIL_TRY(sail_read_file(argv[1], &image));
+    SAIL_TRY(sail_load_image_from_file(argv[1], &image));
 
     /* Convert to BPP32-RGBA. */
     struct sail_image *image_converted;

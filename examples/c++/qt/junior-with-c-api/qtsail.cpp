@@ -66,7 +66,7 @@ QtSail::~QtSail()
 sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
 {
     struct sail_image *image;
-    SAIL_TRY(sail_read_file(path.toLocal8Bit(), &image));
+    SAIL_TRY(sail_load_image_from_file(path.toLocal8Bit(), &image));
 
     struct sail_image *image_converted;
     SAIL_TRY_OR_CLEANUP(sail_convert_image(image,
@@ -125,8 +125,8 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
     sail_destroy_image(image);
     image = image_converted;
 
-    SAIL_TRY_OR_CLEANUP(sail_write_file(path.toLocal8Bit(), image),
-                                        /* cleanup */ sail_destroy_image(image));
+    SAIL_TRY_OR_CLEANUP(sail_save_image_into_file(path.toLocal8Bit(), image),
+                        /* cleanup */ sail_destroy_image(image));
 
     sail_destroy_image(image);
 

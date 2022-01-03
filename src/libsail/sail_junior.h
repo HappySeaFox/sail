@@ -63,20 +63,20 @@ SAIL_EXPORT sail_status_t sail_probe_file(const char *path, struct sail_image **
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_read_file(const char *path, struct sail_image **image);
+SAIL_EXPORT sail_status_t sail_load_image_from_file(const char *path, struct sail_image **image);
 
 /*
- * Loads the specified image file from the specified memory buffer and returns its properties and pixels.
+ * Loads an image from the specified memory buffer and returns its properties and pixels.
  * The assigned image MUST be destroyed later with sail_destroy_image().
  *
  * Typical usage: This is a standalone function that could be called at any time.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_read_memory(const void *buffer, size_t buffer_length, struct sail_image **image);
+SAIL_EXPORT sail_status_t sail_load_image_from_memory(const void *buffer, size_t buffer_length, struct sail_image **image);
 
 /*
- * Writes the specified image into the file.
+ * Saves the specified image into the file.
  *
  * If the selected image format doesn't support the image pixel format, an error is returned.
  * Consider converting the image into a supported image format beforehand with functions
@@ -86,10 +86,10 @@ SAIL_EXPORT sail_status_t sail_read_memory(const void *buffer, size_t buffer_len
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_write_file(const char *path, const struct sail_image *image);
+SAIL_EXPORT sail_status_t sail_save_image_into_file(const char *path, const struct sail_image *image);
 
 /*
- * Writes the specified image into the specified memory buffer.
+ * Saves the specified image into the specified memory buffer.
  *
  * If the selected image format doesn't support the image pixel format, an error is returned.
  * Consider converting the image into a supported image format beforehand with functions
@@ -101,7 +101,7 @@ SAIL_EXPORT sail_status_t sail_write_file(const char *path, const struct sail_im
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_write_memory(void *buffer, size_t buffer_length, const struct sail_image *image, size_t *written);
+SAIL_EXPORT sail_status_t sail_save_image_into_memory(void *buffer, size_t buffer_length, const struct sail_image *image, size_t *written);
 
 /* extern "C" */
 #ifdef __cplusplus
