@@ -70,10 +70,10 @@ if (SAIL_STATIC)
 
     # Generate a 'whole archive' expression per compiler
     #
-    set(SAIL_ALLOWED_COMPILERS MSVC Clang AppleClang GNU)
-    list(FIND SAIL_ALLOWED_COMPILERS ${CMAKE_C_COMPILER_ID} SAIL_ALLOWED_COMPILERS_INDEX)
+    set(ALLOWED_COMPILERS "MSVC" "Clang" "AppleClang" "GNU")
+    list(FIND ALLOWED_COMPILERS ${CMAKE_C_COMPILER_ID} ALLOWED_COMPILERS_INDEX)
 
-    if (SAIL_ALLOWED_COMPILERS_INDEX LESS 0)
+    if (ALLOWED_COMPILERS_INDEX LESS 0)
         message(FATAL_ERROR "Don't know how to build a compiler option for '${CMAKE_C_COMPILER_ID}'")
     endif()
 
