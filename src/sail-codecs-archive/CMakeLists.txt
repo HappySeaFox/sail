@@ -51,78 +51,46 @@ foreach(codec ${ENABLED_CODECS})
     list(APPEND SAIL_CODECS_LIBS $<TARGET_OBJECTS:sail-codec-${codec}>)
 endforeach()
 
+# Figure out which of the codecs' dependencies are object libraries (to be combined) and
+# which are external dependencies (to be linked against).
+#
+set(SAIL_CODECS_DEPENDENCIES "sail-common")
+
+foreach (codec ${ENABLED_CODECS})
+    get_target_property(CODEC_LINK_LIBRARIES sail-codec-${codec} LINK_LIBRARIES)
+
+    foreach (codec_dependency ${CODEC_LINK_LIBRARIES})
+        set(IS_OBJECT_LIBRARY FALSE)
+        if (TARGET ${codec_dependency})
+            get_target_property(IS_OBJECT_LIBRARY ${codec_dependency} SAIL_COMMON_OBJECT_LIBRARY)
+        endif()
+
+        if (IS_OBJECT_LIBRARY)
+            list(APPEND SAIL_CODECS_LIBS $<TARGET_OBJECTS:${codec_dependency}>)
+        else()
+            list(APPEND SAIL_CODECS_DEPENDENCIES ${codec_dependency})
+        endif()
+    endforeach()
+endforeach()
+
+list(REMOVE_DUPLICATES SAIL_CODECS_LIBS)
+
 # Add a combined library
 #
-if (SAIL_STATIC)
-    add_library(sail-codecs-objects ${SAIL_CODECS_LIBS})
-    target_link_libraries(sail-codecs-objects PRIVATE sail-common)
+add_library(sail-codecs ${CMAKE_CURRENT_BINARY_DIR}/enabled_codecs.c ${SAIL_CODECS_LIBS})
 
-    sail_install_pdb(TARGET sail-codecs-objects)
+# Link against all the external dependencies of sail-codecs
+#
+target_link_libraries(sail-codecs PRIVATE ${SAIL_CODECS_DEPENDENCIES})
 
-    # Add an extra library to link against it with a special 'whole archive' option.
-    # Without that option compilers throw functions away as they think they're unreferenced.
-    # We use dlsym/GetProcAddress to access them.
-    #
-    add_library(sail-codecs ${CMAKE_CURRENT_BINARY_DIR}/enabled_codecs.c)
-    target_link_libraries(sail-codecs PRIVATE sail-common)
+sail_install_pdb(TARGET sail-codecs)
 
-    sail_install_pdb(TARGET sail-codecs)
-
-    # Generate a 'whole archive' expression per compiler
-    #
-    set(SAIL_ALLOWED_COMPILERS MSVC Clang AppleClang GNU)
-    list(FIND SAIL_ALLOWED_COMPILERS ${CMAKE_C_COMPILER_ID} SAIL_ALLOWED_COMPILERS_INDEX)
-
-    if (SAIL_ALLOWED_COMPILERS_INDEX LESS 0)
-        message(FATAL_ERROR "Don't know how to build a compiler option for '${CMAKE_C_COMPILER_ID}'")
-    endif()
-
-    target_link_libraries(
-        sail-codecs
-        PRIVATE
-            $<BUILD_INTERFACE:$<$<C_COMPILER_ID:MSVC>:-WHOLEARCHIVE:$<TARGET_FILE:sail-codecs-objects>>>
-            $<BUILD_INTERFACE:$<$<C_COMPILER_ID:Clang>:-Wl,-force_load,$<TARGET_FILE:sail-codecs-objects>>>
-            $<BUILD_INTERFACE:$<$<C_COMPILER_ID:AppleClang>:-Wl,-force_load,$<TARGET_FILE:sail-codecs-objects>>>
-            $<BUILD_INTERFACE:$<$<C_COMPILER_ID:GNU>:-Wl,--whole-archive\ $<TARGET_FILE:sail-codecs-objects>\ -Wl,--no-whole-archive>>
-            $<INSTALL_INTERFACE:$<$<C_COMPILER_ID:MSVC>:-WHOLEARCHIVE:$<TARGET_FILE:SAIL::sail-codecs-objects>>>
-            $<INSTALL_INTERFACE:$<$<C_COMPILER_ID:Clang>:-Wl,-force_load,$<TARGET_FILE:SAIL::sail-codecs-objects>>>
-            $<INSTALL_INTERFACE:$<$<C_COMPILER_ID:AppleClang>:-Wl,-force_load,$<TARGET_FILE:SAIL::sail-codecs-objects>>>
-            $<INSTALL_INTERFACE:$<$<C_COMPILER_ID:GNU>:-Wl,--whole-archive\ $<TARGET_FILE:SAIL::sail-codecs-objects>\ -Wl,--no-whole-archive>>
-    )
-
-    # Link all the enabled codecs dependencies into sail-codecs
-    #
-    foreach(codec ${ENABLED_CODECS})
-        get_target_property(CODEC_LINK_LIBRARIES sail-codec-${codec} LINK_LIBRARIES)
-        target_link_libraries(sail-codecs PRIVATE $<BUILD_INTERFACE:${CODEC_LINK_LIBRARIES}>)
-    endforeach()
-
-    install(TARGETS sail-codecs-objects sail-codecs
-            EXPORT SailCodecsTargets
-            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-            PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/sail/sail-codecs)
-else()
-    add_library(sail-codecs ${CMAKE_CURRENT_BINARY_DIR}/enabled_codecs.c ${SAIL_CODECS_LIBS})
-    target_link_libraries(sail-codecs PRIVATE sail-common)
-
-    sail_install_pdb(TARGET sail-codecs)
-
-    # Link all the enabled codecs dependencies into sail-codecs
-    #
-    foreach(codec ${ENABLED_CODECS})
-        get_target_property(CODEC_LINK_LIBRARIES sail-codec-${codec} LINK_LIBRARIES)
-        target_link_libraries(sail-codecs PRIVATE ${CODEC_LINK_LIBRARIES})
-    endforeach()
-
-    install(TARGETS sail-codecs
-            EXPORT SailCodecsTargets
-            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-            PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/sail/sail-codecs)
-endif()
+install(TARGETS sail-codecs
+        EXPORT SailCodecsTargets
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/sail/sail-codecs)
 
 target_include_directories(sail-codecs PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../libsail)
 
