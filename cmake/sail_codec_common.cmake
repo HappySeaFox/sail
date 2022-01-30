@@ -6,8 +6,6 @@ macro(sail_codec_common)
 
     if (SAIL_COMBINE_CODECS)
         add_library(${SAIL_CODEC_COMMON_NAME} OBJECT ${SAIL_CODEC_COMMON_SOURCES})
-        set_target_properties(${SAIL_CODEC_COMMON_NAME} PROPERTIES
-                SAIL_COMMON_OBJECT_LIBRARY TRUE)
 
     else()
         add_library(${SAIL_CODEC_COMMON_NAME} STATIC ${SAIL_CODEC_COMMON_SOURCES})
