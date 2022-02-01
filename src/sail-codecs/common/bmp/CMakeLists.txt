@@ -1,4 +1,4 @@
-add_library(bmp-common STATIC
+add_library(bmp-common OBJECT
                 helpers.h
                 helpers.c
                 bmp.h

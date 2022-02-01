@@ -82,12 +82,6 @@ else()
     add_library(sail-codecs ${CMAKE_CURRENT_BINARY_DIR}/enabled_codecs.c)
     target_link_libraries(sail-codecs PRIVATE sail-common)
 
-    # External dependencies like libavif are exported through interfaces, grab them
-    #
-    foreach(CODEC ${ENABLED_CODECS})
-        target_link_libraries(sail-codecs INTERFACE $<BUILD_INTERFACE:sail-codec-${CODEC}>)
-    endforeach()
-
     sail_install_pdb(TARGET sail-codecs)
 
     # Generate a 'whole archive' expression per compiler
@@ -111,6 +105,12 @@ else()
             $<INSTALL_INTERFACE:$<$<C_COMPILER_ID:AppleClang>:-Wl,-force_load,$<TARGET_FILE:SAIL::sail-codecs-objects>>>
             $<INSTALL_INTERFACE:$<$<C_COMPILER_ID:GNU>:-Wl,--whole-archive\ $<TARGET_FILE:SAIL::sail-codecs-objects>\ -Wl,--no-whole-archive>>
     )
+
+    # External dependencies like libavif are exported through interfaces, grab them
+    #
+    foreach(CODEC ${ENABLED_CODECS})
+        target_link_libraries(sail-codecs INTERFACE $<BUILD_INTERFACE:sail-codec-${CODEC}>)
+    endforeach()
 
     install(TARGETS sail-codecs-objects sail-codecs
             EXPORT SailCodecsTargets
