@@ -34,7 +34,14 @@ jobs:
           - extra/B
     - os: linux
       dist: focal
-      name: "Ubuntu 20.04 Focal"
+      name: "Ubuntu 20.04 Focal [SHARED]"
+      env:
+        - BUILD_SHARED_LIBS="ON"
+    - os: linux
+      dist: focal
+      name: "Ubuntu 20.04 Focal [STATIC]"
+      env:
+        - BUILD_SHARED_LIBS="OFF"
     - os: osx
       osx_image: xcode12.5
       name: "macOS 11.3"
@@ -80,7 +87,7 @@ script:
 
       CMAKE_INSTALL_PREFIX="C:/SAIL"
 
-      fail_on_error cmake -A x64 -DCMAKE_INSTALL_PREFIX="$CMAKE_INSTALL_PREFIX" -DSAIL_DEV=ON ..
+      fail_on_error cmake -A x64 -DBUILD_SHARED_LIBS="${BUILD_SHARED_LIBS:-ON}" -DCMAKE_INSTALL_PREFIX="$CMAKE_INSTALL_PREFIX" -DSAIL_DEV=ON ..
       fail_on_error cmake --build . --config Debug --target install
 
       cd tests
@@ -94,7 +101,7 @@ script:
 
       CMAKE_INSTALL_PREFIX="/usr/local"
 
-      fail_on_error cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX="$CMAKE_INSTALL_PREFIX" -DSAIL_DEV=ON ..
+      fail_on_error cmake -DBUILD_SHARED_LIBS="${BUILD_SHARED_LIBS:-ON}" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX="$CMAKE_INSTALL_PREFIX" -DSAIL_DEV=ON ..
       fail_on_error cmake --build .
       fail_on_error sudo make install
 
