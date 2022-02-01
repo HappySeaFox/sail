@@ -23,6 +23,8 @@
     SOFTWARE.
 */
 
+#include "sail-common.h"
+
 /*
  * The only purpose of this file is to create an empty sail-codecs-objects library
  * in static mode. Why it's needed:
@@ -30,6 +32,9 @@
  * We create sail-codecs-objects library to hold all codecs objects without any
  * additional source files. CMake doesn't allow creating libraries without sources
  * initially, so we need to specify any source file in add_library().
+ *
+ * Export the function to make compilers happy so they don't complain on unused functions.
+ * The function is not used in SAIL.
  */
-static void sail_codec_objects_stub_function_for_static_build(void) {
+SAIL_EXPORT void sail_codecs_objects_stub_function_for_static_build(void) {
 }

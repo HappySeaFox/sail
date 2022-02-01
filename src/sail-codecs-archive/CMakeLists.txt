@@ -64,6 +64,7 @@ if (BUILD_SHARED_LIBS)
             PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/sail/sail-codecs)
 else()
     add_library(sail-codecs-objects codecs_objects_stub.c)
+    target_link_libraries(sail-codecs-objects PRIVATE sail-common)
 
     # BUILD_INTERFACE is needed as CMake tries to export all the sail-codec-${CODEC} dependencies
     # in the below install(TARGETS) command even though they are OBJECT libraries. This is why we also
