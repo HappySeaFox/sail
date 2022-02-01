@@ -22,7 +22,6 @@ Consider [EXAMPLES](EXAMPLES.md) after building and installing.
 - `SAIL_THIRD_PARTY_CODECS_PATH=ON|OFF` - Enable loading custom codecs from the ';'-separated paths specified in the `SAIL_THIRD_PARTY_CODECS_PATH` environment variable. Default: `ON`
 - `SAIL_ONLY_CODECS="a;b;c"` - Enable only the codecs specified in this ';'-separated list.
   Codecs with missing dependencies will be disabled regardless this setting. Default: empty list
-- `SAIL_STATIC=ON|OFF` - Enable static build. Default: `OFF`
 
 ### VCPKG
 

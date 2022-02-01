@@ -61,7 +61,7 @@ See [BUILDING](BUILDING.md).
 
 ## Does SAIL support static linking?
 
-Yes. Compile with `-DSAIL_STATIC=ON`. This automatically enables `SAIL_COMBINE_CODECS`.
+Yes. Compile with `-DBUILD_SHARED_LIBS=OFF`. This automatically enables `SAIL_COMBINE_CODECS`.
 
 ## What are the competitors of SAIL?
 

@@ -48,8 +48,12 @@
 /* Do we compile for VCPKG (port or client)? */
 #cmakedefine SAIL_VCPKG
 
-/* Build static libs. */
-#cmakedefine SAIL_STATIC
+/* Build static libs. SAIL_SHARED_[ON|OFF] is a helper macro, use SAIL_STATIC instead. */
+#define SAIL_SHARED_@BUILD_SHARED_LIBS@
+
+#ifdef SAIL_SHARED_OFF
+    #define SAIL_STATIC
+#endif
 
 /* Combine all codecs into a single library. */
 #cmakedefine SAIL_COMBINE_CODECS

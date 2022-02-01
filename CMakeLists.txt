@@ -66,16 +66,10 @@ set(SAIL_EXCEPT_CODECS "" CACHE STRING "Disable the codecs specified in this ';'
 A codec specified in this setting remains disabled even if it's also specified in SAIL_ONLY_CODECS.")
 set(SAIL_ONLY_CODECS "" CACHE STRING "Enable only the codecs specified in this ';'-separated list. \
 Codecs with missing dependencies will be disabled regardless this setting.")
-option(SAIL_STATIC "Build static libs. When enabled, sets SAIL_COMBINE_CODECS to ON." OFF)
-cmake_dependent_option(SAIL_COMBINE_CODECS "Combine all codecs into a single library." OFF "NOT SAIL_STATIC" ON)
+option(BUILD_SHARED_LIBS "Build shared libs. When disabled, sets SAIL_COMBINE_CODECS to ON." ON)
+cmake_dependent_option(SAIL_COMBINE_CODECS "Combine all codecs into a single library." OFF "BUILD_SHARED_LIBS" ON)
 option(SAIL_THIRD_PARTY_CODECS_PATH "Enable loading third-party codecs from the ';'-separated paths specified in \
 the SAIL_THIRD_PARTY_CODECS_PATH environment variable." ON)
-
-if (SAIL_STATIC)
-    set(BUILD_SHARED_LIBS OFF)
-else()
-    set(BUILD_SHARED_LIBS ON)
-endif()
 
 # When we compile for VCPKG, VCPKG_TARGET_TRIPLET is defined
 #
@@ -291,7 +285,7 @@ message("*")
 message("* SAIL version:                 ${PROJECT_VERSION}")
 message("* Developer mode:               ${SAIL_DEV}")
 message("* VCPKG mode:                   ${SAIL_VCPKG}")
-message("* Static build:                 ${SAIL_STATIC}")
+message("* Shared build:                 ${BUILD_SHARED_LIBS}")
 message("*   Combine codecs [*]:         ${SAIL_COMBINE_CODECS}")
 message("* SAIL_THIRD_PARTY_CODECS_PATH: ${SAIL_THIRD_PARTY_CODECS_PATH}")
 message("* Build apps:                   ${SAIL_BUILD_APPS}")
@@ -301,7 +295,7 @@ message("* Build tests:                  ${SAIL_BUILD_TESTS}")
 message("* Colored output:               ${SAIL_COLORED_OUTPUT}${SAIL_COLORED_OUTPUT_CLARIFY}")
 message("*")
 message("* [*] - these options depend on other options, their values may be altered by CMake.")
-message("*       For example, if you configure with -DSAIL_STATIC=ON -DSAIL_COMBINE_CODECS=OFF,")
+message("*       For example, if you configure with -DBUILD_SHARED_LIBS=OFF -DSAIL_COMBINE_CODECS=OFF,")
 message("*       the final value of SAIL_COMBINE_CODECS will be ON.")
 message("*")
 message("* Install prefix:               ${CMAKE_INSTALL_PREFIX}")

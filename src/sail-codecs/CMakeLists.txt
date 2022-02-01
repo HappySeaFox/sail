@@ -42,7 +42,7 @@ endforeach()
 
 # Export extra dependencies like giflib for static builds to the parent scope
 #
-if (SAIL_STATIC)
+if (NOT BUILD_SHARED_LIBS)
     foreach (dependency IN LISTS SAIL_CODECS_FIND_DEPENDENCIES)
         string(REPLACE "," ";" dependency ${dependency})
         list(GET dependency 0 dependency_search_mechanism)

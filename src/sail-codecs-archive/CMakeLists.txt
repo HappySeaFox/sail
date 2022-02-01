@@ -53,7 +53,26 @@ endforeach()
 
 # Add a combined library
 #
-if (SAIL_STATIC)
+if (BUILD_SHARED_LIBS)
+    add_library(sail-codecs ${CMAKE_CURRENT_BINARY_DIR}/enabled_codecs.c ${SAIL_CODECS_LIBS})
+    target_link_libraries(sail-codecs PRIVATE sail-common)
+
+    sail_install_pdb(TARGET sail-codecs)
+
+    # Link all the enabled codecs dependencies into sail-codecs
+    #
+    foreach(codec ${ENABLED_CODECS})
+        get_target_property(CODEC_LINK_LIBRARIES sail-codec-${codec} LINK_LIBRARIES)
+        target_link_libraries(sail-codecs PRIVATE ${CODEC_LINK_LIBRARIES})
+    endforeach()
+
+    install(TARGETS sail-codecs
+            EXPORT SailCodecsTargets
+            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+            PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/sail/sail-codecs)
+else()
     add_library(sail-codecs-objects ${SAIL_CODECS_LIBS})
     target_link_libraries(sail-codecs-objects PRIVATE sail-common)
 
@@ -98,25 +117,6 @@ if (SAIL_STATIC)
     endforeach()
 
     install(TARGETS sail-codecs-objects sail-codecs
-            EXPORT SailCodecsTargets
-            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-            PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/sail/sail-codecs)
-else()
-    add_library(sail-codecs ${CMAKE_CURRENT_BINARY_DIR}/enabled_codecs.c ${SAIL_CODECS_LIBS})
-    target_link_libraries(sail-codecs PRIVATE sail-common)
-
-    sail_install_pdb(TARGET sail-codecs)
-
-    # Link all the enabled codecs dependencies into sail-codecs
-    #
-    foreach(codec ${ENABLED_CODECS})
-        get_target_property(CODEC_LINK_LIBRARIES sail-codec-${codec} LINK_LIBRARIES)
-        target_link_libraries(sail-codecs PRIVATE ${CODEC_LINK_LIBRARIES})
-    endforeach()
-
-    install(TARGETS sail-codecs
             EXPORT SailCodecsTargets
             ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
             LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}

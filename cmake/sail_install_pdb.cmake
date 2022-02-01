@@ -3,7 +3,7 @@
 macro(sail_install_pdb)
     cmake_parse_arguments(SAIL_INSTALL_PDB "" "TARGET;RENAME" "" ${ARGN})
 
-    if (MSVC AND NOT SAIL_STATIC)
+    if (MSVC AND BUILD_SHARED_LIBS)
         if (SAIL_INSTALL_PDB_RENAME)
             install(FILES $<TARGET_PDB_FILE:${SAIL_INSTALL_PDB_TARGET}> DESTINATION bin RENAME ${SAIL_INSTALL_PDB_RENAME} OPTIONAL)
         else()
