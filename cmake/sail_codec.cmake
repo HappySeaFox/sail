@@ -71,6 +71,7 @@ macro(sail_codec)
     foreach (LINK_DEPENDENCY ${SAIL_CODEC_LINK})
         if (TARGET ${LINK_DEPENDENCY})
             get_target_property(TARGET_TYPE ${LINK_DEPENDENCY} TYPE)
+
             if (TARGET_TYPE STREQUAL "OBJECT_LIBRARY")
                 target_sources(${TARGET} INTERFACE $<TARGET_OBJECTS:${LINK_DEPENDENCY}>)
             endif()
