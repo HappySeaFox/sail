@@ -107,6 +107,11 @@ else()
             $<INSTALL_INTERFACE:$<$<C_COMPILER_ID:GNU>:-Wl,--whole-archive\ $<TARGET_FILE:SAIL::sail-codecs-objects>\ -Wl,--no-whole-archive>>
     )
 
+    # sail-codecs depends on sail-codecs-objects indirectly through the above link command.
+    # Make the dependency explicit.
+    #
+    add_dependencies(sail-codecs sail-codecs-objects)
+
     # External dependencies like libavif are exported through interfaces, grab them
     #
     foreach(CODEC ${ENABLED_CODECS})
