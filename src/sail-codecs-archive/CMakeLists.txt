@@ -44,27 +44,17 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/enabled_codecs.c.in
                ${CMAKE_CURRENT_BINARY_DIR}/enabled_codecs.c
                @ONLY)
 
-# Link all the enabled codecs into sail-codecs
-#
-set(SAIL_CODECS_LIBS "")
-foreach(codec ${ENABLED_CODECS})
-    list(APPEND SAIL_CODECS_LIBS $<TARGET_OBJECTS:sail-codec-${codec}>)
-endforeach()
-
 # Add a combined library
 #
 if (BUILD_SHARED_LIBS)
-    add_library(sail-codecs ${CMAKE_CURRENT_BINARY_DIR}/enabled_codecs.c ${SAIL_CODECS_LIBS})
+    add_library(sail-codecs ${CMAKE_CURRENT_BINARY_DIR}/enabled_codecs.c)
     target_link_libraries(sail-codecs PRIVATE sail-common)
 
-    sail_install_pdb(TARGET sail-codecs)
-
-    # Link all the enabled codecs dependencies into sail-codecs
-    #
-    foreach(codec ${ENABLED_CODECS})
-        get_target_property(CODEC_LINK_LIBRARIES sail-codec-${codec} LINK_LIBRARIES)
-        target_link_libraries(sail-codecs PRIVATE ${CODEC_LINK_LIBRARIES})
+    foreach(CODEC ${ENABLED_CODECS})
+        target_link_libraries(sail-codecs PRIVATE $<BUILD_INTERFACE:sail-codec-${CODEC}>)
     endforeach()
+
+    sail_install_pdb(TARGET sail-codecs)
 
     install(TARGETS sail-codecs
             EXPORT SailCodecsTargets
@@ -73,8 +63,16 @@ if (BUILD_SHARED_LIBS)
             RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
             PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/sail/sail-codecs)
 else()
-    add_library(sail-codecs-objects ${SAIL_CODECS_LIBS})
+    add_library(sail-codecs-objects codecs_objects_stub.c)
     target_link_libraries(sail-codecs-objects PRIVATE sail-common)
+
+    # BUILD_INTERFACE is needed as CMake tries to export all the sail-codec-${CODEC} dependencies
+    # in the below install(TARGETS) command even though they are OBJECT libraries. This is why we also
+    # use target_link_libraries(sail-codecs INTERFACE ...) later.
+    #
+    foreach(CODEC ${ENABLED_CODECS})
+        target_link_libraries(sail-codecs-objects PRIVATE $<BUILD_INTERFACE:sail-codec-${CODEC}>)
+    endforeach()
 
     sail_install_pdb(TARGET sail-codecs-objects)
 
@@ -109,11 +107,15 @@ else()
             $<INSTALL_INTERFACE:$<$<C_COMPILER_ID:GNU>:-Wl,--whole-archive\ $<TARGET_FILE:SAIL::sail-codecs-objects>\ -Wl,--no-whole-archive>>
     )
 
-    # Link all the enabled codecs dependencies into sail-codecs
+    # sail-codecs depends on sail-codecs-objects indirectly through the above link command.
+    # Make the dependency explicit.
     #
-    foreach(codec ${ENABLED_CODECS})
-        get_target_property(CODEC_LINK_LIBRARIES sail-codec-${codec} LINK_LIBRARIES)
-        target_link_libraries(sail-codecs PRIVATE $<BUILD_INTERFACE:${CODEC_LINK_LIBRARIES}>)
+    add_dependencies(sail-codecs sail-codecs-objects)
+
+    # External dependencies like libavif are exported through interfaces, grab them
+    #
+    foreach(CODEC ${ENABLED_CODECS})
+        target_link_libraries(sail-codecs INTERFACE $<BUILD_INTERFACE:sail-codec-${CODEC}>)
     endforeach()
 
     install(TARGETS sail-codecs-objects sail-codecs

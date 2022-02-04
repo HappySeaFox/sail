@@ -60,6 +60,28 @@ macro(sail_codec)
     #
     target_link_libraries(${TARGET} PRIVATE ${SAIL_CODEC_LINK})
 
+    # This hack is needed for static builds where we have the following dependencies
+    # ("->" is "links to"):
+    #
+    # sail-codecs-objects -> bmp -> bmp-common
+    #
+    # When object libraries (bmp) link to other object libraries (bmp-common), CMake pulls
+    # just their usage requirements, but not the actual objects. So sail-codecs-objects never
+    # contains the bmp-common objects which leads to a linking error. We pull the dependent
+    # objects and export them to the outer world explicitly.
+    #
+    # See also https://gitlab.kitware.com/cmake/cmake/-/issues/18090
+    #
+    foreach (LINK_DEPENDENCY ${SAIL_CODEC_LINK})
+        if (TARGET ${LINK_DEPENDENCY})
+            get_target_property(TARGET_TYPE ${LINK_DEPENDENCY} TYPE)
+
+            if (TARGET_TYPE STREQUAL "OBJECT_LIBRARY")
+                target_sources(${TARGET} INTERFACE $<TARGET_OBJECTS:${LINK_DEPENDENCY}>)
+            endif()
+        endif()
+    endforeach()
+
     if (COMMAND sail_codec_post_add)
         sail_codec_post_add()
     endif()
