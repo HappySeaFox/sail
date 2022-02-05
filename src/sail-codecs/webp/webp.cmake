@@ -18,8 +18,11 @@ macro(sail_find_dependencies)
     # This will add the following CMake rules to the CMake config for static builds so a client
     # application links against the required dependencies:
     #
-    # find_dependency(WebP REQUIRED)
-    # set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES WebP::webp WebP::webpdemux)
+    # find_library(webp_RELEASE_LIBRARY NAMES webp)
+    # find_library(webp_DEBUG_LIBRARY NAMES webpd webp)
+    # set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES $<$<CONFIG:Release>:${webp_RELEASE_LIBRARY}> $<$<CONFIG:Debug>:${webp_DEBUG_LIBRARY}>)
     #
-    set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_dependency,WebP,WebP::webp WebP::webpdemux" PARENT_SCOPE)
+    # Same to webpdemux.
+    #
+    set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,webp,webpd" "find_library,webpdemux,webpdemuxd" PARENT_SCOPE)
 endmacro()
