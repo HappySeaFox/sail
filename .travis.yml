@@ -34,15 +34,6 @@ jobs:
       cache:
         directories:
           - extra/B
-    - os: windows
-      name: "Windows Server [STATIC;DEBUG]"
-      env:
-        - PATH="/c/SAIL/bin:$PATH"
-        - BUILD_SHARED_LIBS="OFF"
-        - CMAKE_BUILD_TYPE="Debug"
-      cache:
-        directories:
-          - extra/B
     - os: linux
       dist: focal
       name: "Ubuntu 20.04 Focal [SHARED;DEBUG]"
