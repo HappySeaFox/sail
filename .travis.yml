@@ -117,6 +117,7 @@ script:
   {
     local project_path="$1"
     local build_type="$2"
+    local exe="$3"
 
     echo
     echo "External Unix Test '$project_path' '$build_type'"
@@ -130,6 +131,7 @@ script:
 
     fail_on_error cmake -DCMAKE_BUILD_TYPE="$build_type" ..
     fail_on_error cmake --build .
+    fail_on_error "$exe"
   }
 
   # Defaults
@@ -177,7 +179,7 @@ script:
 
       fail_on_error "$CMAKE_INSTALL_PREFIX/bin/sail" --version
 
-      test_external_unix "tests/external/link/c"   "$CMAKE_BUILD_TYPE"
-      test_external_unix "tests/external/link/c++" "$CMAKE_BUILD_TYPE"
+      test_external_unix "tests/external/link/c"   "$CMAKE_BUILD_TYPE" "./external-c-api-link"
+      test_external_unix "tests/external/link/c++" "$CMAKE_BUILD_TYPE" "./external-c++-api-link"
     ;;
   esac
