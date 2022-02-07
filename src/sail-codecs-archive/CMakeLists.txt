@@ -50,8 +50,7 @@ add_library(sail-codecs ${CMAKE_CURRENT_BINARY_DIR}/enabled_codecs.c)
 target_link_libraries(sail-codecs PRIVATE sail-common)
 
 # BUILD_INTERFACE is needed as CMake tries to export all the sail-codec-${CODEC} dependencies
-# in the below install(TARGETS) command even though they are OBJECT libraries. This is why we also
-# use target_link_libraries(sail-codecs INTERFACE ...) later.
+# in the below install(TARGETS) command even though they are OBJECT libraries.
 #
 foreach(CODEC ${ENABLED_CODECS})
     target_link_libraries(sail-codecs PRIVATE $<BUILD_INTERFACE:sail-codec-${CODEC}>)
