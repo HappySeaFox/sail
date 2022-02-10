@@ -79,7 +79,7 @@ public:
 
     /*
      * Constructs a new image out of the specified image properties and the shallow pixels.
-     * Assumes the pixels have no extra bytes in the end of every scan line. The pixels
+     * Assumes the pixels have no padding bytes in the end of every scan line. The pixels
      * must remain valid as long as the image exists.
      */
     image(void *pixels, SailPixelFormat pixel_format, unsigned width, unsigned height);
@@ -248,46 +248,25 @@ public:
     const sail::source_image& source_image() const;
 
     /*
-     * Returns the editable pixel data if any. Images hold deep copied or shallow data, but not both.
+     * Returns the editable pixel data if any.
      *
      * READ:  Set by SAIL to valid pixel data.
-     * WRITE: Must be set by a caller to valid pixel data using with_pixels() or with_shallow_pixels().
+     * WRITE: Must be set by a caller to valid pixel data.
      */
     void* pixels();
 
     /*
-     * Returns the constant pixel data if any. Images hold deep copied or shallow data, but not both.
+     * Returns the constant pixel data if any.
      *
      * READ:  Set by SAIL to valid pixel data.
-     * WRITE: Must be set by a caller to valid pixel data using with_pixels() or with_shallow_pixels().
+     * WRITE: Must be set by a caller to valid pixel data.
      */
     const void* pixels() const;
 
     /*
-     * Returns the size of the deep copied pixel data in bytes.
+     * Returns the size of the pixel data in bytes.
      */
     unsigned pixels_size() const;
-
-    /*
-     * Sets a new width.
-     */
-    image& with_width(unsigned width);
-
-    /*
-     * Sets a new height.
-     */
-    image& with_height(unsigned height);
-
-    /*
-     * Sets a new bytes-per-line value.
-     */
-    image& with_bytes_per_line(unsigned bytes_per_line);
-
-    /*
-     * Calculates bytes-per-line automatically based on the image width
-     * and the pixel format. These two properties must be set beforehand.
-     */
-    image& with_bytes_per_line_auto();
 
     /*
      * Sets a new resolution.
@@ -323,36 +302,6 @@ public:
      * Appends the meta data entry to the image meta data.
      */
     image& with_meta_data(const sail::meta_data &meta_data);
-
-    /*
-     * Deep copies the specified pixel data. The data can be accessed later with pixels().
-     * The size of the pixel data is calculated based on the image height, bytes per line, and the pixel
-     * format which must be set beforehand. The deep copied data is deleted upon image destruction.
-     */
-    image& with_pixels(const void *pixels);
-
-    /*
-     * Deep copies the specified pixel data and stores its size. The data can be accessed later with pixels().
-     * The deep copied data is deleted upon image destruction.
-     */
-    image& with_pixels(const void *pixels, unsigned pixels_size);
-
-    /*
-     * Stores the pointer to the external pixel data. Frees the previously stored deep-copied pixel data.
-     * The pixel data must remain valid until the image exists. The shallow data is not deleted upon
-     * image destruction.
-     *
-     * The size of the pixel data is calculated based on the image height, bytes per line, and the pixel
-     * format which must be set beforehand.
-     */
-    image& with_shallow_pixels(void *pixels);
-
-    /*
-     * Stores the pointer to the external pixel data and stores its size. Frees the previously stored
-     * deep-copied pixel data. The pixel data must remain valid until the image exists. The shallow data
-     * is not deleted upon image destruction.
-     */
-    image& with_shallow_pixels(void *pixels, unsigned pixels_size);
 
     /*
      * Sets a new ICC profile.
@@ -728,6 +677,14 @@ private:
 
     sail_status_t to_sail_image(sail_image **image) const;
 
+    image& with_width(unsigned width);
+    image& with_height(unsigned height);
+    image& with_bytes_per_line(unsigned bytes_per_line);
+    image& with_bytes_per_line_auto();
+    image& with_pixels(const void *pixels);
+    image& with_pixels(const void *pixels, unsigned pixels_size);
+    image& with_shallow_pixels(void *pixels);
+    image& with_shallow_pixels(void *pixels, unsigned pixels_size);
     image& with_properties(int properties);
     image& with_source_image(const sail::source_image &source_image);
 

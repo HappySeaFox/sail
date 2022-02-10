@@ -245,32 +245,6 @@ unsigned image::pixels_size() const
     return d->pixels_size;
 }
 
-image& image::with_width(unsigned width)
-{
-    d->sail_image->width = width;
-    return *this;
-}
-
-image& image::with_height(unsigned height)
-{
-    d->sail_image->height = height;
-    return *this;
-}
-
-image& image::with_bytes_per_line(unsigned bytes_per_line)
-{
-    d->sail_image->bytes_per_line = bytes_per_line;
-    return *this;
-}
-
-image& image::with_bytes_per_line_auto()
-{
-    unsigned bytes_per_line = 0;
-    image::bytes_per_line(d->sail_image->width, d->sail_image->pixel_format, &bytes_per_line);
-
-    return with_bytes_per_line(bytes_per_line);
-}
-
 image& image::with_resolution(const sail::resolution &resolution)
 {
     d->resolution = resolution;
@@ -310,53 +284,6 @@ image& image::with_meta_data(const std::vector<sail::meta_data> &meta_data)
 image& image::with_meta_data(const sail::meta_data &meta_data)
 {
     d->meta_data.push_back(meta_data);
-    return *this;
-}
-
-image& image::with_pixels(const void *pixels)
-{
-    with_pixels(pixels, height() * bytes_per_line());
-
-    return *this;
-}
-
-image& image::with_pixels(const void *pixels, unsigned pixels_size)
-{
-    d->reset_pixels();
-
-    if (pixels == nullptr || pixels_size == 0) {
-        return *this;
-    }
-
-    SAIL_TRY_OR_EXECUTE(sail_malloc(pixels_size, &d->sail_image->pixels),
-                        /* on error */ return *this);
-
-    memcpy(d->sail_image->pixels, pixels, pixels_size);
-    d->pixels_size    = pixels_size;
-    d->shallow_pixels = false;
-
-    return *this;
-}
-
-image& image::with_shallow_pixels(void *pixels)
-{
-    with_shallow_pixels(pixels, height() * bytes_per_line());
-
-    return *this;
-}
-
-image& image::with_shallow_pixels(void *pixels, unsigned pixels_size)
-{
-    d->reset_pixels();
-
-    if (pixels == nullptr || pixels_size == 0) {
-        return *this;
-    }
-
-    d->sail_image->pixels = pixels;
-    d->pixels_size        = pixels_size;
-    d->shallow_pixels     = true;
-
     return *this;
 }
 
@@ -799,6 +726,79 @@ sail_status_t image::to_sail_image(sail_image **image) const
     image_local = nullptr;
 
     return SAIL_OK;
+}
+
+image& image::with_width(unsigned width)
+{
+    d->sail_image->width = width;
+    return *this;
+}
+
+image& image::with_height(unsigned height)
+{
+    d->sail_image->height = height;
+    return *this;
+}
+
+image& image::with_bytes_per_line(unsigned bytes_per_line)
+{
+    d->sail_image->bytes_per_line = bytes_per_line;
+    return *this;
+}
+
+image& image::with_bytes_per_line_auto()
+{
+    unsigned bytes_per_line = 0;
+    image::bytes_per_line(d->sail_image->width, d->sail_image->pixel_format, &bytes_per_line);
+
+    return with_bytes_per_line(bytes_per_line);
+}
+
+image& image::with_pixels(const void *pixels)
+{
+    with_pixels(pixels, height() * bytes_per_line());
+
+    return *this;
+}
+
+image& image::with_pixels(const void *pixels, unsigned pixels_size)
+{
+    d->reset_pixels();
+
+    if (pixels == nullptr || pixels_size == 0) {
+        return *this;
+    }
+
+    SAIL_TRY_OR_EXECUTE(sail_malloc(pixels_size, &d->sail_image->pixels),
+                        /* on error */ return *this);
+
+    memcpy(d->sail_image->pixels, pixels, pixels_size);
+    d->pixels_size    = pixels_size;
+    d->shallow_pixels = false;
+
+    return *this;
+}
+
+image& image::with_shallow_pixels(void *pixels)
+{
+    with_shallow_pixels(pixels, height() * bytes_per_line());
+
+    return *this;
+}
+
+image& image::with_shallow_pixels(void *pixels, unsigned pixels_size)
+{
+    d->reset_pixels();
+
+    if (pixels == nullptr || pixels_size == 0) {
+        return *this;
+    }
+
+    d->sail_image->pixels = pixels;
+    d->pixels_size        = pixels_size;
+    d->shallow_pixels     = true;
+
+    return *this;
 }
 
 image& image::with_properties(int properties)
