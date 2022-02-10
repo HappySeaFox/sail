@@ -240,6 +240,16 @@ const void* image::pixels() const
     return d->sail_image->pixels;
 }
 
+void* image::scan_line(unsigned i)
+{
+    return reinterpret_cast<char *>(pixels()) + i * bytes_per_line();
+}
+
+const void* image::scan_line(unsigned i) const
+{
+    return reinterpret_cast<const char *>(pixels()) + i * bytes_per_line();
+}
+
 unsigned image::pixels_size() const
 {
     return d->pixels_size;

@@ -264,6 +264,16 @@ public:
     const void* pixels() const;
 
     /*
+     * Returns a pointer to the pixels scan line with index i.
+     */
+    void* scan_line(unsigned i);
+
+    /*
+     * Returns a pointer to the pixels scan line with index i.
+     */
+    const void* scan_line(unsigned i) const;
+
+    /*
      * Returns the size of the pixel data in bytes.
      */
     unsigned pixels_size() const;
