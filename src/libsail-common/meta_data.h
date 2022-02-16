@@ -184,7 +184,7 @@ SAIL_EXPORT sail_status_t sail_alloc_meta_data_from_unknown_data(const char *key
 SAIL_EXPORT void sail_destroy_meta_data(struct sail_meta_data *meta_data);
 
 /*
- * Makes a deep copy of the specified meta data node.
+ * Makes a deep copy of the specified meta data.
  *
  * Returns SAIL_OK on success.
  */
