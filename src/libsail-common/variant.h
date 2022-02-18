@@ -154,12 +154,36 @@ SAIL_EXPORT sail_status_t sail_alloc_variant_from_unsigned_long(unsigned long va
 SAIL_EXPORT sail_status_t sail_alloc_variant_from_data(void *value, size_t value_size, struct sail_variant **variant);
 
 /*
- * Allocates a new variant from the specified data buffer pointer. Makes a shallow copy of the buffer pointer.
- * Transfers the ownership of the pointer to the constructed variant.
+ * Allocates a new variant from the specified data buffer. Transfers the ownership of the data pointer
+ * to the constructed variant, i.e. makes a shallow copy.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_variant_from_data_pointer(void *value, size_t value_size, struct sail_variant **variant);
+SAIL_EXPORT sail_status_t sail_alloc_variant_from_stolen_data(void *value, size_t value_size, struct sail_variant **variant);
+
+/*
+ * Allocates a new variant from the specified string. Makes a deep copy of the string.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_alloc_variant_from_string(char *value, struct sail_variant **variant);
+
+/*
+ * Allocates a new variant from the specified string. Transfers the ownership of the string
+ * to the constructed variant, i.e. makes a shallow copy.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_alloc_variant_from_stolen_string(char *value, struct sail_variant **variant);
+
+/*
+ * Allocates a new variant from the specified substring. Makes a deep copy of the substring.
+ * The size of the substring must not include a null character. Adds a null character to the end
+ * of the constructed variant, i.e. its final size is value_size + 1.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_alloc_variant_from_substring(char *value, size_t value_size, struct sail_variant **variant);
 
 /*
  * Destroys the specified variant.
