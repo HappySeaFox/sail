@@ -55,8 +55,8 @@ enum SailVariantType {
     SAIL_VARIANT_TYPE_UNSIGNED_INT,
     SAIL_VARIANT_TYPE_LONG,
     SAIL_VARIANT_TYPE_UNSIGNED_LONG,
-    SAIL_VARIANT_TYPE_DATA,
     SAIL_VARIANT_TYPE_STRING,
+    SAIL_VARIANT_TYPE_DATA,
     SAIL_VARIANT_TYPE_USER,
     SAIL_VARIANT_TYPE_INVALID,
 };
@@ -147,21 +147,6 @@ SAIL_EXPORT sail_status_t sail_alloc_variant_from_long(long value, struct sail_v
 SAIL_EXPORT sail_status_t sail_alloc_variant_from_unsigned_long(unsigned long value, struct sail_variant **variant);
 
 /*
- * Allocates a new variant from the specified data buffer. Makes a deep copy of the buffer.
- *
- * Returns SAIL_OK on success.
- */
-SAIL_EXPORT sail_status_t sail_alloc_variant_from_data(void *value, size_t value_size, struct sail_variant **variant);
-
-/*
- * Allocates a new variant from the specified data buffer. Transfers the ownership of the data pointer
- * to the constructed variant, i.e. makes a shallow copy.
- *
- * Returns SAIL_OK on success.
- */
-SAIL_EXPORT sail_status_t sail_alloc_variant_from_adopted_data(void *value, size_t value_size, struct sail_variant **variant);
-
-/*
  * Allocates a new variant from the specified string. Makes a deep copy of the string.
  *
  * Returns SAIL_OK on success.
@@ -184,6 +169,21 @@ SAIL_EXPORT sail_status_t sail_alloc_variant_from_adopted_string(char *value, st
  * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_alloc_variant_from_substring(char *value, size_t value_size, struct sail_variant **variant);
+
+/*
+ * Allocates a new variant from the specified data buffer. Makes a deep copy of the buffer.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_alloc_variant_from_data(void *value, size_t value_size, struct sail_variant **variant);
+
+/*
+ * Allocates a new variant from the specified data buffer. Transfers the ownership of the data pointer
+ * to the constructed variant, i.e. makes a shallow copy.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_alloc_variant_from_adopted_data(void *value, size_t value_size, struct sail_variant **variant);
 
 /*
  * Destroys the specified variant.

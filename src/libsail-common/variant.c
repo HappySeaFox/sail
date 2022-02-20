@@ -125,24 +125,6 @@ sail_status_t sail_alloc_variant_from_unsigned_long(unsigned long value, struct 
     return SAIL_OK;
 }
 
-sail_status_t sail_alloc_variant_from_data(void *value, size_t value_size, struct sail_variant **variant)
-{
-    SAIL_TRY(alloc_variant(SAIL_VARIANT_TYPE_DATA, value, value_size, variant));
-
-    return SAIL_OK;
-}
-
-sail_status_t sail_alloc_variant_from_adopted_data(void *value, size_t value_size, struct sail_variant **variant)
-{
-    SAIL_TRY(sail_alloc_variant(variant));
-
-    (*variant)->value_type = SAIL_VARIANT_TYPE_DATA;
-    (*variant)->value      = value;
-    (*variant)->value_size = value_size;
-
-    return SAIL_OK;
-}
-
 sail_status_t sail_alloc_variant_from_string(char *value, struct sail_variant **variant)
 {
     SAIL_TRY(alloc_variant(SAIL_VARIANT_TYPE_STRING, value, strlen(value) + 1, variant));
@@ -167,6 +149,24 @@ sail_status_t sail_alloc_variant_from_substring(char *value, size_t value_size, 
 
     char *str = (*variant)->value;
     str[value_size] = '\0';
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_alloc_variant_from_data(void *value, size_t value_size, struct sail_variant **variant)
+{
+    SAIL_TRY(alloc_variant(SAIL_VARIANT_TYPE_DATA, value, value_size, variant));
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_alloc_variant_from_adopted_data(void *value, size_t value_size, struct sail_variant **variant)
+{
+    SAIL_TRY(sail_alloc_variant(variant));
+
+    (*variant)->value_type = SAIL_VARIANT_TYPE_DATA;
+    (*variant)->value      = value;
+    (*variant)->value_size = value_size;
 
     return SAIL_OK;
 }
