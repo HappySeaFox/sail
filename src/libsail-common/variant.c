@@ -62,9 +62,9 @@ sail_status_t sail_alloc_variant(struct sail_variant **variant) {
     SAIL_TRY(sail_malloc(sizeof(struct sail_variant), &ptr));
     *variant = ptr;
 
-    (*variant)->value_type  = SAIL_META_DATA_UNKNOWN;
+    (*variant)->value_type  = SAIL_VARIANT_TYPE_INVALID;
     (*variant)->value       = NULL;
-    (*variant)->value_size  = SAIL_VARIANT_TYPE_INVALID;
+    (*variant)->value_size  = 0;
 
     return SAIL_OK;
 }
