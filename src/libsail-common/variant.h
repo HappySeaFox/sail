@@ -72,7 +72,7 @@ struct sail_variant {
     enum SailVariantType value_type;
 
     /*
-     * Actual meta data value. value_length holds its length.
+     * Pointer to the actual variant value.
      */
     void *value;
 
@@ -159,7 +159,7 @@ SAIL_EXPORT sail_status_t sail_alloc_variant_from_data(void *value, size_t value
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_variant_from_stolen_data(void *value, size_t value_size, struct sail_variant **variant);
+SAIL_EXPORT sail_status_t sail_alloc_variant_from_adopted_data(void *value, size_t value_size, struct sail_variant **variant);
 
 /*
  * Allocates a new variant from the specified string. Makes a deep copy of the string.
@@ -174,7 +174,7 @@ SAIL_EXPORT sail_status_t sail_alloc_variant_from_string(char *value, struct sai
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_variant_from_stolen_string(char *value, struct sail_variant **variant);
+SAIL_EXPORT sail_status_t sail_alloc_variant_from_adopted_string(char *value, struct sail_variant **variant);
 
 /*
  * Allocates a new variant from the specified substring. Makes a deep copy of the substring.

@@ -132,7 +132,7 @@ sail_status_t sail_alloc_variant_from_data(void *value, size_t value_size, struc
     return SAIL_OK;
 }
 
-sail_status_t sail_alloc_variant_from_stolen_data(void *value, size_t value_size, struct sail_variant **variant)
+sail_status_t sail_alloc_variant_from_adopted_data(void *value, size_t value_size, struct sail_variant **variant)
 {
     SAIL_TRY(sail_alloc_variant(variant));
 
@@ -150,7 +150,7 @@ sail_status_t sail_alloc_variant_from_string(char *value, struct sail_variant **
     return SAIL_OK;
 }
 
-sail_status_t sail_alloc_variant_from_stolen_string(char *value, struct sail_variant **variant)
+sail_status_t sail_alloc_variant_from_adopted_string(char *value, struct sail_variant **variant)
 {
     SAIL_TRY(sail_alloc_variant(variant));
 
