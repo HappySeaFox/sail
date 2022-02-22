@@ -50,37 +50,30 @@ struct sail_variant;
  * For example:
  *
  * {
- *     key          = SAIL_META_DATA_UNKNOWN,
- *     key_unknown  = "My Data",
- *     value_type   = SAIL_META_DATA_TYPE_STRING,
- *     value        = "Data",
- *     value_length = 5
+ *     key         = SAIL_META_DATA_UNKNOWN,
+ *     key_unknown = "My Data",
+ *     value       = { SAIL_META_DATA_TYPE_STRING, "Data" } 
  * }
  *
  * {
- *     key          = SAIL_META_DATA_COMMENT,
- *     key_unknown  = NULL,
- *     value_type   = SAIL_META_DATA_TYPE_STRING,
- *     value        = "Holidays",
- *     value_length = 9
+ *     key         = SAIL_META_DATA_COMMENT,
+ *     key_unknown = NULL,
+ *     value       = { SAIL_META_DATA_TYPE_STRING, "Holidays" }
  * }
  *
  * {
- *     key          = SAIL_META_DATA_EXIF,
- *     key_unknown  = NULL,
- *     value_type   = SAIL_META_DATA_TYPE_DATA,
- *     value        = <binary data>,
- *     value_length = 2240
+ *     key         = SAIL_META_DATA_EXIF,
+ *     key_unknown = NULL,
+ *     value_type  = { SAIL_META_DATA_TYPE_DATA, <binary data> }
  * }
  *
  * Not every image codec supports key-values. For example:
  *
- *   - JPEG doesn't support keys. When you try to save key-value meta data pairs,
+ *   - JPEG doesn't support keys. When you try to save an image with meta data,
  *     only values are saved.
  *   - TIFF supports only a subset of known meta data keys (Artist, Make, Model etc.).
- *     It doesn't support unknown keys (SAIL_META_DATA_UNKNOWN). This is why TIFF never
- *     saves SAIL_META_DATA_UNKNOWN keys.
- *   - PNG supports both keys and values
+ *     It doesn't support saving unknown keys (SAIL_META_DATA_UNKNOWN).
+ *   - PNG supports both keys and values.
  *
  * When writing images, SAIL codecs don't necessarily use sail_meta_data_to_string() to convert
  * keys to string representations. PNG, for example, uses hardcoded "Raw profile type exif" key name
@@ -89,8 +82,8 @@ struct sail_variant;
 struct sail_meta_data {
 
     /*
-     * If key is SAIL_META_DATA_UNKNOWN, key_unknown contains an actual string key.
-     * If key is not SAIL_META_DATA_UNKNOWN, key_unknown is NULL.
+     * If the key is SAIL_META_DATA_UNKNOWN, key_unknown contains an actual string key.
+     * If the key is other than SAIL_META_DATA_UNKNOWN, key_unknown is NULL.
      */
     enum SailMetaData key;
     char *key_unknown;
