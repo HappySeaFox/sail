@@ -33,6 +33,8 @@ SAIL_EXPORT sail_status_t sail_compare_resolutions(const struct sail_resolution 
 
 SAIL_EXPORT sail_status_t sail_compare_palettes(const struct sail_palette *palette1, const struct sail_palette *palette2);
 
+SAIL_EXPORT sail_status_t sail_compare_variants(const struct sail_variant *variant1, const struct sail_variant *variant2);
+
 SAIL_EXPORT sail_status_t sail_compare_meta_datas(const struct sail_meta_data *meta_data1, const struct sail_meta_data *meta_data2);
 
 SAIL_EXPORT sail_status_t sail_compare_meta_data_nodes(const struct sail_meta_data_node *meta_data_node1, const struct sail_meta_data_node *meta_data_node2);

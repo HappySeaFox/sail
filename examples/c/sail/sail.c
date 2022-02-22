@@ -165,10 +165,10 @@ static sail_status_t probe_impl(const char *path) {
             meta_data_str = sail_meta_data_to_string(meta_data->key);
         }
 
-        if (meta_data->value_type == SAIL_META_DATA_TYPE_STRING) {
-            printf("%-14s: %s\n", meta_data_str, (const char *)meta_data->value);
+        if (meta_data->value->value_type == SAIL_VARIANT_TYPE_STRING) {
+            printf("%-14s: %s\n", meta_data_str, sail_variant_to_string(meta_data->value));
         } else {
-            printf("%-14s: <binary data, length: %u byte(s)>\n", meta_data_str, (unsigned)meta_data->value_length);
+            printf("%-14s: <binary data, length: %u byte(s)>\n", meta_data_str, (unsigned)meta_data->value->value_size);
         }
     }
 

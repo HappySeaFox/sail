@@ -64,6 +64,20 @@ sail_status_t sail_compare_palettes(const struct sail_palette *palette1, const s
     return SAIL_OK;
 }
 
+sail_status_t sail_compare_variants(const struct sail_variant *variant1, const struct sail_variant *variant2) {
+
+    munit_assert_not_null(variant1);
+    munit_assert_not_null(variant2);
+
+    munit_assert(variant1 != variant2);
+
+    munit_assert(variant1->value_type == variant2->value_type);
+    munit_assert_memory_equal(variant1->value_size, variant1->value, variant2->value);
+    munit_assert(variant1->value_size == variant2->value_size);
+
+    return SAIL_OK;
+}
+
 sail_status_t sail_compare_meta_datas(const struct sail_meta_data *meta_data1, const struct sail_meta_data *meta_data2) {
 
     munit_assert_not_null(meta_data1);
@@ -79,19 +93,7 @@ sail_status_t sail_compare_meta_datas(const struct sail_meta_data *meta_data1, c
         munit_assert_string_equal(meta_data1->key_unknown, meta_data2->key_unknown);
     }
 
-    munit_assert(meta_data1->value_type == meta_data2->value_type);
-
-    if (meta_data1->value_type == SAIL_META_DATA_TYPE_STRING) {
-        munit_assert_not_null(meta_data1->value);
-        munit_assert_not_null(meta_data2->value);
-        munit_assert_string_equal((const char *)meta_data1->value, (const char *)meta_data2->value);
-    } else if (meta_data1->value_type == SAIL_META_DATA_TYPE_DATA) {
-        munit_assert(meta_data1->value_length > 0);
-        munit_assert(meta_data1->value_length == meta_data2->value_length);
-        munit_assert_memory_equal(meta_data1->value_length, meta_data1->value, meta_data2->value);
-    } else {
-        munit_assert(false);
-    }
+    munit_assert(sail_compare_variants(meta_data1->value, meta_data2->value) == SAIL_OK);
 
     return SAIL_OK;
 }
