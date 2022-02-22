@@ -200,68 +200,67 @@ SAIL_EXPORT sail_status_t sail_alloc_variant_from_adopted_data(void *value, size
 SAIL_EXPORT void sail_destroy_variant(struct sail_variant *variant);
 
 /*
- * Returns the variant char value. Behavior is undefined if the variant is not valid
- * or its type is not char.
+ * Returns the variant value as a char. Behavior is undefined if the variant is invalid
+ * or its type cannot be safely converted to char.
  */
 SAIL_EXPORT char sail_variant_to_char(const struct sail_variant *variant);
 
 /*
- * Returns the variant unsigned char value. Behavior is undefined if the variant is not valid
- * or its type is not unsigned char.
+ * Returns the variant value as an unsigned char. Behavior is undefined if the variant is invalid
+ * or its type cannot be safely converted to unsigned char.
  */
 SAIL_EXPORT unsigned char sail_variant_to_unsigned_char(const struct sail_variant *variant);
 
 /*
- * Returns the variant short value. Behavior is undefined if the variant is not valid
- * or its type is not short.
+ * Returns the variant value as a short. Behavior is undefined if the variant is invalid
+ * or its type cannot be safely converted to short.
  */
 SAIL_EXPORT short sail_variant_to_short(const struct sail_variant *variant);
 
 /*
- * Returns the variant unsigned short value. Behavior is undefined if the variant is not valid
- * or its type is not unsigned short.
+ * Returns the variant value as an unsigned short. Behavior is undefined if the variant is invalid
+ * or its type cannot be safely converted to unsigned short.
  */
 SAIL_EXPORT unsigned short sail_variant_to_unsigned_short(const struct sail_variant *variant);
 
 /*
- * Returns the variant integer value. Behavior is undefined if the variant is not valid
- * or its type is not int.
+ * Returns the variant value as an integer. Behavior is undefined if the variant is invalid
+ * or its type cannot be safely converted to int.
  */
 SAIL_EXPORT int sail_variant_to_int(const struct sail_variant *variant);
 
 /*
- * Returns the variant unsigned int value. Behavior is undefined if the variant is not valid
- * or its type is not unsigned int.
+ * Returns the variant value as an unsigned int. Behavior is undefined if the variant is invalid
+ * or its type cannot be safely converted to unsigned int.
  */
 SAIL_EXPORT unsigned int sail_variant_to_unsigned_int(const struct sail_variant *variant);
 
 /*
- * Returns the variant long value. Behavior is undefined if the variant is not valid
- * or its type is not long.
+ * Returns the variant value as a long. Behavior is undefined if the variant is invalid
+ * or its type cannot be safely converted to long.
  */
 SAIL_EXPORT long sail_variant_to_long(const struct sail_variant *variant);
 
 /*
- * Returns the variant unsigned long value. Behavior is undefined if the variant is not valid
- * or its type is not unsigned long.
+ * Returns the variant value as an unsigned long. Behavior is undefined if the variant is invalid
+ * or its type cannot be safely converted to unsigned long.
  */
 SAIL_EXPORT unsigned long sail_variant_to_unsigned_long(const struct sail_variant *variant);
 
 /*
- * Returns the variant Unix timestamp value. Behavior is undefined if the variant is not valid
- * or its type is not Unix timestamp.
+ * Returns the variant value as a Unix timestamp. Behavior is undefined if the variant is invalid
+ * or its type cannot be safely converted to Unix timestamp.
  */
 SAIL_EXPORT time_t sail_variant_to_timestamp(const struct sail_variant *variant);
 
 /*
- * Returns the variant string value. Behavior is undefined if the variant is not valid
- * or its type is not string.
+ * Returns the variant value as a string. Behavior is undefined if the variant is invalid
+ * or its type cannot be safely converted to string.
  */
 SAIL_EXPORT char* sail_variant_to_string(const struct sail_variant *variant);
 
 /*
- * Returns the variant data value. Behavior is undefined if the variant is not valid
- * or its type is not data.
+ * Returns the variant value as a binary data. Behavior is undefined if the variant is invalid.
  */
 SAIL_EXPORT void* sail_variant_to_data(const struct sail_variant *variant);
 
