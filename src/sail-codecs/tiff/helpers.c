@@ -328,7 +328,9 @@ static sail_status_t fetch_single_meta_data(TIFF *tiff, int tag, enum SailMetaDa
         struct sail_meta_data_node *meta_data_node;
 
         SAIL_TRY(sail_alloc_meta_data_node(&meta_data_node));
-        SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_from_known_string(key, data, &meta_data_node->meta_data),
+        SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_from_known_key(key, &meta_data_node->meta_data),
+                            /* cleanup */ sail_destroy_meta_data_node(meta_data_node));
+        SAIL_TRY_OR_CLEANUP(sail_alloc_variant_from_string(data, &meta_data_node->meta_data->value),
                             /* cleanup */ sail_destroy_meta_data_node(meta_data_node));
 
         **last_meta_data_node = meta_data_node;
@@ -360,7 +362,7 @@ sail_status_t tiff_private_write_meta_data(TIFF *tiff, const struct sail_meta_da
     for (; meta_data_node != NULL; meta_data_node = meta_data_node->next) {
         const struct sail_meta_data *meta_data = meta_data_node->meta_data;
 
-        if (meta_data->value_type == SAIL_META_DATA_TYPE_STRING) {
+        if (meta_data->value->value_type == SAIL_VARIANT_TYPE_STRING) {
             int tiff_tag = -1;
 
             switch (meta_data->key) {
@@ -386,7 +388,7 @@ sail_status_t tiff_private_write_meta_data(TIFF *tiff, const struct sail_meta_da
                 continue;
             }
 
-            TIFFSetField(tiff, tiff_tag, (char *)meta_data->value);
+            TIFFSetField(tiff, tiff_tag, sail_variant_to_string(meta_data->value));
         } else {
             SAIL_LOG_WARNING("TIFF: Ignoring unsupported binary key '%s'", sail_meta_data_to_string(meta_data->key));
         }

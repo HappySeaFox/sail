@@ -109,21 +109,20 @@ enum SailPixelFormat tga_private_palette_bpp_to_sail_pixel_format(int bpp) {
 sail_status_t tga_private_fetch_id(struct sail_io *io, const struct TgaFileHeader *file_header, struct sail_meta_data_node **meta_data_node) {
 
     struct sail_meta_data_node *meta_data_node_local;
-
     SAIL_TRY(sail_alloc_meta_data_node_and_value(&meta_data_node_local));
 
     struct sail_meta_data *meta_data = meta_data_node_local->meta_data;
 
-    meta_data->key          = SAIL_META_DATA_ID;
-    meta_data->value_type   = SAIL_META_DATA_TYPE_STRING;
-    meta_data->value_length = file_header->id_length + 1;
+    meta_data->key               = SAIL_META_DATA_ID;
+    meta_data->value->value_type = SAIL_VARIANT_TYPE_STRING;
+    meta_data->value->value_size = file_header->id_length + 1;
 
-    SAIL_TRY_OR_CLEANUP(sail_malloc(meta_data->value_length, &meta_data->value),
+    SAIL_TRY_OR_CLEANUP(sail_malloc(meta_data->value->value_size, &meta_data->value->value),
                         /* cleanup */ sail_destroy_meta_data_node(meta_data_node_local));
-    SAIL_TRY_OR_CLEANUP(io->strict_read(io->stream, meta_data->value, meta_data->value_length - 1),
+    SAIL_TRY_OR_CLEANUP(io->strict_read(io->stream, meta_data->value->value, meta_data->value->value_size - 1),
                         /* cleanup */ sail_destroy_meta_data_node(meta_data_node_local));
 
-    ((char *)meta_data->value)[meta_data->value_length - 1] = '\0';
+    (sail_variant_to_string(meta_data->value))[meta_data->value->value_size - 1] = '\0';
 
     *meta_data_node = meta_data_node_local;
 
@@ -158,7 +157,8 @@ sail_status_t tga_private_fetch_extension(struct sail_io *io, double *gamma, str
 
         if (strlen(author) > 0) {
             SAIL_TRY(sail_alloc_meta_data_node(last_meta_data_node));
-            SAIL_TRY(sail_alloc_meta_data_from_known_string(SAIL_META_DATA_AUTHOR, author, &(*last_meta_data_node)->meta_data));
+            SAIL_TRY(sail_alloc_meta_data_from_known_key(SAIL_META_DATA_AUTHOR, &(*last_meta_data_node)->meta_data));
+            SAIL_TRY(sail_alloc_variant_from_string(author, &(*last_meta_data_node)->meta_data->value));
             last_meta_data_node = &(*last_meta_data_node)->next;
         }
     }
@@ -174,7 +174,8 @@ sail_status_t tga_private_fetch_extension(struct sail_io *io, double *gamma, str
 
         if (strlen(comments) > 0) {
             SAIL_TRY(sail_alloc_meta_data_node(last_meta_data_node));
-            SAIL_TRY(sail_alloc_meta_data_from_known_string(SAIL_META_DATA_COMMENT, comments, &(*last_meta_data_node)->meta_data));
+            SAIL_TRY(sail_alloc_meta_data_from_known_key(SAIL_META_DATA_COMMENT, &(*last_meta_data_node)->meta_data));
+            SAIL_TRY(sail_alloc_variant_from_string(comments, &(*last_meta_data_node)->meta_data->value));
             last_meta_data_node = &(*last_meta_data_node)->next;
         }
     }
@@ -193,8 +194,9 @@ sail_status_t tga_private_fetch_extension(struct sail_io *io, double *gamma, str
             char timestamp[20];
             snprintf(timestamp, sizeof(timestamp), "%04d.%02d.%02d %02d:%02d:%02d", year, month, day, hour, minute, second);
 
-            SAIL_TRY(sail_alloc_meta_data_node(last_meta_data_node));
-            SAIL_TRY(sail_alloc_meta_data_from_known_string(SAIL_META_DATA_CREATION_TIME, timestamp, &(*last_meta_data_node)->meta_data));
+            SAIL_TRY(sail_alloc_meta_data_from_known_key(SAIL_META_DATA_CREATION_TIME, &(*last_meta_data_node)->meta_data));
+            SAIL_TRY(sail_alloc_variant_from_string(timestamp, &(*last_meta_data_node)->meta_data->value));
+
             last_meta_data_node = &(*last_meta_data_node)->next;
         }
     }
@@ -207,7 +209,8 @@ sail_status_t tga_private_fetch_extension(struct sail_io *io, double *gamma, str
 
         if (strlen(job) > 0) {
             SAIL_TRY(sail_alloc_meta_data_node(last_meta_data_node));
-            SAIL_TRY(sail_alloc_meta_data_from_known_string(SAIL_META_DATA_JOB, job, &(*last_meta_data_node)->meta_data));
+            SAIL_TRY(sail_alloc_meta_data_from_known_key(SAIL_META_DATA_JOB, &(*last_meta_data_node)->meta_data));
+            SAIL_TRY(sail_alloc_variant_from_string(job, &(*last_meta_data_node)->meta_data->value));
             last_meta_data_node = &(*last_meta_data_node)->next;
         }
     }
@@ -224,7 +227,8 @@ sail_status_t tga_private_fetch_extension(struct sail_io *io, double *gamma, str
             snprintf(timestamp, sizeof(timestamp), "%05d:%02d:%02d", hour, minute, second);
 
             SAIL_TRY(sail_alloc_meta_data_node(last_meta_data_node));
-            SAIL_TRY(sail_alloc_meta_data_from_known_string(SAIL_META_DATA_TIME_CONSUMED, timestamp, &(*last_meta_data_node)->meta_data));
+            SAIL_TRY(sail_alloc_meta_data_from_known_key(SAIL_META_DATA_TIME_CONSUMED, &(*last_meta_data_node)->meta_data));
+            SAIL_TRY(sail_alloc_variant_from_string(timestamp, &(*last_meta_data_node)->meta_data->value));
             last_meta_data_node = &(*last_meta_data_node)->next;
         }
     }
@@ -237,7 +241,8 @@ sail_status_t tga_private_fetch_extension(struct sail_io *io, double *gamma, str
 
         if (strlen(software) > 0) {
             SAIL_TRY(sail_alloc_meta_data_node(last_meta_data_node));
-            SAIL_TRY(sail_alloc_meta_data_from_known_string(SAIL_META_DATA_SOFTWARE, software, &(*last_meta_data_node)->meta_data));
+            SAIL_TRY(sail_alloc_meta_data_from_known_key(SAIL_META_DATA_SOFTWARE, &(*last_meta_data_node)->meta_data));
+            SAIL_TRY(sail_alloc_variant_from_string(software, &(*last_meta_data_node)->meta_data->value));
             last_meta_data_node = &(*last_meta_data_node)->next;
         }
     }
@@ -260,7 +265,8 @@ sail_status_t tga_private_fetch_extension(struct sail_io *io, double *gamma, str
             }
 
             SAIL_TRY(sail_alloc_meta_data_node(last_meta_data_node));
-            SAIL_TRY(sail_alloc_meta_data_from_known_string(SAIL_META_DATA_SOFTWARE_VERSION, version_string, &(*last_meta_data_node)->meta_data));
+            SAIL_TRY(sail_alloc_meta_data_from_known_key(SAIL_META_DATA_SOFTWARE_VERSION, &(*last_meta_data_node)->meta_data));
+            SAIL_TRY(sail_alloc_variant_from_string(version_string, &(*last_meta_data_node)->meta_data->value));
             last_meta_data_node = &(*last_meta_data_node)->next;
         }
     }

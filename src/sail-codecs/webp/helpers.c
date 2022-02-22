@@ -100,14 +100,15 @@ sail_status_t webp_private_fetch_meta_data(WebPDemuxer *webp_demux, struct sail_
             struct sail_meta_data_node *meta_data_node;
 
             SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_node(&meta_data_node),
-                        /* cleanup */ WebPDemuxReleaseChunkIterator(&chunk_iterator));
-
-            SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_from_known_substring(SAIL_META_DATA_XMP,
-                                                                            (const char *)chunk_iterator.chunk.bytes,
-                                                                            chunk_iterator.chunk.size,
-                                                                            &meta_data_node->meta_data),
-                        /* cleanup */ sail_destroy_meta_data_node(meta_data_node),
-                                      WebPDemuxReleaseChunkIterator(&chunk_iterator));
+                                /* cleanup */ WebPDemuxReleaseChunkIterator(&chunk_iterator));
+            SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_from_known_key(SAIL_META_DATA_XMP, &meta_data_node->meta_data),
+                                /* cleanup */ sail_destroy_meta_data_node(meta_data_node),
+                                              WebPDemuxReleaseChunkIterator(&chunk_iterator));
+            SAIL_TRY_OR_CLEANUP(sail_alloc_variant_from_substring((const char *)chunk_iterator.chunk.bytes,
+                                                                  chunk_iterator.chunk.size,
+                                                                  &meta_data_node->meta_data->value),
+                                /* cleanup */ sail_destroy_meta_data_node(meta_data_node),
+                                              WebPDemuxReleaseChunkIterator(&chunk_iterator));
 
             WebPDemuxReleaseChunkIterator(&chunk_iterator);
 
@@ -123,14 +124,15 @@ sail_status_t webp_private_fetch_meta_data(WebPDemuxer *webp_demux, struct sail_
             struct sail_meta_data_node *meta_data_node;
 
             SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_node(&meta_data_node),
-                        /* cleanup */ WebPDemuxReleaseChunkIterator(&chunk_iterator));
-
-            SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_from_known_data(SAIL_META_DATA_EXIF,
-                                                                        chunk_iterator.chunk.bytes,
-                                                                        chunk_iterator.chunk.size,
-                                                                        &meta_data_node->meta_data),
-                        /* cleanup */ sail_destroy_meta_data_node(meta_data_node),
-                                      WebPDemuxReleaseChunkIterator(&chunk_iterator));
+                                /* cleanup */ WebPDemuxReleaseChunkIterator(&chunk_iterator));
+            SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_from_known_key(SAIL_META_DATA_EXIF, &meta_data_node->meta_data),
+                                /* cleanup */ sail_destroy_meta_data_node(meta_data_node),
+                                              WebPDemuxReleaseChunkIterator(&chunk_iterator));
+            SAIL_TRY_OR_CLEANUP(sail_alloc_variant_from_data(chunk_iterator.chunk.bytes,
+                                                             chunk_iterator.chunk.size,
+                                                             &meta_data_node->meta_data->value),
+                                /* cleanup */ sail_destroy_meta_data_node(meta_data_node),
+                                              WebPDemuxReleaseChunkIterator(&chunk_iterator));
 
             WebPDemuxReleaseChunkIterator(&chunk_iterator);
 
