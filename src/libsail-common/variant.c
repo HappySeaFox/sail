@@ -30,7 +30,7 @@
 /*
  * Private functions.
  */
-static sail_status_t alloc_variant(enum SailVariantType value_type, void *value, size_t value_size, struct sail_variant **variant) {
+static sail_status_t alloc_variant(enum SailVariantType value_type, const void *value, const size_t value_size, struct sail_variant **variant) {
 
     SAIL_CHECK_PTR(variant);
 
@@ -125,7 +125,7 @@ sail_status_t sail_alloc_variant_from_unsigned_long(unsigned long value, struct 
     return SAIL_OK;
 }
 
-sail_status_t sail_alloc_variant_from_string(char *value, struct sail_variant **variant)
+sail_status_t sail_alloc_variant_from_string(const char *value, struct sail_variant **variant)
 {
     SAIL_TRY(alloc_variant(SAIL_VARIANT_TYPE_STRING, value, strlen(value) + 1, variant));
 
@@ -143,7 +143,7 @@ sail_status_t sail_alloc_variant_from_adopted_string(char *value, struct sail_va
     return SAIL_OK;
 }
 
-sail_status_t sail_alloc_variant_from_substring(char *value, size_t value_size, struct sail_variant **variant)
+sail_status_t sail_alloc_variant_from_substring(const char *value, size_t value_size, struct sail_variant **variant)
 {
     SAIL_TRY(alloc_variant(SAIL_VARIANT_TYPE_STRING, value, value_size + 1, variant));
 
@@ -153,7 +153,7 @@ sail_status_t sail_alloc_variant_from_substring(char *value, size_t value_size, 
     return SAIL_OK;
 }
 
-sail_status_t sail_alloc_variant_from_data(void *value, size_t value_size, struct sail_variant **variant)
+sail_status_t sail_alloc_variant_from_data(const void *value, size_t value_size, struct sail_variant **variant)
 {
     SAIL_TRY(alloc_variant(SAIL_VARIANT_TYPE_DATA, value, value_size, variant));
 

@@ -42,6 +42,8 @@
 extern "C" {
 #endif
 
+struct sail_variant;
+
 /*
  * Represents a meta data element like a JPEG comment or a binary EXIF profile.
  *
@@ -94,89 +96,35 @@ struct sail_meta_data {
     char *key_unknown;
 
     /*
-     * Value type.
+     * Meta data value.
      */
-    enum SailMetaDataType value_type;
-
-    /*
-     * Actual meta data value. value_length holds its length.
-     */
-    void *value;
-
-    /*
-     * The length of the value. For strings, it's strlen() + 1.
-     */
-    size_t value_length;
+    struct sail_variant *value;
 };
 
 /*
- * Allocates new meta data. Use sail_alloc_meta_data_from_xxx() to allocate meta data from actual data.
+ * Allocates new meta data.
  *
  * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_alloc_meta_data(struct sail_meta_data **meta_data);
 
 /*
- * Allocates new meta data from the specified string. Makes a deep copy of the value.
+ * Allocates new meta data from the specified known key.
  * The key must not be SAIL_META_DATA_UNKNOWN.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_meta_data_from_known_string(enum SailMetaData key,
-                                                                 const char *value,
-                                                                 struct sail_meta_data **meta_data);
+SAIL_EXPORT sail_status_t sail_alloc_meta_data_from_known_key(enum SailMetaData key,
+                                                              struct sail_meta_data **meta_data);
 
 /*
- * Allocates new meta data from the specified string. Makes a deep copy of the value.
+ * Allocates new meta data from the specified unknown key. Makes a deep copy of the key.
  * Sets the key to SAIL_META_DATA_UNKNOWN.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_meta_data_from_unknown_string(const char *key_unknown,
-                                                                   const char *value,
-                                                                   struct sail_meta_data **meta_data);
-/*
- * Allocates new meta data from the specified string. Makes a deep copy of the value.
- * Copies only 'size' bytes. The key must not be SAIL_META_DATA_UNKNOWN.
- *
- * Returns SAIL_OK on success.
- */
-SAIL_EXPORT sail_status_t sail_alloc_meta_data_from_known_substring(enum SailMetaData key,
-                                                                    const char *value,
-                                                                    size_t size,
-                                                                    struct sail_meta_data **meta_data);
-
-/*
- * Allocates new meta data from the specified string. Makes a deep copy of the value.
- * Copies only 'size' bytes. Sets the key to SAIL_META_DATA_UNKNOWN.
- *
- * Returns SAIL_OK on success.
- */
-SAIL_EXPORT sail_status_t sail_alloc_meta_data_from_unknown_substring(const char *key_unknown,
-                                                                      const char *value,
-                                                                      size_t size,
-                                                                      struct sail_meta_data **meta_data);
-/*
- * Allocates new meta data from the specified data. Makes a deep copy of the value.
- * The key must not be SAIL_META_DATA_UNKNOWN.
- *
- * Returns SAIL_OK on success.
- */
-SAIL_EXPORT sail_status_t sail_alloc_meta_data_from_known_data(enum SailMetaData key,
-                                                               const void *value,
-                                                               size_t value_length,
-                                                               struct sail_meta_data **meta_data);
-
-/*
- * Allocates new meta data from the specified data. Makes a deep copy of the value.
- * Sets the key to SAIL_META_DATA_UNKNOWN.
- *
- * Returns SAIL_OK on success.
- */
-SAIL_EXPORT sail_status_t sail_alloc_meta_data_from_unknown_data(const char *key_unknown,
-                                                                 const void *value,
-                                                                 size_t value_length,
-                                                                 struct sail_meta_data **meta_data);
+SAIL_EXPORT sail_status_t sail_alloc_meta_data_from_unknown_key(const char *key_unknown,
+                                                                struct sail_meta_data **meta_data);
 
 /*
  * Destroys the specified meta data.

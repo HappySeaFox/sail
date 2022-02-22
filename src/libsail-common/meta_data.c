@@ -37,66 +37,23 @@ sail_status_t sail_alloc_meta_data(struct sail_meta_data **meta_data) {
     SAIL_TRY(sail_malloc(sizeof(struct sail_meta_data), &ptr));
     *meta_data = ptr;
 
-    (*meta_data)->key          = SAIL_META_DATA_UNKNOWN;
-    (*meta_data)->key_unknown  = NULL;
-    (*meta_data)->value_type   = SAIL_META_DATA_TYPE_STRING;
-    (*meta_data)->value        = NULL;
-    (*meta_data)->value_length = 0;
+    (*meta_data)->key         = SAIL_META_DATA_UNKNOWN;
+    (*meta_data)->key_unknown = NULL;
+    (*meta_data)->value       = NULL;
 
     return SAIL_OK;
 }
 
-sail_status_t sail_alloc_meta_data_from_known_string(enum SailMetaData key, const char *value, struct sail_meta_data **meta_data) {
+sail_status_t sail_alloc_meta_data_from_known_key(enum SailMetaData key, struct sail_meta_data **meta_data) {
 
-    SAIL_CHECK_PTR(value);
+    SAIL_TRY(sail_alloc_meta_data(meta_data));
 
-    SAIL_TRY(sail_alloc_meta_data_from_known_substring(key, value, strlen(value), meta_data));
-
-    return SAIL_OK;
-}
-
-sail_status_t sail_alloc_meta_data_from_unknown_string(const char *key_unknown, const char *value, struct sail_meta_data **meta_data) {
-
-    SAIL_CHECK_PTR(value);
-
-    SAIL_TRY(sail_alloc_meta_data_from_unknown_substring(key_unknown, value, strlen(value), meta_data));
+    (*meta_data)->key = key;
 
     return SAIL_OK;
 }
 
-sail_status_t sail_alloc_meta_data_from_known_substring(enum SailMetaData key, const char *value, size_t size, struct sail_meta_data **meta_data) {
-
-    if (key == SAIL_META_DATA_UNKNOWN) {
-        SAIL_LOG_ERROR("%s() accepts only known meta data keys", __func__);
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
-    }
-
-    SAIL_CHECK_PTR(value);
-    SAIL_CHECK_PTR(meta_data);
-
-    struct sail_meta_data *meta_data_local;
-    SAIL_TRY(sail_alloc_meta_data(&meta_data_local));
-
-    meta_data_local->key          = key;
-    meta_data_local->value_type   = SAIL_META_DATA_TYPE_STRING;
-    meta_data_local->value_length = size + 1;
-
-    SAIL_TRY_OR_CLEANUP(sail_malloc(meta_data_local->value_length, &meta_data_local->value),
-                        /* cleanup */ sail_destroy_meta_data(meta_data_local));
-
-    memcpy(meta_data_local->value, value, meta_data_local->value_length - 1);
-    *((char *)meta_data_local->value + meta_data_local->value_length - 1) = '\0';
-
-    *meta_data = meta_data_local;
-
-    return SAIL_OK;
-}
-
-sail_status_t sail_alloc_meta_data_from_unknown_substring(const char *key_unknown, const char *value, size_t size, struct sail_meta_data **meta_data) {
-
-    SAIL_CHECK_PTR(key_unknown);
-    SAIL_CHECK_PTR(value);
-    SAIL_CHECK_PTR(meta_data);
+sail_status_t sail_alloc_meta_data_from_unknown_key(const char *key_unknown, struct sail_meta_data **meta_data) {
 
     struct sail_meta_data *meta_data_local;
     SAIL_TRY(sail_alloc_meta_data(&meta_data_local));
@@ -104,64 +61,7 @@ sail_status_t sail_alloc_meta_data_from_unknown_substring(const char *key_unknow
     SAIL_TRY_OR_CLEANUP(sail_strdup(key_unknown, &meta_data_local->key_unknown),
                         /* cleanup */ sail_destroy_meta_data(meta_data_local));
 
-    meta_data_local->key          = SAIL_META_DATA_UNKNOWN;
-    meta_data_local->value_type   = SAIL_META_DATA_TYPE_STRING;
-    meta_data_local->value_length = size + 1;
-
-    SAIL_TRY_OR_CLEANUP(sail_malloc(meta_data_local->value_length, &meta_data_local->value),
-                        /* cleanup */ sail_destroy_meta_data(meta_data_local));
-
-    memcpy(meta_data_local->value, value, meta_data_local->value_length - 1);
-    *((char *)meta_data_local->value + meta_data_local->value_length - 1) = '\0';
-
-    *meta_data = meta_data_local;
-
-    return SAIL_OK;
-}
-
-sail_status_t sail_alloc_meta_data_from_known_data(enum SailMetaData key, const void *value, size_t value_length, struct sail_meta_data **meta_data) {
-
-    if (key == SAIL_META_DATA_UNKNOWN) {
-        SAIL_LOG_ERROR("%s() accepts only known meta data keys", __func__);
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
-    }
-
-    SAIL_CHECK_PTR(value);
-    SAIL_CHECK_PTR(meta_data);
-
-    struct sail_meta_data *meta_data_local;
-    SAIL_TRY(sail_alloc_meta_data(&meta_data_local));
-
-    meta_data_local->key          = key;
-    meta_data_local->value_type   = SAIL_META_DATA_TYPE_DATA;
-    meta_data_local->value_length = value_length;
-
-    SAIL_TRY_OR_CLEANUP(sail_memdup(value, value_length, &meta_data_local->value),
-                        /* cleanup */ sail_destroy_meta_data(meta_data_local));
-
-    *meta_data = meta_data_local;
-
-    return SAIL_OK;
-}
-
-sail_status_t sail_alloc_meta_data_from_unknown_data(const char *key_unknown, const void *value, size_t value_length, struct sail_meta_data **meta_data) {
-
-    SAIL_CHECK_PTR(key_unknown);
-    SAIL_CHECK_PTR(value);
-    SAIL_CHECK_PTR(meta_data);
-
-    struct sail_meta_data *meta_data_local;
-    SAIL_TRY(sail_alloc_meta_data(&meta_data_local));
-
-    SAIL_TRY_OR_CLEANUP(sail_strdup(key_unknown, &meta_data_local->key_unknown),
-                        /* cleanup */ sail_destroy_meta_data(meta_data_local));
-
-    meta_data_local->key          = SAIL_META_DATA_UNKNOWN;
-    meta_data_local->value_type   = SAIL_META_DATA_TYPE_DATA;
-    meta_data_local->value_length = value_length;
-
-    SAIL_TRY_OR_CLEANUP(sail_memdup(value, value_length, &meta_data_local->value),
-                        /* cleanup */ sail_destroy_meta_data(meta_data_local));
+    meta_data_local->key = SAIL_META_DATA_UNKNOWN;
 
     *meta_data = meta_data_local;
 
@@ -175,7 +75,7 @@ void sail_destroy_meta_data(struct sail_meta_data *meta_data) {
     }
 
     sail_free(meta_data->key_unknown);
-    sail_free(meta_data->value);
+    sail_destroy_variant(meta_data->value);
     sail_free(meta_data);
 }
 
@@ -194,12 +94,10 @@ sail_status_t sail_copy_meta_data(const struct sail_meta_data *source, struct sa
                             /* cleanup */ sail_destroy_meta_data(meta_data_local));
     }
 
-    meta_data_local->value_type = source->value_type;
-
-    SAIL_TRY_OR_CLEANUP(sail_memdup(source->value, source->value_length, &meta_data_local->value),
-                        /* cleanup */ sail_destroy_meta_data(meta_data_local));
-
-    meta_data_local->value_length = source->value_length;
+    if (source->value != NULL) {
+        SAIL_TRY_OR_CLEANUP(sail_copy_variant(source->value, &meta_data_local->value),
+                            /* cleanup */ sail_destroy_meta_data(meta_data_local));
+    }
 
     *target = meta_data_local;
 

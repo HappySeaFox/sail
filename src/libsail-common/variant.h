@@ -151,7 +151,7 @@ SAIL_EXPORT sail_status_t sail_alloc_variant_from_unsigned_long(unsigned long va
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_variant_from_string(char *value, struct sail_variant **variant);
+SAIL_EXPORT sail_status_t sail_alloc_variant_from_string(const char *value, struct sail_variant **variant);
 
 /*
  * Allocates a new variant from the specified string. Transfers the ownership of the string
@@ -168,14 +168,14 @@ SAIL_EXPORT sail_status_t sail_alloc_variant_from_adopted_string(char *value, st
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_variant_from_substring(char *value, size_t value_size, struct sail_variant **variant);
+SAIL_EXPORT sail_status_t sail_alloc_variant_from_substring(const char *value, size_t value_size, struct sail_variant **variant);
 
 /*
  * Allocates a new variant from the specified data buffer. Makes a deep copy of the buffer.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_variant_from_data(void *value, size_t value_size, struct sail_variant **variant);
+SAIL_EXPORT sail_status_t sail_alloc_variant_from_data(const void *value, size_t value_size, struct sail_variant **variant);
 
 /*
  * Allocates a new variant from the specified data buffer. Transfers the ownership of the data pointer
