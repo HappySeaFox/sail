@@ -30,6 +30,23 @@
 /*
  * Private functions.
  */
+static sail_status_t set_variant_value(struct sail_variant *variant, enum SailVariantType value_type, const void *value, const size_t value_size) {
+
+    SAIL_CHECK_PTR(variant);
+
+    void *ptr;
+    SAIL_TRY(sail_malloc(value_size, &ptr));
+
+    sail_free(variant->value);
+    variant->value = ptr;
+    memcpy(variant->value, value, value_size);
+
+    variant->value_type = value_type;
+    variant->value_size = value_size;
+
+    return SAIL_OK;
+}
+
 static sail_status_t alloc_variant(enum SailVariantType value_type, const void *value, const size_t value_size, struct sail_variant **variant) {
 
     SAIL_CHECK_PTR(variant);
@@ -37,14 +54,8 @@ static sail_status_t alloc_variant(enum SailVariantType value_type, const void *
     struct sail_variant *variant_local;
     SAIL_TRY(sail_alloc_variant(&variant_local));
 
-    void *ptr;
-    SAIL_TRY_OR_CLEANUP(sail_malloc(value_size, &ptr),
+    SAIL_TRY_OR_CLEANUP(set_variant_value(variant_local, value_type, value, value_size),
                         /* on error */ sail_destroy_variant(variant_local));
-    variant_local->value = ptr;
-    memcpy(variant_local->value, value, value_size);
-
-    variant_local->value_type = value_type;
-    variant_local->value_size = value_size;
 
     *variant = variant_local;
 
@@ -141,21 +152,26 @@ sail_status_t sail_alloc_variant_from_string(const char *value, struct sail_vari
 
 sail_status_t sail_alloc_variant_from_adopted_string(char *value, struct sail_variant **variant)
 {
-    SAIL_TRY(sail_alloc_variant(variant));
+    struct sail_variant *variant_local;
+    SAIL_TRY(sail_alloc_variant(&variant_local));
 
-    (*variant)->value_type = SAIL_VARIANT_TYPE_STRING;
-    (*variant)->value      = value;
-    (*variant)->value_size = strlen(value) + 1;
+    SAIL_TRY_OR_CLEANUP(sail_set_variant_adopted_string(variant_local, value),
+                        /* on error */ sail_destroy_variant(variant_local));
+
+    *variant = variant_local;
 
     return SAIL_OK;
 }
 
 sail_status_t sail_alloc_variant_from_substring(const char *value, size_t value_size, struct sail_variant **variant)
 {
-    SAIL_TRY(alloc_variant(SAIL_VARIANT_TYPE_STRING, value, value_size + 1, variant));
+    struct sail_variant *variant_local;
+    SAIL_TRY(sail_alloc_variant(&variant_local));
 
-    char *str = (*variant)->value;
-    str[value_size] = '\0';
+    SAIL_TRY_OR_CLEANUP(sail_set_variant_substring(variant_local, value, value_size),
+                        /* on error */ sail_destroy_variant(variant_local));
+
+    *variant = variant_local;
 
     return SAIL_OK;
 }
@@ -186,6 +202,119 @@ void sail_destroy_variant(struct sail_variant *variant)
 
     sail_free(variant->value);
     sail_free(variant);
+}
+
+sail_status_t sail_set_variant_char(struct sail_variant *variant, char value) {
+
+    SAIL_TRY(set_variant_value(variant, SAIL_VARIANT_TYPE_CHAR, &value, sizeof(value)));
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_set_variant_unsigned_char(struct sail_variant *variant, unsigned char value) {
+
+    SAIL_TRY(set_variant_value(variant, SAIL_VARIANT_TYPE_UNSIGNED_CHAR, &value, sizeof(value)));
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_set_variant_short(struct sail_variant *variant, short value) {
+
+    SAIL_TRY(set_variant_value(variant, SAIL_VARIANT_TYPE_SHORT, &value, sizeof(value)));
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_set_variant_unsigned_short(struct sail_variant *variant, unsigned short value) {
+
+    SAIL_TRY(set_variant_value(variant, SAIL_VARIANT_TYPE_UNSIGNED_SHORT, &value, sizeof(value)));
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_set_variant_int(struct sail_variant *variant, int value) {
+
+    SAIL_TRY(set_variant_value(variant, SAIL_VARIANT_TYPE_INT, &value, sizeof(value)));
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_set_variant_unsigned_int(struct sail_variant *variant, unsigned int value) {
+
+    SAIL_TRY(set_variant_value(variant, SAIL_VARIANT_TYPE_UNSIGNED_INT, &value, sizeof(value)));
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_set_variant_long(struct sail_variant *variant, long value) {
+
+    SAIL_TRY(set_variant_value(variant, SAIL_VARIANT_TYPE_LONG, &value, sizeof(value)));
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_set_variant_unsigned_long(struct sail_variant *variant, unsigned long value) {
+
+    SAIL_TRY(set_variant_value(variant, SAIL_VARIANT_TYPE_UNSIGNED_LONG, &value, sizeof(value)));
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_set_variant_timestamp(struct sail_variant *variant, time_t value) {
+
+    SAIL_TRY(set_variant_value(variant, SAIL_VARIANT_TYPE_TIMESTAMP, &value, sizeof(value)));
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_set_variant_string(struct sail_variant *variant, const char *value) {
+
+    SAIL_TRY(set_variant_value(variant, SAIL_VARIANT_TYPE_STRING, value, strlen(value) + 1));
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_set_variant_adopted_string(struct sail_variant *variant, char *value) {
+
+    SAIL_CHECK_PTR(variant);
+
+    sail_free(variant->value);
+
+    variant->value_type = SAIL_VARIANT_TYPE_STRING;
+    variant->value      = value;
+    variant->value_size = strlen(value) + 1;
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_set_variant_substring(struct sail_variant *variant, const char *value, size_t value_size) {
+
+    SAIL_TRY(set_variant_value(variant, SAIL_VARIANT_TYPE_STRING, value, value_size + 1));
+
+    char *str = variant->value;
+    str[value_size] = '\0';
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_set_variant_data(struct sail_variant *variant, const void *value, size_t value_size) {
+
+    SAIL_TRY(set_variant_value(variant, SAIL_VARIANT_TYPE_DATA, value, value_size));
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_set_variant_adopted_data(struct sail_variant *variant, void *value, size_t value_size) {
+
+    SAIL_CHECK_PTR(variant);
+
+    sail_free(variant->value);
+
+    variant->value_type = SAIL_VARIANT_TYPE_DATA;
+    variant->value      = value;
+    variant->value_size = value_size;
+
+    return SAIL_OK;
 }
 
 char sail_variant_to_char(const struct sail_variant *variant)

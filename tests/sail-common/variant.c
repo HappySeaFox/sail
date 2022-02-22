@@ -182,12 +182,58 @@ static MunitResult test_from_data(const MunitParameter params[], void *user_data
     return MUNIT_OK;
 }
 
+static MunitResult test_set(const MunitParameter params[], void *user_data) {
+    (void)params;
+    (void)user_data;
+
+    struct sail_variant *variant;
+    munit_assert(sail_alloc_variant(&variant) == SAIL_OK);
+
+    munit_assert(sail_set_variant_char(variant, 6) == SAIL_OK);
+    munit_assert(sail_variant_to_char(variant) == 6);
+
+    munit_assert(sail_set_variant_unsigned_char(variant, 7) == SAIL_OK);
+    munit_assert(sail_variant_to_unsigned_char(variant) == 7);
+
+    munit_assert(sail_set_variant_short(variant, 19) == SAIL_OK);
+    munit_assert(sail_variant_to_short(variant) == 19);
+
+    munit_assert(sail_set_variant_unsigned_short(variant, 29) == SAIL_OK);
+    munit_assert(sail_variant_to_unsigned_short(variant) == 29);
+
+    munit_assert(sail_set_variant_int(variant, 0xFFFF9) == SAIL_OK);
+    munit_assert(sail_variant_to_int(variant) == 0xFFFF9);
+
+    munit_assert(sail_set_variant_unsigned_int(variant, 0xFFFFFF9) == SAIL_OK);
+    munit_assert(sail_variant_to_unsigned_int(variant) == 0xFFFFFF9);
+
+    munit_assert(sail_set_variant_long(variant, 0xFFFF9) == SAIL_OK);
+    munit_assert(sail_variant_to_long(variant) == 0xFFFF9);
+
+    munit_assert(sail_set_variant_unsigned_long(variant, 0xFFFFFF9) == SAIL_OK);
+    munit_assert(sail_variant_to_unsigned_long(variant) == 0xFFFFFF9);
+
+    munit_assert(sail_set_variant_string(variant, "abc") == SAIL_OK);
+    munit_assert(strcmp(sail_variant_to_string(variant), "abc") == 0);
+
+    munit_assert(sail_set_variant_substring(variant, "abc", 2) == SAIL_OK);
+    munit_assert(strcmp(sail_variant_to_string(variant), "ab") == 0);
+
+    munit_assert(sail_set_variant_data(variant, "abc", 4) == SAIL_OK);
+    munit_assert(strcmp((char *)sail_variant_to_data(variant), "abc") == 0);
+
+    sail_destroy_variant(variant);
+
+    return MUNIT_OK;
+}
+
 static MunitTest test_suite_tests[] = {
     { (char *)"/alloc",       test_alloc,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/copy",        test_copy,        NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/from-value",  test_from_value,  NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/from-string", test_from_string, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/from-data",   test_from_data,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/set",         test_set,         NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };

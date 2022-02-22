@@ -200,6 +200,109 @@ SAIL_EXPORT sail_status_t sail_alloc_variant_from_adopted_data(void *value, size
 SAIL_EXPORT void sail_destroy_variant(struct sail_variant *variant);
 
 /*
+ * Sets the specified char value as a new variant value.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_set_variant_char(struct sail_variant *variant, char value);
+
+/*
+ * Sets the specified unsigned char value as a new variant value.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_set_variant_unsigned_char(struct sail_variant *variant, unsigned char value);
+
+/*
+ * Sets the specified short value as a new variant value.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_set_variant_short(struct sail_variant *variant, short value);
+
+/*
+ * Sets the specified unsigned short value as a new variant value.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_set_variant_unsigned_short(struct sail_variant *variant, unsigned short value);
+
+/*
+ * Sets the specified int value as a new variant value.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_set_variant_int(struct sail_variant *variant, int value);
+
+/*
+ * Sets the specified unsigned int value as a new variant value.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_set_variant_unsigned_int(struct sail_variant *variant, unsigned int value);
+
+/*
+ * Sets the specified long value as a new variant value.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_set_variant_long(struct sail_variant *variant, long value);
+
+/*
+ * Sets the specified unsigned long value as a new variant value.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_set_variant_unsigned_long(struct sail_variant *variant, unsigned long value);
+
+/*
+ * Sets the specified Unix timestamp value as a new variant value.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_set_variant_timestamp(struct sail_variant *variant, time_t value);
+
+/*
+ * Sets a deep copy of the specified string as a new variant value.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_set_variant_string(struct sail_variant *variant, const char *value);
+
+/*
+ * Sets a shallow copy of the specified string as a new variant value.
+ * Transfers the ownership of the string to the constructed variant.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_set_variant_adopted_string(struct sail_variant *variant, char *value);
+
+/*
+ * Sets a deep copy of the specified substring as a new variant value.
+ *
+ * The size of the substring must not include a null character. Adds a null character to the end
+ * of the constructed variant value, i.e. its final size is value_size + 1.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_set_variant_substring(struct sail_variant *variant, const char *value, size_t value_size);
+
+/*
+ * Sets a deep copy of the specified data buffer as a new variant value.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_set_variant_data(struct sail_variant *variant, const void *value, size_t value_size);
+
+/*
+ * Sets a shallow copy of the specified data buffer as a new variant value.
+ * Transfers the ownership of the data pointer to the variant.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_set_variant_adopted_data(struct sail_variant *variant, void *value, size_t value_size);
+
+/*
  * Returns the variant value as a char. Behavior is undefined if the variant is invalid
  * or its type cannot be safely converted to char.
  */
