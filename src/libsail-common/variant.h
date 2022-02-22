@@ -27,6 +27,7 @@
 #define SAIL_VARIANT_H
 
 #include <stddef.h>
+#include <time.h>
 
 #ifdef SAIL_BUILD
     #include "common.h"
@@ -55,6 +56,7 @@ enum SailVariantType {
     SAIL_VARIANT_TYPE_UNSIGNED_INT,
     SAIL_VARIANT_TYPE_LONG,
     SAIL_VARIANT_TYPE_UNSIGNED_LONG,
+    SAIL_VARIANT_TYPE_TIMESTAMP, /* Unix timestamp. */
     SAIL_VARIANT_TYPE_STRING,
     SAIL_VARIANT_TYPE_DATA,
     SAIL_VARIANT_TYPE_USER,
@@ -147,6 +149,13 @@ SAIL_EXPORT sail_status_t sail_alloc_variant_from_long(long value, struct sail_v
 SAIL_EXPORT sail_status_t sail_alloc_variant_from_unsigned_long(unsigned long value, struct sail_variant **variant);
 
 /*
+ * Allocates a new variant from the specified Unix timestamp value.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_alloc_variant_from_timestamp(time_t value, struct sail_variant **variant);
+
+/*
  * Allocates a new variant from the specified string. Makes a deep copy of the string.
  *
  * Returns SAIL_OK on success.
@@ -237,6 +246,12 @@ SAIL_EXPORT long sail_variant_to_long(const struct sail_variant *variant);
  * or its type is not unsigned long.
  */
 SAIL_EXPORT unsigned long sail_variant_to_unsigned_long(const struct sail_variant *variant);
+
+/*
+ * Returns the variant Unix timestamp value. Behavior is undefined if the variant is not valid
+ * or its type is not Unix timestamp.
+ */
+SAIL_EXPORT time_t sail_variant_to_timestamp(const struct sail_variant *variant);
 
 /*
  * Returns the variant string value. Behavior is undefined if the variant is not valid

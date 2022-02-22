@@ -125,6 +125,13 @@ sail_status_t sail_alloc_variant_from_unsigned_long(unsigned long value, struct 
     return SAIL_OK;
 }
 
+sail_status_t sail_alloc_variant_from_timestamp(time_t value, struct sail_variant **variant)
+{
+    SAIL_TRY(alloc_variant(SAIL_VARIANT_TYPE_TIMESTAMP, &value, sizeof(value), variant));
+
+    return SAIL_OK;
+}
+
 sail_status_t sail_alloc_variant_from_string(const char *value, struct sail_variant **variant)
 {
     SAIL_TRY(alloc_variant(SAIL_VARIANT_TYPE_STRING, value, strlen(value) + 1, variant));
@@ -219,6 +226,11 @@ long sail_variant_to_long(const struct sail_variant *variant)
 unsigned long sail_variant_to_unsigned_long(const struct sail_variant *variant)
 {
     return *(unsigned long *)(variant->value);
+}
+
+time_t sail_variant_to_timestamp(const struct sail_variant *variant)
+{
+    return *(time_t *)(variant->value);
 }
 
 char* sail_variant_to_string(const struct sail_variant *variant)
