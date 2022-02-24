@@ -54,7 +54,8 @@ static MunitResult test_copy(const MunitParameter params[], void *user_data) {
     const int reference_value = 64;
 
     struct sail_variant *variant;
-    munit_assert(sail_alloc_variant_from_int(reference_value, &variant) == SAIL_OK);
+    munit_assert(sail_alloc_variant(&variant) == SAIL_OK);
+    munit_assert(sail_set_variant_int(variant, reference_value) == SAIL_OK);
 
     struct sail_variant *variant_copy = NULL;
     munit_assert(sail_copy_variant(variant, &variant_copy) == SAIL_OK);
@@ -70,12 +71,13 @@ static MunitResult test_copy(const MunitParameter params[], void *user_data) {
     return MUNIT_OK;
 }
 
-#define TEST_VARIANT_FROM_VALUE(VALUE_TYPE, VALUE, ALLOCATOR, VARIANT_TYPE, ACCESSOR) \
+#define TEST_VARIANT_FROM_VALUE(VALUE_TYPE, VALUE, SETTER, VARIANT_TYPE, ACCESSOR) \
 do {                                                         \
     VALUE_TYPE s = VALUE;                                    \
                                                              \
     struct sail_variant *variant;                            \
-    munit_assert(ALLOCATOR(s, &variant) == SAIL_OK);         \
+    munit_assert(sail_alloc_variant(&variant) == SAIL_OK);   \
+    munit_assert(SETTER(variant, s) == SAIL_OK);             \
                                                              \
     munit_assert(variant->value_type == VARIANT_TYPE);       \
     munit_assert(ACCESSOR(variant) == s);                    \
@@ -88,42 +90,43 @@ static MunitResult test_from_value(const MunitParameter params[], void *user_dat
     (void)params;
     (void)user_data;
 
-    TEST_VARIANT_FROM_VALUE(char,          'a', sail_alloc_variant_from_char,          SAIL_VARIANT_TYPE_CHAR,          sail_variant_to_char);
-    TEST_VARIANT_FROM_VALUE(unsigned char, 'b', sail_alloc_variant_from_unsigned_char, SAIL_VARIANT_TYPE_UNSIGNED_CHAR, sail_variant_to_unsigned_char);
+    TEST_VARIANT_FROM_VALUE(char,          'a', sail_set_variant_char,          SAIL_VARIANT_TYPE_CHAR,          sail_variant_to_char);
+    TEST_VARIANT_FROM_VALUE(unsigned char, 'b', sail_set_variant_unsigned_char, SAIL_VARIANT_TYPE_UNSIGNED_CHAR, sail_variant_to_unsigned_char);
 
-    TEST_VARIANT_FROM_VALUE(short,          2110, sail_alloc_variant_from_short,          SAIL_VARIANT_TYPE_SHORT,          sail_variant_to_short);
-    TEST_VARIANT_FROM_VALUE(unsigned short, 2110, sail_alloc_variant_from_unsigned_short, SAIL_VARIANT_TYPE_UNSIGNED_SHORT, sail_variant_to_unsigned_short);
+    TEST_VARIANT_FROM_VALUE(short,          2110, sail_set_variant_short,          SAIL_VARIANT_TYPE_SHORT,          sail_variant_to_short);
+    TEST_VARIANT_FROM_VALUE(unsigned short, 2110, sail_set_variant_unsigned_short, SAIL_VARIANT_TYPE_UNSIGNED_SHORT, sail_variant_to_unsigned_short);
 
-    TEST_VARIANT_FROM_VALUE(int,          0xFFFF5, sail_alloc_variant_from_int,          SAIL_VARIANT_TYPE_INT,          sail_variant_to_int);
-    TEST_VARIANT_FROM_VALUE(unsigned int, 0xFFFF5, sail_alloc_variant_from_unsigned_int, SAIL_VARIANT_TYPE_UNSIGNED_INT, sail_variant_to_unsigned_int);
+    TEST_VARIANT_FROM_VALUE(int,          0xFFFF5, sail_set_variant_int,          SAIL_VARIANT_TYPE_INT,          sail_variant_to_int);
+    TEST_VARIANT_FROM_VALUE(unsigned int, 0xFFFF5, sail_set_variant_unsigned_int, SAIL_VARIANT_TYPE_UNSIGNED_INT, sail_variant_to_unsigned_int);
 
-    TEST_VARIANT_FROM_VALUE(long,          0xFFFF6, sail_alloc_variant_from_long,          SAIL_VARIANT_TYPE_LONG,          sail_variant_to_long);
-    TEST_VARIANT_FROM_VALUE(unsigned long, 0xFFFF6, sail_alloc_variant_from_unsigned_long, SAIL_VARIANT_TYPE_UNSIGNED_LONG, sail_variant_to_unsigned_long);
+    TEST_VARIANT_FROM_VALUE(long,          0xFFFF6, sail_set_variant_long,          SAIL_VARIANT_TYPE_LONG,          sail_variant_to_long);
+    TEST_VARIANT_FROM_VALUE(unsigned long, 0xFFFF6, sail_set_variant_unsigned_long, SAIL_VARIANT_TYPE_UNSIGNED_LONG, sail_variant_to_unsigned_long);
 
     time_t timestamp = time(NULL);
-    TEST_VARIANT_FROM_VALUE(time_t, timestamp, sail_alloc_variant_from_timestamp, SAIL_VARIANT_TYPE_TIMESTAMP, sail_variant_to_timestamp);
+    TEST_VARIANT_FROM_VALUE(time_t, timestamp, sail_set_variant_timestamp, SAIL_VARIANT_TYPE_TIMESTAMP, sail_variant_to_timestamp);
 
     return MUNIT_OK;
 }
 
-#define TEST_VARIANT_FROM_STRING(VALUE, ALLOCATOR, VARIANT_TYPE, ACCESSOR) \
-do {                                                      \
-    void *ptr = (void *)VALUE;                            \
-    struct sail_variant *variant;                         \
-    munit_assert(ALLOCATOR(ptr, &variant) == SAIL_OK);    \
-                                                          \
-    munit_assert(variant->value_type == VARIANT_TYPE);    \
-    munit_assert(strcmp(ACCESSOR(variant), ptr) == 0);    \
-    munit_assert(variant->value_size == strlen(ptr) + 1); \
-                                                          \
-    sail_destroy_variant(variant);                        \
+#define TEST_VARIANT_FROM_STRING(VALUE, SETTER, VARIANT_TYPE, ACCESSOR) \
+do {                                                       \
+    void *ptr = (void *)VALUE;                             \
+    struct sail_variant *variant;                          \
+    munit_assert(sail_alloc_variant(&variant) == SAIL_OK); \
+    munit_assert(SETTER(variant, ptr) == SAIL_OK);         \
+                                                           \
+    munit_assert(variant->value_type == VARIANT_TYPE);     \
+    munit_assert(strcmp(ACCESSOR(variant), ptr) == 0);     \
+    munit_assert(variant->value_size == strlen(ptr) + 1);  \
+                                                           \
+    sail_destroy_variant(variant);                         \
 } while(0)
 
 static MunitResult test_from_string(const MunitParameter params[], void *user_data) {
     (void)params;
     (void)user_data;
 
-    TEST_VARIANT_FROM_STRING("abc", sail_alloc_variant_from_string, SAIL_VARIANT_TYPE_STRING, sail_variant_to_string);
+    TEST_VARIANT_FROM_STRING("abc", sail_set_variant_string, SAIL_VARIANT_TYPE_STRING, sail_variant_to_string);
 
     const char *copy_from = "xyz";
     const size_t copy_size = strlen(copy_from) + 1;
@@ -139,16 +142,17 @@ static MunitResult test_from_string(const MunitParameter params[], void *user_da
     strcpy(str, "xyz");
 #endif
 
-    TEST_VARIANT_FROM_STRING(str, sail_alloc_variant_from_adopted_string, SAIL_VARIANT_TYPE_STRING, sail_variant_to_string);
+    TEST_VARIANT_FROM_STRING(str, sail_set_variant_adopted_string, SAIL_VARIANT_TYPE_STRING, sail_variant_to_string);
 
     return MUNIT_OK;
 }
 
-#define TEST_VARIANT_FROM_DATA(VALUE, VALUE_SIZE, ALLOCATOR, VARIANT_TYPE, ACCESSOR) \
+#define TEST_VARIANT_FROM_DATA(VALUE, VALUE_SIZE, SETTER, VARIANT_TYPE, ACCESSOR) \
 do {                                                               \
     void *ptr = (void *)VALUE;                                     \
     struct sail_variant *variant;                                  \
-    munit_assert(ALLOCATOR(ptr, VALUE_SIZE, &variant) == SAIL_OK); \
+    munit_assert(sail_alloc_variant(&variant) == SAIL_OK);         \
+    munit_assert(SETTER(variant, ptr, VALUE_SIZE) == SAIL_OK);     \
                                                                    \
     munit_assert(variant->value_type == VARIANT_TYPE);             \
     munit_assert(memcmp(ACCESSOR(variant), ptr, VALUE_SIZE) == 0); \
@@ -161,7 +165,7 @@ static MunitResult test_from_data(const MunitParameter params[], void *user_data
     (void)params;
     (void)user_data;
 
-    TEST_VARIANT_FROM_DATA("abc", 3, sail_alloc_variant_from_data, SAIL_VARIANT_TYPE_DATA, sail_variant_to_data);
+    TEST_VARIANT_FROM_DATA("abc", 3, sail_set_variant_data, SAIL_VARIANT_TYPE_DATA, sail_variant_to_data);
 
     const char *copy_from = "xyz";
     const size_t copy_size = strlen(copy_from) + 1;
@@ -177,7 +181,7 @@ static MunitResult test_from_data(const MunitParameter params[], void *user_data
     strcpy(str, "xyz");
 #endif
 
-    TEST_VARIANT_FROM_DATA(str, 3, sail_alloc_variant_from_adopted_data, SAIL_VARIANT_TYPE_DATA, sail_variant_to_data);
+    TEST_VARIANT_FROM_DATA(str, 3, sail_set_variant_adopted_data, SAIL_VARIANT_TYPE_DATA, sail_variant_to_data);
 
     return MUNIT_OK;
 }

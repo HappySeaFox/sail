@@ -281,12 +281,16 @@ static sail_status_t read_meta_data(FILE *fptr, struct sail_image *image) {
                                 /* on error */ sail_destroy_meta_data_node(meta_data_node),
                                                sail_free(value));
 
+            SAIL_TRY_OR_CLEANUP(sail_alloc_variant(&meta_data_node->meta_data->value),
+                                /* on error */ sail_destroy_meta_data_node(meta_data_node),
+                                               sail_free(value));
+
             if (variant_type == SAIL_VARIANT_TYPE_STRING) {
-                SAIL_TRY_OR_CLEANUP(sail_alloc_variant_from_string((const char *)value, &meta_data_node->meta_data->value),
+                SAIL_TRY_OR_CLEANUP(sail_set_variant_string(meta_data_node->meta_data->value, (const char *)value),
                                     /* on error */ sail_destroy_meta_data_node(meta_data_node),
                                                    sail_free(value));
             } else {
-                SAIL_TRY_OR_CLEANUP(sail_alloc_variant_from_data(value, data_length, &meta_data_node->meta_data->value),
+                SAIL_TRY_OR_CLEANUP(sail_set_variant_data(meta_data_node->meta_data->value, value, data_length),
                                     /* on error */ sail_destroy_meta_data_node(meta_data_node),
                                                    sail_free(value));
             }
@@ -294,13 +298,16 @@ static sail_status_t read_meta_data(FILE *fptr, struct sail_image *image) {
             SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_from_known_key(meta_data, &meta_data_node->meta_data),
                                 /* on error */ sail_destroy_meta_data_node(meta_data_node),
                                                sail_free(value));
+            SAIL_TRY_OR_CLEANUP(sail_alloc_variant(&meta_data_node->meta_data->value),
+                                /* on error */ sail_destroy_meta_data_node(meta_data_node),
+                                               sail_free(value));
 
             if (variant_type == SAIL_VARIANT_TYPE_STRING) {
-                SAIL_TRY_OR_CLEANUP(sail_alloc_variant_from_string((const char *)value, &meta_data_node->meta_data->value),
+                SAIL_TRY_OR_CLEANUP(sail_set_variant_string(meta_data_node->meta_data->value, (const char *)value),
                                     /* on error */ sail_destroy_meta_data_node(meta_data_node),
                                                    sail_free(value));
             } else {
-                SAIL_TRY_OR_CLEANUP(sail_alloc_variant_from_data(value, data_length, &meta_data_node->meta_data->value),
+                SAIL_TRY_OR_CLEANUP(sail_set_variant_data(meta_data_node->meta_data->value, value, data_length),
                                     /* on error */ sail_destroy_meta_data_node(meta_data_node),
                                                    sail_free(value));
             }

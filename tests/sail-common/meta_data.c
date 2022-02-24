@@ -93,7 +93,8 @@ static MunitResult test_copy_known_string_meta_data(const MunitParameter params[
     munit_assert(sail_alloc_meta_data_from_known_key(SAIL_META_DATA_COMMENT, &meta_data) == SAIL_OK);
     munit_assert_not_null(meta_data);
 
-    munit_assert(sail_alloc_variant_from_string(value, &meta_data->value) == SAIL_OK);
+    munit_assert(sail_alloc_variant(&meta_data->value) == SAIL_OK);
+    munit_assert(sail_set_variant_string(meta_data->value, value) == SAIL_OK);
     munit_assert_not_null(meta_data->value);
 
     struct sail_meta_data *meta_data_copy = NULL;
@@ -120,7 +121,8 @@ static MunitResult test_copy_unknown_string_meta_data(const MunitParameter param
     munit_assert(sail_alloc_meta_data_from_unknown_key(key, &meta_data) == SAIL_OK);
     munit_assert_not_null(meta_data);
 
-    munit_assert(sail_alloc_variant_from_string(value, &meta_data->value) == SAIL_OK);
+    munit_assert(sail_alloc_variant(&meta_data->value) == SAIL_OK);
+    munit_assert(sail_set_variant_string(meta_data->value, value) == SAIL_OK);
     munit_assert_not_null(meta_data->value);
 
     struct sail_meta_data *meta_data_copy = NULL;
