@@ -113,16 +113,16 @@ sail_status_t tga_private_fetch_id(struct sail_io *io, const struct TgaFileHeade
 
     struct sail_meta_data *meta_data = meta_data_node_local->meta_data;
 
-    meta_data->key               = SAIL_META_DATA_ID;
-    meta_data->value->value_type = SAIL_VARIANT_TYPE_STRING;
-    meta_data->value->value_size = file_header->id_length + 1;
+    meta_data->key         = SAIL_META_DATA_ID;
+    meta_data->value->type = SAIL_VARIANT_TYPE_STRING;
+    meta_data->value->size = file_header->id_length + 1;
 
-    SAIL_TRY_OR_CLEANUP(sail_malloc(meta_data->value->value_size, &meta_data->value->value),
+    SAIL_TRY_OR_CLEANUP(sail_malloc(meta_data->value->size, &meta_data->value->value),
                         /* cleanup */ sail_destroy_meta_data_node(meta_data_node_local));
-    SAIL_TRY_OR_CLEANUP(io->strict_read(io->stream, meta_data->value->value, meta_data->value->value_size - 1),
+    SAIL_TRY_OR_CLEANUP(io->strict_read(io->stream, meta_data->value->value, meta_data->value->size - 1),
                         /* cleanup */ sail_destroy_meta_data_node(meta_data_node_local));
 
-    (sail_variant_to_string(meta_data->value))[meta_data->value->value_size - 1] = '\0';
+    (sail_variant_to_string(meta_data->value))[meta_data->value->size - 1] = '\0';
 
     *meta_data_node = meta_data_node_local;
 

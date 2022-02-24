@@ -364,7 +364,7 @@ sail_status_t tiff_private_write_meta_data(TIFF *tiff, const struct sail_meta_da
     for (; meta_data_node != NULL; meta_data_node = meta_data_node->next) {
         const struct sail_meta_data *meta_data = meta_data_node->meta_data;
 
-        if (meta_data->value->value_type == SAIL_VARIANT_TYPE_STRING) {
+        if (meta_data->value->type == SAIL_VARIANT_TYPE_STRING) {
             int tiff_tag = -1;
 
             switch (meta_data->key) {

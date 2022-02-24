@@ -52,19 +52,19 @@ struct sail_variant;
  * {
  *     key         = SAIL_META_DATA_UNKNOWN,
  *     key_unknown = "My Data",
- *     value       = { SAIL_META_DATA_TYPE_STRING, "Data" } 
+ *     value       = { SAIL_VARIANT_TYPE_STRING, "Data" } 
  * }
  *
  * {
  *     key         = SAIL_META_DATA_COMMENT,
  *     key_unknown = NULL,
- *     value       = { SAIL_META_DATA_TYPE_STRING, "Holidays" }
+ *     value       = { SAIL_VARIANT_TYPE_STRING, "Holidays" }
  * }
  *
  * {
  *     key         = SAIL_META_DATA_EXIF,
  *     key_unknown = NULL,
- *     value_type  = { SAIL_META_DATA_TYPE_DATA, <binary data> }
+ *     value       = { SAIL_VARIANT_TYPE_DATA, <binary data> }
  * }
  *
  * Not every image codec supports key-values. For example:

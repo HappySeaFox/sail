@@ -70,7 +70,7 @@ struct sail_variant {
     /*
      * Value type.
      */
-    enum SailVariantType value_type;
+    enum SailVariantType type;
 
     /*
      * Pointer to the actual variant value.
@@ -80,7 +80,7 @@ struct sail_variant {
     /*
      * The size of the allocated memory for the value. For strings, it's strlen() + 1.
      */
-    size_t value_size;
+    size_t size;
 };
 
 /*
@@ -177,18 +177,18 @@ SAIL_EXPORT sail_status_t sail_set_variant_adopted_string(struct sail_variant *v
  * Sets a deep copy of the specified substring as a new variant value.
  *
  * The size of the substring must not include a null character. Adds a null character to the end
- * of the constructed variant value, i.e. its final size is value_size + 1.
+ * of the constructed variant value, i.e. its final size is size + 1.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_set_variant_substring(struct sail_variant *variant, const char *value, size_t value_size);
+SAIL_EXPORT sail_status_t sail_set_variant_substring(struct sail_variant *variant, const char *value, size_t size);
 
 /*
  * Sets a deep copy of the specified data buffer as a new variant value.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_set_variant_data(struct sail_variant *variant, const void *value, size_t value_size);
+SAIL_EXPORT sail_status_t sail_set_variant_data(struct sail_variant *variant, const void *value, size_t size);
 
 /*
  * Sets a shallow copy of the specified data buffer as a new variant value.
@@ -196,7 +196,7 @@ SAIL_EXPORT sail_status_t sail_set_variant_data(struct sail_variant *variant, co
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_set_variant_adopted_data(struct sail_variant *variant, void *value, size_t value_size);
+SAIL_EXPORT sail_status_t sail_set_variant_adopted_data(struct sail_variant *variant, void *value, size_t size);
 
 /*
  * Returns the variant value as a char. Behavior is undefined if the variant is invalid

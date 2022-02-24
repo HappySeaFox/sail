@@ -362,15 +362,15 @@ sail_status_t png_private_write_meta_data(png_structp png_ptr, png_infop info_pt
             const struct sail_meta_data *meta_data = meta_data_node->meta_data;
 
             if (meta_data->key == SAIL_META_DATA_EXIF) {
-                if (meta_data->value->value_type == SAIL_VARIANT_TYPE_DATA) {
+                if (meta_data->value->type == SAIL_VARIANT_TYPE_DATA) {
                     /* Skip "Exif\0\0" if any. */
-                    if (meta_data->value->value_size >= 4 && memcmp(sail_variant_to_data(meta_data->value), "Exif", 4) == 0) {
-                        SAIL_LOG_DEBUG("PNG: Writing raw EXIF %u bytes long w/o header", (unsigned)meta_data->value->value_size - 6);
-                        png_set_eXIf_1(png_ptr, info_ptr, (png_uint_32)meta_data->value->value_size - 6,
+                    if (meta_data->value->size >= 4 && memcmp(sail_variant_to_data(meta_data->value), "Exif", 4) == 0) {
+                        SAIL_LOG_DEBUG("PNG: Writing raw EXIF %u bytes long w/o header", (unsigned)meta_data->value->size - 6);
+                        png_set_eXIf_1(png_ptr, info_ptr, (png_uint_32)meta_data->value->size - 6,
                                         ((png_bytep)sail_variant_to_data(meta_data->value)) + 6);
                     } else {
-                        SAIL_LOG_DEBUG("PNG: Writing raw EXIF %u bytes long", (unsigned)meta_data->value->value_size);
-                        png_set_eXIf_1(png_ptr, info_ptr, (png_uint_32)meta_data->value->value_size, meta_data->value->value);
+                        SAIL_LOG_DEBUG("PNG: Writing raw EXIF %u bytes long", (unsigned)meta_data->value->size);
+                        png_set_eXIf_1(png_ptr, info_ptr, (png_uint_32)meta_data->value->size, meta_data->value->value);
                     }
                 } else {
                     SAIL_LOG_ERROR("PNG: EXIF meta data must have DATA type");
@@ -390,11 +390,11 @@ sail_status_t png_private_write_meta_data(png_structp png_ptr, png_infop info_pt
                         SAIL_TRY_OR_EXECUTE(write_raw_profile_header(raw_profile_header,
                                                                         sizeof(raw_profile_header),
                                                                         meta_data->key,
-                                                                        (meta_data->value->value_size - 1) * 2),
+                                                                        (meta_data->value->size - 1) * 2),
                                             /* on error */ continue);
 
                         char *hex_string;
-                        SAIL_TRY_OR_EXECUTE(sail_data_to_hex_string(sail_variant_to_data(meta_data->value), meta_data->value->value_size, &hex_string),
+                        SAIL_TRY_OR_EXECUTE(sail_data_to_hex_string(sail_variant_to_data(meta_data->value), meta_data->value->size, &hex_string),
                                             /* on error */ continue);
 
                         SAIL_TRY_OR_EXECUTE(sail_concat(&meta_data_value, 2, raw_profile_header, hex_string),

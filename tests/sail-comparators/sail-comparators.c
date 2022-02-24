@@ -71,9 +71,9 @@ sail_status_t sail_compare_variants(const struct sail_variant *variant1, const s
 
     munit_assert(variant1 != variant2);
 
-    munit_assert(variant1->value_type == variant2->value_type);
-    munit_assert_memory_equal(variant1->value_size, variant1->value, variant2->value);
-    munit_assert(variant1->value_size == variant2->value_size);
+    munit_assert(variant1->type == variant2->type);
+    munit_assert_memory_equal(variant1->size, variant1->value, variant2->value);
+    munit_assert(variant1->size == variant2->size);
 
     return SAIL_OK;
 }

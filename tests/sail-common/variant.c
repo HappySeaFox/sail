@@ -38,9 +38,9 @@ static MunitResult test_alloc(const MunitParameter params[], void *user_data) {
     munit_assert(sail_alloc_variant(&variant) == SAIL_OK);
 
     munit_assert_not_null(variant);
-    munit_assert(variant->value_type == SAIL_VARIANT_TYPE_INVALID);
+    munit_assert(variant->type == SAIL_VARIANT_TYPE_INVALID);
     munit_assert_null(variant->value);
-    munit_assert(variant->value_size == 0);
+    munit_assert(variant->size == 0);
 
     sail_destroy_variant(variant);
 
@@ -61,9 +61,9 @@ static MunitResult test_copy(const MunitParameter params[], void *user_data) {
     munit_assert(sail_copy_variant(variant, &variant_copy) == SAIL_OK);
 
     munit_assert_not_null(variant_copy);
-    munit_assert(variant_copy->value_type == SAIL_VARIANT_TYPE_INT);
+    munit_assert(variant_copy->type == SAIL_VARIANT_TYPE_INT);
     munit_assert(sail_variant_to_int(variant_copy) == reference_value);
-    munit_assert(variant_copy->value_size == sizeof(reference_value));
+    munit_assert(variant_copy->size == sizeof(reference_value));
 
     sail_destroy_variant(variant_copy);
     sail_destroy_variant(variant);
@@ -72,18 +72,18 @@ static MunitResult test_copy(const MunitParameter params[], void *user_data) {
 }
 
 #define TEST_VARIANT_FROM_VALUE(VALUE_TYPE, VALUE, SETTER, VARIANT_TYPE, ACCESSOR) \
-do {                                                         \
-    VALUE_TYPE s = VALUE;                                    \
-                                                             \
-    struct sail_variant *variant;                            \
-    munit_assert(sail_alloc_variant(&variant) == SAIL_OK);   \
-    munit_assert(SETTER(variant, s) == SAIL_OK);             \
-                                                             \
-    munit_assert(variant->value_type == VARIANT_TYPE);       \
-    munit_assert(ACCESSOR(variant) == s);                    \
-    munit_assert(variant->value_size == sizeof(VALUE_TYPE)); \
-                                                             \
-    sail_destroy_variant(variant);                           \
+do {                                                       \
+    VALUE_TYPE s = VALUE;                                  \
+                                                           \
+    struct sail_variant *variant;                          \
+    munit_assert(sail_alloc_variant(&variant) == SAIL_OK); \
+    munit_assert(SETTER(variant, s) == SAIL_OK);           \
+                                                           \
+    munit_assert(variant->type == VARIANT_TYPE);           \
+    munit_assert(ACCESSOR(variant) == s);                  \
+    munit_assert(variant->size == sizeof(VALUE_TYPE));     \
+                                                           \
+    sail_destroy_variant(variant);                         \
 } while(0)
 
 static MunitResult test_from_value(const MunitParameter params[], void *user_data) {
@@ -115,9 +115,9 @@ do {                                                       \
     munit_assert(sail_alloc_variant(&variant) == SAIL_OK); \
     munit_assert(SETTER(variant, ptr) == SAIL_OK);         \
                                                            \
-    munit_assert(variant->value_type == VARIANT_TYPE);     \
+    munit_assert(variant->type == VARIANT_TYPE);           \
     munit_assert(strcmp(ACCESSOR(variant), ptr) == 0);     \
-    munit_assert(variant->value_size == strlen(ptr) + 1);  \
+    munit_assert(variant->size == strlen(ptr) + 1);        \
                                                            \
     sail_destroy_variant(variant);                         \
 } while(0)
@@ -154,9 +154,9 @@ do {                                                               \
     munit_assert(sail_alloc_variant(&variant) == SAIL_OK);         \
     munit_assert(SETTER(variant, ptr, VALUE_SIZE) == SAIL_OK);     \
                                                                    \
-    munit_assert(variant->value_type == VARIANT_TYPE);             \
+    munit_assert(variant->type == VARIANT_TYPE);                   \
     munit_assert(memcmp(ACCESSOR(variant), ptr, VALUE_SIZE) == 0); \
-    munit_assert(variant->value_size == VALUE_SIZE);               \
+    munit_assert(variant->size == VALUE_SIZE);                     \
                                                                    \
     sail_destroy_variant(variant);                                 \
 } while(0)

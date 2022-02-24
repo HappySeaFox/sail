@@ -127,11 +127,11 @@ sail_status_t jpeg_private_fetch_meta_data(struct jpeg_decompress_struct *decomp
 sail_status_t jpeg_private_write_meta_data(struct jpeg_compress_struct *compress_context, const struct sail_meta_data_node *meta_data_node) {
 
     while (meta_data_node != NULL) {
-        if (meta_data_node->meta_data->value->value_type == SAIL_VARIANT_TYPE_STRING) {
+        if (meta_data_node->meta_data->value->type == SAIL_VARIANT_TYPE_STRING) {
             jpeg_write_marker(compress_context,
                                 JPEG_COM,
                                 (JOCTET *)sail_variant_to_string(meta_data_node->meta_data->value),
-                                (unsigned)meta_data_node->meta_data->value->value_size - 1);
+                                (unsigned)meta_data_node->meta_data->value->size - 1);
         } else {
             SAIL_LOG_WARNING("JPEG: Ignoring unsupported binary key '%s'", sail_meta_data_to_string(meta_data_node->meta_data->key));
         }

@@ -318,9 +318,9 @@ static sail_status_t read_meta_data(FILE *fptr, struct sail_image *image) {
 
         sail_free(value);
 
-        SAIL_LOG_DEBUG("DUMP: Meta data properties: key(%s) key_unknown(%s), type(%s), value_size(%u)",
+        SAIL_LOG_DEBUG("DUMP: Meta data properties: key(%s) key_unknown(%s), type(%s), size(%u)",
                         sail_meta_data_to_string(meta_data_node->meta_data->key), meta_data_node->meta_data->key_unknown, type,
-                        meta_data_node->meta_data->value->value_size);
+                        meta_data_node->meta_data->value->size);
     }
 
     return SAIL_OK;
@@ -546,17 +546,17 @@ sail_status_t sail_dump(const struct sail_image *image) {
                 printf("%s\n", sail_meta_data_to_string(meta_data->key));
                 printf("%s\n", meta_data->key_unknown == NULL ? "noop" : meta_data->key_unknown);
 
-                const char *value_type_str = NULL;
-                switch (meta_data->value->value_type) {
-                    case SAIL_VARIANT_TYPE_STRING: value_type_str = "STRING"; break;
-                    case SAIL_VARIANT_TYPE_DATA:   value_type_str = "DATA";   break;
+                const char *type_str = NULL;
+                switch (meta_data->value->type) {
+                    case SAIL_VARIANT_TYPE_STRING: type_str = "STRING"; break;
+                    case SAIL_VARIANT_TYPE_DATA:   type_str = "DATA";   break;
                     default: {
-                        SAIL_LOG_ERROR("DUMP: Unknown meta data value type #%d", meta_data->value->value_type);
+                        SAIL_LOG_ERROR("DUMP: Unknown meta data value type #%d", meta_data->value->type);
                         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
                     }
                 }
-                printf("%s %u\n", value_type_str, (unsigned)meta_data->value->value_size);
-                SAIL_TRY(print_hex(meta_data->value->value, meta_data->value->value_size));
+                printf("%s %u\n", type_str, (unsigned)meta_data->value->size);
+                SAIL_TRY(print_hex(meta_data->value->value, meta_data->value->size));
             }
 
             printf("\n");

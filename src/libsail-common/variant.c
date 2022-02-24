@@ -30,31 +30,31 @@
 /*
  * Private functions.
  */
-static sail_status_t set_variant_value(struct sail_variant *variant, enum SailVariantType value_type, const void *value, const size_t value_size) {
+static sail_status_t set_variant_value(struct sail_variant *variant, enum SailVariantType type, const void *value, const size_t size) {
 
     SAIL_CHECK_PTR(variant);
 
     void *ptr;
-    SAIL_TRY(sail_malloc(value_size, &ptr));
+    SAIL_TRY(sail_malloc(size, &ptr));
 
     sail_free(variant->value);
     variant->value = ptr;
-    memcpy(variant->value, value, value_size);
+    memcpy(variant->value, value, size);
 
-    variant->value_type = value_type;
-    variant->value_size = value_size;
+    variant->type = type;
+    variant->size = size;
 
     return SAIL_OK;
 }
 
-static sail_status_t alloc_variant(enum SailVariantType value_type, const void *value, const size_t value_size, struct sail_variant **variant) {
+static sail_status_t alloc_variant(enum SailVariantType type, const void *value, const size_t size, struct sail_variant **variant) {
 
     SAIL_CHECK_PTR(variant);
 
     struct sail_variant *variant_local;
     SAIL_TRY(sail_alloc_variant(&variant_local));
 
-    SAIL_TRY_OR_CLEANUP(set_variant_value(variant_local, value_type, value, value_size),
+    SAIL_TRY_OR_CLEANUP(set_variant_value(variant_local, type, value, size),
                         /* on error */ sail_destroy_variant(variant_local));
 
     *variant = variant_local;
@@ -73,9 +73,9 @@ sail_status_t sail_alloc_variant(struct sail_variant **variant) {
     SAIL_TRY(sail_malloc(sizeof(struct sail_variant), &ptr));
     *variant = ptr;
 
-    (*variant)->value_type  = SAIL_VARIANT_TYPE_INVALID;
-    (*variant)->value       = NULL;
-    (*variant)->value_size  = 0;
+    (*variant)->type  = SAIL_VARIANT_TYPE_INVALID;
+    (*variant)->value = NULL;
+    (*variant)->size  = 0;
 
     return SAIL_OK;
 }
@@ -166,39 +166,39 @@ sail_status_t sail_set_variant_adopted_string(struct sail_variant *variant, char
 
     sail_free(variant->value);
 
-    variant->value_type = SAIL_VARIANT_TYPE_STRING;
-    variant->value      = value;
-    variant->value_size = strlen(value) + 1;
+    variant->type  = SAIL_VARIANT_TYPE_STRING;
+    variant->value = value;
+    variant->size  = strlen(value) + 1;
 
     return SAIL_OK;
 }
 
-sail_status_t sail_set_variant_substring(struct sail_variant *variant, const char *value, size_t value_size) {
+sail_status_t sail_set_variant_substring(struct sail_variant *variant, const char *value, size_t size) {
 
-    SAIL_TRY(set_variant_value(variant, SAIL_VARIANT_TYPE_STRING, value, value_size + 1));
+    SAIL_TRY(set_variant_value(variant, SAIL_VARIANT_TYPE_STRING, value, size + 1));
 
     char *str = variant->value;
-    str[value_size] = '\0';
+    str[size] = '\0';
 
     return SAIL_OK;
 }
 
-sail_status_t sail_set_variant_data(struct sail_variant *variant, const void *value, size_t value_size) {
+sail_status_t sail_set_variant_data(struct sail_variant *variant, const void *value, size_t size) {
 
-    SAIL_TRY(set_variant_value(variant, SAIL_VARIANT_TYPE_DATA, value, value_size));
+    SAIL_TRY(set_variant_value(variant, SAIL_VARIANT_TYPE_DATA, value, size));
 
     return SAIL_OK;
 }
 
-sail_status_t sail_set_variant_adopted_data(struct sail_variant *variant, void *value, size_t value_size) {
+sail_status_t sail_set_variant_adopted_data(struct sail_variant *variant, void *value, size_t size) {
 
     SAIL_CHECK_PTR(variant);
 
     sail_free(variant->value);
 
-    variant->value_type = SAIL_VARIANT_TYPE_DATA;
+    variant->type = SAIL_VARIANT_TYPE_DATA;
     variant->value      = value;
-    variant->value_size = value_size;
+    variant->size = size;
 
     return SAIL_OK;
 }
@@ -262,7 +262,7 @@ sail_status_t sail_check_variant_valid(const struct sail_variant *variant)
 {
     SAIL_CHECK_PTR(variant);
 
-    if (variant->value_type == SAIL_VARIANT_TYPE_INVALID || variant->value == NULL || variant->value_size == 0) {
+    if (variant->type == SAIL_VARIANT_TYPE_INVALID || variant->value == NULL || variant->size == 0) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_VARIANT);
     }
 
@@ -274,7 +274,7 @@ sail_status_t sail_copy_variant(const struct sail_variant *source, struct sail_v
     SAIL_CHECK_PTR(source);
     SAIL_CHECK_PTR(target);
 
-    SAIL_TRY(alloc_variant(source->value_type, source->value, source->value_size, target));
+    SAIL_TRY(alloc_variant(source->type, source->value, source->size, target));
 
     return SAIL_OK;
 }
