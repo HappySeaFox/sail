@@ -102,12 +102,15 @@ static sail_status_t hex_string_to_meta_data_node(const char *hex_str, enum Sail
     SAIL_TRY(sail_hex_string_to_data(start, &data, &data_size));
 
     struct sail_meta_data_node *meta_data_node_local;
+
     SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_node(&meta_data_node_local),
                         /* cleanup */ sail_free(data));
-    SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data(&meta_data_node_local->meta_data),
+    SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_from_known_key(key, &meta_data_node_local->meta_data),
+                        /* cleanup */ sail_free(data));
+    SAIL_TRY_OR_CLEANUP(sail_alloc_variant(&meta_data_node_local->meta_data->value),
                         /* cleanup */ sail_destroy_meta_data_node(meta_data_node_local),
-                                      sail_free(data));
-    SAIL_TRY_OR_CLEANUP(sail_alloc_variant_from_data(data, data_size, &meta_data_node_local->meta_data->value),
+                                      free(data));
+    SAIL_TRY_OR_CLEANUP(sail_set_variant_data(meta_data_node_local->meta_data->value, data, data_size),
                         /* cleanup */ sail_destroy_meta_data_node(meta_data_node_local),
                                       free(data));
 
@@ -299,7 +302,9 @@ sail_status_t png_private_fetch_meta_data(png_structp png_ptr, png_infop info_pt
                                     /* cleanup */ sail_destroy_meta_data_node(meta_data_node));
             }
 
-            SAIL_TRY_OR_CLEANUP(sail_alloc_variant_from_string(lines[i].text, &meta_data_node->meta_data->value),
+            SAIL_TRY_OR_CLEANUP(sail_alloc_variant(&meta_data_node->meta_data->value),
+                                /* cleanup */ sail_destroy_meta_data_node(meta_data_node));
+            SAIL_TRY_OR_CLEANUP(sail_set_variant_string(meta_data_node->meta_data->value, lines[i].text),
                                 /* cleanup */ sail_destroy_meta_data_node(meta_data_node));
         }
 
@@ -316,7 +321,9 @@ sail_status_t png_private_fetch_meta_data(png_structp png_ptr, png_infop info_pt
         SAIL_TRY(sail_alloc_meta_data_node(&meta_data_node));
         SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_from_known_key(SAIL_META_DATA_EXIF, &meta_data_node->meta_data),
                             /* cleanup */ sail_destroy_meta_data_node(meta_data_node));
-        SAIL_TRY_OR_CLEANUP(sail_alloc_variant_from_data(exif, exif_length, &meta_data_node->meta_data->value),
+        SAIL_TRY_OR_CLEANUP(sail_alloc_variant(&meta_data_node->meta_data->value),
+                            /* cleanup */ sail_destroy_meta_data_node(meta_data_node));
+        SAIL_TRY_OR_CLEANUP(sail_set_variant_data(meta_data_node->meta_data->value, exif, exif_length),
                             /* cleanup */ sail_destroy_meta_data_node(meta_data_node));
 
         *last_meta_data_node = meta_data_node;

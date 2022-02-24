@@ -109,8 +109,9 @@ sail_status_t jpeg_private_fetch_meta_data(struct jpeg_decompress_struct *decomp
 
             SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_from_known_key(SAIL_META_DATA_COMMENT, &meta_data_node->meta_data),
                                 /* cleanup */ sail_destroy_meta_data_node(meta_data_node));
-
-            SAIL_TRY_OR_CLEANUP(sail_alloc_variant_from_substring((const char *)it->data, it->data_length, &meta_data_node->meta_data->value),
+            SAIL_TRY_OR_CLEANUP(sail_alloc_variant(&meta_data_node->meta_data->value),
+                                /* cleanup */ sail_destroy_meta_data_node(meta_data_node));
+            SAIL_TRY_OR_CLEANUP(sail_set_variant_substring(meta_data_node->meta_data->value, (const char *)it->data, it->data_length),
                                 /* cleanup */ sail_destroy_meta_data_node(meta_data_node));
 
             *last_meta_data_node = meta_data_node;
