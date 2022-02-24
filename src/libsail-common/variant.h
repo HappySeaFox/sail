@@ -56,6 +56,8 @@ enum SailVariantType {
     SAIL_VARIANT_TYPE_UNSIGNED_INT,
     SAIL_VARIANT_TYPE_LONG,
     SAIL_VARIANT_TYPE_UNSIGNED_LONG,
+    SAIL_VARIANT_TYPE_FLOAT,
+    SAIL_VARIANT_TYPE_DOUBLE,
     SAIL_VARIANT_TYPE_TIMESTAMP, /* Unix timestamp. */
     SAIL_VARIANT_TYPE_STRING,
     SAIL_VARIANT_TYPE_DATA,
@@ -152,6 +154,20 @@ SAIL_EXPORT sail_status_t sail_set_variant_long(struct sail_variant *variant, lo
 SAIL_EXPORT sail_status_t sail_set_variant_unsigned_long(struct sail_variant *variant, unsigned long value);
 
 /*
+ * Sets the specified float value as a new variant value.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_set_variant_float(struct sail_variant *variant, float value);
+
+/*
+ * Sets the specified double value as a new variant value.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_set_variant_double(struct sail_variant *variant, double value);
+
+/*
  * Sets the specified Unix timestamp value as a new variant value.
  *
  * Returns SAIL_OK on success.
@@ -245,6 +261,18 @@ SAIL_EXPORT long sail_variant_to_long(const struct sail_variant *variant);
  * or its type cannot be safely converted to unsigned long.
  */
 SAIL_EXPORT unsigned long sail_variant_to_unsigned_long(const struct sail_variant *variant);
+
+/*
+ * Returns the variant value as a float. Behavior is undefined if the variant is invalid
+ * or its type cannot be safely converted to float.
+ */
+SAIL_EXPORT float sail_variant_to_float(const struct sail_variant *variant);
+
+/*
+ * Returns the variant value as a double. Behavior is undefined if the variant is invalid
+ * or its type cannot be safely converted to double.
+ */
+SAIL_EXPORT double sail_variant_to_double(const struct sail_variant *variant);
 
 /*
  * Returns the variant value as a Unix timestamp. Behavior is undefined if the variant is invalid

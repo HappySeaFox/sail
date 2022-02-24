@@ -146,6 +146,20 @@ sail_status_t sail_set_variant_unsigned_long(struct sail_variant *variant, unsig
     return SAIL_OK;
 }
 
+sail_status_t sail_set_variant_float(struct sail_variant *variant, float value) {
+
+    SAIL_TRY(set_variant_value(variant, SAIL_VARIANT_TYPE_FLOAT, &value, sizeof(value)));
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_set_variant_double(struct sail_variant *variant, double value) {
+
+    SAIL_TRY(set_variant_value(variant, SAIL_VARIANT_TYPE_DOUBLE, &value, sizeof(value)));
+
+    return SAIL_OK;
+}
+
 sail_status_t sail_set_variant_timestamp(struct sail_variant *variant, time_t value) {
 
     SAIL_TRY(set_variant_value(variant, SAIL_VARIANT_TYPE_TIMESTAMP, &value, sizeof(value)));
@@ -241,6 +255,16 @@ long sail_variant_to_long(const struct sail_variant *variant)
 unsigned long sail_variant_to_unsigned_long(const struct sail_variant *variant)
 {
     return *(unsigned long *)(variant->value);
+}
+
+float sail_variant_to_float(const struct sail_variant *variant)
+{
+    return *(float *)(variant->value);
+}
+
+double sail_variant_to_double(const struct sail_variant *variant)
+{
+    return *(double *)(variant->value);
 }
 
 time_t sail_variant_to_timestamp(const struct sail_variant *variant)
