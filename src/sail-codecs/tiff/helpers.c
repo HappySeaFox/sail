@@ -332,7 +332,7 @@ static sail_status_t fetch_single_meta_data(TIFF *tiff, int tag, enum SailMetaDa
                             /* cleanup */ sail_destroy_meta_data_node(meta_data_node));
         SAIL_TRY_OR_CLEANUP(sail_alloc_variant(&meta_data_node->meta_data->value),
                             /* cleanup */ sail_destroy_meta_data_node(meta_data_node));
-        SAIL_TRY_OR_CLEANUP(sail_set_variant_string(&meta_data_node->meta_data->value, data),
+        SAIL_TRY_OR_CLEANUP(sail_set_variant_string(meta_data_node->meta_data->value, data),
                             /* cleanup */ sail_destroy_meta_data_node(meta_data_node));
 
         **last_meta_data_node = meta_data_node;
