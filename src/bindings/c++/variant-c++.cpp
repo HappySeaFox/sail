@@ -266,7 +266,7 @@ SAIL_EXPORT variant& variant::with_value<>(const sail::arbitrary_data &value)
 }
 
 variant::variant(const sail_variant *variant)
-    : variant()
+    : sail::variant()
 {
     if (variant == nullptr) {
         SAIL_LOG_TRACE("NULL pointer has been passed to sail::variant(). The object is untouched");
