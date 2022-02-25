@@ -26,6 +26,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 #include "sail-common.h"
 
@@ -196,12 +197,23 @@ sail_status_t tga_private_fetch_extension(struct sail_io *io, double *gamma, str
         SAIL_TRY(io->strict_read(io->stream, &second, sizeof(second)));
 
         if (month != 0 || day != 0 || year != 0 || hour != 0 || minute != 0 || second != 0) {
-            char timestamp[20];
-            snprintf(timestamp, sizeof(timestamp), "%04d.%02d.%02d %02d:%02d:%02d", year, month, day, hour, minute, second);
+            struct tm time_tm = {
+                .tm_sec   = second,
+                .tm_min	  = minute,
+                .tm_hour  = hour,
+                .tm_mday  = day,
+                .tm_mon	  = month - 1,
+                .tm_year  = year - 1900,
+                .tm_wday  = 0,
+                .tm_yday  = 0,
+                .tm_isdst = 0
+            };
+            const time_t timestamp = mktime(&time_tm);
 
+            SAIL_TRY(sail_alloc_meta_data_node(last_meta_data_node));
             SAIL_TRY(sail_alloc_meta_data_from_known_key(SAIL_META_DATA_CREATION_TIME, &(*last_meta_data_node)->meta_data));
             SAIL_TRY(sail_alloc_variant(&(*last_meta_data_node)->meta_data->value));
-            SAIL_TRY(sail_set_variant_string((*last_meta_data_node)->meta_data->value, timestamp));
+            SAIL_TRY(sail_set_variant_timestamp((*last_meta_data_node)->meta_data->value, timestamp));
 
             last_meta_data_node = &(*last_meta_data_node)->next;
         }
