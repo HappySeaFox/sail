@@ -55,7 +55,6 @@ namespace sail
  *   - unsigned long
  *   - float
  *   - double
- *   - std::time_t
  *   - std::string
  *   - sail::arbitrary_data
  */

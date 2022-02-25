@@ -105,9 +105,6 @@ static MunitResult test_from_value(const MunitParameter params[], void *user_dat
     TEST_VARIANT_FROM_VALUE(float,         160.f,   sail_set_variant_float,  SAIL_VARIANT_TYPE_FLOAT,  sail_variant_to_float);
     TEST_VARIANT_FROM_VALUE(double,        29555.0, sail_set_variant_double, SAIL_VARIANT_TYPE_DOUBLE, sail_variant_to_double);
 
-    time_t timestamp = time(NULL);
-    TEST_VARIANT_FROM_VALUE(time_t, timestamp, sail_set_variant_timestamp, SAIL_VARIANT_TYPE_TIMESTAMP, sail_variant_to_timestamp);
-
     return MUNIT_OK;
 }
 

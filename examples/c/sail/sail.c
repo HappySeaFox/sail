@@ -178,7 +178,6 @@ static sail_status_t probe_impl(const char *path) {
             case SAIL_VARIANT_TYPE_UNSIGNED_LONG:  printf("%lu\n", sail_variant_to_unsigned_long(meta_data->value));                break;
             case SAIL_VARIANT_TYPE_FLOAT:          printf("%.1f\n", sail_variant_to_float(meta_data->value));                       break;
             case SAIL_VARIANT_TYPE_DOUBLE:         printf("%.1f\n", sail_variant_to_double(meta_data->value));                      break;
-            case SAIL_VARIANT_TYPE_TIMESTAMP:      printf("%lu\n", (unsigned long)sail_variant_to_timestamp(meta_data->value));     break;
             case SAIL_VARIANT_TYPE_STRING:         printf("%s\n", sail_variant_to_string(meta_data->value));                        break;
             case SAIL_VARIANT_TYPE_DATA:           printf("<binary data, length: %u byte(s)>\n", (unsigned)meta_data->value->size); break;
             case SAIL_VARIANT_TYPE_INVALID:        printf("<invalid value>\n");                                                     break;

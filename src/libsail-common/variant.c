@@ -160,13 +160,6 @@ sail_status_t sail_set_variant_double(struct sail_variant *variant, double value
     return SAIL_OK;
 }
 
-sail_status_t sail_set_variant_timestamp(struct sail_variant *variant, time_t value) {
-
-    SAIL_TRY(set_variant_value(variant, SAIL_VARIANT_TYPE_TIMESTAMP, &value, sizeof(value)));
-
-    return SAIL_OK;
-}
-
 sail_status_t sail_set_variant_string(struct sail_variant *variant, const char *value) {
 
     SAIL_TRY(set_variant_value(variant, SAIL_VARIANT_TYPE_STRING, value, strlen(value) + 1));
@@ -265,11 +258,6 @@ float sail_variant_to_float(const struct sail_variant *variant)
 double sail_variant_to_double(const struct sail_variant *variant)
 {
     return *(double *)(variant->value);
-}
-
-time_t sail_variant_to_timestamp(const struct sail_variant *variant)
-{
-    return *(time_t *)(variant->value);
 }
 
 char* sail_variant_to_string(const struct sail_variant *variant)

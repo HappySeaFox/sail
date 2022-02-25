@@ -23,7 +23,6 @@
     SOFTWARE.
 */
 
-#include <ctime>
 #include <cstring>
 #include <stdexcept>
 #include <string>
@@ -45,7 +44,6 @@ using variant_p = std::variant<
                               unsigned long,
                               float,
                               double,
-                              std::time_t,
                               std::string,
                               arbitrary_data
                               >;
@@ -128,7 +126,6 @@ template SAIL_EXPORT bool variant::has_value<unsigned long>() const;
 template SAIL_EXPORT bool variant::has_value<float>() const;
 template SAIL_EXPORT bool variant::has_value<double>() const;
 
-template SAIL_EXPORT bool variant::has_value<std::time_t>() const;
 template SAIL_EXPORT bool variant::has_value<std::string>() const;
 template SAIL_EXPORT bool variant::has_value<sail::arbitrary_data>() const;
 
@@ -155,7 +152,6 @@ template SAIL_EXPORT const unsigned long& variant::value<>() const;
 template SAIL_EXPORT const float&  variant::value<>() const;
 template SAIL_EXPORT const double& variant::value<>() const;
 
-template SAIL_EXPORT const std::time_t&          variant::value<>() const;
 template SAIL_EXPORT const std::string&          variant::value<>() const;
 template SAIL_EXPORT const sail::arbitrary_data& variant::value<>() const;
 
@@ -252,15 +248,6 @@ SAIL_EXPORT variant& variant::with_value<>(const double &value)
 }
 
 template<>
-SAIL_EXPORT variant& variant::with_value<>(const std::time_t &value)
-{
-    d->type = SAIL_VARIANT_TYPE_TIMESTAMP;
-    d->value.emplace<std::time_t>(value);
-
-    return *this;
-}
-
-template<>
 SAIL_EXPORT variant& variant::with_value<>(const std::string &value)
 {
     d->type = SAIL_VARIANT_TYPE_STRING;
@@ -299,7 +286,6 @@ variant::variant(const sail_variant *variant)
         case SAIL_VARIANT_TYPE_UNSIGNED_LONG:  d->value.emplace<unsigned long>(sail_variant_to_unsigned_long(variant));   break;
         case SAIL_VARIANT_TYPE_FLOAT:          d->value.emplace<float>(sail_variant_to_float(variant));                   break;
         case SAIL_VARIANT_TYPE_DOUBLE:         d->value.emplace<double>(sail_variant_to_double(variant));                 break;
-        case SAIL_VARIANT_TYPE_TIMESTAMP:      d->value.emplace<std::time_t>(sail_variant_to_timestamp(variant));         break;
         case SAIL_VARIANT_TYPE_STRING:         d->value.emplace<std::string>(sail_variant_to_string(variant));            break;
         case SAIL_VARIANT_TYPE_DATA: {
             const void *data = sail_variant_to_data(variant);
@@ -336,7 +322,6 @@ sail_status_t variant::to_sail_variant(sail_variant **variant) const
         case SAIL_VARIANT_TYPE_UNSIGNED_LONG:  sail_set_variant_unsigned_long(variant_local,  std::get<unsigned long>(d->value));       break;
         case SAIL_VARIANT_TYPE_FLOAT:          sail_set_variant_float(variant_local,          std::get<float>(d->value));               break;
         case SAIL_VARIANT_TYPE_DOUBLE:         sail_set_variant_double(variant_local,         std::get<double>(d->value));              break;
-        case SAIL_VARIANT_TYPE_TIMESTAMP:      sail_set_variant_timestamp(variant_local,      std::get<std::time_t>(d->value));         break;
         case SAIL_VARIANT_TYPE_STRING:         sail_set_variant_string(variant_local,         std::get<std::string>(d->value).c_str()); break;
         case SAIL_VARIANT_TYPE_DATA: {
             const sail::arbitrary_data &arbitrary_data = std::get<sail::arbitrary_data>(d->value);

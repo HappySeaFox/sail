@@ -81,7 +81,6 @@ static MunitResult test_with_value(const MunitParameter params[], void *user_dat
     test_type<float>(-5.0f);
     test_type<double>(120.0);
 
-    test_type<std::time_t>(500000);
     test_type<std::string>("abc");
     const sail::arbitrary_data arbitrary_data(/* size */ 500, /* value */ 121);
     test_type<sail::arbitrary_data>(arbitrary_data);

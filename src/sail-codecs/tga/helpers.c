@@ -208,12 +208,12 @@ sail_status_t tga_private_fetch_extension(struct sail_io *io, double *gamma, str
                 .tm_yday  = 0,
                 .tm_isdst = 0
             };
-            const time_t timestamp = mktime(&time_tm);
+            const unsigned long timestamp = (unsigned long)mktime(&time_tm);
 
             SAIL_TRY(sail_alloc_meta_data_node(last_meta_data_node));
             SAIL_TRY(sail_alloc_meta_data_from_known_key(SAIL_META_DATA_CREATION_TIME, &(*last_meta_data_node)->meta_data));
             SAIL_TRY(sail_alloc_variant(&(*last_meta_data_node)->meta_data->value));
-            SAIL_TRY(sail_set_variant_timestamp((*last_meta_data_node)->meta_data->value, timestamp));
+            SAIL_TRY(sail_set_variant_unsigned_long((*last_meta_data_node)->meta_data->value, timestamp));
 
             last_meta_data_node = &(*last_meta_data_node)->next;
         }
