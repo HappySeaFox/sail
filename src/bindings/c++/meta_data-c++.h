@@ -47,6 +47,8 @@ struct sail_meta_data;
 namespace sail
 {
 
+class variant;
+
 /*
  * meta_data represents a meta data element like a JPEG comment or a binary EXIF profile.
  */
@@ -99,16 +101,9 @@ public:
     const std::string& key_unknown() const;
 
     /*
-     * Returns the meta data value type: string or data.
+     * Returns the actual meta data value.
      */
-    SailMetaDataType value_type() const;
-
-    /*
-     * Returns the actual meta data value based on value_type(). Only std::string and sail::arbitrary_data template
-     * parameters are allowed.
-     */
-    template<typename T>
-    const T& value() const;
+    const variant& value() const;
 
     /*
      * Sets a new known meta data key like Artist or Comment. Resets the saved unknown key to an empty string.
@@ -122,14 +117,9 @@ public:
     meta_data& with_key_unknown(const std::string &key_unknown);
 
     /*
-     * Sets a new meta data string value. Resets the saved data value.
-     */
-    meta_data& with_value(std::string_view value);
-
-    /*
      * Sets a new meta data binary value. Resets the saved string value.
      */
-    meta_data& with_value(const arbitrary_data &value);
+    meta_data& with_value(const variant &value);
 
     /*
      * Returns a string representation of the specified meta data key. See SailMetaData.
@@ -153,30 +143,12 @@ private:
      */
     explicit meta_data(const sail_meta_data *meta_data);
 
-    const std::string& value_string() const;
-
-    const sail::arbitrary_data& value_arbitrary_data() const;
-
-    meta_data& with_value_type(SailMetaDataType type);
-
     sail_status_t to_sail_meta_data(sail_meta_data **meta_data) const;
 
 private:
     class pimpl;
     std::unique_ptr<pimpl> d;
 };
-
-template<>
-inline const std::string& meta_data::value<std::string>() const
-{
-    return value_string();
-}
-
-template<>
-inline const sail::arbitrary_data& meta_data::value<sail::arbitrary_data>() const
-{
-    return value_arbitrary_data();
-}
 
 }
 
