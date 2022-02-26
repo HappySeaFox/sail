@@ -42,6 +42,8 @@ macro(sail_codec)
         add_library(${TARGET} OBJECT ${SAIL_CODEC_SOURCES})
     else()
         add_library(${TARGET} MODULE ${SAIL_CODEC_SOURCES})
+
+        sail_enable_asan(TARGET ${TARGET})
     endif()
 
     # Disable a "lib" prefix on Unix

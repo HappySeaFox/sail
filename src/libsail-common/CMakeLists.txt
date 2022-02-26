@@ -80,6 +80,8 @@ set_target_properties(sail-common PROPERTIES
                                   SOVERSION 0
                                   PUBLIC_HEADER "${PUBLIC_HEADERS}")
 
+sail_enable_asan(TARGET sail-common)
+
 # fileno
 sail_enable_posix_source(TARGET sail-common VERSION 200112L)
 

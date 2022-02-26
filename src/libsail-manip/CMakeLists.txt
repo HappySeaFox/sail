@@ -26,6 +26,8 @@ set_target_properties(sail-manip PROPERTIES
                                  SOVERSION 0
                                  PUBLIC_HEADER "${PUBLIC_HEADERS}")
 
+sail_enable_asan(TARGET sail-manip)
+
 sail_enable_pch(TARGET sail-manip HEADER sail-manip.h)
 
 sail_install_pdb(TARGET sail-manip)

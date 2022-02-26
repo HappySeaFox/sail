@@ -49,6 +49,10 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/enabled_codecs.c.in
 add_library(sail-codecs ${CMAKE_CURRENT_BINARY_DIR}/enabled_codecs.c)
 target_link_libraries(sail-codecs PRIVATE sail-common)
 
+sail_enable_asan(TARGET sail-codecs)
+
+sail_install_pdb(TARGET sail-codecs)
+
 # BUILD_INTERFACE is needed as CMake tries to export all the sail-codec-${CODEC} dependencies
 # in the below install(TARGETS) command even though they are OBJECT libraries.
 #
@@ -57,8 +61,6 @@ foreach(CODEC ${ENABLED_CODECS})
 endforeach()
 
 target_include_directories(sail-codecs PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../libsail)
-
-sail_install_pdb(TARGET sail-codecs)
 
 install(TARGETS sail-codecs
         EXPORT SailCodecsTargets

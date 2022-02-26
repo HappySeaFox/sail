@@ -82,6 +82,8 @@ set_target_properties(sail-c++ PROPERTIES
                                SOVERSION 0
                                PUBLIC_HEADER "${PUBLIC_HEADERS}")
 
+sail_enable_asan(TARGET sail-c++)
+
 sail_enable_pch(TARGET sail-c++ HEADER sail-c++.h)
 
 sail_install_pdb(TARGET sail-c++)
