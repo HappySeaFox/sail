@@ -45,7 +45,8 @@ enum SailStatus {
     /*
      * Common errors.
      */
-    SAIL_ERROR_MEMORY_ALLOCATION = 1,
+    SAIL_ERROR_NULL_PTR = 1,
+    SAIL_ERROR_MEMORY_ALLOCATION,
     SAIL_ERROR_OPEN_FILE,
     SAIL_ERROR_READ_FILE,
     SAIL_ERROR_SEEK_FILE,
@@ -63,12 +64,12 @@ enum SailStatus {
     SAIL_ERROR_NOT_IMPLEMENTED,
     SAIL_ERROR_UNSUPPORTED_SEEK_WHENCE,
     SAIL_ERROR_EMPTY_STRING,
+    SAIL_ERROR_INVALID_VARIANT,
 
     /*
      * Encoding/decoding common errors.
      */
-    SAIL_ERROR_NULL_PTR = 100,
-    SAIL_ERROR_INVALID_IO,
+    SAIL_ERROR_INVALID_IO = 100,
 
     /*
      * Encoding/decoding specific errors.

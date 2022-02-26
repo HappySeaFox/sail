@@ -42,6 +42,8 @@ add_library(sail-common
                 source_image.h
                 utils.c
                 utils.h
+                variant.c
+                variant.h
                 write_features.c
                 write_features.h
                 write_options.c
@@ -69,6 +71,7 @@ set(PUBLIC_HEADERS "common.h"
                    "sail-common.h"
                    "source_image.h"
                    "utils.h"
+                   "variant.h"
                    "write_features.h"
                    "write_options.h")
 
@@ -76,6 +79,8 @@ set_target_properties(sail-common PROPERTIES
                                   VERSION "0.9.2"
                                   SOVERSION 0
                                   PUBLIC_HEADER "${PUBLIC_HEADERS}")
+
+sail_enable_asan(TARGET sail-common)
 
 # fileno
 sail_enable_posix_source(TARGET sail-common VERSION 200112L)

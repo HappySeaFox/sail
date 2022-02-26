@@ -42,6 +42,8 @@ add_library(sail-c++
                 source_image-c++.h
                 utils-c++.cpp
                 utils-c++.h
+                variant-c++.cpp
+                variant-c++.h
                 write_features-c++.cpp
                 write_features-c++.h
                 write_options-c++.cpp
@@ -72,12 +74,15 @@ set(PUBLIC_HEADERS "abstract_io-c++.h"
                    "source_image-c++.h"
                    "write_features-c++.h"
                    "write_options-c++.h"
-                   "utils-c++.h")
+                   "utils-c++.h"
+                   "variant-c++.h")
 
 set_target_properties(sail-c++ PROPERTIES
                                VERSION "0.7.1"
                                SOVERSION 0
                                PUBLIC_HEADER "${PUBLIC_HEADERS}")
+
+sail_enable_asan(TARGET sail-c++)
 
 sail_enable_pch(TARGET sail-c++ HEADER sail-c++.h)
 

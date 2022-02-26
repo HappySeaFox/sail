@@ -7,4 +7,5 @@ sail_test(TARGET malloc              SOURCES malloc.c              LINK sail-com
 sail_test(TARGET meta-data           SOURCES meta_data.c           LINK sail-common sail-comparators)
 sail_test(TARGET palette             SOURCES palette.c             LINK sail-common)
 sail_test(TARGET read-options        SOURCES read_options.c        LINK sail-common)
+sail_test(TARGET variant             SOURCES variant.c             LINK sail-common)
 sail_test(TARGET write-options       SOURCES write_options.c       LINK sail-common)

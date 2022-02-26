@@ -40,7 +40,11 @@ static sail_status_t save_str_in_meta_data(const char *str, unsigned length_wo_n
 
     SAIL_TRY(sail_alloc_meta_data_node(&meta_data_node_local));
 
-    SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_from_known_substring(key, str, length_wo_null, &meta_data_node_local->meta_data),
+    SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_from_known_key(key, &meta_data_node_local->meta_data),
+                        /* cleanup */ sail_destroy_meta_data_node(meta_data_node_local));
+    SAIL_TRY_OR_CLEANUP(sail_alloc_variant(&meta_data_node_local->meta_data->value),
+                        /* cleanup */ sail_destroy_meta_data_node(meta_data_node_local));
+    SAIL_TRY_OR_CLEANUP(sail_set_variant_substring(meta_data_node_local->meta_data->value, str, length_wo_null),
                         /* cleanup */ sail_destroy_meta_data_node(meta_data_node_local));
 
     *meta_data_node = meta_data_node_local;
