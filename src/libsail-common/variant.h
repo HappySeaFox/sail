@@ -206,68 +206,68 @@ SAIL_EXPORT sail_status_t sail_set_variant_data(struct sail_variant *variant, co
 SAIL_EXPORT sail_status_t sail_set_variant_adopted_data(struct sail_variant *variant, void *value, size_t size);
 
 /*
- * Returns the variant value as a char. Behavior is undefined if the variant is invalid
- * or its type cannot be safely converted to char.
+ * Returns the variant value as a char. Behavior is undefined if the variant is invalid.
+ * Effectively, it casts the value pointer to char*, and then dereferences the resulting pointer.
  */
 SAIL_EXPORT char sail_variant_to_char(const struct sail_variant *variant);
 
 /*
- * Returns the variant value as an unsigned char. Behavior is undefined if the variant is invalid
- * or its type cannot be safely converted to unsigned char.
+ * Returns the variant value as an unsigned char. Behavior is undefined if the variant is invalid.
+ * Effectively, it casts the value pointer to unsigned char*, and then dereferences the resulting pointer.
  */
 SAIL_EXPORT unsigned char sail_variant_to_unsigned_char(const struct sail_variant *variant);
 
 /*
- * Returns the variant value as a short. Behavior is undefined if the variant is invalid
- * or its type cannot be safely converted to short.
+ * Returns the variant value as a short. Behavior is undefined if the variant is invalid.
+ * Effectively, it casts the value pointer to short*, and then dereferences the resulting pointer.
  */
 SAIL_EXPORT short sail_variant_to_short(const struct sail_variant *variant);
 
 /*
- * Returns the variant value as an unsigned short. Behavior is undefined if the variant is invalid
- * or its type cannot be safely converted to unsigned short.
+ * Returns the variant value as an unsigned short. Behavior is undefined if the variant is invalid.
+ * Effectively, it casts the value pointer to unsigned short*, and then dereferences the resulting pointer.
  */
 SAIL_EXPORT unsigned short sail_variant_to_unsigned_short(const struct sail_variant *variant);
 
 /*
- * Returns the variant value as an integer. Behavior is undefined if the variant is invalid
- * or its type cannot be safely converted to int.
+ * Returns the variant value as an integer. Behavior is undefined if the variant is invalid.
+ * Effectively, it casts the value pointer to int*, and then dereferences the resulting pointer.
  */
 SAIL_EXPORT int sail_variant_to_int(const struct sail_variant *variant);
 
 /*
- * Returns the variant value as an unsigned int. Behavior is undefined if the variant is invalid
- * or its type cannot be safely converted to unsigned int.
+ * Returns the variant value as an unsigned int. Behavior is undefined if the variant is invalid.
+ * Effectively, it casts the value pointer to unsigned int*, and then dereferences the resulting pointer.
  */
 SAIL_EXPORT unsigned int sail_variant_to_unsigned_int(const struct sail_variant *variant);
 
 /*
- * Returns the variant value as a long. Behavior is undefined if the variant is invalid
- * or its type cannot be safely converted to long.
+ * Returns the variant value as a long. Behavior is undefined if the variant is invalid.
+ * Effectively, it casts the value pointer to long*, and then dereferences the resulting pointer.
  */
 SAIL_EXPORT long sail_variant_to_long(const struct sail_variant *variant);
 
 /*
- * Returns the variant value as an unsigned long. Behavior is undefined if the variant is invalid
- * or its type cannot be safely converted to unsigned long.
+ * Returns the variant value as an unsigned long. Behavior is undefined if the variant is invalid.
+ * Effectively, it casts the value pointer to unsigned long*, and then dereferences the resulting pointer.
  */
 SAIL_EXPORT unsigned long sail_variant_to_unsigned_long(const struct sail_variant *variant);
 
 /*
- * Returns the variant value as a float. Behavior is undefined if the variant is invalid
- * or its type cannot be safely converted to float.
+ * Returns the variant value as a float. Behavior is undefined if the variant is invalid.
+ * Effectively, it casts the value pointer to float*, and then dereferences the resulting pointer.
  */
 SAIL_EXPORT float sail_variant_to_float(const struct sail_variant *variant);
 
 /*
- * Returns the variant value as a double. Behavior is undefined if the variant is invalid
- * or its type cannot be safely converted to double.
+ * Returns the variant value as a double. Behavior is undefined if the variant is invalid.
+ * Effectively, it casts the value pointer to double*, and then dereferences the resulting pointer.
  */
 SAIL_EXPORT double sail_variant_to_double(const struct sail_variant *variant);
 
 /*
- * Returns the variant value as a string. Behavior is undefined if the variant is invalid
- * or its type cannot be safely converted to string.
+ * Returns the variant value as a string. Behavior is undefined if the variant is invalid.
+ * Effectively, it casts the value pointer to char*, and returns the resulting pointer.
  */
 SAIL_EXPORT char* sail_variant_to_string(const struct sail_variant *variant);
 
