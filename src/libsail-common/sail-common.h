@@ -39,6 +39,7 @@
     #include "iccp.h"
     #include "image.h"
     #include "io_common.h"
+    #include "linked_list_node.h"
     #include "log.h"
     #include "memory.h"
     #include "meta_data.h"

@@ -19,6 +19,8 @@ add_library(sail-common
                 image.h
                 io_common.c
                 io_common.h
+                linked_list_node.c
+                linked_list_node.h
                 log.c
                 log.h
                 memory.c

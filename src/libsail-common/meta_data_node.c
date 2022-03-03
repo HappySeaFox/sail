@@ -31,100 +31,48 @@
 
 sail_status_t sail_alloc_meta_data_node(struct sail_meta_data_node **node) {
 
-    SAIL_CHECK_PTR(node);
-
-    void *ptr;
-    SAIL_TRY(sail_malloc(sizeof(struct sail_meta_data_node), &ptr));
-    *node = ptr;
-
-    (*node)->meta_data = NULL;
-    (*node)->next      = NULL;
+    SAIL_TRY(alloc_linked_list_node((struct linked_list_node **)node));
 
     return SAIL_OK;
 }
 
 sail_status_t sail_alloc_meta_data_node_and_value(struct sail_meta_data_node **node) {
 
-    SAIL_CHECK_PTR(node);
-
-    struct sail_meta_data_node *node_local;
-    SAIL_TRY(sail_alloc_meta_data_node(&node_local));
-
-    SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data(&node_local->meta_data),
-                        /* cleanup */ sail_destroy_meta_data_node(node_local));
-
-    *node = node_local;
+    SAIL_TRY(alloc_linked_list_node_and_value((linked_list_value_allocator_t)&sail_alloc_meta_data,
+                                              (linked_list_value_deallocator_t)&sail_destroy_meta_data,
+                                              (struct linked_list_node **)node));
 
     return SAIL_OK;
 }
 
 void sail_destroy_meta_data_node(struct sail_meta_data_node *node) {
 
-    if (node == NULL) {
-        return;
-    }
-
-    sail_destroy_meta_data(node->meta_data);
-    sail_free(node);
+    destroy_linked_list_node((struct linked_list_node *)node,
+                             (linked_list_value_deallocator_t)&sail_destroy_meta_data);
 }
 
 sail_status_t sail_copy_meta_data_node(const struct sail_meta_data_node *source, struct sail_meta_data_node **target) {
 
-    SAIL_CHECK_PTR(source);
-    SAIL_CHECK_PTR(target);
-
-    struct sail_meta_data_node *node_local;
-    SAIL_TRY(sail_alloc_meta_data_node(&node_local));
-
-    SAIL_TRY_OR_CLEANUP(sail_copy_meta_data(source->meta_data, &node_local->meta_data),
-                        /* cleanup */ sail_destroy_meta_data_node(node_local));
-
-    *target = node_local;
+    SAIL_TRY(copy_linked_list_node((const struct linked_list_node *)source,
+                                   (struct linked_list_node **)target,
+                                   (linked_list_value_copier_t)sail_copy_meta_data,
+                                   (linked_list_value_deallocator_t)&sail_destroy_meta_data));
 
     return SAIL_OK;
 }
 
 void sail_destroy_meta_data_node_chain(struct sail_meta_data_node *node) {
 
-    while (node != NULL) {
-        struct sail_meta_data_node *node_next = node->next;
-
-        sail_destroy_meta_data_node(node);
-
-        node = node_next;
-    }
+    destroy_linked_list_node_chain((struct linked_list_node *)node,
+                                   (linked_list_value_deallocator_t)&sail_destroy_meta_data);
 }
 
 sail_status_t sail_copy_meta_data_node_chain(const struct sail_meta_data_node *source, struct sail_meta_data_node **target) {
 
-    SAIL_CHECK_PTR(target);
-
-    if (source == NULL) {
-        *target = NULL;
-        return SAIL_OK;
-    }
-
-    struct sail_meta_data_node *node_local = NULL;
-    struct sail_meta_data_node *meta_data_node_current = NULL;
-
-    while (source != NULL) {
-        struct sail_meta_data_node *meta_data_node = NULL;
-
-        SAIL_TRY_OR_CLEANUP(sail_copy_meta_data_node(source, &meta_data_node),
-                            /* cleanup */ sail_destroy_meta_data_node_chain(node_local));
-
-        if (node_local == NULL) {
-            node_local = meta_data_node;
-            meta_data_node_current = node_local;
-        } else {
-            meta_data_node_current->next = meta_data_node;
-            meta_data_node_current = meta_data_node_current->next;
-        }
-
-        source = source->next;
-    }
-
-    *target = node_local;
+    SAIL_TRY(copy_linked_list_node_chain((const struct linked_list_node *)source,
+                                         (struct linked_list_node **)target,
+                                         (linked_list_value_copier_t)sail_copy_meta_data,
+                                         (linked_list_value_deallocator_t)&sail_destroy_meta_data));
 
     return SAIL_OK;
 }
