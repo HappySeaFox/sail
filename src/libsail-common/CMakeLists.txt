@@ -13,6 +13,9 @@ add_library(sail-common
                 compiler_specifics.h
                 error.h
                 export.h
+                hash_map.c
+                hash_map.h
+                hash_map_p.h
                 iccp.c
                 iccp.h
                 image.c
@@ -60,6 +63,7 @@ set(PUBLIC_HEADERS "common.h"
                    "compiler_specifics.h"
                    "error.h"
                    "export.h"
+                   "hash_map.h"
                    "iccp.h"
                    "image.h"
                    "io_common.h"
