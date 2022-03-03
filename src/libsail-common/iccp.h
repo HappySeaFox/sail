@@ -38,8 +38,6 @@
 extern "C" {
 #endif
 
-struct sail_meta_data_node;
-
 /*
  * ICCP represents an ICC profile.
  */
