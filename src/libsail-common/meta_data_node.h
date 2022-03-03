@@ -26,14 +26,10 @@
 #ifndef SAIL_META_DATA_NODE_H
 #define SAIL_META_DATA_NODE_H
 
-#include <stddef.h>
-
 #ifdef SAIL_BUILD
-    #include "common.h"
     #include "error.h"
     #include "export.h"
 #else
-    #include <sail-common/common.h>
     #include <sail-common/error.h>
     #include <sail-common/export.h>
 #endif
@@ -42,9 +38,10 @@
 extern "C" {
 #endif
 
+struct sail_meta_data;
+
 /*
  * Represents a meta data node.
- *
  */
 struct sail_meta_data_node {
 

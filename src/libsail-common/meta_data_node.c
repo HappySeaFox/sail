@@ -23,10 +23,6 @@
     SOFTWARE.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "sail-common.h"
 
 sail_status_t sail_alloc_meta_data_node(struct sail_meta_data_node **node) {
