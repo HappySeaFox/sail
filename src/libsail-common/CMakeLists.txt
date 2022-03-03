@@ -46,6 +46,8 @@ add_library(sail-common
                 utils.h
                 variant.c
                 variant.h
+                variant_node.c
+                variant_node.h
                 write_features.c
                 write_features.h
                 write_options.c
@@ -74,6 +76,7 @@ set(PUBLIC_HEADERS "common.h"
                    "source_image.h"
                    "utils.h"
                    "variant.h"
+                   "variant_node.h"
                    "write_features.h"
                    "write_options.h")
 
