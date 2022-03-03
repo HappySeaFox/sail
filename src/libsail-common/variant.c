@@ -290,3 +290,17 @@ sail_status_t sail_copy_variant(const struct sail_variant *source, struct sail_v
 
     return SAIL_OK;
 }
+
+bool sail_compare_variants(const struct sail_variant *variant1, const struct sail_variant *variant2) {
+
+    SAIL_TRY_OR_EXECUTE(sail_check_variant_valid(variant1),
+                        /* on error */ return false);
+    SAIL_TRY_OR_EXECUTE(sail_check_variant_valid(variant2),
+                        /* on error */ return false);
+
+    if (variant1->type != variant2->type || variant1->size != variant2->size) {
+        return false;
+    } else {
+        return memcmp(variant1->value, variant2->value, variant1->size) == 0;
+    }
+}
