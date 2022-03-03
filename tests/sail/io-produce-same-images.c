@@ -52,7 +52,7 @@ static MunitResult test_io_produce_same_images(const MunitParameter params[], vo
     munit_assert(sail_load_image_from_memory(data, data_length, &image_mem) == SAIL_OK);
     munit_assert_not_null(image_mem);
 
-    munit_assert(sail_compare_images(image_file, image_mem) == SAIL_OK);
+    munit_assert(sail_test_compare_images(image_file, image_mem) == SAIL_OK);
 
     sail_free(data);
     sail_destroy_image(image_mem);
