@@ -66,9 +66,7 @@ void sail_destroy_hash_map(struct sail_hash_map *hash_map) {
         return;
     }
 
-    for (size_t i = 0; i < SAIL_HASH_MAP_SIZE; i++) {
-        sail_destroy_variant_node_chain(hash_map->buckets[i]);
-    }
+    sail_clear_hash_map(hash_map);
 
     sail_free(hash_map);
 }
