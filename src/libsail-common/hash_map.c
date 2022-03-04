@@ -208,14 +208,7 @@ void sail_erase_hash_map_key(struct sail_hash_map *hash_map, const char *key) {
 void sail_clear_hash_map(struct sail_hash_map *hash_map) {
 
     for (size_t i = 0; i < SAIL_HASH_MAP_SIZE; i++) {
-        for (struct sail_variant_node *key_variant_node = hash_map->buckets[i];
-                key_variant_node != NULL;
-                key_variant_node = key_variant_node->next->next) {
-
-            sail_destroy_variant_node(key_variant_node->next);
-            sail_destroy_variant_node(key_variant_node);
-        }
-
+        sail_destroy_variant_node_chain(hash_map->buckets[i]);
         hash_map->buckets[i] = NULL;
     }
 }
