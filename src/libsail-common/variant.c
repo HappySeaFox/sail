@@ -90,6 +90,13 @@ void sail_destroy_variant(struct sail_variant *variant) {
     sail_free(variant);
 }
 
+sail_status_t sail_set_variant_bool(struct sail_variant *variant, bool value) {
+
+    SAIL_TRY(set_variant_value(variant, SAIL_VARIANT_TYPE_BOOL, &value, sizeof(value)));
+
+    return SAIL_OK;
+}
+
 sail_status_t sail_set_variant_char(struct sail_variant *variant, char value) {
 
     SAIL_TRY(set_variant_value(variant, SAIL_VARIANT_TYPE_CHAR, &value, sizeof(value)));
@@ -208,6 +215,11 @@ sail_status_t sail_set_variant_adopted_data(struct sail_variant *variant, void *
     variant->size = size;
 
     return SAIL_OK;
+}
+
+bool sail_variant_to_bool(const struct sail_variant *variant)
+{
+    return *(bool *)(variant->value);
 }
 
 char sail_variant_to_char(const struct sail_variant *variant)

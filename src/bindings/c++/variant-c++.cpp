@@ -34,6 +34,7 @@ namespace sail
 {
 
 using variant_p = std::variant<
+                              bool,
                               char,
                               unsigned char,
                               short,
@@ -111,6 +112,8 @@ bool variant::has_value() const
 
 // Allow only specific types. Other types will fail to link.
 //
+template SAIL_EXPORT bool variant::has_value<bool>() const;
+
 template SAIL_EXPORT bool variant::has_value<char>() const;
 template SAIL_EXPORT bool variant::has_value<unsigned char>() const;
 
@@ -137,6 +140,8 @@ const T& variant::value() const
 
 // Allow only specific types. Other types will fail to link.
 //
+template SAIL_EXPORT const bool& variant::value<>() const;
+
 template SAIL_EXPORT const char&          variant::value<>() const;
 template SAIL_EXPORT const unsigned char& variant::value<>() const;
 
@@ -157,6 +162,15 @@ template SAIL_EXPORT const sail::arbitrary_data& variant::value<>() const;
 
 // Allow only specific types. Other types will fail to link.
 //
+template<>
+SAIL_EXPORT variant& variant::with_value<>(const bool &value)
+{
+    d->type = SAIL_VARIANT_TYPE_BOOL;
+    d->value.emplace<bool>(value);
+
+    return *this;
+}
+
 template<>
 SAIL_EXPORT variant& variant::with_value<>(const char &value)
 {
@@ -276,6 +290,7 @@ variant::variant(const sail_variant *variant)
     d->type = variant->type;
 
     switch (variant->type) {
+        case SAIL_VARIANT_TYPE_BOOL:           d->value.emplace<bool>(sail_variant_to_bool(variant));                     break;
         case SAIL_VARIANT_TYPE_CHAR:           d->value.emplace<char>(sail_variant_to_char(variant));                     break;
         case SAIL_VARIANT_TYPE_UNSIGNED_CHAR:  d->value.emplace<unsigned char>(sail_variant_to_unsigned_char(variant));   break;
         case SAIL_VARIANT_TYPE_SHORT:          d->value.emplace<short>(sail_variant_to_short(variant));                   break;
@@ -312,6 +327,7 @@ sail_status_t variant::to_sail_variant(sail_variant **variant) const
     variant_local->type = d->type;
 
     switch (d->type) {
+        case SAIL_VARIANT_TYPE_BOOL:           sail_set_variant_bool(variant_local,           std::get<bool>(d->value));                break;
         case SAIL_VARIANT_TYPE_CHAR:           sail_set_variant_char(variant_local,           std::get<char>(d->value));                break;
         case SAIL_VARIANT_TYPE_UNSIGNED_CHAR:  sail_set_variant_unsigned_char(variant_local,  std::get<unsigned char>(d->value));       break;
         case SAIL_VARIANT_TYPE_SHORT:          sail_set_variant_short(variant_local,          std::get<short>(d->value));               break;

@@ -168,6 +168,7 @@ static sail_status_t probe_impl(const char *path) {
         printf("%-14s: ", meta_data_str);
 
         switch (meta_data->value->type) {
+            case SAIL_VARIANT_TYPE_BOOL:           printf("%s\n",  sail_variant_to_bool(meta_data->value) ? "<set>" : "<unset>");   break;
             case SAIL_VARIANT_TYPE_CHAR:           printf("%d\n",  sail_variant_to_char(meta_data->value));                         break;
             case SAIL_VARIANT_TYPE_UNSIGNED_CHAR:  printf("%u\n",  sail_variant_to_unsigned_char(meta_data->value));                break;
             case SAIL_VARIANT_TYPE_SHORT:          printf("%d\n",  sail_variant_to_short(meta_data->value));                        break;

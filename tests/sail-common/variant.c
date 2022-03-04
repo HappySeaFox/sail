@@ -90,6 +90,8 @@ static MunitResult test_from_value(const MunitParameter params[], void *user_dat
     (void)params;
     (void)user_data;
 
+    TEST_VARIANT_FROM_VALUE(bool, true, sail_set_variant_bool, SAIL_VARIANT_TYPE_BOOL, sail_variant_to_bool);
+
     TEST_VARIANT_FROM_VALUE(char,          'a', sail_set_variant_char,          SAIL_VARIANT_TYPE_CHAR,          sail_variant_to_char);
     TEST_VARIANT_FROM_VALUE(unsigned char, 'b', sail_set_variant_unsigned_char, SAIL_VARIANT_TYPE_UNSIGNED_CHAR, sail_variant_to_unsigned_char);
 
@@ -192,6 +194,9 @@ static MunitResult test_set(const MunitParameter params[], void *user_data) {
 
     struct sail_variant *variant;
     munit_assert(sail_alloc_variant(&variant) == SAIL_OK);
+
+    munit_assert(sail_set_variant_bool(variant, true) == SAIL_OK);
+    munit_assert(sail_variant_to_bool(variant) == true);
 
     munit_assert(sail_set_variant_char(variant, 6) == SAIL_OK);
     munit_assert(sail_variant_to_char(variant) == 6);

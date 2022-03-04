@@ -45,6 +45,7 @@ namespace sail
 
 /*
  * Variant with limited possible data types. Supports only the following data types:
+ *   - bool
  *   - char
  *   - unsigned char
  *   - short
