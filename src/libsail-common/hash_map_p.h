@@ -37,6 +37,9 @@ enum {
 
 struct sail_hash_map {
 
+    /*
+     * Values follow keys in the chain, e.g. key1 -> value1 -> key2 -> value2 -> NULL.
+     */
     struct sail_variant_node *buckets[SAIL_HASH_MAP_SIZE];
 };
 
