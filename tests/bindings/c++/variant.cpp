@@ -66,6 +66,8 @@ static MunitResult test_with_value(const MunitParameter params[], void *user_dat
     (void)params;
     (void)user_data;
 
+    test_type<bool>(true);
+
     test_type<char>('a');
     test_type<unsigned char>('a');
 

@@ -26,6 +26,7 @@
 #ifndef SAIL_VARIANT_H
 #define SAIL_VARIANT_H
 
+#include <stdbool.h>
 #include <stddef.h>
 
 #ifdef SAIL_BUILD
@@ -47,6 +48,7 @@ extern "C" {
  */
 enum SailVariantType {
 
+    SAIL_VARIANT_TYPE_BOOL,
     SAIL_VARIANT_TYPE_CHAR,
     SAIL_VARIANT_TYPE_UNSIGNED_CHAR,
     SAIL_VARIANT_TYPE_SHORT,
@@ -94,6 +96,13 @@ SAIL_EXPORT sail_status_t sail_alloc_variant(struct sail_variant **variant);
  * Destroys the specified variant.
  */
 SAIL_EXPORT void sail_destroy_variant(struct sail_variant *variant);
+
+/*
+ * Sets the specified boolean value as a new variant value.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_set_variant_bool(struct sail_variant *variant, bool value);
 
 /*
  * Sets the specified char value as a new variant value.
@@ -204,6 +213,12 @@ SAIL_EXPORT sail_status_t sail_set_variant_data(struct sail_variant *variant, co
  * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_set_variant_adopted_data(struct sail_variant *variant, void *value, size_t size);
+
+/*
+ * Returns the variant value as a boolean. Behavior is undefined if the variant is invalid.
+ * Effectively, it casts the value pointer to bool*, and then dereferences the resulting pointer.
+ */
+SAIL_EXPORT bool sail_variant_to_bool(const struct sail_variant *variant);
 
 /*
  * Returns the variant value as a char. Behavior is undefined if the variant is invalid.
