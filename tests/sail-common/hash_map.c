@@ -77,6 +77,46 @@ static MunitResult test_put(const MunitParameter params[], void *user_data) {
     return MUNIT_OK;
 }
 
+static MunitResult test_overwrite(const MunitParameter params[], void *user_data) {
+
+    (void)params;
+    (void)user_data;
+
+    struct sail_hash_map *hash_map;
+    munit_assert(sail_alloc_hash_map(&hash_map) == SAIL_OK);
+
+    const double reference_value1 = 11.5;
+    const double reference_value2 = 125.5;
+
+    /* Value. */
+    struct sail_variant *value;
+    munit_assert(sail_alloc_variant(&value) == SAIL_OK);
+    sail_set_variant_double(value, reference_value1);
+
+    munit_assert(sail_put_hash_map(hash_map, "ktop", value) == SAIL_OK);
+
+    /* Overwrite. */
+    sail_set_variant_double(value, reference_value2);
+    munit_assert(sail_put_hash_map(hash_map, "ktop", value) == SAIL_OK);
+    munit_assert(sail_hash_map_size(hash_map) == 1);
+
+    const struct sail_variant *value_in_map = sail_hash_map_value(hash_map, "ktop");
+    munit_assert_double(sail_variant_to_double(value_in_map), ==, reference_value2);
+
+    /* Overwrite #2. */
+    munit_assert(sail_put_hash_map(hash_map, "ktop", value) == SAIL_OK);
+    munit_assert(sail_hash_map_size(hash_map) == 1);
+
+    value_in_map = sail_hash_map_value(hash_map, "ktop");
+    munit_assert_double(sail_variant_to_double(value_in_map), ==, reference_value2);
+
+    /* Cleanup. */
+    sail_destroy_variant(value);
+    sail_destroy_hash_map(hash_map);
+
+    return MUNIT_OK;
+}
+
 static MunitResult test_erase(const MunitParameter params[], void *user_data) {
 
     (void)params;
@@ -152,9 +192,10 @@ static MunitResult test_clear(const MunitParameter params[], void *user_data) {
 }
 
 static MunitTest test_suite_tests[] = {
-    { (char *)"/put",   test_put,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/erase", test_erase, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/clear", test_clear, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/put",       test_put,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/overwrite", test_overwrite, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/erase",     test_erase,     NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/clear",     test_clear,     NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };
