@@ -38,8 +38,6 @@
 extern "C" {
 #endif
 
-struct sail_pixel_formats_mapping_node;
-
 /*
  * Read features. Use this structure to determine what a codec can actually read.
  */
