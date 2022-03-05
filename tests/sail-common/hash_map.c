@@ -24,7 +24,9 @@
 */
 
 #include <stddef.h>
+#include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "sail-common.h"
 
@@ -72,6 +74,65 @@ static MunitResult test_put(const MunitParameter params[], void *user_data) {
     munit_assert(sail_hash_map_size(hash_map) == 2);
 
     /* Cleanup. */
+    sail_destroy_hash_map(hash_map);
+
+    return MUNIT_OK;
+}
+
+static MunitResult test_put_erase_many(const MunitParameter params[], void *user_data) {
+
+    (void)params;
+    (void)user_data;
+
+    srand((unsigned)time(NULL));
+
+    /* Construct a large array of keys to force collisions in the hash map. */
+    enum {
+        ARRAY_SIZE = 5000
+    };
+
+    char* keys[ARRAY_SIZE] = { NULL };
+
+    for (size_t i = 0; i < ARRAY_SIZE; i++) {
+        const size_t length = 5 + 1;
+
+        munit_assert(sail_malloc(length, &keys[i]) == SAIL_OK);
+
+        for (size_t l = 0; l < length - 1; l++) {
+            keys[i][l] = (char)(1 + rand() % 255);
+        }
+
+        keys[i][length - 1] = '\0';
+    }
+
+    /* Value. */
+    const double reference_value = 24.5;
+
+    struct sail_variant *value;
+    munit_assert(sail_alloc_variant(&value) == SAIL_OK);
+    sail_set_variant_double(value, reference_value);
+
+    struct sail_hash_map *hash_map;
+    munit_assert(sail_alloc_hash_map(&hash_map) == SAIL_OK);
+
+    for (size_t i = 0, prev_size = 0; i < ARRAY_SIZE; i++) {
+        munit_assert(sail_put_hash_map(hash_map, keys[i], value) == SAIL_OK);
+        munit_assert(sail_hash_map_has_key(hash_map, keys[i]));
+        munit_assert(sail_hash_map_size(hash_map) == ++prev_size);
+    }
+
+    for (size_t i = 0, prev_size = ARRAY_SIZE; i < ARRAY_SIZE; i++) {
+        sail_erase_hash_map_key(hash_map, keys[i]);
+        munit_assert(!sail_hash_map_has_key(hash_map, keys[i]));
+        munit_assert(sail_hash_map_size(hash_map) == --prev_size);
+    }
+
+    /* Cleanup. */
+    for (size_t i = 0; i < ARRAY_SIZE; i++) {
+        sail_free(keys[i]);
+    }
+
+    sail_destroy_variant(value);
     sail_destroy_hash_map(hash_map);
 
     return MUNIT_OK;
@@ -192,10 +253,11 @@ static MunitResult test_clear(const MunitParameter params[], void *user_data) {
 }
 
 static MunitTest test_suite_tests[] = {
-    { (char *)"/put",       test_put,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/overwrite", test_overwrite, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/erase",     test_erase,     NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/clear",     test_clear,     NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/put",            test_put,            NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/put-erase-many", test_put_erase_many, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/overwrite",      test_overwrite,      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/erase",          test_erase,          NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/clear",          test_clear,          NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };
