@@ -210,9 +210,9 @@ sail_status_t sail_set_variant_adopted_data(struct sail_variant *variant, void *
 
     sail_free(variant->value);
 
-    variant->type = SAIL_VARIANT_TYPE_DATA;
-    variant->value      = value;
-    variant->size = size;
+    variant->type  = SAIL_VARIANT_TYPE_DATA;
+    variant->value = value;
+    variant->size  = size;
 
     return SAIL_OK;
 }
