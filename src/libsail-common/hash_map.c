@@ -86,7 +86,7 @@ sail_status_t sail_put_hash_map(struct sail_hash_map *hash_map, const char *key,
         struct sail_variant_node *value_variant_node = (*key_variant_node)->next;
 
         if (strcmp(sail_variant_to_string((*key_variant_node)->variant), key) == 0) {
-            if (!sail_compare_variants(value_variant_node->variant, value)) {
+            if (!sail_equal_variants(value_variant_node->variant, value)) {
                 /* Overwrite value. */
                 sail_destroy_variant(value_variant_node->variant);
                 SAIL_TRY(sail_copy_variant(value, &value_variant_node->variant));
