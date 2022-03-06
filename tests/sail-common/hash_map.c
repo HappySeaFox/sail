@@ -88,7 +88,7 @@ static MunitResult test_put_erase_many(const MunitParameter params[], void *user
 
     /* Construct a large array of keys to force collisions in the hash map. */
     enum {
-        ARRAY_SIZE = 5000
+        ARRAY_SIZE = 2500
     };
 
     char* keys[ARRAY_SIZE] = { NULL };
