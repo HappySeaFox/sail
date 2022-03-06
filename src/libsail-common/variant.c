@@ -34,11 +34,8 @@ static sail_status_t set_variant_value(struct sail_variant *variant, enum SailVa
 
     SAIL_CHECK_PTR(variant);
 
-    void *ptr;
-    SAIL_TRY(sail_malloc(size, &ptr));
-
-    sail_free(variant->value);
-    variant->value = ptr;
+    void **ptr = &variant->value;
+    SAIL_TRY(sail_realloc(size, ptr));
     memcpy(variant->value, value, size);
 
     variant->type = type;
