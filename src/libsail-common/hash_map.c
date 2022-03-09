@@ -161,13 +161,24 @@ unsigned sail_hash_map_size(const struct sail_hash_map *hash_map) {
     return size;
 }
 
-void sail_traverse_hash_map(const struct sail_hash_map *hash_map, void (*callback)(const char *key, const struct sail_variant *value)){
+void sail_traverse_hash_map(const struct sail_hash_map *hash_map, bool (*callback)(const char *key, const struct sail_variant *value)){
 
     for (size_t i = 0; i < SAIL_HASH_MAP_SIZE; i++) {
         for (const struct sail_variant_node *key_variant_node = hash_map->buckets[i];
-                key_variant_node != NULL;
+                key_variant_node != NULL && callback(sail_variant_to_string(key_variant_node->variant), key_variant_node->next->variant);
                 key_variant_node = key_variant_node->next->next) {
-            callback(sail_variant_to_string(key_variant_node->variant), key_variant_node->next->variant);
+        }
+    }
+}
+
+void sail_traverse_hash_map_with_user_data(const struct sail_hash_map *hash_map,
+                                           bool (*callback)(const char *key, const struct sail_variant *value, void *user_data),
+                                           void *user_data) {
+
+    for (size_t i = 0; i < SAIL_HASH_MAP_SIZE; i++) {
+        for (const struct sail_variant_node *key_variant_node = hash_map->buckets[i];
+                key_variant_node != NULL && callback(sail_variant_to_string(key_variant_node->variant), key_variant_node->next->variant, user_data);
+                key_variant_node = key_variant_node->next->next) {
         }
     }
 }

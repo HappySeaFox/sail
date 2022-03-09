@@ -79,8 +79,18 @@ SAIL_EXPORT unsigned sail_hash_map_size(const struct sail_hash_map *hash_map);
 
 /*
  * Traverses the hash map in random order and calls the callback function on every key-value pair.
+ * If the callback returns false, the loop stops at the current element.
  */
-SAIL_EXPORT void sail_traverse_hash_map(const struct sail_hash_map *hash_map, void (*callback)(const char *key, const struct sail_variant *value));
+SAIL_EXPORT void sail_traverse_hash_map(const struct sail_hash_map *hash_map, bool (*callback)(const char *key, const struct sail_variant *value));
+
+/*
+ * Traverses the hash map in random order and calls the callback function on every key-value pair.
+ * Additionally passes the specfied user data to the callback.
+ * If the callback returns false, the loop stops at the current element.
+ */
+SAIL_EXPORT void sail_traverse_hash_map_with_user_data(const struct sail_hash_map *hash_map,
+                                                       bool (*callback)(const char *key, const struct sail_variant *value, void *user_data),
+                                                       void *user_data);
 
 /*
  * Erases the key-value pair from the hash map.
