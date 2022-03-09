@@ -30,6 +30,8 @@
 
 #include "sail-common.h"
 
+#include "sail-comparators.h"
+
 #include "munit.h"
 
 static MunitResult test_put(const MunitParameter params[], void *user_data) {
@@ -134,6 +136,45 @@ static MunitResult test_put_erase_many(const MunitParameter params[], void *user
 
     sail_destroy_variant(value);
     sail_destroy_hash_map(hash_map);
+
+    return MUNIT_OK;
+}
+
+static MunitResult test_copy(const MunitParameter params[], void *user_data) {
+
+    (void)params;
+    (void)user_data;
+
+    struct sail_hash_map *hash_map1;
+    munit_assert(sail_alloc_hash_map(&hash_map1) == SAIL_OK);
+
+    const double reference_value1 = 11.5;
+    const int reference_value2 = 101;
+
+    /* Value 1. */
+    struct sail_variant *value1;
+    munit_assert(sail_alloc_variant(&value1) == SAIL_OK);
+    sail_set_variant_double(value1, reference_value1);
+
+    munit_assert(sail_put_hash_map(hash_map1, "ktop", value1) == SAIL_OK);
+    sail_destroy_variant(value1);
+
+    /* Value 2. */
+    struct sail_variant *value2;
+    munit_assert(sail_alloc_variant(&value2) == SAIL_OK);
+    sail_set_variant_int(value2, reference_value2);
+
+    munit_assert(sail_put_hash_map(hash_map1, "range", value2) == SAIL_OK);
+    sail_destroy_variant(value2);
+
+    struct sail_hash_map *hash_map2;
+    munit_assert(sail_copy_hash_map(hash_map1, &hash_map2) == SAIL_OK);
+
+    munit_assert(sail_test_compare_hash_maps(hash_map1, hash_map2) == SAIL_OK);
+
+    /* Cleanup. */
+    sail_destroy_hash_map(hash_map2);
+    sail_destroy_hash_map(hash_map1);
 
     return MUNIT_OK;
 }
@@ -255,6 +296,7 @@ static MunitResult test_clear(const MunitParameter params[], void *user_data) {
 static MunitTest test_suite_tests[] = {
     { (char *)"/put",            test_put,            NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/put-erase-many", test_put_erase_many, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/copy",           test_copy,           NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/overwrite",      test_overwrite,      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/erase",          test_erase,          NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/clear",          test_clear,          NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },

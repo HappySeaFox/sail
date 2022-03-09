@@ -78,6 +78,28 @@ sail_status_t sail_test_compare_variants(const struct sail_variant *variant1, co
     return SAIL_OK;
 }
 
+static bool compare_key_value_callback(const char *key, const struct sail_variant *value, void *user_data) {
+
+    const struct sail_hash_map *hash_map2 = (struct sail_hash_map *)user_data;
+    const struct sail_variant *value2 = sail_hash_map_value(hash_map2, key);
+
+    munit_assert(sail_test_compare_variants(value, value2) == SAIL_OK);
+
+    return true;
+}
+
+sail_status_t sail_test_compare_hash_maps(const struct sail_hash_map *hash_map1, const struct sail_hash_map *hash_map2) {
+
+    munit_assert_not_null(hash_map1);
+    munit_assert_not_null(hash_map2);
+
+    munit_assert(sail_hash_map_size(hash_map1) == sail_hash_map_size(hash_map2));
+
+    sail_traverse_hash_map_with_user_data(hash_map1, compare_key_value_callback, (void *)hash_map2);
+
+    return SAIL_OK;
+}
+
 sail_status_t sail_test_compare_meta_datas(const struct sail_meta_data *meta_data1, const struct sail_meta_data *meta_data2) {
 
     munit_assert_not_null(meta_data1);
