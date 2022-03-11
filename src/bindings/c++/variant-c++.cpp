@@ -359,14 +359,35 @@ bool operator==(const sail::variant &a, const sail::variant &b) {
         return false;
     }
 
-#if 0
-    if (variant1->type != variant2->type || variant1->size != variant2->size) {
-        return false;
-    } else {
-        return memcmp(variant1->value, variant2->value, variant1->size) == 0;
+    switch (a.d->type) {
+        case SAIL_VARIANT_TYPE_BOOL:           return std::get<bool>(a.d->value)           == std::get<bool>(b.d->value);
+        case SAIL_VARIANT_TYPE_CHAR:           return std::get<char>(a.d->value)           == std::get<char>(b.d->value);
+        case SAIL_VARIANT_TYPE_UNSIGNED_CHAR:  return std::get<unsigned char>(a.d->value)  == std::get<unsigned char>(b.d->value);
+        case SAIL_VARIANT_TYPE_SHORT:          return std::get<short>(a.d->value)          == std::get<short>(b.d->value);
+        case SAIL_VARIANT_TYPE_UNSIGNED_SHORT: return std::get<unsigned short>(a.d->value) == std::get<unsigned short>(b.d->value);
+        case SAIL_VARIANT_TYPE_INT:            return std::get<int>(a.d->value)            == std::get<int>(b.d->value);
+        case SAIL_VARIANT_TYPE_UNSIGNED_INT:   return std::get<unsigned int>(a.d->value)   == std::get<unsigned int>(b.d->value);
+        case SAIL_VARIANT_TYPE_LONG:           return std::get<long>(a.d->value)           == std::get<long>(b.d->value);
+        case SAIL_VARIANT_TYPE_UNSIGNED_LONG:  return std::get<unsigned long>(a.d->value)  == std::get<unsigned long>(b.d->value);
+        case SAIL_VARIANT_TYPE_FLOAT:          return std::get<float>(a.d->value)          == std::get<float>(b.d->value);
+        case SAIL_VARIANT_TYPE_DOUBLE:         return std::get<double>(a.d->value)         == std::get<double>(b.d->value);
+        case SAIL_VARIANT_TYPE_STRING:         return std::get<std::string>(a.d->value)    == std::get<std::string>(b.d->value);
+        case SAIL_VARIANT_TYPE_DATA: {
+            const sail::arbitrary_data &a_arbitrary_data = std::get<sail::arbitrary_data>(a.d->value);
+            const sail::arbitrary_data &b_arbitrary_data = std::get<sail::arbitrary_data>(b.d->value);
+
+            return a_arbitrary_data.size() == b_arbitrary_data.size() &&
+                    memcmp(a_arbitrary_data.data(), b_arbitrary_data.data(), a_arbitrary_data.size()) == 0;
+        }
+        case SAIL_VARIANT_TYPE_INVALID: return false;
     }
-#endif
-    return true;
+
+    return false;
+}
+
+bool operator!=(const sail::variant &a, const sail::variant &b) {
+
+    return !(a == b);
 }
 
 }

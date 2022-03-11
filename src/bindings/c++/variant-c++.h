@@ -132,7 +132,15 @@ private:
     std::unique_ptr<pimpl> d;
 };
 
+/*
+ * Returns true if the variants have the same type and value.
+ */
 SAIL_EXPORT bool operator==(const sail::variant &a, const sail::variant &b);
+
+/*
+ * Returns true if the variants have different types or values.
+ */
+SAIL_EXPORT bool operator!=(const sail::variant &a, const sail::variant &b);
 
 }
 

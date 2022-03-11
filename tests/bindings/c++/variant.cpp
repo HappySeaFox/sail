@@ -24,6 +24,7 @@
 */
 
 #include <ctime>
+#include <functional>
 
 #include "sail-c++.h"
 
@@ -38,6 +39,36 @@ static MunitResult test_type(const T &value) {
     munit_assert(variant.is_valid());
     munit_assert(variant.has_value<T>());
     munit_assert(variant.value<T>() == value);
+
+    return MUNIT_OK;
+}
+
+template<typename T>
+static MunitResult test_equal(const T &value) {
+
+    sail::variant variant1;
+    variant1.with_value(value);
+
+    sail::variant variant2;
+    variant2.with_value(value);
+
+    munit_assert(std::equal_to<sail::variant>()(variant1, variant2));
+    munit_assert(std::equal_to<sail::variant>()(variant2, variant1));
+
+    return MUNIT_OK;
+}
+
+template<typename T1, typename T2>
+static MunitResult test_not_equal(const T1 &value1, const T2 &value2) {
+
+    sail::variant variant1;
+    variant1.with_value(value1);
+
+    sail::variant variant2;
+    variant2.with_value(value2);
+
+    munit_assert(std::not_equal_to<sail::variant>()(variant1, variant2));
+    munit_assert(std::not_equal_to<sail::variant>()(variant2, variant1));
 
     return MUNIT_OK;
 }
@@ -90,9 +121,83 @@ static MunitResult test_with_value(const MunitParameter params[], void *user_dat
     return MUNIT_OK;
 }
 
+static MunitResult test_compare(const MunitParameter params[], void *user_data) {
+
+    (void)params;
+    (void)user_data;
+
+    // ==
+    test_equal<bool>(true);
+
+    test_equal<char>('a');
+    test_equal<unsigned char>('a');
+
+    test_equal<short>(-5);
+    test_equal<unsigned short>(5566);
+
+    test_equal<int>(-500);
+    test_equal<unsigned int>(0xFFFF5);
+
+    test_equal<long>(-500);
+    test_equal<unsigned long>(0xFFFF5);
+
+    test_equal<float>(-5.0f);
+    test_equal<double>(120.0);
+
+    test_equal<std::string>("abc");
+    const sail::arbitrary_data arbitrary_data(/* size */ 500, /* value */ 121);
+    test_equal<sail::arbitrary_data>(arbitrary_data);
+
+    // !=
+    test_not_equal<bool, bool>(true, false);
+
+    test_not_equal<char, char>('a', 'b');
+    test_not_equal<char, unsigned char>('a', 'a');
+
+    test_not_equal<unsigned char, unsigned char>('a', 'b');
+    test_not_equal<unsigned char, char>('a', 'a');
+
+    test_not_equal<short, short>(5, 10);
+    test_not_equal<short, unsigned short>(5, 5);
+
+    test_not_equal<unsigned short, unsigned short>(5, 10);
+    test_not_equal<unsigned short, short>(5, 5);
+
+    test_not_equal<int, int>(500, 501);
+    test_not_equal<int, unsigned int>(500, 500);
+
+    test_not_equal<unsigned int, unsigned int>(500, 501);
+    test_not_equal<unsigned int, int>(500, 500);
+
+    test_not_equal<long, long>(500, 501);
+    test_not_equal<long, unsigned long>(500, 500);
+
+    test_not_equal<unsigned long, unsigned long>(500, 501);
+    test_not_equal<unsigned long, long>(500, 500);
+
+    test_not_equal<float, float>(-5.0f, -10.0f);
+    test_not_equal<float, int>(-5.0f, 1);
+
+    test_not_equal<double, double>(-5.0, -10.0);
+    test_not_equal<double, int>(-5.0, 1);
+
+    test_not_equal<std::string, std::string>("abc", "def");
+    test_not_equal<std::string, int>("abc", 6);
+
+    const sail::arbitrary_data arbitrary_data1(/* size */ 500, /* value */ 66);
+    const sail::arbitrary_data arbitrary_data2(/* size */ 400, /* value */ 66);
+    const sail::arbitrary_data arbitrary_data3(/* size */ 500, /* value */ 90);
+    test_not_equal<sail::arbitrary_data, sail::arbitrary_data>(arbitrary_data1, arbitrary_data2);
+    test_not_equal<sail::arbitrary_data, sail::arbitrary_data>(arbitrary_data1, arbitrary_data3);
+    test_not_equal<sail::arbitrary_data, int>(arbitrary_data1, 777);
+
+    return MUNIT_OK;
+}
+
 static MunitTest test_suite_tests[] = {
     { (char *)"/move",       test_move,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/with-value", test_with_value, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/compare",    test_compare,    NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };
