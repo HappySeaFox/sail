@@ -98,7 +98,9 @@ static MunitResult test_put_erase_many(const MunitParameter params[], void *user
     for (size_t i = 0; i < ARRAY_SIZE; i++) {
         const size_t length = 5 + 1;
 
-        munit_assert(sail_malloc(length, &keys[i]) == SAIL_OK);
+        void *ptr;
+        munit_assert(sail_malloc(length, &ptr) == SAIL_OK);
+        keys[i] = ptr;
 
         for (size_t l = 0; l < length - 1; l++) {
             keys[i][l] = (char)(1 + rand() % 255);
