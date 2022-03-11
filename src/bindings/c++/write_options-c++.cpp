@@ -47,6 +47,7 @@ public:
     }
 
     struct sail_write_options *sail_write_options;
+    sail::codec_options codec_options;
 };
 
 write_options::write_options()
@@ -62,7 +63,7 @@ write_options::write_options(const write_options &wo)
 
 write_options& write_options::operator=(const sail::write_options &write_options)
 {
-    with_io_options(write_options.io_options())
+    with_codec_options(write_options.codec_options())
         .with_compression(write_options.compression())
         .with_compression_level(write_options.compression_level());
 
@@ -85,9 +86,9 @@ write_options::~write_options()
 {
 }
 
-int write_options::io_options() const
+const sail::codec_options& write_options::codec_options() const
 {
-    return d->sail_write_options->io_options;
+    return d->codec_options;
 }
 
 SailCompression write_options::compression() const
@@ -100,21 +101,24 @@ double write_options::compression_level() const
     return d->sail_write_options->compression_level;
 }
 
-write_options& write_options::with_io_options(int io_options)
+write_options& write_options::with_codec_options(const sail::codec_options &codec_options)
 {
-    d->sail_write_options->io_options = io_options;
+    d->codec_options = codec_options;
+
     return *this;
 }
 
 write_options& write_options::with_compression(SailCompression compression)
 {
     d->sail_write_options->compression = compression;
+
     return *this;
 }
 
 write_options& write_options::with_compression_level(double compression_level)
 {
     d->sail_write_options->compression_level = compression_level;
+
     return *this;
 }
 
@@ -126,18 +130,21 @@ write_options::write_options(const sail_write_options *wo)
         return;
     }
 
-    with_io_options(wo->io_options)
+    with_codec_options(utils_private::sail_codec_options_to_codec_options(wo->codec_options))
         .with_compression(wo->compression)
         .with_compression_level(wo->compression_level);
 }
 
-sail_status_t write_options::to_sail_write_options(sail_write_options *write_options) const
+sail_status_t write_options::to_sail_write_options(sail_write_options **write_options) const
 {
     SAIL_CHECK_PTR(write_options);
 
-    write_options->io_options        = d->sail_write_options->io_options;
-    write_options->compression       = d->sail_write_options->compression;
-    write_options->compression_level = d->sail_write_options->compression_level;
+    SAIL_TRY(sail_alloc_write_options(write_options));
+
+    utils_private::codec_options_to_sail_codec_options(d->codec_options, (*write_options)->codec_options);
+
+    (*write_options)->compression       = d->sail_write_options->compression;
+    (*write_options)->compression_level = d->sail_write_options->compression_level;
 
     return SAIL_OK;
 }

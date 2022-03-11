@@ -23,8 +23,10 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_READ_OPTIONS_H
-#define SAIL_READ_OPTIONS_H
+#ifndef SAIL_CODEC_OPTIONS_H
+#define SAIL_CODEC_OPTIONS_H
+
+#include <stdbool.h>
 
 #ifdef SAIL_BUILD
     #include "error.h"
@@ -39,55 +41,48 @@ extern "C" {
 #endif
 
 struct sail_hash_map;
-struct sail_read_features;
 
 /*
- * Options to tune reading operations.
- */
-struct sail_read_options {
-
-    /* Manipulation options for reading operations. */
-    struct sail_hash_map *codec_options;
-};
-
-typedef struct sail_read_options sail_read_options_t;
-
-/*
- * Allocates read options. The assigned read options MUST be destroyed later
- * with sail_destroy_read_options().
+ * Sets the meta data option value.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_read_options(struct sail_read_options **read_options);
+SAIL_EXPORT void sail_put_meta_data_codec_option(struct sail_hash_map *codec_options, bool value);
 
 /*
- * Destroys the specified read options object and all its internal allocated memory buffers. The read options
- * MUST NOT be used anymore after calling this function. Does nothing if the read options is NULL.
- */
-SAIL_EXPORT void sail_destroy_read_options(struct sail_read_options *read_options);
-
-/*
- * Builds default read options from read features.
+ * Returns the meta data option value or true if the option is absent.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_read_options_from_features(const struct sail_read_features *read_features, struct sail_read_options *read_options);
+SAIL_EXPORT bool sail_meta_data_codec_option(const struct sail_hash_map *codec_options);
 
 /*
- * Allocates and builds default read options from read features. The assigned read options MUST be destroyed later
- * with sail_destroy_read_options().
+ * Sets the interlaced option value.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_read_options_from_features(const struct sail_read_features *read_features, struct sail_read_options **read_options);
+SAIL_EXPORT void sail_put_interlaced_codec_option(struct sail_hash_map *codec_options, bool value);
 
 /*
- * Makes a deep copy of the specified read options object. The assigned read options MUST be destroyed later
- * with sail_destroy_read_options().
+ * Returns the interlaced option value or true if the option is absent.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_copy_read_options(const struct sail_read_options *source, struct sail_read_options **target);
+SAIL_EXPORT bool sail_interlaced_codec_option(const struct sail_hash_map *codec_options);
+
+/*
+ * Sets the ICC profile option value.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT void sail_put_iccp_codec_option(struct sail_hash_map *codec_options, bool value);
+
+/*
+ * Returns the ICC profile option value or true if the option is absent.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT bool sail_iccp_codec_option(const struct sail_hash_map *codec_options);
 
 /* extern "C" */
 #ifdef __cplusplus

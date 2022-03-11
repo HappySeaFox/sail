@@ -23,8 +23,6 @@
     SOFTWARE.
 */
 
-#include <stdexcept>
-
 #include "sail-c++.h"
 #include "sail.h"
 
@@ -35,18 +33,10 @@ class SAIL_HIDDEN read_options::pimpl
 {
 public:
     pimpl()
-        : sail_read_options(nullptr)
     {
-        SAIL_TRY_OR_EXECUTE(sail_alloc_read_options(&sail_read_options),
-                            /* on error */ throw std::bad_alloc());
     }
 
-    ~pimpl()
-    {
-        sail_destroy_read_options(sail_read_options);
-    }
-
-    struct sail_read_options *sail_read_options;
+    sail::codec_options codec_options;
 };
 
 read_options::read_options()
@@ -62,7 +52,8 @@ read_options::read_options(const read_options &ro)
 
 read_options& read_options::operator=(const sail::read_options &read_options)
 {
-    with_io_options(read_options.io_options());
+    with_codec_options(read_options.codec_options());
+
     return *this;
 }
 
@@ -82,14 +73,15 @@ read_options::~read_options()
 {
 }
 
-int read_options::io_options() const
+const sail::codec_options& read_options::codec_options() const
 {
-    return d->sail_read_options->io_options;
+    return d->codec_options;
 }
 
-read_options& read_options::with_io_options(int io_options)
+read_options& read_options::with_codec_options(const sail::codec_options &codec_options)
 {
-    d->sail_read_options->io_options = io_options;
+    d->codec_options = codec_options;
+
     return *this;
 }
 
@@ -101,14 +93,16 @@ read_options::read_options(const sail_read_options *ro)
         return;
     }
 
-    with_io_options(ro->io_options);
+    with_codec_options(utils_private::sail_codec_options_to_codec_options(ro->codec_options));
 }
 
-sail_status_t read_options::to_sail_read_options(sail_read_options *read_options) const
+sail_status_t read_options::to_sail_read_options(sail_read_options **read_options) const
 {
     SAIL_CHECK_PTR(read_options);
 
-    *read_options = *d->sail_read_options;
+    SAIL_TRY(sail_alloc_read_options(read_options));
+
+    utils_private::codec_options_to_sail_codec_options(d->codec_options, (*read_options)->codec_options);
 
     return SAIL_OK;
 }

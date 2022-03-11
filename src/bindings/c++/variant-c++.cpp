@@ -353,4 +353,20 @@ sail_status_t variant::to_sail_variant(sail_variant **variant) const
     return SAIL_OK;
 }
 
+bool operator==(const sail::variant &a, const sail::variant &b) {
+
+    if (!a.is_valid() || !b.is_valid() || a.d->type != b.d->type) {
+        return false;
+    }
+
+#if 0
+    if (variant1->type != variant2->type || variant1->size != variant2->size) {
+        return false;
+    } else {
+        return memcmp(variant1->value, variant2->value, variant1->size) == 0;
+    }
+#endif
+    return true;
+}
+
 }

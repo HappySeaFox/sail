@@ -31,6 +31,7 @@
 #ifdef SAIL_BUILD
     #include "config.h"
 
+    #include "codec_options.h"
     #include "common.h"
     #include "common_serialize.h"
     #include "compiler_specifics.h"
@@ -60,6 +61,7 @@
 #else
     #include <sail-common/config.h>
 
+    #include <sail-common/codec_options.h>
     #include <sail-common/common.h>
     #include <sail-common/common_serialize.h>
     #include <sail-common/compiler_specifics.h>

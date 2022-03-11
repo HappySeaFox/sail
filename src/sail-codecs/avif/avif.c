@@ -126,7 +126,8 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_avif(struct sail_io *io, const
     /* Deep copy read options. */
     SAIL_TRY(sail_copy_read_options(read_options, &avif_state->read_options));
 
-    avif_state->avif_decoder->ignoreExif = avif_state->avif_decoder->ignoreXMP = (avif_state->read_options->io_options & SAIL_IO_OPTION_META_DATA) == 0;
+    avif_state->avif_decoder->ignoreExif = avif_state->avif_decoder->ignoreXMP =
+        !sail_meta_data_codec_option(avif_state->read_options->codec_options);
 
     /* Initialize AVIF. */
     avif_state->avif_context.io = io;
@@ -185,7 +186,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_avif(void *state, s
                         /* cleanup */ sail_destroy_image(image_local));
 
     /* Fetch ICC profile. */
-    if (avif_state->read_options->io_options & SAIL_IO_OPTION_ICCP) {
+    if (sail_iccp_codec_option(avif_state->read_options->codec_options)) {
         SAIL_TRY_OR_CLEANUP(avif_private_fetch_iccp(&avif_image->icc, &image_local->iccp),
                             /* cleanup */ sail_destroy_image(image_local));
     }
