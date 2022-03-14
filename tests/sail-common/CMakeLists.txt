@@ -1,4 +1,5 @@
 sail_test(TARGET bytes-per-line      SOURCES bytes_per_line.c      LINK sail-common)
+sail_test(TARGET codec-options       SOURCES codec_options.c       LINK sail-common)
 sail_test(TARGET compare-pixel-sizes SOURCES compare_pixel_sizes.c LINK sail-common)
 sail_test(TARGET hash-map            SOURCES hash_map.c            LINK sail-common sail-comparators)
 sail_test(TARGET hash-set            SOURCES hash_set.c            LINK sail-common sail-comparators)

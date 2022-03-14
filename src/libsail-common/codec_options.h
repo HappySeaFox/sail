@@ -40,47 +40,52 @@
 extern "C" {
 #endif
 
+/* Codec option. See sail_put_codec_option(). */
+enum SailCodecOption {
+    SAIL_CODEC_OPTION_META_DATA,
+    SAIL_CODEC_OPTION_INTERLACED,
+    SAIL_CODEC_OPTION_ICCP,
+};
+
 struct sail_hash_map;
 
 /*
+ * Sets the specified option value in the codec options.
+ */
+SAIL_EXPORT void sail_put_codec_option(struct sail_hash_map *codec_options, enum SailCodecOption codec_option, bool value);
+
+/*
+ * Returns the codec option value or the specified default value if the option is absent.
+ */
+SAIL_EXPORT bool sail_codec_option(const struct sail_hash_map *codec_options, enum SailCodecOption codec_option, bool def);
+
+/*
  * Sets the meta data option value.
- *
- * Returns SAIL_OK on success.
  */
 SAIL_EXPORT void sail_put_meta_data_codec_option(struct sail_hash_map *codec_options, bool value);
 
 /*
  * Returns the meta data option value or true if the option is absent.
- *
- * Returns SAIL_OK on success.
  */
 SAIL_EXPORT bool sail_meta_data_codec_option(const struct sail_hash_map *codec_options);
 
 /*
  * Sets the interlaced option value.
- *
- * Returns SAIL_OK on success.
  */
 SAIL_EXPORT void sail_put_interlaced_codec_option(struct sail_hash_map *codec_options, bool value);
 
 /*
  * Returns the interlaced option value or true if the option is absent.
- *
- * Returns SAIL_OK on success.
  */
 SAIL_EXPORT bool sail_interlaced_codec_option(const struct sail_hash_map *codec_options);
 
 /*
  * Sets the ICC profile option value.
- *
- * Returns SAIL_OK on success.
  */
 SAIL_EXPORT void sail_put_iccp_codec_option(struct sail_hash_map *codec_options, bool value);
 
 /*
  * Returns the ICC profile option value or true if the option is absent.
- *
- * Returns SAIL_OK on success.
  */
 SAIL_EXPORT bool sail_iccp_codec_option(const struct sail_hash_map *codec_options);
 

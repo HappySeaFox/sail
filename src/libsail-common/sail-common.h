@@ -32,6 +32,7 @@
     #include "config.h"
 
     #include "codec_options.h"
+    #include "codec_options_p.h"
     #include "common.h"
     #include "common_serialize.h"
     #include "compiler_specifics.h"
