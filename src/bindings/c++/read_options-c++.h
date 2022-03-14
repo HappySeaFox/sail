@@ -88,7 +88,7 @@ public:
     /*
      * Returns the codec manipulation options for reading operations.
      */
-    const sail::codec_options& codec_options() const;
+    sail::codec_options& codec_options() const;
 
     /*
      * Sets new codec manipulation options for reading operations.

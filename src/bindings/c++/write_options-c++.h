@@ -84,7 +84,7 @@ public:
     /*
      * Returns the codec manipulation options for writing operations.
      */
-    const sail::codec_options& codec_options() const;
+    sail::codec_options& codec_options() const;
 
     /*
      * Returns the compression type. For example: SAIL_COMPRESSION_RLE. See SailCompression.

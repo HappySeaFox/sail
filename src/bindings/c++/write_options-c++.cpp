@@ -86,7 +86,7 @@ write_options::~write_options()
 {
 }
 
-const sail::codec_options& write_options::codec_options() const
+sail::codec_options& write_options::codec_options() const
 {
     return d->codec_options;
 }

@@ -73,7 +73,7 @@ read_options::~read_options()
 {
 }
 
-const sail::codec_options& read_options::codec_options() const
+sail::codec_options& read_options::codec_options() const
 {
     return d->codec_options;
 }
