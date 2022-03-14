@@ -39,6 +39,8 @@
     #include "export.h"
     #include "hash_map.h"
     #include "hash_map_p.h"
+    #include "hash_set.h"
+    #include "hash_set_p.h"
     #include "iccp.h"
     #include "image.h"
     #include "io_common.h"
@@ -68,6 +70,7 @@
     #include <sail-common/error.h>
     #include <sail-common/export.h>
     #include <sail-common/hash_map.h>
+    #include <sail-common/hash_set.h>
     #include <sail-common/iccp.h>
     #include <sail-common/image.h>
     #include <sail-common/io_common.h>

@@ -100,6 +100,27 @@ sail_status_t sail_test_compare_hash_maps(const struct sail_hash_map *hash_map1,
     return SAIL_OK;
 }
 
+static bool compare_key_callback(const char *key, void *user_data) {
+
+    const struct sail_hash_set *hash_set2 = (struct sail_hash_set *)user_data;
+
+    munit_assert(sail_hash_set_has_key(hash_set2, key));
+
+    return true;
+}
+
+sail_status_t sail_test_compare_hash_sets(const struct sail_hash_set *hash_set1, const struct sail_hash_set *hash_set2) {
+
+    munit_assert_not_null(hash_set1);
+    munit_assert_not_null(hash_set2);
+
+    munit_assert(sail_hash_set_size(hash_set1) == sail_hash_set_size(hash_set2));
+
+    sail_traverse_hash_set_with_user_data(hash_set1, compare_key_callback, (void *)hash_set2);
+
+    return SAIL_OK;
+}
+
 sail_status_t sail_test_compare_meta_datas(const struct sail_meta_data *meta_data1, const struct sail_meta_data *meta_data2) {
 
     munit_assert_not_null(meta_data1);
