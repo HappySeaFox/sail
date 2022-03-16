@@ -25,20 +25,7 @@
 
 #include "sail-common.h"
 
-void sail_put_codec_option(struct sail_hash_map *codec_options, enum SailCodecOption codec_option, bool value) {
-
-    const char *key;
-
-    switch (codec_option) {
-        case SAIL_CODEC_OPTION_META_DATA:  key = SAIL_CODEC_OPTION_META_DATA_KEY;  break;
-        case SAIL_CODEC_OPTION_INTERLACED: key = SAIL_CODEC_OPTION_INTERLACED_KEY; break;
-        case SAIL_CODEC_OPTION_ICCP:       key = SAIL_CODEC_OPTION_ICCP_KEY;       break;
-
-        default: {
-            SAIL_LOG_ERROR("Internal error: Unsupported codec option");
-            return;
-        }
-    }
+void sail_put_codec_option(struct sail_hash_map *codec_options, const char *codec_option, bool value) {
 
     struct sail_variant *variant;
     SAIL_TRY_OR_EXECUTE(sail_alloc_variant(&variant),
@@ -46,27 +33,14 @@ void sail_put_codec_option(struct sail_hash_map *codec_options, enum SailCodecOp
 
     sail_set_variant_bool(variant, value);
 
-    sail_put_hash_map(codec_options, key, variant);
+    sail_put_hash_map(codec_options, codec_option, variant);
 
     sail_destroy_variant(variant);
 }
 
-bool sail_codec_option(const struct sail_hash_map *codec_options, enum SailCodecOption codec_option, bool def) {
+bool sail_codec_option(const struct sail_hash_map *codec_options, const char *codec_option, bool def) {
 
-    const char *key;
-
-    switch (codec_option) {
-        case SAIL_CODEC_OPTION_META_DATA:  key = SAIL_CODEC_OPTION_META_DATA_KEY;  break;
-        case SAIL_CODEC_OPTION_INTERLACED: key = SAIL_CODEC_OPTION_INTERLACED_KEY; break;
-        case SAIL_CODEC_OPTION_ICCP:       key = SAIL_CODEC_OPTION_ICCP_KEY;       break;
-
-        default: {
-            SAIL_LOG_ERROR("Internal error: Unsupported codec option");
-            return def;
-        }
-    }
-
-    const struct sail_variant *variant = sail_hash_map_value(codec_options, key);
+    const struct sail_variant *variant = sail_hash_map_value(codec_options, codec_option);
 
     if (SAIL_UNLIKELY(variant == NULL)) {
         return def;
@@ -82,7 +56,7 @@ void sail_put_meta_data_codec_option(struct sail_hash_map *codec_options, bool v
 
 bool sail_meta_data_codec_option(const struct sail_hash_map *codec_options) {
 
-    const struct sail_variant *variant = sail_hash_map_value(codec_options, SAIL_CODEC_OPTION_META_DATA_KEY);
+    const struct sail_variant *variant = sail_hash_map_value(codec_options, SAIL_CODEC_OPTION_META_DATA);
 
     if (SAIL_UNLIKELY(variant == NULL)) {
         return true;
@@ -98,7 +72,7 @@ void sail_put_interlaced_codec_option(struct sail_hash_map *codec_options, bool 
 
 bool sail_interlaced_codec_option(const struct sail_hash_map *codec_options) {
 
-    const struct sail_variant *variant = sail_hash_map_value(codec_options, SAIL_CODEC_OPTION_INTERLACED_KEY);
+    const struct sail_variant *variant = sail_hash_map_value(codec_options, SAIL_CODEC_OPTION_INTERLACED);
 
     if (SAIL_UNLIKELY(variant == NULL)) {
         return true;
@@ -114,7 +88,7 @@ void sail_put_iccp_codec_option(struct sail_hash_map *codec_options, bool value)
 
 bool sail_iccp_codec_option(const struct sail_hash_map *codec_options) {
 
-    const struct sail_variant *variant = sail_hash_map_value(codec_options, SAIL_CODEC_OPTION_ICCP_KEY);
+    const struct sail_variant *variant = sail_hash_map_value(codec_options, SAIL_CODEC_OPTION_ICCP);
 
     if (SAIL_UNLIKELY(variant == NULL)) {
         return true;

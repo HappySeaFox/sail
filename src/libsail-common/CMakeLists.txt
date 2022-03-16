@@ -9,7 +9,6 @@ set(SAIL_COLORED_OUTPUT ${SAIL_COLORED_OUTPUT} PARENT_SCOPE)
 add_library(sail-common
                 codec_options.c
                 codec_options.h
-                codec_options_p.h
                 common.h
                 common_serialize.c
                 common_serialize.h

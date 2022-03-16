@@ -40,24 +40,22 @@
 extern "C" {
 #endif
 
-/* Codec option. See sail_put_codec_option(). */
-enum SailCodecOption {
-    SAIL_CODEC_OPTION_META_DATA,
-    SAIL_CODEC_OPTION_INTERLACED,
-    SAIL_CODEC_OPTION_ICCP,
-};
+/* Codec options. See sail_put_codec_option(). */
+static const char * const SAIL_CODEC_OPTION_META_DATA  = "META-DATA";
+static const char * const SAIL_CODEC_OPTION_INTERLACED = "INTERLACED";
+static const char * const SAIL_CODEC_OPTION_ICCP       = "ICCP";
 
 struct sail_hash_map;
 
 /*
  * Sets the specified option value in the codec options.
  */
-SAIL_EXPORT void sail_put_codec_option(struct sail_hash_map *codec_options, enum SailCodecOption codec_option, bool value);
+SAIL_EXPORT void sail_put_codec_option(struct sail_hash_map *codec_options, const char *codec_option, bool value);
 
 /*
  * Returns the codec option value or the specified default value if the option is absent.
  */
-SAIL_EXPORT bool sail_codec_option(const struct sail_hash_map *codec_options, enum SailCodecOption codec_option, bool def);
+SAIL_EXPORT bool sail_codec_option(const struct sail_hash_map *codec_options, const char *codec_option, bool def);
 
 /*
  * Sets the meta data option value.

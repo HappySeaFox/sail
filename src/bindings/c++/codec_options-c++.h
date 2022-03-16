@@ -38,6 +38,9 @@
 namespace sail
 {
 
+/*
+ * Codec options.
+ */
 using codec_options = std::unordered_map<std::string, sail::variant>;
 
 }

@@ -6,7 +6,6 @@ add_library(sail-c++
                 at_scope_exit-c++.h
                 codec_info-c++.cpp
                 codec_info-c++.h
-                codec_options-c++.cpp
                 codec_options-c++.h
                 context-c++.cpp
                 context-c++.h
