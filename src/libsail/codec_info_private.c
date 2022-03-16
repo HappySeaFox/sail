@@ -56,11 +56,9 @@ static sail_status_t parse_serialized_ints(const char *value, int **target, unsi
                         /* cleanup */ destroy_string_node_chain(string_node));
 
     *length = 0;
-    struct sail_string_node *node = string_node;
 
-    while (node != NULL) {
+    for (struct sail_string_node *node = string_node; node != NULL; node = node->next) {
         (*length)++;
-        node = node->next;
     }
 
     if (*length > 0) {
@@ -69,12 +67,10 @@ static sail_status_t parse_serialized_ints(const char *value, int **target, unsi
                             /* cleanup */ destroy_string_node_chain(string_node));
         *target = ptr;
 
-        node = string_node;
         int i = 0;
 
-        while (node != NULL) {
+        for (struct sail_string_node *node = string_node; node != NULL; node = node->next) {
             *(*target + i++) = converter(node->value);
-            node = node->next;
         }
     }
 
@@ -105,11 +101,8 @@ static sail_status_t parse_flags(const char *value, int *features, int (*convert
 
     *features = 0;
 
-    struct sail_string_node *node = string_node;
-
-    while (node != NULL) {
+    for (struct sail_string_node *node = string_node; node != NULL; node = node->next) {
         *features |= converter(node->value);
-        node = node->next;
     }
 
     destroy_string_node_chain(string_node);
@@ -163,9 +156,7 @@ static sail_status_t inih_handler_sail_error(void *data, const char *section, co
         } else if (strcmp(name, "magic-numbers") == 0) {
             SAIL_TRY(split_into_string_node_chain(value, &codec_info->magic_number_node));
 
-            struct sail_string_node *node = codec_info->magic_number_node;
-
-            while (node != NULL) {
+            for (struct sail_string_node *node = codec_info->magic_number_node; node != NULL; node = node->next) {
                 if (strlen(node->value) > SAIL_MAGIC_BUFFER_SIZE * 3 - 1) {
                     SAIL_LOG_ERROR("Magic number '%s' is too long. Magic numbers for the '%s' codec are disabled",
                                     node->value, codec_info->name);
@@ -175,25 +166,18 @@ static sail_status_t inih_handler_sail_error(void *data, const char *section, co
                 }
 
                 sail_to_lower(node->value);
-                node = node->next;
             }
         } else if (strcmp(name, "extensions") == 0) {
             SAIL_TRY(split_into_string_node_chain(value, &codec_info->extension_node));
 
-            struct sail_string_node *node = codec_info->extension_node;
-
-            while (node != NULL) {
+            for (struct sail_string_node *node = codec_info->extension_node; node != NULL; node = node->next) {
                 sail_to_lower(node->value);
-                node = node->next;
             }
         } else if (strcmp(name, "mime-types") == 0) {
             SAIL_TRY(split_into_string_node_chain(value, &codec_info->mime_type_node));
 
-            struct sail_string_node *node = codec_info->mime_type_node;
-
-            while (node != NULL) {
+            for (struct sail_string_node *node = codec_info->mime_type_node; node != NULL; node = node->next) {
                 sail_to_lower(node->value);
-                node = node->next;
             }
         } else {
             SAIL_LOG_ERROR("Unsupported codec info key '%s' in [%s]", name, section);
