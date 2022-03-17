@@ -32,11 +32,16 @@ sail_status_t sail_alloc_read_features(struct sail_read_features **read_features
 
     SAIL_CHECK_PTR(read_features);
 
+    struct sail_read_features *read_features_local;
+
     void *ptr;
     SAIL_TRY(sail_malloc(sizeof(struct sail_read_features), &ptr));
-    *read_features = ptr;
+    read_features_local = ptr;
 
-    (*read_features)->features = 0;
+    SAIL_TRY_OR_CLEANUP(sail_alloc_hash_set(&read_features_local->codec_features),
+                        /* cleanup */ sail_destroy_read_features(read_features_local));
+
+    *read_features = read_features_local;
 
     return SAIL_OK;
 }
@@ -47,5 +52,6 @@ void sail_destroy_read_features(struct sail_read_features *read_features) {
         return;
     }
 
+    sail_destroy_hash_set(read_features->codec_features);
     sail_free(read_features);
 }

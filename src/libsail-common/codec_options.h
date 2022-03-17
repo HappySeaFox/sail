@@ -40,9 +40,13 @@
 extern "C" {
 #endif
 
-/* Codec options. See sail_put_codec_option(). */
+/* Read or write image meta data like JPEG comments or EXIF. */
 static const char * const SAIL_CODEC_OPTION_META_DATA  = "META-DATA";
+
+/* Read or write interlaced images. */
 static const char * const SAIL_CODEC_OPTION_INTERLACED = "INTERLACED";
+
+/* Read or write embedded ICC profiles. */
 static const char * const SAIL_CODEC_OPTION_ICCP       = "ICCP";
 
 struct sail_hash_map;

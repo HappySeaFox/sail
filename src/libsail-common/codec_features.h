@@ -1,6 +1,6 @@
 /*  This file is part of SAIL (https://github.com/smoked-herring/sail)
 
-    Copyright (c) 2020 Dmitry Baryshev
+    Copyright (c) 2022 Dmitry Baryshev
 
     The MIT License
 
@@ -23,8 +23,10 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_READ_FEATURES_H
-#define SAIL_READ_FEATURES_H
+#ifndef SAIL_CODEC_FEATURES_H
+#define SAIL_CODEC_FEATURES_H
+
+#include <stdbool.h>
 
 #ifdef SAIL_BUILD
     #include "error.h"
@@ -38,30 +40,23 @@
 extern "C" {
 #endif
 
-/*
- * Read features. Use this structure to determine what a codec can actually read.
- */
-struct sail_read_features {
+/* Can read or write static images. */
+static const char * const SAIL_CODEC_FEATURE_STATIC      = "STATIC";
 
-    /* Supported or-ed features of reading operations. See SailCodecFeature. */
-    struct sail_hash_set *codec_features;
-};
+/* Can read or write animated images. */
+static const char * const SAIL_CODEC_FEATURE_ANIMATED    = "ANIMATED";
 
-typedef struct sail_read_features sail_read_features_t;
+/* Can read or write multi-paged (but not animated) images. */
+static const char * const SAIL_CODEC_FEATURE_MULTI_PAGED = "MULTI-PAGED";
 
-/*
- * Allocates read features. The assigned read features MUST be destroyed later
- * with sail_destroy_read_features().
- *
- * Returns SAIL_OK on success.
- */
-SAIL_EXPORT sail_status_t sail_alloc_read_features(struct sail_read_features **read_features);
+/* Can read or write image meta data like JPEG comments or EXIF. */
+static const char * const SAIL_CODEC_FEATURE_META_DATA   = "META-DATA";
 
-/*
- * Destroys the specified read features object and all its internal allocated memory buffers. The read features
- * MUST NOT be used anymore after calling this function. Does nothing if the read features is NULL.
- */
-SAIL_EXPORT void sail_destroy_read_features(struct sail_read_features *read_features);
+/* Can read or write interlaced images. */
+static const char * const SAIL_CODEC_FEATURE_INTERLACED  = "INTERLACED";
+
+/* Can read or write embedded ICC profiles. */
+static const char * const SAIL_CODEC_FEATURE_ICCP        = "ICCP";
 
 /* extern "C" */
 #ifdef __cplusplus
