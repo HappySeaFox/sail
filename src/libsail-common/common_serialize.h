@@ -102,6 +102,22 @@ SAIL_EXPORT const char* sail_meta_data_to_string(enum SailMetaData meta_data);
  */
 SAIL_EXPORT enum SailMetaData sail_meta_data_from_string(const char *str);
 
+/*
+ * Returns a string representation of the specified codec feature. See SailCodecFeature.
+ * For example: "STATIC" is returned for SAIL_CODEC_FEATURE_STATIC.
+ *
+ * Returns NULL if the codec feature is not known.
+ */
+SAIL_EXPORT const char* sail_codec_feature_to_string(enum SailCodecFeature codec_feature);
+
+/*
+ * Returns a codec feature from the string representation. See SailCodecFeature.
+ * For example: SAIL_CODEC_FEATURE_STATIC is returned for "STATIC".
+ *
+ * Returns SAIL_CODEC_FEATURE_UNKNOWN if the codec feature is not known.
+ */
+SAIL_EXPORT enum SailCodecFeature sail_codec_feature_from_string(const char *str);
+
 /* extern "C" */
 #ifdef __cplusplus
 }

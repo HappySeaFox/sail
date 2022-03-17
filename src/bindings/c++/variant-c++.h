@@ -62,7 +62,6 @@ namespace sail
 class SAIL_EXPORT variant
 {
     friend class meta_data;
-    friend class utils_private;
     friend SAIL_EXPORT bool operator==(const sail::variant &a, const sail::variant &b);
 
 public:

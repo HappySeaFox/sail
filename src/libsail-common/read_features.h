@@ -44,7 +44,7 @@ extern "C" {
 struct sail_read_features {
 
     /* Supported or-ed features of reading operations. See SailCodecFeature. */
-    struct sail_hash_set *codec_features;
+    int features;
 };
 
 typedef struct sail_read_features sail_read_features_t;

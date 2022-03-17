@@ -33,16 +33,11 @@ sail_status_t sail_alloc_read_options(struct sail_read_options **read_options) {
 
     SAIL_CHECK_PTR(read_options);
 
-    struct sail_read_options *read_options_local;
-
     void *ptr;
     SAIL_TRY(sail_malloc(sizeof(struct sail_read_options), &ptr));
-    read_options_local = ptr;
+    *read_options = ptr;
 
-    SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&read_options_local->codec_options),
-                        /* cleanup */ sail_destroy_read_options(read_options_local));
-
-    *read_options = read_options_local;
+    (*read_options)->io_options = 0;
 
     return SAIL_OK;
 }
@@ -53,7 +48,6 @@ void sail_destroy_read_options(struct sail_read_options *read_options) {
         return;
     }
 
-    sail_destroy_hash_map(read_options->codec_options);
     sail_free(read_options);
 }
 
@@ -62,14 +56,14 @@ sail_status_t sail_read_options_from_features(const struct sail_read_features *r
     SAIL_CHECK_PTR(read_features);
     SAIL_CHECK_PTR(read_options);
 
-    sail_clear_hash_map(read_options->codec_options);
+    read_options->io_options = 0;
 
     if (read_features->features & SAIL_CODEC_FEATURE_META_DATA) {
-        sail_put_meta_data_codec_option(read_options->codec_options, true);
+        read_options->io_options |= SAIL_IO_OPTION_META_DATA;
     }
 
     if (read_features->features & SAIL_CODEC_FEATURE_ICCP) {
-        sail_put_iccp_codec_option(read_options->codec_options, true);
+        read_options->io_options |= SAIL_IO_OPTION_ICCP;
     }
 
     return SAIL_OK;
@@ -96,12 +90,9 @@ sail_status_t sail_copy_read_options(const struct sail_read_options *source, str
 
     void *ptr;
     SAIL_TRY(sail_malloc(sizeof(struct sail_read_options), &ptr));
-    struct sail_read_options *target_local = ptr;
+    *target = ptr;
 
-    SAIL_TRY_OR_CLEANUP(sail_copy_hash_map(source->codec_options, &target_local->codec_options),
-                        /* cleanup */ sail_destroy_read_options(target_local));
-
-    *target = target_local;
+    memcpy(*target, source, sizeof(struct sail_read_options));
 
     return SAIL_OK;
 }

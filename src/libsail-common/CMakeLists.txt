@@ -7,9 +7,6 @@ option(SAIL_COLORED_OUTPUT "Enable colored console output on supported platforms
 set(SAIL_COLORED_OUTPUT ${SAIL_COLORED_OUTPUT} PARENT_SCOPE)
 
 add_library(sail-common
-                codec_features.h
-                codec_options.c
-                codec_options.h
                 common.h
                 common_serialize.c
                 common_serialize.h
@@ -64,9 +61,7 @@ add_library(sail-common
 
 # Build a list of public headers to install
 #
-set(PUBLIC_HEADERS "codec_features.h"
-                   "codec_options.h"
-                   "common.h"
+set(PUBLIC_HEADERS "common.h"
                    "common_serialize.h"
                    "compiler_specifics.h"
                    "error.h"

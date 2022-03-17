@@ -6,7 +6,6 @@ add_library(sail-c++
                 at_scope_exit-c++.h
                 codec_info-c++.cpp
                 codec_info-c++.h
-                codec_options-c++.h
                 context-c++.cpp
                 context-c++.h
                 conversion_options-c++.cpp
@@ -43,8 +42,6 @@ add_library(sail-c++
                 source_image-c++.h
                 utils-c++.cpp
                 utils-c++.h
-                utils_private-c++.cpp
-                utils_private-c++.h
                 variant-c++.cpp
                 variant-c++.h
                 write_features-c++.cpp
@@ -70,7 +67,6 @@ set(PUBLIC_HEADERS "abstract_io-c++.h"
                    "meta_data-c++.h"
                    "palette-c++.h"
                    "codec_info-c++.h"
-                   "codec_options-c++.h"
                    "read_features-c++.h"
                    "read_options-c++.h"
                    "resolution-c++.h"

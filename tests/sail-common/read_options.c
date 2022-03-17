@@ -25,8 +25,6 @@
 
 #include "sail-common.h"
 
-#include "sail-comparators.h"
-
 #include "munit.h"
 
 static MunitResult test_alloc_options(const MunitParameter params[], void *user_data) {
@@ -36,7 +34,7 @@ static MunitResult test_alloc_options(const MunitParameter params[], void *user_
     struct sail_read_options *read_options = NULL;
     munit_assert(sail_alloc_read_options(&read_options) == SAIL_OK);
     munit_assert_not_null(read_options);
-    munit_assert(sail_hash_map_size(read_options->codec_options) == 0);
+    munit_assert(read_options->io_options == 0);
 
     sail_destroy_read_options(read_options);
 
@@ -50,13 +48,13 @@ static MunitResult test_copy_options(const MunitParameter params[], void *user_d
     struct sail_read_options *read_options = NULL;
     munit_assert(sail_alloc_read_options(&read_options) == SAIL_OK);
 
-    sail_put_iccp_codec_option(read_options->codec_options, true);
+    read_options->io_options = SAIL_IO_OPTION_ICCP;
 
     struct sail_read_options *read_options_copy = NULL;
     munit_assert(sail_copy_read_options(read_options, &read_options_copy) == SAIL_OK);
     munit_assert_not_null(read_options_copy);
 
-    munit_assert(sail_test_compare_hash_maps(read_options_copy->codec_options, read_options->codec_options) == SAIL_OK);
+    munit_assert(read_options_copy->io_options == read_options->io_options);
 
     sail_destroy_read_options(read_options_copy);
     sail_destroy_read_options(read_options);
@@ -76,8 +74,7 @@ static MunitResult test_options_from_features(const MunitParameter params[], voi
     read_features.features = SAIL_CODEC_FEATURE_META_DATA | SAIL_CODEC_FEATURE_INTERLACED | SAIL_CODEC_FEATURE_ICCP;
     munit_assert(sail_read_options_from_features(&read_features, read_options) == SAIL_OK);
 
-    munit_assert(sail_meta_data_codec_option(read_options->codec_options));
-    munit_assert(sail_iccp_codec_option(read_options->codec_options));
+    munit_assert(read_options->io_options == (SAIL_IO_OPTION_META_DATA | SAIL_IO_OPTION_ICCP));
 
     sail_destroy_read_options(read_options);
 

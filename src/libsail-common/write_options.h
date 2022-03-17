@@ -38,14 +38,13 @@
 extern "C" {
 #endif
 
-struct sail_hash_map;
 struct sail_write_features;
 
 /* Options to modify writing operations. */
 struct sail_write_options {
 
-    /* Manipulation options for reading operations. */
-    struct sail_hash_map *codec_options;
+    /* Or-ed I/O manipulation options. See SailIoOption. */
+    int io_options;
 
     /*
      * Compression type. For example: SAIL_COMPRESSION_RLE. See SailCompression.
@@ -107,7 +106,7 @@ SAIL_EXPORT sail_status_t sail_alloc_write_options_from_features(const struct sa
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_copy_write_options(const struct sail_write_options *source, struct sail_write_options **target);
+SAIL_EXPORT sail_status_t sail_copy_write_options(const struct sail_write_options *write_options_source, struct sail_write_options **write_options_target);
 
 /* extern "C" */
 #ifdef __cplusplus

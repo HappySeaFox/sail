@@ -459,6 +459,42 @@ static MunitResult test_meta_data_from_string(const MunitParameter params[], voi
     return MUNIT_OK;
 }
 
+/*
+ * Codec features.
+ */
+static MunitResult test_codec_feature_to_string(const MunitParameter params[], void *user_data) {
+    (void)params;
+    (void)user_data;
+
+    munit_assert_string_equal(sail_codec_feature_to_string(SAIL_CODEC_FEATURE_UNKNOWN),     "UNKNOWN");
+    munit_assert_string_equal(sail_codec_feature_to_string(SAIL_CODEC_FEATURE_STATIC),      "STATIC");
+    munit_assert_string_equal(sail_codec_feature_to_string(SAIL_CODEC_FEATURE_ANIMATED),    "ANIMATED");
+    munit_assert_string_equal(sail_codec_feature_to_string(SAIL_CODEC_FEATURE_MULTI_PAGED), "MULTI-PAGED");
+    munit_assert_string_equal(sail_codec_feature_to_string(SAIL_CODEC_FEATURE_META_DATA),   "META-DATA");
+    munit_assert_string_equal(sail_codec_feature_to_string(SAIL_CODEC_FEATURE_INTERLACED),  "INTERLACED");
+    munit_assert_string_equal(sail_codec_feature_to_string(SAIL_CODEC_FEATURE_ICCP),        "ICCP");
+
+    return MUNIT_OK;
+}
+
+static MunitResult test_codec_feature_from_string(const MunitParameter params[], void *user_data) {
+    (void)params;
+    (void)user_data;
+
+    munit_assert(sail_codec_feature_from_string(NULL)   == SAIL_CODEC_FEATURE_UNKNOWN);
+    munit_assert(sail_codec_feature_from_string("Some") == SAIL_CODEC_FEATURE_UNKNOWN);
+
+    munit_assert(sail_codec_feature_from_string("UNKNOWN")     == SAIL_CODEC_FEATURE_UNKNOWN);
+    munit_assert(sail_codec_feature_from_string("STATIC")      == SAIL_CODEC_FEATURE_STATIC);
+    munit_assert(sail_codec_feature_from_string("ANIMATED")    == SAIL_CODEC_FEATURE_ANIMATED);
+    munit_assert(sail_codec_feature_from_string("MULTI-PAGED") == SAIL_CODEC_FEATURE_MULTI_PAGED);
+    munit_assert(sail_codec_feature_from_string("META-DATA")   == SAIL_CODEC_FEATURE_META_DATA);
+    munit_assert(sail_codec_feature_from_string("INTERLACED")  == SAIL_CODEC_FEATURE_INTERLACED);
+    munit_assert(sail_codec_feature_from_string("ICCP")        == SAIL_CODEC_FEATURE_ICCP);
+
+    return MUNIT_OK;
+}
+
 static MunitTest test_suite_tests[] = {
     { (char *)"/error-macros", test_error_macros, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
@@ -473,6 +509,9 @@ static MunitTest test_suite_tests[] = {
 
     { (char *)"/meta-data-to-string",   test_meta_data_to_string,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/meta-data-from-string", test_meta_data_from_string, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+
+    { (char *)"/codec-feature-to-string",   test_codec_feature_to_string,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/codec-feature-from-string", test_codec_feature_from_string, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };

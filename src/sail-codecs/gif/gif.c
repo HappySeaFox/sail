@@ -273,7 +273,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_gif(void *state, st
                     }
 
                     case COMMENT_EXT_FUNC_CODE: {
-                        if (sail_meta_data_codec_option(gif_state->read_options->codec_options)) {
+                        if (gif_state->read_options->io_options & SAIL_IO_OPTION_META_DATA) {
                             SAIL_TRY_OR_CLEANUP(gif_private_fetch_comment(extension, last_meta_data_node),
                                                 /* cleanup*/ sail_destroy_image(image_local));
                             last_meta_data_node = &(*last_meta_data_node)->next;
@@ -282,7 +282,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_gif(void *state, st
                     }
 
                     case APPLICATION_EXT_FUNC_CODE: {
-                        if (sail_meta_data_codec_option(gif_state->read_options->codec_options)) {
+                        if (gif_state->read_options->io_options & SAIL_IO_OPTION_META_DATA) {
                             SAIL_TRY_OR_CLEANUP(gif_private_fetch_application(extension, last_meta_data_node),
                                                 /* cleanup */ sail_destroy_image(image_local));
                             last_meta_data_node = &(*last_meta_data_node)->next;

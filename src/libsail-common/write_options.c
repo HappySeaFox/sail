@@ -33,19 +33,13 @@ sail_status_t sail_alloc_write_options(struct sail_write_options **write_options
 
     SAIL_CHECK_PTR(write_options);
 
-    struct sail_write_options *write_options_local;
-
     void *ptr;
     SAIL_TRY(sail_malloc(sizeof(struct sail_write_options), &ptr));
-    write_options_local = ptr;
+    *write_options = ptr;
 
-    SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&write_options_local->codec_options),
-                        /* cleanup */ sail_destroy_write_options(write_options_local));
-
-    write_options_local->compression       = SAIL_COMPRESSION_UNSUPPORTED;
-    write_options_local->compression_level = 0;
-
-    *write_options = write_options_local;
+    (*write_options)->io_options        = 0;
+    (*write_options)->compression       = SAIL_COMPRESSION_UNSUPPORTED;
+    (*write_options)->compression_level = 0;
 
     return SAIL_OK;
 }
@@ -56,7 +50,6 @@ void sail_destroy_write_options(struct sail_write_options *write_options) {
         return;
     }
 
-    sail_destroy_hash_map(write_options->codec_options);
     sail_free(write_options);
 }
 
@@ -65,14 +58,14 @@ sail_status_t sail_write_options_from_features(const struct sail_write_features 
     SAIL_CHECK_PTR(write_features);
     SAIL_CHECK_PTR(write_options);
 
-    sail_clear_hash_map(write_options->codec_options);
+    write_options->io_options = 0;
 
     if (write_features->features & SAIL_CODEC_FEATURE_META_DATA) {
-        sail_put_meta_data_codec_option(write_options->codec_options, true);
+        write_options->io_options |= SAIL_IO_OPTION_META_DATA;
     }
 
     if (write_features->features & SAIL_CODEC_FEATURE_ICCP) {
-        sail_put_iccp_codec_option(write_options->codec_options, true);
+        write_options->io_options |= SAIL_IO_OPTION_ICCP;
     }
 
     write_options->compression = write_features->default_compression;
@@ -93,22 +86,16 @@ sail_status_t sail_alloc_write_options_from_features(const struct sail_write_fea
     return SAIL_OK;
 }
 
-sail_status_t sail_copy_write_options(const struct sail_write_options *source, struct sail_write_options **target) {
+sail_status_t sail_copy_write_options(const struct sail_write_options *write_options_source, struct sail_write_options **write_options_target) {
 
-    SAIL_CHECK_PTR(source);
-    SAIL_CHECK_PTR(target);
+    SAIL_CHECK_PTR(write_options_source);
+    SAIL_CHECK_PTR(write_options_target);
 
     void *ptr;
     SAIL_TRY(sail_malloc(sizeof(struct sail_write_options), &ptr));
-    struct sail_write_options *target_local = ptr;
+    *write_options_target = ptr;
 
-    SAIL_TRY_OR_CLEANUP(sail_copy_hash_map(source->codec_options, &target_local->codec_options),
-                        /* cleanup */ sail_destroy_write_options(target_local));
-
-    target_local->compression       = source->compression;
-    target_local->compression_level = source->compression_level;
-
-    *target = target_local;
+    memcpy(*write_options_target, write_options_source, sizeof(struct sail_write_options));
 
     return SAIL_OK;
 }

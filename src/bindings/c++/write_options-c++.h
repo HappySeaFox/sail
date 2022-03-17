@@ -82,9 +82,9 @@ public:
     ~write_options();
 
     /*
-     * Returns the codec manipulation options for writing operations.
+     * Returns the or-ed I/O manipulation options for writing operations. See SailIoOption.
      */
-    sail::codec_options& codec_options() const;
+    int io_options() const;
 
     /*
      * Returns the compression type. For example: SAIL_COMPRESSION_RLE. See SailCompression.
@@ -109,9 +109,9 @@ public:
     double compression_level() const;
 
     /*
-     * Sets new codec manipulation options for writing operations.
+     * Sets new or-ed I/O manipulation options for writing operations. See SailIoOption.
      */
-    write_options& with_codec_options(const sail::codec_options &codec_options);
+    write_options& with_io_options(int io_options);
 
     /*
      * Sets a new compression type.
@@ -130,7 +130,7 @@ private:
      */
     explicit write_options(const sail_write_options *wo);
 
-    sail_status_t to_sail_write_options(sail_write_options **write_options) const;
+    sail_status_t to_sail_write_options(sail_write_options *write_options) const;
 
 private:
     class pimpl;

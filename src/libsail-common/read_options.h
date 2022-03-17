@@ -38,16 +38,15 @@
 extern "C" {
 #endif
 
-struct sail_hash_map;
 struct sail_read_features;
 
 /*
- * Options to tune reading operations.
+ * sail_read_options represents options to modify reading operations.
  */
 struct sail_read_options {
 
-    /* Manipulation options for reading operations. */
-    struct sail_hash_map *codec_options;
+    /* Or-ed I/O manipulation options for reading operations. See SailIoOption. */
+    int io_options;
 };
 
 typedef struct sail_read_options sail_read_options_t;

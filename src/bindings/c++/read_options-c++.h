@@ -32,13 +32,9 @@
 #ifdef SAIL_BUILD
     #include "error.h"
     #include "export.h"
-
-    #include "codec_options-c++.h"
 #else
     #include <sail-common/error.h>
     #include <sail-common/export.h>
-
-    #include <sail-c++/codec_options-c++.h>
 #endif
 
 struct sail_read_options;
@@ -47,7 +43,7 @@ namespace sail
 {
 
 /*
- * Manipulation options for reading operations. See image_input.
+ * read_options represents options to modify reading operations. See image_input.
  */
 class SAIL_EXPORT read_options
 {
@@ -86,14 +82,14 @@ public:
     ~read_options();
 
     /*
-     * Returns the codec manipulation options for reading operations.
+     * Returns the or-ed I/O manipulation options for reading operations. See SailIoOption.
      */
-    sail::codec_options& codec_options() const;
+    int io_options() const;
 
     /*
-     * Sets new codec manipulation options for reading operations.
+     * Sets new or-ed I/O manipulation options for reading operations. See SailIoOption.
      */
-    read_options& with_codec_options(const sail::codec_options &codec_options);
+    read_options& with_io_options(int io_options);
 
 private:
     /*
@@ -102,7 +98,7 @@ private:
      */
     explicit read_options(const sail_read_options *ro);
 
-    sail_status_t to_sail_read_options(sail_read_options **read_options) const;
+    sail_status_t to_sail_read_options(sail_read_options *read_options) const;
 
 private:
     class pimpl;

@@ -50,7 +50,7 @@ static MunitResult test_read_options(const MunitParameter params[], void *user_d
         munit_assert(first_codec.read_features().to_read_options(&read_options) == SAIL_OK);
 
         const sail::read_options read_options2 = read_options;
-        munit_assert(read_options.codec_options() == read_options2.codec_options());
+        munit_assert(read_options.io_options() == read_options2.io_options());
     }
 
     // Move
@@ -60,7 +60,7 @@ static MunitResult test_read_options(const MunitParameter params[], void *user_d
 
         sail::read_options read_options2 = read_options;
         const sail::read_options read_options3 = std::move(read_options2);
-        munit_assert(read_options.codec_options() == read_options3.codec_options());
+        munit_assert(read_options.io_options() == read_options3.io_options());
     }
 
     return MUNIT_OK;
