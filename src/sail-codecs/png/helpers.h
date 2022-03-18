@@ -39,6 +39,7 @@ struct sail_iccp;
 struct sail_meta_data_node;
 struct sail_palette;
 struct sail_resolution;
+struct sail_variant;
 
 SAIL_HIDDEN void png_private_my_error_fn(png_structp png_ptr, png_const_charp text);
 
@@ -71,5 +72,7 @@ SAIL_HIDDEN void png_private_destroy_rows(png_bytep **A, unsigned height);
 SAIL_HIDDEN sail_status_t png_private_fetch_resolution(png_structp png_ptr, png_infop info_ptr, struct sail_resolution **resolution);
 
 SAIL_HIDDEN sail_status_t png_private_write_resolution(png_structp png_ptr, png_infop info_ptr, const struct sail_resolution *resolution);
+
+SAIL_HIDDEN bool png_private_tuning_key_value_callback(const char *key, const struct sail_variant *value, void *user_data);
 
 #endif
