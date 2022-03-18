@@ -30,6 +30,10 @@ namespace sail
 
 tuning utils_private::c_tuning_to_cpp_tuning(const sail_hash_map *c_tuning) {
 
+    if (c_tuning == nullptr) {
+        return tuning{};
+    }
+
     sail::tuning tuning;
 
     sail_traverse_hash_map_with_user_data(c_tuning, sail_key_value_into_tuning, &tuning);

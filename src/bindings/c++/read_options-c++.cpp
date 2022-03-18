@@ -123,7 +123,7 @@ read_options::read_options(const sail_read_options *ro)
     }
 
     with_io_options(ro->io_options)
-        .with_tuning(utils_private::utils_private::c_tuning_to_cpp_tuning(ro->tuning));
+        .with_tuning(utils_private::c_tuning_to_cpp_tuning(ro->tuning));
 }
 
 sail_status_t read_options::to_sail_read_options(sail_read_options **read_options) const
