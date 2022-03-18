@@ -72,6 +72,12 @@ public:
     variant();
 
     /*
+     * Constructs a new variant from the value.
+     */
+    template<typename T>
+    variant(const T &value);
+
+    /*
      * Copies the variant.
      */
     variant(const variant &var);
@@ -124,7 +130,7 @@ private:
     /*
      * Makes a deep copy of the specified variant.
      */
-    explicit variant(const sail_variant *variant);
+    //explicit variant(const sail_variant *variant);
 
     sail_status_t to_sail_variant(sail_variant **variant) const;
 

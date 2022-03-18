@@ -69,6 +69,35 @@ variant::variant()
 {
 }
 
+template<typename T>
+variant::variant(const T &value)
+    : variant()
+{
+    with_value(value);
+}
+
+// Allow only specific types. Other types will fail to link.
+//
+template SAIL_EXPORT variant::variant(const bool &);
+
+template SAIL_EXPORT variant::variant(const char &);
+template SAIL_EXPORT variant::variant(const unsigned char &);
+
+template SAIL_EXPORT variant::variant(const short &);
+template SAIL_EXPORT variant::variant(const unsigned short &);
+
+template SAIL_EXPORT variant::variant(const int &);
+template SAIL_EXPORT variant::variant(const unsigned int &);
+
+template SAIL_EXPORT variant::variant(const long &);
+template SAIL_EXPORT variant::variant(const unsigned long &);
+
+template SAIL_EXPORT variant::variant(const float &);
+template SAIL_EXPORT variant::variant(const double &);
+
+template SAIL_EXPORT variant::variant(const std::string &);
+template SAIL_EXPORT variant::variant(const sail::arbitrary_data &);
+
 variant::variant(const sail::variant &var)
     : variant()
 {
@@ -279,7 +308,13 @@ SAIL_EXPORT variant& variant::with_value<>(const sail::arbitrary_data &value)
     return *this;
 }
 
-variant::variant(const sail_variant *variant)
+namespace
+{
+    using sail_variant_type_workaround_alias = const sail_variant *;
+}
+
+template<>
+SAIL_EXPORT variant::variant(const sail_variant_type_workaround_alias &variant)
     : sail::variant()
 {
     if (variant == nullptr) {

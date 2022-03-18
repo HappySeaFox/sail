@@ -159,7 +159,8 @@ meta_data::meta_data(const sail_meta_data *meta_data)
         with_key(meta_data->key);
     }
 
-    with_value(variant(meta_data->value));
+    // const_cast to call the correct template specialization
+    with_value(variant(const_cast<const sail_variant *>(meta_data->value)));
 }
 
 sail_status_t meta_data::to_sail_meta_data(sail_meta_data **meta_data) const

@@ -159,9 +159,7 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
     // It's also possible to combine filters with ';' like that:
     // "none;sub;paeth"
     //
-    sail::variant v;
-    v.with_value<std::string>("none;sub");
-    write_options.tuning()["png-filter"] = v;
+    write_options.tuning()["png-filter"] = std::string("none;sub");
 
     SAIL_TRY(image_output.start(path.toLocal8Bit().constData(), write_options));
     SAIL_TRY(image_output.next_frame(image));

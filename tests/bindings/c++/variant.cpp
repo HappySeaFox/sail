@@ -33,8 +33,7 @@
 template<typename T>
 static MunitResult test_type(const T &value) {
 
-    sail::variant variant;
-    variant.with_value(value);
+    const sail::variant variant(value);
 
     munit_assert(variant.is_valid());
     munit_assert(variant.has_value<T>());
