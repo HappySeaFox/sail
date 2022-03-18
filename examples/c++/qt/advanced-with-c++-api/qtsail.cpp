@@ -150,7 +150,20 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
     //
     SAIL_TRY(image.convert(codec_info.write_features()));
 
-    SAIL_TRY(image_output.start(path.toLocal8Bit().constData()));
+    sail::write_options write_options;
+    SAIL_TRY(codec_info.write_features().to_write_options(&write_options));
+
+    // This filter will be handled and applied by the PNG codec only.
+    // Possible values: "none", "sub", "up", "avg", "paeth", "fast", "all".
+    //
+    // It's also possible to combine filters with ';' like that:
+    // "none;sub;paeth"
+    //
+    sail::variant v;
+    v.with_value<std::string>("none;sub");
+    write_options.tuning()["png-filter"] = v;
+
+    SAIL_TRY(image_output.start(path.toLocal8Bit().constData(), write_options));
     SAIL_TRY(image_output.next_frame(image));
     // Optional
     SAIL_TRY(image_output.stop());
