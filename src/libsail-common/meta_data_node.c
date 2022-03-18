@@ -51,7 +51,7 @@ sail_status_t sail_copy_meta_data_node(const struct sail_meta_data_node *source,
 
     SAIL_TRY(copy_linked_list_node((const struct linked_list_node *)source,
                                    (struct linked_list_node **)target,
-                                   (linked_list_value_copier_t)sail_copy_meta_data,
+                                   (linked_list_value_copier_t)&sail_copy_meta_data,
                                    (linked_list_value_deallocator_t)&sail_destroy_meta_data));
 
     return SAIL_OK;
@@ -67,7 +67,7 @@ sail_status_t sail_copy_meta_data_node_chain(const struct sail_meta_data_node *s
 
     SAIL_TRY(copy_linked_list_node_chain((const struct linked_list_node *)source,
                                          (struct linked_list_node **)target,
-                                         (linked_list_value_copier_t)sail_copy_meta_data,
+                                         (linked_list_value_copier_t)&sail_copy_meta_data,
                                          (linked_list_value_deallocator_t)&sail_destroy_meta_data));
 
     return SAIL_OK;

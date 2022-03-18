@@ -52,8 +52,6 @@
     #include "sail_private.h"
     #include "sail_technical_diver.h"
     #include "sail_technical_diver_private.h"
-    #include "string_node.h"
-    #include "string_node_private.h"
     #include "threading.h"
 #else
     #include <sail-common/sail-common.h>
@@ -70,7 +68,6 @@
     #include <sail/sail_deep_diver.h>
     #include <sail/sail_junior.h>
     #include <sail/sail_technical_diver.h>
-    #include <sail/string_node.h>
 #endif
 
 #endif

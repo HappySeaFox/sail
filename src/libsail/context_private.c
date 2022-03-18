@@ -176,7 +176,7 @@ static sail_status_t client_codecs_paths_to_string_node_chain(struct sail_string
     if (client_codecs_path_value == NULL) {
         *string_node = NULL;
     } else {
-        SAIL_TRY(split_into_string_node_chain(client_codecs_path_value, string_node));
+        SAIL_TRY(sail_split_into_string_node_chain(client_codecs_path_value, string_node));
     }
 
     return SAIL_OK;
@@ -455,7 +455,7 @@ static sail_status_t enumerate_codecs_in_paths(struct sail_context *context, con
     struct sail_codec_bundle_node *codec_bundle_node;
 
     for (; string_node != NULL; string_node = string_node->next) {
-        const char *codecs_path = string_node->value;
+        const char *codecs_path = string_node->string;
 
         SAIL_TRY(add_lib_subdir_to_dll_search_path(codecs_path));
 
@@ -599,9 +599,9 @@ static sail_status_t init_context_impl(struct sail_context *context) {
     SAIL_TRY(client_codecs_paths_to_string_node_chain(&client_codecs_paths));
 
     SAIL_TRY_OR_CLEANUP(enumerate_codecs_in_paths(context, client_codecs_paths),
-                        /* cleanup */ destroy_string_node_chain(client_codecs_paths));
+                        /* cleanup */ sail_destroy_string_node_chain(client_codecs_paths));
 
-    destroy_string_node_chain(client_codecs_paths);
+    sail_destroy_string_node_chain(client_codecs_paths);
 #endif
 
     return SAIL_OK;
@@ -668,19 +668,19 @@ static sail_status_t init_context_impl(struct sail_context *context) {
 
     /* Construct a list of paths to search. */
     struct sail_string_node *codecs_paths;
-    SAIL_TRY(alloc_string_node(&codecs_paths));
+    SAIL_TRY(sail_alloc_string_node(&codecs_paths));
 
-    SAIL_TRY_OR_CLEANUP(sail_strdup(our_codecs_path, &codecs_paths->value),
-                        /* cleanup */ destroy_string_node(codecs_paths));
+    SAIL_TRY_OR_CLEANUP(sail_strdup(our_codecs_path, &codecs_paths->string),
+                        /* cleanup */ sail_destroy_string_node(codecs_paths));
 
 #ifdef SAIL_THIRD_PARTY_CODECS_PATH
     SAIL_TRY(client_codecs_paths_to_string_node_chain(&codecs_paths->next));
 #endif
 
     SAIL_TRY_OR_CLEANUP(enumerate_codecs_in_paths(context, codecs_paths),
-                        /* cleanup */ destroy_string_node_chain(codecs_paths));
+                        /* cleanup */ sail_destroy_string_node_chain(codecs_paths));
 
-    destroy_string_node_chain(codecs_paths);
+    sail_destroy_string_node_chain(codecs_paths);
 
     return SAIL_OK;
 }

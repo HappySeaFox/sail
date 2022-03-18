@@ -54,6 +54,7 @@
     #include "read_options.h"
     #include "resolution.h"
     #include "source_image.h"
+    #include "string_node.h"
     #include "utils.h"
     #include "variant.h"
     #include "variant_node.h"
@@ -82,6 +83,7 @@
     #include <sail-common/read_options.h>
     #include <sail-common/resolution.h>
     #include <sail-common/source_image.h>
+    #include <sail-common/string_node.h>
     #include <sail-common/utils.h>
     #include <sail-common/variant.h>
     #include <sail-common/variant_node.h>

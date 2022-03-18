@@ -48,6 +48,8 @@ add_library(sail-common
                 sail-common.h
                 source_image.c
                 source_image.h
+                string_node.c
+                string_node.h
                 utils.c
                 utils.h
                 variant.c
@@ -82,6 +84,7 @@ set(PUBLIC_HEADERS "common.h"
                    "resolution.h"
                    "sail-common.h"
                    "source_image.h"
+                   "string_node.h"
                    "utils.h"
                    "variant.h"
                    "variant_node.h"

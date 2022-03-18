@@ -38,9 +38,6 @@ add_library(sail
                 sail_technical_diver.h
                 sail_technical_diver_private.c
                 sail_technical_diver_private.h
-                string_node.h
-                string_node_private.c
-                string_node_private.h
                 threading.h
                 threading.c)
 
@@ -58,8 +55,7 @@ set(PUBLIC_HEADERS "codec_bundle.h"
                    "sail_advanced.h"
                    "sail_deep_diver.h"
                    "sail_junior.h"
-                   "sail_technical_diver.h"
-                   "string_node.h")
+                   "sail_technical_diver.h")
 
 set_target_properties(sail PROPERTIES
                            VERSION "0.8.0"
