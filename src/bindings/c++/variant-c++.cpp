@@ -76,6 +76,55 @@ variant::variant(const T &value)
     with_value(value);
 }
 
+namespace
+{
+
+using sail_variant_type_workaround_alias_original = const sail_variant * const;
+using sail_variant_type_workaround_alias2         = sail_variant *;
+
+}
+
+template<>
+SAIL_EXPORT variant::variant(const sail_variant_type_workaround_alias_original &variant)
+    : sail::variant()
+{
+    if (variant == nullptr) {
+        SAIL_LOG_TRACE("NULL pointer has been passed to sail::variant(). The object is untouched");
+        return;
+    }
+
+    d->type = variant->type;
+
+    switch (variant->type) {
+        case SAIL_VARIANT_TYPE_BOOL:           d->value.emplace<bool>(sail_variant_to_bool(variant));                     break;
+        case SAIL_VARIANT_TYPE_CHAR:           d->value.emplace<char>(sail_variant_to_char(variant));                     break;
+        case SAIL_VARIANT_TYPE_UNSIGNED_CHAR:  d->value.emplace<unsigned char>(sail_variant_to_unsigned_char(variant));   break;
+        case SAIL_VARIANT_TYPE_SHORT:          d->value.emplace<short>(sail_variant_to_short(variant));                   break;
+        case SAIL_VARIANT_TYPE_UNSIGNED_SHORT: d->value.emplace<unsigned short>(sail_variant_to_unsigned_short(variant)); break;
+        case SAIL_VARIANT_TYPE_INT:            d->value.emplace<int>(sail_variant_to_int(variant));                       break;
+        case SAIL_VARIANT_TYPE_UNSIGNED_INT:   d->value.emplace<unsigned int>(sail_variant_to_unsigned_int(variant));     break;
+        case SAIL_VARIANT_TYPE_LONG:           d->value.emplace<long>(sail_variant_to_long(variant));                     break;
+        case SAIL_VARIANT_TYPE_UNSIGNED_LONG:  d->value.emplace<unsigned long>(sail_variant_to_unsigned_long(variant));   break;
+        case SAIL_VARIANT_TYPE_FLOAT:          d->value.emplace<float>(sail_variant_to_float(variant));                   break;
+        case SAIL_VARIANT_TYPE_DOUBLE:         d->value.emplace<double>(sail_variant_to_double(variant));                 break;
+        case SAIL_VARIANT_TYPE_STRING:         d->value.emplace<std::string>(sail_variant_to_string(variant));            break;
+        case SAIL_VARIANT_TYPE_DATA: {
+            const void *data = sail_variant_to_data(variant);
+            sail::arbitrary_data arbitrary_data(variant->size);
+            memcpy(arbitrary_data.data(), data, variant->size);
+            d->value.emplace<sail::arbitrary_data>(arbitrary_data);
+            break;
+        }
+        case SAIL_VARIANT_TYPE_INVALID: break;
+    }
+}
+
+template<>
+SAIL_EXPORT variant::variant(const sail_variant_type_workaround_alias2 &variant)
+    : variant(reinterpret_cast<sail_variant_type_workaround_alias_original>(variant))
+{
+}
+
 // Allow only specific types. Other types will fail to link.
 //
 template SAIL_EXPORT variant::variant(const bool &);
@@ -306,46 +355,6 @@ SAIL_EXPORT variant& variant::with_value<>(const sail::arbitrary_data &value)
     d->value.emplace<sail::arbitrary_data>(value);
 
     return *this;
-}
-
-namespace
-{
-    using sail_variant_type_workaround_alias = const sail_variant *;
-}
-
-template<>
-SAIL_EXPORT variant::variant(const sail_variant_type_workaround_alias &variant)
-    : sail::variant()
-{
-    if (variant == nullptr) {
-        SAIL_LOG_TRACE("NULL pointer has been passed to sail::variant(). The object is untouched");
-        return;
-    }
-
-    d->type = variant->type;
-
-    switch (variant->type) {
-        case SAIL_VARIANT_TYPE_BOOL:           d->value.emplace<bool>(sail_variant_to_bool(variant));                     break;
-        case SAIL_VARIANT_TYPE_CHAR:           d->value.emplace<char>(sail_variant_to_char(variant));                     break;
-        case SAIL_VARIANT_TYPE_UNSIGNED_CHAR:  d->value.emplace<unsigned char>(sail_variant_to_unsigned_char(variant));   break;
-        case SAIL_VARIANT_TYPE_SHORT:          d->value.emplace<short>(sail_variant_to_short(variant));                   break;
-        case SAIL_VARIANT_TYPE_UNSIGNED_SHORT: d->value.emplace<unsigned short>(sail_variant_to_unsigned_short(variant)); break;
-        case SAIL_VARIANT_TYPE_INT:            d->value.emplace<int>(sail_variant_to_int(variant));                       break;
-        case SAIL_VARIANT_TYPE_UNSIGNED_INT:   d->value.emplace<unsigned int>(sail_variant_to_unsigned_int(variant));     break;
-        case SAIL_VARIANT_TYPE_LONG:           d->value.emplace<long>(sail_variant_to_long(variant));                     break;
-        case SAIL_VARIANT_TYPE_UNSIGNED_LONG:  d->value.emplace<unsigned long>(sail_variant_to_unsigned_long(variant));   break;
-        case SAIL_VARIANT_TYPE_FLOAT:          d->value.emplace<float>(sail_variant_to_float(variant));                   break;
-        case SAIL_VARIANT_TYPE_DOUBLE:         d->value.emplace<double>(sail_variant_to_double(variant));                 break;
-        case SAIL_VARIANT_TYPE_STRING:         d->value.emplace<std::string>(sail_variant_to_string(variant));            break;
-        case SAIL_VARIANT_TYPE_DATA: {
-            const void *data = sail_variant_to_data(variant);
-            sail::arbitrary_data arbitrary_data(variant->size);
-            memcpy(arbitrary_data.data(), data, variant->size);
-            d->value.emplace<sail::arbitrary_data>(arbitrary_data);
-            break;
-        }
-        case SAIL_VARIANT_TYPE_INVALID: break;
-    }
 }
 
 sail_status_t variant::to_sail_variant(sail_variant **variant) const
