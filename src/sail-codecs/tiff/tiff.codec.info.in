@@ -12,9 +12,11 @@ mime-types=image/tiff;image/tiff-fx
 
 [read-features]
 features=STATIC;MULTI-PAGED;META-DATA;ICCP
+tuning=
 
 [write-features]
 features=STATIC;MULTI-PAGED;META-DATA;ICCP
+tuning=
 output-pixel-formats=BPP32-RGBA
 properties=
 compression-types=@SAIL_TIFF_CODEC_INFO_COMPRESSIONS@

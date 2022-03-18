@@ -12,9 +12,11 @@ mime-types=image/webp
 
 [read-features]
 features=STATIC;ANIMATED;META-DATA;ICCP
+tuning=
 
 [write-features]
 features=
+tuning=
 output-pixel-formats=
 properties=
 compression-types=

@@ -47,6 +47,7 @@ public:
     }
 
     struct sail_write_options *sail_write_options;
+    sail::tuning tuning;
 };
 
 write_options::write_options()
@@ -63,6 +64,7 @@ write_options::write_options(const write_options &wo)
 write_options& write_options::operator=(const sail::write_options &write_options)
 {
     with_io_options(write_options.io_options())
+        .with_tuning(write_options.tuning())
         .with_compression(write_options.compression())
         .with_compression_level(write_options.compression_level());
 
@@ -90,6 +92,16 @@ int write_options::io_options() const
     return d->sail_write_options->io_options;
 }
 
+sail::tuning& write_options::tuning()
+{
+    return d->tuning;
+}
+
+const sail::tuning& write_options::tuning() const
+{
+    return d->tuning;
+}
+
 SailCompression write_options::compression() const
 {
     return d->sail_write_options->compression;
@@ -103,18 +115,28 @@ double write_options::compression_level() const
 write_options& write_options::with_io_options(int io_options)
 {
     d->sail_write_options->io_options = io_options;
+
+    return *this;
+}
+
+write_options& write_options::with_tuning(const sail::tuning &tuning)
+{
+    d->tuning = tuning;
+
     return *this;
 }
 
 write_options& write_options::with_compression(SailCompression compression)
 {
     d->sail_write_options->compression = compression;
+
     return *this;
 }
 
 write_options& write_options::with_compression_level(double compression_level)
 {
     d->sail_write_options->compression_level = compression_level;
+
     return *this;
 }
 
@@ -131,13 +153,25 @@ write_options::write_options(const sail_write_options *wo)
         .with_compression_level(wo->compression_level);
 }
 
-sail_status_t write_options::to_sail_write_options(sail_write_options *write_options) const
+sail_status_t write_options::to_sail_write_options(sail_write_options **write_options) const
 {
     SAIL_CHECK_PTR(write_options);
 
-    write_options->io_options        = d->sail_write_options->io_options;
-    write_options->compression       = d->sail_write_options->compression;
-    write_options->compression_level = d->sail_write_options->compression_level;
+    sail_write_options *write_options_local;
+
+    SAIL_TRY(sail_alloc_write_options(&write_options_local));
+
+    write_options_local->io_options        = d->sail_write_options->io_options;
+    write_options_local->compression       = d->sail_write_options->compression;
+    write_options_local->compression_level = d->sail_write_options->compression_level;
+
+    SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&write_options_local->tuning),
+                        /* cleanup */ sail_destroy_write_options(write_options_local));
+
+    SAIL_TRY_OR_CLEANUP(utils_private::cpp_tuning_to_sail_tuning(d->tuning, write_options_local->tuning),
+                        /* cleanup */ sail_destroy_write_options(write_options_local));
+
+    *write_options = write_options_local;
 
     return SAIL_OK;
 }

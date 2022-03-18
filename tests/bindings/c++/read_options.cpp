@@ -51,6 +51,7 @@ static MunitResult test_read_options(const MunitParameter params[], void *user_d
 
         const sail::read_options read_options2 = read_options;
         munit_assert(read_options.io_options() == read_options2.io_options());
+        munit_assert(read_options.tuning() == read_options2.tuning());
     }
 
     // Move
@@ -61,6 +62,7 @@ static MunitResult test_read_options(const MunitParameter params[], void *user_d
         sail::read_options read_options2 = read_options;
         const sail::read_options read_options3 = std::move(read_options2);
         munit_assert(read_options.io_options() == read_options3.io_options());
+        munit_assert(read_options.tuning() == read_options3.tuning());
     }
 
     return MUNIT_OK;

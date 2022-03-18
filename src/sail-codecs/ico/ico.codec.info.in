@@ -12,9 +12,11 @@ mime-types=image/x-icon;image/vnd.microsoft.icon
 
 [read-features]
 features=STATIC;MULTI-PAGED
+tuning=
 
 [write-features]
 features=
+tuning=
 output-pixel-formats=
 properties=
 compression-types=

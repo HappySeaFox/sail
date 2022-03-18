@@ -38,6 +38,8 @@
 extern "C" {
 #endif
 
+struct sail_hash_set;
+
 /*
  * Write features. Use this structure to determine what a codec can actually write.
  */
@@ -53,6 +55,9 @@ struct sail_write_features {
 
     /* Supported or-ed features of writing operations. See SailCodecFeature. */
     int features;
+
+    /* Codec-specific tuning options. */
+    struct sail_hash_set *tuning;
 
     /*
      * Required or-ed image properties. For example, an input image must be flipped by a caller

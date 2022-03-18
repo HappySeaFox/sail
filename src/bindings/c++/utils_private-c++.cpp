@@ -23,31 +23,44 @@
     SOFTWARE.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
+#include "sail-c++.h"
 
-#include "sail-common.h"
+namespace sail
+{
 
-sail_status_t sail_alloc_read_features(struct sail_read_features **read_features) {
+tuning utils_private::c_tuning_to_cpp_tuning(const sail_hash_map *c_tuning) {
 
-    SAIL_CHECK_PTR(read_features);
+    sail::tuning tuning;
 
-    void *ptr;
-    SAIL_TRY(sail_malloc(sizeof(struct sail_read_features), &ptr));
-    *read_features = ptr;
+    sail_traverse_hash_map_with_user_data(c_tuning, sail_key_value_into_tuning, &tuning);
 
-    (*read_features)->features = 0;
-    (*read_features)->tuning   = NULL;
+    return tuning;
+}
+
+sail_status_t utils_private::cpp_tuning_to_sail_tuning(const sail::tuning &cpp_tuning, sail_hash_map *c_tuning) {
+
+    sail_clear_hash_map(c_tuning);
+
+    for (const auto& [key, variant] : cpp_tuning) {
+        struct sail_variant *sail_variant;
+
+        SAIL_TRY(variant.to_sail_variant(&sail_variant));
+
+        sail_put_hash_map(c_tuning, key.c_str(), sail_variant);
+
+        sail_destroy_variant(sail_variant);
+    }
 
     return SAIL_OK;
 }
 
-void sail_destroy_read_features(struct sail_read_features *read_features) {
+bool utils_private::sail_key_value_into_tuning(const char *key, const sail_variant *value, void *user_data) {
 
-    if (read_features == NULL) {
-        return;
-    }
+    sail::tuning *cpp_tuning = reinterpret_cast<sail::tuning *>(user_data);
 
-    sail_destroy_hash_set(read_features->tuning);
-    sail_free(read_features);
+    cpp_tuning->emplace(key, sail::variant(value));
+
+    return true;
+}
+
 }

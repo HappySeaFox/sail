@@ -23,54 +23,36 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_READ_FEATURES_H
-#define SAIL_READ_FEATURES_H
+#ifndef SAIL_UTILS_PRIVATE_CPP_H
+#define SAIL_UTILS_PRIVATE_CPP_H
 
 #ifdef SAIL_BUILD
     #include "error.h"
     #include "export.h"
+
+    #include "tuning-c++.h"
 #else
-    #include <sail-common/error.h>
-    #include <sail-common/export.h>
+    INTERNAL ERROR: For internal use only
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+struct sail_hash_map;
+struct sail_variant;
 
-struct sail_hash_set;
+namespace sail
+{
 
-/*
- * Read features. Use this structure to determine what a codec can actually read.
- */
-struct sail_read_features {
+class SAIL_HIDDEN utils_private
+{
+public:
+    static tuning c_tuning_to_cpp_tuning(const sail_hash_map *c_tuning);
 
-    /* Supported or-ed features of reading operations. See SailCodecFeature. */
-    int features;
+    static sail_status_t cpp_tuning_to_sail_tuning(const sail::tuning &cpp_tuning, sail_hash_map *c_tuning);
 
-    /* Codec-specific tuning options. */
-    struct sail_hash_set *tuning;
+private:
+    // Needs to be in utils_private to allow creating sail:variant from sail_variant
+    static bool sail_key_value_into_tuning(const char *key, const sail_variant *value, void *user_data);
 };
 
-typedef struct sail_read_features sail_read_features_t;
-
-/*
- * Allocates read features. The assigned read features MUST be destroyed later
- * with sail_destroy_read_features().
- *
- * Returns SAIL_OK on success.
- */
-SAIL_EXPORT sail_status_t sail_alloc_read_features(struct sail_read_features **read_features);
-
-/*
- * Destroys the specified read features object and all its internal allocated memory buffers. The read features
- * MUST NOT be used anymore after calling this function. Does nothing if the read features is NULL.
- */
-SAIL_EXPORT void sail_destroy_read_features(struct sail_read_features *read_features);
-
-/* extern "C" */
-#ifdef __cplusplus
 }
-#endif
 
 #endif

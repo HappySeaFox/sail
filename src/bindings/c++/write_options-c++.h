@@ -32,9 +32,13 @@
 #ifdef SAIL_BUILD
     #include "error.h"
     #include "export.h"
+
+    #include "tuning-c++.h"
 #else
     #include <sail-common/error.h>
     #include <sail-common/export.h>
+
+    #include <sail-c++/tuning-c++.h>
 #endif
 
 struct sail_write_options;
@@ -87,6 +91,16 @@ public:
     int io_options() const;
 
     /*
+     * Returns modifiable codec tuning.
+     */
+    sail::tuning& tuning();
+
+    /*
+     * Returns constant codec tuning.
+     */
+    const sail::tuning& tuning() const;
+
+    /*
      * Returns the compression type. For example: SAIL_COMPRESSION_RLE. See SailCompression.
      * Use write_features to determine what compression types or values are supported by a particular codec.
      *
@@ -114,6 +128,11 @@ public:
     write_options& with_io_options(int io_options);
 
     /*
+     * Sets a new codec tuning.
+     */
+    write_options& with_tuning(const sail::tuning &tuning);
+
+    /*
      * Sets a new compression type.
      */
     write_options& with_compression(SailCompression compression);
@@ -130,7 +149,7 @@ private:
      */
     explicit write_options(const sail_write_options *wo);
 
-    sail_status_t to_sail_write_options(sail_write_options *write_options) const;
+    sail_status_t to_sail_write_options(sail_write_options **write_options) const;
 
 private:
     class pimpl;

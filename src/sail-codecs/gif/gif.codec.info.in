@@ -12,9 +12,11 @@ mime-types=image/gif
 
 [read-features]
 features=STATIC;ANIMATED;META-DATA
+tuning=
 
 [write-features]
 features=
+tuning=
 output-pixel-formats=
 properties=
 compression-types=

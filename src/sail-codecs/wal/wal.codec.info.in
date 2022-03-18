@@ -12,9 +12,11 @@ mime-types=
 
 [read-features]
 features=STATIC;MULTI-PAGED
+tuning=
 
 [write-features]
 features=
+tuning=
 output-pixel-formats=
 properties=
 compression-types=

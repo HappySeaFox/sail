@@ -1,6 +1,6 @@
 /*  This file is part of SAIL (https://github.com/smoked-herring/sail)
 
-    Copyright (c) 2020 Dmitry Baryshev
+    Copyright (c) 2022 Dmitry Baryshev
 
     The MIT License
 
@@ -23,54 +23,26 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_READ_FEATURES_H
-#define SAIL_READ_FEATURES_H
+#ifndef SAIL_TUNING_CPP_H
+#define SAIL_TUNING_CPP_H
+
+#include <string>
+#include <unordered_map>
 
 #ifdef SAIL_BUILD
-    #include "error.h"
-    #include "export.h"
+    #include "variant-c++.h"
 #else
-    #include <sail-common/error.h>
-    #include <sail-common/export.h>
+    #include <sail-c++/variant-c++.h>
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-struct sail_hash_set;
+namespace sail
+{
 
 /*
- * Read features. Use this structure to determine what a codec can actually read.
+ * Codec tuning.
  */
-struct sail_read_features {
+using tuning = std::unordered_map<std::string, variant>;
 
-    /* Supported or-ed features of reading operations. See SailCodecFeature. */
-    int features;
-
-    /* Codec-specific tuning options. */
-    struct sail_hash_set *tuning;
-};
-
-typedef struct sail_read_features sail_read_features_t;
-
-/*
- * Allocates read features. The assigned read features MUST be destroyed later
- * with sail_destroy_read_features().
- *
- * Returns SAIL_OK on success.
- */
-SAIL_EXPORT sail_status_t sail_alloc_read_features(struct sail_read_features **read_features);
-
-/*
- * Destroys the specified read features object and all its internal allocated memory buffers. The read features
- * MUST NOT be used anymore after calling this function. Does nothing if the read features is NULL.
- */
-SAIL_EXPORT void sail_destroy_read_features(struct sail_read_features *read_features);
-
-/* extern "C" */
-#ifdef __cplusplus
 }
-#endif
 
 #endif

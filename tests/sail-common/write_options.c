@@ -59,6 +59,7 @@ static MunitResult test_copy_options(const MunitParameter params[], void *user_d
     munit_assert_not_null(write_options_copy);
 
     munit_assert(write_options_copy->io_options == write_options->io_options);
+    munit_assert_null(write_options_copy->tuning);
     munit_assert(write_options_copy->compression == write_options->compression);
     munit_assert(write_options_copy->compression_level == write_options->compression_level);
 
@@ -86,6 +87,7 @@ static MunitResult test_options_from_features(const MunitParameter params[], voi
     munit_assert(sail_write_options_from_features(&write_features, write_options) == SAIL_OK);
 
     munit_assert(write_options->io_options == (SAIL_IO_OPTION_META_DATA | SAIL_IO_OPTION_ICCP));
+    munit_assert_null(write_options->tuning);
     munit_assert(write_options->compression ==  write_features.default_compression);
     munit_assert(write_options->compression_level ==  write_features.compression_level_default);
 

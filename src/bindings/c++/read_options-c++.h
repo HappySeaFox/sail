@@ -32,9 +32,13 @@
 #ifdef SAIL_BUILD
     #include "error.h"
     #include "export.h"
+
+    #include "tuning-c++.h"
 #else
     #include <sail-common/error.h>
     #include <sail-common/export.h>
+
+    #include <sail-c++/tuning-c++.h>
 #endif
 
 struct sail_read_options;
@@ -87,9 +91,24 @@ public:
     int io_options() const;
 
     /*
+     * Returns modifiable codec tuning.
+     */
+    sail::tuning& tuning();
+
+    /*
+     * Returns constant codec tuning.
+     */
+    const sail::tuning& tuning() const;
+
+    /*
      * Sets new or-ed I/O manipulation options for reading operations. See SailIoOption.
      */
     read_options& with_io_options(int io_options);
+
+    /*
+     * Sets a new codec tuning.
+     */
+    read_options& with_tuning(const sail::tuning &tuning);
 
 private:
     /*
@@ -98,7 +117,7 @@ private:
      */
     explicit read_options(const sail_read_options *ro);
 
-    sail_status_t to_sail_read_options(sail_read_options *read_options) const;
+    sail_status_t to_sail_read_options(sail_read_options **read_options) const;
 
 private:
     class pimpl;

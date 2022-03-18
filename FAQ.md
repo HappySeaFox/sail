@@ -328,6 +328,18 @@ mime-types=image/abc
 #
 features=STATIC;META-DATA;INTERLACED;ICCP
 
+# ';'-separated list of codec-specific tuning options. For example, it's possible
+# to disable ABC codec filtering with setting abc-filtering to 0 in read options.
+# Tuning options' names must start with the codec name to avoid confusing.
+#
+# The list of possible values for every tuning option is not current available
+# programmatically. Every codec must document them in the codec info file.
+#
+# For example:
+#   - abc-filtering: Tune filtering. Possible values: 0 (disable), 1 (light), 2 (hard).
+#
+tuning=abc-filtering
+
 # Section of various features describing what the image codec can actually write.
 #
 [write-features]
@@ -344,6 +356,18 @@ features=STATIC;META-DATA;INTERLACED;ICCP
 #    ICCP        - Can write embedded ICC profiles.
 #
 features=STATIC;META-DATA;INTERLACED;ICCP
+
+# ';'-separated list of codec-specific tuning options. For example, it's possible
+# to disable ABC codec filtering with setting abc-filtering to 0 in write options.
+# Tuning options' names must start with the codec name to avoid confusing.
+#
+# The list of possible values for every tuning option is not current available
+# programmatically. Every codec must document them in the codec info file.
+#
+# For example:
+#   - abc-filtering: Tune filtering. Possible values: 0 (disable), 1 (light), 2 (hard).
+#
+tuning=abc-filtering
 
 # ';'-separated list of pixel formats the image codec can write.
 # Can be empty if the image codec cannot write images.
