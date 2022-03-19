@@ -180,7 +180,8 @@
         <br/><br/>
         <b>Content:</b> Static, Meta data, ICC profiles.
         <br/><br/>
-        <b>Tuning:</b> PNG filters. Possible values: "none", "sub", "up", "avg", "paeth", "fast", "all".
+        <b>Tuning:</b> Key: "png-filter". Description: PNG filters to apply.
+        Possible values: "none", "sub", "up", "avg", "paeth", "fast", "all".
         It's also possible to combine filters with ';' like that: "none;sub;paeth".
     </td>
     <td>-</td>
