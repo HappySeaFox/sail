@@ -699,12 +699,6 @@ bool png_private_tuning_key_value_callback(const char *key, const struct sail_va
                 } else if (strcmp(node->string, "paeth") == 0) {
                     SAIL_LOG_TRACE("PNG: Applying PAETH filter");
                     filters |= PNG_FILTER_PAETH;
-                } else if (strcmp(node->string, "fast") == 0) {
-                    SAIL_LOG_TRACE("PNG: Applying FAST filter");
-                    filters |= PNG_FAST_FILTERS;
-                } else if (strcmp(node->string, "all") == 0) {
-                    SAIL_LOG_TRACE("PNG: Applying ALL filter");
-                    filters |= PNG_ALL_FILTERS;
                 }
             }
 
