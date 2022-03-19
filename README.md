@@ -46,7 +46,8 @@ animated, multi-paged images along with their meta data and ICC profiles. :sailb
 - [x] Versatile APIs: `junior`, `advanced`, `deep diver`, and `technical diver`
 - [x] Input/output: files, memory, custom I/O streams
 - [x] Load by file suffixes, paths, and [magic numbers](https://en.wikipedia.org/wiki/File_format#Magic_number)
-- [x] Output pixels as close as possible to the source
+- [x] Save pixels as close as possible to the source
+- [x] Codec-specific tuning options like <a href="https://en.wikipedia.org/wiki/Portable_Network_Graphics#Filtering">PNG filters</a>. See [FORMATS](FORMATS.md)
 - [x] Meta data support: text comments, EXIF, ICC profiles
 - [x] Access to the image properties w/o decoding pixels (probing)
 - [x] Access to the source image properties
