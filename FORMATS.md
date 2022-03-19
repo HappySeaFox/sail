@@ -179,6 +179,9 @@
         <b>RGBA:</b> 32-bit, 64-bit.
         <br/><br/>
         <b>Content:</b> Static, Meta data, ICC profiles.
+        <br/><br/>
+        <b>Tuning:</b> PNG filters. Possible values: "none", "sub", "up", "avg", "paeth", "fast", "all".
+        It's also possible to combine filters with ';' like that: "none;sub;paeth".
     </td>
     <td>-</td>
     <td>libpng</td>
