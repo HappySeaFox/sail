@@ -155,6 +155,9 @@ sail_status_t sail_copy_hash_set(const struct sail_hash_set *source_hash_set, st
     struct sail_hash_set *hash_set_local;
     SAIL_TRY(sail_alloc_hash_set(&hash_set_local));
 
+    sail_destroy_hash_map(hash_set_local->hash_map);
+    hash_set_local->hash_map = NULL;
+
     SAIL_TRY_OR_CLEANUP(sail_copy_hash_map(source_hash_set->hash_map, &hash_set_local->hash_map),
                         /* cleanup */ sail_destroy_hash_set(hash_set_local));
 
