@@ -69,13 +69,6 @@ variant::variant()
 {
 }
 
-template<typename T>
-variant::variant(const T &value)
-    : variant()
-{
-    with_value(value);
-}
-
 namespace
 {
 
@@ -124,28 +117,6 @@ SAIL_EXPORT variant::variant(const sail_variant_type_workaround_alias2 &variant)
     : sail::variant(reinterpret_cast<sail_variant_type_workaround_alias_original>(variant))
 {
 }
-
-// Allow only specific types. Other types will fail to link.
-//
-template SAIL_EXPORT variant::variant(const bool &);
-
-template SAIL_EXPORT variant::variant(const char &);
-template SAIL_EXPORT variant::variant(const unsigned char &);
-
-template SAIL_EXPORT variant::variant(const short &);
-template SAIL_EXPORT variant::variant(const unsigned short &);
-
-template SAIL_EXPORT variant::variant(const int &);
-template SAIL_EXPORT variant::variant(const unsigned int &);
-
-template SAIL_EXPORT variant::variant(const long &);
-template SAIL_EXPORT variant::variant(const unsigned long &);
-
-template SAIL_EXPORT variant::variant(const float &);
-template SAIL_EXPORT variant::variant(const double &);
-
-template SAIL_EXPORT variant::variant(const std::string &);
-template SAIL_EXPORT variant::variant(const sail::arbitrary_data &);
 
 variant::variant(const sail::variant &var)
     : variant()
@@ -356,6 +327,38 @@ SAIL_EXPORT variant& variant::with_value<>(const sail::arbitrary_data &value)
 
     return *this;
 }
+
+// Put this constructor after with_value() specialization
+// as Clang on macOS complained about duplicate specializations.
+//
+template<typename T>
+variant::variant(const T &value)
+    : variant()
+{
+    with_value(value);
+}
+
+// Allow only specific types. Other types will fail to link.
+//
+template SAIL_EXPORT variant::variant(const bool &);
+
+template SAIL_EXPORT variant::variant(const char &);
+template SAIL_EXPORT variant::variant(const unsigned char &);
+
+template SAIL_EXPORT variant::variant(const short &);
+template SAIL_EXPORT variant::variant(const unsigned short &);
+
+template SAIL_EXPORT variant::variant(const int &);
+template SAIL_EXPORT variant::variant(const unsigned int &);
+
+template SAIL_EXPORT variant::variant(const long &);
+template SAIL_EXPORT variant::variant(const unsigned long &);
+
+template SAIL_EXPORT variant::variant(const float &);
+template SAIL_EXPORT variant::variant(const double &);
+
+template SAIL_EXPORT variant::variant(const std::string &);
+template SAIL_EXPORT variant::variant(const sail::arbitrary_data &);
 
 sail_status_t variant::to_sail_variant(sail_variant **variant) const
 {
