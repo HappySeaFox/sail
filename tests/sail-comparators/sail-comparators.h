@@ -37,8 +37,6 @@ SAIL_EXPORT sail_status_t sail_test_compare_variants(const struct sail_variant *
 
 SAIL_EXPORT sail_status_t sail_test_compare_hash_maps(const struct sail_hash_map *hash_map1, const struct sail_hash_map *hash_map2);
 
-SAIL_EXPORT sail_status_t sail_test_compare_hash_sets(const struct sail_hash_set *hash_set1, const struct sail_hash_set *hash_set2);
-
 SAIL_EXPORT sail_status_t sail_test_compare_meta_datas(const struct sail_meta_data *meta_data1, const struct sail_meta_data *meta_data2);
 
 SAIL_EXPORT sail_status_t sail_test_compare_meta_data_nodes(const struct sail_meta_data_node *meta_data_node1, const struct sail_meta_data_node *meta_data_node2);

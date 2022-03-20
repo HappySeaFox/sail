@@ -16,9 +16,6 @@ add_library(sail-common
                 hash_map.c
                 hash_map.h
                 hash_map_p.h
-                hash_set.c
-                hash_set.h
-                hash_set_p.h
                 iccp.c
                 iccp.h
                 image.c
@@ -69,7 +66,6 @@ set(PUBLIC_HEADERS "common.h"
                    "error.h"
                    "export.h"
                    "hash_map.h"
-                   "hash_set.h"
                    "iccp.h"
                    "image.h"
                    "io_common.h"
