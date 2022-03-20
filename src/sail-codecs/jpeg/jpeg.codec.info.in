@@ -12,7 +12,7 @@ mime-types=image/jpeg
 
 [read-features]
 features=STATIC;META-DATA@CODEC_INFO_FEATURE_ICCP@
-tuning=
+tuning=jpeg-dct-method;jpeg-optimize-coding;jpeg-smoothing-factor
 
 [write-features]
 features=STATIC;META-DATA@CODEC_INFO_FEATURE_ICCP@

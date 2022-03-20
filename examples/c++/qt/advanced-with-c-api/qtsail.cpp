@@ -200,7 +200,7 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
     sail_destroy_image(image);
     image = image_converted;
 
-    SAIL_TRY_OR_CLEANUP(sail_start_writing_file(path.toLocal8Bit(), nullptr, &state),
+    SAIL_TRY_OR_CLEANUP(sail_start_ writing_file(path.toLocal8Bit(), nullptr, &state),
                         /* cleanup */ sail_destroy_image(image));
     SAIL_TRY_OR_CLEANUP(sail_write_next_frame(state, image),
                         /* cleanup */ sail_destroy_image(image));

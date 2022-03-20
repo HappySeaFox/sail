@@ -119,6 +119,13 @@
         <b>YCCK:</b> 32-bit.
         <br/><br/>
         <b>Content:</b> Static, Meta data, ICC profiles.
+        <br/><br/>
+        <b>Tuning:</b> Key: "jpeg-dct-method". Description: JPEG DCT method.
+        Possible values: "slow", "fast", "float".
+        Key: "jpeg-optimize-coding". Description: Compute optimal Huffman tables.
+        Possible values: true or false.
+        Key: "jpeg-smoothing-factor". Description: Smooth the image.
+        Possible values: Unsigned int range from 1U to 100U.
     </td>
     <td>-</td>
     <td>libjpeg or libjpeg-turbo</td>

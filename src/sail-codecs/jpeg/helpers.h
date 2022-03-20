@@ -63,4 +63,6 @@ SAIL_HIDDEN sail_status_t jpeg_private_fetch_resolution(struct jpeg_decompress_s
 
 SAIL_HIDDEN sail_status_t jpeg_private_write_resolution(struct jpeg_compress_struct *compress_context, const struct sail_resolution *resolution);
 
+SAIL_HIDDEN bool jpeg_private_tuning_key_value_callback(const char *key, const struct sail_variant *value, void *user_data);
+
 #endif
