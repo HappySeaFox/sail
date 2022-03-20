@@ -12,7 +12,7 @@ mime-types=image/png
 
 [read-features]
 features=STATIC@CODEC_INFO_FEATURE_ANIMATED@;META-DATA;INTERLACED;ICCP
-tuning=
+tuning=png-filter
 
 [write-features]
 features=STATIC;META-DATA;INTERLACED;ICCP
