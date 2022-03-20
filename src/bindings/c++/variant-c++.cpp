@@ -72,13 +72,13 @@ variant::variant()
 namespace
 {
 
-using sail_variant_type_workaround_alias_original = const sail_variant * const;
-using sail_variant_type_workaround_alias2         = sail_variant *;
+using sail_variant_type_workaround_alias_const     = const sail_variant *;
+using sail_variant_type_workaround_alias_non_const = sail_variant *;
 
 }
 
 template<>
-SAIL_EXPORT variant::variant(const sail_variant_type_workaround_alias_original &variant)
+SAIL_EXPORT variant::variant(const sail_variant_type_workaround_alias_const &variant)
     : sail::variant()
 {
     if (variant == nullptr) {
@@ -113,8 +113,8 @@ SAIL_EXPORT variant::variant(const sail_variant_type_workaround_alias_original &
 }
 
 template<>
-SAIL_EXPORT variant::variant(const sail_variant_type_workaround_alias2 &variant)
-    : sail::variant(const_cast<sail_variant_type_workaround_alias_original>(variant))
+SAIL_EXPORT variant::variant(const sail_variant_type_workaround_alias_non_const &variant)
+    : sail::variant(const_cast<sail_variant_type_workaround_alias_const>(variant))
 {
 }
 
