@@ -122,9 +122,9 @@
         <br/><br/>
         <b>Tuning:</b> Key: <i>"jpeg-dct-method"</i>. Description: JPEG DCT method.
         Possible values: "slow", "fast", "float".
-        Key: <i>"jpeg-optimize-coding"</i>. Description: Compute optimal Huffman tables.
+        <br/>Key: <i>"jpeg-optimize-coding"</i>. Description: Compute optimal Huffman tables.
         Possible values: true or false.
-        Key: <i>"jpeg-smoothing-factor"</i>. Description: Smooth the image.
+        <br/>Key: <i>"jpeg-smoothing-factor"</i>. Description: Smooth the image.
         Possible values: Unsigned int range from 1U to 100U.
     </td>
     <td>-</td>
