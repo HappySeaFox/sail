@@ -114,7 +114,7 @@ SAIL_EXPORT variant::variant(const sail_variant_type_workaround_alias_original &
 
 template<>
 SAIL_EXPORT variant::variant(const sail_variant_type_workaround_alias2 &variant)
-    : sail::variant(reinterpret_cast<sail_variant_type_workaround_alias_original>(variant))
+    : sail::variant(const_cast<sail_variant_type_workaround_alias_original>(variant))
 {
 }
 
