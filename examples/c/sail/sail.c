@@ -202,18 +202,29 @@ static sail_status_t probe(int argc, char *argv[]) {
     return SAIL_OK;
 }
 
-static sail_status_t list_impl(void) {
+static bool print_tuning(const char *key) {
+
+    printf("%s ", key);
+
+    return true;
+}
+
+static sail_status_t list_impl(bool verbose) {
 
     const struct sail_codec_bundle_node *codec_bundle_node = sail_codec_bundle_list();
-
-    if (codec_bundle_node == NULL) {
-        return SAIL_OK;
-    }
 
     for (int counter = 1; codec_bundle_node != NULL; codec_bundle_node = codec_bundle_node->next, counter++) {
         const struct sail_codec_info *codec_info = codec_bundle_node->codec_bundle->codec_info;
 
         printf("%2d. [p%d] %s [%s] %s\n", counter, codec_info->priority, codec_info->name, codec_info->description, codec_info->version);
+
+        if (verbose) {
+            if (codec_info->read_features->tuning != NULL) {
+                printf("         Tuning: ");
+                sail_traverse_hash_set(codec_info->read_features->tuning, print_tuning);
+                printf("\n");
+            }
+        }
     }
 
     return SAIL_OK;
@@ -223,12 +234,20 @@ static sail_status_t list(int argc, char *argv[]) {
 
     (void)argv;
 
-    if (argc != 2) {
+    if (argc < 2 || argc > 3) {
         print_invalid_argument();
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 
-    SAIL_TRY(list_impl());
+    bool verbose;
+
+    if (argc == 2) {
+        verbose = false;
+    } else {
+        verbose = strcmp(argv[2], "-v") == 0;
+    }
+
+    SAIL_TRY(list_impl(verbose));
 
     return SAIL_OK;
 }
@@ -241,7 +260,7 @@ static void help(const char *app) {
     fprintf(stderr, "       %s [-h | --help]\n", app);
     fprintf(stderr, "Commands:\n");
     fprintf(stderr, "    convert <INPUT PATH> <OUTPUT PATH> [-c | --compression <value>] - Convert one image format to another.\n");
-    fprintf(stderr, "    list - List supported codecs.\n");
+    fprintf(stderr, "    list [-v] - List supported codecs.\n");
     fprintf(stderr, "    probe <PATH> - Retrieve image information.\n");
 }
 
