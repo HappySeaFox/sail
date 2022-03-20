@@ -32,9 +32,13 @@
 #ifdef SAIL_BUILD
     #include "error.h"
     #include "export.h"
+
+    #include "tuning-c++.h"
 #else
     #include <sail-common/error.h>
     #include <sail-common/export.h>
+
+    #include <sail-c++/tuning-c++.h>
 #endif
 
 struct sail_read_features;
@@ -82,6 +86,20 @@ public:
      * Returns the supported or-ed features of reading operations. See SailCodecFeature.
      */
     int features() const;
+
+    /*
+     * Returns supported codec-specific tuning options. For example, a hypothetical ABC
+     * image codec can allow disabling filtering with setting the "abc-filtering"
+     * tuning option to 0 in read options. Tuning options' names start with the codec name
+     * to avoid confusing.
+     *
+     * The list of possible values for every tuning option is not current available
+     * programmatically. Every codec must document them in the codec info.
+     *
+     * It's not guaranteed that tuning options and their values are backward
+     * or forward compatible.
+     */
+    const sail::supported_tuning& supported_tuning() const;
 
     /*
      * Builds default read options from the read features. Can be used to build

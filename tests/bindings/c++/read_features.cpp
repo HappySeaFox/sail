@@ -41,14 +41,16 @@ static MunitResult test_read_features(const MunitParameter params[], void *user_
     // Copy
     {
         const sail::read_features read_features = first_codec.read_features();
-        munit_assert(read_features.features() == first_codec.read_features().features());
+        munit_assert(read_features.features()         == first_codec.read_features().features());
+        munit_assert(read_features.supported_tuning() == first_codec.read_features().supported_tuning());
     }
 
     // Move
     {
         const sail::read_features read_features1 = std::move(first_codec.read_features());
         const sail::read_features read_features = std::move(read_features1);
-        munit_assert(read_features.features() == first_codec.read_features().features());
+        munit_assert(read_features.features()         == first_codec.read_features().features());
+        munit_assert(read_features.supported_tuning() == first_codec.read_features().supported_tuning());
     }
 
     // Construct read options

@@ -28,6 +28,7 @@
 
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 
 #ifdef SAIL_BUILD
     #include "variant-c++.h"
@@ -42,6 +43,11 @@ namespace sail
  * Codec tuning.
  */
 using tuning = std::unordered_map<std::string, variant>;
+
+/*
+ * Supported codec tuning.
+ */
+using supported_tuning = std::unordered_set<std::string>;
 
 }
 

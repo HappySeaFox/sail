@@ -91,12 +91,30 @@ public:
     int io_options() const;
 
     /*
-     * Returns modifiable codec tuning.
+     * Returns editable codec-specific tuning options. For example, a hypothetical ABC
+     * image codec can allow disabling filtering with setting the "abc-filtering"
+     * tuning option to 0 in read options. Tuning options' names start with the codec name
+     * to avoid confusing.
+     *
+     * The list of possible values for every tuning option is not current available
+     * programmatically. Every codec must document them in the codec info.
+     *
+     * It's not guaranteed that tuning options and their values are backward
+     * or forward compatible.
      */
     sail::tuning& tuning();
 
     /*
-     * Returns constant codec tuning.
+     * Returns constant codec-specific tuning options. For example, a hypothetical ABC
+     * image codec can allow disabling filtering with setting the "abc-filtering"
+     * tuning option to 0 in read options. Tuning options' names start with the codec name
+     * to avoid confusing.
+     *
+     * The list of possible values for every tuning option is not current available
+     * programmatically. Every codec must document them in the codec info.
+     *
+     * It's not guaranteed that tuning options and their values are backward
+     * or forward compatible.
      */
     const sail::tuning& tuning() const;
 
@@ -106,7 +124,7 @@ public:
     read_options& with_io_options(int io_options);
 
     /*
-     * Sets a new codec tuning.
+     * Sets new codec tuning.
      */
     read_options& with_tuning(const sail::tuning &tuning);
 

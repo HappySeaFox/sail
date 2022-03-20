@@ -34,14 +34,27 @@ tuning utils_private::c_tuning_to_cpp_tuning(const sail_hash_map *c_tuning) {
         return tuning{};
     }
 
-    sail::tuning tuning;
+    tuning tuning;
 
     sail_traverse_hash_map_with_user_data(c_tuning, sail_key_value_into_tuning, &tuning);
 
     return tuning;
 }
 
-sail_status_t utils_private::cpp_tuning_to_sail_tuning(const sail::tuning &cpp_tuning, sail_hash_map *c_tuning) {
+supported_tuning utils_private::c_tuning_to_cpp_tuning(const sail_hash_set *c_tuning) {
+
+    if (c_tuning == nullptr) {
+        return supported_tuning{};
+    }
+
+    supported_tuning supported_tuning;
+
+    sail_traverse_hash_set_with_user_data(c_tuning, sail_key_into_tuning, &supported_tuning);
+
+    return supported_tuning;
+}
+
+sail_status_t utils_private::cpp_tuning_to_sail_tuning(const tuning &cpp_tuning, sail_hash_map *c_tuning) {
 
     sail_clear_hash_map(c_tuning);
 
@@ -58,11 +71,29 @@ sail_status_t utils_private::cpp_tuning_to_sail_tuning(const sail::tuning &cpp_t
     return SAIL_OK;
 }
 
+void utils_private::cpp_tuning_to_sail_tuning(const supported_tuning &cpp_tuning, sail_hash_set *c_tuning) {
+
+    sail_clear_hash_set(c_tuning);
+
+    for (const auto& key : cpp_tuning) {
+        sail_put_hash_set(c_tuning, key.c_str());
+    }
+}
+
 bool utils_private::sail_key_value_into_tuning(const char *key, const sail_variant *value, void *user_data) {
 
-    sail::tuning *cpp_tuning = reinterpret_cast<sail::tuning *>(user_data);
+    tuning *cpp_tuning = reinterpret_cast<tuning *>(user_data);
 
-    cpp_tuning->emplace(key, sail::variant(value));
+    cpp_tuning->emplace(key, variant(value));
+
+    return true;
+}
+
+bool utils_private::sail_key_into_tuning(const char *key, void *user_data) {
+
+    supported_tuning *cpp_tuning = reinterpret_cast<supported_tuning *>(user_data);
+
+    cpp_tuning->emplace(key);
 
     return true;
 }
