@@ -38,7 +38,7 @@
 extern "C" {
 #endif
 
-struct sail_hash_set;
+struct sail_string_node;
 
 /*
  * Read features. Use this structure to determine what a codec can actually read.
@@ -60,7 +60,7 @@ struct sail_read_features {
      * It's not guaranteed that tuning options and their values are backward
      * or forward compatible.
      */
-    struct sail_hash_set *tuning;
+    struct sail_string_node *tuning;
 };
 
 typedef struct sail_read_features sail_read_features_t;

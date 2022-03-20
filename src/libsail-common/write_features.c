@@ -60,6 +60,6 @@ void sail_destroy_write_features(struct sail_write_features *write_features) {
 
     sail_free(write_features->output_pixel_formats);
     sail_free(write_features->compressions);
-    sail_destroy_hash_set(write_features->tuning);
+    sail_destroy_string_node_chain(write_features->tuning);
     sail_free(write_features);
 }

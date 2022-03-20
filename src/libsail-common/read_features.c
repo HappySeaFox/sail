@@ -48,6 +48,6 @@ void sail_destroy_read_features(struct sail_read_features *read_features) {
         return;
     }
 
-    sail_destroy_hash_set(read_features->tuning);
+    sail_destroy_string_node_chain(read_features->tuning);
     sail_free(read_features);
 }

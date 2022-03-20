@@ -28,7 +28,7 @@
 
 #include <string>
 #include <unordered_map>
-#include <unordered_set>
+#include <vector>
 
 #ifdef SAIL_BUILD
     #include "variant-c++.h"
@@ -47,7 +47,7 @@ using tuning = std::unordered_map<std::string, variant>;
 /*
  * Supported codec tuning.
  */
-using supported_tuning = std::unordered_set<std::string>;
+using supported_tuning = std::vector<std::string>;
 
 }
 

@@ -106,29 +106,6 @@ static sail_status_t parse_flags(const char *value, int *features, int (*convert
     return SAIL_OK;
 }
 
-static sail_status_t parse_hash_set(const char *value, struct sail_hash_set **hash_set) {
-
-    SAIL_CHECK_PTR(value);
-    SAIL_CHECK_PTR(hash_set);
-
-    struct sail_hash_set *hash_set_local;
-    SAIL_TRY(sail_alloc_hash_set(&hash_set_local));
-
-    struct sail_string_node *string_node;
-    SAIL_TRY_OR_CLEANUP(sail_split_into_string_node_chain(value, &string_node),
-                        /* cleanup */ sail_destroy_hash_set(hash_set_local));
-
-    for (struct sail_string_node *node = string_node; node != NULL; node = node->next) {
-        sail_put_hash_set(hash_set_local, node->string);
-    }
-
-    sail_destroy_string_node_chain(string_node);
-
-    *hash_set = hash_set_local;
-
-    return SAIL_OK;
-}
-
 struct init_data {
     struct sail_codec_info *codec_info;
 };
@@ -207,8 +184,8 @@ static sail_status_t inih_handler_sail_error(void *data, const char *section, co
             SAIL_TRY_OR_CLEANUP(parse_flags(value, &codec_info->read_features->features, codec_feature_from_string),
                                 /* cleanup */ SAIL_LOG_ERROR("Failed to parse codec features: '%s'", value));
         } else if (strcmp(name, "tuning") == 0) {
-            SAIL_TRY_OR_CLEANUP(parse_hash_set(value, &codec_info->read_features->tuning),
-                                /* cleanup */ SAIL_LOG_ERROR("Failed to parse codec tuning options: '%s'", value));
+            SAIL_TRY_OR_CLEANUP(sail_split_into_string_node_chain(value, &codec_info->read_features->tuning),
+                                    /* cleanup */ SAIL_LOG_ERROR("Failed to parse codec tuning: '%s'", value));
         } else {
             SAIL_LOG_ERROR("Unsupported codec info key '%s' in [%s]", name, section);
             SAIL_LOG_AND_RETURN(SAIL_ERROR_PARSE_FILE);
@@ -218,8 +195,8 @@ static sail_status_t inih_handler_sail_error(void *data, const char *section, co
             SAIL_TRY_OR_CLEANUP(parse_flags(value, &codec_info->write_features->features, codec_feature_from_string),
                                 /* cleanup */ SAIL_LOG_ERROR("Failed to parse codec features: '%s'", value));
         } else if (strcmp(name, "tuning") == 0) {
-            SAIL_TRY_OR_CLEANUP(parse_hash_set(value, &codec_info->write_features->tuning),
-                                /* cleanup */ SAIL_LOG_ERROR("Failed to parse codec tuning options: '%s'", value));
+            SAIL_TRY_OR_CLEANUP(sail_split_into_string_node_chain(value, &codec_info->write_features->tuning),
+                                    /* cleanup */ SAIL_LOG_ERROR("Failed to parse codec tuning: '%s'", value));
         } else if (strcmp(name, "output-pixel-formats") == 0) {
             SAIL_TRY_OR_CLEANUP(parse_serialized_ints(value,
                                                         (int **)&codec_info->write_features->output_pixel_formats,

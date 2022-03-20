@@ -156,7 +156,9 @@ write_features::write_features(const sail_write_features *wf)
 
     d->sail_write_features_c = wf;
 
-    d->supported_tuning = utils_private::c_tuning_to_cpp_tuning(wf->tuning);
+    for (const sail_string_node *node = wf->tuning; node != nullptr; node = node->next) {
+        d->supported_tuning.push_back(node->string);
+    }
 
     // Output pixel formats
     std::vector<SailPixelFormat> output_pixel_formats;

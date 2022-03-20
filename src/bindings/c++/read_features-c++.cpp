@@ -110,7 +110,10 @@ read_features::read_features(const sail_read_features *rf)
     }
 
     d->sail_read_features_c = rf;
-    d->supported_tuning     = utils_private::c_tuning_to_cpp_tuning(rf->tuning);
+
+    for (const sail_string_node *node = rf->tuning; node != nullptr; node = node->next) {
+        d->supported_tuning.push_back(node->string);
+    }
 }
 
 const sail_read_features* read_features::sail_read_features_c() const

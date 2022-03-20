@@ -202,13 +202,6 @@ static sail_status_t probe(int argc, char *argv[]) {
     return SAIL_OK;
 }
 
-static bool print_tuning(const char *key) {
-
-    printf("%s ", key);
-
-    return true;
-}
-
 static sail_status_t list_impl(bool verbose) {
 
     const struct sail_codec_bundle_node *codec_bundle_node = sail_codec_bundle_list();
@@ -221,7 +214,17 @@ static sail_status_t list_impl(bool verbose) {
         if (verbose) {
             if (codec_info->read_features->tuning != NULL) {
                 printf("         Tuning: ");
-                sail_traverse_hash_set(codec_info->read_features->tuning, print_tuning);
+
+                for (const struct sail_string_node *node = codec_info->read_features->tuning, *prev = NULL;
+                        node != NULL;
+                        prev = node, node = node->next) {
+                    if (prev != NULL) {
+                        printf(", ");
+                    }
+
+                    printf("%s", node->string);
+                }
+
                 printf("\n");
             }
         }
