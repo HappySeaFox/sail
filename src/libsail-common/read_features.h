@@ -48,7 +48,18 @@ struct sail_read_features {
     /* Supported or-ed features of reading operations. See SailCodecFeature. */
     int features;
 
-    /* Codec-specific tuning options. */
+    /*
+     * Codec-specific tuning options. For example, a hypothetical ABC image codec
+     * can allow disabling filtering with setting the "abc-filtering" tuning option
+     * to 0 in read options. Tuning options' names start with the codec name
+     * to avoid confusing.
+     *
+     * The list of possible values for every tuning option is not current available
+     * programmatically. Every codec must document them in the codec info.
+     *
+     * It's not guaranteed that tuning options and their values are backward
+     * or forward compatible.
+     */
     struct sail_hash_set *tuning;
 };
 
