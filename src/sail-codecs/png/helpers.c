@@ -685,19 +685,19 @@ bool png_private_tuning_key_value_callback(const char *key, const struct sail_va
 
             for (const struct sail_string_node *node = string_node_filters; node != NULL; node = node->next) {
                 if (strcmp(node->string, "none") == 0) {
-                    SAIL_LOG_TRACE("PNG: Applying NONE filter");
+                    SAIL_LOG_TRACE("PNG: Adding NONE filter");
                     filters |= PNG_FILTER_NONE;
                 } else if (strcmp(node->string, "sub") == 0) {
-                    SAIL_LOG_TRACE("PNG: Applying SUB filter");
+                    SAIL_LOG_TRACE("PNG: Adding SUB filter");
                     filters |= PNG_FILTER_SUB;
                 } else if (strcmp(node->string, "up") == 0) {
-                    SAIL_LOG_TRACE("PNG: Applying UP filter");
+                    SAIL_LOG_TRACE("PNG: Adding UP filter");
                     filters |= PNG_FILTER_UP;
                 } else if (strcmp(node->string, "avg") == 0) {
-                    SAIL_LOG_TRACE("PNG: Applying AVG filter");
+                    SAIL_LOG_TRACE("PNG: Adding AVG filter");
                     filters |= PNG_FILTER_AVG;
                 } else if (strcmp(node->string, "paeth") == 0) {
-                    SAIL_LOG_TRACE("PNG: Applying PAETH filter");
+                    SAIL_LOG_TRACE("PNG: Adding PAETH filter");
                     filters |= PNG_FILTER_PAETH;
                 }
             }
