@@ -32,11 +32,11 @@ QStringList QtSail::filters() const
 
         QStringList masks;
 
-        sail_string_node *extension_node = codec_info->extension_node;
-
-        while (extension_node != nullptr) {
-            masks.append(QStringLiteral("*.%1").arg(extension_node->value));
-            extension_node = extension_node->next;
+        for (const sail_string_node *extension_node = codec_info->extension_node;
+                extension_node != nullptr;
+                extension_node = extension_node->next
+             ) {
+            masks.append(QStringLiteral("*.%1").arg(extension_node->string));
         }
 
         filters.append(QStringLiteral("%1: %2 (%3)")
