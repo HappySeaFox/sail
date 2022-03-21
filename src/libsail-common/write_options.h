@@ -90,13 +90,6 @@ SAIL_EXPORT sail_status_t sail_alloc_write_options(struct sail_write_options **w
 SAIL_EXPORT void sail_destroy_write_options(struct sail_write_options *write_options);
 
 /*
- * Builds default write options from the write features.
- *
- * Returns SAIL_OK on success.
- */
-SAIL_EXPORT sail_status_t sail_write_options_from_features(const struct sail_write_features *write_features, struct sail_write_options *write_options);
-
-/*
  * Allocates and builds default write options from the write features.
  * The assigned write options MUST be destroyed later with sail_destroy_write_options().
  *

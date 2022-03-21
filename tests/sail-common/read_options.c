@@ -68,13 +68,10 @@ static MunitResult test_options_from_features(const MunitParameter params[], voi
     (void)params;
     (void)user_data;
 
-    struct sail_read_options *read_options = NULL;
-    munit_assert(sail_alloc_read_options(&read_options) == SAIL_OK);
-    munit_assert_not_null(read_options);
-
+    struct sail_read_options *read_options;
     struct sail_read_features read_features;
     read_features.features = SAIL_CODEC_FEATURE_META_DATA | SAIL_CODEC_FEATURE_INTERLACED | SAIL_CODEC_FEATURE_ICCP;
-    munit_assert(sail_read_options_from_features(&read_features, read_options) == SAIL_OK);
+    munit_assert(sail_alloc_read_options_from_features(&read_features, &read_options) == SAIL_OK);
 
     munit_assert(read_options->io_options == (SAIL_IO_OPTION_META_DATA | SAIL_IO_OPTION_ICCP));
     munit_assert_null(read_options->tuning);

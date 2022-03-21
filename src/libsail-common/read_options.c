@@ -52,32 +52,22 @@ void sail_destroy_read_options(struct sail_read_options *read_options) {
     sail_free(read_options);
 }
 
-sail_status_t sail_read_options_from_features(const struct sail_read_features *read_features, struct sail_read_options *read_options) {
-
-    SAIL_CHECK_PTR(read_features);
-    SAIL_CHECK_PTR(read_options);
-
-    read_options->io_options = 0;
-
-    if (read_features->features & SAIL_CODEC_FEATURE_META_DATA) {
-        read_options->io_options |= SAIL_IO_OPTION_META_DATA;
-    }
-
-    if (read_features->features & SAIL_CODEC_FEATURE_ICCP) {
-        read_options->io_options |= SAIL_IO_OPTION_ICCP;
-    }
-
-    return SAIL_OK;
-}
-
 sail_status_t sail_alloc_read_options_from_features(const struct sail_read_features *read_features, struct sail_read_options **read_options) {
 
     SAIL_CHECK_PTR(read_options);
 
     struct sail_read_options *read_options_local;
     SAIL_TRY(sail_alloc_read_options(&read_options_local));
-    SAIL_TRY_OR_CLEANUP(sail_read_options_from_features(read_features, read_options_local),
-                        /* cleanup */ sail_destroy_read_options(read_options_local));
+
+    read_options_local->io_options = 0;
+
+    if (read_features->features & SAIL_CODEC_FEATURE_META_DATA) {
+        read_options_local->io_options |= SAIL_IO_OPTION_META_DATA;
+    }
+
+    if (read_features->features & SAIL_CODEC_FEATURE_ICCP) {
+        read_options_local->io_options |= SAIL_IO_OPTION_ICCP;
+    }
 
     *read_options = read_options_local;
 

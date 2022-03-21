@@ -81,13 +81,6 @@ SAIL_EXPORT sail_status_t sail_alloc_read_options(struct sail_read_options **rea
 SAIL_EXPORT void sail_destroy_read_options(struct sail_read_options *read_options);
 
 /*
- * Builds default read options from the read features.
- *
- * Returns SAIL_OK on success.
- */
-SAIL_EXPORT sail_status_t sail_read_options_from_features(const struct sail_read_features *read_features, struct sail_read_options *read_options);
-
-/*
  * Allocates and builds default read options from the read features. The assigned read options MUST be destroyed later
  * with sail_destroy_read_options().
  *
