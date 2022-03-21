@@ -126,6 +126,7 @@
         Possible values: true or false.
         <br/>Key: <i>"jpeg-smoothing-factor"</i>. Description: Smooth the image.
         Possible values: Unsigned int range from 1U to 100U.
+        <br/>See the libjpeg docs for more.
     </td>
     <td>-</td>
     <td>libjpeg or libjpeg-turbo</td>
@@ -190,6 +191,7 @@
         <b>Tuning:</b> Key: <i>"png-filter"</i>. Description: PNG filters to apply.
         Possible values: "none", "sub", "up", "avg", "paeth".
         It's also possible to combine filters with ';' like that: "none;sub;paeth".
+        <br/>See the libpng docs for more.
     </td>
     <td>-</td>
     <td>libpng</td>
