@@ -367,6 +367,11 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v6_jpeg(void *state, 
                                 : jpeg_state->write_options->compression_level;
     jpeg_set_quality(jpeg_state->compress_context, /* to quality */ (int)(COMPRESSION_MAX-compression), true);
 
+    /* Handle tuning. */
+    if (jpeg_state->write_options->tuning != NULL) {
+        sail_traverse_hash_map_with_user_data(jpeg_state->write_options->tuning, jpeg_private_tuning_key_value_callback, jpeg_state->compress_context);
+    }
+
     /* Start compression. */
     jpeg_start_compress(jpeg_state->compress_context, true);
     jpeg_state->started_compress = true;

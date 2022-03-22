@@ -305,6 +305,11 @@ SAIL_EXPORT sail_status_t sail_check_variant_valid(const struct sail_variant *va
  */
 SAIL_EXPORT sail_status_t sail_copy_variant(const struct sail_variant *source, struct sail_variant **target);
 
+/*
+ * Returns true if both the variants are valid and contain equal values.
+ */
+SAIL_EXPORT bool sail_equal_variants(const struct sail_variant *variant1, const struct sail_variant *variant2);
+
 /* extern "C" */
 #ifdef __cplusplus
 }

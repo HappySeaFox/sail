@@ -1,6 +1,6 @@
 /*  This file is part of SAIL (https://github.com/smoked-herring/sail)
 
-    Copyright (c) 2020 Dmitry Baryshev
+    Copyright (c) 2022 Dmitry Baryshev
 
     The MIT License
 
@@ -23,16 +23,32 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_STRING_NODE_H
-#define SAIL_STRING_NODE_H
+#ifndef SAIL_TUNING_CPP_H
+#define SAIL_TUNING_CPP_H
 
-struct sail_string_node {
+#include <string>
+#include <unordered_map>
+#include <vector>
 
-    char *value;
+#ifdef SAIL_BUILD
+    #include "variant-c++.h"
+#else
+    #include <sail-c++/variant-c++.h>
+#endif
 
-    struct sail_string_node *next;
-};
+namespace sail
+{
 
-typedef struct sail_string_node sail_string_node_t;
+/*
+ * Codec tuning.
+ */
+using tuning = std::unordered_map<std::string, variant>;
+
+/*
+ * Supported codec tuning.
+ */
+using supported_tuning = std::vector<std::string>;
+
+}
 
 #endif

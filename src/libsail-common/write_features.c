@@ -39,6 +39,7 @@ sail_status_t sail_alloc_write_features(struct sail_write_features **write_featu
     (*write_features)->output_pixel_formats        = NULL;
     (*write_features)->output_pixel_formats_length = 0;
     (*write_features)->features                    = 0;
+    (*write_features)->tuning                      = NULL;
     (*write_features)->properties                  = 0;
     (*write_features)->compressions                = NULL;
     (*write_features)->compressions_length         = 0;
@@ -59,5 +60,6 @@ void sail_destroy_write_features(struct sail_write_features *write_features) {
 
     sail_free(write_features->output_pixel_formats);
     sail_free(write_features->compressions);
+    sail_destroy_string_node_chain(write_features->tuning);
     sail_free(write_features);
 }

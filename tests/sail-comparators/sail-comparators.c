@@ -29,7 +29,7 @@
 
 #include "munit.h"
 
-sail_status_t sail_compare_resolutions(const struct sail_resolution *resolution1, const struct sail_resolution *resolution2) {
+sail_status_t sail_test_compare_resolutions(const struct sail_resolution *resolution1, const struct sail_resolution *resolution2) {
 
     munit_assert_not_null(resolution1);
     munit_assert_not_null(resolution2);
@@ -43,7 +43,7 @@ sail_status_t sail_compare_resolutions(const struct sail_resolution *resolution1
     return SAIL_OK;
 }
 
-sail_status_t sail_compare_palettes(const struct sail_palette *palette1, const struct sail_palette *palette2) {
+sail_status_t sail_test_compare_palettes(const struct sail_palette *palette1, const struct sail_palette *palette2) {
 
     munit_assert_not_null(palette1);
     munit_assert_not_null(palette2);
@@ -64,7 +64,7 @@ sail_status_t sail_compare_palettes(const struct sail_palette *palette1, const s
     return SAIL_OK;
 }
 
-sail_status_t sail_compare_variants(const struct sail_variant *variant1, const struct sail_variant *variant2) {
+sail_status_t sail_test_compare_variants(const struct sail_variant *variant1, const struct sail_variant *variant2) {
 
     munit_assert_not_null(variant1);
     munit_assert_not_null(variant2);
@@ -78,7 +78,29 @@ sail_status_t sail_compare_variants(const struct sail_variant *variant1, const s
     return SAIL_OK;
 }
 
-sail_status_t sail_compare_meta_datas(const struct sail_meta_data *meta_data1, const struct sail_meta_data *meta_data2) {
+static bool compare_key_value_callback(const char *key, const struct sail_variant *value, void *user_data) {
+
+    const struct sail_hash_map *hash_map2 = (struct sail_hash_map *)user_data;
+    const struct sail_variant *value2 = sail_hash_map_value(hash_map2, key);
+
+    munit_assert(sail_test_compare_variants(value, value2) == SAIL_OK);
+
+    return true;
+}
+
+sail_status_t sail_test_compare_hash_maps(const struct sail_hash_map *hash_map1, const struct sail_hash_map *hash_map2) {
+
+    munit_assert_not_null(hash_map1);
+    munit_assert_not_null(hash_map2);
+
+    munit_assert(sail_hash_map_size(hash_map1) == sail_hash_map_size(hash_map2));
+
+    sail_traverse_hash_map_with_user_data(hash_map1, compare_key_value_callback, (void *)hash_map2);
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_test_compare_meta_datas(const struct sail_meta_data *meta_data1, const struct sail_meta_data *meta_data2) {
 
     munit_assert_not_null(meta_data1);
     munit_assert_not_null(meta_data2);
@@ -93,24 +115,24 @@ sail_status_t sail_compare_meta_datas(const struct sail_meta_data *meta_data1, c
         munit_assert_string_equal(meta_data1->key_unknown, meta_data2->key_unknown);
     }
 
-    munit_assert(sail_compare_variants(meta_data1->value, meta_data2->value) == SAIL_OK);
+    munit_assert(sail_test_compare_variants(meta_data1->value, meta_data2->value) == SAIL_OK);
 
     return SAIL_OK;
 }
 
-sail_status_t sail_compare_meta_data_nodes(const struct sail_meta_data_node *meta_data_node1, const struct sail_meta_data_node *meta_data_node2) {
+sail_status_t sail_test_compare_meta_data_nodes(const struct sail_meta_data_node *meta_data_node1, const struct sail_meta_data_node *meta_data_node2) {
 
     munit_assert_not_null(meta_data_node1);
     munit_assert_not_null(meta_data_node2);
 
     munit_assert(meta_data_node1 != meta_data_node2);
 
-    munit_assert(sail_compare_meta_datas(meta_data_node1->meta_data, meta_data_node2->meta_data) == SAIL_OK);
+    munit_assert(sail_test_compare_meta_datas(meta_data_node1->meta_data, meta_data_node2->meta_data) == SAIL_OK);
 
     return SAIL_OK;
 }
 
-sail_status_t sail_compare_meta_data_node_chains(const struct sail_meta_data_node *meta_data_node1, const struct sail_meta_data_node *meta_data_node2) {
+sail_status_t sail_test_compare_meta_data_node_chains(const struct sail_meta_data_node *meta_data_node1, const struct sail_meta_data_node *meta_data_node2) {
 
     munit_assert_not_null(meta_data_node1);
     munit_assert_not_null(meta_data_node2);
@@ -120,7 +142,7 @@ sail_status_t sail_compare_meta_data_node_chains(const struct sail_meta_data_nod
     while (meta_data_node1 != NULL) {
         munit_assert_not_null(meta_data_node2);
 
-        munit_assert(sail_compare_meta_data_nodes(meta_data_node1, meta_data_node2) == SAIL_OK);
+        munit_assert(sail_test_compare_meta_data_nodes(meta_data_node1, meta_data_node2) == SAIL_OK);
 
         meta_data_node1 = meta_data_node1->next;
         meta_data_node2 = meta_data_node2->next;
@@ -131,7 +153,7 @@ sail_status_t sail_compare_meta_data_node_chains(const struct sail_meta_data_nod
     return SAIL_OK;
 }
 
-sail_status_t sail_compare_iccps(const struct sail_iccp *iccp1, const struct sail_iccp *iccp2) {
+sail_status_t sail_test_compare_iccps(const struct sail_iccp *iccp1, const struct sail_iccp *iccp2) {
 
     munit_assert_not_null(iccp1);
     munit_assert_not_null(iccp2);
@@ -145,7 +167,7 @@ sail_status_t sail_compare_iccps(const struct sail_iccp *iccp1, const struct sai
     return SAIL_OK;
 }
 
-sail_status_t sail_compare_source_images(const struct sail_source_image *source_image1, const struct sail_source_image *source_image2) {
+sail_status_t sail_test_compare_source_images(const struct sail_source_image *source_image1, const struct sail_source_image *source_image2) {
 
     munit_assert_not_null(source_image1);
     munit_assert_not_null(source_image2);
@@ -159,7 +181,7 @@ sail_status_t sail_compare_source_images(const struct sail_source_image *source_
     return SAIL_OK;
 }
 
-sail_status_t sail_compare_images(const struct sail_image *image1, const struct sail_image *image2) {
+sail_status_t sail_test_compare_images(const struct sail_image *image1, const struct sail_image *image2) {
 
     munit_assert_not_null(image1);
     munit_assert_not_null(image2);
@@ -181,7 +203,7 @@ sail_status_t sail_compare_images(const struct sail_image *image1, const struct 
     if (image1->resolution == NULL) {
         munit_assert_null(image2->resolution);
     } else {
-        munit_assert(sail_compare_resolutions(image1->resolution, image2->resolution) == SAIL_OK);
+        munit_assert(sail_test_compare_resolutions(image1->resolution, image2->resolution) == SAIL_OK);
     }
 
     munit_assert(image1->pixel_format != SAIL_PIXEL_FORMAT_UNKNOWN);
@@ -192,19 +214,19 @@ sail_status_t sail_compare_images(const struct sail_image *image1, const struct 
     if (image1->palette == NULL) {
         munit_assert_null(image2->palette);
     } else {
-        munit_assert(sail_compare_palettes(image1->palette, image2->palette) == SAIL_OK);
+        munit_assert(sail_test_compare_palettes(image1->palette, image2->palette) == SAIL_OK);
     }
 
     if (image1->meta_data_node == NULL) {
         munit_assert_null(image2->meta_data_node);
     } else {
-        munit_assert(sail_compare_meta_data_node_chains(image1->meta_data_node, image2->meta_data_node) == SAIL_OK);
+        munit_assert(sail_test_compare_meta_data_node_chains(image1->meta_data_node, image2->meta_data_node) == SAIL_OK);
     }
 
     if (image1->iccp == NULL) {
         munit_assert_null(image2->iccp);
     } else {
-        munit_assert(sail_compare_iccps(image1->iccp, image2->iccp) == SAIL_OK);
+        munit_assert(sail_test_compare_iccps(image1->iccp, image2->iccp) == SAIL_OK);
     }
 
     munit_assert(image1->properties == image2->properties);
@@ -212,7 +234,7 @@ sail_status_t sail_compare_images(const struct sail_image *image1, const struct 
     if (image1->source_image == NULL) {
         munit_assert_null(image2->source_image);
     } else {
-        munit_assert(sail_compare_source_images(image1->source_image, image2->source_image) == SAIL_OK);
+        munit_assert(sail_test_compare_source_images(image1->source_image, image2->source_image) == SAIL_OK);
     }
 
     return SAIL_OK;

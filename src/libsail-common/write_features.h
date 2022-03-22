@@ -38,6 +38,8 @@
 extern "C" {
 #endif
 
+struct sail_string_node;
+
 /*
  * Write features. Use this structure to determine what a codec can actually write.
  */
@@ -53,6 +55,20 @@ struct sail_write_features {
 
     /* Supported or-ed features of writing operations. See SailCodecFeature. */
     int features;
+
+    /*
+     * Codec-specific tuning options. For example, a hypothetical ABC image codec
+     * can allow disabling filtering with setting the "abc-filtering" tuning option
+     * to 0 in read options. Tuning options' names start with the codec name
+     * to avoid confusing.
+     *
+     * The list of possible values for every tuning option is not current available
+     * programmatically. Every codec must document them in the codec info.
+     *
+     * It's not guaranteed that tuning options and their values are backward
+     * or forward compatible.
+     */
+    struct sail_string_node *tuning;
 
     /*
      * Required or-ed image properties. For example, an input image must be flipped by a caller

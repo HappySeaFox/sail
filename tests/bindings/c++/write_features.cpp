@@ -41,14 +41,16 @@ static MunitResult test_write_features(const MunitParameter params[], void *user
     // Copy
     {
         const sail::write_features write_features = first_codec.write_features();
-        munit_assert(write_features.features() == first_codec.write_features().features());
+        munit_assert(write_features.features()         == first_codec.write_features().features());
+        munit_assert(write_features.supported_tuning() == first_codec.write_features().supported_tuning());
     }
 
     // Move
     {
         const sail::write_features write_features1 = std::move(first_codec.write_features());
         const sail::write_features write_features = std::move(write_features1);
-        munit_assert(write_features.features() == first_codec.write_features().features());
+        munit_assert(write_features.features()         == first_codec.write_features().features());
+        munit_assert(write_features.supported_tuning() == first_codec.write_features().supported_tuning());
     }
 
     // Construct write options

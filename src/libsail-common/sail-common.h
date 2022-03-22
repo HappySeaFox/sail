@@ -36,9 +36,12 @@
     #include "compiler_specifics.h"
     #include "error.h"
     #include "export.h"
+    #include "hash_map.h"
+    #include "hash_map_p.h"
     #include "iccp.h"
     #include "image.h"
     #include "io_common.h"
+    #include "linked_list_node.h"
     #include "log.h"
     #include "memory.h"
     #include "meta_data.h"
@@ -49,8 +52,10 @@
     #include "read_options.h"
     #include "resolution.h"
     #include "source_image.h"
+    #include "string_node.h"
     #include "utils.h"
     #include "variant.h"
+    #include "variant_node.h"
     #include "write_features.h"
     #include "write_options.h"
 #else
@@ -61,6 +66,7 @@
     #include <sail-common/compiler_specifics.h>
     #include <sail-common/error.h>
     #include <sail-common/export.h>
+    #include <sail-common/hash_map.h>
     #include <sail-common/iccp.h>
     #include <sail-common/image.h>
     #include <sail-common/io_common.h>
@@ -74,8 +80,10 @@
     #include <sail-common/read_options.h>
     #include <sail-common/resolution.h>
     #include <sail-common/source_image.h>
+    #include <sail-common/string_node.h>
     #include <sail-common/utils.h>
     #include <sail-common/variant.h>
+    #include <sail-common/variant_node.h>
     #include <sail-common/write_features.h>
     #include <sail-common/write_options.h>
 #endif

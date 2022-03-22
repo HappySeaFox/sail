@@ -62,12 +62,20 @@ namespace sail
 class SAIL_EXPORT variant
 {
     friend class meta_data;
+    friend class utils_private;
+    friend SAIL_EXPORT bool operator==(const sail::variant &a, const sail::variant &b);
 
 public:
     /*
      * Constructs an invalid variant.
      */
     variant();
+
+    /*
+     * Constructs a new variant from the value.
+     */
+    template<typename T>
+    variant(const T &value);
 
     /*
      * Copies the variant.
@@ -122,13 +130,23 @@ private:
     /*
      * Makes a deep copy of the specified variant.
      */
-    explicit variant(const sail_variant *variant);
+    //explicit variant(const sail_variant *variant);
 
     sail_status_t to_sail_variant(sail_variant **variant) const;
 
     class pimpl;
     std::unique_ptr<pimpl> d;
 };
+
+/*
+ * Returns true if the variants have the same type and value.
+ */
+SAIL_EXPORT bool operator==(const sail::variant &a, const sail::variant &b);
+
+/*
+ * Returns true if the variants have different types or values.
+ */
+SAIL_EXPORT bool operator!=(const sail::variant &a, const sail::variant &b);
 
 }
 

@@ -13,12 +13,17 @@ add_library(sail-common
                 compiler_specifics.h
                 error.h
                 export.h
+                hash_map.c
+                hash_map.h
+                hash_map_p.h
                 iccp.c
                 iccp.h
                 image.c
                 image.h
                 io_common.c
                 io_common.h
+                linked_list_node.c
+                linked_list_node.h
                 log.c
                 log.h
                 memory.c
@@ -40,10 +45,14 @@ add_library(sail-common
                 sail-common.h
                 source_image.c
                 source_image.h
+                string_node.c
+                string_node.h
                 utils.c
                 utils.h
                 variant.c
                 variant.h
+                variant_node.c
+                variant_node.h
                 write_features.c
                 write_features.h
                 write_options.c
@@ -56,6 +65,7 @@ set(PUBLIC_HEADERS "common.h"
                    "compiler_specifics.h"
                    "error.h"
                    "export.h"
+                   "hash_map.h"
                    "iccp.h"
                    "image.h"
                    "io_common.h"
@@ -70,8 +80,10 @@ set(PUBLIC_HEADERS "common.h"
                    "resolution.h"
                    "sail-common.h"
                    "source_image.h"
+                   "string_node.h"
                    "utils.h"
                    "variant.h"
+                   "variant_node.h"
                    "write_features.h"
                    "write_options.h")
 

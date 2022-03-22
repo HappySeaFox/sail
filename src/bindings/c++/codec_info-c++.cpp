@@ -228,27 +228,18 @@ codec_info::codec_info(const sail_codec_info *ci)
     std::vector<std::string> mime_types;
 
     // magic numbers
-    const sail_string_node *magic_number_node = ci->magic_number_node;
-
-    while (magic_number_node != nullptr) {
-        magic_numbers.push_back(magic_number_node->value);
-        magic_number_node = magic_number_node->next;
+    for (const sail_string_node *magic_number_node = ci->magic_number_node; magic_number_node != nullptr; magic_number_node = magic_number_node->next) {
+        magic_numbers.push_back(magic_number_node->string);
     }
 
     // extensions
-    const sail_string_node *extension_node = ci->extension_node;
-
-    while (extension_node != nullptr) {
-        extensions.push_back(extension_node->value);
-        extension_node = extension_node->next;
+    for (const sail_string_node *extension_node = ci->extension_node; extension_node != nullptr; extension_node = extension_node->next) {
+        extensions.push_back(extension_node->string);
     }
 
     // mime types
-    const sail_string_node *mime_type_node = ci->mime_type_node;
-
-    while (mime_type_node != nullptr) {
-        mime_types.push_back(mime_type_node->value);
-        mime_type_node = mime_type_node->next;
+    for (const sail_string_node *mime_type_node = ci->mime_type_node; mime_type_node != nullptr; mime_type_node = mime_type_node->next) {
+        mime_types.push_back(mime_type_node->string);
     }
 
     with_version(ci->version)

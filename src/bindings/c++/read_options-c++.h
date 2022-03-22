@@ -32,9 +32,13 @@
 #ifdef SAIL_BUILD
     #include "error.h"
     #include "export.h"
+
+    #include "tuning-c++.h"
 #else
     #include <sail-common/error.h>
     #include <sail-common/export.h>
+
+    #include <sail-c++/tuning-c++.h>
 #endif
 
 struct sail_read_options;
@@ -87,9 +91,42 @@ public:
     int io_options() const;
 
     /*
+     * Returns editable codec-specific tuning options. For example, a hypothetical ABC
+     * image codec can allow disabling filtering with setting the "abc-filtering"
+     * tuning option to 0 in read options. Tuning options' names start with the codec name
+     * to avoid confusing.
+     *
+     * The list of possible values for every tuning option is not current available
+     * programmatically. Every codec must document them in the codec info.
+     *
+     * It's not guaranteed that tuning options and their values are backward
+     * or forward compatible.
+     */
+    sail::tuning& tuning();
+
+    /*
+     * Returns constant codec-specific tuning options. For example, a hypothetical ABC
+     * image codec can allow disabling filtering with setting the "abc-filtering"
+     * tuning option to 0 in read options. Tuning options' names start with the codec name
+     * to avoid confusing.
+     *
+     * The list of possible values for every tuning option is not current available
+     * programmatically. Every codec must document them in the codec info.
+     *
+     * It's not guaranteed that tuning options and their values are backward
+     * or forward compatible.
+     */
+    const sail::tuning& tuning() const;
+
+    /*
      * Sets new or-ed I/O manipulation options for reading operations. See SailIoOption.
      */
     read_options& with_io_options(int io_options);
+
+    /*
+     * Sets new codec tuning.
+     */
+    read_options& with_tuning(const sail::tuning &tuning);
 
 private:
     /*
@@ -98,7 +135,7 @@ private:
      */
     explicit read_options(const sail_read_options *ro);
 
-    sail_status_t to_sail_read_options(sail_read_options *read_options) const;
+    sail_status_t to_sail_read_options(sail_read_options **read_options) const;
 
 private:
     class pimpl;

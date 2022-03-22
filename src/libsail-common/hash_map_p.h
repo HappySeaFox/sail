@@ -1,6 +1,6 @@
 /*  This file is part of SAIL (https://github.com/smoked-herring/sail)
 
-    Copyright (c) 2020 Dmitry Baryshev
+    Copyright (c) 2022 Dmitry Baryshev
 
     The MIT License
 
@@ -23,27 +23,24 @@
     SOFTWARE.
 */
 
-QStringList QtSail::filters() const
-{
-    QStringList filters { QStringLiteral("All Files (*.*)") };
+#ifndef SAIL_HASH_MAP_PRIVATE_H
+#define SAIL_HASH_MAP_PRIVATE_H
 
-    for (const sail_codec_bundle_node *codec_bundle_node = sail_codec_bundle_list(); codec_bundle_node != nullptr; codec_bundle_node = codec_bundle_node->next) {
-        const sail_codec_info *codec_info = codec_bundle_node->codec_bundle->codec_info;
+struct sail_variant_node;
 
-        QStringList masks;
+/*
+ * A pretty limited hash map implementation.
+ */
+enum {
+    SAIL_HASH_MAP_SIZE = 32
+};
 
-        for (const sail_string_node *extension_node = codec_info->extension_node;
-                extension_node != nullptr;
-                extension_node = extension_node->next
-             ) {
-            masks.append(QStringLiteral("*.%1").arg(extension_node->string));
-        }
+struct sail_hash_map {
 
-        filters.append(QStringLiteral("%1: %2 (%3)")
-                       .arg(codec_info->name)
-                       .arg(codec_info->description)
-                       .arg(masks.join(QStringLiteral(" "))));
-    }
+    /*
+     * Values follow keys in the chain, e.g. key1 -> value1 -> key2 -> value2 -> NULL.
+     */
+    struct sail_variant_node *buckets[SAIL_HASH_MAP_SIZE];
+};
 
-    return filters;
-}
+#endif

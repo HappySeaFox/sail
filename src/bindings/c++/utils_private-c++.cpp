@@ -23,27 +23,48 @@
     SOFTWARE.
 */
 
-QStringList QtSail::filters() const
+#include "sail-c++.h"
+
+namespace sail
 {
-    QStringList filters { QStringLiteral("All Files (*.*)") };
 
-    for (const sail_codec_bundle_node *codec_bundle_node = sail_codec_bundle_list(); codec_bundle_node != nullptr; codec_bundle_node = codec_bundle_node->next) {
-        const sail_codec_info *codec_info = codec_bundle_node->codec_bundle->codec_info;
+tuning utils_private::c_tuning_to_cpp_tuning(const sail_hash_map *c_tuning) {
 
-        QStringList masks;
-
-        for (const sail_string_node *extension_node = codec_info->extension_node;
-                extension_node != nullptr;
-                extension_node = extension_node->next
-             ) {
-            masks.append(QStringLiteral("*.%1").arg(extension_node->string));
-        }
-
-        filters.append(QStringLiteral("%1: %2 (%3)")
-                       .arg(codec_info->name)
-                       .arg(codec_info->description)
-                       .arg(masks.join(QStringLiteral(" "))));
+    if (c_tuning == nullptr) {
+        return tuning{};
     }
 
-    return filters;
+    tuning tuning;
+
+    sail_traverse_hash_map_with_user_data(c_tuning, sail_key_value_into_tuning, &tuning);
+
+    return tuning;
+}
+
+sail_status_t utils_private::cpp_tuning_to_sail_tuning(const tuning &cpp_tuning, sail_hash_map *c_tuning) {
+
+    sail_clear_hash_map(c_tuning);
+
+    for (const auto& [key, variant] : cpp_tuning) {
+        struct sail_variant *sail_variant;
+
+        SAIL_TRY(variant.to_sail_variant(&sail_variant));
+
+        sail_put_hash_map(c_tuning, key.c_str(), sail_variant);
+
+        sail_destroy_variant(sail_variant);
+    }
+
+    return SAIL_OK;
+}
+
+bool utils_private::sail_key_value_into_tuning(const char *key, const sail_variant *value, void *user_data) {
+
+    tuning *cpp_tuning = reinterpret_cast<tuning *>(user_data);
+
+    cpp_tuning->emplace(key, variant(value));
+
+    return true;
+}
+
 }

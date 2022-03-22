@@ -12,9 +12,11 @@ mime-types=image/jp2;image/jpm
 
 [read-features]
 features=STATIC
+tuning=
 
 [write-features]
 features=
+tuning=
 output-pixel-formats=
 properties=
 compression-types=

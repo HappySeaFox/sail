@@ -101,7 +101,7 @@ static MunitResult test_copy_known_string_meta_data(const MunitParameter params[
     munit_assert(sail_copy_meta_data(meta_data, &meta_data_copy) == SAIL_OK);
     munit_assert_not_null(meta_data_copy);
 
-    munit_assert(sail_compare_meta_datas(meta_data_copy, meta_data) == SAIL_OK);
+    munit_assert(sail_test_compare_meta_datas(meta_data_copy, meta_data) == SAIL_OK);
 
     sail_destroy_meta_data(meta_data_copy);
     sail_destroy_meta_data(meta_data);
@@ -129,7 +129,7 @@ static MunitResult test_copy_unknown_string_meta_data(const MunitParameter param
     munit_assert(sail_copy_meta_data(meta_data, &meta_data_copy) == SAIL_OK);
     munit_assert_not_null(meta_data_copy);
 
-    munit_assert(sail_compare_meta_datas(meta_data_copy, meta_data) == SAIL_OK);
+    munit_assert(sail_test_compare_meta_datas(meta_data_copy, meta_data) == SAIL_OK);
 
     sail_destroy_meta_data(meta_data_copy);
     sail_destroy_meta_data(meta_data);

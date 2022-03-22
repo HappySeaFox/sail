@@ -50,10 +50,8 @@ static sail_status_t parse_serialized_ints(const char *value, int **target, unsi
     SAIL_CHECK_PTR(target);
     SAIL_CHECK_PTR(length);
 
-    struct sail_string_node *string_node = NULL;
-
-    SAIL_TRY_OR_CLEANUP(split_into_string_node_chain(value, &string_node),
-                        /* cleanup */ destroy_string_node_chain(string_node));
+    struct sail_string_node *string_node;
+    SAIL_TRY(sail_split_into_string_node_chain(value, &string_node));
 
     *length = 0;
 
@@ -64,17 +62,17 @@ static sail_status_t parse_serialized_ints(const char *value, int **target, unsi
     if (*length > 0) {
         void *ptr;
         SAIL_TRY_OR_CLEANUP(sail_malloc((size_t)*length * sizeof(int), &ptr),
-                            /* cleanup */ destroy_string_node_chain(string_node));
+                            /* cleanup */ sail_destroy_string_node_chain(string_node));
         *target = ptr;
 
         int i = 0;
 
         for (struct sail_string_node *node = string_node; node != NULL; node = node->next) {
-            *(*target + i++) = converter(node->value);
+            *(*target + i++) = converter(node->string);
         }
     }
 
-    destroy_string_node_chain(string_node);
+    sail_destroy_string_node_chain(string_node);
 
     return SAIL_OK;
 }
@@ -94,18 +92,16 @@ static sail_status_t parse_flags(const char *value, int *features, int (*convert
     SAIL_CHECK_PTR(value);
     SAIL_CHECK_PTR(features);
 
-    struct sail_string_node *string_node = NULL;
-
-    SAIL_TRY_OR_CLEANUP(split_into_string_node_chain(value, &string_node),
-                        /* cleanup */ destroy_string_node_chain(string_node));
+    struct sail_string_node *string_node;
+    SAIL_TRY(sail_split_into_string_node_chain(value, &string_node));
 
     *features = 0;
 
     for (struct sail_string_node *node = string_node; node != NULL; node = node->next) {
-        *features |= converter(node->value);
+        *features |= converter(node->string);
     }
 
-    destroy_string_node_chain(string_node);
+    sail_destroy_string_node_chain(string_node);
 
     return SAIL_OK;
 }
@@ -154,30 +150,30 @@ static sail_status_t inih_handler_sail_error(void *data, const char *section, co
         } else if (strcmp(name, "description") == 0) {
             SAIL_TRY(sail_strdup(value, &codec_info->description));
         } else if (strcmp(name, "magic-numbers") == 0) {
-            SAIL_TRY(split_into_string_node_chain(value, &codec_info->magic_number_node));
+            SAIL_TRY(sail_split_into_string_node_chain(value, &codec_info->magic_number_node));
 
             for (struct sail_string_node *node = codec_info->magic_number_node; node != NULL; node = node->next) {
-                if (strlen(node->value) > SAIL_MAGIC_BUFFER_SIZE * 3 - 1) {
+                if (strlen(node->string) > SAIL_MAGIC_BUFFER_SIZE * 3 - 1) {
                     SAIL_LOG_ERROR("Magic number '%s' is too long. Magic numbers for the '%s' codec are disabled",
-                                    node->value, codec_info->name);
-                    destroy_string_node_chain(codec_info->magic_number_node);
+                                    node->string, codec_info->name);
+                    sail_destroy_string_node_chain(codec_info->magic_number_node);
                     codec_info->magic_number_node = NULL;
                     break;
                 }
 
-                sail_to_lower(node->value);
+                sail_to_lower(node->string);
             }
         } else if (strcmp(name, "extensions") == 0) {
-            SAIL_TRY(split_into_string_node_chain(value, &codec_info->extension_node));
+            SAIL_TRY(sail_split_into_string_node_chain(value, &codec_info->extension_node));
 
             for (struct sail_string_node *node = codec_info->extension_node; node != NULL; node = node->next) {
-                sail_to_lower(node->value);
+                sail_to_lower(node->string);
             }
         } else if (strcmp(name, "mime-types") == 0) {
-            SAIL_TRY(split_into_string_node_chain(value, &codec_info->mime_type_node));
+            SAIL_TRY(sail_split_into_string_node_chain(value, &codec_info->mime_type_node));
 
             for (struct sail_string_node *node = codec_info->mime_type_node; node != NULL; node = node->next) {
-                sail_to_lower(node->value);
+                sail_to_lower(node->string);
             }
         } else {
             SAIL_LOG_ERROR("Unsupported codec info key '%s' in [%s]", name, section);
@@ -187,6 +183,9 @@ static sail_status_t inih_handler_sail_error(void *data, const char *section, co
         if (strcmp(name, "features") == 0) {
             SAIL_TRY_OR_CLEANUP(parse_flags(value, &codec_info->read_features->features, codec_feature_from_string),
                                 /* cleanup */ SAIL_LOG_ERROR("Failed to parse codec features: '%s'", value));
+        } else if (strcmp(name, "tuning") == 0) {
+            SAIL_TRY_OR_CLEANUP(sail_split_into_string_node_chain(value, &codec_info->read_features->tuning),
+                                    /* cleanup */ SAIL_LOG_ERROR("Failed to parse codec tuning: '%s'", value));
         } else {
             SAIL_LOG_ERROR("Unsupported codec info key '%s' in [%s]", name, section);
             SAIL_LOG_AND_RETURN(SAIL_ERROR_PARSE_FILE);
@@ -195,6 +194,9 @@ static sail_status_t inih_handler_sail_error(void *data, const char *section, co
         if (strcmp(name, "features") == 0) {
             SAIL_TRY_OR_CLEANUP(parse_flags(value, &codec_info->write_features->features, codec_feature_from_string),
                                 /* cleanup */ SAIL_LOG_ERROR("Failed to parse codec features: '%s'", value));
+        } else if (strcmp(name, "tuning") == 0) {
+            SAIL_TRY_OR_CLEANUP(sail_split_into_string_node_chain(value, &codec_info->write_features->tuning),
+                                    /* cleanup */ SAIL_LOG_ERROR("Failed to parse codec tuning: '%s'", value));
         } else if (strcmp(name, "output-pixel-formats") == 0) {
             SAIL_TRY_OR_CLEANUP(parse_serialized_ints(value,
                                                         (int **)&codec_info->write_features->output_pixel_formats,
@@ -393,9 +395,9 @@ void destroy_codec_info(struct sail_codec_info *codec_info) {
     sail_free(codec_info->name);
     sail_free(codec_info->description);
 
-    destroy_string_node_chain(codec_info->magic_number_node);
-    destroy_string_node_chain(codec_info->extension_node);
-    destroy_string_node_chain(codec_info->mime_type_node);
+    sail_destroy_string_node_chain(codec_info->magic_number_node);
+    sail_destroy_string_node_chain(codec_info->extension_node);
+    sail_destroy_string_node_chain(codec_info->mime_type_node);
 
     sail_destroy_read_features(codec_info->read_features);
     sail_destroy_write_features(codec_info->write_features);

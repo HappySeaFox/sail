@@ -207,9 +207,9 @@ sail_status_t sail_set_variant_adopted_data(struct sail_variant *variant, void *
 
     sail_free(variant->value);
 
-    variant->type = SAIL_VARIANT_TYPE_DATA;
-    variant->value      = value;
-    variant->size = size;
+    variant->type  = SAIL_VARIANT_TYPE_DATA;
+    variant->value = value;
+    variant->size  = size;
 
     return SAIL_OK;
 }
@@ -298,4 +298,18 @@ sail_status_t sail_copy_variant(const struct sail_variant *source, struct sail_v
     SAIL_TRY(alloc_variant(source->type, source->value, source->size, target));
 
     return SAIL_OK;
+}
+
+bool sail_equal_variants(const struct sail_variant *variant1, const struct sail_variant *variant2) {
+
+    SAIL_TRY_OR_EXECUTE(sail_check_variant_valid(variant1),
+                        /* on error */ return false);
+    SAIL_TRY_OR_EXECUTE(sail_check_variant_valid(variant2),
+                        /* on error */ return false);
+
+    if (variant1->type != variant2->type || variant1->size != variant2->size) {
+        return false;
+    } else {
+        return memcmp(variant1->value, variant2->value, variant1->size) == 0;
+    }
 }

@@ -668,3 +668,45 @@ sail_status_t png_private_write_resolution(png_structp png_ptr, png_infop info_p
 
     return SAIL_OK;
 }
+
+bool png_private_tuning_key_value_callback(const char *key, const struct sail_variant *value, void *user_data) {
+
+    png_structp png_ptr = user_data;
+
+    if (strcmp(key, "png-filter") == 0) {
+        if (value->type == SAIL_VARIANT_TYPE_STRING) {
+            const char *str_value = sail_variant_to_string(value);
+
+            int filters = 0;
+
+            struct sail_string_node *string_node_filters;
+            SAIL_TRY_OR_EXECUTE(sail_split_into_string_node_chain(str_value, &string_node_filters),
+                                /* on error */ return true);
+
+            for (const struct sail_string_node *node = string_node_filters; node != NULL; node = node->next) {
+                if (strcmp(node->string, "none") == 0) {
+                    SAIL_LOG_TRACE("PNG: Adding NONE filter");
+                    filters |= PNG_FILTER_NONE;
+                } else if (strcmp(node->string, "sub") == 0) {
+                    SAIL_LOG_TRACE("PNG: Adding SUB filter");
+                    filters |= PNG_FILTER_SUB;
+                } else if (strcmp(node->string, "up") == 0) {
+                    SAIL_LOG_TRACE("PNG: Adding UP filter");
+                    filters |= PNG_FILTER_UP;
+                } else if (strcmp(node->string, "avg") == 0) {
+                    SAIL_LOG_TRACE("PNG: Adding AVG filter");
+                    filters |= PNG_FILTER_AVG;
+                } else if (strcmp(node->string, "paeth") == 0) {
+                    SAIL_LOG_TRACE("PNG: Adding PAETH filter");
+                    filters |= PNG_FILTER_PAETH;
+                }
+            }
+
+            sail_destroy_string_node_chain(string_node_filters);
+
+            png_set_filter(png_ptr, 0, filters);
+        }
+    }
+
+    return true;
+}

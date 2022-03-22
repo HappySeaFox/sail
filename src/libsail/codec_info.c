@@ -153,7 +153,7 @@ sail_status_t sail_codec_info_by_magic_number_from_io(struct sail_io *io, const 
          */
         while (magic_number_node != NULL) {
             size_t buffer_index = 0;
-            const char *magic = magic_number_node->value;
+            const char *magic = magic_number_node->string;
             char hex_byte[3];
             int bytes_consumed = 0;
             bool mismatch = false;
@@ -220,15 +220,15 @@ sail_status_t sail_codec_info_from_extension(const char *extension, const struct
         const struct sail_string_node *extension_node = codec_bundle->codec_info->extension_node;
 
         while (extension_node != NULL) {
-            SAIL_LOG_TRACE("Check against %s extension '%s'", codec_bundle->codec_info->name, extension_node->value);
+            SAIL_LOG_TRACE("Check against %s extension '%s'", codec_bundle->codec_info->name, extension_node->string);
 
-            if (strcmp(extension_node->value, extension_copy) == 0) {
+            if (strcmp(extension_node->string, extension_copy) == 0) {
                 sail_free(extension_copy);
                 *codec_info = codec_bundle->codec_info;
                 SAIL_LOG_DEBUG("Found codec info: %s", (*codec_info)->name);
                 return SAIL_OK;
             } else {
-                SAIL_LOG_TRACE("Extension mismatch '%s' != '%s'", extension_copy, extension_node->value);
+                SAIL_LOG_TRACE("Extension mismatch '%s' != '%s'", extension_copy, extension_node->string);
             }
 
             extension_node = extension_node->next;
@@ -261,15 +261,15 @@ sail_status_t sail_codec_info_from_mime_type(const char *mime_type, const struct
         const struct sail_string_node *mime_type_node = codec_bundle->codec_info->mime_type_node;
 
         while (mime_type_node != NULL) {
-            SAIL_LOG_TRACE("Check against %s MIME type '%s'", codec_bundle->codec_info->name, mime_type_node->value);
+            SAIL_LOG_TRACE("Check against %s MIME type '%s'", codec_bundle->codec_info->name, mime_type_node->string);
 
-            if (strcmp(mime_type_node->value, mime_type_copy) == 0) {
+            if (strcmp(mime_type_node->string, mime_type_copy) == 0) {
                 sail_free(mime_type_copy);
                 *codec_info = codec_bundle->codec_info;
                 SAIL_LOG_DEBUG("Found codec info: %s", (*codec_info)->name);
                 return SAIL_OK;
             } else {
-                SAIL_LOG_TRACE("MIME type mismatch '%s' != '%s'", mime_type_copy, mime_type_node->value);
+                SAIL_LOG_TRACE("MIME type mismatch '%s' != '%s'", mime_type_copy, mime_type_node->string);
             }
 
             mime_type_node = mime_type_node->next;

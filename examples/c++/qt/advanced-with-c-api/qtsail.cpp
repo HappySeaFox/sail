@@ -200,8 +200,39 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
     sail_destroy_image(image);
     image = image_converted;
 
-    SAIL_TRY_OR_CLEANUP(sail_start_writing_file(path.toLocal8Bit(), nullptr, &state),
+    /*
+     * Create write options to pass PNG filters.
+     */
+    struct sail_write_options *write_options;
+    SAIL_TRY_OR_CLEANUP(sail_alloc_write_options_from_features(codec_info->write_features, &write_options),
                         /* cleanup */ sail_destroy_image(image));
+
+    SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&write_options->tuning),
+                        /* cleanup */ sail_destroy_write_options(write_options),
+                                      sail_destroy_image(image));
+
+    /*
+     * This filter will be handled and applied by the PNG codec only.
+     * Possible values: "none", "sub", "up", "avg", "paeth".
+     *
+     * It's also possible to combine PNG filters with ';' like that:
+     * "none;sub;paeth"
+     */
+    struct sail_variant *value;
+    SAIL_TRY_OR_CLEANUP(sail_alloc_variant(&value),
+                        /* cleanup */ sail_destroy_write_options(write_options),
+                                      sail_destroy_image(image));
+
+    sail_set_variant_string(value, "none;sub");
+    sail_put_hash_map(write_options->tuning, "png-filter", value);
+    sail_destroy_variant(value);
+
+    SAIL_TRY_OR_CLEANUP(sail_start_writing_file_with_options(path.toLocal8Bit(), nullptr, write_options, &state),
+                        /* cleanup */ sail_destroy_write_options(write_options),
+                                      sail_destroy_image(image));
+
+    sail_destroy_write_options(write_options);
+
     SAIL_TRY_OR_CLEANUP(sail_write_next_frame(state, image),
                         /* cleanup */ sail_destroy_image(image));
     SAIL_TRY_OR_CLEANUP(sail_stop_writing(state),

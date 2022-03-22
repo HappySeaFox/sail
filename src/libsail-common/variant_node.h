@@ -1,6 +1,6 @@
 /*  This file is part of SAIL (https://github.com/smoked-herring/sail)
 
-    Copyright (c) 2020 Dmitry Baryshev
+    Copyright (c) 2022 Dmitry Baryshev
 
     The MIT License
 
@@ -23,8 +23,8 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_META_DATA_NODE_H
-#define SAIL_META_DATA_NODE_H
+#ifndef SAIL_VARIANT_NODE_H
+#define SAIL_VARIANT_NODE_H
 
 #ifdef SAIL_BUILD
     #include "error.h"
@@ -38,67 +38,67 @@
 extern "C" {
 #endif
 
-struct sail_meta_data;
+struct sail_variant;
 
 /*
- * Represents a meta data node.
+ * Represents a variant node.
  */
-struct sail_meta_data_node {
+struct sail_variant_node {
 
     /*
-     * Meta data value.
+     * Variant value.
      */
-    struct sail_meta_data *meta_data;
+    struct sail_variant *variant;
 
     /*
      * Pointer to the next node or NULL.
      */
-    struct sail_meta_data_node *next;
+    struct sail_variant_node *next;
 };
 
 /*
- * Allocates a new meta data node.
+ * Allocates a new variant node.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_meta_data_node(struct sail_meta_data_node **node);
+SAIL_EXPORT sail_status_t sail_alloc_variant_node(struct sail_variant_node **node);
 
 /*
- * Allocates a new meta data node and the nested value.
+ * Allocates a new variant node and the nested value.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_meta_data_node_and_value(struct sail_meta_data_node **node);
+SAIL_EXPORT sail_status_t sail_alloc_variant_node_and_value(struct sail_variant_node **node);
 
 /*
- * Destroys the specified meta data node.
+ * Destroys the specified variant node.
  */
-SAIL_EXPORT void sail_destroy_meta_data_node(struct sail_meta_data_node *node);
+SAIL_EXPORT void sail_destroy_variant_node(struct sail_variant_node *node);
 
 /*
- * Makes a deep copy of the specified meta data node. The assigned node MUST be destroyed
- * later with sail_destroy_meta_data_node().
+ * Makes a deep copy of the specified variant node. The assigned node MUST be destroyed
+ * later with sail_destroy_variant_node().
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_copy_meta_data_node(const struct sail_meta_data_node *source,
-                                                   struct sail_meta_data_node **target);
+SAIL_EXPORT sail_status_t sail_copy_variant_node(const struct sail_variant_node *source,
+                                                 struct sail_variant_node **target);
 
 /*
- * Destroys the specified meta data node and all its internal allocated memory buffers.
+ * Destroys the specified variant node and all its internal allocated memory buffers.
  * Repeats the destruction procedure recursively for the stored next pointer.
  */
-SAIL_EXPORT void sail_destroy_meta_data_node_chain(struct sail_meta_data_node *node);
+SAIL_EXPORT void sail_destroy_variant_node_chain(struct sail_variant_node *node);
 
 /*
- * Makes a deep copy of the specified meta data node chain. The assigned chain MUST be destroyed
- * later with sail_destroy_meta_data_node_chain(). If the source chain is NULL, it assigns NULL
+ * Makes a deep copy of the specified variant node chain. The assigned chain MUST be destroyed
+ * later with sail_destroy_variant_node_chain(). If the source chain is NULL, it assigns NULL
  * to the target chain and returns SAIL_OK.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_copy_meta_data_node_chain(const struct sail_meta_data_node *source,
-                                                         struct sail_meta_data_node **target);
+SAIL_EXPORT sail_status_t sail_copy_variant_node_chain(const struct sail_variant_node *source,
+                                                       struct sail_variant_node **target);
 
 /* extern "C" */
 #ifdef __cplusplus

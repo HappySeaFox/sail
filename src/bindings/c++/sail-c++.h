@@ -65,7 +65,9 @@
     #include "read_options-c++.h"
     #include "resolution-c++.h"
     #include "source_image-c++.h"
+    #include "tuning-c++.h"
     #include "utils-c++.h"
+    #include "utils_private-c++.h"
     #include "variant-c++.h"
     #include "write_features-c++.h"
     #include "write_options-c++.h"
@@ -97,6 +99,7 @@
     #include <sail-c++/read_options-c++.h>
     #include <sail-c++/resolution-c++.h>
     #include <sail-c++/source_image-c++.h>
+    #include <sail-c++/tuning-c++.h>
     #include <sail-c++/utils-c++.h>
     #include <sail-c++/variant-c++.h>
     #include <sail-c++/write_features-c++.h>

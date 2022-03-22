@@ -47,6 +47,7 @@ public:
     }
 
     struct sail_read_options *sail_read_options;
+    sail::tuning tuning;
 };
 
 read_options::read_options()
@@ -62,7 +63,9 @@ read_options::read_options(const read_options &ro)
 
 read_options& read_options::operator=(const sail::read_options &read_options)
 {
-    with_io_options(read_options.io_options());
+    with_io_options(read_options.io_options())
+        .with_tuning(read_options.tuning());
+
     return *this;
 }
 
@@ -87,9 +90,27 @@ int read_options::io_options() const
     return d->sail_read_options->io_options;
 }
 
+sail::tuning& read_options::tuning()
+{
+    return d->tuning;
+}
+
+const sail::tuning& read_options::tuning() const
+{
+    return d->tuning;
+}
+
 read_options& read_options::with_io_options(int io_options)
 {
     d->sail_read_options->io_options = io_options;
+
+    return *this;
+}
+
+read_options& read_options::with_tuning(const sail::tuning &tuning)
+{
+    d->tuning = tuning;
+
     return *this;
 }
 
@@ -101,14 +122,27 @@ read_options::read_options(const sail_read_options *ro)
         return;
     }
 
-    with_io_options(ro->io_options);
+    with_io_options(ro->io_options)
+        .with_tuning(utils_private::c_tuning_to_cpp_tuning(ro->tuning));
 }
 
-sail_status_t read_options::to_sail_read_options(sail_read_options *read_options) const
+sail_status_t read_options::to_sail_read_options(sail_read_options **read_options) const
 {
     SAIL_CHECK_PTR(read_options);
 
-    *read_options = *d->sail_read_options;
+    sail_read_options *read_options_local;
+
+    SAIL_TRY(sail_alloc_read_options(&read_options_local));
+
+    read_options_local->io_options = d->sail_read_options->io_options;
+
+    SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&read_options_local->tuning),
+                        /* cleanup */ sail_destroy_read_options(read_options_local));
+
+    SAIL_TRY_OR_CLEANUP(utils_private::cpp_tuning_to_sail_tuning(d->tuning, read_options_local->tuning),
+                        /* cleanup */ sail_destroy_read_options(read_options_local));
+
+    *read_options = read_options_local;
 
     return SAIL_OK;
 }

@@ -23,28 +23,36 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_STRING_NODE_PRIVATE_H
-#define SAIL_STRING_NODE_PRIVATE_H
+#ifndef SAIL_UTILS_PRIVATE_CPP_H
+#define SAIL_UTILS_PRIVATE_CPP_H
 
 #ifdef SAIL_BUILD
     #include "error.h"
     #include "export.h"
+
+    #include "tuning-c++.h"
 #else
-    #include <sail-common/error.h>
-    #include <sail-common/export.h>
+    INTERNAL ERROR: For internal use only
 #endif
 
-struct sail_string_node;
+struct sail_hash_map;
+struct sail_variant;
 
-SAIL_HIDDEN sail_status_t alloc_string_node(struct sail_string_node **string_node);
+namespace sail
+{
 
-SAIL_HIDDEN void destroy_string_node(struct sail_string_node *string_node);
+class SAIL_HIDDEN utils_private
+{
+public:
+    static tuning c_tuning_to_cpp_tuning(const sail_hash_map *c_tuning);
 
-SAIL_HIDDEN void destroy_string_node_chain(struct sail_string_node *string_node);
+    static sail_status_t cpp_tuning_to_sail_tuning(const tuning &cpp_tuning, sail_hash_map *c_tuning);
 
-/*
- * Split a ';'-separated list of strings.
- */
-SAIL_HIDDEN sail_status_t split_into_string_node_chain(const char *value, struct sail_string_node **target_string_node);
+private:
+    // Needs to be in utils_private to allow creating sail:variant from sail_variant
+    static bool sail_key_value_into_tuning(const char *key, const sail_variant *value, void *user_data);
+};
+
+}
 
 #endif

@@ -25,7 +25,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #include "sail-common.h"
 
@@ -38,6 +37,7 @@ sail_status_t sail_alloc_read_options(struct sail_read_options **read_options) {
     *read_options = ptr;
 
     (*read_options)->io_options = 0;
+    (*read_options)->tuning     = NULL;
 
     return SAIL_OK;
 }
@@ -48,25 +48,8 @@ void sail_destroy_read_options(struct sail_read_options *read_options) {
         return;
     }
 
+    sail_destroy_hash_map(read_options->tuning);
     sail_free(read_options);
-}
-
-sail_status_t sail_read_options_from_features(const struct sail_read_features *read_features, struct sail_read_options *read_options) {
-
-    SAIL_CHECK_PTR(read_features);
-    SAIL_CHECK_PTR(read_options);
-
-    read_options->io_options = 0;
-
-    if (read_features->features & SAIL_CODEC_FEATURE_META_DATA) {
-        read_options->io_options |= SAIL_IO_OPTION_META_DATA;
-    }
-
-    if (read_features->features & SAIL_CODEC_FEATURE_ICCP) {
-        read_options->io_options |= SAIL_IO_OPTION_ICCP;
-    }
-
-    return SAIL_OK;
 }
 
 sail_status_t sail_alloc_read_options_from_features(const struct sail_read_features *read_features, struct sail_read_options **read_options) {
@@ -75,8 +58,16 @@ sail_status_t sail_alloc_read_options_from_features(const struct sail_read_featu
 
     struct sail_read_options *read_options_local;
     SAIL_TRY(sail_alloc_read_options(&read_options_local));
-    SAIL_TRY_OR_CLEANUP(sail_read_options_from_features(read_features, read_options_local),
-                        /* cleanup */ sail_destroy_read_options(read_options_local));
+
+    read_options_local->io_options = 0;
+
+    if (read_features->features & SAIL_CODEC_FEATURE_META_DATA) {
+        read_options_local->io_options |= SAIL_IO_OPTION_META_DATA;
+    }
+
+    if (read_features->features & SAIL_CODEC_FEATURE_ICCP) {
+        read_options_local->io_options |= SAIL_IO_OPTION_ICCP;
+    }
 
     *read_options = read_options_local;
 
@@ -88,11 +79,17 @@ sail_status_t sail_copy_read_options(const struct sail_read_options *source, str
     SAIL_CHECK_PTR(source);
     SAIL_CHECK_PTR(target);
 
-    void *ptr;
-    SAIL_TRY(sail_malloc(sizeof(struct sail_read_options), &ptr));
-    *target = ptr;
+    struct sail_read_options *target_local;
+    SAIL_TRY(sail_alloc_read_options(&target_local));
 
-    memcpy(*target, source, sizeof(struct sail_read_options));
+    target_local->io_options = source->io_options;
+
+    if (source->tuning != NULL) {
+        SAIL_TRY_OR_CLEANUP(sail_copy_hash_map(source->tuning, &target_local->tuning),
+                            /* cleanup */ sail_destroy_read_options(target_local));
+    }
+
+    *target = target_local;
 
     return SAIL_OK;
 }

@@ -27,12 +27,14 @@
 #define SAIL_CONTEXT_CPP_H
 
 #ifdef SAIL_BUILD
-    #include "context.h"
     #include "error.h"
     #include "export.h"
+
+    #include "context.h"
 #else
     #include <sail-common/error.h>
     #include <sail-common/export.h>
+
     #include <sail/context.h>
 #endif
 

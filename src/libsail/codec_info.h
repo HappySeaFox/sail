@@ -34,6 +34,7 @@ extern "C" {
 
 struct sail_io;
 struct sail_read_features;
+struct sail_string_node;
 struct sail_write_features;
 
 /*

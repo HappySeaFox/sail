@@ -37,6 +37,7 @@ public:
     {}
 
     const sail_read_features *sail_read_features_c;
+    sail::supported_tuning supported_tuning;
 };
 
 read_features::read_features(const read_features &rf)
@@ -48,6 +49,7 @@ read_features::read_features(const read_features &rf)
 read_features& read_features::operator=(const sail::read_features &read_features)
 {
     d->sail_read_features_c = read_features.d->sail_read_features_c;
+    d->supported_tuning     = read_features.d->supported_tuning;
 
     return *this;
 }
@@ -71,6 +73,11 @@ read_features::~read_features()
 int read_features::features() const
 {
     return d->sail_read_features_c->features;
+}
+
+const sail::supported_tuning& read_features::supported_tuning() const
+{
+    return d->supported_tuning;
 }
 
 sail_status_t read_features::to_read_options(sail::read_options *read_options) const
@@ -103,6 +110,10 @@ read_features::read_features(const sail_read_features *rf)
     }
 
     d->sail_read_features_c = rf;
+
+    for (const sail_string_node *node = rf->tuning; node != nullptr; node = node->next) {
+        d->supported_tuning.push_back(node->string);
+    }
 }
 
 const sail_read_features* read_features::sail_read_features_c() const

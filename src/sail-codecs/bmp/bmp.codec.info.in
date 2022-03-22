@@ -12,9 +12,11 @@ mime-types=image/bmp;image/x-bmp
 
 [read-features]
 features=STATIC;META-DATA
+tuning=
 
 [write-features]
 features=
+tuning=
 output-pixel-formats=
 properties=
 compression-types=

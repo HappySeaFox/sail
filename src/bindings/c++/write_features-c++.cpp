@@ -38,6 +38,7 @@ public:
 
     const sail_write_features *sail_write_features_c;
 
+    sail::supported_tuning supported_tuning;
     std::vector<SailPixelFormat> output_pixel_formats;
     std::vector<SailCompression> compressions;
 };
@@ -51,6 +52,7 @@ write_features::write_features(const write_features &wf)
 write_features& write_features::operator=(const sail::write_features &write_features)
 {
     d->sail_write_features_c = write_features.d->sail_write_features_c;
+    d->supported_tuning      = write_features.d->supported_tuning;
     d->output_pixel_formats  = write_features.d->output_pixel_formats;
     d->compressions          = write_features.d->compressions;
 
@@ -81,6 +83,11 @@ const std::vector<SailPixelFormat>& write_features::output_pixel_formats() const
 int write_features::features() const
 {
     return d->sail_write_features_c->features;
+}
+
+const sail::supported_tuning& write_features::supported_tuning() const
+{
+    return d->supported_tuning;
 }
 
 int write_features::properties() const
@@ -148,6 +155,10 @@ write_features::write_features(const sail_write_features *wf)
     }
 
     d->sail_write_features_c = wf;
+
+    for (const sail_string_node *node = wf->tuning; node != nullptr; node = node->next) {
+        d->supported_tuning.push_back(node->string);
+    }
 
     // Output pixel formats
     std::vector<SailPixelFormat> output_pixel_formats;

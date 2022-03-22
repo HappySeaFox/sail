@@ -37,6 +37,7 @@ sail_status_t sail_alloc_read_features(struct sail_read_features **read_features
     *read_features = ptr;
 
     (*read_features)->features = 0;
+    (*read_features)->tuning   = NULL;
 
     return SAIL_OK;
 }
@@ -47,5 +48,6 @@ void sail_destroy_read_features(struct sail_read_features *read_features) {
         return;
     }
 
+    sail_destroy_string_node_chain(read_features->tuning);
     sail_free(read_features);
 }

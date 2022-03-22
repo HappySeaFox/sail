@@ -505,6 +505,11 @@ SAIL_EXPORT sail_status_t sail_codec_write_init_v6_png(struct sail_io *io, const
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
+    /* Handle tuning. */
+    if (png_state->write_options->tuning != NULL) {
+        sail_traverse_hash_map_with_user_data(png_state->write_options->tuning, png_private_tuning_key_value_callback, png_state->png_ptr);
+    }
+
     png_set_write_fn(png_state->png_ptr, io, png_private_my_write_fn, png_private_my_flush_fn);
 
     return SAIL_OK;

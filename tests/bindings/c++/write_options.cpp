@@ -50,7 +50,10 @@ static MunitResult test_write_options(const MunitParameter params[], void *user_
         munit_assert(first_codec.write_features().to_write_options(&write_options) == SAIL_OK);
 
         const sail::write_options write_options2 = write_options;
-        munit_assert(write_options.io_options() == write_options2.io_options());
+        munit_assert(write_options.io_options()        == write_options2.io_options());
+        munit_assert(write_options.tuning()            == write_options2.tuning());
+        munit_assert(write_options.compression()       == write_options2.compression());
+        munit_assert(write_options.compression_level() == write_options2.compression_level());
     }
 
     // Move
@@ -62,6 +65,7 @@ static MunitResult test_write_options(const MunitParameter params[], void *user_
         const sail::write_options write_options3 = std::move(write_options2);
 
         munit_assert(write_options.io_options()        == write_options3.io_options());
+        munit_assert(write_options.tuning()            == write_options3.tuning());
         munit_assert(write_options.compression()       == write_options3.compression());
         munit_assert(write_options.compression_level() == write_options3.compression_level());
     }
