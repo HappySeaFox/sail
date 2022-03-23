@@ -236,6 +236,41 @@ SAIL_EXPORT void sail_destroy_io(struct sail_io *io);
  */
 SAIL_EXPORT sail_status_t sail_check_io_valid(const struct sail_io *io);
 
+/*
+ * Retrieves the I/O stream size. The stream must be seekable.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_io_size(struct sail_io *io, size_t *size);
+
+/*
+ * Reads the specified I/O stream until EOF into the memory buffer. Reads the stream
+ * from the current position and then rewinds it back (i.e. the stream must be seekable).
+ * The buffer must be large enough.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_io_contents_into_data(struct sail_io *io, void *data);
+
+/*
+ * Allocates a memory buffer and reads the specified I/O stream until EOF into it.
+ * Reads the stream from the current position and then rewinds it back (i.e. the stream
+ * must be seekable).
+ *
+ * The size of the memory buffer is stored in 'data_size'.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_io_contents_to_data(struct sail_io *io, void **data, size_t *data_size);
+
+/*
+ * Reads a string ended with '\n' from the I/O stream. Trailing new line characters
+ * are not stripped. The string buffer size must be >= 2 to hold at least "\n".
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_read_string_from_io(struct sail_io *io, char *str, size_t str_size);
+
 /* extern "C" */
 #ifdef __cplusplus
 }
