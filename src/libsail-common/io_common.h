@@ -261,7 +261,7 @@ SAIL_EXPORT sail_status_t sail_io_contents_into_data(struct sail_io *io, void *d
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_io_contents_to_data(struct sail_io *io, void **data, size_t *data_size);
+SAIL_EXPORT sail_status_t sail_alloc_data_from_io_contents(struct sail_io *io, void **data, size_t *data_size);
 
 /*
  * Reads a string ended with '\n' from the I/O stream. Trailing new line characters

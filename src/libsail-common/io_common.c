@@ -138,7 +138,7 @@ sail_status_t sail_io_contents_into_data(struct sail_io *io, void *data) {
     return SAIL_OK;
 }
 
-sail_status_t sail_io_contents_to_data(struct sail_io *io, void **data, size_t *data_size) {
+sail_status_t sail_alloc_data_from_io_contents(struct sail_io *io, void **data, size_t *data_size) {
 
     SAIL_CHECK_PTR(io);
     SAIL_CHECK_PTR(data);
