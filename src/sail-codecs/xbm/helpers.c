@@ -27,41 +27,12 @@
 
 #include "helpers.h"
 
-static const unsigned char reverse_lookup_4bits[16] = {
+static const unsigned char reverse_lookup_4bits[] = {
     0x0, 0x8, 0x4, 0xc, 0x2, 0xa, 0x6, 0xe,
-    0x1, 0x9, 0x5, 0xd, 0x3, 0xb, 0x7, 0xf
+    0x1, 0x9, 0x5, 0xd, 0x3, 0xb, 0x7, 0xf,
 };
 
 unsigned char xbm_private_reverse_byte(unsigned char byte) {
 
    return (reverse_lookup_4bits[byte & 0xF] << 4) | reverse_lookup_4bits[byte >> 4];
-}
-
-sail_status_t xbm_private_skip_comments(struct sail_io *io, char *str, size_t str_size, size_t *str_start_pos) {
-
-/*
-    size_t pos;
-
-    do
-    {
-        SAIL_TRY(io->tell(io->stream, &pos));
-
-        char str[512 + 1];
-        unsigned i = 0;
-
-        do {
-            SAIL_TRY(io->strict_read(io->stream, str + i++, 1));
-        } while(i < sizeof(str) - 1 || str[i - 1] != '\n');
-
-        if (strstr(str, "/*") == NULL) {
-            break;
-        }
-    } while(true);
-
-
-        SAIL_TRY(io->seek(io->stream, 0, SEEK_SET));
-    fsetpos(fp, (fpos_t*)&pos);
-*/
-
-    return SAIL_OK;
 }

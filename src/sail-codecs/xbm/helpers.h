@@ -26,15 +26,8 @@
 #ifndef SAIL_XBM_HELPERS_H
 #define SAIL_XBM_HELPERS_H
 
-#include <stddef.h>
-
-#include "error.h"
 #include "export.h"
 
-struct sail_io;
-
 SAIL_HIDDEN unsigned char xbm_private_reverse_byte(unsigned char byte);
-
-SAIL_HIDDEN sail_status_t xbm_private_skip_comments(struct sail_io *io, char *str, size_t str_size, size_t *str_start_pos);
 
 #endif

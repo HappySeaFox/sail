@@ -146,9 +146,6 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_xbm(void *state, st
         SAIL_TRY(sail_read_string_from_io(io, buf, sizeof(buf)));
     } while(strstr(buf, "#define ") != NULL);
 
-    /* Pixels. */
-    //if (str[0] == '\n') if(!sq_fgets(str, sizeof(str)-1, fptr)) return SQE_R_BADFILE;
-
     if ((ptr = strchr(buf, '[')) == NULL || strchr(ptr, '{') == NULL) {
         SAIL_LOG_ERROR("XBM: C array declaration is not found");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
