@@ -82,11 +82,6 @@ static int codec_feature_from_string(const char *str) {
     return sail_codec_feature_from_string(str);
 }
 
-static int image_property_from_string(const char *str) {
-
-    return sail_image_property_from_string(str);
-}
-
 static sail_status_t parse_flags(const char *value, int *features, int (*converter)(const char *str)) {
 
     SAIL_CHECK_PTR(value);
@@ -203,9 +198,6 @@ static sail_status_t inih_handler_sail_error(void *data, const char *section, co
                                                         &codec_info->write_features->output_pixel_formats_length,
                                                         pixel_format_from_string),
                                 /* cleanup */ SAIL_LOG_ERROR("Failed to parse output pixel formats: '%s'", value));
-        } else if (strcmp(name, "properties") == 0) {
-            SAIL_TRY_OR_CLEANUP(parse_flags(value, &codec_info->write_features->properties, image_property_from_string),
-                                /* cleanup */ SAIL_LOG_ERROR("Failed to parse image properties: '%s'", value));
         } else if (strcmp(name, "compression-types") == 0) {
             SAIL_TRY_OR_CLEANUP(parse_serialized_ints(value,
                                                         (int **)&codec_info->write_features->compressions,

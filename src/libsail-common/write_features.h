@@ -71,12 +71,6 @@ struct sail_write_features {
     struct sail_string_node *tuning;
 
     /*
-     * Required or-ed image properties. For example, an input image must be flipped by a caller
-     * before writing it with SAIL. See SailImageProperty.
-     */
-    int properties;
-
-    /*
      * A list of supported pixels compression types by this codec. If the list has more than
      * two entries, compression levels are ignored.
      *
