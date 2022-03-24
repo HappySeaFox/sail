@@ -107,12 +107,6 @@ public:
     const sail::supported_tuning& supported_tuning() const;
 
     /*
-     * Returns the required or-ed image properties. For example, an input image must be flipped
-     * by a caller before writing it with SAIL. See SailImageProperty.
-     */
-    int properties() const;
-
-    /*
      * Returns the list of supported pixels compression types by this codec. If the list has more than
      * two entries, compression levels are ignored.
      *

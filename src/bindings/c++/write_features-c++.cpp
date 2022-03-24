@@ -90,11 +90,6 @@ const sail::supported_tuning& write_features::supported_tuning() const
     return d->supported_tuning;
 }
 
-int write_features::properties() const
-{
-    return d->sail_write_features_c->properties;
-}
-
 const std::vector<SailCompression>& write_features::compressions() const
 {
     return d->compressions;
