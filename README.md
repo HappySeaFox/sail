@@ -88,6 +88,7 @@ images with the help of [ksquirrel-libs](FAQ.md#how-old-is-sail), the predecesso
 | 13 | [TIFF](https://wikipedia.org/wiki/TIFF)                             | RW            | libtiff           |
 | .. | ...                                                                 |               |                   |
 | 15 | [WEBP](https://wikipedia.org/wiki/WebP)                             | R             | libwebp           |
+| .. | ...                                                                 |               |                   |
 
 See the full list [here](FORMATS.md). Work to add more image formats is ongoing.
 

@@ -102,7 +102,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_svg(struct sail_io *io, const 
     /* Read the entire image as the resvg API requires. */
     void *image_data;
     size_t image_size;
-    SAIL_TRY(sail_io_contents_to_data(io, &image_data, &image_size));
+    SAIL_TRY(sail_alloc_data_from_io_contents(io, &image_data, &image_size));
 
     svg_state->resvg_options = resvg_options_create();
 

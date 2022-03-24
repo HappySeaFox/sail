@@ -297,6 +297,21 @@
     <td>-</td>
     <td>libwebp</td>
 </tr>
+<tr>
+    <td>16</td>
+    <td><a href="https://en.wikipedia.org/wiki/X_BitMap">XBM</a></td>
+    <td>
+        <b>Bit depth:</b> 1-bit.
+        <br/><br/>
+        <b>Content:</b> Static.
+    </td>
+    <td>
+        <b>Content:</b> Multi-paged, C-style /*...*/ comments.
+    </td>
+    <td>Unsupported</td>
+    <td>-</td>
+    <td>-</td>
+</tr>
 </tbody>
 </table>
 
