@@ -1,0 +1,27 @@
+# XBM codec information
+#
+[codec]
+layout=6
+version=0.7.0
+priority=LOWEST
+name=XBM
+description=X BitMap
+magic-numbers=
+extensions=xbm
+mime-types=image/x-xbitmap;image/x-xbm
+
+[read-features]
+features=STATIC
+tuning=
+
+[write-features]
+features=
+tuning=
+output-pixel-formats=
+properties=
+compression-types=
+default-compression=
+compression-level-min=0
+compression-level-max=0
+compression-level-default=0
+compression-level-step=0
