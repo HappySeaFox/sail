@@ -86,8 +86,7 @@ SAIL_HIDDEN void destroy_linked_list_node(struct linked_list_node *node,
                                           linked_list_value_deallocator_t value_deallocator);
 
 /*
- * Makes a deep copy of the specified linked list node. The assigned node MUST be destroyed
- * later with destroy_linked_list_node().
+ * Makes a deep copy of the specified linked list node.
  *
  * Returns SAIL_OK on success.
  */
@@ -104,8 +103,7 @@ SAIL_HIDDEN void destroy_linked_list_node_chain(struct linked_list_node *node,
                                                 linked_list_value_deallocator_t value_deallocator);
 
 /*
- * Makes a deep copy of the specified linked list node chain. The assigned chain MUST be destroyed
- * later with destroy_linked_list_node_chain(). If the source chain is NULL, it assigns NULL
+ * Makes a deep copy of the specified linked list node chain. If the source chain is NULL, it assigns NULL
  * to the target chain and returns SAIL_OK.
  *
  * Returns SAIL_OK on success.

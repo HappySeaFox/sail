@@ -43,9 +43,9 @@ struct sail_io;
 struct sail_codec_info;
 
 /*
- * Loads the specified image file and returns its properties without pixels. The assigned image
- * MUST be destroyed later with sail_destroy_image(). The assigned codec info MUST NOT be destroyed
- * because it is a pointer to an internal data structure. If you don't need it, just pass NULL.
+ * Loads the specified image file and returns its properties without pixels.
+ * The assigned codec info MUST NOT be destroyed because it is a pointer to an internal
+ * data structure. If you don't need it, just pass NULL.
  *
  * This function is pretty fast because it doesn't decode whole image data for most image formats.
  *
@@ -56,8 +56,7 @@ struct sail_codec_info;
 SAIL_EXPORT sail_status_t sail_probe_file(const char *path, struct sail_image **image, const struct sail_codec_info **codec_info);
 
 /*
- * Loads the specified image file and returns its properties and pixels. The assigned image
- * MUST be destroyed later with sail_destroy_image().
+ * Loads the specified image file and returns its properties and pixels.
  *
  * Typical usage: This is a standalone function that could be called at any time.
  *
@@ -67,7 +66,6 @@ SAIL_EXPORT sail_status_t sail_load_image_from_file(const char *path, struct sai
 
 /*
  * Loads an image from the specified memory buffer and returns its properties and pixels.
- * The assigned image MUST be destroyed later with sail_destroy_image().
  *
  * Typical usage: This is a standalone function that could be called at any time.
  *

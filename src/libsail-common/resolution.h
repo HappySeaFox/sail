@@ -52,7 +52,7 @@ struct sail_resolution {
 };
 
 /*
- * Allocates a new resolution. The assigned resolution MUST be destroyed later with sail_destroy_resolution().
+ * Allocates a new resolution.
  *
  * Returns SAIL_OK on success.
  */
@@ -60,7 +60,6 @@ SAIL_EXPORT sail_status_t sail_alloc_resolution(struct sail_resolution **resolut
 
 /*
  * Allocates a new resolution and initializes its fields with the specified values.
- * The assigned resolution MUST be destroyed later with sail_destroy_resolution().
  *
  * Returns SAIL_OK on success.
  */
@@ -72,8 +71,7 @@ SAIL_EXPORT sail_status_t sail_alloc_resolution_from_data(enum SailResolutionUni
 SAIL_EXPORT void sail_destroy_resolution(struct sail_resolution *resolution);
 
 /*
- * Makes a deep copy of the specified resolution. The assigned resolution MUST be destroyed
- * later with sail_destroy_resolution().
+ * Makes a deep copy of the specified resolution.
  *
  * Returns SAIL_OK on success.
  */

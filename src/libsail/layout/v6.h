@@ -88,7 +88,6 @@ sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_read_init_v6)(struct sail_io 
  * SAIL uses this method in reading and probing operations.
  *
  * SAIL uses sail_codec_read_frame_vx() to actually read the frame.
- * The assigned image MUST be destroyed later with sail_destroy_image() by the client.
  *
  * libsail, a caller of this function, guarantees the following:
  *   - The state points to the state allocated by sail_codec_read_init_vx().

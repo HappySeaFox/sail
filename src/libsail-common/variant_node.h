@@ -76,8 +76,7 @@ SAIL_EXPORT sail_status_t sail_alloc_variant_node_and_value(struct sail_variant_
 SAIL_EXPORT void sail_destroy_variant_node(struct sail_variant_node *node);
 
 /*
- * Makes a deep copy of the specified variant node. The assigned node MUST be destroyed
- * later with sail_destroy_variant_node().
+ * Makes a deep copy of the specified variant node.
  *
  * Returns SAIL_OK on success.
  */
@@ -91,8 +90,7 @@ SAIL_EXPORT sail_status_t sail_copy_variant_node(const struct sail_variant_node 
 SAIL_EXPORT void sail_destroy_variant_node_chain(struct sail_variant_node *node);
 
 /*
- * Makes a deep copy of the specified variant node chain. The assigned chain MUST be destroyed
- * later with sail_destroy_variant_node_chain(). If the source chain is NULL, it assigns NULL
+ * Makes a deep copy of the specified variant node chain. If the source chain is NULL, it assigns NULL
  * to the target chain and returns SAIL_OK.
  *
  * Returns SAIL_OK on success.

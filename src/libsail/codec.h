@@ -68,7 +68,6 @@ typedef struct sail_codec sail_codec_t;
 /*
  * Loads the specified codec by its info and saves its handle and exported interfaces into
  * the specified codec instance.
- * The assigned codec MUST be destroyed later with sail_destroy_codec().
  *
  * Returns SAIL_OK on success.
  */

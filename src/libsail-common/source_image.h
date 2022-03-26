@@ -101,7 +101,7 @@ struct sail_source_image {
 typedef struct sail_source_image sail_source_image_t;
 
 /*
- * Allocates a new source image. The assigned source image MUST be destroyed later with sail_destroy_source_image().
+ * Allocates a new source image.
  *
  * Returns SAIL_OK on success.
  */
@@ -114,8 +114,7 @@ SAIL_EXPORT sail_status_t sail_alloc_source_image(struct sail_source_image **sou
 SAIL_EXPORT void sail_destroy_source_image(struct sail_source_image *source_image);
 
 /*
- * Makes a deep copy of the specified source image. The assigned source image MUST be destroyed later
- * with sail_destroy_source_image().
+ * Makes a deep copy of the specified source image.
  *
  * Returns SAIL_OK on success.
  */

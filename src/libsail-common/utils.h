@@ -75,7 +75,6 @@ SAIL_EXPORT sail_status_t sail_strdup_length(const char *input, size_t length, c
 
 /*
  * Concatenates 'num' number of strings together and puts the result into the specified output string.
- * The assigned output string MUST be destroyed later with sail_free().
  *
  * Returns SAIL_OK on success.
  */
@@ -88,7 +87,6 @@ SAIL_EXPORT void sail_to_lower(char *str);
 
 /*
  * Converts the specified char* string into a wchar_t* string.
- * The assigned output string MUST be destroyed later with sail_free().
  *
  * Returns SAIL_OK on success.
  */

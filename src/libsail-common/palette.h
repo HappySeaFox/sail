@@ -72,7 +72,7 @@ struct sail_palette {
 typedef struct sail_palette sail_palette_t;
 
 /*
- * Allocates a new palette. The assigned palette MUST be destroyed later with sail_destroy_palette().
+ * Allocates a new palette.
  *
  * Returns SAIL_OK on success.
  */
@@ -85,26 +85,24 @@ SAIL_EXPORT sail_status_t sail_alloc_palette(struct sail_palette **palette);
 SAIL_EXPORT void sail_destroy_palette(struct sail_palette *palette);
 
 /*
- * Makes a deep copy of the specified palette. The assigned palette MUST be destroyed later
- * with sail_destroy_palette().
+ * Makes a deep copy of the specified palette.
  *
  * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_copy_palette(const struct sail_palette *source_palette, struct sail_palette **target_palette);
 
 /*
- * Allocates a new palette to be filled later with data. The allocated palette MUST be destroyed later
- * with sail_destroy_palette().
+ * Allocates a new palette to be filled later with data.
  *
- * Use this function to allocate a palette and fill its data later with some algorithm (memcpy or for-loop, for example).
+ * Use this function to allocate a palette and fill its data later with
+ * some algorithm (memcpy or for-loop, for example).
  *
  * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_alloc_palette_for_data(enum SailPixelFormat pixel_format, unsigned color_count, struct sail_palette **palette);
 
 /*
- * Allocates a new palette and deep copies the specified data. The allocated palette MUST be destroyed later
- * with sail_destroy_palette().
+ * Allocates a new palette and deep copies the specified data.
  *
  * Returns SAIL_OK on success.
  */

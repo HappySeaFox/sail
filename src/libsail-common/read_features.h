@@ -66,8 +66,7 @@ struct sail_read_features {
 typedef struct sail_read_features sail_read_features_t;
 
 /*
- * Allocates read features. The assigned read features MUST be destroyed later
- * with sail_destroy_read_features().
+ * Allocates read features.
  *
  * Returns SAIL_OK on success.
  */

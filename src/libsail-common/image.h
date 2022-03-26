@@ -178,7 +178,7 @@ struct sail_image {
 typedef struct sail_image sail_image_t;
 
 /*
- * Allocates a new image. The assigned image MUST be destroyed later with sail_destroy_image().
+ * Allocates a new image.
  *
  * Returns SAIL_OK on success.
  */
@@ -191,7 +191,7 @@ SAIL_EXPORT sail_status_t sail_alloc_image(struct sail_image **image);
 SAIL_EXPORT void sail_destroy_image(struct sail_image *image);
 
 /*
- * Makes a deep copy of the specified image. The assigned image MUST be destroyed later with sail_destroy_image().
+ * Makes a deep copy of the specified image.
  *
  * Returns SAIL_OK on success.
  */
@@ -199,7 +199,6 @@ SAIL_EXPORT sail_status_t sail_copy_image(const struct sail_image *source, struc
 
 /*
  * Makes a deep copy of the specified image without its pixels and palette.
- * The assigned image MUST be destroyed later with sail_destroy_image().
  *
  * This function could be used in pixel conversion procedures when you need to preserve all the image info
  * except pixels.

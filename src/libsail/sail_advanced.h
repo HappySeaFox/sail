@@ -41,9 +41,9 @@ extern "C" {
 struct sail_codec_info;
 
 /*
- * Loads an image from the specified I/O source and returns its properties without pixels. The assigned image
- * MUST be destroyed later with sail_destroy_image(). The assigned codec info MUST NOT be destroyed
- * because it is a pointer to an internal data structure. If you don't need it, just pass NULL.
+ * Loads an image from the specified I/O source and returns its properties without pixels.
+ * The assigned codec info MUST NOT be destroyed because it is a pointer to an internal
+ * data structure. If you don't need it, just pass NULL.
  *
  * This function is pretty fast because it doesn't decode whole image data for most image formats.
  *
@@ -54,9 +54,9 @@ struct sail_codec_info;
 SAIL_EXPORT sail_status_t sail_probe_io(struct sail_io *io, struct sail_image **image, const struct sail_codec_info **codec_info);
 
 /*
- * Loads an image from the specified memory buffer and returns its properties without pixels. The assigned image
- * MUST be destroyed later with sail_destroy_image(). The assigned codec info MUST NOT be destroyed
- * because it is a pointer to an internal data structure. If you don't need it, just pass NULL.
+ * Loads an image from the specified memory buffer and returns its properties without pixels.
+ * The assigned codec info MUST NOT be destroyed because it is a pointer to an internal
+ * data structure. If you don't need it, just pass NULL.
  *
  * This function is pretty fast because it doesn't decode whole image data for most image formats.
  *
@@ -106,8 +106,7 @@ SAIL_EXPORT sail_status_t sail_start_reading_memory(const void *buffer, size_t b
                                                     const struct sail_codec_info *codec_info, void **state);
 
 /*
- * Continues reading the file started by sail_start_reading_file() and brothers. The assigned image
- * MUST be destroyed later with sail_image_destroy().
+ * Continues reading the file started by sail_start_reading_file() and brothers.
  *
  * Returns SAIL_OK on success.
  * Returns SAIL_ERROR_NO_MORE_FRAMES when no more frames are available.

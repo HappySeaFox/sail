@@ -41,8 +41,7 @@ struct sail_codec_bundle;
  */
 
 /*
- * Allocates a new codec bundle. The assigned bundle MUST be destroyed later
- * with destroy_codec_bundle().
+ * Allocates a new codec bundle.
  *
  * Returns SAIL_OK on success.
  */

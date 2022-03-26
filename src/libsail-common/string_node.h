@@ -67,8 +67,7 @@ SAIL_EXPORT sail_status_t sail_alloc_string_node(struct sail_string_node **node)
 SAIL_EXPORT void sail_destroy_string_node(struct sail_string_node *node);
 
 /*
- * Makes a deep copy of the specified string node. The assigned node MUST be destroyed
- * later with sail_destroy_string_node().
+ * Makes a deep copy of the specified string node.
  *
  * Returns SAIL_OK on success.
  */
@@ -81,8 +80,7 @@ SAIL_EXPORT sail_status_t sail_copy_string_node(const struct sail_string_node *s
 SAIL_EXPORT void sail_destroy_string_node_chain(struct sail_string_node *node);
 
 /*
- * Makes a deep copy of the specified string node chain. The assigned chain MUST be destroyed
- * later with sail_destroy_string_node_chain(). If the source chain is NULL, it assigns NULL
+ * Makes a deep copy of the specified string node chain. If the source chain is NULL, it assigns NULL
  * to the target chain and returns SAIL_OK.
  *
  * Returns SAIL_OK on success.

@@ -48,7 +48,6 @@ struct sail_write_features;
 
 /*
  * Converts the input image to the pixel format and saves the result in the output image.
- * The output image MUST be destroyed later with sail_destroy_image().
  *
  * Drops the input alpha channel if the output alpha channel doesn't exist. For example,
  * when converting RGBA pixels to RGB. If you need to control this behavior,
@@ -104,7 +103,6 @@ SAIL_EXPORT sail_status_t sail_convert_image(const struct sail_image *image,
 
 /*
  * Converts the input image to the pixel format and saves the result in the output image.
- * The output image MUST be destroyed later with sail_destroy_image().
  *
  * Options (which may be NULL) control the conversion behavior.
  *

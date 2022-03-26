@@ -39,8 +39,7 @@ extern "C" {
 struct sail_codec_bundle_node;
 
 /*
- * Allocates a new codec bundle node. The assigned node MUST be destroyed later
- * with destroy_codec_bundle_node().
+ * Allocates a new codec bundle node.
  *
  * Returns SAIL_OK on success.
  */

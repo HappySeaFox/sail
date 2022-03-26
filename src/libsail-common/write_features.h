@@ -113,8 +113,7 @@ struct sail_write_features {
 typedef struct sail_write_features sail_write_features_t;
 
 /*
- * Allocates write features. The assigned write features MUST be destroyed later
- * with sail_destroy_write_features().
+ * Allocates write features.
  *
  * Returns SAIL_OK on success.
  */

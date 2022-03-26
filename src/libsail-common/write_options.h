@@ -75,8 +75,7 @@ struct sail_write_options {
 typedef struct sail_write_options sail_write_options_t;
 
 /*
- * Allocates write options. The assigned write options MUST be destroyed later
- * with sail_destroy_write_options().
+ * Allocates write options.
  *
  * Returns SAIL_OK on success.
  */
@@ -91,15 +90,13 @@ SAIL_EXPORT void sail_destroy_write_options(struct sail_write_options *write_opt
 
 /*
  * Allocates and builds default write options from the write features.
- * The assigned write options MUST be destroyed later with sail_destroy_write_options().
  *
  * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_alloc_write_options_from_features(const struct sail_write_features *write_features, struct sail_write_options **write_options);
 
 /*
- * Makes a deep copy of the specified write options object. The assigned write options MUST be destroyed later
- * with sail_destroy_write_options().
+ * Makes a deep copy of the specified write options object.
  *
  * Returns SAIL_OK on success.
  */

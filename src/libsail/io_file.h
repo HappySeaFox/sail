@@ -42,7 +42,6 @@ struct sail_io;
 
 /*
  * Opens the specified image file for reading and allocates a new I/O object for it.
- * The assigned I/O object MUST be destroyed later with sail_destroy_io().
  * sail_io.stream is a pointer to a FILE.
  *
  * Returns SAIL_OK on success.
@@ -51,7 +50,6 @@ SAIL_EXPORT sail_status_t sail_alloc_io_read_file(const char *path, struct sail_
 
 /*
  * Opens the specified image file for reading and writing, and allocates a new I/O object for it.
- * The assigned I/O object MUST be destroyed later with sail_destroy_io().
  * sail_io.stream is a pointer to a FILE.
  *
  * Returns SAIL_OK on success.

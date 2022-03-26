@@ -70,7 +70,7 @@ struct sail_conversion_options {
 typedef struct sail_conversion_options sail_conversion_options_t;
 
 /*
- * Allocates new conversion options. The assigned options MUST be destroyed later with sail_destroy_conversion_options().
+ * Allocates new conversion options.
  *
  * Returns SAIL_OK on success.
  */
