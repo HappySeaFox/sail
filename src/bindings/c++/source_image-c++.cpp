@@ -48,6 +48,7 @@ public:
 
 public:
     struct sail_source_image *sail_source_image;
+    sail::special_properties special_properties;
 };
 
 source_image::source_image()
@@ -112,6 +113,11 @@ SailCompression source_image::compression() const
     return d->sail_source_image->compression;
 }
 
+const sail::special_properties &source_image::special_properties() const
+{
+    return d->special_properties;
+}
+
 source_image::source_image(const sail_source_image *si)
     : source_image()
 {
@@ -123,16 +129,29 @@ source_image::source_image(const sail_source_image *si)
     with_pixel_format(si->pixel_format)
         .with_chroma_subsampling(si->chroma_subsampling)
         .with_properties(si->properties)
-        .with_compression(si->compression);
+        .with_compression(si->compression)
+        .with_special_properties(utils_private::c_tuning_to_cpp_tuning(si->special_properties));
 }
 
 sail_status_t source_image::to_sail_source_image(sail_source_image **source_image) const
 {
     SAIL_CHECK_PTR(source_image);
 
-    SAIL_TRY(sail_alloc_source_image(source_image));
+    sail_source_image *source_image_local;
+    SAIL_TRY(sail_alloc_source_image(&source_image_local));
 
-    **source_image = *d->sail_source_image;
+    source_image_local->pixel_format       = d->sail_source_image->pixel_format;
+    source_image_local->chroma_subsampling = d->sail_source_image->chroma_subsampling;
+    source_image_local->properties         = d->sail_source_image->properties;
+    source_image_local->compression        = d->sail_source_image->compression;
+
+    SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&source_image_local->special_properties),
+                        /* cleanup */ sail_destroy_source_image(source_image_local));
+
+    SAIL_TRY_OR_CLEANUP(utils_private::cpp_tuning_to_sail_tuning(d->special_properties, source_image_local->special_properties),
+                        /* cleanup */ sail_destroy_source_image(source_image_local));
+
+    *source_image = source_image_local;
 
     return SAIL_OK;
 }
@@ -161,5 +180,10 @@ source_image& source_image::with_compression(SailCompression compression)
     return *this;
 }
 
+source_image& source_image::with_special_properties(const sail::special_properties &special_properties)
+{
+    d->special_properties = special_properties;
+    return *this;
+}
 
 }

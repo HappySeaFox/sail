@@ -82,6 +82,11 @@
         <b>Bit depth:</b> Same to BMP.
         <br/><br/>
         <b>Content:</b> Static, Multi-paged.
+        <br/><br/>
+        <b>Special properties:</b> Key: <i>"cur-hotspot-x"</i>. Description: X coordinate of the hotspot.
+        Possible values: unsigned int.
+        Key: <i>"cur-hotspot-y"</i>. Description: Y coordinate of the hotspot.
+        Possible values: unsigned int.
     </td>
     <td>PNG contained images</td>
     <td>Unsupported</td>

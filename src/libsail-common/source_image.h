@@ -40,6 +40,8 @@
 extern "C" {
 #endif
 
+struct sail_hash_map;
+
 /*
  * sail_source_image represents source image properties. The structure is used in reading
  * operations only to preserve the source image properties which are usually lost during decoding.
@@ -80,6 +82,20 @@ struct sail_source_image {
      * WRITE: Ignored.
      */
     enum SailCompression compression;
+
+    /*
+     * Image format-specific properties that cannot be expressed
+     * in a common way. For example, a cursor hot spot.
+     *
+     * Can be NULL.
+     *
+     * Special properties' names start with the codec name to avoid confusing.
+     * For example, "cur-hotspot-x".
+     *
+     * READ:  Set by SAIL to valid source image special properties.
+     * WRITE: Ignored.
+     */
+    struct sail_hash_map *special_properties;
 };
 
 typedef struct sail_source_image sail_source_image_t;

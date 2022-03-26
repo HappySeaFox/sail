@@ -178,6 +178,12 @@ sail_status_t sail_test_compare_source_images(const struct sail_source_image *so
     munit_assert(source_image1->properties == source_image2->properties);
     munit_assert(source_image1->compression == source_image2->compression);
 
+    if (source_image1->special_properties == NULL) {
+        munit_assert_null(source_image2->special_properties);
+    } else {
+        munit_assert(sail_test_compare_hash_maps(source_image1->special_properties, source_image2->special_properties) == SAIL_OK);
+    }
+
     return SAIL_OK;
 }
 

@@ -1,6 +1,6 @@
 /*  This file is part of SAIL (https://github.com/smoked-herring/sail)
 
-    Copyright (c) 2020 Dmitry Baryshev
+    Copyright (c) 2022 Dmitry Baryshev
 
     The MIT License
 
@@ -23,48 +23,27 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_ICO_HELPERS_H
-#define SAIL_ICO_HELPERS_H
+#ifndef SAIL_SPECIAL_PROPERTIES_CPP_H
+#define SAIL_SPECIAL_PROPERTIES_CPP_H
 
-#include <stdint.h>
+#include <string>
+#include <unordered_map>
 
-#include "error.h"
-#include "export.h"
+#ifdef SAIL_BUILD
+    #include "variant-c++.h"
+#else
+    #include <sail-c++/variant-c++.h>
+#endif
 
-struct sail_io;
-
-/* File header. */
-struct SailIcoHeader
+namespace sail
 {
-    uint16_t reserved;
-    uint16_t type; /* 1 = ICO, 2 = CUR. */
-    uint16_t images_count;
-};
 
-struct SailIcoDirEntry
-{
-    uint8_t width;
-    uint8_t height;
-    uint8_t color_count; /* 0 when full color. */
-    uint8_t reserved;
-    uint16_t planes; /* CUR: x hotspot. */
-    uint16_t bit_count; /* CUR: y hotspot. */
-    uint32_t image_size;
-    uint32_t image_offset;
-};
+/*
+ * Image format-specific properties that cannot be expressed
+ * in a common way. For example, a cursor hot spot.
+ */
+using special_properties = std::unordered_map<std::string, variant>;
 
-enum SailIcoImageType
-{
-    SAIL_ICO_IMAGE_BMP,
-    SAIL_ICO_IMAGE_PNG,
-};
-
-SAIL_HIDDEN sail_status_t ico_private_read_header(struct sail_io *io, struct SailIcoHeader *header);
-
-SAIL_HIDDEN sail_status_t ico_private_read_dir_entry(struct sail_io *io, struct SailIcoDirEntry *dir_entry);
-
-SAIL_HIDDEN sail_status_t ico_private_probe_image_type(struct sail_io *io, enum SailIcoImageType *ico_image_type);
-
-SAIL_HIDDEN sail_status_t ico_private_store_cur_hotspot(const struct SailIcoDirEntry *ico_dir_entry, struct sail_hash_map *special_properties);
+}
 
 #endif

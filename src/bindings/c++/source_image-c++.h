@@ -31,9 +31,13 @@
 #ifdef SAIL_BUILD
     #include "error.h"
     #include "export.h"
+
+    #include "special_properties-c++.h"
 #else
     #include <sail-common/error.h>
     #include <sail-common/export.h>
+
+    #include <sail-c++/special_properties-c++.h>
 #endif
 
 struct sail_source_image;
@@ -119,6 +123,18 @@ public:
      */
     SailCompression compression() const;
 
+    /*
+     * Returns image format-specific properties that cannot be expressed
+     * in a common way. For example, a cursor hot spot.
+     *
+     * Special properties' names start with the codec name to avoid confusing.
+     * For example, "cur-hotspot-x".
+     *
+     * READ:  Set by SAIL to valid source image special properties.
+     * WRITE: Ignored.
+     */
+    const sail::special_properties &special_properties() const;
+
 private:
     /*
      * Makes a deep copy of the specified source image.
@@ -131,6 +147,7 @@ private:
     source_image& with_chroma_subsampling(SailChromaSubsampling chroma_subsampling);
     source_image& with_properties(int properties);
     source_image& with_compression(SailCompression compression);
+    source_image& with_special_properties(const sail::special_properties &special_properties);
 
 private:
     class pimpl;

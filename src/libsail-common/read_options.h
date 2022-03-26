@@ -55,6 +55,8 @@ struct sail_read_options {
      * to 0 in read options. Tuning options' names start with the codec name
      * to avoid confusing.
      *
+     * Can be NULL.
+     *
      * The list of possible values for every tuning option is not current available
      * programmatically. Every codec must document them in the codec info.
      *
