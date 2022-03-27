@@ -27,48 +27,48 @@
 
 sail_status_t sail_alloc_variant_node(struct sail_variant_node **node) {
 
-    SAIL_TRY(alloc_linked_list_node((struct linked_list_node **)node));
+    SAIL_TRY(sail_private_alloc_linked_list_node((struct linked_list_node **)node));
 
     return SAIL_OK;
 }
 
 sail_status_t sail_alloc_variant_node_and_value(struct sail_variant_node **node) {
 
-    SAIL_TRY(alloc_linked_list_node_and_value((linked_list_value_allocator_t)&sail_alloc_variant,
-                                              (linked_list_value_deallocator_t)&sail_destroy_variant,
-                                              (struct linked_list_node **)node));
+    SAIL_TRY(sail_private_alloc_linked_list_node_and_value((linked_list_value_allocator_t)&sail_alloc_variant,
+                                                           (linked_list_value_deallocator_t)&sail_destroy_variant,
+                                                           (struct linked_list_node **)node));
 
     return SAIL_OK;
 }
 
 void sail_destroy_variant_node(struct sail_variant_node *node) {
 
-    destroy_linked_list_node((struct linked_list_node *)node,
-                             (linked_list_value_deallocator_t)&sail_destroy_variant);
+    sail_private_destroy_linked_list_node((struct linked_list_node *)node,
+                                          (linked_list_value_deallocator_t)&sail_destroy_variant);
 }
 
 sail_status_t sail_copy_variant_node(const struct sail_variant_node *source, struct sail_variant_node **target) {
 
-    SAIL_TRY(copy_linked_list_node((const struct linked_list_node *)source,
-                                   (struct linked_list_node **)target,
-                                   (linked_list_value_copier_t)sail_copy_variant,
-                                   (linked_list_value_deallocator_t)&sail_destroy_variant));
+    SAIL_TRY(sail_private_copy_linked_list_node((const struct linked_list_node *)source,
+                                                (struct linked_list_node **)target,
+                                                (linked_list_value_copier_t)sail_copy_variant,
+                                                (linked_list_value_deallocator_t)&sail_destroy_variant));
 
     return SAIL_OK;
 }
 
 void sail_destroy_variant_node_chain(struct sail_variant_node *node) {
 
-    destroy_linked_list_node_chain((struct linked_list_node *)node,
-                                   (linked_list_value_deallocator_t)&sail_destroy_variant);
+    sail_private_destroy_linked_list_node_chain((struct linked_list_node *)node,
+                                                (linked_list_value_deallocator_t)&sail_destroy_variant);
 }
 
 sail_status_t sail_copy_variant_node_chain(const struct sail_variant_node *source, struct sail_variant_node **target) {
 
-    SAIL_TRY(copy_linked_list_node_chain((const struct linked_list_node *)source,
-                                         (struct linked_list_node **)target,
-                                         (linked_list_value_copier_t)sail_copy_variant,
-                                         (linked_list_value_deallocator_t)&sail_destroy_variant));
+    SAIL_TRY(sail_private_copy_linked_list_node_chain((const struct linked_list_node *)source,
+                                                      (struct linked_list_node **)target,
+                                                      (linked_list_value_copier_t)sail_copy_variant,
+                                                      (linked_list_value_deallocator_t)&sail_destroy_variant));
 
     return SAIL_OK;
 }

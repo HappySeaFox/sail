@@ -68,39 +68,39 @@ typedef void (*linked_list_value_deallocator_t)(void *value);
  *
  * Returns SAIL_OK on success.
  */
-SAIL_HIDDEN sail_status_t alloc_linked_list_node(struct linked_list_node **node);
+SAIL_EXPORT sail_status_t sail_private_alloc_linked_list_node(struct linked_list_node **node);
 
 /*
  * Allocates a new linked list node and the nested value.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_HIDDEN sail_status_t alloc_linked_list_node_and_value(linked_list_value_allocator_t value_allocator,
-                                                           linked_list_value_deallocator_t value_deallocator,
-                                                           struct linked_list_node **node);
+SAIL_EXPORT sail_status_t sail_private_alloc_linked_list_node_and_value(linked_list_value_allocator_t value_allocator,
+                                                                        linked_list_value_deallocator_t value_deallocator,
+                                                                        struct linked_list_node **node);
 
 /*
  * Destroys the specified linked list node.
  */
-SAIL_HIDDEN void destroy_linked_list_node(struct linked_list_node *node,
-                                          linked_list_value_deallocator_t value_deallocator);
+SAIL_EXPORT void sail_private_destroy_linked_list_node(struct linked_list_node *node,
+                                                       linked_list_value_deallocator_t value_deallocator);
 
 /*
  * Makes a deep copy of the specified linked list node.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_HIDDEN sail_status_t copy_linked_list_node(const struct linked_list_node *source,
-                                                struct linked_list_node **target,
-                                                linked_list_value_copier_t value_copier,
-                                                linked_list_value_deallocator_t value_deallocator);
+SAIL_EXPORT sail_status_t sail_private_copy_linked_list_node(const struct linked_list_node *source,
+                                                             struct linked_list_node **target,
+                                                             linked_list_value_copier_t value_copier,
+                                                             linked_list_value_deallocator_t value_deallocator);
 
 /*
  * Destroys the specified linked list node.
  * Repeats the destruction procedure recursively for the stored next pointer.
  */
-SAIL_HIDDEN void destroy_linked_list_node_chain(struct linked_list_node *node,
-                                                linked_list_value_deallocator_t value_deallocator);
+SAIL_EXPORT void sail_private_destroy_linked_list_node_chain(struct linked_list_node *node,
+                                                             linked_list_value_deallocator_t value_deallocator);
 
 /*
  * Makes a deep copy of the specified linked list node chain. If the source chain is NULL, it assigns NULL
@@ -108,10 +108,10 @@ SAIL_HIDDEN void destroy_linked_list_node_chain(struct linked_list_node *node,
  *
  * Returns SAIL_OK on success.
  */
-SAIL_HIDDEN sail_status_t copy_linked_list_node_chain(const struct linked_list_node *source,
-                                                      struct linked_list_node **target,
-                                                      linked_list_value_copier_t value_copier,
-                                                      linked_list_value_deallocator_t value_deallocator);
+SAIL_EXPORT sail_status_t sail_private_copy_linked_list_node_chain(const struct linked_list_node *source,
+                                                                   struct linked_list_node **target,
+                                                                   linked_list_value_copier_t value_copier,
+                                                                   linked_list_value_deallocator_t value_deallocator);
 
 /* extern "C" */
 #ifdef __cplusplus
