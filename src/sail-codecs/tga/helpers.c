@@ -336,7 +336,7 @@ sail_status_t tga_private_fetch_palette(struct sail_io *io, const struct TgaFile
     unsigned char *palette_data = palette_local->data;
 
     for (int i = file_header->first_color_map_entry_index; i < file_header->color_map_elements; i++) {
-        _Alignas(uint16_t) unsigned char data[4];
+        SAIL_ALIGNAS(uint16_t) unsigned char data[4];
 
         SAIL_TRY_OR_CLEANUP(io->strict_read(io->stream, data, element_size_in_bytes),
                             /* cleanup */ sail_destroy_palette(palette_local));

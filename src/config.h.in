@@ -45,6 +45,14 @@
 #cmakedefine SAIL_CYGWIN
 #cmakedefine SAIL_APPLE
 
+#cmakedefine SAIL_HAVE_ALIGNAS
+
+#ifdef SAIL_HAVE_ALIGNAS
+    #define SAIL_ALIGNAS(x) _Alignas(x)
+#else
+    #define SAIL_ALIGNAS(x)
+#endif
+
 /* Do we compile for VCPKG (port or client)? */
 #cmakedefine SAIL_VCPKG
 

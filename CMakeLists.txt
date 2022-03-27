@@ -14,6 +14,7 @@ include(CMakePushCheckState)
 # Our own cmake scripts
 #
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" "${CMAKE_MODULE_PATH}")
+include(sail_check_alignas)
 include(sail_check_c11_thread_local)
 include(sail_check_include)
 include(sail_check_init_once_execute_once)
@@ -25,6 +26,10 @@ include(sail_enable_xopen_source)
 include(sail_install_cmake_config)
 include(sail_install_pdb)
 include(sail_test)
+
+# Check features
+#
+sail_check_alignas()
 
 # Check for required includes
 #
