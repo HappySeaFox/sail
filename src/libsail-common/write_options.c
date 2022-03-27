@@ -36,7 +36,7 @@ sail_status_t sail_alloc_write_options(struct sail_write_options **write_options
     SAIL_TRY(sail_malloc(sizeof(struct sail_write_options), &ptr));
     *write_options = ptr;
 
-    (*write_options)->io_options        = 0;
+    (*write_options)->options           = 0;
     (*write_options)->tuning            = NULL;
     (*write_options)->compression       = SAIL_COMPRESSION_UNSUPPORTED;
     (*write_options)->compression_level = 0;
@@ -58,14 +58,14 @@ sail_status_t sail_alloc_write_options_from_features(const struct sail_write_fea
     struct sail_write_options *write_options_local;
     SAIL_TRY(sail_alloc_write_options(&write_options_local));
 
-    write_options_local->io_options = 0;
+    write_options_local->options = 0;
 
     if (write_features->features & SAIL_CODEC_FEATURE_META_DATA) {
-        write_options_local->io_options |= SAIL_IO_OPTION_META_DATA;
+        write_options_local->options |= SAIL_OPTION_META_DATA;
     }
 
     if (write_features->features & SAIL_CODEC_FEATURE_ICCP) {
-        write_options_local->io_options |= SAIL_IO_OPTION_ICCP;
+        write_options_local->options |= SAIL_OPTION_ICCP;
     }
 
     write_options_local->compression       = write_features->default_compression;
@@ -84,7 +84,7 @@ sail_status_t sail_copy_write_options(const struct sail_write_options *source, s
     struct sail_write_options *target_local;
     SAIL_TRY(sail_alloc_write_options(&target_local));
 
-    target_local->io_options = source->io_options;
+    target_local->options = source->options;
 
     if (source->tuning != NULL) {
         SAIL_TRY_OR_CLEANUP(sail_copy_hash_map(source->tuning, &target_local->tuning),

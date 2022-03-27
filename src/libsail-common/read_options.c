@@ -36,8 +36,8 @@ sail_status_t sail_alloc_read_options(struct sail_read_options **read_options) {
     SAIL_TRY(sail_malloc(sizeof(struct sail_read_options), &ptr));
     *read_options = ptr;
 
-    (*read_options)->io_options = 0;
-    (*read_options)->tuning     = NULL;
+    (*read_options)->options = 0;
+    (*read_options)->tuning  = NULL;
 
     return SAIL_OK;
 }
@@ -59,14 +59,14 @@ sail_status_t sail_alloc_read_options_from_features(const struct sail_read_featu
     struct sail_read_options *read_options_local;
     SAIL_TRY(sail_alloc_read_options(&read_options_local));
 
-    read_options_local->io_options = 0;
+    read_options_local->options = 0;
 
     if (read_features->features & SAIL_CODEC_FEATURE_META_DATA) {
-        read_options_local->io_options |= SAIL_IO_OPTION_META_DATA;
+        read_options_local->options |= SAIL_OPTION_META_DATA;
     }
 
     if (read_features->features & SAIL_CODEC_FEATURE_ICCP) {
-        read_options_local->io_options |= SAIL_IO_OPTION_ICCP;
+        read_options_local->options |= SAIL_OPTION_ICCP;
     }
 
     *read_options = read_options_local;
@@ -82,7 +82,7 @@ sail_status_t sail_copy_read_options(const struct sail_read_options *source, str
     struct sail_read_options *target_local;
     SAIL_TRY(sail_alloc_read_options(&target_local));
 
-    target_local->io_options = source->io_options;
+    target_local->options = source->options;
 
     if (source->tuning != NULL) {
         SAIL_TRY_OR_CLEANUP(sail_copy_hash_map(source->tuning, &target_local->tuning),

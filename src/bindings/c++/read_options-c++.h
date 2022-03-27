@@ -86,9 +86,9 @@ public:
     ~read_options();
 
     /*
-     * Returns the or-ed I/O manipulation options for reading operations. See SailIoOption.
+     * Returns the or-ed manipulation options for reading operations. See SailOption.
      */
-    int io_options() const;
+    int options() const;
 
     /*
      * Returns editable codec-specific tuning options. For example, a hypothetical ABC
@@ -119,9 +119,9 @@ public:
     const sail::tuning& tuning() const;
 
     /*
-     * Sets new or-ed I/O manipulation options for reading operations. See SailIoOption.
+     * Sets new or-ed manipulation options for reading operations. See SailOption.
      */
-    read_options& with_io_options(int io_options);
+    read_options& with_options(int options);
 
     /*
      * Sets new codec tuning.

@@ -63,7 +63,7 @@ write_options::write_options(const write_options &wo)
 
 write_options& write_options::operator=(const sail::write_options &write_options)
 {
-    with_io_options(write_options.io_options())
+    with_options(write_options.options())
         .with_tuning(write_options.tuning())
         .with_compression(write_options.compression())
         .with_compression_level(write_options.compression_level());
@@ -87,9 +87,9 @@ write_options::~write_options()
 {
 }
 
-int write_options::io_options() const
+int write_options::options() const
 {
-    return d->sail_write_options->io_options;
+    return d->sail_write_options->options;
 }
 
 sail::tuning& write_options::tuning()
@@ -112,9 +112,9 @@ double write_options::compression_level() const
     return d->sail_write_options->compression_level;
 }
 
-write_options& write_options::with_io_options(int io_options)
+write_options& write_options::with_options(int options)
 {
-    d->sail_write_options->io_options = io_options;
+    d->sail_write_options->options = options;
 
     return *this;
 }
@@ -148,7 +148,7 @@ write_options::write_options(const sail_write_options *wo)
         return;
     }
 
-    with_io_options(wo->io_options)
+    with_options(wo->options)
         .with_compression(wo->compression)
         .with_compression_level(wo->compression_level);
 }
@@ -161,7 +161,7 @@ sail_status_t write_options::to_sail_write_options(sail_write_options **write_op
 
     SAIL_TRY(sail_alloc_write_options(&write_options_local));
 
-    write_options_local->io_options        = d->sail_write_options->io_options;
+    write_options_local->options           = d->sail_write_options->options;
     write_options_local->compression       = d->sail_write_options->compression;
     write_options_local->compression_level = d->sail_write_options->compression_level;
 

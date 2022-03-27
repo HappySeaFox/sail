@@ -253,12 +253,12 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_png(struct sail_io *io, const 
     }
 
     /* Read meta data. */
-    if (png_state->read_options->io_options & SAIL_IO_OPTION_META_DATA) {
+    if (png_state->read_options->options & SAIL_OPTION_META_DATA) {
         SAIL_TRY(png_private_fetch_meta_data(png_state->png_ptr, png_state->info_ptr, &png_state->first_image->meta_data_node));
     }
 
     /* Fetch ICC profile. */
-    if (png_state->read_options->io_options & SAIL_IO_OPTION_ICCP) {
+    if (png_state->read_options->options & SAIL_OPTION_ICCP) {
         SAIL_TRY(png_private_fetch_iccp(png_state->png_ptr, png_state->info_ptr, &png_state->first_image->iccp));
     }
 
@@ -542,7 +542,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v6_png(void *state, s
                                       return __sail_error_result);
 
     /* Write meta data. */
-    if (png_state->write_options->io_options & SAIL_IO_OPTION_META_DATA && image->meta_data_node != NULL) {
+    if (png_state->write_options->options & SAIL_OPTION_META_DATA && image->meta_data_node != NULL) {
         SAIL_TRY(png_private_write_meta_data(png_state->png_ptr, png_state->info_ptr, image->meta_data_node));
         SAIL_LOG_DEBUG("PNG: Meta data has been written");
     }
@@ -553,7 +553,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v6_png(void *state, s
                  image->height,
                  bit_depth,
                  color_type,
-                 (png_state->write_options->io_options & SAIL_IO_OPTION_INTERLACED) ? PNG_INTERLACE_ADAM7 : PNG_INTERLACE_NONE,
+                 (png_state->write_options->options & SAIL_OPTION_INTERLACED) ? PNG_INTERLACE_ADAM7 : PNG_INTERLACE_NONE,
                  PNG_COMPRESSION_TYPE_BASE,
                  PNG_FILTER_TYPE_BASE);
 
@@ -561,7 +561,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v6_png(void *state, s
     SAIL_TRY(png_private_write_resolution(png_state->png_ptr, png_state->info_ptr, image->resolution));
 
     /* Write ICC profile. */
-    if (png_state->write_options->io_options & SAIL_IO_OPTION_ICCP && image->iccp != NULL) {
+    if (png_state->write_options->options & SAIL_OPTION_ICCP && image->iccp != NULL) {
         png_set_iCCP(png_state->png_ptr,
                         png_state->info_ptr,
                         "ICC profile",
@@ -620,7 +620,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v6_png(void *state, s
         png_set_swap_alpha(png_state->png_ptr);
     }
 
-    if (png_state->write_options->io_options & SAIL_IO_OPTION_INTERLACED) {
+    if (png_state->write_options->options & SAIL_OPTION_INTERLACED) {
         png_state->interlaced_passes = png_set_interlace_handling(png_state->png_ptr);
     } else {
         png_state->interlaced_passes = 1;

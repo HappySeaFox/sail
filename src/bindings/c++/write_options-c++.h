@@ -86,9 +86,9 @@ public:
     ~write_options();
 
     /*
-     * Returns the or-ed I/O manipulation options for writing operations. See SailIoOption.
+     * Returns the or-ed manipulation options for writing operations. See SailOption.
      */
-    int io_options() const;
+    int options() const;
 
     /*
      * Returns modifiable codec tuning.
@@ -123,9 +123,9 @@ public:
     double compression_level() const;
 
     /*
-     * Sets new or-ed I/O manipulation options for writing operations. See SailIoOption.
+     * Sets new or-ed manipulation options for writing operations. See SailOption.
      */
-    write_options& with_io_options(int io_options);
+    write_options& with_options(int options);
 
     /*
      * Sets a new codec tuning.

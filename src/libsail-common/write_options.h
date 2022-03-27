@@ -44,8 +44,8 @@ struct sail_write_features;
 /* Options to modify writing operations. */
 struct sail_write_options {
 
-    /* Or-ed I/O manipulation options. See SailIoOption. */
-    int io_options;
+    /* Or-ed manipulation options. See SailOption. */
+    int options;
 
     /* Codec-specific tuning options. */
     struct sail_hash_map *tuning;

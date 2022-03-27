@@ -46,8 +46,8 @@ struct sail_read_features;
  */
 struct sail_read_options {
 
-    /* Or-ed I/O manipulation options for reading operations. See SailIoOption. */
-    int io_options;
+    /* Or-ed manipulation options for reading operations. See SailOption. */
+    int options;
 
     /*
      * Codec-specific tuning options. For example, a hypothetical ABC image codec

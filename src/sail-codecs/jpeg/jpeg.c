@@ -134,10 +134,10 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_jpeg(struct sail_io *io, const
     jpeg_create_decompress(jpeg_state->decompress_context);
     jpeg_private_sail_io_src(jpeg_state->decompress_context, io);
 
-    if (jpeg_state->read_options->io_options & SAIL_IO_OPTION_META_DATA) {
+    if (jpeg_state->read_options->options & SAIL_OPTION_META_DATA) {
         jpeg_save_markers(jpeg_state->decompress_context, JPEG_COM, 0xffff);
     }
-    if (jpeg_state->read_options->io_options & SAIL_IO_OPTION_ICCP) {
+    if (jpeg_state->read_options->options & SAIL_OPTION_ICCP) {
         jpeg_save_markers(jpeg_state->decompress_context, JPEG_APP0 + 2, 0xFFFF);
     }
 
@@ -195,7 +195,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_jpeg(void *state, s
                         /* cleanup */ sail_destroy_image(image_local));
 
     /* Read meta data. */
-    if (jpeg_state->read_options->io_options & SAIL_IO_OPTION_META_DATA) {
+    if (jpeg_state->read_options->options & SAIL_OPTION_META_DATA) {
         SAIL_TRY_OR_CLEANUP(jpeg_private_fetch_meta_data(jpeg_state->decompress_context, &image_local->meta_data_node),
                             /* cleanup */ sail_destroy_image(image_local));
     }
@@ -206,7 +206,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_jpeg(void *state, s
 
     /* Fetch ICC profile. */
 #ifdef SAIL_HAVE_JPEG_ICCP
-    if (jpeg_state->read_options->io_options & SAIL_IO_OPTION_ICCP) {
+    if (jpeg_state->read_options->options & SAIL_OPTION_ICCP) {
         SAIL_TRY_OR_CLEANUP(jpeg_private_fetch_iccp(jpeg_state->decompress_context, &image_local->iccp),
                             /* cleanup */ sail_destroy_image(image_local));
     }
@@ -377,14 +377,14 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v6_jpeg(void *state, 
     jpeg_state->started_compress = true;
 
     /* Write meta data. */
-    if (jpeg_state->write_options->io_options & SAIL_IO_OPTION_META_DATA && image->meta_data_node != NULL) {
+    if (jpeg_state->write_options->options & SAIL_OPTION_META_DATA && image->meta_data_node != NULL) {
         SAIL_TRY(jpeg_private_write_meta_data(jpeg_state->compress_context, image->meta_data_node));
         SAIL_LOG_DEBUG("JPEG: Meta data has been written");
     }
 
     /* Write ICC profile. */
 #ifdef SAIL_HAVE_JPEG_ICCP
-    if (jpeg_state->write_options->io_options & SAIL_IO_OPTION_ICCP && image->iccp != NULL) {
+    if (jpeg_state->write_options->options & SAIL_OPTION_ICCP && image->iccp != NULL) {
         jpeg_write_icc_profile(jpeg_state->compress_context, image->iccp->data, image->iccp->data_length);
         SAIL_LOG_DEBUG("JPEG: ICC profile has been written");
     }

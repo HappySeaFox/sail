@@ -63,7 +63,7 @@ read_options::read_options(const read_options &ro)
 
 read_options& read_options::operator=(const sail::read_options &read_options)
 {
-    with_io_options(read_options.io_options())
+    with_options(read_options.options())
         .with_tuning(read_options.tuning());
 
     return *this;
@@ -85,9 +85,9 @@ read_options::~read_options()
 {
 }
 
-int read_options::io_options() const
+int read_options::options() const
 {
-    return d->sail_read_options->io_options;
+    return d->sail_read_options->options;
 }
 
 sail::tuning& read_options::tuning()
@@ -100,9 +100,9 @@ const sail::tuning& read_options::tuning() const
     return d->tuning;
 }
 
-read_options& read_options::with_io_options(int io_options)
+read_options& read_options::with_options(int options)
 {
-    d->sail_read_options->io_options = io_options;
+    d->sail_read_options->options = options;
 
     return *this;
 }
@@ -122,7 +122,7 @@ read_options::read_options(const sail_read_options *ro)
         return;
     }
 
-    with_io_options(ro->io_options)
+    with_options(ro->options)
         .with_tuning(utils_private::c_tuning_to_cpp_tuning(ro->tuning));
 }
 
@@ -134,7 +134,7 @@ sail_status_t read_options::to_sail_read_options(sail_read_options **read_option
 
     SAIL_TRY(sail_alloc_read_options(&read_options_local));
 
-    read_options_local->io_options = d->sail_read_options->io_options;
+    read_options_local->options = d->sail_read_options->options;
 
     SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&read_options_local->tuning),
                         /* cleanup */ sail_destroy_read_options(read_options_local));
