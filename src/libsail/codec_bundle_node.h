@@ -36,8 +36,7 @@
 extern "C" {
 #endif
 
-struct sail_codec_info;
-struct sail_codec;
+struct sail_codec_bundle;
 
 /*
  * A structure representing a codec information linked list.
