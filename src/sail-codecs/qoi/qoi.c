@@ -148,6 +148,8 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_qoi(void *state, st
         case 3: image_local->source_image->pixel_format = SAIL_PIXEL_FORMAT_BPP24_RGB;  break;
         case 4: image_local->source_image->pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA; break;
         default: {
+            sail_destroy_image(image_local);
+
             SAIL_LOG_ERROR("QOI: Number of channels is %d, but only RGB24 and RGB32 images are supported", qoi_state->qoi_desc.channels);
             SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
         }
