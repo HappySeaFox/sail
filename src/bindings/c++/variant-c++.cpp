@@ -374,21 +374,21 @@ sail_status_t variant::to_sail_variant(sail_variant **variant) const
     variant_local->type = d->type;
 
     switch (d->type) {
-        case SAIL_VARIANT_TYPE_BOOL:           sail_set_variant_bool(variant_local,           std::get<bool>(d->value));                break;
-        case SAIL_VARIANT_TYPE_CHAR:           sail_set_variant_char(variant_local,           std::get<char>(d->value));                break;
-        case SAIL_VARIANT_TYPE_UNSIGNED_CHAR:  sail_set_variant_unsigned_char(variant_local,  std::get<unsigned char>(d->value));       break;
-        case SAIL_VARIANT_TYPE_SHORT:          sail_set_variant_short(variant_local,          std::get<short>(d->value));               break;
-        case SAIL_VARIANT_TYPE_UNSIGNED_SHORT: sail_set_variant_unsigned_short(variant_local, std::get<unsigned short>(d->value));      break;
-        case SAIL_VARIANT_TYPE_INT:            sail_set_variant_int(variant_local,            std::get<int>(d->value));                 break;
-        case SAIL_VARIANT_TYPE_UNSIGNED_INT:   sail_set_variant_unsigned_int(variant_local,   std::get<unsigned int>(d->value));        break;
-        case SAIL_VARIANT_TYPE_LONG:           sail_set_variant_long(variant_local,           std::get<long>(d->value));                break;
-        case SAIL_VARIANT_TYPE_UNSIGNED_LONG:  sail_set_variant_unsigned_long(variant_local,  std::get<unsigned long>(d->value));       break;
-        case SAIL_VARIANT_TYPE_FLOAT:          sail_set_variant_float(variant_local,          std::get<float>(d->value));               break;
-        case SAIL_VARIANT_TYPE_DOUBLE:         sail_set_variant_double(variant_local,         std::get<double>(d->value));              break;
-        case SAIL_VARIANT_TYPE_STRING:         sail_set_variant_string(variant_local,         std::get<std::string>(d->value).c_str()); break;
+        case SAIL_VARIANT_TYPE_BOOL:           SAIL_TRY(sail_set_variant_bool(variant_local,           std::get<bool>(d->value)));                break;
+        case SAIL_VARIANT_TYPE_CHAR:           SAIL_TRY(sail_set_variant_char(variant_local,           std::get<char>(d->value)));                break;
+        case SAIL_VARIANT_TYPE_UNSIGNED_CHAR:  SAIL_TRY(sail_set_variant_unsigned_char(variant_local,  std::get<unsigned char>(d->value)));       break;
+        case SAIL_VARIANT_TYPE_SHORT:          SAIL_TRY(sail_set_variant_short(variant_local,          std::get<short>(d->value)));               break;
+        case SAIL_VARIANT_TYPE_UNSIGNED_SHORT: SAIL_TRY(sail_set_variant_unsigned_short(variant_local, std::get<unsigned short>(d->value)));      break;
+        case SAIL_VARIANT_TYPE_INT:            SAIL_TRY(sail_set_variant_int(variant_local,            std::get<int>(d->value)));                 break;
+        case SAIL_VARIANT_TYPE_UNSIGNED_INT:   SAIL_TRY(sail_set_variant_unsigned_int(variant_local,   std::get<unsigned int>(d->value)));        break;
+        case SAIL_VARIANT_TYPE_LONG:           SAIL_TRY(sail_set_variant_long(variant_local,           std::get<long>(d->value)));                break;
+        case SAIL_VARIANT_TYPE_UNSIGNED_LONG:  SAIL_TRY(sail_set_variant_unsigned_long(variant_local,  std::get<unsigned long>(d->value)));       break;
+        case SAIL_VARIANT_TYPE_FLOAT:          SAIL_TRY(sail_set_variant_float(variant_local,          std::get<float>(d->value)));               break;
+        case SAIL_VARIANT_TYPE_DOUBLE:         SAIL_TRY(sail_set_variant_double(variant_local,         std::get<double>(d->value)));              break;
+        case SAIL_VARIANT_TYPE_STRING:         SAIL_TRY(sail_set_variant_string(variant_local,         std::get<std::string>(d->value).c_str())); break;
         case SAIL_VARIANT_TYPE_DATA: {
             const sail::arbitrary_data &arbitrary_data = std::get<sail::arbitrary_data>(d->value);
-            sail_set_variant_data(variant_local, arbitrary_data.data(), arbitrary_data.size());
+            SAIL_TRY(sail_set_variant_data(variant_local, arbitrary_data.data(), arbitrary_data.size()));
             break;
         }
         case SAIL_VARIANT_TYPE_INVALID: break;
