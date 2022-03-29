@@ -64,7 +64,7 @@ public:
      * file and memory I/O streams.
      *
      * You MUST use your own unique id for custom I/O classes. For example, you can use sail_hash()
-     * to generate a unique id and assign it with with_id().
+     * to generate and return a unique id.
      *
      * Well-known I/O ids for file and memory I/O classes: SAIL_FILE_IO_ID and SAIL_MEMORY_IO_ID.
      */
