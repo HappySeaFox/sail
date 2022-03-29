@@ -121,14 +121,14 @@ public:
      * if the pixel format is SAIL_PIXEL_FORMAT_UNKNOWN, or the color count is 0,
      * or the data is null.
      */
-    palette& with_data(SailPixelFormat pixel_format, const void *data, unsigned color_count);
+    void set_data(SailPixelFormat pixel_format, const void *data, unsigned color_count);
 
     /*
      * Sets new palette data, pixel format, and colors count. Calculates the color count
      * from the data size and the pixel format. Makes the palette invalid if the pixel
      * format is SAIL_PIXEL_FORMAT_UNKNOWN or the data is empty.
      */
-    palette& with_data(SailPixelFormat pixel_format, const arbitrary_data &data);
+    void set_data(SailPixelFormat pixel_format, const arbitrary_data &data);
 
 private:
     /*
