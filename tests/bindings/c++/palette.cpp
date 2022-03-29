@@ -150,7 +150,7 @@ static MunitTest test_suite_tests[] = {
 };
 
 static const MunitSuite test_suite = {
-    (char *)"/palette",
+    (char *)"/bindings/c++/palette",
     test_suite_tests,
     NULL,
     1,
