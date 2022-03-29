@@ -63,6 +63,36 @@ public:
     meta_data();
 
     /*
+     * Constructs a new meta data entry out of the known meta data
+     * key and the value.
+     */
+    meta_data(SailMetaData key, const variant &value);
+
+    /*
+     * Constructs a new meta data entry out of the known meta data
+     * key and the value.
+     */
+    meta_data(SailMetaData key, variant &&value) noexcept;
+
+    /*
+     * Constructs a new meta data entry out of the unknown meta data
+     * string key and the value.
+     */
+    meta_data(const std::string &key_unknown, const variant &value);
+
+    /*
+     * Constructs a new meta data entry out of the unknown meta data
+     * string key and the value.
+     */
+    meta_data(const std::string &key_unknown, variant &&value);
+
+    /*
+     * Constructs a new meta data entry out of the unknown meta data
+     * string key and the value.
+     */
+    meta_data(std::string &&key_unknown, variant &&value) noexcept;
+
+    /*
      * Copies the meta data entry.
      */
     meta_data(const meta_data &md);
@@ -108,18 +138,29 @@ public:
     /*
      * Sets a new known meta data key like Artist or Comment. Resets the saved unknown key to an empty string.
      */
-    meta_data& with_key(SailMetaData key);
+    void set_key(SailMetaData key);
 
     /*
      * Sets a new unknown meta data string key representation. Resets the saved key to SAIL_META_DATA_UNKNOWN.
      * For example: "Person on the Image".
      */
-    meta_data& with_key_unknown(const std::string &key_unknown);
+    void set_key(const std::string &key_unknown);
+
+    /*
+     * Sets a new unknown meta data string key representation. Resets the saved key to SAIL_META_DATA_UNKNOWN.
+     * For example: "Person on the Image".
+     */
+    void set_key(std::string &&key_unknown) noexcept;
 
     /*
      * Sets a new meta data binary value. Resets the saved string value.
      */
-    meta_data& with_value(const variant &value);
+    void set_value(const variant &value);
+
+    /*
+     * Sets a new meta data binary value. Resets the saved string value.
+     */
+    void set_value(variant &&value) noexcept;
 
     /*
      * Returns a string representation of the specified meta data key. See SailMetaData.
