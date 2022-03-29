@@ -78,14 +78,14 @@ public:
     explicit image(std::string_view path);
 
     /*
-     * Constructs a new image out of the specified image properties and the shallow pixels.
+     * Constructs a new image out of the specified image properties and the pixels.
      * Assumes the pixels have no padding bytes in the end of every scan line. The pixels
      * must remain valid as long as the image exists.
      */
     image(void *pixels, SailPixelFormat pixel_format, unsigned width, unsigned height);
 
     /*
-     * Constructs a new image out of the specified image properties and the shallow pixels.
+     * Constructs a new image out of the specified image properties and the pixels.
      * The pixels must remain valid as long as the image exists.
      */
     image(void *pixels, SailPixelFormat pixel_format, unsigned width, unsigned height, unsigned bytes_per_line);
@@ -117,7 +117,7 @@ public:
 
     /*
      * Returns true if the image has valid dimensions, pixel format, bytes per line,
-     * and the pixel data (deep copied or shallow).
+     * and the pixel data.
      */
     bool is_valid() const;
 
