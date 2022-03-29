@@ -121,7 +121,7 @@ private:
 
     sail_status_t to_sail_iccp(sail_iccp **iccp) const;
 
-    sail_status_t copy(const void *data, unsigned data_length);
+    void copy(const void *data, unsigned data_length);
 
 private:
     class pimpl;

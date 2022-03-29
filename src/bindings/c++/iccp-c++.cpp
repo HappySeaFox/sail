@@ -110,8 +110,7 @@ void iccp::set_data(const void *data, unsigned data_length)
 {
     d->reset();
 
-    SAIL_TRY_OR_EXECUTE(copy(data, data_length),
-                        /* on error */ return);
+    copy(data, data_length);
 }
 
 void iccp::set_data(const arbitrary_data &data)
@@ -142,19 +141,13 @@ sail_status_t iccp::to_sail_iccp(sail_iccp **iccp) const
     return SAIL_OK;
 }
 
-sail_status_t iccp::copy(const void *data, unsigned data_length)
+void iccp::copy(const void *data, unsigned data_length)
 {
-    SAIL_CHECK_PTR(data);
-
-    if (data_length == 0) {
-        SAIL_LOG_ERROR("ICCP data length is 0");
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
-    }
-
     d->data.resize(data_length);
-    memcpy(d->data.data(), data, data_length);
 
-    return SAIL_OK;
+    if (data_length > 0) {
+        memcpy(d->data.data(), data, data_length);
+    }
 }
 
 }
