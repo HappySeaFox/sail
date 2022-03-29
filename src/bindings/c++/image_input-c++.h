@@ -68,26 +68,6 @@ public:
     ~image_input();
 
     /*
-     * Disables copying image readers.
-     */
-    image_input(const image_input&) = delete;
-
-    /*
-     * Disables copying image readers.
-     */
-    image_input& operator=(const image_input&) = delete;
-
-    /*
-     * Disables moving image readers.
-     */
-    image_input(image_input&&) = delete;
-
-    /*
-     * Disables moving image readers.
-     */
-    image_input& operator=(image_input&&) = delete;
-
-    /*
      * Starts reading the specified image file.
      *
      * Typical usage: start()          ->
