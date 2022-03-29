@@ -67,26 +67,6 @@ public:
     ~image_output();
 
     /*
-     * Disables copying image writers.
-     */
-    image_output(const image_output&) = delete;
-
-    /*
-     * Disables copying image writers.
-     */
-    image_output& operator=(const image_output&) = delete;
-
-    /*
-     * Disables moving image writers.
-     */
-    image_output(image_output&&) = delete;
-
-    /*
-     * Disables moving image writers.
-     */
-    image_output& operator=(image_output&&) = delete;
-
-    /*
      * Starts writing into the specified image file.
      *
      * Typical usage: start()          ->
