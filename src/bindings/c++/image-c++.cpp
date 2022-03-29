@@ -257,6 +257,11 @@ void image::set_resolution(const sail::resolution &resolution)
     d->resolution = resolution;
 }
 
+void image::set_resolution(sail::resolution &&resolution) noexcept
+{
+    d->resolution = std::move(resolution);
+}
+
 void image::set_gamma(double gamma)
 {
     d->sail_image->gamma = gamma;
@@ -272,9 +277,19 @@ void image::set_palette(const sail::palette &palette)
     d->palette = palette;
 }
 
+void image::set_palette(sail::palette &&palette) noexcept
+{
+    d->palette = std::move(palette);
+}
+
 void image::set_meta_data(const std::vector<sail::meta_data> &meta_data)
 {
     d->meta_data = meta_data;
+}
+
+void image::set_meta_data(std::vector<sail::meta_data> &&meta_data) noexcept
+{
+    d->meta_data = std::move(meta_data);
 }
 
 void image::set_meta_data(const sail::meta_data &meta_data)
@@ -282,9 +297,19 @@ void image::set_meta_data(const sail::meta_data &meta_data)
     d->meta_data.push_back(meta_data);
 }
 
+void image::set_meta_data(sail::meta_data &&meta_data) noexcept
+{
+    d->meta_data.push_back(std::move(meta_data));
+}
+
 void image::set_iccp(const sail::iccp &iccp)
 {
     d->iccp = iccp;
+}
+
+void image::set_iccp(sail::iccp &&iccp) noexcept
+{
+    d->iccp = std::move(iccp);
 }
 
 sail_status_t image::load(const std::string_view path)

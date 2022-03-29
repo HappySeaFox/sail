@@ -284,6 +284,11 @@ public:
     void set_resolution(const sail::resolution &resolution);
 
     /*
+     * Sets a new resolution.
+     */
+    void set_resolution(sail::resolution &&resolution) noexcept;
+
+    /*
      * Sets a new gamma.
      */
     void set_gamma(double gamma);
@@ -299,9 +304,19 @@ public:
     void set_palette(const sail::palette &palette);
 
     /*
+     * Sets a new palette.
+     */
+    void set_palette(sail::palette &&palette) noexcept;
+
+    /*
      * Sets new meta data.
      */
     void set_meta_data(const std::vector<sail::meta_data> &meta_data);
+
+    /*
+     * Sets new meta data.
+     */
+    void set_meta_data(std::vector<sail::meta_data> &&meta_data) noexcept;
 
     /*
      * Appends the meta data entry to the image meta data.
@@ -309,9 +324,19 @@ public:
     void set_meta_data(const sail::meta_data &meta_data);
 
     /*
+     * Appends the meta data entry to the image meta data.
+     */
+    void set_meta_data(sail::meta_data &&meta_data) noexcept;
+
+    /*
      * Sets a new ICC profile.
      */
     void set_iccp(const sail::iccp &iccp);
+
+    /*
+     * Sets a new ICC profile.
+     */
+    void set_iccp(sail::iccp &&iccp) noexcept;
 
     /*
      * Replaces the image with the image from the specified file path. Reads just a single frame
