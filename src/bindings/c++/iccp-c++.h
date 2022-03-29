@@ -106,12 +106,12 @@ public:
     /*
      * Sets new ICC profile binary data. The data is deep copied.
      */
-    iccp& with_data(const void *data, unsigned data_length);
+    void set_data(const void *data, unsigned data_length);
 
     /*
      * Sets new ICC profile binary data.
      */
-    iccp& with_data(const arbitrary_data &data);
+    void set_data(const arbitrary_data &data);
 
 private:
     /*

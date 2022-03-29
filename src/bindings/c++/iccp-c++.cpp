@@ -54,13 +54,13 @@ iccp::iccp()
 iccp::iccp(const void *data, unsigned data_length)
     : iccp()
 {
-    with_data(data, data_length);
+    set_data(data, data_length);
 }
 
 iccp::iccp(const arbitrary_data &data)
     : iccp()
 {
-    with_data(data);
+    set_data(data);
 }
 
 iccp::iccp(const sail::iccp &ic)
@@ -74,7 +74,7 @@ iccp& iccp::operator=(const sail::iccp &iccp)
     d->reset();
 
     if (iccp.is_valid()) {
-        with_data(iccp.data());
+        set_data(iccp.data());
     }
 
     return *this;
@@ -106,21 +106,17 @@ const arbitrary_data& iccp::data() const
     return d->data;
 }
 
-iccp& iccp::with_data(const void *data, unsigned data_length)
+void iccp::set_data(const void *data, unsigned data_length)
 {
     d->reset();
 
     SAIL_TRY_OR_EXECUTE(copy(data, data_length),
-                        /* on error */ return *this);
-
-    return *this;
+                        /* on error */ return);
 }
 
-iccp& iccp::with_data(const arbitrary_data &data)
+void iccp::set_data(const arbitrary_data &data)
 {
-    with_data(data.data(), static_cast<unsigned>(data.size()));
-
-    return *this;
+    set_data(data.data(), static_cast<unsigned>(data.size()));
 }
 
 iccp::iccp(const sail_iccp *ic)
@@ -131,7 +127,7 @@ iccp::iccp(const sail_iccp *ic)
         return;
     }
 
-    with_data(ic->data, ic->data_length);
+    set_data(ic->data, ic->data_length);
 }
 
 sail_status_t iccp::to_sail_iccp(sail_iccp **iccp) const
