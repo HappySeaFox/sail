@@ -127,11 +127,6 @@ public:
     variant& with_value(const T &value);
 
 private:
-    /*
-     * Makes a deep copy of the specified variant.
-     */
-    //explicit variant(const sail_variant *variant);
-
     sail_status_t to_sail_variant(sail_variant **variant) const;
 
     class pimpl;
