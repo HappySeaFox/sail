@@ -212,130 +212,104 @@ template SAIL_EXPORT const sail::arbitrary_data& variant::value<>() const;
 // Allow only specific types. Other types will fail to link.
 //
 template<>
-SAIL_EXPORT variant& variant::with_value<>(const bool &value)
+SAIL_EXPORT void variant::set_value<>(const bool &value)
 {
     d->type = SAIL_VARIANT_TYPE_BOOL;
     d->value.emplace<bool>(value);
-
-    return *this;
 }
 
 template<>
-SAIL_EXPORT variant& variant::with_value<>(const char &value)
+SAIL_EXPORT void variant::set_value<>(const char &value)
 {
     d->type = SAIL_VARIANT_TYPE_CHAR;
     d->value.emplace<char>(value);
-
-    return *this;
 }
 
 template<>
-SAIL_EXPORT variant& variant::with_value<>(const unsigned char &value)
+SAIL_EXPORT void variant::set_value<>(const unsigned char &value)
 {
     d->type = SAIL_VARIANT_TYPE_UNSIGNED_CHAR;
     d->value.emplace<unsigned char>(value);
-
-    return *this;
 }
 
 template<>
-SAIL_EXPORT variant& variant::with_value<>(const short &value)
+SAIL_EXPORT void variant::set_value<>(const short &value)
 {
     d->type = SAIL_VARIANT_TYPE_SHORT;
     d->value.emplace<short>(value);
-
-    return *this;
 }
 
 template<>
-SAIL_EXPORT variant& variant::with_value<>(const unsigned short &value)
+SAIL_EXPORT void variant::set_value<>(const unsigned short &value)
 {
     d->type = SAIL_VARIANT_TYPE_UNSIGNED_SHORT;
     d->value.emplace<unsigned short>(value);
-
-    return *this;
 }
 
 template<>
-SAIL_EXPORT variant& variant::with_value<>(const int &value)
+SAIL_EXPORT void variant::set_value<>(const int &value)
 {
     d->type = SAIL_VARIANT_TYPE_INT;
     d->value.emplace<int>(value);
-
-    return *this;
 }
 
 template<>
-SAIL_EXPORT variant& variant::with_value<>(const unsigned int &value)
+SAIL_EXPORT void variant::set_value<>(const unsigned int &value)
 {
     d->type = SAIL_VARIANT_TYPE_UNSIGNED_INT;
     d->value.emplace<unsigned int>(value);
-
-    return *this;
 }
 
 template<>
-SAIL_EXPORT variant& variant::with_value<>(const long &value)
+SAIL_EXPORT void variant::set_value<>(const long &value)
 {
     d->type = SAIL_VARIANT_TYPE_LONG;
     d->value.emplace<long>(value);
-
-    return *this;
 }
 
 template<>
-SAIL_EXPORT variant& variant::with_value<>(const unsigned long &value)
+SAIL_EXPORT void variant::set_value<>(const unsigned long &value)
 {
     d->type = SAIL_VARIANT_TYPE_UNSIGNED_LONG;
     d->value.emplace<unsigned long>(value);
-
-    return *this;
 }
 
 template<>
-SAIL_EXPORT variant& variant::with_value<>(const float &value)
+SAIL_EXPORT void variant::set_value<>(const float &value)
 {
     d->type = SAIL_VARIANT_TYPE_FLOAT;
     d->value.emplace<float>(value);
-
-    return *this;
 }
 
 template<>
-SAIL_EXPORT variant& variant::with_value<>(const double &value)
+SAIL_EXPORT void variant::set_value<>(const double &value)
 {
     d->type = SAIL_VARIANT_TYPE_DOUBLE;
     d->value.emplace<double>(value);
-
-    return *this;
 }
 
 template<>
-SAIL_EXPORT variant& variant::with_value<>(const std::string &value)
+SAIL_EXPORT void variant::set_value<>(const std::string &value)
 {
     d->type = SAIL_VARIANT_TYPE_STRING;
     d->value.emplace<std::string>(value);
-
-    return *this;
 }
 
 template<>
-SAIL_EXPORT variant& variant::with_value<>(const sail::arbitrary_data &value)
+SAIL_EXPORT void variant::set_value<>(const sail::arbitrary_data &value)
 {
     d->type = SAIL_VARIANT_TYPE_DATA;
     d->value.emplace<sail::arbitrary_data>(value);
-
-    return *this;
 }
 
-// Put this constructor after with_value() specialization
+// Put this constructor after set_value() specialization
 // as Clang on macOS complained about duplicate specializations.
 //
 template<typename T>
 variant::variant(const T &value)
     : variant()
 {
-    with_value(value);
+    set_value(value);
 }
 
 // Allow only specific types. Other types will fail to link.

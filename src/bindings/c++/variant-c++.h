@@ -124,7 +124,7 @@ public:
      * Sets a new value.
      */
     template<typename T>
-    variant& with_value(const T &value);
+    void set_value(const T &value);
 
 private:
     sail_status_t to_sail_variant(sail_variant **variant) const;
