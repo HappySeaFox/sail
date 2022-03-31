@@ -121,12 +121,12 @@ public:
     /*
      * Sets new or-ed manipulation options for reading operations. See SailOption.
      */
-    read_options& with_options(int options);
+    void set_options(int options);
 
     /*
      * Sets new codec tuning.
      */
-    read_options& with_tuning(const sail::tuning &tuning);
+    void set_tuning(const sail::tuning &tuning);
 
 private:
     /*
