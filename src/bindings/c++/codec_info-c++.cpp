@@ -63,14 +63,14 @@ codec_info& codec_info::operator=(const codec_info &ci)
 {
     d->sail_codec_info_c = ci.d->sail_codec_info_c;
 
-    with_version(ci.version())
-        .with_name(ci.name())
-        .with_description(ci.description())
-        .with_magic_numbers(ci.magic_numbers())
-        .with_extensions(ci.extensions())
-        .with_mime_types(ci.mime_types())
-        .with_read_features(ci.read_features())
-        .with_write_features(ci.write_features());
+    d->version        = ci.version();
+    d->name           = ci.name();
+    d->description    = ci.description();
+    d->magic_numbers  = ci.magic_numbers();
+    d->extensions     = ci.extensions();
+    d->mime_types     = ci.mime_types();
+    d->read_features  = ci.read_features();
+    d->write_features = ci.write_features();
 
     return *this;
 }
@@ -242,62 +242,14 @@ codec_info::codec_info(const sail_codec_info *ci)
         mime_types.push_back(mime_type_node->string);
     }
 
-    with_version(ci->version)
-        .with_name(ci->name)
-        .with_description(ci->description)
-        .with_magic_numbers(magic_numbers)
-        .with_extensions(extensions)
-        .with_mime_types(mime_types)
-        .with_read_features(sail::read_features(ci->read_features))
-        .with_write_features(sail::write_features(ci->write_features));
-}
-
-codec_info& codec_info::with_version(const std::string &version)
-{
-    d->version = version;
-    return *this;
-}
-
-codec_info& codec_info::with_name(const std::string &name)
-{
-    d->name = name;
-    return *this;
-}
-
-codec_info& codec_info::with_description(const std::string &description)
-{
-    d->description = description;
-    return *this;
-}
-
-codec_info& codec_info::with_magic_numbers(const std::vector<std::string> &magic_numbers)
-{
-    d->magic_numbers = magic_numbers;
-    return *this;
-}
-
-codec_info& codec_info::with_extensions(const std::vector<std::string> &extensions)
-{
-    d->extensions = extensions;
-    return *this;
-}
-
-codec_info& codec_info::with_mime_types(const std::vector<std::string> &mime_types)
-{
-    d->mime_types = mime_types;
-    return *this;
-}
-
-codec_info& codec_info::with_read_features(const sail::read_features &read_features)
-{
-    d->read_features = read_features;
-    return *this;
-}
-
-codec_info& codec_info::with_write_features(const sail::write_features &write_features)
-{
-    d->write_features = write_features;
-    return *this;
+    d->version        = ci->version;
+    d->name           = ci->name;
+    d->description    = ci->description;
+    d->magic_numbers  = magic_numbers;
+    d->extensions     = extensions;
+    d->mime_types     = mime_types;
+    d->read_features  = sail::read_features(ci->read_features);
+    d->write_features = sail::write_features(ci->write_features);
 }
 
 const sail_codec_info* codec_info::sail_codec_info_c() const

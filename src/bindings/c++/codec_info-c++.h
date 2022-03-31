@@ -250,15 +250,6 @@ private:
      */
     explicit codec_info(const sail_codec_info *ci);
 
-    codec_info& with_version(const std::string &version);
-    codec_info& with_name(const std::string &name);
-    codec_info& with_description(const std::string &description);
-    codec_info& with_magic_numbers(const std::vector<std::string> &magic_numbers);
-    codec_info& with_extensions(const std::vector<std::string> &extensions);
-    codec_info& with_mime_types(const std::vector<std::string> &mime_types);
-    codec_info& with_read_features(const sail::read_features &read_features);
-    codec_info& with_write_features(const sail::write_features &write_features);
-
     const sail_codec_info* sail_codec_info_c() const;
 
 private:
