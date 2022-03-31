@@ -125,22 +125,22 @@ public:
     /*
      * Sets new or-ed manipulation options for writing operations. See SailOption.
      */
-    write_options& with_options(int options);
+    void set_options(int options);
 
     /*
      * Sets a new codec tuning.
      */
-    write_options& with_tuning(const sail::tuning &tuning);
+    void set_tuning(const sail::tuning &tuning);
 
     /*
      * Sets a new compression type.
      */
-    write_options& with_compression(SailCompression compression);
+    void set_compression(SailCompression compression);
 
     /*
      * Sets a new compression level.
      */
-    write_options& with_compression_level(double compression_level);
+    void set_compression_level(double compression_level);
 
 private:
     /*
