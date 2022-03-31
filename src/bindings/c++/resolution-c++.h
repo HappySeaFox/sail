@@ -107,17 +107,17 @@ public:
     /*
      * Sets a new resolution units.
      */
-    resolution& with_unit(SailResolutionUnit unit);
+    void set_unit(SailResolutionUnit unit);
 
     /*
      * Sets a new resolution x value.
      */
-    resolution& with_x(double x);
+    void set_x(double x);
 
     /*
      * Sets a new resolution y value.
      */
-    resolution& with_y(double y);
+    void set_y(double y);
 
 private:
     /*
