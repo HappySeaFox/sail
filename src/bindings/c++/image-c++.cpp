@@ -297,16 +297,6 @@ void image::set_meta_data(std::vector<sail::meta_data> &&meta_data) noexcept
     d->meta_data = std::move(meta_data);
 }
 
-void image::set_meta_data(const sail::meta_data &meta_data)
-{
-    d->meta_data.push_back(meta_data);
-}
-
-void image::set_meta_data(sail::meta_data &&meta_data) noexcept
-{
-    d->meta_data.push_back(std::move(meta_data));
-}
-
 void image::set_iccp(const sail::iccp &iccp)
 {
     d->iccp = iccp;

@@ -327,16 +327,6 @@ public:
     void set_meta_data(std::vector<sail::meta_data> &&meta_data) noexcept;
 
     /*
-     * Appends the meta data entry to the image meta data.
-     */
-    void set_meta_data(const sail::meta_data &meta_data);
-
-    /*
-     * Appends the meta data entry to the image meta data.
-     */
-    void set_meta_data(sail::meta_data &&meta_data) noexcept;
-
-    /*
      * Sets a new ICC profile.
      */
     void set_iccp(const sail::iccp &iccp);
