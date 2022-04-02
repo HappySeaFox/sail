@@ -220,6 +220,14 @@ public:
     const std::vector<sail::meta_data>& meta_data() const;
 
     /*
+     * Returns the editable image meta data.
+     *
+     * READ:  Set by SAIL to a valid map with meta data (like JPEG comments).
+     * WRITE: Must be set by a caller to a valid map with meta data (like JPEG comments) if necessary.
+     */
+    std::vector<sail::meta_data>& meta_data();
+
+    /*
      * Returns the embedded ICC profile.
      *
      * Note for animated/multi-paged images: only the first image in an animated/multi-paged

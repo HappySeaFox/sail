@@ -212,6 +212,11 @@ const std::vector<sail::meta_data>& image::meta_data() const
     return d->meta_data;
 }
 
+std::vector<sail::meta_data>& image::meta_data()
+{
+    return d->meta_data;
+}
+
 const sail::iccp& image::iccp() const
 {
     return d->iccp;
