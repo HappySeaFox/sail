@@ -107,7 +107,7 @@ public:
     SailPixelFormat pixel_format() const;
 
     /*
-     * Returns the palette binary data.
+     * Returns the palette pixel data.
      */
     const arbitrary_data& data() const;
 
