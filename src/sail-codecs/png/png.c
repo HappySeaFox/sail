@@ -537,9 +537,8 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v6_png(void *state, s
 
     int color_type;
     int bit_depth;
-    SAIL_TRY_OR_EXECUTE(png_private_pixel_format_to_png_color_type(image->pixel_format, &color_type, &bit_depth),
-                        /* cleanup */ SAIL_LOG_ERROR("PNG: %s pixel format is not currently supported for writing", sail_pixel_format_to_string(image->pixel_format));
-                                      return __sail_error_result);
+    SAIL_TRY_OR_CLEANUP(png_private_pixel_format_to_png_color_type(image->pixel_format, &color_type, &bit_depth),
+                        /* cleanup */ SAIL_LOG_ERROR("PNG: %s pixel format is not currently supported for writing", sail_pixel_format_to_string(image->pixel_format)));
 
     /* Write meta data. */
     if (png_state->write_options->options & SAIL_OPTION_META_DATA && image->meta_data_node != NULL) {
@@ -583,11 +582,11 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v6_png(void *state, s
         }
 
         if (image->palette->pixel_format != SAIL_PIXEL_FORMAT_BPP24_RGB) {
-            SAIL_LOG_ERROR("PNG: Palette not in BPP24-RGB format is not supported");
+            SAIL_LOG_ERROR("PNG: Only BPP24-RGB palette is currently supported");
             SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
         }
 
-        /* Palette is deep copied. */
+        /* Deep copy palette. */
         png_set_PLTE(png_state->png_ptr, png_state->info_ptr, image->palette->data, image->palette->color_count);
     }
 

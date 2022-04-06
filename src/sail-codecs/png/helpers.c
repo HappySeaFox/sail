@@ -154,7 +154,6 @@ enum SailPixelFormat png_private_png_color_type_to_pixel_format(int color_type, 
             }
             break;
         }
-
         case PNG_COLOR_TYPE_GRAY_ALPHA: {
             switch (bit_depth) {
                 case 8:  return SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA;
@@ -162,7 +161,6 @@ enum SailPixelFormat png_private_png_color_type_to_pixel_format(int color_type, 
             }
             break;
         }
-
         case PNG_COLOR_TYPE_PALETTE: {
             switch (bit_depth) {
                 case 1: return SAIL_PIXEL_FORMAT_BPP1_INDEXED;
@@ -172,7 +170,6 @@ enum SailPixelFormat png_private_png_color_type_to_pixel_format(int color_type, 
             }
             break;
         }
-
         case PNG_COLOR_TYPE_RGB: {
             switch (bit_depth) {
                 case 8:  return SAIL_PIXEL_FORMAT_BPP24_RGB;
@@ -180,7 +177,6 @@ enum SailPixelFormat png_private_png_color_type_to_pixel_format(int color_type, 
             }
             break;
         }
-
         case PNG_COLOR_TYPE_RGB_ALPHA: {
             switch (bit_depth) {
                 case 8:  return SAIL_PIXEL_FORMAT_BPP32_RGBA;
@@ -204,39 +200,68 @@ sail_status_t png_private_pixel_format_to_png_color_type(enum SailPixelFormat pi
             *bit_depth = 1;
             return SAIL_OK;
         }
-
         case SAIL_PIXEL_FORMAT_BPP2_INDEXED: {
             *color_type = PNG_COLOR_TYPE_PALETTE;
             *bit_depth = 2;
             return SAIL_OK;
         }
-
         case SAIL_PIXEL_FORMAT_BPP4_INDEXED: {
             *color_type = PNG_COLOR_TYPE_PALETTE;
             *bit_depth = 4;
             return SAIL_OK;
         }
-
         case SAIL_PIXEL_FORMAT_BPP8_INDEXED: {
             *color_type = PNG_COLOR_TYPE_PALETTE;
             *bit_depth = 8;
             return SAIL_OK;
         }
-
+        case SAIL_PIXEL_FORMAT_BPP1_GRAYSCALE: {
+            *color_type = PNG_COLOR_TYPE_GRAY;
+            *bit_depth = 1;
+            return SAIL_OK;
+        }
+        case SAIL_PIXEL_FORMAT_BPP2_GRAYSCALE: {
+            *color_type = PNG_COLOR_TYPE_GRAY;
+            *bit_depth = 2;
+            return SAIL_OK;
+        }
+        case SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE: {
+            *color_type = PNG_COLOR_TYPE_GRAY;
+            *bit_depth = 4;
+            return SAIL_OK;
+        }
+        case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE: {
+            *color_type = PNG_COLOR_TYPE_GRAY;
+            *bit_depth = 8;
+            return SAIL_OK;
+        }
+        case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE: {
+            *color_type = PNG_COLOR_TYPE_GRAY;
+            *bit_depth = 16;
+            return SAIL_OK;
+        }
+        case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA: {
+            *color_type = PNG_COLOR_TYPE_GRAY_ALPHA;
+            *bit_depth = 8;
+            return SAIL_OK;
+        }
+        case SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA: {
+            *color_type = PNG_COLOR_TYPE_GRAY_ALPHA;
+            *bit_depth = 16;
+            return SAIL_OK;
+        }
         case SAIL_PIXEL_FORMAT_BPP24_RGB:
         case SAIL_PIXEL_FORMAT_BPP24_BGR: {
             *color_type = PNG_COLOR_TYPE_RGB;
             *bit_depth = 8;
             return SAIL_OK;
         }
-
         case SAIL_PIXEL_FORMAT_BPP48_RGB:
         case SAIL_PIXEL_FORMAT_BPP48_BGR: {
             *color_type = PNG_COLOR_TYPE_RGB;
             *bit_depth = 16;
             return SAIL_OK;
         }
-
         case SAIL_PIXEL_FORMAT_BPP32_RGBA:
         case SAIL_PIXEL_FORMAT_BPP32_BGRA:
         case SAIL_PIXEL_FORMAT_BPP32_ARGB:
@@ -245,7 +270,6 @@ sail_status_t png_private_pixel_format_to_png_color_type(enum SailPixelFormat pi
             *bit_depth = 8;
             return SAIL_OK;
         }
-
         case SAIL_PIXEL_FORMAT_BPP64_RGBA:
         case SAIL_PIXEL_FORMAT_BPP64_BGRA:
         case SAIL_PIXEL_FORMAT_BPP64_ARGB:
@@ -254,7 +278,6 @@ sail_status_t png_private_pixel_format_to_png_color_type(enum SailPixelFormat pi
             *bit_depth = 16;
             return SAIL_OK;
         }
-
         default: {
             SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
         }
