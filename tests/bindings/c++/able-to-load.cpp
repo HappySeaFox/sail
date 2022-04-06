@@ -52,7 +52,7 @@ static MunitTest test_suite_tests[] = {
 };
 
 static const MunitSuite test_suite = {
-    (char *)"/able-to-load",
+    (char *)"/bindings/c++",
     test_suite_tests,
     NULL,
     1,

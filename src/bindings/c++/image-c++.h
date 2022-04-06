@@ -78,14 +78,14 @@ public:
     explicit image(std::string_view path);
 
     /*
-     * Constructs a new image out of the specified image properties and the shallow pixels.
+     * Constructs a new image out of the specified image properties and the pixels.
      * Assumes the pixels have no padding bytes in the end of every scan line. The pixels
      * must remain valid as long as the image exists.
      */
     image(void *pixels, SailPixelFormat pixel_format, unsigned width, unsigned height);
 
     /*
-     * Constructs a new image out of the specified image properties and the shallow pixels.
+     * Constructs a new image out of the specified image properties and the pixels.
      * The pixels must remain valid as long as the image exists.
      */
     image(void *pixels, SailPixelFormat pixel_format, unsigned width, unsigned height, unsigned bytes_per_line);
@@ -117,7 +117,7 @@ public:
 
     /*
      * Returns true if the image has valid dimensions, pixel format, bytes per line,
-     * and the pixel data (deep copied or shallow).
+     * and the pixel data.
      */
     bool is_valid() const;
 
@@ -220,6 +220,14 @@ public:
     const std::vector<sail::meta_data>& meta_data() const;
 
     /*
+     * Returns the editable image meta data.
+     *
+     * READ:  Set by SAIL to a valid map with meta data (like JPEG comments).
+     * WRITE: Must be set by a caller to a valid map with meta data (like JPEG comments) if necessary.
+     */
+    std::vector<sail::meta_data>& meta_data();
+
+    /*
      * Returns the embedded ICC profile.
      *
      * Note for animated/multi-paged images: only the first image in an animated/multi-paged
@@ -281,42 +289,52 @@ public:
     /*
      * Sets a new resolution.
      */
-    image& with_resolution(const sail::resolution &resolution);
+    void set_resolution(const sail::resolution &resolution);
 
     /*
-     * Sets a new pixel format. See SailPixelFormat.
+     * Sets a new resolution.
      */
-    image& with_pixel_format(SailPixelFormat pixel_format);
+    void set_resolution(sail::resolution &&resolution) noexcept;
 
     /*
      * Sets a new gamma.
      */
-    image& with_gamma(double gamma);
+    void set_gamma(double gamma);
 
     /*
      * Sets a new delay for an animated frame in a sequence.
      */
-    image& with_delay(int delay);
+    void set_delay(int delay);
 
     /*
      * Sets a new palette.
      */
-    image& with_palette(const sail::palette &palette);
+    void set_palette(const sail::palette &palette);
+
+    /*
+     * Sets a new palette.
+     */
+    void set_palette(sail::palette &&palette) noexcept;
 
     /*
      * Sets new meta data.
      */
-    image& with_meta_data(const std::vector<sail::meta_data> &meta_data);
+    void set_meta_data(const std::vector<sail::meta_data> &meta_data);
 
     /*
-     * Appends the meta data entry to the image meta data.
+     * Sets new meta data.
      */
-    image& with_meta_data(const sail::meta_data &meta_data);
+    void set_meta_data(std::vector<sail::meta_data> &&meta_data) noexcept;
 
     /*
      * Sets a new ICC profile.
      */
-    image& with_iccp(const sail::iccp &iccp);
+    void set_iccp(const sail::iccp &iccp);
+
+    /*
+     * Sets a new ICC profile.
+     */
+    void set_iccp(sail::iccp &&iccp) noexcept;
 
     /*
      * Replaces the image with the image from the specified file path. Reads just a single frame
@@ -687,16 +705,16 @@ private:
 
     sail_status_t to_sail_image(sail_image **image) const;
 
-    image& with_width(unsigned width);
-    image& with_height(unsigned height);
-    image& with_bytes_per_line(unsigned bytes_per_line);
-    image& with_bytes_per_line_auto();
-    image& with_pixels(const void *pixels);
-    image& with_pixels(const void *pixels, unsigned pixels_size);
-    image& with_shallow_pixels(void *pixels);
-    image& with_shallow_pixels(void *pixels, unsigned pixels_size);
-    image& with_properties(int properties);
-    image& with_source_image(const sail::source_image &source_image);
+    void set_dimensions(unsigned width, unsigned height);
+    void set_pixel_format(SailPixelFormat pixel_format);
+    void set_bytes_per_line(unsigned bytes_per_line);
+    void set_bytes_per_line_auto();
+    void set_pixels(const void *pixels);
+    void set_pixels(const void *pixels, unsigned pixels_size);
+    void set_shallow_pixels(void *pixels);
+    void set_shallow_pixels(void *pixels, unsigned pixels_size);
+    void set_properties(int properties);
+    void set_source_image(const sail::source_image &source_image);
 
 private:
     class pimpl;

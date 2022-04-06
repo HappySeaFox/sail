@@ -54,6 +54,20 @@ conversion_options::conversion_options()
 {
 }
 
+conversion_options::conversion_options(int options, const sail_rgb48_t &rgb48)
+    : conversion_options()
+{
+    set_options(options);
+    set_background(rgb48);
+}
+
+conversion_options::conversion_options(int options, const sail_rgb24_t &rgb24)
+    : conversion_options()
+{
+    set_options(options);
+    set_background(rgb24);
+}
+
 conversion_options::conversion_options(const conversion_options &co)
     : conversion_options()
 {
@@ -62,9 +76,9 @@ conversion_options::conversion_options(const conversion_options &co)
 
 conversion_options& conversion_options::operator=(const conversion_options &co)
 {
-    with_options(co.options())
-        .with_background(co.background48())
-        .with_background(co.background24());
+    set_options(co.options());
+    set_background(co.background48());
+    set_background(co.background24());
 
     return *this;
 }
@@ -100,14 +114,12 @@ sail_rgb24_t conversion_options::background24() const
     return d->conversion_options->background24;
 }
 
-conversion_options& conversion_options::with_options(int options)
+void conversion_options::set_options(int options)
 {
     d->conversion_options->options = options;
-
-    return *this;
 }
 
-conversion_options& conversion_options::with_background(const sail_rgb48_t &rgb48)
+void conversion_options::set_background(const sail_rgb48_t &rgb48)
 {
     d->conversion_options->background48 = rgb48;
 
@@ -116,11 +128,9 @@ conversion_options& conversion_options::with_background(const sail_rgb48_t &rgb4
         static_cast<std::uint8_t>(rgb48.component2 / 257),
         static_cast<std::uint8_t>(rgb48.component3 / 257)
     };
-
-    return *this;
 }
 
-conversion_options& conversion_options::with_background(const sail_rgb24_t &rgb24)
+void conversion_options::set_background(const sail_rgb24_t &rgb24)
 {
     d->conversion_options->background24 = rgb24;
 
@@ -129,8 +139,6 @@ conversion_options& conversion_options::with_background(const sail_rgb24_t &rgb2
         static_cast<std::uint16_t>(rgb24.component2 * 257),
         static_cast<std::uint16_t>(rgb24.component3 * 257)
     };
-
-    return *this;
 }
 
 sail_status_t conversion_options::to_sail_conversion_options(sail_conversion_options **conversion_options) const

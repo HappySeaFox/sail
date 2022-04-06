@@ -50,9 +50,9 @@ resolution::resolution()
 resolution::resolution(SailResolutionUnit unit, double x, double y)
     : resolution()
 {
-    with_unit(unit)
-        .with_x(x)
-        .with_y(y);
+    set_unit(unit);
+    set_x(x);
+    set_y(y);
 }
 
 resolution::resolution(const resolution &res)
@@ -63,9 +63,9 @@ resolution::resolution(const resolution &res)
 
 resolution& resolution::operator=(const resolution &res)
 {
-    with_unit(res.unit())
-        .with_x(res.x())
-        .with_y(res.y());
+    set_unit(res.unit());
+    set_x(res.x());
+    set_y(res.y());
 
     return *this;
 }
@@ -106,22 +106,19 @@ double resolution::y() const
     return d->resolution.y;
 }
 
-resolution& resolution::with_unit(SailResolutionUnit unit)
+void resolution::set_unit(SailResolutionUnit unit)
 {
     d->resolution.unit = unit;
-    return *this;
 }
 
-resolution& resolution::with_x(double x)
+void resolution::set_x(double x)
 {
     d->resolution.x = x;
-    return *this;
 }
 
-resolution& resolution::with_y(double y)
+void resolution::set_y(double y)
 {
     d->resolution.y = y;
-    return *this;
 }
 
 resolution::resolution(const sail_resolution *res)

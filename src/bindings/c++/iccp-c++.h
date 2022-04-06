@@ -106,12 +106,12 @@ public:
     /*
      * Sets new ICC profile binary data. The data is deep copied.
      */
-    iccp& with_data(const void *data, unsigned data_length);
+    void set_data(const void *data, unsigned data_length);
 
     /*
      * Sets new ICC profile binary data.
      */
-    iccp& with_data(const arbitrary_data &data);
+    void set_data(const arbitrary_data &data);
 
 private:
     /*
@@ -121,7 +121,7 @@ private:
 
     sail_status_t to_sail_iccp(sail_iccp **iccp) const;
 
-    sail_status_t copy(const void *data, unsigned data_length);
+    void copy(const void *data, unsigned data_length);
 
 private:
     class pimpl;

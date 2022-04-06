@@ -57,6 +57,22 @@ public:
     conversion_options();
 
     /*
+     * Constructs a new conversion options object out of the or-ed SailConversionOption-s
+     * and the 48-bit color to blend 48-bit images.
+     * If the options argument is zero, SAIL_CONVERSION_OPTION_DROP_ALPHA is assumed.
+     * Additionally, calculates and sets a new 24-bit background color to blend 24-bit images.
+     */
+    conversion_options(int options, const sail_rgb48_t &rgb48);
+
+    /*
+     * Constructs a new conversion options object out of the or-ed SailConversionOption-s
+     * and the 24-bit color to blend 24-bit images.
+     * If the options argument is zero, SAIL_CONVERSION_OPTION_DROP_ALPHA is assumed.
+     * Additionally, calculates and sets a new 48-bit background color to blend 48-bit images.
+     */
+    conversion_options(int options, const sail_rgb24_t &rgb24);
+
+    /*
      * Copies the conversion options object.
      */
     conversion_options(const conversion_options &co);
@@ -99,19 +115,19 @@ public:
     /*
      * Sets new or-ed SailConversionOption-s. If zero, SAIL_CONVERSION_OPTION_DROP_ALPHA is assumed.
      */
-    conversion_options& with_options(int options);
+    void set_options(int options);
 
     /*
      * Sets a new 48-bit background color to blend 48-bit images.
      * Additionally, calculates and sets a new 24-bit background color to blend 24-bit images.
      */
-    conversion_options& with_background(const sail_rgb48_t &rgb48);
+    void set_background(const sail_rgb48_t &rgb48);
 
     /*
      * Sets a new 24-bit background color to blend 24-bit images.
      * Additionally, calculates and sets a new 48-bit background color to blend 48-bit images.
      */
-    conversion_options& with_background(const sail_rgb24_t &rgb24);
+    void set_background(const sail_rgb24_t &rgb24);
 
 private:
     sail_status_t to_sail_conversion_options(sail_conversion_options **conversion_options) const;

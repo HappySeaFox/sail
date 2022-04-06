@@ -63,8 +63,8 @@ read_options::read_options(const read_options &ro)
 
 read_options& read_options::operator=(const sail::read_options &read_options)
 {
-    with_options(read_options.options())
-        .with_tuning(read_options.tuning());
+    set_options(read_options.options());
+    set_tuning(read_options.tuning());
 
     return *this;
 }
@@ -100,18 +100,14 @@ const sail::tuning& read_options::tuning() const
     return d->tuning;
 }
 
-read_options& read_options::with_options(int options)
+void read_options::set_options(int options)
 {
     d->sail_read_options->options = options;
-
-    return *this;
 }
 
-read_options& read_options::with_tuning(const sail::tuning &tuning)
+void read_options::set_tuning(const sail::tuning &tuning)
 {
     d->tuning = tuning;
-
-    return *this;
 }
 
 read_options::read_options(const sail_read_options *ro)
@@ -122,8 +118,8 @@ read_options::read_options(const sail_read_options *ro)
         return;
     }
 
-    with_options(ro->options)
-        .with_tuning(utils_private::c_tuning_to_cpp_tuning(ro->tuning));
+    set_options(ro->options);
+    set_tuning(utils_private::c_tuning_to_cpp_tuning(ro->tuning));
 }
 
 sail_status_t read_options::to_sail_read_options(sail_read_options **read_options) const

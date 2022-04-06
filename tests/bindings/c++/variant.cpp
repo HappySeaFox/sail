@@ -46,10 +46,10 @@ template<typename T>
 static MunitResult test_equal(const T &value) {
 
     sail::variant variant1;
-    variant1.with_value(value);
+    variant1.set_value(value);
 
     sail::variant variant2;
-    variant2.with_value(value);
+    variant2.set_value(value);
 
     munit_assert(std::equal_to<sail::variant>()(variant1, variant2));
     munit_assert(std::equal_to<sail::variant>()(variant2, variant1));
@@ -61,10 +61,10 @@ template<typename T1, typename T2>
 static MunitResult test_not_equal(const T1 &value1, const T2 &value2) {
 
     sail::variant variant1;
-    variant1.with_value(value1);
+    variant1.set_value(value1);
 
     sail::variant variant2;
-    variant2.with_value(value2);
+    variant2.set_value(value2);
 
     munit_assert(std::not_equal_to<sail::variant>()(variant1, variant2));
     munit_assert(std::not_equal_to<sail::variant>()(variant2, variant1));
@@ -80,7 +80,7 @@ static MunitResult test_move(const MunitParameter params[], void *user_data) {
     constexpr short reference_value = -500;
 
     sail::variant variant;
-    variant.with_value<short>(reference_value);
+    variant.set_value<short>(reference_value);
 
     sail::variant variant2 = std::move(variant);
 
@@ -91,7 +91,7 @@ static MunitResult test_move(const MunitParameter params[], void *user_data) {
     return MUNIT_OK;
 }
 
-static MunitResult test_with_value(const MunitParameter params[], void *user_data) {
+static MunitResult test_set_value(const MunitParameter params[], void *user_data) {
 
     (void)params;
     (void)user_data;
@@ -194,9 +194,9 @@ static MunitResult test_compare(const MunitParameter params[], void *user_data) 
 }
 
 static MunitTest test_suite_tests[] = {
-    { (char *)"/move",       test_move,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/with-value", test_with_value, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/compare",    test_compare,    NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/move",       test_move,      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/with-value", test_set_value, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/compare",    test_compare,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };

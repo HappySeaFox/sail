@@ -120,7 +120,7 @@ static MunitTest test_suite_tests[] = {
 };
 
 static const MunitSuite test_suite = {
-    (char *)"/iccp",
+    (char *)"/bindings/c++/iccp",
     test_suite_tests,
     NULL,
     1,

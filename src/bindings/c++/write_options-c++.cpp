@@ -63,10 +63,10 @@ write_options::write_options(const write_options &wo)
 
 write_options& write_options::operator=(const sail::write_options &write_options)
 {
-    with_options(write_options.options())
-        .with_tuning(write_options.tuning())
-        .with_compression(write_options.compression())
-        .with_compression_level(write_options.compression_level());
+    set_options(write_options.options());
+    set_tuning(write_options.tuning());
+    set_compression(write_options.compression());
+    set_compression_level(write_options.compression_level());
 
     return *this;
 }
@@ -112,32 +112,24 @@ double write_options::compression_level() const
     return d->sail_write_options->compression_level;
 }
 
-write_options& write_options::with_options(int options)
+void write_options::set_options(int options)
 {
     d->sail_write_options->options = options;
-
-    return *this;
 }
 
-write_options& write_options::with_tuning(const sail::tuning &tuning)
+void write_options::set_tuning(const sail::tuning &tuning)
 {
     d->tuning = tuning;
-
-    return *this;
 }
 
-write_options& write_options::with_compression(SailCompression compression)
+void write_options::set_compression(SailCompression compression)
 {
     d->sail_write_options->compression = compression;
-
-    return *this;
 }
 
-write_options& write_options::with_compression_level(double compression_level)
+void write_options::set_compression_level(double compression_level)
 {
     d->sail_write_options->compression_level = compression_level;
-
-    return *this;
 }
 
 write_options::write_options(const sail_write_options *wo)
@@ -148,9 +140,10 @@ write_options::write_options(const sail_write_options *wo)
         return;
     }
 
-    with_options(wo->options)
-        .with_compression(wo->compression)
-        .with_compression_level(wo->compression_level);
+    set_options(wo->options);
+    set_tuning(utils_private::c_tuning_to_cpp_tuning(wo->tuning));
+    set_compression(wo->compression);
+    set_compression_level(wo->compression_level);
 }
 
 sail_status_t write_options::to_sail_write_options(sail_write_options **write_options) const

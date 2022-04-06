@@ -143,12 +143,6 @@ private:
 
     sail_status_t to_sail_source_image(sail_source_image **source_image) const;
 
-    source_image& with_pixel_format(SailPixelFormat pixel_format);
-    source_image& with_chroma_subsampling(SailChromaSubsampling chroma_subsampling);
-    source_image& with_properties(int properties);
-    source_image& with_compression(SailCompression compression);
-    source_image& with_special_properties(const sail::special_properties &special_properties);
-
 private:
     class pimpl;
     std::unique_ptr<pimpl> d;

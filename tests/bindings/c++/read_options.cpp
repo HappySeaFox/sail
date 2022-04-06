@@ -30,6 +30,7 @@
 #include "munit.h"
 
 static MunitResult test_read_options(const MunitParameter params[], void *user_data) {
+
     (void)params;
     (void)user_data;
 
@@ -38,26 +39,67 @@ static MunitResult test_read_options(const MunitParameter params[], void *user_d
 
     const sail::codec_info first_codec = codecs.front();
 
-    // Construct read options
     {
         sail::read_options read_options;
         munit_assert(first_codec.read_features().to_read_options(&read_options) == SAIL_OK);
     }
 
-    // Copy
+    return MUNIT_OK;
+}
+
+static MunitResult test_read_options_copy(const MunitParameter params[], void *user_data) {
+
+    (void)params;
+    (void)user_data;
+
+    const sail::codec_info first_codec = sail::codec_info::list().front();
+
     {
         sail::read_options read_options;
         munit_assert(first_codec.read_features().to_read_options(&read_options) == SAIL_OK);
+        munit_assert(read_options.tuning().empty());
 
         const sail::read_options read_options2 = read_options;
         munit_assert(read_options.options() == read_options2.options());
         munit_assert(read_options.tuning()  == read_options2.tuning());
     }
 
-    // Move
     {
         sail::read_options read_options;
         munit_assert(first_codec.read_features().to_read_options(&read_options) == SAIL_OK);
+        read_options.tuning()["key"] = 10.0;
+        munit_assert_double(read_options.tuning()["key"].value<double>(), ==, 10.0);
+
+        const sail::read_options read_options2 = read_options;
+        munit_assert(read_options.options() == read_options2.options());
+        munit_assert(read_options.tuning()  == read_options2.tuning());
+    }
+
+    return MUNIT_OK;
+}
+
+static MunitResult test_read_options_move(const MunitParameter params[], void *user_data) {
+
+    (void)params;
+    (void)user_data;
+
+    const sail::codec_info first_codec = sail::codec_info::list().front();
+
+    {
+        sail::read_options read_options;
+        munit_assert(first_codec.read_features().to_read_options(&read_options) == SAIL_OK);
+
+        sail::read_options read_options2 = read_options;
+        const sail::read_options read_options3 = std::move(read_options2);
+        munit_assert(read_options.options() == read_options3.options());
+        munit_assert(read_options.tuning()  == read_options3.tuning());
+    }
+
+    {
+        sail::read_options read_options;
+        munit_assert(first_codec.read_features().to_read_options(&read_options) == SAIL_OK);
+        read_options.tuning()["key"] = 10.0;
+        munit_assert_double(read_options.tuning()["key"].value<double>(), ==, 10.0);
 
         sail::read_options read_options2 = read_options;
         const sail::read_options read_options3 = std::move(read_options2);
@@ -69,7 +111,9 @@ static MunitResult test_read_options(const MunitParameter params[], void *user_d
 }
 
 static MunitTest test_suite_tests[] = {
-    { (char *)"/read-options", test_read_options, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/read-options",      test_read_options,      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/read-options/copy", test_read_options_copy, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/read-options/move", test_read_options_move, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };

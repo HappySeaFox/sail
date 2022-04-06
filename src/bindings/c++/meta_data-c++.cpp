@@ -25,6 +25,7 @@
 
 #include <cstring>
 #include <stdexcept>
+#include <utility>
 
 #include "sail-c++.h"
 #include "sail.h"
@@ -57,6 +58,41 @@ meta_data::meta_data()
 {
 }
 
+meta_data::meta_data(SailMetaData key, const variant &value)
+    : meta_data()
+{
+    set_key(key);
+    set_value(value);
+}
+
+meta_data::meta_data(SailMetaData key, variant &&value) noexcept
+    : meta_data()
+{
+    set_key(key);
+    set_value(std::move(value));
+}
+
+meta_data::meta_data(const std::string &key_unknown, const variant &value)
+    : meta_data()
+{
+    set_key(key_unknown);
+    set_value(value);
+}
+
+meta_data::meta_data(const std::string &key_unknown, variant &&value)
+    : meta_data()
+{
+    set_key(key_unknown);
+    set_value(std::move(value));
+}
+
+meta_data::meta_data(std::string &&key_unknown, variant &&value) noexcept
+    : meta_data()
+{
+    set_key(std::move(key_unknown));
+    set_value(std::move(value));
+}
+
 meta_data::meta_data(const sail::meta_data &md)
     : meta_data()
 {
@@ -66,12 +102,12 @@ meta_data::meta_data(const sail::meta_data &md)
 meta_data& meta_data::operator=(const sail::meta_data &meta_data)
 {
     if (meta_data.key() == SAIL_META_DATA_UNKNOWN) {
-        with_key_unknown(meta_data.key_unknown());
+        set_key(meta_data.key_unknown());
     } else {
-        with_key(meta_data.key());
+        set_key(meta_data.key());
     }
 
-    with_value(meta_data.value());
+    set_value(meta_data.value());
 
     return *this;
 }
@@ -107,27 +143,32 @@ const variant& meta_data::value() const
     return d->value;
 }
 
-meta_data& meta_data::with_key(SailMetaData key)
+void meta_data::set_key(SailMetaData key)
 {
     d->sail_meta_data->key = key;
     d->key_unknown         = std::string{};
-
-    return *this;
 }
 
-meta_data& meta_data::with_key_unknown(const std::string &key_unknown)
+void meta_data::set_key(const std::string &key_unknown)
 {
     d->sail_meta_data->key = SAIL_META_DATA_UNKNOWN;
     d->key_unknown         = key_unknown;
-
-    return *this;
 }
 
-meta_data& meta_data::with_value(const variant &value)
+void meta_data::set_key(std::string &&key_unknown) noexcept
+{
+    d->sail_meta_data->key = SAIL_META_DATA_UNKNOWN;
+    d->key_unknown         = std::move(key_unknown);
+}
+
+void meta_data::set_value(const variant &value)
 {
     d->value = value;
+}
 
-    return *this;
+void meta_data::set_value(variant &&value) noexcept
+{
+    d->value = std::move(value);
 }
 
 const char* meta_data::meta_data_to_string(SailMetaData meta_data) {
@@ -154,12 +195,12 @@ meta_data::meta_data(const sail_meta_data *meta_data)
     }
 
     if (meta_data->key == SAIL_META_DATA_UNKNOWN) {
-        with_key_unknown(empty_string_on_nullptr(meta_data->key_unknown));
+        set_key(empty_string_on_nullptr(meta_data->key_unknown));
     } else {
-        with_key(meta_data->key);
+        set_key(meta_data->key);
     }
 
-    with_value(variant(meta_data->value));
+    set_value(variant(meta_data->value));
 }
 
 sail_status_t meta_data::to_sail_meta_data(sail_meta_data **meta_data) const

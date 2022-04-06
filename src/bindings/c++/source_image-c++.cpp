@@ -64,10 +64,11 @@ source_image::source_image(const source_image &si)
 
 source_image& source_image::operator=(const source_image &si)
 {
-    with_pixel_format(si.pixel_format())
-        .with_chroma_subsampling(si.chroma_subsampling())
-        .with_properties(si.properties())
-        .with_compression(si.compression());
+    d->sail_source_image->pixel_format       = si.pixel_format();
+    d->sail_source_image->chroma_subsampling = si.chroma_subsampling();
+    d->sail_source_image->properties         = si.properties();
+    d->sail_source_image->compression        = si.compression();
+    d->special_properties                    = si.special_properties();
 
     return *this;
 }
@@ -126,11 +127,11 @@ source_image::source_image(const sail_source_image *si)
         return;
     }
 
-    with_pixel_format(si->pixel_format)
-        .with_chroma_subsampling(si->chroma_subsampling)
-        .with_properties(si->properties)
-        .with_compression(si->compression)
-        .with_special_properties(utils_private::c_tuning_to_cpp_tuning(si->special_properties));
+    d->sail_source_image->pixel_format       = si->pixel_format;
+    d->sail_source_image->chroma_subsampling = si->chroma_subsampling;
+    d->sail_source_image->properties         = si->properties;
+    d->sail_source_image->compression        = si->compression;
+    d->special_properties                    = utils_private::c_tuning_to_cpp_tuning(si->special_properties);
 }
 
 sail_status_t source_image::to_sail_source_image(sail_source_image **source_image) const
@@ -154,36 +155,6 @@ sail_status_t source_image::to_sail_source_image(sail_source_image **source_imag
     *source_image = source_image_local;
 
     return SAIL_OK;
-}
-
-source_image& source_image::with_pixel_format(SailPixelFormat pixel_format)
-{
-    d->sail_source_image->pixel_format = pixel_format;
-    return *this;
-}
-
-source_image& source_image::with_chroma_subsampling(SailChromaSubsampling chroma_subsampling)
-{
-    d->sail_source_image->chroma_subsampling = chroma_subsampling;
-    return *this;
-}
-
-source_image& source_image::with_properties(int properties)
-{
-    d->sail_source_image->properties = properties;
-    return *this;
-}
-
-source_image& source_image::with_compression(SailCompression compression)
-{
-    d->sail_source_image->compression = compression;
-    return *this;
-}
-
-source_image& source_image::with_special_properties(const sail::special_properties &special_properties)
-{
-    d->special_properties = special_properties;
-    return *this;
 }
 
 }

@@ -66,13 +66,13 @@ palette::palette()
 palette::palette(SailPixelFormat pixel_format, const void *data, unsigned color_count)
     : palette()
 {
-    with_data(pixel_format, data, color_count);
+    set_data(pixel_format, data, color_count);
 }
 
 palette::palette(SailPixelFormat pixel_format, const arbitrary_data &data)
     : palette()
 {
-    with_data(pixel_format, data);
+    set_data(pixel_format, data);
 }
 
 palette::palette(const palette &pal)
@@ -86,7 +86,7 @@ palette& palette::operator=(const sail::palette &palette)
     d->reset();
 
     if (palette.is_valid()) {
-        with_data(palette.pixel_format(), palette.data());
+        set_data(palette.pixel_format(), palette.data());
     }
 
     return *this;
@@ -128,29 +128,25 @@ unsigned palette::color_count() const
     return d->sail_palette->color_count;
 }
 
-palette& palette::with_data(SailPixelFormat pixel_format, const void *data, unsigned color_count)
+void palette::set_data(SailPixelFormat pixel_format, const void *data, unsigned color_count)
 {
     d->reset();
 
     SAIL_TRY_OR_EXECUTE(copy(pixel_format, data, color_count),
-                        /* on error */ return *this);
-
-    return *this;
+                        /* on error */ return);
 }
 
-palette& palette::with_data(SailPixelFormat pixel_format, const arbitrary_data &data)
+void palette::set_data(SailPixelFormat pixel_format, const arbitrary_data &data)
 {
     d->reset();
 
     unsigned bits_per_pixel;
     SAIL_TRY_OR_EXECUTE(sail_bits_per_pixel(pixel_format, &bits_per_pixel),
-                        /* on error */ return *this);
+                        /* on error */ return);
 
     const unsigned bytes_per_pixel = (bits_per_pixel + 7) / 8;
 
-    with_data(pixel_format, data.data(), static_cast<unsigned>(data.size() / bytes_per_pixel));
-
-    return *this;
+    set_data(pixel_format, data.data(), static_cast<unsigned>(data.size() / bytes_per_pixel));
 }
 
 palette::palette(const sail_palette *pal)
@@ -161,7 +157,7 @@ palette::palette(const sail_palette *pal)
         return;
     }
 
-    with_data(pal->pixel_format, pal->data, pal->color_count);
+    set_data(pal->pixel_format, pal->data, pal->color_count);
 }
 
 sail_status_t palette::to_sail_palette(sail_palette **palette) const

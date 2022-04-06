@@ -44,7 +44,7 @@ extern "C" {
 struct sail_palette {
 
     /*
-     * Palette pixel format.
+     * Pixel format.
      *
      * READ:  Set by SAIL to a valid palette pixel format if the image is indexed (palette is not NULL).
      *        SAIL guarantees the palette pixel format is byte-aligned.
@@ -53,7 +53,7 @@ struct sail_palette {
     enum SailPixelFormat pixel_format;
 
     /*
-     * Palette data.
+     * Pixel data.
      *
      * READ:  Set by SAIL to a valid pixel array if the image is indexed.
      * WRITE: Must be allocated and set by a caller to a valid pixel array if the image is indexed.

@@ -88,9 +88,10 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
 
         // Mutate alpha into a green color.
         //
-        sail::conversion_options options;
-        options.with_options(SAIL_CONVERSION_OPTION_BLEND_ALPHA)
-                .with_background(sail_rgb24_t{ 0, 255, 0 });
+        const sail::conversion_options options{
+            SAIL_CONVERSION_OPTION_BLEND_ALPHA,
+            sail_rgb24_t{ 0, 255, 0 }
+        };
 
         if (!first_image.is_valid()) {
             first_image = image;
