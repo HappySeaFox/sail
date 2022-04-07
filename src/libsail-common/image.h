@@ -96,8 +96,7 @@ struct sail_image {
     /*
      * Image pixel format. See SailPixelFormat.
      *
-     * READ:  Set by SAIL to a valid output image pixel format. The list of supported output pixel formats
-     *        by a certain codec can be obtained from sail_read_features.input_pixel_formats.
+     * READ:  Set by SAIL to a valid image pixel format.
      * WRITE: Must be set by a caller to a valid input image pixel format. Pixels in this format will be supplied
      *        to the codec by a caller later. The list of supported input pixel formats by a certain codec
      *        can be obtained from sail_write_features.pixel_formats.
