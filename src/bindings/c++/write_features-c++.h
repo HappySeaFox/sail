@@ -85,7 +85,7 @@ public:
     /*
      * Returns the list of supported pixel formats that can be written by this codec.
      */
-    const std::vector<SailPixelFormat>& output_pixel_formats() const;
+    const std::vector<SailPixelFormat>& pixel_formats() const;
 
     /*
      * Returns the supported or-ed features of writing operations. See SailCodecFeature.

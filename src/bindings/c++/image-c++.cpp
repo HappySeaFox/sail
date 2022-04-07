@@ -545,7 +545,7 @@ SailPixelFormat image::closest_pixel_format(const std::vector<SailPixelFormat> &
 
 SailPixelFormat image::closest_pixel_format(const sail::write_features &write_features) const
 {
-    return sail_closest_pixel_format(d->sail_image->pixel_format, write_features.output_pixel_formats().data(), write_features.output_pixel_formats().size());
+    return sail_closest_pixel_format(d->sail_image->pixel_format, write_features.pixel_formats().data(), write_features.pixel_formats().size());
 }
 
 bool image::can_convert(SailPixelFormat input_pixel_format, SailPixelFormat output_pixel_format)
@@ -560,7 +560,7 @@ SailPixelFormat image::closest_pixel_format(SailPixelFormat input_pixel_format, 
 
 SailPixelFormat image::closest_pixel_format(SailPixelFormat input_pixel_format, const sail::write_features &write_features)
 {
-    return sail_closest_pixel_format(input_pixel_format, write_features.output_pixel_formats().data(), write_features.output_pixel_formats().size());
+    return sail_closest_pixel_format(input_pixel_format, write_features.pixel_formats().data(), write_features.pixel_formats().size());
 }
 
 sail_status_t image::bits_per_pixel(SailPixelFormat pixel_format, unsigned *result)

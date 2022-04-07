@@ -39,7 +39,7 @@ public:
     const sail_write_features *sail_write_features_c;
 
     sail::supported_tuning supported_tuning;
-    std::vector<SailPixelFormat> output_pixel_formats;
+    std::vector<SailPixelFormat> pixel_formats;
     std::vector<SailCompression> compressions;
 };
 
@@ -53,7 +53,7 @@ write_features& write_features::operator=(const sail::write_features &write_feat
 {
     d->sail_write_features_c = write_features.d->sail_write_features_c;
     d->supported_tuning      = write_features.d->supported_tuning;
-    d->output_pixel_formats  = write_features.d->output_pixel_formats;
+    d->pixel_formats         = write_features.d->pixel_formats;
     d->compressions          = write_features.d->compressions;
 
     return *this;
@@ -75,9 +75,9 @@ write_features::~write_features()
 {
 }
 
-const std::vector<SailPixelFormat>& write_features::output_pixel_formats() const
+const std::vector<SailPixelFormat>& write_features::pixel_formats() const
 {
-    return d->output_pixel_formats;
+    return d->pixel_formats;
 }
 
 int write_features::features() const
@@ -156,17 +156,17 @@ write_features::write_features(const sail_write_features *wf)
     }
 
     // Output pixel formats
-    std::vector<SailPixelFormat> output_pixel_formats;
+    std::vector<SailPixelFormat> pixel_formats;
 
-    if (d->sail_write_features_c->output_pixel_formats != nullptr && d->sail_write_features_c->output_pixel_formats_length > 0) {
-        output_pixel_formats.reserve(d->sail_write_features_c->output_pixel_formats_length);
+    if (d->sail_write_features_c->pixel_formats != nullptr && d->sail_write_features_c->pixel_formats_length > 0) {
+        pixel_formats.reserve(d->sail_write_features_c->pixel_formats_length);
 
-        for (unsigned i = 0; i < d->sail_write_features_c->output_pixel_formats_length; i++) {
-            output_pixel_formats.push_back(d->sail_write_features_c->output_pixel_formats[i]);
+        for (unsigned i = 0; i < d->sail_write_features_c->pixel_formats_length; i++) {
+            pixel_formats.push_back(d->sail_write_features_c->pixel_formats[i]);
         }
     }
 
-    d->output_pixel_formats = output_pixel_formats;
+    d->pixel_formats = pixel_formats;
 
     // Compressions
     std::vector<SailCompression> compressions;

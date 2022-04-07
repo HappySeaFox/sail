@@ -17,7 +17,7 @@ tuning=jpeg-dct-method;jpeg-optimize-coding;jpeg-smoothing-factor
 [write-features]
 features=STATIC;META-DATA@CODEC_INFO_FEATURE_ICCP@
 tuning=
-output-pixel-formats=BPP8-GRAYSCALE;@SAIL_JPEG_CODEC_INFO_WRITE_EXT@BPP24-YCBCR;BPP32-CMYK;BPP32-YCCK
+pixel-formats=BPP8-GRAYSCALE;@SAIL_JPEG_CODEC_INFO_WRITE_EXT@BPP24-YCBCR;BPP32-CMYK;BPP32-YCCK
 properties=
 compression-types=JPEG
 default-compression=JPEG

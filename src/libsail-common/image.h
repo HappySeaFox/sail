@@ -100,7 +100,7 @@ struct sail_image {
      *        by a certain codec can be obtained from sail_read_features.input_pixel_formats.
      * WRITE: Must be set by a caller to a valid input image pixel format. Pixels in this format will be supplied
      *        to the codec by a caller later. The list of supported input pixel formats by a certain codec
-     *        can be obtained from sail_write_features.output_pixel_formats.
+     *        can be obtained from sail_write_features.pixel_formats.
      */
     enum SailPixelFormat pixel_format;
 

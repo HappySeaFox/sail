@@ -114,7 +114,7 @@ one pixel format to another in writing operations. Images are always written as 
 
 The list of pixel formats that can be written by SAIL is codec-specific and is publicly available in every
 .codec.info file. It can be accessed through `sail_codec_info_from_extension() -> codec_info -> write_features ->
-output_pixel_formats`.
+pixel_formats`.
 
 ## Does SAIL support animated and multi-paged images?
 
@@ -375,7 +375,7 @@ tuning=abc-filtering
 # Note: SAIL doesn't convert images while saving. It writes them 1:1. The image codec
 # can take as input and save 8-bit indexed, 24-bit RGB, and 32-bit RGBA images.
 #
-output-pixel-formats=BPP8-INDEXED;BPP24-RGB;BPP32-BGRA
+pixel-formats=BPP8-INDEXED;BPP24-RGB;BPP32-BGRA
 
 # ';'-separated list of required properties input images must have. Can be empty.
 #

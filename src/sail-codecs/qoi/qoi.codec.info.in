@@ -17,7 +17,7 @@ tuning=
 [write-features]
 features=STATIC
 tuning=
-output-pixel-formats=BPP24-RGB;BPP32-RGBA
+pixel-formats=BPP24-RGB;BPP32-RGBA
 properties=
 compression-types=QOI
 default-compression=QOI

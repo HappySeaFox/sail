@@ -149,8 +149,8 @@ sail_status_t allowed_write_output_pixel_format(const struct sail_write_features
 
     SAIL_CHECK_PTR(write_features);
 
-    for (unsigned i = 0; i < write_features->output_pixel_formats_length; i++) {
-        if (write_features->output_pixel_formats[i] == pixel_format) {
+    for (unsigned i = 0; i < write_features->pixel_formats_length; i++) {
+        if (write_features->pixel_formats[i] == pixel_format) {
             return SAIL_OK;
         }
     }

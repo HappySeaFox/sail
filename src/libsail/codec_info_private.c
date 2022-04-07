@@ -192,10 +192,10 @@ static sail_status_t inih_handler_sail_error(void *data, const char *section, co
         } else if (strcmp(name, "tuning") == 0) {
             SAIL_TRY_OR_CLEANUP(sail_split_into_string_node_chain(value, &codec_info->write_features->tuning),
                                     /* cleanup */ SAIL_LOG_ERROR("Failed to parse codec tuning: '%s'", value));
-        } else if (strcmp(name, "output-pixel-formats") == 0) {
+        } else if (strcmp(name, "pixel-formats") == 0) {
             SAIL_TRY_OR_CLEANUP(parse_serialized_ints(value,
-                                                        (int **)&codec_info->write_features->output_pixel_formats,
-                                                        &codec_info->write_features->output_pixel_formats_length,
+                                                        (int **)&codec_info->write_features->pixel_formats,
+                                                        &codec_info->write_features->pixel_formats_length,
                                                         pixel_format_from_string),
                                 /* cleanup */ SAIL_LOG_ERROR("Failed to parse output pixel formats: '%s'", value));
         } else if (strcmp(name, "compression-types") == 0) {
@@ -270,7 +270,7 @@ static sail_status_t check_codec_info(const struct sail_codec_info *codec_info) 
     if ((write_features->features & SAIL_CODEC_FEATURE_STATIC ||
             write_features->features & SAIL_CODEC_FEATURE_ANIMATED ||
             write_features->features & SAIL_CODEC_FEATURE_MULTI_PAGED) &&
-            (write_features->output_pixel_formats == NULL || write_features->output_pixel_formats_length == 0)) {
+            (write_features->pixel_formats == NULL || write_features->pixel_formats_length == 0)) {
         SAIL_LOG_ERROR("Codec validation error: %s codec is able to write images, but output pixel formats are not specified", codec_info->name);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INCOMPLETE_CODEC_INFO);
     }

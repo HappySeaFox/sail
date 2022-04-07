@@ -17,7 +17,7 @@ tuning=
 [write-features]
 features=
 tuning=
-output-pixel-formats=
+pixel-formats=
 properties=
 compression-types=
 default-compression=

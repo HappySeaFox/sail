@@ -48,10 +48,10 @@ struct sail_write_features {
     /*
      * A list of supported pixel formats that can be written by this codec.
      */
-    enum SailPixelFormat *output_pixel_formats;
+    enum SailPixelFormat *pixel_formats;
 
-    /* The length of output_pixel_formats. */
-    unsigned output_pixel_formats_length;
+    /* The length of pixel_formats. */
+    unsigned pixel_formats_length;
 
     /* Supported or-ed features of writing operations. See SailCodecFeature. */
     int features;
