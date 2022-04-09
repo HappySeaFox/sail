@@ -1,7 +1,7 @@
 # TGA codec information
 #
 [codec]
-layout=6
+layout=7
 version=0.7.2
 priority=LOW
 name=TGA

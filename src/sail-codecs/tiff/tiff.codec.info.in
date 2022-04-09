@@ -1,7 +1,7 @@
 # TIFF codec information
 #
 [codec]
-layout=6
+layout=7
 version=1.0.1
 priority=HIGHEST
 name=TIFF

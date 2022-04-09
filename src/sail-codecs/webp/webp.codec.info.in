@@ -1,7 +1,7 @@
 # WEBP codec information
 #
 [codec]
-layout=6
+layout=7
 version=0.7.1
 priority=MEDIUM
 name=WEBP

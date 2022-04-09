@@ -47,17 +47,17 @@ sail_status_t sail_probe_io(struct sail_io *io, struct sail_image **image, const
     SAIL_TRY(sail_alloc_load_options_from_features((*codec_info_local)->load_features, &load_options_local));
 
     void *state = NULL;
-    SAIL_TRY_OR_CLEANUP(codec->v6->load_init(io, load_options_local, &state),
-                        /* cleanup */ codec->v6->load_finish(&state, io),
+    SAIL_TRY_OR_CLEANUP(codec->v7->load_init(io, load_options_local, &state),
+                        /* cleanup */ codec->v7->load_finish(&state, io),
                                       sail_destroy_load_options(load_options_local));
 
     sail_destroy_load_options(load_options_local);
 
     struct sail_image *image_local;
 
-    SAIL_TRY_OR_CLEANUP(codec->v6->load_seek_next_frame(state, io, &image_local),
-                        /* cleanup */ codec->v6->load_finish(&state, io));
-    SAIL_TRY_OR_CLEANUP(codec->v6->load_finish(&state, io),
+    SAIL_TRY_OR_CLEANUP(codec->v7->load_seek_next_frame(state, io, &image_local),
+                        /* cleanup */ codec->v7->load_finish(&state, io));
+    SAIL_TRY_OR_CLEANUP(codec->v7->load_finish(&state, io),
                         /* ceanup */ sail_destroy_image(image_local));
 
     *image = image_local;
@@ -106,7 +106,7 @@ sail_status_t sail_load_next_frame(void *state, struct sail_image **image) {
     SAIL_CHECK_PTR(state_of_mind->codec);
 
     struct sail_image *image_local;
-    SAIL_TRY(state_of_mind->codec->v6->load_seek_next_frame(state_of_mind->state, state_of_mind->io, &image_local));
+    SAIL_TRY(state_of_mind->codec->v7->load_seek_next_frame(state_of_mind->state, state_of_mind->io, &image_local));
 
     if (image_local->pixels != NULL) {
         SAIL_LOG_ERROR("Internal error in %s codec: codecs must not allocate pixels", state_of_mind->codec_info->name);
@@ -119,7 +119,7 @@ sail_status_t sail_load_next_frame(void *state, struct sail_image **image) {
     SAIL_TRY_OR_CLEANUP(sail_malloc(pixels_size, &image_local->pixels),
                         /* cleanup */ sail_destroy_image(image_local));
 
-    SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v6->load_frame(state_of_mind->state, state_of_mind->io, image_local),
+    SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v7->load_frame(state_of_mind->state, state_of_mind->io, image_local),
                         /* cleanup */ sail_destroy_image(image_local));
 
     *image = image_local;
@@ -142,7 +142,7 @@ sail_status_t sail_stop_loading(void *state) {
         return SAIL_OK;
     }
 
-    SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v6->load_finish(&state_of_mind->state, state_of_mind->io),
+    SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v7->load_finish(&state_of_mind->state, state_of_mind->io),
                         /* cleanup */ destroy_hidden_state(state_of_mind));
 
     destroy_hidden_state(state_of_mind);
@@ -183,8 +183,8 @@ sail_status_t sail_write_next_frame(void *state, const struct sail_image *image)
     unsigned bytes_per_line;
     SAIL_TRY(sail_bytes_per_line(image->width, image->pixel_format, &bytes_per_line));
 
-    SAIL_TRY(state_of_mind->codec->v6->save_seek_next_frame(state_of_mind->state, state_of_mind->io, image));
-    SAIL_TRY(state_of_mind->codec->v6->save_frame(state_of_mind->state, state_of_mind->io, image));
+    SAIL_TRY(state_of_mind->codec->v7->save_seek_next_frame(state_of_mind->state, state_of_mind->io, image));
+    SAIL_TRY(state_of_mind->codec->v7->save_frame(state_of_mind->state, state_of_mind->io, image));
 
     return SAIL_OK;
 }

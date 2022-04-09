@@ -1,7 +1,7 @@
 # JPEG2000 codec information
 #
 [codec]
-layout=6
+layout=7
 version=0.4.0
 priority=MEDIUM
 name=JPEG2000

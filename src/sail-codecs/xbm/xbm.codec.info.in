@@ -1,7 +1,7 @@
 # XBM codec information
 #
 [codec]
-layout=6
+layout=7
 version=0.7.0
 priority=LOWEST
 name=XBM

@@ -110,7 +110,7 @@ static void destroy_avif_state(struct avif_state *avif_state) {
  * Decoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_load_init_v6_avif(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_load_init_v7_avif(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
 
     SAIL_CHECK_PTR(state);
     *state = NULL;
@@ -142,7 +142,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v6_avif(struct sail_io *io, const
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v6_avif(void *state, struct sail_io *io, struct sail_image **image) {
+SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v7_avif(void *state, struct sail_io *io, struct sail_image **image) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
@@ -195,7 +195,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v6_avif(void *state, s
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_load_frame_v6_avif(void *state, struct sail_io *io, struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_load_frame_v7_avif(void *state, struct sail_io *io, struct sail_image *image) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
@@ -217,7 +217,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v6_avif(void *state, struct sail
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_load_finish_v6_avif(void **state, struct sail_io *io) {
+SAIL_EXPORT sail_status_t sail_codec_load_finish_v7_avif(void **state, struct sail_io *io) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
@@ -235,7 +235,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_finish_v6_avif(void **state, struct sa
  * Encoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_save_init_v6_avif(struct sail_io *io, const struct sail_save_options *save_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_save_init_v7_avif(struct sail_io *io, const struct sail_save_options *save_options, void **state) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
@@ -244,7 +244,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v6_avif(struct sail_io *io, const
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v6_avif(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v7_avif(void *state, struct sail_io *io, const struct sail_image *image) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
@@ -253,7 +253,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v6_avif(void *state, s
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-SAIL_EXPORT sail_status_t sail_codec_save_frame_v6_avif(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_save_frame_v7_avif(void *state, struct sail_io *io, const struct sail_image *image) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
@@ -262,7 +262,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v6_avif(void *state, struct sail
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-SAIL_EXPORT sail_status_t sail_codec_save_finish_v6_avif(void **state, struct sail_io *io) {
+SAIL_EXPORT sail_status_t sail_codec_save_finish_v7_avif(void **state, struct sail_io *io) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
