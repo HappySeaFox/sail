@@ -23,8 +23,8 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_WRITE_FEATURES_H
-#define SAIL_WRITE_FEATURES_H
+#ifndef SAIL_SAVE_FEATURES_H
+#define SAIL_SAVE_FEATURES_H
 
 #ifdef SAIL_BUILD
     #include "error.h"
@@ -41,7 +41,7 @@ extern "C" {
 struct sail_string_node;
 
 /*
- * Write features. Use this structure to determine what a codec can actually write.
+ * Save features. Use this structure to determine what a codec can actually save.
  */
 struct sail_save_features {
 

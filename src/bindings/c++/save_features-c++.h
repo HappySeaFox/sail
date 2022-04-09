@@ -23,8 +23,8 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_WRITE_FEATURES_CPP_H
-#define SAIL_WRITE_FEATURES_CPP_H
+#ifndef SAIL_SAVE_FEATURES_CPP_H
+#define SAIL_SAVE_FEATURES_CPP_H
 
 #include <memory>
 #include <vector>
@@ -49,7 +49,7 @@ namespace sail
 class save_options;
 
 /*
- * Write features. Use this structure to determine what a codec can actually write.
+ * Save features. Use this structure to determine what a codec can actually write.
  * See codec_info.
  */
 class SAIL_EXPORT save_features

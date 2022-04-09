@@ -47,8 +47,8 @@ struct sail_resolution;
 struct sail_source_image;
 
 /*
- * sail_image represents an image. Fields set by SAIL when loading images are marked with READ.
- * Fields that must be set by a caller when writing images are marked with WRITE.
+ * sail_image represents an image. Fields set by SAIL when loading images are marked with LOAD.
+ * Fields that must be set by a caller when writing images are marked with SAVE.
  */
 struct sail_image {
 

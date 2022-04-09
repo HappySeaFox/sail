@@ -23,8 +23,8 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_WRITE_OPTIONS_H
-#define SAIL_WRITE_OPTIONS_H
+#ifndef SAIL_SAVE_OPTIONS_H
+#define SAIL_SAVE_OPTIONS_H
 
 #ifdef SAIL_BUILD
     #include "error.h"
@@ -41,7 +41,9 @@ extern "C" {
 struct sail_hash_map;
 struct sail_save_features;
 
-/* Options to modify writing operations. */
+/*
+ * Options to modify saving operations.
+ */
 struct sail_save_options {
 
     /* Or-ed manipulation options. See SailOption. */

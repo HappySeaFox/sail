@@ -269,7 +269,7 @@ sail_status_t bmp_private_read_init(struct sail_io *io, const struct sail_load_o
         SAIL_LOG_DEBUG("BMP: Version(%d), compression(%u)", bmp_state->version, bmp_state->v3.compression);
     }
 
-    /*  Read palette.  */
+    /* Read palette.  */
     if (bmp_state->version == SAIL_BMP_V1) {
         SAIL_TRY(bmp_private_fill_system_palette(bmp_state->v1.bit_count, &bmp_state->palette, &bmp_state->palette_count));
     } else if (bmp_state->v2.bit_count < 16) {

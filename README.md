@@ -26,7 +26,7 @@
 #
 
 SAIL is a format-agnostic cross-platform image decoding library providing rich APIs, from one-liners
-to complex use cases with custom I/O sources. It enables a client to load and write static,
+to complex use cases with custom I/O sources. It enables a client to load and save static,
 animated, multi-paged images along with their meta data and ICC profiles. :sailboat:
 
 <p align="center">

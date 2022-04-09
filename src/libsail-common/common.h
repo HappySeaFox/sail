@@ -311,35 +311,35 @@ enum SailCodecFeature {
     /* Unknown codec feature used to indicate an error in parsing functions. */
     SAIL_CODEC_FEATURE_UNKNOWN     = 1 << 0,
 
-    /* Can load or write static images. */
+    /* Can load or save static images. */
     SAIL_CODEC_FEATURE_STATIC      = 1 << 1,
 
-    /* Can load or write animated images. */
+    /* Can load or save animated images. */
     SAIL_CODEC_FEATURE_ANIMATED    = 1 << 2,
 
-    /* Can load or write multi-paged (but not animated) images. */
+    /* Can load or save multi-paged (but not animated) images. */
     SAIL_CODEC_FEATURE_MULTI_PAGED = 1 << 3,
 
-    /* Can load or write image meta data like JPEG comments or EXIF. */
+    /* Can load or save image meta data like JPEG comments or EXIF. */
     SAIL_CODEC_FEATURE_META_DATA   = 1 << 4,
 
-    /* Can load or write interlaced images. */
+    /* Can load or save interlaced images. */
     SAIL_CODEC_FEATURE_INTERLACED  = 1 << 5,
 
-    /* Can load or write embedded ICC profiles. */
+    /* Can load or save embedded ICC profiles. */
     SAIL_CODEC_FEATURE_ICCP        = 1 << 6,
 };
 
 /* Read or save options. */
 enum SailOption {
 
-    /* Instruction to load or write image meta data like JPEG comments or EXIF. */
+    /* Instruction to load or save image meta data like JPEG comments or EXIF. */
     SAIL_OPTION_META_DATA  = 1 << 0,
 
-    /* Instruction to write interlaced images. Specifying this option for loading operations has no effect. */
+    /* Instruction to save interlaced images. Specifying this option for loading operations has no effect. */
     SAIL_OPTION_INTERLACED = 1 << 1,
 
-    /* Instruction to load or write embedded ICC profile. */
+    /* Instruction to load or save embedded ICC profile. */
     SAIL_OPTION_ICCP       = 1 << 2,
 };
 

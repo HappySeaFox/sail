@@ -57,7 +57,7 @@ static sail_status_t convert_impl(const char *input, const char *output, int com
     SAIL_TRY(sail_load_next_frame(state, &image));
     SAIL_TRY(sail_stop_loading(state));
 
-    /* Write the image. */
+    /* Save the image. */
     SAIL_LOG_INFO("Output file: %s", output);
 
     SAIL_TRY(sail_codec_info_from_path(output, &codec_info));

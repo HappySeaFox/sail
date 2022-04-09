@@ -41,7 +41,7 @@ extern "C" {
 struct sail_string_node;
 
 /*
- * Load features. Use this structure to determine what a codec can actually read.
+ * Load features. Use this structure to determine what a codec can actually load.
  */
 struct sail_load_features {
 

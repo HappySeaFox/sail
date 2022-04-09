@@ -82,7 +82,7 @@ struct sail_codec_info {
     /* Load features of the codec. */
     struct sail_load_features *load_features;
 
-    /* Write features of the codec. */
+    /* Save features of the codec. */
     struct sail_save_features *save_features;
 };
 

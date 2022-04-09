@@ -345,15 +345,15 @@ tuning=abc-filtering
 [save-features]
 
 # ';'-separated list of what the image codec can actually write.
-# Can be empty if the image codec cannot write images.
+# Can be empty if the image codec cannot save images.
 #
 # Possible values:
-#    STATIC      - Can write static images.
-#    ANIMATED    - Can write animated images.
-#    MULTI-PAGED - Can write multi-paged (but not animated) images.
-#    META-DATA   - Can write image meta data like JPEG comments or EXIF.
-#    INTERLACED  - Can write interlaced images.
-#    ICCP        - Can write embedded ICC profiles.
+#    STATIC      - Can save static images.
+#    ANIMATED    - Can save animated images.
+#    MULTI-PAGED - Can save multi-paged (but not animated) images.
+#    META-DATA   - Can save image meta data like JPEG comments or EXIF.
+#    INTERLACED  - Can save interlaced images.
+#    ICCP        - Can save embedded ICC profiles.
 #
 features=STATIC;META-DATA;INTERLACED;ICCP
 
@@ -370,7 +370,7 @@ features=STATIC;META-DATA;INTERLACED;ICCP
 tuning=abc-filtering
 
 # ';'-separated list of pixel formats the image codec can write.
-# Can be empty if the image codec cannot write images.
+# Can be empty if the image codec cannot save images.
 #
 # Note: SAIL doesn't convert images while saving. It writes them 1:1. The image codec
 # can take as input and save 8-bit indexed, 24-bit RGB, and 32-bit RGBA images.
@@ -382,12 +382,12 @@ pixel-formats=BPP8-INDEXED;BPP24-RGB;BPP32-BGRA
 properties=
 
 # ';'-separated list of compressions the image codec can write. Cannot be empty if the image codec
-# can write images. If the image codec cannot select compressions, specify UNSUPPORTED.
+# can save images. If the image codec cannot select compressions, specify UNSUPPORTED.
 #
 compression-types=DEFLATE;RLE
 
 # Default compression from the list above to use when no explicit compression was selected
-# by a client application. Can be empty if the image codec cannot write images.
+# by a client application. Can be empty if the image codec cannot save images.
 #
 default-compression=DEFLATE
 

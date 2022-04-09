@@ -162,7 +162,7 @@ sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_load_finish_v7)(void **state,
  *
  * STATE explanation: Pass the address of a local void* pointer. Codecs will store an internal state
  * in it and destroy it in sail_codec_save_finish_vx(). States must be used per image. DO NOT use the same state
- * to write multiple images in the same time.
+ * to save multiple images to different targets in the same time.
  *
  * Returns SAIL_OK on success.
  */
@@ -170,7 +170,7 @@ sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_save_init_v7)(struct sail_io 
 
 /*
  * Seeks to a next frame before writing it. The frame is NOT immediately written. Use sail_codec_save_frame_vx()
- * to actually write a frame.
+ * to actually save a frame.
  *
  * libsail, a caller of this function, guarantees the following:
  *   - The state points to the state allocated by sail_codec_save_init_vx().

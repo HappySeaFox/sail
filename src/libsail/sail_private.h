@@ -49,7 +49,7 @@ struct hidden_state {
     bool own_io;
 
     /*
-     * Write operations save save options to check if the interlaced mode was requested on later stages.
+     * Save operations use save options to check if the interlaced mode was requested on later stages.
      * It's also used to check if the supplied pixel format is supported.
      */
     struct sail_save_options *save_options;

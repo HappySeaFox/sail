@@ -51,7 +51,7 @@ class image;
 class save_options;
 
 /*
- * Class to write images into files, memory, and custom I/O targets.
+ * Class to save images into files, memory, and custom I/O targets.
  */
 class SAIL_EXPORT image_output
 {

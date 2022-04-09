@@ -106,7 +106,7 @@ public:
     /*
      * Unloads all the loaded codecs from the global static context to release memory occupied by them.
      * Use this method if you want to release some memory but do not want to deinitialize SAIL
-     * with finish(). Subsequent attempts to load or write images will reload necessary SAIL codecs
+     * with finish(). Subsequent attempts to load or save images will reload necessary SAIL codecs
      * from disk.
      *
      * Warning: Make sure no loading or writing operations are in progress before calling unload_codecs().

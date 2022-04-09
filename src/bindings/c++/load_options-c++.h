@@ -23,8 +23,8 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_READ_OPTIONS_CPP_H
-#define SAIL_READ_OPTIONS_CPP_H
+#ifndef SAIL_LOAD_OPTIONS_CPP_H
+#define SAIL_LOAD_OPTIONS_CPP_H
 
 #include <memory>
 #include <vector>

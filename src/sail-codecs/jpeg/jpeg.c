@@ -357,7 +357,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v7_jpeg(void *state, s
     jpeg_set_defaults(jpeg_state->compress_context);
     jpeg_set_colorspace(jpeg_state->compress_context, color_space);
 
-    /* Write resolution. */
+    /* Save resolution. */
     SAIL_TRY(jpeg_private_write_resolution(jpeg_state->compress_context, image->resolution));
 
     /* Compute image quality. */
@@ -376,13 +376,13 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v7_jpeg(void *state, s
     jpeg_start_compress(jpeg_state->compress_context, true);
     jpeg_state->started_compress = true;
 
-    /* Write meta data. */
+    /* Save meta data. */
     if (jpeg_state->save_options->options & SAIL_OPTION_META_DATA && image->meta_data_node != NULL) {
         SAIL_TRY(jpeg_private_write_meta_data(jpeg_state->compress_context, image->meta_data_node));
         SAIL_LOG_DEBUG("JPEG: Meta data has been written");
     }
 
-    /* Write ICC profile. */
+    /* Save ICC profile. */
 #ifdef SAIL_HAVE_JPEG_ICCP
     if (jpeg_state->save_options->options & SAIL_OPTION_ICCP && image->iccp != NULL) {
         jpeg_write_icc_profile(jpeg_state->compress_context, image->iccp->data, image->iccp->data_length);

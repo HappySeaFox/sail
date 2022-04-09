@@ -271,11 +271,11 @@ static sail_status_t check_codec_info(const struct sail_codec_info *codec_info) 
             save_features->features & SAIL_CODEC_FEATURE_ANIMATED ||
             save_features->features & SAIL_CODEC_FEATURE_MULTI_PAGED) &&
             (save_features->pixel_formats == NULL || save_features->pixel_formats_length == 0)) {
-        SAIL_LOG_ERROR("Codec validation error: %s codec is able to write images, but output pixel formats are not specified", codec_info->name);
+        SAIL_LOG_ERROR("Codec validation error: %s codec is able to save images, but output pixel formats are not specified", codec_info->name);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INCOMPLETE_CODEC_INFO);
     }
 
-    /* Compressions must exist if we're able to write this image format.*/
+    /* Compressions must exist if we're able to save this image format.*/
     if (save_features->features != 0 && (save_features->compressions == NULL || save_features->compressions_length == 0)) {
         SAIL_LOG_ERROR("Codec validation error: %s codec has empty compressions list", codec_info->name);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INCOMPLETE_CODEC_INFO);

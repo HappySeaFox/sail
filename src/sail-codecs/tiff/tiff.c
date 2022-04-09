@@ -325,19 +325,19 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v7_tiff(void *state, s
     TIFFSetField(tiff_state->tiff, TIFFTAG_COMPRESSION, tiff_state->save_compression);
     TIFFSetField(tiff_state->tiff, TIFFTAG_ROWSPERSTRIP, TIFFDefaultStripSize(tiff_state->tiff, (uint32_t)-1));
 
-    /* Write ICC profile. */
+    /* Save ICC profile. */
     if (tiff_state->save_options->options & SAIL_OPTION_ICCP && image->iccp != NULL) {
         TIFFSetField(tiff_state->tiff, TIFFTAG_ICCPROFILE, image->iccp->data_length, image->iccp->data);
         SAIL_LOG_DEBUG("TIFF: ICC profile has been set");
     }
 
-    /* Write meta data. */
+    /* Save meta data. */
     if (tiff_state->save_options->options & SAIL_OPTION_META_DATA && image->meta_data_node != NULL) {
         SAIL_LOG_DEBUG("TIFF: Writing meta data");
         SAIL_TRY(tiff_private_write_meta_data(tiff_state->tiff, image->meta_data_node));
     }
 
-    /* Write resolution. */
+    /* Save resolution. */
     SAIL_TRY(tiff_private_write_resolution(tiff_state->tiff, image->resolution));
 
     return SAIL_OK;

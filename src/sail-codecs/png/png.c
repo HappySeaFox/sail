@@ -540,7 +540,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v7_png(void *state, st
     SAIL_TRY_OR_CLEANUP(png_private_pixel_format_to_png_color_type(image->pixel_format, &color_type, &bit_depth),
                         /* cleanup */ SAIL_LOG_ERROR("PNG: %s pixel format is not currently supported for writing", sail_pixel_format_to_string(image->pixel_format)));
 
-    /* Write meta data. */
+    /* Save meta data. */
     if (png_state->save_options->options & SAIL_OPTION_META_DATA && image->meta_data_node != NULL) {
         SAIL_TRY(png_private_write_meta_data(png_state->png_ptr, png_state->info_ptr, image->meta_data_node));
         SAIL_LOG_DEBUG("PNG: Meta data has been written");
@@ -556,10 +556,10 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v7_png(void *state, st
                  PNG_COMPRESSION_TYPE_BASE,
                  PNG_FILTER_TYPE_BASE);
 
-    /* Write resolution. */
+    /* Save resolution. */
     SAIL_TRY(png_private_write_resolution(png_state->png_ptr, png_state->info_ptr, image->resolution));
 
-    /* Write ICC profile. */
+    /* Save ICC profile. */
     if (png_state->save_options->options & SAIL_OPTION_ICCP && image->iccp != NULL) {
         png_set_iCCP(png_state->png_ptr,
                         png_state->info_ptr,
@@ -571,7 +571,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v7_png(void *state, st
         SAIL_LOG_DEBUG("PNG: ICC profile has been written");
     }
 
-    /* Write palette. */
+    /* Save palette. */
     if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP1_INDEXED ||
             image->pixel_format == SAIL_PIXEL_FORMAT_BPP2_INDEXED ||
             image->pixel_format == SAIL_PIXEL_FORMAT_BPP4_INDEXED ||

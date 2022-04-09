@@ -23,8 +23,8 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_READ_OPTIONS_H
-#define SAIL_READ_OPTIONS_H
+#ifndef SAIL_LOAD_OPTIONS_H
+#define SAIL_LOAD_OPTIONS_H
 
 #ifdef SAIL_BUILD
     #include "error.h"
@@ -42,7 +42,7 @@ struct sail_hash_map;
 struct sail_load_features;
 
 /*
- * sail_load_options represents options to modify loading operations.
+ * Options to modify loading operations.
  */
 struct sail_load_options {
 

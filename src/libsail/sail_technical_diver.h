@@ -97,7 +97,7 @@ SAIL_EXPORT sail_status_t sail_start_loading_io_with_options(struct sail_io *io,
  *
  * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
  * in it and destroy it in sail_stop_writing. States must be used per image. DO NOT use the same state
- * to write multiple images to different targets in the same time.
+ * to save multiple images to different targets in the same time.
  *
  * Returns SAIL_OK on success.
  */
@@ -117,7 +117,7 @@ SAIL_EXPORT sail_status_t sail_start_writing_io(struct sail_io *io, const struct
  *
  * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
  * in it and destroy it in sail_stop_writing. States must be used per image. DO NOT use the same state
- * to write multiple images to different targets in the same time.
+ * to save multiple images to different targets in the same time.
  *
  * Returns SAIL_OK on success.
  */
