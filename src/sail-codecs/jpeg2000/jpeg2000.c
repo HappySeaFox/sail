@@ -37,10 +37,10 @@
  * Codec-specific state.
  */
 struct jpeg2000_state {
-    struct sail_read_options *read_options;
-    struct sail_write_options *write_options;
+    struct sail_load_options *load_options;
+    struct sail_save_options *save_options;
 
-    bool frame_read;
+    bool frame_loaded;
     void *image_data;
     jas_stream_t *jas_stream;
     jas_image_t *jas_image;
@@ -62,10 +62,10 @@ static sail_status_t alloc_jpeg2000_state(struct jpeg2000_state **jpeg2000_state
 
     jas_init();
 
-    (*jpeg2000_state)->read_options  = NULL;
-    (*jpeg2000_state)->write_options = NULL;
+    (*jpeg2000_state)->load_options = NULL;
+    (*jpeg2000_state)->save_options = NULL;
 
-    (*jpeg2000_state)->frame_read      = false;
+    (*jpeg2000_state)->frame_loaded    = false;
     (*jpeg2000_state)->image_data      = NULL;
     (*jpeg2000_state)->jas_stream      = NULL;
     (*jpeg2000_state)->jas_image       = NULL;
@@ -102,8 +102,8 @@ static void destroy_jpeg2000_state(struct jpeg2000_state *jpeg2000_state) {
 
     jas_cleanup();
 
-    sail_destroy_read_options(jpeg2000_state->read_options);
-    sail_destroy_write_options(jpeg2000_state->write_options);
+    sail_destroy_load_options(jpeg2000_state->load_options);
+    sail_destroy_save_options(jpeg2000_state->save_options);
 
     sail_free(jpeg2000_state->image_data);
 
@@ -114,21 +114,21 @@ static void destroy_jpeg2000_state(struct jpeg2000_state *jpeg2000_state) {
  * Decoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_read_init_v6_jpeg2000(struct sail_io *io, const struct sail_read_options *read_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_load_init_v7_jpeg2000(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
 
     SAIL_CHECK_PTR(state);
     *state = NULL;
 
     SAIL_TRY(sail_check_io_valid(io));
-    SAIL_CHECK_PTR(read_options);
+    SAIL_CHECK_PTR(load_options);
 
     /* Allocate a new state. */
     struct jpeg2000_state *jpeg2000_state;
     SAIL_TRY(alloc_jpeg2000_state(&jpeg2000_state));
     *state = jpeg2000_state;
 
-    /* Deep copy read options. */
-    SAIL_TRY(sail_copy_read_options(read_options, &jpeg2000_state->read_options));
+    /* Deep copy load options. */
+    SAIL_TRY(sail_copy_load_options(load_options, &jpeg2000_state->load_options));
 
     /* Read the entire image to use the JasPer memory API. */
     size_t image_size;
@@ -145,7 +145,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_jpeg2000(struct sail_io *io, c
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_jpeg2000(void *state, struct sail_io *io, struct sail_image **image) {
+SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v7_jpeg2000(void *state, struct sail_io *io, struct sail_image **image) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
@@ -153,11 +153,11 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_jpeg2000(void *stat
 
     struct jpeg2000_state *jpeg2000_state = (struct jpeg2000_state *)state;
 
-    if (jpeg2000_state->frame_read) {
+    if (jpeg2000_state->frame_loaded) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
     }
 
-    jpeg2000_state->frame_read = true;
+    jpeg2000_state->frame_loaded = true;
 
     /* Get image info. */
     jpeg2000_state->jas_image = jas_image_decode(jpeg2000_state->jas_stream, -1 /* format */, NULL /* options */);
@@ -289,7 +289,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_jpeg2000(void *stat
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_read_frame_v6_jpeg2000(void *state, struct sail_io *io, struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_load_frame_v7_jpeg2000(void *state, struct sail_io *io, struct sail_image *image) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
@@ -323,7 +323,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v6_jpeg2000(void *state, struct 
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_read_finish_v6_jpeg2000(void **state, struct sail_io *io) {
+SAIL_EXPORT sail_status_t sail_codec_load_finish_v7_jpeg2000(void **state, struct sail_io *io) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
@@ -341,25 +341,16 @@ SAIL_EXPORT sail_status_t sail_codec_read_finish_v6_jpeg2000(void **state, struc
  * Encoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_write_init_v6_jpeg2000(struct sail_io *io, const struct sail_write_options *write_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_save_init_v7_jpeg2000(struct sail_io *io, const struct sail_save_options *save_options, void **state) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
-    SAIL_CHECK_PTR(write_options);
+    SAIL_CHECK_PTR(save_options);
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v6_jpeg2000(void *state, struct sail_io *io, const struct sail_image *image) {
-
-    SAIL_CHECK_PTR(state);
-    SAIL_TRY(sail_check_io_valid(io));
-    SAIL_TRY(sail_check_image_valid(image));
-
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
-}
-
-SAIL_EXPORT sail_status_t sail_codec_write_frame_v6_jpeg2000(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v7_jpeg2000(void *state, struct sail_io *io, const struct sail_image *image) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
@@ -368,7 +359,16 @@ SAIL_EXPORT sail_status_t sail_codec_write_frame_v6_jpeg2000(void *state, struct
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-SAIL_EXPORT sail_status_t sail_codec_write_finish_v6_jpeg2000(void **state, struct sail_io *io) {
+SAIL_EXPORT sail_status_t sail_codec_save_frame_v7_jpeg2000(void *state, struct sail_io *io, const struct sail_image *image) {
+
+    SAIL_CHECK_PTR(state);
+    SAIL_TRY(sail_check_io_valid(io));
+    SAIL_TRY(sail_check_image_valid(image));
+
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
+}
+
+SAIL_EXPORT sail_status_t sail_codec_save_finish_v7_jpeg2000(void **state, struct sail_io *io) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));

@@ -1,7 +1,7 @@
 # XBM codec information
 #
 [codec]
-layout=6
+layout=7
 version=0.7.0
 priority=LOWEST
 name=XBM
@@ -10,11 +10,11 @@ magic-numbers=
 extensions=xbm
 mime-types=image/x-xbitmap;image/x-xbm
 
-[read-features]
+[load-features]
 features=STATIC
 tuning=
 
-[write-features]
+[save-features]
 features=
 tuning=
 pixel-formats=

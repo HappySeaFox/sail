@@ -31,13 +31,13 @@ static MunitResult test_alloc_options(const MunitParameter params[], void *user_
     (void)params;
     (void)user_data;
 
-    struct sail_read_options *read_options = NULL;
-    munit_assert(sail_alloc_read_options(&read_options) == SAIL_OK);
-    munit_assert_not_null(read_options);
-    munit_assert(read_options->options == 0);
-    munit_assert_null(read_options->tuning);
+    struct sail_load_options *load_options = NULL;
+    munit_assert(sail_alloc_load_options(&load_options) == SAIL_OK);
+    munit_assert_not_null(load_options);
+    munit_assert(load_options->options == 0);
+    munit_assert_null(load_options->tuning);
 
-    sail_destroy_read_options(read_options);
+    sail_destroy_load_options(load_options);
 
     return MUNIT_OK;
 }
@@ -46,20 +46,20 @@ static MunitResult test_copy_options(const MunitParameter params[], void *user_d
     (void)params;
     (void)user_data;
 
-    struct sail_read_options *read_options = NULL;
-    munit_assert(sail_alloc_read_options(&read_options) == SAIL_OK);
+    struct sail_load_options *load_options = NULL;
+    munit_assert(sail_alloc_load_options(&load_options) == SAIL_OK);
 
-    read_options->options = SAIL_OPTION_ICCP;
+    load_options->options = SAIL_OPTION_ICCP;
 
-    struct sail_read_options *read_options_copy = NULL;
-    munit_assert(sail_copy_read_options(read_options, &read_options_copy) == SAIL_OK);
-    munit_assert_not_null(read_options_copy);
+    struct sail_load_options *load_options_copy = NULL;
+    munit_assert(sail_copy_load_options(load_options, &load_options_copy) == SAIL_OK);
+    munit_assert_not_null(load_options_copy);
 
-    munit_assert(read_options_copy->options == read_options->options);
-    munit_assert_null(read_options_copy->tuning);
+    munit_assert(load_options_copy->options == load_options->options);
+    munit_assert_null(load_options_copy->tuning);
 
-    sail_destroy_read_options(read_options_copy);
-    sail_destroy_read_options(read_options);
+    sail_destroy_load_options(load_options_copy);
+    sail_destroy_load_options(load_options);
 
     return MUNIT_OK;
 }
@@ -68,15 +68,15 @@ static MunitResult test_options_from_features(const MunitParameter params[], voi
     (void)params;
     (void)user_data;
 
-    struct sail_read_options *read_options;
-    struct sail_read_features read_features;
-    read_features.features = SAIL_CODEC_FEATURE_META_DATA | SAIL_CODEC_FEATURE_INTERLACED | SAIL_CODEC_FEATURE_ICCP;
-    munit_assert(sail_alloc_read_options_from_features(&read_features, &read_options) == SAIL_OK);
+    struct sail_load_options *load_options;
+    struct sail_load_features load_features;
+    load_features.features = SAIL_CODEC_FEATURE_META_DATA | SAIL_CODEC_FEATURE_INTERLACED | SAIL_CODEC_FEATURE_ICCP;
+    munit_assert(sail_alloc_load_options_from_features(&load_features, &load_options) == SAIL_OK);
 
-    munit_assert(read_options->options == (SAIL_OPTION_META_DATA | SAIL_OPTION_ICCP));
-    munit_assert_null(read_options->tuning);
+    munit_assert(load_options->options == (SAIL_OPTION_META_DATA | SAIL_OPTION_ICCP));
+    munit_assert_null(load_options->tuning);
 
-    sail_destroy_read_options(read_options);
+    sail_destroy_load_options(load_options);
 
     return MUNIT_OK;
 }

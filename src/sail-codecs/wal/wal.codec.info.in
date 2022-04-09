@@ -1,7 +1,7 @@
 # WAL codec information
 #
 [codec]
-layout=6
+layout=7
 version=0.2.0
 priority=LOWEST
 name=WAL
@@ -10,11 +10,11 @@ magic-numbers=
 extensions=wal
 mime-types=
 
-[read-features]
+[load-features]
 features=STATIC;MULTI-PAGED
 tuning=
 
-[write-features]
+[save-features]
 features=
 tuning=
 pixel-formats=

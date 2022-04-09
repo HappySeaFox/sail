@@ -1,7 +1,7 @@
 # BMP codec information
 #
 [codec]
-layout=6
+layout=7
 version=1.1.2
 priority=HIGH
 name=BMP
@@ -10,11 +10,11 @@ magic-numbers=42 4d;02 00
 extensions=bmp;ddb;dib
 mime-types=image/bmp;image/x-bmp
 
-[read-features]
+[load-features]
 features=STATIC;META-DATA
 tuning=
 
-[write-features]
+[save-features]
 features=
 tuning=
 pixel-formats=

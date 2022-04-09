@@ -47,68 +47,68 @@ struct sail_resolution;
 struct sail_source_image;
 
 /*
- * sail_image represents an image. Fields set by SAIL when reading images are marked with READ.
- * Fields that must be set by a caller when writing images are marked with WRITE.
+ * sail_image represents an image. Fields set by SAIL when loading images are marked with LOAD.
+ * Fields that must be set by a caller when saving images are marked with SAVE.
  */
 struct sail_image {
 
     /*
      * Image pixels.
      *
-     * READ:  Set by SAIL to an allocated array of pixels.
-     * WRITE: Must be set by a caller to an allocated array of pixels.
+     * LOAD: Set by SAIL to an allocated array of pixels.
+     * SAVE: Must be set by a caller to an allocated array of pixels.
      */
     void *pixels;
 
     /*
      * Image width.
      *
-     * READ:  Set by SAIL to a positive image width in pixels.
-     * WRITE: Must be set by a caller to a positive image width in pixels.
+     * LOAD: Set by SAIL to a positive image width in pixels.
+     * SAVE: Must be set by a caller to a positive image width in pixels.
      */
     unsigned width;
 
     /*
      * Image height.
      *
-     * READ:  Set by SAIL to a positive image height in pixels.
-     * WRITE: Must be set by a caller to a positive image height in pixels.
+     * LOAD: Set by SAIL to a positive image height in pixels.
+     * SAVE: Must be set by a caller to a positive image height in pixels.
      */
     unsigned height;
 
     /*
      * Bytes per line.
      *
-     * READ:  Set by SAIL to a positive length of a row of pixels in bytes.
-     * WRITE: Must be set by a caller to a positive number of bytes per line. A caller could set
-     *        it to sail_bytes_per_line() if scan lines are not padded to a certain boundary.
+     * LOAD: Set by SAIL to a positive length of a row of pixels in bytes.
+     * SAVE: Must be set by a caller to a positive number of bytes per line. A caller could set
+     *       it to sail_bytes_per_line() if scan lines are not padded to a certain boundary.
      */
     unsigned bytes_per_line;
 
     /*
      * Image resolution.
      *
-     * READ:  Set by SAIL to a valid resolution or to NULL if this information is not available.
-     * WRITE: Must be set by a caller to a valid image resolution if necessary.
+     * LOAD: Set by SAIL to a valid resolution or to NULL if this information is not available.
+     * SAVE: Must be set by a caller to a valid image resolution if necessary.
      */
     struct sail_resolution *resolution;
 
     /*
      * Image pixel format. See SailPixelFormat.
      *
-     * READ:  Set by SAIL to a valid image pixel format.
-     * WRITE: Must be set by a caller to a valid input image pixel format. Pixels in this format will be supplied
-     *        to the codec by a caller later. The list of supported input pixel formats by a certain codec
-     *        can be obtained from sail_write_features.pixel_formats.
+     * LOAD: Set by SAIL to a valid image pixel format.
+     * SAVE: Must be set by a caller to a valid input image pixel format. Pixels in this format will be supplied
+     *       to the codec by a caller later. The list of supported input pixel formats by a certain codec
+     *       can be obtained from sail_save_features.pixel_formats.
      */
     enum SailPixelFormat pixel_format;
 
     /*
      * Image gamma.
      *
-     * READ:  Set by SAIL to a valid gamma if it's available. 1 by default.
-     * WRITE: Must be set by a caller to a valid gamma. Not all codecs support saving
-     *        gamma.
+     * LOAD: Set by SAIL to a valid gamma if it's available. 1 by default.
+     * SAVE: Must be set by a caller to a valid gamma. Not all codecs support saving
+     *       gamma.
      */
     double gamma;
 
@@ -116,12 +116,12 @@ struct sail_image {
      * Delay in milliseconds to display the image on the screen if the image is a frame
      * in an animation or -1 otherwise.
      *
-     * READ:  Set by SAIL to a non-negative number of milliseconds if the image is a frame
-     *        in an animation or to -1 otherwise.
-     *        For animations, it's guaranteed that all the frames have non-negative delays.
-     *        For multi-paged sequences, it's guaranteed that all the pages have delays equal to -1.
-     * WRITE: Must be set by a caller to a non-negative number of milliseconds if the image is a frame
-     *        in an animation.
+     * LOAD: Set by SAIL to a non-negative number of milliseconds if the image is a frame
+     *       in an animation or to -1 otherwise.
+     *       For animations, it's guaranteed that all the frames have non-negative delays.
+     *       For multi-paged sequences, it's guaranteed that all the pages have delays equal to -1.
+     * SAVE: Must be set by a caller to a non-negative number of milliseconds if the image is a frame
+     *       in an animation.
      */
     int delay;
 
@@ -129,18 +129,18 @@ struct sail_image {
      * Palette if the image has a palette and the requested pixel format assumes having a palette.
      * Destroyed by sail_destroy_image().
      *
-     * READ:  Set by SAIL to a valid palette if the image is indexed and the requested pixel format
-     *        assumes having a palette. NULL otherwise.
-     * WRITE: Must be allocated and set by a caller to a valid palette if the image is indexed.
+     * LOAD: Set by SAIL to a valid palette if the image is indexed and the requested pixel format
+     *       assumes having a palette. NULL otherwise.
+     * SAVE: Must be allocated and set by a caller to a valid palette if the image is indexed.
      */
     struct sail_palette *palette;
 
     /*
      * Image meta data. Codecs guarantee that values are non-NULL.
      *
-     * READ:  Set by SAIL to a valid linked list with meta data (like JPEG comments) or to NULL.
-     * WRITE: Must be allocated and set by a caller to a valid linked list with meta data
-     *        (like JPEG comments) if necessary.
+     * LOAD: Set by SAIL to a valid linked list with meta data (like JPEG comments) or to NULL.
+     * SAVE: Must be allocated and set by a caller to a valid linked list with meta data
+     *       (like JPEG comments) if necessary.
      */
     struct sail_meta_data_node *meta_data_node;
 
@@ -150,17 +150,17 @@ struct sail_image {
      * Note for animated/multi-paged images: only the first image in an animated/multi-paged
      * sequence might have an ICC profile.
      *
-     * READ:  Set by SAIL to a valid ICC profile or to NULL.
-     * WRITE: Must be allocated and set by a caller to a valid ICC profile if necessary.
+     * LOAD: Set by SAIL to a valid ICC profile or to NULL.
+     * SAVE: Must be allocated and set by a caller to a valid ICC profile if necessary.
      */
     struct sail_iccp *iccp;
 
     /*
      * Or-ed image properties. See SailImageProperty.
      *
-     * READ:  Set by SAIL to valid image properties. For example, some image formats store images flipped.
-     *        A caller must use this field to manipulate the output image accordingly (e.g., flip back etc.).
-     * WRITE: Ignored.
+     * LOAD: Set by SAIL to valid image properties. For example, some image formats store images flipped.
+     *       A caller must use this field to manipulate the output image accordingly (e.g., flip back etc.).
+     * SAVE: Ignored.
      */
     int properties;
 
@@ -168,8 +168,8 @@ struct sail_image {
      * Source image properties which are usually lost during decoding.
      * For example, one might want to know the source image pixel format.
      *
-     * READ:  Set by SAIL to valid source image properties of the original image.
-     * WRITE: Ignored.
+     * LOAD: Set by SAIL to valid source image properties of the original image.
+     * SAVE: Ignored.
      */
     struct sail_source_image *source_image;
 };

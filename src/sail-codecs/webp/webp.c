@@ -40,8 +40,8 @@
  * Codec-specific state.
  */
 struct webp_state {
-    struct sail_read_options *read_options;
-    struct sail_write_options *write_options;
+    struct sail_load_options *load_options;
+    struct sail_save_options *save_options;
 
     struct sail_image *canvas_image;
     WebPDemuxer *webp_demux;
@@ -67,9 +67,9 @@ static sail_status_t alloc_webp_state(struct webp_state **webp_state) {
     SAIL_TRY(sail_malloc(sizeof(struct webp_state), &ptr));
     *webp_state = ptr;
 
-    (*webp_state)->read_options  = NULL;
-    (*webp_state)->write_options = NULL;
-    (*webp_state)->canvas_image  = NULL;
+    (*webp_state)->load_options = NULL;
+    (*webp_state)->save_options = NULL;
+    (*webp_state)->canvas_image = NULL;
 
     (*webp_state)->webp_demux            = NULL;
     (*webp_state)->webp_iterator         = NULL;
@@ -105,8 +105,8 @@ static void destroy_webp_state(struct webp_state *webp_state) {
 
     WebPDemuxDelete(webp_state->webp_demux);
 
-    sail_destroy_read_options(webp_state->read_options);
-    sail_destroy_write_options(webp_state->write_options);
+    sail_destroy_load_options(webp_state->load_options);
+    sail_destroy_save_options(webp_state->save_options);
     sail_destroy_image(webp_state->canvas_image);
 
     sail_free(webp_state);
@@ -116,21 +116,21 @@ static void destroy_webp_state(struct webp_state *webp_state) {
  * Decoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_read_init_v6_webp(struct sail_io *io, const struct sail_read_options *read_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_load_init_v7_webp(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
 
     SAIL_CHECK_PTR(state);
     *state = NULL;
 
     SAIL_TRY(sail_check_io_valid(io));
-    SAIL_CHECK_PTR(read_options);
+    SAIL_CHECK_PTR(load_options);
 
     /* Allocate a new state. */
     struct webp_state *webp_state;
     SAIL_TRY(alloc_webp_state(&webp_state));
     *state = webp_state;
 
-    /* Deep copy read options. */
-    SAIL_TRY(sail_copy_read_options(read_options, &webp_state->read_options));
+    /* Deep copy load options. */
+    SAIL_TRY(sail_copy_load_options(load_options, &webp_state->load_options));
 
     /* Read the entire image. */
     SAIL_ALIGNAS(uint32_t) char signature_and_size[8];
@@ -174,13 +174,13 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_webp(struct sail_io *io, const
     webp_state->bytes_per_pixel = image_local->bytes_per_line / image_local->width;
 
     /* Fetch ICCP. */
-    if (webp_state->read_options->options & SAIL_OPTION_ICCP) {
+    if (webp_state->load_options->options & SAIL_OPTION_ICCP) {
         SAIL_TRY_OR_CLEANUP(webp_private_fetch_iccp(webp_state->webp_demux, &image_local->iccp),
                             /* cleanup */ sail_destroy_image(image_local));
     }
 
     /* Fetch meta data. */
-    if (webp_state->read_options->options & SAIL_OPTION_META_DATA) {
+    if (webp_state->load_options->options & SAIL_OPTION_META_DATA) {
         SAIL_TRY_OR_CLEANUP(webp_private_fetch_meta_data(webp_state->webp_demux, &image_local->meta_data_node),
                             /* cleanup */ sail_destroy_image(image_local));
     }
@@ -190,7 +190,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_webp(struct sail_io *io, const
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_webp(void *state, struct sail_io *io, struct sail_image **image) {
+SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v7_webp(void *state, struct sail_io *io, struct sail_image **image) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
@@ -261,7 +261,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_webp(void *state, s
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_read_frame_v6_webp(void *state, struct sail_io *io, struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_load_frame_v7_webp(void *state, struct sail_io *io, struct sail_image *image) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
@@ -312,7 +312,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v6_webp(void *state, struct sail
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_read_finish_v6_webp(void **state, struct sail_io *io) {
+SAIL_EXPORT sail_status_t sail_codec_load_finish_v7_webp(void **state, struct sail_io *io) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
@@ -330,25 +330,16 @@ SAIL_EXPORT sail_status_t sail_codec_read_finish_v6_webp(void **state, struct sa
  * Encoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_write_init_v6_webp(struct sail_io *io, const struct sail_write_options *write_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_save_init_v7_webp(struct sail_io *io, const struct sail_save_options *save_options, void **state) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
-    SAIL_CHECK_PTR(write_options);
+    SAIL_CHECK_PTR(save_options);
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v6_webp(void *state, struct sail_io *io, const struct sail_image *image) {
-
-    SAIL_CHECK_PTR(state);
-    SAIL_TRY(sail_check_io_valid(io));
-    SAIL_TRY(sail_check_image_valid(image));
-
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
-}
-
-SAIL_EXPORT sail_status_t sail_codec_write_frame_v6_webp(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v7_webp(void *state, struct sail_io *io, const struct sail_image *image) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
@@ -357,7 +348,16 @@ SAIL_EXPORT sail_status_t sail_codec_write_frame_v6_webp(void *state, struct sai
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-SAIL_EXPORT sail_status_t sail_codec_write_finish_v6_webp(void **state, struct sail_io *io) {
+SAIL_EXPORT sail_status_t sail_codec_save_frame_v7_webp(void *state, struct sail_io *io, const struct sail_image *image) {
+
+    SAIL_CHECK_PTR(state);
+    SAIL_TRY(sail_check_io_valid(io));
+    SAIL_TRY(sail_check_image_valid(image));
+
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
+}
+
+SAIL_EXPORT sail_status_t sail_codec_save_finish_v7_webp(void **state, struct sail_io *io) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));

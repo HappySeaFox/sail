@@ -43,7 +43,7 @@
 #include <sail-manip/sail-manip.h>
 
 //#define SAIL_CODEC_NAME jpeg
-//#include <sail/layout/v6.h>
+//#include <sail/layout/v7.h>
 
 #include "qtsail.h"
 #include "ui_qtsail.h"
@@ -88,18 +88,18 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
     unsigned width = 0, height = 0;
 
     /*
-     * Starts reading the specified file.
+     * Starts loading the specified file.
      */
-    SAIL_TRY_OR_CLEANUP(sail_start_reading_file(path.toLocal8Bit(), NULL, &state),
-                        /* cleanup */ sail_stop_reading(state));
+    SAIL_TRY_OR_CLEANUP(sail_start_loading_file(path.toLocal8Bit(), NULL, &state),
+                        /* cleanup */ sail_stop_loading(state));
 
     /*
-     * Read all the available image frames in the file.
+     * Load all the available image frames in the file.
      */
     sail_status_t res;
     struct sail_image *image;
 
-    while ((res = sail_read_next_frame(state, &image)) == SAIL_OK) {
+    while ((res = sail_load_next_frame(state, &image)) == SAIL_OK) {
 
         /* Mutate alpha into a green color. */
         const struct sail_conversion_options options = {
@@ -113,7 +113,7 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
                                                             SAIL_PIXEL_FORMAT_BPP24_RGB,
                                                             &options,
                                                             &image_converted),
-                            /* cleanup */ sail_stop_reading(state),
+                            /* cleanup */ sail_stop_loading(state),
                                           sail_destroy_image(image));
 
         if (width == 0) {
@@ -140,16 +140,16 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
     }
 
     if (res != SAIL_ERROR_NO_MORE_FRAMES) {
-        sail_stop_reading(state);
+        sail_stop_loading(state);
         return res;
     }
 
-    SAIL_LOG_DEBUG("Read images: %d", qimages->size());
+    SAIL_LOG_DEBUG("Loaded images: %d", qimages->size());
 
     /*
-     * Finish reading.
+     * Finish loading.
      */
-    SAIL_TRY(sail_stop_reading(state));
+    SAIL_TRY(sail_stop_loading(state));
 
     m_ui->labelStatus->setText(tr("%1  [%2x%3]  [%4 → %5]")
                                 .arg(QFileInfo(path).fileName())
@@ -194,21 +194,21 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
      * without using sail-manip.
      */
     struct sail_image *image_converted;
-    SAIL_TRY_OR_CLEANUP(sail_convert_image_for_saving(image, codec_info->write_features, &image_converted),
+    SAIL_TRY_OR_CLEANUP(sail_convert_image_for_saving(image, codec_info->save_features, &image_converted),
                         /* cleanup */ sail_destroy_image(image));
 
     sail_destroy_image(image);
     image = image_converted;
 
     /*
-     * Create write options to pass PNG filters.
+     * Create save options to pass PNG filters.
      */
-    struct sail_write_options *write_options;
-    SAIL_TRY_OR_CLEANUP(sail_alloc_write_options_from_features(codec_info->write_features, &write_options),
+    struct sail_save_options *save_options;
+    SAIL_TRY_OR_CLEANUP(sail_alloc_save_options_from_features(codec_info->save_features, &save_options),
                         /* cleanup */ sail_destroy_image(image));
 
-    SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&write_options->tuning),
-                        /* cleanup */ sail_destroy_write_options(write_options),
+    SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&save_options->tuning),
+                        /* cleanup */ sail_destroy_save_options(save_options),
                                       sail_destroy_image(image));
 
     /*
@@ -220,22 +220,22 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
      */
     struct sail_variant *value;
     SAIL_TRY_OR_CLEANUP(sail_alloc_variant(&value),
-                        /* cleanup */ sail_destroy_write_options(write_options),
+                        /* cleanup */ sail_destroy_save_options(save_options),
                                       sail_destroy_image(image));
 
     sail_set_variant_string(value, "none;sub");
-    sail_put_hash_map(write_options->tuning, "png-filter", value);
+    sail_put_hash_map(save_options->tuning, "png-filter", value);
     sail_destroy_variant(value);
 
-    SAIL_TRY_OR_CLEANUP(sail_start_writing_file_with_options(path.toLocal8Bit(), nullptr, write_options, &state),
-                        /* cleanup */ sail_destroy_write_options(write_options),
+    SAIL_TRY_OR_CLEANUP(sail_start_saving_file_with_options(path.toLocal8Bit(), nullptr, save_options, &state),
+                        /* cleanup */ sail_destroy_save_options(save_options),
                                       sail_destroy_image(image));
 
-    sail_destroy_write_options(write_options);
+    sail_destroy_save_options(save_options);
 
     SAIL_TRY_OR_CLEANUP(sail_write_next_frame(state, image),
                         /* cleanup */ sail_destroy_image(image));
-    SAIL_TRY_OR_CLEANUP(sail_stop_writing(state),
+    SAIL_TRY_OR_CLEANUP(sail_stop_saving(state),
                         /* cleanup */ sail_destroy_image(image));
 
     sail_destroy_image(image);

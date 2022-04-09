@@ -40,7 +40,7 @@ struct sail_codec_bundle_node;
 
 /*
  * Context is a main entry point to start working with SAIL. It enumerates codec info objects which could be
- * used later in reading and writing operations.
+ * used later in loading and saving operations.
  */
 struct sail_context {
 

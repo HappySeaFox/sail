@@ -23,8 +23,8 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_READ_FEATURES_CPP_H
-#define SAIL_READ_FEATURES_CPP_H
+#ifndef SAIL_LOAD_OPTIONS_CPP_H
+#define SAIL_LOAD_OPTIONS_CPP_H
 
 #include <memory>
 #include <vector>
@@ -41,56 +41,59 @@
     #include <sail-c++/tuning-c++.h>
 #endif
 
-struct sail_read_features;
+struct sail_load_options;
 
 namespace sail
 {
 
-class read_options;
-
 /*
- * Read features. Use this class to determine what a codec can actually read.
- * See codec_info.
+ * load_options represents options to modify loading operations. See image_input.
  */
-class SAIL_EXPORT read_features
+class SAIL_EXPORT load_options
 {
-    friend class codec_info;
+    friend class image_input;
+    friend class load_features;
 
 public:
     /*
-     * Copies the read features.
+     * Constructs empty load options.
      */
-    read_features(const read_features &rf);
+    load_options();
 
     /*
-     * Copies the read features.
+     * Copies the load options.
      */
-    read_features& operator=(const sail::read_features &read_features);
+    load_options(const load_options &ro);
 
     /*
-     * Moves the read features.
+     * Copies the load options.
      */
-    read_features(sail::read_features &&read_features) noexcept;
+    load_options& operator=(const sail::load_options &load_options);
 
     /*
-     * Moves the read features.
+     * Moves the load options.
      */
-    read_features& operator=(sail::read_features &&read_features) noexcept;
+    load_options(sail::load_options &&load_options) noexcept;
 
     /*
-     * Destroys the read features.
+     * Moves the load options.
      */
-    ~read_features();
+    load_options& operator=(sail::load_options &&load_options) noexcept;
 
     /*
-     * Returns the supported or-ed features of reading operations. See SailCodecFeature.
+     * Destroys the load options.
      */
-    int features() const;
+    ~load_options();
 
     /*
-     * Returns supported codec-specific tuning options. For example, a hypothetical ABC
+     * Returns the or-ed manipulation options for loading operations. See SailOption.
+     */
+    int options() const;
+
+    /*
+     * Returns editable codec-specific tuning options. For example, a hypothetical ABC
      * image codec can allow disabling filtering with setting the "abc-filtering"
-     * tuning option to 0 in read options. Tuning options' names start with the codec name
+     * tuning option to 0 in load options. Tuning options' names start with the codec name
      * to avoid confusing.
      *
      * The list of possible values for every tuning option is not current available
@@ -99,26 +102,40 @@ public:
      * It's not guaranteed that tuning options and their values are backward
      * or forward compatible.
      */
-    const sail::supported_tuning& supported_tuning() const;
+    sail::tuning& tuning();
 
     /*
-     * Builds default read options from the read features. Can be used to build
-     * default read options and then slightly modify them before passing to image_input.
+     * Returns constant codec-specific tuning options. For example, a hypothetical ABC
+     * image codec can allow disabling filtering with setting the "abc-filtering"
+     * tuning option to 0 in load options. Tuning options' names start with the codec name
+     * to avoid confusing.
      *
-     * Returns SAIL_OK on success.
+     * The list of possible values for every tuning option is not current available
+     * programmatically. Every codec must document them in the codec info.
+     *
+     * It's not guaranteed that tuning options and their values are backward
+     * or forward compatible.
      */
-    sail_status_t to_read_options(sail::read_options *read_options) const;
+    const sail::tuning& tuning() const;
+
+    /*
+     * Sets new or-ed manipulation options for loading operations. See SailOption.
+     */
+    void set_options(int options);
+
+    /*
+     * Sets new codec tuning.
+     */
+    void set_tuning(const sail::tuning &tuning);
 
 private:
-    read_features();
-
     /*
-     * Makes a deep copy of the specified read features and stores the pointer for further use.
+     * Makes a deep copy of the specified load options and stores the pointer for further use.
      * When the SAIL context gets uninitialized, the pointer becomes dangling.
      */
-    explicit read_features(const sail_read_features *rf);
+    explicit load_options(const sail_load_options *ro);
 
-    const sail_read_features* sail_read_features_c() const;
+    sail_status_t to_sail_load_options(sail_load_options **load_options) const;
 
 private:
     class pimpl;

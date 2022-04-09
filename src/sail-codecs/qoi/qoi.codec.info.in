@@ -1,7 +1,7 @@
 # QOI codec information
 #
 [codec]
-layout=6
+layout=7
 version=0.9.0
 priority=LOW
 name=QOI
@@ -10,11 +10,11 @@ magic-numbers=71 6F 69 66
 extensions=qoi
 mime-types=
 
-[read-features]
+[load-features]
 features=STATIC
 tuning=
 
-[write-features]
+[save-features]
 features=STATIC
 tuning=
 pixel-formats=BPP24-RGB;BPP32-RGBA

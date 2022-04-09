@@ -10,10 +10,10 @@ Table of Contents
   * [Describe the high\-level APIs](#describe-the-high-level-apis)
   * [Does SAIL provide simple one\-line APIs?](#does-sail-provide-simple-one-line-apis)
   * [What pixel formats SAIL is able to read?](#what-pixel-formats-sail-is-able-to-read)
-  * [In what pixel format SAIL reading functions output images?](#in-what-pixel-format-sail-reading-functions-output-images)
+  * [In what pixel format SAIL loading functions output images?](#in-what-pixel-format-sail-loading-functions-output-images)
   * [What pixel formats SAIL is able to write?](#what-pixel-formats-sail-is-able-to-write)
   * [Does SAIL support animated and multi\-paged images?](#does-sail-support-animated-and-multi-paged-images)
-  * [Does SAIL support reading from memory?](#does-sail-support-reading-from-memory)
+  * [Does SAIL support loading from memory?](#does-sail-support-loading-from-memory)
   * [How does SAIL support image formats?](#how-does-sail-support-image-formats)
   * [Does SAIL preload codecs in the initialization routine?](#does-sail-preload-codecs-in-the-initialization-routine)
     * [SAIL\_COMBINE\_CODECS is OFF](#sail_combine_codecs-is-off)
@@ -94,11 +94,11 @@ Yes. SAIL provides four levels of APIs, depending on your needs: `junior`, `adva
 ## What pixel formats SAIL is able to read?
 
 SAIL codecs always try to support as many input pixel formats as possible. The list of
-pixel formats that can be read by SAIL is codec-specific and is not publicly available.
+pixel formats that can be loaded by SAIL is codec-specific and is not publicly available.
 
-For example, some codecs may be able to read just 3 input pixel formats. Other may be able to read 10.
+For example, some codecs may be able to load just 3 input pixel formats. Other may be able to load 10.
 
-## In what pixel format SAIL reading functions output images?
+## In what pixel format SAIL loading functions output images?
 
 SAIL always tries to output pixel format close to the source pixel format as much as possible.
 Ideally (but not always), it outputs the same pixel format as stored in the image.
@@ -110,23 +110,23 @@ You can also consider conversion functions from `libsail-manip`.
 ## What pixel formats SAIL is able to write?
 
 SAIL codecs always try to support as much output pixel formats as possible. SAIL doesn't convert
-one pixel format to another in writing operations. Images are always written as is.
+one pixel format to another in saving operations. Images are always written as is.
 
 The list of pixel formats that can be written by SAIL is codec-specific and is publicly available in every
-.codec.info file. It can be accessed through `sail_codec_info_from_extension() -> codec_info -> write_features ->
+.codec.info file. It can be accessed through `sail_codec_info_from_extension() -> codec_info -> save_features ->
 pixel_formats`.
 
 ## Does SAIL support animated and multi-paged images?
 
-Yes. Just continue reading the image file until the reading functions return `SAIL_OK`.
-If no more frames are available, the reading functions return `SAIL_ERROR_NO_MORE_FRAMES`.
+Yes. Just continue loading the image file until the loading functions return `SAIL_OK`.
+If no more frames are available, the loading functions return `SAIL_ERROR_NO_MORE_FRAMES`.
 
-## Does SAIL support reading from memory?
+## Does SAIL support loading from memory?
 
-Yes. SAIL supports reading/writing from/to files and memory. For technical divers,
+Yes. SAIL supports loading/saving from/to files and memory. For technical divers,
 it's also possible to use custom I/O sources.
 
-See `sail_start_reading_file()`, `sail_start_reading_mem()`, and `sail_start_reading_io()`.
+See `sail_start_loading_file()`, `sail_start_loading_mem()`, and `sail_start_loading_io()`.
 
 ## How does SAIL support image formats?
 
@@ -194,10 +194,10 @@ setting the `SAIL_CODECS_PATH` environment variable.
 
 Internally, SAIL always cleans up on errors. If you encounter a memory leak on error, please report it.
 
-**C only:** However, if an engineer encounters an error in the middle of reading or writing an image with the `advanced`
-or a deeper API, it's always a responsibility of the engineer to stop reading or writing with
-`sail_stop_reading()` or `sail_stop_writing()`. These functions execute a proper cleanup in the underlying codec.
-If you don't call `sail_stop_reading()` or `sail_stop_writing()` in this situation, be prepared for memory leaks.
+**C only:** However, if an engineer encounters an error in the middle of loading or saving an image with the `advanced`
+or a deeper API, it's always a responsibility of the engineer to stop loading or saving with
+`sail_stop_loading()` or `sail_stop_saving()`. These functions execute a proper cleanup in the underlying codec.
+If you don't call `sail_stop_loading()` or `sail_stop_saving()` in this situation, be prepared for memory leaks.
 
 **C++ only:** C++ engineers are more lucky. The C++ binding executes the necessary cleanup automatically in this
 situation in `~image_input()` or `~image_output()`.
@@ -230,29 +230,29 @@ Or:
 void *state = NULL;
 struct sail_image *image = NULL;
 
-SAIL_TRY(sail_start_reading_file(..., &state));
+SAIL_TRY(sail_start_loading_file(..., &state));
 
 /*
- * If sail_read_next_frame() fails, the image pointer stays untouched (NULL).
+ * If sail_load_next_frame() fails, the image pointer stays untouched (NULL).
  * This code prints NULL value on error.
  */
-SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, &image),
+SAIL_TRY_OR_CLEANUP(sail_load_next_frame(state, &image),
                     /* cleanup */ printf("%p\n", image),
-                                  sail_stop_reading(state));
+                                  sail_stop_loading(state));
 ```
 
 ### Always set a pointer to state to NULL (C only)
 
-C reading and writing functions require a local void pointer to state. Always set it to NULL before
-reading or writing. For example:
+C loading and saving functions require a local void pointer to state. Always set it to NULL before
+loading or saving. For example:
 
 ```C
 void *state = NULL;
 
-SAIL_TRY(sail_start_reading_file(..., &state));
+SAIL_TRY(sail_start_loading_file(..., &state));
 
-SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, ...),
-                    /* cleanup */ sail_stop_reading(state));
+SAIL_TRY_OR_CLEANUP(sail_load_next_frame(state, ...),
+                    /* cleanup */ sail_stop_loading(state));
 ```
 
 ## Can I implement an image codec in C++?
@@ -311,25 +311,25 @@ extensions=abc;bca
 #
 mime-types=image/abc
 
-# Section of various features describing what the image codec can actually read.
+# Section of various features describing what the image codec can actually load.
 #
-[read-features]
+[load-features]
 
 # ';'-separated list of what the image codec can actually read.
-# Can be empty if the image codec cannot read images.
+# Can be empty if the image codec cannot load images.
 #
 # Possible values:
-#    STATIC      - Can read static images.
-#    ANIMATED    - Can read animated images.
-#    MULTI-PAGED - Can read multi-paged (but not animated) images.
-#    META-DATA   - Can read image meta data like JPEG comments or EXIF.
-#    INTERLACED  - Can read interlaced images.
-#    ICCP        - Can read embedded ICC profiles.
+#    STATIC      - Can load static images.
+#    ANIMATED    - Can load animated images.
+#    MULTI-PAGED - Can load multi-paged (but not animated) images.
+#    META-DATA   - Can load image meta data like JPEG comments or EXIF.
+#    INTERLACED  - Can load interlaced images.
+#    ICCP        - Can load embedded ICC profiles.
 #
 features=STATIC;META-DATA;INTERLACED;ICCP
 
 # ';'-separated list of codec-specific tuning options. For example, it's possible
-# to disable ABC codec filtering with setting abc-filtering to 0 in read options.
+# to disable ABC codec filtering with setting abc-filtering to 0 in load options.
 # Tuning options' names must start with the codec name to avoid confusing.
 #
 # The list of possible values for every tuning option is not current available
@@ -340,25 +340,25 @@ features=STATIC;META-DATA;INTERLACED;ICCP
 #
 tuning=abc-filtering
 
-# Section of various features describing what the image codec can actually write.
+# Section of various features describing what the image codec can actually save.
 #
-[write-features]
+[save-features]
 
 # ';'-separated list of what the image codec can actually write.
-# Can be empty if the image codec cannot write images.
+# Can be empty if the image codec cannot save images.
 #
 # Possible values:
-#    STATIC      - Can write static images.
-#    ANIMATED    - Can write animated images.
-#    MULTI-PAGED - Can write multi-paged (but not animated) images.
-#    META-DATA   - Can write image meta data like JPEG comments or EXIF.
-#    INTERLACED  - Can write interlaced images.
-#    ICCP        - Can write embedded ICC profiles.
+#    STATIC      - Can save static images.
+#    ANIMATED    - Can save animated images.
+#    MULTI-PAGED - Can save multi-paged (but not animated) images.
+#    META-DATA   - Can save image meta data like JPEG comments or EXIF.
+#    INTERLACED  - Can save interlaced images.
+#    ICCP        - Can save embedded ICC profiles.
 #
 features=STATIC;META-DATA;INTERLACED;ICCP
 
 # ';'-separated list of codec-specific tuning options. For example, it's possible
-# to disable ABC codec filtering with setting abc-filtering to 0 in write options.
+# to disable ABC codec filtering with setting abc-filtering to 0 in save options.
 # Tuning options' names must start with the codec name to avoid confusing.
 #
 # The list of possible values for every tuning option is not current available
@@ -370,7 +370,7 @@ features=STATIC;META-DATA;INTERLACED;ICCP
 tuning=abc-filtering
 
 # ';'-separated list of pixel formats the image codec can write.
-# Can be empty if the image codec cannot write images.
+# Can be empty if the image codec cannot save images.
 #
 # Note: SAIL doesn't convert images while saving. It writes them 1:1. The image codec
 # can take as input and save 8-bit indexed, 24-bit RGB, and 32-bit RGBA images.
@@ -382,12 +382,12 @@ pixel-formats=BPP8-INDEXED;BPP24-RGB;BPP32-BGRA
 properties=
 
 # ';'-separated list of compressions the image codec can write. Cannot be empty if the image codec
-# can write images. If the image codec cannot select compressions, specify UNSUPPORTED.
+# can save images. If the image codec cannot select compressions, specify UNSUPPORTED.
 #
 compression-types=DEFLATE;RLE
 
 # Default compression from the list above to use when no explicit compression was selected
-# by a client application. Can be empty if the image codec cannot write images.
+# by a client application. Can be empty if the image codec cannot save images.
 #
 default-compression=DEFLATE
 

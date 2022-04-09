@@ -28,37 +28,26 @@
 
 #include "sail-common.h"
 
-sail_status_t sail_alloc_write_features(struct sail_write_features **write_features) {
+sail_status_t sail_alloc_load_features(struct sail_load_features **load_features) {
 
-    SAIL_CHECK_PTR(write_features);
+    SAIL_CHECK_PTR(load_features);
 
     void *ptr;
-    SAIL_TRY(sail_malloc(sizeof(struct sail_write_features), &ptr));
-    *write_features = ptr;
+    SAIL_TRY(sail_malloc(sizeof(struct sail_load_features), &ptr));
+    *load_features = ptr;
 
-    (*write_features)->pixel_formats             = NULL;
-    (*write_features)->pixel_formats_length      = 0;
-    (*write_features)->features                  = 0;
-    (*write_features)->tuning                    = NULL;
-    (*write_features)->compressions              = NULL;
-    (*write_features)->compressions_length       = 0;
-    (*write_features)->default_compression       = SAIL_COMPRESSION_UNSUPPORTED;
-    (*write_features)->compression_level_min     = 0;
-    (*write_features)->compression_level_max     = 0;
-    (*write_features)->compression_level_default = 0;
-    (*write_features)->compression_level_step    = 0;
+    (*load_features)->features = 0;
+    (*load_features)->tuning   = NULL;
 
     return SAIL_OK;
 }
 
-void sail_destroy_write_features(struct sail_write_features *write_features) {
+void sail_destroy_load_features(struct sail_load_features *load_features) {
 
-    if (write_features == NULL) {
+    if (load_features == NULL) {
         return;
     }
 
-    sail_free(write_features->pixel_formats);
-    sail_free(write_features->compressions);
-    sail_destroy_string_node_chain(write_features->tuning);
-    sail_free(write_features);
+    sail_destroy_string_node_chain(load_features->tuning);
+    sail_free(load_features);
 }

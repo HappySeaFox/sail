@@ -42,9 +42,9 @@ extern "C" {
  * SAIL context.
  *
  * SAIL context enumerates and holds a list of available codec info objects and a list of loaded codecs.
- * It's a global static object being created on demand by all SAIL reading, writing, and probing functions.
+ * It's a global static object being created on demand by all SAIL loading, saving, and probing functions.
  * If you want to allocate SAIL context explicitly, use sail_init() or sail_init_with_flags().
- * All SAIL reading, writing, and probing functions will re-use it then.
+ * All SAIL loading, saving, and probing functions will re-use it then.
  *
  * SAIL context modification (creating, destroying, loading and unloading codecs) is guarded with a mutex
  * to avoid unpredictable errors in a multi-threaded environment.
@@ -74,7 +74,7 @@ SAIL_EXPORT sail_status_t sail_init(void);
  * if a global context already exists. Builds a list of available SAIL codecs. See SailInitFlags.
  *
  * Use this method when you need specific features like preloading codecs. If you don't need
- * specific features, using this method is optional. All reading or writing functions allocate
+ * specific features, using this method is optional. All loading or saving functions allocate
  * a global static context implicitly when they need it and when it doesn't exist yet.
  *
  * Codecs path search algorithm (first found path wins):
@@ -107,10 +107,10 @@ SAIL_EXPORT sail_status_t sail_init_with_flags(int flags);
 /*
  * Unloads all the loaded codecs from the global static context to release memory occupied by them.
  * Use this function if you want to release some memory but do not want to deinitialize SAIL
- * with sail_finish(). Subsequent attempts to read or write images will reload necessary SAIL codecs
+ * with sail_finish(). Subsequent attempts to load or save images will reload necessary SAIL codecs
  * from disk.
  *
- * Warning: Make sure no reading or writing operations are in progress before calling sail_unload_codecs().
+ * Warning: Make sure no loading or saving operations are in progress before calling sail_unload_codecs().
  *          Failure to do so may lead to a crash.
  *
  * Typical usage: This is a standalone function that can be called at any time.
@@ -121,14 +121,14 @@ SAIL_EXPORT sail_status_t sail_unload_codecs(void);
 
 /*
  * Destroys the global static context that was implicitly or explicitly allocated by
- * reading or writing functions.
+ * loading or saving functions.
  *
- * Unloads all codecs. All pointers to codec info objects, read and write features, and codecs
+ * Unloads all codecs. All pointers to codec info objects, load and save features, and codecs
  * get invalidated. Using them after calling sail_finish() will lead to a crash.
  *
  * It's possible to initialize a new global static context afterwards, implicitly or explicitly.
  *
- * Warning: Make sure no reading or writing operations are in progress before calling sail_finish().
+ * Warning: Make sure no loading or saving operations are in progress before calling sail_finish().
  *          Failure to do so may lead to a crash.
  */
 SAIL_EXPORT void sail_finish(void);

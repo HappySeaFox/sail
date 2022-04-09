@@ -23,8 +23,8 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_WRITE_OPTIONS_CPP_H
-#define SAIL_WRITE_OPTIONS_CPP_H
+#ifndef SAIL_SAVE_OPTIONS_CPP_H
+#define SAIL_SAVE_OPTIONS_CPP_H
 
 #include <memory>
 #include <vector>
@@ -41,52 +41,52 @@
     #include <sail-c++/tuning-c++.h>
 #endif
 
-struct sail_write_options;
+struct sail_save_options;
 
 namespace sail
 {
 
 /*
- * Options to modify writing operations.
+ * Options to modify saving operations.
  */
-class SAIL_EXPORT write_options
+class SAIL_EXPORT save_options
 {
     friend class image_output;
-    friend class write_features;
+    friend class save_features;
 
 public:
     /*
-     * Constructs empty write options.
+     * Constructs empty save options.
      */
-    write_options();
+    save_options();
 
     /*
-     * Copies the write options.
+     * Copies the save options.
      */
-    write_options(const write_options &wo);
+    save_options(const save_options &wo);
 
     /*
-     * Copies the write options.
+     * Copies the save options.
      */
-    write_options& operator=(const sail::write_options &write_options);
+    save_options& operator=(const sail::save_options &save_options);
 
     /*
-     * Moves the write options.
+     * Moves the save options.
      */
-    write_options(sail::write_options &&write_options) noexcept;
+    save_options(sail::save_options &&save_options) noexcept;
 
     /*
-     * Moves the write options.
+     * Moves the save options.
      */
-    write_options& operator=(sail::write_options &&write_options) noexcept;
+    save_options& operator=(sail::save_options &&save_options) noexcept;
 
     /*
-     * Destroys the write options.
+     * Destroys the save options.
      */
-    ~write_options();
+    ~save_options();
 
     /*
-     * Returns the or-ed manipulation options for writing operations. See SailOption.
+     * Returns the or-ed manipulation options for saving operations. See SailOption.
      */
     int options() const;
 
@@ -102,7 +102,7 @@ public:
 
     /*
      * Returns the compression type. For example: SAIL_COMPRESSION_RLE. See SailCompression.
-     * Use write_features to determine what compression types or values are supported by a particular codec.
+     * Use save_features to determine what compression types or values are supported by a particular codec.
      *
      * If a codec supports more than two compression types, compression levels are ignored in this case.
      *
@@ -117,13 +117,13 @@ public:
 
     /*
      * Returns the requested compression level. Must be in the range specified by compression_level_min()
-     * and compression_level_max() in write_features. If compression_level() < compression_level_min() or
+     * and compression_level_max() in save_features. If compression_level() < compression_level_min() or
      * compression_level() > compression_level_max(), compression_level_default() will be used.
      */
     double compression_level() const;
 
     /*
-     * Sets new or-ed manipulation options for writing operations. See SailOption.
+     * Sets new or-ed manipulation options for saving operations. See SailOption.
      */
     void set_options(int options);
 
@@ -144,12 +144,12 @@ public:
 
 private:
     /*
-     * Makes a deep copy of the specified write options and stores the pointer for further use.
+     * Makes a deep copy of the specified save options and stores the pointer for further use.
      * When the SAIL context gets uninitialized, the pointer becomes dangling.
      */
-    explicit write_options(const sail_write_options *wo);
+    explicit save_options(const sail_save_options *wo);
 
-    sail_status_t to_sail_write_options(sail_write_options **write_options) const;
+    sail_status_t to_sail_save_options(sail_save_options **save_options) const;
 
 private:
     class pimpl;

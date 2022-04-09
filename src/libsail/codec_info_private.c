@@ -174,46 +174,46 @@ static sail_status_t inih_handler_sail_error(void *data, const char *section, co
             SAIL_LOG_ERROR("Unsupported codec info key '%s' in [%s]", name, section);
             SAIL_LOG_AND_RETURN(SAIL_ERROR_PARSE_FILE);
         }
-    } else if (strcmp(section, "read-features") == 0) {
+    } else if (strcmp(section, "load-features") == 0) {
         if (strcmp(name, "features") == 0) {
-            SAIL_TRY_OR_CLEANUP(parse_flags(value, &codec_info->read_features->features, codec_feature_from_string),
+            SAIL_TRY_OR_CLEANUP(parse_flags(value, &codec_info->load_features->features, codec_feature_from_string),
                                 /* cleanup */ SAIL_LOG_ERROR("Failed to parse codec features: '%s'", value));
         } else if (strcmp(name, "tuning") == 0) {
-            SAIL_TRY_OR_CLEANUP(sail_split_into_string_node_chain(value, &codec_info->read_features->tuning),
+            SAIL_TRY_OR_CLEANUP(sail_split_into_string_node_chain(value, &codec_info->load_features->tuning),
                                     /* cleanup */ SAIL_LOG_ERROR("Failed to parse codec tuning: '%s'", value));
         } else {
             SAIL_LOG_ERROR("Unsupported codec info key '%s' in [%s]", name, section);
             SAIL_LOG_AND_RETURN(SAIL_ERROR_PARSE_FILE);
         }
-    } else if (strcmp(section, "write-features") == 0) {
+    } else if (strcmp(section, "save-features") == 0) {
         if (strcmp(name, "features") == 0) {
-            SAIL_TRY_OR_CLEANUP(parse_flags(value, &codec_info->write_features->features, codec_feature_from_string),
+            SAIL_TRY_OR_CLEANUP(parse_flags(value, &codec_info->save_features->features, codec_feature_from_string),
                                 /* cleanup */ SAIL_LOG_ERROR("Failed to parse codec features: '%s'", value));
         } else if (strcmp(name, "tuning") == 0) {
-            SAIL_TRY_OR_CLEANUP(sail_split_into_string_node_chain(value, &codec_info->write_features->tuning),
+            SAIL_TRY_OR_CLEANUP(sail_split_into_string_node_chain(value, &codec_info->save_features->tuning),
                                     /* cleanup */ SAIL_LOG_ERROR("Failed to parse codec tuning: '%s'", value));
         } else if (strcmp(name, "pixel-formats") == 0) {
             SAIL_TRY_OR_CLEANUP(parse_serialized_ints(value,
-                                                        (int **)&codec_info->write_features->pixel_formats,
-                                                        &codec_info->write_features->pixel_formats_length,
+                                                        (int **)&codec_info->save_features->pixel_formats,
+                                                        &codec_info->save_features->pixel_formats_length,
                                                         pixel_format_from_string),
                                 /* cleanup */ SAIL_LOG_ERROR("Failed to parse output pixel formats: '%s'", value));
         } else if (strcmp(name, "compression-types") == 0) {
             SAIL_TRY_OR_CLEANUP(parse_serialized_ints(value,
-                                                        (int **)&codec_info->write_features->compressions,
-                                                        &codec_info->write_features->compressions_length,
+                                                        (int **)&codec_info->save_features->compressions,
+                                                        &codec_info->save_features->compressions_length,
                                                         compression_from_string),
                                 /* cleanup */ SAIL_LOG_ERROR("Failed to parse compressions: '%s'", value));
         } else if (strcmp(name, "default-compression") == 0) {
-            codec_info->write_features->default_compression = sail_compression_from_string(value);
+            codec_info->save_features->default_compression = sail_compression_from_string(value);
         } else if (strcmp(name, "compression-level-min") == 0) {
-            codec_info->write_features->compression_level_min = atof(value);
+            codec_info->save_features->compression_level_min = atof(value);
         } else if (strcmp(name, "compression-level-max") == 0) {
-            codec_info->write_features->compression_level_max = atof(value);
+            codec_info->save_features->compression_level_max = atof(value);
         } else if (strcmp(name, "compression-level-default") == 0) {
-            codec_info->write_features->compression_level_default = atof(value);
+            codec_info->save_features->compression_level_default = atof(value);
         } else if (strcmp(name, "compression-level-step") == 0) {
-            codec_info->write_features->compression_level_step = atof(value);
+            codec_info->save_features->compression_level_step = atof(value);
         } else {
             SAIL_LOG_ERROR("Unsupported codec info key '%s' in [%s]", name, section);
             SAIL_LOG_AND_RETURN(SAIL_ERROR_PARSE_FILE);
@@ -264,37 +264,37 @@ static sail_status_t check_codec_info(const struct sail_codec_info *codec_info) 
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INCOMPLETE_CODEC_INFO);
     }
 
-    const struct sail_write_features *write_features = codec_info->write_features;
+    const struct sail_save_features *save_features = codec_info->save_features;
 
-    /* Check write features. */
-    if ((write_features->features & SAIL_CODEC_FEATURE_STATIC ||
-            write_features->features & SAIL_CODEC_FEATURE_ANIMATED ||
-            write_features->features & SAIL_CODEC_FEATURE_MULTI_PAGED) &&
-            (write_features->pixel_formats == NULL || write_features->pixel_formats_length == 0)) {
-        SAIL_LOG_ERROR("Codec validation error: %s codec is able to write images, but output pixel formats are not specified", codec_info->name);
+    /* Check save features. */
+    if ((save_features->features & SAIL_CODEC_FEATURE_STATIC ||
+            save_features->features & SAIL_CODEC_FEATURE_ANIMATED ||
+            save_features->features & SAIL_CODEC_FEATURE_MULTI_PAGED) &&
+            (save_features->pixel_formats == NULL || save_features->pixel_formats_length == 0)) {
+        SAIL_LOG_ERROR("Codec validation error: %s codec is able to save images, but output pixel formats are not specified", codec_info->name);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INCOMPLETE_CODEC_INFO);
     }
 
-    /* Compressions must exist if we're able to write this image format.*/
-    if (write_features->features != 0 && (write_features->compressions == NULL || write_features->compressions_length == 0)) {
+    /* Compressions must exist if we're able to save this image format.*/
+    if (save_features->features != 0 && (save_features->compressions == NULL || save_features->compressions_length == 0)) {
         SAIL_LOG_ERROR("Codec validation error: %s codec has empty compressions list", codec_info->name);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INCOMPLETE_CODEC_INFO);
     }
 
     /* Compression levels and types are mutually exclusive.*/
-    if (write_features->compressions_length > 1 && (write_features->compression_level_min != 0 || write_features->compression_level_max != 0)) {
+    if (save_features->compressions_length > 1 && (save_features->compression_level_min != 0 || save_features->compression_level_max != 0)) {
         SAIL_LOG_ERROR("Codec validation error: %s codec has more than two compression types and non-zero compression levels which is unsupported", codec_info->name);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INCOMPLETE_CODEC_INFO);
     }
 
-    for (unsigned i = 0; i < write_features->compressions_length; i++) {
-        if (write_features->compressions[i] == SAIL_COMPRESSION_UNKNOWN) {
+    for (unsigned i = 0; i < save_features->compressions_length; i++) {
+        if (save_features->compressions[i] == SAIL_COMPRESSION_UNKNOWN) {
             SAIL_LOG_ERROR("Codec validation error: %s codec has UNKNOWN compression", codec_info->name);
             SAIL_LOG_AND_RETURN(SAIL_ERROR_INCOMPLETE_CODEC_INFO);
         }
     }
 
-    if (write_features->default_compression == SAIL_COMPRESSION_UNKNOWN) {
+    if (save_features->default_compression == SAIL_COMPRESSION_UNKNOWN) {
         SAIL_LOG_ERROR("Codec validation error: %s codec has UNKNOWN default compression", codec_info->name);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INCOMPLETE_CODEC_INFO);
     }
@@ -318,8 +318,8 @@ static sail_status_t alloc_codec_info(struct sail_codec_info **codec_info) {
     (*codec_info)->magic_number_node = NULL;
     (*codec_info)->extension_node    = NULL;
     (*codec_info)->mime_type_node    = NULL;
-    (*codec_info)->read_features     = NULL;
-    (*codec_info)->write_features    = NULL;
+    (*codec_info)->load_features     = NULL;
+    (*codec_info)->save_features    = NULL;
 
     return SAIL_OK;
 }
@@ -328,9 +328,9 @@ static sail_status_t codec_read_info_from_input(const char *input, int (*ini_par
 
     struct sail_codec_info *codec_info_local;
     SAIL_TRY(alloc_codec_info(&codec_info_local));
-    SAIL_TRY_OR_CLEANUP(sail_alloc_read_features(&codec_info_local->read_features),
+    SAIL_TRY_OR_CLEANUP(sail_alloc_load_features(&codec_info_local->load_features),
                         destroy_codec_info(codec_info_local));
-    SAIL_TRY_OR_CLEANUP(sail_alloc_write_features(&codec_info_local->write_features),
+    SAIL_TRY_OR_CLEANUP(sail_alloc_save_features(&codec_info_local->save_features),
                         destroy_codec_info(codec_info_local));
 
     struct init_data init_data;
@@ -347,7 +347,7 @@ static sail_status_t codec_read_info_from_input(const char *input, int (*ini_par
 
     /* Success. */
     if (code == 0) {
-        if (codec_info_local->layout != SAIL_CODEC_LAYOUT_V6) {
+        if (codec_info_local->layout != SAIL_CODEC_LAYOUT_V7) {
             SAIL_LOG_ERROR("Unsupported codec layout version %d. Please check your codec info files", codec_info_local->layout);
             destroy_codec_info(codec_info_local);
             SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_CODEC_LAYOUT);
@@ -391,8 +391,8 @@ void destroy_codec_info(struct sail_codec_info *codec_info) {
     sail_destroy_string_node_chain(codec_info->extension_node);
     sail_destroy_string_node_chain(codec_info->mime_type_node);
 
-    sail_destroy_read_features(codec_info->read_features);
-    sail_destroy_write_features(codec_info->write_features);
+    sail_destroy_load_features(codec_info->load_features);
+    sail_destroy_save_features(codec_info->save_features);
 
     sail_free(codec_info);
 }

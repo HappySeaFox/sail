@@ -33,9 +33,9 @@ extern "C" {
 #endif
 
 struct sail_io;
-struct sail_read_features;
+struct sail_load_features;
+struct sail_save_features;
 struct sail_string_node;
-struct sail_write_features;
 
 /*
  * A structure representing codec information.
@@ -79,30 +79,30 @@ struct sail_codec_info {
     /* A linked list of supported mime types. It can be NULL. For example: "image/jpeg". */
     struct sail_string_node *mime_type_node;
 
-    /* Read features of the codec. */
-    struct sail_read_features *read_features;
+    /* Load features of the codec. */
+    struct sail_load_features *load_features;
 
-    /* Write features of the codec. */
-    struct sail_write_features *write_features;
+    /* Save features of the codec. */
+    struct sail_save_features *save_features;
 };
 
 typedef struct sail_codec_info sail_codec_info_t;
 
 /*
- * Finds a first codec info object that supports reading or writing the specified file path by its file extension.
+ * Finds a first codec info object that supports loading or saving the specified file path by its file extension.
  * For example: "/test.jpg". The path might not exist.
  *
  * The assigned codec info MUST NOT be destroyed. It is a pointer to an internal data structure.
  *
  * Typical usage: sail_codec_info_from_path() ->
- *                sail_start_reading_file()   ->
- *                sail_read_next_frame()      ->
- *                sail_stop_reading().
+ *                sail_start_loading_file()   ->
+ *                sail_load_next_frame()      ->
+ *                sail_stop_loading().
  *
  * Or:            sail_codec_info_from_path() ->
- *                sail_start_writing_file()   ->
- *                sail_read_next_frame()      ->
- *                sail_stop_writing().
+ *                sail_start_saving_file()    ->
+ *                sail_load_next_frame()      ->
+ *                sail_stop_saving().
  *
  * Returns SAIL_OK on success.
  */
@@ -115,9 +115,9 @@ SAIL_EXPORT sail_status_t sail_codec_info_from_path(const char *path, const stru
  * The assigned codec info MUST NOT be destroyed. It is a pointer to an internal data structure.
  *
  * Typical usage: sail_codec_info_by_magic_number_from_path() ->
- *                sail_start_reading_file()                   ->
- *                sail_read_next_frame()                      ->
- *                sail_stop_reading().
+ *                sail_start_loading_file()                   ->
+ *                sail_load_next_frame()                      ->
+ *                sail_stop_loading().
  *
  * Returns SAIL_OK on success.
  */
@@ -130,9 +130,9 @@ SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_path(const char *
  * The assigned codec info MUST NOT be destroyed. It is a pointer to an internal data structure.
  *
  * Typical usage: sail_codec_info_by_magic_number_from_memory() ->
- *                sail_start_reading_file()                     ->
- *                sail_read_next_frame()                        ->
- *                sail_stop_reading().
+ *                sail_start_loading_file()                     ->
+ *                sail_load_next_frame()                        ->
+ *                sail_stop_loading().
  *
  * Returns SAIL_OK on success.
  */
@@ -141,7 +141,7 @@ SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_memory(const void
 
 /*
  * Finds a first codec info object that supports the magic number read from the specified I/O data source.
- * The comparison algorithm is case insensitive. After reading a magic number, this function rewinds the I/O
+ * The comparison algorithm is case insensitive. After loading a magic number, this function rewinds the I/O
  * cursor position back to the previous position. That's why the I/O source must be seekable.
  *
  * Not all codecs support magic numbers. That's why it's not guaranteed that this function
@@ -150,9 +150,9 @@ SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_memory(const void
  * The assigned codec info MUST NOT be destroyed. It is a pointer to an internal data structure.
  *
  * Typical usage: sail_codec_info_by_magic_number_from_io() ->
- *                sail_start_reading_file()                 ->
- *                sail_read_next_frame()                    ->
- *                sail_stop_reading().
+ *                sail_start_loading_file()                 ->
+ *                sail_load_next_frame()                    ->
+ *                sail_stop_loading().
  *
  * Returns SAIL_OK on success.
  */
@@ -165,14 +165,14 @@ SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_io(struct sail_io
  * The assigned codec info MUST NOT be destroyed. It is a pointer to an internal data structure.
  *
  * Typical usage: sail_codec_info_from_extension() ->
- *                sail_start_reading_file()        ->
- *                sail_read_next_frame()           ->
- *                sail_stop_reading().
+ *                sail_start_loading_file()        ->
+ *                sail_load_next_frame()           ->
+ *                sail_stop_loading().
  *
  * Or:            sail_codec_info_from_extension() ->
- *                sail_start_writing_file()        ->
- *                sail_read_next_frame()           ->
- *                sail_stop_writing().
+ *                sail_start_saving_file()         ->
+ *                sail_load_next_frame()           ->
+ *                sail_stop_saving().
  *
  * Returns SAIL_OK on success.
  */
@@ -185,14 +185,14 @@ SAIL_EXPORT sail_status_t sail_codec_info_from_extension(const char *extension, 
  * The assigned codec info MUST NOT be destroyed. It is a pointer to an internal data structure.
  *
  * Typical usage: sail_codec_info_from_mime_type() ->
- *                sail_start_reading_file()        ->
- *                sail_read_next_frame()           ->
- *                sail_stop_reading().
+ *                sail_start_loading_file()        ->
+ *                sail_load_next_frame()           ->
+ *                sail_stop_loading().
  *
  * Or:            sail_codec_info_from_mime_type() ->
- *                sail_start_writing_file()        ->
- *                sail_read_next_frame()           ->
- *                sail_stop_writing().
+ *                sail_start_saving_file()         ->
+ *                sail_load_next_frame()           ->
+ *                sail_stop_saving().
  *
  * Returns SAIL_OK on success.
  */

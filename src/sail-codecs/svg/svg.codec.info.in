@@ -1,7 +1,7 @@
 # SVG codec information
 #
 [codec]
-layout=6
+layout=7
 version=0.1.2
 priority=HIGH
 name=SVG
@@ -10,11 +10,11 @@ magic-numbers=3C 3F 78 6D 6C
 extensions=svg;svgz
 mime-types=image/svg+xml
 
-[read-features]
+[load-features]
 features=STATIC
 tuning=
 
-[write-features]
+[save-features]
 features=
 tuning=
 pixel-formats=

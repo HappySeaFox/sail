@@ -46,8 +46,8 @@ namespace sail
 {
 
 /*
- * source_image represents source image properties. The class is used in reading operations only
- * to preserve the source image properties. It's ignored in writing operations.
+ * source_image represents source image properties. The class is used in loading operations only
+ * to preserve the source image properties. It's ignored in saving operations.
  */
 class SAIL_EXPORT source_image
 {
@@ -93,16 +93,16 @@ public:
     /*
      * Returns the source image pixel format. See SailPixelFormat.
      *
-     * READ:  Set by SAIL to a source image pixel format of the original image.
-     * WRITE: Ignored.
+     * LOAD: Set by SAIL to a source image pixel format of the original image.
+     * SAVE: Ignored.
      */
     SailPixelFormat pixel_format() const;
 
     /*
      * Returns the source image chroma subsampling. See SailChromaSubsampling.
      *
-     * READ:  Set by SAIL to a source image chroma subsampling of the original image.
-     * WRITE: Ignored.
+     * LOAD: Set by SAIL to a source image chroma subsampling of the original image.
+     * SAVE: Ignored.
      */
     SailChromaSubsampling chroma_subsampling() const;
 
@@ -110,16 +110,16 @@ public:
      * Returns the or-ed source image properties. Set by SAIL to a valid source image properties of the image file.
      * For example, it can be interlaced. See SailImageProperty.
      *
-     * READ:  Set by SAIL to valid source image properties or to 0.
-     * WRITE: Ignored.
+     * LOAD: Set by SAIL to valid source image properties or to 0.
+     * SAVE: Ignored.
      */
     int properties() const;
 
     /*
      * Returns the source image compression type. See SailCompression.
      *
-     * READ:  Set by SAIL to a valid source image compression type.
-     * WRITE: Ignored.
+     * LOAD: Set by SAIL to a valid source image compression type.
+     * SAVE: Ignored.
      */
     SailCompression compression() const;
 
@@ -130,8 +130,8 @@ public:
      * Special properties' names start with the codec name to avoid confusing.
      * For example, "cur-hotspot-x".
      *
-     * READ:  Set by SAIL to valid source image special properties.
-     * WRITE: Ignored.
+     * LOAD: Set by SAIL to valid source image special properties.
+     * SAVE: Ignored.
      */
     const sail::special_properties &special_properties() const;
 

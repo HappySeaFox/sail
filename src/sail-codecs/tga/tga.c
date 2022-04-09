@@ -39,13 +39,13 @@ static const int          TGA_FOOTER_SIZE = 26;
  * Codec-specific state.
  */
 struct tga_state {
-    struct sail_read_options *read_options;
-    struct sail_write_options *write_options;
+    struct sail_load_options *load_options;
+    struct sail_save_options *save_options;
 
     struct TgaFileHeader file_header;
     struct TgaFooter footer;
 
-    bool frame_read;
+    bool frame_loaded;
     bool tga2;
     bool flipped_h;
     bool flipped_v;
@@ -57,10 +57,10 @@ static sail_status_t alloc_tga_state(struct tga_state **tga_state) {
     SAIL_TRY(sail_malloc(sizeof(struct tga_state), &ptr));
     *tga_state = ptr;
 
-    (*tga_state)->read_options  = NULL;
-    (*tga_state)->write_options = NULL;
+    (*tga_state)->load_options = NULL;
+    (*tga_state)->save_options = NULL;
 
-    (*tga_state)->frame_read    = false;
+    (*tga_state)->frame_loaded  = false;
     (*tga_state)->tga2          = false;
     (*tga_state)->flipped_h     = false;
     (*tga_state)->flipped_v     = false;
@@ -74,8 +74,8 @@ static void destroy_tga_state(struct tga_state *tga_state) {
         return;
     }
 
-    sail_destroy_read_options(tga_state->read_options);
-    sail_destroy_write_options(tga_state->write_options);
+    sail_destroy_load_options(tga_state->load_options);
+    sail_destroy_save_options(tga_state->save_options);
 
     sail_free(tga_state);
 }
@@ -84,21 +84,21 @@ static void destroy_tga_state(struct tga_state *tga_state) {
  * Decoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_read_init_v6_tga(struct sail_io *io, const struct sail_read_options *read_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_load_init_v7_tga(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
 
     SAIL_CHECK_PTR(state);
     *state = NULL;
 
     SAIL_TRY(sail_check_io_valid(io));
-    SAIL_CHECK_PTR(read_options);
+    SAIL_CHECK_PTR(load_options);
 
     /* Allocate a new state. */
     struct tga_state *tga_state;
     SAIL_TRY(alloc_tga_state(&tga_state));
     *state = tga_state;
 
-    /* Deep copy read options. */
-    SAIL_TRY(sail_copy_read_options(read_options, &tga_state->read_options));
+    /* Deep copy load options. */
+    SAIL_TRY(sail_copy_load_options(load_options, &tga_state->load_options));
 
     /* Read TGA footer. */
     SAIL_TRY(io->seek(io->stream, -TGA_FOOTER_SIZE, SEEK_END));
@@ -110,7 +110,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_tga(struct sail_io *io, const 
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_tga(void *state, struct sail_io *io, struct sail_image **image) {
+SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v7_tga(void *state, struct sail_io *io, struct sail_image **image) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
@@ -118,11 +118,11 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_tga(void *state, st
 
     struct tga_state *tga_state = (struct tga_state *)state;
 
-    if (tga_state->frame_read) {
+    if (tga_state->frame_loaded) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
     }
 
-    tga_state->frame_read = true;
+    tga_state->frame_loaded = true;
 
     struct sail_image *image_local;
     SAIL_TRY(sail_alloc_image(&image_local));
@@ -203,7 +203,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_tga(void *state, st
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_read_frame_v6_tga(void *state, struct sail_io *io, struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_load_frame_v7_tga(void *state, struct sail_io *io, struct sail_image *image) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
@@ -263,7 +263,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v6_tga(void *state, struct sail_
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_read_finish_v6_tga(void **state, struct sail_io *io) {
+SAIL_EXPORT sail_status_t sail_codec_load_finish_v7_tga(void **state, struct sail_io *io) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
@@ -281,25 +281,16 @@ SAIL_EXPORT sail_status_t sail_codec_read_finish_v6_tga(void **state, struct sai
  * Encoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_write_init_v6_tga(struct sail_io *io, const struct sail_write_options *write_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_save_init_v7_tga(struct sail_io *io, const struct sail_save_options *save_options, void **state) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
-    SAIL_CHECK_PTR(write_options);
+    SAIL_CHECK_PTR(save_options);
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v6_tga(void *state, struct sail_io *io, const struct sail_image *image) {
-
-    SAIL_CHECK_PTR(state);
-    SAIL_TRY(sail_check_io_valid(io));
-    SAIL_TRY(sail_check_image_valid(image));
-
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
-}
-
-SAIL_EXPORT sail_status_t sail_codec_write_frame_v6_tga(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v7_tga(void *state, struct sail_io *io, const struct sail_image *image) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
@@ -308,7 +299,16 @@ SAIL_EXPORT sail_status_t sail_codec_write_frame_v6_tga(void *state, struct sail
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-SAIL_EXPORT sail_status_t sail_codec_write_finish_v6_tga(void **state, struct sail_io *io) {
+SAIL_EXPORT sail_status_t sail_codec_save_frame_v7_tga(void *state, struct sail_io *io, const struct sail_image *image) {
+
+    SAIL_CHECK_PTR(state);
+    SAIL_TRY(sail_check_io_valid(io));
+    SAIL_TRY(sail_check_image_valid(image));
+
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
+}
+
+SAIL_EXPORT sail_status_t sail_codec_save_finish_v7_tga(void **state, struct sail_io *io) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));

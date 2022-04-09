@@ -31,7 +31,7 @@
 
 struct sail_image;
 struct sail_io;
-struct sail_read_options;
+struct sail_load_options;
 
 enum SailBmpReadOptions {
 
@@ -48,7 +48,7 @@ enum SailBmpReadOptions {
     SAIL_READ_BMP_FILE_HEADER = 1 << 0,
 };
 
-SAIL_HIDDEN sail_status_t bmp_private_read_init(struct sail_io *io, const struct sail_read_options *read_options, void **state, int bmp_read_options);
+SAIL_HIDDEN sail_status_t bmp_private_read_init(struct sail_io *io, const struct sail_load_options *load_options, void **state, int bmp_load_options);
 
 SAIL_HIDDEN sail_status_t bmp_private_read_seek_next_frame(void *state, struct sail_io *io, struct sail_image **image);
 

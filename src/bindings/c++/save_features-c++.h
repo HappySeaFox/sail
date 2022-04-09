@@ -23,8 +23,8 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_WRITE_FEATURES_CPP_H
-#define SAIL_WRITE_FEATURES_CPP_H
+#ifndef SAIL_SAVE_FEATURES_CPP_H
+#define SAIL_SAVE_FEATURES_CPP_H
 
 #include <memory>
 #include <vector>
@@ -41,46 +41,46 @@
     #include <sail-c++/tuning-c++.h>
 #endif
 
-struct sail_write_features;
+struct sail_save_features;
 
 namespace sail
 {
 
-class write_options;
+class save_options;
 
 /*
- * Write features. Use this structure to determine what a codec can actually write.
+ * Save features. Use this structure to determine what a codec can actually write.
  * See codec_info.
  */
-class SAIL_EXPORT write_features
+class SAIL_EXPORT save_features
 {
     friend class codec_info;
 
 public:
     /*
-     * Copies the write features.
+     * Copies the save features.
      */
-    write_features(const write_features &wf);
+    save_features(const save_features &wf);
 
     /*
-     * Copies the write features.
+     * Copies the save features.
      */
-    write_features& operator=(const sail::write_features &write_features);
+    save_features& operator=(const sail::save_features &save_features);
 
     /*
-     * Moves the write features.
+     * Moves the save features.
      */
-    write_features(sail::write_features &&write_features) noexcept;
+    save_features(sail::save_features &&save_features) noexcept;
 
     /*
-     * Moves the write features.
+     * Moves the save features.
      */
-    write_features& operator=(sail::write_features &&write_features) noexcept;
+    save_features& operator=(sail::save_features &&save_features) noexcept;
 
     /*
-     * Destroys the write features.
+     * Destroys the save features.
      */
-    ~write_features();
+    ~save_features();
 
     /*
      * Returns the list of supported pixel formats that can be written by this codec.
@@ -88,14 +88,14 @@ public:
     const std::vector<SailPixelFormat>& pixel_formats() const;
 
     /*
-     * Returns the supported or-ed features of writing operations. See SailCodecFeature.
+     * Returns the supported or-ed features of saving operations. See SailCodecFeature.
      */
     int features() const;
 
     /*
      * Returns supported codec-specific tuning options. For example, a hypothetical ABC
      * image codec can allow disabling filtering with setting the "abc-filtering"
-     * tuning option to 0 in read options. Tuning options' names start with the codec name
+     * tuning option to 0 in load options. Tuning options' names start with the codec name
      * to avoid confusing.
      *
      * The list of possible values for every tuning option is not current available
@@ -155,22 +155,22 @@ public:
     double compression_level_step() const;
 
     /*
-     * Builds default write options from the write features. Can be used to build
-     * default write options and then slightly modify them before passing to image_output.
+     * Builds default save options from the save features. Can be used to build
+     * default save options and then slightly modify them before passing to image_output.
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t to_write_options(sail::write_options *write_options) const;
+    sail_status_t to_save_options(sail::save_options *save_options) const;
 
 private:
-    write_features();
+    save_features();
     /*
-     * Makes a deep copy of the specified write features and stores the pointer for further use.
+     * Makes a deep copy of the specified save features and stores the pointer for further use.
      * When the SAIL context gets uninitialized, the pointer becomes dangling.
      */
-    explicit write_features(const sail_write_features *wf);
+    explicit save_features(const sail_save_features *wf);
 
-    const sail_write_features* sail_write_features_c() const;
+    const sail_save_features* sail_save_features_c() const;
 
 private:
     class pimpl;

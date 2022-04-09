@@ -41,7 +41,7 @@
 #include <sail-c++/sail-c++.h>
 
 //#define SAIL_CODEC_NAME jpeg
-//#include <sail/layout/v6.h>
+//#include <sail/layout/v7.h>
 
 #include "qtsail.h"
 #include "ui_qtsail.h"
@@ -76,12 +76,12 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
     sail::image image;
     sail::image first_image;
 
-    // Initialize reading.
+    // Initialize loading.
     //
     sail::io_file io_file(path.toLocal8Bit().constData());
     SAIL_TRY(image_input.start(io_file));
 
-    // Read all the available image frames in the file.
+    // Load all the available image frames in the file.
     //
     sail_status_t res;
     while ((res = image_input.next_frame(&image)) == SAIL_OK) {
@@ -115,7 +115,7 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
         return res;
     }
 
-    SAIL_LOG_DEBUG("Read images: %d", qimages->size());
+    SAIL_LOG_DEBUG("Loaded images: %d", qimages->size());
 
     // Optional
     SAIL_TRY(image_input.stop());
@@ -149,10 +149,10 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
     // You can prepare the image for saving by converting its pixel format on your own,
     // without using conversion methods.
     //
-    SAIL_TRY(image.convert(codec_info.write_features()));
+    SAIL_TRY(image.convert(codec_info.save_features()));
 
-    sail::write_options write_options;
-    SAIL_TRY(codec_info.write_features().to_write_options(&write_options));
+    sail::save_options save_options;
+    SAIL_TRY(codec_info.save_features().to_save_options(&save_options));
 
     // This filter will be handled and applied by the PNG codec only.
     // Possible values: "none", "sub", "up", "avg", "paeth".
@@ -160,9 +160,9 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
     // It's also possible to combine PNG filters with ';' like that:
     // "none;sub;paeth"
     //
-    write_options.tuning()["png-filter"] = std::string("none;sub");
+    save_options.tuning()["png-filter"] = std::string("none;sub");
 
-    SAIL_TRY(image_output.start(path.toLocal8Bit().constData(), write_options));
+    SAIL_TRY(image_output.start(path.toLocal8Bit().constData(), save_options));
     SAIL_TRY(image_output.next_frame(image));
     // Optional
     SAIL_TRY(image_output.stop());

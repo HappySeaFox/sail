@@ -1,7 +1,7 @@
 # TIFF codec information
 #
 [codec]
-layout=6
+layout=7
 version=1.0.1
 priority=HIGHEST
 name=TIFF
@@ -10,11 +10,11 @@ magic-numbers=49 49 2A 00;4D 4D 00 2A
 extensions=tif;tiff
 mime-types=image/tiff;image/tiff-fx
 
-[read-features]
+[load-features]
 features=STATIC;MULTI-PAGED;META-DATA;ICCP
 tuning=
 
-[write-features]
+[save-features]
 features=STATIC;MULTI-PAGED;META-DATA;ICCP
 tuning=
 pixel-formats=BPP32-RGBA

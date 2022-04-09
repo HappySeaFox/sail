@@ -38,7 +38,7 @@
 #include <sail-c++/sail-c++.h>
 
 //#define SAIL_CODEC_NAME jpeg
-//#include <sail/layout/v6.h>
+//#include <sail/layout/v7.h>
 
 #include "qtsail.h"
 #include "ui_qtsail.h"
@@ -74,7 +74,7 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
     //
     SAIL_TRY(image.convert(SAIL_PIXEL_FORMAT_BPP32_RGBA));
 
-    // Construct QImage from the read image.
+    // Construct QImage from the loaded image.
     //
     *qimage = QImage(reinterpret_cast<const uchar *>(image.pixels()),
                      image.width(),
@@ -109,7 +109,7 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
     // You can prepare the image for saving by converting its pixel format on your own,
     // without using conversion methods.
     //
-    SAIL_TRY(image.convert(codec_info.write_features()));
+    SAIL_TRY(image.convert(codec_info.save_features()));
 
     SAIL_TRY(image_output.save(path.toLocal8Bit().constData(), image));
 

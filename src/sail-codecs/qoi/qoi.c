@@ -37,11 +37,11 @@
  * Codec-specific state.
  */
 struct qoi_state {
-    struct sail_read_options *read_options;
-    struct sail_write_options *write_options;
+    struct sail_load_options *load_options;
+    struct sail_save_options *save_options;
 
-    bool frame_read;
-    bool frame_written;
+    bool frame_loaded;
+    bool frame_saved;
 
     void *image_data;
     size_t image_data_size;
@@ -56,11 +56,11 @@ static sail_status_t alloc_qoi_state(struct qoi_state **qoi_state) {
     SAIL_TRY(sail_malloc(sizeof(struct qoi_state), &ptr));
     *qoi_state = ptr;
 
-    (*qoi_state)->read_options  = NULL;
-    (*qoi_state)->write_options = NULL;
+    (*qoi_state)->load_options = NULL;
+    (*qoi_state)->save_options = NULL;
 
-    (*qoi_state)->frame_read      = false;
-    (*qoi_state)->frame_written   = false;
+    (*qoi_state)->frame_loaded = false;
+    (*qoi_state)->frame_saved  = false;
 
     (*qoi_state)->image_data      = NULL;
     (*qoi_state)->image_data_size = 0;
@@ -75,8 +75,8 @@ static void destroy_qoi_state(struct qoi_state *qoi_state) {
         return;
     }
 
-    sail_destroy_read_options(qoi_state->read_options);
-    sail_destroy_write_options(qoi_state->write_options);
+    sail_destroy_load_options(qoi_state->load_options);
+    sail_destroy_save_options(qoi_state->save_options);
 
     sail_free(qoi_state->image_data);
     sail_free(qoi_state->pixels);
@@ -88,21 +88,21 @@ static void destroy_qoi_state(struct qoi_state *qoi_state) {
  * Decoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_read_init_v6_qoi(struct sail_io *io, const struct sail_read_options *read_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_load_init_v7_qoi(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
 
     SAIL_CHECK_PTR(state);
     *state = NULL;
 
     SAIL_TRY(sail_check_io_valid(io));
-    SAIL_CHECK_PTR(read_options);
+    SAIL_CHECK_PTR(load_options);
 
     /* Allocate a new state. */
     struct qoi_state *qoi_state;
     SAIL_TRY(alloc_qoi_state(&qoi_state));
     *state = qoi_state;
 
-    /* Deep copy read options. */
-    SAIL_TRY(sail_copy_read_options(read_options, &qoi_state->read_options));
+    /* Deep copy load options. */
+    SAIL_TRY(sail_copy_load_options(load_options, &qoi_state->load_options));
 
     /* Cache the entire file as the QOI API requires. */
     SAIL_TRY(sail_alloc_data_from_io_contents(io, &qoi_state->image_data, &qoi_state->image_data_size));
@@ -110,7 +110,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_qoi(struct sail_io *io, const 
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_qoi(void *state, struct sail_io *io, struct sail_image **image) {
+SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v7_qoi(void *state, struct sail_io *io, struct sail_image **image) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
@@ -118,11 +118,11 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_qoi(void *state, st
 
     struct qoi_state *qoi_state = (struct qoi_state *)state;
 
-    if (qoi_state->frame_read) {
+    if (qoi_state->frame_loaded) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
     }
 
-    qoi_state->frame_read = true;
+    qoi_state->frame_loaded = true;
 
     /* Decode the image. */
     /* TODO Remove (int) when QOI supports size_t. */
@@ -169,7 +169,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_qoi(void *state, st
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_read_frame_v6_qoi(void *state, struct sail_io *io, struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_load_frame_v7_qoi(void *state, struct sail_io *io, struct sail_image *image) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
@@ -184,7 +184,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v6_qoi(void *state, struct sail_
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_read_finish_v6_qoi(void **state, struct sail_io *io) {
+SAIL_EXPORT sail_status_t sail_codec_load_finish_v7_qoi(void **state, struct sail_io *io) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
@@ -202,32 +202,32 @@ SAIL_EXPORT sail_status_t sail_codec_read_finish_v6_qoi(void **state, struct sai
  * Encoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_write_init_v6_qoi(struct sail_io *io, const struct sail_write_options *write_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_save_init_v7_qoi(struct sail_io *io, const struct sail_save_options *save_options, void **state) {
 
     SAIL_CHECK_PTR(state);
     *state = NULL;
 
     SAIL_TRY(sail_check_io_valid(io));
-    SAIL_CHECK_PTR(write_options);
+    SAIL_CHECK_PTR(save_options);
 
     struct qoi_state *qoi_state;
     SAIL_TRY(alloc_qoi_state(&qoi_state));
 
     *state = qoi_state;
 
-    /* Deep copy write options. */
-    SAIL_TRY(sail_copy_write_options(write_options, &qoi_state->write_options));
+    /* Deep copy save options. */
+    SAIL_TRY(sail_copy_save_options(save_options, &qoi_state->save_options));
 
     /* Sanity check. */
-    if (qoi_state->write_options->compression != SAIL_COMPRESSION_QOI) {
-        SAIL_LOG_ERROR("QOI: Only QOI compression is allowed for writing");
+    if (qoi_state->save_options->compression != SAIL_COMPRESSION_QOI) {
+        SAIL_LOG_ERROR("QOI: Only QOI compression is allowed for saving");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_COMPRESSION);
     }
 
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v6_qoi(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v7_qoi(void *state, struct sail_io *io, const struct sail_image *image) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
@@ -241,7 +241,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v6_qoi(void *state, s
         case SAIL_PIXEL_FORMAT_BPP24_RGB:  channels = 3; break;
         case SAIL_PIXEL_FORMAT_BPP32_RGBA: channels = 4; break;
         default: {
-            SAIL_LOG_ERROR("QOI: %s pixel format is not currently supported for writing", sail_pixel_format_to_string(image->pixel_format));
+            SAIL_LOG_ERROR("QOI: %s pixel format is not currently supported for saving", sail_pixel_format_to_string(image->pixel_format));
             SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
         }
     }
@@ -262,7 +262,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v6_qoi(void *state, s
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_write_frame_v6_qoi(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_save_frame_v7_qoi(void *state, struct sail_io *io, const struct sail_image *image) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
@@ -277,7 +277,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_frame_v6_qoi(void *state, struct sail
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_write_finish_v6_qoi(void **state, struct sail_io *io) {
+SAIL_EXPORT sail_status_t sail_codec_save_finish_v7_qoi(void **state, struct sail_io *io) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));

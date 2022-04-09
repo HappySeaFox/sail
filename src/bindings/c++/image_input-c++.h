@@ -49,10 +49,10 @@ namespace sail
 class abstract_io;
 class image;
 class codec_info;
-class read_options;
+class load_options;
 
 /*
- * Class to probe and read images form files, memory, and custom I/O sources.
+ * Class to probe and load images form files, memory, and custom I/O sources.
  */
 class SAIL_EXPORT image_input
 {
@@ -63,12 +63,12 @@ public:
     image_input();
 
     /*
-     * Stops reading if it was started and destroys the image reader.
+     * Stops loading if it was started and destroys the image reader.
      */
     ~image_input();
 
     /*
-     * Starts reading the specified image file.
+     * Starts loading the specified image file.
      *
      * Typical usage: start()          ->
      *                next_frame() x n ->
@@ -79,7 +79,7 @@ public:
     sail_status_t start(std::string_view path);
 
     /*
-     * Starts reading the specified image file with the specified codec.
+     * Starts loading the specified image file with the specified codec.
      *
      * Typical usage: codec_info::from_extension() ->
      *                start()                      ->
@@ -91,7 +91,7 @@ public:
     sail_status_t start(std::string_view path, const sail::codec_info &codec_info);
 
     /*
-     * Starts reading the specified image file with the specified read options.
+     * Starts loading the specified image file with the specified load options.
      *
      * Typical usage: start()          ->
      *                next_frame() x n ->
@@ -99,10 +99,10 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t start(std::string_view path, const sail::read_options &read_options);
+    sail_status_t start(std::string_view path, const sail::load_options &load_options);
 
     /*
-     * Starts reading the specified image file with the specified codec and read options.
+     * Starts loading the specified image file with the specified codec and load options.
      *
      * Typical usage: codec_info::from_extension() ->
      *                start()                      ->
@@ -111,10 +111,10 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t start(std::string_view path, const sail::codec_info &codec_info, const sail::read_options &read_options);
+    sail_status_t start(std::string_view path, const sail::codec_info &codec_info, const sail::load_options &load_options);
 
     /*
-     * Starts reading the specified memory buffer.
+     * Starts loading the specified memory buffer.
      *
      * Typical usage: start()          ->
      *                next_frame() x n ->
@@ -125,7 +125,7 @@ public:
     sail_status_t start(const void *buffer, std::size_t buffer_length);
 
     /*
-     * Starts reading the specified memory buffer with the specified codec.
+     * Starts loading the specified memory buffer with the specified codec.
      *
      * Typical usage: codec_info::from_extension() ->
      *                start()                      ->
@@ -137,7 +137,7 @@ public:
     sail_status_t start(const void *buffer, std::size_t buffer_length, const sail::codec_info &codec_info);
 
     /*
-     * Starts reading the specified memory buffer with the specified read options.
+     * Starts loading the specified memory buffer with the specified load options.
      *
      * Typical usage: start()          ->
      *                next_frame() x n ->
@@ -145,10 +145,10 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t start(const void *buffer, std::size_t buffer_length, const sail::read_options &read_options);
+    sail_status_t start(const void *buffer, std::size_t buffer_length, const sail::load_options &load_options);
 
     /*
-     * Starts reading the specified memory buffer with the specified codec and read options.
+     * Starts loading the specified memory buffer with the specified codec and load options.
      *
      * Typical usage: codec_info::from_extension() ->
      *                start()                      ->
@@ -157,10 +157,10 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t start(const void *buffer, std::size_t buffer_length, const sail::codec_info &codec_info, const sail::read_options &read_options);
+    sail_status_t start(const void *buffer, std::size_t buffer_length, const sail::codec_info &codec_info, const sail::load_options &load_options);
 
     /*
-     * Starts reading the specified memory buffer.
+     * Starts loading the specified memory buffer.
      *
      * Typical usage: start()          ->
      *                next_frame() x n ->
@@ -171,7 +171,7 @@ public:
     sail_status_t start(const sail::arbitrary_data &arbitrary_data);
 
     /*
-     * Starts reading the specified memory buffer with the specified codec.
+     * Starts loading the specified memory buffer with the specified codec.
      *
      * Typical usage: codec_info::from_extension() ->
      *                start()                      ->
@@ -183,7 +183,7 @@ public:
     sail_status_t start(const sail::arbitrary_data &arbitrary_data, const sail::codec_info &codec_info);
 
     /*
-     * Starts reading the specified memory buffer with the specified read options.
+     * Starts loading the specified memory buffer with the specified load options.
      *
      * Typical usage: start()          ->
      *                next_frame() x n ->
@@ -191,10 +191,10 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t start(const sail::arbitrary_data &arbitrary_data, const sail::read_options &read_options);
+    sail_status_t start(const sail::arbitrary_data &arbitrary_data, const sail::load_options &load_options);
 
     /*
-     * Starts reading the specified memory buffer with the specified codec and read options.
+     * Starts loading the specified memory buffer with the specified codec and load options.
      *
      * Typical usage: codec_info::from_extension() ->
      *                start()                      ->
@@ -203,10 +203,10 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t start(const sail::arbitrary_data &arbitrary_data, const sail::codec_info &codec_info, const sail::read_options &read_options);
+    sail_status_t start(const sail::arbitrary_data &arbitrary_data, const sail::codec_info &codec_info, const sail::load_options &load_options);
 
     /*
-     * Starts reading the specified I/O source.
+     * Starts loading the specified I/O source.
      *
      * Typical usage: start()          ->
      *                next_frame() x n ->
@@ -217,7 +217,7 @@ public:
     sail_status_t start(sail::abstract_io &abstract_io);
 
     /*
-     * Starts reading the specified I/O source with the specified codec.
+     * Starts loading the specified I/O source with the specified codec.
      *
      * Typical usage: codec_info::from_extension() ->
      *                start()                      ->
@@ -229,7 +229,7 @@ public:
     sail_status_t start(sail::abstract_io &abstract_io, const sail::codec_info &codec_info);
 
     /*
-     * Starts reading the specified I/O source with the specified read options.
+     * Starts loading the specified I/O source with the specified load options.
      *
      * Typical usage: start()          ->
      *                next_frame() x n ->
@@ -237,10 +237,10 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t start(sail::abstract_io &abstract_io, const sail::read_options &read_options);
+    sail_status_t start(sail::abstract_io &abstract_io, const sail::load_options &load_options);
 
     /*
-     * Starts reading the specified I/O source with the specified codec and read options.
+     * Starts loading the specified I/O source with the specified codec and load options.
      *
      * Typical usage: codec_info::from_extension() ->
      *                start()                      ->
@@ -249,11 +249,11 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t start(sail::abstract_io &abstract_io, const sail::codec_info &codec_info, const sail::read_options &read_options);
+    sail_status_t start(sail::abstract_io &abstract_io, const sail::codec_info &codec_info, const sail::load_options &load_options);
 
     /*
-     * Continues reading the source started by the previous call to start().
-     * Assigns the read image to the 'image' argument.
+     * Continues loading the source started by the previous call to start().
+     * Assigns the loaded image to the 'image' argument.
      *
      * Returns SAIL_OK on success.
      * Returns SAIL_ERROR_NO_MORE_FRAMES when no more frames are available.
@@ -261,17 +261,17 @@ public:
     sail_status_t next_frame(sail::image *image);
 
     /*
-     * Continues reading the source started by the previous call to start().
+     * Continues loading the source started by the previous call to start().
      *
      * Returns an invalid image on error.
      */
     image next_frame();
 
     /*
-     * Stops reading the source started by the previous call to start(). Does nothing
-     * if no reading was started.
+     * Stops loading the source started by the previous call to start(). Does nothing
+     * if no loading was started.
      *
-     * It is essential to always stop reading to free memory and I/O resources. Failure to do so
+     * It is essential to always stop loading to free memory and I/O resources. Failure to do so
      * will lead to memory leaks.
      *
      * Returns SAIL_OK on success.

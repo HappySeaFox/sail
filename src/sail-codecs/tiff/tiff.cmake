@@ -45,7 +45,7 @@ macro(sail_codec_post_add)
             target_compile_definitions(${TARGET} PRIVATE SAIL_HAVE_TIFF_${tiff_codec})
         endif()
 
-        # Check if we can actually write defined compressions
+        # Check if we can actually save defined compressions
         #
         if (SAIL_VCPKG)
             # Hardcode compressions as check_c_source_runs() fails in VCPKG mode.

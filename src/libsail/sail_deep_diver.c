@@ -30,8 +30,8 @@
 #include "sail-common.h"
 #include "sail.h"
 
-sail_status_t sail_start_reading_file_with_options(const char *path, const struct sail_codec_info *codec_info,
-                                                  const struct sail_read_options *read_options, void **state) {
+sail_status_t sail_start_loading_file_with_options(const char *path, const struct sail_codec_info *codec_info,
+                                                   const struct sail_load_options *load_options, void **state) {
 
     SAIL_CHECK_PTR(path);
 
@@ -46,14 +46,14 @@ sail_status_t sail_start_reading_file_with_options(const char *path, const struc
     struct sail_io *io;
     SAIL_TRY(sail_alloc_io_read_file(path, &io));
 
-    SAIL_TRY(start_reading_io_with_options(io, true, codec_info_local, read_options, state));
+    SAIL_TRY(start_loading_io_with_options(io, true, codec_info_local, load_options, state));
 
     return SAIL_OK;
 }
 
-sail_status_t sail_start_reading_memory_with_options(const void *buffer, size_t buffer_length,
+sail_status_t sail_start_loading_memory_with_options(const void *buffer, size_t buffer_length,
                                                      const struct sail_codec_info *codec_info,
-                                                     const struct sail_read_options *read_options, void **state) {
+                                                     const struct sail_load_options *load_options, void **state) {
 
     SAIL_CHECK_PTR(buffer);
 
@@ -68,13 +68,13 @@ sail_status_t sail_start_reading_memory_with_options(const void *buffer, size_t 
     struct sail_io *io;
     SAIL_TRY(sail_alloc_io_read_memory(buffer, buffer_length, &io));
 
-    SAIL_TRY(start_reading_io_with_options(io, true, codec_info_local, read_options, state));
+    SAIL_TRY(start_loading_io_with_options(io, true, codec_info_local, load_options, state));
 
     return SAIL_OK;
 }
 
-sail_status_t sail_start_writing_file_with_options(const char *path, const struct sail_codec_info *codec_info,
-                                                  const struct sail_write_options *write_options, void **state) {
+sail_status_t sail_start_saving_file_with_options(const char *path, const struct sail_codec_info *codec_info,
+                                                  const struct sail_save_options *save_options, void **state) {
 
     SAIL_CHECK_PTR(path);
 
@@ -90,14 +90,14 @@ sail_status_t sail_start_writing_file_with_options(const char *path, const struc
     SAIL_TRY(sail_alloc_io_read_write_file(path, &io));
 
     /* The I/O object will be destroyed in this function. */
-    SAIL_TRY(start_writing_io_with_options(io, true, codec_info_local, write_options, state));
+    SAIL_TRY(start_saving_io_with_options(io, true, codec_info_local, save_options, state));
 
     return SAIL_OK;
 }
 
-sail_status_t sail_start_writing_memory_with_options(void *buffer, size_t buffer_length,
+sail_status_t sail_start_saving_memory_with_options(void *buffer, size_t buffer_length,
                                                      const struct sail_codec_info *codec_info,
-                                                     const struct sail_write_options *write_options, void **state) {
+                                                     const struct sail_save_options *save_options, void **state) {
     SAIL_CHECK_PTR(buffer);
     SAIL_CHECK_PTR(codec_info);
 
@@ -105,14 +105,14 @@ sail_status_t sail_start_writing_memory_with_options(void *buffer, size_t buffer
     SAIL_TRY(sail_alloc_io_read_write_memory(buffer, buffer_length, &io));
 
     /* The I/O object will be destroyed in this function. */
-    SAIL_TRY(start_writing_io_with_options(io, true, codec_info, write_options, state));
+    SAIL_TRY(start_saving_io_with_options(io, true, codec_info, save_options, state));
 
     return SAIL_OK;
 }
 
-sail_status_t sail_stop_writing_with_written(void *state, size_t *written) {
+sail_status_t sail_stop_saving_with_written(void *state, size_t *written) {
 
-    SAIL_TRY(stop_writing(state, written));
+    SAIL_TRY(stop_saving(state, written));
 
     return SAIL_OK;
 }

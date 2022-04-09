@@ -1,7 +1,7 @@
 # JPEG2000 codec information
 #
 [codec]
-layout=6
+layout=7
 version=0.4.0
 priority=MEDIUM
 name=JPEG2000
@@ -10,11 +10,11 @@ magic-numbers=00 00 00 0C 6A 50 20 20 0D 0A 87 0A;FF 4F FF 51
 extensions=jp2;j2k;jpf;jpm;jpg2;j2c;jpc;jpx
 mime-types=image/jp2;image/jpm
 
-[read-features]
+[load-features]
 features=STATIC
 tuning=
 
-[write-features]
+[save-features]
 features=
 tuning=
 pixel-formats=

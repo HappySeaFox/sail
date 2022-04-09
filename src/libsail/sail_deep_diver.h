@@ -40,115 +40,115 @@
 extern "C" {
 #endif
 
-struct sail_io;
 struct sail_codec_info;
-struct sail_read_options;
-struct sail_write_options;
+struct sail_io;
+struct sail_load_options;
+struct sail_save_options;
 
 /*
- * Starts reading the specified image file with the specified read options. Pass codec info if you would like
- * to start reading with a specific codec. If not, just pass NULL. If you do not need specific read options,
+ * Starts loading the specified image file with the specified load options. Pass codec info if you would like
+ * to start loading with a specific codec. If not, just pass NULL. If you do not need specific load options,
  * just pass NULL. Codec-specific defaults will be used in this case.
  *
- * The read options are deep copied.
+ * The load options are deep copied.
  *
- * Typical usage: sail_start_reading_file_with_options() ->
- *                sail_read_next_frame()                 ->
- *                sail_stop_reading().
+ * Typical usage: sail_start_loading_file_with_options() ->
+ *                sail_load_next_frame()                 ->
+ *                sail_stop_loading().
  *
  * Or:            sail_codec_info_from_extension()       ->
- *                sail_start_reading_file_with_options() ->
- *                sail_read_next_frame()                 ->
- *                sail_stop_reading().
+ *                sail_start_loading_file_with_options() ->
+ *                sail_load_next_frame()                 ->
+ *                sail_stop_loading().
  *
  * STATE explanation: Passes the address of a local void* pointer. SAIL will store an internal state
- * in it and destroy it in sail_stop_reading(). States must be used per image. DO NOT use the same state
- * to start reading multiple images at the same time.
+ * in it and destroy it in sail_stop_loading(). States must be used per image. DO NOT use the same state
+ * to start loading multiple images at the same time.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_start_reading_file_with_options(const char *path, const struct sail_codec_info *codec_info,
-                                                              const struct sail_read_options *read_options, void **state);
+SAIL_EXPORT sail_status_t sail_start_loading_file_with_options(const char *path, const struct sail_codec_info *codec_info,
+                                                              const struct sail_load_options *load_options, void **state);
 
 /*
- * Starts reading the specified memory buffer with the specified read options. If you do not need specific read options,
+ * Starts loading the specified memory buffer with the specified load options. If you do not need specific load options,
  * just pass NULL. Codec-specific defaults will be used in this case.
  *
- * The read options are deep copied.
+ * The load options are deep copied.
  *
  * Typical usage: sail_codec_info_from_extension()         ->
- *                sail_start_reading_memory_with_options() ->
- *                sail_read_next_frame()                   ->
- *                sail_stop_reading().
+ *                sail_start_loading_memory_with_options() ->
+ *                sail_load_next_frame()                   ->
+ *                sail_stop_loading().
  *
  * STATE explanation: Passes the address of a local void* pointer. SAIL will store an internal state
- * in it and destroy it in sail_stop_reading(). States must be used per image. DO NOT use the same state
- * to start reading multiple images at the same time.
+ * in it and destroy it in sail_stop_loading(). States must be used per image. DO NOT use the same state
+ * to start loading multiple images at the same time.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_start_reading_memory_with_options(const void *buffer, size_t buffer_length,
+SAIL_EXPORT sail_status_t sail_start_loading_memory_with_options(const void *buffer, size_t buffer_length,
                                                                  const struct sail_codec_info *codec_info,
-                                                                 const struct sail_read_options *read_options, void **state);
+                                                                 const struct sail_load_options *load_options, void **state);
 
 /*
- * Starts writing the specified image file with the specified write options. Pass codec info if you would like
- * to start writing with a specific codec. If not, just pass NULL. If you do not need specific write options,
+ * Starts saving the specified image file with the specified save options. Pass codec info if you would like
+ * to start saving with a specific codec. If not, just pass NULL. If you do not need specific save options,
  * just pass NULL. Codec-specific defaults will be used in this case.
  *
- * The write options are deep copied.
+ * The save options are deep copied.
  *
- * Typical usage: sail_start_writing_file_with_options() ->
- *                sail_write_next_frame()                ->
- *                sail_stop_writing().
+ * Typical usage: sail_start_saving_file_with_options() ->
+ *                sail_write_next_frame()               ->
+ *                sail_stop_saving().
  *
- * Or:            sail_codec_info_from_extension()       ->
- *                sail_start_writing_file_with_options() ->
- *                sail_write_next_frame()                ->
- *                sail_stop_writing().
+ * Or:            sail_codec_info_from_extension()      ->
+ *                sail_start_saving_file_with_options() ->
+ *                sail_write_next_frame()               ->
+ *                sail_stop_saving().
  *
  * STATE explanation: Passes the address of a local void* pointer. SAIL will store an internal state
- * in it and destroy it in sail_stop_writing(). States must be used per image. DO NOT use the same state
- * to start writing multiple images at the same time.
+ * in it and destroy it in sail_stop_saving(). States must be used per image. DO NOT use the same state
+ * to start saving multiple images at the same time.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_start_writing_file_with_options(const char *path,
+SAIL_EXPORT sail_status_t sail_start_saving_file_with_options(const char *path,
                                                               const struct sail_codec_info *codec_info,
-                                                              const struct sail_write_options *write_options, void **state);
+                                                              const struct sail_save_options *save_options, void **state);
 
 /*
- * Starts writing the specified memory buffer with the specified write options. If you do not need specific
- * write options, just pass NULL. Codec-specific defaults will be used in this case.
+ * Starts saving the specified memory buffer with the specified save options. If you do not need specific
+ * save options, just pass NULL. Codec-specific defaults will be used in this case.
  *
- * The write options are deep copied.
+ * The save options are deep copied.
  *
- * Typical usage: sail_codec_info_from_extension()         ->
- *                sail_start_writing_memory_with_options() ->
- *                sail_write_next_frame()                  ->
- *                sail_stop_writing().
+ * Typical usage: sail_codec_info_from_extension()        ->
+ *                sail_start_saving_memory_with_options() ->
+ *                sail_write_next_frame()                 ->
+ *                sail_stop_saving().
  *
  * STATE explanation: Passes the address of a local void* pointer. SAIL will store an internal state
- * in it and destroy it in sail_stop_writing. States must be used per image. DO NOT use the same state
- * to start writing multiple images at the same time.
+ * in it and destroy it in sail_stop_saving. States must be used per image. DO NOT use the same state
+ * to start saving multiple images at the same time.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_start_writing_memory_with_options(void *buffer, size_t buffer_length,
+SAIL_EXPORT sail_status_t sail_start_saving_memory_with_options(void *buffer, size_t buffer_length,
                                                                  const struct sail_codec_info *codec_info,
-                                                             const struct sail_write_options *write_options, void **state);
+                                                             const struct sail_save_options *save_options, void **state);
 
 
 /*
- * Stops writing started by sail_start_writing_file() and brothers. Closes the underlying I/O target.
+ * Stops saving started by sail_start_saving_file() and brothers. Closes the underlying I/O target.
  * Assigns the number of bytes written to the 'written' argument. Does nothing if the state is NULL.
  *
- * It is essential to always stop writing to free memory and I/O resources. Failure to do so
+ * It is essential to always stop saving to free memory and I/O resources. Failure to do so
  * will lead to memory leaks.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_stop_writing_with_written(void *state, size_t *written);
+SAIL_EXPORT sail_status_t sail_stop_saving_with_written(void *state, size_t *written);
 
 /* extern "C" */
 #ifdef __cplusplus

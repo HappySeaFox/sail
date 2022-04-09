@@ -73,7 +73,7 @@ static sail_status_t write_raw_profile_header(char *str, size_t str_size, enum S
         case SAIL_META_DATA_XMP:  key_str = "xmp";  break;
 
         default: {
-            SAIL_LOG_ERROR("PNG: Cannot write '%s' meta data key as a raw profile", sail_meta_data_to_string(key));
+            SAIL_LOG_ERROR("PNG: Cannot save '%s' meta data key as a raw profile", sail_meta_data_to_string(key));
             SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
         }
     }
@@ -85,7 +85,7 @@ static sail_status_t write_raw_profile_header(char *str, size_t str_size, enum S
     (void)str_size;
     if (sprintf(str, "\n%s\n    %u\n", key_str, (unsigned)hex_data_length) < 0) {
 #endif
-        SAIL_LOG_ERROR("PNG: Failed to write raw profile header");
+        SAIL_LOG_ERROR("PNG: Failed to save raw profile header");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 
@@ -388,11 +388,11 @@ sail_status_t png_private_write_meta_data(png_structp png_ptr, png_infop info_pt
                 if (meta_data->value->type == SAIL_VARIANT_TYPE_DATA) {
                     /* Skip "Exif\0\0" if any. */
                     if (meta_data->value->size >= 4 && memcmp(sail_variant_to_data(meta_data->value), "Exif", 4) == 0) {
-                        SAIL_LOG_DEBUG("PNG: Writing raw EXIF %u bytes long w/o header", (unsigned)meta_data->value->size - 6);
+                        SAIL_LOG_DEBUG("PNG: Saving raw EXIF %u bytes long w/o header", (unsigned)meta_data->value->size - 6);
                         png_set_eXIf_1(png_ptr, info_ptr, (png_uint_32)meta_data->value->size - 6,
                                         ((png_bytep)sail_variant_to_data(meta_data->value)) + 6);
                     } else {
-                        SAIL_LOG_DEBUG("PNG: Writing raw EXIF %u bytes long", (unsigned)meta_data->value->size);
+                        SAIL_LOG_DEBUG("PNG: Saving raw EXIF %u bytes long", (unsigned)meta_data->value->size);
                         png_set_eXIf_1(png_ptr, info_ptr, (png_uint_32)meta_data->value->size, meta_data->value->value);
                     }
                 } else {

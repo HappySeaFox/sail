@@ -44,8 +44,8 @@ public:
     std::vector<std::string> magic_numbers;
     std::vector<std::string> extensions;
     std::vector<std::string> mime_types;
-    sail::read_features read_features;
-    sail::write_features write_features;
+    sail::load_features load_features;
+    sail::save_features save_features;
 };
 
 codec_info::codec_info()
@@ -63,14 +63,14 @@ codec_info& codec_info::operator=(const codec_info &ci)
 {
     d->sail_codec_info_c = ci.d->sail_codec_info_c;
 
-    d->version        = ci.version();
-    d->name           = ci.name();
-    d->description    = ci.description();
-    d->magic_numbers  = ci.magic_numbers();
-    d->extensions     = ci.extensions();
-    d->mime_types     = ci.mime_types();
-    d->read_features  = ci.read_features();
-    d->write_features = ci.write_features();
+    d->version       = ci.version();
+    d->name          = ci.name();
+    d->description   = ci.description();
+    d->magic_numbers = ci.magic_numbers();
+    d->extensions    = ci.extensions();
+    d->mime_types    = ci.mime_types();
+    d->load_features = ci.load_features();
+    d->save_features = ci.save_features();
 
     return *this;
 }
@@ -126,14 +126,14 @@ const std::vector<std::string>& codec_info::mime_types() const
     return d->mime_types;
 }
 
-const read_features& codec_info::read_features() const
+const load_features& codec_info::load_features() const
 {
-    return d->read_features;
+    return d->load_features;
 }
 
-const write_features& codec_info::write_features() const
+const save_features& codec_info::save_features() const
 {
-    return d->write_features;
+    return d->save_features;
 }
 
 const char* codec_info::codec_feature_to_string(SailCodecFeature codec_feature)
@@ -242,14 +242,14 @@ codec_info::codec_info(const sail_codec_info *ci)
         mime_types.push_back(mime_type_node->string);
     }
 
-    d->version        = ci->version;
-    d->name           = ci->name;
-    d->description    = ci->description;
-    d->magic_numbers  = magic_numbers;
-    d->extensions     = extensions;
-    d->mime_types     = mime_types;
-    d->read_features  = sail::read_features(ci->read_features);
-    d->write_features = sail::write_features(ci->write_features);
+    d->version       = ci->version;
+    d->name          = ci->name;
+    d->description   = ci->description;
+    d->magic_numbers = magic_numbers;
+    d->extensions    = extensions;
+    d->mime_types    = mime_types;
+    d->load_features = sail::load_features(ci->load_features);
+    d->save_features = sail::save_features(ci->save_features);
 }
 
 const sail_codec_info* codec_info::sail_codec_info_c() const

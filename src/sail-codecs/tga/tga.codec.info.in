@@ -1,7 +1,7 @@
 # TGA codec information
 #
 [codec]
-layout=6
+layout=7
 version=0.7.2
 priority=LOW
 name=TGA
@@ -10,11 +10,11 @@ magic-numbers=
 extensions=tga;vda;vst;icb;tpic
 mime-types=image/x-targa;image/x-tga
 
-[read-features]
+[load-features]
 features=STATIC;META-DATA
 tuning=
 
-[write-features]
+[save-features]
 features=
 tuning=
 pixel-formats=

@@ -23,8 +23,8 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_READ_OPTIONS_H
-#define SAIL_READ_OPTIONS_H
+#ifndef SAIL_LOAD_FEATURES_H
+#define SAIL_LOAD_FEATURES_H
 
 #ifdef SAIL_BUILD
     #include "error.h"
@@ -38,24 +38,21 @@
 extern "C" {
 #endif
 
-struct sail_hash_map;
-struct sail_read_features;
+struct sail_string_node;
 
 /*
- * sail_read_options represents options to modify reading operations.
+ * Load features. Use this structure to determine what a codec can actually load.
  */
-struct sail_read_options {
+struct sail_load_features {
 
-    /* Or-ed manipulation options for reading operations. See SailOption. */
-    int options;
+    /* Supported or-ed features of loading operations. See SailCodecFeature. */
+    int features;
 
     /*
      * Codec-specific tuning options. For example, a hypothetical ABC image codec
      * can allow disabling filtering with setting the "abc-filtering" tuning option
-     * to 0 in read options. Tuning options' names start with the codec name
+     * to 0 in load options. Tuning options' names start with the codec name
      * to avoid confusing.
-     *
-     * Can be NULL.
      *
      * The list of possible values for every tuning option is not current available
      * programmatically. Every codec must document them in the codec info.
@@ -63,37 +60,23 @@ struct sail_read_options {
      * It's not guaranteed that tuning options and their values are backward
      * or forward compatible.
      */
-    struct sail_hash_map *tuning;
+    struct sail_string_node *tuning;
 };
 
-typedef struct sail_read_options sail_read_options_t;
+typedef struct sail_load_features sail_load_features_t;
 
 /*
- * Allocates read options.
+ * Allocates load features.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_read_options(struct sail_read_options **read_options);
+SAIL_EXPORT sail_status_t sail_alloc_load_features(struct sail_load_features **load_features);
 
 /*
- * Destroys the specified read options object and all its internal allocated memory buffers. The read options
- * MUST NOT be used anymore after calling this function. Does nothing if the read options is NULL.
+ * Destroys the specified load features object and all its internal allocated memory buffers. The load features
+ * MUST NOT be used anymore after calling this function. Does nothing if the load features is NULL.
  */
-SAIL_EXPORT void sail_destroy_read_options(struct sail_read_options *read_options);
-
-/*
- * Allocates and builds default read options from the read features.
- *
- * Returns SAIL_OK on success.
- */
-SAIL_EXPORT sail_status_t sail_alloc_read_options_from_features(const struct sail_read_features *read_features, struct sail_read_options **read_options);
-
-/*
- * Makes a deep copy of the specified read options object.
- *
- * Returns SAIL_OK on success.
- */
-SAIL_EXPORT sail_status_t sail_copy_read_options(const struct sail_read_options *source, struct sail_read_options **target);
+SAIL_EXPORT void sail_destroy_load_features(struct sail_load_features *load_features);
 
 /* extern "C" */
 #ifdef __cplusplus

@@ -1,7 +1,7 @@
 # JPEG codec information
 #
 [codec]
-layout=6
+layout=7
 version=1.3.4.1
 priority=HIGHEST
 name=JPEG
@@ -10,11 +10,11 @@ magic-numbers=FF D8
 extensions=jpg;jpeg;jpe;jif;jfif;jfi
 mime-types=image/jpeg
 
-[read-features]
+[load-features]
 features=STATIC;META-DATA@CODEC_INFO_FEATURE_ICCP@
 tuning=jpeg-dct-method;jpeg-optimize-coding;jpeg-smoothing-factor
 
-[write-features]
+[save-features]
 features=STATIC;META-DATA@CODEC_INFO_FEATURE_ICCP@
 tuning=
 pixel-formats=BPP8-GRAYSCALE;@SAIL_JPEG_CODEC_INFO_WRITE_EXT@BPP24-YCBCR;BPP32-CMYK;BPP32-YCCK

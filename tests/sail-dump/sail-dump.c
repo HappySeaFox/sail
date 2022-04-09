@@ -485,7 +485,7 @@ sail_status_t sail_read_dump(const char *path, struct sail_image *images[]) {
         skip_whitespaces(fptr);
     }
 
-    /* Save the last read image. */
+    /* Save the last loaded image. */
     images[current_image]   = image_local;
     images[current_image+1] = NULL;
 

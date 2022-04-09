@@ -64,28 +64,28 @@ sail_status_t sail_probe_file(const char *path, struct sail_image **image, const
     const struct sail_codec *codec;
     SAIL_TRY(load_codec_by_codec_info(*codec_info_local, &codec));
 
-    struct sail_read_options *read_options_local;
-    SAIL_TRY(sail_alloc_read_options_from_features((*codec_info_local)->read_features, &read_options_local));
+    struct sail_load_options *load_options_local;
+    SAIL_TRY(sail_alloc_load_options_from_features((*codec_info_local)->load_features, &load_options_local));
 
     struct sail_io *io;
     SAIL_TRY_OR_CLEANUP(sail_alloc_io_read_file(path, &io),
-                        /* cleanup */ sail_destroy_read_options(read_options_local));
+                        /* cleanup */ sail_destroy_load_options(load_options_local));
 
     void *state = NULL;
-    SAIL_TRY_OR_CLEANUP(codec->v6->read_init(io, read_options_local, &state),
-                        /* cleanup */ codec->v6->read_finish(&state, io),
+    SAIL_TRY_OR_CLEANUP(codec->v7->load_init(io, load_options_local, &state),
+                        /* cleanup */ codec->v7->load_finish(&state, io),
                                       sail_destroy_io(io),
-                                      sail_destroy_read_options(read_options_local));
+                                      sail_destroy_load_options(load_options_local));
 
-    sail_destroy_read_options(read_options_local);
+    sail_destroy_load_options(load_options_local);
 
     struct sail_image *image_local;
 
-    SAIL_TRY_OR_CLEANUP(codec->v6->read_seek_next_frame(state, io, &image_local),
-                        /* cleanup */ codec->v6->read_finish(&state, io),
+    SAIL_TRY_OR_CLEANUP(codec->v7->load_seek_next_frame(state, io, &image_local),
+                        /* cleanup */ codec->v7->load_finish(&state, io),
                                       sail_destroy_io(io));
 
-    SAIL_TRY_OR_CLEANUP(codec->v6->read_finish(&state, io),
+    SAIL_TRY_OR_CLEANUP(codec->v7->load_finish(&state, io),
                         /* cleanup */ sail_destroy_image(image_local),
                                       sail_destroy_io(io));
 
@@ -103,15 +103,15 @@ sail_status_t sail_load_image_from_file(const char *path, struct sail_image **im
 
     void *state = NULL;
 
-    SAIL_TRY_OR_CLEANUP(sail_start_reading_file(path, NULL /* codec info */, &state),
-                        /* cleanup */ sail_stop_reading(state));
+    SAIL_TRY_OR_CLEANUP(sail_start_loading_file(path, NULL /* codec info */, &state),
+                        /* cleanup */ sail_stop_loading(state));
 
     struct sail_image *image_local;
 
-    SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, &image_local),
-                        /* cleanup */ sail_stop_reading(state));
+    SAIL_TRY_OR_CLEANUP(sail_load_next_frame(state, &image_local),
+                        /* cleanup */ sail_stop_loading(state));
 
-    SAIL_TRY_OR_CLEANUP(sail_stop_reading(state),
+    SAIL_TRY_OR_CLEANUP(sail_stop_loading(state),
                         /* cleanup */ sail_destroy_image(image_local));
 
     *image = image_local;
@@ -126,13 +126,13 @@ sail_status_t sail_load_image_from_memory(const void *buffer, size_t buffer_leng
 
     void *state = NULL;
 
-    SAIL_TRY_OR_CLEANUP(sail_start_reading_memory(buffer, buffer_length, NULL /* codec info */, &state),
-                        /* cleanup */ sail_stop_reading(state));
+    SAIL_TRY_OR_CLEANUP(sail_start_loading_memory(buffer, buffer_length, NULL /* codec info */, &state),
+                        /* cleanup */ sail_stop_loading(state));
 
-    SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, image),
-                        /* cleanup */ sail_stop_reading(state));
+    SAIL_TRY_OR_CLEANUP(sail_load_next_frame(state, image),
+                        /* cleanup */ sail_stop_loading(state));
 
-    SAIL_TRY_OR_CLEANUP(sail_stop_reading(state),
+    SAIL_TRY_OR_CLEANUP(sail_stop_loading(state),
                         /* cleanup */ sail_destroy_image(*image));
 
     return SAIL_OK;
@@ -145,13 +145,13 @@ sail_status_t sail_save_image_into_file(const char *path, const struct sail_imag
 
     void *state = NULL;
 
-    SAIL_TRY_OR_CLEANUP(sail_start_writing_file(path, NULL /* codec info */, &state),
-                        sail_stop_writing(state));
+    SAIL_TRY_OR_CLEANUP(sail_start_saving_file(path, NULL /* codec info */, &state),
+                        sail_stop_saving(state));
 
     SAIL_TRY_OR_CLEANUP(sail_write_next_frame(state, image),
-                        sail_stop_writing(state));
+                        sail_stop_saving(state));
 
-    SAIL_TRY(sail_stop_writing(state));
+    SAIL_TRY(sail_stop_saving(state));
 
     return SAIL_OK;
 }
@@ -163,16 +163,16 @@ sail_status_t sail_save_image_into_memory(void *buffer, size_t buffer_length, co
 
     void *state = NULL;
 
-    SAIL_TRY_OR_CLEANUP(sail_start_writing_memory(buffer, buffer_length, NULL /* codec info */, &state),
-                        sail_stop_writing(state));
+    SAIL_TRY_OR_CLEANUP(sail_start_saving_memory(buffer, buffer_length, NULL /* codec info */, &state),
+                        sail_stop_saving(state));
 
     SAIL_TRY_OR_CLEANUP(sail_write_next_frame(state, image),
-                        sail_stop_writing(state));
+                        sail_stop_saving(state));
 
     if (written == NULL) {
-        SAIL_TRY(sail_stop_writing(state));
+        SAIL_TRY(sail_stop_saving(state));
     } else {
-        SAIL_TRY(sail_stop_writing_with_written(state, written));
+        SAIL_TRY(sail_stop_saving_with_written(state, written));
     }
 
     return SAIL_OK;

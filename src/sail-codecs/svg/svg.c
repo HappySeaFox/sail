@@ -35,10 +35,10 @@
  * Codec-specific state.
  */
 struct svg_state {
-    struct sail_read_options *read_options;
-    struct sail_write_options *write_options;
+    struct sail_load_options *load_options;
+    struct sail_save_options *save_options;
 
-    bool frame_read;
+    bool frame_loaded;
     resvg_options *resvg_options;
     resvg_render_tree *resvg_tree;
 };
@@ -49,10 +49,10 @@ static sail_status_t alloc_svg_state(struct svg_state **svg_state) {
     SAIL_TRY(sail_malloc(sizeof(struct svg_state), &ptr));
     *svg_state = ptr;
 
-    (*svg_state)->read_options  = NULL;
-    (*svg_state)->write_options = NULL;
+    (*svg_state)->load_options = NULL;
+    (*svg_state)->save_options = NULL;
 
-    (*svg_state)->frame_read    = false;
+    (*svg_state)->frame_loaded  = false;
     (*svg_state)->resvg_options = NULL;
     (*svg_state)->resvg_tree    = NULL;
 
@@ -65,8 +65,8 @@ static void destroy_svg_state(struct svg_state *svg_state) {
         return;
     }
 
-    sail_destroy_read_options(svg_state->read_options);
-    sail_destroy_write_options(svg_state->write_options);
+    sail_destroy_load_options(svg_state->load_options);
+    sail_destroy_save_options(svg_state->save_options);
 
     if (svg_state->resvg_options != NULL) {
         resvg_options_destroy(svg_state->resvg_options);
@@ -83,21 +83,21 @@ static void destroy_svg_state(struct svg_state *svg_state) {
  * Decoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_read_init_v6_svg(struct sail_io *io, const struct sail_read_options *read_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_load_init_v7_svg(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
 
     SAIL_CHECK_PTR(state);
     *state = NULL;
 
     SAIL_TRY(sail_check_io_valid(io));
-    SAIL_CHECK_PTR(read_options);
+    SAIL_CHECK_PTR(load_options);
 
     /* Allocate a new state. */
     struct svg_state *svg_state;
     SAIL_TRY(alloc_svg_state(&svg_state));
     *state = svg_state;
 
-    /* Deep copy read options. */
-    SAIL_TRY(sail_copy_read_options(read_options, &svg_state->read_options));
+    /* Deep copy load options. */
+    SAIL_TRY(sail_copy_load_options(load_options, &svg_state->load_options));
 
     /* Read the entire image as the resvg API requires. */
     void *image_data;
@@ -109,14 +109,14 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_svg(struct sail_io *io, const 
     const int result = resvg_parse_tree_from_data(image_data, image_size, svg_state->resvg_options, &svg_state->resvg_tree);
 
     if (result != RESVG_OK) {
-        SAIL_LOG_ERROR("SVG: Failed to read image");
+        SAIL_LOG_ERROR("SVG: Failed to load image");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
     }
 
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_svg(void *state, struct sail_io *io, struct sail_image **image) {
+SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v7_svg(void *state, struct sail_io *io, struct sail_image **image) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
@@ -124,11 +124,11 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_svg(void *state, st
 
     struct svg_state *svg_state = (struct svg_state *)state;
 
-    if (svg_state->frame_read) {
+    if (svg_state->frame_loaded) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
     }
 
-    svg_state->frame_read = true;
+    svg_state->frame_loaded = true;
 
     struct sail_image *image_local;
     SAIL_TRY(sail_alloc_image(&image_local));
@@ -152,7 +152,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_svg(void *state, st
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_read_frame_v6_svg(void *state, struct sail_io *io, struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_load_frame_v7_svg(void *state, struct sail_io *io, struct sail_image *image) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
@@ -169,7 +169,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v6_svg(void *state, struct sail_
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_read_finish_v6_svg(void **state, struct sail_io *io) {
+SAIL_EXPORT sail_status_t sail_codec_load_finish_v7_svg(void **state, struct sail_io *io) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
@@ -187,25 +187,16 @@ SAIL_EXPORT sail_status_t sail_codec_read_finish_v6_svg(void **state, struct sai
  * Encoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_write_init_v6_svg(struct sail_io *io, const struct sail_write_options *write_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_save_init_v7_svg(struct sail_io *io, const struct sail_save_options *save_options, void **state) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
-    SAIL_CHECK_PTR(write_options);
+    SAIL_CHECK_PTR(save_options);
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v6_svg(void *state, struct sail_io *io, const struct sail_image *image) {
-
-    SAIL_CHECK_PTR(state);
-    SAIL_TRY(sail_check_io_valid(io));
-    SAIL_TRY(sail_check_image_valid(image));
-
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
-}
-
-SAIL_EXPORT sail_status_t sail_codec_write_frame_v6_svg(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v7_svg(void *state, struct sail_io *io, const struct sail_image *image) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
@@ -214,7 +205,16 @@ SAIL_EXPORT sail_status_t sail_codec_write_frame_v6_svg(void *state, struct sail
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-SAIL_EXPORT sail_status_t sail_codec_write_finish_v6_svg(void **state, struct sail_io *io) {
+SAIL_EXPORT sail_status_t sail_codec_save_frame_v7_svg(void *state, struct sail_io *io, const struct sail_image *image) {
+
+    SAIL_CHECK_PTR(state);
+    SAIL_TRY(sail_check_io_valid(io));
+    SAIL_TRY(sail_check_image_valid(image));
+
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
+}
+
+SAIL_EXPORT sail_status_t sail_codec_save_finish_v7_svg(void **state, struct sail_io *io) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));

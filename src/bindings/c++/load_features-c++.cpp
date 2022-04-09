@@ -29,96 +29,96 @@
 namespace sail
 {
 
-class SAIL_HIDDEN read_features::pimpl
+class SAIL_HIDDEN load_features::pimpl
 {
 public:
     pimpl()
-        : sail_read_features_c(nullptr)
+        : sail_load_features_c(nullptr)
     {}
 
-    const sail_read_features *sail_read_features_c;
+    const sail_load_features *sail_load_features_c;
     sail::supported_tuning supported_tuning;
 };
 
-read_features::read_features(const read_features &rf)
-    : read_features()
+load_features::load_features(const load_features &rf)
+    : load_features()
 {
     *this = rf;
 }
 
-read_features& read_features::operator=(const sail::read_features &read_features)
+load_features& load_features::operator=(const sail::load_features &load_features)
 {
-    d->sail_read_features_c = read_features.d->sail_read_features_c;
-    d->supported_tuning     = read_features.d->supported_tuning;
+    d->sail_load_features_c = load_features.d->sail_load_features_c;
+    d->supported_tuning     = load_features.d->supported_tuning;
 
     return *this;
 }
 
-read_features::read_features(sail::read_features &&read_features) noexcept
+load_features::load_features(sail::load_features &&load_features) noexcept
 {
-    *this = std::move(read_features);
+    *this = std::move(load_features);
 }
 
-read_features& read_features::operator=(sail::read_features &&read_features) noexcept
+load_features& load_features::operator=(sail::load_features &&load_features) noexcept
 {
-    d = std::move(read_features.d);
+    d = std::move(load_features.d);
 
     return *this;
 }
 
-read_features::~read_features()
+load_features::~load_features()
 {
 }
 
-int read_features::features() const
+int load_features::features() const
 {
-    return d->sail_read_features_c->features;
+    return d->sail_load_features_c->features;
 }
 
-const sail::supported_tuning& read_features::supported_tuning() const
+const sail::supported_tuning& load_features::supported_tuning() const
 {
     return d->supported_tuning;
 }
 
-sail_status_t read_features::to_read_options(sail::read_options *read_options) const
+sail_status_t load_features::to_load_options(sail::load_options *load_options) const
 {
-    SAIL_CHECK_PTR(d->sail_read_features_c);
-    SAIL_CHECK_PTR(read_options);
+    SAIL_CHECK_PTR(d->sail_load_features_c);
+    SAIL_CHECK_PTR(load_options);
 
-    sail_read_options *sail_read_options;
+    sail_load_options *sail_load_options;
 
-    SAIL_TRY(sail_alloc_read_options_from_features(d->sail_read_features_c, &sail_read_options));
+    SAIL_TRY(sail_alloc_load_options_from_features(d->sail_load_features_c, &sail_load_options));
 
-    *read_options = sail::read_options(sail_read_options);
+    *load_options = sail::load_options(sail_load_options);
 
-    sail_destroy_read_options(sail_read_options);
+    sail_destroy_load_options(sail_load_options);
 
     return SAIL_OK;
 }
 
-read_features::read_features()
+load_features::load_features()
     : d(new pimpl)
 {
 }
 
-read_features::read_features(const sail_read_features *rf)
-    : read_features()
+load_features::load_features(const sail_load_features *rf)
+    : load_features()
 {
     if (rf == nullptr) {
-        SAIL_LOG_TRACE("NULL pointer has been passed to sail::read_features(). The object is untouched");
+        SAIL_LOG_TRACE("NULL pointer has been passed to sail::load_features(). The object is untouched");
         return;
     }
 
-    d->sail_read_features_c = rf;
+    d->sail_load_features_c = rf;
 
     for (const sail_string_node *node = rf->tuning; node != nullptr; node = node->next) {
         d->supported_tuning.push_back(node->string);
     }
 }
 
-const sail_read_features* read_features::sail_read_features_c() const
+const sail_load_features* load_features::sail_load_features_c() const
 {
-    return d->sail_read_features_c;
+    return d->sail_load_features_c;
 }
 
 }

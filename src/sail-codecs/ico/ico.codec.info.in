@@ -1,7 +1,7 @@
 # ICO codec information
 #
 [codec]
-layout=6
+layout=7
 version=0.4.2
 priority=LOW
 name=ICO
@@ -10,11 +10,11 @@ magic-numbers=00 00 01 00;00 00 02 00
 extensions=ico;cur
 mime-types=image/x-icon;image/vnd.microsoft.icon
 
-[read-features]
+[load-features]
 features=STATIC;MULTI-PAGED
 tuning=
 
-[write-features]
+[save-features]
 features=
 tuning=
 pixel-formats=

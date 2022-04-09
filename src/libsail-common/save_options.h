@@ -23,8 +23,8 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_WRITE_OPTIONS_H
-#define SAIL_WRITE_OPTIONS_H
+#ifndef SAIL_SAVE_OPTIONS_H
+#define SAIL_SAVE_OPTIONS_H
 
 #ifdef SAIL_BUILD
     #include "error.h"
@@ -39,10 +39,12 @@ extern "C" {
 #endif
 
 struct sail_hash_map;
-struct sail_write_features;
+struct sail_save_features;
 
-/* Options to modify writing operations. */
-struct sail_write_options {
+/*
+ * Options to modify saving operations.
+ */
+struct sail_save_options {
 
     /* Or-ed manipulation options. See SailOption. */
     int options;
@@ -52,7 +54,7 @@ struct sail_write_options {
 
     /*
      * Compression type. For example: SAIL_COMPRESSION_RLE. See SailCompression.
-     * Use sail_write_features to determine what compression types or values are supported by a particular codec.
+     * Use sail_save_features to determine what compression types or values are supported by a particular codec.
      *
      * If a codec supports more than two compression types, compression levels are ignored in this case.
      *
@@ -67,40 +69,40 @@ struct sail_write_options {
 
     /*
      * Requested compression level. Must be in the range specified by compression_level_min and compression_level_max
-     * in sail_write_features. If compression_level < compression_level_min, compression_level_default will be used.
+     * in sail_save_features. If compression_level < compression_level_min, compression_level_default will be used.
      */
     double compression_level;
 };
 
-typedef struct sail_write_options sail_write_options_t;
+typedef struct sail_save_options sail_save_options_t;
 
 /*
- * Allocates write options.
+ * Allocates save options.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_write_options(struct sail_write_options **write_options);
+SAIL_EXPORT sail_status_t sail_alloc_save_options(struct sail_save_options **save_options);
 
 /*
- * Destroys the specified write options object and all its internal allocated memory buffers.
- * The write options MUST NOT be used anymore after calling this function. It does nothing
- * if the write options is NULL.
+ * Destroys the specified save options object and all its internal allocated memory buffers.
+ * The save options MUST NOT be used anymore after calling this function. It does nothing
+ * if the save options is NULL.
  */
-SAIL_EXPORT void sail_destroy_write_options(struct sail_write_options *write_options);
+SAIL_EXPORT void sail_destroy_save_options(struct sail_save_options *save_options);
 
 /*
- * Allocates and builds default write options from the write features.
+ * Allocates and builds default save options from the save features.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_write_options_from_features(const struct sail_write_features *write_features, struct sail_write_options **write_options);
+SAIL_EXPORT sail_status_t sail_alloc_save_options_from_features(const struct sail_save_features *save_features, struct sail_save_options **save_options);
 
 /*
- * Makes a deep copy of the specified write options object.
+ * Makes a deep copy of the specified save options object.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_copy_write_options(const struct sail_write_options *source, struct sail_write_options **target);
+SAIL_EXPORT sail_status_t sail_copy_save_options(const struct sail_save_options *source, struct sail_save_options **target);
 
 /* extern "C" */
 #ifdef __cplusplus

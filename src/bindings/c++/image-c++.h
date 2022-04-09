@@ -55,7 +55,7 @@ namespace sail
 
 class conversion_options;
 class meta_data;
-class write_features;
+class save_features;
 
 /*
  * Image representation with direct access to the pixel data.
@@ -139,52 +139,52 @@ public:
     /*
      * Returns the image width.
      *
-     * READ:  Set by SAIL to a positive image width in pixels.
-     * WRITE: Must be set by a caller to a positive image width in pixels.
+     * LOAD: Set by SAIL to a positive image width in pixels.
+     * SAVE: Must be set by a caller to a positive image width in pixels.
      */
     unsigned width() const;
 
     /*
      * Returns the image height.
      *
-     * READ:  Set by SAIL to a positive image height in pixels.
-     * WRITE: Must be set by a caller to a positive image height in pixels.
+     * LOAD: Set by SAIL to a positive image height in pixels.
+     * SAVE: Must be set by a caller to a positive image height in pixels.
      */
     unsigned height() const;
 
     /*
      * Returns the bytes per line.
      *
-     * READ:  Set by SAIL to a positive length of a row of pixels in bytes.
-     * WRITE: Must be set by a caller to a positive number of bytes per line. A caller could set
-     *        it with bytes_per_line_auto() if scan lines are not padded to a certain boundary.
+     * LOAD: Set by SAIL to a positive length of a row of pixels in bytes.
+     * SAVE: Must be set by a caller to a positive number of bytes per line. A caller could set
+     *       it with bytes_per_line_auto() if scan lines are not padded to a certain boundary.
      */
     unsigned bytes_per_line() const;
 
     /*
      * Returns the image resolution.
      *
-     * READ:  Set by SAIL to a valid resolution if this information is available.
-     * WRITE: Must be set by a caller to a valid image resolution if necessary.
+     * LOAD: Set by SAIL to a valid resolution if this information is available.
+     * SAVE: Must be set by a caller to a valid image resolution if necessary.
      */
     const sail::resolution& resolution() const;
 
     /*
      * Returns the image pixel format. See SailPixelFormat.
      *
-     * READ:  Set by SAIL to a valid image pixel format.
-     * WRITE: Must be set by a caller to a valid input image pixel format. Pixels in this format will be supplied
-     *        to the codec by a caller later. The list of supported input pixel formats by a certain codec
-     *        can be obtained from write_features.pixel_formats.
+     * LOAD: Set by SAIL to a valid image pixel format.
+     * SAVE: Must be set by a caller to a valid input image pixel format. Pixels in this format will be supplied
+     *       to the codec by a caller later. The list of supported input pixel formats by a certain codec
+     *       can be obtained from save_features.pixel_formats.
      */
     SailPixelFormat pixel_format() const;
 
     /*
      * Returns the image gamma.
      *
-     * READ:  Set by SAIL to a valid gamma if it's available. 1 by default.
-     * WRITE: Must be set by a caller to a valid gamma. Not all codecs support saving
-     *        gamma.
+     * LOAD: Set by SAIL to a valid gamma if it's available. 1 by default.
+     * SAVE: Must be set by a caller to a valid gamma. Not all codecs support saving
+     *       gamma.
      */
     double gamma() const;
 
@@ -192,37 +192,37 @@ public:
      * Returns the delay in milliseconds to display the image on the screen if the image is a frame
      * in an animation or -1 otherwise.
      *
-     * READ:  Set by SAIL to a non-negative number of milliseconds if the image is a frame
-     *        in an animation or to -1 otherwise.
-     *        For animations, it's guaranteed that all the frames have non-negative delays.
-     *        For multi-paged sequences, it's guaranteed that all the pages have delays equal to -1.
-     * WRITE: Must be set by a caller to a non-negative number of milliseconds if the image is a frame
-     *        in an animation.
+     * LOAD: Set by SAIL to a non-negative number of milliseconds if the image is a frame
+     *       in an animation or to -1 otherwise.
+     *       For animations, it's guaranteed that all the frames have non-negative delays.
+     *       For multi-paged sequences, it's guaranteed that all the pages have delays equal to -1.
+     * SAVE: Must be set by a caller to a non-negative number of milliseconds if the image is a frame
+     *       in an animation.
      */
     int delay() const;
 
     /*
      * Returns the image palette if the image has it.
      *
-     * READ:  Set by SAIL to a valid palette if the image is indexed and the requested pixel format
-     *        assumes having a palette.
-     * WRITE: Must be set by a caller to a valid palette if the image is indexed.
+     * LOAD: Set by SAIL to a valid palette if the image is indexed and the requested pixel format
+     *       assumes having a palette.
+     * SAVE: Must be set by a caller to a valid palette if the image is indexed.
      */
     const sail::palette& palette() const;
 
     /*
      * Returns the image meta data.
      *
-     * READ:  Set by SAIL to a valid map with meta data (like JPEG comments).
-     * WRITE: Must be set by a caller to a valid map with meta data (like JPEG comments) if necessary.
+     * LOAD: Set by SAIL to a valid map with meta data (like JPEG comments).
+     * SAVE: Must be set by a caller to a valid map with meta data (like JPEG comments) if necessary.
      */
     const std::vector<sail::meta_data>& meta_data() const;
 
     /*
      * Returns the editable image meta data.
      *
-     * READ:  Set by SAIL to a valid map with meta data (like JPEG comments).
-     * WRITE: Must be set by a caller to a valid map with meta data (like JPEG comments) if necessary.
+     * LOAD: Set by SAIL to a valid map with meta data (like JPEG comments).
+     * SAVE: Must be set by a caller to a valid map with meta data (like JPEG comments) if necessary.
      */
     std::vector<sail::meta_data>& meta_data();
 
@@ -232,41 +232,41 @@ public:
      * Note for animated/multi-paged images: only the first image in an animated/multi-paged
      * sequence might have an ICC profile.
      *
-     * READ:  Set by SAIL to a valid ICC profile if any.
-     * WRITE: Must be set by a caller to a valid ICC profile if necessary.
+     * LOAD: Set by SAIL to a valid ICC profile if any.
+     * SAVE: Must be set by a caller to a valid ICC profile if necessary.
      */
     const sail::iccp& iccp() const;
 
     /*
      * Returns the or-ed image properties. See SailImageProperty.
      *
-     * READ:  Set by SAIL to valid image properties. For example, some image formats store images flipped.
-     *        A caller must use this field to manipulate the output image accordingly (e.g., flip back etc.).
-     * WRITE: Ignored.
+     * LOAD: Set by SAIL to valid image properties. For example, some image formats store images flipped.
+     *       A caller must use this field to manipulate the output image accordingly (e.g., flip back etc.).
+     * SAVE: Ignored.
      */
     int properties() const;
 
     /*
      * Returns the source image properties.
      *
-     * READ:  Set by SAIL to valid source image properties of the original image.
-     * WRITE: Ignored.
+     * LOAD: Set by SAIL to valid source image properties of the original image.
+     * SAVE: Ignored.
      */
     const sail::source_image& source_image() const;
 
     /*
      * Returns the editable pixel data if any.
      *
-     * READ:  Set by SAIL to valid pixel data.
-     * WRITE: Must be set by a caller to valid pixel data.
+     * LOAD: Set by SAIL to valid pixel data.
+     * SAVE: Must be set by a caller to valid pixel data.
      */
     void* pixels();
 
     /*
      * Returns the constant pixel data if any.
      *
-     * READ:  Set by SAIL to valid pixel data.
-     * WRITE: Must be set by a caller to valid pixel data.
+     * LOAD: Set by SAIL to valid pixel data.
+     * SAVE: Must be set by a caller to valid pixel data.
      */
     const void* pixels() const;
 
@@ -409,7 +409,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t convert(const sail::write_features &write_features);
+    sail_status_t convert(const sail::save_features &save_features);
 
     /*
      * Converts the image to the best pixel format for saving using the specified conversion options.
@@ -425,7 +425,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t convert(const sail::write_features &write_features, const conversion_options &options);
+    sail_status_t convert(const sail::save_features &save_features, const conversion_options &options);
 
     /*
      * Converts the image to the specified pixel format and assigns the resulting image to the 'image' argument.
@@ -476,7 +476,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t convert_to(const sail::write_features &write_features, sail::image *image) const;
+    sail_status_t convert_to(const sail::save_features &save_features, sail::image *image) const;
 
     /*
      * Converts the image to the best pixel format for saving using the specified conversion options
@@ -491,7 +491,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t convert_to(const sail::write_features &write_features, const conversion_options &options, sail::image *image) const;
+    sail_status_t convert_to(const sail::save_features &save_features, const conversion_options &options, sail::image *image) const;
 
     /*
      * Converts the image to the specified pixel format and returns the resulting image.
@@ -542,7 +542,7 @@ public:
      *
      * Returns an invalid image on error.
      */
-    image convert_to(const sail::write_features &write_features) const;
+    image convert_to(const sail::save_features &save_features) const;
 
     /*
      * Converts the image to the best pixel format for saving using the specified conversion options
@@ -557,7 +557,7 @@ public:
      *
      * Returns an invalid image on error.
      */
-    image convert_to(const sail::write_features &write_features, const conversion_options &options) const;
+    image convert_to(const sail::save_features &save_features, const conversion_options &options) const;
 
     /*
      * Returns the closest pixel format from the list.
@@ -569,13 +569,13 @@ public:
     SailPixelFormat closest_pixel_format(const std::vector<SailPixelFormat> &pixel_formats) const;
 
     /*
-     * Returns the closest pixel format from the write features.
+     * Returns the closest pixel format from the save features.
      *
      * This method can be used to find the best pixel format to save the image into.
      *
      * Returns SAIL_PIXEL_FORMAT_UNKNOWN if no candidates found at all.
      */
-    SailPixelFormat closest_pixel_format(const sail::write_features &write_features) const;
+    SailPixelFormat closest_pixel_format(const sail::save_features &save_features) const;
 
     /*
      * Returns true if the conversion or updating functions can convert or update from the input
@@ -593,13 +593,13 @@ public:
     static SailPixelFormat closest_pixel_format(SailPixelFormat input_pixel_format, const std::vector<SailPixelFormat> &pixel_formats);
 
     /*
-     * Returns the closest pixel format to the input pixel format from the write features.
+     * Returns the closest pixel format to the input pixel format from the save features.
      *
      * This method can be used to find the best pixel format to save an image into.
      *
      * Returns SAIL_PIXEL_FORMAT_UNKNOWN if no candidates found at all.
      */
-    static SailPixelFormat closest_pixel_format(SailPixelFormat input_pixel_format, const sail::write_features &write_features);
+    static SailPixelFormat closest_pixel_format(SailPixelFormat input_pixel_format, const sail::save_features &save_features);
 
     /*
      * Calculates the number of bits per pixel in the specified pixel format.

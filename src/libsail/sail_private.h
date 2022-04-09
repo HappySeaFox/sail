@@ -41,7 +41,7 @@
 
 struct sail_codec_info;
 struct sail_codec;
-struct sail_write_features;
+struct sail_save_features;
 
 struct hidden_state {
 
@@ -49,12 +49,12 @@ struct hidden_state {
     bool own_io;
 
     /*
-     * Write operations save write options to check if the interlaced mode was requested on later stages.
+     * Save operations use save options to check if the interlaced mode was requested on later stages.
      * It's also used to check if the supplied pixel format is supported.
      */
-    struct sail_write_options *write_options;
+    struct sail_save_options *save_options;
 
-    /* Local state passed to codec reading and writing functions. */
+    /* Local state passed to codec loading and saving functions. */
     void *state;
 
     /* Pointers to internal data structures so no need to free these. */
@@ -67,8 +67,8 @@ SAIL_HIDDEN sail_status_t load_codec_by_codec_info(const struct sail_codec_info 
 
 SAIL_HIDDEN void destroy_hidden_state(struct hidden_state *state);
 
-SAIL_HIDDEN sail_status_t stop_writing(void *state, size_t *written);
+SAIL_HIDDEN sail_status_t stop_saving(void *state, size_t *written);
 
-SAIL_HIDDEN sail_status_t allowed_write_output_pixel_format(const struct sail_write_features *write_features, enum SailPixelFormat pixel_format);
+SAIL_HIDDEN sail_status_t allowed_write_output_pixel_format(const struct sail_save_features *save_features, enum SailPixelFormat pixel_format);
 
 #endif

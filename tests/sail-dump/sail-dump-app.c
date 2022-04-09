@@ -37,13 +37,13 @@ int main(int argc, char *argv[])
     }
 
     void *state = NULL;
-    SAIL_TRY_OR_EXECUTE(sail_start_reading_file(argv[1], NULL, &state),
+    SAIL_TRY_OR_EXECUTE(sail_start_loading_file(argv[1], NULL, &state),
                         /* on error */ return 2);
 
     sail_status_t res;
     struct sail_image *image;
 
-    while ((res = sail_read_next_frame(state, &image)) == SAIL_OK) {
+    while ((res = sail_load_next_frame(state, &image)) == SAIL_OK) {
 
         SAIL_TRY_OR_EXECUTE(sail_dump(image),
                             /* on error */ return 3);
@@ -52,11 +52,11 @@ int main(int argc, char *argv[])
     }
 
     if (res != SAIL_ERROR_NO_MORE_FRAMES) {
-        sail_stop_reading(state);
+        sail_stop_loading(state);
         return res;
     }
 
-    SAIL_TRY_OR_EXECUTE(sail_stop_reading(state),
+    SAIL_TRY_OR_EXECUTE(sail_stop_loading(state),
                         /* on error */ return 4);
 
     return 0;

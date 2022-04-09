@@ -1,7 +1,7 @@
 # WEBP codec information
 #
 [codec]
-layout=6
+layout=7
 version=0.7.1
 priority=MEDIUM
 name=WEBP
@@ -10,11 +10,11 @@ magic-numbers=52 49 46 46 ?? ?? ?? ?? 57 45 42 50
 extensions=webp
 mime-types=image/webp
 
-[read-features]
+[load-features]
 features=STATIC;ANIMATED;META-DATA;ICCP
 tuning=
 
-[write-features]
+[save-features]
 features=
 tuning=
 pixel-formats=

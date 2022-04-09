@@ -29,7 +29,7 @@
 
 #include "munit.h"
 
-static MunitResult test_read_features(const MunitParameter params[], void *user_data) {
+static MunitResult test_save_features(const MunitParameter params[], void *user_data) {
     (void)params;
     (void)user_data;
 
@@ -40,30 +40,30 @@ static MunitResult test_read_features(const MunitParameter params[], void *user_
 
     // Copy
     {
-        const sail::read_features read_features = first_codec.read_features();
-        munit_assert(read_features.features()         == first_codec.read_features().features());
-        munit_assert(read_features.supported_tuning() == first_codec.read_features().supported_tuning());
+        const sail::save_features save_features = first_codec.save_features();
+        munit_assert(save_features.features()         == first_codec.save_features().features());
+        munit_assert(save_features.supported_tuning() == first_codec.save_features().supported_tuning());
     }
 
     // Move
     {
-        const sail::read_features read_features1 = std::move(first_codec.read_features());
-        const sail::read_features read_features = std::move(read_features1);
-        munit_assert(read_features.features()         == first_codec.read_features().features());
-        munit_assert(read_features.supported_tuning() == first_codec.read_features().supported_tuning());
+        const sail::save_features save_features1 = std::move(first_codec.save_features());
+        const sail::save_features save_features = std::move(save_features1);
+        munit_assert(save_features.features()         == first_codec.save_features().features());
+        munit_assert(save_features.supported_tuning() == first_codec.save_features().supported_tuning());
     }
 
-    // Construct read options
+    // Construct save options
     {
-        sail::read_options read_options;
-        munit_assert(first_codec.read_features().to_read_options(&read_options) == SAIL_OK);
+        sail::save_options save_options;
+        munit_assert(first_codec.save_features().to_save_options(&save_options) == SAIL_OK);
     }
 
     return MUNIT_OK;
 }
 
 static MunitTest test_suite_tests[] = {
-    { (char *)"/read-features", test_read_features, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/save-features", test_save_features, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };

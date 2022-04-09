@@ -46,18 +46,18 @@ static sail_status_t convert_impl(const char *input, const char *output, int com
 
     struct sail_image *image;
 
-    /* Read the image. */
+    /* Load the image. */
     SAIL_LOG_INFO("Input file: %s", input);
 
     SAIL_TRY(sail_codec_info_from_path(input, &codec_info));
     SAIL_LOG_INFO("Input codec: %s", codec_info->description);
 
-    SAIL_TRY(sail_start_reading_file(input, codec_info, &state));
+    SAIL_TRY(sail_start_loading_file(input, codec_info, &state));
 
-    SAIL_TRY(sail_read_next_frame(state, &image));
-    SAIL_TRY(sail_stop_reading(state));
+    SAIL_TRY(sail_load_next_frame(state, &image));
+    SAIL_TRY(sail_stop_loading(state));
 
-    /* Write the image. */
+    /* Save the image. */
     SAIL_LOG_INFO("Output file: %s", output);
 
     SAIL_TRY(sail_codec_info_from_path(output, &codec_info));
@@ -66,25 +66,25 @@ static sail_status_t convert_impl(const char *input, const char *output, int com
     /* Convert to the best pixel format for saving. */
     {
         struct sail_image *image_converted;
-        SAIL_TRY(sail_convert_image_for_saving(image, codec_info->write_features, &image_converted));
+        SAIL_TRY(sail_convert_image_for_saving(image, codec_info->save_features, &image_converted));
 
         sail_destroy_image(image);
         image = image_converted;
     }
 
-    struct sail_write_options *write_options;
-    SAIL_TRY(sail_alloc_write_options_from_features(codec_info->write_features, &write_options));
+    struct sail_save_options *save_options;
+    SAIL_TRY(sail_alloc_save_options_from_features(codec_info->save_features, &save_options));
 
     /* Apply our tuning. */
     SAIL_LOG_INFO("Compression: %d%s", compression, compression == -1 ? " (default)" : "");
-    write_options->compression_level = compression;
+    save_options->compression_level = compression;
 
-    SAIL_TRY(sail_start_writing_file_with_options(output, codec_info, write_options, &state));
+    SAIL_TRY(sail_start_saving_file_with_options(output, codec_info, save_options, &state));
     SAIL_TRY(sail_write_next_frame(state, image));
-    SAIL_TRY(sail_stop_writing(state));
+    SAIL_TRY(sail_stop_saving(state));
 
     /* Clean up. */
-    sail_destroy_write_options(write_options);
+    sail_destroy_save_options(save_options);
 
     sail_destroy_image(image);
 
@@ -212,10 +212,10 @@ static sail_status_t list_impl(bool verbose) {
         printf("%2d. [p%d] %s [%s] %s\n", counter, codec_info->priority, codec_info->name, codec_info->description, codec_info->version);
 
         if (verbose) {
-            if (codec_info->read_features->tuning != NULL) {
+            if (codec_info->load_features->tuning != NULL) {
                 printf("         Tuning: ");
 
-                for (const struct sail_string_node *node = codec_info->read_features->tuning, *prev = NULL;
+                for (const struct sail_string_node *node = codec_info->load_features->tuning, *prev = NULL;
                         node != NULL;
                         prev = node, node = node->next) {
                     if (prev != NULL) {

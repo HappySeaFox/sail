@@ -24,6 +24,10 @@ add_library(sail-common
                 io_common.h
                 linked_list_node.c
                 linked_list_node.h
+                load_features.c
+                load_features.h
+                load_options.c
+                load_options.h
                 log.c
                 log.h
                 memory.c
@@ -36,13 +40,13 @@ add_library(sail-common
                 palette.h
                 pixel.c
                 pixel.h
-                read_features.c
-                read_features.h
-                read_options.c
-                read_options.h
                 resolution.c
                 resolution.h
                 sail-common.h
+                save_features.c
+                save_features.h
+                save_options.c
+                save_options.h
                 source_image.c
                 source_image.h
                 string_node.c
@@ -52,11 +56,7 @@ add_library(sail-common
                 variant.c
                 variant.h
                 variant_node.c
-                variant_node.h
-                write_features.c
-                write_features.h
-                write_options.c
-                write_options.h)
+                variant_node.h)
 
 # Build a list of public headers to install
 #
@@ -69,23 +69,23 @@ set(PUBLIC_HEADERS "common.h"
                    "iccp.h"
                    "image.h"
                    "io_common.h"
+                   "load_features.h"
+                   "load_options.h"
                    "log.h"
                    "memory.h"
                    "meta_data.h"
                    "meta_data_node.h"
                    "palette.h"
                    "pixel.h"
-                   "read_features.h"
-                   "read_options.h"
                    "resolution.h"
                    "sail-common.h"
+                   "save_features.h"
+                   "save_options.h"
                    "source_image.h"
                    "string_node.h"
                    "utils.h"
                    "variant.h"
-                   "variant_node.h"
-                   "write_features.h"
-                   "write_options.h")
+                   "variant_node.h")
 
 set_target_properties(sail-common PROPERTIES
                                   VERSION "0.9.2"

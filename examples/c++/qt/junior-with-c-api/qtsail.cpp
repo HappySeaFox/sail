@@ -40,7 +40,7 @@
 #include <sail-manip/sail-manip.h>
 
 //#define SAIL_CODEC_NAME jpeg
-//#include <sail/layout/v6.h>
+//#include <sail/layout/v7.h>
 
 #include "qtsail.h"
 #include "ui_qtsail.h"
@@ -74,7 +74,7 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
                                            &image_converted),
                         /* cleanup */ sail_destroy_image(image));
 
-    // Construct QImage from the read image pixels.
+    // Construct QImage from the converted image pixels.
     //
     *qimage = QImage(reinterpret_cast<const uchar *>(image_converted->pixels),
                      image_converted->width,
@@ -119,7 +119,7 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
      * without using sail-manip.
      */
     struct sail_image *image_converted;
-    SAIL_TRY_OR_CLEANUP(sail_convert_image_for_saving(image, codec_info->write_features, &image_converted),
+    SAIL_TRY_OR_CLEANUP(sail_convert_image_for_saving(image, codec_info->save_features, &image_converted),
                         /* cleanup */ sail_destroy_image(image));
 
     sail_destroy_image(image);

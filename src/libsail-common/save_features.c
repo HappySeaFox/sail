@@ -28,26 +28,37 @@
 
 #include "sail-common.h"
 
-sail_status_t sail_alloc_read_features(struct sail_read_features **read_features) {
+sail_status_t sail_alloc_save_features(struct sail_save_features **save_features) {
 
-    SAIL_CHECK_PTR(read_features);
+    SAIL_CHECK_PTR(save_features);
 
     void *ptr;
-    SAIL_TRY(sail_malloc(sizeof(struct sail_read_features), &ptr));
-    *read_features = ptr;
+    SAIL_TRY(sail_malloc(sizeof(struct sail_save_features), &ptr));
+    *save_features = ptr;
 
-    (*read_features)->features = 0;
-    (*read_features)->tuning   = NULL;
+    (*save_features)->pixel_formats             = NULL;
+    (*save_features)->pixel_formats_length      = 0;
+    (*save_features)->features                  = 0;
+    (*save_features)->tuning                    = NULL;
+    (*save_features)->compressions              = NULL;
+    (*save_features)->compressions_length       = 0;
+    (*save_features)->default_compression       = SAIL_COMPRESSION_UNSUPPORTED;
+    (*save_features)->compression_level_min     = 0;
+    (*save_features)->compression_level_max     = 0;
+    (*save_features)->compression_level_default = 0;
+    (*save_features)->compression_level_step    = 0;
 
     return SAIL_OK;
 }
 
-void sail_destroy_read_features(struct sail_read_features *read_features) {
+void sail_destroy_save_features(struct sail_save_features *save_features) {
 
-    if (read_features == NULL) {
+    if (save_features == NULL) {
         return;
     }
 
-    sail_destroy_string_node_chain(read_features->tuning);
-    sail_free(read_features);
+    sail_free(save_features->pixel_formats);
+    sail_free(save_features->compressions);
+    sail_destroy_string_node_chain(save_features->tuning);
+    sail_free(save_features);
 }
