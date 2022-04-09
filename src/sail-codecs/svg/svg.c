@@ -38,7 +38,7 @@ struct svg_state {
     struct sail_load_options *load_options;
     struct sail_save_options *save_options;
 
-    bool frame_read;
+    bool frame_loaded;
     resvg_options *resvg_options;
     resvg_render_tree *resvg_tree;
 };
@@ -52,7 +52,7 @@ static sail_status_t alloc_svg_state(struct svg_state **svg_state) {
     (*svg_state)->load_options = NULL;
     (*svg_state)->save_options = NULL;
 
-    (*svg_state)->frame_read    = false;
+    (*svg_state)->frame_loaded  = false;
     (*svg_state)->resvg_options = NULL;
     (*svg_state)->resvg_tree    = NULL;
 
@@ -124,11 +124,11 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v6_svg(void *state, st
 
     struct svg_state *svg_state = (struct svg_state *)state;
 
-    if (svg_state->frame_read) {
+    if (svg_state->frame_loaded) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
     }
 
-    svg_state->frame_read = true;
+    svg_state->frame_loaded = true;
 
     struct sail_image *image_local;
     SAIL_TRY(sail_alloc_image(&image_local));

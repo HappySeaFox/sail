@@ -36,7 +36,7 @@ struct bmp_state {
     struct sail_load_options *load_options;
     struct sail_save_options *save_options;
 
-    bool frame_read;
+    bool frame_loaded;
     void *common_bmp_state;
 };
 
@@ -49,7 +49,7 @@ static sail_status_t alloc_bmp_state(struct bmp_state **bmp_state) {
     (*bmp_state)->load_options = NULL;
     (*bmp_state)->save_options = NULL;
 
-    (*bmp_state)->frame_read       = false;
+    (*bmp_state)->frame_loaded     = false;
     (*bmp_state)->common_bmp_state = NULL;
 
     return SAIL_OK;
@@ -100,11 +100,11 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v6_bmp(void *state, st
 
     struct bmp_state *bmp_state = (struct bmp_state *)state;
 
-    if (bmp_state->frame_read) {
+    if (bmp_state->frame_loaded) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
     }
 
-    bmp_state->frame_read = true;
+    bmp_state->frame_loaded = true;
 
     SAIL_TRY(bmp_private_read_seek_next_frame(bmp_state->common_bmp_state, io, image));
 

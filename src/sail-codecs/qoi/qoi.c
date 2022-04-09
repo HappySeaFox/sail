@@ -40,8 +40,8 @@ struct qoi_state {
     struct sail_load_options *load_options;
     struct sail_save_options *save_options;
 
-    bool frame_read;
-    bool frame_written;
+    bool frame_loaded;
+    bool frame_saved;
 
     void *image_data;
     size_t image_data_size;
@@ -59,8 +59,8 @@ static sail_status_t alloc_qoi_state(struct qoi_state **qoi_state) {
     (*qoi_state)->load_options = NULL;
     (*qoi_state)->save_options = NULL;
 
-    (*qoi_state)->frame_read      = false;
-    (*qoi_state)->frame_written   = false;
+    (*qoi_state)->frame_loaded = false;
+    (*qoi_state)->frame_saved  = false;
 
     (*qoi_state)->image_data      = NULL;
     (*qoi_state)->image_data_size = 0;
@@ -118,11 +118,11 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v6_qoi(void *state, st
 
     struct qoi_state *qoi_state = (struct qoi_state *)state;
 
-    if (qoi_state->frame_read) {
+    if (qoi_state->frame_loaded) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
     }
 
-    qoi_state->frame_read = true;
+    qoi_state->frame_loaded = true;
 
     /* Decode the image. */
     /* TODO Remove (int) when QOI supports size_t. */

@@ -45,7 +45,7 @@ struct tga_state {
     struct TgaFileHeader file_header;
     struct TgaFooter footer;
 
-    bool frame_read;
+    bool frame_loaded;
     bool tga2;
     bool flipped_h;
     bool flipped_v;
@@ -60,7 +60,7 @@ static sail_status_t alloc_tga_state(struct tga_state **tga_state) {
     (*tga_state)->load_options = NULL;
     (*tga_state)->save_options = NULL;
 
-    (*tga_state)->frame_read    = false;
+    (*tga_state)->frame_loaded  = false;
     (*tga_state)->tga2          = false;
     (*tga_state)->flipped_h     = false;
     (*tga_state)->flipped_v     = false;
@@ -118,11 +118,11 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v6_tga(void *state, st
 
     struct tga_state *tga_state = (struct tga_state *)state;
 
-    if (tga_state->frame_read) {
+    if (tga_state->frame_loaded) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
     }
 
-    tga_state->frame_read = true;
+    tga_state->frame_loaded = true;
 
     struct sail_image *image_local;
     SAIL_TRY(sail_alloc_image(&image_local));

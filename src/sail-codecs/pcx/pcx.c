@@ -50,7 +50,7 @@ struct pcx_state {
     struct SailPcxHeader pcx_header;
     unsigned char *scanline_buffer; /* buffer to read a single plane scan line. */
 
-    bool frame_read;
+    bool frame_loaded;
 };
 
 static sail_status_t alloc_pcx_state(struct pcx_state **pcx_state) {
@@ -63,7 +63,7 @@ static sail_status_t alloc_pcx_state(struct pcx_state **pcx_state) {
     (*pcx_state)->save_options = NULL;
 
     (*pcx_state)->scanline_buffer = NULL;
-    (*pcx_state)->frame_read      = false;
+    (*pcx_state)->frame_loaded    = false;
 
     return SAIL_OK;
 }
@@ -129,11 +129,11 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v6_pcx(void *state, st
 
     struct pcx_state *pcx_state = (struct pcx_state *)state;
 
-    if (pcx_state->frame_read) {
+    if (pcx_state->frame_loaded) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
     }
 
-    pcx_state->frame_read = true;
+    pcx_state->frame_loaded = true;
 
     struct sail_image *image_local;
     SAIL_TRY(sail_alloc_image(&image_local));

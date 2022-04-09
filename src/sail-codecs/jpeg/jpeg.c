@@ -56,8 +56,8 @@ struct jpeg_state {
     bool libjpeg_error;
     struct sail_load_options *load_options;
     struct sail_save_options *save_options;
-    bool frame_read;
-    bool frame_written;
+    bool frame_loaded;
+    bool frame_saved;
     bool started_compress;
 };
 
@@ -72,8 +72,8 @@ static sail_status_t alloc_jpeg_state(struct jpeg_state **jpeg_state) {
     (*jpeg_state)->libjpeg_error      = false;
     (*jpeg_state)->load_options       = NULL;
     (*jpeg_state)->save_options       = NULL;
-    (*jpeg_state)->frame_read         = false;
-    (*jpeg_state)->frame_written      = false;
+    (*jpeg_state)->frame_loaded       = false;
+    (*jpeg_state)->frame_saved        = false;
     (*jpeg_state)->started_compress   = false;
 
     return SAIL_OK;
@@ -167,11 +167,11 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v6_jpeg(void *state, s
 
     struct jpeg_state *jpeg_state = (struct jpeg_state *)state;
 
-    if (jpeg_state->frame_read) {
+    if (jpeg_state->frame_loaded) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
     }
 
-    jpeg_state->frame_read = true;
+    jpeg_state->frame_loaded = true;
 
     struct sail_image *image_local;
     SAIL_TRY(sail_alloc_image(&image_local));
@@ -324,11 +324,11 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v6_jpeg(void *state, s
 
     struct jpeg_state *jpeg_state = (struct jpeg_state *)state;
 
-    if (jpeg_state->frame_written) {
+    if (jpeg_state->frame_saved) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
     }
 
-    jpeg_state->frame_written = true;
+    jpeg_state->frame_saved = true;
 
     /* Error handling setup. */
     if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0) {

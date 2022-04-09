@@ -40,7 +40,7 @@ struct jpeg2000_state {
     struct sail_load_options *load_options;
     struct sail_save_options *save_options;
 
-    bool frame_read;
+    bool frame_loaded;
     void *image_data;
     jas_stream_t *jas_stream;
     jas_image_t *jas_image;
@@ -65,7 +65,7 @@ static sail_status_t alloc_jpeg2000_state(struct jpeg2000_state **jpeg2000_state
     (*jpeg2000_state)->load_options = NULL;
     (*jpeg2000_state)->save_options = NULL;
 
-    (*jpeg2000_state)->frame_read      = false;
+    (*jpeg2000_state)->frame_loaded    = false;
     (*jpeg2000_state)->image_data      = NULL;
     (*jpeg2000_state)->jas_stream      = NULL;
     (*jpeg2000_state)->jas_image       = NULL;
@@ -153,11 +153,11 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v6_jpeg2000(void *stat
 
     struct jpeg2000_state *jpeg2000_state = (struct jpeg2000_state *)state;
 
-    if (jpeg2000_state->frame_read) {
+    if (jpeg2000_state->frame_loaded) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
     }
 
-    jpeg2000_state->frame_read = true;
+    jpeg2000_state->frame_loaded = true;
 
     /* Get image info. */
     jpeg2000_state->jas_image = jas_image_decode(jpeg2000_state->jas_stream, -1 /* format */, NULL /* options */);

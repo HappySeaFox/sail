@@ -60,7 +60,7 @@ struct png_state {
     bool libpng_error;
     struct sail_load_options *load_options;
     struct sail_save_options *save_options;
-    bool frame_written;
+    bool frame_saved;
     int frames;
     int current_frame;
 
@@ -103,7 +103,7 @@ static sail_status_t alloc_png_state(struct png_state **png_state) {
     (*png_state)->libpng_error      = false;
     (*png_state)->load_options      = NULL;
     (*png_state)->save_options      = NULL;
-    (*png_state)->frame_written     = false;
+    (*png_state)->frame_saved       = false;
     (*png_state)->frames            = 0;
     (*png_state)->current_frame     = 0;
 
@@ -523,11 +523,11 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v6_png(void *state, st
 
     struct png_state *png_state = (struct png_state *)state;
 
-    if (png_state->frame_written) {
+    if (png_state->frame_saved) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
     }
 
-    png_state->frame_written = true;
+    png_state->frame_saved = true;
 
     /* Error handling setup. */
     if (setjmp(png_jmpbuf(png_state->png_ptr))) {

@@ -44,7 +44,7 @@ struct xbm_state {
     struct sail_load_options *load_options;
     struct sail_save_options *save_options;
 
-    bool frame_read;
+    bool frame_loaded;
 
     enum SailXbmVersion version;
 };
@@ -58,7 +58,7 @@ static sail_status_t alloc_xbm_state(struct xbm_state **xbm_state) {
     (*xbm_state)->load_options = NULL;
     (*xbm_state)->save_options = NULL;
 
-    (*xbm_state)->frame_read    = false;
+    (*xbm_state)->frame_loaded = false;
 
     return SAIL_OK;
 }
@@ -106,11 +106,11 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v6_xbm(void *state, st
 
     struct xbm_state *xbm_state = (struct xbm_state *)state;
 
-    if (xbm_state->frame_read) {
+    if (xbm_state->frame_loaded) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
     }
 
-    xbm_state->frame_read = true;
+    xbm_state->frame_loaded = true;
 
     char buf[512 + 1];
 
