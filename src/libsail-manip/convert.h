@@ -44,7 +44,7 @@ extern "C" {
 
 struct sail_conversion_options;
 struct sail_image;
-struct sail_write_features;
+struct sail_save_features;
 
 /*
  * Converts the input image to the pixel format and saves the result in the output image.
@@ -285,27 +285,27 @@ SAIL_EXPORT enum SailPixelFormat sail_closest_pixel_format(enum SailPixelFormat 
                                                            size_t pixel_formats_length);
 
 /*
- * Returns the closest pixel format to the input pixel format from the write features.
+ * Returns the closest pixel format to the input pixel format from the save features.
  *
  * This function can be used to find the best pixel format to save an image into.
  *
  * Returns SAIL_PIXEL_FORMAT_UNKNOWN if no candidates found at all.
  */
-SAIL_EXPORT enum SailPixelFormat sail_closest_pixel_format_from_write_features(enum SailPixelFormat input_pixel_format,
-                                                                               const struct sail_write_features *write_features);
+SAIL_EXPORT enum SailPixelFormat sail_closest_pixel_format_from_save_features(enum SailPixelFormat input_pixel_format,
+                                                                               const struct sail_save_features *save_features);
 
 /*
- * Converts the image to be suitable for saving in the output format described by the write features
+ * Converts the image to be suitable for saving in the output format described by the save features
  * (from the appropriate codec info).
  *
  * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_convert_image_for_saving(const struct sail_image *image,
-                                                        const struct sail_write_features *write_features,
+                                                        const struct sail_save_features *save_features,
                                                         struct sail_image **image_output);
 
 /*
- * Converts the image to be suitable for saving in the output format described by the write features
+ * Converts the image to be suitable for saving in the output format described by the save features
  * (from the appropriate codec info).
  *
  * Options (which may be NULL) control the conversion behavior.
@@ -313,7 +313,7 @@ SAIL_EXPORT sail_status_t sail_convert_image_for_saving(const struct sail_image 
  * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_convert_image_for_saving_with_options(const struct sail_image *image,
-                                                                     const struct sail_write_features *write_features,
+                                                                     const struct sail_save_features *save_features,
                                                                      const struct sail_conversion_options *options,
                                                                      struct sail_image **image_output);
 

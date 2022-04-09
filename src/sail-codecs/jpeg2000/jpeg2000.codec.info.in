@@ -14,7 +14,7 @@ mime-types=image/jp2;image/jpm
 features=STATIC
 tuning=
 
-[write-features]
+[save-features]
 features=
 tuning=
 pixel-formats=

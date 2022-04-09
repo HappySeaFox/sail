@@ -29,7 +29,7 @@
 
 #include "munit.h"
 
-static MunitResult test_write_features(const MunitParameter params[], void *user_data) {
+static MunitResult test_save_features(const MunitParameter params[], void *user_data) {
     (void)params;
     (void)user_data;
 
@@ -40,30 +40,30 @@ static MunitResult test_write_features(const MunitParameter params[], void *user
 
     // Copy
     {
-        const sail::write_features write_features = first_codec.write_features();
-        munit_assert(write_features.features()         == first_codec.write_features().features());
-        munit_assert(write_features.supported_tuning() == first_codec.write_features().supported_tuning());
+        const sail::save_features save_features = first_codec.save_features();
+        munit_assert(save_features.features()         == first_codec.save_features().features());
+        munit_assert(save_features.supported_tuning() == first_codec.save_features().supported_tuning());
     }
 
     // Move
     {
-        const sail::write_features write_features1 = std::move(first_codec.write_features());
-        const sail::write_features write_features = std::move(write_features1);
-        munit_assert(write_features.features()         == first_codec.write_features().features());
-        munit_assert(write_features.supported_tuning() == first_codec.write_features().supported_tuning());
+        const sail::save_features save_features1 = std::move(first_codec.save_features());
+        const sail::save_features save_features = std::move(save_features1);
+        munit_assert(save_features.features()         == first_codec.save_features().features());
+        munit_assert(save_features.supported_tuning() == first_codec.save_features().supported_tuning());
     }
 
     // Construct write options
     {
         sail::write_options write_options;
-        munit_assert(first_codec.write_features().to_write_options(&write_options) == SAIL_OK);
+        munit_assert(first_codec.save_features().to_write_options(&write_options) == SAIL_OK);
     }
 
     return MUNIT_OK;
 }
 
 static MunitTest test_suite_tests[] = {
-    { (char *)"/write-features", test_write_features, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/save-features", test_save_features, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };

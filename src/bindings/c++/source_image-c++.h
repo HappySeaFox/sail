@@ -93,16 +93,16 @@ public:
     /*
      * Returns the source image pixel format. See SailPixelFormat.
      *
-     * LOAD:  Set by SAIL to a source image pixel format of the original image.
-     * WRITE: Ignored.
+     * LOAD: Set by SAIL to a source image pixel format of the original image.
+     * SAVE: Ignored.
      */
     SailPixelFormat pixel_format() const;
 
     /*
      * Returns the source image chroma subsampling. See SailChromaSubsampling.
      *
-     * LOAD:  Set by SAIL to a source image chroma subsampling of the original image.
-     * WRITE: Ignored.
+     * LOAD: Set by SAIL to a source image chroma subsampling of the original image.
+     * SAVE: Ignored.
      */
     SailChromaSubsampling chroma_subsampling() const;
 
@@ -110,16 +110,16 @@ public:
      * Returns the or-ed source image properties. Set by SAIL to a valid source image properties of the image file.
      * For example, it can be interlaced. See SailImageProperty.
      *
-     * LOAD:  Set by SAIL to valid source image properties or to 0.
-     * WRITE: Ignored.
+     * LOAD: Set by SAIL to valid source image properties or to 0.
+     * SAVE: Ignored.
      */
     int properties() const;
 
     /*
      * Returns the source image compression type. See SailCompression.
      *
-     * LOAD:  Set by SAIL to a valid source image compression type.
-     * WRITE: Ignored.
+     * LOAD: Set by SAIL to a valid source image compression type.
+     * SAVE: Ignored.
      */
     SailCompression compression() const;
 
@@ -130,8 +130,8 @@ public:
      * Special properties' names start with the codec name to avoid confusing.
      * For example, "cur-hotspot-x".
      *
-     * LOAD:  Set by SAIL to valid source image special properties.
-     * WRITE: Ignored.
+     * LOAD: Set by SAIL to valid source image special properties.
+     * SAVE: Ignored.
      */
     const sail::special_properties &special_properties() const;
 

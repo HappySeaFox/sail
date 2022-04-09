@@ -41,7 +41,7 @@ static MunitResult test_write_options(const MunitParameter params[], void *user_
 
     {
         sail::write_options write_options;
-        munit_assert(first_codec.write_features().to_write_options(&write_options) == SAIL_OK);
+        munit_assert(first_codec.save_features().to_write_options(&write_options) == SAIL_OK);
     }
 
     return MUNIT_OK;
@@ -56,7 +56,7 @@ static MunitResult test_write_options_copy(const MunitParameter params[], void *
 
     {
         sail::write_options write_options;
-        munit_assert(first_codec.write_features().to_write_options(&write_options) == SAIL_OK);
+        munit_assert(first_codec.save_features().to_write_options(&write_options) == SAIL_OK);
         munit_assert(write_options.tuning().empty());
 
         const sail::write_options write_options2 = write_options;
@@ -68,7 +68,7 @@ static MunitResult test_write_options_copy(const MunitParameter params[], void *
 
     {
         sail::write_options write_options;
-        munit_assert(first_codec.write_features().to_write_options(&write_options) == SAIL_OK);
+        munit_assert(first_codec.save_features().to_write_options(&write_options) == SAIL_OK);
         write_options.tuning()["key"] = 10.0;
         munit_assert_double(write_options.tuning()["key"].value<double>(), ==, 10.0);
 
@@ -91,7 +91,7 @@ static MunitResult test_write_options_move(const MunitParameter params[], void *
 
     {
         sail::write_options write_options;
-        munit_assert(first_codec.write_features().to_write_options(&write_options) == SAIL_OK);
+        munit_assert(first_codec.save_features().to_write_options(&write_options) == SAIL_OK);
 
         sail::write_options write_options2 = write_options;
         const sail::write_options write_options3 = std::move(write_options2);
@@ -104,7 +104,7 @@ static MunitResult test_write_options_move(const MunitParameter params[], void *
 
     {
         sail::write_options write_options;
-        munit_assert(first_codec.write_features().to_write_options(&write_options) == SAIL_OK);
+        munit_assert(first_codec.save_features().to_write_options(&write_options) == SAIL_OK);
         write_options.tuning()["key"] = 10.0;
         munit_assert_double(write_options.tuning()["key"].value<double>(), ==, 10.0);
 

@@ -64,13 +64,13 @@
     #include "meta_data-c++.h"
     #include "palette-c++.h"
     #include "resolution-c++.h"
+    #include "save_features-c++.h"
     #include "source_image-c++.h"
     #include "special_properties-c++.h"
     #include "tuning-c++.h"
     #include "utils-c++.h"
     #include "utils_private-c++.h"
     #include "variant-c++.h"
-    #include "write_features-c++.h"
     #include "write_options-c++.h"
 
     #ifdef _MSC_VER
@@ -100,11 +100,11 @@
     #include <sail-c++/palette-c++.h>
     #include <sail-c++/resolution-c++.h>
     #include <sail-c++/source_image-c++.h>
+    #include <sail-c++/save_features-c++.h>
     #include <sail-c++/special_properties-c++.h>
     #include <sail-c++/tuning-c++.h>
     #include <sail-c++/utils-c++.h>
     #include <sail-c++/variant-c++.h>
-    #include <sail-c++/write_features-c++.h>
     #include <sail-c++/write_options-c++.h>
 
     #include <sail-manip/manip_common.h>

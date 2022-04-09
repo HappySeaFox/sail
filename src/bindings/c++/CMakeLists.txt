@@ -38,6 +38,8 @@ add_library(sail-c++
                 resolution-c++.cpp
                 resolution-c++.h
                 sail-c++.h
+                save_features-c++.cpp
+                save_features-c++.h
                 source_image-c++.cpp
                 source_image-c++.h
                 special_properties-c++.h
@@ -48,8 +50,6 @@ add_library(sail-c++
                 utils_private-c++.h
                 variant-c++.cpp
                 variant-c++.h
-                write_features-c++.cpp
-                write_features-c++.h
                 write_options-c++.cpp
                 write_options-c++.h)
 
@@ -75,10 +75,10 @@ set(PUBLIC_HEADERS "abstract_io-c++.h"
                    "codec_info-c++.h"
                    "resolution-c++.h"
                    "sail-c++.h"
+                   "save_features-c++.h"
                    "source_image-c++.h"
                    "special_properties-c++.h"
                    "tuning-c++.h"
-                   "write_features-c++.h"
                    "write_options-c++.h"
                    "utils-c++.h"
                    "variant-c++.h")

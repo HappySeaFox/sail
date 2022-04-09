@@ -109,7 +109,7 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
     // You can prepare the image for saving by converting its pixel format on your own,
     // without using conversion methods.
     //
-    SAIL_TRY(image.convert(codec_info.write_features()));
+    SAIL_TRY(image.convert(codec_info.save_features()));
 
     SAIL_TRY(image_output.save(path.toLocal8Bit().constData(), image));
 

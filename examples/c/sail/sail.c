@@ -66,14 +66,14 @@ static sail_status_t convert_impl(const char *input, const char *output, int com
     /* Convert to the best pixel format for saving. */
     {
         struct sail_image *image_converted;
-        SAIL_TRY(sail_convert_image_for_saving(image, codec_info->write_features, &image_converted));
+        SAIL_TRY(sail_convert_image_for_saving(image, codec_info->save_features, &image_converted));
 
         sail_destroy_image(image);
         image = image_converted;
     }
 
     struct sail_write_options *write_options;
-    SAIL_TRY(sail_alloc_write_options_from_features(codec_info->write_features, &write_options));
+    SAIL_TRY(sail_alloc_write_options_from_features(codec_info->save_features, &write_options));
 
     /* Apply our tuning. */
     SAIL_LOG_INFO("Compression: %d%s", compression, compression == -1 ? " (default)" : "");

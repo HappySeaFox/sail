@@ -14,7 +14,7 @@ mime-types=image/x-pcx;image/vnd.zbrush.pcx
 features=STATIC
 tuning=
 
-[write-features]
+[save-features]
 features=
 tuning=
 pixel-formats=

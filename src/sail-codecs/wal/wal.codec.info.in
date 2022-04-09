@@ -14,7 +14,7 @@ mime-types=
 features=STATIC;MULTI-PAGED
 tuning=
 
-[write-features]
+[save-features]
 features=
 tuning=
 pixel-formats=

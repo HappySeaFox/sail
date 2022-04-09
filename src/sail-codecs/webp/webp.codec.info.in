@@ -14,7 +14,7 @@ mime-types=image/webp
 features=STATIC;ANIMATED;META-DATA;ICCP
 tuning=
 
-[write-features]
+[save-features]
 features=
 tuning=
 pixel-formats=

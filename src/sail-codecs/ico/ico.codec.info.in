@@ -14,7 +14,7 @@ mime-types=image/x-icon;image/vnd.microsoft.icon
 features=STATIC;MULTI-PAGED
 tuning=
 
-[write-features]
+[save-features]
 features=
 tuning=
 pixel-formats=

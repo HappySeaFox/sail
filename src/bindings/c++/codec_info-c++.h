@@ -46,7 +46,7 @@ namespace sail
 
 class abstract_io;
 class load_features;
-class write_features;
+class save_features;
 
 /*
  * codec_info represents codec information.
@@ -130,9 +130,9 @@ public:
     const sail::load_features& load_features() const;
 
     /*
-     * Returns the write features of the codec.
+     * Returns the save features of the codec.
      */
-    const sail::write_features& write_features() const;
+    const sail::save_features& save_features() const;
 
     /*
      * Returns a string representation of the specified codec feature. See SailCodecFeature.

@@ -122,7 +122,7 @@ public:
      * Destroys the global static context that was implicitly or explicitly allocated by
      * loading or writing functions.
      *
-     * Unloads all codecs. All pointers to codec info objects, load and write features, and codecs
+     * Unloads all codecs. All pointers to codec info objects, load and save features, and codecs
      * get invalidated. Using them after calling finish() will lead to a crash.
      *
      * It's possible to initialize a new global static context afterwards, implicitly or explicitly.

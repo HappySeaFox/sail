@@ -46,25 +46,25 @@ struct sail_palette {
     /*
      * Pixel format.
      *
-     * LOAD:  Set by SAIL to a valid palette pixel format if the image is indexed (palette is not NULL).
-     *        SAIL guarantees the palette pixel format is byte-aligned.
-     * WRITE: Must be set by a caller to a valid palette pixel format if the image is indexed.
+     * LOAD: Set by SAIL to a valid palette pixel format if the image is indexed (palette is not NULL).
+     *       SAIL guarantees the palette pixel format is byte-aligned.
+     * SAVE: Must be set by a caller to a valid palette pixel format if the image is indexed.
      */
     enum SailPixelFormat pixel_format;
 
     /*
      * Pixel data.
      *
-     * LOAD:  Set by SAIL to a valid pixel array if the image is indexed.
-     * WRITE: Must be allocated and set by a caller to a valid pixel array if the image is indexed.
+     * LOAD: Set by SAIL to a valid pixel array if the image is indexed.
+     * SAVE: Must be allocated and set by a caller to a valid pixel array if the image is indexed.
      */
     void *data;
 
     /*
      * Number of colors in the palette.
      *
-     * LOAD:  Set by SAIL to a valid number of colors if the image is indexed or to 0.
-     * WRITE: Must be set by a caller to a valid number of colors if the image is indexed.
+     * LOAD: Set by SAIL to a valid number of colors if the image is indexed or to 0.
+     * SAVE: Must be set by a caller to a valid number of colors if the image is indexed.
      */
     unsigned color_count;
 };

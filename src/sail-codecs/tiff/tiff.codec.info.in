@@ -14,7 +14,7 @@ mime-types=image/tiff;image/tiff-fx
 features=STATIC;MULTI-PAGED;META-DATA;ICCP
 tuning=
 
-[write-features]
+[save-features]
 features=STATIC;MULTI-PAGED;META-DATA;ICCP
 tuning=
 pixel-formats=BPP32-RGBA

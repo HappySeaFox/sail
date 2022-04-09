@@ -177,7 +177,7 @@ sail_status_t sail_write_next_frame(void *state, const struct sail_image *image)
     SAIL_CHECK_PTR(state_of_mind->codec);
 
     /* Check if we actually able to write the requested pixel format. */
-    SAIL_TRY(allowed_write_output_pixel_format(state_of_mind->codec_info->write_features,
+    SAIL_TRY(allowed_write_output_pixel_format(state_of_mind->codec_info->save_features,
                                                 image->pixel_format));
 
     unsigned bytes_per_line;

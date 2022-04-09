@@ -39,7 +39,7 @@ extern "C" {
 #endif
 
 struct sail_hash_map;
-struct sail_write_features;
+struct sail_save_features;
 
 /* Options to modify writing operations. */
 struct sail_write_options {
@@ -52,7 +52,7 @@ struct sail_write_options {
 
     /*
      * Compression type. For example: SAIL_COMPRESSION_RLE. See SailCompression.
-     * Use sail_write_features to determine what compression types or values are supported by a particular codec.
+     * Use sail_save_features to determine what compression types or values are supported by a particular codec.
      *
      * If a codec supports more than two compression types, compression levels are ignored in this case.
      *
@@ -67,7 +67,7 @@ struct sail_write_options {
 
     /*
      * Requested compression level. Must be in the range specified by compression_level_min and compression_level_max
-     * in sail_write_features. If compression_level < compression_level_min, compression_level_default will be used.
+     * in sail_save_features. If compression_level < compression_level_min, compression_level_default will be used.
      */
     double compression_level;
 };
@@ -89,11 +89,11 @@ SAIL_EXPORT sail_status_t sail_alloc_write_options(struct sail_write_options **w
 SAIL_EXPORT void sail_destroy_write_options(struct sail_write_options *write_options);
 
 /*
- * Allocates and builds default write options from the write features.
+ * Allocates and builds default write options from the save features.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_write_options_from_features(const struct sail_write_features *write_features, struct sail_write_options **write_options);
+SAIL_EXPORT sail_status_t sail_alloc_write_options_from_features(const struct sail_save_features *save_features, struct sail_write_options **write_options);
 
 /*
  * Makes a deep copy of the specified write options object.

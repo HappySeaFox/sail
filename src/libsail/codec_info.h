@@ -34,8 +34,8 @@ extern "C" {
 
 struct sail_io;
 struct sail_load_features;
+struct sail_save_features;
 struct sail_string_node;
-struct sail_write_features;
 
 /*
  * A structure representing codec information.
@@ -83,7 +83,7 @@ struct sail_codec_info {
     struct sail_load_features *load_features;
 
     /* Write features of the codec. */
-    struct sail_write_features *write_features;
+    struct sail_save_features *save_features;
 };
 
 typedef struct sail_codec_info sail_codec_info_t;

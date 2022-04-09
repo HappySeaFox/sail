@@ -53,23 +53,23 @@ void sail_destroy_write_options(struct sail_write_options *write_options) {
     sail_free(write_options);
 }
 
-sail_status_t sail_alloc_write_options_from_features(const struct sail_write_features *write_features, struct sail_write_options **write_options) {
+sail_status_t sail_alloc_write_options_from_features(const struct sail_save_features *save_features, struct sail_write_options **write_options) {
 
     struct sail_write_options *write_options_local;
     SAIL_TRY(sail_alloc_write_options(&write_options_local));
 
     write_options_local->options = 0;
 
-    if (write_features->features & SAIL_CODEC_FEATURE_META_DATA) {
+    if (save_features->features & SAIL_CODEC_FEATURE_META_DATA) {
         write_options_local->options |= SAIL_OPTION_META_DATA;
     }
 
-    if (write_features->features & SAIL_CODEC_FEATURE_ICCP) {
+    if (save_features->features & SAIL_CODEC_FEATURE_ICCP) {
         write_options_local->options |= SAIL_OPTION_ICCP;
     }
 
-    write_options_local->compression       = write_features->default_compression;
-    write_options_local->compression_level = write_features->compression_level_default;
+    write_options_local->compression       = save_features->default_compression;
+    write_options_local->compression_level = save_features->compression_level_default;
 
     *write_options = write_options_local;
 

@@ -113,7 +113,7 @@ SAIL codecs always try to support as much output pixel formats as possible. SAIL
 one pixel format to another in writing operations. Images are always written as is.
 
 The list of pixel formats that can be written by SAIL is codec-specific and is publicly available in every
-.codec.info file. It can be accessed through `sail_codec_info_from_extension() -> codec_info -> write_features ->
+.codec.info file. It can be accessed through `sail_codec_info_from_extension() -> codec_info -> save_features ->
 pixel_formats`.
 
 ## Does SAIL support animated and multi-paged images?
@@ -340,9 +340,9 @@ features=STATIC;META-DATA;INTERLACED;ICCP
 #
 tuning=abc-filtering
 
-# Section of various features describing what the image codec can actually write.
+# Section of various features describing what the image codec can actually save.
 #
-[write-features]
+[save-features]
 
 # ';'-separated list of what the image codec can actually write.
 # Can be empty if the image codec cannot write images.

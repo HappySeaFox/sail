@@ -14,7 +14,7 @@ mime-types=image/svg+xml
 features=STATIC
 tuning=
 
-[write-features]
+[save-features]
 features=
 tuning=
 pixel-formats=

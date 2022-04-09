@@ -149,10 +149,10 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
     // You can prepare the image for saving by converting its pixel format on your own,
     // without using conversion methods.
     //
-    SAIL_TRY(image.convert(codec_info.write_features()));
+    SAIL_TRY(image.convert(codec_info.save_features()));
 
     sail::write_options write_options;
-    SAIL_TRY(codec_info.write_features().to_write_options(&write_options));
+    SAIL_TRY(codec_info.save_features().to_write_options(&write_options));
 
     // This filter will be handled and applied by the PNG codec only.
     // Possible values: "none", "sub", "up", "avg", "paeth".

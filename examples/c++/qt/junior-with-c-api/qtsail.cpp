@@ -119,7 +119,7 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
      * without using sail-manip.
      */
     struct sail_image *image_converted;
-    SAIL_TRY_OR_CLEANUP(sail_convert_image_for_saving(image, codec_info->write_features, &image_converted),
+    SAIL_TRY_OR_CLEANUP(sail_convert_image_for_saving(image, codec_info->save_features, &image_converted),
                         /* cleanup */ sail_destroy_image(image));
 
     sail_destroy_image(image);

@@ -194,7 +194,7 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
      * without using sail-manip.
      */
     struct sail_image *image_converted;
-    SAIL_TRY_OR_CLEANUP(sail_convert_image_for_saving(image, codec_info->write_features, &image_converted),
+    SAIL_TRY_OR_CLEANUP(sail_convert_image_for_saving(image, codec_info->save_features, &image_converted),
                         /* cleanup */ sail_destroy_image(image));
 
     sail_destroy_image(image);
@@ -204,7 +204,7 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
      * Create write options to pass PNG filters.
      */
     struct sail_write_options *write_options;
-    SAIL_TRY_OR_CLEANUP(sail_alloc_write_options_from_features(codec_info->write_features, &write_options),
+    SAIL_TRY_OR_CLEANUP(sail_alloc_write_options_from_features(codec_info->save_features, &write_options),
                         /* cleanup */ sail_destroy_image(image));
 
     SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&write_options->tuning),

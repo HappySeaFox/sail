@@ -74,19 +74,19 @@ static MunitResult test_options_from_features(const MunitParameter params[], voi
     (void)user_data;
 
     struct sail_write_options *write_options;
-    struct sail_write_features write_features;
-    write_features.default_compression = SAIL_COMPRESSION_JPEG;
-    write_features.compression_level_min = 1;
-    write_features.compression_level_max = 100;
-    write_features.compression_level_default = 81;
-    write_features.compression_level_step = 1;
-    write_features.features = SAIL_CODEC_FEATURE_META_DATA | SAIL_CODEC_FEATURE_INTERLACED | SAIL_CODEC_FEATURE_ICCP;
-    munit_assert(sail_alloc_write_options_from_features(&write_features, &write_options) == SAIL_OK);
+    struct sail_save_features save_features;
+    save_features.default_compression = SAIL_COMPRESSION_JPEG;
+    save_features.compression_level_min = 1;
+    save_features.compression_level_max = 100;
+    save_features.compression_level_default = 81;
+    save_features.compression_level_step = 1;
+    save_features.features = SAIL_CODEC_FEATURE_META_DATA | SAIL_CODEC_FEATURE_INTERLACED | SAIL_CODEC_FEATURE_ICCP;
+    munit_assert(sail_alloc_write_options_from_features(&save_features, &write_options) == SAIL_OK);
 
     munit_assert(write_options->options == (SAIL_OPTION_META_DATA | SAIL_OPTION_ICCP));
     munit_assert_null(write_options->tuning);
-    munit_assert(write_options->compression ==  write_features.default_compression);
-    munit_assert(write_options->compression_level ==  write_features.compression_level_default);
+    munit_assert(write_options->compression == save_features.default_compression);
+    munit_assert(write_options->compression_level == save_features.compression_level_default);
 
     sail_destroy_write_options(write_options);
 

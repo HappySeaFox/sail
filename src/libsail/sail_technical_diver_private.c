@@ -45,13 +45,13 @@ static sail_status_t check_io_arguments(struct sail_io *io,
     return SAIL_OK;
 }
 
-static sail_status_t allowed_write_compression(const struct sail_write_features *write_features,
+static sail_status_t allowed_write_compression(const struct sail_save_features *save_features,
                                                enum SailCompression compression) {
 
-    SAIL_CHECK_PTR(write_features);
+    SAIL_CHECK_PTR(save_features);
 
-    for (unsigned i = 0; i < write_features->compressions_length; i++) {
-        if (write_features->compressions[i] == compression) {
+    for (unsigned i = 0; i < save_features->compressions_length; i++) {
+        if (save_features->compressions[i] == compression) {
             return SAIL_OK;
         }
     }
@@ -122,7 +122,7 @@ sail_status_t start_writing_io_with_options(struct sail_io *io, bool own_io,
      * When write options is NULL, we use the default compression which is always acceptable.
      */
     if (write_options != NULL) {
-        SAIL_TRY_OR_CLEANUP(allowed_write_compression(codec_info->write_features, write_options->compression),
+        SAIL_TRY_OR_CLEANUP(allowed_write_compression(codec_info->save_features, write_options->compression),
                             /* cleanup */ if (own_io) sail_destroy_io(io));
     }
 
@@ -142,7 +142,7 @@ sail_status_t start_writing_io_with_options(struct sail_io *io, bool own_io,
                         /* cleanup */ destroy_hidden_state(state_of_mind));
 
     if (write_options == NULL) {
-        SAIL_TRY_OR_CLEANUP(sail_alloc_write_options_from_features(state_of_mind->codec_info->write_features, &state_of_mind->write_options),
+        SAIL_TRY_OR_CLEANUP(sail_alloc_write_options_from_features(state_of_mind->codec_info->save_features, &state_of_mind->write_options),
                             /* cleanup */ destroy_hidden_state(state_of_mind));
     } else {
         SAIL_TRY_OR_CLEANUP(sail_copy_write_options(write_options, &state_of_mind->write_options),

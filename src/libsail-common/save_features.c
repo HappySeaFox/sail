@@ -28,37 +28,37 @@
 
 #include "sail-common.h"
 
-sail_status_t sail_alloc_write_features(struct sail_write_features **write_features) {
+sail_status_t sail_alloc_save_features(struct sail_save_features **save_features) {
 
-    SAIL_CHECK_PTR(write_features);
+    SAIL_CHECK_PTR(save_features);
 
     void *ptr;
-    SAIL_TRY(sail_malloc(sizeof(struct sail_write_features), &ptr));
-    *write_features = ptr;
+    SAIL_TRY(sail_malloc(sizeof(struct sail_save_features), &ptr));
+    *save_features = ptr;
 
-    (*write_features)->pixel_formats             = NULL;
-    (*write_features)->pixel_formats_length      = 0;
-    (*write_features)->features                  = 0;
-    (*write_features)->tuning                    = NULL;
-    (*write_features)->compressions              = NULL;
-    (*write_features)->compressions_length       = 0;
-    (*write_features)->default_compression       = SAIL_COMPRESSION_UNSUPPORTED;
-    (*write_features)->compression_level_min     = 0;
-    (*write_features)->compression_level_max     = 0;
-    (*write_features)->compression_level_default = 0;
-    (*write_features)->compression_level_step    = 0;
+    (*save_features)->pixel_formats             = NULL;
+    (*save_features)->pixel_formats_length      = 0;
+    (*save_features)->features                  = 0;
+    (*save_features)->tuning                    = NULL;
+    (*save_features)->compressions              = NULL;
+    (*save_features)->compressions_length       = 0;
+    (*save_features)->default_compression       = SAIL_COMPRESSION_UNSUPPORTED;
+    (*save_features)->compression_level_min     = 0;
+    (*save_features)->compression_level_max     = 0;
+    (*save_features)->compression_level_default = 0;
+    (*save_features)->compression_level_step    = 0;
 
     return SAIL_OK;
 }
 
-void sail_destroy_write_features(struct sail_write_features *write_features) {
+void sail_destroy_save_features(struct sail_save_features *save_features) {
 
-    if (write_features == NULL) {
+    if (save_features == NULL) {
         return;
     }
 
-    sail_free(write_features->pixel_formats);
-    sail_free(write_features->compressions);
-    sail_destroy_string_node_chain(write_features->tuning);
-    sail_free(write_features);
+    sail_free(save_features->pixel_formats);
+    sail_free(save_features->compressions);
+    sail_destroy_string_node_chain(save_features->tuning);
+    sail_free(save_features);
 }

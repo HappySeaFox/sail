@@ -944,30 +944,30 @@ enum SailPixelFormat sail_closest_pixel_format(enum SailPixelFormat input_pixel_
     return found ? pixel_formats[best_index_result] : SAIL_PIXEL_FORMAT_UNKNOWN;
 }
 
-enum SailPixelFormat sail_closest_pixel_format_from_write_features(enum SailPixelFormat input_pixel_format, const struct sail_write_features *write_features) {
+enum SailPixelFormat sail_closest_pixel_format_from_save_features(enum SailPixelFormat input_pixel_format, const struct sail_save_features *save_features) {
 
-    return sail_closest_pixel_format(input_pixel_format, write_features->pixel_formats, write_features->pixel_formats_length);
+    return sail_closest_pixel_format(input_pixel_format, save_features->pixel_formats, save_features->pixel_formats_length);
 }
 
 sail_status_t sail_convert_image_for_saving(const struct sail_image *image,
-                                            const struct sail_write_features *write_features,
+                                            const struct sail_save_features *save_features,
                                             struct sail_image **image_output) {
 
-    SAIL_TRY(sail_convert_image_for_saving_with_options(image, write_features, NULL, image_output));
+    SAIL_TRY(sail_convert_image_for_saving_with_options(image, save_features, NULL, image_output));
 
     return SAIL_OK;
 }
 
 sail_status_t sail_convert_image_for_saving_with_options(const struct sail_image *image,
-                                                         const struct sail_write_features *write_features,
+                                                         const struct sail_save_features *save_features,
                                                          const struct sail_conversion_options *options,
                                                          struct sail_image **image_output) {
 
     SAIL_TRY(sail_check_image_valid(image));
-    SAIL_CHECK_PTR(write_features);
+    SAIL_CHECK_PTR(save_features);
     SAIL_CHECK_PTR(image_output);
 
-    enum SailPixelFormat best_pixel_format = sail_closest_pixel_format_from_write_features(image->pixel_format, write_features);
+    enum SailPixelFormat best_pixel_format = sail_closest_pixel_format_from_save_features(image->pixel_format, save_features);
 
     if (best_pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN) {
         SAIL_LOG_ERROR("Failed to find the best output format for saving %s image", sail_pixel_format_to_string(image->pixel_format));

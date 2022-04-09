@@ -43,6 +43,8 @@ add_library(sail-common
                 resolution.c
                 resolution.h
                 sail-common.h
+                save_features.c
+                save_features.h
                 source_image.c
                 source_image.h
                 string_node.c
@@ -53,8 +55,6 @@ add_library(sail-common
                 variant.h
                 variant_node.c
                 variant_node.h
-                write_features.c
-                write_features.h
                 write_options.c
                 write_options.h)
 
@@ -79,12 +79,12 @@ set(PUBLIC_HEADERS "common.h"
                    "pixel.h"
                    "resolution.h"
                    "sail-common.h"
+                   "save_features.h"
                    "source_image.h"
                    "string_node.h"
                    "utils.h"
                    "variant.h"
                    "variant_node.h"
-                   "write_features.h"
                    "write_options.h")
 
 set_target_properties(sail-common PROPERTIES

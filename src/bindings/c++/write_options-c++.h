@@ -52,7 +52,7 @@ namespace sail
 class SAIL_EXPORT write_options
 {
     friend class image_output;
-    friend class write_features;
+    friend class save_features;
 
 public:
     /*
@@ -102,7 +102,7 @@ public:
 
     /*
      * Returns the compression type. For example: SAIL_COMPRESSION_RLE. See SailCompression.
-     * Use write_features to determine what compression types or values are supported by a particular codec.
+     * Use save_features to determine what compression types or values are supported by a particular codec.
      *
      * If a codec supports more than two compression types, compression levels are ignored in this case.
      *
@@ -117,7 +117,7 @@ public:
 
     /*
      * Returns the requested compression level. Must be in the range specified by compression_level_min()
-     * and compression_level_max() in write_features. If compression_level() < compression_level_min() or
+     * and compression_level_max() in save_features. If compression_level() < compression_level_min() or
      * compression_level() > compression_level_max(), compression_level_default() will be used.
      */
     double compression_level() const;

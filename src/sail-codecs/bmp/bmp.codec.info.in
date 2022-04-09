@@ -14,7 +14,7 @@ mime-types=image/bmp;image/x-bmp
 features=STATIC;META-DATA
 tuning=
 
-[write-features]
+[save-features]
 features=
 tuning=
 pixel-formats=

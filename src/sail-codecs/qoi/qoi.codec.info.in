@@ -14,7 +14,7 @@ mime-types=
 features=STATIC
 tuning=
 
-[write-features]
+[save-features]
 features=STATIC
 tuning=
 pixel-formats=BPP24-RGB;BPP32-RGBA

@@ -41,7 +41,7 @@
 
 struct sail_codec_info;
 struct sail_codec;
-struct sail_write_features;
+struct sail_save_features;
 
 struct hidden_state {
 
@@ -69,6 +69,6 @@ SAIL_HIDDEN void destroy_hidden_state(struct hidden_state *state);
 
 SAIL_HIDDEN sail_status_t stop_writing(void *state, size_t *written);
 
-SAIL_HIDDEN sail_status_t allowed_write_output_pixel_format(const struct sail_write_features *write_features, enum SailPixelFormat pixel_format);
+SAIL_HIDDEN sail_status_t allowed_write_output_pixel_format(const struct sail_save_features *save_features, enum SailPixelFormat pixel_format);
 
 #endif

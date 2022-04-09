@@ -43,7 +43,7 @@ struct sail_string_node;
 /*
  * Write features. Use this structure to determine what a codec can actually write.
  */
-struct sail_write_features {
+struct sail_save_features {
 
     /*
      * A list of supported pixel formats that can be written by this codec.
@@ -110,20 +110,20 @@ struct sail_write_features {
     double compression_level_step;
 };
 
-typedef struct sail_write_features sail_write_features_t;
+typedef struct sail_save_features sail_save_features_t;
 
 /*
- * Allocates write features.
+ * Allocates save features.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_write_features(struct sail_write_features **write_features);
+SAIL_EXPORT sail_status_t sail_alloc_save_features(struct sail_save_features **save_features);
 
 /*
- * Destroys the specified write features object and all its internal allocated memory buffers.
- * The write features MUST NOT be used after calling this function. It does nothing if the write features is NULL.
+ * Destroys the specified save features object and all its internal allocated memory buffers.
+ * The save features MUST NOT be used after calling this function. It does nothing if the save features is NULL.
  */
-SAIL_EXPORT void sail_destroy_write_features(struct sail_write_features *write_features);
+SAIL_EXPORT void sail_destroy_save_features(struct sail_save_features *save_features);
 
 /* extern "C" */
 #ifdef __cplusplus

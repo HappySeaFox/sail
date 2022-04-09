@@ -14,7 +14,7 @@ mime-types=image/gif
 features=STATIC;ANIMATED;META-DATA
 tuning=
 
-[write-features]
+[save-features]
 features=
 tuning=
 pixel-formats=
