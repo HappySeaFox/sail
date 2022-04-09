@@ -1,4 +1,4 @@
-sail_test(TARGET able-to-load-c++   SOURCES able-to-load.cpp   LINK sail-c++)
+sail_test(TARGET can-load-c++       SOURCES can-load.cpp       LINK sail-c++)
 sail_test(TARGET iccp-c++           SOURCES iccp.cpp           LINK sail-c++)
 sail_test(TARGET load-features-c++  SOURCES load_features.cpp  LINK sail-c++)
 sail_test(TARGET load-options-c++   SOURCES load_options.cpp   LINK sail-c++)

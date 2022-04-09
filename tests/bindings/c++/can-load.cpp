@@ -46,7 +46,7 @@ static MunitParameterEnum test_params[] = {
 };
 
 static MunitTest test_suite_tests[] = {
-    { (char *)"/able-to-load", test_able_to_load, NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
+    { (char *)"/can-load", test_able_to_load, NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };
