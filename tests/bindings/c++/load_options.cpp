@@ -111,9 +111,9 @@ static MunitResult test_load_options_move(const MunitParameter params[], void *u
 }
 
 static MunitTest test_suite_tests[] = {
-    { (char *)"/read-options",      test_load_options,      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/read-options/copy", test_load_options_copy, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/read-options/move", test_load_options_move, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/load-options",      test_load_options,      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/load-options/copy", test_load_options_copy, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/load-options/move", test_load_options_move, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };
