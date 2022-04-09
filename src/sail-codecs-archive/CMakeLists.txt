@@ -22,10 +22,10 @@ foreach(codec ${ENABLED_CODECS})
     set(SAIL_ENABLED_CODECS_LAYOUTS "${SAIL_ENABLED_CODECS_LAYOUTS}
     {
         #define SAIL_CODEC_NAME ${codec}
-        .read_init            = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_read_init_v6),
-        .read_seek_next_frame = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_read_seek_next_frame_v6),
-        .read_frame           = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_read_frame_v6),
-        .read_finish          = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_read_finish_v6),
+        .load_init            = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_load_init_v6),
+        .load_seek_next_frame = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_load_seek_next_frame_v6),
+        .load_frame           = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_load_frame_v6),
+        .load_finish          = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_load_finish_v6),
 
         .write_init            = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_write_init_v6),
         .write_seek_next_frame = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_write_seek_next_frame_v6),
