@@ -89,7 +89,7 @@ struct sail_codec_info {
 typedef struct sail_codec_info sail_codec_info_t;
 
 /*
- * Finds a first codec info object that supports loading or writing the specified file path by its file extension.
+ * Finds a first codec info object that supports loading or saving the specified file path by its file extension.
  * For example: "/test.jpg". The path might not exist.
  *
  * The assigned codec info MUST NOT be destroyed. It is a pointer to an internal data structure.
@@ -100,9 +100,9 @@ typedef struct sail_codec_info sail_codec_info_t;
  *                sail_stop_loading().
  *
  * Or:            sail_codec_info_from_path() ->
- *                sail_start_writing_file()   ->
+ *                sail_start_saving_file()    ->
  *                sail_load_next_frame()      ->
- *                sail_stop_writing().
+ *                sail_stop_saving().
  *
  * Returns SAIL_OK on success.
  */
@@ -170,9 +170,9 @@ SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_io(struct sail_io
  *                sail_stop_loading().
  *
  * Or:            sail_codec_info_from_extension() ->
- *                sail_start_writing_file()        ->
+ *                sail_start_saving_file()         ->
  *                sail_load_next_frame()           ->
- *                sail_stop_writing().
+ *                sail_stop_saving().
  *
  * Returns SAIL_OK on success.
  */
@@ -190,9 +190,9 @@ SAIL_EXPORT sail_status_t sail_codec_info_from_extension(const char *extension, 
  *                sail_stop_loading().
  *
  * Or:            sail_codec_info_from_mime_type() ->
- *                sail_start_writing_file()        ->
+ *                sail_start_saving_file()         ->
  *                sail_load_next_frame()           ->
- *                sail_stop_writing().
+ *                sail_stop_saving().
  *
  * Returns SAIL_OK on success.
  */

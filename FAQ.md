@@ -110,7 +110,7 @@ You can also consider conversion functions from `libsail-manip`.
 ## What pixel formats SAIL is able to write?
 
 SAIL codecs always try to support as much output pixel formats as possible. SAIL doesn't convert
-one pixel format to another in writing operations. Images are always written as is.
+one pixel format to another in saving operations. Images are always written as is.
 
 The list of pixel formats that can be written by SAIL is codec-specific and is publicly available in every
 .codec.info file. It can be accessed through `sail_codec_info_from_extension() -> codec_info -> save_features ->
@@ -123,7 +123,7 @@ If no more frames are available, the loading functions return `SAIL_ERROR_NO_MOR
 
 ## Does SAIL support loading from memory?
 
-Yes. SAIL supports loading/writing from/to files and memory. For technical divers,
+Yes. SAIL supports loading/saving from/to files and memory. For technical divers,
 it's also possible to use custom I/O sources.
 
 See `sail_start_loading_file()`, `sail_start_loading_mem()`, and `sail_start_loading_io()`.
@@ -194,10 +194,10 @@ setting the `SAIL_CODECS_PATH` environment variable.
 
 Internally, SAIL always cleans up on errors. If you encounter a memory leak on error, please report it.
 
-**C only:** However, if an engineer encounters an error in the middle of loading or writing an image with the `advanced`
-or a deeper API, it's always a responsibility of the engineer to stop loading or writing with
-`sail_stop_loading()` or `sail_stop_writing()`. These functions execute a proper cleanup in the underlying codec.
-If you don't call `sail_stop_loading()` or `sail_stop_writing()` in this situation, be prepared for memory leaks.
+**C only:** However, if an engineer encounters an error in the middle of loading or saving an image with the `advanced`
+or a deeper API, it's always a responsibility of the engineer to stop loading or saving with
+`sail_stop_loading()` or `sail_stop_saving()`. These functions execute a proper cleanup in the underlying codec.
+If you don't call `sail_stop_loading()` or `sail_stop_saving()` in this situation, be prepared for memory leaks.
 
 **C++ only:** C++ engineers are more lucky. The C++ binding executes the necessary cleanup automatically in this
 situation in `~image_input()` or `~image_output()`.
@@ -243,8 +243,8 @@ SAIL_TRY_OR_CLEANUP(sail_load_next_frame(state, &image),
 
 ### Always set a pointer to state to NULL (C only)
 
-C loading and writing functions require a local void pointer to state. Always set it to NULL before
-loading or writing. For example:
+C loading and saving functions require a local void pointer to state. Always set it to NULL before
+loading or saving. For example:
 
 ```C
 void *state = NULL;

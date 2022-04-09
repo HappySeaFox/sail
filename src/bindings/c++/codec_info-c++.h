@@ -187,7 +187,7 @@ public:
     static codec_info from_magic_number(sail::abstract_io &abstract_io);
 
     /*
-     * Returns a first codec info object that supports loading or writing the specified file path by its file extension.
+     * Returns a first codec info object that supports loading or saving the specified file path by its file extension.
      * Returns an invalid codec info object if no suitable codecs were found.
      * The comparison algorithm is case insensitive. For example: "/test.jpg". The path might not exist.
      *

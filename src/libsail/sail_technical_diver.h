@@ -85,43 +85,43 @@ SAIL_EXPORT sail_status_t sail_start_loading_io_with_options(struct sail_io *io,
                                                             const struct sail_load_options *load_options, void **state);
 
 /*
- * Starts writing into the specified I/O stream.
+ * Starts saving into the specified I/O stream.
  *
  * Typical usage: sail_alloc_io()                  ->
  *                set I/O callbacks                ->
  *                sail_codec_info_from_extension() ->
- *                sail_start_writing_file()        ->
+ *                sail_start_saving_file()         ->
  *                sail_write_next_frame()          ->
- *                sail_stop_writing()              ->
+ *                sail_stop_saving()               ->
  *                sail_destroy_io().
  *
  * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
- * in it and destroy it in sail_stop_writing. States must be used per image. DO NOT use the same state
+ * in it and destroy it in sail_stop_saving. States must be used per image. DO NOT use the same state
  * to save multiple images to different targets in the same time.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_start_writing_io(struct sail_io *io, const struct sail_codec_info *codec_info, void **state);
+SAIL_EXPORT sail_status_t sail_start_saving_io(struct sail_io *io, const struct sail_codec_info *codec_info, void **state);
 
 /*
- * Starts writing the specified I/O stream with the specified save options. If you don't need specific save options,
+ * Starts saving the specified I/O stream with the specified save options. If you don't need specific save options,
  * just pass NULL. Codec-specific defaults will be used in this case. The save options are deep copied.
  *
- * Typical usage: sail_alloc_io()                      ->
- *                set I/O callbacks                    ->
- *                sail_codec_info_from_extension()     ->
- *                sail_start_writing_io_with_options() ->
- *                sail_write_next_frame()              ->
- *                sail_stop_writing()                  ->
+ * Typical usage: sail_alloc_io()                     ->
+ *                set I/O callbacks                   ->
+ *                sail_codec_info_from_extension()    ->
+ *                sail_start_saving_io_with_options() ->
+ *                sail_write_next_frame()             ->
+ *                sail_stop_saving()                  ->
  *                sail_destroy_io().
  *
  * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
- * in it and destroy it in sail_stop_writing. States must be used per image. DO NOT use the same state
+ * in it and destroy it in sail_stop_saving. States must be used per image. DO NOT use the same state
  * to save multiple images to different targets in the same time.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_start_writing_io_with_options(struct sail_io *io,
+SAIL_EXPORT sail_status_t sail_start_saving_io_with_options(struct sail_io *io,
                                                             const struct sail_codec_info *codec_info,
                                                             const struct sail_save_options *save_options, void **state);
 

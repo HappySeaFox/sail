@@ -150,16 +150,16 @@ sail_status_t sail_stop_loading(void *state) {
     return SAIL_OK;
 }
 
-sail_status_t sail_start_writing_file(const char *path, const struct sail_codec_info *codec_info, void **state) {
+sail_status_t sail_start_saving_file(const char *path, const struct sail_codec_info *codec_info, void **state) {
 
-    SAIL_TRY(sail_start_writing_file_with_options(path, codec_info, NULL, state));
+    SAIL_TRY(sail_start_saving_file_with_options(path, codec_info, NULL, state));
 
     return SAIL_OK;
 }
 
-sail_status_t sail_start_writing_memory(void *buffer, size_t buffer_length, const struct sail_codec_info *codec_info, void **state) {
+sail_status_t sail_start_saving_memory(void *buffer, size_t buffer_length, const struct sail_codec_info *codec_info, void **state) {
 
-    SAIL_TRY(sail_start_writing_memory_with_options(buffer, buffer_length, codec_info, NULL, state));
+    SAIL_TRY(sail_start_saving_memory_with_options(buffer, buffer_length, codec_info, NULL, state));
 
     return SAIL_OK;
 }
@@ -189,9 +189,9 @@ sail_status_t sail_write_next_frame(void *state, const struct sail_image *image)
     return SAIL_OK;
 }
 
-sail_status_t sail_stop_writing(void *state) {
+sail_status_t sail_stop_saving(void *state) {
 
-    SAIL_TRY(stop_writing(state, NULL));
+    SAIL_TRY(stop_saving(state, NULL));
 
     return SAIL_OK;
 }

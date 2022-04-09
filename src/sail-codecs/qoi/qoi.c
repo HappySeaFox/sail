@@ -220,7 +220,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v7_qoi(struct sail_io *io, const 
 
     /* Sanity check. */
     if (qoi_state->save_options->compression != SAIL_COMPRESSION_QOI) {
-        SAIL_LOG_ERROR("QOI: Only QOI compression is allowed for writing");
+        SAIL_LOG_ERROR("QOI: Only QOI compression is allowed for saving");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_COMPRESSION);
     }
 
@@ -241,7 +241,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v7_qoi(void *state, st
         case SAIL_PIXEL_FORMAT_BPP24_RGB:  channels = 3; break;
         case SAIL_PIXEL_FORMAT_BPP32_RGBA: channels = 4; break;
         default: {
-            SAIL_LOG_ERROR("QOI: %s pixel format is not currently supported for writing", sail_pixel_format_to_string(image->pixel_format));
+            SAIL_LOG_ERROR("QOI: %s pixel format is not currently supported for saving", sail_pixel_format_to_string(image->pixel_format));
             SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
         }
     }

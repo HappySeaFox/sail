@@ -145,13 +145,13 @@ sail_status_t sail_save_image_into_file(const char *path, const struct sail_imag
 
     void *state = NULL;
 
-    SAIL_TRY_OR_CLEANUP(sail_start_writing_file(path, NULL /* codec info */, &state),
-                        sail_stop_writing(state));
+    SAIL_TRY_OR_CLEANUP(sail_start_saving_file(path, NULL /* codec info */, &state),
+                        sail_stop_saving(state));
 
     SAIL_TRY_OR_CLEANUP(sail_write_next_frame(state, image),
-                        sail_stop_writing(state));
+                        sail_stop_saving(state));
 
-    SAIL_TRY(sail_stop_writing(state));
+    SAIL_TRY(sail_stop_saving(state));
 
     return SAIL_OK;
 }
@@ -163,16 +163,16 @@ sail_status_t sail_save_image_into_memory(void *buffer, size_t buffer_length, co
 
     void *state = NULL;
 
-    SAIL_TRY_OR_CLEANUP(sail_start_writing_memory(buffer, buffer_length, NULL /* codec info */, &state),
-                        sail_stop_writing(state));
+    SAIL_TRY_OR_CLEANUP(sail_start_saving_memory(buffer, buffer_length, NULL /* codec info */, &state),
+                        sail_stop_saving(state));
 
     SAIL_TRY_OR_CLEANUP(sail_write_next_frame(state, image),
-                        sail_stop_writing(state));
+                        sail_stop_saving(state));
 
     if (written == NULL) {
-        SAIL_TRY(sail_stop_writing(state));
+        SAIL_TRY(sail_stop_saving(state));
     } else {
-        SAIL_TRY(sail_stop_writing_with_written(state, written));
+        SAIL_TRY(sail_stop_saving_with_written(state, written));
     }
 
     return SAIL_OK;

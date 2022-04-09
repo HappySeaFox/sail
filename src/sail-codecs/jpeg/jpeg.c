@@ -295,7 +295,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v7_jpeg(struct sail_io *io, const
 
     /* Sanity check. */
     if (jpeg_state->save_options->compression != SAIL_COMPRESSION_JPEG) {
-        SAIL_LOG_ERROR("JPEG: Only JPEG compression is allowed for writing");
+        SAIL_LOG_ERROR("JPEG: Only JPEG compression is allowed for saving");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_COMPRESSION);
     }
 
@@ -343,7 +343,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v7_jpeg(void *state, s
     const J_COLOR_SPACE color_space = jpeg_private_pixel_format_to_color_space(image->pixel_format);
 
     if (color_space == JCS_UNKNOWN) {
-        SAIL_LOG_ERROR("JPEG: %s pixel format is not currently supported for writing", sail_pixel_format_to_string(image->pixel_format));
+        SAIL_LOG_ERROR("JPEG: %s pixel format is not currently supported for saving", sail_pixel_format_to_string(image->pixel_format));
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
     }
 

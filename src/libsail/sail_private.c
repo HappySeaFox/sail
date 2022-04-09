@@ -31,7 +31,7 @@
 
 static void print_unsupported_write_pixel_format(enum SailPixelFormat pixel_format) {
 
-    SAIL_LOG_ERROR("This codec cannot save %s pixels. Use its save features to get the list of supported pixel formats for writing",
+    SAIL_LOG_ERROR("This codec cannot save %s pixels. Use its save features to get the list of supported pixel formats for saving",
                     sail_pixel_format_to_string(pixel_format));
 }
 
@@ -111,7 +111,7 @@ void destroy_hidden_state(struct hidden_state *state) {
     sail_free(state);
 }
 
-sail_status_t stop_writing(void *state, size_t *written) {
+sail_status_t stop_saving(void *state, size_t *written) {
 
     if (written != NULL) {
         *written = 0;

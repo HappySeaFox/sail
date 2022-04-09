@@ -75,7 +75,7 @@ struct sail_variant;
  *     It doesn't support saving unknown keys (SAIL_META_DATA_UNKNOWN).
  *   - PNG supports both keys and values.
  *
- * When writing images, SAIL codecs don't necessarily use sail_meta_data_to_string() to convert
+ * When saving images, SAIL codecs don't necessarily use sail_meta_data_to_string() to convert
  * keys to string representations. PNG, for example, uses hardcoded "Raw profile type exif" key name
  * for EXIF tags.
  */

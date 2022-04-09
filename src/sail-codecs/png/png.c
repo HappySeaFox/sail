@@ -484,7 +484,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v7_png(struct sail_io *io, const 
     SAIL_TRY(sail_copy_save_options(save_options, &png_state->save_options));
 
     if (png_state->save_options->compression != SAIL_COMPRESSION_DEFLATE) {
-        SAIL_LOG_ERROR("PNG: Only DEFLATE compression is allowed for writing");
+        SAIL_LOG_ERROR("PNG: Only DEFLATE compression is allowed for saving");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_COMPRESSION);
     }
 
@@ -538,7 +538,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v7_png(void *state, st
     int color_type;
     int bit_depth;
     SAIL_TRY_OR_CLEANUP(png_private_pixel_format_to_png_color_type(image->pixel_format, &color_type, &bit_depth),
-                        /* cleanup */ SAIL_LOG_ERROR("PNG: %s pixel format is not currently supported for writing", sail_pixel_format_to_string(image->pixel_format)));
+                        /* cleanup */ SAIL_LOG_ERROR("PNG: %s pixel format is not currently supported for saving", sail_pixel_format_to_string(image->pixel_format)));
 
     /* Save meta data. */
     if (png_state->save_options->options & SAIL_OPTION_META_DATA && image->meta_data_node != NULL) {

@@ -62,12 +62,12 @@ public:
     image_output();
 
     /*
-     * Stops writing if it was started and destroys the image writer.
+     * Stops saving if it was started and destroys the image writer.
      */
     ~image_output();
 
     /*
-     * Starts writing into the specified image file.
+     * Starts saving into the specified image file.
      *
      * Typical usage: start()          ->
      *                next_frame() x n ->
@@ -78,7 +78,7 @@ public:
     sail_status_t start(std::string_view path);
 
     /*
-     * Starts writing into the specified image file with the specified codec.
+     * Starts saving into the specified image file with the specified codec.
      *
      * Typical usage: codec_info::from_extension() ->
      *                start()                      ->
@@ -90,7 +90,7 @@ public:
     sail_status_t start(std::string_view path, const sail::codec_info &codec_info);
 
     /*
-     * Starts writing into the specified image file with the specified save options.
+     * Starts saving into the specified image file with the specified save options.
      *
      * Typical usage: start()          ->
      *                next_frame() x n ->
@@ -101,7 +101,7 @@ public:
     sail_status_t start(std::string_view path, const sail::save_options &save_options);
 
     /*
-     * Starts writing into the specified image file with the specified codec and save options.
+     * Starts saving into the specified image file with the specified codec and save options.
      *
      * Typical usage: codec_info::from_extension() ->
      *                start()                      ->
@@ -113,7 +113,7 @@ public:
     sail_status_t start(std::string_view path, const sail::codec_info &codec_info, const sail::save_options &save_options);
 
     /*
-     * Starts writing into the specified memory buffer with the specified codec.
+     * Starts saving into the specified memory buffer with the specified codec.
      *
      * Typical usage: codec_info::from_extension() ->
      *                start()                      ->
@@ -125,7 +125,7 @@ public:
     sail_status_t start(void *buffer, std::size_t buffer_length, const sail::codec_info &codec_info);
 
     /*
-     * Starts writing into the specified memory buffer with the specified codec and save options.
+     * Starts saving into the specified memory buffer with the specified codec and save options.
      *
      * Typical usage: codec_info::from_extension() ->
      *                start()                      ->
@@ -137,7 +137,7 @@ public:
     sail_status_t start(void *buffer, std::size_t buffer_length, const sail::codec_info &codec_info, const sail::save_options &save_options);
 
     /*
-     * Starts writing into the specified memory buffer with the specified codec.
+     * Starts saving into the specified memory buffer with the specified codec.
      *
      * Typical usage: codec_info::from_extension() ->
      *                start()                      ->
@@ -149,7 +149,7 @@ public:
     sail_status_t start(sail::arbitrary_data *arbitrary_data, const sail::codec_info &codec_info);
 
     /*
-     * Starts writing into the specified memory buffer with the specified codec and save options.
+     * Starts saving into the specified memory buffer with the specified codec and save options.
      *
      * Typical usage: codec_info::from_extension() ->
      *                start()                      ->
@@ -161,7 +161,7 @@ public:
     sail_status_t start(sail::arbitrary_data *arbitrary_data, const sail::codec_info &codec_info, const sail::save_options &save_options);
 
     /*
-     * Starts writing into the specified I/O target with the specified codec.
+     * Starts saving into the specified I/O target with the specified codec.
      *
      * Typical usage: codec_info::from_extension() ->
      *                start()                      ->
@@ -173,7 +173,7 @@ public:
     sail_status_t start(sail::abstract_io &abstract_io, const sail::codec_info &codec_info);
 
     /*
-     * Starts writing into the specified I/O target with the specified codec and save options.
+     * Starts saving into the specified I/O target with the specified codec and save options.
      *
      * Typical usage: codec_info::from_extension() ->
      *                start()                      ->
@@ -185,7 +185,7 @@ public:
     sail_status_t start(sail::abstract_io &abstract_io, const sail::codec_info &codec_info, const sail::save_options &save_options);
 
     /*
-     * Continues writing started by start(). Saves the specified image into the underlying I/O target.
+     * Continues saving started by start(). Saves the specified image into the underlying I/O target.
      *
      * If the selected image format doesn't support the image pixel format, an error is returned.
      * Consider converting the image into a supported image format beforehand.
@@ -195,7 +195,7 @@ public:
     sail_status_t next_frame(const sail::image &image) const;
 
     /*
-     * Stops writing started by the previous call to start() and closes the underlying I/O target.
+     * Stops saving started by the previous call to start() and closes the underlying I/O target.
      *
      * Returns SAIL_OK on success.
      */

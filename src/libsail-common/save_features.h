@@ -53,7 +53,7 @@ struct sail_save_features {
     /* The length of pixel_formats. */
     unsigned pixel_formats_length;
 
-    /* Supported or-ed features of writing operations. See SailCodecFeature. */
+    /* Supported or-ed features of saving operations. See SailCodecFeature. */
     int features;
 
     /*

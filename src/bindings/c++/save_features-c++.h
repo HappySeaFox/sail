@@ -88,7 +88,7 @@ public:
     const std::vector<SailPixelFormat>& pixel_formats() const;
 
     /*
-     * Returns the supported or-ed features of writing operations. See SailCodecFeature.
+     * Returns the supported or-ed features of saving operations. See SailCodecFeature.
      */
     int features() const;
 

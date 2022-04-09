@@ -47,7 +47,7 @@ namespace sail
 {
 
 /*
- * Options to modify writing operations.
+ * Options to modify saving operations.
  */
 class SAIL_EXPORT save_options
 {
@@ -86,7 +86,7 @@ public:
     ~save_options();
 
     /*
-     * Returns the or-ed manipulation options for writing operations. See SailOption.
+     * Returns the or-ed manipulation options for saving operations. See SailOption.
      */
     int options() const;
 
@@ -123,7 +123,7 @@ public:
     double compression_level() const;
 
     /*
-     * Sets new or-ed manipulation options for writing operations. See SailOption.
+     * Sets new or-ed manipulation options for saving operations. See SailOption.
      */
     void set_options(int options);
 

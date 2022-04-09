@@ -64,8 +64,8 @@ static sail_status_t allowed_write_compression(const struct sail_save_features *
  */
 
 sail_status_t start_loading_io_with_options(struct sail_io *io, bool own_io,
-                                           const struct sail_codec_info *codec_info,
-                                           const struct sail_load_options *load_options, void **state) {
+                                            const struct sail_codec_info *codec_info,
+                                            const struct sail_load_options *load_options, void **state) {
 
     SAIL_TRY_OR_CLEANUP(check_io_arguments(io, codec_info, state),
                         /* cleanup */ if (own_io) sail_destroy_io(io));
@@ -108,7 +108,7 @@ sail_status_t start_loading_io_with_options(struct sail_io *io, bool own_io,
     return SAIL_OK;
 }
 
-sail_status_t start_writing_io_with_options(struct sail_io *io, bool own_io,
+sail_status_t start_saving_io_with_options(struct sail_io *io, bool own_io,
                                            const struct sail_codec_info *codec_info,
                                            const struct sail_save_options *save_options, void **state) {
 

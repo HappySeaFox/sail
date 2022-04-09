@@ -79,9 +79,9 @@ static sail_status_t convert_impl(const char *input, const char *output, int com
     SAIL_LOG_INFO("Compression: %d%s", compression, compression == -1 ? " (default)" : "");
     save_options->compression_level = compression;
 
-    SAIL_TRY(sail_start_writing_file_with_options(output, codec_info, save_options, &state));
+    SAIL_TRY(sail_start_saving_file_with_options(output, codec_info, save_options, &state));
     SAIL_TRY(sail_write_next_frame(state, image));
-    SAIL_TRY(sail_stop_writing(state));
+    SAIL_TRY(sail_stop_saving(state));
 
     /* Clean up. */
     sail_destroy_save_options(save_options);

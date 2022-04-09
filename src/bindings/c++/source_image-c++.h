@@ -47,7 +47,7 @@ namespace sail
 
 /*
  * source_image represents source image properties. The class is used in loading operations only
- * to preserve the source image properties. It's ignored in writing operations.
+ * to preserve the source image properties. It's ignored in saving operations.
  */
 class SAIL_EXPORT source_image
 {

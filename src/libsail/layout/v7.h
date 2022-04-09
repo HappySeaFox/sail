@@ -169,7 +169,7 @@ sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_load_finish_v7)(void **state,
 sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_save_init_v7)(struct sail_io *io, const struct sail_save_options *save_options, void **state);
 
 /*
- * Seeks to a next frame before writing it. The frame is NOT immediately written. Use sail_codec_save_frame_vx()
+ * Seeks to a next frame before saving it. The frame is NOT immediately written. Use sail_codec_save_frame_vx()
  * to actually save a frame.
  *
  * libsail, a caller of this function, guarantees the following:
@@ -178,7 +178,7 @@ sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_save_init_v7)(struct sail_io 
  *   - The image is valid.
  *
  * This function MUST:
- *   - Seek to the right position before writing the next image frame.
+ *   - Seek to the right position before saving the next image frame.
  *
  * Returns SAIL_OK on success.
  */
@@ -200,7 +200,7 @@ sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_save_seek_next_frame_v7)(void
 sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_save_frame_v7)(void *state, struct sail_io *io, const struct sail_image *image);
 
 /*
- * Finilizes writing operation. No more writings are possible after calling this function.
+ * Finilizes saving operation. No more savings are possible after calling this function.
  * This function doesn't close the io stream. Use io->close() or sail_destroy_io() to actually
  * close the io stream.
  *

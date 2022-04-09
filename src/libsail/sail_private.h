@@ -54,7 +54,7 @@ struct hidden_state {
      */
     struct sail_save_options *save_options;
 
-    /* Local state passed to codec loading and writing functions. */
+    /* Local state passed to codec loading and saving functions. */
     void *state;
 
     /* Pointers to internal data structures so no need to free these. */
@@ -67,7 +67,7 @@ SAIL_HIDDEN sail_status_t load_codec_by_codec_info(const struct sail_codec_info 
 
 SAIL_HIDDEN void destroy_hidden_state(struct hidden_state *state);
 
-SAIL_HIDDEN sail_status_t stop_writing(void *state, size_t *written);
+SAIL_HIDDEN sail_status_t stop_saving(void *state, size_t *written);
 
 SAIL_HIDDEN sail_status_t allowed_write_output_pixel_format(const struct sail_save_features *save_features, enum SailPixelFormat pixel_format);
 

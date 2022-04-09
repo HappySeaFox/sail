@@ -42,8 +42,8 @@
  * SAIL context.
  *
  * SAIL context enumerates and holds a list of available codec info objects and a list of loaded codecs.
- * It's a global static object being created on demand by all SAIL loading, writing, and probing functions.
- * If you want to allocate SAIL context explicitly, use init(). All SAIL loading, writing, and probing
+ * It's a global static object being created on demand by all SAIL loading, saving, and probing functions.
+ * If you want to allocate SAIL context explicitly, use init(). All SAIL loading, saving, and probing
  * functions will re-use it then.
  *
  * SAIL context modification (creating, destroying, loading and unloading codecs) is guarded with a mutex
@@ -73,7 +73,7 @@ public:
      * if a global context already exists. Builds a list of available codecs. See SailInitFlags.
      *
      * Use this method when you need specific features like preloading codecs. If you don't need
-     * specific features, using this method is optional. All loading or writing functions allocate
+     * specific features, using this method is optional. All loading or saving functions allocate
      * a global static context implicitly when they need it and when it doesn't exist yet.
      *
      * Codecs path search algorithm (first found path wins):
@@ -109,7 +109,7 @@ public:
      * with finish(). Subsequent attempts to load or save images will reload necessary SAIL codecs
      * from disk.
      *
-     * Warning: Make sure no loading or writing operations are in progress before calling unload_codecs().
+     * Warning: Make sure no loading or saving operations are in progress before calling unload_codecs().
      *          Failure to do so may lead to a crash.
      *
      * Typical usage: This is a standalone method that can be called at any time.
@@ -120,14 +120,14 @@ public:
 
     /*
      * Destroys the global static context that was implicitly or explicitly allocated by
-     * loading or writing functions.
+     * loading or saving functions.
      *
      * Unloads all codecs. All pointers to codec info objects, load and save features, and codecs
      * get invalidated. Using them after calling finish() will lead to a crash.
      *
      * It's possible to initialize a new global static context afterwards, implicitly or explicitly.
      *
-     * Warning: Make sure no loading or writing operations are in progress before calling finish().
+     * Warning: Make sure no loading or saving operations are in progress before calling finish().
      *          Failure to do so may lead to a crash.
      *
      * Typical usage: This is a standalone method that can be called at any time.
