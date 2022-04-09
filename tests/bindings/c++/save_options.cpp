@@ -41,7 +41,7 @@ static MunitResult test_save_options(const MunitParameter params[], void *user_d
 
     {
         sail::save_options save_options;
-        munit_assert(first_codec.save_features().to_save_options(&save_options) == SAIL_OK);
+        munit_assert(first_codec.save_features().to_options(&save_options) == SAIL_OK);
     }
 
     return MUNIT_OK;
@@ -56,7 +56,7 @@ static MunitResult test_save_options_copy(const MunitParameter params[], void *u
 
     {
         sail::save_options save_options;
-        munit_assert(first_codec.save_features().to_save_options(&save_options) == SAIL_OK);
+        munit_assert(first_codec.save_features().to_options(&save_options) == SAIL_OK);
         munit_assert(save_options.tuning().empty());
 
         const sail::save_options save_options2 = save_options;
@@ -68,7 +68,7 @@ static MunitResult test_save_options_copy(const MunitParameter params[], void *u
 
     {
         sail::save_options save_options;
-        munit_assert(first_codec.save_features().to_save_options(&save_options) == SAIL_OK);
+        munit_assert(first_codec.save_features().to_options(&save_options) == SAIL_OK);
         save_options.tuning()["key"] = 10.0;
         munit_assert_double(save_options.tuning()["key"].value<double>(), ==, 10.0);
 
@@ -91,7 +91,7 @@ static MunitResult test_save_options_move(const MunitParameter params[], void *u
 
     {
         sail::save_options save_options;
-        munit_assert(first_codec.save_features().to_save_options(&save_options) == SAIL_OK);
+        munit_assert(first_codec.save_features().to_options(&save_options) == SAIL_OK);
 
         sail::save_options save_options2 = save_options;
         const sail::save_options save_options3 = std::move(save_options2);
@@ -104,7 +104,7 @@ static MunitResult test_save_options_move(const MunitParameter params[], void *u
 
     {
         sail::save_options save_options;
-        munit_assert(first_codec.save_features().to_save_options(&save_options) == SAIL_OK);
+        munit_assert(first_codec.save_features().to_options(&save_options) == SAIL_OK);
         save_options.tuning()["key"] = 10.0;
         munit_assert_double(save_options.tuning()["key"].value<double>(), ==, 10.0);
 

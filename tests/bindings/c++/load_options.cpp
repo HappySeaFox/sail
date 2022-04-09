@@ -41,7 +41,7 @@ static MunitResult test_load_options(const MunitParameter params[], void *user_d
 
     {
         sail::load_options load_options;
-        munit_assert(first_codec.load_features().to_load_options(&load_options) == SAIL_OK);
+        munit_assert(first_codec.load_features().to_options(&load_options) == SAIL_OK);
     }
 
     return MUNIT_OK;
@@ -56,7 +56,7 @@ static MunitResult test_load_options_copy(const MunitParameter params[], void *u
 
     {
         sail::load_options load_options;
-        munit_assert(first_codec.load_features().to_load_options(&load_options) == SAIL_OK);
+        munit_assert(first_codec.load_features().to_options(&load_options) == SAIL_OK);
         munit_assert(load_options.tuning().empty());
 
         const sail::load_options load_options2 = load_options;
@@ -66,7 +66,7 @@ static MunitResult test_load_options_copy(const MunitParameter params[], void *u
 
     {
         sail::load_options load_options;
-        munit_assert(first_codec.load_features().to_load_options(&load_options) == SAIL_OK);
+        munit_assert(first_codec.load_features().to_options(&load_options) == SAIL_OK);
         load_options.tuning()["key"] = 10.0;
         munit_assert_double(load_options.tuning()["key"].value<double>(), ==, 10.0);
 
@@ -87,7 +87,7 @@ static MunitResult test_load_options_move(const MunitParameter params[], void *u
 
     {
         sail::load_options load_options;
-        munit_assert(first_codec.load_features().to_load_options(&load_options) == SAIL_OK);
+        munit_assert(first_codec.load_features().to_options(&load_options) == SAIL_OK);
 
         sail::load_options load_options2 = load_options;
         const sail::load_options load_options3 = std::move(load_options2);
@@ -97,7 +97,7 @@ static MunitResult test_load_options_move(const MunitParameter params[], void *u
 
     {
         sail::load_options load_options;
-        munit_assert(first_codec.load_features().to_load_options(&load_options) == SAIL_OK);
+        munit_assert(first_codec.load_features().to_options(&load_options) == SAIL_OK);
         load_options.tuning()["key"] = 10.0;
         munit_assert_double(load_options.tuning()["key"].value<double>(), ==, 10.0);
 

@@ -80,7 +80,7 @@ const sail::supported_tuning& load_features::supported_tuning() const
     return d->supported_tuning;
 }
 
-sail_status_t load_features::to_load_options(sail::load_options *load_options) const
+sail_status_t load_features::to_options(sail::load_options *load_options) const
 {
     SAIL_CHECK_PTR(d->sail_load_features_c);
     SAIL_CHECK_PTR(load_options);

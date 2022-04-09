@@ -152,7 +152,7 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
     SAIL_TRY(image.convert(codec_info.save_features()));
 
     sail::save_options save_options;
-    SAIL_TRY(codec_info.save_features().to_save_options(&save_options));
+    SAIL_TRY(codec_info.save_features().to_options(&save_options));
 
     // This filter will be handled and applied by the PNG codec only.
     // Possible values: "none", "sub", "up", "avg", "paeth".

@@ -107,7 +107,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t to_load_options(sail::load_options *load_options) const;
+    sail_status_t to_options(sail::load_options *load_options) const;
 
 private:
     load_features();

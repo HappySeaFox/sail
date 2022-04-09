@@ -160,7 +160,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t to_save_options(sail::save_options *save_options) const;
+    sail_status_t to_options(sail::save_options *save_options) const;
 
 private:
     save_features();

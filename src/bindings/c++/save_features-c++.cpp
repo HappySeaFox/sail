@@ -120,7 +120,7 @@ const sail::supported_tuning& save_features::supported_tuning() const
     return d->supported_tuning;
 }
 
-sail_status_t save_features::to_save_options(sail::save_options *save_options) const
+sail_status_t save_features::to_options(sail::save_options *save_options) const
 {
     SAIL_CHECK_PTR(d->sail_save_features_c);
     SAIL_CHECK_PTR(save_options);

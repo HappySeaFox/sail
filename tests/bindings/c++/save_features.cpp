@@ -56,7 +56,7 @@ static MunitResult test_save_features(const MunitParameter params[], void *user_
     // Construct save options
     {
         sail::save_options save_options;
-        munit_assert(first_codec.save_features().to_save_options(&save_options) == SAIL_OK);
+        munit_assert(first_codec.save_features().to_options(&save_options) == SAIL_OK);
     }
 
     return MUNIT_OK;
