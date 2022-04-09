@@ -55,9 +55,9 @@ sail_status_t sail_start_writing_io(struct sail_io *io, const struct sail_codec_
 
 sail_status_t sail_start_writing_io_with_options(struct sail_io *io,
                                                 const struct sail_codec_info *codec_info,
-                                                const struct sail_write_options *write_options, void **state) {
+                                                const struct sail_save_options *save_options, void **state) {
 
-    SAIL_TRY(start_writing_io_with_options(io, false, codec_info, write_options, state));
+    SAIL_TRY(start_writing_io_with_options(io, false, codec_info, save_options, state));
 
     return SAIL_OK;
 }

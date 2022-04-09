@@ -39,7 +39,7 @@
 struct sail_codec_info;
 struct sail_io;
 struct sail_load_options;
-struct sail_write_options;
+struct sail_save_options;
 
 SAIL_HIDDEN sail_status_t start_loading_io_with_options(struct sail_io *io, bool own_io,
                                                        const struct sail_codec_info *codec_info,
@@ -47,6 +47,6 @@ SAIL_HIDDEN sail_status_t start_loading_io_with_options(struct sail_io *io, bool
 
 SAIL_HIDDEN sail_status_t start_writing_io_with_options(struct sail_io *io, bool own_io,
                                                        const struct sail_codec_info *codec_info,
-                                                       const struct sail_write_options *write_options, void **state);
+                                                       const struct sail_save_options *save_options, void **state);
 
 #endif

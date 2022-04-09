@@ -28,67 +28,67 @@
 
 #include "sail-common.h"
 
-sail_status_t sail_alloc_write_options(struct sail_write_options **write_options) {
+sail_status_t sail_alloc_save_options(struct sail_save_options **save_options) {
 
-    SAIL_CHECK_PTR(write_options);
+    SAIL_CHECK_PTR(save_options);
 
     void *ptr;
-    SAIL_TRY(sail_malloc(sizeof(struct sail_write_options), &ptr));
-    *write_options = ptr;
+    SAIL_TRY(sail_malloc(sizeof(struct sail_save_options), &ptr));
+    *save_options = ptr;
 
-    (*write_options)->options           = 0;
-    (*write_options)->tuning            = NULL;
-    (*write_options)->compression       = SAIL_COMPRESSION_UNSUPPORTED;
-    (*write_options)->compression_level = 0;
+    (*save_options)->options           = 0;
+    (*save_options)->tuning            = NULL;
+    (*save_options)->compression       = SAIL_COMPRESSION_UNSUPPORTED;
+    (*save_options)->compression_level = 0;
 
     return SAIL_OK;
 }
 
-void sail_destroy_write_options(struct sail_write_options *write_options) {
+void sail_destroy_save_options(struct sail_save_options *save_options) {
 
-    if (write_options == NULL) {
+    if (save_options == NULL) {
         return;
     }
 
-    sail_free(write_options);
+    sail_free(save_options);
 }
 
-sail_status_t sail_alloc_write_options_from_features(const struct sail_save_features *save_features, struct sail_write_options **write_options) {
+sail_status_t sail_alloc_save_options_from_features(const struct sail_save_features *save_features, struct sail_save_options **save_options) {
 
-    struct sail_write_options *write_options_local;
-    SAIL_TRY(sail_alloc_write_options(&write_options_local));
+    struct sail_save_options *save_options_local;
+    SAIL_TRY(sail_alloc_save_options(&save_options_local));
 
-    write_options_local->options = 0;
+    save_options_local->options = 0;
 
     if (save_features->features & SAIL_CODEC_FEATURE_META_DATA) {
-        write_options_local->options |= SAIL_OPTION_META_DATA;
+        save_options_local->options |= SAIL_OPTION_META_DATA;
     }
 
     if (save_features->features & SAIL_CODEC_FEATURE_ICCP) {
-        write_options_local->options |= SAIL_OPTION_ICCP;
+        save_options_local->options |= SAIL_OPTION_ICCP;
     }
 
-    write_options_local->compression       = save_features->default_compression;
-    write_options_local->compression_level = save_features->compression_level_default;
+    save_options_local->compression       = save_features->default_compression;
+    save_options_local->compression_level = save_features->compression_level_default;
 
-    *write_options = write_options_local;
+    *save_options = save_options_local;
 
     return SAIL_OK;
 }
 
-sail_status_t sail_copy_write_options(const struct sail_write_options *source, struct sail_write_options **target) {
+sail_status_t sail_copy_save_options(const struct sail_save_options *source, struct sail_save_options **target) {
 
     SAIL_CHECK_PTR(source);
     SAIL_CHECK_PTR(target);
 
-    struct sail_write_options *target_local;
-    SAIL_TRY(sail_alloc_write_options(&target_local));
+    struct sail_save_options *target_local;
+    SAIL_TRY(sail_alloc_save_options(&target_local));
 
     target_local->options = source->options;
 
     if (source->tuning != NULL) {
         SAIL_TRY_OR_CLEANUP(sail_copy_hash_map(source->tuning, &target_local->tuning),
-                            /* cleanup */ sail_destroy_write_options(target_local));
+                            /* cleanup */ sail_destroy_save_options(target_local));
     }
 
     target_local->compression       = source->compression;

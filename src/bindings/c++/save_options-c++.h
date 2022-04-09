@@ -41,7 +41,7 @@
     #include <sail-c++/tuning-c++.h>
 #endif
 
-struct sail_write_options;
+struct sail_save_options;
 
 namespace sail
 {
@@ -49,41 +49,41 @@ namespace sail
 /*
  * Options to modify writing operations.
  */
-class SAIL_EXPORT write_options
+class SAIL_EXPORT save_options
 {
     friend class image_output;
     friend class save_features;
 
 public:
     /*
-     * Constructs empty write options.
+     * Constructs empty save options.
      */
-    write_options();
+    save_options();
 
     /*
-     * Copies the write options.
+     * Copies the save options.
      */
-    write_options(const write_options &wo);
+    save_options(const save_options &wo);
 
     /*
-     * Copies the write options.
+     * Copies the save options.
      */
-    write_options& operator=(const sail::write_options &write_options);
+    save_options& operator=(const sail::save_options &save_options);
 
     /*
-     * Moves the write options.
+     * Moves the save options.
      */
-    write_options(sail::write_options &&write_options) noexcept;
+    save_options(sail::save_options &&save_options) noexcept;
 
     /*
-     * Moves the write options.
+     * Moves the save options.
      */
-    write_options& operator=(sail::write_options &&write_options) noexcept;
+    save_options& operator=(sail::save_options &&save_options) noexcept;
 
     /*
-     * Destroys the write options.
+     * Destroys the save options.
      */
-    ~write_options();
+    ~save_options();
 
     /*
      * Returns the or-ed manipulation options for writing operations. See SailOption.
@@ -144,12 +144,12 @@ public:
 
 private:
     /*
-     * Makes a deep copy of the specified write options and stores the pointer for further use.
+     * Makes a deep copy of the specified save options and stores the pointer for further use.
      * When the SAIL context gets uninitialized, the pointer becomes dangling.
      */
-    explicit write_options(const sail_write_options *wo);
+    explicit save_options(const sail_save_options *wo);
 
-    sail_status_t to_sail_write_options(sail_write_options **write_options) const;
+    sail_status_t to_sail_save_options(sail_save_options **save_options) const;
 
 private:
     class pimpl;

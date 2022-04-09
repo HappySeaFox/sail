@@ -53,10 +53,10 @@ static MunitResult test_save_features(const MunitParameter params[], void *user_
         munit_assert(save_features.supported_tuning() == first_codec.save_features().supported_tuning());
     }
 
-    // Construct write options
+    // Construct save options
     {
-        sail::write_options write_options;
-        munit_assert(first_codec.save_features().to_write_options(&write_options) == SAIL_OK);
+        sail::save_options save_options;
+        munit_assert(first_codec.save_features().to_save_options(&save_options) == SAIL_OK);
     }
 
     return MUNIT_OK;

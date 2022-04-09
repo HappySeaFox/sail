@@ -43,7 +43,7 @@ extern "C" {
 struct sail_codec_info;
 struct sail_io;
 struct sail_load_options;
-struct sail_write_options;
+struct sail_save_options;
 
 /*
  * Starts loading the specified image file with the specified load options. Pass codec info if you would like
@@ -92,11 +92,11 @@ SAIL_EXPORT sail_status_t sail_start_loading_memory_with_options(const void *buf
                                                                  const struct sail_load_options *load_options, void **state);
 
 /*
- * Starts writing the specified image file with the specified write options. Pass codec info if you would like
- * to start writing with a specific codec. If not, just pass NULL. If you do not need specific write options,
+ * Starts writing the specified image file with the specified save options. Pass codec info if you would like
+ * to start writing with a specific codec. If not, just pass NULL. If you do not need specific save options,
  * just pass NULL. Codec-specific defaults will be used in this case.
  *
- * The write options are deep copied.
+ * The save options are deep copied.
  *
  * Typical usage: sail_start_writing_file_with_options() ->
  *                sail_write_next_frame()                ->
@@ -115,13 +115,13 @@ SAIL_EXPORT sail_status_t sail_start_loading_memory_with_options(const void *buf
  */
 SAIL_EXPORT sail_status_t sail_start_writing_file_with_options(const char *path,
                                                               const struct sail_codec_info *codec_info,
-                                                              const struct sail_write_options *write_options, void **state);
+                                                              const struct sail_save_options *save_options, void **state);
 
 /*
- * Starts writing the specified memory buffer with the specified write options. If you do not need specific
- * write options, just pass NULL. Codec-specific defaults will be used in this case.
+ * Starts writing the specified memory buffer with the specified save options. If you do not need specific
+ * save options, just pass NULL. Codec-specific defaults will be used in this case.
  *
- * The write options are deep copied.
+ * The save options are deep copied.
  *
  * Typical usage: sail_codec_info_from_extension()         ->
  *                sail_start_writing_memory_with_options() ->
@@ -136,7 +136,7 @@ SAIL_EXPORT sail_status_t sail_start_writing_file_with_options(const char *path,
  */
 SAIL_EXPORT sail_status_t sail_start_writing_memory_with_options(void *buffer, size_t buffer_length,
                                                                  const struct sail_codec_info *codec_info,
-                                                             const struct sail_write_options *write_options, void **state);
+                                                             const struct sail_save_options *save_options, void **state);
 
 
 /*

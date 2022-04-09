@@ -72,19 +72,19 @@ static sail_status_t convert_impl(const char *input, const char *output, int com
         image = image_converted;
     }
 
-    struct sail_write_options *write_options;
-    SAIL_TRY(sail_alloc_write_options_from_features(codec_info->save_features, &write_options));
+    struct sail_save_options *save_options;
+    SAIL_TRY(sail_alloc_save_options_from_features(codec_info->save_features, &save_options));
 
     /* Apply our tuning. */
     SAIL_LOG_INFO("Compression: %d%s", compression, compression == -1 ? " (default)" : "");
-    write_options->compression_level = compression;
+    save_options->compression_level = compression;
 
-    SAIL_TRY(sail_start_writing_file_with_options(output, codec_info, write_options, &state));
+    SAIL_TRY(sail_start_writing_file_with_options(output, codec_info, save_options, &state));
     SAIL_TRY(sail_write_next_frame(state, image));
     SAIL_TRY(sail_stop_writing(state));
 
     /* Clean up. */
-    sail_destroy_write_options(write_options);
+    sail_destroy_save_options(save_options);
 
     sail_destroy_image(image);
 

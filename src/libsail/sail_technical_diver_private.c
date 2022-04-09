@@ -77,10 +77,10 @@ sail_status_t start_loading_io_with_options(struct sail_io *io, bool own_io,
                         /* cleanup */ if (own_io) sail_destroy_io(io));
     struct hidden_state *state_of_mind = ptr;
 
-    state_of_mind->io            = io;
-    state_of_mind->own_io        = own_io;
-    state_of_mind->write_options = NULL;
-    state_of_mind->state         = NULL;
+    state_of_mind->io           = io;
+    state_of_mind->own_io       = own_io;
+    state_of_mind->save_options = NULL;
+    state_of_mind->state        = NULL;
     state_of_mind->codec_info   = codec_info;
     state_of_mind->codec        = NULL;
 
@@ -110,7 +110,7 @@ sail_status_t start_loading_io_with_options(struct sail_io *io, bool own_io,
 
 sail_status_t start_writing_io_with_options(struct sail_io *io, bool own_io,
                                            const struct sail_codec_info *codec_info,
-                                           const struct sail_write_options *write_options, void **state) {
+                                           const struct sail_save_options *save_options, void **state) {
 
     SAIL_TRY_OR_CLEANUP(check_io_arguments(io, codec_info, state),
                         /* cleanup */ if (own_io) sail_destroy_io(io));
@@ -118,11 +118,11 @@ sail_status_t start_writing_io_with_options(struct sail_io *io, bool own_io,
     *state = NULL;
 
     /*
-     * When write options is not NULL, we need to check if we can actually output the requested compression.
-     * When write options is NULL, we use the default compression which is always acceptable.
+     * When save options is not NULL, we need to check if we can actually output the requested compression.
+     * When save options is NULL, we use the default compression which is always acceptable.
      */
-    if (write_options != NULL) {
-        SAIL_TRY_OR_CLEANUP(allowed_write_compression(codec_info->save_features, write_options->compression),
+    if (save_options != NULL) {
+        SAIL_TRY_OR_CLEANUP(allowed_write_compression(codec_info->save_features, save_options->compression),
                             /* cleanup */ if (own_io) sail_destroy_io(io));
     }
 
@@ -131,26 +131,26 @@ sail_status_t start_writing_io_with_options(struct sail_io *io, bool own_io,
                         /* cleanup */ if (own_io) sail_destroy_io(io));
     struct hidden_state *state_of_mind = ptr;
 
-    state_of_mind->io            = io;
-    state_of_mind->own_io        = own_io;
-    state_of_mind->write_options = NULL;
-    state_of_mind->state         = NULL;
-    state_of_mind->codec_info    = codec_info;
-    state_of_mind->codec         = NULL;
+    state_of_mind->io           = io;
+    state_of_mind->own_io       = own_io;
+    state_of_mind->save_options = NULL;
+    state_of_mind->state        = NULL;
+    state_of_mind->codec_info   = codec_info;
+    state_of_mind->codec        = NULL;
 
     SAIL_TRY_OR_CLEANUP(load_codec_by_codec_info(state_of_mind->codec_info, &state_of_mind->codec),
                         /* cleanup */ destroy_hidden_state(state_of_mind));
 
-    if (write_options == NULL) {
-        SAIL_TRY_OR_CLEANUP(sail_alloc_write_options_from_features(state_of_mind->codec_info->save_features, &state_of_mind->write_options),
+    if (save_options == NULL) {
+        SAIL_TRY_OR_CLEANUP(sail_alloc_save_options_from_features(state_of_mind->codec_info->save_features, &state_of_mind->save_options),
                             /* cleanup */ destroy_hidden_state(state_of_mind));
     } else {
-        SAIL_TRY_OR_CLEANUP(sail_copy_write_options(write_options, &state_of_mind->write_options),
+        SAIL_TRY_OR_CLEANUP(sail_copy_save_options(save_options, &state_of_mind->save_options),
                             /* cleanup */ destroy_hidden_state(state_of_mind));
     }
 
-    SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v6->write_init(state_of_mind->io, state_of_mind->write_options, &state_of_mind->state),
-                        /* cleanup */ state_of_mind->codec->v6->write_finish(&state_of_mind->state, state_of_mind->io),
+    SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v6->save_init(state_of_mind->io, state_of_mind->save_options, &state_of_mind->state),
+                        /* cleanup */ state_of_mind->codec->v6->save_finish(&state_of_mind->state, state_of_mind->io),
                                       destroy_hidden_state(state_of_mind));
 
     *state = state_of_mind;

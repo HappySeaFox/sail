@@ -120,18 +120,18 @@ double save_features::compression_level_step() const
     return d->sail_save_features_c->compression_level_step;
 }
 
-sail_status_t save_features::to_write_options(sail::write_options *write_options) const
+sail_status_t save_features::to_save_options(sail::save_options *save_options) const
 {
     SAIL_CHECK_PTR(d->sail_save_features_c);
-    SAIL_CHECK_PTR(write_options);
+    SAIL_CHECK_PTR(save_options);
 
-    sail_write_options *sail_write_options;
+    sail_save_options *sail_save_options;
 
-    SAIL_TRY(sail_alloc_write_options_from_features(d->sail_save_features_c, &sail_write_options));
+    SAIL_TRY(sail_alloc_save_options_from_features(d->sail_save_features_c, &sail_save_options));
 
-    *write_options = sail::write_options(sail_write_options);
+    *save_options = sail::save_options(sail_save_options);
 
-    sail_destroy_write_options(sail_write_options);
+    sail_destroy_save_options(sail_save_options);
 
     return SAIL_OK;
 }

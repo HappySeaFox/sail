@@ -45,9 +45,9 @@ typedef sail_status_t (*sail_codec_load_finish_v6_t)(void **state, struct sail_i
  * Encoding functions.
  */
 
-typedef sail_status_t (*sail_codec_write_init_v6_t)(struct sail_io *io, const struct sail_write_options *write_options, void **state);
-typedef sail_status_t (*sail_codec_write_seek_next_frame_v6_t)(void *state, struct sail_io *io, const struct sail_image *image);
-typedef sail_status_t (*sail_codec_write_frame_v6_t)(void *state, struct sail_io *io, const struct sail_image *image);
-typedef sail_status_t (*sail_codec_write_finish_v6_t)(void **state, struct sail_io *io);
+typedef sail_status_t (*sail_codec_save_init_v6_t)(struct sail_io *io, const struct sail_save_options *save_options, void **state);
+typedef sail_status_t (*sail_codec_save_seek_next_frame_v6_t)(void *state, struct sail_io *io, const struct sail_image *image);
+typedef sail_status_t (*sail_codec_save_frame_v6_t)(void *state, struct sail_io *io, const struct sail_image *image);
+typedef sail_status_t (*sail_codec_save_finish_v6_t)(void **state, struct sail_io *io);
 
 #endif

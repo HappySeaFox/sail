@@ -149,31 +149,31 @@ sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_load_finish_v6)(void **state,
  */
 
 /*
- * Starts encoding the specified io stream using the specified options. The specified write options
+ * Starts encoding the specified io stream using the specified options. The specified save options
  * will be deep copied into an internal buffer.
  *
  * libsail, a caller of this function, guarantees the following:
  *   - The IO is valid and open.
- *   - The write options is not NULL.
+ *   - The save options is not NULL.
  *
  * This function MUST:
  *   - Allocate an internal state object with internal data structures necessary to decode a file,
  *     and assign its value to the state.
  *
  * STATE explanation: Pass the address of a local void* pointer. Codecs will store an internal state
- * in it and destroy it in sail_codec_write_finish_vx(). States must be used per image. DO NOT use the same state
+ * in it and destroy it in sail_codec_save_finish_vx(). States must be used per image. DO NOT use the same state
  * to write multiple images in the same time.
  *
  * Returns SAIL_OK on success.
  */
-sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_write_init_v6)(struct sail_io *io, const struct sail_write_options *write_options, void **state);
+sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_save_init_v6)(struct sail_io *io, const struct sail_save_options *save_options, void **state);
 
 /*
- * Seeks to a next frame before writing it. The frame is NOT immediately written. Use sail_codec_write_frame_vx()
+ * Seeks to a next frame before writing it. The frame is NOT immediately written. Use sail_codec_save_frame_vx()
  * to actually write a frame.
  *
  * libsail, a caller of this function, guarantees the following:
- *   - The state points to the state allocated by sail_codec_write_init_vx().
+ *   - The state points to the state allocated by sail_codec_save_init_vx().
  *   - The IO is valid and open.
  *   - The image is valid.
  *
@@ -182,13 +182,13 @@ sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_write_init_v6)(struct sail_io
  *
  * Returns SAIL_OK on success.
  */
-sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_write_seek_next_frame_v6)(void *state, struct sail_io *io, const struct sail_image *image);
+sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_save_seek_next_frame_v6)(void *state, struct sail_io *io, const struct sail_image *image);
 
 /*
  * Writes a next frame of the current image in the current pass.
  *
  * libsail, a caller of this function, guarantees the following:
- *   - The state is valid and points to the state allocated by sail_codec_write_init_vx().
+ *   - The state is valid and points to the state allocated by sail_codec_save_init_vx().
  *   - The IO is valid and open.
  *   - The image is valid.
  *
@@ -197,7 +197,7 @@ sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_write_seek_next_frame_v6)(voi
  *
  * Returns SAIL_OK on success.
  */
-sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_write_frame_v6)(void *state, struct sail_io *io, const struct sail_image *image);
+sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_save_frame_v6)(void *state, struct sail_io *io, const struct sail_image *image);
 
 /*
  * Finilizes writing operation. No more writings are possible after calling this function.
@@ -205,7 +205,7 @@ sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_write_frame_v6)(void *state, 
  * close the io stream.
  *
  * libsail, a caller of this function, guarantees the following:
- *   - The state points to the state allocated by sail_codec_write_init_vx().
+ *   - The state points to the state allocated by sail_codec_save_init_vx().
  *   - The IO is valid and open.
  *
  * This function MUST:
@@ -216,7 +216,7 @@ sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_write_frame_v6)(void *state, 
  *
  * Returns SAIL_OK on success.
  */
-sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_write_finish_v6)(void **state, struct sail_io *io);
+sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_save_finish_v6)(void **state, struct sail_io *io);
 
 /* extern "C" */
 #ifdef __cplusplus

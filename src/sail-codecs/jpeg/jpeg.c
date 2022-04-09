@@ -55,7 +55,7 @@ struct jpeg_state {
     struct jpeg_private_my_error_context error_context;
     bool libjpeg_error;
     struct sail_load_options *load_options;
-    struct sail_write_options *write_options;
+    struct sail_save_options *save_options;
     bool frame_read;
     bool frame_written;
     bool started_compress;
@@ -71,7 +71,7 @@ static sail_status_t alloc_jpeg_state(struct jpeg_state **jpeg_state) {
     (*jpeg_state)->compress_context   = NULL;
     (*jpeg_state)->libjpeg_error      = false;
     (*jpeg_state)->load_options       = NULL;
-    (*jpeg_state)->write_options      = NULL;
+    (*jpeg_state)->save_options       = NULL;
     (*jpeg_state)->frame_read         = false;
     (*jpeg_state)->frame_written      = false;
     (*jpeg_state)->started_compress   = false;
@@ -89,7 +89,7 @@ static void destroy_jpeg_state(struct jpeg_state *jpeg_state) {
     sail_free(jpeg_state->compress_context);
 
     sail_destroy_load_options(jpeg_state->load_options);
-    sail_destroy_write_options(jpeg_state->write_options);
+    sail_destroy_save_options(jpeg_state->save_options);
 
     sail_free(jpeg_state);
 }
@@ -272,21 +272,21 @@ SAIL_EXPORT sail_status_t sail_codec_load_finish_v6_jpeg(void **state, struct sa
  * Encoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_write_init_v6_jpeg(struct sail_io *io, const struct sail_write_options *write_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_save_init_v6_jpeg(struct sail_io *io, const struct sail_save_options *save_options, void **state) {
 
     SAIL_CHECK_PTR(state);
     *state = NULL;
 
     SAIL_TRY(sail_check_io_valid(io));
-    SAIL_CHECK_PTR(write_options);
+    SAIL_CHECK_PTR(save_options);
 
     struct jpeg_state *jpeg_state;
     SAIL_TRY(alloc_jpeg_state(&jpeg_state));
 
     *state = jpeg_state;
 
-    /* Deep copy write options. */
-    SAIL_TRY(sail_copy_write_options(write_options, &jpeg_state->write_options));
+    /* Deep copy save options. */
+    SAIL_TRY(sail_copy_save_options(save_options, &jpeg_state->save_options));
 
     /* Create compress context. */
     void *ptr;
@@ -294,7 +294,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_init_v6_jpeg(struct sail_io *io, cons
     jpeg_state->compress_context = ptr;
 
     /* Sanity check. */
-    if (jpeg_state->write_options->compression != SAIL_COMPRESSION_JPEG) {
+    if (jpeg_state->save_options->compression != SAIL_COMPRESSION_JPEG) {
         SAIL_LOG_ERROR("JPEG: Only JPEG compression is allowed for writing");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_COMPRESSION);
     }
@@ -316,7 +316,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_init_v6_jpeg(struct sail_io *io, cons
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v6_jpeg(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v6_jpeg(void *state, struct sail_io *io, const struct sail_image *image) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
@@ -361,15 +361,15 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v6_jpeg(void *state, 
     SAIL_TRY(jpeg_private_write_resolution(jpeg_state->compress_context, image->resolution));
 
     /* Compute image quality. */
-    const double compression = (jpeg_state->write_options->compression_level < COMPRESSION_MIN ||
-                                jpeg_state->write_options->compression_level > COMPRESSION_MAX)
+    const double compression = (jpeg_state->save_options->compression_level < COMPRESSION_MIN ||
+                                jpeg_state->save_options->compression_level > COMPRESSION_MAX)
                                 ? COMPRESSION_DEFAULT
-                                : jpeg_state->write_options->compression_level;
+                                : jpeg_state->save_options->compression_level;
     jpeg_set_quality(jpeg_state->compress_context, /* to quality */ (int)(COMPRESSION_MAX-compression), true);
 
     /* Handle tuning. */
-    if (jpeg_state->write_options->tuning != NULL) {
-        sail_traverse_hash_map_with_user_data(jpeg_state->write_options->tuning, jpeg_private_tuning_key_value_callback, jpeg_state->compress_context);
+    if (jpeg_state->save_options->tuning != NULL) {
+        sail_traverse_hash_map_with_user_data(jpeg_state->save_options->tuning, jpeg_private_tuning_key_value_callback, jpeg_state->compress_context);
     }
 
     /* Start compression. */
@@ -377,14 +377,14 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v6_jpeg(void *state, 
     jpeg_state->started_compress = true;
 
     /* Write meta data. */
-    if (jpeg_state->write_options->options & SAIL_OPTION_META_DATA && image->meta_data_node != NULL) {
+    if (jpeg_state->save_options->options & SAIL_OPTION_META_DATA && image->meta_data_node != NULL) {
         SAIL_TRY(jpeg_private_write_meta_data(jpeg_state->compress_context, image->meta_data_node));
         SAIL_LOG_DEBUG("JPEG: Meta data has been written");
     }
 
     /* Write ICC profile. */
 #ifdef SAIL_HAVE_JPEG_ICCP
-    if (jpeg_state->write_options->options & SAIL_OPTION_ICCP && image->iccp != NULL) {
+    if (jpeg_state->save_options->options & SAIL_OPTION_ICCP && image->iccp != NULL) {
         jpeg_write_icc_profile(jpeg_state->compress_context, image->iccp->data, image->iccp->data_length);
         SAIL_LOG_DEBUG("JPEG: ICC profile has been written");
     }
@@ -393,7 +393,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v6_jpeg(void *state, 
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_write_frame_v6_jpeg(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_save_frame_v6_jpeg(void *state, struct sail_io *io, const struct sail_image *image) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
@@ -418,7 +418,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_frame_v6_jpeg(void *state, struct sai
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_write_finish_v6_jpeg(void **state, struct sail_io *io) {
+SAIL_EXPORT sail_status_t sail_codec_save_finish_v6_jpeg(void **state, struct sail_io *io) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));

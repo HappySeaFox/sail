@@ -43,8 +43,8 @@ struct tiff_state {
     uint16_t current_frame;
     bool libtiff_error;
     struct sail_load_options *load_options;
-    struct sail_write_options *write_options;
-    int write_compression;
+    struct sail_save_options *save_options;
+    int save_compression;
     TIFFRGBAImage image;
     int line;
 };
@@ -55,13 +55,13 @@ static sail_status_t alloc_tiff_state(struct tiff_state **tiff_state) {
     SAIL_TRY(sail_malloc(sizeof(struct tiff_state), &ptr));
     *tiff_state = ptr;
 
-    (*tiff_state)->tiff              = NULL;
-    (*tiff_state)->current_frame     = 0;
-    (*tiff_state)->libtiff_error     = false;
-    (*tiff_state)->load_options      = NULL;
-    (*tiff_state)->write_options     = NULL;
-    (*tiff_state)->write_compression = COMPRESSION_NONE;
-    (*tiff_state)->line              = 0;
+    (*tiff_state)->tiff             = NULL;
+    (*tiff_state)->current_frame    = 0;
+    (*tiff_state)->libtiff_error    = false;
+    (*tiff_state)->load_options     = NULL;
+    (*tiff_state)->save_options     = NULL;
+    (*tiff_state)->save_compression = COMPRESSION_NONE;
+    (*tiff_state)->line             = 0;
 
     tiff_private_zero_tiff_image(&(*tiff_state)->image);
 
@@ -75,7 +75,7 @@ static void destroy_tiff_state(struct tiff_state *tiff_state) {
     }
 
     sail_destroy_load_options(tiff_state->load_options);
-    sail_destroy_write_options(tiff_state->write_options);
+    sail_destroy_save_options(tiff_state->save_options);
 
     TIFFRGBAImageEnd(&tiff_state->image);
 
@@ -253,25 +253,25 @@ SAIL_EXPORT sail_status_t sail_codec_load_finish_v6_tiff(void **state, struct sa
  * Encoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_write_init_v6_tiff(struct sail_io *io, const struct sail_write_options *write_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_save_init_v6_tiff(struct sail_io *io, const struct sail_save_options *save_options, void **state) {
 
     SAIL_CHECK_PTR(state);
     *state = NULL;
 
     SAIL_TRY(sail_check_io_valid(io));
-    SAIL_CHECK_PTR(write_options);
+    SAIL_CHECK_PTR(save_options);
 
     struct tiff_state *tiff_state;
     SAIL_TRY(alloc_tiff_state(&tiff_state));
 
     *state = tiff_state;
 
-    /* Deep copy write options. */
-    SAIL_TRY(sail_copy_write_options(write_options, &tiff_state->write_options));
+    /* Deep copy save options. */
+    SAIL_TRY(sail_copy_save_options(save_options, &tiff_state->save_options));
 
     /* Sanity check. */
-    SAIL_TRY_OR_EXECUTE(tiff_private_sail_compression_to_compression(tiff_state->write_options->compression, &tiff_state->write_compression),
-                        /* cleanup */ SAIL_LOG_ERROR("TIFF: %s compression is not supported for writing", sail_compression_to_string(tiff_state->write_options->compression));
+    SAIL_TRY_OR_EXECUTE(tiff_private_sail_compression_to_compression(tiff_state->save_options->compression, &tiff_state->save_compression),
+                        /* cleanup */ SAIL_LOG_ERROR("TIFF: %s compression is not supported for writing", sail_compression_to_string(tiff_state->save_options->compression));
                                       return __sail_error_result);
 
     TIFFSetWarningHandler(tiff_private_my_warning_fn);
@@ -301,7 +301,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_init_v6_tiff(struct sail_io *io, cons
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v6_tiff(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v6_tiff(void *state, struct sail_io *io, const struct sail_image *image) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
@@ -322,17 +322,17 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v6_tiff(void *state, 
     TIFFSetField(tiff_state->tiff, TIFFTAG_BITSPERSAMPLE, 8);
     TIFFSetField(tiff_state->tiff, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
     TIFFSetField(tiff_state->tiff, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_RGB);
-    TIFFSetField(tiff_state->tiff, TIFFTAG_COMPRESSION, tiff_state->write_compression);
+    TIFFSetField(tiff_state->tiff, TIFFTAG_COMPRESSION, tiff_state->save_compression);
     TIFFSetField(tiff_state->tiff, TIFFTAG_ROWSPERSTRIP, TIFFDefaultStripSize(tiff_state->tiff, (uint32_t)-1));
 
     /* Write ICC profile. */
-    if (tiff_state->write_options->options & SAIL_OPTION_ICCP && image->iccp != NULL) {
+    if (tiff_state->save_options->options & SAIL_OPTION_ICCP && image->iccp != NULL) {
         TIFFSetField(tiff_state->tiff, TIFFTAG_ICCPROFILE, image->iccp->data_length, image->iccp->data);
         SAIL_LOG_DEBUG("TIFF: ICC profile has been set");
     }
 
     /* Write meta data. */
-    if (tiff_state->write_options->options & SAIL_OPTION_META_DATA && image->meta_data_node != NULL) {
+    if (tiff_state->save_options->options & SAIL_OPTION_META_DATA && image->meta_data_node != NULL) {
         SAIL_LOG_DEBUG("TIFF: Writing meta data");
         SAIL_TRY(tiff_private_write_meta_data(tiff_state->tiff, image->meta_data_node));
     }
@@ -343,7 +343,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v6_tiff(void *state, 
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_write_frame_v6_tiff(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_save_frame_v6_tiff(void *state, struct sail_io *io, const struct sail_image *image) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
@@ -368,7 +368,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_frame_v6_tiff(void *state, struct sai
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_write_finish_v6_tiff(void **state, struct sail_io *io) {
+SAIL_EXPORT sail_status_t sail_codec_save_finish_v6_tiff(void **state, struct sail_io *io) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));

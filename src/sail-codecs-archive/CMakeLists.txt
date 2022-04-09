@@ -27,10 +27,10 @@ foreach(codec ${ENABLED_CODECS})
         .load_frame           = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_load_frame_v6),
         .load_finish          = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_load_finish_v6),
 
-        .write_init            = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_write_init_v6),
-        .write_seek_next_frame = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_write_seek_next_frame_v6),
-        .write_frame           = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_write_frame_v6),
-        .write_finish          = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_write_finish_v6)
+        .save_init            = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_save_init_v6),
+        .save_seek_next_frame = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_save_seek_next_frame_v6),
+        .save_frame           = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_save_frame_v6),
+        .save_finish          = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_save_finish_v6)
         #undef SAIL_CODEC_NAME
     },\n")
 endforeach()

@@ -52,12 +52,12 @@
     #include "pixel.h"
     #include "resolution.h"
     #include "save_features.h"
+    #include "save_options.h"
     #include "source_image.h"
     #include "string_node.h"
     #include "utils.h"
     #include "variant.h"
     #include "variant_node.h"
-    #include "write_options.h"
 #else
     #include <sail-common/config.h>
 
@@ -80,12 +80,12 @@
     #include <sail-common/pixel.h>
     #include <sail-common/resolution.h>
     #include <sail-common/save_features.h>
+    #include <sail-common/save_options.h>
     #include <sail-common/source_image.h>
     #include <sail-common/string_node.h>
     #include <sail-common/utils.h>
     #include <sail-common/variant.h>
     #include <sail-common/variant_node.h>
-    #include <sail-common/write_options.h>
 #endif
 
 #endif

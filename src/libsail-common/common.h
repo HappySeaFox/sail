@@ -330,7 +330,7 @@ enum SailCodecFeature {
     SAIL_CODEC_FEATURE_ICCP        = 1 << 6,
 };
 
-/* Read or write options. */
+/* Read or save options. */
 enum SailOption {
 
     /* Instruction to load or write image meta data like JPEG comments or EXIF. */

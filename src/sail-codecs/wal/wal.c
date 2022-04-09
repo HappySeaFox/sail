@@ -37,7 +37,7 @@
  */
 struct wal_state {
     struct sail_load_options *load_options;
-    struct sail_write_options *write_options;
+    struct sail_save_options *save_options;
 
     unsigned frame_number;
 
@@ -52,8 +52,8 @@ static sail_status_t alloc_wal_state(struct wal_state **wal_state) {
     SAIL_TRY(sail_malloc(sizeof(struct wal_state), &ptr));
     *wal_state = ptr;
 
-    (*wal_state)->load_options  = NULL;
-    (*wal_state)->write_options = NULL;
+    (*wal_state)->load_options = NULL;
+    (*wal_state)->save_options = NULL;
 
     (*wal_state)->frame_number  = 0;
     (*wal_state)->width         = 0;
@@ -69,7 +69,7 @@ static void destroy_wal_state(struct wal_state *wal_state) {
     }
 
     sail_destroy_load_options(wal_state->load_options);
-    sail_destroy_write_options(wal_state->write_options);
+    sail_destroy_save_options(wal_state->save_options);
 
     sail_free(wal_state);
 }
@@ -178,25 +178,16 @@ SAIL_EXPORT sail_status_t sail_codec_load_finish_v6_wal(void **state, struct sai
  * Encoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_write_init_v6_wal(struct sail_io *io, const struct sail_write_options *write_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_save_init_v6_wal(struct sail_io *io, const struct sail_save_options *save_options, void **state) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
-    SAIL_CHECK_PTR(write_options);
+    SAIL_CHECK_PTR(save_options);
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v6_wal(void *state, struct sail_io *io, const struct sail_image *image) {
-
-    SAIL_CHECK_PTR(state);
-    SAIL_TRY(sail_check_io_valid(io));
-    SAIL_TRY(sail_check_image_valid(image));
-
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
-}
-
-SAIL_EXPORT sail_status_t sail_codec_write_frame_v6_wal(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v6_wal(void *state, struct sail_io *io, const struct sail_image *image) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
@@ -205,7 +196,16 @@ SAIL_EXPORT sail_status_t sail_codec_write_frame_v6_wal(void *state, struct sail
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-SAIL_EXPORT sail_status_t sail_codec_write_finish_v6_wal(void **state, struct sail_io *io) {
+SAIL_EXPORT sail_status_t sail_codec_save_frame_v6_wal(void *state, struct sail_io *io, const struct sail_image *image) {
+
+    SAIL_CHECK_PTR(state);
+    SAIL_TRY(sail_check_io_valid(io));
+    SAIL_TRY(sail_check_image_valid(image));
+
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
+}
+
+SAIL_EXPORT sail_status_t sail_codec_save_finish_v6_wal(void **state, struct sail_io *io) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));

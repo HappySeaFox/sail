@@ -59,7 +59,7 @@ struct png_state {
     int interlaced_passes;
     bool libpng_error;
     struct sail_load_options *load_options;
-    struct sail_write_options *write_options;
+    struct sail_save_options *save_options;
     bool frame_written;
     int frames;
     int current_frame;
@@ -102,7 +102,7 @@ static sail_status_t alloc_png_state(struct png_state **png_state) {
     (*png_state)->interlaced_passes = 0;
     (*png_state)->libpng_error      = false;
     (*png_state)->load_options      = NULL;
-    (*png_state)->write_options     = NULL;
+    (*png_state)->save_options      = NULL;
     (*png_state)->frame_written     = false;
     (*png_state)->frames            = 0;
     (*png_state)->current_frame     = 0;
@@ -137,7 +137,7 @@ static void destroy_png_state(struct png_state *png_state) {
     }
 
     sail_destroy_load_options(png_state->load_options);
-    sail_destroy_write_options(png_state->write_options);
+    sail_destroy_save_options(png_state->save_options);
 
 #ifdef PNG_APNG_SUPPORTED
     sail_free(png_state->temp_scanline);
@@ -467,23 +467,23 @@ SAIL_EXPORT sail_status_t sail_codec_load_finish_v6_png(void **state, struct sai
  * Encoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_write_init_v6_png(struct sail_io *io, const struct sail_write_options *write_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_save_init_v6_png(struct sail_io *io, const struct sail_save_options *save_options, void **state) {
 
     SAIL_CHECK_PTR(state);
     *state = NULL;
 
     SAIL_TRY(sail_check_io_valid(io));
-    SAIL_CHECK_PTR(write_options);
+    SAIL_CHECK_PTR(save_options);
 
     struct png_state *png_state;
     SAIL_TRY(alloc_png_state(&png_state));
 
     *state = png_state;
 
-    /* Deep copy write options. */
-    SAIL_TRY(sail_copy_write_options(write_options, &png_state->write_options));
+    /* Deep copy save options. */
+    SAIL_TRY(sail_copy_save_options(save_options, &png_state->save_options));
 
-    if (png_state->write_options->compression != SAIL_COMPRESSION_DEFLATE) {
+    if (png_state->save_options->compression != SAIL_COMPRESSION_DEFLATE) {
         SAIL_LOG_ERROR("PNG: Only DEFLATE compression is allowed for writing");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_COMPRESSION);
     }
@@ -506,8 +506,8 @@ SAIL_EXPORT sail_status_t sail_codec_write_init_v6_png(struct sail_io *io, const
     }
 
     /* Handle tuning. */
-    if (png_state->write_options->tuning != NULL) {
-        sail_traverse_hash_map_with_user_data(png_state->write_options->tuning, png_private_tuning_key_value_callback, png_state->png_ptr);
+    if (png_state->save_options->tuning != NULL) {
+        sail_traverse_hash_map_with_user_data(png_state->save_options->tuning, png_private_tuning_key_value_callback, png_state->png_ptr);
     }
 
     png_set_write_fn(png_state->png_ptr, io, png_private_my_write_fn, png_private_my_flush_fn);
@@ -515,7 +515,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_init_v6_png(struct sail_io *io, const
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v6_png(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v6_png(void *state, struct sail_io *io, const struct sail_image *image) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
@@ -541,7 +541,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v6_png(void *state, s
                         /* cleanup */ SAIL_LOG_ERROR("PNG: %s pixel format is not currently supported for writing", sail_pixel_format_to_string(image->pixel_format)));
 
     /* Write meta data. */
-    if (png_state->write_options->options & SAIL_OPTION_META_DATA && image->meta_data_node != NULL) {
+    if (png_state->save_options->options & SAIL_OPTION_META_DATA && image->meta_data_node != NULL) {
         SAIL_TRY(png_private_write_meta_data(png_state->png_ptr, png_state->info_ptr, image->meta_data_node));
         SAIL_LOG_DEBUG("PNG: Meta data has been written");
     }
@@ -552,7 +552,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v6_png(void *state, s
                  image->height,
                  bit_depth,
                  color_type,
-                 (png_state->write_options->options & SAIL_OPTION_INTERLACED) ? PNG_INTERLACE_ADAM7 : PNG_INTERLACE_NONE,
+                 (png_state->save_options->options & SAIL_OPTION_INTERLACED) ? PNG_INTERLACE_ADAM7 : PNG_INTERLACE_NONE,
                  PNG_COMPRESSION_TYPE_BASE,
                  PNG_FILTER_TYPE_BASE);
 
@@ -560,7 +560,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v6_png(void *state, s
     SAIL_TRY(png_private_write_resolution(png_state->png_ptr, png_state->info_ptr, image->resolution));
 
     /* Write ICC profile. */
-    if (png_state->write_options->options & SAIL_OPTION_ICCP && image->iccp != NULL) {
+    if (png_state->save_options->options & SAIL_OPTION_ICCP && image->iccp != NULL) {
         png_set_iCCP(png_state->png_ptr,
                         png_state->info_ptr,
                         "ICC profile",
@@ -594,10 +594,10 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v6_png(void *state, s
     png_set_gAMA(png_state->png_ptr, png_state->info_ptr, image->gamma);
 
     /* Set compression. */
-    const double compression = (png_state->write_options->compression_level < COMPRESSION_MIN ||
-                                png_state->write_options->compression_level > COMPRESSION_MAX)
+    const double compression = (png_state->save_options->compression_level < COMPRESSION_MIN ||
+                                png_state->save_options->compression_level > COMPRESSION_MAX)
                                 ? COMPRESSION_DEFAULT
-                                : png_state->write_options->compression_level;
+                                : png_state->save_options->compression_level;
 
     png_set_compression_level(png_state->png_ptr, (int)compression);
 
@@ -619,7 +619,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v6_png(void *state, s
         png_set_swap_alpha(png_state->png_ptr);
     }
 
-    if (png_state->write_options->options & SAIL_OPTION_INTERLACED) {
+    if (png_state->save_options->options & SAIL_OPTION_INTERLACED) {
         png_state->interlaced_passes = png_set_interlace_handling(png_state->png_ptr);
     } else {
         png_state->interlaced_passes = 1;
@@ -628,7 +628,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v6_png(void *state, s
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_write_frame_v6_png(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_save_frame_v6_png(void *state, struct sail_io *io, const struct sail_image *image) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
@@ -655,7 +655,7 @@ SAIL_EXPORT sail_status_t sail_codec_write_frame_v6_png(void *state, struct sail
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_write_finish_v6_png(void **state, struct sail_io *io) {
+SAIL_EXPORT sail_status_t sail_codec_save_finish_v6_png(void **state, struct sail_io *io) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));

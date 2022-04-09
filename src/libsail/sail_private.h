@@ -49,10 +49,10 @@ struct hidden_state {
     bool own_io;
 
     /*
-     * Write operations save write options to check if the interlaced mode was requested on later stages.
+     * Write operations save save options to check if the interlaced mode was requested on later stages.
      * It's also used to check if the supplied pixel format is supported.
      */
-    struct sail_write_options *write_options;
+    struct sail_save_options *save_options;
 
     /* Local state passed to codec loading and writing functions. */
     void *state;

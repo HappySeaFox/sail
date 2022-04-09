@@ -70,7 +70,7 @@ static const char SAIL_PROFILE_EMBEDDED[4] = { 'M', 'B', 'E', 'D' };
 struct bmp_state {
     /* These two are external. */
     const struct sail_load_options *load_options;
-    const struct sail_write_options *write_options;
+    const struct sail_save_options *save_options;
 
     int bmp_load_options;
 
@@ -108,7 +108,7 @@ static sail_status_t alloc_bmp_state(struct bmp_state **bmp_state) {
     }
 
     (*bmp_state)->load_options     = NULL;
-    (*bmp_state)->write_options    = NULL;
+    (*bmp_state)->save_options     = NULL;
     (*bmp_state)->bmp_load_options = 0;
     (*bmp_state)->iccp             = NULL;
     (*bmp_state)->palette          = NULL;

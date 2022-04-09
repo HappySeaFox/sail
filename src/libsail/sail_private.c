@@ -103,7 +103,7 @@ void destroy_hidden_state(struct hidden_state *state) {
         sail_destroy_io(state->io);
     }
 
-    sail_destroy_write_options(state->write_options);
+    sail_destroy_save_options(state->save_options);
 
     /* This state must be freed and zeroed by codecs. We free it just in case to avoid memory leaks. */
     sail_free(state->state);
@@ -130,7 +130,7 @@ sail_status_t stop_writing(void *state, size_t *written) {
         return SAIL_OK;
     }
 
-    SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v6->write_finish(&state_of_mind->state, state_of_mind->io),
+    SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v6->save_finish(&state_of_mind->state, state_of_mind->io),
                         /* cleanup */ destroy_hidden_state(state_of_mind));
 
     if (written != NULL) {

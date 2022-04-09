@@ -42,7 +42,7 @@ struct sail_hash_map;
 struct sail_save_features;
 
 /* Options to modify writing operations. */
-struct sail_write_options {
+struct sail_save_options {
 
     /* Or-ed manipulation options. See SailOption. */
     int options;
@@ -72,35 +72,35 @@ struct sail_write_options {
     double compression_level;
 };
 
-typedef struct sail_write_options sail_write_options_t;
+typedef struct sail_save_options sail_save_options_t;
 
 /*
- * Allocates write options.
+ * Allocates save options.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_write_options(struct sail_write_options **write_options);
+SAIL_EXPORT sail_status_t sail_alloc_save_options(struct sail_save_options **save_options);
 
 /*
- * Destroys the specified write options object and all its internal allocated memory buffers.
- * The write options MUST NOT be used anymore after calling this function. It does nothing
- * if the write options is NULL.
+ * Destroys the specified save options object and all its internal allocated memory buffers.
+ * The save options MUST NOT be used anymore after calling this function. It does nothing
+ * if the save options is NULL.
  */
-SAIL_EXPORT void sail_destroy_write_options(struct sail_write_options *write_options);
+SAIL_EXPORT void sail_destroy_save_options(struct sail_save_options *save_options);
 
 /*
- * Allocates and builds default write options from the save features.
+ * Allocates and builds default save options from the save features.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_write_options_from_features(const struct sail_save_features *save_features, struct sail_write_options **write_options);
+SAIL_EXPORT sail_status_t sail_alloc_save_options_from_features(const struct sail_save_features *save_features, struct sail_save_options **save_options);
 
 /*
- * Makes a deep copy of the specified write options object.
+ * Makes a deep copy of the specified save options object.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_copy_write_options(const struct sail_write_options *source, struct sail_write_options **target);
+SAIL_EXPORT sail_status_t sail_copy_save_options(const struct sail_save_options *source, struct sail_save_options **target);
 
 /* extern "C" */
 #ifdef __cplusplus

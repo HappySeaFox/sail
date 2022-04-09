@@ -46,7 +46,7 @@ struct sail_save_features;
 namespace sail
 {
 
-class write_options;
+class save_options;
 
 /*
  * Write features. Use this structure to determine what a codec can actually write.
@@ -155,12 +155,12 @@ public:
     double compression_level_step() const;
 
     /*
-     * Builds default write options from the save features. Can be used to build
-     * default write options and then slightly modify them before passing to image_output.
+     * Builds default save options from the save features. Can be used to build
+     * default save options and then slightly modify them before passing to image_output.
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t to_write_options(sail::write_options *write_options) const;
+    sail_status_t to_save_options(sail::save_options *save_options) const;
 
 private:
     save_features();

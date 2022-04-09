@@ -46,9 +46,9 @@ namespace sail
 {
 
 class abstract_io;
-class image;
 class codec_info;
-class write_options;
+class image;
+class save_options;
 
 /*
  * Class to write images into files, memory, and custom I/O targets.
@@ -90,7 +90,7 @@ public:
     sail_status_t start(std::string_view path, const sail::codec_info &codec_info);
 
     /*
-     * Starts writing into the specified image file with the specified write options.
+     * Starts writing into the specified image file with the specified save options.
      *
      * Typical usage: start()          ->
      *                next_frame() x n ->
@@ -98,10 +98,10 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t start(std::string_view path, const sail::write_options &write_options);
+    sail_status_t start(std::string_view path, const sail::save_options &save_options);
 
     /*
-     * Starts writing into the specified image file with the specified codec and write options.
+     * Starts writing into the specified image file with the specified codec and save options.
      *
      * Typical usage: codec_info::from_extension() ->
      *                start()                      ->
@@ -110,7 +110,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t start(std::string_view path, const sail::codec_info &codec_info, const sail::write_options &write_options);
+    sail_status_t start(std::string_view path, const sail::codec_info &codec_info, const sail::save_options &save_options);
 
     /*
      * Starts writing into the specified memory buffer with the specified codec.
@@ -125,7 +125,7 @@ public:
     sail_status_t start(void *buffer, std::size_t buffer_length, const sail::codec_info &codec_info);
 
     /*
-     * Starts writing into the specified memory buffer with the specified codec and write options.
+     * Starts writing into the specified memory buffer with the specified codec and save options.
      *
      * Typical usage: codec_info::from_extension() ->
      *                start()                      ->
@@ -134,7 +134,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t start(void *buffer, std::size_t buffer_length, const sail::codec_info &codec_info, const sail::write_options &write_options);
+    sail_status_t start(void *buffer, std::size_t buffer_length, const sail::codec_info &codec_info, const sail::save_options &save_options);
 
     /*
      * Starts writing into the specified memory buffer with the specified codec.
@@ -149,7 +149,7 @@ public:
     sail_status_t start(sail::arbitrary_data *arbitrary_data, const sail::codec_info &codec_info);
 
     /*
-     * Starts writing into the specified memory buffer with the specified codec and write options.
+     * Starts writing into the specified memory buffer with the specified codec and save options.
      *
      * Typical usage: codec_info::from_extension() ->
      *                start()                      ->
@@ -158,7 +158,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t start(sail::arbitrary_data *arbitrary_data, const sail::codec_info &codec_info, const sail::write_options &write_options);
+    sail_status_t start(sail::arbitrary_data *arbitrary_data, const sail::codec_info &codec_info, const sail::save_options &save_options);
 
     /*
      * Starts writing into the specified I/O target with the specified codec.
@@ -173,7 +173,7 @@ public:
     sail_status_t start(sail::abstract_io &abstract_io, const sail::codec_info &codec_info);
 
     /*
-     * Starts writing into the specified I/O target with the specified codec and write options.
+     * Starts writing into the specified I/O target with the specified codec and save options.
      *
      * Typical usage: codec_info::from_extension() ->
      *                start()                      ->
@@ -182,7 +182,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t start(sail::abstract_io &abstract_io, const sail::codec_info &codec_info, const sail::write_options &write_options);
+    sail_status_t start(sail::abstract_io &abstract_io, const sail::codec_info &codec_info, const sail::save_options &save_options);
 
     /*
      * Continues writing started by start(). Saves the specified image into the underlying I/O target.

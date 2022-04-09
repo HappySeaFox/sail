@@ -43,10 +43,10 @@ struct sail_codec_layout_v6 {
     sail_codec_load_frame_v6_t           load_frame;
     sail_codec_load_finish_v6_t          load_finish;
 
-    sail_codec_write_init_v6_t            write_init;
-    sail_codec_write_seek_next_frame_v6_t write_seek_next_frame;
-    sail_codec_write_frame_v6_t           write_frame;
-    sail_codec_write_finish_v6_t          write_finish;
+    sail_codec_save_init_v6_t            save_init;
+    sail_codec_save_seek_next_frame_v6_t save_seek_next_frame;
+    sail_codec_save_frame_v6_t           save_frame;
+    sail_codec_save_finish_v6_t          save_finish;
 };
 
 #endif

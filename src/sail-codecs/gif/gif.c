@@ -44,7 +44,7 @@ static const int InterlacedJumps[]  = { 8, 8, 4, 2 };
  */
 struct gif_state {
     struct sail_load_options *load_options;
-    struct sail_write_options *write_options;
+    struct sail_save_options *save_options;
 
     GifFileType *gif;
     const ColorMapObject *map;
@@ -72,8 +72,8 @@ static sail_status_t alloc_gif_state(struct gif_state **gif_state) {
     SAIL_TRY(sail_malloc(sizeof(struct gif_state), &ptr));
     *gif_state = ptr;
 
-    (*gif_state)->load_options  = NULL;
-    (*gif_state)->write_options = NULL;
+    (*gif_state)->load_options = NULL;
+    (*gif_state)->save_options = NULL;
 
     (*gif_state)->gif                = NULL;
     (*gif_state)->map                = NULL;
@@ -102,7 +102,7 @@ static void destroy_gif_state(struct gif_state *gif_state) {
     }
 
     sail_destroy_load_options(gif_state->load_options);
-    sail_destroy_write_options(gif_state->write_options);
+    sail_destroy_save_options(gif_state->save_options);
 
     sail_free(gif_state->buf);
 
@@ -455,25 +455,16 @@ SAIL_EXPORT sail_status_t sail_codec_load_finish_v6_gif(void **state, struct sai
  * Encoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_write_init_v6_gif(struct sail_io *io, const struct sail_write_options *write_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_save_init_v6_gif(struct sail_io *io, const struct sail_save_options *save_options, void **state) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
-    SAIL_CHECK_PTR(write_options);
+    SAIL_CHECK_PTR(save_options);
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-SAIL_EXPORT sail_status_t sail_codec_write_seek_next_frame_v6_gif(void *state, struct sail_io *io, const struct sail_image *image) {
-
-    SAIL_CHECK_PTR(state);
-    SAIL_TRY(sail_check_io_valid(io));
-    SAIL_TRY(sail_check_image_valid(image));
-
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
-}
-
-SAIL_EXPORT sail_status_t sail_codec_write_frame_v6_gif(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v6_gif(void *state, struct sail_io *io, const struct sail_image *image) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));
@@ -482,7 +473,16 @@ SAIL_EXPORT sail_status_t sail_codec_write_frame_v6_gif(void *state, struct sail
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-SAIL_EXPORT sail_status_t sail_codec_write_finish_v6_gif(void **state, struct sail_io *io) {
+SAIL_EXPORT sail_status_t sail_codec_save_frame_v6_gif(void *state, struct sail_io *io, const struct sail_image *image) {
+
+    SAIL_CHECK_PTR(state);
+    SAIL_TRY(sail_check_io_valid(io));
+    SAIL_TRY(sail_check_image_valid(image));
+
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
+}
+
+SAIL_EXPORT sail_status_t sail_codec_save_finish_v6_gif(void **state, struct sail_io *io) {
 
     SAIL_CHECK_PTR(state);
     SAIL_TRY(sail_check_io_valid(io));

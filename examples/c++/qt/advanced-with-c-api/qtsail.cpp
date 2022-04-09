@@ -201,14 +201,14 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
     image = image_converted;
 
     /*
-     * Create write options to pass PNG filters.
+     * Create save options to pass PNG filters.
      */
-    struct sail_write_options *write_options;
-    SAIL_TRY_OR_CLEANUP(sail_alloc_write_options_from_features(codec_info->save_features, &write_options),
+    struct sail_save_options *save_options;
+    SAIL_TRY_OR_CLEANUP(sail_alloc_save_options_from_features(codec_info->save_features, &save_options),
                         /* cleanup */ sail_destroy_image(image));
 
-    SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&write_options->tuning),
-                        /* cleanup */ sail_destroy_write_options(write_options),
+    SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&save_options->tuning),
+                        /* cleanup */ sail_destroy_save_options(save_options),
                                       sail_destroy_image(image));
 
     /*
@@ -220,18 +220,18 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
      */
     struct sail_variant *value;
     SAIL_TRY_OR_CLEANUP(sail_alloc_variant(&value),
-                        /* cleanup */ sail_destroy_write_options(write_options),
+                        /* cleanup */ sail_destroy_save_options(save_options),
                                       sail_destroy_image(image));
 
     sail_set_variant_string(value, "none;sub");
-    sail_put_hash_map(write_options->tuning, "png-filter", value);
+    sail_put_hash_map(save_options->tuning, "png-filter", value);
     sail_destroy_variant(value);
 
-    SAIL_TRY_OR_CLEANUP(sail_start_writing_file_with_options(path.toLocal8Bit(), nullptr, write_options, &state),
-                        /* cleanup */ sail_destroy_write_options(write_options),
+    SAIL_TRY_OR_CLEANUP(sail_start_writing_file_with_options(path.toLocal8Bit(), nullptr, save_options, &state),
+                        /* cleanup */ sail_destroy_save_options(save_options),
                                       sail_destroy_image(image));
 
-    sail_destroy_write_options(write_options);
+    sail_destroy_save_options(save_options);
 
     SAIL_TRY_OR_CLEANUP(sail_write_next_frame(state, image),
                         /* cleanup */ sail_destroy_image(image));

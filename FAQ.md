@@ -358,7 +358,7 @@ tuning=abc-filtering
 features=STATIC;META-DATA;INTERLACED;ICCP
 
 # ';'-separated list of codec-specific tuning options. For example, it's possible
-# to disable ABC codec filtering with setting abc-filtering to 0 in write options.
+# to disable ABC codec filtering with setting abc-filtering to 0 in save options.
 # Tuning options' names must start with the codec name to avoid confusing.
 #
 # The list of possible values for every tuning option is not current available
