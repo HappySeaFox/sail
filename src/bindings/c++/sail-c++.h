@@ -34,8 +34,8 @@
     #ifdef _MSC_VER
     #pragma warning(push)
     /*
-     * read_options-c++.h: warning C4251: 'sail::read_options::d': class 'std::unique_ptr<...>'
-     * needs to have dll-interface to be used by clients of class 'sail::read_options'.
+     * load_options-c++.h: warning C4251: 'sail::load_options::d': class 'std::unique_ptr<...>'
+     * needs to have dll-interface to be used by clients of class 'sail::load_options'.
      *
      * To fix this warning we need to stop exporting whole classes and start exporting
      * individual methods. Just silence this warning.
@@ -59,10 +59,10 @@
     #include "io_file-c++.h"
     #include "io_memory-c++.h"
     #include "load_features-c++.h"
+    #include "load_options-c++.h"
     #include "log-c++.h"
     #include "meta_data-c++.h"
     #include "palette-c++.h"
-    #include "read_options-c++.h"
     #include "resolution-c++.h"
     #include "source_image-c++.h"
     #include "special_properties-c++.h"
@@ -94,10 +94,10 @@
     #include <sail-c++/io_file-c++.h>
     #include <sail-c++/io_memory-c++.h>
     #include <sail-c++/load_features-c++.h>
+    #include <sail-c++/load_options-c++.h>
     #include <sail-c++/log-c++.h>
     #include <sail-c++/meta_data-c++.h>
     #include <sail-c++/palette-c++.h>
-    #include <sail-c++/read_options-c++.h>
     #include <sail-c++/resolution-c++.h>
     #include <sail-c++/source_image-c++.h>
     #include <sail-c++/special_properties-c++.h>

@@ -54,7 +54,7 @@ struct jpeg_state {
     struct jpeg_compress_struct *compress_context;
     struct jpeg_private_my_error_context error_context;
     bool libjpeg_error;
-    struct sail_read_options *read_options;
+    struct sail_load_options *load_options;
     struct sail_write_options *write_options;
     bool frame_read;
     bool frame_written;
@@ -70,7 +70,7 @@ static sail_status_t alloc_jpeg_state(struct jpeg_state **jpeg_state) {
     (*jpeg_state)->decompress_context = NULL;
     (*jpeg_state)->compress_context   = NULL;
     (*jpeg_state)->libjpeg_error      = false;
-    (*jpeg_state)->read_options       = NULL;
+    (*jpeg_state)->load_options       = NULL;
     (*jpeg_state)->write_options      = NULL;
     (*jpeg_state)->frame_read         = false;
     (*jpeg_state)->frame_written      = false;
@@ -88,7 +88,7 @@ static void destroy_jpeg_state(struct jpeg_state *jpeg_state) {
     sail_free(jpeg_state->decompress_context);
     sail_free(jpeg_state->compress_context);
 
-    sail_destroy_read_options(jpeg_state->read_options);
+    sail_destroy_load_options(jpeg_state->load_options);
     sail_destroy_write_options(jpeg_state->write_options);
 
     sail_free(jpeg_state);
@@ -98,13 +98,13 @@ static void destroy_jpeg_state(struct jpeg_state *jpeg_state) {
  * Decoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_read_init_v6_jpeg(struct sail_io *io, const struct sail_read_options *read_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_read_init_v6_jpeg(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
 
     SAIL_CHECK_PTR(state);
     *state = NULL;
 
     SAIL_TRY(sail_check_io_valid(io));
-    SAIL_CHECK_PTR(read_options);
+    SAIL_CHECK_PTR(load_options);
 
     /* Allocate a new state. */
     struct jpeg_state *jpeg_state;
@@ -113,7 +113,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_jpeg(struct sail_io *io, const
     *state = jpeg_state;
 
     /* Deep copy load options. */
-    SAIL_TRY(sail_copy_read_options(read_options, &jpeg_state->read_options));
+    SAIL_TRY(sail_copy_load_options(load_options, &jpeg_state->load_options));
 
     /* Create decompress context. */
     void *ptr;
@@ -134,10 +134,10 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_jpeg(struct sail_io *io, const
     jpeg_create_decompress(jpeg_state->decompress_context);
     jpeg_private_sail_io_src(jpeg_state->decompress_context, io);
 
-    if (jpeg_state->read_options->options & SAIL_OPTION_META_DATA) {
+    if (jpeg_state->load_options->options & SAIL_OPTION_META_DATA) {
         jpeg_save_markers(jpeg_state->decompress_context, JPEG_COM, 0xffff);
     }
-    if (jpeg_state->read_options->options & SAIL_OPTION_ICCP) {
+    if (jpeg_state->load_options->options & SAIL_OPTION_ICCP) {
         jpeg_save_markers(jpeg_state->decompress_context, JPEG_APP0 + 2, 0xFFFF);
     }
 
@@ -195,7 +195,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_jpeg(void *state, s
                         /* cleanup */ sail_destroy_image(image_local));
 
     /* Read meta data. */
-    if (jpeg_state->read_options->options & SAIL_OPTION_META_DATA) {
+    if (jpeg_state->load_options->options & SAIL_OPTION_META_DATA) {
         SAIL_TRY_OR_CLEANUP(jpeg_private_fetch_meta_data(jpeg_state->decompress_context, &image_local->meta_data_node),
                             /* cleanup */ sail_destroy_image(image_local));
     }
@@ -206,7 +206,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_jpeg(void *state, s
 
     /* Fetch ICC profile. */
 #ifdef SAIL_HAVE_JPEG_ICCP
-    if (jpeg_state->read_options->options & SAIL_OPTION_ICCP) {
+    if (jpeg_state->load_options->options & SAIL_OPTION_ICCP) {
         SAIL_TRY_OR_CLEANUP(jpeg_private_fetch_iccp(jpeg_state->decompress_context, &image_local->iccp),
                             /* cleanup */ sail_destroy_image(image_local));
     }

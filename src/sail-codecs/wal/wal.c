@@ -36,7 +36,7 @@
  * Codec-specific state.
  */
 struct wal_state {
-    struct sail_read_options *read_options;
+    struct sail_load_options *load_options;
     struct sail_write_options *write_options;
 
     unsigned frame_number;
@@ -52,7 +52,7 @@ static sail_status_t alloc_wal_state(struct wal_state **wal_state) {
     SAIL_TRY(sail_malloc(sizeof(struct wal_state), &ptr));
     *wal_state = ptr;
 
-    (*wal_state)->read_options  = NULL;
+    (*wal_state)->load_options  = NULL;
     (*wal_state)->write_options = NULL;
 
     (*wal_state)->frame_number  = 0;
@@ -68,7 +68,7 @@ static void destroy_wal_state(struct wal_state *wal_state) {
         return;
     }
 
-    sail_destroy_read_options(wal_state->read_options);
+    sail_destroy_load_options(wal_state->load_options);
     sail_destroy_write_options(wal_state->write_options);
 
     sail_free(wal_state);
@@ -78,13 +78,13 @@ static void destroy_wal_state(struct wal_state *wal_state) {
  * Decoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_read_init_v6_wal(struct sail_io *io, const struct sail_read_options *read_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_read_init_v6_wal(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
 
     SAIL_CHECK_PTR(state);
     *state = NULL;
 
     SAIL_TRY(sail_check_io_valid(io));
-    SAIL_CHECK_PTR(read_options);
+    SAIL_CHECK_PTR(load_options);
 
     /* Allocate a new state. */
     struct wal_state *wal_state;
@@ -92,7 +92,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_wal(struct sail_io *io, const 
     *state = wal_state;
 
     /* Deep copy load options. */
-    SAIL_TRY(sail_copy_read_options(read_options, &wal_state->read_options));
+    SAIL_TRY(sail_copy_load_options(load_options, &wal_state->load_options));
 
     /* Read WAL header. */
     SAIL_TRY(wal_private_read_file_header(io, &wal_state->wal_header));

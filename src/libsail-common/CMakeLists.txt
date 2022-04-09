@@ -26,6 +26,8 @@ add_library(sail-common
                 linked_list_node.h
                 load_features.c
                 load_features.h
+                load_options.c
+                load_options.h
                 log.c
                 log.h
                 memory.c
@@ -38,8 +40,6 @@ add_library(sail-common
                 palette.h
                 pixel.c
                 pixel.h
-                read_options.c
-                read_options.h
                 resolution.c
                 resolution.h
                 sail-common.h
@@ -70,13 +70,13 @@ set(PUBLIC_HEADERS "common.h"
                    "image.h"
                    "io_common.h"
                    "load_features.h"
+                   "load_options.h"
                    "log.h"
                    "memory.h"
                    "meta_data.h"
                    "meta_data_node.h"
                    "palette.h"
                    "pixel.h"
-                   "read_options.h"
                    "resolution.h"
                    "sail-common.h"
                    "source_image.h"

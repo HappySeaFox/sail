@@ -33,7 +33,7 @@
  * Codec-specific state.
  */
 struct bmp_state {
-    struct sail_read_options *read_options;
+    struct sail_load_options *load_options;
     struct sail_write_options *write_options;
 
     bool frame_read;
@@ -46,7 +46,7 @@ static sail_status_t alloc_bmp_state(struct bmp_state **bmp_state) {
     SAIL_TRY(sail_malloc(sizeof(struct bmp_state), &ptr));
     *bmp_state = ptr;
 
-    (*bmp_state)->read_options  = NULL;
+    (*bmp_state)->load_options  = NULL;
     (*bmp_state)->write_options = NULL;
 
     (*bmp_state)->frame_read       = false;
@@ -61,7 +61,7 @@ static void destroy_bmp_state(struct bmp_state *bmp_state) {
         return;
     }
 
-    sail_destroy_read_options(bmp_state->read_options);
+    sail_destroy_load_options(bmp_state->load_options);
     sail_destroy_write_options(bmp_state->write_options);
 
     sail_free(bmp_state);
@@ -71,13 +71,13 @@ static void destroy_bmp_state(struct bmp_state *bmp_state) {
  * Decoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_read_init_v6_bmp(struct sail_io *io, const struct sail_read_options *read_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_read_init_v6_bmp(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
 
     SAIL_CHECK_PTR(state);
     *state = NULL;
 
     SAIL_TRY(sail_check_io_valid(io));
-    SAIL_CHECK_PTR(read_options);
+    SAIL_CHECK_PTR(load_options);
 
     /* Allocate a new state. */
     struct bmp_state *bmp_state;
@@ -85,9 +85,9 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_bmp(struct sail_io *io, const 
     *state = bmp_state;
 
     /* Deep copy load options. */
-    SAIL_TRY(sail_copy_read_options(read_options, &bmp_state->read_options));
+    SAIL_TRY(sail_copy_load_options(load_options, &bmp_state->load_options));
 
-    SAIL_TRY(bmp_private_read_init(io, bmp_state->read_options, &bmp_state->common_bmp_state, SAIL_READ_BMP_FILE_HEADER));
+    SAIL_TRY(bmp_private_read_init(io, bmp_state->load_options, &bmp_state->common_bmp_state, SAIL_READ_BMP_FILE_HEADER));
 
     return SAIL_OK;
 }

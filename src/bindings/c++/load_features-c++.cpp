@@ -80,18 +80,18 @@ const sail::supported_tuning& load_features::supported_tuning() const
     return d->supported_tuning;
 }
 
-sail_status_t load_features::to_read_options(sail::read_options *read_options) const
+sail_status_t load_features::to_load_options(sail::load_options *load_options) const
 {
     SAIL_CHECK_PTR(d->sail_load_features_c);
-    SAIL_CHECK_PTR(read_options);
+    SAIL_CHECK_PTR(load_options);
 
-    sail_read_options *sail_read_options;
+    sail_load_options *sail_load_options;
 
-    SAIL_TRY(sail_alloc_read_options_from_features(d->sail_load_features_c, &sail_read_options));
+    SAIL_TRY(sail_alloc_load_options_from_features(d->sail_load_features_c, &sail_load_options));
 
-    *read_options = sail::read_options(sail_read_options);
+    *load_options = sail::load_options(sail_load_options);
 
-    sail_destroy_read_options(sail_read_options);
+    sail_destroy_load_options(sail_load_options);
 
     return SAIL_OK;
 }

@@ -41,7 +41,7 @@ enum SailXbmVersion {
  * Codec-specific state.
  */
 struct xbm_state {
-    struct sail_read_options *read_options;
+    struct sail_load_options *load_options;
     struct sail_write_options *write_options;
 
     bool frame_read;
@@ -55,7 +55,7 @@ static sail_status_t alloc_xbm_state(struct xbm_state **xbm_state) {
     SAIL_TRY(sail_malloc(sizeof(struct xbm_state), &ptr));
     *xbm_state = ptr;
 
-    (*xbm_state)->read_options  = NULL;
+    (*xbm_state)->load_options  = NULL;
     (*xbm_state)->write_options = NULL;
 
     (*xbm_state)->frame_read    = false;
@@ -69,7 +69,7 @@ static void destroy_xbm_state(struct xbm_state *xbm_state) {
         return;
     }
 
-    sail_destroy_read_options(xbm_state->read_options);
+    sail_destroy_load_options(xbm_state->load_options);
     sail_destroy_write_options(xbm_state->write_options);
 
     sail_free(xbm_state);
@@ -79,13 +79,13 @@ static void destroy_xbm_state(struct xbm_state *xbm_state) {
  * Decoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_read_init_v6_xbm(struct sail_io *io, const struct sail_read_options *read_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_read_init_v6_xbm(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
 
     SAIL_CHECK_PTR(state);
     *state = NULL;
 
     SAIL_TRY(sail_check_io_valid(io));
-    SAIL_CHECK_PTR(read_options);
+    SAIL_CHECK_PTR(load_options);
 
     /* Allocate a new state. */
     struct xbm_state *xbm_state;
@@ -93,7 +93,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_xbm(struct sail_io *io, const 
     *state = xbm_state;
 
     /* Deep copy load options. */
-    SAIL_TRY(sail_copy_read_options(read_options, &xbm_state->read_options));
+    SAIL_TRY(sail_copy_load_options(load_options, &xbm_state->load_options));
 
     return SAIL_OK;
 }

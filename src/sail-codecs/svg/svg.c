@@ -35,7 +35,7 @@
  * Codec-specific state.
  */
 struct svg_state {
-    struct sail_read_options *read_options;
+    struct sail_load_options *load_options;
     struct sail_write_options *write_options;
 
     bool frame_read;
@@ -49,7 +49,7 @@ static sail_status_t alloc_svg_state(struct svg_state **svg_state) {
     SAIL_TRY(sail_malloc(sizeof(struct svg_state), &ptr));
     *svg_state = ptr;
 
-    (*svg_state)->read_options  = NULL;
+    (*svg_state)->load_options  = NULL;
     (*svg_state)->write_options = NULL;
 
     (*svg_state)->frame_read    = false;
@@ -65,7 +65,7 @@ static void destroy_svg_state(struct svg_state *svg_state) {
         return;
     }
 
-    sail_destroy_read_options(svg_state->read_options);
+    sail_destroy_load_options(svg_state->load_options);
     sail_destroy_write_options(svg_state->write_options);
 
     if (svg_state->resvg_options != NULL) {
@@ -83,13 +83,13 @@ static void destroy_svg_state(struct svg_state *svg_state) {
  * Decoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_read_init_v6_svg(struct sail_io *io, const struct sail_read_options *read_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_read_init_v6_svg(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
 
     SAIL_CHECK_PTR(state);
     *state = NULL;
 
     SAIL_TRY(sail_check_io_valid(io));
-    SAIL_CHECK_PTR(read_options);
+    SAIL_CHECK_PTR(load_options);
 
     /* Allocate a new state. */
     struct svg_state *svg_state;
@@ -97,7 +97,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_svg(struct sail_io *io, const 
     *state = svg_state;
 
     /* Deep copy load options. */
-    SAIL_TRY(sail_copy_read_options(read_options, &svg_state->read_options));
+    SAIL_TRY(sail_copy_load_options(load_options, &svg_state->load_options));
 
     /* Read the entire image as the resvg API requires. */
     void *image_data;

@@ -46,7 +46,7 @@ struct sail_load_features;
 namespace sail
 {
 
-class read_options;
+class load_options;
 
 /*
  * Load features. Use this class to determine what a codec can actually read.
@@ -107,7 +107,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t to_read_options(sail::read_options *read_options) const;
+    sail_status_t to_load_options(sail::load_options *load_options) const;
 
 private:
     load_features();

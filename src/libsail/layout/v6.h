@@ -81,7 +81,7 @@ Please define SAIL_CODEC_NAME before including this header.
  *
  * Returns SAIL_OK on success.
  */
-sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_read_init_v6)(struct sail_io *io, const struct sail_read_options *read_options, void **state);
+sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_read_init_v6)(struct sail_io *io, const struct sail_load_options *load_options, void **state);
 
 /*
  * Seeks to the next frame. The frame is NOT immediately loaded or decoded by most SAIL codecs.

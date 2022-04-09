@@ -39,9 +39,9 @@ sail_status_t sail_start_loading_io(struct sail_io *io, const struct sail_codec_
 
 sail_status_t sail_start_loading_io_with_options(struct sail_io *io,
                                                 const struct sail_codec_info *codec_info,
-                                                const struct sail_read_options *read_options, void **state) {
+                                                const struct sail_load_options *load_options, void **state) {
 
-    SAIL_TRY(start_loading_io_with_options(io, false, codec_info, read_options, state));
+    SAIL_TRY(start_loading_io_with_options(io, false, codec_info, load_options, state));
 
     return SAIL_OK;
 }

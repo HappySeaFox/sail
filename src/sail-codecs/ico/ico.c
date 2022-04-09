@@ -42,7 +42,7 @@
  * Codec-specific state.
  */
 struct ico_state {
-    struct sail_read_options *read_options;
+    struct sail_load_options *load_options;
     struct sail_write_options *write_options;
 
     struct SailIcoHeader ico_header;
@@ -58,7 +58,7 @@ static sail_status_t alloc_ico_state(struct ico_state **ico_state) {
     SAIL_TRY(sail_malloc(sizeof(struct ico_state), &ptr));
     *ico_state = ptr;
 
-    (*ico_state)->read_options  = NULL;
+    (*ico_state)->load_options  = NULL;
     (*ico_state)->write_options = NULL;
 
     (*ico_state)->ico_dir_entries  = NULL;
@@ -74,7 +74,7 @@ static void destroy_ico_state(struct ico_state *ico_state) {
         return;
     }
 
-    sail_destroy_read_options(ico_state->read_options);
+    sail_destroy_load_options(ico_state->load_options);
     sail_destroy_write_options(ico_state->write_options);
 
     sail_free(ico_state->ico_dir_entries);
@@ -86,13 +86,13 @@ static void destroy_ico_state(struct ico_state *ico_state) {
  * Decoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_read_init_v6_ico(struct sail_io *io, const struct sail_read_options *read_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_read_init_v6_ico(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
 
     SAIL_CHECK_PTR(state);
     *state = NULL;
 
     SAIL_TRY(sail_check_io_valid(io));
-    SAIL_CHECK_PTR(read_options);
+    SAIL_CHECK_PTR(load_options);
 
     /* Allocate a new state. */
     struct ico_state *ico_state;
@@ -152,7 +152,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_ico(void *state, st
     /* Continue to loading BMP. */
     struct sail_image *image_local;
 
-    SAIL_TRY(bmp_private_read_init(io, ico_state->read_options, &ico_state->common_bmp_state, SAIL_NO_BMP_FLAGS));
+    SAIL_TRY(bmp_private_read_init(io, ico_state->load_options, &ico_state->common_bmp_state, SAIL_NO_BMP_FLAGS));
     SAIL_TRY(bmp_private_read_seek_next_frame(ico_state->common_bmp_state, io, &image_local));
 
     /* Store CUR hotspot. */

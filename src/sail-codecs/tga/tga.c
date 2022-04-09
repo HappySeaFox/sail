@@ -39,7 +39,7 @@ static const int          TGA_FOOTER_SIZE = 26;
  * Codec-specific state.
  */
 struct tga_state {
-    struct sail_read_options *read_options;
+    struct sail_load_options *load_options;
     struct sail_write_options *write_options;
 
     struct TgaFileHeader file_header;
@@ -57,7 +57,7 @@ static sail_status_t alloc_tga_state(struct tga_state **tga_state) {
     SAIL_TRY(sail_malloc(sizeof(struct tga_state), &ptr));
     *tga_state = ptr;
 
-    (*tga_state)->read_options  = NULL;
+    (*tga_state)->load_options  = NULL;
     (*tga_state)->write_options = NULL;
 
     (*tga_state)->frame_read    = false;
@@ -74,7 +74,7 @@ static void destroy_tga_state(struct tga_state *tga_state) {
         return;
     }
 
-    sail_destroy_read_options(tga_state->read_options);
+    sail_destroy_load_options(tga_state->load_options);
     sail_destroy_write_options(tga_state->write_options);
 
     sail_free(tga_state);
@@ -84,13 +84,13 @@ static void destroy_tga_state(struct tga_state *tga_state) {
  * Decoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_read_init_v6_tga(struct sail_io *io, const struct sail_read_options *read_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_read_init_v6_tga(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
 
     SAIL_CHECK_PTR(state);
     *state = NULL;
 
     SAIL_TRY(sail_check_io_valid(io));
-    SAIL_CHECK_PTR(read_options);
+    SAIL_CHECK_PTR(load_options);
 
     /* Allocate a new state. */
     struct tga_state *tga_state;
@@ -98,7 +98,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_tga(struct sail_io *io, const 
     *state = tga_state;
 
     /* Deep copy load options. */
-    SAIL_TRY(sail_copy_read_options(read_options, &tga_state->read_options));
+    SAIL_TRY(sail_copy_load_options(load_options, &tga_state->load_options));
 
     /* Read TGA footer. */
     SAIL_TRY(io->seek(io->stream, -TGA_FOOTER_SIZE, SEEK_END));

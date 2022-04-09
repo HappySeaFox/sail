@@ -58,7 +58,7 @@ struct png_state {
     struct sail_image *first_image;
     int interlaced_passes;
     bool libpng_error;
-    struct sail_read_options *read_options;
+    struct sail_load_options *load_options;
     struct sail_write_options *write_options;
     bool frame_written;
     int frames;
@@ -101,7 +101,7 @@ static sail_status_t alloc_png_state(struct png_state **png_state) {
     (*png_state)->first_image       = NULL;
     (*png_state)->interlaced_passes = 0;
     (*png_state)->libpng_error      = false;
-    (*png_state)->read_options      = NULL;
+    (*png_state)->load_options      = NULL;
     (*png_state)->write_options     = NULL;
     (*png_state)->frame_written     = false;
     (*png_state)->frames            = 0;
@@ -136,7 +136,7 @@ static void destroy_png_state(struct png_state *png_state) {
         return;
     }
 
-    sail_destroy_read_options(png_state->read_options);
+    sail_destroy_load_options(png_state->load_options);
     sail_destroy_write_options(png_state->write_options);
 
 #ifdef PNG_APNG_SUPPORTED
@@ -157,13 +157,13 @@ static void destroy_png_state(struct png_state *png_state) {
  * Decoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_read_init_v6_png(struct sail_io *io, const struct sail_read_options *read_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_read_init_v6_png(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
 
     SAIL_CHECK_PTR(state);
     *state = NULL;
 
     SAIL_TRY(sail_check_io_valid(io));
-    SAIL_CHECK_PTR(read_options);
+    SAIL_CHECK_PTR(load_options);
 
     /* Allocate a new state. */
     struct png_state *png_state;
@@ -172,7 +172,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_png(struct sail_io *io, const 
     *state = png_state;
 
     /* Deep copy load options. */
-    SAIL_TRY(sail_copy_read_options(read_options, &png_state->read_options));
+    SAIL_TRY(sail_copy_load_options(load_options, &png_state->load_options));
 
     /* Initialize PNG. */
     if ((png_state->png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, png_private_my_error_fn, png_private_my_warning_fn)) == NULL) {
@@ -253,12 +253,12 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_png(struct sail_io *io, const 
     }
 
     /* Read meta data. */
-    if (png_state->read_options->options & SAIL_OPTION_META_DATA) {
+    if (png_state->load_options->options & SAIL_OPTION_META_DATA) {
         SAIL_TRY(png_private_fetch_meta_data(png_state->png_ptr, png_state->info_ptr, &png_state->first_image->meta_data_node));
     }
 
     /* Fetch ICC profile. */
-    if (png_state->read_options->options & SAIL_OPTION_ICCP) {
+    if (png_state->load_options->options & SAIL_OPTION_ICCP) {
         SAIL_TRY(png_private_fetch_iccp(png_state->png_ptr, png_state->info_ptr, &png_state->first_image->iccp));
     }
 

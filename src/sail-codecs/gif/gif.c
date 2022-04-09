@@ -43,7 +43,7 @@ static const int InterlacedJumps[]  = { 8, 8, 4, 2 };
  * Codec-specific state.
  */
 struct gif_state {
-    struct sail_read_options *read_options;
+    struct sail_load_options *load_options;
     struct sail_write_options *write_options;
 
     GifFileType *gif;
@@ -72,7 +72,7 @@ static sail_status_t alloc_gif_state(struct gif_state **gif_state) {
     SAIL_TRY(sail_malloc(sizeof(struct gif_state), &ptr));
     *gif_state = ptr;
 
-    (*gif_state)->read_options  = NULL;
+    (*gif_state)->load_options  = NULL;
     (*gif_state)->write_options = NULL;
 
     (*gif_state)->gif                = NULL;
@@ -101,7 +101,7 @@ static void destroy_gif_state(struct gif_state *gif_state) {
         return;
     }
 
-    sail_destroy_read_options(gif_state->read_options);
+    sail_destroy_load_options(gif_state->load_options);
     sail_destroy_write_options(gif_state->write_options);
 
     sail_free(gif_state->buf);
@@ -121,13 +121,13 @@ static void destroy_gif_state(struct gif_state *gif_state) {
  * Decoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_read_init_v6_gif(struct sail_io *io, const struct sail_read_options *read_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_read_init_v6_gif(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
 
     SAIL_CHECK_PTR(state);
     *state = NULL;
 
     SAIL_TRY(sail_check_io_valid(io));
-    SAIL_CHECK_PTR(read_options);
+    SAIL_CHECK_PTR(load_options);
 
     /* Allocate a new state. */
     struct gif_state *gif_state;
@@ -135,7 +135,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_gif(struct sail_io *io, const 
     *state = gif_state;
 
     /* Deep copy load options. */
-    SAIL_TRY(sail_copy_read_options(read_options, &gif_state->read_options));
+    SAIL_TRY(sail_copy_load_options(load_options, &gif_state->load_options));
 
     /* Initialize GIF. */
     int error_code;
@@ -273,7 +273,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_gif(void *state, st
                     }
 
                     case COMMENT_EXT_FUNC_CODE: {
-                        if (gif_state->read_options->options & SAIL_OPTION_META_DATA) {
+                        if (gif_state->load_options->options & SAIL_OPTION_META_DATA) {
                             SAIL_TRY_OR_CLEANUP(gif_private_fetch_comment(extension, last_meta_data_node),
                                                 /* cleanup*/ sail_destroy_image(image_local));
                             last_meta_data_node = &(*last_meta_data_node)->next;
@@ -282,7 +282,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_gif(void *state, st
                     }
 
                     case APPLICATION_EXT_FUNC_CODE: {
-                        if (gif_state->read_options->options & SAIL_OPTION_META_DATA) {
+                        if (gif_state->load_options->options & SAIL_OPTION_META_DATA) {
                             SAIL_TRY_OR_CLEANUP(gif_private_fetch_application(extension, last_meta_data_node),
                                                 /* cleanup */ sail_destroy_image(image_local));
                             last_meta_data_node = &(*last_meta_data_node)->next;

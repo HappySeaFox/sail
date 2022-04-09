@@ -41,15 +41,15 @@
     #include <sail-c++/tuning-c++.h>
 #endif
 
-struct sail_read_options;
+struct sail_load_options;
 
 namespace sail
 {
 
 /*
- * read_options represents options to modify loading operations. See image_input.
+ * load_options represents options to modify loading operations. See image_input.
  */
-class SAIL_EXPORT read_options
+class SAIL_EXPORT load_options
 {
     friend class image_input;
     friend class load_features;
@@ -58,32 +58,32 @@ public:
     /*
      * Constructs empty load options.
      */
-    read_options();
+    load_options();
 
     /*
      * Copies the load options.
      */
-    read_options(const read_options &ro);
+    load_options(const load_options &ro);
 
     /*
      * Copies the load options.
      */
-    read_options& operator=(const sail::read_options &read_options);
+    load_options& operator=(const sail::load_options &load_options);
 
     /*
      * Moves the load options.
      */
-    read_options(sail::read_options &&read_options) noexcept;
+    load_options(sail::load_options &&load_options) noexcept;
 
     /*
      * Moves the load options.
      */
-    read_options& operator=(sail::read_options &&read_options) noexcept;
+    load_options& operator=(sail::load_options &&load_options) noexcept;
 
     /*
      * Destroys the load options.
      */
-    ~read_options();
+    ~load_options();
 
     /*
      * Returns the or-ed manipulation options for loading operations. See SailOption.
@@ -133,9 +133,9 @@ private:
      * Makes a deep copy of the specified load options and stores the pointer for further use.
      * When the SAIL context gets uninitialized, the pointer becomes dangling.
      */
-    explicit read_options(const sail_read_options *ro);
+    explicit load_options(const sail_load_options *ro);
 
-    sail_status_t to_sail_read_options(sail_read_options **read_options) const;
+    sail_status_t to_sail_load_options(sail_load_options **load_options) const;
 
 private:
     class pimpl;

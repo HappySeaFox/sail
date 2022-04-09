@@ -37,7 +37,7 @@
  * Codec-specific state.
  */
 struct qoi_state {
-    struct sail_read_options *read_options;
+    struct sail_load_options *load_options;
     struct sail_write_options *write_options;
 
     bool frame_read;
@@ -56,7 +56,7 @@ static sail_status_t alloc_qoi_state(struct qoi_state **qoi_state) {
     SAIL_TRY(sail_malloc(sizeof(struct qoi_state), &ptr));
     *qoi_state = ptr;
 
-    (*qoi_state)->read_options  = NULL;
+    (*qoi_state)->load_options  = NULL;
     (*qoi_state)->write_options = NULL;
 
     (*qoi_state)->frame_read      = false;
@@ -75,7 +75,7 @@ static void destroy_qoi_state(struct qoi_state *qoi_state) {
         return;
     }
 
-    sail_destroy_read_options(qoi_state->read_options);
+    sail_destroy_load_options(qoi_state->load_options);
     sail_destroy_write_options(qoi_state->write_options);
 
     sail_free(qoi_state->image_data);
@@ -88,13 +88,13 @@ static void destroy_qoi_state(struct qoi_state *qoi_state) {
  * Decoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_read_init_v6_qoi(struct sail_io *io, const struct sail_read_options *read_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_read_init_v6_qoi(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
 
     SAIL_CHECK_PTR(state);
     *state = NULL;
 
     SAIL_TRY(sail_check_io_valid(io));
-    SAIL_CHECK_PTR(read_options);
+    SAIL_CHECK_PTR(load_options);
 
     /* Allocate a new state. */
     struct qoi_state *qoi_state;
@@ -102,7 +102,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_qoi(struct sail_io *io, const 
     *state = qoi_state;
 
     /* Deep copy load options. */
-    SAIL_TRY(sail_copy_read_options(read_options, &qoi_state->read_options));
+    SAIL_TRY(sail_copy_load_options(load_options, &qoi_state->load_options));
 
     /* Cache the entire file as the QOI API requires. */
     SAIL_TRY(sail_alloc_data_from_io_contents(io, &qoi_state->image_data, &qoi_state->image_data_size));

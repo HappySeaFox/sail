@@ -37,7 +37,7 @@
  * Codec-specific state.
  */
 struct jpeg2000_state {
-    struct sail_read_options *read_options;
+    struct sail_load_options *load_options;
     struct sail_write_options *write_options;
 
     bool frame_read;
@@ -62,7 +62,7 @@ static sail_status_t alloc_jpeg2000_state(struct jpeg2000_state **jpeg2000_state
 
     jas_init();
 
-    (*jpeg2000_state)->read_options  = NULL;
+    (*jpeg2000_state)->load_options  = NULL;
     (*jpeg2000_state)->write_options = NULL;
 
     (*jpeg2000_state)->frame_read      = false;
@@ -102,7 +102,7 @@ static void destroy_jpeg2000_state(struct jpeg2000_state *jpeg2000_state) {
 
     jas_cleanup();
 
-    sail_destroy_read_options(jpeg2000_state->read_options);
+    sail_destroy_load_options(jpeg2000_state->load_options);
     sail_destroy_write_options(jpeg2000_state->write_options);
 
     sail_free(jpeg2000_state->image_data);
@@ -114,13 +114,13 @@ static void destroy_jpeg2000_state(struct jpeg2000_state *jpeg2000_state) {
  * Decoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_read_init_v6_jpeg2000(struct sail_io *io, const struct sail_read_options *read_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_read_init_v6_jpeg2000(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
 
     SAIL_CHECK_PTR(state);
     *state = NULL;
 
     SAIL_TRY(sail_check_io_valid(io));
-    SAIL_CHECK_PTR(read_options);
+    SAIL_CHECK_PTR(load_options);
 
     /* Allocate a new state. */
     struct jpeg2000_state *jpeg2000_state;
@@ -128,7 +128,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_jpeg2000(struct sail_io *io, c
     *state = jpeg2000_state;
 
     /* Deep copy load options. */
-    SAIL_TRY(sail_copy_read_options(read_options, &jpeg2000_state->read_options));
+    SAIL_TRY(sail_copy_load_options(load_options, &jpeg2000_state->load_options));
 
     /* Read the entire image to use the JasPer memory API. */
     size_t image_size;

@@ -49,7 +49,7 @@ namespace sail
 class abstract_io;
 class image;
 class codec_info;
-class read_options;
+class load_options;
 
 /*
  * Class to probe and load images form files, memory, and custom I/O sources.
@@ -99,7 +99,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t start(std::string_view path, const sail::read_options &read_options);
+    sail_status_t start(std::string_view path, const sail::load_options &load_options);
 
     /*
      * Starts loading the specified image file with the specified codec and load options.
@@ -111,7 +111,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t start(std::string_view path, const sail::codec_info &codec_info, const sail::read_options &read_options);
+    sail_status_t start(std::string_view path, const sail::codec_info &codec_info, const sail::load_options &load_options);
 
     /*
      * Starts loading the specified memory buffer.
@@ -145,7 +145,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t start(const void *buffer, std::size_t buffer_length, const sail::read_options &read_options);
+    sail_status_t start(const void *buffer, std::size_t buffer_length, const sail::load_options &load_options);
 
     /*
      * Starts loading the specified memory buffer with the specified codec and load options.
@@ -157,7 +157,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t start(const void *buffer, std::size_t buffer_length, const sail::codec_info &codec_info, const sail::read_options &read_options);
+    sail_status_t start(const void *buffer, std::size_t buffer_length, const sail::codec_info &codec_info, const sail::load_options &load_options);
 
     /*
      * Starts loading the specified memory buffer.
@@ -191,7 +191,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t start(const sail::arbitrary_data &arbitrary_data, const sail::read_options &read_options);
+    sail_status_t start(const sail::arbitrary_data &arbitrary_data, const sail::load_options &load_options);
 
     /*
      * Starts loading the specified memory buffer with the specified codec and load options.
@@ -203,7 +203,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t start(const sail::arbitrary_data &arbitrary_data, const sail::codec_info &codec_info, const sail::read_options &read_options);
+    sail_status_t start(const sail::arbitrary_data &arbitrary_data, const sail::codec_info &codec_info, const sail::load_options &load_options);
 
     /*
      * Starts loading the specified I/O source.
@@ -237,7 +237,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t start(sail::abstract_io &abstract_io, const sail::read_options &read_options);
+    sail_status_t start(sail::abstract_io &abstract_io, const sail::load_options &load_options);
 
     /*
      * Starts loading the specified I/O source with the specified codec and load options.
@@ -249,7 +249,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t start(sail::abstract_io &abstract_io, const sail::codec_info &codec_info, const sail::read_options &read_options);
+    sail_status_t start(sail::abstract_io &abstract_io, const sail::codec_info &codec_info, const sail::load_options &load_options);
 
     /*
      * Continues loading the source started by the previous call to start().

@@ -69,10 +69,10 @@ static const char SAIL_PROFILE_EMBEDDED[4] = { 'M', 'B', 'E', 'D' };
  */
 struct bmp_state {
     /* These two are external. */
-    const struct sail_read_options *read_options;
+    const struct sail_load_options *load_options;
     const struct sail_write_options *write_options;
 
-    int bmp_read_options;
+    int bmp_load_options;
 
     enum SailPixelFormat source_pixel_format;
 
@@ -107,9 +107,9 @@ static sail_status_t alloc_bmp_state(struct bmp_state **bmp_state) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_MEMORY_ALLOCATION);
     }
 
-    (*bmp_state)->read_options     = NULL;
+    (*bmp_state)->load_options     = NULL;
     (*bmp_state)->write_options    = NULL;
-    (*bmp_state)->bmp_read_options = 0;
+    (*bmp_state)->bmp_load_options = 0;
     (*bmp_state)->iccp             = NULL;
     (*bmp_state)->palette          = NULL;
     (*bmp_state)->palette_count    = 0;
@@ -189,7 +189,7 @@ static sail_status_t read_bmp_headers(struct sail_io *io, struct bmp_state *bmp_
  * Decoding functions.
  */
 
-sail_status_t bmp_private_read_init(struct sail_io *io, const struct sail_read_options *read_options, void **state, int bmp_read_options) {
+sail_status_t bmp_private_read_init(struct sail_io *io, const struct sail_load_options *load_options, void **state, int bmp_load_options) {
 
     /* Allocate a new state. */
     struct bmp_state *bmp_state;
@@ -197,11 +197,11 @@ sail_status_t bmp_private_read_init(struct sail_io *io, const struct sail_read_o
     *state = bmp_state;
 
     /* Shallow copy load options. */
-    bmp_state->read_options = read_options;
+    bmp_state->load_options = load_options;
 
-    bmp_state->bmp_read_options = bmp_read_options;
+    bmp_state->bmp_load_options = bmp_load_options;
 
-    if (bmp_read_options & SAIL_READ_BMP_FILE_HEADER) {
+    if (bmp_load_options & SAIL_READ_BMP_FILE_HEADER) {
         /* "BM" or 0x02. */
         uint16_t magic;
         SAIL_TRY(io->strict_read(io->stream, &magic, sizeof(magic)));
@@ -369,7 +369,7 @@ sail_status_t bmp_private_read_seek_next_frame(void *state, struct sail_io *io, 
     }
 
     /* Seek to the bitmap data if we have the file header. */
-    if (bmp_state->bmp_read_options & SAIL_READ_BMP_FILE_HEADER) {
+    if (bmp_state->bmp_load_options & SAIL_READ_BMP_FILE_HEADER) {
         if (bmp_state->version > SAIL_BMP_V1) {
             SAIL_TRY_OR_CLEANUP(io->seek(io->stream, bmp_state->dib_file_header.offset, SEEK_SET),
                                 /* cleanup */ sail_destroy_image(image_local));

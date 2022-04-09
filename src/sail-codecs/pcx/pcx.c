@@ -44,7 +44,7 @@ static const uint8_t SAIL_PCX_RLE_COUNT_MASK = 0x3F;
  * Codec-specific state.
  */
 struct pcx_state {
-    struct sail_read_options *read_options;
+    struct sail_load_options *load_options;
     struct sail_write_options *write_options;
 
     struct SailPcxHeader pcx_header;
@@ -59,7 +59,7 @@ static sail_status_t alloc_pcx_state(struct pcx_state **pcx_state) {
     SAIL_TRY(sail_malloc(sizeof(struct pcx_state), &ptr));
     *pcx_state = ptr;
 
-    (*pcx_state)->read_options  = NULL;
+    (*pcx_state)->load_options  = NULL;
     (*pcx_state)->write_options = NULL;
 
     (*pcx_state)->scanline_buffer = NULL;
@@ -74,7 +74,7 @@ static void destroy_pcx_state(struct pcx_state *pcx_state) {
         return;
     }
 
-    sail_destroy_read_options(pcx_state->read_options);
+    sail_destroy_load_options(pcx_state->load_options);
     sail_destroy_write_options(pcx_state->write_options);
 
     sail_free(pcx_state->scanline_buffer);
@@ -86,13 +86,13 @@ static void destroy_pcx_state(struct pcx_state *pcx_state) {
  * Decoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_read_init_v6_pcx(struct sail_io *io, const struct sail_read_options *read_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_read_init_v6_pcx(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
 
     SAIL_CHECK_PTR(state);
     *state = NULL;
 
     SAIL_TRY(sail_check_io_valid(io));
-    SAIL_CHECK_PTR(read_options);
+    SAIL_CHECK_PTR(load_options);
 
     /* Allocate a new state. */
     struct pcx_state *pcx_state;
@@ -100,7 +100,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_pcx(struct sail_io *io, const 
     *state = pcx_state;
 
     /* Deep copy load options. */
-    SAIL_TRY(sail_copy_read_options(read_options, &pcx_state->read_options));
+    SAIL_TRY(sail_copy_load_options(load_options, &pcx_state->load_options));
 
     /* Read PCX header. */
     SAIL_TRY(pcx_private_read_header(io, &pcx_state->pcx_header));

@@ -64,20 +64,20 @@ sail_status_t sail_probe_file(const char *path, struct sail_image **image, const
     const struct sail_codec *codec;
     SAIL_TRY(load_codec_by_codec_info(*codec_info_local, &codec));
 
-    struct sail_read_options *read_options_local;
-    SAIL_TRY(sail_alloc_read_options_from_features((*codec_info_local)->load_features, &read_options_local));
+    struct sail_load_options *load_options_local;
+    SAIL_TRY(sail_alloc_load_options_from_features((*codec_info_local)->load_features, &load_options_local));
 
     struct sail_io *io;
     SAIL_TRY_OR_CLEANUP(sail_alloc_io_read_file(path, &io),
-                        /* cleanup */ sail_destroy_read_options(read_options_local));
+                        /* cleanup */ sail_destroy_load_options(load_options_local));
 
     void *state = NULL;
-    SAIL_TRY_OR_CLEANUP(codec->v6->read_init(io, read_options_local, &state),
+    SAIL_TRY_OR_CLEANUP(codec->v6->read_init(io, load_options_local, &state),
                         /* cleanup */ codec->v6->read_finish(&state, io),
                                       sail_destroy_io(io),
-                                      sail_destroy_read_options(read_options_local));
+                                      sail_destroy_load_options(load_options_local));
 
-    sail_destroy_read_options(read_options_local);
+    sail_destroy_load_options(load_options_local);
 
     struct sail_image *image_local;
 

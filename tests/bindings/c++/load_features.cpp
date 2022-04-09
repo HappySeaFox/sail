@@ -55,8 +55,8 @@ static MunitResult test_load_features(const MunitParameter params[], void *user_
 
     // Construct load options
     {
-        sail::read_options read_options;
-        munit_assert(first_codec.load_features().to_read_options(&read_options) == SAIL_OK);
+        sail::load_options load_options;
+        munit_assert(first_codec.load_features().to_load_options(&load_options) == SAIL_OK);
     }
 
     return MUNIT_OK;

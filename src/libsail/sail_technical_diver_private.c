@@ -65,7 +65,7 @@ static sail_status_t allowed_write_compression(const struct sail_write_features 
 
 sail_status_t start_loading_io_with_options(struct sail_io *io, bool own_io,
                                            const struct sail_codec_info *codec_info,
-                                           const struct sail_read_options *read_options, void **state) {
+                                           const struct sail_load_options *load_options, void **state) {
 
     SAIL_TRY_OR_CLEANUP(check_io_arguments(io, codec_info, state),
                         /* cleanup */ if (own_io) sail_destroy_io(io));
@@ -87,18 +87,18 @@ sail_status_t start_loading_io_with_options(struct sail_io *io, bool own_io,
     SAIL_TRY_OR_CLEANUP(load_codec_by_codec_info(state_of_mind->codec_info, &state_of_mind->codec),
                         /* cleanup */ destroy_hidden_state(state_of_mind));
 
-    if (read_options == NULL) {
-        struct sail_read_options *read_options_local = NULL;
+    if (load_options == NULL) {
+        struct sail_load_options *load_options_local = NULL;
 
-        SAIL_TRY_OR_CLEANUP(sail_alloc_read_options_from_features(state_of_mind->codec_info->load_features, &read_options_local),
+        SAIL_TRY_OR_CLEANUP(sail_alloc_load_options_from_features(state_of_mind->codec_info->load_features, &load_options_local),
                             /* cleanup */ destroy_hidden_state(state_of_mind));
-        SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v6->read_init(state_of_mind->io, read_options_local, &state_of_mind->state),
-                            /* cleanup */ sail_destroy_read_options(read_options_local),
+        SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v6->read_init(state_of_mind->io, load_options_local, &state_of_mind->state),
+                            /* cleanup */ sail_destroy_load_options(load_options_local),
                                           state_of_mind->codec->v6->read_finish(&state_of_mind->state, state_of_mind->io),
                                           destroy_hidden_state(state_of_mind));
-        sail_destroy_read_options(read_options_local);
+        sail_destroy_load_options(load_options_local);
     } else {
-        SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v6->read_init(state_of_mind->io, read_options, &state_of_mind->state),
+        SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v6->read_init(state_of_mind->io, load_options, &state_of_mind->state),
                             /* cleanup */ state_of_mind->codec->v6->read_finish(&state_of_mind->state, state_of_mind->io),
                                           destroy_hidden_state(state_of_mind));
     }

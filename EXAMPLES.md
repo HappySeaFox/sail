@@ -165,7 +165,7 @@ SAIL_TRY(input.stop());
  */
 SAIL_TRY(sail_init_with_flags(SAIL_FLAG_PRELOAD_CODECS));
 
-struct sail_read_options *read_options;
+struct sail_load_options *load_options;
 struct sail_image *image;
 
 /*
@@ -182,7 +182,7 @@ SAIL_TRY(sail_codec_info_from_extension("JPEG", &codec_info));
 /*
  * Allocate new load options and copy defaults from the codec-specific load features.
  */
-SAIL_TRY(sail_alloc_read_options_from_features(codec_info->load_features, &read_options));
+SAIL_TRY(sail_alloc_load_options_from_features(codec_info->load_features, &load_options));
 
 /*
  * Obtain an image data in a buffer: load it from a file etc.
@@ -196,14 +196,14 @@ size_t buffer_length = ...
 SAIL_TRY_OR_CLEANUP(sail_start_loading_mem_with_options(buffer,
                                                         buffer_length,
                                                         codec_info,
-                                                        read_options,
+                                                        load_options,
                                                         &state),
-                    /* cleanup */ sail_destroy_read_options(read_options));
+                    /* cleanup */ sail_destroy_load_options(load_options));
 
 /*
  * Our load options are not needed anymore.
  */
-sail_destroy_read_options(read_options);
+sail_destroy_load_options(load_options);
 
 /*
  * Load just a single frame. It's possible to load more frames if any. Just continue
@@ -253,8 +253,8 @@ SAIL_TRY(codec_info::from_extension("JPEG", &codec_info));
 
 // Instantiate new load options and copy defaults from the load features.
 //
-sail::read_options read_options;
-SAIL_TRY(codec_info.load_features().to_read_options(&read_options));
+sail::load_options load_options;
+SAIL_TRY(codec_info.load_features().to_load_options(&load_options));
 
 // Obtain an image data in a buffer: load it from a file etc.
 //
@@ -263,7 +263,7 @@ size_t buffer_length = ...
 
 // Initialize loading from memory with our options. The options will be deep copied.
 //
-SAIL_TRY(input.start(buffer, buffer_length, codec_info, read_options));
+SAIL_TRY(input.start(buffer, buffer_length, codec_info, load_options));
 
 // Load just a single frame. It's possible to load more frames if any. Just continue
 // loading frames till load_next_frame() returns SAIL_OK. If no more frames are available,
@@ -301,7 +301,7 @@ and call `sail_start_loading_io_with_options()`.
  */
 SAIL_TRY(sail_init_with_flags(SAIL_FLAG_PRELOAD_CODECS));
 
-struct sail_read_options *read_options;
+struct sail_load_options *load_options;
 struct sail_image *image;
 
 /*
@@ -345,8 +345,8 @@ io->eof   = io_my_data_source_eof;
 /*
  * Allocate new load options and copy defaults from the codec-specific load features.
  */
-SAIL_TRY_OR_CLEANUP(sail_alloc_read_options_from_features(codec_info->load_features,
-                                                          &read_options),
+SAIL_TRY_OR_CLEANUP(sail_alloc_load_options_from_features(codec_info->load_features,
+                                                          &load_options),
                     /* cleanup */ sail_destroy_io(io));
 
 /*
@@ -354,15 +354,15 @@ SAIL_TRY_OR_CLEANUP(sail_alloc_read_options_from_features(codec_info->load_featu
  */
 SAIL_TRY_OR_CLEANUP(sail_start_loading_io_with_options(io,
                                                        codec_info,
-                                                       read_options,
+                                                       load_options,
                                                        &state),
-                    /* cleanup */ sail_destroy_read_options(read_options),
+                    /* cleanup */ sail_destroy_load_options(load_options),
                                   sail_destroy_io(io));
 
 /*
  * Our load options are not needed anymore.
  */
-sail_destroy_read_options(read_options);
+sail_destroy_load_options(load_options);
 
 /*
  * Load just a single frame. It's possible to load more frames if any. Just continue
@@ -440,12 +440,12 @@ io.with_read(io_my_data_source_read)
 
 // Instantiate new load options and copy defaults from the load features.
 //
-sail::read_options read_options;
-SAIL_TRY(codec_info.load_features().to_read_options(&read_options));
+sail::load_options load_options;
+SAIL_TRY(codec_info.load_features().to_load_options(&load_options));
 
 // Initialize loading with our I/O stream and options.
 //
-SAIL_TRY(input.start(io, codec_info, read_options));
+SAIL_TRY(input.start(io, codec_info, load_options));
 
 // Load just a single frame. It's possible to load more frames if any. Just continue
 // loading frames till load_next_frame() returns SAIL_OK. If no more frames are available,

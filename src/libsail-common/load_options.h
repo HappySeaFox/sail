@@ -42,9 +42,9 @@ struct sail_hash_map;
 struct sail_load_features;
 
 /*
- * sail_read_options represents options to modify loading operations.
+ * sail_load_options represents options to modify loading operations.
  */
-struct sail_read_options {
+struct sail_load_options {
 
     /* Or-ed manipulation options for loading operations. See SailOption. */
     int options;
@@ -66,34 +66,34 @@ struct sail_read_options {
     struct sail_hash_map *tuning;
 };
 
-typedef struct sail_read_options sail_read_options_t;
+typedef struct sail_load_options sail_load_options_t;
 
 /*
  * Allocates load options.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_read_options(struct sail_read_options **read_options);
+SAIL_EXPORT sail_status_t sail_alloc_load_options(struct sail_load_options **load_options);
 
 /*
  * Destroys the specified load options object and all its internal allocated memory buffers. The load options
  * MUST NOT be used anymore after calling this function. Does nothing if the load options is NULL.
  */
-SAIL_EXPORT void sail_destroy_read_options(struct sail_read_options *read_options);
+SAIL_EXPORT void sail_destroy_load_options(struct sail_load_options *load_options);
 
 /*
  * Allocates and builds default load options from the load features.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_read_options_from_features(const struct sail_load_features *load_features, struct sail_read_options **read_options);
+SAIL_EXPORT sail_status_t sail_alloc_load_options_from_features(const struct sail_load_features *load_features, struct sail_load_options **load_options);
 
 /*
  * Makes a deep copy of the specified load options object.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_copy_read_options(const struct sail_read_options *source, struct sail_read_options **target);
+SAIL_EXPORT sail_status_t sail_copy_load_options(const struct sail_load_options *source, struct sail_load_options **target);
 
 /* extern "C" */
 #ifdef __cplusplus

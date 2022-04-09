@@ -53,7 +53,7 @@ struct sail_source_image {
     /*
      * Source image pixel format. See SailPixelFormat.
      *
-     * READ:  Set by SAIL to a source image pixel format of the original image.
+     * LOAD:  Set by SAIL to a source image pixel format of the original image.
      * WRITE: Ignored.
      */
     enum SailPixelFormat pixel_format;
@@ -61,7 +61,7 @@ struct sail_source_image {
     /*
      * Source image chroma subsampling. See SailChromaSubsampling.
      *
-     * READ:  Set by SAIL to a source image chroma subsampling of the original image.
+     * LOAD:  Set by SAIL to a source image chroma subsampling of the original image.
      * WRITE: Ignored.
      */
     enum SailChromaSubsampling chroma_subsampling;
@@ -70,7 +70,7 @@ struct sail_source_image {
      * Or-ed source image properties. Set by SAIL to a valid source image properties of the image file.
      * For example, it can be interlaced. See SailImageProperty.
      *
-     * READ:  Set by SAIL to valid source image properties or to 0.
+     * LOAD:  Set by SAIL to valid source image properties or to 0.
      * WRITE: Ignored.
      */
     int properties;
@@ -78,7 +78,7 @@ struct sail_source_image {
     /*
      * Source image compression type. See SailCompression.
      *
-     * READ:  Set by SAIL to a valid source image compression type.
+     * LOAD:  Set by SAIL to a valid source image compression type.
      * WRITE: Ignored.
      */
     enum SailCompression compression;
@@ -92,7 +92,7 @@ struct sail_source_image {
      * Special properties' names start with the codec name to avoid confusing.
      * For example, "cur-hotspot-x".
      *
-     * READ:  Set by SAIL to valid source image special properties.
+     * LOAD:  Set by SAIL to valid source image special properties.
      * WRITE: Ignored.
      */
     struct sail_hash_map *special_properties;

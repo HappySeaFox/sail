@@ -38,9 +38,9 @@
 extern "C" {
 #endif
 
-struct sail_io;
 struct sail_codec_info;
-struct sail_read_options;
+struct sail_io;
+struct sail_load_options;
 struct sail_write_options;
 
 /*
@@ -63,8 +63,8 @@ struct sail_write_options;
 SAIL_EXPORT sail_status_t sail_start_loading_io(struct sail_io *io, const struct sail_codec_info *codec_info, void **state);
 
 /*
- * Starts loading the specified I/O stream with the specified read options. If you don't need specific read options,
- * just pass NULL. Codec-specific defaults will be used in this case. The read options are deep copied.
+ * Starts loading the specified I/O stream with the specified load options. If you don't need specific load options,
+ * just pass NULL. Codec-specific defaults will be used in this case. The load options are deep copied.
  *
  * Typical usage: sail_alloc_io()                      ->
  *                set I/O callbacks                    ->
@@ -82,7 +82,7 @@ SAIL_EXPORT sail_status_t sail_start_loading_io(struct sail_io *io, const struct
  */
 SAIL_EXPORT sail_status_t sail_start_loading_io_with_options(struct sail_io *io,
                                                             const struct sail_codec_info *codec_info,
-                                                            const struct sail_read_options *read_options, void **state);
+                                                            const struct sail_load_options *load_options, void **state);
 
 /*
  * Starts writing into the specified I/O stream.

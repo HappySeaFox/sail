@@ -42,7 +42,7 @@ struct tiff_state {
     TIFF *tiff;
     uint16_t current_frame;
     bool libtiff_error;
-    struct sail_read_options *read_options;
+    struct sail_load_options *load_options;
     struct sail_write_options *write_options;
     int write_compression;
     TIFFRGBAImage image;
@@ -58,7 +58,7 @@ static sail_status_t alloc_tiff_state(struct tiff_state **tiff_state) {
     (*tiff_state)->tiff              = NULL;
     (*tiff_state)->current_frame     = 0;
     (*tiff_state)->libtiff_error     = false;
-    (*tiff_state)->read_options      = NULL;
+    (*tiff_state)->load_options      = NULL;
     (*tiff_state)->write_options     = NULL;
     (*tiff_state)->write_compression = COMPRESSION_NONE;
     (*tiff_state)->line              = 0;
@@ -74,7 +74,7 @@ static void destroy_tiff_state(struct tiff_state *tiff_state) {
         return;
     }
 
-    sail_destroy_read_options(tiff_state->read_options);
+    sail_destroy_load_options(tiff_state->load_options);
     sail_destroy_write_options(tiff_state->write_options);
 
     TIFFRGBAImageEnd(&tiff_state->image);
@@ -86,13 +86,13 @@ static void destroy_tiff_state(struct tiff_state *tiff_state) {
  * Decoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_read_init_v6_tiff(struct sail_io *io, const struct sail_read_options *read_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_read_init_v6_tiff(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
 
     SAIL_CHECK_PTR(state);
     *state = NULL;
 
     SAIL_TRY(sail_check_io_valid(io));
-    SAIL_CHECK_PTR(read_options);
+    SAIL_CHECK_PTR(load_options);
 
     TIFFSetWarningHandler(tiff_private_my_warning_fn);
     TIFFSetErrorHandler(tiff_private_my_error_fn);
@@ -104,7 +104,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_tiff(struct sail_io *io, const
     *state = tiff_state;
 
     /* Deep copy load options. */
-    SAIL_TRY(sail_copy_read_options(read_options, &tiff_state->read_options));
+    SAIL_TRY(sail_copy_load_options(load_options, &tiff_state->load_options));
 
     /* Initialize TIFF.
      *
@@ -172,7 +172,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_tiff(void *state, s
     }
 
     /* Fetch meta data. */
-    if (tiff_state->read_options->options & SAIL_OPTION_META_DATA) {
+    if (tiff_state->load_options->options & SAIL_OPTION_META_DATA) {
         struct sail_meta_data_node **last_meta_data_node = &image_local->meta_data_node;
 
         SAIL_TRY_OR_CLEANUP(tiff_private_fetch_meta_data(tiff_state->tiff, &last_meta_data_node),
@@ -180,7 +180,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_tiff(void *state, s
     }
 
     /* Fetch ICC profile. */
-    if (tiff_state->read_options->options & SAIL_OPTION_ICCP) {
+    if (tiff_state->load_options->options & SAIL_OPTION_ICCP) {
         SAIL_TRY_OR_CLEANUP(tiff_private_fetch_iccp(tiff_state->tiff, &image_local->iccp),
                             /* cleanup */ sail_destroy_image(image_local));
     }

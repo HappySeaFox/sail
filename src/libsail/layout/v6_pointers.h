@@ -36,7 +36,7 @@
  * Decoding functions.
  */
 
-typedef sail_status_t (*sail_codec_read_init_v6_t)(struct sail_io *io, const struct sail_read_options *read_options, void **state);
+typedef sail_status_t (*sail_codec_read_init_v6_t)(struct sail_io *io, const struct sail_load_options *load_options, void **state);
 typedef sail_status_t (*sail_codec_read_seek_next_frame_v6_t)(void *state, struct sail_io *io, struct sail_image **image);
 typedef sail_status_t (*sail_codec_read_frame_v6_t)(void *state, struct sail_io *io, struct sail_image *image);
 typedef sail_status_t (*sail_codec_read_finish_v6_t)(void **state, struct sail_io *io);

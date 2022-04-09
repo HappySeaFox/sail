@@ -40,9 +40,9 @@
 extern "C" {
 #endif
 
-struct sail_io;
 struct sail_codec_info;
-struct sail_read_options;
+struct sail_io;
+struct sail_load_options;
 struct sail_write_options;
 
 /*
@@ -68,7 +68,7 @@ struct sail_write_options;
  * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_start_loading_file_with_options(const char *path, const struct sail_codec_info *codec_info,
-                                                              const struct sail_read_options *read_options, void **state);
+                                                              const struct sail_load_options *load_options, void **state);
 
 /*
  * Starts loading the specified memory buffer with the specified load options. If you do not need specific load options,
@@ -89,7 +89,7 @@ SAIL_EXPORT sail_status_t sail_start_loading_file_with_options(const char *path,
  */
 SAIL_EXPORT sail_status_t sail_start_loading_memory_with_options(const void *buffer, size_t buffer_length,
                                                                  const struct sail_codec_info *codec_info,
-                                                                 const struct sail_read_options *read_options, void **state);
+                                                                 const struct sail_load_options *load_options, void **state);
 
 /*
  * Starts writing the specified image file with the specified write options. Pass codec info if you would like
