@@ -64,9 +64,9 @@ save_options::save_options(const save_options &wo)
 save_options& save_options::operator=(const sail::save_options &save_options)
 {
     set_options(save_options.options());
-    set_tuning(save_options.tuning());
     set_compression(save_options.compression());
     set_compression_level(save_options.compression_level());
+    set_tuning(save_options.tuning());
 
     return *this;
 }
@@ -92,16 +92,6 @@ int save_options::options() const
     return d->sail_save_options->options;
 }
 
-sail::tuning& save_options::tuning()
-{
-    return d->tuning;
-}
-
-const sail::tuning& save_options::tuning() const
-{
-    return d->tuning;
-}
-
 SailCompression save_options::compression() const
 {
     return d->sail_save_options->compression;
@@ -112,14 +102,19 @@ double save_options::compression_level() const
     return d->sail_save_options->compression_level;
 }
 
+sail::tuning& save_options::tuning()
+{
+    return d->tuning;
+}
+
+const sail::tuning& save_options::tuning() const
+{
+    return d->tuning;
+}
+
 void save_options::set_options(int options)
 {
     d->sail_save_options->options = options;
-}
-
-void save_options::set_tuning(const sail::tuning &tuning)
-{
-    d->tuning = tuning;
 }
 
 void save_options::set_compression(SailCompression compression)
@@ -132,6 +127,11 @@ void save_options::set_compression_level(double compression_level)
     d->sail_save_options->compression_level = compression_level;
 }
 
+void save_options::set_tuning(const sail::tuning &tuning)
+{
+    d->tuning = tuning;
+}
+
 save_options::save_options(const sail_save_options *wo)
     : save_options()
 {
@@ -141,9 +141,9 @@ save_options::save_options(const sail_save_options *wo)
     }
 
     set_options(wo->options);
-    set_tuning(utils_private::c_tuning_to_cpp_tuning(wo->tuning));
     set_compression(wo->compression);
     set_compression_level(wo->compression_level);
+    set_tuning(utils_private::c_tuning_to_cpp_tuning(wo->tuning));
 }
 
 sail_status_t save_options::to_sail_save_options(sail_save_options **save_options) const

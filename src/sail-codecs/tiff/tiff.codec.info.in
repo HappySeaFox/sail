@@ -16,7 +16,6 @@ tuning=
 
 [save-features]
 features=STATIC;MULTI-PAGED;META-DATA;ICCP
-tuning=
 pixel-formats=BPP32-RGBA
 properties=
 compression-types=@SAIL_TIFF_CODEC_INFO_COMPRESSIONS@
@@ -25,3 +24,4 @@ compression-level-min=0
 compression-level-max=0
 compression-level-default=0
 compression-level-step=0
+tuning=

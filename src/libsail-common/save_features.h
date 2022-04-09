@@ -57,20 +57,6 @@ struct sail_save_features {
     int features;
 
     /*
-     * Codec-specific tuning options. For example, a hypothetical ABC image codec
-     * can allow disabling filtering with setting the "abc-filtering" tuning option
-     * to 0 in load options. Tuning options' names start with the codec name
-     * to avoid confusing.
-     *
-     * The list of possible values for every tuning option is not current available
-     * programmatically. Every codec must document them in the codec info.
-     *
-     * It's not guaranteed that tuning options and their values are backward
-     * or forward compatible.
-     */
-    struct sail_string_node *tuning;
-
-    /*
      * A list of supported pixels compression types by this codec. If the list has more than
      * two entries, compression levels are ignored.
      *
@@ -108,6 +94,20 @@ struct sail_save_features {
 
     /* Step to increase or decrease compression levels. For example: 1. */
     double compression_level_step;
+
+    /*
+     * Codec-specific tuning options. For example, a hypothetical ABC image codec
+     * can allow disabling filtering with setting the "abc-filtering" tuning option
+     * to 0 in load options. Tuning options' names start with the codec name
+     * to avoid confusing.
+     *
+     * The list of possible values for every tuning option is not current available
+     * programmatically. Every codec must document them in the codec info.
+     *
+     * It's not guaranteed that tuning options and their values are backward
+     * or forward compatible.
+     */
+    struct sail_string_node *tuning;
 };
 
 typedef struct sail_save_features sail_save_features_t;

@@ -49,9 +49,6 @@ struct sail_save_options {
     /* Or-ed manipulation options. See SailOption. */
     int options;
 
-    /* Codec-specific tuning options. */
-    struct sail_hash_map *tuning;
-
     /*
      * Compression type. For example: SAIL_COMPRESSION_RLE. See SailCompression.
      * Use sail_save_features to determine what compression types or values are supported by a particular codec.
@@ -72,6 +69,9 @@ struct sail_save_options {
      * in sail_save_features. If compression_level < compression_level_min, compression_level_default will be used.
      */
     double compression_level;
+
+    /* Codec-specific tuning options. */
+    struct sail_hash_map *tuning;
 };
 
 typedef struct sail_save_options sail_save_options_t;

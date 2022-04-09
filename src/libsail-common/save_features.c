@@ -39,7 +39,6 @@ sail_status_t sail_alloc_save_features(struct sail_save_features **save_features
     (*save_features)->pixel_formats             = NULL;
     (*save_features)->pixel_formats_length      = 0;
     (*save_features)->features                  = 0;
-    (*save_features)->tuning                    = NULL;
     (*save_features)->compressions              = NULL;
     (*save_features)->compressions_length       = 0;
     (*save_features)->default_compression       = SAIL_COMPRESSION_UNSUPPORTED;
@@ -47,6 +46,7 @@ sail_status_t sail_alloc_save_features(struct sail_save_features **save_features
     (*save_features)->compression_level_max     = 0;
     (*save_features)->compression_level_default = 0;
     (*save_features)->compression_level_step    = 0;
+    (*save_features)->tuning                    = NULL;
 
     return SAIL_OK;
 }

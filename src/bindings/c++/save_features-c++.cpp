@@ -38,9 +38,9 @@ public:
 
     const sail_save_features *sail_save_features_c;
 
-    sail::supported_tuning supported_tuning;
     std::vector<SailPixelFormat> pixel_formats;
     std::vector<SailCompression> compressions;
+    sail::supported_tuning supported_tuning;
 };
 
 save_features::save_features(const save_features &wf)
@@ -52,9 +52,9 @@ save_features::save_features(const save_features &wf)
 save_features& save_features::operator=(const sail::save_features &save_features)
 {
     d->sail_save_features_c = save_features.d->sail_save_features_c;
-    d->supported_tuning     = save_features.d->supported_tuning;
     d->pixel_formats        = save_features.d->pixel_formats;
     d->compressions         = save_features.d->compressions;
+    d->supported_tuning     = save_features.d->supported_tuning;
 
     return *this;
 }
@@ -85,11 +85,6 @@ int save_features::features() const
     return d->sail_save_features_c->features;
 }
 
-const sail::supported_tuning& save_features::supported_tuning() const
-{
-    return d->supported_tuning;
-}
-
 const std::vector<SailCompression>& save_features::compressions() const
 {
     return d->compressions;
@@ -118,6 +113,11 @@ double save_features::compression_level_default() const
 double save_features::compression_level_step() const
 {
     return d->sail_save_features_c->compression_level_step;
+}
+
+const sail::supported_tuning& save_features::supported_tuning() const
+{
+    return d->supported_tuning;
 }
 
 sail_status_t save_features::to_save_options(sail::save_options *save_options) const
@@ -151,10 +151,6 @@ save_features::save_features(const sail_save_features *wf)
 
     d->sail_save_features_c = wf;
 
-    for (const sail_string_node *node = wf->tuning; node != nullptr; node = node->next) {
-        d->supported_tuning.push_back(node->string);
-    }
-
     // Output pixel formats
     std::vector<SailPixelFormat> pixel_formats;
 
@@ -180,6 +176,11 @@ save_features::save_features(const sail_save_features *wf)
     }
 
     d->compressions = compressions;
+
+    // Supported tuning
+    for (const sail_string_node *node = wf->tuning; node != nullptr; node = node->next) {
+        d->supported_tuning.push_back(node->string);
+    }
 }
 
 const sail_save_features* save_features::sail_save_features_c() const

@@ -37,9 +37,9 @@ sail_status_t sail_alloc_save_options(struct sail_save_options **save_options) {
     *save_options = ptr;
 
     (*save_options)->options           = 0;
-    (*save_options)->tuning            = NULL;
     (*save_options)->compression       = SAIL_COMPRESSION_UNSUPPORTED;
     (*save_options)->compression_level = 0;
+    (*save_options)->tuning            = NULL;
 
     return SAIL_OK;
 }
@@ -84,15 +84,14 @@ sail_status_t sail_copy_save_options(const struct sail_save_options *source, str
     struct sail_save_options *target_local;
     SAIL_TRY(sail_alloc_save_options(&target_local));
 
-    target_local->options = source->options;
+    target_local->options           = source->options;
+    target_local->compression       = source->compression;
+    target_local->compression_level = source->compression_level;
 
     if (source->tuning != NULL) {
         SAIL_TRY_OR_CLEANUP(sail_copy_hash_map(source->tuning, &target_local->tuning),
                             /* cleanup */ sail_destroy_save_options(target_local));
     }
-
-    target_local->compression       = source->compression;
-    target_local->compression_level = source->compression_level;
 
     *target = target_local;
 

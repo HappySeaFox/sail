@@ -59,9 +59,9 @@ static MunitResult test_copy_options(const MunitParameter params[], void *user_d
     munit_assert_not_null(save_options_copy);
 
     munit_assert(save_options_copy->options == save_options->options);
-    munit_assert_null(save_options_copy->tuning);
     munit_assert(save_options_copy->compression == save_options->compression);
     munit_assert(save_options_copy->compression_level == save_options->compression_level);
+    munit_assert_null(save_options_copy->tuning);
 
     sail_destroy_save_options(save_options_copy);
     sail_destroy_save_options(save_options);
@@ -84,9 +84,9 @@ static MunitResult test_options_from_features(const MunitParameter params[], voi
     munit_assert(sail_alloc_save_options_from_features(&save_features, &save_options) == SAIL_OK);
 
     munit_assert(save_options->options == (SAIL_OPTION_META_DATA | SAIL_OPTION_ICCP));
-    munit_assert_null(save_options->tuning);
     munit_assert(save_options->compression == save_features.default_compression);
     munit_assert(save_options->compression_level == save_features.compression_level_default);
+    munit_assert_null(save_options->tuning);
 
     sail_destroy_save_options(save_options);
 

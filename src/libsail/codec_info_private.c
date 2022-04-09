@@ -189,9 +189,6 @@ static sail_status_t inih_handler_sail_error(void *data, const char *section, co
         if (strcmp(name, "features") == 0) {
             SAIL_TRY_OR_CLEANUP(parse_flags(value, &codec_info->save_features->features, codec_feature_from_string),
                                 /* cleanup */ SAIL_LOG_ERROR("Failed to parse codec features: '%s'", value));
-        } else if (strcmp(name, "tuning") == 0) {
-            SAIL_TRY_OR_CLEANUP(sail_split_into_string_node_chain(value, &codec_info->save_features->tuning),
-                                    /* cleanup */ SAIL_LOG_ERROR("Failed to parse codec tuning: '%s'", value));
         } else if (strcmp(name, "pixel-formats") == 0) {
             SAIL_TRY_OR_CLEANUP(parse_serialized_ints(value,
                                                         (int **)&codec_info->save_features->pixel_formats,
@@ -214,6 +211,9 @@ static sail_status_t inih_handler_sail_error(void *data, const char *section, co
             codec_info->save_features->compression_level_default = atof(value);
         } else if (strcmp(name, "compression-level-step") == 0) {
             codec_info->save_features->compression_level_step = atof(value);
+        } else if (strcmp(name, "tuning") == 0) {
+            SAIL_TRY_OR_CLEANUP(sail_split_into_string_node_chain(value, &codec_info->save_features->tuning),
+                                    /* cleanup */ SAIL_LOG_ERROR("Failed to parse codec tuning: '%s'", value));
         } else {
             SAIL_LOG_ERROR("Unsupported codec info key '%s' in [%s]", name, section);
             SAIL_LOG_AND_RETURN(SAIL_ERROR_PARSE_FILE);

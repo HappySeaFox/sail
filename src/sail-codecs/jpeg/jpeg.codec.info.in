@@ -16,7 +16,6 @@ tuning=jpeg-dct-method;jpeg-optimize-coding;jpeg-smoothing-factor
 
 [save-features]
 features=STATIC;META-DATA@CODEC_INFO_FEATURE_ICCP@
-tuning=
 pixel-formats=BPP8-GRAYSCALE;@SAIL_JPEG_CODEC_INFO_WRITE_EXT@BPP24-YCBCR;BPP32-CMYK;BPP32-YCCK
 properties=
 compression-types=JPEG
@@ -25,3 +24,4 @@ compression-level-min=0
 compression-level-max=100
 compression-level-default=15
 compression-level-step=1
+tuning=

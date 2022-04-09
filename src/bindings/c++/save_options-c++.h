@@ -91,16 +91,6 @@ public:
     int options() const;
 
     /*
-     * Returns modifiable codec tuning.
-     */
-    sail::tuning& tuning();
-
-    /*
-     * Returns constant codec tuning.
-     */
-    const sail::tuning& tuning() const;
-
-    /*
      * Returns the compression type. For example: SAIL_COMPRESSION_RLE. See SailCompression.
      * Use save_features to determine what compression types or values are supported by a particular codec.
      *
@@ -123,14 +113,19 @@ public:
     double compression_level() const;
 
     /*
+     * Returns modifiable codec tuning.
+     */
+    sail::tuning& tuning();
+
+    /*
+     * Returns constant codec tuning.
+     */
+    const sail::tuning& tuning() const;
+
+    /*
      * Sets new or-ed manipulation options for saving operations. See SailOption.
      */
     void set_options(int options);
-
-    /*
-     * Sets a new codec tuning.
-     */
-    void set_tuning(const sail::tuning &tuning);
 
     /*
      * Sets a new compression type.
@@ -141,6 +136,11 @@ public:
      * Sets a new compression level.
      */
     void set_compression_level(double compression_level);
+
+    /*
+     * Sets a new codec tuning.
+     */
+    void set_tuning(const sail::tuning &tuning);
 
 private:
     /*

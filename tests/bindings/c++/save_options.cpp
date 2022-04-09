@@ -61,9 +61,9 @@ static MunitResult test_save_options_copy(const MunitParameter params[], void *u
 
         const sail::save_options save_options2 = save_options;
         munit_assert(save_options.options()           == save_options2.options());
-        munit_assert(save_options.tuning()            == save_options2.tuning());
         munit_assert(save_options.compression()       == save_options2.compression());
         munit_assert(save_options.compression_level() == save_options2.compression_level());
+        munit_assert(save_options.tuning()            == save_options2.tuning());
     }
 
     {
@@ -74,9 +74,9 @@ static MunitResult test_save_options_copy(const MunitParameter params[], void *u
 
         const sail::save_options save_options2 = save_options;
         munit_assert(save_options.options()           == save_options2.options());
-        munit_assert(save_options.tuning()            == save_options2.tuning());
         munit_assert(save_options.compression()       == save_options2.compression());
         munit_assert(save_options.compression_level() == save_options2.compression_level());
+        munit_assert(save_options.tuning()            == save_options2.tuning());
     }
 
     return MUNIT_OK;
@@ -97,9 +97,9 @@ static MunitResult test_save_options_move(const MunitParameter params[], void *u
         const sail::save_options save_options3 = std::move(save_options2);
 
         munit_assert(save_options.options()           == save_options3.options());
-        munit_assert(save_options.tuning()            == save_options3.tuning());
         munit_assert(save_options.compression()       == save_options3.compression());
         munit_assert(save_options.compression_level() == save_options3.compression_level());
+        munit_assert(save_options.tuning()            == save_options3.tuning());
     }
 
     {
@@ -112,9 +112,9 @@ static MunitResult test_save_options_move(const MunitParameter params[], void *u
         const sail::save_options save_options3 = std::move(save_options2);
 
         munit_assert(save_options.options()           == save_options3.options());
-        munit_assert(save_options.tuning()            == save_options3.tuning());
         munit_assert(save_options.compression()       == save_options3.compression());
         munit_assert(save_options.compression_level() == save_options3.compression_level());
+        munit_assert(save_options.tuning()            == save_options3.tuning());
     }
 
     return MUNIT_OK;
