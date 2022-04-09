@@ -69,7 +69,7 @@ Please define SAIL_CODEC_NAME before including this header.
  *
  * libsail, a caller of this function, guarantees the following:
  *   - The IO is valid and open.
- *   - The read optins is not NULL.
+ *   - The load options is not NULL.
  *
  * This function MUST:
  *   - Allocate an internal state object with internal data structures necessary to decode a file,
@@ -77,17 +77,17 @@ Please define SAIL_CODEC_NAME before including this header.
  *
  * STATE explanation: Pass the address of a local void* pointer. Codecs will store an internal state
  * in it and destroy it in sail_codec_read_finish_vx(). States must be used per image. DO NOT use the same state
- * to read multiple images in the same time.
+ * to load multiple images in the same time.
  *
  * Returns SAIL_OK on success.
  */
 sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_read_init_v6)(struct sail_io *io, const struct sail_read_options *read_options, void **state);
 
 /*
- * Seeks to the next frame. The frame is NOT immediately read or decoded by most SAIL codecs.
- * SAIL uses this method in reading and probing operations.
+ * Seeks to the next frame. The frame is NOT immediately loaded or decoded by most SAIL codecs.
+ * SAIL uses this method in loading and probing operations.
  *
- * SAIL uses sail_codec_read_frame_vx() to actually read the frame.
+ * SAIL uses sail_codec_read_frame_vx() to actually load the frame.
  *
  * libsail, a caller of this function, guarantees the following:
  *   - The state points to the state allocated by sail_codec_read_init_vx().
@@ -126,7 +126,7 @@ sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_read_seek_next_frame_v6)(void
 sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_read_frame_v6)(void *state, struct sail_io *io, struct sail_image *image);
 
 /*
- * Finilizes reading operation. No more readings are possible after calling this function.
+ * Finilizes loading operation. No more loadings are possible after calling this function.
  * This function doesn't close the io stream. It just stops decoding. Use io->close() or sail_destroy_io()
  * to actually close the io stream.
  *
@@ -154,7 +154,7 @@ sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_read_finish_v6)(void **state,
  *
  * libsail, a caller of this function, guarantees the following:
  *   - The IO is valid and open.
- *   - The write optins is not NULL.
+ *   - The write options is not NULL.
  *
  * This function MUST:
  *   - Allocate an internal state object with internal data structures necessary to decode a file,

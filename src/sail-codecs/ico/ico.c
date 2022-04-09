@@ -149,7 +149,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_seek_next_frame_v6_ico(void *state, st
         SAIL_TRY(ico_private_probe_image_type(io, &ico_image_type));
     } while (ico_image_type != SAIL_ICO_IMAGE_BMP);
 
-    /* Continue to reading BMP. */
+    /* Continue to loading BMP. */
     struct sail_image *image_local;
 
     SAIL_TRY(bmp_private_read_init(io, ico_state->read_options, &ico_state->common_bmp_state, SAIL_NO_BMP_FLAGS));

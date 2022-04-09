@@ -10,7 +10,7 @@ magic-numbers=71 6F 69 66
 extensions=qoi
 mime-types=
 
-[read-features]
+[load-features]
 features=STATIC
 tuning=
 

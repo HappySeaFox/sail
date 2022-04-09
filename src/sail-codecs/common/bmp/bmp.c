@@ -196,7 +196,7 @@ sail_status_t bmp_private_read_init(struct sail_io *io, const struct sail_read_o
     SAIL_TRY(alloc_bmp_state(&bmp_state));
     *state = bmp_state;
 
-    /* Shallow copy read options. */
+    /* Shallow copy load options. */
     bmp_state->read_options = read_options;
 
     bmp_state->bmp_read_options = bmp_read_options;

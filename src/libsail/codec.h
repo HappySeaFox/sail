@@ -41,7 +41,7 @@
 struct sail_codec_info;
 struct sail_codec_layout_v6;
 
-struct sail_read_features;
+struct sail_load_features;
 struct sail_read_options;
 struct sail_write_features;
 struct sail_write_options;

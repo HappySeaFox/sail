@@ -112,7 +112,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_jpeg(struct sail_io *io, const
 
     *state = jpeg_state;
 
-    /* Deep copy read options. */
+    /* Deep copy load options. */
     SAIL_TRY(sail_copy_read_options(read_options, &jpeg_state->read_options));
 
     /* Create decompress context. */

@@ -101,7 +101,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_qoi(struct sail_io *io, const 
     SAIL_TRY(alloc_qoi_state(&qoi_state));
     *state = qoi_state;
 
-    /* Deep copy read options. */
+    /* Deep copy load options. */
     SAIL_TRY(sail_copy_read_options(read_options, &qoi_state->read_options));
 
     /* Cache the entire file as the QOI API requires. */

@@ -88,18 +88,18 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
     unsigned width = 0, height = 0;
 
     /*
-     * Starts reading the specified file.
+     * Starts loading the specified file.
      */
-    SAIL_TRY_OR_CLEANUP(sail_start_reading_file(path.toLocal8Bit(), NULL, &state),
-                        /* cleanup */ sail_stop_reading(state));
+    SAIL_TRY_OR_CLEANUP(sail_start_loading_file(path.toLocal8Bit(), NULL, &state),
+                        /* cleanup */ sail_stop_loading(state));
 
     /*
-     * Read all the available image frames in the file.
+     * Load all the available image frames in the file.
      */
     sail_status_t res;
     struct sail_image *image;
 
-    while ((res = sail_read_next_frame(state, &image)) == SAIL_OK) {
+    while ((res = sail_load_next_frame(state, &image)) == SAIL_OK) {
 
         /* Mutate alpha into a green color. */
         const struct sail_conversion_options options = {
@@ -113,7 +113,7 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
                                                             SAIL_PIXEL_FORMAT_BPP24_RGB,
                                                             &options,
                                                             &image_converted),
-                            /* cleanup */ sail_stop_reading(state),
+                            /* cleanup */ sail_stop_loading(state),
                                           sail_destroy_image(image));
 
         if (width == 0) {
@@ -140,16 +140,16 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
     }
 
     if (res != SAIL_ERROR_NO_MORE_FRAMES) {
-        sail_stop_reading(state);
+        sail_stop_loading(state);
         return res;
     }
 
-    SAIL_LOG_DEBUG("Read images: %d", qimages->size());
+    SAIL_LOG_DEBUG("Loaded images: %d", qimages->size());
 
     /*
-     * Finish reading.
+     * Finish loading.
      */
-    SAIL_TRY(sail_stop_reading(state));
+    SAIL_TRY(sail_stop_loading(state));
 
     m_ui->labelStatus->setText(tr("%1  [%2x%3]  [%4 → %5]")
                                 .arg(QFileInfo(path).fileName())

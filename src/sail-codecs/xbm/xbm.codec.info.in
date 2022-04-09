@@ -10,7 +10,7 @@ magic-numbers=
 extensions=xbm
 mime-types=image/x-xbitmap;image/x-xbm
 
-[read-features]
+[load-features]
 features=STATIC
 tuning=
 

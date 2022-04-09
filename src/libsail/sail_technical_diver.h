@@ -44,43 +44,43 @@ struct sail_read_options;
 struct sail_write_options;
 
 /*
- * Starts reading the specified I/O stream.
+ * Starts loading the specified I/O stream.
  *
  * Typical usage: sail_alloc_io()                  ->
  *                set I/O callbacks                ->
  *                sail_codec_info_from_extension() ->
- *                sail_start_reading_io()          ->
- *                sail_read_next_frame()           ->
- *                sail_stop_reading()              ->
+ *                sail_start_loading_io()          ->
+ *                sail_load_next_frame()           ->
+ *                sail_stop_loading()              ->
  *                sail_destroy_io().
  *
  * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
- * in it and destroy it in sail_stop_reading. States must be used per image. DO NOT use the same state
- * to read multiple images in the same time.
+ * in it and destroy it in sail_stop_loading. States must be used per image. DO NOT use the same state
+ * to load multiple images from different sources in the same time.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_start_reading_io(struct sail_io *io, const struct sail_codec_info *codec_info, void **state);
+SAIL_EXPORT sail_status_t sail_start_loading_io(struct sail_io *io, const struct sail_codec_info *codec_info, void **state);
 
 /*
- * Starts reading the specified I/O stream with the specified read options. If you don't need specific read options,
+ * Starts loading the specified I/O stream with the specified read options. If you don't need specific read options,
  * just pass NULL. Codec-specific defaults will be used in this case. The read options are deep copied.
  *
  * Typical usage: sail_alloc_io()                      ->
  *                set I/O callbacks                    ->
  *                sail_codec_info_from_extension()     ->
- *                sail_start_reading_io_with_options() ->
- *                sail_read_next_frame()               ->
- *                sail_stop_reading()                  ->
+ *                sail_start_loading_io_with_options() ->
+ *                sail_load_next_frame()               ->
+ *                sail_stop_loading()                  ->
  *                sail_destroy_io().
  *
  * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
- * in it and destroy it in sail_stop_reading. States must be used per image. DO NOT use the same state
- * to read multiple images in the same time.
+ * in it and destroy it in sail_stop_loading. States must be used per image. DO NOT use the same state
+ * to load multiple images from different sources in the same time.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_start_reading_io_with_options(struct sail_io *io,
+SAIL_EXPORT sail_status_t sail_start_loading_io_with_options(struct sail_io *io,
                                                             const struct sail_codec_info *codec_info,
                                                             const struct sail_read_options *read_options, void **state);
 
@@ -97,7 +97,7 @@ SAIL_EXPORT sail_status_t sail_start_reading_io_with_options(struct sail_io *io,
  *
  * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
  * in it and destroy it in sail_stop_writing. States must be used per image. DO NOT use the same state
- * to write multiple images in the same time.
+ * to write multiple images to different targets in the same time.
  *
  * Returns SAIL_OK on success.
  */
@@ -117,7 +117,7 @@ SAIL_EXPORT sail_status_t sail_start_writing_io(struct sail_io *io, const struct
  *
  * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
  * in it and destroy it in sail_stop_writing. States must be used per image. DO NOT use the same state
- * to write multiple images in the same time.
+ * to write multiple images to different targets in the same time.
  *
  * Returns SAIL_OK on success.
  */

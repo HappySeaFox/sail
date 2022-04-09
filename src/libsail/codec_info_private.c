@@ -174,12 +174,12 @@ static sail_status_t inih_handler_sail_error(void *data, const char *section, co
             SAIL_LOG_ERROR("Unsupported codec info key '%s' in [%s]", name, section);
             SAIL_LOG_AND_RETURN(SAIL_ERROR_PARSE_FILE);
         }
-    } else if (strcmp(section, "read-features") == 0) {
+    } else if (strcmp(section, "load-features") == 0) {
         if (strcmp(name, "features") == 0) {
-            SAIL_TRY_OR_CLEANUP(parse_flags(value, &codec_info->read_features->features, codec_feature_from_string),
+            SAIL_TRY_OR_CLEANUP(parse_flags(value, &codec_info->load_features->features, codec_feature_from_string),
                                 /* cleanup */ SAIL_LOG_ERROR("Failed to parse codec features: '%s'", value));
         } else if (strcmp(name, "tuning") == 0) {
-            SAIL_TRY_OR_CLEANUP(sail_split_into_string_node_chain(value, &codec_info->read_features->tuning),
+            SAIL_TRY_OR_CLEANUP(sail_split_into_string_node_chain(value, &codec_info->load_features->tuning),
                                     /* cleanup */ SAIL_LOG_ERROR("Failed to parse codec tuning: '%s'", value));
         } else {
             SAIL_LOG_ERROR("Unsupported codec info key '%s' in [%s]", name, section);
@@ -318,7 +318,7 @@ static sail_status_t alloc_codec_info(struct sail_codec_info **codec_info) {
     (*codec_info)->magic_number_node = NULL;
     (*codec_info)->extension_node    = NULL;
     (*codec_info)->mime_type_node    = NULL;
-    (*codec_info)->read_features     = NULL;
+    (*codec_info)->load_features     = NULL;
     (*codec_info)->write_features    = NULL;
 
     return SAIL_OK;
@@ -328,7 +328,7 @@ static sail_status_t codec_read_info_from_input(const char *input, int (*ini_par
 
     struct sail_codec_info *codec_info_local;
     SAIL_TRY(alloc_codec_info(&codec_info_local));
-    SAIL_TRY_OR_CLEANUP(sail_alloc_read_features(&codec_info_local->read_features),
+    SAIL_TRY_OR_CLEANUP(sail_alloc_load_features(&codec_info_local->load_features),
                         destroy_codec_info(codec_info_local));
     SAIL_TRY_OR_CLEANUP(sail_alloc_write_features(&codec_info_local->write_features),
                         destroy_codec_info(codec_info_local));
@@ -391,7 +391,7 @@ void destroy_codec_info(struct sail_codec_info *codec_info) {
     sail_destroy_string_node_chain(codec_info->extension_node);
     sail_destroy_string_node_chain(codec_info->mime_type_node);
 
-    sail_destroy_read_features(codec_info->read_features);
+    sail_destroy_load_features(codec_info->load_features);
     sail_destroy_write_features(codec_info->write_features);
 
     sail_free(codec_info);

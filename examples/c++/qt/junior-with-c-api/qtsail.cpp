@@ -74,7 +74,7 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
                                            &image_converted),
                         /* cleanup */ sail_destroy_image(image));
 
-    // Construct QImage from the read image pixels.
+    // Construct QImage from the converted image pixels.
     //
     *qimage = QImage(reinterpret_cast<const uchar *>(image_converted->pixels),
                      image_converted->width,

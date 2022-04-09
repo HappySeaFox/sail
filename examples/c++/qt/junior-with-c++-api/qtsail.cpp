@@ -74,7 +74,7 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
     //
     SAIL_TRY(image.convert(SAIL_PIXEL_FORMAT_BPP32_RGBA));
 
-    // Construct QImage from the read image.
+    // Construct QImage from the loaded image.
     //
     *qimage = QImage(reinterpret_cast<const uchar *>(image.pixels()),
                      image.width(),

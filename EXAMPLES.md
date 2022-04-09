@@ -42,7 +42,7 @@ SAIL provides 4 levels of APIs depending on your needs. Let's have a look at the
 
 ### 1. `junior`
 
-**Purpose:** read a single image frame in a one-line manner from a file or memory.
+**Purpose:** load a single image frame in a one-line manner from a file or memory.
 
 #### C:
 ```C
@@ -78,7 +78,7 @@ sail::image image(path);
 
 ### 2. `advanced`
 
-**Purpose:** read a single-paged or multi-paged image from a file or memory.
+**Purpose:** load a single-paged or multi-paged image from a file or memory.
 
 #### C:
 ```C
@@ -90,26 +90,26 @@ void *state = NULL;
 struct sail_image *image;
 
 /*
- * Starts reading the specified file.
+ * Starts loading the specified file.
  */
-SAIL_TRY_OR_CLEANUP(sail_start_reading_file(path, NULL, &state),
-                    /* cleanup */ sail_stop_reading(state));
+SAIL_TRY_OR_CLEANUP(sail_start_loading_file(path, NULL, &state),
+                    /* cleanup */ sail_stop_loading(state));
 
 /*
- * Read just a single frame. It's possible to read more frames if any. Just continue
- * reading frames till sail_read_next_frame() returns SAIL_OK. If no more frames are available,
+ * Load just a single frame. It's possible to load more frames if any. Just continue
+ * loading frames till sail_load_next_frame() returns SAIL_OK. If no more frames are available,
  * it returns SAIL_ERROR_NO_MORE_FRAMES.
  *
  * SAIL always outputs frames of the same size.
  */
-SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, &image),
-                    /* cleanup */ sail_stop_reading(state));
+SAIL_TRY_OR_CLEANUP(sail_load_next_frame(state, &image),
+                    /* cleanup */ sail_stop_loading(state));
 
 /*
- * It's essential to ALWAYS stop reading to free memory resources.
+ * It's essential to ALWAYS stop loading to free memory resources.
  * Avoiding doing so will lead to memory leaks.
  */
-SAIL_TRY_OR_CLEANUP(sail_stop_reading(state),
+SAIL_TRY_OR_CLEANUP(sail_stop_loading(state),
          /* cleanup */ sail_destroy_image(image));
 
 /*
@@ -129,21 +129,21 @@ sail_destroy_image(image);
 sail::image_input input;
 sail::image image;
 
-// Starts reading the specified file.
+// Starts loading the specified file.
 //
 SAIL_TRY(input.start(path));
 
-// Read just a single frame. It's possible to read more frames if any. Just continue
-// reading frames till read_next_frame() returns SAIL_OK. If no more frames are available,
+// Load just a single frame. It's possible to load more frames if any. Just continue
+// loading frames till load_next_frame() returns SAIL_OK. If no more frames are available,
 // it returns SAIL_ERROR_NO_MORE_FRAMES.
 //
 // SAIL always outputs frames of the same size.
 //
 SAIL_TRY(input.next_frame(&image));
 
-// It's essential to ALWAYS stop reading to free memory resources.
+// It's essential to ALWAYS stop loading to free memory resources.
 // Avoiding doing so will lead to memory leaks. ~image_input() always
-// stops reading.
+// stops loading.
 //
 SAIL_TRY(input.stop());
 
@@ -154,7 +154,7 @@ SAIL_TRY(input.stop());
 
 ### 3. `deep diver`
 
-**Purpose:** read a single-paged or multi-paged image from a file or memory. Specify a concrete codec to use.
+**Purpose:** load a single-paged or multi-paged image from a file or memory. Specify a concrete codec to use.
              Possibly specify I/O controlling options.
 
 #### C:
@@ -174,26 +174,26 @@ struct sail_image *image;
 void *state = NULL;
 
 /*
- * Find the codec to read JPEGs.
+ * Find the codec to load JPEGs.
  */
 const struct sail_codec_info *codec_info;
 SAIL_TRY(sail_codec_info_from_extension("JPEG", &codec_info));
 
 /*
- * Allocate new read options and copy defaults from the codec-specific read features.
+ * Allocate new load options and copy defaults from the codec-specific load features.
  */
-SAIL_TRY(sail_alloc_read_options_from_features(codec_info->read_features, &read_options));
+SAIL_TRY(sail_alloc_read_options_from_features(codec_info->load_features, &read_options));
 
 /*
- * Obtain an image data in a buffer: read it from a file etc.
+ * Obtain an image data in a buffer: load it from a file etc.
  */
 void *buffer = ...
 size_t buffer_length = ...
 
 /*
- * Initialize reading from memory with our options. The options will be deep copied.
+ * Initialize loading from memory with our options. The options will be deep copied.
  */
-SAIL_TRY_OR_CLEANUP(sail_start_reading_mem_with_options(buffer,
+SAIL_TRY_OR_CLEANUP(sail_start_loading_mem_with_options(buffer,
                                                         buffer_length,
                                                         codec_info,
                                                         read_options,
@@ -201,24 +201,24 @@ SAIL_TRY_OR_CLEANUP(sail_start_reading_mem_with_options(buffer,
                     /* cleanup */ sail_destroy_read_options(read_options));
 
 /*
- * Our read options are not needed anymore.
+ * Our load options are not needed anymore.
  */
 sail_destroy_read_options(read_options);
 
 /*
- * Read just a single frame. It's possible to read more frames if any. Just continue
- * reading frames till sail_read_next_frame() returns SAIL_OK. If no more frames are available,
+ * Load just a single frame. It's possible to load more frames if any. Just continue
+ * loading frames till sail_load_next_frame() returns SAIL_OK. If no more frames are available,
  * it returns SAIL_ERROR_NO_MORE_FRAMES.
  *
  * SAIL always outputs frames of the same size.
  */
-SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, &image),
-                    /* cleanup */ sail_stop_reading(state));
+SAIL_TRY_OR_CLEANUP(sail_load_next_frame(state, &image),
+                    /* cleanup */ sail_stop_loading(state));
 
 /*
- * Finish reading.
+ * Finish loading.
  */
-SAIL_TRY_OR_CLEANUP(sail_stop_reading(state),
+SAIL_TRY_OR_CLEANUP(sail_stop_loading(state),
                     /* cleanup */ sail_destroy_image(image));
 
 /*
@@ -246,27 +246,27 @@ sail_unload_codecs();
 sail::context::init(SAIL_FLAG_PRELOAD_CODECS);
 sail::image_input input;
 
-// Find the codec to read JPEGs.
+// Find the codec to load JPEGs.
 //
 sail::codec_info codec_info;
 SAIL_TRY(codec_info::from_extension("JPEG", &codec_info));
 
-// Instantiate new read options and copy defaults from the read features.
+// Instantiate new load options and copy defaults from the load features.
 //
 sail::read_options read_options;
-SAIL_TRY(codec_info.read_features().to_read_options(&read_options));
+SAIL_TRY(codec_info.load_features().to_read_options(&read_options));
 
-// Obtain an image data in a buffer: read it from a file etc.
+// Obtain an image data in a buffer: load it from a file etc.
 //
 void *buffer = ...
 size_t buffer_length = ...
 
-// Initialize reading from memory with our options. The options will be deep copied.
+// Initialize loading from memory with our options. The options will be deep copied.
 //
 SAIL_TRY(input.start(buffer, buffer_length, codec_info, read_options));
 
-// Read just a single frame. It's possible to read more frames if any. Just continue
-// reading frames till read_next_frame() returns SAIL_OK. If no more frames are available,
+// Load just a single frame. It's possible to load more frames if any. Just continue
+// loading frames till load_next_frame() returns SAIL_OK. If no more frames are available,
 // it returns SAIL_ERROR_NO_MORE_FRAMES.
 //
 // SAIL always outputs frames of the same size.
@@ -274,9 +274,9 @@ SAIL_TRY(input.start(buffer, buffer_length, codec_info, read_options));
 sail::image image;
 SAIL_TRY(input.next_frame(&image));
 
-// It's essential to ALWAYS stop reading to free memory resources.
+// It's essential to ALWAYS stop loading to free memory resources.
 // Avoiding doing so will lead to memory leaks. ~image_input() always
-// stops reading.
+// stops loading.
 //
 SAIL_TRY(input.stop());
 
@@ -291,8 +291,8 @@ SAIL_TRY(input.stop());
 
 #### C:
 
-Instead of using `sail_start_reading_file_with_options()` in the `deep diver` example, create your own I/O stream
-and call `sail_start_reading_io_with_options()`.
+Instead of using `sail_start_loading_file_with_options()` in the `deep diver` example, create your own I/O stream
+and call `sail_start_loading_io_with_options()`.
 
 ```C
 /*
@@ -310,7 +310,7 @@ struct sail_image *image;
 void *state = NULL;
 
 /*
- * Find the codec to read JPEGs.
+ * Find the codec to load JPEGs.
  */
 const struct sail_codec_info *codec_info;
 SAIL_TRY(sail_codec_info_from_extension("JPEG", &codec_info));
@@ -325,13 +325,13 @@ SAIL_TRY(sail_alloc_io(&io));
  * Save a pointer to our data source. It will be passed back to the callback functions below.
  * You can free the data source in the close() callback.
  *
- * WARNING: If you don't call sail_stop_reading(), the close() callback is never called.
- *          Please make sure you always call sail_stop_reading().
+ * WARNING: If you don't call sail_stop_loading(), the close() callback is never called.
+ *          Please make sure you always call sail_stop_loading().
  */
 io->stream = my_data_source_pointer;
 
 /*
- * Setup reading, seeking, flushing etc. callbacks for our custom I/O source.
+ * Setup loading, seeking, flushing etc. callbacks for our custom I/O source.
  * All of them must be set.
  */
 io->read  = io_my_data_source_read;
@@ -343,16 +343,16 @@ io->close = io_my_data_source_close;
 io->eof   = io_my_data_source_eof;
 
 /*
- * Allocate new read options and copy defaults from the codec-specific read features.
+ * Allocate new load options and copy defaults from the codec-specific load features.
  */
-SAIL_TRY_OR_CLEANUP(sail_alloc_read_options_from_features(codec_info->read_features,
+SAIL_TRY_OR_CLEANUP(sail_alloc_read_options_from_features(codec_info->load_features,
                                                           &read_options),
                     /* cleanup */ sail_destroy_io(io));
 
 /*
- * Initialize reading with our options. The options will be deep copied.
+ * Initialize loading with our options. The options will be deep copied.
  */
-SAIL_TRY_OR_CLEANUP(sail_start_reading_io_with_options(io,
+SAIL_TRY_OR_CLEANUP(sail_start_loading_io_with_options(io,
                                                        codec_info,
                                                        read_options,
                                                        &state),
@@ -360,25 +360,25 @@ SAIL_TRY_OR_CLEANUP(sail_start_reading_io_with_options(io,
                                   sail_destroy_io(io));
 
 /*
- * Our read options are not needed anymore.
+ * Our load options are not needed anymore.
  */
 sail_destroy_read_options(read_options);
 
 /*
- * Read just a single frame. It's possible to read more frames if any. Just continue
- * reading frames till sail_read_next_frame() returns SAIL_OK. If no more frames are available,
+ * Load just a single frame. It's possible to load more frames if any. Just continue
+ * loading frames till sail_load_next_frame() returns SAIL_OK. If no more frames are available,
  * it returns SAIL_ERROR_NO_MORE_FRAMES.
  *
  * SAIL always outputs frames of the same size.
  */
-SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, &image),
-                    /* cleanup */ sail_stop_reading(state),
+SAIL_TRY_OR_CLEANUP(sail_load_next_frame(state, &image),
+                    /* cleanup */ sail_stop_loading(state),
                                   sail_destroy_io(io));
 
 /*
- * Finish reading.
+ * Finish loading.
  */
-SAIL_TRY_OR_CLEANUP(sail_stop_reading(state),
+SAIL_TRY_OR_CLEANUP(sail_stop_loading(state),
                     /* cleanup */ sail_destroy_image(image),
                                   sail_destroy_io(io));
 
@@ -427,7 +427,7 @@ sail::io io;
 //
 io.with_stream(my_data_source_pointer);
 
-// Setup reading, seeking, flushing etc. callbacks for our custom I/O source.
+// Setup loading, seeking, flushing etc. callbacks for our custom I/O source.
 // All of them must be set.
 //
 io.with_read(io_my_data_source_read)
@@ -438,17 +438,17 @@ io.with_read(io_my_data_source_read)
   .with_close(io_my_data_source_close)
   .with_eof(io_my_data_source_eof);
 
-// Instantiate new read options and copy defaults from the read features.
+// Instantiate new load options and copy defaults from the load features.
 //
 sail::read_options read_options;
-SAIL_TRY(codec_info.read_features().to_read_options(&read_options));
+SAIL_TRY(codec_info.load_features().to_read_options(&read_options));
 
-// Initialize reading with our I/O stream and options.
+// Initialize loading with our I/O stream and options.
 //
 SAIL_TRY(input.start(io, codec_info, read_options));
 
-// Read just a single frame. It's possible to read more frames if any. Just continue
-// reading frames till read_next_frame() returns SAIL_OK. If no more frames are available,
+// Load just a single frame. It's possible to load more frames if any. Just continue
+// loading frames till load_next_frame() returns SAIL_OK. If no more frames are available,
 // it returns SAIL_ERROR_NO_MORE_FRAMES.
 //
 // SAIL always outputs frames of the same size.
@@ -456,9 +456,9 @@ SAIL_TRY(input.start(io, codec_info, read_options));
 sail::image image;
 SAIL_TRY(input.next_frame(&image));
 
-// It's essential to ALWAYS stop reading to free memory resources.
+// It's essential to ALWAYS stop loading to free memory resources.
 // Avoiding doing so will lead to memory leaks. ~image_input() always
-// stops reading.
+// stops loading.
 //
 SAIL_TRY(input.stop());
 

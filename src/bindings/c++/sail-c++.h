@@ -58,10 +58,10 @@
     #include "io_base_p-c++.h"
     #include "io_file-c++.h"
     #include "io_memory-c++.h"
+    #include "load_features-c++.h"
     #include "log-c++.h"
     #include "meta_data-c++.h"
     #include "palette-c++.h"
-    #include "read_features-c++.h"
     #include "read_options-c++.h"
     #include "resolution-c++.h"
     #include "source_image-c++.h"
@@ -93,10 +93,10 @@
     #include <sail-c++/io_base-c++.h>
     #include <sail-c++/io_file-c++.h>
     #include <sail-c++/io_memory-c++.h>
+    #include <sail-c++/load_features-c++.h>
     #include <sail-c++/log-c++.h>
     #include <sail-c++/meta_data-c++.h>
     #include <sail-c++/palette-c++.h>
-    #include <sail-c++/read_features-c++.h>
     #include <sail-c++/read_options-c++.h>
     #include <sail-c++/resolution-c++.h>
     #include <sail-c++/source_image-c++.h>

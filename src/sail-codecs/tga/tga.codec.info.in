@@ -10,7 +10,7 @@ magic-numbers=
 extensions=tga;vda;vst;icb;tpic
 mime-types=image/x-targa;image/x-tga
 
-[read-features]
+[load-features]
 features=STATIC;META-DATA
 tuning=
 

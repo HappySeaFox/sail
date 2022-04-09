@@ -25,14 +25,14 @@ add_library(sail-c++
                 io_file-c++.h
                 io_memory-c++.cpp
                 io_memory-c++.h
+                load_features-c++.cpp
+                load_features-c++.h
                 log-c++.cpp
                 log-c++.h
                 meta_data-c++.cpp
                 meta_data-c++.h
                 palette-c++.cpp
                 palette-c++.h
-                read_features-c++.cpp
-                read_features-c++.h
                 read_options-c++.cpp
                 read_options-c++.h
                 resolution-c++.cpp
@@ -67,11 +67,11 @@ set(PUBLIC_HEADERS "abstract_io-c++.h"
                    "io_base-c++.h"
                    "io_file-c++.h"
                    "io_memory-c++.h"
+                   "load_features-c++.h"
                    "log-c++.h"
                    "meta_data-c++.h"
                    "palette-c++.h"
                    "codec_info-c++.h"
-                   "read_features-c++.h"
                    "read_options-c++.h"
                    "resolution-c++.h"
                    "sail-c++.h"

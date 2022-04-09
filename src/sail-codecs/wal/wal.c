@@ -91,7 +91,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_wal(struct sail_io *io, const 
     SAIL_TRY(alloc_wal_state(&wal_state));
     *state = wal_state;
 
-    /* Deep copy read options. */
+    /* Deep copy load options. */
     SAIL_TRY(sail_copy_read_options(read_options, &wal_state->read_options));
 
     /* Read WAL header. */

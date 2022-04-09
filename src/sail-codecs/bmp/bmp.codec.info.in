@@ -10,7 +10,7 @@ magic-numbers=42 4d;02 00
 extensions=bmp;ddb;dib
 mime-types=image/bmp;image/x-bmp
 
-[read-features]
+[load-features]
 features=STATIC;META-DATA
 tuning=
 

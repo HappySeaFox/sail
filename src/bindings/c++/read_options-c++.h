@@ -47,53 +47,53 @@ namespace sail
 {
 
 /*
- * read_options represents options to modify reading operations. See image_input.
+ * read_options represents options to modify loading operations. See image_input.
  */
 class SAIL_EXPORT read_options
 {
     friend class image_input;
-    friend class read_features;
+    friend class load_features;
 
 public:
     /*
-     * Constructs empty read options.
+     * Constructs empty load options.
      */
     read_options();
 
     /*
-     * Copies the read options.
+     * Copies the load options.
      */
     read_options(const read_options &ro);
 
     /*
-     * Copies the read options.
+     * Copies the load options.
      */
     read_options& operator=(const sail::read_options &read_options);
 
     /*
-     * Moves the read options.
+     * Moves the load options.
      */
     read_options(sail::read_options &&read_options) noexcept;
 
     /*
-     * Moves the read options.
+     * Moves the load options.
      */
     read_options& operator=(sail::read_options &&read_options) noexcept;
 
     /*
-     * Destroys the read options.
+     * Destroys the load options.
      */
     ~read_options();
 
     /*
-     * Returns the or-ed manipulation options for reading operations. See SailOption.
+     * Returns the or-ed manipulation options for loading operations. See SailOption.
      */
     int options() const;
 
     /*
      * Returns editable codec-specific tuning options. For example, a hypothetical ABC
      * image codec can allow disabling filtering with setting the "abc-filtering"
-     * tuning option to 0 in read options. Tuning options' names start with the codec name
+     * tuning option to 0 in load options. Tuning options' names start with the codec name
      * to avoid confusing.
      *
      * The list of possible values for every tuning option is not current available
@@ -107,7 +107,7 @@ public:
     /*
      * Returns constant codec-specific tuning options. For example, a hypothetical ABC
      * image codec can allow disabling filtering with setting the "abc-filtering"
-     * tuning option to 0 in read options. Tuning options' names start with the codec name
+     * tuning option to 0 in load options. Tuning options' names start with the codec name
      * to avoid confusing.
      *
      * The list of possible values for every tuning option is not current available
@@ -119,7 +119,7 @@ public:
     const sail::tuning& tuning() const;
 
     /*
-     * Sets new or-ed manipulation options for reading operations. See SailOption.
+     * Sets new or-ed manipulation options for loading operations. See SailOption.
      */
     void set_options(int options);
 
@@ -130,7 +130,7 @@ public:
 
 private:
     /*
-     * Makes a deep copy of the specified read options and stores the pointer for further use.
+     * Makes a deep copy of the specified load options and stores the pointer for further use.
      * When the SAIL context gets uninitialized, the pointer becomes dangling.
      */
     explicit read_options(const sail_read_options *ro);

@@ -53,7 +53,7 @@ typedef struct sail_codec_bundle_node sail_codec_bundle_node_t;
 
 /*
  * Returns a linked list of found codec info nodes. Use it to determine the list of possible image formats,
- * file extensions, and mime types that could be hypothetically read or written by SAIL.
+ * file extensions, and mime types that could be hypothetically loaded or saved by SAIL.
  *
  * Returns a pointer to the first codec info node or NULL when no SAIL codecs were found.
  * Use sail_codec_bundle_node.next to iterate.

@@ -43,7 +43,7 @@ extern "C" {
 struct sail_hash_map;
 
 /*
- * sail_source_image represents source image properties. The structure is used in reading
+ * sail_source_image represents source image properties. The structure is used in loading
  * operations only to preserve the source image properties which are usually lost during decoding.
  * For example, one might want to know the source image pixel format.
  * It's ignored in writing operations.

@@ -92,7 +92,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_xbm(struct sail_io *io, const 
     SAIL_TRY(alloc_xbm_state(&xbm_state));
     *state = xbm_state;
 
-    /* Deep copy read options. */
+    /* Deep copy load options. */
     SAIL_TRY(sail_copy_read_options(read_options, &xbm_state->read_options));
 
     return SAIL_OK;

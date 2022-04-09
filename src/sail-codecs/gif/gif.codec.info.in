@@ -10,7 +10,7 @@ magic-numbers=47 49 46 38 37 61;47 49 46 38 39 61
 extensions=gif
 mime-types=image/gif
 
-[read-features]
+[load-features]
 features=STATIC;ANIMATED;META-DATA
 tuning=
 

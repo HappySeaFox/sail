@@ -52,7 +52,7 @@ void sail_destroy_read_options(struct sail_read_options *read_options) {
     sail_free(read_options);
 }
 
-sail_status_t sail_alloc_read_options_from_features(const struct sail_read_features *read_features, struct sail_read_options **read_options) {
+sail_status_t sail_alloc_read_options_from_features(const struct sail_load_features *load_features, struct sail_read_options **read_options) {
 
     SAIL_CHECK_PTR(read_options);
 
@@ -61,11 +61,11 @@ sail_status_t sail_alloc_read_options_from_features(const struct sail_read_featu
 
     read_options_local->options = 0;
 
-    if (read_features->features & SAIL_CODEC_FEATURE_META_DATA) {
+    if (load_features->features & SAIL_CODEC_FEATURE_META_DATA) {
         read_options_local->options |= SAIL_OPTION_META_DATA;
     }
 
-    if (read_features->features & SAIL_CODEC_FEATURE_ICCP) {
+    if (load_features->features & SAIL_CODEC_FEATURE_ICCP) {
         read_options_local->options |= SAIL_OPTION_ICCP;
     }
 

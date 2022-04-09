@@ -84,7 +84,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_bmp(struct sail_io *io, const 
     SAIL_TRY(alloc_bmp_state(&bmp_state));
     *state = bmp_state;
 
-    /* Deep copy read options. */
+    /* Deep copy load options. */
     SAIL_TRY(sail_copy_read_options(read_options, &bmp_state->read_options));
 
     SAIL_TRY(bmp_private_read_init(io, bmp_state->read_options, &bmp_state->common_bmp_state, SAIL_READ_BMP_FILE_HEADER));

@@ -97,7 +97,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_tga(struct sail_io *io, const 
     SAIL_TRY(alloc_tga_state(&tga_state));
     *state = tga_state;
 
-    /* Deep copy read options. */
+    /* Deep copy load options. */
     SAIL_TRY(sail_copy_read_options(read_options, &tga_state->read_options));
 
     /* Read TGA footer. */

@@ -39,20 +39,20 @@ extern "C" {
 #endif
 
 struct sail_hash_map;
-struct sail_read_features;
+struct sail_load_features;
 
 /*
- * sail_read_options represents options to modify reading operations.
+ * sail_read_options represents options to modify loading operations.
  */
 struct sail_read_options {
 
-    /* Or-ed manipulation options for reading operations. See SailOption. */
+    /* Or-ed manipulation options for loading operations. See SailOption. */
     int options;
 
     /*
      * Codec-specific tuning options. For example, a hypothetical ABC image codec
      * can allow disabling filtering with setting the "abc-filtering" tuning option
-     * to 0 in read options. Tuning options' names start with the codec name
+     * to 0 in load options. Tuning options' names start with the codec name
      * to avoid confusing.
      *
      * Can be NULL.
@@ -69,27 +69,27 @@ struct sail_read_options {
 typedef struct sail_read_options sail_read_options_t;
 
 /*
- * Allocates read options.
+ * Allocates load options.
  *
  * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_alloc_read_options(struct sail_read_options **read_options);
 
 /*
- * Destroys the specified read options object and all its internal allocated memory buffers. The read options
- * MUST NOT be used anymore after calling this function. Does nothing if the read options is NULL.
+ * Destroys the specified load options object and all its internal allocated memory buffers. The load options
+ * MUST NOT be used anymore after calling this function. Does nothing if the load options is NULL.
  */
 SAIL_EXPORT void sail_destroy_read_options(struct sail_read_options *read_options);
 
 /*
- * Allocates and builds default read options from the read features.
+ * Allocates and builds default load options from the load features.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_read_options_from_features(const struct sail_read_features *read_features, struct sail_read_options **read_options);
+SAIL_EXPORT sail_status_t sail_alloc_read_options_from_features(const struct sail_load_features *load_features, struct sail_read_options **read_options);
 
 /*
- * Makes a deep copy of the specified read options object.
+ * Makes a deep copy of the specified load options object.
  *
  * Returns SAIL_OK on success.
  */

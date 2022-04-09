@@ -28,26 +28,26 @@
 
 #include "sail-common.h"
 
-sail_status_t sail_alloc_read_features(struct sail_read_features **read_features) {
+sail_status_t sail_alloc_load_features(struct sail_load_features **load_features) {
 
-    SAIL_CHECK_PTR(read_features);
+    SAIL_CHECK_PTR(load_features);
 
     void *ptr;
-    SAIL_TRY(sail_malloc(sizeof(struct sail_read_features), &ptr));
-    *read_features = ptr;
+    SAIL_TRY(sail_malloc(sizeof(struct sail_load_features), &ptr));
+    *load_features = ptr;
 
-    (*read_features)->features = 0;
-    (*read_features)->tuning   = NULL;
+    (*load_features)->features = 0;
+    (*load_features)->tuning   = NULL;
 
     return SAIL_OK;
 }
 
-void sail_destroy_read_features(struct sail_read_features *read_features) {
+void sail_destroy_load_features(struct sail_load_features *load_features) {
 
-    if (read_features == NULL) {
+    if (load_features == NULL) {
         return;
     }
 
-    sail_destroy_string_node_chain(read_features->tuning);
-    sail_free(read_features);
+    sail_destroy_string_node_chain(load_features->tuning);
+    sail_free(load_features);
 }

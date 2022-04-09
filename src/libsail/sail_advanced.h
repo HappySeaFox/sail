@@ -68,53 +68,53 @@ SAIL_EXPORT sail_status_t sail_probe_memory(const void *buffer, size_t buffer_le
                                             struct sail_image **image, const struct sail_codec_info **codec_info);
 
 /*
- * Starts reading the specified image file. Pass codec info if you would like to start reading
+ * Starts loading the specified image file. Pass codec info if you would like to start loading
  * with a specific codec. If not, just pass NULL.
  *
- * Typical usage: sail_start_reading_file() ->
- *                sail_read_next_frame()    ->
- *                sail_stop_reading().
+ * Typical usage: sail_start_loading_file() ->
+ *                sail_load_next_frame()    ->
+ *                sail_stop_loading().
  *
  * Or:            sail_codec_info_from_extension() ->
- *                sail_start_reading_file()        ->
- *                sail_read_next_frame()           ->
- *                sail_stop_reading().
+ *                sail_start_loading_file()        ->
+ *                sail_load_next_frame()           ->
+ *                sail_stop_loading().
  *
  * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
- * in it and destroy it in sail_stop_reading. States must be used per image. DO NOT use the same state
- * to start reading multiple images at the same time.
+ * in it and destroy it in sail_stop_loading. States must be used per image. DO NOT use the same state
+ * to start loading multiple images at the same time.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_start_reading_file(const char *path, const struct sail_codec_info *codec_info, void **state);
+SAIL_EXPORT sail_status_t sail_start_loading_file(const char *path, const struct sail_codec_info *codec_info, void **state);
 
 /*
- * Starts reading the specified memory buffer.
+ * Starts loading the specified memory buffer.
  *
  * Typical usage: sail_codec_info_from_extension() ->
- *                sail_start_reading_memory()      ->
- *                sail_read_next_frame()           ->
- *                sail_stop_reading().
+ *                sail_start_loading_memory()      ->
+ *                sail_load_next_frame()           ->
+ *                sail_stop_loading().
  *
  * STATE explanation: Passes the address of a local void* pointer. SAIL will store an internal state
- * in it and destroy it in sail_stop_reading(). States must be used per image. DO NOT use the same state
- * to start reading multiple images at the same time.
+ * in it and destroy it in sail_stop_loading(). States must be used per image. DO NOT use the same state
+ * to start loading multiple images at the same time.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_start_reading_memory(const void *buffer, size_t buffer_length,
+SAIL_EXPORT sail_status_t sail_start_loading_memory(const void *buffer, size_t buffer_length,
                                                     const struct sail_codec_info *codec_info, void **state);
 
 /*
- * Continues reading the file started by sail_start_reading_file() and brothers.
+ * Continues loading the file started by sail_start_loading_file() and brothers.
  *
  * Returns SAIL_OK on success.
  * Returns SAIL_ERROR_NO_MORE_FRAMES when no more frames are available.
  */
-SAIL_EXPORT sail_status_t sail_read_next_frame(void *state, struct sail_image **image);
+SAIL_EXPORT sail_status_t sail_load_next_frame(void *state, struct sail_image **image);
 
 /*
- * Stops reading the file started by sail_start_reading_file() and brothers.
+ * Stops loading the file started by sail_start_loading_file() and brothers.
  * Does nothing if the state is NULL.
  *
  * It is essential to always stop writing to free memory and I/O resources. Failure to do so
@@ -122,7 +122,7 @@ SAIL_EXPORT sail_status_t sail_read_next_frame(void *state, struct sail_image **
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_stop_reading(void *state);
+SAIL_EXPORT sail_status_t sail_stop_loading(void *state);
 
 /*
  * Starts writing into the specified image file. Pass codec info if you'd like to start writing

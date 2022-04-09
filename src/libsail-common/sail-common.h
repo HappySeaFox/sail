@@ -42,13 +42,13 @@
     #include "image.h"
     #include "io_common.h"
     #include "linked_list_node.h"
+    #include "load_features.h"
     #include "log.h"
     #include "memory.h"
     #include "meta_data.h"
     #include "meta_data_node.h"
     #include "palette.h"
     #include "pixel.h"
-    #include "read_features.h"
     #include "read_options.h"
     #include "resolution.h"
     #include "source_image.h"
@@ -70,13 +70,13 @@
     #include <sail-common/iccp.h>
     #include <sail-common/image.h>
     #include <sail-common/io_common.h>
+    #include <sail-common/load_features.h>
     #include <sail-common/log.h>
     #include <sail-common/memory.h>
     #include <sail-common/meta_data.h>
     #include <sail-common/meta_data_node.h>
     #include <sail-common/palette.h>
     #include <sail-common/pixel.h>
-    #include <sail-common/read_features.h>
     #include <sail-common/read_options.h>
     #include <sail-common/resolution.h>
     #include <sail-common/source_image.h>

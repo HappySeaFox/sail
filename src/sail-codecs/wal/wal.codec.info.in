@@ -10,7 +10,7 @@ magic-numbers=
 extensions=wal
 mime-types=
 
-[read-features]
+[load-features]
 features=STATIC;MULTI-PAGED
 tuning=
 

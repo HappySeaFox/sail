@@ -11,7 +11,7 @@ magic-numbers=?? ?? ?? ?? 66 74 79 70 61 76 69 66;?? ?? ?? ?? 66 74 79 70 61 76 
 extensions=avif;avifs
 mime-types=image/avif;image/avif-sequence
 
-[read-features]
+[load-features]
 features=STATIC;ANIMATED;META-DATA;ICCP
 tuning=
 

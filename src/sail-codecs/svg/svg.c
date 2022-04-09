@@ -96,7 +96,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_svg(struct sail_io *io, const 
     SAIL_TRY(alloc_svg_state(&svg_state));
     *state = svg_state;
 
-    /* Deep copy read options. */
+    /* Deep copy load options. */
     SAIL_TRY(sail_copy_read_options(read_options, &svg_state->read_options));
 
     /* Read the entire image as the resvg API requires. */
@@ -109,7 +109,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_svg(struct sail_io *io, const 
     const int result = resvg_parse_tree_from_data(image_data, image_size, svg_state->resvg_options, &svg_state->resvg_tree);
 
     if (result != RESVG_OK) {
-        SAIL_LOG_ERROR("SVG: Failed to read image");
+        SAIL_LOG_ERROR("SVG: Failed to load image");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
     }
 

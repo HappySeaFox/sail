@@ -23,8 +23,8 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_READ_FEATURES_H
-#define SAIL_READ_FEATURES_H
+#ifndef SAIL_LOAD_FEATURES_H
+#define SAIL_LOAD_FEATURES_H
 
 #ifdef SAIL_BUILD
     #include "error.h"
@@ -41,17 +41,17 @@ extern "C" {
 struct sail_string_node;
 
 /*
- * Read features. Use this structure to determine what a codec can actually read.
+ * Load features. Use this structure to determine what a codec can actually read.
  */
-struct sail_read_features {
+struct sail_load_features {
 
-    /* Supported or-ed features of reading operations. See SailCodecFeature. */
+    /* Supported or-ed features of loading operations. See SailCodecFeature. */
     int features;
 
     /*
      * Codec-specific tuning options. For example, a hypothetical ABC image codec
      * can allow disabling filtering with setting the "abc-filtering" tuning option
-     * to 0 in read options. Tuning options' names start with the codec name
+     * to 0 in load options. Tuning options' names start with the codec name
      * to avoid confusing.
      *
      * The list of possible values for every tuning option is not current available
@@ -63,20 +63,20 @@ struct sail_read_features {
     struct sail_string_node *tuning;
 };
 
-typedef struct sail_read_features sail_read_features_t;
+typedef struct sail_load_features sail_load_features_t;
 
 /*
- * Allocates read features.
+ * Allocates load features.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_read_features(struct sail_read_features **read_features);
+SAIL_EXPORT sail_status_t sail_alloc_load_features(struct sail_load_features **load_features);
 
 /*
- * Destroys the specified read features object and all its internal allocated memory buffers. The read features
- * MUST NOT be used anymore after calling this function. Does nothing if the read features is NULL.
+ * Destroys the specified load features object and all its internal allocated memory buffers. The load features
+ * MUST NOT be used anymore after calling this function. Does nothing if the load features is NULL.
  */
-SAIL_EXPORT void sail_destroy_read_features(struct sail_read_features *read_features);
+SAIL_EXPORT void sail_destroy_load_features(struct sail_load_features *load_features);
 
 /* extern "C" */
 #ifdef __cplusplus

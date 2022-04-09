@@ -30,7 +30,7 @@
 #include "sail-common.h"
 #include "sail.h"
 
-sail_status_t sail_start_reading_file_with_options(const char *path, const struct sail_codec_info *codec_info,
+sail_status_t sail_start_loading_file_with_options(const char *path, const struct sail_codec_info *codec_info,
                                                   const struct sail_read_options *read_options, void **state) {
 
     SAIL_CHECK_PTR(path);
@@ -46,12 +46,12 @@ sail_status_t sail_start_reading_file_with_options(const char *path, const struc
     struct sail_io *io;
     SAIL_TRY(sail_alloc_io_read_file(path, &io));
 
-    SAIL_TRY(start_reading_io_with_options(io, true, codec_info_local, read_options, state));
+    SAIL_TRY(start_loading_io_with_options(io, true, codec_info_local, read_options, state));
 
     return SAIL_OK;
 }
 
-sail_status_t sail_start_reading_memory_with_options(const void *buffer, size_t buffer_length,
+sail_status_t sail_start_loading_memory_with_options(const void *buffer, size_t buffer_length,
                                                      const struct sail_codec_info *codec_info,
                                                      const struct sail_read_options *read_options, void **state) {
 
@@ -68,7 +68,7 @@ sail_status_t sail_start_reading_memory_with_options(const void *buffer, size_t 
     struct sail_io *io;
     SAIL_TRY(sail_alloc_io_read_memory(buffer, buffer_length, &io));
 
-    SAIL_TRY(start_reading_io_with_options(io, true, codec_info_local, read_options, state));
+    SAIL_TRY(start_loading_io_with_options(io, true, codec_info_local, read_options, state));
 
     return SAIL_OK;
 }

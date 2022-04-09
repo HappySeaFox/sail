@@ -127,7 +127,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_jpeg2000(struct sail_io *io, c
     SAIL_TRY(alloc_jpeg2000_state(&jpeg2000_state));
     *state = jpeg2000_state;
 
-    /* Deep copy read options. */
+    /* Deep copy load options. */
     SAIL_TRY(sail_copy_read_options(read_options, &jpeg2000_state->read_options));
 
     /* Read the entire image to use the JasPer memory API. */

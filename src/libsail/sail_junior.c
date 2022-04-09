@@ -65,7 +65,7 @@ sail_status_t sail_probe_file(const char *path, struct sail_image **image, const
     SAIL_TRY(load_codec_by_codec_info(*codec_info_local, &codec));
 
     struct sail_read_options *read_options_local;
-    SAIL_TRY(sail_alloc_read_options_from_features((*codec_info_local)->read_features, &read_options_local));
+    SAIL_TRY(sail_alloc_read_options_from_features((*codec_info_local)->load_features, &read_options_local));
 
     struct sail_io *io;
     SAIL_TRY_OR_CLEANUP(sail_alloc_io_read_file(path, &io),
@@ -103,15 +103,15 @@ sail_status_t sail_load_image_from_file(const char *path, struct sail_image **im
 
     void *state = NULL;
 
-    SAIL_TRY_OR_CLEANUP(sail_start_reading_file(path, NULL /* codec info */, &state),
-                        /* cleanup */ sail_stop_reading(state));
+    SAIL_TRY_OR_CLEANUP(sail_start_loading_file(path, NULL /* codec info */, &state),
+                        /* cleanup */ sail_stop_loading(state));
 
     struct sail_image *image_local;
 
-    SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, &image_local),
-                        /* cleanup */ sail_stop_reading(state));
+    SAIL_TRY_OR_CLEANUP(sail_load_next_frame(state, &image_local),
+                        /* cleanup */ sail_stop_loading(state));
 
-    SAIL_TRY_OR_CLEANUP(sail_stop_reading(state),
+    SAIL_TRY_OR_CLEANUP(sail_stop_loading(state),
                         /* cleanup */ sail_destroy_image(image_local));
 
     *image = image_local;
@@ -126,13 +126,13 @@ sail_status_t sail_load_image_from_memory(const void *buffer, size_t buffer_leng
 
     void *state = NULL;
 
-    SAIL_TRY_OR_CLEANUP(sail_start_reading_memory(buffer, buffer_length, NULL /* codec info */, &state),
-                        /* cleanup */ sail_stop_reading(state));
+    SAIL_TRY_OR_CLEANUP(sail_start_loading_memory(buffer, buffer_length, NULL /* codec info */, &state),
+                        /* cleanup */ sail_stop_loading(state));
 
-    SAIL_TRY_OR_CLEANUP(sail_read_next_frame(state, image),
-                        /* cleanup */ sail_stop_reading(state));
+    SAIL_TRY_OR_CLEANUP(sail_load_next_frame(state, image),
+                        /* cleanup */ sail_stop_loading(state));
 
-    SAIL_TRY_OR_CLEANUP(sail_stop_reading(state),
+    SAIL_TRY_OR_CLEANUP(sail_stop_loading(state),
                         /* cleanup */ sail_destroy_image(*image));
 
     return SAIL_OK;

@@ -41,7 +41,7 @@ static MunitResult test_read_options(const MunitParameter params[], void *user_d
 
     {
         sail::read_options read_options;
-        munit_assert(first_codec.read_features().to_read_options(&read_options) == SAIL_OK);
+        munit_assert(first_codec.load_features().to_read_options(&read_options) == SAIL_OK);
     }
 
     return MUNIT_OK;
@@ -56,7 +56,7 @@ static MunitResult test_read_options_copy(const MunitParameter params[], void *u
 
     {
         sail::read_options read_options;
-        munit_assert(first_codec.read_features().to_read_options(&read_options) == SAIL_OK);
+        munit_assert(first_codec.load_features().to_read_options(&read_options) == SAIL_OK);
         munit_assert(read_options.tuning().empty());
 
         const sail::read_options read_options2 = read_options;
@@ -66,7 +66,7 @@ static MunitResult test_read_options_copy(const MunitParameter params[], void *u
 
     {
         sail::read_options read_options;
-        munit_assert(first_codec.read_features().to_read_options(&read_options) == SAIL_OK);
+        munit_assert(first_codec.load_features().to_read_options(&read_options) == SAIL_OK);
         read_options.tuning()["key"] = 10.0;
         munit_assert_double(read_options.tuning()["key"].value<double>(), ==, 10.0);
 
@@ -87,7 +87,7 @@ static MunitResult test_read_options_move(const MunitParameter params[], void *u
 
     {
         sail::read_options read_options;
-        munit_assert(first_codec.read_features().to_read_options(&read_options) == SAIL_OK);
+        munit_assert(first_codec.load_features().to_read_options(&read_options) == SAIL_OK);
 
         sail::read_options read_options2 = read_options;
         const sail::read_options read_options3 = std::move(read_options2);
@@ -97,7 +97,7 @@ static MunitResult test_read_options_move(const MunitParameter params[], void *u
 
     {
         sail::read_options read_options;
-        munit_assert(first_codec.read_features().to_read_options(&read_options) == SAIL_OK);
+        munit_assert(first_codec.load_features().to_read_options(&read_options) == SAIL_OK);
         read_options.tuning()["key"] = 10.0;
         munit_assert_double(read_options.tuning()["key"].value<double>(), ==, 10.0);
 

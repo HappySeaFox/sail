@@ -99,7 +99,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_pcx(struct sail_io *io, const 
     SAIL_TRY(alloc_pcx_state(&pcx_state));
     *state = pcx_state;
 
-    /* Deep copy read options. */
+    /* Deep copy load options. */
     SAIL_TRY(sail_copy_read_options(read_options, &pcx_state->read_options));
 
     /* Read PCX header. */

@@ -123,7 +123,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_avif(struct sail_io *io, const
     SAIL_TRY(alloc_avif_state(&avif_state));
     *state = avif_state;
 
-    /* Deep copy read options. */
+    /* Deep copy load options. */
     SAIL_TRY(sail_copy_read_options(read_options, &avif_state->read_options));
 
     avif_state->avif_decoder->ignoreExif = avif_state->avif_decoder->ignoreXMP = (avif_state->read_options->options & SAIL_OPTION_META_DATA) == 0;

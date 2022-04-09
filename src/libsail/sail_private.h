@@ -54,7 +54,7 @@ struct hidden_state {
      */
     struct sail_write_options *write_options;
 
-    /* Local state passed to codec reading and writing functions. */
+    /* Local state passed to codec loading and writing functions. */
     void *state;
 
     /* Pointers to internal data structures so no need to free these. */

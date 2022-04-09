@@ -10,7 +10,7 @@ magic-numbers=3C 3F 78 6D 6C
 extensions=svg;svgz
 mime-types=image/svg+xml
 
-[read-features]
+[load-features]
 features=STATIC
 tuning=
 

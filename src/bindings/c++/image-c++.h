@@ -139,7 +139,7 @@ public:
     /*
      * Returns the image width.
      *
-     * READ:  Set by SAIL to a positive image width in pixels.
+     * LOAD:  Set by SAIL to a positive image width in pixels.
      * WRITE: Must be set by a caller to a positive image width in pixels.
      */
     unsigned width() const;
@@ -147,7 +147,7 @@ public:
     /*
      * Returns the image height.
      *
-     * READ:  Set by SAIL to a positive image height in pixels.
+     * LOAD:  Set by SAIL to a positive image height in pixels.
      * WRITE: Must be set by a caller to a positive image height in pixels.
      */
     unsigned height() const;
@@ -155,7 +155,7 @@ public:
     /*
      * Returns the bytes per line.
      *
-     * READ:  Set by SAIL to a positive length of a row of pixels in bytes.
+     * LOAD:  Set by SAIL to a positive length of a row of pixels in bytes.
      * WRITE: Must be set by a caller to a positive number of bytes per line. A caller could set
      *        it with bytes_per_line_auto() if scan lines are not padded to a certain boundary.
      */
@@ -164,7 +164,7 @@ public:
     /*
      * Returns the image resolution.
      *
-     * READ:  Set by SAIL to a valid resolution if this information is available.
+     * LOAD:  Set by SAIL to a valid resolution if this information is available.
      * WRITE: Must be set by a caller to a valid image resolution if necessary.
      */
     const sail::resolution& resolution() const;
@@ -172,7 +172,7 @@ public:
     /*
      * Returns the image pixel format. See SailPixelFormat.
      *
-     * READ:  Set by SAIL to a valid image pixel format.
+     * LOAD:  Set by SAIL to a valid image pixel format.
      * WRITE: Must be set by a caller to a valid input image pixel format. Pixels in this format will be supplied
      *        to the codec by a caller later. The list of supported input pixel formats by a certain codec
      *        can be obtained from write_features.pixel_formats.
@@ -182,7 +182,7 @@ public:
     /*
      * Returns the image gamma.
      *
-     * READ:  Set by SAIL to a valid gamma if it's available. 1 by default.
+     * LOAD:  Set by SAIL to a valid gamma if it's available. 1 by default.
      * WRITE: Must be set by a caller to a valid gamma. Not all codecs support saving
      *        gamma.
      */
@@ -192,7 +192,7 @@ public:
      * Returns the delay in milliseconds to display the image on the screen if the image is a frame
      * in an animation or -1 otherwise.
      *
-     * READ:  Set by SAIL to a non-negative number of milliseconds if the image is a frame
+     * LOAD:  Set by SAIL to a non-negative number of milliseconds if the image is a frame
      *        in an animation or to -1 otherwise.
      *        For animations, it's guaranteed that all the frames have non-negative delays.
      *        For multi-paged sequences, it's guaranteed that all the pages have delays equal to -1.
@@ -204,7 +204,7 @@ public:
     /*
      * Returns the image palette if the image has it.
      *
-     * READ:  Set by SAIL to a valid palette if the image is indexed and the requested pixel format
+     * LOAD:  Set by SAIL to a valid palette if the image is indexed and the requested pixel format
      *        assumes having a palette.
      * WRITE: Must be set by a caller to a valid palette if the image is indexed.
      */
@@ -213,7 +213,7 @@ public:
     /*
      * Returns the image meta data.
      *
-     * READ:  Set by SAIL to a valid map with meta data (like JPEG comments).
+     * LOAD:  Set by SAIL to a valid map with meta data (like JPEG comments).
      * WRITE: Must be set by a caller to a valid map with meta data (like JPEG comments) if necessary.
      */
     const std::vector<sail::meta_data>& meta_data() const;
@@ -221,7 +221,7 @@ public:
     /*
      * Returns the editable image meta data.
      *
-     * READ:  Set by SAIL to a valid map with meta data (like JPEG comments).
+     * LOAD:  Set by SAIL to a valid map with meta data (like JPEG comments).
      * WRITE: Must be set by a caller to a valid map with meta data (like JPEG comments) if necessary.
      */
     std::vector<sail::meta_data>& meta_data();
@@ -232,7 +232,7 @@ public:
      * Note for animated/multi-paged images: only the first image in an animated/multi-paged
      * sequence might have an ICC profile.
      *
-     * READ:  Set by SAIL to a valid ICC profile if any.
+     * LOAD:  Set by SAIL to a valid ICC profile if any.
      * WRITE: Must be set by a caller to a valid ICC profile if necessary.
      */
     const sail::iccp& iccp() const;
@@ -240,7 +240,7 @@ public:
     /*
      * Returns the or-ed image properties. See SailImageProperty.
      *
-     * READ:  Set by SAIL to valid image properties. For example, some image formats store images flipped.
+     * LOAD:  Set by SAIL to valid image properties. For example, some image formats store images flipped.
      *        A caller must use this field to manipulate the output image accordingly (e.g., flip back etc.).
      * WRITE: Ignored.
      */
@@ -249,7 +249,7 @@ public:
     /*
      * Returns the source image properties.
      *
-     * READ:  Set by SAIL to valid source image properties of the original image.
+     * LOAD:  Set by SAIL to valid source image properties of the original image.
      * WRITE: Ignored.
      */
     const sail::source_image& source_image() const;
@@ -257,7 +257,7 @@ public:
     /*
      * Returns the editable pixel data if any.
      *
-     * READ:  Set by SAIL to valid pixel data.
+     * LOAD:  Set by SAIL to valid pixel data.
      * WRITE: Must be set by a caller to valid pixel data.
      */
     void* pixels();
@@ -265,7 +265,7 @@ public:
     /*
      * Returns the constant pixel data if any.
      *
-     * READ:  Set by SAIL to valid pixel data.
+     * LOAD:  Set by SAIL to valid pixel data.
      * WRITE: Must be set by a caller to valid pixel data.
      */
     const void* pixels() const;

@@ -46,16 +46,16 @@ static sail_status_t convert_impl(const char *input, const char *output, int com
 
     struct sail_image *image;
 
-    /* Read the image. */
+    /* Load the image. */
     SAIL_LOG_INFO("Input file: %s", input);
 
     SAIL_TRY(sail_codec_info_from_path(input, &codec_info));
     SAIL_LOG_INFO("Input codec: %s", codec_info->description);
 
-    SAIL_TRY(sail_start_reading_file(input, codec_info, &state));
+    SAIL_TRY(sail_start_loading_file(input, codec_info, &state));
 
-    SAIL_TRY(sail_read_next_frame(state, &image));
-    SAIL_TRY(sail_stop_reading(state));
+    SAIL_TRY(sail_load_next_frame(state, &image));
+    SAIL_TRY(sail_stop_loading(state));
 
     /* Write the image. */
     SAIL_LOG_INFO("Output file: %s", output);
@@ -212,10 +212,10 @@ static sail_status_t list_impl(bool verbose) {
         printf("%2d. [p%d] %s [%s] %s\n", counter, codec_info->priority, codec_info->name, codec_info->description, codec_info->version);
 
         if (verbose) {
-            if (codec_info->read_features->tuning != NULL) {
+            if (codec_info->load_features->tuning != NULL) {
                 printf("         Tuning: ");
 
-                for (const struct sail_string_node *node = codec_info->read_features->tuning, *prev = NULL;
+                for (const struct sail_string_node *node = codec_info->load_features->tuning, *prev = NULL;
                         node != NULL;
                         prev = node, node = node->next) {
                     if (prev != NULL) {

@@ -10,7 +10,7 @@ magic-numbers=89 50 4E 47 0D 0A 1A 0A
 extensions=png@CODEC_INFO_EXTENSION_APNG@
 mime-types=image/png
 
-[read-features]
+[load-features]
 features=STATIC@CODEC_INFO_FEATURE_ANIMATED@;META-DATA;INTERLACED;ICCP
 tuning=png-filter
 

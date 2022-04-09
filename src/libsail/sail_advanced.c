@@ -44,7 +44,7 @@ sail_status_t sail_probe_io(struct sail_io *io, struct sail_image **image, const
     SAIL_TRY(load_codec_by_codec_info(*codec_info_local, &codec));
 
     struct sail_read_options *read_options_local;
-    SAIL_TRY(sail_alloc_read_options_from_features((*codec_info_local)->read_features, &read_options_local));
+    SAIL_TRY(sail_alloc_read_options_from_features((*codec_info_local)->load_features, &read_options_local));
 
     void *state = NULL;
     SAIL_TRY_OR_CLEANUP(codec->v6->read_init(io, read_options_local, &state),
@@ -80,21 +80,21 @@ sail_status_t sail_probe_memory(const void *buffer, size_t buffer_length, struct
     return SAIL_OK;
 }
 
-sail_status_t sail_start_reading_file(const char *path, const struct sail_codec_info *codec_info, void **state) {
+sail_status_t sail_start_loading_file(const char *path, const struct sail_codec_info *codec_info, void **state) {
 
-    SAIL_TRY(sail_start_reading_file_with_options(path, codec_info, NULL, state));
-
-    return SAIL_OK;
-}
-
-sail_status_t sail_start_reading_memory(const void *buffer, size_t buffer_length, const struct sail_codec_info *codec_info, void **state) {
-
-    SAIL_TRY(sail_start_reading_memory_with_options(buffer, buffer_length, codec_info, NULL, state));
+    SAIL_TRY(sail_start_loading_file_with_options(path, codec_info, NULL, state));
 
     return SAIL_OK;
 }
 
-sail_status_t sail_read_next_frame(void *state, struct sail_image **image) {
+sail_status_t sail_start_loading_memory(const void *buffer, size_t buffer_length, const struct sail_codec_info *codec_info, void **state) {
+
+    SAIL_TRY(sail_start_loading_memory_with_options(buffer, buffer_length, codec_info, NULL, state));
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_load_next_frame(void *state, struct sail_image **image) {
 
     SAIL_CHECK_PTR(state);
     SAIL_CHECK_PTR(image);
@@ -127,7 +127,7 @@ sail_status_t sail_read_next_frame(void *state, struct sail_image **image) {
     return SAIL_OK;
 }
 
-sail_status_t sail_stop_reading(void *state) {
+sail_status_t sail_stop_loading(void *state) {
 
     /* Not an error. */
     if (state == NULL) {

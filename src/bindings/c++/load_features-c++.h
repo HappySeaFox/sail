@@ -23,8 +23,8 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_READ_FEATURES_CPP_H
-#define SAIL_READ_FEATURES_CPP_H
+#ifndef SAIL_LOAD_FEATURES_CPP_H
+#define SAIL_LOAD_FEATURES_CPP_H
 
 #include <memory>
 #include <vector>
@@ -41,7 +41,7 @@
     #include <sail-c++/tuning-c++.h>
 #endif
 
-struct sail_read_features;
+struct sail_load_features;
 
 namespace sail
 {
@@ -49,48 +49,48 @@ namespace sail
 class read_options;
 
 /*
- * Read features. Use this class to determine what a codec can actually read.
+ * Load features. Use this class to determine what a codec can actually read.
  * See codec_info.
  */
-class SAIL_EXPORT read_features
+class SAIL_EXPORT load_features
 {
     friend class codec_info;
 
 public:
     /*
-     * Copies the read features.
+     * Copies the load features.
      */
-    read_features(const read_features &rf);
+    load_features(const load_features &rf);
 
     /*
-     * Copies the read features.
+     * Copies the load features.
      */
-    read_features& operator=(const sail::read_features &read_features);
+    load_features& operator=(const sail::load_features &load_features);
 
     /*
-     * Moves the read features.
+     * Moves the load features.
      */
-    read_features(sail::read_features &&read_features) noexcept;
+    load_features(sail::load_features &&load_features) noexcept;
 
     /*
-     * Moves the read features.
+     * Moves the load features.
      */
-    read_features& operator=(sail::read_features &&read_features) noexcept;
+    load_features& operator=(sail::load_features &&load_features) noexcept;
 
     /*
-     * Destroys the read features.
+     * Destroys the load features.
      */
-    ~read_features();
+    ~load_features();
 
     /*
-     * Returns the supported or-ed features of reading operations. See SailCodecFeature.
+     * Returns the supported or-ed features of loading operations. See SailCodecFeature.
      */
     int features() const;
 
     /*
      * Returns supported codec-specific tuning options. For example, a hypothetical ABC
      * image codec can allow disabling filtering with setting the "abc-filtering"
-     * tuning option to 0 in read options. Tuning options' names start with the codec name
+     * tuning option to 0 in load options. Tuning options' names start with the codec name
      * to avoid confusing.
      *
      * The list of possible values for every tuning option is not current available
@@ -102,23 +102,23 @@ public:
     const sail::supported_tuning& supported_tuning() const;
 
     /*
-     * Builds default read options from the read features. Can be used to build
-     * default read options and then slightly modify them before passing to image_input.
+     * Builds default load options from the load features. Can be used to build
+     * default load options and then slightly modify them before passing to image_input.
      *
      * Returns SAIL_OK on success.
      */
     sail_status_t to_read_options(sail::read_options *read_options) const;
 
 private:
-    read_features();
+    load_features();
 
     /*
-     * Makes a deep copy of the specified read features and stores the pointer for further use.
+     * Makes a deep copy of the specified load features and stores the pointer for further use.
      * When the SAIL context gets uninitialized, the pointer becomes dangling.
      */
-    explicit read_features(const sail_read_features *rf);
+    explicit load_features(const sail_load_features *rf);
 
-    const sail_read_features* sail_read_features_c() const;
+    const sail_load_features* sail_load_features_c() const;
 
 private:
     class pimpl;

@@ -45,7 +45,7 @@ namespace sail
 {
 
 class abstract_io;
-class read_features;
+class load_features;
 class write_features;
 
 /*
@@ -125,9 +125,9 @@ public:
     const std::vector<std::string>& mime_types() const;
 
     /*
-     * Returns the read features of the codec.
+     * Returns the load features of the codec.
      */
-    const sail::read_features& read_features() const;
+    const sail::load_features& load_features() const;
 
     /*
      * Returns the write features of the codec.
@@ -187,7 +187,7 @@ public:
     static codec_info from_magic_number(sail::abstract_io &abstract_io);
 
     /*
-     * Returns a first codec info object that supports reading or writing the specified file path by its file extension.
+     * Returns a first codec info object that supports loading or writing the specified file path by its file extension.
      * Returns an invalid codec info object if no suitable codecs were found.
      * The comparison algorithm is case insensitive. For example: "/test.jpg". The path might not exist.
      *
@@ -239,7 +239,7 @@ public:
 
     /*
      * Returns the list of found codec info objects. Use it to determine the list of possible
-     * image formats, file extensions, and mime types that could be hypothetically read or written by SAIL.
+     * image formats, file extensions, and mime types that could be hypothetically loaded or saved by SAIL.
      */
     static std::vector<codec_info> list();
 

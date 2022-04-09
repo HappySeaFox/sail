@@ -134,7 +134,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_init_v6_gif(struct sail_io *io, const 
     SAIL_TRY(alloc_gif_state(&gif_state));
     *state = gif_state;
 
-    /* Deep copy read options. */
+    /* Deep copy load options. */
     SAIL_TRY(sail_copy_read_options(read_options, &gif_state->read_options));
 
     /* Initialize GIF. */
@@ -398,8 +398,7 @@ SAIL_EXPORT sail_status_t sail_codec_read_frame_v6_gif(void *state, struct sail_
                     do_read = true;
                     next_interlaced_row += InterlacedJumps[current_pass];
                 }
-            }
-            else { // !s32erlaced
+            } else {
                 do_read = true;
             }
 

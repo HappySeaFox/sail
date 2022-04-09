@@ -26,7 +26,7 @@
 #
 
 SAIL is a format-agnostic cross-platform image decoding library providing rich APIs, from one-liners
-to complex use cases with custom I/O sources. It enables a client to read and write static,
+to complex use cases with custom I/O sources. It enables a client to load and write static,
 animated, multi-paged images along with their meta data and ICC profiles. :sailboat:
 
 <p align="center">
@@ -192,7 +192,7 @@ and DLL on Windows). They implement actual decoding and encoding capabilities. E
 codecs directly. They always use abstract, high-level APIs in `libsail` for that.
 
 Every codec is accompanied with a so called codec info (description) file which is just a plain text file.
-It describes what the codec can actually do: what pixel formats it can read and output, what compression types
+It describes what the codec can actually do: what pixel formats it can load and output, what compression types
 it supports, and more.
 
 By default, SAIL loads codecs on demand. To preload them, use `sail_init_with_flags(SAIL_FLAG_PRELOAD_CODECS)`.

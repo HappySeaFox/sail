@@ -10,7 +10,7 @@ magic-numbers=FF D8
 extensions=jpg;jpeg;jpe;jif;jfif;jfi
 mime-types=image/jpeg
 
-[read-features]
+[load-features]
 features=STATIC;META-DATA@CODEC_INFO_FEATURE_ICCP@
 tuning=jpeg-dct-method;jpeg-optimize-coding;jpeg-smoothing-factor
 

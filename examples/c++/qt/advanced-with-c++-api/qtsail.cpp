@@ -76,12 +76,12 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
     sail::image image;
     sail::image first_image;
 
-    // Initialize reading.
+    // Initialize loading.
     //
     sail::io_file io_file(path.toLocal8Bit().constData());
     SAIL_TRY(image_input.start(io_file));
 
-    // Read all the available image frames in the file.
+    // Load all the available image frames in the file.
     //
     sail_status_t res;
     while ((res = image_input.next_frame(&image)) == SAIL_OK) {
@@ -115,7 +115,7 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
         return res;
     }
 
-    SAIL_LOG_DEBUG("Read images: %d", qimages->size());
+    SAIL_LOG_DEBUG("Loaded images: %d", qimages->size());
 
     // Optional
     SAIL_TRY(image_input.stop());

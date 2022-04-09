@@ -95,7 +95,7 @@ public:
     /*
      * Returns supported codec-specific tuning options. For example, a hypothetical ABC
      * image codec can allow disabling filtering with setting the "abc-filtering"
-     * tuning option to 0 in read options. Tuning options' names start with the codec name
+     * tuning option to 0 in load options. Tuning options' names start with the codec name
      * to avoid confusing.
      *
      * The list of possible values for every tuning option is not current available

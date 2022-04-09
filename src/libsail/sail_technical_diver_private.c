@@ -63,7 +63,7 @@ static sail_status_t allowed_write_compression(const struct sail_write_features 
  * Public functions.
  */
 
-sail_status_t start_reading_io_with_options(struct sail_io *io, bool own_io,
+sail_status_t start_loading_io_with_options(struct sail_io *io, bool own_io,
                                            const struct sail_codec_info *codec_info,
                                            const struct sail_read_options *read_options, void **state) {
 
@@ -90,7 +90,7 @@ sail_status_t start_reading_io_with_options(struct sail_io *io, bool own_io,
     if (read_options == NULL) {
         struct sail_read_options *read_options_local = NULL;
 
-        SAIL_TRY_OR_CLEANUP(sail_alloc_read_options_from_features(state_of_mind->codec_info->read_features, &read_options_local),
+        SAIL_TRY_OR_CLEANUP(sail_alloc_read_options_from_features(state_of_mind->codec_info->load_features, &read_options_local),
                             /* cleanup */ destroy_hidden_state(state_of_mind));
         SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v6->read_init(state_of_mind->io, read_options_local, &state_of_mind->state),
                             /* cleanup */ sail_destroy_read_options(read_options_local),
