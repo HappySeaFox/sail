@@ -41,7 +41,7 @@ sail_status_t sail_alloc_save_features(struct sail_save_features **save_features
     (*save_features)->features                  = 0;
     (*save_features)->compressions              = NULL;
     (*save_features)->compressions_length       = 0;
-    (*save_features)->default_compression       = SAIL_COMPRESSION_UNSUPPORTED;
+    (*save_features)->default_compression       = SAIL_COMPRESSION_UNKNOWN;
     (*save_features)->compression_level_min     = 0;
     (*save_features)->compression_level_max     = 0;
     (*save_features)->compression_level_default = 0;

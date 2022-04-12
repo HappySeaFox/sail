@@ -267,7 +267,6 @@ enum SailImageProperty sail_image_property_from_string(const char *str) {
 const char* sail_compression_to_string(enum SailCompression compression) {
 
     switch (compression) {
-        case SAIL_COMPRESSION_UNSUPPORTED:   return "UNSUPPORTED";
         case SAIL_COMPRESSION_UNKNOWN:       return "UNKNOWN";
         case SAIL_COMPRESSION_NONE:          return "NONE";
         case SAIL_COMPRESSION_ADOBE_DEFLATE: return "ADOBE-DEFLATE";
@@ -318,7 +317,6 @@ enum SailCompression sail_compression_from_string(const char *str) {
                         /* cleanup */ return SAIL_COMPRESSION_UNKNOWN);
 
     switch (hash) {
-        case UINT64_C(13846582888989074574): return SAIL_COMPRESSION_UNSUPPORTED;
         case UINT64_C(229442760833397):      return SAIL_COMPRESSION_UNKNOWN;
         case UINT64_C(6384332661):           return SAIL_COMPRESSION_NONE;
         case UINT64_C(10962109560604417378): return SAIL_COMPRESSION_ADOBE_DEFLATE;

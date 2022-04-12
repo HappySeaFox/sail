@@ -291,7 +291,6 @@ static MunitResult test_compression_to_string(const MunitParameter params[], voi
     (void)user_data;
 
     munit_assert_string_equal(sail_compression_to_string(SAIL_COMPRESSION_UNKNOWN),       "UNKNOWN");
-    munit_assert_string_equal(sail_compression_to_string(SAIL_COMPRESSION_UNSUPPORTED),   "UNSUPPORTED");
     munit_assert_string_equal(sail_compression_to_string(SAIL_COMPRESSION_NONE),          "NONE");
     munit_assert_string_equal(sail_compression_to_string(SAIL_COMPRESSION_ADOBE_DEFLATE), "ADOBE-DEFLATE");
     munit_assert_string_equal(sail_compression_to_string(SAIL_COMPRESSION_AV1),           "AV1");
@@ -340,7 +339,6 @@ static MunitResult test_compression_from_string(const MunitParameter params[], v
     munit_assert(sail_compression_from_string("Some") == SAIL_COMPRESSION_UNKNOWN);
 
     munit_assert(sail_compression_from_string("UNKNOWN")       == SAIL_COMPRESSION_UNKNOWN);
-    munit_assert(sail_compression_from_string("UNSUPPORTED")   == SAIL_COMPRESSION_UNSUPPORTED);
     munit_assert(sail_compression_from_string("NONE")          == SAIL_COMPRESSION_NONE);
     munit_assert(sail_compression_from_string("ADOBE-DEFLATE") == SAIL_COMPRESSION_ADOBE_DEFLATE);
     munit_assert(sail_compression_from_string("AV1")           == SAIL_COMPRESSION_AV1);

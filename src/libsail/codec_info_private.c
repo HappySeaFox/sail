@@ -294,7 +294,7 @@ static sail_status_t check_codec_info(const struct sail_codec_info *codec_info) 
         }
     }
 
-    if (save_features->default_compression == SAIL_COMPRESSION_UNKNOWN) {
+    if (save_features->compressions_length > 0 && save_features->default_compression == SAIL_COMPRESSION_UNKNOWN) {
         SAIL_LOG_ERROR("Codec validation error: %s codec has UNKNOWN default compression", codec_info->name);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INCOMPLETE_CODEC_INFO);
     }

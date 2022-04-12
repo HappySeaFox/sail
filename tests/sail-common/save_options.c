@@ -35,7 +35,7 @@ static MunitResult test_alloc_options(const MunitParameter params[], void *user_
     munit_assert(sail_alloc_save_options(&save_options) == SAIL_OK);
     munit_assert_not_null(save_options);
     munit_assert(save_options->options == 0);
-    munit_assert(save_options->compression == SAIL_COMPRESSION_UNSUPPORTED);
+    munit_assert(save_options->compression == SAIL_COMPRESSION_UNKNOWN);
     munit_assert(save_options->compression_level == 0);
 
     sail_destroy_save_options(save_options);

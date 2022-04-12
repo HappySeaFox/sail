@@ -40,7 +40,7 @@ sail_status_t sail_alloc_source_image(struct sail_source_image **source_image) {
     (*source_image)->pixel_format       = SAIL_PIXEL_FORMAT_UNKNOWN;
     (*source_image)->chroma_subsampling = SAIL_CHROMA_SUBSAMPLING_UNKNOWN;
     (*source_image)->properties         = 0;
-    (*source_image)->compression        = SAIL_COMPRESSION_UNSUPPORTED;
+    (*source_image)->compression        = SAIL_COMPRESSION_UNKNOWN;
     (*source_image)->special_properties = NULL;
 
     return SAIL_OK;

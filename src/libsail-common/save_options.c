@@ -37,7 +37,7 @@ sail_status_t sail_alloc_save_options(struct sail_save_options **save_options) {
     *save_options = ptr;
 
     (*save_options)->options           = 0;
-    (*save_options)->compression       = SAIL_COMPRESSION_UNSUPPORTED;
+    (*save_options)->compression       = SAIL_COMPRESSION_UNKNOWN;
     (*save_options)->compression_level = 0;
     (*save_options)->tuning            = NULL;
 
