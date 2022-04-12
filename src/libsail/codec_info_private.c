@@ -195,7 +195,7 @@ static sail_status_t inih_handler_sail_error(void *data, const char *section, co
                                                         &codec_info->save_features->pixel_formats_length,
                                                         pixel_format_from_string),
                                 /* cleanup */ SAIL_LOG_ERROR("Failed to parse output pixel formats: '%s'", value));
-        } else if (strcmp(name, "compression-types") == 0) {
+        } else if (strcmp(name, "compressions") == 0) {
             SAIL_TRY_OR_CLEANUP(parse_serialized_ints(value,
                                                         (int **)&codec_info->save_features->compressions,
                                                         &codec_info->save_features->compressions_length,
