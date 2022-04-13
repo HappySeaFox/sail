@@ -76,24 +76,10 @@ struct sail_save_features {
     enum SailCompression default_compression;
 
     /*
-     * Minimum compression value. For lossy codecs, more compression means less quality and vice versa.
-     * For lossless codecs, more compression means nothing but a smaller file size. This field is
-     * codec-specific. If compression_level_min == compression_level_max == 0, no compression tuning is available.
-     * For example: 0.
+     * Supported compression level range. If compression levels are not supported
+     * by the codec, compression_level is NULL.
      */
-    double compression_level_min;
-
-    /*
-     * Maximum compression value. This field is codec-specific. If compression_level_min == compression_level_max == 0,
-     * no compression tuning is available. For example: 100.
-     */
-    double compression_level_max;
-
-    /* Default compression value. For example: 15. */
-    double compression_level_default;
-
-    /* Step to increase or decrease compression levels. For example: 1. */
-    double compression_level_step;
+    struct sail_compression_level *compression_level;
 
     /*
      * Codec-specific tuning options. For example, a hypothetical ABC image codec

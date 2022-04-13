@@ -27,6 +27,7 @@
 #define SAIL_SAVE_FEATURES_CPP_H
 
 #include <memory>
+#include <optional>
 #include <vector>
 
 #ifdef SAIL_BUILD
@@ -111,34 +112,10 @@ public:
     SailCompression default_compression() const;
 
     /*
-     * Returns the minimum compression value. For lossy codecs, more compression means less
-     * quality and vice versa. For lossless codecs, more compression means nothing but a smaller
-     * file size. The value is codec-specific.
-     *
-     * If compression_level_min() == compression_level_max() == 0, no compression tuning is available.
-     *
-     * For example: 0.
+     * Returns the supported compression level range or an empty object if
+     * compression levels are not supported by the codec.
      */
-    double compression_level_min() const;
-
-    /*
-     * Returns the maximum compression value. This field is codec-specific.
-     *
-     * If compression_level_min() == compression_level_max() == 0, no compression tuning is available.
-     *
-     * For example: 100.
-     */
-    double compression_level_max() const;
-
-    /*
-     * Returns the default compression value. For example: 15.
-     */
-    double compression_level_default() const;
-
-    /*
-     * Returns the step to increase or decrease compression levels. For example: 1.
-     */
-    double compression_level_step() const;
+    const std::optional<sail::compression_level>& compression_level() const;
 
     /*
      * Returns supported codec-specific tuning options. For example, a hypothetical ABC

@@ -6,6 +6,8 @@ add_library(sail-c++
                 at_scope_exit-c++.h
                 codec_info-c++.cpp
                 codec_info-c++.h
+                compression_level-c++.cpp
+                compression_level-c++.h
                 context-c++.cpp
                 context-c++.h
                 conversion_options-c++.cpp
@@ -58,8 +60,10 @@ add_library(sail-c++
 set(PUBLIC_HEADERS "abstract_io-c++.h"
                    "arbitrary_data-c++.h"
                    "at_scope_exit-c++.h"
+                   "codec_info-c++.h"
                    "context-c++.h"
                    "conversion_options-c++.h"
+                   "compression_level-c++.h"
                    "iccp-c++.h"
                    "image-c++.h"
                    "image_input-c++.h"
@@ -72,7 +76,6 @@ set(PUBLIC_HEADERS "abstract_io-c++.h"
                    "log-c++.h"
                    "meta_data-c++.h"
                    "palette-c++.h"
-                   "codec_info-c++.h"
                    "resolution-c++.h"
                    "sail-c++.h"
                    "save_features-c++.h"

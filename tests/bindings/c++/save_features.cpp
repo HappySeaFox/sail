@@ -41,7 +41,20 @@ static MunitResult test_save_features(const MunitParameter params[], void *user_
     // Copy
     {
         const sail::save_features save_features = first_codec.save_features();
-        munit_assert(save_features.features()         == first_codec.save_features().features());
+
+        munit_assert(save_features.features() == first_codec.save_features().features());
+
+        munit_assert(save_features.compression_level().has_value() == first_codec.save_features().compression_level().has_value());
+        if (save_features.compression_level().has_value()) {
+            const sail::compression_level &l1 = save_features.compression_level().value();
+            const sail::compression_level &l2 = first_codec.save_features().compression_level().value();
+
+            munit_assert(l1.level_min()     == l2.level_min());
+            munit_assert(l1.level_max()     == l2.level_max());
+            munit_assert(l1.level_default() == l2.level_default());
+            munit_assert(l1.level_step()    == l2.level_step());
+        }
+
         munit_assert(save_features.supported_tuning() == first_codec.save_features().supported_tuning());
     }
 
@@ -49,7 +62,20 @@ static MunitResult test_save_features(const MunitParameter params[], void *user_
     {
         const sail::save_features save_features1 = std::move(first_codec.save_features());
         const sail::save_features save_features = std::move(save_features1);
-        munit_assert(save_features.features()         == first_codec.save_features().features());
+
+        munit_assert(save_features.features() == first_codec.save_features().features());
+
+        munit_assert(save_features.compression_level().has_value() == first_codec.save_features().compression_level().has_value());
+        if (save_features.compression_level().has_value()) {
+            const sail::compression_level &l1 = save_features.compression_level().value();
+            const sail::compression_level &l2 = first_codec.save_features().compression_level().value();
+
+            munit_assert(l1.level_min()     == l2.level_min());
+            munit_assert(l1.level_max()     == l2.level_max());
+            munit_assert(l1.level_default() == l2.level_default());
+            munit_assert(l1.level_step()    == l2.level_step());
+        }
+
         munit_assert(save_features.supported_tuning() == first_codec.save_features().supported_tuning());
     }
 

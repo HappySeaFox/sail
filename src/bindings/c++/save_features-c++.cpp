@@ -40,6 +40,7 @@ public:
 
     std::vector<SailPixelFormat> pixel_formats;
     std::vector<SailCompression> compressions;
+    std::optional<sail::compression_level> compression_level;
     sail::supported_tuning supported_tuning;
 };
 
@@ -54,6 +55,7 @@ save_features& save_features::operator=(const sail::save_features &save_features
     d->sail_save_features_c = save_features.d->sail_save_features_c;
     d->pixel_formats        = save_features.d->pixel_formats;
     d->compressions         = save_features.d->compressions;
+    d->compression_level    = save_features.d->compression_level;
     d->supported_tuning     = save_features.d->supported_tuning;
 
     return *this;
@@ -95,24 +97,9 @@ SailCompression save_features::default_compression() const
     return d->sail_save_features_c->default_compression;
 }
 
-double save_features::compression_level_min() const
+const std::optional<sail::compression_level>& save_features::compression_level() const
 {
-    return d->sail_save_features_c->compression_level_min;
-}
-
-double save_features::compression_level_max() const
-{
-    return d->sail_save_features_c->compression_level_max;
-}
-
-double save_features::compression_level_default() const
-{
-    return d->sail_save_features_c->compression_level_default;
-}
-
-double save_features::compression_level_step() const
-{
-    return d->sail_save_features_c->compression_level_step;
+    return d->compression_level;
 }
 
 const sail::supported_tuning& save_features::supported_tuning() const
@@ -176,6 +163,11 @@ save_features::save_features(const sail_save_features *wf)
     }
 
     d->compressions = compressions;
+
+    // Compression level
+    if (wf->compression_level != nullptr) {
+        d->compression_level = sail::compression_level(wf->compression_level);
+    }
 
     // Supported tuning
     for (const sail_string_node *node = wf->tuning; node != nullptr; node = node->next) {
