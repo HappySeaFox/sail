@@ -69,7 +69,9 @@ sail_status_t sail_alloc_save_options_from_features(const struct sail_save_featu
     }
 
     save_options_local->compression       = save_features->default_compression;
-    save_options_local->compression_level = save_features->compression_level_default;
+    save_options_local->compression_level = save_features->compression_level == NULL
+                                                ? 0
+                                                : save_features->compression_level->level_default;
 
     *save_options = save_options_local;
 

@@ -73,21 +73,26 @@ static MunitResult test_options_from_features(const MunitParameter params[], voi
     (void)params;
     (void)user_data;
 
+    struct sail_save_features *save_features;
     struct sail_save_options *save_options;
-    struct sail_save_features save_features;
-    save_features.default_compression = SAIL_COMPRESSION_JPEG;
-    save_features.compression_level_min = 1;
-    save_features.compression_level_max = 100;
-    save_features.compression_level_default = 81;
-    save_features.compression_level_step = 1;
-    save_features.features = SAIL_CODEC_FEATURE_META_DATA | SAIL_CODEC_FEATURE_INTERLACED | SAIL_CODEC_FEATURE_ICCP;
-    munit_assert(sail_alloc_save_options_from_features(&save_features, &save_options) == SAIL_OK);
+
+    munit_assert(sail_alloc_save_features(&save_features) == SAIL_OK);
+    munit_assert(sail_alloc_compression_level(&save_features->compression_level) == SAIL_OK);
+
+    save_features->default_compression = SAIL_COMPRESSION_JPEG;
+    save_features->compression_level->level_min = 1;
+    save_features->compression_level->level_max = 100;
+    save_features->compression_level->level_default = 81;
+    save_features->compression_level->level_step = 1;
+    save_features->features = SAIL_CODEC_FEATURE_META_DATA | SAIL_CODEC_FEATURE_INTERLACED | SAIL_CODEC_FEATURE_ICCP;
+    munit_assert(sail_alloc_save_options_from_features(save_features, &save_options) == SAIL_OK);
 
     munit_assert(save_options->options == (SAIL_OPTION_META_DATA | SAIL_OPTION_ICCP));
-    munit_assert(save_options->compression == save_features.default_compression);
-    munit_assert(save_options->compression_level == save_features.compression_level_default);
+    munit_assert(save_options->compression == save_features->default_compression);
+    munit_assert(save_options->compression_level == save_features->compression_level->level_default);
     munit_assert_null(save_options->tuning);
 
+    sail_destroy_save_features(save_features);
     sail_destroy_save_options(save_options);
 
     return MUNIT_OK;

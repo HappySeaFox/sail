@@ -11,6 +11,8 @@ add_library(sail-common
                 common_serialize.c
                 common_serialize.h
                 compiler_specifics.h
+                compression_level.h
+                compression_level.c
                 error.h
                 export.h
                 hash_map.c
@@ -63,6 +65,7 @@ add_library(sail-common
 set(PUBLIC_HEADERS "common.h"
                    "common_serialize.h"
                    "compiler_specifics.h"
+                   "compression_level.h"
                    "error.h"
                    "export.h"
                    "hash_map.h"

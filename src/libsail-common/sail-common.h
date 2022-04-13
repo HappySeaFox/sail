@@ -34,6 +34,7 @@
     #include "common.h"
     #include "common_serialize.h"
     #include "compiler_specifics.h"
+    #include "compression_level.h"
     #include "error.h"
     #include "export.h"
     #include "hash_map.h"
@@ -64,6 +65,7 @@
     #include <sail-common/common.h>
     #include <sail-common/common_serialize.h>
     #include <sail-common/compiler_specifics.h>
+    #include <sail-common/compression_level.h>
     #include <sail-common/error.h>
     #include <sail-common/export.h>
     #include <sail-common/hash_map.h>

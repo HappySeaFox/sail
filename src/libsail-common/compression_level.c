@@ -1,6 +1,6 @@
 /*  This file is part of SAIL (https://github.com/smoked-herring/sail)
 
-    Copyright (c) 2020 Dmitry Baryshev
+    Copyright (c) 2022 Dmitry Baryshev
 
     The MIT License
 
@@ -23,40 +23,29 @@
     SOFTWARE.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "sail-common.h"
 
-sail_status_t sail_alloc_save_features(struct sail_save_features **save_features) {
+sail_status_t sail_alloc_compression_level(struct sail_compression_level **compression_level) {
 
-    SAIL_CHECK_PTR(save_features);
+    SAIL_CHECK_PTR(compression_level);
 
     void *ptr;
-    SAIL_TRY(sail_malloc(sizeof(struct sail_save_features), &ptr));
-    *save_features = ptr;
+    SAIL_TRY(sail_malloc(sizeof(struct sail_compression_level), &ptr));
+    *compression_level = ptr;
 
-    (*save_features)->pixel_formats        = NULL;
-    (*save_features)->pixel_formats_length = 0;
-    (*save_features)->features             = 0;
-    (*save_features)->compressions         = NULL;
-    (*save_features)->compressions_length  = 0;
-    (*save_features)->default_compression  = SAIL_COMPRESSION_UNKNOWN;
-    (*save_features)->compression_level    = NULL;
-    (*save_features)->tuning               = NULL;
+    (*compression_level)->level_min     = 0;
+    (*compression_level)->level_max     = 0;
+    (*compression_level)->level_default = 0;
+    (*compression_level)->level_step    = 0;
 
     return SAIL_OK;
 }
 
-void sail_destroy_save_features(struct sail_save_features *save_features) {
+void sail_destroy_compression_level(struct sail_compression_level *compression_level) {
 
-    if (save_features == NULL) {
+    if (compression_level == NULL) {
         return;
     }
 
-    sail_free(save_features->pixel_formats);
-    sail_free(save_features->compressions);
-    sail_destroy_compression_level(save_features->compression_level);
-    sail_destroy_string_node_chain(save_features->tuning);
-    sail_free(save_features);
+    sail_free(compression_level);
 }
