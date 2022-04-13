@@ -46,6 +46,7 @@
 
 static struct sail_context *global_context = NULL;
 
+#ifdef SAIL_THREAD_SAFE
 static sail_mutex_t global_context_guard_mutex;
 
 static bool global_context_guard_mutex_initialized = false;
@@ -72,6 +73,7 @@ static sail_status_t initialize_global_context_guard_mutex(void) {
 
     return SAIL_OK;
 }
+#endif
 
 #ifdef SAIL_WIN32
 static sail_status_t add_dll_directory(const char *path) {
@@ -726,6 +728,12 @@ static void print_build_statistics(void) {
     SAIL_LOG_INFO("Combine codecs: no");
 #endif
 
+#ifdef SAIL_THREAD_SAFE
+    SAIL_LOG_INFO("Thread-safe: yes");
+#else
+    SAIL_LOG_INFO("Thread-safe: no");
+#endif
+
 #ifdef SAIL_THIRD_PARTY_CODECS_PATH
     SAIL_LOG_INFO("SAIL_THIRD_PARTY_CODECS_PATH: enabled");
 #else
@@ -870,16 +878,20 @@ sail_status_t sail_unload_codecs_private(void) {
 
 sail_status_t lock_context(void) {
 
+#ifdef SAIL_THREAD_SAFE
     SAIL_TRY(initialize_global_context_guard_mutex());
 
     SAIL_TRY(threading_lock_mutex(&global_context_guard_mutex));
+#endif
 
     return SAIL_OK;
 }
 
 sail_status_t unlock_context(void) {
 
+#ifdef SAIL_THREAD_SAFE
     SAIL_TRY(threading_unlock_mutex(&global_context_guard_mutex));
+#endif
 
     return SAIL_OK;
 }

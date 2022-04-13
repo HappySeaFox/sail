@@ -1,3 +1,7 @@
+if (SAIL_THREAD_SAFE)
+    set(THREADING_SOURCES threading.h threading.c)
+endif()
+
 add_library(sail
                 codec.c
                 codec_bundle.h
@@ -38,8 +42,7 @@ add_library(sail
                 sail_technical_diver.h
                 sail_technical_diver_private.c
                 sail_technical_diver_private.h
-                threading.h
-                threading.c)
+                ${THREADING_SOURCES})
 
 # Build a list of public headers to install
 #
@@ -85,19 +88,19 @@ endif()
 
 target_link_libraries(sail PUBLIC sail-common)
 
-if (WIN32)
-    sail_check_init_once_execute_once()
-endif()
+if (SAIL_THREAD_SAFE)
+    if (WIN32)
+        sail_check_init_once_execute_once()
+    elseif (UNIX)
+        # pthread_once()
+        find_package(Threads REQUIRED)
+        target_link_libraries(sail PUBLIC ${CMAKE_THREAD_LIBS_INIT})
 
-if (UNIX)
-    # pthread_once()
-    find_package(Threads REQUIRED)
-    target_link_libraries(sail PUBLIC ${CMAKE_THREAD_LIBS_INIT})
+        # pthread_mutexattr_settype()
+        sail_enable_xopen_source(TARGET sail VERSION 500)
 
-    # pthread_mutexattr_settype()
-    sail_enable_xopen_source(TARGET sail VERSION 500)
-
-    target_link_libraries(sail PRIVATE dl)
+        target_link_libraries(sail PRIVATE dl)
+    endif()
 endif()
 
 # pkg-config integration

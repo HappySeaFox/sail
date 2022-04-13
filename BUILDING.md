@@ -20,6 +20,7 @@ Consider [EXAMPLES](EXAMPLES.md) after building and installing.
 - `SAIL_EXCEPT_CODECS="a;b;c"` - Enable all codecs except the codecs specified in this ';'-separated list.
   Codecs with missing dependencies will be disabled regardless this setting. Default: empty list
 - `SAIL_THIRD_PARTY_CODECS_PATH=ON|OFF` - Enable loading custom codecs from the ';'-separated paths specified in the `SAIL_THIRD_PARTY_CODECS_PATH` environment variable. Default: `ON`
+- `SAIL_THREAD_SAFE=ON|OFF` - Enable working in multi-threaded environments by locking the internal context with a mutex. Default: `ON`
 - `SAIL_ONLY_CODECS="a;b;c"` - Enable only the codecs specified in this ';'-separated list.
   Codecs with missing dependencies will be disabled regardless this setting. Default: empty list
 

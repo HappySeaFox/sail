@@ -75,6 +75,7 @@ option(BUILD_SHARED_LIBS "Build shared libs. When disabled, sets SAIL_COMBINE_CO
 cmake_dependent_option(SAIL_COMBINE_CODECS "Combine all codecs into a single library." OFF "BUILD_SHARED_LIBS" ON)
 option(SAIL_THIRD_PARTY_CODECS_PATH "Enable loading third-party codecs from the ';'-separated paths specified in \
 the SAIL_THIRD_PARTY_CODECS_PATH environment variable." ON)
+option(SAIL_THREAD_SAFE "Enable working in multi-threaded environments by locking the internal context with a mutex." ON)
 
 # When we compile for VCPKG, VCPKG_TARGET_TRIPLET is defined
 #
@@ -292,6 +293,7 @@ message("* Developer mode:               ${SAIL_DEV}")
 message("* VCPKG mode:                   ${SAIL_VCPKG}")
 message("* Shared build:                 ${BUILD_SHARED_LIBS}")
 message("*   Combine codecs [*]:         ${SAIL_COMBINE_CODECS}")
+message("* Thread-safe:                  ${SAIL_THREAD_SAFE}")
 message("* SAIL_THIRD_PARTY_CODECS_PATH: ${SAIL_THIRD_PARTY_CODECS_PATH}")
 message("* Build apps:                   ${SAIL_BUILD_APPS}")
 message("* Build examples:               ${SAIL_BUILD_EXAMPLES}")

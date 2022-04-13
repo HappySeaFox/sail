@@ -52,7 +52,9 @@
     #include "sail_private.h"
     #include "sail_technical_diver.h"
     #include "sail_technical_diver_private.h"
+    #ifdef SAIL_THREAD_SAFE
     #include "threading.h"
+    #endif
 #else
     #include <sail-common/sail-common.h>
 

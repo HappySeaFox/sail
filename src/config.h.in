@@ -72,4 +72,7 @@
 /* Load third-party codecs from SAIL_THIRD_PARTY_CODECS_PATH. */
 #cmakedefine SAIL_THIRD_PARTY_CODECS_PATH
 
+/* Enable working in multi-threaded environments. */
+#cmakedefine SAIL_THREAD_SAFE
+
 #endif
