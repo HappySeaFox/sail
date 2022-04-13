@@ -113,18 +113,18 @@ compression_level::compression_level()
 {
 }
 
-compression_level::compression_level(const sail_compression_level *compression_level)
+compression_level::compression_level(const sail_compression_level *cl)
     : compression_level()
 {
-    if (compression_level == nullptr) {
+    if (cl == nullptr) {
         SAIL_LOG_TRACE("NULL pointer has been passed to sail::compression_level(). The object is untouched");
         return;
     }
 
-    d->sail_compression_level->level_min     = compression_level->level_min;
-    d->sail_compression_level->level_max     = compression_level->level_max;
-    d->sail_compression_level->level_default = compression_level->level_default;
-    d->sail_compression_level->level_step    = compression_level->level_step;
+    d->sail_compression_level->level_min     = cl->level_min;
+    d->sail_compression_level->level_max     = cl->level_max;
+    d->sail_compression_level->level_default = cl->level_default;
+    d->sail_compression_level->level_step    = cl->level_step;
 }
 
 }
