@@ -49,10 +49,10 @@ static MunitResult test_save_features(const MunitParameter params[], void *user_
             const sail::compression_level &l1 = save_features.compression_level().value();
             const sail::compression_level &l2 = first_codec.save_features().compression_level().value();
 
-            munit_assert(l1.level_min()     == l2.level_min());
-            munit_assert(l1.level_max()     == l2.level_max());
-            munit_assert(l1.level_default() == l2.level_default());
-            munit_assert(l1.level_step()    == l2.level_step());
+            munit_assert(l1.min_level()     == l2.min_level());
+            munit_assert(l1.max_level()     == l2.max_level());
+            munit_assert(l1.default_level() == l2.default_level());
+            munit_assert(l1.step()          == l2.step());
         }
 
         munit_assert(save_features.supported_tuning() == first_codec.save_features().supported_tuning());
@@ -70,10 +70,10 @@ static MunitResult test_save_features(const MunitParameter params[], void *user_
             const sail::compression_level &l1 = save_features.compression_level().value();
             const sail::compression_level &l2 = first_codec.save_features().compression_level().value();
 
-            munit_assert(l1.level_min()     == l2.level_min());
-            munit_assert(l1.level_max()     == l2.level_max());
-            munit_assert(l1.level_default() == l2.level_default());
-            munit_assert(l1.level_step()    == l2.level_step());
+            munit_assert(l1.min_level()     == l2.min_level());
+            munit_assert(l1.max_level()     == l2.max_level());
+            munit_assert(l1.default_level() == l2.default_level());
+            munit_assert(l1.step()          == l2.step());
         }
 
         munit_assert(save_features.supported_tuning() == first_codec.save_features().supported_tuning());

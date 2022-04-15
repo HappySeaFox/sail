@@ -98,17 +98,16 @@ public:
      *
      * For example:
      *
-     *     1. The JPEG codec supports only one compression, JPEG. compression_level_min, compression_level_max,
-     *        compression_level_default can be used to select a compression level.
+     *     1. The JPEG codec supports only one compression, JPEG. save_features.compression_level() can be used
+     *        to select a compression level.
      *     2. The TIFF codec supports more than two compression types (PACKBITS, JPEG, etc.). Compression levels
      *        are ignored.
      */
     SailCompression compression() const;
 
     /*
-     * Returns the requested compression level. Must be in the range specified by compression_level_min()
-     * and compression_level_max() in save_features. If compression_level() < compression_level_min() or
-     * compression_level() > compression_level_max(), compression_level_default() will be used.
+     * Returns the requested compression level. Must be in the range specified in
+     * save_features.compression_level().
      */
     double compression_level() const;
 

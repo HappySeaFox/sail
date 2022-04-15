@@ -48,25 +48,25 @@ struct sail_compression_level {
      * and vice versa. For lossless codecs, more compression means nothing but a smaller
      * file size.
      */
-    double level_min;
+    double min_level;
 
     /*
      * Maximum compression value. For lossy codecs, more compression means less quality
      * and vice versa. For lossless codecs, more compression means nothing but a smaller
      * file size.
      */
-    double level_max;
+    double max_level;
 
     /*
      * Default compression value within the min/max range.
      */
-    double level_default;
+    double default_level;
 
     /*
-     * Step to increase or decrease compression levels.
-     * Can be used in UI to build a compression level component.
+     * Step to increase or decrease compression levels in the range.
+     * Can be used in UI to build a compression level selection component.
      */
-    double level_step;
+    double step;
 };
 
 typedef struct sail_compression_level sail_compression_level_t;

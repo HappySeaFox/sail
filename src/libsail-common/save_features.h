@@ -62,8 +62,8 @@ struct sail_save_features {
      *
      * For example:
      *
-     *     1. The JPEG codec supports only one compression, JPEG. compression_level_min, compression_level_max,
-     *        compression_level_default can be used to select a compression level.
+     *     1. The JPEG codec supports only one compression, JPEG. compression_level can be used
+     *        to select a compression level.
      *     2. The TIFF codec supports more than two compression types (PACKBITS, JPEG, etc.).
      *        Compression levels are ignored.
      */

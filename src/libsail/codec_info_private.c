@@ -208,25 +208,25 @@ static sail_status_t inih_handler_sail_error(void *data, const char *section, co
                 SAIL_TRY(sail_alloc_compression_level(&codec_info->save_features->compression_level));
             }
 
-            codec_info->save_features->compression_level->level_min = atof(value);
+            codec_info->save_features->compression_level->min_level = atof(value);
         } else if (strcmp(name, "compression-level-max") == 0) {
             if (codec_info->save_features->compression_level == NULL) {
                 SAIL_TRY(sail_alloc_compression_level(&codec_info->save_features->compression_level));
             }
 
-            codec_info->save_features->compression_level->level_max = atof(value);
+            codec_info->save_features->compression_level->max_level = atof(value);
         } else if (strcmp(name, "compression-level-default") == 0) {
             if (codec_info->save_features->compression_level == NULL) {
                 SAIL_TRY(sail_alloc_compression_level(&codec_info->save_features->compression_level));
             }
 
-            codec_info->save_features->compression_level->level_default = atof(value);
+            codec_info->save_features->compression_level->default_level = atof(value);
         } else if (strcmp(name, "compression-level-step") == 0) {
             if (codec_info->save_features->compression_level == NULL) {
                 SAIL_TRY(sail_alloc_compression_level(&codec_info->save_features->compression_level));
             }
 
-            codec_info->save_features->compression_level->level_step = atof(value);
+            codec_info->save_features->compression_level->step = atof(value);
         } else if (strcmp(name, "tuning") == 0) {
             SAIL_TRY_OR_CLEANUP(sail_split_into_string_node_chain(value, &codec_info->save_features->tuning),
                                     /* cleanup */ SAIL_LOG_ERROR("Failed to parse codec tuning: '%s'", value));
@@ -299,7 +299,7 @@ static sail_status_t check_codec_info(const struct sail_codec_info *codec_info) 
 
     /* Compression levels and types are mutually exclusive.*/
     if (save_features->compressions_length > 1 && save_features->compression_level != NULL &&
-            (save_features->compression_level->level_min != 0 || save_features->compression_level->level_max != 0)) {
+            (save_features->compression_level->min_level != 0 || save_features->compression_level->max_level != 0)) {
         SAIL_LOG_ERROR("Codec validation error: %s codec has more than two compression types and non-zero compression levels which is unsupported", codec_info->name);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INCOMPLETE_CODEC_INFO);
     }
@@ -317,10 +317,10 @@ static sail_status_t check_codec_info(const struct sail_codec_info *codec_info) 
     }
 
     if (codec_info->save_features->compression_level != NULL) {
-        if (codec_info->save_features->compression_level->level_min > codec_info->save_features->compression_level->level_max) {
+        if (codec_info->save_features->compression_level->min_level > codec_info->save_features->compression_level->max_level) {
             SAIL_LOG_ERROR("Codec validation error: %s codec has incorrect compression levels of min(%.1f), max(%.1f)",
-                            codec_info->name, codec_info->save_features->compression_level->level_min,
-                            codec_info->save_features->compression_level->level_max);
+                            codec_info->name, codec_info->save_features->compression_level->min_level,
+                            codec_info->save_features->compression_level->max_level);
             SAIL_LOG_AND_RETURN(SAIL_ERROR_INCOMPLETE_CODEC_INFO);
         }
     }

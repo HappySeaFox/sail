@@ -33,10 +33,10 @@ sail_status_t sail_alloc_compression_level(struct sail_compression_level **compr
     SAIL_TRY(sail_malloc(sizeof(struct sail_compression_level), &ptr));
     *compression_level = ptr;
 
-    (*compression_level)->level_min     = 0;
-    (*compression_level)->level_max     = 0;
-    (*compression_level)->level_default = 0;
-    (*compression_level)->level_step    = 0;
+    (*compression_level)->min_level     = 0;
+    (*compression_level)->max_level     = 0;
+    (*compression_level)->default_level = 0;
+    (*compression_level)->step          = 0;
 
     return SAIL_OK;
 }

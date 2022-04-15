@@ -82,25 +82,25 @@ public:
      * means less quality and vice versa. For lossless codecs, more compression
      * means nothing but a smaller file size.
      */
-    double level_min() const;
+    double min_level() const;
 
     /*
      * Returns the maximum compression value. For lossy codecs, more compression
      * means less quality and vice versa. For lossless codecs, more compression
      * means nothing but a smaller file size.
      */
-    double level_max() const;
+    double max_level() const;
 
     /*
      * Returns the default compression value within the min/max range.
      */
-    double level_default() const;
+    double default_level() const;
 
     /*
-     * Returns the step to increase or decrease compression levels.
-     * Can be used in UI to build a compression level component.
+     * Returns the step to increase or decrease compression levels in the range.
+     * Can be used in UI to build a compression level selection component.
      */
-    double level_step() const;
+    double step() const;
 
 private:
     compression_level();

@@ -57,10 +57,10 @@ compression_level::compression_level(const sail::compression_level &cl)
 
 compression_level& compression_level::operator=(const sail::compression_level &compression_level)
 {
-    d->sail_compression_level->level_min     = compression_level.level_min();
-    d->sail_compression_level->level_max     = compression_level.level_max();
-    d->sail_compression_level->level_default = compression_level.level_default();
-    d->sail_compression_level->level_step    = compression_level.level_step();
+    d->sail_compression_level->min_level     = compression_level.min_level();
+    d->sail_compression_level->max_level     = compression_level.max_level();
+    d->sail_compression_level->default_level = compression_level.default_level();
+    d->sail_compression_level->step          = compression_level.step();
 
     return *this;
 }
@@ -83,29 +83,29 @@ compression_level::~compression_level()
 
 bool compression_level::is_valid() const
 {
-    return d->sail_compression_level->level_min < d->sail_compression_level->level_max &&
-            d->sail_compression_level->level_default >= d->sail_compression_level->level_min &&
-            d->sail_compression_level->level_default <= d->sail_compression_level->level_max;
+    return d->sail_compression_level->min_level < d->sail_compression_level->max_level &&
+            d->sail_compression_level->default_level >= d->sail_compression_level->min_level &&
+            d->sail_compression_level->default_level <= d->sail_compression_level->max_level;
 }
 
-double compression_level::level_min() const
+double compression_level::min_level() const
 {
-    return d->sail_compression_level->level_min;
+    return d->sail_compression_level->min_level;
 }
 
-double compression_level::level_max() const
+double compression_level::max_level() const
 {
-    return d->sail_compression_level->level_max;
+    return d->sail_compression_level->max_level;
 }
 
-double compression_level::level_default() const
+double compression_level::default_level() const
 {
-    return d->sail_compression_level->level_default;
+    return d->sail_compression_level->default_level;
 }
 
-double compression_level::level_step() const
+double compression_level::step() const
 {
-    return d->sail_compression_level->level_step;
+    return d->sail_compression_level->step;
 }
 
 compression_level::compression_level()
@@ -121,10 +121,10 @@ compression_level::compression_level(const sail_compression_level *cl)
         return;
     }
 
-    d->sail_compression_level->level_min     = cl->level_min;
-    d->sail_compression_level->level_max     = cl->level_max;
-    d->sail_compression_level->level_default = cl->level_default;
-    d->sail_compression_level->level_step    = cl->level_step;
+    d->sail_compression_level->min_level     = cl->min_level;
+    d->sail_compression_level->max_level     = cl->max_level;
+    d->sail_compression_level->default_level = cl->default_level;
+    d->sail_compression_level->step          = cl->step;
 }
 
 }
