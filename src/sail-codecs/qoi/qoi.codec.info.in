@@ -17,7 +17,6 @@ tuning=
 [save-features]
 features=STATIC
 pixel-formats=BPP24-RGB;BPP32-RGBA
-properties=
 compressions=QOI
 default-compression=QOI
 compression-level-min=0

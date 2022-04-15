@@ -17,7 +17,6 @@ tuning=
 [save-features]
 features=
 pixel-formats=
-properties=
 compressions=
 default-compression=
 compression-level-min=0
