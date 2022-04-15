@@ -16,7 +16,6 @@
   <a href="#features-overview">Features</a> •
   <a href="#supported-image-formats">Image Formats</a> •
   <a href="#apis-overview">Getting Started</a> •
-  <a href="EXAMPLES.md">Examples</a> •
   <a href="FAQ.md">FAQ</a>
 </p>
 
@@ -138,7 +137,7 @@ sail::image image(path);
 // In particular, you can convert it to a different pixel format with image::convert().
 ```
 
-It's pretty easy, isn't it? :smile: See [EXAMPLES](EXAMPLES.md) and [FAQ](FAQ.md) for more.
+It's pretty easy, isn't it? :smile: See also [FAQ](FAQ.md).
 
 ## Programming languages
 

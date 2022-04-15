@@ -1,7 +1,5 @@
 ## Building SAIL
 
-Consider [EXAMPLES](EXAMPLES.md) after building and installing.
-
 ### Terminology and build types
 
 **Standalone build** - manually compiled with `cmake` and respective build commands. Extra dependencies like libjpeg ARE NOT shipped with the build. macOS brew package is a good example of a standalone build.

@@ -84,12 +84,10 @@ SAIL provides four levels of high-level APIs:
 - `Deep diver`: I want to load this animated GIF from a file or memory and have control over selected codecs and meta data
 - `Technical diver`: I want everything above and my custom I/O source
 
-See [EXAMPLES](EXAMPLES.md) for more.
-
 ## Does SAIL provide simple one-line APIs?
 
 Yes. SAIL provides four levels of APIs, depending on your needs: `junior`, `advanced`, `deep diver`, and `technical diver`.
-`junior` is your choice. See [EXAMPLES](EXAMPLES.md) for more.
+`junior` is your choice.
 
 ## What pixel formats SAIL is able to read?
 
@@ -429,7 +427,7 @@ compression-level-step=1
 
 ## Are there any C/C++ examples?
 
-Yes. See [EXAMPLES](EXAMPLES.md) for more.
+Yes. See the `examples` directory in the source tree.
 
 ## Are there any bindings to other programming languages?
 
