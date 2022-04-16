@@ -204,7 +204,7 @@ enum SailImageProperty {
     SAIL_IMAGE_PROPERTY_FLIPPED_HORIZONTALLY = 1 << 2,
 
     /*
-     * Image is interlaced. Only sail_image.source_properties can have this property.
+     * Image is interlaced. Only sail_image.source_image.properties can have this property.
      * Reading operations never output interlaced images, that's why sail_image.properties
      * never has it.
      */
