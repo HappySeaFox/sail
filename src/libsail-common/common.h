@@ -177,7 +177,6 @@ enum SailPixelFormat {
 /* Chroma subsampling. See https://en.wikipedia.org/wiki/Chroma_subsampling */
 enum SailChromaSubsampling {
 
-    SAIL_CHROMA_SUBSAMPLING_UNSUPPORTED,
     SAIL_CHROMA_SUBSAMPLING_UNKNOWN,
     SAIL_CHROMA_SUBSAMPLING_NONE,
 
