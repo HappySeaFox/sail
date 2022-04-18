@@ -178,8 +178,6 @@ enum SailPixelFormat {
 enum SailChromaSubsampling {
 
     SAIL_CHROMA_SUBSAMPLING_UNKNOWN,
-    SAIL_CHROMA_SUBSAMPLING_NONE,
-
     SAIL_CHROMA_SUBSAMPLING_311,
     SAIL_CHROMA_SUBSAMPLING_400,
     SAIL_CHROMA_SUBSAMPLING_410,
@@ -190,24 +188,17 @@ enum SailChromaSubsampling {
     SAIL_CHROMA_SUBSAMPLING_444,
 };
 
-/* Image properties. */
-enum SailImageProperty {
+/* Orientation. */
+enum SailOrientation {
 
-    /* Unknown image property used to indicate an error in parsing functions. */
-    SAIL_IMAGE_PROPERTY_UNKNOWN              = 1 << 0,
-
-    /* Image is flipped vertically. */
-    SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY   = 1 << 1,
-
-    /* Image is flipped vertically. */
-    SAIL_IMAGE_PROPERTY_FLIPPED_HORIZONTALLY = 1 << 2,
-
-    /*
-     * Image is interlaced. Only sail_image.source_image.properties can have this property.
-     * Reading operations never output interlaced images, that's why sail_image.properties
-     * never has it.
-     */
-    SAIL_IMAGE_PROPERTY_INTERLACED           = 1 << 3,
+    SAIL_ORIENTATION_NORMAL,
+    SAIL_ORIENTATION_ROTATED_90,
+    SAIL_ORIENTATION_ROTATED_180,
+    SAIL_ORIENTATION_ROTATED_270,
+    SAIL_ORIENTATION_MIRRORED_HORIZONTALLY,
+    SAIL_ORIENTATION_MIRRORED_VERTICALLY,
+    SAIL_ORIENTATION_MIRRORED_HORIZONTALLY_ROTATED_90,
+    SAIL_ORIENTATION_MIRRORED_HORIZONTALLY_ROTATED_270,
 };
 
 /* Pixels compression types. */

@@ -249,7 +249,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v7_png(struct sail_io *io, const 
     png_state->first_image->source_image->compression = SAIL_COMPRESSION_DEFLATE;
 
     if (png_state->interlaced_passes > 1) {
-        png_state->first_image->source_image->properties |= SAIL_IMAGE_PROPERTY_INTERLACED;
+        png_state->first_image->source_image->interlaced = true;
     }
 
     /* Read meta data. */

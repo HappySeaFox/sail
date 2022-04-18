@@ -123,7 +123,7 @@ image& image::operator=(const sail::image &image)
     set_palette(image.palette());
     set_meta_data(image.meta_data());
     set_iccp(image.iccp());
-    set_properties(image.properties());
+    set_orientation(image.orientation());
     set_source_image(image.source_image());
     set_pixels(image.pixels(), image.pixels_size());
 
@@ -222,9 +222,9 @@ const sail::iccp& image::iccp() const
     return d->iccp;
 }
 
-int image::properties() const
+SailOrientation image::orientation() const
 {
-    return d->sail_image->properties;
+    return d->sail_image->orientation;
 }
 
 const sail::source_image& image::source_image() const
@@ -604,14 +604,24 @@ SailPixelFormat image::pixel_format_from_string(const std::string_view str)
     return sail_pixel_format_from_string(str.data());
 }
 
-const char* image::image_property_to_string(SailImageProperty image_property)
+const char* chroma_subsampling_to_string(SailChromaSubsampling chroma_subsampling)
 {
-    return sail_image_property_to_string(image_property);
+    return sail_chroma_subsampling_to_string(chroma_subsampling);
 }
 
-SailImageProperty image::image_property_from_string(const std::string_view str)
+SailChromaSubsampling chroma_subsampling_from_string(const std::string_view str)
 {
-    return sail_image_property_from_string(str.data());
+    return sail_chroma_subsampling_from_string(str.data());
+}
+
+const char* image::orientation_to_string(SailOrientation orientation)
+{
+    return sail_orientation_to_string(orientation);
+}
+
+SailOrientation image::orientation_from_string(const std::string_view str)
+{
+    return sail_orientation_from_string(str.data());
 }
 
 const char* image::compression_to_string(SailCompression compression)
@@ -647,7 +657,7 @@ image::image(const sail_image *sail_image)
     set_palette(sail::palette(sail_image->palette));
     set_meta_data(meta_data);
     set_iccp(sail::iccp(sail_image->iccp));
-    set_properties(sail_image->properties);
+    set_orientation(sail_image->orientation);
     set_source_image(sail::source_image(sail_image->source_image));
 
     if (sail_image->pixels != nullptr) {
@@ -728,7 +738,7 @@ sail_status_t image::to_sail_image(sail_image **image) const
         SAIL_TRY(d->iccp.to_sail_iccp(&image_local->iccp));
     }
 
-    image_local->properties = d->sail_image->properties;
+    image_local->orientation = d->sail_image->orientation;
 
     if (d->source_image.is_valid()) {
         SAIL_TRY(d->source_image.to_sail_source_image(&image_local->source_image));
@@ -803,9 +813,9 @@ void image::set_shallow_pixels(void *pixels, unsigned pixels_size)
     d->shallow_pixels     = true;
 }
 
-void image::set_properties(int properties)
+void image::set_orientation(SailOrientation orientation)
 {
-    d->sail_image->properties = properties;
+    d->sail_image->orientation = orientation;
 }
 
 void image::set_source_image(const sail::source_image &source_image)

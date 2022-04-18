@@ -174,9 +174,11 @@ sail_status_t sail_test_compare_source_images(const struct sail_source_image *so
 
     munit_assert(source_image1 != source_image2);
 
-    munit_assert(source_image1->pixel_format == source_image2->pixel_format);
-    munit_assert(source_image1->properties == source_image2->properties);
-    munit_assert(source_image1->compression == source_image2->compression);
+    munit_assert(source_image1->pixel_format       == source_image2->pixel_format);
+    munit_assert(source_image1->chroma_subsampling == source_image2->chroma_subsampling);
+    munit_assert(source_image1->orientation        == source_image2->orientation);
+    munit_assert(source_image1->compression        == source_image2->compression);
+    munit_assert(source_image1->interlaced         == source_image2->interlaced);
 
     if (source_image1->special_properties == NULL) {
         munit_assert_null(source_image2->special_properties);
@@ -235,7 +237,7 @@ sail_status_t sail_test_compare_images(const struct sail_image *image1, const st
         munit_assert(sail_test_compare_iccps(image1->iccp, image2->iccp) == SAIL_OK);
     }
 
-    munit_assert(image1->properties == image2->properties);
+    munit_assert(image1->orientation == image2->orientation);
 
     if (image1->source_image == NULL) {
         munit_assert_null(image2->source_image);

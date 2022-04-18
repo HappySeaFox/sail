@@ -333,7 +333,7 @@ sail_status_t bmp_private_read_seek_next_frame(void *state, struct sail_io *io, 
                         /* cleanup */ sail_destroy_image(image_local));
 
     image_local->source_image->pixel_format = bmp_state->source_pixel_format;
-    image_local->source_image->properties = bmp_state->flipped ? SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY : 0;
+    image_local->source_image->orientation = bmp_state->flipped ? SAIL_ORIENTATION_MIRRORED_VERTICALLY : SAIL_ORIENTATION_NORMAL;
     image_local->source_image->compression = (bmp_state->v3.compression == SAIL_BI_RLE4 || bmp_state->v3.compression == SAIL_BI_RLE8)
                                              ? SAIL_COMPRESSION_RLE : SAIL_COMPRESSION_NONE;
     image_local->width = (bmp_state->version == SAIL_BMP_V1) ? bmp_state->v1.width : bmp_state->v2.width;

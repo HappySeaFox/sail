@@ -236,32 +236,78 @@ enum SailPixelFormat sail_pixel_format_from_string(const char *str) {
     return SAIL_PIXEL_FORMAT_UNKNOWN;
 }
 
-const char* sail_image_property_to_string(enum SailImageProperty image_property) {
+const char* sail_chroma_subsampling_to_string(enum SailChromaSubsampling chroma_subsampling) {
 
-    switch (image_property) {
-        case SAIL_IMAGE_PROPERTY_UNKNOWN:              return "UNKNOWN";
-        case SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY:   return "FLIPPED-VERTICALLY";
-        case SAIL_IMAGE_PROPERTY_FLIPPED_HORIZONTALLY: return "FLIPPED-HORIZONTALLY";
-        case SAIL_IMAGE_PROPERTY_INTERLACED:           return "INTERLACED";
+    switch (chroma_subsampling) {
+        case SAIL_CHROMA_SUBSAMPLING_UNKNOWN: return "UNKNOWN";
+        case SAIL_CHROMA_SUBSAMPLING_311:     return "311";
+        case SAIL_CHROMA_SUBSAMPLING_400:     return "400";
+        case SAIL_CHROMA_SUBSAMPLING_410:     return "410";
+        case SAIL_CHROMA_SUBSAMPLING_411:     return "411";
+        case SAIL_CHROMA_SUBSAMPLING_420:     return "420";
+        case SAIL_CHROMA_SUBSAMPLING_421:     return "421";
+        case SAIL_CHROMA_SUBSAMPLING_422:     return "422";
+        case SAIL_CHROMA_SUBSAMPLING_444:     return "444";
     }
 
     return NULL;
 }
 
-enum SailImageProperty sail_image_property_from_string(const char *str) {
+enum SailChromaSubsampling sail_chroma_subsampling_from_string(const char *str) {
 
     uint64_t hash;
     SAIL_TRY_OR_EXECUTE(sail_string_hash(str, &hash),
-                        /* cleanup */ return SAIL_IMAGE_PROPERTY_UNKNOWN);
+                        /* cleanup */ return SAIL_CHROMA_SUBSAMPLING_UNKNOWN);
 
     switch (hash) {
-        case UINT64_C(229442760833397):      return SAIL_IMAGE_PROPERTY_UNKNOWN;
-        case UINT64_C(17202465669660106453): return SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY;
-        case UINT64_C(9347591013355692325):  return SAIL_IMAGE_PROPERTY_FLIPPED_HORIZONTALLY;
-        case UINT64_C(8244927930303708800):  return SAIL_IMAGE_PROPERTY_INTERLACED;
+        case UINT64_C(229442760833397): return SAIL_CHROMA_SUBSAMPLING_UNKNOWN;
+        case UINT64_C(193434202):       return SAIL_CHROMA_SUBSAMPLING_311;
+        case UINT64_C(193435257):       return SAIL_CHROMA_SUBSAMPLING_400;
+        case UINT64_C(193435290):       return SAIL_CHROMA_SUBSAMPLING_410;
+        case UINT64_C(193435291):       return SAIL_CHROMA_SUBSAMPLING_411;
+        case UINT64_C(193435323):       return SAIL_CHROMA_SUBSAMPLING_420;
+        case UINT64_C(193435324):       return SAIL_CHROMA_SUBSAMPLING_421;
+        case UINT64_C(193435325):       return SAIL_CHROMA_SUBSAMPLING_422;
+        case UINT64_C(193435393):       return SAIL_CHROMA_SUBSAMPLING_444;
     }
 
-    return SAIL_IMAGE_PROPERTY_UNKNOWN;
+    return SAIL_CHROMA_SUBSAMPLING_UNKNOWN;
+}
+
+const char* sail_orientation_to_string(enum SailOrientation orientation) {
+
+    switch (orientation) {
+        case SAIL_ORIENTATION_NORMAL:                            return "NORMAL";
+        case SAIL_ORIENTATION_ROTATED_90:                        return "ROTATED-90";
+        case SAIL_ORIENTATION_ROTATED_180:                       return "ROTATED-180";
+        case SAIL_ORIENTATION_ROTATED_270:                       return "ROTATED-270";
+        case SAIL_ORIENTATION_MIRRORED_HORIZONTALLY:             return "MIRRORED-HORIZONTALLY";
+        case SAIL_ORIENTATION_MIRRORED_VERTICALLY:               return "MIRRORED-VERTICALLY";
+        case SAIL_ORIENTATION_MIRRORED_HORIZONTALLY_ROTATED_90:  return "MIRRORED-HORIZONTALLY-ROTATED-90";
+        case SAIL_ORIENTATION_MIRRORED_HORIZONTALLY_ROTATED_270: return "MIRRORED-HORIZONTALLY-ROTATED-270";
+    }
+
+    return NULL;
+}
+
+enum SailOrientation sail_orientation_from_string(const char *str) {
+
+    uint64_t hash;
+    SAIL_TRY_OR_EXECUTE(sail_string_hash(str, &hash),
+                        /* cleanup */ return SAIL_ORIENTATION_NORMAL);
+
+    switch (hash) {
+        case UINT64_C(6952538422510):        return SAIL_ORIENTATION_NORMAL;
+        case UINT64_C(8245347034976125518):  return SAIL_ORIENTATION_ROTATED_90;
+        case UINT64_C(13842035122278411070): return SAIL_ORIENTATION_ROTATED_180;
+        case UINT64_C(13842035122278412126): return SAIL_ORIENTATION_ROTATED_270;
+        case UINT64_C(11926570361219790885): return SAIL_ORIENTATION_MIRRORED_HORIZONTALLY;
+        case UINT64_C(13156374894390392277): return SAIL_ORIENTATION_MIRRORED_VERTICALLY;
+        case UINT64_C(2303160910968993403):  return SAIL_ORIENTATION_MIRRORED_HORIZONTALLY_ROTATED_90;
+        case UINT64_C(2217333767138568491):  return SAIL_ORIENTATION_MIRRORED_HORIZONTALLY_ROTATED_270;
+    }
+
+    return SAIL_ORIENTATION_NORMAL;
 }
 
 const char* sail_compression_to_string(enum SailCompression compression) {

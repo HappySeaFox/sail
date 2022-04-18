@@ -103,28 +103,30 @@ static sail_status_t print_hex(uint8_t *data, size_t data_length) {
 static sail_status_t read_image(FILE *fptr, struct sail_image *image) {
 
     /*
-     * 124 124 62(bpl) BPP4-INDEXED 0(properties)
+     * 124 124 62(bpl) BPP4-INDEXED NORMAL(orientation)
      */
     char pixel_format[64];
+    char orientation[64];
 
 #ifdef _MSC_VER
-    if (fscanf_s(fptr, "%u %u %u %s %d", &image->width, &image->height, &image->bytes_per_line, pixel_format, (unsigned)sizeof(pixel_format), &image->properties) != 5) {
+    if (fscanf_s(fptr, "%u %u %u %s %s", &image->width, &image->height, &image->bytes_per_line, pixel_format, (unsigned)sizeof(pixel_format), orientation, (unsigned)sizeof(orientation)) != 5) {
 #else
-    if (fscanf(fptr, "%u %u %u %s %d", &image->width, &image->height, &image->bytes_per_line, pixel_format, &image->properties) != 5) {
+    if (fscanf(fptr, "%u %u %u %s %s", &image->width, &image->height, &image->bytes_per_line, pixel_format, orientation) != 5) {
 #endif
         SAIL_LOG_ERROR("DUMP: Failed to read IMAGE properties");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_READ_FILE);
     }
 
     image->pixel_format = sail_pixel_format_from_string(pixel_format);
+    image->orientation = sail_orientation_from_string(orientation);
 
     if (image->pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN) {
         SAIL_LOG_ERROR("DUMP: Read image with unknown pixel format: '%s'", pixel_format);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
     }
 
-    SAIL_LOG_DEBUG("DUMP: Image properties: %ux%u bytes_per_line(%u), pixel_format(%s), properties(%d)",
-                    image->width, image->height, image->bytes_per_line, sail_pixel_format_to_string(image->pixel_format), image->properties);
+    SAIL_LOG_DEBUG("DUMP: Image properties: %ux%u bytes_per_line(%u), pixel_format(%s), orientation(%s)",
+                    image->width, image->height, image->bytes_per_line, sail_pixel_format_to_string(image->pixel_format), sail_orientation_to_string(image->orientation));
 
     return SAIL_OK;
 }
@@ -132,28 +134,37 @@ static sail_status_t read_image(FILE *fptr, struct sail_image *image) {
 static sail_status_t read_source_image(FILE *fptr, struct sail_image *image) {
 
     /*
-     * BPP4-INDEXED 0(properties) NONE(compression)
+     * BPP4-INDEXED UNKNOWN(chroma subsampling) NORMAL(orientation) NONE(compression) 1(interlaced)
      */
     SAIL_TRY(sail_alloc_source_image(&image->source_image));
 
     char pixel_format[64];
+    char chroma_subsampling[16];
+    char orientation[64];
     char compression[64];
+    int interlaced;
 
 #ifdef _MSC_VER
-    if (fscanf_s(fptr, "%s %d %s", pixel_format, (unsigned)sizeof(pixel_format), &image->source_image->properties, compression, (unsigned)sizeof(compression)) != 3) {
+    if (fscanf_s(fptr, "%s %s %s %s %d", pixel_format, (unsigned)sizeof(pixel_format), chroma_subsampling, (unsigned)sizeof(chroma_subsampling), orientation, (unsigned)sizeof(orientation), compression, (unsigned)sizeof(compression), &interlaced) != 5) {
 #else
-    if (fscanf(fptr, "%s %d %s", pixel_format, &image->source_image->properties, compression) != 3) {
+    if (fscanf(fptr, "%s %s %s %s %d", pixel_format, chroma_subsampling, orientation, compression, &interlaced) != 5) {
 #endif
         SAIL_LOG_ERROR("DUMP: Failed to read SOURCE-IMAGE properties");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_READ_FILE);
     }
 
-    image->source_image->pixel_format = sail_pixel_format_from_string(pixel_format);
-    image->source_image->compression = sail_compression_from_string(compression);
+    image->source_image->pixel_format       = sail_pixel_format_from_string(pixel_format);
+    image->source_image->chroma_subsampling = sail_chroma_subsampling_from_string(chroma_subsampling);
+    image->source_image->orientation        = sail_orientation_from_string(orientation);
+    image->source_image->compression        = sail_compression_from_string(compression);
+    image->source_image->interlaced         = interlaced;
 
-    SAIL_LOG_DEBUG("DUMP: Source image properties: pixel_format(%s), properties(%d), compression(%s)",
-                    sail_pixel_format_to_string(image->source_image->pixel_format), image->source_image->properties,
-                    sail_compression_to_string(image->source_image->compression));
+    SAIL_LOG_DEBUG("DUMP: Source image properties: pixel_format(%s), chroma_subsampling(%s), orientation(%s), compression(%s), interlaced(%s)",
+                    sail_pixel_format_to_string(image->source_image->pixel_format),
+                    sail_chroma_subsampling_to_string(image->source_image->chroma_subsampling),
+                    sail_orientation_to_string(image->source_image->orientation),
+                    sail_compression_to_string(image->source_image->compression),
+                    image->source_image->interlaced ? "yes" : "no");
 
     return SAIL_OK;
 }
@@ -501,11 +512,15 @@ sail_status_t sail_dump(const struct sail_image *image) {
     /*  To print dots in floats. */
     setlocale(LC_NUMERIC, "C");
 
-    printf("IMAGE\n%u %u %u %s %d\n\n", image->width, image->height, image->bytes_per_line, sail_pixel_format_to_string(image->pixel_format), image->properties);
+    printf("IMAGE\n%u %u %u %s %s\n\n", image->width, image->height, image->bytes_per_line, sail_pixel_format_to_string(image->pixel_format), sail_orientation_to_string(image->orientation));
 
     if (image->source_image != NULL) {
-        printf("SOURCE-IMAGE\n%s %d %s\n\n", sail_pixel_format_to_string(image->source_image->pixel_format), image->properties,
-                sail_compression_to_string(image->source_image->compression));
+        printf("SOURCE-IMAGE\n%s %s %s %s %d\n\n",
+                sail_pixel_format_to_string(image->source_image->pixel_format),
+                sail_chroma_subsampling_to_string(image->source_image->chroma_subsampling),
+                sail_orientation_to_string(image->source_image->orientation),
+                sail_compression_to_string(image->source_image->compression),
+                image->source_image->interlaced);
     }
 
     if (image->resolution != NULL) {

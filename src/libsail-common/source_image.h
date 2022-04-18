@@ -67,13 +67,12 @@ struct sail_source_image {
     enum SailChromaSubsampling chroma_subsampling;
 
     /*
-     * Or-ed source image properties. Set by SAIL to a valid source image properties of the image file.
-     * For example, it can be interlaced. See SailImageProperty.
+     * Source image orientation.
      *
-     * LOAD: Set by SAIL to valid source image properties or to 0.
+     * LOAD: Set by SAIL to the source image orientation.
      * SAVE: Ignored.
      */
-    int properties;
+    enum SailOrientation orientation;
 
     /*
      * Source image compression type. See SailCompression.
@@ -82,6 +81,14 @@ struct sail_source_image {
      * SAVE: Ignored.
      */
     enum SailCompression compression;
+
+    /*
+     * Source image interlacing.
+     *
+     * LOAD: Set by SAIL to true if the source image is interlaced.
+     * SAVE: Ignored.
+     */
+    bool interlaced;
 
     /*
      * Image format-specific properties that cannot be expressed
