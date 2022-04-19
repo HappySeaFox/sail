@@ -375,10 +375,6 @@ tuning=abc-filtering
 #
 pixel-formats=BPP8-INDEXED;BPP24-RGB;BPP32-BGRA
 
-# ';'-separated list of required properties input images must have. Can be empty.
-#
-properties=
-
 # ';'-separated list of compressions the image codec can write. Cannot be empty if the image codec
 # can save images. If the image codec cannot select compressions, specify UNSUPPORTED.
 #
