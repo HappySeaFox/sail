@@ -238,13 +238,13 @@ public:
     const sail::iccp& iccp() const;
 
     /*
-     * Returns the or-ed image properties. See SailImageProperty.
+     * Returns the image orientation.
      *
-     * LOAD: Set by SAIL to valid image properties. For example, some image formats store images flipped.
-     *       A caller must use this field to manipulate the output image accordingly (e.g., flip back etc.).
+     * LOAD: Set by SAIL to an image orientation. The user can use this field
+     *       to manipulate the output image accordingly (e.g., rotate).
      * SAVE: Ignored.
      */
-    int properties() const;
+    SailOrientation orientation() const;
 
     /*
      * Returns the source image properties.
@@ -662,20 +662,36 @@ public:
     static SailPixelFormat pixel_format_from_string(std::string_view str);
 
     /*
-     * Returns a string representation of the specified image property. See SailImageProperty.
-     * For example: "FLIPPED-VERTICALLY" is returned for SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY.
+     * Returns a string representation of the specified chroma subsampling.
+     * For example: "311" is returned for SAIL_CHROMA_SUBSAMPLING_311.
+     *
+     * Returns NULL if the chroma subsampling is not known.
+     */
+    static const char* chroma_subsampling_to_string(SailChromaSubsampling chroma_subsampling);
+
+    /*
+     * Returns a chroma subsampling from the string representation.
+     * For example: SAIL_CHROMA_SUBSAMPLING_311 is returned for "311".
+     *
+     * Returns SAIL_CHROMA_SUBSAMPLING_UNKNOWN if the chroma subsampling is not known.
+     */
+    static SailChromaSubsampling chroma_subsampling_from_string(std::string_view str);
+
+    /*
+     * Returns a string representation of the specified orientation. See SailOrientation.
+     * For example: "NORMAL" is returned for SAIL_ORIENTATION_NORMAL.
      *
      * Returns NULL if the property is not known.
      */
-    static const char* image_property_to_string(SailImageProperty image_property);
+    static const char* orientation_to_string(SailOrientation orientation);
 
     /*
-     * Returns an image property from the string representation. See SailImageProperty.
-     * For example: SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY is returned for "FLIPPED-VERTICALLY".
+     * Returns orientation from the string representation. See SailOrientation.
+     * For example: SAIL_ORIENTATION_NORMAL is returned for "NORMAL".
      *
-     * Returns SAIL_IMAGE_PROPERTY_UNKNOWN if the property is not known.
+     * Returns SAIL_ORIENTATION_NORMAL if the orientation is not known.
      */
-    static SailImageProperty image_property_from_string(std::string_view str);
+    static SailOrientation orientation_from_string(std::string_view str);
 
     /*
      * Returns string representation of the specified compression type. See SailCompression.
@@ -712,7 +728,7 @@ private:
     void set_pixels(const void *pixels, unsigned pixels_size);
     void set_shallow_pixels(void *pixels);
     void set_shallow_pixels(void *pixels, unsigned pixels_size);
-    void set_properties(int properties);
+    void set_orientation(SailOrientation orientation);
     void set_source_image(const sail::source_image &source_image);
 
 private:
