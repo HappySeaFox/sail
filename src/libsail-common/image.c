@@ -48,7 +48,7 @@ sail_status_t sail_alloc_image(struct sail_image **image) {
     (*image)->palette                 = NULL;
     (*image)->meta_data_node          = NULL;
     (*image)->iccp                    = NULL;
-    (*image)->properties              = 0;
+    (*image)->orientation             = SAIL_ORIENTATION_NORMAL;
     (*image)->source_image            = NULL;
 
     return SAIL_OK;
@@ -131,7 +131,7 @@ sail_status_t sail_copy_image_skeleton(const struct sail_image *source, struct s
                             /* cleanup */ sail_destroy_image(image_local));
     }
 
-    image_local->properties = source->properties;
+    image_local->orientation = source->orientation;
 
     if (source->source_image != NULL) {
         SAIL_TRY_OR_CLEANUP(sail_copy_source_image(source->source_image, &image_local->source_image),
@@ -190,7 +190,7 @@ sail_status_t sail_flip_vertically(struct sail_image *image) {
 
     sail_free(line);
 
-    image->properties ^= SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY;
+    //image->properties ^= SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY;
 
     return SAIL_OK;
 }
@@ -217,7 +217,7 @@ sail_status_t sail_flip_horizontally(struct sail_image *image) {
 
     sail_free(pixel);
 
-    image->properties ^= SAIL_IMAGE_PROPERTY_FLIPPED_HORIZONTALLY;
+    //image->properties ^= SAIL_IMAGE_PROPERTY_FLIPPED_HORIZONTALLY;
 
     return SAIL_OK;
 }

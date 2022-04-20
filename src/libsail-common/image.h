@@ -156,13 +156,13 @@ struct sail_image {
     struct sail_iccp *iccp;
 
     /*
-     * Or-ed image properties. See SailImageProperty.
+     * Image orientation.
      *
-     * LOAD: Set by SAIL to valid image properties. For example, some image formats store images flipped.
-     *       A caller must use this field to manipulate the output image accordingly (e.g., flip back etc.).
+     * LOAD: Set by SAIL to an image orientation. The user can use this field
+     *       to manipulate the output image accordingly (e.g., rotate).
      * SAVE: Ignored.
      */
-    int properties;
+    enum SailOrientation orientation;
 
     /*
      * Source image properties which are usually lost during decoding.

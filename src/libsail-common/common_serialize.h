@@ -55,20 +55,36 @@ SAIL_EXPORT const char* sail_pixel_format_to_string(enum SailPixelFormat pixel_f
 SAIL_EXPORT enum SailPixelFormat sail_pixel_format_from_string(const char *str);
 
 /*
- * Returns a string representation of the specified image property. See SailImageProperty.
- * For example: "FLIPPED-VERTICALLY" is returned for SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY.
+ * Returns a string representation of the specified chroma subsampling.
+ * For example: "311" is returned for SAIL_CHROMA_SUBSAMPLING_311.
+ *
+ * Returns NULL if the chroma subsampling is not known.
+ */
+SAIL_EXPORT const char* sail_chroma_subsampling_to_string(enum SailChromaSubsampling chroma_subsampling);
+
+/*
+ * Returns a chroma subsampling from the string representation.
+ * For example: SAIL_CHROMA_SUBSAMPLING_311 is returned for "311".
+ *
+ * Returns SAIL_CHROMA_SUBSAMPLING_UNKNOWN if the chroma subsampling is not known.
+ */
+SAIL_EXPORT enum SailChromaSubsampling sail_chroma_subsampling_from_string(const char *str);
+
+/*
+ * Returns a string representation of the specified image property. See SailOrientation.
+ * For example: "NORMAL" is returned for SAIL_ORIENTATION_NORMAL.
  *
  * Returns NULL if the property is not known.
  */
-SAIL_EXPORT const char* sail_image_property_to_string(enum SailImageProperty image_property);
+SAIL_EXPORT const char* sail_orientation_to_string(enum SailOrientation orientation);
 
 /*
- * Returns an image property from the string representation. See SailImageProperty.
- * For example: SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY is returned for "FLIPPED-VERTICALLY".
+ * Returns an image property from the string representation. See SailOrientation.
+ * For example: SAIL_ORIENTATION_NORMAL is returned for "NORMAL".
  *
- * Returns SAIL_IMAGE_PROPERTY_UNKNOWN if the property is not known.
+ * Returns SAIL_ORIENTATION_NORMAL if the orientation is not known.
  */
-SAIL_EXPORT enum SailImageProperty sail_image_property_from_string(const char *str);
+SAIL_EXPORT enum SailOrientation sail_orientation_from_string(const char *str);
 
 /*
  * Returns string representation of the specified compression type. See SailCompression.

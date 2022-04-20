@@ -254,31 +254,78 @@ static MunitResult test_pixel_format_from_string(const MunitParameter params[], 
 }
 
 /*
- * Image properties.
+ * Chroma subsampling.
  */
-static MunitResult test_image_property_to_string(const MunitParameter params[], void *user_data) {
+static MunitResult test_chroma_subsampling_to_string(const MunitParameter params[], void *user_data) {
     (void)params;
     (void)user_data;
 
-    munit_assert_string_equal(sail_image_property_to_string(SAIL_IMAGE_PROPERTY_UNKNOWN),              "UNKNOWN");
-    munit_assert_string_equal(sail_image_property_to_string(SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY),   "FLIPPED-VERTICALLY");
-    munit_assert_string_equal(sail_image_property_to_string(SAIL_IMAGE_PROPERTY_FLIPPED_HORIZONTALLY), "FLIPPED-HORIZONTALLY");
-    munit_assert_string_equal(sail_image_property_to_string(SAIL_IMAGE_PROPERTY_INTERLACED),           "INTERLACED");
+    munit_assert_string_equal(sail_chroma_subsampling_to_string(SAIL_CHROMA_SUBSAMPLING_UNKNOWN), "UNKNOWN");
+    munit_assert_string_equal(sail_chroma_subsampling_to_string(SAIL_CHROMA_SUBSAMPLING_311),     "311");
+    munit_assert_string_equal(sail_chroma_subsampling_to_string(SAIL_CHROMA_SUBSAMPLING_400),     "400");
+    munit_assert_string_equal(sail_chroma_subsampling_to_string(SAIL_CHROMA_SUBSAMPLING_410),     "410");
+    munit_assert_string_equal(sail_chroma_subsampling_to_string(SAIL_CHROMA_SUBSAMPLING_411),     "411");
+    munit_assert_string_equal(sail_chroma_subsampling_to_string(SAIL_CHROMA_SUBSAMPLING_420),     "420");
+    munit_assert_string_equal(sail_chroma_subsampling_to_string(SAIL_CHROMA_SUBSAMPLING_421),     "421");
+    munit_assert_string_equal(sail_chroma_subsampling_to_string(SAIL_CHROMA_SUBSAMPLING_422),     "422");
+    munit_assert_string_equal(sail_chroma_subsampling_to_string(SAIL_CHROMA_SUBSAMPLING_444),     "444");
 
     return MUNIT_OK;
 }
 
-static MunitResult test_image_property_from_string(const MunitParameter params[], void *user_data) {
+static MunitResult test_chroma_subsampling_from_string(const MunitParameter params[], void *user_data) {
     (void)params;
     (void)user_data;
 
-    munit_assert(sail_image_property_from_string(NULL)                 == SAIL_IMAGE_PROPERTY_UNKNOWN);
-    munit_assert(sail_image_property_from_string("Some")               == SAIL_IMAGE_PROPERTY_UNKNOWN);
+    munit_assert(sail_chroma_subsampling_from_string(NULL)      == SAIL_CHROMA_SUBSAMPLING_UNKNOWN);
+    munit_assert(sail_chroma_subsampling_from_string("Some")    == SAIL_CHROMA_SUBSAMPLING_UNKNOWN);
 
-    munit_assert(sail_image_property_from_string("UNKNOWN")              == SAIL_IMAGE_PROPERTY_UNKNOWN);
-    munit_assert(sail_image_property_from_string("FLIPPED-VERTICALLY")   == SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY);
-    munit_assert(sail_image_property_from_string("FLIPPED-HORIZONTALLY") == SAIL_IMAGE_PROPERTY_FLIPPED_HORIZONTALLY);
-    munit_assert(sail_image_property_from_string("INTERLACED")           == SAIL_IMAGE_PROPERTY_INTERLACED);
+    munit_assert(sail_chroma_subsampling_from_string("UNKNOWN") == SAIL_CHROMA_SUBSAMPLING_UNKNOWN);
+    munit_assert(sail_chroma_subsampling_from_string("311")     == SAIL_CHROMA_SUBSAMPLING_311);
+    munit_assert(sail_chroma_subsampling_from_string("400")     == SAIL_CHROMA_SUBSAMPLING_400);
+    munit_assert(sail_chroma_subsampling_from_string("410")     == SAIL_CHROMA_SUBSAMPLING_410);
+    munit_assert(sail_chroma_subsampling_from_string("411")     == SAIL_CHROMA_SUBSAMPLING_411);
+    munit_assert(sail_chroma_subsampling_from_string("420")     == SAIL_CHROMA_SUBSAMPLING_420);
+    munit_assert(sail_chroma_subsampling_from_string("422")     == SAIL_CHROMA_SUBSAMPLING_422);
+    munit_assert(sail_chroma_subsampling_from_string("444")     == SAIL_CHROMA_SUBSAMPLING_444);
+
+    return MUNIT_OK;
+}
+
+/*
+ * Orientation.
+ */
+static MunitResult test_orientation_to_string(const MunitParameter params[], void *user_data) {
+    (void)params;
+    (void)user_data;
+
+    munit_assert_string_equal(sail_orientation_to_string(SAIL_ORIENTATION_NORMAL),                            "NORMAL");
+    munit_assert_string_equal(sail_orientation_to_string(SAIL_ORIENTATION_ROTATED_90),                        "ROTATED-90");
+    munit_assert_string_equal(sail_orientation_to_string(SAIL_ORIENTATION_ROTATED_180),                       "ROTATED-180");
+    munit_assert_string_equal(sail_orientation_to_string(SAIL_ORIENTATION_ROTATED_270),                       "ROTATED-270");
+    munit_assert_string_equal(sail_orientation_to_string(SAIL_ORIENTATION_MIRRORED_HORIZONTALLY),             "MIRRORED-HORIZONTALLY");
+    munit_assert_string_equal(sail_orientation_to_string(SAIL_ORIENTATION_MIRRORED_VERTICALLY),               "MIRRORED-VERTICALLY");
+    munit_assert_string_equal(sail_orientation_to_string(SAIL_ORIENTATION_MIRRORED_HORIZONTALLY_ROTATED_90),  "MIRRORED-HORIZONTALLY-ROTATED-90");
+    munit_assert_string_equal(sail_orientation_to_string(SAIL_ORIENTATION_MIRRORED_HORIZONTALLY_ROTATED_270), "MIRRORED-HORIZONTALLY-ROTATED-270");
+
+    return MUNIT_OK;
+}
+
+static MunitResult test_orientation_from_string(const MunitParameter params[], void *user_data) {
+    (void)params;
+    (void)user_data;
+
+    munit_assert(sail_orientation_from_string(NULL)                 == SAIL_ORIENTATION_NORMAL);
+    munit_assert(sail_orientation_from_string("Some")               == SAIL_ORIENTATION_NORMAL);
+
+    munit_assert(sail_orientation_from_string("NORMAL")                            == SAIL_ORIENTATION_NORMAL);
+    munit_assert(sail_orientation_from_string("ROTATED-90")                        == SAIL_ORIENTATION_ROTATED_90);
+    munit_assert(sail_orientation_from_string("ROTATED-180")                       == SAIL_ORIENTATION_ROTATED_180);
+    munit_assert(sail_orientation_from_string("ROTATED-270")                       == SAIL_ORIENTATION_ROTATED_270);
+    munit_assert(sail_orientation_from_string("MIRRORED-HORIZONTALLY")             == SAIL_ORIENTATION_MIRRORED_HORIZONTALLY);
+    munit_assert(sail_orientation_from_string("MIRRORED-VERTICALLY")               == SAIL_ORIENTATION_MIRRORED_VERTICALLY);
+    munit_assert(sail_orientation_from_string("MIRRORED-HORIZONTALLY-ROTATED-90")  == SAIL_ORIENTATION_MIRRORED_HORIZONTALLY_ROTATED_90);
+    munit_assert(sail_orientation_from_string("MIRRORED-HORIZONTALLY-ROTATED-270") == SAIL_ORIENTATION_MIRRORED_HORIZONTALLY_ROTATED_270);
 
     return MUNIT_OK;
 }
@@ -499,8 +546,11 @@ static MunitTest test_suite_tests[] = {
     { (char *)"/pixel-format-to-string",   test_pixel_format_to_string,     NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/pixel-format-from-string", test_pixel_format_from_string,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
-    { (char *)"/image-property-to-string",   test_image_property_to_string,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/image-property-from-string", test_image_property_from_string, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/chroma-subsampling-to-string",   test_chroma_subsampling_to_string,     NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/chroma-subsampling-from-string", test_chroma_subsampling_from_string,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+
+    { (char *)"/orientation-to-string",   test_orientation_to_string,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/orientation-from-string", test_orientation_from_string, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { (char *)"/compression-to-string",   test_compression_to_string,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/compression-from-string", test_compression_from_string, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },

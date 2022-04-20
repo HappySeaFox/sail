@@ -322,7 +322,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v7_gif(void *state, st
             }
 
             if (gif_state->gif->Image.Interlace) {
-                image_local->source_image->properties |= SAIL_IMAGE_PROPERTY_INTERLACED;
+                image_local->source_image->interlaced = true;
             }
 
             image_local->pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;
@@ -346,7 +346,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v7_gif(void *state, struct sail_
 
     struct gif_state *gif_state = (struct gif_state *)state;
 
-    const int passes = (image->source_image->properties & SAIL_IMAGE_PROPERTY_INTERLACED) ? 4 : 1;
+    const int passes = image->source_image->interlaced ? 4 : 1;
     const int last_pass = passes - 1;
     unsigned next_interlaced_row = 0;
 

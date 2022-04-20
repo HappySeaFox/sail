@@ -107,13 +107,12 @@ public:
     SailChromaSubsampling chroma_subsampling() const;
 
     /*
-     * Returns the or-ed source image properties. Set by SAIL to a valid source image properties of the image file.
-     * For example, it can be interlaced. See SailImageProperty.
+     * Returns the source image orientation.
      *
-     * LOAD: Set by SAIL to valid source image properties or to 0.
+     * LOAD: Set by SAIL to the source image orientation.
      * SAVE: Ignored.
      */
-    int properties() const;
+    SailOrientation orientation() const;
 
     /*
      * Returns the source image compression type. See SailCompression.
@@ -122,6 +121,14 @@ public:
      * SAVE: Ignored.
      */
     SailCompression compression() const;
+
+    /*
+     * Returns the source image interlacing.
+     *
+     * LOAD: Set by SAIL to true if the source image is interlaced.
+     * SAVE: Ignored.
+     */
+    bool interlaced() const;
 
     /*
      * Returns image format-specific properties that cannot be expressed
