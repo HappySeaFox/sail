@@ -27,7 +27,6 @@
 #define SAIL_SAVE_FEATURES_CPP_H
 
 #include <memory>
-#include <optional>
 #include <vector>
 
 #ifdef SAIL_BUILD
@@ -112,10 +111,10 @@ public:
     SailCompression default_compression() const;
 
     /*
-     * Returns the supported compression level range or an empty object if
+     * Returns the supported compression level range or an ivalid object if
      * compression levels are not supported by the codec.
      */
-    const std::optional<sail::compression_level>& compression_level() const;
+    const sail::compression_level& compression_level() const;
 
     /*
      * Returns supported codec-specific tuning options. For example, a hypothetical ABC

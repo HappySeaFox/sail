@@ -73,7 +73,7 @@ public:
     ~compression_level();
 
     /*
-     * Returns true if the compression level bounds are valid.
+     * Returns true if min_level() < max_level() and default_level() is within the range.
      */
     bool is_valid() const;
 

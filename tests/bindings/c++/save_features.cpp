@@ -44,10 +44,10 @@ static MunitResult test_save_features(const MunitParameter params[], void *user_
 
         munit_assert(save_features.features() == first_codec.save_features().features());
 
-        munit_assert(save_features.compression_level().has_value() == first_codec.save_features().compression_level().has_value());
-        if (save_features.compression_level().has_value()) {
-            const sail::compression_level &l1 = save_features.compression_level().value();
-            const sail::compression_level &l2 = first_codec.save_features().compression_level().value();
+        munit_assert(save_features.compression_level().is_valid() == first_codec.save_features().compression_level().is_valid());
+        if (save_features.compression_level().is_valid()) {
+            const sail::compression_level &l1 = save_features.compression_level();
+            const sail::compression_level &l2 = first_codec.save_features().compression_level();
 
             munit_assert(l1.min_level()     == l2.min_level());
             munit_assert(l1.max_level()     == l2.max_level());
@@ -65,10 +65,10 @@ static MunitResult test_save_features(const MunitParameter params[], void *user_
 
         munit_assert(save_features.features() == first_codec.save_features().features());
 
-        munit_assert(save_features.compression_level().has_value() == first_codec.save_features().compression_level().has_value());
-        if (save_features.compression_level().has_value()) {
-            const sail::compression_level &l1 = save_features.compression_level().value();
-            const sail::compression_level &l2 = first_codec.save_features().compression_level().value();
+        munit_assert(save_features.compression_level().is_valid() == first_codec.save_features().compression_level().is_valid());
+        if (save_features.compression_level().is_valid()) {
+            const sail::compression_level &l1 = save_features.compression_level();
+            const sail::compression_level &l2 = first_codec.save_features().compression_level();
 
             munit_assert(l1.min_level()     == l2.min_level());
             munit_assert(l1.max_level()     == l2.max_level());

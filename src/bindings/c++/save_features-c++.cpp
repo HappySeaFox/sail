@@ -40,7 +40,7 @@ public:
 
     std::vector<SailPixelFormat> pixel_formats;
     std::vector<SailCompression> compressions;
-    std::optional<sail::compression_level> compression_level;
+    sail::compression_level compression_level;
     sail::supported_tuning supported_tuning;
 };
 
@@ -97,7 +97,7 @@ SailCompression save_features::default_compression() const
     return d->sail_save_features_c->default_compression;
 }
 
-const std::optional<sail::compression_level>& save_features::compression_level() const
+const sail::compression_level& save_features::compression_level() const
 {
     return d->compression_level;
 }
