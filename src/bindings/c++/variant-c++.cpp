@@ -26,32 +26,40 @@
 #include <cstring>
 #include <stdexcept>
 #include <string>
+#include <typeindex>
+#include <unordered_map>
 
 #include "sail-c++.h"
 
 namespace sail
 {
 
+namespace
+{
+
+const std::unordered_map<std::type_index, SailVariantType> cpp_to_sail_variant_type_mapping {
+    { std::type_index(typeid(bool)),                 SAIL_VARIANT_TYPE_BOOL           },
+    { std::type_index(typeid(char)),                 SAIL_VARIANT_TYPE_CHAR           },
+    { std::type_index(typeid(unsigned char)),        SAIL_VARIANT_TYPE_UNSIGNED_CHAR  },
+    { std::type_index(typeid(short)),                SAIL_VARIANT_TYPE_SHORT          },
+    { std::type_index(typeid(unsigned short)),       SAIL_VARIANT_TYPE_UNSIGNED_SHORT },
+    { std::type_index(typeid(int)),                  SAIL_VARIANT_TYPE_INT            },
+    { std::type_index(typeid(unsigned int)),         SAIL_VARIANT_TYPE_UNSIGNED_INT   },
+    { std::type_index(typeid(long)),                 SAIL_VARIANT_TYPE_LONG           },
+    { std::type_index(typeid(unsigned long)),        SAIL_VARIANT_TYPE_UNSIGNED_LONG  },
+    { std::type_index(typeid(float)),                SAIL_VARIANT_TYPE_FLOAT          },
+    { std::type_index(typeid(double)),               SAIL_VARIANT_TYPE_DOUBLE         },
+    { std::type_index(typeid(std::string)),          SAIL_VARIANT_TYPE_STRING         },
+    { std::type_index(typeid(sail::arbitrary_data)), SAIL_VARIANT_TYPE_DATA           },
+};
+
+}
+
 class SAIL_HIDDEN variant::pimpl
 {
 public:
     pimpl()
         : type(SAIL_VARIANT_TYPE_INVALID)
-        , types_mapping{
-            { typeid(bool).hash_code(),                 SAIL_VARIANT_TYPE_BOOL           },
-            { typeid(char).hash_code(),                 SAIL_VARIANT_TYPE_CHAR           },
-            { typeid(unsigned char).hash_code(),        SAIL_VARIANT_TYPE_UNSIGNED_CHAR  },
-            { typeid(short).hash_code(),                SAIL_VARIANT_TYPE_SHORT          },
-            { typeid(unsigned short).hash_code(),       SAIL_VARIANT_TYPE_UNSIGNED_SHORT },
-            { typeid(int).hash_code(),                  SAIL_VARIANT_TYPE_INT            },
-            { typeid(unsigned int).hash_code(),         SAIL_VARIANT_TYPE_UNSIGNED_INT   },
-            { typeid(long).hash_code(),                 SAIL_VARIANT_TYPE_LONG           },
-            { typeid(unsigned long).hash_code(),        SAIL_VARIANT_TYPE_UNSIGNED_LONG  },
-            { typeid(float).hash_code(),                SAIL_VARIANT_TYPE_FLOAT          },
-            { typeid(double).hash_code(),               SAIL_VARIANT_TYPE_DOUBLE         },
-            { typeid(std::string).hash_code(),          SAIL_VARIANT_TYPE_STRING         },
-            { typeid(sail::arbitrary_data).hash_code(), SAIL_VARIANT_TYPE_DATA           },
-        }
     {
     }
     ~pimpl()
@@ -74,9 +82,9 @@ public:
     template<typename T>
     SailVariantType type_to_sail_variant_type() {
 
-        auto it = types_mapping.find(typeid(T).hash_code());
+        auto it = cpp_to_sail_variant_type_mapping.find(std::type_index(typeid(T)));
 
-        return it == types_mapping.end() ? SAIL_VARIANT_TYPE_INVALID : it->second;
+        return it == cpp_to_sail_variant_type_mapping.end() ? SAIL_VARIANT_TYPE_INVALID : it->second;
     }
 
     union {
@@ -95,7 +103,6 @@ public:
         arbitrary_data v_arbitrary_data;
     };
 
-    const std::unordered_map<std::size_t, SailVariantType> types_mapping;
     SailVariantType type;
 };
 
