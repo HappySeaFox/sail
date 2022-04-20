@@ -114,8 +114,8 @@ public:
     bool has_value() const;
 
     /*
-     * Returns the current value. If the requested type doesn't match the actual type stored in the variant,
-     * throws std::bad_variant_access. Use has_value<T>() to check the stored data type.
+     * Returns the current value. The behavior is undefined if the requested type doesn't match
+     * the actual type stored in the variant. Use has_value<T>() to check the stored data type.
      */
     template<typename T>
     const T& value() const;
