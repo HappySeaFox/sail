@@ -45,12 +45,12 @@ sail_status_t utils_private::cpp_tuning_to_sail_tuning(const tuning &cpp_tuning,
 
     sail_clear_hash_map(c_tuning);
 
-    for (const auto& [key, variant] : cpp_tuning) {
+    for (const auto& kv : cpp_tuning) {
         struct sail_variant *sail_variant;
 
-        SAIL_TRY(variant.to_sail_variant(&sail_variant));
+        SAIL_TRY(kv.second.to_sail_variant(&sail_variant));
 
-        sail_put_hash_map(c_tuning, key.c_str(), sail_variant);
+        sail_put_hash_map(c_tuning, kv.first.c_str(), sail_variant);
 
         sail_destroy_variant(sail_variant);
     }
