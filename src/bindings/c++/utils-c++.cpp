@@ -40,29 +40,29 @@ std::uint64_t now()
     return sail_now();
 }
 
-bool path_exists(const std::string_view path)
+bool path_exists(const std::string &path)
 {
-    return sail_path_exists(path.data());
+    return sail_path_exists(path.c_str());
 }
 
-bool is_dir(const std::string_view path)
+bool is_dir(const std::string &path)
 {
-    return sail_is_dir(path.data());
+    return sail_is_dir(path.c_str());
 }
 
-bool is_file(const std::string_view path)
+bool is_file(const std::string &path)
 {
-    return sail_is_file(path.data());
+    return sail_is_file(path.c_str());
 }
 
-sail_status_t file_size(const std::string_view path, size_t *size) {
+sail_status_t file_size(const std::string &path, size_t *size) {
 
-    SAIL_TRY(sail_file_size(path.data(), size));
+    SAIL_TRY(sail_file_size(path.c_str(), size));
 
     return SAIL_OK;
 }
 
-sail_status_t read_file_contents(const std::string_view path, sail::arbitrary_data *contents) {
+sail_status_t read_file_contents(const std::string &path, sail::arbitrary_data *contents) {
 
     SAIL_CHECK_PTR(contents);
 
@@ -70,7 +70,7 @@ sail_status_t read_file_contents(const std::string_view path, sail::arbitrary_da
     SAIL_TRY(file_size(path, &size));
 
     contents->resize(size);
-    SAIL_TRY(sail_file_contents_into_data(path.data(), contents->data()));
+    SAIL_TRY(sail_file_contents_into_data(path.c_str(), contents->data()));
 
     return SAIL_OK;
 }

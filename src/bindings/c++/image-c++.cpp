@@ -82,7 +82,7 @@ image::image()
 {
 }
 
-image::image(const std::string_view path)
+image::image(const std::string &path)
     : image()
 {
     load(path);
@@ -307,7 +307,7 @@ void image::set_iccp(sail::iccp &&iccp) noexcept
     d->iccp = std::move(iccp);
 }
 
-sail_status_t image::load(const std::string_view path)
+sail_status_t image::load(const std::string &path)
 {
     image_input input;
     SAIL_TRY(input.start(path));
@@ -320,7 +320,7 @@ sail_status_t image::load(const std::string_view path)
     return SAIL_OK;
 }
 
-sail_status_t image::save(const std::string_view path)
+sail_status_t image::save(const std::string &path)
 {
     image_output output;
 
@@ -599,9 +599,9 @@ const char* image::pixel_format_to_string(SailPixelFormat pixel_format)
     return sail_pixel_format_to_string(pixel_format);
 }
 
-SailPixelFormat image::pixel_format_from_string(const std::string_view str)
+SailPixelFormat image::pixel_format_from_string(const std::string &str)
 {
-    return sail_pixel_format_from_string(str.data());
+    return sail_pixel_format_from_string(str.c_str());
 }
 
 const char* image::image_property_to_string(SailImageProperty image_property)
@@ -609,9 +609,9 @@ const char* image::image_property_to_string(SailImageProperty image_property)
     return sail_image_property_to_string(image_property);
 }
 
-SailImageProperty image::image_property_from_string(const std::string_view str)
+SailImageProperty image::image_property_from_string(const std::string &str)
 {
-    return sail_image_property_from_string(str.data());
+    return sail_image_property_from_string(str.c_str());
 }
 
 const char* image::compression_to_string(SailCompression compression)
@@ -619,9 +619,9 @@ const char* image::compression_to_string(SailCompression compression)
     return sail_compression_to_string(compression);
 }
 
-SailCompression image::compression_from_string(const std::string_view str)
+SailCompression image::compression_from_string(const std::string &str)
 {
-    return sail_compression_from_string(str.data());
+    return sail_compression_from_string(str.c_str());
 }
 
 image::image(const sail_image *sail_image)

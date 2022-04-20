@@ -27,7 +27,6 @@
 #define SAIL_CODEC_INFO_CPP_H
 
 #include <memory>
-#include <string_view>
 #include <string>
 #include <vector>
 
@@ -148,7 +147,7 @@ public:
      *
      * Returns SAIL_CODEC_FEATURE_UNKNOWN if the codec feature is not known.
      */
-    static SailCodecFeature codec_feature_from_string(std::string_view str);
+    static SailCodecFeature codec_feature_from_string(const std::string &str);
 
     /*
      * Returns a first codec info object that supports the magic number read from the specified file.
@@ -160,7 +159,7 @@ public:
      *                image_input::next_frame()       ->
      *                image_input::stop().
      */
-    static codec_info from_magic_number(std::string_view path);
+    static codec_info from_magic_number(const std::string &path);
 
     /*
      * Returns a first codec info object that supports the magic number read from the specified memory buffer.
@@ -201,7 +200,7 @@ public:
      *                image_output::next_frame() ->
      *                image_output::stop().
      */
-    static codec_info from_path(std::string_view path);
+    static codec_info from_path(const std::string &path);
 
     /*
      * Returns a first codec info object that supports the specified file extension.
@@ -218,7 +217,7 @@ public:
      *                image_output::next_frame()   ->
      *                image_output::stop().
      */
-    static codec_info from_extension(std::string_view suffix);
+    static codec_info from_extension(const std::string &suffix);
 
     /*
      * Returns a first codec info object that supports the specified mime type.
@@ -235,7 +234,7 @@ public:
      *                image_output::next_frame()   ->
      *                image_output::stop().
      */
-    static codec_info from_mime_type(std::string_view mime_type);
+    static codec_info from_mime_type(const std::string &mime_type);
 
     /*
      * Returns the list of found codec info objects. Use it to determine the list of possible

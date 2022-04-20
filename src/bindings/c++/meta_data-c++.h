@@ -28,7 +28,6 @@
 
 #include <memory>
 #include <string>
-#include <string_view>
 
 #ifdef SAIL_BUILD
     #include "error.h"
@@ -176,7 +175,7 @@ public:
      *
      * Returns SAIL_META_DATA_UNKNOWN if the meta data key is not known.
      */
-    static SailMetaData meta_data_from_string(std::string_view str);
+    static SailMetaData meta_data_from_string(const std::string &str);
 
 private:
     /*
