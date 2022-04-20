@@ -292,7 +292,7 @@ std::tuple<image, codec_info> image_input::probe(const std::string &path)
     SAIL_TRY_OR_EXECUTE(sail_probe_file(path.c_str(), &sail_image, &sail_codec_info),
                         /* on error */ return {});
 
-    return { image(sail_image), codec_info(sail_codec_info) };
+    return std::tuple<image, codec_info>{ image(sail_image), codec_info(sail_codec_info) };
 }
 
 std::tuple<image, codec_info> image_input::probe(const void *buffer, std::size_t buffer_length)
@@ -307,7 +307,7 @@ std::tuple<image, codec_info> image_input::probe(const void *buffer, std::size_t
     SAIL_TRY_OR_EXECUTE(sail_probe_memory(buffer, buffer_length, &sail_image, &sail_codec_info),
                         /* on error */ return {});
 
-    return { image(sail_image), codec_info(sail_codec_info) };
+    return std::tuple<image, codec_info>{ image(sail_image), codec_info(sail_codec_info) };
 }
 
 std::tuple<image, codec_info> image_input::probe(const sail::arbitrary_data &arbitrary_data)
@@ -329,7 +329,7 @@ std::tuple<image, codec_info> image_input::probe(sail::abstract_io &abstract_io)
     SAIL_TRY_OR_EXECUTE(sail_probe_io(&abstract_io_adapter.sail_io_c(), &sail_image, &sail_codec_info),
                         /* on error */ return {});
 
-    return { image(sail_image), codec_info(sail_codec_info) };
+    return std::tuple<image, codec_info>{ image(sail_image), codec_info(sail_codec_info) };
 }
 
 image image_input::load(const std::string &path)
