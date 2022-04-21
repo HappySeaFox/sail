@@ -51,7 +51,9 @@ target_link_libraries(sail-codecs PRIVATE sail-common)
 
 sail_enable_asan(TARGET sail-codecs)
 
-sail_install_pdb(TARGET sail-codecs)
+if (SAIL_INSTALL_PDB)
+    sail_install_pdb(TARGET sail-codecs)
+endif()
 
 # BUILD_INTERFACE is needed as CMake tries to export all the sail-codec-${CODEC} dependencies
 # in the below install(TARGETS) command even though they are OBJECT libraries.

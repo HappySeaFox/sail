@@ -30,7 +30,9 @@ sail_enable_asan(TARGET sail-manip)
 
 sail_enable_pch(TARGET sail-manip HEADER sail-manip.h)
 
-sail_install_pdb(TARGET sail-manip)
+if (SAIL_INSTALL_PDB)
+    sail_install_pdb(TARGET sail-manip)
+endif()
 
 # Definitions, includes, link
 #

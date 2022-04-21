@@ -72,7 +72,9 @@ sail_enable_posix_source(TARGET sail VERSION 200112L)
 
 sail_enable_pch(TARGET sail HEADER sail.h)
 
-sail_install_pdb(TARGET sail)
+if (SAIL_INSTALL_PDB)
+    sail_install_pdb(TARGET sail)
+endif()
 
 # Definitions, includes, link
 #
