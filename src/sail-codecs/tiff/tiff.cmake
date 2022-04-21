@@ -77,6 +77,10 @@ macro(sail_codec_post_add)
                             return 1;
                         }
 
+                        /*
+                         * This check is not quite correct as some codecs may not support
+                         * these parameters. For example, JBIG doesn't support RGBA.
+                         */
                         TIFFSetField(tiff, TIFFTAG_IMAGEWIDTH,  1);
                         TIFFSetField(tiff, TIFFTAG_IMAGELENGTH, 1);
                         TIFFSetField(tiff, TIFFTAG_ORIENTATION, ORIENTATION_TOPLEFT);
