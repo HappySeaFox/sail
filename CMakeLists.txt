@@ -112,6 +112,10 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Build position-independent targets
+#
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 # Internal flag used to include SAIL headers locally with "header.h" or <sail/header.h> otherwise
 #
 add_definitions(-DSAIL_BUILD)
