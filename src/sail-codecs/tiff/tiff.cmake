@@ -47,9 +47,9 @@ macro(sail_codec_post_add)
 
         # Check if we can actually save defined compressions
         #
-        if (SAIL_VCPKG)
-            # Hardcode compressions as check_c_source_runs() fails in VCPKG mode.
-            # It fails because it cannot find tiff.dll.
+        if (SAIL_VCPKG OR CMAKE_CROSSCOMPILING)
+            # Hardcode compressions as check_c_source_runs() fails in VCPKG or cross-compilation mode.
+            # For VCPKG, it fails because it cannot find tiff.dll. See https://github.com/microsoft/vcpkg/issues/16793
             #
             set(SAIL_TIFF_CODEC_INFO_COMPRESSIONS ADOBE-DEFLATE DEFLATE JPEG LZW NONE PACKBITS)
             target_compile_definitions(${TARGET} PRIVATE SAIL_HAVE_TIFF_WRITE_ADOBE_DEFLATE)
