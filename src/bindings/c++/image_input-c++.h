@@ -28,7 +28,7 @@
 
 #include <cstddef>
 #include <memory>
-#include <string_view>
+#include <string>
 #include <tuple>
 
 #ifdef SAIL_BUILD
@@ -76,7 +76,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t start(std::string_view path);
+    sail_status_t start(const std::string &path);
 
     /*
      * Starts loading the specified image file with the specified codec.
@@ -88,7 +88,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t start(std::string_view path, const sail::codec_info &codec_info);
+    sail_status_t start(const std::string &path, const sail::codec_info &codec_info);
 
     /*
      * Starts loading the specified image file with the specified load options.
@@ -99,7 +99,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t start(std::string_view path, const sail::load_options &load_options);
+    sail_status_t start(const std::string &path, const sail::load_options &load_options);
 
     /*
      * Starts loading the specified image file with the specified codec and load options.
@@ -111,7 +111,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t start(std::string_view path, const sail::codec_info &codec_info, const sail::load_options &load_options);
+    sail_status_t start(const std::string &path, const sail::codec_info &codec_info, const sail::load_options &load_options);
 
     /*
      * Starts loading the specified memory buffer.
@@ -286,7 +286,7 @@ public:
      *
      * Returns an invalid image on error.
      */
-    static std::tuple<image, codec_info> probe(std::string_view path);
+    static std::tuple<image, codec_info> probe(const std::string &path);
 
     /*
      * Loads an image from the specified memory buffer and returns its properties without pixels
@@ -323,7 +323,7 @@ public:
      *
      * Returns an invalid image on error.
      */
-    static image load(std::string_view path);
+    static image load(const std::string &path);
 
     /*
      * Loads an image from the specified memory buffer.

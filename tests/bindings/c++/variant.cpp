@@ -194,9 +194,9 @@ static MunitResult test_compare(const MunitParameter params[], void *user_data) 
 }
 
 static MunitTest test_suite_tests[] = {
-    { (char *)"/move",       test_move,      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/with-value", test_set_value, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/compare",    test_compare,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/move",      test_move,      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/set-value", test_set_value, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/compare",   test_compare,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };

@@ -75,32 +75,32 @@ image_output::~image_output()
     stop();
 }
 
-sail_status_t image_output::start(const std::string_view path)
+sail_status_t image_output::start(const std::string &path)
 {
     SAIL_TRY(d->start());
 
-    SAIL_TRY(sail_start_saving_file(path.data(), nullptr, &d->state));
+    SAIL_TRY(sail_start_saving_file(path.c_str(), nullptr, &d->state));
 
     return SAIL_OK;
 }
 
-sail_status_t image_output::start(const std::string_view path, const sail::codec_info &codec_info)
+sail_status_t image_output::start(const std::string &path, const sail::codec_info &codec_info)
 {
     SAIL_TRY(d->start());
 
-    SAIL_TRY(sail_start_saving_file(path.data(), codec_info.sail_codec_info_c(), &d->state));
+    SAIL_TRY(sail_start_saving_file(path.c_str(), codec_info.sail_codec_info_c(), &d->state));
 
     return SAIL_OK;
 }
 
-sail_status_t image_output::start(const std::string_view path, const sail::save_options &save_options)
+sail_status_t image_output::start(const std::string &path, const sail::save_options &save_options)
 {
     SAIL_TRY(d->start());
 
     sail_save_options *sail_save_options;
     SAIL_TRY(save_options.to_sail_save_options(&sail_save_options));
 
-    SAIL_TRY_OR_CLEANUP(sail_start_saving_file_with_options(path.data(), nullptr, sail_save_options, &d->state),
+    SAIL_TRY_OR_CLEANUP(sail_start_saving_file_with_options(path.c_str(), nullptr, sail_save_options, &d->state),
                         /* cleanup */ sail_destroy_save_options(sail_save_options));
 
     sail_destroy_save_options(sail_save_options);
@@ -108,14 +108,14 @@ sail_status_t image_output::start(const std::string_view path, const sail::save_
     return SAIL_OK;
 }
 
-sail_status_t image_output::start(const std::string_view path, const sail::codec_info &codec_info, const sail::save_options &save_options)
+sail_status_t image_output::start(const std::string &path, const sail::codec_info &codec_info, const sail::save_options &save_options)
 {
     SAIL_TRY(d->start());
 
     sail_save_options *sail_save_options;
     SAIL_TRY(save_options.to_sail_save_options(&sail_save_options));
 
-    SAIL_TRY_OR_CLEANUP(sail_start_saving_file_with_options(path.data(), codec_info.sail_codec_info_c(), sail_save_options, &d->state),
+    SAIL_TRY_OR_CLEANUP(sail_start_saving_file_with_options(path.c_str(), codec_info.sail_codec_info_c(), sail_save_options, &d->state),
                         /* cleanup */ sail_destroy_save_options(sail_save_options));
 
     sail_destroy_save_options(sail_save_options);
@@ -224,7 +224,7 @@ std::size_t image_output::written() const
     return d->written;
 }
 
-sail_status_t image_output::save(const std::string_view path, const sail::image &image)
+sail_status_t image_output::save(const std::string &path, const sail::image &image)
 {
     sail_image *sail_image = nullptr;
     SAIL_TRY(image.to_sail_image(&sail_image));
@@ -234,7 +234,7 @@ sail_status_t image_output::save(const std::string_view path, const sail::image 
         sail_destroy_image(sail_image);
     );
 
-    SAIL_TRY(sail_save_image_into_file(path.data(), sail_image));
+    SAIL_TRY(sail_save_image_into_file(path.c_str(), sail_image));
 
     return SAIL_OK;
 }

@@ -28,7 +28,7 @@
 
 #include <cstddef>
 #include <memory>
-#include <string_view>
+#include <string>
 
 #ifdef SAIL_BUILD
     #include "error.h"
@@ -75,7 +75,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t start(std::string_view path);
+    sail_status_t start(const std::string &path);
 
     /*
      * Starts saving into the specified image file with the specified codec.
@@ -87,7 +87,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t start(std::string_view path, const sail::codec_info &codec_info);
+    sail_status_t start(const std::string &path, const sail::codec_info &codec_info);
 
     /*
      * Starts saving into the specified image file with the specified save options.
@@ -98,7 +98,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t start(std::string_view path, const sail::save_options &save_options);
+    sail_status_t start(const std::string &path, const sail::save_options &save_options);
 
     /*
      * Starts saving into the specified image file with the specified codec and save options.
@@ -110,7 +110,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t start(std::string_view path, const sail::codec_info &codec_info, const sail::save_options &save_options);
+    sail_status_t start(const std::string &path, const sail::codec_info &codec_info, const sail::save_options &save_options);
 
     /*
      * Starts saving into the specified memory buffer with the specified codec.
@@ -214,7 +214,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    static sail_status_t save(std::string_view path, const sail::image &image);
+    static sail_status_t save(const std::string &path, const sail::image &image);
 
     /*
      * Saves the specified image into the specified memory buffer.

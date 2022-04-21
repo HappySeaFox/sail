@@ -63,32 +63,32 @@ image_input::~image_input()
     stop();
 }
 
-sail_status_t image_input::start(const std::string_view path)
+sail_status_t image_input::start(const std::string &path)
 {
     SAIL_TRY(d->ensure_not_started());
 
-    SAIL_TRY(sail_start_loading_file(path.data(), nullptr, &d->state));
+    SAIL_TRY(sail_start_loading_file(path.c_str(), nullptr, &d->state));
 
     return SAIL_OK;
 }
 
-sail_status_t image_input::start(const std::string_view path, const sail::codec_info &codec_info)
+sail_status_t image_input::start(const std::string &path, const sail::codec_info &codec_info)
 {
     SAIL_TRY(d->ensure_not_started());
 
-    SAIL_TRY(sail_start_loading_file(path.data(), codec_info.sail_codec_info_c(), &d->state));
+    SAIL_TRY(sail_start_loading_file(path.c_str(), codec_info.sail_codec_info_c(), &d->state));
 
     return SAIL_OK;
 }
 
-sail_status_t image_input::start(const std::string_view path, const sail::codec_info &codec_info, const sail::load_options &load_options)
+sail_status_t image_input::start(const std::string &path, const sail::codec_info &codec_info, const sail::load_options &load_options)
 {
     SAIL_TRY(d->ensure_not_started());
 
     sail_load_options *sail_load_options;
     SAIL_TRY(load_options.to_sail_load_options(&sail_load_options));
 
-    SAIL_TRY_OR_CLEANUP(sail_start_loading_file_with_options(path.data(), codec_info.sail_codec_info_c(), sail_load_options, &d->state),
+    SAIL_TRY_OR_CLEANUP(sail_start_loading_file_with_options(path.c_str(), codec_info.sail_codec_info_c(), sail_load_options, &d->state),
                         /* cleanup */ sail_destroy_load_options(sail_load_options));
 
     sail_destroy_load_options(sail_load_options);
@@ -280,7 +280,7 @@ sail_status_t image_input::stop()
     return saved_status;
 }
 
-std::tuple<image, codec_info> image_input::probe(const std::string_view path)
+std::tuple<image, codec_info> image_input::probe(const std::string &path)
 {
     const sail_codec_info *sail_codec_info;
     sail_image *sail_image = nullptr;
@@ -289,7 +289,7 @@ std::tuple<image, codec_info> image_input::probe(const std::string_view path)
         sail_destroy_image(sail_image);
     );
 
-    SAIL_TRY_OR_EXECUTE(sail_probe_file(path.data(), &sail_image, &sail_codec_info),
+    SAIL_TRY_OR_EXECUTE(sail_probe_file(path.c_str(), &sail_image, &sail_codec_info),
                         /* on error */ return {});
 
     return std::tuple<image, codec_info>{ image(sail_image), codec_info(sail_codec_info) };
@@ -332,7 +332,7 @@ std::tuple<image, codec_info> image_input::probe(sail::abstract_io &abstract_io)
     return std::tuple<image, codec_info>{ image(sail_image), codec_info(sail_codec_info) };
 }
 
-image image_input::load(const std::string_view path)
+image image_input::load(const std::string &path)
 {
     sail_image *sail_image = nullptr;
 
@@ -340,7 +340,7 @@ image image_input::load(const std::string_view path)
         sail_destroy_image(sail_image);
     );
 
-    SAIL_TRY_OR_EXECUTE(sail_load_image_from_file(path.data(), &sail_image),
+    SAIL_TRY_OR_EXECUTE(sail_load_image_from_file(path.c_str(), &sail_image),
                         /* on error */ return {});
 
     const sail::image image(sail_image);

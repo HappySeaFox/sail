@@ -27,7 +27,7 @@
 #define SAIL_IMAGE_CPP_H
 
 #include <memory>
-#include <string_view>
+#include <string>
 #include <vector>
 
 #ifdef SAIL_BUILD
@@ -75,7 +75,7 @@ public:
      * Constructs a new image out of the specified file path. Reads just a single frame
      * from the file.
      */
-    explicit image(std::string_view path);
+    explicit image(const std::string &path);
 
     /*
      * Constructs a new image out of the specified image properties and the pixels.
@@ -341,14 +341,14 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t load(std::string_view path);
+    sail_status_t load(const std::string &path);
 
     /*
      * Saves the image with into the specified file path.
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t save(std::string_view path);
+    sail_status_t save(const std::string &path);
 
     /*
      * Returns true if the image can be converted into the specified pixel format.
@@ -659,7 +659,7 @@ public:
      *
      * Returns SAIL_PIXEL_FORMAT_UNKNOWN if the pixel format is not known.
      */
-    static SailPixelFormat pixel_format_from_string(std::string_view str);
+    static SailPixelFormat pixel_format_from_string(const std::string &str);
 
     /*
      * Returns a string representation of the specified chroma subsampling.
@@ -675,7 +675,7 @@ public:
      *
      * Returns SAIL_CHROMA_SUBSAMPLING_UNKNOWN if the chroma subsampling is not known.
      */
-    static SailChromaSubsampling chroma_subsampling_from_string(std::string_view str);
+    static SailChromaSubsampling chroma_subsampling_from_string(const std::string &str);
 
     /*
      * Returns a string representation of the specified orientation. See SailOrientation.
@@ -691,7 +691,7 @@ public:
      *
      * Returns SAIL_ORIENTATION_NORMAL if the orientation is not known.
      */
-    static SailOrientation orientation_from_string(std::string_view str);
+    static SailOrientation orientation_from_string(const std::string &str);
 
     /*
      * Returns string representation of the specified compression type. See SailCompression.
@@ -707,7 +707,7 @@ public:
      *
      * Returns SAIL_COMPRESSION_UNKNOWN if the compression is not known.
      */
-    static SailCompression compression_from_string(std::string_view str);
+    static SailCompression compression_from_string(const std::string &str);
 
 private:
     /*

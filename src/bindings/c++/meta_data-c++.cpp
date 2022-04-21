@@ -176,9 +176,9 @@ const char* meta_data::meta_data_to_string(SailMetaData meta_data) {
     return sail_meta_data_to_string(meta_data);
 }
 
-SailMetaData meta_data::meta_data_from_string(const std::string_view str) {
+SailMetaData meta_data::meta_data_from_string(const std::string &str) {
 
-    return sail_meta_data_from_string(str.data());
+    return sail_meta_data_from_string(str.c_str());
 }
 
 static inline std::string empty_string_on_nullptr(const char *str) {

@@ -34,7 +34,7 @@ namespace sail
 class SAIL_HIDDEN io_file::io_file_pimpl
 {
 public:
-    io_file_pimpl(const std::string_view path)
+    io_file_pimpl(const std::string &path)
         : codec_info(sail::codec_info::from_path(path))
     {
     }
@@ -42,17 +42,17 @@ public:
     const sail::codec_info codec_info;
 };
 
-static struct sail_io *construct_sail_io(const std::string_view path, io_file::Operation operation)
+static struct sail_io *construct_sail_io(const std::string &path, io_file::Operation operation)
 {
     struct sail_io *sail_io;
 
     switch (operation) {
         case io_file::Operation::Read:
-            SAIL_TRY_OR_EXECUTE(sail_alloc_io_read_file(path.data(), &sail_io),
+            SAIL_TRY_OR_EXECUTE(sail_alloc_io_read_file(path.c_str(), &sail_io),
                                 /* on error */ throw std::bad_alloc());
         break;
         case io_file::Operation::ReadWrite:
-            SAIL_TRY_OR_EXECUTE(sail_alloc_io_read_write_file(path.data(), &sail_io),
+            SAIL_TRY_OR_EXECUTE(sail_alloc_io_read_write_file(path.c_str(), &sail_io),
                                 /* on error */ throw std::bad_alloc());
         break;
         default: {
@@ -63,12 +63,12 @@ static struct sail_io *construct_sail_io(const std::string_view path, io_file::O
     return sail_io;
 }
 
-io_file::io_file(const std::string_view path)
+io_file::io_file(const std::string &path)
     : io_file(path, Operation::Read)
 {
 }
 
-io_file::io_file(const std::string_view path, io_file::Operation operation)
+io_file::io_file(const std::string &path, io_file::Operation operation)
     : io_base(construct_sail_io(path, operation))
     , file_d(new io_file_pimpl(path))
 {
