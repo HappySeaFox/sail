@@ -48,16 +48,13 @@ macro(sail_codec_post_add)
         # Check if we can actually save defined compressions
         #
         if (SAIL_VCPKG OR CMAKE_CROSSCOMPILING)
-            # Hardcode compressions as check_c_source_runs() fails in VCPKG or cross-compilation mode.
-            # For VCPKG, it fails because it cannot find tiff.dll. See https://github.com/microsoft/vcpkg/issues/16793
+            # Enable compression and hope for the best. The reason is that check_c_source_runs()
+            # fails in VCPKG or cross-compilation mode.
             #
-            set(SAIL_TIFF_CODEC_INFO_COMPRESSIONS ADOBE-DEFLATE DEFLATE JPEG LZW NONE PACKBITS)
-            target_compile_definitions(${TARGET} PRIVATE SAIL_HAVE_TIFF_WRITE_ADOBE_DEFLATE)
-            target_compile_definitions(${TARGET} PRIVATE SAIL_HAVE_TIFF_WRITE_DEFLATE)
-            target_compile_definitions(${TARGET} PRIVATE SAIL_HAVE_TIFF_WRITE_JPEG)
-            target_compile_definitions(${TARGET} PRIVATE SAIL_HAVE_TIFF_WRITE_LZW)
-            target_compile_definitions(${TARGET} PRIVATE SAIL_HAVE_TIFF_WRITE_NONE)
-            target_compile_definitions(${TARGET} PRIVATE SAIL_HAVE_TIFF_WRITE_PACKBITS)
+            # For VCPKG, it fails as it cannot find tiff.dll, see https://github.com/microsoft/vcpkg/issues/16793
+            #
+            message("-- Skipping Test and Explicitly Enabling SAIL_HAVE_TIFF_WRITE_${tiff_codec}")
+            set(SAIL_HAVE_TIFF_WRITE_${tiff_codec} ON)
         else()
             cmake_push_check_state(RESET)
                 set(CMAKE_REQUIRED_INCLUDES ${sail_tiff_include_dirs})
@@ -108,27 +105,27 @@ macro(sail_codec_post_add)
                 SAIL_HAVE_TIFF_WRITE_${tiff_codec}
                 )
             cmake_pop_check_state()
+        endif()
 
-            if (SAIL_HAVE_TIFF_WRITE_${tiff_codec})
-                # Match the SAIL namings
-                #
-                string(REPLACE "_"         "-"          tiff_codec_fixed ${tiff_codec})
-                string(REPLACE "CCITTRLE"  "CCITT-RLE"  tiff_codec_fixed ${tiff_codec_fixed})
-                string(REPLACE "CCITTRLEW" "CCITT-RLEW" tiff_codec_fixed ${tiff_codec_fixed})
-                string(REPLACE "IT8BL"     "IT8-BL"     tiff_codec_fixed ${tiff_codec_fixed})
-                string(REPLACE "IT8CTPAD"  "IT8-CTPAD"  tiff_codec_fixed ${tiff_codec_fixed})
-                string(REPLACE "IT8LW"     "IT8-LW"     tiff_codec_fixed ${tiff_codec_fixed})
-                string(REPLACE "IT8MP"     "IT8-MP"     tiff_codec_fixed ${tiff_codec_fixed})
-                string(REPLACE "JP2000"    "JPEG-2000"  tiff_codec_fixed ${tiff_codec_fixed})
-                string(REPLACE "JXL"       "JPEG-XL"    tiff_codec_fixed ${tiff_codec_fixed})
-                string(REPLACE "PIXARLOG"  "PIXAR-LOG"  tiff_codec_fixed ${tiff_codec_fixed})
-                string(REPLACE "PIXARFILM" "PIXAR-FILM" tiff_codec_fixed ${tiff_codec_fixed})
-                string(REPLACE "SGILOG24"  "SGI-LOG24"  tiff_codec_fixed ${tiff_codec_fixed})
-                string(REPLACE "SGILOG"    "SGI-LOG"    tiff_codec_fixed ${tiff_codec_fixed})
-                list(APPEND SAIL_TIFF_CODEC_INFO_COMPRESSIONS ${tiff_codec_fixed})
+        if (SAIL_HAVE_TIFF_WRITE_${tiff_codec})
+            # Match the SAIL namings
+            #
+            string(REPLACE "_"         "-"          tiff_codec_fixed ${tiff_codec})
+            string(REPLACE "CCITTRLE"  "CCITT-RLE"  tiff_codec_fixed ${tiff_codec_fixed})
+            string(REPLACE "CCITTRLEW" "CCITT-RLEW" tiff_codec_fixed ${tiff_codec_fixed})
+            string(REPLACE "IT8BL"     "IT8-BL"     tiff_codec_fixed ${tiff_codec_fixed})
+            string(REPLACE "IT8CTPAD"  "IT8-CTPAD"  tiff_codec_fixed ${tiff_codec_fixed})
+            string(REPLACE "IT8LW"     "IT8-LW"     tiff_codec_fixed ${tiff_codec_fixed})
+            string(REPLACE "IT8MP"     "IT8-MP"     tiff_codec_fixed ${tiff_codec_fixed})
+            string(REPLACE "JP2000"    "JPEG-2000"  tiff_codec_fixed ${tiff_codec_fixed})
+            string(REPLACE "JXL"       "JPEG-XL"    tiff_codec_fixed ${tiff_codec_fixed})
+            string(REPLACE "PIXARLOG"  "PIXAR-LOG"  tiff_codec_fixed ${tiff_codec_fixed})
+            string(REPLACE "PIXARFILM" "PIXAR-FILM" tiff_codec_fixed ${tiff_codec_fixed})
+            string(REPLACE "SGILOG24"  "SGI-LOG24"  tiff_codec_fixed ${tiff_codec_fixed})
+            string(REPLACE "SGILOG"    "SGI-LOG"    tiff_codec_fixed ${tiff_codec_fixed})
+            list(APPEND SAIL_TIFF_CODEC_INFO_COMPRESSIONS ${tiff_codec_fixed})
 
-                target_compile_definitions(${TARGET} PRIVATE SAIL_HAVE_TIFF_WRITE_${tiff_codec})
-            endif()
+            target_compile_definitions(${TARGET} PRIVATE SAIL_HAVE_TIFF_WRITE_${tiff_codec})
         endif()
     endforeach()
 
