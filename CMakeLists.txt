@@ -67,7 +67,7 @@ option(SAIL_BUILD_APPS "Build applications." ON)
 option(SAIL_BUILD_EXAMPLES "Build examples." ON)
 option(SAIL_BUILD_TESTS "Build tests." ON)
 option(SAIL_DEV "Enable developer mode. Be more strict when compiling source code, for example." OFF)
-set(SAIL_EXCEPT_CODECS "" CACHE STRING "Disable the codecs specified in this ';'-separated list. \
+set(SAIL_DISABLE_CODECS "" CACHE STRING "Disable the codecs specified in this ';'-separated list. \
 A codec specified in this setting remains disabled even if it's also specified in SAIL_ONLY_CODECS.")
 option(SAIL_INSTALL_PDB "Install PDB files along with libraries." ON)
 set(SAIL_ONLY_CODECS "" CACHE STRING "Enable only the codecs specified in this ';'-separated list. \
