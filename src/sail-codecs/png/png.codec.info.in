@@ -7,11 +7,11 @@ priority=HIGHEST
 name=PNG
 description=Portable Network Graphics
 magic-numbers=89 50 4E 47 0D 0A 1A 0A
-extensions=png@CODEC_INFO_EXTENSION_APNG@
+extensions=png@PNG_CODEC_INFO_EXTENSION_APNG@
 mime-types=image/png
 
 [load-features]
-features=STATIC@CODEC_INFO_FEATURE_ANIMATED@;META-DATA;INTERLACED;ICCP
+features=STATIC@PNG_CODEC_INFO_FEATURE_ANIMATED@;META-DATA;INTERLACED;ICCP
 tuning=png-filter
 
 [save-features]

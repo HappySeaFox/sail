@@ -1,34 +1,8 @@
 # Intended to be included by every codec. Sets up necessary dependencies,
 # installation targets, codec info.
 #
-# Usage:
-#
-#   1. When CMAKE is specified, sail_find_dependencies() is called to search CMake packages.
-#   2. When CMAKE is specified, sail_codec_post_add() is called right after a new target
-#      is added. sail_codec_post_add() could be used for tests like check_c_source_compiles().
-#
 macro(sail_codec)
-    cmake_parse_arguments(SAIL_CODEC "" "NAME;ICON" "SOURCES;LINK;CMAKE" ${ARGN})
-
-    # Put this codec into the disabled list so when we return from here
-    # on error it's get automatically marked as disabled. If no errors were found,
-    # we remove the codec from the disabled list at the end.
-    list(REMOVE_ITEM ENABLED_CODECS ${SAIL_CODEC_NAME})
-    set(ENABLED_CODECS ${ENABLED_CODECS} PARENT_SCOPE)
-    set(DISABLED_CODECS ${DISABLED_CODECS} ${SAIL_CODEC_NAME} PARENT_SCOPE)
-    set(DISABLED_CODECS ${DISABLED_CODECS} ${SAIL_CODEC_NAME})
-
-    if (SAIL_CODEC_CMAKE)
-        include(${SAIL_CODEC_CMAKE})
-
-        if (COMMAND sail_find_dependencies)
-            sail_find_dependencies()
-        endif()
-    endif()
-
-    set(sail_${SAIL_CODEC_NAME}_cflags       ${sail_${SAIL_CODEC_NAME}_cflags}       CACHE INTERNAL "List of ${SAIL_CODEC_NAME} CFLAGS")
-    set(sail_${SAIL_CODEC_NAME}_include_dirs ${sail_${SAIL_CODEC_NAME}_include_dirs} CACHE INTERNAL "List of ${SAIL_CODEC_NAME} include dirs")
-    set(sail_${SAIL_CODEC_NAME}_libs         ${sail_${SAIL_CODEC_NAME}_libs}         CACHE INTERNAL "List of ${SAIL_CODEC_NAME} libs")
+    cmake_parse_arguments(SAIL_CODEC "" "NAME;ICON" "SOURCES;LINK;DEPENDENCY_COMPILE_OPTIONS;DEPENDENCY_INCLUDE_DIRS;DEPENDENCY_LIBS" ${ARGN})
 
     # Use 'sail-codec-png' instead of just 'png' to avoid conflicts
     # with libpng cmake configs (they also export a 'png' target)
@@ -84,15 +58,11 @@ macro(sail_codec)
         endif()
     endforeach()
 
-    if (COMMAND sail_codec_post_add)
-        sail_codec_post_add()
-    endif()
-
     # Link against the found libs
     #
-    target_compile_options(${TARGET}     PRIVATE ${sail_${SAIL_CODEC_NAME}_cflags})
-    target_include_directories(${TARGET} PRIVATE ${sail_${SAIL_CODEC_NAME}_include_dirs})
-    target_link_libraries(${TARGET}      PRIVATE ${sail_${SAIL_CODEC_NAME}_libs})
+    target_compile_options(${TARGET}     PRIVATE ${SAIL_CODEC_DEPENDENCY_COMPILE_OPTIONS})
+    target_include_directories(${TARGET} PRIVATE ${SAIL_CODEC_DEPENDENCY_INCLUDE_DIRS})
+    target_link_libraries(${TARGET}      PRIVATE ${SAIL_CODEC_DEPENDENCY_LIBS})
 
     # Generate and copy .codec.info into the build dir
     #
@@ -112,10 +82,4 @@ macro(sail_codec)
     # Install icon
     #
     install(FILES "${SAIL_CODEC_ICON}" DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/sail/icons")
-
-    # Export this codec name into the parent scope
-    #
-    set(ENABLED_CODECS ${ENABLED_CODECS} ${SAIL_CODEC_NAME} PARENT_SCOPE)
-    list(REMOVE_ITEM DISABLED_CODECS ${SAIL_CODEC_NAME})
-    set(DISABLED_CODECS ${DISABLED_CODECS} PARENT_SCOPE)
 endmacro()
