@@ -53,9 +53,9 @@ are currently supported. Pull requests to support more platforms are highly welc
 
 ## What's the preferred way of installation?
 
-- Windows: `vcpkg`
-- macOS: `brew`
-- Linux: native packages if available
+- Windows: `conan`, `vcpkg`
+- macOS: `conan`, `brew`
+- Linux: native packages if available, `conan`, `vcpkg`
 
 See [BUILDING](BUILDING.md).
 

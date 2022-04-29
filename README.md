@@ -98,9 +98,9 @@ Time to load and output default pixels (without explicit conversion) was measure
 
 ## Preferred installation method
 
-- Windows: `vcpkg`
-- macOS: `brew`
-- Linux: native packages if available or `vcpkg`
+- Windows: `conan`, `vcpkg`
+- macOS: `conan`, `brew`
+- Linux: native packages if available, `conan`, `vcpkg`
 
 See [BUILDING](BUILDING.md).
 

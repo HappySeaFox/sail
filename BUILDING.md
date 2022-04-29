@@ -6,6 +6,8 @@
 
 **Standalone bundle** - manually compiled with `cmake` and respective build commands. Extra dependencies like libjpeg ARE shipped with the build. Portable archive for Windows on the releases page on GitHub is a good example of a standalone bundle.
 
+**Conan recipe** - installed with `conan`.
+
 **VCPKG port** - installed with `vcpkg install sail`.
 
 ### CMake options overview
@@ -21,6 +23,10 @@
 - `SAIL_THREAD_SAFE=ON|OFF` - Enable working in multi-threaded environments by locking the internal context with a mutex. Default: `ON`
 - `SAIL_ONLY_CODECS="a;b;c"` - Enable only the codecs specified in this ';'-separated list.
   Codecs with missing dependencies will be disabled regardless this setting. Default: empty list
+
+### Conan
+
+SAIL is available in [Conan](https://conan.io/center/sail) on all supported platforms.
 
 ### VCPKG
 
