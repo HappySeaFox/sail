@@ -277,9 +277,7 @@ SAIL_EXPORT variant::variant(const sail_variant_type_workaround_alias_const &var
         return;
     }
 
-    d->type = variant->type;
-
-    switch (d->type) {
+    switch (variant->type) {
         case SAIL_VARIANT_TYPE_BOOL:           set_value(sail_variant_to_bool(variant));                break;
         case SAIL_VARIANT_TYPE_CHAR:           set_value(sail_variant_to_char(variant));                break;
         case SAIL_VARIANT_TYPE_UNSIGNED_CHAR:  set_value(sail_variant_to_unsigned_char(variant));       break;
