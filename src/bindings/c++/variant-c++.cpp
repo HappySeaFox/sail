@@ -260,13 +260,8 @@ template SAIL_EXPORT variant::variant(const double &);
 template SAIL_EXPORT variant::variant(const std::string &);
 template SAIL_EXPORT variant::variant(const sail::arbitrary_data &);
 
-namespace
-{
-
 using sail_variant_type_workaround_alias_const     = const sail_variant *;
 using sail_variant_type_workaround_alias_non_const = sail_variant *;
-
-}
 
 template<>
 SAIL_EXPORT variant::variant(const sail_variant_type_workaround_alias_const &variant)
