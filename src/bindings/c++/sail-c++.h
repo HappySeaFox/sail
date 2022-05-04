@@ -63,6 +63,7 @@
     #include "load_options-c++.h"
     #include "log-c++.h"
     #include "meta_data-c++.h"
+    #include "ostream-c++.h"
     #include "palette-c++.h"
     #include "resolution-c++.h"
     #include "save_features-c++.h"
@@ -99,6 +100,7 @@
     #include <sail-c++/load_options-c++.h>
     #include <sail-c++/log-c++.h>
     #include <sail-c++/meta_data-c++.h>
+    #include <sail-c++/ostream-c++.h>
     #include <sail-c++/palette-c++.h>
     #include <sail-c++/resolution-c++.h>
     #include <sail-c++/source_image-c++.h>

@@ -119,6 +119,22 @@ public:
      */
     void set_y(double y);
 
+    /*
+     * Returns a string representation of the specified resolution unit. See SailResolutionUnit.
+     * For example: "Micrometer" is returned for SAIL_RESOLUTION_UNIT_MICROMETER.
+     *
+     * Returns NULL if the resolution unit is not known.
+     */
+    static const char* resolution_unit_to_string(SailResolutionUnit resolution_unit);
+
+    /*
+     * Returns a resolution unit from the string representation. See SailResolutionUnit.
+     * For example: SAIL_RESOLUTION_UNIT_MICROMETER is returned for "Micrometer".
+     *
+     * Returns SAIL_RESOLUTION_UNIT_UNKNOWN if the resolution unit is not known.
+     */
+    static SailResolutionUnit resolution_unit_from_string(const std::string &str);
+
 private:
     /*
      * Makes a deep copy of the specified resolution.

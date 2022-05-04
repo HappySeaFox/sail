@@ -35,6 +35,8 @@ add_library(sail-c++
                 log-c++.h
                 meta_data-c++.cpp
                 meta_data-c++.h
+                ostream-c++.h
+                ostream-c++.cpp
                 palette-c++.cpp
                 palette-c++.h
                 resolution-c++.cpp
@@ -75,6 +77,7 @@ set(PUBLIC_HEADERS "abstract_io-c++.h"
                    "load_options-c++.h"
                    "log-c++.h"
                    "meta_data-c++.h"
+                   "ostream-c++.h"
                    "palette-c++.h"
                    "resolution-c++.h"
                    "sail-c++.h"

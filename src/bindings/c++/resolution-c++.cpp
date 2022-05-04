@@ -121,6 +121,16 @@ void resolution::set_y(double y)
     d->resolution.y = y;
 }
 
+const char* resolution::resolution_unit_to_string(SailResolutionUnit resolution_unit)
+{
+    return sail_resolution_unit_to_string(resolution_unit);
+}
+
+SailResolutionUnit resolution::resolution_unit_from_string(const std::string &str)
+{
+    return sail_resolution_unit_from_string(str.c_str());
+}
+
 resolution::resolution(const sail_resolution *res)
     : resolution()
 {
