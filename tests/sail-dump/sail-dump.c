@@ -187,20 +187,7 @@ static sail_status_t read_resolution(FILE *fptr, struct sail_image *image) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_READ_FILE);
     }
 
-    if (strcmp(unit, "UNKNOWN") == 0) {
-        image->resolution->unit = SAIL_RESOLUTION_UNIT_UNKNOWN;
-    } else if (strcmp(unit, "MICROMETER") == 0) {
-        image->resolution->unit = SAIL_RESOLUTION_UNIT_MICROMETER;
-    } else if (strcmp(unit, "CENTIMETER") == 0) {
-        image->resolution->unit = SAIL_RESOLUTION_UNIT_CENTIMETER;
-    } else if (strcmp(unit, "METER") == 0) {
-        image->resolution->unit = SAIL_RESOLUTION_UNIT_METER;
-    } else if (strcmp(unit, "INCH") == 0) {
-        image->resolution->unit = SAIL_RESOLUTION_UNIT_INCH;
-    } else {
-        SAIL_LOG_ERROR("DUMP: Unknown resolution unit '%s'", unit);
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_PARSE_FILE);
-    }
+    image->resolution->unit = sail_resolution_unit_from_string(unit);
 
     SAIL_LOG_DEBUG("DUMP: Resolution properties: %.1fx%.1f unit(%s)",
                     image->resolution->x, image->resolution->y, unit);
@@ -524,21 +511,7 @@ sail_status_t sail_dump(const struct sail_image *image) {
     }
 
     if (image->resolution != NULL) {
-        const char *resolution_str = NULL;
-
-        switch (image->resolution->unit) {
-            case SAIL_RESOLUTION_UNIT_UNKNOWN:    resolution_str = "UNKNOWN";    break;
-            case SAIL_RESOLUTION_UNIT_MICROMETER: resolution_str = "MICROMETER"; break;
-            case SAIL_RESOLUTION_UNIT_CENTIMETER: resolution_str = "CENTIMETER"; break;
-            case SAIL_RESOLUTION_UNIT_METER:      resolution_str = "METER";      break;
-            case SAIL_RESOLUTION_UNIT_INCH:       resolution_str = "INCH";       break;
-            default: {
-                SAIL_LOG_ERROR("DUMP: Unknown resolution unit #%d", image->resolution->unit);
-                SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
-            }
-        }
-
-        printf("RESOLUTION\n%f %f %s\n\n", image->resolution->x, image->resolution->y, resolution_str);
+        printf("RESOLUTION\n%f %f %s\n\n", image->resolution->x, image->resolution->y, sail_resolution_unit_to_string(image->resolution->unit));
     }
 
     {

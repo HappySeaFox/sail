@@ -505,6 +505,38 @@ static MunitResult test_meta_data_from_string(const MunitParameter params[], voi
 }
 
 /*
+ * Resolution Unit.
+ */
+static MunitResult test_resolution_unit_to_string(const MunitParameter params[], void *user_data) {
+    (void)params;
+    (void)user_data;
+
+    munit_assert_string_equal(sail_resolution_unit_to_string(SAIL_RESOLUTION_UNIT_UNKNOWN),    "Unknown");
+    munit_assert_string_equal(sail_resolution_unit_to_string(SAIL_RESOLUTION_UNIT_MICROMETER), "Micrometer");
+    munit_assert_string_equal(sail_resolution_unit_to_string(SAIL_RESOLUTION_UNIT_CENTIMETER), "Centimeter");
+    munit_assert_string_equal(sail_resolution_unit_to_string(SAIL_RESOLUTION_UNIT_METER),      "Meter");
+    munit_assert_string_equal(sail_resolution_unit_to_string(SAIL_RESOLUTION_UNIT_INCH),       "Inch");
+
+    return MUNIT_OK;
+}
+
+static MunitResult test_resolution_unit_from_string(const MunitParameter params[], void *user_data) {
+    (void)params;
+    (void)user_data;
+
+    munit_assert(sail_resolution_unit_from_string(NULL)   == SAIL_RESOLUTION_UNIT_UNKNOWN);
+    munit_assert(sail_resolution_unit_from_string("Some") == SAIL_RESOLUTION_UNIT_UNKNOWN);
+
+    munit_assert(sail_resolution_unit_from_string("Unknown")    == SAIL_RESOLUTION_UNIT_UNKNOWN);
+    munit_assert(sail_resolution_unit_from_string("Micrometer") == SAIL_RESOLUTION_UNIT_MICROMETER);
+    munit_assert(sail_resolution_unit_from_string("Centimeter") == SAIL_RESOLUTION_UNIT_CENTIMETER);
+    munit_assert(sail_resolution_unit_from_string("Meter")      == SAIL_RESOLUTION_UNIT_METER);
+    munit_assert(sail_resolution_unit_from_string("Inch")       == SAIL_RESOLUTION_UNIT_INCH);
+
+    return MUNIT_OK;
+}
+
+/*
  * Codec features.
  */
 static MunitResult test_codec_feature_to_string(const MunitParameter params[], void *user_data) {
@@ -557,6 +589,9 @@ static MunitTest test_suite_tests[] = {
 
     { (char *)"/meta-data-to-string",   test_meta_data_to_string,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/meta-data-from-string", test_meta_data_from_string, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+
+    { (char *)"/resolution-unit-to-string",   test_resolution_unit_to_string,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/resolution-unit-from-string", test_resolution_unit_from_string, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { (char *)"/codec-feature-to-string",   test_codec_feature_to_string,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/codec-feature-from-string", test_codec_feature_from_string, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },

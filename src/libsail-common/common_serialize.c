@@ -482,6 +482,36 @@ enum SailMetaData sail_meta_data_from_string(const char *str) {
     return SAIL_META_DATA_UNKNOWN;
 }
 
+const char* sail_resolution_unit_to_string(enum SailResolutionUnit resolution_unit) {
+
+    switch (resolution_unit) {
+        case SAIL_RESOLUTION_UNIT_UNKNOWN:    return "Unknown";
+        case SAIL_RESOLUTION_UNIT_MICROMETER: return "Micrometer";
+        case SAIL_RESOLUTION_UNIT_CENTIMETER: return "Centimeter";
+        case SAIL_RESOLUTION_UNIT_METER:      return "Meter";
+        case SAIL_RESOLUTION_UNIT_INCH:       return "Inch";
+    }
+
+    return NULL;
+}
+
+enum SailResolutionUnit sail_resolution_unit_from_string(const char *str) {
+
+    uint64_t hash;
+    SAIL_TRY_OR_EXECUTE(sail_string_hash(str, &hash),
+                        /* cleanup */ return SAIL_RESOLUTION_UNIT_UNKNOWN);
+
+    switch (hash) {
+        case UINT64_C(229444052301365):     return SAIL_RESOLUTION_UNIT_UNKNOWN;
+        case UINT64_C(8245152247842122364): return SAIL_RESOLUTION_UNIT_MICROMETER;
+        case UINT64_C(8244682978514626197): return SAIL_RESOLUTION_UNIT_CENTIMETER;
+        case UINT64_C(210682625058):        return SAIL_RESOLUTION_UNIT_METER;
+        case UINT64_C(6384187463):          return SAIL_RESOLUTION_UNIT_INCH;
+    }
+
+    return SAIL_RESOLUTION_UNIT_UNKNOWN;
+}
+
 const char* sail_codec_feature_to_string(enum SailCodecFeature codec_feature) {
 
     switch (codec_feature) {

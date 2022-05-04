@@ -119,6 +119,22 @@ SAIL_EXPORT const char* sail_meta_data_to_string(enum SailMetaData meta_data);
 SAIL_EXPORT enum SailMetaData sail_meta_data_from_string(const char *str);
 
 /*
+ * Returns a string representation of the specified resolution unit. See SailResolutionUnit.
+ * For example: "Micrometer" is returned for SAIL_RESOLUTION_UNIT_MICROMETER.
+ *
+ * Returns NULL if the resolution unit is not known.
+ */
+SAIL_EXPORT const char* sail_resolution_unit_to_string(enum SailResolutionUnit resolution_unit);
+
+/*
+ * Returns a resolution unit from the string representation. See SailResolutionUnit.
+ * For example: SAIL_RESOLUTION_UNIT_MICROMETER is returned for "Micrometer".
+ *
+ * Returns SAIL_RESOLUTION_UNIT_UNKNOWN if the resolution unit is not known.
+ */
+SAIL_EXPORT enum SailResolutionUnit sail_resolution_unit_from_string(const char *str);
+
+/*
  * Returns a string representation of the specified codec feature. See SailCodecFeature.
  * For example: "STATIC" is returned for SAIL_CODEC_FEATURE_STATIC.
  *
