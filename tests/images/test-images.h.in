@@ -19,7 +19,7 @@ static const char * const SAIL_TEST_IMAGES[] = {
     "@SAIL_TEST_IMAGES_PATH@/bmp/bpp8-indexed.rle.bmp",
     "@SAIL_TEST_IMAGES_PATH@/bmp/bpp8-indexed.rle.not4.bmp",
 
-    "@SAIL_TEST_IMAGES_PATH@/png/bpp4-indexed.png",
+    "@SAIL_TEST_IMAGES_PATH@/png/bpp4-indexed.comment.iccp.png",
 
     NULL,
 };
