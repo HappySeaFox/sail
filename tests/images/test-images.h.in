@@ -25,7 +25,8 @@ static const char * const SAIL_TEST_IMAGES[] = {
     "@SAIL_TEST_IMAGES_PATH@/tga/bpp8-indexed.extension.rle.tga",
     "@SAIL_TEST_IMAGES_PATH@/tga/bpp24-bgr.extension.rle.tga",
 
-    "@SAIL_TEST_IMAGES_PATH@/xbm/bpp1-indexed.xbm",
+    "@SAIL_TEST_IMAGES_PATH@/xbm/bpp1-indexed.x10.xbm",
+    "@SAIL_TEST_IMAGES_PATH@/xbm/bpp1-indexed.x11.xbm",
 
     NULL,
 };
