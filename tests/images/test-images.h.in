@@ -6,10 +6,6 @@
 static const char * const SAIL_TEST_IMAGES[] = {
     "@SAIL_TEST_IMAGES_PATH@/bmp/bpp1-indexed.bmp",
     "@SAIL_TEST_IMAGES_PATH@/bmp/bpp1-indexed.not4.bmp",
-    "@SAIL_TEST_IMAGES_PATH@/bmp/bpp24-bgr.bmp",
-    "@SAIL_TEST_IMAGES_PATH@/bmp/bpp24-bgr.not4.bmp",
-    "@SAIL_TEST_IMAGES_PATH@/bmp/bpp32-bgra.bmp",
-    "@SAIL_TEST_IMAGES_PATH@/bmp/bpp32-bgra.not4.bmp",
     "@SAIL_TEST_IMAGES_PATH@/bmp/bpp4-indexed.bmp",
     "@SAIL_TEST_IMAGES_PATH@/bmp/bpp4-indexed.not4.bmp",
     "@SAIL_TEST_IMAGES_PATH@/bmp/bpp4-indexed.rle.bmp",
@@ -18,8 +14,16 @@ static const char * const SAIL_TEST_IMAGES[] = {
     "@SAIL_TEST_IMAGES_PATH@/bmp/bpp8-indexed.not4.bmp",
     "@SAIL_TEST_IMAGES_PATH@/bmp/bpp8-indexed.rle.bmp",
     "@SAIL_TEST_IMAGES_PATH@/bmp/bpp8-indexed.rle.not4.bmp",
+    "@SAIL_TEST_IMAGES_PATH@/bmp/bpp24-bgr.bmp",
+    "@SAIL_TEST_IMAGES_PATH@/bmp/bpp24-bgr.not4.bmp",
+    "@SAIL_TEST_IMAGES_PATH@/bmp/bpp32-bgra.bmp",
+    "@SAIL_TEST_IMAGES_PATH@/bmp/bpp32-bgra.not4.bmp",
 
     "@SAIL_TEST_IMAGES_PATH@/png/bpp4-indexed.comment.iccp.png",
+
+    "@SAIL_TEST_IMAGES_PATH@/tga/bpp8-grayscale.extension.rle.tga",
+    "@SAIL_TEST_IMAGES_PATH@/tga/bpp8-indexed.extension.rle.tga",
+    "@SAIL_TEST_IMAGES_PATH@/tga/bpp24-bgr.extension.rle.tga",
 
     NULL,
 };
