@@ -309,6 +309,8 @@
         <b>Bit depth:</b> 1-bit.
         <br/><br/>
         <b>Content:</b> Static.
+        <br/><br/>
+        <b>Specifications:</b> X10, X11.
     </td>
     <td>
         <b>Content:</b> Multi-paged, C-style /*...*/ comments.
