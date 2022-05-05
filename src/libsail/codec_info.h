@@ -94,14 +94,14 @@ typedef struct sail_codec_info sail_codec_info_t;
  *
  * The assigned codec info MUST NOT be destroyed. It is a pointer to an internal data structure.
  *
- * Typical usage: sail_codec_info_from_path() ->
- *                sail_start_loading_file()   ->
- *                sail_load_next_frame()      ->
+ * Typical usage: sail_codec_info_from_path()    ->
+ *                sail_start_loading_from_file() ->
+ *                sail_load_next_frame()         ->
  *                sail_stop_loading().
  *
- * Or:            sail_codec_info_from_path() ->
- *                sail_start_saving_file()    ->
- *                sail_load_next_frame()      ->
+ * Or:            sail_codec_info_from_path()   ->
+ *                sail_start_saving_into_file() ->
+ *                sail_load_next_frame()        ->
  *                sail_stop_saving().
  *
  * Returns SAIL_OK on success.
@@ -115,7 +115,7 @@ SAIL_EXPORT sail_status_t sail_codec_info_from_path(const char *path, const stru
  * The assigned codec info MUST NOT be destroyed. It is a pointer to an internal data structure.
  *
  * Typical usage: sail_codec_info_by_magic_number_from_path() ->
- *                sail_start_loading_file()                   ->
+ *                sail_start_loading_from_file()              ->
  *                sail_load_next_frame()                      ->
  *                sail_stop_loading().
  *
@@ -130,7 +130,7 @@ SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_path(const char *
  * The assigned codec info MUST NOT be destroyed. It is a pointer to an internal data structure.
  *
  * Typical usage: sail_codec_info_by_magic_number_from_memory() ->
- *                sail_start_loading_file()                     ->
+ *                sail_start_loading_from_file()                ->
  *                sail_load_next_frame()                        ->
  *                sail_stop_loading().
  *
@@ -150,7 +150,7 @@ SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_memory(const void
  * The assigned codec info MUST NOT be destroyed. It is a pointer to an internal data structure.
  *
  * Typical usage: sail_codec_info_by_magic_number_from_io() ->
- *                sail_start_loading_file()                 ->
+ *                sail_start_loading_from_file()            ->
  *                sail_load_next_frame()                    ->
  *                sail_stop_loading().
  *
@@ -165,12 +165,12 @@ SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_io(struct sail_io
  * The assigned codec info MUST NOT be destroyed. It is a pointer to an internal data structure.
  *
  * Typical usage: sail_codec_info_from_extension() ->
- *                sail_start_loading_file()        ->
+ *                sail_start_loading_from_file()   ->
  *                sail_load_next_frame()           ->
  *                sail_stop_loading().
  *
  * Or:            sail_codec_info_from_extension() ->
- *                sail_start_saving_file()         ->
+ *                sail_start_saving_into_file()    ->
  *                sail_load_next_frame()           ->
  *                sail_stop_saving().
  *
@@ -185,12 +185,12 @@ SAIL_EXPORT sail_status_t sail_codec_info_from_extension(const char *extension, 
  * The assigned codec info MUST NOT be destroyed. It is a pointer to an internal data structure.
  *
  * Typical usage: sail_codec_info_from_mime_type() ->
- *                sail_start_loading_file()        ->
+ *                sail_start_loading_from_file()   ->
  *                sail_load_next_frame()           ->
  *                sail_stop_loading().
  *
  * Or:            sail_codec_info_from_mime_type() ->
- *                sail_start_saving_file()         ->
+ *                sail_start_saving_into_file()    ->
  *                sail_load_next_frame()           ->
  *                sail_stop_saving().
  *

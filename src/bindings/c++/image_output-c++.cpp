@@ -79,7 +79,7 @@ sail_status_t image_output::start(const std::string &path)
 {
     SAIL_TRY(d->start());
 
-    SAIL_TRY(sail_start_saving_file(path.c_str(), nullptr, &d->state));
+    SAIL_TRY(sail_start_saving_into_file(path.c_str(), nullptr, &d->state));
 
     return SAIL_OK;
 }
@@ -88,7 +88,7 @@ sail_status_t image_output::start(const std::string &path, const sail::codec_inf
 {
     SAIL_TRY(d->start());
 
-    SAIL_TRY(sail_start_saving_file(path.c_str(), codec_info.sail_codec_info_c(), &d->state));
+    SAIL_TRY(sail_start_saving_into_file(path.c_str(), codec_info.sail_codec_info_c(), &d->state));
 
     return SAIL_OK;
 }
@@ -100,7 +100,7 @@ sail_status_t image_output::start(const std::string &path, const sail::save_opti
     sail_save_options *sail_save_options;
     SAIL_TRY(save_options.to_sail_save_options(&sail_save_options));
 
-    SAIL_TRY_OR_CLEANUP(sail_start_saving_file_with_options(path.c_str(), nullptr, sail_save_options, &d->state),
+    SAIL_TRY_OR_CLEANUP(sail_start_saving_into_file_with_options(path.c_str(), nullptr, sail_save_options, &d->state),
                         /* cleanup */ sail_destroy_save_options(sail_save_options));
 
     sail_destroy_save_options(sail_save_options);
@@ -115,7 +115,7 @@ sail_status_t image_output::start(const std::string &path, const sail::codec_inf
     sail_save_options *sail_save_options;
     SAIL_TRY(save_options.to_sail_save_options(&sail_save_options));
 
-    SAIL_TRY_OR_CLEANUP(sail_start_saving_file_with_options(path.c_str(), codec_info.sail_codec_info_c(), sail_save_options, &d->state),
+    SAIL_TRY_OR_CLEANUP(sail_start_saving_into_file_with_options(path.c_str(), codec_info.sail_codec_info_c(), sail_save_options, &d->state),
                         /* cleanup */ sail_destroy_save_options(sail_save_options));
 
     sail_destroy_save_options(sail_save_options);
@@ -127,10 +127,7 @@ sail_status_t image_output::start(void *buffer, std::size_t buffer_length, const
 {
     SAIL_TRY(d->start());
 
-    SAIL_TRY(sail_start_saving_memory(buffer,
-                                      buffer_length,
-                                      codec_info.sail_codec_info_c(),
-                                      &d->state));
+    SAIL_TRY(sail_start_saving_into_memory(buffer, buffer_length, codec_info.sail_codec_info_c(), &d->state));
 
     return SAIL_OK;
 }
@@ -142,7 +139,7 @@ sail_status_t image_output::start(void *buffer, std::size_t buffer_length, const
     sail_save_options *sail_save_options;
     SAIL_TRY(save_options.to_sail_save_options(&sail_save_options));
 
-    SAIL_TRY_OR_CLEANUP(sail_start_saving_memory_with_options(buffer, buffer_length, codec_info.sail_codec_info_c(), sail_save_options, &d->state),
+    SAIL_TRY_OR_CLEANUP(sail_start_saving_into_memory_with_options(buffer, buffer_length, codec_info.sail_codec_info_c(), sail_save_options, &d->state),
                         /* cleanup */ sail_destroy_save_options(sail_save_options));
 
     sail_destroy_save_options(sail_save_options);
@@ -170,7 +167,7 @@ sail_status_t image_output::start(sail::abstract_io &abstract_io, const sail::co
 
     d->abstract_io_adapter.reset(new sail::abstract_io_adapter(abstract_io));
 
-    SAIL_TRY(sail_start_saving_io_with_options(&d->abstract_io_adapter->sail_io_c(), codec_info.sail_codec_info_c(), nullptr, &d->state));
+    SAIL_TRY(sail_start_saving_into_io_with_options(&d->abstract_io_adapter->sail_io_c(), codec_info.sail_codec_info_c(), nullptr, &d->state));
 
     return SAIL_OK;
 }
@@ -184,7 +181,7 @@ sail_status_t image_output::start(sail::abstract_io &abstract_io, const sail::co
     sail_save_options *sail_save_options;
     SAIL_TRY(save_options.to_sail_save_options(&sail_save_options));
 
-    SAIL_TRY_OR_CLEANUP(sail_start_saving_io_with_options(&d->abstract_io_adapter->sail_io_c(), codec_info.sail_codec_info_c(), sail_save_options, &d->state),
+    SAIL_TRY_OR_CLEANUP(sail_start_saving_into_io_with_options(&d->abstract_io_adapter->sail_io_c(), codec_info.sail_codec_info_c(), sail_save_options, &d->state),
                         /* cleanup */ sail_destroy_save_options(sail_save_options));
 
     sail_destroy_save_options(sail_save_options);

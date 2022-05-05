@@ -53,7 +53,7 @@ static MunitResult test_io_produce_same_images(const MunitParameter params[], vo
     munit_assert(sail_codec_info_from_path(path, &codec_info) == SAIL_OK);
 
     void *state;
-    munit_assert(sail_start_loading_memory(data, data_length, codec_info, &state) == SAIL_OK);
+    munit_assert(sail_start_loading_from_memory(data, data_length, codec_info, &state) == SAIL_OK);
 
     struct sail_image *image_mem = NULL;
     munit_assert(sail_load_next_frame(state, &image_mem) == SAIL_OK);

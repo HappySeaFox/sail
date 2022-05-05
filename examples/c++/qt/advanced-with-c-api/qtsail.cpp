@@ -90,7 +90,7 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
     /*
      * Starts loading the specified file.
      */
-    SAIL_TRY_OR_CLEANUP(sail_start_loading_file(path.toLocal8Bit(), NULL, &state),
+    SAIL_TRY_OR_CLEANUP(sail_start_loading_from_file(path.toLocal8Bit(), NULL, &state),
                         /* cleanup */ sail_stop_loading(state));
 
     /*
@@ -227,7 +227,7 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
     sail_put_hash_map(save_options->tuning, "png-filter", value);
     sail_destroy_variant(value);
 
-    SAIL_TRY_OR_CLEANUP(sail_start_saving_file_with_options(path.toLocal8Bit(), nullptr, save_options, &state),
+    SAIL_TRY_OR_CLEANUP(sail_start_saving_into_file_with_options(path.toLocal8Bit(), nullptr, save_options, &state),
                         /* cleanup */ sail_destroy_save_options(save_options),
                                       sail_destroy_image(image));
 

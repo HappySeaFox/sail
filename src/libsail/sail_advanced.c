@@ -80,16 +80,16 @@ sail_status_t sail_probe_memory(const void *buffer, size_t buffer_length, struct
     return SAIL_OK;
 }
 
-sail_status_t sail_start_loading_file(const char *path, const struct sail_codec_info *codec_info, void **state) {
+sail_status_t sail_start_loading_from_file(const char *path, const struct sail_codec_info *codec_info, void **state) {
 
-    SAIL_TRY(sail_start_loading_file_with_options(path, codec_info, NULL, state));
+    SAIL_TRY(sail_start_loading_from_file_with_options(path, codec_info, NULL, state));
 
     return SAIL_OK;
 }
 
-sail_status_t sail_start_loading_memory(const void *buffer, size_t buffer_length, const struct sail_codec_info *codec_info, void **state) {
+sail_status_t sail_start_loading_from_memory(const void *buffer, size_t buffer_length, const struct sail_codec_info *codec_info, void **state) {
 
-    SAIL_TRY(sail_start_loading_memory_with_options(buffer, buffer_length, codec_info, NULL, state));
+    SAIL_TRY(sail_start_loading_from_memory_with_options(buffer, buffer_length, codec_info, NULL, state));
 
     return SAIL_OK;
 }
@@ -150,16 +150,16 @@ sail_status_t sail_stop_loading(void *state) {
     return SAIL_OK;
 }
 
-sail_status_t sail_start_saving_file(const char *path, const struct sail_codec_info *codec_info, void **state) {
+sail_status_t sail_start_saving_into_file(const char *path, const struct sail_codec_info *codec_info, void **state) {
 
-    SAIL_TRY(sail_start_saving_file_with_options(path, codec_info, NULL, state));
+    SAIL_TRY(sail_start_saving_into_file_with_options(path, codec_info, NULL, state));
 
     return SAIL_OK;
 }
 
-sail_status_t sail_start_saving_memory(void *buffer, size_t buffer_length, const struct sail_codec_info *codec_info, void **state) {
+sail_status_t sail_start_saving_into_memory(void *buffer, size_t buffer_length, const struct sail_codec_info *codec_info, void **state) {
 
-    SAIL_TRY(sail_start_saving_memory_with_options(buffer, buffer_length, codec_info, NULL, state));
+    SAIL_TRY(sail_start_saving_into_memory_with_options(buffer, buffer_length, codec_info, NULL, state));
 
     return SAIL_OK;
 }

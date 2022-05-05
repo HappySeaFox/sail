@@ -52,7 +52,7 @@ static sail_status_t convert_impl(const char *input, const char *output, int com
     SAIL_TRY(sail_codec_info_from_path(input, &codec_info));
     SAIL_LOG_INFO("Input codec: %s", codec_info->description);
 
-    SAIL_TRY(sail_start_loading_file(input, codec_info, &state));
+    SAIL_TRY(sail_start_loading_from_file(input, codec_info, &state));
 
     SAIL_TRY(sail_load_next_frame(state, &image));
     SAIL_TRY(sail_stop_loading(state));
@@ -79,7 +79,7 @@ static sail_status_t convert_impl(const char *input, const char *output, int com
     SAIL_LOG_INFO("Compression: %d%s", compression, compression == -1 ? " (default)" : "");
     save_options->compression_level = compression;
 
-    SAIL_TRY(sail_start_saving_file_with_options(output, codec_info, save_options, &state));
+    SAIL_TRY(sail_start_saving_into_file_with_options(output, codec_info, save_options, &state));
     SAIL_TRY(sail_write_next_frame(state, image));
     SAIL_TRY(sail_stop_saving(state));
 

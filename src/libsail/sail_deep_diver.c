@@ -30,8 +30,8 @@
 #include "sail-common.h"
 #include "sail.h"
 
-sail_status_t sail_start_loading_file_with_options(const char *path, const struct sail_codec_info *codec_info,
-                                                   const struct sail_load_options *load_options, void **state) {
+sail_status_t sail_start_loading_from_file_with_options(const char *path, const struct sail_codec_info *codec_info,
+                                                        const struct sail_load_options *load_options, void **state) {
 
     SAIL_CHECK_PTR(path);
 
@@ -51,9 +51,9 @@ sail_status_t sail_start_loading_file_with_options(const char *path, const struc
     return SAIL_OK;
 }
 
-sail_status_t sail_start_loading_memory_with_options(const void *buffer, size_t buffer_length,
-                                                     const struct sail_codec_info *codec_info,
-                                                     const struct sail_load_options *load_options, void **state) {
+sail_status_t sail_start_loading_from_memory_with_options(const void *buffer, size_t buffer_length,
+                                                          const struct sail_codec_info *codec_info,
+                                                          const struct sail_load_options *load_options, void **state) {
 
     SAIL_CHECK_PTR(buffer);
 
@@ -73,8 +73,8 @@ sail_status_t sail_start_loading_memory_with_options(const void *buffer, size_t 
     return SAIL_OK;
 }
 
-sail_status_t sail_start_saving_file_with_options(const char *path, const struct sail_codec_info *codec_info,
-                                                  const struct sail_save_options *save_options, void **state) {
+sail_status_t sail_start_saving_into_file_with_options(const char *path, const struct sail_codec_info *codec_info,
+                                                       const struct sail_save_options *save_options, void **state) {
 
     SAIL_CHECK_PTR(path);
 
@@ -95,9 +95,9 @@ sail_status_t sail_start_saving_file_with_options(const char *path, const struct
     return SAIL_OK;
 }
 
-sail_status_t sail_start_saving_memory_with_options(void *buffer, size_t buffer_length,
-                                                     const struct sail_codec_info *codec_info,
-                                                     const struct sail_save_options *save_options, void **state) {
+sail_status_t sail_start_saving_into_memory_with_options(void *buffer, size_t buffer_length,
+                                                         const struct sail_codec_info *codec_info,
+                                                         const struct sail_save_options *save_options, void **state) {
     SAIL_CHECK_PTR(buffer);
     SAIL_CHECK_PTR(codec_info);
 

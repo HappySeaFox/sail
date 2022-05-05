@@ -49,7 +49,7 @@ struct sail_save_options;
  * Typical usage: sail_alloc_io()                  ->
  *                set I/O callbacks                ->
  *                sail_codec_info_from_extension() ->
- *                sail_start_loading_io()          ->
+ *                sail_start_loading_from_io()     ->
  *                sail_load_next_frame()           ->
  *                sail_stop_loading()              ->
  *                sail_destroy_io().
@@ -60,18 +60,18 @@ struct sail_save_options;
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_start_loading_io(struct sail_io *io, const struct sail_codec_info *codec_info, void **state);
+SAIL_EXPORT sail_status_t sail_start_loading_from_io(struct sail_io *io, const struct sail_codec_info *codec_info, void **state);
 
 /*
  * Starts loading the specified I/O stream with the specified load options. If you don't need specific load options,
  * just pass NULL. Codec-specific defaults will be used in this case. The load options are deep copied.
  *
- * Typical usage: sail_alloc_io()                      ->
- *                set I/O callbacks                    ->
- *                sail_codec_info_from_extension()     ->
- *                sail_start_loading_io_with_options() ->
- *                sail_load_next_frame()               ->
- *                sail_stop_loading()                  ->
+ * Typical usage: sail_alloc_io()                           ->
+ *                set I/O callbacks                         ->
+ *                sail_codec_info_from_extension()          ->
+ *                sail_start_loading_from_io_with_options() ->
+ *                sail_load_next_frame()                    ->
+ *                sail_stop_loading()                       ->
  *                sail_destroy_io().
  *
  * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
@@ -80,9 +80,9 @@ SAIL_EXPORT sail_status_t sail_start_loading_io(struct sail_io *io, const struct
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_start_loading_io_with_options(struct sail_io *io,
-                                                            const struct sail_codec_info *codec_info,
-                                                            const struct sail_load_options *load_options, void **state);
+SAIL_EXPORT sail_status_t sail_start_loading_from_io_with_options(struct sail_io *io,
+                                                                  const struct sail_codec_info *codec_info,
+                                                                  const struct sail_load_options *load_options, void **state);
 
 /*
  * Starts saving into the specified I/O stream.
@@ -90,7 +90,7 @@ SAIL_EXPORT sail_status_t sail_start_loading_io_with_options(struct sail_io *io,
  * Typical usage: sail_alloc_io()                  ->
  *                set I/O callbacks                ->
  *                sail_codec_info_from_extension() ->
- *                sail_start_saving_file()         ->
+ *                sail_start_saving_into_file()    ->
  *                sail_write_next_frame()          ->
  *                sail_stop_saving()               ->
  *                sail_destroy_io().
@@ -101,18 +101,18 @@ SAIL_EXPORT sail_status_t sail_start_loading_io_with_options(struct sail_io *io,
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_start_saving_io(struct sail_io *io, const struct sail_codec_info *codec_info, void **state);
+SAIL_EXPORT sail_status_t sail_start_saving_into_io(struct sail_io *io, const struct sail_codec_info *codec_info, void **state);
 
 /*
  * Starts saving the specified I/O stream with the specified save options. If you don't need specific save options,
  * just pass NULL. Codec-specific defaults will be used in this case. The save options are deep copied.
  *
- * Typical usage: sail_alloc_io()                     ->
- *                set I/O callbacks                   ->
- *                sail_codec_info_from_extension()    ->
- *                sail_start_saving_io_with_options() ->
- *                sail_write_next_frame()             ->
- *                sail_stop_saving()                  ->
+ * Typical usage: sail_alloc_io()                          ->
+ *                set I/O callbacks                        ->
+ *                sail_codec_info_from_extension()         ->
+ *                sail_start_saving_into_io_with_options() ->
+ *                sail_write_next_frame()                  ->
+ *                sail_stop_saving()                       ->
  *                sail_destroy_io().
  *
  * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
@@ -121,9 +121,9 @@ SAIL_EXPORT sail_status_t sail_start_saving_io(struct sail_io *io, const struct 
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_start_saving_io_with_options(struct sail_io *io,
-                                                            const struct sail_codec_info *codec_info,
-                                                            const struct sail_save_options *save_options, void **state);
+SAIL_EXPORT sail_status_t sail_start_saving_into_io_with_options(struct sail_io *io,
+                                                                 const struct sail_codec_info *codec_info,
+                                                                 const struct sail_save_options *save_options, void **state);
 
 /* extern "C" */
 #ifdef __cplusplus

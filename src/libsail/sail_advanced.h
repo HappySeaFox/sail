@@ -71,12 +71,12 @@ SAIL_EXPORT sail_status_t sail_probe_memory(const void *buffer, size_t buffer_le
  * Starts loading the specified image file. Pass codec info if you would like to start loading
  * with a specific codec. If not, just pass NULL.
  *
- * Typical usage: sail_start_loading_file() ->
- *                sail_load_next_frame()    ->
+ * Typical usage: sail_start_loading_from_file() ->
+ *                sail_load_next_frame()         ->
  *                sail_stop_loading().
  *
  * Or:            sail_codec_info_from_extension() ->
- *                sail_start_loading_file()        ->
+ *                sail_start_loading_from_file()   ->
  *                sail_load_next_frame()           ->
  *                sail_stop_loading().
  *
@@ -86,13 +86,13 @@ SAIL_EXPORT sail_status_t sail_probe_memory(const void *buffer, size_t buffer_le
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_start_loading_file(const char *path, const struct sail_codec_info *codec_info, void **state);
+SAIL_EXPORT sail_status_t sail_start_loading_from_file(const char *path, const struct sail_codec_info *codec_info, void **state);
 
 /*
  * Starts loading the specified memory buffer.
  *
  * Typical usage: sail_codec_info_from_extension() ->
- *                sail_start_loading_memory()      ->
+ *                sail_start_loading_from_memory() ->
  *                sail_load_next_frame()           ->
  *                sail_stop_loading().
  *
@@ -102,11 +102,11 @@ SAIL_EXPORT sail_status_t sail_start_loading_file(const char *path, const struct
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_start_loading_memory(const void *buffer, size_t buffer_length,
-                                                    const struct sail_codec_info *codec_info, void **state);
+SAIL_EXPORT sail_status_t sail_start_loading_from_memory(const void *buffer, size_t buffer_length,
+                                                         const struct sail_codec_info *codec_info, void **state);
 
 /*
- * Continues loading the file started by sail_start_loading_file() and brothers.
+ * Continues loading the file started by sail_start_loading_from_file() and brothers.
  *
  * Returns SAIL_OK on success.
  * Returns SAIL_ERROR_NO_MORE_FRAMES when no more frames are available.
@@ -114,7 +114,7 @@ SAIL_EXPORT sail_status_t sail_start_loading_memory(const void *buffer, size_t b
 SAIL_EXPORT sail_status_t sail_load_next_frame(void *state, struct sail_image **image);
 
 /*
- * Stops loading the file started by sail_start_loading_file() and brothers.
+ * Stops loading the file started by sail_start_loading_from_file() and brothers.
  * Does nothing if the state is NULL.
  *
  * It is essential to always stop saving to free memory and I/O resources. Failure to do so
@@ -128,12 +128,12 @@ SAIL_EXPORT sail_status_t sail_stop_loading(void *state);
  * Starts saving into the specified image file. Pass codec info if you'd like to start saving
  * with a specific codec. If not, just pass NULL.
  *
- * Typical usage: sail_start_saving_file() ->
- *                sail_write_next_frame()  ->
+ * Typical usage: sail_start_saving_into_file() ->
+ *                sail_write_next_frame()       ->
  *                sail_stop_saving().
  *
  * Or:            sail_codec_info_from_extension() ->
- *                sail_start_saving_file()         ->
+ *                sail_start_saving_into_file()    ->
  *                sail_write_next_frame()          ->
  *                sail_stop_saving().
  *
@@ -143,13 +143,13 @@ SAIL_EXPORT sail_status_t sail_stop_loading(void *state);
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_start_saving_file(const char *path, const struct sail_codec_info *codec_info, void **state);
+SAIL_EXPORT sail_status_t sail_start_saving_into_file(const char *path, const struct sail_codec_info *codec_info, void **state);
 
 /*
  * Starts saving the specified memory buffer.
  *
  * Typical usage: sail_codec_info_from_extension() ->
- *                sail_start_saving_memory()       ->
+ *                sail_start_saving_into_memory()  ->
  *                sail_write_next_frame()          ->
  *                sail_stop_saving().
  *
@@ -159,11 +159,11 @@ SAIL_EXPORT sail_status_t sail_start_saving_file(const char *path, const struct 
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_start_saving_memory(void *buffer, size_t buffer_length,
-                                                   const struct sail_codec_info *codec_info, void **state);
+SAIL_EXPORT sail_status_t sail_start_saving_into_memory(void *buffer, size_t buffer_length,
+                                                        const struct sail_codec_info *codec_info, void **state);
 
 /*
- * Continues saving started by sail_start_saving_file() and brothers. Writes the specified
+ * Continues saving started by sail_start_saving_into_file() and brothers. Writes the specified
  * image into the underlying I/O target.
  *
  * If the selected image format doesn't support the image pixel format, an error is returned.
@@ -175,7 +175,7 @@ SAIL_EXPORT sail_status_t sail_start_saving_memory(void *buffer, size_t buffer_l
 SAIL_EXPORT sail_status_t sail_write_next_frame(void *state, const struct sail_image *image);
 
 /*
- * Stops saving started by sail_start_saving_file() and brothers. Closes the underlying I/O target.
+ * Stops saving started by sail_start_saving_into_file() and brothers. Closes the underlying I/O target.
  * Does nothing if the state is NULL.
  *
  * It is essential to always stop saving to free memory and I/O resources. Failure to do so

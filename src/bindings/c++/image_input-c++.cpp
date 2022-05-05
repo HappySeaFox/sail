@@ -67,7 +67,7 @@ sail_status_t image_input::start(const std::string &path)
 {
     SAIL_TRY(d->ensure_not_started());
 
-    SAIL_TRY(sail_start_loading_file(path.c_str(), nullptr, &d->state));
+    SAIL_TRY(sail_start_loading_from_file(path.c_str(), nullptr, &d->state));
 
     return SAIL_OK;
 }
@@ -76,7 +76,7 @@ sail_status_t image_input::start(const std::string &path, const sail::codec_info
 {
     SAIL_TRY(d->ensure_not_started());
 
-    SAIL_TRY(sail_start_loading_file(path.c_str(), codec_info.sail_codec_info_c(), &d->state));
+    SAIL_TRY(sail_start_loading_from_file(path.c_str(), codec_info.sail_codec_info_c(), &d->state));
 
     return SAIL_OK;
 }
@@ -88,7 +88,7 @@ sail_status_t image_input::start(const std::string &path, const sail::codec_info
     sail_load_options *sail_load_options;
     SAIL_TRY(load_options.to_sail_load_options(&sail_load_options));
 
-    SAIL_TRY_OR_CLEANUP(sail_start_loading_file_with_options(path.c_str(), codec_info.sail_codec_info_c(), sail_load_options, &d->state),
+    SAIL_TRY_OR_CLEANUP(sail_start_loading_from_file_with_options(path.c_str(), codec_info.sail_codec_info_c(), sail_load_options, &d->state),
                         /* cleanup */ sail_destroy_load_options(sail_load_options));
 
     sail_destroy_load_options(sail_load_options);
@@ -100,7 +100,7 @@ sail_status_t image_input::start(const void *buffer, std::size_t buffer_length)
 {
     SAIL_TRY(d->ensure_not_started());
 
-    SAIL_TRY(sail_start_loading_memory(buffer, buffer_length, nullptr, &d->state));
+    SAIL_TRY(sail_start_loading_from_memory(buffer, buffer_length, nullptr, &d->state));
 
     return SAIL_OK;
 }
@@ -109,7 +109,7 @@ sail_status_t image_input::start(const void *buffer, std::size_t buffer_length, 
 {
     SAIL_TRY(d->ensure_not_started());
 
-    SAIL_TRY(sail_start_loading_memory(buffer, buffer_length, codec_info.sail_codec_info_c(), &d->state));
+    SAIL_TRY(sail_start_loading_from_memory(buffer, buffer_length, codec_info.sail_codec_info_c(), &d->state));
 
     return SAIL_OK;
 }
@@ -121,7 +121,7 @@ sail_status_t image_input::start(const void *buffer, std::size_t buffer_length, 
     sail_load_options *sail_load_options;
     SAIL_TRY(load_options.to_sail_load_options(&sail_load_options));
 
-    SAIL_TRY_OR_CLEANUP(sail_start_loading_memory_with_options(buffer, buffer_length, nullptr, sail_load_options, &d->state),
+    SAIL_TRY_OR_CLEANUP(sail_start_loading_from_memory_with_options(buffer, buffer_length, nullptr, sail_load_options, &d->state),
                         /* cleanup */ sail_destroy_load_options(sail_load_options));
 
     sail_destroy_load_options(sail_load_options);
@@ -136,7 +136,7 @@ sail_status_t image_input::start(const void *buffer, std::size_t buffer_length, 
     sail_load_options *sail_load_options;
     SAIL_TRY(load_options.to_sail_load_options(&sail_load_options));
 
-    SAIL_TRY_OR_CLEANUP(sail_start_loading_memory_with_options(buffer, buffer_length, codec_info.sail_codec_info_c(), sail_load_options, &d->state),
+    SAIL_TRY_OR_CLEANUP(sail_start_loading_from_memory_with_options(buffer, buffer_length, codec_info.sail_codec_info_c(), sail_load_options, &d->state),
                         /* cleanup */ sail_destroy_load_options(sail_load_options));
 
     sail_destroy_load_options(sail_load_options);
@@ -184,7 +184,7 @@ sail_status_t image_input::start(sail::abstract_io &abstract_io)
         SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_NOT_FOUND);
     }
 
-    SAIL_TRY(sail_start_loading_io(&d->abstract_io_adapter->sail_io_c(), codec_info.sail_codec_info_c(), &d->state));
+    SAIL_TRY(sail_start_loading_from_io(&d->abstract_io_adapter->sail_io_c(), codec_info.sail_codec_info_c(), &d->state));
 
     return SAIL_OK;
 }
@@ -195,7 +195,7 @@ sail_status_t image_input::start(sail::abstract_io &abstract_io, const sail::cod
 
     d->abstract_io_adapter.reset(new sail::abstract_io_adapter(abstract_io));
 
-    SAIL_TRY(sail_start_loading_io(&d->abstract_io_adapter->sail_io_c(), codec_info.sail_codec_info_c(), &d->state));
+    SAIL_TRY(sail_start_loading_from_io(&d->abstract_io_adapter->sail_io_c(), codec_info.sail_codec_info_c(), &d->state));
 
     return SAIL_OK;
 }
@@ -215,7 +215,7 @@ sail_status_t image_input::start(sail::abstract_io &abstract_io, const sail::loa
     sail_load_options *sail_load_options;
     SAIL_TRY(load_options.to_sail_load_options(&sail_load_options));
 
-    SAIL_TRY_OR_CLEANUP(sail_start_loading_io_with_options(&d->abstract_io_adapter->sail_io_c(), codec_info.sail_codec_info_c(), sail_load_options, &d->state),
+    SAIL_TRY_OR_CLEANUP(sail_start_loading_from_io_with_options(&d->abstract_io_adapter->sail_io_c(), codec_info.sail_codec_info_c(), sail_load_options, &d->state),
                         /* cleanup */ sail_destroy_load_options(sail_load_options));
 
     sail_destroy_load_options(sail_load_options);
@@ -232,7 +232,7 @@ sail_status_t image_input::start(sail::abstract_io &abstract_io, const sail::cod
     sail_load_options *sail_load_options;
     SAIL_TRY(load_options.to_sail_load_options(&sail_load_options));
 
-    SAIL_TRY_OR_CLEANUP(sail_start_loading_io_with_options(&d->abstract_io_adapter->sail_io_c(), codec_info.sail_codec_info_c(), sail_load_options, &d->state),
+    SAIL_TRY_OR_CLEANUP(sail_start_loading_from_io_with_options(&d->abstract_io_adapter->sail_io_c(), codec_info.sail_codec_info_c(), sail_load_options, &d->state),
                         /* cleanup */ sail_destroy_load_options(sail_load_options));
 
     sail_destroy_load_options(sail_load_options);

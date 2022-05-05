@@ -103,7 +103,7 @@ sail_status_t sail_load_from_file(const char *path, struct sail_image **image) {
 
     void *state = NULL;
 
-    SAIL_TRY_OR_CLEANUP(sail_start_loading_file(path, NULL /* codec info */, &state),
+    SAIL_TRY_OR_CLEANUP(sail_start_loading_from_file(path, NULL /* codec info */, &state),
                         /* cleanup */ sail_stop_loading(state));
 
     struct sail_image *image_local;
@@ -126,7 +126,7 @@ sail_status_t sail_load_from_memory(const void *buffer, size_t buffer_length, st
 
     void *state = NULL;
 
-    SAIL_TRY_OR_CLEANUP(sail_start_loading_memory(buffer, buffer_length, NULL /* codec info */, &state),
+    SAIL_TRY_OR_CLEANUP(sail_start_loading_from_memory(buffer, buffer_length, NULL /* codec info */, &state),
                         /* cleanup */ sail_stop_loading(state));
 
     SAIL_TRY_OR_CLEANUP(sail_load_next_frame(state, image),
@@ -145,7 +145,7 @@ sail_status_t sail_save_into_file(const char *path, const struct sail_image *ima
 
     void *state = NULL;
 
-    SAIL_TRY_OR_CLEANUP(sail_start_saving_file(path, NULL /* codec info */, &state),
+    SAIL_TRY_OR_CLEANUP(sail_start_saving_into_file(path, NULL /* codec info */, &state),
                         sail_stop_saving(state));
 
     SAIL_TRY_OR_CLEANUP(sail_write_next_frame(state, image),
@@ -163,7 +163,7 @@ sail_status_t sail_save_into_memory(void *buffer, size_t buffer_length, const st
 
     void *state = NULL;
 
-    SAIL_TRY_OR_CLEANUP(sail_start_saving_memory(buffer, buffer_length, NULL /* codec info */, &state),
+    SAIL_TRY_OR_CLEANUP(sail_start_saving_into_memory(buffer, buffer_length, NULL /* codec info */, &state),
                         sail_stop_saving(state));
 
     SAIL_TRY_OR_CLEANUP(sail_write_next_frame(state, image),

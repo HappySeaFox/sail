@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
     }
 
     void *state = NULL;
-    SAIL_TRY_OR_EXECUTE(sail_start_loading_file(argv[1], NULL, &state),
+    SAIL_TRY_OR_EXECUTE(sail_start_loading_from_file(argv[1], NULL, &state),
                         /* on error */ return 2);
 
     sail_status_t res;

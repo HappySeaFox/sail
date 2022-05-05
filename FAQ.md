@@ -124,7 +124,7 @@ If no more frames are available, the loading functions return `SAIL_ERROR_NO_MOR
 Yes. SAIL supports loading/saving from/to files and memory. For technical divers,
 it's also possible to use custom I/O sources.
 
-See `sail_start_loading_file()`, `sail_start_loading_mem()`, and `sail_start_loading_io()`.
+See `sail_start_loading_from_file()`, `sail_start_loading_mem()`, and `sail_start_loading_from_io()`.
 
 ## How does SAIL support image formats?
 
@@ -228,7 +228,7 @@ Or:
 void *state = NULL;
 struct sail_image *image = NULL;
 
-SAIL_TRY(sail_start_loading_file(..., &state));
+SAIL_TRY(sail_start_loading_from_file(..., &state));
 
 /*
  * If sail_load_next_frame() fails, the image pointer stays untouched (NULL).
@@ -247,7 +247,7 @@ loading or saving. For example:
 ```C
 void *state = NULL;
 
-SAIL_TRY(sail_start_loading_file(..., &state));
+SAIL_TRY(sail_start_loading_from_file(..., &state));
 
 SAIL_TRY_OR_CLEANUP(sail_load_next_frame(state, ...),
                     /* cleanup */ sail_stop_loading(state));
