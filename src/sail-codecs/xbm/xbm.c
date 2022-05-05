@@ -151,7 +151,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v7_xbm(void *state, st
         SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
     }
     
-    if(strstr(buf, "short") != NULL) {
+    if (strstr(buf, "short") != NULL) {
         xbm_state->version = SAIL_XBM_VERSION_10;
         SAIL_LOG_TRACE("XBM: Version 10");
     } else if (strstr(buf, "char") != NULL) {
@@ -213,6 +213,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v7_xbm(void *state, struct sail_
         literals_to_read = (((image->width + 7) / 8 + 1) / 2) * image->height;
     }
 
+    SAIL_LOG_TRACE("XBM: Literals to read(%u)", literals_to_read);
+
     char buf[512 + 1];
     unsigned char *pixels = image->pixels;
 
@@ -229,7 +231,14 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v7_xbm(void *state, struct sail_
     #else
         while (sscanf(buf + buf_offset, "%x %c %n", &holder, &comma, &bytes_consumed) == 2) {
     #endif
-            *pixels++ = xbm_private_reverse_byte((unsigned char)holder);
+
+            if (SAIL_LIKELY(xbm_state->version == SAIL_XBM_VERSION_11)) {
+                *pixels++ = xbm_private_reverse_byte((unsigned char)holder);
+            } else {
+                *pixels++ = xbm_private_reverse_byte((unsigned char)(holder & 0xff));
+                *pixels++ = xbm_private_reverse_byte((unsigned char)(holder >> 8));
+            }
+
             literals_read++;
             buf_offset += bytes_consumed;
         }
