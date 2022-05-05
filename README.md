@@ -112,7 +112,7 @@ SAIL provides four levels of APIs, depending on your needs. Let's have a quick l
 ```C
 struct sail_image *image;
 
-SAIL_TRY(sail_load_image_from_file(path, &image));
+SAIL_TRY(sail_load_from_file(path, &image));
 
 /*
  * Handle the image pixels here.

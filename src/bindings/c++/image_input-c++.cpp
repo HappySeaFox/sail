@@ -340,7 +340,7 @@ image image_input::load(const std::string &path)
         sail_destroy_image(sail_image);
     );
 
-    SAIL_TRY_OR_EXECUTE(sail_load_image_from_file(path.c_str(), &sail_image),
+    SAIL_TRY_OR_EXECUTE(sail_load_from_file(path.c_str(), &sail_image),
                         /* on error */ return {});
 
     const sail::image image(sail_image);
@@ -357,7 +357,7 @@ image image_input::load(const void *buffer, std::size_t buffer_length)
         sail_destroy_image(sail_image);
     );
 
-    SAIL_TRY_OR_EXECUTE(sail_load_image_from_memory(buffer, buffer_length, &sail_image),
+    SAIL_TRY_OR_EXECUTE(sail_load_from_memory(buffer, buffer_length, &sail_image),
                         /* on error */ return {});
 
     const sail::image image(sail_image);

@@ -96,7 +96,7 @@ sail_status_t sail_probe_file(const char *path, struct sail_image **image, const
     return SAIL_OK;
 }
 
-sail_status_t sail_load_image_from_file(const char *path, struct sail_image **image) {
+sail_status_t sail_load_from_file(const char *path, struct sail_image **image) {
 
     SAIL_CHECK_PTR(path);
     SAIL_CHECK_PTR(image);
@@ -119,7 +119,7 @@ sail_status_t sail_load_image_from_file(const char *path, struct sail_image **im
     return SAIL_OK;
 }
 
-sail_status_t sail_load_image_from_memory(const void *buffer, size_t buffer_length, struct sail_image **image) {
+sail_status_t sail_load_from_memory(const void *buffer, size_t buffer_length, struct sail_image **image) {
 
     SAIL_CHECK_PTR(buffer);
     SAIL_CHECK_PTR(image);
@@ -138,7 +138,7 @@ sail_status_t sail_load_image_from_memory(const void *buffer, size_t buffer_leng
     return SAIL_OK;
 }
 
-sail_status_t sail_save_image_into_file(const char *path, const struct sail_image *image) {
+sail_status_t sail_save_into_file(const char *path, const struct sail_image *image) {
 
     SAIL_CHECK_PTR(path);
     SAIL_TRY(sail_check_image_valid(image));
@@ -156,7 +156,7 @@ sail_status_t sail_save_image_into_file(const char *path, const struct sail_imag
     return SAIL_OK;
 }
 
-sail_status_t sail_save_image_into_memory(void *buffer, size_t buffer_length, const struct sail_image *image, size_t *written) {
+sail_status_t sail_save_into_memory(void *buffer, size_t buffer_length, const struct sail_image *image, size_t *written) {
 
     SAIL_CHECK_PTR(buffer);
     SAIL_TRY(sail_check_image_valid(image));
