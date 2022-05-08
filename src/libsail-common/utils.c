@@ -221,25 +221,22 @@ sail_status_t sail_to_wchar(const char *input, wchar_t **output) {
     return SAIL_OK;
 }
 
-sail_status_t sail_string_hash(const char *str, uint64_t *hash) {
+uint64_t sail_string_hash(const char *str) {
 
-    SAIL_CHECK_PTR(str);
-    SAIL_CHECK_PTR(hash);
+    if (str == NULL || *str == '\0') {
+        return 0;
+    }
 
     const unsigned char *ustr = (const unsigned char *)str;
 
-    if (*ustr == '\0') {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_EMPTY_STRING);
-    }
-
-    *hash = 5381; /* Magic number, never explained. */
+    uint64_t hash = 5381; /* Magic number, never explained. */
     unsigned c;
 
     while ((c = *ustr++) != 0) {
-        *hash = ((*hash << 5) + *hash) + c; /* hash * 33 + c */
+        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
     }
 
-    return SAIL_OK;
+    return hash;
 }
 
 sail_status_t sail_bits_per_pixel(enum SailPixelFormat pixel_format, unsigned *result) {

@@ -127,10 +127,6 @@ const char* sail_pixel_format_to_string(enum SailPixelFormat pixel_format) {
 
 enum SailPixelFormat sail_pixel_format_from_string(const char *str) {
 
-    uint64_t hash;
-    SAIL_TRY_OR_EXECUTE(sail_string_hash(str, &hash),
-                        /* cleanup */ return SAIL_PIXEL_FORMAT_UNKNOWN);
-
     /*
      * The switch doesn't look very nice, I know :) However, it's fast and doesn't require
      * extra data structures and initializations. It's not C++11, so we choose between two evils:
@@ -138,7 +134,7 @@ enum SailPixelFormat sail_pixel_format_from_string(const char *str) {
      *     1. Introduce extra data structures and their initializations to work with hashes.
      *     2. Use a single ugly looking switch/case.
      */
-    switch (hash) {
+    switch (sail_string_hash(str)) {
         case UINT64_C(229442760833397):      return SAIL_PIXEL_FORMAT_UNKNOWN;
 
         case UINT64_C(6383902552):           return SAIL_PIXEL_FORMAT_BPP1;
@@ -255,11 +251,7 @@ const char* sail_chroma_subsampling_to_string(enum SailChromaSubsampling chroma_
 
 enum SailChromaSubsampling sail_chroma_subsampling_from_string(const char *str) {
 
-    uint64_t hash;
-    SAIL_TRY_OR_EXECUTE(sail_string_hash(str, &hash),
-                        /* cleanup */ return SAIL_CHROMA_SUBSAMPLING_UNKNOWN);
-
-    switch (hash) {
+    switch (sail_string_hash(str)) {
         case UINT64_C(229442760833397): return SAIL_CHROMA_SUBSAMPLING_UNKNOWN;
         case UINT64_C(193434202):       return SAIL_CHROMA_SUBSAMPLING_311;
         case UINT64_C(193435257):       return SAIL_CHROMA_SUBSAMPLING_400;
@@ -292,11 +284,7 @@ const char* sail_orientation_to_string(enum SailOrientation orientation) {
 
 enum SailOrientation sail_orientation_from_string(const char *str) {
 
-    uint64_t hash;
-    SAIL_TRY_OR_EXECUTE(sail_string_hash(str, &hash),
-                        /* cleanup */ return SAIL_ORIENTATION_NORMAL);
-
-    switch (hash) {
+    switch (sail_string_hash(str)) {
         case UINT64_C(6952538422510):        return SAIL_ORIENTATION_NORMAL;
         case UINT64_C(8245347034976125518):  return SAIL_ORIENTATION_ROTATED_90;
         case UINT64_C(13842035122278411070): return SAIL_ORIENTATION_ROTATED_180;
@@ -358,11 +346,7 @@ const char* sail_compression_to_string(enum SailCompression compression) {
 
 enum SailCompression sail_compression_from_string(const char *str) {
 
-    uint64_t hash;
-    SAIL_TRY_OR_EXECUTE(sail_string_hash(str, &hash),
-                        /* cleanup */ return SAIL_COMPRESSION_UNKNOWN);
-
-    switch (hash) {
+    switch (sail_string_hash(str)) {
         case UINT64_C(229442760833397):      return SAIL_COMPRESSION_UNKNOWN;
         case UINT64_C(6384332661):           return SAIL_COMPRESSION_NONE;
         case UINT64_C(10962109560604417378): return SAIL_COMPRESSION_ADOBE_DEFLATE;
@@ -444,11 +428,7 @@ const char* sail_meta_data_to_string(enum SailMetaData meta_data) {
 
 enum SailMetaData sail_meta_data_from_string(const char *str) {
 
-    uint64_t hash;
-    SAIL_TRY_OR_EXECUTE(sail_string_hash(str, &hash),
-                        /* cleanup */ return SAIL_META_DATA_UNKNOWN);
-
-    switch (hash) {
+    switch (sail_string_hash(str)) {
         case UINT64_C(229444052301365):      return SAIL_META_DATA_UNKNOWN;
 
         case UINT64_C(6952072423676):        return SAIL_META_DATA_ARTIST;
@@ -497,11 +477,7 @@ const char* sail_resolution_unit_to_string(enum SailResolutionUnit resolution_un
 
 enum SailResolutionUnit sail_resolution_unit_from_string(const char *str) {
 
-    uint64_t hash;
-    SAIL_TRY_OR_EXECUTE(sail_string_hash(str, &hash),
-                        /* cleanup */ return SAIL_RESOLUTION_UNIT_UNKNOWN);
-
-    switch (hash) {
+    switch (sail_string_hash(str)) {
         case UINT64_C(229444052301365):     return SAIL_RESOLUTION_UNIT_UNKNOWN;
         case UINT64_C(8245152247842122364): return SAIL_RESOLUTION_UNIT_MICROMETER;
         case UINT64_C(8244682978514626197): return SAIL_RESOLUTION_UNIT_CENTIMETER;
@@ -529,11 +505,7 @@ const char* sail_codec_feature_to_string(enum SailCodecFeature codec_feature) {
 
 enum SailCodecFeature sail_codec_feature_from_string(const char *str) {
 
-    uint64_t hash;
-    SAIL_TRY_OR_EXECUTE(sail_string_hash(str, &hash),
-                        /* cleanup */ return SAIL_CODEC_FEATURE_UNKNOWN);
-
-    switch (hash) {
+    switch (sail_string_hash(str)) {
         case UINT64_C(229442760833397):      return SAIL_CODEC_FEATURE_UNKNOWN;
         case UINT64_C(6952739426029):        return SAIL_CODEC_FEATURE_STATIC;
         case UINT64_C(7570758658679240):     return SAIL_CODEC_FEATURE_ANIMATED;

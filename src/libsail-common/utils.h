@@ -95,9 +95,9 @@ SAIL_EXPORT sail_status_t sail_to_wchar(const char *input, wchar_t **output);
 /*
  * Computes a unique hash of the specified string. It utilizes the djb2 algorithm proposed by Dan Bernstein.
  *
- * Returns SAIL_OK on success.
+ * Returns 0 if the string is NULL or empty.
  */
-SAIL_EXPORT sail_status_t sail_string_hash(const char *str, uint64_t *hash);
+SAIL_EXPORT uint64_t sail_string_hash(const char *str);
 
 /*
  * Calculates the number of bits per pixel in the specified pixel format.

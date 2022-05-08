@@ -107,11 +107,7 @@ struct init_data {
 
 static sail_status_t codec_priority_from_string(const char *str, enum SailCodecPriority *result) {
 
-    uint64_t hash;
-    SAIL_TRY_OR_EXECUTE(sail_string_hash(str, &hash),
-                        /* cleanup */ return SAIL_ERROR_UNSUPPORTED_CODEC_PRIORITY);
-
-    switch (hash) {
+    switch (sail_string_hash(str)) {
         case UINT64_C(229425771102513): *result = SAIL_CODEC_PRIORITY_HIGHEST; return SAIL_OK;
         case UINT64_C(6384110277):      *result = SAIL_CODEC_PRIORITY_HIGH;    return SAIL_OK;
         case UINT64_C(6952486921094):   *result = SAIL_CODEC_PRIORITY_MEDIUM;  return SAIL_OK;
