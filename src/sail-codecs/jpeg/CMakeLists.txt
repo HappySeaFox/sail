@@ -1,4 +1,4 @@
-find_package(JPEG)
+find_package(JPEG ${SAIL_CODEC_JPEG_REQUIRED_OPTION})
 
 if (NOT JPEG_FOUND)
     return()

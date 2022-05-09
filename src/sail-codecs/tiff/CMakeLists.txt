@@ -1,4 +1,4 @@
-find_package(TIFF)
+find_package(TIFF ${SAIL_CODEC_TIFF_REQUIRED_OPTION})
 
 if (NOT TIFF_FOUND)
     return()

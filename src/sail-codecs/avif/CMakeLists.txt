@@ -1,5 +1,5 @@
-find_library(AVIF_LIBRARY avif)
-find_path(AVIF_INCLUDE_DIRS avif/avif.h)
+find_library(AVIF_LIBRARY avif          ${SAIL_CODEC_AVIF_REQUIRED_OPTION})
+find_path(AVIF_INCLUDE_DIRS avif/avif.h ${SAIL_CODEC_AVIF_REQUIRED_OPTION})
 
 if (NOT AVIF_LIBRARY OR NOT AVIF_INCLUDE_DIRS)
     return()

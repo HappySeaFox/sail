@@ -10,28 +10,43 @@ list(SORT CODECS)
 
 # Filter out codecs
 #
+set(FORCED_CODECS "")
+
 if (SAIL_ONLY_CODECS)
     set(ENABLED_CODECS "")
 
     foreach (codec IN LISTS CODECS)
         if (${codec} IN_LIST SAIL_ONLY_CODECS)
             list(APPEND ENABLED_CODECS ${codec})
+            list(APPEND FORCED_CODECS ${codec})
         else()
             list(APPEND DISABLED_CODECS ${codec})
         endif()
     endforeach()
 else()
     set(ENABLED_CODECS ${CODECS})
+
+    if (SAIL_ENABLE_CODECS)
+        foreach (codec IN LISTS SAIL_ENABLE_CODECS)
+            list(APPEND FORCED_CODECS ${codec})
+        endforeach()
+    endif()
+
+    if (SAIL_DISABLE_CODECS)
+        foreach (codec IN LISTS ENABLED_CODECS)
+            if (${codec} IN_LIST SAIL_DISABLE_CODECS)
+                list(REMOVE_ITEM ENABLED_CODECS ${codec})
+                list(REMOVE_ITEM FORCED_CODECS ${codec})
+                list(APPEND DISABLED_CODECS ${codec})
+            endif()
+        endforeach()
+    endif()
 endif()
 
-if (SAIL_DISABLE_CODECS)
-    foreach (codec IN LISTS ENABLED_CODECS)
-        if (${codec} IN_LIST SAIL_DISABLE_CODECS)
-            list(REMOVE_ITEM ENABLED_CODECS ${codec})
-            list(APPEND DISABLED_CODECS ${codec})
-        endif()
-    endforeach()
-endif()
+foreach (codec IN LISTS FORCED_CODECS)
+    string(TOUPPER ${codec} codec_upper)
+    set(SAIL_CODEC_${codec_upper}_REQUIRED_OPTION "REQUIRED")
+endforeach()
 
 # Add enabled codecs.
 #

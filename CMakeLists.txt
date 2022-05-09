@@ -67,12 +67,13 @@ option(SAIL_BUILD_APPS "Build applications." ON)
 option(SAIL_BUILD_EXAMPLES "Build examples." ON)
 option(SAIL_BUILD_TESTS "Build tests." ON)
 option(SAIL_DEV "Enable developer mode. Be more strict when compiling source code, for example." OFF)
-set(SAIL_DISABLE_CODECS "" CACHE STRING "Disable the codecs specified in this ';'-separated list. \
-A codec specified in this setting remains disabled even if it's also specified in SAIL_ONLY_CODECS.")
+set(SAIL_ENABLE_CODECS "" CACHE STRING "Forcefully enable the codecs specified in this ';'-separated list. \
+If an enabled codec fails to find its dependencies, the configuration process fails.")
+set(SAIL_DISABLE_CODECS "" CACHE STRING "Disable the codecs specified in this ';'-separated list.")
 option(SAIL_INSTALL_PDB "Install PDB files along with libraries." ON)
-set(SAIL_ONLY_CODECS "" CACHE STRING "Enable only the codecs specified in this ';'-separated list. \
-Codecs with missing dependencies will be disabled regardless this setting.")
-option(BUILD_SHARED_LIBS "Build shared libs. When disabled, sets SAIL_COMBINE_CODECS to ON." ON)
+set(SAIL_ONLY_CODECS "" CACHE STRING "Forcefully enable only the codecs specified in this ';'-separated list and disable the rest. \
+If an enabled codec fails to find its dependencies, the configuration process fails.")
+option(BUILD_SHARED_LIBS "Build shared libs. When disabled, sets SAIL_COMBINE_CODECS to ON automatically." ON)
 cmake_dependent_option(SAIL_COMBINE_CODECS "Combine all codecs into a single library." OFF "BUILD_SHARED_LIBS" ON)
 option(SAIL_THIRD_PARTY_CODECS_PATH "Enable loading third-party codecs from the ';'-separated paths specified in \
 the SAIL_THIRD_PARTY_CODECS_PATH environment variable." ON)

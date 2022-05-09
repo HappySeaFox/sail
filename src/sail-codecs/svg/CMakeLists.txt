@@ -1,5 +1,5 @@
-find_library(SVG_LIBRARY resvg)
-find_path(SVG_INCLUDE_DIRS resvg.h)
+find_library(SVG_LIBRARY resvg     ${SAIL_CODEC_SVG_REQUIRED_OPTION})
+find_path(SVG_INCLUDE_DIRS resvg.h ${SAIL_CODEC_SVG_REQUIRED_OPTION})
 
 if (NOT SVG_LIBRARY OR NOT SVG_INCLUDE_DIRS)
     return()

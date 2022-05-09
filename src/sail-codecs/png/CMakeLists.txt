@@ -1,4 +1,4 @@
-find_package(PNG)
+find_package(PNG ${SAIL_CODEC_PNG_REQUIRED_OPTION})
 
 if (NOT PNG_FOUND)
     return()

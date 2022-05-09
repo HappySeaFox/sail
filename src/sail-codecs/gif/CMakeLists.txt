@@ -1,4 +1,4 @@
-find_package(GIF)
+find_package(GIF ${SAIL_CODEC_GIF_REQUIRED_OPTION})
 
 if (NOT GIF_FOUND)
     return()
