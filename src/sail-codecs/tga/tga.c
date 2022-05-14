@@ -253,6 +253,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v7_tga(void *state, struct sail_
         }
     }
 
+    /* TODO: We can avoid this by putting pixels in reverse order like in the BMP codec. */
     if (tga_state->flipped_v) {
         sail_mirror_vertically(image);
     }
