@@ -156,15 +156,6 @@ struct sail_image {
     struct sail_iccp *iccp;
 
     /*
-     * Image orientation.
-     *
-     * LOAD: Set by SAIL to an image orientation. The user can use this field
-     *       to manipulate the output image accordingly (e.g., rotate).
-     * SAVE: Ignored.
-     */
-    enum SailOrientation orientation;
-
-    /*
      * Source image properties which are usually lost during decoding.
      * For example, one might want to know the source image pixel format.
      *

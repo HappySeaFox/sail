@@ -143,11 +143,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v7_tga(void *state, st
     }
 
     if (tga_state->flipped_h) {
-        image_local->orientation               = SAIL_ORIENTATION_MIRRORED_HORIZONTALLY;
         image_local->source_image->orientation = SAIL_ORIENTATION_MIRRORED_HORIZONTALLY;
-    }
-    if (tga_state->flipped_v) {
-        image_local->orientation               = SAIL_ORIENTATION_MIRRORED_VERTICALLY;
+    } else if (tga_state->flipped_v) {
         image_local->source_image->orientation = SAIL_ORIENTATION_MIRRORED_VERTICALLY;
     }
 

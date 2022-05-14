@@ -152,7 +152,6 @@ static sail_status_t probe_impl(const char *path) {
     printf("Color         : %s\n", sail_pixel_format_to_string(image->source_image->pixel_format));
     printf("ICC profile   : %s\n", image->iccp == NULL ? "no" : "yes");
     printf("Interlaced    : %s\n", image->source_image->interlaced ? "yes" : "no");
-    printf("Orientation   : %s\n", sail_orientation_to_string(image->orientation));
 
     for (const struct sail_meta_data_node *meta_data_node = image->meta_data_node; meta_data_node != NULL; meta_data_node = meta_data_node->next) {
         const struct sail_meta_data *meta_data = meta_data_node->meta_data;

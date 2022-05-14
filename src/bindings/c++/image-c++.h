@@ -238,15 +238,6 @@ public:
     const sail::iccp& iccp() const;
 
     /*
-     * Returns the image orientation.
-     *
-     * LOAD: Set by SAIL to an image orientation. The user can use this field
-     *       to manipulate the output image accordingly (e.g., rotate).
-     * SAVE: Ignored.
-     */
-    SailOrientation orientation() const;
-
-    /*
      * Returns the source image properties.
      *
      * LOAD: Set by SAIL to valid source image properties of the original image.
@@ -728,7 +719,6 @@ private:
     void set_pixels(const void *pixels, unsigned pixels_size);
     void set_shallow_pixels(void *pixels);
     void set_shallow_pixels(void *pixels, unsigned pixels_size);
-    void set_orientation(SailOrientation orientation);
     void set_source_image(const sail::source_image &source_image);
 
 private:

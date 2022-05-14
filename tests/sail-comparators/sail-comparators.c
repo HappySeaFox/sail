@@ -237,8 +237,6 @@ sail_status_t sail_test_compare_images(const struct sail_image *image1, const st
         munit_assert(sail_test_compare_iccps(image1->iccp, image2->iccp) == SAIL_OK);
     }
 
-    munit_assert(image1->orientation == image2->orientation);
-
     if (image1->source_image == NULL) {
         munit_assert_null(image2->source_image);
     } else {

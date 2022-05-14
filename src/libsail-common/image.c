@@ -37,19 +37,18 @@ sail_status_t sail_alloc_image(struct sail_image **image) {
     SAIL_TRY(sail_malloc(sizeof(struct sail_image), &ptr));
     *image = ptr;
 
-    (*image)->pixels                  = NULL;
-    (*image)->width                   = 0;
-    (*image)->height                  = 0;
-    (*image)->bytes_per_line          = 0;
-    (*image)->resolution              = NULL;
-    (*image)->pixel_format            = SAIL_PIXEL_FORMAT_UNKNOWN;
-    (*image)->gamma                   = 1;
-    (*image)->delay                   = -1;
-    (*image)->palette                 = NULL;
-    (*image)->meta_data_node          = NULL;
-    (*image)->iccp                    = NULL;
-    (*image)->orientation             = SAIL_ORIENTATION_NORMAL;
-    (*image)->source_image            = NULL;
+    (*image)->pixels         = NULL;
+    (*image)->width          = 0;
+    (*image)->height         = 0;
+    (*image)->bytes_per_line = 0;
+    (*image)->resolution     = NULL;
+    (*image)->pixel_format   = SAIL_PIXEL_FORMAT_UNKNOWN;
+    (*image)->gamma          = 1;
+    (*image)->delay          = -1;
+    (*image)->palette        = NULL;
+    (*image)->meta_data_node = NULL;
+    (*image)->iccp           = NULL;
+    (*image)->source_image   = NULL;
 
     return SAIL_OK;
 }
@@ -130,8 +129,6 @@ sail_status_t sail_copy_image_skeleton(const struct sail_image *source, struct s
         SAIL_TRY_OR_CLEANUP(sail_copy_iccp(source->iccp, &image_local->iccp),
                             /* cleanup */ sail_destroy_image(image_local));
     }
-
-    image_local->orientation = source->orientation;
 
     if (source->source_image != NULL) {
         SAIL_TRY_OR_CLEANUP(sail_copy_source_image(source->source_image, &image_local->source_image),

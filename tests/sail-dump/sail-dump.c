@@ -106,27 +106,25 @@ static sail_status_t read_image(FILE *fptr, struct sail_image *image) {
      * 124 124 62(bpl) BPP4-INDEXED NORMAL(orientation)
      */
     char pixel_format[64];
-    char orientation[64];
 
 #ifdef _MSC_VER
-    if (fscanf_s(fptr, "%u %u %u %s %s", &image->width, &image->height, &image->bytes_per_line, pixel_format, (unsigned)sizeof(pixel_format), orientation, (unsigned)sizeof(orientation)) != 5) {
+    if (fscanf_s(fptr, "%u %u %u %s", &image->width, &image->height, &image->bytes_per_line, pixel_format, (unsigned)sizeof(pixel_format)) != 4) {
 #else
-    if (fscanf(fptr, "%u %u %u %s %s", &image->width, &image->height, &image->bytes_per_line, pixel_format, orientation) != 5) {
+    if (fscanf(fptr, "%u %u %u %s", &image->width, &image->height, &image->bytes_per_line, pixel_format) != 4) {
 #endif
         SAIL_LOG_ERROR("DUMP: Failed to read IMAGE properties");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_READ_FILE);
     }
 
     image->pixel_format = sail_pixel_format_from_string(pixel_format);
-    image->orientation = sail_orientation_from_string(orientation);
 
     if (image->pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN) {
         SAIL_LOG_ERROR("DUMP: Read image with unknown pixel format: '%s'", pixel_format);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
     }
 
-    SAIL_LOG_DEBUG("DUMP: Image properties: %ux%u bytes_per_line(%u), pixel_format(%s), orientation(%s)",
-                    image->width, image->height, image->bytes_per_line, sail_pixel_format_to_string(image->pixel_format), sail_orientation_to_string(image->orientation));
+    SAIL_LOG_DEBUG("DUMP: Image properties: %ux%u bytes_per_line(%u), pixel_format(%s)",
+                    image->width, image->height, image->bytes_per_line, sail_pixel_format_to_string(image->pixel_format));
 
     return SAIL_OK;
 }
@@ -499,7 +497,7 @@ sail_status_t sail_dump(const struct sail_image *image) {
     /*  To print dots in floats. */
     setlocale(LC_NUMERIC, "C");
 
-    printf("IMAGE\n%u %u %u %s %s\n\n", image->width, image->height, image->bytes_per_line, sail_pixel_format_to_string(image->pixel_format), sail_orientation_to_string(image->orientation));
+    printf("IMAGE\n%u %u %u %s\n\n", image->width, image->height, image->bytes_per_line, sail_pixel_format_to_string(image->pixel_format));
 
     if (image->source_image != NULL) {
         printf("SOURCE-IMAGE\n%s %s %s %s %d\n\n",
