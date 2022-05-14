@@ -174,3 +174,50 @@ sail_status_t sail_check_image_valid(const struct sail_image *image)
 
     return SAIL_OK;
 }
+
+sail_status_t sail_flip_vertically(struct sail_image *image) {
+
+    SAIL_TRY(sail_check_image_valid(image));
+
+    void *line;
+    SAIL_TRY(sail_malloc(image->bytes_per_line, &line));
+
+    for (unsigned row1 = 0, row2 = image->height - 1; row1 < row2; row1++, row2--) {
+        memcpy(line,                                                          (unsigned char *)image->pixels + image->bytes_per_line * row1, image->bytes_per_line);
+        memcpy((unsigned char *)image->pixels + image->bytes_per_line * row1, (unsigned char *)image->pixels + image->bytes_per_line * row2, image->bytes_per_line);
+        memcpy((unsigned char *)image->pixels + image->bytes_per_line * row2, line,                                                          image->bytes_per_line);
+    }
+
+    sail_free(line);
+
+    //image->properties ^= SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY;
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_flip_horizontally(struct sail_image *image) {
+
+    SAIL_TRY(sail_check_image_valid(image));
+
+    unsigned bytes_per_pixel;
+    SAIL_TRY(sail_bits_per_pixel(image->pixel_format, &bytes_per_pixel));
+
+    void *pixel;
+    SAIL_TRY(sail_malloc(bytes_per_pixel, &pixel));
+
+    for (unsigned row = 0; row < image->height; row++) {
+        unsigned char *scan = (unsigned char *)image->pixels + image->bytes_per_line * row;
+
+        for (unsigned col1 = 0, col2 = image->width - bytes_per_pixel; col1 < col2; col1 += bytes_per_pixel, col2 -= bytes_per_pixel) {
+            memcpy(pixel,       scan + col1, bytes_per_pixel);
+            memcpy(scan + col1, scan + col2, bytes_per_pixel);
+            memcpy(scan + col2, pixel,       bytes_per_pixel);
+        }
+    }
+
+    sail_free(pixel);
+
+    //image->properties ^= SAIL_IMAGE_PROPERTY_FLIPPED_HORIZONTALLY;
+
+    return SAIL_OK;
+}

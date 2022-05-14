@@ -220,6 +220,20 @@ SAIL_EXPORT sail_status_t sail_check_image_skeleton_valid(const struct sail_imag
  */
 SAIL_EXPORT sail_status_t sail_check_image_valid(const struct sail_image *image);
 
+/*
+ * Flips the image vertically.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_flip_vertically(struct sail_image *image);
+
+/*
+ * Flips the image horizontally.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_flip_horizontally(struct sail_image *image);
+
 /* extern "C" */
 #ifdef __cplusplus
 }
