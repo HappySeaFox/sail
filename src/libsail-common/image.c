@@ -175,7 +175,7 @@ sail_status_t sail_check_image_valid(const struct sail_image *image)
     return SAIL_OK;
 }
 
-sail_status_t sail_flip_vertically(struct sail_image *image) {
+sail_status_t sail_mirror_vertically(struct sail_image *image) {
 
     SAIL_TRY(sail_check_image_valid(image));
 
@@ -195,7 +195,7 @@ sail_status_t sail_flip_vertically(struct sail_image *image) {
     return SAIL_OK;
 }
 
-sail_status_t sail_flip_horizontally(struct sail_image *image) {
+sail_status_t sail_mirror_horizontally(struct sail_image *image) {
 
     SAIL_TRY(sail_check_image_valid(image));
 

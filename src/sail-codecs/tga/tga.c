@@ -254,10 +254,10 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v7_tga(void *state, struct sail_
     }
 
     if (tga_state->flipped_v) {
-        sail_flip_vertically(image);
+        sail_mirror_vertically(image);
     }
     if (tga_state->flipped_h) {
-        sail_flip_horizontally(image);
+        sail_mirror_horizontally(image);
     }
 
     return SAIL_OK;
