@@ -187,8 +187,6 @@ sail_status_t sail_mirror_vertically(struct sail_image *image) {
 
     sail_free(line);
 
-    //image->properties ^= SAIL_IMAGE_PROPERTY_FLIPPED_VERTICALLY;
-
     return SAIL_OK;
 }
 
@@ -213,8 +211,6 @@ sail_status_t sail_mirror_horizontally(struct sail_image *image) {
     }
 
     sail_free(pixel);
-
-    //image->properties ^= SAIL_IMAGE_PROPERTY_FLIPPED_HORIZONTALLY;
 
     return SAIL_OK;
 }
