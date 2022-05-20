@@ -18,19 +18,25 @@ else()
         target_include_directories(sail-sdl-viewer PRIVATE ${SAIL_SDL2_INCLUDE_DIR})
     endif()
 
-    # Strip whitespaces.
+    # Some SDL2 configs export SDL2::SDL2, some ${SDL2_LIBRARIES}
     #
-    # Some SDL2 versions have buggy CMake config with extra whitespaces.
-    # Configuration can fail with:
-    #
-    #   Target "sail-sdl-viewer" links to item "-L/usr/lib/x86_64-linux-gnu -lSDL2
-    #   " which has leading or trailing whitespace.  This is now an error according
-    #   to policy CMP0004.
-    #
-    string(STRIP ${SDL2_LIBRARIES} SDL2_LIBRARIES)
+    if (TARGET SDL2::SDL2)
+        target_link_libraries(sail-sdl-viewer PRIVATE SDL2::SDL2)
+    else()
+        # Strip whitespaces.
+        #
+        # Some SDL2 versions have buggy CMake config with extra whitespaces.
+        # Configuration can fail with:
+        #
+        #   Target "sail-sdl-viewer" links to item "-L/usr/lib/x86_64-linux-gnu -lSDL2
+        #   " which has leading or trailing whitespace.  This is now an error according
+        #   to policy CMP0004.
+        #
+        string(STRIP ${SDL2_LIBRARIES} SDL2_LIBRARIES)
 
-    target_include_directories(sail-sdl-viewer PRIVATE ${SDL2_INCLUDE_DIRS})
-    target_link_libraries(sail-sdl-viewer PRIVATE ${SDL2_LIBRARIES})
+        target_include_directories(sail-sdl-viewer PRIVATE ${SDL2_INCLUDE_DIRS})
+        target_link_libraries(sail-sdl-viewer PRIVATE ${SDL2_LIBRARIES})
+    endif()
 endif()
 
 # Depend on sail
