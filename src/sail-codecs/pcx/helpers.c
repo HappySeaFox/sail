@@ -88,7 +88,7 @@ sail_status_t pcx_private_sail_pixel_format(unsigned bits_per_plane, unsigned pl
     SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
 }
 
-sail_status_t pcx_private_build_palette(enum SailPixelFormat pixel_format, struct sail_io *io, uint8_t palette16[], struct sail_palette **palette) {
+sail_status_t pcx_private_build_palette(enum SailPixelFormat pixel_format, struct sail_io *io, uint8_t palette16[48], struct sail_palette **palette) {
 
     switch (pixel_format) {
         case SAIL_PIXEL_FORMAT_BPP1_INDEXED: {
