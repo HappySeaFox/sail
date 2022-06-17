@@ -62,11 +62,8 @@ sail_status_t sail_copy_palette(const struct sail_palette *source_palette, struc
     struct sail_palette *palette_local;
     SAIL_TRY(sail_alloc_palette(&palette_local));
 
-    unsigned bits_per_pixel;
-    SAIL_TRY_OR_CLEANUP(sail_bits_per_pixel(source_palette->pixel_format, &bits_per_pixel),
-                        /* cleanup */ sail_destroy_palette(palette_local));
-
-    unsigned palette_size = source_palette->color_count * bits_per_pixel / 8;
+    const unsigned bits_per_pixel = sail_bits_per_pixel(source_palette->pixel_format);
+    const unsigned palette_size = source_palette->color_count * ((bits_per_pixel + 7) / 8);
 
     SAIL_TRY_OR_CLEANUP(sail_malloc(palette_size, &palette_local->data),
                         /* cleanup */ sail_destroy_palette(palette_local));

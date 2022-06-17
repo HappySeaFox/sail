@@ -336,9 +336,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v7_jpeg(void *state, s
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
-    unsigned bits_per_pixel;
-    SAIL_TRY(sail_bits_per_pixel(image->pixel_format, &bits_per_pixel));
-
     /* Compute output pixel format. */
     const J_COLOR_SPACE color_space = jpeg_private_pixel_format_to_color_space(image->pixel_format);
 
@@ -350,7 +347,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v7_jpeg(void *state, s
     /* Initialize compression. */
     jpeg_state->compress_context->image_width      = image->width;
     jpeg_state->compress_context->image_height     = image->height;
-    jpeg_state->compress_context->input_components = bits_per_pixel / 8;
+    jpeg_state->compress_context->input_components = sail_bits_per_pixel(image->pixel_format) / 8;
     jpeg_state->compress_context->in_color_space   = color_space;
     jpeg_state->compress_context->input_gamma      = image->gamma;
 

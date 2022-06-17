@@ -194,8 +194,7 @@ sail_status_t sail_mirror_horizontally(struct sail_image *image) {
 
     SAIL_TRY(sail_check_image_valid(image));
 
-    unsigned bytes_per_pixel;
-    SAIL_TRY(sail_bits_per_pixel(image->pixel_format, &bytes_per_pixel));
+    const unsigned bytes_per_pixel = (sail_bits_per_pixel(image->pixel_format) + 7) / 8;
 
     void *pixel;
     SAIL_TRY(sail_malloc(bytes_per_pixel, &pixel));

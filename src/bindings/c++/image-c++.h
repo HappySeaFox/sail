@@ -593,12 +593,10 @@ public:
     static SailPixelFormat closest_pixel_format(SailPixelFormat input_pixel_format, const sail::save_features &save_features);
 
     /*
-     * Calculates the number of bits per pixel in the specified pixel format.
-     * For example, for SAIL_PIXEL_FORMAT_RGB 24 is assigned.
-     *
-     * Returns SAIL_OK on success.
+     * Returns the number of bits per pixel of the specified pixel format.
+     * For example, for SAIL_PIXEL_FORMAT_RGB 24 is returned. Returns 0 on unknown pixel format.
      */
-    static sail_status_t bits_per_pixel(SailPixelFormat pixel_format, unsigned *result);
+    static unsigned bits_per_pixel(SailPixelFormat pixel_format);
 
     /*
      * Calculates the number of bytes per line needed to hold a scan line without padding.

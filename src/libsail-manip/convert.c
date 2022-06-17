@@ -765,8 +765,7 @@ sail_status_t sail_update_image_with_options(struct sail_image *image,
         return SAIL_OK;
     }
 
-    bool new_image_fits_into_existing;
-    SAIL_TRY(sail_greater_equal_bits_per_pixel(image->pixel_format, output_pixel_format, &new_image_fits_into_existing));
+    const bool new_image_fits_into_existing = sail_greater_equal_bits_per_pixel(image->pixel_format, output_pixel_format);
 
     if (!new_image_fits_into_existing) {
         SAIL_LOG_ERROR("Updating from %s to %s cannot be done as the output is larger than the input",

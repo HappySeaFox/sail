@@ -239,53 +239,51 @@ uint64_t sail_string_hash(const char *str) {
     return hash;
 }
 
-sail_status_t sail_bits_per_pixel(enum SailPixelFormat pixel_format, unsigned *result) {
-
-    SAIL_CHECK_PTR(result);
+unsigned sail_bits_per_pixel(enum SailPixelFormat pixel_format) {
 
     switch (pixel_format) {
-        case SAIL_PIXEL_FORMAT_UNKNOWN: SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+        case SAIL_PIXEL_FORMAT_UNKNOWN: return 0;
 
-        case SAIL_PIXEL_FORMAT_BPP1:   *result = 1;   return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP2:   *result = 2;   return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP4:   *result = 4;   return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP8:   *result = 8;   return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP16:  *result = 16;  return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP24:  *result = 24;  return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP32:  *result = 32;  return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP48:  *result = 48;  return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP64:  *result = 64;  return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP72:  *result = 72;  return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP96:  *result = 96;  return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP128: *result = 128; return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP1:   return 1;
+        case SAIL_PIXEL_FORMAT_BPP2:   return 2;
+        case SAIL_PIXEL_FORMAT_BPP4:   return 4;
+        case SAIL_PIXEL_FORMAT_BPP8:   return 8;
+        case SAIL_PIXEL_FORMAT_BPP16:  return 16;
+        case SAIL_PIXEL_FORMAT_BPP24:  return 24;
+        case SAIL_PIXEL_FORMAT_BPP32:  return 32;
+        case SAIL_PIXEL_FORMAT_BPP48:  return 48;
+        case SAIL_PIXEL_FORMAT_BPP64:  return 64;
+        case SAIL_PIXEL_FORMAT_BPP72:  return 72;
+        case SAIL_PIXEL_FORMAT_BPP96:  return 96;
+        case SAIL_PIXEL_FORMAT_BPP128: return 128;
 
-        case SAIL_PIXEL_FORMAT_BPP1_INDEXED:  *result = 1; return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP2_INDEXED:  *result = 2; return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP4_INDEXED:  *result = 4; return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP8_INDEXED:  *result = 8; return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP16_INDEXED: *result = 16; return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP1_INDEXED:  return 1;
+        case SAIL_PIXEL_FORMAT_BPP2_INDEXED:  return 2;
+        case SAIL_PIXEL_FORMAT_BPP4_INDEXED:  return 4;
+        case SAIL_PIXEL_FORMAT_BPP8_INDEXED:  return 8;
+        case SAIL_PIXEL_FORMAT_BPP16_INDEXED: return 16;
 
-        case SAIL_PIXEL_FORMAT_BPP1_GRAYSCALE:  *result = 1; return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP2_GRAYSCALE:  *result = 2; return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE:  *result = 4; return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE:  *result = 8; return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE: *result = 16; return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP1_GRAYSCALE:  return 1;
+        case SAIL_PIXEL_FORMAT_BPP2_GRAYSCALE:  return 2;
+        case SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE:  return 4;
+        case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE:  return 8;
+        case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE: return 16;
 
-        case SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE_ALPHA:  *result = 4; return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE_ALPHA:  *result = 8; return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA: *result = 16; return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA: *result = 32; return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE_ALPHA:  return 4;
+        case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE_ALPHA:  return 8;
+        case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA: return 16;
+        case SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA: return 32;
 
         case SAIL_PIXEL_FORMAT_BPP16_RGB555:
         case SAIL_PIXEL_FORMAT_BPP16_BGR555:
         case SAIL_PIXEL_FORMAT_BPP16_RGB565:
-        case SAIL_PIXEL_FORMAT_BPP16_BGR565: *result = 16; return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP16_BGR565: return 16;
 
         case SAIL_PIXEL_FORMAT_BPP24_RGB:
-        case SAIL_PIXEL_FORMAT_BPP24_BGR: *result = 24; return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP24_BGR: return 24;
 
         case SAIL_PIXEL_FORMAT_BPP48_RGB:
-        case SAIL_PIXEL_FORMAT_BPP48_BGR: *result = 48; return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP48_BGR: return 48;
 
         case SAIL_PIXEL_FORMAT_BPP16_RGBX:
         case SAIL_PIXEL_FORMAT_BPP16_BGRX:
@@ -294,7 +292,7 @@ sail_status_t sail_bits_per_pixel(enum SailPixelFormat pixel_format, unsigned *r
         case SAIL_PIXEL_FORMAT_BPP16_RGBA:
         case SAIL_PIXEL_FORMAT_BPP16_BGRA:
         case SAIL_PIXEL_FORMAT_BPP16_ARGB:
-        case SAIL_PIXEL_FORMAT_BPP16_ABGR: *result = 16; return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP16_ABGR: return 16;
 
         case SAIL_PIXEL_FORMAT_BPP32_RGBX:
         case SAIL_PIXEL_FORMAT_BPP32_BGRX:
@@ -303,7 +301,7 @@ sail_status_t sail_bits_per_pixel(enum SailPixelFormat pixel_format, unsigned *r
         case SAIL_PIXEL_FORMAT_BPP32_RGBA:
         case SAIL_PIXEL_FORMAT_BPP32_BGRA:
         case SAIL_PIXEL_FORMAT_BPP32_ARGB:
-        case SAIL_PIXEL_FORMAT_BPP32_ABGR: *result = 32; return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP32_ABGR: return 32;
 
         case SAIL_PIXEL_FORMAT_BPP64_RGBX:
         case SAIL_PIXEL_FORMAT_BPP64_BGRX:
@@ -312,33 +310,33 @@ sail_status_t sail_bits_per_pixel(enum SailPixelFormat pixel_format, unsigned *r
         case SAIL_PIXEL_FORMAT_BPP64_RGBA:
         case SAIL_PIXEL_FORMAT_BPP64_BGRA:
         case SAIL_PIXEL_FORMAT_BPP64_ARGB:
-        case SAIL_PIXEL_FORMAT_BPP64_ABGR: *result = 64; return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP64_ABGR: return 64;
 
-        case SAIL_PIXEL_FORMAT_BPP32_CMYK: *result = 32; return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP64_CMYK: *result = 64; return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP32_CMYK: return 32;
+        case SAIL_PIXEL_FORMAT_BPP64_CMYK: return 64;
 
-        case SAIL_PIXEL_FORMAT_BPP24_YCBCR: *result = 24; return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP24_YCBCR: return 24;
 
-        case SAIL_PIXEL_FORMAT_BPP32_YCCK: *result = 32; return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP32_YCCK: return 32;
 
-        case SAIL_PIXEL_FORMAT_BPP24_CIE_LAB: *result = 24; return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP40_CIE_LAB: *result = 40; return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP24_CIE_LAB: return 24;
+        case SAIL_PIXEL_FORMAT_BPP40_CIE_LAB: return 40;
 
-        case SAIL_PIXEL_FORMAT_BPP24_CIE_LUV: *result = 24; return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP40_CIE_LUV: *result = 40; return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP24_CIE_LUV: return 24;
+        case SAIL_PIXEL_FORMAT_BPP40_CIE_LUV: return 40;
 
-        case SAIL_PIXEL_FORMAT_BPP24_YUV: *result = 24; return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP30_YUV: *result = 30; return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP36_YUV: *result = 36; return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP48_YUV: *result = 48; return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP24_YUV: return 24;
+        case SAIL_PIXEL_FORMAT_BPP30_YUV: return 30;
+        case SAIL_PIXEL_FORMAT_BPP36_YUV: return 36;
+        case SAIL_PIXEL_FORMAT_BPP48_YUV: return 48;
 
-        case SAIL_PIXEL_FORMAT_BPP32_YUVA: *result = 32; return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP40_YUVA: *result = 40; return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP48_YUVA: *result = 48; return SAIL_OK;
-        case SAIL_PIXEL_FORMAT_BPP64_YUVA: *result = 64; return SAIL_OK;
+        case SAIL_PIXEL_FORMAT_BPP32_YUVA: return 32;
+        case SAIL_PIXEL_FORMAT_BPP40_YUVA: return 40;
+        case SAIL_PIXEL_FORMAT_BPP48_YUVA: return 48;
+        case SAIL_PIXEL_FORMAT_BPP64_YUVA: return 64;
     }
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+    return 0;
 }
 
 enum SailPixelFormatComparisonPrivate {
@@ -350,74 +348,63 @@ enum SailPixelFormatComparisonPrivate {
 };
 
 static sail_status_t sail_compare_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPixelFormat pixel_format2,
-                                                    enum SailPixelFormatComparisonPrivate op, bool *result) {
+                                                    enum SailPixelFormatComparisonPrivate op) {
 
-    SAIL_CHECK_PTR(result);
+    if (pixel_format1 == SAIL_PIXEL_FORMAT_UNKNOWN || pixel_format2 == SAIL_PIXEL_FORMAT_UNKNOWN) {
+        return false;
+    }
 
-    unsigned pixel_format_bits1;
-    SAIL_TRY(sail_bits_per_pixel(pixel_format1, &pixel_format_bits1));
-
-    unsigned pixel_format_bits2;
-    SAIL_TRY(sail_bits_per_pixel(pixel_format2, &pixel_format_bits2));
+    const unsigned pixel_format_bits1 = sail_bits_per_pixel(pixel_format1);
+    const unsigned pixel_format_bits2 = sail_bits_per_pixel(pixel_format2);
 
     switch(op) {
         case SAIL_PIXEL_FORMAT_COMPARISON_PRIVATE_LESS:
-            *result = pixel_format_bits1 < pixel_format_bits2;
+            return pixel_format_bits1 < pixel_format_bits2;
         break;
 
         case SAIL_PIXEL_FORMAT_COMPARISON_PRIVATE_LESS_EQUAL:
-            *result = pixel_format_bits1 <= pixel_format_bits2;
+            return pixel_format_bits1 <= pixel_format_bits2;
         break;
 
         case SAIL_PIXEL_FORMAT_COMPARISON_PRIVATE_EQUAL:
-            *result = pixel_format_bits1 == pixel_format_bits2;
+            return pixel_format_bits1 == pixel_format_bits2;
         break;
 
         case SAIL_PIXEL_FORMAT_COMPARISON_PRIVATE_GREATER_EQUAL:
-            *result = pixel_format_bits1 >= pixel_format_bits2;
+            return pixel_format_bits1 >= pixel_format_bits2;
         break;
 
         case SAIL_PIXEL_FORMAT_COMPARISON_PRIVATE_GREATER:
-            *result = pixel_format_bits1 > pixel_format_bits2;
+            return pixel_format_bits1 > pixel_format_bits2;
         break;
     }
 
-    return SAIL_OK;
+    return false;
 }
 
-sail_status_t sail_less_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPixelFormat pixel_format2, bool *result) {
+bool sail_less_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPixelFormat pixel_format2) {
 
-    SAIL_TRY(sail_compare_bits_per_pixel(pixel_format1, pixel_format2, SAIL_PIXEL_FORMAT_COMPARISON_PRIVATE_LESS, result));
-
-    return SAIL_OK;
+    return sail_compare_bits_per_pixel(pixel_format1, pixel_format2, SAIL_PIXEL_FORMAT_COMPARISON_PRIVATE_LESS);
 }
 
-sail_status_t sail_less_equal_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPixelFormat pixel_format2, bool *result) {
+bool sail_less_equal_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPixelFormat pixel_format2) {
 
-    SAIL_TRY(sail_compare_bits_per_pixel(pixel_format1, pixel_format2, SAIL_PIXEL_FORMAT_COMPARISON_PRIVATE_LESS_EQUAL, result));
-
-    return SAIL_OK;
+    return sail_compare_bits_per_pixel(pixel_format1, pixel_format2, SAIL_PIXEL_FORMAT_COMPARISON_PRIVATE_LESS_EQUAL);
 }
 
-sail_status_t sail_equal_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPixelFormat pixel_format2, bool *result) {
+bool sail_equal_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPixelFormat pixel_format2) {
 
-    SAIL_TRY(sail_compare_bits_per_pixel(pixel_format1, pixel_format2, SAIL_PIXEL_FORMAT_COMPARISON_PRIVATE_EQUAL, result));
-
-    return SAIL_OK;
+    return sail_compare_bits_per_pixel(pixel_format1, pixel_format2, SAIL_PIXEL_FORMAT_COMPARISON_PRIVATE_EQUAL);
 }
 
-sail_status_t sail_greater_equal_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPixelFormat pixel_format2, bool *result) {
+bool sail_greater_equal_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPixelFormat pixel_format2) {
 
-    SAIL_TRY(sail_compare_bits_per_pixel(pixel_format1, pixel_format2, SAIL_PIXEL_FORMAT_COMPARISON_PRIVATE_GREATER_EQUAL, result));
-
-    return SAIL_OK;
+    return sail_compare_bits_per_pixel(pixel_format1, pixel_format2, SAIL_PIXEL_FORMAT_COMPARISON_PRIVATE_GREATER_EQUAL);
 }
 
-sail_status_t sail_greater_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPixelFormat pixel_format2, bool *result) {
+bool sail_greater_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPixelFormat pixel_format2) {
 
-    SAIL_TRY(sail_compare_bits_per_pixel(pixel_format1, pixel_format2, SAIL_PIXEL_FORMAT_COMPARISON_PRIVATE_GREATER, result));
-
-    return SAIL_OK;
+    return sail_compare_bits_per_pixel(pixel_format1, pixel_format2, SAIL_PIXEL_FORMAT_COMPARISON_PRIVATE_GREATER);
 }
 
 sail_status_t sail_bytes_per_line(unsigned width, enum SailPixelFormat pixel_format, unsigned *result) {
@@ -429,9 +416,7 @@ sail_status_t sail_bytes_per_line(unsigned width, enum SailPixelFormat pixel_for
 
     SAIL_CHECK_PTR(result);
 
-    unsigned bits_per_pixel;
-    SAIL_TRY(sail_bits_per_pixel(pixel_format, &bits_per_pixel));
-
+    const unsigned bits_per_pixel = sail_bits_per_pixel(pixel_format);
     *result = (unsigned)(((double)width * bits_per_pixel + 7) / 8);
 
     return SAIL_OK;

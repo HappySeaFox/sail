@@ -100,47 +100,35 @@ SAIL_EXPORT sail_status_t sail_to_wchar(const char *input, wchar_t **output);
 SAIL_EXPORT uint64_t sail_string_hash(const char *str);
 
 /*
- * Calculates the number of bits per pixel in the specified pixel format.
- * For example, for SAIL_PIXEL_FORMAT_RGB 24 is assigned.
- *
- * Returns SAIL_OK on success.
+ * Returns the number of bits per pixel of the specified pixel format.
+ * For example, for SAIL_PIXEL_FORMAT_RGB 24 is returned. Returns 0 on unknown pixel format.
  */
-SAIL_EXPORT sail_status_t sail_bits_per_pixel(enum SailPixelFormat pixel_format, unsigned *result);
+SAIL_EXPORT unsigned sail_bits_per_pixel(enum SailPixelFormat pixel_format);
 
 /*
- * Sets the result to true if the first pixel format occupies less bits than the second one.
- *
- * Returns SAIL_OK on success.
+ * Returns true if the first pixel format occupies less bits than the second one.
  */
-SAIL_EXPORT sail_status_t sail_less_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPixelFormat pixel_format2, bool *result);
+SAIL_EXPORT bool sail_less_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPixelFormat pixel_format2);
 
 /*
- * Sets the result to true if the first pixel format occupies less or the same number of bits than the second one.
- *
- * Returns SAIL_OK on success.
+ * Returns true if the first pixel format occupies less or the same number of bits than the second one.
  */
-SAIL_EXPORT sail_status_t sail_less_equal_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPixelFormat pixel_format2, bool *result);
+SAIL_EXPORT bool sail_less_equal_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPixelFormat pixel_format2);
 
 /*
- * Sets the result to true if both the pixel formats occupy the same number of bits.
- *
- * Returns SAIL_OK on success.
+ * Returns true if both the pixel formats occupy the same number of bits.
  */
-SAIL_EXPORT sail_status_t sail_equal_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPixelFormat pixel_format2, bool *result);
+SAIL_EXPORT bool sail_equal_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPixelFormat pixel_format2);
 
 /*
- * Sets the result to true if the first pixel format occupies more or the same number of bits than the second one.
- *
- * Returns SAIL_OK on success.
+ * Returns true if the first pixel format occupies more or the same number of bits than the second one.
  */
-SAIL_EXPORT sail_status_t sail_greater_equal_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPixelFormat pixel_format2, bool *result);
+SAIL_EXPORT bool sail_greater_equal_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPixelFormat pixel_format2);
 
 /*
- * Sets the result to true if the first pixel format occupies more bits than the second one.
- *
- * Returns SAIL_OK on success.
+ * Returns true if the first pixel format occupies more bits than the second one.
  */
-SAIL_EXPORT sail_status_t sail_greater_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPixelFormat pixel_format2, bool *result);
+SAIL_EXPORT bool sail_greater_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPixelFormat pixel_format2);
 
 /*
  * Calculates the number of bytes per line needed to hold a scan line without padding.

@@ -227,10 +227,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v7_png(struct sail_io *io, const 
     SAIL_LOG_TRACE("PNG: Interlaced passes: %d", png_state->interlaced_passes);
 
 #ifdef PNG_APNG_SUPPORTED
-    unsigned bits_per_pixel;
-    SAIL_TRY(sail_bits_per_pixel(png_state->first_image->pixel_format, &bits_per_pixel));
-    png_state->bytes_per_pixel = bits_per_pixel / 8;
-
+    png_state->bytes_per_pixel = sail_bits_per_pixel(png_state->first_image->pixel_format) / 8;
     png_state->is_apng = png_get_valid(png_state->png_ptr, png_state->info_ptr, PNG_INFO_acTL) != 0;
     png_state->frames = png_state->is_apng ? png_get_num_frames(png_state->png_ptr, png_state->info_ptr) : 1;
 
