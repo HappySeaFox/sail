@@ -171,12 +171,10 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v7_xbm(void *state, st
     image_local->source_image->pixel_format = SAIL_PIXEL_FORMAT_BPP1_INDEXED;
     image_local->source_image->compression = SAIL_COMPRESSION_NONE;
 
-    image_local->width = width;
-    image_local->height = height;
-    image_local->pixel_format = SAIL_PIXEL_FORMAT_BPP1_INDEXED;
-
-    SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(image_local->width, image_local->pixel_format, &image_local->bytes_per_line),
-                        /* cleanup */ sail_destroy_image(image_local));
+    image_local->width          = width;
+    image_local->height         = height;
+    image_local->pixel_format   = SAIL_PIXEL_FORMAT_BPP1_INDEXED;
+    image_local->bytes_per_line = sail_bytes_per_line(image_local->width, image_local->pixel_format);
 
     /* Black and white palette. */
     SAIL_TRY_OR_CLEANUP(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP24_RGB, 2, &image_local->palette),

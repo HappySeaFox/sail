@@ -88,9 +88,7 @@ sail_status_t sail_alloc_palette_for_data(enum SailPixelFormat pixel_format, uns
     palette_local->pixel_format = pixel_format;
     palette_local->color_count = color_count;
 
-    unsigned palette_size;
-    SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(color_count, pixel_format, &palette_size),
-                        /* cleanup */ sail_destroy_palette(palette_local));
+    const unsigned palette_size = sail_bytes_per_line(color_count, pixel_format);
 
     void *ptr;
     SAIL_TRY_OR_CLEANUP(sail_malloc(palette_size, &ptr),
@@ -109,9 +107,7 @@ sail_status_t sail_alloc_palette_from_data(enum SailPixelFormat pixel_format, co
     struct sail_palette *palette_local;
     SAIL_TRY(sail_alloc_palette_for_data(pixel_format, color_count, &palette_local));
 
-    unsigned palette_size;
-    SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(color_count, pixel_format, &palette_size),
-                        /* cleanup */ sail_destroy_palette(palette_local));
+    const unsigned palette_size = sail_bytes_per_line(color_count, pixel_format);
 
     memcpy(palette_local->data, data, palette_size);
 

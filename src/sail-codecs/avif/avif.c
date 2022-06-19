@@ -176,13 +176,11 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v7_avif(void *state, s
     image_local->source_image->chroma_subsampling = avif_private_sail_chroma_subsampling(avif_image->yuvFormat);
     image_local->source_image->compression = SAIL_COMPRESSION_AV1;
 
-    image_local->width = avif_image->width;
-    image_local->height = avif_image->height;
-    image_local->pixel_format = avif_private_rgb_sail_pixel_format(avif_state->rgb_image.format, avif_state->rgb_image.depth);
-    image_local->delay = (int)(avif_state->avif_decoder->imageTiming.duration * 1000);
-
-    SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(image_local->width, image_local->pixel_format, &image_local->bytes_per_line),
-                        /* cleanup */ sail_destroy_image(image_local));
+    image_local->width          = avif_image->width;
+    image_local->height         = avif_image->height;
+    image_local->pixel_format   = avif_private_rgb_sail_pixel_format(avif_state->rgb_image.format, avif_state->rgb_image.depth);
+    image_local->bytes_per_line = sail_bytes_per_line(image_local->width, image_local->pixel_format);
+    image_local->delay          = (int)(avif_state->avif_decoder->imageTiming.duration * 1000);
 
     /* Fetch ICC profile. */
     if (avif_state->load_options->options & SAIL_OPTION_ICCP) {

@@ -169,8 +169,7 @@ sail_status_t palette::copy(SailPixelFormat pixel_format, const void *data, unsi
 {
     SAIL_CHECK_PTR(data);
 
-    unsigned palette_size;
-    SAIL_TRY(sail_bytes_per_line(color_count, pixel_format, &palette_size));
+    const unsigned palette_size = sail_bytes_per_line(color_count, pixel_format);
 
     d->data.resize(palette_size);
     memcpy(d->data.data(), data, palette_size);

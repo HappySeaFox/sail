@@ -190,9 +190,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v7_tiff(void *state, s
                             /* cleanup */ sail_destroy_image(image_local));
 
     image_local->pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;
-
-    SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(image_local->width, image_local->pixel_format, &image_local->bytes_per_line),
-                        /* cleanup */ sail_destroy_image(image_local));
+    image_local->bytes_per_line = sail_bytes_per_line(image_local->width, image_local->pixel_format);
 
     /* Fill the source image properties. */
     int compression = COMPRESSION_NONE;

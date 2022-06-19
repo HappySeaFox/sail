@@ -207,12 +207,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v7_png(struct sail_io *io, const 
                     /* compression type */ NULL,
                     /* filter method */ NULL);
 
-    /* Pixel format. */
     png_state->first_image->pixel_format = png_private_png_color_type_to_pixel_format(png_state->color_type, png_state->bit_depth);
-
-    SAIL_TRY(sail_bytes_per_line(png_state->first_image->width,
-                                 png_state->first_image->pixel_format,
-                                 &png_state->first_image->bytes_per_line));
+    png_state->first_image->bytes_per_line = sail_bytes_per_line(png_state->first_image->width, png_state->first_image->pixel_format);
 
     /* Fetch palette. */
     if (png_state->color_type == PNG_COLOR_TYPE_PALETTE) {

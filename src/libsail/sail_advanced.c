@@ -180,9 +180,6 @@ sail_status_t sail_write_next_frame(void *state, const struct sail_image *image)
     SAIL_TRY(allowed_write_output_pixel_format(state_of_mind->codec_info->save_features,
                                                 image->pixel_format));
 
-    unsigned bytes_per_line;
-    SAIL_TRY(sail_bytes_per_line(image->width, image->pixel_format, &bytes_per_line));
-
     SAIL_TRY(state_of_mind->codec->v7->save_seek_next_frame(state_of_mind->state, state_of_mind->io, image));
     SAIL_TRY(state_of_mind->codec->v7->save_frame(state_of_mind->state, state_of_mind->io, image));
 

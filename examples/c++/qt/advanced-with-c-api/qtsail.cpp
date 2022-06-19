@@ -181,9 +181,7 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
     image->width = qimage.width();
     image->height = qimage.height();
     image->pixel_format = qImageFormatToSailPixelFormat(qimage.format());
-
-    SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(image->width, image->pixel_format, &image->bytes_per_line),
-                        /* cleanup */ sail_destroy_image(image));
+    image->bytes_per_line = sail_bytes_per_line(image->width, image->pixel_format);
 
     /*
      * SAIL tries to save an image as is, preserving its pixel format.

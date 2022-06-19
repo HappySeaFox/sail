@@ -275,14 +275,12 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v7_jpeg2000(void *stat
                         /* cleanup */ sail_destroy_image(image_local));
 
     image_local->source_image->pixel_format = pixel_format;
-    image_local->source_image->compression = SAIL_COMPRESSION_JPEG_2000;
+    image_local->source_image->compression  = SAIL_COMPRESSION_JPEG_2000;
 
-    image_local->width = width;
-    image_local->height = height;
-    image_local->pixel_format = pixel_format;
-
-    SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(image_local->width, image_local->pixel_format, &image_local->bytes_per_line),
-                        /* cleanup */ sail_destroy_image(image_local));
+    image_local->width          = width;
+    image_local->height         = height;
+    image_local->pixel_format   = pixel_format;
+    image_local->bytes_per_line = sail_bytes_per_line(image_local->width, image_local->pixel_format);
 
     *image = image_local;
 

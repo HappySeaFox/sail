@@ -166,11 +166,11 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v7_webp(struct sail_io *io, const
     image_local->source_image->chroma_subsampling = SAIL_CHROMA_SUBSAMPLING_420;
     image_local->source_image->compression = SAIL_COMPRESSION_WEBP;
 
-    image_local->width = WebPDemuxGetI(webp_state->webp_demux, WEBP_FF_CANVAS_WIDTH);
-    image_local->height = WebPDemuxGetI(webp_state->webp_demux, WEBP_FF_CANVAS_HEIGHT);
-    image_local->pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;
-    SAIL_TRY_OR_CLEANUP(sail_bytes_per_line(image_local->width, image_local->pixel_format, &image_local->bytes_per_line),
-                        /* cleanup */ sail_destroy_image(image_local));
+    image_local->width          = WebPDemuxGetI(webp_state->webp_demux, WEBP_FF_CANVAS_WIDTH);
+    image_local->height         = WebPDemuxGetI(webp_state->webp_demux, WEBP_FF_CANVAS_HEIGHT);
+    image_local->pixel_format   = SAIL_PIXEL_FORMAT_BPP32_RGBA;
+    image_local->bytes_per_line = sail_bytes_per_line(image_local->width, image_local->pixel_format);
+
     webp_state->bytes_per_pixel = image_local->bytes_per_line / image_local->width;
 
     /* Fetch ICCP. */

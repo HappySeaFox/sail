@@ -407,19 +407,10 @@ bool sail_greater_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPi
     return sail_compare_bits_per_pixel(pixel_format1, pixel_format2, SAIL_PIXEL_FORMAT_COMPARISON_PRIVATE_GREATER);
 }
 
-sail_status_t sail_bytes_per_line(unsigned width, enum SailPixelFormat pixel_format, unsigned *result) {
-
-    if (width == 0) {
-        SAIL_LOG_ERROR("Line width is 0");
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
-    }
-
-    SAIL_CHECK_PTR(result);
+unsigned sail_bytes_per_line(unsigned width, enum SailPixelFormat pixel_format) {
 
     const unsigned bits_per_pixel = sail_bits_per_pixel(pixel_format);
-    *result = (unsigned)(((double)width * bits_per_pixel + 7) / 8);
-
-    return SAIL_OK;
+    return (unsigned)(((double)width * bits_per_pixel + 7) / 8);
 }
 
 bool sail_is_indexed(enum SailPixelFormat pixel_format) {

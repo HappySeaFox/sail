@@ -57,8 +57,8 @@ sail_status_t sail_test_compare_palettes(const struct sail_palette *palette1, co
 
     munit_assert_not_null(palette1->data);
     munit_assert_not_null(palette2->data);
-    unsigned palette_size;
-    munit_assert(sail_bytes_per_line(palette1->color_count, palette1->pixel_format, &palette_size) == SAIL_OK);
+    unsigned palette_size = sail_bytes_per_line(palette1->color_count, palette1->pixel_format);
+    munit_assert(palette_size > 0);
     munit_assert_memory_equal(palette_size, palette1->data, palette2->data);
 
     return SAIL_OK;

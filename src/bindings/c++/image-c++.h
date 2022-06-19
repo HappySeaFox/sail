@@ -599,7 +599,7 @@ public:
     static unsigned bits_per_pixel(SailPixelFormat pixel_format);
 
     /*
-     * Calculates the number of bytes per line needed to hold a scan line without padding.
+     * Returns the number of bytes per line needed to hold a scan line without padding.
      *
      * For example:
      *   - 12 pixels * 1 bits per pixel / 8 + 1 ==
@@ -614,10 +614,8 @@ public:
      *     12 * 2 + 0                            ==
      *     24 + 0                                ==
      *     24 bytes per line
-     *
-     * Returns SAIL_OK on success.
      */
-    static sail_status_t bytes_per_line(unsigned width, SailPixelFormat pixel_format, unsigned *result);
+    static unsigned bytes_per_line(unsigned width, SailPixelFormat pixel_format);
 
     /*
      * Returns true if the specified pixel format is indexed with palette.

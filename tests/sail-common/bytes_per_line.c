@@ -28,301 +28,196 @@
 #include "munit.h"
 
 static MunitResult test_indexed(const MunitParameter params[], void *user_data) {
+
     (void)params;
     (void)user_data;
 
-    unsigned result;
-
     /* 1-bit indexed. */
-    munit_assert(sail_bytes_per_line(7, SAIL_PIXEL_FORMAT_BPP1_INDEXED, &result) == SAIL_OK);
-    munit_assert(result == 1);
-
-    munit_assert(sail_bytes_per_line(8, SAIL_PIXEL_FORMAT_BPP1_INDEXED, &result) == SAIL_OK);
-    munit_assert(result == 1);
-
-    munit_assert(sail_bytes_per_line(9, SAIL_PIXEL_FORMAT_BPP1_INDEXED, &result) == SAIL_OK);
-    munit_assert(result == 2);
+    munit_assert(sail_bytes_per_line(7, SAIL_PIXEL_FORMAT_BPP1_INDEXED) == 1);
+    munit_assert(sail_bytes_per_line(8, SAIL_PIXEL_FORMAT_BPP1_INDEXED) == 1);
+    munit_assert(sail_bytes_per_line(9, SAIL_PIXEL_FORMAT_BPP1_INDEXED) == 2);
 
     /* 2-bit indexed. */
-    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP2_INDEXED, &result) == SAIL_OK);
-    munit_assert(result == 3);
-
-    munit_assert(sail_bytes_per_line(12, SAIL_PIXEL_FORMAT_BPP2_INDEXED, &result) == SAIL_OK);
-    munit_assert(result == 3);
-
-    munit_assert(sail_bytes_per_line(13, SAIL_PIXEL_FORMAT_BPP2_INDEXED, &result) == SAIL_OK);
-    munit_assert(result == 4);
+    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP2_INDEXED) == 3);
+    munit_assert(sail_bytes_per_line(12, SAIL_PIXEL_FORMAT_BPP2_INDEXED) == 3);
+    munit_assert(sail_bytes_per_line(13, SAIL_PIXEL_FORMAT_BPP2_INDEXED) == 4);
 
     /* 4-bit indexed. */
-    munit_assert(sail_bytes_per_line(9, SAIL_PIXEL_FORMAT_BPP4_INDEXED, &result) == SAIL_OK);
-    munit_assert(result == 5);
-
-    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP4_INDEXED, &result) == SAIL_OK);
-    munit_assert(result == 5);
-
-    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP4_INDEXED, &result) == SAIL_OK);
-    munit_assert(result == 6);
+    munit_assert(sail_bytes_per_line(9, SAIL_PIXEL_FORMAT_BPP4_INDEXED) == 5);
+    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP4_INDEXED) == 5);
+    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP4_INDEXED) == 6);
 
     /* 8-bit indexed. */
-    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP8_INDEXED, &result) == SAIL_OK);
-    munit_assert(result == 10);
-
-    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP8_INDEXED, &result) == SAIL_OK);
-    munit_assert(result == 11);
+    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP8_INDEXED) == 10);
+    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP8_INDEXED) == 11);
 
     return MUNIT_OK;
 }
 
 static MunitResult test_grayscale(const MunitParameter params[], void *user_data) {
+
     (void)params;
     (void)user_data;
 
-    unsigned result;
-
     /* 1-bit grayscale. */
-    munit_assert(sail_bytes_per_line(7, SAIL_PIXEL_FORMAT_BPP1_GRAYSCALE, &result) == SAIL_OK);
-    munit_assert(result == 1);
-
-    munit_assert(sail_bytes_per_line(8, SAIL_PIXEL_FORMAT_BPP1_GRAYSCALE, &result) == SAIL_OK);
-    munit_assert(result == 1);
-
-    munit_assert(sail_bytes_per_line(9, SAIL_PIXEL_FORMAT_BPP1_GRAYSCALE, &result) == SAIL_OK);
-    munit_assert(result == 2);
+    munit_assert(sail_bytes_per_line(7, SAIL_PIXEL_FORMAT_BPP1_GRAYSCALE) == 1);
+    munit_assert(sail_bytes_per_line(8, SAIL_PIXEL_FORMAT_BPP1_GRAYSCALE) == 1);
+    munit_assert(sail_bytes_per_line(9, SAIL_PIXEL_FORMAT_BPP1_GRAYSCALE) == 2);
 
     /* 2-bit grayscale. */
-    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP2_GRAYSCALE, &result) == SAIL_OK);
-    munit_assert(result == 3);
-
-    munit_assert(sail_bytes_per_line(12, SAIL_PIXEL_FORMAT_BPP2_GRAYSCALE, &result) == SAIL_OK);
-    munit_assert(result == 3);
-
-    munit_assert(sail_bytes_per_line(13, SAIL_PIXEL_FORMAT_BPP2_GRAYSCALE, &result) == SAIL_OK);
-    munit_assert(result == 4);
+    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP2_GRAYSCALE) == 3);
+    munit_assert(sail_bytes_per_line(12, SAIL_PIXEL_FORMAT_BPP2_GRAYSCALE) == 3);
+    munit_assert(sail_bytes_per_line(13, SAIL_PIXEL_FORMAT_BPP2_GRAYSCALE) == 4);
 
     /* 4-bit grayscale. */
-    munit_assert(sail_bytes_per_line(9, SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE, &result) == SAIL_OK);
-    munit_assert(result == 5);
-
-    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE, &result) == SAIL_OK);
-    munit_assert(result == 5);
-
-    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE, &result) == SAIL_OK);
-    munit_assert(result == 6);
+    munit_assert(sail_bytes_per_line(9, SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE) == 5);
+    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE) == 5);
+    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE) == 6);
 
     /* 8-bit grayscale. */
-    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE, &result) == SAIL_OK);
-    munit_assert(result == 10);
-
-    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE, &result) == SAIL_OK);
-    munit_assert(result == 11);
+    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE) == 10);
+    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE) == 11);
 
     /* 16-bit grayscale. */
-    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE, &result) == SAIL_OK);
-    munit_assert(result == 20);
-
-    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE, &result) == SAIL_OK);
-    munit_assert(result == 22);
+    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE) == 20);
+    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE) == 22);
 
     return MUNIT_OK;
 }
 
 static MunitResult test_grayscale_alpha(const MunitParameter params[], void *user_data) {
+
     (void)params;
     (void)user_data;
 
-    unsigned result;
-
     /* 4-bit grayscale-alpha. */
-    munit_assert(sail_bytes_per_line(9, SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE_ALPHA, &result) == SAIL_OK);
-    munit_assert(result == 5);
-
-    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE_ALPHA, &result) == SAIL_OK);
-    munit_assert(result == 5);
-
-    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE_ALPHA, &result) == SAIL_OK);
-    munit_assert(result == 6);
+    munit_assert(sail_bytes_per_line(9, SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE_ALPHA) == 5);
+    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE_ALPHA) == 5);
+    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE_ALPHA) == 6);
 
     /* 8-bit grayscale-alpha. */
-    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE_ALPHA, &result) == SAIL_OK);
-    munit_assert(result == 10);
-
-    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE_ALPHA, &result) == SAIL_OK);
-    munit_assert(result == 11);
+    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE_ALPHA) == 10);
+    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE_ALPHA) == 11);
 
     /* 16-bit grayscale-alpha. */
-    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA, &result) == SAIL_OK);
-    munit_assert(result == 20);
-
-    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA, &result) == SAIL_OK);
-    munit_assert(result == 22);
+    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA) == 20);
+    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA) == 22);
 
     /* 32-bit grayscale-alpha. */
-    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA, &result) == SAIL_OK);
-    munit_assert(result == 40);
-
-    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA, &result) == SAIL_OK);
-    munit_assert(result == 44);
+    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA) == 40);
+    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA) == 44);
 
     return MUNIT_OK;
 }
 
 static MunitResult test_rgb_555_565(const MunitParameter params[], void *user_data) {
+
     (void)params;
     (void)user_data;
 
-    unsigned result;
-
     /* RGB-555. */
-    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP16_RGB555, &result) == SAIL_OK);
-    munit_assert(result == 20);
-
-    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP16_RGB555, &result) == SAIL_OK);
-    munit_assert(result == 22);
+    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP16_RGB555) == 20);
+    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP16_RGB555) == 22);
 
     /* BGR-555. */
-    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP16_BGR555, &result) == SAIL_OK);
-    munit_assert(result == 20);
-
-    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP16_BGR555, &result) == SAIL_OK);
-    munit_assert(result == 22);
+    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP16_BGR555) == 20);
+    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP16_BGR555) == 22);
 
     /* RGB-565. */
-    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP16_RGB565, &result) == SAIL_OK);
-    munit_assert(result == 20);
-
-    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP16_RGB565, &result) == SAIL_OK);
-    munit_assert(result == 22);
+    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP16_RGB565) == 20);
+    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP16_RGB565) == 22);
 
     /* BGR-565. */
-    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP16_BGR565, &result) == SAIL_OK);
-    munit_assert(result == 20);
-
-    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP16_BGR565, &result) == SAIL_OK);
-    munit_assert(result == 22);
+    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP16_BGR565) == 20);
+    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP16_BGR565) == 22);
 
     return MUNIT_OK;
 }
 
 static MunitResult test_rgb(const MunitParameter params[], void *user_data) {
+
     (void)params;
     (void)user_data;
 
-    unsigned result;
-
     /* 24-bit RGB. */
-    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP24_RGB, &result) == SAIL_OK);
-    munit_assert(result == 30);
-
-    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP24_RGB, &result) == SAIL_OK);
-    munit_assert(result == 33);
+    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP24_RGB) == 30);
+    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP24_RGB) == 33);
 
     /* 48-bit RGB. */
-    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP48_RGB, &result) == SAIL_OK);
-    munit_assert(result == 60);
-
-    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP48_RGB, &result) == SAIL_OK);
-    munit_assert(result == 66);
+    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP48_RGB) == 60);
+    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP48_RGB) == 66);
 
     return MUNIT_OK;
 }
 
 static MunitResult test_rgba(const MunitParameter params[], void *user_data) {
+
     (void)params;
     (void)user_data;
 
-    unsigned result;
-
     /* 32-bit RGBA. */
-    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP32_RGBA, &result) == SAIL_OK);
-    munit_assert(result == 40);
-
-    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP32_RGBA, &result) == SAIL_OK);
-    munit_assert(result == 44);
+    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP32_RGBA) == 40);
+    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP32_RGBA) == 44);
 
     /* 64-bit RGBA. */
-    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP64_RGBA, &result) == SAIL_OK);
-    munit_assert(result == 80);
-
-    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP64_RGBA, &result) == SAIL_OK);
-    munit_assert(result == 88);
+    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP64_RGBA) == 80);
+    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP64_RGBA) == 88);
 
     return MUNIT_OK;
 }
 
 static MunitResult test_cmyk(const MunitParameter params[], void *user_data) {
+
     (void)params;
     (void)user_data;
 
-    unsigned result;
-
     /* 32-bit CMYK. */
-    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP32_CMYK, &result) == SAIL_OK);
-    munit_assert(result == 40);
-
-    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP32_CMYK, &result) == SAIL_OK);
-    munit_assert(result == 44);
+    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP32_CMYK) == 40);
+    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP32_CMYK) == 44);
 
     /* 64-bit CMYK. */
-    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP64_CMYK, &result) == SAIL_OK);
-    munit_assert(result == 80);
-
-    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP64_CMYK, &result) == SAIL_OK);
-    munit_assert(result == 88);
+    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP64_CMYK) == 80);
+    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP64_CMYK) == 88);
 
     return MUNIT_OK;
 }
 
 static MunitResult test_ycbcr(const MunitParameter params[], void *user_data) {
+
     (void)params;
     (void)user_data;
 
-    unsigned result;
-
     /* 24-bit YCbCr. */
-    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP24_YCBCR, &result) == SAIL_OK);
-    munit_assert(result == 30);
-
-    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP24_YCBCR, &result) == SAIL_OK);
-    munit_assert(result == 33);
+    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP24_YCBCR) == 30);
+    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP24_YCBCR) == 33);
 
     return MUNIT_OK;
 }
 
 static MunitResult test_ycck(const MunitParameter params[], void *user_data) {
+
     (void)params;
     (void)user_data;
 
-    unsigned result;
-
     /* 32-bit YCbCr. */
-    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP32_YCCK, &result) == SAIL_OK);
-    munit_assert(result == 40);
-
-    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP32_YCCK, &result) == SAIL_OK);
-    munit_assert(result == 44);
+    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP32_YCCK) == 40);
+    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP32_YCCK) == 44);
 
     return MUNIT_OK;
 }
 
 static MunitResult test_cie_lab(const MunitParameter params[], void *user_data) {
+
     (void)params;
     (void)user_data;
 
-    unsigned result;
-
     /* 24-bit CIE-LAB. */
-    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP24_CIE_LAB, &result) == SAIL_OK);
-    munit_assert(result == 30);
-
-    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP24_CIE_LAB, &result) == SAIL_OK);
-    munit_assert(result == 33);
+    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP24_CIE_LAB) == 30);
+    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP24_CIE_LAB) == 33);
 
     /* 40-bit CIE-LAB. */
-    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP40_CIE_LAB, &result) == SAIL_OK);
-    munit_assert(result == 50);
-
-    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP40_CIE_LAB, &result) == SAIL_OK);
-    munit_assert(result == 55);
+    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP40_CIE_LAB) == 50);
+    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP40_CIE_LAB) == 55);
 
     return MUNIT_OK;
 }

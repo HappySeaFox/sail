@@ -562,13 +562,9 @@ unsigned image::bits_per_pixel(SailPixelFormat pixel_format)
     return sail_bits_per_pixel(pixel_format);
 }
 
-sail_status_t image::bytes_per_line(unsigned width, SailPixelFormat pixel_format, unsigned *result)
+unsigned image::bytes_per_line(unsigned width, SailPixelFormat pixel_format)
 {
-    SAIL_CHECK_PTR(result);
-
-    SAIL_TRY(sail_bytes_per_line(width, pixel_format, result));
-
-    return SAIL_OK;
+    return sail_bytes_per_line(width, pixel_format);
 }
 
 bool image::is_indexed(SailPixelFormat pixel_format)
@@ -757,10 +753,9 @@ void image::set_bytes_per_line(unsigned bytes_per_line)
 
 void image::set_bytes_per_line_auto()
 {
-    unsigned bytes_per_line = 0;
-    image::bytes_per_line(d->sail_image->width, d->sail_image->pixel_format, &bytes_per_line);
+    const unsigned bytes_per_line = image::bytes_per_line(d->sail_image->width, d->sail_image->pixel_format);
 
-    return set_bytes_per_line(bytes_per_line);
+    set_bytes_per_line(bytes_per_line);
 }
 
 void image::set_pixels(const void *pixels)

@@ -556,8 +556,7 @@ sail_status_t sail_dump(const struct sail_image *image) {
     }
 
     if (image->palette != NULL) {
-        unsigned palette_size;
-        SAIL_TRY(sail_bytes_per_line(image->palette->color_count, image->palette->pixel_format, &palette_size));
+        unsigned palette_size = sail_bytes_per_line(image->palette->color_count, image->palette->pixel_format);
 
         printf("PALETTE\n%s %u %u\n", sail_pixel_format_to_string(image->palette->pixel_format), image->palette->color_count, palette_size);
         SAIL_TRY(print_hex(image->palette->data, palette_size));
