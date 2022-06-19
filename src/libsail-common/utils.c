@@ -488,13 +488,11 @@ bool sail_is_rgb_family(enum SailPixelFormat pixel_format) {
     }
 }
 
-sail_status_t sail_print_errno(const char *format) {
-
-    SAIL_CHECK_PTR(format);
+void sail_print_errno(const char *format) {
 
     if (strstr(format, "%s") == NULL) {
         SAIL_LOG_ERROR("Format argument must contain %%s");
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+        return;
     }
 
 #ifdef _MSC_VER
@@ -504,8 +502,6 @@ sail_status_t sail_print_errno(const char *format) {
 #else
     SAIL_LOG_ERROR(format, strerror(errno));
 #endif
-
-    return SAIL_OK;
 }
 
 uint64_t sail_now(void) {

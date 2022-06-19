@@ -28,11 +28,9 @@
 namespace sail
 {
 
-sail_status_t print_errno(const char *format)
+void print_errno(const char *format)
 {
-    SAIL_TRY(sail_print_errno(format));
-
-    return SAIL_OK;
+    sail_print_errno(format);
 }
 
 std::uint64_t now()

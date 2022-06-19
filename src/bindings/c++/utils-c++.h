@@ -48,10 +48,8 @@ class abstract_io;
 
 /*
  * Prints the recent errno value with SAIL_LOG_ERROR(). The specified format must include '%s'.
- *
- * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t print_errno(const char *format);
+SAIL_EXPORT void print_errno(const char *format);
 
 /*
  * Returns the current number of milliseconds since Epoch or 0 on error.
