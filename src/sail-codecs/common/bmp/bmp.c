@@ -398,17 +398,17 @@ sail_status_t bmp_private_read_frame(void *state, struct sail_io *io, struct sai
                 uint8_t marker;
                 SAIL_TRY(io->strict_read(io->stream, &marker, sizeof(marker)));
 
-                if (marker == SAIL_UNENCODED_RUN_MARKER) {
+                if (marker == SAIL_BMP_UNENCODED_RUN_MARKER) {
                     uint8_t count_or_marker;
                     SAIL_TRY(io->strict_read(io->stream, &count_or_marker, sizeof(count_or_marker)));
 
-                    if (count_or_marker == SAIL_END_OF_SCAN_LINE_MARKER) {
+                    if (count_or_marker == SAIL_BMP_END_OF_SCAN_LINE_MARKER) {
                         /* Jump to the end of scan line. +1 to avoid reading end-of-scan-line marker twice below. */
                         pixel_index = image->width + 1;
-                    } else if (count_or_marker == SAIL_END_OF_RLE_DATA_MARKER) {
+                    } else if (count_or_marker == SAIL_BMP_END_OF_RLE_DATA_MARKER) {
                         SAIL_LOG_ERROR("BMP: Unexpected end-of-rle-data marker");
                         SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
-                    } else if (count_or_marker == SAIL_DELTA_MARKER) {
+                    } else if (count_or_marker == SAIL_BMP_DELTA_MARKER) {
                         SAIL_LOG_ERROR("BMP: Delta marker is not supported");
                         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_FORMAT);
                     } else {
@@ -470,17 +470,17 @@ sail_status_t bmp_private_read_frame(void *state, struct sail_io *io, struct sai
                 uint8_t marker;
                 SAIL_TRY(io->strict_read(io->stream, &marker, sizeof(marker)));
 
-                if (marker == SAIL_UNENCODED_RUN_MARKER) {
+                if (marker == SAIL_BMP_UNENCODED_RUN_MARKER) {
                     uint8_t count_or_marker;
                     SAIL_TRY(io->strict_read(io->stream, &count_or_marker, sizeof(count_or_marker)));
 
-                    if (count_or_marker == SAIL_END_OF_SCAN_LINE_MARKER) {
+                    if (count_or_marker == SAIL_BMP_END_OF_SCAN_LINE_MARKER) {
                         /* Jump to the end of scan line. +1 to avoid reading end-of-scan-line marker twice below. */
                         pixel_index = image->width + 1;
-                    } else if (count_or_marker == SAIL_END_OF_RLE_DATA_MARKER) {
+                    } else if (count_or_marker == SAIL_BMP_END_OF_RLE_DATA_MARKER) {
                         SAIL_LOG_ERROR("BMP: Unexpected end-of-rle-data marker");
                         SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
-                    } else if (count_or_marker == SAIL_DELTA_MARKER) {
+                    } else if (count_or_marker == SAIL_BMP_DELTA_MARKER) {
                         SAIL_LOG_ERROR("BMP: Delta marker is not supported");
                         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_FORMAT);
                     } else {

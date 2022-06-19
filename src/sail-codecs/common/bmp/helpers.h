@@ -37,10 +37,13 @@ struct sail_iccp;
 struct sail_io;
 
 /* RLE markers. */
-static const uint8_t SAIL_UNENCODED_RUN_MARKER    = 0;
-static const uint8_t SAIL_END_OF_SCAN_LINE_MARKER = 0;
-static const uint8_t SAIL_END_OF_RLE_DATA_MARKER  = 1;
-static const uint8_t SAIL_DELTA_MARKER            = 2;
+enum
+{
+    SAIL_BMP_UNENCODED_RUN_MARKER    = 0,
+    SAIL_BMP_END_OF_SCAN_LINE_MARKER = 0,
+    SAIL_BMP_END_OF_RLE_DATA_MARKER  = 1,
+    SAIL_BMP_DELTA_MARKER            = 2,
+};
 
 /*
  * V1: Device-Dependent Bitmap (DDB).

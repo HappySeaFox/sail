@@ -151,10 +151,10 @@ sail_status_t bmp_private_skip_end_of_scan_line(struct sail_io *io) {
     uint8_t marker;
     SAIL_TRY(io->strict_read(io->stream, &marker, sizeof(marker)));
 
-    if (marker == SAIL_UNENCODED_RUN_MARKER) {
+    if (marker == SAIL_BMP_UNENCODED_RUN_MARKER) {
         SAIL_TRY(io->strict_read(io->stream, &marker, sizeof(marker)));
 
-        if (marker != SAIL_END_OF_SCAN_LINE_MARKER) {
+        if (marker != SAIL_BMP_END_OF_SCAN_LINE_MARKER) {
             SAIL_TRY(io->seek(io->stream, -2, SEEK_CUR));
         }
     } else {
