@@ -136,7 +136,7 @@ SAIL_EXPORT sail_status_t sail_start_saving_into_file_with_options(const char *p
  */
 SAIL_EXPORT sail_status_t sail_start_saving_into_memory_with_options(void *buffer, size_t buffer_length,
                                                                      const struct sail_codec_info *codec_info,
-                                                                        const struct sail_save_options *save_options, void **state);
+                                                                     const struct sail_save_options *save_options, void **state);
 
 
 /*
