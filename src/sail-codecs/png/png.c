@@ -159,11 +159,7 @@ static void destroy_png_state(struct png_state *png_state) {
 
 SAIL_EXPORT sail_status_t sail_codec_load_init_v7_png(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
 
-    SAIL_CHECK_PTR(state);
     *state = NULL;
-
-    SAIL_TRY(sail_check_io_valid(io));
-    SAIL_CHECK_PTR(load_options);
 
     /* Allocate a new state. */
     struct png_state *png_state;
@@ -271,9 +267,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v7_png(struct sail_io *io, const 
 
 SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v7_png(void *state, struct sail_io *io, struct sail_image **image) {
 
-    SAIL_CHECK_PTR(state);
-    SAIL_TRY(sail_check_io_valid(io));
-    SAIL_CHECK_PTR(image);
+    (void)io;
 
     struct png_state *png_state = (struct png_state *)state;
 
@@ -363,9 +357,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v7_png(void *state, st
 
 SAIL_EXPORT sail_status_t sail_codec_load_frame_v7_png(void *state, struct sail_io *io, struct sail_image *image) {
 
-    SAIL_CHECK_PTR(state);
-    SAIL_TRY(sail_check_io_valid(io));
-    SAIL_TRY(sail_check_image_skeleton_valid(image));
+    (void)io;
 
     struct png_state *png_state = (struct png_state *)state;
 
@@ -433,8 +425,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v7_png(void *state, struct sail_
 
 SAIL_EXPORT sail_status_t sail_codec_load_finish_v7_png(void **state, struct sail_io *io) {
 
-    SAIL_CHECK_PTR(state);
-    SAIL_TRY(sail_check_io_valid(io));
+    (void)io;
 
     struct png_state *png_state = (struct png_state *)(*state);
 
@@ -462,11 +453,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_finish_v7_png(void **state, struct sai
 
 SAIL_EXPORT sail_status_t sail_codec_save_init_v7_png(struct sail_io *io, const struct sail_save_options *save_options, void **state) {
 
-    SAIL_CHECK_PTR(state);
     *state = NULL;
-
-    SAIL_TRY(sail_check_io_valid(io));
-    SAIL_CHECK_PTR(save_options);
 
     struct png_state *png_state;
     SAIL_TRY(alloc_png_state(&png_state));
@@ -510,9 +497,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v7_png(struct sail_io *io, const 
 
 SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v7_png(void *state, struct sail_io *io, const struct sail_image *image) {
 
-    SAIL_CHECK_PTR(state);
-    SAIL_TRY(sail_check_io_valid(io));
-    SAIL_TRY(sail_check_image_valid(image));
+    (void)io;
 
     struct png_state *png_state = (struct png_state *)state;
 
@@ -623,9 +608,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v7_png(void *state, st
 
 SAIL_EXPORT sail_status_t sail_codec_save_frame_v7_png(void *state, struct sail_io *io, const struct sail_image *image) {
 
-    SAIL_CHECK_PTR(state);
-    SAIL_TRY(sail_check_io_valid(io));
-    SAIL_TRY(sail_check_image_valid(image));
+    (void)io;
 
     struct png_state *png_state = (struct png_state *)state;
 
@@ -650,8 +633,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v7_png(void *state, struct sail_
 
 SAIL_EXPORT sail_status_t sail_codec_save_finish_v7_png(void **state, struct sail_io *io) {
 
-    SAIL_CHECK_PTR(state);
-    SAIL_TRY(sail_check_io_valid(io));
+    (void)io;
 
     struct png_state *png_state = (struct png_state *)(*state);
 

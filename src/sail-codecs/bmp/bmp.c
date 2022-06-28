@@ -73,11 +73,7 @@ static void destroy_bmp_state(struct bmp_state *bmp_state) {
 
 SAIL_EXPORT sail_status_t sail_codec_load_init_v7_bmp(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
 
-    SAIL_CHECK_PTR(state);
     *state = NULL;
-
-    SAIL_TRY(sail_check_io_valid(io));
-    SAIL_CHECK_PTR(load_options);
 
     /* Allocate a new state. */
     struct bmp_state *bmp_state;
@@ -94,10 +90,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v7_bmp(struct sail_io *io, const 
 
 SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v7_bmp(void *state, struct sail_io *io, struct sail_image **image) {
 
-    SAIL_CHECK_PTR(state);
-    SAIL_TRY(sail_check_io_valid(io));
-    SAIL_CHECK_PTR(image);
-
     struct bmp_state *bmp_state = (struct bmp_state *)state;
 
     if (bmp_state->frame_loaded) {
@@ -113,10 +105,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v7_bmp(void *state, st
 
 SAIL_EXPORT sail_status_t sail_codec_load_frame_v7_bmp(void *state, struct sail_io *io, struct sail_image *image) {
 
-    SAIL_CHECK_PTR(state);
-    SAIL_TRY(sail_check_io_valid(io));
-    SAIL_TRY(sail_check_image_skeleton_valid(image));
-
     struct bmp_state *bmp_state = (struct bmp_state *)state;
 
     SAIL_TRY(bmp_private_read_frame(bmp_state->common_bmp_state, io, image));
@@ -125,9 +113,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v7_bmp(void *state, struct sail_
 }
 
 SAIL_EXPORT sail_status_t sail_codec_load_finish_v7_bmp(void **state, struct sail_io *io) {
-
-    SAIL_CHECK_PTR(state);
-    SAIL_TRY(sail_check_io_valid(io));
 
     struct bmp_state *bmp_state = (struct bmp_state *)(*state);
 
@@ -149,35 +134,35 @@ SAIL_EXPORT sail_status_t sail_codec_load_finish_v7_bmp(void **state, struct sai
 
 SAIL_EXPORT sail_status_t sail_codec_save_init_v7_bmp(struct sail_io *io, const struct sail_save_options *save_options, void **state) {
 
-    SAIL_CHECK_PTR(state);
-    SAIL_TRY(sail_check_io_valid(io));
-    SAIL_CHECK_PTR(save_options);
+    (void)io;
+    (void)save_options;
+    (void)state;
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
 SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v7_bmp(void *state, struct sail_io *io, const struct sail_image *image) {
 
-    SAIL_CHECK_PTR(state);
-    SAIL_TRY(sail_check_io_valid(io));
-    SAIL_TRY(sail_check_image_valid(image));
+    (void)state;
+    (void)io;
+    (void)image;
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
 SAIL_EXPORT sail_status_t sail_codec_save_frame_v7_bmp(void *state, struct sail_io *io, const struct sail_image *image) {
 
-    SAIL_CHECK_PTR(state);
-    SAIL_TRY(sail_check_io_valid(io));
-    SAIL_TRY(sail_check_image_valid(image));
+    (void)state;
+    (void)io;
+    (void)image;
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
 SAIL_EXPORT sail_status_t sail_codec_save_finish_v7_bmp(void **state, struct sail_io *io) {
 
-    SAIL_CHECK_PTR(state);
-    SAIL_TRY(sail_check_io_valid(io));
+    (void)state;
+    (void)io;
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }

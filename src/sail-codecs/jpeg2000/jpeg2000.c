@@ -116,11 +116,7 @@ static void destroy_jpeg2000_state(struct jpeg2000_state *jpeg2000_state) {
 
 SAIL_EXPORT sail_status_t sail_codec_load_init_v7_jpeg2000(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
 
-    SAIL_CHECK_PTR(state);
     *state = NULL;
-
-    SAIL_TRY(sail_check_io_valid(io));
-    SAIL_CHECK_PTR(load_options);
 
     /* Allocate a new state. */
     struct jpeg2000_state *jpeg2000_state;
@@ -147,9 +143,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v7_jpeg2000(struct sail_io *io, c
 
 SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v7_jpeg2000(void *state, struct sail_io *io, struct sail_image **image) {
 
-    SAIL_CHECK_PTR(state);
-    SAIL_TRY(sail_check_io_valid(io));
-    SAIL_CHECK_PTR(image);
+    (void)io;
 
     struct jpeg2000_state *jpeg2000_state = (struct jpeg2000_state *)state;
 
@@ -289,9 +283,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v7_jpeg2000(void *stat
 
 SAIL_EXPORT sail_status_t sail_codec_load_frame_v7_jpeg2000(void *state, struct sail_io *io, struct sail_image *image) {
 
-    SAIL_CHECK_PTR(state);
-    SAIL_TRY(sail_check_io_valid(io));
-    SAIL_TRY(sail_check_image_skeleton_valid(image));
+    (void)io;
 
     const struct jpeg2000_state *jpeg2000_state = (struct jpeg2000_state *)state;
 
@@ -323,8 +315,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v7_jpeg2000(void *state, struct 
 
 SAIL_EXPORT sail_status_t sail_codec_load_finish_v7_jpeg2000(void **state, struct sail_io *io) {
 
-    SAIL_CHECK_PTR(state);
-    SAIL_TRY(sail_check_io_valid(io));
+    (void)io;
 
     struct jpeg2000_state *jpeg2000_state = (struct jpeg2000_state *)(*state);
 
@@ -341,35 +332,35 @@ SAIL_EXPORT sail_status_t sail_codec_load_finish_v7_jpeg2000(void **state, struc
 
 SAIL_EXPORT sail_status_t sail_codec_save_init_v7_jpeg2000(struct sail_io *io, const struct sail_save_options *save_options, void **state) {
 
-    SAIL_CHECK_PTR(state);
-    SAIL_TRY(sail_check_io_valid(io));
-    SAIL_CHECK_PTR(save_options);
+    (void)io;
+    (void)save_options;
+    (void)state;
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
 SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v7_jpeg2000(void *state, struct sail_io *io, const struct sail_image *image) {
 
-    SAIL_CHECK_PTR(state);
-    SAIL_TRY(sail_check_io_valid(io));
-    SAIL_TRY(sail_check_image_valid(image));
+    (void)state;
+    (void)io;
+    (void)image;
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
 SAIL_EXPORT sail_status_t sail_codec_save_frame_v7_jpeg2000(void *state, struct sail_io *io, const struct sail_image *image) {
 
-    SAIL_CHECK_PTR(state);
-    SAIL_TRY(sail_check_io_valid(io));
-    SAIL_TRY(sail_check_image_valid(image));
+    (void)state;
+    (void)io;
+    (void)image;
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
 SAIL_EXPORT sail_status_t sail_codec_save_finish_v7_jpeg2000(void **state, struct sail_io *io) {
 
-    SAIL_CHECK_PTR(state);
-    SAIL_TRY(sail_check_io_valid(io));
+    (void)state;
+    (void)io;
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
