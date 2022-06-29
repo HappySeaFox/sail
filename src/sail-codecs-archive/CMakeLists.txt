@@ -15,22 +15,22 @@ foreach(codec ${ENABLED_CODECS})
 
     set(SAIL_ENABLED_CODECS_DECLARE_FUNCTIONS "${SAIL_ENABLED_CODECS_DECLARE_FUNCTIONS}
 #define SAIL_CODEC_NAME ${codec}
-#include \"layout/v7.h\"
+#include \"layout/v8.h\"
 #undef SAIL_CODEC_NAME
 ")
 
     set(SAIL_ENABLED_CODECS_LAYOUTS "${SAIL_ENABLED_CODECS_LAYOUTS}
     {
         #define SAIL_CODEC_NAME ${codec}
-        .load_init            = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_load_init_v7),
-        .load_seek_next_frame = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_load_seek_next_frame_v7),
-        .load_frame           = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_load_frame_v7),
-        .load_finish          = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_load_finish_v7),
+        .load_init            = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_load_init_v8),
+        .load_seek_next_frame = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_load_seek_next_frame_v8),
+        .load_frame           = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_load_frame_v8),
+        .load_finish          = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_load_finish_v8),
 
-        .save_init            = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_save_init_v7),
-        .save_seek_next_frame = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_save_seek_next_frame_v7),
-        .save_frame           = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_save_frame_v7),
-        .save_finish          = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_save_finish_v7)
+        .save_init            = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_save_init_v8),
+        .save_seek_next_frame = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_save_seek_next_frame_v8),
+        .save_frame           = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_save_frame_v8),
+        .save_finish          = SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_save_finish_v8)
         #undef SAIL_CODEC_NAME
     },\n")
 endforeach()

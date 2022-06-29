@@ -86,7 +86,7 @@ static void destroy_tiff_state(struct tiff_state *tiff_state) {
  * Decoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_load_init_v7_tiff(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_load_init_v8_tiff(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
 
     *state = NULL;
 
@@ -127,9 +127,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v7_tiff(struct sail_io *io, const
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v7_tiff(void *state, struct sail_io *io, struct sail_image **image) {
-
-    (void)io;
+SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_tiff(void *state, struct sail_image **image) {
 
     struct tiff_state *tiff_state = (struct tiff_state *)state;
 
@@ -202,9 +200,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v7_tiff(void *state, s
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_load_frame_v7_tiff(void *state, struct sail_io *io, struct sail_image *image) {
-
-    (void)io;
+SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_tiff(void *state, struct sail_image *image) {
 
     struct tiff_state *tiff_state = (struct tiff_state *)state;
 
@@ -221,9 +217,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v7_tiff(void *state, struct sail
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_load_finish_v7_tiff(void **state, struct sail_io *io) {
-
-    (void)io;
+SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_tiff(void **state) {
 
     struct tiff_state *tiff_state = (struct tiff_state *)(*state);
 
@@ -242,7 +236,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_finish_v7_tiff(void **state, struct sa
  * Encoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_save_init_v7_tiff(struct sail_io *io, const struct sail_save_options *save_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_save_init_v8_tiff(struct sail_io *io, const struct sail_save_options *save_options, void **state) {
 
     *state = NULL;
 
@@ -286,9 +280,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v7_tiff(struct sail_io *io, const
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v7_tiff(void *state, struct sail_io *io, const struct sail_image *image) {
-
-    (void)io;
+SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_tiff(void *state, const struct sail_image *image) {
 
     struct tiff_state *tiff_state = (struct tiff_state *)state;
 
@@ -326,9 +318,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v7_tiff(void *state, s
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_save_frame_v7_tiff(void *state, struct sail_io *io, const struct sail_image *image) {
-
-    (void)io;
+SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_tiff(void *state, const struct sail_image *image) {
 
     struct tiff_state *tiff_state = (struct tiff_state *)state;
 
@@ -349,9 +339,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v7_tiff(void *state, struct sail
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_save_finish_v7_tiff(void **state, struct sail_io *io) {
-
-    (void)io;
+SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_tiff(void **state) {
 
     struct tiff_state *tiff_state = (struct tiff_state *)(*state);
 

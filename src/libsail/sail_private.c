@@ -130,7 +130,7 @@ sail_status_t stop_saving(void *state, size_t *written) {
         return SAIL_OK;
     }
 
-    SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v7->save_finish(&state_of_mind->state, state_of_mind->io),
+    SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v8->save_finish(&state_of_mind->state),
                         /* cleanup */ destroy_hidden_state(state_of_mind));
 
     if (written != NULL) {

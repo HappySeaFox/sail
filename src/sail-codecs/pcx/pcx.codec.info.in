@@ -1,7 +1,7 @@
 # PCX codec information
 #
 [codec]
-layout=7
+layout=8
 version=0.8.1
 priority=LOW
 name=PCX

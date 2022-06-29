@@ -27,26 +27,26 @@
 #define SAIL_CODEC_LAYOUT_H
 
 #ifdef SAIL_BUILD
-    #include "layout/v7_pointers.h"
+    #include "layout/v8_pointers.h"
 #else
-    #include <sail/layout/v7_pointers.h>
+    #include <sail/layout/v8_pointers.h>
 #endif
 
 /*
  * Currently supported codec layout version.
  */
-#define SAIL_CODEC_LAYOUT_V7 7
+#define SAIL_CODEC_LAYOUT_V8 8
 
-struct sail_codec_layout_v7 {
-    sail_codec_load_init_v7_t            load_init;
-    sail_codec_load_seek_next_frame_v7_t load_seek_next_frame;
-    sail_codec_load_frame_v7_t           load_frame;
-    sail_codec_load_finish_v7_t          load_finish;
+struct sail_codec_layout_v8 {
+    sail_codec_load_init_v8_t            load_init;
+    sail_codec_load_seek_next_frame_v8_t load_seek_next_frame;
+    sail_codec_load_frame_v8_t           load_frame;
+    sail_codec_load_finish_v8_t          load_finish;
 
-    sail_codec_save_init_v7_t            save_init;
-    sail_codec_save_seek_next_frame_v7_t save_seek_next_frame;
-    sail_codec_save_frame_v7_t           save_frame;
-    sail_codec_save_finish_v7_t          save_finish;
+    sail_codec_save_init_v8_t            save_init;
+    sail_codec_save_seek_next_frame_v8_t save_seek_next_frame;
+    sail_codec_save_frame_v8_t           save_frame;
+    sail_codec_save_finish_v8_t          save_finish;
 };
 
 #endif

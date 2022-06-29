@@ -1,7 +1,7 @@
 # JPEG codec information
 #
 [codec]
-layout=7
+layout=8
 version=1.3.4.1
 priority=HIGHEST
 name=JPEG

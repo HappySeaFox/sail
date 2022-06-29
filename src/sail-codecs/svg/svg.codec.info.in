@@ -1,7 +1,7 @@
 # SVG codec information
 #
 [codec]
-layout=7
+layout=8
 version=0.1.2
 priority=HIGH
 name=SVG

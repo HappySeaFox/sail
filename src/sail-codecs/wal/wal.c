@@ -36,6 +36,7 @@
  * Codec-specific state.
  */
 struct wal_state {
+    struct sail_io *io;
     struct sail_load_options *load_options;
     struct sail_save_options *save_options;
 
@@ -52,6 +53,7 @@ static sail_status_t alloc_wal_state(struct wal_state **wal_state) {
     SAIL_TRY(sail_malloc(sizeof(struct wal_state), &ptr));
     *wal_state = ptr;
 
+    (*wal_state)->io           = NULL;
     (*wal_state)->load_options = NULL;
     (*wal_state)->save_options = NULL;
 
@@ -78,7 +80,7 @@ static void destroy_wal_state(struct wal_state *wal_state) {
  * Decoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_load_init_v7_wal(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_load_init_v8_wal(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
 
     *state = NULL;
 
@@ -87,11 +89,14 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v7_wal(struct sail_io *io, const 
     SAIL_TRY(alloc_wal_state(&wal_state));
     *state = wal_state;
 
+    /* Save I/O for further operations. */
+    wal_state->io = io;
+
     /* Deep copy load options. */
     SAIL_TRY(sail_copy_load_options(load_options, &wal_state->load_options));
 
     /* Read WAL header. */
-    SAIL_TRY(wal_private_read_file_header(io, &wal_state->wal_header));
+    SAIL_TRY(wal_private_read_file_header(wal_state->io, &wal_state->wal_header));
 
     wal_state->width = wal_state->wal_header.width;
     wal_state->height = wal_state->wal_header.height;
@@ -99,7 +104,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v7_wal(struct sail_io *io, const 
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v7_wal(void *state, struct sail_io *io, struct sail_image **image) {
+SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_wal(void *state, struct sail_image **image) {
 
     struct wal_state *wal_state = (struct wal_state *)state;
 
@@ -130,7 +135,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v7_wal(void *state, st
     SAIL_TRY_OR_CLEANUP(wal_private_assign_meta_data(&wal_state->wal_header, &image_local->meta_data_node),
                         /* cleanup */ sail_destroy_image(image_local));
 
-    SAIL_TRY_OR_CLEANUP(io->seek(io->stream, wal_state->wal_header.offset[wal_state->frame_number], SEEK_SET),
+    SAIL_TRY_OR_CLEANUP(wal_state->io->seek(wal_state->io->stream, wal_state->wal_header.offset[wal_state->frame_number], SEEK_SET),
                         /* cleanup */ sail_destroy_image(image_local));
 
     wal_state->frame_number++;
@@ -140,18 +145,16 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v7_wal(void *state, st
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_load_frame_v7_wal(void *state, struct sail_io *io, struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_wal(void *state, struct sail_image *image) {
 
-    (void)state;
+    struct wal_state *wal_state = (struct wal_state *)state;
 
-    SAIL_TRY(io->strict_read(io->stream, image->pixels, (size_t)image->bytes_per_line * image->height));
+    SAIL_TRY(wal_state->io->strict_read(wal_state->io->stream, image->pixels, (size_t)image->bytes_per_line * image->height));
 
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_load_finish_v7_wal(void **state, struct sail_io *io) {
-
-    (void)io;
+SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_wal(void **state) {
 
     struct wal_state *wal_state = (struct wal_state *)(*state);
 
@@ -166,7 +169,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_finish_v7_wal(void **state, struct sai
  * Encoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_save_init_v7_wal(struct sail_io *io, const struct sail_save_options *save_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_save_init_v8_wal(struct sail_io *io, const struct sail_save_options *save_options, void **state) {
 
     (void)io;
     (void)save_options;
@@ -175,28 +178,25 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v7_wal(struct sail_io *io, const 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v7_wal(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_wal(void *state, const struct sail_image *image) {
 
     (void)state;
-    (void)io;
     (void)image;
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-SAIL_EXPORT sail_status_t sail_codec_save_frame_v7_wal(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_wal(void *state, const struct sail_image *image) {
 
     (void)state;
-    (void)io;
     (void)image;
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-SAIL_EXPORT sail_status_t sail_codec_save_finish_v7_wal(void **state, struct sail_io *io) {
+SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_wal(void **state) {
 
     (void)state;
-    (void)io;
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }

@@ -41,6 +41,7 @@ enum SailXbmVersion {
  * Codec-specific state.
  */
 struct xbm_state {
+    struct sail_io *io;
     struct sail_load_options *load_options;
     struct sail_save_options *save_options;
 
@@ -55,6 +56,7 @@ static sail_status_t alloc_xbm_state(struct xbm_state **xbm_state) {
     SAIL_TRY(sail_malloc(sizeof(struct xbm_state), &ptr));
     *xbm_state = ptr;
 
+    (*xbm_state)->io           = NULL;
     (*xbm_state)->load_options = NULL;
     (*xbm_state)->save_options = NULL;
 
@@ -79,9 +81,7 @@ static void destroy_xbm_state(struct xbm_state *xbm_state) {
  * Decoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_load_init_v7_xbm(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
-
-    (void)io;
+SAIL_EXPORT sail_status_t sail_codec_load_init_v8_xbm(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
 
     *state = NULL;
 
@@ -90,13 +90,16 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v7_xbm(struct sail_io *io, const 
     SAIL_TRY(alloc_xbm_state(&xbm_state));
     *state = xbm_state;
 
+    /* Save I/O for further operations. */
+    xbm_state->io = io;
+
     /* Deep copy load options. */
     SAIL_TRY(sail_copy_load_options(load_options, &xbm_state->load_options));
 
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v7_xbm(void *state, struct sail_io *io, struct sail_image **image) {
+SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_xbm(void *state, struct sail_image **image) {
 
     struct xbm_state *xbm_state = (struct xbm_state *)state;
 
@@ -109,7 +112,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v7_xbm(void *state, st
     char buf[512 + 1];
 
     /* Read width. */
-    SAIL_TRY(sail_read_string_from_io(io, buf, sizeof(buf)));
+    SAIL_TRY(sail_read_string_from_io(xbm_state->io, buf, sizeof(buf)));
 
     if (strncmp(buf, "#define ", 8) != 0) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
@@ -123,7 +126,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v7_xbm(void *state, st
     unsigned width = atoi(ptr + 6);
 
     /* Read height. */
-    SAIL_TRY(sail_read_string_from_io(io, buf, sizeof(buf)));
+    SAIL_TRY(sail_read_string_from_io(xbm_state->io, buf, sizeof(buf)));
 
     if (strncmp(buf, "#define ", 8) != 0) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
@@ -137,7 +140,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v7_xbm(void *state, st
 
     /* Skip other defines. */
     do {
-        SAIL_TRY(sail_read_string_from_io(io, buf, sizeof(buf)));
+        SAIL_TRY(sail_read_string_from_io(xbm_state->io, buf, sizeof(buf)));
     } while(strstr(buf, "#define ") != NULL);
 
     if ((ptr = strchr(buf, '[')) == NULL || strchr(ptr, '{') == NULL) {
@@ -189,7 +192,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v7_xbm(void *state, st
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_load_frame_v7_xbm(void *state, struct sail_io *io, struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_xbm(void *state, struct sail_image *image) {
 
     const struct xbm_state *xbm_state = (struct xbm_state *)state;
 
@@ -207,7 +210,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v7_xbm(void *state, struct sail_
     unsigned char *pixels = image->pixels;
 
     for (unsigned literals_read = 0; literals_read < literals_to_read; ) {
-        SAIL_TRY(sail_read_string_from_io(io, buf, sizeof(buf)));
+        SAIL_TRY(sail_read_string_from_io(xbm_state->io, buf, sizeof(buf)));
 
         unsigned buf_offset = 0;
         unsigned holder;
@@ -235,9 +238,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v7_xbm(void *state, struct sail_
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_load_finish_v7_xbm(void **state, struct sail_io *io) {
-
-    (void)io;
+SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_xbm(void **state) {
 
     struct xbm_state *xbm_state = (struct xbm_state *)(*state);
 
@@ -252,7 +253,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_finish_v7_xbm(void **state, struct sai
  * Encoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_save_init_v7_xbm(struct sail_io *io, const struct sail_save_options *save_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_save_init_v8_xbm(struct sail_io *io, const struct sail_save_options *save_options, void **state) {
 
     (void)io;
     (void)save_options;
@@ -261,28 +262,25 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v7_xbm(struct sail_io *io, const 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v7_xbm(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_xbm(void *state, const struct sail_image *image) {
 
     (void)state;
-    (void)io;
     (void)image;
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-SAIL_EXPORT sail_status_t sail_codec_save_frame_v7_xbm(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_xbm(void *state, const struct sail_image *image) {
 
     (void)state;
-    (void)io;
     (void)image;
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-SAIL_EXPORT sail_status_t sail_codec_save_finish_v7_xbm(void **state, struct sail_io *io) {
+SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_xbm(void **state) {
 
     (void)state;
-    (void)io;
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }

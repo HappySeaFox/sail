@@ -39,6 +39,6 @@ SAIL_EXPORT const char * const sail_enabled_codecs_info[] = {
 
 @SAIL_ENABLED_CODECS_DECLARE_FUNCTIONS@
 
-SAIL_EXPORT struct sail_codec_layout_v7 const sail_enabled_codecs_layouts[] = {
+SAIL_EXPORT struct sail_codec_layout_v8 const sail_enabled_codecs_layouts[] = {
     @SAIL_ENABLED_CODECS_LAYOUTS@
 };

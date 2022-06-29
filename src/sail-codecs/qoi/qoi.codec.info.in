@@ -1,7 +1,7 @@
 # QOI codec information
 #
 [codec]
-layout=7
+layout=8
 version=0.9.0
 priority=LOW
 name=QOI
