@@ -42,6 +42,7 @@
  * Codec-specific state.
  */
 struct ico_state {
+    struct sail_io *io;
     struct sail_load_options *load_options;
     struct sail_save_options *save_options;
 
@@ -58,6 +59,7 @@ static sail_status_t alloc_ico_state(struct ico_state **ico_state) {
     SAIL_TRY(sail_malloc(sizeof(struct ico_state), &ptr));
     *ico_state = ptr;
 
+    (*ico_state)->io           = NULL;
     (*ico_state)->load_options = NULL;
     (*ico_state)->save_options = NULL;
 
@@ -86,7 +88,7 @@ static void destroy_ico_state(struct ico_state *ico_state) {
  * Decoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_load_init_v7_ico(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_load_init_v8_ico(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
 
     *state = NULL;
 
@@ -95,10 +97,13 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v7_ico(struct sail_io *io, const 
     SAIL_TRY(alloc_ico_state(&ico_state));
     *state = ico_state;
 
+    /* Save I/O for further operations. */
+    ico_state->io = io;
+
     /* Deep copy load options. */
     SAIL_TRY(sail_copy_load_options(load_options, &ico_state->load_options));
 
-    SAIL_TRY(ico_private_read_header(io, &ico_state->ico_header));
+    SAIL_TRY(ico_private_read_header(ico_state->io, &ico_state->ico_header));
 
     if (ico_state->ico_header.images_count == 0) {
         SAIL_LOG_ERROR("ICO: No images found");
@@ -120,13 +125,13 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v7_ico(struct sail_io *io, const 
     ico_state->ico_dir_entries = ptr;
 
     for (unsigned i = 0; i < ico_state->ico_header.images_count; i++) {
-        SAIL_TRY(ico_private_read_dir_entry(io, &ico_state->ico_dir_entries[i]));
+        SAIL_TRY(ico_private_read_dir_entry(ico_state->io, &ico_state->ico_dir_entries[i]));
     }
 
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v7_ico(void *state, struct sail_io *io, struct sail_image **image) {
+SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_ico(void *state, struct sail_image **image) {
 
     struct ico_state *ico_state = (struct ico_state *)state;
 
@@ -138,17 +143,17 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v7_ico(void *state, st
             SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
         }
 
-        SAIL_TRY(io->seek(io->stream, (long)ico_state->ico_dir_entries[ico_state->current_frame++].image_offset, SEEK_SET));
+        SAIL_TRY(ico_state->io->seek(ico_state->io->stream, (long)ico_state->ico_dir_entries[ico_state->current_frame++].image_offset, SEEK_SET));
 
         /* Check the image is not PNG. */
-        SAIL_TRY(ico_private_probe_image_type(io, &ico_image_type));
+        SAIL_TRY(ico_private_probe_image_type(ico_state->io, &ico_image_type));
     } while (ico_image_type != SAIL_ICO_IMAGE_BMP);
 
     /* Continue to loading BMP. */
     struct sail_image *image_local;
 
-    SAIL_TRY(bmp_private_read_init(io, ico_state->load_options, &ico_state->common_bmp_state, SAIL_NO_BMP_FLAGS));
-    SAIL_TRY(bmp_private_read_seek_next_frame(ico_state->common_bmp_state, io, &image_local));
+    SAIL_TRY(bmp_private_read_init(ico_state->io, ico_state->load_options, &ico_state->common_bmp_state, SAIL_NO_BMP_FLAGS));
+    SAIL_TRY(bmp_private_read_seek_next_frame(ico_state->common_bmp_state, ico_state->io, &image_local));
 
     /* Store CUR hotspot. */
     if (ico_state->ico_header.type == SAIL_ICO_TYPE_CUR) {
@@ -175,24 +180,24 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v7_ico(void *state, st
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_load_frame_v7_ico(void *state, struct sail_io *io, struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_ico(void *state, struct sail_image *image) {
 
     struct ico_state *ico_state = (struct ico_state *)state;
 
-    SAIL_TRY(bmp_private_read_frame(ico_state->common_bmp_state, io, image));
-    SAIL_TRY(bmp_private_read_finish(&ico_state->common_bmp_state, io));
+    SAIL_TRY(bmp_private_read_frame(ico_state->common_bmp_state, ico_state->io, image));
+    SAIL_TRY(bmp_private_read_finish(&ico_state->common_bmp_state, ico_state->io));
 
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_load_finish_v7_ico(void **state, struct sail_io *io) {
+SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_ico(void **state) {
 
     struct ico_state *ico_state = (struct ico_state *)(*state);
 
     *state = NULL;
 
     if (ico_state->common_bmp_state != NULL) {
-        SAIL_TRY_OR_CLEANUP(bmp_private_read_finish(&ico_state->common_bmp_state, io),
+        SAIL_TRY_OR_CLEANUP(bmp_private_read_finish(&ico_state->common_bmp_state, ico_state->io),
                             /* cleanup */ destroy_ico_state(ico_state));
     }
 
@@ -205,7 +210,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_finish_v7_ico(void **state, struct sai
  * Encoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_save_init_v7_ico(struct sail_io *io, const struct sail_save_options *save_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_save_init_v8_ico(struct sail_io *io, const struct sail_save_options *save_options, void **state) {
 
     (void)io;
     (void)save_options;
@@ -214,28 +219,25 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v7_ico(struct sail_io *io, const 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v7_ico(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_ico(void *state, const struct sail_image *image) {
 
     (void)state;
-    (void)io;
     (void)image;
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-SAIL_EXPORT sail_status_t sail_codec_save_frame_v7_ico(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_ico(void *state, const struct sail_image *image) {
 
     (void)state;
-    (void)io;
     (void)image;
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-SAIL_EXPORT sail_status_t sail_codec_save_finish_v7_ico(void **state, struct sail_io *io) {
+SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_ico(void **state) {
 
     (void)state;
-    (void)io;
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }

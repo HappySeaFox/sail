@@ -37,6 +37,7 @@
  * Codec-specific state.
  */
 struct qoi_state {
+    struct sail_io *io;
     struct sail_load_options *load_options;
     struct sail_save_options *save_options;
 
@@ -56,6 +57,7 @@ static sail_status_t alloc_qoi_state(struct qoi_state **qoi_state) {
     SAIL_TRY(sail_malloc(sizeof(struct qoi_state), &ptr));
     *qoi_state = ptr;
 
+    (*qoi_state)->io           = NULL;
     (*qoi_state)->load_options = NULL;
     (*qoi_state)->save_options = NULL;
 
@@ -88,7 +90,7 @@ static void destroy_qoi_state(struct qoi_state *qoi_state) {
  * Decoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_load_init_v7_qoi(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_load_init_v8_qoi(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
 
     *state = NULL;
 
@@ -106,9 +108,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v7_qoi(struct sail_io *io, const 
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v7_qoi(void *state, struct sail_io *io, struct sail_image **image) {
-
-    (void)io;
+SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_qoi(void *state, struct sail_image **image) {
 
     struct qoi_state *qoi_state = (struct qoi_state *)state;
 
@@ -161,9 +161,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v7_qoi(void *state, st
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_load_frame_v7_qoi(void *state, struct sail_io *io, struct sail_image *image) {
-
-    (void)io;
+SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_qoi(void *state, struct sail_image *image) {
 
     const struct qoi_state *qoi_state = (struct qoi_state *)state;
 
@@ -174,9 +172,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v7_qoi(void *state, struct sail_
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_load_finish_v7_qoi(void **state, struct sail_io *io) {
-
-    (void)io;
+SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_qoi(void **state) {
 
     struct qoi_state *qoi_state = (struct qoi_state *)(*state);
 
@@ -191,9 +187,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_finish_v7_qoi(void **state, struct sai
  * Encoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_save_init_v7_qoi(struct sail_io *io, const struct sail_save_options *save_options, void **state) {
-
-    (void)io;
+SAIL_EXPORT sail_status_t sail_codec_save_init_v8_qoi(struct sail_io *io, const struct sail_save_options *save_options, void **state) {
 
     *state = NULL;
 
@@ -201,6 +195,9 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v7_qoi(struct sail_io *io, const 
     SAIL_TRY(alloc_qoi_state(&qoi_state));
 
     *state = qoi_state;
+
+    /* Save I/O for further operations. */
+    qoi_state->io = io;
 
     /* Deep copy save options. */
     SAIL_TRY(sail_copy_save_options(save_options, &qoi_state->save_options));
@@ -214,9 +211,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v7_qoi(struct sail_io *io, const 
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v7_qoi(void *state, struct sail_io *io, const struct sail_image *image) {
-
-    (void)io;
+SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_qoi(void *state, const struct sail_image *image) {
 
     struct qoi_state *qoi_state = (struct qoi_state *)state;
 
@@ -247,20 +242,18 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v7_qoi(void *state, st
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_save_frame_v7_qoi(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_qoi(void *state, const struct sail_image *image) {
 
     struct qoi_state *qoi_state = (struct qoi_state *)state;
 
     const size_t pixels_size = (size_t)image->bytes_per_line * image->height;
 
-    SAIL_TRY(io->strict_write(io->stream, qoi_state->pixels, pixels_size));
+    SAIL_TRY(qoi_state->io->strict_write(qoi_state->io->stream, qoi_state->pixels, pixels_size));
 
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_save_finish_v7_qoi(void **state, struct sail_io *io) {
-
-    (void)io;
+SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_qoi(void **state) {
 
     struct qoi_state *qoi_state = (struct qoi_state *)(*state);
 

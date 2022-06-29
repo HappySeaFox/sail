@@ -53,7 +53,7 @@ static sail_status_t alloc_codec(struct sail_codec **codec) {
 
     (*codec)->layout = 0;
     (*codec)->handle = NULL;
-    (*codec)->v7     = NULL;
+    (*codec)->v8     = NULL;
 
     return SAIL_OK;
 }
@@ -64,14 +64,14 @@ static sail_status_t load_combined_codec(const struct sail_codec_info *codec_inf
 #ifdef SAIL_STATIC
     /* For example: [ "gif", "jpeg", "png" ]. */
     extern const char * const sail_enabled_codecs[];
-    extern struct sail_codec_layout_v7 const sail_enabled_codecs_layouts[];
+    extern struct sail_codec_layout_v8 const sail_enabled_codecs_layouts[];
 #else
     SAIL_IMPORT extern const char * const sail_enabled_codecs[];
-    SAIL_IMPORT extern struct sail_codec_layout_v7 const sail_enabled_codecs_layouts[];
+    SAIL_IMPORT extern struct sail_codec_layout_v8 const sail_enabled_codecs_layouts[];
 #endif
     for (size_t i = 0; sail_enabled_codecs[i] != NULL; i++) {
         if (strcmp(sail_enabled_codecs[i], codec_info->name) == 0) {
-            *codec->v7 = sail_enabled_codecs_layouts[i];
+            *codec->v8 = sail_enabled_codecs_layouts[i];
             return SAIL_OK;
         }
     }
@@ -132,15 +132,15 @@ static sail_status_t load_codec_from_file(const struct sail_codec_info *codec_in
         sail_free(full_symbol_name);                                               \
     } do{} while(0)
 
-    SAIL_RESOLVE(codec->v7->load_init,            handle, sail_codec_load_init_v7,            codec_info->name);
-    SAIL_RESOLVE(codec->v7->load_seek_next_frame, handle, sail_codec_load_seek_next_frame_v7, codec_info->name);
-    SAIL_RESOLVE(codec->v7->load_frame,           handle, sail_codec_load_frame_v7,           codec_info->name);
-    SAIL_RESOLVE(codec->v7->load_finish,          handle, sail_codec_load_finish_v7,          codec_info->name);
+    SAIL_RESOLVE(codec->v8->load_init,            handle, sail_codec_load_init_v8,            codec_info->name);
+    SAIL_RESOLVE(codec->v8->load_seek_next_frame, handle, sail_codec_load_seek_next_frame_v8, codec_info->name);
+    SAIL_RESOLVE(codec->v8->load_frame,           handle, sail_codec_load_frame_v8,           codec_info->name);
+    SAIL_RESOLVE(codec->v8->load_finish,          handle, sail_codec_load_finish_v8,          codec_info->name);
 
-    SAIL_RESOLVE(codec->v7->save_init,            handle, sail_codec_save_init_v7,            codec_info->name);
-    SAIL_RESOLVE(codec->v7->save_seek_next_frame, handle, sail_codec_save_seek_next_frame_v7, codec_info->name);
-    SAIL_RESOLVE(codec->v7->save_frame,           handle, sail_codec_save_frame_v7,           codec_info->name);
-    SAIL_RESOLVE(codec->v7->save_finish,          handle, sail_codec_save_finish_v7,          codec_info->name);
+    SAIL_RESOLVE(codec->v8->save_init,            handle, sail_codec_save_init_v8,            codec_info->name);
+    SAIL_RESOLVE(codec->v8->save_seek_next_frame, handle, sail_codec_save_seek_next_frame_v8, codec_info->name);
+    SAIL_RESOLVE(codec->v8->save_frame,           handle, sail_codec_save_frame_v8,           codec_info->name);
+    SAIL_RESOLVE(codec->v8->save_finish,          handle, sail_codec_save_finish_v8,          codec_info->name);
 
     return SAIL_OK;
 }
@@ -154,8 +154,8 @@ sail_status_t alloc_and_load_codec(const struct sail_codec_info *codec_info, str
     SAIL_CHECK_PTR(codec_info);
     SAIL_CHECK_PTR(codec);
 
-    if (codec_info->layout != SAIL_CODEC_LAYOUT_V7) {
-        SAIL_LOG_ERROR("Failed to load %s codec with unsupported layout V%d (expected V%d)", codec_info->name, codec_info->layout, SAIL_CODEC_LAYOUT_V7);
+    if (codec_info->layout != SAIL_CODEC_LAYOUT_V8) {
+        SAIL_LOG_ERROR("Failed to load %s codec with unsupported layout V%d (expected V%d)", codec_info->name, codec_info->layout, SAIL_CODEC_LAYOUT_V8);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_CODEC_LAYOUT);
     }
 
@@ -185,9 +185,9 @@ sail_status_t alloc_and_load_codec(const struct sail_codec_info *codec_info, str
     }
 
     void *ptr;
-    SAIL_TRY_OR_CLEANUP(sail_malloc(sizeof(struct sail_codec_layout_v7), &ptr),
+    SAIL_TRY_OR_CLEANUP(sail_malloc(sizeof(struct sail_codec_layout_v8), &ptr),
                         /* cleanup */ destroy_codec(codec_local));
-    codec_local->v7 = ptr;
+    codec_local->v8 = ptr;
 
 #ifdef SAIL_COMBINE_CODECS
     if (fetch_combined_codec) {
@@ -221,6 +221,6 @@ void destroy_codec(struct sail_codec *codec) {
 #endif
     }
 
-    sail_free(codec->v7);
+    sail_free(codec->v8);
     sail_free(codec);
 }

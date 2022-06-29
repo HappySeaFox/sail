@@ -44,6 +44,7 @@ static const uint8_t SAIL_PCX_RLE_COUNT_MASK = 0x3F;
  * Codec-specific state.
  */
 struct pcx_state {
+    struct sail_io *io;
     struct sail_load_options *load_options;
     struct sail_save_options *save_options;
 
@@ -59,6 +60,7 @@ static sail_status_t alloc_pcx_state(struct pcx_state **pcx_state) {
     SAIL_TRY(sail_malloc(sizeof(struct pcx_state), &ptr));
     *pcx_state = ptr;
 
+    (*pcx_state)->io           = NULL;
     (*pcx_state)->load_options = NULL;
     (*pcx_state)->save_options = NULL;
 
@@ -86,7 +88,7 @@ static void destroy_pcx_state(struct pcx_state *pcx_state) {
  * Decoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_load_init_v7_pcx(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_load_init_v8_pcx(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
 
     *state = NULL;
 
@@ -95,11 +97,14 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v7_pcx(struct sail_io *io, const 
     SAIL_TRY(alloc_pcx_state(&pcx_state));
     *state = pcx_state;
 
+    /* Save I/O for further operations. */
+    pcx_state->io = io;
+
     /* Deep copy load options. */
     SAIL_TRY(sail_copy_load_options(load_options, &pcx_state->load_options));
 
     /* Read PCX header. */
-    SAIL_TRY(pcx_private_read_header(io, &pcx_state->pcx_header));
+    SAIL_TRY(pcx_private_read_header(pcx_state->io, &pcx_state->pcx_header));
 
     if (pcx_state->pcx_header.id != SAIL_PCX_SIGNATURE) {
         SAIL_LOG_ERROR("PCX: ID is %u, but must be %u", pcx_state->pcx_header.id, SAIL_PCX_SIGNATURE);
@@ -117,7 +122,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v7_pcx(struct sail_io *io, const 
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v7_pcx(void *state, struct sail_io *io, struct sail_image **image) {
+SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_pcx(void *state, struct sail_image **image) {
 
     struct pcx_state *pcx_state = (struct pcx_state *)state;
 
@@ -153,7 +158,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v7_pcx(void *state, st
     pcx_state->scanline_buffer = ptr;
 
     /* Build palette if needed. */
-    SAIL_TRY_OR_CLEANUP(pcx_private_build_palette(image_local->pixel_format, io, pcx_state->pcx_header.palette, &image_local->palette),
+    SAIL_TRY_OR_CLEANUP(pcx_private_build_palette(image_local->pixel_format, pcx_state->io, pcx_state->pcx_header.palette, &image_local->palette),
                         /* cleanup */ sail_destroy_image(image_local));
 
     if (pcx_state->pcx_header.hdpi > 0 && pcx_state->pcx_header.vdpi > 0) {
@@ -169,12 +174,12 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v7_pcx(void *state, st
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_load_frame_v7_pcx(void *state, struct sail_io *io, struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_pcx(void *state, struct sail_image *image) {
 
     const struct pcx_state *pcx_state = (struct pcx_state *)state;
 
     if (pcx_state->pcx_header.encoding == SAIL_PCX_NO_ENCODING) {
-        SAIL_TRY(pcx_private_read_uncompressed(io, pcx_state->pcx_header.bytes_per_line, pcx_state->pcx_header.planes, pcx_state->scanline_buffer, image));
+        SAIL_TRY(pcx_private_read_uncompressed(pcx_state->io, pcx_state->pcx_header.bytes_per_line, pcx_state->pcx_header.planes, pcx_state->scanline_buffer, image));
     } else {
         for (unsigned row = 0; row < image->height; row++) {
             unsigned buffer_offset = 0;
@@ -182,7 +187,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v7_pcx(void *state, struct sail_
             /* Decode all planes of a single scan line. */
             for (unsigned bytes = 0; bytes < image->bytes_per_line;) {
                 uint8_t marker;
-                SAIL_TRY(io->strict_read(io->stream, &marker, sizeof(marker)));
+                SAIL_TRY(pcx_state->io->strict_read(pcx_state->io->stream, &marker, sizeof(marker)));
 
                 uint8_t count;
                 uint8_t value;
@@ -190,7 +195,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v7_pcx(void *state, struct sail_
                 /* RLE marker set. */
                 if ((marker & SAIL_PCX_RLE_MARKER) == SAIL_PCX_RLE_MARKER) {
                     count = marker & SAIL_PCX_RLE_COUNT_MASK;
-                    SAIL_TRY(io->strict_read(io->stream, &value, sizeof(value)));
+                    SAIL_TRY(pcx_state->io->strict_read(pcx_state->io->stream, &value, sizeof(value)));
                 } else {
                     /* Pixel value. */
                     count = 1;
@@ -219,9 +224,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v7_pcx(void *state, struct sail_
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_load_finish_v7_pcx(void **state, struct sail_io *io) {
-
-    (void)io;
+SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_pcx(void **state) {
 
     struct pcx_state *pcx_state = (struct pcx_state *)(*state);
 
@@ -236,7 +239,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_finish_v7_pcx(void **state, struct sai
  * Encoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_save_init_v7_pcx(struct sail_io *io, const struct sail_save_options *save_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_save_init_v8_pcx(struct sail_io *io, const struct sail_save_options *save_options, void **state) {
 
     (void)io;
     (void)save_options;
@@ -245,28 +248,25 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v7_pcx(struct sail_io *io, const 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v7_pcx(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_pcx(void *state, const struct sail_image *image) {
 
     (void)state;
-    (void)io;
     (void)image;
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-SAIL_EXPORT sail_status_t sail_codec_save_frame_v7_pcx(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_pcx(void *state, const struct sail_image *image) {
 
     (void)state;
-    (void)io;
     (void)image;
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-SAIL_EXPORT sail_status_t sail_codec_save_finish_v7_pcx(void **state, struct sail_io *io) {
+SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_pcx(void **state) {
 
     (void)state;
-    (void)io;
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }

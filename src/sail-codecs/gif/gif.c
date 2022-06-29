@@ -43,6 +43,7 @@ static const int InterlacedJumps[]  = { 8, 8, 4, 2 };
  * Codec-specific state.
  */
 struct gif_state {
+    struct sail_io *io;
     struct sail_load_options *load_options;
     struct sail_save_options *save_options;
 
@@ -72,6 +73,7 @@ static sail_status_t alloc_gif_state(struct gif_state **gif_state) {
     SAIL_TRY(sail_malloc(sizeof(struct gif_state), &ptr));
     *gif_state = ptr;
 
+    (*gif_state)->io           = NULL;
     (*gif_state)->load_options = NULL;
     (*gif_state)->save_options = NULL;
 
@@ -121,7 +123,7 @@ static void destroy_gif_state(struct gif_state *gif_state) {
  * Decoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_load_init_v7_gif(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_load_init_v8_gif(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
 
     *state = NULL;
 
@@ -130,12 +132,15 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v7_gif(struct sail_io *io, const 
     SAIL_TRY(alloc_gif_state(&gif_state));
     *state = gif_state;
 
+    /* Save I/O for further operations. */
+    gif_state->io = io;
+
     /* Deep copy load options. */
     SAIL_TRY(sail_copy_load_options(load_options, &gif_state->load_options));
 
     /* Initialize GIF. */
     int error_code;
-    gif_state->gif = DGifOpen(io, my_read_proc, &error_code);
+    gif_state->gif = DGifOpen(gif_state->io, my_read_proc, &error_code);
 
     if (gif_state->gif == NULL) {
         SAIL_LOG_ERROR("GIF: Failed to initialize. GIFLIB error code: %d", error_code);
@@ -170,9 +175,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v7_gif(struct sail_io *io, const 
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v7_gif(void *state, struct sail_io *io, struct sail_image **image) {
-
-    (void)io;
+SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_gif(void *state, struct sail_image **image) {
 
     struct gif_state *gif_state = (struct gif_state *)state;
 
@@ -331,9 +334,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v7_gif(void *state, st
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_load_frame_v7_gif(void *state, struct sail_io *io, struct sail_image *image) {
-
-    (void)io;
+SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_gif(void *state, struct sail_image *image) {
 
     struct gif_state *gif_state = (struct gif_state *)state;
 
@@ -424,9 +425,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v7_gif(void *state, struct sail_
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_load_finish_v7_gif(void **state, struct sail_io *io) {
-
-    (void)io;
+SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_gif(void **state) {
 
     struct gif_state *gif_state = (struct gif_state *)(*state);
 
@@ -445,7 +444,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_finish_v7_gif(void **state, struct sai
  * Encoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_save_init_v7_gif(struct sail_io *io, const struct sail_save_options *save_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_save_init_v8_gif(struct sail_io *io, const struct sail_save_options *save_options, void **state) {
 
     (void)io;
     (void)save_options;
@@ -454,28 +453,25 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v7_gif(struct sail_io *io, const 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v7_gif(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_gif(void *state, const struct sail_image *image) {
 
     (void)state;
-    (void)io;
     (void)image;
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-SAIL_EXPORT sail_status_t sail_codec_save_frame_v7_gif(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_gif(void *state, const struct sail_image *image) {
 
     (void)state;
-    (void)io;
     (void)image;
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-SAIL_EXPORT sail_status_t sail_codec_save_finish_v7_gif(void **state, struct sail_io *io) {
+SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_gif(void **state) {
 
     (void)state;
-    (void)io;
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }

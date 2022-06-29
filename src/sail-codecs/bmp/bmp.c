@@ -33,6 +33,7 @@
  * Codec-specific state.
  */
 struct bmp_state {
+    struct sail_io *io;
     struct sail_load_options *load_options;
     struct sail_save_options *save_options;
 
@@ -46,6 +47,7 @@ static sail_status_t alloc_bmp_state(struct bmp_state **bmp_state) {
     SAIL_TRY(sail_malloc(sizeof(struct bmp_state), &ptr));
     *bmp_state = ptr;
 
+    (*bmp_state)->io           = NULL;
     (*bmp_state)->load_options = NULL;
     (*bmp_state)->save_options = NULL;
 
@@ -71,7 +73,7 @@ static void destroy_bmp_state(struct bmp_state *bmp_state) {
  * Decoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_load_init_v7_bmp(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_load_init_v8_bmp(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
 
     *state = NULL;
 
@@ -79,6 +81,9 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v7_bmp(struct sail_io *io, const 
     struct bmp_state *bmp_state;
     SAIL_TRY(alloc_bmp_state(&bmp_state));
     *state = bmp_state;
+
+    /* Save I/O for further operations. */
+    bmp_state->io = io;
 
     /* Deep copy load options. */
     SAIL_TRY(sail_copy_load_options(load_options, &bmp_state->load_options));
@@ -88,7 +93,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v7_bmp(struct sail_io *io, const 
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v7_bmp(void *state, struct sail_io *io, struct sail_image **image) {
+SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_bmp(void *state, struct sail_image **image) {
 
     struct bmp_state *bmp_state = (struct bmp_state *)state;
 
@@ -98,28 +103,28 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v7_bmp(void *state, st
 
     bmp_state->frame_loaded = true;
 
-    SAIL_TRY(bmp_private_read_seek_next_frame(bmp_state->common_bmp_state, io, image));
+    SAIL_TRY(bmp_private_read_seek_next_frame(bmp_state->common_bmp_state, bmp_state->io, image));
 
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_load_frame_v7_bmp(void *state, struct sail_io *io, struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_bmp(void *state, struct sail_image *image) {
 
     struct bmp_state *bmp_state = (struct bmp_state *)state;
 
-    SAIL_TRY(bmp_private_read_frame(bmp_state->common_bmp_state, io, image));
+    SAIL_TRY(bmp_private_read_frame(bmp_state->common_bmp_state, bmp_state->io, image));
 
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_load_finish_v7_bmp(void **state, struct sail_io *io) {
+SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_bmp(void **state) {
 
     struct bmp_state *bmp_state = (struct bmp_state *)(*state);
 
     *state = NULL;
 
     if (bmp_state->common_bmp_state != NULL) {
-        SAIL_TRY_OR_CLEANUP(bmp_private_read_finish(&bmp_state->common_bmp_state, io),
+        SAIL_TRY_OR_CLEANUP(bmp_private_read_finish(&bmp_state->common_bmp_state, bmp_state->io),
                             /* cleanup */ destroy_bmp_state(bmp_state));
     }
 
@@ -132,7 +137,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_finish_v7_bmp(void **state, struct sai
  * Encoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_save_init_v7_bmp(struct sail_io *io, const struct sail_save_options *save_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_save_init_v8_bmp(struct sail_io *io, const struct sail_save_options *save_options, void **state) {
 
     (void)io;
     (void)save_options;
@@ -141,28 +146,25 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v7_bmp(struct sail_io *io, const 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v7_bmp(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_bmp(void *state, const struct sail_image *image) {
 
     (void)state;
-    (void)io;
     (void)image;
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-SAIL_EXPORT sail_status_t sail_codec_save_frame_v7_bmp(void *state, struct sail_io *io, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_bmp(void *state, const struct sail_image *image) {
 
     (void)state;
-    (void)io;
     (void)image;
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
 
-SAIL_EXPORT sail_status_t sail_codec_save_finish_v7_bmp(void **state, struct sail_io *io) {
+SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_bmp(void **state) {
 
     (void)state;
-    (void)io;
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
