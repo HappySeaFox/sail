@@ -46,19 +46,19 @@ add_library(sail
 
 # Build a list of public headers to install
 #
-set(PUBLIC_HEADERS "codec_bundle.h"
-                   "codec_bundle_node.h"
-                   "codec_info.h"
-                   "codec_priority.h"
-                   "context.h"
-                   "io_file.h"
-                   "io_memory.h"
-                   "io_noop.h"
-                   "sail.h"
-                   "sail_advanced.h"
-                   "sail_deep_diver.h"
-                   "sail_junior.h"
-                   "sail_technical_diver.h")
+set(PUBLIC_HEADERS codec_bundle.h
+                   codec_bundle_node.h
+                   codec_info.h
+                   codec_priority.h
+                   context.h
+                   io_file.h
+                   io_memory.h
+                   io_noop.h
+                   sail.h
+                   sail_advanced.h
+                   sail_deep_diver.h
+                   sail_junior.h
+                   sail_technical_diver.h)
 
 set_target_properties(sail PROPERTIES
                            VERSION "0.8.0"
