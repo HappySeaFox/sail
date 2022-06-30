@@ -126,6 +126,11 @@ public:
     template<typename T>
     void set_value(const T &value);
 
+    /*
+     * Resets the variant to the invalid state and deletes the stored value.
+     */
+    void clear();
+
 private:
     sail_status_t to_sail_variant(sail_variant **variant) const;
 

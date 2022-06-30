@@ -238,6 +238,12 @@ variant::variant(const T &value)
     set_value(value);
 }
 
+void variant::clear()
+{
+    d->destroy_value();
+    d->type = SAIL_VARIANT_TYPE_INVALID;
+}
+
 // Allow only specific types. Other types will fail to link.
 //
 template SAIL_EXPORT variant::variant(const bool &);

@@ -31,13 +31,24 @@
 #include "munit.h"
 
 template<typename T>
-static MunitResult test_type(const T &value) {
+static MunitResult test_set_type(const T &value) {
 
-    const sail::variant variant(value);
+    {
+        const sail::variant variant(value);
 
-    munit_assert(variant.is_valid());
-    munit_assert(variant.has_value<T>());
-    munit_assert(variant.value<T>() == value);
+        munit_assert(variant.is_valid());
+        munit_assert(variant.has_value<T>());
+        munit_assert(variant.value<T>() == value);
+    }
+
+    {
+        sail::variant variant;
+        variant.set_value(value);
+
+        munit_assert(variant.is_valid());
+        munit_assert(variant.has_value<T>());
+        munit_assert(variant.value<T>() == value);
+    }
 
     return MUNIT_OK;
 }
@@ -45,11 +56,8 @@ static MunitResult test_type(const T &value) {
 template<typename T>
 static MunitResult test_equal(const T &value) {
 
-    sail::variant variant1;
-    variant1.set_value(value);
-
-    sail::variant variant2;
-    variant2.set_value(value);
+    const sail::variant variant1(value);
+    const sail::variant variant2(value);
 
     munit_assert(std::equal_to<sail::variant>()(variant1, variant2));
     munit_assert(std::equal_to<sail::variant>()(variant2, variant1));
@@ -60,14 +68,52 @@ static MunitResult test_equal(const T &value) {
 template<typename T1, typename T2>
 static MunitResult test_not_equal(const T1 &value1, const T2 &value2) {
 
-    sail::variant variant1;
-    variant1.set_value(value1);
-
-    sail::variant variant2;
-    variant2.set_value(value2);
+    const sail::variant variant1(value1);
+    const sail::variant variant2(value2);
 
     munit_assert(std::not_equal_to<sail::variant>()(variant1, variant2));
     munit_assert(std::not_equal_to<sail::variant>()(variant2, variant1));
+
+    return MUNIT_OK;
+}
+
+template<typename T>
+static MunitResult test_clear_type(const T &value) {
+
+    sail::variant variant(value);
+    variant.clear();
+
+    munit_assert(!variant.is_valid());
+    munit_assert(!variant.has_value<T>());
+
+    return MUNIT_OK;
+}
+
+static MunitResult test_set_value(const MunitParameter params[], void *user_data) {
+
+    (void)params;
+    (void)user_data;
+
+    test_set_type<bool>(true);
+
+    test_set_type<char>('a');
+    test_set_type<unsigned char>('a');
+
+    test_set_type<short>(-5);
+    test_set_type<unsigned short>(5566);
+
+    test_set_type<int>(-500);
+    test_set_type<unsigned int>(0xFFFF5);
+
+    test_set_type<long>(-500);
+    test_set_type<unsigned long>(0xFFFF5);
+
+    test_set_type<float>(-5.0f);
+    test_set_type<double>(120.0);
+
+    test_set_type<std::string>("abc");
+    const sail::arbitrary_data arbitrary_data(/* size */ 500, /* value */ 121);
+    test_set_type<sail::arbitrary_data>(arbitrary_data);
 
     return MUNIT_OK;
 }
@@ -87,35 +133,6 @@ static MunitResult test_move(const MunitParameter params[], void *user_data) {
     munit_assert(variant2.is_valid());
     munit_assert(variant2.has_value<short>());
     munit_assert(variant2.value<short>() == reference_value);
-
-    return MUNIT_OK;
-}
-
-static MunitResult test_set_value(const MunitParameter params[], void *user_data) {
-
-    (void)params;
-    (void)user_data;
-
-    test_type<bool>(true);
-
-    test_type<char>('a');
-    test_type<unsigned char>('a');
-
-    test_type<short>(-5);
-    test_type<unsigned short>(5566);
-
-    test_type<int>(-500);
-    test_type<unsigned int>(0xFFFF5);
-
-    test_type<long>(-500);
-    test_type<unsigned long>(0xFFFF5);
-
-    test_type<float>(-5.0f);
-    test_type<double>(120.0);
-
-    test_type<std::string>("abc");
-    const sail::arbitrary_data arbitrary_data(/* size */ 500, /* value */ 121);
-    test_type<sail::arbitrary_data>(arbitrary_data);
 
     return MUNIT_OK;
 }
@@ -193,10 +210,40 @@ static MunitResult test_compare(const MunitParameter params[], void *user_data) 
     return MUNIT_OK;
 }
 
+static MunitResult test_clear(const MunitParameter params[], void *user_data) {
+
+    (void)params;
+    (void)user_data;
+
+    test_clear_type<bool>(true);
+
+    test_clear_type<char>('a');
+    test_clear_type<unsigned char>('a');
+
+    test_clear_type<short>(-5);
+    test_clear_type<unsigned short>(5566);
+
+    test_clear_type<int>(-500);
+    test_clear_type<unsigned int>(0xFFFF5);
+
+    test_clear_type<long>(-500);
+    test_clear_type<unsigned long>(0xFFFF5);
+
+    test_clear_type<float>(-5.0f);
+    test_clear_type<double>(120.0);
+
+    test_clear_type<std::string>("abc");
+    const sail::arbitrary_data arbitrary_data(/* size */ 500, /* value */ 121);
+    test_clear_type<sail::arbitrary_data>(arbitrary_data);
+
+    return MUNIT_OK;
+}
+
 static MunitTest test_suite_tests[] = {
-    { (char *)"/move",      test_move,      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/set-value", test_set_value, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/move",      test_move,      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/compare",   test_compare,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/clear",     test_clear,     NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };
