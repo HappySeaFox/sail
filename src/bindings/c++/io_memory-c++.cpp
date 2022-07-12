@@ -66,6 +66,16 @@ io_memory::io_memory(const void *buffer, std::size_t buffer_length)
 {
 }
 
+io_memory::io_memory(sail::arbitrary_data &arbitrary_data)
+    : io_memory(arbitrary_data.data(), arbitrary_data.size())
+{
+}
+
+io_memory::io_memory(const sail::arbitrary_data &arbitrary_data)
+    : io_memory(arbitrary_data.data(), arbitrary_data.size())
+{
+}
+
 io_memory::~io_memory()
 {
 }

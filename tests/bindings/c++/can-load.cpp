@@ -29,12 +29,128 @@
 
 #include "test-images.h"
 
-static MunitResult test_able_to_load(const MunitParameter params[], void *user_data) {
+static MunitResult test_can_load_path(const MunitParameter params[], void *user_data) {
+
     (void)user_data;
 
     const char *path = munit_parameters_get(params, "path");
 
     const sail::image image(path);
+    munit_assert(image.is_valid());
+
+    return MUNIT_OK;
+}
+
+static MunitResult test_can_load_memory1(const MunitParameter params[], void *user_data) {
+
+    (void)user_data;
+
+    const char *path = munit_parameters_get(params, "path");
+
+    void *data;
+    size_t data_size;
+    munit_assert(sail_file_contents_to_data(path, &data, &data_size) == SAIL_OK);
+
+    sail::image_input input;
+    sail::image image;
+
+    const sail::codec_info codec_info = sail::codec_info::from_path(path);
+    munit_assert(codec_info.is_valid());
+
+    munit_assert(input.start(data, data_size, codec_info) == SAIL_OK);
+    munit_assert(input.next_frame(&image)                 == SAIL_OK);
+    munit_assert(image.is_valid());
+
+    sail_free(data);
+
+    return MUNIT_OK;
+}
+
+static MunitResult test_can_load_memory2(const MunitParameter params[], void *user_data) {
+
+    (void)user_data;
+
+    const char *path = munit_parameters_get(params, "path");
+
+    void *data;
+    size_t data_size;
+    munit_assert(sail_file_contents_to_data(path, &data, &data_size) == SAIL_OK);
+
+    const sail::arbitrary_data arbitrary_data(reinterpret_cast<std::uint8_t *>(data), reinterpret_cast<std::uint8_t *>(data) + data_size);
+
+    sail::image_input input;
+    sail::image image;
+
+    const sail::codec_info codec_info = sail::codec_info::from_path(path);
+    munit_assert(codec_info.is_valid());
+
+    munit_assert(input.start(arbitrary_data, codec_info) == SAIL_OK);
+    munit_assert(input.next_frame(&image)                == SAIL_OK);
+    munit_assert(image.is_valid());
+
+    sail_free(data);
+
+    return MUNIT_OK;
+}
+
+static MunitResult test_can_load_abstract_io_path(const MunitParameter params[], void *user_data) {
+
+    (void)user_data;
+
+    const char *path = munit_parameters_get(params, "path");
+
+    sail::image_input input;
+    sail::io_file io_file(path);
+    sail::image image;
+
+    munit_assert(input.start(io_file)     == SAIL_OK);
+    munit_assert(input.next_frame(&image) == SAIL_OK);
+    munit_assert(image.is_valid());
+
+    return MUNIT_OK;
+}
+
+static MunitResult test_can_load_abstract_io_memory1(const MunitParameter params[], void *user_data) {
+
+    (void)user_data;
+
+    const char *path = munit_parameters_get(params, "path");
+
+    sail::arbitrary_data arbitrary_data;
+    munit_assert(sail::read_file_contents(path, &arbitrary_data) == SAIL_OK);
+
+    const sail::codec_info codec_info = sail::codec_info::from_path(path);
+    munit_assert(codec_info.is_valid());
+
+    sail::image_input input;
+    sail::io_memory io_memory(arbitrary_data.data(), arbitrary_data.size());
+    sail::image image;
+
+    munit_assert(input.start(io_memory, codec_info) == SAIL_OK);
+    munit_assert(input.next_frame(&image)           == SAIL_OK);
+    munit_assert(image.is_valid());
+
+    return MUNIT_OK;
+}
+
+static MunitResult test_can_load_abstract_io_memory2(const MunitParameter params[], void *user_data) {
+
+    (void)user_data;
+
+    const char *path = munit_parameters_get(params, "path");
+
+    sail::arbitrary_data arbitrary_data;
+    munit_assert(sail::read_file_contents(path, &arbitrary_data) == SAIL_OK);
+
+    const sail::codec_info codec_info = sail::codec_info::from_path(path);
+    munit_assert(codec_info.is_valid());
+
+    sail::image_input input;
+    sail::io_memory io_memory(arbitrary_data);
+    sail::image image;
+
+    munit_assert(input.start(io_memory, codec_info) == SAIL_OK);
+    munit_assert(input.next_frame(&image)           == SAIL_OK);
     munit_assert(image.is_valid());
 
     return MUNIT_OK;
@@ -46,7 +162,12 @@ static MunitParameterEnum test_params[] = {
 };
 
 static MunitTest test_suite_tests[] = {
-    { (char *)"/can-load", test_able_to_load, NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
+    { (char *)"/can-load-path",                test_can_load_path,                NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
+    { (char *)"/can-load-memory1",             test_can_load_memory1,             NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
+    { (char *)"/can-load-memory2",             test_can_load_memory2,             NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
+    { (char *)"/can-load-abstract-io-path",    test_can_load_abstract_io_path,    NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
+    { (char *)"/can-load-abstract-io-memory1", test_can_load_abstract_io_memory1, NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
+    { (char *)"/can-load-abstract-io-memory2", test_can_load_abstract_io_memory2, NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };

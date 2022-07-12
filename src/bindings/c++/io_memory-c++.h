@@ -29,8 +29,10 @@
 #include <cstddef>
 
 #ifdef SAIL_BUILD
+    #include "arbitrary_data-c++.h"
     #include "io_base-c++.h"
 #else
+    #include <sail-c++/arbitrary_data-c++.h>
     #include <sail-c++/io_base-c++.h>
 #endif
 
@@ -52,6 +54,16 @@ public:
      * Opens the specified memory buffer for reading.
      */
     io_memory(const void *buffer, std::size_t buffer_length);
+
+    /*
+     * Opens the specified memory buffer for reading and writing.
+     */
+    io_memory(sail::arbitrary_data &arbitrary_data);
+
+    /*
+     * Opens the specified memory buffer for reading.
+     */
+    io_memory(const sail::arbitrary_data &arbitrary_data);
 
     /*
      * Destroys the memory I/O stream.
