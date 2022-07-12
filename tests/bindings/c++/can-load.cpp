@@ -156,6 +156,52 @@ static MunitResult test_can_load_abstract_io_memory2(const MunitParameter params
     return MUNIT_OK;
 }
 
+static MunitResult test_can_load_abstract_io_memory3(const MunitParameter params[], void *user_data) {
+
+    (void)user_data;
+
+    const char *path = munit_parameters_get(params, "path");
+
+    sail::arbitrary_data arbitrary_data;
+    munit_assert(sail::read_file_contents(path, &arbitrary_data) == SAIL_OK);
+
+    const sail::codec_info codec_info = sail::codec_info::from_path(path);
+    munit_assert(codec_info.is_valid());
+
+    sail::image_input input;
+    sail::io_memory io_memory(arbitrary_data.data(), arbitrary_data.size(), sail::io_memory::Operation::Read);
+    sail::image image;
+
+    munit_assert(input.start(io_memory, codec_info) == SAIL_OK);
+    munit_assert(input.next_frame(&image)           == SAIL_OK);
+    munit_assert(image.is_valid());
+
+    return MUNIT_OK;
+}
+
+static MunitResult test_can_load_abstract_io_memory4(const MunitParameter params[], void *user_data) {
+
+    (void)user_data;
+
+    const char *path = munit_parameters_get(params, "path");
+
+    sail::arbitrary_data arbitrary_data;
+    munit_assert(sail::read_file_contents(path, &arbitrary_data) == SAIL_OK);
+
+    const sail::codec_info codec_info = sail::codec_info::from_path(path);
+    munit_assert(codec_info.is_valid());
+
+    sail::image_input input;
+    sail::io_memory io_memory(arbitrary_data, sail::io_memory::Operation::Read);
+    sail::image image;
+
+    munit_assert(input.start(io_memory, codec_info) == SAIL_OK);
+    munit_assert(input.next_frame(&image)           == SAIL_OK);
+    munit_assert(image.is_valid());
+
+    return MUNIT_OK;
+}
+
 static MunitParameterEnum test_params[] = {
     { (char *)"path", (char **)SAIL_TEST_IMAGES },
     { NULL, NULL },
@@ -168,6 +214,8 @@ static MunitTest test_suite_tests[] = {
     { (char *)"/can-load-abstract-io-path",    test_can_load_abstract_io_path,    NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
     { (char *)"/can-load-abstract-io-memory1", test_can_load_abstract_io_memory1, NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
     { (char *)"/can-load-abstract-io-memory2", test_can_load_abstract_io_memory2, NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
+    { (char *)"/can-load-abstract-io-memory3", test_can_load_abstract_io_memory3, NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
+    { (char *)"/can-load-abstract-io-memory4", test_can_load_abstract_io_memory4, NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };

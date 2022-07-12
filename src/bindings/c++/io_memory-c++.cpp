@@ -66,6 +66,11 @@ io_memory::io_memory(const void *buffer, std::size_t buffer_length)
 {
 }
 
+io_memory::io_memory(void *buffer, std::size_t buffer_length, Operation operation)
+    : io_base(construct_sail_io(operation == Operation::Read ? const_cast<const void *>(buffer) : buffer, buffer_length))
+{
+}
+
 io_memory::io_memory(sail::arbitrary_data &arbitrary_data)
     : io_memory(arbitrary_data.data(), arbitrary_data.size())
 {
@@ -73,6 +78,12 @@ io_memory::io_memory(sail::arbitrary_data &arbitrary_data)
 
 io_memory::io_memory(const sail::arbitrary_data &arbitrary_data)
     : io_memory(arbitrary_data.data(), arbitrary_data.size())
+{
+}
+
+io_memory::io_memory(sail::arbitrary_data &arbitrary_data, Operation operation)
+    : io_memory(operation == Operation::Read ? const_cast<const sail::arbitrary_data &>(arbitrary_data).data() : arbitrary_data.data(),
+                arbitrary_data.size())
 {
 }
 

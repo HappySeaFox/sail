@@ -56,6 +56,11 @@ public:
     io_memory(const void *buffer, std::size_t buffer_length);
 
     /*
+     * Opens the specified memory buffer for the specified I/O operations.
+     */
+    io_memory(void *buffer, std::size_t buffer_length, Operation operation);
+
+    /*
      * Opens the specified memory buffer for reading and writing.
      */
     io_memory(sail::arbitrary_data &arbitrary_data);
@@ -64,6 +69,11 @@ public:
      * Opens the specified memory buffer for reading.
      */
     io_memory(const sail::arbitrary_data &arbitrary_data);
+
+    /*
+     * Opens the specified memory buffer for the specified I/O operations.
+     */
+    io_memory(sail::arbitrary_data &arbitrary_data, Operation operation);
 
     /*
      * Destroys the memory I/O stream.
