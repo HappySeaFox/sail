@@ -284,7 +284,7 @@ sail_status_t sail_alloc_io_read_write_memory(void *buffer, size_t length, struc
     SAIL_CHECK_PTR(buffer);
     SAIL_CHECK_PTR(io);
 
-    SAIL_LOG_DEBUG("Opening memory buffer of size %lu for writing", length);
+    SAIL_LOG_DEBUG("Opening memory buffer of size %lu for reading/writing", length);
 
     struct sail_io *io_local;
     SAIL_TRY(sail_alloc_io(&io_local));
@@ -295,7 +295,7 @@ sail_status_t sail_alloc_io_read_write_memory(void *buffer, size_t length, struc
     struct mem_io_write_stream *mem_io_write_stream = ptr;
 
     mem_io_write_stream->mem_io_buffer_info.length            = length;
-    mem_io_write_stream->mem_io_buffer_info.accessible_length = 0;
+    mem_io_write_stream->mem_io_buffer_info.accessible_length = length;
     mem_io_write_stream->mem_io_buffer_info.pos               = 0;
     mem_io_write_stream->buffer                               = buffer;
 
