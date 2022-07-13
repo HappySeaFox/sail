@@ -151,7 +151,7 @@ public:
      * Finds and returns a first codec info object that can theoretically read the underlying
      * I/O stream into a valid image.
      *
-     * Returns an invalid codec info object if no suitable codecs was found.
+     * Returns an invalid codec info object if no suitable codec was found.
      */
     virtual sail::codec_info codec_info() = 0;
 };

@@ -151,7 +151,7 @@ public:
 
     /*
      * Returns a first codec info object that supports the magic number read from the specified file.
-     * Returns an invalid codec info object if no suitable codecs were found.
+     * Returns an invalid codec info object if no suitable codec was found.
      * The comparison algorithm is case insensitive.
      *
      * Typical usage: codec_info::from_magic_number() ->
@@ -163,7 +163,7 @@ public:
 
     /*
      * Returns a first codec info object that supports the magic number read from the specified memory buffer.
-     * Returns an invalid codec info object if no suitable codecs were found.
+     * Returns an invalid codec info object if no suitable codec was found.
      * The comparison algorithm is case insensitive.
      *
      * Typical usage: codec_info::from_magic_number() ->
@@ -175,7 +175,7 @@ public:
 
     /*
      * Returns a first codec info object that supports the magic number read from the specified I/O source.
-     * Returns an invalid codec info object if no suitable codecs were found.
+     * Returns an invalid codec info object if no suitable codec was found.
      * The comparison algorithm is case insensitive.
      *
      * Typical usage: codec_info::from_magic_number() ->
@@ -187,7 +187,7 @@ public:
 
     /*
      * Returns a first codec info object that supports loading or saving the specified file path by its file extension.
-     * Returns an invalid codec info object if no suitable codecs were found.
+     * Returns an invalid codec info object if no suitable codec was found.
      * The comparison algorithm is case insensitive. For example: "/test.jpg". The path might not exist.
      *
      * Typical usage: codec_info::from_path()   ->
@@ -204,7 +204,7 @@ public:
 
     /*
      * Returns a first codec info object that supports the specified file extension.
-     * Returns an invalid codec info object if no suitable codecs were found.
+     * Returns an invalid codec info object if no suitable codec was found.
      * The comparison algorithm is case-insensitive. For example: "jpg".
      *
      * Typical usage: codec_info::from_extension() ->
@@ -221,7 +221,7 @@ public:
 
     /*
      * Returns a first codec info object that supports the specified mime type.
-     * Returns an invalid codec info object if no suitable codecs were found.
+     * Returns an invalid codec info object if no suitable codec was found.
      * The comparison algorithm is case-insensitive. For example: "image/jpeg".
      *
      * Typical usage: codec_info::from_mime_type() ->
