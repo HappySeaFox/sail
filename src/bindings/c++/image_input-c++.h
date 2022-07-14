@@ -58,12 +58,12 @@ class SAIL_EXPORT image_input
 {
 public:
     /*
-     * Constructs a new image reader.
+     * Constructs a new image input.
      */
     image_input();
 
     /*
-     * Stops loading if it was started and destroys the image reader.
+     * Stops loading if it was started and destroys the image input.
      */
     ~image_input();
 

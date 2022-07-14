@@ -57,12 +57,12 @@ class SAIL_EXPORT image_output
 {
 public:
     /*
-     * Constructs a new image writer.
+     * Constructs a new image output.
      */
     image_output();
 
     /*
-     * Stops saving if it was started and destroys the image writer.
+     * Stops saving if it was started and destroys the image output.
      */
     ~image_output();
 
