@@ -34,163 +34,121 @@ namespace sail
 class SAIL_HIDDEN image_output::pimpl
 {
 public:
-    pimpl()
-        : state(nullptr)
-        , written(0)
+    pimpl(sail::abstract_io *abstract_io_ext, const sail::codec_info &other_codec_info)
+        : abstract_io(abstract_io_ext)
+        , abstract_io_ref(*abstract_io)
+        , abstract_io_adapter(new sail::abstract_io_adapter(abstract_io_ref))
+        , state(nullptr)
+        , codec_info(other_codec_info)
+        , override_save_options(false)
     {
     }
 
-    sail_status_t start()
+    pimpl(sail::abstract_io &abstract_io_ext, const sail::codec_info &other_codec_info)
+        : abstract_io()
+        , abstract_io_ref(abstract_io_ext)
+        , abstract_io_adapter(new sail::abstract_io_adapter(abstract_io_ref))
+        , state(nullptr)
+        , codec_info(other_codec_info)
+        , override_save_options(false)
     {
-        SAIL_TRY(ensure_not_started());
-
-        written = 0;
-
-        return SAIL_OK;
     }
 
-    void *state;
-    std::unique_ptr<sail::abstract_io_adapter> abstract_io_adapter;
-    std::size_t written;
+    sail_status_t start();
 
 private:
-    sail_status_t ensure_not_started()
-    {
-        if (state != nullptr) {
-            SAIL_LOG_ERROR("Saving operation is in progress. Stop it before starting a new one");
-            return SAIL_ERROR_CONFLICTING_OPERATION;
-        }
+    const std::unique_ptr<sail::abstract_io> abstract_io;
+    sail::abstract_io &abstract_io_ref;
 
-        return SAIL_OK;
-    }
+public:
+    const std::unique_ptr<sail::abstract_io_adapter> abstract_io_adapter;
+    void *state;
+
+    sail::codec_info codec_info;
+    bool override_save_options;
+    sail::save_options save_options;
 };
 
-image_output::image_output()
-    : d(new pimpl)
+sail_status_t image_output::pimpl::start()
+{
+    const sail_codec_info *sail_codec_info = codec_info.sail_codec_info_c();
+
+    sail_save_options *sail_save_options = nullptr;
+
+    SAIL_AT_SCOPE_EXIT(
+        sail_destroy_save_options(sail_save_options);
+    );
+
+    if (override_save_options) {
+        SAIL_TRY(save_options.to_sail_save_options(&sail_save_options));
+    }
+
+    SAIL_TRY(sail_start_saving_into_io_with_options(&abstract_io_adapter->sail_io_c(), sail_codec_info, sail_save_options, &state));
+
+    return SAIL_OK;
+}
+
+image_output::image_output(const std::string &path)
+    : d(new pimpl(new io_file(path, io_file::Operation::ReadWrite), sail::codec_info::from_path(path)))
+{
+}
+
+image_output::image_output(void *buffer, std::size_t buffer_length, const sail::codec_info &codec_info)
+    : d(new pimpl(new io_memory(buffer, buffer_length), codec_info))
+{
+}
+
+image_output::image_output(sail::arbitrary_data *arbitrary_data, const sail::codec_info &codec_info)
+    : image_output(arbitrary_data->data(), arbitrary_data->size(), codec_info)
+{
+}
+
+image_output::image_output(sail::abstract_io &abstract_io, const sail::codec_info &codec_info)
+    : d(new pimpl(abstract_io, codec_info))
 {
 }
 
 image_output::~image_output()
 {
-    stop();
+    if (d) {
+        SAIL_TRY_OR_SUPPRESS(sail_stop_saving(d->state));
+    }
 }
 
-sail_status_t image_output::start(const std::string &path)
+image_output::image_output(image_output &&other)
 {
-    SAIL_TRY(d->start());
-
-    SAIL_TRY(sail_start_saving_into_file(path.c_str(), nullptr, &d->state));
-
-    return SAIL_OK;
+    *this = std::move(other);
 }
 
-sail_status_t image_output::start(const std::string &path, const sail::codec_info &codec_info)
+image_output& image_output::operator=(image_output &&other)
 {
-    SAIL_TRY(d->start());
+    d = std::move(other.d);
+    other.d = {};
 
-    SAIL_TRY(sail_start_saving_into_file(path.c_str(), codec_info.sail_codec_info_c(), &d->state));
-
-    return SAIL_OK;
+    return *this;
 }
 
-sail_status_t image_output::start(const std::string &path, const sail::save_options &save_options)
+image_output& image_output::with(const sail::codec_info &codec_info)
 {
-    SAIL_TRY(d->start());
+    d->codec_info = codec_info;
 
-    sail_save_options *sail_save_options;
-    SAIL_TRY(save_options.to_sail_save_options(&sail_save_options));
-
-    SAIL_TRY_OR_CLEANUP(sail_start_saving_into_file_with_options(path.c_str(), nullptr, sail_save_options, &d->state),
-                        /* cleanup */ sail_destroy_save_options(sail_save_options));
-
-    sail_destroy_save_options(sail_save_options);
-
-    return SAIL_OK;
+    return *this;
 }
 
-sail_status_t image_output::start(const std::string &path, const sail::codec_info &codec_info, const sail::save_options &save_options)
+image_output& image_output::with(const sail::save_options &save_options)
 {
-    SAIL_TRY(d->start());
+    d->override_save_options = true;
+    d->save_options          = save_options;
 
-    sail_save_options *sail_save_options;
-    SAIL_TRY(save_options.to_sail_save_options(&sail_save_options));
-
-    SAIL_TRY_OR_CLEANUP(sail_start_saving_into_file_with_options(path.c_str(), codec_info.sail_codec_info_c(), sail_save_options, &d->state),
-                        /* cleanup */ sail_destroy_save_options(sail_save_options));
-
-    sail_destroy_save_options(sail_save_options);
-
-    return SAIL_OK;
-}
-
-sail_status_t image_output::start(void *buffer, std::size_t buffer_length, const sail::codec_info &codec_info)
-{
-    SAIL_TRY(d->start());
-
-    SAIL_TRY(sail_start_saving_into_memory(buffer, buffer_length, codec_info.sail_codec_info_c(), &d->state));
-
-    return SAIL_OK;
-}
-
-sail_status_t image_output::start(void *buffer, std::size_t buffer_length, const sail::codec_info &codec_info, const sail::save_options &save_options)
-{
-    SAIL_TRY(d->start());
-
-    sail_save_options *sail_save_options;
-    SAIL_TRY(save_options.to_sail_save_options(&sail_save_options));
-
-    SAIL_TRY_OR_CLEANUP(sail_start_saving_into_memory_with_options(buffer, buffer_length, codec_info.sail_codec_info_c(), sail_save_options, &d->state),
-                        /* cleanup */ sail_destroy_save_options(sail_save_options));
-
-    sail_destroy_save_options(sail_save_options);
-
-    return SAIL_OK;
-}
-
-sail_status_t image_output::start(sail::arbitrary_data *arbitrary_data, const sail::codec_info &codec_info)
-{
-    SAIL_TRY(start(arbitrary_data->data(), arbitrary_data->size(), codec_info));
-
-    return SAIL_OK;
-}
-
-sail_status_t image_output::start(sail::arbitrary_data *arbitrary_data, const sail::codec_info &codec_info, const sail::save_options &save_options)
-{
-    SAIL_TRY(start(arbitrary_data->data(), arbitrary_data->size(), codec_info, save_options));
-
-    return SAIL_OK;
-}
-
-sail_status_t image_output::start(sail::abstract_io &abstract_io, const sail::codec_info &codec_info)
-{
-    SAIL_TRY(d->start());
-
-    d->abstract_io_adapter.reset(new sail::abstract_io_adapter(abstract_io));
-
-    SAIL_TRY(sail_start_saving_into_io_with_options(&d->abstract_io_adapter->sail_io_c(), codec_info.sail_codec_info_c(), nullptr, &d->state));
-
-    return SAIL_OK;
-}
-
-sail_status_t image_output::start(sail::abstract_io &abstract_io, const sail::codec_info &codec_info, const sail::save_options &save_options)
-{
-    SAIL_TRY(d->start());
-
-    d->abstract_io_adapter.reset(new sail::abstract_io_adapter(abstract_io));
-
-    sail_save_options *sail_save_options;
-    SAIL_TRY(save_options.to_sail_save_options(&sail_save_options));
-
-    SAIL_TRY_OR_CLEANUP(sail_start_saving_into_io_with_options(&d->abstract_io_adapter->sail_io_c(), codec_info.sail_codec_info_c(), sail_save_options, &d->state),
-                        /* cleanup */ sail_destroy_save_options(sail_save_options));
-
-    sail_destroy_save_options(sail_save_options);
-
-    return SAIL_OK;
+    return *this;
 }
 
 sail_status_t image_output::next_frame(const sail::image &image) const
 {
+    if (d->state == nullptr) {
+        SAIL_TRY(d->start());
+    }
+
     sail_image *sail_image = nullptr;
     SAIL_TRY(image.to_sail_image(&sail_image));
 
@@ -200,76 +158,6 @@ sail_status_t image_output::next_frame(const sail::image &image) const
     );
 
     SAIL_TRY(sail_write_next_frame(d->state, sail_image));
-
-    return SAIL_OK;
-}
-
-sail_status_t image_output::stop()
-{
-    sail_status_t saved_status = SAIL_OK;
-    SAIL_TRY_OR_EXECUTE(sail_stop_saving_with_written(d->state, &d->written),
-                        /* on error */ saved_status = __sail_error_result);
-
-    d->state = nullptr;
-    d->abstract_io_adapter.reset();
-
-    return saved_status;
-}
-
-std::size_t image_output::written() const
-{
-    return d->written;
-}
-
-sail_status_t image_output::save(const std::string &path, const sail::image &image)
-{
-    sail_image *sail_image = nullptr;
-    SAIL_TRY(image.to_sail_image(&sail_image));
-
-    SAIL_AT_SCOPE_EXIT(
-        sail_image->pixels = nullptr;
-        sail_destroy_image(sail_image);
-    );
-
-    SAIL_TRY(sail_save_into_file(path.c_str(), sail_image));
-
-    return SAIL_OK;
-}
-
-sail_status_t image_output::save(void *buffer, std::size_t buffer_length, const sail::image &image)
-{
-    SAIL_TRY(save(buffer, buffer_length, image, nullptr));
-
-    return SAIL_OK;
-}
-
-sail_status_t image_output::save(void *buffer, std::size_t buffer_length, const sail::image &image, std::size_t *written)
-{
-    SAIL_CHECK_PTR(buffer);
-
-    sail_image *sail_image = nullptr;
-    SAIL_TRY(image.to_sail_image(&sail_image));
-
-    SAIL_AT_SCOPE_EXIT(
-        sail_image->pixels = nullptr;
-        sail_destroy_image(sail_image);
-    );
-
-    SAIL_TRY(sail_save_into_memory(buffer, buffer_length, sail_image, written));
-
-    return SAIL_OK;
-}
-
-sail_status_t image_output::save(sail::arbitrary_data *arbitrary_data, const sail::image &image)
-{
-    SAIL_TRY(save(arbitrary_data->data(), arbitrary_data->size(), image));
-
-    return SAIL_OK;
-}
-
-sail_status_t image_output::save(sail::arbitrary_data *arbitrary_data, const sail::image &image, std::size_t *written)
-{
-    SAIL_TRY(save(arbitrary_data->data(), arbitrary_data->size(), image, written));
 
     return SAIL_OK;
 }

@@ -315,9 +315,9 @@ sail_status_t image::load(const std::string &path)
 
 sail_status_t image::save(const std::string &path)
 {
-    image_output output;
+    image_output output(path);
 
-    SAIL_TRY(output.save(path, *this));
+    SAIL_TRY(output.next_frame(*this));
 
     return SAIL_OK;
 }

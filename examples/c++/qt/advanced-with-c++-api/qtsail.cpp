@@ -135,7 +135,6 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
         SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_NOT_FOUND);
     }
 
-    sail::image_output image_output;
     sail::image image(const_cast<uchar *>(qimage.bits()), qImageFormatToSailPixelFormat(qimage.format()), qimage.width(), qimage.height(), qimage.bytesPerLine());
 
     // SAIL tries to save an image as is, preserving its pixel format.
@@ -158,10 +157,9 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
     //
     save_options.tuning()["png-filter"] = std::string("none;sub");
 
-    SAIL_TRY(image_output.start(path.toLocal8Bit().constData(), save_options));
+    sail::image_output image_output(path.toLocal8Bit().constData());
+    image_output.with(save_options);
     SAIL_TRY(image_output.next_frame(image));
-    // Optional
-    SAIL_TRY(image_output.stop());
 
     return SAIL_OK;
 }
