@@ -60,7 +60,7 @@ public:
      * Constructs a new image output to the specified image file.
      * Detects the image format based on the file extension.
      */
-    image_output(const std::string &path);
+    explicit image_output(const std::string &path);
 
     /*
      * Constructs a new image output to the specified memory buffer.

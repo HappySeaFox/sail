@@ -61,7 +61,7 @@ public:
     /*
      * Constructs a new image input from the specified image file.
      */
-    image_input(const std::string &path);
+    explicit image_input(const std::string &path);
 
     /*
      * Constructs a new image input from the specified memory buffer.
@@ -71,12 +71,12 @@ public:
     /*
      * Constructs a new image input from the specified memory buffer.
      */
-    image_input(const sail::arbitrary_data &arbitrary_data);
+    explicit image_input(const sail::arbitrary_data &arbitrary_data);
 
     /*
      * Constructs a new image input from the specified I/O source.
      */
-    image_input(sail::abstract_io &abstract_io);
+    explicit image_input(sail::abstract_io &abstract_io);
 
     /*
      * Stops loading and destroys the image input.
