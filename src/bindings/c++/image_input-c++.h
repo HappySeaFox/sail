@@ -79,7 +79,7 @@ public:
     image_input(sail::abstract_io &abstract_io);
 
     /*
-     * Stops loading if it was started and destroys the image input.
+     * Stops loading and destroys the image input.
      */
     ~image_input();
 
