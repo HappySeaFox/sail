@@ -72,14 +72,13 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
     qimages->clear();
     delays->clear();
 
-    sail::image_input image_input;
     sail::image image;
     sail::image first_image;
 
     // Initialize loading.
     //
     sail::io_file io_file(path.toLocal8Bit().constData());
-    SAIL_TRY(image_input.start(io_file));
+    sail::image_input image_input(io_file);
 
     // Load all the available image frames in the file.
     //
@@ -116,9 +115,6 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
     }
 
     SAIL_LOG_DEBUG("Loaded images: %d", qimages->size());
-
-    // Optional
-    SAIL_TRY(image_input.stop());
 
     m_ui->labelStatus->setText(tr("%1  [%2x%3]  [%4 → %5]")
                                 .arg(QFileInfo(path).fileName())
@@ -208,8 +204,7 @@ sail_status_t QtSail::onProbe()
     QElapsedTimer elapsedTimer;
     elapsedTimer.start();
 
-    sail::image_input image_input;
-    auto [image, codec_info] = image_input.probe(path.toLocal8Bit().constData());
+    auto [image, codec_info] = sail::image_input(path.toLocal8Bit().constData()).probe();
 
     QMessageBox::information(this,
                              tr("File info"),

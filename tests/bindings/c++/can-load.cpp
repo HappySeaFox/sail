@@ -51,14 +51,14 @@ static MunitResult test_can_load_memory1(const MunitParameter params[], void *us
     size_t data_size;
     munit_assert(sail_file_contents_to_data(path, &data, &data_size) == SAIL_OK);
 
-    sail::image_input input;
-    sail::image image;
-
     const sail::codec_info codec_info = sail::codec_info::from_path(path);
     munit_assert(codec_info.is_valid());
 
-    munit_assert(input.start(data, data_size, codec_info) == SAIL_OK);
-    munit_assert(input.next_frame(&image)                 == SAIL_OK);
+    sail::image_input input(data, data_size);
+    input.with(codec_info);
+    sail::image image;
+
+    munit_assert(input.next_frame(&image) == SAIL_OK);
     munit_assert(image.is_valid());
 
     sail_free(data);
@@ -78,14 +78,14 @@ static MunitResult test_can_load_memory2(const MunitParameter params[], void *us
 
     const sail::arbitrary_data arbitrary_data(reinterpret_cast<std::uint8_t *>(data), reinterpret_cast<std::uint8_t *>(data) + data_size);
 
-    sail::image_input input;
-    sail::image image;
-
     const sail::codec_info codec_info = sail::codec_info::from_path(path);
     munit_assert(codec_info.is_valid());
 
-    munit_assert(input.start(arbitrary_data, codec_info) == SAIL_OK);
-    munit_assert(input.next_frame(&image)                == SAIL_OK);
+    sail::image_input input(arbitrary_data);
+    input.with(codec_info);
+    sail::image image;
+
+    munit_assert(input.next_frame(&image) == SAIL_OK);
     munit_assert(image.is_valid());
 
     sail_free(data);
@@ -99,11 +99,10 @@ static MunitResult test_can_load_abstract_io_path(const MunitParameter params[],
 
     const char *path = munit_parameters_get(params, "path");
 
-    sail::image_input input;
     sail::io_file io_file(path);
+    sail::image_input input(io_file);
     sail::image image;
 
-    munit_assert(input.start(io_file)     == SAIL_OK);
     munit_assert(input.next_frame(&image) == SAIL_OK);
     munit_assert(image.is_valid());
 
@@ -122,12 +121,12 @@ static MunitResult test_can_load_abstract_io_memory1(const MunitParameter params
     const sail::codec_info codec_info = sail::codec_info::from_path(path);
     munit_assert(codec_info.is_valid());
 
-    sail::image_input input;
     sail::io_memory io_memory(arbitrary_data.data(), arbitrary_data.size());
+    sail::image_input input(io_memory);
+    input.with(codec_info);
     sail::image image;
 
-    munit_assert(input.start(io_memory, codec_info) == SAIL_OK);
-    munit_assert(input.next_frame(&image)           == SAIL_OK);
+    munit_assert(input.next_frame(&image) == SAIL_OK);
     munit_assert(image.is_valid());
 
     return MUNIT_OK;
@@ -145,12 +144,12 @@ static MunitResult test_can_load_abstract_io_memory2(const MunitParameter params
     const sail::codec_info codec_info = sail::codec_info::from_path(path);
     munit_assert(codec_info.is_valid());
 
-    sail::image_input input;
     sail::io_memory io_memory(arbitrary_data);
+    sail::image_input input(io_memory);
+    input.with(codec_info);
     sail::image image;
 
-    munit_assert(input.start(io_memory, codec_info) == SAIL_OK);
-    munit_assert(input.next_frame(&image)           == SAIL_OK);
+    munit_assert(input.next_frame(&image) == SAIL_OK);
     munit_assert(image.is_valid());
 
     return MUNIT_OK;
@@ -168,12 +167,12 @@ static MunitResult test_can_load_abstract_io_memory3(const MunitParameter params
     const sail::codec_info codec_info = sail::codec_info::from_path(path);
     munit_assert(codec_info.is_valid());
 
-    sail::image_input input;
     sail::io_memory io_memory(arbitrary_data.data(), arbitrary_data.size(), sail::io_memory::Operation::Read);
+    sail::image_input input(io_memory);
+    input.with(codec_info);
     sail::image image;
 
-    munit_assert(input.start(io_memory, codec_info) == SAIL_OK);
-    munit_assert(input.next_frame(&image)           == SAIL_OK);
+    munit_assert(input.next_frame(&image) == SAIL_OK);
     munit_assert(image.is_valid());
 
     return MUNIT_OK;
@@ -191,12 +190,11 @@ static MunitResult test_can_load_abstract_io_memory4(const MunitParameter params
     const sail::codec_info codec_info = sail::codec_info::from_path(path);
     munit_assert(codec_info.is_valid());
 
-    sail::image_input input;
     sail::io_memory io_memory(arbitrary_data, sail::io_memory::Operation::Read);
+    sail::image_input input = std::move(sail::image_input(io_memory).with(codec_info));
     sail::image image;
 
-    munit_assert(input.start(io_memory, codec_info) == SAIL_OK);
-    munit_assert(input.next_frame(&image)           == SAIL_OK);
+    munit_assert(input.next_frame(&image) == SAIL_OK);
     munit_assert(image.is_valid());
 
     return MUNIT_OK;
