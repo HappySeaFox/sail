@@ -110,7 +110,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t next_frame(const sail::image &image) const;
+    sail_status_t next_frame(const sail::image &image);
 
 private:
     class pimpl;

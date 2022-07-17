@@ -143,7 +143,7 @@ image_output& image_output::with(const sail::save_options &save_options)
     return *this;
 }
 
-sail_status_t image_output::next_frame(const sail::image &image) const
+sail_status_t image_output::next_frame(const sail::image &image)
 {
     if (d->state == nullptr) {
         SAIL_TRY(d->start());
