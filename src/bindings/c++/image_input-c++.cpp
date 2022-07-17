@@ -116,7 +116,7 @@ image_input::image_input(sail::abstract_io &abstract_io)
 image_input::~image_input()
 {
     if (d) {
-        SAIL_TRY_OR_SUPPRESS(sail_stop_loading(d->state));
+        finish();
     }
 }
 
@@ -177,6 +177,17 @@ image image_input::next_frame()
                         /* on error */ return {});
 
     return image;
+}
+
+sail_status_t image_input::finish()
+{
+    sail_status_t saved_status = SAIL_OK;
+    SAIL_TRY_OR_EXECUTE(sail_stop_loading(d->state),
+                        /* on error */ saved_status = __sail_error_result);
+
+    d->state = nullptr;
+
+    return saved_status;
 }
 
 std::tuple<image, codec_info> image_input::probe()

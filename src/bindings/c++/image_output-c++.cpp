@@ -111,7 +111,7 @@ image_output::image_output(sail::abstract_io &abstract_io, const sail::codec_inf
 image_output::~image_output()
 {
     if (d) {
-        SAIL_TRY_OR_SUPPRESS(sail_stop_saving(d->state));
+        finish();
     }
 }
 
@@ -160,6 +160,17 @@ sail_status_t image_output::next_frame(const sail::image &image)
     SAIL_TRY(sail_write_next_frame(d->state, sail_image));
 
     return SAIL_OK;
+}
+
+sail_status_t image_output::finish()
+{
+    sail_status_t saved_status = SAIL_OK;
+    SAIL_TRY_OR_EXECUTE(sail_stop_saving(d->state),
+                        /* on error */ saved_status = __sail_error_result);
+
+    d->state = nullptr;
+
+    return saved_status;
 }
 
 }

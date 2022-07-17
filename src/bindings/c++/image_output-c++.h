@@ -78,7 +78,7 @@ public:
     image_output(sail::abstract_io &abstract_io, const sail::codec_info &codec_info);
 
     /*
-     * Stops saving and destroys the image output.
+     * Finishes saving and destroys the image output.
      */
     ~image_output();
 
@@ -111,6 +111,14 @@ public:
      * Returns SAIL_OK on success.
      */
     sail_status_t next_frame(const sail::image &image);
+
+    /*
+     * Finishes saving and closes the I/O stream. Call to finish() is recommended
+     * if you want to ensure the I/O stream is flushed and closed successfully.
+     *
+     * Returns SAIL_OK on success.
+     */
+    sail_status_t finish();
 
 private:
     class pimpl;

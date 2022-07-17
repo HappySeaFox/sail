@@ -79,7 +79,7 @@ public:
     explicit image_input(sail::abstract_io &abstract_io);
 
     /*
-     * Stops loading and destroys the image input.
+     * Finishes loading and destroys the image input.
      */
     ~image_input();
 
@@ -117,6 +117,13 @@ public:
      * Returns an invalid image on error.
      */
     image next_frame();
+
+    /*
+     * Finishes loading and closes the I/O stream. Call to finish() is optional.
+     *
+     * Returns SAIL_OK on success.
+     */
+    sail_status_t finish();
 
     /*
      * Loads the image and returns its properties without pixels and the corresponding
