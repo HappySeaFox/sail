@@ -303,8 +303,7 @@ void image::set_iccp(sail::iccp &&iccp) noexcept
 
 sail_status_t image::load(const std::string &path)
 {
-    image_input input;
-    SAIL_TRY(input.start(path));
+    image_input input(path);
 
     image img;
     SAIL_TRY(input.next_frame(&img));
@@ -316,9 +315,9 @@ sail_status_t image::load(const std::string &path)
 
 sail_status_t image::save(const std::string &path)
 {
-    image_output output;
+    image_output output(path);
 
-    SAIL_TRY(output.save(path, *this));
+    SAIL_TRY(output.next_frame(*this));
 
     return SAIL_OK;
 }
