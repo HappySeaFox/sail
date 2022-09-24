@@ -11,6 +11,7 @@ function(sail_check_init_once_execute_once)
                 (void)InitOnce;
                 (void)Parameter;
                 (void)lpContext;
+                return FALSE;
             }
 
             int main(int argc, char *argv[]) {
