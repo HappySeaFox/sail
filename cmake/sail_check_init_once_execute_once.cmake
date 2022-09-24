@@ -4,6 +4,7 @@ function(sail_check_init_once_execute_once)
     cmake_push_check_state(RESET)
         check_c_source_compiles(
         "
+            #define _WIN32_WINNT 0x0600
             #include <Windows.h>
             static BOOL CALLBACK OnceHandler(PINIT_ONCE InitOnce, PVOID Parameter, PVOID *lpContext)
             {
