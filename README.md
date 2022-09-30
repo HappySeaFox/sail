@@ -33,8 +33,8 @@ animated, multi-paged images along with their meta data and ICC profiles. :sailb
 
 - Image viewers
 - Game developers
-- Anyone who needs to load or save images in different image formats and who needs
-  a clean and comprehensive API for that
+- Anyone who needs to load or save images in different image formats with
+  a clean and comprehensive API
 
 ## Features overview
 
