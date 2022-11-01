@@ -133,6 +133,9 @@ static MunitResult test_pixel_format_to_string(const MunitParameter params[], vo
     munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP64_ARGB), "BPP64-ARGB");
     munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP64_ABGR), "BPP64-ABGR");
 
+    munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP16_FLOAT), "BPP16-FLOAT");
+    munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP32_FLOAT), "BPP32-FLOAT");
+
     munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP32_CMYK), "BPP32-CMYK");
     munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP64_CMYK), "BPP64-CMYK");
 
@@ -226,6 +229,9 @@ static MunitResult test_pixel_format_from_string(const MunitParameter params[], 
     munit_assert(sail_pixel_format_from_string("BPP64-BGRA") == SAIL_PIXEL_FORMAT_BPP64_BGRA);
     munit_assert(sail_pixel_format_from_string("BPP64-ARGB") == SAIL_PIXEL_FORMAT_BPP64_ARGB);
     munit_assert(sail_pixel_format_from_string("BPP64-ABGR") == SAIL_PIXEL_FORMAT_BPP64_ABGR);
+
+    munit_assert(sail_pixel_format_from_string("BPP16-FLOAT") == SAIL_PIXEL_FORMAT_BPP16_FLOAT);
+    munit_assert(sail_pixel_format_from_string("BPP32-FLOAT") == SAIL_PIXEL_FORMAT_BPP32_FLOAT);
 
     munit_assert(sail_pixel_format_from_string("BPP32-CMYK") == SAIL_PIXEL_FORMAT_BPP32_CMYK);
     munit_assert(sail_pixel_format_from_string("BPP64-CMYK") == SAIL_PIXEL_FORMAT_BPP64_CMYK);
