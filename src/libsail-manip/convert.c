@@ -540,10 +540,10 @@ static sail_status_t conversion_impl(
     const struct sail_image *image,
     struct sail_image *image_output,
     pixel_consumer_t pixel_consumer,
-    int r, /* Index of RED component. */
-    int g, /* Index of GREEN component. */
-    int b, /* Index of BLUE component. */
-    int a, /* Index of ALPHA component. */
+    int r, /* Index of the RED component.   */
+    int g, /* Index of the GREEN component. */
+    int b, /* Index of the BLUE component.  */
+    int a, /* Index of the ALPHA component. */
     const struct sail_conversion_options *options) {
 
     const struct output_context output_context = { image_output, r, g, b, a, options };
