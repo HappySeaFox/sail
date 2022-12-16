@@ -34,12 +34,14 @@
     #include "error.h"
     #include "export.h"
 
+    #include "compression_level-c++.h"
     #include "tuning-c++.h"
 #else
     #include <sail-common/common.h>
     #include <sail-common/error.h>
     #include <sail-common/export.h>
 
+    #include <sail-c++/compression_level-c++.h>
     #include <sail-c++/tuning-c++.h>
 #endif
 
