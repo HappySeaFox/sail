@@ -40,6 +40,8 @@
     #include <sail-c++/arbitrary_data-c++.h>
 #endif
 
+struct sail_variant;
+
 namespace sail
 {
 
