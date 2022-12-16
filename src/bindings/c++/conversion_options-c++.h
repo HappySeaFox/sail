@@ -32,10 +32,14 @@
     #include "error.h"
     #include "export.h"
     #include "pixel.h"
+
+    #include "manip_common.h"
 #else
     #include <sail-common/error.h>
     #include <sail-common/export.h>
     #include <sail-common/pixel.h>
+
+    #include <sail-manip/manip_common.h>
 #endif
 
 struct sail_conversion_options;
