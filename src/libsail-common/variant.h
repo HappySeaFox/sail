@@ -27,7 +27,7 @@
 #define SAIL_VARIANT_H
 
 #include <stdbool.h>
-#include <stddef.h>
+#include <stddef.h> /* size_t */
 
 #ifdef SAIL_BUILD
     #include "common.h"
