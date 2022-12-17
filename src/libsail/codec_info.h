@@ -26,7 +26,17 @@
 #ifndef SAIL_CODEC_INFO_H
 #define SAIL_CODEC_INFO_H
 
-#include "codec_priority.h"
+#ifdef SAIL_BUILD
+    #include "error.h"
+    #include "export.h"
+
+    #include "codec_priority.h"
+#else
+    #include <sail-common/error.h>
+    #include <sail-common/export.h>
+
+    #include <sail/codec_priority.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {
