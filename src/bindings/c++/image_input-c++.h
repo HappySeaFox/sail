@@ -36,13 +36,13 @@
     #include "export.h"
 
     #include "arbitrary_data-c++.h"
-    #include "image_input-c++.h"
+    #include "image-c++.h"
 #else
     #include <sail-common/error.h>
     #include <sail-common/export.h>
 
     #include <sail-c++/arbitrary_data-c++.h>
-    #include <sail-c++/image_input-c++.h>
+    #include <sail-c++/image-c++.h>
 #endif
 
 namespace sail

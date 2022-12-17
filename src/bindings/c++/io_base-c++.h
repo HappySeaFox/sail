@@ -26,6 +26,7 @@
 #ifndef SAIL_IO_BASE_CPP_H
 #define SAIL_IO_BASE_CPP_H
 
+#include <cstddef> /* std::size_t */
 #include <memory>
 
 #ifdef SAIL_BUILD

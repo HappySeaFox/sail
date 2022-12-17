@@ -26,7 +26,7 @@
 #ifndef SAIL_IO_MEMORY_CPP_H
 #define SAIL_IO_MEMORY_CPP_H
 
-#include <cstddef>
+#include <cstddef> /* std::size_t */
 
 #ifdef SAIL_BUILD
     #include "arbitrary_data-c++.h"

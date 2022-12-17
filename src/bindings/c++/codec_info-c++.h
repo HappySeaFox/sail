@@ -31,9 +31,11 @@
 #include <vector>
 
 #ifdef SAIL_BUILD
+    #include "common.h"
     #include "error.h"
     #include "export.h"
 #else
+    #include <sail-common/common.h>
     #include <sail-common/error.h>
     #include <sail-common/export.h>
 #endif
