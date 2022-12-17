@@ -440,7 +440,7 @@ the most popular image formats will be definitely ported from ksquirrel-libs.
 
 ## I have questions, issues, or proposals
 
-Opening a GitHub [issue](https://github.com/smoked-herring/sail/issues) is the preferred way
+Opening a GitHub [issue](https://github.com/HappySeaFox/sail/issues) is the preferred way
 of communicating and solving problems.
 
 Pull requests are always welcomed.

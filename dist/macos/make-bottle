@@ -1,14 +1,14 @@
 #!/bin/sh -e
 
 # Update the tap
-brew tap smoked-herring/sail
+brew tap HappySeaFox/sail
 
 # Build errors are faced when SAIL is already installed. Uninstall any previous versions.
 brew uninstall sail
 
 # Make a new bottle
-brew test-bot --root-url=https://dl.bintray.com/smoked-herring/bottles-sail --bintray-org=smoked-herring \
-    --tap=smoked-herring/sail smoked-herring/sail/sail
+brew test-bot --root-url=https://dl.bintray.com/HappySeaFox/bottles-sail --bintray-org=HappySeaFox \
+    --tap=HappySeaFox/sail HappySeaFox/sail/sail
 
 echo
 echo "SUCCESS. Now you can upload the created bottles."
