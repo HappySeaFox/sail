@@ -27,6 +27,7 @@
 #define SAIL_CONVERT_H
 
 #include <stdbool.h>
+#include <stddef.h> /* size_t */
 
 #ifdef SAIL_BUILD
     #include "common.h"
