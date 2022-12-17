@@ -79,12 +79,7 @@ static sail_status_t write_raw_profile_header(char *str, size_t str_size, enum S
     }
 
     /* Write "\nexif\n    1234\n" before the actual HEX-encoded data. */
-#ifdef _MSC_VER
-    if (sprintf_s(str, str_size, "\n%s\n    %u\n", key_str, (unsigned)hex_data_length) < 0) {
-#else
-    (void)str_size;
-    if (sprintf(str, "\n%s\n    %u\n", key_str, (unsigned)hex_data_length) < 0) {
-#endif
+    if (snprintf(str, str_size, "\n%s\n    %u\n", key_str, (unsigned)hex_data_length) < 0) {
         SAIL_LOG_ERROR("PNG: Failed to save raw profile header");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
