@@ -55,8 +55,8 @@ jobs:
         - CMAKE_BUILD_TYPE="Debug"
         - BUILD_SHARED_LIBS="OFF"
     - os: osx
-      osx_image: xcode13.1
-      name: "macOS 11.6 [DEBUG;SHARED]"
+      osx_image: xcode14.1
+      name: "macOS 12.6 [DEBUG;SHARED]"
       env:
         - CMAKE_BUILD_TYPE="Debug"
         - BUILD_SHARED_LIBS="ON"
