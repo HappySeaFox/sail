@@ -26,7 +26,7 @@
 #ifndef SAIL_ABSTRACT_IO_CPP_H
 #define SAIL_ABSTRACT_IO_CPP_H
 
-#include <cstddef>
+#include <cstddef> /* std::size_t */
 #include <cstdint>
 #include <cstdio> /* seek whence */
 

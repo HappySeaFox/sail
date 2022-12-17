@@ -26,7 +26,7 @@
 #ifndef SAIL_IMAGE_OUTPUT_CPP_H
 #define SAIL_IMAGE_OUTPUT_CPP_H
 
-#include <cstddef>
+#include <cstddef> /* std::size_t */
 #include <memory>
 #include <string>
 

@@ -26,7 +26,7 @@
 #ifndef SAIL_IMAGE_INPUT_CPP_H
 #define SAIL_IMAGE_INPUT_CPP_H
 
-#include <cstddef>
+#include <cstddef> /* std::size_t */
 #include <memory>
 #include <string>
 #include <tuple>
