@@ -26,6 +26,8 @@
 #ifndef SAIL_SAIL_ADVANCED_H
 #define SAIL_SAIL_ADVANCED_H
 
+#include <stddef.h> /* size_t */
+
 #ifdef SAIL_BUILD
     #include "error.h"
     #include "export.h"

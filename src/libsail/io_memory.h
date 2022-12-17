@@ -26,7 +26,7 @@
 #ifndef SAIL_IO_MEMORY_H
 #define SAIL_IO_MEMORY_H
 
-#include <stddef.h>
+#include <stddef.h> /* size_t */
 
 #ifdef SAIL_BUILD
     #include "error.h"

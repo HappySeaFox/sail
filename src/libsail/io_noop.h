@@ -27,7 +27,7 @@
 #define SAIL_IO_NOOP_H
 
 #include <stdbool.h>
-#include <stddef.h>
+#include <stddef.h> /* size_t */
 
 #ifdef SAIL_BUILD
     #include "error.h"

@@ -26,7 +26,7 @@
 #ifndef SAIL_SAIL_DEEP_DIVER_H
 #define SAIL_SAIL_DEEP_DIVER_H
 
-#include <stddef.h>
+#include <stddef.h> /* size_t */
 
 #ifdef SAIL_BUILD
     #include "error.h"
