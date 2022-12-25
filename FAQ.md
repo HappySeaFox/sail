@@ -35,6 +35,7 @@ Table of Contents
   * [Are there any C/C\+\+ examples?](#are-there-any-cc-examples)
   * [Are there any bindings to other programming languages?](#are-there-any-bindings-to-other-programming-languages)
   * [How many image formats do you plan to implement?](#how-many-image-formats-do-you-plan-to-implement)
+  * [I have problems with include paths with vcpkg without CMake](#i-have-problems-with-include-paths-with-vcpkg-without-cmake)
   * [I have questions, issues, or proposals](#i-have-questions-issues-or-proposals)
 
 # SAIL Frequently Asked Questions (FAQ)
@@ -437,6 +438,11 @@ Pull requests to support more programming languages are highly welcomed.
 
 Ksquirrel-libs supported around 60 image formats. I don't plan to port all of them. However,
 the most popular image formats will be definitely ported from ksquirrel-libs.
+
+## I have problems with include paths with vcpkg without CMake
+
+Add `VcpkgInstalledDir/include/sail` to the project include path.
+See https://vcpkg.readthedocs.io/en/latest/users/buildsystems/msbuild-integration.
 
 ## I have questions, issues, or proposals
 
