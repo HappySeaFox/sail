@@ -338,7 +338,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_png(void *state, st
             SAIL_LOG_AND_RETURN(SAIL_ERROR_INCORRECT_IMAGE_DIMENSIONS);
         }
 
-        if (!png_state->next_frame_delay_den) {
+        if (png_state->next_frame_delay_den == 0) {
             png_state->next_frame_delay_den = 100;
         }
 
