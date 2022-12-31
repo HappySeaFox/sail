@@ -71,7 +71,7 @@ SAIL_EXPORT sail_status_t sail_probe_memory(const void *buffer, size_t buffer_le
 
 /*
  * Starts loading the specified image file. Pass codec info if you would like to start loading
- * with a specific codec. If not, just pass NULL.
+ * with a specific codec. If not, just pass NULL, and SAIL will detect it automatically.
  *
  * Typical usage: sail_start_loading_from_file() ->
  *                sail_load_next_frame()         ->
@@ -128,7 +128,7 @@ SAIL_EXPORT sail_status_t sail_stop_loading(void *state);
 
 /*
  * Starts saving into the specified image file. Pass codec info if you'd like to start saving
- * with a specific codec. If not, just pass NULL.
+ * with a specific codec. If not, just pass NULL, and SAIL will detect it automatically.
  *
  * Typical usage: sail_start_saving_into_file() ->
  *                sail_write_next_frame()       ->

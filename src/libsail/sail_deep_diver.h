@@ -47,8 +47,8 @@ struct sail_save_options;
 
 /*
  * Starts loading the specified image file with the specified load options. Pass codec info if you would like
- * to start loading with a specific codec. If not, just pass NULL. If you do not need specific load options,
- * just pass NULL. Codec-specific defaults will be used in this case.
+ * to start loading with a specific codec. If not, just pass NULL, and SAIL will detect it automatically.
+ * If you do not need specific load options, just pass NULL. Codec-specific defaults will be used in this case.
  *
  * The load options are deep copied.
  *
@@ -93,8 +93,8 @@ SAIL_EXPORT sail_status_t sail_start_loading_from_memory_with_options(const void
 
 /*
  * Starts saving the specified image file with the specified save options. Pass codec info if you would like
- * to start saving with a specific codec. If not, just pass NULL. If you do not need specific save options,
- * just pass NULL. Codec-specific defaults will be used in this case.
+ * to start saving with a specific codec. If not, just pass NULL, and SAIL will detect it automatically.
+ * If you do not need specific save options, just pass NULL. Codec-specific defaults will be used in this case.
  *
  * The save options are deep copied.
  *
