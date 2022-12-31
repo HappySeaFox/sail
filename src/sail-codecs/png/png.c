@@ -220,8 +220,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_png(struct sail_io *io, const 
 
 #ifdef PNG_APNG_SUPPORTED
     png_state->bytes_per_pixel = sail_bits_per_pixel(png_state->first_image->pixel_format) / 8;
-    png_state->is_apng = png_get_valid(png_state->png_ptr, png_state->info_ptr, PNG_INFO_acTL) != 0;
-    png_state->frames = png_state->is_apng ? png_get_num_frames(png_state->png_ptr, png_state->info_ptr) : 1;
+    png_state->is_apng         = png_get_valid(png_state->png_ptr, png_state->info_ptr, PNG_INFO_acTL) != 0;
+    png_state->frames          = png_state->is_apng ? png_get_num_frames(png_state->png_ptr, png_state->info_ptr) : 1;
 
     if (png_state->frames == 0) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
@@ -258,7 +258,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_png(struct sail_io *io, const 
 
 #ifdef PNG_APNG_SUPPORTED
     if (png_state->is_apng) {
-        SAIL_TRY(sail_malloc((size_t)png_state->first_image->width * png_state->bytes_per_pixel, &png_state->temp_scanline));
+        SAIL_TRY(sail_malloc(png_state->first_image->bytes_per_line, &png_state->temp_scanline));
     }
 #endif
 
@@ -372,7 +372,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_png(void *state, struct sail_
             for (unsigned row = 0; row < image->height; row++) {
                 unsigned char *scanline = (unsigned char *)image->pixels + row * image->bytes_per_line;
 
-                memcpy(scanline, png_state->prev[row], (size_t)png_state->first_image->width * png_state->bytes_per_pixel);
+                memcpy(scanline, png_state->prev[row], png_state->first_image->bytes_per_line);
 
                 if (row >= png_state->next_frame_y_offset && row < png_state->next_frame_y_offset + png_state->next_frame_height) {
                     png_read_row(png_state->png_ptr, (png_bytep)png_state->temp_scanline, NULL);
