@@ -570,6 +570,7 @@ sail_status_t png_private_blend_over(void *dst_raw, unsigned dst_offset, const v
             *dst = (uint16_t)((src_a + (1-src_a) * dst_a) * 65535);         src++; dst++;
         }
     } else {
+        SAIL_LOG_ERROR("Bit depth %u is not supported for blend operation", bytes_per_pixel);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_BIT_DEPTH);
     }
 
