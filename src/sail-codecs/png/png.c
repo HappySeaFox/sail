@@ -392,15 +392,18 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_png(void *state, struct sail_
                                             png_state->bytes_per_pixel));
                     }
 
-                    if (png_state->next_frame_dispose_op == PNG_DISPOSE_OP_BACKGROUND) {
-                        memset(png_state->prev[row] + png_state->next_frame_x_offset * png_state->bytes_per_pixel,
-                                0,
-                                (size_t)png_state->next_frame_width * png_state->bytes_per_pixel);
-                    } else if (png_state->next_frame_dispose_op == PNG_DISPOSE_OP_NONE) {
-                        memcpy(png_state->prev[row] + png_state->next_frame_x_offset * png_state->bytes_per_pixel,
-                                scanline,
-                                (size_t)png_state->next_frame_width * png_state->bytes_per_pixel);
-                    } else { /* PNG_DISPOSE_OP_PREVIOUS */
+                    /* Workaround: Apply disposal method only for images with bpp >= 8. */
+                    if (png_state->bytes_per_pixel > 0) {
+                        if (png_state->next_frame_dispose_op == PNG_DISPOSE_OP_BACKGROUND) {
+                            memset(png_state->prev[row] + png_state->next_frame_x_offset * png_state->bytes_per_pixel,
+                                    0,
+                                    (size_t)png_state->next_frame_width * png_state->bytes_per_pixel);
+                        } else if (png_state->next_frame_dispose_op == PNG_DISPOSE_OP_NONE) {
+                            memcpy(png_state->prev[row] + png_state->next_frame_x_offset * png_state->bytes_per_pixel,
+                                    scanline,
+                                    (size_t)png_state->next_frame_width * png_state->bytes_per_pixel);
+                        } else { /* PNG_DISPOSE_OP_PREVIOUS */
+                        }
                     }
                 }
             }
