@@ -20,7 +20,7 @@
         <br/><br/>
         <b>Content:</b> Static, Animated, Meta data, ICC profiles.
     </td>
-    <td>Blend operations with pixel formats other than BPP32-RGBA or BPP64-RGBA.</td>
+    <td>Blend operations with pixel formats other than BPP16-GRAYSCALE-ALPHA, BPP32-GRAYSCALE-ALPHA, BPP32-RGBA, BPP64-RGBA.</td>
     <td>Unsupported</td>
     <td>-</td>
     <td>libpng+APNG patch</td>

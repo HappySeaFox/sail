@@ -538,40 +538,74 @@ sail_status_t png_private_blend_source(void *dst_raw, unsigned dst_offset, const
     return SAIL_OK;
 }
 
-sail_status_t png_private_blend_over(void *dst_raw, unsigned dst_offset, const void *src_raw, unsigned width, unsigned bytes_per_pixel) {
+sail_status_t png_private_blend_over(void *dst_raw, unsigned dst_offset, const void *src_raw, unsigned width, enum SailPixelFormat pixel_format) {
 
     SAIL_CHECK_PTR(src_raw);
     SAIL_CHECK_PTR(dst_raw);
 
-    if (bytes_per_pixel == 4) {
-        const uint8_t *src = src_raw;
-        uint8_t *dst = (uint8_t *)dst_raw + dst_offset * bytes_per_pixel;
+    const unsigned bytes_per_pixel = sail_bits_per_pixel(pixel_format) / 8;
 
-        while (width--) {
-            const double src_a = *(src+3) / 255.0;
-            const double dst_a = *(dst+3) / 255.0;
+    switch (pixel_format) {
+        case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA: {
+            const uint8_t *src = src_raw;
+            uint8_t *dst = (uint8_t *)dst_raw + dst_offset * bytes_per_pixel;
 
-            *dst = (uint8_t)(src_a * (*src) + (1-src_a) * dst_a * (*dst)); src++; dst++;
-            *dst = (uint8_t)(src_a * (*src) + (1-src_a) * dst_a * (*dst)); src++; dst++;
-            *dst = (uint8_t)(src_a * (*src) + (1-src_a) * dst_a * (*dst)); src++; dst++;
-            *dst = (uint8_t)((src_a + (1-src_a) * dst_a) * 255);           src++; dst++;
+            while (width--) {
+                const double src_a = *(src+1) / 255.0;
+                const double dst_a = *(dst+1) / 255.0;
+
+                *dst = (uint8_t)(src_a * (*src) + (1-src_a) * dst_a * (*dst)); src++; dst++;
+                *dst = (uint8_t)((src_a + (1-src_a) * dst_a) * 255);           src++; dst++;
+            }
+            break;
         }
-    } else if (bytes_per_pixel == 8) {
-        const uint16_t *src = src_raw;
-        uint16_t *dst = (uint16_t *)((uint8_t *)dst_raw + dst_offset * bytes_per_pixel);
+        case SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA: {
+            const uint16_t *src = src_raw;
+            uint16_t *dst = (uint16_t *)((uint8_t *)dst_raw + dst_offset * bytes_per_pixel);
 
-        while (width--) {
-            const double src_a = *(src+3) / 65535.0;
-            const double dst_a = *(dst+3) / 65535.0;
+            while (width--) {
+                const double src_a = *(src+1) / 65535.0;
+                const double dst_a = *(dst+1) / 65535.0;
 
-            *dst = (uint16_t)(src_a * (*src) + (1-src_a) * dst_a * (*dst)); src++; dst++;
-            *dst = (uint16_t)(src_a * (*src) + (1-src_a) * dst_a * (*dst)); src++; dst++;
-            *dst = (uint16_t)(src_a * (*src) + (1-src_a) * dst_a * (*dst)); src++; dst++;
-            *dst = (uint16_t)((src_a + (1-src_a) * dst_a) * 65535);         src++; dst++;
+                *dst = (uint16_t)(src_a * (*src) + (1-src_a) * dst_a * (*dst)); src++; dst++;
+                *dst = (uint16_t)((src_a + (1-src_a) * dst_a) * 65535);         src++; dst++;
+            }
+            break;
         }
-    } else {
-        SAIL_LOG_ERROR("Bit depth %u is not supported for blend operation", bytes_per_pixel);
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_BIT_DEPTH);
+        case SAIL_PIXEL_FORMAT_BPP32_RGBA: {
+            const uint8_t *src = src_raw;
+            uint8_t *dst = (uint8_t *)dst_raw + dst_offset * bytes_per_pixel;
+
+            while (width--) {
+                const double src_a = *(src+3) / 255.0;
+                const double dst_a = *(dst+3) / 255.0;
+
+                *dst = (uint8_t)(src_a * (*src) + (1-src_a) * dst_a * (*dst)); src++; dst++;
+                *dst = (uint8_t)(src_a * (*src) + (1-src_a) * dst_a * (*dst)); src++; dst++;
+                *dst = (uint8_t)(src_a * (*src) + (1-src_a) * dst_a * (*dst)); src++; dst++;
+                *dst = (uint8_t)((src_a + (1-src_a) * dst_a) * 255);           src++; dst++;
+            }
+            break;
+        }
+        case SAIL_PIXEL_FORMAT_BPP64_RGBA: {
+            const uint16_t *src = src_raw;
+            uint16_t *dst = (uint16_t *)((uint8_t *)dst_raw + dst_offset * bytes_per_pixel);
+
+            while (width--) {
+                const double src_a = *(src+3) / 65535.0;
+                const double dst_a = *(dst+3) / 65535.0;
+
+                *dst = (uint16_t)(src_a * (*src) + (1-src_a) * dst_a * (*dst)); src++; dst++;
+                *dst = (uint16_t)(src_a * (*src) + (1-src_a) * dst_a * (*dst)); src++; dst++;
+                *dst = (uint16_t)(src_a * (*src) + (1-src_a) * dst_a * (*dst)); src++; dst++;
+                *dst = (uint16_t)((src_a + (1-src_a) * dst_a) * 65535);         src++; dst++;
+            }
+            break;
+        }
+        default: {
+            SAIL_LOG_ERROR("Pixel format %s is not supported for blending operations", sail_pixel_format_to_string(pixel_format));
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+        }
     }
 
     return SAIL_OK;

@@ -229,6 +229,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_png(struct sail_io *io, const 
 
     if (png_state->is_apng) {
         SAIL_TRY(png_private_alloc_rows(&png_state->prev, png_state->first_image->bytes_per_line, png_state->first_image->height));
+
+        SAIL_LOG_TRACE("PNG: Number of frames: %u", png_get_num_frames(png_state->png_ptr, png_state->info_ptr));
     }
 #else
     png_state->frames = 1;
@@ -331,12 +333,18 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_png(void *state, st
         if (png_state->next_frame_width + png_state->next_frame_x_offset > image_local->width ||
                 png_state->next_frame_height + png_state->next_frame_y_offset > image_local->height) {
             sail_destroy_image(image_local);
-            SAIL_LOG_ERROR("PNG: Frame (%u,%u %ux%u) doesn't fit into the image (%ux%u)",
+            SAIL_LOG_ERROR("PNG: Frame %u,%u %ux%u doesn't fit into the canvas image %ux%u",
                             png_state->next_frame_x_offset, png_state->next_frame_y_offset,
                             png_state->next_frame_width, png_state->next_frame_height,
                             image_local->width, image_local->height);
             SAIL_LOG_AND_RETURN(SAIL_ERROR_INCORRECT_IMAGE_DIMENSIONS);
         }
+
+        SAIL_LOG_TRACE("PNG: Frame #%u: %u,%u %ux%u, canvas image: %ux%u",
+                        png_state->current_frame,
+                        png_state->next_frame_x_offset, png_state->next_frame_y_offset,
+                        png_state->next_frame_width, png_state->next_frame_height,
+                        image_local->width, image_local->height);
 
         if (png_state->next_frame_delay_den == 0) {
             png_state->next_frame_delay_den = 100;
@@ -389,7 +397,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_png(void *state, struct sail_
                                             png_state->next_frame_x_offset,
                                             png_state->temp_scanline,
                                             png_state->next_frame_width,
-                                            png_state->bytes_per_pixel));
+                                            image->pixel_format));
                     }
 
                     /* Workaround: Apply disposal method only for images with bpp >= 8. */
