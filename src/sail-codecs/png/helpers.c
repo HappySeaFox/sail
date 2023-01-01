@@ -612,6 +612,7 @@ sail_status_t png_private_alloc_rows(png_bytep **A, unsigned row_length, unsigne
         SAIL_TRY(sail_malloc(row_length, &ptr));
         (*A)[row] = ptr;
 
+        /* Set to the transparent background as per the APNG spec. */
         memset((*A)[row], 0, row_length);
     }
 
