@@ -230,7 +230,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_png(struct sail_io *io, const 
     if (png_state->is_apng) {
         SAIL_TRY(png_private_alloc_rows(&png_state->prev, png_state->first_image->bytes_per_line, png_state->first_image->height));
 
-        SAIL_LOG_TRACE("PNG: Number of frames: %u", png_get_num_frames(png_state->png_ptr, png_state->info_ptr));
+        SAIL_TRY(sail_alloc_hash_map(&png_state->first_image->source_image->special_properties));
+        SAIL_TRY(png_private_store_num_frames_and_plays(png_state->png_ptr, png_state->info_ptr, png_state->first_image->source_image->special_properties));
     }
 #else
     png_state->frames = 1;

@@ -35,6 +35,7 @@
 #include "error.h"
 #include "export.h"
 
+struct sail_hash_map;
 struct sail_iccp;
 struct sail_meta_data_node;
 struct sail_palette;
@@ -67,6 +68,8 @@ SAIL_HIDDEN sail_status_t png_private_skip_hidden_frame(unsigned bytes_per_line,
 SAIL_HIDDEN sail_status_t png_private_alloc_rows(png_bytep **A, unsigned row_length, unsigned height);
 
 SAIL_HIDDEN void png_private_destroy_rows(png_bytep **A, unsigned height);
+
+SAIL_HIDDEN sail_status_t png_private_store_num_frames_and_plays(png_structp png_ptr, png_infop info_ptr, struct sail_hash_map *special_properties);
 #endif
 
 SAIL_HIDDEN sail_status_t png_private_fetch_resolution(png_structp png_ptr, png_infop info_ptr, struct sail_resolution **resolution);
