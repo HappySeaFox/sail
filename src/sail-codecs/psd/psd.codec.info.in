@@ -1,0 +1,26 @@
+# PSD codec information
+#
+[codec]
+layout=8
+version=0.8.1
+priority=LOW
+name=PSD
+description=Photoshop Document
+magic-numbers=38 42 50 53
+extensions=psd
+mime-types=image/vnd.adobe.photoshop
+
+[load-features]
+features=STATIC
+tuning=
+
+[save-features]
+features=
+pixel-formats=
+compressions=
+default-compression=
+compression-level-min=0
+compression-level-max=0
+compression-level-default=0
+compression-level-step=0
+tuning=
