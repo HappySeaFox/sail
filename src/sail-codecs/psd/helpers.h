@@ -58,6 +58,6 @@ SAIL_HIDDEN sail_status_t psd_private_get_big_endian_uint16_t(struct sail_io *io
 
 SAIL_HIDDEN sail_status_t psd_private_get_big_endian_uint32_t(struct sail_io *io, uint32_t *v);
 
-SAIL_HIDDEN sail_status_t psd_private_sail_pixel_format(enum SailPsdMode mode, uint16_t channels, enum SailPixelFormat *result);
+SAIL_HIDDEN sail_status_t psd_private_sail_pixel_format(enum SailPsdMode mode, uint16_t channels, uint16_t depth, enum SailPixelFormat *result);
 
 #endif

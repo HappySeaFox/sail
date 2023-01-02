@@ -49,9 +49,15 @@ sail_status_t psd_private_get_big_endian_uint32_t(struct sail_io *io, uint32_t *
     return SAIL_OK;
 }
 
-sail_status_t psd_private_sail_pixel_format(enum SailPsdMode mode, uint16_t channels, enum SailPixelFormat *result) {
+sail_status_t psd_private_sail_pixel_format(enum SailPsdMode mode, uint16_t channels, uint16_t depth, enum SailPixelFormat *result) {
 
     switch (mode) {
+        case SAIL_PSD_MODE_BITMAP: {
+            switch (channels) {
+                case 1: *result = SAIL_PIXEL_FORMAT_BPP1_INDEXED; return SAIL_OK;
+            }
+            break;
+        }
         case SAIL_PSD_MODE_INDEXED: {
             switch (channels) {
                 case 1: *result = SAIL_PIXEL_FORMAT_BPP8_INDEXED; return SAIL_OK;
@@ -60,21 +66,41 @@ sail_status_t psd_private_sail_pixel_format(enum SailPsdMode mode, uint16_t chan
         }
         case SAIL_PSD_MODE_GRAYSCALE: {
             switch (channels) {
-                case 1: *result = SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE; return SAIL_OK;
+                case 1: {
+                    switch (depth) {
+                        case 8:  *result = SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE;  return SAIL_OK;
+                        case 16: *result = SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE; return SAIL_OK;
+                    }
+                }
             }
             break;
         }
         case SAIL_PSD_MODE_RGB: {
             switch (channels) {
-                case 4: *result = SAIL_PIXEL_FORMAT_BPP24_RGB;  return SAIL_OK;
-                case 5: *result = SAIL_PIXEL_FORMAT_BPP32_RGBA; return SAIL_OK;
+                case 4: {
+                    switch(depth) {
+                        case 8:  *result = SAIL_PIXEL_FORMAT_BPP24_RGB; return SAIL_OK;
+                        case 16: *result = SAIL_PIXEL_FORMAT_BPP48_RGB; return SAIL_OK;
+                    }
+                }
+                case 5: {
+                    switch (depth) {
+                        case 8:  *result = SAIL_PIXEL_FORMAT_BPP32_RGBA; return SAIL_OK;
+                        case 16: *result = SAIL_PIXEL_FORMAT_BPP64_RGBA; return SAIL_OK;
+                    }
+                }
             }
             break;
         }
         case SAIL_PSD_MODE_CMYK: {
             switch (channels) {
                 /* TODO: 5 channels? */
-                case 4: *result = SAIL_PIXEL_FORMAT_BPP32_CMYK; return SAIL_OK;
+                case 4: {
+                    switch (depth) {
+                        case 8:  *result = SAIL_PIXEL_FORMAT_BPP32_CMYK; return SAIL_OK;
+                        case 16: *result = SAIL_PIXEL_FORMAT_BPP64_CMYK; return SAIL_OK;
+                    }
+                }
             }
             break;
         }

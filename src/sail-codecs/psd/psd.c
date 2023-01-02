@@ -184,7 +184,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_psd(void *state, st
     SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
                         /* cleanup */ sail_destroy_image(image_local));
 
-    SAIL_TRY_OR_CLEANUP(psd_private_sail_pixel_format(mode, channels, &image_local->source_image->pixel_format),
+    SAIL_TRY_OR_CLEANUP(psd_private_sail_pixel_format(mode, channels, depth, &image_local->source_image->pixel_format),
                         /* cleanup */ sail_destroy_image(image_local));
     image_local->source_image->compression  = (compression == SAIL_PSD_COMPRESSION_NONE) ? SAIL_COMPRESSION_NONE : SAIL_COMPRESSION_RLE;
 
