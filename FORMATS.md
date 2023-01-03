@@ -215,6 +215,8 @@
         <b>RGB:</b> 24-bit, 48-bit.
         <b>RGBA:</b> 32-bit, 64-bit.
         <br/><br/>
+        <b>Compressions:</b> NONE, RLE.
+        <br/><br/>
         <b>Content:</b> Static, Preview Image Only.
     </td>
     <td>
@@ -222,6 +224,8 @@
         <b>RGB:</b> 96-bit.
         <b>RGBA:</b> 128-bit.
         <b>Pixel formats:</b> Multichannel, Duotone, LAB.
+        <br/><br/>
+        <b>Compressions:</b> ZIP.
         <br/><br/>
         <b>Content:</b> Layers, masks, etc.
     </td>
