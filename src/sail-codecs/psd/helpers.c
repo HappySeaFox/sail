@@ -109,3 +109,14 @@ sail_status_t psd_private_sail_pixel_format(enum SailPsdMode mode, uint16_t chan
     SAIL_LOG_ERROR("PSD: Unsuppored combination of mode(%u) and channels(%u)", mode, channels);
     SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
 }
+
+enum SailCompression psd_private_sail_compression(enum SailPsdCompression compression)
+{
+    switch (compression) {
+        case SAIL_PSD_COMPRESSION_NONE:                   return SAIL_COMPRESSION_NONE;
+        case SAIL_PSD_COMPRESSION_RLE:                    return SAIL_COMPRESSION_RLE;
+        case SAIL_PSD_COMPRESSION_ZIP_WITHOUT_PREDICTION: return SAIL_COMPRESSION_ZIP;
+        case SAIL_PSD_COMPRESSION_ZIP_WITH_PREDICTION:    return SAIL_COMPRESSION_ZIP;
+        default: return SAIL_COMPRESSION_UNKNOWN;
+    }
+}

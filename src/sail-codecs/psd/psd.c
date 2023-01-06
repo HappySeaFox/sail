@@ -44,6 +44,10 @@ struct psd_state {
     bool frame_loaded;
 
     uint16_t channels;
+    uint16_t depth;
+    enum SailPsdCompression compression;
+    unsigned bytes_per_channel;
+    unsigned char *scan_buffer;
 };
 
 static sail_status_t alloc_psd_state(struct psd_state **psd_state) {
@@ -58,7 +62,11 @@ static sail_status_t alloc_psd_state(struct psd_state **psd_state) {
 
     (*psd_state)->frame_loaded = false;
 
-    (*psd_state)->channels     = 0;
+    (*psd_state)->channels          = 0;
+    (*psd_state)->depth             = 0;
+    (*psd_state)->compression       = SAIL_PSD_COMPRESSION_NONE;
+    (*psd_state)->bytes_per_channel = 0;
+    (*psd_state)->scan_buffer       = NULL;
 
     return SAIL_OK;
 }
@@ -68,6 +76,8 @@ static void destroy_psd_state(struct psd_state *psd_state) {
     if (psd_state == NULL) {
         return;
     }
+
+    sail_free(psd_state->scan_buffer);
 
     sail_destroy_load_options(psd_state->load_options);
     sail_destroy_save_options(psd_state->save_options);
@@ -94,7 +104,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_psd(struct sail_io *io, const 
     /* Deep copy load options. */
     SAIL_TRY(sail_copy_load_options(load_options, &psd_state->load_options));
 
-    /* Init decoder here. */
+    /* Init decoder. PSD spec: https://www.adobe.com/devnet-apps/photoshop/fileformatashtml/#50577409_89817 */
     uint32_t magic;
     SAIL_TRY(psd_private_get_big_endian_uint32_t(psd_state->io, &magic));
 
@@ -136,13 +146,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_psd(void *state, st
     uint32_t width;
     SAIL_TRY(psd_private_get_big_endian_uint32_t(psd_state->io, &width));
 
-    uint16_t depth;
-    SAIL_TRY(psd_private_get_big_endian_uint16_t(psd_state->io, &depth));
-
-    if (depth != 8) {
-        SAIL_LOG_ERROR("PSD: Bit depth %u is not supported", depth);
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_BIT_DEPTH);
-    }
+    SAIL_TRY(psd_private_get_big_endian_uint16_t(psd_state->io, &psd_state->depth));
 
     uint16_t mode;
     SAIL_TRY(psd_private_get_big_endian_uint16_t(psd_state->io, &mode));
@@ -154,8 +158,32 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_psd(void *state, st
     struct sail_palette *palette = NULL;
 
     if (data_size > 0) {
+        SAIL_LOG_TRACE("PSD: Palette data size: %u", data_size);
         SAIL_TRY(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP24_RGB, 256, &palette));
-        SAIL_TRY(psd_state->io->strict_read(psd_state->io->stream, palette->data, 256*3));
+
+        /* Merge RR GG BB... to RGB RGB... */
+        unsigned char buf[256*3];
+        SAIL_TRY(psd_state->io->strict_read(psd_state->io->stream, buf, sizeof(buf)));
+
+        unsigned char *palette_data = palette->data;
+
+        for (unsigned i = 0; i < 256; i++) {
+            for (unsigned channel = 0; channel < 3; channel++) {
+                *palette_data++ = buf[256 * channel + i];
+            }
+        }
+    } else if (mode == SAIL_PSD_MODE_BITMAP) {
+        SAIL_TRY(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP24_RGB, 2, &palette));
+
+        unsigned char *palette_data = palette->data;
+
+        *palette_data++ = 255;
+        *palette_data++ = 255;
+        *palette_data++ = 255;
+
+        *palette_data++ = 0;
+        *palette_data++ = 0;
+        *palette_data++ = 0;
     }
 
     /* Skip the image resources. */
@@ -174,15 +202,33 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_psd(void *state, st
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_COMPRESSION);
     }
 
+    psd_state->compression = compression;
+
+    /* Skip byte counts for all the scan lines. */
+    if (psd_state->compression == SAIL_PSD_COMPRESSION_RLE) {
+        SAIL_TRY(psd_state->io->seek(psd_state->io->stream, height * psd_state->channels * 2, SEEK_CUR));
+    }
+
+    /* Used to optimize uncompressed readings. */
+    if (psd_state->compression == SAIL_PSD_COMPRESSION_NONE) {
+        psd_state->bytes_per_channel = ((unsigned)width * psd_state->depth + 7) / 8;
+
+        void *ptr;
+        SAIL_TRY(sail_malloc(psd_state->bytes_per_channel, &ptr));
+        psd_state->scan_buffer = ptr;
+    }
+
+    SAIL_LOG_TRACE("PSD: mode(%u), channels(%u), depth(%u)", mode, psd_state->channels, psd_state->depth);
+
     /* Allocate image. */
     struct sail_image *image_local;
     SAIL_TRY(sail_alloc_image(&image_local));
     SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
                         /* cleanup */ sail_destroy_image(image_local));
 
-    SAIL_TRY_OR_CLEANUP(psd_private_sail_pixel_format(mode, psd_state->channels, depth, &image_local->source_image->pixel_format),
+    SAIL_TRY_OR_CLEANUP(psd_private_sail_pixel_format(mode, psd_state->channels, psd_state->depth, &image_local->source_image->pixel_format),
                         /* cleanup */ sail_destroy_image(image_local));
-    image_local->source_image->compression  = (compression == SAIL_PSD_COMPRESSION_NONE) ? SAIL_COMPRESSION_NONE : SAIL_COMPRESSION_RLE;
+    image_local->source_image->compression  = psd_private_sail_compression(psd_state->compression);
 
     image_local->width          = width;
     image_local->height         = height;
@@ -198,6 +244,55 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_psd(void *state, st
 SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_psd(void *state, struct sail_image *image) {
 
     const struct psd_state *psd_state = (struct psd_state *)state;
+
+    const unsigned bpp = (psd_state->channels * psd_state->depth + 7) / 8;
+
+    if (psd_state->compression == SAIL_PSD_COMPRESSION_RLE) {
+        for (unsigned channel = 0; channel < psd_state->channels; channel++) {
+            for (unsigned row = 0; row < image->height; row++) {
+                for (unsigned count = 0; count < image->width; ) {
+                    unsigned char c;
+                    SAIL_TRY(psd_state->io->strict_read(psd_state->io->stream, &c, sizeof(c)));
+
+                    if (c > 128) {
+                        c ^= 0xff;
+                        c += 2;
+
+                        unsigned char value;
+                        SAIL_TRY(psd_state->io->strict_read(psd_state->io->stream, &value, sizeof(value)));
+
+                        for (unsigned i = count; i < count + c; i++) {
+                            unsigned char *scan = (unsigned char *)image->pixels + row * image->bytes_per_line + i * bpp;
+                            *(scan + channel) = value;
+                        }
+                    } else if (c < 128) {
+                        c++;
+
+                        for (unsigned i = count; i < count + c; i++) {
+                            unsigned char value;
+                            SAIL_TRY(psd_state->io->strict_read(psd_state->io->stream, &value, sizeof(value)));
+
+                            unsigned char *scan = (unsigned char *)image->pixels + row * image->bytes_per_line + i * bpp;
+                            *(scan + channel) = value;
+                        }
+                    }
+
+                    count += c;
+                }
+            }
+        }
+    } else {
+        for (unsigned channel = 0; channel < psd_state->channels; channel++) {
+            for (unsigned row = 0; row < image->height; row++) {
+                SAIL_TRY(psd_state->io->strict_read(psd_state->io->stream, psd_state->scan_buffer, psd_state->bytes_per_channel));
+
+                for (unsigned count = 0; count < psd_state->bytes_per_channel; count++) {
+                    unsigned char *scan = (unsigned char *)image->pixels + row * image->bytes_per_line + count * bpp;
+                    *(scan + channel) = *(psd_state->scan_buffer + count);
+                }
+            }
+        }
+    }
 
     return SAIL_OK;
 }
