@@ -71,6 +71,7 @@ sail_status_t psd_private_sail_pixel_format(enum SailPsdMode mode, uint16_t chan
                         case 8:  *result = SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE;  return SAIL_OK;
                         case 16: *result = SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE; return SAIL_OK;
                     }
+                    break;
                 }
             }
             break;
@@ -82,12 +83,14 @@ sail_status_t psd_private_sail_pixel_format(enum SailPsdMode mode, uint16_t chan
                         case 8:  *result = SAIL_PIXEL_FORMAT_BPP24_RGB; return SAIL_OK;
                         case 16: *result = SAIL_PIXEL_FORMAT_BPP48_RGB; return SAIL_OK;
                     }
+                    break;
                 }
                 case 4: {
                     switch (depth) {
                         case 8:  *result = SAIL_PIXEL_FORMAT_BPP32_RGBA; return SAIL_OK;
                         case 16: *result = SAIL_PIXEL_FORMAT_BPP64_RGBA; return SAIL_OK;
                     }
+                    break;
                 }
             }
             break;
@@ -100,8 +103,12 @@ sail_status_t psd_private_sail_pixel_format(enum SailPsdMode mode, uint16_t chan
                         case 8:  *result = SAIL_PIXEL_FORMAT_BPP32_CMYK; return SAIL_OK;
                         case 16: *result = SAIL_PIXEL_FORMAT_BPP64_CMYK; return SAIL_OK;
                     }
+                    break;
                 }
             }
+            break;
+        }
+        default: {
             break;
         }
     }
