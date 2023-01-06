@@ -206,7 +206,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_psd(void *state, st
 
     /* Skip byte counts for all the scan lines. */
     if (psd_state->compression == SAIL_PSD_COMPRESSION_RLE) {
-        SAIL_TRY(psd_state->io->seek(psd_state->io->stream, height * psd_state->channels * 2, SEEK_CUR));
+        SAIL_TRY(psd_state->io->seek(psd_state->io->stream, (long)height * psd_state->channels * 2, SEEK_CUR));
     }
 
     /* Used to optimize uncompressed readings. */
