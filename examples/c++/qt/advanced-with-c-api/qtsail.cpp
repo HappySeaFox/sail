@@ -291,11 +291,12 @@ sail_status_t QtSail::onProbe()
 
     QMessageBox::information(this,
                              tr("File info"),
-                             tr("Probed in: %1 ms.\nCodec: %2\nSize: %3x%4\nSource pixel format: %5\nOutput pixel format: %6")
+                             tr("Probed in: %1 ms.\nCodec: %2\nSize: %3x%4\nSource compression: %5\nSource pixel format: %6\nOutput pixel format: %7")
                                 .arg(elapsedTimer.elapsed())
                                 .arg(codec_info->description)
                                 .arg(image->width)
                                 .arg(image->height)
+                                .arg(sail_compression_to_string(image->source_image->compression))
                                 .arg(sail_pixel_format_to_string(image->source_image->pixel_format))
                                 .arg(sail_pixel_format_to_string(image->pixel_format))
                              );
