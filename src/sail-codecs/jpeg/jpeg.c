@@ -157,7 +157,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_jpeg(struct sail_io *io, const
 
 SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpeg(void *state, struct sail_image **image) {
 
-    struct jpeg_state *jpeg_state = (struct jpeg_state *)state;
+    struct jpeg_state *jpeg_state = state;
 
     if (jpeg_state->frame_loaded) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
@@ -209,7 +209,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpeg(void *state, s
 
 SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_jpeg(void *state, struct sail_image *image) {
 
-    struct jpeg_state *jpeg_state = (struct jpeg_state *)state;
+    struct jpeg_state *jpeg_state = state;
 
     if (jpeg_state->libjpeg_error) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
@@ -232,7 +232,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_jpeg(void *state, struct sail
 
 SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_jpeg(void **state) {
 
-    struct jpeg_state *jpeg_state = (struct jpeg_state *)(*state);
+    struct jpeg_state *jpeg_state = *state;
 
     *state = NULL;
 
@@ -297,7 +297,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_jpeg(struct sail_io *io, const
 
 SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_jpeg(void *state, const struct sail_image *image) {
 
-    struct jpeg_state *jpeg_state = (struct jpeg_state *)state;
+    struct jpeg_state *jpeg_state = state;
 
     if (jpeg_state->frame_saved) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
@@ -367,7 +367,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_jpeg(void *state, c
 
 SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_jpeg(void *state, const struct sail_image *image) {
 
-    struct jpeg_state *jpeg_state = (struct jpeg_state *)state;
+    struct jpeg_state *jpeg_state = state;
 
     if (jpeg_state->libjpeg_error) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
@@ -388,7 +388,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_jpeg(void *state, const struc
 
 SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_jpeg(void **state) {
 
-    struct jpeg_state *jpeg_state = (struct jpeg_state *)(*state);
+    struct jpeg_state *jpeg_state = *state;
 
     /* Subsequent calls to finish() will expectedly fail in the above line. */
     *state = NULL;

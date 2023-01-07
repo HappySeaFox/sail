@@ -126,7 +126,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_psd(struct sail_io *io, const 
 
 SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_psd(void *state, struct sail_image **image) {
 
-    struct psd_state *psd_state = (struct psd_state *)state;
+    struct psd_state *psd_state = state;
 
     if (psd_state->frame_loaded) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
@@ -243,7 +243,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_psd(void *state, st
 
 SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_psd(void *state, struct sail_image *image) {
 
-    const struct psd_state *psd_state = (struct psd_state *)state;
+    const struct psd_state *psd_state = state;
 
     const unsigned bpp = (psd_state->channels * psd_state->depth + 7) / 8;
 
@@ -299,7 +299,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_psd(void *state, struct sail_
 
 SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_psd(void **state) {
 
-    struct psd_state *psd_state = (struct psd_state *)(*state);
+    struct psd_state *psd_state = *state;
 
     *state = NULL;
 
