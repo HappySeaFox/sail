@@ -283,7 +283,7 @@ version=1.0.0
 # HIGHEST = one of the most popular image formats like JPEG
 # HIGH    = pretty popular and common image format like SVG
 # MEDIUM  = moderate popularity
-# LOW     = rare image format
+# LOW     = pretty rare image format
 # LOWEST  = very rare and/or too specific and/or ancient image format
 #
 priority=MEDIUM
