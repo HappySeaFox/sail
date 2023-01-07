@@ -95,7 +95,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_bmp(struct sail_io *io, const 
 
 SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_bmp(void *state, struct sail_image **image) {
 
-    struct bmp_state *bmp_state = (struct bmp_state *)state;
+    struct bmp_state *bmp_state = state;
 
     if (bmp_state->frame_loaded) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
@@ -110,7 +110,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_bmp(void *state, st
 
 SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_bmp(void *state, struct sail_image *image) {
 
-    struct bmp_state *bmp_state = (struct bmp_state *)state;
+    struct bmp_state *bmp_state = state;
 
     SAIL_TRY(bmp_private_read_frame(bmp_state->common_bmp_state, bmp_state->io, image));
 
@@ -119,7 +119,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_bmp(void *state, struct sail_
 
 SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_bmp(void **state) {
 
-    struct bmp_state *bmp_state = (struct bmp_state *)(*state);
+    struct bmp_state *bmp_state = *state;
 
     *state = NULL;
 

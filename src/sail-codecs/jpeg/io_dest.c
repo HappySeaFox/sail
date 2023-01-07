@@ -130,9 +130,9 @@ void jpeg_private_sail_io_dest(j_compress_ptr cinfo, struct sail_io *io)
      * can be written to the same file without re-executing jpeg_stdio_dest.
      */
     if (cinfo->dest == NULL) {    /* first time for this JPEG object? */
-        cinfo->dest = (struct jpeg_destination_mgr *)(*cinfo->mem->alloc_small)((j_common_ptr)cinfo,
-                                                                                JPOOL_PERMANENT,
-                                                                                sizeof(struct sail_jpeg_destination_mgr));
+        cinfo->dest = cinfo->mem->alloc_small((j_common_ptr)cinfo,
+                                                JPOOL_PERMANENT,
+                                                sizeof(struct sail_jpeg_destination_mgr));
     } else if (cinfo->dest->init_destination != init_destination) {
         /* It is unsafe to reuse the existing destination manager unless it was
          * created by this function.  Otherwise, there is no guarantee that the

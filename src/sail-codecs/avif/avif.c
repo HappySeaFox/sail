@@ -140,7 +140,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_avif(struct sail_io *io, const
 
 SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_avif(void *state, struct sail_image **image) {
 
-    struct avif_state *avif_state = (struct avif_state *)state;
+    struct avif_state *avif_state = state;
 
     avifResult avif_result = avifDecoderNextImage(avif_state->avif_decoder);
 
@@ -187,7 +187,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_avif(void *state, s
 
 SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_avif(void *state, struct sail_image *image) {
 
-    struct avif_state *avif_state = (struct avif_state *)state;
+    struct avif_state *avif_state = state;
     const struct avifImage *avif_image = avif_state->avif_decoder->image;
 
     avif_state->rgb_image.pixels = image->pixels;
@@ -205,7 +205,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_avif(void *state, struct sail
 
 SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_avif(void **state) {
 
-    struct avif_state *avif_state = (struct avif_state *)(*state);
+    struct avif_state *avif_state = *state;
 
     *state = NULL;
 

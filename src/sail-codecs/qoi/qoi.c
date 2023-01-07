@@ -110,7 +110,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_qoi(struct sail_io *io, const 
 
 SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_qoi(void *state, struct sail_image **image) {
 
-    struct qoi_state *qoi_state = (struct qoi_state *)state;
+    struct qoi_state *qoi_state = state;
 
     if (qoi_state->frame_loaded) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
@@ -163,7 +163,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_qoi(void *state, st
 
 SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_qoi(void *state, struct sail_image *image) {
 
-    const struct qoi_state *qoi_state = (struct qoi_state *)state;
+    const struct qoi_state *qoi_state = state;
 
     const size_t pixels_size = (size_t)image->bytes_per_line * image->height;
 
@@ -174,7 +174,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_qoi(void *state, struct sail_
 
 SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_qoi(void **state) {
 
-    struct qoi_state *qoi_state = (struct qoi_state *)(*state);
+    struct qoi_state *qoi_state = *state;
 
     *state = NULL;
 
@@ -213,7 +213,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_qoi(struct sail_io *io, const 
 
 SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_qoi(void *state, const struct sail_image *image) {
 
-    struct qoi_state *qoi_state = (struct qoi_state *)state;
+    struct qoi_state *qoi_state = state;
 
     unsigned char channels;
 
@@ -244,7 +244,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_qoi(void *state, co
 
 SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_qoi(void *state, const struct sail_image *image) {
 
-    struct qoi_state *qoi_state = (struct qoi_state *)state;
+    struct qoi_state *qoi_state = state;
 
     const size_t pixels_size = (size_t)image->bytes_per_line * image->height;
 
@@ -255,7 +255,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_qoi(void *state, const struct
 
 SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_qoi(void **state) {
 
-    struct qoi_state *qoi_state = (struct qoi_state *)(*state);
+    struct qoi_state *qoi_state = *state;
 
     /* Subsequent calls to finish() will expectedly fail in the above line. */
     *state = NULL;

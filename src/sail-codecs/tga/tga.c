@@ -113,7 +113,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_tga(struct sail_io *io, const 
 
 SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_tga(void *state, struct sail_image **image) {
 
-    struct tga_state *tga_state = (struct tga_state *)state;
+    struct tga_state *tga_state = state;
 
     if (tga_state->frame_loaded) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
@@ -197,7 +197,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_tga(void *state, st
 
 SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_tga(void *state, struct sail_image *image) {
 
-    struct tga_state *tga_state = (struct tga_state *)state;
+    struct tga_state *tga_state = state;
 
     switch (tga_state->file_header.image_type) {
         case TGA_INDEXED:
@@ -254,7 +254,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_tga(void *state, struct sail_
 
 SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_tga(void **state) {
 
-    struct tga_state *tga_state = (struct tga_state *)(*state);
+    struct tga_state *tga_state = *state;
 
     *state = NULL;
 

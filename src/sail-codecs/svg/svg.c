@@ -114,7 +114,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_svg(struct sail_io *io, const 
 
 SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_svg(void *state, struct sail_image **image) {
 
-    struct svg_state *svg_state = (struct svg_state *)state;
+    struct svg_state *svg_state = state;
 
     if (svg_state->frame_loaded) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
@@ -144,7 +144,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_svg(void *state, st
 
 SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_svg(void *state, struct sail_image *image) {
 
-    const struct svg_state *svg_state = (struct svg_state *)state;
+    const struct svg_state *svg_state = state;
 
     memset(image->pixels, 0, (size_t)image->bytes_per_line * image->height);
 
@@ -157,7 +157,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_svg(void *state, struct sail_
 
 SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_svg(void **state) {
 
-    struct svg_state *svg_state = (struct svg_state *)(*state);
+    struct svg_state *svg_state = *state;
 
     *state = NULL;
 

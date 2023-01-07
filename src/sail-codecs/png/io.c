@@ -38,7 +38,7 @@ void png_private_my_read_fn(png_structp png_ptr, png_bytep bytes, png_size_t byt
         return;
     }
 
-    struct sail_io *io = (struct sail_io *)png_get_io_ptr(png_ptr);
+    struct sail_io *io = png_get_io_ptr(png_ptr);
 
     sail_status_t err = io->strict_read(io->stream, bytes, bytes_size);
 
@@ -53,7 +53,7 @@ void png_private_my_write_fn(png_structp png_ptr, png_bytep bytes, png_size_t by
         return;
     }
 
-    struct sail_io *io = (struct sail_io *)png_get_io_ptr(png_ptr);
+    struct sail_io *io = png_get_io_ptr(png_ptr);
 
     sail_status_t err = io->strict_write(io->stream, bytes, bytes_size);
 
@@ -68,7 +68,7 @@ void png_private_my_flush_fn(png_structp png_ptr) {
         return;
     }
 
-    struct sail_io *io = (struct sail_io *)png_get_io_ptr(png_ptr);
+    struct sail_io *io = png_get_io_ptr(png_ptr);
 
     sail_status_t err = io->flush(io->stream);
 
