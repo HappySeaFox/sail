@@ -29,7 +29,7 @@
 
 int my_read_proc(GifFileType *gif, GifByteType *buffer, int buffer_size) {
 
-    struct sail_io *io = (struct sail_io *)gif->UserData;
+    struct sail_io *io = gif->UserData;
     size_t nbytes;
 
     sail_status_t err = io->tolerant_read(io->stream, buffer, buffer_size, &nbytes);
@@ -44,7 +44,7 @@ int my_read_proc(GifFileType *gif, GifByteType *buffer, int buffer_size) {
 
 int my_write_proc(GifFileType *gif, GifByteType *buffer, int buffer_size) {
 
-    struct sail_io *io = (struct sail_io *)gif->UserData;
+    struct sail_io *io = gif->UserData;
     size_t nbytes;
 
     sail_status_t err = io->tolerant_write(io->stream, buffer, buffer_size, &nbytes);

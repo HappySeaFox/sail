@@ -106,7 +106,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_wal(struct sail_io *io, const 
 
 SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_wal(void *state, struct sail_image **image) {
 
-    struct wal_state *wal_state = (struct wal_state *)state;
+    struct wal_state *wal_state = state;
 
     if (wal_state->frame_number == 4) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
@@ -147,7 +147,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_wal(void *state, st
 
 SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_wal(void *state, struct sail_image *image) {
 
-    struct wal_state *wal_state = (struct wal_state *)state;
+    struct wal_state *wal_state = state;
 
     SAIL_TRY(wal_state->io->strict_read(wal_state->io->stream, image->pixels, (size_t)image->bytes_per_line * image->height));
 
@@ -156,7 +156,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_wal(void *state, struct sail_
 
 SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_wal(void **state) {
 
-    struct wal_state *wal_state = (struct wal_state *)(*state);
+    struct wal_state *wal_state = *state;
 
     *state = NULL;
 

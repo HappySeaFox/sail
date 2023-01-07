@@ -101,7 +101,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_xbm(struct sail_io *io, const 
 
 SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_xbm(void *state, struct sail_image **image) {
 
-    struct xbm_state *xbm_state = (struct xbm_state *)state;
+    struct xbm_state *xbm_state = state;
 
     if (xbm_state->frame_loaded) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
@@ -194,7 +194,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_xbm(void *state, st
 
 SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_xbm(void *state, struct sail_image *image) {
 
-    const struct xbm_state *xbm_state = (struct xbm_state *)state;
+    const struct xbm_state *xbm_state = state;
 
     unsigned literals_to_read;
 
@@ -240,7 +240,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_xbm(void *state, struct sail_
 
 SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_xbm(void **state) {
 
-    struct xbm_state *xbm_state = (struct xbm_state *)(*state);
+    struct xbm_state *xbm_state = *state;
 
     *state = NULL;
 

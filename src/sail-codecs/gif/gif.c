@@ -177,7 +177,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_gif(struct sail_io *io, const 
 
 SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_gif(void *state, struct sail_image **image) {
 
-    struct gif_state *gif_state = (struct gif_state *)state;
+    struct gif_state *gif_state = state;
 
     struct sail_image *image_local;
     SAIL_TRY(sail_alloc_image(&image_local));
@@ -336,7 +336,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_gif(void *state, st
 
 SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_gif(void *state, struct sail_image *image) {
 
-    struct gif_state *gif_state = (struct gif_state *)state;
+    struct gif_state *gif_state = state;
 
     const int passes = image->source_image->interlaced ? 4 : 1;
     const int last_pass = passes - 1;
@@ -427,7 +427,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_gif(void *state, struct sail_
 
 SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_gif(void **state) {
 
-    struct gif_state *gif_state = (struct gif_state *)(*state);
+    struct gif_state *gif_state = *state;
 
     *state = NULL;
 

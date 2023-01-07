@@ -325,7 +325,7 @@ sail_status_t bmp_private_read_init(struct sail_io *io, const struct sail_load_o
 
 sail_status_t bmp_private_read_seek_next_frame(void *state, struct sail_io *io, struct sail_image **image) {
 
-    struct bmp_state *bmp_state = (struct bmp_state *)state;
+    struct bmp_state *bmp_state = state;
 
     struct sail_image *image_local;
     SAIL_TRY(sail_alloc_image(&image_local));
@@ -383,7 +383,7 @@ sail_status_t bmp_private_read_seek_next_frame(void *state, struct sail_io *io, 
 
 sail_status_t bmp_private_read_frame(void *state, struct sail_io *io, struct sail_image *image) {
 
-    struct bmp_state *bmp_state = (struct bmp_state *)state;
+    struct bmp_state *bmp_state = state;
 
     /* RLE-encoded images don't need to skip pad bytes. */
     bool skip_pad_bytes = true;
@@ -534,7 +534,7 @@ sail_status_t bmp_private_read_finish(void **state, struct sail_io *io) {
 
     (void)io;
 
-    struct bmp_state *bmp_state = (struct bmp_state *)(*state);
+    struct bmp_state *bmp_state = *state;
 
     *state = NULL;
 

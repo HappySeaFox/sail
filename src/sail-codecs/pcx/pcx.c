@@ -124,7 +124,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_pcx(struct sail_io *io, const 
 
 SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_pcx(void *state, struct sail_image **image) {
 
-    struct pcx_state *pcx_state = (struct pcx_state *)state;
+    struct pcx_state *pcx_state = state;
 
     if (pcx_state->frame_loaded) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
@@ -176,7 +176,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_pcx(void *state, st
 
 SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_pcx(void *state, struct sail_image *image) {
 
-    const struct pcx_state *pcx_state = (struct pcx_state *)state;
+    const struct pcx_state *pcx_state = state;
 
     if (pcx_state->pcx_header.encoding == SAIL_PCX_NO_ENCODING) {
         SAIL_TRY(pcx_private_read_uncompressed(pcx_state->io, pcx_state->pcx_header.bytes_per_line, pcx_state->pcx_header.planes, pcx_state->scanline_buffer, image));
@@ -226,7 +226,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_pcx(void *state, struct sail_
 
 SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_pcx(void **state) {
 
-    struct pcx_state *pcx_state = (struct pcx_state *)(*state);
+    struct pcx_state *pcx_state = *state;
 
     *state = NULL;
 

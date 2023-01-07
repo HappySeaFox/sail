@@ -270,7 +270,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_png(struct sail_io *io, const 
 
 SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_png(void *state, struct sail_image **image) {
 
-    struct png_state *png_state = (struct png_state *)state;
+    struct png_state *png_state = state;
 
     if (png_state->libpng_error) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
@@ -364,7 +364,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_png(void *state, st
 
 SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_png(void *state, struct sail_image *image) {
 
-    struct png_state *png_state = (struct png_state *)state;
+    struct png_state *png_state = state;
 
     if (png_state->libpng_error) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
@@ -433,7 +433,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_png(void *state, struct sail_
 
 SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_png(void **state) {
 
-    struct png_state *png_state = (struct png_state *)(*state);
+    struct png_state *png_state = *state;
 
     *state = NULL;
 
@@ -503,7 +503,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_png(struct sail_io *io, const 
 
 SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_png(void *state, const struct sail_image *image) {
 
-    struct png_state *png_state = (struct png_state *)state;
+    struct png_state *png_state = state;
 
     if (png_state->frame_saved) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
@@ -612,7 +612,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_png(void *state, co
 
 SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_png(void *state, const struct sail_image *image) {
 
-    struct png_state *png_state = (struct png_state *)state;
+    struct png_state *png_state = state;
 
     if (png_state->libpng_error) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
@@ -635,7 +635,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_png(void *state, const struct
 
 SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_png(void **state) {
 
-    struct png_state *png_state = (struct png_state *)(*state);
+    struct png_state *png_state = *state;
 
     /* Subsequent calls to finish() will expectedly fail in the above line. */
     *state = NULL;

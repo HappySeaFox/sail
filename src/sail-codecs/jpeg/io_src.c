@@ -177,9 +177,9 @@ void jpeg_private_sail_io_src(j_decompress_ptr cinfo, struct sail_io *io) {
      * one image, we'd likely lose the start of the next one.)
      */
     if (cinfo->src == NULL) {     /* first time for this JPEG object? */
-        cinfo->src = (struct jpeg_source_mgr *)(*cinfo->mem->alloc_small)((j_common_ptr)cinfo,
-                                                                            JPOOL_PERMANENT,
-                                                                            sizeof(struct sail_jpeg_source_mgr));
+        cinfo->src = cinfo->mem->alloc_small((j_common_ptr)cinfo,
+                                                JPOOL_PERMANENT,
+                                                sizeof(struct sail_jpeg_source_mgr));
         src = (struct sail_jpeg_source_mgr *)cinfo->src;
         src->buffer = (JOCTET *)(*cinfo->mem->alloc_small)((j_common_ptr)cinfo,
                                                                             JPOOL_PERMANENT,

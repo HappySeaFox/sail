@@ -143,7 +143,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_jpeg2000(struct sail_io *io, c
 
 SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpeg2000(void *state, struct sail_image **image) {
 
-    struct jpeg2000_state *jpeg2000_state = (struct jpeg2000_state *)state;
+    struct jpeg2000_state *jpeg2000_state = state;
 
     if (jpeg2000_state->frame_loaded) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
@@ -281,7 +281,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpeg2000(void *stat
 
 SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_jpeg2000(void *state, struct sail_image *image) {
 
-    const struct jpeg2000_state *jpeg2000_state = (struct jpeg2000_state *)state;
+    const struct jpeg2000_state *jpeg2000_state = state;
 
     for (unsigned row = 0; row < image->height; row++) {
         unsigned char *scan = (unsigned char *)image->pixels + row * image->bytes_per_line;
@@ -311,7 +311,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_jpeg2000(void *state, struct 
 
 SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_jpeg2000(void **state) {
 
-    struct jpeg2000_state *jpeg2000_state = (struct jpeg2000_state *)(*state);
+    struct jpeg2000_state *jpeg2000_state = *state;
 
     *state = NULL;
 

@@ -188,7 +188,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_webp(struct sail_io *io, const
 
 SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_webp(void *state, struct sail_image **image) {
 
-    struct webp_state *webp_state = (struct webp_state *)state;
+    struct webp_state *webp_state = state;
 
     /* Start demuxing. */
     if (webp_state->frame_number == 0) {
@@ -255,7 +255,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_webp(void *state, s
 
 SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_webp(void *state, struct sail_image *image) {
 
-    struct webp_state *webp_state = (struct webp_state *)state;
+    struct webp_state *webp_state = state;
 
     switch (webp_state->frame_blend_method) {
         case WEBP_MUX_NO_BLEND: {
@@ -302,7 +302,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_webp(void *state, struct sail
 
 SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_webp(void **state) {
 
-    struct webp_state *webp_state = (struct webp_state *)(*state);
+    struct webp_state *webp_state = *state;
 
     *state = NULL;
 
