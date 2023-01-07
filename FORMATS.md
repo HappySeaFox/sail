@@ -217,7 +217,7 @@
         <br/><br/>
         <b>Compressions:</b> NONE, RLE.
         <br/><br/>
-        <b>Content:</b> Static, Preview Image Only.
+        <b>Content:</b> Static (Preview Image Only).
     </td>
     <td>
         <b>Grayscale:</b> 32-bit.
