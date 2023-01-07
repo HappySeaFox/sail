@@ -75,12 +75,13 @@ images with the help of [ksquirrel-libs](FAQ.md#how-old-is-sail), the predecesso
 | 7  | [JPEG2000](https://wikipedia.org/wiki/JPEG_2000)                    | R             | jasper            |
 | 8  | [PCX](https://wikipedia.org/wiki/PCX)                               | R             |                   |
 | 9  | [PNG](https://wikipedia.org/wiki/Portable_Network_Graphics)         | RW            | libpng            |
-| 10 | [QOI](http://qoiformat.org)                                         | RW            |                   |
-| 11 | [SVG](https://wikipedia.org/wiki/Scalable_Vector_Graphics)          | R             | resvg             |
-| 12 | [TGA](https://wikipedia.org/wiki/Truevision_TGA)                    | R             |                   |
-| 13 | [TIFF](https://wikipedia.org/wiki/TIFF)                             | RW            | libtiff           |
+| 10 | [PSD](https://en.wikipedia.org/wiki/Adobe_Photoshop#File_format)    | R             |                   |
+| 11 | [QOI](http://qoiformat.org)                                         | RW            |                   |
+| 12 | [SVG](https://wikipedia.org/wiki/Scalable_Vector_Graphics)          | R             | resvg             |
+| 13 | [TGA](https://wikipedia.org/wiki/Truevision_TGA)                    | R             |                   |
+| 14 | [TIFF](https://wikipedia.org/wiki/TIFF)                             | RW            | libtiff           |
 | .. | ...                                                                 |               |                   |
-| 15 | [WEBP](https://wikipedia.org/wiki/WebP)                             | R             | libwebp           |
+| 16 | [WEBP](https://wikipedia.org/wiki/WebP)                             | R             | libwebp           |
 | .. | ...                                                                 |               |                   |
 
 See the full list [here](FORMATS.md). Work to add more image formats is ongoing.

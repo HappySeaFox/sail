@@ -344,6 +344,7 @@ const char* sail_compression_to_string(enum SailCompression compression) {
         case SAIL_COMPRESSION_T85:           return "T85";
         case SAIL_COMPRESSION_THUNDERSCAN:   return "THUNDERSCAN";
         case SAIL_COMPRESSION_WEBP:          return "WEBP";
+        case SAIL_COMPRESSION_ZIP:           return "ZIP";
         case SAIL_COMPRESSION_ZSTD:          return "ZSTD";
     }
 
@@ -391,6 +392,7 @@ enum SailCompression sail_compression_from_string(const char *str) {
         case UINT64_C(13844775339661004164): return SAIL_COMPRESSION_THUNDERSCAN;
         case UINT64_C(6384644819):           return SAIL_COMPRESSION_WEBP;
         case UINT64_C(6384768458):           return SAIL_COMPRESSION_ZSTD;
+        case UINT64_C(193477496):            return SAIL_COMPRESSION_ZIP;
     }
 
     return SAIL_COMPRESSION_UNKNOWN;

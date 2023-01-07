@@ -379,6 +379,7 @@ static MunitResult test_compression_to_string(const MunitParameter params[], voi
     munit_assert_string_equal(sail_compression_to_string(SAIL_COMPRESSION_T85),           "T85");
     munit_assert_string_equal(sail_compression_to_string(SAIL_COMPRESSION_THUNDERSCAN),   "THUNDERSCAN");
     munit_assert_string_equal(sail_compression_to_string(SAIL_COMPRESSION_WEBP),          "WEBP");
+    munit_assert_string_equal(sail_compression_to_string(SAIL_COMPRESSION_ZIP),           "ZIP");
     munit_assert_string_equal(sail_compression_to_string(SAIL_COMPRESSION_ZSTD),          "ZSTD");
 
     return MUNIT_OK;
@@ -427,6 +428,7 @@ static MunitResult test_compression_from_string(const MunitParameter params[], v
     munit_assert(sail_compression_from_string("T85")           == SAIL_COMPRESSION_T85);
     munit_assert(sail_compression_from_string("THUNDERSCAN")   == SAIL_COMPRESSION_THUNDERSCAN);
     munit_assert(sail_compression_from_string("WEBP")          == SAIL_COMPRESSION_WEBP);
+    munit_assert(sail_compression_from_string("ZIP")           == SAIL_COMPRESSION_ZIP);
     munit_assert(sail_compression_from_string("ZSTD")          == SAIL_COMPRESSION_ZSTD);
 
     return MUNIT_OK;
