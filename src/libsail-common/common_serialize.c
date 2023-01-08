@@ -391,8 +391,8 @@ enum SailCompression sail_compression_from_string(const char *str) {
         case UINT64_C(193470374):            return SAIL_COMPRESSION_T85;
         case UINT64_C(13844775339661004164): return SAIL_COMPRESSION_THUNDERSCAN;
         case UINT64_C(6384644819):           return SAIL_COMPRESSION_WEBP;
-        case UINT64_C(6384768458):           return SAIL_COMPRESSION_ZSTD;
         case UINT64_C(193477496):            return SAIL_COMPRESSION_ZIP;
+        case UINT64_C(6384768458):           return SAIL_COMPRESSION_ZSTD;
     }
 
     return SAIL_COMPRESSION_UNKNOWN;
