@@ -180,7 +180,7 @@ endif()
 
 # Codecs & icons paths
 #
-set(SAIL_CODECS_PATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/sail/codecs")
+set(SAIL_CODECS_PATH "${CMAKE_INSTALL_FULL_LIBDIR}/sail/codecs")
 if (WIN32)
     string(REPLACE "/" "\\\\" SAIL_CODECS_PATH "${SAIL_CODECS_PATH}")
 endif()
@@ -313,9 +313,9 @@ message("*       For example, if you configure with -DBUILD_SHARED_LIBS=OFF -DSA
 message("*       the final value of SAIL_COMBINE_CODECS will be ON.")
 message("*")
 message("* Install prefix:               ${CMAKE_INSTALL_PREFIX}")
-message("* LIBDIR:                       ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
-message("* INCLUDEDIR:                   ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}")
-message("* DATADIR:                      ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}")
+message("* LIBDIR:                       ${CMAKE_INSTALL_FULL_LIBDIR}")
+message("* INCLUDEDIR:                   ${CMAKE_INSTALL_FULL_INCLUDEDIR}")
+message("* DATADIR:                      ${CMAKE_INSTALL_FULL_DATAROOTDIR}")
 message("*")
 message("* Enabled codecs:               ${ENABLED_CODECS}")
 message("* Disabled codecs:              ${DISABLED_CODECS}")
