@@ -29,22 +29,18 @@
 
 sail_status_t psd_private_get_big_endian_uint16_t(struct sail_io *io, uint16_t *v)
 {
-    SAIL_TRY(io->strict_read(io->stream, v, sizeof(uint16_t)));
+    SAIL_TRY(io->strict_read(io->stream, v, sizeof(*v)));
 
-    unsigned char *view = (unsigned char *)v;
-
-    *v = (view[0] << 8) + view[1];
+    *v = sail_reverse_uint16_t(*v);
 
     return SAIL_OK;
 }
 
 sail_status_t psd_private_get_big_endian_uint32_t(struct sail_io *io, uint32_t *v)
 {
-    SAIL_TRY(io->strict_read(io->stream, v, sizeof(uint32_t)));
+    SAIL_TRY(io->strict_read(io->stream, v, sizeof(*v)));
 
-    unsigned char *view = (unsigned char *)v;
-
-    *v = (view[0] << 24) + (view[1] << 16) + (view[2] << 8) + view[3];
+    *v = sail_reverse_uint32_t(*v);
 
     return SAIL_OK;
 }

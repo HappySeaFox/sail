@@ -75,4 +75,13 @@
 /* Enable working in multi-threaded environments. */
 #cmakedefine SAIL_THREAD_SAFE
 
+/* Enable __builtin_bswap16. */
+#cmakedefine SAIL_HAVE_BUILTIN_BSWAP16
+
+/* Enable __builtin_bswap32. */
+#cmakedefine SAIL_HAVE_BUILTIN_BSWAP32
+
+/* Enable __builtin_bswap64. */
+#cmakedefine SAIL_HAVE_BUILTIN_BSWAP64
+
 #endif
