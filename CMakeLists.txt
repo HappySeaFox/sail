@@ -15,6 +15,7 @@ include(CMakePushCheckState)
 #
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" "${CMAKE_MODULE_PATH}")
 include(sail_check_alignas)
+include(sail_check_builtin_bswap)
 include(sail_check_c11_thread_local)
 include(sail_check_include)
 include(sail_check_init_once_execute_once)
@@ -30,6 +31,7 @@ include(sail_test)
 # Check features
 #
 sail_check_alignas()
+sail_check_builtin_bswap()
 
 # Check for required includes
 #
@@ -307,6 +309,10 @@ message("* Build examples:               ${SAIL_BUILD_EXAMPLES}")
 message("* Build SDL example:            ${SAIL_SDL_EXAMPLE}")
 message("* Build tests:                  ${SAIL_BUILD_TESTS}")
 message("* Install PDB files:            ${SAIL_INSTALL_PDB}")
+message("*")
+message("* SAIL_HAVE_BUILTIN_BSWAP16:    ${SAIL_HAVE_BUILTIN_BSWAP16_DISPLAY}")
+message("* SAIL_HAVE_BUILTIN_BSWAP32:    ${SAIL_HAVE_BUILTIN_BSWAP32_DISPLAY}")
+message("* SAIL_HAVE_BUILTIN_BSWAP64:    ${SAIL_HAVE_BUILTIN_BSWAP64_DISPLAY}")
 message("*")
 message("* [*] - these options depend on other options, their values may be altered by CMake.")
 message("*       For example, if you configure with -DBUILD_SHARED_LIBS=OFF -DSAIL_COMBINE_CODECS=OFF,")

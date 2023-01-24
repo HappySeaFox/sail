@@ -91,4 +91,22 @@ sail_status_t read_io_contents(sail::abstract_io &abstract_io, sail::arbitrary_d
     return SAIL_OK;
 }
 
+template<>
+SAIL_EXPORT std::uint16_t reverse_bytes<>(std::uint16_t v)
+{
+    return sail_reverse_uint16(v);
+}
+
+template<>
+SAIL_EXPORT std::uint32_t reverse_bytes<>(std::uint32_t v)
+{
+    return sail_reverse_uint32(v);
+}
+
+template<>
+SAIL_EXPORT std::uint64_t reverse_bytes<>(std::uint64_t v)
+{
+    return sail_reverse_uint64(v);
+}
+
 }

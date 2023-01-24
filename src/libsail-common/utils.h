@@ -245,6 +245,27 @@ SAIL_EXPORT sail_status_t sail_data_into_hex_string(const void *data, size_t dat
  */
 SAIL_EXPORT sail_status_t sail_data_to_hex_string(const void *data, size_t data_size, char **str);
 
+/*
+ * Reverses the input value byte order.
+ *
+ * Returns the reversed value.
+ */
+SAIL_EXPORT uint16_t sail_reverse_uint16(uint16_t v);
+
+/*
+ * Reverses the input value byte order.
+ *
+ * Returns the reversed value.
+ */
+SAIL_EXPORT uint32_t sail_reverse_uint32(uint32_t v);
+
+/*
+ * Reverses the input value byte order.
+ *
+ * Returns the reversed value.
+ */
+SAIL_EXPORT uint64_t sail_reverse_uint64(uint64_t v);
+
 /* extern "C" */
 #ifdef __cplusplus
 }
