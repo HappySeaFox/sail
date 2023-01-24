@@ -32,8 +32,8 @@ include(JoinPaths)
 
 # https://github.com/jtojnar/cmake-snips#concatenating-paths-when-building-pkg-config-files
 #
-join_paths(libdir_for_pc_file     "\${exec_prefix}" "${CMAKE_INSTALL_LIBDIR}")
-join_paths(includedir_for_pc_file "\${prefix}"      "${CMAKE_INSTALL_INCLUDEDIR}")
+join_paths(SAIL_LIBDIR_FOR_PKG_CONFIG     "\${exec_prefix}" "${CMAKE_INSTALL_LIBDIR}")
+join_paths(SAIL_INCLUDEDIR_FOR_PKG_CONFIG "\${prefix}"      "${CMAKE_INSTALL_INCLUDEDIR}")
 
 # Check features
 #
