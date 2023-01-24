@@ -56,11 +56,11 @@ static MunitResult test_reverse_uint64(const MunitParameter params[], void *user
     (void)params;
     (void)user_data;
 
-    munit_assert_uint64(sail_reverse_uint64(0),           ==, 0);
-    munit_assert_uint64(sail_reverse_uint64(100),         ==, 7205759403792793600);
-    munit_assert_uint64(sail_reverse_uint64(1000),        ==, 16718206241729413120);
-    munit_assert_uint64(sail_reverse_uint64(100000),      ==, 11566933792459325440);
-    munit_assert_uint64(sail_reverse_uint64(10000000000), ==, 64188750128742400);
+    munit_assert_uint64(sail_reverse_uint64(0),           ==, 0ull);
+    munit_assert_uint64(sail_reverse_uint64(100),         ==, 7205759403792793600ull);
+    munit_assert_uint64(sail_reverse_uint64(1000),        ==, 16718206241729413120ull);
+    munit_assert_uint64(sail_reverse_uint64(100000),      ==, 11566933792459325440ull);
+    munit_assert_uint64(sail_reverse_uint64(10000000000), ==, 64188750128742400ull);
 
     return MUNIT_OK;
 }
