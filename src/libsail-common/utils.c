@@ -763,3 +763,52 @@ sail_status_t sail_data_to_hex_string(const void *data, size_t data_size, char *
 
     return SAIL_OK;
 }
+
+uint16_t sail_reverse_uint16_t(uint16_t v)
+{
+#if defined(SAIL_HAVE_BUILTIN_BSWAP16)
+    return __builtin_bswap16(v);
+#elif defined(_MSC_VER)
+    return _byteswap_ushort(v);
+#else
+    const uint8_t *view = (uint8_t *)&v;
+
+    return (view[0] << 8) | view[1];
+#endif
+}
+
+uint32_t sail_reverse_uint32_t(uint32_t v)
+{
+#if defined(SAIL_HAVE_BUILTIN_BSWAP32)
+    return __builtin_bswap32(v);
+#elif defined(_MSC_VER)
+    return (uint32_t)_byteswap_ulong(v);
+#else
+    const uint8_t *view = (uint8_t *)&v;
+
+    return (view[0] << 24) |
+           (view[1] << 16) |
+           (view[2] << 8)  |
+           (view[3] << 0);
+#endif
+}
+
+uint64_t sail_reverse_uint64_t(uint64_t v)
+{
+#if defined(SAIL_HAVE_BUILTIN_BSWAP64)
+    return __builtin_bswap64(v);
+#elif defined(_MSC_VER)
+    return (uint64_t)_byteswap_uint64(v);
+#else
+    const uint8_t *view = (uint8_t *)&v;
+
+    return ((uint64_t)view[0] << 56) |
+           ((uint64_t)view[1] << 48) |
+           ((uint64_t)view[2] << 40) |
+           ((uint64_t)view[3] << 32) |
+                     (view[4] << 24) |
+                     (view[5] << 16) |
+                     (view[6] << 8)  |
+                     (view[7] << 0);
+#endif
+}
