@@ -764,7 +764,7 @@ sail_status_t sail_data_to_hex_string(const void *data, size_t data_size, char *
     return SAIL_OK;
 }
 
-uint16_t sail_reverse_uint16_t(uint16_t v)
+uint16_t sail_reverse_uint16(uint16_t v)
 {
 #if defined(SAIL_HAVE_BUILTIN_BSWAP16)
     return __builtin_bswap16(v);
@@ -777,7 +777,7 @@ uint16_t sail_reverse_uint16_t(uint16_t v)
 #endif
 }
 
-uint32_t sail_reverse_uint32_t(uint32_t v)
+uint32_t sail_reverse_uint32(uint32_t v)
 {
 #if defined(SAIL_HAVE_BUILTIN_BSWAP32)
     return __builtin_bswap32(v);
@@ -793,7 +793,7 @@ uint32_t sail_reverse_uint32_t(uint32_t v)
 #endif
 }
 
-uint64_t sail_reverse_uint64_t(uint64_t v)
+uint64_t sail_reverse_uint64(uint64_t v)
 {
 #if defined(SAIL_HAVE_BUILTIN_BSWAP64)
     return __builtin_bswap64(v);

@@ -29,46 +29,46 @@
 
 #include "munit.h"
 
-static MunitResult test_reverse_uint16_t(const MunitParameter params[], void *user_data) {
+static MunitResult test_reverse_uint16(const MunitParameter params[], void *user_data) {
     (void)params;
     (void)user_data;
 
-    munit_assert_uint16(sail_reverse_uint16_t(0),    ==, 0);
-    munit_assert_uint16(sail_reverse_uint16_t(100),  ==, 25600);
-    munit_assert_uint16(sail_reverse_uint16_t(1000), ==, 59395);
+    munit_assert_uint16(sail_reverse_uint16(0),    ==, 0);
+    munit_assert_uint16(sail_reverse_uint16(100),  ==, 25600);
+    munit_assert_uint16(sail_reverse_uint16(1000), ==, 59395);
 
     return MUNIT_OK;
 }
 
-static MunitResult test_reverse_uint32_t(const MunitParameter params[], void *user_data) {
+static MunitResult test_reverse_uint32(const MunitParameter params[], void *user_data) {
     (void)params;
     (void)user_data;
 
-    munit_assert_uint32(sail_reverse_uint32_t(0),      ==, 0);
-    munit_assert_uint32(sail_reverse_uint32_t(100),    ==, 1677721600);
-    munit_assert_uint32(sail_reverse_uint32_t(1000),   ==, 3892510720);
-    munit_assert_uint32(sail_reverse_uint32_t(100000), ==, 2693136640);
+    munit_assert_uint32(sail_reverse_uint32(0),      ==, 0);
+    munit_assert_uint32(sail_reverse_uint32(100),    ==, 1677721600);
+    munit_assert_uint32(sail_reverse_uint32(1000),   ==, 3892510720);
+    munit_assert_uint32(sail_reverse_uint32(100000), ==, 2693136640);
 
     return MUNIT_OK;
 }
 
-static MunitResult test_reverse_uint64_t(const MunitParameter params[], void *user_data) {
+static MunitResult test_reverse_uint64(const MunitParameter params[], void *user_data) {
     (void)params;
     (void)user_data;
 
-    munit_assert_uint64(sail_reverse_uint64_t(0),           ==, 0);
-    munit_assert_uint64(sail_reverse_uint64_t(100),         ==, 7205759403792793600);
-    munit_assert_uint64(sail_reverse_uint64_t(1000),        ==, 16718206241729413120);
-    munit_assert_uint64(sail_reverse_uint64_t(100000),      ==, 11566933792459325440);
-    munit_assert_uint64(sail_reverse_uint64_t(10000000000), ==, 64188750128742400);
+    munit_assert_uint64(sail_reverse_uint64(0),           ==, 0);
+    munit_assert_uint64(sail_reverse_uint64(100),         ==, 7205759403792793600);
+    munit_assert_uint64(sail_reverse_uint64(1000),        ==, 16718206241729413120);
+    munit_assert_uint64(sail_reverse_uint64(100000),      ==, 11566933792459325440);
+    munit_assert_uint64(sail_reverse_uint64(10000000000), ==, 64188750128742400);
 
     return MUNIT_OK;
 }
 
 static MunitTest test_suite_tests[] = {
-    { (char *)"/reverse-uint16-t", test_reverse_uint16_t, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/reverse-uint32-t", test_reverse_uint32_t, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/reverse-uint64-t", test_reverse_uint64_t, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/reverse-uint16", test_reverse_uint16, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/reverse-uint32", test_reverse_uint32, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/reverse-uint64", test_reverse_uint64, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };

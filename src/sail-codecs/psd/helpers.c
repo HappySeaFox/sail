@@ -31,7 +31,7 @@ sail_status_t psd_private_get_big_endian_uint16_t(struct sail_io *io, uint16_t *
 {
     SAIL_TRY(io->strict_read(io->stream, v, sizeof(*v)));
 
-    *v = sail_reverse_uint16_t(*v);
+    *v = sail_reverse_uint16(*v);
 
     return SAIL_OK;
 }
@@ -40,7 +40,7 @@ sail_status_t psd_private_get_big_endian_uint32_t(struct sail_io *io, uint32_t *
 {
     SAIL_TRY(io->strict_read(io->stream, v, sizeof(*v)));
 
-    *v = sail_reverse_uint32_t(*v);
+    *v = sail_reverse_uint32(*v);
 
     return SAIL_OK;
 }
