@@ -93,8 +93,8 @@ SAIL_EXPORT sail_status_t read_file_contents(const std::string &path, sail::arbi
 SAIL_EXPORT sail_status_t read_io_contents(sail::abstract_io &abstract_io, sail::arbitrary_data *contents);
 
 /*
- * Reverses the input value byte order. Only std::uint16_t, std::uint32_t, and std::uint64_t
- * types are supported. Other types will fail to link.
+ * Reverses the input value byte order. Only std::uint16_t, std::uint32_t, std::uint64_t,
+ * and their equivalent types are supported. Other types will fail to link.
  *
  * Returns the reversed value.
  */
