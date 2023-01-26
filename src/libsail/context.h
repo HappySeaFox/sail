@@ -56,7 +56,10 @@ extern "C" {
 enum SailInitFlags {
 
     /*
-     * Preload all codecs in sail_init_with_flags(). Codecs are lazy-loaded by default.
+     * When SAIL is compiled with SAIL_COMBINE_CODECS disabled (default),
+     * preload all codecs in sail_init_with_flags(). Codecs are lazy-loaded
+     * by default. When SAIL is compiled with SAIL_COMBINE_CODECS enabled,
+     * this option has no effect.
      */
     SAIL_FLAG_PRELOAD_CODECS = 1 << 0,
 };
