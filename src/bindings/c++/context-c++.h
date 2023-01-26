@@ -81,18 +81,21 @@ public:
      *
      * Codecs path search algorithm (first found path wins):
      *
-     * 1. VCPKG port on any platform
+     * 1. Conan recipe on any platform
      *    Codecs are combined into a dynamically linked library, so no need to search them.
      *
-     * 2. Manually compiled on any platform with SAIL_COMBINE_CODECS=ON
+     * 2. VCPKG port on any platform
      *    Codecs are combined into a dynamically linked library, so no need to search them.
      *
-     * 3. Manually compiled on Windows with SAIL_COMBINE_CODECS=OFF (the default)
+     * 3. Manually compiled on any platform with SAIL_COMBINE_CODECS=ON
+     *    Codecs are combined into a dynamically linked library, so no need to search them.
+     *
+     * 4. Manually compiled on Windows with SAIL_COMBINE_CODECS=OFF (the default)
      *    1. SAIL_CODECS_PATH environment variable
      *    2. <SAIL DEPLOYMENT FOLDER>\lib\sail\codecs
      *    3. Hardcoded SAIL_CODECS_PATH in config.h
      *
-     * 4. Manually compiled on Unix (including macOS) SAIL_COMBINE_CODECS=OFF (the default)
+     * 5. Manually compiled on Unix (including macOS) SAIL_COMBINE_CODECS=OFF (the default)
      *    1. SAIL_CODECS_PATH environment variable
      *    2. Hardcoded SAIL_CODECS_PATH in config.h
      *

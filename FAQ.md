@@ -19,6 +19,7 @@ Table of Contents
     * [SAIL\_COMBINE\_CODECS is OFF](#sail_combine_codecs-is-off)
     * [SAIL\_COMBINE\_CODECS is ON](#sail_combine_codecs-is-on)
   * [How does SAIL look for codecs?](#how-does-sail-look-for-codecs)
+    + [Conan recipe on any platform](#conan-recipe-on-any-platform)
     + [VCPKG port on any platform](#vcpkg-port-on-any-platform)
     + [Manually compiled on any platform with SAIL\_COMBINE\_CODECS=ON](#manually-compiled-on-any-platform-with-sail_combine_codecson)
     + [Manually compiled on Windows with SAIL\_COMBINE\_CODECS=OFF (the default)](#manually-compiled-on-windows-with-sail_combine_codecsoff-the-default)
@@ -146,6 +147,10 @@ All codecs get loaded on application startup.
 ## How does SAIL look for codecs?
 
 Codecs path search algorithm (first found path wins):
+
+### Conan recipe on any platform
+
+Codecs are combined into a dynamically linked library, so no need to search them.
 
 ### VCPKG port on any platform
 
