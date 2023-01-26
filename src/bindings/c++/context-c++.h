@@ -62,7 +62,10 @@ public:
 
     /*
      * Initializes a new SAIL global static context with default flags. Does nothing
-     * if a global static context already exists. See also init() with flags.
+     * if a global context already exists. See also init(flags).
+     *
+     * In general, SAIL initializes a new global static context automatically. You can use
+     * this method if you want to initialize it explicitly for some reason.
      *
      * Returns SAIL_OK on success.
      */
@@ -79,24 +82,24 @@ public:
      * Codecs path search algorithm (first found path wins):
      *
      * 1. VCPKG port on any platform
-     *   Codecs are combined into a dynamically linked library, so no need to search them.
+     *    Codecs are combined into a dynamically linked library, so no need to search them.
      *
-     * 2. Standalone build or bundle, both compiled with SAIL_COMBINE_CODECS=ON
-     *   Same to VCPKG port.
+     * 2. Manually compiled on any platform with SAIL_COMBINE_CODECS=ON
+     *    Codecs are combined into a dynamically linked library, so no need to search them.
      *
-     * 3. Windows standalone build or bundle, both compiled with SAIL_COMBINE_CODECS=OFF (the default)
-     *   1. SAIL_CODECS_PATH environment variable
-     *   2. <SAIL DEPLOYMENT FOLDER>\lib\sail\codecs
-     *   3. Hardcoded SAIL_CODECS_PATH in config.h
+     * 3. Manually compiled on Windows with SAIL_COMBINE_CODECS=OFF (the default)
+     *    1. SAIL_CODECS_PATH environment variable
+     *    2. <SAIL DEPLOYMENT FOLDER>\lib\sail\codecs
+     *    3. Hardcoded SAIL_CODECS_PATH in config.h
      *
-     * 4. Unix including macOS (standalone build), compiled with SAIL_COMBINE_CODECS=OFF (the default)
-     *   1. SAIL_CODECS_PATH environment variable
-     *   2. Hardcoded SAIL_CODECS_PATH in config.h
+     * 4. Manually compiled on Unix (including macOS) SAIL_COMBINE_CODECS=OFF (the default)
+     *    1. SAIL_CODECS_PATH environment variable
+     *    2. Hardcoded SAIL_CODECS_PATH in config.h
      *
-     *   <FOUND PATH>/lib is added to LD_LIBRARY_PATH.
+     *    <FOUND PATH>/lib is added to LD_LIBRARY_PATH.
      *
      * Additionally, SAIL_THIRD_PARTY_CODECS_PATH environment variable with a list of ';'-separated paths
-     * is searched if SAIL_THIRD_PARTY_CODECS_PATH is enabled in CMake, (the default) so you can load
+     * is searched if SAIL_THIRD_PARTY_CODECS_PATH is enabled in CMake (the default), so you can load
      * your own codecs from there.
      *
      * Returns SAIL_OK on success.
@@ -112,7 +115,7 @@ public:
      * Warning: Make sure no loading or saving operations are in progress before calling unload_codecs().
      *          Failure to do so may lead to a crash.
      *
-     * Typical usage: This is a standalone method that can be called at any time.
+     * Typical usage: This is a standalone method that can be called at any time (with the restriction above).
      *
      * Returns SAIL_OK on success.
      */
@@ -123,14 +126,14 @@ public:
      * loading or saving functions.
      *
      * Unloads all codecs. All pointers to codec info objects, load and save features, and codecs
-     * get invalidated. Using them after calling finish() will lead to a crash.
+     * get invalidated. Using them after calling finish() may lead to a crash.
      *
      * It's possible to initialize a new global static context afterwards, implicitly or explicitly.
      *
      * Warning: Make sure no loading or saving operations are in progress before calling finish().
      *          Failure to do so may lead to a crash.
      *
-     * Typical usage: This is a standalone method that can be called at any time.
+     * Typical usage: This is a standalone method that can be called at any time (with the restriction above).
      */
     static void finish();
 };

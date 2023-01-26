@@ -56,7 +56,7 @@ extern "C" {
 enum SailInitFlags {
 
     /*
-     * When SAIL is compiled with SAIL_COMBINE_CODECS disabled (default),
+     * When SAIL is compiled with SAIL_COMBINE_CODECS disabled (the default),
      * preload all codecs in sail_init_with_flags(). Codecs are lazy-loaded
      * by default. When SAIL is compiled with SAIL_COMBINE_CODECS enabled,
      * this option has no effect.
@@ -68,6 +68,9 @@ enum SailInitFlags {
  * Initializes a new SAIL global static context with default flags. Does nothing
  * if a global context already exists. See also sail_init_with_flags().
  *
+ * In general, SAIL initializes a new global static context automatically. You can use
+ * this function if you want to initialize it explicitly for some reason.
+ *
  * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_init(void);
@@ -77,30 +80,30 @@ SAIL_EXPORT sail_status_t sail_init(void);
  * if a global context already exists. Builds a list of available SAIL codecs. See SailInitFlags.
  *
  * Use this method when you need specific features like preloading codecs. If you don't need
- * specific features, using this method is optional. All loading or saving functions allocate
+ * specific features, using this function is optional. All loading or saving functions allocate
  * a global static context implicitly when they need it and when it doesn't exist yet.
  *
  * Codecs path search algorithm (first found path wins):
  *
  * 1. VCPKG port on any platform
- *   Codecs are combined into a dynamically linked library, so no need to search them.
+ *    Codecs are combined into a dynamically linked library, so no need to search them.
  *
- * 2. Standalone build or bundle, both compiled with SAIL_COMBINE_CODECS=ON
- *   Same to VCPKG port.
+ * 2. Manually compiled on any platform with SAIL_COMBINE_CODECS=ON
+ *    Codecs are combined into a dynamically linked library, so no need to search them.
  *
- * 3. Windows standalone build or bundle, both compiled with SAIL_COMBINE_CODECS=OFF (the default)
- *   1. SAIL_CODECS_PATH environment variable
- *   2. <SAIL DEPLOYMENT FOLDER>\lib\sail\codecs
- *   3. Hardcoded SAIL_CODECS_PATH in config.h
+ * 3. Manually compiled on Windows with SAIL_COMBINE_CODECS=OFF (the default)
+ *    1. SAIL_CODECS_PATH environment variable
+ *    2. <SAIL DEPLOYMENT FOLDER>\lib\sail\codecs
+ *    3. Hardcoded SAIL_CODECS_PATH in config.h
  *
- * 4. Unix including macOS (standalone build), compiled with SAIL_COMBINE_CODECS=OFF (the default)
- *   1. SAIL_CODECS_PATH environment variable
- *   2. Hardcoded SAIL_CODECS_PATH in config.h
+ * 4. Manually compiled on Unix (including macOS) SAIL_COMBINE_CODECS=OFF (the default)
+ *    1. SAIL_CODECS_PATH environment variable
+ *    2. Hardcoded SAIL_CODECS_PATH in config.h
  *
- *   <FOUND PATH>/lib is added to LD_LIBRARY_PATH.
+ *    <FOUND PATH>/lib is added to LD_LIBRARY_PATH.
  *
  * Additionally, SAIL_THIRD_PARTY_CODECS_PATH environment variable with a list of ';'-separated paths
- * is searched if SAIL_THIRD_PARTY_CODECS_PATH is enabled in CMake, (the default) so you can load
+ * is searched if SAIL_THIRD_PARTY_CODECS_PATH is enabled in CMake (the default), so you can load
  * your own codecs from there.
  *
  * Returns SAIL_OK on success.
@@ -116,7 +119,7 @@ SAIL_EXPORT sail_status_t sail_init_with_flags(int flags);
  * Warning: Make sure no loading or saving operations are in progress before calling sail_unload_codecs().
  *          Failure to do so may lead to a crash.
  *
- * Typical usage: This is a standalone function that can be called at any time.
+ * Typical usage: This is a standalone function that can be called at any time (with the restriction above).
  *
  * Returns SAIL_OK on success.
  */
@@ -127,12 +130,14 @@ SAIL_EXPORT sail_status_t sail_unload_codecs(void);
  * loading or saving functions.
  *
  * Unloads all codecs. All pointers to codec info objects, load and save features, and codecs
- * get invalidated. Using them after calling sail_finish() will lead to a crash.
+ * get invalidated. Using them after calling sail_finish() may lead to a crash.
  *
  * It's possible to initialize a new global static context afterwards, implicitly or explicitly.
  *
  * Warning: Make sure no loading or saving operations are in progress before calling sail_finish().
  *          Failure to do so may lead to a crash.
+ *
+ * Typical usage: This is a standalone function that can be called at any time (with the restriction above).
  */
 SAIL_EXPORT void sail_finish(void);
 

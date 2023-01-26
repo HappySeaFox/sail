@@ -19,10 +19,10 @@ Table of Contents
     * [SAIL\_COMBINE\_CODECS is OFF](#sail_combine_codecs-is-off)
     * [SAIL\_COMBINE\_CODECS is ON](#sail_combine_codecs-is-on)
   * [How does SAIL look for codecs?](#how-does-sail-look-for-codecs)
-    * [VCPKG port on any platform](#vcpkg-port-on-any-platform)
-    * [Standalone build or bundle, both compiled with SAIL\_COMBINE\_CODECS=ON](#standalone-build-or-bundle-both-compiled-with-sail_combine_codecson)
-    * [Windows standalone build or bundle, both compiled with SAIL\_COMBINE\_CODECS=OFF (the default)](#windows-standalone-build-or-bundle-both-compiled-with-sail_combine_codecsoff-the-default)
-    * [Unix including macOS (standalone build), compiled with SAIL\_COMBINE\_CODECS=OFF (the default)](#unix-including-macos-standalone-build-compiled-with-sail_combine_codecsoff-the-default)
+    + [VCPKG port on any platform](#vcpkg-port-on-any-platform)
+    + [Manually compiled on any platform with SAIL\_COMBINE\_CODECS=ON](#manually-compiled-on-any-platform-with-sail_combine_codecson)
+    + [Manually compiled on Windows with SAIL\_COMBINE\_CODECS=OFF (the default)](#manually-compiled-on-windows-with-sail_combine_codecsoff-the-default)
+    + [Manually compiled on Unix (including macOS) SAIL\_COMBINE\_CODECS=OFF (the default)](#manually-compiled-on-unix-including-macos-sail_combine_codecsoff-the-default)
   * [How can I point SAIL to my custom codecs?](#how-can-i-point-sail-to-my-custom-codecs)
   * [I'd like to reorganize the standard SAIL folder layout on Windows (for standalone build or bundle)](#id-like-to-reorganize-the-standard-sail-folder-layout-on-windows-for-standalone-build-or-bundle)
   * [Describe the memory management techniques implemented in SAIL](#describe-the-memory-management-techniques-implemented-in-sail)
@@ -151,16 +151,17 @@ Codecs path search algorithm (first found path wins):
 
 Codecs are combined into a dynamically linked library, so no need to search them.
 
-### Standalone build or bundle, both compiled with SAIL_COMBINE_CODECS=ON
+### Manually compiled on any platform with SAIL_COMBINE_CODECS=ON
 
-Same to VCPKG port.
+Codecs are combined into a dynamically linked library, so no need to search them.
 
-### Windows standalone build or bundle, both compiled with SAIL_COMBINE_CODECS=OFF (the default)
+### Manually compiled on Windows with SAIL_COMBINE_CODECS=OFF (the default)
 1. `SAIL_CODECS_PATH` environment variable
 2. `<SAIL DEPLOYMENT FOLDER>\lib\sail\codecs`
 3. Hardcoded `SAIL_CODECS_PATH` in config.h
 
-### Unix including macOS (standalone build), compiled with SAIL_COMBINE_CODECS=OFF (the default)
+### Manually compiled on Unix (including macOS) SAIL_COMBINE_CODECS=OFF (the default)
+
 1. `SAIL_CODECS_PATH` environment variable
 2. Hardcoded `SAIL_CODECS_PATH` in config.h
 
@@ -181,7 +182,7 @@ On other platforms, `SAIL_THIRD_PARTY_CODECS_PATH/lib` is added to `LD_LIBRARY_P
 
 If `SAIL_THIRD_PARTY_CODECS_PATH` is `OFF`, loading custom codecs is disabled.
 
-## I'd like to reorganize the standard SAIL folder layout on Windows (for standalone build or bundle)
+## I'd like to reorganize the standard SAIL folder layout on Windows
 
 You can surely do that. However, with the standard layout SAIL detects the codecs' location automatically.
 If you reorganize the standard SAIL folder layout, you'll need to specify the new codecs' location by
