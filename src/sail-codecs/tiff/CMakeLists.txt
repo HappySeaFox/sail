@@ -96,28 +96,28 @@ foreach (tiff_codec IN LISTS TIFF_CODECS)
             HAVE_TIFF_WRITE_${tiff_codec}
             )
         cmake_pop_check_state()
+    endif()
 
-        if (HAVE_TIFF_WRITE_${tiff_codec})
-            # Match the SAIL namings
-            #
-            string(REPLACE "_"         "-"          tiff_codec_fixed ${tiff_codec})
-            string(REPLACE "CCITTRLE"  "CCITT-RLE"  tiff_codec_fixed ${tiff_codec_fixed})
-            string(REPLACE "CCITTRLEW" "CCITT-RLEW" tiff_codec_fixed ${tiff_codec_fixed})
-            string(REPLACE "IT8BL"     "IT8-BL"     tiff_codec_fixed ${tiff_codec_fixed})
-            string(REPLACE "IT8CTPAD"  "IT8-CTPAD"  tiff_codec_fixed ${tiff_codec_fixed})
-            string(REPLACE "IT8LW"     "IT8-LW"     tiff_codec_fixed ${tiff_codec_fixed})
-            string(REPLACE "IT8MP"     "IT8-MP"     tiff_codec_fixed ${tiff_codec_fixed})
-            string(REPLACE "JP2000"    "JPEG-2000"  tiff_codec_fixed ${tiff_codec_fixed})
-            string(REPLACE "JXL"       "JPEG-XL"    tiff_codec_fixed ${tiff_codec_fixed})
-            string(REPLACE "PIXARLOG"  "PIXAR-LOG"  tiff_codec_fixed ${tiff_codec_fixed})
-            string(REPLACE "PIXARFILM" "PIXAR-FILM" tiff_codec_fixed ${tiff_codec_fixed})
-            string(REPLACE "SGILOG24"  "SGI-LOG24"  tiff_codec_fixed ${tiff_codec_fixed})
-            string(REPLACE "SGILOG"    "SGI-LOG"    tiff_codec_fixed ${tiff_codec_fixed})
+    if (HAVE_TIFF_WRITE_${tiff_codec})
+        # Match the SAIL namings
+        #
+        string(REPLACE "_"         "-"          tiff_codec_fixed ${tiff_codec})
+        string(REPLACE "CCITTRLE"  "CCITT-RLE"  tiff_codec_fixed ${tiff_codec_fixed})
+        string(REPLACE "CCITTRLEW" "CCITT-RLEW" tiff_codec_fixed ${tiff_codec_fixed})
+        string(REPLACE "IT8BL"     "IT8-BL"     tiff_codec_fixed ${tiff_codec_fixed})
+        string(REPLACE "IT8CTPAD"  "IT8-CTPAD"  tiff_codec_fixed ${tiff_codec_fixed})
+        string(REPLACE "IT8LW"     "IT8-LW"     tiff_codec_fixed ${tiff_codec_fixed})
+        string(REPLACE "IT8MP"     "IT8-MP"     tiff_codec_fixed ${tiff_codec_fixed})
+        string(REPLACE "JP2000"    "JPEG-2000"  tiff_codec_fixed ${tiff_codec_fixed})
+        string(REPLACE "JXL"       "JPEG-XL"    tiff_codec_fixed ${tiff_codec_fixed})
+        string(REPLACE "PIXARLOG"  "PIXAR-LOG"  tiff_codec_fixed ${tiff_codec_fixed})
+        string(REPLACE "PIXARFILM" "PIXAR-FILM" tiff_codec_fixed ${tiff_codec_fixed})
+        string(REPLACE "SGILOG24"  "SGI-LOG24"  tiff_codec_fixed ${tiff_codec_fixed})
+        string(REPLACE "SGILOG"    "SGI-LOG"    tiff_codec_fixed ${tiff_codec_fixed})
 
-            # Used in .codec.info
-            #
-            list(APPEND TIFF_CODEC_INFO_COMPRESSIONS ${tiff_codec_fixed})
-        endif()
+        # Used in .codec.info
+        #
+        list(APPEND TIFF_CODEC_INFO_COMPRESSIONS ${tiff_codec_fixed})
     endif()
 endforeach()
 
