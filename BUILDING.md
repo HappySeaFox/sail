@@ -81,7 +81,7 @@ cmake --build . --config Release --target install
 #### Installation steps
 
 ```
-brew install happyseafox/sail/sail
+brew install HappySeaFox/sail/sail
 ```
 
 Or
