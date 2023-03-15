@@ -44,7 +44,7 @@ vcpkg install sail
 #### Build requirements
 
 - git
-- cmake 3.10 or later
+- cmake 3.12 or later
 - MSVC 2019 or later
 
 #### Build steps
@@ -100,7 +100,7 @@ brew upgrade sail
 #### Build requirements
 
 - git
-- cmake 3.10 or later
+- cmake 3.12 or later
 - GCC and G++ 7.5 or later
 - standard C/C++ development files installed (usually installed by metapackages like `build-essential`)
 - codec-specific development libraries installed. You can grab the list from `debian/control`
