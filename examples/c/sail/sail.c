@@ -149,7 +149,7 @@ static sail_status_t probe_impl(const char *path) {
     } else {
         printf("Resolution:   : %.1fx%.1f\n", image->resolution->x, image->resolution->y);
     }
-    printf("Color         : %s\n", sail_pixel_format_to_string(image->source_image->pixel_format));
+    printf("Pixel format  : %s\n", sail_pixel_format_to_string(image->source_image->pixel_format));
     printf("ICC profile   : %s\n", image->iccp == NULL ? "no" : "yes");
     printf("Interlaced    : %s\n", image->source_image->interlaced ? "yes" : "no");
 
