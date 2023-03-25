@@ -73,6 +73,7 @@ if (NOT BUILD_SHARED_LIBS)
             list(GET dependency 2 dependency_link_target)
 
             set(SAIL_CODECS_FIND_DEPENDENCIES_EXPANDED "${SAIL_CODECS_FIND_DEPENDENCIES_EXPANDED}
+# ${dependency_name}
 find_dependency(${dependency_name} REQUIRED)
 set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES ${dependency_link_target})
 ")
@@ -82,6 +83,7 @@ set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES $
             set(dependency_name ${dependency_release_name})
 
             set(SAIL_CODECS_FIND_DEPENDENCIES_EXPANDED "${SAIL_CODECS_FIND_DEPENDENCIES_EXPANDED}
+# ${dependency_name}
 find_library(${dependency_name}_RELEASE_LIBRARY NAMES ${dependency_release_name})
 find_library(${dependency_name}_DEBUG_LIBRARY NAMES ${dependency_debug_name} ${dependency_release_name})
 
