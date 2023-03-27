@@ -119,6 +119,10 @@ script:
 
   build()
   {
+    echo
+    echo "Building with $@"
+    echo
+
     eval $@
 
     cd "$TRAVIS_BUILD_DIR"
