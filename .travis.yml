@@ -8,7 +8,9 @@ addons:
     packages:
       - sdl2
       - giflib
+      - jasper
       - jpeg-turbo
+      - libavif
       - libpng
       - libtiff
       - webp
