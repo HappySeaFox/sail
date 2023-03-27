@@ -446,7 +446,7 @@ For example:
 cd F:/vcpkg/
 vcpkg install sail[all] --triplet x64-windows-static
 
-# Go to the SAIL sources
+# Go to the cloned SAIL sources
 cd F:/sail/
 
 # Compile SAIL against vcpkg
