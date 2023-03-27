@@ -78,14 +78,18 @@ find_dependency(${dependency_name} REQUIRED)
 set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES ${dependency_link_target})
 ")
         elseif(dependency_search_mechanism STREQUAL "find_library")
-            list(GET dependency 1 dependency_release_name)
-            list(GET dependency 2 dependency_debug_name)
-            set(dependency_name ${dependency_release_name})
+            list(GET dependency 1 dependency_release_names)
+            list(GET dependency 2 dependency_debug_names)
+
+            # Get "webp" from "webp libwebp"
+            set(dependency_release_names_as_list ${dependency_release_names})
+            string(REGEX REPLACE " +" ";" dependency_release_names_as_list ${dependency_release_names_as_list})
+            list(GET dependency_release_names_as_list 0 dependency_name)
 
             set(SAIL_CODECS_FIND_DEPENDENCIES_EXPANDED "${SAIL_CODECS_FIND_DEPENDENCIES_EXPANDED}
 # ${dependency_name}
-find_library(${dependency_name}_RELEASE_LIBRARY NAMES ${dependency_release_name})
-find_library(${dependency_name}_DEBUG_LIBRARY NAMES ${dependency_debug_name} ${dependency_release_name})
+find_library(${dependency_name}_RELEASE_LIBRARY NAMES ${dependency_release_names})
+find_library(${dependency_name}_DEBUG_LIBRARY NAMES ${dependency_debug_names} ${dependency_release_names})
 
 if (NOT ${dependency_name}_RELEASE_LIBRARY OR NOT ${dependency_name}_DEBUG_LIBRARY)
     message(FATAL_ERROR \"Missing dependency: ${dependency_name}\")
