@@ -19,13 +19,13 @@ Table of Contents
     * [SAIL\_COMBINE\_CODECS is OFF](#sail_combine_codecs-is-off)
     * [SAIL\_COMBINE\_CODECS is ON](#sail_combine_codecs-is-on)
   * [How does SAIL look for codecs?](#how-does-sail-look-for-codecs)
-    + [Conan recipe on any platform](#conan-recipe-on-any-platform)
-    + [VCPKG port on any platform](#vcpkg-port-on-any-platform)
-    + [Manually compiled on any platform with SAIL\_COMBINE\_CODECS=ON](#manually-compiled-on-any-platform-with-sail_combine_codecson)
-    + [Manually compiled on Windows with SAIL\_COMBINE\_CODECS=OFF (the default)](#manually-compiled-on-windows-with-sail_combine_codecsoff-the-default)
-    + [Manually compiled on Unix (including macOS) SAIL\_COMBINE\_CODECS=OFF (the default)](#manually-compiled-on-unix-including-macos-sail_combine_codecsoff-the-default)
+    * [Conan recipe on any platform](#conan-recipe-on-any-platform)
+    * [VCPKG port on any platform](#vcpkg-port-on-any-platform)
+    * [Manually compiled on any platform with SAIL\_COMBINE\_CODECS=ON](#manually-compiled-on-any-platform-with-sail_combine_codecson)
+    * [Manually compiled on Windows with SAIL\_COMBINE\_CODECS=OFF (the default)](#manually-compiled-on-windows-with-sail_combine_codecsoff-the-default)
+    * [Manually compiled on Unix (including macOS) SAIL\_COMBINE\_CODECS=OFF (the default)](#manually-compiled-on-unix-including-macos-sail_combine_codecsoff-the-default)
   * [How can I point SAIL to my custom codecs?](#how-can-i-point-sail-to-my-custom-codecs)
-  * [I'd like to reorganize the standard SAIL folder layout on Windows (for standalone build or bundle)](#id-like-to-reorganize-the-standard-sail-folder-layout-on-windows-for-standalone-build-or-bundle)
+  * [I'd like to reorganize the standard SAIL folder layout on Windows](#id-like-to-reorganize-the-standard-sail-folder-layout-on-windows)
   * [Describe the memory management techniques implemented in SAIL](#describe-the-memory-management-techniques-implemented-in-sail)
     * [The memory management technique implemented in SAIL](#the-memory-management-technique-implemented-in-sail)
     * [Convention to call SAIL functions](#convention-to-call-sail-functions)
@@ -33,6 +33,7 @@ Table of Contents
     * [Always set a pointer to state to NULL (C only)](#always-set-a-pointer-to-state-to-null-c-only)
   * [Can I implement an image codec in C\+\+?](#can-i-implement-an-image-codec-in-c)
   * [Describe codec info file format](#describe-codec-info-file-format)
+  * [Can I compile codecs dependencies (like libjpeg) directly into SAIL?](#can-i-compile-codecs-dependencies-like-libjpeg-directly-into-sail)
   * [Are there any C/C\+\+ examples?](#are-there-any-cc-examples)
   * [Are there any bindings to other programming languages?](#are-there-any-bindings-to-other-programming-languages)
   * [How many image formats do you plan to implement?](#how-many-image-formats-do-you-plan-to-implement)
@@ -427,6 +428,35 @@ compression-level-default=6
 #
 compression-level-step=1
 ```
+
+## Can I compile codecs dependencies (like libjpeg) directly into SAIL?</h5>
+Unlike FreeImage, SAIL doesn't allow compiling external dependencies into a single library and I have no plans to allow that.
+
+You can still achieve that using external build systems like `vcpkg`.
+
+If you prefer compiling SAIL manually as a shared library, you can compile it against the static vcpkg triplet like `x64-windows-static`.
+For example:
+
+```
+# Install vcpkg using the official installation guide into your preferred path.
+# For example, into F:/vcpkg.
+
+# Install SAIL in vcpkg just to install all its dependencies
+# as static libs. We'll compile SAIL manually later.
+cd F:/vcpkg/
+vcpkg install sail[all] --triplet x64-windows-static
+
+# Go to the SAIL sources
+cd F:/sail/
+
+# Compile SAIL against vcpkg
+mkdir build
+cd build
+cmake -DSAIL_COMBINE_CODECS=ON -DCMAKE_TOOLCHAIN_FILE=F:/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows-static ..
+cmake --build . --config Release
+```
+
+This way all codecs and their dependencies will be compiled into `sail-codecs.dll`.
 
 ## Are there any C/C++ examples?
 
