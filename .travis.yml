@@ -120,7 +120,7 @@ script:
   build()
   {
     echo
-    echo "Building with $@"
+    echo " *** Building with $@ ***"
     echo
 
     eval $@
