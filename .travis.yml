@@ -14,7 +14,6 @@ addons:
       - libpng
       - libtiff
       - webp
-    update: true
   apt:
     packages:
       - libavif-dev
