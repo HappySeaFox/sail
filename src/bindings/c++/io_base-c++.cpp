@@ -33,11 +33,6 @@ io_base::io_base(struct sail_io *sail_io)
 {
 }
 
-std::uint64_t io_base::id() const
-{
-    return d->sail_io->id;
-}
-
 int io_base::features() const
 {
     return d->sail_io->features;

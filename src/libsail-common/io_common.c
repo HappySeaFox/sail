@@ -38,7 +38,6 @@ sail_status_t sail_alloc_io(struct sail_io **io) {
     SAIL_TRY(sail_malloc(sizeof(struct sail_io), &ptr));
     *io = ptr;
 
-    (*io)->id             = 0;
     (*io)->features       = 0;
     (*io)->stream         = NULL;
     (*io)->tolerant_read  = NULL;
@@ -72,8 +71,7 @@ sail_status_t sail_check_io_valid(const struct sail_io *io)
 {
     SAIL_CHECK_PTR(io);
 
-    if (io->id == 0U                   ||
-            io->tolerant_read  == NULL ||
+    if (io->tolerant_read      == NULL ||
             io->strict_read    == NULL ||
             io->tolerant_write == NULL ||
             io->strict_write   == NULL ||

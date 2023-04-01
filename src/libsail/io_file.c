@@ -193,7 +193,6 @@ static sail_status_t alloc_io_file(const char *path, const char *mode, struct sa
     SAIL_TRY_OR_CLEANUP(sail_alloc_io(io),
                         /* cleanup */ fclose(fptr));
 
-    (*io)->id     = SAIL_FILE_IO_ID;
     (*io)->stream = fptr;
 
     return SAIL_OK;

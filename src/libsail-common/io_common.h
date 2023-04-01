@@ -115,18 +115,6 @@ typedef sail_status_t (*sail_io_close_t)(void *stream);
  */
 typedef sail_status_t (*sail_io_eof_t)(void *stream, bool *result);
 
-/*
- * Well-known I/O ids used in libsail for file and memory I/O classes.
- *
- * You MUST use your own unique id for custom I/O classes. For example, you can use sail_string_hash()
- * to generate a unique id and store it in the source code.
- *
- * SAIL_FILE_IO_ID   = sail_string_hash("sail-file-io-id")
- * SAIL_MEMORY_IO_ID = sail_string_hash("sail-memory-io-id")
- */
-static const uint64_t SAIL_FILE_IO_ID   = UINT64_C(5820790535323209114);
-static const uint64_t SAIL_MEMORY_IO_ID = UINT64_C(11955407548648566675);
-
 /* I/O features. */
 enum SailIoFeature {
 
@@ -142,16 +130,6 @@ enum SailIoFeature {
  * allocate I/O objects.
  */
 struct sail_io {
-
-    /*
-     * Unique I/O class id. The same I/O classes (file, memory etc.) share the same ids. This way
-     * a client can known the exact type of the I/O object. For example, a client can distinguish between
-     * file and memory I/O objects.
-     *
-     * You MUST use your own unique id for custom I/O classes. For example, you can use sail_string_hash()
-     * to generate a unique id and assign it to this field.
-     */
-    uint64_t id;
 
     /*
      * Or-ed I/O features. See SailIoFeature.

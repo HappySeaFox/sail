@@ -66,20 +66,6 @@ public:
     explicit io_base(struct sail_io *sail_io);
 
     /*
-     * Returns the I/O stream id.
-     *
-     * The same I/O classes (file, memory, etc.) share the same ids. This way
-     * a client can known the exact type of the I/O stream. For example, a client can distinguish between
-     * file and memory I/O streams.
-     *
-     * You MUST use your own unique id for custom I/O classes. For example, you can use sail_string_hash()
-     * to generate and return a unique id.
-     *
-     * Well-known I/O ids for file and memory I/O classes: SAIL_FILE_IO_ID and SAIL_MEMORY_IO_ID.
-     */
-    std::uint64_t id() const override;
-
-    /*
      * Returns the I/O stream features. See SailIoFeature.
      */
     int features() const override;

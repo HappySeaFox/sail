@@ -120,7 +120,6 @@ public:
     explicit pimpl(sail::abstract_io &other_abstract_io)
         : abstract_io(other_abstract_io)
     {
-        sail_io.id             = abstract_io.id();
         sail_io.features       = abstract_io.features();
         sail_io.stream         = &abstract_io;
         sail_io.tolerant_read  = wrapped_tolerant_read;
