@@ -1,5 +1,17 @@
 ## Building SAIL
 
+### Conan
+
+SAIL is available in [Conan](https://conan.io/center/sail) on all supported platforms.
+
+### VCPKG
+
+SAIL is available in VCPKG on Windows, Linux, and macOS:
+
+```
+vcpkg install sail
+```
+
 ### CMake options overview
 
 - `SAIL_BUILD_EXAMPLES=ON|OFF` - Build examples. Default: `ON`
@@ -12,18 +24,6 @@
 - `SAIL_THIRD_PARTY_CODECS_PATH=ON|OFF` - Enable loading custom codecs from the ';'-separated paths specified in the `SAIL_THIRD_PARTY_CODECS_PATH` environment variable. Default: `ON`
 - `SAIL_THREAD_SAFE=ON|OFF` - Enable working in multi-threaded environments by locking the internal context with a mutex. Default: `ON`
 - `SAIL_ONLY_CODECS="a;b;c"` - Forcefully enable only the codecs specified in this ';'-separated list and disable the rest. If an enabled codec fails to find its dependencies, the configuration process fails. Default: empty list
-
-### Conan
-
-SAIL is available in [Conan](https://conan.io/center/sail) on all supported platforms.
-
-### VCPKG
-
-SAIL is available in VCPKG on Windows, Linux, and macOS:
-
-```
-vcpkg install sail
-```
 
 ### Windows
 
