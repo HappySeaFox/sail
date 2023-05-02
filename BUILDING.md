@@ -1,15 +1,5 @@
 ## Building SAIL
 
-### Terminology and build types
-
-**Standalone build** - manually compiled with `cmake` and respective build commands. Extra dependencies like libjpeg ARE NOT shipped with the build. macOS brew package is a good example of a standalone build.
-
-**Standalone bundle** - manually compiled with `cmake` and respective build commands. Extra dependencies like libjpeg ARE shipped with the build. Portable archive for Windows on the releases page on GitHub is a good example of a standalone bundle.
-
-**Conan recipe** - installed with `conan`.
-
-**VCPKG port** - installed with `vcpkg install sail`.
-
 ### CMake options overview
 
 - `SAIL_BUILD_EXAMPLES=ON|OFF` - Build examples. Default: `ON`
@@ -35,7 +25,7 @@ SAIL is available in VCPKG on Windows, Linux, and macOS:
 vcpkg install sail
 ```
 
-### Windows (standalone bundle)
+### Windows
 
 #### Tested environments
 
@@ -70,7 +60,7 @@ cmake --build . --config Release
 cmake --build . --config Release --target install
 ```
 
-### macOS (standalone build)
+### macOS
 
 #### Tested environments
 
@@ -90,7 +80,7 @@ Or
 brew upgrade sail
 ```
 
-### Linux (standalone build)
+### Linux
 
 #### Tested environments
 
