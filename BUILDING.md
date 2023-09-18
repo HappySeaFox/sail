@@ -2,7 +2,7 @@
 
 ### Conan
 
-SAIL is available in [Conan](https://conan.io/center/sail) on all supported platforms.
+SAIL is available in [Conan](https://conan.io/center/recipes/sail) on all supported platforms.
 
 ### VCPKG
 
