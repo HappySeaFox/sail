@@ -240,7 +240,7 @@ Dmitry Baryshev
 Released under the MIT license.
 
 ```
-Copyright (c) 2020-2022 Dmitry Baryshev
+Copyright (c) 2020-2023 Dmitry Baryshev
 
 The MIT License
 
