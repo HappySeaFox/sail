@@ -1,0 +1,26 @@
+# JXL codec information
+#
+[codec]
+layout=8
+version=0.2.0
+priority=MEDIUM
+name=JXL
+description=JPEG XL
+magic-numbers=FF 0A;00 00 00 0C 4A 58 4C 20 0D 0A 87 0A
+extensions=jxl
+mime-types=image/jxl
+
+[load-features]
+features=STATIC;META-DATA;ICCP
+tuning=
+
+[save-features]
+features=
+pixel-formats=
+compressions=
+default-compression=
+compression-level-min=0
+compression-level-max=0
+compression-level-default=0
+compression-level-step=0
+tuning=
