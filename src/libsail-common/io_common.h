@@ -223,8 +223,7 @@ SAIL_EXPORT sail_status_t sail_io_size(struct sail_io *io, size_t *size);
 
 /*
  * Reads the specified I/O stream until EOF into the memory buffer. Reads the stream
- * from the current position and then rewinds it back (i.e. the stream must be seekable).
- * The buffer must be large enough.
+ * from the current position. The buffer must be large enough.
  *
  * Returns SAIL_OK on success.
  */
@@ -232,8 +231,7 @@ SAIL_EXPORT sail_status_t sail_io_contents_into_data(struct sail_io *io, void *d
 
 /*
  * Allocates a memory buffer and reads the specified I/O stream until EOF into it.
- * Reads the stream from the current position and then rewinds it back (i.e. the stream
- * must be seekable).
+ * Reads the stream from the current position.
  *
  * The size of the memory buffer is stored in 'data_size'.
  *

@@ -110,10 +110,6 @@ sail_status_t sail_io_contents_into_data(struct sail_io *io, void *data) {
     SAIL_CHECK_PTR(io);
     SAIL_CHECK_PTR(data);
 
-    /* Save the current position. */
-    size_t saved_position;
-    SAIL_TRY(io->tell(io->stream, &saved_position));
-
     unsigned char buffer[4096];
     unsigned char *data_ptr = data;
     size_t actually_read;
@@ -125,8 +121,6 @@ sail_status_t sail_io_contents_into_data(struct sail_io *io, void *data) {
         memcpy(data_ptr, buffer, actually_read);
         data_ptr += actually_read;
     }
-
-    SAIL_TRY(io->seek(io->stream, (long)saved_position, SEEK_SET));
 
     if (status != SAIL_ERROR_EOF) {
         SAIL_LOG_ERROR("Failed to read from the I/O stream, error #%d", status);
@@ -142,10 +136,6 @@ sail_status_t sail_alloc_data_from_io_contents(struct sail_io *io, void **data, 
     SAIL_CHECK_PTR(data);
     SAIL_CHECK_PTR(data_size);
 
-    /* Save the current position. */
-    size_t saved_position;
-    SAIL_TRY(io->tell(io->stream, &saved_position));
-
     size_t data_size_local;
     SAIL_TRY(sail_io_size(io, &data_size_local));
 
@@ -155,9 +145,6 @@ sail_status_t sail_alloc_data_from_io_contents(struct sail_io *io, void **data, 
 
     SAIL_TRY_OR_CLEANUP(io->strict_read(io->stream, data_local, data_size_local),
                         /* cleanup */ sail_free(data_local));
-
-    /* Seek back. */
-    SAIL_TRY(io->seek(io->stream, (long)saved_position, SEEK_SET));
 
     *data = data_local;
     *data_size = data_size_local;
