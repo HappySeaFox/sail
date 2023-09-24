@@ -23,6 +23,7 @@
     SOFTWARE.
 */
 
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -255,8 +256,8 @@ static sail_status_t check_codec_info(const struct sail_codec_info *codec_info) 
     }
 
     for (size_t i = 0; i < strlen(codec_info->name); i++) {
-        if (codec_info->name[i] >= 'a' && codec_info->name[i] <= 'z') {
-            SAIL_LOG_ERROR("Codec validation error: %s codec has lowercase letters in its name", codec_info->name);
+        if (!isupper(codec_info->name[i]) && !isdigit(codec_info->name[i])) {
+            SAIL_LOG_ERROR("Codec validation error: %s codec has invalid name. Only upper-case letters and numbers are allowed", codec_info->name);
             SAIL_LOG_AND_RETURN(SAIL_ERROR_INCOMPLETE_CODEC_INFO);
         }
     }
