@@ -672,7 +672,7 @@ sail_status_t sail_file_contents_into_data(const char *path, void *data) {
     return SAIL_OK;
 }
 
-sail_status_t sail_file_contents_to_data(const char *path, void **data, size_t *data_size) {
+sail_status_t sail_alloc_data_from_file_contents(const char *path, void **data, size_t *data_size) {
 
     SAIL_CHECK_PTR(data);
     SAIL_CHECK_PTR(data_size);

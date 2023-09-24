@@ -209,7 +209,7 @@ SAIL_EXPORT sail_status_t sail_file_contents_into_data(const char *path, void *d
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_file_contents_to_data(const char *path, void **data, size_t *data_size);
+SAIL_EXPORT sail_status_t sail_alloc_data_from_file_contents(const char *path, void **data, size_t *data_size);
 
 /*
  * Decodes the specified HEX-encoded string into the specified memory buffer.

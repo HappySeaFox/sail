@@ -49,7 +49,7 @@ static MunitResult test_can_load_memory1(const MunitParameter params[], void *us
 
     void *data;
     size_t data_size;
-    munit_assert(sail_file_contents_to_data(path, &data, &data_size) == SAIL_OK);
+    munit_assert(sail_alloc_data_from_file_contents(path, &data, &data_size) == SAIL_OK);
 
     const sail::codec_info codec_info = sail::codec_info::from_path(path);
     munit_assert(codec_info.is_valid());
@@ -74,7 +74,7 @@ static MunitResult test_can_load_memory2(const MunitParameter params[], void *us
 
     void *data;
     size_t data_size;
-    munit_assert(sail_file_contents_to_data(path, &data, &data_size) == SAIL_OK);
+    munit_assert(sail_alloc_data_from_file_contents(path, &data, &data_size) == SAIL_OK);
 
     const sail::arbitrary_data arbitrary_data(reinterpret_cast<std::uint8_t *>(data), reinterpret_cast<std::uint8_t *>(data) + data_size);
 

@@ -44,7 +44,7 @@ static MunitResult test_io_produce_same_images(const MunitParameter params[], vo
 
     void *data;
     size_t data_length;
-    munit_assert(sail_file_contents_to_data(path, &data, &data_length) == SAIL_OK);
+    munit_assert(sail_alloc_data_from_file_contents(path, &data, &data_length) == SAIL_OK);
     munit_assert_not_null(data);
     munit_assert(data_length > 0);
 
