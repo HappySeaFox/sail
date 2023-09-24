@@ -4,6 +4,10 @@
 macro(sail_codec)
     cmake_parse_arguments(SAIL_CODEC "" "NAME;ICON" "SOURCES;LINK;DEPENDENCY_COMPILE_OPTIONS;DEPENDENCY_INCLUDE_DIRS;DEPENDENCY_LIBS" ${ARGN})
 
+    if (NOT SAIL_CODEC_NAME MATCHES "^[a-z0-9]+$")
+        message(FATAL_ERROR "Invalid codec name '${SAIL_CODEC_NAME}'. Only lower-case letters and numbers are allowed.")
+    endif()
+
     # Use 'sail-codec-png' instead of just 'png' to avoid conflicts
     # with libpng cmake configs (they also export a 'png' target)
     # and possibly other libs in the future.
