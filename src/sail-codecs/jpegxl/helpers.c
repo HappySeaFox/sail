@@ -26,3 +26,32 @@
 #include "sail-common.h"
 
 #include "helpers.h"
+
+enum SailPixelFormat jpegxl_private_sail_pixel_format(uint32_t num_color_channels, uint32_t alpha_bits) {
+
+    switch (num_color_channels) {
+        case 1: {
+            switch (alpha_bits) {
+                case 0: return SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE;
+                case 8: return SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA;
+
+                default: {
+                    return SAIL_PIXEL_FORMAT_UNKNOWN;
+                }
+            }
+        }
+        case 3: {
+            switch (alpha_bits) {
+                case 0: return SAIL_PIXEL_FORMAT_BPP24_RGB;
+                case 8: return SAIL_PIXEL_FORMAT_BPP32_RGBA;
+
+                default: {
+                    return SAIL_PIXEL_FORMAT_UNKNOWN;
+                }
+            }
+        }
+        default: {
+            return SAIL_PIXEL_FORMAT_UNKNOWN;
+        }
+    }
+}

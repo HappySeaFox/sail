@@ -26,8 +26,12 @@
 #ifndef SAIL_JPEGXL_HELPERS_H
 #define SAIL_JPEGXL_HELPERS_H
 
+#include <stdint.h>
+
 #include "common.h"
 #include "error.h"
 #include "export.h"
+
+SAIL_HIDDEN enum SailPixelFormat jpegxl_private_sail_pixel_format(uint32_t num_color_channels, uint32_t alpha_bits);
 
 #endif
