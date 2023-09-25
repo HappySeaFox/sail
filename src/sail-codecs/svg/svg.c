@@ -104,6 +104,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_svg(struct sail_io *io, const 
 
     const int result = resvg_parse_tree_from_data(image_data, image_size, svg_state->resvg_options, &svg_state->resvg_tree);
 
+    sail_free(image_data);
+
     if (result != RESVG_OK) {
         SAIL_LOG_ERROR("SVG: Failed to load image");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
