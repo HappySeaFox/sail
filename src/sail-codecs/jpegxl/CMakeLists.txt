@@ -1,7 +1,7 @@
-find_library(JXL_LIBRARY jxl            ${SAIL_CODEC_JXL_REQUIRED_OPTION})
-find_path(JXL_INCLUDE_DIRS jxl/decode.h ${SAIL_CODEC_JXL_REQUIRED_OPTION})
+find_library(JPEGXL_LIBRARY jxl            ${SAIL_CODEC_JPEGXL_REQUIRED_OPTION})
+find_path(JPEGXL_INCLUDE_DIRS jxl/decode.h ${SAIL_CODEC_JPEGXL_REQUIRED_OPTION})
 
-if (NOT JXL_LIBRARY OR NOT JXL_INCLUDE_DIRS)
+if (NOT JPEGXL_LIBRARY OR NOT JPEGXL_INCLUDE_DIRS)
     return()
 endif()
 
@@ -16,8 +16,8 @@ set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library
 
 # Common codec configuration
 #
-sail_codec(NAME jxl
-            SOURCES helpers.h helpers.c jxl.c memory.h memory.c
-            ICON jxl.png
-            DEPENDENCY_INCLUDE_DIRS ${JXL_INCLUDE_DIRS}
-            DEPENDENCY_LIBS ${JXL_LIBRARY})
+sail_codec(NAME jpegxl
+            SOURCES helpers.h helpers.c jpegxl.c memory.h memory.c
+            ICON jpegxl.png
+            DEPENDENCY_INCLUDE_DIRS ${JPEGXL_INCLUDE_DIRS}
+            DEPENDENCY_LIBS ${JPEGXL_LIBRARY})

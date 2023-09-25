@@ -23,24 +23,13 @@
     SOFTWARE.
 */
 
-#include "sail-common.h"
+#ifndef SAIL_JPEGXL_MEMORY_H
+#define SAIL_JPEGXL_MEMORY_H
 
-#include "memory.h"
+#include "export.h"
 
-void *jxl_private_alloc_func(void *opaque, size_t size)
-{
-    (void)opaque;
+/* We want to allocate/free with sail_malloc()/sail_free(). */
+SAIL_HIDDEN void *jpegxl_private_alloc_func(void *opaque, size_t size);
+SAIL_HIDDEN void jpegxl_private_free_func(void *opaque, void *address);
 
-    void *ptr;
-    SAIL_TRY_OR_EXECUTE(sail_malloc(size, &ptr),
-                        /* on error */ return NULL);
-
-    return ptr;
-}
-
-void jxl_private_free_func(void *opaque, void *address)
-{
-    (void)opaque;
-
-    sail_free(address);
-}
+#endif

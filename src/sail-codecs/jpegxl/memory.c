@@ -23,11 +23,24 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_JXL_HELPERS_H
-#define SAIL_JXL_HELPERS_H
+#include "sail-common.h"
 
-#include "common.h"
-#include "error.h"
-#include "export.h"
+#include "memory.h"
 
-#endif
+void *jpegxl_private_alloc_func(void *opaque, size_t size)
+{
+    (void)opaque;
+
+    void *ptr;
+    SAIL_TRY_OR_EXECUTE(sail_malloc(size, &ptr),
+                        /* on error */ return NULL);
+
+    return ptr;
+}
+
+void jpegxl_private_free_func(void *opaque, void *address)
+{
+    (void)opaque;
+
+    sail_free(address);
+}

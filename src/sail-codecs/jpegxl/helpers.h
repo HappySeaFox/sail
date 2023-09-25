@@ -23,12 +23,11 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_JXL_MEMORY_H
-#define SAIL_JXL_MEMORY_H
+#ifndef SAIL_JPEGXL_HELPERS_H
+#define SAIL_JPEGXL_HELPERS_H
 
+#include "common.h"
+#include "error.h"
 #include "export.h"
-
-SAIL_HIDDEN void *jxl_private_alloc_func(void *opaque, size_t size);
-SAIL_HIDDEN void jxl_private_free_func(void *opaque, void *address);
 
 #endif
