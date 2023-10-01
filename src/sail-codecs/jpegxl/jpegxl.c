@@ -227,7 +227,12 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void *state,
             }
             case JXL_DEC_NEED_IMAGE_OUT_BUFFER: {
 /*
-                JxlPixelFormat format = {4, JXL_TYPE_FLOAT, JXL_NATIVE_ENDIAN, 0};
+                JxlPixelFormat format = {
+                    .num_channels = 4,
+                    .data_type    = JXL_TYPE_FLOAT,
+                    .endianness   = JXL_NATIVE_ENDIAN,
+                    .align        = 0
+                };
                 size_t buffer_size;
                 if (JxlDecoderImageOutBufferSize(jpegxl_state->decoder,
                                                     &format,
