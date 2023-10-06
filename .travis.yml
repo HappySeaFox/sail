@@ -10,6 +10,7 @@ addons:
       - giflib
       - jasper
       - jpeg-turbo
+      - jpeg-xl
       - libavif
       - libpng
       - libtiff
