@@ -55,7 +55,8 @@ struct sail_source_image;
 struct sail_image {
 
     /*
-     * Image pixels.
+     * Image pixels. The channels are interleaved per pixel. The pixels are
+     * organized row by row, left to right, top to bottom.
      *
      * LOAD: Set by SAIL to an allocated array of pixels.
      * SAVE: Must be set by a caller to an allocated array of pixels.
