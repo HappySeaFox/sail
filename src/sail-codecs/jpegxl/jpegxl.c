@@ -29,6 +29,7 @@
 #include <stdlib.h>
 
 #include <jxl/decode.h>
+#include <jxl/resizable_parallel_runner.h>
 
 #include "sail-common.h"
 
@@ -43,9 +44,10 @@ struct jpegxl_state {
     struct sail_load_options *load_options;
     struct sail_save_options *save_options;
 
-    bool frame_loaded;
-
     void *image_data;
+
+    bool libjxl_success;
+    JxlBasicInfo *basic_info;
     JxlMemoryManager *memory_manager;
     void *runner;
     JxlDecoder *decoder;
@@ -61,9 +63,10 @@ static sail_status_t alloc_jpegxl_state(struct jpegxl_state **jpegxl_state) {
     (*jpegxl_state)->load_options = NULL;
     (*jpegxl_state)->save_options = NULL;
 
-    (*jpegxl_state)->frame_loaded = false;
-
     (*jpegxl_state)->image_data     = NULL;
+
+    (*jpegxl_state)->libjxl_success = false;
+    (*jpegxl_state)->basic_info     = NULL;
     (*jpegxl_state)->memory_manager = NULL;
     (*jpegxl_state)->runner         = NULL;
     (*jpegxl_state)->decoder        = NULL;
@@ -81,10 +84,10 @@ static void destroy_jpegxl_state(struct jpegxl_state *jpegxl_state) {
     sail_destroy_save_options(jpegxl_state->save_options);
 
     sail_free(jpegxl_state->image_data);
+    sail_free(jpegxl_state->basic_info);
     sail_free(jpegxl_state->memory_manager);
 
-    // TODO
-    //JxlResizableParallelRunnerDestroy(jpegxl_state->runner);
+    JxlResizableParallelRunnerDestroy(jpegxl_state->runner);
     JxlDecoderDestroy(jpegxl_state->decoder);
 
     sail_free(jpegxl_state);
@@ -117,27 +120,31 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_jpegxl(struct sail_io *io, con
     jpegxl_state->memory_manager->alloc  = jpegxl_private_alloc_func,
     jpegxl_state->memory_manager->free   = jpegxl_private_free_func,
 
-    // TODO
-    // jpegxl_state->runner = JxlResizableParallelRunnerCreate(jpegxl_state->memory_manager);
-
+    jpegxl_state->runner  = JxlResizableParallelRunnerCreate(jpegxl_state->memory_manager);
     jpegxl_state->decoder = JxlDecoderCreate(jpegxl_state->memory_manager);
+
+    if (JxlDecoderSetCoalescing(jpegxl_state->decoder, JXL_TRUE) != JXL_DEC_SUCCESS) {
+        SAIL_LOG_ERROR("JPEGXL: Failed to set coalescing");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+    }
 
     if (JxlDecoderSubscribeEvents(jpegxl_state->decoder, JXL_DEC_BASIC_INFO
                                                             | JXL_DEC_COLOR_ENCODING
+                                                            | JXL_DEC_FRAME
                                                             | JXL_DEC_FULL_IMAGE) != JXL_DEC_SUCCESS) {
         SAIL_LOG_ERROR("JPEGXL: Failed to subscribe to decoder events");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
-    // TODO
-    //if (JxlDecoderSetParallelRunner(jpegxl_state->decoder,
-    //                                JxlResizableParallelRunner,
-    //                                jpegxl_state->runner) != JXL_DEC_SUCCESS) {
-    //    SAIL_LOG_ERROR("JPEGXL: Failed to set a parallel runner");
-    //    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
-    //}
+    if (JxlDecoderSetParallelRunner(jpegxl_state->decoder,
+                                    JxlResizableParallelRunner,
+                                    jpegxl_state->runner) != JXL_DEC_SUCCESS) {
+        SAIL_LOG_ERROR("JPEGXL: Failed to set parallel runner");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+    }
 
-    /* Read the entire image to use the JasPer memory API. */
+    // TODO Progressive
+    /* Read the entire image to use the libjxl memory API. */
     size_t image_size;
     SAIL_TRY(sail_alloc_data_from_io_contents(io, &jpegxl_state->image_data, &image_size));
 
@@ -151,11 +158,9 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void *state,
 
     struct jpegxl_state *jpegxl_state = state;
 
-    if (jpegxl_state->frame_loaded) {
+    if (jpegxl_state->libjxl_success) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
     }
-
-    jpegxl_state->frame_loaded = true;
 
     struct sail_image *image_local;
 
@@ -169,40 +174,64 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void *state,
         JxlDecoderStatus status = JxlDecoderProcessInput(jpegxl_state->decoder);
 
         switch (status) {
-            case JXL_DEC_ERROR: {
-                sail_destroy_image(image_local);
-                SAIL_LOG_ERROR("JPEGXL: Unknown decoder error");
-                SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
-            }
             case JXL_DEC_NEED_MORE_INPUT: {
                 sail_destroy_image(image_local);
-                SAIL_LOG_ERROR("JPEGXL: For unknown reason decoder needs more input");
+                SAIL_LOG_ERROR("JPEGXL: For unknown reason decoder still needs more input");
                 SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
             }
             case JXL_DEC_BASIC_INFO: {
-                JxlBasicInfo info;
+                void *ptr;
+                SAIL_TRY_OR_CLEANUP(sail_malloc(sizeof(JxlBasicInfo), &ptr),
+                                        /* cleanup */ sail_destroy_image(image_local));
+                jpegxl_state->basic_info = ptr;
 
-                if (JxlDecoderGetBasicInfo(jpegxl_state->decoder, &info) != JXL_DEC_SUCCESS) {
+                if (JxlDecoderGetBasicInfo(jpegxl_state->decoder, jpegxl_state->basic_info) != JXL_DEC_SUCCESS) {
                     sail_destroy_image(image_local);
                     SAIL_LOG_ERROR("JPEGXL: Failed to get image info");
                     SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
                 }
 
-                image_local->source_image->pixel_format =
-                    jpegxl_private_sail_pixel_format(info.num_color_channels, info.alpha_bits);
-                //image_local->source_image->chroma_subsampling = jpegxl_private_sail_chroma_subsampling(jpegxl_image->yuvFormat);
-                //image_local->source_image->compression = SAIL_COMPRESSION_NONE;
+                SAIL_LOG_TRACE("JPEGXL: Animation: %s", jpegxl_state->basic_info->have_animation ? "yes" : "no");
 
-                image_local->width          = info.xsize;
-                image_local->height         = info.ysize;
+                if (jpegxl_state->basic_info->have_animation) {
+                    SAIL_LOG_TRACE("JPEGXL: num: %u, denom: %u, loops: %u",
+                        jpegxl_state->basic_info->animation.tps_numerator, jpegxl_state->basic_info->animation.tps_denominator,
+                        jpegxl_state->basic_info->animation.num_loops);
+                }
+
+                JxlResizableParallelRunnerSetThreads(
+                        jpegxl_state->runner,
+                        JxlResizableParallelRunnerSuggestThreads(jpegxl_state->basic_info->xsize, jpegxl_state->basic_info->ysize));
+                break;
+            }
+            case JXL_DEC_FRAME: {
+                JxlFrameHeader frame_header;
+
+                if (JxlDecoderGetFrameHeader(jpegxl_state->decoder, &frame_header) != JXL_DEC_SUCCESS) {
+                    sail_destroy_image(image_local);
+                    SAIL_LOG_ERROR("JPEGXL: Failed to get frame header");
+                    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+                }
+
+                image_local->source_image->pixel_format =
+                    jpegxl_private_sail_pixel_format(jpegxl_state->basic_info->bits_per_sample,
+                                                        jpegxl_state->basic_info->num_color_channels,
+                                                        jpegxl_state->basic_info->alpha_bits);
+                image_local->source_image->compression = SAIL_COMPRESSION_UNKNOWN;
+
+                image_local->width          = jpegxl_state->basic_info->xsize;
+                image_local->height         = jpegxl_state->basic_info->ysize;
                 image_local->pixel_format   = image_local->source_image->pixel_format;
-                //image_local->delay          = (int)(jpegxl_state->jpegxl_decoder->imageTiming.duration * 1000);
                 image_local->bytes_per_line = sail_bytes_per_line(image_local->width, image_local->pixel_format);
 
-                // TODO
-                //JxlResizableParallelRunnerSetThreads(
-                //        jpegxl_state->runner,
-                //        JxlResizableParallelRunnerSuggestThreads(info.xsize, info.ysize));
+                if (jpegxl_state->basic_info->have_animation) {
+                    float ms = frame_header.duration
+                                * 1000.f
+                                * jpegxl_state->basic_info->animation.tps_denominator
+                                / jpegxl_state->basic_info->animation.tps_numerator;
+                    image_local->delay = (int)ms;
+                    SAIL_LOG_TRACE("JPEGXL: Frame delay: %d ms.", image_local->delay);
+                }
                 break;
             }
             case JXL_DEC_COLOR_ENCODING: {
@@ -226,69 +255,22 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void *state,
                 break;
             }
             case JXL_DEC_NEED_IMAGE_OUT_BUFFER: {
-/*
-                JxlPixelFormat format = {
-                    .num_channels = 4,
-                    .data_type    = JXL_TYPE_FLOAT,
-                    .endianness   = JXL_NATIVE_ENDIAN,
-                    .align        = 0
-                };
-                size_t buffer_size;
-                if (JxlDecoderImageOutBufferSize(jpegxl_state->decoder,
-                                                    &format,
-                                                    &buffer_size) != JXL_DEC_SUCCESS) {
-                    sail_destroy_image(image_local);
-                    SAIL_LOG_ERROR("JPEGXL: Failed to get output buffer size");
-                    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
-                }
-                if (buffer_size != (size_t)image_local->width * image_local->height * 16) {
-                    sail_destroy_image(image_local);
-                    SAIL_LOG_ERROR("JPEGXL: Invalid output buffer size");
-                    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
-                }
-                pixels->resize(*xsize * *ysize * 4);
-                void* pixels_buffer = (void*)pixels->data();
-                size_t pixels_buffer_size = pixels->size() * sizeof(float);
-                if (JxlDecoderSetImageOutBuffer(jpegxl_state->decoder,
-                                                &format,
-                                                pixels_buffer,
-                                                pixels_buffer_size) != JXL_DEC_SUCCESS) {
-                    sail_destroy_image(image_local);
-                    SAIL_LOG_ERROR("JPEGXL: Failed to set output buffer");
-                    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
-                }
-*/
-                break;
-            }
-            case JXL_DEC_FULL_IMAGE: {
-                // Nothing to do. Do not yet return. If the image is an animation, more
-                // full frames may be decoded. This example only keeps the last one.
-                break;
-            }
-            case JXL_DEC_SUCCESS: {
                 done = true;
                 break;
             }
+            case JXL_DEC_SUCCESS: {
+                sail_destroy_image(image_local);
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+            }
             default: {
                 sail_destroy_image(image_local);
-                SAIL_LOG_ERROR("JPEGXL: Unknown decoder status");
+                SAIL_LOG_ERROR("JPEGXL: Unexpected decoder status %u", status);
                 SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
             }
         }
     }
 
 #if 0
-    image_local->source_image->pixel_format =
-        jpegxl_private_sail_pixel_format(jpegxl_image->yuvFormat, jpegxl_image->depth, jpegxl_image->alphaPlane != NULL);
-    image_local->source_image->chroma_subsampling = jpegxl_private_sail_chroma_subsampling(jpegxl_image->yuvFormat);
-    image_local->source_image->compression = SAIL_COMPRESSION_NONE;
-
-    image_local->width          = jpegxl_state->width;
-    image_local->height         = jpegxl_state->height;
-    image_local->pixel_format   = jpegxl_private_rgb_sail_pixel_format(jpegxl_state->rgb_image.format, jpegxl_state->rgb_image.depth);
-    image_local->delay          = (int)(jpegxl_state->jpegxl_decoder->imageTiming.duration * 1000);
-    image_local->bytes_per_line = sail_bytes_per_line(image_local->width, image_local->pixel_format);
-
     /* Fetch ICC profile. */
     if (sail_iccp_codec_option(jpegxl_state->load_options->codec_options)) {
         SAIL_TRY_OR_CLEANUP(jpegxl_private_fetch_iccp(&jpegxl_image->icc, &image_local->iccp),
@@ -303,7 +285,46 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void *state,
 
 SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_jpegxl(void *state, struct sail_image *image) {
 
-    const struct jpegxl_state *jpegxl_state = state;
+    struct jpegxl_state *jpegxl_state = state;
+
+    JxlPixelFormat format = {
+        .num_channels = jpegxl_private_sail_pixel_format_to_num_channels(image->pixel_format),
+        .data_type    = jpegxl_private_sail_pixel_format_to_jxl_data_type(image->pixel_format),
+        .endianness   = JXL_NATIVE_ENDIAN,
+        .align        = 0
+    };
+
+    JxlDecoderStatus status = JxlDecoderSetImageOutBuffer(
+            jpegxl_state->decoder,
+            &format,
+            image->pixels,
+            image->bytes_per_line * image->height);
+    if (status != JXL_DEC_SUCCESS) {
+        SAIL_LOG_ERROR("JPEGXL: Failed to set output buffer. Error: %u", status);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+    }
+
+    bool done = false;
+
+    while (!done) {
+        status = JxlDecoderProcessInput(jpegxl_state->decoder);
+
+        switch (status) {
+            case JXL_DEC_FULL_IMAGE: {
+                done = true;
+                break;
+            }
+            case JXL_DEC_SUCCESS: {
+                done = true;
+                jpegxl_state->libjxl_success = true;
+                break;
+            }
+            default: {
+                SAIL_LOG_ERROR("JPEGXL: Unexpected decoder status %u", status);
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+            }
+        }
+    }
 
     return SAIL_OK;
 }
