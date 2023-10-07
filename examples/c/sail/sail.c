@@ -125,31 +125,20 @@ static sail_status_t convert(int argc, char *argv[]) {
     return SAIL_OK;
 }
 
-static sail_status_t probe_impl(const char *path) {
+static void print_aligned_image_info(const struct sail_image *image) {
 
-    SAIL_CHECK_PTR(path);
-
-    /* Time counter. */
-    uint64_t start_time = sail_now();
-
-    struct sail_image *image;
-    const struct sail_codec_info *codec_info;
-
-    SAIL_TRY(sail_probe_file(path, &image, &codec_info));
-
-    printf("File          : %s\n", path);
-    printf("Probe time    : %lu ms.\n", (unsigned long)(sail_now() - start_time));
-    printf("Codec         : %s [%s]\n", codec_info->name, codec_info->description);
-    printf("Codec version : %s\n", codec_info->version);
     printf("Size          : %ux%u\n", image->width, image->height);
+
     if (image->resolution == NULL) {
         printf("Resolution:   : -\n");
     } else {
         printf("Resolution:   : %.1fx%.1f\n", image->resolution->x, image->resolution->y);
     }
+
     printf("Pixel format  : %s\n", sail_pixel_format_to_string(image->source_image->pixel_format));
     printf("ICC profile   : %s\n", image->iccp == NULL ? "no" : "yes");
     printf("Interlaced    : %s\n", image->source_image->interlaced ? "yes" : "no");
+    printf("Delay         : %d ms.\n", image->delay);
 
     for (const struct sail_meta_data_node *meta_data_node = image->meta_data_node; meta_data_node != NULL; meta_data_node = meta_data_node->next) {
         const struct sail_meta_data *meta_data = meta_data_node->meta_data;
@@ -180,6 +169,28 @@ static sail_status_t probe_impl(const char *path) {
             case SAIL_VARIANT_TYPE_INVALID:        printf("<invalid value>\n");                                                     break;
         }
     }
+}
+
+static sail_status_t probe_impl(const char *path) {
+
+    SAIL_CHECK_PTR(path);
+
+    /* Time counter. */
+    uint64_t start_time = sail_now();
+
+    struct sail_image *image;
+    const struct sail_codec_info *codec_info;
+
+    SAIL_TRY(sail_probe_file(path, &image, &codec_info));
+
+    uint64_t elapsed_time = sail_now() - start_time;
+
+    printf("File          : %s\n", path);
+    printf("Codec         : %s [%s]\n", codec_info->name, codec_info->description);
+    printf("Codec version : %s\n", codec_info->version);
+    printf("Probe time    : %lu ms.\n", (unsigned long)elapsed_time);
+
+    print_aligned_image_info(image);
 
     sail_destroy_image(image);
 
@@ -194,6 +205,64 @@ static sail_status_t probe(int argc, char *argv[]) {
     }
 
     SAIL_TRY(probe_impl(argv[2]));
+
+    return SAIL_OK;
+}
+
+static sail_status_t decode_impl(const char *path) {
+
+    SAIL_CHECK_PTR(path);
+
+    struct sail_image *image;
+    const struct sail_codec_info *codec_info;
+
+    SAIL_TRY(sail_probe_file(path, &image, &codec_info));
+
+    printf("File          : %s\n", path);
+    printf("Codec         : %s [%s]\n", codec_info->name, codec_info->description);
+    printf("Codec version : %s\n", codec_info->version);
+
+    sail_destroy_image(image);
+
+    /* Time counter. */
+    uint64_t start_time = sail_now();
+
+    /* Decode. */
+    void *state;
+    SAIL_TRY(sail_start_loading_from_file(path, codec_info, &state));
+
+    sail_status_t status;
+    unsigned frame = 0;
+
+    while ((status = sail_load_next_frame(state, &image)) == SAIL_OK) {
+        printf("Frame #%u\n", frame++);
+        print_aligned_image_info(image);
+        sail_destroy_image(image);
+    }
+
+    if (status != SAIL_ERROR_NO_MORE_FRAMES) {
+        sail_stop_loading(state);
+        fprintf(stderr, "Error: Decoder error %d.\n", status);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+    }
+
+    SAIL_TRY(sail_stop_loading(state));
+
+    uint64_t elapsed_time = sail_now() - start_time;
+
+    printf("Decode time   : %lu ms.\n", (unsigned long)elapsed_time);
+
+    return SAIL_OK;
+}
+
+static sail_status_t decode(int argc, char *argv[]) {
+
+    if (argc != 3) {
+        print_invalid_argument();
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+    }
+
+    SAIL_TRY(decode_impl(argv[2]));
 
     return SAIL_OK;
 }
@@ -258,9 +327,13 @@ static void help(const char *app) {
     fprintf(stderr, "       %s [-v | --version]\n", app);
     fprintf(stderr, "       %s [-h | --help]\n", app);
     fprintf(stderr, "Commands:\n");
-    fprintf(stderr, "    convert <INPUT PATH> <OUTPUT PATH> [-c | --compression <value>] - Convert one image format to another.\n");
     fprintf(stderr, "    list [-v] - List supported codecs.\n");
-    fprintf(stderr, "    probe <PATH> - Retrieve image information.\n");
+    fprintf(stderr, "\n");
+    fprintf(stderr, "    convert <INPUT PATH> <OUTPUT PATH> [-c | --compression <value>] - Convert one image format to another.\n");
+    fprintf(stderr, "\n");
+    fprintf(stderr, "    probe <PATH> - Retrieve information of the very first image found in the file.\n");
+    fprintf(stderr, "                   In most cases probing doesn't decode the image data.\n");
+    fprintf(stderr, "    decode <PATH> - Decode the whole file and print information of all its frames.\n");
 }
 
 int main(int argc, char *argv[]) {
@@ -289,6 +362,8 @@ int main(int argc, char *argv[]) {
         SAIL_TRY(list(argc, argv));
     } else if (strcmp(argv[1], "probe") == 0) {
         SAIL_TRY(probe(argc, argv));
+    } else if (strcmp(argv[1], "decode") == 0) {
+        SAIL_TRY(decode(argc, argv));
     } else {
         print_invalid_argument();
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
