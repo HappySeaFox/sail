@@ -88,8 +88,6 @@ static sail_status_t convert_impl(const char *input, const char *output, int com
 
     sail_destroy_image(image);
 
-    SAIL_LOG_INFO("\n*** Success ***\n");
-
     return SAIL_OK;
 }
 
