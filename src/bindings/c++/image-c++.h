@@ -248,7 +248,8 @@ public:
     const sail::source_image& source_image() const;
 
     /*
-     * Returns the editable pixel data if any.
+     * Returns the editable pixel data if any. The channels are interleaved per pixel.
+     * The pixels are organized row by row, left to right, top to bottom.
      *
      * LOAD: Set by SAIL to valid pixel data.
      * SAVE: Must be set by a caller to valid pixel data.
@@ -256,7 +257,8 @@ public:
     void* pixels();
 
     /*
-     * Returns the constant pixel data if any.
+     * Returns the constant pixel data if any. The channels are interleaved per pixel.
+     * The pixels are organized row by row, left to right, top to bottom.
      *
      * LOAD: Set by SAIL to valid pixel data.
      * SAVE: Must be set by a caller to valid pixel data.
