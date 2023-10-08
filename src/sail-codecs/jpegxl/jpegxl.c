@@ -191,10 +191,10 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void *state,
                     SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
                 }
 
-                SAIL_LOG_TRACE("JPEGXL: Animation: %s", jpegxl_state->basic_info->have_animation ? "yes" : "no");
+                SAIL_LOG_TRACE("JPEGXL: Animation(%s)", jpegxl_state->basic_info->have_animation ? "yes" : "no");
 
                 if (jpegxl_state->basic_info->have_animation) {
-                    SAIL_LOG_TRACE("JPEGXL: num: %u, denom: %u, loops: %u",
+                    SAIL_LOG_TRACE("JPEGXL: Animation parameters: num(%u), denom(%u), loops(%u)",
                         jpegxl_state->basic_info->animation.tps_numerator, jpegxl_state->basic_info->animation.tps_denominator,
                         jpegxl_state->basic_info->animation.num_loops);
                 }
@@ -230,7 +230,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void *state,
                                 * jpegxl_state->basic_info->animation.tps_denominator
                                 / jpegxl_state->basic_info->animation.tps_numerator;
                     image_local->delay = (int)ms;
-                    SAIL_LOG_TRACE("JPEGXL: Frame delay: %d ms.", image_local->delay);
+                    SAIL_LOG_TRACE("JPEGXL: Frame delay(%d) ms.", image_local->delay);
                 }
                 break;
             }

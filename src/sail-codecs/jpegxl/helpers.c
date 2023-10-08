@@ -29,7 +29,7 @@
 
 enum SailPixelFormat jpegxl_private_sail_pixel_format(uint32_t bits_per_sample, uint32_t num_color_channels, uint32_t alpha_bits) {
 
-    SAIL_LOG_TRACE("JPEGXL: Bits per sample: %u, number of channels: %u, alpha bits: %u",
+    SAIL_LOG_TRACE("JPEGXL: Bits per sample(%u), number of channels(%u), alpha bits(%u)",
         bits_per_sample, num_color_channels, alpha_bits);
 
     /*
