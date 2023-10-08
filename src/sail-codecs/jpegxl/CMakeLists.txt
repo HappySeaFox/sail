@@ -6,6 +6,16 @@ if (NOT JPEGXL_LIBRARY OR NOT JPEGXL_THREADS_LIBRARY OR NOT JPEGXL_INCLUDE_DIRS)
     return()
 endif()
 
+# Dependencies
+#
+find_library(HWY_LIBRARY           NAMES hwy                              ${SAIL_CODEC_JPEGXL_REQUIRED_OPTION})
+find_library(BROTLI_COMMON_LIBRARY NAMES brotlicommon brotlicommon-static ${SAIL_CODEC_JPEGXL_REQUIRED_OPTION})
+find_library(BROTLI_DEC_LIBRARY    NAMES brotlidec brotlidec-static       ${SAIL_CODEC_JPEGXL_REQUIRED_OPTION})
+
+if (NOT HWY_LIBRARY OR NOT BROTLI_COMMON_LIBRARY OR NOT BROTLI_DEC_LIBRARY)
+    return()
+endif()
+
 # This will add the following CMake rules to the CMake config for static builds so a client
 # application links against the required dependencies:
 #
@@ -25,4 +35,5 @@ sail_codec(NAME jpegxl
             SOURCES helpers.h helpers.c jpegxl.c memory.h memory.c
             ICON jpegxl.png
             DEPENDENCY_INCLUDE_DIRS ${JPEGXL_INCLUDE_DIRS}
-            DEPENDENCY_LIBS ${JPEGXL_LIBRARY} ${JPEGXL_THREADS_LIBRARY})
+            DEPENDENCY_LIBS ${BROTLI_COMMON_LIBRARY} ${BROTLI_DEC_LIBRARY} ${HWY_LIBRARY}
+                            ${JPEGXL_LIBRARY} ${JPEGXL_THREADS_LIBRARY})
