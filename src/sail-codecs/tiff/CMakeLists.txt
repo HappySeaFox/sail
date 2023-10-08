@@ -139,10 +139,10 @@ sail_codec(NAME tiff
 
 foreach (tiff_codec IN LISTS TIFF_CODECS)
     if (HAVE_TIFF_${tiff_codec})
-        target_compile_definitions(${TARGET} PRIVATE SAIL_HAVE_TIFF_${tiff_codec})
+        target_compile_definitions(${SAIL_CODEC_TARGET} PRIVATE SAIL_HAVE_TIFF_${tiff_codec})
     endif()
 
     if (HAVE_TIFF_WRITE_${tiff_codec})
-        target_compile_definitions(${TARGET} PRIVATE SAIL_HAVE_TIFF_WRITE_${tiff_codec})
+        target_compile_definitions(${SAIL_CODEC_TARGET} PRIVATE SAIL_HAVE_TIFF_WRITE_${tiff_codec})
     endif()
 endforeach()
