@@ -235,23 +235,28 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void *state,
                 break;
             }
             case JXL_DEC_COLOR_ENCODING: {
-                // TODO
-                /*
                 size_t icc_size;
-                if (JXL_DEC_SUCCESS !=
-                        JxlDecoderGetICCProfileSize(dec.get(), JXL_COLOR_PROFILE_TARGET_DATA,
-                                                                                &icc_size)) {
-                    fprintf(stderr, "JxlDecoderGetICCProfileSize failed\n");
-                    return false;
+                if (JxlDecoderGetICCProfileSize(jpegxl_state->decoder,
+                                                /* unused */ NULL,
+                                                JXL_COLOR_PROFILE_TARGET_DATA,
+                                                &icc_size) != JXL_DEC_SUCCESS) {
+                    sail_destroy_image(image_local);
+                    SAIL_LOG_ERROR("JPEGXL: Failed to get ICC size");
+                    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
                 }
-                icc_profile->resize(icc_size);
-                if (JXL_DEC_SUCCESS != JxlDecoderGetColorAsICCProfile(
-                                                                     dec.get(), JXL_COLOR_PROFILE_TARGET_DATA,
-                                                                     icc_profile->data(), icc_profile->size())) {
-                    fprintf(stderr, "JxlDecoderGetColorAsICCProfile failed\n");
-                    return false;
+
+                SAIL_TRY_OR_CLEANUP(sail_alloc_iccp_for_data((unsigned)icc_size, &image_local->iccp),
+                                    /* cleanup */ sail_destroy_image(image_local));
+
+                if (JxlDecoderGetColorAsICCProfile(jpegxl_state->decoder,
+                                                    /* unused */ NULL,
+                                                    JXL_COLOR_PROFILE_TARGET_DATA,
+                                                    image_local->iccp->data,
+                                                    image_local->iccp->data_length) != JXL_DEC_SUCCESS) {
+                    sail_destroy_image(image_local);
+                    SAIL_LOG_ERROR("JPEGXL: Failed to get ICC profile");
+                    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
                 }
-                */
                 break;
             }
             case JXL_DEC_NEED_IMAGE_OUT_BUFFER: {
