@@ -41,3 +41,9 @@ sail_codec(NAME jpegxl
             DEPENDENCY_INCLUDE_DIRS ${JPEGXL_INCLUDE_DIRS}
             DEPENDENCY_LIBS ${BROTLI_COMMON_LIBRARY} ${BROTLI_DEC_LIBRARY} ${HWY_LIBRARY}
                             ${JPEGXL_LIBRARY} ${JPEGXL_THREADS_LIBRARY})
+
+# For static builds libjxl requires -DJXL_STATIC_DEFINE
+#
+if (JPEGXL_LIBRARY MATCHES "jxl-static")
+    target_compile_definitions(${TARGET} PRIVATE JXL_STATIC_DEFINE)
+endif()
