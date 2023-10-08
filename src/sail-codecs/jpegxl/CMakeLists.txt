@@ -6,7 +6,8 @@ if (NOT JPEGXL_LIBRARY OR NOT JPEGXL_THREADS_LIBRARY OR NOT JPEGXL_INCLUDE_DIRS)
     return()
 endif()
 
-# Dependencies
+# Find dependencies for static builds as libjxl doesn't provide CMake configs
+# to find them automatically.
 #
 find_library(HWY_LIBRARY           NAMES hwy                              ${SAIL_CODEC_JPEGXL_REQUIRED_OPTION})
 find_library(BROTLI_COMMON_LIBRARY NAMES brotlicommon brotlicommon-static ${SAIL_CODEC_JPEGXL_REQUIRED_OPTION})
@@ -22,12 +23,15 @@ endif()
 # find_library(jxl_RELEASE_LIBRARY NAMES jxl jxl-static)
 # find_library(jxl_DEBUG_LIBRARY NAMES jxl jxl-static)
 # set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES $<$<CONFIG:Release>:${jxl_RELEASE_LIBRARY}> $<$<CONFIG:Debug>:${jxl_DEBUG_LIBRARY}>)
-# find_library(jxl_threads_RELEASE_LIBRARY NAMES jxl_threads jxl_threads-static)
-# find_library(jxl_threads_DEBUG_LIBRARY NAMES jxl_threads jxl_threads-static)
-# set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES $<$<CONFIG:Release>:${jxl_threads_RELEASE_LIBRARY}> $<$<CONFIG:Debug>:${jxl_threads_DEBUG_LIBRARY}>)
+#
+# etc.
 #
 set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,jxl jxl-static,jxl jxl-static" PARENT_SCOPE)
 set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,jxl_threads jxl_threads-static,jxl_threads jxl_threads-static" PARENT_SCOPE)
+
+set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,hwy,hwy" PARENT_SCOPE)
+set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,brotlicommon brotlicommon-static,brotlicommon brotlicommon-static" PARENT_SCOPE)
+set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,brotlidec brotlidec-static,brotlidec brotlidec-static" PARENT_SCOPE)
 
 # Common codec configuration
 #
