@@ -67,6 +67,16 @@ SAIL_EXPORT sail_status_t sail_alloc_iccp(struct sail_iccp **iccp);
 SAIL_EXPORT sail_status_t sail_alloc_iccp_from_data(const void *data, unsigned data_length, struct sail_iccp **iccp);
 
 /*
+ * Allocates a new ICC profile for the specified ICC profile data size.
+ *
+ * Use this function to allocate a ICC profile and fill its data later with
+ * some algorithm (memcpy or for-loop, for example).
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_alloc_iccp_for_data(unsigned data_length, struct sail_iccp **iccp);
+
+/*
  * Allocates a new ICC profile and copies the external pointer to a ICC profile data into it.
  * DO NOT free the external pointer as it will be freed in sail_destroy_iccp(), beware of double free.
  *
