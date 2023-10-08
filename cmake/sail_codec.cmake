@@ -2,7 +2,7 @@
 # installation targets, codec info.
 #
 macro(sail_codec)
-    cmake_parse_arguments(SAIL_CODEC "" "NAME;ICON" "SOURCES;LINK;DEPENDENCY_COMPILE_OPTIONS;DEPENDENCY_INCLUDE_DIRS;DEPENDENCY_LIBS" ${ARGN})
+    cmake_parse_arguments(SAIL_CODEC "" "NAME;ICON" "SOURCES;LINK;DEPENDENCY_COMPILE_DEFINITIONS;DEPENDENCY_INCLUDE_DIRS;DEPENDENCY_LIBS" ${ARGN})
 
     if (NOT SAIL_CODEC_NAME MATCHES "^[a-z0-9]+$")
         message(FATAL_ERROR "Invalid codec name '${SAIL_CODEC_NAME}'. Only lower-case letters and numbers are allowed.")
@@ -12,33 +12,33 @@ macro(sail_codec)
     # with libpng cmake configs (they also export a 'png' target)
     # and possibly other libs in the future.
     #
-    set(TARGET sail-codec-${SAIL_CODEC_NAME})
+    set(SAIL_CODEC_TARGET sail-codec-${SAIL_CODEC_NAME})
 
     # Add a codec
     #
     if (SAIL_COMBINE_CODECS)
-        add_library(${TARGET} OBJECT ${SAIL_CODEC_SOURCES})
+        add_library(${SAIL_CODEC_TARGET} OBJECT ${SAIL_CODEC_SOURCES})
     else()
-        add_library(${TARGET} MODULE ${SAIL_CODEC_SOURCES})
+        add_library(${SAIL_CODEC_TARGET} MODULE ${SAIL_CODEC_SOURCES})
 
-        sail_enable_asan(TARGET ${TARGET})
+        sail_enable_asan(TARGET ${SAIL_CODEC_TARGET})
     endif()
 
     # Disable a "lib" prefix on Unix
     #
-    set_target_properties(${TARGET} PROPERTIES PREFIX "")
+    set_target_properties(${SAIL_CODEC_TARGET} PROPERTIES PREFIX "")
 
     # Rename to 'sail-codec-png.dll'
     #
-    set_target_properties(${TARGET} PROPERTIES OUTPUT_NAME sail-codec-${SAIL_CODEC_NAME})
+    set_target_properties(${SAIL_CODEC_TARGET} PROPERTIES OUTPUT_NAME sail-codec-${SAIL_CODEC_NAME})
 
     # Depend on sail-common
     #
-    target_link_libraries(${TARGET} PRIVATE sail-common)
+    target_link_libraries(${SAIL_CODEC_TARGET} PRIVATE sail-common)
 
     # Depend on user-defined targets
     #
-    target_link_libraries(${TARGET} PRIVATE ${SAIL_CODEC_LINK})
+    target_link_libraries(${SAIL_CODEC_TARGET} PRIVATE ${SAIL_CODEC_LINK})
 
     # This hack is needed for static builds where we have the following dependencies
     # ("->" is "links to"):
@@ -57,16 +57,16 @@ macro(sail_codec)
             get_target_property(TARGET_TYPE ${LINK_DEPENDENCY} TYPE)
 
             if (TARGET_TYPE STREQUAL "OBJECT_LIBRARY")
-                target_sources(${TARGET} INTERFACE $<TARGET_OBJECTS:${LINK_DEPENDENCY}>)
+                target_sources(${SAIL_CODEC_TARGET} INTERFACE $<TARGET_OBJECTS:${LINK_DEPENDENCY}>)
             endif()
         endif()
     endforeach()
 
     # Link against the found libs
     #
-    target_compile_options(${TARGET}     PRIVATE ${SAIL_CODEC_DEPENDENCY_COMPILE_OPTIONS})
-    target_include_directories(${TARGET} PRIVATE ${SAIL_CODEC_DEPENDENCY_INCLUDE_DIRS})
-    target_link_libraries(${TARGET}      PRIVATE ${SAIL_CODEC_DEPENDENCY_LIBS})
+    target_compile_definitions(${SAIL_CODEC_TARGET} PRIVATE ${SAIL_CODEC_DEPENDENCY_COMPILE_DEFINITIONS})
+    target_include_directories(${SAIL_CODEC_TARGET} PRIVATE ${SAIL_CODEC_DEPENDENCY_INCLUDE_DIRS})
+    target_link_libraries(${SAIL_CODEC_TARGET}      PRIVATE ${SAIL_CODEC_DEPENDENCY_LIBS})
 
     # Generate and copy .codec.info into the build dir
     #
@@ -77,7 +77,7 @@ macro(sail_codec)
     # Installation
     #
     if (NOT SAIL_COMBINE_CODECS)
-        install(TARGETS ${TARGET} DESTINATION "${CMAKE_INSTALL_LIBDIR}/sail/codecs")
+        install(TARGETS ${SAIL_CODEC_TARGET} DESTINATION "${CMAKE_INSTALL_LIBDIR}/sail/codecs")
 
         install(FILES "${CMAKE_CURRENT_BINARY_DIR}/sail-codec-${SAIL_CODEC_NAME}.codec.info"
                 DESTINATION "${CMAKE_INSTALL_LIBDIR}/sail/codecs")
