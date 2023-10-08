@@ -17,6 +17,12 @@ if (NOT HWY_LIBRARY OR NOT BROTLI_COMMON_LIBRARY OR NOT BROTLI_DEC_LIBRARY)
     return()
 endif()
 
+# For static builds libjxl requires -DJXL_STATIC_DEFINE
+#
+if (JPEGXL_LIBRARY MATCHES "jxl-static")
+    set(JXL_STATIC_DEFINE "JXL_STATIC_DEFINE")
+endif()
+
 # This will add the following CMake rules to the CMake config for static builds so a client
 # application links against the required dependencies:
 #
@@ -38,12 +44,7 @@ set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library
 sail_codec(NAME jpegxl
             SOURCES helpers.h helpers.c jpegxl.c memory.h memory.c
             ICON jpegxl.png
+            DEPENDENCY_COMPILE_DEFINITIONS ${JXL_STATIC_DEFINE}
             DEPENDENCY_INCLUDE_DIRS ${JPEGXL_INCLUDE_DIRS}
             DEPENDENCY_LIBS ${BROTLI_COMMON_LIBRARY} ${BROTLI_DEC_LIBRARY} ${HWY_LIBRARY}
                             ${JPEGXL_LIBRARY} ${JPEGXL_THREADS_LIBRARY})
-
-# For static builds libjxl requires -DJXL_STATIC_DEFINE
-#
-if (JPEGXL_LIBRARY MATCHES "jxl-static")
-    target_compile_definitions(${TARGET} PRIVATE JXL_STATIC_DEFINE)
-endif()
