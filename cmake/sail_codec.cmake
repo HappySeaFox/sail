@@ -1,6 +1,8 @@
 # Intended to be included by every codec. Sets up necessary dependencies,
 # installation targets, codec info.
 #
+# Creates SAIL_CODEC_TARGET variable with the created target name.
+#
 macro(sail_codec)
     cmake_parse_arguments(SAIL_CODEC "" "NAME;ICON" "SOURCES;LINK;DEPENDENCY_COMPILE_DEFINITIONS;DEPENDENCY_INCLUDE_DIRS;DEPENDENCY_LIBS" ${ARGN})
 
