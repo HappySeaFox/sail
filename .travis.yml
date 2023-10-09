@@ -113,7 +113,7 @@ script:
     cd build
 
     fail_on_error cmake -DSAIL_DEV=ON -DCMAKE_BUILD_TYPE="$build_type" ..
-    fail_on_error cmake --build .
+    fail_on_error cmake --build . --verbose
     fail_on_error "$exe"
   }
 
