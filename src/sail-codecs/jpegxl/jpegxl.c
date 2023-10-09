@@ -30,6 +30,7 @@
 
 #include <jxl/decode.h>
 #include <jxl/resizable_parallel_runner.h>
+#include <jxl/version.h>
 
 #include "sail-common.h"
 
@@ -237,7 +238,9 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void *state,
             case JXL_DEC_COLOR_ENCODING: {
                 size_t icc_size;
                 if (JxlDecoderGetICCProfileSize(jpegxl_state->decoder,
+#if JPEGXL_NUMERIC_VERSION < JPEGXL_COMPUTE_NUMERIC_VERSION(0, 9, 0)
                                                 /* unused */ NULL,
+#endif
                                                 JXL_COLOR_PROFILE_TARGET_DATA,
                                                 &icc_size) != JXL_DEC_SUCCESS) {
                     sail_destroy_image(image_local);
@@ -249,7 +252,9 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void *state,
                                     /* cleanup */ sail_destroy_image(image_local));
 
                 if (JxlDecoderGetColorAsICCProfile(jpegxl_state->decoder,
+#if JPEGXL_NUMERIC_VERSION < JPEGXL_COMPUTE_NUMERIC_VERSION(0, 9, 0)
                                                     /* unused */ NULL,
+#endif
                                                     JXL_COLOR_PROFILE_TARGET_DATA,
                                                     image_local->iccp->data,
                                                     image_local->iccp->data_length) != JXL_DEC_SUCCESS) {
