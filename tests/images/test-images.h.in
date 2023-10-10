@@ -3,7 +3,10 @@
 
 #include <stddef.h>
 
+#include "config.h"
+
 static const char * const SAIL_TEST_IMAGES[] = {
+#ifdef SAIL_HAVE_BUILTIN_BMP
     "@SAIL_TEST_IMAGES_PATH@/bmp/bpp1-indexed.bmp",
     "@SAIL_TEST_IMAGES_PATH@/bmp/bpp1-indexed.not4.bmp",
     "@SAIL_TEST_IMAGES_PATH@/bmp/bpp4-indexed.bmp",
@@ -18,15 +21,22 @@ static const char * const SAIL_TEST_IMAGES[] = {
     "@SAIL_TEST_IMAGES_PATH@/bmp/bpp24-bgr.not4.bmp",
     "@SAIL_TEST_IMAGES_PATH@/bmp/bpp32-bgra.bmp",
     "@SAIL_TEST_IMAGES_PATH@/bmp/bpp32-bgra.not4.bmp",
+#endif
 
+#ifdef SAIL_HAVE_BUILTIN_PNG
     "@SAIL_TEST_IMAGES_PATH@/png/bpp4-indexed.comment.iccp.png",
+#endif
 
+#ifdef SAIL_HAVE_BUILTIN_TGA
     "@SAIL_TEST_IMAGES_PATH@/tga/bpp8-grayscale.extension.rle.tga",
     "@SAIL_TEST_IMAGES_PATH@/tga/bpp8-indexed.extension.rle.tga",
     "@SAIL_TEST_IMAGES_PATH@/tga/bpp24-bgr.extension.rle.tga",
+#endif
 
+#ifdef SAIL_HAVE_BUILTIN_XBM
     "@SAIL_TEST_IMAGES_PATH@/xbm/bpp1-indexed.x10.xbm",
     "@SAIL_TEST_IMAGES_PATH@/xbm/bpp1-indexed.x11.xbm",
+#endif
 
     NULL,
 };
