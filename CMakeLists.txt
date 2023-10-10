@@ -39,6 +39,7 @@ join_paths(SAIL_INCLUDEDIR_FOR_PKG_CONFIG "\${prefix}"      "${CMAKE_INSTALL_INC
 #
 sail_check_alignas()
 sail_check_builtin_bswap()
+sail_check_c11_thread_local()
 
 # Check for required includes
 #
@@ -195,14 +196,9 @@ if (WIN32)
     string(REPLACE "/" "\\\\" SAIL_CODECS_PATH "${SAIL_CODECS_PATH}")
 endif()
 
-# Common configuration file
+# Global include directory with generated configs
 #
-configure_file("${PROJECT_SOURCE_DIR}/src/config.h.in" "${PROJECT_BINARY_DIR}/include/config.h" @ONLY)
 include_directories("${PROJECT_BINARY_DIR}/include")
-
-# Execute tests that depend on config.h
-#
-sail_check_c11_thread_local()
 
 # Configure subdirs
 #
@@ -239,10 +235,6 @@ if (NOT ENABLED_CODECS AND NOT SAIL_THIRD_PARTY_CODECS_PATH)
     message(FATAL_ERROR "Error: No codecs are enabled and SAIL_THIRD_PARTY_CODECS_PATH is disabled.\nThis particular build of SAIL cannot load any image.")
 endif()
 
-# Installation
-#
-install(FILES "${PROJECT_BINARY_DIR}/include/config.h" DESTINATION include/sail/sail-common)
-
 # Install our bundled libs if they exist and when VCPKG is not used
 #
 if (NOT SAIL_VCPKG)
@@ -272,20 +264,30 @@ if (NOT SAIL_VCPKG)
     endif()
 endif()
 
-# Print configuration statistics
-#
-if (SAIL_COLORED_OUTPUT)
-    set(SAIL_COLORED_OUTPUT_CLARIFY " (on Windows >= 10 and Unix)")
-endif()
-
 if (ENABLED_CODECS)
     string(TOUPPER "${ENABLED_CODECS}" ENABLED_CODECS)
+
+    foreach (codec IN LISTS ENABLED_CODECS)
+        set(SAIL_HAVE_CODEC_DEFINES "${SAIL_HAVE_CODEC_DEFINES}#define SAIL_HAVE_BUILTIN_${codec}\n")
+    endforeach()
+
     string(REPLACE ";" " " ENABLED_CODECS "${ENABLED_CODECS}")
 endif()
 
 if (DISABLED_CODECS)
     string(TOUPPER "${DISABLED_CODECS}" DISABLED_CODECS)
     string(REPLACE ";" " " DISABLED_CODECS "${DISABLED_CODECS}")
+endif()
+
+# Common configuration file
+#
+configure_file("${PROJECT_SOURCE_DIR}/src/config.h.in" "${PROJECT_BINARY_DIR}/include/config.h" @ONLY)
+install(FILES "${PROJECT_BINARY_DIR}/include/config.h" DESTINATION include/sail/sail-common)
+
+# Print configuration statistics
+#
+if (SAIL_COLORED_OUTPUT)
+    set(SAIL_COLORED_OUTPUT_CLARIFY " (on Windows >= 10 and Unix)")
 endif()
 
 message("")

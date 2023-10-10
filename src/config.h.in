@@ -84,4 +84,7 @@
 /* Enable __builtin_bswap64. */
 #cmakedefine SAIL_HAVE_BUILTIN_BSWAP64
 
+/* Enabled built-in codecs. */
+@SAIL_HAVE_CODEC_DEFINES@
+
 #endif
