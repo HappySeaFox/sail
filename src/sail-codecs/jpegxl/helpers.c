@@ -23,6 +23,11 @@
     SOFTWARE.
 */
 
+#include <stddef.h> /* size_t */
+#include <string.h> /* memmove */
+
+#include <jxl/version.h>
+
 #include "sail-common.h"
 
 #include "helpers.h"
@@ -97,4 +102,56 @@ JxlDataType jpegxl_private_sail_pixel_format_to_jxl_data_type(enum SailPixelForm
             return JXL_TYPE_UINT8;
         }
     }
+}
+
+sail_status_t jpegxl_private_fetch_iccp(JxlDecoder *decoder, struct sail_iccp **iccp) {
+
+    size_t icc_size;
+    if (JxlDecoderGetICCProfileSize(decoder,
+#if JPEGXL_NUMERIC_VERSION < JPEGXL_COMPUTE_NUMERIC_VERSION(0, 9, 0)
+                                    /* unused */ NULL,
+#endif
+                                    JXL_COLOR_PROFILE_TARGET_DATA,
+                                    &icc_size) != JXL_DEC_SUCCESS) {
+        SAIL_LOG_ERROR("JPEGXL: Failed to get ICC size");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+    }
+
+    struct sail_iccp *iccp_local;
+    SAIL_TRY(sail_alloc_iccp_for_data((unsigned)icc_size, &iccp_local));
+
+    if (JxlDecoderGetColorAsICCProfile(decoder,
+#if JPEGXL_NUMERIC_VERSION < JPEGXL_COMPUTE_NUMERIC_VERSION(0, 9, 0)
+                                        /* unused */ NULL,
+#endif
+                                        JXL_COLOR_PROFILE_TARGET_DATA,
+                                        iccp_local->data,
+                                        iccp_local->data_length) != JXL_DEC_SUCCESS) {
+        sail_destroy_iccp(iccp_local);
+        SAIL_LOG_ERROR("JPEGXL: Failed to get ICC profile");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+    }
+
+    *iccp = iccp_local;
+
+    return SAIL_OK;
+}
+
+sail_status_t jpegxl_private_read_more_data(struct sail_io *io, JxlDecoder *decoder, unsigned char *buffer, size_t buffer_size) {
+
+    size_t remaining = JxlDecoderReleaseInput(decoder);
+
+    if (remaining > 0) {
+        memmove(buffer, buffer + buffer_size - remaining, remaining);
+    }
+
+    size_t bytes_read;
+    SAIL_TRY(io->tolerant_read(io->stream, buffer + remaining, buffer_size - remaining, &bytes_read));
+
+    if (JxlDecoderSetInput(decoder, buffer, bytes_read + remaining) != JXL_DEC_SUCCESS) {
+        SAIL_LOG_ERROR("JPEGXL: Failed to set input buffer");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+    }
+
+    return SAIL_OK;
 }

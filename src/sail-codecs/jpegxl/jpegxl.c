@@ -24,13 +24,13 @@
 */
 
 #include <stdbool.h>
+#include <stddef.h> /* size_t */
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #include <jxl/decode.h>
 #include <jxl/resizable_parallel_runner.h>
-#include <jxl/version.h>
 
 #include "sail-common.h"
 
@@ -45,13 +45,14 @@ struct jpegxl_state {
     struct sail_load_options *load_options;
     struct sail_save_options *save_options;
 
-    void *image_data;
-
     bool libjxl_success;
     JxlBasicInfo *basic_info;
     JxlMemoryManager *memory_manager;
     void *runner;
     JxlDecoder *decoder;
+    /* For progressive reading. */
+    unsigned char *buffer;
+    size_t buffer_size;
 };
 
 static sail_status_t alloc_jpegxl_state(struct jpegxl_state **jpegxl_state) {
@@ -64,13 +65,13 @@ static sail_status_t alloc_jpegxl_state(struct jpegxl_state **jpegxl_state) {
     (*jpegxl_state)->load_options = NULL;
     (*jpegxl_state)->save_options = NULL;
 
-    (*jpegxl_state)->image_data     = NULL;
-
     (*jpegxl_state)->libjxl_success = false;
     (*jpegxl_state)->basic_info     = NULL;
     (*jpegxl_state)->memory_manager = NULL;
     (*jpegxl_state)->runner         = NULL;
     (*jpegxl_state)->decoder        = NULL;
+    (*jpegxl_state)->buffer         = NULL;
+    (*jpegxl_state)->buffer_size    = 10*1024;
 
     return SAIL_OK;
 }
@@ -84,12 +85,13 @@ static void destroy_jpegxl_state(struct jpegxl_state *jpegxl_state) {
     sail_destroy_load_options(jpegxl_state->load_options);
     sail_destroy_save_options(jpegxl_state->save_options);
 
-    sail_free(jpegxl_state->image_data);
     sail_free(jpegxl_state->basic_info);
     sail_free(jpegxl_state->memory_manager);
 
     JxlResizableParallelRunnerDestroy(jpegxl_state->runner);
+    JxlDecoderCloseInput(jpegxl_state->decoder);
     JxlDecoderDestroy(jpegxl_state->decoder);
+    sail_free(jpegxl_state->buffer);
 
     sail_free(jpegxl_state);
 }
@@ -124,6 +126,9 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_jpegxl(struct sail_io *io, con
     jpegxl_state->runner  = JxlResizableParallelRunnerCreate(jpegxl_state->memory_manager);
     jpegxl_state->decoder = JxlDecoderCreate(jpegxl_state->memory_manager);
 
+    SAIL_TRY(sail_malloc(jpegxl_state->buffer_size, &ptr));
+    jpegxl_state->buffer = ptr;
+
     if (JxlDecoderSetCoalescing(jpegxl_state->decoder, JXL_TRUE) != JXL_DEC_SUCCESS) {
         SAIL_LOG_ERROR("JPEGXL: Failed to set coalescing");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
@@ -144,13 +149,13 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_jpegxl(struct sail_io *io, con
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
-    // TODO Progressive
-    /* Read the entire image to use the libjxl memory API. */
-    size_t image_size;
-    SAIL_TRY(sail_alloc_data_from_io_contents(io, &jpegxl_state->image_data, &image_size));
+    size_t bytes_read;
+    SAIL_TRY(jpegxl_state->io->tolerant_read(jpegxl_state->io->stream, jpegxl_state->buffer, jpegxl_state->buffer_size, &bytes_read));
 
-    JxlDecoderSetInput(jpegxl_state->decoder, jpegxl_state->image_data, image_size);
-    JxlDecoderCloseInput(jpegxl_state->decoder);
+    if (JxlDecoderSetInput(jpegxl_state->decoder, jpegxl_state->buffer, bytes_read) != JXL_DEC_SUCCESS) {
+        SAIL_LOG_ERROR("JPEGXL: Failed to set input buffer");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+    }
 
     return SAIL_OK;
 }
@@ -169,21 +174,27 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void *state,
     SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
                         /* cleanup */ sail_destroy_image(image_local));
 
-    bool done = false;
-
-    while (!done) {
+    for(bool done = false; !done; ) {
         JxlDecoderStatus status = JxlDecoderProcessInput(jpegxl_state->decoder);
 
         switch (status) {
-            case JXL_DEC_NEED_MORE_INPUT: {
+            case JXL_DEC_ERROR: {
                 sail_destroy_image(image_local);
-                SAIL_LOG_ERROR("JPEGXL: For unknown reason decoder still needs more input");
+                SAIL_LOG_ERROR("JPEGXL: Decoder error");
                 SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+            }
+            case JXL_DEC_NEED_MORE_INPUT: {
+                SAIL_TRY_OR_CLEANUP(jpegxl_private_read_more_data(jpegxl_state->io,
+                                                                     jpegxl_state->decoder,
+                                                                     jpegxl_state->buffer,
+                                                                     jpegxl_state->buffer_size),
+                                    /* cleanup */ sail_destroy_image(image_local));
+                break;
             }
             case JXL_DEC_BASIC_INFO: {
                 void *ptr;
                 SAIL_TRY_OR_CLEANUP(sail_malloc(sizeof(JxlBasicInfo), &ptr),
-                                        /* cleanup */ sail_destroy_image(image_local));
+                                    /* cleanup */ sail_destroy_image(image_local));
                 jpegxl_state->basic_info = ptr;
 
                 if (JxlDecoderGetBasicInfo(jpegxl_state->decoder, jpegxl_state->basic_info) != JXL_DEC_SUCCESS) {
@@ -236,32 +247,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void *state,
                 break;
             }
             case JXL_DEC_COLOR_ENCODING: {
-                size_t icc_size;
-                if (JxlDecoderGetICCProfileSize(jpegxl_state->decoder,
-#if JPEGXL_NUMERIC_VERSION < JPEGXL_COMPUTE_NUMERIC_VERSION(0, 9, 0)
-                                                /* unused */ NULL,
-#endif
-                                                JXL_COLOR_PROFILE_TARGET_DATA,
-                                                &icc_size) != JXL_DEC_SUCCESS) {
-                    sail_destroy_image(image_local);
-                    SAIL_LOG_ERROR("JPEGXL: Failed to get ICC size");
-                    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
-                }
-
-                SAIL_TRY_OR_CLEANUP(sail_alloc_iccp_for_data((unsigned)icc_size, &image_local->iccp),
+                SAIL_TRY_OR_CLEANUP(jpegxl_private_fetch_iccp(jpegxl_state->decoder, &image_local->iccp),
                                     /* cleanup */ sail_destroy_image(image_local));
-
-                if (JxlDecoderGetColorAsICCProfile(jpegxl_state->decoder,
-#if JPEGXL_NUMERIC_VERSION < JPEGXL_COMPUTE_NUMERIC_VERSION(0, 9, 0)
-                                                    /* unused */ NULL,
-#endif
-                                                    JXL_COLOR_PROFILE_TARGET_DATA,
-                                                    image_local->iccp->data,
-                                                    image_local->iccp->data_length) != JXL_DEC_SUCCESS) {
-                    sail_destroy_image(image_local);
-                    SAIL_LOG_ERROR("JPEGXL: Failed to get ICC profile");
-                    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
-                }
                 break;
             }
             case JXL_DEC_NEED_IMAGE_OUT_BUFFER: {
@@ -279,14 +266,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void *state,
             }
         }
     }
-
-#if 0
-    /* Fetch ICC profile. */
-    if (sail_iccp_codec_option(jpegxl_state->load_options->codec_options)) {
-        SAIL_TRY_OR_CLEANUP(jpegxl_private_fetch_iccp(&jpegxl_image->icc, &image_local->iccp),
-                            /* cleanup */ sail_destroy_image(image_local));
-    }
-#endif
 
     *image = image_local;
 
@@ -314,12 +293,21 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_jpegxl(void *state, struct sa
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
-    bool done = false;
-
-    while (!done) {
+    for(bool done = false; !done; ) {
         status = JxlDecoderProcessInput(jpegxl_state->decoder);
 
         switch (status) {
+            case JXL_DEC_ERROR: {
+                SAIL_LOG_ERROR("JPEGXL: Decoder error");
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+            }
+            case JXL_DEC_NEED_MORE_INPUT: {
+                SAIL_TRY(jpegxl_private_read_more_data(jpegxl_state->io,
+                                                        jpegxl_state->decoder,
+                                                        jpegxl_state->buffer,
+                                                        jpegxl_state->buffer_size));
+                break;
+            }
             case JXL_DEC_FULL_IMAGE: {
                 done = true;
                 break;

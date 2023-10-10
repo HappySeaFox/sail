@@ -28,16 +28,23 @@
 
 #include <stdint.h>
 
-#include <jxl/types.h>
+#include <jxl/decode.h>
 
 #include "common.h"
 #include "error.h"
 #include "export.h"
+
+struct sail_iccp;
+struct sail_io;
 
 SAIL_HIDDEN enum SailPixelFormat jpegxl_private_sail_pixel_format(uint32_t bits_per_sample, uint32_t num_color_channels, uint32_t alpha_bits);
 
 SAIL_HIDDEN unsigned jpegxl_private_sail_pixel_format_to_num_channels(enum SailPixelFormat pixel_format);
 
 SAIL_HIDDEN JxlDataType jpegxl_private_sail_pixel_format_to_jxl_data_type(enum SailPixelFormat pixel_format);
+
+SAIL_HIDDEN sail_status_t jpegxl_private_fetch_iccp(JxlDecoder *decoder, struct sail_iccp **iccp);
+
+SAIL_HIDDEN sail_status_t jpegxl_private_read_more_data(struct sail_io *io, JxlDecoder *decoder, unsigned char *buffer, size_t buffer_size);
 
 #endif
