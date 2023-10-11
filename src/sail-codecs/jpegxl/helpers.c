@@ -155,3 +155,32 @@ sail_status_t jpegxl_private_read_more_data(struct sail_io *io, JxlDecoder *deco
 
     return SAIL_OK;
 }
+
+sail_status_t jpegxl_private_fetch_name(JxlDecoder *decoder, uint32_t name_length, struct sail_meta_data_node **meta_data_node) {
+
+    struct sail_meta_data_node *meta_data_node_local = NULL;
+
+    void *ptr;
+    SAIL_TRY(sail_malloc(name_length + 1, &ptr));
+    char *name = ptr;
+
+    if (JxlDecoderGetFrameName(decoder, name, name_length + 1) != JXL_DEC_SUCCESS) {
+        sail_free(name);
+        SAIL_LOG_ERROR("JPEGXL: Failed to get frame name");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+    }
+
+    SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_node(&meta_data_node_local),
+                        /* cleanup */ sail_free(name));
+
+    SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_from_known_key(SAIL_META_DATA_NAME, &meta_data_node_local->meta_data),
+                        /* cleanup */ sail_free(name), sail_destroy_meta_data_node(meta_data_node_local));
+    SAIL_TRY_OR_CLEANUP(sail_alloc_variant(&meta_data_node_local->meta_data->value),
+                        /* cleanup */ sail_free(name), sail_destroy_meta_data_node(meta_data_node_local));
+    SAIL_TRY_OR_CLEANUP(sail_set_variant_shallow_string(meta_data_node_local->meta_data->value, name),
+                        /* cleanup */ sail_free(name), sail_destroy_meta_data_node(meta_data_node_local));
+
+    *meta_data_node = meta_data_node_local;
+
+    return SAIL_OK;
+}

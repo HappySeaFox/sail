@@ -174,6 +174,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void *state,
     SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
                         /* cleanup */ sail_destroy_image(image_local));
 
+    struct sail_meta_data_node **last_meta_data_node = &image_local->meta_data_node;
+
     for(bool done = false; !done; ) {
         JxlDecoderStatus status = JxlDecoderProcessInput(jpegxl_state->decoder);
 
@@ -203,6 +205,34 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void *state,
                     SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
                 }
 
+                SAIL_LOG_TRACE("JPEGXL: bits_per_sample(%u)", jpegxl_state->basic_info->bits_per_sample);
+                SAIL_LOG_TRACE("JPEGXL: intensity_target(%.1f)", jpegxl_state->basic_info->intensity_target);
+                SAIL_LOG_TRACE("JPEGXL: min_nits(%.1f)", jpegxl_state->basic_info->min_nits);
+                SAIL_LOG_TRACE("JPEGXL: relative_to_max_display(%s)", jpegxl_state->basic_info->relative_to_max_display ? "yes" : "no");
+                SAIL_LOG_TRACE("JPEGXL: linear_below(%.1f)", jpegxl_state->basic_info->linear_below);
+                SAIL_LOG_TRACE("JPEGXL: num_color_channels(%u)", jpegxl_state->basic_info->num_color_channels);
+                SAIL_LOG_TRACE("JPEGXL: num_extra_channels(%u)", jpegxl_state->basic_info->num_extra_channels);
+                SAIL_LOG_TRACE("JPEGXL: alpha_bits(%u)", jpegxl_state->basic_info->alpha_bits);
+                SAIL_LOG_TRACE("JPEGXL: intrinsic_xsize(%u)", jpegxl_state->basic_info->intrinsic_xsize);
+                SAIL_LOG_TRACE("JPEGXL: intrinsic_ysize(%u)", jpegxl_state->basic_info->intrinsic_ysize);
+
+#if 0
+                SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&image_local->source_image->special_properties),
+                                    /* cleanup */ sail_destroy_image(image_local));
+
+    struct sail_variant *variant;
+    SAIL_TRY(sail_alloc_variant(&variant));
+
+    SAIL_LOG_TRACE("JPEGXL: Number of frames: %u", num_frames);
+    sail_set_variant_unsigned_int(variant, num_frames);
+    sail_put_hash_map(special_properties, "apng-number-of-frames", variant);
+
+    SAIL_LOG_TRACE("JPEGXL: Number of plays: %u", num_plays);
+    sail_set_variant_unsigned_int(variant, num_plays);
+    sail_put_hash_map(special_properties, "apng-number-of-plays", variant);
+
+    sail_destroy_variant(variant);
+#endif
                 SAIL_LOG_TRACE("JPEGXL: Animation(%s)", jpegxl_state->basic_info->have_animation ? "yes" : "no");
 
                 if (jpegxl_state->basic_info->have_animation) {
@@ -223,6 +253,16 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void *state,
                     sail_destroy_image(image_local);
                     SAIL_LOG_ERROR("JPEGXL: Failed to get frame header");
                     SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+                }
+
+                if (jpegxl_state->load_options->options & SAIL_OPTION_META_DATA) {
+                    if (frame_header.name_length > 0) {
+                        SAIL_TRY_OR_CLEANUP(jpegxl_private_fetch_name(jpegxl_state->decoder,
+                                                                        frame_header.name_length,
+                                                                        last_meta_data_node),
+                                            /* cleanup*/ sail_destroy_image(image_local));
+                        last_meta_data_node = &(*last_meta_data_node)->next;
+                    }
                 }
 
                 image_local->source_image->pixel_format =
