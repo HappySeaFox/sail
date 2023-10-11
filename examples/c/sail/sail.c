@@ -127,7 +127,7 @@ static sail_status_t convert(int argc, char *argv[]) {
 
 static bool special_properties_printf_callback(const char *key, const struct sail_variant *value) {
 
-    printf("  %-12s: ", key);
+    printf("  %s : ", key);
     sail_printf_variant(value);
     printf("\n");
 
