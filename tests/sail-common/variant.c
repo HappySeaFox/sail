@@ -144,7 +144,7 @@ static MunitResult test_from_string(const MunitParameter params[], void *user_da
     strcpy(str, "xyz");
 #endif
 
-    TEST_VARIANT_FROM_STRING(str, sail_set_variant_adopted_string, SAIL_VARIANT_TYPE_STRING, sail_variant_to_string);
+    TEST_VARIANT_FROM_STRING(str, sail_set_variant_shallow_string, SAIL_VARIANT_TYPE_STRING, sail_variant_to_string);
 
     return MUNIT_OK;
 }
@@ -183,7 +183,7 @@ static MunitResult test_from_data(const MunitParameter params[], void *user_data
     strcpy(str, "xyz");
 #endif
 
-    TEST_VARIANT_FROM_DATA(str, 3, sail_set_variant_adopted_data, SAIL_VARIANT_TYPE_DATA, sail_variant_to_data);
+    TEST_VARIANT_FROM_DATA(str, 3, sail_set_variant_shallow_data, SAIL_VARIANT_TYPE_DATA, sail_variant_to_data);
 
     return MUNIT_OK;
 }

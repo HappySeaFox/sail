@@ -171,7 +171,7 @@ sail_status_t sail_set_variant_string(struct sail_variant *variant, const char *
     return SAIL_OK;
 }
 
-sail_status_t sail_set_variant_adopted_string(struct sail_variant *variant, char *value) {
+sail_status_t sail_set_variant_shallow_string(struct sail_variant *variant, char *value) {
 
     SAIL_CHECK_PTR(variant);
 
@@ -201,7 +201,7 @@ sail_status_t sail_set_variant_data(struct sail_variant *variant, const void *va
     return SAIL_OK;
 }
 
-sail_status_t sail_set_variant_adopted_data(struct sail_variant *variant, void *value, size_t size) {
+sail_status_t sail_set_variant_shallow_data(struct sail_variant *variant, void *value, size_t size) {
 
     SAIL_CHECK_PTR(variant);
 

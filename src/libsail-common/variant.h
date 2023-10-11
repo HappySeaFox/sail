@@ -184,10 +184,11 @@ SAIL_EXPORT sail_status_t sail_set_variant_string(struct sail_variant *variant, 
 /*
  * Sets a shallow copy of the specified string as a new variant value.
  * Transfers the ownership of the string to the constructed variant.
+ * Do not free the string pointer. It will be freed in sail_destroy_variant().
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_set_variant_adopted_string(struct sail_variant *variant, char *value);
+SAIL_EXPORT sail_status_t sail_set_variant_shallow_string(struct sail_variant *variant, char *value);
 
 /*
  * Sets a deep copy of the specified substring as a new variant value.
@@ -209,10 +210,11 @@ SAIL_EXPORT sail_status_t sail_set_variant_data(struct sail_variant *variant, co
 /*
  * Sets a shallow copy of the specified data buffer as a new variant value.
  * Transfers the ownership of the data pointer to the variant.
+ * Do not free the data pointer. It will be freed in sail_destroy_variant().
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_set_variant_adopted_data(struct sail_variant *variant, void *value, size_t size);
+SAIL_EXPORT sail_status_t sail_set_variant_shallow_data(struct sail_variant *variant, void *value, size_t size);
 
 /*
  * Returns the variant value as a boolean. Behavior is undefined if the variant is invalid.

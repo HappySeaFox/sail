@@ -67,12 +67,12 @@ SAIL_EXPORT sail_status_t sail_alloc_iccp(struct sail_iccp **iccp);
 SAIL_EXPORT sail_status_t sail_alloc_iccp_from_data(const void *data, unsigned data_length, struct sail_iccp **iccp);
 
 /*
- * Allocates a new ICC profile and copies the external pointer to a ICC profile data into it.
- * DO NOT free the external pointer as it will be freed in sail_destroy_iccp(), beware of double free.
+ * Allocates a new ICC profile and copies the external pointer to another ICC data into it.
+ * Do not free the external pointer. It will be freed in sail_destroy_iccp().
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_iccp_move_data(void *data, unsigned data_length, struct sail_iccp **iccp);
+SAIL_EXPORT sail_status_t sail_alloc_iccp_from_shallow_data(void *data, unsigned data_length, struct sail_iccp **iccp);
 
 /*
  * Destroys the specified ICC profile and all its internal allocated memory buffers.
