@@ -75,7 +75,7 @@ static sail_status_t alloc_jpegxl_state(struct jpegxl_state **jpegxl_state) {
     (*jpegxl_state)->runner         = NULL;
     (*jpegxl_state)->decoder        = NULL;
     (*jpegxl_state)->buffer         = NULL;
-    (*jpegxl_state)->buffer_size    = 10*1024;
+    (*jpegxl_state)->buffer_size    = 8192;
 
     return SAIL_OK;
 }
