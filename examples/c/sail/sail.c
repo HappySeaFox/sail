@@ -165,7 +165,7 @@ static void print_aligned_image_info(const struct sail_image *image) {
             case SAIL_VARIANT_TYPE_FLOAT:          printf("%.1f\n", sail_variant_to_float(meta_data->value));                       break;
             case SAIL_VARIANT_TYPE_DOUBLE:         printf("%.1f\n", sail_variant_to_double(meta_data->value));                      break;
             case SAIL_VARIANT_TYPE_STRING:         printf("%s\n", sail_variant_to_string(meta_data->value));                        break;
-            case SAIL_VARIANT_TYPE_DATA:           printf("<binary data, length: %u byte(s)>\n", (unsigned)meta_data->value->size); break;
+            case SAIL_VARIANT_TYPE_DATA:           printf("<binary data, %u byte(s)>\n", (unsigned)meta_data->value->size); break;
             case SAIL_VARIANT_TYPE_INVALID:        printf("<invalid value>\n");                                                     break;
         }
     }
