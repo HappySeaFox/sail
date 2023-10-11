@@ -125,6 +125,15 @@ static sail_status_t convert(int argc, char *argv[]) {
     return SAIL_OK;
 }
 
+static bool special_properties_printf_callback(const char *key, const struct sail_variant *value) {
+
+    printf("  %-12s: ", key);
+    sail_printf_variant(value);
+    printf("\n");
+
+    return true;
+}
+
 static void print_aligned_image_info(const struct sail_image *image) {
 
     printf("Size          : %ux%u\n", image->width, image->height);
@@ -157,6 +166,12 @@ static void print_aligned_image_info(const struct sail_image *image) {
             sail_printf_variant(meta_data->value);
             printf("\n");
         }
+    }
+
+    if (image->source_image->special_properties != NULL) {
+        printf("Special properties :\n");
+        sail_traverse_hash_map(image->source_image->special_properties,
+                                special_properties_printf_callback);
     }
 }
 
