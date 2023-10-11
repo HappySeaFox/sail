@@ -20,9 +20,9 @@
         <br/><br/>
         <b>Content:</b> Static, Animated, Meta data, ICC profiles.
         <br/><br/>
-        <b>Special properties:</b> Key: <i>"apng-number-of-frames"</i>. Description: Number of frames in the animation.
+        <b>Special properties:</b> Key: <i>"apng-frames"</i>. Description: Number of frames in the animation.
         Possible values: unsigned int.
-        Key: <i>"apng-number-of-plays"</i>. Description: Number of plays of the animation.
+        Key: <i>"apng-plays"</i>. Description: Number of plays of the animation.
         Possible values: unsigned int.
     </td>
     <td>Blend operations with pixel formats other than BPP16-GRAYSCALE-ALPHA, BPP32-GRAYSCALE-ALPHA, BPP32-RGBA, BPP64-RGBA.</td>

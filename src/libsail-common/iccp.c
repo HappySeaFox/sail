@@ -55,6 +55,19 @@ sail_status_t sail_alloc_iccp_from_data(const void *data, unsigned data_length, 
     return SAIL_OK;
 }
 
+sail_status_t sail_alloc_iccp_from_shallow_data(void *data, unsigned data_length, struct sail_iccp **iccp) {
+
+    SAIL_CHECK_PTR(data);
+    SAIL_CHECK_PTR(iccp);
+
+    SAIL_TRY(sail_alloc_iccp(iccp));
+
+    (*iccp)->data        = data;
+    (*iccp)->data_length = data_length;
+
+    return SAIL_OK;
+}
+
 sail_status_t sail_alloc_iccp_for_data(unsigned data_length, struct sail_iccp **iccp) {
 
     SAIL_CHECK_PTR(iccp);
@@ -68,19 +81,6 @@ sail_status_t sail_alloc_iccp_for_data(unsigned data_length, struct sail_iccp **
     iccp_local->data_length = data_length;
 
     *iccp = iccp_local;
-
-    return SAIL_OK;
-}
-
-sail_status_t sail_alloc_iccp_move_data(void *data, unsigned data_length, struct sail_iccp **iccp) {
-
-    SAIL_CHECK_PTR(data);
-    SAIL_CHECK_PTR(iccp);
-
-    SAIL_TRY(sail_alloc_iccp(iccp));
-
-    (*iccp)->data        = data;
-    (*iccp)->data_length = data_length;
 
     return SAIL_OK;
 }
