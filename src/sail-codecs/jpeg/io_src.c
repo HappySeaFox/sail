@@ -29,7 +29,7 @@
 
 #include "io_src.h"
 
-#define INPUT_BUF_SIZE  4096    /* choose an efficiently fread'able size */
+#define INPUT_BUF_SIZE 8192 /* choose an efficiently fread'able size */
 
 /*
  * Most of this file was copied from libjpeg-turbo 2.0.4 and adapted to SAIL.
