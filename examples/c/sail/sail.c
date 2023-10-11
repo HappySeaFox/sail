@@ -217,16 +217,12 @@ static sail_status_t decode_impl(const char *path) {
 
     SAIL_CHECK_PTR(path);
 
-    struct sail_image *image;
     const struct sail_codec_info *codec_info;
-
-    SAIL_TRY(sail_probe_file(path, &image, &codec_info));
+    SAIL_TRY(sail_codec_info_from_path(path, &codec_info));
 
     printf("File          : %s\n", path);
     printf("Codec         : %s [%s]\n", codec_info->name, codec_info->description);
     printf("Codec version : %s\n", codec_info->version);
-
-    sail_destroy_image(image);
 
     /* Time counter. */
     uint64_t start_time = sail_now();
@@ -235,6 +231,7 @@ static sail_status_t decode_impl(const char *path) {
     void *state;
     SAIL_TRY(sail_start_loading_from_file(path, codec_info, &state));
 
+    struct sail_image *image;
     sail_status_t status;
     unsigned frame = 0;
 
