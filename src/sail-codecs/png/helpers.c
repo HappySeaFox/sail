@@ -677,11 +677,11 @@ sail_status_t png_private_store_num_frames_and_plays(png_structp png_ptr, png_in
 
     SAIL_LOG_TRACE("PNG: Number of frames: %u", num_frames);
     sail_set_variant_unsigned_int(variant, num_frames);
-    sail_put_hash_map(special_properties, "apng-number-of-frames", variant);
+    sail_put_hash_map(special_properties, "apng-frames", variant);
 
     SAIL_LOG_TRACE("PNG: Number of plays: %u", num_plays);
     sail_set_variant_unsigned_int(variant, num_plays);
-    sail_put_hash_map(special_properties, "apng-number-of-plays", variant);
+    sail_put_hash_map(special_properties, "apng-plays", variant);
 
     sail_destroy_variant(variant);
 
