@@ -45,6 +45,8 @@ struct jpegxl_state {
     struct sail_load_options *load_options;
     struct sail_save_options *save_options;
 
+    struct sail_source_image *source_image;
+
     bool libjxl_success;
     JxlBasicInfo *basic_info;
     JxlMemoryManager *memory_manager;
@@ -65,6 +67,8 @@ static sail_status_t alloc_jpegxl_state(struct jpegxl_state **jpegxl_state) {
     (*jpegxl_state)->load_options = NULL;
     (*jpegxl_state)->save_options = NULL;
 
+    (*jpegxl_state)->source_image = NULL;
+
     (*jpegxl_state)->libjxl_success = false;
     (*jpegxl_state)->basic_info     = NULL;
     (*jpegxl_state)->memory_manager = NULL;
@@ -84,6 +88,8 @@ static void destroy_jpegxl_state(struct jpegxl_state *jpegxl_state) {
 
     sail_destroy_load_options(jpegxl_state->load_options);
     sail_destroy_save_options(jpegxl_state->save_options);
+
+    sail_destroy_source_image(jpegxl_state->source_image);
 
     sail_free(jpegxl_state->basic_info);
     sail_free(jpegxl_state->memory_manager);
@@ -171,8 +177,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void *state,
     struct sail_image *image_local;
 
     SAIL_TRY(sail_alloc_image(&image_local));
-    SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
-                        /* cleanup */ sail_destroy_image(image_local));
 
     struct sail_meta_data_node **last_meta_data_node = &image_local->meta_data_node;
 
@@ -205,12 +209,15 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void *state,
                     SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
                 }
 
+                SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&jpegxl_state->source_image),
+                                    /* cleanup */ sail_destroy_image(image_local));
+
                 /* Special properties. */
-                SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&image_local->source_image->special_properties),
+                SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&jpegxl_state->source_image->special_properties),
                                     /* cleanup */ sail_destroy_image(image_local));
                 SAIL_TRY_OR_CLEANUP(jpegxl_private_fetch_special_properties(
                                         jpegxl_state->basic_info,
-                                        image_local->source_image->special_properties),
+                                        jpegxl_state->source_image->special_properties),
                                     /* cleanup*/ sail_destroy_image(image_local));
 
                 SAIL_LOG_TRACE("JPEGXL: Animation(%s)", jpegxl_state->basic_info->have_animation ? "yes" : "no");
@@ -234,6 +241,9 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void *state,
                     SAIL_LOG_ERROR("JPEGXL: Failed to get frame header");
                     SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
                 }
+
+                SAIL_TRY_OR_CLEANUP(sail_copy_source_image(jpegxl_state->source_image, &image_local->source_image),
+                                    /* cleanup */ sail_destroy_image(image_local));
 
                 if (jpegxl_state->load_options->options & SAIL_OPTION_META_DATA) {
                     if (frame_header.name_length > 0) {
