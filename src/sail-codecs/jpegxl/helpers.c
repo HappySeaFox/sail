@@ -156,6 +156,56 @@ sail_status_t jpegxl_private_read_more_data(struct sail_io *io, JxlDecoder *deco
     return SAIL_OK;
 }
 
+sail_status_t jpegxl_private_fetch_special_properties(const JxlBasicInfo *basic_info, struct sail_hash_map *special_properties) {
+
+    struct sail_variant *variant;
+    SAIL_TRY(sail_alloc_variant(&variant));
+
+    SAIL_LOG_TRACE("JPEGXL: bits_per_sample(%u)", basic_info->bits_per_sample);
+    sail_set_variant_unsigned_int(variant, basic_info->bits_per_sample);
+    sail_put_hash_map(special_properties, "jpegxl-bits-per-sample", variant);
+
+    SAIL_LOG_TRACE("JPEGXL: intensity_target(%.1f)", basic_info->intensity_target);
+    sail_set_variant_float(variant, basic_info->intensity_target);
+    sail_put_hash_map(special_properties, "jpegxl-intensity-target", variant);
+
+    SAIL_LOG_TRACE("JPEGXL: min_nits(%.1f)", basic_info->min_nits);
+    sail_set_variant_float(variant, basic_info->min_nits);
+    sail_put_hash_map(special_properties, "jpegxl-min-nits", variant);
+
+    SAIL_LOG_TRACE("JPEGXL: relative_to_max_display(%s)", basic_info->relative_to_max_display ? "yes" : "no");
+    sail_set_variant_bool(variant, basic_info->relative_to_max_display);
+    sail_put_hash_map(special_properties, "jpegxl-relative-to-max-display", variant);
+
+    SAIL_LOG_TRACE("JPEGXL: linear_below(%.1f)", basic_info->linear_below);
+    sail_set_variant_float(variant, basic_info->linear_below);
+    sail_put_hash_map(special_properties, "jpegxl-linear-below", variant);
+
+    SAIL_LOG_TRACE("JPEGXL: num_color_channels(%u)", basic_info->num_color_channels);
+    sail_set_variant_unsigned_int(variant, basic_info->num_color_channels);
+    sail_put_hash_map(special_properties, "jpegxl-color-channels", variant);
+
+    SAIL_LOG_TRACE("JPEGXL: num_extra_channels(%u)", basic_info->num_extra_channels);
+    sail_set_variant_unsigned_int(variant, basic_info->num_extra_channels);
+    sail_put_hash_map(special_properties, "jpegxl-extra-channels", variant);
+
+    SAIL_LOG_TRACE("JPEGXL: alpha_bits(%u)", basic_info->alpha_bits);
+    sail_set_variant_unsigned_int(variant, basic_info->alpha_bits);
+    sail_put_hash_map(special_properties, "jpegxl-alpha-bits", variant);
+
+    SAIL_LOG_TRACE("JPEGXL: intrinsic_xsize(%u)", basic_info->intrinsic_xsize);
+    sail_set_variant_unsigned_int(variant, basic_info->intrinsic_xsize);
+    sail_put_hash_map(special_properties, "jpegxl-intrinsic-width", variant);
+
+    SAIL_LOG_TRACE("JPEGXL: intrinsic_ysize(%u)", basic_info->intrinsic_ysize);
+    sail_set_variant_unsigned_int(variant, basic_info->intrinsic_ysize);
+    sail_put_hash_map(special_properties, "jpegxl-intrinsic-height", variant);
+
+    sail_destroy_variant(variant);
+
+    return SAIL_OK;
+}
+
 sail_status_t jpegxl_private_fetch_name(JxlDecoder *decoder, uint32_t name_length, struct sail_meta_data_node **meta_data_node) {
 
     struct sail_meta_data_node *meta_data_node_local = NULL;

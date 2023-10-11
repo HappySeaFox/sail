@@ -34,6 +34,7 @@
 #include "error.h"
 #include "export.h"
 
+struct sail_hash_map;
 struct sail_iccp;
 struct sail_io;
 struct sail_meta_data_node;
@@ -48,6 +49,8 @@ SAIL_HIDDEN sail_status_t jpegxl_private_fetch_iccp(JxlDecoder *decoder, struct 
 
 SAIL_HIDDEN sail_status_t jpegxl_private_read_more_data(struct sail_io *io, JxlDecoder *decoder, unsigned char *buffer, size_t buffer_size);
 
-SAIL_HIDDEN sail_status_t jpegxl_private_fetch_comment(JxlDecoder *decoder, uint32_t name_length, struct sail_meta_data_node **meta_data_node);
+SAIL_HIDDEN sail_status_t jpegxl_private_fetch_special_properties(const JxlBasicInfo *basic_info, struct sail_hash_map *special_properties);
+
+SAIL_HIDDEN sail_status_t jpegxl_private_fetch_name(JxlDecoder *decoder, uint32_t name_length, struct sail_meta_data_node **meta_data_node);
 
 #endif
