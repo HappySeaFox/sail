@@ -209,8 +209,15 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void *state,
                     SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
                 }
 
+                /* Source image. */
                 SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&jpegxl_state->source_image),
                                     /* cleanup */ sail_destroy_image(image_local));
+
+                jpegxl_state->source_image->pixel_format =
+                    jpegxl_private_sail_pixel_format(jpegxl_state->basic_info->bits_per_sample,
+                                                        jpegxl_state->basic_info->num_color_channels,
+                                                        jpegxl_state->basic_info->alpha_bits);
+                jpegxl_state->source_image->compression = SAIL_COMPRESSION_UNKNOWN;
 
                 /* Special properties. */
                 SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&jpegxl_state->source_image->special_properties),
@@ -254,12 +261,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void *state,
                         last_meta_data_node = &(*last_meta_data_node)->next;
                     }
                 }
-
-                image_local->source_image->pixel_format =
-                    jpegxl_private_sail_pixel_format(jpegxl_state->basic_info->bits_per_sample,
-                                                        jpegxl_state->basic_info->num_color_channels,
-                                                        jpegxl_state->basic_info->alpha_bits);
-                image_local->source_image->compression = SAIL_COMPRESSION_UNKNOWN;
 
                 image_local->width          = jpegxl_state->basic_info->xsize;
                 image_local->height         = jpegxl_state->basic_info->ysize;
