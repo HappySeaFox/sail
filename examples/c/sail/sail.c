@@ -140,33 +140,22 @@ static void print_aligned_image_info(const struct sail_image *image) {
     printf("Interlaced    : %s\n", image->source_image->interlaced ? "yes" : "no");
     printf("Delay         : %d ms.\n", image->delay);
 
-    for (const struct sail_meta_data_node *meta_data_node = image->meta_data_node; meta_data_node != NULL; meta_data_node = meta_data_node->next) {
-        const struct sail_meta_data *meta_data = meta_data_node->meta_data;
-        const char *meta_data_str = NULL;
+    if (image->meta_data_node != NULL) {
+        printf("Meta data     :\n");
 
-        if (meta_data->key == SAIL_META_DATA_UNKNOWN) {
-            meta_data_str = meta_data->key_unknown;
-        } else {
-            meta_data_str = sail_meta_data_to_string(meta_data->key);
-        }
+        for (const struct sail_meta_data_node *meta_data_node = image->meta_data_node; meta_data_node != NULL; meta_data_node = meta_data_node->next) {
+            const struct sail_meta_data *meta_data = meta_data_node->meta_data;
+            const char *meta_data_str = NULL;
 
-        printf("%-14s: ", meta_data_str);
+            if (meta_data->key == SAIL_META_DATA_UNKNOWN) {
+                meta_data_str = meta_data->key_unknown;
+            } else {
+                meta_data_str = sail_meta_data_to_string(meta_data->key);
+            }
 
-        switch (meta_data->value->type) {
-            case SAIL_VARIANT_TYPE_BOOL:           printf("%s\n",  sail_variant_to_bool(meta_data->value) ? "<set>" : "<unset>");   break;
-            case SAIL_VARIANT_TYPE_CHAR:           printf("%d\n",  sail_variant_to_char(meta_data->value));                         break;
-            case SAIL_VARIANT_TYPE_UNSIGNED_CHAR:  printf("%u\n",  sail_variant_to_unsigned_char(meta_data->value));                break;
-            case SAIL_VARIANT_TYPE_SHORT:          printf("%d\n",  sail_variant_to_short(meta_data->value));                        break;
-            case SAIL_VARIANT_TYPE_UNSIGNED_SHORT: printf("%u\n",  sail_variant_to_unsigned_short(meta_data->value));               break;
-            case SAIL_VARIANT_TYPE_INT:            printf("%d\n",  sail_variant_to_int(meta_data->value));                          break;
-            case SAIL_VARIANT_TYPE_UNSIGNED_INT:   printf("%u\n",  sail_variant_to_unsigned_int(meta_data->value));                 break;
-            case SAIL_VARIANT_TYPE_LONG:           printf("%ld\n", sail_variant_to_long(meta_data->value));                         break;
-            case SAIL_VARIANT_TYPE_UNSIGNED_LONG:  printf("%lu\n", sail_variant_to_unsigned_long(meta_data->value));                break;
-            case SAIL_VARIANT_TYPE_FLOAT:          printf("%.1f\n", sail_variant_to_float(meta_data->value));                       break;
-            case SAIL_VARIANT_TYPE_DOUBLE:         printf("%.1f\n", sail_variant_to_double(meta_data->value));                      break;
-            case SAIL_VARIANT_TYPE_STRING:         printf("%s\n", sail_variant_to_string(meta_data->value));                        break;
-            case SAIL_VARIANT_TYPE_DATA:           printf("<binary data, %u byte(s)>\n", (unsigned)meta_data->value->size); break;
-            case SAIL_VARIANT_TYPE_INVALID:        printf("<invalid value>\n");                                                     break;
+            printf("  %-12s: ", meta_data_str);
+            sail_printf_variant(meta_data->value);
+            printf("\n");
         }
     }
 }

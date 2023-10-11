@@ -236,6 +236,32 @@ static MunitResult test_set(const MunitParameter params[], void *user_data) {
     return MUNIT_OK;
 }
 
+static MunitResult test_snprintf(const MunitParameter params[], void *user_data) {
+    (void)params;
+    (void)user_data;
+
+    char buffer[32];
+
+    struct sail_variant *variant;
+    munit_assert(sail_alloc_variant(&variant) == SAIL_OK);
+
+    sail_set_variant_bool(variant, true);
+    munit_assert(sail_snprintf_variant(variant, buffer, sizeof(buffer)) == 4);
+    munit_assert_string_equal(buffer, "true");
+
+    sail_set_variant_bool(variant, false);
+    munit_assert(sail_snprintf_variant(variant, buffer, sizeof(buffer)) == 5);
+    munit_assert_string_equal(buffer, "false");
+
+    sail_set_variant_int(variant, 105);
+    munit_assert(sail_snprintf_variant(variant, buffer, sizeof(buffer)) == 3);
+    munit_assert_string_equal(buffer, "105");
+
+    sail_destroy_variant(variant);
+
+    return MUNIT_OK;
+}
+
 static MunitTest test_suite_tests[] = {
     { (char *)"/alloc",       test_alloc,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/copy",        test_copy,        NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
@@ -243,6 +269,7 @@ static MunitTest test_suite_tests[] = {
     { (char *)"/from-string", test_from_string, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/from-data",   test_from_data,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/set",         test_set,         NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/snprintf",    test_snprintf,    NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };
