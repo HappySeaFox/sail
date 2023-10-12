@@ -420,6 +420,7 @@ const char* sail_meta_data_to_string(enum SailMetaData meta_data) {
         case SAIL_META_DATA_ID:               return "ID";
         case SAIL_META_DATA_IPTC:             return "IPTC";
         case SAIL_META_DATA_JOB:              return "Job";
+        case SAIL_META_DATA_JUMBF:            return "JUMBF";
         case SAIL_META_DATA_LABEL:            return "Label";
         case SAIL_META_DATA_MAKE:             return "Make";
         case SAIL_META_DATA_MODEL:            return "Model";
@@ -456,6 +457,7 @@ enum SailMetaData sail_meta_data_from_string(const char *str) {
         case UINT64_C(5862386):              return SAIL_META_DATA_ID;
         case UINT64_C(6384154261):           return SAIL_META_DATA_IPTC;
         case UINT64_C(193461344):            return SAIL_META_DATA_JOB;
+        case UINT64_C(210678448633):         return SAIL_META_DATA_JUMBF;
         case UINT64_C(210681275781):         return SAIL_META_DATA_LABEL;
         case UINT64_C(6384317315):           return SAIL_META_DATA_MAKE;
         case UINT64_C(210682966998):         return SAIL_META_DATA_MODEL;

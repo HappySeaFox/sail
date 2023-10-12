@@ -460,6 +460,7 @@ static MunitResult test_meta_data_to_string(const MunitParameter params[], void 
     munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_ID),               "ID");
     munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_IPTC),             "IPTC");
     munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_JOB),              "Job");
+    munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_JUMBF),            "JUMBF");
     munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_LABEL),            "Label");
     munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_MAKE),             "Make");
     munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_MODEL),            "Model");
@@ -499,6 +500,7 @@ static MunitResult test_meta_data_from_string(const MunitParameter params[], voi
     munit_assert(sail_meta_data_from_string("ID")               == SAIL_META_DATA_ID);
     munit_assert(sail_meta_data_from_string("IPTC")             == SAIL_META_DATA_IPTC);
     munit_assert(sail_meta_data_from_string("Job")              == SAIL_META_DATA_JOB);
+    munit_assert(sail_meta_data_from_string("JUMBF")            == SAIL_META_DATA_JUMBF);
     munit_assert(sail_meta_data_from_string("Label")            == SAIL_META_DATA_LABEL);
     munit_assert(sail_meta_data_from_string("Make")             == SAIL_META_DATA_MAKE);
     munit_assert(sail_meta_data_from_string("Model")            == SAIL_META_DATA_MODEL);
