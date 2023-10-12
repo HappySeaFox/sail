@@ -148,6 +148,11 @@ sail_status_t jpegxl_private_read_more_data(struct sail_io *io, JxlDecoder *deco
     size_t bytes_read;
     SAIL_TRY(io->tolerant_read(io->stream, buffer + remaining, buffer_size - remaining, &bytes_read));
 
+    if (bytes_read == 0) {
+        JxlDecoderCloseInput(decoder);
+        return SAIL_OK;
+    }
+
     if (JxlDecoderSetInput(decoder, buffer, bytes_read + remaining) != JXL_DEC_SUCCESS) {
         SAIL_LOG_ERROR("JPEGXL: Failed to set input buffer");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
@@ -229,6 +234,55 @@ sail_status_t jpegxl_private_fetch_name(JxlDecoder *decoder, uint32_t name_lengt
                         /* cleanup */ sail_free(name), sail_destroy_meta_data_node(meta_data_node_local));
     SAIL_TRY_OR_CLEANUP(sail_set_variant_shallow_string(meta_data_node_local->meta_data->value, name),
                         /* cleanup */ sail_free(name), sail_destroy_meta_data_node(meta_data_node_local));
+
+    *meta_data_node = meta_data_node_local;
+
+    return SAIL_OK;
+}
+
+sail_status_t jpegxl_private_fetch_metadata(JxlDecoder *decoder, struct sail_meta_data_node **meta_data_node) {
+
+    JxlBoxType type;
+    if (JxlDecoderGetBoxType(decoder, type, JXL_FALSE) != JXL_DEC_SUCCESS) {
+        SAIL_LOG_ERROR("JPEGXL: Failed to get box type");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+    }
+
+    SAIL_LOG_TRACE("JPEGXL: Box %c%c%c%c", type[0], type[1], type[2], type[3]);
+
+    enum SailMetaData meta_data;
+
+    if (strncmp(type, "Exif", 4) == 0) {
+        meta_data = SAIL_META_DATA_EXIF;
+    } else if (strncmp(type, "xml ", 4) == 0) {
+        meta_data = SAIL_META_DATA_XMP;
+    } else {
+        return SAIL_OK;
+    }
+
+    uint64_t size;
+    if (JxlDecoderGetBoxSizeRaw(decoder, &size) != JXL_DEC_SUCCESS) {
+        SAIL_LOG_ERROR("JPEGXL: Failed to get box size");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+    }
+
+    struct sail_meta_data_node *meta_data_node_local = NULL;
+
+    void *data;
+    SAIL_TRY(sail_malloc(size, &data));
+
+    SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_node(&meta_data_node_local),
+                        /* cleanup */ sail_free(data));
+
+    SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_from_known_key(meta_data, &meta_data_node_local->meta_data),
+                        /* cleanup */ sail_free(data), sail_destroy_meta_data_node(meta_data_node_local));
+    SAIL_TRY_OR_CLEANUP(sail_alloc_variant(&meta_data_node_local->meta_data->value),
+                        /* cleanup */ sail_free(data), sail_destroy_meta_data_node(meta_data_node_local));
+    SAIL_TRY_OR_CLEANUP(sail_set_variant_shallow_data(meta_data_node_local->meta_data->value, data, size),
+                        /* cleanup */ sail_free(data), sail_destroy_meta_data_node(meta_data_node_local));
+
+    JxlDecoderReleaseBoxBuffer(decoder);
+    JxlDecoderSetBoxBuffer(decoder, data, size);
 
     *meta_data_node = meta_data_node_local;
 

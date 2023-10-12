@@ -53,4 +53,6 @@ SAIL_HIDDEN sail_status_t jpegxl_private_fetch_special_properties(const JxlBasic
 
 SAIL_HIDDEN sail_status_t jpegxl_private_fetch_name(JxlDecoder *decoder, uint32_t name_length, struct sail_meta_data_node **meta_data_node);
 
+SAIL_HIDDEN sail_status_t jpegxl_private_fetch_metadata(JxlDecoder *decoder, struct sail_meta_data_node **meta_data_node);
+
 #endif

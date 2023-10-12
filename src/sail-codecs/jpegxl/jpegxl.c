@@ -48,6 +48,7 @@ struct jpegxl_state {
     struct sail_source_image *source_image;
 
     bool libjxl_success;
+    bool frame_header_seen;
     JxlBasicInfo *basic_info;
     JxlMemoryManager *memory_manager;
     void *runner;
@@ -69,13 +70,14 @@ static sail_status_t alloc_jpegxl_state(struct jpegxl_state **jpegxl_state) {
 
     (*jpegxl_state)->source_image = NULL;
 
-    (*jpegxl_state)->libjxl_success = false;
-    (*jpegxl_state)->basic_info     = NULL;
-    (*jpegxl_state)->memory_manager = NULL;
-    (*jpegxl_state)->runner         = NULL;
-    (*jpegxl_state)->decoder        = NULL;
-    (*jpegxl_state)->buffer         = NULL;
-    (*jpegxl_state)->buffer_size    = 8192;
+    (*jpegxl_state)->libjxl_success    = false;
+    (*jpegxl_state)->frame_header_seen = false;
+    (*jpegxl_state)->basic_info        = NULL;
+    (*jpegxl_state)->memory_manager    = NULL;
+    (*jpegxl_state)->runner            = NULL;
+    (*jpegxl_state)->decoder           = NULL;
+    (*jpegxl_state)->buffer            = NULL;
+    (*jpegxl_state)->buffer_size       = 8192;
 
     return SAIL_OK;
 }
@@ -141,6 +143,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_jpegxl(struct sail_io *io, con
     }
 
     if (JxlDecoderSubscribeEvents(jpegxl_state->decoder, JXL_DEC_BASIC_INFO
+                                                            | JXL_DEC_BOX
                                                             | JXL_DEC_COLOR_ENCODING
                                                             | JXL_DEC_FRAME
                                                             | JXL_DEC_FULL_IMAGE) != JXL_DEC_SUCCESS) {
@@ -155,14 +158,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_jpegxl(struct sail_io *io, con
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
-    size_t bytes_read;
-    SAIL_TRY(jpegxl_state->io->tolerant_read(jpegxl_state->io->stream, jpegxl_state->buffer, jpegxl_state->buffer_size, &bytes_read));
-
-    if (JxlDecoderSetInput(jpegxl_state->decoder, jpegxl_state->buffer, bytes_read) != JXL_DEC_SUCCESS) {
-        SAIL_LOG_ERROR("JPEGXL: Failed to set input buffer");
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
-    }
-
     return SAIL_OK;
 }
 
@@ -174,15 +169,16 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void *state,
         SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
     }
 
-    struct sail_image *image_local;
-
+    struct sail_image *image_local = NULL;
     SAIL_TRY(sail_alloc_image(&image_local));
 
     struct sail_meta_data_node **last_meta_data_node = &image_local->meta_data_node;
 
-    for(bool done = false; !done; ) {
-        JxlDecoderStatus status = JxlDecoderProcessInput(jpegxl_state->decoder);
-
+    for (JxlDecoderStatus status = jpegxl_state->frame_header_seen
+                                    ? JXL_DEC_FRAME
+                                    : JxlDecoderProcessInput(jpegxl_state->decoder);
+            status != JXL_DEC_NEED_IMAGE_OUT_BUFFER;
+            status = JxlDecoderProcessInput(jpegxl_state->decoder)) {
         switch (status) {
             case JXL_DEC_ERROR: {
                 sail_destroy_image(image_local);
@@ -277,13 +273,24 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void *state,
                 }
                 break;
             }
+            case JXL_DEC_BOX: {
+                if (jpegxl_state->load_options->options & SAIL_OPTION_META_DATA) {
+                    SAIL_TRY_OR_CLEANUP(jpegxl_private_fetch_metadata(jpegxl_state->decoder,
+                                                                        last_meta_data_node),
+                                        /* cleanup*/ sail_destroy_image(image_local));
+
+                    if (*last_meta_data_node != NULL) {
+                        last_meta_data_node = &(*last_meta_data_node)->next;
+                    }
+                }
+                break;
+            }
             case JXL_DEC_COLOR_ENCODING: {
                 SAIL_TRY_OR_CLEANUP(jpegxl_private_fetch_iccp(jpegxl_state->decoder, &image_local->iccp),
                                     /* cleanup */ sail_destroy_image(image_local));
                 break;
             }
             case JXL_DEC_NEED_IMAGE_OUT_BUFFER: {
-                done = true;
                 break;
             }
             case JXL_DEC_SUCCESS: {
@@ -319,14 +326,19 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_jpegxl(void *state, struct sa
             &format,
             image->pixels,
             image->bytes_per_line * image->height);
+
     if (status != JXL_DEC_SUCCESS) {
         SAIL_LOG_ERROR("JPEGXL: Failed to set output buffer. Error: %u", status);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
-    for(bool done = false; !done; ) {
-        status = JxlDecoderProcessInput(jpegxl_state->decoder);
+    jpegxl_state->frame_header_seen = false;
 
+    struct sail_meta_data_node **last_meta_data_node = &image->meta_data_node;
+
+    for (status = JxlDecoderProcessInput(jpegxl_state->decoder);
+            !jpegxl_state->frame_header_seen && !jpegxl_state->libjxl_success;
+            status = JxlDecoderProcessInput(jpegxl_state->decoder)) {
         switch (status) {
             case JXL_DEC_ERROR: {
                 SAIL_LOG_ERROR("JPEGXL: Decoder error");
@@ -340,11 +352,23 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_jpegxl(void *state, struct sa
                 break;
             }
             case JXL_DEC_FULL_IMAGE: {
-                done = true;
+                break;
+            }
+            case JXL_DEC_FRAME: {
+                jpegxl_state->frame_header_seen = true;
+                break;
+            }
+            case JXL_DEC_BOX: {
+                if (jpegxl_state->load_options->options & SAIL_OPTION_META_DATA) {
+                    SAIL_TRY(jpegxl_private_fetch_metadata(jpegxl_state->decoder, last_meta_data_node));
+
+                    if (*last_meta_data_node != NULL) {
+                        last_meta_data_node = &(*last_meta_data_node)->next;
+                    }
+                }
                 break;
             }
             case JXL_DEC_SUCCESS: {
-                done = true;
                 jpegxl_state->libjxl_success = true;
                 break;
             }
