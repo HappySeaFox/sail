@@ -256,6 +256,8 @@ sail_status_t jpegxl_private_fetch_metadata(JxlDecoder *decoder, struct sail_met
         meta_data = SAIL_META_DATA_EXIF;
     } else if (strncmp(type, "xml ", 4) == 0) {
         meta_data = SAIL_META_DATA_XMP;
+    } else if (strncmp(type, "jumb", 4) == 0) {
+        meta_data = SAIL_META_DATA_JUMBF;
     } else {
         return SAIL_OK;
     }
