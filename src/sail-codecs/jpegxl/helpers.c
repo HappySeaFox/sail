@@ -213,6 +213,10 @@ sail_status_t jpegxl_private_fetch_special_properties(const JxlBasicInfo *basic_
     sail_set_variant_unsigned_int(variant, basic_info->bits_per_sample);
     sail_put_hash_map(special_properties, "jpegxl-bits-per-sample", variant);
 
+    SAIL_LOG_TRACE("JPEGXL: exponent_bits_per_sample(%u)", basic_info->exponent_bits_per_sample);
+    sail_set_variant_unsigned_int(variant, basic_info->exponent_bits_per_sample);
+    sail_put_hash_map(special_properties, "jpegxl-exponent-bits-per-sample", variant);
+
     SAIL_LOG_TRACE("JPEGXL: intensity_target(%.1f)", basic_info->intensity_target);
     sail_set_variant_float(variant, basic_info->intensity_target);
     sail_put_hash_map(special_properties, "jpegxl-intensity-target", variant);
