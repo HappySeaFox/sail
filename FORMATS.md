@@ -163,7 +163,7 @@
 </tr>
 <tr>
     <td>8</td>
-    <td><a href="https://wikipedia.org/wiki/JPEG_XL">JPEG-XL</a></td>
+    <td><a href="https://wikipedia.org/wiki/JPEG_XL">JPEG XL</a></td>
     <td>
         <b>Grayscale:</b> 8-bit, 16-bit.
         <b>RGB:</b> 24-bit, 48-bit.
