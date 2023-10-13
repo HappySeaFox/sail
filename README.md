@@ -76,15 +76,16 @@ images with the help of [ksquirrel-libs](FAQ.md#how-old-is-sail), the predecesso
 | .. | ...                                                                 |               |                   |
 | 6  | [JPEG](https://wikipedia.org/wiki/JPEG)                             | RW            | libjpeg-turbo     |
 | 7  | [JPEG2000](https://wikipedia.org/wiki/JPEG_2000)                    | R             | jasper            |
-| 8  | [PCX](https://wikipedia.org/wiki/PCX)                               | R             |                   |
-| 9  | [PNG](https://wikipedia.org/wiki/Portable_Network_Graphics)         | RW            | libpng            |
-| 10 | [PSD](https://en.wikipedia.org/wiki/Adobe_Photoshop#File_format)    | R             |                   |
-| 11 | [QOI](http://qoiformat.org)                                         | RW            |                   |
-| 12 | [SVG](https://wikipedia.org/wiki/Scalable_Vector_Graphics)          | R             | resvg             |
-| 13 | [TGA](https://wikipedia.org/wiki/Truevision_TGA)                    | R             |                   |
-| 14 | [TIFF](https://wikipedia.org/wiki/TIFF)                             | RW            | libtiff           |
+| 8  | [JPEG-XL](https://wikipedia.org/wiki/JPEG_XL)                       | R             | libjxl            |
+| 9  | [PCX](https://wikipedia.org/wiki/PCX)                               | R             |                   |
+| 10 | [PNG](https://wikipedia.org/wiki/Portable_Network_Graphics)         | RW            | libpng            |
+| 11 | [PSD](https://en.wikipedia.org/wiki/Adobe_Photoshop#File_format)    | R             |                   |
+| 12 | [QOI](http://qoiformat.org)                                         | RW            |                   |
+| 13 | [SVG](https://wikipedia.org/wiki/Scalable_Vector_Graphics)          | R             | resvg             |
+| 14 | [TGA](https://wikipedia.org/wiki/Truevision_TGA)                    | R             |                   |
+| 15 | [TIFF](https://wikipedia.org/wiki/TIFF)                             | RW            | libtiff           |
 | .. | ...                                                                 |               |                   |
-| 16 | [WEBP](https://wikipedia.org/wiki/WebP)                             | R             | libwebp           |
+| 17 | [WEBP](https://wikipedia.org/wiki/WebP)                             | R             | libwebp           |
 | .. | ...                                                                 |               |                   |
 
 See the full list [here](FORMATS.md). Work to add more image formats is ongoing.
