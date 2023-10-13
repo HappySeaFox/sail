@@ -169,6 +169,7 @@
         <b>RGB:</b> 24-bit, 48-bit.
         <b>RGBA:</b> 32-bit, 64-bit.
         <b>CMYK:</b> 32-bit, 64-bit.
+        <b>CMYKA:</b> 40-bit, 80-bit.
         <br/><br/>
         <b>Content:</b> Static, Animated, Meta data, ICC profiles.
         <br/><br/>

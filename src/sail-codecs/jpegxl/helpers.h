@@ -42,7 +42,7 @@ struct sail_meta_data_node;
 
 SAIL_HIDDEN bool jpegxl_private_is_cmyk(JxlDecoder *decoder, uint32_t num_extra_channels);
 
-SAIL_HIDDEN enum SailPixelFormat jpegxl_private_source_pixel_format_cmyk(uint32_t bits_per_sample);
+SAIL_HIDDEN enum SailPixelFormat jpegxl_private_source_pixel_format_cmyk(uint32_t bits_per_sample, uint32_t alpha_bits);
 
 SAIL_HIDDEN enum SailPixelFormat jpegxl_private_source_pixel_format(uint32_t bits_per_sample, uint32_t num_color_channels, uint32_t alpha_bits);
 

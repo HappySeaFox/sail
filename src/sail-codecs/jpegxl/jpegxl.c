@@ -211,7 +211,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void *state,
 
                 if (jpegxl_private_is_cmyk(jpegxl_state->decoder, jpegxl_state->basic_info->num_extra_channels)) {
                     jpegxl_state->source_image->pixel_format =
-                        jpegxl_private_source_pixel_format_cmyk(jpegxl_state->basic_info->bits_per_sample);
+                        jpegxl_private_source_pixel_format_cmyk(
+                            jpegxl_state->basic_info->bits_per_sample, jpegxl_state->basic_info->alpha_bits);
                 } else {
                     jpegxl_state->source_image->pixel_format =
                         jpegxl_private_source_pixel_format(jpegxl_state->basic_info->bits_per_sample,

@@ -49,13 +49,13 @@ SAIL_HIDDEN bool jpegxl_private_is_cmyk(JxlDecoder *decoder, uint32_t num_extra_
     return false;
 }
 
-enum SailPixelFormat jpegxl_private_source_pixel_format_cmyk(uint32_t bits_per_sample) {
+enum SailPixelFormat jpegxl_private_source_pixel_format_cmyk(uint32_t bits_per_sample, uint32_t alpha_bits) {
 
-    SAIL_LOG_TRACE("JPEGXL: CMYK bits per sample(%u)", bits_per_sample);
+    SAIL_LOG_TRACE("JPEGXL: CMYK bits per sample(%u), alpha bits(%u)", bits_per_sample, alpha_bits);
 
     switch (bits_per_sample) {
-        case 8:  return SAIL_PIXEL_FORMAT_BPP32_CMYK;
-        case 16: return SAIL_PIXEL_FORMAT_BPP64_CMYK;
+        case 8:  return alpha_bits > 0 ? SAIL_PIXEL_FORMAT_BPP40_CMYKA : SAIL_PIXEL_FORMAT_BPP32_CMYK;
+        case 16: return alpha_bits > 0 ? SAIL_PIXEL_FORMAT_BPP80_CMYKA : SAIL_PIXEL_FORMAT_BPP64_CMYK;
 
         default: {
             return SAIL_PIXEL_FORMAT_UNKNOWN;
@@ -103,6 +103,9 @@ enum SailPixelFormat jpegxl_private_source_pixel_format_to_output(enum SailPixel
     switch(pixel_format) {
         case SAIL_PIXEL_FORMAT_BPP32_CMYK: return SAIL_PIXEL_FORMAT_BPP24_RGB;
         case SAIL_PIXEL_FORMAT_BPP64_CMYK: return SAIL_PIXEL_FORMAT_BPP48_RGB;
+
+        case SAIL_PIXEL_FORMAT_BPP40_CMYKA: return SAIL_PIXEL_FORMAT_BPP32_RGBA;
+        case SAIL_PIXEL_FORMAT_BPP80_CMYKA: return SAIL_PIXEL_FORMAT_BPP64_RGBA;
 
         default: {
             return pixel_format;
