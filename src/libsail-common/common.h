@@ -146,6 +146,9 @@ enum SailPixelFormat {
     SAIL_PIXEL_FORMAT_BPP32_CMYK,
     SAIL_PIXEL_FORMAT_BPP64_CMYK,
 
+    SAIL_PIXEL_FORMAT_BPP40_CMYKA,
+    SAIL_PIXEL_FORMAT_BPP80_CMYKA,
+
     /*
      * YCbCr formats.
      */

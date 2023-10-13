@@ -106,6 +106,9 @@ const char* sail_pixel_format_to_string(enum SailPixelFormat pixel_format) {
         case SAIL_PIXEL_FORMAT_BPP32_CMYK:            return "BPP32-CMYK";
         case SAIL_PIXEL_FORMAT_BPP64_CMYK:            return "BPP64-CMYK";
 
+        case SAIL_PIXEL_FORMAT_BPP40_CMYKA:           return "BPP40-CMYKA";
+        case SAIL_PIXEL_FORMAT_BPP80_CMYKA:           return "BPP80-CMYKA";
+
         case SAIL_PIXEL_FORMAT_BPP24_YCBCR:           return "BPP24-YCBCR";
 
         case SAIL_PIXEL_FORMAT_BPP32_YCCK:            return "BPP32-YCCK";
@@ -217,6 +220,9 @@ enum SailPixelFormat sail_pixel_format_from_string(const char *str) {
 
         case UINT64_C(8244605667720923565):  return SAIL_PIXEL_FORMAT_BPP32_CMYK;
         case UINT64_C(8244605671673598258):  return SAIL_PIXEL_FORMAT_BPP64_CMYK;
+
+        case UINT64_C(13817570042892262125): return SAIL_PIXEL_FORMAT_BPP40_CMYKA;
+        case UINT64_C(13817570213366034033): return SAIL_PIXEL_FORMAT_BPP80_CMYKA;
 
         case UINT64_C(13817569962846953645): return SAIL_PIXEL_FORMAT_BPP24_YCBCR;
 
