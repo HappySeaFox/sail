@@ -32,13 +32,44 @@
 
 #include "helpers.h"
 
-enum SailPixelFormat jpegxl_private_sail_pixel_format(uint32_t bits_per_sample, uint32_t num_color_channels, uint32_t alpha_bits) {
+SAIL_HIDDEN bool jpegxl_private_is_cmyk(JxlDecoder *decoder, uint32_t num_extra_channels) {
+
+    for (uint32_t i = 0; i < num_extra_channels; i++) {
+        JxlExtraChannelInfo extra_channel_info;
+
+        if (JxlDecoderGetExtraChannelInfo(decoder, i, &extra_channel_info) != JXL_DEC_SUCCESS) {
+            return false;
+        }
+
+        if (extra_channel_info.type == JXL_CHANNEL_BLACK) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+enum SailPixelFormat jpegxl_private_source_pixel_format_cmyk(uint32_t bits_per_sample) {
+
+    SAIL_LOG_TRACE("JPEGXL: CMYK bits per sample(%u)", bits_per_sample);
+
+    switch (bits_per_sample) {
+        case 8:  return SAIL_PIXEL_FORMAT_BPP32_CMYK;
+        case 16: return SAIL_PIXEL_FORMAT_BPP64_CMYK;
+
+        default: {
+            return SAIL_PIXEL_FORMAT_UNKNOWN;
+        }
+    }
+}
+
+enum SailPixelFormat jpegxl_private_source_pixel_format(uint32_t bits_per_sample, uint32_t num_color_channels, uint32_t alpha_bits) {
 
     SAIL_LOG_TRACE("JPEGXL: Bits per sample(%u), number of channels(%u), alpha bits(%u)",
         bits_per_sample, num_color_channels, alpha_bits);
 
     /*
-     * Also update jpegxl_private_sail_pixel_format_to_num_channels() with new pixel formats.
+     * Also update jpegxl_private_pixel_format_to_num_channels() with new pixel formats.
      */
     switch (num_color_channels) {
         case 1: {
@@ -67,7 +98,19 @@ enum SailPixelFormat jpegxl_private_sail_pixel_format(uint32_t bits_per_sample, 
     }
 }
 
-unsigned jpegxl_private_sail_pixel_format_to_num_channels(enum SailPixelFormat pixel_format) {
+enum SailPixelFormat jpegxl_private_source_pixel_format_to_output(enum SailPixelFormat pixel_format) {
+
+    switch(pixel_format) {
+        case SAIL_PIXEL_FORMAT_BPP32_CMYK: return SAIL_PIXEL_FORMAT_BPP24_RGB;
+        case SAIL_PIXEL_FORMAT_BPP64_CMYK: return SAIL_PIXEL_FORMAT_BPP48_RGB;
+
+        default: {
+            return pixel_format;
+        }
+    }
+}
+
+unsigned jpegxl_private_pixel_format_to_num_channels(enum SailPixelFormat pixel_format) {
 
     switch(pixel_format) {
         case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE:
@@ -85,7 +128,7 @@ unsigned jpegxl_private_sail_pixel_format_to_num_channels(enum SailPixelFormat p
     }
 }
 
-JxlDataType jpegxl_private_sail_pixel_format_to_jxl_data_type(enum SailPixelFormat pixel_format) {
+JxlDataType jpegxl_private_pixel_format_to_jxl_data_type(enum SailPixelFormat pixel_format) {
 
     switch(pixel_format) {
         case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE:

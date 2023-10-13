@@ -209,10 +209,16 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void *state,
                 SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&jpegxl_state->source_image),
                                     /* cleanup */ sail_destroy_image(image_local));
 
-                jpegxl_state->source_image->pixel_format =
-                    jpegxl_private_sail_pixel_format(jpegxl_state->basic_info->bits_per_sample,
-                                                        jpegxl_state->basic_info->num_color_channels,
-                                                        jpegxl_state->basic_info->alpha_bits);
+                if (jpegxl_private_is_cmyk(jpegxl_state->decoder, jpegxl_state->basic_info->num_extra_channels)) {
+                    jpegxl_state->source_image->pixel_format =
+                        jpegxl_private_source_pixel_format_cmyk(jpegxl_state->basic_info->bits_per_sample);
+                } else {
+                    jpegxl_state->source_image->pixel_format =
+                        jpegxl_private_source_pixel_format(jpegxl_state->basic_info->bits_per_sample,
+                                                            jpegxl_state->basic_info->num_color_channels,
+                                                            jpegxl_state->basic_info->alpha_bits);
+                }
+
                 jpegxl_state->source_image->compression = SAIL_COMPRESSION_UNKNOWN;
 
                 /* Special properties. */
@@ -260,7 +266,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void *state,
 
                 image_local->width          = jpegxl_state->basic_info->xsize;
                 image_local->height         = jpegxl_state->basic_info->ysize;
-                image_local->pixel_format   = image_local->source_image->pixel_format;
+                image_local->pixel_format   = jpegxl_private_source_pixel_format_to_output(image_local->source_image->pixel_format);
                 image_local->bytes_per_line = sail_bytes_per_line(image_local->width, image_local->pixel_format);
 
                 if (jpegxl_state->basic_info->have_animation) {
@@ -315,8 +321,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_jpegxl(void *state, struct sa
     struct jpegxl_state *jpegxl_state = state;
 
     JxlPixelFormat format = {
-        .num_channels = jpegxl_private_sail_pixel_format_to_num_channels(image->pixel_format),
-        .data_type    = jpegxl_private_sail_pixel_format_to_jxl_data_type(image->pixel_format),
+        .num_channels = jpegxl_private_pixel_format_to_num_channels(image->pixel_format),
+        .data_type    = jpegxl_private_pixel_format_to_jxl_data_type(image->pixel_format),
         .endianness   = JXL_NATIVE_ENDIAN,
         .align        = 0
     };

@@ -26,6 +26,7 @@
 #ifndef SAIL_JPEGXL_HELPERS_H
 #define SAIL_JPEGXL_HELPERS_H
 
+#include <stdbool.h>
 #include <stdint.h>
 
 #include <jxl/decode.h>
@@ -39,11 +40,17 @@ struct sail_iccp;
 struct sail_io;
 struct sail_meta_data_node;
 
-SAIL_HIDDEN enum SailPixelFormat jpegxl_private_sail_pixel_format(uint32_t bits_per_sample, uint32_t num_color_channels, uint32_t alpha_bits);
+SAIL_HIDDEN bool jpegxl_private_is_cmyk(JxlDecoder *decoder, uint32_t num_extra_channels);
 
-SAIL_HIDDEN unsigned jpegxl_private_sail_pixel_format_to_num_channels(enum SailPixelFormat pixel_format);
+SAIL_HIDDEN enum SailPixelFormat jpegxl_private_source_pixel_format_cmyk(uint32_t bits_per_sample);
 
-SAIL_HIDDEN JxlDataType jpegxl_private_sail_pixel_format_to_jxl_data_type(enum SailPixelFormat pixel_format);
+SAIL_HIDDEN enum SailPixelFormat jpegxl_private_source_pixel_format(uint32_t bits_per_sample, uint32_t num_color_channels, uint32_t alpha_bits);
+
+SAIL_HIDDEN enum SailPixelFormat jpegxl_private_source_pixel_format_to_output(enum SailPixelFormat pixel_format);
+
+SAIL_HIDDEN unsigned jpegxl_private_pixel_format_to_num_channels(enum SailPixelFormat pixel_format);
+
+SAIL_HIDDEN JxlDataType jpegxl_private_pixel_format_to_jxl_data_type(enum SailPixelFormat pixel_format);
 
 SAIL_HIDDEN sail_status_t jpegxl_private_fetch_iccp(JxlDecoder *decoder, struct sail_iccp **iccp);
 
