@@ -312,10 +312,8 @@ unsigned sail_bits_per_pixel(enum SailPixelFormat pixel_format) {
         case SAIL_PIXEL_FORMAT_BPP64_ARGB:
         case SAIL_PIXEL_FORMAT_BPP64_ABGR: return 64;
 
-        case SAIL_PIXEL_FORMAT_BPP32_FLOAT:  return 32;
-        case SAIL_PIXEL_FORMAT_BPP64_FLOAT:  return 64;
-        case SAIL_PIXEL_FORMAT_BPP96_FLOAT:  return 96;
-        case SAIL_PIXEL_FORMAT_BPP128_FLOAT: return 128;
+        case SAIL_PIXEL_FORMAT_BPP16_FLOAT: return 16;
+        case SAIL_PIXEL_FORMAT_BPP32_FLOAT: return 32;
 
         case SAIL_PIXEL_FORMAT_BPP32_CMYK: return 32;
         case SAIL_PIXEL_FORMAT_BPP64_CMYK: return 64;

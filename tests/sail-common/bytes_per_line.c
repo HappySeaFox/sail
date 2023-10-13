@@ -171,21 +171,13 @@ static MunitResult test_float(const MunitParameter params[], void *user_data) {
     (void)params;
     (void)user_data;
 
+    /* 16-bit FLOAT. */
+    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP16_FLOAT) == 20);
+    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP16_FLOAT) == 22);
+
     /* 32-bit FLOAT. */
     munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP32_FLOAT) == 40);
     munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP32_FLOAT) == 44);
-
-    /* 64-bit FLOAT. */
-    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP64_FLOAT) == 80);
-    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP64_FLOAT) == 88);
-
-    /* 96-bit FLOAT. */
-    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP96_FLOAT) == 120);
-    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP96_FLOAT) == 132);
-
-    /* 128-bit FLOAT. */
-    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP128_FLOAT) == 160);
-    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP128_FLOAT) == 176);
 
     return MUNIT_OK;
 }
