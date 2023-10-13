@@ -79,16 +79,14 @@ foreach (tiff_codec IN LISTS TIFF_CODECS)
                     TIFFSetField(tiff, TIFFTAG_COMPRESSION, COMPRESSION_${tiff_codec});
                     TIFFSetField(tiff, TIFFTAG_ROWSPERSTRIP, TIFFDefaultStripSize(tiff, (uint32)-1));
 
-                    unsigned char *scan = malloc(4);
-                    memset(scan, 255, 4);
+                    unsigned char scan[4];
+                    memset(scan, 255, sizeof(scan));
 
                     if (TIFFWriteScanline(tiff, scan, 0, 0) < 0) {
                         return 2;
                     }
 
                     TIFFClose(tiff);
-
-                    free(scan);
 
                     return 0;
                 }
