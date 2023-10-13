@@ -88,7 +88,11 @@ static char* find_chars_or_comment(const char* s, const char* chars)
    NUL-terminated, and doesn't pad with NULs. */
 static char* strncpy0(char* dest, const char* src, size_t size)
 {
+#ifdef _MSC_VER
+    strncpy_s(dest, size, src, size - 1);
+#else
     strncpy(dest, src, size - 1);
+#endif
     dest[size - 1] = '\0';
 
     return dest;
@@ -254,7 +258,13 @@ int ini_parse(const char* filename, ini_handler handler, void* user)
     FILE* file;
     int error;
 
+#ifdef _MSC_VER
+    errno_t err = fopen_s(&file, filename, "r");
+    if (err != 0)
+        return -1;
+#else
     file = fopen(filename, "r");
+#endif
     if (!file)
         return -1;
     error = ini_parse_file(file, handler, user);
