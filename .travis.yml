@@ -10,6 +10,7 @@ addons:
       - giflib
       - jasper
       - jpeg-turbo
+      - jpeg-xl
       - libavif
       - libpng
       - libtiff
@@ -38,7 +39,7 @@ jobs:
       dist: jammy
       name: "Ubuntu 22.04 Jammy"
     - os: osx
-      osx_image: xcode14.1
+      osx_image: xcode14.2
       name: "macOS 12.6"
       env:
         - CMAKE_PREFIX_PATH="/usr/local/opt/jpeg-turbo;$CMAKE_PREFIX_PATH"
@@ -80,6 +81,7 @@ script:
     local project_path="$1"
     local sail_cmake_path="$2"
     local build_type="$3"
+    local old_dir="$PWD"
 
     echo
     echo "External Windows Test '$project_path' '$build_type'"
@@ -93,6 +95,8 @@ script:
 
     fail_on_error cmake -A x64 -DSAIL_DEV=ON -DCMAKE_PREFIX_PATH="$sail_cmake_path" ..
     fail_on_error cmake --build . --config $build_type
+
+    cd "$old_dir"
   }
 
   test_external_unix()
@@ -100,6 +104,7 @@ script:
     local project_path="$1"
     local build_type="$2"
     local exe="$3"
+    local old_dir="$PWD"
 
     echo
     echo "External Unix Test '$project_path' '$build_type'"
@@ -114,6 +119,8 @@ script:
     fail_on_error cmake -DSAIL_DEV=ON -DCMAKE_BUILD_TYPE="$build_type" ..
     fail_on_error cmake --build .
     fail_on_error "$exe"
+
+    cd "$old_dir"
   }
 
   build()
@@ -145,6 +152,8 @@ script:
 
         test_external_windows "tests/external/link/c"   "$CMAKE_INSTALL_PREFIX/lib/cmake" "$CMAKE_BUILD_TYPE"
         test_external_windows "tests/external/link/c++" "$CMAKE_INSTALL_PREFIX/lib/cmake" "$CMAKE_BUILD_TYPE"
+
+        rm -rf "$CMAKE_INSTALL_PREFIX"
       ;;
       osx | linux)
         CMAKE_INSTALL_PREFIX="/usr/local"
@@ -160,11 +169,14 @@ script:
 
         cd tests
         fail_on_error ctest --verbose
+        cd -
 
         fail_on_error "$CMAKE_INSTALL_PREFIX/bin/sail" --version
 
         test_external_unix "tests/external/link/c"   "$CMAKE_BUILD_TYPE" "./external-c-api-link"
         test_external_unix "tests/external/link/c++" "$CMAKE_BUILD_TYPE" "./external-c++-api-link"
+
+        xargs sudo rm -v < install_manifest.txt
       ;;
     esac
   }

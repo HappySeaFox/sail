@@ -28,6 +28,7 @@
 
 #include <stdbool.h>
 #include <stddef.h> /* size_t */
+#include <stdio.h> /* FILE */
 
 #ifdef SAIL_BUILD
     #include "common.h"
@@ -311,6 +312,30 @@ SAIL_EXPORT sail_status_t sail_copy_variant(const struct sail_variant *source, s
  * Returns true if both the variants are valid and contain equal values.
  */
 SAIL_EXPORT bool sail_equal_variants(const struct sail_variant *variant1, const struct sail_variant *variant2);
+
+/*
+ * Calls printf() to print the value of the variant. If the variant is NULL,
+ * doesn't print anything and returns -1.
+ *
+ * Returns the result of printf().
+ */
+SAIL_EXPORT int sail_printf_variant(const struct sail_variant *variant);
+
+/*
+ * Calls fprintf() to print the value of the variant into the file.
+ * If the variant is NULL, doesn't print anything and returns -1.
+ *
+ * Returns the result of fprintf().
+ */
+SAIL_EXPORT int sail_fprintf_variant(const struct sail_variant *variant, FILE *f);
+
+/*
+ * Calls snprintf() to put the value of the variant into the string.
+ * If the variant is NULL, doesn't print anything and returns -1.
+ *
+ * Returns the result of snprintf().
+ */
+SAIL_EXPORT int sail_snprintf_variant(const struct sail_variant *variant, char *str, size_t str_size);
 
 /* extern "C" */
 #ifdef __cplusplus

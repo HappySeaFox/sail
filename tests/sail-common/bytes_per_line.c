@@ -195,6 +195,14 @@ static MunitResult test_cmyk(const MunitParameter params[], void *user_data) {
     munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP64_CMYK) == 80);
     munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP64_CMYK) == 88);
 
+    /* 40-bit CMYKA. */
+    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP40_CMYKA) == 50);
+    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP40_CMYKA) == 55);
+
+    /* 64-bit CMYK. */
+    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP80_CMYKA) == 100);
+    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP80_CMYKA) == 110);
+
     return MUNIT_OK;
 }
 

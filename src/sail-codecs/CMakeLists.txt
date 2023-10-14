@@ -4,7 +4,7 @@ add_subdirectory(common/bmp)
 
 # List of codecs
 #
-set(CODECS avif bmp gif ico jpeg jpeg2000 pcx png psd qoi svg tga tiff wal webp xbm)
+set(CODECS avif bmp gif ico jpeg jpeg2000 jpegxl pcx png psd qoi svg tga tiff wal webp xbm)
 
 list(SORT CODECS)
 

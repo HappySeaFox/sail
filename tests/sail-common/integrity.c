@@ -139,6 +139,9 @@ static MunitResult test_pixel_format_to_string(const MunitParameter params[], vo
     munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP32_CMYK), "BPP32-CMYK");
     munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP64_CMYK), "BPP64-CMYK");
 
+    munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP40_CMYKA), "BPP40-CMYKA");
+    munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP80_CMYKA), "BPP80-CMYKA");
+
     munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP24_YCBCR), "BPP24-YCBCR");
 
     munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP32_YCCK), "BPP32-YCCK");
@@ -235,6 +238,9 @@ static MunitResult test_pixel_format_from_string(const MunitParameter params[], 
 
     munit_assert(sail_pixel_format_from_string("BPP32-CMYK") == SAIL_PIXEL_FORMAT_BPP32_CMYK);
     munit_assert(sail_pixel_format_from_string("BPP64-CMYK") == SAIL_PIXEL_FORMAT_BPP64_CMYK);
+
+    munit_assert(sail_pixel_format_from_string("BPP40-CMYKA") == SAIL_PIXEL_FORMAT_BPP40_CMYKA);
+    munit_assert(sail_pixel_format_from_string("BPP80-CMYKA") == SAIL_PIXEL_FORMAT_BPP80_CMYKA);
 
     munit_assert(sail_pixel_format_from_string("BPP24-YCBCR") == SAIL_PIXEL_FORMAT_BPP24_YCBCR);
 
@@ -456,6 +462,7 @@ static MunitResult test_meta_data_to_string(const MunitParameter params[], void 
     munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_ID),               "ID");
     munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_IPTC),             "IPTC");
     munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_JOB),              "Job");
+    munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_JUMBF),            "JUMBF");
     munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_LABEL),            "Label");
     munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_MAKE),             "Make");
     munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_MODEL),            "Model");
@@ -495,6 +502,7 @@ static MunitResult test_meta_data_from_string(const MunitParameter params[], voi
     munit_assert(sail_meta_data_from_string("ID")               == SAIL_META_DATA_ID);
     munit_assert(sail_meta_data_from_string("IPTC")             == SAIL_META_DATA_IPTC);
     munit_assert(sail_meta_data_from_string("Job")              == SAIL_META_DATA_JOB);
+    munit_assert(sail_meta_data_from_string("JUMBF")            == SAIL_META_DATA_JUMBF);
     munit_assert(sail_meta_data_from_string("Label")            == SAIL_META_DATA_LABEL);
     munit_assert(sail_meta_data_from_string("Make")             == SAIL_META_DATA_MAKE);
     munit_assert(sail_meta_data_from_string("Model")            == SAIL_META_DATA_MODEL);

@@ -163,6 +163,37 @@
 </tr>
 <tr>
     <td>8</td>
+    <td><a href="https://wikipedia.org/wiki/JPEG_XL">JPEG XL</a></td>
+    <td>
+        <b>Grayscale:</b> 8-bit, 16-bit.
+        <b>RGB:</b> 24-bit, 48-bit.
+        <b>RGBA:</b> 32-bit, 64-bit.
+        <b>CMYK:</b> 32-bit, 64-bit.
+        <b>CMYKA:</b> 40-bit, 80-bit.
+        <br/><br/>
+        <b>Content:</b> Static, Animated, Meta data, ICC profiles.
+        <br/><br/>
+        <b>Special properties:</b>
+             Key: <i>"jpegxl-bits-per-sample"</i>. Possible values: unsigned int.
+        <br/>Key: <i>"jpegxl-exponent-bits-per-sample"</i>. Possible values: unsigned int.
+        <br/>Key: <i>"jpegxl-intensity-target"</i>. Possible values: float.
+        <br/>Key: <i>"jpegxl-min-nits"</i>. Possible values: float.
+        <br/>Key: <i>"jpegxl-relative-to-max-display"</i>. Possible values: bool.
+        <br/>Key: <i>"jpegxl-linear-below"</i>. Possible values: float.
+        <br/>Key: <i>"jpegxl-color-channels"</i>. Possible values: unsigned int.
+        <br/>Key: <i>"jpegxl-extra-channels"</i>. Possible values: unsigned int.
+        <br/>Key: <i>"jpegxl-alpha-bits"</i>. Possible values: unsigned int.
+        <br/>Key: <i>"jpegxl-intrinsic-width"</i>. Possible values: unsigned int.
+        <br/>Key: <i>"jpegxl-intrinsic-height"</i>. Possible values: unsigned int.
+        <br/>See the <a href="https://libjxl.readthedocs.io/en/latest/api_metadata.html#_CPPv412JxlBasicInfo">JxlBasicInfo structure</a> documentation in libjxl for more.
+    </td>
+    <td>-</td>
+    <td>Unsupported</td>
+    <td>-</td>
+    <td>-</td>
+</tr>
+<tr>
+    <td>9</td>
     <td><a href="https://wikipedia.org/wiki/PCX">PCX</a></td>
     <td>
         <b>Indexed:</b> 1-bit, 4-bit, 8-bit.
@@ -179,7 +210,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>9</td>
+    <td>10</td>
     <td><a href="https://wikipedia.org/wiki/Portable_Network_Graphics">PNG</a></td>
     <td>
         <b>Grayscale:</b> 1-bit, 2-bit, 4-bit, 8-bit, 16-bit.
@@ -207,7 +238,7 @@
     <td>libpng</td>
 </tr>
 <tr>
-    <td>10</td>
+    <td>11</td>
     <td><a href="https://en.wikipedia.org/wiki/Adobe_Photoshop#File_format">PSD</a></td>
     <td>
         <b>Grayscale:</b> 8-bit, 16-bit.
@@ -234,7 +265,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>11</td>
+    <td>12</td>
     <td><a href="http://qoiformat.org">QOI</a></td>
     <td>
         <b>RGB:</b> 24-bit.
@@ -253,7 +284,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>12</td>
+    <td>13</td>
     <td><a href="https://wikipedia.org/wiki/Scalable_Vector_Graphics">SVG</a></td>
     <td>
         <b>Bit depth:</b> 32-bit.
@@ -272,7 +303,7 @@
     <td>resvg</td>
 </tr>
 <tr>
-    <td>13</td>
+    <td>14</td>
     <td><a href="https://wikipedia.org/wiki/Truevision_TGA">TGA</a></td>
     <td>
         <b>Grayscale:</b> 8-bit.
@@ -288,7 +319,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>14</td>
+    <td>15</td>
     <td><a href="https://wikipedia.org/wiki/TIFF">TIFF</a></td>
     <td>
         <b>Bit depth:</b> 1-bit, 2-bit, 4-bit, 8-bit, 16-bit, 24-bit, 32-bit, 48-bit, 64-bit.
@@ -309,7 +340,7 @@
     <td>libtiff</td>
 </tr>
 <tr>
-    <td>15</td>
+    <td>16</td>
     <td><a href="http://fileformats.archiveteam.org/wiki/Quake_2_Texture">WAL</a></td>
     <td>
         <b>Indexed:</b> 8-bit.
@@ -322,7 +353,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>16</td>
+    <td>17</td>
     <td><a href="https://wikipedia.org/wiki/WebP">WEBP</a></td>
     <td>
         <b>Bit depth:</b> 24-bit, 32-bit.
@@ -335,7 +366,7 @@
     <td>libwebp</td>
 </tr>
 <tr>
-    <td>17</td>
+    <td>18</td>
     <td><a href="https://en.wikipedia.org/wiki/X_BitMap">XBM</a></td>
     <td>
         <b>Bit depth:</b> 1-bit.

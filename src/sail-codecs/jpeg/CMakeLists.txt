@@ -76,9 +76,9 @@ sail_codec(NAME jpeg
 # Add compile options to the target based on our findings
 #
 if (HAVE_JPEG_ICCP)
-    target_compile_definitions(${TARGET} PRIVATE SAIL_HAVE_JPEG_ICCP)
+    target_compile_definitions(${SAIL_CODEC_TARGET} PRIVATE SAIL_HAVE_JPEG_ICCP)
 endif()
 
 if (HAVE_JPEG_JCS_EXT)
-    target_compile_definitions(${TARGET} PRIVATE SAIL_HAVE_JPEG_JCS_EXT)
+    target_compile_definitions(${SAIL_CODEC_TARGET} PRIVATE SAIL_HAVE_JPEG_JCS_EXT)
 endif()

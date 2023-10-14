@@ -88,8 +88,6 @@ static sail_status_t convert_impl(const char *input, const char *output, int com
 
     sail_destroy_image(image);
 
-    SAIL_LOG_INFO("\n*** Success ***\n");
-
     return SAIL_OK;
 }
 
@@ -127,6 +125,56 @@ static sail_status_t convert(int argc, char *argv[]) {
     return SAIL_OK;
 }
 
+static bool special_properties_printf_callback(const char *key, const struct sail_variant *value) {
+
+    printf("  %s : ", key);
+    sail_printf_variant(value);
+    printf("\n");
+
+    return true;
+}
+
+static void print_aligned_image_info(const struct sail_image *image) {
+
+    printf("Size          : %ux%u\n", image->width, image->height);
+
+    if (image->resolution == NULL) {
+        printf("Resolution:   : -\n");
+    } else {
+        printf("Resolution:   : %.1fx%.1f\n", image->resolution->x, image->resolution->y);
+    }
+
+    printf("Pixel format  : %s\n", sail_pixel_format_to_string(image->source_image->pixel_format));
+    printf("ICC profile   : %s\n", image->iccp == NULL ? "no" : "yes");
+    printf("Interlaced    : %s\n", image->source_image->interlaced ? "yes" : "no");
+    printf("Delay         : %d ms.\n", image->delay);
+
+    if (image->meta_data_node != NULL) {
+        printf("Meta data     :\n");
+
+        for (const struct sail_meta_data_node *meta_data_node = image->meta_data_node; meta_data_node != NULL; meta_data_node = meta_data_node->next) {
+            const struct sail_meta_data *meta_data = meta_data_node->meta_data;
+            const char *meta_data_str = NULL;
+
+            if (meta_data->key == SAIL_META_DATA_UNKNOWN) {
+                meta_data_str = meta_data->key_unknown;
+            } else {
+                meta_data_str = sail_meta_data_to_string(meta_data->key);
+            }
+
+            printf("  %-12s: ", meta_data_str);
+            sail_printf_variant(meta_data->value);
+            printf("\n");
+        }
+    }
+
+    if (image->source_image->special_properties != NULL) {
+        printf("Special properties :\n");
+        sail_traverse_hash_map(image->source_image->special_properties,
+                                special_properties_printf_callback);
+    }
+}
+
 static sail_status_t probe_impl(const char *path) {
 
     SAIL_CHECK_PTR(path);
@@ -139,49 +187,14 @@ static sail_status_t probe_impl(const char *path) {
 
     SAIL_TRY(sail_probe_file(path, &image, &codec_info));
 
+    uint64_t elapsed_time = sail_now() - start_time;
+
     printf("File          : %s\n", path);
-    printf("Probe time    : %lu ms.\n", (unsigned long)(sail_now() - start_time));
     printf("Codec         : %s [%s]\n", codec_info->name, codec_info->description);
     printf("Codec version : %s\n", codec_info->version);
-    printf("Size          : %ux%u\n", image->width, image->height);
-    if (image->resolution == NULL) {
-        printf("Resolution:   : -\n");
-    } else {
-        printf("Resolution:   : %.1fx%.1f\n", image->resolution->x, image->resolution->y);
-    }
-    printf("Pixel format  : %s\n", sail_pixel_format_to_string(image->source_image->pixel_format));
-    printf("ICC profile   : %s\n", image->iccp == NULL ? "no" : "yes");
-    printf("Interlaced    : %s\n", image->source_image->interlaced ? "yes" : "no");
+    printf("Probe time    : %lu ms.\n", (unsigned long)elapsed_time);
 
-    for (const struct sail_meta_data_node *meta_data_node = image->meta_data_node; meta_data_node != NULL; meta_data_node = meta_data_node->next) {
-        const struct sail_meta_data *meta_data = meta_data_node->meta_data;
-        const char *meta_data_str = NULL;
-
-        if (meta_data->key == SAIL_META_DATA_UNKNOWN) {
-            meta_data_str = meta_data->key_unknown;
-        } else {
-            meta_data_str = sail_meta_data_to_string(meta_data->key);
-        }
-
-        printf("%-14s: ", meta_data_str);
-
-        switch (meta_data->value->type) {
-            case SAIL_VARIANT_TYPE_BOOL:           printf("%s\n",  sail_variant_to_bool(meta_data->value) ? "<set>" : "<unset>");   break;
-            case SAIL_VARIANT_TYPE_CHAR:           printf("%d\n",  sail_variant_to_char(meta_data->value));                         break;
-            case SAIL_VARIANT_TYPE_UNSIGNED_CHAR:  printf("%u\n",  sail_variant_to_unsigned_char(meta_data->value));                break;
-            case SAIL_VARIANT_TYPE_SHORT:          printf("%d\n",  sail_variant_to_short(meta_data->value));                        break;
-            case SAIL_VARIANT_TYPE_UNSIGNED_SHORT: printf("%u\n",  sail_variant_to_unsigned_short(meta_data->value));               break;
-            case SAIL_VARIANT_TYPE_INT:            printf("%d\n",  sail_variant_to_int(meta_data->value));                          break;
-            case SAIL_VARIANT_TYPE_UNSIGNED_INT:   printf("%u\n",  sail_variant_to_unsigned_int(meta_data->value));                 break;
-            case SAIL_VARIANT_TYPE_LONG:           printf("%ld\n", sail_variant_to_long(meta_data->value));                         break;
-            case SAIL_VARIANT_TYPE_UNSIGNED_LONG:  printf("%lu\n", sail_variant_to_unsigned_long(meta_data->value));                break;
-            case SAIL_VARIANT_TYPE_FLOAT:          printf("%.1f\n", sail_variant_to_float(meta_data->value));                       break;
-            case SAIL_VARIANT_TYPE_DOUBLE:         printf("%.1f\n", sail_variant_to_double(meta_data->value));                      break;
-            case SAIL_VARIANT_TYPE_STRING:         printf("%s\n", sail_variant_to_string(meta_data->value));                        break;
-            case SAIL_VARIANT_TYPE_DATA:           printf("<binary data, length: %u byte(s)>\n", (unsigned)meta_data->value->size); break;
-            case SAIL_VARIANT_TYPE_INVALID:        printf("<invalid value>\n");                                                     break;
-        }
-    }
+    print_aligned_image_info(image);
 
     sail_destroy_image(image);
 
@@ -196,6 +209,61 @@ static sail_status_t probe(int argc, char *argv[]) {
     }
 
     SAIL_TRY(probe_impl(argv[2]));
+
+    return SAIL_OK;
+}
+
+static sail_status_t decode_impl(const char *path) {
+
+    SAIL_CHECK_PTR(path);
+
+    const struct sail_codec_info *codec_info;
+    SAIL_TRY(sail_codec_info_from_path(path, &codec_info));
+
+    printf("File          : %s\n", path);
+    printf("Codec         : %s [%s]\n", codec_info->name, codec_info->description);
+    printf("Codec version : %s\n", codec_info->version);
+
+    /* Time counter. */
+    uint64_t start_time = sail_now();
+
+    /* Decode. */
+    void *state;
+    SAIL_TRY(sail_start_loading_from_file(path, codec_info, &state));
+
+    struct sail_image *image;
+    sail_status_t status;
+    unsigned frame = 0;
+
+    while ((status = sail_load_next_frame(state, &image)) == SAIL_OK) {
+        printf("Frame #%u\n", frame++);
+        print_aligned_image_info(image);
+        sail_destroy_image(image);
+    }
+
+    if (status != SAIL_ERROR_NO_MORE_FRAMES) {
+        sail_stop_loading(state);
+        fprintf(stderr, "Error: Decoder error %d.\n", status);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+    }
+
+    SAIL_TRY(sail_stop_loading(state));
+
+    uint64_t elapsed_time = sail_now() - start_time;
+
+    printf("Decode time   : %lu ms.\n", (unsigned long)elapsed_time);
+
+    return SAIL_OK;
+}
+
+static sail_status_t decode(int argc, char *argv[]) {
+
+    if (argc != 3) {
+        print_invalid_argument();
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+    }
+
+    SAIL_TRY(decode_impl(argv[2]));
 
     return SAIL_OK;
 }
@@ -260,9 +328,13 @@ static void help(const char *app) {
     fprintf(stderr, "       %s [-v | --version]\n", app);
     fprintf(stderr, "       %s [-h | --help]\n", app);
     fprintf(stderr, "Commands:\n");
-    fprintf(stderr, "    convert <INPUT PATH> <OUTPUT PATH> [-c | --compression <value>] - Convert one image format to another.\n");
     fprintf(stderr, "    list [-v] - List supported codecs.\n");
-    fprintf(stderr, "    probe <PATH> - Retrieve image information.\n");
+    fprintf(stderr, "\n");
+    fprintf(stderr, "    convert <INPUT PATH> <OUTPUT PATH> [-c | --compression <value>] - Convert one image format to another.\n");
+    fprintf(stderr, "\n");
+    fprintf(stderr, "    probe <PATH> - Retrieve information of the very first image found in the file.\n");
+    fprintf(stderr, "                   In most cases probing doesn't decode the image data.\n");
+    fprintf(stderr, "    decode <PATH> - Decode the whole file and print information of all its frames.\n");
 }
 
 int main(int argc, char *argv[]) {
@@ -291,6 +363,8 @@ int main(int argc, char *argv[]) {
         SAIL_TRY(list(argc, argv));
     } else if (strcmp(argv[1], "probe") == 0) {
         SAIL_TRY(probe(argc, argv));
+    } else if (strcmp(argv[1], "decode") == 0) {
+        SAIL_TRY(decode(argc, argv));
     } else {
         print_invalid_argument();
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);

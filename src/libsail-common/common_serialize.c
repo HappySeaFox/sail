@@ -104,6 +104,9 @@ const char* sail_pixel_format_to_string(enum SailPixelFormat pixel_format) {
         case SAIL_PIXEL_FORMAT_BPP32_CMYK:            return "BPP32-CMYK";
         case SAIL_PIXEL_FORMAT_BPP64_CMYK:            return "BPP64-CMYK";
 
+        case SAIL_PIXEL_FORMAT_BPP40_CMYKA:           return "BPP40-CMYKA";
+        case SAIL_PIXEL_FORMAT_BPP80_CMYKA:           return "BPP80-CMYKA";
+
         case SAIL_PIXEL_FORMAT_BPP24_YCBCR:           return "BPP24-YCBCR";
 
         case SAIL_PIXEL_FORMAT_BPP32_YCCK:            return "BPP32-YCCK";
@@ -213,6 +216,9 @@ enum SailPixelFormat sail_pixel_format_from_string(const char *str) {
 
         case UINT64_C(8244605667720923565):  return SAIL_PIXEL_FORMAT_BPP32_CMYK;
         case UINT64_C(8244605671673598258):  return SAIL_PIXEL_FORMAT_BPP64_CMYK;
+
+        case UINT64_C(13817570042892262125): return SAIL_PIXEL_FORMAT_BPP40_CMYKA;
+        case UINT64_C(13817570213366034033): return SAIL_PIXEL_FORMAT_BPP80_CMYKA;
 
         case UINT64_C(13817569962846953645): return SAIL_PIXEL_FORMAT_BPP24_YCBCR;
 
@@ -416,6 +422,7 @@ const char* sail_meta_data_to_string(enum SailMetaData meta_data) {
         case SAIL_META_DATA_ID:               return "ID";
         case SAIL_META_DATA_IPTC:             return "IPTC";
         case SAIL_META_DATA_JOB:              return "Job";
+        case SAIL_META_DATA_JUMBF:            return "JUMBF";
         case SAIL_META_DATA_LABEL:            return "Label";
         case SAIL_META_DATA_MAKE:             return "Make";
         case SAIL_META_DATA_MODEL:            return "Model";
@@ -452,6 +459,7 @@ enum SailMetaData sail_meta_data_from_string(const char *str) {
         case UINT64_C(5862386):              return SAIL_META_DATA_ID;
         case UINT64_C(6384154261):           return SAIL_META_DATA_IPTC;
         case UINT64_C(193461344):            return SAIL_META_DATA_JOB;
+        case UINT64_C(210678448633):         return SAIL_META_DATA_JUMBF;
         case UINT64_C(210681275781):         return SAIL_META_DATA_LABEL;
         case UINT64_C(6384317315):           return SAIL_META_DATA_MAKE;
         case UINT64_C(210682966998):         return SAIL_META_DATA_MODEL;

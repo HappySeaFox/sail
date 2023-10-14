@@ -313,3 +313,60 @@ bool sail_equal_variants(const struct sail_variant *variant1, const struct sail_
         return memcmp(variant1->value, variant2->value, variant1->size) == 0;
     }
 }
+
+int sail_printf_variant(const struct sail_variant *variant) {
+
+    return sail_fprintf_variant(variant, stdout);
+}
+
+int sail_fprintf_variant(const struct sail_variant *variant, FILE *f) {
+
+    if (variant == NULL) {
+        return -1;
+    }
+
+    switch (variant->type) {
+        case SAIL_VARIANT_TYPE_BOOL:           return fprintf(f, "%s",  sail_variant_to_bool(variant) ? "true" : "false");
+        case SAIL_VARIANT_TYPE_CHAR:           return fprintf(f, "%d",  sail_variant_to_char(variant));
+        case SAIL_VARIANT_TYPE_UNSIGNED_CHAR:  return fprintf(f, "%u",  sail_variant_to_unsigned_char(variant));
+        case SAIL_VARIANT_TYPE_SHORT:          return fprintf(f, "%d",  sail_variant_to_short(variant));
+        case SAIL_VARIANT_TYPE_UNSIGNED_SHORT: return fprintf(f, "%u",  sail_variant_to_unsigned_short(variant));
+        case SAIL_VARIANT_TYPE_INT:            return fprintf(f, "%d",  sail_variant_to_int(variant));
+        case SAIL_VARIANT_TYPE_UNSIGNED_INT:   return fprintf(f, "%u",  sail_variant_to_unsigned_int(variant));
+        case SAIL_VARIANT_TYPE_LONG:           return fprintf(f, "%ld", sail_variant_to_long(variant));
+        case SAIL_VARIANT_TYPE_UNSIGNED_LONG:  return fprintf(f, "%lu", sail_variant_to_unsigned_long(variant));
+        case SAIL_VARIANT_TYPE_FLOAT:          return fprintf(f, "%f",  sail_variant_to_float(variant));
+        case SAIL_VARIANT_TYPE_DOUBLE:         return fprintf(f, "%f",  sail_variant_to_double(variant));
+        case SAIL_VARIANT_TYPE_STRING:         return fprintf(f, "%s",  sail_variant_to_string(variant));
+        case SAIL_VARIANT_TYPE_DATA:           return fprintf(f, "<binary data, %u byte(s)>", (unsigned)variant->size);
+        case SAIL_VARIANT_TYPE_INVALID:        return fprintf(f, "<invalid value>");
+    }
+
+    return 0;
+}
+
+int sail_snprintf_variant(const struct sail_variant *variant, char *str, size_t str_size) {
+
+    if (variant == NULL) {
+        return -1;
+    }
+
+    switch (variant->type) {
+        case SAIL_VARIANT_TYPE_BOOL:           return snprintf(str, str_size, "%s",  sail_variant_to_bool(variant) ? "true" : "false");
+        case SAIL_VARIANT_TYPE_CHAR:           return snprintf(str, str_size, "%d",  sail_variant_to_char(variant));
+        case SAIL_VARIANT_TYPE_UNSIGNED_CHAR:  return snprintf(str, str_size, "%u",  sail_variant_to_unsigned_char(variant));
+        case SAIL_VARIANT_TYPE_SHORT:          return snprintf(str, str_size, "%d",  sail_variant_to_short(variant));
+        case SAIL_VARIANT_TYPE_UNSIGNED_SHORT: return snprintf(str, str_size, "%u",  sail_variant_to_unsigned_short(variant));
+        case SAIL_VARIANT_TYPE_INT:            return snprintf(str, str_size, "%d",  sail_variant_to_int(variant));
+        case SAIL_VARIANT_TYPE_UNSIGNED_INT:   return snprintf(str, str_size, "%u",  sail_variant_to_unsigned_int(variant));
+        case SAIL_VARIANT_TYPE_LONG:           return snprintf(str, str_size, "%ld", sail_variant_to_long(variant));
+        case SAIL_VARIANT_TYPE_UNSIGNED_LONG:  return snprintf(str, str_size, "%lu", sail_variant_to_unsigned_long(variant));
+        case SAIL_VARIANT_TYPE_FLOAT:          return snprintf(str, str_size, "%f",  sail_variant_to_float(variant));
+        case SAIL_VARIANT_TYPE_DOUBLE:         return snprintf(str, str_size, "%f",  sail_variant_to_double(variant));
+        case SAIL_VARIANT_TYPE_STRING:         return snprintf(str, str_size, "%s",  sail_variant_to_string(variant));
+        case SAIL_VARIANT_TYPE_DATA:           return snprintf(str, str_size, "<binary data, %u byte(s)>", (unsigned)variant->size);
+        case SAIL_VARIANT_TYPE_INVALID:        return snprintf(str, str_size, "<invalid value>");
+    }
+
+    return 0;
+}

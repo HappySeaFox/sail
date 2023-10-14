@@ -117,11 +117,31 @@ static MunitResult test_iccp_from_shallow_data(const MunitParameter params[], vo
     return MUNIT_OK;
 }
 
+static MunitResult test_iccp_for_data(const MunitParameter params[], void *user_data) {
+    (void)params;
+    (void)user_data;
+
+    const unsigned data_length = 1024;
+
+    struct sail_iccp *iccp = NULL;
+    munit_assert(sail_alloc_iccp_for_data(data_length, &iccp) == SAIL_OK);
+    munit_assert_not_null(iccp);
+
+    munit_assert_not_null(iccp->data);
+
+    memset(iccp->data, 15, data_length);
+
+    sail_destroy_iccp(iccp);
+
+    return MUNIT_OK;
+}
+
 static MunitTest test_suite_tests[] = {
     { (char *)"/alloc", test_alloc_iccp, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/copy", test_copy_iccp, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/from-data", test_iccp_from_data, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/from-shallow-data", test_iccp_from_shallow_data, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/for-data", test_iccp_for_data, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };
