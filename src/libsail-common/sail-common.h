@@ -35,7 +35,6 @@
     #include "common_serialize.h"
     #include "compiler_specifics.h"
     #include "compression_level.h"
-    #include "error.h"
     #include "export.h"
     #include "hash_map.h"
     #include "hash_map_p.h"
@@ -55,6 +54,7 @@
     #include "save_features.h"
     #include "save_options.h"
     #include "source_image.h"
+    #include "status.h"
     #include "string_node.h"
     #include "utils.h"
     #include "variant.h"
@@ -66,7 +66,6 @@
     #include <sail-common/common_serialize.h>
     #include <sail-common/compiler_specifics.h>
     #include <sail-common/compression_level.h>
-    #include <sail-common/error.h>
     #include <sail-common/export.h>
     #include <sail-common/hash_map.h>
     #include <sail-common/iccp.h>
@@ -84,6 +83,7 @@
     #include <sail-common/save_features.h>
     #include <sail-common/save_options.h>
     #include <sail-common/source_image.h>
+    #include <sail-common/status.h>
     #include <sail-common/string_node.h>
     #include <sail-common/utils.h>
     #include <sail-common/variant.h>

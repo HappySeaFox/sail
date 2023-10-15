@@ -27,15 +27,15 @@
 #define SAIL_CONVERSION_OPTIONS_H
 
 #ifdef SAIL_BUILD
-    #include "error.h"
     #include "export.h"
     #include "pixel.h"
+    #include "status.h"
 
     #include "manip_common.h"
 #else
-    #include <sail-common/error.h>
     #include <sail-common/export.h>
     #include <sail-common/pixel.h>
+    #include <sail-common/status.h>
 
     #include <sail-manip/manip_common.h>
 #endif

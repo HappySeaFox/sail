@@ -32,8 +32,8 @@
 #include <png.h>
 
 #include "common.h"
-#include "error.h"
 #include "export.h"
+#include "status.h"
 
 struct sail_hash_map;
 struct sail_iccp;

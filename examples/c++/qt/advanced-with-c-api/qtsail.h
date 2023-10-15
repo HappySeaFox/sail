@@ -30,7 +30,7 @@
 #include <QScopedPointer>
 #include <QVector>
 
-#include <sail-common/error.h>
+#include <sail-common/status.h>
 
 namespace Ui {
     class QtSail;

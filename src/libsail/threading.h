@@ -29,11 +29,11 @@
 #include "config.h"
 
 #ifdef SAIL_BUILD
-    #include "error.h"
     #include "export.h"
+    #include "status.h"
 #else
-    #include <sail-common/error.h>
     #include <sail-common/export.h>
+    #include <sail-common/status.h>
 #endif
 
 #ifdef SAIL_WIN32

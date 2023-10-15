@@ -30,14 +30,14 @@
 
 #ifdef SAIL_BUILD
     #include "common.h"
-    #include "error.h"
     #include "export.h"
+    #include "status.h"
 
     #include "special_properties-c++.h"
 #else
     #include <sail-common/common.h>
-    #include <sail-common/error.h>
     #include <sail-common/export.h>
+    #include <sail-common/status.h>
 
     #include <sail-c++/special_properties-c++.h>
 #endif

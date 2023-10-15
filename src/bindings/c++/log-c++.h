@@ -27,13 +27,13 @@
 #define SAIL_LOG_CPP_H
 
 #ifdef SAIL_BUILD
-    #include "error.h"
     #include "export.h"
     #include "log.h"
+    #include "status.h"
 #else
-    #include <sail-common/error.h>
     #include <sail-common/export.h>
     #include <sail-common/log.h>
+    #include <sail-common/status.h>
 #endif
 
 namespace sail

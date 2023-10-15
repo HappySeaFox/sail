@@ -28,8 +28,8 @@
 
 #include <stdint.h>
 
-#include "error.h"
 #include "export.h"
+#include "status.h"
 
 struct sail_conversion_options;
 struct sail_palette;

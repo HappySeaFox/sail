@@ -30,7 +30,7 @@
 #include <QScopedPointer>
 #include <QImage>
 
-#include <sail-common/error.h>
+#include <sail-common/status.h>
 
 namespace Ui {
     class QtSail;

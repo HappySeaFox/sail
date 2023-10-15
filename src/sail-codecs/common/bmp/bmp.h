@@ -26,8 +26,8 @@
 #ifndef SAIL_BMP_COMMON_H
 #define SAIL_BMP_COMMON_H
 
-#include "error.h"
 #include "export.h"
+#include "status.h"
 
 struct sail_image;
 struct sail_io;

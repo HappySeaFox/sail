@@ -35,9 +35,9 @@
  */
 
 #ifdef SAIL_BUILD
-#include "error.h"
+#include "status.h"
 #else
-#include <sail-common/error.h>
+#include <sail-common/status.h>
 #endif
 
 #ifdef __cplusplus

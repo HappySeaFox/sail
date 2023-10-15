@@ -29,8 +29,8 @@
 #include <gif_lib.h>
 
 #include "common.h"
-#include "error.h"
 #include "export.h"
+#include "status.h"
 
 struct sail_meta_data_node;
 

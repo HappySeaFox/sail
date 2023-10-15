@@ -29,13 +29,13 @@
 #include <stddef.h> /* size_t */
 
 #ifdef SAIL_BUILD
-    #include "error.h"
     #include "export.h"
+    #include "status.h"
 
     #include "codec_priority.h"
 #else
-    #include <sail-common/error.h>
     #include <sail-common/export.h>
+    #include <sail-common/status.h>
 
     #include <sail/codec_priority.h>
 #endif

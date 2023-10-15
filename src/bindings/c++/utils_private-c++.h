@@ -27,8 +27,8 @@
 #define SAIL_UTILS_PRIVATE_CPP_H
 
 #ifdef SAIL_BUILD
-    #include "error.h"
     #include "export.h"
+    #include "status.h"
 
     #include "tuning-c++.h"
 #else

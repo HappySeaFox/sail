@@ -23,8 +23,8 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_ERROR_H
-#define SAIL_ERROR_H
+#ifndef SAIL_STATUS_H
+#define SAIL_STATUS_H
 
 #ifdef SAIL_BUILD
     #include "compiler_specifics.h"

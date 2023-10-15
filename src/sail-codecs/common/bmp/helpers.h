@@ -29,9 +29,9 @@
 #include <stdint.h>
 
 #include "common.h"
-#include "error.h"
 #include "export.h"
 #include "pixel.h"
+#include "status.h"
 
 struct sail_iccp;
 struct sail_io;

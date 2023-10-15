@@ -31,13 +31,13 @@
 #include <cstdio> /* seek whence */
 
 #ifdef SAIL_BUILD
-    #include "error.h"
     #include "export.h"
+    #include "status.h"
 
     #include "codec_info-c++.h"
 #else
-    #include <sail-common/error.h>
     #include <sail-common/export.h>
+    #include <sail-common/status.h>
 
     #include <sail-c++/codec_info-c++.h>
 #endif

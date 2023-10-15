@@ -33,8 +33,8 @@
 
 #ifdef SAIL_BUILD
     #include "common.h"
-    #include "error.h"
     #include "export.h"
+    #include "status.h"
 
     #include "iccp-c++.h"
     #include "palette-c++.h"
@@ -42,8 +42,8 @@
     #include "resolution-c++.h"
 #else
     #include <sail-common/common.h>
-    #include <sail-common/error.h>
     #include <sail-common/export.h>
+    #include <sail-common/status.h>
 
     #include <sail-c++/iccp-c++.h>
     #include <sail-c++/palette-c++.h>

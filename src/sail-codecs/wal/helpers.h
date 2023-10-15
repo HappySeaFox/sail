@@ -27,8 +27,8 @@
 #define SAIL_WAL_HELPERS_H
 
 #include "common.h"
-#include "error.h"
 #include "export.h"
+#include "status.h"
 
 struct WalFileHeader
 {

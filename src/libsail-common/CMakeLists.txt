@@ -13,7 +13,6 @@ add_library(sail-common
                 compiler_specifics.h
                 compression_level.h
                 compression_level.c
-                error.h
                 export.h
                 hash_map.c
                 hash_map.h
@@ -51,6 +50,7 @@ add_library(sail-common
                 save_options.h
                 source_image.c
                 source_image.h
+                status.h
                 string_node.c
                 string_node.h
                 utils.c
@@ -66,7 +66,6 @@ set(PUBLIC_HEADERS common.h
                    common_serialize.h
                    compiler_specifics.h
                    compression_level.h
-                   error.h
                    export.h
                    hash_map.h
                    iccp.h
@@ -85,6 +84,7 @@ set(PUBLIC_HEADERS common.h
                    save_features.h
                    save_options.h
                    source_image.h
+                   status.h
                    string_node.h
                    utils.h
                    variant.h

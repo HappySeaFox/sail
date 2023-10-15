@@ -27,13 +27,13 @@
 #define SAIL_CODEC_H
 
 #ifdef SAIL_BUILD
-    #include "error.h"
     #include "export.h"
+    #include "status.h"
 
     #include "layout/v8_pointers.h"
 #else
-    #include <sail-common/error.h>
     #include <sail-common/export.h>
+    #include <sail-common/status.h>
 
     #include <sail/layout/v8_pointers.h>
 #endif

@@ -29,8 +29,8 @@
 #include <stdint.h>
 
 #include "common.h"
-#include "error.h"
 #include "export.h"
+#include "status.h"
 
 /* PSD pixel formats. */
 enum SailPsdMode {

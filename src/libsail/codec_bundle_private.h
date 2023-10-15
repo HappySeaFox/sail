@@ -27,11 +27,11 @@
 #define SAIL_CODEC_BUNDLE_PRIVATE_H
 
 #ifdef SAIL_BUILD
-    #include "error.h"
     #include "export.h"
+    #include "status.h"
 #else
-    #include <sail-common/error.h>
     #include <sail-common/export.h>
+    #include <sail-common/status.h>
 #endif
 
 struct sail_codec_bundle;
