@@ -55,7 +55,8 @@ struct sail_palette {
     enum SailPixelFormat pixel_format;
 
     /*
-     * Pixel data.
+     * Pixel data. The channels are interleaved per pixel. The pixel data has no gaps, i.e.:
+     * RGBRGB...
      *
      * LOAD: Set by SAIL to a valid pixel array if the image is indexed.
      * SAVE: Must be allocated and set by a caller to a valid pixel array if the image is indexed.

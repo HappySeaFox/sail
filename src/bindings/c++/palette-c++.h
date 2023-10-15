@@ -63,6 +63,8 @@ public:
     /*
      * Constructs palette from the data. The palette stays invalid if the pixel format
      * is SAIL_PIXEL_FORMAT_UNKNOWN, or the color count is 0, or the data is null.
+     * The channels are interleaved per pixel. The pixel data must not have gaps, i.e.:
+     * RGBRGB...
      */
     palette(SailPixelFormat pixel_format, const void *data, unsigned color_count);
 
@@ -70,6 +72,9 @@ public:
      * Constructs palette from the data. Calculates the color count from the data size
      * and the pixel format. The palette stays invalid if the pixel format
      * is SAIL_PIXEL_FORMAT_UNKNOWN or the data is empty.
+     *
+     * The channels are interleaved per pixel. The pixel data must not have gaps, i.e.:
+     * RGBRGB...
      */
     palette(SailPixelFormat pixel_format, const arbitrary_data &data);
 
@@ -109,7 +114,8 @@ public:
     SailPixelFormat pixel_format() const;
 
     /*
-     * Returns the palette pixel data.
+     * Returns the palette pixel data. The channels are interleaved per pixel.
+     * The pixel data has no gaps, i.e.: RGBRGB...
      */
     const arbitrary_data& data() const;
 
