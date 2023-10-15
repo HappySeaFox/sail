@@ -133,12 +133,6 @@ enum SailPixelFormat {
     SAIL_PIXEL_FORMAT_BPP64_ABGR,
 
     /*
-     * Float formats.
-     */
-    SAIL_PIXEL_FORMAT_BPP16_FLOAT,
-    SAIL_PIXEL_FORMAT_BPP32_FLOAT,
-
-    /*
      * CMYK formats.
      */
     SAIL_PIXEL_FORMAT_BPP32_CMYK,

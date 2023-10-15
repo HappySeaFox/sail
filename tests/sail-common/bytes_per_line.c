@@ -166,22 +166,6 @@ static MunitResult test_rgba(const MunitParameter params[], void *user_data) {
     return MUNIT_OK;
 }
 
-static MunitResult test_float(const MunitParameter params[], void *user_data) {
-
-    (void)params;
-    (void)user_data;
-
-    /* 16-bit FLOAT. */
-    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP16_FLOAT) == 20);
-    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP16_FLOAT) == 22);
-
-    /* 32-bit FLOAT. */
-    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP32_FLOAT) == 40);
-    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP32_FLOAT) == 44);
-
-    return MUNIT_OK;
-}
-
 static MunitResult test_cmyk(const MunitParameter params[], void *user_data) {
 
     (void)params;
@@ -253,7 +237,6 @@ static MunitTest test_suite_tests[] = {
     { (char *)"/rgb-555-565",     test_rgb_555_565,     NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/rgb",             test_rgb,             NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/rgba",            test_rgba,            NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/float",           test_float,           NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/cmyk",            test_cmyk,            NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/ycbcr",           test_ycbcr,           NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/ycck",            test_ycck,            NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
