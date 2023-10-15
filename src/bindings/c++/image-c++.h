@@ -26,6 +26,7 @@
 #ifndef SAIL_IMAGE_CPP_H
 #define SAIL_IMAGE_CPP_H
 
+#include <cstddef> /* std::size_t */
 #include <memory>
 #include <string>
 #include <vector>
@@ -278,7 +279,7 @@ public:
     /*
      * Returns the size of the pixel data in bytes.
      */
-    unsigned pixels_size() const;
+    std::size_t pixels_size() const;
 
     /*
      * Sets a new resolution.
@@ -716,9 +717,9 @@ private:
     void set_bytes_per_line(unsigned bytes_per_line);
     void set_bytes_per_line_auto();
     void set_pixels(const void *pixels);
-    void set_pixels(const void *pixels, unsigned pixels_size);
+    void set_pixels(const void *pixels, std::size_t pixels_size);
     void set_shallow_pixels(void *pixels);
-    void set_shallow_pixels(void *pixels, unsigned pixels_size);
+    void set_shallow_pixels(void *pixels, std::size_t pixels_size);
     void set_source_image(const sail::source_image &source_image);
 
 private:

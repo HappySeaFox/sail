@@ -73,7 +73,7 @@ public:
     std::vector<sail::meta_data> meta_data;
     sail::iccp iccp;
     sail::source_image source_image;
-    unsigned pixels_size;
+    std::size_t pixels_size;
     bool shallow_pixels;
 };
 
@@ -246,7 +246,7 @@ const void* image::scan_line(unsigned i) const
     return reinterpret_cast<const char *>(pixels()) + i * bytes_per_line();
 }
 
-unsigned image::pixels_size() const
+std::size_t image::pixels_size() const
 {
     return d->pixels_size;
 }
@@ -387,7 +387,7 @@ sail_status_t image::convert(SailPixelFormat pixel_format, const conversion_opti
     d->sail_image->bytes_per_line = sail_image_output->bytes_per_line;
     d->sail_image->pixel_format   = sail_image_output->pixel_format;
     d->sail_image->pixels         = sail_image_output->pixels;
-    d->pixels_size                = sail_image_output->height * sail_image_output->bytes_per_line;
+    d->pixels_size                = static_cast<std::size_t>(sail_image_output->height) * sail_image_output->bytes_per_line;
     d->shallow_pixels             = false;
 
     sail_image_output->pixels = nullptr;
@@ -667,7 +667,7 @@ sail_status_t image::transfer_pixels_pointer(const sail_image *sail_image)
     }
 
     d->sail_image->pixels = sail_image->pixels;
-    d->pixels_size        = sail_image->height * sail_image->bytes_per_line;
+    d->pixels_size        = static_cast<std::size_t>(sail_image->height) * sail_image->bytes_per_line;
 
     return SAIL_OK;
 }
@@ -762,7 +762,7 @@ void image::set_pixels(const void *pixels)
     set_pixels(pixels, height() * bytes_per_line());
 }
 
-void image::set_pixels(const void *pixels, unsigned pixels_size)
+void image::set_pixels(const void *pixels, std::size_t pixels_size)
 {
     d->reset_pixels();
 
@@ -783,7 +783,7 @@ void image::set_shallow_pixels(void *pixels)
     set_shallow_pixels(pixels, height() * bytes_per_line());
 }
 
-void image::set_shallow_pixels(void *pixels, unsigned pixels_size)
+void image::set_shallow_pixels(void *pixels, std::size_t pixels_size)
 {
     d->reset_pixels();
 
