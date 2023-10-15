@@ -51,10 +51,10 @@ iccp::iccp()
 {
 }
 
-iccp::iccp(const void *data, unsigned data_length)
+iccp::iccp(const void *data, std::size_t data_size)
     : iccp()
 {
-    set_data(data, data_length);
+    set_data(data, data_size);
 }
 
 iccp::iccp(const arbitrary_data &data)
@@ -106,16 +106,16 @@ const arbitrary_data& iccp::data() const
     return d->data;
 }
 
-void iccp::set_data(const void *data, unsigned data_length)
+void iccp::set_data(const void *data, std::size_t data_size)
 {
     d->reset();
 
-    copy(data, data_length);
+    copy(data, data_size);
 }
 
 void iccp::set_data(const arbitrary_data &data)
 {
-    set_data(data.data(), static_cast<unsigned>(data.size()));
+    set_data(data.data(), data.size());
 }
 
 iccp::iccp(const sail_iccp *ic)
@@ -126,7 +126,7 @@ iccp::iccp(const sail_iccp *ic)
         return;
     }
 
-    set_data(ic->data, ic->data_length);
+    set_data(ic->data, ic->size);
 }
 
 sail_status_t iccp::to_sail_iccp(sail_iccp **iccp) const
@@ -134,19 +134,19 @@ sail_status_t iccp::to_sail_iccp(sail_iccp **iccp) const
     SAIL_CHECK_PTR(iccp);
 
     sail_iccp *iccp_local;
-    SAIL_TRY(sail_alloc_iccp_from_data(d->data.data(), static_cast<unsigned>(d->data.size()), &iccp_local));
+    SAIL_TRY(sail_alloc_iccp_from_data(d->data.data(), static_cast<std::size_t>(d->data.size()), &iccp_local));
 
     *iccp = iccp_local;
 
     return SAIL_OK;
 }
 
-void iccp::copy(const void *data, unsigned data_length)
+void iccp::copy(const void *data, std::size_t data_size)
 {
-    d->data.resize(data_length);
+    d->data.resize(data_size);
 
-    if (data_length > 0) {
-        memcpy(d->data.data(), data, data_length);
+    if (data_size > 0) {
+        memcpy(d->data.data(), data, data_size);
     }
 }
 

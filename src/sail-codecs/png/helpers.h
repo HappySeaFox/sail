@@ -59,7 +59,7 @@ SAIL_HIDDEN sail_status_t png_private_fetch_iccp(png_structp png_ptr, png_infop 
 SAIL_HIDDEN sail_status_t png_private_fetch_palette(png_structp png_ptr, png_infop info_ptr, struct sail_palette **palette);
 
 #ifdef PNG_APNG_SUPPORTED
-SAIL_HIDDEN sail_status_t png_private_blend_source(void *dst_raw, unsigned dst_offset, const void *src_raw, unsigned src_length, unsigned bytes_per_pixel);
+SAIL_HIDDEN sail_status_t png_private_blend_source(void *dst_raw, unsigned dst_offset, const void *src_raw, unsigned src_width, unsigned bytes_per_pixel);
 
 SAIL_HIDDEN sail_status_t png_private_blend_over(void *dst_raw, unsigned dst_offset, const void *src_raw, unsigned width, enum SailPixelFormat pixel_format);
 

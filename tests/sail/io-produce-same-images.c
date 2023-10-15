@@ -43,17 +43,17 @@ static MunitResult test_io_produce_same_images(const MunitParameter params[], vo
     munit_assert_not_null(image_file);
 
     void *data;
-    size_t data_length;
-    munit_assert(sail_alloc_data_from_file_contents(path, &data, &data_length) == SAIL_OK);
+    size_t data_size;
+    munit_assert(sail_alloc_data_from_file_contents(path, &data, &data_size) == SAIL_OK);
     munit_assert_not_null(data);
-    munit_assert(data_length > 0);
+    munit_assert(data_size > 0);
 
     /* Codec info for loading from memory. */
     const struct sail_codec_info *codec_info;
     munit_assert(sail_codec_info_from_path(path, &codec_info) == SAIL_OK);
 
     void *state;
-    munit_assert(sail_start_loading_from_memory(data, data_length, codec_info, &state) == SAIL_OK);
+    munit_assert(sail_start_loading_from_memory(data, data_size, codec_info, &state) == SAIL_OK);
 
     struct sail_image *image_mem = NULL;
     munit_assert(sail_load_next_frame(state, &image_mem) == SAIL_OK);

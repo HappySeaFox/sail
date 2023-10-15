@@ -148,7 +148,7 @@ SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_path(const char *
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_memory(const void *buffer, size_t buffer_length,
+SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_memory(const void *buffer, size_t buffer_size,
                                                                       const struct sail_codec_info **codec_info);
 
 /*

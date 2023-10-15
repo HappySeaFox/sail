@@ -173,7 +173,7 @@ public:
      *                image_input::next_frame()       ->
      *                image_input::stop().
      */
-    static codec_info from_magic_number(const void *buffer, size_t buffer_length);
+    static codec_info from_magic_number(const void *buffer, size_t buffer_size);
 
     /*
      * Returns a first codec info object that supports the magic number read from the specified I/O source.

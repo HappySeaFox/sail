@@ -115,7 +115,7 @@ sail_status_t avif_private_fetch_iccp(const struct avifRWData *avif_iccp, struct
     SAIL_CHECK_PTR(iccp);
 
     if (avif_iccp->data != NULL) {
-        SAIL_TRY(sail_alloc_iccp_from_data(avif_iccp->data, (unsigned)avif_iccp->size, iccp));
+        SAIL_TRY(sail_alloc_iccp_from_data(avif_iccp->data, avif_iccp->size, iccp));
         SAIL_LOG_DEBUG("AVIF: Found ICC profile %u bytes long", (unsigned)avif_iccp->size);
     } else {
         SAIL_LOG_DEBUG("AVIF: ICC profile is not found");

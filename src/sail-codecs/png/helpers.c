@@ -61,7 +61,7 @@ static sail_status_t skip_raw_profile_header(const char *data, const char **star
     return SAIL_OK;
 }
 
-static sail_status_t write_raw_profile_header(char *str, size_t str_size, enum SailMetaData key, size_t hex_data_length) {
+static sail_status_t write_raw_profile_header(char *str, size_t str_size, enum SailMetaData key, size_t hex_data_size) {
 
     SAIL_CHECK_PTR(str);
 
@@ -79,7 +79,7 @@ static sail_status_t write_raw_profile_header(char *str, size_t str_size, enum S
     }
 
     /* Write "\nexif\n    1234\n" before the actual HEX-encoded data. */
-    if (snprintf(str, str_size, "\n%s\n    %u\n", key_str, (unsigned)hex_data_length) < 0) {
+    if (snprintf(str, str_size, "\n%s\n    %u\n", key_str, (unsigned)hex_data_size) < 0) {
         SAIL_LOG_ERROR("PNG: Failed to save raw profile header");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
@@ -331,9 +331,9 @@ sail_status_t png_private_fetch_meta_data(png_structp png_ptr, png_infop info_pt
     }
 
     png_bytep exif;
-    png_uint_32 exif_length;
+    png_uint_32 exif_size;
 
-    if (png_get_eXIf_1(png_ptr, info_ptr, &exif_length, &exif) != 0) {
+    if (png_get_eXIf_1(png_ptr, info_ptr, &exif_size, &exif) != 0) {
         struct sail_meta_data_node *meta_data_node;
 
         SAIL_TRY(sail_alloc_meta_data_node(&meta_data_node));
@@ -341,7 +341,7 @@ sail_status_t png_private_fetch_meta_data(png_structp png_ptr, png_infop info_pt
                             /* cleanup */ sail_destroy_meta_data_node(meta_data_node));
         SAIL_TRY_OR_CLEANUP(sail_alloc_variant(&meta_data_node->meta_data->value),
                             /* cleanup */ sail_destroy_meta_data_node(meta_data_node));
-        SAIL_TRY_OR_CLEANUP(sail_set_variant_data(meta_data_node->meta_data->value, exif, exif_length),
+        SAIL_TRY_OR_CLEANUP(sail_set_variant_data(meta_data_node->meta_data->value, exif, exif_size),
                             /* cleanup */ sail_destroy_meta_data_node(meta_data_node));
 
         *last_meta_data_node = meta_data_node;
@@ -459,18 +459,18 @@ sail_status_t png_private_fetch_iccp(png_structp png_ptr, png_infop info_ptr, st
     char *name;
     int compression;
     png_bytep data;
-    unsigned data_length;
+    unsigned data_size;
 
     bool ok = png_get_iCCP(png_ptr,
                            info_ptr,
                            &name,
                            &compression,
                            &data,
-                           &data_length) == PNG_INFO_iCCP;
+                           &data_size) == PNG_INFO_iCCP;
 
     if (ok) {
-        SAIL_TRY(sail_alloc_iccp_from_data(data, data_length, iccp));
-        SAIL_LOG_DEBUG("PNG: Found ICC profile '%s' %u bytes long", name, data_length);
+        SAIL_TRY(sail_alloc_iccp_from_data(data, data_size, iccp));
+        SAIL_LOG_DEBUG("PNG: Found ICC profile '%s' %u bytes long", name, data_size);
     } else {
         SAIL_LOG_DEBUG("PNG: ICC profile is not found");
     }
@@ -526,14 +526,14 @@ sail_status_t png_private_fetch_palette(png_structp png_ptr, png_infop info_ptr,
 }
 
 #ifdef PNG_APNG_SUPPORTED
-sail_status_t png_private_blend_source(void *dst_raw, unsigned dst_offset, const void *src_raw, unsigned src_length, unsigned bytes_per_pixel) {
+sail_status_t png_private_blend_source(void *dst_raw, unsigned dst_offset, const void *src_raw, unsigned src_width, unsigned bytes_per_pixel) {
 
     SAIL_CHECK_PTR(dst_raw);
     SAIL_CHECK_PTR(src_raw);
 
     memcpy((uint8_t *)dst_raw + dst_offset * bytes_per_pixel,
             src_raw,
-            (size_t)src_length * bytes_per_pixel);
+            (size_t)src_width * bytes_per_pixel);
 
     return SAIL_OK;
 }

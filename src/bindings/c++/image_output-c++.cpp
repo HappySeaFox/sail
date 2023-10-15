@@ -93,8 +93,8 @@ image_output::image_output(const std::string &path)
 {
 }
 
-image_output::image_output(void *buffer, std::size_t buffer_length, const sail::codec_info &codec_info)
-    : d(new pimpl(new io_memory(buffer, buffer_length), codec_info))
+image_output::image_output(void *buffer, std::size_t buffer_size, const sail::codec_info &codec_info)
+    : d(new pimpl(new io_memory(buffer, buffer_size), codec_info))
 {
 }
 

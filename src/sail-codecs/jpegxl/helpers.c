@@ -172,7 +172,7 @@ sail_status_t jpegxl_private_fetch_iccp(JxlDecoder *decoder, struct sail_iccp **
 #endif
                                         JXL_COLOR_PROFILE_TARGET_DATA,
                                         iccp_local->data,
-                                        iccp_local->data_length) != JXL_DEC_SUCCESS) {
+                                        iccp_local->size) != JXL_DEC_SUCCESS) {
         sail_destroy_iccp(iccp_local);
         SAIL_LOG_ERROR("JPEGXL: Failed to get ICC profile");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);

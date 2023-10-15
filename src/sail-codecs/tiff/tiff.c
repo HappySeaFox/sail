@@ -302,7 +302,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_tiff(void *state, c
 
     /* Save ICC profile. */
     if (tiff_state->save_options->options & SAIL_OPTION_ICCP && image->iccp != NULL) {
-        TIFFSetField(tiff_state->tiff, TIFFTAG_ICCPROFILE, image->iccp->data_length, image->iccp->data);
+        TIFFSetField(tiff_state->tiff, TIFFTAG_ICCPROFILE, image->iccp->size, image->iccp->data);
         SAIL_LOG_DEBUG("TIFF: ICC profile has been saved");
     }
 

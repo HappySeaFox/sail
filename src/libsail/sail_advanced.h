@@ -66,7 +66,7 @@ SAIL_EXPORT sail_status_t sail_probe_io(struct sail_io *io, struct sail_image **
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_probe_memory(const void *buffer, size_t buffer_length,
+SAIL_EXPORT sail_status_t sail_probe_memory(const void *buffer, size_t buffer_size,
                                             struct sail_image **image, const struct sail_codec_info **codec_info);
 
 /*
@@ -104,7 +104,7 @@ SAIL_EXPORT sail_status_t sail_start_loading_from_file(const char *path, const s
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_start_loading_from_memory(const void *buffer, size_t buffer_length,
+SAIL_EXPORT sail_status_t sail_start_loading_from_memory(const void *buffer, size_t buffer_size,
                                                          const struct sail_codec_info *codec_info, void **state);
 
 /*
@@ -161,7 +161,7 @@ SAIL_EXPORT sail_status_t sail_start_saving_into_file(const char *path, const st
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_start_saving_into_memory(void *buffer, size_t buffer_length,
+SAIL_EXPORT sail_status_t sail_start_saving_into_memory(void *buffer, size_t buffer_size,
                                                         const struct sail_codec_info *codec_info, void **state);
 
 /*

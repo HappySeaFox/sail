@@ -26,6 +26,7 @@
 #ifndef SAIL_ICCP_CPP_H
 #define SAIL_ICCP_CPP_H
 
+#include <cstddef> /* std::size_t */
 #include <memory>
 
 #ifdef SAIL_BUILD
@@ -61,7 +62,7 @@ public:
     /*
      * Constructs a new ICC profile from the binary data. The data is deep copied.
      */
-    iccp(const void *data, unsigned data_length);
+    iccp(const void *data, std::size_t data_size);
 
     /*
      * Constructs a new ICC profile from the binary data.
@@ -106,7 +107,7 @@ public:
     /*
      * Sets new ICC profile binary data. The data is deep copied.
      */
-    void set_data(const void *data, unsigned data_length);
+    void set_data(const void *data, std::size_t data_size);
 
     /*
      * Sets new ICC profile binary data.
@@ -121,7 +122,7 @@ private:
 
     sail_status_t to_sail_iccp(sail_iccp **iccp) const;
 
-    void copy(const void *data, unsigned data_length);
+    void copy(const void *data, std::size_t data_size);
 
 private:
     class pimpl;

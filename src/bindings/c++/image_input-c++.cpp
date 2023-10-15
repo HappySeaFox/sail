@@ -98,8 +98,8 @@ image_input::image_input(const std::string &path)
 {
 }
 
-image_input::image_input(const void *buffer, std::size_t buffer_length)
-    : d(new pimpl(new io_memory(buffer, buffer_length)))
+image_input::image_input(const void *buffer, std::size_t buffer_size)
+    : d(new pimpl(new io_memory(buffer, buffer_size)))
 {
 }
 

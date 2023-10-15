@@ -88,13 +88,13 @@ sail_status_t sail_codec_info_by_magic_number_from_path(const char *path, const 
     return SAIL_OK;
 }
 
-sail_status_t sail_codec_info_by_magic_number_from_memory(const void *buffer, size_t buffer_length, const struct sail_codec_info **codec_info) {
+sail_status_t sail_codec_info_by_magic_number_from_memory(const void *buffer, size_t buffer_size, const struct sail_codec_info **codec_info) {
 
     SAIL_CHECK_PTR(buffer);
     SAIL_CHECK_PTR(codec_info);
 
     struct sail_io *io;
-    SAIL_TRY(sail_alloc_io_read_memory(buffer, buffer_length, &io));
+    SAIL_TRY(sail_alloc_io_read_memory(buffer, buffer_size, &io));
 
     SAIL_TRY_OR_CLEANUP(sail_codec_info_by_magic_number_from_io(io, codec_info),
                         /* cleanup */ sail_destroy_io(io));

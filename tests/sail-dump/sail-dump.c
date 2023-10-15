@@ -52,13 +52,13 @@ static void skip_whitespaces(FILE *fptr) {
     (void)ret;
 }
 
-static sail_status_t read_hex(FILE *fptr, size_t data_length, uint8_t **value) {
+static sail_status_t read_hex(FILE *fptr, size_t data_size, uint8_t **value) {
 
     void *ptr;
-    SAIL_TRY(sail_malloc(data_length, &ptr));
+    SAIL_TRY(sail_malloc(data_size, &ptr));
     uint8_t *value_local = ptr;
 
-    for (unsigned i = 0; i < data_length; i++) {
+    for (unsigned i = 0; i < data_size; i++) {
         skip_whitespaces(fptr);
 
         unsigned v;
@@ -80,18 +80,18 @@ static sail_status_t read_hex(FILE *fptr, size_t data_length, uint8_t **value) {
     return SAIL_OK;
 }
 
-static sail_status_t print_hex(uint8_t *data, size_t data_length) {
+static sail_status_t print_hex(uint8_t *data, size_t data_size) {
 
-    if (data_length == 0) {
+    if (data_size == 0) {
         return SAIL_OK;
     }
 
     if (data == NULL) {
-        SAIL_LOG_ERROR("DUMP: Data length is %u but data is NULL", data_length);
+        SAIL_LOG_ERROR("DUMP: Data length is %u but data is NULL", data_size);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 
-    for (unsigned i = 0; i < data_length; i++) {
+    for (unsigned i = 0; i < data_size; i++) {
         printf("%02x ", *(data + i));
     }
 
@@ -241,19 +241,19 @@ static sail_status_t read_meta_data(FILE *fptr, struct sail_image *image) {
         char key[32];
         char key_unknown[256];
         char type[16];
-        unsigned data_length;
+        unsigned data_size;
 
 #ifdef _MSC_VER
-        if (fscanf_s(fptr, "%[^\n]%*[\r\n]%[^\n]%*[\r\n]%s%u%*[\r\n]", key, (unsigned)sizeof(key), key_unknown, (unsigned)sizeof(key_unknown), type, (unsigned)sizeof(type), &data_length) != 4) {
+        if (fscanf_s(fptr, "%[^\n]%*[\r\n]%[^\n]%*[\r\n]%s%u%*[\r\n]", key, (unsigned)sizeof(key), key_unknown, (unsigned)sizeof(key_unknown), type, (unsigned)sizeof(type), &data_size) != 4) {
 #else
-        if (fscanf(fptr, "%[^\n]%*[\r\n]%[^\n]%*[\r\n]%s%u%*[\r\n]", key, key_unknown, type, &data_length) != 4) {
+        if (fscanf(fptr, "%[^\n]%*[\r\n]%[^\n]%*[\r\n]%s%u%*[\r\n]", key, key_unknown, type, &data_size) != 4) {
 #endif
             SAIL_LOG_ERROR("DUMP: Failed to read META-DATA properties");
             SAIL_LOG_AND_RETURN(SAIL_ERROR_READ_FILE);
         }
 
         uint8_t *value;
-        SAIL_TRY(read_hex(fptr, data_length, &value));
+        SAIL_TRY(read_hex(fptr, data_size, &value));
 
         enum SailMetaData meta_data = sail_meta_data_from_string(key);
         enum SailVariantType variant_type;
@@ -286,7 +286,7 @@ static sail_status_t read_meta_data(FILE *fptr, struct sail_image *image) {
                                     /* on error */ sail_destroy_meta_data_node(meta_data_node),
                                                    sail_free(value));
             } else {
-                SAIL_TRY_OR_CLEANUP(sail_set_variant_data(meta_data_node->meta_data->value, value, data_length),
+                SAIL_TRY_OR_CLEANUP(sail_set_variant_data(meta_data_node->meta_data->value, value, data_size),
                                     /* on error */ sail_destroy_meta_data_node(meta_data_node),
                                                    sail_free(value));
             }
@@ -303,7 +303,7 @@ static sail_status_t read_meta_data(FILE *fptr, struct sail_image *image) {
                                     /* on error */ sail_destroy_meta_data_node(meta_data_node),
                                                    sail_free(value));
             } else {
-                SAIL_TRY_OR_CLEANUP(sail_set_variant_data(meta_data_node->meta_data->value, value, data_length),
+                SAIL_TRY_OR_CLEANUP(sail_set_variant_data(meta_data_node->meta_data->value, value, data_size),
                                     /* on error */ sail_destroy_meta_data_node(meta_data_node),
                                                    sail_free(value));
             }
@@ -329,25 +329,25 @@ static sail_status_t read_iccp(FILE *fptr, struct sail_image *image) {
      * 00 11 22...
      * 00 11 22...
      */
-    unsigned data_length;
+    unsigned data_size;
 #ifdef _MSC_VER
-    if (fscanf_s(fptr, "%u%*[\r\n]", &data_length) != 1) {
+    if (fscanf_s(fptr, "%u%*[\r\n]", &data_size) != 1) {
 #else
-    if (fscanf(fptr, "%u%*[\r\n]", &data_length) != 1) {
+    if (fscanf(fptr, "%u%*[\r\n]", &data_size) != 1) {
 #endif
         SAIL_LOG_ERROR("DUMP: Failed to read ICCP data length");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_READ_FILE);
     }
 
     uint8_t *value;
-    SAIL_TRY(read_hex(fptr, data_length, &value));
+    SAIL_TRY(read_hex(fptr, data_size, &value));
 
-    SAIL_TRY_OR_CLEANUP(sail_alloc_iccp_from_data(value, data_length, &image->iccp),
+    SAIL_TRY_OR_CLEANUP(sail_alloc_iccp_from_data(value, data_size, &image->iccp),
                         /* on error */ sail_free(value));
 
     sail_free(value);
 
-    SAIL_LOG_DEBUG("DUMP: ICCP properties: data_length(%u)", data_length);
+    SAIL_LOG_DEBUG("DUMP: ICCP properties: data_size(%u)", data_size);
 
     return SAIL_OK;
 }
@@ -358,21 +358,21 @@ static sail_status_t read_palette(FILE *fptr, struct sail_image *image) {
      * BPP24-RGB 3(color count) 144(data length)
      * 00 11 22...
      */
-    unsigned data_length;
+    unsigned data_size;
     unsigned color_count;
     char pixel_format[64];
 
 #ifdef _MSC_VER
-    if (fscanf_s(fptr, "%s%u%u%*[ \r\n]", pixel_format, (unsigned)sizeof(pixel_format), &color_count, &data_length) != 3) {
+    if (fscanf_s(fptr, "%s%u%u%*[ \r\n]", pixel_format, (unsigned)sizeof(pixel_format), &color_count, &data_size) != 3) {
 #else
-    if (fscanf(fptr, "%s%u%u%*[ \r\n]", pixel_format, &color_count, &data_length) != 3) {
+    if (fscanf(fptr, "%s%u%u%*[ \r\n]", pixel_format, &color_count, &data_size) != 3) {
 #endif
         SAIL_LOG_ERROR("DUMP: Failed to read PALETTE properties");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_READ_FILE);
     }
 
     uint8_t *value;
-    SAIL_TRY(read_hex(fptr, data_length, &value));
+    SAIL_TRY(read_hex(fptr, data_size, &value));
 
     enum SailPixelFormat pixel_format_enum = sail_pixel_format_from_string(pixel_format);
 
@@ -387,8 +387,8 @@ static sail_status_t read_palette(FILE *fptr, struct sail_image *image) {
 
     sail_free(value);
 
-    SAIL_LOG_DEBUG("DUMP: Palette properties: pixel_format(%s), color_count(%u), data_length(%u)",
-                    sail_pixel_format_to_string(pixel_format_enum), color_count, data_length);
+    SAIL_LOG_DEBUG("DUMP: Palette properties: pixel_format(%s), color_count(%u), data_size(%u)",
+                    sail_pixel_format_to_string(pixel_format_enum), color_count, data_size);
 
     return SAIL_OK;
 }
@@ -398,14 +398,14 @@ static sail_status_t read_pixels(FILE *fptr, struct sail_image *image) {
     /*
      * 00 11 22...
      */
-    const unsigned data_length = image->bytes_per_line * image->height;
+    const unsigned data_size = image->bytes_per_line * image->height;
 
     uint8_t *value;
-    SAIL_TRY(read_hex(fptr, data_length, &value));
+    SAIL_TRY(read_hex(fptr, data_size, &value));
 
     image->pixels = value;
 
-    SAIL_LOG_DEBUG("DUMP: Pixels properties: data_length(%u)", data_length);
+    SAIL_LOG_DEBUG("DUMP: Pixels properties: data_size(%u)", data_size);
 
     return SAIL_OK;
 }
@@ -550,8 +550,8 @@ sail_status_t sail_dump(const struct sail_image *image) {
     }
 
     if (image->iccp != NULL) {
-        printf("ICCP\n%u\n", image->iccp->data_length);
-        SAIL_TRY(print_hex(image->iccp->data, image->iccp->data_length));
+        printf("ICCP\n%lu\n", (unsigned long)image->iccp->size);
+        SAIL_TRY(print_hex(image->iccp->data, image->iccp->size));
         printf("\n");
     }
 

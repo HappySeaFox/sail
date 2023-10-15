@@ -548,7 +548,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_png(void *state, co
                         "ICC profile",
                         PNG_COMPRESSION_TYPE_BASE,
                         (const png_bytep)image->iccp->data,
-                        image->iccp->data_length);
+                        (unsigned)image->iccp->size);
 
         SAIL_LOG_DEBUG("PNG: ICC profile has been written");
     }

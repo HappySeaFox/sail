@@ -65,7 +65,7 @@ public:
     /*
      * Constructs a new image output to the specified memory buffer.
      */
-    image_output(void *buffer, std::size_t buffer_length, const sail::codec_info &codec_info);
+    image_output(void *buffer, std::size_t buffer_size, const sail::codec_info &codec_info);
 
     /*
      * Constructs a new image output to the specified memory buffer.

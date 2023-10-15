@@ -48,17 +48,17 @@ public:
     /*
      * Opens the specified memory buffer for reading and writing.
      */
-    io_memory(void *buffer, std::size_t buffer_length);
+    io_memory(void *buffer, std::size_t buffer_size);
 
     /*
      * Opens the specified memory buffer for reading.
      */
-    io_memory(const void *buffer, std::size_t buffer_length);
+    io_memory(const void *buffer, std::size_t buffer_size);
 
     /*
      * Opens the specified memory buffer for the specified I/O operations.
      */
-    io_memory(void *buffer, std::size_t buffer_length, Operation operation);
+    io_memory(void *buffer, std::size_t buffer_size, Operation operation);
 
     /*
      * Opens the specified memory buffer for reading and writing.

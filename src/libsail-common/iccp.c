@@ -37,48 +37,48 @@ sail_status_t sail_alloc_iccp(struct sail_iccp **iccp) {
     SAIL_TRY(sail_malloc(sizeof(struct sail_iccp), &ptr));
     *iccp = ptr;
 
-    (*iccp)->data        = NULL;
-    (*iccp)->data_length = 0;
+    (*iccp)->data = NULL;
+    (*iccp)->size = 0;
 
     return SAIL_OK;
 }
 
-sail_status_t sail_alloc_iccp_from_data(const void *data, unsigned data_length, struct sail_iccp **iccp) {
+sail_status_t sail_alloc_iccp_from_data(const void *data, size_t data_size, struct sail_iccp **iccp) {
 
     struct sail_iccp *iccp_local;
-    SAIL_TRY(sail_alloc_iccp_for_data(data_length, &iccp_local));
+    SAIL_TRY(sail_alloc_iccp_for_data(data_size, &iccp_local));
 
-    memcpy(iccp_local->data, data, data_length);
+    memcpy(iccp_local->data, data, data_size);
 
     *iccp = iccp_local;
 
     return SAIL_OK;
 }
 
-sail_status_t sail_alloc_iccp_from_shallow_data(void *data, unsigned data_length, struct sail_iccp **iccp) {
+sail_status_t sail_alloc_iccp_from_shallow_data(void *data, size_t data_size, struct sail_iccp **iccp) {
 
     SAIL_CHECK_PTR(data);
     SAIL_CHECK_PTR(iccp);
 
     SAIL_TRY(sail_alloc_iccp(iccp));
 
-    (*iccp)->data        = data;
-    (*iccp)->data_length = data_length;
+    (*iccp)->data = data;
+    (*iccp)->size = data_size;
 
     return SAIL_OK;
 }
 
-sail_status_t sail_alloc_iccp_for_data(unsigned data_length, struct sail_iccp **iccp) {
+sail_status_t sail_alloc_iccp_for_data(size_t data_size, struct sail_iccp **iccp) {
 
     SAIL_CHECK_PTR(iccp);
 
     struct sail_iccp *iccp_local;
     SAIL_TRY(sail_alloc_iccp(&iccp_local));
 
-    SAIL_TRY_OR_CLEANUP(sail_malloc(data_length, &iccp_local->data),
+    SAIL_TRY_OR_CLEANUP(sail_malloc(data_size, &iccp_local->data),
                         /* cleanup */ sail_destroy_iccp(iccp_local));
 
-    iccp_local->data_length = data_length;
+    iccp_local->size = data_size;
 
     *iccp = iccp_local;
 
@@ -103,11 +103,11 @@ sail_status_t sail_copy_iccp(const struct sail_iccp *source_iccp, struct sail_ic
     struct sail_iccp *iccp_local;
     SAIL_TRY(sail_alloc_iccp(&iccp_local));
 
-    SAIL_TRY_OR_CLEANUP(sail_malloc(source_iccp->data_length, &iccp_local->data),
+    SAIL_TRY_OR_CLEANUP(sail_malloc(source_iccp->size, &iccp_local->data),
                         /* cleanup */ sail_destroy_iccp(iccp_local));
 
-    memcpy(iccp_local->data, source_iccp->data, source_iccp->data_length);
-    iccp_local->data_length = source_iccp->data_length;
+    memcpy(iccp_local->data, source_iccp->data, source_iccp->size);
+    iccp_local->size = source_iccp->size;
 
     *target_iccp = iccp_local;
 

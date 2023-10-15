@@ -66,7 +66,7 @@ public:
     /*
      * Constructs a new image input from the specified memory buffer.
      */
-    image_input(const void *buffer, std::size_t buffer_length);
+    image_input(const void *buffer, std::size_t buffer_size);
 
     /*
      * Constructs a new image input from the specified memory buffer.

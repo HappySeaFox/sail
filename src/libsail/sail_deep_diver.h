@@ -87,7 +87,7 @@ SAIL_EXPORT sail_status_t sail_start_loading_from_file_with_options(const char *
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_start_loading_from_memory_with_options(const void *buffer, size_t buffer_length,
+SAIL_EXPORT sail_status_t sail_start_loading_from_memory_with_options(const void *buffer, size_t buffer_size,
                                                                       const struct sail_codec_info *codec_info,
                                                                       const struct sail_load_options *load_options, void **state);
 
@@ -134,7 +134,7 @@ SAIL_EXPORT sail_status_t sail_start_saving_into_file_with_options(const char *p
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_start_saving_into_memory_with_options(void *buffer, size_t buffer_length,
+SAIL_EXPORT sail_status_t sail_start_saving_into_memory_with_options(void *buffer, size_t buffer_size,
                                                                      const struct sail_codec_info *codec_info,
                                                                      const struct sail_save_options *save_options, void **state);
 

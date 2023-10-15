@@ -311,10 +311,10 @@ void tiff_private_zero_tiff_image(TIFFRGBAImage *img) {
 sail_status_t tiff_private_fetch_iccp(TIFF *tiff, struct sail_iccp **iccp) {
 
     unsigned char *data;
-    unsigned data_length;
+    unsigned data_size;
 
-    if (TIFFGetField(tiff, TIFFTAG_ICCPROFILE, &data_length, &data)) {
-        SAIL_TRY(sail_alloc_iccp_from_data(data, data_length, iccp));
+    if (TIFFGetField(tiff, TIFFTAG_ICCPROFILE, &data_size, &data)) {
+        SAIL_TRY(sail_alloc_iccp_from_data(data, data_size, iccp));
     }
 
     return SAIL_OK;

@@ -37,7 +37,7 @@ static MunitResult test_alloc_iccp(const MunitParameter params[], void *user_dat
     munit_assert(sail_alloc_iccp(&iccp) == SAIL_OK);
     munit_assert_not_null(iccp);
     munit_assert_null(iccp->data);
-    munit_assert(iccp->data_length == 0);
+    munit_assert(iccp->size == 0);
 
     sail_destroy_iccp(iccp);
 
@@ -51,19 +51,19 @@ static MunitResult test_copy_iccp(const MunitParameter params[], void *user_data
     struct sail_iccp *iccp = NULL;
     munit_assert(sail_alloc_iccp(&iccp) == SAIL_OK);
 
-    iccp->data_length = 1024;
-    munit_assert(sail_malloc(iccp->data_length, &iccp->data) == SAIL_OK);
+    iccp->size = 1024;
+    munit_assert(sail_malloc(iccp->size, &iccp->data) == SAIL_OK);
     munit_assert_not_null(iccp->data);
 
-    memset(iccp->data, 15, iccp->data_length);
+    memset(iccp->data, 15, iccp->size);
 
     struct sail_iccp *iccp_copy = NULL;
     munit_assert(sail_copy_iccp(iccp, &iccp_copy) == SAIL_OK);
     munit_assert_not_null(iccp_copy);
 
     munit_assert(iccp_copy->data != iccp->data);
-    munit_assert(iccp_copy->data_length == iccp->data_length);
-    munit_assert_memory_equal(iccp->data_length, iccp_copy->data, iccp->data);
+    munit_assert(iccp_copy->size == iccp->size);
+    munit_assert_memory_equal(iccp->size, iccp_copy->data, iccp->data);
 
     sail_destroy_iccp(iccp_copy);
     sail_destroy_iccp(iccp);
@@ -75,18 +75,18 @@ static MunitResult test_iccp_from_data(const MunitParameter params[], void *user
     (void)params;
     (void)user_data;
 
-    const unsigned data_length = 1024;
+    const unsigned data_size = 1024;
     void *data = NULL;
-    munit_assert(sail_malloc(data_length, &data) == SAIL_OK);
-    memset(data, 15, data_length);
+    munit_assert(sail_malloc(data_size, &data) == SAIL_OK);
+    memset(data, 15, data_size);
     munit_assert_not_null(data);
 
     struct sail_iccp *iccp = NULL;
-    munit_assert(sail_alloc_iccp_from_data(data, data_length, &iccp) == SAIL_OK);
+    munit_assert(sail_alloc_iccp_from_data(data, data_size, &iccp) == SAIL_OK);
     munit_assert_not_null(iccp);
 
-    munit_assert(iccp->data_length == data_length);
-    munit_assert_memory_equal(data_length, iccp->data, data);
+    munit_assert(iccp->size == data_size);
+    munit_assert_memory_equal(data_size, iccp->data, data);
 
     sail_destroy_iccp(iccp);
     sail_free(data);
@@ -98,17 +98,17 @@ static MunitResult test_iccp_from_shallow_data(const MunitParameter params[], vo
     (void)params;
     (void)user_data;
 
-    const unsigned data_length = 1024;
+    const unsigned data_size = 1024;
     void *data = NULL;
-    munit_assert(sail_malloc(data_length, &data) == SAIL_OK);
-    memset(data, 15, data_length);
+    munit_assert(sail_malloc(data_size, &data) == SAIL_OK);
+    memset(data, 15, data_size);
     munit_assert_not_null(data);
 
     struct sail_iccp *iccp = NULL;
-    munit_assert(sail_alloc_iccp_from_shallow_data(data, data_length, &iccp) == SAIL_OK);
+    munit_assert(sail_alloc_iccp_from_shallow_data(data, data_size, &iccp) == SAIL_OK);
     munit_assert_not_null(iccp);
 
-    munit_assert(iccp->data_length == data_length);
+    munit_assert(iccp->size == data_size);
     munit_assert(iccp->data == data);
     data = NULL;
 
@@ -121,15 +121,15 @@ static MunitResult test_iccp_for_data(const MunitParameter params[], void *user_
     (void)params;
     (void)user_data;
 
-    const unsigned data_length = 1024;
+    const unsigned data_size = 1024;
 
     struct sail_iccp *iccp = NULL;
-    munit_assert(sail_alloc_iccp_for_data(data_length, &iccp) == SAIL_OK);
+    munit_assert(sail_alloc_iccp_for_data(data_size, &iccp) == SAIL_OK);
     munit_assert_not_null(iccp);
 
     munit_assert_not_null(iccp->data);
 
-    memset(iccp->data, 15, data_length);
+    memset(iccp->data, 15, data_size);
 
     sail_destroy_iccp(iccp);
 

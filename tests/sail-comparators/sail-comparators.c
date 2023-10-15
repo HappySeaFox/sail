@@ -160,9 +160,9 @@ sail_status_t sail_test_compare_iccps(const struct sail_iccp *iccp1, const struc
 
     munit_assert(iccp1 != iccp2);
 
-    munit_assert(iccp1->data_length > 0);
-    munit_assert(iccp1->data_length == iccp2->data_length);
-    munit_assert_memory_equal(iccp1->data_length, iccp1->data, iccp2->data);
+    munit_assert(iccp1->size > 0);
+    munit_assert(iccp1->size == iccp2->size);
+    munit_assert_memory_equal(iccp1->size, iccp1->data, iccp2->data);
 
     return SAIL_OK;
 }
