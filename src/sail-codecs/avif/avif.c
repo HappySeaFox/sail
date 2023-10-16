@@ -143,7 +143,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_avif(void *state, s
     struct avif_state *avif_state = state;
 
     avifResult avif_result = avifDecoderNextImage(avif_state->avif_decoder);
-
     if (avif_result == AVIF_RESULT_NO_IMAGES_REMAINING) {
         return SAIL_ERROR_NO_MORE_FRAMES;
     }
@@ -178,6 +177,24 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_avif(void *state, s
     if (avif_state->load_options->options & SAIL_OPTION_ICCP) {
         SAIL_TRY_OR_CLEANUP(avif_private_fetch_iccp(&avif_image->icc, &image_local->iccp),
                             /* cleanup */ sail_destroy_image(image_local));
+    }
+
+    struct sail_meta_data_node **last_meta_data_node = &image_local->meta_data_node;
+
+    if (avif_state->load_options->options & SAIL_OPTION_META_DATA) {
+        /* Fetch EXIF. */
+        SAIL_TRY_OR_CLEANUP(avif_private_fetch_meta_data(SAIL_META_DATA_EXIF, &avif_image->exif, last_meta_data_node),
+                            /* cleanup */ sail_destroy_image(image_local));
+        if (*last_meta_data_node != NULL) {
+            last_meta_data_node = &(*last_meta_data_node)->next;
+        }
+
+        /* Fetch XMP. */
+        SAIL_TRY_OR_CLEANUP(avif_private_fetch_meta_data(SAIL_META_DATA_XMP, &avif_image->xmp, last_meta_data_node),
+                            /* cleanup */ sail_destroy_image(image_local));
+        if (*last_meta_data_node != NULL) {
+            last_meta_data_node = &(*last_meta_data_node)->next;
+        }
     }
 
     *image = image_local;
