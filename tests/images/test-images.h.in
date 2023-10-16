@@ -6,6 +6,10 @@
 #include "config.h"
 
 static const char * const SAIL_TEST_IMAGES[] = {
+#ifdef SAIL_HAVE_BUILTIN_AVIF
+    "@SAIL_TEST_IMAGES_PATH@/avif/bpp24-yuv.iccp.exif.xmp.avif",
+#endif
+
 #ifdef SAIL_HAVE_BUILTIN_BMP
     "@SAIL_TEST_IMAGES_PATH@/bmp/bpp1-indexed.bmp",
     "@SAIL_TEST_IMAGES_PATH@/bmp/bpp1-indexed.not4.bmp",
