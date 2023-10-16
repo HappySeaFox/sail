@@ -36,8 +36,6 @@ avifResult avif_private_read_proc(struct avifIO *io, uint32_t read_flags, uint64
         return AVIF_RESULT_IO_ERROR;
     }
 
-    SAIL_LOG_TRACE("AVIF: Read at offset %ld size %lu", (long)offset, (unsigned long)size);
-
     struct sail_avif_context *avif_context = io->data;
     SAIL_TRY_OR_EXECUTE(avif_context->io->seek(avif_context->io->stream, (long)offset, SEEK_SET),
                         /* on error */ return AVIF_RESULT_IO_ERROR);
@@ -54,8 +52,6 @@ avifResult avif_private_read_proc(struct avifIO *io, uint32_t read_flags, uint64
                         /* on error */ return AVIF_RESULT_IO_ERROR);
     out->data = avif_context->buffer;
     out->size = size_read;
-
-    SAIL_LOG_TRACE("AVIF: Actually read: %lu", (unsigned long)size_read);
 
     return AVIF_RESULT_OK;
 }
