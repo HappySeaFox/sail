@@ -325,7 +325,10 @@ enum SailCodecFeature {
 /* Load or save options. */
 enum SailOption {
 
-    /* Instruction to load or save image meta data like JPEG comments or EXIF. */
+    /*
+     * Instruction to load or save image meta data like JPEG comments or EXIF.
+     * Loading special properties in source images is also affected by this option.
+     */
     SAIL_OPTION_META_DATA  = 1 << 0,
 
     /* Instruction to save interlaced images. Specifying this option for loading operations has no effect. */
