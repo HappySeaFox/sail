@@ -332,7 +332,7 @@ static void help(const char *app) {
     fprintf(stderr, "\n");
     fprintf(stderr, "    convert <INPUT PATH> <OUTPUT PATH> [-c | --compression <value>] - Convert one image format to another.\n");
     fprintf(stderr, "\n");
-    fprintf(stderr, "    probe <PATH> - Retrieve information of the very first image found in the file.\n");
+    fprintf(stderr, "    probe <PATH> - Retrieve information of the very first image frame found in the file.\n");
     fprintf(stderr, "                   In most cases probing doesn't decode the image data.\n");
     fprintf(stderr, "    decode <PATH> - Decode the whole file and print information of all its frames.\n");
 }
