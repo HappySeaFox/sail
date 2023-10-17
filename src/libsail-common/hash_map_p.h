@@ -28,13 +28,13 @@
 
 struct sail_variant_node;
 
-/*
- * A pretty limited hash map implementation.
- */
 enum {
     SAIL_HASH_MAP_SIZE = 32
 };
 
+/*
+ * A pretty limited hash map implementation.
+ */
 struct sail_hash_map {
 
     /*
