@@ -326,11 +326,9 @@ static sail_status_t fetch_single_meta_data(TIFF *tiff, int tag, enum SailMetaDa
 
     if (TIFFGetField(tiff, tag, &data)) {
         struct sail_meta_data_node *meta_data_node;
-
         SAIL_TRY(sail_alloc_meta_data_node(&meta_data_node));
-        SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_from_known_key(key, &meta_data_node->meta_data),
-                            /* cleanup */ sail_destroy_meta_data_node(meta_data_node));
-        SAIL_TRY_OR_CLEANUP(sail_alloc_variant(&meta_data_node->meta_data->value),
+
+        SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_and_value_from_known_key(key, &meta_data_node->meta_data),
                             /* cleanup */ sail_destroy_meta_data_node(meta_data_node));
         SAIL_TRY_OR_CLEANUP(sail_set_variant_string(meta_data_node->meta_data->value, data),
                             /* cleanup */ sail_destroy_meta_data_node(meta_data_node));

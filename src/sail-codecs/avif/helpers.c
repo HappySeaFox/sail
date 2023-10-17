@@ -131,9 +131,7 @@ sail_status_t avif_private_fetch_meta_data(enum SailMetaData key, const struct a
 
         SAIL_TRY(sail_alloc_meta_data_node(&meta_data_node_local));
 
-        SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_from_known_key(key, &meta_data_node_local->meta_data),
-                            /* cleanup */ sail_destroy_meta_data_node(meta_data_node_local));
-        SAIL_TRY_OR_CLEANUP(sail_alloc_variant(&meta_data_node_local->meta_data->value),
+        SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_and_value_from_known_key(key, &meta_data_node_local->meta_data),
                             /* cleanup */ sail_destroy_meta_data_node(meta_data_node_local));
         SAIL_TRY_OR_CLEANUP(sail_set_variant_data(meta_data_node_local->meta_data->value, avif_rw_data->data, avif_rw_data->size),
                             /* cleanup */ sail_destroy_meta_data_node(meta_data_node_local));

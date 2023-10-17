@@ -317,9 +317,7 @@ sail_status_t wal_private_assign_meta_data(const struct WalFileHeader *wal_heade
     struct sail_meta_data_node *meta_data_node_local;
     SAIL_TRY(sail_alloc_meta_data_node(&meta_data_node_local));
 
-    SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_from_known_key(SAIL_META_DATA_NAME, &meta_data_node_local->meta_data),
-                        /* cleanup */ sail_destroy_meta_data_node(meta_data_node_local));
-    SAIL_TRY_OR_CLEANUP(sail_alloc_variant(&meta_data_node_local->meta_data->value),
+    SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_and_value_from_known_key(SAIL_META_DATA_NAME, &meta_data_node_local->meta_data),
                         /* cleanup */ sail_destroy_meta_data_node(meta_data_node_local));
     SAIL_TRY_OR_CLEANUP(sail_set_variant_string(meta_data_node_local->meta_data->value, wal_header->name),
                         /* cleanup */ sail_destroy_meta_data_node(meta_data_node_local));

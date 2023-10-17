@@ -278,9 +278,7 @@ sail_status_t jpegxl_private_fetch_name(JxlDecoder *decoder, uint32_t name_lengt
     SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_node(&meta_data_node_local),
                         /* cleanup */ sail_free(name));
 
-    SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_from_known_key(SAIL_META_DATA_NAME, &meta_data_node_local->meta_data),
-                        /* cleanup */ sail_free(name), sail_destroy_meta_data_node(meta_data_node_local));
-    SAIL_TRY_OR_CLEANUP(sail_alloc_variant(&meta_data_node_local->meta_data->value),
+    SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_and_value_from_known_key(SAIL_META_DATA_NAME, &meta_data_node_local->meta_data),
                         /* cleanup */ sail_free(name), sail_destroy_meta_data_node(meta_data_node_local));
     SAIL_TRY_OR_CLEANUP(sail_set_variant_shallow_string(meta_data_node_local->meta_data->value, name),
                         /* cleanup */ sail_free(name), sail_destroy_meta_data_node(meta_data_node_local));
@@ -318,17 +316,14 @@ sail_status_t jpegxl_private_fetch_metadata(JxlDecoder *decoder, struct sail_met
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
-    struct sail_meta_data_node *meta_data_node_local = NULL;
-
     void *data;
     SAIL_TRY(sail_malloc(size, &data));
 
+    struct sail_meta_data_node *meta_data_node_local;
     SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_node(&meta_data_node_local),
                         /* cleanup */ sail_free(data));
 
-    SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_from_known_key(meta_data, &meta_data_node_local->meta_data),
-                        /* cleanup */ sail_free(data), sail_destroy_meta_data_node(meta_data_node_local));
-    SAIL_TRY_OR_CLEANUP(sail_alloc_variant(&meta_data_node_local->meta_data->value),
+    SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_and_value_from_known_key(meta_data, &meta_data_node_local->meta_data),
                         /* cleanup */ sail_free(data), sail_destroy_meta_data_node(meta_data_node_local));
     SAIL_TRY_OR_CLEANUP(sail_set_variant_shallow_data(meta_data_node_local->meta_data->value, data, size),
                         /* cleanup */ sail_free(data), sail_destroy_meta_data_node(meta_data_node_local));

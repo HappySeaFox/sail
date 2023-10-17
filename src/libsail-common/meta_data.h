@@ -120,6 +120,24 @@ SAIL_EXPORT sail_status_t sail_alloc_meta_data_from_unknown_key(const char *key_
                                                                 struct sail_meta_data **meta_data);
 
 /*
+ * Allocates new meta data from the specified known key and the nested value.
+ * The key must not be SAIL_META_DATA_UNKNOWN.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_alloc_meta_data_and_value_from_known_key(enum SailMetaData key,
+                                                                        struct sail_meta_data **meta_data);
+
+/*
+ * Allocates new meta data from the specified unknown key and the nested value.
+ * Makes a deep copy of the key. Sets the key to SAIL_META_DATA_UNKNOWN.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_alloc_meta_data_and_value_from_unknown_key(const char *key_unknown,
+                                                                          struct sail_meta_data **meta_data);
+
+/*
  * Destroys the specified meta data.
  */
 SAIL_EXPORT void sail_destroy_meta_data(struct sail_meta_data *meta_data);

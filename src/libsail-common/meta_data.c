@@ -68,6 +68,32 @@ sail_status_t sail_alloc_meta_data_from_unknown_key(const char *key_unknown, str
     return SAIL_OK;
 }
 
+sail_status_t sail_alloc_meta_data_and_value_from_known_key(enum SailMetaData key, struct sail_meta_data **meta_data) {
+
+    struct sail_meta_data *meta_data_local;
+    SAIL_TRY(sail_alloc_meta_data_from_known_key(key, &meta_data_local));
+
+    SAIL_TRY_OR_CLEANUP(sail_alloc_variant(&meta_data_local->value),
+                        /* cleanup */ sail_destroy_meta_data(meta_data_local));
+
+    *meta_data = meta_data_local;
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_alloc_meta_data_and_value_from_unknown_key(const char *key_unknown, struct sail_meta_data **meta_data) {
+
+    struct sail_meta_data *meta_data_local;
+    SAIL_TRY(sail_alloc_meta_data_from_unknown_key(key_unknown, &meta_data_local));
+
+    SAIL_TRY_OR_CLEANUP(sail_alloc_variant(&meta_data_local->value),
+                        /* cleanup */ sail_destroy_meta_data(meta_data_local));
+
+    *meta_data = meta_data_local;
+
+    return SAIL_OK;
+}
+
 void sail_destroy_meta_data(struct sail_meta_data *meta_data) {
 
     if (meta_data == NULL) {
