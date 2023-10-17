@@ -1,7 +1,7 @@
 Source: sail
 Priority: optional
-Maintainer: Dmitry Baryshev +ADw-dmitrymq+AEA-gmail.com+AD4-
-Build-Depends: debhelper (+AD4APQ-9), build-essential, libgif-dev, libjpeg-dev, libpng-dev, libtiff-dev, libavif-dev, libwebp-dev
+Maintainer: Dmitry Baryshev <dima8w@gmail.com>
+Build-Depends: debhelper (>=9), build-essential, libgif-dev, libjpeg-dev, libpng-dev, libtiff-dev, libavif-dev, libwebp-dev, libjxl-dev
 Standards-Version: 3.9.6
 Vcs-Browser: https://github.com/HappySeaFox/sail
 Vcs-Git: https://github.com/HappySeaFox/sail.git
@@ -9,7 +9,7 @@ Vcs-Git: https://github.com/HappySeaFox/sail.git
 Package: libsail-common0
 Section: libs
 Architecture: any
-Depends: +ACQAew-shlibs:Depends+AH0-, +ACQAew-misc:Depends+AH0-
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: SAIL is a fast and lightweight cross-platform image decoding
  and encoding library providing multi-leveled APIs from one-liners
  to complex use-cases with custom I/O sources.
@@ -19,7 +19,7 @@ Description: SAIL is a fast and lightweight cross-platform image decoding
 Package: libsail-common-dev
 Section: libdevel
 Architecture: any
-Depends: libsail-common0 (+AD0- +ACQAew-binary:Version+AH0-), +ACQAew-misc:Depends+AH0-
+Depends: libsail-common0 (= ${binary:Version}), ${misc:Depends}
 Description: SAIL is a fast and lightweight cross-platform image decoding
  and encoding library providing multi-leveled APIs from one-liners
  to complex use-cases with custom I/O sources.
@@ -29,7 +29,7 @@ Description: SAIL is a fast and lightweight cross-platform image decoding
 Package: libsail-manip0
 Section: libs
 Architecture: any
-Depends: +ACQAew-shlibs:Depends+AH0-, +ACQAew-misc:Depends+AH0-
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: SAIL is a fast and lightweight cross-platform image decoding
  and encoding library providing multi-leveled APIs from one-liners
  to complex use-cases with custom I/O sources.
@@ -39,7 +39,7 @@ Description: SAIL is a fast and lightweight cross-platform image decoding
 Package: libsail-manip-dev
 Section: libdevel
 Architecture: any
-Depends: libsail-manip0 (+AD0- +ACQAew-binary:Version+AH0-), +ACQAew-misc:Depends+AH0-
+Depends: libsail-manip0 (= ${binary:Version}), ${misc:Depends}
 Description: SAIL is a fast and lightweight cross-platform image decoding
  and encoding library providing multi-leveled APIs from one-liners
  to complex use-cases with custom I/O sources.
@@ -49,7 +49,7 @@ Description: SAIL is a fast and lightweight cross-platform image decoding
 Package: sail-codecs
 Section: libs
 Architecture: any
-Depends: +ACQAew-shlibs:Depends+AH0-, +ACQAew-misc:Depends+AH0-
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: SAIL is a fast and lightweight cross-platform image decoding
  and encoding library providing multi-leveled APIs from one-liners
  to complex use-cases with custom I/O sources.
@@ -59,7 +59,7 @@ Description: SAIL is a fast and lightweight cross-platform image decoding
 Package: libsail0
 Section: libs
 Architecture: any
-Depends: +ACQAew-shlibs:Depends+AH0-, +ACQAew-misc:Depends+AH0-, sail-codecs (+AD0- +ACQAew-binary:Version+AH0-)
+Depends: ${shlibs:Depends}, ${misc:Depends}, sail-codecs (= ${binary:Version})
 Description: SAIL is a fast and lightweight cross-platform image decoding
  and encoding library providing multi-leveled APIs from one-liners
  to complex use-cases with custom I/O sources.
@@ -69,39 +69,29 @@ Description: SAIL is a fast and lightweight cross-platform image decoding
 Package: libsail-dev
 Section: libdevel
 Architecture: any
-Depends: libsail0 (+AD0- +ACQAew-binary:Version+AH0-), +ACQAew-misc:Depends+AH0-
+Depends: libsail0 (= ${binary:Version}), ${misc:Depends}
 Description: SAIL is a fast and lightweight cross-platform image decoding
  and encoding library providing multi-leveled APIs from one-liners
  to complex use-cases with custom I/O sources.
  .
  This package provides high-level SAIL development headers and libraries.
 
-Package: libsail-c
+Package: libsail-c++0
 Section: libs
 Architecture: any
-Depends: +ACQAew-shlibs:Depends+AH0-, +ACQAew-misc:Depends+AH0-
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: SAIL is a fast and lightweight cross-platform image decoding
  and encoding library providing multi-leveled APIs from one-liners
  to complex use-cases with custom I/O sources.
  .
  This package provides high-level SAIL client libraries.
 
-Package: libsail-cdev
+Package: libsail-c++-dev
 Section: libdevel
 Architecture: any
-Depends: libsail-c (+AD0- +ACQAew-binary:Version+AH0-), +ACQAew-misc:Depends+AH0-
+Depends: libsail-c++0 (= ${binary:Version}), ${misc:Depends}
 Description: SAIL is a fast and lightweight cross-platform image decoding
  and encoding library providing multi-leveled APIs from one-liners
  to complex use-cases with custom I/O sources.
  .
- This package provides high-level SAIL C development headers and libraries.
-
-Package: libsail-progs
-Section: graphics
-Architecture: any
-Depends: +ACQAew-shlibs:Depends+AH0-, +ACQAew-misc:Depends+AH0-
-Description: SAIL is a fast and lightweight cross-platform image decoding
- and encoding library providing multi-leveled APIs from one-liners
- to complex use-cases with custom I/O sources.
- .
- This package provides SAIL command line tools.
+ This package provides high-level SAIL C++ development headers and libraries.

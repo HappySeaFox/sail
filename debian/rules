@@ -2,8 +2,3 @@
 
 %:
 	dh $@ --parallel
-
-override_dh_auto_install:
-	dh_auto_install
-	install -m 644 -D $(CURDIR)/debian/sail-convert.1 $(CURDIR)/debian/tmp/usr/share/man/man1/sail-convert.1
-	install -m 644 -D $(CURDIR)/debian/sail-probe.1 $(CURDIR)/debian/tmp/usr/share/man/man1/sail-probe.1

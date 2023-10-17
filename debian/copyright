@@ -1,6 +1,6 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: SAIL
-Upstream-Contact: Dmitry Baryshev <dmitrymq@gmail.com>
+Upstream-Contact: Dmitry Baryshev <dima8w@gmail.com>
 Source: https://github.com/HappySeaFox/sail.git
 
 Files: debian/*

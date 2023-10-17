@@ -1,5 +1,5 @@
-sail (0.9.0-1) unstable; urgency=medium
+sail (0.9.0~rc3) unstable; urgency=medium
 
-  * First release
+  * Release candidate #3.
 
- -- Dmitry Baryshev <dmitrymq@gmail.com>  Thu, 14 May 2020 20:12:49 +0300
+ -- Dmitry Baryshev <dima8w@gmail.com>  Tue, 17 Oct 2023 15:36:15 +0300
