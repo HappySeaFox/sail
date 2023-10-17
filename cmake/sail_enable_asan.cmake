@@ -8,23 +8,25 @@ macro(sail_enable_asan)
     # but the resulting program fails to run due to mising symbols in kernel32.
     #
     if (SAIL_DEV)
-        cmake_push_check_state(RESET)
-            set(CMAKE_REQUIRED_FLAGS "-fsanitize=address")
+        if (NOT MSVC OR MSVC_TOOLSET_VERSION GREATER 141)
+            cmake_push_check_state(RESET)
+                set(CMAKE_REQUIRED_FLAGS "-fsanitize=address")
 
-            # GCC and Clang require to link ASAN as well
-            if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID MATCHES "Clang")
-                set(CMAKE_REQUIRED_LIBRARIES "-fsanitize=address")
-            endif()
+                # GCC and Clang require to link ASAN as well
+                if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID MATCHES "Clang")
+                    set(CMAKE_REQUIRED_LIBRARIES "-fsanitize=address")
+                endif()
 
-            check_c_source_runs(
-                "
-                int main(int argc, char *argv[]) {
-                    return 0;
-                }
-                "
-                SAIL_HAVE_ASAN
-            )
-        cmake_pop_check_state()
+                check_c_source_runs(
+                    "
+                    int main(int argc, char *argv[]) {
+                        return 0;
+                    }
+                    "
+                    SAIL_HAVE_ASAN
+                )
+            cmake_pop_check_state()
+        endif()
 
         if (SAIL_HAVE_ASAN)
             message("${SAIL_ASAN_TARGET}: ASAN is enabled")
