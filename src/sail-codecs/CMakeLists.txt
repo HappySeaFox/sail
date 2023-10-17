@@ -50,7 +50,7 @@ endforeach()
 
 # Add enabled codecs.
 #
-foreach(codec ${ENABLED_CODECS})
+foreach (codec ${ENABLED_CODECS})
     add_subdirectory(${codec})
 
     # Codecs can disable themselves due to missing dependencies.
