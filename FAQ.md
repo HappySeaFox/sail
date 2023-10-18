@@ -478,7 +478,7 @@ the most popular image formats will be definitely ported from ksquirrel-libs.
 ## I have problems with include paths with vcpkg without CMake
 
 Add `VcpkgInstalledDir/include/sail` to the project include path.
-See https://vcpkg.readthedocs.io/en/latest/users/buildsystems/msbuild-integration.
+See https://learn.microsoft.com/en-us/vcpkg/users/buildsystems/msbuild-integration.
 
 ## I have questions, issues, or proposals
 
