@@ -52,7 +52,7 @@ Technically, SAIL (ksquirrel-libs) was founded in 2003 making it one of the olde
 ## Is SAIL cross-platform?
 
 Yes. It's written in pure C11 and is highly portable. However, only the Windows, macOS, and Linux platforms
-are currently supported. Pull requests to support more platforms are highly welcomed.
+are officially supported. SAIL may or may not compile on other platforms. Pull requests to support more platforms are highly welcomed.
 
 ## What's the preferred way of installation?
 
