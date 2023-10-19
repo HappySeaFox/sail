@@ -9,7 +9,6 @@ Table of Contents
   * [What are the competitors of SAIL?](#what-are-the-competitors-of-sail)
   * [Describe the high\-level APIs](#describe-the-high-level-apis)
   * [Does SAIL provide simple one\-line APIs?](#does-sail-provide-simple-one-line-apis)
-  * [What pixel formats SAIL is able to read?](#what-pixel-formats-sail-is-able-to-read)
   * [In what pixel format SAIL loading functions output images?](#in-what-pixel-format-sail-loading-functions-output-images)
   * [What pixel formats SAIL is able to write?](#what-pixel-formats-sail-is-able-to-write)
   * [Does SAIL support animated and multi\-paged images?](#does-sail-support-animated-and-multi-paged-images)
@@ -91,13 +90,6 @@ SAIL provides four levels of high-level APIs:
 
 Yes. SAIL provides four levels of APIs, depending on your needs: `junior`, `advanced`, `deep diver`, and `technical diver`.
 `junior` is your choice.
-
-## What pixel formats SAIL is able to read?
-
-SAIL codecs always try to support as many input pixel formats as possible. The list of
-pixel formats that can be loaded by SAIL is codec-specific and is not publicly available.
-
-For example, some codecs may be able to load just 3 input pixel formats. Other may be able to load 10.
 
 ## In what pixel format SAIL loading functions output images?
 
