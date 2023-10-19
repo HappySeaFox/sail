@@ -267,10 +267,10 @@ Let's take a hypothetical codec info:
 #
 [codec]
 
-# Codec layout is a set of functions it exports. Different layouts generations are not compatible.
+# Codec layout is a set of functions the codec exports. Different layouts generations are not compatible.
 # libsail supports just a single (current) layout. Cannot be empty.
 #
-layout=6
+layout=8
 
 # Semantic codec version. Cannot be empty.
 #
@@ -287,7 +287,7 @@ version=1.0.0
 #
 priority=MEDIUM
 
-# Short codec name. Must be uppercase. Cannot be empty.
+# Short codec name. Must be uppercase letters and numbers only. Cannot be empty.
 #
 name=ABC
 
