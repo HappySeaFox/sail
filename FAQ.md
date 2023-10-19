@@ -55,9 +55,9 @@ are officially supported. SAIL may or may not compile on other platforms. Pull r
 
 ## What's the preferred way of installation?
 
-- Windows: `conan`, `vcpkg`
-- macOS: `conan`, `brew`
-- Linux: native packages if available, `conan`, `vcpkg`
+- Windows: [Conan](https://conan.io/center/recipes/sail), `vcpkg`
+- macOS: [Conan](https://conan.io/center/recipes/sail), `brew`, `vcpkg`
+- Linux: native packages if available, [Conan](https://conan.io/center/recipes/sail), `vcpkg`
 
 See [BUILDING](BUILDING.md).
 
