@@ -64,6 +64,10 @@ sail_status_t sail_alloc_save_options_from_features(const struct sail_save_featu
         save_options_local->options |= SAIL_OPTION_META_DATA;
     }
 
+    if (save_features->features & SAIL_CODEC_FEATURE_INTERLACED) {
+        save_options_local->options |= SAIL_OPTION_INTERLACED;
+    }
+
     if (save_features->features & SAIL_CODEC_FEATURE_ICCP) {
         save_options_local->options |= SAIL_OPTION_ICCP;
     }
