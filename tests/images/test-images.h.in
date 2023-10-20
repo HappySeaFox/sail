@@ -68,6 +68,10 @@ static const char * const SAIL_TEST_IMAGES[] = {
     "@SAIL_TEST_IMAGES_PATH@/qoi/bpp24-rgb.qoi",
 #endif
 
+#ifdef SAIL_HAVE_BUILTIN_SVG
+    "@SAIL_TEST_IMAGES_PATH@/svg/bpp32-rgba.svg",
+#endif
+
 #ifdef SAIL_HAVE_BUILTIN_PNG
     "@SAIL_TEST_IMAGES_PATH@/png/bpp4-indexed.comment.iccp.png",
 #endif

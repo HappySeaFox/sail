@@ -1,0 +1,19 @@
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="100%" viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve">
+<rect x="0"  y="0"  width="8" height="8" fill="#C0C0C0" />
+<rect x="8"  y="0"  width="8" height="8" fill="#FFFFFF" />
+<rect x="16" y="0"  width="8" height="8" fill="#01FFFF" />
+<rect x="24" y="0"  width="8" height="8" fill="#FF00FF" />
+<rect x="0"  y="8"  width="8" height="8" fill="#0000FF" />
+<rect x="8"  y="8"  width="8" height="8" fill="#808080" />
+<rect x="16" y="8"  width="8" height="8" fill="#000080" />
+<rect x="24" y="8"  width="8" height="8" fill="#808000" />
+<rect x="0"  y="16" width="8" height="8" fill="#008000" />
+<rect x="8"  y="16" width="8" height="8" fill="#800000" />
+<rect x="16" y="16" width="8" height="8" fill="#000000" />
+<rect x="24" y="16" width="8" height="8" fill="#FFFF00" />
+<rect x="0"  y="24" width="8" height="8" fill="#01FF00" />
+<rect x="8"  y="24" width="8" height="8" fill="#008080" />
+<rect x="16" y="24" width="8" height="8" fill="#FF0000" />
+<rect x="24" y="24" width="8" height="8" fill="#800080" />
+</svg>
