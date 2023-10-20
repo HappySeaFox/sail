@@ -42,12 +42,12 @@ static const char * const SAIL_TEST_IMAGES[] = {
     "@SAIL_TEST_IMAGES_PATH@/jpeg/bpp24-ycbcr.comment.jpeg",
 #endif
 
-#ifdef SAIL_HAVE_BUILTIN_PNG
-    "@SAIL_TEST_IMAGES_PATH@/png/bpp4-indexed.comment.iccp.png",
-#endif
-
 #ifdef SAIL_HAVE_BUILTIN_JPEGXL
     "@SAIL_TEST_IMAGES_PATH@/jpegxl/bpp24.iccp.jxl",
+#endif
+
+#ifdef SAIL_HAVE_BUILTIN_PNG
+    "@SAIL_TEST_IMAGES_PATH@/png/bpp4-indexed.comment.iccp.png",
 #endif
 
 #ifdef SAIL_HAVE_BUILTIN_TGA
