@@ -153,7 +153,7 @@ sail_status_t jpeg_private_fetch_iccp(struct jpeg_decompress_struct *decompress_
                    ? "" : "not ");
 
     if (data != NULL && data_size > 0) {
-        SAIL_TRY_OR_CLEANUP(sail_alloc_iccp_from_data(data, data_size, iccp),
+        SAIL_TRY_OR_CLEANUP(sail_alloc_iccp_from_shallow_data(data, data_size, iccp),
                             /* cleanup */ sail_free(data));
     }
 
