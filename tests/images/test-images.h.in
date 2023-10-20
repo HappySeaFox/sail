@@ -37,6 +37,11 @@ static const char * const SAIL_TEST_IMAGES[] = {
     "@SAIL_TEST_IMAGES_PATH@/ico/bpp24-bgr.ico",
 #endif
 
+#ifdef SAIL_HAVE_BUILTIN_JPEG
+    "@SAIL_TEST_IMAGES_PATH@/jpeg/bpp8-grayscale.comment.jpeg",
+    "@SAIL_TEST_IMAGES_PATH@/jpeg/bpp24-ycbcr.comment.jpeg",
+#endif
+
 #ifdef SAIL_HAVE_BUILTIN_PNG
     "@SAIL_TEST_IMAGES_PATH@/png/bpp4-indexed.comment.iccp.png",
 #endif
