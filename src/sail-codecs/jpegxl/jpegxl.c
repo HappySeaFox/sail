@@ -223,13 +223,15 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void *state,
                 jpegxl_state->source_image->compression = SAIL_COMPRESSION_UNKNOWN;
 
                 /* Special properties. */
-                if (jpegxl_state->load_options->options & SAIL_OPTION_META_DATA) {
-                    SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&jpegxl_state->source_image->special_properties),
-                                        /* cleanup */ sail_destroy_image(image_local));
-                    SAIL_TRY_OR_CLEANUP(jpegxl_private_fetch_special_properties(
-                                            jpegxl_state->basic_info,
-                                            jpegxl_state->source_image->special_properties),
-                                        /* cleanup*/ sail_destroy_image(image_local));
+                if (jpegxl_state->load_options->options & SAIL_OPTION_SOURCE_IMAGE) {
+                    if (jpegxl_state->load_options->options & SAIL_OPTION_META_DATA) {
+                        SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&jpegxl_state->source_image->special_properties),
+                                            /* cleanup */ sail_destroy_image(image_local));
+                        SAIL_TRY_OR_CLEANUP(jpegxl_private_fetch_special_properties(
+                                                jpegxl_state->basic_info,
+                                                jpegxl_state->source_image->special_properties),
+                                            /* cleanup*/ sail_destroy_image(image_local));
+                    }
                 }
 
                 SAIL_LOG_TRACE("JPEGXL: Animation(%s)", jpegxl_state->basic_info->have_animation ? "yes" : "no");
@@ -254,8 +256,10 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void *state,
                     SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
                 }
 
-                SAIL_TRY_OR_CLEANUP(sail_copy_source_image(jpegxl_state->source_image, &image_local->source_image),
-                                    /* cleanup */ sail_destroy_image(image_local));
+                if (jpegxl_state->load_options->options & SAIL_OPTION_SOURCE_IMAGE) {
+                    SAIL_TRY_OR_CLEANUP(sail_copy_source_image(jpegxl_state->source_image, &image_local->source_image),
+                                        /* cleanup */ sail_destroy_image(image_local));
+                }
 
                 if (jpegxl_state->load_options->options & SAIL_OPTION_META_DATA) {
                     if (frame_header.name_length > 0) {
@@ -269,7 +273,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void *state,
 
                 image_local->width          = jpegxl_state->basic_info->xsize;
                 image_local->height         = jpegxl_state->basic_info->ysize;
-                image_local->pixel_format   = jpegxl_private_source_pixel_format_to_output(image_local->source_image->pixel_format);
+                image_local->pixel_format   = jpegxl_private_source_pixel_format_to_output(jpegxl_state->source_image->pixel_format);
                 image_local->bytes_per_line = sail_bytes_per_line(image_local->width, image_local->pixel_format);
 
                 if (jpegxl_state->basic_info->have_animation) {

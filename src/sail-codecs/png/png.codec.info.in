@@ -11,7 +11,7 @@ extensions=png@PNG_CODEC_INFO_EXTENSION_APNG@
 mime-types=image/png
 
 [load-features]
-features=STATIC@PNG_CODEC_INFO_FEATURE_ANIMATED@;META-DATA;INTERLACED;ICCP
+features=STATIC@PNG_CODEC_INFO_FEATURE_ANIMATED@;META-DATA;INTERLACED;ICCP;SOURCE-IMAGE
 tuning=png-filter
 
 [save-features]

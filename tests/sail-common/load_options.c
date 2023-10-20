@@ -70,10 +70,10 @@ static MunitResult test_options_from_features(const MunitParameter params[], voi
 
     struct sail_load_options *load_options;
     struct sail_load_features load_features;
-    load_features.features = SAIL_CODEC_FEATURE_META_DATA | SAIL_CODEC_FEATURE_INTERLACED | SAIL_CODEC_FEATURE_ICCP;
+    load_features.features = SAIL_CODEC_FEATURE_META_DATA | SAIL_CODEC_FEATURE_INTERLACED | SAIL_CODEC_FEATURE_ICCP | SAIL_CODEC_FEATURE_SOURCE_IMAGE;
     munit_assert(sail_alloc_load_options_from_features(&load_features, &load_options) == SAIL_OK);
 
-    munit_assert(load_options->options == (SAIL_OPTION_META_DATA | SAIL_OPTION_ICCP));
+    munit_assert(load_options->options == (SAIL_OPTION_META_DATA | SAIL_OPTION_ICCP | SAIL_OPTION_SOURCE_IMAGE));
     munit_assert_null(load_options->tuning);
 
     sail_destroy_load_options(load_options);

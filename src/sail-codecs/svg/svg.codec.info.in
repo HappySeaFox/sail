@@ -11,7 +11,7 @@ extensions=svg;svgz
 mime-types=image/svg+xml
 
 [load-features]
-features=STATIC
+features=STATIC;SOURCE-IMAGE
 tuning=
 
 [save-features]

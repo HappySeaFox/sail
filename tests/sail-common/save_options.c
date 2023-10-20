@@ -84,7 +84,7 @@ static MunitResult test_options_from_features(const MunitParameter params[], voi
     save_features->compression_level->max_level = 100;
     save_features->compression_level->default_level = 81;
     save_features->compression_level->step = 1;
-    save_features->features = SAIL_CODEC_FEATURE_META_DATA | SAIL_CODEC_FEATURE_INTERLACED | SAIL_CODEC_FEATURE_ICCP;
+    save_features->features = SAIL_CODEC_FEATURE_META_DATA | SAIL_CODEC_FEATURE_INTERLACED | SAIL_CODEC_FEATURE_ICCP | SAIL_CODEC_FEATURE_SOURCE_IMAGE;
     munit_assert(sail_alloc_save_options_from_features(save_features, &save_options) == SAIL_OK);
 
     munit_assert(save_options->options == (SAIL_OPTION_META_DATA | SAIL_OPTION_ICCP));

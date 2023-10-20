@@ -191,7 +191,10 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_png(struct sail_io *io, const 
     png_read_info(png_state->png_ptr, png_state->info_ptr);
 
     SAIL_TRY(sail_alloc_image(&png_state->first_image));
-    SAIL_TRY(sail_alloc_source_image(&png_state->first_image->source_image));
+
+    if (png_state->load_options->options & SAIL_OPTION_SOURCE_IMAGE) {
+        SAIL_TRY(sail_alloc_source_image(&png_state->first_image->source_image));
+    }
 
     png_get_IHDR(png_state->png_ptr,
                     png_state->info_ptr,
@@ -230,23 +233,27 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_png(struct sail_io *io, const 
     if (png_state->is_apng) {
         SAIL_TRY(png_private_alloc_rows(&png_state->prev, png_state->first_image->bytes_per_line, png_state->first_image->height));
 
-        if (png_state->load_options->options & SAIL_OPTION_META_DATA) {
-            SAIL_TRY(sail_alloc_hash_map(&png_state->first_image->source_image->special_properties));
-            SAIL_TRY(png_private_store_num_frames_and_plays(
-                        png_state->png_ptr,
-                        png_state->info_ptr,
-                        png_state->first_image->source_image->special_properties));
+        if (png_state->load_options->options & SAIL_OPTION_SOURCE_IMAGE) {
+            if (png_state->load_options->options & SAIL_OPTION_META_DATA) {
+                SAIL_TRY(sail_alloc_hash_map(&png_state->first_image->source_image->special_properties));
+                SAIL_TRY(png_private_store_num_frames_and_plays(
+                            png_state->png_ptr,
+                            png_state->info_ptr,
+                            png_state->first_image->source_image->special_properties));
+            }
         }
     }
 #else
     png_state->frames = 1;
 #endif
 
-    png_state->first_image->source_image->pixel_format = png_private_png_color_type_to_pixel_format(png_state->color_type, png_state->bit_depth);
-    png_state->first_image->source_image->compression = SAIL_COMPRESSION_DEFLATE;
+    if (png_state->load_options->options & SAIL_OPTION_SOURCE_IMAGE) {
+        png_state->first_image->source_image->pixel_format = png_private_png_color_type_to_pixel_format(png_state->color_type, png_state->bit_depth);
+        png_state->first_image->source_image->compression  = SAIL_COMPRESSION_DEFLATE;
 
-    if (png_state->interlaced_passes > 1) {
-        png_state->first_image->source_image->interlaced = true;
+        if (png_state->interlaced_passes > 1) {
+            png_state->first_image->source_image->interlaced = true;
+        }
     }
 
     /* Read meta data. */

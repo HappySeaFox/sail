@@ -11,7 +11,7 @@ extensions=jxl
 mime-types=image/jxl
 
 [load-features]
-features=STATIC;META-DATA;ICCP
+features=STATIC;META-DATA;ICCP;SOURCE-IMAGE
 tuning=
 
 [save-features]

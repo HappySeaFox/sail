@@ -181,11 +181,14 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_gif(void *state, st
 
     struct sail_image *image_local;
     SAIL_TRY(sail_alloc_image(&image_local));
-    SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
-                        /* cleanup */ sail_destroy_image(image_local));
 
-    image_local->source_image->pixel_format = SAIL_PIXEL_FORMAT_BPP8_INDEXED;
-    image_local->source_image->compression = SAIL_COMPRESSION_LZW;
+    if (gif_state->load_options->options & SAIL_OPTION_SOURCE_IMAGE) {
+        SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
+                            /* cleanup */ sail_destroy_image(image_local));
+
+        image_local->source_image->pixel_format = SAIL_PIXEL_FORMAT_BPP8_INDEXED;
+        image_local->source_image->compression = SAIL_COMPRESSION_LZW;
+    }
 
     gif_state->current_image++;
 
@@ -318,8 +321,10 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_gif(void *state, st
                 SAIL_LOG_AND_RETURN(SAIL_ERROR_MISSING_PALETTE);
             }
 
-            if (gif_state->gif->Image.Interlace) {
-                image_local->source_image->interlaced = true;
+            if (gif_state->load_options->options & SAIL_OPTION_SOURCE_IMAGE) {
+                if (gif_state->gif->Image.Interlace) {
+                    image_local->source_image->interlaced = true;
+                }
             }
 
             image_local->pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;
@@ -338,7 +343,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_gif(void *state, struct sail_
 
     struct gif_state *gif_state = state;
 
-    const int passes = image->source_image->interlaced ? 4 : 1;
+    const int passes = gif_state->gif->Image.Interlace ? 4 : 1;
     const int last_pass = passes - 1;
     unsigned next_interlaced_row = 0;
 

@@ -132,28 +132,31 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_qoi(void *state, st
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
     }
 
-    /* Construct the SAIL image. */
-    struct sail_image *image_local;
-    SAIL_TRY(sail_alloc_image(&image_local));
-    SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
-                        /* cleanup */ sail_destroy_image(image_local));
-
+    enum SailPixelFormat pixel_format;
     switch (qoi_state->qoi_desc.channels) {
-        case 3: image_local->source_image->pixel_format = SAIL_PIXEL_FORMAT_BPP24_RGB;  break;
-        case 4: image_local->source_image->pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA; break;
+        case 3: pixel_format = SAIL_PIXEL_FORMAT_BPP24_RGB;  break;
+        case 4: pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA; break;
         default: {
-            sail_destroy_image(image_local);
-
             SAIL_LOG_ERROR("QOI: Number of channels is %d, but only RGB24 and RGB32 images are supported", qoi_state->qoi_desc.channels);
             SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
         }
     }
 
-    image_local->source_image->compression = SAIL_COMPRESSION_QOI;
+    /* Construct the SAIL image. */
+    struct sail_image *image_local;
+    SAIL_TRY(sail_alloc_image(&image_local));
+
+    if (qoi_state->load_options->options & SAIL_OPTION_SOURCE_IMAGE) {
+        SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
+                            /* cleanup */ sail_destroy_image(image_local));
+
+        image_local->source_image->pixel_format = pixel_format;
+        image_local->source_image->compression  = SAIL_COMPRESSION_QOI;
+    }
 
     image_local->width          = qoi_state->qoi_desc.width;
     image_local->height         = qoi_state->qoi_desc.height;
-    image_local->pixel_format   = image_local->source_image->pixel_format;
+    image_local->pixel_format   = pixel_format;
     image_local->bytes_per_line = sail_bytes_per_line(image_local->width, image_local->pixel_format);
 
     *image = image_local;

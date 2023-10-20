@@ -156,11 +156,14 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_webp(struct sail_io *io, const
     /* Construct a canvas image. */
     struct sail_image *image_local;
     SAIL_TRY(sail_alloc_image(&image_local));
-    SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
-                        /* cleanup */ sail_destroy_image(image_local));
 
-    image_local->source_image->chroma_subsampling = SAIL_CHROMA_SUBSAMPLING_420;
-    image_local->source_image->compression = SAIL_COMPRESSION_WEBP;
+    if (webp_state->load_options->options & SAIL_OPTION_SOURCE_IMAGE) {
+        SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
+                            /* cleanup */ sail_destroy_image(image_local));
+
+        image_local->source_image->chroma_subsampling = SAIL_CHROMA_SUBSAMPLING_420;
+        image_local->source_image->compression = SAIL_COMPRESSION_WEBP;
+    }
 
     image_local->width          = WebPDemuxGetI(webp_state->webp_demux, WEBP_FF_CANVAS_WIDTH);
     image_local->height         = WebPDemuxGetI(webp_state->webp_demux, WEBP_FF_CANVAS_HEIGHT);
@@ -241,7 +244,11 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_webp(void *state, s
     struct sail_image *image_local;
     SAIL_TRY(sail_copy_image_skeleton(webp_state->canvas_image, &image_local));
 
-    image_local->source_image->pixel_format = webp_state->webp_iterator->has_alpha ? SAIL_PIXEL_FORMAT_BPP32_YUVA : SAIL_PIXEL_FORMAT_BPP24_YUV;
+    if (webp_state->load_options->options & SAIL_OPTION_SOURCE_IMAGE) {
+        image_local->source_image->pixel_format = webp_state->webp_iterator->has_alpha
+                                                    ? SAIL_PIXEL_FORMAT_BPP32_YUVA
+                                                    : SAIL_PIXEL_FORMAT_BPP24_YUV;
+    }
 
     if (webp_state->frame_count > 1) {
         /* Fall back to 100 ms. when the duration is <= 0. */

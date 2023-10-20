@@ -126,13 +126,16 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_svg(void *state, st
 
     struct sail_image *image_local;
     SAIL_TRY(sail_alloc_image(&image_local));
-    SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
-                        /* cleanup */ sail_destroy_image(image_local));
+
+    if (svg_state->load_options->options & SAIL_OPTION_SOURCE_IMAGE) {
+        SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
+                            /* cleanup */ sail_destroy_image(image_local));
+
+        image_local->source_image->pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;
+        image_local->source_image->compression  = SAIL_COMPRESSION_NONE;
+    }
 
     const resvg_size image_size = resvg_get_image_size(svg_state->resvg_tree);
-
-    image_local->source_image->pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;
-    image_local->source_image->compression = SAIL_COMPRESSION_NONE;
 
     image_local->width          = (unsigned)image_size.width;
     image_local->height         = (unsigned)image_size.height;

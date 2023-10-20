@@ -11,7 +11,7 @@ extensions=wal
 mime-types=
 
 [load-features]
-features=STATIC;MULTI-PAGED
+features=STATIC;MULTI-PAGED;SOURCE-IMAGE
 tuning=
 
 [save-features]

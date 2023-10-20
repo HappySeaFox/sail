@@ -11,7 +11,7 @@ extensions=tga;vda;vst;icb;tpic
 mime-types=image/x-targa;image/x-tga
 
 [load-features]
-features=STATIC;META-DATA
+features=STATIC;META-DATA;SOURCE-IMAGE
 tuning=
 
 [save-features]

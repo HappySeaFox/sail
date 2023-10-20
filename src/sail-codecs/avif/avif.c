@@ -156,16 +156,19 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_avif(void *state, s
 
     struct sail_image *image_local;
     SAIL_TRY(sail_alloc_image(&image_local));
-    SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
-                        /* cleanup */ sail_destroy_image(image_local));
 
     avifRGBImageSetDefaults(&avif_state->rgb_image, avif_image);
     avif_state->rgb_image.depth = avif_private_round_depth(avif_state->rgb_image.depth);
 
-    image_local->source_image->pixel_format =
-        avif_private_sail_pixel_format(avif_image->yuvFormat, avif_image->depth, avif_image->alphaPlane != NULL);
-    image_local->source_image->chroma_subsampling = avif_private_sail_chroma_subsampling(avif_image->yuvFormat);
-    image_local->source_image->compression = SAIL_COMPRESSION_AV1;
+    if (avif_state->load_options->options & SAIL_OPTION_SOURCE_IMAGE) {
+        SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
+                            /* cleanup */ sail_destroy_image(image_local));
+
+        image_local->source_image->pixel_format =
+            avif_private_sail_pixel_format(avif_image->yuvFormat, avif_image->depth, avif_image->alphaPlane != NULL);
+        image_local->source_image->chroma_subsampling = avif_private_sail_chroma_subsampling(avif_image->yuvFormat);
+        image_local->source_image->compression = SAIL_COMPRESSION_AV1;
+    }
 
     image_local->width          = avif_image->width;
     image_local->height         = avif_image->height;

@@ -162,11 +162,14 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_xbm(void *state, st
     /* Construct image. */
     struct sail_image *image_local;
     SAIL_TRY(sail_alloc_image(&image_local));
-    SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
-                        /* cleanup */ sail_destroy_image(image_local));
 
-    image_local->source_image->pixel_format = SAIL_PIXEL_FORMAT_BPP1_INDEXED;
-    image_local->source_image->compression = SAIL_COMPRESSION_NONE;
+    if (xbm_state->load_options->options & SAIL_OPTION_SOURCE_IMAGE) {
+        SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
+                            /* cleanup */ sail_destroy_image(image_local));
+
+        image_local->source_image->pixel_format = SAIL_PIXEL_FORMAT_BPP1_INDEXED;
+        image_local->source_image->compression  = SAIL_COMPRESSION_NONE;
+    }
 
     image_local->width          = width;
     image_local->height         = height;

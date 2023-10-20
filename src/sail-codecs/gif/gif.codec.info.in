@@ -11,7 +11,7 @@ extensions=gif
 mime-types=image/gif
 
 [load-features]
-features=STATIC;ANIMATED;META-DATA
+features=STATIC;ANIMATED;META-DATA;SOURCE-IMAGE
 tuning=
 
 [save-features]

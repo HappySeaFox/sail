@@ -11,7 +11,7 @@ extensions=tif;tiff
 mime-types=image/tiff;image/tiff-fx
 
 [load-features]
-features=STATIC;MULTI-PAGED;META-DATA;ICCP
+features=STATIC;MULTI-PAGED;META-DATA;ICCP;SOURCE-IMAGE
 tuning=
 
 [save-features]

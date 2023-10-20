@@ -12,7 +12,7 @@ extensions=avif;avifs
 mime-types=image/avif;image/avif-sequence
 
 [load-features]
-features=STATIC;ANIMATED;META-DATA;ICCP
+features=STATIC;ANIMATED;META-DATA;ICCP;SOURCE-IMAGE
 tuning=
 
 [save-features]

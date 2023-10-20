@@ -11,7 +11,7 @@ extensions=jpg;jpeg;jpe;jif;jfif;jfi
 mime-types=image/jpeg
 
 [load-features]
-features=STATIC;META-DATA@JPEG_CODEC_INFO_FEATURE_ICCP@
+features=STATIC;META-DATA@JPEG_CODEC_INFO_FEATURE_ICCP@;SOURCE-IMAGE
 tuning=jpeg-dct-method;jpeg-optimize-coding;jpeg-smoothing-factor
 
 [save-features]

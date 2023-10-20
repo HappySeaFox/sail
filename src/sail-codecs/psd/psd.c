@@ -220,19 +220,24 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_psd(void *state, st
 
     SAIL_LOG_TRACE("PSD: mode(%u), channels(%u), depth(%u)", mode, psd_state->channels, psd_state->depth);
 
+    enum SailPixelFormat pixel_format;
+    SAIL_TRY(psd_private_sail_pixel_format(mode, psd_state->channels, psd_state->depth, &pixel_format));
+
     /* Allocate image. */
     struct sail_image *image_local;
     SAIL_TRY(sail_alloc_image(&image_local));
-    SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
-                        /* cleanup */ sail_destroy_image(image_local));
 
-    SAIL_TRY_OR_CLEANUP(psd_private_sail_pixel_format(mode, psd_state->channels, psd_state->depth, &image_local->source_image->pixel_format),
-                        /* cleanup */ sail_destroy_image(image_local));
-    image_local->source_image->compression  = psd_private_sail_compression(psd_state->compression);
+    if (psd_state->load_options->options & SAIL_OPTION_SOURCE_IMAGE) {
+        SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
+                            /* cleanup */ sail_destroy_image(image_local));
+
+        image_local->source_image->pixel_format = pixel_format;
+        image_local->source_image->compression  = psd_private_sail_compression(psd_state->compression);
+    }
 
     image_local->width          = width;
     image_local->height         = height;
-    image_local->pixel_format   = image_local->source_image->pixel_format;
+    image_local->pixel_format   = pixel_format;
     image_local->palette        = palette;
     image_local->bytes_per_line = sail_bytes_per_line(image_local->width, image_local->pixel_format);
 

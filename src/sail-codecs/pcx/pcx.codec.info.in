@@ -11,7 +11,7 @@ extensions=pcx
 mime-types=image/x-pcx;image/vnd.zbrush.pcx
 
 [load-features]
-features=STATIC
+features=STATIC;SOURCE-IMAGE
 tuning=
 
 [save-features]

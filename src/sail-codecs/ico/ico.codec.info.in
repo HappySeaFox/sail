@@ -11,7 +11,7 @@ extensions=ico;cur
 mime-types=image/x-icon;image/vnd.microsoft.icon
 
 [load-features]
-features=STATIC;MULTI-PAGED
+features=STATIC;MULTI-PAGED;SOURCE-IMAGE
 tuning=
 
 [save-features]

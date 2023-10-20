@@ -69,6 +69,10 @@ sail_status_t sail_alloc_load_options_from_features(const struct sail_load_featu
         load_options_local->options |= SAIL_OPTION_ICCP;
     }
 
+    if (load_features->features & SAIL_CODEC_FEATURE_SOURCE_IMAGE) {
+        load_options_local->options |= SAIL_OPTION_SOURCE_IMAGE;
+    }
+
     *load_options = load_options_local;
 
     return SAIL_OK;

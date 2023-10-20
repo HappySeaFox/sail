@@ -165,24 +165,27 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpeg(void *state, s
 
     jpeg_state->frame_loaded = true;
 
-    struct sail_image *image_local;
-    SAIL_TRY(sail_alloc_image(&image_local));
-    SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
-                        /* cleanup */ sail_destroy_image(image_local));
-
     if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0) {
         jpeg_state->libjpeg_error = true;
-        sail_destroy_image(image_local);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
+    struct sail_image *image_local;
+    SAIL_TRY(sail_alloc_image(&image_local));
+
+    if (jpeg_state->load_options->options & SAIL_OPTION_SOURCE_IMAGE) {
+        SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
+                            /* cleanup */ sail_destroy_image(image_local));
+
+        image_local->source_image->pixel_format = jpeg_private_color_space_to_pixel_format(jpeg_state->decompress_context->jpeg_color_space);
+        image_local->source_image->compression  = SAIL_COMPRESSION_JPEG;
+    }
+
     /* Image properties. */
-    image_local->width                      = jpeg_state->decompress_context->output_width;
-    image_local->height                     = jpeg_state->decompress_context->output_height;
-    image_local->pixel_format               = jpeg_private_color_space_to_pixel_format(jpeg_state->decompress_context->out_color_space);
-    image_local->bytes_per_line             = sail_bytes_per_line(image_local->width, image_local->pixel_format);
-    image_local->source_image->pixel_format = jpeg_private_color_space_to_pixel_format(jpeg_state->decompress_context->jpeg_color_space);
-    image_local->source_image->compression  = SAIL_COMPRESSION_JPEG;
+    image_local->width          = jpeg_state->decompress_context->output_width;
+    image_local->height         = jpeg_state->decompress_context->output_height;
+    image_local->pixel_format   = jpeg_private_color_space_to_pixel_format(jpeg_state->decompress_context->out_color_space);
+    image_local->bytes_per_line = sail_bytes_per_line(image_local->width, image_local->pixel_format);
 
     /* Read meta data. */
     if (jpeg_state->load_options->options & SAIL_OPTION_META_DATA) {

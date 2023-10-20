@@ -119,11 +119,14 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_wal(void *state, st
 
     struct sail_image *image_local;
     SAIL_TRY(sail_alloc_image(&image_local));
-    SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
-                        /* cleanup */ sail_destroy_image(image_local));
 
-    image_local->source_image->pixel_format = SAIL_PIXEL_FORMAT_BPP8_INDEXED;
-    image_local->source_image->compression = SAIL_COMPRESSION_NONE;
+    if (wal_state->load_options->options & SAIL_OPTION_SOURCE_IMAGE) {
+        SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
+                            /* cleanup */ sail_destroy_image(image_local));
+
+        image_local->source_image->pixel_format = SAIL_PIXEL_FORMAT_BPP8_INDEXED;
+        image_local->source_image->compression  = SAIL_COMPRESSION_NONE;
+    }
 
     image_local->width          = wal_state->width;
     image_local->height         = wal_state->height;

@@ -132,23 +132,29 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_pcx(void *state, st
 
     pcx_state->frame_loaded = true;
 
+    enum SailPixelFormat pixel_format;
+    SAIL_TRY(pcx_private_sail_pixel_format(
+                pcx_state->pcx_header.bits_per_plane,
+                pcx_state->pcx_header.planes,
+                pcx_state->pcx_header.palette_info,
+                &pixel_format));
+
     struct sail_image *image_local;
     SAIL_TRY(sail_alloc_image(&image_local));
-    SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
-                        /* cleanup */ sail_destroy_image(image_local));
 
-    SAIL_TRY_OR_CLEANUP(pcx_private_sail_pixel_format(
-                            pcx_state->pcx_header.bits_per_plane,
-                            pcx_state->pcx_header.planes,
-                            pcx_state->pcx_header.palette_info,
-                            &image_local->source_image->pixel_format),
-                        /* cleanup */ sail_destroy_image(image_local));
+    if (pcx_state->load_options->options & SAIL_OPTION_SOURCE_IMAGE) {
+        SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
+                            /* cleanup */ sail_destroy_image(image_local));
 
-    image_local->source_image->compression = (pcx_state->pcx_header.encoding == SAIL_PCX_NO_ENCODING) ? SAIL_COMPRESSION_NONE : SAIL_COMPRESSION_RLE;
+        image_local->source_image->pixel_format = pixel_format;
+        image_local->source_image->compression  = (pcx_state->pcx_header.encoding == SAIL_PCX_NO_ENCODING)
+                                                    ? SAIL_COMPRESSION_NONE
+                                                    : SAIL_COMPRESSION_RLE;
+    }
 
     image_local->width = pcx_state->pcx_header.xmax - pcx_state->pcx_header.xmin + 1;
     image_local->height = pcx_state->pcx_header.ymax - pcx_state->pcx_header.ymin + 1;
-    image_local->pixel_format = image_local->source_image->pixel_format;
+    image_local->pixel_format = pixel_format;
     image_local->bytes_per_line = pcx_state->pcx_header.bytes_per_line * pcx_state->pcx_header.planes;
 
     /* Scan line buffer to store planes so we can merge them later into individual pixels. */

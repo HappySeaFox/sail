@@ -137,8 +137,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_tiff(void *state, s
 
     struct sail_image *image_local;
     SAIL_TRY(sail_alloc_image(&image_local));
-    SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
-                        /* cleanup */ sail_destroy_image(image_local));
 
     /* Start reading the next directory. */
     if (!TIFFSetDirectory(tiff_state->tiff, tiff_state->current_frame++)) {
@@ -184,16 +182,21 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_tiff(void *state, s
     image_local->pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;
     image_local->bytes_per_line = sail_bytes_per_line(image_local->width, image_local->pixel_format);
 
-    /* Fill the source image properties. */
-    int compression = COMPRESSION_NONE;
-    if (!TIFFGetField(tiff_state->tiff, TIFFTAG_COMPRESSION, &compression)) {
-        SAIL_LOG_ERROR("TIFF: Failed to get the image compression type");
-        sail_destroy_image(image_local);
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
-    }
+    /* Source image. */
+    if (tiff_state->load_options->options & SAIL_OPTION_SOURCE_IMAGE) {
+        int compression = COMPRESSION_NONE;
+        if (!TIFFGetField(tiff_state->tiff, TIFFTAG_COMPRESSION, &compression)) {
+            SAIL_LOG_ERROR("TIFF: Failed to get the image compression type");
+            sail_destroy_image(image_local);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+        }
 
-    image_local->source_image->pixel_format = tiff_private_bpp_to_pixel_format(tiff_state->image.bitspersample * tiff_state->image.samplesperpixel);
-    image_local->source_image->compression = tiff_private_compression_to_sail_compression(compression);
+        SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
+                            /* cleanup */ sail_destroy_image(image_local));
+
+        image_local->source_image->pixel_format = tiff_private_bpp_to_pixel_format(tiff_state->image.bitspersample * tiff_state->image.samplesperpixel);
+        image_local->source_image->compression  = tiff_private_compression_to_sail_compression(compression);
+    }
 
     *image = image_local;
 
