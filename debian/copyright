@@ -7,7 +7,7 @@ Files: debian/*
 Copyright: 2020 Dmitry Baryshev
 License: GPL-3+
 
-Files: src/* examples/* tests/sail/* icons/*
+Files: cmake/* src/* examples/* tests/*
 Copyright: 2020 Dmitry Baryshev
 License: MIT
 
