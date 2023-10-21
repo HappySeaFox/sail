@@ -146,7 +146,7 @@ script:
         fail_on_error cmake --build . --config $CMAKE_BUILD_TYPE --target install
 
         cd tests
-        fail_on_error ctest --verbose -C $CMAKE_BUILD_TYPE
+        fail_on_error ctest --verbose -C $CMAKE_BUILD_TYPE --rerun-failed --output-on-failure
 
         fail_on_error "$CMAKE_INSTALL_PREFIX/bin/sail" --version
 
