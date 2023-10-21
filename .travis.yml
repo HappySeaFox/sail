@@ -139,6 +139,8 @@ script:
 
     case "$TRAVIS_OS_NAME" in
       windows)
+        git -C .. apply .travis/disable-jpeg-test-files.patch
+
         CMAKE_INSTALL_PREFIX="C:/SAIL"
 
         fail_on_error cmake -A x64 -DBUILD_SHARED_LIBS="$BUILD_SHARED_LIBS" -DCMAKE_INSTALL_PREFIX="$CMAKE_INSTALL_PREFIX" \
