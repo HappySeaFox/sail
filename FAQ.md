@@ -317,12 +317,12 @@ mime-types=image/abc
 # Can be empty if the image codec cannot load images.
 #
 # Possible values:
-#    STATIC      - Can load static images.
-#    ANIMATED    - Can load animated images.
-#    MULTI-PAGED - Can load multi-paged (but not animated) images.
-#    META-DATA   - Can load image meta data like JPEG comments or EXIF.
-#    INTERLACED  - Can load interlaced images.
-#    ICCP        - Can load embedded ICC profiles.
+#    STATIC       - Can load static images.
+#    ANIMATED     - Can load animated images.
+#    MULTI-PAGED  - Can load multi-paged (but not animated) images.
+#    META-DATA    - Can load image meta data like JPEG comments or EXIF.
+#    ICCP         - Can load embedded ICC profiles.
+#    SOURCE-IMAGE - Can populate source image information in sail_image.source_image.
 #
 features=STATIC;META-DATA;INTERLACED;ICCP
 
