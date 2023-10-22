@@ -35,7 +35,7 @@ Table of Contents
   * [Can I compile codecs dependencies (like libjpeg) directly into SAIL?](#can-i-compile-codecs-dependencies-like-libjpeg-directly-into-sail)
   * [Are there any C/C\+\+ examples?](#are-there-any-cc-examples)
   * [Are there any bindings to other programming languages?](#are-there-any-bindings-to-other-programming-languages)
-  * [How many image formats are you going to implement?(#how-many-image-formats-are-you-going-to-implement)
+  * [How many image formats are you going to implement?](#how-many-image-formats-are-you-going-to-implement)
   * [I have problems with include paths with vcpkg without CMake](#i-have-problems-with-include-paths-with-vcpkg-without-cmake)
   * [I have questions, issues, or proposals](#i-have-questions-issues-or-proposals)
 
