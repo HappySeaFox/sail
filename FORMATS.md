@@ -187,7 +187,7 @@
         <br/>Key: <i>"jpegxl-intrinsic-height"</i>. Possible values: unsigned int.
         <br/>See the <a href="https://libjxl.readthedocs.io/en/latest/api_metadata.html#_CPPv412JxlBasicInfo">JxlBasicInfo structure</a> documentation in libjxl for more.
     </td>
-    <td>-</td>
+    <td>Wide color gamut data gets clipped.</td>
     <td>Unsupported</td>
     <td>-</td>
     <td>-</td>
