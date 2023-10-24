@@ -98,6 +98,9 @@ else()
     set(SAIL_VCPKG OFF)
 endif()
 
+# Number of bytes to read from a file or memory to detect the image
+# format by its MIME type.
+#
 set(SAIL_MAGIC_BUFFER_SIZE 16)
 
 # Our bundled libs
