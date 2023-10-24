@@ -4,14 +4,49 @@ add_subdirectory(common/bmp)
 
 # List of codecs
 #
-set(CODECS avif bmp gif ico jpeg jpeg2000 jpegxl pcx png psd qoi svg tga tiff wal webp xbm)
+set(HIGHEST_PRIORITY_CODECS gif jpeg png tiff)
+set(HIGH_PRIORITY_CODECS    bmp svg)
+set(MEDIUM_PRIORITY_CODECS  avif jpeg2000 jpegxl webp)
+set(LOW_PRIORITY_CODECS     ico pcx psd qoi tga)
+set(LOWEST_PRIORITY_CODECS  wal xbm)
 
+set(CODECS ${HIGHEST_PRIORITY_CODECS}
+           ${HIGH_PRIORITY_CODECS}
+           ${MEDIUM_PRIORITY_CODECS}
+           ${LOW_PRIORITY_CODECS}
+           ${LOWEST_PRIORITY_CODECS})
 list(SORT CODECS)
+
+# Expand codecs priorities to actual codecs.
+#
+macro(sail_expand_priorities)
+    set(TEMP_LIST)
+
+    foreach (codec IN LISTS ${ARGV0})
+        if (codec STREQUAL "highest-priority")
+            list(APPEND TEMP_LIST ${HIGHEST_PRIORITY_CODECS})
+        elseif (codec STREQUAL "high-priority")
+            list(APPEND TEMP_LIST ${HIGH_PRIORITY_CODECS})
+        elseif (codec STREQUAL "medium-priority")
+            list(APPEND TEMP_LIST ${MEDIUM_PRIORITY_CODECS})
+        elseif (codec STREQUAL "low-priority")
+            list(APPEND TEMP_LIST ${LOW_PRIORITY_CODECS})
+        elseif (codec STREQUAL "lowest-priority")
+            list(APPEND TEMP_LIST ${LOWEST_PRIORITY_CODECS})
+        else()
+            list(APPEND TEMP_LIST ${codec})
+        endif()
+    endforeach()
+
+    set(${ARGV0} ${TEMP_LIST})
+endmacro()
+
+sail_expand_priorities(SAIL_ONLY_CODECS)
+sail_expand_priorities(SAIL_ENABLE_CODECS)
+sail_expand_priorities(SAIL_DISABLE_CODECS)
 
 # Filter out codecs
 #
-set(FORCED_CODECS "")
-
 if (SAIL_ONLY_CODECS)
     set(ENABLED_CODECS "")
 
