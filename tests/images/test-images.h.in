@@ -87,6 +87,10 @@ static const char * const SAIL_TEST_IMAGES[] = {
     "@SAIL_TEST_IMAGES_PATH@/tiff/bpp24.tiff",
 #endif
 
+#ifdef SAIL_HAVE_BUILTIN_WAL
+    "@SAIL_TEST_IMAGES_PATH@/wal/bpp8-indexed.wal",
+#endif
+
 #ifdef SAIL_HAVE_BUILTIN_WEBP
     "@SAIL_TEST_IMAGES_PATH@/webp/bpp24-yuv.webp",
 #endif
