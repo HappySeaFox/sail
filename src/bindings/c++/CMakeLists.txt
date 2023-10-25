@@ -90,8 +90,8 @@ set(PUBLIC_HEADERS abstract_io-c++.h
                    variant-c++.h)
 
 set_target_properties(sail-c++ PROPERTIES
-                               VERSION "0.7.1"
-                               SOVERSION 0
+                               VERSION ${PROJECT_VERSION}
+                               SOVERSION ${PROJECT_VERSION_MAJOR}
                                PUBLIC_HEADER "${PUBLIC_HEADERS}")
 
 sail_enable_asan(TARGET sail-c++)

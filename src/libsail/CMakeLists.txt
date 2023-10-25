@@ -61,8 +61,8 @@ set(PUBLIC_HEADERS codec_bundle.h
                    sail_technical_diver.h)
 
 set_target_properties(sail PROPERTIES
-                           VERSION "0.8.0"
-                           SOVERSION 0
+                           VERSION ${PROJECT_VERSION}
+                           SOVERSION ${PROJECT_VERSION_MAJOR}
                            PUBLIC_HEADER "${PUBLIC_HEADERS}")
 
 sail_enable_asan(TARGET sail)
