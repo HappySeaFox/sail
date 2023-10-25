@@ -45,6 +45,10 @@ sail_expand_priorities(SAIL_ONLY_CODECS)
 sail_expand_priorities(SAIL_ENABLE_CODECS)
 sail_expand_priorities(SAIL_DISABLE_CODECS)
 
+list(REMOVE_DUPLICATES SAIL_ONLY_CODECS)
+list(REMOVE_DUPLICATES SAIL_ENABLE_CODECS)
+list(REMOVE_DUPLICATES SAIL_DISABLE_CODECS)
+
 # Filter out codecs
 #
 if (SAIL_ONLY_CODECS)
