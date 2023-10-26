@@ -124,7 +124,7 @@ image& image::operator=(const sail::image &image)
     set_meta_data(image.meta_data());
     set_iccp(image.iccp());
     set_source_image(image.source_image());
-    set_pixels(image.pixels(), image.d->pixels_size);
+    set_pixels(image.pixels(), image.pixels_size());
 
     return *this;
 }
@@ -249,6 +249,11 @@ void* image::scan_line(unsigned i)
 const void* image::scan_line(unsigned i) const
 {
     return reinterpret_cast<const char *>(pixels()) + i * bytes_per_line();
+}
+
+std::size_t image::pixels_size() const
+{
+    return d->pixels_size;
 }
 
 void image::set_resolution(const sail::resolution &resolution)

@@ -284,6 +284,11 @@ public:
     const void* scan_line(unsigned i) const;
 
     /*
+     * Returns the size of the pixel data in bytes.
+     */
+    std::size_t pixels_size() const;
+
+    /*
      * Sets a new resolution.
      */
     void set_resolution(const sail::resolution &resolution);
