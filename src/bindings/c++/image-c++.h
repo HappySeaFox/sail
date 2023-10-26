@@ -183,6 +183,13 @@ public:
     SailPixelFormat pixel_format() const;
 
     /*
+     * Returns the number of bits per pixel (depth) of the image.
+     * For example, for SAIL_PIXEL_FORMAT_RGB 24 is returned.
+     * Returns 0 on unknown pixel format.
+     */
+    unsigned bits_per_pixel() const;
+
+    /*
      * Returns the image gamma.
      *
      * LOAD: Set by SAIL to a valid gamma if it's available. 1 by default.

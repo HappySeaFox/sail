@@ -191,6 +191,11 @@ SailPixelFormat image::pixel_format() const
     return d->sail_image->pixel_format;
 }
 
+unsigned image::bits_per_pixel() const
+{
+    return sail_bits_per_pixel(pixel_format());
+}
+
 double image::gamma() const
 {
     return d->sail_image->gamma;
