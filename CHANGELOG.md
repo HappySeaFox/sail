@@ -7,14 +7,19 @@ See [README](README.md) for more.
 
 # SAIL (since 0.9.0)
 
-## 0.9.0 XXXX-XX-XX
+## 0.9.0 2023-XX-XX
 
-- first public release
-- implemented a rich C client API to load and save images
-- implemented a rich C++ client API to load and save images
-- codecs interfaces are now hidden. Always use the client APIs to load or save images
+- codecs interface has been rewritten in C
+- implemented rich C and С++ client APIs to load and save images: junior, advanced, deep diver, technical diver
+- load from everywhere: files, memory, custom I/O sources
+- codec-specific tuning options like PNG filters
+- step-by-step loading of multi-paged or animated images
+- meta data support: text comments, EXIF, ICC profiles
+- implemented conversion functions (with limitations)
+- [SAIL website](https://sail.software)
+- 19 codecs in total: APNG, AVIF, BMP, CUR, GIF, ICO, JPEG, JPEG2000, JPEG XL, PCX, PNG, PSD, QOI, SVG, TGA, TIFF, WAL, WEBP, XBM
 
-# ksquirrel-libs (until 0.8.0)
+# ksquirrel-libs (before 0.9.0)
 
 ## 0.8.0 2007-12-08
 
