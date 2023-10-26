@@ -79,7 +79,8 @@ option(SAIL_BUILD_TESTS "Build tests." ON)
 option(SAIL_DEV "Enable developer mode. Be more strict when compiling source code, for example." OFF)
 set(SAIL_ENABLE_CODECS "" CACHE STRING "Forcefully enable the codecs specified in this ';'-separated list. \
 If an enabled codec fails to find its dependencies, the configuration process fails. \
-One can also specify not just individual codecs but codec groups by their priority like that: highest-priority;xbm.")
+One can also specify not just individual codecs but codec groups by their priority like that: highest-priority;xbm. \
+When SAIL_ENABLE_CODECS is enabled, SAIL_ONLY_CODECS gets ignored.")
 set(SAIL_DISABLE_CODECS "" CACHE STRING "Disable the codecs specified in this ';'-separated list. \
 One can also specify not just individual codecs but codec groups by their priority like that: highest-priority;xbm.")
 option(SAIL_INSTALL_PDB "Install PDB files along with libraries." ON)
