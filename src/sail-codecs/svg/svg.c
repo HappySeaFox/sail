@@ -153,9 +153,12 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_svg(void *state, struct sail_
 
     memset(image->pixels, 0, (size_t)image->bytes_per_line * image->height);
 
+#ifdef SAIL_HAVE_RESVG_FIT_TO
     const resvg_fit_to resvg_fit_to = { RESVG_FIT_TO_ORIGINAL, 0 };
-
     resvg_render(svg_state->resvg_tree, resvg_fit_to, image->width, image->height, image->pixels);
+#else
+    resvg_render(svg_state->resvg_tree, resvg_transform_identity(), image->width, image->height, image->pixels);
+#endif
 
     return SAIL_OK;
 }
