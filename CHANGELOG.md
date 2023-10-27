@@ -9,6 +9,7 @@ See [README](README.md) for more.
 
 ## 0.9.0 2023-XX-XX
 
+- 20 years anniversary!
 - codecs interface has been rewritten in C
 - implemented rich C and С++ client APIs to load and save images: junior, advanced, deep diver, technical diver
 - load from everywhere: files, memory, custom I/O sources
