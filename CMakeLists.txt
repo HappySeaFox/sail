@@ -80,6 +80,7 @@ option(SAIL_DEV "Enable developer mode. Be more strict when compiling source cod
 set(SAIL_ENABLE_CODECS "" CACHE STRING "Forcefully enable the codecs specified in this ';'-separated list. \
 If an enabled codec fails to find its dependencies, the configuration process fails. \
 One can also specify not just individual codecs but codec groups by their priority like that: highest-priority;xbm. \
+Other codecs may or may not be enabled depending on found dependencies. \
 When SAIL_ENABLE_CODECS is enabled, SAIL_ONLY_CODECS gets ignored.")
 set(SAIL_DISABLE_CODECS "" CACHE STRING "Disable the codecs specified in this ';'-separated list. \
 One can also specify not just individual codecs but codec groups by their priority like that: highest-priority;xbm.")
