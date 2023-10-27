@@ -19,11 +19,11 @@ vcpkg install sail
 - `SAIL_COLORED_OUTPUT=ON|OFF` - Enable colored console output on Windows >= 10 and Unix platforms. Default: `ON`
 - `SAIL_COMBINE_CODECS=ON|OFF` - Combine all codecs into a single library. Static build always sets this option to ON. Default: `OFF`
 - `SAIL_DEV=ON|OFF` - Enable developer mode with pedantic warnings and possible `ASAN` enabled for examples. Default: `OFF`
-- `SAIL_DISABLE_CODECS="a;b;c"` - Enable all codecs except the codecs specified in this ';'-separated list.
-- `SAIL_ENABLE_CODECS="a;b;c"` - Forcefully enable the codecs specified in this ';'-separated list. If an enabled codec fails to find its dependencies, the configuration process fails. Default: empty list
+- `SAIL_DISABLE_CODECS="a;b;c"` - Disable the codecs specified in this ';'-separated list. One can also specify not just individual codecs but codec groups by their priority like that: highest-priority;xbm. Default: empty list
+- `SAIL_ENABLE_CODECS="a;b;c"` - Forcefully enable the codecs specified in this ';'-separated list. If an enabled codec fails to find its dependencies, the configuration process fails. One can also specify not just individual codecs but codec groups by their priority like that: highest-priority;xbm. Other codecs may or may not be enabled depending on found dependencies. When SAIL_ENABLE_CODECS is enabled, SAIL_ONLY_CODECS gets ignored. Default: empty list
 - `SAIL_THIRD_PARTY_CODECS_PATH=ON|OFF` - Enable loading custom codecs from the ';'-separated paths specified in the `SAIL_THIRD_PARTY_CODECS_PATH` environment variable. Default: `ON`
 - `SAIL_THREAD_SAFE=ON|OFF` - Enable working in multi-threaded environments by locking the internal context with a mutex. Default: `ON`
-- `SAIL_ONLY_CODECS="a;b;c"` - Forcefully enable only the codecs specified in this ';'-separated list and disable the rest. If an enabled codec fails to find its dependencies, the configuration process fails. Default: empty list
+- `SAIL_ONLY_CODECS="a;b;c"` - Forcefully enable only the codecs specified in this ';'-separated list and disable the rest. If an enabled codec fails to find its dependencies, the configuration process fails. One can also specify not just individual codecs but codec groups by their priority like that: highest-priority;xbm. Default: empty list
 
 ### Windows
 
