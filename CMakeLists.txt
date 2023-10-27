@@ -240,7 +240,7 @@ endif()
 # Error check: This particular build of SAIL cannot load any image
 #
 if (NOT ENABLED_CODECS AND NOT SAIL_THIRD_PARTY_CODECS_PATH)
-    message(FATAL_ERROR "Error: No codecs are enabled and SAIL_THIRD_PARTY_CODECS_PATH is disabled.\nThis particular build of SAIL cannot load any image.")
+    message(FATAL_ERROR "No codecs are enabled and SAIL_THIRD_PARTY_CODECS_PATH is disabled.\nThis particular build of SAIL cannot load any image.")
 endif()
 
 # Install our bundled libs if they exist and when VCPKG is not used
