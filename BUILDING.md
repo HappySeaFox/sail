@@ -15,7 +15,6 @@ vcpkg install sail
 ### CMake options overview
 
 - `SAIL_BUILD_EXAMPLES=ON|OFF` - Build examples. Default: `ON`
-- `SAIL_BUILD_TESTS=ON|OFF` - Build tests. Default: `ON`
 - `SAIL_COLORED_OUTPUT=ON|OFF` - Enable colored console output on Windows >= 10 and Unix platforms. Default: `ON`
 - `SAIL_COMBINE_CODECS=ON|OFF` - Combine all codecs into a single library. Static build always sets this option to ON. Default: `OFF`
 - `SAIL_DEV=ON|OFF` - Enable developer mode with pedantic warnings and possible `ASAN` enabled for examples. Default: `OFF`

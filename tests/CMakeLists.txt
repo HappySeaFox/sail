@@ -1,5 +1,3 @@
-enable_testing()
-
 # Test images
 #
 set(SAIL_TEST_IMAGES_PATH ${CMAKE_CURRENT_SOURCE_DIR}/images)

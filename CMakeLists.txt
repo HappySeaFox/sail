@@ -10,6 +10,7 @@ include(CheckCSourceCompiles)
 include(CheckCSourceRuns)
 include(CMakeDependentOption)
 include(CMakePushCheckState)
+include(CTest)
 
 # Our own cmake scripts
 #
@@ -75,7 +76,6 @@ endif()
 #
 option(SAIL_BUILD_APPS "Build applications." ON)
 option(SAIL_BUILD_EXAMPLES "Build examples." ON)
-option(SAIL_BUILD_TESTS "Build tests." ON)
 option(SAIL_DEV "Enable developer mode. Be more strict when compiling source code, for example." OFF)
 set(SAIL_ENABLE_CODECS "" CACHE STRING "Forcefully enable the codecs specified in this ';'-separated list. \
 If an enabled codec fails to find its dependencies, the configuration process fails. \
@@ -233,7 +233,7 @@ if (SAIL_BUILD_EXAMPLES)
     endif()
 endif()
 
-if (SAIL_BUILD_TESTS)
+if (BUILD_TESTING)
     add_subdirectory(tests)
 endif()
 
@@ -321,7 +321,7 @@ message("* Colored output:               ${SAIL_COLORED_OUTPUT}${SAIL_COLORED_OU
 message("* Build apps:                   ${SAIL_BUILD_APPS}")
 message("* Build examples:               ${SAIL_BUILD_EXAMPLES}")
 message("* Build SDL example:            ${SAIL_SDL_EXAMPLE}")
-message("* Build tests:                  ${SAIL_BUILD_TESTS}")
+message("* Build tests:                  ${BUILD_TESTING}")
 message("* Install PDB files:            ${SAIL_INSTALL_PDB}")
 message("*")
 message("* SAIL_HAVE_BUILTIN_BSWAP16:    ${SAIL_HAVE_BUILTIN_BSWAP16_DISPLAY}")
