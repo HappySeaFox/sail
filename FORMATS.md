@@ -143,7 +143,7 @@
 </tr>
 <tr>
     <td>7</td>
-    <td><a href="https://wikipedia.org/wiki/JPEG_2000">JPEG2000</a></td>
+    <td><a href="https://wikipedia.org/wiki/JPEG_2000">JPEG 2000</a></td>
     <td>
         <b>Grayscale:</b> 8-bit, 16-bit.
         <b>RGB:</b> 24-bit, 48-bit.
