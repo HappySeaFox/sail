@@ -41,6 +41,20 @@ macro(sail_expand_priorities)
     set(${ARGV0} ${TEMP_LIST})
 endmacro()
 
+# Check if the input codecs list matches the existing codecs list
+# and fail with an error if any of the input codecs doesn't exist.
+#
+# For example: sail_check_codec_presence(jpeg;png jpeg;png;tiff) succeeds
+#              sail_check_codec_presence(jpeg;png ico;jpeg;tiff) fails
+#
+function(sail_check_codec_presence VAR_INPUT_LIST CHECK_AGAINST_LIST)
+    foreach (codec IN LISTS ${VAR_INPUT_LIST})
+        if (NOT ${codec} IN_LIST CHECK_AGAINST_LIST)
+            message(FATAL_ERROR "Codec '${codec}' doesn't exist in the list of the valid codecs '${CHECK_AGAINST_LIST}'")
+        endif()
+    endforeach()
+endfunction()
+
 sail_expand_priorities(SAIL_ONLY_CODECS)
 sail_expand_priorities(SAIL_ENABLE_CODECS)
 sail_expand_priorities(SAIL_DISABLE_CODECS)
@@ -48,6 +62,10 @@ sail_expand_priorities(SAIL_DISABLE_CODECS)
 list(REMOVE_DUPLICATES SAIL_ONLY_CODECS)
 list(REMOVE_DUPLICATES SAIL_ENABLE_CODECS)
 list(REMOVE_DUPLICATES SAIL_DISABLE_CODECS)
+
+sail_check_codec_presence(SAIL_ONLY_CODECS "${CODECS}")
+sail_check_codec_presence(SAIL_ENABLE_CODECS "${CODECS}")
+sail_check_codec_presence(SAIL_DISABLE_CODECS "${CODECS}")
 
 # Filter out codecs
 #
