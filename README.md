@@ -55,7 +55,7 @@ animated, multi-paged images along with their meta data and ICC profiles. :sailb
 \* One day Intel demonstrated the advantages of their [IPP](https://wikipedia.org/wiki/Integrated_Performance_Primitives) technology in speeding up decoding
 [JPEG](https://web.archive.org/web/20091009223918/http://software.intel.com/en-us/articles/intel-integrated-performance-primitives-intel-ipp-for-linux-optimizing-jpeg-coding-in-the-ksquirrel-application-with-intel-ipp)
 and
-[JPEG2000](https://web.archive.org/web/20091009224048/http://software.intel.com/en-us/articles/performance-tools-for-software-developers-application-notes-intel-ipp-jpeg2000-and-jasper-in-ksquirrel)
+[JPEG 2000](https://web.archive.org/web/20091009224048/http://software.intel.com/en-us/articles/performance-tools-for-software-developers-application-notes-intel-ipp-jpeg2000-and-jasper-in-ksquirrel)
 images with the help of [ksquirrel-libs](FAQ.md#how-old-is-sail), the predecessor of SAIL.
 
 ## Features NOT provided
@@ -75,7 +75,7 @@ images with the help of [ksquirrel-libs](FAQ.md#how-old-is-sail), the predecesso
 | 4  | [GIF](https://wikipedia.org/wiki/GIF)                               | R             | giflib            |
 | .. | ...                                                                 |               |                   |
 | 6  | [JPEG](https://wikipedia.org/wiki/JPEG)                             | RW            | libjpeg-turbo     |
-| 7  | [JPEG2000](https://wikipedia.org/wiki/JPEG_2000)                    | R             | jasper            |
+| 7  | [JPEG 2000](https://wikipedia.org/wiki/JPEG_2000)                    | R             | jasper            |
 | 8  | [JPEG XL](https://wikipedia.org/wiki/JPEG_XL)                       | R             | libjxl            |
 | 9  | [PCX](https://wikipedia.org/wiki/PCX)                               | R             |                   |
 | 10 | [PNG](https://wikipedia.org/wiki/Portable_Network_Graphics)         | RW            | libpng            |
