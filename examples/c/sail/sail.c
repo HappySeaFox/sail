@@ -350,7 +350,7 @@ int main(int argc, char *argv[]) {
     }
 
     if (strcmp(argv[1], "-v") == 0 || strcmp(argv[1], "--version") == 0) {
-        fprintf(stderr, "SAIL command-line utility 1.3.0\n");
+        fprintf(stderr, "SAIL command-line utility 1.5.0\n");
         fprintf(stderr, "SAIL library %s\n", SAIL_VERSION_STRING);
         return 0;
     }
