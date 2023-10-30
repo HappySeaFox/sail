@@ -7,7 +7,7 @@ See [README](README.md) for more.
 
 # SAIL (since 0.9.0)
 
-## 0.9.0 2023-XX-XX
+## 0.9.0 2023-11-06
 
 - 20 years anniversary!
 - codecs interface has been rewritten in C
