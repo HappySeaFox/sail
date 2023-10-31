@@ -101,10 +101,11 @@ static sail_status_t hex_string_to_meta_data_node(const char *hex_str, enum Sail
                         /* cleanup */ sail_free(data));
 
     SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_and_value_from_known_key(key, &meta_data_node_local->meta_data),
-                        /* cleanup */ sail_free(data));
+                        /* cleanup */ sail_destroy_meta_data_node(meta_data_node_local),
+                                      sail_free(data));
     SAIL_TRY_OR_CLEANUP(sail_set_variant_data(meta_data_node_local->meta_data->value, data, data_size),
                         /* cleanup */ sail_destroy_meta_data_node(meta_data_node_local),
-                                      free(data));
+                                      sail_free(data));
 
     meta_data_node_local->meta_data->key = key;
 
