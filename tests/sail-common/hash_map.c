@@ -221,44 +221,104 @@ static MunitResult test_overwrite(const MunitParameter params[], void *user_data
     return MUNIT_OK;
 }
 
+static struct sail_hash_map *generate_specific_hash_map_for_erasing(int value) {
+
+    struct sail_hash_map *hash_map;
+    sail_alloc_hash_map(&hash_map);
+
+    /* Value 1. */
+    struct sail_variant *variant;
+    sail_alloc_variant(&variant);
+    sail_set_variant_int(variant, value);
+
+    sail_put_hash_map(hash_map, "z",  variant);
+    sail_put_hash_map(hash_map, "i1", variant);
+    sail_put_hash_map(hash_map, "h2", variant);
+
+    sail_destroy_variant(variant);
+
+    return hash_map;
+}
+
 static MunitResult test_erase(const MunitParameter params[], void *user_data) {
 
     (void)params;
     (void)user_data;
 
+    /*
+     * The current hashing algorithm puts "z", "i1", and "h2" keys in the same bucket.
+     * Let's test this specific use-case.
+     */
+
     struct sail_hash_map *hash_map;
-    munit_assert(sail_alloc_hash_map(&hash_map) == SAIL_OK);
+    int reference_value;
+    const struct sail_variant *value_in_map;
 
-    const double reference_value1 = 11.5;
-    const int reference_value2 = 101;
+    /* Erase non-existing. */
+    reference_value = 444;
+    hash_map = generate_specific_hash_map_for_erasing(reference_value);
 
-    /* Value 1. */
-    struct sail_variant *value1;
-    munit_assert(sail_alloc_variant(&value1) == SAIL_OK);
-    sail_set_variant_double(value1, reference_value1);
+    sail_erase_hash_map_key(hash_map, "oops");
+    munit_assert(sail_hash_map_has_key(hash_map, "z"));
+    munit_assert(sail_hash_map_has_key(hash_map, "i1"));
+    munit_assert(sail_hash_map_has_key(hash_map, "h2"));
+    munit_assert(sail_hash_map_size(hash_map) == 3);
 
-    munit_assert(sail_put_hash_map(hash_map, "ktop", value1) == SAIL_OK);
-    sail_destroy_variant(value1);
+    value_in_map = sail_hash_map_value(hash_map, "z");
+    munit_assert_not_null(value_in_map);
+    munit_assert_int(sail_variant_to_int(value_in_map), ==, reference_value);
+    value_in_map = sail_hash_map_value(hash_map, "i1");
+    munit_assert_not_null(value_in_map);
+    munit_assert_int(sail_variant_to_int(value_in_map), ==, reference_value);
+    value_in_map = sail_hash_map_value(hash_map, "h2");
+    munit_assert_not_null(value_in_map);
+    munit_assert_int(sail_variant_to_int(value_in_map), ==, reference_value);
 
-    /* Value 2. */
-    struct sail_variant *value2;
-    munit_assert(sail_alloc_variant(&value2) == SAIL_OK);
-    sail_set_variant_int(value2, reference_value2);
+    sail_destroy_hash_map(hash_map);
 
-    munit_assert(sail_put_hash_map(hash_map, "range", value2) == SAIL_OK);
-    sail_destroy_variant(value2);
-    munit_assert(sail_hash_map_has_key(hash_map, "range"));
+    /* Erase "z". */
+    reference_value = 555;
+    hash_map = generate_specific_hash_map_for_erasing(reference_value);
 
-    /* Erase. */
-    sail_erase_hash_map_key(hash_map, "ktop");
-    munit_assert(!sail_hash_map_has_key(hash_map, "ktop"));
-    munit_assert(sail_hash_map_size(hash_map) == 1);
+    sail_erase_hash_map_key(hash_map, "z");
+    munit_assert(!sail_hash_map_has_key(hash_map, "z"));
+    munit_assert(sail_hash_map_size(hash_map) == 2);
 
-    sail_erase_hash_map_key(hash_map, "range");
-    munit_assert(!sail_hash_map_has_key(hash_map, "range"));
-    munit_assert(sail_hash_map_size(hash_map) == 0);
+    value_in_map = sail_hash_map_value(hash_map, "i1");
+    munit_assert_int(sail_variant_to_int(value_in_map), ==, reference_value);
+    value_in_map = sail_hash_map_value(hash_map, "h2");
+    munit_assert_int(sail_variant_to_int(value_in_map), ==, reference_value);
 
-    /* Cleanup. */
+    sail_destroy_hash_map(hash_map);
+
+    /* Erase "i1". */
+    reference_value = 666;
+    hash_map = generate_specific_hash_map_for_erasing(reference_value);
+
+    sail_erase_hash_map_key(hash_map, "i1");
+    munit_assert(!sail_hash_map_has_key(hash_map, "i1"));
+    munit_assert(sail_hash_map_size(hash_map) == 2);
+
+    value_in_map = sail_hash_map_value(hash_map, "z");
+    munit_assert_int(sail_variant_to_int(value_in_map), ==, reference_value);
+    value_in_map = sail_hash_map_value(hash_map, "h2");
+    munit_assert_int(sail_variant_to_int(value_in_map), ==, reference_value);
+
+    sail_destroy_hash_map(hash_map);
+
+    /* Erase "h2". */
+    reference_value = 777;
+    hash_map = generate_specific_hash_map_for_erasing(reference_value);
+
+    sail_erase_hash_map_key(hash_map, "h2");
+    munit_assert(!sail_hash_map_has_key(hash_map, "h2"));
+    munit_assert(sail_hash_map_size(hash_map) == 2);
+
+    value_in_map = sail_hash_map_value(hash_map, "z");
+    munit_assert_int(sail_variant_to_int(value_in_map), ==, reference_value);
+    value_in_map = sail_hash_map_value(hash_map, "i1");
+    munit_assert_int(sail_variant_to_int(value_in_map), ==, reference_value);
+
     sail_destroy_hash_map(hash_map);
 
     return MUNIT_OK;

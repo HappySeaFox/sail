@@ -194,9 +194,9 @@ void sail_erase_hash_map_key(struct sail_hash_map *hash_map, const char *key) {
             /* Erase from the head. */
             if (key_variant_node == *head_variant_node) {
                 *head_variant_node = next_key_variant_node;
-            } else if (next_key_variant_node == NULL) {
+            } else {
                 /* Erase from the middle/end. */
-                prev_key_variant_node->next = next_key_variant_node;
+                prev_key_variant_node->next->next = next_key_variant_node;
             }
 
             return;
