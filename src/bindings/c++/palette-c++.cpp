@@ -142,7 +142,9 @@ void palette::set_data(SailPixelFormat pixel_format, const arbitrary_data &data)
 
     const unsigned bytes_per_pixel = (sail_bits_per_pixel(pixel_format) + 7) / 8;
 
-    set_data(pixel_format, data.data(), static_cast<unsigned>(data.size() / bytes_per_pixel));
+    if (bytes_per_pixel != 0) {
+        set_data(pixel_format, data.data(), static_cast<unsigned>(data.size() / bytes_per_pixel));
+    }
 }
 
 palette::palette(const sail_palette *pal)
