@@ -48,6 +48,7 @@ struct psd_state {
     enum SailPsdCompression compression;
     unsigned bytes_per_channel;
     unsigned char *scan_buffer;
+    struct sail_palette *palette;
 };
 
 static sail_status_t alloc_psd_state(struct psd_state **psd_state) {
@@ -67,6 +68,7 @@ static sail_status_t alloc_psd_state(struct psd_state **psd_state) {
     (*psd_state)->compression       = SAIL_PSD_COMPRESSION_NONE;
     (*psd_state)->bytes_per_channel = 0;
     (*psd_state)->scan_buffer       = NULL;
+    (*psd_state)->palette           = NULL;
 
     return SAIL_OK;
 }
@@ -81,6 +83,8 @@ static void destroy_psd_state(struct psd_state *psd_state) {
 
     sail_destroy_load_options(psd_state->load_options);
     sail_destroy_save_options(psd_state->save_options);
+
+    sail_destroy_palette(psd_state->palette);
 
     sail_free(psd_state);
 }
@@ -155,17 +159,15 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_psd(void *state, st
     SAIL_TRY(psd_private_get_big_endian_uint32_t(psd_state->io, &data_size));
 
     /* Palette. */
-    struct sail_palette *palette = NULL;
-
     if (data_size > 0) {
         SAIL_LOG_TRACE("PSD: Palette data size: %u", data_size);
-        SAIL_TRY(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP24_RGB, 256, &palette));
+        SAIL_TRY(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP24_RGB, 256, &psd_state->palette));
 
         /* Merge RR GG BB... to RGB RGB... */
         unsigned char buf[256*3];
         SAIL_TRY(psd_state->io->strict_read(psd_state->io->stream, buf, sizeof(buf)));
 
-        unsigned char *palette_data = palette->data;
+        unsigned char *palette_data = psd_state->palette->data;
 
         for (unsigned i = 0; i < 256; i++) {
             for (unsigned channel = 0; channel < 3; channel++) {
@@ -173,9 +175,9 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_psd(void *state, st
             }
         }
     } else if (mode == SAIL_PSD_MODE_BITMAP) {
-        SAIL_TRY(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP24_RGB, 2, &palette));
+        SAIL_TRY(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP24_RGB, 2, &psd_state->palette));
 
-        unsigned char *palette_data = palette->data;
+        unsigned char *palette_data = psd_state->palette->data;
 
         *palette_data++ = 255;
         *palette_data++ = 255;
@@ -238,8 +240,11 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_psd(void *state, st
     image_local->width          = width;
     image_local->height         = height;
     image_local->pixel_format   = pixel_format;
-    image_local->palette        = palette;
+    image_local->palette        = psd_state->palette;
     image_local->bytes_per_line = sail_bytes_per_line(image_local->width, image_local->pixel_format);
+
+    /* Palette has been moved. */
+    psd_state->palette = NULL;
 
     *image = image_local;
 
