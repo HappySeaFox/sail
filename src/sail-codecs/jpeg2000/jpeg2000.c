@@ -193,9 +193,9 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpeg2000(void *stat
     }
 
     /* Check channels ids are valid. */
-    for (int i = 0; i < jpeg2000_state->number_channels; i++) {
-        if (jpeg2000_state->channels[i] < 0) {
-            SAIL_LOG_ERROR("JPEG2000: Some channels are missing");
+    for (int channel = 0; channel < jpeg2000_state->number_channels; channel++) {
+        if (jpeg2000_state->channels[channel] < 0) {
+            SAIL_LOG_ERROR("JPEG2000: Channel #%d is missing", channel);
             SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
         }
     }
@@ -287,9 +287,10 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_jpeg2000(void *state, struct 
     const struct jpeg2000_state *jpeg2000_state = state;
 
     for (unsigned row = 0; row < image->height; row++) {
-        for (int i = 0; i < jpeg2000_state->number_channels; i++) {
-            if (jas_image_readcmpt(jpeg2000_state->jas_image, jpeg2000_state->channels[i], 0 /* x */, row /* y */,
-                    image->width /* width */, 1 /* height */, jpeg2000_state->matrix[i]) != 0) {
+        for (int channel = 0; channel < jpeg2000_state->number_channels; channel++) {
+            if (jas_image_readcmpt(jpeg2000_state->jas_image, jpeg2000_state->channels[channel],
+                    0 /* x */, row /* y */, image->width /* width */, 1 /* height */,
+                    jpeg2000_state->matrix[channel]) != 0) {
                 SAIL_LOG_ERROR("JPEG2000: Failed to read image row #%u", row);
                 SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
             }
@@ -299,16 +300,16 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_jpeg2000(void *state, struct 
             unsigned char *scan = (unsigned char *)image->pixels + row * image->bytes_per_line;
 
             for (unsigned column = 0; column < image->width; column++) {
-                for (int i = 0; i < jpeg2000_state->number_channels; i++) {
-                    *scan++ = (unsigned char)(jas_matrix_getv(jpeg2000_state->matrix[i], column) << jpeg2000_state->shift);
+                for (int channel = 0; channel < jpeg2000_state->number_channels; channel++) {
+                    *scan++ = (unsigned char)(jas_matrix_getv(jpeg2000_state->matrix[channel], column) << jpeg2000_state->shift);
                 }
             }
         } else {
             uint16_t *scan = (uint16_t *)((uint8_t *)image->pixels + row * image->bytes_per_line);
 
             for (unsigned column = 0; column < image->width; column++) {
-                for (int i = 0; i < jpeg2000_state->number_channels; i++) {
-                    *scan++ = (uint16_t)(jas_matrix_getv(jpeg2000_state->matrix[i], column) << jpeg2000_state->shift);
+                for (int channel = 0; channel < jpeg2000_state->number_channels; channel++) {
+                    *scan++ = (uint16_t)(jas_matrix_getv(jpeg2000_state->matrix[channel], column) << jpeg2000_state->shift);
                 }
             }
         }
