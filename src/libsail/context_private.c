@@ -669,20 +669,21 @@ static sail_status_t init_context_impl(struct sail_context *context) {
     }
 
     /* Construct a list of paths to search. */
-    struct sail_string_node *codecs_paths;
-    SAIL_TRY(sail_alloc_string_node(&codecs_paths));
+    struct sail_string_node *codecs_paths_node;
+    SAIL_TRY(sail_alloc_string_node(&codecs_paths_node));
 
-    SAIL_TRY_OR_CLEANUP(sail_strdup(our_codecs_path, &codecs_paths->string),
-                        /* cleanup */ sail_destroy_string_node(codecs_paths));
+    SAIL_TRY_OR_CLEANUP(sail_strdup(our_codecs_path, &codecs_paths_node->string),
+                        /* cleanup */ sail_destroy_string_node(codecs_paths_node));
 
 #ifdef SAIL_THIRD_PARTY_CODECS_PATH
-    SAIL_TRY(client_codecs_paths_to_string_node_chain(&codecs_paths->next));
+    SAIL_TRY_OR_CLEANUP(client_codecs_paths_to_string_node_chain(&codecs_paths_node->next),
+                        /* cleanup */ sail_destroy_string_node_chain(codecs_paths_node));
 #endif
 
-    SAIL_TRY_OR_CLEANUP(enumerate_codecs_in_paths(context, codecs_paths),
-                        /* cleanup */ sail_destroy_string_node_chain(codecs_paths));
+    SAIL_TRY_OR_CLEANUP(enumerate_codecs_in_paths(context, codecs_paths_node),
+                        /* cleanup */ sail_destroy_string_node_chain(codecs_paths_node));
 
-    sail_destroy_string_node_chain(codecs_paths);
+    sail_destroy_string_node_chain(codecs_paths_node);
 
     return SAIL_OK;
 }
