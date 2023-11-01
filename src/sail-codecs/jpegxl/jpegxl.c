@@ -303,9 +303,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void *state,
                                     /* cleanup */ sail_destroy_image(image_local));
                 break;
             }
-            case JXL_DEC_NEED_IMAGE_OUT_BUFFER: {
-                break;
-            }
             case JXL_DEC_SUCCESS: {
                 sail_destroy_image(image_local);
                 SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
