@@ -624,7 +624,8 @@ public:
     static bool is_indexed(SailPixelFormat pixel_format);
 
     /*
-     * Returns true if the specified pixel format is grayscale.
+     * Returns true if the specified pixel format is grayscale,
+     * with or without alpha.
      */
     static bool is_grayscale(SailPixelFormat pixel_format);
 
