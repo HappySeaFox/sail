@@ -62,7 +62,7 @@ foreach(CODEC ${ENABLED_CODECS})
     target_link_libraries(sail-codecs PRIVATE $<BUILD_INTERFACE:sail-codec-${CODEC}>)
 endforeach()
 
-target_include_directories(sail-codecs PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../libsail)
+target_include_directories(sail-codecs PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../sail)
 
 install(TARGETS sail-codecs
         EXPORT SailCodecsTargets

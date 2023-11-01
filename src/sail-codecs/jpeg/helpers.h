@@ -32,8 +32,8 @@
 
 #include <jpeglib.h>
 
-#include "common.h"
-#include "export.h"
+#include <sail-common/common.h>
+#include <sail-common/export.h>
 
 struct sail_meta_data_node;
 struct sail_resolution;

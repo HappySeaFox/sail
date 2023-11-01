@@ -28,7 +28,7 @@
 
 #include <gif_lib.h>
 
-#include "export.h"
+#include <sail-common/export.h>
 
 SAIL_HIDDEN int my_read_proc(GifFileType *gif, GifByteType *buffer, int buffer_size);
 

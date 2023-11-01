@@ -30,7 +30,7 @@
 
 #include <jpeglib.h>
 
-#include "export.h"
+#include <sail-common/export.h>
 
 struct sail_io;
 

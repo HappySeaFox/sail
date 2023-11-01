@@ -26,7 +26,7 @@
 #ifndef SAIL_XBM_HELPERS_H
 #define SAIL_XBM_HELPERS_H
 
-#include "export.h"
+#include <sail-common/export.h>
 
 SAIL_HIDDEN unsigned char xbm_private_reverse_byte(unsigned char byte);
 

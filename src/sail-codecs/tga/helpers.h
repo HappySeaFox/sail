@@ -28,9 +28,9 @@
 
 #include <stdint.h>
 
-#include "common.h"
-#include "export.h"
-#include "status.h"
+#include <sail-common/common.h>
+#include <sail-common/export.h>
+#include <sail-common/status.h>
 
 struct sail_io;
 struct sail_meta_data_node;

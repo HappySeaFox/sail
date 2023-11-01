@@ -25,7 +25,7 @@
 
 #include <jerror.h>
 
-#include "sail-common.h"
+#include <sail-common/sail-common.h>
 
 #include "io_dest.h"
 

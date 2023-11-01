@@ -26,9 +26,9 @@
 #ifndef SAIL_WAL_HELPERS_H
 #define SAIL_WAL_HELPERS_H
 
-#include "common.h"
-#include "export.h"
-#include "status.h"
+#include <sail-common/common.h>
+#include <sail-common/export.h>
+#include <sail-common/status.h>
 
 struct WalFileHeader
 {

@@ -26,7 +26,7 @@
 #include <stddef.h>
 #include <string.h>
 
-#include "sail-common.h"
+#include <sail-common/sail-common.h>
 
 #include "munit.h"
 

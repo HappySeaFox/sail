@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 
-#include "sail.h"
+#include <sail/sail.h>
 
 #include "sail-comparators.h"
 

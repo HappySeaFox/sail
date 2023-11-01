@@ -30,8 +30,8 @@
 
 #include <avif/avif.h>
 
-#include "export.h"
-#include "status.h"
+#include <sail-common/export.h>
+#include <sail-common/status.h>
 
 struct sail_avif_context {
     struct sail_io *io;

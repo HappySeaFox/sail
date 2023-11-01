@@ -30,7 +30,7 @@
 
 #include <png.h>
 
-#include "export.h"
+#include <sail-common/export.h>
 
 SAIL_HIDDEN void png_private_my_read_fn(png_structp png_ptr, png_bytep bytes, png_size_t bytes_size);
 

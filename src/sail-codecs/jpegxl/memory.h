@@ -26,7 +26,7 @@
 #ifndef SAIL_JPEGXL_MEMORY_H
 #define SAIL_JPEGXL_MEMORY_H
 
-#include "export.h"
+#include <sail-common/export.h>
 
 /* We want to allocate/free with sail_malloc()/sail_free(). */
 SAIL_HIDDEN void *jpegxl_private_alloc_func(void *opaque, size_t size);

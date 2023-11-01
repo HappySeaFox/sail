@@ -32,7 +32,7 @@
 #include <jxl/decode.h>
 #include <jxl/resizable_parallel_runner.h>
 
-#include "sail-common.h"
+#include <sail-common/sail-common.h>
 
 #include "helpers.h"
 #include "memory.h"

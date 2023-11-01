@@ -29,7 +29,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "sail-common.h"
+#include <sail-common/sail-common.h>
 
 #include "common/bmp/bmp.h"
 

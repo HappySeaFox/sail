@@ -210,14 +210,14 @@ include_directories("${PROJECT_BINARY_DIR}/include")
 
 # Configure subdirs
 #
-add_subdirectory(src/libsail-common)
-add_subdirectory(src/libsail-manip)
+add_subdirectory(src/sail-common)
 add_subdirectory(src/sail-codecs)
 if (SAIL_COMBINE_CODECS)
     add_subdirectory(src/sail-codecs-archive)
 endif()
-add_subdirectory(src/libsail)
-add_subdirectory(src/bindings/c++)
+add_subdirectory(src/sail)
+add_subdirectory(src/sail-manip)
+add_subdirectory(src/bindings/sail-c++)
 
 if (SAIL_BUILD_APPS)
     add_subdirectory(examples/c/sail)

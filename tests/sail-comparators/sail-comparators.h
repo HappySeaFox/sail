@@ -26,8 +26,8 @@
 #ifndef SAIL_COMPARATORS_H
 #define SAIL_COMPARATORS_H
 
-#include "export.h"
-#include "status.h"
+#include <sail-common/export.h>
+#include <sail-common/status.h>
 
 SAIL_EXPORT sail_status_t sail_test_compare_resolutions(const struct sail_resolution *resolution1, const struct sail_resolution *resolution2);
 

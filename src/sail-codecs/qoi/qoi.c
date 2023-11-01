@@ -27,7 +27,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "sail-common.h"
+#include <sail-common/sail-common.h>
 
 #define QOI_IMPLEMENTATION
 #define QOI_NO_STDIO

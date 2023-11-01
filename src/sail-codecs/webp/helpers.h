@@ -30,9 +30,9 @@
 
 #include <webp/demux.h>
 
-#include "common.h"
-#include "export.h"
-#include "status.h"
+#include <sail-common/common.h>
+#include <sail-common/export.h>
+#include <sail-common/status.h>
 
 SAIL_HIDDEN void webp_private_fill_color(uint8_t *pixels, unsigned bytes_per_line, unsigned bytes_per_pixel,
                                             uint32_t color, unsigned x, unsigned y, unsigned width, unsigned height);

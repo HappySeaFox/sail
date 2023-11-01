@@ -28,7 +28,7 @@
 #include <string.h>
 #include <time.h>
 
-#include "sail-common.h"
+#include <sail-common/sail-common.h>
 
 #include "sail-comparators.h"
 
