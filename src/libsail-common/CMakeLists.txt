@@ -111,6 +111,7 @@ endif()
 if (SAIL_COLORED_OUTPUT)
     target_compile_definitions(sail-common PRIVATE SAIL_COLORED_OUTPUT=1)
 endif()
+
 target_include_directories(sail-common
                             PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
                                    $<INSTALL_INTERFACE:include/sail>)
