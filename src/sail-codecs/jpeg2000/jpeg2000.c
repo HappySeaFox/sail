@@ -130,7 +130,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_jpeg2000(struct sail_io *io, c
     size_t image_size;
     SAIL_TRY(sail_alloc_data_from_io_contents(io, &jpeg2000_state->image_data, &image_size));
 
-    /* This function may generate a warning on old versions of Jasper: conversion from size_t to int. */
+    /* TODO This function may generate a warning on old versions of Jasper: conversion from size_t to int. */
     jpeg2000_state->jas_stream = jas_stream_memopen(jpeg2000_state->image_data, image_size);
 
     if (jpeg2000_state->jas_stream == NULL) {
@@ -287,8 +287,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_jpeg2000(void *state, struct 
     const struct jpeg2000_state *jpeg2000_state = state;
 
     for (unsigned row = 0; row < image->height; row++) {
-        unsigned char *scan = (unsigned char *)image->pixels + row * image->bytes_per_line;
-
         for (int i = 0; i < jpeg2000_state->number_channels; i++) {
             if (jas_image_readcmpt(jpeg2000_state->jas_image, jpeg2000_state->channels[i], 0 /* x */, row /* y */,
                     image->width /* width */, 1 /* height */, jpeg2000_state->matrix[i]) != 0) {
@@ -297,13 +295,20 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_jpeg2000(void *state, struct 
             }
         }
 
-        for (unsigned column = 0; column < image->width; column++) {
-            for (int i = 0; i < jpeg2000_state->number_channels; i++) {
-                if (jpeg2000_state->channel_depth_scaled == 8) {
-                    *scan++ = (unsigned char)(jas_matrix_getv(jpeg2000_state->matrix[i], column + i) << jpeg2000_state->shift);
-                } else {
-                    uint16_t **scan16 = (uint16_t **)&scan;
-                    *(*scan16)++ = (uint16_t)(jas_matrix_getv(jpeg2000_state->matrix[i], column + i) << jpeg2000_state->shift);
+        if (jpeg2000_state->channel_depth_scaled == 8) {
+            unsigned char *scan = (unsigned char *)image->pixels + row * image->bytes_per_line;
+
+            for (unsigned column = 0; column < image->width; column++) {
+                for (int i = 0; i < jpeg2000_state->number_channels; i++) {
+                    *scan++ = (unsigned char)(jas_matrix_getv(jpeg2000_state->matrix[i], column) << jpeg2000_state->shift);
+                }
+            }
+        } else {
+            uint16_t *scan = (uint16_t *)((uint8_t *)image->pixels + row * image->bytes_per_line);
+
+            for (unsigned column = 0; column < image->width; column++) {
+                for (int i = 0; i < jpeg2000_state->number_channels; i++) {
+                    *scan++ = (uint16_t)(jas_matrix_getv(jpeg2000_state->matrix[i], column) << jpeg2000_state->shift);
                 }
             }
         }
