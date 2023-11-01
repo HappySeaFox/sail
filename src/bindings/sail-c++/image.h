@@ -148,8 +148,7 @@ public:
      * Returns the bytes per line.
      *
      * LOAD: Set by SAIL to a positive length of a row of pixels in bytes.
-     * SAVE: Must be set by a caller to a positive number of bytes per line. A caller could set
-     *       it with bytes_per_line_auto() if scan lines are not padded to a certain boundary.
+     * SAVE: Must be set by a caller to a positive number of bytes per line.
      */
     unsigned bytes_per_line() const;
 
