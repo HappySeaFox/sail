@@ -1,4 +1,4 @@
 usr/include/sail/sail-c++
 usr/lib/*/libsail-c++.so
-usr/lib/*/pkgconfig/libsail-c++.pc
+usr/lib/*/pkgconfig/sail-c++.pc
 usr/lib/cmake/sailc++/SailC++*.cmake

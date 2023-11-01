@@ -32,7 +32,7 @@
 #include <webp/decode.h>
 #include <webp/demux.h>
 
-#include "sail-common.h"
+#include <sail-common/sail-common.h>
 
 #include "helpers.h"
 

@@ -23,17 +23,15 @@
     SOFTWARE.
 */
 
-#include "config.h"
-
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #include <SDL2/SDL.h>
 
-#include "sail-common.h"
-#include "sail.h"
-#include "sail-manip.h"
+#include <sail/sail.h>
+
+#include <sail-manip/sail-manip.h>
 
 int main(int argc, char *argv[]) {
 

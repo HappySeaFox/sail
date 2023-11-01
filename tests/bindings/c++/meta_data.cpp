@@ -25,7 +25,7 @@
 
 #include <utility> /* move */
 
-#include "sail-c++.h"
+#include <sail-c++/sail-c++.h>
 
 #include "munit.h"
 

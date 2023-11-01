@@ -28,10 +28,10 @@
 
 #include <stdint.h>
 
-#include "common.h"
-#include "export.h"
-#include "pixel.h"
-#include "status.h"
+#include <sail-common/common.h>
+#include <sail-common/export.h>
+#include <sail-common/pixel.h>
+#include <sail-common/status.h>
 
 struct sail_iccp;
 struct sail_io;

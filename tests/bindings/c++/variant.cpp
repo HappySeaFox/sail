@@ -26,7 +26,7 @@
 #include <ctime>
 #include <functional>
 
-#include "sail-c++.h"
+#include <sail-c++/sail-c++.h>
 
 #include "munit.h"
 

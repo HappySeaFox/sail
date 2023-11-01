@@ -33,7 +33,7 @@
     #include <share.h>
 #endif
 
-#include "sail-common.h"
+#include <sail-common/sail-common.h>
 
 #include "sail-dump.h"
 

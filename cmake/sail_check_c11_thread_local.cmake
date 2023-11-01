@@ -6,7 +6,7 @@ function(sail_check_c11_thread_local)
 
         check_c_source_compiles(
             "
-            #include \"libsail-common/compiler_specifics.h\"
+            #include \"sail-common/compiler_specifics.h\"
 
             int main(int argc, char *argv[]) {
                 static SAIL_THREAD_LOCAL int i = 0;

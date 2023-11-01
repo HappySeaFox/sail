@@ -28,7 +28,7 @@
 #include <stdlib.h> /* atoi() */
 #include <string.h>
 
-#include "sail-common.h"
+#include <sail-common/sail-common.h>
 
 #include "helpers.h"
 

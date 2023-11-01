@@ -26,8 +26,8 @@
 #ifndef SAIL_DUMP_H
 #define SAIL_DUMP_H
 
-#include "export.h"
-#include "status.h"
+#include <sail-common/export.h>
+#include <sail-common/status.h>
 
 /*
  * Reads a dump file from path + ".dump".

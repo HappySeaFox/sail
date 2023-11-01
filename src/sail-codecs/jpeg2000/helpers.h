@@ -28,9 +28,9 @@
 
 #include <jasper/jas_cm.h>
 
-#include "common.h"
-#include "export.h"
-#include "status.h"
+#include <sail-common/common.h>
+#include <sail-common/export.h>
+#include <sail-common/status.h>
 
 SAIL_HIDDEN enum SailPixelFormat jpeg2000_private_sail_pixel_format(jas_clrspc_t jasper_color_space, int bpp);
 

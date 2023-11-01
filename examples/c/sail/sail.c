@@ -23,14 +23,13 @@
     SOFTWARE.
 */
 
-#include "config.h"
-
 #include <stdio.h>
 #include <stdlib.h> /* atoi */
 #include <string.h>
 
-#include "sail.h"
-#include "sail-manip.h"
+#include <sail/sail.h>
+
+#include <sail-manip/sail-manip.h>
 
 static void print_invalid_argument(void) {
     fprintf(stderr, "Error: Invalid arguments. Run with -h to see command arguments.\n");
