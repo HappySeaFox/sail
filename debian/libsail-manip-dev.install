@@ -1,4 +1,4 @@
 usr/include/sail/sail-manip/
 usr/lib/*/libsail-manip.so
-usr/lib/*/pkgconfig/libsail-manip.pc
+usr/lib/*/pkgconfig/sail-manip.pc
 usr/lib/cmake/sailmanip/SailManip*.cmake
