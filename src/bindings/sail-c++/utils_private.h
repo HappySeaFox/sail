@@ -26,14 +26,10 @@
 #ifndef SAIL_UTILS_PRIVATE_CPP_H
 #define SAIL_UTILS_PRIVATE_CPP_H
 
-#ifdef SAIL_BUILD
-    #include <sail-common/export.h>
-    #include <sail-common/status.h>
+#include <sail-common/export.h>
+#include <sail-common/status.h>
 
-    #include <sail-c++/tuning.h>
-#else
-    INTERNAL ERROR: For internal use only
-#endif
+#include <sail-c++/tuning.h>
 
 struct sail_hash_map;
 struct sail_variant;

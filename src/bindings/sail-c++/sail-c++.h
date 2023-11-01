@@ -41,14 +41,14 @@
     #pragma warning(disable: 4251)
     #endif
 
-    #include "io_base_private.h"
-    #include "utils_private.h"
+    #include <sail-c++/abstract_io_adapter.h>
+    #include <sail-c++/io_base_private.h>
+    #include <sail-c++/utils_private.h>
 #endif
 
 #include <sail-common/sail-common.h>
 
 #include <sail-c++/abstract_io.h>
-#include <sail-c++/abstract_io_adapter.h>
 #include <sail-c++/arbitrary_data.h>
 #include <sail-c++/at_scope_exit.h>
 #include <sail-c++/codec_info.h>

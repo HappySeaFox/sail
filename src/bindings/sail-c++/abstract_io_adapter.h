@@ -41,7 +41,7 @@ class abstract_io;
 /*
  * Adapter to make abstract I/O streams suitable for C functions.
  */
-class SAIL_EXPORT abstract_io_adapter
+class SAIL_HIDDEN abstract_io_adapter
 {
 public:
     /*
