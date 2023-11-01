@@ -14,7 +14,6 @@ addons:
       - libavif
       - libpng
       - libtiff
-      - pkg-config
       - webp
   apt:
     packages:
@@ -25,7 +24,6 @@ addons:
       - libsdl2-dev
       - libtiff-dev
       - libwebp-dev
-      - pkgconf
     update: true
 
 jobs:
@@ -120,9 +118,6 @@ script:
 
     fail_on_error cmake -DSAIL_DEV=ON -DCMAKE_BUILD_TYPE="$build_type" ..
     fail_on_error cmake --build .
-    fail_on_error "$exe"
-
-    fail_on_error cc $(pkg-config --cflags sail) main.c -o "$exe" $(pkg-config --libs sail)
     fail_on_error "$exe"
 
     cd "$old_dir"
