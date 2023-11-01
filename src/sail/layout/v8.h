@@ -63,7 +63,7 @@ Please define SAIL_CODEC_NAME before including this header.
 /*
  * Starts decoding the specified io stream using the specified options.
  *
- * libsail, a caller of this function, guarantees the following:
+ * libsail, the caller of this function, guarantees the following:
  *   - The IO is valid and open.
  *   - The load options is not NULL.
  *
@@ -72,7 +72,7 @@ Please define SAIL_CODEC_NAME before including this header.
  *     and assign its value to the state.
  *
  * STATE explanation: Pass the address of a local void* pointer. Codecs will store an internal state
- * in it and destroy it in sail_codec_load_finish_vx(). States must be used per image. DO NOT use the same state
+ * in it and destroy it in sail_codec_load_finish_v8(). States must be used per image. DO NOT use the same state
  * to load multiple images in the same time.
  *
  * Returns SAIL_OK on success.
@@ -83,10 +83,10 @@ sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_load_init_v8)(struct sail_io 
  * Seeks to the next frame. The frame is NOT immediately loaded or decoded by most SAIL codecs.
  * SAIL uses this method in loading and probing operations.
  *
- * SAIL uses sail_codec_load_frame_vx() to actually load the frame.
+ * SAIL uses sail_codec_load_frame_v8() to actually load the frame.
  *
- * libsail, a caller of this function, guarantees the following:
- *   - The state points to the state allocated by sail_codec_load_init_vx().
+ * libsail, the caller of this function, guarantees the following:
+ *   - The state points to the state allocated by sail_codec_load_init_v8().
  *
  * This function MUST:
  *   - Allocate the image and the source image (sail_image.sail_source_image).
@@ -96,7 +96,7 @@ sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_load_init_v8)(struct sail_io 
  *
  * This function MUST NOT:
  *   - Allocate the image pixels. They will be allocated by libsail and will be available in
- *     sail_codec_load_frame_vx().
+ *     sail_codec_load_frame_v8().
  *
  * Returns SAIL_OK on success.
  */
@@ -105,9 +105,9 @@ sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_load_seek_next_frame_v8)(void
 /*
  * Reads the next frame of the current image in the current pass. The image pixels are pre-allocated by libsail.
  *
- * libsail, a caller of this function, guarantees the following:
- *   - The state is valid and points to the state allocated by sail_codec_load_init_vx().
- *   - The image points to the image allocated by sail_codec_load_seek_next_frame_vx().
+ * libsail, the caller of this function, guarantees the following:
+ *   - The state is valid and points to the state allocated by sail_codec_load_init_v8().
+ *   - The image points to the image allocated by sail_codec_load_seek_next_frame_v8().
  *   - The image pixels are allocated.
  *
  * This function MUST:
@@ -124,8 +124,8 @@ sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_load_frame_v8)(void *state, s
  * This function doesn't close the io stream. It just stops decoding. Use io->close() or sail_destroy_io()
  * to actually close the io stream.
  *
- * libsail, a caller of this function, guarantees the following:
- *   - The state points to the state allocated by sail_codec_load_init_vx().
+ * libsail, the caller of this function, guarantees the following:
+ *   - The state points to the state allocated by sail_codec_load_init_v8().
  *
  * This function MUST:
  *   - Destroy the state and set it to NULL.
@@ -145,7 +145,7 @@ sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_load_finish_v8)(void **state)
  * Starts encoding the specified io stream using the specified options. The specified save options
  * will be deep copied into an internal buffer.
  *
- * libsail, a caller of this function, guarantees the following:
+ * libsail, the caller of this function, guarantees the following:
  *   - The IO is valid and open.
  *   - The save options is not NULL.
  *
@@ -154,7 +154,7 @@ sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_load_finish_v8)(void **state)
  *     and assign its value to the state.
  *
  * STATE explanation: Pass the address of a local void* pointer. Codecs will store an internal state
- * in it and destroy it in sail_codec_save_finish_vx(). States must be used per image. DO NOT use the same state
+ * in it and destroy it in sail_codec_save_finish_v8(). States must be used per image. DO NOT use the same state
  * to save multiple images to different targets in the same time.
  *
  * Returns SAIL_OK on success.
@@ -162,11 +162,11 @@ sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_load_finish_v8)(void **state)
 sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_save_init_v8)(struct sail_io *io, const struct sail_save_options *save_options, void **state);
 
 /*
- * Seeks to a next frame before saving it. The frame is NOT immediately written. Use sail_codec_save_frame_vx()
+ * Seeks to a next frame before saving it. The frame is NOT immediately written. Use sail_codec_save_frame_v8()
  * to actually save a frame.
  *
- * libsail, a caller of this function, guarantees the following:
- *   - The state points to the state allocated by sail_codec_save_init_vx().
+ * libsail, the caller of this function, guarantees the following:
+ *   - The state points to the state allocated by sail_codec_save_init_v8().
  *   - The image is valid.
  *
  * This function MUST:
@@ -179,8 +179,8 @@ sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_save_seek_next_frame_v8)(void
 /*
  * Writes a next frame of the current image in the current pass.
  *
- * libsail, a caller of this function, guarantees the following:
- *   - The state is valid and points to the state allocated by sail_codec_save_init_vx().
+ * libsail, the caller of this function, guarantees the following:
+ *   - The state is valid and points to the state allocated by sail_codec_save_init_v8().
  *   - The image is valid.
  *
  * This function MUST:
@@ -195,8 +195,8 @@ sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_save_frame_v8)(void *state, c
  * This function doesn't close the io stream. Use io->close() or sail_destroy_io() to actually
  * close the io stream.
  *
- * libsail, a caller of this function, guarantees the following:
- *   - The state points to the state allocated by sail_codec_save_init_vx().
+ * libsail, the caller of this function, guarantees the following:
+ *   - The state points to the state allocated by sail_codec_save_init_v8().
  *
  * This function MUST:
  *   - Destroy the state and set it to NULL.
