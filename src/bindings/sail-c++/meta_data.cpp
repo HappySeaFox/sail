@@ -25,10 +25,11 @@
 
 #include <cstring>
 #include <stdexcept>
-#include <utility>
+#include <utility> // std::move
+
+#include <sail/sail.h>
 
 #include <sail-c++/sail-c++.h>
-#include <sail/sail.h>
 
 namespace sail
 {

@@ -26,13 +26,13 @@
 #include <cstdlib>
 #include <cstring>
 #include <stdexcept>
-#include <utility>
+#include <utility> // std::move
 
 #include <sail/sail.h>
 
-#include <sail-c++/sail-c++.h>
-
 #include <sail-manip/sail-manip.h>
+
+#include <sail-c++/sail-c++.h>
 
 namespace sail
 {

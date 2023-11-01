@@ -23,11 +23,9 @@
     SOFTWARE.
 */
 
-#include "config.h"
+#include <sail-common/sail-common.h>
 
-#include "sail-common.h"
-
-#include "codec_layout.h"
+#include <sail/codec_layout.h>
 
 SAIL_EXPORT const char * const sail_enabled_codecs[] = {
     @SAIL_ENABLED_CODECS@

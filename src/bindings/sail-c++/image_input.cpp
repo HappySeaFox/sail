@@ -25,8 +25,9 @@
 
 #include <memory>
 
-#include <sail-c++/sail-c++.h>
 #include <sail/sail.h>
+
+#include <sail-c++/sail-c++.h>
 
 namespace sail
 {

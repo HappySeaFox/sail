@@ -34,11 +34,7 @@
  * SAIL_CODEC_NAME definitions.
  */
 
-#ifdef SAIL_BUILD
-#include "status.h"
-#else
 #include <sail-common/status.h>
-#endif
 
 #ifdef __cplusplus
 extern "C" {
