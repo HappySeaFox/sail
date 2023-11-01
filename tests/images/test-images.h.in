@@ -43,8 +43,7 @@ static const char * const SAIL_TEST_IMAGES[] = {
 #endif
 
 #ifdef SAIL_HAVE_BUILTIN_JPEG2000
-    /* TODO The codec or the image seems to be broken. */
-    /* "@SAIL_TEST_IMAGES_PATH@/jpeg2000/bpp24-rgb.jp2", */
+    "@SAIL_TEST_IMAGES_PATH@/jpeg2000/bpp24-rgb.jp2",
 #endif
 
 #ifdef SAIL_HAVE_BUILTIN_JPEGXL
