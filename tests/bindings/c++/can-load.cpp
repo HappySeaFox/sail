@@ -170,6 +170,28 @@ static MunitResult test_can_load_io_memory4(const MunitParameter params[], void 
     return MUNIT_OK;
 }
 
+static MunitResult test_can_load_io_memory5(const MunitParameter params[], void *user_data) {
+
+    (void)user_data;
+
+    const char *path = munit_parameters_get(params, "path");
+
+    sail::arbitrary_data arbitrary_data;
+    munit_assert(sail::read_file_contents(path, &arbitrary_data) == SAIL_OK);
+
+    const sail::codec_info codec_info = sail::codec_info::from_path(path);
+    munit_assert(codec_info.is_valid());
+
+    std::unique_ptr<sail::abstract_io> io_memory { new sail::io_memory(arbitrary_data, sail::io_memory::Operation::Read) };
+    sail::image_input input = std::move(sail::image_input(*io_memory).with(codec_info));
+    sail::image image;
+
+    munit_assert(input.next_frame(&image) == SAIL_OK);
+    munit_assert(image.is_valid());
+
+    return MUNIT_OK;
+}
+
 static MunitParameterEnum test_params[] = {
     { (char *)"path", (char **)SAIL_TEST_IMAGES },
     { NULL, NULL },
@@ -183,6 +205,7 @@ static MunitTest test_suite_tests[] = {
     { (char *)"/can-load-io-memory2", test_can_load_io_memory2, NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
     { (char *)"/can-load-io-memory3", test_can_load_io_memory3, NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
     { (char *)"/can-load-io-memory4", test_can_load_io_memory4, NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
+    { (char *)"/can-load-io-memory5", test_can_load_io_memory5, NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };
