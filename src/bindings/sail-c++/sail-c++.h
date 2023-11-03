@@ -28,6 +28,10 @@
 
 // Universal include
 //
+#include <sail-common/sail-common.h>
+
+#include <sail-manip/manip_common.h>
+
 #ifdef SAIL_BUILD
     #ifdef _MSC_VER
     #pragma warning(push)
@@ -45,8 +49,6 @@
     #include <sail-c++/io_base_private.h>
     #include <sail-c++/utils_private.h>
 #endif
-
-#include <sail-common/sail-common.h>
 
 #include <sail-c++/abstract_io.h>
 #include <sail-c++/arbitrary_data.h>
@@ -76,8 +78,6 @@
 #include <sail-c++/tuning.h>
 #include <sail-c++/utils.h>
 #include <sail-c++/variant.h>
-
-#include <sail-manip/manip_common.h>
 
 #ifdef SAIL_BUILD
     #ifdef _MSC_VER

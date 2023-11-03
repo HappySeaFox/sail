@@ -289,8 +289,8 @@ endif()
 
 # Common configuration file
 #
-configure_file("${PROJECT_SOURCE_DIR}/src/config.h.in" "${PROJECT_BINARY_DIR}/include/config.h" @ONLY)
-install(FILES "${PROJECT_BINARY_DIR}/include/config.h" DESTINATION include/sail/sail-common)
+configure_file("${PROJECT_SOURCE_DIR}/src/config.h.in" "${PROJECT_BINARY_DIR}/include/sail-common/config.h" @ONLY)
+install(FILES "${PROJECT_BINARY_DIR}/include/sail-common/config.h" DESTINATION include/sail/sail-common)
 
 # Print configuration statistics
 #

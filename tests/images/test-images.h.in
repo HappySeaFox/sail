@@ -3,7 +3,7 @@
 
 #include <stddef.h>
 
-#include "config.h"
+#include <sail-common/config.h>
 
 static const char * const SAIL_TEST_IMAGES[] = {
 #ifdef SAIL_HAVE_BUILTIN_AVIF

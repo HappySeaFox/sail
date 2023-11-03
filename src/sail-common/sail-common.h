@@ -28,11 +28,7 @@
 
 /* Universal sail-common include. */
 
-#ifdef SAIL_BUILD
-    #include "config.h"
-#else
-    #include <sail-common/config.h>
-#endif
+#include <sail-common/config.h>
 
 #include <sail-common/common.h>
 #include <sail-common/common_serialize.h>

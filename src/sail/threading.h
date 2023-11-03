@@ -26,8 +26,7 @@
 #ifndef SAIL_THREADING_H
 #define SAIL_THREADING_H
 
-#include "config.h"
-
+#include <sail-common/config.h>
 #include <sail-common/export.h>
 #include <sail-common/status.h>
 
