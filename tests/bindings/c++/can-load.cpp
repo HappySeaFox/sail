@@ -23,7 +23,19 @@
     SOFTWARE.
 */
 
-#include <sail-c++/sail-c++.h>
+#include <sail-c++/suppress_c4251_begin.h>
+
+#include <sail-c++/abstract_io.h>
+#include <sail-c++/arbitrary_data.h>
+#include <sail-c++/codec_info.h>
+#include <sail-c++/image.h>
+#include <sail-c++/image_input.h>
+#include <sail-c++/io_base_private.h>
+#include <sail-c++/io_file.h>
+#include <sail-c++/io_memory.h>
+#include <sail-c++/utils.h>
+
+#include <sail-c++/suppress_end.h>
 
 #include "munit.h"
 

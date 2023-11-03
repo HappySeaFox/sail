@@ -33,17 +33,7 @@
 #include <sail-manip/manip_common.h>
 
 #ifdef SAIL_BUILD
-    #ifdef _MSC_VER
-    #pragma warning(push)
-    /*
-     * load_options.h: warning C4251: 'sail::load_options::d': class 'std::unique_ptr<...>'
-     * needs to have dll-interface to be used by clients of class 'sail::load_options'.
-     *
-     * To fix this warning we need to stop exporting whole classes and start exporting
-     * individual methods. Just silence this warning.
-     */
-    #pragma warning(disable: 4251)
-    #endif
+    #include <sail-c++/suppress_c4251_begin.h>
 
     #include <sail-c++/abstract_io_adapter.h>
     #include <sail-c++/io_base_private.h>
@@ -80,9 +70,7 @@
 #include <sail-c++/variant.h>
 
 #ifdef SAIL_BUILD
-    #ifdef _MSC_VER
-    #pragma warning(pop)
-    #endif
+    #include <sail-c++/suppress_end.h>
 #endif
 
 #endif

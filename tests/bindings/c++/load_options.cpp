@@ -25,7 +25,13 @@
 
 #include <utility>
 
-#include <sail-c++/sail-c++.h>
+#include <sail-c++/suppress_c4251_begin.h>
+
+#include <sail-c++/codec_info.h>
+#include <sail-c++/load_features.h>
+#include <sail-c++/load_options.h>
+
+#include <sail-c++/suppress_end.h>
 
 #include "munit.h"
 

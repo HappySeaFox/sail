@@ -25,7 +25,12 @@
 
 #include <utility> /* move */
 
-#include <sail-c++/sail-c++.h>
+#include <sail-c++/suppress_c4251_begin.h>
+
+#include <sail-c++/arbitrary_data.h>
+#include <sail-c++/iccp.h>
+
+#include <sail-c++/suppress_end.h>
 
 #include "munit.h"
 
