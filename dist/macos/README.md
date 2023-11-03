@@ -1,1 +1,0 @@
-These scripts are intended for developers. Use `brew install HappySeaFox/sail/sail` to install SAIL on macOS.

@@ -1,9 +1,0 @@
-#!/bin/sh -e
-
-cat "$(brew --repo HappySeaFox/sail)/Formula/sail.rb"
-
-git -C "$(brew --repo HappySeaFox/sail)" reset --hard origin/master
-
-echo
-echo "SUCCESS. Now you can copy the 'bottle do' block above and commit it."
-echo
