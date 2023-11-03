@@ -129,6 +129,8 @@ script:
     echo " *** Building with $@ ***"
     echo
 
+    local cmake_parallel_options="--parallel 2"
+
     eval $@
 
     cd "$TRAVIS_BUILD_DIR"
@@ -145,7 +147,7 @@ script:
 
         fail_on_error cmake -A x64 -DBUILD_SHARED_LIBS="$BUILD_SHARED_LIBS" -DCMAKE_INSTALL_PREFIX="$CMAKE_INSTALL_PREFIX" \
                                    -DSAIL_DEV=ON -DSAIL_COMBINE_CODECS="$SAIL_COMBINE_CODECS" ..
-        fail_on_error cmake --build . --config $CMAKE_BUILD_TYPE --target install
+        fail_on_error cmake --build . --config $CMAKE_BUILD_TYPE $cmake_parallel_options --target install
 
         cd tests
         fail_on_error ctest -C $CMAKE_BUILD_TYPE --output-on-failure
@@ -162,7 +164,7 @@ script:
 
         fail_on_error cmake -DCMAKE_BUILD_TYPE="$CMAKE_BUILD_TYPE" -DCMAKE_INSTALL_PREFIX="$CMAKE_INSTALL_PREFIX" \
                             -DBUILD_SHARED_LIBS="$BUILD_SHARED_LIBS" -DSAIL_DEV=ON -DSAIL_COMBINE_CODECS="$SAIL_COMBINE_CODECS" ..
-        fail_on_error cmake --build .
+        fail_on_error cmake --build . $cmake_parallel_options
         fail_on_error sudo make install
 
         if [ "$TRAVIS_OS_NAME" = "linux" ]; then
