@@ -737,7 +737,7 @@ sail_status_t sail_data_into_hex_string(const void *data, size_t data_size, char
 #ifdef _MSC_VER
         sprintf_s(str_local_copy, SIZE_MAX, "%02X", data_local[data_local_index++]);
 #else
-        sprintf(str_local_copy, "%02X", data_local[data_local_index++]);
+        snprintf(str_local_copy, SIZE_MAX, "%02X", data_local[data_local_index++]);
 #endif
         str_local_copy += 2;
     }

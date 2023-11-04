@@ -130,7 +130,7 @@ sail_status_t sail_codec_info_by_magic_number_from_io(struct sail_io *io, const 
 #ifdef _MSC_VER
             sprintf_s(hex_numbers_ptr, 4, "%02x ", buffer[i]);
 #else
-            sprintf(hex_numbers_ptr, "%02x ", buffer[i]);
+            snprintf(hex_numbers_ptr, 4, "%02x ", buffer[i]);
 #endif
         }
 
