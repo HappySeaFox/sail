@@ -25,7 +25,8 @@
 
 #include <utility>
 
-#include <sail-c++/suppress_c4251_begin.h>
+#include <sail-c++/suppress_begin.h>
+#include <sail-c++/suppress_c4251.h>
 
 #include <sail-c++/codec_info.h>
 #include <sail-c++/load_features.h>

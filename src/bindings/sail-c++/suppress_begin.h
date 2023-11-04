@@ -25,12 +25,4 @@
 
 #ifdef _MSC_VER
 #pragma warning(push)
-/*
- * load_options.h: warning C4251: 'sail::load_options::d': class 'std::unique_ptr<...>'
- * needs to have dll-interface to be used by clients of class 'sail::load_options'.
- *
- * To fix this warning we need to stop exporting whole classes and start exporting
- * individual methods. Just silence this warning.
- */
-#pragma warning(disable: 4251)
 #endif

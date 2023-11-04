@@ -49,7 +49,8 @@ add_library(sail-c++
                 source_image.cpp
                 source_image.h
                 special_properties.h
-                suppress_c4251_begin.h
+                suppress_begin.h
+                suppress_c4251.h
                 suppress_end.h
                 tuning.h
                 utils.cpp
@@ -87,7 +88,8 @@ set(PUBLIC_HEADERS abstract_io.h
                    save_options.h
                    source_image.h
                    special_properties.h
-                   suppress_c4251_begin.h
+                   suppress_begin.h
+                   suppress_c4251.h
                    suppress_end.h
                    tuning.h
                    utils.h
