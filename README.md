@@ -101,7 +101,7 @@ Time to load and output default pixels (without explicit conversion) was measure
 ## Preferred installation method
 
 - Windows: [Conan](https://conan.io/center/recipes/sail), `vcpkg`
-- macOS: [Conan](https://conan.io/center/recipes/sail), `brew`, `vcpkg`
+- macOS: [brew](https://formulae.brew.sh/formula/libsail), [Conan](https://conan.io/center/recipes/sail), `vcpkg`
 - Linux: native packages if available, [Conan](https://conan.io/center/recipes/sail), `vcpkg`
 
 See [BUILDING](BUILDING.md).
