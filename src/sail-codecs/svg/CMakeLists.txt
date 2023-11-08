@@ -9,12 +9,9 @@ if (NOT SVG_LIBRARY OR NOT SVG_INCLUDE_DIRS)
 
     if (NOT SVG_INCLUDE_DIRS)
         return()
-    else()
-        message("SVG: Using nanosvg")
     endif()
 else()
     set(SAIL_RESVG ON)
-    message("SVG: Using resvg")
 endif()
 
 if (SAIL_RESVG)
