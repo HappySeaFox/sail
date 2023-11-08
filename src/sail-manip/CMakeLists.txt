@@ -40,6 +40,10 @@ target_include_directories(sail-manip PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_S
 
 target_link_libraries(sail-manip PUBLIC sail-common)
 
+if (SAIL_HAVE_OPENMP)
+    target_link_libraries(sail-manip PRIVATE OpenMP::OpenMP_C)
+endif()
+
 # pkg-config integration
 #
 get_target_property(VERSION sail-manip VERSION)
