@@ -32,10 +32,10 @@
 
 #include <sail-manip/manip_common.h>
 
-#ifdef SAIL_BUILD
-    #include <sail-c++/suppress_begin.h>
-    #include <sail-c++/suppress_c4251.h>
+#include <sail-c++/suppress_begin.h>
+#include <sail-c++/suppress_c4251.h>
 
+#ifdef SAIL_BUILD
     #include <sail-c++/abstract_io_adapter.h>
     #include <sail-c++/io_base_private.h>
     #include <sail-c++/utils_private.h>
@@ -70,8 +70,6 @@
 #include <sail-c++/utils.h>
 #include <sail-c++/variant.h>
 
-#ifdef SAIL_BUILD
-    #include <sail-c++/suppress_end.h>
-#endif
+#include <sail-c++/suppress_end.h>
 
 #endif
