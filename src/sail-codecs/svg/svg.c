@@ -27,7 +27,14 @@
 #include <stddef.h>
 #include <string.h>
 
-#include <resvg.h>
+#ifdef SAIL_RESVG
+    #include <resvg.h>
+#else
+    #define NANOSVG_IMPLEMENTATION
+    #include <nanosvg.h>
+    #define NANOSVGRAST_IMPLEMENTATION
+    #include <nanosvgrast.h>
+#endif
 
 #include <sail-common/sail-common.h>
 
@@ -39,8 +46,14 @@ struct svg_state {
     struct sail_save_options *save_options;
 
     bool frame_loaded;
+
+#ifdef SAIL_RESVG
     resvg_options *resvg_options;
     resvg_render_tree *resvg_tree;
+#else
+    NSVGimage *nsvg_image;
+    NSVGrasterizer *nsvg_rasterizer;
+#endif
 };
 
 static sail_status_t alloc_svg_state(struct svg_state **svg_state) {
@@ -53,8 +66,14 @@ static sail_status_t alloc_svg_state(struct svg_state **svg_state) {
     (*svg_state)->save_options = NULL;
 
     (*svg_state)->frame_loaded  = false;
+
+#ifdef SAIL_RESVG
     (*svg_state)->resvg_options = NULL;
     (*svg_state)->resvg_tree    = NULL;
+#else
+    (*svg_state)->nsvg_image      = NULL;
+    (*svg_state)->nsvg_rasterizer = NULL;
+#endif
 
     return SAIL_OK;
 }
@@ -68,13 +87,17 @@ static void destroy_svg_state(struct svg_state *svg_state) {
     sail_destroy_load_options(svg_state->load_options);
     sail_destroy_save_options(svg_state->save_options);
 
+#ifdef SAIL_RESVG
     if (svg_state->resvg_options != NULL) {
         resvg_options_destroy(svg_state->resvg_options);
     }
-
     if (svg_state->resvg_tree != NULL) {
         resvg_tree_destroy(svg_state->resvg_tree);
     }
+#else
+    nsvgDeleteRasterizer(svg_state->nsvg_rasterizer);
+    nsvgDelete(svg_state->nsvg_image);
+#endif
 
     sail_free(svg_state);
 }
@@ -100,6 +123,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_svg(struct sail_io *io, const 
     size_t image_size;
     SAIL_TRY(sail_alloc_data_from_io_contents(io, &image_data, &image_size));
 
+#ifdef SAIL_RESVG
     svg_state->resvg_options = resvg_options_create();
 
     const int result = resvg_parse_tree_from_data(image_data, image_size, svg_state->resvg_options, &svg_state->resvg_tree);
@@ -110,6 +134,23 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_svg(struct sail_io *io, const 
         SAIL_LOG_ERROR("SVG: Failed to load image");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
     }
+#else
+    svg_state->nsvg_image = nsvgParse(image_data, "px", 96.0f);
+
+    sail_free(image_data);
+
+    if (svg_state->nsvg_image == NULL) {
+        SAIL_LOG_ERROR("SVG: Failed to load image");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+    }
+
+    svg_state->nsvg_rasterizer = nsvgCreateRasterizer();
+
+    if (svg_state->nsvg_rasterizer == NULL) {
+        SAIL_LOG_ERROR("SVG: Failed to create NanoSVG rasterizer");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+    }
+#endif
 
     return SAIL_OK;
 }
@@ -135,10 +176,15 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_svg(void *state, st
         image_local->source_image->compression  = SAIL_COMPRESSION_NONE;
     }
 
+#ifdef SAIL_RESVG
     const resvg_size image_size = resvg_get_image_size(svg_state->resvg_tree);
 
     image_local->width          = (unsigned)image_size.width;
     image_local->height         = (unsigned)image_size.height;
+#else
+    image_local->width          = (unsigned)svg_state->nsvg_image->width;
+    image_local->height         = (unsigned)svg_state->nsvg_image->height;
+#endif
     image_local->pixel_format   = SAIL_PIXEL_FORMAT_BPP32_RGBA;
     image_local->bytes_per_line = sail_bytes_per_line(image_local->width, image_local->pixel_format);
 
@@ -153,11 +199,16 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_svg(void *state, struct sail_
 
     memset(image->pixels, 0, (size_t)image->bytes_per_line * image->height);
 
-#ifdef SAIL_HAVE_RESVG_FIT_TO
-    const resvg_fit_to resvg_fit_to = { RESVG_FIT_TO_ORIGINAL, 0 };
-    resvg_render(svg_state->resvg_tree, resvg_fit_to, image->width, image->height, image->pixels);
+#ifdef SAIL_RESVG
+    #ifdef SAIL_HAVE_RESVG_FIT_TO
+        const resvg_fit_to resvg_fit_to = { RESVG_FIT_TO_ORIGINAL, 0 };
+        resvg_render(svg_state->resvg_tree, resvg_fit_to, image->width, image->height, image->pixels);
+    #else
+        resvg_render(svg_state->resvg_tree, resvg_transform_identity(), image->width, image->height, image->pixels);
+    #endif
 #else
-    resvg_render(svg_state->resvg_tree, resvg_transform_identity(), image->width, image->height, image->pixels);
+    nsvgRasterize(svg_state->nsvg_rasterizer, svg_state->nsvg_image, /* x */ 0, /* y */ 0, /* scale */ 1,
+                    image->pixels, (int)image->width, (int)image->height, (int)image->bytes_per_line);
 #endif
 
     return SAIL_OK;
