@@ -15,7 +15,6 @@ function(sail_check_openmp)
             check_c_source_compiles(
             "
                 #include <stdio.h>
-                #include <omp.h>
 
                 int main(int argc, char *argv[]) {
                     unsigned i;
