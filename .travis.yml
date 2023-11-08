@@ -12,6 +12,7 @@ addons:
       - jpeg-turbo
       - jpeg-xl
       - libavif
+      - libomp
       - libpng
       - libtiff
       - webp
