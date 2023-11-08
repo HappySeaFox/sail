@@ -291,16 +291,16 @@
         <br/><br/>
         <b>Content:</b> Static.
         <br/><br/>
-        See <a href="https://razrfalcon.github.io/resvg-test-suite/svg-support-table.html">more</a>.
+        See <a href="https://razrfalcon.github.io/resvg-test-suite/svg-support-table.html">resvg support table</a> when compiled with resvg.
     </td>
     <td>
         <b>Content:</b> Animated, Meta data, ICC profiles.
         <br/><br/>
-        See <a href="https://razrfalcon.github.io/resvg-test-suite/svg-support-table.html">more</a>.
+        See <a href="https://razrfalcon.github.io/resvg-test-suite/svg-support-table.html">resvg support table</a> when compiled with resvg.
     </td>
     <td>Unsupported</td>
     <td>-</td>
-    <td>resvg</td>
+    <td>resvg or nanosvg</td>
 </tr>
 <tr>
     <td>14</td>
