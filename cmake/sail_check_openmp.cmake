@@ -1,7 +1,7 @@
 # Intended to be included by SAIL.
 #
 function(sail_check_openmp)
-    find_package(OpenMP)
+    find_package(OpenMP COMPONENTS C)
 
     if (OpenMP_FOUND)
         if (MSVC)
