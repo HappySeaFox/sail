@@ -38,11 +38,13 @@ endif()
 #
 target_include_directories(sail-manip PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>)
 
-target_link_libraries(sail-manip PUBLIC sail-common)
-
 if (SAIL_HAVE_OPENMP)
-    target_link_libraries(sail-manip PRIVATE OpenMP::OpenMP_C)
+    target_compile_options(sail-manip     PRIVATE ${SAIL_OPENMP_FLAGS})
+    target_include_directories(sail-manip PRIVATE ${SAIL_OPENMP_INCLUDE_DIRS})
+    target_link_libraries(sail-manip      PRIVATE ${SAIL_OPENMP_LIB_NAMES})
 endif()
+
+target_link_libraries(sail-manip PUBLIC sail-common)
 
 # pkg-config integration
 #

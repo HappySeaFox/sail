@@ -4,13 +4,22 @@ function(sail_check_openmp)
     find_package(OpenMP)
 
     if (OpenMP_FOUND)
-        # Try to compile a sample program as some compilers may still
-        # fail to use OpenMP
+        if (MSVC)
+            set(SAIL_OPENMP_FLAGS "-openmp:llvm" CACHE INTERNAL "")
+        else()
+            set(SAIL_OPENMP_FLAGS ${OpenMP_C_FLAGS} CACHE INTERNAL "")
+        endif()
+
+        set(SAIL_OPENMP_INCLUDE_DIRS ${OpenMP_C_INCLUDE_DIRS} CACHE INTERNAL "")
+        set(SAIL_OPENMP_LIB_NAMES    ${OpenMP_C_LIB_NAMES}    CACHE INTERNAL "")
+
+        # Try to compile a sample program to make sure the compiler
+        # supports at least OpenMP 3.0 with unsigned integers in for loops.
         #
         cmake_push_check_state(RESET)
-            set(CMAKE_REQUIRED_FLAGS     ${OpenMP_C_FLAGS})
-            set(CMAKE_REQUIRED_INCLUDES  ${OpenMP_C_INCLUDE_DIRS})
-            set(CMAKE_REQUIRED_LIBRARIES ${OpenMP_C_LIBRARIES})
+            set(CMAKE_REQUIRED_FLAGS     ${SAIL_OPENMP_FLAGS})
+            set(CMAKE_REQUIRED_INCLUDES  ${SAIL_OPENMP_INCLUDE_DIRS})
+            set(CMAKE_REQUIRED_LIBRARIES ${SAIL_OPENMP_LIB_NAMES})
 
             check_c_source_compiles(
             "
