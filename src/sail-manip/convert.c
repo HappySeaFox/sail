@@ -173,7 +173,10 @@ static sail_status_t verify_and_construct_rgba_indexes_verbose(enum SailPixelFor
     }
 }
 
-static sail_status_t convert_from_bpp1_indexed(const struct sail_image *image, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
+static sail_status_t convert_from_indexed(const struct sail_image *image,
+                                            const unsigned input_bit_shift, const unsigned bit_shift_decrease_by,
+                                            const unsigned input_bit_mask, const unsigned bit_mask_shift_by,
+                                            pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
 
     sail_status_t status = SAIL_OK;
     unsigned row;
@@ -185,8 +188,8 @@ static sail_status_t convert_from_bpp1_indexed(const struct sail_image *image, p
             const uint8_t *scan_input = (uint8_t *)image->pixels + image->bytes_per_line * row;
 
             for (unsigned column = 0; column < image->width;) {
-                unsigned bit_shift = 7;
-                unsigned bit_mask = 1 << 7;
+                unsigned bit_shift = input_bit_shift;
+                unsigned bit_mask = input_bit_mask;
                 const uint8_t byte = *scan_input++;
 
                 while (bit_mask > 0 && column < image->width) {
@@ -198,111 +201,43 @@ static sail_status_t convert_from_bpp1_indexed(const struct sail_image *image, p
                     #pragma omp flush(status)
                     pixel_consumer(output_context, row, column, &rgba32, NULL);
 
-                    bit_shift--;
-                    bit_mask >>= 1;
+                    bit_shift -= bit_shift_decrease_by;
+                    bit_mask >>= bit_mask_shift_by;
                     column++;
                 }
             }
         }
     }
+
+    return SAIL_OK;
+}
+
+static sail_status_t convert_from_bpp1_indexed(const struct sail_image *image, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
+
+    SAIL_TRY(convert_from_indexed(image, 7, 1, /* 10000000 */ 0x80, 1, pixel_consumer, output_context));
 
     return SAIL_OK;
 }
 
 static sail_status_t convert_from_bpp2_indexed(const struct sail_image *image, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
 
-    sail_status_t status = SAIL_OK;
-    unsigned row;
-
-    #pragma omp parallel for shared(status)
-    for (row = 0; row < image->height; row++) {
-        #pragma omp flush(status)
-        if (status == SAIL_OK) {
-            const uint8_t *scan_input = (uint8_t *)image->pixels + image->bytes_per_line * row;
-
-            for (unsigned column = 0; column < image->width;) {
-                unsigned bit_shift = 6;
-                unsigned bit_mask = 3 << 6; /* 11000000 */
-                const uint8_t byte = *scan_input++;
-
-                while (bit_mask > 0 && column < image->width) {
-                    const uint8_t index = (byte & bit_mask) >> bit_shift;
-
-                    sail_rgba32_t rgba32;
-                    SAIL_TRY_OR_EXECUTE(get_palette_rgba32(image->palette, index, &rgba32),
-                                        /* on error */ status = __sail_error_result);
-                    #pragma omp flush(status)
-                    pixel_consumer(output_context, row, column, &rgba32, NULL);
-
-                    bit_shift -= 2;
-                    bit_mask >>= 2;
-                    column++;
-                }
-            }
-        }
-    }
+    SAIL_TRY(convert_from_indexed(image, 6, 2, /* 11000000 */ 0xC0, 2, pixel_consumer, output_context));
 
     return SAIL_OK;
 }
 
 static sail_status_t convert_from_bpp4_indexed(const struct sail_image *image, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
 
-    sail_status_t status = SAIL_OK;
-    unsigned row;
-
-    #pragma omp parallel for shared(status)
-    for (row = 0; row < image->height; row++) {
-        #pragma omp flush(status)
-        if (status == SAIL_OK) {
-            const uint8_t *scan_input = (uint8_t *)image->pixels + image->bytes_per_line * row;
-
-            for (unsigned column = 0; column < image->width;) {
-                unsigned bit_shift = 4;
-                unsigned bit_mask = 15 << 4; /* 11110000 */
-                const uint8_t byte = *scan_input++;
-
-                while (bit_mask > 0 && column < image->width) {
-                    const uint8_t index = (byte & bit_mask) >> bit_shift;
-
-                    sail_rgba32_t rgba32;
-                    SAIL_TRY_OR_EXECUTE(get_palette_rgba32(image->palette, index, &rgba32),
-                                        /* on error */ status = __sail_error_result);
-                    #pragma omp flush(status)
-                    pixel_consumer(output_context, row, column, &rgba32, NULL);
-
-                    bit_shift -= 4;
-                    bit_mask >>= 4;
-                    column++;
-                }
-            }
-        }
-    }
+    SAIL_TRY(convert_from_indexed(image, 4, 4, /* 11110000 */ 0xF0, 4, pixel_consumer, output_context));
 
     return SAIL_OK;
 }
 
 static sail_status_t convert_from_bpp8_indexed(const struct sail_image *image, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
 
-    sail_status_t status = SAIL_OK;
-    unsigned row;
+    SAIL_TRY(convert_from_indexed(image, 0, 0, /* 11111111 */ 0xFF, 8, pixel_consumer, output_context));
 
-    #pragma omp parallel for shared(status)
-    for (row = 0; row < image->height; row++) {
-        #pragma omp flush(status)
-        if (status == SAIL_OK) {
-            const uint8_t *scan_input = (uint8_t *)image->pixels + image->bytes_per_line * row;
-
-            for (unsigned column = 0; column < image->width; column++) {
-                sail_rgba32_t rgba32;
-                SAIL_TRY_OR_EXECUTE(get_palette_rgba32(image->palette, *scan_input++, &rgba32),
-                                    /* on error */ status = __sail_error_result);
-                #pragma omp flush(status)
-                pixel_consumer(output_context, row, column, &rgba32, NULL);
-            }
-        }
-    }
-
-    return status;
+    return SAIL_OK;
 }
 
 static sail_status_t convert_from_bpp1_grayscale(const struct sail_image *image, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
