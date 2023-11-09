@@ -154,7 +154,7 @@ sail_status_t pcx_private_build_palette(enum SailPixelFormat pixel_format, struc
 sail_status_t pcx_private_read_uncompressed(struct sail_io *io, unsigned bytes_per_plane_to_read, unsigned planes, unsigned char *buffer, struct sail_image *image) {
 
     for (unsigned row = 0; row < image->height; row++) {
-        unsigned char *target_scan = (unsigned char *)image->pixels + image->bytes_per_line * row;
+        unsigned char *target_scan = sail_scan_line(image, row);
 
         /* Read plane by plane and then merge them into the image pixels. */
         for (unsigned plane = 0; plane < planes; plane++) {

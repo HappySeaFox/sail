@@ -287,7 +287,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_webp(void *state, struct sail
                 SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
             }
 
-            uint8_t *dst_scanline = (uint8_t *)webp_state->canvas_image->pixels + webp_state->frame_y * image->bytes_per_line + webp_state->frame_x * webp_state->bytes_per_pixel;
+            uint8_t *dst_scanline = (uint8_t *)sail_scan_line(webp_state->canvas_image, webp_state->frame_y) + webp_state->frame_x * webp_state->bytes_per_pixel;
             uint8_t *src_scanline = image->pixels;
 
             for (unsigned row = 0; row < webp_state->frame_height; row++, dst_scanline += webp_state->canvas_image->bytes_per_line,

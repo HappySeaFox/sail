@@ -224,7 +224,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_jpeg(void *state, struct sail
     }
 
     for (unsigned row = 0; row < image->height; row++) {
-        unsigned char *scanline = (unsigned char *)image->pixels + row * image->bytes_per_line;
+        unsigned char *scanline = sail_scan_line(image, row);
 
         JSAMPROW samprow = (JSAMPROW)scanline;
         (void)jpeg_read_scanlines(jpeg_state->decompress_context, &samprow, 1);
@@ -382,7 +382,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_jpeg(void *state, const struc
     }
 
     for (unsigned row = 0; row < image->height; row++) {
-        JSAMPROW samprow = (JSAMPROW)((const unsigned char *)image->pixels + row * image->bytes_per_line);
+        JSAMPROW samprow = (JSAMPROW)sail_scan_line(image, row);
         jpeg_write_scanlines(jpeg_state->compress_context, &samprow, 1);
     }
 

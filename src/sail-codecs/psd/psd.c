@@ -272,7 +272,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_psd(void *state, struct sail_
                         SAIL_TRY(psd_state->io->strict_read(psd_state->io->stream, &value, sizeof(value)));
 
                         for (unsigned i = count; i < count + c; i++) {
-                            unsigned char *scan = (unsigned char *)image->pixels + row * image->bytes_per_line + i * bpp;
+                            unsigned char *scan = (unsigned char *)sail_scan_line(image, row) + i * bpp;
                             *(scan + channel) = value;
                         }
                     } else if (c < 128) {
@@ -282,7 +282,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_psd(void *state, struct sail_
                             unsigned char value;
                             SAIL_TRY(psd_state->io->strict_read(psd_state->io->stream, &value, sizeof(value)));
 
-                            unsigned char *scan = (unsigned char *)image->pixels + row * image->bytes_per_line + i * bpp;
+                            unsigned char *scan = (unsigned char *)sail_scan_line(image, row) + i * bpp;
                             *(scan + channel) = value;
                         }
                     }
@@ -297,7 +297,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_psd(void *state, struct sail_
                 SAIL_TRY(psd_state->io->strict_read(psd_state->io->stream, psd_state->scan_buffer, psd_state->bytes_per_channel));
 
                 for (unsigned count = 0; count < psd_state->bytes_per_channel; count++) {
-                    unsigned char *scan = (unsigned char *)image->pixels + row * image->bytes_per_line + count * bpp;
+                    unsigned char *scan = (unsigned char *)sail_scan_line(image, row) + count * bpp;
                     *(scan + channel) = *(psd_state->scan_buffer + count);
                 }
             }

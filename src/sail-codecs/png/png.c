@@ -391,7 +391,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_png(void *state, struct sail_
     #ifdef PNG_APNG_SUPPORTED
         if (png_state->is_apng) {
             for (unsigned row = 0; row < image->height; row++) {
-                unsigned char *scanline = (unsigned char *)image->pixels + row * image->bytes_per_line;
+                unsigned char *scanline = sail_scan_line(image, row);
 
                 memcpy(scanline, png_state->prev[row], png_state->first_image->bytes_per_line);
 
@@ -430,12 +430,12 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_png(void *state, struct sail_
             }
         } else {
             for (unsigned row = 0; row < image->height; row++) {
-                png_read_row(png_state->png_ptr, (unsigned char *)image->pixels + row * image->bytes_per_line, NULL);
+                png_read_row(png_state->png_ptr, sail_scan_line(image, row), NULL);
             }
         }
     #else
         for (unsigned row = 0; row < image->height; row++) {
-            png_read_row(png_state->png_ptr, (unsigned char *)image->pixels + row * image->bytes_per_line, NULL);
+            png_read_row(png_state->png_ptr, sail_scan_line(image, row), NULL);
         }
     #endif
     }
@@ -638,7 +638,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_png(void *state, const struct
 
     for (int current_pass = 0; current_pass < png_state->interlaced_passes; current_pass++) {
         for (unsigned row = 0; row < image->height; row++) {
-            png_write_row(png_state->png_ptr, (const unsigned char *)image->pixels + row * image->bytes_per_line);
+            png_write_row(png_state->png_ptr, sail_scan_line(image, row));
         }
     }
 

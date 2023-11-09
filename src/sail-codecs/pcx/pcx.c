@@ -215,7 +215,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_pcx(void *state, struct sail_
             }
 
             /* Merge planes into the image pixels. */
-            unsigned char * const scan = (unsigned char *)image->pixels + image->bytes_per_line * row;
+            unsigned char * const scan = sail_scan_line(image, row);
 
             for (unsigned plane = 0; plane < pcx_state->pcx_header.planes; plane++) {
                 const unsigned buffer_plane_offset = plane * pcx_state->pcx_header.bytes_per_line;

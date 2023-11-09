@@ -297,7 +297,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_jpeg2000(void *state, struct 
         }
 
         if (jpeg2000_state->channel_depth_scaled == 8) {
-            unsigned char *scan = (unsigned char *)image->pixels + row * image->bytes_per_line;
+            unsigned char *scan = sail_scan_line(image, row);
 
             for (unsigned column = 0; column < image->width; column++) {
                 for (int channel = 0; channel < jpeg2000_state->number_channels; channel++) {
@@ -305,7 +305,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_jpeg2000(void *state, struct 
                 }
             }
         } else {
-            uint16_t *scan = (uint16_t *)((uint8_t *)image->pixels + row * image->bytes_per_line);
+            uint16_t *scan = sail_scan_line(image, row);
 
             for (unsigned column = 0; column < image->width; column++) {
                 for (int channel = 0; channel < jpeg2000_state->number_channels; channel++) {

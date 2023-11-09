@@ -330,7 +330,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_tiff(void *state, const struc
     }
 
     for (unsigned row = 0; row < image->height; row++) {
-        if (TIFFWriteScanline(tiff_state->tiff, (unsigned char *)image->pixels + row * image->bytes_per_line, tiff_state->line++, 0) < 0) {
+        if (TIFFWriteScanline(tiff_state->tiff, sail_scan_line(image, row), tiff_state->line++, 0) < 0) {
             SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
         }
     }
