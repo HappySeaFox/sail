@@ -1,17 +1,26 @@
 # Intended to be included by SAIL.
 #
 function(sail_check_openmp)
+    # This may require setting OpenMP_ROOT on macOS
+    #
     find_package(OpenMP COMPONENTS C)
 
     if (OpenMP_FOUND)
+        # We want OpenMP 3.0 to support unsigned integers in loops.
+        # The default OpenMP implementation in MSVC 2022 still supports 2.0,
+        # so switch to the LLVM option with OpenMP 3.1.
+        #
         if (MSVC)
-            set(SAIL_OPENMP_FLAGS "-openmp:llvm" CACHE INTERNAL "")
+            set(SAIL_OPENMP_FLAGS "/openmp:llvm" CACHE INTERNAL "")
         else()
             set(SAIL_OPENMP_FLAGS ${OpenMP_C_FLAGS} CACHE INTERNAL "")
         endif()
 
         set(SAIL_OPENMP_INCLUDE_DIRS ${OpenMP_C_INCLUDE_DIRS} CACHE INTERNAL "")
 
+        # Build a list of direct paths to libraries. This is needed on macOS with brew specifically
+        # as the installed libomp version lays in /usr/local/opt/libomp and is not globally visible.
+        #
         foreach(lib IN LISTS OpenMP_C_LIB_NAMES)
             set(SAIL_OPENMP_LIBS ${SAIL_OPENMP_LIBS} "${OpenMP_${lib}_LIBRARY}" CACHE INTERNAL "")
         endforeach()
