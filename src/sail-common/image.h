@@ -222,6 +222,12 @@ SAIL_EXPORT sail_status_t sail_mirror_vertically(struct sail_image *image);
  */
 SAIL_EXPORT sail_status_t sail_mirror_horizontally(struct sail_image *image);
 
+/*
+ * Returns the scan line at the given row.
+ * Return NULL if the image or its pixels is NULL.
+ */
+SAIL_EXPORT void* sail_scan_line(const struct sail_image *image, unsigned row);
+
 /* extern "C" */
 #ifdef __cplusplus
 }

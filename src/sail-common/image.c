@@ -213,3 +213,12 @@ sail_status_t sail_mirror_horizontally(struct sail_image *image) {
 
     return SAIL_OK;
 }
+
+void* sail_scan_line(const struct sail_image *image, unsigned row) {
+
+    if (SAIL_UNLIKELY(image == NULL || image->pixels == NULL)) {
+        return NULL;
+    }
+
+    return (uint8_t *)image->pixels + image->bytes_per_line * row;
+}
