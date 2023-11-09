@@ -394,7 +394,7 @@ sail_status_t bmp_private_read_frame(void *state, struct sail_io *io, struct sai
     bool skip_pad_bytes = true;
 
     for (unsigned i = image->height; i > 0; i--) {
-        unsigned char *scan = sail_scan_line(image->pixels, bmp_state->flipped ? (i - 1) : (image->height - i));
+        unsigned char *scan = sail_scan_line(image, bmp_state->flipped ? (i - 1) : (image->height - i));
 
         for (unsigned pixel_index = 0; pixel_index < image->width;) {
             if (bmp_state->version >= SAIL_BMP_V3 && bmp_state->v3.compression == SAIL_BI_RLE4) {
