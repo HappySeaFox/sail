@@ -20,6 +20,7 @@ include(sail_check_builtin_bswap)
 include(sail_check_c11_thread_local)
 include(sail_check_include)
 include(sail_check_init_once_execute_once)
+include(sail_check_openmp)
 include(sail_codec)
 include(sail_enable_asan)
 include(sail_enable_pch)
@@ -77,6 +78,7 @@ endif()
 option(SAIL_BUILD_APPS "Build applications." ON)
 option(SAIL_BUILD_EXAMPLES "Build examples." ON)
 option(SAIL_DEV "Enable developer mode. Be more strict when compiling source code, for example." OFF)
+option(SAIL_ENABLE_OPENMP "Enable OpenMP support if it's available in the compiler." ON)
 set(SAIL_ENABLE_CODECS "" CACHE STRING "Forcefully enable the codecs specified in this ';'-separated list. \
 If an enabled codec fails to find its dependencies, the configuration process fails. \
 One can also specify not just individual codecs but codec groups by their priority like that: highest-priority;xbm. \
@@ -94,6 +96,12 @@ dynamically loaded plugins." OFF "BUILD_SHARED_LIBS" ON)
 option(SAIL_THIRD_PARTY_CODECS_PATH "Enable loading third-party codecs from the ';'-separated paths specified in \
 the SAIL_THIRD_PARTY_CODECS_PATH environment variable." ON)
 option(SAIL_THREAD_SAFE "Enable working in multi-threaded environments by locking the internal context with a mutex." ON)
+
+if (SAIL_ENABLE_OPENMP)
+    sail_check_openmp()
+else()
+    set(SAIL_HAVE_OPENMP_DISPLAY "OFF (forced)" CACHE INTERNAL "")
+endif()
 
 # When we compile for VCPKG, VCPKG_TARGET_TRIPLET is defined
 #
@@ -327,6 +335,7 @@ message("*")
 message("* SAIL_HAVE_BUILTIN_BSWAP16:    ${SAIL_HAVE_BUILTIN_BSWAP16_DISPLAY}")
 message("* SAIL_HAVE_BUILTIN_BSWAP32:    ${SAIL_HAVE_BUILTIN_BSWAP32_DISPLAY}")
 message("* SAIL_HAVE_BUILTIN_BSWAP64:    ${SAIL_HAVE_BUILTIN_BSWAP64_DISPLAY}")
+message("* SAIL_HAVE_OPENMP:             ${SAIL_HAVE_OPENMP_DISPLAY}")
 message("*")
 message("* [*] - these options depend on other options, their values may be altered by CMake.")
 message("*       For example, if you configure with -DBUILD_SHARED_LIBS=OFF -DSAIL_COMBINE_CODECS=OFF,")
