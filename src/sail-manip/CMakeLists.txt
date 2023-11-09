@@ -41,7 +41,7 @@ target_include_directories(sail-manip PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_S
 if (SAIL_HAVE_OPENMP)
     target_compile_options(sail-manip     PRIVATE ${SAIL_OPENMP_FLAGS})
     target_include_directories(sail-manip PRIVATE ${SAIL_OPENMP_INCLUDE_DIRS})
-    target_link_libraries(sail-manip      PRIVATE ${SAIL_OPENMP_LIB_NAMES})
+    target_link_libraries(sail-manip      PRIVATE ${SAIL_OPENMP_LIBS})
 endif()
 
 target_link_libraries(sail-manip PUBLIC sail-common)

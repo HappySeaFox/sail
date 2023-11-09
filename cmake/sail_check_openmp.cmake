@@ -11,7 +11,10 @@ function(sail_check_openmp)
         endif()
 
         set(SAIL_OPENMP_INCLUDE_DIRS ${OpenMP_C_INCLUDE_DIRS} CACHE INTERNAL "")
-        set(SAIL_OPENMP_LIB_NAMES    ${OpenMP_C_LIB_NAMES}    CACHE INTERNAL "")
+
+        foreach(lib IN LISTS OpenMP_C_LIB_NAMES)
+            set(SAIL_OPENMP_LIBS ${SAIL_OPENMP_LIBS} "${OpenMP_${lib}_LIBRARY}" CACHE INTERNAL "")
+        endforeach()
 
         # Try to compile a sample program to make sure the compiler
         # supports at least OpenMP 3.0 with unsigned integers in for loops.
@@ -19,7 +22,7 @@ function(sail_check_openmp)
         cmake_push_check_state(RESET)
             set(CMAKE_REQUIRED_FLAGS     ${SAIL_OPENMP_FLAGS})
             set(CMAKE_REQUIRED_INCLUDES  ${SAIL_OPENMP_INCLUDE_DIRS})
-            set(CMAKE_REQUIRED_LIBRARIES ${SAIL_OPENMP_LIB_NAMES})
+            set(CMAKE_REQUIRED_LIBRARIES ${SAIL_OPENMP_LIBS})
 
             check_c_source_compiles(
             "
