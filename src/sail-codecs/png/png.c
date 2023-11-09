@@ -316,7 +316,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_png(void *state, st
 
             /* We have just a single frame left - continue to reading scan lines. */
             if (png_state->frames == 1) {
-                png_read_frame_head(png_state->png_ptr, png_state->info_ptr);
                 png_state->next_frame_width  = png_state->first_image->width;
                 png_state->next_frame_height = png_state->first_image->height;
             } else if (png_state->frames == 0) {
