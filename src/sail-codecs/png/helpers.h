@@ -46,6 +46,10 @@ SAIL_HIDDEN void png_private_my_error_fn(png_structp png_ptr, png_const_charp te
 
 SAIL_HIDDEN void png_private_my_warning_fn(png_structp png_ptr, png_const_charp text);
 
+SAIL_HIDDEN void* png_private_my_malloc_fn(png_structp png_ptr, png_size_t size);
+
+SAIL_HIDDEN void png_private_my_free_fn(png_structp png_ptr, void *ptr);
+
 SAIL_HIDDEN enum SailPixelFormat png_private_png_color_type_to_pixel_format(int color_type, int bit_depth);
 
 SAIL_HIDDEN sail_status_t png_private_pixel_format_to_png_color_type(enum SailPixelFormat pixel_format, int *color_type, int *bit_depth);

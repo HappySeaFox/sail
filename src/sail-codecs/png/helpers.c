@@ -134,6 +134,25 @@ void png_private_my_warning_fn(png_structp png_ptr, png_const_charp text) {
     SAIL_LOG_WARNING("PNG: %s", text);
 }
 
+void* png_private_my_malloc_fn(png_structp png_ptr, png_size_t size) {
+
+    (void)png_ptr;
+
+    void *ptr;
+
+    SAIL_TRY_OR_EXECUTE(sail_malloc(size, &ptr),
+                        /* on error */ return NULL);
+
+    return ptr;
+}
+
+void png_private_my_free_fn(png_structp png_ptr, void *ptr) {
+
+    (void)png_ptr;
+
+    sail_free(ptr);
+}
+
 enum SailPixelFormat png_private_png_color_type_to_pixel_format(int color_type, int bit_depth) {
 
     switch (color_type) {

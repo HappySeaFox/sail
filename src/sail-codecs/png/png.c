@@ -171,7 +171,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_png(struct sail_io *io, const 
     SAIL_TRY(sail_copy_load_options(load_options, &png_state->load_options));
 
     /* Initialize PNG. */
-    if ((png_state->png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, png_private_my_error_fn, png_private_my_warning_fn)) == NULL) {
+    if ((png_state->png_ptr = png_create_read_struct_2(PNG_LIBPNG_VER_STRING, NULL, png_private_my_error_fn, png_private_my_warning_fn, NULL, png_private_my_malloc_fn, png_private_my_free_fn)) == NULL) {
         png_state->libpng_error = true;
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
@@ -486,7 +486,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_png(struct sail_io *io, const 
     }
 
     /* Initialize PNG. */
-    if ((png_state->png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, png_private_my_error_fn, png_private_my_warning_fn)) == NULL) {
+    if ((png_state->png_ptr = png_create_write_struct_2(PNG_LIBPNG_VER_STRING, NULL, png_private_my_error_fn, png_private_my_warning_fn, NULL, png_private_my_malloc_fn, png_private_my_free_fn)) == NULL) {
         png_state->libpng_error = true;
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
