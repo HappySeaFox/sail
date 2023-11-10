@@ -138,12 +138,7 @@ void* png_private_my_malloc_fn(png_structp png_ptr, png_size_t size) {
 
     (void)png_ptr;
 
-    void *ptr;
-
-    SAIL_TRY_OR_EXECUTE(sail_malloc(size, &ptr),
-                        /* on error */ return NULL);
-
-    return ptr;
+    return sail_malloc_std_signature(size);
 }
 
 void png_private_my_free_fn(png_structp png_ptr, void *ptr) {
