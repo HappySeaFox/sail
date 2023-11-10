@@ -29,6 +29,8 @@
 
 #include <sail-common/sail-common.h>
 
+#define QOI_MALLOC sail_malloc_std_signature
+#define QOI_FREE sail_free
 #define QOI_IMPLEMENTATION
 #define QOI_NO_STDIO
 #include "qoi.h"
