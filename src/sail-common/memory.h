@@ -43,6 +43,15 @@ extern "C" {
 SAIL_EXPORT sail_status_t sail_malloc(size_t size, void **ptr);
 
 /*
+ * Calls sail_malloc() and returns the allocated pointer or NULL in case of error.
+ * One can pass sail_malloc_std_signature() to memory management functions in third-party
+ * imaging libraries to force them to use sail_malloc().
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT void* sail_malloc_std_signature(size_t size);
+
+/*
  * Interface to realloc().
  *
  * Returns SAIL_OK on success.

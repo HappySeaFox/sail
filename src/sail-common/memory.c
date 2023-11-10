@@ -42,6 +42,16 @@ sail_status_t sail_malloc(size_t size, void **ptr) {
     return SAIL_OK;
 }
 
+void* sail_malloc_std_signature(size_t size) {
+
+    void *ptr;
+
+    SAIL_TRY_OR_EXECUTE(sail_malloc(size, &ptr),
+                        /* on error */ return NULL);
+
+    return ptr;
+}
+
 sail_status_t sail_realloc(size_t size, void **ptr) {
 
     SAIL_CHECK_PTR(ptr);
