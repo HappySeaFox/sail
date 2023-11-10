@@ -31,11 +31,7 @@ void *jpegxl_private_alloc_func(void *opaque, size_t size)
 {
     (void)opaque;
 
-    void *ptr;
-    SAIL_TRY_OR_EXECUTE(sail_malloc(size, &ptr),
-                        /* on error */ return NULL);
-
-    return ptr;
+    return sail_malloc_std_signature(size);
 }
 
 void jpegxl_private_free_func(void *opaque, void *address)
