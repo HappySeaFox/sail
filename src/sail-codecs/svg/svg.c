@@ -42,8 +42,8 @@
  * Codec-specific state.
  */
 struct svg_state {
-    struct sail_load_options *load_options;
-    struct sail_save_options *save_options;
+    const struct sail_load_options *load_options;
+    const struct sail_save_options *save_options;
 
     bool frame_loaded;
 
@@ -56,24 +56,28 @@ struct svg_state {
 #endif
 };
 
-static sail_status_t alloc_svg_state(struct svg_state **svg_state) {
+static sail_status_t alloc_svg_state(const struct sail_load_options *load_options,
+                                        const struct sail_save_options *save_options,
+                                        struct svg_state **svg_state) {
 
     void *ptr;
     SAIL_TRY(sail_malloc(sizeof(struct svg_state), &ptr));
     *svg_state = ptr;
 
-    (*svg_state)->load_options = NULL;
-    (*svg_state)->save_options = NULL;
+    **svg_state = (struct svg_state) {
+        .load_options = load_options,
+        .save_options = save_options,
 
-    (*svg_state)->frame_loaded  = false;
+        .frame_loaded  = false,
 
 #ifdef SAIL_RESVG
-    (*svg_state)->resvg_options = NULL;
-    (*svg_state)->resvg_tree    = NULL;
+        .resvg_options = NULL,
+        .resvg_tree    = NULL,
 #else
-    (*svg_state)->nsvg_image      = NULL;
-    (*svg_state)->nsvg_rasterizer = NULL;
+        .nsvg_image      = NULL,
+        .nsvg_rasterizer = NULL,
 #endif
+    };
 
     return SAIL_OK;
 }
@@ -83,9 +87,6 @@ static void destroy_svg_state(struct svg_state *svg_state) {
     if (svg_state == NULL) {
         return;
     }
-
-    sail_destroy_load_options(svg_state->load_options);
-    sail_destroy_save_options(svg_state->save_options);
 
 #ifdef SAIL_RESVG
     if (svg_state->resvg_options != NULL) {
@@ -112,11 +113,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_svg(struct sail_io *io, const 
 
     /* Allocate a new state. */
     struct svg_state *svg_state;
-    SAIL_TRY(alloc_svg_state(&svg_state));
+    SAIL_TRY(alloc_svg_state(load_options, NULL, &svg_state));
     *state = svg_state;
-
-    /* Deep copy load options. */
-    SAIL_TRY(sail_copy_load_options(load_options, &svg_state->load_options));
 
     /* Read the entire image as the resvg API requires. */
     void *image_data;
