@@ -43,8 +43,8 @@
  */
 struct ico_state {
     struct sail_io *io;
-    struct sail_load_options *load_options;
-    struct sail_save_options *save_options;
+    const struct sail_load_options *load_options;
+    const struct sail_save_options *save_options;
 
     struct SailIcoHeader ico_header;
     struct SailIcoDirEntry *ico_dir_entries;
@@ -53,19 +53,24 @@ struct ico_state {
     void *common_bmp_state;
 };
 
-static sail_status_t alloc_ico_state(struct ico_state **ico_state) {
+static sail_status_t alloc_ico_state(struct sail_io *io,
+                                        const struct sail_load_options *load_options,
+                                        const struct sail_save_options *save_options,
+                                        struct ico_state **ico_state) {
 
     void *ptr;
     SAIL_TRY(sail_malloc(sizeof(struct ico_state), &ptr));
     *ico_state = ptr;
 
-    (*ico_state)->io           = NULL;
-    (*ico_state)->load_options = NULL;
-    (*ico_state)->save_options = NULL;
+    **ico_state = (struct ico_state) {
+        .io           = io,
+        .load_options = load_options,
+        .save_options = save_options,
 
-    (*ico_state)->ico_dir_entries  = NULL;
-    (*ico_state)->current_frame    = 0;
-    (*ico_state)->common_bmp_state = NULL;
+        .ico_dir_entries  = NULL,
+        .current_frame    = 0,
+        .common_bmp_state = NULL,
+    };
 
     return SAIL_OK;
 }
@@ -75,9 +80,6 @@ static void destroy_ico_state(struct ico_state *ico_state) {
     if (ico_state == NULL) {
         return;
     }
-
-    sail_destroy_load_options(ico_state->load_options);
-    sail_destroy_save_options(ico_state->save_options);
 
     sail_free(ico_state->ico_dir_entries);
 
@@ -94,14 +96,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_ico(struct sail_io *io, const 
 
     /* Allocate a new state. */
     struct ico_state *ico_state;
-    SAIL_TRY(alloc_ico_state(&ico_state));
+    SAIL_TRY(alloc_ico_state(io, load_options, NULL, &ico_state));
     *state = ico_state;
-
-    /* Save I/O for further operations. */
-    ico_state->io = io;
-
-    /* Deep copy load options. */
-    SAIL_TRY(sail_copy_load_options(load_options, &ico_state->load_options));
 
     SAIL_TRY(ico_private_read_header(ico_state->io, &ico_state->ico_header));
 
