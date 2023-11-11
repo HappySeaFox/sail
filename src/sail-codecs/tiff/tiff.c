@@ -39,29 +39,35 @@
  * Codec-specific state.
  */
 struct tiff_state {
+    const struct sail_load_options *load_options;
+    const struct sail_save_options *save_options;
+
     TIFF *tiff;
     uint16_t current_frame;
     bool libtiff_error;
-    struct sail_load_options *load_options;
-    struct sail_save_options *save_options;
     int save_compression;
     TIFFRGBAImage image;
     int line;
 };
 
-static sail_status_t alloc_tiff_state(struct tiff_state **tiff_state) {
+static sail_status_t alloc_tiff_state(const struct sail_load_options *load_options,
+                                        const struct sail_save_options *save_options,
+                                        struct tiff_state **tiff_state) {
 
     void *ptr;
     SAIL_TRY(sail_malloc(sizeof(struct tiff_state), &ptr));
     *tiff_state = ptr;
 
-    (*tiff_state)->tiff             = NULL;
-    (*tiff_state)->current_frame    = 0;
-    (*tiff_state)->libtiff_error    = false;
-    (*tiff_state)->load_options     = NULL;
-    (*tiff_state)->save_options     = NULL;
-    (*tiff_state)->save_compression = COMPRESSION_NONE;
-    (*tiff_state)->line             = 0;
+    **tiff_state = (struct tiff_state) {
+        .load_options = load_options,
+        .save_options = save_options,
+
+        .tiff             = NULL,
+        .current_frame    = 0,
+        .libtiff_error    = false,
+        .save_compression = COMPRESSION_NONE,
+        .line             = 0,
+    };
 
     tiff_private_zero_tiff_image(&(*tiff_state)->image);
 
@@ -73,9 +79,6 @@ static void destroy_tiff_state(struct tiff_state *tiff_state) {
     if (tiff_state == NULL) {
         return;
     }
-
-    sail_destroy_load_options(tiff_state->load_options);
-    sail_destroy_save_options(tiff_state->save_options);
 
     TIFFRGBAImageEnd(&tiff_state->image);
 
@@ -95,12 +98,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_tiff(struct sail_io *io, const
 
     /* Allocate a new state. */
     struct tiff_state *tiff_state;
-    SAIL_TRY(alloc_tiff_state(&tiff_state));
-
+    SAIL_TRY(alloc_tiff_state(load_options, NULL, &tiff_state));
     *state = tiff_state;
-
-    /* Deep copy load options. */
-    SAIL_TRY(sail_copy_load_options(load_options, &tiff_state->load_options));
 
     /* Initialize TIFF.
      *
@@ -244,12 +243,8 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_tiff(struct sail_io *io, const
     *state = NULL;
 
     struct tiff_state *tiff_state;
-    SAIL_TRY(alloc_tiff_state(&tiff_state));
-
+    SAIL_TRY(alloc_tiff_state(NULL, save_options, &tiff_state));
     *state = tiff_state;
-
-    /* Deep copy save options. */
-    SAIL_TRY(sail_copy_save_options(save_options, &tiff_state->save_options));
 
     /* Sanity check. */
     SAIL_TRY_OR_EXECUTE(tiff_private_sail_compression_to_compression(tiff_state->save_options->compression, &tiff_state->save_compression),
