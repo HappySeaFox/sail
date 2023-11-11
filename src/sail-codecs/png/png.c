@@ -49,6 +49,9 @@ static const double COMPRESSION_DEFAULT = 6;
  * Codec-specific state.
  */
 struct png_state {
+    const struct sail_load_options *load_options;
+    const struct sail_save_options *save_options;
+
     png_structp png_ptr;
     png_infop info_ptr;
     int color_type;
@@ -58,8 +61,6 @@ struct png_state {
     struct sail_image *first_image;
     int interlaced_passes;
     bool libpng_error;
-    struct sail_load_options *load_options;
-    struct sail_save_options *save_options;
     bool frame_saved;
     int frames;
     int current_frame;
@@ -87,45 +88,50 @@ struct png_state {
 #endif
 };
 
-static sail_status_t alloc_png_state(struct png_state **png_state) {
+static sail_status_t alloc_png_state(const struct sail_load_options *load_options,
+                                        const struct sail_save_options *save_options,
+                                        struct png_state **png_state) {
 
     void *ptr;
     SAIL_TRY(sail_malloc(sizeof(struct png_state), &ptr));
     *png_state = ptr;
 
-    (*png_state)->png_ptr           = NULL;
-    (*png_state)->info_ptr          = NULL;
-    (*png_state)->color_type        = 0;
-    (*png_state)->bit_depth         = 0;
-    (*png_state)->interlace_type    = 0;
-    (*png_state)->first_image       = NULL;
-    (*png_state)->interlaced_passes = 0;
-    (*png_state)->libpng_error      = false;
-    (*png_state)->load_options      = NULL;
-    (*png_state)->save_options      = NULL;
-    (*png_state)->frame_saved       = false;
-    (*png_state)->frames            = 0;
-    (*png_state)->current_frame     = 0;
+    **png_state = (struct png_state) {
+        .load_options = load_options,
+        .save_options = save_options,
 
-    /* APNG-specific. */
+        .png_ptr           = NULL,
+        .info_ptr          = NULL,
+        .color_type        = 0,
+        .bit_depth         = 0,
+        .interlace_type    = 0,
+        .first_image       = NULL,
+        .interlaced_passes = 0,
+        .libpng_error      = false,
+        .frame_saved       = false,
+        .frames            = 0,
+        .current_frame     = 0,
+
+/* APNG-specific. */
 #ifdef PNG_APNG_SUPPORTED
-    (*png_state)->is_apng               = false;
-    (*png_state)->bytes_per_pixel       = 0;
+        .is_apng               = false,
+        .bytes_per_pixel       = 0,
 
-    (*png_state)->next_frame_width      = 0;
-    (*png_state)->next_frame_height     = 0;
-    (*png_state)->next_frame_x_offset   = 0;
-    (*png_state)->next_frame_y_offset   = 0;
-    (*png_state)->next_frame_delay_num  = 0;
-    (*png_state)->next_frame_delay_den  = 0;
-    (*png_state)->next_frame_dispose_op = PNG_DISPOSE_OP_BACKGROUND;
-    (*png_state)->next_frame_blend_op   = PNG_BLEND_OP_SOURCE;
+        .next_frame_width      = 0,
+        .next_frame_height     = 0,
+        .next_frame_x_offset   = 0,
+        .next_frame_y_offset   = 0,
+        .next_frame_delay_num  = 0,
+        .next_frame_delay_den  = 0,
+        .next_frame_dispose_op = PNG_DISPOSE_OP_BACKGROUND,
+        .next_frame_blend_op   = PNG_BLEND_OP_SOURCE,
 
-    (*png_state)->skipped_hidden        = false;
-    (*png_state)->prev                  = NULL;
-    (*png_state)->temp_scanline         = NULL;
-    (*png_state)->scanline_for_skipping = NULL;
+        .skipped_hidden        = false,
+        .prev                  = NULL,
+        .temp_scanline         = NULL,
+        .scanline_for_skipping = NULL,
 #endif
+    };
 
     return SAIL_OK;
 }
@@ -135,9 +141,6 @@ static void destroy_png_state(struct png_state *png_state) {
     if (png_state == NULL) {
         return;
     }
-
-    sail_destroy_load_options(png_state->load_options);
-    sail_destroy_save_options(png_state->save_options);
 
 #ifdef PNG_APNG_SUPPORTED
     sail_free(png_state->temp_scanline);
@@ -163,12 +166,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_png(struct sail_io *io, const 
 
     /* Allocate a new state. */
     struct png_state *png_state;
-    SAIL_TRY(alloc_png_state(&png_state));
-
+    SAIL_TRY(alloc_png_state(load_options, NULL, &png_state));
     *state = png_state;
-
-    /* Deep copy load options. */
-    SAIL_TRY(sail_copy_load_options(load_options, &png_state->load_options));
 
     /* Initialize PNG. */
     if ((png_state->png_ptr = png_create_read_struct_2(PNG_LIBPNG_VER_STRING, NULL, png_private_my_error_fn, png_private_my_warning_fn, NULL, png_private_my_malloc_fn, png_private_my_free_fn)) == NULL) {
@@ -473,12 +472,8 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_png(struct sail_io *io, const 
     *state = NULL;
 
     struct png_state *png_state;
-    SAIL_TRY(alloc_png_state(&png_state));
-
+    SAIL_TRY(alloc_png_state(NULL, save_options, &png_state));
     *state = png_state;
-
-    /* Deep copy save options. */
-    SAIL_TRY(sail_copy_save_options(save_options, &png_state->save_options));
 
     if (png_state->save_options->compression != SAIL_COMPRESSION_DEFLATE) {
         SAIL_LOG_ERROR("PNG: Only DEFLATE compression is allowed for saving");
