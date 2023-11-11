@@ -37,8 +37,8 @@
  * Codec-specific state.
  */
 struct jpeg2000_state {
-    struct sail_load_options *load_options;
-    struct sail_save_options *save_options;
+    const struct sail_load_options *load_options;
+    const struct sail_save_options *save_options;
 
     bool frame_loaded;
     void *image_data;
@@ -54,7 +54,9 @@ struct jpeg2000_state {
     unsigned shift;
 };
 
-static sail_status_t alloc_jpeg2000_state(struct jpeg2000_state **jpeg2000_state) {
+static sail_status_t alloc_jpeg2000_state(const struct sail_load_options *load_options,
+                                            const struct sail_save_options *save_options,
+                                            struct jpeg2000_state **jpeg2000_state) {
 
     void *ptr;
     SAIL_TRY(sail_malloc(sizeof(struct jpeg2000_state), &ptr));
@@ -62,20 +64,18 @@ static sail_status_t alloc_jpeg2000_state(struct jpeg2000_state **jpeg2000_state
 
     jas_init();
 
-    (*jpeg2000_state)->load_options = NULL;
-    (*jpeg2000_state)->save_options = NULL;
+    **jpeg2000_state = (struct jpeg2000_state) {
+        .load_options = load_options,
+        .save_options = save_options,
 
-    (*jpeg2000_state)->frame_loaded    = false;
-    (*jpeg2000_state)->image_data      = NULL;
-    (*jpeg2000_state)->jas_stream      = NULL;
-    (*jpeg2000_state)->jas_image       = NULL;
-    (*jpeg2000_state)->number_channels = 0;
-
-    for (int i = 0; i < 4; i++) {
-        (*jpeg2000_state)->matrix[i] = NULL;
-    }
-
-    (*jpeg2000_state)->shift = 0;
+        .frame_loaded    = false,
+        .image_data      = NULL,
+        .jas_stream      = NULL,
+        .jas_image       = NULL,
+        .number_channels = 0,
+        .matrix          = { NULL, NULL, NULL, NULL },
+        .shift           = 0,
+    };
 
     return SAIL_OK;
 }
@@ -102,9 +102,6 @@ static void destroy_jpeg2000_state(struct jpeg2000_state *jpeg2000_state) {
 
     jas_cleanup();
 
-    sail_destroy_load_options(jpeg2000_state->load_options);
-    sail_destroy_save_options(jpeg2000_state->save_options);
-
     sail_free(jpeg2000_state->image_data);
 
     sail_free(jpeg2000_state);
@@ -120,11 +117,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_jpeg2000(struct sail_io *io, c
 
     /* Allocate a new state. */
     struct jpeg2000_state *jpeg2000_state;
-    SAIL_TRY(alloc_jpeg2000_state(&jpeg2000_state));
+    SAIL_TRY(alloc_jpeg2000_state(load_options, NULL, &jpeg2000_state));
     *state = jpeg2000_state;
-
-    /* Deep copy load options. */
-    SAIL_TRY(sail_copy_load_options(load_options, &jpeg2000_state->load_options));
 
     /* Read the entire image to use the JasPer memory API. */
     size_t image_size;
