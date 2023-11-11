@@ -38,8 +38,8 @@ static const unsigned SAIL_PSD_MAGIC = 0x38425053;
  */
 struct psd_state {
     struct sail_io *io;
-    struct sail_load_options *load_options;
-    struct sail_save_options *save_options;
+    const struct sail_load_options *load_options;
+    const struct sail_save_options *save_options;
 
     bool frame_loaded;
 
@@ -51,24 +51,29 @@ struct psd_state {
     struct sail_palette *palette;
 };
 
-static sail_status_t alloc_psd_state(struct psd_state **psd_state) {
+static sail_status_t alloc_psd_state(struct sail_io *io,
+                                        const struct sail_load_options *load_options,
+                                        const struct sail_save_options *save_options,
+                                        struct psd_state **psd_state) {
 
     void *ptr;
     SAIL_TRY(sail_malloc(sizeof(struct psd_state), &ptr));
     *psd_state = ptr;
 
-    (*psd_state)->io           = NULL;
-    (*psd_state)->load_options = NULL;
-    (*psd_state)->save_options = NULL;
+    **psd_state = (struct psd_state) {
+        .io           = io,
+        .load_options = load_options,
+        .save_options = save_options,
 
-    (*psd_state)->frame_loaded = false;
+        .frame_loaded      = false,
 
-    (*psd_state)->channels          = 0;
-    (*psd_state)->depth             = 0;
-    (*psd_state)->compression       = SAIL_PSD_COMPRESSION_NONE;
-    (*psd_state)->bytes_per_channel = 0;
-    (*psd_state)->scan_buffer       = NULL;
-    (*psd_state)->palette           = NULL;
+        .channels          = 0,
+        .depth             = 0,
+        .compression       = SAIL_PSD_COMPRESSION_NONE,
+        .bytes_per_channel = 0,
+        .scan_buffer       = NULL,
+        .palette           = NULL,
+    };
 
     return SAIL_OK;
 }
@@ -80,9 +85,6 @@ static void destroy_psd_state(struct psd_state *psd_state) {
     }
 
     sail_free(psd_state->scan_buffer);
-
-    sail_destroy_load_options(psd_state->load_options);
-    sail_destroy_save_options(psd_state->save_options);
 
     sail_destroy_palette(psd_state->palette);
 
@@ -99,14 +101,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_psd(struct sail_io *io, const 
 
     /* Allocate a new state. */
     struct psd_state *psd_state;
-    SAIL_TRY(alloc_psd_state(&psd_state));
+    SAIL_TRY(alloc_psd_state(io, load_options, NULL, &psd_state));
     *state = psd_state;
-
-    /* Save I/O for further operations. */
-    psd_state->io = io;
-
-    /* Deep copy load options. */
-    SAIL_TRY(sail_copy_load_options(load_options, &psd_state->load_options));
 
     /* Init decoder. PSD spec: https://www.adobe.com/devnet-apps/photoshop/fileformatashtml/#50577409_89817 */
     uint32_t magic;
