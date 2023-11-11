@@ -34,25 +34,30 @@
  */
 struct bmp_state {
     struct sail_io *io;
-    struct sail_load_options *load_options;
-    struct sail_save_options *save_options;
+    const struct sail_load_options *load_options;
+    const struct sail_save_options *save_options;
 
     bool frame_loaded;
     void *common_bmp_state;
 };
 
-static sail_status_t alloc_bmp_state(struct bmp_state **bmp_state) {
+static sail_status_t alloc_bmp_state(struct sail_io *io,
+                                        const struct sail_load_options *load_options,
+                                        const struct sail_save_options *save_options,
+                                        struct bmp_state **bmp_state) {
 
     void *ptr;
     SAIL_TRY(sail_malloc(sizeof(struct bmp_state), &ptr));
     *bmp_state = ptr;
 
-    (*bmp_state)->io           = NULL;
-    (*bmp_state)->load_options = NULL;
-    (*bmp_state)->save_options = NULL;
+    **bmp_state = (struct bmp_state) {
+        .io           = io,
+        .load_options = load_options,
+        .save_options = save_options,
 
-    (*bmp_state)->frame_loaded     = false;
-    (*bmp_state)->common_bmp_state = NULL;
+        .frame_loaded     = false,
+        .common_bmp_state = NULL,
+    };
 
     return SAIL_OK;
 }
@@ -62,9 +67,6 @@ static void destroy_bmp_state(struct bmp_state *bmp_state) {
     if (bmp_state == NULL) {
         return;
     }
-
-    sail_destroy_load_options(bmp_state->load_options);
-    sail_destroy_save_options(bmp_state->save_options);
 
     sail_free(bmp_state);
 }
@@ -79,14 +81,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_bmp(struct sail_io *io, const 
 
     /* Allocate a new state. */
     struct bmp_state *bmp_state;
-    SAIL_TRY(alloc_bmp_state(&bmp_state));
+    SAIL_TRY(alloc_bmp_state(io, load_options, NULL, &bmp_state));
     *state = bmp_state;
-
-    /* Save I/O for further operations. */
-    bmp_state->io = io;
-
-    /* Deep copy load options. */
-    SAIL_TRY(sail_copy_load_options(load_options, &bmp_state->load_options));
 
     SAIL_TRY(bmp_private_read_init(io, bmp_state->load_options, &bmp_state->common_bmp_state, SAIL_READ_BMP_FILE_HEADER));
 
