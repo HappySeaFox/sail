@@ -40,8 +40,8 @@
  * Codec-specific state.
  */
 struct webp_state {
-    struct sail_load_options *load_options;
-    struct sail_save_options *save_options;
+    const struct sail_load_options *load_options;
+    const struct sail_save_options *save_options;
 
     struct sail_image *canvas_image;
     WebPDemuxer *webp_demux;
@@ -61,31 +61,35 @@ struct webp_state {
     size_t image_data_size;
 };
 
-static sail_status_t alloc_webp_state(struct webp_state **webp_state) {
+static sail_status_t alloc_webp_state(const struct sail_load_options *load_options,
+                                        const struct sail_save_options *save_options,
+                                        struct webp_state **webp_state) {
 
     void *ptr;
     SAIL_TRY(sail_malloc(sizeof(struct webp_state), &ptr));
     *webp_state = ptr;
 
-    (*webp_state)->load_options = NULL;
-    (*webp_state)->save_options = NULL;
-    (*webp_state)->canvas_image = NULL;
+    **webp_state = (struct webp_state) {
+        .load_options = load_options,
+        .save_options = save_options,
 
-    (*webp_state)->webp_demux            = NULL;
-    (*webp_state)->webp_iterator         = NULL;
-    (*webp_state)->frame_number          = 0;
-    (*webp_state)->background_color      = 0;
-    (*webp_state)->frame_count           = 0;
-    (*webp_state)->bytes_per_pixel       = 0;
-    (*webp_state)->frame_x               = 0;
-    (*webp_state)->frame_y               = 0;
-    (*webp_state)->frame_width           = 0;
-    (*webp_state)->frame_height          = 0;
-    (*webp_state)->frame_dispose_method  = WEBP_MUX_DISPOSE_NONE;
-    (*webp_state)->frame_blend_method    = WEBP_MUX_NO_BLEND;
+        .canvas_image         = NULL,
+        .webp_demux           = NULL,
+        .webp_iterator        = NULL,
+        .frame_number         = 0,
+        .background_color     = 0,
+        .frame_count          = 0,
+        .bytes_per_pixel      = 0,
+        .frame_x              = 0,
+        .frame_y              = 0,
+        .frame_width          = 0,
+        .frame_height         = 0,
+        .frame_dispose_method = WEBP_MUX_DISPOSE_NONE,
+        .frame_blend_method   = WEBP_MUX_NO_BLEND,
 
-    (*webp_state)->image_data      = NULL;
-    (*webp_state)->image_data_size = 0;
+        .image_data      = NULL,
+        .image_data_size = 0,
+    };
 
     return SAIL_OK;
 }
@@ -105,8 +109,6 @@ static void destroy_webp_state(struct webp_state *webp_state) {
 
     WebPDemuxDelete(webp_state->webp_demux);
 
-    sail_destroy_load_options(webp_state->load_options);
-    sail_destroy_save_options(webp_state->save_options);
     sail_destroy_image(webp_state->canvas_image);
 
     sail_free(webp_state);
@@ -122,11 +124,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_webp(struct sail_io *io, const
 
     /* Allocate a new state. */
     struct webp_state *webp_state;
-    SAIL_TRY(alloc_webp_state(&webp_state));
+    SAIL_TRY(alloc_webp_state(load_options, NULL, &webp_state));
     *state = webp_state;
-
-    /* Deep copy load options. */
-    SAIL_TRY(sail_copy_load_options(load_options, &webp_state->load_options));
 
     /* Read the entire image. */
     SAIL_ALIGNAS(uint32_t) char signature_and_size[8];
