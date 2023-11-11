@@ -42,25 +42,30 @@ enum SailXbmVersion {
  */
 struct xbm_state {
     struct sail_io *io;
-    struct sail_load_options *load_options;
-    struct sail_save_options *save_options;
+    const struct sail_load_options *load_options;
+    const struct sail_save_options *save_options;
 
     bool frame_loaded;
 
     enum SailXbmVersion version;
 };
 
-static sail_status_t alloc_xbm_state(struct xbm_state **xbm_state) {
+static sail_status_t alloc_xbm_state(struct sail_io *io,
+                                        const struct sail_load_options *load_options,
+                                        const struct sail_save_options *save_options,
+                                        struct xbm_state **xbm_state) {
 
     void *ptr;
     SAIL_TRY(sail_malloc(sizeof(struct xbm_state), &ptr));
     *xbm_state = ptr;
 
-    (*xbm_state)->io           = NULL;
-    (*xbm_state)->load_options = NULL;
-    (*xbm_state)->save_options = NULL;
+    **xbm_state = (struct xbm_state) {
+        .io           = io,
+        .load_options = load_options,
+        .save_options = save_options,
 
-    (*xbm_state)->frame_loaded = false;
+        .frame_loaded = false,
+    };
 
     return SAIL_OK;
 }
@@ -70,9 +75,6 @@ static void destroy_xbm_state(struct xbm_state *xbm_state) {
     if (xbm_state == NULL) {
         return;
     }
-
-    sail_destroy_load_options(xbm_state->load_options);
-    sail_destroy_save_options(xbm_state->save_options);
 
     sail_free(xbm_state);
 }
@@ -87,14 +89,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_xbm(struct sail_io *io, const 
 
     /* Allocate a new state. */
     struct xbm_state *xbm_state;
-    SAIL_TRY(alloc_xbm_state(&xbm_state));
+    SAIL_TRY(alloc_xbm_state(io, load_options, NULL, &xbm_state));
     *state = xbm_state;
-
-    /* Save I/O for further operations. */
-    xbm_state->io = io;
-
-    /* Deep copy load options. */
-    SAIL_TRY(sail_copy_load_options(load_options, &xbm_state->load_options));
 
     return SAIL_OK;
 }
