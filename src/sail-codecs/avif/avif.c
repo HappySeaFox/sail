@@ -39,8 +39,8 @@
  * Codec-specific state.
  */
 struct avif_state {
-    struct sail_load_options *load_options;
-    struct sail_save_options *save_options;
+    const struct sail_load_options *load_options;
+    const struct sail_save_options *save_options;
 
     struct avifIO *avif_io;
     struct avifDecoder *avif_decoder;
@@ -48,42 +48,56 @@ struct avif_state {
     struct sail_avif_context avif_context;
 };
 
-static sail_status_t alloc_avif_state(struct avif_state **avif_state) {
+static sail_status_t alloc_avif_state(struct sail_io *io,
+                                        const struct sail_load_options *load_options,
+                                        const struct sail_save_options *save_options,
+                                        struct avif_state **avif_state) {
 
     void *ptr;
-    SAIL_TRY(sail_malloc(sizeof(struct avif_state), &ptr));
+
+    /* avifIO */
+    SAIL_TRY(sail_malloc(sizeof(struct avifIO), &ptr));
+    struct avifIO *avif_io = ptr;
+
+    *avif_io = (struct avifIO) {
+        .destroy    = NULL,
+        .read       = avif_private_read_proc,
+        .write      = NULL,
+        .sizeHint   = 0,
+        .persistent = AVIF_FALSE,
+        .data       = NULL,
+    };
+
+    /* buffer */
+    const size_t buffer_size = 8*1024;
+    void *buffer;
+    SAIL_TRY_OR_CLEANUP(sail_malloc(buffer_size, &buffer),
+                        /* on error */ sail_free(avif_io));
+
+    /* avif_state */
+    SAIL_TRY_OR_CLEANUP(sail_malloc(sizeof(struct avif_state), &ptr),
+                        /* on error */ sail_free(buffer), sail_free(avif_io));
     *avif_state = ptr;
 
-    (*avif_state)->load_options = NULL;
-    (*avif_state)->save_options = NULL;
-    (*avif_state)->avif_io      = NULL;
-    (*avif_state)->avif_decoder = NULL;
-    (*avif_state)->avif_io      = NULL;
+    **avif_state = (struct avif_state){
+        .load_options = load_options,
+        .save_options = save_options,
+        .avif_io      = avif_io,
+        .avif_decoder = avifDecoderCreate(),
+        .avif_context = (struct sail_avif_context) {
+            .io          = io,
+            .buffer      = buffer,
+            .buffer_size = buffer_size,
+        }
+    };
 
-    SAIL_TRY(sail_malloc(sizeof(struct avifIO), &ptr));
-    (*avif_state)->avif_io = ptr;
-
-    (*avif_state)->avif_io->destroy    = NULL;
-    (*avif_state)->avif_io->read       = avif_private_read_proc;
-    (*avif_state)->avif_io->write      = NULL;
-    (*avif_state)->avif_io->sizeHint   = 0;
-    (*avif_state)->avif_io->persistent = AVIF_FALSE;
-    (*avif_state)->avif_io->data       = NULL;
-
-    (*avif_state)->avif_context.io          = NULL;
-    (*avif_state)->avif_context.buffer      = NULL;
-    (*avif_state)->avif_context.buffer_size = 0;
-
-    const size_t initial_buffer_size = 10*1024;
-    SAIL_TRY(sail_malloc(initial_buffer_size, &ptr));
-    (*avif_state)->avif_context.buffer      = ptr;
-    (*avif_state)->avif_context.buffer_size = initial_buffer_size;
-
-    (*avif_state)->avif_decoder = avifDecoderCreate();
 #if AVIF_VERSION_MAJOR > 0 || AVIF_VERSION_MINOR >= 9
     (*avif_state)->avif_decoder->strictFlags = AVIF_STRICT_DISABLED;
 #endif
+
     avifDecoderSetIO((*avif_state)->avif_decoder, (*avif_state)->avif_io);
+
+    (*avif_state)->avif_io->data = &(*avif_state)->avif_context;
 
     return SAIL_OK;
 }
@@ -100,9 +114,6 @@ static void destroy_avif_state(struct avif_state *avif_state) {
 
     sail_free(avif_state->avif_io);
 
-    sail_destroy_load_options(avif_state->load_options);
-    sail_destroy_save_options(avif_state->save_options);
-
     sail_free(avif_state);
 }
 
@@ -116,18 +127,12 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_avif(struct sail_io *io, const
 
     /* Allocate a new state. */
     struct avif_state *avif_state;
-    SAIL_TRY(alloc_avif_state(&avif_state));
+    SAIL_TRY(alloc_avif_state(io, load_options, NULL, &avif_state));
     *state = avif_state;
-
-    /* Deep copy load options. */
-    SAIL_TRY(sail_copy_load_options(load_options, &avif_state->load_options));
 
     avif_state->avif_decoder->ignoreExif = avif_state->avif_decoder->ignoreXMP = (avif_state->load_options->options & SAIL_OPTION_META_DATA) == 0;
 
     /* Initialize AVIF. */
-    avif_state->avif_context.io = io;
-    avif_state->avif_io->data = &avif_state->avif_context;
-
     avifResult avif_result = avifDecoderParse(avif_state->avif_decoder);
 
     if (avif_result != AVIF_RESULT_OK) {
