@@ -44,8 +44,8 @@ static const int InterlacedJumps[]  = { 8, 8, 4, 2 };
  */
 struct gif_state {
     struct sail_io *io;
-    struct sail_load_options *load_options;
-    struct sail_save_options *save_options;
+    const struct sail_load_options *load_options;
+    const struct sail_save_options *save_options;
 
     GifFileType *gif;
     const ColorMapObject *map;
@@ -67,32 +67,37 @@ struct gif_state {
     unsigned char background[4]; /* RGBA */
 };
 
-static sail_status_t alloc_gif_state(struct gif_state **gif_state) {
+static sail_status_t alloc_gif_state(struct sail_io *io,
+                                        const struct sail_load_options *load_options,
+                                        const struct sail_save_options *save_options,
+                                        struct gif_state **gif_state) {
 
     void *ptr;
     SAIL_TRY(sail_malloc(sizeof(struct gif_state), &ptr));
     *gif_state = ptr;
 
-    (*gif_state)->io           = NULL;
-    (*gif_state)->load_options = NULL;
-    (*gif_state)->save_options = NULL;
+    **gif_state = (struct gif_state) {
+        .io           = io,
+        .load_options = load_options,
+        .save_options = save_options,
 
-    (*gif_state)->gif                = NULL;
-    (*gif_state)->map                = NULL;
-    (*gif_state)->buf                = NULL;
-    (*gif_state)->transparency_index = -1;
-    (*gif_state)->disposal           = DISPOSAL_UNSPECIFIED;
-    (*gif_state)->prev_disposal      = DISPOSAL_UNSPECIFIED;
-    (*gif_state)->current_image      = -1;
-    (*gif_state)->row                = 0;
-    (*gif_state)->column             = 0;
-    (*gif_state)->width              = 0;
-    (*gif_state)->height             = 0;
-    (*gif_state)->prev_row           = 0;
-    (*gif_state)->prev_column        = 0;
-    (*gif_state)->prev_width         = 0;
-    (*gif_state)->prev_height        = 0;
-    (*gif_state)->first_frame        = NULL;
+        .gif                = NULL,
+        .map                = NULL,
+        .buf                = NULL,
+        .transparency_index = -1,
+        .disposal           = DISPOSAL_UNSPECIFIED,
+        .prev_disposal      = DISPOSAL_UNSPECIFIED,
+        .current_image      = -1,
+        .row                = 0,
+        .column             = 0,
+        .width              = 0,
+        .height             = 0,
+        .prev_row           = 0,
+        .prev_column        = 0,
+        .prev_width         = 0,
+        .prev_height        = 0,
+        .first_frame        = NULL,
+    };
 
     return SAIL_OK;
 }
@@ -102,9 +107,6 @@ static void destroy_gif_state(struct gif_state *gif_state) {
     if (gif_state == NULL) {
         return;
     }
-
-    sail_destroy_load_options(gif_state->load_options);
-    sail_destroy_save_options(gif_state->save_options);
 
     sail_free(gif_state->buf);
 
@@ -129,14 +131,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_gif(struct sail_io *io, const 
 
     /* Allocate a new state. */
     struct gif_state *gif_state;
-    SAIL_TRY(alloc_gif_state(&gif_state));
+    SAIL_TRY(alloc_gif_state(io, load_options, NULL, &gif_state));
     *state = gif_state;
-
-    /* Save I/O for further operations. */
-    gif_state->io = io;
-
-    /* Deep copy load options. */
-    SAIL_TRY(sail_copy_load_options(load_options, &gif_state->load_options));
 
     /* Initialize GIF. */
     int error_code;
