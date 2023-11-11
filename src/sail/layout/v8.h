@@ -99,11 +99,12 @@ sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_load_init_v8)(struct sail_io 
  *     sail_codec_load_frame_v8().
  *
  * Returns SAIL_OK on success.
+ * Returns SAIL_ERROR_NO_MORE_FRAMES when no more frames are available.
  */
 sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_load_seek_next_frame_v8)(void *state, struct sail_image **image);
 
 /*
- * Reads the next frame of the current image in the current pass. The image pixels are pre-allocated by libsail.
+ * Reads the next frame of the current image. The image pixels are pre-allocated by libsail.
  *
  * libsail, the caller of this function, guarantees the following:
  *   - The state is valid and points to the state allocated by sail_codec_load_init_v8().
@@ -177,7 +178,7 @@ sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_save_init_v8)(struct sail_io 
 sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_save_seek_next_frame_v8)(void *state, const struct sail_image *image);
 
 /*
- * Writes a next frame of the current image in the current pass.
+ * Writes a next frame of the current image.
  *
  * libsail, the caller of this function, guarantees the following:
  *   - The state is valid and points to the state allocated by sail_codec_save_init_v8().
