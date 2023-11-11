@@ -37,8 +37,8 @@
  */
 struct wal_state {
     struct sail_io *io;
-    struct sail_load_options *load_options;
-    struct sail_save_options *save_options;
+    const struct sail_load_options *load_options;
+    const struct sail_save_options *save_options;
 
     unsigned frame_number;
 
@@ -47,19 +47,24 @@ struct wal_state {
     unsigned height;
 };
 
-static sail_status_t alloc_wal_state(struct wal_state **wal_state) {
+static sail_status_t alloc_wal_state(struct sail_io *io,
+                                        const struct sail_load_options *load_options,
+                                        const struct sail_save_options *save_options,
+                                        struct wal_state **wal_state) {
 
     void *ptr;
     SAIL_TRY(sail_malloc(sizeof(struct wal_state), &ptr));
     *wal_state = ptr;
 
-    (*wal_state)->io           = NULL;
-    (*wal_state)->load_options = NULL;
-    (*wal_state)->save_options = NULL;
+    **wal_state = (struct wal_state) {
+        .io           = io,
+        .load_options = load_options,
+        .save_options = save_options,
 
-    (*wal_state)->frame_number  = 0;
-    (*wal_state)->width         = 0;
-    (*wal_state)->height        = 0;
+        .frame_number  = 0,
+        .width         = 0,
+        .height        = 0,
+    };
 
     return SAIL_OK;
 }
@@ -69,9 +74,6 @@ static void destroy_wal_state(struct wal_state *wal_state) {
     if (wal_state == NULL) {
         return;
     }
-
-    sail_destroy_load_options(wal_state->load_options);
-    sail_destroy_save_options(wal_state->save_options);
 
     sail_free(wal_state);
 }
@@ -86,14 +88,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_wal(struct sail_io *io, const 
 
     /* Allocate a new state. */
     struct wal_state *wal_state;
-    SAIL_TRY(alloc_wal_state(&wal_state));
+    SAIL_TRY(alloc_wal_state(io, load_options, NULL, &wal_state));
     *state = wal_state;
-
-    /* Save I/O for further operations. */
-    wal_state->io = io;
-
-    /* Deep copy load options. */
-    SAIL_TRY(sail_copy_load_options(load_options, &wal_state->load_options));
 
     /* Read WAL header. */
     SAIL_TRY(wal_private_read_file_header(wal_state->io, &wal_state->wal_header));
