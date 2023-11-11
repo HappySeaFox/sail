@@ -50,31 +50,37 @@ static const double COMPRESSION_DEFAULT = 15;
  */
 
 struct jpeg_state {
+    const struct sail_load_options *load_options;
+    const struct sail_save_options *save_options;
+
     struct jpeg_decompress_struct *decompress_context;
     struct jpeg_compress_struct *compress_context;
     struct jpeg_private_my_error_context error_context;
     bool libjpeg_error;
-    struct sail_load_options *load_options;
-    struct sail_save_options *save_options;
     bool frame_loaded;
     bool frame_saved;
     bool started_compress;
 };
 
-static sail_status_t alloc_jpeg_state(struct jpeg_state **jpeg_state) {
+static sail_status_t alloc_jpeg_state(const struct sail_load_options *load_options,
+                                        const struct sail_save_options *save_options,
+                                        struct jpeg_state **jpeg_state) {
 
     void *ptr;
     SAIL_TRY(sail_malloc(sizeof(struct jpeg_state), &ptr));
     *jpeg_state = ptr;
 
-    (*jpeg_state)->decompress_context = NULL;
-    (*jpeg_state)->compress_context   = NULL;
-    (*jpeg_state)->libjpeg_error      = false;
-    (*jpeg_state)->load_options       = NULL;
-    (*jpeg_state)->save_options       = NULL;
-    (*jpeg_state)->frame_loaded       = false;
-    (*jpeg_state)->frame_saved        = false;
-    (*jpeg_state)->started_compress   = false;
+    **jpeg_state = (struct jpeg_state) {
+        .load_options = load_options,
+        .save_options = save_options,
+
+        .decompress_context = NULL,
+        .compress_context   = NULL,
+        .libjpeg_error      = false,
+        .frame_loaded       = false,
+        .frame_saved        = false,
+        .started_compress   = false,
+    };
 
     return SAIL_OK;
 }
@@ -87,9 +93,6 @@ static void destroy_jpeg_state(struct jpeg_state *jpeg_state) {
 
     sail_free(jpeg_state->decompress_context);
     sail_free(jpeg_state->compress_context);
-
-    sail_destroy_load_options(jpeg_state->load_options);
-    sail_destroy_save_options(jpeg_state->save_options);
 
     sail_free(jpeg_state);
 }
@@ -104,12 +107,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_jpeg(struct sail_io *io, const
 
     /* Allocate a new state. */
     struct jpeg_state *jpeg_state;
-    SAIL_TRY(alloc_jpeg_state(&jpeg_state));
-
+    SAIL_TRY(alloc_jpeg_state(load_options, NULL, &jpeg_state));
     *state = jpeg_state;
-
-    /* Deep copy load options. */
-    SAIL_TRY(sail_copy_load_options(load_options, &jpeg_state->load_options));
 
     /* Create decompress context. */
     void *ptr;
@@ -263,12 +262,8 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_jpeg(struct sail_io *io, const
     *state = NULL;
 
     struct jpeg_state *jpeg_state;
-    SAIL_TRY(alloc_jpeg_state(&jpeg_state));
-
+    SAIL_TRY(alloc_jpeg_state(NULL, save_options, &jpeg_state));
     *state = jpeg_state;
-
-    /* Deep copy save options. */
-    SAIL_TRY(sail_copy_save_options(save_options, &jpeg_state->save_options));
 
     /* Create compress context. */
     void *ptr;
