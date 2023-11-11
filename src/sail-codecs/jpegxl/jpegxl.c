@@ -42,8 +42,8 @@
  */
 struct jpegxl_state {
     struct sail_io *io;
-    struct sail_load_options *load_options;
-    struct sail_save_options *save_options;
+    const struct sail_load_options *load_options;
+    const struct sail_save_options *save_options;
 
     struct sail_source_image *source_image;
 
@@ -58,26 +58,50 @@ struct jpegxl_state {
     size_t buffer_size;
 };
 
-static sail_status_t alloc_jpegxl_state(struct jpegxl_state **jpegxl_state) {
+static sail_status_t alloc_jpegxl_state(struct sail_io *io,
+                                        const struct sail_load_options *load_options,
+                                        const struct sail_save_options *save_options,
+                                        struct jpegxl_state **jpegxl_state) {
 
     void *ptr;
-    SAIL_TRY(sail_malloc(sizeof(struct jpegxl_state), &ptr));
+
+    /* JxlMemoryManager */
+    SAIL_TRY(sail_malloc(sizeof(JxlMemoryManager), &ptr));
+    JxlMemoryManager *memory_manager = ptr;
+
+    *memory_manager = (JxlMemoryManager) {
+        .opaque = NULL,
+        .alloc  = jpegxl_private_alloc_func,
+        .free   = jpegxl_private_free_func,
+    };
+
+    /* buffer */
+    const size_t buffer_size = 8192;
+    void *buffer;
+    SAIL_TRY_OR_CLEANUP(sail_malloc(buffer_size, &buffer),
+                        /* on error */ sail_free(memory_manager));
+
+    /* jpegxl_state */
+    SAIL_TRY_OR_CLEANUP(sail_malloc(sizeof(struct jpegxl_state), &ptr),
+                        /* on error */ sail_free(buffer), sail_free(memory_manager));
     *jpegxl_state = ptr;
 
-    (*jpegxl_state)->io           = NULL;
-    (*jpegxl_state)->load_options = NULL;
-    (*jpegxl_state)->save_options = NULL;
+    **jpegxl_state = (struct jpegxl_state) {
+        .io           = io,
+        .load_options = load_options,
+        .save_options = save_options,
 
-    (*jpegxl_state)->source_image = NULL;
+        .source_image      = NULL,
 
-    (*jpegxl_state)->libjxl_success    = false;
-    (*jpegxl_state)->frame_header_seen = false;
-    (*jpegxl_state)->basic_info        = NULL;
-    (*jpegxl_state)->memory_manager    = NULL;
-    (*jpegxl_state)->runner            = NULL;
-    (*jpegxl_state)->decoder           = NULL;
-    (*jpegxl_state)->buffer            = NULL;
-    (*jpegxl_state)->buffer_size       = 8192;
+        .libjxl_success    = false,
+        .frame_header_seen = false,
+        .basic_info        = NULL,
+        .memory_manager    = memory_manager,
+        .runner            = NULL,
+        .decoder           = NULL,
+        .buffer            = buffer,
+        .buffer_size       = buffer_size,
+    };
 
     return SAIL_OK;
 }
@@ -87,9 +111,6 @@ static void destroy_jpegxl_state(struct jpegxl_state *jpegxl_state) {
     if (jpegxl_state == NULL) {
         return;
     }
-
-    sail_destroy_load_options(jpegxl_state->load_options);
-    sail_destroy_save_options(jpegxl_state->save_options);
 
     sail_destroy_source_image(jpegxl_state->source_image);
 
@@ -114,28 +135,12 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_jpegxl(struct sail_io *io, con
 
     /* Allocate a new state. */
     struct jpegxl_state *jpegxl_state;
-    SAIL_TRY(alloc_jpegxl_state(&jpegxl_state));
+    SAIL_TRY(alloc_jpegxl_state(io, load_options, NULL, &jpegxl_state));
     *state = jpegxl_state;
 
-    /* Save I/O for further operations. */
-    jpegxl_state->io = io;
-
-    /* Deep copy load options. */
-    SAIL_TRY(sail_copy_load_options(load_options, &jpegxl_state->load_options));
-
     /* Init decoder. */
-    void *ptr;
-    SAIL_TRY(sail_malloc(sizeof(JxlMemoryManager), &ptr));
-    jpegxl_state->memory_manager = ptr;
-    jpegxl_state->memory_manager->opaque = NULL,
-    jpegxl_state->memory_manager->alloc  = jpegxl_private_alloc_func,
-    jpegxl_state->memory_manager->free   = jpegxl_private_free_func,
-
     jpegxl_state->runner  = JxlResizableParallelRunnerCreate(jpegxl_state->memory_manager);
     jpegxl_state->decoder = JxlDecoderCreate(jpegxl_state->memory_manager);
-
-    SAIL_TRY(sail_malloc(jpegxl_state->buffer_size, &ptr));
-    jpegxl_state->buffer = ptr;
 
     if (JxlDecoderSetCoalescing(jpegxl_state->decoder, JXL_TRUE) != JXL_DEC_SUCCESS) {
         SAIL_LOG_ERROR("JPEGXL: Failed to set coalescing");
