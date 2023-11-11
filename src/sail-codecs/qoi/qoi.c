@@ -40,8 +40,8 @@
  */
 struct qoi_state {
     struct sail_io *io;
-    struct sail_load_options *load_options;
-    struct sail_save_options *save_options;
+    const struct sail_load_options *load_options;
+    const struct sail_save_options *save_options;
 
     bool frame_loaded;
     bool frame_saved;
@@ -53,22 +53,27 @@ struct qoi_state {
     qoi_desc qoi_desc;
 };
 
-static sail_status_t alloc_qoi_state(struct qoi_state **qoi_state) {
+static sail_status_t alloc_qoi_state(struct sail_io *io,
+                                        const struct sail_load_options *load_options,
+                                        const struct sail_save_options *save_options,
+                                        struct qoi_state **qoi_state) {
 
     void *ptr;
     SAIL_TRY(sail_malloc(sizeof(struct qoi_state), &ptr));
     *qoi_state = ptr;
 
-    (*qoi_state)->io           = NULL;
-    (*qoi_state)->load_options = NULL;
-    (*qoi_state)->save_options = NULL;
+    **qoi_state = (struct qoi_state) {
+        .io           = io,
+        .load_options = load_options,
+        .save_options = save_options,
 
-    (*qoi_state)->frame_loaded = false;
-    (*qoi_state)->frame_saved  = false;
+        .frame_loaded = false,
+        .frame_saved  = false,
 
-    (*qoi_state)->image_data      = NULL;
-    (*qoi_state)->image_data_size = 0;
-    (*qoi_state)->pixels          = NULL;
+        .image_data      = NULL,
+        .image_data_size = 0,
+        .pixels          = NULL,
+    };
 
     return SAIL_OK;
 }
@@ -78,9 +83,6 @@ static void destroy_qoi_state(struct qoi_state *qoi_state) {
     if (qoi_state == NULL) {
         return;
     }
-
-    sail_destroy_load_options(qoi_state->load_options);
-    sail_destroy_save_options(qoi_state->save_options);
 
     sail_free(qoi_state->image_data);
     sail_free(qoi_state->pixels);
@@ -98,11 +100,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_qoi(struct sail_io *io, const 
 
     /* Allocate a new state. */
     struct qoi_state *qoi_state;
-    SAIL_TRY(alloc_qoi_state(&qoi_state));
+    SAIL_TRY(alloc_qoi_state(io, load_options, NULL, &qoi_state));
     *state = qoi_state;
-
-    /* Deep copy load options. */
-    SAIL_TRY(sail_copy_load_options(load_options, &qoi_state->load_options));
 
     /* Cache the entire file as the QOI API requires. */
     SAIL_TRY(sail_alloc_data_from_io_contents(io, &qoi_state->image_data, &qoi_state->image_data_size));
@@ -197,15 +196,8 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_qoi(struct sail_io *io, const 
     *state = NULL;
 
     struct qoi_state *qoi_state;
-    SAIL_TRY(alloc_qoi_state(&qoi_state));
-
+    SAIL_TRY(alloc_qoi_state(io, NULL, save_options, &qoi_state));
     *state = qoi_state;
-
-    /* Save I/O for further operations. */
-    qoi_state->io = io;
-
-    /* Deep copy save options. */
-    SAIL_TRY(sail_copy_save_options(save_options, &qoi_state->save_options));
 
     /* Sanity check. */
     if (qoi_state->save_options->compression != SAIL_COMPRESSION_QOI) {
