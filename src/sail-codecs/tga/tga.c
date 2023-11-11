@@ -40,8 +40,8 @@ static const int          TGA_FOOTER_SIZE = 26;
  */
 struct tga_state {
     struct sail_io *io;
-    struct sail_load_options *load_options;
-    struct sail_save_options *save_options;
+    const struct sail_load_options *load_options;
+    const struct sail_save_options *save_options;
 
     struct TgaFileHeader file_header;
     struct TgaFooter footer;
@@ -52,20 +52,25 @@ struct tga_state {
     bool flipped_v;
 };
 
-static sail_status_t alloc_tga_state(struct tga_state **tga_state) {
+static sail_status_t alloc_tga_state(struct sail_io *io,
+                                        const struct sail_load_options *load_options,
+                                        const struct sail_save_options *save_options,
+                                        struct tga_state **tga_state) {
 
     void *ptr;
     SAIL_TRY(sail_malloc(sizeof(struct tga_state), &ptr));
     *tga_state = ptr;
 
-    (*tga_state)->io           = NULL;
-    (*tga_state)->load_options = NULL;
-    (*tga_state)->save_options = NULL;
+    **tga_state = (struct tga_state) {
+        .io           = io,
+        .load_options = load_options,
+        .save_options = save_options,
 
-    (*tga_state)->frame_loaded  = false;
-    (*tga_state)->tga2          = false;
-    (*tga_state)->flipped_h     = false;
-    (*tga_state)->flipped_v     = false;
+        .frame_loaded  = false,
+        .tga2          = false,
+        .flipped_h     = false,
+        .flipped_v     = false,
+    };
 
     return SAIL_OK;
 }
@@ -75,9 +80,6 @@ static void destroy_tga_state(struct tga_state *tga_state) {
     if (tga_state == NULL) {
         return;
     }
-
-    sail_destroy_load_options(tga_state->load_options);
-    sail_destroy_save_options(tga_state->save_options);
 
     sail_free(tga_state);
 }
@@ -92,14 +94,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_tga(struct sail_io *io, const 
 
     /* Allocate a new state. */
     struct tga_state *tga_state;
-    SAIL_TRY(alloc_tga_state(&tga_state));
+    SAIL_TRY(alloc_tga_state(io, load_options, NULL, &tga_state));
     *state = tga_state;
-
-    /* Save I/O for further operations. */
-    tga_state->io = io;
-
-    /* Deep copy load options. */
-    SAIL_TRY(sail_copy_load_options(load_options, &tga_state->load_options));
 
     /* Read TGA footer. */
     SAIL_TRY(tga_state->io->seek(tga_state->io->stream, -TGA_FOOTER_SIZE, SEEK_END));
