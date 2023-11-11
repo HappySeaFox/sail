@@ -45,8 +45,8 @@ static const uint8_t SAIL_PCX_RLE_COUNT_MASK = 0x3F;
  */
 struct pcx_state {
     struct sail_io *io;
-    struct sail_load_options *load_options;
-    struct sail_save_options *save_options;
+    const struct sail_load_options *load_options;
+    const struct sail_save_options *save_options;
 
     struct SailPcxHeader pcx_header;
     unsigned char *scanline_buffer; /* buffer to read a single plane scan line. */
@@ -54,18 +54,23 @@ struct pcx_state {
     bool frame_loaded;
 };
 
-static sail_status_t alloc_pcx_state(struct pcx_state **pcx_state) {
+static sail_status_t alloc_pcx_state(struct sail_io *io,
+                                        const struct sail_load_options *load_options,
+                                        const struct sail_save_options *save_options,
+                                        struct pcx_state **pcx_state) {
 
     void *ptr;
     SAIL_TRY(sail_malloc(sizeof(struct pcx_state), &ptr));
     *pcx_state = ptr;
 
-    (*pcx_state)->io           = NULL;
-    (*pcx_state)->load_options = NULL;
-    (*pcx_state)->save_options = NULL;
+    **pcx_state = (struct pcx_state) {
+        .io           = io,
+        .load_options = load_options,
+        .save_options = save_options,
 
-    (*pcx_state)->scanline_buffer = NULL;
-    (*pcx_state)->frame_loaded    = false;
+        .scanline_buffer = NULL,
+        .frame_loaded    = false,
+    };
 
     return SAIL_OK;
 }
@@ -75,9 +80,6 @@ static void destroy_pcx_state(struct pcx_state *pcx_state) {
     if (pcx_state == NULL) {
         return;
     }
-
-    sail_destroy_load_options(pcx_state->load_options);
-    sail_destroy_save_options(pcx_state->save_options);
 
     sail_free(pcx_state->scanline_buffer);
 
@@ -94,14 +96,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_pcx(struct sail_io *io, const 
 
     /* Allocate a new state. */
     struct pcx_state *pcx_state;
-    SAIL_TRY(alloc_pcx_state(&pcx_state));
+    SAIL_TRY(alloc_pcx_state(io, load_options, NULL, &pcx_state));
     *state = pcx_state;
-
-    /* Save I/O for further operations. */
-    pcx_state->io = io;
-
-    /* Deep copy load options. */
-    SAIL_TRY(sail_copy_load_options(load_options, &pcx_state->load_options));
 
     /* Read PCX header. */
     SAIL_TRY(pcx_private_read_header(pcx_state->io, &pcx_state->pcx_header));
