@@ -103,6 +103,7 @@ void destroy_hidden_state(struct hidden_state *state) {
         sail_destroy_io(state->io);
     }
 
+    sail_destroy_load_options(state->load_options);
     sail_destroy_save_options(state->save_options);
 
     /* This state must be freed and zeroed by codecs. We free it just in case to avoid memory leaks. */

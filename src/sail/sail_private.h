@@ -42,16 +42,13 @@ struct hidden_state {
     struct sail_io *io;
     bool own_io;
 
-    /*
-     * Save operations use save options to check if the interlaced mode was requested on later stages.
-     * It's also used to check if the supplied pixel format is supported.
-     */
+    struct sail_load_options *load_options;
     struct sail_save_options *save_options;
 
     /* Local state passed to codec loading and saving functions. */
     void *state;
 
-    /* Pointers to internal data structures so no need to free these. */
+    /* Shallow pointers to internal data structures so no need to free these. */
     const struct sail_codec_info *codec_info;
     const struct sail_codec *codec;
 };

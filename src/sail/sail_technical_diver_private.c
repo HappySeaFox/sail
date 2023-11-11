@@ -76,6 +76,7 @@ sail_status_t start_loading_io_with_options(struct sail_io *io, bool own_io,
 
     state_of_mind->io           = io;
     state_of_mind->own_io       = own_io;
+    state_of_mind->load_options = NULL;
     state_of_mind->save_options = NULL;
     state_of_mind->state        = NULL;
     state_of_mind->codec_info   = codec_info;
@@ -85,20 +86,16 @@ sail_status_t start_loading_io_with_options(struct sail_io *io, bool own_io,
                         /* cleanup */ destroy_hidden_state(state_of_mind));
 
     if (load_options == NULL) {
-        struct sail_load_options *load_options_local = NULL;
-
-        SAIL_TRY_OR_CLEANUP(sail_alloc_load_options_from_features(state_of_mind->codec_info->load_features, &load_options_local),
+        SAIL_TRY_OR_CLEANUP(sail_alloc_load_options_from_features(state_of_mind->codec_info->load_features, &state_of_mind->load_options),
                             /* cleanup */ destroy_hidden_state(state_of_mind));
-        SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v8->load_init(state_of_mind->io, load_options_local, &state_of_mind->state),
-                            /* cleanup */ sail_destroy_load_options(load_options_local),
-                                          state_of_mind->codec->v8->load_finish(&state_of_mind->state),
-                                          destroy_hidden_state(state_of_mind));
-        sail_destroy_load_options(load_options_local);
     } else {
-        SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v8->load_init(state_of_mind->io, load_options, &state_of_mind->state),
-                            /* cleanup */ state_of_mind->codec->v8->load_finish(&state_of_mind->state),
-                                          destroy_hidden_state(state_of_mind));
+        SAIL_TRY_OR_CLEANUP(sail_copy_load_options(load_options, &state_of_mind->load_options),
+                            /* cleanup */ destroy_hidden_state(state_of_mind));
     }
+
+    SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v8->load_init(state_of_mind->io, state_of_mind->load_options, &state_of_mind->state),
+                        /* cleanup */ state_of_mind->codec->v8->load_finish(&state_of_mind->state),
+                                      destroy_hidden_state(state_of_mind));
 
     *state = state_of_mind;
 
@@ -130,6 +127,7 @@ sail_status_t start_saving_io_with_options(struct sail_io *io, bool own_io,
 
     state_of_mind->io           = io;
     state_of_mind->own_io       = own_io;
+    state_of_mind->load_options = NULL;
     state_of_mind->save_options = NULL;
     state_of_mind->state        = NULL;
     state_of_mind->codec_info   = codec_info;
