@@ -31,9 +31,9 @@
     #include <resvg.h>
 #else
     #define NANOSVG_IMPLEMENTATION
-    #include <nanosvg.h>
+    #include <nanosvg/nanosvg.h>
     #define NANOSVGRAST_IMPLEMENTATION
-    #include <nanosvgrast.h>
+    #include <nanosvg/nanosvgrast.h>
 #endif
 
 #include <sail-common/sail-common.h>

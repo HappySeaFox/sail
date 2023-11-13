@@ -5,7 +5,7 @@ find_path(SVG_INCLUDE_DIRS resvg.h)
 #
 if (NOT SVG_LIBRARY OR NOT SVG_INCLUDE_DIRS)
     set(SVG_LIBRARY "")
-    find_path(SVG_INCLUDE_DIRS nanosvg.h ${SAIL_CODEC_SVG_REQUIRED_OPTION})
+    find_path(SVG_INCLUDE_DIRS nanosvg/nanosvg.h ${SAIL_CODEC_SVG_REQUIRED_OPTION})
 
     if (NOT SVG_INCLUDE_DIRS)
         return()
