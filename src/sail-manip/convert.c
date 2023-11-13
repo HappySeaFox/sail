@@ -213,7 +213,7 @@ static sail_status_t convert_from_indexed(const struct sail_image *image,
 
                     sail_rgba32_t rgba32;
                     SAIL_TRY_OR_EXECUTE(get_palette_rgba32(image->palette, index, &rgba32),
-                                        /* on error */ status = __sail_error_result);
+                                        /* on error */ status = __sail_status);
                     #pragma omp flush(status)
                     pixel_consumer(output_context, &scan_output8, &scan_output16, &rgba32, NULL);
 

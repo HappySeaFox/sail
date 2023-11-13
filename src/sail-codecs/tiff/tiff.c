@@ -249,7 +249,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_tiff(struct sail_io *io, const
     /* Sanity check. */
     SAIL_TRY_OR_EXECUTE(tiff_private_sail_compression_to_compression(tiff_state->save_options->compression, &tiff_state->save_compression),
                         /* cleanup */ SAIL_LOG_ERROR("TIFF: %s compression is not supported for saving", sail_compression_to_string(tiff_state->save_options->compression));
-                                      return __sail_error_result);
+                                      return __sail_status);
 
     TIFFSetWarningHandler(tiff_private_my_warning_fn);
     TIFFSetErrorHandler(tiff_private_my_error_fn);

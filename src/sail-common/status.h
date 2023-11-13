@@ -134,9 +134,9 @@ do {                                                   \
  */
 #define SAIL_TRY_OR_EXECUTE(sail_func, ...)              \
 {                                                        \
-    const sail_status_t __sail_error_result = sail_func; \
+    const sail_status_t __sail_status = sail_func;       \
                                                          \
-    if (SAIL_UNLIKELY(__sail_error_result != SAIL_OK)) { \
+    if (SAIL_UNLIKELY(__sail_status != SAIL_OK)) {       \
         __VA_ARGS__;                                     \
     }                                                    \
 } do{} while(0)
@@ -144,7 +144,7 @@ do {                                                   \
 /*
  * Tries to execute the specified SAIL function. If it fails, returns the error code.
  */
-#define SAIL_TRY(sail_func) SAIL_TRY_OR_EXECUTE(sail_func, return __sail_error_result)
+#define SAIL_TRY(sail_func) SAIL_TRY_OR_EXECUTE(sail_func, return __sail_status)
 
 /*
  * Tries to execute the specified SAIL function. If it fails, ignores the error and continues execution.
@@ -155,6 +155,6 @@ do {                                                   \
  * Tries to execute the specified SAIL function. If it fails, executes the rest of the arguments which
  * can be separated by commas or by semicolons (so called cleanup), and returns the error code.
  */
-#define SAIL_TRY_OR_CLEANUP(sail_func, ...) SAIL_TRY_OR_EXECUTE(sail_func, __VA_ARGS__; return __sail_error_result)
+#define SAIL_TRY_OR_CLEANUP(sail_func, ...) SAIL_TRY_OR_EXECUTE(sail_func, __VA_ARGS__; return __sail_status)
 
 #endif

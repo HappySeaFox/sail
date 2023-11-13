@@ -184,7 +184,7 @@ sail_status_t image_input::finish()
 {
     sail_status_t saved_status = SAIL_OK;
     SAIL_TRY_OR_EXECUTE(sail_stop_loading(d->state),
-                        /* on error */ saved_status = __sail_error_result);
+                        /* on error */ saved_status = __sail_status);
 
     d->state = nullptr;
 
