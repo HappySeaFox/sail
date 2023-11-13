@@ -56,6 +56,12 @@ save_options::save_options()
 {
 }
 
+save_options::save_options(int options)
+    : d(new pimpl)
+{
+    set_options(options);
+}
+
 save_options::save_options(const save_options &wo)
     : save_options()
 {

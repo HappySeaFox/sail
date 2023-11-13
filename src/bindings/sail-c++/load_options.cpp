@@ -51,6 +51,12 @@ public:
     sail::tuning tuning;
 };
 
+load_options::load_options(int options)
+    : d(new pimpl)
+{
+    set_options(options);
+}
+
 load_options::load_options()
     : d(new pimpl)
 {

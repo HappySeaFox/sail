@@ -55,6 +55,11 @@ public:
     save_options();
 
     /*
+     * Constructs new save options from the or-ed manipulation options. See SailOption.
+     */
+    save_options(int options);
+
+    /*
      * Copies the save options.
      */
     save_options(const save_options &wo);

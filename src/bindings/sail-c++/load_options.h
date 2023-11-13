@@ -54,6 +54,11 @@ public:
     load_options();
 
     /*
+     * Constructs new load options from the or-ed manipulation options. See SailOption.
+     */
+    load_options(int options);
+
+    /*
      * Copies the load options.
      */
     load_options(const load_options &ro);

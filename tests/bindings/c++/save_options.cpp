@@ -29,19 +29,23 @@
 
 #include "munit.h"
 
-static MunitResult test_save_options(const MunitParameter params[], void *user_data) {
+static MunitResult test_save_options_construct(const MunitParameter params[], void *user_data) {
 
     (void)params;
     (void)user_data;
 
-    const std::vector<sail::codec_info> codecs = sail::codec_info::list();
-    munit_assert(codecs.size() > 0U);
-
-    const sail::codec_info first_codec = codecs.front();
-
     {
         sail::save_options save_options;
-        munit_assert(first_codec.save_features().to_options(&save_options) == SAIL_OK);
+
+        munit_assert(save_options.options() == 0);
+        munit_assert(save_options.tuning().empty());
+    }
+
+    {
+        sail::save_options save_options(SAIL_OPTION_META_DATA);
+
+        munit_assert(save_options.options() == SAIL_OPTION_META_DATA);
+        munit_assert(save_options.tuning().empty());
     }
 
     return MUNIT_OK;
@@ -121,9 +125,9 @@ static MunitResult test_save_options_move(const MunitParameter params[], void *u
 }
 
 static MunitTest test_suite_tests[] = {
-    { (char *)"/save-options", test_save_options,           NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/save-options/copy", test_save_options_copy, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/save-options/move", test_save_options_move, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/save-options/construct", test_save_options_construct, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/save-options/copy",      test_save_options_copy,      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/save-options/move",      test_save_options_move,      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };
