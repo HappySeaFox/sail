@@ -84,6 +84,7 @@ enum SailStatus {
     SAIL_ERROR_MISSING_PALETTE,
     SAIL_ERROR_UNSUPPORTED_FORMAT,
     SAIL_ERROR_BROKEN_IMAGE,
+    SAIL_ERROR_INCOMPLETE_PIXELS,
 
     /*
      * Codecs-specific errors.

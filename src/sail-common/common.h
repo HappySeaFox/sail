@@ -340,6 +340,11 @@ enum SailOption {
      * Specifying this option for saving operations has no effect.
      */
     SAIL_OPTION_SOURCE_IMAGE = 1 << 3,
+
+    /*
+     * Instruction for the loading operations to still return image.
+     */
+    SAIL_OPTION_TOLERATE_INCOMPLETE_PIXELS = 1 << 4,
 };
 
 #endif

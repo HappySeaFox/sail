@@ -79,11 +79,14 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
     //
     sail::io_file io_file(path.toLocal8Bit().constData());
     sail::image_input image_input(io_file);
+    sail::load_options load_options;
+    load_options.set_options(SAIL_OPTION_SOURCE_IMAGE | SAIL_OPTION_TOLERATE_INCOMPLETE_PIXELS);
+    image_input.with(load_options);
 
     // Load all the available image frames in the file.
     //
     sail_status_t res;
-    while ((res = image_input.next_frame(&image)) == SAIL_OK) {
+    while ((res = image_input.next_frame(&image)) == SAIL_OK || res == SAIL_ERROR_INCOMPLETE_PIXELS) {
 
         // Mutate alpha into a green color.
         //

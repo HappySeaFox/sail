@@ -116,12 +116,20 @@ sail_status_t sail_load_next_frame(void *state, struct sail_image **image) {
     SAIL_TRY_OR_CLEANUP(sail_malloc(pixels_size, &image_local->pixels),
                         /* cleanup */ sail_destroy_image(image_local));
 
-    SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v8->load_frame(state_of_mind->state, image_local),
-                        /* cleanup */ sail_destroy_image(image_local));
+    sail_status_t status = state_of_mind->codec->v8->load_frame(state_of_mind->state, image_local);
 
-    *image = image_local;
-
-    return SAIL_OK;
+    if (status == SAIL_OK) {
+        *image = image_local;
+        return status;
+    } else {
+        if (state_of_mind->load_options->options & SAIL_OPTION_TOLERATE_INCOMPLETE_PIXELS) {
+            *image = image_local;
+            return SAIL_ERROR_INCOMPLETE_PIXELS;
+        } else {
+            sail_destroy_image(image_local);
+            return status;
+        }
+    }
 }
 
 sail_status_t sail_stop_loading(void *state) {

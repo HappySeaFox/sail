@@ -90,7 +90,11 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
     /*
      * Starts loading the specified file.
      */
-    SAIL_TRY_OR_CLEANUP(sail_start_loading_from_file(path.toLocal8Bit(), NULL, &state),
+    struct sail_load_options *load_options;
+    SAIL_TRY_OR_CLEANUP(sail_alloc_load_options(&load_options),
+                        /* cleanup */ sail_stop_loading(state));
+    load_options->options = SAIL_OPTION_SOURCE_IMAGE | SAIL_OPTION_TOLERATE_INCOMPLETE_PIXELS;
+    SAIL_TRY_OR_CLEANUP(sail_start_loading_from_file_with_options(path.toLocal8Bit(), NULL, load_options, &state),
                         /* cleanup */ sail_stop_loading(state));
 
     /*
@@ -99,7 +103,7 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
     sail_status_t res;
     struct sail_image *image;
 
-    while ((res = sail_load_next_frame(state, &image)) == SAIL_OK) {
+    while ((res = sail_load_next_frame(state, &image)) == SAIL_OK || res == SAIL_ERROR_INCOMPLETE_PIXELS) {
 
         /* Mutate alpha into a green color. */
         const struct sail_conversion_options options = {

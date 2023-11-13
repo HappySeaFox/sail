@@ -107,6 +107,9 @@ SAIL_EXPORT sail_status_t sail_start_loading_from_memory(const void *buffer, siz
  *
  * Returns SAIL_OK on success.
  * Returns SAIL_ERROR_NO_MORE_FRAMES when no more frames are available.
+ * Returns SAIL_ERROR_INCOMPLETE_PIXELS when the image is loaded but not all its pixels are available
+ *                                      possibly because of the corrupted input file. Unassigned pixels
+ *                                      have random values.
  */
 SAIL_EXPORT sail_status_t sail_load_next_frame(void *state, struct sail_image **image);
 

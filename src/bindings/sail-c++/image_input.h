@@ -100,6 +100,9 @@ public:
      *
      * Returns SAIL_OK on success.
      * Returns SAIL_ERROR_NO_MORE_FRAMES when no more frames are available.
+     * Returns SAIL_ERROR_INCOMPLETE_PIXELS when the image is loaded but not all its pixels are available
+     *                                      possibly because of the corrupted input file. Unassigned pixels
+     *                                      have random values.
      */
     sail_status_t next_frame(sail::image *image);
  

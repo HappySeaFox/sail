@@ -41,7 +41,7 @@ public:
         , abstract_io_adapter(new sail::abstract_io_adapter(abstract_io_ref))
         , state(nullptr)
         , override_codec_info(false)
-        , override_load_options(false)
+        , load_options(nullptr, sail_destroy_load_options)
     {
     }
 
@@ -51,7 +51,7 @@ public:
         , abstract_io_adapter(new sail::abstract_io_adapter(abstract_io_ref))
         , state(nullptr)
         , override_codec_info(false)
-        , override_load_options(false)
+        , load_options(nullptr, sail_destroy_load_options)
     {
     }
 
@@ -67,8 +67,7 @@ public:
 
     bool override_codec_info;
     sail::codec_info codec_info;
-    bool override_load_options;
-    sail::load_options load_options;
+    std::unique_ptr<struct sail_load_options, decltype(&sail_destroy_load_options)> load_options;
 };
 
 sail_status_t image_input::pimpl::start()
@@ -79,17 +78,13 @@ sail_status_t image_input::pimpl::start()
 
     const sail_codec_info *sail_codec_info = codec_info.sail_codec_info_c();
 
-    sail_load_options *sail_load_options = nullptr;
-
-    SAIL_AT_SCOPE_EXIT(
-        sail_destroy_load_options(sail_load_options);
-    );
-
-    if (override_load_options) {
-        SAIL_TRY(load_options.to_sail_load_options(&sail_load_options));
+    if (!load_options) {
+        sail_load_options *sail_load_options;
+        SAIL_TRY(sail_alloc_load_options_from_features(sail_codec_info->load_features, &sail_load_options));
+        load_options.reset(sail_load_options);
     }
 
-    SAIL_TRY(sail_start_loading_from_io_with_options(&abstract_io_adapter->sail_io_c(), sail_codec_info, sail_load_options, &state));
+    SAIL_TRY(sail_start_loading_from_io_with_options(&abstract_io_adapter->sail_io_c(), sail_codec_info, load_options.get(), &state));
 
     return SAIL_OK;
 }
@@ -144,8 +139,10 @@ image_input& image_input::with(const sail::codec_info &codec_info)
 
 image_input& image_input::with(const sail::load_options &load_options)
 {
-    d->override_load_options = true;
-    d->load_options          = load_options;
+    sail_load_options *sail_load_options = nullptr;
+    SAIL_TRY_OR_SUPPRESS(load_options.to_sail_load_options(&sail_load_options));
+
+    d->load_options.reset(sail_load_options);
 
     return *this;
 }
@@ -162,12 +159,19 @@ sail_status_t image_input::next_frame(sail::image *image)
         sail_destroy_image(sail_image);
     );
 
-    SAIL_TRY(sail_load_next_frame(d->state, &sail_image));
+    sail_status_t status = sail_load_next_frame(d->state, &sail_image);
 
-    *image = sail::image(sail_image);
-    sail_image->pixels = nullptr;
+    if (status == SAIL_OK) {
+        *image = sail::image(sail_image);
+        sail_image->pixels = nullptr;
+    } else if (status == SAIL_ERROR_INCOMPLETE_PIXELS) {
+        if (d->load_options->options & SAIL_OPTION_TOLERATE_INCOMPLETE_PIXELS) {
+            *image = sail::image(sail_image);
+            sail_image->pixels = nullptr;
+        }
+    }
 
-    return SAIL_OK;
+    return status;
 }
 
 image image_input::next_frame()
