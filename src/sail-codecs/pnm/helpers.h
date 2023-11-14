@@ -43,6 +43,6 @@ enum SailPnmVersion {
 
 SAIL_HIDDEN sail_status_t pnm_private_skip_to_data(struct sail_io *io, char *first_char);
 
-SAIL_HIDDEN enum SailPixelFormat pnm_private_rgb_sail_pixel_format(enum SailPnmVersion pnm_version);
+SAIL_HIDDEN enum SailPixelFormat pnm_private_rgb_sail_pixel_format(enum SailPnmVersion pnm_version, unsigned bpp);
 
 #endif
