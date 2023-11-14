@@ -42,6 +42,7 @@ struct pnm_state {
 
     bool frame_loaded;
     enum SailPnmVersion version;
+    double multiplier_to_full_range;
 };
 
 static sail_status_t alloc_pnm_state(struct sail_io *io,
@@ -59,6 +60,7 @@ static sail_status_t alloc_pnm_state(struct sail_io *io,
         .save_options = save_options,
 
         .frame_loaded = false,
+        .multiplier_to_full_range = 0,
     };
 
     return SAIL_OK;
@@ -124,20 +126,60 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_pnm(void *state, st
     char first_char;
     SAIL_TRY(pnm_private_skip_to_data(pnm_state->io, &first_char));
 
-    char width_height_str[32] = { first_char };
-    SAIL_TRY(sail_read_string_from_io(pnm_state->io, width_height_str + 1, sizeof(width_height_str) - 1));
+    char str[32] = { first_char };
+    SAIL_TRY(sail_read_string_from_io(pnm_state->io, str + 1, sizeof(str) - 1));
 
+    /* Dimensions. */
     unsigned w, h;
 #ifdef _MSC_VER
-    if (sscanf_s(width_height_str, "%u%u", &w, &h) != 2) {
+    if (sscanf_s(str, "%u%u", &w, &h) != 2) {
 #else
-    if (sscanf(width_height_str, "%u%u", &w, &h) != 2) {
+    if (sscanf(str, "%u%u", &w, &h) != 2) {
 #endif
         SAIL_LOG_ERROR("PNM: Failed to read image dimensions");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
     }
 
-    enum SailPixelFormat pixel_format = pnm_private_rgb_sail_pixel_format(pnm_state->version);
+    unsigned bpp;
+
+    /* Maximum color. */
+    if (pnm_state->version == SAIL_PNM_VERSION_P2     ||
+            pnm_state->version == SAIL_PNM_VERSION_P3 ||
+            pnm_state->version == SAIL_PNM_VERSION_P5 ||
+            pnm_state->version == SAIL_PNM_VERSION_P6) {
+        SAIL_TRY(pnm_private_skip_to_data(pnm_state->io, &first_char));
+
+        str[0] = first_char;
+        SAIL_TRY(sail_read_string_from_io(pnm_state->io, str + 1, sizeof(str) - 1));
+
+        unsigned max_color;
+#ifdef _MSC_VER
+        if (sscanf_s(str, "%u", &max_color) != 1) {
+#else
+        if (sscanf(str, "%u", &max_color) != 1) {
+#endif
+            SAIL_LOG_ERROR("PNM: Failed to read maximum color value");
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        }
+
+        if (max_color <= 255) {
+            bpp = 8;
+            pnm_state->multiplier_to_full_range = 255.0 / max_color;
+        } else if (max_color <= 65535) {
+            bpp = 16;
+            pnm_state->multiplier_to_full_range = 65535.0 / max_color;
+        } else  {
+            SAIL_LOG_ERROR("PNM: BPP more than 16 is not supported");
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_FORMAT);
+        }
+
+        SAIL_LOG_TRACE("PNM: Max color(%u), scale(%.1f)", max_color, pnm_state->multiplier_to_full_range);
+    } else {
+        pnm_state->multiplier_to_full_range = 1;
+        bpp = 1;
+    }
+
+    enum SailPixelFormat pixel_format = pnm_private_rgb_sail_pixel_format(pnm_state->version, bpp);
 
     if (pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN) {
         SAIL_LOG_ERROR("PNM: Unsupported pixel format");
@@ -184,6 +226,26 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_pnm(void *state, st
 SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_pnm(void *state, struct sail_image *image) {
 
     const struct pnm_state *pnm_state = state;
+
+    switch (pnm_state->version) {
+        case SAIL_PNM_VERSION_P1: {
+            break;
+        }
+        case SAIL_PNM_VERSION_P2: {
+            break;
+        }
+        case SAIL_PNM_VERSION_P3: {
+            break;
+        }
+        case SAIL_PNM_VERSION_P4:
+        case SAIL_PNM_VERSION_P5:
+        case SAIL_PNM_VERSION_P6: {
+            for (unsigned row = 0; row < image->height; row++) {
+                SAIL_TRY(pnm_state->io->strict_read(pnm_state->io->stream, sail_scan_line(image, row), image->bytes_per_line));
+            }
+            break;
+        }
+    }
 
     return SAIL_OK;
 }

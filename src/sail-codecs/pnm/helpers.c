@@ -46,17 +46,31 @@ sail_status_t pnm_private_skip_to_data(struct sail_io *io, char *first_char) {
     return SAIL_OK;
 }
 
-enum SailPixelFormat pnm_private_rgb_sail_pixel_format(enum SailPnmVersion pnm_version) {
+enum SailPixelFormat pnm_private_rgb_sail_pixel_format(enum SailPnmVersion pnm_version, unsigned bpp) {
 
     switch (pnm_version) {
         case SAIL_PNM_VERSION_P1:
         case SAIL_PNM_VERSION_P4: return SAIL_PIXEL_FORMAT_BPP1_INDEXED;
 
         case SAIL_PNM_VERSION_P2:
-        case SAIL_PNM_VERSION_P5: return SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE;
+        case SAIL_PNM_VERSION_P5: {
+            switch (bpp) {
+                case 8:  return SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE;
+                case 16: return SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE;
+
+                default: return SAIL_PIXEL_FORMAT_UNKNOWN;
+            }
+        }
 
         case SAIL_PNM_VERSION_P3:
-        case SAIL_PNM_VERSION_P6: return SAIL_PIXEL_FORMAT_BPP24_RGB;
+        case SAIL_PNM_VERSION_P6: {
+            switch (bpp) {
+                case 8:  return SAIL_PIXEL_FORMAT_BPP24_RGB;
+                case 16: return SAIL_PIXEL_FORMAT_BPP48_RGB;
+
+                default: return SAIL_PIXEL_FORMAT_UNKNOWN;
+            }
+        }
 
         default: {
             return SAIL_PIXEL_FORMAT_UNKNOWN;
