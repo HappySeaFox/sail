@@ -1,0 +1,26 @@
+# PNM codec information
+#
+[codec]
+layout=8
+version=0.6.5
+priority=LOW
+name=PNM
+description=Portable aNy Map
+magic-numbers=50 31;50 32;50 33;50 34;50 35;50 36
+extensions=pbm;pgm;ppm;pnm
+mime-types=image/x-portable-bitmap;image/x-portable-graymap;image/x-portable-pixmap;image/x-portable-anymap
+
+[load-features]
+features=STATIC;SOURCE-IMAGE
+tuning=
+
+[save-features]
+features=
+pixel-formats=
+compressions=
+default-compression=
+compression-level-min=0
+compression-level-max=0
+compression-level-default=0
+compression-level-step=0
+tuning=
