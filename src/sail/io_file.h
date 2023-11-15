@@ -37,7 +37,7 @@ struct sail_io;
 
 /*
  * Opens the specified image file for reading and allocates a new I/O object for it.
- * sail_io.stream is a pointer to a FILE.
+ * sail_io.stream is a pointer to a FILE. fread/fwrite/fseek/feof are used underneath.
  *
  * Returns SAIL_OK on success.
  */
