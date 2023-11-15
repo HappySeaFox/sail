@@ -26,6 +26,8 @@
 #ifndef SAIL_PNM_HELPERS_H
 #define SAIL_PNM_HELPERS_H
 
+#include <stddef.h> /* size_t */
+
 #include <sail-common/common.h>
 #include <sail-common/export.h>
 #include <sail-common/status.h>
@@ -41,7 +43,11 @@ enum SailPnmVersion {
     SAIL_PNM_VERSION_P6,
 };
 
-SAIL_HIDDEN sail_status_t pnm_private_skip_to_data(struct sail_io *io, char *first_char);
+static const char PNM_INVALID_STARTING_CHAR = '\0';
+
+SAIL_HIDDEN sail_status_t pnm_private_skip_to_letters_numbers(struct sail_io *io, char starting_char, char *first_char);
+
+SAIL_HIDDEN sail_status_t pnm_private_read_word(struct sail_io *io, char *str, size_t str_size);
 
 SAIL_HIDDEN enum SailPixelFormat pnm_private_rgb_sail_pixel_format(enum SailPnmVersion pnm_version, unsigned bpp);
 

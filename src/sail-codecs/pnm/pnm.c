@@ -90,7 +90,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_pnm(struct sail_io *io, const 
 
     /* Init decoder. */
     char str[8];
-    SAIL_TRY(sail_read_string_from_io(pnm_state->io, str, sizeof(str)));
+    SAIL_TRY(pnm_private_read_word(pnm_state->io, str, sizeof(str)));
 
     const char pnm = str[1];
 
@@ -123,18 +123,28 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_pnm(void *state, st
 
     pnm_state->frame_loaded = true;
 
-    char first_char;
-    SAIL_TRY(pnm_private_skip_to_data(pnm_state->io, &first_char));
-
-    char str[32] = { first_char };
-    SAIL_TRY(sail_read_string_from_io(pnm_state->io, str + 1, sizeof(str) - 1));
+    char buffer[32];
 
     /* Dimensions. */
-    unsigned w, h;
+    unsigned w;
+    SAIL_TRY(pnm_private_read_word(pnm_state->io, buffer, sizeof(buffer)));
+
 #ifdef _MSC_VER
-    if (sscanf_s(str, "%u%u", &w, &h) != 2) {
+    if (sscanf_s(buffer, "%u", &w) != 1) {
 #else
-    if (sscanf(str, "%u%u", &w, &h) != 2) {
+    if (sscanf(buffer, "%u", &w) != 1) {
+#endif
+        SAIL_LOG_ERROR("PNM: Failed to read image dimensions");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+    }
+
+    unsigned h;
+    SAIL_TRY(pnm_private_read_word(pnm_state->io, buffer, sizeof(buffer)));
+
+#ifdef _MSC_VER
+    if (sscanf_s(buffer, "%u", &h) != 1) {
+#else
+    if (sscanf(buffer, "%u", &h) != 1) {
 #endif
         SAIL_LOG_ERROR("PNM: Failed to read image dimensions");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
@@ -147,16 +157,14 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_pnm(void *state, st
             pnm_state->version == SAIL_PNM_VERSION_P3 ||
             pnm_state->version == SAIL_PNM_VERSION_P5 ||
             pnm_state->version == SAIL_PNM_VERSION_P6) {
-        SAIL_TRY(pnm_private_skip_to_data(pnm_state->io, &first_char));
 
-        str[0] = first_char;
-        SAIL_TRY(sail_read_string_from_io(pnm_state->io, str + 1, sizeof(str) - 1));
+        SAIL_TRY(pnm_private_read_word(pnm_state->io, buffer, sizeof(buffer)));
 
         unsigned max_color;
 #ifdef _MSC_VER
-        if (sscanf_s(str, "%u", &max_color) != 1) {
+        if (sscanf_s(buffer, "%u", &max_color) != 1) {
 #else
-        if (sscanf(str, "%u", &max_color) != 1) {
+        if (sscanf(buffer, "%u", &max_color) != 1) {
 #endif
             SAIL_LOG_ERROR("PNM: Failed to read maximum color value");
             SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
@@ -232,9 +240,57 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_pnm(void *state, struct sail_
             break;
         }
         case SAIL_PNM_VERSION_P2: {
+            char buffer[8];
+
+            for (unsigned row = 0; row < image->height; row++) {
+                unsigned char *scanline = sail_scan_line(image, row);
+
+                for (unsigned column = 0; column < image->width; column++) {
+                    for(unsigned channel = 0; channel < 1; channel++) {
+                        SAIL_TRY(pnm_private_read_word(pnm_state->io, buffer, sizeof(buffer)));
+
+                        unsigned value;
+                    #ifdef _MSC_VER
+                        if (sscanf_s(buffer, "%u", &value) != 1) {
+                    #else
+                        if (sscanf(buffer, "%u", &value) != 1) {
+                    #endif
+                            SAIL_LOG_ERROR("PNM: Failed to read color value");
+                            SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+                        }
+
+                        // TODO 16-bit
+                        *scanline++ = (unsigned char)value;
+                    }
+                }
+            }
             break;
         }
         case SAIL_PNM_VERSION_P3: {
+            char buffer[8];
+
+            for (unsigned row = 0; row < image->height; row++) {
+                unsigned char *scanline = sail_scan_line(image, row);
+
+                for (unsigned column = 0; column < image->width; column++) {
+                    for(unsigned channel = 0; channel < 3; channel++) {
+                        SAIL_TRY(pnm_private_read_word(pnm_state->io, buffer, sizeof(buffer)));
+
+                        unsigned value;
+                    #ifdef _MSC_VER
+                        if (sscanf_s(buffer, "%u", &value) != 1) {
+                    #else
+                        if (sscanf(buffer, "%u", &value) != 1) {
+                    #endif
+                            SAIL_LOG_ERROR("PNM: Failed to read color value");
+                            SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+                        }
+
+                        // TODO 16-bit
+                        *scanline++ = (unsigned char)value;
+                    }
+                }
+            }
             break;
         }
         case SAIL_PNM_VERSION_P4:

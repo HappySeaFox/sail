@@ -23,11 +23,19 @@
     SOFTWARE.
 */
 
+#include <ctype.h>
+#include <stdbool.h>
+
 #include <sail-common/sail-common.h>
 
 #include "helpers.h"
 
-sail_status_t pnm_private_skip_to_data(struct sail_io *io, char *first_char) {
+sail_status_t pnm_private_skip_to_letters_numbers(struct sail_io *io, char starting_char, char *first_char) {
+
+    if (isalnum(starting_char)) {
+        *first_char = starting_char;
+        return SAIL_OK;
+    }
 
     char c;
 
@@ -39,9 +47,48 @@ sail_status_t pnm_private_skip_to_data(struct sail_io *io, char *first_char) {
                 SAIL_TRY(io->strict_read(io->stream, &c, 1));
             } while(c != '\n');
         }
-    } while(c < '0' || c > '9');
+    } while (!isalnum(c));
 
     *first_char = c;
+
+    return SAIL_OK;
+}
+
+sail_status_t pnm_private_read_word(struct sail_io *io, char *str, size_t str_size) {
+
+    if (str_size < 2) {
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+    }
+
+    char first_char;
+    SAIL_TRY(pnm_private_skip_to_letters_numbers(io, PNM_INVALID_STARTING_CHAR, &first_char));
+
+    unsigned i = 0;
+    char c = first_char;
+
+    bool eof;
+    SAIL_TRY(io->eof(io->stream, &eof));
+
+    sail_status_t saved_status = SAIL_OK;
+
+    while (isalnum(c) && i < str_size - 1 && !eof) {
+        *(str + i++) = c;
+        SAIL_TRY_OR_EXECUTE(io->strict_read(io->stream, &c, 1),
+                            /* on error */ saved_status = __sail_status);
+        SAIL_TRY(io->eof(io->stream, &eof));
+
+        if (saved_status != SAIL_OK && !eof) {
+            return saved_status;
+        }
+    }
+
+    /* The buffer is full but no word delimiter found. */
+    if (i == str_size - 1 && !eof) {
+        SAIL_LOG_ERROR("PNM: No word delimiter found");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+    }
+
+    *(str + i) = '\0';
 
     return SAIL_OK;
 }
