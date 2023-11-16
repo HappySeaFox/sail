@@ -90,6 +90,7 @@ option(SAIL_INSTALL_PDB "Install PDB files along with libraries." ON)
 set(SAIL_ONLY_CODECS "" CACHE STRING "Forcefully enable only the codecs specified in this ';'-separated list and disable the rest. \
 If an enabled codec fails to find its dependencies, the configuration process fails. \
 One can also specify not just individual codecs but codec groups by their priority like that: highest-priority;xbm.")
+set(SAIL_OPENMP_SCHEDULE "dynamic" CACHE STRING "OpenMP scheduling algorithm.")
 option(BUILD_SHARED_LIBS "Build shared libs. When disabled, sets SAIL_COMBINE_CODECS to ON automatically." ON)
 cmake_dependent_option(SAIL_COMBINE_CODECS "Combine all codecs into a single library. When disabled, all codecs are implemented as \
 dynamically loaded plugins." OFF "BUILD_SHARED_LIBS" ON)

@@ -24,6 +24,7 @@ vcpkg install sail
 - `SAIL_THIRD_PARTY_CODECS_PATH=ON|OFF` - Enable loading custom codecs from the ';'-separated paths specified in the `SAIL_THIRD_PARTY_CODECS_PATH` environment variable. Default: `ON`
 - `SAIL_THREAD_SAFE=ON|OFF` - Enable working in multi-threaded environments by locking the internal context with a mutex. Default: `ON`
 - `SAIL_ONLY_CODECS="a;b;c"` - Forcefully enable only the codecs specified in this ';'-separated list and disable the rest. If an enabled codec fails to find its dependencies, the configuration process fails. One can also specify not just individual codecs but codec groups by their priority like that: highest-priority;xbm. Default: empty list
+- `SAIL_OPENMP_SCHEDULE="dynamic"` - OpenMP scheduling algorithm. Default: dynamic
 
 ### Windows
 

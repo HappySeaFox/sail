@@ -87,4 +87,7 @@
 /* Enabled built-in codecs. */
 @SAIL_HAVE_CODEC_DEFINES@
 
+/* OpenMP scheduling algorithm. */
+#cmakedefine SAIL_OPENMP_SCHEDULE @SAIL_OPENMP_SCHEDULE@
+
 #endif
