@@ -32,6 +32,8 @@
 
 #include "helpers.h"
 
+static const unsigned char SAIL_XBM_MONO_PALETTE[] = { 255, 255, 255, 0, 0, 0 };
+
 enum SailXbmVersion {
     SAIL_XBM_VERSION_10 = 10,
     SAIL_XBM_VERSION_11 = 11,
@@ -176,15 +178,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_xbm(void *state, st
     SAIL_TRY_OR_CLEANUP(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP24_RGB, 2, &image_local->palette),
                         /* cleanup */ sail_destroy_image(image_local));
 
-    unsigned char *palette = image_local->palette->data;
-
-    *palette++ = 255;
-    *palette++ = 255;
-    *palette++ = 255;
-
-    *palette++ = 0;
-    *palette++ = 0;
-    *palette++ = 0;
+    memcpy(image_local->palette->data, SAIL_XBM_MONO_PALETTE, 6);
 
     *image = image_local;
 

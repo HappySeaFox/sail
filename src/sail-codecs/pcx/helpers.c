@@ -34,6 +34,8 @@
 /* 256-color palette signature. */
 static const unsigned SAIL_PCX_PALETTE_SIGNATURE = 0x0C;
 
+static const unsigned char SAIL_PCX_MONO_PALETTE[] = { 0, 0, 0, 255, 255, 255 };
+
 sail_status_t pcx_private_read_header(struct sail_io *io, struct SailPcxHeader *header) {
 
     SAIL_TRY(io->strict_read(io->stream, &header->id,             sizeof(header->id)));
@@ -93,16 +95,7 @@ sail_status_t pcx_private_build_palette(enum SailPixelFormat pixel_format, struc
     switch (pixel_format) {
         case SAIL_PIXEL_FORMAT_BPP1_INDEXED: {
             SAIL_TRY(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP24_RGB, 2, palette));
-
-            unsigned char *palette_data = (*palette)->data;
-
-            *palette_data++ = 0;
-            *palette_data++ = 0;
-            *palette_data++ = 0;
-            *palette_data++ = 255;
-            *palette_data++ = 255;
-            *palette_data++ = 255;
-
+            memcpy((*palette)->data, SAIL_PCX_MONO_PALETTE, 6);
             break;
         }
         case SAIL_PIXEL_FORMAT_BPP4_INDEXED: {

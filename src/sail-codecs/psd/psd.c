@@ -26,12 +26,15 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <sail-common/sail-common.h>
 
 #include "helpers.h"
 
 static const unsigned SAIL_PSD_MAGIC = 0x38425053;
+
+static const unsigned char SAIL_PSD_MONO_PALETTE[] = { 255, 255, 255, 0, 0, 0 };
 
 /*
  * Codec-specific state.
@@ -172,16 +175,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_psd(void *state, st
         }
     } else if (mode == SAIL_PSD_MODE_BITMAP) {
         SAIL_TRY(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP24_RGB, 2, &psd_state->palette));
-
-        unsigned char *palette_data = psd_state->palette->data;
-
-        *palette_data++ = 255;
-        *palette_data++ = 255;
-        *palette_data++ = 255;
-
-        *palette_data++ = 0;
-        *palette_data++ = 0;
-        *palette_data++ = 0;
+        memcpy(psd_state->palette->data, SAIL_PSD_MONO_PALETTE, 6);
     }
 
     /* Skip the image resources. */
