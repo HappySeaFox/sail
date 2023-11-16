@@ -46,6 +46,8 @@ enum SailPnmVersion {
 
 static const char SAIL_PNM_INVALID_STARTING_CHAR = '\0';
 
+SAIL_HIDDEN sail_status_t pnm_private_skip_to_letters_numbers_force_read(struct sail_io *io, char *first_char);
+
 SAIL_HIDDEN sail_status_t pnm_private_skip_to_letters_numbers(struct sail_io *io, char starting_char, char *first_char);
 
 SAIL_HIDDEN sail_status_t pnm_private_read_word(struct sail_io *io, char *str, size_t str_size);

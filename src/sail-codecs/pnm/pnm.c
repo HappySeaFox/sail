@@ -233,6 +233,33 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_pnm(void *state, struct sail_
 
     switch (pnm_state->version) {
         case SAIL_PNM_VERSION_P1: {
+            for (unsigned row = 0; row < image->height; row++) {
+                uint8_t *scan = sail_scan_line(image, row);
+                unsigned shift = 8;
+
+                for (unsigned column = 0; column < image->width; column++) {
+                    char first_char;
+                    SAIL_TRY(pnm_private_skip_to_letters_numbers_force_read(pnm_state->io, &first_char));
+
+                    const unsigned value = first_char - '0';
+
+                    if (value != 0 && value != 1) {
+                        SAIL_LOG_ERROR("PNM: Unexpected character '%c'", first_char);
+                        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+                    }
+
+                    if (shift == 8) {
+                        *scan = 0;
+                    }
+
+                    *scan |= (value << --shift);
+
+                    if (shift == 0) {
+                        scan++;
+                        shift = 8;
+                    }
+                }
+            }
             break;
         }
         case SAIL_PNM_VERSION_P2: {
