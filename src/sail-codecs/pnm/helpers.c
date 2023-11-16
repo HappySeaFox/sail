@@ -25,6 +25,7 @@
 
 #include <ctype.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 #include <sail-common/sail-common.h>
 
@@ -93,7 +94,40 @@ sail_status_t pnm_private_read_word(struct sail_io *io, char *str, size_t str_si
     return SAIL_OK;
 }
 
-enum SailPixelFormat pnm_private_rgb_sail_pixel_format(enum SailPnmVersion pnm_version, unsigned bpp) {
+sail_status_t pnm_private_read_pixels(struct sail_io *io, struct sail_image *image, unsigned channels, unsigned bpc, double multiplier_to_full_range) {
+
+    for (unsigned row = 0; row < image->height; row++) {
+        uint8_t *scan8 = sail_scan_line(image, row);
+        uint16_t *scan16 = sail_scan_line(image, row);
+
+        for (unsigned column = 0; column < image->width; column++) {
+            for(unsigned channel = 0; channel < channels; channel++) {
+                char buffer[8];
+                SAIL_TRY(pnm_private_read_word(io, buffer, sizeof(buffer)));
+
+                unsigned value;
+            #ifdef _MSC_VER
+                if (sscanf_s(buffer, "%u", &value) != 1) {
+            #else
+                if (sscanf(buffer, "%u", &value) != 1) {
+            #endif
+                    SAIL_LOG_ERROR("PNM: Failed to read color value");
+                    SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+                }
+
+                if (SAIL_LIKELY(bpc == 8)) {
+                    *scan8++ = (uint8_t)(value * multiplier_to_full_range);
+                } else {
+                    *scan16++ = (uint16_t)(value * multiplier_to_full_range);
+                }
+            }
+        }
+    }
+
+    return SAIL_OK;
+}
+
+enum SailPixelFormat pnm_private_rgb_sail_pixel_format(enum SailPnmVersion pnm_version, unsigned bpc) {
 
     switch (pnm_version) {
         case SAIL_PNM_VERSION_P1:
@@ -101,7 +135,7 @@ enum SailPixelFormat pnm_private_rgb_sail_pixel_format(enum SailPnmVersion pnm_v
 
         case SAIL_PNM_VERSION_P2:
         case SAIL_PNM_VERSION_P5: {
-            switch (bpp) {
+            switch (bpc) {
                 case 8:  return SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE;
                 case 16: return SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE;
 
@@ -111,7 +145,7 @@ enum SailPixelFormat pnm_private_rgb_sail_pixel_format(enum SailPnmVersion pnm_v
 
         case SAIL_PNM_VERSION_P3:
         case SAIL_PNM_VERSION_P6: {
-            switch (bpp) {
+            switch (bpc) {
                 case 8:  return SAIL_PIXEL_FORMAT_BPP24_RGB;
                 case 16: return SAIL_PIXEL_FORMAT_BPP48_RGB;
 

@@ -43,6 +43,7 @@ struct pnm_state {
     bool frame_loaded;
     enum SailPnmVersion version;
     double multiplier_to_full_range;
+    unsigned bpc;
 };
 
 static sail_status_t alloc_pnm_state(struct sail_io *io,
@@ -60,7 +61,9 @@ static sail_status_t alloc_pnm_state(struct sail_io *io,
         .save_options = save_options,
 
         .frame_loaded = false,
+
         .multiplier_to_full_range = 0,
+        .bpc                      = 0,
     };
 
     return SAIL_OK;
@@ -150,8 +153,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_pnm(void *state, st
         SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
     }
 
-    unsigned bpp;
-
     /* Maximum color. */
     if (pnm_state->version == SAIL_PNM_VERSION_P2     ||
             pnm_state->version == SAIL_PNM_VERSION_P3 ||
@@ -171,10 +172,10 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_pnm(void *state, st
         }
 
         if (max_color <= 255) {
-            bpp = 8;
+            pnm_state->bpc = 8;
             pnm_state->multiplier_to_full_range = 255.0 / max_color;
         } else if (max_color <= 65535) {
-            bpp = 16;
+            pnm_state->bpc = 16;
             pnm_state->multiplier_to_full_range = 65535.0 / max_color;
         } else  {
             SAIL_LOG_ERROR("PNM: BPP more than 16 is not supported");
@@ -184,10 +185,10 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_pnm(void *state, st
         SAIL_LOG_TRACE("PNM: Max color(%u), scale(%.1f)", max_color, pnm_state->multiplier_to_full_range);
     } else {
         pnm_state->multiplier_to_full_range = 1;
-        bpp = 1;
+        pnm_state->bpc = 1;
     }
 
-    enum SailPixelFormat pixel_format = pnm_private_rgb_sail_pixel_format(pnm_state->version, bpp);
+    enum SailPixelFormat pixel_format = pnm_private_rgb_sail_pixel_format(pnm_state->version, pnm_state->bpc);
 
     if (pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN) {
         SAIL_LOG_ERROR("PNM: Unsupported pixel format");
@@ -240,57 +241,11 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_pnm(void *state, struct sail_
             break;
         }
         case SAIL_PNM_VERSION_P2: {
-            char buffer[8];
-
-            for (unsigned row = 0; row < image->height; row++) {
-                unsigned char *scanline = sail_scan_line(image, row);
-
-                for (unsigned column = 0; column < image->width; column++) {
-                    for(unsigned channel = 0; channel < 1; channel++) {
-                        SAIL_TRY(pnm_private_read_word(pnm_state->io, buffer, sizeof(buffer)));
-
-                        unsigned value;
-                    #ifdef _MSC_VER
-                        if (sscanf_s(buffer, "%u", &value) != 1) {
-                    #else
-                        if (sscanf(buffer, "%u", &value) != 1) {
-                    #endif
-                            SAIL_LOG_ERROR("PNM: Failed to read color value");
-                            SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
-                        }
-
-                        // TODO 16-bit
-                        *scanline++ = (unsigned char)value;
-                    }
-                }
-            }
+            SAIL_TRY(pnm_private_read_pixels(pnm_state->io, image, 1, pnm_state->bpc, pnm_state->multiplier_to_full_range));
             break;
         }
         case SAIL_PNM_VERSION_P3: {
-            char buffer[8];
-
-            for (unsigned row = 0; row < image->height; row++) {
-                unsigned char *scanline = sail_scan_line(image, row);
-
-                for (unsigned column = 0; column < image->width; column++) {
-                    for(unsigned channel = 0; channel < 3; channel++) {
-                        SAIL_TRY(pnm_private_read_word(pnm_state->io, buffer, sizeof(buffer)));
-
-                        unsigned value;
-                    #ifdef _MSC_VER
-                        if (sscanf_s(buffer, "%u", &value) != 1) {
-                    #else
-                        if (sscanf(buffer, "%u", &value) != 1) {
-                    #endif
-                            SAIL_LOG_ERROR("PNM: Failed to read color value");
-                            SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
-                        }
-
-                        // TODO 16-bit
-                        *scanline++ = (unsigned char)value;
-                    }
-                }
-            }
+            SAIL_TRY(pnm_private_read_pixels(pnm_state->io, image, 3, pnm_state->bpc, pnm_state->multiplier_to_full_range));
             break;
         }
         case SAIL_PNM_VERSION_P4:
