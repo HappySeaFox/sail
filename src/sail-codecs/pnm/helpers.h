@@ -44,7 +44,7 @@ enum SailPnmVersion {
     SAIL_PNM_VERSION_P6,
 };
 
-static const char PNM_INVALID_STARTING_CHAR = '\0';
+static const char SAIL_PNM_INVALID_STARTING_CHAR = '\0';
 
 SAIL_HIDDEN sail_status_t pnm_private_skip_to_letters_numbers(struct sail_io *io, char starting_char, char *first_char);
 
