@@ -26,6 +26,7 @@
 #include <ctype.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #include <sail-common/sail-common.h>
 
