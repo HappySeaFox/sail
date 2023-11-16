@@ -1,6 +1,6 @@
 /*  This file is part of SAIL (https://github.com/HappySeaFox/sail)
 
-    Copyright (c) 2020 Dmitry Baryshev
+    Copyright (c) 2023 Dmitry Baryshev
 
     The MIT License
 
@@ -23,37 +23,37 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_IO_FILE_H
-#define SAIL_IO_FILE_H
+#ifndef SAIL_PNM_HELPERS_H
+#define SAIL_PNM_HELPERS_H
 
+#include <stddef.h> /* size_t */
+
+#include <sail-common/common.h>
 #include <sail-common/export.h>
 #include <sail-common/status.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
+struct sail_image;
 struct sail_io;
 
-/*
- * Opens the specified image file for reading and allocates a new I/O object for it.
- * sail_io.stream is a pointer to a FILE. fread/fwrite/fseek/feof are used underneath.
- *
- * Returns SAIL_OK on success.
- */
-SAIL_EXPORT sail_status_t sail_alloc_io_read_file(const char *path, struct sail_io **io);
+enum SailPnmVersion {
+    SAIL_PNM_VERSION_P1,
+    SAIL_PNM_VERSION_P2,
+    SAIL_PNM_VERSION_P3,
+    SAIL_PNM_VERSION_P4,
+    SAIL_PNM_VERSION_P5,
+    SAIL_PNM_VERSION_P6,
+};
 
-/*
- * Opens the specified image file for reading and writing, and allocates a new I/O object for it.
- * sail_io.stream is a pointer to a FILE.
- *
- * Returns SAIL_OK on success.
- */
-SAIL_EXPORT sail_status_t sail_alloc_io_read_write_file(const char *path, struct sail_io **io);
+static const char SAIL_PNM_INVALID_STARTING_CHAR = '\0';
 
-/* extern "C" */
-#ifdef __cplusplus
-}
-#endif
+SAIL_HIDDEN sail_status_t pnm_private_skip_to_letters_numbers_force_read(struct sail_io *io, char *first_char);
+
+SAIL_HIDDEN sail_status_t pnm_private_skip_to_letters_numbers(struct sail_io *io, char starting_char, char *first_char);
+
+SAIL_HIDDEN sail_status_t pnm_private_read_word(struct sail_io *io, char *str, size_t str_size);
+
+SAIL_HIDDEN sail_status_t pnm_private_read_pixels(struct sail_io *io, struct sail_image *image, unsigned channels, unsigned bpc, double multiplier_to_full_range);
+
+SAIL_HIDDEN enum SailPixelFormat pnm_private_rgb_sail_pixel_format(enum SailPnmVersion pnm_version, unsigned bpc);
 
 #endif
