@@ -241,8 +241,8 @@
     <td>11</td>
     <td><a href="https://wikipedia.org/wiki/Portable_anymap">PNM</a></td>
     <td>
-        <b>Grayscale:</b> 1-bit, 8-bit, 16-bit.
-        <b>Indexed:</b> 1-bit, 8-bit.
+        <b>Grayscale:</b> 8-bit, 16-bit.
+        <b>Indexed:</b> 1-bit.
         <b>RGB:</b> 24-bit, 48-bit.
         <br/><br/>
         <b>Content:</b> Static, Meta data.
