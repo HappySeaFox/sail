@@ -33,7 +33,7 @@
 
 #include "helpers.h"
 
-static const uint8_t PNM_MONO_PALETTE[] = { 255, 255, 255, 0, 0, 0 };
+static const uint8_t SAIL_PNM_MONO_PALETTE[] = { 255, 255, 255, 0, 0, 0 };
 
 /*
  * Codec-specific state.
@@ -219,7 +219,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_pnm(void *state, st
         SAIL_TRY_OR_CLEANUP(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP24_RGB, 2, &image_local->palette),
                             /* cleanup */ sail_destroy_image(image_local));
 
-        memcpy(image_local->palette->data, PNM_MONO_PALETTE, 6);
+        memcpy(image_local->palette->data, SAIL_PNM_MONO_PALETTE, 6);
     }
 
     *image = image_local;
