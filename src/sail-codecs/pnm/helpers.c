@@ -63,7 +63,7 @@ sail_status_t pnm_private_read_word(struct sail_io *io, char *str, size_t str_si
     }
 
     char first_char;
-    SAIL_TRY(pnm_private_skip_to_letters_numbers(io, PNM_INVALID_STARTING_CHAR, &first_char));
+    SAIL_TRY(pnm_private_skip_to_letters_numbers(io, SAIL_PNM_INVALID_STARTING_CHAR, &first_char));
 
     unsigned i = 0;
     char c = first_char;
