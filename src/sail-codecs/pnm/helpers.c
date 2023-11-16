@@ -32,12 +32,7 @@
 
 #include "helpers.h"
 
-sail_status_t pnm_private_skip_to_letters_numbers(struct sail_io *io, char starting_char, char *first_char) {
-
-    if (isalnum(starting_char)) {
-        *first_char = starting_char;
-        return SAIL_OK;
-    }
+sail_status_t pnm_private_skip_to_letters_numbers_force_read(struct sail_io *io, char *first_char) {
 
     char c;
 
@@ -52,6 +47,18 @@ sail_status_t pnm_private_skip_to_letters_numbers(struct sail_io *io, char start
     } while (!isalnum(c));
 
     *first_char = c;
+
+    return SAIL_OK;
+}
+
+sail_status_t pnm_private_skip_to_letters_numbers(struct sail_io *io, char starting_char, char *first_char) {
+
+    if (isalnum(starting_char)) {
+        *first_char = starting_char;
+        return SAIL_OK;
+    }
+
+    SAIL_TRY(pnm_private_skip_to_letters_numbers_force_read(io, first_char));
 
     return SAIL_OK;
 }
