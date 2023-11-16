@@ -245,7 +245,10 @@
         <b>Indexed:</b> 1-bit, 8-bit.
         <b>RGB:</b> 24-bit, 48-bit.
         <br/><br/>
-        <b>Content:</b> Static.
+        <b>Content:</b> Static, Meta data.
+        <br/><br/>
+        <b>Special properties:</b> Key: <i>"pnm-ascii"</i>. Description: True if the image pixels are encoded in ASCII mode.
+        Possible values: bool.
     </td>
     <td>-</td>
     <td>Unsupported</td>

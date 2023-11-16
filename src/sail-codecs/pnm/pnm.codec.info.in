@@ -11,7 +11,7 @@ extensions=pbm;pgm;ppm;pnm
 mime-types=image/x-portable-bitmap;image/x-portable-graymap;image/x-portable-pixmap;image/x-portable-anymap
 
 [load-features]
-features=STATIC;SOURCE-IMAGE
+features=STATIC;META-DATA;SOURCE-IMAGE
 tuning=
 
 [save-features]
