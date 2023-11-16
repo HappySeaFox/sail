@@ -239,6 +239,21 @@
 </tr>
 <tr>
     <td>11</td>
+    <td><a href="https://wikipedia.org/wiki/Portable_anymap">PNM</a></td>
+    <td>
+        <b>Grayscale:</b> 1-bit, 8-bit, 16-bit.
+        <b>Indexed:</b> 1-bit, 8-bit.
+        <b>RGB:</b> 24-bit, 48-bit.
+        <br/><br/>
+        <b>Content:</b> Static.
+    </td>
+    <td>-</td>
+    <td>Unsupported</td>
+    <td>-</td>
+    <td>-</td>
+</tr>
+<tr>
+    <td>12</td>
     <td><a href="https://en.wikipedia.org/wiki/Adobe_Photoshop#File_format">PSD</a></td>
     <td>
         <b>Grayscale:</b> 8-bit, 16-bit.
@@ -265,7 +280,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>12</td>
+    <td>13</td>
     <td><a href="http://qoiformat.org">QOI</a></td>
     <td>
         <b>RGB:</b> 24-bit.
@@ -284,7 +299,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>13</td>
+    <td>14</td>
     <td><a href="https://wikipedia.org/wiki/Scalable_Vector_Graphics">SVG</a></td>
     <td>
         <b>Bit depth:</b> 32-bit.
@@ -303,7 +318,7 @@
     <td>resvg or nanosvg</td>
 </tr>
 <tr>
-    <td>14</td>
+    <td>15</td>
     <td><a href="https://wikipedia.org/wiki/Truevision_TGA">TGA</a></td>
     <td>
         <b>Grayscale:</b> 8-bit.
@@ -319,7 +334,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>15</td>
+    <td>16</td>
     <td><a href="https://wikipedia.org/wiki/TIFF">TIFF</a></td>
     <td>
         <b>Bit depth:</b> 1-bit, 2-bit, 4-bit, 8-bit, 16-bit, 24-bit, 32-bit, 48-bit, 64-bit.
@@ -340,7 +355,7 @@
     <td>libtiff</td>
 </tr>
 <tr>
-    <td>16</td>
+    <td>17</td>
     <td><a href="http://fileformats.archiveteam.org/wiki/Quake_2_Texture">WAL</a></td>
     <td>
         <b>Indexed:</b> 8-bit.
@@ -353,7 +368,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>17</td>
+    <td>18</td>
     <td><a href="https://wikipedia.org/wiki/WebP">WEBP</a></td>
     <td>
         <b>Bit depth:</b> 24-bit, 32-bit.
@@ -366,7 +381,7 @@
     <td>libwebp</td>
 </tr>
 <tr>
-    <td>18</td>
+    <td>19</td>
     <td><a href="https://en.wikipedia.org/wiki/X_BitMap">XBM</a></td>
     <td>
         <b>Bit depth:</b> 1-bit.

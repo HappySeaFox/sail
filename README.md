@@ -79,13 +79,14 @@ images with the help of [ksquirrel-libs](FAQ.md#how-old-is-sail), the predecesso
 | 8  | [JPEG XL](https://wikipedia.org/wiki/JPEG_XL)                       | R             | libjxl            |
 | 9  | [PCX](https://wikipedia.org/wiki/PCX)                               | R             |                   |
 | 10 | [PNG](https://wikipedia.org/wiki/Portable_Network_Graphics)         | RW            | libpng            |
-| 11 | [PSD](https://en.wikipedia.org/wiki/Adobe_Photoshop#File_format)    | R             |                   |
-| 12 | [QOI](http://qoiformat.org)                                         | RW            |                   |
-| 13 | [SVG](https://wikipedia.org/wiki/Scalable_Vector_Graphics)          | R             | resvg             |
-| 14 | [TGA](https://wikipedia.org/wiki/Truevision_TGA)                    | R             |                   |
-| 15 | [TIFF](https://wikipedia.org/wiki/TIFF)                             | RW            | libtiff           |
 | .. | ...                                                                 |               |                   |
-| 17 | [WEBP](https://wikipedia.org/wiki/WebP)                             | R             | libwebp           |
+| 12 | [PSD](https://en.wikipedia.org/wiki/Adobe_Photoshop#File_format)    | R             |                   |
+| 13 | [QOI](http://qoiformat.org)                                         | RW            |                   |
+| 14 | [SVG](https://wikipedia.org/wiki/Scalable_Vector_Graphics)          | R             | resvg             |
+| 15 | [TGA](https://wikipedia.org/wiki/Truevision_TGA)                    | R             |                   |
+| 16 | [TIFF](https://wikipedia.org/wiki/TIFF)                             | RW            | libtiff           |
+| .. | ...                                                                 |               |                   |
+| 18 | [WEBP](https://wikipedia.org/wiki/WebP)                             | R             | libwebp           |
 | .. | ...                                                                 |               |                   |
 
 See the full list [here](FORMATS.md). Work to add more image formats is ongoing.
