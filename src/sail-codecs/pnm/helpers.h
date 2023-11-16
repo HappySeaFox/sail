@@ -32,6 +32,7 @@
 #include <sail-common/export.h>
 #include <sail-common/status.h>
 
+struct sail_image;
 struct sail_io;
 
 enum SailPnmVersion {
@@ -49,6 +50,8 @@ SAIL_HIDDEN sail_status_t pnm_private_skip_to_letters_numbers(struct sail_io *io
 
 SAIL_HIDDEN sail_status_t pnm_private_read_word(struct sail_io *io, char *str, size_t str_size);
 
-SAIL_HIDDEN enum SailPixelFormat pnm_private_rgb_sail_pixel_format(enum SailPnmVersion pnm_version, unsigned bpp);
+SAIL_HIDDEN sail_status_t pnm_private_read_pixels(struct sail_io *io, struct sail_image *image, unsigned channels, unsigned bpc, double multiplier_to_full_range);
+
+SAIL_HIDDEN enum SailPixelFormat pnm_private_rgb_sail_pixel_format(enum SailPnmVersion pnm_version, unsigned bpc);
 
 #endif
