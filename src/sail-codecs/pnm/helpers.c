@@ -177,6 +177,7 @@ sail_status_t pnm_private_store_ascii(enum SailPnmVersion pnm_version, struct sa
         case SAIL_PNM_VERSION_P2:
         case SAIL_PNM_VERSION_P3: {
             sail_set_variant_bool(variant, true);
+            break;
         }
 
         default: {
