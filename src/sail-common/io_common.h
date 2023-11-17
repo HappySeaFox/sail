@@ -97,14 +97,16 @@ typedef sail_status_t (*sail_io_tell_t)(void *stream, size_t *offset);
 typedef sail_status_t (*sail_io_flush_t)(void *stream);
 
 /*
- * Closes the underlying I/O object.
+ * Closes the underlying I/O object. Using the I/O object after closing it
+ * has undefined behavior.
  *
  * Returns SAIL_OK on success.
  */
 typedef sail_status_t (*sail_io_close_t)(void *stream);
 
 /*
- * Assigns true to the specified result if the underlying I/O object reached the end-of-file indicator.
+ * Assigns true to the specified result if the underlying I/O object
+ * reached the end-of-file indicator.
  *
  * Returns SAIL_OK on success.
  */
