@@ -78,16 +78,14 @@ sail_status_t pnm_private_read_word(struct sail_io *io, char *str, size_t str_si
     bool eof;
     SAIL_TRY(io->eof(io->stream, &eof));
 
-    sail_status_t saved_status = SAIL_OK;
-
-    while (isalnum(c) && i < str_size - 1 && !eof) {
+    if (eof) {
         *(str + i++) = c;
-        SAIL_TRY_OR_EXECUTE(io->strict_read(io->stream, &c, 1),
-                            /* on error */ saved_status = __sail_status);
-        SAIL_TRY(io->eof(io->stream, &eof));
+    } else {
+        while (isalnum(c) && i < str_size - 1 && !eof) {
+            *(str + i++) = c;
 
-        if (saved_status != SAIL_OK && !eof) {
-            return saved_status;
+            SAIL_TRY(io->strict_read(io->stream, &c, 1));
+            SAIL_TRY(io->eof(io->stream, &eof));
         }
     }
 
@@ -119,7 +117,7 @@ sail_status_t pnm_private_read_pixels(struct sail_io *io, struct sail_image *ima
             #else
                 if (sscanf(buffer, "%u", &value) != 1) {
             #endif
-                    SAIL_LOG_ERROR("PNM: Failed to read color value");
+                    SAIL_LOG_ERROR("PNM: Failed to read color value from '%s'", buffer);
                     SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
                 }
 
