@@ -5,10 +5,16 @@ find_path(SVG_INCLUDE_DIRS resvg.h)
 #
 if (NOT SVG_LIBRARY OR NOT SVG_INCLUDE_DIRS)
     set(SVG_LIBRARY "")
-    find_path(SVG_INCLUDE_DIRS nanosvg/nanosvg.h ${SAIL_CODEC_SVG_REQUIRED_OPTION})
+    # Don't use SAIL_CODEC_SVG_REQUIRED_OPTION as it requires CMake 3.18
+    #
+    find_path(SVG_INCLUDE_DIRS nanosvg/nanosvg.h)
 
     if (NOT SVG_INCLUDE_DIRS)
-        return()
+        if (SAIL_CODEC_SVG_REQUIRED_OPTION STREQUAL "REQUIRED")
+            message(FATAL_ERROR "SVG: Missing dependencies")
+        else()
+            return()
+        endif()
     endif()
 else()
     set(SAIL_RESVG ON)

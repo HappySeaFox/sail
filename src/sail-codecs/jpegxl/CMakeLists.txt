@@ -1,9 +1,15 @@
-find_library(JPEGXL_LIBRARY jxl                 NAMES jxl jxl-static                 ${SAIL_CODEC_JPEGXL_REQUIRED_OPTION})
-find_library(JPEGXL_THREADS_LIBRARY jxl_threads NAMES jxl_threads jxl_threads-static ${SAIL_CODEC_JPEGXL_REQUIRED_OPTION})
-find_path(JPEGXL_INCLUDE_DIRS jxl/decode.h                                           ${SAIL_CODEC_JPEGXL_REQUIRED_OPTION})
+# Don't use SAIL_CODEC_JPEGXL_REQUIRED_OPTION as it requires CMake 3.18
+#
+find_library(JPEGXL_LIBRARY jxl                 NAMES jxl jxl-static)
+find_library(JPEGXL_THREADS_LIBRARY jxl_threads NAMES jxl_threads jxl_threads-static)
+find_path(JPEGXL_INCLUDE_DIRS jxl/decode.h)
 
 if (NOT JPEGXL_LIBRARY OR NOT JPEGXL_THREADS_LIBRARY OR NOT JPEGXL_INCLUDE_DIRS)
-    return()
+    if (SAIL_CODEC_JPEGXL_REQUIRED_OPTION STREQUAL "REQUIRED")
+        message(FATAL_ERROR "JPEGXL: Missing dependencies")
+    else()
+        return()
+    endif()
 endif()
 
 # Find dependencies for static builds as libjxl doesn't provide CMake configs
