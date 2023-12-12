@@ -10,7 +10,7 @@ function(sail_check_openmp)
         # The default OpenMP implementation in MSVC 2022 still supports 2.0,
         # so switch to the LLVM option with OpenMP 3.1.
         #
-        if (MSVC)
+        if (MSVC AND NOT CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
             set(SAIL_OPENMP_FLAGS "/openmp:llvm" CACHE INTERNAL "")
         else()
             set(SAIL_OPENMP_FLAGS ${OpenMP_C_FLAGS} CACHE INTERNAL "")
