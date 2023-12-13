@@ -5,7 +5,7 @@ macro(sail_enable_asan)
 
     # Enable ASAN on the specified target in DEV mode only. We try to compile and run
     # a test program with -fsanitize=address as ASAN may be accessible in MSVC 2019 on Windows 7,
-    # but the resulting program fails to run due to mising symbols in kernel32.
+    # but the resulting program fails to run due to missing symbols in kernel32.
     #
     if (SAIL_DEV)
         if (NOT MSVC OR MSVC_TOOLSET_VERSION GREATER 141)
