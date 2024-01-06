@@ -1,7 +1,0 @@
-#!/usr/bin/make -f
-
-%:
-	dh $@ --parallel
-
-override_dh_auto_configure:
-	dh_auto_configure -- -DSAIL_BUILD_APPS=OFF -DSAIL_BUILD_EXAMPLES=OFF

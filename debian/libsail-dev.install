@@ -1,5 +1,0 @@
-usr/include/sail/sail
-usr/lib/*/libsail.so
-usr/lib/*/pkgconfig/sail.pc
-usr/lib/cmake/sail/SailConfig*.cmake
-usr/lib/cmake/sail/SailTargets*.cmake
