@@ -15,6 +15,7 @@ addons:
       - libomp
       - libpng
       - libtiff
+      - resvg
       - webp
   apt:
     packages:
