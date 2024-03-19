@@ -97,6 +97,9 @@ dynamically loaded plugins." OFF "BUILD_SHARED_LIBS" ON)
 option(SAIL_THIRD_PARTY_CODECS_PATH "Enable loading third-party codecs from the ';'-separated paths specified in \
 the SAIL_THIRD_PARTY_CODECS_PATH environment variable." ON)
 option(SAIL_THREAD_SAFE "Enable working in multi-threaded environments by locking the internal context with a mutex." ON)
+if (WIN32)
+    option(SAIL_WINDOWS_UTF8_PATHS "Convert file paths to UTF-8 on Windows." ON)
+endif()
 
 if (SAIL_ENABLE_OPENMP)
     sail_check_openmp()

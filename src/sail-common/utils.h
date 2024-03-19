@@ -255,6 +255,15 @@ SAIL_EXPORT uint32_t sail_reverse_uint32(uint32_t v);
  */
 SAIL_EXPORT uint64_t sail_reverse_uint64(uint64_t v);
 
+/*
+ * Converts a character string to a UTF-16 string. Available on Windows only.
+ *
+ * Returns SAIL_OK on success.
+ */
+#ifdef SAIL_WINDOWS_UTF8_PATHS
+SAIL_EXPORT sail_status_t sail_multibyte_to_wchar(const char *str, wchar_t **wstr);
+#endif
+
 /* extern "C" */
 #ifdef __cplusplus
 }

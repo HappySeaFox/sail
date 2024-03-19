@@ -549,10 +549,22 @@ bool sail_path_exists(const char *path) {
         return false;
     }
 
-#ifdef _MSC_VER
-    return _access(path, 0) == 0;
+#ifdef SAIL_WINDOWS_UTF8_PATHS
+    wchar_t *wpath;
+    SAIL_TRY_OR_EXECUTE(sail_multibyte_to_wchar(path, &wpath),
+                        /* on error */ return false);
+
+    bool result = _waccess(wpath, 0) == 0;
+
+    sail_free(wpath);
+
+    return result;
 #else
-    return access(path, 0) == 0;
+    #ifdef _MSC_VER
+        return _access(path, 0) == 0;
+    #else
+        return access(path, 0) == 0;
+    #endif
 #endif
 }
 
@@ -563,22 +575,39 @@ bool sail_is_dir(const char *path) {
         return false;
     }
 
-#ifdef _MSC_VER
+#ifdef SAIL_WINDOWS_UTF8_PATHS
+    wchar_t *wpath;
+    SAIL_TRY_OR_EXECUTE(sail_multibyte_to_wchar(path, &wpath),
+                        /* on error */ return false);
+
     struct _stat attrs;
 
-    if (_stat(path, &attrs) != 0) {
+    if (_wstat(wpath, &attrs) != 0) {
+        sail_free(wpath);
         return false;
     }
+
+    sail_free(wpath);
 
     return (attrs.st_mode & _S_IFMT) == _S_IFDIR;
 #else
-    struct stat attrs;
+    #ifdef _MSC_VER
+        struct _stat attrs;
 
-    if (stat(path, &attrs) != 0) {
-        return false;
-    }
+        if (_stat(path, &attrs) != 0) {
+            return false;
+        }
 
-    return S_ISDIR(attrs.st_mode);
+        return (attrs.st_mode & _S_IFMT) == _S_IFDIR;
+    #else
+        struct stat attrs;
+
+        if (stat(path, &attrs) != 0) {
+            return false;
+        }
+
+        return S_ISDIR(attrs.st_mode);
+    #endif
 #endif
 }
 
@@ -589,22 +618,39 @@ bool sail_is_file(const char *path) {
         return false;
     }
 
-#ifdef _MSC_VER
+#ifdef SAIL_WINDOWS_UTF8_PATHS
+    wchar_t *wpath;
+    SAIL_TRY_OR_EXECUTE(sail_multibyte_to_wchar(path, &wpath),
+                        /* on error */ return false);
+
     struct _stat attrs;
 
-    if (_stat(path, &attrs) != 0) {
+    if (_wstat(wpath, &attrs) != 0) {
+        sail_free(wpath);
         return false;
     }
+
+    sail_free(wpath);
 
     return (attrs.st_mode & _S_IFMT) == _S_IFREG;
 #else
-    struct stat attrs;
+    #ifdef _MSC_VER
+        struct _stat attrs;
 
-    if (stat(path, &attrs) != 0) {
-        return false;
-    }
+        if (_stat(path, &attrs) != 0) {
+            return false;
+        }
 
-    return S_ISREG(attrs.st_mode);
+        return (attrs.st_mode & _S_IFMT) == _S_IFREG;
+    #else
+        struct stat attrs;
+
+        if (stat(path, &attrs) != 0) {
+            return false;
+        }
+
+        return S_ISREG(attrs.st_mode);
+    #endif
 #endif
 }
 
@@ -614,30 +660,47 @@ sail_status_t sail_file_size(const char *path, size_t *size) {
 
     bool is_file;
 
-#ifdef _MSC_VER
+#ifdef SAIL_WINDOWS_UTF8_PATHS
+    wchar_t *wpath;
+    SAIL_TRY_OR_EXECUTE(sail_multibyte_to_wchar(path, &wpath),
+                        /* on error */ return false);
+
     struct _stat attrs;
 
-    if (_stat(path, &attrs) != 0) {
+    if (_wstat(wpath, &attrs) != 0) {
+        sail_free(wpath);
         return false;
     }
+
+    sail_free(wpath);
 
     is_file = (attrs.st_mode & _S_IFMT) == _S_IFREG;
 #else
-    struct stat attrs;
+    #ifdef _MSC_VER
+        struct _stat attrs;
 
-    if (stat(path, &attrs) != 0) {
-        return false;
-    }
+        if (_stat(path, &attrs) != 0) {
+            return false;
+        }
 
-    is_file = S_ISREG(attrs.st_mode);
+        is_file = (attrs.st_mode & _S_IFMT) == _S_IFREG;
+    #else
+        struct stat attrs;
+
+        if (stat(path, &attrs) != 0) {
+            return false;
+        }
+
+        is_file = S_ISREG(attrs.st_mode);
+    #endif
 #endif
 
-    if (!is_file) {
+    if (is_file) {
+        *size = attrs.st_size;
+    } else {
         SAIL_LOG_ERROR("'%s' is not a file", path);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_OPEN_FILE);
     }
-
-    *size = attrs.st_size;
 
     return SAIL_OK;
 }
@@ -650,10 +713,20 @@ sail_status_t sail_file_contents_into_data(const char *path, void *data) {
     size_t size;
     SAIL_TRY(sail_file_size(path, &size));
 
-#ifdef _MSC_VER
-    FILE *f = _fsopen(path, "rb", _SH_DENYWR);
+#ifdef SAIL_WINDOWS_UTF8_PATHS
+    /* FIXME: We convert to UTF-8 twice, in sail_file_size() and here. */
+    wchar_t *wpath;
+    SAIL_TRY(sail_multibyte_to_wchar(path, &wpath));
+
+    FILE *f = _wfsopen(wpath, L"rb", _SH_DENYWR);
+
+    sail_free(wpath);
 #else
-    FILE *f = fopen(path, "rb");
+    #ifdef _MSC_VER
+        FILE *f = _fsopen(path, "rb", _SH_DENYWR);
+    #else
+        FILE *f = fopen(path, "rb");
+    #endif
 #endif
 
     if (f == NULL) {
@@ -810,3 +883,35 @@ uint64_t sail_reverse_uint64(uint64_t v)
                      (view[7] << 0);
 #endif
 }
+
+#ifdef SAIL_WINDOWS_UTF8_PATHS
+sail_status_t sail_multibyte_to_wchar(const char *str, wchar_t **wstr) {
+
+    SAIL_CHECK_PTR(str);
+    SAIL_CHECK_PTR(wstr);
+
+    /* Detect buffer size. */
+    int chars_needed = MultiByteToWideChar(CP_UTF8, 0, str, -1, NULL, 0);
+
+    if (chars_needed <= 0) {
+        SAIL_LOG_ERROR("MultiByteToWideChar() failed. Error: 0x%X", GetLastError());
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+    }
+
+    wchar_t *wstr_local;
+    SAIL_TRY(sail_malloc(chars_needed, &wstr_local));
+
+    /* Actually convert. */
+    int result = MultiByteToWideChar(CP_UTF8, 0, str, -1, wstr_local, chars_needed);
+
+    if (result <= 0) {
+        sail_free(wstr_local);
+        SAIL_LOG_ERROR("MultiByteToWideChar() failed. Error: 0x%X", GetLastError());
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+    }
+
+    *wstr = wstr_local;
+
+    return SAIL_OK;
+}
+#endif
