@@ -899,7 +899,7 @@ sail_status_t sail_multibyte_to_wchar(const char *str, wchar_t **wstr) {
     }
 
     wchar_t *wstr_local;
-    SAIL_TRY(sail_malloc(chars_needed, &wstr_local));
+    SAIL_TRY(sail_malloc(chars_needed * sizeof(wchar_t), &wstr_local));
 
     /* Actually convert. */
     int result = MultiByteToWideChar(CP_UTF8, 0, str, -1, wstr_local, chars_needed);
