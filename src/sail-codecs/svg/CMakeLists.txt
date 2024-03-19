@@ -55,6 +55,8 @@ endif()
 #
 if (NOT SAIL_RESVG)
     set(SVG_LIBRARY "")
+    set(SVG_INCLUDE_DIRS "")
+
     # Don't use SAIL_CODEC_SVG_REQUIRED_OPTION as it requires CMake 3.18
     #
     find_path(SVG_INCLUDE_DIRS nanosvg/nanosvg.h)
