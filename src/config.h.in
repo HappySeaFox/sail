@@ -90,4 +90,6 @@
 /* OpenMP scheduling algorithm. */
 #cmakedefine SAIL_OPENMP_SCHEDULE @SAIL_OPENMP_SCHEDULE@
 
+#cmakedefine SAIL_WINDOWS_UTF8_PATHS
+
 #endif
