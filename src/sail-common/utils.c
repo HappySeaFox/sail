@@ -34,6 +34,7 @@
 
 #ifdef SAIL_WIN32
     #include <io.h>
+    #include <share.h> /* _SH_DENYWR */
     #include <windows.h>
 #else
     #include <errno.h>
