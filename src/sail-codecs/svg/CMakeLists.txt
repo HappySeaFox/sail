@@ -1,12 +1,12 @@
-find_library(SVG_LIBRARY resvg)
-find_path(SVG_INCLUDE_DIRS resvg.h)
+find_library(RESVG_LIBRARY resvg)
+find_path(RESVG_INCLUDE_DIRS resvg.h)
 
 # Check the ReSVG version is fresh enough
 #
-if (SVG_LIBRARY AND SVG_INCLUDE_DIRS)
+if (RESVG_LIBRARY AND RESVG_INCLUDE_DIRS)
     cmake_push_check_state(RESET)
-        set(CMAKE_REQUIRED_INCLUDES ${SVG_INCLUDE_DIRS})
-        set(CMAKE_REQUIRED_LIBRARIES ${SVG_LIBRARY})
+        set(CMAKE_REQUIRED_INCLUDES ${RESVG_INCLUDE_DIRS})
+        set(CMAKE_REQUIRED_LIBRARIES ${RESVG_LIBRARY})
 
         check_c_source_compiles(
             "
@@ -25,7 +25,7 @@ if (SVG_LIBRARY AND SVG_INCLUDE_DIRS)
         set(SAIL_RESVG ON)
 
         cmake_push_check_state(RESET)
-            set(CMAKE_REQUIRED_INCLUDES ${SVG_INCLUDE_DIRS})
+            set(CMAKE_REQUIRED_INCLUDES ${RESVG_INCLUDE_DIRS})
 
             check_c_source_compiles(
                 "
@@ -39,6 +39,9 @@ if (SVG_LIBRARY AND SVG_INCLUDE_DIRS)
             HAVE_RESVG_FIT_TO
             )
         cmake_pop_check_state()
+
+        set(SVG_LIBRARY ${RESVG_LIBRARY})
+        set(SVG_INCLUDE_DIRS ${RESVG_INCLUDE_DIRS})
 
         # This will add the following CMake rules to the CMake config for static builds so a client
         # application links against the required dependencies:
@@ -54,16 +57,15 @@ endif()
 # Fall back to NanoSVG
 #
 if (NOT SAIL_RESVG)
-    set(SVG_LIBRARY "")
-    set(SVG_INCLUDE_DIRS "")
-
     # Don't use SAIL_CODEC_SVG_REQUIRED_OPTION as it requires CMake 3.18
     #
-    find_path(SVG_INCLUDE_DIRS nanosvg/nanosvg.h)
+    find_path(NANOSVG_INCLUDE_DIRS nanosvg/nanosvg.h)
 
-    if (NOT SVG_INCLUDE_DIRS)
+    if (NANOSVG_INCLUDE_DIRS)
+        set(SVG_INCLUDE_DIRS ${NANOSVG_INCLUDE_DIRS})
+    else()
         if (SAIL_CODEC_SVG_REQUIRED_OPTION STREQUAL "REQUIRED")
-            message(FATAL_ERROR "SVG: Missing dependencies")
+            message(FATAL_ERROR "SVG: Missing dependencies (ReSVG or NanoSVG)")
         else()
             return()
         endif()
