@@ -58,7 +58,8 @@ static MunitResult test_image_create(const MunitParameter params[], void *user_d
     }
 
     {
-        void *pixels = "abcdef";
+        // Peek a random pointer
+        void *pixels = &user_data;
         sail::image image(pixels, SAIL_PIXEL_FORMAT_BPP24_RGB, 16, 16);
         munit_assert(image.pixel_format() == SAIL_PIXEL_FORMAT_BPP24_RGB);
         munit_assert_uint(image.width(), ==, 16);
@@ -68,7 +69,8 @@ static MunitResult test_image_create(const MunitParameter params[], void *user_d
     }
 
     {
-        void *pixels = "abcdef";
+        // Peek a random pointer
+        void *pixels = &user_data;
         sail::image image(pixels, SAIL_PIXEL_FORMAT_BPP24_RGB, 16, 16, 50);
         munit_assert(image.pixel_format() == SAIL_PIXEL_FORMAT_BPP24_RGB);
         munit_assert_uint(image.width(), ==, 16);
