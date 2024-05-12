@@ -97,13 +97,10 @@ image::image(SailPixelFormat pixel_format, unsigned width, unsigned height)
     set_pixel_format(pixel_format);
     set_bytes_per_line_auto();
 
-    const std::size_t pixels_size = static_cast<std::size_t>(this->height()) * this->bytes_per_line();
-    void *pixels;
+    d->pixels_size = static_cast<std::size_t>(height) * bytes_per_line();
 
-    SAIL_TRY_OR_EXECUTE(sail_malloc(pixels_size, &pixels),
+    SAIL_TRY_OR_EXECUTE(sail_malloc(d->pixels_size, &d->sail_image->pixels),
                         /* on error */ throw std::bad_alloc());
-
-    set_pixels(pixels, pixels_size);
 }
 
 image::image(SailPixelFormat pixel_format, unsigned width, unsigned height, unsigned bytes_per_line)
@@ -113,13 +110,10 @@ image::image(SailPixelFormat pixel_format, unsigned width, unsigned height, unsi
     set_pixel_format(pixel_format);
     set_bytes_per_line(bytes_per_line);
 
-    const std::size_t pixels_size = static_cast<std::size_t>(this->height()) * this->bytes_per_line();
-    void *pixels;
+    d->pixels_size = static_cast<std::size_t>(height) * bytes_per_line;
 
-    SAIL_TRY_OR_EXECUTE(sail_malloc(pixels_size, &pixels),
+    SAIL_TRY_OR_EXECUTE(sail_malloc(d->pixels_size, &d->sail_image->pixels),
                         /* on error */ throw std::bad_alloc());
-
-    set_pixels(pixels, pixels_size);
 }
 
 image::image(void *pixels, SailPixelFormat pixel_format, unsigned width, unsigned height)
