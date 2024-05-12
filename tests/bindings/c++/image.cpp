@@ -23,6 +23,8 @@
     SOFTWARE.
 */
 
+#include <utility> /* move */
+
 #include <sail-c++/sail-c++.h>
 
 #include "munit.h"
@@ -83,8 +85,77 @@ static MunitResult test_image_create(const MunitParameter params[], void *user_d
     return MUNIT_OK;
 }
 
+static MunitResult test_image_copy(const MunitParameter params[], void *user_data) {
+    (void)params;
+    (void)user_data;
+
+    {
+        sail::image image(SAIL_PIXEL_FORMAT_BPP24_RGB, 16, 16);
+        munit_assert_true(image.is_valid());
+
+        sail::image image_copy = image;
+        munit_assert(image_copy.pixel_format() == image.pixel_format());
+        munit_assert_uint(image_copy.width(), ==, image.width());
+        munit_assert_uint(image_copy.height(), ==, image.height());
+        munit_assert_uint(image_copy.bytes_per_line(), ==, image.bytes_per_line());
+        munit_assert_ptr_not_equal(image_copy.pixels(), image.pixels());
+        munit_assert_true(image_copy.is_valid());
+    }
+
+    {
+        char pixels[16*16*3];
+        sail::image image(pixels, SAIL_PIXEL_FORMAT_BPP24_RGB, 16, 16);
+        munit_assert_true(image.is_valid());
+
+        sail::image image_copy = image;
+        munit_assert(image_copy.pixel_format() == image.pixel_format());
+        munit_assert_uint(image_copy.width(), ==, image.width());
+        munit_assert_uint(image_copy.height(), ==, image.height());
+        munit_assert_uint(image_copy.bytes_per_line(), ==, image.bytes_per_line());
+        munit_assert_ptr_not_equal(image_copy.pixels(), image.pixels());
+        munit_assert_true(image_copy.is_valid());
+    }
+
+    return MUNIT_OK;
+}
+
+static MunitResult test_image_move(const MunitParameter params[], void *user_data) {
+    (void)params;
+    (void)user_data;
+
+    {
+        sail::image image(SAIL_PIXEL_FORMAT_BPP24_RGB, 16, 16);
+        munit_assert_true(image.is_valid());
+
+        sail::image image_copy = std::move(image);
+        munit_assert(image_copy.pixel_format() == SAIL_PIXEL_FORMAT_BPP24_RGB);
+        munit_assert_uint(image_copy.width(), ==, 16);
+        munit_assert_uint(image_copy.height(), ==, 16);
+        munit_assert_not_null(image_copy.pixels());
+        munit_assert_true(image_copy.is_valid());
+    }
+
+    {
+        char pixels[16*16*3];
+        sail::image image(pixels, SAIL_PIXEL_FORMAT_BPP24_RGB, 16, 16);
+        munit_assert_true(image.is_valid());
+
+        sail::image image_copy = std::move(image);
+
+        munit_assert(image_copy.pixel_format() == SAIL_PIXEL_FORMAT_BPP24_RGB);
+        munit_assert_uint(image_copy.width(), ==, 16);
+        munit_assert_uint(image_copy.height(), ==, 16);
+        munit_assert_not_null(image_copy.pixels());
+        munit_assert_true(image_copy.is_valid());
+    }
+
+    return MUNIT_OK;
+}
+
 static MunitTest test_suite_tests[] = {
     { (char *)"/create", test_image_create, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/copy",   test_image_copy,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/move",   test_image_move,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };
