@@ -90,6 +90,28 @@ image::image(const std::string &path)
     load(path);
 }
 
+image::image(SailPixelFormat pixel_format, unsigned width, unsigned height)
+    : image()
+{
+    set_dimensions(width, height);
+    set_pixel_format(pixel_format);
+    set_bytes_per_line_auto();
+
+    SAIL_TRY_OR_EXECUTE(sail_malloc(this->height() * bytes_per_line(), &d->sail_image->pixels),
+                        /* on error */ throw std::bad_alloc());
+}
+
+image::image(SailPixelFormat pixel_format, unsigned width, unsigned height, unsigned bytes_per_line)
+    : image()
+{
+    set_dimensions(width, height);
+    set_pixel_format(pixel_format);
+    set_bytes_per_line(bytes_per_line);
+
+    SAIL_TRY_OR_EXECUTE(sail_malloc(this->height() * this->bytes_per_line(), &d->sail_image->pixels),
+                        /* on error */ throw std::bad_alloc());
+}
+
 image::image(void *pixels, SailPixelFormat pixel_format, unsigned width, unsigned height)
     : image()
 {
