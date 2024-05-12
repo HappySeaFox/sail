@@ -60,14 +60,14 @@ sail_status_t pcx_private_read_header(struct sail_io *io, struct SailPcxHeader *
     return SAIL_OK;
 }
 
-sail_status_t pcx_private_sail_pixel_format(unsigned bits_per_plane, unsigned planes, enum SailPcxPaletteInfo palette_info, enum SailPixelFormat *result) {
+sail_status_t pcx_private_sail_pixel_format(unsigned bits_per_plane, unsigned planes, enum SailPixelFormat *result) {
 
     switch (planes) {
         case 1: {
             switch (bits_per_plane) {
                 case 1: *result = SAIL_PIXEL_FORMAT_BPP1_INDEXED; return SAIL_OK;
                 case 4: *result = SAIL_PIXEL_FORMAT_BPP4_INDEXED; return SAIL_OK;
-                case 8: *result = (palette_info == SAIL_PCX_PALETTE_COLOR) ? SAIL_PIXEL_FORMAT_BPP8_INDEXED : SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE; return SAIL_OK;
+                case 8: *result = SAIL_PIXEL_FORMAT_BPP8_INDEXED; return SAIL_OK;
             }
             break;
         }

@@ -132,7 +132,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_pcx(void *state, st
     SAIL_TRY(pcx_private_sail_pixel_format(
                 pcx_state->pcx_header.bits_per_plane,
                 pcx_state->pcx_header.planes,
-                pcx_state->pcx_header.palette_info,
                 &pixel_format));
 
     struct sail_image *image_local;

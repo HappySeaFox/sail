@@ -47,12 +47,6 @@ enum SailPcxEncoding
     SAIL_PCX_RLE_ENCODING = 1,
 };
 
-enum SailPcxPaletteInfo
-{
-    SAIL_PCX_PALETTE_COLOR     = 1,
-    SAIL_PCX_PALETTE_GRAYSCALE = 2,
-};
-
 struct SailPcxHeader
 {
     uint8_t  id;
@@ -77,7 +71,7 @@ struct SailPcxHeader
 
 SAIL_HIDDEN sail_status_t pcx_private_read_header(struct sail_io *io, struct SailPcxHeader *header);
 
-SAIL_HIDDEN sail_status_t pcx_private_sail_pixel_format(unsigned bits_per_plane, unsigned planes, enum SailPcxPaletteInfo palette_info, enum SailPixelFormat *result);
+SAIL_HIDDEN sail_status_t pcx_private_sail_pixel_format(unsigned bits_per_plane, unsigned planes, enum SailPixelFormat *result);
 
 SAIL_HIDDEN sail_status_t pcx_private_build_palette(enum SailPixelFormat pixel_format, struct sail_io *io, uint8_t palette16[48], struct sail_palette **palette);
 
