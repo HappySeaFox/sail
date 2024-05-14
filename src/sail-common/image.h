@@ -223,6 +223,16 @@ SAIL_EXPORT sail_status_t sail_mirror_vertically(struct sail_image *image);
 SAIL_EXPORT sail_status_t sail_mirror_horizontally(struct sail_image *image);
 
 /*
+ * Mirrors the image horizontally or vertically.
+ *
+ * Only SAIL_ORIENTATION_MIRRORED_HORIZONTALLY and SAIL_ORIENTATION_MIRRORED_VERTICALLY
+ * values are accepted.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_mirror(struct sail_image *image, enum SailOrientation orientation);
+
+/*
  * Returns the scan line at the given row.
  * Return NULL if the image or its pixels is NULL.
  */

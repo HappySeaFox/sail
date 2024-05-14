@@ -175,42 +175,61 @@ sail_status_t sail_check_image_valid(const struct sail_image *image)
 
 sail_status_t sail_mirror_vertically(struct sail_image *image) {
 
-    SAIL_TRY(sail_check_image_valid(image));
-
-    void *line;
-    SAIL_TRY(sail_malloc(image->bytes_per_line, &line));
-
-    for (unsigned row1 = 0, row2 = image->height - 1; row1 < row2; row1++, row2--) {
-        memcpy(line,                        sail_scan_line(image, row1), image->bytes_per_line);
-        memcpy(sail_scan_line(image, row1), sail_scan_line(image, row2), image->bytes_per_line);
-        memcpy(sail_scan_line(image, row2), line,                        image->bytes_per_line);
-    }
-
-    sail_free(line);
+    SAIL_TRY(sail_mirror(image, SAIL_ORIENTATION_MIRRORED_VERTICALLY));
 
     return SAIL_OK;
 }
 
 sail_status_t sail_mirror_horizontally(struct sail_image *image) {
 
-    SAIL_TRY(sail_check_image_valid(image));
+    SAIL_TRY(sail_mirror(image, SAIL_ORIENTATION_MIRRORED_HORIZONTALLY));
 
-    const unsigned bytes_per_pixel = (sail_bits_per_pixel(image->pixel_format) + 7) / 8;
+    return SAIL_OK;
+}
 
-    void *pixel;
-    SAIL_TRY(sail_malloc(bytes_per_pixel, &pixel));
+sail_status_t sail_mirror(struct sail_image *image, enum SailOrientation orientation)
+{
+    switch (orientation) {
+        case SAIL_ORIENTATION_MIRRORED_VERTICALLY: {
+            SAIL_TRY(sail_check_image_valid(image));
 
-    for (unsigned row = 0; row < image->height; row++) {
-        unsigned char *scan = sail_scan_line(image, row);
+            void *line;
+            SAIL_TRY(sail_malloc(image->bytes_per_line, &line));
 
-        for (unsigned col1 = 0, col2 = image->width - bytes_per_pixel; col1 < col2; col1 += bytes_per_pixel, col2 -= bytes_per_pixel) {
-            memcpy(pixel,       scan + col1, bytes_per_pixel);
-            memcpy(scan + col1, scan + col2, bytes_per_pixel);
-            memcpy(scan + col2, pixel,       bytes_per_pixel);
+            for (unsigned row1 = 0, row2 = image->height - 1; row1 < row2; row1++, row2--) {
+                memcpy(line,                        sail_scan_line(image, row1), image->bytes_per_line);
+                memcpy(sail_scan_line(image, row1), sail_scan_line(image, row2), image->bytes_per_line);
+                memcpy(sail_scan_line(image, row2), line,                        image->bytes_per_line);
+            }
+
+            sail_free(line);
+            break;
+        }
+        case SAIL_ORIENTATION_MIRRORED_HORIZONTALLY: {
+            SAIL_TRY(sail_check_image_valid(image));
+
+            const unsigned bytes_per_pixel = (sail_bits_per_pixel(image->pixel_format) + 7) / 8;
+
+            void *pixel;
+            SAIL_TRY(sail_malloc(bytes_per_pixel, &pixel));
+
+            for (unsigned row = 0; row < image->height; row++) {
+                unsigned char *scan = sail_scan_line(image, row);
+
+                for (unsigned col1 = 0, col2 = image->width - bytes_per_pixel; col1 < col2; col1 += bytes_per_pixel, col2 -= bytes_per_pixel) {
+                    memcpy(pixel,       scan + col1, bytes_per_pixel);
+                    memcpy(scan + col1, scan + col2, bytes_per_pixel);
+                    memcpy(scan + col2, pixel,       bytes_per_pixel);
+                }
+            }
+
+            sail_free(pixel);
+            break;
+        }
+        default: {
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
         }
     }
-
-    sail_free(pixel);
 
     return SAIL_OK;
 }
