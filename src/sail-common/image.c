@@ -208,7 +208,14 @@ sail_status_t sail_mirror(struct sail_image *image, enum SailOrientation orienta
         case SAIL_ORIENTATION_MIRRORED_HORIZONTALLY: {
             SAIL_TRY(sail_check_image_valid(image));
 
-            const unsigned bytes_per_pixel = (sail_bits_per_pixel(image->pixel_format) + 7) / 8;
+            const unsigned bits_per_pixel = sail_bits_per_pixel(image->pixel_format);
+
+            if (bits_per_pixel % 8 != 0) {
+                SAIL_LOG_ERROR("Only byte-aligned pixels are supported for the horizontal mirroring");
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+            }
+
+            const unsigned bytes_per_pixel = bits_per_pixel / 8;
 
             void *pixel;
             SAIL_TRY(sail_malloc(bytes_per_pixel, &pixel));
@@ -216,7 +223,7 @@ sail_status_t sail_mirror(struct sail_image *image, enum SailOrientation orienta
             for (unsigned row = 0; row < image->height; row++) {
                 unsigned char *scan = sail_scan_line(image, row);
 
-                for (unsigned col1 = 0, col2 = image->width - bytes_per_pixel; col1 < col2; col1 += bytes_per_pixel, col2 -= bytes_per_pixel) {
+                for (unsigned col1 = 0, col2 = (image->width - 1) * bytes_per_pixel; col1 < col2; col1 += bytes_per_pixel, col2 -= bytes_per_pixel) {
                     memcpy(pixel,       scan + col1, bytes_per_pixel);
                     memcpy(scan + col1, scan + col2, bytes_per_pixel);
                     memcpy(scan + col2, pixel,       bytes_per_pixel);

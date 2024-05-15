@@ -216,7 +216,8 @@ SAIL_EXPORT sail_status_t sail_check_image_valid(const struct sail_image *image)
 SAIL_EXPORT sail_status_t sail_mirror_vertically(struct sail_image *image);
 
 /*
- * Mirrors the image horizontally.
+ * Mirrors the image horizontally. The image pixel size must be a multiple of 8,
+ * e.g. 8, 16, 24 etc.
  *
  * Returns SAIL_OK on success.
  */
@@ -226,7 +227,8 @@ SAIL_EXPORT sail_status_t sail_mirror_horizontally(struct sail_image *image);
  * Mirrors the image horizontally or vertically.
  *
  * Only SAIL_ORIENTATION_MIRRORED_HORIZONTALLY and SAIL_ORIENTATION_MIRRORED_VERTICALLY
- * values are accepted.
+ * values are accepted. When mirroring horizontally, the image pixel size must be a multiple of 8,
+ * e.g. 8, 16, 24 etc.
  *
  * Returns SAIL_OK on success.
  */
