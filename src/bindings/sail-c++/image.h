@@ -582,6 +582,17 @@ public:
     SailPixelFormat closest_pixel_format(const sail::save_features &save_features) const;
 
     /*
+     * Mirrors the image horizontally or vertically.
+     *
+     * Only SAIL_ORIENTATION_MIRRORED_HORIZONTALLY and SAIL_ORIENTATION_MIRRORED_VERTICALLY
+     * values are accepted. When mirroring horizontally, the image pixel size must be a multiple of 8,
+     * e.g. 8, 16, 24 etc.
+     *
+     * Returns SAIL_OK on success.
+     */
+    sail_status_t mirror(SailOrientation orientation);
+
+    /*
      * Returns true if the conversion or updating functions can convert or update from the input
      * pixel format to the output pixel format.
      */

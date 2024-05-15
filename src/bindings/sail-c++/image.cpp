@@ -574,6 +574,13 @@ SailPixelFormat image::closest_pixel_format(const sail::save_features &save_feat
     return sail_closest_pixel_format(d->sail_image->pixel_format, save_features.pixel_formats().data(), save_features.pixel_formats().size());
 }
 
+sail_status_t image::mirror(SailOrientation orientation)
+{
+    SAIL_TRY(sail_mirror(d->sail_image, orientation));
+
+    return SAIL_OK;
+}
+
 bool image::can_convert(SailPixelFormat input_pixel_format, SailPixelFormat output_pixel_format)
 {
     return sail_can_convert(input_pixel_format, output_pixel_format);
