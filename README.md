@@ -166,12 +166,6 @@ It's pretty easy, isn't it? :smile: See also [FAQ](FAQ.md).
 - Access to source pixel data (supported by the most codecs)
 - Access to the image properties w/o decoding pixel data (probing)
 
-## Development status
-
-SAIL is ready for every day use. However, it's still under heavy development. The API can be changed at any time
-breaking binary and source compatibility. Consider opening a GitHub [issue](https://github.com/HappySeaFox/sail/issues)
-if you have any feature requests or issue reports. Your help (pull requests etc.) is highly welcomed.
-
 ## Have questions or issues?
 
 Opening a GitHub [issue](https://github.com/HappySeaFox/sail/issues) is the preferred way
