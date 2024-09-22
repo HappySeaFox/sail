@@ -193,10 +193,6 @@ if (WIN32)
     set(SAIL_WIN32 ON)
 endif()
 
-if (UNIX)
-    set(SAIL_UNIX ON)
-endif()
-
 if (MINGW)
     set(SAIL_MINGW ON)
 endif()
@@ -207,6 +203,10 @@ endif()
 
 if (APPLE)
     set(SAIL_APPLE ON)
+endif()
+
+if (UNIX)
+    set(SAIL_UNIX ON)
 endif()
 
 # Codecs & icons paths
