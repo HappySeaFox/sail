@@ -349,14 +349,14 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_jpeg(void *state, c
     /* Save meta data. */
     if (jpeg_state->save_options->options & SAIL_OPTION_META_DATA && image->meta_data_node != NULL) {
         SAIL_TRY(jpeg_private_write_meta_data(jpeg_state->compress_context, image->meta_data_node));
-        SAIL_LOG_DEBUG("JPEG: Meta data has been written");
+        SAIL_LOG_TRACE("JPEG: Meta data has been written");
     }
 
     /* Save ICC profile. */
 #ifdef SAIL_HAVE_JPEG_ICCP
     if (jpeg_state->save_options->options & SAIL_OPTION_ICCP && image->iccp != NULL) {
         jpeg_write_icc_profile(jpeg_state->compress_context, image->iccp->data, (unsigned)image->iccp->size);
-        SAIL_LOG_DEBUG("JPEG: ICC profile has been written");
+        SAIL_LOG_TRACE("JPEG: ICC profile has been written");
     }
 #endif
 

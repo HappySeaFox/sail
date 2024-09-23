@@ -264,9 +264,9 @@ sail_status_t bmp_private_read_init(struct sail_io *io, const struct sail_load_o
                                                     &bmp_state->source_pixel_format));
 
     if (bmp_state->version < SAIL_BMP_V3) {
-        SAIL_LOG_DEBUG("BMP: Version(%d)", bmp_state->version);
+        SAIL_LOG_TRACE("BMP: Version(%d)", bmp_state->version);
     } else {
-        SAIL_LOG_DEBUG("BMP: Version(%d), compression(%u)", bmp_state->version, bmp_state->v3.compression);
+        SAIL_LOG_TRACE("BMP: Version(%d), compression(%u)", bmp_state->version, bmp_state->v3.compression);
     }
 
     /* Read palette.  */

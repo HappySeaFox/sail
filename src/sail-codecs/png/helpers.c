@@ -391,11 +391,11 @@ sail_status_t png_private_write_meta_data(png_structp png_ptr, png_infop info_pt
                 if (meta_data->value->type == SAIL_VARIANT_TYPE_DATA) {
                     /* Skip "Exif\0\0" if any. */
                     if (meta_data->value->size >= 4 && memcmp(sail_variant_to_data(meta_data->value), "Exif", 4) == 0) {
-                        SAIL_LOG_DEBUG("PNG: Saving raw EXIF %u bytes long w/o header", (unsigned)meta_data->value->size - 6);
+                        SAIL_LOG_TRACE("PNG: Saving raw EXIF %u bytes long w/o header", (unsigned)meta_data->value->size - 6);
                         png_set_eXIf_1(png_ptr, info_ptr, (png_uint_32)meta_data->value->size - 6,
                                         ((png_bytep)sail_variant_to_data(meta_data->value)) + 6);
                     } else {
-                        SAIL_LOG_DEBUG("PNG: Saving raw EXIF %u bytes long", (unsigned)meta_data->value->size);
+                        SAIL_LOG_TRACE("PNG: Saving raw EXIF %u bytes long", (unsigned)meta_data->value->size);
                         png_set_eXIf_1(png_ptr, info_ptr, (png_uint_32)meta_data->value->size, meta_data->value->value);
                     }
                 } else {
@@ -478,9 +478,9 @@ sail_status_t png_private_fetch_iccp(png_structp png_ptr, png_infop info_ptr, st
 
     if (ok) {
         SAIL_TRY(sail_alloc_iccp_from_data(data, data_size, iccp));
-        SAIL_LOG_DEBUG("PNG: Found ICC profile '%s' %u bytes long", name, data_size);
+        SAIL_LOG_TRACE("PNG: Found ICC profile '%s' %u bytes long", name, data_size);
     } else {
-        SAIL_LOG_DEBUG("PNG: ICC profile is not found");
+        SAIL_LOG_TRACE("PNG: ICC profile is not found");
     }
 
     return SAIL_OK;

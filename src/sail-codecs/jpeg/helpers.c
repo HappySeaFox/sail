@@ -148,7 +148,7 @@ sail_status_t jpeg_private_fetch_iccp(struct jpeg_decompress_struct *decompress_
     JOCTET *data = NULL;
     unsigned data_size = 0;
 
-    SAIL_LOG_DEBUG("JPEG: ICC profile is %sfound",
+    SAIL_LOG_TRACE("JPEG: ICC profile is %sfound",
                    jpeg_read_icc_profile(decompress_context, &data, &data_size)
                    ? "" : "not ");
 

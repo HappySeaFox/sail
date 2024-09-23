@@ -301,12 +301,12 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_tiff(void *state, c
     /* Save ICC profile. */
     if (tiff_state->save_options->options & SAIL_OPTION_ICCP && image->iccp != NULL) {
         TIFFSetField(tiff_state->tiff, TIFFTAG_ICCPROFILE, image->iccp->size, image->iccp->data);
-        SAIL_LOG_DEBUG("TIFF: ICC profile has been saved");
+        SAIL_LOG_TRACE("TIFF: ICC profile has been saved");
     }
 
     /* Save meta data. */
     if (tiff_state->save_options->options & SAIL_OPTION_META_DATA && image->meta_data_node != NULL) {
-        SAIL_LOG_DEBUG("TIFF: Saving meta data");
+        SAIL_LOG_TRACE("TIFF: Saving meta data");
         SAIL_TRY(tiff_private_write_meta_data(tiff_state->tiff, image->meta_data_node));
     }
 

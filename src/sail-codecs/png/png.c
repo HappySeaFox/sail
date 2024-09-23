@@ -303,7 +303,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_png(void *state, st
     if (png_state->is_apng) {
         /* APNG feature: a hidden frame. */
         if (!png_state->skipped_hidden && png_get_first_frame_is_hidden(png_state->png_ptr, png_state->info_ptr)) {
-            SAIL_LOG_DEBUG("PNG: Skipping hidden frame");
+            SAIL_LOG_TRACE("PNG: Skipping hidden frame");
             SAIL_TRY_OR_CLEANUP(png_private_skip_hidden_frame(png_state->first_image->bytes_per_line,
                                                                png_state->first_image->height,
                                                                png_state->png_ptr,
@@ -531,7 +531,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_png(void *state, co
     /* Save meta data. */
     if (png_state->save_options->options & SAIL_OPTION_META_DATA && image->meta_data_node != NULL) {
         SAIL_TRY(png_private_write_meta_data(png_state->png_ptr, png_state->info_ptr, image->meta_data_node));
-        SAIL_LOG_DEBUG("PNG: Meta data has been written");
+        SAIL_LOG_TRACE("PNG: Meta data has been written");
     }
 
     png_set_IHDR(png_state->png_ptr,
@@ -556,7 +556,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_png(void *state, co
                         (const png_bytep)image->iccp->data,
                         (unsigned)image->iccp->size);
 
-        SAIL_LOG_DEBUG("PNG: ICC profile has been written");
+        SAIL_LOG_TRACE("PNG: ICC profile has been written");
     }
 
     /* Save palette. */
