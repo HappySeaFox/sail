@@ -37,6 +37,7 @@ Table of Contents
   * [Are there any bindings to other programming languages?](#are-there-any-bindings-to-other-programming-languages)
   * [How many image formats are you going to implement?](#how-many-image-formats-are-you-going-to-implement)
   * [I have problems with include paths with vcpkg without CMake](#i-have-problems-with-include-paths-with-vcpkg-without-cmake)
+  * [How to embed SAIL as a subproject?](#how-to-embed-sail-as-a-subproject)
   * [I have questions, issues, or proposals](#i-have-questions-issues-or-proposals)
 
 # SAIL Frequently Asked Questions (FAQ)
@@ -471,6 +472,11 @@ the most popular image formats will be definitely ported from ksquirrel-libs.
 
 Add `VcpkgInstalledDir/include/sail` to the project include path.
 See https://learn.microsoft.com/en-us/vcpkg/users/buildsystems/msbuild-integration.
+
+## How to embed SAIL as a subproject?
+
+Embedding SAIL is not fully supported. SAIL alters global CMake variables like `CMAKE_C_FLAGS`,
+so embedding it is not recommended. One of the possible options is to build SAIL separately.
 
 ## I have questions, issues, or proposals
 
