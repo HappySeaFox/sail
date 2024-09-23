@@ -79,6 +79,7 @@ option(SAIL_BUILD_APPS "Build applications." ON)
 option(SAIL_BUILD_EXAMPLES "Build examples." ON)
 option(SAIL_DEV "Enable developer mode. Be more strict when compiling source code, for example." OFF)
 option(SAIL_ENABLE_OPENMP "Enable OpenMP support if it's available in the compiler." ON)
+option(SAIL_BUILD_BINDINGS "Build the C++ and other bindings. Set to OFF if only building C code." ON)
 set(SAIL_ENABLE_CODECS "" CACHE STRING "Forcefully enable the codecs specified in this ';'-separated list. \
 If an enabled codec fails to find its dependencies, the configuration process fails. \
 One can also specify not just individual codecs but codec groups by their priority like that: highest-priority;xbm. \
@@ -141,9 +142,11 @@ set(CMAKE_C_EXTENSIONS OFF)
 
 # Enable strict C++11
 #
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
+if (SAIL_BUILD_BINDINGS)
+  set(CMAKE_CXX_STANDARD 11)
+  set(CMAKE_CXX_STANDARD_REQUIRED ON)
+  set(CMAKE_CXX_EXTENSIONS OFF)
+endif()
 
 # Build position-independent targets
 #
@@ -162,18 +165,26 @@ endif()
 if (MSVC)
     if (CMAKE_C_FLAGS MATCHES "/W[0-4]")
         string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+      if (SAIL_BUILD_BINDINGS)
         string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+      endif()
     else()
         string(APPEND CMAKE_C_FLAGS " " "/W4")
+      if (SAIL_BUILD_BINDINGS)
         string(APPEND CMAKE_CXX_FLAGS " " "/W4")
+      endif()
     endif()
 elseif (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID MATCHES "Clang")
     string(APPEND CMAKE_C_FLAGS " " "-Wall -Wextra")
+  if (SAIL_BUILD_BINDINGS)
     string(APPEND CMAKE_CXX_FLAGS " " "-Wall -Wextra")
+  endif()
 
     if (SAIL_DEV)
         string(APPEND CMAKE_C_FLAGS " " "-pedantic")
+      if (SAIL_BUILD_BINDINGS)
         string(APPEND CMAKE_CXX_FLAGS " " "-pedantic")
+      endif()
     endif()
 endif()
 
@@ -229,7 +240,10 @@ if (SAIL_COMBINE_CODECS)
 endif()
 add_subdirectory(src/sail)
 add_subdirectory(src/sail-manip)
-add_subdirectory(src/bindings/sail-c++)
+
+if (SAIL_BUILD_BINDINGS)
+  add_subdirectory(src/bindings/sail-c++)
+endif()
 
 if (SAIL_BUILD_APPS)
     add_subdirectory(examples/c/sail)
@@ -333,6 +347,7 @@ message("* Colored output:               ${SAIL_COLORED_OUTPUT}${SAIL_COLORED_OU
 message("* Build apps:                   ${SAIL_BUILD_APPS}")
 message("* Build examples:               ${SAIL_BUILD_EXAMPLES}")
 message("* Build SDL example:            ${SAIL_SDL_EXAMPLE}")
+message("* Build bindings:               ${SAIL_BUILD_BINDINGS}")
 message("* Build tests:                  ${BUILD_TESTING}")
 message("* Install PDB files:            ${SAIL_INSTALL_PDB}")
 message("*")
