@@ -59,7 +59,7 @@ foreach (tiff_codec IN LISTS TIFF_CODECS)
 
                 int main(int argc, char *argv[]) {
 
-                    TIFF *tiff = TIFFOpen(\"file.tiff\", \"w\");
+                    TIFF *tiff = TIFFOpen(\"${CMAKE_CURRENT_BINARY_DIR}/file.tiff\", \"w\");
 
                     if (tiff == NULL) {
                         return 1;
