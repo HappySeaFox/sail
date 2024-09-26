@@ -61,6 +61,8 @@ public:
      */
     explicit io_base(struct sail_io *sail_io);
 
+    ~io_base();
+
     /*
      * Returns the I/O stream features. See SailIoFeature.
      */
