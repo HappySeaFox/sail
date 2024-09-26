@@ -63,6 +63,11 @@ before_script:
         extra/build
       fi
     ;;
+    linux)
+      # Workaround ASAN bug in Jammy
+      # See https://github.com/google/sanitizers/issues/1614
+      sudo sysctl vm.mmap_rnd_bits=28
+    ;;
   esac
 
 script:
