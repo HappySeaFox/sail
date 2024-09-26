@@ -33,6 +33,10 @@ io_base::io_base(struct sail_io *sail_io)
 {
 }
 
+io_base::~io_base()
+{
+}
+
 int io_base::features() const
 {
     return d->sail_io_wrapper->features;
