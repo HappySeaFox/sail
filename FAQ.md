@@ -38,6 +38,7 @@ Table of Contents
   * [How many image formats are you going to implement?](#how-many-image-formats-are-you-going-to-implement)
   * [I have problems with include paths with vcpkg without CMake](#i-have-problems-with-include-paths-with-vcpkg-without-cmake)
   * [How to embed SAIL as a subproject?](#how-to-embed-sail-as-a-subproject)
+  * [Does SAIL support big\-endian platforms?](#does-sail-support-big-endian-platforms)
   * [I have questions, issues, or proposals](#i-have-questions-issues-or-proposals)
 
 # SAIL Frequently Asked Questions (FAQ)
@@ -477,6 +478,10 @@ See https://learn.microsoft.com/en-us/vcpkg/users/buildsystems/msbuild-integrati
 
 Embedding SAIL is not fully supported. SAIL alters global CMake variables like `CMAKE_C_FLAGS`,
 so embedding it is not recommended. One of the possible options is to build SAIL separately.
+
+## Does SAIL support big-endian platforms?
+
+No. Currently SAIL supports little-endian platforms only.
 
 ## I have questions, issues, or proposals
 
