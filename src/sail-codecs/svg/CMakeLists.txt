@@ -88,4 +88,12 @@ if (SAIL_RESVG)
     endif()
 else()
     target_compile_definitions(${SAIL_CODEC_TARGET} PRIVATE SAIL_NANOSVG)
+
+    # NanoSVG requires the math library
+    #
+    find_library(MATH_LIBRARY m)
+
+    if (MATH_LIBRARY)
+        target_link_libraries(${SAIL_CODEC_TARGET} PRIVATE ${MATH_LIBRARY})
+    endif()
 endif()
