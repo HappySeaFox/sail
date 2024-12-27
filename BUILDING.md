@@ -27,6 +27,8 @@ vcpkg install sail
 - `SAIL_ONLY_CODECS="a;b;c"` - Forcefully enable only the codecs specified in this ';'-separated list and disable the rest. If an enabled codec fails to find its dependencies, the configuration process fails. One can also specify not just individual codecs but codec groups by their priority like that: highest-priority;xbm. Default: empty list
 - `SAIL_OPENMP_SCHEDULE="dynamic"` - OpenMP scheduling algorithm. Default: dynamic
 
+- `BUILD_TESTING=ON|OFF` - Enable generation of tests using CTest. Default: `ON`
+
 ### Windows
 
 #### Tested environments
@@ -88,6 +90,13 @@ brew upgrade sail
 
 - LUbuntu 18.04 64-bit
 - LUbuntu 20.04 64-bit
+
+#### Package Managers
+
+SAIL is not always available in official distro repositories. Here is an incomplete list of available packages for various distributions:
+
+- Ubuntu 24.04 - `sudo apt-get install sail-codecs libsail-dev libsail-common-dev libsail-manip-dev libsail-c++-dev`
+- Arch User Repository - [`sail-img`](https://aur.archlinux.org/packages/sail-img)
 
 #### Build requirements
 
