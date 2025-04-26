@@ -142,15 +142,15 @@ const char* codec_info::codec_feature_to_string(SailCodecFeature codec_feature)
     return sail_codec_feature_to_string(codec_feature);
 }
 
-SailCodecFeature codec_info::codec_feature_from_string(const std::string &str)
+SailCodecFeature codec_info::codec_feature_from_string(const std::string_view str)
 {
-    return sail_codec_feature_from_string(str.c_str());
+    return sail_codec_feature_from_string(str.data());
 }
 
-codec_info codec_info::from_magic_number(const std::string &path)
+codec_info codec_info::from_magic_number(const std::string_view path)
 {
     const struct sail_codec_info *sail_codec_info;
-    SAIL_TRY_OR_EXECUTE(sail_codec_info_by_magic_number_from_path(path.c_str(), &sail_codec_info),
+    SAIL_TRY_OR_EXECUTE(sail_codec_info_by_magic_number_from_path(path.data(), &sail_codec_info),
                         /* on error */ return codec_info{});
 
     return codec_info(sail_codec_info);
@@ -176,28 +176,28 @@ codec_info codec_info::from_magic_number(sail::abstract_io &abstract_io)
     return codec_info(sail_codec_info);
 }
 
-codec_info codec_info::from_path(const std::string &path)
+codec_info codec_info::from_path(const std::string_view path)
 {
     const struct sail_codec_info *sail_codec_info;
-    SAIL_TRY_OR_EXECUTE(sail_codec_info_from_path(path.c_str(), &sail_codec_info),
+    SAIL_TRY_OR_EXECUTE(sail_codec_info_from_path(path.data(), &sail_codec_info),
                         /* on error */ return codec_info{});
 
     return codec_info(sail_codec_info);
 }
 
-codec_info codec_info::from_extension(const std::string &suffix)
+codec_info codec_info::from_extension(const std::string_view suffix)
 {
     const struct sail_codec_info *sail_codec_info;
-    SAIL_TRY_OR_EXECUTE(sail_codec_info_from_extension(suffix.c_str(), &sail_codec_info),
+    SAIL_TRY_OR_EXECUTE(sail_codec_info_from_extension(suffix.data(), &sail_codec_info),
                         /* on error */ return codec_info{});
 
     return codec_info(sail_codec_info);
 }
 
-codec_info codec_info::from_mime_type(const std::string &mime_type)
+codec_info codec_info::from_mime_type(const std::string_view mime_type)
 {
     const struct sail_codec_info *sail_codec_info;
-    SAIL_TRY_OR_EXECUTE(sail_codec_info_from_mime_type(mime_type.c_str(), &sail_codec_info),
+    SAIL_TRY_OR_EXECUTE(sail_codec_info_from_mime_type(mime_type.data(), &sail_codec_info),
                         /* on error */ return codec_info{});
 
     return codec_info(sail_codec_info);

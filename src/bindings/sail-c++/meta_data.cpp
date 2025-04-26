@@ -73,14 +73,14 @@ meta_data::meta_data(SailMetaData key, variant &&value) noexcept
     set_value(std::move(value));
 }
 
-meta_data::meta_data(const std::string &key_unknown, const variant &value)
+meta_data::meta_data(const std::string_view key_unknown, const variant &value)
     : meta_data()
 {
     set_key(key_unknown);
     set_value(value);
 }
 
-meta_data::meta_data(const std::string &key_unknown, variant &&value)
+meta_data::meta_data(const std::string_view key_unknown, variant &&value)
     : meta_data()
 {
     set_key(key_unknown);
@@ -150,7 +150,7 @@ void meta_data::set_key(SailMetaData key)
     d->key_unknown         = std::string{};
 }
 
-void meta_data::set_key(const std::string &key_unknown)
+void meta_data::set_key(const std::string_view key_unknown)
 {
     d->sail_meta_data->key = SAIL_META_DATA_UNKNOWN;
     d->key_unknown         = key_unknown;
@@ -177,9 +177,9 @@ const char* meta_data::meta_data_to_string(SailMetaData meta_data) {
     return sail_meta_data_to_string(meta_data);
 }
 
-SailMetaData meta_data::meta_data_from_string(const std::string &str) {
+SailMetaData meta_data::meta_data_from_string(const std::string_view str) {
 
-    return sail_meta_data_from_string(str.c_str());
+    return sail_meta_data_from_string(str.data());
 }
 
 static inline std::string empty_string_on_nullptr(const char *str) {

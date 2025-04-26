@@ -27,7 +27,7 @@
 #define SAIL_RESOLUTION_CPP_H
 
 #include <memory>
-#include <string>
+#include <string_view>
 
 #include <sail-common/common.h>
 #include <sail-common/export.h>
@@ -130,7 +130,7 @@ public:
      *
      * Returns SAIL_RESOLUTION_UNIT_UNKNOWN if the resolution unit is not known.
      */
-    static SailResolutionUnit resolution_unit_from_string(const std::string &str);
+    static SailResolutionUnit resolution_unit_from_string(const std::string_view str);
 
 private:
     /*

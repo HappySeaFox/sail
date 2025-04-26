@@ -28,6 +28,7 @@
 
 #include <memory>
 #include <string>
+#include <string_view>
 
 #include <sail-common/common.h>
 #include <sail-common/export.h>
@@ -71,13 +72,13 @@ public:
      * Constructs a new meta data entry out of the unknown meta data
      * string key and the value.
      */
-    meta_data(const std::string &key_unknown, const variant &value);
+    meta_data(const std::string_view key_unknown, const variant &value);
 
     /*
      * Constructs a new meta data entry out of the unknown meta data
      * string key and the value.
      */
-    meta_data(const std::string &key_unknown, variant &&value);
+    meta_data(const std::string_view key_unknown, variant &&value);
 
     /*
      * Constructs a new meta data entry out of the unknown meta data
@@ -137,7 +138,7 @@ public:
      * Sets a new unknown meta data string key representation. Resets the saved key to SAIL_META_DATA_UNKNOWN.
      * For example: "Person on the Image".
      */
-    void set_key(const std::string &key_unknown);
+    void set_key(const std::string_view key_unknown);
 
     /*
      * Sets a new unknown meta data string key representation. Resets the saved key to SAIL_META_DATA_UNKNOWN.
@@ -169,7 +170,7 @@ public:
      *
      * Returns SAIL_META_DATA_UNKNOWN if the meta data key is not known.
      */
-    static SailMetaData meta_data_from_string(const std::string &str);
+    static SailMetaData meta_data_from_string(const std::string_view str);
 
 private:
     /*

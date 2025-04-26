@@ -127,9 +127,9 @@ const char* resolution::resolution_unit_to_string(SailResolutionUnit resolution_
     return sail_resolution_unit_to_string(resolution_unit);
 }
 
-SailResolutionUnit resolution::resolution_unit_from_string(const std::string &str)
+SailResolutionUnit resolution::resolution_unit_from_string(const std::string_view str)
 {
-    return sail_resolution_unit_from_string(str.c_str());
+    return sail_resolution_unit_from_string(str.data());
 }
 
 resolution::resolution(const sail_resolution *res)

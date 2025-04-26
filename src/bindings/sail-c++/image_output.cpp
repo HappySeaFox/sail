@@ -89,7 +89,7 @@ sail_status_t image_output::pimpl::start()
     return SAIL_OK;
 }
 
-image_output::image_output(const std::string &path)
+image_output::image_output(const std::string_view path)
     : d(new pimpl(new io_file(path, io_file::Operation::ReadWrite), sail::codec_info::from_path(path)))
 {
 }

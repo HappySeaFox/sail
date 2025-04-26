@@ -84,7 +84,7 @@ image::image()
 {
 }
 
-image::image(const std::string &path)
+image::image(const std::string_view path)
     : image()
 {
     load(path);
@@ -334,7 +334,7 @@ void image::set_iccp(sail::iccp &&iccp) noexcept
     d->iccp = std::move(iccp);
 }
 
-sail_status_t image::load(const std::string &path)
+sail_status_t image::load(const std::string_view path)
 {
     image_input input(path);
 
@@ -346,7 +346,7 @@ sail_status_t image::load(const std::string &path)
     return SAIL_OK;
 }
 
-sail_status_t image::save(const std::string &path)
+sail_status_t image::save(const std::string_view path)
 {
     image_output output(path);
 
@@ -626,9 +626,9 @@ const char* image::pixel_format_to_string(SailPixelFormat pixel_format)
     return sail_pixel_format_to_string(pixel_format);
 }
 
-SailPixelFormat image::pixel_format_from_string(const std::string &str)
+SailPixelFormat image::pixel_format_from_string(const std::string_view str)
 {
-    return sail_pixel_format_from_string(str.c_str());
+    return sail_pixel_format_from_string(str.data());
 }
 
 const char* chroma_subsampling_to_string(SailChromaSubsampling chroma_subsampling)
@@ -636,7 +636,7 @@ const char* chroma_subsampling_to_string(SailChromaSubsampling chroma_subsamplin
     return sail_chroma_subsampling_to_string(chroma_subsampling);
 }
 
-SailChromaSubsampling chroma_subsampling_from_string(const std::string &str)
+SailChromaSubsampling chroma_subsampling_from_string(const std::string_view str)
 {
     return sail_chroma_subsampling_from_string(str.data());
 }
@@ -646,7 +646,7 @@ const char* image::orientation_to_string(SailOrientation orientation)
     return sail_orientation_to_string(orientation);
 }
 
-SailOrientation image::orientation_from_string(const std::string &str)
+SailOrientation image::orientation_from_string(const std::string_view str)
 {
     return sail_orientation_from_string(str.data());
 }
@@ -656,9 +656,9 @@ const char* image::compression_to_string(SailCompression compression)
     return sail_compression_to_string(compression);
 }
 
-SailCompression image::compression_from_string(const std::string &str)
+SailCompression image::compression_from_string(const std::string_view str)
 {
-    return sail_compression_from_string(str.c_str());
+    return sail_compression_from_string(str.data());
 }
 
 image::image(const sail_image *sail_image)

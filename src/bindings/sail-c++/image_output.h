@@ -28,7 +28,7 @@
 
 #include <cstddef> /* std::size_t */
 #include <memory>
-#include <string>
+#include <string_view>
 
 #include <sail-common/export.h>
 #include <sail-common/status.h>
@@ -53,7 +53,7 @@ public:
      * Constructs a new image output to the specified image file.
      * Detects the image format based on the file extension.
      */
-    explicit image_output(const std::string &path);
+    explicit image_output(const std::string_view path);
 
     /*
      * Constructs a new image output to the specified memory buffer.

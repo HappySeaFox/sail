@@ -28,7 +28,7 @@
 
 #include <cstddef> /* std::size_t */
 #include <memory>
-#include <string>
+#include <string_view>
 #include <tuple>
 
 #include <sail-common/export.h>
@@ -53,7 +53,7 @@ public:
     /*
      * Constructs a new image input from the specified image file.
      */
-    explicit image_input(const std::string &path);
+    explicit image_input(const std::string_view path);
 
     /*
      * Constructs a new image input from the specified memory buffer.

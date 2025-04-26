@@ -56,7 +56,7 @@ static MunitResult test_meta_data_create(const MunitParameter params[], void *us
     }
 
     {
-        const sail::meta_data meta_data("Unknown Key", sail::variant(std::string("Mike")));
+        const sail::meta_data meta_data(std::string("Unknown Key"), sail::variant(std::string("Mike")));
         munit_assert(meta_data.key_unknown() == "Unknown Key");
         munit_assert(meta_data.key()   == SAIL_META_DATA_UNKNOWN);
         munit_assert(meta_data.value() == sail::variant(std::string("Mike")));

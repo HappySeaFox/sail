@@ -27,7 +27,7 @@
 #define SAIL_UTILS_CPP_H
 
 #include <cstdint>
-#include <string>
+#include <string_view>
 
 #include <sail-common/export.h>
 #include <sail-common/status.h>
@@ -52,31 +52,31 @@ SAIL_EXPORT std::uint64_t now();
 /*
  * Returns true if the specified file system path exists.
  */
-SAIL_EXPORT bool path_exists(const std::string &path);
+SAIL_EXPORT bool path_exists(const std::string_view path);
 
 /*
  * Returns true if the specified file system path is a directory.
  */
-SAIL_EXPORT bool is_dir(const std::string &path);
+SAIL_EXPORT bool is_dir(const std::string_view path);
 
 /*
  * Returns true if the specified file system path is a regular file.
  */
-SAIL_EXPORT bool is_file(const std::string &path);
+SAIL_EXPORT bool is_file(const std::string_view path);
 
 /*
  * Retrieves the file size.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t file_size(const std::string &path, size_t *size);
+SAIL_EXPORT sail_status_t file_size(const std::string_view path, size_t *size);
 
 /*
  * Reads the specified file into the memory buffer. The memory buffer is resized to fit the contents.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t read_file_contents(const std::string &path, sail::arbitrary_data *contents);
+SAIL_EXPORT sail_status_t read_file_contents(const std::string_view path, sail::arbitrary_data *contents);
 
 /*
  * Reads the specified I/O stream into the memory buffer. The memory buffer is resized to fit the contents.

@@ -27,7 +27,7 @@
 #define SAIL_IO_FILE_CPP_H
 
 #include <memory>
-#include <string>
+#include <string_view>
 
 #include <sail-c++/io_base.h>
 
@@ -43,12 +43,12 @@ public:
     /*
      * Opens the specified file for reading.
      */
-    explicit io_file(const std::string &path);
+    explicit io_file(const std::string_view path);
 
     /*
      * Opens the specified memory buffer for the specified I/O operations.
      */
-    io_file(const std::string &path, Operation operation);
+    io_file(const std::string_view path, Operation operation);
 
     /*
      * Destroys the file I/O stream.

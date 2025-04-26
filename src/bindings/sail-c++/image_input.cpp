@@ -94,7 +94,7 @@ sail_status_t image_input::pimpl::start()
     return SAIL_OK;
 }
 
-image_input::image_input(const std::string &path)
+image_input::image_input(const std::string_view path)
     : d(new pimpl(new io_file(path)))
 {
 }
