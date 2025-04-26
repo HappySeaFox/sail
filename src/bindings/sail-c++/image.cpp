@@ -97,7 +97,7 @@ image::image(SailPixelFormat pixel_format, unsigned width, unsigned height)
     set_pixel_format(pixel_format);
     set_bytes_per_line_auto();
 
-    d->pixels_size = static_cast<std::size_t>(height) * bytes_per_line();
+    d->pixels_size = static_cast<std::size_t>(bytes_per_line()) * height;
 
     SAIL_TRY_OR_EXECUTE(sail_malloc(d->pixels_size, &d->sail_image->pixels),
                         /* on error */ throw std::bad_alloc());
@@ -799,7 +799,7 @@ void image::set_bytes_per_line_auto()
 
 void image::set_pixels(const void *pixels)
 {
-    set_pixels(pixels, height() * bytes_per_line());
+    set_pixels(pixels, static_cast<std::size_t>(bytes_per_line()) * height());
 }
 
 void image::set_pixels(const void *pixels, std::size_t pixels_size)
@@ -820,7 +820,7 @@ void image::set_pixels(const void *pixels, std::size_t pixels_size)
 
 void image::set_shallow_pixels(void *pixels)
 {
-    set_shallow_pixels(pixels, height() * bytes_per_line());
+    set_shallow_pixels(pixels, static_cast<std::size_t>(bytes_per_line()) * height());
 }
 
 void image::set_shallow_pixels(void *pixels, std::size_t pixels_size)
