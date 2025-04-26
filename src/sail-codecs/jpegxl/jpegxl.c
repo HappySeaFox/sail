@@ -340,7 +340,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_jpegxl(void *state, struct sa
             jpegxl_state->decoder,
             &format,
             image->pixels,
-            image->bytes_per_line * image->height);
+            (size_t)image->bytes_per_line * image->height);
 
     if (status != JXL_DEC_SUCCESS) {
         SAIL_LOG_ERROR("JPEGXL: Failed to set output buffer. Error: %u", status);
