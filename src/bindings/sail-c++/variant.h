@@ -26,6 +26,7 @@
 #ifndef SAIL_VARIANT_CPP_H
 #define SAIL_VARIANT_CPP_H
 
+#include <compare>
 #include <memory>
 
 #include <sail-common/export.h>
@@ -58,7 +59,6 @@ class SAIL_EXPORT variant
 {
     friend class meta_data;
     friend class utils_private;
-    friend SAIL_EXPORT bool operator==(const sail::variant &a, const sail::variant &b);
 
 public:
     /*
@@ -126,22 +126,17 @@ public:
      */
     void clear();
 
+    /*
+     * Returns a <=> comparison result if the variants have the same type and value.
+     */
+    auto operator<=>(const sail::variant &b) const = default;
+
 private:
     sail_status_t to_sail_variant(sail_variant **variant) const;
 
     class pimpl;
     std::unique_ptr<pimpl> d;
 };
-
-/*
- * Returns true if the variants have the same type and value.
- */
-SAIL_EXPORT bool operator==(const sail::variant &a, const sail::variant &b);
-
-/*
- * Returns true if the variants have different types or values.
- */
-SAIL_EXPORT bool operator!=(const sail::variant &a, const sail::variant &b);
 
 }
 
