@@ -26,6 +26,7 @@
 #include <cstring>
 #include <stdexcept>
 #include <string>
+#include <unordered_map>
 #include <variant>
 
 #include <sail-c++/sail-c++.h>
@@ -36,7 +37,10 @@ namespace sail
 namespace
 {
 
+struct sail_invalid_variant {};
+
 using variant_p = std::variant<
+                                sail_invalid_variant,
                                 bool,
                                 char,
                                 unsigned char,
@@ -51,21 +55,34 @@ using variant_p = std::variant<
                                 std::string,
                                 arbitrary_data
                               >;
+
+const std::unordered_map<std::size_t, SailVariantType> variant_type {
+    { 0,  SAIL_VARIANT_TYPE_INVALID        },
+    { 1,  SAIL_VARIANT_TYPE_BOOL           },
+    { 2,  SAIL_VARIANT_TYPE_CHAR           },
+    { 3,  SAIL_VARIANT_TYPE_UNSIGNED_CHAR  },
+    { 4,  SAIL_VARIANT_TYPE_SHORT          },
+    { 5,  SAIL_VARIANT_TYPE_UNSIGNED_SHORT },
+    { 6,  SAIL_VARIANT_TYPE_INT            },
+    { 7,  SAIL_VARIANT_TYPE_UNSIGNED_INT   },
+    { 8,  SAIL_VARIANT_TYPE_LONG           },
+    { 9,  SAIL_VARIANT_TYPE_UNSIGNED_LONG  },
+    { 10, SAIL_VARIANT_TYPE_FLOAT          },
+    { 11, SAIL_VARIANT_TYPE_DOUBLE         },
+    { 12, SAIL_VARIANT_TYPE_STRING         },
+    { 13, SAIL_VARIANT_TYPE_DATA           },
+};
+
 }
 
 class SAIL_HIDDEN variant::pimpl
 {
 public:
-    pimpl()
-        : type(SAIL_VARIANT_TYPE_INVALID)
-    {
-    }
-    ~pimpl()
-    {
+    SailVariantType type() const {
+        return variant_type.at(value.index());
     }
 
     variant_p value;
-    SailVariantType type;
 };
 
 variant::variant()
@@ -75,7 +92,6 @@ variant::variant()
 
 void variant::clear()
 {
-    d->type = SAIL_VARIANT_TYPE_INVALID;
     d->value = {};
 }
 
@@ -91,8 +107,6 @@ SAIL_EXPORT variant::variant(const sail_variant_type_workaround_alias_const &var
         return;
     }
 
-    d->type = variant->type;
- 
     switch (variant->type) {
         case SAIL_VARIANT_TYPE_BOOL:           d->value.emplace<bool>(sail_variant_to_bool(variant));                     break;
         case SAIL_VARIANT_TYPE_CHAR:           d->value.emplace<char>(sail_variant_to_char(variant));                     break;
@@ -131,7 +145,6 @@ variant::variant(const sail::variant &var)
 
 variant& variant::operator=(const sail::variant &variant)
 {
-    d->type  = variant.d->type;
     d->value = variant.d->value;
 
     return *this;
@@ -155,7 +168,7 @@ variant::~variant()
 
 bool variant::is_valid() const
 {
-    return d->type != SAIL_VARIANT_TYPE_INVALID;
+    return d->type() != SAIL_VARIANT_TYPE_INVALID;
 }
 
 template<typename T>
@@ -214,98 +227,33 @@ template SAIL_EXPORT const double& variant::value<>() const;
 template SAIL_EXPORT const std::string&          variant::value<>() const;
 template SAIL_EXPORT const sail::arbitrary_data& variant::value<>() const;
 
+template<typename T>
+void variant::set_value(const T &value)
+{
+    d->value.emplace<T>(value);
+}
+
 // Allow only specific types. Other types will fail to link.
 //
-template<>
-SAIL_EXPORT void variant::set_value<>(const bool &value)
-{
-    d->type = SAIL_VARIANT_TYPE_BOOL;
-    d->value.emplace<bool>(value);
-}
+template SAIL_EXPORT void variant::set_value<>(const bool &value);
 
-template<>
-SAIL_EXPORT void variant::set_value<>(const char &value)
-{
-    d->type = SAIL_VARIANT_TYPE_CHAR;
-    d->value.emplace<char>(value);
-}
+template SAIL_EXPORT void variant::set_value<>(const char &value);
+template SAIL_EXPORT void variant::set_value<>(const unsigned char &value);
 
-template<>
-SAIL_EXPORT void variant::set_value<>(const unsigned char &value)
-{
-    d->type = SAIL_VARIANT_TYPE_UNSIGNED_CHAR;
-    d->value.emplace<unsigned char>(value);
-}
+template SAIL_EXPORT void variant::set_value<>(const short &value);
+template SAIL_EXPORT void variant::set_value<>(const unsigned short &value);
 
-template<>
-SAIL_EXPORT void variant::set_value<>(const short &value)
-{
-    d->type = SAIL_VARIANT_TYPE_SHORT;
-    d->value.emplace<short>(value);
-}
+template SAIL_EXPORT void variant::set_value<>(const int &value);
+template SAIL_EXPORT void variant::set_value<>(const unsigned int &value);
 
-template<>
-SAIL_EXPORT void variant::set_value<>(const unsigned short &value)
-{
-    d->type = SAIL_VARIANT_TYPE_UNSIGNED_SHORT;
-    d->value.emplace<unsigned short>(value);
-}
+template SAIL_EXPORT void variant::set_value<>(const long &value);
+template SAIL_EXPORT void variant::set_value<>(const unsigned long &value);
 
-template<>
-SAIL_EXPORT void variant::set_value<>(const int &value)
-{
-    d->type = SAIL_VARIANT_TYPE_INT;
-    d->value.emplace<int>(value);
-}
+template SAIL_EXPORT void variant::set_value<>(const float &value);
+template SAIL_EXPORT void variant::set_value<>(const double &value);
 
-template<>
-SAIL_EXPORT void variant::set_value<>(const unsigned int &value)
-{
-    d->type = SAIL_VARIANT_TYPE_UNSIGNED_INT;
-    d->value.emplace<unsigned int>(value);
-}
-
-template<>
-SAIL_EXPORT void variant::set_value<>(const long &value)
-{
-    d->type = SAIL_VARIANT_TYPE_LONG;
-    d->value.emplace<long>(value);
-}
-
-template<>
-SAIL_EXPORT void variant::set_value<>(const unsigned long &value)
-{
-    d->type = SAIL_VARIANT_TYPE_UNSIGNED_LONG;
-    d->value.emplace<unsigned long>(value);
-}
-
-template<>
-SAIL_EXPORT void variant::set_value<>(const float &value)
-{
-    d->type = SAIL_VARIANT_TYPE_FLOAT;
-    d->value.emplace<float>(value);
-}
-
-template<>
-SAIL_EXPORT void variant::set_value<>(const double &value)
-{
-    d->type = SAIL_VARIANT_TYPE_DOUBLE;
-    d->value.emplace<double>(value);
-}
-
-template<>
-SAIL_EXPORT void variant::set_value<>(const std::string &value)
-{
-    d->type = SAIL_VARIANT_TYPE_STRING;
-    d->value.emplace<std::string>(value);
-}
-
-template<>
-SAIL_EXPORT void variant::set_value<>(const sail::arbitrary_data &value)
-{
-    d->type = SAIL_VARIANT_TYPE_DATA;
-    d->value.emplace<sail::arbitrary_data>(value);
-}
+template SAIL_EXPORT void variant::set_value<>(const std::string &value);
+template SAIL_EXPORT void variant::set_value<>(const sail::arbitrary_data &value);
 
 // Put this constructor after set_value() specialization
 // as Clang on macOS complained about duplicate specializations.
@@ -350,9 +298,9 @@ sail_status_t variant::to_sail_variant(sail_variant **variant) const
         sail_destroy_variant(variant_local);
     );
 
-    variant_local->type = d->type;
+    variant_local->type = d->type();
 
-    switch (d->type) {
+    switch (d->type()) {
         case SAIL_VARIANT_TYPE_BOOL:           SAIL_TRY(sail_set_variant_bool(variant_local,           std::get<bool>(d->value)));                break;
         case SAIL_VARIANT_TYPE_CHAR:           SAIL_TRY(sail_set_variant_char(variant_local,           std::get<char>(d->value)));                break;
         case SAIL_VARIANT_TYPE_UNSIGNED_CHAR:  SAIL_TRY(sail_set_variant_unsigned_char(variant_local,  std::get<unsigned char>(d->value)));       break;
@@ -381,11 +329,11 @@ sail_status_t variant::to_sail_variant(sail_variant **variant) const
 
 bool operator==(const sail::variant &a, const sail::variant &b) {
 
-    if (!a.is_valid() || !b.is_valid() || a.d->type != b.d->type) {
+    if (!a.is_valid() || !b.is_valid() || a.d->type() != b.d->type()) {
         return false;
     }
 
-    switch (a.d->type) {
+    switch (a.d->type()) {
         case SAIL_VARIANT_TYPE_BOOL:           return std::get<bool>(a.d->value)           == std::get<bool>(b.d->value);
         case SAIL_VARIANT_TYPE_CHAR:           return std::get<char>(a.d->value)           == std::get<char>(b.d->value);
         case SAIL_VARIANT_TYPE_UNSIGNED_CHAR:  return std::get<unsigned char>(a.d->value)  == std::get<unsigned char>(b.d->value);
