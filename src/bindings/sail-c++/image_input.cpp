@@ -121,12 +121,12 @@ image_input::~image_input()
     }
 }
 
-image_input::image_input(image_input &&other)
+image_input::image_input(image_input &&other) noexcept
 {
     *this = std::move(other);
 }
 
-image_input& image_input::operator=(image_input &&other)
+image_input& image_input::operator=(image_input &&other) noexcept
 {
     d = std::move(other.d);
     other.d = {};

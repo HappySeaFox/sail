@@ -78,12 +78,12 @@ public:
     /*
      * Moves the image input.
      */
-    image_input(image_input &&other);
+    image_input(image_input &&other) noexcept;
 
     /*
      * Moves the image input.
      */
-    image_input& operator=(image_input &&other);
+    image_input& operator=(image_input &&other) noexcept;
 
     /*
      * Overrides the automatically detected codec info used to load the image.

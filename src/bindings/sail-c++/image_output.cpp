@@ -116,12 +116,12 @@ image_output::~image_output()
     }
 }
 
-image_output::image_output(image_output &&other)
+image_output::image_output(image_output &&other) noexcept
 {
     *this = std::move(other);
 }
 
-image_output& image_output::operator=(image_output &&other)
+image_output& image_output::operator=(image_output &&other) noexcept
 {
     d = std::move(other.d);
     other.d = {};

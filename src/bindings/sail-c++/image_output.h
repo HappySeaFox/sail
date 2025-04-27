@@ -78,12 +78,12 @@ public:
     /*
      * Moves the image output.
      */
-    image_output(image_output &&other);
+    image_output(image_output &&other) noexcept;
 
     /*
      * Moves the image output.
      */
-    image_output& operator=(image_output &&other);
+    image_output& operator=(image_output &&other) noexcept;
 
     /*
      * Overrides the automatically detected codec info used to save the image.
