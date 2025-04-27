@@ -120,10 +120,7 @@ compression_level::compression_level(const sail_compression_level *cl)
         return;
     }
 
-    d->sail_compression_level->min_level     = cl->min_level;
-    d->sail_compression_level->max_level     = cl->max_level;
-    d->sail_compression_level->default_level = cl->default_level;
-    d->sail_compression_level->step          = cl->step;
+    *(d->sail_compression_level) = *cl;
 }
 
 }
