@@ -87,7 +87,7 @@ public:
     template<typename U>
     bool has_value() const
     {
-        return std::holds_alternative<std::remove_cvref_t<U>>(*this);
+        return std::holds_alternative<std::decay_t<U>>(*this);
     }
 
     /*
@@ -98,7 +98,7 @@ public:
     template<typename U>
     const U& value() const
     {
-        return std::get<std::remove_cvref_t<U>>(*this);
+        return std::get<std::decay_t<U>>(*this);
     }
 
     /*
@@ -107,7 +107,7 @@ public:
     template<typename U>
     void set_value(U&& value)
     {
-        emplace<std::remove_cvref_t<U>>(std::forward<U>(value));
+        emplace<std::decay_t<U>>(std::forward<U>(value));
     }
 
     /*
