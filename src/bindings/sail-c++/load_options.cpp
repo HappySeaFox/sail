@@ -142,7 +142,7 @@ sail_status_t load_options::to_sail_load_options(sail_load_options **load_option
     SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&load_options_local->tuning),
                         /* cleanup */ sail_destroy_load_options(load_options_local));
 
-    SAIL_TRY_OR_CLEANUP(utils_private::cpp_tuning_to_sail_tuning(d->tuning, load_options_local->tuning),
+    SAIL_TRY_OR_CLEANUP(utils_private::cpp_tuning_into_c_tuning(d->tuning, load_options_local->tuning),
                         /* cleanup */ sail_destroy_load_options(load_options_local));
 
     *load_options = load_options_local;

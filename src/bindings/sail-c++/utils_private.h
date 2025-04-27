@@ -30,6 +30,7 @@
 #include <sail-common/status.h>
 
 #include <sail-c++/tuning.h>
+#include <sail-c++/variant.h>
 
 struct sail_hash_map;
 struct sail_variant;
@@ -42,11 +43,11 @@ class SAIL_HIDDEN utils_private
 public:
     static tuning c_tuning_to_cpp_tuning(const sail_hash_map *c_tuning);
 
-    static sail_status_t cpp_tuning_to_sail_tuning(const tuning &cpp_tuning, sail_hash_map *c_tuning);
+    static sail_status_t cpp_tuning_into_c_tuning(const tuning &cpp_tuning, sail_hash_map *c_tuning);
 
-private:
-    // Needs to be in utils_private to allow creating sail:variant from sail_variant
-    static bool sail_key_value_into_tuning(const char *key, const sail_variant *value, void *user_data);
+    static variant c_variant_to_cpp_variant(const sail_variant *sail_variant);
+
+    static sail_status_t cpp_variant_to_c_variant(const sail::variant &variant, sail_variant **sail_variant);
 };
 
 }

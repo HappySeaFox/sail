@@ -158,7 +158,7 @@ sail_status_t source_image::to_sail_source_image(sail_source_image **source_imag
     SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&source_image_local->special_properties),
                         /* cleanup */ sail_destroy_source_image(source_image_local));
 
-    SAIL_TRY_OR_CLEANUP(utils_private::cpp_tuning_to_sail_tuning(d->special_properties, source_image_local->special_properties),
+    SAIL_TRY_OR_CLEANUP(utils_private::cpp_tuning_into_c_tuning(d->special_properties, source_image_local->special_properties),
                         /* cleanup */ sail_destroy_source_image(source_image_local));
 
     *source_image = source_image_local;

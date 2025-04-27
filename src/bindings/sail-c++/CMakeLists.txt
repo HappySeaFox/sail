@@ -57,7 +57,6 @@ add_library(sail-c++
                 utils.h
                 utils_private.cpp
                 utils_private.h
-                variant.cpp
                 variant.h)
 
 # Build a list of public headers to install

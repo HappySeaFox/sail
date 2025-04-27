@@ -23,10 +23,34 @@
     SOFTWARE.
 */
 
+#include <unordered_map>
+
 #include <sail-c++/sail-c++.h>
 
 namespace sail
 {
+
+namespace
+{
+
+const std::unordered_map<std::size_t, SailVariantType> variant_types_map {
+    { 0,  SAIL_VARIANT_TYPE_INVALID        },
+    { 1,  SAIL_VARIANT_TYPE_BOOL           },
+    { 2,  SAIL_VARIANT_TYPE_CHAR           },
+    { 3,  SAIL_VARIANT_TYPE_UNSIGNED_CHAR  },
+    { 4,  SAIL_VARIANT_TYPE_SHORT          },
+    { 5,  SAIL_VARIANT_TYPE_UNSIGNED_SHORT },
+    { 6,  SAIL_VARIANT_TYPE_INT            },
+    { 7,  SAIL_VARIANT_TYPE_UNSIGNED_INT   },
+    { 8,  SAIL_VARIANT_TYPE_LONG           },
+    { 9,  SAIL_VARIANT_TYPE_UNSIGNED_LONG  },
+    { 10, SAIL_VARIANT_TYPE_FLOAT          },
+    { 11, SAIL_VARIANT_TYPE_DOUBLE         },
+    { 12, SAIL_VARIANT_TYPE_STRING         },
+    { 13, SAIL_VARIANT_TYPE_DATA           },
+};
+
+}
 
 tuning utils_private::c_tuning_to_cpp_tuning(const sail_hash_map *c_tuning) {
 
@@ -34,21 +58,30 @@ tuning utils_private::c_tuning_to_cpp_tuning(const sail_hash_map *c_tuning) {
         return tuning{};
     }
 
+    auto visitor = [](const char *key, const sail_variant *value, void *user_data) -> bool {
+
+        sail::tuning *cpp_tuning = reinterpret_cast<sail::tuning *>(user_data);
+
+        cpp_tuning->emplace(key, utils_private::c_variant_to_cpp_variant(value));
+
+        return true;
+    };
+
     tuning tuning;
 
-    sail_traverse_hash_map_with_user_data(c_tuning, sail_key_value_into_tuning, &tuning);
+    sail_traverse_hash_map_with_user_data(c_tuning, visitor, &tuning);
 
     return tuning;
 }
 
-sail_status_t utils_private::cpp_tuning_to_sail_tuning(const tuning &cpp_tuning, sail_hash_map *c_tuning) {
+sail_status_t utils_private::cpp_tuning_into_c_tuning(const tuning &cpp_tuning, sail_hash_map *c_tuning) {
 
     sail_clear_hash_map(c_tuning);
 
     for (const auto& [key, variant] : cpp_tuning) {
         struct sail_variant *sail_variant;
 
-        SAIL_TRY(to_struct(variant, &sail_variant));
+        SAIL_TRY(utils_private::cpp_variant_to_c_variant(variant, &sail_variant));
 
         sail_put_hash_map(c_tuning, key.c_str(), sail_variant);
 
@@ -58,13 +91,71 @@ sail_status_t utils_private::cpp_tuning_to_sail_tuning(const tuning &cpp_tuning,
     return SAIL_OK;
 }
 
-bool utils_private::sail_key_value_into_tuning(const char *key, const sail_variant *value, void *user_data) {
+variant utils_private::c_variant_to_cpp_variant(const sail_variant *sail_variant) {
 
-    tuning *cpp_tuning = reinterpret_cast<tuning *>(user_data);
+    switch (sail_variant->type) {
+        case SAIL_VARIANT_TYPE_BOOL:           return variant(sail_variant_to_bool(sail_variant));
+        case SAIL_VARIANT_TYPE_CHAR:           return variant(sail_variant_to_char(sail_variant));
+        case SAIL_VARIANT_TYPE_UNSIGNED_CHAR:  return variant(sail_variant_to_unsigned_char(sail_variant));
+        case SAIL_VARIANT_TYPE_SHORT:          return variant(sail_variant_to_short(sail_variant));
+        case SAIL_VARIANT_TYPE_UNSIGNED_SHORT: return variant(sail_variant_to_unsigned_short(sail_variant));
+        case SAIL_VARIANT_TYPE_INT:            return variant(sail_variant_to_int(sail_variant));
+        case SAIL_VARIANT_TYPE_UNSIGNED_INT:   return variant(sail_variant_to_unsigned_int(sail_variant));
+        case SAIL_VARIANT_TYPE_LONG:           return variant(sail_variant_to_long(sail_variant));
+        case SAIL_VARIANT_TYPE_UNSIGNED_LONG:  return variant(sail_variant_to_unsigned_long(sail_variant));
+        case SAIL_VARIANT_TYPE_FLOAT:          return variant(sail_variant_to_float(sail_variant));
+        case SAIL_VARIANT_TYPE_DOUBLE:         return variant(sail_variant_to_double(sail_variant));
+        case SAIL_VARIANT_TYPE_STRING:         return variant(std::string(sail_variant_to_string(sail_variant)));
+        case SAIL_VARIANT_TYPE_DATA: {
+            const void *data = sail_variant_to_data(sail_variant);
+            sail::arbitrary_data arbitrary_data(sail_variant->size);
+            memcpy(arbitrary_data.data(), data, sail_variant->size);
+            return variant(std::move(arbitrary_data));
+        }
+        case SAIL_VARIANT_TYPE_INVALID: return {};
+    }
 
-    cpp_tuning->emplace(key, from_struct(value));
+    return {};
+}
 
-    return true;
+sail_status_t utils_private::cpp_variant_to_c_variant(const sail::variant &variant, sail_variant **sail_variant) {
+
+    SAIL_CHECK_PTR(sail_variant);
+
+    struct sail_variant *variant_local;
+    SAIL_TRY(sail_alloc_variant(&variant_local));
+
+    SAIL_AT_SCOPE_EXIT(
+        sail_destroy_variant(variant_local);
+    );
+
+    variant_local->type = variant_types_map.at(variant.index());
+
+    switch (variant_local->type) {
+        case SAIL_VARIANT_TYPE_BOOL:           SAIL_TRY(sail_set_variant_bool(variant_local,           variant.value<bool>()));                break;
+        case SAIL_VARIANT_TYPE_CHAR:           SAIL_TRY(sail_set_variant_char(variant_local,           variant.value<char>()));                break;
+        case SAIL_VARIANT_TYPE_UNSIGNED_CHAR:  SAIL_TRY(sail_set_variant_unsigned_char(variant_local,  variant.value<unsigned char>()));       break;
+        case SAIL_VARIANT_TYPE_SHORT:          SAIL_TRY(sail_set_variant_short(variant_local,          variant.value<short>()));               break;
+        case SAIL_VARIANT_TYPE_UNSIGNED_SHORT: SAIL_TRY(sail_set_variant_unsigned_short(variant_local, variant.value<unsigned short>()));      break;
+        case SAIL_VARIANT_TYPE_INT:            SAIL_TRY(sail_set_variant_int(variant_local,            variant.value<int>()));                 break;
+        case SAIL_VARIANT_TYPE_UNSIGNED_INT:   SAIL_TRY(sail_set_variant_unsigned_int(variant_local,   variant.value<unsigned int>()));        break;
+        case SAIL_VARIANT_TYPE_LONG:           SAIL_TRY(sail_set_variant_long(variant_local,           variant.value<long>()));                break;
+        case SAIL_VARIANT_TYPE_UNSIGNED_LONG:  SAIL_TRY(sail_set_variant_unsigned_long(variant_local,  variant.value<unsigned long>()));       break;
+        case SAIL_VARIANT_TYPE_FLOAT:          SAIL_TRY(sail_set_variant_float(variant_local,          variant.value<float>()));               break;
+        case SAIL_VARIANT_TYPE_DOUBLE:         SAIL_TRY(sail_set_variant_double(variant_local,         variant.value<double>()));              break;
+        case SAIL_VARIANT_TYPE_STRING:         SAIL_TRY(sail_set_variant_string(variant_local,         variant.value<std::string>().c_str())); break;
+        case SAIL_VARIANT_TYPE_DATA: {
+            const sail::arbitrary_data &arbitrary_data = variant.value<sail::arbitrary_data>();
+            SAIL_TRY(sail_set_variant_data(variant_local, arbitrary_data.data(), arbitrary_data.size()));
+            break;
+        }
+        case SAIL_VARIANT_TYPE_INVALID: break;
+    }
+
+    *sail_variant = variant_local;
+    variant_local = nullptr;
+
+    return SAIL_OK;
 }
 
 }

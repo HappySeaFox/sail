@@ -119,10 +119,6 @@ public:
     }
 };
 
-SAIL_EXPORT sail::variant from_struct(const sail_variant *sail_variant);
-
-SAIL_EXPORT sail_status_t to_struct(const sail::variant &variant, sail_variant **sail_variant);
-
 }
 
 #endif
