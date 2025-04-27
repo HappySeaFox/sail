@@ -201,7 +201,7 @@ meta_data::meta_data(const sail_meta_data *meta_data)
         set_key(meta_data->key);
     }
 
-    set_value(variant(meta_data->value));
+    set_value(from_struct(meta_data->value));
 }
 
 sail_status_t meta_data::to_sail_meta_data(sail_meta_data **meta_data) const
@@ -221,7 +221,7 @@ sail_status_t meta_data::to_sail_meta_data(sail_meta_data **meta_data) const
         SAIL_TRY(sail_strdup(d->key_unknown.c_str(), &meta_data_local->key_unknown));
     }
 
-    SAIL_TRY(d->value.to_sail_variant(&meta_data_local->value));
+    SAIL_TRY(to_struct(d->value, &meta_data_local->value));
 
     *meta_data = meta_data_local;
     meta_data_local = nullptr;

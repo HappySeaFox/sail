@@ -28,6 +28,10 @@
 
 #include <compare>
 #include <memory>
+#include <string>
+#include <type_traits>
+#include <utility>
+#include <variant>
 
 #include <sail-common/export.h>
 #include <sail-common/status.h>
@@ -39,104 +43,85 @@ struct sail_variant;
 namespace sail
 {
 
-/*
- * Variant with limited possible data types. Supports only the following data types:
- *   - bool
- *   - char
- *   - unsigned char
- *   - short
- *   - unsigned short
- *   - int
- *   - unsigned int
- *   - long
- *   - unsigned long
- *   - float
- *   - double
- *   - std::string
- *   - sail::arbitrary_data
- */
-class SAIL_EXPORT variant
+struct invalid_variant_type
 {
-    friend class meta_data;
-    friend class utils_private;
+    auto operator<=>(const invalid_variant_type &other) const = default;
+};
 
+using variant_type = std::variant<
+                                     invalid_variant_type,
+                                     bool,
+                                     char,
+                                     unsigned char,
+                                     short,
+                                     unsigned short,
+                                     int,
+                                     unsigned int,
+                                     long,
+                                     unsigned long,
+                                     float,
+                                     double,
+                                     std::string,
+                                     arbitrary_data
+                                 >;
+
+/*
+ * Variant with limited possible data types.
+ */
+class SAIL_EXPORT variant : public variant_type
+{
 public:
-    /*
-     * Constructs an invalid variant.
-     */
-    variant();
-
-    /*
-     * Constructs a new variant from the value.
-     */
-    template<typename T>
-    variant(const T &value);
-
-    /*
-     * Copies the variant.
-     */
-    variant(const variant &var);
-
-    /*
-     * Copies the variant.
-     */
-    variant& operator=(const sail::variant &variant);
-
-    /*
-     * Moves the variant.
-     */
-    variant(sail::variant &&variant) noexcept;
-
-    /*
-     * Moves the variant.
-     */
-    variant& operator=(sail::variant &&variant) noexcept;
-
-    /*
-     * Destroys the variant.
-     */
-    ~variant();
+    using variant_type::variant_type;
 
     /*
      * Returns true if the variant has some value stored.
      */
-    bool is_valid() const;
+    inline bool is_valid() const
+    {
+        return index() != 0;
+    }
 
     /*
      * Returns true if the value stored in the variant is of the requested type.
      */
-    template<typename T>
-    bool has_value() const;
+    template<typename U>
+    bool has_value() const
+    {
+        return std::holds_alternative<std::remove_cvref_t<U>>(*this);
+    }
 
     /*
-     * Returns the current value. If the requested type doesn't match the actual type stored in the variant,
-     * throws std::bad_variant_access. Use has_value<T>() to check the stored data type.
+     * Returns the current value. If the requested type doesn't match the actual type stored
+     * in the variant, throws std::bad_variant_access. Use has_value<T>() to check
+     * the stored type.
      */
-    template<typename T>
-    const T& value() const;
+    template<typename U>
+    const U& value() const
+    {
+        return std::get<std::remove_cvref_t<U>>(*this);
+    }
 
     /*
      * Sets a new value.
      */
-    template<typename T>
-    void set_value(const T &value);
+    template<typename U>
+    void set_value(U&& value)
+    {
+        emplace<std::remove_cvref_t<U>>(std::forward<U>(value));
+    }
 
     /*
-     * Resets the variant to the invalid state and deletes the stored value.
+     * Resets the variant to the invalid state.
      */
-    void clear();
-
-    /*
-     * Returns a <=> comparison result if the variants have the same type and value.
-     */
-    auto operator<=>(const sail::variant &b) const = default;
-
-private:
-    sail_status_t to_sail_variant(sail_variant **variant) const;
-
-    class pimpl;
-    std::unique_ptr<pimpl> d;
+    inline void clear()
+    {
+        *this = {};
+    }
 };
+
+SAIL_EXPORT sail::variant from_struct(const sail_variant *sail_variant);
+
+SAIL_EXPORT sail_status_t to_struct(const sail::variant &variant, sail_variant **sail_variant);
 
 }
 

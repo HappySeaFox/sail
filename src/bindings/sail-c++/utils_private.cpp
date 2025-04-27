@@ -48,7 +48,7 @@ sail_status_t utils_private::cpp_tuning_to_sail_tuning(const tuning &cpp_tuning,
     for (const auto& [key, variant] : cpp_tuning) {
         struct sail_variant *sail_variant;
 
-        SAIL_TRY(variant.to_sail_variant(&sail_variant));
+        SAIL_TRY(to_struct(variant, &sail_variant));
 
         sail_put_hash_map(c_tuning, key.c_str(), sail_variant);
 
@@ -62,7 +62,7 @@ bool utils_private::sail_key_value_into_tuning(const char *key, const sail_varia
 
     tuning *cpp_tuning = reinterpret_cast<tuning *>(user_data);
 
-    cpp_tuning->emplace(key, variant(value));
+    cpp_tuning->emplace(key, from_struct(value));
 
     return true;
 }

@@ -126,7 +126,7 @@ static MunitResult test_move(const MunitParameter params[], void *user_data) {
     constexpr short reference_value = -500;
 
     sail::variant variant;
-    variant.set_value<short>(reference_value);
+    variant.set_value(reference_value);
 
     sail::variant variant2 = std::move(variant);
 
