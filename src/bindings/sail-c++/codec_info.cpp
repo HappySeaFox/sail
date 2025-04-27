@@ -224,33 +224,26 @@ codec_info::codec_info(const sail_codec_info *ci)
 
     d->sail_codec_info_c = ci;
 
-    std::vector<std::string> magic_numbers;
-    std::vector<std::string> extensions;
-    std::vector<std::string> mime_types;
-
     // magic numbers
     for (const sail_string_node *magic_number_node = ci->magic_number_node; magic_number_node != nullptr; magic_number_node = magic_number_node->next) {
-        magic_numbers.push_back(magic_number_node->string);
+        d->magic_numbers.push_back(magic_number_node->string);
     }
 
     // extensions
     for (const sail_string_node *extension_node = ci->extension_node; extension_node != nullptr; extension_node = extension_node->next) {
-        extensions.push_back(extension_node->string);
+        d->extensions.push_back(extension_node->string);
     }
 
     // mime types
     for (const sail_string_node *mime_type_node = ci->mime_type_node; mime_type_node != nullptr; mime_type_node = mime_type_node->next) {
-        mime_types.push_back(mime_type_node->string);
+        d->mime_types.push_back(mime_type_node->string);
     }
 
     d->version       = ci->version;
     d->name          = ci->name;
     d->description   = ci->description;
-    d->magic_numbers = magic_numbers;
-    d->extensions    = extensions;
-    d->mime_types    = mime_types;
-    d->load_features = sail::load_features(ci->load_features);
-    d->save_features = sail::save_features(ci->save_features);
+    d->load_features = std::move(sail::load_features(ci->load_features));
+    d->save_features = std::move(sail::save_features(ci->save_features));
 }
 
 const sail_codec_info* codec_info::sail_codec_info_c() const
