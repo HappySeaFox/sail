@@ -298,8 +298,13 @@ enum class ResolutionUnit {
     Inch       = SAIL_RESOLUTION_UNIT_INCH,
 };
 
-/* Codec features. */
-enum class CodecFeature {
+/*
+ * Codec features.
+ *
+ * Make the underlying type int to match the C enum restriction
+ * when enumerators are always int.
+ */
+enum class CodecFeature : int {
 
     /* Unknown codec feature used to indicate an error in parsing functions. */
     Unknown = SAIL_CODEC_FEATURE_UNKNOWN,
@@ -326,8 +331,13 @@ enum class CodecFeature {
     SourceImage = SAIL_CODEC_FEATURE_SOURCE_IMAGE,
 };
 
-/* Load or save options. */
-enum class CodecOption {
+/*
+ * Load or save codec options.
+ *
+ * Make the underlying type int to match the C enum restriction
+ * when enumerators are always int.
+ */
+enum class CodecOption : int {
 
     /*
      * Instruction to load or save image meta data like JPEG comments or EXIF.
