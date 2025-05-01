@@ -59,14 +59,14 @@ meta_data::meta_data()
 {
 }
 
-meta_data::meta_data(SailMetaData key, const variant &value)
+meta_data::meta_data(MetaData key, const variant &value)
     : meta_data()
 {
     set_key(key);
     set_value(value);
 }
 
-meta_data::meta_data(SailMetaData key, variant &&value) noexcept
+meta_data::meta_data(MetaData key, variant &&value) noexcept
     : meta_data()
 {
     set_key(key);
@@ -102,7 +102,7 @@ meta_data::meta_data(const sail::meta_data &md)
 
 meta_data& meta_data::operator=(const sail::meta_data &meta_data)
 {
-    if (meta_data.key() == SAIL_META_DATA_UNKNOWN) {
+    if (meta_data.key() == MetaData::Unknown) {
         set_key(meta_data.key_unknown());
     } else {
         set_key(meta_data.key());
@@ -129,9 +129,9 @@ meta_data::~meta_data()
 {
 }
 
-SailMetaData meta_data::key() const
+MetaData meta_data::key() const
 {
-    return d->sail_meta_data->key;
+    return static_cast<MetaData>(d->sail_meta_data->key);
 }
 
 const std::string& meta_data::key_unknown() const
@@ -144,9 +144,9 @@ const variant& meta_data::value() const
     return d->value;
 }
 
-void meta_data::set_key(SailMetaData key)
+void meta_data::set_key(MetaData key)
 {
-    d->sail_meta_data->key = key;
+    d->sail_meta_data->key = static_cast<SailMetaData>(key);
     d->key_unknown         = std::string{};
 }
 
@@ -172,14 +172,14 @@ void meta_data::set_value(variant &&value) noexcept
     d->value = std::move(value);
 }
 
-const char* meta_data::meta_data_to_string(SailMetaData meta_data) {
+const char* meta_data::meta_data_to_string(MetaData meta_data) {
 
-    return sail_meta_data_to_string(meta_data);
+    return sail_meta_data_to_string(static_cast<SailMetaData>(meta_data));
 }
 
-SailMetaData meta_data::meta_data_from_string(const std::string_view str) {
+MetaData meta_data::meta_data_from_string(const std::string_view str) {
 
-    return sail_meta_data_from_string(str.data());
+    return static_cast<MetaData>(sail_meta_data_from_string(str.data()));
 }
 
 static inline std::string empty_string_on_nullptr(const char *str) {
@@ -198,7 +198,7 @@ meta_data::meta_data(const sail_meta_data *meta_data)
     if (meta_data->key == SAIL_META_DATA_UNKNOWN) {
         set_key(empty_string_on_nullptr(meta_data->key_unknown));
     } else {
-        set_key(meta_data->key);
+        set_key(static_cast<MetaData>(meta_data->key));
     }
 
     set_value(utils_private::c_variant_to_cpp_variant(meta_data->value));

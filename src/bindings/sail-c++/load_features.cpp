@@ -71,9 +71,9 @@ load_features::~load_features()
 {
 }
 
-int load_features::features() const
+CodecFeatures load_features::features() const
 {
-    return d->sail_load_features_c->features;
+    return CodecFeatures(d->sail_load_features_c->features);
 }
 
 const sail::supported_tuning& load_features::supported_tuning() const

@@ -49,8 +49,8 @@ static MunitResult test_palette_create(const MunitParameter params[], void *user
 
         const unsigned color_count = static_cast<unsigned>(data.size() / 2);
 
-        sail::palette palette(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE, data.data(), color_count);
-        munit_assert(palette.pixel_format() == SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE);
+        sail::palette palette(sail::PixelFormat::BPP16_Grayscale, data.data(), color_count);
+        munit_assert(palette.pixel_format() == sail::PixelFormat::BPP16_Grayscale);
         munit_assert(palette.data()         == data);
         munit_assert(palette.color_count()  == color_count);
         munit_assert(palette.is_valid());
@@ -59,8 +59,8 @@ static MunitResult test_palette_create(const MunitParameter params[], void *user
     {
         sail::arbitrary_data data = construct_data();
 
-        sail::palette palette(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE, data);
-        munit_assert(palette.pixel_format() == SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE);
+        sail::palette palette(sail::PixelFormat::BPP16_Grayscale, data);
+        munit_assert(palette.pixel_format() == sail::PixelFormat::BPP16_Grayscale);
         munit_assert(palette.data()         == data);
         munit_assert(palette.color_count()  == (data.size() / 2));
         munit_assert(palette.is_valid());
@@ -71,7 +71,7 @@ static MunitResult test_palette_create(const MunitParameter params[], void *user
 
         munit_assert(palette.color_count() == 0);
         munit_assert(palette.data().empty());
-        munit_assert(palette.pixel_format() == SAIL_PIXEL_FORMAT_UNKNOWN);
+        munit_assert(palette.pixel_format() == sail::PixelFormat::Unknown);
         munit_assert(!palette.is_valid());
     }
 
@@ -87,7 +87,7 @@ static MunitResult test_palette_copy(const MunitParameter params[], void *user_d
 
         const unsigned color_count = static_cast<unsigned>(data.size() / 2);
 
-        sail::palette palette(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE, data.data(), color_count);
+        sail::palette palette(sail::PixelFormat::BPP16_Grayscale, data.data(), color_count);
         munit_assert(palette.is_valid());
 
         sail::palette palette_copy = palette;
@@ -120,13 +120,13 @@ static MunitResult test_palette_move(const MunitParameter params[], void *user_d
 
         const unsigned color_count = static_cast<unsigned>(data.size() / 2);
 
-        sail::palette palette(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE, data.data(), color_count);
+        sail::palette palette(sail::PixelFormat::BPP16_Grayscale, data.data(), color_count);
         munit_assert(palette.is_valid());
 
         sail::palette palette_copy = std::move(palette);
         munit_assert(palette_copy.color_count()  == color_count);
         munit_assert(palette_copy.data()         == data);
-        munit_assert(palette_copy.pixel_format() == SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE);
+        munit_assert(palette_copy.pixel_format() == sail::PixelFormat::BPP16_Grayscale);
         munit_assert(palette_copy.is_valid());
     }
 
@@ -134,7 +134,7 @@ static MunitResult test_palette_move(const MunitParameter params[], void *user_d
         sail::palette palette = sail::palette{};
         munit_assert(palette.color_count() == 0);
         munit_assert(palette.data().empty());
-        munit_assert(palette.pixel_format() == SAIL_PIXEL_FORMAT_UNKNOWN);
+        munit_assert(palette.pixel_format() == sail::PixelFormat::Unknown);
         munit_assert(!palette.is_valid());
     }
 

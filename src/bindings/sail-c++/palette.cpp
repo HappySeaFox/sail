@@ -64,13 +64,13 @@ palette::palette()
 {
 }
 
-palette::palette(SailPixelFormat pixel_format, const void *data, unsigned color_count)
+palette::palette(PixelFormat pixel_format, const void *data, unsigned color_count)
     : palette()
 {
     set_data(pixel_format, data, color_count);
 }
 
-palette::palette(SailPixelFormat pixel_format, const arbitrary_data &data)
+palette::palette(PixelFormat pixel_format, const arbitrary_data &data)
     : palette()
 {
     set_data(pixel_format, data);
@@ -114,9 +114,9 @@ bool palette::is_valid() const
     return d->sail_palette->pixel_format != SAIL_PIXEL_FORMAT_UNKNOWN && d->sail_palette->color_count > 0 && !d->data.empty();
 }
 
-SailPixelFormat palette::pixel_format() const
+PixelFormat palette::pixel_format() const
 {
-    return d->sail_palette->pixel_format;
+    return static_cast<PixelFormat>(d->sail_palette->pixel_format);
 }
 
 const arbitrary_data& palette::data() const
@@ -129,7 +129,7 @@ unsigned palette::color_count() const
     return d->sail_palette->color_count;
 }
 
-void palette::set_data(SailPixelFormat pixel_format, const void *data, unsigned color_count)
+void palette::set_data(PixelFormat pixel_format, const void *data, unsigned color_count)
 {
     d->reset();
 
@@ -137,11 +137,11 @@ void palette::set_data(SailPixelFormat pixel_format, const void *data, unsigned 
                         /* on error */ return);
 }
 
-void palette::set_data(SailPixelFormat pixel_format, const arbitrary_data &data)
+void palette::set_data(PixelFormat pixel_format, const arbitrary_data &data)
 {
     d->reset();
 
-    const unsigned bytes_per_pixel = (sail_bits_per_pixel(pixel_format) + 7) / 8;
+    const unsigned bytes_per_pixel = (sail_bits_per_pixel(static_cast<SailPixelFormat>(pixel_format)) + 7) / 8;
 
     if (bytes_per_pixel != 0) {
         set_data(pixel_format, data.data(), static_cast<unsigned>(data.size() / bytes_per_pixel));
@@ -156,7 +156,7 @@ palette::palette(const sail_palette *pal)
         return;
     }
 
-    set_data(pal->pixel_format, pal->data, pal->color_count);
+    set_data(static_cast<PixelFormat>(pal->pixel_format), pal->data, pal->color_count);
 }
 
 sail_status_t palette::to_sail_palette(sail_palette **palette) const
@@ -168,16 +168,16 @@ sail_status_t palette::to_sail_palette(sail_palette **palette) const
     return SAIL_OK;
 }
 
-sail_status_t palette::copy(SailPixelFormat pixel_format, const void *data, unsigned color_count)
+sail_status_t palette::copy(PixelFormat pixel_format, const void *data, unsigned color_count)
 {
     SAIL_CHECK_PTR(data);
 
-    const unsigned palette_size = sail_bytes_per_line(color_count, pixel_format);
+    const unsigned palette_size = sail_bytes_per_line(color_count, static_cast<SailPixelFormat>(pixel_format));
 
     d->data.resize(palette_size);
     memcpy(d->data.data(), data, palette_size);
 
-    d->sail_palette->pixel_format = pixel_format;
+    d->sail_palette->pixel_format = static_cast<SailPixelFormat>(pixel_format);
     d->sail_palette->color_count  = color_count;
 
     return SAIL_OK;

@@ -48,7 +48,7 @@ resolution::resolution()
 {
 }
 
-resolution::resolution(SailResolutionUnit unit, double x, double y)
+resolution::resolution(ResolutionUnit unit, double x, double y)
     : resolution()
 {
     set_unit(unit);
@@ -92,9 +92,9 @@ bool resolution::is_valid() const
     return d->resolution.unit != SAIL_RESOLUTION_UNIT_UNKNOWN && d->resolution.x > 0 && d->resolution.y > 0;
 }
 
-SailResolutionUnit resolution::unit() const
+ResolutionUnit resolution::unit() const
 {
-    return d->resolution.unit;
+    return static_cast<ResolutionUnit>(d->resolution.unit);
 }
 
 double resolution::x() const
@@ -107,9 +107,9 @@ double resolution::y() const
     return d->resolution.y;
 }
 
-void resolution::set_unit(SailResolutionUnit unit)
+void resolution::set_unit(ResolutionUnit unit)
 {
-    d->resolution.unit = unit;
+    d->resolution.unit = static_cast<SailResolutionUnit>(unit);
 }
 
 void resolution::set_x(double x)
@@ -122,14 +122,14 @@ void resolution::set_y(double y)
     d->resolution.y = y;
 }
 
-const char* resolution::resolution_unit_to_string(SailResolutionUnit resolution_unit)
+const char* resolution::resolution_unit_to_string(ResolutionUnit resolution_unit)
 {
-    return sail_resolution_unit_to_string(resolution_unit);
+    return sail_resolution_unit_to_string(static_cast<SailResolutionUnit>(resolution_unit));
 }
 
-SailResolutionUnit resolution::resolution_unit_from_string(const std::string_view str)
+ResolutionUnit resolution::resolution_unit_from_string(const std::string_view str)
 {
-    return sail_resolution_unit_from_string(str.data());
+    return static_cast<ResolutionUnit>(sail_resolution_unit_from_string(str.data()));
 }
 
 resolution::resolution(const sail_resolution *res)

@@ -1,6 +1,6 @@
 /*  This file is part of SAIL (https://github.com/HappySeaFox/sail)
 
-    Copyright (c) 2022 Dmitry Baryshev
+    Copyright (c) 2025 Dmitry Baryshev
 
     The MIT License
 
@@ -23,21 +23,41 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_OSTREAM_CPP_H
-#define SAIL_OSTREAM_CPP_H
-
-#include <ostream>
-
-#include <sail-common/export.h>
+#ifndef SAIL_COMMON_FLAGS_CPP_H
+#define SAIL_COMMON_FLAGS_CPP_H
 
 #include <sail-c++/common.h>
+#include <sail-c++/flags.h>
 
-SAIL_EXPORT std::ostream& operator<<(std::ostream &os, sail::PixelFormat pixel_format);
-SAIL_EXPORT std::ostream& operator<<(std::ostream &os, sail::ChromaSubsampling chroma_subsampling);
-SAIL_EXPORT std::ostream& operator<<(std::ostream &os, sail::Orientation orientation);
-SAIL_EXPORT std::ostream& operator<<(std::ostream &os, sail::Compression compression);
-SAIL_EXPORT std::ostream& operator<<(std::ostream &os, sail::MetaData meta_data);
-SAIL_EXPORT std::ostream& operator<<(std::ostream &os, sail::ResolutionUnit resolution_unit);
-SAIL_EXPORT std::ostream& operator<<(std::ostream &os, sail::CodecFeature codec_feature);
+namespace sail
+{
+
+/*
+ * Flags combining codec features.
+ */
+class CodecFeatures : public Flags<CodecFeature>
+{
+    friend class load_features;
+    friend class save_features;
+
+public:
+    using base = Flags<CodecFeature>;
+    using base::base;
+};
+
+/*
+ * Flags combining codec options.
+ */
+class CodecOptions : public Flags<CodecOption>
+{
+    friend class load_options;
+    friend class save_options;
+
+public:
+    using base = Flags<CodecOption>;
+    using base::base;
+};
+
+}
 
 #endif

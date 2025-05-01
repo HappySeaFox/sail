@@ -32,6 +32,7 @@
 #include <sail-common/export.h>
 #include <sail-common/status.h>
 
+#include <sail-c++/common.h>
 #include <sail-c++/special_properties.h>
 
 struct sail_source_image;
@@ -85,12 +86,12 @@ public:
     bool is_valid() const;
 
     /*
-     * Returns the source image pixel format. See SailPixelFormat.
+     * Returns the source image pixel format. See PixelFormat.
      *
      * LOAD: Set by SAIL to a source image pixel format of the original image.
      * SAVE: Ignored.
      */
-    SailPixelFormat pixel_format() const;
+    PixelFormat pixel_format() const;
 
     /*
      * Returns the source image chroma subsampling. See SailChromaSubsampling.
@@ -98,7 +99,7 @@ public:
      * LOAD: Set by SAIL to a source image chroma subsampling of the original image.
      * SAVE: Ignored.
      */
-    SailChromaSubsampling chroma_subsampling() const;
+    ChromaSubsampling chroma_subsampling() const;
 
     /*
      * Returns the source image orientation.
@@ -106,15 +107,15 @@ public:
      * LOAD: Set by SAIL to the source image orientation.
      * SAVE: Ignored.
      */
-    SailOrientation orientation() const;
+    Orientation orientation() const;
 
     /*
-     * Returns the source image compression type. See SailCompression.
+     * Returns the source image compression type. See Compression.
      *
      * LOAD: Set by SAIL to a valid source image compression type.
      * SAVE: Ignored.
      */
-    SailCompression compression() const;
+    Compression compression() const;
 
     /*
      * Returns the source image interlacing.

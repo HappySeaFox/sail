@@ -32,6 +32,7 @@
 #include <sail-common/export.h>
 #include <sail-common/status.h>
 
+#include <sail-c++/common_flags.h>
 #include <sail-c++/tuning.h>
 
 struct sail_load_features;
@@ -76,9 +77,9 @@ public:
     ~load_features();
 
     /*
-     * Returns the supported or-ed features of loading operations. See SailCodecFeature.
+     * Returns the supported or-ed features of loading operations. See CodecFeatures.
      */
-    int features() const;
+    CodecFeatures features() const;
 
     /*
      * Returns supported codec-specific tuning options. For example, a hypothetical ABC

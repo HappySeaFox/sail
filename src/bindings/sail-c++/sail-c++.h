@@ -45,9 +45,12 @@
 #include <sail-c++/arbitrary_data.h>
 #include <sail-c++/at_scope_exit.h>
 #include <sail-c++/codec_info.h>
+#include <sail-c++/common.h>
+#include <sail-c++/common_flags.h>
 #include <sail-c++/compression_level.h>
 #include <sail-c++/context.h>
 #include <sail-c++/conversion_options.h>
+#include <sail-c++/flags.h>
 #include <sail-c++/iccp.h>
 #include <sail-c++/image.h>
 #include <sail-c++/image_input.h>

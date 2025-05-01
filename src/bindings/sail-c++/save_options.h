@@ -29,10 +29,10 @@
 #include <memory>
 #include <vector>
 
-#include <sail-common/common.h>
 #include <sail-common/export.h>
 #include <sail-common/status.h>
 
+#include <sail-c++/common_flags.h>
 #include <sail-c++/tuning.h>
 
 struct sail_save_options;
@@ -55,9 +55,9 @@ public:
     save_options();
 
     /*
-     * Constructs new save options from the or-ed manipulation options. See SailOption.
+     * Constructs new save options from the or-ed manipulation options. See CodecOptions.
      */
-    save_options(int options);
+    save_options(CodecOptions options);
 
     /*
      * Copies the save options.
@@ -85,12 +85,12 @@ public:
     ~save_options();
 
     /*
-     * Returns the or-ed manipulation options for saving operations. See SailOption.
+     * Returns the or-ed manipulation options for saving operations. See CodecOptions.
      */
-    int options() const;
+    CodecOptions options() const;
 
     /*
-     * Returns the compression type. For example: SAIL_COMPRESSION_RLE. See SailCompression.
+     * Returns the compression type. For example: Compression::RLE. See Compression.
      * Use save_features to determine what compression types or values are supported by a particular codec.
      *
      * If a codec supports more than two compression types, compression levels are ignored in this case.
@@ -102,7 +102,7 @@ public:
      *     2. The TIFF codec supports more than two compression types (PACKBITS, JPEG, etc.). Compression levels
      *        are ignored.
      */
-    SailCompression compression() const;
+    Compression compression() const;
 
     /*
      * Returns the requested compression level. Must be in the range specified in
@@ -121,14 +121,14 @@ public:
     const sail::tuning& tuning() const;
 
     /*
-     * Sets new or-ed manipulation options for saving operations. See SailOption.
+     * Sets new or-ed manipulation options for saving operations. See CodecOptions.
      */
-    void set_options(int options);
+    void set_options(CodecOptions options);
 
     /*
      * Sets a new compression type.
      */
-    void set_compression(SailCompression compression);
+    void set_compression(Compression compression);
 
     /*
      * Sets a new compression level.

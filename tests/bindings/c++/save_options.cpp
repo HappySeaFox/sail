@@ -42,9 +42,9 @@ static MunitResult test_save_options_construct(const MunitParameter params[], vo
     }
 
     {
-        sail::save_options save_options(SAIL_OPTION_META_DATA);
+        sail::save_options save_options(sail::CodecOption::MetaData);
 
-        munit_assert(save_options.options() == SAIL_OPTION_META_DATA);
+        munit_assert(save_options.options() == sail::CodecOption::MetaData);
         munit_assert(save_options.tuning().empty());
     }
 

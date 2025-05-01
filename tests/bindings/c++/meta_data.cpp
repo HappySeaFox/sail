@@ -41,24 +41,24 @@ static MunitResult test_meta_data_create(const MunitParameter params[], void *us
 
     {
         const sail::variant value(std::string("Mike"));
-        const sail::meta_data meta_data(SAIL_META_DATA_AUTHOR, value);
+        const sail::meta_data meta_data(sail::MetaData::Author, value);
 
         munit_assert(meta_data.key_unknown().empty());
-        munit_assert(meta_data.key()   == SAIL_META_DATA_AUTHOR);
+        munit_assert(meta_data.key()   == sail::MetaData::Author);
         munit_assert(meta_data.value() == value);
     }
 
     {
-        const sail::meta_data meta_data(SAIL_META_DATA_AUTHOR, sail::variant(std::string("Mike")));
+        const sail::meta_data meta_data(sail::MetaData::Author, sail::variant(std::string("Mike")));
         munit_assert(meta_data.key_unknown().empty());
-        munit_assert(meta_data.key()   == SAIL_META_DATA_AUTHOR);
+        munit_assert(meta_data.key()   == sail::MetaData::Author);
         munit_assert(meta_data.value() == sail::variant(std::string("Mike")));
     }
 
     {
         const sail::meta_data meta_data(std::string("Unknown Key"), sail::variant(std::string("Mike")));
         munit_assert(meta_data.key_unknown() == "Unknown Key");
-        munit_assert(meta_data.key()   == SAIL_META_DATA_UNKNOWN);
+        munit_assert(meta_data.key()   == sail::MetaData::Unknown);
         munit_assert(meta_data.value() == sail::variant(std::string("Mike")));
     }
 
@@ -70,11 +70,11 @@ static MunitResult test_meta_data_copy(const MunitParameter params[], void *user
     (void)user_data;
 
     const sail::variant value(std::string("Mike"));
-    const sail::meta_data meta_data(SAIL_META_DATA_AUTHOR, value);
+    const sail::meta_data meta_data(sail::MetaData::Author, value);
     const sail::meta_data meta_data2 = meta_data;
 
     munit_assert(meta_data2.key_unknown().empty());
-    munit_assert(meta_data2.key()   == SAIL_META_DATA_AUTHOR);
+    munit_assert(meta_data2.key()   == sail::MetaData::Author);
     munit_assert(meta_data2.value() == value);
 
     return MUNIT_OK;
@@ -85,11 +85,11 @@ static MunitResult test_meta_data_move(const MunitParameter params[], void *user
     (void)user_data;
 
     const sail::variant value(std::string("Mike"));
-    sail::meta_data meta_data(SAIL_META_DATA_AUTHOR, value);
+    sail::meta_data meta_data(sail::MetaData::Author, value);
     const sail::meta_data meta_data2 = std::move(meta_data);
 
     munit_assert(meta_data2.key_unknown().empty());
-    munit_assert(meta_data2.key()   == SAIL_META_DATA_AUTHOR);
+    munit_assert(meta_data2.key()   == sail::MetaData::Author);
     munit_assert(meta_data2.value() == value);
 
     return MUNIT_OK;

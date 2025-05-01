@@ -51,7 +51,7 @@ public:
     sail::tuning tuning;
 };
 
-load_options::load_options(int options)
+load_options::load_options(CodecOptions options)
     : d(new pimpl)
 {
     set_options(options);
@@ -92,9 +92,9 @@ load_options::~load_options()
 {
 }
 
-int load_options::options() const
+CodecOptions load_options::options() const
 {
-    return d->sail_load_options->options;
+    return CodecOptions(d->sail_load_options->options);
 }
 
 sail::tuning& load_options::tuning()
@@ -107,9 +107,9 @@ const sail::tuning& load_options::tuning() const
     return d->tuning;
 }
 
-void load_options::set_options(int options)
+void load_options::set_options(CodecOptions options)
 {
-    d->sail_load_options->options = options;
+    d->sail_load_options->options = options.underlying_value();
 }
 
 void load_options::set_tuning(const sail::tuning &tuning)
@@ -125,7 +125,7 @@ load_options::load_options(const sail_load_options *ro)
         return;
     }
 
-    set_options(ro->options);
+    set_options(CodecOptions(ro->options));
     set_tuning(utils_private::c_tuning_to_cpp_tuning(ro->tuning));
 }
 

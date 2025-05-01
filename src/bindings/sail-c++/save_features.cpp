@@ -39,8 +39,8 @@ public:
 
     const sail_save_features *sail_save_features_c;
 
-    std::vector<SailPixelFormat> pixel_formats;
-    std::vector<SailCompression> compressions;
+    std::vector<PixelFormat> pixel_formats;
+    std::vector<Compression> compressions;
     sail::compression_level compression_level;
     sail::supported_tuning supported_tuning;
 };
@@ -78,24 +78,24 @@ save_features::~save_features()
 {
 }
 
-const std::vector<SailPixelFormat>& save_features::pixel_formats() const
+const std::vector<PixelFormat>& save_features::pixel_formats() const
 {
     return d->pixel_formats;
 }
 
-int save_features::features() const
+CodecFeatures save_features::features() const
 {
-    return d->sail_save_features_c->features;
+    return CodecFeatures(d->sail_save_features_c->features);
 }
 
-const std::vector<SailCompression>& save_features::compressions() const
+const std::vector<Compression>& save_features::compressions() const
 {
     return d->compressions;
 }
 
-SailCompression save_features::default_compression() const
+Compression save_features::default_compression() const
 {
-    return d->sail_save_features_c->default_compression;
+    return static_cast<Compression>(d->sail_save_features_c->default_compression);
 }
 
 const sail::compression_level& save_features::compression_level() const
@@ -140,26 +140,26 @@ save_features::save_features(const sail_save_features *wf)
     d->sail_save_features_c = wf;
 
     // Output pixel formats
-    std::vector<SailPixelFormat> pixel_formats;
+    std::vector<PixelFormat> pixel_formats;
 
     if (d->sail_save_features_c->pixel_formats != nullptr && d->sail_save_features_c->pixel_formats_length > 0) {
         pixel_formats.reserve(d->sail_save_features_c->pixel_formats_length);
 
         for (unsigned i = 0; i < d->sail_save_features_c->pixel_formats_length; i++) {
-            pixel_formats.push_back(d->sail_save_features_c->pixel_formats[i]);
+            pixel_formats.push_back(static_cast<PixelFormat>(d->sail_save_features_c->pixel_formats[i]));
         }
     }
 
     d->pixel_formats = pixel_formats;
 
     // Compressions
-    std::vector<SailCompression> compressions;
+    std::vector<Compression> compressions;
 
     if (d->sail_save_features_c->compressions != nullptr && d->sail_save_features_c->compressions_length > 0) {
         compressions.reserve(d->sail_save_features_c->compressions_length);
 
         for (unsigned i = 0; i < d->sail_save_features_c->compressions_length; i++) {
-            compressions.push_back(d->sail_save_features_c->compressions[i]);
+            compressions.push_back(static_cast<Compression>(d->sail_save_features_c->compressions[i]));
         }
     }
 

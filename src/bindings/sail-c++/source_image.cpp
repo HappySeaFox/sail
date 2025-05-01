@@ -65,10 +65,10 @@ source_image::source_image(const source_image &si)
 
 source_image& source_image::operator=(const source_image &si)
 {
-    d->sail_source_image->pixel_format       = si.pixel_format();
-    d->sail_source_image->chroma_subsampling = si.chroma_subsampling();
-    d->sail_source_image->orientation        = si.orientation();
-    d->sail_source_image->compression        = si.compression();
+    d->sail_source_image->pixel_format       = static_cast<SailPixelFormat>(si.pixel_format());
+    d->sail_source_image->chroma_subsampling = static_cast<SailChromaSubsampling>(si.chroma_subsampling());
+    d->sail_source_image->orientation        = static_cast<SailOrientation>(si.orientation());
+    d->sail_source_image->compression        = static_cast<SailCompression>(si.compression());
     d->sail_source_image->interlaced         = si.interlaced();
     d->special_properties                    = si.special_properties();
 
@@ -96,24 +96,24 @@ bool source_image::is_valid() const
     return d->sail_source_image != nullptr;
 }
 
-SailPixelFormat source_image::pixel_format() const
+PixelFormat source_image::pixel_format() const
 {
-    return d->sail_source_image->pixel_format;
+    return static_cast<PixelFormat>(d->sail_source_image->pixel_format);
 }
 
-SailChromaSubsampling source_image::chroma_subsampling() const
+ChromaSubsampling source_image::chroma_subsampling() const
 {
-    return d->sail_source_image->chroma_subsampling;
+    return static_cast<ChromaSubsampling>(d->sail_source_image->chroma_subsampling);
 }
 
-SailOrientation source_image::orientation() const
+Orientation source_image::orientation() const
 {
-    return d->sail_source_image->orientation;
+    return static_cast<Orientation>(d->sail_source_image->orientation);
 }
 
-SailCompression source_image::compression() const
+Compression source_image::compression() const
 {
-    return d->sail_source_image->compression;
+    return static_cast<Compression>(d->sail_source_image->compression);
 }
 
 bool source_image::interlaced() const

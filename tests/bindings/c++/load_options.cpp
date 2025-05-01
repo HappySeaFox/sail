@@ -49,9 +49,9 @@ static MunitResult test_load_options_construct(const MunitParameter params[], vo
     }
 
     {
-        sail::load_options load_options(SAIL_OPTION_META_DATA);
+        sail::load_options load_options(sail::CodecOption::MetaData);
 
-        munit_assert(load_options.options() == SAIL_OPTION_META_DATA);
+        munit_assert(load_options.options() == sail::CodecOption::MetaData);
         munit_assert(load_options.tuning().empty());
     }
 

@@ -6,12 +6,15 @@ add_library(sail-c++
                 at_scope_exit.h
                 codec_info.cpp
                 codec_info.h
+                common.h
+                common_flags.h
                 compression_level.cpp
                 compression_level.h
                 context.cpp
                 context.h
                 conversion_options.cpp
                 conversion_options.h
+                flags.h
                 iccp.cpp
                 iccp.h
                 image.cpp
@@ -65,9 +68,12 @@ set(PUBLIC_HEADERS abstract_io.h
                    arbitrary_data.h
                    at_scope_exit.h
                    codec_info.h
+                   common.h
+                   common_flags.h
                    context.h
-                   conversion_options.h
                    compression_level.h
+                   conversion_options.h
+                   flags.h
                    iccp.h
                    image.h
                    image_input.h

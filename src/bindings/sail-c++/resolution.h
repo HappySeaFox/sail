@@ -54,7 +54,7 @@ public:
     /*
      * Constructs a new resolution with the specified unit and values.
      */
-    resolution(SailResolutionUnit unit, double x, double y);
+    resolution(ResolutionUnit unit, double x, double y);
 
     /*
      * Copies the resolution.
@@ -89,7 +89,7 @@ public:
     /*
      * Returns the resolution unit.
      */
-    SailResolutionUnit unit() const;
+    ResolutionUnit unit() const;
 
     /*
      * Returns the resolution x value.
@@ -104,7 +104,7 @@ public:
     /*
      * Sets a new resolution units.
      */
-    void set_unit(SailResolutionUnit unit);
+    void set_unit(ResolutionUnit unit);
 
     /*
      * Sets a new resolution x value.
@@ -117,20 +117,20 @@ public:
     void set_y(double y);
 
     /*
-     * Returns a string representation of the specified resolution unit. See SailResolutionUnit.
-     * For example: "Micrometer" is returned for SAIL_RESOLUTION_UNIT_MICROMETER.
+     * Returns a string representation of the specified resolution unit. See ResolutionUnit.
+     * For example: "Micrometer" is returned for ResolutionUnit::Micrometer.
      *
      * Returns NULL if the resolution unit is not known.
      */
-    static const char* resolution_unit_to_string(SailResolutionUnit resolution_unit);
+    static const char* resolution_unit_to_string(ResolutionUnit resolution_unit);
 
     /*
-     * Returns a resolution unit from the string representation. See SailResolutionUnit.
-     * For example: SAIL_RESOLUTION_UNIT_MICROMETER is returned for "Micrometer".
+     * Returns a resolution unit from the string representation. See ResolutionUnit.
+     * For example: ResolutionUnit::Micrometer is returned for "Micrometer".
      *
-     * Returns SAIL_RESOLUTION_UNIT_UNKNOWN if the resolution unit is not known.
+     * Returns ResolutionUnit::Unknown if the resolution unit is not known.
      */
-    static SailResolutionUnit resolution_unit_from_string(const std::string_view str);
+    static ResolutionUnit resolution_unit_from_string(const std::string_view str);
 
 private:
     /*

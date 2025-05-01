@@ -30,10 +30,10 @@
 #include <string>
 #include <string_view>
 
-#include <sail-common/common.h>
 #include <sail-common/export.h>
 #include <sail-common/status.h>
 
+#include <sail-c++/common.h>
 #include <sail-c++/arbitrary_data.h>
 
 struct sail_meta_data;
@@ -60,13 +60,13 @@ public:
      * Constructs a new meta data entry out of the known meta data
      * key and the value.
      */
-    meta_data(SailMetaData key, const variant &value);
+    meta_data(MetaData key, const variant &value);
 
     /*
      * Constructs a new meta data entry out of the known meta data
      * key and the value.
      */
-    meta_data(SailMetaData key, variant &&value) noexcept;
+    meta_data(MetaData key, variant &&value) noexcept;
 
     /*
      * Constructs a new meta data entry out of the unknown meta data
@@ -113,13 +113,13 @@ public:
 
     /*
      * Returns the meta data key when it's well known like Artist or Comment.
-     * When key() returns SAIL_META_DATA_UNKNOWN, use key_unknown() to get the
+     * When key() returns MetaData::Unknown, use key_unknown() to get the
      * key string representation.
      */
-    SailMetaData key() const;
+    MetaData key() const;
 
     /*
-     * Returns the meta data string key representation when key() returns SAIL_META_DATA_UNKNOWN.
+     * Returns the meta data string key representation when key() returns MetaData::Unknown.
      * For example: "Person on the Image".
      */
     const std::string& key_unknown() const;
@@ -132,16 +132,16 @@ public:
     /*
      * Sets a new known meta data key like Artist or Comment. Resets the saved unknown key to an empty string.
      */
-    void set_key(SailMetaData key);
+    void set_key(MetaData key);
 
     /*
-     * Sets a new unknown meta data string key representation. Resets the saved key to SAIL_META_DATA_UNKNOWN.
+     * Sets a new unknown meta data string key representation. Resets the saved key to MetaData::Unknown.
      * For example: "Person on the Image".
      */
     void set_key(const std::string_view key_unknown);
 
     /*
-     * Sets a new unknown meta data string key representation. Resets the saved key to SAIL_META_DATA_UNKNOWN.
+     * Sets a new unknown meta data string key representation. Resets the saved key to MetaData::Unknown.
      * For example: "Person on the Image".
      */
     void set_key(std::string &&key_unknown) noexcept;
@@ -157,20 +157,20 @@ public:
     void set_value(variant &&value) noexcept;
 
     /*
-     * Returns a string representation of the specified meta data key. See SailMetaData.
-     * For example: "Author" is returned for SAIL_META_DATA_AUTHOR.
+     * Returns a string representation of the specified meta data key. See MetaData.
+     * For example: "Author" is returned for MetaData::Author.
      *
      * Returns nullptr if the meta data key is not known.
      */
-    static const char* meta_data_to_string(SailMetaData meta_data);
+    static const char* meta_data_to_string(MetaData meta_data);
 
     /*
-     * Returns a meta data key from the string representation. See SailMetaData.
-     * For example: SAIL_META_DATA_AUTHOR is returned for "Author".
+     * Returns a meta data key from the string representation. See MetaData.
+     * For example: MetaData::Author is returned for "Author".
      *
-     * Returns SAIL_META_DATA_UNKNOWN if the meta data key is not known.
+     * Returns MetaData::Unknown if the meta data key is not known.
      */
-    static SailMetaData meta_data_from_string(const std::string_view str);
+    static MetaData meta_data_from_string(const std::string_view str);
 
 private:
     /*

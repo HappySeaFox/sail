@@ -29,10 +29,10 @@
 #include <memory>
 #include <vector>
 
-#include <sail-common/common.h>
 #include <sail-common/export.h>
 #include <sail-common/status.h>
 
+#include <sail-c++/common_flags.h>
 #include <sail-c++/compression_level.h>
 #include <sail-c++/tuning.h>
 
@@ -80,12 +80,12 @@ public:
     /*
      * Returns the list of supported pixel formats that can be written by this codec.
      */
-    const std::vector<SailPixelFormat>& pixel_formats() const;
+    const std::vector<PixelFormat>& pixel_formats() const;
 
     /*
-     * Returns the supported or-ed features of saving operations. See SailCodecFeature.
+     * Returns the supported or-ed features of saving operations. See CodecFeatures.
      */
-    int features() const;
+    CodecFeatures features() const;
 
     /*
      * Returns the list of supported pixels compression types by this codec. If the list has more than
@@ -98,12 +98,12 @@ public:
      *     2. The TIFF codec supports more than two compression types (PACKBITS, JPEG, etc.).
      *        Compression levels are ignored.
      */
-    const std::vector<SailCompression>& compressions() const;
+    const std::vector<Compression>& compressions() const;
 
     /*
      * Returns the compression type to use by default.
      */
-    SailCompression default_compression() const;
+    Compression default_compression() const;
 
     /*
      * Returns the supported compression level range or an ivalid object if

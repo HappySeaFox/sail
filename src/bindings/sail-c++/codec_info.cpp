@@ -137,14 +137,14 @@ const save_features& codec_info::save_features() const
     return d->save_features;
 }
 
-const char* codec_info::codec_feature_to_string(SailCodecFeature codec_feature)
+const char* codec_info::codec_feature_to_string(CodecFeature codec_feature)
 {
-    return sail_codec_feature_to_string(codec_feature);
+    return sail_codec_feature_to_string(static_cast<SailCodecFeature>(codec_feature));
 }
 
-SailCodecFeature codec_info::codec_feature_from_string(const std::string_view str)
+CodecFeature codec_info::codec_feature_from_string(const std::string_view str)
 {
-    return sail_codec_feature_from_string(str.data());
+    return static_cast<CodecFeature>(sail_codec_feature_from_string(str.data()));
 }
 
 codec_info codec_info::from_magic_number(const std::string_view path)

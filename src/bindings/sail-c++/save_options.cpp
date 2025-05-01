@@ -56,7 +56,7 @@ save_options::save_options()
 {
 }
 
-save_options::save_options(int options)
+save_options::save_options(CodecOptions options)
     : d(new pimpl)
 {
     set_options(options);
@@ -94,14 +94,14 @@ save_options::~save_options()
 {
 }
 
-int save_options::options() const
+CodecOptions save_options::options() const
 {
-    return d->sail_save_options->options;
+    return CodecOptions(d->sail_save_options->options);
 }
 
-SailCompression save_options::compression() const
+Compression save_options::compression() const
 {
-    return d->sail_save_options->compression;
+    return static_cast<Compression>(d->sail_save_options->compression);
 }
 
 double save_options::compression_level() const
@@ -119,14 +119,14 @@ const sail::tuning& save_options::tuning() const
     return d->tuning;
 }
 
-void save_options::set_options(int options)
+void save_options::set_options(CodecOptions options)
 {
-    d->sail_save_options->options = options;
+    d->sail_save_options->options = options.underlying_value();
 }
 
-void save_options::set_compression(SailCompression compression)
+void save_options::set_compression(Compression compression)
 {
-    d->sail_save_options->compression = compression;
+    d->sail_save_options->compression = static_cast<SailCompression>(compression);
 }
 
 void save_options::set_compression_level(double compression_level)
@@ -147,8 +147,8 @@ save_options::save_options(const sail_save_options *wo)
         return;
     }
 
-    set_options(wo->options);
-    set_compression(wo->compression);
+    set_options(CodecOptions(wo->options));
+    set_compression(static_cast<Compression>(wo->compression));
     set_compression_level(wo->compression_level);
     set_tuning(utils_private::c_tuning_to_cpp_tuning(wo->tuning));
 }

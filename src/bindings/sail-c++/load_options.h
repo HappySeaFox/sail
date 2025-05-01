@@ -32,6 +32,7 @@
 #include <sail-common/export.h>
 #include <sail-common/status.h>
 
+#include <sail-c++/common_flags.h>
 #include <sail-c++/tuning.h>
 
 struct sail_load_options;
@@ -54,9 +55,9 @@ public:
     load_options();
 
     /*
-     * Constructs new load options from the or-ed manipulation options. See SailOption.
+     * Constructs new load options from the or-ed manipulation options. See CodecOptions.
      */
-    load_options(int options);
+    load_options(CodecOptions options);
 
     /*
      * Copies the load options.
@@ -84,9 +85,9 @@ public:
     ~load_options();
 
     /*
-     * Returns the or-ed manipulation options for loading operations. See SailOption.
+     * Returns the or-ed manipulation options for loading operations. See CodecOptions.
      */
-    int options() const;
+    CodecOptions options() const;
 
     /*
      * Returns editable codec-specific tuning options. For example, a hypothetical ABC
@@ -117,9 +118,9 @@ public:
     const sail::tuning& tuning() const;
 
     /*
-     * Sets new or-ed manipulation options for loading operations. See SailOption.
+     * Sets new or-ed manipulation options for loading operations. See CodecOptions.
      */
-    void set_options(int options);
+    void set_options(CodecOptions options);
 
     /*
      * Sets new codec tuning.

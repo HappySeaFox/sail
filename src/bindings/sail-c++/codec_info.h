@@ -31,9 +31,10 @@
 #include <string>
 #include <vector>
 
-#include <sail-common/common.h>
 #include <sail-common/export.h>
 #include <sail-common/status.h>
+
+#include <sail-c++/common.h>
 
 struct sail_codec_info;
 
@@ -131,20 +132,20 @@ public:
     const sail::save_features& save_features() const;
 
     /*
-     * Returns a string representation of the specified codec feature. See SailCodecFeature.
-     * For example: "STATIC" is returned for SAIL_CODEC_FEATURE_STATIC.
+     * Returns a string representation of the specified codec feature. See CodecFeature.
+     * For example: "STATIC" is returned for CodecFeature::Static.
      *
      * Returns NULL if the codec feature is not known.
      */
-    static const char* codec_feature_to_string(SailCodecFeature codec_feature);
+    static const char* codec_feature_to_string(CodecFeature codec_feature);
 
     /*
-     * Returns a codec feature from the string representation. See SailCodecFeature.
-     * For example: SAIL_CODEC_FEATURE_STATIC is returned for "STATIC".
+     * Returns a codec feature from the string representation. See CodecFeature.
+     * For example: CodecFeature::Static is returned for "STATIC".
      *
-     * Returns SAIL_CODEC_FEATURE_UNKNOWN if the codec feature is not known.
+     * Returns CodecFeature::Unknown if the codec feature is not known.
      */
-    static SailCodecFeature codec_feature_from_string(const std::string_view str);
+    static CodecFeature codec_feature_from_string(const std::string_view str);
 
     /*
      * Returns a first codec info object that supports the magic number read from the specified file.

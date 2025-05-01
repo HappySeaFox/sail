@@ -35,14 +35,14 @@ static MunitResult test_image_create(const MunitParameter params[], void *user_d
 
     {
         sail::image image;
-        munit_assert(image.pixel_format() == SAIL_PIXEL_FORMAT_UNKNOWN);
+        munit_assert(image.pixel_format() == sail::PixelFormat::Unknown);
         munit_assert_null(image.pixels());
         munit_assert_false(image.is_valid());
     }
 
     {
-        sail::image image(SAIL_PIXEL_FORMAT_BPP24_RGB, 16, 16);
-        munit_assert(image.pixel_format() == SAIL_PIXEL_FORMAT_BPP24_RGB);
+        sail::image image(sail::PixelFormat::BPP24_RGB, 16, 16);
+        munit_assert(image.pixel_format() == sail::PixelFormat::BPP24_RGB);
         munit_assert_uint(image.width(), ==, 16);
         munit_assert_uint(image.height(), ==, 16);
         munit_assert_not_null(image.pixels());
@@ -50,8 +50,8 @@ static MunitResult test_image_create(const MunitParameter params[], void *user_d
     }
 
     {
-        sail::image image(SAIL_PIXEL_FORMAT_BPP24_RGB, 16, 16, 50);
-        munit_assert(image.pixel_format() == SAIL_PIXEL_FORMAT_BPP24_RGB);
+        sail::image image(sail::PixelFormat::BPP24_RGB, 16, 16, 50);
+        munit_assert(image.pixel_format() == sail::PixelFormat::BPP24_RGB);
         munit_assert_uint(image.width(), ==, 16);
         munit_assert_uint(image.height(), ==, 16);
         munit_assert_uint(image.bytes_per_line(), ==, 50);
@@ -62,8 +62,8 @@ static MunitResult test_image_create(const MunitParameter params[], void *user_d
     {
         // Peek a random pointer
         void *pixels = &user_data;
-        sail::image image(pixels, SAIL_PIXEL_FORMAT_BPP24_RGB, 16, 16);
-        munit_assert(image.pixel_format() == SAIL_PIXEL_FORMAT_BPP24_RGB);
+        sail::image image(pixels, sail::PixelFormat::BPP24_RGB, 16, 16);
+        munit_assert(image.pixel_format() == sail::PixelFormat::BPP24_RGB);
         munit_assert_uint(image.width(), ==, 16);
         munit_assert_uint(image.height(), ==, 16);
         munit_assert_ptr_equal(image.pixels(), pixels);
@@ -73,8 +73,8 @@ static MunitResult test_image_create(const MunitParameter params[], void *user_d
     {
         // Peek a random pointer
         void *pixels = &user_data;
-        sail::image image(pixels, SAIL_PIXEL_FORMAT_BPP24_RGB, 16, 16, 50);
-        munit_assert(image.pixel_format() == SAIL_PIXEL_FORMAT_BPP24_RGB);
+        sail::image image(pixels, sail::PixelFormat::BPP24_RGB, 16, 16, 50);
+        munit_assert(image.pixel_format() == sail::PixelFormat::BPP24_RGB);
         munit_assert_uint(image.width(), ==, 16);
         munit_assert_uint(image.height(), ==, 16);
         munit_assert_uint(image.bytes_per_line(), ==, 50);
@@ -90,7 +90,7 @@ static MunitResult test_image_copy(const MunitParameter params[], void *user_dat
     (void)user_data;
 
     {
-        sail::image image(SAIL_PIXEL_FORMAT_BPP24_RGB, 16, 16);
+        sail::image image(sail::PixelFormat::BPP24_RGB, 16, 16);
         munit_assert_true(image.is_valid());
 
         sail::image image_copy = image;
@@ -104,7 +104,7 @@ static MunitResult test_image_copy(const MunitParameter params[], void *user_dat
 
     {
         char pixels[16*16*3];
-        sail::image image(pixels, SAIL_PIXEL_FORMAT_BPP24_RGB, 16, 16);
+        sail::image image(pixels, sail::PixelFormat::BPP24_RGB, 16, 16);
         munit_assert_true(image.is_valid());
 
         sail::image image_copy = image;
@@ -124,11 +124,11 @@ static MunitResult test_image_move(const MunitParameter params[], void *user_dat
     (void)user_data;
 
     {
-        sail::image image(SAIL_PIXEL_FORMAT_BPP24_RGB, 16, 16);
+        sail::image image(sail::PixelFormat::BPP24_RGB, 16, 16);
         munit_assert_true(image.is_valid());
 
         sail::image image_copy = std::move(image);
-        munit_assert(image_copy.pixel_format() == SAIL_PIXEL_FORMAT_BPP24_RGB);
+        munit_assert(image_copy.pixel_format() == sail::PixelFormat::BPP24_RGB);
         munit_assert_uint(image_copy.width(), ==, 16);
         munit_assert_uint(image_copy.height(), ==, 16);
         munit_assert_not_null(image_copy.pixels());
@@ -137,12 +137,12 @@ static MunitResult test_image_move(const MunitParameter params[], void *user_dat
 
     {
         char pixels[16*16*3];
-        sail::image image(pixels, SAIL_PIXEL_FORMAT_BPP24_RGB, 16, 16);
+        sail::image image(pixels, sail::PixelFormat::BPP24_RGB, 16, 16);
         munit_assert_true(image.is_valid());
 
         sail::image image_copy = std::move(image);
 
-        munit_assert(image_copy.pixel_format() == SAIL_PIXEL_FORMAT_BPP24_RGB);
+        munit_assert(image_copy.pixel_format() == sail::PixelFormat::BPP24_RGB);
         munit_assert_uint(image_copy.width(), ==, 16);
         munit_assert_uint(image_copy.height(), ==, 16);
         munit_assert_not_null(image_copy.pixels());

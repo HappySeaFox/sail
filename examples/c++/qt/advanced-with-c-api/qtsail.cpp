@@ -180,7 +180,7 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
     memcpy(image->pixels, qimage.bits(), sizeInBytes);
     image->width = qimage.width();
     image->height = qimage.height();
-    image->pixel_format = qImageFormatToSailPixelFormat(qimage.format());
+    image->pixel_format = qImageFormatToSailPixelFormatCApi(qimage.format());
     image->bytes_per_line = sail_bytes_per_line(image->width, image->pixel_format);
 
     /*

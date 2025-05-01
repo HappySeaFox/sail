@@ -33,6 +33,7 @@
 #include <sail-common/status.h>
 
 #include <sail-c++/arbitrary_data.h>
+#include <sail-c++/common.h>
 
 struct sail_palette;
 
@@ -54,21 +55,21 @@ public:
 
     /*
      * Constructs palette from the data. The palette stays invalid if the pixel format
-     * is SAIL_PIXEL_FORMAT_UNKNOWN, or the color count is 0, or the data is null.
+     * is PixelFormat::Unknown, or the color count is 0, or the data is null.
      * The channels are interleaved per pixel. The pixel data must not have gaps, i.e.:
      * RGBRGB...
      */
-    palette(SailPixelFormat pixel_format, const void *data, unsigned color_count);
+    palette(PixelFormat pixel_format, const void *data, unsigned color_count);
 
     /*
      * Constructs palette from the data. Calculates the color count from the data size
      * and the pixel format. The palette stays invalid if the pixel format
-     * is SAIL_PIXEL_FORMAT_UNKNOWN or the data is empty.
+     * is PixelFormat::Unknown or the data is empty.
      *
      * The channels are interleaved per pixel. The pixel data must not have gaps, i.e.:
      * RGBRGB...
      */
-    palette(SailPixelFormat pixel_format, const arbitrary_data &data);
+    palette(PixelFormat pixel_format, const arbitrary_data &data);
 
     /*
      * Copies the palette.
@@ -103,7 +104,7 @@ public:
     /*
      * Returns the palette pixel format.
      */
-    SailPixelFormat pixel_format() const;
+    PixelFormat pixel_format() const;
 
     /*
      * Returns the palette pixel data. The channels are interleaved per pixel.
@@ -118,17 +119,17 @@ public:
 
     /*
      * Sets new palette data, pixel format, and colors count. Makes the palette invalid
-     * if the pixel format is SAIL_PIXEL_FORMAT_UNKNOWN, or the color count is 0,
+     * if the pixel format is PixelFormat::Unknown, or the color count is 0,
      * or the data is null.
      */
-    void set_data(SailPixelFormat pixel_format, const void *data, unsigned color_count);
+    void set_data(PixelFormat pixel_format, const void *data, unsigned color_count);
 
     /*
      * Sets new palette data, pixel format, and colors count. Calculates the color count
      * from the data size and the pixel format. Makes the palette invalid if the pixel
-     * format is SAIL_PIXEL_FORMAT_UNKNOWN or the data is empty.
+     * format is PixelFormat::Unknown or the data is empty.
      */
-    void set_data(SailPixelFormat pixel_format, const arbitrary_data &data);
+    void set_data(PixelFormat pixel_format, const arbitrary_data &data);
 
 private:
     /*
@@ -138,7 +139,7 @@ private:
 
     sail_status_t to_sail_palette(sail_palette **palette) const;
 
-    sail_status_t copy(SailPixelFormat pixel_format, const void *data, unsigned color_count);
+    sail_status_t copy(PixelFormat pixel_format, const void *data, unsigned color_count);
 
 private:
     class pimpl;

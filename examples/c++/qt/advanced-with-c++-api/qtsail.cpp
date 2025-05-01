@@ -95,7 +95,7 @@ sail_status_t QtSail::loadImage(const QString &path, QVector<QImage> *qimages, Q
             first_image = image;
         }
 
-        SAIL_TRY(image.convert(SAIL_PIXEL_FORMAT_BPP24_RGB, options));
+        SAIL_TRY(image.convert(sail::PixelFormat::BPP24_RGB, options));
 
         // Convert to QImage.
         //
@@ -134,7 +134,7 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
         SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_NOT_FOUND);
     }
 
-    sail::image image(const_cast<uchar *>(qimage.bits()), qImageFormatToSailPixelFormat(qimage.format()), qimage.width(), qimage.height(), qimage.bytesPerLine());
+    sail::image image(const_cast<uchar *>(qimage.bits()), qImageFormatToSailPixelFormatCppApi(qimage.format()), qimage.width(), qimage.height(), qimage.bytesPerLine());
 
     // SAIL tries to save an image as is, preserving its pixel format.
     // Particular image formats may support saving in different pixel formats:
