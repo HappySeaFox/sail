@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_AT_SCOPE_EXIT_CPP_H
-#define SAIL_AT_SCOPE_EXIT_CPP_H
+module sail.cpp;
 
 namespace sail
 {
@@ -77,5 +76,3 @@ private:
 do {                                                                   \
     (void)sail_local_cleanup_lambda_executor;                          \
 } while(0)
-
-#endif

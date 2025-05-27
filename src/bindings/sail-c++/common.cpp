@@ -23,12 +23,9 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_COMMON_CPP_H
-#define SAIL_COMMON_CPP_H
+module sail.cpp;
 
 #include <sail-common/common.h>
-
-#include <sail-c++/flags.h>
 
 /*
  * Common data types used across SAIL, adapted for C++.
@@ -39,7 +36,7 @@ namespace sail
 {
 
 /* Pixel format */
-enum class PixelFormat {
+export enum class PixelFormat {
 
     /*
      * Unknown or unsupported pixel format that cannot be parsed by SAIL.
@@ -178,7 +175,7 @@ enum class PixelFormat {
 };
 
 /* Chroma subsampling. See https://en.wikipedia.org/wiki/Chroma_subsampling */
-enum class ChromaSubsampling {
+export enum class ChromaSubsampling {
 
     Unknown   = SAIL_CHROMA_SUBSAMPLING_UNKNOWN,
 
@@ -193,7 +190,7 @@ enum class ChromaSubsampling {
 };
 
 /* Orientation. */
-enum class Orientation {
+export enum class Orientation {
 
     Normal                         = SAIL_ORIENTATION_NORMAL,
     Rotated90                      = SAIL_ORIENTATION_ROTATED_90,
@@ -254,7 +251,7 @@ enum class Compression {
 };
 
 /* Meta data. */
-enum class MetaData {
+export enum class MetaData {
 
     /* Unknown meta data type. */
     Unknown = SAIL_META_DATA_UNKNOWN,
@@ -289,7 +286,7 @@ enum class MetaData {
 };
 
 /* Resolution units. */
-enum class ResolutionUnit {
+export enum class ResolutionUnit {
 
     Unknown    = SAIL_RESOLUTION_UNIT_UNKNOWN,
     Micrometer = SAIL_RESOLUTION_UNIT_MICROMETER,
@@ -304,7 +301,7 @@ enum class ResolutionUnit {
  * Make the underlying type int to match the C enum restriction
  * when enumerators are always int.
  */
-enum class CodecFeature : int {
+export enum class CodecFeature : int {
 
     /* Unknown codec feature used to indicate an error in parsing functions. */
     Unknown = SAIL_CODEC_FEATURE_UNKNOWN,
@@ -337,7 +334,7 @@ enum class CodecFeature : int {
  * Make the underlying type int to match the C enum restriction
  * when enumerators are always int.
  */
-enum class CodecOption : int {
+export enum class CodecOption : int {
 
     /*
      * Instruction to load or save image meta data like JPEG comments or EXIF.
@@ -359,5 +356,3 @@ enum class CodecOption : int {
 };
 
 }
-
-#endif

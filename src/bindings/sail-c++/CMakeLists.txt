@@ -1,109 +1,59 @@
-add_library(sail-c++
-                abstract_io.h
-                abstract_io_adapter.cpp
-                abstract_io_adapter.h
-                arbitrary_data.h
-                at_scope_exit.h
-                codec_info.cpp
-                codec_info.h
-                common.h
-                common_flags.h
-                compression_level.cpp
-                compression_level.h
-                context.cpp
-                context.h
-                conversion_options.cpp
-                conversion_options.h
-                flags.h
-                iccp.cpp
-                iccp.h
-                image.cpp
-                image.h
-                image_input.cpp
-                image_input.h
-                image_output.cpp
-                image_output.h
-                io_base.cpp
-                io_base.h
-                io_base_private.h
-                io_file.cpp
-                io_file.h
-                io_memory.cpp
-                io_memory.h
-                load_features.cpp
-                load_features.h
-                load_options.cpp
-                load_options.h
-                log.cpp
-                log.h
-                meta_data.cpp
-                meta_data.h
-                ostream.h
-                ostream.cpp
-                palette.cpp
-                palette.h
-                resolution.cpp
-                resolution.h
-                sail-c++.h
-                save_features.cpp
-                save_features.h
-                save_options.cpp
-                save_options.h
-                source_image.cpp
-                source_image.h
-                special_properties.h
-                suppress_begin.h
-                suppress_c4251.h
-                suppress_end.h
-                tuning.h
-                utils.cpp
-                utils.h
-                utils_private.cpp
-                utils_private.h
-                variant.h)
+add_library(sail-c++)
 
-# Build a list of public headers to install
-#
-set(PUBLIC_HEADERS abstract_io.h
-                   arbitrary_data.h
-                   at_scope_exit.h
-                   codec_info.h
-                   common.h
-                   common_flags.h
-                   context.h
-                   compression_level.h
-                   conversion_options.h
-                   flags.h
-                   iccp.h
-                   image.h
-                   image_input.h
-                   image_output.h
-                   io_base.h
-                   io_file.h
-                   io_memory.h
-                   load_features.h
-                   load_options.h
-                   log.h
-                   meta_data.h
-                   ostream.h
-                   palette.h
-                   resolution.h
-                   sail-c++.h
-                   save_features.h
-                   save_options.h
-                   source_image.h
-                   special_properties.h
-                   suppress_begin.h
-                   suppress_c4251.h
-                   suppress_end.h
-                   tuning.h
-                   utils.h
-                   variant.h)
+target_sources(sail-c++
+    PRIVATE
+        FILE_SET private_headers TYPE HEADERS
+        FILES
+            at_scope_exit.h
+            suppress_begin.h
+            suppress_c4251.h
+            suppress_end.h
+        FILE_SET private_cxx_modules TYPE CXX_MODULES
+        FILES
+            abstract_io_adapter.cpp
+            utils_private.cpp
+            utils_private.h
+    PUBLIC
+        FILE_SET cxx_modules TYPE CXX_MODULES
+        FILES
+            abstract_io.cpp
+            arbitrary_data.cpp
+            codec_info.cpp
+            common.cpp
+            common_flags.cpp
+            compression_level.cpp
+            context.cpp
+            conversion_options.cpp
+            flags.cpp
+            iccp.cpp
+            image.h
+            image_input.h
+            image_output.h
+            io_base.cpp
+            io_file.h
+            io_memory.h
+            load_features.h
+            load_options.h
+            log.h
+            meta_data.h
+            ostream.h
+            palette.h
+            resolution.h
+            sail-c++.h
+            save_features.h
+            save_options.h
+            source_image.h
+            special_properties.h
+            suppress_begin.h
+            suppress_c4251.h
+            suppress_end.h
+            tuning.h
+            utils.h
+            variant.h)
 
 set_target_properties(sail-c++ PROPERTIES
                                VERSION ${PROJECT_VERSION}
-                               SOVERSION ${PROJECT_VERSION_MAJOR}
-                               PUBLIC_HEADER "${PUBLIC_HEADERS}")
+                               SOVERSION ${PROJECT_VERSION_MAJOR})
 
 sail_enable_asan(TARGET sail-c++)
 
@@ -136,7 +86,12 @@ install(TARGETS sail-c++
         ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
         LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
         RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
-        PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/sail/sail-c++")
+        PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/sail/sail-c++"
+        FILE_SET cxx_modules DESTINATION "${CMAKE_INSTALL_LIBDIR}/share/sail-c++/modules")
+
+install(EXPORT SailC++Targets
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/share/sail-c++/modules"
+        CXX_MODULES_DIRECTORY .)
 
 # Install development packages
 #

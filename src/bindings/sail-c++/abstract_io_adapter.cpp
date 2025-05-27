@@ -23,18 +23,21 @@
     SOFTWARE.
 */
 
+module sail.cpp;
+
+#include <sail-common/export.h>
+#include <sail-common/status.h>
+
 #include <sail/sail.h>
 
-#include <sail-c++/sail-c++.h>
-
-namespace sail
+namespace
 {
 
 /*
  * Private functions.
  */
 
-static sail_status_t wrapped_tolerant_read(void *stream, void *buf, size_t size_to_read, size_t *read_size) {
+sail_status_t wrapped_tolerant_read(void *stream, void *buf, size_t size_to_read, size_t *read_size) {
 
     sail::abstract_io &abstract_io = *reinterpret_cast<sail::abstract_io *&>(stream);
 
@@ -43,7 +46,7 @@ static sail_status_t wrapped_tolerant_read(void *stream, void *buf, size_t size_
     return SAIL_OK;
 }
 
-static sail_status_t wrapped_strict_read(void *stream, void *buf, size_t size_to_read) {
+sail_status_t wrapped_strict_read(void *stream, void *buf, size_t size_to_read) {
 
     sail::abstract_io &abstract_io = *reinterpret_cast<sail::abstract_io *&>(stream);
 
@@ -52,7 +55,7 @@ static sail_status_t wrapped_strict_read(void *stream, void *buf, size_t size_to
     return SAIL_OK;
 }
 
-static sail_status_t wrapped_tolerant_write(void *stream, const void *buf, size_t size_to_write, size_t *written_size) {
+sail_status_t wrapped_tolerant_write(void *stream, const void *buf, size_t size_to_write, size_t *written_size) {
 
     sail::abstract_io &abstract_io = *reinterpret_cast<sail::abstract_io *&>(stream);
 
@@ -61,7 +64,7 @@ static sail_status_t wrapped_tolerant_write(void *stream, const void *buf, size_
     return SAIL_OK;
 }
 
-static sail_status_t wrapped_strict_write(void *stream, const void *buf, size_t size_to_write) {
+sail_status_t wrapped_strict_write(void *stream, const void *buf, size_t size_to_write) {
 
     sail::abstract_io &abstract_io = *reinterpret_cast<sail::abstract_io *&>(stream);
 
@@ -70,7 +73,7 @@ static sail_status_t wrapped_strict_write(void *stream, const void *buf, size_t 
     return SAIL_OK;
 }
 
-static sail_status_t wrapped_seek(void *stream, long offset, int whence) {
+sail_status_t wrapped_seek(void *stream, long offset, int whence) {
 
     sail::abstract_io &abstract_io = *reinterpret_cast<sail::abstract_io *&>(stream);
 
@@ -79,7 +82,7 @@ static sail_status_t wrapped_seek(void *stream, long offset, int whence) {
     return SAIL_OK;
 }
 
-static sail_status_t wrapped_tell(void *stream, size_t *offset) {
+sail_status_t wrapped_tell(void *stream, size_t *offset) {
 
     sail::abstract_io &abstract_io = *reinterpret_cast<sail::abstract_io *&>(stream);
 
@@ -88,7 +91,7 @@ static sail_status_t wrapped_tell(void *stream, size_t *offset) {
     return SAIL_OK;
 }
 
-static sail_status_t wrapped_flush(void *stream) {
+sail_status_t wrapped_flush(void *stream) {
 
     sail::abstract_io &abstract_io = *reinterpret_cast<sail::abstract_io *&>(stream);
 
@@ -97,7 +100,7 @@ static sail_status_t wrapped_flush(void *stream) {
     return SAIL_OK;
 }
 
-static sail_status_t wrapped_close(void *stream) {
+sail_status_t wrapped_close(void *stream) {
 
     sail::abstract_io &abstract_io = *reinterpret_cast<sail::abstract_io *&>(stream);
 
@@ -106,7 +109,7 @@ static sail_status_t wrapped_close(void *stream) {
     return SAIL_OK;
 }
 
-static sail_status_t wrapped_eof(void *stream, bool *result) {
+sail_status_t wrapped_eof(void *stream, bool *result) {
 
     sail::abstract_io &abstract_io = *reinterpret_cast<sail::abstract_io *&>(stream);
 
@@ -115,32 +118,51 @@ static sail_status_t wrapped_eof(void *stream, bool *result) {
     return SAIL_OK;
 }
 
-class SAIL_HIDDEN abstract_io_adapter::pimpl
+}
+
+namespace sail
+{
+
+/*
+ * Adapter to make abstract I/O streams suitable for C functions.
+ */
+class SAIL_HIDDEN abstract_io_adapter
 {
 public:
-    explicit pimpl(sail::abstract_io &other_abstract_io)
-        : abstract_io(other_abstract_io)
-    {
-        sail_io.features       = abstract_io.features();
-        sail_io.stream         = &abstract_io;
-        sail_io.tolerant_read  = wrapped_tolerant_read;
-        sail_io.strict_read    = wrapped_strict_read;
-        sail_io.tolerant_write = wrapped_tolerant_write;
-        sail_io.strict_write   = wrapped_strict_write;
-        sail_io.seek           = wrapped_seek;
-        sail_io.tell           = wrapped_tell;
-        sail_io.flush          = wrapped_flush;
-        sail_io.close          = wrapped_close;
-        sail_io.eof            = wrapped_eof;
-    }
+    /*
+     * Constructs a new I/O wrapper with the specified abstract I/O stream to wrap.
+     */
+    explicit abstract_io_adapter(sail::abstract_io &abstract_io);
 
+    /*
+     * Destroys the I/O wrapper.
+     */
+    ~abstract_io_adapter();
+
+    /*
+     * Returns the I/O stream suitable for passing it to C functions.
+     */
+    struct sail_io& sail_io_c() const;
+
+private:
     sail::abstract_io &abstract_io;
     struct sail_io sail_io;
 };
 
 abstract_io_adapter::abstract_io_adapter(sail::abstract_io &abstract_io)
-    : d(new pimpl(abstract_io))
+    : abstract_io(other_abstract_io)
 {
+    sail_io.features       = abstract_io.features();
+    sail_io.stream         = &abstract_io;
+    sail_io.tolerant_read  = wrapped_tolerant_read;
+    sail_io.strict_read    = wrapped_strict_read;
+    sail_io.tolerant_write = wrapped_tolerant_write;
+    sail_io.strict_write   = wrapped_strict_write;
+    sail_io.seek           = wrapped_seek;
+    sail_io.tell           = wrapped_tell;
+    sail_io.flush          = wrapped_flush;
+    sail_io.close          = wrapped_close;
+    sail_io.eof            = wrapped_eof;
 }
 
 abstract_io_adapter::~abstract_io_adapter()
@@ -149,7 +171,7 @@ abstract_io_adapter::~abstract_io_adapter()
 
 struct sail_io& abstract_io_adapter::sail_io_c() const
 {
-    return d->sail_io;
+    return sail_io;
 }
 
 }

@@ -23,34 +23,238 @@
     SOFTWARE.
 */
 
+module sail.cpp;
+
+import <string_view>;
+import <string>;
+import <vector>;
+
 #include <sail/sail.h>
 
-#include <sail-c++/sail-c++.h>
+#include <sail-common/export.h>
+#include <sail-common/status.h>
 
 namespace sail
 {
 
-class SAIL_HIDDEN codec_info::pimpl
+/*
+ * codec_info represents image codec information.
+ */
+export class SAIL_EXPORT codec_info
 {
+    friend class image_input;
+    friend class image_output;
+
 public:
-    pimpl()
-        : sail_codec_info_c(nullptr)
-    {}
+    /*
+     * Constructs an invalid codec info object that can be later initialized with,
+     * for example, from_magic_number().
+     */
+    codec_info();
 
-    const sail_codec_info *sail_codec_info_c;
+    /*
+     * Copies the codec info object.
+     */
+    codec_info(const codec_info &ci);
 
-    std::string version;
-    std::string name;
-    std::string description;
-    std::vector<std::string> magic_numbers;
-    std::vector<std::string> extensions;
-    std::vector<std::string> mime_types;
-    sail::load_features load_features;
-    sail::save_features save_features;
+    /*
+     * Copies the codec info object.
+     */
+    codec_info& operator=(const codec_info &ci);
+
+    /*
+     * Moves the codec info object.
+     */
+    codec_info(codec_info &&ci) noexcept;
+
+    /*
+     * Moves the codec info object.
+     */
+    codec_info& operator=(codec_info &&ci) noexcept;
+
+    /*
+     * Destroys the codec info object.
+     */
+    ~codec_info();
+
+    /*
+     * Returns true if the codec info object is valid.
+     */
+    bool is_valid() const;
+
+    /*
+     * Returns the codec version as a semver string. For example: "1.2.0".
+     */
+    const std::string& version() const;
+
+    /*
+     * Returns the short codec name in upper case. For example: "JPEG".
+     */
+    const std::string& name() const;
+
+    /*
+     * Returns the codec description. For example: "Joint Photographic Experts Group".
+     */
+    const std::string& description() const;
+
+    /*
+     * Returns the list of supported magic numbers. It can be empty. For example: "FF D8" for JPEGs.
+     * See https://en.wikipedia.org/wiki/File_format#Magic_number.
+     */
+    const std::vector<std::string>& magic_numbers() const;
+
+    /*
+     * Returns the list of supported file extensions. It can be empty. For example: "jpg", "jpeg".
+     */
+    const std::vector<std::string>& extensions() const;
+
+    /*
+     * Returns the list of supported mime types. It can be empty. For example: "image/jpeg".
+     */
+    const std::vector<std::string>& mime_types() const;
+
+    /*
+     * Returns the load features of the codec.
+     */
+    const sail::load_features& load_features() const;
+
+    /*
+     * Returns the save features of the codec.
+     */
+    const sail::save_features& save_features() const;
+
+    /*
+     * Returns a string representation of the specified codec feature. See CodecFeature.
+     * For example: "STATIC" is returned for CodecFeature::Static.
+     *
+     * Returns NULL if the codec feature is not known.
+     */
+    static const char* codec_feature_to_string(CodecFeature codec_feature);
+
+    /*
+     * Returns a codec feature from the string representation. See CodecFeature.
+     * For example: CodecFeature::Static is returned for "STATIC".
+     *
+     * Returns CodecFeature::Unknown if the codec feature is not known.
+     */
+    static CodecFeature codec_feature_from_string(const std::string_view str);
+
+    /*
+     * Returns a first codec info object that supports the magic number read from the specified file.
+     * Returns an invalid codec info object if no suitable codec was found.
+     * The comparison algorithm is case insensitive.
+     *
+     * Typical usage: codec_info::from_magic_number() ->
+     *                image_input::start()            ->
+     *                image_input::next_frame()       ->
+     *                image_input::stop().
+     */
+    static codec_info from_magic_number(const std::string_view path);
+
+    /*
+     * Returns a first codec info object that supports the magic number read from the specified memory buffer.
+     * Returns an invalid codec info object if no suitable codec was found.
+     * The comparison algorithm is case insensitive.
+     *
+     * Typical usage: codec_info::from_magic_number() ->
+     *                image_input::start()            ->
+     *                image_input::next_frame()       ->
+     *                image_input::stop().
+     */
+    static codec_info from_magic_number(const void *buffer, size_t buffer_size);
+
+    /*
+     * Returns a first codec info object that supports the magic number read from the specified I/O source.
+     * Returns an invalid codec info object if no suitable codec was found.
+     * The comparison algorithm is case insensitive.
+     *
+     * Typical usage: codec_info::from_magic_number() ->
+     *                image_input::start()            ->
+     *                image_input::next_frame()       ->
+     *                image_input::stop().
+     */
+    static codec_info from_magic_number(sail::abstract_io &abstract_io);
+
+    /*
+     * Returns a first codec info object that supports loading or saving the specified file path by its file extension.
+     * Returns an invalid codec info object if no suitable codec was found.
+     * The comparison algorithm is case insensitive. For example: "/test.jpg". The path might not exist.
+     *
+     * Typical usage: codec_info::from_path()   ->
+     *                image_input::start()      ->
+     *                image_input::next_frame() ->
+     *                image_input::stop().
+     *
+     * Or:            codec_info::from_path()    ->
+     *                image_output::start()      ->
+     *                image_output::next_frame() ->
+     *                image_output::stop().
+     */
+    static codec_info from_path(const std::string_view path);
+
+    /*
+     * Returns a first codec info object that supports the specified file extension.
+     * Returns an invalid codec info object if no suitable codec was found.
+     * The comparison algorithm is case-insensitive. For example: "jpg".
+     *
+     * Typical usage: codec_info::from_extension() ->
+     *                image_input::start()         ->
+     *                image_input::next_frame()    ->
+     *                image_input::stop().
+     *
+     * Or:            codec_info::from_extension() ->
+     *                image_output::start()        ->
+     *                image_output::next_frame()   ->
+     *                image_output::stop().
+     */
+    static codec_info from_extension(const std::string_view suffix);
+
+    /*
+     * Returns a first codec info object that supports the specified mime type.
+     * Returns an invalid codec info object if no suitable codec was found.
+     * The comparison algorithm is case-insensitive. For example: "image/jpeg".
+     *
+     * Typical usage: codec_info::from_mime_type() ->
+     *                image_input::start()         ->
+     *                image_input::next_frame()    ->
+     *                image_input::stop().
+     *
+     * Or:            codec_info::from_mime_type() ->
+     *                image_output::start()        ->
+     *                image_output::next_frame()   ->
+     *                image_output::stop().
+     */
+    static codec_info from_mime_type(const std::string_view mime_type);
+
+    /*
+     * Returns the list of found codec info objects. Use it to determine the list of possible
+     * image formats, file extensions, and mime types that could be hypothetically loaded or saved by SAIL.
+     */
+    static std::vector<codec_info> list();
+
+private:
+    /*
+     * Makes a deep copy of the specified codec info and stores the pointer for further use.
+     * When the SAIL context gets uninitialized, the pointer becomes dangling.
+     */
+    explicit codec_info(const sail_codec_info *ci);
+
+    const sail_codec_info* sail_codec_info_c() const;
+
+private:
+    const sail_codec_info *m_sail_codec_info_c{nullptr};
+
+    std::string m_version;
+    std::string m_name;
+    std::string m_description;
+    std::vector<std::string> m_magic_numbers;
+    std::vector<std::string> m_extensions;
+    std::vector<std::string> m_mime_types;
+    sail::load_features m_load_features;
+    sail::save_features m_save_features;
 };
 
 codec_info::codec_info()
-    : d(new pimpl)
 {
 }
 
@@ -62,16 +266,16 @@ codec_info::codec_info(const codec_info &ci)
 
 codec_info& codec_info::operator=(const codec_info &ci)
 {
-    d->sail_codec_info_c = ci.d->sail_codec_info_c;
+    m_sail_codec_info_c = ci.m_sail_codec_info_c;
 
-    d->version       = ci.version();
-    d->name          = ci.name();
-    d->description   = ci.description();
-    d->magic_numbers = ci.magic_numbers();
-    d->extensions    = ci.extensions();
-    d->mime_types    = ci.mime_types();
-    d->load_features = ci.load_features();
-    d->save_features = ci.save_features();
+    m_version       = ci.version();
+    m_name          = ci.name();
+    m_description   = ci.description();
+    m_magic_numbers = ci.magic_numbers();
+    m_extensions    = ci.extensions();
+    m_mime_types    = ci.mime_types();
+    m_load_features = ci.load_features();
+    m_save_features = ci.save_features();
 
     return *this;
 }
@@ -83,7 +287,17 @@ codec_info::codec_info(codec_info &&ci) noexcept
 
 codec_info& codec_info::operator=(codec_info &&ci) noexcept
 {
-    d = std::move(ci.d);
+    m_sail_codec_info_c = ci.m_sail_codec_info_c;
+    ci.m_sail_codec_info_c = nullptr;
+
+    m_version       = std::move(ci.version());
+    m_name          = std::move(ci.name());
+    m_description   = std::move(ci.description());
+    m_magic_numbers = std::move(ci.magic_numbers());
+    m_extensions    = std::move(ci.extensions());
+    m_mime_types    = std::move(ci.mime_types());
+    m_load_features = std::move(ci.load_features());
+    m_save_features = std::move(ci.save_features());
 
     return *this;
 }
@@ -94,47 +308,47 @@ codec_info::~codec_info()
 
 bool codec_info::is_valid() const
 {
-    return d->sail_codec_info_c != nullptr && !d->name.empty() && !d->version.empty();
+    return m_sail_codec_info_c != nullptr && !m_name.empty() && !m_version.empty();
 }
 
 const std::string& codec_info::version() const
 {
-    return d->version;
+    return m_version;
 }
 
 const std::string& codec_info::name() const
 {
-    return d->name;
+    return m_name;
 }
 
 const std::string& codec_info::description() const
 {
-    return d->description;
+    return m_description;
 }
 
 const std::vector<std::string>& codec_info::magic_numbers() const
 {
-    return d->magic_numbers;
+    return m_magic_numbers;
 }
 
 const std::vector<std::string>& codec_info::extensions() const
 {
-    return d->extensions;
+    return m_extensions;
 }
 
 const std::vector<std::string>& codec_info::mime_types() const
 {
-    return d->mime_types;
+    return m_mime_types;
 }
 
 const load_features& codec_info::load_features() const
 {
-    return d->load_features;
+    return m_load_features;
 }
 
 const save_features& codec_info::save_features() const
 {
-    return d->save_features;
+    return m_save_features;
 }
 
 const char* codec_info::codec_feature_to_string(CodecFeature codec_feature)
@@ -222,33 +436,33 @@ codec_info::codec_info(const sail_codec_info *ci)
         return;
     }
 
-    d->sail_codec_info_c = ci;
+    m_sail_codec_info_c = ci;
 
     // magic numbers
     for (const sail_string_node *magic_number_node = ci->magic_number_node; magic_number_node != nullptr; magic_number_node = magic_number_node->next) {
-        d->magic_numbers.push_back(magic_number_node->string);
+        m_magic_numbers.push_back(magic_number_node->string);
     }
 
     // extensions
     for (const sail_string_node *extension_node = ci->extension_node; extension_node != nullptr; extension_node = extension_node->next) {
-        d->extensions.push_back(extension_node->string);
+        m_extensions.push_back(extension_node->string);
     }
 
     // mime types
     for (const sail_string_node *mime_type_node = ci->mime_type_node; mime_type_node != nullptr; mime_type_node = mime_type_node->next) {
-        d->mime_types.push_back(mime_type_node->string);
+        m_mime_types.push_back(mime_type_node->string);
     }
 
-    d->version       = ci->version;
-    d->name          = ci->name;
-    d->description   = ci->description;
-    d->load_features = std::move(sail::load_features(ci->load_features));
-    d->save_features = std::move(sail::save_features(ci->save_features));
+    m_version       = ci->version;
+    m_name          = ci->name;
+    m_description   = ci->description;
+    m_load_features = sail::load_features(ci->load_features);
+    m_save_features = sail::save_features(ci->save_features);
 }
 
 const sail_codec_info* codec_info::sail_codec_info_c() const
 {
-    return d->sail_codec_info_c;
+    return m_sail_codec_info_c;
 }
 
 }

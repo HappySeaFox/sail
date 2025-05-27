@@ -1,6 +1,6 @@
 /*  This file is part of SAIL (https://github.com/HappySeaFox/sail)
 
-    Copyright (c) 2021 Dmitry Baryshev
+    Copyright (c) 2025 Dmitry Baryshev
 
     The MIT License
 
@@ -23,33 +23,35 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_IO_BASE_PRIVATE_CPP_H
-#define SAIL_IO_BASE_PRIVATE_CPP_H
-
-#include <memory>
-
-#include <sail-common/export.h>
-#include <sail-common/io_common.h>
-
-#include <sail-c++/io_base.h>
+module sail.cpp;
 
 namespace sail
 {
 
-class SAIL_HIDDEN io_base::pimpl
+/*
+ * Flags combining codec features.
+ */
+export class CodecFeatures : public Flags<CodecFeature>
 {
-public:
-    pimpl(struct sail_io *other_sail_io)
-        : sail_io_wrapper(other_sail_io, sail_destroy_io)
-    {
-    }
-    ~pimpl()
-    {
-    }
+    friend class load_features;
+    friend class save_features;
 
-    std::unique_ptr<struct sail_io, decltype(&sail_destroy_io)> sail_io_wrapper;
+public:
+    using base = Flags<CodecFeature>;
+    using base::base;
+};
+
+/*
+ * Flags combining codec options.
+ */
+export class CodecOptions : public Flags<CodecOption>
+{
+    friend class load_options;
+    friend class save_options;
+
+public:
+    using base = Flags<CodecOption>;
+    using base::base;
 };
 
 }
-
-#endif

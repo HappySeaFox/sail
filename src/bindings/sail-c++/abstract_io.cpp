@@ -23,50 +23,33 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_IO_BASE_CPP_H
-#define SAIL_IO_BASE_CPP_H
+module sail.cpp;
 
-#include <cstddef> /* std::size_t */
-#include <memory>
+import <cstddef>; /* std::size_t */
+import <cstdint>;
+import <cstdio>; /* seek whence */
 
-#include <sail-c++/abstract_io.h>
+#include <sail-common/export.h>
+#include <sail-common/status.h>
 
 namespace sail
 {
 
 /*
- * Base I/O stream.
+ * Abstract I/O stream represents an input/output abstraction.
  */
-class SAIL_EXPORT io_base : public abstract_io
+export class SAIL_EXPORT abstract_io
 {
 public:
     /*
-     * Operations on I/O streams.
+     * Destroys the I/O stream.
      */
-    enum class Operation
-    {
-        /*
-         * Reading only.
-         */
-        Read,
-
-        /*
-         * Reading and writing.
-         */
-        ReadWrite,
-    };
-
-    /*
-     * Construct a new base I/O stream.
-     */
-    explicit io_base(struct sail_io *sail_io);
-
-    ~io_base();
+    virtual ~abstract_io() = default;
 
     /*
      * Returns the I/O stream features. See SailIoFeature.
      */
-    int features() const override;
+    virtual int features() const = 0;
 
     /*
      * Reads from the underlying I/O object into the specified buffer. In contrast to strict_read(),
@@ -75,7 +58,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t tolerant_read(void *buf, std::size_t size_to_read, std::size_t *read_size) override;
+    virtual sail_status_t tolerant_read(void *buf, std::size_t size_to_read, std::size_t *read_size) = 0;
 
     /*
      * Reads from the underlying I/O object into the specified buffer. In contrast to tolerant_read(),
@@ -83,7 +66,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t strict_read(void *buf, std::size_t size_to_read) override;
+    virtual sail_status_t strict_read(void *buf, std::size_t size_to_read) = 0;
 
     /*
      * Writes the specified buffer to the underlying I/O object. In contrast to strict_write(),
@@ -92,7 +75,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t tolerant_write(const void *buf, std::size_t size_to_write, std::size_t *written_size) override;
+    virtual sail_status_t tolerant_write(const void *buf, std::size_t size_to_write, std::size_t *written_size) = 0;
 
     /*
      * Writes the specified buffer to the underlying I/O object. In contrast to tolerant_write(),
@@ -100,7 +83,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t strict_write(const void *buf, std::size_t size_to_write) override;
+    virtual sail_status_t strict_write(const void *buf, std::size_t size_to_write) = 0;
 
     /*
      * Sets the I/O position in the underlying I/O object.
@@ -109,14 +92,14 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t seek(long offset, int whence) override;
+    virtual sail_status_t seek(long offset, int whence) = 0;
 
     /*
      * Assigns the current I/O position in the underlying I/O object.
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t tell(std::size_t *offset) override;
+    virtual sail_status_t tell(std::size_t *offset) = 0;
 
     /*
      * Flushes buffers of the underlying I/O object. Has no effect if the underlying I/O object
@@ -124,27 +107,29 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t flush() override;
+    virtual sail_status_t flush() = 0;
 
     /*
      * Closes the underlying I/O object.
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t close() override;
+    virtual sail_status_t close() = 0;
 
     /*
      * Assigns true to the specified result if the underlying I/O object reached the end-of-file indicator.
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t eof(bool *result) override;
+    virtual sail_status_t eof(bool *result) = 0;
 
-protected:
-    class pimpl;
-    const std::unique_ptr<pimpl> d;
+    /*
+     * Finds and returns a first codec info object that can theoretically read the underlying
+     * I/O stream into a valid image.
+     *
+     * Returns an invalid codec info object if no suitable codec was found.
+     */
+    virtual sail::codec_info codec_info() = 0;
 };
 
 }
-
-#endif

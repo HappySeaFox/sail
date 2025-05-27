@@ -23,93 +23,158 @@
     SOFTWARE.
 */
 
-#include <stdexcept>
+module sail.cpp;
 
-#include <sail-c++/sail-c++.h>
+import <stdexcept>;
+
+#include <sail-common/compression_level.h>
+#include <sail-common/export.h>
 
 namespace sail
 {
 
-class SAIL_HIDDEN compression_level::pimpl
+/*
+ * Compression level.
+ */
+export class SAIL_EXPORT compression_level
 {
+    friend class save_features;
+
 public:
-    pimpl()
-        : sail_compression_level(nullptr)
-    {
-        SAIL_TRY_OR_EXECUTE(sail_alloc_compression_level(&sail_compression_level),
-                            /* on error */ throw std::bad_alloc());
-    }
+    /*
+     * Copies the compression level.
+     */
+    compression_level(const sail::compression_level &cl);
 
-    ~pimpl()
-    {
-        sail_destroy_compression_level(sail_compression_level);
-    }
+    /*
+     * Copies the compression level.
+     */
+    compression_level& operator=(const compression_level &cl);
 
-    struct sail_compression_level *sail_compression_level;
+    /*
+     * Moves the compression level.
+     */
+    compression_level(compression_level &&cl) noexcept;
+
+    /*
+     * Moves the compression level.
+     */
+    compression_level& operator=(compression_level &&cl) noexcept;
+
+    /*
+     * Destroys the compression level.
+     */
+    ~compression_level();
+
+    /*
+     * Returns true if min_level() < max_level() and default_level() is within the range.
+     */
+    bool is_valid() const;
+
+    /*
+     * Returns the minimum compression value. For lossy codecs, more compression
+     * means less quality and vice versa. For lossless codecs, more compression
+     * means nothing but a smaller file size.
+     */
+    double min_level() const;
+
+    /*
+     * Returns the maximum compression value. For lossy codecs, more compression
+     * means less quality and vice versa. For lossless codecs, more compression
+     * means nothing but a smaller file size.
+     */
+    double max_level() const;
+
+    /*
+     * Returns the default compression value within the min/max range.
+     */
+    double default_level() const;
+
+    /*
+     * Returns the step to increase or decrease compression levels in the range.
+     * Can be used in UI to build a compression level selection component.
+     */
+    double step() const;
+
+private:
+    compression_level();
+
+    /*
+     * Makes a deep copy of the specified compression level.
+     */
+    explicit compression_level(const sail_compression_level *compression_level);
+
+private:
+    struct sail_compression_level *m_sail_compression_level{nullptr};
 };
 
-compression_level::compression_level(const sail::compression_level &cl)
+compression_level::compression_level(const compression_level &cl)
     : compression_level()
 {
     *this = cl;
 }
 
-compression_level& compression_level::operator=(const sail::compression_level &compression_level)
+compression_level& compression_level::operator=(const compression_level &cl)
 {
-    d->sail_compression_level->min_level     = compression_level.min_level();
-    d->sail_compression_level->max_level     = compression_level.max_level();
-    d->sail_compression_level->default_level = compression_level.default_level();
-    d->sail_compression_level->step          = compression_level.step();
+    m_sail_compression_level->min_level     = cl.min_level();
+    m_sail_compression_level->max_level     = cl.max_level();
+    m_sail_compression_level->default_level = cl.default_level();
+    m_sail_compression_level->step          = cl.step();
 
     return *this;
 }
 
-compression_level::compression_level(sail::compression_level &&compression_level) noexcept
+compression_level::compression_level(compression_level &&cl) noexcept
 {
-    *this = std::move(compression_level);
+    *this = std::move(cl);
 }
 
-compression_level& compression_level::operator=(sail::compression_level &&compression_level) noexcept
+compression_level& compression_level::operator=(compression_level &&cl) noexcept
 {
-    d = std::move(compression_level.d);
+    sail_destroy_compression_level(m_sail_compression_level);
+
+    m_sail_compression_level = cl.m_sail_compression_level;
+    cl.m_sail_compression_level = nullptr;
 
     return *this;
 }
 
 compression_level::~compression_level()
 {
+    sail_destroy_compression_level(m_sail_compression_level);
 }
 
 bool compression_level::is_valid() const
 {
-    return d->sail_compression_level->min_level < d->sail_compression_level->max_level &&
-            d->sail_compression_level->default_level >= d->sail_compression_level->min_level &&
-            d->sail_compression_level->default_level <= d->sail_compression_level->max_level;
+    return m_sail_compression_level->min_level < m_sail_compression_level->max_level &&
+            m_sail_compression_level->default_level >= m_sail_compression_level->min_level &&
+            m_sail_compression_level->default_level <= m_sail_compression_level->max_level;
 }
 
 double compression_level::min_level() const
 {
-    return d->sail_compression_level->min_level;
+    return m_sail_compression_level->min_level;
 }
 
 double compression_level::max_level() const
 {
-    return d->sail_compression_level->max_level;
+    return m_sail_compression_level->max_level;
 }
 
 double compression_level::default_level() const
 {
-    return d->sail_compression_level->default_level;
+    return m_sail_compression_level->default_level;
 }
 
 double compression_level::step() const
 {
-    return d->sail_compression_level->step;
+    return m_sail_compression_level->step;
 }
 
 compression_level::compression_level()
-    : d(new pimpl)
 {
+    SAIL_TRY_OR_EXECUTE(sail_alloc_compression_level(&m_sail_compression_level),
+                        /* on error */ throw std::bad_alloc());
 }
 
 compression_level::compression_level(const sail_compression_level *cl)
@@ -120,7 +185,7 @@ compression_level::compression_level(const sail_compression_level *cl)
         return;
     }
 
-    *(d->sail_compression_level) = *cl;
+    *(m_sail_compression_level) = *cl;
 }
 
 }

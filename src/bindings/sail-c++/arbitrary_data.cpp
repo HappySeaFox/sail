@@ -1,6 +1,6 @@
 /*  This file is part of SAIL (https://github.com/HappySeaFox/sail)
 
-    Copyright (c) 2021 Dmitry Baryshev
+    Copyright (c) 2020-2021 Dmitry Baryshev
 
     The MIT License
 
@@ -23,47 +23,16 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_ABSTRACT_IO_ADAPTER_CPP_H
-#define SAIL_ABSTRACT_IO_ADAPTER_CPP_H
+module sail.cpp;
 
-#include <memory>
-
-#include <sail-common/export.h>
-#include <sail-common/status.h>
-
-struct sail_io;
+import <cstdint>;
+import <vector>;
 
 namespace sail
 {
-
-class abstract_io;
-
 /*
- * Adapter to make abstract I/O streams suitable for C functions.
+ * A list of bytes of arbitrary data. Used to hold binary EXIF data, for example.
  */
-class SAIL_HIDDEN abstract_io_adapter
-{
-public:
-    /*
-     * Constructs a new I/O wrapper with the specified abstract I/O stream to wrap.
-     */
-    explicit abstract_io_adapter(sail::abstract_io &abstract_io);
-
-    /*
-     * Destroys the I/O wrapper.
-     */
-    ~abstract_io_adapter();
-
-    /*
-     * Returns the I/O stream suitable for passing it to C functions.
-     */
-    struct sail_io& sail_io_c() const;
-
-private:
-    class pimpl;
-    const std::unique_ptr<pimpl> d;
-};
+export using arbitrary_data = std::vector<std::uint8_t>;
 
 }
-
-#endif

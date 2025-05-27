@@ -23,22 +23,22 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_FLAGS_CPP_H
-#define SAIL_FLAGS_CPP_H
+module sail.cpp;
 
-#include <type_traits>
+import <type_traits>;
 
 namespace sail
 {
 
-template<typename T>
-concept EnumFlag = std::is_enum_v<T>;
+export
+    template<typename T>
+    concept EnumFlag = std::is_enum_v<T>;
 
 /*
  * Base class for combining enum flags.
  */
 template<EnumFlag T>
-class Flags {
+export class Flags {
 
 public:
     using underlying_t = std::underlying_type_t<T>;
@@ -115,5 +115,3 @@ private:
 };
 
 }
-
-#endif

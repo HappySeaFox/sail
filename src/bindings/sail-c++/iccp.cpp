@@ -23,32 +23,99 @@
     SOFTWARE.
 */
 
-#include <cstring>
+module sail.cpp;
+
+import <cstddef>; /* std::size_t */
+import <cstring>;
 
 #include <sail/sail.h>
-
-#include <sail-c++/sail-c++.h>
 
 namespace sail
 {
 
-class SAIL_HIDDEN iccp::pimpl
+/*
+ * ICC profile.
+ */
+export class SAIL_EXPORT iccp
 {
+    friend class image;
+
 public:
-    pimpl()
-    {
-    }
+    /*
+     * Constructs an invalid ICC profile.
+     */
+    iccp();
 
-    void reset()
-    {
-        data.clear();
-    }
+    /*
+     * Constructs a new ICC profile from the binary data. The data is deep copied.
+     */
+    iccp(const void *data, std::size_t data_size);
 
-    arbitrary_data data;
+    /*
+     * Constructs a new ICC profile from the binary data.
+     */
+    explicit iccp(const arbitrary_data &data);
+
+    /*
+     * Copies the ICC profile.
+     */
+    iccp(const sail::iccp &iccp);
+
+    /*
+     * Copies the ICC profile.
+     */
+    iccp& operator=(const sail::iccp &iccp);
+
+    /*
+     * Moves the ICC profile.
+     */
+    iccp(sail::iccp &&iccp) noexcept;
+
+    /*
+     * Moves the ICC profile.
+     */
+    iccp& operator=(sail::iccp &&iccp) noexcept;
+
+    /*
+     * Destroys the ICC profile.
+     */
+    ~iccp();
+
+    /*
+     * Returns true if the ICC profile data is not empty. It doesn't validate the data.
+     */
+    bool is_valid() const;
+
+    /*
+     * Returns the ICC profile binary data.
+     */
+    const arbitrary_data& data() const;
+
+    /*
+     * Sets new ICC profile binary data. The data is deep copied.
+     */
+    void set_data(const void *data, std::size_t data_size);
+
+    /*
+     * Sets new ICC profile binary data.
+     */
+    void set_data(const arbitrary_data &data);
+
+private:
+    /*
+     * Makes a deep copy of the specified ICC profile.
+     */
+    explicit iccp(const sail_iccp *ic);
+
+    sail_status_t to_sail_iccp(sail_iccp **iccp) const;
+
+    void copy(const void *data, std::size_t data_size);
+
+private:
+    arbitrary_data m_data;
 };
 
 iccp::iccp()
-    : d(new pimpl)
 {
 }
 
@@ -64,15 +131,15 @@ iccp::iccp(const arbitrary_data &data)
     set_data(data);
 }
 
-iccp::iccp(const sail::iccp &ic)
+iccp::iccp(const sail::iccp &iccp)
     : iccp()
 {
-    *this = ic;
+    *this = iccp;
 }
 
 iccp& iccp::operator=(const sail::iccp &iccp)
 {
-    d->reset();
+    m_data.clear();
 
     if (iccp.is_valid()) {
         set_data(iccp.data());
@@ -88,7 +155,7 @@ iccp::iccp(sail::iccp &&iccp) noexcept
 
 iccp& iccp::operator=(sail::iccp &&iccp) noexcept
 {
-    d = std::move(iccp.d);
+    m_data = std::move(iccp.m_data);
 
     return *this;
 }
@@ -99,17 +166,17 @@ iccp::~iccp()
 
 bool iccp::is_valid() const
 {
-    return !d->data.empty();
+    return !m_data.empty();
 }
 
 const arbitrary_data& iccp::data() const
 {
-    return d->data;
+    return m_data;
 }
 
 void iccp::set_data(const void *data, std::size_t data_size)
 {
-    d->reset();
+    m_data.clear();
 
     copy(data, data_size);
 }
@@ -135,7 +202,7 @@ sail_status_t iccp::to_sail_iccp(sail_iccp **iccp) const
     SAIL_CHECK_PTR(iccp);
 
     sail_iccp *iccp_local;
-    SAIL_TRY(sail_alloc_iccp_from_data(d->data.data(), static_cast<std::size_t>(d->data.size()), &iccp_local));
+    SAIL_TRY(sail_alloc_iccp_from_data(m_data.data(), static_cast<std::size_t>(m_data.size()), &iccp_local));
 
     *iccp = iccp_local;
 
@@ -144,10 +211,10 @@ sail_status_t iccp::to_sail_iccp(sail_iccp **iccp) const
 
 void iccp::copy(const void *data, std::size_t data_size)
 {
-    d->data.resize(data_size);
+    m_data.resize(data_size);
 
     if (data_size > 0) {
-        memcpy(d->data.data(), data, data_size);
+        memcpy(m_data.data(), data, data_size);
     }
 }
 
