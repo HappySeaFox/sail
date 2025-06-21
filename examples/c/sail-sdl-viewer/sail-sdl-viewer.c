@@ -121,5 +121,5 @@ int main(int argc, char *argv[]) {
 
     SDL_Quit();
 
-    return SAIL_OK;
+    return 0;
 }
