@@ -120,7 +120,7 @@ sail_status_t sail_load_next_frame(void *state, struct sail_image **image) {
     if (image_local->height > max_height) {
         SAIL_LOG_ERROR("Image height is too long");
         sail_destroy_image(image_local);
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_INCORRECT_DIMENSIONS);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INCORRECT_IMAGE_DIMENSIONS);
     }
 
     const size_t pixels_size = (size_t)image_local->height * image_local->bytes_per_line;
