@@ -24,6 +24,7 @@
 */
 
 #include <stddef.h>
+#include <stdint.h> /* SIZE_MAX */
 #include <stdlib.h>
 
 #include <sail/sail.h>
@@ -105,13 +106,23 @@ sail_status_t sail_load_next_frame(void *state, struct sail_image **image) {
     struct sail_image *image_local;
     SAIL_TRY(state_of_mind->codec->v8->load_seek_next_frame(state_of_mind->state, &image_local));
 
+    SAIL_TRY(sail_check_image_skeleton_valid(image_local));
+
     if (image_local->pixels != NULL) {
         SAIL_LOG_ERROR("Internal error in %s codec: codecs must not allocate pixels", state_of_mind->codec_info->name);
         sail_destroy_image(image_local);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_CONFLICTING_OPERATION);
     }
 
-    /* Allocate pixels. */
+    /* Validate and allocate pixels. */
+    const size_t max_height = SIZE_MAX / image_local->bytes_per_line;
+
+    if (image_local->height > max_height) {
+        SAIL_LOG_ERROR("Image height is too long");
+        sail_destroy_image(image_local);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INCORRECT_DIMENSIONS);
+    }
+
     const size_t pixels_size = (size_t)image_local->height * image_local->bytes_per_line;
     SAIL_TRY_OR_CLEANUP(sail_malloc(pixels_size, &image_local->pixels),
                         /* cleanup */ sail_destroy_image(image_local));
