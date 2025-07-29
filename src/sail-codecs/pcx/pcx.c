@@ -203,6 +203,9 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_pcx(void *state, struct sail_
                     value = marker;
                 }
 
+                /* Round to the buffer size. */
+                count = (bytes + count) < image->bytes_per_line ? count : (image->bytes_per_line - bytes);
+
                 bytes += count;
 
                 memset(pcx_state->scanline_buffer + buffer_offset, value, count);
