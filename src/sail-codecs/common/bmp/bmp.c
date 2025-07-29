@@ -1,4 +1,4 @@
-/*  This file is part of SAIL (https://github.com/HappySeaFox/sail)
+./*  This file is part of SAIL (https://github.com/HappySeaFox/sail)
 
     Copyright (c) 2020 Dmitry Baryshev
 
@@ -282,6 +282,14 @@ sail_status_t bmp_private_read_init(struct sail_io *io, const struct sail_load_o
         if (bmp_state->palette_count == 0) {
             SAIL_LOG_ERROR("BMP: Indexed image has no palette");
             SAIL_LOG_AND_RETURN(SAIL_ERROR_MISSING_PALETTE);
+        }
+
+        /* Validate and allocate palette. */
+        size_t max_palette_count = SIZE_MAX / sizeof(sail_rgba32_t);
+
+        if (bmp_state->palette_count > max_palette_count) {
+            SAIL_LOG_ERROR("BMP: Indexed image has too large palette");
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
         }
 
         void *ptr;
