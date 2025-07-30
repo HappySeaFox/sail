@@ -23,6 +23,8 @@
     SOFTWARE.
 */
 
+#include <limits.h> /* UINT_MAX */
+
 #include <sail-common/sail-common.h>
 
 #include "munit.h"
@@ -230,6 +232,16 @@ static MunitResult test_cie_lab(const MunitParameter params[], void *user_data) 
     return MUNIT_OK;
 }
 
+static MunitResult test_overflow(const MunitParameter params[], void *user_data) {
+
+    (void)params;
+    (void)user_data;
+
+    munit_assert(sail_bytes_per_line(UINT_MAX / 2, SAIL_PIXEL_FORMAT_BPP24_RGB) == 0);
+
+    return MUNIT_OK;
+}
+
 static MunitTest test_suite_tests[] = {
     { (char *)"/indexed",         test_indexed,         NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/grayscale",       test_grayscale,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
@@ -241,6 +253,7 @@ static MunitTest test_suite_tests[] = {
     { (char *)"/ycbcr",           test_ycbcr,           NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/ycck",            test_ycck,            NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/cie-lab",         test_cie_lab,         NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/overflow",        test_overflow,        NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };
