@@ -261,6 +261,9 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_psd(void *state, struct sail_
                         unsigned char value;
                         SAIL_TRY(psd_state->io->strict_read(psd_state->io->stream, &value, sizeof(value)));
 
+                        /* Round to the buffer size. */
+                        c = (count + c) <= image->width ? c : (image->width - count);
+                        
                         for (unsigned i = count; i < count + c; i++) {
                             unsigned char *scan = (unsigned char *)sail_scan_line(image, row) + i * bpp;
                             *(scan + channel) = value;
