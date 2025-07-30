@@ -204,7 +204,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_pcx(void *state, struct sail_
                 }
 
                 /* Round to the buffer size. */
-                count = (bytes + count) < image->bytes_per_line ? count : (image->bytes_per_line - bytes);
+                count = (bytes + count) <= image->bytes_per_line ? count : (image->bytes_per_line - bytes);
 
                 bytes += count;
 
