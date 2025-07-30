@@ -25,6 +25,7 @@
 
 #include <ctype.h>
 #include <errno.h>
+#include <limits.h> /* UINT_MAX */
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -412,7 +413,8 @@ bool sail_greater_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPi
 unsigned sail_bytes_per_line(unsigned width, enum SailPixelFormat pixel_format) {
 
     const unsigned bits_per_pixel = sail_bits_per_pixel(pixel_format);
-    return (unsigned)(((double)width * bits_per_pixel + 7) / 8);
+    const double bytes_per_line = ((double)width * bits_per_pixel + 7) / 8;
+    return (bytes_per_line < UINT_MAX) ? (unsigned)bytes_per_line : 0;
 }
 
 bool sail_is_indexed(enum SailPixelFormat pixel_format) {
