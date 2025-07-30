@@ -127,6 +127,7 @@ SAIL_EXPORT bool sail_greater_bits_per_pixel(enum SailPixelFormat pixel_format1,
 /*
  * Returns the number of bytes per line needed to hold a scan line of the given width
  * without padding.
+ * Returns 0 if the result doesn't fit into an unsigned int.
  *
  * For example:
  *   sail_bytes_per_line(12, SAIL_PIXEL_FORMAT_BPP1) ==
