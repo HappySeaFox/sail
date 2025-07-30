@@ -106,7 +106,8 @@ sail_status_t sail_load_next_frame(void *state, struct sail_image **image) {
     struct sail_image *image_local;
     SAIL_TRY(state_of_mind->codec->v8->load_seek_next_frame(state_of_mind->state, &image_local));
 
-    SAIL_TRY(sail_check_image_skeleton_valid(image_local));
+    SAIL_TRY_OR_CLEANUP(sail_check_image_skeleton_valid(image_local),
+                        /* cleanup */ sail_destroy_image(image_local));
 
     if (image_local->pixels != NULL) {
         SAIL_LOG_ERROR("Internal error in %s codec: codecs must not allocate pixels", state_of_mind->codec_info->name);
