@@ -1,0 +1,45 @@
+#ifndef SAIL_TEST_IMAGES_H
+#define SAIL_TEST_IMAGES_H
+
+#include <sail-common/config.h>
+
+static const char * const SAIL_TEST_IMAGES_MUST_FAIL[] = {
+
+#ifdef SAIL_HAVE_BUILTIN_BMP
+    "@SAIL_TEST_IMAGES_PATH@/bmp/TALOS-2025-2215.bmp",
+    "@SAIL_TEST_IMAGES_PATH@/bmp/TALOS-2025-2216.bmp",
+#endif
+
+#ifdef SAIL_HAVE_BUILTIN_PSD
+    "@SAIL_TEST_IMAGES_PATH@/psd/TALOS-2025-2218.psd",
+#endif
+
+#ifdef SAIL_HAVE_BUILTIN_WEBP
+    "@SAIL_TEST_IMAGES_PATH@/webp/TALOS-2025-2224.webp",
+#endif
+
+    NULL,
+};
+
+static const char * const SAIL_TEST_IMAGES_MUST_SUCCEED[] = {
+
+#ifdef SAIL_HAVE_BUILTIN_BMP
+    "@SAIL_TEST_IMAGES_PATH@/bmp/TALOS-2025-2221.bmp",
+#endif
+
+#ifdef SAIL_HAVE_BUILTIN_PCX
+    "@SAIL_TEST_IMAGES_PATH@/pcx/TALOS-2025-2217.pcx",
+#endif
+
+#ifdef SAIL_HAVE_BUILTIN_PSD
+    "@SAIL_TEST_IMAGES_PATH@/psd/TALOS-2025-2219.psd",
+#endif
+
+#ifdef SAIL_HAVE_BUILTIN_TGA
+    "@SAIL_TEST_IMAGES_PATH@/tga/TALOS-2025-2220.tga",
+#endif
+
+    NULL,
+};
+
+#endif

@@ -4,6 +4,10 @@ set(SAIL_TEST_IMAGES_PATH ${CMAKE_CURRENT_SOURCE_DIR}/images/acceptance)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/images/acceptance/test-images.h.in
                ${PROJECT_BINARY_DIR}/include/tests/images/acceptance/test-images.h @ONLY)
 
+set(SAIL_TEST_IMAGES_PATH ${CMAKE_CURRENT_SOURCE_DIR}/images/bugs)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/images/bugs/test-images.h.in
+               ${PROJECT_BINARY_DIR}/include/tests/images/bugs/test-images.h @ONLY)
+
 # Dependencies
 #
 add_subdirectory(munit)
