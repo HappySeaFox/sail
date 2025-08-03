@@ -1,7 +1,8 @@
 # Test images
 #
-set(SAIL_TEST_IMAGES_PATH ${CMAKE_CURRENT_SOURCE_DIR}/images)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/images/test-images.h.in ${PROJECT_BINARY_DIR}/include/test-images.h @ONLY)
+set(SAIL_TEST_IMAGES_PATH ${CMAKE_CURRENT_SOURCE_DIR}/images/acceptance)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/images/acceptance/test-images.h.in
+               ${PROJECT_BINARY_DIR}/include/tests/images/acceptance/test-images.h @ONLY)
 
 # Dependencies
 #

@@ -31,7 +31,7 @@
 
 #include "munit.h"
 
-#include "test-images.h"
+#include "tests/images/acceptance/test-images.h"
 
 static MunitResult test_io_produce_same_images(const MunitParameter params[], void *user_data) {
     (void)user_data;
