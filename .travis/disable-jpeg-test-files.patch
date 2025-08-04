@@ -1,4 +1,4 @@
-diff --git a/tests/images/test-images.h.in b/tests/images/test-images.h.in
+diff --git a/tests/images/acceptance/test-images.h.in b/tests/images/acceptance/test-images.h.in
 --- a/tests/images/acceptance/test-images.h.in
 +++ b/tests/images/acceptance/test-images.h.in
 @@ -38,8 +38,15 @@ static const char * const SAIL_TEST_IMAGES[] = {
