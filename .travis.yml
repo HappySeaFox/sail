@@ -132,7 +132,7 @@ script:
 
     case "$TRAVIS_OS_NAME" in
       windows)
-        git -C .. apply .travis/disable-jpeg-test-files.patch
+        fail_on_error git -C .. apply .travis/disable-jpeg-test-files.patch
 
         CMAKE_INSTALL_PREFIX="C:/SAIL"
 
