@@ -30,6 +30,18 @@ jobs:
 
 before_script:
 - |-
+  fail_on_error()
+  {
+    if [ $# -eq 0 ]; then
+      echo "Error: No arguments given for fail_on_error()" >&2
+      exit 1
+    fi
+
+    set -e
+    "$@"
+    set +e
+  }
+
   case "$TRAVIS_OS_NAME" in
     windows)
       # Build non-existing extra libs
@@ -38,11 +50,13 @@ before_script:
         build_script_time=$(git log --pretty=format:%cd -n 1 --date=unix --date-order -- extra/build)
 
         if [ $build_script_time -gt $extra_bin_time ]; then
-          extra/build
+          fail_on_error extra/build
         fi
       else
-        extra/build
+        fail_on_error extra/build
       fi
+
+      fail_on_error git apply .travis/disable-jpeg-test-files.patch
     ;;
     linux)
       # Workaround ASAN bug in Jammy
@@ -132,8 +146,6 @@ script:
 
     case "$TRAVIS_OS_NAME" in
       windows)
-        fail_on_error git -C .. apply .travis/disable-jpeg-test-files.patch
-
         CMAKE_INSTALL_PREFIX="C:/SAIL"
 
         fail_on_error cmake -A x64 -DBUILD_SHARED_LIBS="$BUILD_SHARED_LIBS" -DCMAKE_INSTALL_PREFIX="$CMAKE_INSTALL_PREFIX" \
