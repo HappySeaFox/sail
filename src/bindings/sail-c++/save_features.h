@@ -106,7 +106,7 @@ public:
     SailCompression default_compression() const;
 
     /*
-     * Returns the supported compression level range or an ivalid object if
+     * Returns the supported compression level range or an invalid object if
      * compression levels are not supported by the codec.
      */
     const sail::compression_level& compression_level() const;
@@ -117,7 +117,7 @@ public:
      * tuning option to 0 in load options. Tuning options' names start with the codec name
      * to avoid confusing.
      *
-     * The list of possible values for every tuning option is not current available
+     * The list of possible values for every tuning option is not currently available
      * programmatically. Every codec must document them in the codec info.
      *
      * It's not guaranteed that tuning options and their values are backward

@@ -52,7 +52,7 @@ struct sail_load_options {
      *
      * Can be NULL.
      *
-     * The list of possible values for every tuning option is not current available
+     * The list of possible values for every tuning option is not currently available
      * programmatically. Every codec must document them in the codec info.
      *
      * It's not guaranteed that tuning options and their values are backward
