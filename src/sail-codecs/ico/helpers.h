@@ -31,6 +31,7 @@
 #include <sail-common/export.h>
 #include <sail-common/status.h>
 
+struct sail_hash_map;
 struct sail_io;
 
 /* File header. */
@@ -66,5 +67,11 @@ SAIL_HIDDEN sail_status_t ico_private_read_dir_entry(struct sail_io *io, struct 
 SAIL_HIDDEN sail_status_t ico_private_probe_image_type(struct sail_io *io, enum SailIcoImageType *ico_image_type);
 
 SAIL_HIDDEN sail_status_t ico_private_store_cur_hotspot(const struct SailIcoDirEntry *ico_dir_entry, struct sail_hash_map *special_properties);
+
+SAIL_HIDDEN sail_status_t ico_private_write_header(struct sail_io *io, const struct SailIcoHeader *header);
+
+SAIL_HIDDEN sail_status_t ico_private_write_dir_entry(struct sail_io *io, const struct SailIcoDirEntry *dir_entry);
+
+SAIL_HIDDEN sail_status_t ico_private_fetch_cur_hotspot(const struct sail_hash_map *special_properties, uint16_t *hotspot_x, uint16_t *hotspot_y);
 
 #endif

@@ -15,10 +15,10 @@ features=STATIC;META-DATA;SOURCE-IMAGE
 tuning=
 
 [save-features]
-features=
-pixel-formats=
-compressions=
-default-compression=
+features=STATIC
+pixel-formats=BPP1-INDEXED;BPP4-INDEXED;BPP8-INDEXED;BPP8-GRAYSCALE;BPP16-BGR555;BPP24-BGR;BPP24-RGB;BPP32-BGRA;BPP32-RGBA;BPP32-ARGB;BPP32-ABGR
+compressions=NONE;RLE
+default-compression=NONE
 compression-level-min=0
 compression-level-max=0
 compression-level-default=0

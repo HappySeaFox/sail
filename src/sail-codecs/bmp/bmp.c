@@ -38,6 +38,7 @@ struct bmp_state {
     const struct sail_save_options *save_options;
 
     bool frame_loaded;
+    bool frame_saved;
     void *common_bmp_state;
 };
 
@@ -56,6 +57,7 @@ static sail_status_t alloc_bmp_state(struct sail_io *io,
         .save_options = save_options,
 
         .frame_loaded     = false,
+        .frame_saved      = false,
         .common_bmp_state = NULL,
     };
 
@@ -135,32 +137,54 @@ SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_bmp(void **state) {
 
 SAIL_EXPORT sail_status_t sail_codec_save_init_v8_bmp(struct sail_io *io, const struct sail_save_options *save_options, void **state) {
 
-    (void)io;
-    (void)save_options;
-    (void)state;
+    *state = NULL;
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
+    /* Allocate a new state. */
+    struct bmp_state *bmp_state;
+    SAIL_TRY(alloc_bmp_state(io, NULL, save_options, &bmp_state));
+    *state = bmp_state;
+
+    SAIL_TRY(bmp_private_write_init(io, bmp_state->save_options, &bmp_state->common_bmp_state, SAIL_WRITE_BMP_FILE_HEADER));
+
+    return SAIL_OK;
 }
 
 SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_bmp(void *state, const struct sail_image *image) {
 
-    (void)state;
-    (void)image;
+    struct bmp_state *bmp_state = state;
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
+    if (bmp_state->frame_saved) {
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+    }
+
+    bmp_state->frame_saved = true;
+
+    SAIL_TRY(bmp_private_write_seek_next_frame(bmp_state->common_bmp_state, bmp_state->io, image));
+
+    return SAIL_OK;
 }
 
 SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_bmp(void *state, const struct sail_image *image) {
 
-    (void)state;
-    (void)image;
+    struct bmp_state *bmp_state = state;
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
+    SAIL_TRY(bmp_private_write_frame(bmp_state->common_bmp_state, bmp_state->io, image));
+
+    return SAIL_OK;
 }
 
 SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_bmp(void **state) {
 
-    (void)state;
+    struct bmp_state *bmp_state = *state;
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
+    *state = NULL;
+
+    if (bmp_state->common_bmp_state != NULL) {
+        SAIL_TRY_OR_CLEANUP(bmp_private_write_finish(&bmp_state->common_bmp_state, bmp_state->io),
+                            /* cleanup */ destroy_bmp_state(bmp_state));
+    }
+
+    destroy_bmp_state(bmp_state);
+
+    return SAIL_OK;
 }

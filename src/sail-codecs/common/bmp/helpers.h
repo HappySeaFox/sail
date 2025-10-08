@@ -165,4 +165,16 @@ SAIL_HIDDEN unsigned bmp_private_pad_bytes(unsigned bytes_in_row);
 
 SAIL_HIDDEN sail_status_t bmp_private_fill_system_palette(unsigned bit_count, sail_rgb24_t **palette, unsigned *palette_count);
 
+SAIL_HIDDEN sail_status_t bmp_private_write_dib_file_header(struct sail_io *io, const struct SailBmpDibFileHeader *fh);
+
+SAIL_HIDDEN sail_status_t bmp_private_write_v2(struct sail_io *io, const struct SailBmpDibHeaderV2 *v2);
+
+SAIL_HIDDEN sail_status_t bmp_private_write_v3(struct sail_io *io, const struct SailBmpDibHeaderV3 *v3);
+
+SAIL_HIDDEN sail_status_t bmp_private_supported_write_pixel_format(enum SailPixelFormat pixel_format);
+
+SAIL_HIDDEN sail_status_t bmp_private_write_rle8_scan_line(struct sail_io *io, const unsigned char *scan, unsigned width);
+
+SAIL_HIDDEN sail_status_t bmp_private_write_rle4_scan_line(struct sail_io *io, const unsigned char *scan, unsigned width);
+
 #endif

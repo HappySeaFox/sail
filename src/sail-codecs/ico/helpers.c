@@ -86,3 +86,52 @@ sail_status_t ico_private_store_cur_hotspot(const struct SailIcoDirEntry *ico_di
 
     return SAIL_OK;
 }
+
+sail_status_t ico_private_write_header(struct sail_io *io, const struct SailIcoHeader *header) {
+
+    SAIL_TRY(io->strict_write(io->stream, &header->reserved,     sizeof(header->reserved)));
+    SAIL_TRY(io->strict_write(io->stream, &header->type,         sizeof(header->type)));
+    SAIL_TRY(io->strict_write(io->stream, &header->images_count, sizeof(header->images_count)));
+
+    return SAIL_OK;
+}
+
+sail_status_t ico_private_write_dir_entry(struct sail_io *io, const struct SailIcoDirEntry *dir_entry) {
+
+    SAIL_TRY(io->strict_write(io->stream, &dir_entry->width,        sizeof(dir_entry->width)));
+    SAIL_TRY(io->strict_write(io->stream, &dir_entry->height,       sizeof(dir_entry->height)));
+    SAIL_TRY(io->strict_write(io->stream, &dir_entry->color_count,  sizeof(dir_entry->color_count)));
+    SAIL_TRY(io->strict_write(io->stream, &dir_entry->reserved,     sizeof(dir_entry->reserved)));
+    SAIL_TRY(io->strict_write(io->stream, &dir_entry->planes,       sizeof(dir_entry->planes)));
+    SAIL_TRY(io->strict_write(io->stream, &dir_entry->bit_count,    sizeof(dir_entry->bit_count)));
+    SAIL_TRY(io->strict_write(io->stream, &dir_entry->image_size,   sizeof(dir_entry->image_size)));
+    SAIL_TRY(io->strict_write(io->stream, &dir_entry->image_offset, sizeof(dir_entry->image_offset)));
+
+    return SAIL_OK;
+}
+
+sail_status_t ico_private_fetch_cur_hotspot(const struct sail_hash_map *special_properties, uint16_t *hotspot_x, uint16_t *hotspot_y) {
+
+    *hotspot_x = 0;
+    *hotspot_y = 0;
+
+    if (special_properties == NULL) {
+        return SAIL_OK;
+    }
+
+    const struct sail_variant *variant;
+
+    /* Get X hotspot. */
+    variant = sail_hash_map_value(special_properties, "cur-hotspot-x");
+    if (variant != NULL && variant->type == SAIL_VARIANT_TYPE_UNSIGNED_INT) {
+        *hotspot_x = (uint16_t)sail_variant_to_unsigned_int(variant);
+    }
+
+    /* Get Y hotspot. */
+    variant = sail_hash_map_value(special_properties, "cur-hotspot-y");
+    if (variant != NULL && variant->type == SAIL_VARIANT_TYPE_UNSIGNED_INT) {
+        *hotspot_y = (uint16_t)sail_variant_to_unsigned_int(variant);
+    }
+
+    return SAIL_OK;
+}
