@@ -36,4 +36,6 @@
  */
 SAIL_HIDDEN void convert_cmyk32_to_rgba32(uint8_t c, uint8_t m, uint8_t y, uint8_t k, sail_rgba32_t *rgba32);
 
+SAIL_HIDDEN void convert_cmyk64_to_rgba64(uint16_t c, uint16_t m, uint16_t y, uint16_t k, sail_rgba64_t *rgba64);
+
 #endif

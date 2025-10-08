@@ -43,3 +43,11 @@ void convert_cmyk32_to_rgba32(uint8_t c, uint8_t m, uint8_t y, uint8_t k, sail_r
     rgba32->component4 = 255;
 #endif
 }
+
+void convert_cmyk64_to_rgba64(uint16_t c, uint16_t m, uint16_t y, uint16_t k, sail_rgba64_t *rgba64) {
+
+    rgba64->component1 = (uint16_t)((double)c * k / 65535.0 + 0.5);
+    rgba64->component2 = (uint16_t)((double)m * k / 65535.0 + 0.5);
+    rgba64->component3 = (uint16_t)((double)y * k / 65535.0 + 0.5);
+    rgba64->component4 = 65535;
+}

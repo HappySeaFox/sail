@@ -117,10 +117,118 @@ static MunitResult test_best_conversion_rgb(const MunitParameter params[], void 
     return MUNIT_OK;
 }
 
+static MunitResult test_best_conversion_grayscale_alpha(const MunitParameter params[], void *user_data) {
+
+    (void)params;
+    (void)user_data;
+
+    {
+        const enum SailPixelFormat pixel_formats[] = { SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA, SAIL_PIXEL_FORMAT_BPP24_RGB };
+        const size_t pixel_formats_length = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
+
+        munit_assert_int(sail_closest_pixel_format(SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA, pixel_formats, pixel_formats_length), ==, SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA);
+    }
+
+    {
+        const enum SailPixelFormat pixel_formats[] = { SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE_ALPHA, SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA, SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA };
+        const size_t pixel_formats_length = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
+
+        munit_assert_int(sail_closest_pixel_format(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE, pixel_formats, pixel_formats_length), ==, SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE_ALPHA);
+    }
+
+    return MUNIT_OK;
+}
+
+static MunitResult test_best_conversion_rgb555_565(const MunitParameter params[], void *user_data) {
+
+    (void)params;
+    (void)user_data;
+
+    {
+        const enum SailPixelFormat pixel_formats[] = { SAIL_PIXEL_FORMAT_BPP16_RGB565, SAIL_PIXEL_FORMAT_BPP16_RGBA };
+        const size_t pixel_formats_length = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
+
+        munit_assert_int(sail_closest_pixel_format(SAIL_PIXEL_FORMAT_BPP16_RGB555, pixel_formats, pixel_formats_length), ==, SAIL_PIXEL_FORMAT_BPP16_RGB565);
+    }
+
+    {
+        const enum SailPixelFormat pixel_formats[] = { SAIL_PIXEL_FORMAT_BPP16_BGR555, SAIL_PIXEL_FORMAT_BPP16_BGR565 };
+        const size_t pixel_formats_length = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
+
+        munit_assert_int(sail_closest_pixel_format(SAIL_PIXEL_FORMAT_BPP24_BGR, pixel_formats, pixel_formats_length), ==, SAIL_PIXEL_FORMAT_BPP16_BGR555);
+    }
+
+    return MUNIT_OK;
+}
+
+static MunitResult test_best_conversion_cmyk(const MunitParameter params[], void *user_data) {
+
+    (void)params;
+    (void)user_data;
+
+    {
+        const enum SailPixelFormat pixel_formats[] = { SAIL_PIXEL_FORMAT_BPP32_CMYK, SAIL_PIXEL_FORMAT_BPP24_RGB };
+        const size_t pixel_formats_length = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
+
+        munit_assert_int(sail_closest_pixel_format(SAIL_PIXEL_FORMAT_BPP24_RGB, pixel_formats, pixel_formats_length), ==, SAIL_PIXEL_FORMAT_BPP24_RGB);
+    }
+
+    {
+        const enum SailPixelFormat pixel_formats[] = { SAIL_PIXEL_FORMAT_BPP32_CMYK, SAIL_PIXEL_FORMAT_BPP64_CMYK };
+        const size_t pixel_formats_length = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
+
+        munit_assert_int(sail_closest_pixel_format(SAIL_PIXEL_FORMAT_BPP24_RGB, pixel_formats, pixel_formats_length), ==, SAIL_PIXEL_FORMAT_BPP32_CMYK);
+    }
+
+    return MUNIT_OK;
+}
+
+static MunitResult test_best_conversion_rgba16(const MunitParameter params[], void *user_data) {
+
+    (void)params;
+    (void)user_data;
+
+    {
+        const enum SailPixelFormat pixel_formats[] = { SAIL_PIXEL_FORMAT_BPP16_RGBA, SAIL_PIXEL_FORMAT_BPP32_RGBA };
+        const size_t pixel_formats_length = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
+
+        munit_assert_int(sail_closest_pixel_format(SAIL_PIXEL_FORMAT_BPP32_RGBA, pixel_formats, pixel_formats_length), ==, SAIL_PIXEL_FORMAT_BPP32_RGBA);
+    }
+
+    {
+        const enum SailPixelFormat pixel_formats[] = { SAIL_PIXEL_FORMAT_BPP64_RGBA, SAIL_PIXEL_FORMAT_BPP16_RGBA };
+        const size_t pixel_formats_length = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
+
+        munit_assert_int(sail_closest_pixel_format(SAIL_PIXEL_FORMAT_BPP32_RGBA, pixel_formats, pixel_formats_length), ==, SAIL_PIXEL_FORMAT_BPP64_RGBA);
+    }
+
+    return MUNIT_OK;
+}
+
+static MunitResult test_best_conversion_yuv(const MunitParameter params[], void *user_data) {
+
+    (void)params;
+    (void)user_data;
+
+    {
+        const enum SailPixelFormat pixel_formats[] = { SAIL_PIXEL_FORMAT_BPP24_YUV, SAIL_PIXEL_FORMAT_BPP24_YCBCR, SAIL_PIXEL_FORMAT_BPP24_RGB };
+        const size_t pixel_formats_length = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
+
+        munit_assert_int(sail_closest_pixel_format(SAIL_PIXEL_FORMAT_BPP24_RGB, pixel_formats, pixel_formats_length), ==, SAIL_PIXEL_FORMAT_BPP24_YCBCR);
+    }
+
+    return MUNIT_OK;
+}
+
 static MunitTest test_suite_tests[] = {
-    { (char *)"/grayscale", test_best_conversion_grayscale, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/indexed", test_best_conversion_indexed, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/rgb", test_best_conversion_rgb, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/grayscale",       test_best_conversion_grayscale,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/indexed",         test_best_conversion_indexed,         NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/rgb",             test_best_conversion_rgb,             NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/grayscale-alpha", test_best_conversion_grayscale_alpha, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/rgb555-565",      test_best_conversion_rgb555_565,      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/cmyk",            test_best_conversion_cmyk,            NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/rgba16",          test_best_conversion_rgba16,          NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/yuv",             test_best_conversion_yuv,             NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };
