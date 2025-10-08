@@ -38,6 +38,9 @@
 #define SAIL_ICO_TYPE_ICO 1
 #define SAIL_ICO_TYPE_CUR 2
 
+/* Maximum number of ICO frames that can be saved. */
+static const unsigned SAIL_ICO_MAX_RESERVED_IMAGES = 64;
+
 /*
  * Codec-specific state.
  */
@@ -56,7 +59,7 @@ struct ico_state {
     size_t *frame_data_offsets;
     size_t *frame_data_sizes;
     unsigned frames_to_save;
-    bool is_cur; /* True if saving CUR (has hotspot). */
+    size_t directory_size_reserved;
 };
 
 static sail_status_t alloc_ico_state(struct sail_io *io,
@@ -80,7 +83,7 @@ static sail_status_t alloc_ico_state(struct sail_io *io,
         .frame_data_offsets = NULL,
         .frame_data_sizes   = NULL,
         .frames_to_save     = 0,
-        .is_cur             = false,
+        .directory_size_reserved = 0,
     };
 
     return SAIL_OK;
@@ -249,62 +252,71 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_ico(void *state, co
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_IMAGE_PROPERTY);
     }
 
-    /* Check if this is a CUR file (has hotspot in image special properties). */
+    bool is_cur = false;
     uint16_t hotspot_x = 0;
     uint16_t hotspot_y = 0;
     if (image->special_properties != NULL) {
         ico_private_fetch_cur_hotspot(image->special_properties, &hotspot_x, &hotspot_y);
         if (hotspot_x != 0 || hotspot_y != 0) {
-            ico_state->is_cur = true;
+            is_cur = true;
         }
     }
 
-    /* Track that we're saving another frame. */
+    if (ico_state->current_frame == 0) {
+        ico_state->ico_header.type = is_cur ? SAIL_ICO_TYPE_CUR : SAIL_ICO_TYPE_ICO;
+    } else if (is_cur) {
+        ico_state->ico_header.type = SAIL_ICO_TYPE_CUR;
+    }
+
+    if (ico_state->frames_to_save >= SAIL_ICO_MAX_RESERVED_IMAGES) {
+        SAIL_LOG_ERROR("ICO: Too many frames. Maximum is %u", SAIL_ICO_MAX_RESERVED_IMAGES);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_CONFLICTING_OPERATION);
+    }
+
     ico_state->frames_to_save++;
 
-    /* For first frame, write placeholder header and start directory. */
+    SAIL_TRY(sail_realloc(sizeof(struct SailIcoDirEntry) * ico_state->frames_to_save, (void **)&ico_state->ico_dir_entries));
+    SAIL_TRY(sail_realloc(sizeof(size_t) * ico_state->frames_to_save, (void **)&ico_state->frame_data_offsets));
+    SAIL_TRY(sail_realloc(sizeof(size_t) * ico_state->frames_to_save, (void **)&ico_state->frame_data_sizes));
+
+    struct SailIcoDirEntry *dir_entry = &ico_state->ico_dir_entries[ico_state->current_frame];
+    *dir_entry = (struct SailIcoDirEntry){ 0 };
+    dir_entry->width = (image->width == 256) ? 0 : (uint8_t)image->width;
+    dir_entry->height = (image->height == 256) ? 0 : (uint8_t)image->height;
+
+    /* For CUR files, planes and bit_count store hotspot coordinates. For ICO, they store color info. */
+    if (is_cur) {
+        dir_entry->planes = hotspot_x;
+        dir_entry->bit_count = hotspot_y;
+    } else {
+        dir_entry->planes = 1;
+        dir_entry->bit_count = (uint16_t)sail_bits_per_pixel(image->pixel_format);
+    }
+
     if (ico_state->current_frame == 0) {
-        /* Write ICO/CUR header with placeholder count. We'll update it in finish. */
+        /* Write header with placeholder count. */
         struct SailIcoHeader header = {
             .reserved = 0,
-            .type = ico_state->is_cur ? SAIL_ICO_TYPE_CUR : SAIL_ICO_TYPE_ICO,
-            .images_count = 0, /* Will be updated in finish. */
+            .type = ico_state->ico_header.type,
+            .images_count = 0,
         };
         SAIL_TRY(ico_private_write_header(ico_state->io, &header));
 
-        /* Allocate space for directory entries. */
+        /* Reserve space for maximum directory entries (64 * 16 = 1024 bytes). */
+        ico_state->directory_size_reserved = SAIL_ICO_MAX_RESERVED_IMAGES * sizeof(struct SailIcoDirEntry);
+
+        unsigned char *zero_buffer;
         void *ptr;
-        SAIL_TRY(sail_malloc(sizeof(struct SailIcoDirEntry) * ico_state->frames_to_save, &ptr));
-        ico_state->ico_dir_entries = ptr;
+        SAIL_TRY(sail_malloc(ico_state->directory_size_reserved, &ptr));
+        zero_buffer = ptr;
+        memset(zero_buffer, 0, ico_state->directory_size_reserved);
 
-        SAIL_TRY(sail_malloc(sizeof(size_t) * ico_state->frames_to_save, &ptr));
-        ico_state->frame_data_offsets = ptr;
-
-        SAIL_TRY(sail_malloc(sizeof(size_t) * ico_state->frames_to_save, &ptr));
-        ico_state->frame_data_sizes = ptr;
+        SAIL_TRY_OR_CLEANUP(ico_state->io->strict_write(ico_state->io->stream, zero_buffer, ico_state->directory_size_reserved),
+                            /* cleanup */ sail_free(zero_buffer));
+        sail_free(zero_buffer);
     }
 
-    /* Save current position - this is where directory entry will be written. */
-    size_t dir_entry_offset;
-    SAIL_TRY(ico_state->io->tell(ico_state->io->stream, &dir_entry_offset));
-
-    /* Write placeholder directory entry. */
-    struct SailIcoDirEntry dir_entry = { 0 };
-    dir_entry.width = (image->width == 256) ? 0 : (uint8_t)image->width;
-    dir_entry.height = (image->height == 256) ? 0 : (uint8_t)image->height;
-
-    /* For CUR files, planes and bit_count store hotspot coordinates. For ICO, they store color info. */
-    if (ico_state->is_cur) {
-        dir_entry.planes = hotspot_x;
-        dir_entry.bit_count = hotspot_y;
-    } else {
-        dir_entry.planes = 1;
-        dir_entry.bit_count = (uint16_t)sail_bits_per_pixel(image->pixel_format);
-    }
-
-    SAIL_TRY(ico_private_write_dir_entry(ico_state->io, &dir_entry));
-
-    /* Remember where image data will start. */
+    /* Remember where image data starts. */
     SAIL_TRY(ico_state->io->tell(ico_state->io->stream, &ico_state->frame_data_offsets[ico_state->current_frame]));
 
     /* Initialize BMP writer (without file header, as ICO contains raw BMP data). */
@@ -328,10 +340,9 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_ico(void *state, const struct
 
     struct ico_state *ico_state = state;
 
-    /* Write actual image data. */
     SAIL_TRY(bmp_private_write_frame(ico_state->common_bmp_state, ico_state->io, image));
 
-    /* Write AND mask (all zeros for now - no transparency). */
+    /* Write AND mask (all zeros for now, no transparency). */
     const unsigned mask_bytes_per_line = ((image->width + 31) / 32) * 4;
     unsigned char *mask_line;
     void *ptr;
@@ -346,10 +357,8 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_ico(void *state, const struct
 
     sail_free(mask_line);
 
-    /* Finish BMP writing. */
     SAIL_TRY(bmp_private_write_finish(&ico_state->common_bmp_state, ico_state->io));
 
-    /* Calculate size of data we just wrote. */
     size_t current_offset;
     SAIL_TRY(ico_state->io->tell(ico_state->io->stream, &current_offset));
     ico_state->frame_data_sizes[ico_state->current_frame] = current_offset - ico_state->frame_data_offsets[ico_state->current_frame];
@@ -372,7 +381,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_ico(void **state) {
 
         struct SailIcoHeader header = {
             .reserved = 0,
-            .type = ico_state->is_cur ? SAIL_ICO_TYPE_CUR : SAIL_ICO_TYPE_ICO,
+            .type = ico_state->ico_header.type,
             .images_count = (uint16_t)ico_state->frames_to_save,
         };
         SAIL_TRY_OR_CLEANUP(ico_private_write_header(ico_state->io, &header),
@@ -380,22 +389,13 @@ SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_ico(void **state) {
 
         /* Update directory entries with correct offsets and sizes. */
         for (unsigned i = 0; i < ico_state->frames_to_save; i++) {
+            /* Update directory entry with actual offset and size. */
+            ico_state->ico_dir_entries[i].image_offset = (uint32_t)ico_state->frame_data_offsets[i];
+            ico_state->ico_dir_entries[i].image_size = (uint32_t)ico_state->frame_data_sizes[i];
+
             SAIL_TRY_OR_CLEANUP(ico_state->io->seek(ico_state->io->stream, (long)(6 + i * 16), SEEK_SET),
                                 /* cleanup */ destroy_ico_state(ico_state));
-
-            /* Re-read the directory entry we wrote earlier. */
-            struct SailIcoDirEntry dir_entry;
-            SAIL_TRY_OR_CLEANUP(ico_private_read_dir_entry(ico_state->io, &dir_entry),
-                                /* cleanup */ destroy_ico_state(ico_state));
-
-            /* Update with actual offset and size. */
-            dir_entry.image_offset = (uint32_t)ico_state->frame_data_offsets[i];
-            dir_entry.image_size = (uint32_t)ico_state->frame_data_sizes[i];
-
-            /* Write it back. */
-            SAIL_TRY_OR_CLEANUP(ico_state->io->seek(ico_state->io->stream, (long)(6 + i * 16), SEEK_SET),
-                                /* cleanup */ destroy_ico_state(ico_state));
-            SAIL_TRY_OR_CLEANUP(ico_private_write_dir_entry(ico_state->io, &dir_entry),
+            SAIL_TRY_OR_CLEANUP(ico_private_write_dir_entry(ico_state->io, &ico_state->ico_dir_entries[i]),
                                 /* cleanup */ destroy_ico_state(ico_state));
         }
     }
