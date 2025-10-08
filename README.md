@@ -83,7 +83,7 @@ images with the help of [ksquirrel-libs](FAQ.md#how-old-is-sail), the predecesso
 | 12 | [PSD](https://en.wikipedia.org/wiki/Adobe_Photoshop#File_format)    | R             |                   |
 | 13 | [QOI](http://qoiformat.org)                                         | RW            |                   |
 | 14 | [SVG](https://wikipedia.org/wiki/Scalable_Vector_Graphics)          | R             | resvg             |
-| 15 | [TGA](https://wikipedia.org/wiki/Truevision_TGA)                    | R             |                   |
+| 15 | [TGA](https://wikipedia.org/wiki/Truevision_TGA)                    | RW            |                   |
 | 16 | [TIFF](https://wikipedia.org/wiki/TIFF)                             | RW            | libtiff           |
 | .. | ...                                                                 |               |                   |
 | 18 | [WEBP](https://wikipedia.org/wiki/WebP)                             | R             | libwebp           |
