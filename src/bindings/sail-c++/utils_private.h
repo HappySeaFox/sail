@@ -29,6 +29,7 @@
 #include <sail-common/export.h>
 #include <sail-common/status.h>
 
+#include <sail-c++/special_properties.h>
 #include <sail-c++/tuning.h>
 
 struct sail_hash_map;
@@ -40,9 +41,13 @@ namespace sail
 class SAIL_HIDDEN utils_private
 {
 public:
-    static tuning c_tuning_to_cpp_tuning(const sail_hash_map *c_tuning);
+    static tuning to_cpp_tuning(const sail_hash_map *c_tuning);
 
-    static sail_status_t cpp_tuning_to_sail_tuning(const tuning &cpp_tuning, sail_hash_map *c_tuning);
+    static sail_status_t to_sail_tuning(const tuning &cpp_tuning, sail_hash_map *c_tuning);
+
+    static special_properties to_cpp_special_properties(const sail_hash_map *c_special_properties);
+
+    static sail_status_t to_sail_special_properties(const special_properties &cpp_special_properties, sail_hash_map *c_special_properties);
 
 private:
     // Needs to be in utils_private to allow creating sail:variant from sail_variant

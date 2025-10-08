@@ -167,9 +167,9 @@ static void print_aligned_image_info(const struct sail_image *image) {
         }
     }
 
-    if (image->source_image->special_properties != NULL) {
+    if (image->special_properties != NULL) {
         printf("Special properties :\n");
-        sail_traverse_hash_map(image->source_image->special_properties,
+        sail_traverse_hash_map(image->special_properties,
                                 special_properties_printf_callback);
     }
 }

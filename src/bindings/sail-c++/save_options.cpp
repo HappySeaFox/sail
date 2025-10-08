@@ -150,7 +150,7 @@ save_options::save_options(const sail_save_options *wo)
     set_options(wo->options);
     set_compression(wo->compression);
     set_compression_level(wo->compression_level);
-    set_tuning(utils_private::c_tuning_to_cpp_tuning(wo->tuning));
+    set_tuning(utils_private::to_cpp_tuning(wo->tuning));
 }
 
 sail_status_t save_options::to_sail_save_options(sail_save_options **save_options) const
@@ -168,7 +168,7 @@ sail_status_t save_options::to_sail_save_options(sail_save_options **save_option
     SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&save_options_local->tuning),
                         /* cleanup */ sail_destroy_save_options(save_options_local));
 
-    SAIL_TRY_OR_CLEANUP(utils_private::cpp_tuning_to_sail_tuning(d->tuning, save_options_local->tuning),
+    SAIL_TRY_OR_CLEANUP(utils_private::to_sail_tuning(d->tuning, save_options_local->tuning),
                         /* cleanup */ sail_destroy_save_options(save_options_local));
 
     *save_options = save_options_local;

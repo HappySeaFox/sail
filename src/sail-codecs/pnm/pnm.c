@@ -207,14 +207,14 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_pnm(void *state, st
 
         image_local->source_image->pixel_format = pixel_format;
         image_local->source_image->compression  = SAIL_COMPRESSION_NONE;
+    }
 
-        if (pnm_state->load_options->options & SAIL_OPTION_META_DATA) {
-            SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&image_local->source_image->special_properties),
-                                /* cleanup */ sail_destroy_image(image_local));
-            SAIL_TRY_OR_CLEANUP(pnm_private_store_ascii(pnm_state->version,
-                                                        image_local->source_image->special_properties),
-                                /* cleanup */ sail_destroy_image(image_local));
-        }
+    if (pnm_state->load_options->options & SAIL_OPTION_META_DATA) {
+        SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&image_local->special_properties),
+                            /* cleanup */ sail_destroy_image(image_local));
+        SAIL_TRY_OR_CLEANUP(pnm_private_store_ascii(pnm_state->version,
+                                                    image_local->special_properties),
+                            /* cleanup */ sail_destroy_image(image_local));
     }
 
     image_local->width          = w;

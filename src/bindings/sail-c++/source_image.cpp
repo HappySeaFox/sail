@@ -49,7 +49,6 @@ public:
 
 public:
     struct sail_source_image *sail_source_image;
-    sail::special_properties special_properties;
 };
 
 source_image::source_image()
@@ -70,7 +69,6 @@ source_image& source_image::operator=(const source_image &si)
     d->sail_source_image->orientation        = si.orientation();
     d->sail_source_image->compression        = si.compression();
     d->sail_source_image->interlaced         = si.interlaced();
-    d->special_properties                    = si.special_properties();
 
     return *this;
 }
@@ -121,11 +119,6 @@ bool source_image::interlaced() const
     return d->sail_source_image->interlaced;
 }
 
-const sail::special_properties &source_image::special_properties() const
-{
-    return d->special_properties;
-}
-
 source_image::source_image(const sail_source_image *si)
     : source_image()
 {
@@ -139,7 +132,6 @@ source_image::source_image(const sail_source_image *si)
     d->sail_source_image->orientation        = si->orientation;
     d->sail_source_image->compression        = si->compression;
     d->sail_source_image->interlaced         = si->interlaced;
-    d->special_properties                    = utils_private::c_tuning_to_cpp_tuning(si->special_properties);
 }
 
 sail_status_t source_image::to_sail_source_image(sail_source_image **source_image) const
@@ -154,12 +146,6 @@ sail_status_t source_image::to_sail_source_image(sail_source_image **source_imag
     source_image_local->orientation        = d->sail_source_image->orientation;
     source_image_local->compression        = d->sail_source_image->compression;
     source_image_local->interlaced         = d->sail_source_image->interlaced;
-
-    SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&source_image_local->special_properties),
-                        /* cleanup */ sail_destroy_source_image(source_image_local));
-
-    SAIL_TRY_OR_CLEANUP(utils_private::cpp_tuning_to_sail_tuning(d->special_properties, source_image_local->special_properties),
-                        /* cleanup */ sail_destroy_source_image(source_image_local));
 
     *source_image = source_image_local;
 

@@ -152,10 +152,43 @@ static MunitResult test_image_move(const MunitParameter params[], void *user_dat
     return MUNIT_OK;
 }
 
+static MunitResult test_image_special_properties(const MunitParameter params[], void *user_data) {
+    (void)params;
+    (void)user_data;
+
+    {
+        sail::image image(SAIL_PIXEL_FORMAT_BPP24_RGB, 16, 16);
+        munit_assert_true(image.is_valid());
+        munit_assert_true(image.special_properties().empty());
+
+        // Add special properties
+        image.special_properties()["test-key-1"] = sail::variant(42u);
+        image.special_properties()["test-key-2"] = sail::variant(std::string("test-value"));
+
+        munit_assert_uint(image.special_properties().size(), ==, 2);
+        munit_assert_uint(image.special_properties()["test-key-1"].value<unsigned>(), ==, 42u);
+        munit_assert_string_equal(image.special_properties()["test-key-2"].value<std::string>().c_str(), "test-value");
+
+        // Copy and verify special_properties are copied
+        sail::image image_copy = image;
+        munit_assert_uint(image_copy.special_properties().size(), ==, 2);
+        munit_assert_uint(image_copy.special_properties()["test-key-1"].value<unsigned>(), ==, 42u);
+        munit_assert_string_equal(image_copy.special_properties()["test-key-2"].value<std::string>().c_str(), "test-value");
+
+        // Modify copy and verify original is not affected
+        image_copy.special_properties()["test-key-3"] = sail::variant(100u);
+        munit_assert_uint(image_copy.special_properties().size(), ==, 3);
+        munit_assert_uint(image.special_properties().size(), ==, 2);
+    }
+
+    return MUNIT_OK;
+}
+
 static MunitTest test_suite_tests[] = {
-    { (char *)"/create", test_image_create, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/copy",   test_image_copy,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/move",   test_image_move,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/create",             test_image_create,             NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/copy",               test_image_copy,               NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/move",               test_image_move,               NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/special-properties", test_image_special_properties, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };

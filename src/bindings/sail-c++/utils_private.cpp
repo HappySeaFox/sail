@@ -28,7 +28,7 @@
 namespace sail
 {
 
-tuning utils_private::c_tuning_to_cpp_tuning(const sail_hash_map *c_tuning) {
+tuning utils_private::to_cpp_tuning(const sail_hash_map *c_tuning) {
 
     if (c_tuning == nullptr) {
         return tuning{};
@@ -41,7 +41,7 @@ tuning utils_private::c_tuning_to_cpp_tuning(const sail_hash_map *c_tuning) {
     return tuning;
 }
 
-sail_status_t utils_private::cpp_tuning_to_sail_tuning(const tuning &cpp_tuning, sail_hash_map *c_tuning) {
+sail_status_t utils_private::to_sail_tuning(const tuning &cpp_tuning, sail_hash_map *c_tuning) {
 
     sail_clear_hash_map(c_tuning);
 
@@ -65,6 +65,36 @@ bool utils_private::sail_key_value_into_tuning(const char *key, const sail_varia
     cpp_tuning->emplace(key, variant(value));
 
     return true;
+}
+
+special_properties utils_private::to_cpp_special_properties(const sail_hash_map *c_special_properties) {
+
+    if (c_special_properties == nullptr) {
+        return special_properties{};
+    }
+
+    special_properties special_properties;
+
+    sail_traverse_hash_map_with_user_data(c_special_properties, sail_key_value_into_tuning, &special_properties);
+
+    return special_properties;
+}
+
+sail_status_t utils_private::to_sail_special_properties(const special_properties &cpp_special_properties, sail_hash_map *c_special_properties) {
+
+    sail_clear_hash_map(c_special_properties);
+
+    for (const auto &kv : cpp_special_properties) {
+        struct sail_variant *sail_variant;
+
+        SAIL_TRY(kv.second.to_sail_variant(&sail_variant));
+
+        sail_put_hash_map(c_special_properties, kv.first.c_str(), sail_variant);
+
+        sail_destroy_variant(sail_variant);
+    }
+
+    return SAIL_OK;
 }
 
 }
