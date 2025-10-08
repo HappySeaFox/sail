@@ -326,13 +326,28 @@
     <td>
         <b>Grayscale:</b> 8-bit.
         <b>Indexed:</b> 8-bit.
-        <b>RGB:</b> 24-bit.
-        <b>RGBA:</b> 32-bit.
+        <b>BGR:</b> 16-bit (BGR555), 24-bit.
+        <b>BGRA:</b> 32-bit.
+        <br/><br/>
+        <b>Compressions:</b> NONE, RLE.
         <br/><br/>
         <b>Content:</b> Static, Meta data.
+        <br/><br/>
+        <b>TGA Versions:</b> TGA 1.0, TGA 2.0 (with Extension Area).
     </td>
     <td><b>Content:</b> Thumbnail images.</td>
-    <td>Unsupported</td>
+    <td>
+        <b>Grayscale:</b> 8-bit.
+        <b>Indexed:</b> 8-bit.
+        <b>BGR:</b> 16-bit (BGR555), 24-bit.
+        <b>BGRA:</b> 32-bit.
+        <br/><br/>
+        <b>Compressions:</b> NONE, RLE.
+        <br/><br/>
+        <b>Content:</b> Static, Meta data.
+        <br/><br/>
+        <b>Output format:</b> TGA 2.0 with Extension Area.
+    </td>
     <td>-</td>
     <td>-</td>
 </tr>

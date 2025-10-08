@@ -372,3 +372,259 @@ sail_status_t tga_private_fetch_palette(struct sail_io *io, const struct TgaFile
 
     return SAIL_OK;
 }
+
+sail_status_t tga_private_write_file_header(struct sail_io *io, const struct TgaFileHeader *file_header) {
+
+    SAIL_TRY(io->strict_write(io->stream, &file_header->id_length,                   sizeof(file_header->id_length)));
+    SAIL_TRY(io->strict_write(io->stream, &file_header->color_map_type,              sizeof(file_header->color_map_type)));
+    SAIL_TRY(io->strict_write(io->stream, &file_header->image_type,                  sizeof(file_header->image_type)));
+    SAIL_TRY(io->strict_write(io->stream, &file_header->first_color_map_entry_index, sizeof(file_header->first_color_map_entry_index)));
+    SAIL_TRY(io->strict_write(io->stream, &file_header->color_map_elements,          sizeof(file_header->color_map_elements)));
+    SAIL_TRY(io->strict_write(io->stream, &file_header->color_map_entry_size,        sizeof(file_header->color_map_entry_size)));
+    SAIL_TRY(io->strict_write(io->stream, &file_header->x,                           sizeof(file_header->x)));
+    SAIL_TRY(io->strict_write(io->stream, &file_header->y,                           sizeof(file_header->y)));
+    SAIL_TRY(io->strict_write(io->stream, &file_header->width,                       sizeof(file_header->width)));
+    SAIL_TRY(io->strict_write(io->stream, &file_header->height,                      sizeof(file_header->height)));
+    SAIL_TRY(io->strict_write(io->stream, &file_header->bpp,                         sizeof(file_header->bpp)));
+    SAIL_TRY(io->strict_write(io->stream, &file_header->descriptor,                  sizeof(file_header->descriptor)));
+
+    return SAIL_OK;
+}
+
+sail_status_t tga_private_write_file_footer(struct sail_io *io, const struct TgaFooter *footer) {
+
+    SAIL_TRY(io->strict_write(io->stream, &footer->extension_area_offset, sizeof(footer->extension_area_offset)));
+    SAIL_TRY(io->strict_write(io->stream, &footer->developer_area_offset, sizeof(footer->developer_area_offset)));
+    SAIL_TRY(io->strict_write(io->stream, footer->signature,              sizeof(footer->signature)));
+
+    return SAIL_OK;
+}
+
+sail_status_t tga_private_write_extension_area(struct sail_io *io, double gamma, const struct sail_meta_data_node *meta_data_node) {
+
+    /* Extension area size (495 bytes for TGA 2.0). */
+    uint16_t extension_size = TGA2_EXTENSION_AREA_LENGTH;
+    SAIL_TRY(io->strict_write(io->stream, &extension_size, sizeof(extension_size)));
+
+    /* Author Name (41 bytes). */
+    char author[41] = {0};
+    for (const struct sail_meta_data_node *node = meta_data_node; node != NULL; node = node->next) {
+        if (node->meta_data->key == SAIL_META_DATA_AUTHOR &&
+            node->meta_data->value->type == SAIL_VARIANT_TYPE_STRING) {
+            const char *author_str = sail_variant_to_string(node->meta_data->value);
+            if (author_str != NULL) {
+                strncpy(author, author_str, 40);
+            }
+            break;
+        }
+    }
+    SAIL_TRY(io->strict_write(io->stream, author, sizeof(author)));
+
+    /* Comments (324 bytes = 4 lines x 81 bytes). */
+    char comments[324] = {0};
+    for (const struct sail_meta_data_node *node = meta_data_node; node != NULL; node = node->next) {
+        if (node->meta_data->key == SAIL_META_DATA_COMMENT &&
+            node->meta_data->value->type == SAIL_VARIANT_TYPE_STRING) {
+            const char *comment_str = sail_variant_to_string(node->meta_data->value);
+            if (comment_str != NULL) {
+                strncpy(comments, comment_str, 323);
+            }
+            break;
+        }
+    }
+    SAIL_TRY(io->strict_write(io->stream, comments, sizeof(comments)));
+
+    /* Date/Time Stamp (12 bytes). */
+    uint16_t month = 0, day = 0, year = 0, hour = 0, minute = 0, second = 0;
+    for (const struct sail_meta_data_node *node = meta_data_node; node != NULL; node = node->next) {
+        if (node->meta_data->key == SAIL_META_DATA_CREATION_TIME &&
+            node->meta_data->value->type == SAIL_VARIANT_TYPE_UNSIGNED_LONG) {
+            time_t timestamp = (time_t)sail_variant_to_unsigned_long(node->meta_data->value);
+            struct tm *time_tm = localtime(&timestamp);
+            if (time_tm != NULL) {
+                month  = (uint16_t)(time_tm->tm_mon + 1);
+                day    = (uint16_t)time_tm->tm_mday;
+                year   = (uint16_t)(time_tm->tm_year + 1900);
+                hour   = (uint16_t)time_tm->tm_hour;
+                minute = (uint16_t)time_tm->tm_min;
+                second = (uint16_t)time_tm->tm_sec;
+            }
+            break;
+        }
+    }
+    SAIL_TRY(io->strict_write(io->stream, &month,  sizeof(month)));
+    SAIL_TRY(io->strict_write(io->stream, &day,    sizeof(day)));
+    SAIL_TRY(io->strict_write(io->stream, &year,   sizeof(year)));
+    SAIL_TRY(io->strict_write(io->stream, &hour,   sizeof(hour)));
+    SAIL_TRY(io->strict_write(io->stream, &minute, sizeof(minute)));
+    SAIL_TRY(io->strict_write(io->stream, &second, sizeof(second)));
+
+    /* Job Name/ID (41 bytes). */
+    char job[41] = {0};
+    for (const struct sail_meta_data_node *node = meta_data_node; node != NULL; node = node->next) {
+        if (node->meta_data->key == SAIL_META_DATA_JOB &&
+            node->meta_data->value->type == SAIL_VARIANT_TYPE_STRING) {
+            const char *job_str = sail_variant_to_string(node->meta_data->value);
+            if (job_str != NULL) {
+                strncpy(job, job_str, 40);
+            }
+            break;
+        }
+    }
+    SAIL_TRY(io->strict_write(io->stream, job, sizeof(job)));
+
+    /* Job Time (6 bytes). */
+    uint16_t job_hour = 0, job_minute = 0, job_second = 0;
+    for (const struct sail_meta_data_node *node = meta_data_node; node != NULL; node = node->next) {
+        if (node->meta_data->key == SAIL_META_DATA_TIME_CONSUMED &&
+            node->meta_data->value->type == SAIL_VARIANT_TYPE_STRING) {
+            const char *time_str = sail_variant_to_string(node->meta_data->value);
+            if (time_str != NULL) {
+                sscanf(time_str, "%hu:%hu:%hu", &job_hour, &job_minute, &job_second);
+            }
+            break;
+        }
+    }
+    SAIL_TRY(io->strict_write(io->stream, &job_hour,   sizeof(job_hour)));
+    SAIL_TRY(io->strict_write(io->stream, &job_minute, sizeof(job_minute)));
+    SAIL_TRY(io->strict_write(io->stream, &job_second, sizeof(job_second)));
+
+    /* Software ID (41 bytes). */
+    char software[41] = {0};
+    for (const struct sail_meta_data_node *node = meta_data_node; node != NULL; node = node->next) {
+        if (node->meta_data->key == SAIL_META_DATA_SOFTWARE &&
+            node->meta_data->value->type == SAIL_VARIANT_TYPE_STRING) {
+            const char *software_str = sail_variant_to_string(node->meta_data->value);
+            if (software_str != NULL) {
+                strncpy(software, software_str, 40);
+            }
+            break;
+        }
+    }
+    SAIL_TRY(io->strict_write(io->stream, software, sizeof(software)));
+
+    /* Software Version (3 bytes). */
+    uint16_t version = 0;
+    uint8_t version_letter = ' ';
+    for (const struct sail_meta_data_node *node = meta_data_node; node != NULL; node = node->next) {
+        if (node->meta_data->key == SAIL_META_DATA_SOFTWARE_VERSION &&
+            node->meta_data->value->type == SAIL_VARIANT_TYPE_STRING) {
+            const char *version_str = sail_variant_to_string(node->meta_data->value);
+            if (version_str != NULL) {
+                double version_double;
+                char letter;
+                if (sscanf(version_str, "%lf.%c", &version_double, &letter) == 2) {
+                    version = (uint16_t)(version_double * 100);
+                    version_letter = (uint8_t)letter;
+                } else if (sscanf(version_str, "%lf", &version_double) == 1) {
+                    version = (uint16_t)(version_double * 100);
+                }
+            }
+            break;
+        }
+    }
+    SAIL_TRY(io->strict_write(io->stream, &version,        sizeof(version)));
+    SAIL_TRY(io->strict_write(io->stream, &version_letter, sizeof(version_letter)));
+
+    /* Key Color (4 bytes - ARGB). */
+    uint32_t key_color = 0;
+    SAIL_TRY(io->strict_write(io->stream, &key_color, sizeof(key_color)));
+
+    /* Pixel Aspect Ratio (4 bytes). */
+    uint16_t pixel_aspect_num = 0;
+    uint16_t pixel_aspect_denom = 0;
+    SAIL_TRY(io->strict_write(io->stream, &pixel_aspect_num,   sizeof(pixel_aspect_num)));
+    SAIL_TRY(io->strict_write(io->stream, &pixel_aspect_denom, sizeof(pixel_aspect_denom)));
+
+    /* Gamma Value (4 bytes). */
+    uint16_t gamma_num = 0;
+    uint16_t gamma_denom = 0;
+    if (gamma > 0.0) {
+        gamma_num = (uint16_t)(gamma * 1000);
+        gamma_denom = 1000;
+    }
+    SAIL_TRY(io->strict_write(io->stream, &gamma_num,   sizeof(gamma_num)));
+    SAIL_TRY(io->strict_write(io->stream, &gamma_denom, sizeof(gamma_denom)));
+
+    /* Color Correction Offset (4 bytes). */
+    uint32_t color_correction_offset = 0;
+    SAIL_TRY(io->strict_write(io->stream, &color_correction_offset, sizeof(color_correction_offset)));
+
+    /* Postage Stamp Offset (4 bytes). */
+    uint32_t postage_stamp_offset = 0;
+    SAIL_TRY(io->strict_write(io->stream, &postage_stamp_offset, sizeof(postage_stamp_offset)));
+
+    /* Scan Line Offset (4 bytes). */
+    uint32_t scan_line_offset = 0;
+    SAIL_TRY(io->strict_write(io->stream, &scan_line_offset, sizeof(scan_line_offset)));
+
+    /* Attributes Type (1 byte). */
+    uint8_t attributes_type = 3; /* 3 = useful alpha channel data. */
+    SAIL_TRY(io->strict_write(io->stream, &attributes_type, sizeof(attributes_type)));
+
+    return SAIL_OK;
+}
+
+void tga_private_pixel_format_to_tga_format(enum SailPixelFormat pixel_format, uint8_t *image_type, uint8_t *bpp) {
+
+    switch (pixel_format) {
+        case SAIL_PIXEL_FORMAT_BPP8_INDEXED: {
+            *image_type = TGA_INDEXED;
+            *bpp = 8;
+            break;
+        }
+        case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE: {
+            *image_type = TGA_GRAY;
+            *bpp = 8;
+            break;
+        }
+        case SAIL_PIXEL_FORMAT_BPP16_BGR555: {
+            *image_type = TGA_TRUE_COLOR;
+            *bpp = 16;
+            break;
+        }
+        case SAIL_PIXEL_FORMAT_BPP24_BGR: {
+            *image_type = TGA_TRUE_COLOR;
+            *bpp = 24;
+            break;
+        }
+        case SAIL_PIXEL_FORMAT_BPP32_BGRA: {
+            *image_type = TGA_TRUE_COLOR;
+            *bpp = 32;
+            break;
+        }
+        default: {
+            *image_type = TGA_NO_IMAGE;
+            *bpp = 0;
+        }
+    }
+}
+
+sail_status_t tga_private_write_palette(struct sail_io *io, const struct sail_palette *palette, struct TgaFileHeader *file_header) {
+
+    /* Write palette data converting RGB(A) to BGR(A). */
+    const unsigned bytes_per_entry = (file_header->color_map_entry_size + 7) / 8;
+    const unsigned char *palette_data = palette->data;
+
+    for (unsigned i = 0; i < palette->color_count; i++) {
+        unsigned char entry[4];
+
+        if (bytes_per_entry == 3) {
+            /* RGB -> BGR. */
+            entry[0] = palette_data[2];
+            entry[1] = palette_data[1];
+            entry[2] = palette_data[0];
+        } else if (bytes_per_entry == 4) {
+            /* RGBA -> BGRA. */
+            entry[0] = palette_data[2];
+            entry[1] = palette_data[1];
+            entry[2] = palette_data[0];
+            entry[3] = palette_data[3];
+        }
+
+        SAIL_TRY(io->strict_write(io->stream, entry, bytes_per_entry));
+        palette_data += bytes_per_entry;
+    }
+
+    return SAIL_OK;
+}
