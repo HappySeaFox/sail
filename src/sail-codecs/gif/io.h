@@ -32,6 +32,6 @@
 
 SAIL_HIDDEN int my_read_proc(GifFileType *gif, GifByteType *buffer, int buffer_size);
 
-SAIL_HIDDEN int my_write_proc(GifFileType *gif, GifByteType *buffer, int buffer_size);
+SAIL_HIDDEN int my_write_proc(GifFileType *gif, const GifByteType *buffer, int buffer_size);
 
 #endif

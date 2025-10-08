@@ -72,7 +72,7 @@ images with the help of [ksquirrel-libs](FAQ.md#how-old-is-sail), the predecesso
 | 1  | [APNG](https://wikipedia.org/wiki/APNG)                             | R             | libpng+APNG patch |
 | 2  | [AVIF](https://wikipedia.org/wiki/AV1#AV1_Image_File_Format_(AVIF)) | R             | libavif           |
 | 3  | [BMP](https://wikipedia.org/wiki/BMP_file_format)                   | RW            |                   |
-| 4  | [GIF](https://wikipedia.org/wiki/GIF)                               | R             | giflib            |
+| 4  | [GIF](https://wikipedia.org/wiki/GIF)                               | RW            | giflib            |
 | .. | ...                                                                 |               |                   |
 | 6  | [JPEG](https://wikipedia.org/wiki/JPEG)                             | RW            | libjpeg-turbo     |
 | 7  | [JPEG 2000](https://wikipedia.org/wiki/JPEG_2000)                    | R             | jasper            |

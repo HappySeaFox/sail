@@ -25,8 +25,6 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include <gif_lib.h>
@@ -65,6 +63,14 @@ struct gif_state {
     unsigned prev_height;
     unsigned char **first_frame;
     unsigned char background[4]; /* RGBA */
+
+    /* For saving. */
+    int frames_written;
+    ColorMapObject *color_map;
+    bool is_first_frame;
+    int transparency_index_save;
+    int loop_count;
+    int background_color_index;
 };
 
 static sail_status_t alloc_gif_state(struct sail_io *io,
@@ -97,6 +103,13 @@ static sail_status_t alloc_gif_state(struct sail_io *io,
         .prev_width         = 0,
         .prev_height        = 0,
         .first_frame        = NULL,
+
+        .frames_written     = 0,
+        .color_map          = NULL,
+        .is_first_frame     = true,
+        .transparency_index_save = -1,
+        .loop_count         = 0,
+        .background_color_index = 0,
     };
 
     return SAIL_OK;
@@ -116,6 +129,10 @@ static void destroy_gif_state(struct gif_state *gif_state) {
         }
 
         sail_free(gif_state->first_frame);
+    }
+
+    if (gif_state->color_map != NULL) {
+        GifFreeMapObject(gif_state->color_map);
     }
 
     sail_free(gif_state);
@@ -447,32 +464,202 @@ SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_gif(void **state) {
 
 SAIL_EXPORT sail_status_t sail_codec_save_init_v8_gif(struct sail_io *io, const struct sail_save_options *save_options, void **state) {
 
-    (void)io;
-    (void)save_options;
-    (void)state;
+    *state = NULL;
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
+    /* Allocate a new state. */
+    struct gif_state *gif_state;
+    SAIL_TRY(alloc_gif_state(io, NULL, save_options, &gif_state));
+    *state = gif_state;
+
+    /* Check compression. GIF always uses LZW. */
+    if (gif_state->save_options->compression != SAIL_COMPRESSION_LZW &&
+        gif_state->save_options->compression != SAIL_COMPRESSION_NONE) {
+        SAIL_LOG_ERROR("GIF: Only LZW and NONE compressions are supported");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_COMPRESSION);
+    }
+
+    /* Handle tuning options. */
+    if (gif_state->save_options->tuning != NULL) {
+        struct gif_tuning_state tuning_state = {
+            .transparency_index_save = &gif_state->transparency_index_save,
+            .loop_count              = &gif_state->loop_count,
+            .background_color_index  = &gif_state->background_color_index
+        };
+        sail_traverse_hash_map_with_user_data(gif_state->save_options->tuning, gif_private_tuning_key_value_callback, &tuning_state);
+    }
+
+    return SAIL_OK;
 }
 
 SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_gif(void *state, const struct sail_image *image) {
 
-    (void)state;
-    (void)image;
+    struct gif_state *gif_state = state;
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
+    int bpp;
+    SAIL_TRY(gif_private_pixel_format_to_bpp(image->pixel_format, &bpp));
+
+    if (image->palette == NULL) {
+        SAIL_LOG_ERROR("GIF: Indexed image must have a palette");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_MISSING_PALETTE);
+    }
+
+    /* First frame: initialize GIF and write header. */
+    if (gif_state->is_first_frame) {
+        gif_state->is_first_frame = false;
+
+        /* Build color map from first frame. */
+        SAIL_TRY(gif_private_build_color_map(image->palette, &gif_state->color_map));
+
+        /* Initialize GIF for writing. */
+        int error_code;
+        gif_state->gif = EGifOpen(gif_state->io, my_write_proc, &error_code);
+
+        if (gif_state->gif == NULL) {
+            SAIL_LOG_ERROR("GIF: Failed to initialize for writing. GIFLIB error code: %d", error_code);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+        }
+
+        /* Set GIF version to GIF89a (needed for animation). */
+        EGifSetGifVersion(gif_state->gif, true);
+
+        /* Write screen descriptor. */
+        gif_state->gif->SWidth  = image->width;
+        gif_state->gif->SHeight = image->height;
+        gif_state->gif->SColorResolution = bpp;
+        gif_state->gif->SBackGroundColor = gif_state->background_color_index;
+        gif_state->gif->SColorMap = gif_state->color_map;
+
+        if (EGifPutScreenDesc(gif_state->gif,
+                              image->width,
+                              image->height,
+                              bpp,
+                              gif_state->background_color_index,
+                              gif_state->color_map) == GIF_ERROR) {
+            SAIL_LOG_ERROR("GIF: %s", GifErrorString(gif_state->gif->Error));
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+        }
+
+        /* Write NETSCAPE2.0 application extension for looping animation. */
+        unsigned char netscape_ext[12] = "NETSCAPE2.0";
+        unsigned char netscape_params[3];
+        netscape_params[0] = 1;
+        netscape_params[1] = (unsigned char)(gif_state->loop_count & 0xFF);
+        netscape_params[2] = (unsigned char)((gif_state->loop_count >> 8) & 0xFF);
+
+        if (EGifPutExtensionLeader(gif_state->gif, APPLICATION_EXT_FUNC_CODE) == GIF_ERROR) {
+            SAIL_LOG_ERROR("GIF: %s", GifErrorString(gif_state->gif->Error));
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+        }
+
+        if (EGifPutExtensionBlock(gif_state->gif, 11, netscape_ext) == GIF_ERROR) {
+            SAIL_LOG_ERROR("GIF: %s", GifErrorString(gif_state->gif->Error));
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+        }
+
+        if (EGifPutExtensionBlock(gif_state->gif, 3, netscape_params) == GIF_ERROR) {
+            SAIL_LOG_ERROR("GIF: %s", GifErrorString(gif_state->gif->Error));
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+        }
+
+        if (EGifPutExtensionTrailer(gif_state->gif) == GIF_ERROR) {
+            SAIL_LOG_ERROR("GIF: %s", GifErrorString(gif_state->gif->Error));
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+        }
+    }
+
+    /* Write meta data (comments) if requested and available. */
+    if (gif_state->save_options->options & SAIL_OPTION_META_DATA && image->meta_data_node != NULL) {
+        for (const struct sail_meta_data_node *node = image->meta_data_node; node != NULL; node = node->next) {
+            if (node->meta_data->key == SAIL_META_DATA_COMMENT) {
+                const char *comment = sail_variant_to_string(node->meta_data->value);
+                if (comment != NULL) {
+                    size_t comment_len = strlen(comment);
+                    if (comment_len > 0 && comment_len <= 255) {
+                        if (EGifPutExtensionLeader(gif_state->gif, COMMENT_EXT_FUNC_CODE) == GIF_ERROR ||
+                            EGifPutExtensionBlock(gif_state->gif, comment_len, (const unsigned char *)comment) == GIF_ERROR ||
+                            EGifPutExtensionTrailer(gif_state->gif) == GIF_ERROR) {
+                            SAIL_LOG_ERROR("GIF: Failed to write comment extension");
+                            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /* Write Graphics Control Extension for frame delay and transparency. */
+    unsigned char gce[4];
+    /* Disposal method in bits 2-4, transparency flag in bit 0. */
+    gce[0] = (gif_state->transparency_index_save >= 0) ? 1 : 0; /* Transparency flag. */
+    gce[1] = (unsigned char)(image->delay / 10); /* Delay in 1/100 seconds. */
+    gce[2] = (unsigned char)((image->delay / 10) >> 8);
+    gce[3] = (gif_state->transparency_index_save >= 0) ? (unsigned char)gif_state->transparency_index_save : 0;
+
+    if (EGifPutExtensionLeader(gif_state->gif, GRAPHICS_EXT_FUNC_CODE) == GIF_ERROR) {
+        SAIL_LOG_ERROR("GIF: %s", GifErrorString(gif_state->gif->Error));
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+    }
+
+    if (EGifPutExtensionBlock(gif_state->gif, 4, gce) == GIF_ERROR) {
+        SAIL_LOG_ERROR("GIF: %s", GifErrorString(gif_state->gif->Error));
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+    }
+
+    if (EGifPutExtensionTrailer(gif_state->gif) == GIF_ERROR) {
+        SAIL_LOG_ERROR("GIF: %s", GifErrorString(gif_state->gif->Error));
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+    }
+
+    /* Write image descriptor. */
+    if (EGifPutImageDesc(gif_state->gif,
+                         0, /* left */
+                         0, /* top */
+                         image->width,
+                         image->height,
+                         false, /* interlace */
+                         NULL) == GIF_ERROR) {
+        SAIL_LOG_ERROR("GIF: %s", GifErrorString(gif_state->gif->Error));
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+    }
+
+    gif_state->frames_written++;
+
+    return SAIL_OK;
 }
 
 SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_gif(void *state, const struct sail_image *image) {
 
-    (void)state;
-    (void)image;
+    struct gif_state *gif_state = state;
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
+    /* Write pixel data line by line. */
+    for (unsigned row = 0; row < image->height; row++) {
+        const unsigned char *scanline = (const unsigned char *)image->pixels + row * image->bytes_per_line;
+
+        if (EGifPutLine(gif_state->gif, (GifPixelType *)scanline, image->width) == GIF_ERROR) {
+            SAIL_LOG_ERROR("GIF: %s", GifErrorString(gif_state->gif->Error));
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+        }
+    }
+
+    return SAIL_OK;
 }
 
 SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_gif(void **state) {
 
-    (void)state;
+    struct gif_state *gif_state = *state;
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
+    /* Subsequent calls to finish() will expectedly fail in the above line. */
+    *state = NULL;
+
+    /* Close the GIF file. */
+    if (gif_state->gif != NULL) {
+        if (EGifCloseFile(gif_state->gif, /* ErrorCode */ NULL) == GIF_ERROR) {
+            destroy_gif_state(gif_state);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+        }
+    }
+
+    destroy_gif_state(gif_state);
+
+    return SAIL_OK;
 }
