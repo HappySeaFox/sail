@@ -37,6 +37,9 @@
         <b>YUV:</b> 8-bit, 10-bit, 12-bit.
         <br/><br/>
         <b>Content:</b> Static, Animated, Meta data, ICC profiles.
+        <br/><br/>
+        <b>Tuning:</b> Key: <i>"avif-threads"</i>. Description: Number of decoder threads.
+        Possible values: positive integer (default: 1).
     </td>
     <td>-</td>
     <td>

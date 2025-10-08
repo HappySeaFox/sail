@@ -13,7 +13,7 @@ mime-types=image/avif;image/avif-sequence
 
 [load-features]
 features=STATIC;ANIMATED;META-DATA;ICCP;SOURCE-IMAGE
-tuning=
+tuning=avif-threads
 
 [save-features]
 features=STATIC;ANIMATED;META-DATA;ICCP

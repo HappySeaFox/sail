@@ -148,6 +148,11 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_avif(struct sail_io *io, const
 
     avif_state->avif_decoder->ignoreExif = avif_state->avif_decoder->ignoreXMP = (avif_state->load_options->options & SAIL_OPTION_META_DATA) == 0;
 
+    /* Handle tuning options. */
+    if (load_options->tuning != NULL) {
+        sail_traverse_hash_map_with_user_data(load_options->tuning, avif_private_load_tuning_key_value_callback, avif_state->avif_decoder);
+    }
+
     /* Initialize AVIF. */
     avifResult avif_result = avifDecoderParse(avif_state->avif_decoder);
 

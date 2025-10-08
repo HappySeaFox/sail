@@ -298,3 +298,20 @@ bool avif_private_tuning_key_value_callback(const char *key, const struct sail_v
 
     return true;
 }
+
+bool avif_private_load_tuning_key_value_callback(const char *key, const struct sail_variant *value, void *user_data) {
+
+    struct avifDecoder *decoder = user_data;
+
+    if (strcmp(key, "avif-threads") == 0) {
+        if (value->type == SAIL_VARIANT_TYPE_INT) {
+            int threads = sail_variant_to_int(value);
+            if (threads > 0) {
+                decoder->maxThreads = threads;
+                SAIL_LOG_TRACE("AVIF: Set decoder max threads to %d", threads);
+            }
+        }
+    }
+
+    return true;
+}
