@@ -15,10 +15,10 @@ features=STATIC;MULTI-PAGED;SOURCE-IMAGE
 tuning=
 
 [save-features]
-features=
-pixel-formats=
-compressions=
-default-compression=
+features=STATIC;MULTI-PAGED
+pixel-formats=BPP1-INDEXED;BPP4-INDEXED;BPP8-INDEXED;BPP24-BGR;BPP32-BGRA
+compressions=NONE
+default-compression=NONE
 compression-level-min=0
 compression-level-max=0
 compression-level-default=0

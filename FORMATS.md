@@ -84,8 +84,23 @@
         <br/><br/>
         <b>BMP Versions:</b> OS/2.
     </td>
-    <td>Unsupported</td>
-    <td>-</td>
+    <td>
+        <b>Indexed:</b> 1-bit, 4-bit, 8-bit.
+        <b>Grayscale:</b> 8-bit.
+        <b>RGB:</b> 16-bit, 24-bit.
+        <b>RGBA:</b> 32-bit.
+        <br/><br/>
+        <b>Compressions:</b> NONE, RLE (RLE4 for 4-bit, RLE8 for 8-bit).
+        <br/><br/>
+        <b>Content:</b> Static.
+    </td>
+    <td>
+        <b>Compressions:</b> ALPHABITFIELDS, BITFIELDS, JPEG, PNG.
+        <br/><br/>
+        <b>Content:</b> Meta data, ICC profiles.
+        <br/><br/>
+        <b>BMP Versions:</b> V1 (DDB), V2, V4, V5.
+    </td>
     <td>-</td>
 </tr>
 <tr>
@@ -115,8 +130,23 @@
         Possible values: unsigned int.
     </td>
     <td>PNG contained images</td>
-    <td>Unsupported</td>
-    <td>-</td>
+    <td>
+        <b>Indexed:</b> 1-bit, 4-bit, 8-bit.
+        <b>RGB:</b> 24-bit (BGR).
+        <b>RGBA:</b> 32-bit (BGRA).
+        <br/><br/>
+        <b>Compressions:</b> NONE.
+        <br/><br/>
+        <b>Content:</b> Static, Multi-paged.
+        <br/><br/>
+        <b>Note:</b> Maximum image size is 256x256 pixels.
+        <br/><br/>
+        <b>Special properties:</b> Key: <i>"cur-hotspot-x"</i>, <i>"cur-hotspot-y"</i>. Description: CUR hotspot coordinates.
+        Possible values: unsigned int.
+    </td>
+    <td>
+        <b>Content:</b> PNG embedded images, transparency mask optimization.
+    </td>
     <td>-</td>
 </tr>
 <tr>

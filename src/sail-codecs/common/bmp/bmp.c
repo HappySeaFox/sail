@@ -558,3 +558,307 @@ sail_status_t bmp_private_read_finish(void **state, struct sail_io *io) {
 
     return SAIL_OK;
 }
+
+/*
+ * Encoding functions.
+ */
+
+sail_status_t bmp_private_write_init(struct sail_io *io, const struct sail_save_options *save_options, void **state, int bmp_write_options) {
+
+    (void)io;
+
+    struct bmp_state *bmp_state;
+    SAIL_TRY(alloc_bmp_state(&bmp_state));
+    *state = bmp_state;
+
+    bmp_state->save_options = save_options;
+    bmp_state->bmp_load_options = bmp_write_options; /* Reuse the field for write options. */
+
+    return SAIL_OK;
+}
+
+sail_status_t bmp_private_write_seek_next_frame(void *state, struct sail_io *io, const struct sail_image *image) {
+
+    struct bmp_state *bmp_state = state;
+
+    /* Validate pixel format. */
+    SAIL_TRY(bmp_private_supported_write_pixel_format(image->pixel_format));
+
+    /* Determine compression type. */
+    uint32_t compression = 0; /* BI_RGB */
+    if (bmp_state->save_options != NULL && bmp_state->save_options->compression != SAIL_COMPRESSION_NONE) {
+        if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP4_INDEXED && bmp_state->save_options->compression == SAIL_COMPRESSION_RLE) {
+            compression = 2; /* BI_RLE4 */
+        } else if ((image->pixel_format == SAIL_PIXEL_FORMAT_BPP8_INDEXED || image->pixel_format == SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE) &&
+                   bmp_state->save_options->compression == SAIL_COMPRESSION_RLE) {
+            compression = 1; /* BI_RLE8 */
+        }
+    }
+
+    /* Calculate BPP. */
+    unsigned bits_per_pixel;
+    switch (image->pixel_format) {
+        case SAIL_PIXEL_FORMAT_BPP1_INDEXED: {
+            bits_per_pixel = 1;
+            break;
+        }
+        case SAIL_PIXEL_FORMAT_BPP4_INDEXED: {
+            bits_per_pixel = 4;
+            break;
+        }
+        case SAIL_PIXEL_FORMAT_BPP8_INDEXED:
+        case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE: {
+            bits_per_pixel = 8;
+            break;
+        }
+        case SAIL_PIXEL_FORMAT_BPP16_BGR555: {
+            bits_per_pixel = 16;
+            break;
+        }
+        case SAIL_PIXEL_FORMAT_BPP24_RGB:
+        case SAIL_PIXEL_FORMAT_BPP24_BGR: {
+            bits_per_pixel = 24;
+            break;
+        }
+        case SAIL_PIXEL_FORMAT_BPP32_RGBA:
+        case SAIL_PIXEL_FORMAT_BPP32_BGRA:
+        case SAIL_PIXEL_FORMAT_BPP32_ARGB:
+        case SAIL_PIXEL_FORMAT_BPP32_ABGR: {
+            bits_per_pixel = 32;
+            break;
+        }
+        default: {
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+        }
+    }
+
+    /* Store compression for use in write_frame. */
+    bmp_state->v3.compression = compression;
+
+    /* Calculate bytes in row and padding. */
+    SAIL_TRY(bmp_private_bytes_in_row(image->width, bits_per_pixel, &bmp_state->bytes_in_row));
+    bmp_state->pad_bytes = bmp_private_pad_bytes(bmp_state->bytes_in_row);
+
+    /* Calculate palette size for indexed formats. */
+    unsigned palette_size = 0;
+    unsigned colors_used = 0;
+    if (bits_per_pixel <= 8) {
+        if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE) {
+            /* Grayscale has 256 colors. */
+            colors_used = 256;
+        } else if (image->palette != NULL) {
+            /* Use palette from image. */
+            colors_used = image->palette->color_count;
+        } else {
+            /* Default palette sizes. */
+            colors_used = (1U << bits_per_pixel);
+        }
+        palette_size = colors_used * 4; /* 4 bytes per color (BGRA). */
+    }
+
+    /* For RLE compression, bitmap size is unknown and can be 0. For uncompressed, calculate the size. */
+    const unsigned bitmap_size = (compression == 0)
+        ? (bmp_state->bytes_in_row + bmp_state->pad_bytes) * image->height
+        : 0;
+    const unsigned file_header_size = (bmp_state->bmp_load_options & SAIL_WRITE_BMP_FILE_HEADER) ? 14 : 0;
+    const unsigned dib_header_size = 40;
+    const unsigned offset = file_header_size + dib_header_size + palette_size;
+
+    /* Write file header only if requested (BMP files have it, ICO files don't). */
+    if (bmp_state->bmp_load_options & SAIL_WRITE_BMP_FILE_HEADER) {
+        struct SailBmpDibFileHeader file_header = {
+            .type      = 0x4D42, /* "BM" */
+            .size      = offset + bitmap_size,
+            .reserved1 = 0,
+            .reserved2 = 0,
+            .offset    = offset,
+        };
+        SAIL_TRY(bmp_private_write_dib_file_header(io, &file_header));
+    }
+
+    /* Write DIB header V3. */
+    struct SailBmpDibHeaderV2 v2 = {
+        .size      = dib_header_size,
+        .width     = (int32_t)image->width,
+        .height    = (int32_t)image->height,
+        .planes    = 1,
+        .bit_count = (uint16_t)bits_per_pixel,
+    };
+    SAIL_TRY(bmp_private_write_v2(io, &v2));
+
+    /* Get resolution values. */
+    int32_t x_pixels_per_meter = 0;
+    int32_t y_pixels_per_meter = 0;
+
+    if (image->resolution != NULL) {
+        if (image->resolution->unit == SAIL_RESOLUTION_UNIT_METER) {
+            x_pixels_per_meter = (int32_t)image->resolution->x;
+            y_pixels_per_meter = (int32_t)image->resolution->y;
+        } else if (image->resolution->unit == SAIL_RESOLUTION_UNIT_CENTIMETER) {
+            x_pixels_per_meter = (int32_t)(image->resolution->x * 100);
+            y_pixels_per_meter = (int32_t)(image->resolution->y * 100);
+        }
+    }
+
+    struct SailBmpDibHeaderV3 v3 = {
+        .compression        = compression,
+        .bitmap_size        = bitmap_size,
+        .x_pixels_per_meter = x_pixels_per_meter,
+        .y_pixels_per_meter = y_pixels_per_meter,
+        .colors_used        = colors_used,
+        .colors_important   = 0,
+    };
+    SAIL_TRY(bmp_private_write_v3(io, &v3));
+
+    /* Also store v3 in state for use in write_frame. */
+    bmp_state->v3 = v3;
+
+    /* Write palette for indexed and grayscale formats. */
+    if (palette_size > 0) {
+        unsigned char bgra[4] = { 0, 0, 0, 0 };
+
+        if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE) {
+            /* Generate grayscale palette. */
+            for (unsigned i = 0; i < 256; i++) {
+                bgra[0] = (unsigned char)i; /* B */
+                bgra[1] = (unsigned char)i; /* G */
+                bgra[2] = (unsigned char)i; /* R */
+                bgra[3] = 0;                /* A */
+                SAIL_TRY(io->strict_write(io->stream, bgra, 4));
+            }
+        } else if (image->palette != NULL) {
+            /* Write palette from image. */
+            const unsigned char *palette_data = image->palette->data;
+            unsigned bytes_per_color;
+
+            switch (image->palette->pixel_format) {
+                case SAIL_PIXEL_FORMAT_BPP24_RGB:
+                case SAIL_PIXEL_FORMAT_BPP24_BGR: {
+                    bytes_per_color = 3;
+                    break;
+                }
+                case SAIL_PIXEL_FORMAT_BPP32_RGBA:
+                case SAIL_PIXEL_FORMAT_BPP32_BGRA:
+                case SAIL_PIXEL_FORMAT_BPP32_ARGB:
+                case SAIL_PIXEL_FORMAT_BPP32_ABGR: {
+                    bytes_per_color = 4;
+                    break;
+                }
+                default: {
+                    bytes_per_color = 3;
+                }
+            }
+
+            for (unsigned i = 0; i < colors_used; i++) {
+                /* Convert palette entry to BGRA. */
+                switch (image->palette->pixel_format) {
+                    case SAIL_PIXEL_FORMAT_BPP24_RGB: {
+                        bgra[0] = palette_data[2]; /* B */
+                        bgra[1] = palette_data[1]; /* G */
+                        bgra[2] = palette_data[0]; /* R */
+                        bgra[3] = 0;
+                        break;
+                    }
+                    case SAIL_PIXEL_FORMAT_BPP24_BGR: {
+                        bgra[0] = palette_data[0]; /* B */
+                        bgra[1] = palette_data[1]; /* G */
+                        bgra[2] = palette_data[2]; /* R */
+                        bgra[3] = 0;
+                        break;
+                    }
+                    case SAIL_PIXEL_FORMAT_BPP32_RGBA: {
+                        bgra[0] = palette_data[2]; /* B */
+                        bgra[1] = palette_data[1]; /* G */
+                        bgra[2] = palette_data[0]; /* R */
+                        bgra[3] = palette_data[3]; /* A */
+                        break;
+                    }
+                    case SAIL_PIXEL_FORMAT_BPP32_BGRA: {
+                        bgra[0] = palette_data[0]; /* B */
+                        bgra[1] = palette_data[1]; /* G */
+                        bgra[2] = palette_data[2]; /* R */
+                        bgra[3] = palette_data[3]; /* A */
+                        break;
+                    }
+                    default: {
+                        /* Fallback to black. */
+                        bgra[0] = 0;
+                        bgra[1] = 0;
+                        bgra[2] = 0;
+                        bgra[3] = 0;
+                    }
+                }
+                SAIL_TRY(io->strict_write(io->stream, bgra, 4));
+                palette_data += bytes_per_color;
+            }
+        } else {
+            /* Generate default palette for indexed formats. */
+            SAIL_TRY(bmp_private_fill_system_palette(bits_per_pixel, &bmp_state->palette, &bmp_state->palette_count));
+
+            for (unsigned i = 0; i < bmp_state->palette_count; i++) {
+                bgra[0] = bmp_state->palette[i].component1; /* B */
+                bgra[1] = bmp_state->palette[i].component2; /* G */
+                bgra[2] = bmp_state->palette[i].component3; /* R */
+                bgra[3] = 0;
+                SAIL_TRY(io->strict_write(io->stream, bgra, 4));
+            }
+        }
+    }
+
+    return SAIL_OK;
+}
+
+sail_status_t bmp_private_write_frame(void *state, struct sail_io *io, const struct sail_image *image) {
+
+    struct bmp_state *bmp_state = state;
+
+    /* BMP images are stored bottom-to-top. */
+    const unsigned char padding[4] = { 0, 0, 0, 0 };
+
+    if (bmp_state->v3.compression == 1) {
+        /* RLE8 compression. */
+        for (unsigned row = image->height; row > 0; row--) {
+            const unsigned char *scan = sail_scan_line(image, row - 1);
+            SAIL_TRY(bmp_private_write_rle8_scan_line(io, scan, image->width));
+        }
+
+        /* End of bitmap marker. */
+        uint8_t eob[2] = { 0x00, 0x01 };
+        SAIL_TRY(io->strict_write(io->stream, eob, 2));
+    } else if (bmp_state->v3.compression == 2) {
+        /* RLE4 compression. */
+        for (unsigned row = image->height; row > 0; row--) {
+            const unsigned char *scan = sail_scan_line(image, row - 1);
+            SAIL_TRY(bmp_private_write_rle4_scan_line(io, scan, image->width));
+        }
+
+        /* End of bitmap marker. */
+        uint8_t eob[2] = { 0x00, 0x01 };
+        SAIL_TRY(io->strict_write(io->stream, eob, 2));
+    } else {
+        /* Uncompressed. */
+        for (unsigned row = image->height; row > 0; row--) {
+            const unsigned char *scan = sail_scan_line(image, row - 1);
+            SAIL_TRY(io->strict_write(io->stream, scan, bmp_state->bytes_in_row));
+
+            if (bmp_state->pad_bytes > 0) {
+                SAIL_TRY(io->strict_write(io->stream, padding, bmp_state->pad_bytes));
+            }
+        }
+    }
+
+    return SAIL_OK;
+}
+
+sail_status_t bmp_private_write_finish(void **state, struct sail_io *io) {
+
+    (void)io;
+
+    struct bmp_state *bmp_state = *state;
+
+    *state = NULL;
+
+    destroy_bmp_state(bmp_state);
+
+    return SAIL_OK;
+}

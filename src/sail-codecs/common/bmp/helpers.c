@@ -229,3 +229,196 @@ sail_status_t bmp_private_fill_system_palette(unsigned bit_count, sail_rgb24_t *
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_BIT_DEPTH);
 }
+
+sail_status_t bmp_private_write_dib_file_header(struct sail_io *io, const struct SailBmpDibFileHeader *fh) {
+
+    SAIL_TRY(io->strict_write(io->stream, &fh->type,      sizeof(fh->type)));
+    SAIL_TRY(io->strict_write(io->stream, &fh->size,      sizeof(fh->size)));
+    SAIL_TRY(io->strict_write(io->stream, &fh->reserved1, sizeof(fh->reserved1)));
+    SAIL_TRY(io->strict_write(io->stream, &fh->reserved2, sizeof(fh->reserved2)));
+    SAIL_TRY(io->strict_write(io->stream, &fh->offset,    sizeof(fh->offset)));
+
+    return SAIL_OK;
+}
+
+sail_status_t bmp_private_write_v2(struct sail_io *io, const struct SailBmpDibHeaderV2 *v2) {
+
+    SAIL_TRY(io->strict_write(io->stream, &v2->size,      sizeof(v2->size)));
+    SAIL_TRY(io->strict_write(io->stream, &v2->width,     sizeof(v2->width)));
+    SAIL_TRY(io->strict_write(io->stream, &v2->height,    sizeof(v2->height)));
+    SAIL_TRY(io->strict_write(io->stream, &v2->planes,    sizeof(v2->planes)));
+    SAIL_TRY(io->strict_write(io->stream, &v2->bit_count, sizeof(v2->bit_count)));
+
+    return SAIL_OK;
+}
+
+sail_status_t bmp_private_write_v3(struct sail_io *io, const struct SailBmpDibHeaderV3 *v3) {
+
+    SAIL_TRY(io->strict_write(io->stream, &v3->compression,        sizeof(v3->compression)));
+    SAIL_TRY(io->strict_write(io->stream, &v3->bitmap_size,        sizeof(v3->bitmap_size)));
+    SAIL_TRY(io->strict_write(io->stream, &v3->x_pixels_per_meter, sizeof(v3->x_pixels_per_meter)));
+    SAIL_TRY(io->strict_write(io->stream, &v3->y_pixels_per_meter, sizeof(v3->y_pixels_per_meter)));
+    SAIL_TRY(io->strict_write(io->stream, &v3->colors_used,        sizeof(v3->colors_used)));
+    SAIL_TRY(io->strict_write(io->stream, &v3->colors_important,   sizeof(v3->colors_important)));
+
+    return SAIL_OK;
+}
+
+sail_status_t bmp_private_supported_write_pixel_format(enum SailPixelFormat pixel_format) {
+
+    switch (pixel_format) {
+        case SAIL_PIXEL_FORMAT_BPP1_INDEXED:
+        case SAIL_PIXEL_FORMAT_BPP4_INDEXED:
+        case SAIL_PIXEL_FORMAT_BPP8_INDEXED:
+        case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE:
+        case SAIL_PIXEL_FORMAT_BPP16_BGR555:
+        case SAIL_PIXEL_FORMAT_BPP24_RGB:
+        case SAIL_PIXEL_FORMAT_BPP24_BGR:
+        case SAIL_PIXEL_FORMAT_BPP32_RGBA:
+        case SAIL_PIXEL_FORMAT_BPP32_BGRA:
+        case SAIL_PIXEL_FORMAT_BPP32_ARGB:
+        case SAIL_PIXEL_FORMAT_BPP32_ABGR: {
+            return SAIL_OK;
+        }
+        default: {
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+        }
+    }
+}
+
+sail_status_t bmp_private_write_rle8_scan_line(struct sail_io *io, const unsigned char *scan, unsigned width) {
+
+    unsigned i = 0;
+
+    while (i < width) {
+        /* Find run length. */
+        unsigned run_length = 1;
+        while (i + run_length < width && run_length < 255 && scan[i] == scan[i + run_length]) {
+            run_length++;
+        }
+
+        if (run_length > 1) {
+            /* Encoded run: count + value. */
+            uint8_t encoded[2];
+            encoded[0] = (uint8_t)run_length;
+            encoded[1] = scan[i];
+            SAIL_TRY(io->strict_write(io->stream, encoded, 2));
+            i += run_length;
+        } else {
+            /* Find literal run length. */
+            unsigned literal_length = 1;
+            while (i + literal_length < width && literal_length < 255) {
+                /* Check if there's a run of same pixels ahead. */
+                unsigned ahead_run = 1;
+                while (i + literal_length + ahead_run < width &&
+                       ahead_run < 3 &&
+                       scan[i + literal_length] == scan[i + literal_length + ahead_run]) {
+                    ahead_run++;
+                }
+
+                /* If we found a run of 3+ same pixels, stop the literal run. */
+                if (ahead_run >= 3) {
+                    break;
+                }
+
+                literal_length++;
+            }
+
+            /* Write unencoded run: 0x00, count, data. */
+            uint8_t marker[2];
+            marker[0] = 0x00;
+            marker[1] = (uint8_t)literal_length;
+            SAIL_TRY(io->strict_write(io->stream, marker, 2));
+            SAIL_TRY(io->strict_write(io->stream, scan + i, literal_length));
+
+            /* Pad to word boundary. */
+            if (literal_length % 2 != 0) {
+                uint8_t padding = 0;
+                SAIL_TRY(io->strict_write(io->stream, &padding, 1));
+            }
+
+            i += literal_length;
+        }
+    }
+
+    /* End of scan line marker. */
+    uint8_t eol[2] = { 0x00, 0x00 };
+    SAIL_TRY(io->strict_write(io->stream, eol, 2));
+
+    return SAIL_OK;
+}
+
+sail_status_t bmp_private_write_rle4_scan_line(struct sail_io *io, const unsigned char *scan, unsigned width) {
+
+    unsigned i = 0;
+
+    while (i < width) {
+        /* Find run length. */
+        unsigned run_length = 1;
+        while (i + run_length < width && run_length < 255 && scan[i] == scan[i + run_length]) {
+            run_length++;
+        }
+
+        if (run_length > 1) {
+            /* Encoded run: count + packed value. */
+            uint8_t encoded[2];
+            encoded[0] = (uint8_t)run_length;
+            /* Pack two 4-bit values into one byte. */
+            encoded[1] = (uint8_t)((scan[i] << 4) | scan[i]);
+            SAIL_TRY(io->strict_write(io->stream, encoded, 2));
+            i += run_length;
+        } else {
+            /* Find literal run length. */
+            unsigned literal_length = 1;
+            while (i + literal_length < width && literal_length < 255) {
+                /* Check if there's a run of same pixels ahead. */
+                unsigned ahead_run = 1;
+                while (i + literal_length + ahead_run < width &&
+                       ahead_run < 3 &&
+                       scan[i + literal_length] == scan[i + literal_length + ahead_run]) {
+                    ahead_run++;
+                }
+
+                /* If we found a run of 3+ same pixels, stop the literal run. */
+                if (ahead_run >= 3) {
+                    break;
+                }
+
+                literal_length++;
+            }
+
+            /* Write unencoded run: 0x00, count, packed data. */
+            uint8_t marker[2];
+            marker[0] = 0x00;
+            marker[1] = (uint8_t)literal_length;
+            SAIL_TRY(io->strict_write(io->stream, marker, 2));
+
+            /* Pack 4-bit pixels into bytes. */
+            unsigned bytes_to_write = (literal_length + 1) / 2;
+            for (unsigned j = 0; j < bytes_to_write; j++) {
+                uint8_t packed;
+                if (i + j * 2 + 1 < width) {
+                    packed = (uint8_t)((scan[i + j * 2] << 4) | scan[i + j * 2 + 1]);
+                } else {
+                    /* Last pixel, pad with 0. */
+                    packed = (uint8_t)(scan[i + j * 2] << 4);
+                }
+                SAIL_TRY(io->strict_write(io->stream, &packed, 1));
+            }
+
+            /* Pad to word boundary. */
+            if (bytes_to_write % 2 != 0) {
+                uint8_t padding = 0;
+                SAIL_TRY(io->strict_write(io->stream, &padding, 1));
+            }
+
+            i += literal_length;
+        }
+    }
+
+    /* End of scan line marker. */
+    uint8_t eol[2] = { 0x00, 0x00 };
+    SAIL_TRY(io->strict_write(io->stream, eol, 2));
+
+    return SAIL_OK;
+}
