@@ -440,14 +440,19 @@ sail_status_t tga_private_write_extension_area(struct sail_io *io, double gamma,
         if (node->meta_data->key == SAIL_META_DATA_CREATION_TIME &&
             node->meta_data->value->type == SAIL_VARIANT_TYPE_UNSIGNED_LONG) {
             time_t timestamp = (time_t)sail_variant_to_unsigned_long(node->meta_data->value);
-            struct tm *time_tm = localtime(&timestamp);
-            if (time_tm != NULL) {
-                month  = (uint16_t)(time_tm->tm_mon + 1);
-                day    = (uint16_t)time_tm->tm_mday;
-                year   = (uint16_t)(time_tm->tm_year + 1900);
-                hour   = (uint16_t)time_tm->tm_hour;
-                minute = (uint16_t)time_tm->tm_min;
-                second = (uint16_t)time_tm->tm_sec;
+            struct tm time_tm;
+
+#ifdef _MSC_VER
+            if (localtime_s(&time_tm, &timestamp) == 0) {
+#else
+            if (localtime_r(&timestamp, &time_tm) != NULL) {
+#endif
+                month  = (uint16_t)(time_tm.tm_mon + 1);
+                day    = (uint16_t)time_tm.tm_mday;
+                year   = (uint16_t)(time_tm.tm_year + 1900);
+                hour   = (uint16_t)time_tm.tm_hour;
+                minute = (uint16_t)time_tm.tm_min;
+                second = (uint16_t)time_tm.tm_sec;
             }
             break;
         }
@@ -480,7 +485,11 @@ sail_status_t tga_private_write_extension_area(struct sail_io *io, double gamma,
             node->meta_data->value->type == SAIL_VARIANT_TYPE_STRING) {
             const char *time_str = sail_variant_to_string(node->meta_data->value);
             if (time_str != NULL) {
+#ifdef _MSC_VER
+                sscanf_s(time_str, "%hu:%hu:%hu", &job_hour, &job_minute, &job_second);
+#else
                 sscanf(time_str, "%hu:%hu:%hu", &job_hour, &job_minute, &job_second);
+#endif
             }
             break;
         }
@@ -513,10 +522,18 @@ sail_status_t tga_private_write_extension_area(struct sail_io *io, double gamma,
             if (version_str != NULL) {
                 double version_double;
                 char letter;
+#ifdef _MSC_VER
+                if (sscanf_s(version_str, "%lf.%c", &version_double, &letter, 1) == 2) {
+#else
                 if (sscanf(version_str, "%lf.%c", &version_double, &letter) == 2) {
+#endif
                     version = (uint16_t)(version_double * 100);
                     version_letter = (uint8_t)letter;
+#ifdef _MSC_VER
+                } else if (sscanf_s(version_str, "%lf", &version_double) == 1) {
+#else
                 } else if (sscanf(version_str, "%lf", &version_double) == 1) {
+#endif
                     version = (uint16_t)(version_double * 100);
                 }
             }
