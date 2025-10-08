@@ -137,17 +137,152 @@ static inline void pixel_consumer_ycbcr(const struct output_context *output_cont
     *scan8 += 3;
 }
 
+static inline void pixel_consumer_gray_alpha8(const struct output_context *output_context, uint8_t **scan8, uint16_t **scan16, const sail_rgba32_t *rgba32, const sail_rgba64_t *rgba64) {
+
+    (void)scan16;
+
+    if (rgba32 != NULL) {
+        fill_gray_alpha8_pixel_from_uint8_values(rgba32, *scan8, output_context->options);
+    } else {
+        fill_gray_alpha8_pixel_from_uint16_values(rgba64, *scan8, output_context->options);
+    }
+
+    (*scan8)++;
+}
+
+static inline void pixel_consumer_gray_alpha16(const struct output_context *output_context, uint8_t **scan8, uint16_t **scan16, const sail_rgba32_t *rgba32, const sail_rgba64_t *rgba64) {
+
+    (void)scan16;
+
+    if (rgba32 != NULL) {
+        fill_gray_alpha16_pixel_from_uint8_values(rgba32, *scan8, output_context->options);
+    } else {
+        fill_gray_alpha16_pixel_from_uint16_values(rgba64, *scan8, output_context->options);
+    }
+
+    *scan8 += 2;
+}
+
+static inline void pixel_consumer_gray_alpha32(const struct output_context *output_context, uint8_t **scan8, uint16_t **scan16, const sail_rgba32_t *rgba32, const sail_rgba64_t *rgba64) {
+
+    (void)scan8;
+
+    if (rgba32 != NULL) {
+        fill_gray_alpha32_pixel_from_uint8_values(rgba32, *scan16, output_context->options);
+    } else {
+        fill_gray_alpha32_pixel_from_uint16_values(rgba64, *scan16, output_context->options);
+    }
+
+    *scan16 += 2;
+}
+
+static inline void pixel_consumer_rgb555_kind(const struct output_context *output_context, uint8_t **scan8, uint16_t **scan16, const sail_rgba32_t *rgba32, const sail_rgba64_t *rgba64) {
+
+    (void)scan8;
+
+    if (rgba32 != NULL) {
+        fill_rgb555_pixel_from_uint8_values(rgba32, *scan16, output_context->r, output_context->g, output_context->b, output_context->options);
+    } else {
+        fill_rgb555_pixel_from_uint16_values(rgba64, *scan16, output_context->r, output_context->g, output_context->b, output_context->options);
+    }
+
+    (*scan16)++;
+}
+
+static inline void pixel_consumer_rgb565_kind(const struct output_context *output_context, uint8_t **scan8, uint16_t **scan16, const sail_rgba32_t *rgba32, const sail_rgba64_t *rgba64) {
+
+    (void)scan8;
+
+    if (rgba32 != NULL) {
+        fill_rgb565_pixel_from_uint8_values(rgba32, *scan16, output_context->r, output_context->g, output_context->b, output_context->options);
+    } else {
+        fill_rgb565_pixel_from_uint16_values(rgba64, *scan16, output_context->r, output_context->g, output_context->b, output_context->options);
+    }
+
+    (*scan16)++;
+}
+
+static inline void pixel_consumer_cmyk32(const struct output_context *output_context, uint8_t **scan8, uint16_t **scan16, const sail_rgba32_t *rgba32, const sail_rgba64_t *rgba64) {
+
+    (void)scan16;
+
+    if (rgba32 != NULL) {
+        fill_cmyk32_pixel_from_uint8_values(rgba32, *scan8, output_context->options);
+    } else {
+        fill_cmyk32_pixel_from_uint16_values(rgba64, *scan8, output_context->options);
+    }
+
+    *scan8 += 4;
+}
+
+static inline void pixel_consumer_cmyk64(const struct output_context *output_context, uint8_t **scan8, uint16_t **scan16, const sail_rgba32_t *rgba32, const sail_rgba64_t *rgba64) {
+
+    (void)scan8;
+
+    if (rgba32 != NULL) {
+        fill_cmyk64_pixel_from_uint8_values(rgba32, *scan16, output_context->options);
+    } else {
+        fill_cmyk64_pixel_from_uint16_values(rgba64, *scan16, output_context->options);
+    }
+
+    *scan16 += 4;
+}
+
+static inline void pixel_consumer_rgba16_kind(const struct output_context *output_context, uint8_t **scan8, uint16_t **scan16, const sail_rgba32_t *rgba32, const sail_rgba64_t *rgba64) {
+
+    (void)scan8;
+
+    if (rgba32 != NULL) {
+        fill_rgba16_pixel_from_uint8_values(rgba32, *scan16, output_context->r, output_context->g, output_context->b, output_context->a, 4, output_context->options);
+    } else {
+        fill_rgba16_pixel_from_uint16_values(rgba64, *scan16, output_context->r, output_context->g, output_context->b, output_context->a, 4, output_context->options);
+    }
+
+    (*scan16)++;
+}
+
+static inline void pixel_consumer_yuv24(const struct output_context *output_context, uint8_t **scan8, uint16_t **scan16, const sail_rgba32_t *rgba32, const sail_rgba64_t *rgba64) {
+
+    (void)scan16;
+
+    if (rgba32 != NULL) {
+        fill_yuv24_pixel_from_uint8_values(rgba32, *scan8, output_context->options);
+    } else {
+        fill_yuv24_pixel_from_uint16_values(rgba64, *scan8, output_context->options);
+    }
+
+    *scan8 += 3;
+}
+
 static bool verify_and_construct_rgba_indexes_silent(enum SailPixelFormat output_pixel_format, pixel_consumer_t *pixel_consumer, int *r, int *g, int *b, int *a) {
 
     switch (output_pixel_format) {
         case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE:  { *pixel_consumer = pixel_consumer_gray8;  *r = *g = *b = *a = -1; /* unused. */ break; }
         case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE: { *pixel_consumer = pixel_consumer_gray16; *r = *g = *b = *a = -1; /* unused. */ break; }
 
+        case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE_ALPHA:  { *pixel_consumer = pixel_consumer_gray_alpha8;  *r = *g = *b = *a = -1; /* unused. */ break; }
+        case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA: { *pixel_consumer = pixel_consumer_gray_alpha16; *r = *g = *b = *a = -1; /* unused. */ break; }
+        case SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA: { *pixel_consumer = pixel_consumer_gray_alpha32; *r = *g = *b = *a = -1; /* unused. */ break; }
+
+        case SAIL_PIXEL_FORMAT_BPP16_RGB555: { *pixel_consumer = pixel_consumer_rgb555_kind; *r = 0;  *g = 5;  *b = 10; *a = -1; break; }
+        case SAIL_PIXEL_FORMAT_BPP16_BGR555: { *pixel_consumer = pixel_consumer_rgb555_kind; *r = 10; *g = 5;  *b = 0;  *a = -1; break; }
+        case SAIL_PIXEL_FORMAT_BPP16_RGB565: { *pixel_consumer = pixel_consumer_rgb565_kind; *r = 0;  *g = 5;  *b = 11; *a = -1; break; }
+        case SAIL_PIXEL_FORMAT_BPP16_BGR565: { *pixel_consumer = pixel_consumer_rgb565_kind; *r = 11; *g = 5;  *b = 0;  *a = -1; break; }
+
         case SAIL_PIXEL_FORMAT_BPP24_RGB: { *pixel_consumer = pixel_consumer_rgb24_kind; *r = 0; *g = 1; *b = 2; *a = -1; break; }
         case SAIL_PIXEL_FORMAT_BPP24_BGR: { *pixel_consumer = pixel_consumer_rgb24_kind; *r = 2; *g = 1; *b = 0; *a = -1; break; }
 
         case SAIL_PIXEL_FORMAT_BPP48_RGB: { *pixel_consumer = pixel_consumer_rgb48_kind; *r = 0; *g = 1; *b = 2; *a = -1; break; }
         case SAIL_PIXEL_FORMAT_BPP48_BGR: { *pixel_consumer = pixel_consumer_rgb48_kind; *r = 2; *g = 1; *b = 0; *a = -1; break; }
+
+        case SAIL_PIXEL_FORMAT_BPP16_RGBX: { *pixel_consumer = pixel_consumer_rgba16_kind; *r = 0;  *g = 4;  *b = 8;  *a = -1; break; }
+        case SAIL_PIXEL_FORMAT_BPP16_BGRX: { *pixel_consumer = pixel_consumer_rgba16_kind; *r = 8;  *g = 4;  *b = 0;  *a = -1; break; }
+        case SAIL_PIXEL_FORMAT_BPP16_XRGB: { *pixel_consumer = pixel_consumer_rgba16_kind; *r = 4;  *g = 8;  *b = 12; *a = -1; break; }
+        case SAIL_PIXEL_FORMAT_BPP16_XBGR: { *pixel_consumer = pixel_consumer_rgba16_kind; *r = 12; *g = 8;  *b = 4;  *a = -1; break; }
+        case SAIL_PIXEL_FORMAT_BPP16_RGBA: { *pixel_consumer = pixel_consumer_rgba16_kind; *r = 0;  *g = 4;  *b = 8;  *a = 12; break; }
+        case SAIL_PIXEL_FORMAT_BPP16_BGRA: { *pixel_consumer = pixel_consumer_rgba16_kind; *r = 8;  *g = 4;  *b = 0;  *a = 12; break; }
+        case SAIL_PIXEL_FORMAT_BPP16_ARGB: { *pixel_consumer = pixel_consumer_rgba16_kind; *r = 4;  *g = 8;  *b = 12; *a = 0;  break; }
+        case SAIL_PIXEL_FORMAT_BPP16_ABGR: { *pixel_consumer = pixel_consumer_rgba16_kind; *r = 12; *g = 8;  *b = 4;  *a = 0;  break; }
 
         case SAIL_PIXEL_FORMAT_BPP32_RGBX: { *pixel_consumer = pixel_consumer_rgba32_kind; *r = 0; *g = 1; *b = 2; *a = -1; break; }
         case SAIL_PIXEL_FORMAT_BPP32_BGRX: { *pixel_consumer = pixel_consumer_rgba32_kind; *r = 2; *g = 1; *b = 0; *a = -1; break; }
@@ -167,7 +302,12 @@ static bool verify_and_construct_rgba_indexes_silent(enum SailPixelFormat output
         case SAIL_PIXEL_FORMAT_BPP64_ARGB: { *pixel_consumer = pixel_consumer_rgba64_kind; *r = 1; *g = 2; *b = 3; *a = 0;  break; }
         case SAIL_PIXEL_FORMAT_BPP64_ABGR: { *pixel_consumer = pixel_consumer_rgba64_kind; *r = 3; *g = 2; *b = 1; *a = 0;  break; }
 
+        case SAIL_PIXEL_FORMAT_BPP32_CMYK: { *pixel_consumer = pixel_consumer_cmyk32; *r = *g = *b = *a = -1; /* unused. */ break; }
+        case SAIL_PIXEL_FORMAT_BPP64_CMYK: { *pixel_consumer = pixel_consumer_cmyk64; *r = *g = *b = *a = -1; /* unused. */ break; }
+
         case SAIL_PIXEL_FORMAT_BPP24_YCBCR: { *pixel_consumer = pixel_consumer_ycbcr; *r = *g = *b = *a = -1; /* unused. */ break; }
+
+        case SAIL_PIXEL_FORMAT_BPP24_YUV: { *pixel_consumer = pixel_consumer_yuv24; *r = *g = *b = *a = -1; /* unused. */ break; }
 
         default: {
             return false;
@@ -574,6 +714,28 @@ static sail_status_t convert_from_bpp32_cmyk(const struct sail_image *image, pix
     return SAIL_OK;
 }
 
+static sail_status_t convert_from_bpp64_cmyk(const struct sail_image *image, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
+
+    unsigned row;
+
+    #pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    for (row = 0; row < image->height; row++) {
+        const uint16_t *scan_input    = sail_scan_line(image, row);
+              uint8_t  *scan_output8  = sail_scan_line(output_context->image, row);
+              uint16_t *scan_output16 = sail_scan_line(output_context->image, row);
+
+        for (unsigned column = 0; column < image->width; column++) {
+            sail_rgba64_t rgba64;
+            convert_cmyk64_to_rgba64(*(scan_input+0), *(scan_input+1), *(scan_input+2), *(scan_input+3), &rgba64);
+
+            pixel_consumer(output_context, &scan_output8, &scan_output16, NULL, &rgba64);
+            scan_input += 4;
+        }
+    }
+
+    return SAIL_OK;
+}
+
 static sail_status_t convert_from_bpp24_ycbcr(const struct sail_image *image, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
 
     unsigned row;
@@ -776,6 +938,10 @@ static sail_status_t conversion_impl(
             SAIL_TRY(convert_from_bpp32_cmyk(image, pixel_consumer, &output_context));
             break;
         }
+        case SAIL_PIXEL_FORMAT_BPP64_CMYK: {
+            SAIL_TRY(convert_from_bpp64_cmyk(image, pixel_consumer, &output_context));
+            break;
+        }
         case SAIL_PIXEL_FORMAT_BPP24_YCBCR: {
             SAIL_TRY(convert_from_bpp24_ycbcr(image, pixel_consumer, &output_context));
             break;
@@ -912,6 +1078,7 @@ bool sail_can_convert(enum SailPixelFormat input_pixel_format, enum SailPixelFor
         case SAIL_PIXEL_FORMAT_BPP64_ARGB:
         case SAIL_PIXEL_FORMAT_BPP64_ABGR:
         case SAIL_PIXEL_FORMAT_BPP32_CMYK:
+        case SAIL_PIXEL_FORMAT_BPP64_CMYK:
         case SAIL_PIXEL_FORMAT_BPP24_YCBCR: {
             int r, g, b, a;
             pixel_consumer_t pixel_consumer;
@@ -930,13 +1097,23 @@ static const enum SailPixelFormat GRAYSCALE_CANDIDATES[] = {
     SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE,
     SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE,
 
+    SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE_ALPHA,
+    SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA,
+    SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA,
+
     SAIL_PIXEL_FORMAT_BPP24_YCBCR,
+    SAIL_PIXEL_FORMAT_BPP24_YUV,
 
     SAIL_PIXEL_FORMAT_BPP24_RGB,
     SAIL_PIXEL_FORMAT_BPP24_BGR,
 
     SAIL_PIXEL_FORMAT_BPP48_RGB,
     SAIL_PIXEL_FORMAT_BPP48_BGR,
+
+    SAIL_PIXEL_FORMAT_BPP16_RGB555,
+    SAIL_PIXEL_FORMAT_BPP16_BGR555,
+    SAIL_PIXEL_FORMAT_BPP16_RGB565,
+    SAIL_PIXEL_FORMAT_BPP16_BGR565,
 
     SAIL_PIXEL_FORMAT_BPP32_RGBA,
     SAIL_PIXEL_FORMAT_BPP32_BGRA,
@@ -955,6 +1132,15 @@ static const enum SailPixelFormat GRAYSCALE_CANDIDATES[] = {
     SAIL_PIXEL_FORMAT_BPP64_BGRX,
     SAIL_PIXEL_FORMAT_BPP64_XRGB,
     SAIL_PIXEL_FORMAT_BPP64_XBGR,
+
+    SAIL_PIXEL_FORMAT_BPP16_RGBA,
+    SAIL_PIXEL_FORMAT_BPP16_BGRA,
+    SAIL_PIXEL_FORMAT_BPP16_ARGB,
+    SAIL_PIXEL_FORMAT_BPP16_ABGR,
+    SAIL_PIXEL_FORMAT_BPP16_RGBX,
+    SAIL_PIXEL_FORMAT_BPP16_BGRX,
+    SAIL_PIXEL_FORMAT_BPP16_XRGB,
+    SAIL_PIXEL_FORMAT_BPP16_XBGR,
 };
 
 static const size_t GRAYSCALE_CANDIDATES_LENGTH = sizeof(GRAYSCALE_CANDIDATES) / sizeof(GRAYSCALE_CANDIDATES[0]);
@@ -964,12 +1150,18 @@ static const enum SailPixelFormat INDEXED_OR_FULL_COLOR_CANDIDATES[] = {
 
     /* After adding a new output pixel format, also update this list. */
     SAIL_PIXEL_FORMAT_BPP24_YCBCR,
+    SAIL_PIXEL_FORMAT_BPP24_YUV,
 
     SAIL_PIXEL_FORMAT_BPP24_RGB,
     SAIL_PIXEL_FORMAT_BPP24_BGR,
 
     SAIL_PIXEL_FORMAT_BPP48_RGB,
     SAIL_PIXEL_FORMAT_BPP48_BGR,
+
+    SAIL_PIXEL_FORMAT_BPP16_RGB555,
+    SAIL_PIXEL_FORMAT_BPP16_BGR555,
+    SAIL_PIXEL_FORMAT_BPP16_RGB565,
+    SAIL_PIXEL_FORMAT_BPP16_BGR565,
 
     SAIL_PIXEL_FORMAT_BPP32_RGBA,
     SAIL_PIXEL_FORMAT_BPP32_BGRA,
@@ -989,8 +1181,24 @@ static const enum SailPixelFormat INDEXED_OR_FULL_COLOR_CANDIDATES[] = {
     SAIL_PIXEL_FORMAT_BPP64_XRGB,
     SAIL_PIXEL_FORMAT_BPP64_XBGR,
 
+    SAIL_PIXEL_FORMAT_BPP16_RGBA,
+    SAIL_PIXEL_FORMAT_BPP16_BGRA,
+    SAIL_PIXEL_FORMAT_BPP16_ARGB,
+    SAIL_PIXEL_FORMAT_BPP16_ABGR,
+    SAIL_PIXEL_FORMAT_BPP16_RGBX,
+    SAIL_PIXEL_FORMAT_BPP16_BGRX,
+    SAIL_PIXEL_FORMAT_BPP16_XRGB,
+    SAIL_PIXEL_FORMAT_BPP16_XBGR,
+
+    SAIL_PIXEL_FORMAT_BPP32_CMYK,
+    SAIL_PIXEL_FORMAT_BPP64_CMYK,
+
     SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE,
     SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE,
+
+    SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE_ALPHA,
+    SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA,
+    SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA,
 };
 
 static const size_t INDEXED_OR_FULL_COLOR_CANDIDATES_LENGTH = sizeof(INDEXED_OR_FULL_COLOR_CANDIDATES) / sizeof(INDEXED_OR_FULL_COLOR_CANDIDATES[0]);

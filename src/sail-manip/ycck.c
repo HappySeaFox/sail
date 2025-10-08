@@ -26,7 +26,7 @@
 #include <sail-manip/sail-manip.h>
 
 #include "cmyk.h"
-#include "ycbcr.h"
+#include "ycck.h"
 
 /*
  * Pre-compiled intermediate values for YCCK -> RGB conversion like that:
