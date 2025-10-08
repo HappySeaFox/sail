@@ -160,10 +160,10 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_ico(void *state, st
                                         /* cleanup */ sail_destroy_image(image_local));
                 }
 
-                SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&image_local->source_image->special_properties),
+                SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&image_local->special_properties),
                                     /* cleanup */ sail_destroy_image(image_local));
                 SAIL_TRY_OR_CLEANUP(ico_private_store_cur_hotspot(&ico_state->ico_dir_entries[ico_state->current_frame - 1],
-                                                                    image_local->source_image->special_properties),
+                                                                    image_local->special_properties),
                                     /* cleanup */ sail_destroy_image(image_local));
             }
         }
