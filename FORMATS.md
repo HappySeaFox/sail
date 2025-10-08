@@ -39,8 +39,26 @@
         <b>Content:</b> Static, Animated, Meta data, ICC profiles.
     </td>
     <td>-</td>
-    <td>Unsupported</td>
-    <td>-</td>
+    <td>
+        <b>RGB:</b> 24-bit.
+        <b>BGR:</b> 24-bit.
+        <b>RGBA:</b> 32-bit.
+        <b>BGRA:</b> 32-bit.
+        <b>ARGB:</b> 32-bit.
+        <b>ABGR:</b> 32-bit.
+        <br/><br/>
+        <b>Compressions:</b> AV1.
+        <br/><br/>
+        <b>Content:</b> Static, Animated, Meta data, ICC profiles.
+        <br/><br/>
+        <b>Tuning:</b> Key: <i>"avif-speed"</i>. Description: Encoding speed (0=slowest/best compression, 10=fastest).
+        Possible values: 0-10 (default: 6).
+        <br/>Key: <i>"avif-threads"</i>. Description: Number of encoder threads.
+        Possible values: positive integer (default: 1).
+        <br/>Key: <i>"avif-auto-tiling"</i>. Description: Enable automatic tiling for parallel encoding.
+        Possible values: true or false.
+    </td>
+    <td>10-bit and 12-bit depths</td>
     <td>libavif</td>
 </tr>
 <tr>

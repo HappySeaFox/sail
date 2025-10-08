@@ -23,6 +23,8 @@
     SOFTWARE.
 */
 
+#include <string.h>
+
 #include <sail-common/sail-common.h>
 
 #include "helpers.h"
@@ -140,4 +142,159 @@ sail_status_t avif_private_fetch_meta_data(enum SailMetaData key, const struct a
     }
 
     return SAIL_OK;
+}
+
+bool avif_private_sail_pixel_format_to_avif_rgb_format(enum SailPixelFormat pixel_format, enum avifRGBFormat *rgb_format, uint32_t *depth) {
+
+    switch (pixel_format) {
+        case SAIL_PIXEL_FORMAT_BPP24_RGB: {
+            *rgb_format = AVIF_RGB_FORMAT_RGB;
+            *depth = 8;
+            return true;
+        }
+        case SAIL_PIXEL_FORMAT_BPP32_RGBA: {
+            *rgb_format = AVIF_RGB_FORMAT_RGBA;
+            *depth = 8;
+            return true;
+        }
+        case SAIL_PIXEL_FORMAT_BPP32_ARGB: {
+            *rgb_format = AVIF_RGB_FORMAT_ARGB;
+            *depth = 8;
+            return true;
+        }
+        case SAIL_PIXEL_FORMAT_BPP24_BGR: {
+            *rgb_format = AVIF_RGB_FORMAT_BGR;
+            *depth = 8;
+            return true;
+        }
+        case SAIL_PIXEL_FORMAT_BPP32_BGRA: {
+            *rgb_format = AVIF_RGB_FORMAT_BGRA;
+            *depth = 8;
+            return true;
+        }
+        case SAIL_PIXEL_FORMAT_BPP32_ABGR: {
+            *rgb_format = AVIF_RGB_FORMAT_ABGR;
+            *depth = 8;
+            return true;
+        }
+        case SAIL_PIXEL_FORMAT_BPP48_RGB: {
+            *rgb_format = AVIF_RGB_FORMAT_RGB;
+            *depth = 16;
+            return true;
+        }
+        case SAIL_PIXEL_FORMAT_BPP64_RGBA: {
+            *rgb_format = AVIF_RGB_FORMAT_RGBA;
+            *depth = 16;
+            return true;
+        }
+        case SAIL_PIXEL_FORMAT_BPP64_ARGB: {
+            *rgb_format = AVIF_RGB_FORMAT_ARGB;
+            *depth = 16;
+            return true;
+        }
+        case SAIL_PIXEL_FORMAT_BPP48_BGR: {
+            *rgb_format = AVIF_RGB_FORMAT_BGR;
+            *depth = 16;
+            return true;
+        }
+        case SAIL_PIXEL_FORMAT_BPP64_BGRA: {
+            *rgb_format = AVIF_RGB_FORMAT_BGRA;
+            *depth = 16;
+            return true;
+        }
+        case SAIL_PIXEL_FORMAT_BPP64_ABGR: {
+            *rgb_format = AVIF_RGB_FORMAT_ABGR;
+            *depth = 16;
+            return true;
+        }
+        default: {
+            return false;
+        }
+    }
+}
+
+sail_status_t avif_private_write_iccp(struct avifImage *avif_image, const struct sail_iccp *iccp) {
+
+    SAIL_CHECK_PTR(avif_image);
+
+    if (iccp != NULL && iccp->data != NULL) {
+        avifResult result = avifImageSetProfileICC(avif_image, iccp->data, iccp->size);
+
+        if (result != AVIF_RESULT_OK) {
+            SAIL_LOG_ERROR("AVIF: Failed to set ICC profile: %s", avifResultToString(result));
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+        }
+
+        SAIL_LOG_TRACE("AVIF: ICC profile has been written");
+    }
+
+    return SAIL_OK;
+}
+
+sail_status_t avif_private_write_meta_data(struct avifEncoder *encoder, struct avifImage *avif_image, const struct sail_meta_data_node *meta_data_node) {
+
+    SAIL_CHECK_PTR(encoder);
+    SAIL_CHECK_PTR(avif_image);
+
+    (void)encoder;
+
+    for (const struct sail_meta_data_node *node = meta_data_node; node != NULL; node = node->next) {
+        if (node->meta_data->key == SAIL_META_DATA_EXIF &&
+            node->meta_data->value->type == SAIL_VARIANT_TYPE_DATA) {
+            avifResult result = avifImageSetMetadataExif(avif_image,
+                                                          (const uint8_t *)node->meta_data->value->value,
+                                                          node->meta_data->value->size);
+
+            if (result != AVIF_RESULT_OK) {
+                SAIL_LOG_ERROR("AVIF: Failed to set EXIF: %s", avifResultToString(result));
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+            }
+
+            SAIL_LOG_TRACE("AVIF: EXIF has been written");
+        } else if (node->meta_data->key == SAIL_META_DATA_XMP &&
+                   node->meta_data->value->type == SAIL_VARIANT_TYPE_DATA) {
+            avifResult result = avifImageSetMetadataXMP(avif_image,
+                                                         (const uint8_t *)node->meta_data->value->value,
+                                                         node->meta_data->value->size);
+
+            if (result != AVIF_RESULT_OK) {
+                SAIL_LOG_ERROR("AVIF: Failed to set XMP: %s", avifResultToString(result));
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+            }
+
+            SAIL_LOG_TRACE("AVIF: XMP has been written");
+        }
+    }
+
+    return SAIL_OK;
+}
+
+bool avif_private_tuning_key_value_callback(const char *key, const struct sail_variant *value, void *user_data) {
+
+    struct avifEncoder *encoder = user_data;
+
+    if (strcmp(key, "avif-speed") == 0) {
+        if (value->type == SAIL_VARIANT_TYPE_INT) {
+            int speed = sail_variant_to_int(value);
+            if (speed >= 0 && speed <= 10) {
+                encoder->speed = speed;
+                SAIL_LOG_TRACE("AVIF: Set speed to %d", speed);
+            }
+        }
+    } else if (strcmp(key, "avif-threads") == 0) {
+        if (value->type == SAIL_VARIANT_TYPE_INT) {
+            int threads = sail_variant_to_int(value);
+            if (threads > 0) {
+                encoder->maxThreads = threads;
+                SAIL_LOG_TRACE("AVIF: Set max threads to %d", threads);
+            }
+        }
+    } else if (strcmp(key, "avif-auto-tiling") == 0) {
+        if (value->type == SAIL_VARIANT_TYPE_BOOL) {
+            encoder->autoTiling = sail_variant_to_bool(value) ? AVIF_TRUE : AVIF_FALSE;
+            SAIL_LOG_TRACE("AVIF: Set auto tiling to %s", sail_variant_to_bool(value) ? "true" : "false");
+        }
+    }
+
+    return true;
 }

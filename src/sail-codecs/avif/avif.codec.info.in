@@ -16,12 +16,12 @@ features=STATIC;ANIMATED;META-DATA;ICCP;SOURCE-IMAGE
 tuning=
 
 [save-features]
-features=
-pixel-formats=
-compressions=
-default-compression=
+features=STATIC;ANIMATED;META-DATA;ICCP
+pixel-formats=BPP24-RGB;BPP24-BGR;BPP32-RGBA;BPP32-BGRA;BPP32-ARGB;BPP32-ABGR
+compressions=AV1
+default-compression=AV1
 compression-level-min=0
-compression-level-max=0
-compression-level-default=0
-compression-level-step=0
-tuning=
+compression-level-max=100
+compression-level-default=25
+compression-level-step=1
+tuning=avif-speed;avif-threads;avif-auto-tiling

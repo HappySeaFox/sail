@@ -41,4 +41,6 @@ struct sail_avif_context {
 
 SAIL_HIDDEN avifResult avif_private_read_proc(struct avifIO *io, uint32_t read_flags, uint64_t offset, size_t size, avifROData *out);
 
+SAIL_HIDDEN avifResult avif_private_write_proc(struct avifIO *io, uint32_t write_flags, uint64_t offset, const uint8_t *data, size_t size);
+
 #endif
