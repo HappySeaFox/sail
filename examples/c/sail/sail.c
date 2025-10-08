@@ -35,70 +35,129 @@ static void print_invalid_argument(void) {
     fprintf(stderr, "Error: Invalid arguments. Run with -h to see command arguments.\n");
 }
 
-static sail_status_t convert_impl(const char *input, const char *output, int compression) {
+static sail_status_t convert_impl(const char *input, const char *output, int compression, int max_frames) {
 
     SAIL_CHECK_PTR(input);
     SAIL_CHECK_PTR(output);
 
-    const struct sail_codec_info *codec_info;
-    void *state;
+    const struct sail_codec_info *input_codec_info;
+    const struct sail_codec_info *output_codec_info;
+    void *load_state;
+    void *save_state = NULL;
 
     struct sail_image *image;
 
     /* Load the image. */
     SAIL_LOG_INFO("Input file: %s", input);
 
-    SAIL_TRY(sail_codec_info_from_path(input, &codec_info));
-    SAIL_LOG_INFO("Input codec: %s", codec_info->description);
+    SAIL_TRY(sail_codec_info_from_path(input, &input_codec_info));
+    SAIL_LOG_INFO("Input codec: %s", input_codec_info->description);
 
-    SAIL_TRY(sail_start_loading_from_file(input, codec_info, &state));
+    /* Use SOURCE_IMAGE option to preserve original pixel format when possible. */
+    struct sail_load_options *load_options;
+    SAIL_TRY(sail_alloc_load_options_from_features(input_codec_info->load_features, &load_options));
+    load_options->options |= SAIL_OPTION_SOURCE_IMAGE;
 
-    SAIL_TRY(sail_load_next_frame(state, &image));
-    SAIL_TRY(sail_stop_loading(state));
+    SAIL_TRY(sail_start_loading_from_file_with_options(input, input_codec_info, load_options, &load_state));
+    sail_destroy_load_options(load_options);
 
-    /* Save the image. */
+    /* Setup output. */
     SAIL_LOG_INFO("Output file: %s", output);
 
-    SAIL_TRY(sail_codec_info_from_path(output, &codec_info));
-    SAIL_LOG_INFO("Output codec: %s", codec_info->description);
-
-    /* Convert to the best pixel format for saving. */
-    {
-        struct sail_image *image_converted;
-        SAIL_TRY(sail_convert_image_for_saving(image, codec_info->save_features, &image_converted));
-
-        sail_destroy_image(image);
-        image = image_converted;
-    }
+    SAIL_TRY(sail_codec_info_from_path(output, &output_codec_info));
+    SAIL_LOG_INFO("Output codec: %s", output_codec_info->description);
 
     struct sail_save_options *save_options;
-    SAIL_TRY(sail_alloc_save_options_from_features(codec_info->save_features, &save_options));
+    SAIL_TRY(sail_alloc_save_options_from_features(output_codec_info->save_features, &save_options));
 
     /* Apply our tuning. */
     SAIL_LOG_INFO("Compression: %d%s", compression, compression == -1 ? " (default)" : "");
     save_options->compression_level = compression;
 
-    SAIL_TRY(sail_start_saving_into_file_with_options(output, codec_info, save_options, &state));
-    SAIL_TRY(sail_write_next_frame(state, image));
-    SAIL_TRY(sail_stop_saving(state));
+    /* Check if output format supports animation or multi-paged. If not, force limit to 1 frame. */
+    if (!(output_codec_info->save_features->features & SAIL_CODEC_FEATURE_ANIMATED) &&
+        !(output_codec_info->save_features->features & SAIL_CODEC_FEATURE_MULTI_PAGED)) {
+        if (max_frames > 0) {
+            SAIL_LOG_WARNING("Output format doesn't support animation/multi-page, forcing to 1 frame");
+        }
+        max_frames = 1;
+    }
+
+    /* Convert all frames (or limited number). */
+    int frame_count = 0;
+    sail_status_t load_status;
+
+    while ((load_status = sail_load_next_frame(load_state, &image)) == SAIL_OK) {
+        /* Check max frames limit. */
+        if (max_frames > 0 && frame_count >= max_frames) {
+            SAIL_LOG_INFO("Reached max frames limit (%d), stopping", max_frames);
+            sail_destroy_image(image);
+            break;
+        }
+
+        SAIL_LOG_INFO("Processing frame #%d", frame_count);
+
+        /* Convert to the best pixel format for saving. */
+        struct sail_image *image_converted;
+        SAIL_TRY_OR_CLEANUP(sail_convert_image_for_saving(image, output_codec_info->save_features, &image_converted),
+                            /* cleanup */ sail_destroy_image(image);
+                                          if (save_state != NULL) sail_stop_saving(save_state);
+                                          sail_destroy_save_options(save_options);
+                                          sail_stop_loading(load_state));
+
+        sail_destroy_image(image);
+        image = image_converted;
+
+        /* Start saving on first frame. */
+        if (frame_count == 0) {
+            SAIL_TRY_OR_CLEANUP(sail_start_saving_into_file_with_options(output, output_codec_info, save_options, &save_state),
+                                /* cleanup */ sail_destroy_image(image);
+                                              sail_destroy_save_options(save_options);
+                                              sail_stop_loading(load_state));
+        }
+
+        /* Write frame. */
+        SAIL_TRY_OR_CLEANUP(sail_write_next_frame(save_state, image),
+                            /* cleanup */ sail_destroy_image(image);
+                                          sail_stop_saving(save_state);
+                                          sail_destroy_save_options(save_options);
+                                          sail_stop_loading(load_state));
+
+        sail_destroy_image(image);
+        frame_count++;
+    }
+
+    /* Check if we processed at least one frame. */
+    if (frame_count == 0) {
+        SAIL_LOG_ERROR("No frames found in input file");
+        sail_destroy_save_options(save_options);
+        sail_stop_loading(load_state);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+    }
+
+    SAIL_LOG_INFO("Converted %d frame(s)", frame_count);
 
     /* Clean up. */
+    if (save_state != NULL) {
+        SAIL_TRY(sail_stop_saving(save_state));
+    }
     sail_destroy_save_options(save_options);
-
-    sail_destroy_image(image);
+    SAIL_TRY(sail_stop_loading(load_state));
 
     return SAIL_OK;
 }
 
 static sail_status_t convert(int argc, char *argv[]) {
 
-    if (argc < 4 || argc > 6) {
+    if (argc < 4 || argc > 8) {
         print_invalid_argument();
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 
     /* -1: default compression will be selected. */
     int compression = -1;
+    /* 0: convert all frames. */
+    int max_frames = 0;
 
     /* Start parsing CLI options from the third argument. */
     int i = 4;
@@ -115,11 +174,22 @@ static sail_status_t convert(int argc, char *argv[]) {
             continue;
         }
 
+        if (strcmp(argv[i], "-m") == 0 || strcmp(argv[i], "--max-frames") == 0) {
+            if (i == argc-1) {
+                fprintf(stderr, "Error: Missing max-frames value.\n");
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+            }
+
+            max_frames = atoi(argv[i+1]);
+            i += 2;
+            continue;
+        }
+
         fprintf(stderr, "Error: Unrecognized option '%s'.\n", argv[i]);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 
-    SAIL_TRY(convert_impl(argv[2], argv[3], compression));
+    SAIL_TRY(convert_impl(argv[2], argv[3], compression, max_frames));
 
     return SAIL_OK;
 }
@@ -329,7 +399,10 @@ static void help(const char *app) {
     fprintf(stderr, "Commands:\n");
     fprintf(stderr, "    list [-v] - List supported codecs.\n");
     fprintf(stderr, "\n");
-    fprintf(stderr, "    convert <INPUT PATH> <OUTPUT PATH> [-c | --compression <value>] - Convert one image format to another.\n");
+    fprintf(stderr, "    convert <INPUT PATH> <OUTPUT PATH> [-c | --compression <value>] [-m | --max-frames <value>]\n");
+    fprintf(stderr, "            Convert one image format to another.\n");
+    fprintf(stderr, "            Supports both static and animated images (all frames are converted by default).\n");
+    fprintf(stderr, "            Use --max-frames to limit number of frames to convert from animations.\n");
     fprintf(stderr, "\n");
     fprintf(stderr, "    probe <PATH> - Retrieve information of the very first image frame found in the file.\n");
     fprintf(stderr, "                   In most cases probing doesn't decode the image data.\n");
