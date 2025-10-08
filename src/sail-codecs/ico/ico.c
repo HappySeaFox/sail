@@ -178,20 +178,13 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_ico(void *state, st
         }
     }
 
-    if (ico_state->load_options->options & SAIL_OPTION_SOURCE_IMAGE) {
-        if (ico_state->load_options->options & SAIL_OPTION_META_DATA) {
-            if (ico_state->ico_header.type == SAIL_ICO_TYPE_CUR) {
-                if (image_local->source_image == NULL) {
-                    SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
-                                        /* cleanup */ sail_destroy_image(image_local));
-                }
-
-                SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&image_local->special_properties),
-                                    /* cleanup */ sail_destroy_image(image_local));
-                SAIL_TRY_OR_CLEANUP(ico_private_store_cur_hotspot(&ico_state->ico_dir_entries[ico_state->current_frame - 1],
-                                                                    image_local->special_properties),
-                                    /* cleanup */ sail_destroy_image(image_local));
-            }
+    if (ico_state->load_options->options & SAIL_OPTION_META_DATA) {
+        if (ico_state->ico_header.type == SAIL_ICO_TYPE_CUR) {
+            SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&image_local->special_properties),
+                                /* cleanup */ sail_destroy_image(image_local));
+            SAIL_TRY_OR_CLEANUP(ico_private_store_cur_hotspot(&ico_state->ico_dir_entries[ico_state->current_frame - 1],
+                                                                image_local->special_properties),
+                                /* cleanup */ sail_destroy_image(image_local));
         }
     }
 
