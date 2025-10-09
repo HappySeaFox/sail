@@ -21,7 +21,7 @@
 
 #
 
-SAIL is a format-agnostic cross-platform image decoding library providing rich APIs, from one-liners
+SAIL is a high-quality cross-platform image decoding library providing rich APIs, from one-liners
 to complex use cases with custom I/O sources. It enables a client to load and save static,
 animated, multi-paged images along with their meta data and ICC profiles. :sailboat:
 
@@ -79,7 +79,7 @@ images with the help of [ksquirrel-libs](FAQ.md#how-old-is-sail), the predecesso
 | 8  | [JPEG XL](https://wikipedia.org/wiki/JPEG_XL)                       | RW            | libjxl            |
 | 9  | [PCX](https://wikipedia.org/wiki/PCX)                               | RW            |                   |
 | 10 | [PNG](https://wikipedia.org/wiki/Portable_Network_Graphics)         | RW            | libpng            |
-| .. | ...                                                                 |               |                   |
+| 11 | [PNM](https://wikipedia.org/wiki/Portable_anymap)                   | RW            |                   |
 | 12 | [PSD](https://en.wikipedia.org/wiki/Adobe_Photoshop#File_format)    | R             |                   |
 | 13 | [QOI](http://qoiformat.org)                                         | RW            |                   |
 | 14 | [SVG](https://wikipedia.org/wiki/Scalable_Vector_Graphics)          | R             | resvg/nanosvg     |

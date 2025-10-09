@@ -371,17 +371,30 @@
     <td>11</td>
     <td><a href="https://wikipedia.org/wiki/Portable_anymap">PNM</a></td>
     <td>
-        <b>Grayscale:</b> 8-bit, 16-bit.
         <b>Indexed:</b> 1-bit.
+        <b>Grayscale:</b> 8-bit, 16-bit.
+        <b>Grayscale+Alpha:</b> 16-bit, 32-bit.
         <b>RGB:</b> 24-bit, 48-bit.
+        <b>RGBA:</b> 32-bit, 64-bit.
         <br/><br/>
         <b>Content:</b> Static, Meta data.
         <br/><br/>
-        <b>Special properties:</b> Key: <i>"pnm-ascii"</i>. Description: True if the image pixels are encoded in ASCII mode.
+        <b>Formats:</b> PBM (P1/P4), PGM (P2/P5), PPM (P3/P6), PAM (P7).
+        <br/><br/>
+        <b>Special properties:</b> Key: <i>"pnm-ascii"</i>. Description: True if the image pixels are encoded in ASCII mode (P1-P3).
         Possible values: bool.
     </td>
-    <td>-</td>
-    <td>Unsupported</td>
+    <td>
+        <b>Indexed:</b> 1-bit (P4).
+        <b>Grayscale:</b> 8-bit, 16-bit (P5).
+        <b>Grayscale+Alpha:</b> 16-bit, 32-bit (P7/PAM).
+        <b>RGB:</b> 24-bit, 48-bit (P6).
+        <b>RGBA:</b> 32-bit, 64-bit (P7/PAM).
+        <br/><br/>
+        <b>Content:</b> Static.
+        <br/><br/>
+        <b>Compression:</b> None.
+    </td>
     <td>-</td>
     <td>-</td>
 </tr>
