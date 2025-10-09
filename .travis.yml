@@ -9,6 +9,9 @@ addons:
       - libavif-dev
       - libgif-dev
       - libjpeg-dev
+      - libjxl-dev
+      - libnanosvg-dev
+      - libopenjp2-7-dev
       - libpng-dev
       - libsdl2-dev
       - libtiff-dev
@@ -25,8 +28,8 @@ jobs:
         directories:
           - extra/B
     - os: linux
-      dist: jammy
-      name: "Ubuntu 22.04 Jammy"
+      dist: noble
+      name: "Ubuntu 24.04 Noble"
 
 before_script:
 - |-
