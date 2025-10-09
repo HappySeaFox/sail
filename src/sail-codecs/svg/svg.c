@@ -116,10 +116,15 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_svg(struct sail_io *io, const 
     SAIL_TRY(alloc_svg_state(load_options, NULL, &svg_state));
     *state = svg_state;
 
-    /* Read the entire image as the resvg API requires. */
-    void *image_data;
+    /* Read the entire image. */
     size_t image_size;
-    SAIL_TRY(sail_alloc_data_from_io_contents(io, &image_data, &image_size));
+    SAIL_TRY(sail_io_size(io, &image_size));
+
+    void *image_data;
+    SAIL_TRY(sail_malloc(image_size + 1, &image_data)); /* Allocate +1 byte for '\0' (for nsvgParse). */
+
+    SAIL_TRY_OR_CLEANUP(sail_io_contents_into_data(io, image_data),
+                        /* cleanup */ sail_free(image_data));
 
 #ifdef SAIL_RESVG
     svg_state->resvg_options = resvg_options_create();
@@ -133,6 +138,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_svg(struct sail_io *io, const 
         SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
     }
 #else
+    ((char *)image_data)[image_size] = '\0';
+
     svg_state->nsvg_image = nsvgParse(image_data, "px", 96.0f);
 
     sail_free(image_data);
