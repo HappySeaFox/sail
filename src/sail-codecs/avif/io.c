@@ -55,3 +55,17 @@ avifResult avif_private_read_proc(struct avifIO *io, uint32_t read_flags, uint64
 
     return AVIF_RESULT_OK;
 }
+
+avifResult avif_private_write_proc(struct avifIO *io, uint32_t write_flags, uint64_t offset, const uint8_t *data, size_t size) {
+
+    (void)write_flags;
+
+    struct sail_avif_context *avif_context = io->data;
+
+    SAIL_TRY_OR_EXECUTE(avif_context->io->seek(avif_context->io->stream, (long)offset, SEEK_SET),
+                        /* on error */ return AVIF_RESULT_IO_ERROR);
+    SAIL_TRY_OR_EXECUTE(avif_context->io->strict_write(avif_context->io->stream, data, size),
+                        /* on error */ return AVIF_RESULT_IO_ERROR);
+
+    return AVIF_RESULT_OK;
+}

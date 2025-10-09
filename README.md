@@ -70,7 +70,7 @@ images with the help of [ksquirrel-libs](FAQ.md#how-old-is-sail), the predecesso
 | N  | Image format                                                        | Operations    | Dependencies      |
 | -- | --------------------------------------------------------------------| ------------- | ----------------- |
 | 1  | [APNG](https://wikipedia.org/wiki/APNG)                             | R             | libpng+APNG patch |
-| 2  | [AVIF](https://wikipedia.org/wiki/AV1#AV1_Image_File_Format_(AVIF)) | R             | libavif           |
+| 2  | [AVIF](https://wikipedia.org/wiki/AV1#AV1_Image_File_Format_(AVIF)) | RW            | libavif           |
 | 3  | [BMP](https://wikipedia.org/wiki/BMP_file_format)                   | RW            |                   |
 | 4  | [GIF](https://wikipedia.org/wiki/GIF)                               | RW            | giflib            |
 | .. | ...                                                                 |               |                   |
