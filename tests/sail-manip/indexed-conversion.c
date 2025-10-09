@@ -97,7 +97,7 @@ static MunitResult test_indexed_roundtrip(const MunitParameter params[], void *u
     rgb_image->pixel_format = SAIL_PIXEL_FORMAT_BPP24_RGB;
     rgb_image->bytes_per_line = sail_bytes_per_line(rgb_image->width, rgb_image->pixel_format);
 
-    munit_assert_int(sail_malloc(rgb_image->bytes_per_line * rgb_image->height, &rgb_image->pixels), ==, SAIL_OK);
+    munit_assert_int(sail_malloc((size_t)rgb_image->bytes_per_line * rgb_image->height, &rgb_image->pixels), ==, SAIL_OK);
 
     /* Fill with gradient pattern */
     unsigned char *pixels = (unsigned char *)rgb_image->pixels;
