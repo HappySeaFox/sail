@@ -35,7 +35,7 @@ static void print_invalid_argument(void) {
     fprintf(stderr, "Error: Invalid arguments. Run with -h to see command arguments.\n");
 }
 
-static sail_status_t convert_impl(const char *input, const char *output, int compression, int max_frames) {
+static sail_status_t convert_impl(const char *input, const char *output, enum SailPixelFormat pixel_format, int compression, int max_frames) {
 
     SAIL_CHECK_PTR(input);
     SAIL_CHECK_PTR(output);
@@ -97,13 +97,22 @@ static sail_status_t convert_impl(const char *input, const char *output, int com
 
         SAIL_LOG_INFO("Processing frame #%d", frame_count);
 
-        /* Convert to the best pixel format for saving. */
+        /* Convert to the specified or best pixel format for saving. */
         struct sail_image *image_converted;
-        SAIL_TRY_OR_CLEANUP(sail_convert_image_for_saving(image, output_codec_info->save_features, &image_converted),
-                            /* cleanup */ sail_destroy_image(image);
-                                          if (save_state != NULL) sail_stop_saving(save_state);
-                                          sail_destroy_save_options(save_options);
-                                          sail_stop_loading(load_state));
+        if (pixel_format != SAIL_PIXEL_FORMAT_UNKNOWN) {
+            SAIL_LOG_INFO("Converting to specified pixel format: %s", sail_pixel_format_to_string(pixel_format));
+            SAIL_TRY_OR_CLEANUP(sail_convert_image(image, pixel_format, &image_converted),
+                                /* cleanup */ sail_destroy_image(image);
+                                              if (save_state != NULL) sail_stop_saving(save_state);
+                                              sail_destroy_save_options(save_options);
+                                              sail_stop_loading(load_state));
+        } else {
+            SAIL_TRY_OR_CLEANUP(sail_convert_image_for_saving(image, output_codec_info->save_features, &image_converted),
+                                /* cleanup */ sail_destroy_image(image);
+                                              if (save_state != NULL) sail_stop_saving(save_state);
+                                              sail_destroy_save_options(save_options);
+                                              sail_stop_loading(load_state));
+        }
 
         sail_destroy_image(image);
         image = image_converted;
@@ -149,7 +158,7 @@ static sail_status_t convert_impl(const char *input, const char *output, int com
 
 static sail_status_t convert(int argc, char *argv[]) {
 
-    if (argc < 4 || argc > 8) {
+    if (argc < 4 || argc > 10) {
         print_invalid_argument();
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
@@ -158,8 +167,10 @@ static sail_status_t convert(int argc, char *argv[]) {
     int compression = -1;
     /* 0: convert all frames. */
     int max_frames = 0;
+    /* UNKNOWN: auto-select best format. */
+    enum SailPixelFormat pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;
 
-    /* Start parsing CLI options from the third argument. */
+    /* Start parsing CLI options from the 4th argument. */
     int i = 4;
 
     while (i < argc) {
@@ -185,11 +196,26 @@ static sail_status_t convert(int argc, char *argv[]) {
             continue;
         }
 
+        if (strcmp(argv[i], "-p") == 0 || strcmp(argv[i], "--pixel-format") == 0) {
+            if (i == argc-1) {
+                fprintf(stderr, "Error: Missing pixel-format value.\n");
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+            }
+
+            pixel_format = sail_pixel_format_from_string(argv[i+1]);
+            if (pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN) {
+                fprintf(stderr, "Error: Unknown pixel format '%s'.\n", argv[i+1]);
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+            }
+            i += 2;
+            continue;
+        }
+
         fprintf(stderr, "Error: Unrecognized option '%s'.\n", argv[i]);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 
-    SAIL_TRY(convert_impl(argv[2], argv[3], compression, max_frames));
+    SAIL_TRY(convert_impl(argv[2], argv[3], pixel_format, compression, max_frames));
 
     return SAIL_OK;
 }
@@ -399,10 +425,13 @@ static void help(const char *app) {
     fprintf(stderr, "Commands:\n");
     fprintf(stderr, "    list [-v] - List supported codecs.\n");
     fprintf(stderr, "\n");
-    fprintf(stderr, "    convert <INPUT PATH> <OUTPUT PATH> [-c | --compression <value>] [-m | --max-frames <value>]\n");
+    fprintf(stderr, "    convert <INPUT PATH> <OUTPUT PATH> [-p | --pixel-format <value>]\n");
+    fprintf(stderr, "                                       [-c | --compression <value>]\n");
+    fprintf(stderr, "                                       [-m | --max-frames <value>]\n");
     fprintf(stderr, "            Convert one image format to another.\n");
     fprintf(stderr, "            Supports both static and animated images (all frames are converted by default).\n");
-    fprintf(stderr, "            Use --max-frames to limit number of frames to convert from animations.\n");
+    fprintf(stderr, "            Use -p to specify target pixel format (e.g., BPP24-RGB, BPP8-INDEXED).\n");
+    fprintf(stderr, "            Use -m to limit number of frames to convert from animations.\n");
     fprintf(stderr, "\n");
     fprintf(stderr, "    probe <PATH> - Retrieve information of the very first image frame found in the file.\n");
     fprintf(stderr, "                   In most cases probing doesn't decode the image data.\n");
