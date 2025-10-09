@@ -261,7 +261,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_tiff(void *state, struct sail
 
     /* Handle PHOTOMETRIC_MINISWHITE - invert the values. */
     if (tiff_state->photometric == PHOTOMETRIC_MINISWHITE) {
-        const size_t pixels_size = image->bytes_per_line * image->height;
+        const size_t pixels_size = (size_t)image->bytes_per_line * image->height;
 
         for (size_t i = 0; i < pixels_size; i++) {
             ((uint8_t *)image->pixels)[i] = ~((uint8_t *)image->pixels)[i];
