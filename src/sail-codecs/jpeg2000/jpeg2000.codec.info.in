@@ -2,7 +2,7 @@
 #
 [codec]
 layout=8
-version=0.4.0
+version=0.5.0
 priority=MEDIUM
 name=JPEG2000
 description=JPEG 2000
@@ -11,16 +11,16 @@ extensions=jp2;j2k;jpf;jpm;jpg2;j2c;jpc;jpx
 mime-types=image/jp2;image/jpm
 
 [load-features]
-features=STATIC;SOURCE-IMAGE
-tuning=
+features=STATIC;ICCP;SOURCE-IMAGE
+tuning=jpeg2000-reduce;jpeg2000-layer;jpeg2000-tile-index;jpeg2000-num-tiles
 
 [save-features]
-features=
-pixel-formats=
-compressions=
-default-compression=
+features=STATIC;ICCP
+pixel-formats=BPP8-GRAYSCALE;BPP16-GRAYSCALE;BPP16-GRAYSCALE-ALPHA;BPP32-GRAYSCALE-ALPHA;BPP24-RGB;BPP48-RGB;BPP32-RGBA;BPP64-RGBA;BPP24-YCBCR;BPP32-CMYK;BPP64-CMYK;BPP40-CMYKA;BPP80-CMYKA
+compressions=JPEG-2000
+default-compression=JPEG-2000
 compression-level-min=0
-compression-level-max=0
+compression-level-max=100
 compression-level-default=0
-compression-level-step=0
-tuning=
+compression-level-step=1
+tuning=jpeg2000-irreversible;jpeg2000-numresolution;jpeg2000-prog-order;jpeg2000-codeblock-width;jpeg2000-codeblock-height

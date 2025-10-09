@@ -1,6 +1,6 @@
 /*  This file is part of SAIL (https://github.com/HappySeaFox/sail)
 
-    Copyright (c) 2021 Dmitry Baryshev
+    Copyright (c) 2025 Dmitry Baryshev
 
     The MIT License
 
@@ -23,25 +23,16 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_JPEG2000_HELPERS_H
-#define SAIL_JPEG2000_HELPERS_H
-
-#include <stdbool.h>
+#ifndef SAIL_JPEG2000_IO_DEST_H
+#define SAIL_JPEG2000_IO_DEST_H
 
 #include <openjpeg.h>
 
-#include <sail-common/common.h>
 #include <sail-common/export.h>
-#include <sail-common/status.h>
 
-struct sail_variant;
+struct sail_io;
 
-SAIL_HIDDEN enum SailPixelFormat jpeg2000_private_sail_pixel_format(OPJ_COLOR_SPACE color_space, int num_comps, int prec);
-
-SAIL_HIDDEN sail_status_t jpeg2000_private_pixel_format_to_openjpeg(enum SailPixelFormat pixel_format, OPJ_COLOR_SPACE *color_space, int *num_comps, int *prec);
-
-SAIL_HIDDEN bool jpeg2000_private_tuning_key_value_callback_load(const char *key, const struct sail_variant *value, void *user_data);
-
-SAIL_HIDDEN bool jpeg2000_private_tuning_key_value_callback_save(const char *key, const struct sail_variant *value, void *user_data);
+SAIL_HIDDEN opj_stream_t *jpeg2000_private_sail_io_dest(struct sail_io *io);
 
 #endif
+
