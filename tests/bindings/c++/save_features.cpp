@@ -60,7 +60,7 @@ static MunitResult test_save_features(const MunitParameter params[], void *user_
 
     // Move
     {
-        const sail::save_features save_features1 = std::move(first_codec.save_features());
+        const sail::save_features save_features1 = first_codec.save_features();
         const sail::save_features save_features = std::move(save_features1);
 
         munit_assert(save_features.features() == first_codec.save_features().features());
