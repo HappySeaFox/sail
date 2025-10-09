@@ -1060,6 +1060,43 @@ sail_status_t sail_convert_image_with_options(const struct sail_image *image,
     SAIL_TRY(sail_check_image_valid(image));
     SAIL_CHECK_PTR(image_output);
 
+    /* Handle conversion to indexed formats using quantization. */
+    if (sail_is_indexed(output_pixel_format)) {
+
+        /* Determine max colors based on target format. */
+        unsigned max_colors;
+        if (output_pixel_format == SAIL_PIXEL_FORMAT_BPP1_INDEXED) {
+            max_colors = 2;
+        } else if (output_pixel_format == SAIL_PIXEL_FORMAT_BPP4_INDEXED) {
+            max_colors = 16;
+        } else {
+            max_colors = 256;
+        }
+
+        /* For indexed formats, first convert to RGB if needed. */
+        struct sail_image *rgb_image = NULL;
+
+        if (image->pixel_format != SAIL_PIXEL_FORMAT_BPP24_RGB &&
+            image->pixel_format != SAIL_PIXEL_FORMAT_BPP24_BGR &&
+            image->pixel_format != SAIL_PIXEL_FORMAT_BPP32_RGBA &&
+            image->pixel_format != SAIL_PIXEL_FORMAT_BPP32_BGRA &&
+            image->pixel_format != SAIL_PIXEL_FORMAT_BPP32_RGBX &&
+            image->pixel_format != SAIL_PIXEL_FORMAT_BPP32_BGRX) {
+
+            SAIL_TRY(sail_convert_image_with_options(image, SAIL_PIXEL_FORMAT_BPP24_RGB, options, &rgb_image));
+        } else {
+            SAIL_TRY(sail_copy_image(image, &rgb_image));
+        }
+
+        /* Apply quantization with optional dithering. */
+        bool dither = (options != NULL && (options->options & SAIL_CONVERSION_OPTION_DITHERING));
+        SAIL_TRY_OR_CLEANUP(sail_quantize_image(rgb_image, max_colors, dither, image_output),
+                            /* cleanup */ sail_destroy_image(rgb_image));
+        sail_destroy_image(rgb_image);
+
+        return SAIL_OK;
+    }
+
     int r, g, b, a;
     pixel_consumer_t pixel_consumer;
     SAIL_TRY(verify_and_construct_rgba_indexes_verbose(output_pixel_format, &pixel_consumer, &r, &g, &b, &a));
@@ -1069,6 +1106,28 @@ sail_status_t sail_convert_image_with_options(const struct sail_image *image,
 
     image_local->pixel_format = output_pixel_format;
     image_local->bytes_per_line = sail_bytes_per_line(image_local->width, image_local->pixel_format);
+
+    /* Clear ICC profile if changing color space (RGB <-> Grayscale, CMYK <-> RGB, etc). */
+    bool input_is_rgb    = sail_is_rgb_family(image->pixel_format);
+    bool output_is_rgb   = sail_is_rgb_family(output_pixel_format);
+    bool input_is_gray   = sail_is_grayscale(image->pixel_format);
+    bool output_is_gray  = sail_is_grayscale(output_pixel_format);
+    bool input_is_cmyk   = sail_is_cmyk(image->pixel_format);
+    bool output_is_cmyk  = sail_is_cmyk(output_pixel_format);
+    bool input_is_ycbcr  = sail_is_ycbcr(image->pixel_format);
+    bool output_is_ycbcr = sail_is_ycbcr(output_pixel_format);
+    bool input_is_ycck   = sail_is_ycck(image->pixel_format);
+    bool output_is_ycck  = sail_is_ycck(output_pixel_format);
+
+    if (input_is_rgb != output_is_rgb         ||
+            input_is_gray  != output_is_gray  ||
+            input_is_cmyk  != output_is_cmyk  ||
+            input_is_ycbcr != output_is_ycbcr ||
+            input_is_ycck  != output_is_ycck) {
+        SAIL_LOG_DEBUG("Color space conversion detected, clearing ICC profile");
+        sail_destroy_iccp(image_local->iccp);
+        image_local->iccp = NULL;
+    }
 
     const size_t pixels_size = (size_t)image_local->height * image_local->bytes_per_line;
     SAIL_TRY_OR_CLEANUP(sail_malloc(pixels_size, &image_local->pixels),
@@ -1119,6 +1178,12 @@ sail_status_t sail_update_image_with_options(struct sail_image *image,
 }
 
 bool sail_can_convert(enum SailPixelFormat input_pixel_format, enum SailPixelFormat output_pixel_format) {
+
+    /* Special handling for indexed output formats (using quantization). */
+    if (sail_is_indexed(output_pixel_format)) {
+        /* Any format that can convert to RGB can convert to indexed. */
+        return sail_can_convert(input_pixel_format, SAIL_PIXEL_FORMAT_BPP24_RGB);
+    }
 
     /* After adding a new input pixel format, also update the switch in conversion_impl(). */
     switch (input_pixel_format) {

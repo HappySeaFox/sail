@@ -49,6 +49,16 @@ enum SailConversionOption {
      *   output_pixel = opacity * input_pixel + (1 - opacity) * background
      */
     SAIL_CONVERSION_OPTION_BLEND_ALPHA = 1 << 1,
+
+    /*
+     * Apply Floyd-Steinberg dithering when converting to indexed formats.
+     * Only applicable when the output format is indexed (with bpp 1/4/8).
+     * Currently only BPP8_INDEXED (256 colors) supports dithering.
+     *
+     * Dithering reduces color banding on smooth gradients by distributing
+     * quantization error to neighboring pixels.
+     */
+    SAIL_CONVERSION_OPTION_DITHERING   = 1 << 2,
 };
 
 #endif
