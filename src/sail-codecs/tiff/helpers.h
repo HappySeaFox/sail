@@ -27,7 +27,7 @@
 #define SAIL_TIFF_HELPERS_H
 
 #include <stdarg.h>
-#include <stdio.h>
+#include <stdbool.h>
 
 #include <tiffio.h>
 
@@ -35,8 +35,10 @@
 #include <sail-common/export.h>
 #include <sail-common/status.h>
 
+struct sail_iccp;
 struct sail_meta_data_node;
 struct sail_resolution;
+struct sail_variant;
 
 SAIL_HIDDEN void tiff_private_my_error_fn(const char *module, const char *format, va_list ap);
 
@@ -48,6 +50,8 @@ SAIL_HIDDEN sail_status_t tiff_private_sail_compression_to_compression(enum Sail
 
 SAIL_HIDDEN enum SailPixelFormat tiff_private_bpp_to_pixel_format(int bpp);
 
+SAIL_HIDDEN sail_status_t tiff_private_sail_pixel_format_from_tiff(TIFF *tiff, enum SailPixelFormat *result);
+
 SAIL_HIDDEN void tiff_private_zero_tiff_image(TIFFRGBAImage *img);
 
 SAIL_HIDDEN sail_status_t tiff_private_fetch_iccp(TIFF *tiff, struct sail_iccp **iccp);
@@ -56,8 +60,14 @@ SAIL_HIDDEN sail_status_t tiff_private_fetch_meta_data(TIFF *tiff, struct sail_m
 
 SAIL_HIDDEN sail_status_t tiff_private_write_meta_data(TIFF *tiff, const struct sail_meta_data_node *meta_data_node);
 
+SAIL_HIDDEN sail_status_t tiff_private_fetch_xmp(TIFF *tiff, struct sail_meta_data_node ***last_meta_data_node);
+
+SAIL_HIDDEN sail_status_t tiff_private_write_xmp(TIFF *tiff, const struct sail_meta_data_node *meta_data_node);
+
 SAIL_HIDDEN sail_status_t tiff_private_fetch_resolution(TIFF *tiff, struct sail_resolution **resolution);
 
 SAIL_HIDDEN sail_status_t tiff_private_write_resolution(TIFF *tiff, const struct sail_resolution *resolution);
+
+SAIL_HIDDEN bool tiff_private_tuning_key_value_callback(const char *key, const struct sail_variant *value, void *user_data);
 
 #endif
