@@ -377,9 +377,9 @@ sail_status_t png_private_write_meta_data(png_structp png_ptr, png_infop info_pt
         png_text *lines = ptr;
 
         /* Indexes in 'lines' that must be freed. 1 = free, 0 = don't free. */
-        SAIL_TRY(sail_malloc(count * sizeof(bool), &ptr));
+        SAIL_TRY(sail_malloc(count * sizeof(int), &ptr));
         int *lines_to_free = ptr;
-        memset(lines_to_free, 0, count);
+        memset(lines_to_free, 0, count * sizeof(int));
 
         unsigned index = 0;
 
@@ -410,7 +410,6 @@ sail_status_t png_private_write_meta_data(png_structp png_ptr, png_infop info_pt
                     const char *variant_str = sail_variant_to_string(meta_data->value);
                     SAIL_TRY_OR_EXECUTE(sail_strdup(variant_str, &meta_data_value),
                                         /* on error */ continue);
-                    lines_to_free[index] = 1;
                 } else {
                     if (meta_data->key == SAIL_META_DATA_IPTC) {
                         meta_data_key = "Raw profile type iptc";
@@ -429,20 +428,18 @@ sail_status_t png_private_write_meta_data(png_structp png_ptr, png_infop info_pt
                         SAIL_TRY_OR_EXECUTE(sail_concat(&meta_data_value, 2, raw_profile_header, hex_string),
                                             /* on error */ sail_free(hex_string); continue);
                         sail_free(hex_string);
-
-                        lines_to_free[index] = 1;
                     } else {
                         meta_data_key   = sail_meta_data_to_string(meta_data->key);
                         const char *variant_str = sail_variant_to_string(meta_data->value);
                         SAIL_TRY_OR_EXECUTE(sail_strdup(variant_str, &meta_data_value),
                                             /* on error */ continue);
-                        lines_to_free[index] = 1;
                     }
                 }
 
                 lines[index].compression = PNG_TEXT_COMPRESSION_zTXt;
                 lines[index].key         = (char *)meta_data_key;
                 lines[index].text        = meta_data_value;
+                lines_to_free[index] = 1;
 
                 index++;
             }
