@@ -26,9 +26,6 @@
 #include <setjmp.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #include <png.h>
 
@@ -550,33 +547,51 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_png(void *state, co
 
     /* Save ICC profile. */
     if (png_state->save_options->options & SAIL_OPTION_ICCP && image->iccp != NULL) {
-        png_set_iCCP(png_state->png_ptr,
-                        png_state->info_ptr,
-                        "ICC profile",
-                        PNG_COMPRESSION_TYPE_BASE,
-                        (const png_bytep)image->iccp->data,
-                        (unsigned)image->iccp->size);
+        if (setjmp(png_jmpbuf(png_state->png_ptr))) {
+            SAIL_LOG_WARNING("PNG: ICC profile was rejected (incompatible color space?)");
+        } else {
+            png_set_iCCP(png_state->png_ptr,
+                            png_state->info_ptr,
+                            "ICC profile",
+                            PNG_COMPRESSION_TYPE_BASE,
+                            (const png_bytep)image->iccp->data,
+                            (unsigned)image->iccp->size);
 
-        SAIL_LOG_TRACE("PNG: ICC profile has been written");
+            SAIL_LOG_TRACE("PNG: ICC profile has been written");
+        }
     }
 
     /* Save palette. */
-    if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP1_INDEXED ||
-            image->pixel_format == SAIL_PIXEL_FORMAT_BPP2_INDEXED ||
-            image->pixel_format == SAIL_PIXEL_FORMAT_BPP4_INDEXED ||
-            image->pixel_format == SAIL_PIXEL_FORMAT_BPP8_INDEXED) {
+    if (sail_is_indexed(image->pixel_format)) {
         if (image->palette == NULL) {
             SAIL_LOG_ERROR("PNG: The indexed image has no palette");
             SAIL_LOG_AND_RETURN(SAIL_ERROR_MISSING_PALETTE);
         }
 
-        if (image->palette->pixel_format != SAIL_PIXEL_FORMAT_BPP24_RGB) {
-            SAIL_LOG_ERROR("PNG: Only BPP24-RGB palette is currently supported");
+        /* Set palette. BPP24-RGB can be used directly, BPP32-RGBA needs conversion. */
+        if (image->palette->pixel_format == SAIL_PIXEL_FORMAT_BPP24_RGB) {
+            png_set_PLTE(png_state->png_ptr, png_state->info_ptr,
+                        (png_color *)image->palette->data,
+                        image->palette->color_count);
+        } else if (image->palette->pixel_format == SAIL_PIXEL_FORMAT_BPP32_RGBA) {
+            void *png_palette_ptr = NULL;
+            SAIL_TRY(sail_malloc(image->palette->color_count * sizeof(png_color), &png_palette_ptr));
+            png_color *png_palette = (png_color *)png_palette_ptr;
+
+            const unsigned char *pal_data = (const unsigned char *)image->palette->data;
+            for (unsigned i = 0; i < image->palette->color_count; i++) {
+                png_palette[i].red   = pal_data[i * 4 + 0];
+                png_palette[i].green = pal_data[i * 4 + 1];
+                png_palette[i].blue  = pal_data[i * 4 + 2];
+                /* Alpha channel ignored. */
+            }
+
+            png_set_PLTE(png_state->png_ptr, png_state->info_ptr, png_palette, image->palette->color_count);
+            sail_free(png_palette);
+        } else {
+            SAIL_LOG_ERROR("PNG: Unsupported palette format %s", sail_pixel_format_to_string(image->palette->pixel_format));
             SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
         }
-
-        /* Deep copy palette. */
-        png_set_PLTE(png_state->png_ptr, png_state->info_ptr, image->palette->data, image->palette->color_count);
     }
 
     /* Save gamma. */
@@ -591,6 +606,9 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_png(void *state, co
     png_set_compression_level(png_state->png_ptr, (int)compression);
 
     png_write_info(png_state->png_ptr, png_state->info_ptr);
+
+    /* Convert to big-endian for PNG format. */
+    png_set_swap(png_state->png_ptr);
 
     if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP24_BGR      ||
             image->pixel_format == SAIL_PIXEL_FORMAT_BPP48_BGR  ||
