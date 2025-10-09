@@ -34,6 +34,7 @@
 
 struct sail_image;
 struct sail_io;
+struct sail_hash_map;
 
 enum SailPnmVersion {
     SAIL_PNM_VERSION_P1,
@@ -42,6 +43,16 @@ enum SailPnmVersion {
     SAIL_PNM_VERSION_P4,
     SAIL_PNM_VERSION_P5,
     SAIL_PNM_VERSION_P6,
+    SAIL_PNM_VERSION_P7,
+};
+
+enum SailPamTuplType {
+    SAIL_PAM_TUPLTYPE_UNKNOWN,
+    SAIL_PAM_TUPLTYPE_BLACKANDWHITE,
+    SAIL_PAM_TUPLTYPE_GRAYSCALE,
+    SAIL_PAM_TUPLTYPE_GRAYSCALE_ALPHA,
+    SAIL_PAM_TUPLTYPE_RGB,
+    SAIL_PAM_TUPLTYPE_RGB_ALPHA,
 };
 
 static const char SAIL_PNM_INVALID_STARTING_CHAR = '\0';
@@ -57,5 +68,15 @@ SAIL_HIDDEN sail_status_t pnm_private_read_pixels(struct sail_io *io, struct sai
 SAIL_HIDDEN enum SailPixelFormat pnm_private_rgb_sail_pixel_format(enum SailPnmVersion pnm_version, unsigned bpc);
 
 SAIL_HIDDEN sail_status_t pnm_private_store_ascii(enum SailPnmVersion pnm_version, struct sail_hash_map *special_properties);
+
+SAIL_HIDDEN sail_status_t pnm_private_read_pam_header(struct sail_io *io, unsigned *width, unsigned *height, unsigned *depth, unsigned *maxval, enum SailPamTuplType *tupltype);
+
+SAIL_HIDDEN enum SailPixelFormat pnm_private_pam_sail_pixel_format(enum SailPamTuplType tupltype, unsigned depth, unsigned bpc);
+
+SAIL_HIDDEN sail_status_t pnm_private_pixel_format_to_pnm_params(enum SailPixelFormat pixel_format, enum SailPnmVersion *version, unsigned *bpc, unsigned *depth, enum SailPamTuplType *tupltype);
+
+SAIL_HIDDEN sail_status_t pnm_private_write_pnm_header(struct sail_io *io, enum SailPnmVersion version, unsigned width, unsigned height, unsigned maxval);
+
+SAIL_HIDDEN sail_status_t pnm_private_write_pam_header(struct sail_io *io, unsigned width, unsigned height, unsigned depth, unsigned maxval, enum SailPamTuplType tupltype);
 
 #endif

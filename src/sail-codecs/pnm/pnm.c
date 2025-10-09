@@ -26,7 +26,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include <sail-common/sail-common.h>
@@ -44,9 +43,14 @@ struct pnm_state {
     const struct sail_save_options *save_options;
 
     bool frame_loaded;
+    bool frame_saved;
     enum SailPnmVersion version;
     double multiplier_to_full_range;
     unsigned bpc;
+
+    /* PAM-specific. */
+    unsigned pam_depth;
+    enum SailPamTuplType pam_tupltype;
 };
 
 static sail_status_t alloc_pnm_state(struct sail_io *io,
@@ -64,9 +68,13 @@ static sail_status_t alloc_pnm_state(struct sail_io *io,
         .save_options = save_options,
 
         .frame_loaded = false,
+        .frame_saved  = false,
 
         .multiplier_to_full_range = 0,
         .bpc                      = 0,
+
+        .pam_depth    = 0,
+        .pam_tupltype = SAIL_PAM_TUPLTYPE_UNKNOWN,
     };
 
     return SAIL_OK;
@@ -109,6 +117,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_pnm(struct sail_io *io, const 
         case '4': pnm_state->version = SAIL_PNM_VERSION_P4; break;
         case '5': pnm_state->version = SAIL_PNM_VERSION_P5; break;
         case '6': pnm_state->version = SAIL_PNM_VERSION_P6; break;
+        case '7': pnm_state->version = SAIL_PNM_VERSION_P7; break;
 
         default: {
             SAIL_LOG_ERROR("PNM: Unsupported version '%c'", pnm);
@@ -129,69 +138,93 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_pnm(void *state, st
 
     pnm_state->frame_loaded = true;
 
-    char buffer[32];
+    unsigned w, h;
+    enum SailPixelFormat pixel_format;
 
-    /* Dimensions. */
-    unsigned w;
-    SAIL_TRY(pnm_private_read_word(pnm_state->io, buffer, sizeof(buffer)));
+    /* P7 (PAM) has different header format. */
+    if (pnm_state->version == SAIL_PNM_VERSION_P7) {
+        unsigned maxval;
+        SAIL_TRY(pnm_private_read_pam_header(pnm_state->io, &w, &h, &pnm_state->pam_depth, &maxval, &pnm_state->pam_tupltype));
 
-#ifdef _MSC_VER
-    if (sscanf_s(buffer, "%u", &w) != 1) {
-#else
-    if (sscanf(buffer, "%u", &w) != 1) {
-#endif
-        SAIL_LOG_ERROR("PNM: Failed to read image dimensions");
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
-    }
-
-    unsigned h;
-    SAIL_TRY(pnm_private_read_word(pnm_state->io, buffer, sizeof(buffer)));
-
-#ifdef _MSC_VER
-    if (sscanf_s(buffer, "%u", &h) != 1) {
-#else
-    if (sscanf(buffer, "%u", &h) != 1) {
-#endif
-        SAIL_LOG_ERROR("PNM: Failed to read image dimensions");
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
-    }
-
-    /* Maximum color. */
-    if (pnm_state->version == SAIL_PNM_VERSION_P2     ||
-            pnm_state->version == SAIL_PNM_VERSION_P3 ||
-            pnm_state->version == SAIL_PNM_VERSION_P5 ||
-            pnm_state->version == SAIL_PNM_VERSION_P6) {
-
-        SAIL_TRY(pnm_private_read_word(pnm_state->io, buffer, sizeof(buffer)));
-
-        unsigned max_color;
-#ifdef _MSC_VER
-        if (sscanf_s(buffer, "%u", &max_color) != 1) {
-#else
-        if (sscanf(buffer, "%u", &max_color) != 1) {
-#endif
-            SAIL_LOG_ERROR("PNM: Failed to read maximum color value");
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
-        }
-
-        if (max_color <= 255) {
+        if (maxval <= 255) {
             pnm_state->bpc = 8;
-            pnm_state->multiplier_to_full_range = 255.0 / max_color;
-        } else if (max_color <= 65535) {
+            pnm_state->multiplier_to_full_range = 255.0 / maxval;
+        } else if (maxval <= 65535) {
             pnm_state->bpc = 16;
-            pnm_state->multiplier_to_full_range = 65535.0 / max_color;
-        } else  {
-            SAIL_LOG_ERROR("PNM: BPP more than 16 is not supported");
+            pnm_state->multiplier_to_full_range = 65535.0 / maxval;
+        } else {
+            SAIL_LOG_ERROR("PAM: MAXVAL more than 65535 is not supported");
             SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_FORMAT);
         }
 
-        SAIL_LOG_TRACE("PNM: Max color(%u), scale(%.1f)", max_color, pnm_state->multiplier_to_full_range);
-    } else {
-        pnm_state->multiplier_to_full_range = 1;
-        pnm_state->bpc = 1;
-    }
+        pixel_format = pnm_private_pam_sail_pixel_format(pnm_state->pam_tupltype, pnm_state->pam_depth, pnm_state->bpc);
 
-    enum SailPixelFormat pixel_format = pnm_private_rgb_sail_pixel_format(pnm_state->version, pnm_state->bpc);
+        SAIL_LOG_TRACE("PAM: W=%u, H=%u, DEPTH=%u, MAXVAL=%u, BPC=%u, TUPLTYPE=%d",
+                       w, h, pnm_state->pam_depth, maxval, pnm_state->bpc, pnm_state->pam_tupltype);
+    } else {
+        /* P1-P6: Standard PNM header. */
+        char buffer[32];
+
+        /* Dimensions. */
+        SAIL_TRY(pnm_private_read_word(pnm_state->io, buffer, sizeof(buffer)));
+
+#ifdef _MSC_VER
+        if (sscanf_s(buffer, "%u", &w) != 1) {
+#else
+        if (sscanf(buffer, "%u", &w) != 1) {
+#endif
+            SAIL_LOG_ERROR("PNM: Failed to read image dimensions");
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        }
+
+        SAIL_TRY(pnm_private_read_word(pnm_state->io, buffer, sizeof(buffer)));
+
+#ifdef _MSC_VER
+        if (sscanf_s(buffer, "%u", &h) != 1) {
+#else
+        if (sscanf(buffer, "%u", &h) != 1) {
+#endif
+            SAIL_LOG_ERROR("PNM: Failed to read image dimensions");
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        }
+
+        /* Maximum color. */
+        if (pnm_state->version == SAIL_PNM_VERSION_P2 ||
+                pnm_state->version == SAIL_PNM_VERSION_P3 ||
+                pnm_state->version == SAIL_PNM_VERSION_P5 ||
+                pnm_state->version == SAIL_PNM_VERSION_P6) {
+
+            SAIL_TRY(pnm_private_read_word(pnm_state->io, buffer, sizeof(buffer)));
+
+            unsigned max_color;
+#ifdef _MSC_VER
+            if (sscanf_s(buffer, "%u", &max_color) != 1) {
+#else
+            if (sscanf(buffer, "%u", &max_color) != 1) {
+#endif
+                SAIL_LOG_ERROR("PNM: Failed to read maximum color value");
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+            }
+
+            if (max_color <= 255) {
+                pnm_state->bpc = 8;
+                pnm_state->multiplier_to_full_range = 255.0 / max_color;
+            } else if (max_color <= 65535) {
+                pnm_state->bpc = 16;
+                pnm_state->multiplier_to_full_range = 65535.0 / max_color;
+            } else  {
+                SAIL_LOG_ERROR("PNM: BPP more than 16 is not supported");
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_FORMAT);
+            }
+
+            SAIL_LOG_TRACE("PNM: Max color(%u), scale(%.1f)", max_color, pnm_state->multiplier_to_full_range);
+        } else {
+            pnm_state->multiplier_to_full_range = 1;
+            pnm_state->bpc = 1;
+        }
+
+        pixel_format = pnm_private_rgb_sail_pixel_format(pnm_state->version, pnm_state->bpc);
+    }
 
     if (pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN) {
         SAIL_LOG_ERROR("PNM: Unsupported pixel format");
@@ -284,6 +317,33 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_pnm(void *state, struct sail_
             for (unsigned row = 0; row < image->height; row++) {
                 SAIL_TRY(pnm_state->io->strict_read(pnm_state->io->stream, sail_scan_line(image, row), image->bytes_per_line));
             }
+
+            /* For 16-bit formats, swap from big-endian to little-endian (SAIL internal). */
+            if (pnm_state->bpc == 16) {
+                for (unsigned row = 0; row < image->height; row++) {
+                    uint16_t *pixels = (uint16_t *)sail_scan_line(image, row);
+                    for (unsigned i = 0; i < image->bytes_per_line / 2; i++) {
+                        pixels[i] = sail_reverse_uint16(pixels[i]);
+                    }
+                }
+            }
+            break;
+        }
+        case SAIL_PNM_VERSION_P7: {
+            /* PAM: Binary format, read raw pixel data. */
+            for (unsigned row = 0; row < image->height; row++) {
+                SAIL_TRY(pnm_state->io->strict_read(pnm_state->io->stream, sail_scan_line(image, row), image->bytes_per_line));
+            }
+
+            /* For 16-bit formats, swap from big-endian to little-endian (SAIL internal). */
+            if (pnm_state->bpc == 16) {
+                for (unsigned row = 0; row < image->height; row++) {
+                    uint16_t *pixels = (uint16_t *)sail_scan_line(image, row);
+                    for (unsigned i = 0; i < image->bytes_per_line / 2; i++) {
+                        pixels[i] = sail_reverse_uint16(pixels[i]);
+                    }
+                }
+            }
             break;
         }
     }
@@ -308,32 +368,99 @@ SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_pnm(void **state) {
 
 SAIL_EXPORT sail_status_t sail_codec_save_init_v8_pnm(struct sail_io *io, const struct sail_save_options *save_options, void **state) {
 
-    (void)io;
-    (void)save_options;
-    (void)state;
+    SAIL_CHECK_PTR(io);
+    SAIL_CHECK_PTR(state);
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
+    SAIL_LOG_TRACE("PNM: Starting save");
+
+    struct pnm_state *pnm_state;
+    SAIL_TRY(alloc_pnm_state(io, NULL, save_options, &pnm_state));
+
+    *state = pnm_state;
+
+    return SAIL_OK;
 }
 
 SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_pnm(void *state, const struct sail_image *image) {
 
-    (void)state;
-    (void)image;
+    SAIL_CHECK_PTR(state);
+    SAIL_CHECK_PTR(image);
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
+    struct pnm_state *pnm_state = state;
+
+    if (pnm_state->frame_saved) {
+        SAIL_LOG_ERROR("PNM: Only single frame is supported for saving");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+    }
+
+    /* Determine PNM format from pixel format. */
+    unsigned bpc, depth;
+    enum SailPamTuplType tupltype;
+    SAIL_TRY(pnm_private_pixel_format_to_pnm_params(image->pixel_format, &pnm_state->version, &bpc, &depth, &tupltype));
+
+    pnm_state->bpc = bpc;
+    pnm_state->pam_depth = depth;
+    pnm_state->pam_tupltype = tupltype;
+
+    /* Write header. */
+    unsigned maxval = (bpc == 1) ? 1 : ((1u << bpc) - 1);
+
+    if (pnm_state->version == SAIL_PNM_VERSION_P7) {
+        SAIL_TRY(pnm_private_write_pam_header(pnm_state->io, image->width, image->height, depth, maxval, tupltype));
+    } else {
+        SAIL_TRY(pnm_private_write_pnm_header(pnm_state->io, pnm_state->version, image->width, image->height, maxval));
+    }
+
+    return SAIL_OK;
 }
 
 SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_pnm(void *state, const struct sail_image *image) {
 
-    (void)state;
-    (void)image;
+    SAIL_CHECK_PTR(state);
+    SAIL_CHECK_PTR(image);
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
+    struct pnm_state *pnm_state = state;
+
+    /* For 16-bit formats, need to swap byte order to big-endian. */
+    if (pnm_state->bpc == 16) {
+        for (unsigned row = 0; row < image->height; row++) {
+            const uint8_t *scan = sail_scan_line(image, row);
+            void *buffer;
+            SAIL_TRY(sail_malloc(image->bytes_per_line, &buffer));
+
+            memcpy(buffer, scan, image->bytes_per_line);
+
+            /* Swap to big-endian. */
+            uint16_t *pixels = (uint16_t *)buffer;
+            for (unsigned i = 0; i < image->bytes_per_line / 2; i++) {
+                pixels[i] = sail_reverse_uint16(pixels[i]);
+            }
+
+            SAIL_TRY_OR_CLEANUP(pnm_state->io->strict_write(pnm_state->io->stream, buffer, image->bytes_per_line),
+                               /* cleanup */ sail_free(buffer));
+            sail_free(buffer);
+        }
+    } else {
+        /* For 8-bit and 1-bit formats, write as-is. */
+        for (unsigned row = 0; row < image->height; row++) {
+            SAIL_TRY(pnm_state->io->strict_write(pnm_state->io->stream, sail_scan_line(image, row), image->bytes_per_line));
+        }
+    }
+
+    pnm_state->frame_saved = true;
+
+    return SAIL_OK;
 }
 
 SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_pnm(void **state) {
 
-    (void)state;
+    SAIL_CHECK_PTR(state);
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
+    struct pnm_state *pnm_state = *state;
+
+    *state = NULL;
+
+    destroy_pnm_state(pnm_state);
+
+    return SAIL_OK;
 }
