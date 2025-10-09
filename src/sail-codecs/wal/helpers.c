@@ -292,6 +292,16 @@ static const unsigned char WAL_PALETTE[256 * 3] =
 
 sail_status_t wal_private_read_file_header(struct sail_io *io, struct WalFileHeader *wal_header) {
 
+    /* WAL file header structure (100 bytes total):
+     * - name (32 bytes): texture name (null-terminated string)
+     * - width (4 bytes): texture width in pixels
+     * - height (4 bytes): texture height in pixels
+     * - offset[4] (16 bytes): file offsets to 4 mipmap levels
+     * - next_name (32 bytes): name of next texture in animation (unused)
+     * - flags (4 bytes): surface flags
+     * - contents (4 bytes): content flags
+     * - value (4 bytes): light emission value
+     */
     SAIL_TRY(io->strict_read(io->stream, &wal_header->name,      sizeof(wal_header->name)));
     SAIL_TRY(io->strict_read(io->stream, &wal_header->width,     sizeof(wal_header->width)));
     SAIL_TRY(io->strict_read(io->stream, &wal_header->height,    sizeof(wal_header->height)));
@@ -300,6 +310,68 @@ sail_status_t wal_private_read_file_header(struct sail_io *io, struct WalFileHea
     SAIL_TRY(io->strict_read(io->stream, &wal_header->flags,     sizeof(wal_header->flags)));
     SAIL_TRY(io->strict_read(io->stream, &wal_header->contents,  sizeof(wal_header->contents)));
     SAIL_TRY(io->strict_read(io->stream, &wal_header->value,     sizeof(wal_header->value)));
+
+    /* Validate dimensions. */
+    if (wal_header->width == 0 || wal_header->height == 0) {
+        SAIL_LOG_ERROR("WAL: Invalid dimensions %ux%u", wal_header->width, wal_header->height);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+    }
+
+    /* Reasonable size limit to prevent memory exhaustion (16K x 16K). */
+    if (wal_header->width > 16384 || wal_header->height > 16384) {
+        SAIL_LOG_ERROR("WAL: Image dimensions %ux%u exceed maximum allowed (16384x16384)", wal_header->width, wal_header->height);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+    }
+
+    /* Validate offsets - they should be positive and in ascending order. */
+    const size_t header_size = sizeof(wal_header->name) +
+                               sizeof(wal_header->width) +
+                               sizeof(wal_header->height) +
+                               sizeof(wal_header->offset) +
+                               sizeof(wal_header->next_name) +
+                               sizeof(wal_header->flags) +
+                               sizeof(wal_header->contents) +
+                               sizeof(wal_header->value);
+
+    if (wal_header->offset[0] < (int)header_size) {
+        SAIL_LOG_ERROR("WAL: First mipmap offset %d is invalid (should be >= %zu)", wal_header->offset[0], header_size);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+    }
+
+    /* Validate that offsets are in ascending order and calculate expected sizes. */
+    unsigned current_width = wal_header->width;
+    unsigned current_height = wal_header->height;
+
+    for (int i = 0; i < 4; i++) {
+        if (wal_header->offset[i] <= 0) {
+            SAIL_LOG_ERROR("WAL: Mipmap offset[%d] = %d is invalid", i, wal_header->offset[i]);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        }
+
+        if (i > 0) {
+            /* Check offsets are in ascending order. */
+            if (wal_header->offset[i] <= wal_header->offset[i - 1]) {
+                SAIL_LOG_ERROR("WAL: Mipmap offsets are not in ascending order");
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+            }
+        }
+
+        /* Verify expected mipmap size matches offset difference (except for last level). */
+        if (i < 3) {
+            const size_t expected_size = (size_t)current_width * current_height;
+            const size_t actual_size = wal_header->offset[i + 1] - wal_header->offset[i];
+
+            if (actual_size != expected_size) {
+                SAIL_LOG_ERROR("WAL: Mipmap level %d size mismatch. Expected %zu bytes, got %zu bytes",
+                              i, expected_size, actual_size);
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+            }
+        }
+
+        /* Update dimensions for next level. */
+        current_width /= 2;
+        current_height /= 2;
+    }
 
     return SAIL_OK;
 }
@@ -324,5 +396,59 @@ sail_status_t wal_private_assign_meta_data(const struct WalFileHeader *wal_heade
 
     *meta_data_node = meta_data_node_local;
 
+    return SAIL_OK;
+}
+
+sail_status_t wal_private_write_file_header(struct sail_io *io, const struct WalFileHeader *wal_header) {
+
+    SAIL_TRY(io->strict_write(io->stream, &wal_header->name,      sizeof(wal_header->name)));
+    SAIL_TRY(io->strict_write(io->stream, &wal_header->width,     sizeof(wal_header->width)));
+    SAIL_TRY(io->strict_write(io->stream, &wal_header->height,    sizeof(wal_header->height)));
+    SAIL_TRY(io->strict_write(io->stream, &wal_header->offset,    sizeof(wal_header->offset)));
+    SAIL_TRY(io->strict_write(io->stream, &wal_header->next_name, sizeof(wal_header->next_name)));
+    SAIL_TRY(io->strict_write(io->stream, &wal_header->flags,     sizeof(wal_header->flags)));
+    SAIL_TRY(io->strict_write(io->stream, &wal_header->contents,  sizeof(wal_header->contents)));
+    SAIL_TRY(io->strict_write(io->stream, &wal_header->value,     sizeof(wal_header->value)));
+
+    return SAIL_OK;
+}
+
+sail_status_t wal_private_supported_write_pixel_format(enum SailPixelFormat pixel_format) {
+
+    switch (pixel_format) {
+        case SAIL_PIXEL_FORMAT_BPP8_INDEXED: {
+            return SAIL_OK;
+        }
+        default: {
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+        }
+    }
+}
+
+sail_status_t wal_private_downsample_indexed(const void *src, unsigned src_width, unsigned src_height,
+                                              void **dst, unsigned *dst_width, unsigned *dst_height) {
+
+    *dst_width = src_width / 2;
+    *dst_height = src_height / 2;
+
+    if (*dst_width == 0 || *dst_height == 0) {
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INCORRECT_IMAGE_DIMENSIONS);
+    }
+
+    const size_t dst_size = (size_t)(*dst_width) * (*dst_height);
+    void *dst_ptr;
+    SAIL_TRY(sail_malloc(dst_size, &dst_ptr));
+
+    const uint8_t *src_pixels = src;
+    uint8_t *dst_pixels = dst_ptr;
+
+    /* Simple box filter: take the top-left pixel of each 2x2 block. */
+    for (unsigned y = 0; y < *dst_height; y++) {
+        for (unsigned x = 0; x < *dst_width; x++) {
+            dst_pixels[y * (*dst_width) + x] = src_pixels[(y * 2) * src_width + (x * 2)];
+        }
+    }
+
+    *dst = dst_ptr;
     return SAIL_OK;
 }

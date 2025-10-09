@@ -521,10 +521,16 @@
     <td>
         <b>Indexed:</b> 8-bit.
         <br/><br/>
-        <b>Content:</b> Static, Multi-paged.
+        <b>Content:</b> Static, Multi-paged (4 mipmap levels).
     </td>
     <td>-</td>
-    <td>Unsupported</td>
+    <td>
+        <b>Indexed:</b> 8-bit.
+        <br/><br/>
+        <b>Content:</b> Static, Multi-paged (4 mipmap levels).
+        <br/><br/>
+        <b>Note:</b> Dimensions must be divisible by 8. If only one frame is provided, mipmaps are generated automatically.
+    </td>
     <td>-</td>
     <td>-</td>
 </tr>

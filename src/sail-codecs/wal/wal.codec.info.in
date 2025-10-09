@@ -2,7 +2,7 @@
 #
 [codec]
 layout=8
-version=0.2.0
+version=0.4.0
 priority=LOWEST
 name=WAL
 description=Quake2 Texture
@@ -15,10 +15,10 @@ features=STATIC;MULTI-PAGED;SOURCE-IMAGE
 tuning=
 
 [save-features]
-features=
-pixel-formats=
-compressions=
-default-compression=
+features=STATIC;MULTI-PAGED
+pixel-formats=BPP8-INDEXED
+compressions=NONE
+default-compression=NONE
 compression-level-min=0
 compression-level-max=0
 compression-level-default=0
