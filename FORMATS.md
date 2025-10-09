@@ -532,12 +532,23 @@
     <td>18</td>
     <td><a href="https://wikipedia.org/wiki/WebP">WEBP</a></td>
     <td>
-        <b>Bit depth:</b> 24-bit, 32-bit.
+        <b>RGBA:</b> 32-bit.
         <br/><br/>
         <b>Content:</b> Static, Animated, Meta data, ICC profiles.
     </td>
     <td>-</td>
-    <td>Unsupported</td>
+    <td>
+        <b>RGB:</b> 24-bit.
+        <b>BGR:</b> 24-bit.
+        <b>RGBA:</b> 32-bit.
+        <b>BGRA:</b> 32-bit.
+        <b>ARGB:</b> 32-bit.
+        <b>ABGR:</b> 32-bit.
+        <br/><br/>
+        <b>Content:</b> Static, Animated.
+        <br/><br/>
+        <b>Compression:</b> WebP.
+    </td>
     <td>-</td>
     <td>libwebp</td>
 </tr>

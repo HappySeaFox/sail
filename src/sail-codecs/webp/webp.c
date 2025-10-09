@@ -31,6 +31,9 @@
 
 #include <webp/decode.h>
 #include <webp/demux.h>
+#include <webp/encode.h>
+#include <webp/mux.h>
+#include <webp/mux_types.h>
 
 #include <sail-common/sail-common.h>
 
@@ -43,6 +46,7 @@ struct webp_state {
     const struct sail_load_options *load_options;
     const struct sail_save_options *save_options;
 
+    /* Loading-specific fields. */
     struct sail_image *canvas_image;
     WebPDemuxer *webp_demux;
     WebPIterator *webp_iterator;
@@ -59,9 +63,18 @@ struct webp_state {
 
     void *image_data;
     size_t image_data_size;
+
+    /* Saving-specific fields. */
+    struct sail_io *io;
+    struct WebPAnimEncoder *anim_encoder;
+    int timestamp_ms;
+    bool is_first_frame;
+    unsigned canvas_width;
+    unsigned canvas_height;
 };
 
-static sail_status_t alloc_webp_state(const struct sail_load_options *load_options,
+static sail_status_t alloc_webp_state(struct sail_io *io,
+                                        const struct sail_load_options *load_options,
                                         const struct sail_save_options *save_options,
                                         struct webp_state **webp_state) {
 
@@ -89,6 +102,13 @@ static sail_status_t alloc_webp_state(const struct sail_load_options *load_optio
 
         .image_data      = NULL,
         .image_data_size = 0,
+
+        .io            = io,
+        .anim_encoder  = NULL,
+        .timestamp_ms  = 0,
+        .is_first_frame = true,
+        .canvas_width  = 0,
+        .canvas_height = 0,
     };
 
     return SAIL_OK;
@@ -100,6 +120,7 @@ static void destroy_webp_state(struct webp_state *webp_state) {
         return;
     }
 
+    /* Load-specific cleanup. */
     if (webp_state->webp_iterator != NULL) {
         WebPDemuxReleaseIterator(webp_state->webp_iterator);
         sail_free(webp_state->webp_iterator);
@@ -110,6 +131,11 @@ static void destroy_webp_state(struct webp_state *webp_state) {
     WebPDemuxDelete(webp_state->webp_demux);
 
     sail_destroy_image(webp_state->canvas_image);
+
+    /* Save-specific cleanup. */
+    if (webp_state->anim_encoder != NULL) {
+        WebPAnimEncoderDelete(webp_state->anim_encoder);
+    }
 
     sail_free(webp_state);
 }
@@ -124,7 +150,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_webp(struct sail_io *io, const
 
     /* Allocate a new state. */
     struct webp_state *webp_state;
-    SAIL_TRY(alloc_webp_state(load_options, NULL, &webp_state));
+    SAIL_TRY(alloc_webp_state(io, load_options, NULL, &webp_state));
     *state = webp_state;
 
     /* Read the entire image. */
@@ -152,6 +178,29 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_webp(struct sail_io *io, const
     webp_state->background_color = WebPDemuxGetI(webp_state->webp_demux, WEBP_FF_BACKGROUND_COLOR);
     webp_state->frame_count      = WebPDemuxGetI(webp_state->webp_demux, WEBP_FF_FRAME_COUNT);
 
+    /* Get bitstream features. */
+    struct WebPBitstreamFeatures features;
+    if (WebPGetFeatures(webp_state->image_data, webp_state->image_data_size, &features) != VP8_STATUS_OK) {
+        SAIL_LOG_ERROR("WEBP: Failed to get bitstream features");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+    }
+
+    /* Validate format flags. */
+    const uint32_t format_flags = WebPDemuxGetI(webp_state->webp_demux, WEBP_FF_FORMAT_FLAGS);
+
+    if (features.has_alpha && !(format_flags & ALPHA_FLAG)) {
+        SAIL_LOG_WARNING("WEBP: Bitstream has alpha channel but ALPHA_FLAG is not set");
+    }
+    if (!features.has_alpha && (format_flags & ALPHA_FLAG)) {
+        SAIL_LOG_WARNING("WEBP: ALPHA_FLAG is set but bitstream has no alpha channel");
+    }
+    if (features.has_animation && !(format_flags & ANIMATION_FLAG)) {
+        SAIL_LOG_WARNING("WEBP: Bitstream has animation but ANIMATION_FLAG is not set");
+    }
+    if (!features.has_animation && (format_flags & ANIMATION_FLAG)) {
+        SAIL_LOG_WARNING("WEBP: ANIMATION_FLAG is set but bitstream has no animation");
+    }
+
     /* Construct a canvas image. */
     struct sail_image *image_local;
     SAIL_TRY(sail_alloc_image(&image_local));
@@ -160,7 +209,27 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_webp(struct sail_io *io, const
         SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
                             /* cleanup */ sail_destroy_image(image_local));
 
-        image_local->source_image->chroma_subsampling = SAIL_CHROMA_SUBSAMPLING_420;
+        /* Set source image properties based on bitstream features. */
+        if (features.format == 1) {
+            /* Lossy (VP8). */
+            image_local->source_image->pixel_format = features.has_alpha
+                                                        ? SAIL_PIXEL_FORMAT_BPP32_YUVA
+                                                        : SAIL_PIXEL_FORMAT_BPP24_YUV;
+            image_local->source_image->chroma_subsampling = SAIL_CHROMA_SUBSAMPLING_420;
+        } else if (features.format == 2) {
+            /* Lossless (VP8L). */
+            image_local->source_image->pixel_format = features.has_alpha
+                                                        ? SAIL_PIXEL_FORMAT_BPP32_RGBA
+                                                        : SAIL_PIXEL_FORMAT_BPP24_RGB;
+            image_local->source_image->chroma_subsampling = SAIL_CHROMA_SUBSAMPLING_444;
+        } else {
+            /* Mixed or undefined format. */
+            image_local->source_image->pixel_format = features.has_alpha
+                                                        ? SAIL_PIXEL_FORMAT_BPP32_RGBA
+                                                        : SAIL_PIXEL_FORMAT_BPP24_RGB;
+            image_local->source_image->chroma_subsampling = SAIL_CHROMA_SUBSAMPLING_UNKNOWN;
+        }
+
         image_local->source_image->compression = SAIL_COMPRESSION_WEBP;
     }
 
@@ -180,6 +249,12 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_webp(struct sail_io *io, const
     /* Fetch meta data. */
     if (webp_state->load_options->options & SAIL_OPTION_META_DATA) {
         SAIL_TRY_OR_CLEANUP(webp_private_fetch_meta_data(webp_state->webp_demux, &image_local->meta_data_node),
+                            /* cleanup */ sail_destroy_image(image_local));
+
+        /* Store loop count for animated images. */
+        SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&image_local->special_properties),
+                            /* cleanup */ sail_destroy_image(image_local));
+        SAIL_TRY_OR_CLEANUP(webp_private_store_loop_count(webp_state->webp_demux, image_local->special_properties),
                             /* cleanup */ sail_destroy_image(image_local));
     }
 
@@ -323,32 +398,181 @@ SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_webp(void **state) {
 
 SAIL_EXPORT sail_status_t sail_codec_save_init_v8_webp(struct sail_io *io, const struct sail_save_options *save_options, void **state) {
 
-    (void)io;
-    (void)save_options;
-    (void)state;
+    *state = NULL;
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
+    struct webp_state *webp_state;
+    SAIL_TRY(alloc_webp_state(io, NULL, save_options, &webp_state));
+    *state = webp_state;
+
+    /* Validate compression. */
+    if (webp_state->save_options->compression != SAIL_COMPRESSION_WEBP) {
+        SAIL_LOG_ERROR("WEBP: Only WEBP compression is allowed for saving");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_COMPRESSION);
+    }
+
+    return SAIL_OK;
 }
 
 SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_webp(void *state, const struct sail_image *image) {
 
-    (void)state;
-    (void)image;
+    struct webp_state *webp_state = state;
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
+    /* Validate pixel format. */
+    SAIL_TRY(webp_private_supported_write_pixel_format(image->pixel_format));
+
+    /* First frame - remember canvas dimensions. */
+    if (webp_state->is_first_frame) {
+        webp_state->canvas_width = image->width;
+        webp_state->canvas_height = image->height;
+    }
+
+    /* Validate dimensions match canvas. */
+    if (image->width != webp_state->canvas_width || image->height != webp_state->canvas_height) {
+        SAIL_LOG_ERROR("WEBP: All frames must have the same dimensions (%ux%u)", webp_state->canvas_width, webp_state->canvas_height);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_IMAGE_PROPERTY);
+    }
+
+    return SAIL_OK;
 }
 
 SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_webp(void *state, const struct sail_image *image) {
 
-    (void)state;
-    (void)image;
+    struct webp_state *webp_state = state;
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
+    /* Determine if this is an animation (has delay) or static image. */
+    const bool is_animation = (image->delay >= 0);
+
+    /* For animations, initialize WebPAnimEncoder on first frame. */
+    if (is_animation && webp_state->is_first_frame) {
+        struct WebPAnimEncoderOptions anim_options;
+        if (!WebPAnimEncoderOptionsInit(&anim_options)) {
+            SAIL_LOG_ERROR("WEBP: Failed to initialize animation encoder options");
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+        }
+
+        /* Set animation options. */
+        anim_options.anim_params.loop_count = 0; /* Default: infinite loop. */
+        anim_options.minimize_size = 1;
+        anim_options.allow_mixed = 1; /* Allow mixed lossy/lossless. */
+
+        webp_state->anim_encoder = WebPAnimEncoderNew(image->width, image->height, &anim_options);
+        if (webp_state->anim_encoder == NULL) {
+            SAIL_LOG_ERROR("WEBP: Failed to create animation encoder");
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+        }
+    }
+
+    /* Initialize WebPConfig. */
+    struct WebPConfig config;
+    if (!WebPConfigInit(&config)) {
+        SAIL_LOG_ERROR("WEBP: Failed to initialize WebP config");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+    }
+
+    /* Set quality from compression level (0-100). */
+    float quality = 75.0f; /* Default quality. */
+    if (webp_state->save_options->compression_level >= 0 && webp_state->save_options->compression_level <= 100) {
+        quality = (float)webp_state->save_options->compression_level;
+    }
+
+    config.quality = quality;
+    config.method = 4; /* Compression method (0=fast, 6=slow). */
+
+    if (!WebPValidateConfig(&config)) {
+        SAIL_LOG_ERROR("WEBP: Invalid WebP config");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+    }
+
+    /* Initialize WebPPicture. */
+    struct WebPPicture picture;
+    if (!WebPPictureInit(&picture)) {
+        SAIL_LOG_ERROR("WEBP: Failed to initialize WebP picture");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+    }
+
+    picture.width = image->width;
+    picture.height = image->height;
+    picture.use_argb = 1; /* Use ARGB format for encoding. */
+
+    /* Import pixels. */
+    SAIL_TRY_OR_CLEANUP(webp_private_import_pixels(&picture, image),
+                        /* cleanup */ WebPPictureFree(&picture));
+
+    /* Encode frame. */
+    if (is_animation) {
+        /* Add frame to animation encoder. */
+        if (!WebPAnimEncoderAdd(webp_state->anim_encoder, &picture, webp_state->timestamp_ms, &config)) {
+            WebPPictureFree(&picture);
+            SAIL_LOG_ERROR("WEBP: Failed to add frame to animation");
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+        }
+
+        webp_state->timestamp_ms += (image->delay > 0) ? image->delay : 100;
+    } else {
+        /* Static image - use WebPMemoryWriter to accumulate data. */
+        struct WebPMemoryWriter writer;
+        WebPMemoryWriterInit(&writer);
+
+        picture.writer = WebPMemoryWrite;
+        picture.custom_ptr = &writer;
+
+        if (!WebPEncode(&config, &picture)) {
+            WebPMemoryWriterClear(&writer);
+            WebPPictureFree(&picture);
+            SAIL_LOG_ERROR("WEBP: Failed to encode image");
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+        }
+
+        /* Write encoded data to output. */
+        SAIL_TRY_OR_CLEANUP(webp_state->io->strict_write(webp_state->io->stream, writer.mem, writer.size),
+                            /* cleanup */ WebPMemoryWriterClear(&writer);
+                                          WebPPictureFree(&picture));
+
+        WebPMemoryWriterClear(&writer);
+    }
+
+    WebPPictureFree(&picture);
+
+    webp_state->is_first_frame = false;
+
+    return SAIL_OK;
 }
 
 SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_webp(void **state) {
 
-    (void)state;
+    struct webp_state *webp_state = *state;
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
+    *state = NULL;
+
+    /* For animations, finalize and write the output. */
+    if (webp_state->anim_encoder != NULL) {
+        /* Add NULL frame to signal end of animation. */
+        if (!WebPAnimEncoderAdd(webp_state->anim_encoder, NULL, webp_state->timestamp_ms, NULL)) {
+            destroy_webp_state(webp_state);
+            SAIL_LOG_ERROR("WEBP: Failed to finalize animation");
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+        }
+
+        /* Assemble animation into WebPData. */
+        struct WebPData webp_data;
+        WebPDataInit(&webp_data);
+
+        if (!WebPAnimEncoderAssemble(webp_state->anim_encoder, &webp_data)) {
+            WebPDataClear(&webp_data);
+            destroy_webp_state(webp_state);
+            SAIL_LOG_ERROR("WEBP: Failed to assemble animation");
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+        }
+
+        /* Write animation data to output. */
+        SAIL_TRY_OR_CLEANUP(webp_state->io->strict_write(webp_state->io->stream, webp_data.bytes, webp_data.size),
+                            /* cleanup */ WebPDataClear(&webp_data);
+                                          destroy_webp_state(webp_state));
+
+        WebPDataClear(&webp_data);
+    }
+
+    destroy_webp_state(webp_state);
+
+    return SAIL_OK;
 }

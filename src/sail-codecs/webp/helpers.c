@@ -25,6 +25,8 @@
 
 #include <string.h>
 
+#include <webp/encode.h>
+
 #include <sail-common/sail-common.h>
 
 #include "helpers.h"
@@ -138,6 +140,171 @@ sail_status_t webp_private_fetch_meta_data(WebPDemuxer *webp_demux, struct sail_
 
             *last_meta_data_node = meta_data_node;
             last_meta_data_node = &meta_data_node->next;
+        }
+    }
+
+    return SAIL_OK;
+}
+
+sail_status_t webp_private_store_loop_count(WebPDemuxer *webp_demux, struct sail_hash_map *special_properties) {
+
+    SAIL_CHECK_PTR(webp_demux);
+    SAIL_CHECK_PTR(special_properties);
+
+    const uint32_t webp_flags = WebPDemuxGetI(webp_demux, WEBP_FF_FORMAT_FLAGS);
+
+    /* Only set loop count for animated images. */
+    if (webp_flags & ANIMATION_FLAG) {
+        const uint32_t loop_count = WebPDemuxGetI(webp_demux, WEBP_FF_LOOP_COUNT);
+
+        struct sail_variant *variant;
+        SAIL_TRY(sail_alloc_variant(&variant));
+
+        SAIL_LOG_TRACE("WEBP: Loop count: %u", loop_count);
+        sail_set_variant_unsigned_int(variant, loop_count);
+        sail_put_hash_map(special_properties, "webp-loop-count", variant);
+
+        sail_destroy_variant(variant);
+    }
+
+    return SAIL_OK;
+}
+
+sail_status_t webp_private_supported_write_pixel_format(enum SailPixelFormat pixel_format) {
+
+    switch (pixel_format) {
+        case SAIL_PIXEL_FORMAT_BPP24_RGB:
+        case SAIL_PIXEL_FORMAT_BPP24_BGR:
+        case SAIL_PIXEL_FORMAT_BPP32_RGBA:
+        case SAIL_PIXEL_FORMAT_BPP32_BGRA:
+        case SAIL_PIXEL_FORMAT_BPP32_ARGB:
+        case SAIL_PIXEL_FORMAT_BPP32_ABGR: {
+            return SAIL_OK;
+        }
+        default: {
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+        }
+    }
+}
+
+sail_status_t webp_private_convert_argb_to_rgba(const uint8_t *pixels, unsigned width, unsigned height,
+                                                  unsigned stride, void **rgba_pixels) {
+
+    SAIL_CHECK_PTR(pixels);
+    SAIL_CHECK_PTR(rgba_pixels);
+
+    SAIL_TRY(sail_malloc((size_t)stride * height, rgba_pixels));
+
+    /* Convert ARGB to RGBA. */
+    for (unsigned y = 0; y < height; y++) {
+        const uint8_t *src = pixels + y * stride;
+        uint8_t *dst = (uint8_t *)*rgba_pixels + y * stride;
+        for (unsigned x = 0; x < width; x++) {
+            dst[0] = src[1]; /* R */
+            dst[1] = src[2]; /* G */
+            dst[2] = src[3]; /* B */
+            dst[3] = src[0]; /* A */
+            src += 4;
+            dst += 4;
+        }
+    }
+
+    return SAIL_OK;
+}
+
+sail_status_t webp_private_convert_abgr_to_rgba(const uint8_t *pixels, unsigned width, unsigned height,
+                                                  unsigned stride, void **rgba_pixels) {
+
+    SAIL_CHECK_PTR(pixels);
+    SAIL_CHECK_PTR(rgba_pixels);
+
+    SAIL_TRY(sail_malloc((size_t)stride * height, rgba_pixels));
+
+    /* Convert ABGR to RGBA. */
+    for (unsigned y = 0; y < height; y++) {
+        const uint8_t *src = pixels + y * stride;
+        uint8_t *dst = (uint8_t *)*rgba_pixels + y * stride;
+        for (unsigned x = 0; x < width; x++) {
+            dst[0] = src[3]; /* R */
+            dst[1] = src[2]; /* G */
+            dst[2] = src[1]; /* B */
+            dst[3] = src[0]; /* A */
+            src += 4;
+            dst += 4;
+        }
+    }
+
+    return SAIL_OK;
+}
+
+sail_status_t webp_private_import_pixels(struct WebPPicture *picture, const struct sail_image *image) {
+
+    SAIL_CHECK_PTR(picture);
+    SAIL_CHECK_PTR(image);
+
+    const uint8_t *pixels = (const uint8_t *)image->pixels;
+    const int stride = image->bytes_per_line;
+
+    switch (image->pixel_format) {
+        case SAIL_PIXEL_FORMAT_BPP24_RGB: {
+            if (!WebPPictureImportRGB(picture, pixels, stride)) {
+                SAIL_LOG_ERROR("WEBP: Failed to import RGB pixels");
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+            }
+            break;
+        }
+        case SAIL_PIXEL_FORMAT_BPP24_BGR: {
+            if (!WebPPictureImportBGR(picture, pixels, stride)) {
+                SAIL_LOG_ERROR("WEBP: Failed to import BGR pixels");
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+            }
+            break;
+        }
+        case SAIL_PIXEL_FORMAT_BPP32_RGBA: {
+            if (!WebPPictureImportRGBA(picture, pixels, stride)) {
+                SAIL_LOG_ERROR("WEBP: Failed to import RGBA pixels");
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+            }
+            break;
+        }
+        case SAIL_PIXEL_FORMAT_BPP32_BGRA: {
+            if (!WebPPictureImportBGRA(picture, pixels, stride)) {
+                SAIL_LOG_ERROR("WEBP: Failed to import BGRA pixels");
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+            }
+            break;
+        }
+        case SAIL_PIXEL_FORMAT_BPP32_ARGB: {
+            /* WebP doesn't have direct ARGB import, need to convert to RGBA. */
+            void *rgba_pixels;
+            SAIL_TRY(webp_private_convert_argb_to_rgba(pixels, image->width, image->height, stride, &rgba_pixels));
+
+            const int import_result = WebPPictureImportRGBA(picture, rgba_pixels, stride);
+            sail_free(rgba_pixels);
+
+            if (!import_result) {
+                SAIL_LOG_ERROR("WEBP: Failed to import ARGB pixels");
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+            }
+            break;
+        }
+        case SAIL_PIXEL_FORMAT_BPP32_ABGR: {
+            /* WebP doesn't have direct ABGR import, need to convert to RGBA. */
+            void *rgba_pixels;
+            SAIL_TRY(webp_private_convert_abgr_to_rgba(pixels, image->width, image->height, stride, &rgba_pixels));
+
+            const int import_result = WebPPictureImportRGBA(picture, rgba_pixels, stride);
+            sail_free(rgba_pixels);
+
+            if (!import_result) {
+                SAIL_LOG_ERROR("WEBP: Failed to import ABGR pixels");
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+            }
+            break;
+        }
+        default: {
+            SAIL_LOG_ERROR("WEBP: Unsupported pixel format for writing");
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
         }
     }
 
