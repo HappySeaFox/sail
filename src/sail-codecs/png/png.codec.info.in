@@ -12,7 +12,7 @@ mime-types=image/png
 
 [load-features]
 features=STATIC@PNG_CODEC_INFO_FEATURE_ANIMATED@;META-DATA;INTERLACED;ICCP;SOURCE-IMAGE
-tuning=png-filter
+tuning=
 
 [save-features]
 features=STATIC;META-DATA;INTERLACED;ICCP
@@ -23,4 +23,4 @@ compression-level-min=1
 compression-level-max=9
 compression-level-default=6
 compression-level-step=1
-tuning=
+tuning=png-filter
