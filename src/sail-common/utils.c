@@ -492,6 +492,31 @@ bool sail_is_rgb_family(enum SailPixelFormat pixel_format) {
     }
 }
 
+bool sail_is_cmyk(enum SailPixelFormat pixel_format) {
+
+    switch (pixel_format) {
+        case SAIL_PIXEL_FORMAT_BPP32_CMYK:
+        case SAIL_PIXEL_FORMAT_BPP64_CMYK:
+        case SAIL_PIXEL_FORMAT_BPP40_CMYKA:
+        case SAIL_PIXEL_FORMAT_BPP80_CMYKA: {
+            return true;
+        }
+        default: {
+            return false;
+        }
+    }
+}
+
+bool sail_is_ycbcr(enum SailPixelFormat pixel_format) {
+
+    return pixel_format == SAIL_PIXEL_FORMAT_BPP24_YCBCR;
+}
+
+bool sail_is_ycck(enum SailPixelFormat pixel_format) {
+
+    return pixel_format == SAIL_PIXEL_FORMAT_BPP32_YCCK;
+}
+
 void sail_print_errno(const char *format) {
 
     if (strstr(format, "%s") == NULL) {
