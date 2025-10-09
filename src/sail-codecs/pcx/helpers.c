@@ -161,3 +161,93 @@ sail_status_t pcx_private_read_uncompressed(struct sail_io *io, unsigned bytes_p
 
     return SAIL_OK;
 }
+
+sail_status_t pcx_private_write_header(struct sail_io *io, const struct SailPcxHeader *header) {
+
+    SAIL_TRY(io->strict_write(io->stream, &header->id,             sizeof(header->id)));
+    SAIL_TRY(io->strict_write(io->stream, &header->version,        sizeof(header->version)));
+    SAIL_TRY(io->strict_write(io->stream, &header->encoding,       sizeof(header->encoding)));
+    SAIL_TRY(io->strict_write(io->stream, &header->bits_per_plane, sizeof(header->bits_per_plane)));
+    SAIL_TRY(io->strict_write(io->stream, &header->xmin,           sizeof(header->xmin)));
+    SAIL_TRY(io->strict_write(io->stream, &header->ymin,           sizeof(header->ymin)));
+    SAIL_TRY(io->strict_write(io->stream, &header->xmax,           sizeof(header->xmax)));
+    SAIL_TRY(io->strict_write(io->stream, &header->ymax,           sizeof(header->ymax)));
+    SAIL_TRY(io->strict_write(io->stream, &header->hdpi,           sizeof(header->hdpi)));
+    SAIL_TRY(io->strict_write(io->stream, &header->vdpi,           sizeof(header->vdpi)));
+    SAIL_TRY(io->strict_write(io->stream, header->palette,         sizeof(header->palette)));
+    SAIL_TRY(io->strict_write(io->stream, &header->reserved,       sizeof(header->reserved)));
+    SAIL_TRY(io->strict_write(io->stream, &header->planes,         sizeof(header->planes)));
+    SAIL_TRY(io->strict_write(io->stream, &header->bytes_per_line, sizeof(header->bytes_per_line)));
+    SAIL_TRY(io->strict_write(io->stream, &header->palette_info,   sizeof(header->palette_info)));
+    SAIL_TRY(io->strict_write(io->stream, &header->hscreen_size,   sizeof(header->hscreen_size)));
+    SAIL_TRY(io->strict_write(io->stream, &header->vscreen_size,   sizeof(header->vscreen_size)));
+    SAIL_TRY(io->strict_write(io->stream, header->filler,          sizeof(header->filler)));
+
+    return SAIL_OK;
+}
+
+sail_status_t pcx_private_pixel_format_to_pcx_format(enum SailPixelFormat pixel_format, uint8_t *bits_per_plane, uint8_t *planes) {
+
+    switch (pixel_format) {
+        case SAIL_PIXEL_FORMAT_BPP1_INDEXED: {
+            *bits_per_plane = 1;
+            *planes = 1;
+            return SAIL_OK;
+        }
+        case SAIL_PIXEL_FORMAT_BPP4_INDEXED: {
+            *bits_per_plane = 1;
+            *planes = 4;
+            return SAIL_OK;
+        }
+        case SAIL_PIXEL_FORMAT_BPP8_INDEXED: {
+            *bits_per_plane = 8;
+            *planes = 1;
+            return SAIL_OK;
+        }
+        case SAIL_PIXEL_FORMAT_BPP24_RGB: {
+            *bits_per_plane = 8;
+            *planes = 3;
+            return SAIL_OK;
+        }
+        case SAIL_PIXEL_FORMAT_BPP32_RGBA: {
+            *bits_per_plane = 8;
+            *planes = 4;
+            return SAIL_OK;
+        }
+        default: {
+            SAIL_LOG_ERROR("PCX: Pixel format %s is not supported for saving", sail_pixel_format_to_string(pixel_format));
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+        }
+    }
+}
+
+void pcx_private_palette_to_rgb(const struct sail_palette *palette, unsigned char *rgb_output, unsigned color_count) {
+
+    if (palette->pixel_format == SAIL_PIXEL_FORMAT_BPP24_RGB) {
+        memcpy(rgb_output, palette->data, color_count * 3);
+    } else {
+        /* Convert RGBA to RGB. */
+        const unsigned char *src = (const unsigned char *)palette->data;
+        for (unsigned i = 0; i < color_count; i++) {
+            rgb_output[i * 3 + 0] = src[i * 4 + 0];
+            rgb_output[i * 3 + 1] = src[i * 4 + 1];
+            rgb_output[i * 3 + 2] = src[i * 4 + 2];
+        }
+    }
+}
+
+sail_status_t pcx_private_write_palette(struct sail_io *io, const struct sail_palette *palette) {
+
+    /* Write 256-color palette signature. */
+    uint8_t signature = SAIL_PCX_PALETTE_SIGNATURE;
+    SAIL_TRY(io->strict_write(io->stream, &signature, sizeof(signature)));
+
+    /* Write palette data (256 RGB entries). PCX always requires exactly 256 entries.
+     * If palette has fewer colors, pad with zeros. */
+    unsigned char rgb[768]; /* 256 * 3 */
+    memset(rgb, 0, sizeof(rgb));
+    pcx_private_palette_to_rgb(palette, rgb, palette->color_count);
+    SAIL_TRY(io->strict_write(io->stream, rgb, sizeof(rgb)));
+
+    return SAIL_OK;
+}
