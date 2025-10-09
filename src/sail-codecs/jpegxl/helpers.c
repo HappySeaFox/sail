@@ -26,6 +26,7 @@
 #include <stddef.h> /* size_t */
 #include <string.h> /* memmove */
 
+#include <jxl/encode.h>
 #include <jxl/version.h>
 
 #include <sail-common/sail-common.h>
@@ -334,4 +335,248 @@ sail_status_t jpegxl_private_fetch_metadata(JxlDecoder *decoder, struct sail_met
     *meta_data_node = meta_data_node_local;
 
     return SAIL_OK;
+}
+
+sail_status_t jpegxl_private_write_output(JxlEncoder *encoder, struct sail_io *io, unsigned char *buffer, size_t buffer_size) {
+
+    uint8_t *next_out = buffer;
+    size_t avail_out = buffer_size;
+
+    JxlEncoderStatus status;
+
+    do {
+        status = JxlEncoderProcessOutput(encoder, &next_out, &avail_out);
+
+        if (status == JXL_ENC_NEED_MORE_OUTPUT) {
+            /* Write the filled buffer. */
+            size_t bytes_written = buffer_size - avail_out;
+            SAIL_TRY(io->strict_write(io->stream, buffer, bytes_written));
+
+            next_out = buffer;
+            avail_out = buffer_size;
+        } else if (status == JXL_ENC_SUCCESS) {
+            /* Write any remaining data. */
+            size_t bytes_written = buffer_size - avail_out;
+            if (bytes_written > 0) {
+                SAIL_TRY(io->strict_write(io->stream, buffer, bytes_written));
+            }
+            return SAIL_OK;
+        } else if (status == JXL_ENC_ERROR) {
+            JxlEncoderError error = JxlEncoderGetError(encoder);
+            SAIL_LOG_ERROR("JPEGXL: Encoder error %d", error);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+        } else {
+            SAIL_LOG_ERROR("JPEGXL: Unexpected encoder status %d", status);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+        }
+    } while (true);
+}
+
+sail_status_t jpegxl_private_pixel_format_to_jxl_basic_info(enum SailPixelFormat pixel_format,
+                                                              JxlBasicInfo *basic_info,
+                                                              JxlPixelFormat *jxl_pixel_format) {
+
+    JxlEncoderInitBasicInfo(basic_info);
+
+    jxl_pixel_format->endianness = JXL_NATIVE_ENDIAN;
+    jxl_pixel_format->align = 0;
+
+    switch(pixel_format) {
+        case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE: {
+            basic_info->bits_per_sample = 8;
+            basic_info->num_color_channels = 1;
+            basic_info->alpha_bits = 0;
+            jxl_pixel_format->num_channels = 1;
+            jxl_pixel_format->data_type = JXL_TYPE_UINT8;
+            return SAIL_OK;
+        }
+        case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE: {
+            basic_info->bits_per_sample = 16;
+            basic_info->num_color_channels = 1;
+            basic_info->alpha_bits = 0;
+            jxl_pixel_format->num_channels = 1;
+            jxl_pixel_format->data_type = JXL_TYPE_UINT16;
+            return SAIL_OK;
+        }
+        case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA: {
+            basic_info->bits_per_sample = 8;
+            basic_info->num_color_channels = 1;
+            basic_info->alpha_bits = 8;
+            basic_info->num_extra_channels = 1;
+            jxl_pixel_format->num_channels = 2;
+            jxl_pixel_format->data_type = JXL_TYPE_UINT8;
+            return SAIL_OK;
+        }
+        case SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA: {
+            basic_info->bits_per_sample = 16;
+            basic_info->num_color_channels = 1;
+            basic_info->alpha_bits = 16;
+            basic_info->num_extra_channels = 1;
+            jxl_pixel_format->num_channels = 2;
+            jxl_pixel_format->data_type = JXL_TYPE_UINT16;
+            return SAIL_OK;
+        }
+        case SAIL_PIXEL_FORMAT_BPP24_RGB: {
+            basic_info->bits_per_sample = 8;
+            basic_info->num_color_channels = 3;
+            basic_info->alpha_bits = 0;
+            jxl_pixel_format->num_channels = 3;
+            jxl_pixel_format->data_type = JXL_TYPE_UINT8;
+            return SAIL_OK;
+        }
+        case SAIL_PIXEL_FORMAT_BPP48_RGB: {
+            basic_info->bits_per_sample = 16;
+            basic_info->num_color_channels = 3;
+            basic_info->alpha_bits = 0;
+            jxl_pixel_format->num_channels = 3;
+            jxl_pixel_format->data_type = JXL_TYPE_UINT16;
+            return SAIL_OK;
+        }
+        case SAIL_PIXEL_FORMAT_BPP32_RGBA: {
+            basic_info->bits_per_sample = 8;
+            basic_info->num_color_channels = 3;
+            basic_info->alpha_bits = 8;
+            basic_info->num_extra_channels = 1;
+            jxl_pixel_format->num_channels = 4;
+            jxl_pixel_format->data_type = JXL_TYPE_UINT8;
+            return SAIL_OK;
+        }
+        case SAIL_PIXEL_FORMAT_BPP64_RGBA: {
+            basic_info->bits_per_sample = 16;
+            basic_info->num_color_channels = 3;
+            basic_info->alpha_bits = 16;
+            basic_info->num_extra_channels = 1;
+            jxl_pixel_format->num_channels = 4;
+            jxl_pixel_format->data_type = JXL_TYPE_UINT16;
+            return SAIL_OK;
+        }
+        default: {
+            SAIL_LOG_ERROR("JPEGXL: %s pixel format is not supported for saving", sail_pixel_format_to_string(pixel_format));
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+        }
+    }
+}
+
+bool jpegxl_private_encoder_tuning_key_value_callback(const char *key, const struct sail_variant *value, void *user_data) {
+
+    JxlEncoderFrameSettings *frame_settings = user_data;
+
+    if (strcmp(key, "jpegxl-effort") == 0) {
+        if (value->type == SAIL_VARIANT_TYPE_INT) {
+            int64_t effort = sail_variant_to_int(value);
+            if (effort >= 1 && effort <= 9) {
+                SAIL_LOG_TRACE("JPEGXL: Setting effort to %lld", (long long)effort);
+                JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_EFFORT, effort);
+            }
+        }
+    } else if (strcmp(key, "jpegxl-decoding-speed") == 0) {
+        if (value->type == SAIL_VARIANT_TYPE_INT) {
+            int64_t speed = sail_variant_to_int(value);
+            if (speed >= 0 && speed <= 4) {
+                SAIL_LOG_TRACE("JPEGXL: Setting decoding speed to %lld", (long long)speed);
+                JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_DECODING_SPEED, speed);
+            }
+        }
+    } else if (strcmp(key, "jpegxl-modular") == 0) {
+        if (value->type == SAIL_VARIANT_TYPE_INT) {
+            int64_t modular = sail_variant_to_int(value);
+            if (modular >= -1 && modular <= 1) {
+                SAIL_LOG_TRACE("JPEGXL: Setting modular to %lld", (long long)modular);
+                JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_MODULAR, modular);
+            }
+        }
+    } else if (strcmp(key, "jpegxl-progressive-ac") == 0) {
+        if (value->type == SAIL_VARIANT_TYPE_INT) {
+            int64_t progressive = sail_variant_to_int(value);
+            if (progressive >= -1 && progressive <= 1) {
+                SAIL_LOG_TRACE("JPEGXL: Setting progressive-ac to %lld", (long long)progressive);
+                JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_PROGRESSIVE_AC, progressive);
+            }
+        }
+    } else if (strcmp(key, "jpegxl-progressive-dc") == 0) {
+        if (value->type == SAIL_VARIANT_TYPE_INT) {
+            int64_t progressive = sail_variant_to_int(value);
+            if (progressive >= -1 && progressive <= 2) {
+                SAIL_LOG_TRACE("JPEGXL: Setting progressive-dc to %lld", (long long)progressive);
+                JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_PROGRESSIVE_DC, progressive);
+            }
+        }
+    } else if (strcmp(key, "jpegxl-responsive") == 0) {
+        if (value->type == SAIL_VARIANT_TYPE_INT) {
+            int64_t responsive = sail_variant_to_int(value);
+            if (responsive >= -1 && responsive <= 1) {
+                SAIL_LOG_TRACE("JPEGXL: Setting responsive to %lld", (long long)responsive);
+                JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_RESPONSIVE, responsive);
+            }
+        }
+    } else if (strcmp(key, "jpegxl-epf") == 0) {
+        if (value->type == SAIL_VARIANT_TYPE_INT) {
+            int64_t epf = sail_variant_to_int(value);
+            if (epf >= -1 && epf <= 3) {
+                SAIL_LOG_TRACE("JPEGXL: Setting EPF to %lld", (long long)epf);
+                JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_EPF, epf);
+            }
+        }
+    } else if (strcmp(key, "jpegxl-gaborish") == 0) {
+        if (value->type == SAIL_VARIANT_TYPE_INT) {
+            int64_t gaborish = sail_variant_to_int(value);
+            if (gaborish >= -1 && gaborish <= 1) {
+                SAIL_LOG_TRACE("JPEGXL: Setting gaborish to %lld", (long long)gaborish);
+                JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_GABORISH, gaborish);
+            }
+        }
+    } else if (strcmp(key, "jpegxl-photon-noise") == 0) {
+        if (value->type == SAIL_VARIANT_TYPE_INT) {
+            int64_t noise = sail_variant_to_int(value);
+            if (noise >= 0) {
+                SAIL_LOG_TRACE("JPEGXL: Setting photon noise to %lld", (long long)noise);
+                JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_PHOTON_NOISE, noise);
+            }
+        }
+    } else if (strcmp(key, "jpegxl-modular-predictor") == 0) {
+        if (value->type == SAIL_VARIANT_TYPE_INT) {
+            int64_t predictor = sail_variant_to_int(value);
+            if (predictor >= -1 && predictor <= 15) {
+                SAIL_LOG_TRACE("JPEGXL: Setting modular predictor to %lld", (long long)predictor);
+                JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_MODULAR_PREDICTOR, predictor);
+            }
+        }
+    } else if (strcmp(key, "jpegxl-palette-colors") == 0) {
+        if (value->type == SAIL_VARIANT_TYPE_INT) {
+            int64_t colors = sail_variant_to_int(value);
+            SAIL_LOG_TRACE("JPEGXL: Setting palette colors to %lld", (long long)colors);
+            JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_PALETTE_COLORS, colors);
+        }
+    } else if (strcmp(key, "jpegxl-resampling") == 0) {
+        if (value->type == SAIL_VARIANT_TYPE_INT) {
+            int64_t resampling = sail_variant_to_int(value);
+            if (resampling >= -1 && (resampling == -1 || resampling == 1 || resampling == 2 || resampling == 4 || resampling == 8)) {
+                SAIL_LOG_TRACE("JPEGXL: Setting resampling to %lld", (long long)resampling);
+                JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_RESAMPLING, resampling);
+            }
+        }
+    }
+
+    return true;
+}
+
+bool jpegxl_private_decoder_tuning_key_value_callback(const char *key, const struct sail_variant *value, void *user_data) {
+
+    JxlDecoder *decoder = user_data;
+
+    if (strcmp(key, "jpegxl-desired-intensity-target") == 0) {
+        if (value->type == SAIL_VARIANT_TYPE_FLOAT) {
+            float intensity = sail_variant_to_float(value);
+            SAIL_LOG_TRACE("JPEGXL: Setting desired intensity target to %.1f", intensity);
+            JxlDecoderSetDesiredIntensityTarget(decoder, intensity);
+        }
+    } else if (strcmp(key, "jpegxl-render-spotcolors") == 0) {
+        if (value->type == SAIL_VARIANT_TYPE_BOOL) {
+            bool render = sail_variant_to_bool(value);
+            SAIL_LOG_TRACE("JPEGXL: Setting render spotcolors to %s", render ? "true" : "false");
+            JxlDecoderSetRenderSpotcolors(decoder, render ? JXL_TRUE : JXL_FALSE);
+        }
+    }
+
+    return true;
 }

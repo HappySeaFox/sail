@@ -30,12 +30,21 @@
 #include <stdlib.h>
 
 #include <jxl/decode.h>
+#include <jxl/encode.h>
 #include <jxl/resizable_parallel_runner.h>
 
 #include <sail-common/sail-common.h>
 
 #include "helpers.h"
 #include "memory.h"
+
+/*
+ * Codec-specific data types.
+ */
+
+static const double COMPRESSION_MIN     = 0;
+static const double COMPRESSION_MAX     = 100;
+static const double COMPRESSION_DEFAULT = 75;
 
 /*
  * Codec-specific state.
@@ -53,9 +62,14 @@ struct jpegxl_state {
     JxlMemoryManager *memory_manager;
     void *runner;
     JxlDecoder *decoder;
+    JxlEncoder *encoder;
+    JxlEncoderFrameSettings *frame_settings;
     /* For progressive reading. */
     unsigned char *buffer;
     size_t buffer_size;
+    bool frame_saved;
+    unsigned current_frame;
+    bool is_animation;
 };
 
 static sail_status_t alloc_jpegxl_state(struct sail_io *io,
@@ -99,8 +113,13 @@ static sail_status_t alloc_jpegxl_state(struct sail_io *io,
         .memory_manager    = memory_manager,
         .runner            = NULL,
         .decoder           = NULL,
+        .encoder           = NULL,
+        .frame_settings    = NULL,
         .buffer            = buffer,
         .buffer_size       = buffer_size,
+        .frame_saved       = false,
+        .current_frame     = 0,
+        .is_animation      = false,
     };
 
     return SAIL_OK;
@@ -118,8 +137,16 @@ static void destroy_jpegxl_state(struct jpegxl_state *jpegxl_state) {
     sail_free(jpegxl_state->memory_manager);
 
     JxlResizableParallelRunnerDestroy(jpegxl_state->runner);
-    JxlDecoderCloseInput(jpegxl_state->decoder);
-    JxlDecoderDestroy(jpegxl_state->decoder);
+
+    if (jpegxl_state->decoder != NULL) {
+        JxlDecoderCloseInput(jpegxl_state->decoder);
+        JxlDecoderDestroy(jpegxl_state->decoder);
+    }
+
+    if (jpegxl_state->encoder != NULL) {
+        JxlEncoderDestroy(jpegxl_state->encoder);
+    }
+
     sail_free(jpegxl_state->buffer);
 
     sail_free(jpegxl_state);
@@ -161,6 +188,13 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_jpegxl(struct sail_io *io, con
                                     jpegxl_state->runner) != JXL_DEC_SUCCESS) {
         SAIL_LOG_ERROR("JPEGXL: Failed to set parallel runner");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+    }
+
+    /* Handle decoder tuning. */
+    if (jpegxl_state->load_options->tuning != NULL) {
+        sail_traverse_hash_map_with_user_data(jpegxl_state->load_options->tuning,
+                                                jpegxl_private_decoder_tuning_key_value_callback,
+                                                jpegxl_state->decoder);
     }
 
     return SAIL_OK;
@@ -412,32 +446,180 @@ SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_jpegxl(void **state) {
 
 SAIL_EXPORT sail_status_t sail_codec_save_init_v8_jpegxl(struct sail_io *io, const struct sail_save_options *save_options, void **state) {
 
-    (void)io;
-    (void)save_options;
-    (void)state;
+    *state = NULL;
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
+    /* Allocate a new state. */
+    struct jpegxl_state *jpegxl_state;
+    SAIL_TRY(alloc_jpegxl_state(io, NULL, save_options, &jpegxl_state));
+    *state = jpegxl_state;
+
+    /* Sanity check. */
+    if (jpegxl_state->save_options->compression != SAIL_COMPRESSION_JPEG_XL) {
+        SAIL_LOG_ERROR("JPEGXL: Only JPEG-XL compression is allowed for saving");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_COMPRESSION);
+    }
+
+    /* Init encoder. */
+    jpegxl_state->runner  = JxlResizableParallelRunnerCreate(jpegxl_state->memory_manager);
+    jpegxl_state->encoder = JxlEncoderCreate(jpegxl_state->memory_manager);
+
+    if (jpegxl_state->encoder == NULL) {
+        SAIL_LOG_ERROR("JPEGXL: Failed to create encoder");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+    }
+
+    /* Use container format. */
+    if (JxlEncoderUseContainer(jpegxl_state->encoder, JXL_TRUE) != JXL_ENC_SUCCESS) {
+        SAIL_LOG_ERROR("JPEGXL: Failed to set use container");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+    }
+
+    if (JxlEncoderSetParallelRunner(jpegxl_state->encoder,
+                                    JxlResizableParallelRunner,
+                                    jpegxl_state->runner) != JXL_ENC_SUCCESS) {
+        SAIL_LOG_ERROR("JPEGXL: Failed to set parallel runner");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+    }
+
+    return SAIL_OK;
 }
 
 SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_jpegxl(void *state, const struct sail_image *image) {
 
-    (void)state;
-    (void)image;
+    struct jpegxl_state *jpegxl_state = state;
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
+    /* Set basic info and color encoding on first frame. */
+    if (jpegxl_state->current_frame == 0) {
+        /* Validate pixel format and convert to JXL format. */
+        JxlBasicInfo basic_info;
+        JxlPixelFormat pixel_format;
+
+        SAIL_TRY(jpegxl_private_pixel_format_to_jxl_basic_info(image->pixel_format, &basic_info, &pixel_format));
+
+        /* Set image dimensions. */
+        basic_info.xsize = image->width;
+        basic_info.ysize = image->height;
+
+        /* Check if this is animation. */
+        if (image->delay > 0) {
+            jpegxl_state->is_animation = true;
+            basic_info.have_animation = JXL_TRUE;
+            basic_info.animation.tps_numerator = 1000;
+            basic_info.animation.tps_denominator = 1;
+            basic_info.animation.num_loops = 0;
+        }
+
+        if (JxlEncoderSetBasicInfo(jpegxl_state->encoder, &basic_info) != JXL_ENC_SUCCESS) {
+            SAIL_LOG_ERROR("JPEGXL: Failed to set basic info");
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+        }
+
+        /* Set ICC profile if provided, otherwise set color encoding to sRGB. */
+        if (jpegxl_state->save_options->options & SAIL_OPTION_ICCP && image->iccp != NULL) {
+            if (JxlEncoderSetICCProfile(jpegxl_state->encoder, image->iccp->data, image->iccp->size) != JXL_ENC_SUCCESS) {
+                SAIL_LOG_WARNING("JPEGXL: Failed to set ICC profile");
+            }
+        } else {
+            JxlColorEncoding color_encoding;
+            JxlColorEncodingSetToSRGB(&color_encoding, pixel_format.num_channels < 3);
+
+            if (JxlEncoderSetColorEncoding(jpegxl_state->encoder, &color_encoding) != JXL_ENC_SUCCESS) {
+                SAIL_LOG_ERROR("JPEGXL: Failed to set color encoding");
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+            }
+        }
+
+        /* Create frame settings. */
+        jpegxl_state->frame_settings = JxlEncoderFrameSettingsCreate(jpegxl_state->encoder, NULL);
+
+        /* Set compression quality. */
+        const double compression = (jpegxl_state->save_options->compression_level < COMPRESSION_MIN ||
+                                    jpegxl_state->save_options->compression_level > COMPRESSION_MAX)
+                                    ? COMPRESSION_DEFAULT
+                                    : jpegxl_state->save_options->compression_level;
+
+        /* Convert compression level (0-100) to distance (0-15, lower is better quality). */
+        const float distance = (float)((COMPRESSION_MAX - compression) / COMPRESSION_MAX * 15.0);
+
+        if (JxlEncoderSetFrameDistance(jpegxl_state->frame_settings, distance) != JXL_ENC_SUCCESS) {
+            SAIL_LOG_ERROR("JPEGXL: Failed to set frame distance");
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+        }
+
+        /* Handle encoder tuning. */
+        if (jpegxl_state->save_options->tuning != NULL) {
+            sail_traverse_hash_map_with_user_data(jpegxl_state->save_options->tuning,
+                                                    jpegxl_private_encoder_tuning_key_value_callback,
+                                                    jpegxl_state->frame_settings);
+        }
+    } else {
+        /* Reuse frame settings for subsequent frames. */
+        if (jpegxl_state->frame_settings == NULL) {
+            jpegxl_state->frame_settings = JxlEncoderFrameSettingsCreate(jpegxl_state->encoder, NULL);
+        }
+    }
+
+    /* Set frame header for animation. */
+    if (jpegxl_state->is_animation && image->delay > 0) {
+        JxlFrameHeader frame_header;
+        JxlEncoderInitFrameHeader(&frame_header);
+        frame_header.duration = (uint32_t)image->delay;
+
+        if (JxlEncoderSetFrameHeader(jpegxl_state->frame_settings, &frame_header) != JXL_ENC_SUCCESS) {
+            SAIL_LOG_ERROR("JPEGXL: Failed to set frame header");
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+        }
+    }
+
+    jpegxl_state->current_frame++;
+
+    return SAIL_OK;
 }
 
 SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_jpegxl(void *state, const struct sail_image *image) {
 
-    (void)state;
-    (void)image;
+    struct jpegxl_state *jpegxl_state = state;
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
+    /* Get pixel format. */
+    JxlBasicInfo basic_info;
+    JxlPixelFormat pixel_format;
+
+    SAIL_TRY(jpegxl_private_pixel_format_to_jxl_basic_info(image->pixel_format, &basic_info, &pixel_format));
+
+    /* Add image frame. */
+    const size_t buffer_size = (size_t)image->bytes_per_line * image->height;
+
+    if (JxlEncoderAddImageFrame(jpegxl_state->frame_settings, &pixel_format, image->pixels, buffer_size) != JXL_ENC_SUCCESS) {
+        SAIL_LOG_ERROR("JPEGXL: Failed to add image frame");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+    }
+
+    jpegxl_state->frame_saved = true;
+
+    return SAIL_OK;
 }
 
 SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_jpegxl(void **state) {
 
-    (void)state;
+    struct jpegxl_state *jpegxl_state = *state;
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
+    /* Subsequent calls to finish() will expectedly fail in the above line. */
+    *state = NULL;
+
+    sail_status_t status = SAIL_OK;
+
+    if (jpegxl_state->frame_saved && jpegxl_state->encoder != NULL) {
+        /* Close input. */
+        JxlEncoderCloseInput(jpegxl_state->encoder);
+
+        /* Write final output. */
+        status = jpegxl_private_write_output(jpegxl_state->encoder,
+                                              jpegxl_state->io,
+                                              jpegxl_state->buffer,
+                                              jpegxl_state->buffer_size);
+    }
+
+    destroy_jpegxl_state(jpegxl_state);
+
+    return status;
 }

@@ -263,6 +263,7 @@
     <td><a href="https://wikipedia.org/wiki/JPEG_XL">JPEG XL</a></td>
     <td>
         <b>Grayscale:</b> 8-bit, 16-bit.
+        <b>Grayscale+Alpha:</b> 16-bit, 32-bit.
         <b>RGB:</b> 24-bit, 48-bit.
         <b>RGBA:</b> 32-bit, 64-bit.
         <b>CMYK:</b> 32-bit, 64-bit.
@@ -285,9 +286,33 @@
         <br/>See the <a href="https://libjxl.readthedocs.io/en/latest/api_metadata.html#_CPPv412JxlBasicInfo">JxlBasicInfo structure</a> documentation in libjxl for more.
     </td>
     <td>Wide color gamut data gets clipped.</td>
-    <td>Unsupported</td>
-    <td>-</td>
-    <td>-</td>
+    <td>
+        <b>Grayscale:</b> 8-bit, 16-bit.
+        <b>Grayscale+Alpha:</b> 16-bit, 32-bit.
+        <b>RGB:</b> 24-bit, 48-bit.
+        <b>RGBA:</b> 32-bit, 64-bit.
+        <br/><br/>
+        <b>Content:</b> Static, Animated, ICC profiles.
+        <br/><br/>
+        <b>Tuning:</b> Key: <i>"jpegxl-effort"</i>. Description: Encoder effort/speed (1=fastest, 9=slowest). Possible values: 1-9. Default: 7.
+        <br/>Key: <i>"jpegxl-decoding-speed"</i>. Description: Decoding speed tier (0=best quality, 4=fastest). Possible values: 0-4. Default: 0.
+        <br/>Key: <i>"jpegxl-modular"</i>. Description: Encoding mode (-1=auto, 0=VarDCT, 1=modular). Possible values: -1, 0, 1. Default: -1.
+        <br/>Key: <i>"jpegxl-progressive-ac"</i>. Description: Progressive AC mode. Possible values: -1 (auto), 0 (off), 1 (on). Default: -1.
+        <br/>Key: <i>"jpegxl-progressive-dc"</i>. Description: Progressive DC mode. Possible values: -1 (auto), 0 (off), 1, 2. Default: -1.
+        <br/>Key: <i>"jpegxl-responsive"</i>. Description: Responsive mode for modular. Possible values: -1 (auto), 0 (off), 1 (on). Default: -1.
+        <br/>Key: <i>"jpegxl-epf"</i>. Description: Edge Preserving Filter strength. Possible values: -1 (auto), 0-3. Default: -1.
+        <br/>Key: <i>"jpegxl-gaborish"</i>. Description: Gaborish filter. Possible values: -1 (auto), 0 (off), 1 (on). Default: -1.
+        <br/>Key: <i>"jpegxl-photon-noise"</i>. Description: Film grain noise (0=none, 3200=high). Possible values: 0+. Default: 0.
+        <br/>Key: <i>"jpegxl-modular-predictor"</i>. Description: Predictor for modular. Possible values: -1 (auto), 0-15. Default: -1.
+        <br/>Key: <i>"jpegxl-palette-colors"</i>. Description: Use palette if colors ≤ N. Possible values: -1 (auto), 0-1024. Default: -1.
+        <br/>Key: <i>"jpegxl-resampling"</i>. Description: Downsampling factor. Possible values: -1, 1, 2, 4, 8. Default: -1.
+    </td>
+    <td>
+        <b>Pixel formats:</b> CMYK, CMYKA.
+        <br/><br/>
+        <b>Content:</b> Meta data.
+    </td>
+    <td>libjxl</td>
 </tr>
 <tr>
     <td>9</td>
