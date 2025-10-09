@@ -2,7 +2,7 @@
 #
 [codec]
 layout=8
-version=0.4.3
+version=0.6.0
 priority=LOW
 name=ICO
 description=Windows Icon
