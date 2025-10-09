@@ -15,12 +15,12 @@ features=STATIC;ANIMATED;META-DATA;SOURCE-IMAGE
 tuning=
 
 [save-features]
-features=
-pixel-formats=
-compressions=
-default-compression=
+features=STATIC;ANIMATED;META-DATA
+pixel-formats=BPP1-INDEXED;BPP2-INDEXED;BPP4-INDEXED;BPP8-INDEXED
+compressions=LZW
+default-compression=LZW
 compression-level-min=0
 compression-level-max=0
 compression-level-default=0
 compression-level-step=0
-tuning=
+tuning=gif-transparency-index;gif-loop-count;gif-background-color

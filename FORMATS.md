@@ -86,12 +86,23 @@
     <td>4</td>
     <td><a href="https://wikipedia.org/wiki/GIF">GIF</a></td>
     <td>
-        <b>Indexed:</b> 8-bit.
+        <b>Indexed:</b> 1-bit, 2-bit, 4-bit, 8-bit.
         <br/><br/>
         <b>Content:</b> Static, Animated, Meta data.
     </td>
     <td>-</td>
-    <td>Unsupported</td>
+    <td>
+        <b>Indexed:</b> 1-bit, 2-bit, 4-bit, 8-bit.
+        <br/><br/>
+        <b>Compressions:</b> LZW.
+        <br/><br/>
+        <b>Content:</b> Static, Animated, Meta data (comments only).
+        <br/><br/>
+        <b>Tuning<sup><a href="#star-tuning">[3]</a></sup>:</b>
+             <i>"gif-transparency-index"</i>: Transparent color index in palette (-1 for no transparency). Default: -1.
+        <br/><i>"gif-loop-count"</i>: Number of animation loops (0 for infinite). Default: 0.
+        <br/><i>"gif-background-color"</i>: Background color index in palette. Default: 0.
+    </td>
     <td>-</td>
     <td>giflib</td>
 </tr>
