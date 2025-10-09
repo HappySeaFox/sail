@@ -2,7 +2,7 @@
 #
 [codec]
 layout=8
-version=0.9.0
+version=1.0.1
 priority=MEDIUM
 name=AVIF
 description=AV1 Still Image File Format
