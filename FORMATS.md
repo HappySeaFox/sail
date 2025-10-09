@@ -176,20 +176,55 @@
     <td><a href="https://wikipedia.org/wiki/JPEG_2000">JPEG 2000</a></td>
     <td>
         <b>Grayscale:</b> 8-bit, 16-bit.
+        <b>Grayscale+Alpha:</b> 16-bit, 32-bit.
         <b>RGB:</b> 24-bit, 48-bit.
-        <b>YCbCr:</b> 24-bit.
         <b>RGBA:</b> 32-bit, 64-bit.
+        <b>YCbCr:</b> 24-bit.
+        <b>CMYK:</b> 32-bit, 64-bit.
+        <b>CMYKA:</b> 40-bit, 80-bit.
         <br/><br/>
-        <b>Content:</b> Static.
+        <b>Content:</b> Static, ICC profiles.
+        <br/><br/>
+        <b>Tuning:</b> Key: <i>"jpeg2000-reduce"</i>. Description: Discard resolution levels (0=full resolution, 1=half, 2=quarter, etc.).
+        Possible values: unsigned int.
+        <br/>Key: <i>"jpeg2000-layer"</i>. Description: Maximum quality layers to decode (0=all).
+        Possible values: unsigned int.
+        <br/>Key: <i>"jpeg2000-tile-index"</i>. Description: Specific tile index to decode.
+        Possible values: unsigned int.
+        <br/>Key: <i>"jpeg2000-num-tiles"</i>. Description: Number of tiles to decode.
+        Possible values: unsigned int.
     </td>
     <td>
-        <b>Pixel formats:</b> YCCK, CMYK, LAB, XYZ, and other.
+        <b>Pixel formats:</b> LAB, XYZ, and other exotic color spaces.
         <br/><br/>
-        <b>Content:</b> Meta data, ICC profiles, images with non-zero position, images with bits per channel greater than 16.
+        <b>Content:</b> Meta data, images with non-zero position, images with bits per channel greater than 16.
     </td>
-    <td>Unsupported</td>
-    <td>-</td>
-    <td>jasper</td>
+    <td>
+        <b>Grayscale:</b> 8-bit, 16-bit.
+        <b>Grayscale+Alpha:</b> 16-bit, 32-bit.
+        <b>RGB:</b> 24-bit, 48-bit.
+        <b>RGBA:</b> 32-bit, 64-bit.
+        <b>YCbCr:</b> 24-bit.
+        <b>CMYK:</b> 32-bit, 64-bit.
+        <b>CMYKA:</b> 40-bit, 80-bit.
+        <br/><br/>
+        <b>Content:</b> Static, ICC profiles (requires OpenJPEG 2.5.4+).
+        <br/><br/>
+        <b>Tuning:</b> Key: <i>"jpeg2000-irreversible"</i>. Description: Use lossy DWT 9-7 instead of lossless 5-3.
+        Possible values: bool.
+        <br/>Key: <i>"jpeg2000-numresolution"</i>. Description: Number of resolution levels (1-32).
+        Possible values: int.
+        <br/>Key: <i>"jpeg2000-prog-order"</i>. Description: Progression order.
+        Possible values: "lrcp", "rlcp", "rpcl", "pcrl", "cprl".
+        <br/>Key: <i>"jpeg2000-codeblock-width"</i>. Description: Code block width (4-1024, power of 2).
+        Possible values: int.
+        <br/>Key: <i>"jpeg2000-codeblock-height"</i>. Description: Code block height (4-1024, power of 2).
+        Possible values: int.
+    </td>
+    <td>
+        <b>Content:</b> Meta data, ICC profiles (OpenJPEG &lt; 2.5.4 has encoding bug).
+    </td>
+    <td>openjpeg</td>
 </tr>
 <tr>
     <td>8</td>

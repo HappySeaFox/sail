@@ -75,7 +75,7 @@ images with the help of [ksquirrel-libs](FAQ.md#how-old-is-sail), the predecesso
 | 4  | [GIF](https://wikipedia.org/wiki/GIF)                               | R             | giflib            |
 | .. | ...                                                                 |               |                   |
 | 6  | [JPEG](https://wikipedia.org/wiki/JPEG)                             | RW            | libjpeg-turbo     |
-| 7  | [JPEG 2000](https://wikipedia.org/wiki/JPEG_2000)                    | R             | jasper            |
+| 7  | [JPEG 2000](https://wikipedia.org/wiki/JPEG_2000)                    | R             | openjpeg          |
 | 8  | [JPEG XL](https://wikipedia.org/wiki/JPEG_XL)                       | R             | libjxl            |
 | 9  | [PCX](https://wikipedia.org/wiki/PCX)                               | R             |                   |
 | 10 | [PNG](https://wikipedia.org/wiki/Portable_Network_Graphics)         | RW            | libpng            |
