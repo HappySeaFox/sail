@@ -49,14 +49,16 @@ sail_status_t sail_probe_io(struct sail_io *io, struct sail_image **image, const
                         /* cleanup */ codec->v8->load_finish(&state),
                                       sail_destroy_load_options(load_options_local));
 
-    sail_destroy_load_options(load_options_local);
-
     struct sail_image *image_local;
 
     SAIL_TRY_OR_CLEANUP(codec->v8->load_seek_next_frame(state, &image_local),
-                        /* cleanup */ codec->v8->load_finish(&state));
+                        /* cleanup */ codec->v8->load_finish(&state),
+                                      sail_destroy_load_options(load_options_local));
     SAIL_TRY_OR_CLEANUP(codec->v8->load_finish(&state),
-                        /* ceanup */ sail_destroy_image(image_local));
+                        /* ceanup */ sail_destroy_image(image_local),
+                                     sail_destroy_load_options(load_options_local));
+
+    sail_destroy_load_options(load_options_local);
 
     *image = image_local;
 

@@ -29,6 +29,7 @@
 #include <stdint.h>
 
 #include <sail-common/export.h>
+#include <sail-common/pixel.h>
 #include <sail-common/status.h>
 
 struct sail_conversion_options;
@@ -99,6 +100,14 @@ SAIL_HIDDEN void fill_cmyk32_pixel_from_uint16_values(const sail_rgba64_t *rgba6
 SAIL_HIDDEN void fill_cmyk64_pixel_from_uint8_values(const sail_rgba32_t *rgba32, uint16_t *scan, const struct sail_conversion_options *options);
 
 SAIL_HIDDEN void fill_cmyk64_pixel_from_uint16_values(const sail_rgba64_t *rgba64, uint16_t *scan, const struct sail_conversion_options *options);
+
+SAIL_HIDDEN void fill_cmyka40_pixel_from_uint8_values(const sail_rgba32_t *rgba32, uint8_t *scan, const struct sail_conversion_options *options);
+
+SAIL_HIDDEN void fill_cmyka40_pixel_from_uint16_values(const sail_rgba64_t *rgba64, uint8_t *scan, const struct sail_conversion_options *options);
+
+SAIL_HIDDEN void fill_cmyka80_pixel_from_uint8_values(const sail_rgba32_t *rgba32, uint16_t *scan, const struct sail_conversion_options *options);
+
+SAIL_HIDDEN void fill_cmyka80_pixel_from_uint16_values(const sail_rgba64_t *rgba64, uint16_t *scan, const struct sail_conversion_options *options);
 
 SAIL_HIDDEN void fill_rgba16_pixel_from_uint8_values(const sail_rgba32_t *rgba32, uint16_t *scan, int r_shift, int g_shift, int b_shift, int a_shift, int bits_per_component, const struct sail_conversion_options *options);
 

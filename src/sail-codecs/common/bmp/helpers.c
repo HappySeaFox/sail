@@ -272,12 +272,8 @@ sail_status_t bmp_private_supported_write_pixel_format(enum SailPixelFormat pixe
         case SAIL_PIXEL_FORMAT_BPP8_INDEXED:
         case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE:
         case SAIL_PIXEL_FORMAT_BPP16_BGR555:
-        case SAIL_PIXEL_FORMAT_BPP24_RGB:
         case SAIL_PIXEL_FORMAT_BPP24_BGR:
-        case SAIL_PIXEL_FORMAT_BPP32_RGBA:
-        case SAIL_PIXEL_FORMAT_BPP32_BGRA:
-        case SAIL_PIXEL_FORMAT_BPP32_ARGB:
-        case SAIL_PIXEL_FORMAT_BPP32_ABGR: {
+        case SAIL_PIXEL_FORMAT_BPP32_BGRA: {
             return SAIL_OK;
         }
         default: {

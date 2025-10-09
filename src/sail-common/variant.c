@@ -30,33 +30,48 @@
 /*
  * Private functions.
  */
-static sail_status_t set_variant_value(struct sail_variant *variant, enum SailVariantType type, const void *value, const size_t size) {
+static sail_status_t set_variant_value_asymmetric(struct sail_variant *variant, enum SailVariantType type, const void *value,
+                                                  const size_t variant_size, const size_t value_size) {
 
     SAIL_CHECK_PTR(variant);
 
+    if (variant_size < value_size) {
+        SAIL_LOG_ERROR("Variant size %zu is less than value size %zu", variant_size, value_size);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+    }
+
     void **ptr = &variant->value;
-    SAIL_TRY(sail_realloc(size, ptr));
-    memcpy(variant->value, value, size);
+    SAIL_TRY(sail_realloc(variant_size, ptr));
+    memcpy(variant->value, value, value_size);
 
     variant->type = type;
-    variant->size = size;
+    variant->size = variant_size;
 
     return SAIL_OK;
 }
 
-static sail_status_t alloc_variant(enum SailVariantType type, const void *value, const size_t size, struct sail_variant **variant) {
+static sail_status_t set_variant_value(struct sail_variant *variant, enum SailVariantType type, const void *value, const size_t size) {
 
-    SAIL_CHECK_PTR(variant);
+  SAIL_TRY(set_variant_value_asymmetric(variant, type, value, size, size));
 
-    struct sail_variant *variant_local;
-    SAIL_TRY(sail_alloc_variant(&variant_local));
+  return SAIL_OK;
+}
 
-    SAIL_TRY_OR_CLEANUP(set_variant_value(variant_local, type, value, size),
-                        /* on error */ sail_destroy_variant(variant_local));
+static sail_status_t alloc_variant(enum SailVariantType type, const void *value,
+                                   const size_t size,
+                                   struct sail_variant **variant) {
 
-    *variant = variant_local;
+  SAIL_CHECK_PTR(variant);
 
-    return SAIL_OK;
+  struct sail_variant *variant_local;
+  SAIL_TRY(sail_alloc_variant(&variant_local));
+
+  SAIL_TRY_OR_CLEANUP(set_variant_value(variant_local, type, value, size),
+                      /* on error */ sail_destroy_variant(variant_local));
+
+  *variant = variant_local;
+
+  return SAIL_OK;
 }
 
 /*
@@ -186,7 +201,7 @@ sail_status_t sail_set_variant_shallow_string(struct sail_variant *variant, char
 
 sail_status_t sail_set_variant_substring(struct sail_variant *variant, const char *value, size_t size) {
 
-    SAIL_TRY(set_variant_value(variant, SAIL_VARIANT_TYPE_STRING, value, size + 1));
+    SAIL_TRY(set_variant_value_asymmetric(variant, SAIL_VARIANT_TYPE_STRING, value, size + 1, size));
 
     char *str = variant->value;
     str[size] = '\0';

@@ -615,15 +615,11 @@ sail_status_t bmp_private_write_seek_next_frame(void *state, struct sail_io *io,
             bits_per_pixel = 16;
             break;
         }
-        case SAIL_PIXEL_FORMAT_BPP24_RGB:
         case SAIL_PIXEL_FORMAT_BPP24_BGR: {
             bits_per_pixel = 24;
             break;
         }
-        case SAIL_PIXEL_FORMAT_BPP32_RGBA:
-        case SAIL_PIXEL_FORMAT_BPP32_BGRA:
-        case SAIL_PIXEL_FORMAT_BPP32_ARGB:
-        case SAIL_PIXEL_FORMAT_BPP32_ABGR: {
+        case SAIL_PIXEL_FORMAT_BPP32_BGRA: {
             bits_per_pixel = 32;
             break;
         }
