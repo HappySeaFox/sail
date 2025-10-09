@@ -407,7 +407,10 @@ sail_status_t png_private_write_meta_data(png_structp png_ptr, png_infop info_pt
 
                 if (meta_data->key == SAIL_META_DATA_UNKNOWN) {
                     meta_data_key = meta_data->key_unknown;
-                    meta_data_value = (char *)meta_data->value;
+                    const char *variant_str = sail_variant_to_string(meta_data->value);
+                    SAIL_TRY_OR_EXECUTE(sail_strdup(variant_str, &meta_data_value),
+                                        /* on error */ continue);
+                    lines_to_free[index] = 1;
                 } else {
                     if (meta_data->key == SAIL_META_DATA_IPTC) {
                         meta_data_key = "Raw profile type iptc";
@@ -430,7 +433,10 @@ sail_status_t png_private_write_meta_data(png_structp png_ptr, png_infop info_pt
                         lines_to_free[index] = 1;
                     } else {
                         meta_data_key   = sail_meta_data_to_string(meta_data->key);
-                        meta_data_value = sail_variant_to_string(meta_data->value);
+                        const char *variant_str = sail_variant_to_string(meta_data->value);
+                        SAIL_TRY_OR_EXECUTE(sail_strdup(variant_str, &meta_data_value),
+                                            /* on error */ continue);
+                        lines_to_free[index] = 1;
                     }
                 }
 

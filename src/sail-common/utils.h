@@ -155,6 +155,21 @@ SAIL_EXPORT bool sail_is_grayscale(enum SailPixelFormat pixel_format);
 SAIL_EXPORT bool sail_is_rgb_family(enum SailPixelFormat pixel_format);
 
 /*
+ * Returns true if the given pixel format is CMYK, with or without alpha.
+ */
+SAIL_EXPORT bool sail_is_cmyk(enum SailPixelFormat pixel_format);
+
+/*
+ * Returns true if the given pixel format is YCbCr.
+ */
+SAIL_EXPORT bool sail_is_ycbcr(enum SailPixelFormat pixel_format);
+
+/*
+ * Returns true if the given pixel format is YCCK.
+ */
+SAIL_EXPORT bool sail_is_ycck(enum SailPixelFormat pixel_format);
+
+/*
  * Prints the recent errno value with SAIL_LOG_ERROR(). The specified format must include '%s'.
  */
 SAIL_EXPORT void sail_print_errno(const char *format);

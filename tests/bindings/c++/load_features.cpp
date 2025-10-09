@@ -54,7 +54,7 @@ static MunitResult test_load_features(const MunitParameter params[], void *user_
 
     // Move
     {
-        const sail::load_features load_features1 = std::move(first_codec.load_features());
+        const sail::load_features load_features1 = first_codec.load_features();
         const sail::load_features load_features = std::move(load_features1);
         munit_assert(load_features.features()         == first_codec.load_features().features());
         munit_assert(load_features.supported_tuning() == first_codec.load_features().supported_tuning());

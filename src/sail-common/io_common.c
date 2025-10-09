@@ -116,11 +116,14 @@ sail_status_t sail_io_contents_into_data(struct sail_io *io, void *data) {
 
     /* Read stream. */
     while ((status = io->tolerant_read(io->stream, buffer, sizeof(buffer), &actually_read)) == SAIL_OK) {
+        if (actually_read == 0) {
+            break;
+        }
         memcpy(data_ptr, buffer, actually_read);
         data_ptr += actually_read;
     }
 
-    if (status != SAIL_ERROR_EOF) {
+    if (status != SAIL_ERROR_EOF && status != SAIL_OK) {
         SAIL_LOG_ERROR("Failed to read from the I/O stream, error #%d", status);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_READ_IO);
     }
