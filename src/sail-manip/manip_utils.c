@@ -575,6 +575,116 @@ void fill_cmyk64_pixel_from_uint16_values(const sail_rgba64_t *rgba64, uint16_t 
     *(scan+3) = (uint16_t)(k * 65535);
 }
 
+void fill_cmyka40_pixel_from_uint8_values(const sail_rgba32_t *rgba32, uint8_t *scan, const struct sail_conversion_options *options) {
+
+    sail_rgb24_t rgb24;
+
+    if (rgba32->component4 < 255 && options != NULL && (options->options & SAIL_CONVERSION_OPTION_BLEND_ALPHA)) {
+        const double opacity = rgba32->component4 / 255.0;
+
+        rgb24.component1 = (uint8_t)(opacity * rgba32->component1 + (1 - opacity) * options->background24.component1);
+        rgb24.component2 = (uint8_t)(opacity * rgba32->component2 + (1 - opacity) * options->background24.component2);
+        rgb24.component3 = (uint8_t)(opacity * rgba32->component3 + (1 - opacity) * options->background24.component3);
+    } else {
+        rgb24.component1 = rgba32->component1;
+        rgb24.component2 = rgba32->component2;
+        rgb24.component3 = rgba32->component3;
+    }
+
+    /* RGB to CMYK conversion */
+    const double r = rgb24.component1 / 255.0;
+    const double g = rgb24.component2 / 255.0;
+    const double b = rgb24.component3 / 255.0;
+
+    const double k = 1.0 - SAIL_MAX(SAIL_MAX(r, g), b);
+    const double c = (1.0 - r - k) / (1.0 - k + 1e-10);
+    const double m = (1.0 - g - k) / (1.0 - k + 1e-10);
+    const double y = (1.0 - b - k) / (1.0 - k + 1e-10);
+
+    *(scan+0) = (uint8_t)(c * 255);
+    *(scan+1) = (uint8_t)(m * 255);
+    *(scan+2) = (uint8_t)(y * 255);
+    *(scan+3) = (uint8_t)(k * 255);
+    *(scan+4) = rgba32->component4;
+}
+
+void fill_cmyka40_pixel_from_uint16_values(const sail_rgba64_t *rgba64, uint8_t *scan, const struct sail_conversion_options *options) {
+
+    sail_rgba32_t rgba32;
+    rgba32.component1 = (uint8_t)(rgba64->component1 / 257.0);
+    rgba32.component2 = (uint8_t)(rgba64->component2 / 257.0);
+    rgba32.component3 = (uint8_t)(rgba64->component3 / 257.0);
+    rgba32.component4 = (uint8_t)(rgba64->component4 / 257.0);
+
+    fill_cmyka40_pixel_from_uint8_values(&rgba32, scan, options);
+}
+
+void fill_cmyka80_pixel_from_uint8_values(const sail_rgba32_t *rgba32, uint16_t *scan, const struct sail_conversion_options *options) {
+
+    sail_rgb48_t rgb48;
+
+    if (rgba32->component4 < 255 && options != NULL && (options->options & SAIL_CONVERSION_OPTION_BLEND_ALPHA)) {
+        const double opacity = rgba32->component4 / 255.0;
+
+        rgb48.component1 = (uint16_t)(opacity * rgba32->component1 * 257 + (1 - opacity) * options->background48.component1);
+        rgb48.component2 = (uint16_t)(opacity * rgba32->component2 * 257 + (1 - opacity) * options->background48.component2);
+        rgb48.component3 = (uint16_t)(opacity * rgba32->component3 * 257 + (1 - opacity) * options->background48.component3);
+    } else {
+        rgb48.component1 = rgba32->component1 * 257;
+        rgb48.component2 = rgba32->component2 * 257;
+        rgb48.component3 = rgba32->component3 * 257;
+    }
+
+    /* RGB to CMYK conversion */
+    const double r = rgb48.component1 / 65535.0;
+    const double g = rgb48.component2 / 65535.0;
+    const double b = rgb48.component3 / 65535.0;
+
+    const double k = 1.0 - SAIL_MAX(SAIL_MAX(r, g), b);
+    const double c = (1.0 - r - k) / (1.0 - k + 1e-10);
+    const double m = (1.0 - g - k) / (1.0 - k + 1e-10);
+    const double y = (1.0 - b - k) / (1.0 - k + 1e-10);
+
+    *(scan+0) = (uint16_t)(c * 65535);
+    *(scan+1) = (uint16_t)(m * 65535);
+    *(scan+2) = (uint16_t)(y * 65535);
+    *(scan+3) = (uint16_t)(k * 65535);
+    *(scan+4) = rgba32->component4 * 257;
+}
+
+void fill_cmyka80_pixel_from_uint16_values(const sail_rgba64_t *rgba64, uint16_t *scan, const struct sail_conversion_options *options) {
+
+    sail_rgb48_t rgb48;
+
+    if (rgba64->component4 < 65535 && options != NULL && (options->options & SAIL_CONVERSION_OPTION_BLEND_ALPHA)) {
+        const double opacity = rgba64->component4 / 65535.0;
+
+        rgb48.component1 = (uint16_t)(opacity * rgba64->component1 + (1 - opacity) * options->background48.component1);
+        rgb48.component2 = (uint16_t)(opacity * rgba64->component2 + (1 - opacity) * options->background48.component2);
+        rgb48.component3 = (uint16_t)(opacity * rgba64->component3 + (1 - opacity) * options->background48.component3);
+    } else {
+        rgb48.component1 = rgba64->component1;
+        rgb48.component2 = rgba64->component2;
+        rgb48.component3 = rgba64->component3;
+    }
+
+    /* RGB to CMYK conversion */
+    const double r = rgb48.component1 / 65535.0;
+    const double g = rgb48.component2 / 65535.0;
+    const double b = rgb48.component3 / 65535.0;
+
+    const double k = 1.0 - SAIL_MAX(SAIL_MAX(r, g), b);
+    const double c = (1.0 - r - k) / (1.0 - k + 1e-10);
+    const double m = (1.0 - g - k) / (1.0 - k + 1e-10);
+    const double y = (1.0 - b - k) / (1.0 - k + 1e-10);
+
+    *(scan+0) = (uint16_t)(c * 65535);
+    *(scan+1) = (uint16_t)(m * 65535);
+    *(scan+2) = (uint16_t)(y * 65535);
+    *(scan+3) = (uint16_t)(k * 65535);
+    *(scan+4) = rgba64->component4;
+}
+
 void fill_rgba16_pixel_from_uint8_values(const sail_rgba32_t *rgba32, uint16_t *scan, int r_shift, int g_shift, int b_shift, int a_shift, int bits_per_component, const struct sail_conversion_options *options) {
 
     (void)options;
