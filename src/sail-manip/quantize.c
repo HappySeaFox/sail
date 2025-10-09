@@ -795,7 +795,7 @@ sail_status_t sail_quantize_image(const struct sail_image *source_image,
     } else {
         /* TODO: Pack into BPP1/BPP4. */
         unsigned char *dest = (unsigned char *)indexed_image->pixels;
-        memset(dest, 0, indexed_image->bytes_per_line * indexed_image->height);
+        memset(dest, 0, (size_t)indexed_image->bytes_per_line * indexed_image->height);
 
         for (unsigned int y = 0; y < source_image->height; y++) {
             for (unsigned int x = 0; x < source_image->width; x++) {
