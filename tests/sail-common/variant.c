@@ -228,6 +228,9 @@ static MunitResult test_set(const MunitParameter params[], void *user_data) {
     munit_assert(sail_set_variant_substring(variant, "abc", 2) == SAIL_OK);
     munit_assert(strcmp(sail_variant_to_string(variant), "ab") == 0);
 
+    munit_assert(sail_set_variant_substring(variant, "abc", 3) == SAIL_OK);
+    munit_assert(strcmp(sail_variant_to_string(variant), "abc") == 0);
+
     munit_assert(sail_set_variant_data(variant, "abc", 4) == SAIL_OK);
     munit_assert(strcmp((char *)sail_variant_to_data(variant), "abc") == 0);
 
