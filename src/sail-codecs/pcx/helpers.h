@@ -77,4 +77,12 @@ SAIL_HIDDEN sail_status_t pcx_private_build_palette(enum SailPixelFormat pixel_f
 
 SAIL_HIDDEN sail_status_t pcx_private_read_uncompressed(struct sail_io *io, unsigned bytes_per_plane_to_read, unsigned planes, unsigned char *buffer, struct sail_image *image);
 
+SAIL_HIDDEN sail_status_t pcx_private_write_header(struct sail_io *io, const struct SailPcxHeader *header);
+
+SAIL_HIDDEN sail_status_t pcx_private_pixel_format_to_pcx_format(enum SailPixelFormat pixel_format, uint8_t *bits_per_plane, uint8_t *planes);
+
+SAIL_HIDDEN sail_status_t pcx_private_write_palette(struct sail_io *io, const struct sail_palette *palette);
+
+SAIL_HIDDEN void pcx_private_palette_to_rgb(const struct sail_palette *palette, unsigned char *rgb_output, unsigned color_count);
+
 #endif

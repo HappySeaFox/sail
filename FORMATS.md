@@ -327,7 +327,15 @@
         <b>Compressions:</b> NONE<sup><a href="#star-pcx-rle">[2]</a></sup>, RLE.
     </td>
     <td>-</td>
-    <td>Unsupported</td>
+    <td>
+        <b>Indexed:</b> 1-bit, 4-bit, 8-bit.
+        <b>RGB:</b> 24-bit.
+        <b>RGBA:</b> 32-bit.
+        <br/><br/>
+        <b>Compressions:</b> NONE, RLE.
+        <br/><br/>
+        <b>Content:</b> Static.
+    </td>
     <td>-</td>
     <td>-</td>
 </tr>
