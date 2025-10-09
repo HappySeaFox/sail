@@ -568,7 +568,7 @@
     <td>19</td>
     <td><a href="https://en.wikipedia.org/wiki/X_BitMap">XBM</a></td>
     <td>
-        <b>Bit depth:</b> 1-bit.
+        <b>Indexed:</b> 1-bit.
         <br/><br/>
         <b>Content:</b> Static.
         <br/><br/>
@@ -577,7 +577,16 @@
     <td>
         <b>Content:</b> Multi-paged, C-style /*...*/ comments.
     </td>
-    <td>Unsupported</td>
+    <td>
+        <b>Indexed:</b> 1-bit.
+        <br/><br/>
+        <b>Compressions:</b> NONE.
+        <br/><br/>
+        <b>Content:</b> Static.
+        <br/><br/>
+        <b>Tuning:</b> Key: <i>"xbm-version"</i>. Description: XBM format version. Possible values: "X10", "X11" (default: "X11").
+        Key: <i>"xbm-name"</i>. Description: Variable name for the C array. Possible values: any valid C identifier (default: "image").
+    </td>
     <td>-</td>
     <td>-</td>
 </tr>
