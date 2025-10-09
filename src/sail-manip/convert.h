@@ -116,6 +116,15 @@ struct sail_save_features;
  *
  *   - SAIL_PIXEL_FORMAT_BPP24_YUV
  *
+ *   - SAIL_PIXEL_FORMAT_BPP1_INDEXED (2 colors, uses Wu quantization)
+ *   - SAIL_PIXEL_FORMAT_BPP4_INDEXED (up to 16 colors, uses Wu quantization)
+ *   - SAIL_PIXEL_FORMAT_BPP8_INDEXED (up to 256 colors, uses Wu quantization)
+ *
+ * Note: Conversion to indexed formats uses Xiaolin Wu's color quantization algorithm.
+ *       The palette is automatically generated with up to the maximum colors for the format.
+ *       Floyd-Steinberg dithering is available via sail_convert_image_with_options()
+ *       with SAIL_CONVERSION_OPTION_DITHERING (currently only for BPP8_INDEXED).
+ *
  * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_convert_image(const struct sail_image *image,

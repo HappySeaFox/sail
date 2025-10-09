@@ -8,6 +8,8 @@ add_library(sail-manip
                 manip_common.h
                 manip_utils.c
                 manip_utils.h
+                quantize.c
+                quantize.h
                 sail-manip.h
                 ycbcr.c
                 ycbcr.h
@@ -19,6 +21,7 @@ add_library(sail-manip
 set(PUBLIC_HEADERS conversion_options.h
                    convert.h
                    manip_common.h
+                   quantize.h
                    sail-manip.h)
 
 set_target_properties(sail-manip PROPERTIES
