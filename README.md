@@ -86,7 +86,7 @@ images with the help of [ksquirrel-libs](FAQ.md#how-old-is-sail), the predecesso
 | 15 | [TGA](https://wikipedia.org/wiki/Truevision_TGA)                    | RW            |                   |
 | 16 | [TIFF](https://wikipedia.org/wiki/TIFF)                             | RW            | libtiff           |
 | .. | ...                                                                 |               |                   |
-| 18 | [WEBP](https://wikipedia.org/wiki/WebP)                             | R             | libwebp           |
+| 18 | [WEBP](https://wikipedia.org/wiki/WebP)                             | RW            | libwebp           |
 | .. | ...                                                                 |               |                   |
 
 See the full list [here](FORMATS.md). Work to add more image formats is ongoing.

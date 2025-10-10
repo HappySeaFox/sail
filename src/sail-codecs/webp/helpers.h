@@ -26,6 +26,7 @@
 #ifndef SAIL_WEBP_HELPERS_H
 #define SAIL_WEBP_HELPERS_H
 
+#include <stdbool.h>
 #include <stdint.h>
 
 #include <webp/demux.h>
@@ -33,6 +34,12 @@
 #include <sail-common/common.h>
 #include <sail-common/export.h>
 #include <sail-common/status.h>
+
+struct sail_iccp;
+struct sail_meta_data_node;
+struct sail_hash_map;
+
+struct WebPPicture;
 
 SAIL_HIDDEN void webp_private_fill_color(uint8_t *pixels, unsigned bytes_per_line, unsigned bytes_per_pixel,
                                             uint32_t color, unsigned x, unsigned y, unsigned width, unsigned height);
@@ -43,5 +50,19 @@ SAIL_HIDDEN sail_status_t webp_private_blend_over(void *dst_raw, unsigned dst_of
 SAIL_HIDDEN sail_status_t webp_private_fetch_iccp(WebPDemuxer *webp_demux, struct sail_iccp **iccp);
 
 SAIL_HIDDEN sail_status_t webp_private_fetch_meta_data(WebPDemuxer *webp_demux, struct sail_meta_data_node **last_meta_data_node);
+
+SAIL_HIDDEN sail_status_t webp_private_store_loop_count(WebPDemuxer *webp_demux, struct sail_hash_map *special_properties);
+
+SAIL_HIDDEN sail_status_t webp_private_supported_write_pixel_format(enum SailPixelFormat pixel_format);
+
+SAIL_HIDDEN sail_status_t webp_private_convert_argb_to_rgba(const uint8_t *pixels, unsigned width, unsigned height,
+                                                              unsigned stride, void **rgba_pixels);
+
+SAIL_HIDDEN sail_status_t webp_private_convert_abgr_to_rgba(const uint8_t *pixels, unsigned width, unsigned height,
+                                                              unsigned stride, void **rgba_pixels);
+
+SAIL_HIDDEN sail_status_t webp_private_import_pixels(struct WebPPicture *picture, const struct sail_image *image);
+
+SAIL_HIDDEN bool webp_private_tuning_key_value_callback(const char *key, const struct sail_variant *value, void *user_data);
 
 #endif

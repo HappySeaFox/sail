@@ -561,12 +561,74 @@
     <td>18</td>
     <td><a href="https://wikipedia.org/wiki/WebP">WEBP</a></td>
     <td>
-        <b>Bit depth:</b> 24-bit, 32-bit.
+        <b>RGBA:</b> 32-bit.
         <br/><br/>
         <b>Content:</b> Static, Animated, Meta data, ICC profiles.
     </td>
     <td>-</td>
-    <td>Unsupported</td>
+    <td>
+        <b>RGB:</b> 24-bit.
+        <b>BGR:</b> 24-bit.
+        <b>RGBA:</b> 32-bit.
+        <b>BGRA:</b> 32-bit.
+        <b>ARGB:</b> 32-bit.
+        <b>ABGR:</b> 32-bit.
+        <br/><br/>
+        <b>Compressions:</b> WebP.
+        <br/><br/>
+        <b>Content:</b> Static, Animated.
+        <br/><br/>
+        <b>Tuning:</b> Key: <i>"webp-lossless"</i>. Description: Lossless encoding (0=lossy, 1=lossless).
+        Possible values: 0 or 1 (default: 0).
+        <br/>Key: <i>"webp-method"</i>. Description: Quality/speed trade-off (0=fast, 6=slower-better).
+        Possible values: 0-6 (default: 4).
+        <br/>Key: <i>"webp-image-hint"</i>. Description: Image type hint ("default", "picture", "photo", "graph").
+        Possible values: string (default: "default").
+        <br/>Key: <i>"webp-target-size"</i>. Description: Target size in bytes (0=disabled).
+        Possible values: non-negative integer (default: 0).
+        <br/>Key: <i>"webp-target-psnr"</i>. Description: Minimal distortion to achieve (0=disabled).
+        Possible values: float (default: 0).
+        <br/>Key: <i>"webp-segments"</i>. Description: Maximum number of segments.
+        Possible values: 1-4 (default: 4).
+        <br/>Key: <i>"webp-sns-strength"</i>. Description: Spatial Noise Shaping (0=off, 100=max).
+        Possible values: 0-100 (default: 50).
+        <br/>Key: <i>"webp-filter-strength"</i>. Description: Filtering strength (0=off, 100=strongest).
+        Possible values: 0-100 (default: 60).
+        <br/>Key: <i>"webp-filter-sharpness"</i>. Description: Filtering sharpness (0=off, 7=least sharp).
+        Possible values: 0-7 (default: 0).
+        <br/>Key: <i>"webp-filter-type"</i>. Description: Filtering type.
+        Possible values: "simple", "strong" (default: "strong").
+        <br/>Key: <i>"webp-autofilter"</i>. Description: Auto adjust filter strength.
+        Possible values: 0, 1 (default: 0).
+        <br/>Key: <i>"webp-alpha-compression"</i>. Description: Alpha plane compression (0=none, 1=compressed).
+        Possible values: 0, 1 (default: 1).
+        <br/>Key: <i>"webp-alpha-filtering"</i>. Description: Alpha predictive filtering.
+        Possible values: "none", "fast", "best" (default: "fast").
+        <br/>Key: <i>"webp-alpha-quality"</i>. Description: Alpha quality (0=smallest, 100=lossless).
+        Possible values: 0-100 (default: 100).
+        <br/>Key: <i>"webp-pass"</i>. Description: Number of entropy analysis passes.
+        Possible values: 1-10 (default: 1).
+        <br/>Key: <i>"webp-preprocessing"</i>. Description: Preprocessing filter.
+        Possible values: "none", "segment-smooth", "pseudo-random-dithering" (default: "none").
+        <br/>Key: <i>"webp-partitions"</i>. Description: log2(number of token partitions).
+        Possible values: 0-3 (default: 0).
+        <br/>Key: <i>"webp-partition-limit"</i>. Description: Quality degradation for 512k limit (0=none, 100=max).
+        Possible values: 0-100 (default: 0).
+        <br/>Key: <i>"webp-emulate-jpeg-size"</i>. Description: Remap parameters to match JPEG size.
+        Possible values: 0, 1 (default: 0).
+        <br/>Key: <i>"webp-thread-level"</i>. Description: Use multi-threaded encoding.
+        Possible values: 0, 1 (default: 0).
+        <br/>Key: <i>"webp-low-memory"</i>. Description: Reduce memory usage (increases CPU).
+        Possible values: 0, 1 (default: 0).
+        <br/>Key: <i>"webp-near-lossless"</i>. Description: Near lossless encoding (0=max loss, 100=off).
+        Possible values: 0-100 (default: 100).
+        <br/>Key: <i>"webp-exact"</i>. Description: Preserve exact RGB under transparent areas.
+        Possible values: 0, 1 (default: 0).
+        <br/>Key: <i>"webp-use-delta-palette"</i>. Description: Use delta palette (reserved for future).
+        Possible values: 0, 1 (default: 0).
+        <br/>Key: <i>"webp-use-sharp-yuv"</i>. Description: Use sharp RGB→YUV conversion.
+        Possible values: 0, 1 (default: 0).
+    </td>
     <td>-</td>
     <td>libwebp</td>
 </tr>

@@ -2,7 +2,7 @@
 #
 [codec]
 layout=8
-version=0.7.1
+version=0.8.0
 priority=MEDIUM
 name=WEBP
 description=Web Picture
@@ -15,12 +15,12 @@ features=STATIC;ANIMATED;META-DATA;ICCP;SOURCE-IMAGE
 tuning=
 
 [save-features]
-features=
-pixel-formats=
-compressions=
-default-compression=
+features=STATIC;ANIMATED
+pixel-formats=BPP24-RGB;BPP24-BGR;BPP32-RGBA;BPP32-BGRA;BPP32-ARGB;BPP32-ABGR
+compressions=WEBP
+default-compression=WEBP
 compression-level-min=0
-compression-level-max=0
-compression-level-default=0
-compression-level-step=0
-tuning=
+compression-level-max=100
+compression-level-default=75
+compression-level-step=1
+tuning=webp-lossless;webp-method;webp-image-hint;webp-target-size;webp-target-psnr;webp-segments;webp-sns-strength;webp-filter-strength;webp-filter-sharpness;webp-filter-type;webp-autofilter;webp-alpha-compression;webp-alpha-filtering;webp-alpha-quality;webp-pass;webp-preprocessing;webp-partitions;webp-partition-limit;webp-emulate-jpeg-size;webp-thread-level;webp-low-memory;webp-near-lossless;webp-exact;webp-use-delta-palette;webp-use-sharp-yuv
