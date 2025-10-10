@@ -33,29 +33,30 @@
 
 #include "tests/images/acceptance/test-images.h"
 
-static MunitResult test_io_produce_same_images(const MunitParameter params[], void *user_data) {
+static MunitResult test_io_produce_same_images(const MunitParameter params[], void* user_data)
+{
     (void)user_data;
 
-    const char *path = munit_parameters_get(params, "path");
+    const char* path = munit_parameters_get(params, "path");
 
-    struct sail_image *image_file = NULL;
+    struct sail_image* image_file = NULL;
     munit_assert(sail_load_from_file(path, &image_file) == SAIL_OK);
     munit_assert_not_null(image_file);
 
-    void *data;
+    void* data;
     size_t data_size;
     munit_assert(sail_alloc_data_from_file_contents(path, &data, &data_size) == SAIL_OK);
     munit_assert_not_null(data);
     munit_assert(data_size > 0);
 
     /* Codec info for loading from memory. */
-    const struct sail_codec_info *codec_info;
+    const struct sail_codec_info* codec_info;
     munit_assert(sail_codec_info_from_path(path, &codec_info) == SAIL_OK);
 
-    void *state;
+    void* state;
     munit_assert(sail_start_loading_from_memory(data, data_size, codec_info, &state) == SAIL_OK);
 
-    struct sail_image *image_mem = NULL;
+    struct sail_image* image_mem = NULL;
     munit_assert(sail_load_next_frame(state, &image_mem) == SAIL_OK);
     munit_assert_not_null(image_mem);
 
@@ -89,6 +90,7 @@ static const MunitSuite test_suite = {
     MUNIT_SUITE_OPTION_NONE
 };
 
-int main(int argc, char *argv[MUNIT_ARRAY_PARAM(argc + 1)]) {
+int main(int argc, char* argv[MUNIT_ARRAY_PARAM(argc + 1)])
+{
     return munit_suite_main(&test_suite, NULL, argc, argv);
 }

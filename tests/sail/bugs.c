@@ -23,34 +23,32 @@
     SOFTWARE.
 */
 
-#include <stdio.h>
-
 #include <sail/sail.h>
 
 #include "munit.h"
 
 #include "tests/images/bugs/test-images.h"
 
-static MunitResult test_bugs_must_fail(const MunitParameter params[], void *user_data) {
-
+static MunitResult test_bugs_must_fail(const MunitParameter params[], void* user_data)
+{
     (void)user_data;
 
-    const char *path = munit_parameters_get(params, "path");
+    const char* path = munit_parameters_get(params, "path");
 
-    struct sail_image *image = NULL;
+    struct sail_image* image = NULL;
     munit_assert(sail_load_from_file(path, &image) != SAIL_OK);
     munit_assert_null(image);
 
     return MUNIT_OK;
 }
 
-static MunitResult test_bugs_must_succeed(const MunitParameter params[], void *user_data) {
-
+static MunitResult test_bugs_must_succeed(const MunitParameter params[], void* user_data)
+{
     (void)user_data;
 
-    const char *path = munit_parameters_get(params, "path");
+    const char* path = munit_parameters_get(params, "path");
 
-    struct sail_image *image = NULL;
+    struct sail_image* image = NULL;
     munit_assert(sail_load_from_file(path, &image) == SAIL_OK);
     munit_assert_not_null(image);
 
@@ -84,6 +82,7 @@ static const MunitSuite test_suite = {
     MUNIT_SUITE_OPTION_NONE
 };
 
-int main(int argc, char *argv[MUNIT_ARRAY_PARAM(argc + 1)]) {
+int main(int argc, char* argv[MUNIT_ARRAY_PARAM(argc + 1)])
+{
     return munit_suite_main(&test_suite, NULL, argc, argv);
 }
