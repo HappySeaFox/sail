@@ -27,11 +27,12 @@
 
 #include "munit.h"
 
-static MunitResult test_alloc_options(const MunitParameter params[], void *user_data) {
+static MunitResult test_alloc_options(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
-    struct sail_load_options *load_options = NULL;
+    struct sail_load_options* load_options = NULL;
     munit_assert(sail_alloc_load_options(&load_options) == SAIL_OK);
     munit_assert_not_null(load_options);
     munit_assert(load_options->options == 0);
@@ -42,16 +43,17 @@ static MunitResult test_alloc_options(const MunitParameter params[], void *user_
     return MUNIT_OK;
 }
 
-static MunitResult test_copy_options(const MunitParameter params[], void *user_data) {
+static MunitResult test_copy_options(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
-    struct sail_load_options *load_options = NULL;
+    struct sail_load_options* load_options = NULL;
     munit_assert(sail_alloc_load_options(&load_options) == SAIL_OK);
 
     load_options->options = SAIL_OPTION_ICCP;
 
-    struct sail_load_options *load_options_copy = NULL;
+    struct sail_load_options* load_options_copy = NULL;
     munit_assert(sail_copy_load_options(load_options, &load_options_copy) == SAIL_OK);
     munit_assert_not_null(load_options_copy);
 
@@ -64,13 +66,15 @@ static MunitResult test_copy_options(const MunitParameter params[], void *user_d
     return MUNIT_OK;
 }
 
-static MunitResult test_options_from_features(const MunitParameter params[], void *user_data) {
+static MunitResult test_options_from_features(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
-    struct sail_load_options *load_options;
+    struct sail_load_options* load_options;
     struct sail_load_features load_features;
-    load_features.features = SAIL_CODEC_FEATURE_META_DATA | SAIL_CODEC_FEATURE_INTERLACED | SAIL_CODEC_FEATURE_ICCP | SAIL_CODEC_FEATURE_SOURCE_IMAGE;
+    load_features.features = SAIL_CODEC_FEATURE_META_DATA | SAIL_CODEC_FEATURE_INTERLACED | SAIL_CODEC_FEATURE_ICCP
+                             | SAIL_CODEC_FEATURE_SOURCE_IMAGE;
     munit_assert(sail_alloc_load_options_from_features(&load_features, &load_options) == SAIL_OK);
 
     munit_assert(load_options->options == (SAIL_OPTION_META_DATA | SAIL_OPTION_ICCP | SAIL_OPTION_SOURCE_IMAGE));
@@ -81,6 +85,7 @@ static MunitResult test_options_from_features(const MunitParameter params[], voi
     return MUNIT_OK;
 }
 
+// clang-format off
 static MunitTest test_suite_tests[] = {
     { (char *)"/alloc", test_alloc_options, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/copy", test_copy_options, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
@@ -90,13 +95,11 @@ static MunitTest test_suite_tests[] = {
 };
 
 static const MunitSuite test_suite = {
-    (char *)"/load-options",
-    test_suite_tests,
-    NULL,
-    1,
-    MUNIT_SUITE_OPTION_NONE
+    (char *)"/load-options", test_suite_tests, NULL, 1, MUNIT_SUITE_OPTION_NONE
 };
+// clang-format on
 
-int main(int argc, char *argv[MUNIT_ARRAY_PARAM(argc + 1)]) {
+int main(int argc, char* argv[MUNIT_ARRAY_PARAM(argc + 1)])
+{
     return munit_suite_main(&test_suite, NULL, argc, argv);
 }

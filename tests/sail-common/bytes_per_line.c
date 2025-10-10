@@ -29,8 +29,8 @@
 
 #include "munit.h"
 
-static MunitResult test_indexed(const MunitParameter params[], void *user_data) {
-
+static MunitResult test_indexed(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
@@ -56,8 +56,8 @@ static MunitResult test_indexed(const MunitParameter params[], void *user_data) 
     return MUNIT_OK;
 }
 
-static MunitResult test_grayscale(const MunitParameter params[], void *user_data) {
-
+static MunitResult test_grayscale(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
@@ -87,8 +87,8 @@ static MunitResult test_grayscale(const MunitParameter params[], void *user_data
     return MUNIT_OK;
 }
 
-static MunitResult test_grayscale_alpha(const MunitParameter params[], void *user_data) {
-
+static MunitResult test_grayscale_alpha(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
@@ -112,8 +112,8 @@ static MunitResult test_grayscale_alpha(const MunitParameter params[], void *use
     return MUNIT_OK;
 }
 
-static MunitResult test_rgb_555_565(const MunitParameter params[], void *user_data) {
-
+static MunitResult test_rgb_555_565(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
@@ -136,8 +136,8 @@ static MunitResult test_rgb_555_565(const MunitParameter params[], void *user_da
     return MUNIT_OK;
 }
 
-static MunitResult test_rgb(const MunitParameter params[], void *user_data) {
-
+static MunitResult test_rgb(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
@@ -152,8 +152,8 @@ static MunitResult test_rgb(const MunitParameter params[], void *user_data) {
     return MUNIT_OK;
 }
 
-static MunitResult test_rgba(const MunitParameter params[], void *user_data) {
-
+static MunitResult test_rgba(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
@@ -168,8 +168,8 @@ static MunitResult test_rgba(const MunitParameter params[], void *user_data) {
     return MUNIT_OK;
 }
 
-static MunitResult test_cmyk(const MunitParameter params[], void *user_data) {
-
+static MunitResult test_cmyk(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
@@ -192,8 +192,8 @@ static MunitResult test_cmyk(const MunitParameter params[], void *user_data) {
     return MUNIT_OK;
 }
 
-static MunitResult test_ycbcr(const MunitParameter params[], void *user_data) {
-
+static MunitResult test_ycbcr(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
@@ -204,8 +204,8 @@ static MunitResult test_ycbcr(const MunitParameter params[], void *user_data) {
     return MUNIT_OK;
 }
 
-static MunitResult test_ycck(const MunitParameter params[], void *user_data) {
-
+static MunitResult test_ycck(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
@@ -216,8 +216,8 @@ static MunitResult test_ycck(const MunitParameter params[], void *user_data) {
     return MUNIT_OK;
 }
 
-static MunitResult test_cie_lab(const MunitParameter params[], void *user_data) {
-
+static MunitResult test_cie_lab(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
@@ -232,8 +232,8 @@ static MunitResult test_cie_lab(const MunitParameter params[], void *user_data) 
     return MUNIT_OK;
 }
 
-static MunitResult test_overflow(const MunitParameter params[], void *user_data) {
-
+static MunitResult test_overflow(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
@@ -242,6 +242,7 @@ static MunitResult test_overflow(const MunitParameter params[], void *user_data)
     return MUNIT_OK;
 }
 
+// clang-format off
 static MunitTest test_suite_tests[] = {
     { (char *)"/indexed",         test_indexed,         NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/grayscale",       test_grayscale,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
@@ -259,13 +260,11 @@ static MunitTest test_suite_tests[] = {
 };
 
 static const MunitSuite test_suite = {
-    (char *)"/bytes-per-line",
-    test_suite_tests,
-    NULL,
-    1,
-    MUNIT_SUITE_OPTION_NONE
+    (char *)"/bytes-per-line", test_suite_tests, NULL, 1, MUNIT_SUITE_OPTION_NONE
 };
+// clang-format on
 
-int main(int argc, char *argv[MUNIT_ARRAY_PARAM(argc + 1)]) {
+int main(int argc, char* argv[MUNIT_ARRAY_PARAM(argc + 1)])
+{
     return munit_suite_main(&test_suite, NULL, argc, argv);
 }

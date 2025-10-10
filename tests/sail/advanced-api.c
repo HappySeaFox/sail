@@ -442,9 +442,10 @@ static MunitResult test_advanced_roundtrip(const MunitParameter params[], void* 
     return MUNIT_OK;
 }
 
+// clang-format off
 static MunitParameterEnum test_params[] = {
-    {(char*)"path", (char**)SAIL_TEST_IMAGES},
-    {NULL, NULL},
+    { (char *)"path", (char **)SAIL_TEST_IMAGES },
+    { NULL, NULL },
 };
 
 static MunitTest test_suite_tests[] = {
@@ -464,8 +465,9 @@ static MunitTest test_suite_tests[] = {
 };
 
 static const MunitSuite test_suite = {
-    (char*)"/advanced-api", test_suite_tests, NULL, 1, MUNIT_SUITE_OPTION_NONE
+    (char *)"/advanced-api", test_suite_tests, NULL, 1, MUNIT_SUITE_OPTION_NONE
 };
+// clang-format on
 
 int main(int argc, char* argv[MUNIT_ARRAY_PARAM(argc + 1)])
 {

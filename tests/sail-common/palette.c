@@ -29,11 +29,12 @@
 
 #include "munit.h"
 
-static MunitResult test_alloc_palette(const MunitParameter params[], void *user_data) {
+static MunitResult test_alloc_palette(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
-    struct sail_palette *palette = NULL;
+    struct sail_palette* palette = NULL;
     munit_assert(sail_alloc_palette(&palette) == SAIL_OK);
     munit_assert_not_null(palette);
     munit_assert_null(palette->data);
@@ -45,11 +46,12 @@ static MunitResult test_alloc_palette(const MunitParameter params[], void *user_
     return MUNIT_OK;
 }
 
-static MunitResult test_copy_palette(const MunitParameter params[], void *user_data) {
+static MunitResult test_copy_palette(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
-    struct sail_palette *palette = NULL;
+    struct sail_palette* palette = NULL;
     munit_assert(sail_alloc_palette(&palette) == SAIL_OK);
 
     palette->pixel_format = SAIL_PIXEL_FORMAT_BPP24_RGB;
@@ -60,7 +62,7 @@ static MunitResult test_copy_palette(const MunitParameter params[], void *user_d
 
     memset(palette->data, 15, data_size);
 
-    struct sail_palette *palette_copy = NULL;
+    struct sail_palette* palette_copy = NULL;
     munit_assert(sail_copy_palette(palette, &palette_copy) == SAIL_OK);
     munit_assert_not_null(palette_copy);
 
@@ -75,7 +77,8 @@ static MunitResult test_copy_palette(const MunitParameter params[], void *user_d
     return MUNIT_OK;
 }
 
-static MunitResult test_palette_from_data(const MunitParameter params[], void *user_data) {
+static MunitResult test_palette_from_data(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
@@ -83,12 +86,12 @@ static MunitResult test_palette_from_data(const MunitParameter params[], void *u
     const unsigned color_count = 100;
     const unsigned data_size = color_count * 3;
 
-    void *data = NULL;
+    void* data = NULL;
     munit_assert(sail_malloc(data_size, &data) == SAIL_OK);
     memset(data, 15, data_size);
     munit_assert_not_null(data);
 
-    struct sail_palette *palette = NULL;
+    struct sail_palette* palette = NULL;
     munit_assert(sail_alloc_palette_from_data(pixel_format, data, color_count, &palette) == SAIL_OK);
     munit_assert_not_null(palette);
 
@@ -102,7 +105,8 @@ static MunitResult test_palette_from_data(const MunitParameter params[], void *u
     return MUNIT_OK;
 }
 
-static MunitResult test_palette_for_data(const MunitParameter params[], void *user_data) {
+static MunitResult test_palette_for_data(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
@@ -110,7 +114,7 @@ static MunitResult test_palette_for_data(const MunitParameter params[], void *us
     const unsigned color_count = 100;
     const unsigned data_size = color_count * 3;
 
-    struct sail_palette *palette = NULL;
+    struct sail_palette* palette = NULL;
     munit_assert(sail_alloc_palette_for_data(pixel_format, color_count, &palette) == SAIL_OK);
     munit_assert_not_null(palette);
 
@@ -125,6 +129,7 @@ static MunitResult test_palette_for_data(const MunitParameter params[], void *us
     return MUNIT_OK;
 }
 
+// clang-format off
 static MunitTest test_suite_tests[] = {
     { (char *)"/alloc", test_alloc_palette, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/copy", test_copy_palette, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
@@ -135,13 +140,11 @@ static MunitTest test_suite_tests[] = {
 };
 
 static const MunitSuite test_suite = {
-    (char *)"/palette",
-    test_suite_tests,
-    NULL,
-    1,
-    MUNIT_SUITE_OPTION_NONE
+    (char *)"/palette", test_suite_tests, NULL, 1, MUNIT_SUITE_OPTION_NONE
 };
+// clang-format on
 
-int main(int argc, char *argv[MUNIT_ARRAY_PARAM(argc + 1)]) {
+int main(int argc, char* argv[MUNIT_ARRAY_PARAM(argc + 1)])
+{
     return munit_suite_main(&test_suite, NULL, argc, argv);
 }

@@ -27,11 +27,12 @@
 
 #include "munit.h"
 
-static MunitResult test_alloc_options(const MunitParameter params[], void *user_data) {
+static MunitResult test_alloc_options(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
-    struct sail_save_options *save_options = NULL;
+    struct sail_save_options* save_options = NULL;
     munit_assert(sail_alloc_save_options(&save_options) == SAIL_OK);
     munit_assert_not_null(save_options);
     munit_assert(save_options->options == 0);
@@ -43,18 +44,19 @@ static MunitResult test_alloc_options(const MunitParameter params[], void *user_
     return MUNIT_OK;
 }
 
-static MunitResult test_copy_options(const MunitParameter params[], void *user_data) {
+static MunitResult test_copy_options(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
-    struct sail_save_options *save_options = NULL;
+    struct sail_save_options* save_options = NULL;
     munit_assert(sail_alloc_save_options(&save_options) == SAIL_OK);
 
-    save_options->options           = SAIL_OPTION_ICCP;
-    save_options->compression       = SAIL_COMPRESSION_JPEG;
+    save_options->options = SAIL_OPTION_ICCP;
+    save_options->compression = SAIL_COMPRESSION_JPEG;
     save_options->compression_level = 55;
 
-    struct sail_save_options *save_options_copy = NULL;
+    struct sail_save_options* save_options_copy = NULL;
     munit_assert(sail_copy_save_options(save_options, &save_options_copy) == SAIL_OK);
     munit_assert_not_null(save_options_copy);
 
@@ -69,12 +71,13 @@ static MunitResult test_copy_options(const MunitParameter params[], void *user_d
     return MUNIT_OK;
 }
 
-static MunitResult test_options_from_features(const MunitParameter params[], void *user_data) {
+static MunitResult test_options_from_features(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
-    struct sail_save_features *save_features;
-    struct sail_save_options *save_options;
+    struct sail_save_features* save_features;
+    struct sail_save_options* save_options;
 
     munit_assert(sail_alloc_save_features(&save_features) == SAIL_OK);
     munit_assert(sail_alloc_compression_level(&save_features->compression_level) == SAIL_OK);
@@ -84,7 +87,8 @@ static MunitResult test_options_from_features(const MunitParameter params[], voi
     save_features->compression_level->max_level = 100;
     save_features->compression_level->default_level = 81;
     save_features->compression_level->step = 1;
-    save_features->features = SAIL_CODEC_FEATURE_META_DATA | SAIL_CODEC_FEATURE_INTERLACED | SAIL_CODEC_FEATURE_ICCP | SAIL_CODEC_FEATURE_SOURCE_IMAGE;
+    save_features->features = SAIL_CODEC_FEATURE_META_DATA | SAIL_CODEC_FEATURE_INTERLACED | SAIL_CODEC_FEATURE_ICCP
+                              | SAIL_CODEC_FEATURE_SOURCE_IMAGE;
     munit_assert(sail_alloc_save_options_from_features(save_features, &save_options) == SAIL_OK);
 
     munit_assert(save_options->options == (SAIL_OPTION_META_DATA | SAIL_OPTION_INTERLACED | SAIL_OPTION_ICCP));
@@ -98,6 +102,7 @@ static MunitResult test_options_from_features(const MunitParameter params[], voi
     return MUNIT_OK;
 }
 
+// clang-format off
 static MunitTest test_suite_tests[] = {
     { (char *)"/alloc", test_alloc_options, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/copy", test_copy_options, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
@@ -107,13 +112,11 @@ static MunitTest test_suite_tests[] = {
 };
 
 static const MunitSuite test_suite = {
-    (char *)"/save-options",
-    test_suite_tests,
-    NULL,
-    1,
-    MUNIT_SUITE_OPTION_NONE
+    (char *)"/save-options", test_suite_tests, NULL, 1, MUNIT_SUITE_OPTION_NONE
 };
+// clang-format on
 
-int main(int argc, char *argv[MUNIT_ARRAY_PARAM(argc + 1)]) {
+int main(int argc, char* argv[MUNIT_ARRAY_PARAM(argc + 1)])
+{
     return munit_suite_main(&test_suite, NULL, argc, argv);
 }

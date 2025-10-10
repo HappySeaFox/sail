@@ -31,12 +31,12 @@
 
 #include "munit.h"
 
-static MunitResult test_alloc_meta_data(const MunitParameter params[], void *user_data) {
-
+static MunitResult test_alloc_meta_data(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
-    struct sail_meta_data *meta_data = NULL;
+    struct sail_meta_data* meta_data = NULL;
     munit_assert(sail_alloc_meta_data(&meta_data) == SAIL_OK);
     munit_assert_not_null(meta_data);
     munit_assert_null(meta_data->key_unknown);
@@ -47,12 +47,12 @@ static MunitResult test_alloc_meta_data(const MunitParameter params[], void *use
     return MUNIT_OK;
 }
 
-static MunitResult test_alloc_meta_data_from_known_key(const MunitParameter params[], void *user_data) {
-
+static MunitResult test_alloc_meta_data_from_known_key(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
-    struct sail_meta_data *meta_data = NULL;
+    struct sail_meta_data* meta_data = NULL;
     munit_assert(sail_alloc_meta_data_from_known_key(SAIL_META_DATA_COMMENT, &meta_data) == SAIL_OK);
     munit_assert_not_null(meta_data);
     munit_assert(meta_data->key == SAIL_META_DATA_COMMENT);
@@ -64,14 +64,14 @@ static MunitResult test_alloc_meta_data_from_known_key(const MunitParameter para
     return MUNIT_OK;
 }
 
-static MunitResult test_alloc_meta_data_from_unknown_key(const MunitParameter params[], void *user_data) {
-
+static MunitResult test_alloc_meta_data_from_unknown_key(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
-    const char *key = "Some Key";
+    const char* key = "Some Key";
 
-    struct sail_meta_data *meta_data = NULL;
+    struct sail_meta_data* meta_data = NULL;
     munit_assert(sail_alloc_meta_data_from_unknown_key(key, &meta_data) == SAIL_OK);
     munit_assert_not_null(meta_data);
     munit_assert_not_null(meta_data->key_unknown);
@@ -83,12 +83,12 @@ static MunitResult test_alloc_meta_data_from_unknown_key(const MunitParameter pa
     return MUNIT_OK;
 }
 
-static MunitResult test_alloc_meta_data_and_value_from_known_key(const MunitParameter params[], void *user_data) {
-
+static MunitResult test_alloc_meta_data_and_value_from_known_key(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
-    struct sail_meta_data *meta_data = NULL;
+    struct sail_meta_data* meta_data = NULL;
     munit_assert(sail_alloc_meta_data_and_value_from_known_key(SAIL_META_DATA_COMMENT, &meta_data) == SAIL_OK);
     munit_assert_not_null(meta_data);
     munit_assert(meta_data->key == SAIL_META_DATA_COMMENT);
@@ -99,14 +99,14 @@ static MunitResult test_alloc_meta_data_and_value_from_known_key(const MunitPara
     return MUNIT_OK;
 }
 
-static MunitResult test_alloc_meta_data_and_value_from_unknown_key(const MunitParameter params[], void *user_data) {
-
+static MunitResult test_alloc_meta_data_and_value_from_unknown_key(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
-    const char *key = "Some Key";
+    const char* key = "Some Key";
 
-    struct sail_meta_data *meta_data = NULL;
+    struct sail_meta_data* meta_data = NULL;
     munit_assert(sail_alloc_meta_data_and_value_from_unknown_key(key, &meta_data) == SAIL_OK);
     munit_assert_not_null(meta_data);
     munit_assert_not_null(meta_data->key_unknown);
@@ -118,14 +118,14 @@ static MunitResult test_alloc_meta_data_and_value_from_unknown_key(const MunitPa
     return MUNIT_OK;
 }
 
-static MunitResult test_copy_known_string_meta_data(const MunitParameter params[], void *user_data) {
-
+static MunitResult test_copy_known_string_meta_data(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
-    const char *value = "Comment 1";
+    const char* value = "Comment 1";
 
-    struct sail_meta_data *meta_data = NULL;
+    struct sail_meta_data* meta_data = NULL;
     munit_assert(sail_alloc_meta_data_from_known_key(SAIL_META_DATA_COMMENT, &meta_data) == SAIL_OK);
     munit_assert_not_null(meta_data);
 
@@ -133,7 +133,7 @@ static MunitResult test_copy_known_string_meta_data(const MunitParameter params[
     munit_assert(sail_set_variant_string(meta_data->value, value) == SAIL_OK);
     munit_assert_not_null(meta_data->value);
 
-    struct sail_meta_data *meta_data_copy = NULL;
+    struct sail_meta_data* meta_data_copy = NULL;
     munit_assert(sail_copy_meta_data(meta_data, &meta_data_copy) == SAIL_OK);
     munit_assert_not_null(meta_data_copy);
 
@@ -145,15 +145,15 @@ static MunitResult test_copy_known_string_meta_data(const MunitParameter params[
     return MUNIT_OK;
 }
 
-static MunitResult test_copy_unknown_string_meta_data(const MunitParameter params[], void *user_data) {
-
+static MunitResult test_copy_unknown_string_meta_data(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
-    const char *key = "Some Key";
-    const char *value = "Comment 1";
+    const char* key = "Some Key";
+    const char* value = "Comment 1";
 
-    struct sail_meta_data *meta_data = NULL;
+    struct sail_meta_data* meta_data = NULL;
     munit_assert(sail_alloc_meta_data_from_unknown_key(key, &meta_data) == SAIL_OK);
     munit_assert_not_null(meta_data);
 
@@ -161,7 +161,7 @@ static MunitResult test_copy_unknown_string_meta_data(const MunitParameter param
     munit_assert(sail_set_variant_string(meta_data->value, value) == SAIL_OK);
     munit_assert_not_null(meta_data->value);
 
-    struct sail_meta_data *meta_data_copy = NULL;
+    struct sail_meta_data* meta_data_copy = NULL;
     munit_assert(sail_copy_meta_data(meta_data, &meta_data_copy) == SAIL_OK);
     munit_assert_not_null(meta_data_copy);
 
@@ -173,6 +173,7 @@ static MunitResult test_copy_unknown_string_meta_data(const MunitParameter param
     return MUNIT_OK;
 }
 
+// clang-format off
 static MunitTest test_suite_tests[] = {
     { (char *)"/alloc",                             test_alloc_meta_data,                  NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/alloc-from-known-key",              test_alloc_meta_data_from_known_key,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
@@ -186,13 +187,11 @@ static MunitTest test_suite_tests[] = {
 };
 
 static const MunitSuite test_suite = {
-    (char *)"/meta_data",
-    test_suite_tests,
-    NULL,
-    1,
-    MUNIT_SUITE_OPTION_NONE
+    (char *)"/meta_data", test_suite_tests, NULL, 1, MUNIT_SUITE_OPTION_NONE
 };
+// clang-format on
 
-int main(int argc, char *argv[MUNIT_ARRAY_PARAM(argc + 1)]) {
+int main(int argc, char* argv[MUNIT_ARRAY_PARAM(argc + 1)])
+{
     return munit_suite_main(&test_suite, NULL, argc, argv);
 }

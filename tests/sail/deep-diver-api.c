@@ -501,6 +501,7 @@ static MunitResult test_deep_diver_compression_levels(const MunitParameter param
     return MUNIT_OK;
 }
 
+// clang-format off
 static MunitParameterEnum test_params[] = {
     { (char *)"path", (char **)SAIL_TEST_IMAGES },
     { NULL, NULL },
@@ -521,12 +522,9 @@ static MunitTest test_suite_tests[] = {
 };
 
 static const MunitSuite test_suite = {
-    (char *)"/deep-diver-api",
-    test_suite_tests,
-    NULL,
-    1,
-    MUNIT_SUITE_OPTION_NONE
+    (char *)"/deep-diver-api", test_suite_tests, NULL, 1, MUNIT_SUITE_OPTION_NONE
 };
+// clang-format on
 
 int main(int argc, char* argv[MUNIT_ARRAY_PARAM(argc + 1)])
 {

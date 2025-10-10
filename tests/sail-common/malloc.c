@@ -29,13 +29,14 @@
 
 #include "munit.h"
 
-static MunitResult test_malloc(const MunitParameter params[], void *user_data) {
+static MunitResult test_malloc(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
     const size_t size = 10 * 1024;
 
-    void *ptr = NULL;
+    void* ptr = NULL;
     munit_assert(sail_malloc(size, &ptr) == SAIL_OK);
     munit_assert_not_null(ptr);
 
@@ -45,20 +46,22 @@ static MunitResult test_malloc(const MunitParameter params[], void *user_data) {
     return MUNIT_OK;
 }
 
-static MunitResult test_calloc(const MunitParameter params[], void *user_data) {
+static MunitResult test_calloc(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
     const size_t size = 1;
     const size_t members = 1024;
 
-    void *ptr = NULL;
+    void* ptr = NULL;
     munit_assert(sail_calloc(members, size, &ptr) == SAIL_OK);
     munit_assert_not_null(ptr);
 
-    unsigned char *cptr = ptr;
+    unsigned char* cptr = ptr;
 
-    for (size_t i = 0; i < size * members; i++, cptr++) {
+    for (size_t i = 0; i < size * members; i++, cptr++)
+    {
         munit_assert(*cptr == 0);
     }
 
@@ -67,7 +70,8 @@ static MunitResult test_calloc(const MunitParameter params[], void *user_data) {
     return MUNIT_OK;
 }
 
-static MunitResult test_realloc(const MunitParameter params[], void *user_data) {
+static MunitResult test_realloc(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
@@ -77,9 +81,10 @@ static MunitResult test_realloc(const MunitParameter params[], void *user_data) 
     const int iterations = 10;
     int iteration = 0;
 
-    void *ptr = NULL;
+    void* ptr = NULL;
 
-    while (iteration++ < iterations) {
+    while (iteration++ < iterations)
+    {
         munit_assert(sail_realloc(current_size, &ptr) == SAIL_OK);
         munit_assert_not_null(ptr);
 
@@ -93,6 +98,7 @@ static MunitResult test_realloc(const MunitParameter params[], void *user_data) 
     return MUNIT_OK;
 }
 
+// clang-format off
 static MunitTest test_suite_tests[] = {
     { (char *)"/malloc",  test_malloc,  NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/calloc",  test_calloc,  NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
@@ -102,13 +108,11 @@ static MunitTest test_suite_tests[] = {
 };
 
 static const MunitSuite test_suite = {
-    (char *)"/malloc",
-    test_suite_tests,
-    NULL,
-    1,
-    MUNIT_SUITE_OPTION_NONE
+    (char *)"/malloc", test_suite_tests, NULL, 1, MUNIT_SUITE_OPTION_NONE
 };
+// clang-format on
 
-int main(int argc, char *argv[MUNIT_ARRAY_PARAM(argc + 1)]) {
+int main(int argc, char* argv[MUNIT_ARRAY_PARAM(argc + 1)])
+{
     return munit_suite_main(&test_suite, NULL, argc, argv);
 }

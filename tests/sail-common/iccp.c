@@ -29,11 +29,12 @@
 
 #include "munit.h"
 
-static MunitResult test_alloc_iccp(const MunitParameter params[], void *user_data) {
+static MunitResult test_alloc_iccp(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
-    struct sail_iccp *iccp = NULL;
+    struct sail_iccp* iccp = NULL;
     munit_assert(sail_alloc_iccp(&iccp) == SAIL_OK);
     munit_assert_not_null(iccp);
     munit_assert_null(iccp->data);
@@ -44,11 +45,12 @@ static MunitResult test_alloc_iccp(const MunitParameter params[], void *user_dat
     return MUNIT_OK;
 }
 
-static MunitResult test_copy_iccp(const MunitParameter params[], void *user_data) {
+static MunitResult test_copy_iccp(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
-    struct sail_iccp *iccp = NULL;
+    struct sail_iccp* iccp = NULL;
     munit_assert(sail_alloc_iccp(&iccp) == SAIL_OK);
 
     iccp->size = 1024;
@@ -57,7 +59,7 @@ static MunitResult test_copy_iccp(const MunitParameter params[], void *user_data
 
     memset(iccp->data, 15, iccp->size);
 
-    struct sail_iccp *iccp_copy = NULL;
+    struct sail_iccp* iccp_copy = NULL;
     munit_assert(sail_copy_iccp(iccp, &iccp_copy) == SAIL_OK);
     munit_assert_not_null(iccp_copy);
 
@@ -71,17 +73,18 @@ static MunitResult test_copy_iccp(const MunitParameter params[], void *user_data
     return MUNIT_OK;
 }
 
-static MunitResult test_iccp_from_data(const MunitParameter params[], void *user_data) {
+static MunitResult test_iccp_from_data(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
     const unsigned data_size = 1024;
-    void *data = NULL;
+    void* data = NULL;
     munit_assert(sail_malloc(data_size, &data) == SAIL_OK);
     memset(data, 15, data_size);
     munit_assert_not_null(data);
 
-    struct sail_iccp *iccp = NULL;
+    struct sail_iccp* iccp = NULL;
     munit_assert(sail_alloc_iccp_from_data(data, data_size, &iccp) == SAIL_OK);
     munit_assert_not_null(iccp);
 
@@ -94,17 +97,18 @@ static MunitResult test_iccp_from_data(const MunitParameter params[], void *user
     return MUNIT_OK;
 }
 
-static MunitResult test_iccp_from_shallow_data(const MunitParameter params[], void *user_data) {
+static MunitResult test_iccp_from_shallow_data(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
     const unsigned data_size = 1024;
-    void *data = NULL;
+    void* data = NULL;
     munit_assert(sail_malloc(data_size, &data) == SAIL_OK);
     memset(data, 15, data_size);
     munit_assert_not_null(data);
 
-    struct sail_iccp *iccp = NULL;
+    struct sail_iccp* iccp = NULL;
     munit_assert(sail_alloc_iccp_from_shallow_data(data, data_size, &iccp) == SAIL_OK);
     munit_assert_not_null(iccp);
 
@@ -117,13 +121,14 @@ static MunitResult test_iccp_from_shallow_data(const MunitParameter params[], vo
     return MUNIT_OK;
 }
 
-static MunitResult test_iccp_for_data(const MunitParameter params[], void *user_data) {
+static MunitResult test_iccp_for_data(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
     const unsigned data_size = 1024;
 
-    struct sail_iccp *iccp = NULL;
+    struct sail_iccp* iccp = NULL;
     munit_assert(sail_alloc_iccp_for_data(data_size, &iccp) == SAIL_OK);
     munit_assert_not_null(iccp);
 
@@ -136,6 +141,7 @@ static MunitResult test_iccp_for_data(const MunitParameter params[], void *user_
     return MUNIT_OK;
 }
 
+// clang-format off
 static MunitTest test_suite_tests[] = {
     { (char *)"/alloc", test_alloc_iccp, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/copy", test_copy_iccp, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
@@ -147,13 +153,11 @@ static MunitTest test_suite_tests[] = {
 };
 
 static const MunitSuite test_suite = {
-    (char *)"/iccp",
-    test_suite_tests,
-    NULL,
-    1,
-    MUNIT_SUITE_OPTION_NONE
+    (char *)"/iccp", test_suite_tests, NULL, 1, MUNIT_SUITE_OPTION_NONE
 };
+// clang-format on
 
-int main(int argc, char *argv[MUNIT_ARRAY_PARAM(argc + 1)]) {
+int main(int argc, char* argv[MUNIT_ARRAY_PARAM(argc + 1)])
+{
     return munit_suite_main(&test_suite, NULL, argc, argv);
 }

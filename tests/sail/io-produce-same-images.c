@@ -71,6 +71,7 @@ static MunitResult test_io_produce_same_images(const MunitParameter params[], vo
     return MUNIT_OK;
 }
 
+// clang-format off
 static MunitParameterEnum test_params[] = {
     { (char *)"path", (char **)SAIL_TEST_IMAGES },
     { NULL, NULL },
@@ -83,12 +84,9 @@ static MunitTest test_suite_tests[] = {
 };
 
 static const MunitSuite test_suite = {
-    (char *)"/io-produce-same-images",
-    test_suite_tests,
-    NULL,
-    1,
-    MUNIT_SUITE_OPTION_NONE
+    (char *)"/io-produce-same-images", test_suite_tests, NULL, 1, MUNIT_SUITE_OPTION_NONE
 };
+// clang-format on
 
 int main(int argc, char* argv[MUNIT_ARRAY_PARAM(argc + 1)])
 {

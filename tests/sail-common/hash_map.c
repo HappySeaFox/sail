@@ -34,19 +34,19 @@
 
 #include "munit.h"
 
-static MunitResult test_put(const MunitParameter params[], void *user_data) {
-
+static MunitResult test_put(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
-    struct sail_hash_map *hash_map;
+    struct sail_hash_map* hash_map;
     munit_assert(sail_alloc_hash_map(&hash_map) == SAIL_OK);
 
     const double reference_value1 = 11.5;
     const int reference_value2 = 101;
 
     /* Value 1. */
-    struct sail_variant *value1;
+    struct sail_variant* value1;
     munit_assert(sail_alloc_variant(&value1) == SAIL_OK);
     sail_set_variant_double(value1, reference_value1);
 
@@ -54,14 +54,14 @@ static MunitResult test_put(const MunitParameter params[], void *user_data) {
     sail_destroy_variant(value1);
     munit_assert(sail_hash_map_has_key(hash_map, "ktop"));
 
-    const struct sail_variant *value_in_map1 = sail_hash_map_value(hash_map, "ktop");
+    const struct sail_variant* value_in_map1 = sail_hash_map_value(hash_map, "ktop");
     munit_assert_not_null(value_in_map1);
     munit_assert_double(sail_variant_to_double(value_in_map1), ==, reference_value1);
 
     munit_assert(sail_hash_map_size(hash_map) == 1);
 
     /* Value 2. */
-    struct sail_variant *value2;
+    struct sail_variant* value2;
     munit_assert(sail_alloc_variant(&value2) == SAIL_OK);
     sail_set_variant_int(value2, reference_value2);
 
@@ -69,7 +69,7 @@ static MunitResult test_put(const MunitParameter params[], void *user_data) {
     sail_destroy_variant(value2);
     munit_assert(sail_hash_map_has_key(hash_map, "range"));
 
-    const struct sail_variant *value_in_map2 = sail_hash_map_value(hash_map, "range");
+    const struct sail_variant* value_in_map2 = sail_hash_map_value(hash_map, "range");
     munit_assert_not_null(value_in_map2);
     munit_assert_int(sail_variant_to_int(value_in_map2), ==, reference_value2);
 
@@ -81,28 +81,31 @@ static MunitResult test_put(const MunitParameter params[], void *user_data) {
     return MUNIT_OK;
 }
 
-static MunitResult test_put_erase_many(const MunitParameter params[], void *user_data) {
-
+static MunitResult test_put_erase_many(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
     srand((unsigned)time(NULL));
 
     /* Construct a large array of keys to force collisions in the hash map. */
-    enum {
+    enum
+    {
         ARRAY_SIZE = 2500
     };
 
-    char* keys[ARRAY_SIZE] = { NULL };
+    char* keys[ARRAY_SIZE] = {NULL};
 
-    for (size_t i = 0; i < ARRAY_SIZE; i++) {
+    for (size_t i = 0; i < ARRAY_SIZE; i++)
+    {
         const size_t length = 5 + 1;
 
-        void *ptr;
+        void* ptr;
         munit_assert(sail_malloc(length, &ptr) == SAIL_OK);
         keys[i] = ptr;
 
-        for (size_t l = 0; l < length - 1; l++) {
+        for (size_t l = 0; l < length - 1; l++)
+        {
             keys[i][l] = (char)(1 + rand() % 255);
         }
 
@@ -112,27 +115,30 @@ static MunitResult test_put_erase_many(const MunitParameter params[], void *user
     /* Value. */
     const double reference_value = 24.5;
 
-    struct sail_variant *value;
+    struct sail_variant* value;
     munit_assert(sail_alloc_variant(&value) == SAIL_OK);
     sail_set_variant_double(value, reference_value);
 
-    struct sail_hash_map *hash_map;
+    struct sail_hash_map* hash_map;
     munit_assert(sail_alloc_hash_map(&hash_map) == SAIL_OK);
 
-    for (size_t i = 0, prev_size = 0; i < ARRAY_SIZE; i++) {
+    for (size_t i = 0, prev_size = 0; i < ARRAY_SIZE; i++)
+    {
         munit_assert(sail_put_hash_map(hash_map, keys[i], value) == SAIL_OK);
         munit_assert(sail_hash_map_has_key(hash_map, keys[i]));
         munit_assert(sail_hash_map_size(hash_map) == ++prev_size);
     }
 
-    for (size_t i = 0, prev_size = ARRAY_SIZE; i < ARRAY_SIZE; i++) {
+    for (size_t i = 0, prev_size = ARRAY_SIZE; i < ARRAY_SIZE; i++)
+    {
         sail_erase_hash_map_key(hash_map, keys[i]);
         munit_assert(!sail_hash_map_has_key(hash_map, keys[i]));
         munit_assert(sail_hash_map_size(hash_map) == --prev_size);
     }
 
     /* Cleanup. */
-    for (size_t i = 0; i < ARRAY_SIZE; i++) {
+    for (size_t i = 0; i < ARRAY_SIZE; i++)
+    {
         sail_free(keys[i]);
     }
 
@@ -142,19 +148,19 @@ static MunitResult test_put_erase_many(const MunitParameter params[], void *user
     return MUNIT_OK;
 }
 
-static MunitResult test_copy(const MunitParameter params[], void *user_data) {
-
+static MunitResult test_copy(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
-    struct sail_hash_map *hash_map1;
+    struct sail_hash_map* hash_map1;
     munit_assert(sail_alloc_hash_map(&hash_map1) == SAIL_OK);
 
     const double reference_value1 = 11.5;
     const int reference_value2 = 101;
 
     /* Value 1. */
-    struct sail_variant *value1;
+    struct sail_variant* value1;
     munit_assert(sail_alloc_variant(&value1) == SAIL_OK);
     sail_set_variant_double(value1, reference_value1);
 
@@ -162,14 +168,14 @@ static MunitResult test_copy(const MunitParameter params[], void *user_data) {
     sail_destroy_variant(value1);
 
     /* Value 2. */
-    struct sail_variant *value2;
+    struct sail_variant* value2;
     munit_assert(sail_alloc_variant(&value2) == SAIL_OK);
     sail_set_variant_int(value2, reference_value2);
 
     munit_assert(sail_put_hash_map(hash_map1, "range", value2) == SAIL_OK);
     sail_destroy_variant(value2);
 
-    struct sail_hash_map *hash_map2;
+    struct sail_hash_map* hash_map2;
     munit_assert(sail_copy_hash_map(hash_map1, &hash_map2) == SAIL_OK);
 
     munit_assert(sail_test_compare_hash_maps(hash_map1, hash_map2) == SAIL_OK);
@@ -181,19 +187,19 @@ static MunitResult test_copy(const MunitParameter params[], void *user_data) {
     return MUNIT_OK;
 }
 
-static MunitResult test_overwrite(const MunitParameter params[], void *user_data) {
-
+static MunitResult test_overwrite(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
-    struct sail_hash_map *hash_map;
+    struct sail_hash_map* hash_map;
     munit_assert(sail_alloc_hash_map(&hash_map) == SAIL_OK);
 
     const double reference_value1 = 11.5;
     const double reference_value2 = 125.5;
 
     /* Value. */
-    struct sail_variant *value;
+    struct sail_variant* value;
     munit_assert(sail_alloc_variant(&value) == SAIL_OK);
     sail_set_variant_double(value, reference_value1);
 
@@ -204,7 +210,7 @@ static MunitResult test_overwrite(const MunitParameter params[], void *user_data
     munit_assert(sail_put_hash_map(hash_map, "ktop", value) == SAIL_OK);
     munit_assert(sail_hash_map_size(hash_map) == 1);
 
-    const struct sail_variant *value_in_map = sail_hash_map_value(hash_map, "ktop");
+    const struct sail_variant* value_in_map = sail_hash_map_value(hash_map, "ktop");
     munit_assert_double(sail_variant_to_double(value_in_map), ==, reference_value2);
 
     /* Overwrite #2. */
@@ -221,17 +227,17 @@ static MunitResult test_overwrite(const MunitParameter params[], void *user_data
     return MUNIT_OK;
 }
 
-static struct sail_hash_map *generate_specific_hash_map_for_erasing(int value) {
-
-    struct sail_hash_map *hash_map;
+static struct sail_hash_map* generate_specific_hash_map_for_erasing(int value)
+{
+    struct sail_hash_map* hash_map;
     sail_alloc_hash_map(&hash_map);
 
     /* Value 1. */
-    struct sail_variant *variant;
+    struct sail_variant* variant;
     sail_alloc_variant(&variant);
     sail_set_variant_int(variant, value);
 
-    sail_put_hash_map(hash_map, "z",  variant);
+    sail_put_hash_map(hash_map, "z", variant);
     sail_put_hash_map(hash_map, "i1", variant);
     sail_put_hash_map(hash_map, "h2", variant);
 
@@ -240,8 +246,8 @@ static struct sail_hash_map *generate_specific_hash_map_for_erasing(int value) {
     return hash_map;
 }
 
-static MunitResult test_erase(const MunitParameter params[], void *user_data) {
-
+static MunitResult test_erase(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
@@ -250,9 +256,9 @@ static MunitResult test_erase(const MunitParameter params[], void *user_data) {
      * Let's test this specific use-case.
      */
 
-    struct sail_hash_map *hash_map;
+    struct sail_hash_map* hash_map;
     int reference_value;
-    const struct sail_variant *value_in_map;
+    const struct sail_variant* value_in_map;
 
     /* Erase non-existing. */
     reference_value = 444;
@@ -324,12 +330,12 @@ static MunitResult test_erase(const MunitParameter params[], void *user_data) {
     return MUNIT_OK;
 }
 
-static MunitResult test_clear(const MunitParameter params[], void *user_data) {
-
+static MunitResult test_clear(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
-    struct sail_hash_map *hash_map;
+    struct sail_hash_map* hash_map;
     munit_assert(sail_alloc_hash_map(&hash_map) == SAIL_OK);
 
     /* Clear an empty hash map. */
@@ -338,7 +344,7 @@ static MunitResult test_clear(const MunitParameter params[], void *user_data) {
     const double reference_value = 11.5;
 
     /* Value. */
-    struct sail_variant *value;
+    struct sail_variant* value;
     munit_assert(sail_alloc_variant(&value) == SAIL_OK);
     sail_set_variant_double(value, reference_value);
 
@@ -355,6 +361,7 @@ static MunitResult test_clear(const MunitParameter params[], void *user_data) {
     return MUNIT_OK;
 }
 
+// clang-format off
 static MunitTest test_suite_tests[] = {
     { (char *)"/put",            test_put,            NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/put-erase-many", test_put_erase_many, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
@@ -367,13 +374,11 @@ static MunitTest test_suite_tests[] = {
 };
 
 static const MunitSuite test_suite = {
-    (char *)"/hash-map",
-    test_suite_tests,
-    NULL,
-    1,
-    MUNIT_SUITE_OPTION_NONE
+    (char *)"/hash-map", test_suite_tests, NULL, 1, MUNIT_SUITE_OPTION_NONE
 };
+// clang-format on
 
-int main(int argc, char *argv[MUNIT_ARRAY_PARAM(argc + 1)]) {
+int main(int argc, char* argv[MUNIT_ARRAY_PARAM(argc + 1)])
+{
     return munit_suite_main(&test_suite, NULL, argc, argv);
 }

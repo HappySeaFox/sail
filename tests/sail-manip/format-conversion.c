@@ -26,13 +26,13 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <sail/sail.h>
 #include <sail-manip/sail-manip.h>
+#include <sail/sail.h>
 
 #include "munit.h"
 
-static MunitResult test_grayscale_alpha_conversion(const MunitParameter params[], void *user_data) {
-
+static MunitResult test_grayscale_alpha_conversion(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
@@ -51,8 +51,8 @@ static MunitResult test_grayscale_alpha_conversion(const MunitParameter params[]
     return MUNIT_OK;
 }
 
-static MunitResult test_rgb555_565_conversion(const MunitParameter params[], void *user_data) {
-
+static MunitResult test_rgb555_565_conversion(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
@@ -69,8 +69,8 @@ static MunitResult test_rgb555_565_conversion(const MunitParameter params[], voi
     return MUNIT_OK;
 }
 
-static MunitResult test_cmyk_conversion(const MunitParameter params[], void *user_data) {
-
+static MunitResult test_cmyk_conversion(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
@@ -92,8 +92,8 @@ static MunitResult test_cmyk_conversion(const MunitParameter params[], void *use
     return MUNIT_OK;
 }
 
-static MunitResult test_yuv_conversion(const MunitParameter params[], void *user_data) {
-
+static MunitResult test_yuv_conversion(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
@@ -105,8 +105,8 @@ static MunitResult test_yuv_conversion(const MunitParameter params[], void *user
     return MUNIT_OK;
 }
 
-static MunitResult test_rgba16_conversion(const MunitParameter params[], void *user_data) {
-
+static MunitResult test_rgba16_conversion(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
@@ -130,13 +130,13 @@ static MunitResult test_rgba16_conversion(const MunitParameter params[], void *u
     return MUNIT_OK;
 }
 
-static MunitResult test_actual_conversion_grayscale_alpha(const MunitParameter params[], void *user_data) {
-
+static MunitResult test_actual_conversion_grayscale_alpha(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
     /* Create a simple test image BPP32_RGBA */
-    struct sail_image *image;
+    struct sail_image* image;
     munit_assert_int(sail_alloc_image(&image), ==, SAIL_OK);
 
     image->width = 2;
@@ -148,14 +148,26 @@ static MunitResult test_actual_conversion_grayscale_alpha(const MunitParameter p
     munit_assert_int(sail_malloc(pixels_size, &image->pixels), ==, SAIL_OK);
 
     /* Fill with test data: RGBA */
-    uint8_t *pixels = image->pixels;
-    pixels[0] = 255; pixels[1] = 0;   pixels[2] = 0;   pixels[3] = 255; /* Red, opaque */
-    pixels[4] = 0;   pixels[5] = 255; pixels[6] = 0;   pixels[7] = 128; /* Green, semi-transparent */
-    pixels[8] = 0;   pixels[9] = 0;   pixels[10] = 255; pixels[11] = 255; /* Blue, opaque */
-    pixels[12] = 255; pixels[13] = 255; pixels[14] = 255; pixels[15] = 0;   /* White, transparent */
+    uint8_t* pixels = image->pixels;
+    pixels[0] = 255;
+    pixels[1] = 0;
+    pixels[2] = 0;
+    pixels[3] = 255; /* Red, opaque */
+    pixels[4] = 0;
+    pixels[5] = 255;
+    pixels[6] = 0;
+    pixels[7] = 128; /* Green, semi-transparent */
+    pixels[8] = 0;
+    pixels[9] = 0;
+    pixels[10] = 255;
+    pixels[11] = 255; /* Blue, opaque */
+    pixels[12] = 255;
+    pixels[13] = 255;
+    pixels[14] = 255;
+    pixels[15] = 0; /* White, transparent */
 
     /* Convert to BPP16_GRAYSCALE_ALPHA */
-    struct sail_image *converted_image;
+    struct sail_image* converted_image;
     munit_assert_int(sail_convert_image(image, SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA, &converted_image), ==, SAIL_OK);
 
     munit_assert_not_null(converted_image);
@@ -164,7 +176,7 @@ static MunitResult test_actual_conversion_grayscale_alpha(const MunitParameter p
     munit_assert_int(converted_image->height, ==, 2);
 
     /* Verify first pixel is converted correctly (grayscale of red) */
-    uint8_t *converted_pixels = converted_image->pixels;
+    uint8_t* converted_pixels = converted_image->pixels;
     /* First pixel: Gray value should be around 76 (0.299*255), alpha 255 */
     munit_assert_int(converted_pixels[0], >, 70);
     munit_assert_int(converted_pixels[0], <, 82);
@@ -176,13 +188,13 @@ static MunitResult test_actual_conversion_grayscale_alpha(const MunitParameter p
     return MUNIT_OK;
 }
 
-static MunitResult test_actual_conversion_rgb555(const MunitParameter params[], void *user_data) {
-
+static MunitResult test_actual_conversion_rgb555(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
     /* Create a simple test image BPP24_RGB */
-    struct sail_image *image;
+    struct sail_image* image;
     munit_assert_int(sail_alloc_image(&image), ==, SAIL_OK);
 
     image->width = 2;
@@ -194,12 +206,16 @@ static MunitResult test_actual_conversion_rgb555(const MunitParameter params[], 
     munit_assert_int(sail_malloc(pixels_size, &image->pixels), ==, SAIL_OK);
 
     /* Fill with test data: RGB */
-    uint8_t *pixels = image->pixels;
-    pixels[0] = 248; pixels[1] = 0;   pixels[2] = 0;   /* Red (should be 31 in 5-bit) */
-    pixels[3] = 0;   pixels[4] = 252; pixels[5] = 0;   /* Green (should be 31 in 5-bit) */
+    uint8_t* pixels = image->pixels;
+    pixels[0] = 248;
+    pixels[1] = 0;
+    pixels[2] = 0; /* Red (should be 31 in 5-bit) */
+    pixels[3] = 0;
+    pixels[4] = 252;
+    pixels[5] = 0; /* Green (should be 31 in 5-bit) */
 
     /* Convert to BPP16_RGB555 */
-    struct sail_image *converted_image;
+    struct sail_image* converted_image;
     munit_assert_int(sail_convert_image(image, SAIL_PIXEL_FORMAT_BPP16_RGB555, &converted_image), ==, SAIL_OK);
 
     munit_assert_not_null(converted_image);
@@ -211,13 +227,13 @@ static MunitResult test_actual_conversion_rgb555(const MunitParameter params[], 
     return MUNIT_OK;
 }
 
-static MunitResult test_actual_conversion_cmyk(const MunitParameter params[], void *user_data) {
-
+static MunitResult test_actual_conversion_cmyk(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
     /* Create a simple test image BPP24_RGB */
-    struct sail_image *image;
+    struct sail_image* image;
     munit_assert_int(sail_alloc_image(&image), ==, SAIL_OK);
 
     image->width = 2;
@@ -229,24 +245,28 @@ static MunitResult test_actual_conversion_cmyk(const MunitParameter params[], vo
     munit_assert_int(sail_malloc(pixels_size, &image->pixels), ==, SAIL_OK);
 
     /* Fill with test data: RGB */
-    uint8_t *pixels = image->pixels;
-    pixels[0] = 255; pixels[1] = 0;   pixels[2] = 0;   /* Pure Red */
-    pixels[3] = 0;   pixels[4] = 0;   pixels[5] = 0;   /* Black */
+    uint8_t* pixels = image->pixels;
+    pixels[0] = 255;
+    pixels[1] = 0;
+    pixels[2] = 0; /* Pure Red */
+    pixels[3] = 0;
+    pixels[4] = 0;
+    pixels[5] = 0; /* Black */
 
     /* Convert to BPP32_CMYK */
-    struct sail_image *converted_image;
+    struct sail_image* converted_image;
     munit_assert_int(sail_convert_image(image, SAIL_PIXEL_FORMAT_BPP32_CMYK, &converted_image), ==, SAIL_OK);
 
     munit_assert_not_null(converted_image);
     munit_assert_int(converted_image->pixel_format, ==, SAIL_PIXEL_FORMAT_BPP32_CMYK);
 
     /* Verify CMYK conversion */
-    uint8_t *cmyk_pixels = converted_image->pixels;
+    uint8_t* cmyk_pixels = converted_image->pixels;
     /* Pure red: C=0, M=~255, Y=~255, K=0 (may have small rounding errors) */
-    munit_assert_int(cmyk_pixels[0], ==, 0);   /* C */
-    munit_assert_int(cmyk_pixels[1], >, 250);  /* M should be close to 255 */
-    munit_assert_int(cmyk_pixels[2], >, 250);  /* Y should be close to 255 */
-    munit_assert_int(cmyk_pixels[3], ==, 0);   /* K */
+    munit_assert_int(cmyk_pixels[0], ==, 0);  /* C */
+    munit_assert_int(cmyk_pixels[1], >, 250); /* M should be close to 255 */
+    munit_assert_int(cmyk_pixels[2], >, 250); /* Y should be close to 255 */
+    munit_assert_int(cmyk_pixels[3], ==, 0);  /* K */
 
     /* Black: C=0, M=0, Y=0, K=255 */
     munit_assert_int(cmyk_pixels[4], ==, 0);   /* C */
@@ -260,6 +280,7 @@ static MunitResult test_actual_conversion_cmyk(const MunitParameter params[], vo
     return MUNIT_OK;
 }
 
+// clang-format off
 static MunitTest test_suite_tests[] = {
     { (char *)"/grayscale-alpha",        test_grayscale_alpha_conversion,        NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/rgb555-565",             test_rgb555_565_conversion,             NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
@@ -274,14 +295,11 @@ static MunitTest test_suite_tests[] = {
 };
 
 static const MunitSuite test_suite = {
-    (char *)"/format-conversion",
-    test_suite_tests,
-    NULL,
-    1,
-    MUNIT_SUITE_OPTION_NONE
+    (char *)"/format-conversion", test_suite_tests, NULL, 1, MUNIT_SUITE_OPTION_NONE
 };
+// clang-format on
 
-int main(int argc, char *argv[MUNIT_ARRAY_PARAM(argc + 1)]) {
+int main(int argc, char* argv[MUNIT_ARRAY_PARAM(argc + 1)])
+{
     return munit_suite_main(&test_suite, NULL, argc, argv);
 }
-

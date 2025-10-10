@@ -57,6 +57,7 @@ static MunitResult test_bugs_must_succeed(const MunitParameter params[], void* u
     return MUNIT_OK;
 }
 
+// clang-format off
 static MunitParameterEnum test_params_must_fail[] = {
     { (char *)"path", (char **)SAIL_TEST_IMAGES_MUST_FAIL },
     { NULL, NULL },
@@ -75,12 +76,9 @@ static MunitTest test_suite_tests[] = {
 };
 
 static const MunitSuite test_suite = {
-    (char *)"/bugs",
-    test_suite_tests,
-    NULL,
-    1,
-    MUNIT_SUITE_OPTION_NONE
+    (char *)"/bugs", test_suite_tests, NULL, 1, MUNIT_SUITE_OPTION_NONE
 };
+// clang-format on
 
 int main(int argc, char* argv[MUNIT_ARRAY_PARAM(argc + 1)])
 {
