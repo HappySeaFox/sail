@@ -665,15 +665,17 @@ SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_png(void **state) {
     /* Subsequent calls to finish() will expectedly fail in the above line. */
     *state = NULL;
 
+    sail_status_t result = SAIL_OK;
+
     /* Error handling setup. */
     if (png_state->png_ptr != NULL) {
         if (setjmp(png_jmpbuf(png_state->png_ptr))) {
-            destroy_png_state(png_state);
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+            png_state->libpng_error = true;
+            result = SAIL_ERROR_UNDERLYING_CODEC;
         }
     }
 
-    if (png_state->png_ptr != NULL && !png_state->libpng_error) {
+    if (result == SAIL_OK && png_state->png_ptr != NULL && !png_state->libpng_error) {
         png_write_end(png_state->png_ptr, png_state->info_ptr);
     }
 
@@ -682,6 +684,10 @@ SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_png(void **state) {
     }
 
     destroy_png_state(png_state);
+
+    if (result != SAIL_OK) {
+        SAIL_LOG_AND_RETURN(result);
+    }
 
     return SAIL_OK;
 }
