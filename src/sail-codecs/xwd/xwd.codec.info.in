@@ -1,0 +1,26 @@
+# XWD codec information
+#
+[codec]
+layout=8
+version=0.5.0
+priority=LOWEST
+name=XWD
+description=X Window Dump
+magic-numbers=00 00 00 64
+extensions=xwd
+mime-types=image/x-xwindowdump;image/x-xwd
+
+[load-features]
+features=STATIC;SOURCE-IMAGE
+tuning=
+
+[save-features]
+features=STATIC
+pixel-formats=BPP1-INDEXED;BPP2-INDEXED;BPP4-INDEXED;BPP8-INDEXED;BPP16-RGB555;BPP16-BGR555;BPP16-RGB565;BPP16-BGR565;BPP24-RGB;BPP24-BGR;BPP32-RGBA;BPP32-BGRA;BPP32-ARGB;BPP32-ABGR
+compressions=NONE
+default-compression=NONE
+compression-level-min=0
+compression-level-max=0
+compression-level-default=0
+compression-level-step=0
+tuning=

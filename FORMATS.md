@@ -692,6 +692,39 @@
     <td>-</td>
     <td>-</td>
 </tr>
+<tr>
+    <td>21</td>
+    <td><a href="https://en.wikipedia.org/wiki/Xwd">XWD</a></td>
+    <td>
+        <b>Indexed:</b> 1-bit, 2-bit, 4-bit, 8-bit.
+        <b>RGB:</b> 16-bit (555, 565), 24-bit.
+        <b>BGR:</b> 16-bit (555, 565), 24-bit.
+        <b>RGBA:</b> 32-bit.
+        <b>BGRA:</b> 32-bit.
+        <b>ARGB:</b> 32-bit.
+        <b>ABGR:</b> 32-bit.
+        <br/><br/>
+        <b>Content:</b> Static.
+        <br/><br/>
+        <b>Specifications:</b> X11.
+    </td>
+    <td>XYPixmap and XYBitmap formats (only ZPixmap is supported).</td>
+    <td>
+        <b>Indexed:</b> 1-bit, 2-bit, 4-bit, 8-bit.
+        <b>RGB:</b> 16-bit (555, 565), 24-bit.
+        <b>BGR:</b> 16-bit (555, 565), 24-bit.
+        <b>RGBA:</b> 32-bit.
+        <b>BGRA:</b> 32-bit.
+        <b>ARGB:</b> 32-bit.
+        <b>ABGR:</b> 32-bit.
+        <br/><br/>
+        <b>Compressions:</b> NONE.
+        <br/><br/>
+        <b>Content:</b> Static.
+    </td>
+    <td>-</td>
+    <td>-</td>
+</tr>
 </tbody>
 </table>
 
