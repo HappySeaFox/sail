@@ -58,7 +58,8 @@ static sail_status_t convert_impl(const char *input, const char *output, enum Sa
     SAIL_TRY(sail_alloc_load_options_from_features(input_codec_info->load_features, &load_options));
     load_options->options |= SAIL_OPTION_SOURCE_IMAGE;
 
-    SAIL_TRY(sail_start_loading_from_file_with_options(input, input_codec_info, load_options, &load_state));
+    SAIL_TRY_OR_CLEANUP(sail_start_loading_from_file_with_options(input, input_codec_info, load_options, &load_state),
+                        /* cleanup */ sail_destroy_load_options(load_options));
     sail_destroy_load_options(load_options);
 
     /* Setup output. */
