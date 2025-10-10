@@ -445,14 +445,17 @@
         <b>Content:</b> Static (Composite Image Only).
     </td>
     <td>
-        <b>Grayscale:</b> 32-bit.
-        <b>RGB:</b> 96-bit.
-        <b>RGBA:</b> 128-bit.
-        <b>Pixel formats:</b> Multichannel, Duotone, LAB+Alpha.
+        <b>Grayscale:</b> 32-bit (float/HDR).
+        <b>RGB:</b> 96-bit (float/HDR).
+        <b>RGBA:</b> 128-bit (float/HDR).
+        <br/><br/>
+        <b>Color Modes:</b> Multichannel (mode 7), Duotone (mode 8).
+        <br/><br/>
+        <b>LAB+Alpha</b>
         <br/><br/>
         <b>Compressions:</b> ZIP.
         <br/><br/>
-        <b>Content:</b> Layers, masks, etc.
+        <b>Content:</b> Layers, masks, annotations, etc.
     </td>
     <td>Unsupported</td>
     <td>-</td>

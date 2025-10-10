@@ -69,6 +69,13 @@ sail_status_t psd_private_sail_pixel_format(enum SailPsdMode mode, uint16_t chan
                     }
                     break;
                 }
+                case 2: {
+                    switch (depth) {
+                        case 8:  *result = SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA; return SAIL_OK;
+                        case 16: *result = SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA; return SAIL_OK;
+                    }
+                    break;
+                }
             }
             break;
         }
@@ -93,7 +100,6 @@ sail_status_t psd_private_sail_pixel_format(enum SailPsdMode mode, uint16_t chan
         }
         case SAIL_PSD_MODE_CMYK: {
             switch (channels) {
-                /* TODO: 5 channels? */
                 case 4: {
                     switch (depth) {
                         case 8:  *result = SAIL_PIXEL_FORMAT_BPP32_CMYK; return SAIL_OK;
@@ -101,6 +107,26 @@ sail_status_t psd_private_sail_pixel_format(enum SailPsdMode mode, uint16_t chan
                     }
                     break;
                 }
+                case 5: {
+                    switch (depth) {
+                        case 8:  *result = SAIL_PIXEL_FORMAT_BPP40_CMYKA; return SAIL_OK;
+                        case 16: *result = SAIL_PIXEL_FORMAT_BPP80_CMYKA; return SAIL_OK;
+                    }
+                    break;
+                }
+            }
+            break;
+        }
+        case SAIL_PSD_MODE_LAB: {
+            switch (channels) {
+                case 3: {
+                    switch (depth) {
+                        case 8:  *result = SAIL_PIXEL_FORMAT_BPP24_CIE_LAB; return SAIL_OK;
+                        case 16: *result = SAIL_PIXEL_FORMAT_BPP40_CIE_LAB; return SAIL_OK;
+                    }
+                    break;
+                }
+                /* 4 channels would be LAB+Alpha, but SAIL doesn't have LABA format. */
             }
             break;
         }

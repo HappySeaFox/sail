@@ -25,7 +25,6 @@
 
 #include <stdbool.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include <sail-common/sail-common.h>
@@ -160,6 +159,12 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_psd(void *state, st
     /* Palette. */
     if (data_size > 0) {
         SAIL_LOG_TRACE("PSD: Palette data size: %u", data_size);
+
+        if (data_size != 768) {
+            SAIL_LOG_ERROR("PSD: Invalid palette size %u (expected 768)", data_size);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        }
+
         SAIL_TRY(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP24_RGB, 256, &psd_state->palette));
 
         /* Merge RR GG BB... to RGB RGB... */
@@ -248,6 +253,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_psd(void *state, struct sail_
     const unsigned bpp = (psd_state->channels * psd_state->depth + 7) / 8;
 
     if (psd_state->compression == SAIL_PSD_COMPRESSION_RLE) {
+        const unsigned bytes_per_sample = (psd_state->depth + 7) / 8;
+
         for (unsigned channel = 0; channel < psd_state->channels; channel++) {
             for (unsigned row = 0; row < image->height; row++) {
                 for (unsigned count = 0; count < image->width; ) {
@@ -255,32 +262,47 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_psd(void *state, struct sail_
                     SAIL_TRY(psd_state->io->strict_read(psd_state->io->stream, &c, sizeof(c)));
 
                     if (c > 128) {
-                        c ^= 0xff;
+                        c ^= 0xFF;
                         c += 2;
 
-                        unsigned char value;
-                        SAIL_TRY(psd_state->io->strict_read(psd_state->io->stream, &value, sizeof(value)));
+                        unsigned char value[2];
+                        SAIL_TRY(psd_state->io->strict_read(psd_state->io->stream, value, bytes_per_sample));
 
                         /* Round to the buffer size. */
                         c = (count + c) <= image->width ? c : (image->width - count);
-                        
+
                         for (unsigned i = count; i < count + c; i++) {
                             unsigned char *scan = (unsigned char *)sail_scan_line(image, row) + i * bpp;
-                            *(scan + channel) = value;
+                            for (unsigned b = 0; b < bytes_per_sample; b++) {
+                                *(scan + channel * bytes_per_sample + b) = value[b];
+                            }
                         }
+
+                        count += c;
                     } else if (c < 128) {
                         c++;
 
-                        for (unsigned i = count; i < count + c; i++) {
-                            unsigned char value;
-                            SAIL_TRY(psd_state->io->strict_read(psd_state->io->stream, &value, sizeof(value)));
+                        /* Round to the buffer size. */
+                        unsigned actual_count = (count + c) <= image->width ? c : (image->width - count);
 
-                            unsigned char *scan = (unsigned char *)sail_scan_line(image, row) + i * bpp;
-                            *(scan + channel) = value;
+                        for (unsigned i = 0; i < actual_count; i++) {
+                            unsigned char value[2];
+                            SAIL_TRY(psd_state->io->strict_read(psd_state->io->stream, value, bytes_per_sample));
+
+                            unsigned char *scan = (unsigned char *)sail_scan_line(image, row) + (count + i) * bpp;
+                            for (unsigned b = 0; b < bytes_per_sample; b++) {
+                                *(scan + channel * bytes_per_sample + b) = value[b];
+                            }
                         }
-                    }
 
-                    count += c;
+                        /* Skip remaining bytes if we had to truncate. */
+                        if (actual_count < c) {
+                            SAIL_TRY(psd_state->io->seek(psd_state->io->stream, (c - actual_count) * bytes_per_sample, SEEK_CUR));
+                        }
+
+                        count += c;
+                    }
+                    /* c == 128 is NOP, do nothing. */
                 }
             }
         }
@@ -289,9 +311,23 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_psd(void *state, struct sail_
             for (unsigned row = 0; row < image->height; row++) {
                 SAIL_TRY(psd_state->io->strict_read(psd_state->io->stream, psd_state->scan_buffer, psd_state->bytes_per_channel));
 
-                for (unsigned count = 0; count < psd_state->bytes_per_channel; count++) {
-                    unsigned char *scan = (unsigned char *)sail_scan_line(image, row) + count * bpp;
-                    *(scan + channel) = *(psd_state->scan_buffer + count);
+                if (psd_state->depth == 8) {
+                    for (unsigned pixel = 0; pixel < image->width; pixel++) {
+                        unsigned char *scan = (unsigned char *)sail_scan_line(image, row) + pixel * bpp;
+                        *(scan + channel) = *(psd_state->scan_buffer + pixel);
+                    }
+                } else if (psd_state->depth == 16) {
+                    for (unsigned pixel = 0; pixel < image->width; pixel++) {
+                        unsigned char *scan = (unsigned char *)sail_scan_line(image, row) + pixel * bpp;
+                        *(scan + channel * 2) = *(psd_state->scan_buffer + pixel * 2);
+                        *(scan + channel * 2 + 1) = *(psd_state->scan_buffer + pixel * 2 + 1);
+                    }
+                } else if (psd_state->depth == 1) {
+                    /* For 1-bit depth, copy byte by byte. */
+                    for (unsigned byte_idx = 0; byte_idx < psd_state->bytes_per_channel; byte_idx++) {
+                        unsigned char *scan = (unsigned char *)sail_scan_line(image, row) + byte_idx;
+                        *scan = *(psd_state->scan_buffer + byte_idx);
+                    }
                 }
             }
         }

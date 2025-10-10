@@ -2,7 +2,7 @@
 #
 [codec]
 layout=8
-version=0.8.2
+version=0.8.3
 priority=LOW
 name=PSD
 description=Photoshop Document
