@@ -23,4 +23,4 @@ compression-level-min=0
 compression-level-max=100
 compression-level-default=75
 compression-level-step=1
-tuning=
+tuning=webp-lossless;webp-method;webp-image-hint;webp-target-size;webp-target-psnr;webp-segments;webp-sns-strength;webp-filter-strength;webp-filter-sharpness;webp-filter-type;webp-autofilter;webp-alpha-compression;webp-alpha-filtering;webp-alpha-quality;webp-pass;webp-preprocessing;webp-partitions;webp-partition-limit;webp-emulate-jpeg-size;webp-thread-level;webp-low-memory;webp-near-lossless;webp-exact;webp-use-delta-palette;webp-use-sharp-yuv

@@ -478,6 +478,11 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_webp(void *state, const struc
     config.quality = quality;
     config.method = 4; /* Compression method (0=fast, 6=slow). */
 
+    /* Handle tuning options. */
+    if (webp_state->save_options->tuning != NULL) {
+        sail_traverse_hash_map_with_user_data(webp_state->save_options->tuning, webp_private_tuning_key_value_callback, &config);
+    }
+
     if (!WebPValidateConfig(&config)) {
         SAIL_LOG_ERROR("WEBP: Invalid WebP config");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);

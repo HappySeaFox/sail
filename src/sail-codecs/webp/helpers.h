@@ -26,6 +26,7 @@
 #ifndef SAIL_WEBP_HELPERS_H
 #define SAIL_WEBP_HELPERS_H
 
+#include <stdbool.h>
 #include <stdint.h>
 
 #include <webp/demux.h>
@@ -61,5 +62,7 @@ SAIL_HIDDEN sail_status_t webp_private_convert_abgr_to_rgba(const uint8_t *pixel
                                                               unsigned stride, void **rgba_pixels);
 
 SAIL_HIDDEN sail_status_t webp_private_import_pixels(struct WebPPicture *picture, const struct sail_image *image);
+
+SAIL_HIDDEN bool webp_private_tuning_key_value_callback(const char *key, const struct sail_variant *value, void *user_data);
 
 #endif
