@@ -39,7 +39,7 @@
         <b>Content:</b> Static, Animated, Meta data, ICC profiles.
         <br/><br/>
         <b>Tuning:</b> Key: <i>"avif-threads"</i>. Description: Number of decoder threads.
-        Possible values: positive integer (default: 1).
+        Possible values: positive int/unsigned int (default: 1).
     </td>
     <td>-</td>
     <td>
@@ -55,9 +55,9 @@
         <b>Content:</b> Static, Animated, Meta data, ICC profiles.
         <br/><br/>
         <b>Tuning:</b> Key: <i>"avif-speed"</i>. Description: Encoding speed (0=slowest/best compression, 10=fastest).
-        Possible values: 0-10 (default: 6).
+        Possible values: 0-10 int/unsigned int (default: 6).
         <br/>Key: <i>"avif-threads"</i>. Description: Number of encoder threads.
-        Possible values: positive integer (default: 1).
+        Possible values: positive int/unsigned int (default: 1).
         <br/>Key: <i>"avif-auto-tiling"</i>. Description: Enable automatic tiling for parallel encoding.
         Possible values: true or false.
     </td>
@@ -120,9 +120,9 @@
         <b>Content:</b> Static, Animated, Meta data (comments only).
         <br/><br/>
         <b>Tuning<sup><a href="#star-tuning">[3]</a></sup>:</b>
-             <i>"gif-transparency-index"</i>: Transparent color index in palette (-1 for no transparency). Default: -1.
-        <br/><i>"gif-loop-count"</i>: Number of animation loops (0 for infinite). Default: 0.
-        <br/><i>"gif-background-color"</i>: Background color index in palette. Default: 0.
+             <i>"gif-transparency-index"</i>: Transparent color index in palette (-1 for no transparency). Values: int/unsigned int. Default: -1.
+        <br/><i>"gif-loop-count"</i>: Number of animation loops (0 for infinite). Values: int/unsigned int. Default: 0.
+        <br/><i>"gif-background-color"</i>: Background color index in palette. Values: int/unsigned int. Default: 0.
     </td>
     <td>-</td>
     <td>giflib</td>
@@ -196,8 +196,8 @@
         Possible values: "slow", "fast", "float".
         <br/>Key: <i>"jpeg-optimize-coding"</i>. Description: Compute optimal Huffman tables.
         Possible values: true or false.
-        <br/>Key: <i>"jpeg-smoothing-factor"</i>. Description: Smooth the image.
-        Possible values: Unsigned int range from 1U to 100U.
+        <br/>Key: <i>"jpeg-smoothing-factor"</i>. Description: Image smoothing (0-100).
+        Possible values: int/unsigned int 0-100.
         <br/>See the libjpeg docs for more.
     </td>
     <td>-</td>
@@ -218,13 +218,13 @@
         <b>Content:</b> Static, ICC profiles.
         <br/><br/>
         <b>Tuning:</b> Key: <i>"jpeg2000-reduce"</i>. Description: Discard resolution levels (0=full resolution, 1=half, 2=quarter, etc.).
-        Possible values: unsigned int.
+        Possible values: int/unsigned int.
         <br/>Key: <i>"jpeg2000-layer"</i>. Description: Maximum quality layers to decode (0=all).
-        Possible values: unsigned int.
+        Possible values: int/unsigned int.
         <br/>Key: <i>"jpeg2000-tile-index"</i>. Description: Specific tile index to decode.
-        Possible values: unsigned int.
+        Possible values: int/unsigned int.
         <br/>Key: <i>"jpeg2000-num-tiles"</i>. Description: Number of tiles to decode.
-        Possible values: unsigned int.
+        Possible values: int/unsigned int.
     </td>
     <td>
         <b>Pixel formats:</b> LAB, XYZ, and other exotic color spaces.
@@ -245,13 +245,13 @@
         <b>Tuning:</b> Key: <i>"jpeg2000-irreversible"</i>. Description: Use lossy DWT 9-7 instead of lossless 5-3.
         Possible values: bool.
         <br/>Key: <i>"jpeg2000-numresolution"</i>. Description: Number of resolution levels (1-32).
-        Possible values: int.
+        Possible values: int/unsigned int.
         <br/>Key: <i>"jpeg2000-prog-order"</i>. Description: Progression order.
         Possible values: "lrcp", "rlcp", "rpcl", "pcrl", "cprl".
         <br/>Key: <i>"jpeg2000-codeblock-width"</i>. Description: Code block width (4-1024, power of 2).
-        Possible values: int.
+        Possible values: int/unsigned int.
         <br/>Key: <i>"jpeg2000-codeblock-height"</i>. Description: Code block height (4-1024, power of 2).
-        Possible values: int.
+        Possible values: int/unsigned int.
     </td>
     <td>
         <b>Content:</b> Meta data, ICC profiles (OpenJPEG &lt; 2.5.4 has encoding bug).
@@ -284,6 +284,9 @@
         <br/>Key: <i>"jpegxl-intrinsic-width"</i>. Possible values: unsigned int.
         <br/>Key: <i>"jpegxl-intrinsic-height"</i>. Possible values: unsigned int.
         <br/>See the <a href="https://libjxl.readthedocs.io/en/latest/api_metadata.html#_CPPv412JxlBasicInfo">JxlBasicInfo structure</a> documentation in libjxl for more.
+        <br/><br/>
+        <b>Tuning:</b> Key: <i>"jpegxl-desired-intensity-target"</i>. Description: Desired display intensity target. Possible values: float/double.
+        <br/>Key: <i>"jpegxl-render-spotcolors"</i>. Description: Render spot colors. Possible values: bool.
     </td>
     <td>Wide color gamut data gets clipped.</td>
     <td>
@@ -294,18 +297,18 @@
         <br/><br/>
         <b>Content:</b> Static, Animated, ICC profiles.
         <br/><br/>
-        <b>Tuning:</b> Key: <i>"jpegxl-effort"</i>. Description: Encoder effort/speed (1=fastest, 9=slowest). Possible values: 1-9. Default: 7.
-        <br/>Key: <i>"jpegxl-decoding-speed"</i>. Description: Decoding speed tier (0=best quality, 4=fastest). Possible values: 0-4. Default: 0.
-        <br/>Key: <i>"jpegxl-modular"</i>. Description: Encoding mode (-1=auto, 0=VarDCT, 1=modular). Possible values: -1, 0, 1. Default: -1.
-        <br/>Key: <i>"jpegxl-progressive-ac"</i>. Description: Progressive AC mode. Possible values: -1 (auto), 0 (off), 1 (on). Default: -1.
-        <br/>Key: <i>"jpegxl-progressive-dc"</i>. Description: Progressive DC mode. Possible values: -1 (auto), 0 (off), 1, 2. Default: -1.
-        <br/>Key: <i>"jpegxl-responsive"</i>. Description: Responsive mode for modular. Possible values: -1 (auto), 0 (off), 1 (on). Default: -1.
-        <br/>Key: <i>"jpegxl-epf"</i>. Description: Edge Preserving Filter strength. Possible values: -1 (auto), 0-3. Default: -1.
-        <br/>Key: <i>"jpegxl-gaborish"</i>. Description: Gaborish filter. Possible values: -1 (auto), 0 (off), 1 (on). Default: -1.
-        <br/>Key: <i>"jpegxl-photon-noise"</i>. Description: Film grain noise (0=none, 3200=high). Possible values: 0+. Default: 0.
-        <br/>Key: <i>"jpegxl-modular-predictor"</i>. Description: Predictor for modular. Possible values: -1 (auto), 0-15. Default: -1.
-        <br/>Key: <i>"jpegxl-palette-colors"</i>. Description: Use palette if colors ≤ N. Possible values: -1 (auto), 0-1024. Default: -1.
-        <br/>Key: <i>"jpegxl-resampling"</i>. Description: Downsampling factor. Possible values: -1, 1, 2, 4, 8. Default: -1.
+        <b>Tuning:</b> Key: <i>"jpegxl-effort"</i>. Description: Encoder effort/speed (1=fastest, 9=slowest). Possible values: int/unsigned int 1-9. Default: 7.
+        <br/>Key: <i>"jpegxl-decoding-speed"</i>. Description: Decoding speed tier (0=best quality, 4=fastest). Possible values: int/unsigned int 0-4. Default: 0.
+        <br/>Key: <i>"jpegxl-modular"</i>. Description: Encoding mode (-1=auto, 0=VarDCT, 1=modular). Possible values: int/unsigned int -1, 0, 1. Default: -1.
+        <br/>Key: <i>"jpegxl-progressive-ac"</i>. Description: Progressive AC mode. Possible values: int/unsigned int -1 (auto), 0 (off), 1 (on). Default: -1.
+        <br/>Key: <i>"jpegxl-progressive-dc"</i>. Description: Progressive DC mode. Possible values: int/unsigned int -1 (auto), 0 (off), 1, 2. Default: -1.
+        <br/>Key: <i>"jpegxl-responsive"</i>. Description: Responsive mode for modular. Possible values: int/unsigned int -1 (auto), 0 (off), 1 (on). Default: -1.
+        <br/>Key: <i>"jpegxl-epf"</i>. Description: Edge Preserving Filter strength. Possible values: int/unsigned int -1 (auto), 0-3. Default: -1.
+        <br/>Key: <i>"jpegxl-gaborish"</i>. Description: Gaborish filter. Possible values: int/unsigned int -1 (auto), 0 (off), 1 (on). Default: -1.
+        <br/>Key: <i>"jpegxl-photon-noise"</i>. Description: Film grain noise (0=none, 3200=high). Possible values: int/unsigned int 0+. Default: 0.
+        <br/>Key: <i>"jpegxl-modular-predictor"</i>. Description: Predictor for modular. Possible values: int/unsigned int -1 (auto), 0-15. Default: -1.
+        <br/>Key: <i>"jpegxl-palette-colors"</i>. Description: Use palette if colors ≤ N. Possible values: int/unsigned int -1 (auto), 0-1024. Default: -1.
+        <br/>Key: <i>"jpegxl-resampling"</i>. Description: Downsampling factor. Possible values: int/unsigned int -1, 1, 2, 4, 8. Default: -1.
     </td>
     <td>
         <b>Pixel formats:</b> CMYK, CMYKA.
@@ -403,19 +406,23 @@
     <td><a href="https://en.wikipedia.org/wiki/Adobe_Photoshop#File_format">PSD</a></td>
     <td>
         <b>Grayscale:</b> 8-bit, 16-bit.
+        <b>Grayscale+Alpha:</b> 16-bit, 32-bit.
         <b>Indexed:</b> 1-bit, 8-bit.
         <b>RGB:</b> 24-bit, 48-bit.
         <b>RGBA:</b> 32-bit, 64-bit.
+        <b>CMYK:</b> 32-bit, 64-bit.
+        <b>CMYKA:</b> 40-bit, 80-bit.
+        <b>LAB:</b> 24-bit, 40-bit.
         <br/><br/>
         <b>Compressions:</b> NONE, RLE.
         <br/><br/>
-        <b>Content:</b> Static (Preview Image Only).
+        <b>Content:</b> Static (Composite Image Only).
     </td>
     <td>
         <b>Grayscale:</b> 32-bit.
         <b>RGB:</b> 96-bit.
         <b>RGBA:</b> 128-bit.
-        <b>Pixel formats:</b> Multichannel, Duotone, LAB.
+        <b>Pixel formats:</b> Multichannel, Duotone, LAB+Alpha.
         <br/><br/>
         <b>Compressions:</b> ZIP.
         <br/><br/>
@@ -532,8 +539,8 @@
         <br/><br/>
         <b>Tuning options:</b>
         <br/><i>tiff-predictor</i>: Prediction scheme for LZW/DEFLATE. Values: "none", "horizontal", "floating-point".
-        <br/><i>tiff-jpeg-quality</i>: JPEG quality (1-100). Default: 75.
-        <br/><i>tiff-zip-quality</i>: ZIP/DEFLATE quality (1-9). Default: 6.
+        <br/><i>tiff-jpeg-quality</i>: JPEG quality (1-100). Values: int/unsigned int. Default: 75.
+        <br/><i>tiff-zip-quality</i>: ZIP/DEFLATE quality (1-9). Values: int/unsigned int. Default: 6.
     </td>
     <td>Tiled TIFFs, Planar configuration (PLANARCONFIG_SEPARATE), EXIF</td>
     <td>libtiff</td>
@@ -579,55 +586,55 @@
         <b>Content:</b> Static, Animated.
         <br/><br/>
         <b>Tuning:</b> Key: <i>"webp-lossless"</i>. Description: Lossless encoding (0=lossy, 1=lossless).
-        Possible values: 0 or 1 (default: 0).
+        Possible values: int/unsigned int 0 or 1 (default: 0).
         <br/>Key: <i>"webp-method"</i>. Description: Quality/speed trade-off (0=fast, 6=slower-better).
-        Possible values: 0-6 (default: 4).
-        <br/>Key: <i>"webp-image-hint"</i>. Description: Image type hint ("default", "picture", "photo", "graph").
-        Possible values: string (default: "default").
+        Possible values: int/unsigned int 0-6 (default: 4).
+        <br/>Key: <i>"webp-image-hint"</i>. Description: Image type hint.
+        Possible values: "default", "picture", "photo", "graph" (default: "default").
         <br/>Key: <i>"webp-target-size"</i>. Description: Target size in bytes (0=disabled).
-        Possible values: non-negative integer (default: 0).
+        Possible values: int/unsigned int (default: 0).
         <br/>Key: <i>"webp-target-psnr"</i>. Description: Minimal distortion to achieve (0=disabled).
-        Possible values: float (default: 0).
+        Possible values: float/double (default: 0).
         <br/>Key: <i>"webp-segments"</i>. Description: Maximum number of segments.
-        Possible values: 1-4 (default: 4).
+        Possible values: int/unsigned int 1-4 (default: 4).
         <br/>Key: <i>"webp-sns-strength"</i>. Description: Spatial Noise Shaping (0=off, 100=max).
-        Possible values: 0-100 (default: 50).
+        Possible values: int/unsigned int 0-100 (default: 50).
         <br/>Key: <i>"webp-filter-strength"</i>. Description: Filtering strength (0=off, 100=strongest).
-        Possible values: 0-100 (default: 60).
+        Possible values: int/unsigned int 0-100 (default: 60).
         <br/>Key: <i>"webp-filter-sharpness"</i>. Description: Filtering sharpness (0=off, 7=least sharp).
-        Possible values: 0-7 (default: 0).
+        Possible values: int/unsigned int 0-7 (default: 0).
         <br/>Key: <i>"webp-filter-type"</i>. Description: Filtering type.
         Possible values: "simple", "strong" (default: "strong").
         <br/>Key: <i>"webp-autofilter"</i>. Description: Auto adjust filter strength.
-        Possible values: 0, 1 (default: 0).
+        Possible values: int/unsigned int 0 or 1 (default: 0).
         <br/>Key: <i>"webp-alpha-compression"</i>. Description: Alpha plane compression (0=none, 1=compressed).
-        Possible values: 0, 1 (default: 1).
+        Possible values: int/unsigned int 0 or 1 (default: 1).
         <br/>Key: <i>"webp-alpha-filtering"</i>. Description: Alpha predictive filtering.
         Possible values: "none", "fast", "best" (default: "fast").
         <br/>Key: <i>"webp-alpha-quality"</i>. Description: Alpha quality (0=smallest, 100=lossless).
-        Possible values: 0-100 (default: 100).
+        Possible values: int/unsigned int 0-100 (default: 100).
         <br/>Key: <i>"webp-pass"</i>. Description: Number of entropy analysis passes.
-        Possible values: 1-10 (default: 1).
+        Possible values: int/unsigned int 1-10 (default: 1).
         <br/>Key: <i>"webp-preprocessing"</i>. Description: Preprocessing filter.
         Possible values: "none", "segment-smooth", "pseudo-random-dithering" (default: "none").
         <br/>Key: <i>"webp-partitions"</i>. Description: log2(number of token partitions).
-        Possible values: 0-3 (default: 0).
+        Possible values: int/unsigned int 0-3 (default: 0).
         <br/>Key: <i>"webp-partition-limit"</i>. Description: Quality degradation for 512k limit (0=none, 100=max).
-        Possible values: 0-100 (default: 0).
+        Possible values: int/unsigned int 0-100 (default: 0).
         <br/>Key: <i>"webp-emulate-jpeg-size"</i>. Description: Remap parameters to match JPEG size.
-        Possible values: 0, 1 (default: 0).
+        Possible values: int/unsigned int 0 or 1 (default: 0).
         <br/>Key: <i>"webp-thread-level"</i>. Description: Use multi-threaded encoding.
-        Possible values: 0, 1 (default: 0).
+        Possible values: int/unsigned int 0 or 1 (default: 0).
         <br/>Key: <i>"webp-low-memory"</i>. Description: Reduce memory usage (increases CPU).
-        Possible values: 0, 1 (default: 0).
+        Possible values: int/unsigned int 0 or 1 (default: 0).
         <br/>Key: <i>"webp-near-lossless"</i>. Description: Near lossless encoding (0=max loss, 100=off).
-        Possible values: 0-100 (default: 100).
+        Possible values: int/unsigned int 0-100 (default: 100).
         <br/>Key: <i>"webp-exact"</i>. Description: Preserve exact RGB under transparent areas.
-        Possible values: 0, 1 (default: 0).
+        Possible values: int/unsigned int 0 or 1 (default: 0).
         <br/>Key: <i>"webp-use-delta-palette"</i>. Description: Use delta palette (reserved for future).
-        Possible values: 0, 1 (default: 0).
+        Possible values: int/unsigned int 0 or 1 (default: 0).
         <br/>Key: <i>"webp-use-sharp-yuv"</i>. Description: Use sharp RGB→YUV conversion.
-        Possible values: 0, 1 (default: 0).
+        Possible values: int/unsigned int 0 or 1 (default: 0).
     </td>
     <td>-</td>
     <td>libwebp</td>
