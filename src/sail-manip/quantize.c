@@ -822,15 +822,14 @@ sail_status_t sail_quantize_image(const struct sail_image *source_image,
 
     /* Create palette. */
     struct sail_palette *palette = NULL;
-    SAIL_TRY_OR_CLEANUP(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP32_RGBA, state->K, &palette),
+    SAIL_TRY_OR_CLEANUP(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP24_RGB, state->K, &palette),
                         /* cleanup */ sail_destroy_image(indexed_image), sail_free(state));
 
     unsigned char *pal_data = (unsigned char *)palette->data;
     for (int k = 0; k < state->K; ++k) {
-        pal_data[k * 4 + 0] = lut_r[k];
-        pal_data[k * 4 + 1] = lut_g[k];
-        pal_data[k * 4 + 2] = lut_b[k];
-        pal_data[k * 4 + 3] = 255;
+        pal_data[k * 3 + 0] = lut_r[k];
+        pal_data[k * 3 + 1] = lut_g[k];
+        pal_data[k * 3 + 2] = lut_b[k];
     }
 
     indexed_image->palette = palette;

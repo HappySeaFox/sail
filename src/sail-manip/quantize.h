@@ -53,7 +53,7 @@ struct sail_image;
  *   - SAIL_PIXEL_FORMAT_BPP4_INDEXED for 2-16 colors (rounded up)
  *   - SAIL_PIXEL_FORMAT_BPP1_INDEXED for 2 colors
  *
- * The output image will have a palette attached (BPP32_RGBA format).
+ * The output image will have a palette attached (BPP24_RGB format).
  *
  * max_colors: Maximum number of colors in the output palette (2-256).
  *             The actual number may be less if the image has fewer unique colors.
