@@ -27,6 +27,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <sail-common/sail-common.h>
 
@@ -45,6 +46,11 @@ struct wal_state {
     struct WalFileHeader wal_header;
     unsigned width;
     unsigned height;
+
+    /* For saving. */
+    bool header_written;
+    void *mipmap_buffers[4];
+    size_t mipmap_sizes[4];
 };
 
 static sail_status_t alloc_wal_state(struct sail_io *io,
@@ -64,6 +70,10 @@ static sail_status_t alloc_wal_state(struct sail_io *io,
         .frame_number  = 0,
         .width         = 0,
         .height        = 0,
+
+        .header_written = false,
+        .mipmap_buffers = { NULL, NULL, NULL, NULL },
+        .mipmap_sizes   = { 0, 0, 0, 0 },
     };
 
     return SAIL_OK;
@@ -73,6 +83,10 @@ static void destroy_wal_state(struct wal_state *wal_state) {
 
     if (wal_state == NULL) {
         return;
+    }
+
+    for (int i = 0; i < 4; i++) {
+        sail_free(wal_state->mipmap_buffers[i]);
     }
 
     sail_free(wal_state);
@@ -104,13 +118,26 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_wal(void *state, st
 
     struct wal_state *wal_state = state;
 
-    if (wal_state->frame_number == 4) {
+    if (wal_state->frame_number >= 4) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
     }
 
     if (wal_state->frame_number > 0) {
         wal_state->width /= 2;
         wal_state->height /= 2;
+    }
+
+    /* Validate dimensions for this mipmap level. */
+    if (wal_state->width == 0 || wal_state->height == 0) {
+        SAIL_LOG_ERROR("WAL: Invalid mipmap level %u dimensions: %ux%u", wal_state->frame_number, wal_state->width, wal_state->height);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+    }
+
+    /* Check for potential overflow in image size calculation. */
+    const size_t image_size = (size_t)wal_state->width * wal_state->height;
+    if (image_size > SIZE_MAX / 2) {
+        SAIL_LOG_ERROR("WAL: Image size calculation overflow for dimensions %ux%u", wal_state->width, wal_state->height);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
     }
 
     struct sail_image *image_local;
@@ -148,7 +175,14 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_wal(void *state, struct sail_
 
     struct wal_state *wal_state = state;
 
-    SAIL_TRY(wal_state->io->strict_read(wal_state->io->stream, image->pixels, (size_t)image->bytes_per_line * image->height));
+    const size_t bytes_to_read = (size_t)image->bytes_per_line * image->height;
+
+    if (bytes_to_read == 0) {
+        SAIL_LOG_ERROR("WAL: Invalid image size for reading");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+    }
+
+    SAIL_TRY(wal_state->io->strict_read(wal_state->io->stream, image->pixels, bytes_to_read));
 
     return SAIL_OK;
 }
@@ -170,32 +204,168 @@ SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_wal(void **state) {
 
 SAIL_EXPORT sail_status_t sail_codec_save_init_v8_wal(struct sail_io *io, const struct sail_save_options *save_options, void **state) {
 
-    (void)io;
-    (void)save_options;
-    (void)state;
+    *state = NULL;
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
+    /* Allocate a new state. */
+    struct wal_state *wal_state;
+    SAIL_TRY(alloc_wal_state(io, NULL, save_options, &wal_state));
+    *state = wal_state;
+
+    return SAIL_OK;
 }
 
 SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_wal(void *state, const struct sail_image *image) {
 
-    (void)state;
-    (void)image;
+    struct wal_state *wal_state = state;
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
+    /* WAL format supports up to 4 mipmap levels. */
+    if (wal_state->frame_number >= 4) {
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+    }
+
+    /* Verify pixel format. */
+    SAIL_TRY(wal_private_supported_write_pixel_format(image->pixel_format));
+
+    /* First frame determines the dimensions. */
+    if (wal_state->frame_number == 0) {
+        /* Check that dimensions are valid and divisible by 8 for mipmaps. */
+        if (image->width == 0 || image->height == 0) {
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INCORRECT_IMAGE_DIMENSIONS);
+        }
+        if ((image->width % 8) != 0 || (image->height % 8) != 0) {
+            SAIL_LOG_ERROR("WAL: Image dimensions must be divisible by 8 for mipmap generation. Got %ux%u", image->width, image->height);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INCORRECT_IMAGE_DIMENSIONS);
+        }
+
+        wal_state->width = image->width;
+        wal_state->height = image->height;
+
+        /* Initialize header. */
+        memset(&wal_state->wal_header, 0, sizeof(wal_state->wal_header));
+
+        /* Extract texture name from metadata if available. */
+        const struct sail_meta_data_node *meta_data_node = image->meta_data_node;
+        while (meta_data_node != NULL) {
+            if (meta_data_node->meta_data != NULL &&
+                meta_data_node->meta_data->key == SAIL_META_DATA_NAME &&
+                meta_data_node->meta_data->value != NULL &&
+                meta_data_node->meta_data->value->type == SAIL_VARIANT_TYPE_STRING) {
+                const char *name = sail_variant_to_string(meta_data_node->meta_data->value);
+                strncpy(wal_state->wal_header.name, name, sizeof(wal_state->wal_header.name) - 1);
+                wal_state->wal_header.name[sizeof(wal_state->wal_header.name) - 1] = '\0';
+                break;
+            }
+            meta_data_node = meta_data_node->next;
+        }
+
+        wal_state->wal_header.width = wal_state->width;
+        wal_state->wal_header.height = wal_state->height;
+    } else {
+        /* Verify subsequent frames have correct dimensions (half of previous). */
+        unsigned expected_width = wal_state->width;
+        unsigned expected_height = wal_state->height;
+
+        for (unsigned i = 0; i < wal_state->frame_number; i++) {
+            expected_width /= 2;
+            expected_height /= 2;
+        }
+
+        if (image->width != expected_width || image->height != expected_height) {
+            SAIL_LOG_ERROR("WAL: Mipmap level %u has incorrect dimensions. Expected %ux%u, got %ux%u",
+                          wal_state->frame_number, expected_width, expected_height, image->width, image->height);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INCORRECT_IMAGE_DIMENSIONS);
+        }
+    }
+
+    wal_state->frame_number++;
+
+    return SAIL_OK;
 }
 
 SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_wal(void *state, const struct sail_image *image) {
 
-    (void)state;
-    (void)image;
+    struct wal_state *wal_state = state;
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
+    /* Store the mipmap data. */
+    const unsigned mipmap_index = wal_state->frame_number - 1;
+    const size_t data_size = (size_t)image->width * image->height;
+
+    void *buffer;
+    SAIL_TRY(sail_malloc(data_size, &buffer));
+    memcpy(buffer, image->pixels, data_size);
+
+    wal_state->mipmap_buffers[mipmap_index] = buffer;
+    wal_state->mipmap_sizes[mipmap_index] = data_size;
+
+    return SAIL_OK;
 }
 
 SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_wal(void **state) {
 
-    (void)state;
+    struct wal_state *wal_state = *state;
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
+    if (wal_state->frame_number == 0) {
+        SAIL_LOG_ERROR("WAL: No frames were provided");
+        destroy_wal_state(wal_state);
+        *state = NULL;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+    }
+
+    /* If only one frame was provided, generate mipmaps automatically. */
+    if (wal_state->frame_number == 1) {
+        unsigned current_width = wal_state->width;
+        unsigned current_height = wal_state->height;
+        const void *src_data = wal_state->mipmap_buffers[0];
+
+        for (unsigned i = 1; i < 4; i++) {
+            void *dst_data;
+            unsigned dst_width, dst_height;
+
+            SAIL_TRY_OR_CLEANUP(wal_private_downsample_indexed(src_data, current_width, current_height,
+                                                                &dst_data, &dst_width, &dst_height),
+                                /* cleanup */ destroy_wal_state(wal_state); *state = NULL);
+
+            wal_state->mipmap_buffers[i] = dst_data;
+            wal_state->mipmap_sizes[i] = (size_t)dst_width * dst_height;
+
+            src_data = dst_data;
+            current_width = dst_width;
+            current_height = dst_height;
+        }
+    }
+
+    /* Calculate offsets for each mipmap level. */
+    const size_t header_size = sizeof(wal_state->wal_header.name) +
+                               sizeof(wal_state->wal_header.width) +
+                               sizeof(wal_state->wal_header.height) +
+                               sizeof(wal_state->wal_header.offset) +
+                               sizeof(wal_state->wal_header.next_name) +
+                               sizeof(wal_state->wal_header.flags) +
+                               sizeof(wal_state->wal_header.contents) +
+                               sizeof(wal_state->wal_header.value);
+
+    wal_state->wal_header.offset[0] = (int)header_size;
+
+    for (unsigned i = 1; i < 4; i++) {
+        wal_state->wal_header.offset[i] = wal_state->wal_header.offset[i - 1] + (int)wal_state->mipmap_sizes[i - 1];
+    }
+
+    /* Write the header. */
+    SAIL_TRY_OR_CLEANUP(wal_private_write_file_header(wal_state->io, &wal_state->wal_header),
+                        /* cleanup */ destroy_wal_state(wal_state); *state = NULL);
+
+    /* Write all mipmap levels. */
+    for (unsigned i = 0; i < 4; i++) {
+        if (wal_state->mipmap_buffers[i] != NULL) {
+            SAIL_TRY_OR_CLEANUP(wal_state->io->strict_write(wal_state->io->stream,
+                                                             wal_state->mipmap_buffers[i],
+                                                             wal_state->mipmap_sizes[i]),
+                                /* cleanup */ destroy_wal_state(wal_state); *state = NULL);
+        }
+    }
+
+    destroy_wal_state(wal_state);
+    *state = NULL;
+
+    return SAIL_OK;
 }
