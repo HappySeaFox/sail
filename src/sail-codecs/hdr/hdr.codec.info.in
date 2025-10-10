@@ -1,0 +1,26 @@
+# Radiance HDR codec information
+#
+[codec]
+layout=8
+version=0.4.0
+priority=MEDIUM
+name=HDR
+description=Radiance High Dynamic Range
+magic-numbers=23 3f 52 41 44 49 41 4e 43 45;23 3f 52 47 42 45
+extensions=hdr;pic;rgbe
+mime-types=image/vnd.radiance;image/x-hdr
+
+[load-features]
+features=STATIC;META-DATA;SOURCE-IMAGE
+tuning=
+
+[save-features]
+features=STATIC;META-DATA
+pixel-formats=BPP96
+compressions=RLE
+default-compression=RLE
+compression-level-min=0
+compression-level-max=0
+compression-level-default=0
+compression-level-step=0
+tuning=hdr-rle-compression;hdr-y-direction;hdr-x-direction;hdr-exposure;hdr-gamma

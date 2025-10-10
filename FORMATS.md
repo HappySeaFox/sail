@@ -129,6 +129,45 @@
 </tr>
 <tr>
     <td>5</td>
+    <td><a href="https://en.wikipedia.org/wiki/RGBE_image_format">HDR</a></td>
+    <td>
+        <b>RGB:</b> 96-bit (32-bit float per channel).
+        <br/><br/>
+        <b>Compressions:</b> RLE.
+        <br/><br/>
+        <b>Content:</b> Static, Meta data.
+        <br/><br/>
+        <b>Special properties:</b> Key: <i>"hdr-exposure"</i>. Description: Exposure value.
+        Possible values: float.
+        Key: <i>"hdr-gamma"</i>. Description: Gamma correction value.
+        Possible values: float.
+        Key: <i>"hdr-view"</i>. Description: View parameters.
+        Possible values: string.
+        Key: <i>"hdr-primaries"</i>. Description: Color primaries.
+        Possible values: string.
+        Key: <i>"hdr-colorcorr-1"</i>, <i>"hdr-colorcorr-2"</i>, <i>"hdr-colorcorr-3"</i>. Description: Color correction per channel.
+        Possible values: float.
+    </td>
+    <td>-</td>
+    <td>
+        <b>RGB:</b> 96-bit (32-bit float per channel).
+        <br/><br/>
+        <b>Compressions:</b> RLE.
+        <br/><br/>
+        <b>Content:</b> Static, Meta data.
+        <br/><br/>
+        <b>Tuning<sup><a href="#star-tuning">[3]</a></sup>:</b>
+             <i>"hdr-rle-compression"</i>: Enable/disable RLE compression. Values: 0 or 1. Default: 1.
+        <br/><i>"hdr-y-direction"</i>: Y axis direction ("increasing"/"+" or "decreasing"/"-"). Values: string. Default: "decreasing".
+        <br/><i>"hdr-x-direction"</i>: X axis direction ("increasing"/"+" or "decreasing"/"-"). Values: string. Default: "increasing".
+        <br/><i>"hdr-exposure"</i>: Exposure value for header. Values: positive float/double. Default: 1.0.
+        <br/><i>"hdr-gamma"</i>: Gamma correction value for header. Values: positive float/double. Default: 1.0.
+    </td>
+    <td>-</td>
+    <td>-</td>
+</tr>
+<tr>
+    <td>6</td>
     <td><a href="https://en.wikipedia.org/wiki/ICO_(file_format)">ICO and CUR</a></td>
     <td>
         <b>Bit depth:</b> Same to BMP.
@@ -161,7 +200,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>6</td>
+    <td>7</td>
     <td><a href="https://en.wikipedia.org/wiki/JBIG">JBIG</a></td>
     <td>
         <b>Indexed:</b> 1-bit.
@@ -187,7 +226,7 @@
     <td>libjbig</td>
 </tr>
 <tr>
-    <td>7</td>
+    <td>8</td>
     <td><a href="https://wikipedia.org/wiki/JPEG">JPEG</a></td>
     <td>
         <b>Grayscale:</b> 8-bit.
@@ -230,7 +269,7 @@
     <td>libjpeg or libjpeg-turbo</td>
 </tr>
 <tr>
-    <td>8</td>
+    <td>9</td>
     <td><a href="https://wikipedia.org/wiki/JPEG_2000">JPEG 2000</a></td>
     <td>
         <b>Grayscale:</b> 8-bit, 16-bit.
@@ -285,7 +324,7 @@
     <td>openjpeg</td>
 </tr>
 <tr>
-    <td>9</td>
+    <td>10</td>
     <td><a href="https://wikipedia.org/wiki/JPEG_XL">JPEG XL</a></td>
     <td>
         <b>Grayscale:</b> 8-bit, 16-bit.
@@ -344,7 +383,7 @@
     <td>libjxl</td>
 </tr>
 <tr>
-    <td>10</td>
+    <td>11</td>
     <td><a href="https://wikipedia.org/wiki/PCX">PCX</a></td>
     <td>
         <b>Indexed:</b> 1-bit, 4-bit, 8-bit.
@@ -369,7 +408,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>11</td>
+    <td>12</td>
     <td><a href="https://wikipedia.org/wiki/Portable_Network_Graphics">PNG</a></td>
     <td>
         <b>Grayscale:</b> 1-bit, 2-bit, 4-bit, 8-bit, 16-bit.
@@ -397,7 +436,7 @@
     <td>libpng</td>
 </tr>
 <tr>
-    <td>12</td>
+    <td>13</td>
     <td><a href="https://wikipedia.org/wiki/Portable_anymap">PNM</a></td>
     <td>
         <b>Indexed:</b> 1-bit.
@@ -428,7 +467,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>13</td>
+    <td>14</td>
     <td><a href="https://en.wikipedia.org/wiki/Adobe_Photoshop#File_format">PSD</a></td>
     <td>
         <b>Grayscale:</b> 8-bit, 16-bit.
@@ -462,7 +501,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>14</td>
+    <td>15</td>
     <td><a href="http://qoiformat.org">QOI</a></td>
     <td>
         <b>RGB:</b> 24-bit.
@@ -481,7 +520,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>15</td>
+    <td>16</td>
     <td><a href="https://wikipedia.org/wiki/Scalable_Vector_Graphics">SVG</a></td>
     <td>
         <b>Bit depth:</b> 32-bit.
@@ -500,7 +539,7 @@
     <td>resvg or nanosvg</td>
 </tr>
 <tr>
-    <td>16</td>
+    <td>17</td>
     <td><a href="https://wikipedia.org/wiki/Truevision_TGA">TGA</a></td>
     <td>
         <b>Grayscale:</b> 8-bit.
@@ -531,7 +570,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>17</td>
+    <td>18</td>
     <td><a href="https://wikipedia.org/wiki/TIFF">TIFF</a></td>
     <td>
         <b>Bit depth:</b> 1-bit, 2-bit, 4-bit, 8-bit, 16-bit, 24-bit, 32-bit, 40-bit, 48-bit, 64-bit, 80-bit.
@@ -575,7 +614,7 @@
     <td>libtiff</td>
 </tr>
 <tr>
-    <td>18</td>
+    <td>19</td>
     <td><a href="http://fileformats.archiveteam.org/wiki/Quake_2_Texture">WAL</a></td>
     <td>
         <b>Indexed:</b> 8-bit.
@@ -594,7 +633,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>19</td>
+    <td>20</td>
     <td><a href="https://wikipedia.org/wiki/WebP">WEBP</a></td>
     <td>
         <b>RGBA:</b> 32-bit.
@@ -669,7 +708,7 @@
     <td>libwebp</td>
 </tr>
 <tr>
-    <td>20</td>
+    <td>21</td>
     <td><a href="https://en.wikipedia.org/wiki/X_BitMap">XBM</a></td>
     <td>
         <b>Indexed:</b> 1-bit.
@@ -695,7 +734,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>21</td>
+    <td>22</td>
     <td><a href="https://en.wikipedia.org/wiki/X_PixMap">XPM</a></td>
     <td>
         <b>Indexed:</b> 1-bit, 2-bit, 4-bit, 8-bit.
@@ -722,7 +761,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>22</td>
+    <td>23</td>
     <td><a href="https://en.wikipedia.org/wiki/Xwd">XWD</a></td>
     <td>
         <b>Indexed:</b> 1-bit, 2-bit, 4-bit, 8-bit.
