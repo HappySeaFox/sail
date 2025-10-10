@@ -60,3 +60,30 @@ enum SailConversionOption
      */
     SAIL_CONVERSION_OPTION_DITHERING = 1 << 2,
 };
+
+/* Convert 8-bit component to 16-bit: v * 257 = (v << 8) | v */
+#define SAIL_COMPONENT_8_TO_16(v) (((uint16_t)(v) << 8) | (uint16_t)(v))
+
+/* Convert 16-bit component to 8-bit: v / 257 ≈ (v * 255 + 32768) / 65536 */
+#define SAIL_COMPONENT_16_TO_8(v) ((uint8_t)((((uint32_t)(v) * 255 + 32768) >> 16)))
+
+/*
+ * RGB to Grayscale conversion using integer weights.
+ * Based on ITU-R BT.601: Y = 0.299*R + 0.587*G + 0.114*B
+ * Scaled by 256 for integer arithmetic.
+ */
+#define SAIL_RGB_TO_GRAY_R_WEIGHT 77  /* 0.299 * 256 ≈ 77  */
+#define SAIL_RGB_TO_GRAY_G_WEIGHT 150 /* 0.587 * 256 ≈ 150 */
+#define SAIL_RGB_TO_GRAY_B_WEIGHT 29  /* 0.114 * 256 ≈ 29  */
+
+/* Calculate 8-bit grayscale from 8-bit RGB */
+#define SAIL_RGB8_TO_GRAY8(r, g, b)                                                   \
+    ((uint8_t)(((SAIL_RGB_TO_GRAY_R_WEIGHT * (r)) + (SAIL_RGB_TO_GRAY_G_WEIGHT * (g)) \
+                + (SAIL_RGB_TO_GRAY_B_WEIGHT * (b)))                                  \
+               >> 8))
+
+/* Calculate 16-bit grayscale from 16-bit RGB */
+#define SAIL_RGB16_TO_GRAY16(r, g, b)                                                  \
+    ((uint16_t)(((SAIL_RGB_TO_GRAY_R_WEIGHT * (r)) + (SAIL_RGB_TO_GRAY_G_WEIGHT * (g)) \
+                 + (SAIL_RGB_TO_GRAY_B_WEIGHT * (b)))                                  \
+                >> 8))

@@ -5,6 +5,8 @@ add_library(sail-manip
                 conversion_options.h
                 convert.c
                 convert.h
+                fast_conversions.c
+                fast_conversions.h
                 manip_common.h
                 manip_utils.c
                 manip_utils.h

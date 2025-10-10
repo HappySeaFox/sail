@@ -31,6 +31,8 @@
 
 #include <sail-manip/sail-manip.h>
 
+#include "fast_conversions.h"
+
 /*
  * Private functions.
  */
@@ -1820,6 +1822,17 @@ sail_status_t sail_convert_image_with_options(const struct sail_image* image,
     SAIL_TRY_OR_CLEANUP(sail_malloc(pixels_size, &image_local->pixels),
                         /* cleanup */ sail_destroy_image(image_local));
 
+    /* Try fast-path conversion first (no alpha blending support in fast-path) */
+    if (options == NULL || !(options->options & SAIL_CONVERSION_OPTION_BLEND_ALPHA))
+    {
+        if (sail_try_fast_conversion(image, image_local, output_pixel_format))
+        {
+            *image_output = image_local;
+            return SAIL_OK;
+        }
+    }
+
+    /* Fall back to standard conversion through intermediate RGBA */
     SAIL_TRY_OR_CLEANUP(conversion_impl(image, image_local, pixel_consumer, r, g, b, a, options),
                         /* cleanup */ sail_destroy_image(image_local));
 

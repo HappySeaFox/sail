@@ -82,14 +82,14 @@ void spread_gray8_to_rgba32(uint8_t value, sail_rgba32_t* rgba32)
 void spread_gray16_to_rgba32(uint16_t value, sail_rgba32_t* rgba32)
 {
 
-    rgba32->component1 = rgba32->component2 = rgba32->component3 = (uint8_t)(value / 257.0);
+    rgba32->component1 = rgba32->component2 = rgba32->component3 = SAIL_COMPONENT_16_TO_8(value);
     rgba32->component4                                           = 255;
 }
 
 void spread_gray8_to_rgba64(uint8_t value, sail_rgba64_t* rgba64)
 {
 
-    rgba64->component1 = rgba64->component2 = rgba64->component3 = (uint16_t)value * 257;
+    rgba64->component1 = rgba64->component2 = rgba64->component3 = SAIL_COMPONENT_8_TO_16(value);
     rgba64->component4                                           = 65535;
 }
 
@@ -122,73 +122,67 @@ void fill_gray8_pixel_from_uint8_values(const sail_rgba32_t* rgba32,
         rgb24.component3 = rgba32->component3;
     }
 
-    *scan = (uint8_t)((R_TO_GRAY_COEFFICIENT * rgb24.component1) + (G_TO_GRAY_COEFFICIENT * rgb24.component2)
-                      + (B_TO_GRAY_COEFFICIENT * rgb24.component3));
+    *scan = SAIL_RGB8_TO_GRAY8(rgb24.component1, rgb24.component2, rgb24.component3);
 }
 
 void fill_gray8_pixel_from_uint16_values(const sail_rgba64_t* rgba64,
                                          uint8_t* scan,
                                          const struct sail_conversion_options* options)
 {
-
     sail_rgb24_t rgb24;
 
     if (rgba64->component4 < 65535 && options != NULL && (options->options & SAIL_CONVERSION_OPTION_BLEND_ALPHA))
     {
         const double opacity = rgba64->component4 / 65535.0;
 
-        rgb24.component1 =
-            (uint8_t)((opacity * rgba64->component1 + (1 - opacity) * options->background48.component1) / 257.0);
-        rgb24.component2 =
-            (uint8_t)((opacity * rgba64->component2 + (1 - opacity) * options->background48.component2) / 257.0);
-        rgb24.component3 =
-            (uint8_t)((opacity * rgba64->component3 + (1 - opacity) * options->background48.component3) / 257.0);
+        rgb24.component1 = SAIL_COMPONENT_16_TO_8(
+            (uint16_t)(opacity * rgba64->component1 + (1 - opacity) * options->background48.component1));
+        rgb24.component2 = SAIL_COMPONENT_16_TO_8(
+            (uint16_t)(opacity * rgba64->component2 + (1 - opacity) * options->background48.component2));
+        rgb24.component3 = SAIL_COMPONENT_16_TO_8(
+            (uint16_t)(opacity * rgba64->component3 + (1 - opacity) * options->background48.component3));
     }
     else
     {
-        rgb24.component1 = (uint8_t)(rgba64->component1 / 257.0);
-        rgb24.component2 = (uint8_t)(rgba64->component2 / 257.0);
-        rgb24.component3 = (uint8_t)(rgba64->component3 / 257.0);
+        rgb24.component1 = SAIL_COMPONENT_16_TO_8(rgba64->component1);
+        rgb24.component2 = SAIL_COMPONENT_16_TO_8(rgba64->component2);
+        rgb24.component3 = SAIL_COMPONENT_16_TO_8(rgba64->component3);
     }
 
-    *scan = (uint8_t)((R_TO_GRAY_COEFFICIENT * rgb24.component1) + (G_TO_GRAY_COEFFICIENT * rgb24.component2)
-                      + (B_TO_GRAY_COEFFICIENT * rgb24.component3));
+    *scan = SAIL_RGB8_TO_GRAY8(rgb24.component1, rgb24.component2, rgb24.component3);
 }
 
 void fill_gray16_pixel_from_uint8_values(const sail_rgba32_t* rgba32,
                                          uint16_t* scan,
                                          const struct sail_conversion_options* options)
 {
-
     sail_rgb48_t rgb48;
 
     if (rgba32->component4 < 255 && options != NULL && (options->options & SAIL_CONVERSION_OPTION_BLEND_ALPHA))
     {
         const double opacity = rgba32->component4 / 255.0;
 
-        rgb48.component1 =
-            (uint16_t)(opacity * (rgba32->component1 * 257) + (1 - opacity) * options->background48.component1);
-        rgb48.component2 =
-            (uint16_t)(opacity * (rgba32->component2 * 257) + (1 - opacity) * options->background48.component2);
-        rgb48.component3 =
-            (uint16_t)(opacity * (rgba32->component3 * 257) + (1 - opacity) * options->background48.component3);
+        rgb48.component1 = (uint16_t)(opacity * SAIL_COMPONENT_8_TO_16(rgba32->component1)
+                                      + (1 - opacity) * options->background48.component1);
+        rgb48.component2 = (uint16_t)(opacity * SAIL_COMPONENT_8_TO_16(rgba32->component2)
+                                      + (1 - opacity) * options->background48.component2);
+        rgb48.component3 = (uint16_t)(opacity * SAIL_COMPONENT_8_TO_16(rgba32->component3)
+                                      + (1 - opacity) * options->background48.component3);
     }
     else
     {
-        rgb48.component1 = rgba32->component1 * 257;
-        rgb48.component2 = rgba32->component2 * 257;
-        rgb48.component3 = rgba32->component3 * 257;
+        rgb48.component1 = SAIL_COMPONENT_8_TO_16(rgba32->component1);
+        rgb48.component2 = SAIL_COMPONENT_8_TO_16(rgba32->component2);
+        rgb48.component3 = SAIL_COMPONENT_8_TO_16(rgba32->component3);
     }
 
-    *scan = (uint16_t)((R_TO_GRAY_COEFFICIENT * rgb48.component1) + (G_TO_GRAY_COEFFICIENT * rgb48.component2)
-                       + (B_TO_GRAY_COEFFICIENT * rgb48.component3));
+    *scan = SAIL_RGB16_TO_GRAY16(rgb48.component1, rgb48.component2, rgb48.component3);
 }
 
 void fill_gray16_pixel_from_uint16_values(const sail_rgba64_t* rgba64,
                                           uint16_t* scan,
                                           const struct sail_conversion_options* options)
 {
-
     sail_rgb48_t rgb48;
 
     if (rgba64->component4 < 65535 && options != NULL && (options->options & SAIL_CONVERSION_OPTION_BLEND_ALPHA))
@@ -206,8 +200,7 @@ void fill_gray16_pixel_from_uint16_values(const sail_rgba64_t* rgba64,
         rgb48.component3 = rgba64->component3;
     }
 
-    *scan = (uint16_t)((R_TO_GRAY_COEFFICIENT * rgb48.component1) + (G_TO_GRAY_COEFFICIENT * rgb48.component2)
-                       + (B_TO_GRAY_COEFFICIENT * rgb48.component3));
+    *scan = SAIL_RGB16_TO_GRAY16(rgb48.component1, rgb48.component2, rgb48.component3);
 }
 
 void fill_rgb24_pixel_from_uint8_values(
@@ -233,23 +226,22 @@ void fill_rgb24_pixel_from_uint8_values(
 void fill_rgb24_pixel_from_uint16_values(
     const sail_rgba64_t* rgba64, uint8_t* scan, int r, int g, int b, const struct sail_conversion_options* options)
 {
-
     if (rgba64->component4 < 65535 && options != NULL && (options->options & SAIL_CONVERSION_OPTION_BLEND_ALPHA))
     {
         const double opacity = rgba64->component4 / 65535.0;
 
-        *(scan + r) =
-            (uint8_t)((opacity * rgba64->component1 + (1 - opacity) * options->background48.component1) / 257.0);
-        *(scan + g) =
-            (uint8_t)((opacity * rgba64->component2 + (1 - opacity) * options->background48.component2) / 257.0);
-        *(scan + b) =
-            (uint8_t)((opacity * rgba64->component3 + (1 - opacity) * options->background48.component3) / 257.0);
+        *(scan + r) = SAIL_COMPONENT_16_TO_8(
+            (uint16_t)(opacity * rgba64->component1 + (1 - opacity) * options->background48.component1));
+        *(scan + g) = SAIL_COMPONENT_16_TO_8(
+            (uint16_t)(opacity * rgba64->component2 + (1 - opacity) * options->background48.component2));
+        *(scan + b) = SAIL_COMPONENT_16_TO_8(
+            (uint16_t)(opacity * rgba64->component3 + (1 - opacity) * options->background48.component3));
     }
     else
     {
-        *(scan + r) = (uint8_t)(rgba64->component1 / 257.0);
-        *(scan + g) = (uint8_t)(rgba64->component2 / 257.0);
-        *(scan + b) = (uint8_t)(rgba64->component3 / 257.0);
+        *(scan + r) = SAIL_COMPONENT_16_TO_8(rgba64->component1);
+        *(scan + g) = SAIL_COMPONENT_16_TO_8(rgba64->component2);
+        *(scan + b) = SAIL_COMPONENT_16_TO_8(rgba64->component3);
     }
 }
 
@@ -261,18 +253,18 @@ void fill_rgb48_pixel_from_uint8_values(
     {
         const double opacity = rgba32->component4 / 255.0;
 
-        *(scan + r) =
-            (uint16_t)(opacity * (rgba32->component1 * 257) + (1 - opacity) * options->background48.component1);
-        *(scan + g) =
-            (uint16_t)(opacity * (rgba32->component2 * 257) + (1 - opacity) * options->background48.component2);
-        *(scan + b) =
-            (uint16_t)(opacity * (rgba32->component3 * 257) + (1 - opacity) * options->background48.component3);
+        *(scan + r) = (uint16_t)(opacity * SAIL_COMPONENT_8_TO_16(rgba32->component1)
+                                 + (1 - opacity) * options->background48.component1);
+        *(scan + g) = (uint16_t)(opacity * SAIL_COMPONENT_8_TO_16(rgba32->component2)
+                                 + (1 - opacity) * options->background48.component2);
+        *(scan + b) = (uint16_t)(opacity * SAIL_COMPONENT_8_TO_16(rgba32->component3)
+                                 + (1 - opacity) * options->background48.component3);
     }
     else
     {
-        *(scan + r) = rgba32->component1 * 257;
-        *(scan + g) = rgba32->component2 * 257;
-        *(scan + b) = rgba32->component3 * 257;
+        *(scan + r) = SAIL_COMPONENT_8_TO_16(rgba32->component1);
+        *(scan + g) = SAIL_COMPONENT_8_TO_16(rgba32->component2);
+        *(scan + b) = SAIL_COMPONENT_8_TO_16(rgba32->component3);
     }
 }
 
@@ -340,23 +332,23 @@ void fill_rgba32_pixel_from_uint16_values(const sail_rgba64_t* rgba64,
     {
         const double opacity = rgba64->component4 / 65535.0;
 
-        *(scan + r) =
-            (uint8_t)((opacity * rgba64->component1 + (1 - opacity) * options->background48.component1) / 257.0);
-        *(scan + g) =
-            (uint8_t)((opacity * rgba64->component2 + (1 - opacity) * options->background48.component2) / 257.0);
-        *(scan + b) =
-            (uint8_t)((opacity * rgba64->component3 + (1 - opacity) * options->background48.component3) / 257.0);
+        *(scan + r) = SAIL_COMPONENT_16_TO_8(
+            (uint16_t)(opacity * rgba64->component1 + (1 - opacity) * options->background48.component1));
+        *(scan + g) = SAIL_COMPONENT_16_TO_8(
+            (uint16_t)(opacity * rgba64->component2 + (1 - opacity) * options->background48.component2));
+        *(scan + b) = SAIL_COMPONENT_16_TO_8(
+            (uint16_t)(opacity * rgba64->component3 + (1 - opacity) * options->background48.component3));
     }
     else
     {
-        *(scan + r) = (uint8_t)(rgba64->component1 / 257.0);
-        *(scan + g) = (uint8_t)(rgba64->component2 / 257.0);
-        *(scan + b) = (uint8_t)(rgba64->component3 / 257.0);
+        *(scan + r) = SAIL_COMPONENT_16_TO_8(rgba64->component1);
+        *(scan + g) = SAIL_COMPONENT_16_TO_8(rgba64->component2);
+        *(scan + b) = SAIL_COMPONENT_16_TO_8(rgba64->component3);
     }
 
     if (a >= 0)
     {
-        *(scan + a) = (uint8_t)(rgba64->component4 / 257.0);
+        *(scan + a) = SAIL_COMPONENT_16_TO_8(rgba64->component4);
     }
 }
 
@@ -373,23 +365,23 @@ void fill_rgba64_pixel_from_uint8_values(const sail_rgba32_t* rgba32,
     {
         const double opacity = rgba32->component4 / 255.0;
 
-        *(scan + r) =
-            (uint16_t)(opacity * (rgba32->component1 * 257) + (1 - opacity) * options->background48.component1);
-        *(scan + g) =
-            (uint16_t)(opacity * (rgba32->component2 * 257) + (1 - opacity) * options->background48.component2);
-        *(scan + b) =
-            (uint16_t)(opacity * (rgba32->component3 * 257) + (1 - opacity) * options->background48.component3);
+        *(scan + r) = (uint16_t)(opacity * SAIL_COMPONENT_8_TO_16(rgba32->component1)
+                                 + (1 - opacity) * options->background48.component1);
+        *(scan + g) = (uint16_t)(opacity * SAIL_COMPONENT_8_TO_16(rgba32->component2)
+                                 + (1 - opacity) * options->background48.component2);
+        *(scan + b) = (uint16_t)(opacity * SAIL_COMPONENT_8_TO_16(rgba32->component3)
+                                 + (1 - opacity) * options->background48.component3);
     }
     else
     {
-        *(scan + r) = rgba32->component1 * 257;
-        *(scan + g) = rgba32->component2 * 257;
-        *(scan + b) = rgba32->component3 * 257;
+        *(scan + r) = SAIL_COMPONENT_8_TO_16(rgba32->component1);
+        *(scan + g) = SAIL_COMPONENT_8_TO_16(rgba32->component2);
+        *(scan + b) = SAIL_COMPONENT_8_TO_16(rgba32->component3);
     }
 
     if (a >= 0)
     {
-        *(scan + a) = rgba32->component4 * 257;
+        *(scan + a) = SAIL_COMPONENT_8_TO_16(rgba32->component4);
     }
 }
 
@@ -461,18 +453,18 @@ void fill_ycbcr_pixel_from_uint16_values(const sail_rgba64_t* rgba64,
     {
         const double opacity = rgba64->component4 / 65535.0;
 
-        rgba32_no_alpha.component1 =
-            (uint8_t)((opacity * rgba64->component1 + (1 - opacity) * options->background48.component1) / 257.0);
-        rgba32_no_alpha.component2 =
-            (uint8_t)((opacity * rgba64->component2 + (1 - opacity) * options->background48.component2) / 257.0);
-        rgba32_no_alpha.component3 =
-            (uint8_t)((opacity * rgba64->component3 + (1 - opacity) * options->background48.component3) / 257.0);
+        rgba32_no_alpha.component1 = SAIL_COMPONENT_16_TO_8(
+            (uint16_t)(opacity * rgba64->component1 + (1 - opacity) * options->background48.component1));
+        rgba32_no_alpha.component2 = SAIL_COMPONENT_16_TO_8(
+            (uint16_t)(opacity * rgba64->component2 + (1 - opacity) * options->background48.component2));
+        rgba32_no_alpha.component3 = SAIL_COMPONENT_16_TO_8(
+            (uint16_t)(opacity * rgba64->component3 + (1 - opacity) * options->background48.component3));
     }
     else
     {
-        rgba32_no_alpha.component1 = (uint8_t)(rgba64->component1 / 257.0);
-        rgba32_no_alpha.component2 = (uint8_t)(rgba64->component2 / 257.0);
-        rgba32_no_alpha.component3 = (uint8_t)(rgba64->component3 / 257.0);
+        rgba32_no_alpha.component1 = SAIL_COMPONENT_16_TO_8(rgba64->component1);
+        rgba32_no_alpha.component2 = SAIL_COMPONENT_16_TO_8(rgba64->component2);
+        rgba32_no_alpha.component3 = SAIL_COMPONENT_16_TO_8(rgba64->component3);
     }
 
     convert_rgba32_to_ycbcr24(&rgba32_no_alpha, scan + 0, scan + 1, scan + 2);
@@ -498,10 +490,10 @@ void fill_gray_alpha8_pixel_from_uint16_values(const sail_rgba64_t* rgba64,
 {
 
     sail_rgba32_t rgba32;
-    rgba32.component1 = (uint8_t)(rgba64->component1 / 257.0);
-    rgba32.component2 = (uint8_t)(rgba64->component2 / 257.0);
-    rgba32.component3 = (uint8_t)(rgba64->component3 / 257.0);
-    rgba32.component4 = (uint8_t)(rgba64->component4 / 257.0);
+    rgba32.component1 = SAIL_COMPONENT_16_TO_8(rgba64->component1);
+    rgba32.component2 = SAIL_COMPONENT_16_TO_8(rgba64->component2);
+    rgba32.component3 = SAIL_COMPONENT_16_TO_8(rgba64->component3);
+    rgba32.component4 = SAIL_COMPONENT_16_TO_8(rgba64->component4);
 
     fill_gray_alpha8_pixel_from_uint8_values(&rgba32, scan, options);
 }
@@ -527,10 +519,10 @@ void fill_gray_alpha16_pixel_from_uint16_values(const sail_rgba64_t* rgba64,
 {
 
     sail_rgba32_t rgba32;
-    rgba32.component1 = (uint8_t)(rgba64->component1 / 257.0);
-    rgba32.component2 = (uint8_t)(rgba64->component2 / 257.0);
-    rgba32.component3 = (uint8_t)(rgba64->component3 / 257.0);
-    rgba32.component4 = (uint8_t)(rgba64->component4 / 257.0);
+    rgba32.component1 = SAIL_COMPONENT_16_TO_8(rgba64->component1);
+    rgba32.component2 = SAIL_COMPONENT_16_TO_8(rgba64->component2);
+    rgba32.component3 = SAIL_COMPONENT_16_TO_8(rgba64->component3);
+    rgba32.component4 = SAIL_COMPONENT_16_TO_8(rgba64->component4);
 
     fill_gray_alpha16_pixel_from_uint8_values(&rgba32, scan, options);
 }
@@ -543,13 +535,11 @@ void fill_gray_alpha32_pixel_from_uint8_values(const sail_rgba32_t* rgba32,
     (void)options;
 
     uint16_t gray =
-        (uint16_t)(((R_TO_GRAY_COEFFICIENT * rgba32->component1) + (G_TO_GRAY_COEFFICIENT * rgba32->component2)
-                    + (B_TO_GRAY_COEFFICIENT * rgba32->component3))
-                   * 257);
+        SAIL_COMPONENT_8_TO_16(SAIL_RGB8_TO_GRAY8(rgba32->component1, rgba32->component2, rgba32->component3));
 
     /* BPP32_GRAYSCALE_ALPHA: 16 bits gray + 16 bits alpha */
     *(scan + 0) = gray;
-    *(scan + 1) = rgba32->component4 * 257;
+    *(scan + 1) = SAIL_COMPONENT_8_TO_16(rgba32->component4);
 }
 
 void fill_gray_alpha32_pixel_from_uint16_values(const sail_rgba64_t* rgba64,
@@ -607,10 +597,10 @@ void fill_rgb555_pixel_from_uint16_values(const sail_rgba64_t* rgba64,
 {
 
     sail_rgba32_t rgba32;
-    rgba32.component1 = (uint8_t)(rgba64->component1 / 257.0);
-    rgba32.component2 = (uint8_t)(rgba64->component2 / 257.0);
-    rgba32.component3 = (uint8_t)(rgba64->component3 / 257.0);
-    rgba32.component4 = (uint8_t)(rgba64->component4 / 257.0);
+    rgba32.component1 = SAIL_COMPONENT_16_TO_8(rgba64->component1);
+    rgba32.component2 = SAIL_COMPONENT_16_TO_8(rgba64->component2);
+    rgba32.component3 = SAIL_COMPONENT_16_TO_8(rgba64->component3);
+    rgba32.component4 = SAIL_COMPONENT_16_TO_8(rgba64->component4);
 
     fill_rgb555_pixel_from_uint8_values(&rgba32, scan, r_shift, g_shift, b_shift, options);
 }
@@ -654,10 +644,10 @@ void fill_rgb565_pixel_from_uint16_values(const sail_rgba64_t* rgba64,
 {
 
     sail_rgba32_t rgba32;
-    rgba32.component1 = (uint8_t)(rgba64->component1 / 257.0);
-    rgba32.component2 = (uint8_t)(rgba64->component2 / 257.0);
-    rgba32.component3 = (uint8_t)(rgba64->component3 / 257.0);
-    rgba32.component4 = (uint8_t)(rgba64->component4 / 257.0);
+    rgba32.component1 = SAIL_COMPONENT_16_TO_8(rgba64->component1);
+    rgba32.component2 = SAIL_COMPONENT_16_TO_8(rgba64->component2);
+    rgba32.component3 = SAIL_COMPONENT_16_TO_8(rgba64->component3);
+    rgba32.component4 = SAIL_COMPONENT_16_TO_8(rgba64->component4);
 
     fill_rgb565_pixel_from_uint8_values(&rgba32, scan, r_shift, g_shift, b_shift, options);
 }
@@ -706,10 +696,10 @@ void fill_cmyk32_pixel_from_uint16_values(const sail_rgba64_t* rgba64,
 {
 
     sail_rgba32_t rgba32;
-    rgba32.component1 = (uint8_t)(rgba64->component1 / 257.0);
-    rgba32.component2 = (uint8_t)(rgba64->component2 / 257.0);
-    rgba32.component3 = (uint8_t)(rgba64->component3 / 257.0);
-    rgba32.component4 = (uint8_t)(rgba64->component4 / 257.0);
+    rgba32.component1 = SAIL_COMPONENT_16_TO_8(rgba64->component1);
+    rgba32.component2 = SAIL_COMPONENT_16_TO_8(rgba64->component2);
+    rgba32.component3 = SAIL_COMPONENT_16_TO_8(rgba64->component3);
+    rgba32.component4 = SAIL_COMPONENT_16_TO_8(rgba64->component4);
 
     fill_cmyk32_pixel_from_uint8_values(&rgba32, scan, options);
 }
@@ -835,10 +825,10 @@ void fill_cmyka40_pixel_from_uint16_values(const sail_rgba64_t* rgba64,
 {
 
     sail_rgba32_t rgba32;
-    rgba32.component1 = (uint8_t)(rgba64->component1 / 257.0);
-    rgba32.component2 = (uint8_t)(rgba64->component2 / 257.0);
-    rgba32.component3 = (uint8_t)(rgba64->component3 / 257.0);
-    rgba32.component4 = (uint8_t)(rgba64->component4 / 257.0);
+    rgba32.component1 = SAIL_COMPONENT_16_TO_8(rgba64->component1);
+    rgba32.component2 = SAIL_COMPONENT_16_TO_8(rgba64->component2);
+    rgba32.component3 = SAIL_COMPONENT_16_TO_8(rgba64->component3);
+    rgba32.component4 = SAIL_COMPONENT_16_TO_8(rgba64->component4);
 
     fill_cmyka40_pixel_from_uint8_values(&rgba32, scan, options);
 }
@@ -854,18 +844,18 @@ void fill_cmyka80_pixel_from_uint8_values(const sail_rgba32_t* rgba32,
     {
         const double opacity = rgba32->component4 / 255.0;
 
-        rgb48.component1 =
-            (uint16_t)(opacity * rgba32->component1 * 257 + (1 - opacity) * options->background48.component1);
-        rgb48.component2 =
-            (uint16_t)(opacity * rgba32->component2 * 257 + (1 - opacity) * options->background48.component2);
-        rgb48.component3 =
-            (uint16_t)(opacity * rgba32->component3 * 257 + (1 - opacity) * options->background48.component3);
+        rgb48.component1 = (uint16_t)(opacity * SAIL_COMPONENT_8_TO_16(rgba32->component1)
+                                      + (1 - opacity) * options->background48.component1);
+        rgb48.component2 = (uint16_t)(opacity * SAIL_COMPONENT_8_TO_16(rgba32->component2)
+                                      + (1 - opacity) * options->background48.component2);
+        rgb48.component3 = (uint16_t)(opacity * SAIL_COMPONENT_8_TO_16(rgba32->component3)
+                                      + (1 - opacity) * options->background48.component3);
     }
     else
     {
-        rgb48.component1 = rgba32->component1 * 257;
-        rgb48.component2 = rgba32->component2 * 257;
-        rgb48.component3 = rgba32->component3 * 257;
+        rgb48.component1 = SAIL_COMPONENT_8_TO_16(rgba32->component1);
+        rgb48.component2 = SAIL_COMPONENT_8_TO_16(rgba32->component2);
+        rgb48.component3 = SAIL_COMPONENT_8_TO_16(rgba32->component3);
     }
 
     /* RGB to CMYK conversion */
@@ -882,7 +872,7 @@ void fill_cmyka80_pixel_from_uint8_values(const sail_rgba32_t* rgba32,
     *(scan + 1) = (uint16_t)(m * 65535);
     *(scan + 2) = (uint16_t)(y * 65535);
     *(scan + 3) = (uint16_t)(k * 65535);
-    *(scan + 4) = rgba32->component4 * 257;
+    *(scan + 4) = SAIL_COMPONENT_8_TO_16(rgba32->component4);
 }
 
 void fill_cmyka80_pixel_from_uint16_values(const sail_rgba64_t* rgba64,
@@ -960,10 +950,10 @@ void fill_rgba16_pixel_from_uint16_values(const sail_rgba64_t* rgba64,
 {
 
     sail_rgba32_t rgba32;
-    rgba32.component1 = (uint8_t)(rgba64->component1 / 257.0);
-    rgba32.component2 = (uint8_t)(rgba64->component2 / 257.0);
-    rgba32.component3 = (uint8_t)(rgba64->component3 / 257.0);
-    rgba32.component4 = (uint8_t)(rgba64->component4 / 257.0);
+    rgba32.component1 = SAIL_COMPONENT_16_TO_8(rgba64->component1);
+    rgba32.component2 = SAIL_COMPONENT_16_TO_8(rgba64->component2);
+    rgba32.component3 = SAIL_COMPONENT_16_TO_8(rgba64->component3);
+    rgba32.component4 = SAIL_COMPONENT_16_TO_8(rgba64->component4);
 
     fill_rgba16_pixel_from_uint8_values(&rgba32, scan, r_shift, g_shift, b_shift, a_shift, bits_per_component, options);
 }
@@ -1007,10 +997,10 @@ void fill_yuv24_pixel_from_uint16_values(const sail_rgba64_t* rgba64,
 {
 
     sail_rgba32_t rgba32;
-    rgba32.component1 = (uint8_t)(rgba64->component1 / 257.0);
-    rgba32.component2 = (uint8_t)(rgba64->component2 / 257.0);
-    rgba32.component3 = (uint8_t)(rgba64->component3 / 257.0);
-    rgba32.component4 = (uint8_t)(rgba64->component4 / 257.0);
+    rgba32.component1 = SAIL_COMPONENT_16_TO_8(rgba64->component1);
+    rgba32.component2 = SAIL_COMPONENT_16_TO_8(rgba64->component2);
+    rgba32.component3 = SAIL_COMPONENT_16_TO_8(rgba64->component3);
+    rgba32.component4 = SAIL_COMPONENT_16_TO_8(rgba64->component4);
 
     fill_yuv24_pixel_from_uint8_values(&rgba32, scan, options);
 }
