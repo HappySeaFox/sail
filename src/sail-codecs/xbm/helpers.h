@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_XBM_HELPERS_H
-#define SAIL_XBM_HELPERS_H
+#pragma once
 
 #include <stdbool.h>
 
@@ -55,5 +54,3 @@ SAIL_HIDDEN sail_status_t xbm_private_write_header(struct sail_io *io, unsigned 
 SAIL_HIDDEN sail_status_t xbm_private_write_pixels(struct sail_io *io, const unsigned char *pixels, unsigned width, unsigned height, enum SailXbmVersion version);
 
 SAIL_HIDDEN bool xbm_private_tuning_key_value_callback(const char *key, const struct sail_variant *value, void *user_data);
-
-#endif

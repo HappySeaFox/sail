@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_SAVE_FEATURES_H
-#define SAIL_SAVE_FEATURES_H
+#pragma once
 
 #include <sail-common/common.h>
 #include <sail-common/export.h>
@@ -110,6 +109,4 @@ SAIL_EXPORT void sail_destroy_save_features(struct sail_save_features *save_feat
 /* extern "C" */
 #ifdef __cplusplus
 }
-#endif
-
 #endif

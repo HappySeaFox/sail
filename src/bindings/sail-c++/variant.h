@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_VARIANT_CPP_H
-#define SAIL_VARIANT_CPP_H
+#pragma once
 
 #include <memory>
 
@@ -144,5 +143,3 @@ SAIL_EXPORT bool operator==(const sail::variant &a, const sail::variant &b);
 SAIL_EXPORT bool operator!=(const sail::variant &a, const sail::variant &b);
 
 }
-
-#endif

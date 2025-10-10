@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_SOURCE_IMAGE_CPP_H
-#define SAIL_SOURCE_IMAGE_CPP_H
+#pragma once
 
 #include <memory>
 
@@ -138,5 +137,3 @@ private:
 };
 
 }
-
-#endif

@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_QUANTIZE_H
-#define SAIL_QUANTIZE_H
+#pragma once
 
 #include <stdbool.h>
 
@@ -70,6 +69,4 @@ SAIL_EXPORT sail_status_t sail_quantize_image(const struct sail_image *source_im
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

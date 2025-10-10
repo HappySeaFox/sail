@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_IO_MEMORY_CPP_H
-#define SAIL_IO_MEMORY_CPP_H
+#pragma once
 
 #include <cstddef> /* std::size_t */
 
@@ -89,5 +88,3 @@ public:
 };
 
 }
-
-#endif

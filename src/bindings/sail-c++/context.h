@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_CONTEXT_CPP_H
-#define SAIL_CONTEXT_CPP_H
+#pragma once
 
 #include <sail-common/export.h>
 #include <sail-common/status.h>
@@ -135,5 +134,3 @@ public:
 };
 
 }
-
-#endif

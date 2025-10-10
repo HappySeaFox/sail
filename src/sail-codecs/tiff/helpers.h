@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_TIFF_HELPERS_H
-#define SAIL_TIFF_HELPERS_H
+#pragma once
 
 #include <stdarg.h>
 #include <stdbool.h>
@@ -69,5 +68,3 @@ SAIL_HIDDEN sail_status_t tiff_private_fetch_resolution(TIFF *tiff, struct sail_
 SAIL_HIDDEN sail_status_t tiff_private_write_resolution(TIFF *tiff, const struct sail_resolution *resolution);
 
 SAIL_HIDDEN bool tiff_private_tuning_key_value_callback(const char *key, const struct sail_variant *value, void *user_data);
-
-#endif

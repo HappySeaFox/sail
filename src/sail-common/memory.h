@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_MEMORY_H
-#define SAIL_MEMORY_H
+#pragma once
 
 #include <stddef.h> /* size_t */
 
@@ -75,6 +74,4 @@ SAIL_EXPORT void sail_free(void *ptr);
 /* extern "C" */
 #ifdef __cplusplus
 }
-#endif
-
 #endif

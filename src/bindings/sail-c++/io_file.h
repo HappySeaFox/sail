@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_IO_FILE_CPP_H
-#define SAIL_IO_FILE_CPP_H
+#pragma once
 
 #include <memory>
 #include <string>
@@ -69,5 +68,3 @@ private:
 };
 
 }
-
-#endif

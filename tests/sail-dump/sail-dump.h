@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_DUMP_H
-#define SAIL_DUMP_H
+#pragma once
 
 #include <sail-common/export.h>
 #include <sail-common/status.h>
@@ -38,5 +37,3 @@ SAIL_EXPORT sail_status_t sail_read_dump(const char *path, struct sail_image *im
  * Prints the image dump.
  */
 SAIL_EXPORT sail_status_t sail_dump(const struct sail_image *image);
-
-#endif

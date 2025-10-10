@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_JPEGXL_HELPERS_H
-#define SAIL_JPEGXL_HELPERS_H
+#pragma once
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -73,5 +72,3 @@ SAIL_HIDDEN sail_status_t jpegxl_private_write_output(JxlEncoder *encoder, struc
 SAIL_HIDDEN bool jpegxl_private_encoder_tuning_key_value_callback(const char *key, const struct sail_variant *value, void *user_data);
 
 SAIL_HIDDEN bool jpegxl_private_decoder_tuning_key_value_callback(const char *key, const struct sail_variant *value, void *user_data);
-
-#endif

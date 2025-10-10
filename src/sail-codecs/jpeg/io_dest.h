@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_JPEG_IO_DEST_H
-#define SAIL_JPEG_IO_DEST_H
+#pragma once
 
 #include <stdio.h>
 
@@ -42,5 +41,3 @@ struct sail_jpeg_destination_mgr {
 };
 
 SAIL_HIDDEN void jpeg_private_sail_io_dest(j_compress_ptr cinfo, struct sail_io *io);
-
-#endif

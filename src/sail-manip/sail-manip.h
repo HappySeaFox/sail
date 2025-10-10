@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_SAIL_MANIP_H
-#define SAIL_SAIL_MANIP_H
+#pragma once
 
 /* Universal sail-manip include. */
 
@@ -40,6 +39,4 @@
     #include <sail-manip/manip_utils.h>
     #include <sail-manip/ycbcr.h>
     #include <sail-manip/ycck.h>
-#endif
-
 #endif

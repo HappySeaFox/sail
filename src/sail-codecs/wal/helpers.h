@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_WAL_HELPERS_H
-#define SAIL_WAL_HELPERS_H
+#pragma once
 
 #include <sail-common/common.h>
 #include <sail-common/export.h>
@@ -58,5 +57,3 @@ SAIL_HIDDEN sail_status_t wal_private_supported_write_pixel_format(enum SailPixe
 
 SAIL_HIDDEN sail_status_t wal_private_downsample_indexed(const void *src, unsigned src_width, unsigned src_height,
                                                           void **dst, unsigned *dst_width, unsigned *dst_height);
-
-#endif

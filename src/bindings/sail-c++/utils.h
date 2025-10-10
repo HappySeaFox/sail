@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_UTILS_CPP_H
-#define SAIL_UTILS_CPP_H
+#pragma once
 
 #include <cstdint>
 #include <string>
@@ -95,5 +94,3 @@ template<typename T>
 T reverse_bytes(T v);
 
 }
-
-#endif

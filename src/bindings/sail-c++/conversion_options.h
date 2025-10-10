@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_CONVERSION_OPTIONS_CPP_H
-#define SAIL_CONVERSION_OPTIONS_CPP_H
+#pragma once
 
 #include <memory>
 
@@ -134,5 +133,3 @@ private:
 };
 
 }
-
-#endif

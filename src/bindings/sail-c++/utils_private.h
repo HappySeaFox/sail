@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_UTILS_PRIVATE_CPP_H
-#define SAIL_UTILS_PRIVATE_CPP_H
+#pragma once
 
 #include <sail-common/export.h>
 #include <sail-common/status.h>
@@ -55,5 +54,3 @@ private:
 };
 
 }
-
-#endif

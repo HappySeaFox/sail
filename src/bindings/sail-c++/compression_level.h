@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_COMPRESSION_LEVEL_CPP_H
-#define SAIL_COMPRESSION_LEVEL_CPP_H
+#pragma once
 
 #include <memory>
 
@@ -112,5 +111,3 @@ private:
 };
 
 }
-
-#endif

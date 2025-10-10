@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_CODEC_PRIORITY_H
-#define SAIL_CODEC_PRIORITY_H
+#pragma once
 
 /* Codec priority. */
 enum SailCodecPriority {
@@ -40,5 +39,3 @@ enum SailCodecPriority {
     /* Very rare and/or too specific and/or ancient image format. */
     SAIL_CODEC_PRIORITY_LOWEST,
 };
-
-#endif

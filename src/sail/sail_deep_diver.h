@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_SAIL_DEEP_DIVER_H
-#define SAIL_SAIL_DEEP_DIVER_H
+#pragma once
 
 #include <stddef.h> /* size_t */
 
@@ -148,6 +147,4 @@ SAIL_EXPORT sail_status_t sail_stop_saving_with_written(void *state, size_t *wri
 /* extern "C" */
 #ifdef __cplusplus
 }
-#endif
-
 #endif

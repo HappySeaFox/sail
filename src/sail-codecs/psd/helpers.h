@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_PSD_HELPERS_H
-#define SAIL_PSD_HELPERS_H
+#pragma once
 
 #include <stdint.h>
 
@@ -61,5 +60,3 @@ SAIL_HIDDEN sail_status_t psd_private_get_big_endian_uint32_t(struct sail_io *io
 SAIL_HIDDEN sail_status_t psd_private_sail_pixel_format(enum SailPsdMode mode, uint16_t channels, uint16_t depth, enum SailPixelFormat *result);
 
 SAIL_HIDDEN enum SailCompression psd_private_sail_compression(enum SailPsdCompression compression);
-
-#endif

@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_SAIL_COMMON_H
-#define SAIL_SAIL_COMMON_H
+#pragma once
 
 /* Universal sail-common include. */
 
@@ -60,6 +59,4 @@
 #ifdef SAIL_BUILD
     #include <sail-common/hash_map_private.h>
     #include <sail-common/linked_list_node.h>
-#endif
-
 #endif

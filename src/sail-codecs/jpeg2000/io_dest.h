@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_JPEG2000_IO_DEST_H
-#define SAIL_JPEG2000_IO_DEST_H
+#pragma once
 
 #include <openjpeg.h>
 
@@ -33,6 +32,3 @@
 struct sail_io;
 
 SAIL_HIDDEN opj_stream_t *jpeg2000_private_sail_io_dest(struct sail_io *io);
-
-#endif
-

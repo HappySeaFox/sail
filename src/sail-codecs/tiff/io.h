@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_TIFF_IO_H
-#define SAIL_TIFF_IO_H
+#pragma once
 
 #include <tiffio.h>
 
@@ -39,5 +38,3 @@ SAIL_HIDDEN toff_t tiff_private_my_seek_proc(thandle_t client_data, toff_t offse
 SAIL_HIDDEN int tiff_private_my_dummy_close_proc(thandle_t client_data);
 
 SAIL_HIDDEN toff_t tiff_private_my_dummy_size_proc(thandle_t client_data);
-
-#endif

@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_AVIF_HELPERS_H
-#define SAIL_AVIF_HELPERS_H
+#pragma once
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -60,5 +59,3 @@ SAIL_HIDDEN sail_status_t avif_private_write_meta_data(struct avifEncoder *encod
 SAIL_HIDDEN bool avif_private_tuning_key_value_callback(const char *key, const struct sail_variant *value, void *user_data);
 
 SAIL_HIDDEN bool avif_private_load_tuning_key_value_callback(const char *key, const struct sail_variant *value, void *user_data);
-
-#endif

@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_OSTREAM_CPP_H
-#define SAIL_OSTREAM_CPP_H
+#pragma once
 
 #include <ostream>
 
@@ -38,5 +37,3 @@ SAIL_EXPORT std::ostream& operator<<(std::ostream &os, SailCompression compressi
 SAIL_EXPORT std::ostream& operator<<(std::ostream &os, SailMetaData meta_data);
 SAIL_EXPORT std::ostream& operator<<(std::ostream &os, SailResolutionUnit resolution_unit);
 SAIL_EXPORT std::ostream& operator<<(std::ostream &os, SailCodecFeature codec_feature);
-
-#endif

@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_COMMON_H
-#define SAIL_COMMON_H
+#pragma once
 
 #include <sail-common/export.h>
 #include <sail-common/status.h>
@@ -344,5 +343,3 @@ enum SailOption {
      */
     SAIL_OPTION_SOURCE_IMAGE = 1 << 3,
 };
-
-#endif

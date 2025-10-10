@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_CONTEXT_H
-#define SAIL_CONTEXT_H
+#pragma once
 
 #include <sail-common/export.h>
 #include <sail-common/status.h>
@@ -142,6 +141,4 @@ SAIL_EXPORT void sail_finish(void);
 /* extern "C" */
 #ifdef __cplusplus
 }
-#endif
-
 #endif

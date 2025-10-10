@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_CODEC_BUNDLE_NODE_PRIVATE_H
-#define SAIL_CODEC_BUNDLE_NODE_PRIVATE_H
+#pragma once
 
 #include <sail-common/export.h>
 
@@ -55,6 +54,4 @@ SAIL_HIDDEN void destroy_codec_bundle_node_chain(struct sail_codec_bundle_node *
 /* extern "C" */
 #ifdef __cplusplus
 }
-#endif
-
 #endif

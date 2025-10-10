@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_PCX_HELPERS_H
-#define SAIL_PCX_HELPERS_H
+#pragma once
 
 #include <stdint.h>
 
@@ -84,5 +83,3 @@ SAIL_HIDDEN sail_status_t pcx_private_pixel_format_to_pcx_format(enum SailPixelF
 SAIL_HIDDEN sail_status_t pcx_private_write_palette(struct sail_io *io, const struct sail_palette *palette);
 
 SAIL_HIDDEN void pcx_private_palette_to_rgb(const struct sail_palette *palette, unsigned char *rgb_output, unsigned color_count);
-
-#endif

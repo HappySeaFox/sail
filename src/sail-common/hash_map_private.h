@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_HASH_MAP_PRIVATE_H
-#define SAIL_HASH_MAP_PRIVATE_H
+#pragma once
 
 struct sail_variant_node;
 
@@ -42,5 +41,3 @@ struct sail_hash_map {
      */
     struct sail_variant_node *buckets[SAIL_HASH_MAP_SIZE];
 };
-
-#endif

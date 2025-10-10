@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_SAVE_OPTIONS_CPP_H
-#define SAIL_SAVE_OPTIONS_CPP_H
+#pragma once
 
 #include <memory>
 #include <vector>
@@ -155,5 +154,3 @@ private:
 };
 
 }
-
-#endif

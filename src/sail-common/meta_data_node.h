@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_META_DATA_NODE_H
-#define SAIL_META_DATA_NODE_H
+#pragma once
 
 #include <sail-common/export.h>
 #include <sail-common/status.h>
@@ -96,6 +95,4 @@ SAIL_EXPORT sail_status_t sail_copy_meta_data_node_chain(const struct sail_meta_
 /* extern "C" */
 #ifdef __cplusplus
 }
-#endif
-
 #endif

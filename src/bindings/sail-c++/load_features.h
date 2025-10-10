@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_LOAD_FEATURES_CPP_H
-#define SAIL_LOAD_FEATURES_CPP_H
+#pragma once
 
 #include <memory>
 #include <vector>
@@ -119,5 +118,3 @@ private:
 };
 
 }
-
-#endif

@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_MANIP_COMMON_H
-#define SAIL_MANIP_COMMON_H
+#pragma once
 
 /*
  * Options to control color conversion behavior.
@@ -60,5 +59,3 @@ enum SailConversionOption {
      */
     SAIL_CONVERSION_OPTION_DITHERING   = 1 << 2,
 };
-
-#endif

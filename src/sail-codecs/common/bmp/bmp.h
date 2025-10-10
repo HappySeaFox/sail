@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_BMP_COMMON_H
-#define SAIL_BMP_COMMON_H
+#pragma once
 
 #include <sail-common/export.h>
 #include <sail-common/status.h>
@@ -78,5 +77,3 @@ SAIL_HIDDEN sail_status_t bmp_private_write_seek_next_frame(void *state, struct 
 SAIL_HIDDEN sail_status_t bmp_private_write_frame(void *state, struct sail_io *io, const struct sail_image *image);
 
 SAIL_HIDDEN sail_status_t bmp_private_write_finish(void **state, struct sail_io *io);
-
-#endif

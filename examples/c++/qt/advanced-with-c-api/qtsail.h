@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef QT_SAIL_H
-#define QT_SAIL_H
+#pragma once
 
 #include <QWidget>
 #include <QScopedPointer>
@@ -74,5 +73,3 @@ private:
     int m_currentIndex = 0;
     QString m_suffix;
 };
-
-#endif

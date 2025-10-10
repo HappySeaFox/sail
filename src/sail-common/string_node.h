@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_STRING_NODE_H
-#define SAIL_STRING_NODE_H
+#pragma once
 
 #include <sail-common/export.h>
 #include <sail-common/status.h>
@@ -90,6 +89,4 @@ SAIL_EXPORT sail_status_t sail_split_into_string_node_chain(const char *value, s
 /* extern "C" */
 #ifdef __cplusplus
 }
-#endif
-
 #endif

@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_IO_FILE_H
-#define SAIL_IO_FILE_H
+#pragma once
 
 #include <sail-common/export.h>
 #include <sail-common/status.h>
@@ -52,6 +51,4 @@ SAIL_EXPORT sail_status_t sail_alloc_io_read_write_file(const char *path, struct
 /* extern "C" */
 #ifdef __cplusplus
 }
-#endif
-
 #endif

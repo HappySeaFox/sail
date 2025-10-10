@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_CODEC_INFO_H
-#define SAIL_CODEC_INFO_H
+#pragma once
 
 #include <stddef.h> /* size_t */
 
@@ -206,6 +205,4 @@ SAIL_EXPORT sail_status_t sail_codec_info_from_mime_type(const char *mime_type, 
 /* extern "C" */
 #ifdef __cplusplus
 }
-#endif
-
 #endif

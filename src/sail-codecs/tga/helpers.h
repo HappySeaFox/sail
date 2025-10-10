@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_TGA_HELPERS_H
-#define SAIL_TGA_HELPERS_H
+#pragma once
 
 #include <stdint.h>
 
@@ -99,5 +98,3 @@ SAIL_HIDDEN sail_status_t tga_private_write_extension_area(struct sail_io *io, d
 SAIL_HIDDEN void tga_private_pixel_format_to_tga_format(enum SailPixelFormat pixel_format, uint8_t *image_type, uint8_t *bpp);
 
 SAIL_HIDDEN sail_status_t tga_private_write_palette(struct sail_io *io, const struct sail_palette *palette, struct TgaFileHeader *file_header);
-
-#endif

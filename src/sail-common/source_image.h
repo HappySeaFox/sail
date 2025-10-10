@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_SOURCE_IMAGE_H
-#define SAIL_SOURCE_IMAGE_H
+#pragma once
 
 #include <stdbool.h>
 
@@ -112,6 +111,4 @@ SAIL_EXPORT sail_status_t sail_copy_source_image(const struct sail_source_image 
 /* extern "C" */
 #ifdef __cplusplus
 }
-#endif
-
 #endif

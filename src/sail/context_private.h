@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_CONTEXT_PRIVATE_H
-#define SAIL_CONTEXT_PRIVATE_H
+#pragma once
 
 #include <stdbool.h>
 
@@ -63,5 +62,3 @@ SAIL_HIDDEN sail_status_t sail_unload_codecs_private(void);
 SAIL_HIDDEN sail_status_t lock_context(void);
 
 SAIL_HIDDEN sail_status_t unlock_context(void);
-
-#endif

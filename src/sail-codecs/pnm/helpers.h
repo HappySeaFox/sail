@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_PNM_HELPERS_H
-#define SAIL_PNM_HELPERS_H
+#pragma once
 
 #include <stddef.h> /* size_t */
 
@@ -78,5 +77,3 @@ SAIL_HIDDEN sail_status_t pnm_private_pixel_format_to_pnm_params(enum SailPixelF
 SAIL_HIDDEN sail_status_t pnm_private_write_pnm_header(struct sail_io *io, enum SailPnmVersion version, unsigned width, unsigned height, unsigned maxval);
 
 SAIL_HIDDEN sail_status_t pnm_private_write_pam_header(struct sail_io *io, unsigned width, unsigned height, unsigned depth, unsigned maxval, enum SailPamTuplType tupltype);
-
-#endif

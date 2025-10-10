@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_SAIL_TECHNICAL_DIVER_H
-#define SAIL_SAIL_TECHNICAL_DIVER_H
+#pragma once
 
 #include <sail-common/export.h>
 #include <sail-common/status.h>
@@ -123,6 +122,4 @@ SAIL_EXPORT sail_status_t sail_start_saving_into_io_with_options(struct sail_io 
 /* extern "C" */
 #ifdef __cplusplus
 }
-#endif
-
 #endif

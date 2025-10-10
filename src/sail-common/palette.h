@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_PALETTE_H
-#define SAIL_PALETTE_H
+#pragma once
 
 #include <sail-common/common.h>
 #include <sail-common/export.h>
@@ -108,6 +107,4 @@ SAIL_EXPORT sail_status_t sail_alloc_palette_from_data(enum SailPixelFormat pixe
 /* extern "C" */
 #ifdef __cplusplus
 }
-#endif
-
 #endif

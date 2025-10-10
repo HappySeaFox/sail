@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_CODEC_LAYOUT_H
-#define SAIL_CODEC_LAYOUT_H
+#pragma once
 
 #include <sail/layout/v8_pointers.h>
 
@@ -44,5 +43,3 @@ struct sail_codec_layout_v8 {
     sail_codec_save_frame_v8_t           save_frame;
     sail_codec_save_finish_v8_t          save_finish;
 };
-
-#endif

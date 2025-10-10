@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_PIXEL_H
-#define SAIL_PIXEL_H
+#pragma once
 
 #include <stdint.h>
 
@@ -136,6 +135,4 @@ SAIL_EXPORT sail_status_t sail_read_pixel4_uint16(struct sail_io *io, struct sai
 /* extern "C" */
 #ifdef __cplusplus
 }
-#endif
-
 #endif

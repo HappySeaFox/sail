@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_XPM_HELPERS_H
-#define SAIL_XPM_HELPERS_H
+#pragma once
 
 #include <stdbool.h>
 
@@ -130,5 +129,3 @@ SAIL_HIDDEN sail_status_t xpm_private_convert_palette_to_rgb(const unsigned char
                                                              enum SailPixelFormat src_format,
                                                              unsigned num_colors,
                                                              unsigned char **rgb_palette);
-
-#endif

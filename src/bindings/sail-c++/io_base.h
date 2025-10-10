@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_IO_BASE_CPP_H
-#define SAIL_IO_BASE_CPP_H
+#pragma once
 
 #include <cstddef> /* std::size_t */
 #include <memory>
@@ -146,5 +145,3 @@ protected:
 };
 
 }
-
-#endif

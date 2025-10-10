@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_SAIL_CPP_H
-#define SAIL_SAIL_CPP_H
+#pragma once
 
 // Universal include
 //
@@ -71,5 +70,3 @@
 #include <sail-c++/variant.h>
 
 #include <sail-c++/suppress_end.h>
-
-#endif

@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_CODEC_BUNDLE_PRIVATE_H
-#define SAIL_CODEC_BUNDLE_PRIVATE_H
+#pragma once
 
 #include <sail-common/export.h>
 #include <sail-common/status.h>
@@ -46,5 +45,3 @@ SAIL_HIDDEN sail_status_t alloc_codec_bundle(struct sail_codec_bundle **codec_bu
  * Destroys the specified codec bundle and all its internal allocated memory buffers.
  */
 SAIL_HIDDEN void destroy_codec_bundle(struct sail_codec_bundle *codec_bundle);
-
-#endif

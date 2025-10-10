@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_HDR_HELPERS_H
-#define SAIL_HDR_HELPERS_H
+#pragma once
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -81,5 +80,3 @@ SAIL_HIDDEN sail_status_t hdr_private_store_properties(const struct hdr_header *
 SAIL_HIDDEN sail_status_t hdr_private_fetch_properties(const struct sail_hash_map *special_properties, struct hdr_header *header);
 
 SAIL_HIDDEN bool hdr_private_tuning_key_value_callback(const char *key, const struct sail_variant *value, void *user_data);
-
-#endif

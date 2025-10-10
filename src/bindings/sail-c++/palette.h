@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_PALETTE_CPP_H
-#define SAIL_PALETTE_CPP_H
+#pragma once
 
 #include <memory>
 
@@ -146,5 +145,3 @@ private:
 };
 
 }
-
-#endif

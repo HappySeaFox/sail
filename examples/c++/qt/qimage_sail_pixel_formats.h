@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef QIMAGE_SAIL_PIXEL_FORMATS_H
-#define QIMAGE_SAIL_PIXEL_FORMATS_H
+#pragma once
 
 #include <QImage>
 
@@ -43,5 +42,3 @@ inline SailPixelFormat qImageFormatToSailPixelFormat(QImage::Format format) {
         default: return SAIL_PIXEL_FORMAT_UNKNOWN;
     }
 }
-
-#endif

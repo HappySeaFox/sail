@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_JPEG2000_HELPERS_H
-#define SAIL_JPEG2000_HELPERS_H
+#pragma once
 
 #include <stdbool.h>
 
@@ -43,5 +42,3 @@ SAIL_HIDDEN sail_status_t jpeg2000_private_pixel_format_to_openjpeg(enum SailPix
 SAIL_HIDDEN bool jpeg2000_private_tuning_key_value_callback_load(const char *key, const struct sail_variant *value, void *user_data);
 
 SAIL_HIDDEN bool jpeg2000_private_tuning_key_value_callback_save(const char *key, const struct sail_variant *value, void *user_data);
-
-#endif

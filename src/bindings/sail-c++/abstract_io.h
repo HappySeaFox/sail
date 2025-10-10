@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_ABSTRACT_IO_CPP_H
-#define SAIL_ABSTRACT_IO_CPP_H
+#pragma once
 
 #include <cstddef> /* std::size_t */
 #include <cstdint>
@@ -136,5 +135,3 @@ public:
 };
 
 }
-
-#endif

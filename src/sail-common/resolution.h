@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_RESOLUTION_H
-#define SAIL_RESOLUTION_H
+#pragma once
 
 #include <sail-common/common.h>
 #include <sail-common/export.h>
@@ -74,6 +73,4 @@ SAIL_EXPORT sail_status_t sail_copy_resolution(struct sail_resolution *source, s
 /* extern "C" */
 #ifdef __cplusplus
 }
-#endif
-
 #endif

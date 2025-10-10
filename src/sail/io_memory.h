@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_IO_MEMORY_H
-#define SAIL_IO_MEMORY_H
+#pragma once
 
 #include <stddef.h> /* size_t */
 
@@ -54,6 +53,4 @@ SAIL_EXPORT sail_status_t sail_alloc_io_read_write_memory(void *buffer, size_t l
 /* extern "C" */
 #ifdef __cplusplus
 }
-#endif
-
 #endif

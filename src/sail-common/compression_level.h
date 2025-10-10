@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_COMPRESSION_LEVEL_H
-#define SAIL_COMPRESSION_LEVEL_H
+#pragma once
 
 #include <sail-common/export.h>
 #include <sail-common/status.h>
@@ -81,6 +80,4 @@ SAIL_EXPORT void sail_destroy_compression_level(struct sail_compression_level *c
 /* extern "C" */
 #ifdef __cplusplus
 }
-#endif
-
 #endif

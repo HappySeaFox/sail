@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_COMMON_SERIALIZE_H
-#define SAIL_COMMON_SERIALIZE_H
+#pragma once
 
 #include <sail-common/common.h>
 #include <sail-common/export.h>
@@ -148,6 +147,4 @@ SAIL_EXPORT enum SailCodecFeature sail_codec_feature_from_string(const char *str
 /* extern "C" */
 #ifdef __cplusplus
 }
-#endif
-
 #endif

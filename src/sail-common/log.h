@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_LOG_H
-#define SAIL_LOG_H
+#pragma once
 
 #include <stdarg.h>
 
@@ -101,6 +100,4 @@ SAIL_EXPORT void sail_set_logger(sail_logger logger);
 /* extern "C" */
 #ifdef __cplusplus
 }
-#endif
-
 #endif

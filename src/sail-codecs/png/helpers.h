@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_PNG_HELPERS_H
-#define SAIL_PNG_HELPERS_H
+#pragma once
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -81,5 +80,3 @@ SAIL_HIDDEN sail_status_t png_private_fetch_resolution(png_structp png_ptr, png_
 SAIL_HIDDEN sail_status_t png_private_write_resolution(png_structp png_ptr, png_infop info_ptr, const struct sail_resolution *resolution);
 
 SAIL_HIDDEN bool png_private_tuning_key_value_callback(const char *key, const struct sail_variant *value, void *user_data);
-
-#endif

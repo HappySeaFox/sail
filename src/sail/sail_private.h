@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_SAIL_PRIVATE_H
-#define SAIL_SAIL_PRIVATE_H
+#pragma once
 
 #include <stdbool.h>
 #include <stddef.h> /* size_t */
@@ -61,5 +60,3 @@ SAIL_HIDDEN void destroy_hidden_state(struct hidden_state *state);
 SAIL_HIDDEN sail_status_t stop_saving(void *state, size_t *written);
 
 SAIL_HIDDEN sail_status_t allowed_write_output_pixel_format(const struct sail_save_features *save_features, enum SailPixelFormat pixel_format);
-
-#endif

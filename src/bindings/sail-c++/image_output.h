@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_IMAGE_OUTPUT_CPP_H
-#define SAIL_IMAGE_OUTPUT_CPP_H
+#pragma once
 
 #include <cstddef> /* std::size_t */
 #include <memory>
@@ -119,5 +118,3 @@ private:
 };
 
 }
-
-#endif

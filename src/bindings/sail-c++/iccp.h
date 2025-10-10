@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_ICCP_CPP_H
-#define SAIL_ICCP_CPP_H
+#pragma once
 
 #include <cstddef> /* std::size_t */
 #include <memory>
@@ -123,5 +122,3 @@ private:
 };
 
 }
-
-#endif

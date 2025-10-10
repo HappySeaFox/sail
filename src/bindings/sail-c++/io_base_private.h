@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_IO_BASE_PRIVATE_CPP_H
-#define SAIL_IO_BASE_PRIVATE_CPP_H
+#pragma once
 
 #include <memory>
 
@@ -51,5 +50,3 @@ public:
 };
 
 }
-
-#endif

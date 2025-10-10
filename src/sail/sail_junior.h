@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_SAIL_JUNIOR_H
-#define SAIL_SAIL_JUNIOR_H
+#pragma once
 
 #include <stddef.h> /* size_t */
 
@@ -101,6 +100,4 @@ SAIL_EXPORT sail_status_t sail_save_into_memory(void *buffer, size_t buffer_size
 /* extern "C" */
 #ifdef __cplusplus
 }
-#endif
-
 #endif

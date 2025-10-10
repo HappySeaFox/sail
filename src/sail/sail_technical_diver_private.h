@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_SAIL_TECHNICAL_DIVER_PRIVATE_H
-#define SAIL_SAIL_TECHNICAL_DIVER_PRIVATE_H
+#pragma once
 
 #include <stdbool.h>
 
@@ -43,5 +42,3 @@ SAIL_HIDDEN sail_status_t start_loading_io_with_options(struct sail_io *io, bool
 SAIL_HIDDEN sail_status_t start_saving_io_with_options(struct sail_io *io, bool own_io,
                                                        const struct sail_codec_info *codec_info,
                                                        const struct sail_save_options *save_options, void **state);
-
-#endif

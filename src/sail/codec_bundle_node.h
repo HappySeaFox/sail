@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_CODEC_BUNDLE_NODE_H
-#define SAIL_CODEC_BUNDLE_NODE_H
+#pragma once
 
 #include <sail-common/export.h>
 
@@ -59,6 +58,4 @@ SAIL_EXPORT const struct sail_codec_bundle_node* sail_codec_bundle_list(void);
 /* extern "C" */
 #ifdef __cplusplus
 }
-#endif
-
 #endif

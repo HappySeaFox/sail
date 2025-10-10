@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_JPEG_IO_SRC_H
-#define SAIL_JPEG_IO_SRC_H
+#pragma once
 
 #include <stdio.h>
 
@@ -46,5 +45,3 @@ struct sail_jpeg_source_mgr {
 };
 
 SAIL_HIDDEN void jpeg_private_sail_io_src(j_decompress_ptr cinfo, struct sail_io *io);
-
-#endif

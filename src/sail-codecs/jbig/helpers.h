@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_JBIG_HELPERS_H
-#define SAIL_JBIG_HELPERS_H
+#pragma once
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -45,5 +44,3 @@ SAIL_HIDDEN sail_status_t jbig_private_read_header(struct sail_io *io,
                                                      int *planes);
 
 SAIL_HIDDEN bool jbig_private_is_jbig(const void *data, size_t size);
-
-#endif

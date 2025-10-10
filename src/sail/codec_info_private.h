@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_CODEC_INFO_PRIVATE_H
-#define SAIL_CODEC_INFO_PRIVATE_H
+#pragma once
 
 #include <sail-common/export.h>
 #include <sail-common/status.h>
@@ -52,5 +51,3 @@ SAIL_HIDDEN sail_status_t codec_read_info_from_file(const char *path, struct sai
  * Returns SAIL_OK on success.
  */
 SAIL_HIDDEN sail_status_t codec_read_info_from_string(const char *str, struct sail_codec_info **codec_info);
-
-#endif

@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_BMP_HELPERS_H
-#define SAIL_BMP_HELPERS_H
+#pragma once
 
 #include <stdint.h>
 
@@ -176,5 +175,3 @@ SAIL_HIDDEN sail_status_t bmp_private_supported_write_pixel_format(enum SailPixe
 SAIL_HIDDEN sail_status_t bmp_private_write_rle8_scan_line(struct sail_io *io, const unsigned char *scan, unsigned width);
 
 SAIL_HIDDEN sail_status_t bmp_private_write_rle4_scan_line(struct sail_io *io, const unsigned char *scan, unsigned width);
-
-#endif

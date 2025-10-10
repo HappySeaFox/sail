@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef QT_SAIL_H
-#define QT_SAIL_H
+#pragma once
 
 #include <QWidget>
 #include <QScopedPointer>
@@ -61,5 +60,3 @@ private:
 
     QImage m_qimage;
 };
-
-#endif

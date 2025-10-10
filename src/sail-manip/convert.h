@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_CONVERT_H
-#define SAIL_CONVERT_H
+#pragma once
 
 #include <stdbool.h>
 #include <stddef.h> /* size_t */
@@ -419,6 +418,4 @@ SAIL_EXPORT sail_status_t sail_convert_image_for_saving_with_options(const struc
 /* extern "C" */
 #ifdef __cplusplus
 }
-#endif
-
 #endif

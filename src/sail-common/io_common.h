@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_IO_COMMON_H
-#define SAIL_IO_COMMON_H
+#pragma once
 
 #include <stdbool.h>
 #include <stddef.h> /* size_t */
@@ -247,6 +246,4 @@ SAIL_EXPORT sail_status_t sail_read_string_from_io(struct sail_io *io, char *str
 /* extern "C" */
 #ifdef __cplusplus
 }
-#endif
-
 #endif

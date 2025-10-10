@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_RESOLUTION_CPP_H
-#define SAIL_RESOLUTION_CPP_H
+#pragma once
 
 #include <memory>
 #include <string>
@@ -146,5 +145,3 @@ private:
 };
 
 }
-
-#endif

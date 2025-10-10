@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_CODEC_LAYOUT_FUNCTIONS_POINTERS_H
-#define SAIL_CODEC_LAYOUT_FUNCTIONS_POINTERS_H
+#pragma once
 
 #include <sail-common/sail-common.h>
 
@@ -45,5 +44,3 @@ typedef sail_status_t (*sail_codec_save_init_v8_t)(struct sail_io *io, const str
 typedef sail_status_t (*sail_codec_save_seek_next_frame_v8_t)(void *state, const struct sail_image *image);
 typedef sail_status_t (*sail_codec_save_frame_v8_t)(void *state, const struct sail_image *image);
 typedef sail_status_t (*sail_codec_save_finish_v8_t)(void **state);
-
-#endif

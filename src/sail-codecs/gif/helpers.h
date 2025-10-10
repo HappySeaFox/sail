@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_GIF_HELPERS_H
-#define SAIL_GIF_HELPERS_H
+#pragma once
 
 #include <gif_lib.h>
 
@@ -53,5 +52,3 @@ SAIL_HIDDEN sail_status_t gif_private_pixel_format_to_bpp(enum SailPixelFormat p
 SAIL_HIDDEN sail_status_t gif_private_build_color_map(const struct sail_palette *palette, ColorMapObject **color_map);
 
 SAIL_HIDDEN bool gif_private_tuning_key_value_callback(const char *key, const struct sail_variant *value, void *user_data);
-
-#endif

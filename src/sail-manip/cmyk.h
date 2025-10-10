@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_CMYK_H
-#define SAIL_CMYK_H
+#pragma once
 
 #include <stdint.h>
 
@@ -41,5 +40,3 @@ SAIL_HIDDEN void convert_cmyk64_to_rgba64(uint16_t c, uint16_t m, uint16_t y, ui
 SAIL_HIDDEN void convert_cmyka40_to_rgba32(uint8_t c, uint8_t m, uint8_t y, uint8_t k, uint8_t a, sail_rgba32_t *rgba32);
 
 SAIL_HIDDEN void convert_cmyka80_to_rgba64(uint16_t c, uint16_t m, uint16_t y, uint16_t k, uint16_t a, sail_rgba64_t *rgba64);
-
-#endif

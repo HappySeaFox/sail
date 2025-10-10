@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_IMAGE_H
-#define SAIL_IMAGE_H
+#pragma once
 
 #include <stdbool.h>
 
@@ -257,6 +256,4 @@ SAIL_EXPORT void* sail_scan_line(const struct sail_image *image, unsigned row);
 /* extern "C" */
 #ifdef __cplusplus
 }
-#endif
-
 #endif

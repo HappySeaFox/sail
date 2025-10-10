@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_STATUS_H
-#define SAIL_STATUS_H
+#pragma once
 
 #include <sail-common/compiler_specifics.h>
 
@@ -156,5 +155,3 @@ do {                                                   \
  * can be separated by commas or by semicolons (so called cleanup), and returns the error code.
  */
 #define SAIL_TRY_OR_CLEANUP(sail_func, ...) SAIL_TRY_OR_EXECUTE(sail_func, __VA_ARGS__; return __sail_status)
-
-#endif

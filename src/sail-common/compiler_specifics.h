@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_COMPILER_SPECIFICS_H
-#define SAIL_COMPILER_SPECIFICS_H
+#pragma once
 
 /* Thread local flag used with static variables. */
 #if defined __GNUC__
@@ -47,6 +46,4 @@
 #else
     #define SAIL_LIKELY(x)   (x)
     #define SAIL_UNLIKELY(x) (x)
-#endif
-
 #endif

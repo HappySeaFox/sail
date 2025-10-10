@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_SAIL_H
-#define SAIL_SAIL_H
+#pragma once
 
 /* Universal sail include. */
 
@@ -56,6 +55,4 @@
     #ifdef SAIL_THREAD_SAFE
         #include <sail/threading.h>
     #endif
-#endif
-
 #endif

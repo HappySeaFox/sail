@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_CONVERSION_OPTIONS_H
-#define SAIL_CONVERSION_OPTIONS_H
+#pragma once
 
 #include <sail-common/export.h>
 #include <sail-common/pixel.h>
@@ -77,6 +76,4 @@ SAIL_EXPORT void sail_destroy_conversion_options(struct sail_conversion_options 
 /* extern "C" */
 #ifdef __cplusplus
 }
-#endif
-
 #endif

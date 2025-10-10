@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_SPECIAL_PROPERTIES_CPP_H
-#define SAIL_SPECIAL_PROPERTIES_CPP_H
+#pragma once
 
 #include <string>
 #include <unordered_map>
@@ -41,5 +40,3 @@ namespace sail
 using special_properties = std::unordered_map<std::string, variant>;
 
 }
-
-#endif

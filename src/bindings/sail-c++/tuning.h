@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_TUNING_CPP_H
-#define SAIL_TUNING_CPP_H
+#pragma once
 
 #include <string>
 #include <unordered_map>
@@ -46,5 +45,3 @@ using tuning = std::unordered_map<std::string, variant>;
 using supported_tuning = std::vector<std::string>;
 
 }
-
-#endif

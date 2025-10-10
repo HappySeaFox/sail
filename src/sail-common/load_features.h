@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_LOAD_FEATURES_H
-#define SAIL_LOAD_FEATURES_H
+#pragma once
 
 #include <sail-common/export.h>
 #include <sail-common/status.h>
@@ -76,6 +75,4 @@ SAIL_EXPORT void sail_destroy_load_features(struct sail_load_features *load_feat
 /* extern "C" */
 #ifdef __cplusplus
 }
-#endif
-
 #endif

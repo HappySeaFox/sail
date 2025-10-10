@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_JPEGXL_MEMORY_H
-#define SAIL_JPEGXL_MEMORY_H
+#pragma once
 
 #include <sail-common/export.h>
 
@@ -32,5 +31,3 @@
 SAIL_HIDDEN void *jpegxl_private_alloc_func(void *opaque, size_t size);
 
 SAIL_HIDDEN void jpegxl_private_free_func(void *opaque, void *address);
-
-#endif

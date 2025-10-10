@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_UTILS_H
-#define SAIL_UTILS_H
+#pragma once
 
 #include <stdbool.h>
 #include <stddef.h> /* size_t */
@@ -283,6 +282,4 @@ SAIL_EXPORT sail_status_t sail_multibyte_to_wchar(const char *str, wchar_t **wst
 /* extern "C" */
 #ifdef __cplusplus
 }
-#endif
-
 #endif

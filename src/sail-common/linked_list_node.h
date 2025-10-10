@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_LINKED_LIST_NODE_H
-#define SAIL_LINKED_LIST_NODE_H
+#pragma once
 
 #include <sail-common/export.h>
 #include <sail-common/status.h>
@@ -111,6 +110,4 @@ SAIL_EXPORT sail_status_t sail_private_copy_linked_list_node_chain(const struct 
 /* extern "C" */
 #ifdef __cplusplus
 }
-#endif
-
 #endif

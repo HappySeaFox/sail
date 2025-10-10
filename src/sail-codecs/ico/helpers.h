@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_ICO_HELPERS_H
-#define SAIL_ICO_HELPERS_H
+#pragma once
 
 #include <stdint.h>
 
@@ -73,5 +72,3 @@ SAIL_HIDDEN sail_status_t ico_private_write_header(struct sail_io *io, const str
 SAIL_HIDDEN sail_status_t ico_private_write_dir_entry(struct sail_io *io, const struct SailIcoDirEntry *dir_entry);
 
 SAIL_HIDDEN sail_status_t ico_private_fetch_cur_hotspot(const struct sail_hash_map *special_properties, uint16_t *hotspot_x, uint16_t *hotspot_y);
-
-#endif

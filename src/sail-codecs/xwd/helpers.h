@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_XWD_HELPERS_H
-#define SAIL_XWD_HELPERS_H
+#pragma once
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -139,5 +138,3 @@ SAIL_HIDDEN sail_status_t xwd_private_palette_to_colormap(const struct sail_pale
                                                            uint32_t *ncolors);
 
 SAIL_HIDDEN bool xwd_private_is_native_byte_order(uint32_t byte_order);
-
-#endif

@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_ARBITRARY_DATA_CPP_H
-#define SAIL_ARBITRARY_DATA_CPP_H
+#pragma once
 
 #include <cstdint>
 #include <vector>
@@ -37,5 +36,3 @@ namespace sail
 using arbitrary_data = std::vector<std::uint8_t>;
 
 }
-
-#endif

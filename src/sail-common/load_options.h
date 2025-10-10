@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_LOAD_OPTIONS_H
-#define SAIL_LOAD_OPTIONS_H
+#pragma once
 
 #include <sail-common/export.h>
 #include <sail-common/status.h>
@@ -93,6 +92,4 @@ SAIL_EXPORT sail_status_t sail_copy_load_options(const struct sail_load_options 
 /* extern "C" */
 #ifdef __cplusplus
 }
-#endif
-
 #endif

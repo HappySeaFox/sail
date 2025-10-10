@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_LOG_CPP_H
-#define SAIL_LOG_CPP_H
+#pragma once
 
 #include <sail-common/export.h>
 #include <sail-common/log.h>
@@ -50,5 +49,3 @@ SAIL_EXPORT void set_barrier(SailLogLevel max_level);
 }
 
 }
-
-#endif

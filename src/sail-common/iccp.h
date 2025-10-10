@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_ICCP_H
-#define SAIL_ICCP_H
+#pragma once
 
 #include <stddef.h> /* size_t */
 
@@ -97,6 +96,4 @@ SAIL_EXPORT sail_status_t sail_copy_iccp(const struct sail_iccp *source_iccp, st
 /* extern "C" */
 #ifdef __cplusplus
 }
-#endif
-
 #endif

@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_META_DATA_CPP_H
-#define SAIL_META_DATA_CPP_H
+#pragma once
 
 #include <memory>
 #include <string>
@@ -185,5 +184,3 @@ private:
 };
 
 }
-
-#endif

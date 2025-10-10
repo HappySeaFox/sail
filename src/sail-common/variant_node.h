@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_VARIANT_NODE_H
-#define SAIL_VARIANT_NODE_H
+#pragma once
 
 #include <sail-common/export.h>
 #include <sail-common/status.h>
@@ -96,6 +95,4 @@ SAIL_EXPORT sail_status_t sail_copy_variant_node_chain(const struct sail_variant
 /* extern "C" */
 #ifdef __cplusplus
 }
-#endif
-
 #endif

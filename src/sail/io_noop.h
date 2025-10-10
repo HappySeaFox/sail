@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_IO_NOOP_H
-#define SAIL_IO_NOOP_H
+#pragma once
 
 #include <stdbool.h>
 #include <stddef.h> /* size_t */
@@ -90,6 +89,4 @@ SAIL_EXPORT sail_status_t sail_io_noop_eof(void *stream, bool *result);
 /* extern "C" */
 #ifdef __cplusplus
 }
-#endif
-
 #endif

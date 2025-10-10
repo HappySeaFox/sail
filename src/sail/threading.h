@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_THREADING_H
-#define SAIL_THREADING_H
+#pragma once
 
 #include <sail-common/config.h>
 #include <sail-common/export.h>
@@ -71,5 +70,3 @@ SAIL_HIDDEN sail_status_t threading_lock_mutex(sail_mutex_t *mutex);
 SAIL_HIDDEN sail_status_t threading_unlock_mutex(sail_mutex_t *mutex);
 
 SAIL_HIDDEN sail_status_t threading_destroy_mutex(sail_mutex_t *mutex);
-
-#endif

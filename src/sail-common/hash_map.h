@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_HASH_MAP_H
-#define SAIL_HASH_MAP_H
+#pragma once
 
 #include <stdbool.h>
 
@@ -107,6 +106,4 @@ SAIL_EXPORT sail_status_t sail_copy_hash_map(const struct sail_hash_map *source_
 /* extern "C" */
 #ifdef __cplusplus
 }
-#endif
-
 #endif

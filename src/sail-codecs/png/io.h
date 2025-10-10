@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_PNG_IO_H
-#define SAIL_PNG_IO_H
+#pragma once
 
 #include <stdio.h>
 
@@ -37,5 +36,3 @@ SAIL_HIDDEN void png_private_my_read_fn(png_structp png_ptr, png_bytep bytes, pn
 SAIL_HIDDEN void png_private_my_write_fn(png_structp png_ptr, png_bytep bytes, png_size_t bytes_size);
 
 SAIL_HIDDEN void png_private_my_flush_fn(png_structp png_ptr);
-
-#endif

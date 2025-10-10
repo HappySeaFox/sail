@@ -23,8 +23,7 @@
     SOFTWARE.
 */
 
-#ifndef SAIL_VARIANT_H
-#define SAIL_VARIANT_H
+#pragma once
 
 #include <stdbool.h>
 #include <stddef.h> /* size_t */
@@ -334,6 +333,4 @@ SAIL_EXPORT int sail_snprintf_variant(const struct sail_variant *variant, char *
 /* extern "C" */
 #ifdef __cplusplus
 }
-#endif
-
 #endif
