@@ -23,6 +23,7 @@
     SOFTWARE.
 */
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h> /* atoi */
 #include <string.h>
@@ -31,135 +32,688 @@
 
 #include <sail-manip/sail-manip.h>
 
-static void print_invalid_argument(void) {
+/*
+ * MSVC-specific safe functions.
+ * MSVC provides _s (secure) versions of standard C functions that include additional
+ * buffer size checks and validation. These macros provide compatibility between
+ * MSVC and other compilers while maintaining safety.
+ */
+#ifdef _MSC_VER
+/* Use MSVC secure versions with _TRUNCATE flag for safe truncation */
+#define sail_snprintf(buf, size, fmt, ...) _snprintf_s(buf, size, _TRUNCATE, fmt, __VA_ARGS__)
+#define sail_strncpy(dst, src, size) strncpy_s(dst, size, src, _TRUNCATE)
+#define sail_sscanf sscanf_s
+#else
+/* Standard C functions with manual null-termination for safety */
+#define sail_snprintf snprintf
+#define sail_strncpy(dst, src, size) (strncpy(dst, src, size), (dst)[(size) - 1] = '\0')
+#define sail_sscanf sscanf
+#endif
+
+static void print_invalid_argument(void)
+{
     fprintf(stderr, "Error: Invalid arguments. Run with -h to see command arguments.\n");
 }
 
-static sail_status_t convert_impl(const char *input, const char *output, enum SailPixelFormat pixel_format, int compression, int max_frames) {
-
-    SAIL_CHECK_PTR(input);
+static sail_status_t convert_impl(const char** inputs, int input_count, const char* output,
+                                  enum SailPixelFormat pixel_format, int compression, int max_frames, int delay,
+                                  int colors, bool dither, const char* background, bool strip_metadata,
+                                  bool flip_horizontal, bool flip_vertical)
+{
+    SAIL_CHECK_PTR(inputs);
     SAIL_CHECK_PTR(output);
 
-    const struct sail_codec_info *input_codec_info;
-    const struct sail_codec_info *output_codec_info;
-    void *load_state;
-    void *save_state = NULL;
+    if (input_count < 1)
+    {
+        SAIL_LOG_ERROR("No input files specified");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+    }
 
-    struct sail_image *image;
-
-    /* Load the image. */
-    SAIL_LOG_INFO("Input file: %s", input);
-
-    SAIL_TRY(sail_codec_info_from_path(input, &input_codec_info));
-    SAIL_LOG_INFO("Input codec: %s", input_codec_info->description);
-
-    /* Use SOURCE_IMAGE option to preserve original pixel format when possible. */
-    struct sail_load_options *load_options;
-    SAIL_TRY(sail_alloc_load_options_from_features(input_codec_info->load_features, &load_options));
-    load_options->options |= SAIL_OPTION_SOURCE_IMAGE;
-
-    SAIL_TRY_OR_CLEANUP(sail_start_loading_from_file_with_options(input, input_codec_info, load_options, &load_state),
-                        /* cleanup */ sail_destroy_load_options(load_options));
-    sail_destroy_load_options(load_options);
+    const struct sail_codec_info* output_codec_info;
+    void* save_state = NULL;
 
     /* Setup output. */
     SAIL_LOG_INFO("Output file: %s", output);
+    SAIL_LOG_INFO("Processing %d input file(s)", input_count);
 
     SAIL_TRY(sail_codec_info_from_path(output, &output_codec_info));
     SAIL_LOG_INFO("Output codec: %s", output_codec_info->description);
 
-    struct sail_save_options *save_options;
+    struct sail_save_options* save_options;
     SAIL_TRY(sail_alloc_save_options_from_features(output_codec_info->save_features, &save_options));
 
     /* Apply our tuning. */
     SAIL_LOG_INFO("Compression: %d%s", compression, compression == -1 ? " (default)" : "");
     save_options->compression_level = compression;
 
+    /* Determine output mode based on delay parameter and format capabilities. */
+    bool output_supports_animated = (output_codec_info->save_features->features & SAIL_CODEC_FEATURE_ANIMATED) != 0;
+    bool output_supports_multi_paged =
+        (output_codec_info->save_features->features & SAIL_CODEC_FEATURE_MULTI_PAGED) != 0;
+
     /* Check if output format supports animation or multi-paged. If not, force limit to 1 frame. */
-    if (!(output_codec_info->save_features->features & SAIL_CODEC_FEATURE_ANIMATED) &&
-        !(output_codec_info->save_features->features & SAIL_CODEC_FEATURE_MULTI_PAGED)) {
-        if (max_frames > 0) {
+    if (!output_supports_animated && !output_supports_multi_paged)
+    {
+        if (max_frames > 0 || input_count > 1)
+        {
             SAIL_LOG_WARNING("Output format doesn't support animation/multi-page, forcing to 1 frame");
         }
         max_frames = 1;
     }
 
-    /* Convert all frames (or limited number). */
-    int frame_count = 0;
-    sail_status_t load_status;
+    /* Log the output mode. */
+    if (input_count > 1)
+    {
+        if (delay >= 0)
+        {
+            SAIL_LOG_INFO("Composing %d files into animation with %d ms delay", input_count, delay);
+        }
+        else if (output_supports_multi_paged)
+        {
+            SAIL_LOG_INFO("Composing %d files into multi-page document", input_count);
+        }
+        else if (output_supports_animated)
+        {
+            SAIL_LOG_INFO("Composing %d files into animation with default delay", input_count);
+        }
+    }
+    else
+    {
+        if (delay >= 0)
+        {
+            SAIL_LOG_INFO("Delay specified (%d ms), creating animation", delay);
+        }
+        else if (output_supports_multi_paged)
+        {
+            SAIL_LOG_INFO("No delay specified, creating multi-page document");
+        }
+        else if (output_supports_animated)
+        {
+            SAIL_LOG_INFO("Creating animation with original frame delays");
+        }
+    }
 
-    while ((load_status = sail_load_next_frame(load_state, &image)) == SAIL_OK) {
+    /* Process all input files. */
+    int total_frame_count = 0;
+
+    for (int file_idx = 0; file_idx < input_count; file_idx++)
+    {
+        const char* input = inputs[file_idx];
+        const struct sail_codec_info* input_codec_info;
+        void* load_state;
+        struct sail_image* image;
+
+        /* Load the image. */
+        SAIL_LOG_INFO("Input file #%d: %s", file_idx + 1, input);
+
+        SAIL_TRY_OR_CLEANUP(sail_codec_info_from_path(input, &input_codec_info), sail_stop_saving(save_state);
+                            sail_destroy_save_options(save_options));
+        SAIL_LOG_INFO("Input codec: %s", input_codec_info->description);
+
+        /* Use SOURCE_IMAGE option to preserve original pixel format when possible. */
+        struct sail_load_options* load_options;
+        SAIL_TRY_OR_CLEANUP(sail_alloc_load_options_from_features(input_codec_info->load_features, &load_options),
+                            sail_stop_saving(save_state);
+                            sail_destroy_save_options(save_options));
+        load_options->options |= SAIL_OPTION_SOURCE_IMAGE;
+
+        SAIL_TRY_OR_CLEANUP(
+            sail_start_loading_from_file_with_options(input, input_codec_info, load_options, &load_state),
+            sail_destroy_load_options(load_options);
+            sail_stop_saving(save_state); sail_destroy_save_options(save_options));
+        sail_destroy_load_options(load_options);
+
+        /* Convert all frames from this input file. */
+        sail_status_t load_status;
+        int file_frame_count = 0;
+
+        while ((load_status = sail_load_next_frame(load_state, &image)) == SAIL_OK)
+        {
+            /* Check max frames limit. */
+            if (max_frames > 0 && total_frame_count >= max_frames)
+            {
+                SAIL_LOG_INFO("Reached max frames limit (%d), stopping", max_frames);
+                sail_destroy_image(image);
+                break;
+            }
+
+            SAIL_LOG_INFO("Processing frame #%d (file #%d, frame #%d)", total_frame_count, file_idx + 1,
+                          file_frame_count);
+
+            /* Setup conversion options if needed. */
+            struct sail_conversion_options* conversion_options = NULL;
+            if (background != NULL || dither)
+            {
+                SAIL_TRY_OR_CLEANUP(sail_alloc_conversion_options(&conversion_options), sail_destroy_image(image);
+                                    sail_stop_loading(load_state); sail_stop_saving(save_state);
+                                    sail_destroy_save_options(save_options));
+
+                if (background != NULL)
+                {
+                    /* Parse background color. */
+                    unsigned r, g, b;
+                    if (strcmp(background, "white") == 0)
+                    {
+                        r = g = b = 255;
+                    }
+                    else if (strcmp(background, "black") == 0)
+                    {
+                        r = g = b = 0;
+                    }
+                    else if (background[0] == '#' && strlen(background) == 7)
+                    {
+                        sail_sscanf(background + 1, "%02x%02x%02x", &r, &g, &b);
+                    }
+                    else
+                    {
+                        SAIL_LOG_ERROR("Invalid background color: %s", background);
+                        sail_destroy_conversion_options(conversion_options);
+                        sail_destroy_image(image);
+                        sail_stop_loading(load_state);
+                        sail_stop_saving(save_state);
+                        sail_destroy_save_options(save_options);
+                        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+                    }
+
+                    conversion_options->options |= SAIL_CONVERSION_OPTION_BLEND_ALPHA;
+                    conversion_options->background24.component1 = (uint8_t)r;
+                    conversion_options->background24.component2 = (uint8_t)g;
+                    conversion_options->background24.component3 = (uint8_t)b;
+                    conversion_options->background48.component1 = (uint16_t)(r * 257);
+                    conversion_options->background48.component2 = (uint16_t)(g * 257);
+                    conversion_options->background48.component3 = (uint16_t)(b * 257);
+                    SAIL_LOG_INFO("Background color: #%02X%02X%02X", r, g, b);
+                }
+
+                if (dither)
+                {
+                    conversion_options->options |= SAIL_CONVERSION_OPTION_DITHERING;
+                    SAIL_LOG_INFO("Dithering enabled");
+                }
+            }
+
+            /* Convert to the appropriate pixel format. */
+            struct sail_image* image_converted;
+
+            /* If quantization is requested, convert to RGB for quantization input. */
+            if (colors > 0)
+            {
+                SAIL_LOG_INFO("Converting to BPP24-RGB for quantization");
+                if (conversion_options != NULL)
+                {
+                    SAIL_TRY_OR_CLEANUP(sail_convert_image_with_options(image, SAIL_PIXEL_FORMAT_BPP24_RGB,
+                                                                        conversion_options, &image_converted),
+                                        sail_destroy_conversion_options(conversion_options);
+                                        sail_destroy_image(image); sail_stop_loading(load_state);
+                                        sail_stop_saving(save_state); sail_destroy_save_options(save_options));
+                }
+                else
+                {
+                    SAIL_TRY_OR_CLEANUP(sail_convert_image(image, SAIL_PIXEL_FORMAT_BPP24_RGB, &image_converted),
+                                        sail_destroy_image(image);
+                                        sail_stop_loading(load_state); sail_stop_saving(save_state);
+                                        sail_destroy_save_options(save_options));
+                }
+
+                sail_destroy_conversion_options(conversion_options);
+                sail_destroy_image(image);
+                image = image_converted;
+
+                /* Apply flip before quantization (RGB is byte-aligned). */
+                if (flip_horizontal)
+                {
+                    SAIL_LOG_INFO("Flipping horizontally");
+                    SAIL_TRY_OR_CLEANUP(sail_mirror_horizontally(image), sail_destroy_image(image);
+                                        sail_stop_loading(load_state); sail_stop_saving(save_state);
+                                        sail_destroy_save_options(save_options));
+                }
+                if (flip_vertical)
+                {
+                    SAIL_LOG_INFO("Flipping vertically");
+                    SAIL_TRY_OR_CLEANUP(sail_mirror_vertically(image), sail_destroy_image(image);
+                                        sail_stop_loading(load_state); sail_stop_saving(save_state);
+                                        sail_destroy_save_options(save_options));
+                }
+
+                /* Now quantize RGB to indexed. */
+                SAIL_LOG_INFO("Quantizing to %d colors%s", colors, dither ? " with dithering" : "");
+                struct sail_image* image_quantized;
+                SAIL_TRY_OR_CLEANUP(sail_quantize_image(image, colors, dither, &image_quantized),
+                                    sail_destroy_image(image);
+                                    sail_stop_loading(load_state); sail_stop_saving(save_state);
+                                    sail_destroy_save_options(save_options));
+                sail_destroy_image(image);
+                image = image_quantized;
+            }
+            /* Otherwise convert to format suitable for saving. */
+            else if (pixel_format != SAIL_PIXEL_FORMAT_UNKNOWN)
+            {
+                SAIL_LOG_INFO("Converting to specified pixel format: %s", sail_pixel_format_to_string(pixel_format));
+                if (conversion_options != NULL)
+                {
+                    SAIL_TRY_OR_CLEANUP(
+                        sail_convert_image_with_options(image, pixel_format, conversion_options, &image_converted),
+                        sail_destroy_conversion_options(conversion_options);
+                        sail_destroy_image(image); sail_stop_loading(load_state); sail_stop_saving(save_state);
+                        sail_destroy_save_options(save_options));
+                }
+                else
+                {
+                    SAIL_TRY_OR_CLEANUP(sail_convert_image(image, pixel_format, &image_converted),
+                                        sail_destroy_image(image);
+                                        sail_stop_loading(load_state); sail_stop_saving(save_state);
+                                        sail_destroy_save_options(save_options));
+                }
+
+                sail_destroy_conversion_options(conversion_options);
+                sail_destroy_image(image);
+                image = image_converted;
+            }
+            else
+            {
+                if (conversion_options != NULL)
+                {
+                    SAIL_TRY_OR_CLEANUP(
+                        sail_convert_image_for_saving_with_options(image, output_codec_info->save_features,
+                                                                   conversion_options, &image_converted),
+                        sail_destroy_conversion_options(conversion_options);
+                        sail_destroy_image(image); sail_stop_loading(load_state); sail_stop_saving(save_state);
+                        sail_destroy_save_options(save_options));
+                }
+                else
+                {
+                    SAIL_TRY_OR_CLEANUP(
+                        sail_convert_image_for_saving(image, output_codec_info->save_features, &image_converted),
+                        sail_destroy_image(image);
+                        sail_stop_loading(load_state); sail_stop_saving(save_state);
+                        sail_destroy_save_options(save_options));
+                }
+
+                sail_destroy_conversion_options(conversion_options);
+                sail_destroy_image(image);
+                image = image_converted;
+            }
+
+            /* Apply flip after conversion if not quantizing. */
+            if (colors == 0)
+            {
+                if (flip_horizontal)
+                {
+                    SAIL_LOG_INFO("Flipping horizontally");
+                    SAIL_TRY_OR_CLEANUP(sail_mirror_horizontally(image), sail_destroy_image(image);
+                                        sail_stop_loading(load_state); sail_stop_saving(save_state);
+                                        sail_destroy_save_options(save_options));
+                }
+                if (flip_vertical)
+                {
+                    SAIL_LOG_INFO("Flipping vertically");
+                    SAIL_TRY_OR_CLEANUP(sail_mirror_vertically(image), sail_destroy_image(image);
+                                        sail_stop_loading(load_state); sail_stop_saving(save_state);
+                                        sail_destroy_save_options(save_options));
+                }
+            }
+
+            /* Strip metadata if requested. */
+            if (strip_metadata)
+            {
+                if (image->meta_data_node != NULL)
+                {
+                    SAIL_LOG_INFO("Stripping metadata");
+                    sail_destroy_meta_data_node_chain(image->meta_data_node);
+                    image->meta_data_node = NULL;
+                }
+            }
+
+            /* Apply delay based on user intent and format capabilities. */
+            if (delay >= 0)
+            {
+                /* User specified delay - create animation with this delay. */
+                image->delay = delay;
+            }
+            else if (output_supports_multi_paged)
+            {
+                /* No delay specified and format supports multi-page - create multi-page document. */
+                image->delay = 0;
+            }
+            /* Otherwise keep original delay for animation. */
+
+            /* Start saving on first frame. */
+            if (total_frame_count == 0)
+            {
+                SAIL_TRY_OR_CLEANUP(
+                    sail_start_saving_into_file_with_options(output, output_codec_info, save_options, &save_state),
+                    sail_destroy_image(image);
+                    sail_stop_loading(load_state); sail_destroy_save_options(save_options));
+            }
+
+            /* Write frame. */
+            SAIL_TRY_OR_CLEANUP(sail_write_next_frame(save_state, image), sail_destroy_image(image);
+                                sail_stop_loading(load_state); sail_stop_saving(save_state);
+                                sail_destroy_save_options(save_options));
+
+            sail_destroy_image(image);
+            total_frame_count++;
+            file_frame_count++;
+        }
+
+        SAIL_TRY_OR_CLEANUP(sail_stop_loading(load_state), sail_stop_saving(save_state);
+                            sail_destroy_save_options(save_options));
+
+        SAIL_LOG_INFO("Processed %d frame(s) from file #%d", file_frame_count, file_idx + 1);
+
+        /* For composition mode, break after processing all frames if max_frames reached. */
+        if (max_frames > 0 && total_frame_count >= max_frames)
+        {
+            break;
+        }
+    }
+
+    /* Check if we processed at least one frame. */
+    if (total_frame_count == 0)
+    {
+        SAIL_LOG_ERROR("No frames found in input files");
+        sail_destroy_save_options(save_options);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+    }
+
+    SAIL_LOG_INFO("Total: converted %d frame(s)", total_frame_count);
+
+    /* Clean up. */
+    SAIL_TRY(sail_stop_saving(save_state));
+    sail_destroy_save_options(save_options);
+
+    return SAIL_OK;
+}
+
+static sail_status_t extract_frames_impl(const char* input, const char* output_template,
+                                         enum SailPixelFormat pixel_format, int compression, int max_frames, int colors,
+                                         bool dither, const char* background, bool strip_metadata, bool flip_horizontal,
+                                         bool flip_vertical)
+{
+
+    SAIL_CHECK_PTR(input);
+    SAIL_CHECK_PTR(output_template);
+
+    const struct sail_codec_info* input_codec_info;
+    void* load_state;
+    struct sail_image* image;
+
+    /* Load the image. */
+    SAIL_LOG_INFO("Input file: %s", input);
+    SAIL_LOG_INFO("Extracting frames to: %s", output_template);
+
+    SAIL_TRY(sail_codec_info_from_path(input, &input_codec_info));
+    SAIL_LOG_INFO("Input codec: %s", input_codec_info->description);
+
+    /* Use SOURCE_IMAGE option to preserve original pixel format when possible. */
+    struct sail_load_options* load_options;
+    SAIL_TRY(sail_alloc_load_options_from_features(input_codec_info->load_features, &load_options));
+    load_options->options |= SAIL_OPTION_SOURCE_IMAGE;
+
+    SAIL_TRY_OR_CLEANUP(sail_start_loading_from_file_with_options(input, input_codec_info, load_options, &load_state),
+                        sail_destroy_load_options(load_options));
+    sail_destroy_load_options(load_options);
+
+    /* Extract the file extension from output template. */
+    const char* ext = strrchr(output_template, '.');
+    const char* base_name_end = ext ? ext : (output_template + strlen(output_template));
+    const char* dir_sep = strrchr(output_template, '/');
+    if (dir_sep == NULL)
+    {
+        dir_sep = strrchr(output_template, '\\');
+    }
+    const char* base_name_start = dir_sep ? (dir_sep + 1) : output_template;
+    int base_name_len = base_name_end - base_name_start;
+
+    /* Extract all frames. */
+    sail_status_t load_status;
+    int frame_count = 0;
+
+    while ((load_status = sail_load_next_frame(load_state, &image)) == SAIL_OK)
+    {
         /* Check max frames limit. */
-        if (max_frames > 0 && frame_count >= max_frames) {
+        if (max_frames > 0 && frame_count >= max_frames)
+        {
             SAIL_LOG_INFO("Reached max frames limit (%d), stopping", max_frames);
             sail_destroy_image(image);
             break;
         }
 
-        SAIL_LOG_INFO("Processing frame #%d", frame_count);
+        /* Construct output filename: base-N.ext */
+        char output_filename[512];
+        /* Ensure base_name_len doesn't exceed buffer size. */
+        int safe_base_name_len = base_name_len;
+        if (safe_base_name_len > (int)sizeof(output_filename) - 20)
+        {
+            safe_base_name_len = sizeof(output_filename) - 20; /* Reserve space for "-N" and extension */
+        }
+        sail_snprintf(output_filename, sizeof(output_filename), "%.*s-%d%s", safe_base_name_len, base_name_start,
+                      frame_count + 1, ext ? ext : "");
 
-        /* Convert to the specified or best pixel format for saving. */
-        struct sail_image *image_converted;
-        if (pixel_format != SAIL_PIXEL_FORMAT_UNKNOWN) {
-            SAIL_LOG_INFO("Converting to specified pixel format: %s", sail_pixel_format_to_string(pixel_format));
-            SAIL_TRY_OR_CLEANUP(sail_convert_image(image, pixel_format, &image_converted),
-                                /* cleanup */ sail_destroy_image(image);
-                                              if (save_state != NULL) sail_stop_saving(save_state);
-                                              sail_destroy_save_options(save_options);
-                                              sail_stop_loading(load_state));
-        } else {
-            SAIL_TRY_OR_CLEANUP(sail_convert_image_for_saving(image, output_codec_info->save_features, &image_converted),
-                                /* cleanup */ sail_destroy_image(image);
-                                              if (save_state != NULL) sail_stop_saving(save_state);
-                                              sail_destroy_save_options(save_options);
-                                              sail_stop_loading(load_state));
+        /* Add directory prefix if present. */
+        if (dir_sep)
+        {
+            char full_path[1024]; /* Large enough for dir + filename */
+            int dir_len = dir_sep - output_template + 1;
+            /* Ensure dir_len doesn't exceed reasonable size. */
+            if (dir_len > 500)
+            {
+                dir_len = 500;
+            }
+            sail_snprintf(full_path, sizeof(full_path), "%.*s%s", dir_len, output_template, output_filename);
+            sail_strncpy(output_filename, full_path, sizeof(output_filename));
         }
 
-        sail_destroy_image(image);
-        image = image_converted;
+        SAIL_LOG_INFO("Extracting frame #%d to %s", frame_count, output_filename);
 
-        /* Start saving on first frame. */
-        if (frame_count == 0) {
-            SAIL_TRY_OR_CLEANUP(sail_start_saving_into_file_with_options(output, output_codec_info, save_options, &save_state),
-                                /* cleanup */ sail_destroy_image(image);
-                                              sail_destroy_save_options(save_options);
-                                              sail_stop_loading(load_state));
+        /* Determine output codec from filename. */
+        const struct sail_codec_info* output_codec_info;
+        SAIL_TRY_OR_CLEANUP(sail_codec_info_from_path(output_filename, &output_codec_info), sail_destroy_image(image);
+                            sail_stop_loading(load_state));
+
+        /* Setup conversion options if needed. */
+        struct sail_conversion_options* conversion_options = NULL;
+        if (background != NULL || dither)
+        {
+            SAIL_TRY_OR_CLEANUP(sail_alloc_conversion_options(&conversion_options), sail_destroy_image(image);
+                                sail_stop_loading(load_state));
+
+            if (background != NULL)
+            {
+                /* Parse background color. */
+                unsigned r, g, b;
+                if (strcmp(background, "white") == 0)
+                {
+                    r = g = b = 255;
+                }
+                else if (strcmp(background, "black") == 0)
+                {
+                    r = g = b = 0;
+                }
+                else if (background[0] == '#' && strlen(background) == 7)
+                {
+                    sail_sscanf(background + 1, "%02x%02x%02x", &r, &g, &b);
+                }
+                else
+                {
+                    SAIL_LOG_ERROR("Invalid background color: %s", background);
+                    sail_destroy_conversion_options(conversion_options);
+                    sail_destroy_image(image);
+                    sail_stop_loading(load_state);
+                    SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+                }
+
+                conversion_options->options |= SAIL_CONVERSION_OPTION_BLEND_ALPHA;
+                conversion_options->background24.component1 = (uint8_t)r;
+                conversion_options->background24.component2 = (uint8_t)g;
+                conversion_options->background24.component3 = (uint8_t)b;
+                conversion_options->background48.component1 = (uint16_t)(r * 257);
+                conversion_options->background48.component2 = (uint16_t)(g * 257);
+                conversion_options->background48.component3 = (uint16_t)(b * 257);
+            }
+
+            if (dither)
+            {
+                conversion_options->options |= SAIL_CONVERSION_OPTION_DITHERING;
+            }
         }
 
-        /* Write frame. */
-        SAIL_TRY_OR_CLEANUP(sail_write_next_frame(save_state, image),
-                            /* cleanup */ sail_destroy_image(image);
-                                          sail_stop_saving(save_state);
-                                          sail_destroy_save_options(save_options);
-                                          sail_stop_loading(load_state));
+        /* Convert to the appropriate pixel format. */
+        struct sail_image* image_converted;
+
+        /* If quantization is requested, convert to RGB for quantization input. */
+        if (colors > 0)
+        {
+            if (conversion_options != NULL)
+            {
+                SAIL_TRY_OR_CLEANUP(sail_convert_image_with_options(image, SAIL_PIXEL_FORMAT_BPP24_RGB,
+                                                                    conversion_options, &image_converted),
+                                    sail_destroy_conversion_options(conversion_options);
+                                    sail_destroy_image(image); sail_stop_loading(load_state));
+            }
+            else
+            {
+                SAIL_TRY_OR_CLEANUP(sail_convert_image(image, SAIL_PIXEL_FORMAT_BPP24_RGB, &image_converted),
+                                    sail_destroy_image(image);
+                                    sail_stop_loading(load_state));
+            }
+
+            sail_destroy_conversion_options(conversion_options);
+            sail_destroy_image(image);
+            image = image_converted;
+
+            /* Apply flip before quantization (RGB is byte-aligned). */
+            if (flip_horizontal)
+            {
+                SAIL_TRY_OR_CLEANUP(sail_mirror_horizontally(image), sail_destroy_image(image);
+                                    sail_stop_loading(load_state));
+            }
+            if (flip_vertical)
+            {
+                SAIL_TRY_OR_CLEANUP(sail_mirror_vertically(image), sail_destroy_image(image);
+                                    sail_stop_loading(load_state));
+            }
+
+            /* Now quantize RGB to indexed. */
+            struct sail_image* image_quantized;
+            SAIL_TRY_OR_CLEANUP(sail_quantize_image(image, colors, dither, &image_quantized), sail_destroy_image(image);
+                                sail_stop_loading(load_state));
+            sail_destroy_image(image);
+            image = image_quantized;
+        }
+        /* Otherwise convert to format suitable for saving. */
+        else if (pixel_format != SAIL_PIXEL_FORMAT_UNKNOWN)
+        {
+            if (conversion_options != NULL)
+            {
+                SAIL_TRY_OR_CLEANUP(
+                    sail_convert_image_with_options(image, pixel_format, conversion_options, &image_converted),
+                    sail_destroy_conversion_options(conversion_options);
+                    sail_destroy_image(image); sail_stop_loading(load_state));
+            }
+            else
+            {
+                SAIL_TRY_OR_CLEANUP(sail_convert_image(image, pixel_format, &image_converted),
+                                    sail_destroy_image(image);
+                                    sail_stop_loading(load_state));
+            }
+
+            sail_destroy_conversion_options(conversion_options);
+            sail_destroy_image(image);
+            image = image_converted;
+        }
+        else
+        {
+            if (conversion_options != NULL)
+            {
+                SAIL_TRY_OR_CLEANUP(sail_convert_image_for_saving_with_options(image, output_codec_info->save_features,
+                                                                               conversion_options, &image_converted),
+                                    sail_destroy_conversion_options(conversion_options);
+                                    sail_destroy_image(image); sail_stop_loading(load_state));
+            }
+            else
+            {
+                SAIL_TRY_OR_CLEANUP(
+                    sail_convert_image_for_saving(image, output_codec_info->save_features, &image_converted),
+                    sail_destroy_image(image);
+                    sail_stop_loading(load_state));
+            }
+
+            sail_destroy_conversion_options(conversion_options);
+            sail_destroy_image(image);
+            image = image_converted;
+        }
+
+        /* Apply flip after conversion if not quantizing. */
+        if (colors == 0)
+        {
+            if (flip_horizontal)
+            {
+                SAIL_TRY_OR_CLEANUP(sail_mirror_horizontally(image), sail_destroy_image(image);
+                                    sail_stop_loading(load_state));
+            }
+            if (flip_vertical)
+            {
+                SAIL_TRY_OR_CLEANUP(sail_mirror_vertically(image), sail_destroy_image(image);
+                                    sail_stop_loading(load_state));
+            }
+        }
+
+        /* Strip metadata if requested. */
+        if (strip_metadata)
+        {
+            if (image->meta_data_node != NULL)
+            {
+                sail_destroy_meta_data_node_chain(image->meta_data_node);
+                image->meta_data_node = NULL;
+            }
+        }
+
+        /* Setup save options. */
+        struct sail_save_options* save_options;
+        SAIL_TRY_OR_CLEANUP(sail_alloc_save_options_from_features(output_codec_info->save_features, &save_options),
+                            sail_destroy_image(image);
+                            sail_stop_loading(load_state));
+
+        save_options->compression_level = compression;
+
+        /* Save single frame. */
+        void* save_state;
+        SAIL_TRY_OR_CLEANUP(
+            sail_start_saving_into_file_with_options(output_filename, output_codec_info, save_options, &save_state),
+            sail_destroy_image(image);
+            sail_destroy_save_options(save_options); sail_stop_loading(load_state));
+
+        SAIL_TRY_OR_CLEANUP(sail_write_next_frame(save_state, image), sail_destroy_image(image);
+                            sail_stop_saving(save_state); sail_destroy_save_options(save_options);
+                            sail_stop_loading(load_state));
+
+        SAIL_TRY_OR_CLEANUP(sail_stop_saving(save_state), sail_destroy_image(image);
+                            sail_destroy_save_options(save_options); sail_stop_loading(load_state));
 
         sail_destroy_image(image);
+        sail_destroy_save_options(save_options);
         frame_count++;
     }
 
+    SAIL_TRY(sail_stop_loading(load_state));
+
     /* Check if we processed at least one frame. */
-    if (frame_count == 0) {
+    if (frame_count == 0)
+    {
         SAIL_LOG_ERROR("No frames found in input file");
-        sail_destroy_save_options(save_options);
-        sail_stop_loading(load_state);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
     }
 
-    SAIL_LOG_INFO("Converted %d frame(s)", frame_count);
-
-    /* Clean up. */
-    if (save_state != NULL) {
-        SAIL_TRY(sail_stop_saving(save_state));
-    }
-    sail_destroy_save_options(save_options);
-    SAIL_TRY(sail_stop_loading(load_state));
+    SAIL_LOG_INFO("Extracted %d frame(s)", frame_count);
 
     return SAIL_OK;
 }
 
-static sail_status_t convert(int argc, char *argv[]) {
-
-    if (argc < 4 || argc > 10) {
+static sail_status_t convert(int argc, char* argv[])
+{
+    if (argc < 4)
+    {
         print_invalid_argument();
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
@@ -170,58 +724,214 @@ static sail_status_t convert(int argc, char *argv[]) {
     int max_frames = 0;
     /* UNKNOWN: auto-select best format. */
     enum SailPixelFormat pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;
+    /* -1: no delay specified, use original or default based on format. */
+    int delay = -1;
+    /* false: compose/convert mode, true: extract frames mode. */
+    bool extract_frames = false;
+    /* 0: no quantization, >0: quantize to N colors. */
+    int colors = 0;
+    /* false: no dithering (default), true: apply Floyd-Steinberg dithering. */
+    bool dither = false;
+    /* NULL: no background (default). */
+    const char* background = NULL;
+    /* false: preserve metadata (default), true: strip metadata. */
+    bool strip_metadata = false;
+    /* false: no flip (default). */
+    bool flip_horizontal = false;
+    bool flip_vertical = false;
 
-    /* Start parsing CLI options from the 4th argument. */
-    int i = 4;
+    /* Collect positional arguments (file paths). */
+    const char* files[256];
+    int file_count = 0;
 
-    while (i < argc) {
-        if (strcmp(argv[i], "-c") == 0 || strcmp(argv[i], "--compression") == 0) {
-            if (i == argc-1) {
-                fprintf(stderr, "Error: Missing compression value.\n");
-                SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+    /* Parse arguments: first collect all files, then parse options. */
+    int i = 2; /* Skip program name and "convert" command. */
+
+    while (i < argc)
+    {
+        /* Check if this is an option. */
+        if (argv[i][0] == '-')
+        {
+            /* Parse option. */
+            if (strcmp(argv[i], "-c") == 0 || strcmp(argv[i], "--compression") == 0)
+            {
+                if (i == argc - 1)
+                {
+                    fprintf(stderr, "Error: Missing compression value.\n");
+                    SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+                }
+                compression = atoi(argv[i + 1]);
+                i += 2;
+                continue;
             }
 
-            compression = atoi(argv[i+1]);
-            i += 2;
-            continue;
+            if (strcmp(argv[i], "-m") == 0 || strcmp(argv[i], "--max-frames") == 0)
+            {
+                if (i == argc - 1)
+                {
+                    fprintf(stderr, "Error: Missing max-frames value.\n");
+                    SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+                }
+                max_frames = atoi(argv[i + 1]);
+                i += 2;
+                continue;
+            }
+
+            if (strcmp(argv[i], "-p") == 0 || strcmp(argv[i], "--pixel-format") == 0)
+            {
+                if (i == argc - 1)
+                {
+                    fprintf(stderr, "Error: Missing pixel-format value.\n");
+                    SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+                }
+                pixel_format = sail_pixel_format_from_string(argv[i + 1]);
+                if (pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN)
+                {
+                    fprintf(stderr, "Error: Unknown pixel format '%s'.\n", argv[i + 1]);
+                    SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+                }
+                i += 2;
+                continue;
+            }
+
+            if (strcmp(argv[i], "-d") == 0 || strcmp(argv[i], "--delay") == 0)
+            {
+                if (i == argc - 1)
+                {
+                    fprintf(stderr, "Error: Missing delay value.\n");
+                    SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+                }
+                delay = atoi(argv[i + 1]);
+                if (delay < 0)
+                {
+                    fprintf(stderr, "Error: Delay must be non-negative.\n");
+                    SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+                }
+                i += 2;
+                continue;
+            }
+
+            if (strcmp(argv[i], "-e") == 0 || strcmp(argv[i], "--extract-frames") == 0)
+            {
+                extract_frames = true;
+                i += 1;
+                continue;
+            }
+
+            if (strcmp(argv[i], "-C") == 0 || strcmp(argv[i], "--colors") == 0)
+            {
+                if (i == argc - 1)
+                {
+                    fprintf(stderr, "Error: Missing colors value.\n");
+                    SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+                }
+                colors = atoi(argv[i + 1]);
+                if (colors < 2 || colors > 256)
+                {
+                    fprintf(stderr, "Error: Colors must be between 2 and 256.\n");
+                    SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+                }
+                i += 2;
+                continue;
+            }
+
+            if (strcmp(argv[i], "-D") == 0 || strcmp(argv[i], "--dither") == 0)
+            {
+                dither = true;
+                i += 1;
+                continue;
+            }
+
+            if (strcmp(argv[i], "-b") == 0 || strcmp(argv[i], "--background") == 0)
+            {
+                if (i == argc - 1)
+                {
+                    fprintf(stderr, "Error: Missing background value.\n");
+                    SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+                }
+                background = argv[i + 1];
+                i += 2;
+                continue;
+            }
+
+            if (strcmp(argv[i], "-s") == 0 || strcmp(argv[i], "--strip") == 0)
+            {
+                strip_metadata = true;
+                i += 1;
+                continue;
+            }
+
+            if (strcmp(argv[i], "-H") == 0 || strcmp(argv[i], "--flip-horizontal") == 0)
+            {
+                flip_horizontal = true;
+                i += 1;
+                continue;
+            }
+
+            if (strcmp(argv[i], "-V") == 0 || strcmp(argv[i], "--flip-vertical") == 0)
+            {
+                flip_vertical = true;
+                i += 1;
+                continue;
+            }
+
+            fprintf(stderr, "Error: Unrecognized option '%s'.\n", argv[i]);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
         }
-
-        if (strcmp(argv[i], "-m") == 0 || strcmp(argv[i], "--max-frames") == 0) {
-            if (i == argc-1) {
-                fprintf(stderr, "Error: Missing max-frames value.\n");
+        else
+        {
+            /* This is a file path. */
+            if (file_count >= 256)
+            {
+                fprintf(stderr, "Error: Too many input files (maximum 256).\n");
                 SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
             }
-
-            max_frames = atoi(argv[i+1]);
-            i += 2;
-            continue;
+            files[file_count++] = argv[i];
+            i++;
         }
+    }
 
-        if (strcmp(argv[i], "-p") == 0 || strcmp(argv[i], "--pixel-format") == 0) {
-            if (i == argc-1) {
-                fprintf(stderr, "Error: Missing pixel-format value.\n");
-                SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
-            }
-
-            pixel_format = sail_pixel_format_from_string(argv[i+1]);
-            if (pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN) {
-                fprintf(stderr, "Error: Unknown pixel format '%s'.\n", argv[i+1]);
-                SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
-            }
-            i += 2;
-            continue;
-        }
-
-        fprintf(stderr, "Error: Unrecognized option '%s'.\n", argv[i]);
+    /* Check that we have at least 2 files (1 input + 1 output). */
+    if (file_count < 2)
+    {
+        fprintf(stderr, "Error: Need at least one input file and one output file.\n");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 
-    SAIL_TRY(convert_impl(argv[2], argv[3], pixel_format, compression, max_frames));
+    /* Last file is output, all others are inputs. */
+    const char* output = files[file_count - 1];
+    int input_count = file_count - 1;
+
+    /* Choose mode: extract frames or compose/convert. */
+    if (extract_frames)
+    {
+        /* Extract frames mode: only one input file is allowed. */
+        if (input_count != 1)
+        {
+            fprintf(stderr, "Error: Extract frames mode requires exactly one input file.\n");
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+        }
+
+        /* Delay option is not applicable in extract mode. */
+        if (delay >= 0)
+        {
+            fprintf(stderr, "Warning: --delay option is ignored in extract frames mode.\n");
+        }
+
+        SAIL_TRY(extract_frames_impl(files[0], output, pixel_format, compression, max_frames, colors, dither,
+                                     background, strip_metadata, flip_horizontal, flip_vertical));
+    }
+    else
+    {
+        SAIL_TRY(convert_impl(files, input_count, output, pixel_format, compression, max_frames, delay, colors, dither,
+                              background, strip_metadata, flip_horizontal, flip_vertical));
+    }
 
     return SAIL_OK;
 }
 
-static bool special_properties_printf_callback(const char *key, const struct sail_variant *value) {
+static bool special_properties_printf_callback(const char* key, const struct sail_variant* value)
+{
 
     printf("  %s : ", key);
     sail_printf_variant(value);
@@ -230,13 +940,16 @@ static bool special_properties_printf_callback(const char *key, const struct sai
     return true;
 }
 
-static void print_aligned_image_info(const struct sail_image *image) {
-
+static void print_aligned_image_info(const struct sail_image* image)
+{
     printf("Size          : %ux%u\n", image->width, image->height);
 
-    if (image->resolution == NULL) {
+    if (image->resolution == NULL)
+    {
         printf("Resolution:   : -\n");
-    } else {
+    }
+    else
+    {
         printf("Resolution:   : %.1fx%.1f\n", image->resolution->x, image->resolution->y);
     }
 
@@ -245,16 +958,22 @@ static void print_aligned_image_info(const struct sail_image *image) {
     printf("Interlaced    : %s\n", image->source_image->interlaced ? "yes" : "no");
     printf("Delay         : %d ms.\n", image->delay);
 
-    if (image->meta_data_node != NULL) {
+    if (image->meta_data_node != NULL)
+    {
         printf("Meta data     :\n");
 
-        for (const struct sail_meta_data_node *meta_data_node = image->meta_data_node; meta_data_node != NULL; meta_data_node = meta_data_node->next) {
-            const struct sail_meta_data *meta_data = meta_data_node->meta_data;
-            const char *meta_data_str = NULL;
+        for (const struct sail_meta_data_node* meta_data_node = image->meta_data_node; meta_data_node != NULL;
+             meta_data_node = meta_data_node->next)
+        {
+            const struct sail_meta_data* meta_data = meta_data_node->meta_data;
+            const char* meta_data_str = NULL;
 
-            if (meta_data->key == SAIL_META_DATA_UNKNOWN) {
+            if (meta_data->key == SAIL_META_DATA_UNKNOWN)
+            {
                 meta_data_str = meta_data->key_unknown;
-            } else {
+            }
+            else
+            {
                 meta_data_str = sail_meta_data_to_string(meta_data->key);
             }
 
@@ -264,22 +983,22 @@ static void print_aligned_image_info(const struct sail_image *image) {
         }
     }
 
-    if (image->special_properties != NULL) {
+    if (image->special_properties != NULL)
+    {
         printf("Special properties :\n");
-        sail_traverse_hash_map(image->special_properties,
-                                special_properties_printf_callback);
+        sail_traverse_hash_map(image->special_properties, special_properties_printf_callback);
     }
 }
 
-static sail_status_t probe_impl(const char *path) {
-
+static sail_status_t probe_impl(const char* path)
+{
     SAIL_CHECK_PTR(path);
 
     /* Time counter. */
     uint64_t start_time = sail_now();
 
-    struct sail_image *image;
-    const struct sail_codec_info *codec_info;
+    struct sail_image* image;
+    const struct sail_codec_info* codec_info;
 
     SAIL_TRY(sail_probe_file(path, &image, &codec_info));
 
@@ -297,9 +1016,10 @@ static sail_status_t probe_impl(const char *path) {
     return SAIL_OK;
 }
 
-static sail_status_t probe(int argc, char *argv[]) {
-
-    if (argc != 3) {
+static sail_status_t probe(int argc, char* argv[])
+{
+    if (argc != 3)
+    {
         print_invalid_argument();
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
@@ -309,11 +1029,11 @@ static sail_status_t probe(int argc, char *argv[]) {
     return SAIL_OK;
 }
 
-static sail_status_t decode_impl(const char *path) {
-
+static sail_status_t decode_impl(const char* path)
+{
     SAIL_CHECK_PTR(path);
 
-    const struct sail_codec_info *codec_info;
+    const struct sail_codec_info* codec_info;
     SAIL_TRY(sail_codec_info_from_path(path, &codec_info));
 
     printf("File          : %s\n", path);
@@ -324,20 +1044,22 @@ static sail_status_t decode_impl(const char *path) {
     uint64_t start_time = sail_now();
 
     /* Decode. */
-    void *state;
+    void* state;
     SAIL_TRY(sail_start_loading_from_file(path, codec_info, &state));
 
-    struct sail_image *image;
+    struct sail_image* image;
     sail_status_t status;
     unsigned frame = 0;
 
-    while ((status = sail_load_next_frame(state, &image)) == SAIL_OK) {
+    while ((status = sail_load_next_frame(state, &image)) == SAIL_OK)
+    {
         printf("Frame #%u\n", frame++);
         print_aligned_image_info(image);
         sail_destroy_image(image);
     }
 
-    if (status != SAIL_ERROR_NO_MORE_FRAMES) {
+    if (status != SAIL_ERROR_NO_MORE_FRAMES)
+    {
         sail_stop_loading(state);
         fprintf(stderr, "Error: Decoder error %d.\n", status);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
@@ -352,9 +1074,10 @@ static sail_status_t decode_impl(const char *path) {
     return SAIL_OK;
 }
 
-static sail_status_t decode(int argc, char *argv[]) {
-
-    if (argc != 3) {
+static sail_status_t decode(int argc, char* argv[])
+{
+    if (argc != 3)
+    {
         print_invalid_argument();
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
@@ -364,51 +1087,146 @@ static sail_status_t decode(int argc, char *argv[]) {
     return SAIL_OK;
 }
 
-static sail_status_t list_impl(bool verbose) {
+static sail_status_t list_impl(bool verbose)
+{
+    const struct sail_codec_bundle_node* codec_bundle_node = sail_codec_bundle_list();
 
-    const struct sail_codec_bundle_node *codec_bundle_node = sail_codec_bundle_list();
+    for (int counter = 1; codec_bundle_node != NULL; codec_bundle_node = codec_bundle_node->next, counter++)
+    {
+        const struct sail_codec_info* codec_info = codec_bundle_node->codec_bundle->codec_info;
 
-    for (int counter = 1; codec_bundle_node != NULL; codec_bundle_node = codec_bundle_node->next, counter++) {
-        const struct sail_codec_info *codec_info = codec_bundle_node->codec_bundle->codec_info;
+        printf("%2d. [p%d] %s [%s] %s\n", counter, codec_info->priority, codec_info->name, codec_info->description,
+               codec_info->version);
 
-        printf("%2d. [p%d] %s [%s] %s\n", counter, codec_info->priority, codec_info->name, codec_info->description, codec_info->version);
+        if (verbose)
+        {
+            /* Load features tuning. */
+            if (codec_info->load_features->tuning != NULL)
+            {
+                printf("         Load tuning: ");
 
-        if (verbose) {
-            if (codec_info->load_features->tuning != NULL) {
-                printf("         Tuning: ");
-
-                for (const struct sail_string_node *node = codec_info->load_features->tuning, *prev = NULL;
-                        node != NULL;
-                        prev = node, node = node->next) {
-                    if (prev != NULL) {
+                int tuning_counter = 0;
+                for (const struct sail_string_node* node = codec_info->load_features->tuning; node != NULL;
+                     node = node->next)
+                {
+                    if (tuning_counter > 0 && tuning_counter % 2 == 0)
+                    {
+                        printf(",\n                      ");
+                    }
+                    else if (tuning_counter > 0)
+                    {
                         printf(", ");
                     }
 
                     printf("%s", node->string);
+                    tuning_counter++;
                 }
 
                 printf("\n");
             }
+
+            /* Save features. */
+            const struct sail_save_features* save_features = codec_info->save_features;
+
+            if (save_features->features != 0)
+            {
+                /* Output pixel formats. */
+                if (save_features->pixel_formats_length > 0)
+                {
+                    printf("         Output formats: ");
+                    for (unsigned i = 0; i < save_features->pixel_formats_length; i++)
+                    {
+                        if (i > 0 && i % 2 == 0)
+                        {
+                            printf(",\n                         ");
+                        }
+                        else if (i > 0)
+                        {
+                            printf(", ");
+                        }
+                        printf("%s", sail_pixel_format_to_string(save_features->pixel_formats[i]));
+                    }
+                    printf("\n");
+                }
+
+                /* Compressions. */
+                if (save_features->compressions_length > 0)
+                {
+                    printf("         Compressions: ");
+                    for (unsigned i = 0; i < save_features->compressions_length; i++)
+                    {
+                        if (i > 0 && i % 5 == 0)
+                        {
+                            printf(",\n                       ");
+                        }
+                        else if (i > 0)
+                        {
+                            printf(", ");
+                        }
+                        printf("%s", sail_compression_to_string(save_features->compressions[i]));
+                    }
+                    printf(" (default: %s)\n", sail_compression_to_string(save_features->default_compression));
+                }
+
+                /* Compression levels. */
+                if (save_features->compression_level != NULL)
+                {
+                    printf("         Compression levels: min=%.0f, max=%.0f, default=%.0f, step=%.0f\n",
+                           save_features->compression_level->min_level, save_features->compression_level->max_level,
+                           save_features->compression_level->default_level, save_features->compression_level->step);
+                }
+
+                /* Save features tuning. */
+                if (save_features->tuning != NULL)
+                {
+                    printf("         Save tuning: ");
+
+                    int tuning_counter = 0;
+                    for (const struct sail_string_node* node = save_features->tuning; node != NULL; node = node->next)
+                    {
+                        if (tuning_counter > 0 && tuning_counter % 2 == 0)
+                        {
+                            printf(",\n                      ");
+                        }
+                        else if (tuning_counter > 0)
+                        {
+                            printf(", ");
+                        }
+
+                        printf("%s", node->string);
+                        tuning_counter++;
+                    }
+
+                    printf("\n");
+                }
+            }
+
+            /* Add blank line after each codec in verbose mode. */
+            printf("\n");
         }
     }
 
     return SAIL_OK;
 }
 
-static sail_status_t list(int argc, char *argv[]) {
-
+static sail_status_t list(int argc, char* argv[])
+{
     (void)argv;
 
-    if (argc < 2 || argc > 3) {
+    if (argc < 2 || argc > 3)
+    {
         print_invalid_argument();
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 
     bool verbose;
 
-    if (argc == 2) {
+    if (argc == 2)
+    {
         verbose = false;
-    } else {
+    }
+    else
+    {
         verbose = strcmp(argv[2], "-v") == 0;
     }
 
@@ -417,41 +1235,77 @@ static sail_status_t list(int argc, char *argv[]) {
     return SAIL_OK;
 }
 
-static void help(const char *app) {
+static void help(const char* app)
+{
+    fprintf(stderr, "SAIL command-line utility for image conversion.\n\n");
+    fprintf(stderr, "Usage: %s <command> [arguments]\n\n", app);
 
-    fprintf(stderr, "SAIL command-line utility.\n\n");
-    fprintf(stderr, "Usage: %s <command> <command arguments>\n", app);
-    fprintf(stderr, "       %s [-v | --version]\n", app);
-    fprintf(stderr, "       %s [-h | --help]\n", app);
-    fprintf(stderr, "Commands:\n");
-    fprintf(stderr, "    list [-v] - List supported codecs.\n");
-    fprintf(stderr, "\n");
-    fprintf(stderr, "    convert <INPUT PATH> <OUTPUT PATH> [-p | --pixel-format <value>]\n");
-    fprintf(stderr, "                                       [-c | --compression <value>]\n");
-    fprintf(stderr, "                                       [-m | --max-frames <value>]\n");
-    fprintf(stderr, "            Convert one image format to another.\n");
-    fprintf(stderr, "            Supports both static and animated images (all frames are converted by default).\n");
-    fprintf(stderr, "            Use -p to specify target pixel format (e.g., BPP24-RGB, BPP8-INDEXED).\n");
-    fprintf(stderr, "            Use -m to limit number of frames to convert from animations.\n");
-    fprintf(stderr, "\n");
-    fprintf(stderr, "    probe <PATH> - Retrieve information of the very first image frame found in the file.\n");
-    fprintf(stderr, "                   In most cases probing doesn't decode the image data.\n");
-    fprintf(stderr, "    decode <PATH> - Decode the whole file and print information of all its frames.\n");
+    fprintf(stderr, "Commands:\n\n");
+
+    fprintf(stderr, "  list [-v]    List all supported image codecs with details\n\n");
+
+    fprintf(stderr, "  convert - Convert, compose, and extract image files\n");
+    fprintf(stderr, "      Options:\n");
+    fprintf(stderr, "        -p, --pixel-format <format>  Force specific output pixel format\n");
+    fprintf(stderr, "        -c, --compression <level>    Set compression quality level (codec-specific)\n");
+    fprintf(stderr, "        -m, --max-frames <count>     Limit number of frames to process\n");
+    fprintf(stderr, "        -d, --delay <ms>             Set frame delay for animations in milliseconds\n");
+    fprintf(stderr, "        -e, --extract-frames         Extract each frame to separate file\n");
+    fprintf(stderr, "        -C, --colors <N>             Quantize image to N colors (2-256) using Wu algorithm\n");
+    fprintf(stderr, "        -D, --dither                 Apply Floyd-Steinberg dithering for better gradients\n");
+    fprintf(stderr,
+            "        -b, --background <color>     Blend alpha channel with background (white, black, #RRGGBB)\n");
+    fprintf(stderr, "        -s, --strip                  Remove all metadata from output files\n");
+    fprintf(stderr, "        -H, --flip-horizontal        Flip image horizontally (mirror left-right)\n");
+    fprintf(stderr, "        -V, --flip-vertical          Flip image vertically (mirror top-bottom)\n\n");
+    fprintf(stderr, "      Use cases:\n");
+    fprintf(stderr, "        # Simple format conversion between codecs\n");
+    fprintf(stderr, "        %s convert input.jpg output.png\n\n", app);
+    fprintf(stderr, "        # Convert with custom quality and pixel format\n");
+    fprintf(stderr, "        %s convert input.png output.jpg -c 90 -p BPP24-RGB\n\n", app);
+    fprintf(stderr, "        # Convert animation with specified frame delay\n");
+    fprintf(stderr, "        %s convert animation.gif output.webp -d 100\n\n", app);
+    fprintf(stderr, "        # Convert animation to multi-page document format\n");
+    fprintf(stderr, "        %s convert animation.gif output.tiff\n\n", app);
+    fprintf(stderr, "        # Compose multiple images into single animation\n");
+    fprintf(stderr, "        %s convert frame1.png frame2.png frame3.png animation.gif -d 100\n\n", app);
+    fprintf(stderr, "        # Extract all frames from animation into frame-1.jpg...\n");
+    fprintf(stderr, "        %s convert animation.gif frame.jpg -e\n\n", app);
+    fprintf(stderr, "        # Extract first 5 frames only from animation\n");
+    fprintf(stderr, "        %s convert animation.webp frame.png -e -m 5\n\n", app);
+    fprintf(stderr, "        # Reduce colors to 16 with dithering for smaller file size\n");
+    fprintf(stderr, "        %s convert photo.jpg output.gif --colors 16 --dither\n\n", app);
+    fprintf(stderr, "        # Convert RGBA to RGB with white background blend\n");
+    fprintf(stderr, "        %s convert transparent.png opaque.jpg --background white\n\n", app);
+    fprintf(stderr, "        # Strip metadata for privacy and smaller size\n");
+    fprintf(stderr, "        %s convert photo.jpg clean.jpg --strip\n\n", app);
+    fprintf(stderr, "        # Flip image horizontally or vertically\n");
+    fprintf(stderr, "        %s convert photo.jpg flipped.jpg -H -V\n\n", app);
+
+    fprintf(stderr, "  probe <path>     Display detailed information about image file\n");
+    fprintf(stderr, "  decode <path>    Decode file and show information for all frames\n\n");
+
+    fprintf(stderr, "Options:\n");
+    fprintf(stderr, "  %s -h, --help       Display this help message and exit\n", app);
+    fprintf(stderr, "  %s -v, --version    Display version information and exit\n", app);
 }
 
-int main(int argc, char *argv[]) {
-
-    if (argc < 2) {
+int main(int argc, char* argv[])
+{
+    if (argc < 2)
+    {
         help(argv[0]);
         return 1;
     }
 
-    if (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0) {
+    if (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0)
+    {
         help(argv[0]);
         return 0;
     }
 
-    if (strcmp(argv[1], "-v") == 0 || strcmp(argv[1], "--version") == 0) {
+    if (strcmp(argv[1], "-v") == 0 || strcmp(argv[1], "--version") == 0)
+    {
         fprintf(stderr, "SAIL command-line utility 1.5.0\n");
         fprintf(stderr, "SAIL library %s\n", SAIL_VERSION_STRING);
         return 0;
@@ -459,20 +1313,27 @@ int main(int argc, char *argv[]) {
 
     sail_set_log_barrier(SAIL_LOG_LEVEL_WARNING);
 
-    if (strcmp(argv[1], "convert") == 0) {
+    if (strcmp(argv[1], "convert") == 0)
+    {
         SAIL_TRY(convert(argc, argv));
-    } else if (strcmp(argv[1], "list") == 0) {
+    }
+    else if (strcmp(argv[1], "list") == 0)
+    {
         SAIL_TRY(list(argc, argv));
-    } else if (strcmp(argv[1], "probe") == 0) {
+    }
+    else if (strcmp(argv[1], "probe") == 0)
+    {
         SAIL_TRY(probe(argc, argv));
-    } else if (strcmp(argv[1], "decode") == 0) {
+    }
+    else if (strcmp(argv[1], "decode") == 0)
+    {
         SAIL_TRY(decode(argc, argv));
-    } else {
+    }
+    else
+    {
         print_invalid_argument();
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
-
-    printf("Success\n");
 
     sail_finish();
 
