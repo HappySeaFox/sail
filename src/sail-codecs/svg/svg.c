@@ -165,7 +165,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_svg(void *state, st
     struct svg_state *svg_state = state;
 
     if (svg_state->frame_loaded) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+        return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
     svg_state->frame_loaded = true;

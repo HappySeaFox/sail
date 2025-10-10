@@ -152,7 +152,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_ico(void *state, st
 
     do {
         if (ico_state->current_frame >= ico_state->ico_header.images_count) {
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+            return SAIL_ERROR_NO_MORE_FRAMES;
         }
 
         SAIL_TRY(ico_state->io->seek(ico_state->io->stream, (long)ico_state->ico_dir_entries[ico_state->current_frame++].image_offset, SEEK_SET));

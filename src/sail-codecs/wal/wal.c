@@ -119,7 +119,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_wal(void *state, st
     struct wal_state *wal_state = state;
 
     if (wal_state->frame_number >= 4) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+        return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
     if (wal_state->frame_number > 0) {
@@ -220,7 +220,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_wal(void *state, co
 
     /* WAL format supports up to 4 mipmap levels. */
     if (wal_state->frame_number >= 4) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+        return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
     /* Verify pixel format. */

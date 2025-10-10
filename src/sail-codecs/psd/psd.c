@@ -131,7 +131,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_psd(void *state, st
     struct psd_state *psd_state = state;
 
     if (psd_state->frame_loaded) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+        return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
     psd_state->frame_loaded = true;

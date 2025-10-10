@@ -143,7 +143,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_tiff(void *state, s
     /* Start reading the next directory. */
     if (!TIFFSetDirectory(tiff_state->tiff, tiff_state->current_frame++)) {
         sail_destroy_image(image_local);
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+        return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
     /* Fill the image properties. */

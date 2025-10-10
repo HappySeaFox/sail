@@ -102,7 +102,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jbig(void *state, s
     struct jbig_codec_state *jbig_state = state;
 
     if (jbig_state->frame_loaded) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+        return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
     jbig_state->frame_loaded = true;

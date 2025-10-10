@@ -302,7 +302,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_webp(void *state, s
         }
 
         if (WebPDemuxNextFrame(webp_state->webp_iterator) == 0) {
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+            return SAIL_ERROR_NO_MORE_FRAMES;
         }
     }
 

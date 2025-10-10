@@ -96,7 +96,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_bmp(void *state, st
     struct bmp_state *bmp_state = state;
 
     if (bmp_state->frame_loaded) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+        return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
     bmp_state->frame_loaded = true;
@@ -154,7 +154,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_bmp(void *state, co
     struct bmp_state *bmp_state = state;
 
     if (bmp_state->frame_saved) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+        return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
     bmp_state->frame_saved = true;

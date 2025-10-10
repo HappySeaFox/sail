@@ -186,7 +186,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpeg2000(void *stat
     struct jpeg2000_state *jpeg2000_state = state;
 
     if (jpeg2000_state->frame_loaded) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+        return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
     jpeg2000_state->frame_loaded = true;
@@ -396,7 +396,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_jpeg2000(void *stat
     struct jpeg2000_state *jpeg2000_state = state;
 
     if (jpeg2000_state->frame_loaded) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+        return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
     jpeg2000_state->frame_loaded = true;

@@ -115,7 +115,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_hdr(void *state, st
     struct hdr_codec_state *hdr_state = state;
 
     if (hdr_state->frame_loaded) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+        return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
     hdr_state->frame_loaded = true;

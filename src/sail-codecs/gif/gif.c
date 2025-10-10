@@ -318,7 +318,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_gif(void *state, st
 
             case TERMINATE_RECORD_TYPE: {
                 sail_destroy_image(image_local);
-                SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+                return SAIL_ERROR_NO_MORE_FRAMES;
             }
 
             default: {

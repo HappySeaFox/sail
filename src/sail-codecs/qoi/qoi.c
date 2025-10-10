@@ -114,7 +114,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_qoi(void *state, st
     struct qoi_state *qoi_state = state;
 
     if (qoi_state->frame_loaded) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+        return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
     qoi_state->frame_loaded = true;

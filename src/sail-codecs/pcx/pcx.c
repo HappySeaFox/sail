@@ -123,7 +123,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_pcx(void *state, st
     struct pcx_state *pcx_state = state;
 
     if (pcx_state->frame_loaded) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+        return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
     pcx_state->frame_loaded = true;
@@ -260,7 +260,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_pcx(void *state, co
     struct pcx_state *pcx_state = state;
 
     if (pcx_state->frame_saved) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+        return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
     pcx_state->frame_saved = true;

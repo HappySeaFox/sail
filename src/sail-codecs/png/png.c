@@ -282,7 +282,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_png(void *state, st
     struct png_state *png_state = state;
 
     if (png_state->current_frame == png_state->frames) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+        return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
     if (setjmp(png_jmpbuf(png_state->png_ptr))) {
@@ -510,7 +510,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_png(void *state, co
     struct png_state *png_state = state;
 
     if (png_state->frame_saved) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+        return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
     png_state->frame_saved = true;

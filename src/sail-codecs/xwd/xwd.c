@@ -100,7 +100,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_xwd(void *state, st
     struct xwd_codec_state *xwd_state = state;
 
     if (xwd_state->frame_loaded) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+        return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
     xwd_state->frame_loaded = true;

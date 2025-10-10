@@ -205,7 +205,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void *state,
     struct jpegxl_state *jpegxl_state = state;
 
     if (jpegxl_state->libjxl_success) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+        return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
     struct sail_image *image_local = NULL;
@@ -342,7 +342,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void *state,
             }
             case JXL_DEC_SUCCESS: {
                 sail_destroy_image(image_local);
-                SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+                return SAIL_ERROR_NO_MORE_FRAMES;
             }
             default: {
                 sail_destroy_image(image_local);

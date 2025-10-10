@@ -115,7 +115,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_xpm(void *state, st
     struct xpm_codec_state *xpm_state = state;
 
     if (xpm_state->frame_loaded) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+        return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
     xpm_state->frame_loaded = true;

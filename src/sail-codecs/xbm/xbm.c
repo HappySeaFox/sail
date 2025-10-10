@@ -102,7 +102,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_xbm(void *state, st
     struct xbm_codec_state *xbm_state = state;
 
     if (xbm_state->frame_loaded) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+        return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
     xbm_state->frame_loaded = true;

@@ -133,7 +133,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_pnm(void *state, st
     struct pnm_state *pnm_state = state;
 
     if (pnm_state->frame_loaded) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+        return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
     pnm_state->frame_loaded = true;
