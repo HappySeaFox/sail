@@ -8,6 +8,7 @@ addons:
     packages:
       - libavif-dev
       - libgif-dev
+      - libjbig-dev
       - libjpeg-dev
       - libjxl-dev
       - libnanosvg-dev

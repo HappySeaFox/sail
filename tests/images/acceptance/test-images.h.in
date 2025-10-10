@@ -32,9 +32,21 @@ static const char * const SAIL_TEST_IMAGES[] = {
     "@SAIL_TEST_IMAGES_PATH@/gif/bpp8-indexed.interlaced.gif",
 #endif
 
+#ifdef SAIL_HAVE_BUILTIN_HDR
+    "@SAIL_TEST_IMAGES_PATH@/hdr/test.hdr",
+    "@SAIL_TEST_IMAGES_PATH@/hdr/bright.hdr",
+#endif
+
 #ifdef SAIL_HAVE_BUILTIN_ICO
     "@SAIL_TEST_IMAGES_PATH@/ico/bpp8-indexed.ico",
     "@SAIL_TEST_IMAGES_PATH@/ico/bpp24-bgr.ico",
+#endif
+
+#ifdef SAIL_HAVE_BUILTIN_JBIG
+    "@SAIL_TEST_IMAGES_PATH@/jbig/bpp1.jbig",
+    "@SAIL_TEST_IMAGES_PATH@/jbig/stripes.jbig",
+    "@SAIL_TEST_IMAGES_PATH@/jbig/black.jbig",
+    "@SAIL_TEST_IMAGES_PATH@/jbig/white.jbig",
 #endif
 
 #ifdef SAIL_HAVE_BUILTIN_JPEG
@@ -106,6 +118,29 @@ static const char * const SAIL_TEST_IMAGES[] = {
 #ifdef SAIL_HAVE_BUILTIN_XBM
     "@SAIL_TEST_IMAGES_PATH@/xbm/bpp1-indexed.x10.xbm",
     "@SAIL_TEST_IMAGES_PATH@/xbm/bpp1-indexed.x11.xbm",
+#endif
+
+#ifdef SAIL_HAVE_BUILTIN_XPM
+    "@SAIL_TEST_IMAGES_PATH@/xpm/bpp1-indexed.xpm",
+    "@SAIL_TEST_IMAGES_PATH@/xpm/bpp2-indexed.xpm",
+    "@SAIL_TEST_IMAGES_PATH@/xpm/bpp4-indexed.xpm",
+    "@SAIL_TEST_IMAGES_PATH@/xpm/bpp8-indexed.xpm",
+    "@SAIL_TEST_IMAGES_PATH@/xpm/grayscale.xpm",
+    "@SAIL_TEST_IMAGES_PATH@/xpm/hotspot.xpm",
+    "@SAIL_TEST_IMAGES_PATH@/xpm/multichar.xpm",
+    "@SAIL_TEST_IMAGES_PATH@/xpm/named-colors.xpm",
+    "@SAIL_TEST_IMAGES_PATH@/xpm/short-rgb.xpm",
+    "@SAIL_TEST_IMAGES_PATH@/xpm/transparency.xpm",
+#endif
+
+#ifdef SAIL_HAVE_BUILTIN_XWD
+    "@SAIL_TEST_IMAGES_PATH@/xwd/bpp1-indexed.xwd",
+    "@SAIL_TEST_IMAGES_PATH@/xwd/bpp4-indexed.xwd",
+    "@SAIL_TEST_IMAGES_PATH@/xwd/bpp8-indexed.xwd",
+    "@SAIL_TEST_IMAGES_PATH@/xwd/bpp16-rgb555.xwd",
+    "@SAIL_TEST_IMAGES_PATH@/xwd/bpp16-rgb565.xwd",
+    "@SAIL_TEST_IMAGES_PATH@/xwd/bpp24-rgb.xwd",
+    "@SAIL_TEST_IMAGES_PATH@/xwd/bpp32-rgba.xwd",
 #endif
 
     NULL,
