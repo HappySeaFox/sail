@@ -1,0 +1,19 @@
+/* XPM */
+static char *named_colors[] = {
+"8 8 6 1",
+"  c red",
+". c green",
+"X c blue",
+"o c yellow",
+"O c cyan",
+"+ c magenta",
+"  ......",
+" X X....",
+"  XX....",
+"..XXoo..",
+"..XXoo..",
+"....ooOO",
+"....o+X+",
+"......OO"
+};
+

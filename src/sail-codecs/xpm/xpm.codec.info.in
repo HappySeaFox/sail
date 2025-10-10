@@ -1,0 +1,26 @@
+# XPM codec information
+#
+[codec]
+layout=8
+version=0.7.0
+priority=LOWEST
+name=XPM
+description=X11 PixMap
+magic-numbers=2f 2a 20 58 50 4d 20 2a 2f
+extensions=xpm
+mime-types=image/x-xpixmap;image/x-xpm
+
+[load-features]
+features=STATIC;META-DATA;SOURCE-IMAGE
+tuning=
+
+[save-features]
+features=STATIC;META-DATA
+pixel-formats=BPP1-INDEXED;BPP2-INDEXED;BPP4-INDEXED;BPP8-INDEXED
+compressions=NONE
+default-compression=NONE
+compression-level-min=0
+compression-level-max=0
+compression-level-default=0
+compression-level-step=0
+tuning=xpm-name

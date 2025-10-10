@@ -1,0 +1,24 @@
+/* XPM */
+static char *transparency[] = {
+"16 16 3 1",
+"  c #FFFFFF",
+". c #000000",
+"X c None",
+"XXXXXXXXXXXXXXXX",
+"XXXX........XXXX",
+"XXX..........XXX",
+"XX............XX",
+"X..............X",
+"................",
+"X..  ....  ....X",
+"XX..........  XX",
+"XXX..........XXX",
+"XXXX........XXXX",
+"XXXXX......XXXXX",
+"XXXXXX....XXXXXX",
+"XXXXXXX..XXXXXXX",
+"XXXXXXXXXXXXXXXX",
+"XXXXXXXXXXXXXXXX",
+"XXXXXXXXXXXXXXXX"
+};
+

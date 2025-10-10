@@ -1,0 +1,18 @@
+/* XPM */
+static char *multichar[] = {
+"8 8 5 2",
+"   c #FF0000",
+"..  c #00FF00",
+"XX  c #0000FF",
+"oo  c #FFFF00",
+"OO  c #FFFFFF",
+"                ",
+"..  ..  XX  XX  ",
+"..  ..  XX  XX  ",
+"oo  oo  OO  OO  ",
+"oo  oo  OO  OO  ",
+"                ",
+"XX  ..  oo      ",
+"XX  ..  oo      "
+};
+

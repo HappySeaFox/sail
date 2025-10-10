@@ -665,6 +665,33 @@
     <td>-</td>
     <td>-</td>
 </tr>
+<tr>
+    <td>20</td>
+    <td><a href="https://en.wikipedia.org/wiki/X_PixMap">XPM</a></td>
+    <td>
+        <b>Indexed:</b> 1-bit, 2-bit, 4-bit, 8-bit.
+        <b>RGBA:</b> 32-bit.
+        <br/><br/>
+        <b>Content:</b> Static, Meta data.
+        <br/><br/>
+        <b>Special properties:</b> Key: <i>"xpm-hotspot-x"</i>. Description: X coordinate of hotspot.
+        Possible values: int (default: -1).
+        Key: <i>"xpm-hotspot-y"</i>. Description: Y coordinate of hotspot.
+        Possible values: int (default: -1).
+    </td>
+    <td>-</td>
+    <td>
+        <b>Indexed:</b> 1-bit, 2-bit, 4-bit, 8-bit.
+        <br/><br/>
+        <b>Compressions:</b> NONE.
+        <br/><br/>
+        <b>Content:</b> Static, Meta data.
+        <br/><br/>
+        <b>Tuning:</b> Key: <i>"xpm-name"</i>. Description: Variable name for the C array. Possible values: any valid C identifier (default: "image").
+    </td>
+    <td>-</td>
+    <td>-</td>
+</tr>
 </tbody>
 </table>
 

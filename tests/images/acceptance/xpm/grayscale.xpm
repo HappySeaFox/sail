@@ -1,0 +1,29 @@
+/* XPM */
+static char *grayscale[] = {
+"16 16 8 1",
+"  c #000000",
+". c #242424",
+"X c #484848",
+"o c #6D6D6D",
+"O c #919191",
+"+ c #B6B6B6",
+"@ c #DADADA",
+"# c #FFFFFF",
+"  ..XXooOO++@@##",
+"  ..XXooOO++@@##",
+"..  XXooOO++@@##",
+"..  XXooOO++@@##",
+"XX    ooOO++@@##",
+"XX    ooOO++@@##",
+"ooOO    ++@@##  ",
+"ooOO    ++@@##  ",
+"OO++@@    ##  ..",
+"OO++@@    ##  ..",
+"++@@##      ..XX",
+"++@@##      ..XX",
+"@@##  ..XX    oo",
+"@@##  ..XX    oo",
+"##  ..XXoo    OO",
+"##  ..XXoo    OO"
+};
+
