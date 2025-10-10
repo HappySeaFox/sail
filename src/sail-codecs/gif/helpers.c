@@ -169,25 +169,43 @@ bool gif_private_tuning_key_value_callback(const char *key, const struct sail_va
     struct gif_tuning_state *tuning_state = (struct gif_tuning_state *)user_data;
 
     if (strcmp(key, "gif-transparency-index") == 0) {
-        if (value->type == SAIL_VARIANT_TYPE_INT) {
-            *tuning_state->transparency_index_save = sail_variant_to_int(value);
-            SAIL_LOG_DEBUG("GIF: Set transparency index to %d", *tuning_state->transparency_index_save);
+        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT) {
+            int transparency_index = (value->type == SAIL_VARIANT_TYPE_INT)
+                                      ? sail_variant_to_int(value)
+                                      : (int)sail_variant_to_unsigned_int(value);
+            /* GIF palette has 256 colors max, -1 for no transparency */
+            if (transparency_index >= -1 && transparency_index <= 255) {
+                *tuning_state->transparency_index_save = transparency_index;
+                SAIL_LOG_DEBUG("GIF: Set transparency index to %d", *tuning_state->transparency_index_save);
+            }
         } else {
             SAIL_LOG_ERROR("GIF: 'gif-transparency-index' must be an integer");
         }
         return true;
     } else if (strcmp(key, "gif-loop-count") == 0) {
-        if (value->type == SAIL_VARIANT_TYPE_INT) {
-            *tuning_state->loop_count = sail_variant_to_int(value);
-            SAIL_LOG_DEBUG("GIF: Set loop count to %d", *tuning_state->loop_count);
+        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT) {
+            int loop_count = (value->type == SAIL_VARIANT_TYPE_INT)
+                              ? sail_variant_to_int(value)
+                              : (int)sail_variant_to_unsigned_int(value);
+            /* 0 = infinite, max 65535 (uint16 max) */
+            if (loop_count >= 0 && loop_count <= 65535) {
+                *tuning_state->loop_count = loop_count;
+                SAIL_LOG_DEBUG("GIF: Set loop count to %d", *tuning_state->loop_count);
+            }
         } else {
             SAIL_LOG_ERROR("GIF: 'gif-loop-count' must be an integer");
         }
         return true;
     } else if (strcmp(key, "gif-background-color") == 0) {
-        if (value->type == SAIL_VARIANT_TYPE_INT) {
-            *tuning_state->background_color_index = sail_variant_to_int(value);
-            SAIL_LOG_DEBUG("GIF: Set background color index to %d", *tuning_state->background_color_index);
+        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT) {
+            int background_color_index = (value->type == SAIL_VARIANT_TYPE_INT)
+                                          ? sail_variant_to_int(value)
+                                          : (int)sail_variant_to_unsigned_int(value);
+            /* GIF palette has 256 colors max */
+            if (background_color_index >= 0 && background_color_index <= 255) {
+                *tuning_state->background_color_index = background_color_index;
+                SAIL_LOG_DEBUG("GIF: Set background color index to %d", *tuning_state->background_color_index);
+            }
         } else {
             SAIL_LOG_ERROR("GIF: 'gif-background-color' must be an integer");
         }
