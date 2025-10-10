@@ -8,6 +8,7 @@
 static const char * const SAIL_TEST_IMAGES[] = {
 #ifdef SAIL_HAVE_BUILTIN_AVIF
     "@SAIL_TEST_IMAGES_PATH@/avif/bpp24-yuv.iccp.exif.xmp.avif",
+    "@SAIL_TEST_IMAGES_PATH@/avif/bpp24-yuv-animated.avif",
 #endif
 
 #ifdef SAIL_HAVE_BUILTIN_BMP
@@ -30,6 +31,7 @@ static const char * const SAIL_TEST_IMAGES[] = {
 #ifdef SAIL_HAVE_BUILTIN_GIF
     "@SAIL_TEST_IMAGES_PATH@/gif/bpp8-indexed.comment.gif",
     "@SAIL_TEST_IMAGES_PATH@/gif/bpp8-indexed.interlaced.gif",
+    "@SAIL_TEST_IMAGES_PATH@/gif/bpp24-rgb-animated.gif",
 #endif
 
 #ifdef SAIL_HAVE_BUILTIN_HDR
@@ -40,6 +42,7 @@ static const char * const SAIL_TEST_IMAGES[] = {
 #ifdef SAIL_HAVE_BUILTIN_ICO
     "@SAIL_TEST_IMAGES_PATH@/ico/bpp8-indexed.ico",
     "@SAIL_TEST_IMAGES_PATH@/ico/bpp24-bgr.ico",
+    "@SAIL_TEST_IMAGES_PATH@/ico/bpp24-bgr-multi.ico",
 #endif
 
 #ifdef SAIL_HAVE_BUILTIN_JBIG
@@ -68,6 +71,7 @@ static const char * const SAIL_TEST_IMAGES[] = {
 
 #ifdef SAIL_HAVE_BUILTIN_PNG
     "@SAIL_TEST_IMAGES_PATH@/png/bpp4-indexed.comment.iccp.png",
+    "@SAIL_TEST_IMAGES_PATH@/png/bpp32-rgba-animated.png",
 #endif
 
 #ifdef SAIL_HAVE_BUILTIN_PNM
@@ -92,10 +96,6 @@ static const char * const SAIL_TEST_IMAGES[] = {
     "@SAIL_TEST_IMAGES_PATH@/svg/bpp32-rgba.svg",
 #endif
 
-#ifdef SAIL_HAVE_BUILTIN_PNG
-    "@SAIL_TEST_IMAGES_PATH@/png/bpp4-indexed.comment.iccp.png",
-#endif
-
 #ifdef SAIL_HAVE_BUILTIN_TGA
     "@SAIL_TEST_IMAGES_PATH@/tga/bpp8-grayscale.extension.rle.tga",
     "@SAIL_TEST_IMAGES_PATH@/tga/bpp8-indexed.extension.rle.tga",
@@ -105,6 +105,7 @@ static const char * const SAIL_TEST_IMAGES[] = {
 #ifdef SAIL_HAVE_BUILTIN_TIFF
     "@SAIL_TEST_IMAGES_PATH@/tiff/bpp8.deflate.tiff",
     "@SAIL_TEST_IMAGES_PATH@/tiff/bpp24.tiff",
+    "@SAIL_TEST_IMAGES_PATH@/tiff/bpp24-rgb-multi-page.tiff",
 #endif
 
 #ifdef SAIL_HAVE_BUILTIN_WAL
@@ -113,6 +114,7 @@ static const char * const SAIL_TEST_IMAGES[] = {
 
 #ifdef SAIL_HAVE_BUILTIN_WEBP
     "@SAIL_TEST_IMAGES_PATH@/webp/bpp24-yuv.webp",
+    "@SAIL_TEST_IMAGES_PATH@/webp/bpp24-yuv-animated.webp",
 #endif
 
 #ifdef SAIL_HAVE_BUILTIN_XBM
