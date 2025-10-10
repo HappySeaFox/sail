@@ -5,7 +5,7 @@ ConstructorInitializerIndentWidth: 4
 IndentWidth: 4
 TabWidth: 4
 UseTab: Never
-BreakBeforeBinaryOperators: All
+BreakBeforeBinaryOperators: NonAssignment
 BreakBeforeBraces: Custom
 BraceWrapping:
   AfterCaseLabel:        true
