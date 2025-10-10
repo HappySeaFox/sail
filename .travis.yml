@@ -126,7 +126,7 @@ script:
     cd build
 
     fail_on_error cmake -DSAIL_DEV=ON -DCMAKE_BUILD_TYPE="$build_type" ..
-    fail_on_error cmake --build .
+    fail_on_error cmake --build . -j$(nproc)
     fail_on_error "$exe"
 
     cd "$old_dir"
@@ -154,10 +154,10 @@ script:
 
         fail_on_error cmake -A x64 -DBUILD_SHARED_LIBS="$BUILD_SHARED_LIBS" -DCMAKE_INSTALL_PREFIX="$CMAKE_INSTALL_PREFIX" \
                                    -DSAIL_DEV=ON -DSAIL_COMBINE_CODECS="$SAIL_COMBINE_CODECS" ..
-        fail_on_error cmake --build . --config $CMAKE_BUILD_TYPE $cmake_parallel_options --target install
+        fail_on_error cmake --build . --config $CMAKE_BUILD_TYPE $cmake_parallel_options --target install -j$(nproc)
 
         cd tests
-        fail_on_error ctest -C $CMAKE_BUILD_TYPE --output-on-failure
+        fail_on_error ctest -C $CMAKE_BUILD_TYPE --output-on-failure -j$(nproc)
 
         fail_on_error "$CMAKE_INSTALL_PREFIX/bin/sail" --version
 
@@ -171,7 +171,7 @@ script:
 
         fail_on_error cmake -DCMAKE_BUILD_TYPE="$CMAKE_BUILD_TYPE" -DCMAKE_INSTALL_PREFIX="$CMAKE_INSTALL_PREFIX" \
                             -DBUILD_SHARED_LIBS="$BUILD_SHARED_LIBS" -DSAIL_DEV=ON -DSAIL_COMBINE_CODECS="$SAIL_COMBINE_CODECS" ..
-        fail_on_error cmake --build . $cmake_parallel_options
+        fail_on_error cmake --build . $cmake_parallel_options -j$(nproc)
         fail_on_error sudo make install
 
         if [ "$TRAVIS_OS_NAME" = "linux" ]; then
@@ -179,7 +179,7 @@ script:
         fi
 
         cd tests
-        fail_on_error ctest --output-on-failure
+        fail_on_error ctest --output-on-failure -j$(nproc)
         cd -
 
         fail_on_error "$CMAKE_INSTALL_PREFIX/bin/sail" --version
