@@ -791,6 +791,8 @@ bool png_private_tuning_key_value_callback(const char *key, const struct sail_va
             sail_destroy_string_node_chain(string_node_filters);
 
             png_set_filter(png_ptr, 0, filters);
+        } else {
+            SAIL_LOG_ERROR("PNG: 'png-filter' must be a string");
         }
     }
 
