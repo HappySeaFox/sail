@@ -111,6 +111,9 @@ const char* sail_pixel_format_to_string(enum SailPixelFormat pixel_format) {
         case SAIL_PIXEL_FORMAT_BPP24_CIE_LAB:         return "BPP24-CIE-LAB";
         case SAIL_PIXEL_FORMAT_BPP40_CIE_LAB:         return "BPP40-CIE-LAB";
 
+        case SAIL_PIXEL_FORMAT_BPP32_CIE_LABA:        return "BPP32-CIE-LABA";
+        case SAIL_PIXEL_FORMAT_BPP64_CIE_LABA:        return "BPP64-CIE-LABA";
+
         case SAIL_PIXEL_FORMAT_BPP24_CIE_LUV:         return "BPP24-CIE-LUV";
         case SAIL_PIXEL_FORMAT_BPP40_CIE_LUV:         return "BPP40-CIE-LUV";
 
@@ -220,6 +223,9 @@ enum SailPixelFormat sail_pixel_format_from_string(const char *str) {
 
         case UINT64_C(13237269438873232231): return SAIL_PIXEL_FORMAT_BPP24_CIE_LAB;
         case UINT64_C(13237356636207563173): return SAIL_PIXEL_FORMAT_BPP40_CIE_LAB;
+
+        case UINT64_C(12556216543513437063): return SAIL_PIXEL_FORMAT_BPP32_CIE_LABA;
+        case UINT64_C(12560904103438034316): return SAIL_PIXEL_FORMAT_BPP64_CIE_LABA;
 
         case UINT64_C(13237269438873232911): return SAIL_PIXEL_FORMAT_BPP24_CIE_LUV;
         case UINT64_C(13237356636207563853): return SAIL_PIXEL_FORMAT_BPP40_CIE_LUV;

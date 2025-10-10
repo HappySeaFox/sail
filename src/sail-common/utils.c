@@ -325,6 +325,9 @@ unsigned sail_bits_per_pixel(enum SailPixelFormat pixel_format) {
         case SAIL_PIXEL_FORMAT_BPP24_CIE_LAB: return 24;
         case SAIL_PIXEL_FORMAT_BPP40_CIE_LAB: return 40;
 
+        case SAIL_PIXEL_FORMAT_BPP32_CIE_LABA: return 32;
+        case SAIL_PIXEL_FORMAT_BPP64_CIE_LABA: return 64;
+
         case SAIL_PIXEL_FORMAT_BPP24_CIE_LUV: return 24;
         case SAIL_PIXEL_FORMAT_BPP40_CIE_LUV: return 40;
 

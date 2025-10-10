@@ -478,6 +478,7 @@
         <b>CMYK:</b> 32-bit, 64-bit.
         <b>CMYKA:</b> 40-bit, 80-bit.
         <b>LAB:</b> 24-bit, 40-bit.
+        <b>LABA:</b> 32-bit, 64-bit.
         <br/><br/>
         <b>Compressions:</b> NONE, RLE.
         <br/><br/>
@@ -489,8 +490,6 @@
         <b>RGBA:</b> 128-bit (float/HDR).
         <br/><br/>
         <b>Color Modes:</b> Multichannel (mode 7), Duotone (mode 8).
-        <br/><br/>
-        <b>LAB+Alpha</b>
         <br/><br/>
         <b>Compressions:</b> ZIP.
         <br/><br/>

@@ -146,6 +146,9 @@ static MunitResult test_pixel_format_to_string(const MunitParameter params[], vo
     munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP24_CIE_LAB), "BPP24-CIE-LAB");
     munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP40_CIE_LAB), "BPP40-CIE-LAB");
 
+    munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP32_CIE_LABA), "BPP32-CIE-LABA");
+    munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP64_CIE_LABA), "BPP64-CIE-LABA");
+
     munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP24_CIE_LUV), "BPP24-CIE-LUV");
     munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP40_CIE_LUV), "BPP40-CIE-LUV");
 
@@ -242,6 +245,9 @@ static MunitResult test_pixel_format_from_string(const MunitParameter params[], 
 
     munit_assert(sail_pixel_format_from_string("BPP24-CIE-LAB") == SAIL_PIXEL_FORMAT_BPP24_CIE_LAB);
     munit_assert(sail_pixel_format_from_string("BPP40-CIE-LAB") == SAIL_PIXEL_FORMAT_BPP40_CIE_LAB);
+
+    munit_assert(sail_pixel_format_from_string("BPP32-CIE-LABA") == SAIL_PIXEL_FORMAT_BPP32_CIE_LABA);
+    munit_assert(sail_pixel_format_from_string("BPP64-CIE-LABA") == SAIL_PIXEL_FORMAT_BPP64_CIE_LABA);
 
     munit_assert(sail_pixel_format_from_string("BPP24-CIE-LUV") == SAIL_PIXEL_FORMAT_BPP24_CIE_LUV);
     munit_assert(sail_pixel_format_from_string("BPP40-CIE-LUV") == SAIL_PIXEL_FORMAT_BPP40_CIE_LUV);
