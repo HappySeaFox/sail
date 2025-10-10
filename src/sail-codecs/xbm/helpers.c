@@ -139,6 +139,8 @@ bool xbm_private_tuning_key_value_callback(const char *key, const struct sail_va
             } else {
                 SAIL_LOG_WARNING("XBM: Unknown version '%s', using X11 (default)", str_value);
             }
+        } else {
+            SAIL_LOG_ERROR("XBM: 'xbm-version' must be a string");
         }
     } else if (strcmp(key, "xbm-name") == 0) {
         if (value->type == SAIL_VARIANT_TYPE_STRING) {
@@ -149,6 +151,8 @@ bool xbm_private_tuning_key_value_callback(const char *key, const struct sail_va
                 xbm_state->var_name[sizeof(xbm_state->var_name) - 1] = '\0';
                 SAIL_LOG_TRACE("XBM: Using variable name '%s'", xbm_state->var_name);
             }
+        } else {
+            SAIL_LOG_ERROR("XBM: 'xbm-name' must be a string");
         }
     }
 
