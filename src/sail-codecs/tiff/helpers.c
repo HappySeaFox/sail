@@ -707,6 +707,8 @@ bool tiff_private_tuning_key_value_callback(const char *key, const struct sail_v
             }
 
             TIFFSetField(tiff, TIFFTAG_PREDICTOR, predictor);
+        } else {
+            SAIL_LOG_ERROR("TIFF: 'tiff-predictor' must be a string");
         }
     } else if (strcmp(key, "tiff-jpeg-quality") == 0) {
         if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT) {
@@ -720,6 +722,8 @@ bool tiff_private_tuning_key_value_callback(const char *key, const struct sail_v
             } else {
                 SAIL_LOG_WARNING("TIFF: JPEG quality must be 1-100, got %d", quality);
             }
+        } else {
+            SAIL_LOG_ERROR("TIFF: 'tiff-jpeg-quality' must be an integer");
         }
     } else if (strcmp(key, "tiff-zip-quality") == 0) {
         if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT) {
@@ -733,6 +737,8 @@ bool tiff_private_tuning_key_value_callback(const char *key, const struct sail_v
             } else {
                 SAIL_LOG_WARNING("TIFF: ZIP quality must be 1-9, got %d", quality);
             }
+        } else {
+            SAIL_LOG_ERROR("TIFF: 'tiff-zip-quality' must be an integer");
         }
     }
 
