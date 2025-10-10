@@ -17,6 +17,7 @@ addons:
       - libsdl2-dev
       - libtiff-dev
       - libwebp-dev
+      - zlib1g-dev
     update: true
 
 jobs:

@@ -40,7 +40,7 @@ animated, multi-paged images along with their meta data and ICC profiles. :sailb
 
 - [x] Easy-to-use thread-safe C and C++ interfaces
 - [x] Versatile APIs: `junior`, `advanced`, `deep diver`, and `technical diver`
-- [x] Input/output: files, memory, custom I/O streams
+- [x] Input/output: files, memory, custom I/O streams (see `tests/sail/custom-io.c`)
 - [x] Load by file suffixes, paths, and [magic numbers](https://en.wikipedia.org/wiki/File_format#Magic_number)
 - [x] Save pixels as close as possible to the source
 - [x] Codec-specific tuning options like <a href="https://en.wikipedia.org/wiki/Portable_Network_Graphics#Filtering">PNG filters</a>. See [FORMATS](FORMATS.md)

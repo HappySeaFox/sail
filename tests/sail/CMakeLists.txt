@@ -11,3 +11,14 @@ target_compile_definitions(edge-cases PRIVATE
     SAIL_TEST_IMAGES_ACCEPTANCE_PATH="${CMAKE_SOURCE_DIR}/tests/images/acceptance"
     SAIL_TEST_IMAGES_EDGE_CASES_PATH="${CMAKE_SOURCE_DIR}/tests/images/edge-cases"
 )
+
+find_package(ZLIB)
+if (ZLIB_FOUND)
+    sail_test(TARGET custom-io SOURCES custom-io.c LINK sail)
+    target_link_libraries(custom-io PRIVATE ZLIB::ZLIB)
+    target_compile_definitions(custom-io PRIVATE
+        SAIL_TEST_IMAGES_ACCEPTANCE_PATH="${CMAKE_SOURCE_DIR}/tests/images/acceptance"
+    )
+else()
+    message(WARNING "ZLIB not found, skipping custom-io test")
+endif()
