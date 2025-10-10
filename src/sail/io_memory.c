@@ -23,7 +23,6 @@
     SOFTWARE.
 */
 
-#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -260,6 +259,7 @@ sail_status_t sail_alloc_io_read_memory(const void *buffer, size_t length, struc
     mem_io_read_stream->mem_io_buffer_info.pos               = 0;
     mem_io_read_stream->buffer                               = buffer;
 
+    io_local->features       = SAIL_IO_FEATURE_SEEKABLE;
     io_local->stream         = mem_io_read_stream;
     io_local->tolerant_read  = io_memory_tolerant_read;
     io_local->strict_read    = io_memory_strict_read;
