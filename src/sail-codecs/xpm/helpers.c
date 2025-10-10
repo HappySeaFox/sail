@@ -317,9 +317,20 @@ sail_status_t xpm_private_read_pixels(struct sail_io *io,
                         pixel[1] = colors[c].g;
                         pixel[2] = colors[c].b;
                         pixel[3] = colors[c].a;
-                    } else {
-                        /* Indexed format. */
+                    } else if (pixel_format == SAIL_PIXEL_FORMAT_BPP8_INDEXED) {
                         pixels[y * width + x] = c;
+                    } else if (pixel_format == SAIL_PIXEL_FORMAT_BPP4_INDEXED) {
+                        unsigned byte_index = (y * width + x) / 2;
+                        unsigned shift = ((y * width + x) % 2) ? 0 : 4;
+                        pixels[byte_index] = (pixels[byte_index] & ~(0x0F << shift)) | ((c & 0x0F) << shift);
+                    } else if (pixel_format == SAIL_PIXEL_FORMAT_BPP2_INDEXED) {
+                        unsigned byte_index = (y * width + x) / 4;
+                        unsigned shift = 6 - ((y * width + x) % 4) * 2;
+                        pixels[byte_index] = (pixels[byte_index] & ~(0x03 << shift)) | ((c & 0x03) << shift);
+                    } else if (pixel_format == SAIL_PIXEL_FORMAT_BPP1_INDEXED) {
+                        unsigned byte_index = (y * width + x) / 8;
+                        unsigned shift = 7 - ((y * width + x) % 8);
+                        pixels[byte_index] = (pixels[byte_index] & ~(1 << shift)) | ((c & 1) << shift);
                     }
                     found = true;
                     break;
