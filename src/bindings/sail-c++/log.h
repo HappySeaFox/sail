@@ -46,6 +46,6 @@ namespace log
  */
 SAIL_EXPORT void set_barrier(SailLogLevel max_level);
 
-}
+} // namespace log
 
-}
+} // namespace sail

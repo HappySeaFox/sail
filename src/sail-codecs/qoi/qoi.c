@@ -38,31 +38,33 @@
 /*
  * Codec-specific state.
  */
-struct qoi_state {
-    struct sail_io *io;
-    const struct sail_load_options *load_options;
-    const struct sail_save_options *save_options;
+struct qoi_state
+{
+    struct sail_io* io;
+    const struct sail_load_options* load_options;
+    const struct sail_save_options* save_options;
 
     bool frame_loaded;
     bool frame_saved;
 
-    void *image_data;
+    void* image_data;
     size_t image_data_size;
-    void *pixels;
+    void* pixels;
 
     qoi_desc qoi_desc;
 };
 
-static sail_status_t alloc_qoi_state(struct sail_io *io,
-                                        const struct sail_load_options *load_options,
-                                        const struct sail_save_options *save_options,
-                                        struct qoi_state **qoi_state) {
+static sail_status_t alloc_qoi_state(struct sail_io* io,
+                                     const struct sail_load_options* load_options,
+                                     const struct sail_save_options* save_options,
+                                     struct qoi_state** qoi_state)
+{
 
-    void *ptr;
+    void* ptr;
     SAIL_TRY(sail_malloc(sizeof(struct qoi_state), &ptr));
     *qoi_state = ptr;
 
-    **qoi_state = (struct qoi_state) {
+    **qoi_state = (struct qoi_state){
         .io           = io,
         .load_options = load_options,
         .save_options = save_options,
@@ -78,9 +80,11 @@ static sail_status_t alloc_qoi_state(struct sail_io *io,
     return SAIL_OK;
 }
 
-static void destroy_qoi_state(struct qoi_state *qoi_state) {
+static void destroy_qoi_state(struct qoi_state* qoi_state)
+{
 
-    if (qoi_state == NULL) {
+    if (qoi_state == NULL)
+    {
         return;
     }
 
@@ -94,12 +98,15 @@ static void destroy_qoi_state(struct qoi_state *qoi_state) {
  * Decoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_load_init_v8_qoi(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_load_init_v8_qoi(struct sail_io* io,
+                                                      const struct sail_load_options* load_options,
+                                                      void** state)
+{
 
     *state = NULL;
 
     /* Allocate a new state. */
-    struct qoi_state *qoi_state;
+    struct qoi_state* qoi_state;
     SAIL_TRY(alloc_qoi_state(io, load_options, NULL, &qoi_state));
     *state = qoi_state;
 
@@ -109,11 +116,13 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_qoi(struct sail_io *io, const 
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_qoi(void *state, struct sail_image **image) {
+SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_qoi(void* state, struct sail_image** image)
+{
 
-    struct qoi_state *qoi_state = state;
+    struct qoi_state* qoi_state = state;
 
-    if (qoi_state->frame_loaded) {
+    if (qoi_state->frame_loaded)
+    {
         return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
@@ -123,31 +132,37 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_qoi(void *state, st
     /* TODO Remove (int) when QOI supports size_t. */
     qoi_state->pixels = qoi_decode(qoi_state->image_data, (int)qoi_state->image_data_size, &qoi_state->qoi_desc, 0);
 
-    if (qoi_state->pixels == NULL) {
+    if (qoi_state->pixels == NULL)
+    {
         SAIL_LOG_ERROR("QOI: Image is broken without any details");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
     }
 
-    if (qoi_state->qoi_desc.colorspace != QOI_SRGB) {
+    if (qoi_state->qoi_desc.colorspace != QOI_SRGB)
+    {
         SAIL_LOG_ERROR("QOI: Only RGB images are supported");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
     }
 
     enum SailPixelFormat pixel_format;
-    switch (qoi_state->qoi_desc.channels) {
-        case 3: pixel_format = SAIL_PIXEL_FORMAT_BPP24_RGB;  break;
-        case 4: pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA; break;
-        default: {
-            SAIL_LOG_ERROR("QOI: Number of channels is %d, but only RGB24 and RGB32 images are supported", qoi_state->qoi_desc.channels);
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
-        }
+    switch (qoi_state->qoi_desc.channels)
+    {
+    case 3: pixel_format = SAIL_PIXEL_FORMAT_BPP24_RGB; break;
+    case 4: pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA; break;
+    default:
+    {
+        SAIL_LOG_ERROR("QOI: Number of channels is %d, but only RGB24 and RGB32 images are supported",
+                       qoi_state->qoi_desc.channels);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+    }
     }
 
     /* Construct the SAIL image. */
-    struct sail_image *image_local;
+    struct sail_image* image_local;
     SAIL_TRY(sail_alloc_image(&image_local));
 
-    if (qoi_state->load_options->options & SAIL_OPTION_SOURCE_IMAGE) {
+    if (qoi_state->load_options->options & SAIL_OPTION_SOURCE_IMAGE)
+    {
         SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
                             /* cleanup */ sail_destroy_image(image_local));
 
@@ -165,9 +180,10 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_qoi(void *state, st
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_qoi(void *state, struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_qoi(void* state, struct sail_image* image)
+{
 
-    const struct qoi_state *qoi_state = state;
+    const struct qoi_state* qoi_state = state;
 
     const size_t pixels_size = (size_t)image->bytes_per_line * image->height;
 
@@ -176,9 +192,10 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_qoi(void *state, struct sail_
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_qoi(void **state) {
+SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_qoi(void** state)
+{
 
-    struct qoi_state *qoi_state = *state;
+    struct qoi_state* qoi_state = *state;
 
     *state = NULL;
 
@@ -191,16 +208,20 @@ SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_qoi(void **state) {
  * Encoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_save_init_v8_qoi(struct sail_io *io, const struct sail_save_options *save_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_save_init_v8_qoi(struct sail_io* io,
+                                                      const struct sail_save_options* save_options,
+                                                      void** state)
+{
 
     *state = NULL;
 
-    struct qoi_state *qoi_state;
+    struct qoi_state* qoi_state;
     SAIL_TRY(alloc_qoi_state(io, NULL, save_options, &qoi_state));
     *state = qoi_state;
 
     /* Sanity check. */
-    if (qoi_state->save_options->compression != SAIL_COMPRESSION_QOI) {
+    if (qoi_state->save_options->compression != SAIL_COMPRESSION_QOI)
+    {
         SAIL_LOG_ERROR("QOI: Only QOI compression is allowed for saving");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_COMPRESSION);
     }
@@ -208,30 +229,33 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_qoi(struct sail_io *io, const 
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_qoi(void *state, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_qoi(void* state, const struct sail_image* image)
+{
 
-    struct qoi_state *qoi_state = state;
+    struct qoi_state* qoi_state = state;
 
     unsigned char channels;
 
-    switch (image->pixel_format) {
-        case SAIL_PIXEL_FORMAT_BPP24_RGB:  channels = 3; break;
-        case SAIL_PIXEL_FORMAT_BPP32_RGBA: channels = 4; break;
-        default: {
-            SAIL_LOG_ERROR("QOI: %s pixel format is not currently supported for saving", sail_pixel_format_to_string(image->pixel_format));
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
-        }
+    switch (image->pixel_format)
+    {
+    case SAIL_PIXEL_FORMAT_BPP24_RGB: channels = 3; break;
+    case SAIL_PIXEL_FORMAT_BPP32_RGBA: channels = 4; break;
+    default:
+    {
+        SAIL_LOG_ERROR("QOI: %s pixel format is not currently supported for saving",
+                       sail_pixel_format_to_string(image->pixel_format));
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+    }
     }
 
     int written;
-    qoi_state->pixels = qoi_encode(image->pixels, &(qoi_desc){
-    	                    .width      = image->width,
-                    	    .height     = image->height,
-                        	.channels   = channels,
-                        	.colorspace = QOI_SRGB
-                        }, &written);
+    qoi_state->pixels = qoi_encode(
+        image->pixels,
+        &(qoi_desc){.width = image->width, .height = image->height, .channels = channels, .colorspace = QOI_SRGB},
+        &written);
 
-    if (qoi_state->pixels == NULL) {
+    if (qoi_state->pixels == NULL)
+    {
         SAIL_LOG_ERROR("QOI: Encoding failed without any details");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
@@ -239,9 +263,10 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_qoi(void *state, co
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_qoi(void *state, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_qoi(void* state, const struct sail_image* image)
+{
 
-    struct qoi_state *qoi_state = state;
+    struct qoi_state* qoi_state = state;
 
     const size_t pixels_size = (size_t)image->bytes_per_line * image->height;
 
@@ -250,9 +275,10 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_qoi(void *state, const struct
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_qoi(void **state) {
+SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_qoi(void** state)
+{
 
-    struct qoi_state *qoi_state = *state;
+    struct qoi_state* qoi_state = *state;
 
     /* Subsequent calls to finish() will expectedly fail in the above line. */
     *state = NULL;

@@ -34,126 +34,153 @@
 /* 256-color palette signature. */
 static const unsigned SAIL_PCX_PALETTE_SIGNATURE = 0x0C;
 
-static const unsigned char SAIL_PCX_MONO_PALETTE[] = { 0, 0, 0, 255, 255, 255 };
+static const unsigned char SAIL_PCX_MONO_PALETTE[] = {0, 0, 0, 255, 255, 255};
 
-sail_status_t pcx_private_read_header(struct sail_io *io, struct SailPcxHeader *header) {
+sail_status_t pcx_private_read_header(struct sail_io* io, struct SailPcxHeader* header)
+{
 
-    SAIL_TRY(io->strict_read(io->stream, &header->id,             sizeof(header->id)));
-    SAIL_TRY(io->strict_read(io->stream, &header->version,        sizeof(header->version)));
-    SAIL_TRY(io->strict_read(io->stream, &header->encoding,       sizeof(header->encoding)));
+    SAIL_TRY(io->strict_read(io->stream, &header->id, sizeof(header->id)));
+    SAIL_TRY(io->strict_read(io->stream, &header->version, sizeof(header->version)));
+    SAIL_TRY(io->strict_read(io->stream, &header->encoding, sizeof(header->encoding)));
     SAIL_TRY(io->strict_read(io->stream, &header->bits_per_plane, sizeof(header->bits_per_plane)));
-    SAIL_TRY(io->strict_read(io->stream, &header->xmin,           sizeof(header->xmin)));
-    SAIL_TRY(io->strict_read(io->stream, &header->ymin,           sizeof(header->ymin)));
-    SAIL_TRY(io->strict_read(io->stream, &header->xmax,           sizeof(header->xmax)));
-    SAIL_TRY(io->strict_read(io->stream, &header->ymax,           sizeof(header->ymax)));
-    SAIL_TRY(io->strict_read(io->stream, &header->hdpi,           sizeof(header->hdpi)));
-    SAIL_TRY(io->strict_read(io->stream, &header->vdpi,           sizeof(header->vdpi)));
-    SAIL_TRY(io->strict_read(io->stream, header->palette,         sizeof(header->palette)));
-    SAIL_TRY(io->strict_read(io->stream, &header->reserved,       sizeof(header->reserved)));
-    SAIL_TRY(io->strict_read(io->stream, &header->planes,         sizeof(header->planes)));
+    SAIL_TRY(io->strict_read(io->stream, &header->xmin, sizeof(header->xmin)));
+    SAIL_TRY(io->strict_read(io->stream, &header->ymin, sizeof(header->ymin)));
+    SAIL_TRY(io->strict_read(io->stream, &header->xmax, sizeof(header->xmax)));
+    SAIL_TRY(io->strict_read(io->stream, &header->ymax, sizeof(header->ymax)));
+    SAIL_TRY(io->strict_read(io->stream, &header->hdpi, sizeof(header->hdpi)));
+    SAIL_TRY(io->strict_read(io->stream, &header->vdpi, sizeof(header->vdpi)));
+    SAIL_TRY(io->strict_read(io->stream, header->palette, sizeof(header->palette)));
+    SAIL_TRY(io->strict_read(io->stream, &header->reserved, sizeof(header->reserved)));
+    SAIL_TRY(io->strict_read(io->stream, &header->planes, sizeof(header->planes)));
     SAIL_TRY(io->strict_read(io->stream, &header->bytes_per_line, sizeof(header->bytes_per_line)));
-    SAIL_TRY(io->strict_read(io->stream, &header->palette_info,   sizeof(header->palette_info)));
-    SAIL_TRY(io->strict_read(io->stream, &header->hscreen_size,   sizeof(header->hscreen_size)));
-    SAIL_TRY(io->strict_read(io->stream, &header->vscreen_size,   sizeof(header->vscreen_size)));
-    SAIL_TRY(io->strict_read(io->stream, header->filler,          sizeof(header->filler)));
+    SAIL_TRY(io->strict_read(io->stream, &header->palette_info, sizeof(header->palette_info)));
+    SAIL_TRY(io->strict_read(io->stream, &header->hscreen_size, sizeof(header->hscreen_size)));
+    SAIL_TRY(io->strict_read(io->stream, &header->vscreen_size, sizeof(header->vscreen_size)));
+    SAIL_TRY(io->strict_read(io->stream, header->filler, sizeof(header->filler)));
 
     return SAIL_OK;
 }
 
-sail_status_t pcx_private_sail_pixel_format(unsigned bits_per_plane, unsigned planes, enum SailPixelFormat *result) {
+sail_status_t pcx_private_sail_pixel_format(unsigned bits_per_plane, unsigned planes, enum SailPixelFormat* result)
+{
 
-    switch (planes) {
-        case 1: {
-            switch (bits_per_plane) {
-                case 1: *result = SAIL_PIXEL_FORMAT_BPP1_INDEXED; return SAIL_OK;
-                case 4: *result = SAIL_PIXEL_FORMAT_BPP4_INDEXED; return SAIL_OK;
-                case 8: *result = SAIL_PIXEL_FORMAT_BPP8_INDEXED; return SAIL_OK;
-            }
-            break;
+    switch (planes)
+    {
+    case 1:
+    {
+        switch (bits_per_plane)
+        {
+        case 1: *result = SAIL_PIXEL_FORMAT_BPP1_INDEXED; return SAIL_OK;
+        case 4: *result = SAIL_PIXEL_FORMAT_BPP4_INDEXED; return SAIL_OK;
+        case 8: *result = SAIL_PIXEL_FORMAT_BPP8_INDEXED; return SAIL_OK;
         }
-        case 3: {
-            switch (bits_per_plane) {
-                case 8: *result = SAIL_PIXEL_FORMAT_BPP24_RGB; return SAIL_OK;
-            }
-            break;
+        break;
+    }
+    case 3:
+    {
+        switch (bits_per_plane)
+        {
+        case 8: *result = SAIL_PIXEL_FORMAT_BPP24_RGB; return SAIL_OK;
         }
-        case 4: {
-            switch (bits_per_plane) {
-                case 1: *result = SAIL_PIXEL_FORMAT_BPP4_INDEXED; return SAIL_OK;
-                case 8: *result = SAIL_PIXEL_FORMAT_BPP32_RGBA;   return SAIL_OK;
-            }
-            break;
+        break;
+    }
+    case 4:
+    {
+        switch (bits_per_plane)
+        {
+        case 1: *result = SAIL_PIXEL_FORMAT_BPP4_INDEXED; return SAIL_OK;
+        case 8: *result = SAIL_PIXEL_FORMAT_BPP32_RGBA; return SAIL_OK;
         }
+        break;
+    }
     }
 
     SAIL_LOG_ERROR("PCX: Unsuppored combination of bits per plane(%u) and planes(%u)", bits_per_plane, planes);
     SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
 }
 
-sail_status_t pcx_private_build_palette(enum SailPixelFormat pixel_format, struct sail_io *io, uint8_t palette16[48], struct sail_palette **palette) {
+sail_status_t pcx_private_build_palette(enum SailPixelFormat pixel_format,
+                                        struct sail_io* io,
+                                        uint8_t palette16[48],
+                                        struct sail_palette** palette)
+{
 
-    switch (pixel_format) {
-        case SAIL_PIXEL_FORMAT_BPP1_INDEXED: {
-            SAIL_TRY(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP24_RGB, 2, palette));
-            memcpy((*palette)->data, SAIL_PCX_MONO_PALETTE, 6);
-            break;
+    switch (pixel_format)
+    {
+    case SAIL_PIXEL_FORMAT_BPP1_INDEXED:
+    {
+        SAIL_TRY(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP24_RGB, 2, palette));
+        memcpy((*palette)->data, SAIL_PCX_MONO_PALETTE, 6);
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP4_INDEXED:
+    {
+        const int palette_colors = 16;     /* 256 RGB entries. */
+        const int palette_size   = 16 * 3; /* 256 RGB entries. */
+
+        SAIL_TRY(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP24_RGB, palette_colors, palette));
+        memcpy((*palette)->data, palette16, palette_size);
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP8_INDEXED:
+    {
+        const int palette_colors = 256;     /* 256 RGB entries. */
+        const int palette_size   = 256 * 3; /* 256 RGB entries. */
+
+        /* Seek to offset. */
+        size_t saved_offset;
+        SAIL_TRY(io->tell(io->stream, &saved_offset));
+        SAIL_TRY(io->seek(io->stream, (long)-(palette_size + 1), SEEK_END));
+
+        uint8_t signature;
+        SAIL_TRY(io->strict_read(io->stream, &signature, sizeof(signature)));
+
+        if (signature != SAIL_PCX_PALETTE_SIGNATURE)
+        {
+            SAIL_LOG_ERROR("PCX: Palette has invalid signature %u, must be %u", signature, SAIL_PCX_PALETTE_SIGNATURE);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
         }
-        case SAIL_PIXEL_FORMAT_BPP4_INDEXED: {
-            const int palette_colors = 16; /* 256 RGB entries. */
-            const int palette_size = 16 * 3; /* 256 RGB entries. */
 
-            SAIL_TRY(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP24_RGB, palette_colors, palette));
-            memcpy((*palette)->data, palette16, palette_size);
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP8_INDEXED: {
-            const int palette_colors = 256; /* 256 RGB entries. */
-            const int palette_size = 256 * 3; /* 256 RGB entries. */
+        struct sail_palette* palette_local;
+        SAIL_TRY(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP24_RGB, palette_colors, &palette_local));
 
-            /* Seek to offset. */
-            size_t saved_offset;
-            SAIL_TRY(io->tell(io->stream, &saved_offset));
-            SAIL_TRY(io->seek(io->stream, (long)-(palette_size + 1), SEEK_END));
+        SAIL_TRY_OR_CLEANUP(io->strict_read(io->stream, palette_local->data, palette_size),
+                            /* cleanup */ sail_destroy_palette(palette_local));
 
-            uint8_t signature;
-            SAIL_TRY(io->strict_read(io->stream, &signature, sizeof(signature)));
+        SAIL_TRY_OR_CLEANUP(io->seek(io->stream, (long)saved_offset, SEEK_SET),
+                            /* cleanup */ sail_destroy_palette(palette_local));
 
-            if (signature != SAIL_PCX_PALETTE_SIGNATURE) {
-                SAIL_LOG_ERROR("PCX: Palette has invalid signature %u, must be %u", signature, SAIL_PCX_PALETTE_SIGNATURE);
-                SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
-            }
+        *palette = palette_local;
 
-            struct sail_palette *palette_local;
-            SAIL_TRY(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP24_RGB, palette_colors, &palette_local));
-
-            SAIL_TRY_OR_CLEANUP(io->strict_read(io->stream, palette_local->data, palette_size),
-                                /* cleanup */ sail_destroy_palette(palette_local));
-
-            SAIL_TRY_OR_CLEANUP(io->seek(io->stream, (long)saved_offset, SEEK_SET),
-                                /* cleanup */ sail_destroy_palette(palette_local));
-
-            *palette = palette_local;
-
-            break;
-        }
-        default: {
-            break;
-        }
+        break;
+    }
+    default:
+    {
+        break;
+    }
     }
 
     return SAIL_OK;
 }
 
-sail_status_t pcx_private_read_uncompressed(struct sail_io *io, unsigned bytes_per_plane_to_read, unsigned planes, unsigned char *buffer, struct sail_image *image) {
+sail_status_t pcx_private_read_uncompressed(struct sail_io* io,
+                                            unsigned bytes_per_plane_to_read,
+                                            unsigned planes,
+                                            unsigned char* buffer,
+                                            struct sail_image* image)
+{
 
-    for (unsigned row = 0; row < image->height; row++) {
-        unsigned char *target_scan = sail_scan_line(image, row);
+    for (unsigned row = 0; row < image->height; row++)
+    {
+        unsigned char* target_scan = sail_scan_line(image, row);
 
         /* Read plane by plane and then merge them into the image pixels. */
-        for (unsigned plane = 0; plane < planes; plane++) {
+        for (unsigned plane = 0; plane < planes; plane++)
+        {
             SAIL_TRY(io->strict_read(io->stream, buffer, bytes_per_plane_to_read));
 
-            for (unsigned column = 0; column < bytes_per_plane_to_read; column++) {
+            for (unsigned column = 0; column < bytes_per_plane_to_read; column++)
+            {
                 *(target_scan + column * planes + plane) = *(buffer + column);
             }
         }
@@ -162,73 +189,89 @@ sail_status_t pcx_private_read_uncompressed(struct sail_io *io, unsigned bytes_p
     return SAIL_OK;
 }
 
-sail_status_t pcx_private_write_header(struct sail_io *io, const struct SailPcxHeader *header) {
+sail_status_t pcx_private_write_header(struct sail_io* io, const struct SailPcxHeader* header)
+{
 
-    SAIL_TRY(io->strict_write(io->stream, &header->id,             sizeof(header->id)));
-    SAIL_TRY(io->strict_write(io->stream, &header->version,        sizeof(header->version)));
-    SAIL_TRY(io->strict_write(io->stream, &header->encoding,       sizeof(header->encoding)));
+    SAIL_TRY(io->strict_write(io->stream, &header->id, sizeof(header->id)));
+    SAIL_TRY(io->strict_write(io->stream, &header->version, sizeof(header->version)));
+    SAIL_TRY(io->strict_write(io->stream, &header->encoding, sizeof(header->encoding)));
     SAIL_TRY(io->strict_write(io->stream, &header->bits_per_plane, sizeof(header->bits_per_plane)));
-    SAIL_TRY(io->strict_write(io->stream, &header->xmin,           sizeof(header->xmin)));
-    SAIL_TRY(io->strict_write(io->stream, &header->ymin,           sizeof(header->ymin)));
-    SAIL_TRY(io->strict_write(io->stream, &header->xmax,           sizeof(header->xmax)));
-    SAIL_TRY(io->strict_write(io->stream, &header->ymax,           sizeof(header->ymax)));
-    SAIL_TRY(io->strict_write(io->stream, &header->hdpi,           sizeof(header->hdpi)));
-    SAIL_TRY(io->strict_write(io->stream, &header->vdpi,           sizeof(header->vdpi)));
-    SAIL_TRY(io->strict_write(io->stream, header->palette,         sizeof(header->palette)));
-    SAIL_TRY(io->strict_write(io->stream, &header->reserved,       sizeof(header->reserved)));
-    SAIL_TRY(io->strict_write(io->stream, &header->planes,         sizeof(header->planes)));
+    SAIL_TRY(io->strict_write(io->stream, &header->xmin, sizeof(header->xmin)));
+    SAIL_TRY(io->strict_write(io->stream, &header->ymin, sizeof(header->ymin)));
+    SAIL_TRY(io->strict_write(io->stream, &header->xmax, sizeof(header->xmax)));
+    SAIL_TRY(io->strict_write(io->stream, &header->ymax, sizeof(header->ymax)));
+    SAIL_TRY(io->strict_write(io->stream, &header->hdpi, sizeof(header->hdpi)));
+    SAIL_TRY(io->strict_write(io->stream, &header->vdpi, sizeof(header->vdpi)));
+    SAIL_TRY(io->strict_write(io->stream, header->palette, sizeof(header->palette)));
+    SAIL_TRY(io->strict_write(io->stream, &header->reserved, sizeof(header->reserved)));
+    SAIL_TRY(io->strict_write(io->stream, &header->planes, sizeof(header->planes)));
     SAIL_TRY(io->strict_write(io->stream, &header->bytes_per_line, sizeof(header->bytes_per_line)));
-    SAIL_TRY(io->strict_write(io->stream, &header->palette_info,   sizeof(header->palette_info)));
-    SAIL_TRY(io->strict_write(io->stream, &header->hscreen_size,   sizeof(header->hscreen_size)));
-    SAIL_TRY(io->strict_write(io->stream, &header->vscreen_size,   sizeof(header->vscreen_size)));
-    SAIL_TRY(io->strict_write(io->stream, header->filler,          sizeof(header->filler)));
+    SAIL_TRY(io->strict_write(io->stream, &header->palette_info, sizeof(header->palette_info)));
+    SAIL_TRY(io->strict_write(io->stream, &header->hscreen_size, sizeof(header->hscreen_size)));
+    SAIL_TRY(io->strict_write(io->stream, &header->vscreen_size, sizeof(header->vscreen_size)));
+    SAIL_TRY(io->strict_write(io->stream, header->filler, sizeof(header->filler)));
 
     return SAIL_OK;
 }
 
-sail_status_t pcx_private_pixel_format_to_pcx_format(enum SailPixelFormat pixel_format, uint8_t *bits_per_plane, uint8_t *planes) {
+sail_status_t pcx_private_pixel_format_to_pcx_format(enum SailPixelFormat pixel_format,
+                                                     uint8_t* bits_per_plane,
+                                                     uint8_t* planes)
+{
 
-    switch (pixel_format) {
-        case SAIL_PIXEL_FORMAT_BPP1_INDEXED: {
-            *bits_per_plane = 1;
-            *planes = 1;
-            return SAIL_OK;
-        }
-        case SAIL_PIXEL_FORMAT_BPP4_INDEXED: {
-            *bits_per_plane = 1;
-            *planes = 4;
-            return SAIL_OK;
-        }
-        case SAIL_PIXEL_FORMAT_BPP8_INDEXED: {
-            *bits_per_plane = 8;
-            *planes = 1;
-            return SAIL_OK;
-        }
-        case SAIL_PIXEL_FORMAT_BPP24_RGB: {
-            *bits_per_plane = 8;
-            *planes = 3;
-            return SAIL_OK;
-        }
-        case SAIL_PIXEL_FORMAT_BPP32_RGBA: {
-            *bits_per_plane = 8;
-            *planes = 4;
-            return SAIL_OK;
-        }
-        default: {
-            SAIL_LOG_ERROR("PCX: Pixel format %s is not supported for saving", sail_pixel_format_to_string(pixel_format));
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
-        }
+    switch (pixel_format)
+    {
+    case SAIL_PIXEL_FORMAT_BPP1_INDEXED:
+    {
+        *bits_per_plane = 1;
+        *planes         = 1;
+        return SAIL_OK;
+    }
+    case SAIL_PIXEL_FORMAT_BPP4_INDEXED:
+    {
+        *bits_per_plane = 1;
+        *planes         = 4;
+        return SAIL_OK;
+    }
+    case SAIL_PIXEL_FORMAT_BPP8_INDEXED:
+    {
+        *bits_per_plane = 8;
+        *planes         = 1;
+        return SAIL_OK;
+    }
+    case SAIL_PIXEL_FORMAT_BPP24_RGB:
+    {
+        *bits_per_plane = 8;
+        *planes         = 3;
+        return SAIL_OK;
+    }
+    case SAIL_PIXEL_FORMAT_BPP32_RGBA:
+    {
+        *bits_per_plane = 8;
+        *planes         = 4;
+        return SAIL_OK;
+    }
+    default:
+    {
+        SAIL_LOG_ERROR("PCX: Pixel format %s is not supported for saving", sail_pixel_format_to_string(pixel_format));
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+    }
     }
 }
 
-void pcx_private_palette_to_rgb(const struct sail_palette *palette, unsigned char *rgb_output, unsigned color_count) {
+void pcx_private_palette_to_rgb(const struct sail_palette* palette, unsigned char* rgb_output, unsigned color_count)
+{
 
-    if (palette->pixel_format == SAIL_PIXEL_FORMAT_BPP24_RGB) {
+    if (palette->pixel_format == SAIL_PIXEL_FORMAT_BPP24_RGB)
+    {
         memcpy(rgb_output, palette->data, color_count * 3);
-    } else {
+    }
+    else
+    {
         /* Convert RGBA to RGB. */
-        const unsigned char *src = (const unsigned char *)palette->data;
-        for (unsigned i = 0; i < color_count; i++) {
+        const unsigned char* src = (const unsigned char*)palette->data;
+        for (unsigned i = 0; i < color_count; i++)
+        {
             rgb_output[i * 3 + 0] = src[i * 4 + 0];
             rgb_output[i * 3 + 1] = src[i * 4 + 1];
             rgb_output[i * 3 + 2] = src[i * 4 + 2];
@@ -236,7 +279,8 @@ void pcx_private_palette_to_rgb(const struct sail_palette *palette, unsigned cha
     }
 }
 
-sail_status_t pcx_private_write_palette(struct sail_io *io, const struct sail_palette *palette) {
+sail_status_t pcx_private_write_palette(struct sail_io* io, const struct sail_palette* palette)
+{
 
     /* Write 256-color palette signature. */
     uint8_t signature = SAIL_PCX_PALETTE_SIGNATURE;

@@ -31,7 +31,8 @@
 #include <sail-common/status.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 struct sail_io;
@@ -41,14 +42,14 @@ struct sail_io;
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_io_read_memory(const void *buffer, size_t length, struct sail_io **io);
+SAIL_EXPORT sail_status_t sail_alloc_io_read_memory(const void* buffer, size_t length, struct sail_io** io);
 
 /*
  * Opens the specified memory buffer for reading and writing, and allocates a new I/O object for it.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_io_read_write_memory(void *buffer, size_t length, struct sail_io **io);
+SAIL_EXPORT sail_status_t sail_alloc_io_read_write_memory(void* buffer, size_t length, struct sail_io** io);
 
 /* extern "C" */
 #ifdef __cplusplus

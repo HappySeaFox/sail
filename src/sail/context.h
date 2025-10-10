@@ -29,7 +29,8 @@
 #include <sail-common/status.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 /*
@@ -47,7 +48,8 @@ extern "C" {
 /*
  * Flags to control SAIL initialization behavior.
  */
-enum SailInitFlags {
+enum SailInitFlags
+{
 
     /*
      * When SAIL is compiled with SAIL_COMBINE_CODECS disabled (the default),

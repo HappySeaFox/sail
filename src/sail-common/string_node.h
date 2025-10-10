@@ -29,23 +29,25 @@
 #include <sail-common/status.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 /*
  * Represents a string node.
  */
-struct sail_string_node {
+struct sail_string_node
+{
 
     /*
      * String value.
      */
-    char *string;
+    char* string;
 
     /*
      * Pointer to the next node or NULL.
      */
-    struct sail_string_node *next;
+    struct sail_string_node* next;
 };
 
 /*
@@ -53,25 +55,26 @@ struct sail_string_node {
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_string_node(struct sail_string_node **node);
+SAIL_EXPORT sail_status_t sail_alloc_string_node(struct sail_string_node** node);
 
 /*
  * Destroys the specified string node.
  */
-SAIL_EXPORT void sail_destroy_string_node(struct sail_string_node *node);
+SAIL_EXPORT void sail_destroy_string_node(struct sail_string_node* node);
 
 /*
  * Makes a deep copy of the specified string node.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_copy_string_node(const struct sail_string_node *source, struct sail_string_node **target);
+SAIL_EXPORT sail_status_t sail_copy_string_node(const struct sail_string_node* source,
+                                                struct sail_string_node** target);
 
 /*
  * Destroys the specified string node and all its internal allocated memory buffers.
  * Repeats the destruction procedure recursively for the stored next pointer.
  */
-SAIL_EXPORT void sail_destroy_string_node_chain(struct sail_string_node *node);
+SAIL_EXPORT void sail_destroy_string_node_chain(struct sail_string_node* node);
 
 /*
  * Makes a deep copy of the specified string node chain. If the source chain is NULL, it assigns NULL
@@ -79,12 +82,14 @@ SAIL_EXPORT void sail_destroy_string_node_chain(struct sail_string_node *node);
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_copy_string_node_chain(const struct sail_string_node *source, struct sail_string_node **target);
+SAIL_EXPORT sail_status_t sail_copy_string_node_chain(const struct sail_string_node* source,
+                                                      struct sail_string_node** target);
 
 /*
  * Split a ';'-separated list of strings.
  */
-SAIL_EXPORT sail_status_t sail_split_into_string_node_chain(const char *value, struct sail_string_node **target_string_node);
+SAIL_EXPORT sail_status_t sail_split_into_string_node_chain(const char* value,
+                                                            struct sail_string_node** target_string_node);
 
 /* extern "C" */
 #ifdef __cplusplus

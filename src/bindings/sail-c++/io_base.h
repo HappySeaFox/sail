@@ -58,7 +58,7 @@ public:
     /*
      * Construct a new base I/O stream.
      */
-    explicit io_base(struct sail_io *sail_io);
+    explicit io_base(struct sail_io* sail_io);
 
     ~io_base();
 
@@ -74,7 +74,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t tolerant_read(void *buf, std::size_t size_to_read, std::size_t *read_size) override;
+    sail_status_t tolerant_read(void* buf, std::size_t size_to_read, std::size_t* read_size) override;
 
     /*
      * Reads from the underlying I/O object into the specified buffer. In contrast to tolerant_read(),
@@ -82,7 +82,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t strict_read(void *buf, std::size_t size_to_read) override;
+    sail_status_t strict_read(void* buf, std::size_t size_to_read) override;
 
     /*
      * Writes the specified buffer to the underlying I/O object. In contrast to strict_write(),
@@ -91,7 +91,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t tolerant_write(const void *buf, std::size_t size_to_write, std::size_t *written_size) override;
+    sail_status_t tolerant_write(const void* buf, std::size_t size_to_write, std::size_t* written_size) override;
 
     /*
      * Writes the specified buffer to the underlying I/O object. In contrast to tolerant_write(),
@@ -99,7 +99,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t strict_write(const void *buf, std::size_t size_to_write) override;
+    sail_status_t strict_write(const void* buf, std::size_t size_to_write) override;
 
     /*
      * Sets the I/O position in the underlying I/O object.
@@ -115,7 +115,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t tell(std::size_t *offset) override;
+    sail_status_t tell(std::size_t* offset) override;
 
     /*
      * Flushes buffers of the underlying I/O object. Has no effect if the underlying I/O object
@@ -137,11 +137,11 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t eof(bool *result) override;
+    sail_status_t eof(bool* result) override;
 
 protected:
     class pimpl;
     const std::unique_ptr<pimpl> d;
 };
 
-}
+} // namespace sail

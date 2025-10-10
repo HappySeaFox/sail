@@ -35,13 +35,15 @@ struct sail_io;
 struct sail_meta_data_node;
 struct sail_palette;
 
-enum TgaColorMapType {
+enum TgaColorMapType
+{
 
     TGA_HAS_NO_COLOR_MAP = 0,
     TGA_HAS_COLOR_MAP    = 1,
 };
 
-enum TgaImageType {
+enum TgaImageType
+{
 
     TGA_NO_IMAGE       = 0,
     TGA_INDEXED        = 1,
@@ -54,47 +56,59 @@ enum TgaImageType {
 
 struct TgaFileHeader
 {
-    uint8_t  id_length;
-    uint8_t  color_map_type; /* See TgaColorMapType. */
-    uint8_t  image_type;     /* See TgaImageType. */
+    uint8_t id_length;
+    uint8_t color_map_type; /* See TgaColorMapType. */
+    uint8_t image_type;     /* See TgaImageType. */
     uint16_t first_color_map_entry_index;
     uint16_t color_map_elements;
-    uint8_t  color_map_entry_size; /* 15, 16, 24, 32. */
+    uint8_t color_map_entry_size; /* 15, 16, 24, 32. */
     uint16_t x;
     uint16_t y;
     uint16_t width;
     uint16_t height;
-    uint8_t  bpp; /* 8, 16, 24, 32.  */
-    uint8_t  descriptor; /* bits 3-0: n of alpha bits, bit 4: flipped H, bit 5 = flipped V. */
+    uint8_t bpp;        /* 8, 16, 24, 32.  */
+    uint8_t descriptor; /* bits 3-0: n of alpha bits, bit 4: flipped H, bit 5 = flipped V. */
 };
 
 struct TgaFooter
 {
     uint32_t extension_area_offset;
     uint32_t developer_area_offset;
-    uint8_t  signature[18];    /* "TRUEVISION-XFILE.\0" */
+    uint8_t signature[18]; /* "TRUEVISION-XFILE.\0" */
 };
 
-SAIL_HIDDEN sail_status_t tga_private_read_file_header(struct sail_io *io, struct TgaFileHeader *file_header);
+SAIL_HIDDEN sail_status_t tga_private_read_file_header(struct sail_io* io, struct TgaFileHeader* file_header);
 
-SAIL_HIDDEN sail_status_t tga_private_read_file_footer(struct sail_io *io, struct TgaFooter *footer);
+SAIL_HIDDEN sail_status_t tga_private_read_file_footer(struct sail_io* io, struct TgaFooter* footer);
 
 SAIL_HIDDEN enum SailPixelFormat tga_private_sail_pixel_format(int image_type, int bpp);
 
 SAIL_HIDDEN enum SailPixelFormat tga_private_palette_bpp_to_sail_pixel_format(int bpp);
 
-SAIL_HIDDEN sail_status_t tga_private_fetch_id(struct sail_io *io, const struct TgaFileHeader *file_header, struct sail_meta_data_node **meta_data_node);
+SAIL_HIDDEN sail_status_t tga_private_fetch_id(struct sail_io* io,
+                                               const struct TgaFileHeader* file_header,
+                                               struct sail_meta_data_node** meta_data_node);
 
-SAIL_HIDDEN sail_status_t tga_private_fetch_extension(struct sail_io *io, double *gamma, struct sail_meta_data_node **meta_data_node);
+SAIL_HIDDEN sail_status_t tga_private_fetch_extension(struct sail_io* io,
+                                                      double* gamma,
+                                                      struct sail_meta_data_node** meta_data_node);
 
-SAIL_HIDDEN sail_status_t tga_private_fetch_palette(struct sail_io *io, const struct TgaFileHeader *file_header, struct sail_palette **palette);
+SAIL_HIDDEN sail_status_t tga_private_fetch_palette(struct sail_io* io,
+                                                    const struct TgaFileHeader* file_header,
+                                                    struct sail_palette** palette);
 
-SAIL_HIDDEN sail_status_t tga_private_write_file_header(struct sail_io *io, const struct TgaFileHeader *file_header);
+SAIL_HIDDEN sail_status_t tga_private_write_file_header(struct sail_io* io, const struct TgaFileHeader* file_header);
 
-SAIL_HIDDEN sail_status_t tga_private_write_file_footer(struct sail_io *io, const struct TgaFooter *footer);
+SAIL_HIDDEN sail_status_t tga_private_write_file_footer(struct sail_io* io, const struct TgaFooter* footer);
 
-SAIL_HIDDEN sail_status_t tga_private_write_extension_area(struct sail_io *io, double gamma, const struct sail_meta_data_node *meta_data_node);
+SAIL_HIDDEN sail_status_t tga_private_write_extension_area(struct sail_io* io,
+                                                           double gamma,
+                                                           const struct sail_meta_data_node* meta_data_node);
 
-SAIL_HIDDEN void tga_private_pixel_format_to_tga_format(enum SailPixelFormat pixel_format, uint8_t *image_type, uint8_t *bpp);
+SAIL_HIDDEN void tga_private_pixel_format_to_tga_format(enum SailPixelFormat pixel_format,
+                                                        uint8_t* image_type,
+                                                        uint8_t* bpp);
 
-SAIL_HIDDEN sail_status_t tga_private_write_palette(struct sail_io *io, const struct sail_palette *palette, struct TgaFileHeader *file_header);
+SAIL_HIDDEN sail_status_t tga_private_write_palette(struct sail_io* io,
+                                                    const struct sail_palette* palette,
+                                                    struct TgaFileHeader* file_header);

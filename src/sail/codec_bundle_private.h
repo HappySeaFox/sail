@@ -39,9 +39,9 @@ struct sail_codec_bundle;
  *
  * Returns SAIL_OK on success.
  */
-SAIL_HIDDEN sail_status_t alloc_codec_bundle(struct sail_codec_bundle **codec_bundle);
+SAIL_HIDDEN sail_status_t alloc_codec_bundle(struct sail_codec_bundle** codec_bundle);
 
 /*
  * Destroys the specified codec bundle and all its internal allocated memory buffers.
  */
-SAIL_HIDDEN void destroy_codec_bundle(struct sail_codec_bundle *codec_bundle);
+SAIL_HIDDEN void destroy_codec_bundle(struct sail_codec_bundle* codec_bundle);

@@ -38,7 +38,7 @@ namespace sail
 class SAIL_HIDDEN io_base::pimpl
 {
 public:
-    pimpl(struct sail_io *other_sail_io)
+    pimpl(struct sail_io* other_sail_io)
         : sail_io_wrapper(other_sail_io, sail_destroy_io)
     {
     }
@@ -49,4 +49,4 @@ public:
     std::unique_ptr<struct sail_io, decltype(&sail_destroy_io)> sail_io_wrapper;
 };
 
-}
+} // namespace sail

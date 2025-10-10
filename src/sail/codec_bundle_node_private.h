@@ -28,7 +28,8 @@
 #include <sail-common/export.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 struct sail_codec_bundle_node;
@@ -38,18 +39,18 @@ struct sail_codec_bundle_node;
  *
  * Returns SAIL_OK on success.
  */
-SAIL_HIDDEN sail_status_t alloc_codec_bundle_node(struct sail_codec_bundle_node **codec_bundle_node);
+SAIL_HIDDEN sail_status_t alloc_codec_bundle_node(struct sail_codec_bundle_node** codec_bundle_node);
 
 /*
  * Destroys the specified codec bundle node and all its internal allocated memory buffers.
  */
-SAIL_HIDDEN void destroy_codec_bundle_node(struct sail_codec_bundle_node *codec_bundle_node);
+SAIL_HIDDEN void destroy_codec_bundle_node(struct sail_codec_bundle_node* codec_bundle_node);
 
 /*
  * Destroys the specified codec bundle node and all its internal allocated memory buffers.
  * Repeats the destruction procedure recursively for the next stored pointer.
  */
-SAIL_HIDDEN void destroy_codec_bundle_node_chain(struct sail_codec_bundle_node *codec_bundle_node);
+SAIL_HIDDEN void destroy_codec_bundle_node_chain(struct sail_codec_bundle_node* codec_bundle_node);
 
 /* extern "C" */
 #ifdef __cplusplus

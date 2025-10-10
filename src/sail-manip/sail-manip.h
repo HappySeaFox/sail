@@ -35,8 +35,8 @@
 #include <sail-manip/quantize.h>
 
 #ifdef SAIL_BUILD
-    #include <sail-manip/cmyk.h>
-    #include <sail-manip/manip_utils.h>
-    #include <sail-manip/ycbcr.h>
-    #include <sail-manip/ycck.h>
+#include <sail-manip/cmyk.h>
+#include <sail-manip/manip_utils.h>
+#include <sail-manip/ycbcr.h>
+#include <sail-manip/ycck.h>
 #endif

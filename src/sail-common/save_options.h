@@ -30,7 +30,8 @@
 #include <sail-common/status.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 struct sail_hash_map;
@@ -39,7 +40,8 @@ struct sail_save_features;
 /*
  * Options to modify saving operations.
  */
-struct sail_save_options {
+struct sail_save_options
+{
 
     /* Or-ed manipulation options. See SailOption. */
     int options;
@@ -65,7 +67,7 @@ struct sail_save_options {
     double compression_level;
 
     /* Codec-specific tuning options. */
-    struct sail_hash_map *tuning;
+    struct sail_hash_map* tuning;
 };
 
 typedef struct sail_save_options sail_save_options_t;
@@ -75,28 +77,30 @@ typedef struct sail_save_options sail_save_options_t;
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_save_options(struct sail_save_options **save_options);
+SAIL_EXPORT sail_status_t sail_alloc_save_options(struct sail_save_options** save_options);
 
 /*
  * Destroys the specified save options object and all its internal allocated memory buffers.
  * The save options MUST NOT be used anymore after calling this function. It does nothing
  * if the save options is NULL.
  */
-SAIL_EXPORT void sail_destroy_save_options(struct sail_save_options *save_options);
+SAIL_EXPORT void sail_destroy_save_options(struct sail_save_options* save_options);
 
 /*
  * Allocates and builds default save options from the save features.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_save_options_from_features(const struct sail_save_features *save_features, struct sail_save_options **save_options);
+SAIL_EXPORT sail_status_t sail_alloc_save_options_from_features(const struct sail_save_features* save_features,
+                                                                struct sail_save_options** save_options);
 
 /*
  * Makes a deep copy of the specified save options object.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_copy_save_options(const struct sail_save_options *source, struct sail_save_options **target);
+SAIL_EXPORT sail_status_t sail_copy_save_options(const struct sail_save_options* source,
+                                                 struct sail_save_options** target);
 
 /* extern "C" */
 #ifdef __cplusplus

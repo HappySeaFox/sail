@@ -35,10 +35,19 @@
 
 struct sail_variant;
 
-SAIL_HIDDEN enum SailPixelFormat jpeg2000_private_sail_pixel_format(OPJ_COLOR_SPACE color_space, int num_comps, int prec);
+SAIL_HIDDEN enum SailPixelFormat jpeg2000_private_sail_pixel_format(OPJ_COLOR_SPACE color_space,
+                                                                    int num_comps,
+                                                                    int prec);
 
-SAIL_HIDDEN sail_status_t jpeg2000_private_pixel_format_to_openjpeg(enum SailPixelFormat pixel_format, OPJ_COLOR_SPACE *color_space, int *num_comps, int *prec);
+SAIL_HIDDEN sail_status_t jpeg2000_private_pixel_format_to_openjpeg(enum SailPixelFormat pixel_format,
+                                                                    OPJ_COLOR_SPACE* color_space,
+                                                                    int* num_comps,
+                                                                    int* prec);
 
-SAIL_HIDDEN bool jpeg2000_private_tuning_key_value_callback_load(const char *key, const struct sail_variant *value, void *user_data);
+SAIL_HIDDEN bool jpeg2000_private_tuning_key_value_callback_load(const char* key,
+                                                                 const struct sail_variant* value,
+                                                                 void* user_data);
 
-SAIL_HIDDEN bool jpeg2000_private_tuning_key_value_callback_save(const char *key, const struct sail_variant *value, void *user_data);
+SAIL_HIDDEN bool jpeg2000_private_tuning_key_value_callback_save(const char* key,
+                                                                 const struct sail_variant* value,
+                                                                 void* user_data);

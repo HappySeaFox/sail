@@ -29,9 +29,9 @@
 
 #include <sail-common/export.h>
 
-SAIL_HIDDEN tmsize_t tiff_private_my_read_proc(thandle_t client_data, void *buffer, tmsize_t buffer_size);
+SAIL_HIDDEN tmsize_t tiff_private_my_read_proc(thandle_t client_data, void* buffer, tmsize_t buffer_size);
 
-SAIL_HIDDEN tmsize_t tiff_private_my_write_proc(thandle_t client_data, void *buffer, tmsize_t buffer_size);
+SAIL_HIDDEN tmsize_t tiff_private_my_write_proc(thandle_t client_data, void* buffer, tmsize_t buffer_size);
 
 SAIL_HIDDEN toff_t tiff_private_my_seek_proc(thandle_t client_data, toff_t offset, int whence);
 

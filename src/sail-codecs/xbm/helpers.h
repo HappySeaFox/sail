@@ -34,7 +34,8 @@
 struct sail_io;
 struct sail_variant;
 
-enum SailXbmVersion {
+enum SailXbmVersion
+{
     SAIL_XBM_VERSION_10 = 10,
     SAIL_XBM_VERSION_11 = 11,
 };
@@ -42,15 +43,22 @@ enum SailXbmVersion {
 /*
  * Tuning state for callback.
  */
-struct xbm_state {
+struct xbm_state
+{
     enum SailXbmVersion version;
     char var_name[256];
 };
 
 SAIL_HIDDEN unsigned char xbm_private_reverse_byte(unsigned char byte);
 
-SAIL_HIDDEN sail_status_t xbm_private_write_header(struct sail_io *io, unsigned width, unsigned height, const char *name);
+SAIL_HIDDEN sail_status_t xbm_private_write_header(struct sail_io* io,
+                                                   unsigned width,
+                                                   unsigned height,
+                                                   const char* name);
 
-SAIL_HIDDEN sail_status_t xbm_private_write_pixels(struct sail_io *io, const unsigned char *pixels, unsigned width, unsigned height, enum SailXbmVersion version);
+SAIL_HIDDEN sail_status_t xbm_private_write_pixels(
+    struct sail_io* io, const unsigned char* pixels, unsigned width, unsigned height, enum SailXbmVersion version);
 
-SAIL_HIDDEN bool xbm_private_tuning_key_value_callback(const char *key, const struct sail_variant *value, void *user_data);
+SAIL_HIDDEN bool xbm_private_tuning_key_value_callback(const char* key,
+                                                       const struct sail_variant* value,
+                                                       void* user_data);

@@ -57,7 +57,7 @@ class SAIL_EXPORT variant
 {
     friend class meta_data;
     friend class utils_private;
-    friend SAIL_EXPORT bool operator==(const sail::variant &a, const sail::variant &b);
+    friend SAIL_EXPORT bool operator==(const sail::variant& a, const sail::variant& b);
 
 public:
     /*
@@ -68,28 +68,27 @@ public:
     /*
      * Constructs a new variant from the value.
      */
-    template<typename T>
-    variant(const T &value);
+    template <typename T> variant(const T& value);
 
     /*
      * Copies the variant.
      */
-    variant(const variant &var);
+    variant(const variant& var);
 
     /*
      * Copies the variant.
      */
-    variant& operator=(const sail::variant &variant);
+    variant& operator=(const sail::variant& variant);
 
     /*
      * Moves the variant.
      */
-    variant(sail::variant &&variant) noexcept;
+    variant(sail::variant&& variant) noexcept;
 
     /*
      * Moves the variant.
      */
-    variant& operator=(sail::variant &&variant) noexcept;
+    variant& operator=(sail::variant&& variant) noexcept;
 
     /*
      * Destroys the variant.
@@ -104,21 +103,18 @@ public:
     /*
      * Returns true if the value stored in the variant is of the requested type.
      */
-    template<typename T>
-    bool has_value() const;
+    template <typename T> bool has_value() const;
 
     /*
      * Returns the current value. The behavior is undefined if the requested type doesn't match
      * the actual type stored in the variant. Use has_value<T>() to check the stored data type.
      */
-    template<typename T>
-    const T& value() const;
+    template <typename T> const T& value() const;
 
     /*
      * Sets a new value.
      */
-    template<typename T>
-    void set_value(const T &value);
+    template <typename T> void set_value(const T& value);
 
     /*
      * Resets the variant to the invalid state and deletes the stored value.
@@ -126,7 +122,7 @@ public:
     void clear();
 
 private:
-    sail_status_t to_sail_variant(sail_variant **variant) const;
+    sail_status_t to_sail_variant(sail_variant** variant) const;
 
     class pimpl;
     std::unique_ptr<pimpl> d;
@@ -135,11 +131,11 @@ private:
 /*
  * Returns true if the variants have the same type and value.
  */
-SAIL_EXPORT bool operator==(const sail::variant &a, const sail::variant &b);
+SAIL_EXPORT bool operator==(const sail::variant& a, const sail::variant& b);
 
 /*
  * Returns true if the variants have different types or values.
  */
-SAIL_EXPORT bool operator!=(const sail::variant &a, const sail::variant &b);
+SAIL_EXPORT bool operator!=(const sail::variant& a, const sail::variant& b);
 
-}
+} // namespace sail

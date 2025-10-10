@@ -52,22 +52,22 @@ public:
     /*
      * Constructs a new image input from the specified image file.
      */
-    explicit image_input(const std::string &path);
+    explicit image_input(const std::string& path);
 
     /*
      * Constructs a new image input from the specified memory buffer.
      */
-    image_input(const void *buffer, std::size_t buffer_size);
+    image_input(const void* buffer, std::size_t buffer_size);
 
     /*
      * Constructs a new image input from the specified memory buffer.
      */
-    explicit image_input(const sail::arbitrary_data &arbitrary_data);
+    explicit image_input(const sail::arbitrary_data& arbitrary_data);
 
     /*
      * Constructs a new image input from the specified I/O source.
      */
-    explicit image_input(sail::abstract_io &abstract_io);
+    explicit image_input(sail::abstract_io& abstract_io);
 
     /*
      * Finishes loading and destroys the image input.
@@ -77,22 +77,22 @@ public:
     /*
      * Moves the image input.
      */
-    image_input(image_input &&other) noexcept;
+    image_input(image_input&& other) noexcept;
 
     /*
      * Moves the image input.
      */
-    image_input& operator=(image_input &&other) noexcept;
+    image_input& operator=(image_input&& other) noexcept;
 
     /*
      * Overrides the automatically detected codec info used to load the image.
      */
-    image_input& with(const sail::codec_info &codec_info);
+    image_input& with(const sail::codec_info& codec_info);
 
     /*
      * Overrides the load options used to load the image.
      */
-    image_input& with(const sail::load_options &load_options);
+    image_input& with(const sail::load_options& load_options);
 
     /*
      * Continues loading the image. Assigns the loaded image to the 'image' argument.
@@ -100,8 +100,8 @@ public:
      * Returns SAIL_OK on success.
      * Returns SAIL_ERROR_NO_MORE_FRAMES when no more frames are available.
      */
-    sail_status_t next_frame(sail::image *image);
- 
+    sail_status_t next_frame(sail::image* image);
+
     /*
      * Continues loading the image.
      *
@@ -131,4 +131,4 @@ private:
     std::unique_ptr<pimpl> d;
 };
 
-}
+} // namespace sail

@@ -60,7 +60,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    virtual sail_status_t tolerant_read(void *buf, std::size_t size_to_read, std::size_t *read_size) = 0;
+    virtual sail_status_t tolerant_read(void* buf, std::size_t size_to_read, std::size_t* read_size) = 0;
 
     /*
      * Reads from the underlying I/O object into the specified buffer. In contrast to tolerant_read(),
@@ -68,7 +68,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    virtual sail_status_t strict_read(void *buf, std::size_t size_to_read) = 0;
+    virtual sail_status_t strict_read(void* buf, std::size_t size_to_read) = 0;
 
     /*
      * Writes the specified buffer to the underlying I/O object. In contrast to strict_write(),
@@ -77,7 +77,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    virtual sail_status_t tolerant_write(const void *buf, std::size_t size_to_write, std::size_t *written_size) = 0;
+    virtual sail_status_t tolerant_write(const void* buf, std::size_t size_to_write, std::size_t* written_size) = 0;
 
     /*
      * Writes the specified buffer to the underlying I/O object. In contrast to tolerant_write(),
@@ -85,7 +85,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    virtual sail_status_t strict_write(const void *buf, std::size_t size_to_write) = 0;
+    virtual sail_status_t strict_write(const void* buf, std::size_t size_to_write) = 0;
 
     /*
      * Sets the I/O position in the underlying I/O object.
@@ -101,7 +101,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    virtual sail_status_t tell(std::size_t *offset) = 0;
+    virtual sail_status_t tell(std::size_t* offset) = 0;
 
     /*
      * Flushes buffers of the underlying I/O object. Has no effect if the underlying I/O object
@@ -123,7 +123,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    virtual sail_status_t eof(bool *result) = 0;
+    virtual sail_status_t eof(bool* result) = 0;
 
     /*
      * Finds and returns a first codec info object that can theoretically read the underlying
@@ -134,4 +134,4 @@ public:
     virtual sail::codec_info codec_info() = 0;
 };
 
-}
+} // namespace sail

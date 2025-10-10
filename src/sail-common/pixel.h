@@ -31,7 +31,8 @@
 #include <sail-common/status.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 /*
@@ -109,28 +110,28 @@ typedef struct sail_pixel4_uint16 sail_cmyk64_t;
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_read_pixel3_uint8(struct sail_io *io, struct sail_pixel3_uint8 *pixel);
+SAIL_EXPORT sail_status_t sail_read_pixel3_uint8(struct sail_io* io, struct sail_pixel3_uint8* pixel);
 
 /*
  * Reads a sail_pixel4_uint8 pixel byte by byte from the I/O stream.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_read_pixel4_uint8(struct sail_io *io, struct sail_pixel4_uint8 *pixel);
+SAIL_EXPORT sail_status_t sail_read_pixel4_uint8(struct sail_io* io, struct sail_pixel4_uint8* pixel);
 
 /*
  * Reads a sail_pixel3_uint16 pixel byte by byte from the I/O stream.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_read_pixel3_uint16(struct sail_io *io, struct sail_pixel3_uint16 *pixel);
+SAIL_EXPORT sail_status_t sail_read_pixel3_uint16(struct sail_io* io, struct sail_pixel3_uint16* pixel);
 
 /*
  * Reads a sail_pixel4_uint16 pixel byte by byte from the I/O stream.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_read_pixel4_uint16(struct sail_io *io, struct sail_pixel4_uint16 *pixel);
+SAIL_EXPORT sail_status_t sail_read_pixel4_uint16(struct sail_io* io, struct sail_pixel4_uint16* pixel);
 
 /* extern "C" */
 #ifdef __cplusplus

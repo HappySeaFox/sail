@@ -37,7 +37,7 @@ static MunitResult test_best_conversion_grayscale(const MunitParameter params[],
 
     {
         const enum SailPixelFormat pixel_formats[] = {SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE, SAIL_PIXEL_FORMAT_BPP24_RGB};
-        const size_t pixel_formats_length = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
+        const size_t pixel_formats_length          = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
 
         munit_assert_int(
             sail_closest_pixel_format(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE, pixel_formats, pixel_formats_length), ==,
@@ -46,7 +46,7 @@ static MunitResult test_best_conversion_grayscale(const MunitParameter params[],
 
     {
         const enum SailPixelFormat pixel_formats[] = {SAIL_PIXEL_FORMAT_BPP24_RGB, SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE};
-        const size_t pixel_formats_length = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
+        const size_t pixel_formats_length          = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
 
         munit_assert_int(
             sail_closest_pixel_format(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE, pixel_formats, pixel_formats_length), ==,
@@ -55,7 +55,7 @@ static MunitResult test_best_conversion_grayscale(const MunitParameter params[],
 
     {
         const enum SailPixelFormat pixel_formats[] = {SAIL_PIXEL_FORMAT_BPP1_INDEXED, SAIL_PIXEL_FORMAT_BPP2_INDEXED};
-        const size_t pixel_formats_length = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
+        const size_t pixel_formats_length          = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
 
         munit_assert_int(
             sail_closest_pixel_format(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE, pixel_formats, pixel_formats_length), ==,
@@ -72,7 +72,7 @@ static MunitResult test_best_conversion_indexed(const MunitParameter params[], v
 
     {
         const enum SailPixelFormat pixel_formats[] = {SAIL_PIXEL_FORMAT_BPP24_RGB, SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE};
-        const size_t pixel_formats_length = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
+        const size_t pixel_formats_length          = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
 
         munit_assert_int(sail_closest_pixel_format(SAIL_PIXEL_FORMAT_BPP8_INDEXED, pixel_formats, pixel_formats_length),
                          ==, SAIL_PIXEL_FORMAT_BPP24_RGB);
@@ -80,16 +80,16 @@ static MunitResult test_best_conversion_indexed(const MunitParameter params[], v
 
     {
         const enum SailPixelFormat pixel_formats[] = {SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE, SAIL_PIXEL_FORMAT_BPP24_RGB};
-        const size_t pixel_formats_length = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
+        const size_t pixel_formats_length          = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
 
         munit_assert_int(sail_closest_pixel_format(SAIL_PIXEL_FORMAT_BPP1_INDEXED, pixel_formats, pixel_formats_length),
                          ==, SAIL_PIXEL_FORMAT_BPP24_RGB);
     }
 
     {
-        const enum SailPixelFormat pixel_formats[]
-            = {SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE, SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE};
-        const size_t pixel_formats_length = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
+        const enum SailPixelFormat pixel_formats[] = {SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE,
+                                                      SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE};
+        const size_t pixel_formats_length          = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
 
         munit_assert_int(sail_closest_pixel_format(SAIL_PIXEL_FORMAT_BPP1_INDEXED, pixel_formats, pixel_formats_length),
                          ==, SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE);
@@ -105,7 +105,7 @@ static MunitResult test_best_conversion_rgb(const MunitParameter params[], void*
 
     {
         const enum SailPixelFormat pixel_formats[] = {SAIL_PIXEL_FORMAT_BPP32_RGBA, SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE};
-        const size_t pixel_formats_length = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
+        const size_t pixel_formats_length          = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
 
         munit_assert_int(sail_closest_pixel_format(SAIL_PIXEL_FORMAT_BPP24_RGB, pixel_formats, pixel_formats_length),
                          ==, SAIL_PIXEL_FORMAT_BPP32_RGBA);
@@ -113,16 +113,16 @@ static MunitResult test_best_conversion_rgb(const MunitParameter params[], void*
 
     {
         const enum SailPixelFormat pixel_formats[] = {SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE, SAIL_PIXEL_FORMAT_BPP32_RGBA};
-        const size_t pixel_formats_length = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
+        const size_t pixel_formats_length          = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
 
         munit_assert_int(sail_closest_pixel_format(SAIL_PIXEL_FORMAT_BPP24_RGB, pixel_formats, pixel_formats_length),
                          ==, SAIL_PIXEL_FORMAT_BPP32_RGBA);
     }
 
     {
-        const enum SailPixelFormat pixel_formats[]
-            = {SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE, SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE};
-        const size_t pixel_formats_length = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
+        const enum SailPixelFormat pixel_formats[] = {SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE,
+                                                      SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE};
+        const size_t pixel_formats_length          = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
 
         munit_assert_int(sail_closest_pixel_format(SAIL_PIXEL_FORMAT_BPP24_RGB, pixel_formats, pixel_formats_length),
                          ==, SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE);
@@ -137,9 +137,9 @@ static MunitResult test_best_conversion_grayscale_alpha(const MunitParameter par
     (void)user_data;
 
     {
-        const enum SailPixelFormat pixel_formats[]
-            = {SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA, SAIL_PIXEL_FORMAT_BPP24_RGB};
-        const size_t pixel_formats_length = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
+        const enum SailPixelFormat pixel_formats[] = {SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA,
+                                                      SAIL_PIXEL_FORMAT_BPP24_RGB};
+        const size_t pixel_formats_length          = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
 
         munit_assert_int(
             sail_closest_pixel_format(SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA, pixel_formats, pixel_formats_length), ==,
@@ -147,10 +147,10 @@ static MunitResult test_best_conversion_grayscale_alpha(const MunitParameter par
     }
 
     {
-        const enum SailPixelFormat pixel_formats[]
-            = {SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE_ALPHA, SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA,
-               SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA};
-        const size_t pixel_formats_length = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
+        const enum SailPixelFormat pixel_formats[] = {SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE_ALPHA,
+                                                      SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA,
+                                                      SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA};
+        const size_t pixel_formats_length          = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
 
         munit_assert_int(
             sail_closest_pixel_format(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE, pixel_formats, pixel_formats_length), ==,
@@ -167,7 +167,7 @@ static MunitResult test_best_conversion_rgb555_565(const MunitParameter params[]
 
     {
         const enum SailPixelFormat pixel_formats[] = {SAIL_PIXEL_FORMAT_BPP16_RGB565, SAIL_PIXEL_FORMAT_BPP16_RGBA};
-        const size_t pixel_formats_length = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
+        const size_t pixel_formats_length          = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
 
         munit_assert_int(sail_closest_pixel_format(SAIL_PIXEL_FORMAT_BPP16_RGB555, pixel_formats, pixel_formats_length),
                          ==, SAIL_PIXEL_FORMAT_BPP16_RGB565);
@@ -175,7 +175,7 @@ static MunitResult test_best_conversion_rgb555_565(const MunitParameter params[]
 
     {
         const enum SailPixelFormat pixel_formats[] = {SAIL_PIXEL_FORMAT_BPP16_BGR555, SAIL_PIXEL_FORMAT_BPP16_BGR565};
-        const size_t pixel_formats_length = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
+        const size_t pixel_formats_length          = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
 
         munit_assert_int(sail_closest_pixel_format(SAIL_PIXEL_FORMAT_BPP24_BGR, pixel_formats, pixel_formats_length),
                          ==, SAIL_PIXEL_FORMAT_BPP16_BGR555);
@@ -191,7 +191,7 @@ static MunitResult test_best_conversion_cmyk(const MunitParameter params[], void
 
     {
         const enum SailPixelFormat pixel_formats[] = {SAIL_PIXEL_FORMAT_BPP32_CMYK, SAIL_PIXEL_FORMAT_BPP24_RGB};
-        const size_t pixel_formats_length = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
+        const size_t pixel_formats_length          = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
 
         munit_assert_int(sail_closest_pixel_format(SAIL_PIXEL_FORMAT_BPP24_RGB, pixel_formats, pixel_formats_length),
                          ==, SAIL_PIXEL_FORMAT_BPP24_RGB);
@@ -199,7 +199,7 @@ static MunitResult test_best_conversion_cmyk(const MunitParameter params[], void
 
     {
         const enum SailPixelFormat pixel_formats[] = {SAIL_PIXEL_FORMAT_BPP32_CMYK, SAIL_PIXEL_FORMAT_BPP64_CMYK};
-        const size_t pixel_formats_length = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
+        const size_t pixel_formats_length          = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
 
         munit_assert_int(sail_closest_pixel_format(SAIL_PIXEL_FORMAT_BPP24_RGB, pixel_formats, pixel_formats_length),
                          ==, SAIL_PIXEL_FORMAT_BPP32_CMYK);
@@ -215,7 +215,7 @@ static MunitResult test_best_conversion_rgba16(const MunitParameter params[], vo
 
     {
         const enum SailPixelFormat pixel_formats[] = {SAIL_PIXEL_FORMAT_BPP16_RGBA, SAIL_PIXEL_FORMAT_BPP32_RGBA};
-        const size_t pixel_formats_length = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
+        const size_t pixel_formats_length          = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
 
         munit_assert_int(sail_closest_pixel_format(SAIL_PIXEL_FORMAT_BPP32_RGBA, pixel_formats, pixel_formats_length),
                          ==, SAIL_PIXEL_FORMAT_BPP32_RGBA);
@@ -223,7 +223,7 @@ static MunitResult test_best_conversion_rgba16(const MunitParameter params[], vo
 
     {
         const enum SailPixelFormat pixel_formats[] = {SAIL_PIXEL_FORMAT_BPP64_RGBA, SAIL_PIXEL_FORMAT_BPP16_RGBA};
-        const size_t pixel_formats_length = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
+        const size_t pixel_formats_length          = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
 
         munit_assert_int(sail_closest_pixel_format(SAIL_PIXEL_FORMAT_BPP32_RGBA, pixel_formats, pixel_formats_length),
                          ==, SAIL_PIXEL_FORMAT_BPP64_RGBA);
@@ -238,9 +238,9 @@ static MunitResult test_best_conversion_yuv(const MunitParameter params[], void*
     (void)user_data;
 
     {
-        const enum SailPixelFormat pixel_formats[]
-            = {SAIL_PIXEL_FORMAT_BPP24_YUV, SAIL_PIXEL_FORMAT_BPP24_YCBCR, SAIL_PIXEL_FORMAT_BPP24_RGB};
-        const size_t pixel_formats_length = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
+        const enum SailPixelFormat pixel_formats[] = {SAIL_PIXEL_FORMAT_BPP24_YUV, SAIL_PIXEL_FORMAT_BPP24_YCBCR,
+                                                      SAIL_PIXEL_FORMAT_BPP24_RGB};
+        const size_t pixel_formats_length          = sizeof(pixel_formats) / sizeof(pixel_formats[0]);
 
         munit_assert_int(sail_closest_pixel_format(SAIL_PIXEL_FORMAT_BPP24_RGB, pixel_formats, pixel_formats_length),
                          ==, SAIL_PIXEL_FORMAT_BPP24_YCBCR);

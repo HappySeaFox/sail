@@ -54,32 +54,32 @@ public:
     /*
      * Constructs a new ICC profile from the binary data. The data is deep copied.
      */
-    iccp(const void *data, std::size_t data_size);
+    iccp(const void* data, std::size_t data_size);
 
     /*
      * Constructs a new ICC profile from the binary data.
      */
-    explicit iccp(const arbitrary_data &data);
+    explicit iccp(const arbitrary_data& data);
 
     /*
      * Copies the ICC profile.
      */
-    iccp(const sail::iccp &ic);
+    iccp(const sail::iccp& ic);
 
     /*
      * Copies the ICC profile.
      */
-    iccp& operator=(const sail::iccp &iccp);
+    iccp& operator=(const sail::iccp& iccp);
 
     /*
      * Moves the ICC profile.
      */
-    iccp(sail::iccp &&iccp) noexcept;
+    iccp(sail::iccp&& iccp) noexcept;
 
     /*
      * Moves the ICC profile.
      */
-    iccp& operator=(sail::iccp &&iccp) noexcept;
+    iccp& operator=(sail::iccp&& iccp) noexcept;
 
     /*
      * Destroys the ICC profile.
@@ -99,26 +99,26 @@ public:
     /*
      * Sets new ICC profile binary data. The data is deep copied.
      */
-    void set_data(const void *data, std::size_t data_size);
+    void set_data(const void* data, std::size_t data_size);
 
     /*
      * Sets new ICC profile binary data.
      */
-    void set_data(const arbitrary_data &data);
+    void set_data(const arbitrary_data& data);
 
 private:
     /*
      * Makes a deep copy of the specified ICC profile.
      */
-    explicit iccp(const sail_iccp *ic);
+    explicit iccp(const sail_iccp* ic);
 
-    sail_status_t to_sail_iccp(sail_iccp **iccp) const;
+    sail_status_t to_sail_iccp(sail_iccp** iccp) const;
 
-    void copy(const void *data, std::size_t data_size);
+    void copy(const void* data, std::size_t data_size);
 
 private:
     class pimpl;
     std::unique_ptr<pimpl> d;
 };
 
-}
+} // namespace sail

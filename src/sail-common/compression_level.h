@@ -29,13 +29,15 @@
 #include <sail-common/status.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 /*
  * Compression level.
  */
-struct sail_compression_level {
+struct sail_compression_level
+{
 
     /*
      * Minimum compression value. For lossy codecs, more compression means less quality
@@ -70,12 +72,12 @@ typedef struct sail_compression_level sail_compression_level_t;
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_compression_level(struct sail_compression_level **compression_level);
+SAIL_EXPORT sail_status_t sail_alloc_compression_level(struct sail_compression_level** compression_level);
 
 /*
  * Destroys the specified compression level. Does nothing if the compression level is NULL.
  */
-SAIL_EXPORT void sail_destroy_compression_level(struct sail_compression_level *compression_level);
+SAIL_EXPORT void sail_destroy_compression_level(struct sail_compression_level* compression_level);
 
 /* extern "C" */
 #ifdef __cplusplus

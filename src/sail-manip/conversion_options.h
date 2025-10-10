@@ -32,13 +32,15 @@
 #include <sail-manip/manip_common.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 /*
  * Options to control image conversion behavior.
  */
-struct sail_conversion_options {
+struct sail_conversion_options
+{
 
     /*
      * Or-ed SailConversionOption-s. If zero, SAIL_CONVERSION_OPTION_DROP_ALPHA is assumed.
@@ -65,13 +67,13 @@ typedef struct sail_conversion_options sail_conversion_options_t;
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_conversion_options(struct sail_conversion_options **options);
+SAIL_EXPORT sail_status_t sail_alloc_conversion_options(struct sail_conversion_options** options);
 
 /*
  * Destroys the specified conversion options and all its internal allocated memory buffers.
  * The options MUST NOT be used anymore after calling this function. Does nothing if the options is NULL.
  */
-SAIL_EXPORT void sail_destroy_conversion_options(struct sail_conversion_options *options);
+SAIL_EXPORT void sail_destroy_conversion_options(struct sail_conversion_options* options);
 
 /* extern "C" */
 #ifdef __cplusplus

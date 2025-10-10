@@ -26,7 +26,8 @@
 #pragma once
 
 /* Codec priority. */
-enum SailCodecPriority {
+enum SailCodecPriority
+{
 
     /* One of the most popular image formats like JPEG. */
     SAIL_CODEC_PRIORITY_HIGHEST,

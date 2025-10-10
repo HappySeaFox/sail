@@ -58,51 +58,51 @@ public:
      * Constructs a new meta data entry out of the known meta data
      * key and the value.
      */
-    meta_data(SailMetaData key, const variant &value);
+    meta_data(SailMetaData key, const variant& value);
 
     /*
      * Constructs a new meta data entry out of the known meta data
      * key and the value.
      */
-    meta_data(SailMetaData key, variant &&value) noexcept;
+    meta_data(SailMetaData key, variant&& value) noexcept;
 
     /*
      * Constructs a new meta data entry out of the unknown meta data
      * string key and the value.
      */
-    meta_data(const std::string &key_unknown, const variant &value);
+    meta_data(const std::string& key_unknown, const variant& value);
 
     /*
      * Constructs a new meta data entry out of the unknown meta data
      * string key and the value.
      */
-    meta_data(const std::string &key_unknown, variant &&value);
+    meta_data(const std::string& key_unknown, variant&& value);
 
     /*
      * Constructs a new meta data entry out of the unknown meta data
      * string key and the value.
      */
-    meta_data(std::string &&key_unknown, variant &&value) noexcept;
+    meta_data(std::string&& key_unknown, variant&& value) noexcept;
 
     /*
      * Copies the meta data entry.
      */
-    meta_data(const meta_data &md);
+    meta_data(const meta_data& md);
 
     /*
      * Copies the meta data entry.
      */
-    meta_data& operator=(const sail::meta_data &meta_data);
+    meta_data& operator=(const sail::meta_data& meta_data);
 
     /*
      * Moves the meta data entry.
      */
-    meta_data(sail::meta_data &&meta_data) noexcept;
+    meta_data(sail::meta_data&& meta_data) noexcept;
 
     /*
      * Moves the meta data entry.
      */
-    meta_data& operator=(sail::meta_data &&meta_data) noexcept;
+    meta_data& operator=(sail::meta_data&& meta_data) noexcept;
 
     /*
      * Destroys the meta data entry.
@@ -136,23 +136,23 @@ public:
      * Sets a new unknown meta data string key representation. Resets the saved key to SAIL_META_DATA_UNKNOWN.
      * For example: "Person on the Image".
      */
-    void set_key(const std::string &key_unknown);
+    void set_key(const std::string& key_unknown);
 
     /*
      * Sets a new unknown meta data string key representation. Resets the saved key to SAIL_META_DATA_UNKNOWN.
      * For example: "Person on the Image".
      */
-    void set_key(std::string &&key_unknown) noexcept;
+    void set_key(std::string&& key_unknown) noexcept;
 
     /*
      * Sets a new meta data binary value. Resets the saved string value.
      */
-    void set_value(const variant &value);
+    void set_value(const variant& value);
 
     /*
      * Sets a new meta data binary value. Resets the saved string value.
      */
-    void set_value(variant &&value) noexcept;
+    void set_value(variant&& value) noexcept;
 
     /*
      * Returns a string representation of the specified meta data key. See SailMetaData.
@@ -168,19 +168,19 @@ public:
      *
      * Returns SAIL_META_DATA_UNKNOWN if the meta data key is not known.
      */
-    static SailMetaData meta_data_from_string(const std::string &str);
+    static SailMetaData meta_data_from_string(const std::string& str);
 
 private:
     /*
      * Makes a deep copy of the specified meta data.
      */
-    explicit meta_data(const sail_meta_data *meta_data);
+    explicit meta_data(const sail_meta_data* meta_data);
 
-    sail_status_t to_sail_meta_data(sail_meta_data **meta_data) const;
+    sail_status_t to_sail_meta_data(sail_meta_data** meta_data) const;
 
 private:
     class pimpl;
     std::unique_ptr<pimpl> d;
 };
 
-}
+} // namespace sail

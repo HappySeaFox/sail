@@ -57,7 +57,7 @@ public:
      * The channels are interleaved per pixel. The pixel data must not have gaps, i.e.:
      * RGBRGB...
      */
-    palette(SailPixelFormat pixel_format, const void *data, unsigned color_count);
+    palette(SailPixelFormat pixel_format, const void* data, unsigned color_count);
 
     /*
      * Constructs palette from the data. Calculates the color count from the data size
@@ -67,27 +67,27 @@ public:
      * The channels are interleaved per pixel. The pixel data must not have gaps, i.e.:
      * RGBRGB...
      */
-    palette(SailPixelFormat pixel_format, const arbitrary_data &data);
+    palette(SailPixelFormat pixel_format, const arbitrary_data& data);
 
     /*
      * Copies the palette.
      */
-    palette(const palette &pal);
+    palette(const palette& pal);
 
     /*
      * Copies the palette.
      */
-    palette& operator=(const sail::palette &palette);
+    palette& operator=(const sail::palette& palette);
 
     /*
      * Moves the palette.
      */
-    palette(sail::palette &&palette) noexcept;
+    palette(sail::palette&& palette) noexcept;
 
     /*
      * Moves the palette.
      */
-    palette& operator=(sail::palette &&palette) noexcept;
+    palette& operator=(sail::palette&& palette) noexcept;
 
     /*
      * Destroys the palette.
@@ -120,28 +120,28 @@ public:
      * if the pixel format is SAIL_PIXEL_FORMAT_UNKNOWN, or the color count is 0,
      * or the data is null.
      */
-    void set_data(SailPixelFormat pixel_format, const void *data, unsigned color_count);
+    void set_data(SailPixelFormat pixel_format, const void* data, unsigned color_count);
 
     /*
      * Sets new palette data, pixel format, and colors count. Calculates the color count
      * from the data size and the pixel format. Makes the palette invalid if the pixel
      * format is SAIL_PIXEL_FORMAT_UNKNOWN or the data is empty.
      */
-    void set_data(SailPixelFormat pixel_format, const arbitrary_data &data);
+    void set_data(SailPixelFormat pixel_format, const arbitrary_data& data);
 
 private:
     /*
      * Makes a deep copy of the specified palette.
      */
-    explicit palette(const sail_palette *pal);
+    explicit palette(const sail_palette* pal);
 
-    sail_status_t to_sail_palette(sail_palette **palette) const;
+    sail_status_t to_sail_palette(sail_palette** palette) const;
 
-    sail_status_t copy(SailPixelFormat pixel_format, const void *data, unsigned color_count);
+    sail_status_t copy(SailPixelFormat pixel_format, const void* data, unsigned color_count);
 
 private:
     class pimpl;
     std::unique_ptr<pimpl> d;
 };
 
-}
+} // namespace sail

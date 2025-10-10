@@ -31,7 +31,8 @@
 #include <sail-common/status.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 /*
@@ -39,7 +40,7 @@ extern "C" {
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_malloc(size_t size, void **ptr);
+SAIL_EXPORT sail_status_t sail_malloc(size_t size, void** ptr);
 
 /*
  * Calls sail_malloc() and returns the allocated pointer or NULL in case of error.
@@ -55,21 +56,21 @@ SAIL_EXPORT void* sail_malloc_std_signature(size_t size);
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_realloc(size_t size, void **ptr);
+SAIL_EXPORT sail_status_t sail_realloc(size_t size, void** ptr);
 
 /*
  * Interface to calloc().
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_calloc(size_t nmemb, size_t size, void **ptr);
+SAIL_EXPORT sail_status_t sail_calloc(size_t nmemb, size_t size, void** ptr);
 
 /*
  * Interface to free().
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT void sail_free(void *ptr);
+SAIL_EXPORT void sail_free(void* ptr);
 
 /* extern "C" */
 #ifdef __cplusplus

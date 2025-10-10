@@ -25,24 +25,27 @@
 
 #include <sail-manip/sail-manip.h>
 
-sail_status_t sail_alloc_conversion_options(struct sail_conversion_options **options) {
+sail_status_t sail_alloc_conversion_options(struct sail_conversion_options** options)
+{
 
     SAIL_CHECK_PTR(options);
 
-    void *ptr;
+    void* ptr;
     SAIL_TRY(sail_malloc(sizeof(struct sail_conversion_options), &ptr));
     *options = ptr;
 
     (*options)->options      = SAIL_CONVERSION_OPTION_DROP_ALPHA;
-    (*options)->background48 = (sail_rgb48_t){ 0, 0, 0 };
-    (*options)->background24 = (sail_rgb24_t){ 0, 0, 0 };
+    (*options)->background48 = (sail_rgb48_t){0, 0, 0};
+    (*options)->background24 = (sail_rgb24_t){0, 0, 0};
 
     return SAIL_OK;
 }
 
-void sail_destroy_conversion_options(struct sail_conversion_options *options) {
+void sail_destroy_conversion_options(struct sail_conversion_options* options)
+{
 
-    if (options == NULL) {
+    if (options == NULL)
+    {
         return;
     }
 

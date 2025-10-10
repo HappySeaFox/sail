@@ -30,9 +30,9 @@
 #include <sail-common/status.h>
 
 #ifdef SAIL_WIN32
-    #include <Windows.h>
+#include <Windows.h>
 #else
-    #include <pthread.h>
+#include <pthread.h>
 #endif
 
 /*
@@ -46,27 +46,27 @@
 /* Call once. */
 
 #ifdef SAIL_WIN32
-    typedef INIT_ONCE sail_once_flag_t;
-    #define SAIL_ONCE_DEFAULT_VALUE INIT_ONCE_STATIC_INIT
+typedef INIT_ONCE sail_once_flag_t;
+#define SAIL_ONCE_DEFAULT_VALUE INIT_ONCE_STATIC_INIT
 #else
-    typedef pthread_once_t sail_once_flag_t;
-    #define SAIL_ONCE_DEFAULT_VALUE PTHREAD_ONCE_INIT
+typedef pthread_once_t sail_once_flag_t;
+#define SAIL_ONCE_DEFAULT_VALUE PTHREAD_ONCE_INIT
 #endif
 
-SAIL_HIDDEN sail_status_t threading_call_once(sail_once_flag_t *once_flag, void (*callback)(void));
+SAIL_HIDDEN sail_status_t threading_call_once(sail_once_flag_t* once_flag, void (*callback)(void));
 
 /* Mutexes. */
 
 #ifdef SAIL_WIN32
-    typedef CRITICAL_SECTION sail_mutex_t;
+typedef CRITICAL_SECTION sail_mutex_t;
 #else
-    typedef pthread_mutex_t sail_mutex_t;
+typedef pthread_mutex_t sail_mutex_t;
 #endif
 
-SAIL_HIDDEN sail_status_t threading_init_mutex(sail_mutex_t *mutex);
+SAIL_HIDDEN sail_status_t threading_init_mutex(sail_mutex_t* mutex);
 
-SAIL_HIDDEN sail_status_t threading_lock_mutex(sail_mutex_t *mutex);
+SAIL_HIDDEN sail_status_t threading_lock_mutex(sail_mutex_t* mutex);
 
-SAIL_HIDDEN sail_status_t threading_unlock_mutex(sail_mutex_t *mutex);
+SAIL_HIDDEN sail_status_t threading_unlock_mutex(sail_mutex_t* mutex);
 
-SAIL_HIDDEN sail_status_t threading_destroy_mutex(sail_mutex_t *mutex);
+SAIL_HIDDEN sail_status_t threading_destroy_mutex(sail_mutex_t* mutex);

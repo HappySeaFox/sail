@@ -27,20 +27,26 @@
 
 #include <sail/sail.h>
 
-sail_status_t sail_start_loading_from_file_with_options(const char *path, const struct sail_codec_info *codec_info,
-                                                        const struct sail_load_options *load_options, void **state) {
+sail_status_t sail_start_loading_from_file_with_options(const char* path,
+                                                        const struct sail_codec_info* codec_info,
+                                                        const struct sail_load_options* load_options,
+                                                        void** state)
+{
 
     SAIL_CHECK_PTR(path);
 
-    const struct sail_codec_info *codec_info_local;
+    const struct sail_codec_info* codec_info_local;
 
-    if (codec_info == NULL) {
+    if (codec_info == NULL)
+    {
         SAIL_TRY(sail_codec_info_from_path(path, &codec_info_local));
-    } else {
+    }
+    else
+    {
         codec_info_local = codec_info;
     }
 
-    struct sail_io *io;
+    struct sail_io* io;
     SAIL_TRY(sail_alloc_io_read_file(path, &io));
 
     SAIL_TRY(start_loading_io_with_options(io, true, codec_info_local, load_options, state));
@@ -48,21 +54,27 @@ sail_status_t sail_start_loading_from_file_with_options(const char *path, const 
     return SAIL_OK;
 }
 
-sail_status_t sail_start_loading_from_memory_with_options(const void *buffer, size_t buffer_size,
-                                                          const struct sail_codec_info *codec_info,
-                                                          const struct sail_load_options *load_options, void **state) {
+sail_status_t sail_start_loading_from_memory_with_options(const void* buffer,
+                                                          size_t buffer_size,
+                                                          const struct sail_codec_info* codec_info,
+                                                          const struct sail_load_options* load_options,
+                                                          void** state)
+{
 
     SAIL_CHECK_PTR(buffer);
 
-    const struct sail_codec_info *codec_info_local;
+    const struct sail_codec_info* codec_info_local;
 
-    if (codec_info == NULL) {
+    if (codec_info == NULL)
+    {
         SAIL_TRY(sail_codec_info_by_magic_number_from_memory(buffer, buffer_size, &codec_info_local));
-    } else {
+    }
+    else
+    {
         codec_info_local = codec_info;
     }
 
-    struct sail_io *io;
+    struct sail_io* io;
     SAIL_TRY(sail_alloc_io_read_memory(buffer, buffer_size, &io));
 
     SAIL_TRY(start_loading_io_with_options(io, true, codec_info_local, load_options, state));
@@ -70,20 +82,26 @@ sail_status_t sail_start_loading_from_memory_with_options(const void *buffer, si
     return SAIL_OK;
 }
 
-sail_status_t sail_start_saving_into_file_with_options(const char *path, const struct sail_codec_info *codec_info,
-                                                       const struct sail_save_options *save_options, void **state) {
+sail_status_t sail_start_saving_into_file_with_options(const char* path,
+                                                       const struct sail_codec_info* codec_info,
+                                                       const struct sail_save_options* save_options,
+                                                       void** state)
+{
 
     SAIL_CHECK_PTR(path);
 
-    const struct sail_codec_info *codec_info_local;
+    const struct sail_codec_info* codec_info_local;
 
-    if (codec_info == NULL) {
+    if (codec_info == NULL)
+    {
         SAIL_TRY(sail_codec_info_from_path(path, &codec_info_local));
-    } else {
+    }
+    else
+    {
         codec_info_local = codec_info;
     }
 
-    struct sail_io *io;
+    struct sail_io* io;
     SAIL_TRY(sail_alloc_io_read_write_file(path, &io));
 
     /* The I/O object will be destroyed in this function. */
@@ -92,13 +110,16 @@ sail_status_t sail_start_saving_into_file_with_options(const char *path, const s
     return SAIL_OK;
 }
 
-sail_status_t sail_start_saving_into_memory_with_options(void *buffer, size_t buffer_size,
-                                                         const struct sail_codec_info *codec_info,
-                                                         const struct sail_save_options *save_options, void **state) {
+sail_status_t sail_start_saving_into_memory_with_options(void* buffer,
+                                                         size_t buffer_size,
+                                                         const struct sail_codec_info* codec_info,
+                                                         const struct sail_save_options* save_options,
+                                                         void** state)
+{
     SAIL_CHECK_PTR(buffer);
     SAIL_CHECK_PTR(codec_info);
 
-    struct sail_io *io;
+    struct sail_io* io;
     SAIL_TRY(sail_alloc_io_read_write_memory(buffer, buffer_size, &io));
 
     /* The I/O object will be destroyed in this function. */
@@ -107,7 +128,8 @@ sail_status_t sail_start_saving_into_memory_with_options(void *buffer, size_t bu
     return SAIL_OK;
 }
 
-sail_status_t sail_stop_saving_with_written(void *state, size_t *written) {
+sail_status_t sail_stop_saving_with_written(void* state, size_t* written)
+{
 
     SAIL_TRY(stop_saving(state, written));
 

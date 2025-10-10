@@ -137,7 +137,7 @@ static MunitResult test_deep_diver_save_with_null_options(const MunitParameter p
     }
 
     struct sail_image* image_to_save = NULL;
-    sail_status_t conv_status = sail_convert_image_for_saving(image, codec_info->save_features, &image_to_save);
+    sail_status_t conv_status        = sail_convert_image_for_saving(image, codec_info->save_features, &image_to_save);
 
     if (conv_status != SAIL_OK)
     {
@@ -157,7 +157,7 @@ static MunitResult test_deep_diver_save_with_null_options(const MunitParameter p
         snprintf(temp_path, sizeof(temp_path), "%s.test.null-opts", path);
     }
 
-    void* state = NULL;
+    void* state          = NULL;
     sail_status_t status = sail_start_saving_into_file_with_options(temp_path, codec_info, NULL, &state);
 
     if (status == SAIL_OK)
@@ -205,7 +205,7 @@ static MunitResult test_deep_diver_save_with_custom_options(const MunitParameter
     }
 
     struct sail_image* image_to_save = NULL;
-    sail_status_t conv_status = sail_convert_image_for_saving(image, codec_info->save_features, &image_to_save);
+    sail_status_t conv_status        = sail_convert_image_for_saving(image, codec_info->save_features, &image_to_save);
 
     if (conv_status != SAIL_OK)
     {
@@ -233,7 +233,7 @@ static MunitResult test_deep_diver_save_with_custom_options(const MunitParameter
         save_options->compression_level = codec_info->save_features->compression_level->max_level;
     }
 
-    void* state = NULL;
+    void* state          = NULL;
     sail_status_t status = sail_start_saving_into_file_with_options(temp_path, codec_info, save_options, &state);
 
     if (status == SAIL_OK)
@@ -282,7 +282,7 @@ static MunitResult test_deep_diver_save_to_memory_with_options(const MunitParame
     }
 
     struct sail_image* image_to_save = NULL;
-    sail_status_t conv_status = sail_convert_image_for_saving(image, codec_info->save_features, &image_to_save);
+    sail_status_t conv_status        = sail_convert_image_for_saving(image, codec_info->save_features, &image_to_save);
 
     if (conv_status != SAIL_OK)
     {
@@ -298,8 +298,8 @@ static MunitResult test_deep_diver_save_to_memory_with_options(const MunitParame
     munit_assert(sail_malloc(buffer_size, &buffer) == SAIL_OK);
 
     void* state = NULL;
-    sail_status_t status
-        = sail_start_saving_into_memory_with_options(buffer, buffer_size, codec_info, save_options, &state);
+    sail_status_t status =
+        sail_start_saving_into_memory_with_options(buffer, buffer_size, codec_info, save_options, &state);
 
     if (status == SAIL_OK)
     {
@@ -347,7 +347,7 @@ static MunitResult test_deep_diver_stop_saving_with_written(const MunitParameter
     }
 
     struct sail_image* image_to_save = NULL;
-    sail_status_t conv_status = sail_convert_image_for_saving(image, codec_info->save_features, &image_to_save);
+    sail_status_t conv_status        = sail_convert_image_for_saving(image, codec_info->save_features, &image_to_save);
 
     if (conv_status != SAIL_OK)
     {
@@ -359,7 +359,7 @@ static MunitResult test_deep_diver_stop_saving_with_written(const MunitParameter
     void* buffer;
     munit_assert(sail_malloc(buffer_size, &buffer) == SAIL_OK);
 
-    void* state = NULL;
+    void* state          = NULL;
     sail_status_t status = sail_start_saving_into_memory_with_options(buffer, buffer_size, codec_info, NULL, &state);
 
     if (status == SAIL_OK)
@@ -438,7 +438,7 @@ static MunitResult test_deep_diver_compression_levels(const MunitParameter param
     }
 
     struct sail_image* image_to_save = NULL;
-    sail_status_t conv_status = sail_convert_image_for_saving(image, codec_info->save_features, &image_to_save);
+    sail_status_t conv_status        = sail_convert_image_for_saving(image, codec_info->save_features, &image_to_save);
 
     if (conv_status != SAIL_OK)
     {
@@ -468,7 +468,7 @@ static MunitResult test_deep_diver_compression_levels(const MunitParameter param
             snprintf(temp_path, sizeof(temp_path), "%s.test.comp-%zu", path, i);
         }
 
-        void* state = NULL;
+        void* state          = NULL;
         sail_status_t status = sail_start_saving_into_file_with_options(temp_path, codec_info, save_options, &state);
 
         if (status == SAIL_OK)

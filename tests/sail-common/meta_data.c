@@ -150,7 +150,7 @@ static MunitResult test_copy_unknown_string_meta_data(const MunitParameter param
     (void)params;
     (void)user_data;
 
-    const char* key = "Some Key";
+    const char* key   = "Some Key";
     const char* value = "Comment 1";
 
     struct sail_meta_data* meta_data = NULL;

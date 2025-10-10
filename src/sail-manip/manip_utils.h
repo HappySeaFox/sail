@@ -34,84 +34,190 @@
 struct sail_conversion_options;
 struct sail_palette;
 
-SAIL_HIDDEN sail_status_t get_palette_rgba32(const struct sail_palette *palette, unsigned index, sail_rgba32_t *rgba32);
+SAIL_HIDDEN sail_status_t get_palette_rgba32(const struct sail_palette* palette, unsigned index, sail_rgba32_t* rgba32);
 
-SAIL_HIDDEN void spread_gray8_to_rgba32(uint8_t value, sail_rgba32_t *rgba32);
+SAIL_HIDDEN void spread_gray8_to_rgba32(uint8_t value, sail_rgba32_t* rgba32);
 
-SAIL_HIDDEN void spread_gray16_to_rgba32(uint16_t value, sail_rgba32_t *rgba32);
+SAIL_HIDDEN void spread_gray16_to_rgba32(uint16_t value, sail_rgba32_t* rgba32);
 
-SAIL_HIDDEN void spread_gray8_to_rgba64(uint8_t value, sail_rgba64_t *rgba64);
+SAIL_HIDDEN void spread_gray8_to_rgba64(uint8_t value, sail_rgba64_t* rgba64);
 
-SAIL_HIDDEN void spread_gray16_to_rgba64(uint16_t value, sail_rgba64_t *rgba64);
+SAIL_HIDDEN void spread_gray16_to_rgba64(uint16_t value, sail_rgba64_t* rgba64);
 
-SAIL_HIDDEN void fill_gray8_pixel_from_uint8_values(const sail_rgba32_t *rgba32, uint8_t *scan, const struct sail_conversion_options *options);
+SAIL_HIDDEN void fill_gray8_pixel_from_uint8_values(const sail_rgba32_t* rgba32,
+                                                    uint8_t* scan,
+                                                    const struct sail_conversion_options* options);
 
-SAIL_HIDDEN void fill_gray8_pixel_from_uint16_values(const sail_rgba64_t *rgba64, uint8_t *scan, const struct sail_conversion_options *options);
+SAIL_HIDDEN void fill_gray8_pixel_from_uint16_values(const sail_rgba64_t* rgba64,
+                                                     uint8_t* scan,
+                                                     const struct sail_conversion_options* options);
 
-SAIL_HIDDEN void fill_gray16_pixel_from_uint8_values(const sail_rgba32_t *rgba32, uint16_t *scan, const struct sail_conversion_options *options);
+SAIL_HIDDEN void fill_gray16_pixel_from_uint8_values(const sail_rgba32_t* rgba32,
+                                                     uint16_t* scan,
+                                                     const struct sail_conversion_options* options);
 
-SAIL_HIDDEN void fill_gray16_pixel_from_uint16_values(const sail_rgba64_t *rgba64, uint16_t *scan, const struct sail_conversion_options *options);
+SAIL_HIDDEN void fill_gray16_pixel_from_uint16_values(const sail_rgba64_t* rgba64,
+                                                      uint16_t* scan,
+                                                      const struct sail_conversion_options* options);
 
-SAIL_HIDDEN void fill_rgb24_pixel_from_uint8_values(const sail_rgba32_t *rgba32, uint8_t *scan, int r, int g, int b, const struct sail_conversion_options *options);
+SAIL_HIDDEN void fill_rgb24_pixel_from_uint8_values(
+    const sail_rgba32_t* rgba32, uint8_t* scan, int r, int g, int b, const struct sail_conversion_options* options);
 
-SAIL_HIDDEN void fill_rgb24_pixel_from_uint16_values(const sail_rgba64_t *rgba64, uint8_t *scan, int r, int g, int b, const struct sail_conversion_options *options);
+SAIL_HIDDEN void fill_rgb24_pixel_from_uint16_values(
+    const sail_rgba64_t* rgba64, uint8_t* scan, int r, int g, int b, const struct sail_conversion_options* options);
 
-SAIL_HIDDEN void fill_rgb48_pixel_from_uint8_values(const sail_rgba32_t *rgba32, uint16_t *scan, int r, int g, int b, const struct sail_conversion_options *options);
+SAIL_HIDDEN void fill_rgb48_pixel_from_uint8_values(
+    const sail_rgba32_t* rgba32, uint16_t* scan, int r, int g, int b, const struct sail_conversion_options* options);
 
-SAIL_HIDDEN void fill_rgb48_pixel_from_uint16_values(const sail_rgba64_t *rgba64, uint16_t *scan, int r, int g, int b, const struct sail_conversion_options *options);
+SAIL_HIDDEN void fill_rgb48_pixel_from_uint16_values(
+    const sail_rgba64_t* rgba64, uint16_t* scan, int r, int g, int b, const struct sail_conversion_options* options);
 
-SAIL_HIDDEN void fill_rgba32_pixel_from_uint8_values(const sail_rgba32_t *rgba32, uint8_t *scan, int r, int g, int b, int a, const struct sail_conversion_options *options);
+SAIL_HIDDEN void fill_rgba32_pixel_from_uint8_values(const sail_rgba32_t* rgba32,
+                                                     uint8_t* scan,
+                                                     int r,
+                                                     int g,
+                                                     int b,
+                                                     int a,
+                                                     const struct sail_conversion_options* options);
 
-SAIL_HIDDEN void fill_rgba32_pixel_from_uint16_values(const sail_rgba64_t *rgba64, uint8_t *scan, int r, int g, int b, int a, const struct sail_conversion_options *options);
+SAIL_HIDDEN void fill_rgba32_pixel_from_uint16_values(const sail_rgba64_t* rgba64,
+                                                      uint8_t* scan,
+                                                      int r,
+                                                      int g,
+                                                      int b,
+                                                      int a,
+                                                      const struct sail_conversion_options* options);
 
-SAIL_HIDDEN void fill_rgba64_pixel_from_uint8_values(const sail_rgba32_t *rgba32, uint16_t *scan, int r, int g, int b, int a, const struct sail_conversion_options *options);
+SAIL_HIDDEN void fill_rgba64_pixel_from_uint8_values(const sail_rgba32_t* rgba32,
+                                                     uint16_t* scan,
+                                                     int r,
+                                                     int g,
+                                                     int b,
+                                                     int a,
+                                                     const struct sail_conversion_options* options);
 
-SAIL_HIDDEN void fill_rgba64_pixel_from_uint16_values(const sail_rgba64_t *rgba64, uint16_t *scan, int r, int g, int b, int a, const struct sail_conversion_options *options);
+SAIL_HIDDEN void fill_rgba64_pixel_from_uint16_values(const sail_rgba64_t* rgba64,
+                                                      uint16_t* scan,
+                                                      int r,
+                                                      int g,
+                                                      int b,
+                                                      int a,
+                                                      const struct sail_conversion_options* options);
 
-SAIL_HIDDEN void fill_ycbcr_pixel_from_uint8_values(const sail_rgba32_t *rgba32, uint8_t *scan, const struct sail_conversion_options *options);
+SAIL_HIDDEN void fill_ycbcr_pixel_from_uint8_values(const sail_rgba32_t* rgba32,
+                                                    uint8_t* scan,
+                                                    const struct sail_conversion_options* options);
 
-SAIL_HIDDEN void fill_ycbcr_pixel_from_uint16_values(const sail_rgba64_t *rgba64, uint8_t *scan, const struct sail_conversion_options *options);
+SAIL_HIDDEN void fill_ycbcr_pixel_from_uint16_values(const sail_rgba64_t* rgba64,
+                                                     uint8_t* scan,
+                                                     const struct sail_conversion_options* options);
 
-SAIL_HIDDEN void fill_gray_alpha8_pixel_from_uint8_values(const sail_rgba32_t *rgba32, uint8_t *scan, const struct sail_conversion_options *options);
+SAIL_HIDDEN void fill_gray_alpha8_pixel_from_uint8_values(const sail_rgba32_t* rgba32,
+                                                          uint8_t* scan,
+                                                          const struct sail_conversion_options* options);
 
-SAIL_HIDDEN void fill_gray_alpha8_pixel_from_uint16_values(const sail_rgba64_t *rgba64, uint8_t *scan, const struct sail_conversion_options *options);
+SAIL_HIDDEN void fill_gray_alpha8_pixel_from_uint16_values(const sail_rgba64_t* rgba64,
+                                                           uint8_t* scan,
+                                                           const struct sail_conversion_options* options);
 
-SAIL_HIDDEN void fill_gray_alpha16_pixel_from_uint8_values(const sail_rgba32_t *rgba32, uint8_t *scan, const struct sail_conversion_options *options);
+SAIL_HIDDEN void fill_gray_alpha16_pixel_from_uint8_values(const sail_rgba32_t* rgba32,
+                                                           uint8_t* scan,
+                                                           const struct sail_conversion_options* options);
 
-SAIL_HIDDEN void fill_gray_alpha16_pixel_from_uint16_values(const sail_rgba64_t *rgba64, uint8_t *scan, const struct sail_conversion_options *options);
+SAIL_HIDDEN void fill_gray_alpha16_pixel_from_uint16_values(const sail_rgba64_t* rgba64,
+                                                            uint8_t* scan,
+                                                            const struct sail_conversion_options* options);
 
-SAIL_HIDDEN void fill_gray_alpha32_pixel_from_uint8_values(const sail_rgba32_t *rgba32, uint16_t *scan, const struct sail_conversion_options *options);
+SAIL_HIDDEN void fill_gray_alpha32_pixel_from_uint8_values(const sail_rgba32_t* rgba32,
+                                                           uint16_t* scan,
+                                                           const struct sail_conversion_options* options);
 
-SAIL_HIDDEN void fill_gray_alpha32_pixel_from_uint16_values(const sail_rgba64_t *rgba64, uint16_t *scan, const struct sail_conversion_options *options);
+SAIL_HIDDEN void fill_gray_alpha32_pixel_from_uint16_values(const sail_rgba64_t* rgba64,
+                                                            uint16_t* scan,
+                                                            const struct sail_conversion_options* options);
 
-SAIL_HIDDEN void fill_rgb555_pixel_from_uint8_values(const sail_rgba32_t *rgba32, uint16_t *scan, int r_shift, int g_shift, int b_shift, const struct sail_conversion_options *options);
+SAIL_HIDDEN void fill_rgb555_pixel_from_uint8_values(const sail_rgba32_t* rgba32,
+                                                     uint16_t* scan,
+                                                     int r_shift,
+                                                     int g_shift,
+                                                     int b_shift,
+                                                     const struct sail_conversion_options* options);
 
-SAIL_HIDDEN void fill_rgb555_pixel_from_uint16_values(const sail_rgba64_t *rgba64, uint16_t *scan, int r_shift, int g_shift, int b_shift, const struct sail_conversion_options *options);
+SAIL_HIDDEN void fill_rgb555_pixel_from_uint16_values(const sail_rgba64_t* rgba64,
+                                                      uint16_t* scan,
+                                                      int r_shift,
+                                                      int g_shift,
+                                                      int b_shift,
+                                                      const struct sail_conversion_options* options);
 
-SAIL_HIDDEN void fill_rgb565_pixel_from_uint8_values(const sail_rgba32_t *rgba32, uint16_t *scan, int r_shift, int g_shift, int b_shift, const struct sail_conversion_options *options);
+SAIL_HIDDEN void fill_rgb565_pixel_from_uint8_values(const sail_rgba32_t* rgba32,
+                                                     uint16_t* scan,
+                                                     int r_shift,
+                                                     int g_shift,
+                                                     int b_shift,
+                                                     const struct sail_conversion_options* options);
 
-SAIL_HIDDEN void fill_rgb565_pixel_from_uint16_values(const sail_rgba64_t *rgba64, uint16_t *scan, int r_shift, int g_shift, int b_shift, const struct sail_conversion_options *options);
+SAIL_HIDDEN void fill_rgb565_pixel_from_uint16_values(const sail_rgba64_t* rgba64,
+                                                      uint16_t* scan,
+                                                      int r_shift,
+                                                      int g_shift,
+                                                      int b_shift,
+                                                      const struct sail_conversion_options* options);
 
-SAIL_HIDDEN void fill_cmyk32_pixel_from_uint8_values(const sail_rgba32_t *rgba32, uint8_t *scan, const struct sail_conversion_options *options);
+SAIL_HIDDEN void fill_cmyk32_pixel_from_uint8_values(const sail_rgba32_t* rgba32,
+                                                     uint8_t* scan,
+                                                     const struct sail_conversion_options* options);
 
-SAIL_HIDDEN void fill_cmyk32_pixel_from_uint16_values(const sail_rgba64_t *rgba64, uint8_t *scan, const struct sail_conversion_options *options);
+SAIL_HIDDEN void fill_cmyk32_pixel_from_uint16_values(const sail_rgba64_t* rgba64,
+                                                      uint8_t* scan,
+                                                      const struct sail_conversion_options* options);
 
-SAIL_HIDDEN void fill_cmyk64_pixel_from_uint8_values(const sail_rgba32_t *rgba32, uint16_t *scan, const struct sail_conversion_options *options);
+SAIL_HIDDEN void fill_cmyk64_pixel_from_uint8_values(const sail_rgba32_t* rgba32,
+                                                     uint16_t* scan,
+                                                     const struct sail_conversion_options* options);
 
-SAIL_HIDDEN void fill_cmyk64_pixel_from_uint16_values(const sail_rgba64_t *rgba64, uint16_t *scan, const struct sail_conversion_options *options);
+SAIL_HIDDEN void fill_cmyk64_pixel_from_uint16_values(const sail_rgba64_t* rgba64,
+                                                      uint16_t* scan,
+                                                      const struct sail_conversion_options* options);
 
-SAIL_HIDDEN void fill_cmyka40_pixel_from_uint8_values(const sail_rgba32_t *rgba32, uint8_t *scan, const struct sail_conversion_options *options);
+SAIL_HIDDEN void fill_cmyka40_pixel_from_uint8_values(const sail_rgba32_t* rgba32,
+                                                      uint8_t* scan,
+                                                      const struct sail_conversion_options* options);
 
-SAIL_HIDDEN void fill_cmyka40_pixel_from_uint16_values(const sail_rgba64_t *rgba64, uint8_t *scan, const struct sail_conversion_options *options);
+SAIL_HIDDEN void fill_cmyka40_pixel_from_uint16_values(const sail_rgba64_t* rgba64,
+                                                       uint8_t* scan,
+                                                       const struct sail_conversion_options* options);
 
-SAIL_HIDDEN void fill_cmyka80_pixel_from_uint8_values(const sail_rgba32_t *rgba32, uint16_t *scan, const struct sail_conversion_options *options);
+SAIL_HIDDEN void fill_cmyka80_pixel_from_uint8_values(const sail_rgba32_t* rgba32,
+                                                      uint16_t* scan,
+                                                      const struct sail_conversion_options* options);
 
-SAIL_HIDDEN void fill_cmyka80_pixel_from_uint16_values(const sail_rgba64_t *rgba64, uint16_t *scan, const struct sail_conversion_options *options);
+SAIL_HIDDEN void fill_cmyka80_pixel_from_uint16_values(const sail_rgba64_t* rgba64,
+                                                       uint16_t* scan,
+                                                       const struct sail_conversion_options* options);
 
-SAIL_HIDDEN void fill_rgba16_pixel_from_uint8_values(const sail_rgba32_t *rgba32, uint16_t *scan, int r_shift, int g_shift, int b_shift, int a_shift, int bits_per_component, const struct sail_conversion_options *options);
+SAIL_HIDDEN void fill_rgba16_pixel_from_uint8_values(const sail_rgba32_t* rgba32,
+                                                     uint16_t* scan,
+                                                     int r_shift,
+                                                     int g_shift,
+                                                     int b_shift,
+                                                     int a_shift,
+                                                     int bits_per_component,
+                                                     const struct sail_conversion_options* options);
 
-SAIL_HIDDEN void fill_rgba16_pixel_from_uint16_values(const sail_rgba64_t *rgba64, uint16_t *scan, int r_shift, int g_shift, int b_shift, int a_shift, int bits_per_component, const struct sail_conversion_options *options);
+SAIL_HIDDEN void fill_rgba16_pixel_from_uint16_values(const sail_rgba64_t* rgba64,
+                                                      uint16_t* scan,
+                                                      int r_shift,
+                                                      int g_shift,
+                                                      int b_shift,
+                                                      int a_shift,
+                                                      int bits_per_component,
+                                                      const struct sail_conversion_options* options);
 
-SAIL_HIDDEN void fill_yuv24_pixel_from_uint8_values(const sail_rgba32_t *rgba32, uint8_t *scan, const struct sail_conversion_options *options);
+SAIL_HIDDEN void fill_yuv24_pixel_from_uint8_values(const sail_rgba32_t* rgba32,
+                                                    uint8_t* scan,
+                                                    const struct sail_conversion_options* options);
 
-SAIL_HIDDEN void fill_yuv24_pixel_from_uint16_values(const sail_rgba64_t *rgba64, uint8_t *scan, const struct sail_conversion_options *options);
+SAIL_HIDDEN void fill_yuv24_pixel_from_uint16_values(const sail_rgba64_t* rgba64,
+                                                     uint8_t* scan,
+                                                     const struct sail_conversion_options* options);

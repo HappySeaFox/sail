@@ -28,13 +28,14 @@
 #include <stdbool.h>
 #include <stddef.h> /* size_t */
 #include <stdint.h>
-#include <stdio.h>  /* SEEK_CUR */
+#include <stdio.h> /* SEEK_CUR */
 
 #include <sail-common/export.h>
 #include <sail-common/status.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 /*
@@ -44,7 +45,7 @@ extern "C" {
  *
  * Returns SAIL_OK on success.
  */
-typedef sail_status_t (*sail_io_tolerant_read_t)(void *stream, void *buf, size_t size_to_read, size_t *read_size);
+typedef sail_status_t (*sail_io_tolerant_read_t)(void* stream, void* buf, size_t size_to_read, size_t* read_size);
 
 /*
  * Reads from the underlying I/O object into the specified buffer. In contrast to sail_io_tolerant_read_t,
@@ -52,7 +53,7 @@ typedef sail_status_t (*sail_io_tolerant_read_t)(void *stream, void *buf, size_t
  *
  * Returns SAIL_OK on success.
  */
-typedef sail_status_t (*sail_io_strict_read_t)(void *stream, void *buf, size_t size_to_read);
+typedef sail_status_t (*sail_io_strict_read_t)(void* stream, void* buf, size_t size_to_read);
 
 /*
  * Writes the specified buffer to the underlying I/O object. In contrast to sail_io_strict_write_t,
@@ -61,7 +62,10 @@ typedef sail_status_t (*sail_io_strict_read_t)(void *stream, void *buf, size_t s
  *
  * Returns SAIL_OK on success.
  */
-typedef sail_status_t (*sail_io_tolerant_write_t)(void *stream, const void *buf, size_t size_to_write, size_t *written_size);
+typedef sail_status_t (*sail_io_tolerant_write_t)(void* stream,
+                                                  const void* buf,
+                                                  size_t size_to_write,
+                                                  size_t* written_size);
 
 /*
  * Writes the specified buffer to the underlying I/O object. In contrast to sail_io_tolerant_write_t,
@@ -69,7 +73,7 @@ typedef sail_status_t (*sail_io_tolerant_write_t)(void *stream, const void *buf,
  *
  * Returns SAIL_OK on success.
  */
-typedef sail_status_t (*sail_io_strict_write_t)(void *stream, const void *buf, size_t size_to_write);
+typedef sail_status_t (*sail_io_strict_write_t)(void* stream, const void* buf, size_t size_to_write);
 
 /*
  * Sets the I/O position in the underlying I/O object.
@@ -78,14 +82,14 @@ typedef sail_status_t (*sail_io_strict_write_t)(void *stream, const void *buf, s
  *
  * Returns SAIL_OK on success.
  */
-typedef sail_status_t (*sail_io_seek_t)(void *stream, long offset, int whence);
+typedef sail_status_t (*sail_io_seek_t)(void* stream, long offset, int whence);
 
 /*
  * Assigns the current I/O position in the underlying I/O object.
  *
  * Returns SAIL_OK on success.
  */
-typedef sail_status_t (*sail_io_tell_t)(void *stream, size_t *offset);
+typedef sail_status_t (*sail_io_tell_t)(void* stream, size_t* offset);
 
 /*
  * Flushes buffers of the underlying I/O object. Has no effect if the underlying I/O object
@@ -93,7 +97,7 @@ typedef sail_status_t (*sail_io_tell_t)(void *stream, size_t *offset);
  *
  * Returns SAIL_OK on success.
  */
-typedef sail_status_t (*sail_io_flush_t)(void *stream);
+typedef sail_status_t (*sail_io_flush_t)(void* stream);
 
 /*
  * Closes the underlying I/O object. Using the I/O object after closing it
@@ -101,7 +105,7 @@ typedef sail_status_t (*sail_io_flush_t)(void *stream);
  *
  * Returns SAIL_OK on success.
  */
-typedef sail_status_t (*sail_io_close_t)(void *stream);
+typedef sail_status_t (*sail_io_close_t)(void* stream);
 
 /*
  * Assigns true to the specified result if the underlying I/O object
@@ -109,10 +113,11 @@ typedef sail_status_t (*sail_io_close_t)(void *stream);
  *
  * Returns SAIL_OK on success.
  */
-typedef sail_status_t (*sail_io_eof_t)(void *stream, bool *result);
+typedef sail_status_t (*sail_io_eof_t)(void* stream, bool* result);
 
 /* I/O features. */
-enum SailIoFeature {
+enum SailIoFeature
+{
 
     /*
      * The I/O object is seekable. When this flag is off, the seek callback
@@ -125,7 +130,8 @@ enum SailIoFeature {
  * sail_io represents an input/output abstraction. Use sail_alloc_io_read_file() and brothers to
  * allocate I/O objects.
  */
-struct sail_io {
+struct sail_io
+{
 
     /*
      * Or-ed I/O features. See SailIoFeature.
@@ -135,7 +141,7 @@ struct sail_io {
     /*
      * I/O-specific data object. For example, a pointer to a FILE.
      */
-    void *stream;
+    void* stream;
 
     /*
      * Tolerant read callback.
@@ -190,7 +196,7 @@ typedef struct sail_io sail_io_t;
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_io(struct sail_io **io);
+SAIL_EXPORT sail_status_t sail_alloc_io(struct sail_io** io);
 
 /*
  * Closes and destroys the specified I/O object and all its internal allocated memory buffers.
@@ -201,21 +207,21 @@ SAIL_EXPORT sail_status_t sail_alloc_io(struct sail_io **io);
  *
  * Does nothing if the I/O object is NULL.
  */
-SAIL_EXPORT void sail_destroy_io(struct sail_io *io);
+SAIL_EXPORT void sail_destroy_io(struct sail_io* io);
 
 /*
  * Returns SAIL_OK if the given I/O object has valid callbacks and a non-zero id.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_check_io_valid(const struct sail_io *io);
+SAIL_EXPORT sail_status_t sail_check_io_valid(const struct sail_io* io);
 
 /*
  * Retrieves the I/O stream size. The stream must be seekable.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_io_size(struct sail_io *io, size_t *size);
+SAIL_EXPORT sail_status_t sail_io_size(struct sail_io* io, size_t* size);
 
 /*
  * Reads the specified I/O stream until EOF into the memory buffer. Reads the stream
@@ -223,7 +229,7 @@ SAIL_EXPORT sail_status_t sail_io_size(struct sail_io *io, size_t *size);
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_io_contents_into_data(struct sail_io *io, void *data);
+SAIL_EXPORT sail_status_t sail_io_contents_into_data(struct sail_io* io, void* data);
 
 /*
  * Allocates a memory buffer and reads the specified I/O stream until EOF into it.
@@ -233,7 +239,7 @@ SAIL_EXPORT sail_status_t sail_io_contents_into_data(struct sail_io *io, void *d
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_data_from_io_contents(struct sail_io *io, void **data, size_t *data_size);
+SAIL_EXPORT sail_status_t sail_alloc_data_from_io_contents(struct sail_io* io, void** data, size_t* data_size);
 
 /*
  * Reads a string ended with '\n' from the I/O stream. Trailing new line characters
@@ -241,7 +247,7 @@ SAIL_EXPORT sail_status_t sail_alloc_data_from_io_contents(struct sail_io *io, v
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_read_string_from_io(struct sail_io *io, char *str, size_t str_size);
+SAIL_EXPORT sail_status_t sail_read_string_from_io(struct sail_io* io, char* str, size_t str_size);
 
 /* extern "C" */
 #ifdef __cplusplus

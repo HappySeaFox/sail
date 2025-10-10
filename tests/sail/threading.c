@@ -26,17 +26,17 @@
 #include <stdbool.h>
 
 #ifdef _WIN32
-    #include <windows.h>
-    typedef HANDLE thread_t;
-    typedef DWORD (WINAPI *thread_func_t)(LPVOID);
-    #define THREAD_RETURN DWORD WINAPI
-    #define THREAD_RETURN_VALUE 0
+#include <windows.h>
+typedef HANDLE thread_t;
+typedef DWORD(WINAPI* thread_func_t)(LPVOID);
+#define THREAD_RETURN DWORD WINAPI
+#define THREAD_RETURN_VALUE 0
 #else
-    #include <pthread.h>
-    typedef pthread_t thread_t;
-    typedef void* (*thread_func_t)(void*);
-    #define THREAD_RETURN void*
-    #define THREAD_RETURN_VALUE NULL
+#include <pthread.h>
+typedef pthread_t thread_t;
+typedef void* (*thread_func_t)(void*);
+#define THREAD_RETURN void*
+#define THREAD_RETURN_VALUE NULL
 #endif
 
 #include <sail/sail.h>
@@ -47,7 +47,8 @@
 
 #define NUM_THREADS 4
 
-struct thread_data {
+struct thread_data
+{
     const char* path;
     bool success;
     int thread_id;
@@ -81,11 +82,12 @@ static THREAD_RETURN load_image_thread(void* arg)
     struct thread_data* data = (struct thread_data*)arg;
 
     struct sail_image* image = NULL;
-    sail_status_t status = sail_load_from_file(data->path, &image);
+    sail_status_t status     = sail_load_from_file(data->path, &image);
 
     data->success = (status == SAIL_OK && image != NULL);
 
-    if (image != NULL) {
+    if (image != NULL)
+    {
         sail_destroy_image(image);
     }
 
@@ -101,16 +103,18 @@ static MunitResult test_threading_concurrent_loads(const MunitParameter params[]
     thread_t threads[NUM_THREADS];
     struct thread_data thread_data[NUM_THREADS];
 
-    for (int i = 0; i < NUM_THREADS && SAIL_TEST_IMAGES[i] != NULL; i++) {
-        thread_data[i].path = SAIL_TEST_IMAGES[i];
-        thread_data[i].success = false;
+    for (int i = 0; i < NUM_THREADS && SAIL_TEST_IMAGES[i] != NULL; i++)
+    {
+        thread_data[i].path      = SAIL_TEST_IMAGES[i];
+        thread_data[i].success   = false;
         thread_data[i].thread_id = i;
 
         int result = create_thread(&threads[i], load_image_thread, &thread_data[i]);
         munit_assert(result == 0);
     }
 
-    for (int i = 0; i < NUM_THREADS && SAIL_TEST_IMAGES[i] != NULL; i++) {
+    for (int i = 0; i < NUM_THREADS && SAIL_TEST_IMAGES[i] != NULL; i++)
+    {
         join_thread(threads[i]);
         munit_assert(thread_data[i].success);
     }
@@ -124,11 +128,12 @@ static THREAD_RETURN load_same_image_thread(void* arg)
     struct thread_data* data = (struct thread_data*)arg;
 
     struct sail_image* image = NULL;
-    sail_status_t status = sail_load_from_file(data->path, &image);
+    sail_status_t status     = sail_load_from_file(data->path, &image);
 
     data->success = (status == SAIL_OK && image != NULL);
 
-    if (image != NULL) {
+    if (image != NULL)
+    {
         sail_destroy_image(image);
     }
 
@@ -146,16 +151,18 @@ static MunitResult test_threading_same_image_loads(const MunitParameter params[]
     thread_t threads[NUM_THREADS];
     struct thread_data thread_data[NUM_THREADS];
 
-    for (int i = 0; i < NUM_THREADS; i++) {
-        thread_data[i].path = path;
-        thread_data[i].success = false;
+    for (int i = 0; i < NUM_THREADS; i++)
+    {
+        thread_data[i].path      = path;
+        thread_data[i].success   = false;
         thread_data[i].thread_id = i;
 
         int result = create_thread(&threads[i], load_same_image_thread, &thread_data[i]);
         munit_assert(result == 0);
     }
 
-    for (int i = 0; i < NUM_THREADS; i++) {
+    for (int i = 0; i < NUM_THREADS; i++)
+    {
         join_thread(threads[i]);
         munit_assert(thread_data[i].success);
     }
@@ -169,7 +176,7 @@ static THREAD_RETURN codec_info_thread(void* arg)
     struct thread_data* data = (struct thread_data*)arg;
 
     const struct sail_codec_info* codec_info = NULL;
-    sail_status_t status = sail_codec_info_from_path(data->path, &codec_info);
+    sail_status_t status                     = sail_codec_info_from_path(data->path, &codec_info);
 
     data->success = (status == SAIL_OK && codec_info != NULL);
 
@@ -185,16 +192,18 @@ static MunitResult test_threading_codec_info_queries(const MunitParameter params
     thread_t threads[NUM_THREADS];
     struct thread_data thread_data[NUM_THREADS];
 
-    for (int i = 0; i < NUM_THREADS && SAIL_TEST_IMAGES[i] != NULL; i++) {
-        thread_data[i].path = SAIL_TEST_IMAGES[i];
-        thread_data[i].success = false;
+    for (int i = 0; i < NUM_THREADS && SAIL_TEST_IMAGES[i] != NULL; i++)
+    {
+        thread_data[i].path      = SAIL_TEST_IMAGES[i];
+        thread_data[i].success   = false;
         thread_data[i].thread_id = i;
 
         int result = create_thread(&threads[i], codec_info_thread, &thread_data[i]);
         munit_assert(result == 0);
     }
 
-    for (int i = 0; i < NUM_THREADS && SAIL_TEST_IMAGES[i] != NULL; i++) {
+    for (int i = 0; i < NUM_THREADS && SAIL_TEST_IMAGES[i] != NULL; i++)
+    {
         join_thread(threads[i]);
         munit_assert(thread_data[i].success);
     }
@@ -207,14 +216,16 @@ static THREAD_RETURN advanced_load_thread(void* arg)
 {
     struct thread_data* data = (struct thread_data*)arg;
 
-    void* state = NULL;
+    void* state          = NULL;
     sail_status_t status = sail_start_loading_from_file(data->path, NULL, &state);
 
-    if (status == SAIL_OK) {
+    if (status == SAIL_OK)
+    {
         struct sail_image* image = NULL;
-        status = sail_load_next_frame(state, &image);
+        status                   = sail_load_next_frame(state, &image);
 
-        if (status == SAIL_OK && image != NULL) {
+        if (status == SAIL_OK && image != NULL)
+        {
             data->success = true;
             sail_destroy_image(image);
         }
@@ -234,16 +245,18 @@ static MunitResult test_threading_advanced_api(const MunitParameter params[], vo
     thread_t threads[NUM_THREADS];
     struct thread_data thread_data[NUM_THREADS];
 
-    for (int i = 0; i < NUM_THREADS && SAIL_TEST_IMAGES[i] != NULL; i++) {
-        thread_data[i].path = SAIL_TEST_IMAGES[i];
-        thread_data[i].success = false;
+    for (int i = 0; i < NUM_THREADS && SAIL_TEST_IMAGES[i] != NULL; i++)
+    {
+        thread_data[i].path      = SAIL_TEST_IMAGES[i];
+        thread_data[i].success   = false;
         thread_data[i].thread_id = i;
 
         int result = create_thread(&threads[i], advanced_load_thread, &thread_data[i]);
         munit_assert(result == 0);
     }
 
-    for (int i = 0; i < NUM_THREADS && SAIL_TEST_IMAGES[i] != NULL; i++) {
+    for (int i = 0; i < NUM_THREADS && SAIL_TEST_IMAGES[i] != NULL; i++)
+    {
         join_thread(threads[i]);
         munit_assert(thread_data[i].success);
     }
@@ -262,16 +275,18 @@ static MunitResult test_threading_context_init_race(const MunitParameter params[
     thread_t threads[NUM_THREADS];
     struct thread_data thread_data[NUM_THREADS];
 
-    for (int i = 0; i < NUM_THREADS && SAIL_TEST_IMAGES[i] != NULL; i++) {
-        thread_data[i].path = SAIL_TEST_IMAGES[i];
-        thread_data[i].success = false;
+    for (int i = 0; i < NUM_THREADS && SAIL_TEST_IMAGES[i] != NULL; i++)
+    {
+        thread_data[i].path      = SAIL_TEST_IMAGES[i];
+        thread_data[i].success   = false;
         thread_data[i].thread_id = i;
 
         int result = create_thread(&threads[i], load_image_thread, &thread_data[i]);
         munit_assert(result == 0);
     }
 
-    for (int i = 0; i < NUM_THREADS && SAIL_TEST_IMAGES[i] != NULL; i++) {
+    for (int i = 0; i < NUM_THREADS && SAIL_TEST_IMAGES[i] != NULL; i++)
+    {
         join_thread(threads[i]);
         munit_assert(thread_data[i].success);
     }

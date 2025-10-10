@@ -33,11 +33,12 @@
 
 struct sail_io;
 
-struct sail_jpeg_destination_mgr {
+struct sail_jpeg_destination_mgr
+{
     struct jpeg_destination_mgr pub; /* public fields */
 
-    struct sail_io *io;                /* target stream */
-    JOCTET *buffer;             /* start of buffer */
+    struct sail_io* io; /* target stream */
+    JOCTET* buffer;     /* start of buffer */
 };
 
-SAIL_HIDDEN void jpeg_private_sail_io_dest(j_compress_ptr cinfo, struct sail_io *io);
+SAIL_HIDDEN void jpeg_private_sail_io_dest(j_compress_ptr cinfo, struct sail_io* io);

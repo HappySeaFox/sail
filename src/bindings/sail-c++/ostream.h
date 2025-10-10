@@ -30,10 +30,10 @@
 #include <sail-common/common.h>
 #include <sail-common/export.h>
 
-SAIL_EXPORT std::ostream& operator<<(std::ostream &os, SailPixelFormat pixel_format);
-SAIL_EXPORT std::ostream& operator<<(std::ostream &os, SailChromaSubsampling chroma_subsampling);
-SAIL_EXPORT std::ostream& operator<<(std::ostream &os, SailOrientation orientation);
-SAIL_EXPORT std::ostream& operator<<(std::ostream &os, SailCompression compression);
-SAIL_EXPORT std::ostream& operator<<(std::ostream &os, SailMetaData meta_data);
-SAIL_EXPORT std::ostream& operator<<(std::ostream &os, SailResolutionUnit resolution_unit);
-SAIL_EXPORT std::ostream& operator<<(std::ostream &os, SailCodecFeature codec_feature);
+SAIL_EXPORT std::ostream& operator<<(std::ostream& os, SailPixelFormat pixel_format);
+SAIL_EXPORT std::ostream& operator<<(std::ostream& os, SailChromaSubsampling chroma_subsampling);
+SAIL_EXPORT std::ostream& operator<<(std::ostream& os, SailOrientation orientation);
+SAIL_EXPORT std::ostream& operator<<(std::ostream& os, SailCompression compression);
+SAIL_EXPORT std::ostream& operator<<(std::ostream& os, SailMetaData meta_data);
+SAIL_EXPORT std::ostream& operator<<(std::ostream& os, SailResolutionUnit resolution_unit);
+SAIL_EXPORT std::ostream& operator<<(std::ostream& os, SailCodecFeature codec_feature);

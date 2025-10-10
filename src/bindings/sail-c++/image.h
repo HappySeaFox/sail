@@ -36,8 +36,8 @@
 
 #include <sail-c++/iccp.h>
 #include <sail-c++/palette.h>
-#include <sail-c++/source_image.h>
 #include <sail-c++/resolution.h>
+#include <sail-c++/source_image.h>
 
 struct sail_image;
 
@@ -66,7 +66,7 @@ public:
      * Constructs a new image out of the specified file path. Reads just a single frame
      * from the file.
      */
-    explicit image(const std::string &path);
+    explicit image(const std::string& path);
 
     /*
      * Constructs a new image out of the specified image properties and allocates the pixels
@@ -86,33 +86,33 @@ public:
      * Assumes the pixels have no padding bytes in the end of every scan line. The pixels
      * must remain valid as long as the image exists.
      */
-    image(void *pixels, SailPixelFormat pixel_format, unsigned width, unsigned height);
+    image(void* pixels, SailPixelFormat pixel_format, unsigned width, unsigned height);
 
     /*
      * Constructs a new image out of the specified image properties and the pixels.
      * The pixels must remain valid as long as the image exists.
      */
-    image(void *pixels, SailPixelFormat pixel_format, unsigned width, unsigned height, unsigned bytes_per_line);
+    image(void* pixels, SailPixelFormat pixel_format, unsigned width, unsigned height, unsigned bytes_per_line);
 
     /*
      * Makes a deep copy of the image.
      */
-    image(const image &img);
+    image(const image& img);
 
     /*
      * Makes a deep copy of the image.
      */
-    image& operator=(const sail::image &image);
+    image& operator=(const sail::image& image);
 
     /*
      * Moves the image.
      */
-    image(sail::image &&image) noexcept;
+    image(sail::image&& image) noexcept;
 
     /*
      * Moves the image.
      */
-    image& operator=(sail::image &&image) noexcept;
+    image& operator=(sail::image&& image) noexcept;
 
     /*
      * Destroys the image and the deep copied pixel data.
@@ -311,12 +311,12 @@ public:
     /*
      * Sets a new resolution.
      */
-    void set_resolution(const sail::resolution &resolution);
+    void set_resolution(const sail::resolution& resolution);
 
     /*
      * Sets a new resolution.
      */
-    void set_resolution(sail::resolution &&resolution) noexcept;
+    void set_resolution(sail::resolution&& resolution) noexcept;
 
     /*
      * Sets a new gamma.
@@ -331,42 +331,42 @@ public:
     /*
      * Sets a new palette.
      */
-    void set_palette(const sail::palette &palette);
+    void set_palette(const sail::palette& palette);
 
     /*
      * Sets a new palette.
      */
-    void set_palette(sail::palette &&palette) noexcept;
+    void set_palette(sail::palette&& palette) noexcept;
 
     /*
      * Sets new meta data.
      */
-    void set_meta_data(const std::vector<sail::meta_data> &meta_data);
+    void set_meta_data(const std::vector<sail::meta_data>& meta_data);
 
     /*
      * Sets new meta data.
      */
-    void set_meta_data(std::vector<sail::meta_data> &&meta_data) noexcept;
+    void set_meta_data(std::vector<sail::meta_data>&& meta_data) noexcept;
 
     /*
      * Sets a new ICC profile.
      */
-    void set_iccp(const sail::iccp &iccp);
+    void set_iccp(const sail::iccp& iccp);
 
     /*
      * Sets a new ICC profile.
      */
-    void set_iccp(sail::iccp &&iccp) noexcept;
+    void set_iccp(sail::iccp&& iccp) noexcept;
 
     /*
      * Sets new special properties.
      */
-    void set_special_properties(const sail::special_properties &special_properties);
+    void set_special_properties(const sail::special_properties& special_properties);
 
     /*
      * Sets new special properties.
      */
-    void set_special_properties(sail::special_properties &&special_properties) noexcept;
+    void set_special_properties(sail::special_properties&& special_properties) noexcept;
 
     /*
      * Replaces the image with the image from the specified file path. Reads just a single frame
@@ -374,14 +374,14 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t load(const std::string &path);
+    sail_status_t load(const std::string& path);
 
     /*
      * Saves the image with into the specified file path.
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t save(const std::string &path);
+    sail_status_t save(const std::string& path);
 
     /*
      * Returns true if the image can be converted into the specified pixel format.
@@ -422,7 +422,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t convert(SailPixelFormat pixel_format, const conversion_options &options);
+    sail_status_t convert(SailPixelFormat pixel_format, const conversion_options& options);
 
     /*
      * Converts the image to the best pixel format for saving. Use can_convert()
@@ -442,7 +442,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t convert(const sail::save_features &save_features);
+    sail_status_t convert(const sail::save_features& save_features);
 
     /*
      * Converts the image to the best pixel format for saving using the specified conversion options.
@@ -458,7 +458,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t convert(const sail::save_features &save_features, const conversion_options &options);
+    sail_status_t convert(const sail::save_features& save_features, const conversion_options& options);
 
     /*
      * Converts the image to the specified pixel format and assigns the resulting image to the 'image' argument.
@@ -476,7 +476,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t convert_to(SailPixelFormat pixel_format, sail::image *image) const;
+    sail_status_t convert_to(SailPixelFormat pixel_format, sail::image* image) const;
 
     /*
      * Converts the image to the specified pixel format using the specified conversion options
@@ -491,7 +491,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t convert_to(SailPixelFormat pixel_format, const conversion_options &options, sail::image *image) const;
+    sail_status_t convert_to(SailPixelFormat pixel_format, const conversion_options& options, sail::image* image) const;
 
     /*
      * Converts the image to the best pixel format for saving and assigns the resulting image to the 'image' argument.
@@ -509,7 +509,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t convert_to(const sail::save_features &save_features, sail::image *image) const;
+    sail_status_t convert_to(const sail::save_features& save_features, sail::image* image) const;
 
     /*
      * Converts the image to the best pixel format for saving using the specified conversion options
@@ -524,7 +524,9 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t convert_to(const sail::save_features &save_features, const conversion_options &options, sail::image *image) const;
+    sail_status_t convert_to(const sail::save_features& save_features,
+                             const conversion_options& options,
+                             sail::image* image) const;
 
     /*
      * Converts the image to the specified pixel format and returns the resulting image.
@@ -557,7 +559,7 @@ public:
      *
      * Returns an invalid image on error.
      */
-    image convert_to(SailPixelFormat pixel_format, const conversion_options &options) const;
+    image convert_to(SailPixelFormat pixel_format, const conversion_options& options) const;
 
     /*
      * Converts the image to the best pixel format for saving and returns the resulting image.
@@ -575,7 +577,7 @@ public:
      *
      * Returns an invalid image on error.
      */
-    image convert_to(const sail::save_features &save_features) const;
+    image convert_to(const sail::save_features& save_features) const;
 
     /*
      * Converts the image to the best pixel format for saving using the specified conversion options
@@ -590,7 +592,7 @@ public:
      *
      * Returns an invalid image on error.
      */
-    image convert_to(const sail::save_features &save_features, const conversion_options &options) const;
+    image convert_to(const sail::save_features& save_features, const conversion_options& options) const;
 
     /*
      * Returns the closest pixel format from the list.
@@ -599,7 +601,7 @@ public:
      *
      * Returns SAIL_PIXEL_FORMAT_UNKNOWN if no candidates found at all.
      */
-    SailPixelFormat closest_pixel_format(const std::vector<SailPixelFormat> &pixel_formats) const;
+    SailPixelFormat closest_pixel_format(const std::vector<SailPixelFormat>& pixel_formats) const;
 
     /*
      * Returns the closest pixel format from the save features.
@@ -608,7 +610,7 @@ public:
      *
      * Returns SAIL_PIXEL_FORMAT_UNKNOWN if no candidates found at all.
      */
-    SailPixelFormat closest_pixel_format(const sail::save_features &save_features) const;
+    SailPixelFormat closest_pixel_format(const sail::save_features& save_features) const;
 
     /*
      * Mirrors the image horizontally or vertically.
@@ -634,7 +636,8 @@ public:
      *
      * Returns SAIL_PIXEL_FORMAT_UNKNOWN if no candidates found at all.
      */
-    static SailPixelFormat closest_pixel_format(SailPixelFormat input_pixel_format, const std::vector<SailPixelFormat> &pixel_formats);
+    static SailPixelFormat closest_pixel_format(SailPixelFormat input_pixel_format,
+                                                const std::vector<SailPixelFormat>& pixel_formats);
 
     /*
      * Returns the closest pixel format to the input pixel format from the save features.
@@ -643,7 +646,8 @@ public:
      *
      * Returns SAIL_PIXEL_FORMAT_UNKNOWN if no candidates found at all.
      */
-    static SailPixelFormat closest_pixel_format(SailPixelFormat input_pixel_format, const sail::save_features &save_features);
+    static SailPixelFormat closest_pixel_format(SailPixelFormat input_pixel_format,
+                                                const sail::save_features& save_features);
 
     /*
      * Returns the number of bits per pixel of the specified pixel format.
@@ -695,7 +699,7 @@ public:
      *
      * Returns SAIL_PIXEL_FORMAT_UNKNOWN if the pixel format is not known.
      */
-    static SailPixelFormat pixel_format_from_string(const std::string &str);
+    static SailPixelFormat pixel_format_from_string(const std::string& str);
 
     /*
      * Returns a string representation of the specified chroma subsampling.
@@ -711,7 +715,7 @@ public:
      *
      * Returns SAIL_CHROMA_SUBSAMPLING_UNKNOWN if the chroma subsampling is not known.
      */
-    static SailChromaSubsampling chroma_subsampling_from_string(const std::string &str);
+    static SailChromaSubsampling chroma_subsampling_from_string(const std::string& str);
 
     /*
      * Returns a string representation of the specified orientation. See SailOrientation.
@@ -727,7 +731,7 @@ public:
      *
      * Returns SAIL_ORIENTATION_NORMAL if the orientation is not known.
      */
-    static SailOrientation orientation_from_string(const std::string &str);
+    static SailOrientation orientation_from_string(const std::string& str);
 
     /*
      * Returns string representation of the specified compression type. See SailCompression.
@@ -743,32 +747,32 @@ public:
      *
      * Returns SAIL_COMPRESSION_UNKNOWN if the compression is not known.
      */
-    static SailCompression compression_from_string(const std::string &str);
+    static SailCompression compression_from_string(const std::string& str);
 
 private:
     /*
      * Makes a deep copy of the specified image. The pixels are transferred. The caller must set the pixels
      * in the sail_image object to NULL afterwards to avoid destructing them in sail_destroy_image().
      */
-    image(const sail_image *sail_image);
+    image(const sail_image* sail_image);
 
-    sail_status_t transfer_pixels_pointer(const sail_image *sail_image);
+    sail_status_t transfer_pixels_pointer(const sail_image* sail_image);
 
-    sail_status_t to_sail_image(sail_image **image) const;
+    sail_status_t to_sail_image(sail_image** image) const;
 
     void set_dimensions(unsigned width, unsigned height);
     void set_pixel_format(SailPixelFormat pixel_format);
     void set_bytes_per_line(unsigned bytes_per_line);
     void set_bytes_per_line_auto();
-    void set_pixels(const void *pixels);
-    void set_pixels(const void *pixels, std::size_t pixels_size);
-    void set_shallow_pixels(void *pixels);
-    void set_shallow_pixels(void *pixels, std::size_t pixels_size);
-    void set_source_image(const sail::source_image &source_image);
+    void set_pixels(const void* pixels);
+    void set_pixels(const void* pixels, std::size_t pixels_size);
+    void set_shallow_pixels(void* pixels);
+    void set_shallow_pixels(void* pixels, std::size_t pixels_size);
+    void set_source_image(const sail::source_image& source_image);
 
 private:
     class pimpl;
     std::unique_ptr<pimpl> d;
 };
 
-}
+} // namespace sail

@@ -145,7 +145,7 @@ static MunitResult test_technical_diver_save_to_io_file(const MunitParameter par
     }
 
     struct sail_image* image_to_save = NULL;
-    sail_status_t conv_status = sail_convert_image_for_saving(image, codec_info->save_features, &image_to_save);
+    sail_status_t conv_status        = sail_convert_image_for_saving(image, codec_info->save_features, &image_to_save);
 
     if (conv_status != SAIL_OK)
     {
@@ -168,7 +168,7 @@ static MunitResult test_technical_diver_save_to_io_file(const MunitParameter par
     struct sail_io* io;
     munit_assert(sail_alloc_io_read_write_file(temp_path, &io) == SAIL_OK);
 
-    void* state = NULL;
+    void* state          = NULL;
     sail_status_t status = sail_start_saving_into_io(io, codec_info, &state);
 
     if (status == SAIL_OK)
@@ -217,7 +217,7 @@ static MunitResult test_technical_diver_save_to_io_memory(const MunitParameter p
     }
 
     struct sail_image* image_to_save = NULL;
-    sail_status_t conv_status = sail_convert_image_for_saving(image, codec_info->save_features, &image_to_save);
+    sail_status_t conv_status        = sail_convert_image_for_saving(image, codec_info->save_features, &image_to_save);
 
     if (conv_status != SAIL_OK)
     {
@@ -232,7 +232,7 @@ static MunitResult test_technical_diver_save_to_io_memory(const MunitParameter p
     struct sail_io* io;
     munit_assert(sail_alloc_io_read_write_memory(buffer, buffer_size, &io) == SAIL_OK);
 
-    void* state = NULL;
+    void* state          = NULL;
     sail_status_t status = sail_start_saving_into_io(io, codec_info, &state);
 
     if (status == SAIL_OK)
@@ -281,7 +281,7 @@ static MunitResult test_technical_diver_save_to_io_with_options(const MunitParam
     }
 
     struct sail_image* image_to_save = NULL;
-    sail_status_t conv_status = sail_convert_image_for_saving(image, codec_info->save_features, &image_to_save);
+    sail_status_t conv_status        = sail_convert_image_for_saving(image, codec_info->save_features, &image_to_save);
 
     if (conv_status != SAIL_OK)
     {
@@ -307,7 +307,7 @@ static MunitResult test_technical_diver_save_to_io_with_options(const MunitParam
     struct sail_save_options* save_options;
     munit_assert(sail_alloc_save_options_from_features(codec_info->save_features, &save_options) == SAIL_OK);
 
-    void* state = NULL;
+    void* state          = NULL;
     sail_status_t status = sail_start_saving_into_io_with_options(io, codec_info, save_options, &state);
 
     if (status == SAIL_OK)
@@ -438,7 +438,7 @@ static MunitResult test_technical_diver_io_roundtrip(const MunitParameter params
     }
 
     struct sail_image* image_to_save = NULL;
-    sail_status_t conv_status = sail_convert_image_for_saving(image1, codec_info->save_features, &image_to_save);
+    sail_status_t conv_status        = sail_convert_image_for_saving(image1, codec_info->save_features, &image_to_save);
 
     if (conv_status != SAIL_OK)
     {
@@ -461,7 +461,7 @@ static MunitResult test_technical_diver_io_roundtrip(const MunitParameter params
     struct sail_io* io2;
     munit_assert(sail_alloc_io_read_write_file(temp_path, &io2) == SAIL_OK);
 
-    void* state2 = NULL;
+    void* state2              = NULL;
     sail_status_t save_status = sail_start_saving_into_io(io2, codec_info, &state2);
 
     if (save_status == SAIL_OK)

@@ -31,7 +31,8 @@
 #include <sail-common/status.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 struct sail_hash_map;
@@ -42,66 +43,72 @@ struct sail_variant;
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_hash_map(struct sail_hash_map **hash_map);
+SAIL_EXPORT sail_status_t sail_alloc_hash_map(struct sail_hash_map** hash_map);
 
 /*
  * Destroys the specified hash map. Does nothing if the hash map is NULL.
  */
-SAIL_EXPORT void sail_destroy_hash_map(struct sail_hash_map *hash_map);
+SAIL_EXPORT void sail_destroy_hash_map(struct sail_hash_map* hash_map);
 
 /*
  * Puts a new key-value pair into the hash map. The value gets deep copied.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_put_hash_map(struct sail_hash_map *hash_map, const char *key, const struct sail_variant *value);
+SAIL_EXPORT sail_status_t sail_put_hash_map(struct sail_hash_map* hash_map,
+                                            const char* key,
+                                            const struct sail_variant* value);
 
 /*
  * Returns true if the hash map contains the specified key.
  */
-SAIL_EXPORT bool sail_hash_map_has_key(const struct sail_hash_map *hash_map, const char *key);
+SAIL_EXPORT bool sail_hash_map_has_key(const struct sail_hash_map* hash_map, const char* key);
 
 /*
  * Returns the key associated value or NULL.
  */
-SAIL_EXPORT struct sail_variant* sail_hash_map_value(const struct sail_hash_map *hash_map, const char *key);
+SAIL_EXPORT struct sail_variant* sail_hash_map_value(const struct sail_hash_map* hash_map, const char* key);
 
 /*
  * Returns the number of keys stored in the hash map.
  */
-SAIL_EXPORT unsigned sail_hash_map_size(const struct sail_hash_map *hash_map);
+SAIL_EXPORT unsigned sail_hash_map_size(const struct sail_hash_map* hash_map);
 
 /*
  * Traverses the hash map in random order and calls the callback function on every key-value pair.
  * If the callback returns false, the loop stops at the current element.
  */
-SAIL_EXPORT void sail_traverse_hash_map(const struct sail_hash_map *hash_map, bool (*callback)(const char *key, const struct sail_variant *value));
+SAIL_EXPORT void sail_traverse_hash_map(const struct sail_hash_map* hash_map,
+                                        bool (*callback)(const char* key, const struct sail_variant* value));
 
 /*
  * Traverses the hash map in random order and calls the callback function on every key-value pair.
  * Additionally passes the specfied user data to the callback.
  * If the callback returns false, the loop stops at the current element.
  */
-SAIL_EXPORT void sail_traverse_hash_map_with_user_data(const struct sail_hash_map *hash_map,
-                                                       bool (*callback)(const char *key, const struct sail_variant *value, void *user_data),
-                                                       void *user_data);
+SAIL_EXPORT void sail_traverse_hash_map_with_user_data(const struct sail_hash_map* hash_map,
+                                                       bool (*callback)(const char* key,
+                                                                        const struct sail_variant* value,
+                                                                        void* user_data),
+                                                       void* user_data);
 
 /*
  * Erases the key-value pair from the hash map.
  */
-SAIL_EXPORT void sail_erase_hash_map_key(struct sail_hash_map *hash_map, const char *key);
+SAIL_EXPORT void sail_erase_hash_map_key(struct sail_hash_map* hash_map, const char* key);
 
 /*
  * Removes all the key-value pairs from the hash map.
  */
-SAIL_EXPORT void sail_clear_hash_map(struct sail_hash_map *hash_map);
+SAIL_EXPORT void sail_clear_hash_map(struct sail_hash_map* hash_map);
 
 /*
  * Makes a deep copy of the specified hash map.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_copy_hash_map(const struct sail_hash_map *source_hash_map, struct sail_hash_map **target_hash_map);
+SAIL_EXPORT sail_status_t sail_copy_hash_map(const struct sail_hash_map* source_hash_map,
+                                             struct sail_hash_map** target_hash_map);
 
 /* extern "C" */
 #ifdef __cplusplus

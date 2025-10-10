@@ -52,22 +52,22 @@ public:
      * Constructs a new image output to the specified image file.
      * Detects the image format based on the file extension.
      */
-    explicit image_output(const std::string &path);
+    explicit image_output(const std::string& path);
 
     /*
      * Constructs a new image output to the specified memory buffer.
      */
-    image_output(void *buffer, std::size_t buffer_size, const sail::codec_info &codec_info);
+    image_output(void* buffer, std::size_t buffer_size, const sail::codec_info& codec_info);
 
     /*
      * Constructs a new image output to the specified memory buffer.
      */
-    image_output(sail::arbitrary_data *arbitrary_data, const sail::codec_info &codec_info);
+    image_output(sail::arbitrary_data* arbitrary_data, const sail::codec_info& codec_info);
 
     /*
      * Constructs a new image output to the specified I/O source.
      */
-    image_output(sail::abstract_io &abstract_io, const sail::codec_info &codec_info);
+    image_output(sail::abstract_io& abstract_io, const sail::codec_info& codec_info);
 
     /*
      * Finishes saving and destroys the image output.
@@ -77,22 +77,22 @@ public:
     /*
      * Moves the image output.
      */
-    image_output(image_output &&other) noexcept;
+    image_output(image_output&& other) noexcept;
 
     /*
      * Moves the image output.
      */
-    image_output& operator=(image_output &&other) noexcept;
+    image_output& operator=(image_output&& other) noexcept;
 
     /*
      * Overrides the automatically detected codec info used to save the image.
      */
-    image_output& with(const sail::codec_info &codec_info);
+    image_output& with(const sail::codec_info& codec_info);
 
     /*
      * Overrides the save options used to save the image.
      */
-    image_output& with(const sail::save_options &save_options);
+    image_output& with(const sail::save_options& save_options);
 
     /*
      * Continues saving into the I/O target.
@@ -102,7 +102,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t next_frame(const sail::image &image);
+    sail_status_t next_frame(const sail::image& image);
 
     /*
      * Finishes saving and closes the I/O stream. Call to finish() is recommended
@@ -117,4 +117,4 @@ private:
     std::unique_ptr<pimpl> d;
 };
 
-}
+} // namespace sail

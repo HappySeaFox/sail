@@ -29,7 +29,8 @@
 #include <sail-common/status.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 struct sail_io;
@@ -39,14 +40,14 @@ struct sail_io;
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_io_read_file(const char *path, struct sail_io **io);
+SAIL_EXPORT sail_status_t sail_alloc_io_read_file(const char* path, struct sail_io** io);
 
 /*
  * Opens the specified image file for reading and writing, and allocates a new I/O object for it.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_io_read_write_file(const char *path, struct sail_io **io);
+SAIL_EXPORT sail_status_t sail_alloc_io_read_write_file(const char* path, struct sail_io** io);
 
 /* extern "C" */
 #ifdef __cplusplus

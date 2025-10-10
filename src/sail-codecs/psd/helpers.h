@@ -32,7 +32,8 @@
 #include <sail-common/status.h>
 
 /* PSD pixel formats. */
-enum SailPsdMode {
+enum SailPsdMode
+{
     SAIL_PSD_MODE_BITMAP       = 0,
     SAIL_PSD_MODE_GRAYSCALE    = 1,
     SAIL_PSD_MODE_INDEXED      = 2,
@@ -44,7 +45,8 @@ enum SailPsdMode {
 };
 
 /* PSD compressions. */
-enum SailPsdCompression {
+enum SailPsdCompression
+{
     SAIL_PSD_COMPRESSION_NONE                   = 0,
     SAIL_PSD_COMPRESSION_RLE                    = 1,
     SAIL_PSD_COMPRESSION_ZIP_WITHOUT_PREDICTION = 2,
@@ -53,10 +55,13 @@ enum SailPsdCompression {
 
 struct sail_io;
 
-SAIL_HIDDEN sail_status_t psd_private_get_big_endian_uint16_t(struct sail_io *io, uint16_t *v);
+SAIL_HIDDEN sail_status_t psd_private_get_big_endian_uint16_t(struct sail_io* io, uint16_t* v);
 
-SAIL_HIDDEN sail_status_t psd_private_get_big_endian_uint32_t(struct sail_io *io, uint32_t *v);
+SAIL_HIDDEN sail_status_t psd_private_get_big_endian_uint32_t(struct sail_io* io, uint32_t* v);
 
-SAIL_HIDDEN sail_status_t psd_private_sail_pixel_format(enum SailPsdMode mode, uint16_t channels, uint16_t depth, enum SailPixelFormat *result);
+SAIL_HIDDEN sail_status_t psd_private_sail_pixel_format(enum SailPsdMode mode,
+                                                        uint16_t channels,
+                                                        uint16_t depth,
+                                                        enum SailPixelFormat* result);
 
 SAIL_HIDDEN enum SailCompression psd_private_sail_compression(enum SailPsdCompression compression);

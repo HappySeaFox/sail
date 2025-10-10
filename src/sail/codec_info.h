@@ -33,7 +33,8 @@
 #include <sail/codec_priority.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 struct sail_io;
@@ -44,10 +45,11 @@ struct sail_string_node;
 /*
  * A structure representing codec information.
  */
-struct sail_codec_info {
+struct sail_codec_info
+{
 
     /* Full path to the codec. NULL when SAIL_COMBINE_CODECS is ON. */
-    char *path;
+    char* path;
 
     /*
      * The codec loader will use the codec's layout version to correctly handle the codec.
@@ -63,31 +65,31 @@ struct sail_codec_info {
     enum SailCodecPriority priority;
 
     /* Codec version. For example: "1.5.2". */
-    char *version;
+    char* version;
 
     /* Short codec name in upper case. For example: "JPEG". */
-    char *name;
+    char* name;
 
     /* Codec description. For example: "Joint Photographic Experts Group". */
-    char *description;
+    char* description;
 
     /*
      * A linked list of supported magic numbers. It can be NULL. For example: "FF D8" for JPEGs.
      * See https://en.wikipedia.org/wiki/File_format#Magic_number.
      */
-    struct sail_string_node *magic_number_node;
+    struct sail_string_node* magic_number_node;
 
     /* A linked list of supported file extensions. It can be NULL. For example: "jpg", "jpeg". */
-    struct sail_string_node *extension_node;
+    struct sail_string_node* extension_node;
 
     /* A linked list of supported mime types. It can be NULL. For example: "image/jpeg". */
-    struct sail_string_node *mime_type_node;
+    struct sail_string_node* mime_type_node;
 
     /* Load features of the codec. */
-    struct sail_load_features *load_features;
+    struct sail_load_features* load_features;
 
     /* Save features of the codec. */
-    struct sail_save_features *save_features;
+    struct sail_save_features* save_features;
 };
 
 typedef struct sail_codec_info sail_codec_info_t;
@@ -110,7 +112,7 @@ typedef struct sail_codec_info sail_codec_info_t;
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_codec_info_from_path(const char *path, const struct sail_codec_info **codec_info);
+SAIL_EXPORT sail_status_t sail_codec_info_from_path(const char* path, const struct sail_codec_info** codec_info);
 
 /*
  * Finds a first codec info object that supports the magic number read from the specified file.
@@ -125,7 +127,8 @@ SAIL_EXPORT sail_status_t sail_codec_info_from_path(const char *path, const stru
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_path(const char *path, const struct sail_codec_info **codec_info);
+SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_path(const char* path,
+                                                                    const struct sail_codec_info** codec_info);
 
 /*
  * Finds a first codec info object that supports the magic number read from the specified memory buffer.
@@ -140,8 +143,9 @@ SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_path(const char *
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_memory(const void *buffer, size_t buffer_size,
-                                                                      const struct sail_codec_info **codec_info);
+SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_memory(const void* buffer,
+                                                                      size_t buffer_size,
+                                                                      const struct sail_codec_info** codec_info);
 
 /*
  * Finds a first codec info object that supports the magic number read from the specified I/O data source.
@@ -160,7 +164,8 @@ SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_memory(const void
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_io(struct sail_io *io, const struct sail_codec_info **codec_info);
+SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_io(struct sail_io* io,
+                                                                  const struct sail_codec_info** codec_info);
 
 /*
  * Finds a first codec info object that supports the specified file extension.
@@ -180,7 +185,8 @@ SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_io(struct sail_io
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_codec_info_from_extension(const char *extension, const struct sail_codec_info **codec_info);
+SAIL_EXPORT sail_status_t sail_codec_info_from_extension(const char* extension,
+                                                         const struct sail_codec_info** codec_info);
 
 /*
  * Finds a first codec info object that supports the specified mime type.
@@ -200,7 +206,8 @@ SAIL_EXPORT sail_status_t sail_codec_info_from_extension(const char *extension, 
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_codec_info_from_mime_type(const char *mime_type, const struct sail_codec_info **codec_info);
+SAIL_EXPORT sail_status_t sail_codec_info_from_mime_type(const char* mime_type,
+                                                         const struct sail_codec_info** codec_info);
 
 /* extern "C" */
 #ifdef __cplusplus

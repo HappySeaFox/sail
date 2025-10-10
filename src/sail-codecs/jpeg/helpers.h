@@ -37,7 +37,8 @@
 struct sail_meta_data_node;
 struct sail_resolution;
 
-struct jpeg_private_my_error_context {
+struct jpeg_private_my_error_context
+{
     struct jpeg_error_mgr jpeg_error_mgr;
     jmp_buf setjmp_buffer;
 };
@@ -50,16 +51,23 @@ SAIL_HIDDEN enum SailPixelFormat jpeg_private_color_space_to_pixel_format(J_COLO
 
 SAIL_HIDDEN J_COLOR_SPACE jpeg_private_pixel_format_to_color_space(enum SailPixelFormat pixel_format);
 
-SAIL_HIDDEN sail_status_t jpeg_private_fetch_meta_data(struct jpeg_decompress_struct *decompress_context, struct sail_meta_data_node **last_meta_data_node);
+SAIL_HIDDEN sail_status_t jpeg_private_fetch_meta_data(struct jpeg_decompress_struct* decompress_context,
+                                                       struct sail_meta_data_node** last_meta_data_node);
 
-SAIL_HIDDEN sail_status_t jpeg_private_write_meta_data(struct jpeg_compress_struct *compress_context, const struct sail_meta_data_node *meta_data_node);
+SAIL_HIDDEN sail_status_t jpeg_private_write_meta_data(struct jpeg_compress_struct* compress_context,
+                                                       const struct sail_meta_data_node* meta_data_node);
 
 #ifdef SAIL_HAVE_JPEG_ICCP
-SAIL_HIDDEN sail_status_t jpeg_private_fetch_iccp(struct jpeg_decompress_struct *decompress_context, struct sail_iccp **iccp);
+SAIL_HIDDEN sail_status_t jpeg_private_fetch_iccp(struct jpeg_decompress_struct* decompress_context,
+                                                  struct sail_iccp** iccp);
 #endif
 
-SAIL_HIDDEN sail_status_t jpeg_private_fetch_resolution(struct jpeg_decompress_struct *decompress_context, struct sail_resolution **resolution);
+SAIL_HIDDEN sail_status_t jpeg_private_fetch_resolution(struct jpeg_decompress_struct* decompress_context,
+                                                        struct sail_resolution** resolution);
 
-SAIL_HIDDEN sail_status_t jpeg_private_write_resolution(struct jpeg_compress_struct *compress_context, const struct sail_resolution *resolution);
+SAIL_HIDDEN sail_status_t jpeg_private_write_resolution(struct jpeg_compress_struct* compress_context,
+                                                        const struct sail_resolution* resolution);
 
-SAIL_HIDDEN bool jpeg_private_tuning_key_value_callback(const char *key, const struct sail_variant *value, void *user_data);
+SAIL_HIDDEN bool jpeg_private_tuning_key_value_callback(const char* key,
+                                                        const struct sail_variant* value,
+                                                        void* user_data);

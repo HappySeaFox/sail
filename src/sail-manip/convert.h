@@ -33,7 +33,8 @@
 #include <sail-common/status.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 struct sail_conversion_options;
@@ -126,9 +127,9 @@ struct sail_save_features;
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_convert_image(const struct sail_image *image,
+SAIL_EXPORT sail_status_t sail_convert_image(const struct sail_image* image,
                                              enum SailPixelFormat output_pixel_format,
-                                             struct sail_image **image_output);
+                                             struct sail_image** image_output);
 
 /*
  * Converts the input image to the pixel format and saves the result in the output image.
@@ -202,10 +203,10 @@ SAIL_EXPORT sail_status_t sail_convert_image(const struct sail_image *image,
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_convert_image_with_options(const struct sail_image *image,
+SAIL_EXPORT sail_status_t sail_convert_image_with_options(const struct sail_image* image,
                                                           enum SailPixelFormat output_pixel_format,
-                                                          const struct sail_conversion_options *options,
-                                                          struct sail_image **image_output);
+                                                          const struct sail_conversion_options* options,
+                                                          struct sail_image** image_output);
 
 /*
  * Updates the image to the pixel format. If the function fails, the image pixels
@@ -284,7 +285,7 @@ SAIL_EXPORT sail_status_t sail_convert_image_with_options(const struct sail_imag
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_update_image(struct sail_image *image, enum SailPixelFormat output_pixel_format);
+SAIL_EXPORT sail_status_t sail_update_image(struct sail_image* image, enum SailPixelFormat output_pixel_format);
 
 /*
  * Updates the image to the pixel format. If the function fails, the image pixels
@@ -361,9 +362,9 @@ SAIL_EXPORT sail_status_t sail_update_image(struct sail_image *image, enum SailP
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_update_image_with_options(struct sail_image *image,
+SAIL_EXPORT sail_status_t sail_update_image_with_options(struct sail_image* image,
                                                          enum SailPixelFormat output_pixel_format,
-                                                         const struct sail_conversion_options *options);
+                                                         const struct sail_conversion_options* options);
 
 /*
  * Returns true if the conversion or updating functions can convert or update from the input
@@ -389,8 +390,8 @@ SAIL_EXPORT enum SailPixelFormat sail_closest_pixel_format(enum SailPixelFormat 
  *
  * Returns SAIL_PIXEL_FORMAT_UNKNOWN if no candidates found at all.
  */
-SAIL_EXPORT enum SailPixelFormat sail_closest_pixel_format_from_save_features(enum SailPixelFormat input_pixel_format,
-                                                                               const struct sail_save_features *save_features);
+SAIL_EXPORT enum SailPixelFormat sail_closest_pixel_format_from_save_features(
+    enum SailPixelFormat input_pixel_format, const struct sail_save_features* save_features);
 
 /*
  * Converts the image to be suitable for saving in the output format described by the save features
@@ -398,9 +399,9 @@ SAIL_EXPORT enum SailPixelFormat sail_closest_pixel_format_from_save_features(en
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_convert_image_for_saving(const struct sail_image *image,
-                                                        const struct sail_save_features *save_features,
-                                                        struct sail_image **image_output);
+SAIL_EXPORT sail_status_t sail_convert_image_for_saving(const struct sail_image* image,
+                                                        const struct sail_save_features* save_features,
+                                                        struct sail_image** image_output);
 
 /*
  * Converts the image to be suitable for saving in the output format described by the save features
@@ -410,10 +411,10 @@ SAIL_EXPORT sail_status_t sail_convert_image_for_saving(const struct sail_image 
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_convert_image_for_saving_with_options(const struct sail_image *image,
-                                                                     const struct sail_save_features *save_features,
-                                                                     const struct sail_conversion_options *options,
-                                                                     struct sail_image **image_output);
+SAIL_EXPORT sail_status_t sail_convert_image_for_saving_with_options(const struct sail_image* image,
+                                                                     const struct sail_save_features* save_features,
+                                                                     const struct sail_conversion_options* options,
+                                                                     struct sail_image** image_output);
 
 /* extern "C" */
 #ifdef __cplusplus

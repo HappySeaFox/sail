@@ -25,14 +25,15 @@
 
 #pragma once
 
-#include <QWidget>
-#include <QScopedPointer>
 #include <QImage>
+#include <QScopedPointer>
+#include <QWidget>
 
 #include <sail-common/status.h>
 
-namespace Ui {
-    class QtSail;
+namespace Ui
+{
+class QtSail;
 }
 
 class QtSail : public QWidget
@@ -40,12 +41,12 @@ class QtSail : public QWidget
     Q_OBJECT
 
 public:
-    QtSail(QWidget *parent = nullptr);
+    QtSail(QWidget* parent = nullptr);
     ~QtSail();
 
 private:
-    sail_status_t loadImage(const QString &path, QImage *qimage);
-    sail_status_t saveImage(const QString &path, const QImage &qimage);
+    sail_status_t loadImage(const QString& path, QImage* qimage);
+    sail_status_t saveImage(const QString& path, const QImage& qimage);
     QStringList filters() const;
 
 private: // slots

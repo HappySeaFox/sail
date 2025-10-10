@@ -54,8 +54,8 @@ static MunitResult test_copy_palette(const MunitParameter params[], void* user_d
     struct sail_palette* palette = NULL;
     munit_assert(sail_alloc_palette(&palette) == SAIL_OK);
 
-    palette->pixel_format = SAIL_PIXEL_FORMAT_BPP24_RGB;
-    palette->color_count = 10;
+    palette->pixel_format    = SAIL_PIXEL_FORMAT_BPP24_RGB;
+    palette->color_count     = 10;
     const unsigned data_size = palette->color_count * 3;
     munit_assert(sail_malloc(data_size, &palette->data) == SAIL_OK);
     munit_assert_not_null(palette->data);
@@ -83,8 +83,8 @@ static MunitResult test_palette_from_data(const MunitParameter params[], void* u
     (void)user_data;
 
     const enum SailPixelFormat pixel_format = SAIL_PIXEL_FORMAT_BPP24_RGB;
-    const unsigned color_count = 100;
-    const unsigned data_size = color_count * 3;
+    const unsigned color_count              = 100;
+    const unsigned data_size                = color_count * 3;
 
     void* data = NULL;
     munit_assert(sail_malloc(data_size, &data) == SAIL_OK);
@@ -111,8 +111,8 @@ static MunitResult test_palette_for_data(const MunitParameter params[], void* us
     (void)user_data;
 
     const enum SailPixelFormat pixel_format = SAIL_PIXEL_FORMAT_BPP24_RGB;
-    const unsigned color_count = 100;
-    const unsigned data_size = color_count * 3;
+    const unsigned color_count              = 100;
+    const unsigned data_size                = color_count * 3;
 
     struct sail_palette* palette = NULL;
     munit_assert(sail_alloc_palette_for_data(pixel_format, color_count, &palette) == SAIL_OK);

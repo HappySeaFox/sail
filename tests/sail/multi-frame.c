@@ -41,8 +41,10 @@ static MunitResult test_multi_frame_load_all_frames(const MunitParameter params[
     const struct sail_codec_info* codec_info;
     munit_assert(sail_codec_info_from_path(path, &codec_info) == SAIL_OK);
 
-    bool is_multi_frame = (codec_info->load_features->features & (SAIL_CODEC_FEATURE_ANIMATED | SAIL_CODEC_FEATURE_MULTI_PAGED)) != 0;
-    if (!is_multi_frame) {
+    bool is_multi_frame =
+        (codec_info->load_features->features & (SAIL_CODEC_FEATURE_ANIMATED | SAIL_CODEC_FEATURE_MULTI_PAGED)) != 0;
+    if (!is_multi_frame)
+    {
         return MUNIT_SKIP;
     }
 
@@ -50,13 +52,15 @@ static MunitResult test_multi_frame_load_all_frames(const MunitParameter params[
     munit_assert(sail_start_loading_from_file(path, codec_info, &state) == SAIL_OK);
 
     unsigned frame_count = 0;
-    int prev_delay = -2;
+    int prev_delay       = -2;
 
-    while (true) {
+    while (true)
+    {
         struct sail_image* image = NULL;
-        sail_status_t status = sail_load_next_frame(state, &image);
+        sail_status_t status     = sail_load_next_frame(state, &image);
 
-        if (status == SAIL_ERROR_NO_MORE_FRAMES) {
+        if (status == SAIL_ERROR_NO_MORE_FRAMES)
+        {
             break;
         }
 
@@ -66,9 +70,11 @@ static MunitResult test_multi_frame_load_all_frames(const MunitParameter params[
         munit_assert(image->height > 0);
         munit_assert(image->pixel_format != SAIL_PIXEL_FORMAT_UNKNOWN);
 
-        if (frame_count > 0) {
+        if (frame_count > 0)
+        {
             munit_assert(image->delay >= -1);
-            if (image->delay >= 0) {
+            if (image->delay >= 0)
+            {
                 munit_assert(prev_delay >= 0);
             }
         }
@@ -95,8 +101,10 @@ static MunitResult test_multi_frame_delay_consistency(const MunitParameter param
     const struct sail_codec_info* codec_info;
     munit_assert(sail_codec_info_from_path(path, &codec_info) == SAIL_OK);
 
-    bool is_multi_frame = (codec_info->load_features->features & (SAIL_CODEC_FEATURE_ANIMATED | SAIL_CODEC_FEATURE_MULTI_PAGED)) != 0;
-    if (!is_multi_frame) {
+    bool is_multi_frame =
+        (codec_info->load_features->features & (SAIL_CODEC_FEATURE_ANIMATED | SAIL_CODEC_FEATURE_MULTI_PAGED)) != 0;
+    if (!is_multi_frame)
+    {
         return MUNIT_SKIP;
     }
 
@@ -110,19 +118,24 @@ static MunitResult test_multi_frame_delay_consistency(const MunitParameter param
 
     sail_destroy_image(first_image);
 
-    while (1) {
+    while (1)
+    {
         struct sail_image* image = NULL;
-        sail_status_t status = sail_load_next_frame(state, &image);
+        sail_status_t status     = sail_load_next_frame(state, &image);
 
-        if (status == SAIL_ERROR_NO_MORE_FRAMES) {
+        if (status == SAIL_ERROR_NO_MORE_FRAMES)
+        {
             break;
         }
 
         munit_assert(status == SAIL_OK);
 
-        if (is_animation) {
+        if (is_animation)
+        {
             munit_assert(image->delay >= 0);
-        } else {
+        }
+        else
+        {
             munit_assert(image->delay == -1);
         }
 
@@ -144,8 +157,11 @@ static MunitResult test_multi_frame_special_properties(const MunitParameter para
     const struct sail_codec_info* codec_info_check;
     munit_assert(sail_codec_info_from_path(path, &codec_info_check) == SAIL_OK);
 
-    bool is_multi_frame = (codec_info_check->load_features->features & (SAIL_CODEC_FEATURE_ANIMATED | SAIL_CODEC_FEATURE_MULTI_PAGED)) != 0;
-    if (!is_multi_frame) {
+    bool is_multi_frame =
+        (codec_info_check->load_features->features & (SAIL_CODEC_FEATURE_ANIMATED | SAIL_CODEC_FEATURE_MULTI_PAGED))
+        != 0;
+    if (!is_multi_frame)
+    {
         return MUNIT_SKIP;
     }
 
@@ -156,28 +172,32 @@ static MunitResult test_multi_frame_special_properties(const MunitParameter para
     const struct sail_codec_info* codec_info;
     munit_assert(sail_codec_info_from_path(path, &codec_info) == SAIL_OK);
 
-    void* state = NULL;
+    void* state          = NULL;
     sail_status_t status = sail_start_loading_from_file_with_options(path, codec_info, load_options, &state);
 
     sail_destroy_load_options(load_options);
 
-    if (status != SAIL_OK) {
+    if (status != SAIL_OK)
+    {
         return MUNIT_SKIP;
     }
 
     struct sail_image* image = NULL;
     munit_assert(sail_load_next_frame(state, &image) == SAIL_OK);
 
-    if (image->special_properties != NULL) {
+    if (image->special_properties != NULL)
+    {
         const struct sail_variant* frames_variant = sail_hash_map_value(image->special_properties, "apng-frames");
-        const struct sail_variant* plays_variant = sail_hash_map_value(image->special_properties, "apng-plays");
+        const struct sail_variant* plays_variant  = sail_hash_map_value(image->special_properties, "apng-plays");
 
-        if (frames_variant != NULL && frames_variant->type == SAIL_VARIANT_TYPE_UNSIGNED_INT) {
+        if (frames_variant != NULL && frames_variant->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
+        {
             /* frames should be positive (at least 1 frame) */
             munit_assert(sail_variant_to_unsigned_int(frames_variant) >= 1);
         }
 
-        if (plays_variant != NULL && plays_variant->type == SAIL_VARIANT_TYPE_UNSIGNED_INT) {
+        if (plays_variant != NULL && plays_variant->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
+        {
             /* plays can be 0 (infinite loop) or positive number - just verify it exists */
         }
     }
@@ -198,8 +218,10 @@ static MunitResult test_multi_frame_codec_features(const MunitParameter params[]
     const struct sail_codec_info* codec_info;
     munit_assert(sail_codec_info_from_path(path, &codec_info) == SAIL_OK);
 
-    bool is_multi_frame = (codec_info->load_features->features & (SAIL_CODEC_FEATURE_ANIMATED | SAIL_CODEC_FEATURE_MULTI_PAGED)) != 0;
-    if (!is_multi_frame) {
+    bool is_multi_frame =
+        (codec_info->load_features->features & (SAIL_CODEC_FEATURE_ANIMATED | SAIL_CODEC_FEATURE_MULTI_PAGED)) != 0;
+    if (!is_multi_frame)
+    {
         return MUNIT_SKIP;
     }
 
@@ -207,11 +229,13 @@ static MunitResult test_multi_frame_codec_features(const MunitParameter params[]
     munit_assert(sail_start_loading_from_file(path, codec_info, &state) == SAIL_OK);
 
     unsigned frame_count = 0;
-    while (1) {
+    while (1)
+    {
         struct sail_image* image = NULL;
-        sail_status_t status = sail_load_next_frame(state, &image);
+        sail_status_t status     = sail_load_next_frame(state, &image);
 
-        if (status == SAIL_ERROR_NO_MORE_FRAMES) {
+        if (status == SAIL_ERROR_NO_MORE_FRAMES)
+        {
             break;
         }
 
@@ -222,8 +246,9 @@ static MunitResult test_multi_frame_codec_features(const MunitParameter params[]
 
     munit_assert(sail_stop_loading(state) == SAIL_OK);
 
-    if (frame_count > 1) {
-        bool is_animated = (codec_info->load_features->features & SAIL_CODEC_FEATURE_ANIMATED) != 0;
+    if (frame_count > 1)
+    {
+        bool is_animated    = (codec_info->load_features->features & SAIL_CODEC_FEATURE_ANIMATED) != 0;
         bool is_multi_paged = (codec_info->load_features->features & SAIL_CODEC_FEATURE_MULTI_PAGED) != 0;
         munit_assert(is_animated || is_multi_paged);
     }
@@ -241,8 +266,10 @@ static MunitResult test_multi_frame_dimensions(const MunitParameter params[], vo
     const struct sail_codec_info* codec_info;
     munit_assert(sail_codec_info_from_path(path, &codec_info) == SAIL_OK);
 
-    bool is_multi_frame = (codec_info->load_features->features & (SAIL_CODEC_FEATURE_ANIMATED | SAIL_CODEC_FEATURE_MULTI_PAGED)) != 0;
-    if (!is_multi_frame) {
+    bool is_multi_frame =
+        (codec_info->load_features->features & (SAIL_CODEC_FEATURE_ANIMATED | SAIL_CODEC_FEATURE_MULTI_PAGED)) != 0;
+    if (!is_multi_frame)
+    {
         return MUNIT_SKIP;
     }
 
@@ -252,16 +279,18 @@ static MunitResult test_multi_frame_dimensions(const MunitParameter params[], vo
     struct sail_image* first_image = NULL;
     munit_assert(sail_load_next_frame(state, &first_image) == SAIL_OK);
 
-    unsigned canvas_width = first_image->width;
+    unsigned canvas_width  = first_image->width;
     unsigned canvas_height = first_image->height;
 
     sail_destroy_image(first_image);
 
-    while (1) {
+    while (1)
+    {
         struct sail_image* image = NULL;
-        sail_status_t status = sail_load_next_frame(state, &image);
+        sail_status_t status     = sail_load_next_frame(state, &image);
 
-        if (status == SAIL_ERROR_NO_MORE_FRAMES) {
+        if (status == SAIL_ERROR_NO_MORE_FRAMES)
+        {
             break;
         }
 
@@ -302,4 +331,3 @@ int main(int argc, char* argv[MUNIT_ARRAY_PARAM(argc + 1)])
 {
     return munit_suite_main(&test_suite, NULL, argc, argv);
 }
-

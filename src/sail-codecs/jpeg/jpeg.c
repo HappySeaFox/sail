@@ -49,12 +49,13 @@ static const double COMPRESSION_DEFAULT = 15;
  * Codec-specific state.
  */
 
-struct jpeg_state {
-    const struct sail_load_options *load_options;
-    const struct sail_save_options *save_options;
+struct jpeg_state
+{
+    const struct sail_load_options* load_options;
+    const struct sail_save_options* save_options;
 
-    struct jpeg_decompress_struct *decompress_context;
-    struct jpeg_compress_struct *compress_context;
+    struct jpeg_decompress_struct* decompress_context;
+    struct jpeg_compress_struct* compress_context;
     struct jpeg_private_my_error_context error_context;
     bool libjpeg_error;
     bool frame_loaded;
@@ -62,15 +63,16 @@ struct jpeg_state {
     bool started_compress;
 };
 
-static sail_status_t alloc_jpeg_state(const struct sail_load_options *load_options,
-                                        const struct sail_save_options *save_options,
-                                        struct jpeg_state **jpeg_state) {
+static sail_status_t alloc_jpeg_state(const struct sail_load_options* load_options,
+                                      const struct sail_save_options* save_options,
+                                      struct jpeg_state** jpeg_state)
+{
 
-    void *ptr;
+    void* ptr;
     SAIL_TRY(sail_malloc(sizeof(struct jpeg_state), &ptr));
     *jpeg_state = ptr;
 
-    **jpeg_state = (struct jpeg_state) {
+    **jpeg_state = (struct jpeg_state){
         .load_options = load_options,
         .save_options = save_options,
 
@@ -85,9 +87,11 @@ static sail_status_t alloc_jpeg_state(const struct sail_load_options *load_optio
     return SAIL_OK;
 }
 
-static void destroy_jpeg_state(struct jpeg_state *jpeg_state) {
+static void destroy_jpeg_state(struct jpeg_state* jpeg_state)
+{
 
-    if (jpeg_state == NULL) {
+    if (jpeg_state == NULL)
+    {
         return;
     }
 
@@ -101,26 +105,30 @@ static void destroy_jpeg_state(struct jpeg_state *jpeg_state) {
  * Decoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_load_init_v8_jpeg(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_load_init_v8_jpeg(struct sail_io* io,
+                                                       const struct sail_load_options* load_options,
+                                                       void** state)
+{
 
     *state = NULL;
 
     /* Allocate a new state. */
-    struct jpeg_state *jpeg_state;
+    struct jpeg_state* jpeg_state;
     SAIL_TRY(alloc_jpeg_state(load_options, NULL, &jpeg_state));
     *state = jpeg_state;
 
     /* Create decompress context. */
-    void *ptr;
+    void* ptr;
     SAIL_TRY(sail_malloc(sizeof(struct jpeg_decompress_struct), &ptr));
     jpeg_state->decompress_context = ptr;
 
     /* Error handling setup. */
-    jpeg_state->decompress_context->err = jpeg_std_error(&jpeg_state->error_context.jpeg_error_mgr);
-    jpeg_state->error_context.jpeg_error_mgr.error_exit = jpeg_private_my_error_exit;
+    jpeg_state->decompress_context->err                     = jpeg_std_error(&jpeg_state->error_context.jpeg_error_mgr);
+    jpeg_state->error_context.jpeg_error_mgr.error_exit     = jpeg_private_my_error_exit;
     jpeg_state->error_context.jpeg_error_mgr.output_message = jpeg_private_my_output_message;
 
-    if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0) {
+    if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0)
+    {
         jpeg_state->libjpeg_error = true;
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
@@ -129,19 +137,24 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_jpeg(struct sail_io *io, const
     jpeg_create_decompress(jpeg_state->decompress_context);
     jpeg_private_sail_io_src(jpeg_state->decompress_context, io);
 
-    if (jpeg_state->load_options->options & SAIL_OPTION_META_DATA) {
+    if (jpeg_state->load_options->options & SAIL_OPTION_META_DATA)
+    {
         jpeg_save_markers(jpeg_state->decompress_context, JPEG_COM, 0xffff);
     }
-    if (jpeg_state->load_options->options & SAIL_OPTION_ICCP) {
+    if (jpeg_state->load_options->options & SAIL_OPTION_ICCP)
+    {
         jpeg_save_markers(jpeg_state->decompress_context, JPEG_APP0 + 2, 0xFFFF);
     }
 
     jpeg_read_header(jpeg_state->decompress_context, true);
 
     /* Handle the requested color space. */
-    if (jpeg_state->decompress_context->jpeg_color_space == JCS_YCbCr) {
+    if (jpeg_state->decompress_context->jpeg_color_space == JCS_YCbCr)
+    {
         jpeg_state->decompress_context->out_color_space = JCS_RGB;
-    } else {
+    }
+    else
+    {
         jpeg_state->decompress_context->out_color_space = jpeg_state->decompress_context->jpeg_color_space;
     }
 
@@ -154,51 +167,59 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_jpeg(struct sail_io *io, const
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpeg(void *state, struct sail_image **image) {
+SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpeg(void* state, struct sail_image** image)
+{
 
-    struct jpeg_state *jpeg_state = state;
+    struct jpeg_state* jpeg_state = state;
 
-    if (jpeg_state->frame_loaded) {
+    if (jpeg_state->frame_loaded)
+    {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
     }
 
     jpeg_state->frame_loaded = true;
 
-    if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0) {
+    if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0)
+    {
         jpeg_state->libjpeg_error = true;
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
-    struct sail_image *image_local;
+    struct sail_image* image_local;
     SAIL_TRY(sail_alloc_image(&image_local));
 
-    if (jpeg_state->load_options->options & SAIL_OPTION_SOURCE_IMAGE) {
+    if (jpeg_state->load_options->options & SAIL_OPTION_SOURCE_IMAGE)
+    {
         SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
                             /* cleanup */ sail_destroy_image(image_local));
 
-        image_local->source_image->pixel_format = jpeg_private_color_space_to_pixel_format(jpeg_state->decompress_context->jpeg_color_space);
-        image_local->source_image->compression  = SAIL_COMPRESSION_JPEG;
+        image_local->source_image->pixel_format =
+            jpeg_private_color_space_to_pixel_format(jpeg_state->decompress_context->jpeg_color_space);
+        image_local->source_image->compression = SAIL_COMPRESSION_JPEG;
     }
 
     /* Image properties. */
-    image_local->width          = jpeg_state->decompress_context->output_width;
-    image_local->height         = jpeg_state->decompress_context->output_height;
-    image_local->pixel_format   = jpeg_private_color_space_to_pixel_format(jpeg_state->decompress_context->out_color_space);
+    image_local->width  = jpeg_state->decompress_context->output_width;
+    image_local->height = jpeg_state->decompress_context->output_height;
+    image_local->pixel_format =
+        jpeg_private_color_space_to_pixel_format(jpeg_state->decompress_context->out_color_space);
     image_local->bytes_per_line = sail_bytes_per_line(image_local->width, image_local->pixel_format);
 
     /* Read meta data. */
-    if (jpeg_state->load_options->options & SAIL_OPTION_META_DATA) {
+    if (jpeg_state->load_options->options & SAIL_OPTION_META_DATA)
+    {
         SAIL_TRY_OR_CLEANUP(jpeg_private_fetch_meta_data(jpeg_state->decompress_context, &image_local->meta_data_node),
                             /* cleanup */ sail_destroy_image(image_local));
     }
 
     /* Fetch resolution. */
     SAIL_TRY_OR_CLEANUP(jpeg_private_fetch_resolution(jpeg_state->decompress_context, &image_local->resolution),
-                            /* cleanup */ sail_destroy_image(image_local));
+                        /* cleanup */ sail_destroy_image(image_local));
 
     /* Fetch ICC profile. */
 #ifdef SAIL_HAVE_JPEG_ICCP
-    if (jpeg_state->load_options->options & SAIL_OPTION_ICCP) {
+    if (jpeg_state->load_options->options & SAIL_OPTION_ICCP)
+    {
         SAIL_TRY_OR_CLEANUP(jpeg_private_fetch_iccp(jpeg_state->decompress_context, &image_local->iccp),
                             /* cleanup */ sail_destroy_image(image_local));
     }
@@ -209,21 +230,25 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpeg(void *state, s
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_jpeg(void *state, struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_jpeg(void* state, struct sail_image* image)
+{
 
-    struct jpeg_state *jpeg_state = state;
+    struct jpeg_state* jpeg_state = state;
 
-    if (jpeg_state->libjpeg_error) {
+    if (jpeg_state->libjpeg_error)
+    {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
-    if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0) {
+    if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0)
+    {
         jpeg_state->libjpeg_error = true;
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
-    for (unsigned row = 0; row < image->height; row++) {
-        unsigned char *scanline = sail_scan_line(image, row);
+    for (unsigned row = 0; row < image->height; row++)
+    {
+        unsigned char* scanline = sail_scan_line(image, row);
 
         JSAMPROW samprow = (JSAMPROW)scanline;
         (void)jpeg_read_scanlines(jpeg_state->decompress_context, &samprow, 1);
@@ -232,18 +257,21 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_jpeg(void *state, struct sail
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_jpeg(void **state) {
+SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_jpeg(void** state)
+{
 
-    struct jpeg_state *jpeg_state = *state;
+    struct jpeg_state* jpeg_state = *state;
 
     *state = NULL;
 
-    if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0) {
+    if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0)
+    {
         destroy_jpeg_state(jpeg_state);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
-    if (jpeg_state->decompress_context != NULL) {
+    if (jpeg_state->decompress_context != NULL)
+    {
         jpeg_abort_decompress(jpeg_state->decompress_context);
         jpeg_destroy_decompress(jpeg_state->decompress_context);
     }
@@ -257,31 +285,36 @@ SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_jpeg(void **state) {
  * Encoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_save_init_v8_jpeg(struct sail_io *io, const struct sail_save_options *save_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_save_init_v8_jpeg(struct sail_io* io,
+                                                       const struct sail_save_options* save_options,
+                                                       void** state)
+{
 
     *state = NULL;
 
-    struct jpeg_state *jpeg_state;
+    struct jpeg_state* jpeg_state;
     SAIL_TRY(alloc_jpeg_state(NULL, save_options, &jpeg_state));
     *state = jpeg_state;
 
     /* Create compress context. */
-    void *ptr;
+    void* ptr;
     SAIL_TRY(sail_malloc(sizeof(struct jpeg_compress_struct), &ptr));
     jpeg_state->compress_context = ptr;
 
     /* Sanity check. */
-    if (jpeg_state->save_options->compression != SAIL_COMPRESSION_JPEG) {
+    if (jpeg_state->save_options->compression != SAIL_COMPRESSION_JPEG)
+    {
         SAIL_LOG_ERROR("JPEG: Only JPEG compression is allowed for saving");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_COMPRESSION);
     }
 
     /* Error handling setup. */
-    jpeg_state->compress_context->err = jpeg_std_error(&jpeg_state->error_context.jpeg_error_mgr);
-    jpeg_state->error_context.jpeg_error_mgr.error_exit = jpeg_private_my_error_exit;
+    jpeg_state->compress_context->err                       = jpeg_std_error(&jpeg_state->error_context.jpeg_error_mgr);
+    jpeg_state->error_context.jpeg_error_mgr.error_exit     = jpeg_private_my_error_exit;
     jpeg_state->error_context.jpeg_error_mgr.output_message = jpeg_private_my_output_message;
 
-    if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0) {
+    if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0)
+    {
         jpeg_state->libjpeg_error = true;
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
@@ -293,18 +326,21 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_jpeg(struct sail_io *io, const
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_jpeg(void *state, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_jpeg(void* state, const struct sail_image* image)
+{
 
-    struct jpeg_state *jpeg_state = state;
+    struct jpeg_state* jpeg_state = state;
 
-    if (jpeg_state->frame_saved) {
+    if (jpeg_state->frame_saved)
+    {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
     }
 
     jpeg_state->frame_saved = true;
 
     /* Error handling setup. */
-    if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0) {
+    if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0)
+    {
         jpeg_state->libjpeg_error = true;
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
@@ -312,8 +348,10 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_jpeg(void *state, c
     /* Compute output pixel format. */
     const J_COLOR_SPACE color_space = jpeg_private_pixel_format_to_color_space(image->pixel_format);
 
-    if (color_space == JCS_UNKNOWN) {
-        SAIL_LOG_ERROR("JPEG: %s pixel format is not currently supported for saving", sail_pixel_format_to_string(image->pixel_format));
+    if (color_space == JCS_UNKNOWN)
+    {
+        SAIL_LOG_ERROR("JPEG: %s pixel format is not currently supported for saving",
+                       sail_pixel_format_to_string(image->pixel_format));
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
     }
 
@@ -331,15 +369,17 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_jpeg(void *state, c
     SAIL_TRY(jpeg_private_write_resolution(jpeg_state->compress_context, image->resolution));
 
     /* Compute image quality. */
-    const double compression = (jpeg_state->save_options->compression_level < COMPRESSION_MIN ||
-                                jpeg_state->save_options->compression_level > COMPRESSION_MAX)
-                                ? COMPRESSION_DEFAULT
-                                : jpeg_state->save_options->compression_level;
-    jpeg_set_quality(jpeg_state->compress_context, /* to quality */ (int)(COMPRESSION_MAX-compression), true);
+    const double compression = (jpeg_state->save_options->compression_level < COMPRESSION_MIN
+                                || jpeg_state->save_options->compression_level > COMPRESSION_MAX)
+                                   ? COMPRESSION_DEFAULT
+                                   : jpeg_state->save_options->compression_level;
+    jpeg_set_quality(jpeg_state->compress_context, /* to quality */ (int)(COMPRESSION_MAX - compression), true);
 
     /* Handle tuning. */
-    if (jpeg_state->save_options->tuning != NULL) {
-        sail_traverse_hash_map_with_user_data(jpeg_state->save_options->tuning, jpeg_private_tuning_key_value_callback, jpeg_state->compress_context);
+    if (jpeg_state->save_options->tuning != NULL)
+    {
+        sail_traverse_hash_map_with_user_data(jpeg_state->save_options->tuning, jpeg_private_tuning_key_value_callback,
+                                              jpeg_state->compress_context);
     }
 
     /* Start compression. */
@@ -347,14 +387,16 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_jpeg(void *state, c
     jpeg_state->started_compress = true;
 
     /* Save meta data. */
-    if (jpeg_state->save_options->options & SAIL_OPTION_META_DATA && image->meta_data_node != NULL) {
+    if (jpeg_state->save_options->options & SAIL_OPTION_META_DATA && image->meta_data_node != NULL)
+    {
         SAIL_TRY(jpeg_private_write_meta_data(jpeg_state->compress_context, image->meta_data_node));
         SAIL_LOG_TRACE("JPEG: Meta data has been written");
     }
 
     /* Save ICC profile. */
 #ifdef SAIL_HAVE_JPEG_ICCP
-    if (jpeg_state->save_options->options & SAIL_OPTION_ICCP && image->iccp != NULL) {
+    if (jpeg_state->save_options->options & SAIL_OPTION_ICCP && image->iccp != NULL)
+    {
         jpeg_write_icc_profile(jpeg_state->compress_context, image->iccp->data, (unsigned)image->iccp->size);
         SAIL_LOG_TRACE("JPEG: ICC profile has been written");
     }
@@ -363,20 +405,24 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_jpeg(void *state, c
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_jpeg(void *state, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_jpeg(void* state, const struct sail_image* image)
+{
 
-    struct jpeg_state *jpeg_state = state;
+    struct jpeg_state* jpeg_state = state;
 
-    if (jpeg_state->libjpeg_error) {
+    if (jpeg_state->libjpeg_error)
+    {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
-    if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0) {
+    if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0)
+    {
         jpeg_state->libjpeg_error = true;
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
-    for (unsigned row = 0; row < image->height; row++) {
+    for (unsigned row = 0; row < image->height; row++)
+    {
         JSAMPROW samprow = (JSAMPROW)sail_scan_line(image, row);
         jpeg_write_scanlines(jpeg_state->compress_context, &samprow, 1);
     }
@@ -384,20 +430,24 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_jpeg(void *state, const struc
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_jpeg(void **state) {
+SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_jpeg(void** state)
+{
 
-    struct jpeg_state *jpeg_state = *state;
+    struct jpeg_state* jpeg_state = *state;
 
     /* Subsequent calls to finish() will expectedly fail in the above line. */
     *state = NULL;
 
-    if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0) {
+    if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0)
+    {
         destroy_jpeg_state(jpeg_state);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
-    if (jpeg_state->compress_context != NULL) {
-        if (jpeg_state->started_compress) {
+    if (jpeg_state->compress_context != NULL)
+    {
+        if (jpeg_state->started_compress)
+        {
             jpeg_finish_compress(jpeg_state->compress_context);
         }
 

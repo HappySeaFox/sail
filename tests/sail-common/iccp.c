@@ -79,7 +79,7 @@ static MunitResult test_iccp_from_data(const MunitParameter params[], void* user
     (void)user_data;
 
     const unsigned data_size = 1024;
-    void* data = NULL;
+    void* data               = NULL;
     munit_assert(sail_malloc(data_size, &data) == SAIL_OK);
     memset(data, 15, data_size);
     munit_assert_not_null(data);
@@ -103,7 +103,7 @@ static MunitResult test_iccp_from_shallow_data(const MunitParameter params[], vo
     (void)user_data;
 
     const unsigned data_size = 1024;
-    void* data = NULL;
+    void* data               = NULL;
     munit_assert(sail_malloc(data_size, &data) == SAIL_OK);
     memset(data, 15, data_size);
     munit_assert_not_null(data);

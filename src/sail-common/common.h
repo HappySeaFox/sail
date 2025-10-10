@@ -33,7 +33,8 @@
  */
 
 /* Pixel format */
-enum SailPixelFormat {
+enum SailPixelFormat
+{
 
     /*
      * Unknown or unsupported pixel format that cannot be parsed by SAIL.
@@ -175,7 +176,8 @@ enum SailPixelFormat {
 };
 
 /* Chroma subsampling. See https://en.wikipedia.org/wiki/Chroma_subsampling */
-enum SailChromaSubsampling {
+enum SailChromaSubsampling
+{
 
     SAIL_CHROMA_SUBSAMPLING_UNKNOWN,
     SAIL_CHROMA_SUBSAMPLING_311,
@@ -189,7 +191,8 @@ enum SailChromaSubsampling {
 };
 
 /* Orientation. */
-enum SailOrientation {
+enum SailOrientation
+{
 
     SAIL_ORIENTATION_NORMAL,
     SAIL_ORIENTATION_ROTATED_90,
@@ -202,7 +205,8 @@ enum SailOrientation {
 };
 
 /* Pixels compression types. */
-enum SailCompression {
+enum SailCompression
+{
 
     /* Unknown compression. */
     SAIL_COMPRESSION_UNKNOWN,
@@ -250,7 +254,8 @@ enum SailCompression {
 };
 
 /* Meta data. */
-enum SailMetaData {
+enum SailMetaData
+{
 
     /* Unknown meta data type. */
     SAIL_META_DATA_UNKNOWN,
@@ -285,7 +290,8 @@ enum SailMetaData {
 };
 
 /* Resolution units. */
-enum SailResolutionUnit {
+enum SailResolutionUnit
+{
 
     SAIL_RESOLUTION_UNIT_UNKNOWN,
     SAIL_RESOLUTION_UNIT_MICROMETER,
@@ -295,47 +301,49 @@ enum SailResolutionUnit {
 };
 
 /* Codec features. */
-enum SailCodecFeature {
+enum SailCodecFeature
+{
 
     /* Unknown codec feature used to indicate an error in parsing functions. */
-    SAIL_CODEC_FEATURE_UNKNOWN      = 1 << 0,
+    SAIL_CODEC_FEATURE_UNKNOWN = 1 << 0,
 
     /* Can load or save static images. */
-    SAIL_CODEC_FEATURE_STATIC       = 1 << 1,
+    SAIL_CODEC_FEATURE_STATIC = 1 << 1,
 
     /* Can load or save animated images. */
-    SAIL_CODEC_FEATURE_ANIMATED     = 1 << 2,
+    SAIL_CODEC_FEATURE_ANIMATED = 1 << 2,
 
     /* Can load or save multi-paged (but not animated) images. */
-    SAIL_CODEC_FEATURE_MULTI_PAGED  = 1 << 3,
+    SAIL_CODEC_FEATURE_MULTI_PAGED = 1 << 3,
 
     /* Can load or save image meta data like JPEG comments or EXIF. */
-    SAIL_CODEC_FEATURE_META_DATA    = 1 << 4,
+    SAIL_CODEC_FEATURE_META_DATA = 1 << 4,
 
     /* Can load or save interlaced images. */
-    SAIL_CODEC_FEATURE_INTERLACED   = 1 << 5,
+    SAIL_CODEC_FEATURE_INTERLACED = 1 << 5,
 
     /* Can load or save embedded ICC profiles. */
-    SAIL_CODEC_FEATURE_ICCP         = 1 << 6,
+    SAIL_CODEC_FEATURE_ICCP = 1 << 6,
 
     /* Can preserve the source image information. */
     SAIL_CODEC_FEATURE_SOURCE_IMAGE = 1 << 7,
 };
 
 /* Load or save options. */
-enum SailOption {
+enum SailOption
+{
 
     /*
      * Instruction to load or save image meta data like JPEG comments or EXIF.
      * Loading special properties in source images is also affected by this option.
      */
-    SAIL_OPTION_META_DATA    = 1 << 0,
+    SAIL_OPTION_META_DATA = 1 << 0,
 
     /* Instruction to save interlaced images. Specifying this option for loading operations has no effect. */
-    SAIL_OPTION_INTERLACED   = 1 << 1,
+    SAIL_OPTION_INTERLACED = 1 << 1,
 
     /* Instruction to load or save embedded ICC profile. */
-    SAIL_OPTION_ICCP         = 1 << 2,
+    SAIL_OPTION_ICCP = 1 << 2,
 
     /*
      * Instruction to preserve the source image information in loading operations.

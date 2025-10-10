@@ -30,13 +30,15 @@
 #include <sail-common/status.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 /*
  * sail_palette represents an image palette used in indexed images.
  */
-struct sail_palette {
+struct sail_palette
+{
 
     /*
      * Pixel format.
@@ -54,7 +56,7 @@ struct sail_palette {
      * LOAD: Set by SAIL to a valid pixel array if the image is indexed.
      * SAVE: Must be allocated and set by a caller to a valid pixel array if the image is indexed.
      */
-    void *data;
+    void* data;
 
     /*
      * Number of colors in the palette.
@@ -72,20 +74,21 @@ typedef struct sail_palette sail_palette_t;
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_palette(struct sail_palette **palette);
+SAIL_EXPORT sail_status_t sail_alloc_palette(struct sail_palette** palette);
 
 /*
  * Destroys the specified palette and all its internal allocated memory buffers.
  * Does nothing if the palette is NULL.
  */
-SAIL_EXPORT void sail_destroy_palette(struct sail_palette *palette);
+SAIL_EXPORT void sail_destroy_palette(struct sail_palette* palette);
 
 /*
  * Makes a deep copy of the specified palette.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_copy_palette(const struct sail_palette *source_palette, struct sail_palette **target_palette);
+SAIL_EXPORT sail_status_t sail_copy_palette(const struct sail_palette* source_palette,
+                                            struct sail_palette** target_palette);
 
 /*
  * Allocates a new palette to be filled later with data.
@@ -95,14 +98,19 @@ SAIL_EXPORT sail_status_t sail_copy_palette(const struct sail_palette *source_pa
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_palette_for_data(enum SailPixelFormat pixel_format, unsigned color_count, struct sail_palette **palette);
+SAIL_EXPORT sail_status_t sail_alloc_palette_for_data(enum SailPixelFormat pixel_format,
+                                                      unsigned color_count,
+                                                      struct sail_palette** palette);
 
 /*
  * Allocates a new palette and deep copies the specified data.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_palette_from_data(enum SailPixelFormat pixel_format, const void *data, unsigned color_count, struct sail_palette **palette);
+SAIL_EXPORT sail_status_t sail_alloc_palette_from_data(enum SailPixelFormat pixel_format,
+                                                       const void* data,
+                                                       unsigned color_count,
+                                                       struct sail_palette** palette);
 
 /* extern "C" */
 #ifdef __cplusplus

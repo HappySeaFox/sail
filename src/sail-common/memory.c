@@ -27,13 +27,15 @@
 
 #include "sail-common.h"
 
-sail_status_t sail_malloc(size_t size, void **ptr) {
+sail_status_t sail_malloc(size_t size, void** ptr)
+{
 
     SAIL_CHECK_PTR(ptr);
 
-    void *ptr_local = malloc(size);
+    void* ptr_local = malloc(size);
 
-    if (ptr_local == NULL) {
+    if (ptr_local == NULL)
+    {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_MEMORY_ALLOCATION);
     }
 
@@ -42,9 +44,10 @@ sail_status_t sail_malloc(size_t size, void **ptr) {
     return SAIL_OK;
 }
 
-void* sail_malloc_std_signature(size_t size) {
+void* sail_malloc_std_signature(size_t size)
+{
 
-    void *ptr;
+    void* ptr;
 
     SAIL_TRY_OR_EXECUTE(sail_malloc(size, &ptr),
                         /* on error */ return NULL);
@@ -52,13 +55,15 @@ void* sail_malloc_std_signature(size_t size) {
     return ptr;
 }
 
-sail_status_t sail_realloc(size_t size, void **ptr) {
+sail_status_t sail_realloc(size_t size, void** ptr)
+{
 
     SAIL_CHECK_PTR(ptr);
 
-    void *ptr_local = realloc(*ptr, size);
+    void* ptr_local = realloc(*ptr, size);
 
-    if (ptr_local == NULL) {
+    if (ptr_local == NULL)
+    {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_MEMORY_ALLOCATION);
     }
 
@@ -67,13 +72,15 @@ sail_status_t sail_realloc(size_t size, void **ptr) {
     return SAIL_OK;
 }
 
-sail_status_t sail_calloc(size_t nmemb, size_t size, void **ptr) {
+sail_status_t sail_calloc(size_t nmemb, size_t size, void** ptr)
+{
 
     SAIL_CHECK_PTR(ptr);
 
-    void *ptr_local = calloc(nmemb, size);
+    void* ptr_local = calloc(nmemb, size);
 
-    if (ptr_local == NULL) {
+    if (ptr_local == NULL)
+    {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_MEMORY_ALLOCATION);
     }
 
@@ -82,7 +89,8 @@ sail_status_t sail_calloc(size_t nmemb, size_t size, void **ptr) {
     return SAIL_OK;
 }
 
-void sail_free(void *ptr) {
+void sail_free(void* ptr)
+{
 
     free(ptr);
 }

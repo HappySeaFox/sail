@@ -36,16 +36,17 @@ struct sail_codec_layout_v8;
 /*
  * SAIL codec.
  */
-struct sail_codec {
+struct sail_codec
+{
 
     /* Layout version. */
     int layout;
 
     /* System-specific library handle. */
-    void *handle;
+    void* handle;
 
     /* Codec interface. */
-    struct sail_codec_layout_v8 *v8;
+    struct sail_codec_layout_v8* v8;
 };
 
 typedef struct sail_codec sail_codec_t;
@@ -56,10 +57,10 @@ typedef struct sail_codec sail_codec_t;
  *
  * Returns SAIL_OK on success.
  */
-SAIL_HIDDEN sail_status_t alloc_and_load_codec(const struct sail_codec_info *codec_info, struct sail_codec **codec);
+SAIL_HIDDEN sail_status_t alloc_and_load_codec(const struct sail_codec_info* codec_info, struct sail_codec** codec);
 
 /*
  * Destroys the specified codec and all its internal memory buffers.
  * Does nothing if the codec is NULL.
  */
-SAIL_HIDDEN void destroy_codec(struct sail_codec *codec);
+SAIL_HIDDEN void destroy_codec(struct sail_codec* codec);

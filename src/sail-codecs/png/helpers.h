@@ -47,36 +47,55 @@ SAIL_HIDDEN void png_private_my_warning_fn(png_structp png_ptr, png_const_charp 
 
 SAIL_HIDDEN void* png_private_my_malloc_fn(png_structp png_ptr, png_size_t size);
 
-SAIL_HIDDEN void png_private_my_free_fn(png_structp png_ptr, void *ptr);
+SAIL_HIDDEN void png_private_my_free_fn(png_structp png_ptr, void* ptr);
 
 SAIL_HIDDEN enum SailPixelFormat png_private_png_color_type_to_pixel_format(int color_type, int bit_depth);
 
-SAIL_HIDDEN sail_status_t png_private_pixel_format_to_png_color_type(enum SailPixelFormat pixel_format, int *color_type, int *bit_depth);
+SAIL_HIDDEN sail_status_t png_private_pixel_format_to_png_color_type(enum SailPixelFormat pixel_format,
+                                                                     int* color_type,
+                                                                     int* bit_depth);
 
-SAIL_HIDDEN sail_status_t png_private_fetch_meta_data(png_structp png_ptr, png_infop info_ptr, struct sail_meta_data_node **target_meta_data_node);
+SAIL_HIDDEN sail_status_t png_private_fetch_meta_data(png_structp png_ptr,
+                                                      png_infop info_ptr,
+                                                      struct sail_meta_data_node** target_meta_data_node);
 
-SAIL_HIDDEN sail_status_t png_private_write_meta_data(png_structp png_ptr, png_infop info_ptr, const struct sail_meta_data_node *meta_data_node);
+SAIL_HIDDEN sail_status_t png_private_write_meta_data(png_structp png_ptr,
+                                                      png_infop info_ptr,
+                                                      const struct sail_meta_data_node* meta_data_node);
 
-SAIL_HIDDEN sail_status_t png_private_fetch_iccp(png_structp png_ptr, png_infop info_ptr, struct sail_iccp **iccp);
+SAIL_HIDDEN sail_status_t png_private_fetch_iccp(png_structp png_ptr, png_infop info_ptr, struct sail_iccp** iccp);
 
-SAIL_HIDDEN sail_status_t png_private_fetch_palette(png_structp png_ptr, png_infop info_ptr, struct sail_palette **palette);
+SAIL_HIDDEN sail_status_t png_private_fetch_palette(png_structp png_ptr,
+                                                    png_infop info_ptr,
+                                                    struct sail_palette** palette);
 
 #ifdef PNG_APNG_SUPPORTED
-SAIL_HIDDEN sail_status_t png_private_blend_source(void *dst_raw, unsigned dst_offset, const void *src_raw, unsigned src_width, unsigned bytes_per_pixel);
+SAIL_HIDDEN sail_status_t png_private_blend_source(
+    void* dst_raw, unsigned dst_offset, const void* src_raw, unsigned src_width, unsigned bytes_per_pixel);
 
-SAIL_HIDDEN sail_status_t png_private_blend_over(void *dst_raw, unsigned dst_offset, const void *src_raw, unsigned width, enum SailPixelFormat pixel_format);
+SAIL_HIDDEN sail_status_t png_private_blend_over(
+    void* dst_raw, unsigned dst_offset, const void* src_raw, unsigned width, enum SailPixelFormat pixel_format);
 
-SAIL_HIDDEN sail_status_t png_private_skip_hidden_frame(unsigned bytes_per_line, unsigned height, png_structp png_ptr, png_infop info_ptr, void **row);
+SAIL_HIDDEN sail_status_t png_private_skip_hidden_frame(
+    unsigned bytes_per_line, unsigned height, png_structp png_ptr, png_infop info_ptr, void** row);
 
-SAIL_HIDDEN sail_status_t png_private_alloc_rows(png_bytep **A, unsigned row_length, unsigned height);
+SAIL_HIDDEN sail_status_t png_private_alloc_rows(png_bytep** A, unsigned row_length, unsigned height);
 
-SAIL_HIDDEN void png_private_destroy_rows(png_bytep **A, unsigned height);
+SAIL_HIDDEN void png_private_destroy_rows(png_bytep** A, unsigned height);
 
-SAIL_HIDDEN sail_status_t png_private_store_num_frames_and_plays(png_structp png_ptr, png_infop info_ptr, struct sail_hash_map *special_properties);
+SAIL_HIDDEN sail_status_t png_private_store_num_frames_and_plays(png_structp png_ptr,
+                                                                 png_infop info_ptr,
+                                                                 struct sail_hash_map* special_properties);
 #endif
 
-SAIL_HIDDEN sail_status_t png_private_fetch_resolution(png_structp png_ptr, png_infop info_ptr, struct sail_resolution **resolution);
+SAIL_HIDDEN sail_status_t png_private_fetch_resolution(png_structp png_ptr,
+                                                       png_infop info_ptr,
+                                                       struct sail_resolution** resolution);
 
-SAIL_HIDDEN sail_status_t png_private_write_resolution(png_structp png_ptr, png_infop info_ptr, const struct sail_resolution *resolution);
+SAIL_HIDDEN sail_status_t png_private_write_resolution(png_structp png_ptr,
+                                                       png_infop info_ptr,
+                                                       const struct sail_resolution* resolution);
 
-SAIL_HIDDEN bool png_private_tuning_key_value_callback(const char *key, const struct sail_variant *value, void *user_data);
+SAIL_HIDDEN bool png_private_tuning_key_value_callback(const char* key,
+                                                       const struct sail_variant* value,
+                                                       void* user_data);

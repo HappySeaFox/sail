@@ -29,28 +29,36 @@
  * Private functions.
  */
 
-static void print_unsupported_write_pixel_format(enum SailPixelFormat pixel_format) {
+static void print_unsupported_write_pixel_format(enum SailPixelFormat pixel_format)
+{
 
-    SAIL_LOG_ERROR("This codec cannot save %s pixels. Use its save features to get the list of supported pixel formats for saving",
-                    sail_pixel_format_to_string(pixel_format));
+    SAIL_LOG_ERROR(
+        "This codec cannot save %s pixels. Use its save features to get the list of supported pixel formats for saving",
+        sail_pixel_format_to_string(pixel_format));
 }
 
-static sail_status_t load_codec_by_codec_info_unsafe(const struct sail_codec_info *codec_info, const struct sail_codec **codec) {
+static sail_status_t load_codec_by_codec_info_unsafe(const struct sail_codec_info* codec_info,
+                                                     const struct sail_codec** codec)
+{
 
     SAIL_CHECK_PTR(codec_info);
     SAIL_CHECK_PTR(codec);
 
-    struct sail_context *context;
+    struct sail_context* context;
     SAIL_TRY(fetch_global_context_unsafe(&context));
 
     /* Find the codec in the cache. */
-    struct sail_codec_bundle *found_codec_bundle = NULL;
+    struct sail_codec_bundle* found_codec_bundle = NULL;
 
-    for (struct sail_codec_bundle_node *codec_bundle_node = context->codec_bundle_node; codec_bundle_node != NULL; codec_bundle_node = codec_bundle_node->next) {
-        struct sail_codec_bundle *codec_bundle = codec_bundle_node->codec_bundle;
+    for (struct sail_codec_bundle_node* codec_bundle_node = context->codec_bundle_node; codec_bundle_node != NULL;
+         codec_bundle_node                                = codec_bundle_node->next)
+    {
+        struct sail_codec_bundle* codec_bundle = codec_bundle_node->codec_bundle;
 
-        if (codec_bundle->codec_info == codec_info) {
-            if (codec_bundle->codec != NULL) {
+        if (codec_bundle->codec_info == codec_info)
+        {
+            if (codec_bundle->codec != NULL)
+            {
                 *codec = codec_bundle->codec;
                 return SAIL_OK;
             }
@@ -61,11 +69,13 @@ static sail_status_t load_codec_by_codec_info_unsafe(const struct sail_codec_inf
     }
 
     /* Something weird. The pointer to the codec info is not found in the cache. */
-    if (found_codec_bundle == NULL) {
+    if (found_codec_bundle == NULL)
+    {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_NOT_FOUND);
     }
 
-    if (found_codec_bundle->codec == NULL) {
+    if (found_codec_bundle->codec == NULL)
+    {
         SAIL_TRY(alloc_and_load_codec(found_codec_bundle->codec_info, &found_codec_bundle->codec));
     }
 
@@ -78,7 +88,8 @@ static sail_status_t load_codec_by_codec_info_unsafe(const struct sail_codec_inf
  * Public functions.
  */
 
-sail_status_t load_codec_by_codec_info(const struct sail_codec_info *codec_info, const struct sail_codec **codec) {
+sail_status_t load_codec_by_codec_info(const struct sail_codec_info* codec_info, const struct sail_codec** codec)
+{
 
     SAIL_CHECK_PTR(codec_info);
     SAIL_CHECK_PTR(codec);
@@ -93,13 +104,16 @@ sail_status_t load_codec_by_codec_info(const struct sail_codec_info *codec_info,
     return SAIL_OK;
 }
 
-void destroy_hidden_state(struct hidden_state *state) {
+void destroy_hidden_state(struct hidden_state* state)
+{
 
-    if (state == NULL) {
+    if (state == NULL)
+    {
         return;
     }
 
-    if (state->own_io) {
+    if (state->own_io)
+    {
         sail_destroy_io(state->io);
     }
 
@@ -112,21 +126,25 @@ void destroy_hidden_state(struct hidden_state *state) {
     sail_free(state);
 }
 
-sail_status_t stop_saving(void *state, size_t *written) {
+sail_status_t stop_saving(void* state, size_t* written)
+{
 
-    if (written != NULL) {
+    if (written != NULL)
+    {
         *written = 0;
     }
 
     /* Not an error. */
-    if (state == NULL) {
+    if (state == NULL)
+    {
         return SAIL_OK;
     }
 
-    struct hidden_state *state_of_mind = (struct hidden_state *)state;
+    struct hidden_state* state_of_mind = (struct hidden_state*)state;
 
     /* Not an error. */
-    if (state_of_mind->codec == NULL) {
+    if (state_of_mind->codec == NULL)
+    {
         destroy_hidden_state(state_of_mind);
         return SAIL_OK;
     }
@@ -134,7 +152,8 @@ sail_status_t stop_saving(void *state, size_t *written) {
     SAIL_TRY_OR_CLEANUP(state_of_mind->codec->v8->save_finish(&state_of_mind->state),
                         /* cleanup */ destroy_hidden_state(state_of_mind));
 
-    if (written != NULL) {
+    if (written != NULL)
+    {
         /* The stream cursor may not be positioned at the end. Let's move it. */
         SAIL_TRY_OR_CLEANUP(state_of_mind->io->seek(state_of_mind->io->stream, 0, SEEK_END),
                             /* cleanup */ destroy_hidden_state(state_of_mind));
@@ -146,12 +165,16 @@ sail_status_t stop_saving(void *state, size_t *written) {
     return SAIL_OK;
 }
 
-sail_status_t allowed_write_output_pixel_format(const struct sail_save_features *save_features, enum SailPixelFormat pixel_format) {
+sail_status_t allowed_write_output_pixel_format(const struct sail_save_features* save_features,
+                                                enum SailPixelFormat pixel_format)
+{
 
     SAIL_CHECK_PTR(save_features);
 
-    for (unsigned i = 0; i < save_features->pixel_formats_length; i++) {
-        if (save_features->pixel_formats[i] == pixel_format) {
+    for (unsigned i = 0; i < save_features->pixel_formats_length; i++)
+    {
+        if (save_features->pixel_formats[i] == pixel_format)
+        {
             return SAIL_OK;
         }
     }

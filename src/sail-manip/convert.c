@@ -35,358 +35,849 @@
  * Private functions.
  */
 
-struct output_context {
-    struct sail_image *image;
+struct output_context
+{
+    struct sail_image* image;
     int r;
     int g;
     int b;
     int a;
-    const struct sail_conversion_options *options;
+    const struct sail_conversion_options* options;
 };
 
-typedef void (*pixel_consumer_t)(const struct output_context *output_context, uint8_t **scan8, uint16_t **scan16, const sail_rgba32_t *rgba32, const sail_rgba64_t *rgba64);
+typedef void (*pixel_consumer_t)(const struct output_context* output_context,
+                                 uint8_t** scan8,
+                                 uint16_t** scan16,
+                                 const sail_rgba32_t* rgba32,
+                                 const sail_rgba64_t* rgba64);
 
-static inline void pixel_consumer_gray8(const struct output_context *output_context, uint8_t **scan8, uint16_t ** scan16, const sail_rgba32_t *rgba32, const sail_rgba64_t *rgba64) {
+static inline void pixel_consumer_gray8(const struct output_context* output_context,
+                                        uint8_t** scan8,
+                                        uint16_t** scan16,
+                                        const sail_rgba32_t* rgba32,
+                                        const sail_rgba64_t* rgba64)
+{
 
     (void)scan16;
 
-    if (rgba32 != NULL) {
+    if (rgba32 != NULL)
+    {
         fill_gray8_pixel_from_uint8_values(rgba32, *scan8, output_context->options);
-    } else {
+    }
+    else
+    {
         fill_gray8_pixel_from_uint16_values(rgba64, *scan8, output_context->options);
     }
 
     (*scan8)++;
 }
 
-static inline void pixel_consumer_gray16(const struct output_context *output_context, uint8_t ** scan8, uint16_t **scan16, const sail_rgba32_t *rgba32, const sail_rgba64_t *rgba64) {
+static inline void pixel_consumer_gray16(const struct output_context* output_context,
+                                         uint8_t** scan8,
+                                         uint16_t** scan16,
+                                         const sail_rgba32_t* rgba32,
+                                         const sail_rgba64_t* rgba64)
+{
 
     (void)scan8;
 
-    if (rgba32 != NULL) {
+    if (rgba32 != NULL)
+    {
         fill_gray16_pixel_from_uint8_values(rgba32, *scan16, output_context->options);
-    } else {
+    }
+    else
+    {
         fill_gray16_pixel_from_uint16_values(rgba64, *scan16, output_context->options);
     }
 
     (*scan16)++;
 }
 
-static inline void pixel_consumer_rgb24_kind(const struct output_context *output_context, uint8_t **scan8, uint16_t **scan16, const sail_rgba32_t *rgba32, const sail_rgba64_t *rgba64) {
+static inline void pixel_consumer_rgb24_kind(const struct output_context* output_context,
+                                             uint8_t** scan8,
+                                             uint16_t** scan16,
+                                             const sail_rgba32_t* rgba32,
+                                             const sail_rgba64_t* rgba64)
+{
 
     (void)scan16;
 
-    if (rgba32 != NULL) {
-        fill_rgb24_pixel_from_uint8_values(rgba32, *scan8, output_context->r, output_context->g, output_context->b, output_context->options);
-    } else {
-        fill_rgb24_pixel_from_uint16_values(rgba64, *scan8, output_context->r, output_context->g, output_context->b, output_context->options);
+    if (rgba32 != NULL)
+    {
+        fill_rgb24_pixel_from_uint8_values(rgba32, *scan8, output_context->r, output_context->g, output_context->b,
+                                           output_context->options);
+    }
+    else
+    {
+        fill_rgb24_pixel_from_uint16_values(rgba64, *scan8, output_context->r, output_context->g, output_context->b,
+                                            output_context->options);
     }
 
     *scan8 += 3;
 }
 
-static inline void pixel_consumer_rgb48_kind(const struct output_context *output_context, uint8_t ** scan8, uint16_t **scan16, const sail_rgba32_t *rgba32, const sail_rgba64_t *rgba64) {
+static inline void pixel_consumer_rgb48_kind(const struct output_context* output_context,
+                                             uint8_t** scan8,
+                                             uint16_t** scan16,
+                                             const sail_rgba32_t* rgba32,
+                                             const sail_rgba64_t* rgba64)
+{
 
     (void)scan8;
 
-    if (rgba32 != NULL) {
-        fill_rgb48_pixel_from_uint8_values(rgba32, *scan16, output_context->r, output_context->g, output_context->b, output_context->options);
-    } else {
-        fill_rgb48_pixel_from_uint16_values(rgba64, *scan16, output_context->r, output_context->g, output_context->b, output_context->options);
+    if (rgba32 != NULL)
+    {
+        fill_rgb48_pixel_from_uint8_values(rgba32, *scan16, output_context->r, output_context->g, output_context->b,
+                                           output_context->options);
+    }
+    else
+    {
+        fill_rgb48_pixel_from_uint16_values(rgba64, *scan16, output_context->r, output_context->g, output_context->b,
+                                            output_context->options);
     }
 
     *scan16 += 3;
 }
 
-static inline void pixel_consumer_rgba32_kind(const struct output_context *output_context, uint8_t **scan8, uint16_t ** scan16, const sail_rgba32_t *rgba32, const sail_rgba64_t *rgba64) {
+static inline void pixel_consumer_rgba32_kind(const struct output_context* output_context,
+                                              uint8_t** scan8,
+                                              uint16_t** scan16,
+                                              const sail_rgba32_t* rgba32,
+                                              const sail_rgba64_t* rgba64)
+{
 
     (void)scan16;
 
-    if (rgba32 != NULL) {
-        fill_rgba32_pixel_from_uint8_values(rgba32, *scan8, output_context->r, output_context->g, output_context->b, output_context->a, output_context->options);
-    } else {
-        fill_rgba32_pixel_from_uint16_values(rgba64, *scan8, output_context->r, output_context->g, output_context->b, output_context->a, output_context->options);
+    if (rgba32 != NULL)
+    {
+        fill_rgba32_pixel_from_uint8_values(rgba32, *scan8, output_context->r, output_context->g, output_context->b,
+                                            output_context->a, output_context->options);
+    }
+    else
+    {
+        fill_rgba32_pixel_from_uint16_values(rgba64, *scan8, output_context->r, output_context->g, output_context->b,
+                                             output_context->a, output_context->options);
     }
 
     *scan8 += 4;
 }
 
-static inline void pixel_consumer_rgba64_kind(const struct output_context *output_context, uint8_t ** scan8, uint16_t **scan16, const sail_rgba32_t *rgba32, const sail_rgba64_t *rgba64) {
+static inline void pixel_consumer_rgba64_kind(const struct output_context* output_context,
+                                              uint8_t** scan8,
+                                              uint16_t** scan16,
+                                              const sail_rgba32_t* rgba32,
+                                              const sail_rgba64_t* rgba64)
+{
 
     (void)scan8;
 
-    if (rgba32 != NULL) {
-        fill_rgba64_pixel_from_uint8_values(rgba32, *scan16, output_context->r, output_context->g, output_context->b, output_context->a, output_context->options);
-    } else {
-        fill_rgba64_pixel_from_uint16_values(rgba64, *scan16, output_context->r, output_context->g, output_context->b, output_context->a, output_context->options);
+    if (rgba32 != NULL)
+    {
+        fill_rgba64_pixel_from_uint8_values(rgba32, *scan16, output_context->r, output_context->g, output_context->b,
+                                            output_context->a, output_context->options);
+    }
+    else
+    {
+        fill_rgba64_pixel_from_uint16_values(rgba64, *scan16, output_context->r, output_context->g, output_context->b,
+                                             output_context->a, output_context->options);
     }
 
     *scan16 += 4;
 }
 
-static inline void pixel_consumer_ycbcr(const struct output_context *output_context, uint8_t **scan8, uint16_t ** scan16, const sail_rgba32_t *rgba32, const sail_rgba64_t *rgba64) {
+static inline void pixel_consumer_ycbcr(const struct output_context* output_context,
+                                        uint8_t** scan8,
+                                        uint16_t** scan16,
+                                        const sail_rgba32_t* rgba32,
+                                        const sail_rgba64_t* rgba64)
+{
 
     (void)scan16;
 
-    if (rgba32 != NULL) {
+    if (rgba32 != NULL)
+    {
         fill_ycbcr_pixel_from_uint8_values(rgba32, *scan8, output_context->options);
-    } else {
+    }
+    else
+    {
         fill_ycbcr_pixel_from_uint16_values(rgba64, *scan8, output_context->options);
     }
 
     *scan8 += 3;
 }
 
-static inline void pixel_consumer_gray_alpha8(const struct output_context *output_context, uint8_t **scan8, uint16_t **scan16, const sail_rgba32_t *rgba32, const sail_rgba64_t *rgba64) {
+static inline void pixel_consumer_gray_alpha8(const struct output_context* output_context,
+                                              uint8_t** scan8,
+                                              uint16_t** scan16,
+                                              const sail_rgba32_t* rgba32,
+                                              const sail_rgba64_t* rgba64)
+{
 
     (void)scan16;
 
-    if (rgba32 != NULL) {
+    if (rgba32 != NULL)
+    {
         fill_gray_alpha8_pixel_from_uint8_values(rgba32, *scan8, output_context->options);
-    } else {
+    }
+    else
+    {
         fill_gray_alpha8_pixel_from_uint16_values(rgba64, *scan8, output_context->options);
     }
 
     (*scan8)++;
 }
 
-static inline void pixel_consumer_gray_alpha16(const struct output_context *output_context, uint8_t **scan8, uint16_t **scan16, const sail_rgba32_t *rgba32, const sail_rgba64_t *rgba64) {
+static inline void pixel_consumer_gray_alpha16(const struct output_context* output_context,
+                                               uint8_t** scan8,
+                                               uint16_t** scan16,
+                                               const sail_rgba32_t* rgba32,
+                                               const sail_rgba64_t* rgba64)
+{
 
     (void)scan16;
 
-    if (rgba32 != NULL) {
+    if (rgba32 != NULL)
+    {
         fill_gray_alpha16_pixel_from_uint8_values(rgba32, *scan8, output_context->options);
-    } else {
+    }
+    else
+    {
         fill_gray_alpha16_pixel_from_uint16_values(rgba64, *scan8, output_context->options);
     }
 
     *scan8 += 2;
 }
 
-static inline void pixel_consumer_gray_alpha32(const struct output_context *output_context, uint8_t **scan8, uint16_t **scan16, const sail_rgba32_t *rgba32, const sail_rgba64_t *rgba64) {
+static inline void pixel_consumer_gray_alpha32(const struct output_context* output_context,
+                                               uint8_t** scan8,
+                                               uint16_t** scan16,
+                                               const sail_rgba32_t* rgba32,
+                                               const sail_rgba64_t* rgba64)
+{
 
     (void)scan8;
 
-    if (rgba32 != NULL) {
+    if (rgba32 != NULL)
+    {
         fill_gray_alpha32_pixel_from_uint8_values(rgba32, *scan16, output_context->options);
-    } else {
+    }
+    else
+    {
         fill_gray_alpha32_pixel_from_uint16_values(rgba64, *scan16, output_context->options);
     }
 
     *scan16 += 2;
 }
 
-static inline void pixel_consumer_rgb555_kind(const struct output_context *output_context, uint8_t **scan8, uint16_t **scan16, const sail_rgba32_t *rgba32, const sail_rgba64_t *rgba64) {
+static inline void pixel_consumer_rgb555_kind(const struct output_context* output_context,
+                                              uint8_t** scan8,
+                                              uint16_t** scan16,
+                                              const sail_rgba32_t* rgba32,
+                                              const sail_rgba64_t* rgba64)
+{
 
     (void)scan8;
 
-    if (rgba32 != NULL) {
-        fill_rgb555_pixel_from_uint8_values(rgba32, *scan16, output_context->r, output_context->g, output_context->b, output_context->options);
-    } else {
-        fill_rgb555_pixel_from_uint16_values(rgba64, *scan16, output_context->r, output_context->g, output_context->b, output_context->options);
+    if (rgba32 != NULL)
+    {
+        fill_rgb555_pixel_from_uint8_values(rgba32, *scan16, output_context->r, output_context->g, output_context->b,
+                                            output_context->options);
+    }
+    else
+    {
+        fill_rgb555_pixel_from_uint16_values(rgba64, *scan16, output_context->r, output_context->g, output_context->b,
+                                             output_context->options);
     }
 
     (*scan16)++;
 }
 
-static inline void pixel_consumer_rgb565_kind(const struct output_context *output_context, uint8_t **scan8, uint16_t **scan16, const sail_rgba32_t *rgba32, const sail_rgba64_t *rgba64) {
+static inline void pixel_consumer_rgb565_kind(const struct output_context* output_context,
+                                              uint8_t** scan8,
+                                              uint16_t** scan16,
+                                              const sail_rgba32_t* rgba32,
+                                              const sail_rgba64_t* rgba64)
+{
 
     (void)scan8;
 
-    if (rgba32 != NULL) {
-        fill_rgb565_pixel_from_uint8_values(rgba32, *scan16, output_context->r, output_context->g, output_context->b, output_context->options);
-    } else {
-        fill_rgb565_pixel_from_uint16_values(rgba64, *scan16, output_context->r, output_context->g, output_context->b, output_context->options);
+    if (rgba32 != NULL)
+    {
+        fill_rgb565_pixel_from_uint8_values(rgba32, *scan16, output_context->r, output_context->g, output_context->b,
+                                            output_context->options);
+    }
+    else
+    {
+        fill_rgb565_pixel_from_uint16_values(rgba64, *scan16, output_context->r, output_context->g, output_context->b,
+                                             output_context->options);
     }
 
     (*scan16)++;
 }
 
-static inline void pixel_consumer_cmyk32(const struct output_context *output_context, uint8_t **scan8, uint16_t **scan16, const sail_rgba32_t *rgba32, const sail_rgba64_t *rgba64) {
+static inline void pixel_consumer_cmyk32(const struct output_context* output_context,
+                                         uint8_t** scan8,
+                                         uint16_t** scan16,
+                                         const sail_rgba32_t* rgba32,
+                                         const sail_rgba64_t* rgba64)
+{
 
     (void)scan16;
 
-    if (rgba32 != NULL) {
+    if (rgba32 != NULL)
+    {
         fill_cmyk32_pixel_from_uint8_values(rgba32, *scan8, output_context->options);
-    } else {
+    }
+    else
+    {
         fill_cmyk32_pixel_from_uint16_values(rgba64, *scan8, output_context->options);
     }
 
     *scan8 += 4;
 }
 
-static inline void pixel_consumer_cmyk64(const struct output_context *output_context, uint8_t **scan8, uint16_t **scan16, const sail_rgba32_t *rgba32, const sail_rgba64_t *rgba64) {
+static inline void pixel_consumer_cmyk64(const struct output_context* output_context,
+                                         uint8_t** scan8,
+                                         uint16_t** scan16,
+                                         const sail_rgba32_t* rgba32,
+                                         const sail_rgba64_t* rgba64)
+{
 
     (void)scan8;
 
-    if (rgba32 != NULL) {
+    if (rgba32 != NULL)
+    {
         fill_cmyk64_pixel_from_uint8_values(rgba32, *scan16, output_context->options);
-    } else {
+    }
+    else
+    {
         fill_cmyk64_pixel_from_uint16_values(rgba64, *scan16, output_context->options);
     }
 
     *scan16 += 4;
 }
 
-static inline void pixel_consumer_cmyka40(const struct output_context *output_context, uint8_t **scan8, uint16_t **scan16, const sail_rgba32_t *rgba32, const sail_rgba64_t *rgba64) {
+static inline void pixel_consumer_cmyka40(const struct output_context* output_context,
+                                          uint8_t** scan8,
+                                          uint16_t** scan16,
+                                          const sail_rgba32_t* rgba32,
+                                          const sail_rgba64_t* rgba64)
+{
 
     (void)scan16;
 
-    if (rgba32 != NULL) {
+    if (rgba32 != NULL)
+    {
         fill_cmyka40_pixel_from_uint8_values(rgba32, *scan8, output_context->options);
-    } else {
+    }
+    else
+    {
         fill_cmyka40_pixel_from_uint16_values(rgba64, *scan8, output_context->options);
     }
 
     *scan8 += 5;
 }
 
-static inline void pixel_consumer_cmyka80(const struct output_context *output_context, uint8_t **scan8, uint16_t **scan16, const sail_rgba32_t *rgba32, const sail_rgba64_t *rgba64) {
+static inline void pixel_consumer_cmyka80(const struct output_context* output_context,
+                                          uint8_t** scan8,
+                                          uint16_t** scan16,
+                                          const sail_rgba32_t* rgba32,
+                                          const sail_rgba64_t* rgba64)
+{
 
     (void)scan8;
 
-    if (rgba32 != NULL) {
+    if (rgba32 != NULL)
+    {
         fill_cmyka80_pixel_from_uint8_values(rgba32, *scan16, output_context->options);
-    } else {
+    }
+    else
+    {
         fill_cmyka80_pixel_from_uint16_values(rgba64, *scan16, output_context->options);
     }
 
     *scan16 += 5;
 }
 
-static inline void pixel_consumer_rgba16_kind(const struct output_context *output_context, uint8_t **scan8, uint16_t **scan16, const sail_rgba32_t *rgba32, const sail_rgba64_t *rgba64) {
+static inline void pixel_consumer_rgba16_kind(const struct output_context* output_context,
+                                              uint8_t** scan8,
+                                              uint16_t** scan16,
+                                              const sail_rgba32_t* rgba32,
+                                              const sail_rgba64_t* rgba64)
+{
 
     (void)scan8;
 
-    if (rgba32 != NULL) {
-        fill_rgba16_pixel_from_uint8_values(rgba32, *scan16, output_context->r, output_context->g, output_context->b, output_context->a, 4, output_context->options);
-    } else {
-        fill_rgba16_pixel_from_uint16_values(rgba64, *scan16, output_context->r, output_context->g, output_context->b, output_context->a, 4, output_context->options);
+    if (rgba32 != NULL)
+    {
+        fill_rgba16_pixel_from_uint8_values(rgba32, *scan16, output_context->r, output_context->g, output_context->b,
+                                            output_context->a, 4, output_context->options);
+    }
+    else
+    {
+        fill_rgba16_pixel_from_uint16_values(rgba64, *scan16, output_context->r, output_context->g, output_context->b,
+                                             output_context->a, 4, output_context->options);
     }
 
     (*scan16)++;
 }
 
-static inline void pixel_consumer_yuv24(const struct output_context *output_context, uint8_t **scan8, uint16_t **scan16, const sail_rgba32_t *rgba32, const sail_rgba64_t *rgba64) {
+static inline void pixel_consumer_yuv24(const struct output_context* output_context,
+                                        uint8_t** scan8,
+                                        uint16_t** scan16,
+                                        const sail_rgba32_t* rgba32,
+                                        const sail_rgba64_t* rgba64)
+{
 
     (void)scan16;
 
-    if (rgba32 != NULL) {
+    if (rgba32 != NULL)
+    {
         fill_yuv24_pixel_from_uint8_values(rgba32, *scan8, output_context->options);
-    } else {
+    }
+    else
+    {
         fill_yuv24_pixel_from_uint16_values(rgba64, *scan8, output_context->options);
     }
 
     *scan8 += 3;
 }
 
-static bool verify_and_construct_rgba_indexes_silent(enum SailPixelFormat output_pixel_format, pixel_consumer_t *pixel_consumer, int *r, int *g, int *b, int *a) {
+static bool verify_and_construct_rgba_indexes_silent(
+    enum SailPixelFormat output_pixel_format, pixel_consumer_t* pixel_consumer, int* r, int* g, int* b, int* a)
+{
 
-    switch (output_pixel_format) {
-        case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE:  { *pixel_consumer = pixel_consumer_gray8;  *r = *g = *b = *a = -1; /* unused. */ break; }
-        case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE: { *pixel_consumer = pixel_consumer_gray16; *r = *g = *b = *a = -1; /* unused. */ break; }
+    switch (output_pixel_format)
+    {
+    case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE:
+    {
+        *pixel_consumer = pixel_consumer_gray8;
+        *r = *g = *b = *a = -1; /* unused. */
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE:
+    {
+        *pixel_consumer = pixel_consumer_gray16;
+        *r = *g = *b = *a = -1; /* unused. */
+        break;
+    }
 
-        case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE_ALPHA:  { *pixel_consumer = pixel_consumer_gray_alpha8;  *r = *g = *b = *a = -1; /* unused. */ break; }
-        case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA: { *pixel_consumer = pixel_consumer_gray_alpha16; *r = *g = *b = *a = -1; /* unused. */ break; }
-        case SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA: { *pixel_consumer = pixel_consumer_gray_alpha32; *r = *g = *b = *a = -1; /* unused. */ break; }
+    case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE_ALPHA:
+    {
+        *pixel_consumer = pixel_consumer_gray_alpha8;
+        *r = *g = *b = *a = -1; /* unused. */
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA:
+    {
+        *pixel_consumer = pixel_consumer_gray_alpha16;
+        *r = *g = *b = *a = -1; /* unused. */
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA:
+    {
+        *pixel_consumer = pixel_consumer_gray_alpha32;
+        *r = *g = *b = *a = -1; /* unused. */
+        break;
+    }
 
-        case SAIL_PIXEL_FORMAT_BPP16_RGB555: { *pixel_consumer = pixel_consumer_rgb555_kind; *r = 0;  *g = 5;  *b = 10; *a = -1; break; }
-        case SAIL_PIXEL_FORMAT_BPP16_BGR555: { *pixel_consumer = pixel_consumer_rgb555_kind; *r = 10; *g = 5;  *b = 0;  *a = -1; break; }
-        case SAIL_PIXEL_FORMAT_BPP16_RGB565: { *pixel_consumer = pixel_consumer_rgb565_kind; *r = 0;  *g = 5;  *b = 11; *a = -1; break; }
-        case SAIL_PIXEL_FORMAT_BPP16_BGR565: { *pixel_consumer = pixel_consumer_rgb565_kind; *r = 11; *g = 5;  *b = 0;  *a = -1; break; }
+    case SAIL_PIXEL_FORMAT_BPP16_RGB555:
+    {
+        *pixel_consumer = pixel_consumer_rgb555_kind;
+        *r              = 0;
+        *g              = 5;
+        *b              = 10;
+        *a              = -1;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP16_BGR555:
+    {
+        *pixel_consumer = pixel_consumer_rgb555_kind;
+        *r              = 10;
+        *g              = 5;
+        *b              = 0;
+        *a              = -1;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP16_RGB565:
+    {
+        *pixel_consumer = pixel_consumer_rgb565_kind;
+        *r              = 0;
+        *g              = 5;
+        *b              = 11;
+        *a              = -1;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP16_BGR565:
+    {
+        *pixel_consumer = pixel_consumer_rgb565_kind;
+        *r              = 11;
+        *g              = 5;
+        *b              = 0;
+        *a              = -1;
+        break;
+    }
 
-        case SAIL_PIXEL_FORMAT_BPP24_RGB: { *pixel_consumer = pixel_consumer_rgb24_kind; *r = 0; *g = 1; *b = 2; *a = -1; break; }
-        case SAIL_PIXEL_FORMAT_BPP24_BGR: { *pixel_consumer = pixel_consumer_rgb24_kind; *r = 2; *g = 1; *b = 0; *a = -1; break; }
+    case SAIL_PIXEL_FORMAT_BPP24_RGB:
+    {
+        *pixel_consumer = pixel_consumer_rgb24_kind;
+        *r              = 0;
+        *g              = 1;
+        *b              = 2;
+        *a              = -1;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP24_BGR:
+    {
+        *pixel_consumer = pixel_consumer_rgb24_kind;
+        *r              = 2;
+        *g              = 1;
+        *b              = 0;
+        *a              = -1;
+        break;
+    }
 
-        case SAIL_PIXEL_FORMAT_BPP48_RGB: { *pixel_consumer = pixel_consumer_rgb48_kind; *r = 0; *g = 1; *b = 2; *a = -1; break; }
-        case SAIL_PIXEL_FORMAT_BPP48_BGR: { *pixel_consumer = pixel_consumer_rgb48_kind; *r = 2; *g = 1; *b = 0; *a = -1; break; }
+    case SAIL_PIXEL_FORMAT_BPP48_RGB:
+    {
+        *pixel_consumer = pixel_consumer_rgb48_kind;
+        *r              = 0;
+        *g              = 1;
+        *b              = 2;
+        *a              = -1;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP48_BGR:
+    {
+        *pixel_consumer = pixel_consumer_rgb48_kind;
+        *r              = 2;
+        *g              = 1;
+        *b              = 0;
+        *a              = -1;
+        break;
+    }
 
-        case SAIL_PIXEL_FORMAT_BPP16_RGBX: { *pixel_consumer = pixel_consumer_rgba16_kind; *r = 0;  *g = 4;  *b = 8;  *a = -1; break; }
-        case SAIL_PIXEL_FORMAT_BPP16_BGRX: { *pixel_consumer = pixel_consumer_rgba16_kind; *r = 8;  *g = 4;  *b = 0;  *a = -1; break; }
-        case SAIL_PIXEL_FORMAT_BPP16_XRGB: { *pixel_consumer = pixel_consumer_rgba16_kind; *r = 4;  *g = 8;  *b = 12; *a = -1; break; }
-        case SAIL_PIXEL_FORMAT_BPP16_XBGR: { *pixel_consumer = pixel_consumer_rgba16_kind; *r = 12; *g = 8;  *b = 4;  *a = -1; break; }
-        case SAIL_PIXEL_FORMAT_BPP16_RGBA: { *pixel_consumer = pixel_consumer_rgba16_kind; *r = 0;  *g = 4;  *b = 8;  *a = 12; break; }
-        case SAIL_PIXEL_FORMAT_BPP16_BGRA: { *pixel_consumer = pixel_consumer_rgba16_kind; *r = 8;  *g = 4;  *b = 0;  *a = 12; break; }
-        case SAIL_PIXEL_FORMAT_BPP16_ARGB: { *pixel_consumer = pixel_consumer_rgba16_kind; *r = 4;  *g = 8;  *b = 12; *a = 0;  break; }
-        case SAIL_PIXEL_FORMAT_BPP16_ABGR: { *pixel_consumer = pixel_consumer_rgba16_kind; *r = 12; *g = 8;  *b = 4;  *a = 0;  break; }
+    case SAIL_PIXEL_FORMAT_BPP16_RGBX:
+    {
+        *pixel_consumer = pixel_consumer_rgba16_kind;
+        *r              = 0;
+        *g              = 4;
+        *b              = 8;
+        *a              = -1;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP16_BGRX:
+    {
+        *pixel_consumer = pixel_consumer_rgba16_kind;
+        *r              = 8;
+        *g              = 4;
+        *b              = 0;
+        *a              = -1;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP16_XRGB:
+    {
+        *pixel_consumer = pixel_consumer_rgba16_kind;
+        *r              = 4;
+        *g              = 8;
+        *b              = 12;
+        *a              = -1;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP16_XBGR:
+    {
+        *pixel_consumer = pixel_consumer_rgba16_kind;
+        *r              = 12;
+        *g              = 8;
+        *b              = 4;
+        *a              = -1;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP16_RGBA:
+    {
+        *pixel_consumer = pixel_consumer_rgba16_kind;
+        *r              = 0;
+        *g              = 4;
+        *b              = 8;
+        *a              = 12;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP16_BGRA:
+    {
+        *pixel_consumer = pixel_consumer_rgba16_kind;
+        *r              = 8;
+        *g              = 4;
+        *b              = 0;
+        *a              = 12;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP16_ARGB:
+    {
+        *pixel_consumer = pixel_consumer_rgba16_kind;
+        *r              = 4;
+        *g              = 8;
+        *b              = 12;
+        *a              = 0;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP16_ABGR:
+    {
+        *pixel_consumer = pixel_consumer_rgba16_kind;
+        *r              = 12;
+        *g              = 8;
+        *b              = 4;
+        *a              = 0;
+        break;
+    }
 
-        case SAIL_PIXEL_FORMAT_BPP32_RGBX: { *pixel_consumer = pixel_consumer_rgba32_kind; *r = 0; *g = 1; *b = 2; *a = -1; break; }
-        case SAIL_PIXEL_FORMAT_BPP32_BGRX: { *pixel_consumer = pixel_consumer_rgba32_kind; *r = 2; *g = 1; *b = 0; *a = -1; break; }
-        case SAIL_PIXEL_FORMAT_BPP32_XRGB: { *pixel_consumer = pixel_consumer_rgba32_kind; *r = 1; *g = 2; *b = 3; *a = -1; break; }
-        case SAIL_PIXEL_FORMAT_BPP32_XBGR: { *pixel_consumer = pixel_consumer_rgba32_kind; *r = 3; *g = 2; *b = 1; *a = -1; break; }
-        case SAIL_PIXEL_FORMAT_BPP32_RGBA: { *pixel_consumer = pixel_consumer_rgba32_kind; *r = 0; *g = 1; *b = 2; *a = 3;  break; }
-        case SAIL_PIXEL_FORMAT_BPP32_BGRA: { *pixel_consumer = pixel_consumer_rgba32_kind; *r = 2; *g = 1; *b = 0; *a = 3;  break; }
-        case SAIL_PIXEL_FORMAT_BPP32_ARGB: { *pixel_consumer = pixel_consumer_rgba32_kind; *r = 1; *g = 2; *b = 3; *a = 0;  break; }
-        case SAIL_PIXEL_FORMAT_BPP32_ABGR: { *pixel_consumer = pixel_consumer_rgba32_kind; *r = 3; *g = 2; *b = 1; *a = 0;  break; }
+    case SAIL_PIXEL_FORMAT_BPP32_RGBX:
+    {
+        *pixel_consumer = pixel_consumer_rgba32_kind;
+        *r              = 0;
+        *g              = 1;
+        *b              = 2;
+        *a              = -1;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP32_BGRX:
+    {
+        *pixel_consumer = pixel_consumer_rgba32_kind;
+        *r              = 2;
+        *g              = 1;
+        *b              = 0;
+        *a              = -1;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP32_XRGB:
+    {
+        *pixel_consumer = pixel_consumer_rgba32_kind;
+        *r              = 1;
+        *g              = 2;
+        *b              = 3;
+        *a              = -1;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP32_XBGR:
+    {
+        *pixel_consumer = pixel_consumer_rgba32_kind;
+        *r              = 3;
+        *g              = 2;
+        *b              = 1;
+        *a              = -1;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP32_RGBA:
+    {
+        *pixel_consumer = pixel_consumer_rgba32_kind;
+        *r              = 0;
+        *g              = 1;
+        *b              = 2;
+        *a              = 3;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP32_BGRA:
+    {
+        *pixel_consumer = pixel_consumer_rgba32_kind;
+        *r              = 2;
+        *g              = 1;
+        *b              = 0;
+        *a              = 3;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP32_ARGB:
+    {
+        *pixel_consumer = pixel_consumer_rgba32_kind;
+        *r              = 1;
+        *g              = 2;
+        *b              = 3;
+        *a              = 0;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP32_ABGR:
+    {
+        *pixel_consumer = pixel_consumer_rgba32_kind;
+        *r              = 3;
+        *g              = 2;
+        *b              = 1;
+        *a              = 0;
+        break;
+    }
 
-        case SAIL_PIXEL_FORMAT_BPP64_RGBX: { *pixel_consumer = pixel_consumer_rgba64_kind; *r = 0; *g = 1; *b = 2; *a = -1; break; }
-        case SAIL_PIXEL_FORMAT_BPP64_BGRX: { *pixel_consumer = pixel_consumer_rgba64_kind; *r = 2; *g = 1; *b = 0; *a = -1; break; }
-        case SAIL_PIXEL_FORMAT_BPP64_XRGB: { *pixel_consumer = pixel_consumer_rgba64_kind; *r = 1; *g = 2; *b = 3; *a = -1; break; }
-        case SAIL_PIXEL_FORMAT_BPP64_XBGR: { *pixel_consumer = pixel_consumer_rgba64_kind; *r = 3; *g = 2; *b = 1; *a = -1; break; }
-        case SAIL_PIXEL_FORMAT_BPP64_RGBA: { *pixel_consumer = pixel_consumer_rgba64_kind; *r = 0; *g = 1; *b = 2; *a = 3;  break; }
-        case SAIL_PIXEL_FORMAT_BPP64_BGRA: { *pixel_consumer = pixel_consumer_rgba64_kind; *r = 2; *g = 1; *b = 0; *a = 3;  break; }
-        case SAIL_PIXEL_FORMAT_BPP64_ARGB: { *pixel_consumer = pixel_consumer_rgba64_kind; *r = 1; *g = 2; *b = 3; *a = 0;  break; }
-        case SAIL_PIXEL_FORMAT_BPP64_ABGR: { *pixel_consumer = pixel_consumer_rgba64_kind; *r = 3; *g = 2; *b = 1; *a = 0;  break; }
+    case SAIL_PIXEL_FORMAT_BPP64_RGBX:
+    {
+        *pixel_consumer = pixel_consumer_rgba64_kind;
+        *r              = 0;
+        *g              = 1;
+        *b              = 2;
+        *a              = -1;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP64_BGRX:
+    {
+        *pixel_consumer = pixel_consumer_rgba64_kind;
+        *r              = 2;
+        *g              = 1;
+        *b              = 0;
+        *a              = -1;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP64_XRGB:
+    {
+        *pixel_consumer = pixel_consumer_rgba64_kind;
+        *r              = 1;
+        *g              = 2;
+        *b              = 3;
+        *a              = -1;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP64_XBGR:
+    {
+        *pixel_consumer = pixel_consumer_rgba64_kind;
+        *r              = 3;
+        *g              = 2;
+        *b              = 1;
+        *a              = -1;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP64_RGBA:
+    {
+        *pixel_consumer = pixel_consumer_rgba64_kind;
+        *r              = 0;
+        *g              = 1;
+        *b              = 2;
+        *a              = 3;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP64_BGRA:
+    {
+        *pixel_consumer = pixel_consumer_rgba64_kind;
+        *r              = 2;
+        *g              = 1;
+        *b              = 0;
+        *a              = 3;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP64_ARGB:
+    {
+        *pixel_consumer = pixel_consumer_rgba64_kind;
+        *r              = 1;
+        *g              = 2;
+        *b              = 3;
+        *a              = 0;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP64_ABGR:
+    {
+        *pixel_consumer = pixel_consumer_rgba64_kind;
+        *r              = 3;
+        *g              = 2;
+        *b              = 1;
+        *a              = 0;
+        break;
+    }
 
-        case SAIL_PIXEL_FORMAT_BPP32_CMYK:  { *pixel_consumer = pixel_consumer_cmyk32;  *r = *g = *b = *a = -1; /* unused. */ break; }
-        case SAIL_PIXEL_FORMAT_BPP64_CMYK:  { *pixel_consumer = pixel_consumer_cmyk64;  *r = *g = *b = *a = -1; /* unused. */ break; }
-        case SAIL_PIXEL_FORMAT_BPP40_CMYKA: { *pixel_consumer = pixel_consumer_cmyka40; *r = *g = *b = *a = -1; /* unused. */ break; }
-        case SAIL_PIXEL_FORMAT_BPP80_CMYKA: { *pixel_consumer = pixel_consumer_cmyka80; *r = *g = *b = *a = -1; /* unused. */ break; }
+    case SAIL_PIXEL_FORMAT_BPP32_CMYK:
+    {
+        *pixel_consumer = pixel_consumer_cmyk32;
+        *r = *g = *b = *a = -1; /* unused. */
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP64_CMYK:
+    {
+        *pixel_consumer = pixel_consumer_cmyk64;
+        *r = *g = *b = *a = -1; /* unused. */
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP40_CMYKA:
+    {
+        *pixel_consumer = pixel_consumer_cmyka40;
+        *r = *g = *b = *a = -1; /* unused. */
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP80_CMYKA:
+    {
+        *pixel_consumer = pixel_consumer_cmyka80;
+        *r = *g = *b = *a = -1; /* unused. */
+        break;
+    }
 
-        case SAIL_PIXEL_FORMAT_BPP24_YCBCR: { *pixel_consumer = pixel_consumer_ycbcr; *r = *g = *b = *a = -1; /* unused. */ break; }
+    case SAIL_PIXEL_FORMAT_BPP24_YCBCR:
+    {
+        *pixel_consumer = pixel_consumer_ycbcr;
+        *r = *g = *b = *a = -1; /* unused. */
+        break;
+    }
 
-        case SAIL_PIXEL_FORMAT_BPP24_YUV: { *pixel_consumer = pixel_consumer_yuv24; *r = *g = *b = *a = -1; /* unused. */ break; }
+    case SAIL_PIXEL_FORMAT_BPP24_YUV:
+    {
+        *pixel_consumer = pixel_consumer_yuv24;
+        *r = *g = *b = *a = -1; /* unused. */
+        break;
+    }
 
-        default: {
-            return false;
-        }
+    default:
+    {
+        return false;
+    }
     }
 
     return true;
 }
 
-static sail_status_t verify_and_construct_rgba_indexes_verbose(enum SailPixelFormat output_pixel_format, pixel_consumer_t *pixel_consumer, int *r, int *g, int *b, int *a) {
+static sail_status_t verify_and_construct_rgba_indexes_verbose(
+    enum SailPixelFormat output_pixel_format, pixel_consumer_t* pixel_consumer, int* r, int* g, int* b, int* a)
+{
 
-    if (verify_and_construct_rgba_indexes_silent(output_pixel_format, pixel_consumer, r, g, b, a)) {
+    if (verify_and_construct_rgba_indexes_silent(output_pixel_format, pixel_consumer, r, g, b, a))
+    {
         return SAIL_OK;
-    } else {
+    }
+    else
+    {
         SAIL_LOG_ERROR("Conversion to %s is not supported", sail_pixel_format_to_string(output_pixel_format));
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
     }
 }
 
-static sail_status_t convert_from_indexed(const struct sail_image *image,
-                                            const unsigned input_bit_shift, const unsigned bit_shift_decrease_by,
-                                            const unsigned input_bit_mask, const unsigned bit_mask_shift_by,
-                                            pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
+static sail_status_t convert_from_indexed(const struct sail_image* image,
+                                          const unsigned input_bit_shift,
+                                          const unsigned bit_shift_decrease_by,
+                                          const unsigned input_bit_mask,
+                                          const unsigned bit_mask_shift_by,
+                                          pixel_consumer_t pixel_consumer,
+                                          const struct output_context* output_context)
+{
 
     sail_status_t status = SAIL_OK;
     unsigned row;
 
-    #pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE) shared(status)
-    for (row = 0; row < image->height; row++) {
-        #pragma omp flush(status)
-        if (status == SAIL_OK) {
-            const uint8_t  *scan_input    = sail_scan_line(image, row);
-                  uint8_t  *scan_output8  = sail_scan_line(output_context->image, row);
-                  uint16_t *scan_output16 = sail_scan_line(output_context->image, row);
+#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE) shared(status)
+    for (row = 0; row < image->height; row++)
+    {
+#pragma omp flush(status)
+        if (status == SAIL_OK)
+        {
+            const uint8_t* scan_input = sail_scan_line(image, row);
+            uint8_t* scan_output8     = sail_scan_line(output_context->image, row);
+            uint16_t* scan_output16   = sail_scan_line(output_context->image, row);
 
-            for (unsigned column = 0; column < image->width;) {
+            for (unsigned column = 0; column < image->width;)
+            {
                 unsigned bit_shift = input_bit_shift;
-                unsigned bit_mask = input_bit_mask;
+                unsigned bit_mask  = input_bit_mask;
                 const uint8_t byte = *scan_input++;
 
-                while (bit_mask > 0 && column < image->width) {
+                while (bit_mask > 0 && column < image->width)
+                {
                     const uint8_t index = (byte & bit_mask) >> bit_shift;
 
                     sail_rgba32_t rgba32;
                     SAIL_TRY_OR_EXECUTE(get_palette_rgba32(image->palette, index, &rgba32),
                                         /* on error */ status = __sail_status);
-                    #pragma omp flush(status)
+#pragma omp flush(status)
                     pixel_consumer(output_context, &scan_output8, &scan_output16, &rgba32, NULL);
 
-                    bit_shift -= bit_shift_decrease_by;
-                    bit_mask >>= bit_mask_shift_by;
+                    bit_shift  -= bit_shift_decrease_by;
+                    bit_mask  >>= bit_mask_shift_by;
                     column++;
                 }
             }
@@ -396,62 +887,81 @@ static sail_status_t convert_from_indexed(const struct sail_image *image,
     return SAIL_OK;
 }
 
-static sail_status_t convert_from_bpp1_indexed(const struct sail_image *image, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
+static sail_status_t convert_from_bpp1_indexed(const struct sail_image* image,
+                                               pixel_consumer_t pixel_consumer,
+                                               const struct output_context* output_context)
+{
 
     SAIL_TRY(convert_from_indexed(image, 7, 1, /* 10000000 */ 0x80, 1, pixel_consumer, output_context));
 
     return SAIL_OK;
 }
 
-static sail_status_t convert_from_bpp2_indexed(const struct sail_image *image, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
+static sail_status_t convert_from_bpp2_indexed(const struct sail_image* image,
+                                               pixel_consumer_t pixel_consumer,
+                                               const struct output_context* output_context)
+{
 
     SAIL_TRY(convert_from_indexed(image, 6, 2, /* 11000000 */ 0xC0, 2, pixel_consumer, output_context));
 
     return SAIL_OK;
 }
 
-static sail_status_t convert_from_bpp4_indexed(const struct sail_image *image, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
+static sail_status_t convert_from_bpp4_indexed(const struct sail_image* image,
+                                               pixel_consumer_t pixel_consumer,
+                                               const struct output_context* output_context)
+{
 
     SAIL_TRY(convert_from_indexed(image, 4, 4, /* 11110000 */ 0xF0, 4, pixel_consumer, output_context));
 
     return SAIL_OK;
 }
 
-static sail_status_t convert_from_bpp8_indexed(const struct sail_image *image, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
+static sail_status_t convert_from_bpp8_indexed(const struct sail_image* image,
+                                               pixel_consumer_t pixel_consumer,
+                                               const struct output_context* output_context)
+{
 
     SAIL_TRY(convert_from_indexed(image, 0, 0, /* 11111111 */ 0xFF, 8, pixel_consumer, output_context));
 
     return SAIL_OK;
 }
 
-static sail_status_t convert_from_grayscale_up_to_bpp8(const struct sail_image *image,
-                                                        const unsigned input_bit_shift, const unsigned bit_shift_decrease_by,
-                                                        const unsigned input_bit_mask, const unsigned bit_mask_shift_by,
-                                                        const unsigned multiplicator_to_255,
-                                                        pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
+static sail_status_t convert_from_grayscale_up_to_bpp8(const struct sail_image* image,
+                                                       const unsigned input_bit_shift,
+                                                       const unsigned bit_shift_decrease_by,
+                                                       const unsigned input_bit_mask,
+                                                       const unsigned bit_mask_shift_by,
+                                                       const unsigned multiplicator_to_255,
+                                                       pixel_consumer_t pixel_consumer,
+                                                       const struct output_context* output_context)
+{
 
     unsigned row;
 
-    #pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
-    for (row = 0; row < image->height; row++) {
-        const uint8_t  *scan_input    = sail_scan_line(image, row);
-              uint8_t  *scan_output8  = sail_scan_line(output_context->image, row);
-              uint16_t *scan_output16 = sail_scan_line(output_context->image, row);
+#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    for (row = 0; row < image->height; row++)
+    {
+        const uint8_t* scan_input = sail_scan_line(image, row);
+        uint8_t* scan_output8     = sail_scan_line(output_context->image, row);
+        uint16_t* scan_output16   = sail_scan_line(output_context->image, row);
 
-        for (unsigned column = 0; column < image->width;) {
+        for (unsigned column = 0; column < image->width;)
+        {
             unsigned bit_shift = input_bit_shift;
-            unsigned bit_mask = input_bit_mask;
+            unsigned bit_mask  = input_bit_mask;
             const uint8_t byte = *scan_input++;
 
-            while (bit_mask > 0 && column < image->width) {
+            while (bit_mask > 0 && column < image->width)
+            {
                 const uint8_t index = (byte & bit_mask) >> bit_shift;
 
                 sail_rgba32_t rgba32;
                 spread_gray8_to_rgba32((uint8_t)(index * multiplicator_to_255), &rgba32);
                 pixel_consumer(output_context, &scan_output8, &scan_output16, &rgba32, NULL);
 
-                bit_shift -= bit_shift_decrease_by;
-                bit_mask >>= bit_mask_shift_by;
+                bit_shift  -= bit_shift_decrease_by;
+                bit_mask  >>= bit_mask_shift_by;
                 column++;
             }
         }
@@ -460,45 +970,65 @@ static sail_status_t convert_from_grayscale_up_to_bpp8(const struct sail_image *
     return SAIL_OK;
 }
 
-static sail_status_t convert_from_bpp1_grayscale(const struct sail_image *image, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
+static sail_status_t convert_from_bpp1_grayscale(const struct sail_image* image,
+                                                 pixel_consumer_t pixel_consumer,
+                                                 const struct output_context* output_context)
+{
 
-    SAIL_TRY(convert_from_grayscale_up_to_bpp8(image, 7, 1, /* 10000000 */ 0x80, 1, 255, pixel_consumer, output_context));
-
-    return SAIL_OK;
-}
-
-static sail_status_t convert_from_bpp2_grayscale(const struct sail_image *image, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
-
-    SAIL_TRY(convert_from_grayscale_up_to_bpp8(image, 6, 2, /* 11000000 */ 0xC0, 2, 85, pixel_consumer, output_context));
+    SAIL_TRY(
+        convert_from_grayscale_up_to_bpp8(image, 7, 1, /* 10000000 */ 0x80, 1, 255, pixel_consumer, output_context));
 
     return SAIL_OK;
 }
 
-static sail_status_t convert_from_bpp4_grayscale(const struct sail_image *image, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
+static sail_status_t convert_from_bpp2_grayscale(const struct sail_image* image,
+                                                 pixel_consumer_t pixel_consumer,
+                                                 const struct output_context* output_context)
+{
 
-    SAIL_TRY(convert_from_grayscale_up_to_bpp8(image, 4, 4, /* 11110000 */ 0xF0, 4, 17, pixel_consumer, output_context));
+    SAIL_TRY(
+        convert_from_grayscale_up_to_bpp8(image, 6, 2, /* 11000000 */ 0xC0, 2, 85, pixel_consumer, output_context));
 
     return SAIL_OK;
 }
 
-static sail_status_t convert_from_bpp8_grayscale(const struct sail_image *image, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
+static sail_status_t convert_from_bpp4_grayscale(const struct sail_image* image,
+                                                 pixel_consumer_t pixel_consumer,
+                                                 const struct output_context* output_context)
+{
+
+    SAIL_TRY(
+        convert_from_grayscale_up_to_bpp8(image, 4, 4, /* 11110000 */ 0xF0, 4, 17, pixel_consumer, output_context));
+
+    return SAIL_OK;
+}
+
+static sail_status_t convert_from_bpp8_grayscale(const struct sail_image* image,
+                                                 pixel_consumer_t pixel_consumer,
+                                                 const struct output_context* output_context)
+{
 
     SAIL_TRY(convert_from_grayscale_up_to_bpp8(image, 0, 0, /* 11111111 */ 0xFF, 8, 1, pixel_consumer, output_context));
 
     return SAIL_OK;
 }
 
-static sail_status_t convert_from_bpp16_grayscale(const struct sail_image *image, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
+static sail_status_t convert_from_bpp16_grayscale(const struct sail_image* image,
+                                                  pixel_consumer_t pixel_consumer,
+                                                  const struct output_context* output_context)
+{
 
     unsigned row;
 
-    #pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
-    for (row = 0; row < image->height; row++) {
-        const uint16_t *scan_input    = sail_scan_line(image, row);
-              uint8_t  *scan_output8  = sail_scan_line(output_context->image, row);
-              uint16_t *scan_output16 = sail_scan_line(output_context->image, row);
+#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    for (row = 0; row < image->height; row++)
+    {
+        const uint16_t* scan_input = sail_scan_line(image, row);
+        uint8_t* scan_output8      = sail_scan_line(output_context->image, row);
+        uint16_t* scan_output16    = sail_scan_line(output_context->image, row);
 
-        for (unsigned column = 0; column < image->width; column++) {
+        for (unsigned column = 0; column < image->width; column++)
+        {
             sail_rgba64_t rgba64;
             spread_gray16_to_rgba64(*scan_input++, &rgba64);
             pixel_consumer(output_context, &scan_output8, &scan_output16, NULL, &rgba64);
@@ -508,17 +1038,22 @@ static sail_status_t convert_from_bpp16_grayscale(const struct sail_image *image
     return SAIL_OK;
 }
 
-static sail_status_t convert_from_bpp16_grayscale_alpha(const struct sail_image *image, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
+static sail_status_t convert_from_bpp16_grayscale_alpha(const struct sail_image* image,
+                                                        pixel_consumer_t pixel_consumer,
+                                                        const struct output_context* output_context)
+{
 
     unsigned row;
 
-    #pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
-    for (row = 0; row < image->height; row++) {
-        const uint8_t  *scan_input    = sail_scan_line(image, row);
-              uint8_t  *scan_output8  = sail_scan_line(output_context->image, row);
-              uint16_t *scan_output16 = sail_scan_line(output_context->image, row);
+#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    for (row = 0; row < image->height; row++)
+    {
+        const uint8_t* scan_input = sail_scan_line(image, row);
+        uint8_t* scan_output8     = sail_scan_line(output_context->image, row);
+        uint16_t* scan_output16   = sail_scan_line(output_context->image, row);
 
-        for (unsigned column = 0; column < image->width; column++) {
+        for (unsigned column = 0; column < image->width; column++)
+        {
             sail_rgba32_t rgba32;
             spread_gray8_to_rgba32(*scan_input++, &rgba32);
             rgba32.component4 = *scan_input++;
@@ -530,17 +1065,22 @@ static sail_status_t convert_from_bpp16_grayscale_alpha(const struct sail_image 
     return SAIL_OK;
 }
 
-static sail_status_t convert_from_bpp32_grayscale_alpha(const struct sail_image *image, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
+static sail_status_t convert_from_bpp32_grayscale_alpha(const struct sail_image* image,
+                                                        pixel_consumer_t pixel_consumer,
+                                                        const struct output_context* output_context)
+{
 
     unsigned row;
 
-    #pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
-    for (row = 0; row < image->height; row++) {
-        const uint16_t *scan_input    = sail_scan_line(image, row);
-              uint8_t  *scan_output8  = sail_scan_line(output_context->image, row);
-              uint16_t *scan_output16 = sail_scan_line(output_context->image, row);
+#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    for (row = 0; row < image->height; row++)
+    {
+        const uint16_t* scan_input = sail_scan_line(image, row);
+        uint8_t* scan_output8      = sail_scan_line(output_context->image, row);
+        uint16_t* scan_output16    = sail_scan_line(output_context->image, row);
 
-        for (unsigned column = 0; column < image->width; column++) {
+        for (unsigned column = 0; column < image->width; column++)
+        {
             sail_rgba64_t rgba64;
             spread_gray16_to_rgba64(*scan_input++, &rgba64);
             rgba64.component4 = *scan_input++;
@@ -552,18 +1092,24 @@ static sail_status_t convert_from_bpp32_grayscale_alpha(const struct sail_image 
     return SAIL_OK;
 }
 
-static sail_status_t convert_from_bpp16_rgb555(const struct sail_image *image, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
+static sail_status_t convert_from_bpp16_rgb555(const struct sail_image* image,
+                                               pixel_consumer_t pixel_consumer,
+                                               const struct output_context* output_context)
+{
 
     unsigned row;
 
-    #pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
-    for (row = 0; row < image->height; row++) {
-        const uint16_t *scan_input    = sail_scan_line(image, row);
-              uint8_t  *scan_output8  = sail_scan_line(output_context->image, row);
-              uint16_t *scan_output16 = sail_scan_line(output_context->image, row);
+#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    for (row = 0; row < image->height; row++)
+    {
+        const uint16_t* scan_input = sail_scan_line(image, row);
+        uint8_t* scan_output8      = sail_scan_line(output_context->image, row);
+        uint16_t* scan_output16    = sail_scan_line(output_context->image, row);
 
-        for (unsigned column = 0; column < image->width; column++) {
-            const sail_rgba32_t rgba32 = { ((*scan_input >> 0) & 0x1f) << 3, ((*scan_input >> 5) & 0x1f) << 3, ((*scan_input >> 10) & 0x1f) << 3, 255 };
+        for (unsigned column = 0; column < image->width; column++)
+        {
+            const sail_rgba32_t rgba32 = {((*scan_input >> 0) & 0x1f) << 3, ((*scan_input >> 5) & 0x1f) << 3,
+                                          ((*scan_input >> 10) & 0x1f) << 3, 255};
 
             pixel_consumer(output_context, &scan_output8, &scan_output16, &rgba32, NULL);
             scan_input++;
@@ -573,18 +1119,24 @@ static sail_status_t convert_from_bpp16_rgb555(const struct sail_image *image, p
     return SAIL_OK;
 }
 
-static sail_status_t convert_from_bpp16_bgr555(const struct sail_image *image, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
+static sail_status_t convert_from_bpp16_bgr555(const struct sail_image* image,
+                                               pixel_consumer_t pixel_consumer,
+                                               const struct output_context* output_context)
+{
 
     unsigned row;
 
-    #pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
-    for (row = 0; row < image->height; row++) {
-        const uint16_t *scan_input    = sail_scan_line(image, row);
-              uint8_t  *scan_output8  = sail_scan_line(output_context->image, row);
-              uint16_t *scan_output16 = sail_scan_line(output_context->image, row);
+#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    for (row = 0; row < image->height; row++)
+    {
+        const uint16_t* scan_input = sail_scan_line(image, row);
+        uint8_t* scan_output8      = sail_scan_line(output_context->image, row);
+        uint16_t* scan_output16    = sail_scan_line(output_context->image, row);
 
-        for (unsigned column = 0; column < image->width; column++) {
-            const sail_rgba32_t rgba32 = { ((*scan_input >> 10) & 0x1f) << 3, ((*scan_input >> 5) & 0x1f) << 3, ((*scan_input >> 0) & 0x1f) << 3, 255 };
+        for (unsigned column = 0; column < image->width; column++)
+        {
+            const sail_rgba32_t rgba32 = {((*scan_input >> 10) & 0x1f) << 3, ((*scan_input >> 5) & 0x1f) << 3,
+                                          ((*scan_input >> 0) & 0x1f) << 3, 255};
 
             pixel_consumer(output_context, &scan_output8, &scan_output16, &rgba32, NULL);
             scan_input++;
@@ -594,18 +1146,24 @@ static sail_status_t convert_from_bpp16_bgr555(const struct sail_image *image, p
     return SAIL_OK;
 }
 
-static sail_status_t convert_from_bpp16_rgb565(const struct sail_image *image, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
+static sail_status_t convert_from_bpp16_rgb565(const struct sail_image* image,
+                                               pixel_consumer_t pixel_consumer,
+                                               const struct output_context* output_context)
+{
 
     unsigned row;
 
-    #pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
-    for (row = 0; row < image->height; row++) {
-        const uint16_t *scan_input    = sail_scan_line(image, row);
-              uint8_t  *scan_output8  = sail_scan_line(output_context->image, row);
-              uint16_t *scan_output16 = sail_scan_line(output_context->image, row);
+#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    for (row = 0; row < image->height; row++)
+    {
+        const uint16_t* scan_input = sail_scan_line(image, row);
+        uint8_t* scan_output8      = sail_scan_line(output_context->image, row);
+        uint16_t* scan_output16    = sail_scan_line(output_context->image, row);
 
-        for (unsigned column = 0; column < image->width; column++) {
-            const sail_rgba32_t rgba32 = { ((*scan_input >> 0) & 0x1f) << 3, ((*scan_input >> 5) & 0x3f) << 2, ((*scan_input >> 11) & 0x1f) << 3, 255 };
+        for (unsigned column = 0; column < image->width; column++)
+        {
+            const sail_rgba32_t rgba32 = {((*scan_input >> 0) & 0x1f) << 3, ((*scan_input >> 5) & 0x3f) << 2,
+                                          ((*scan_input >> 11) & 0x1f) << 3, 255};
 
             pixel_consumer(output_context, &scan_output8, &scan_output16, &rgba32, NULL);
             scan_input++;
@@ -615,18 +1173,24 @@ static sail_status_t convert_from_bpp16_rgb565(const struct sail_image *image, p
     return SAIL_OK;
 }
 
-static sail_status_t convert_from_bpp16_bgr565(const struct sail_image *image, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
+static sail_status_t convert_from_bpp16_bgr565(const struct sail_image* image,
+                                               pixel_consumer_t pixel_consumer,
+                                               const struct output_context* output_context)
+{
 
     unsigned row;
 
-    #pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
-    for (row = 0; row < image->height; row++) {
-        const uint16_t *scan_input    = sail_scan_line(image, row);
-              uint8_t  *scan_output8  = sail_scan_line(output_context->image, row);
-              uint16_t *scan_output16 = sail_scan_line(output_context->image, row);
+#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    for (row = 0; row < image->height; row++)
+    {
+        const uint16_t* scan_input = sail_scan_line(image, row);
+        uint8_t* scan_output8      = sail_scan_line(output_context->image, row);
+        uint16_t* scan_output16    = sail_scan_line(output_context->image, row);
 
-        for (unsigned column = 0; column < image->width; column++) {
-            const sail_rgba32_t rgba32 = { ((*scan_input >> 11) & 0x1f) << 3, ((*scan_input >> 5) & 0x3f) << 2, ((*scan_input >> 0) & 0x1f) << 3, 255 };
+        for (unsigned column = 0; column < image->width; column++)
+        {
+            const sail_rgba32_t rgba32 = {((*scan_input >> 11) & 0x1f) << 3, ((*scan_input >> 5) & 0x3f) << 2,
+                                          ((*scan_input >> 0) & 0x1f) << 3, 255};
 
             pixel_consumer(output_context, &scan_output8, &scan_output16, &rgba32, NULL);
             scan_input++;
@@ -636,18 +1200,26 @@ static sail_status_t convert_from_bpp16_bgr565(const struct sail_image *image, p
     return SAIL_OK;
 }
 
-static sail_status_t convert_from_bpp24_rgb_kind(const struct sail_image *image, int ri, int gi, int bi, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
+static sail_status_t convert_from_bpp24_rgb_kind(const struct sail_image* image,
+                                                 int ri,
+                                                 int gi,
+                                                 int bi,
+                                                 pixel_consumer_t pixel_consumer,
+                                                 const struct output_context* output_context)
+{
 
     unsigned row;
 
-    #pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
-    for (row = 0; row < image->height; row++) {
-        const uint8_t  *scan_input    = sail_scan_line(image, row);
-              uint8_t  *scan_output8  = sail_scan_line(output_context->image, row);
-              uint16_t *scan_output16 = sail_scan_line(output_context->image, row);
+#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    for (row = 0; row < image->height; row++)
+    {
+        const uint8_t* scan_input = sail_scan_line(image, row);
+        uint8_t* scan_output8     = sail_scan_line(output_context->image, row);
+        uint16_t* scan_output16   = sail_scan_line(output_context->image, row);
 
-        for (unsigned column = 0; column < image->width; column++) {
-            const sail_rgba32_t rgba32 = { *(scan_input+ri), *(scan_input+gi), *(scan_input+bi), 255 };
+        for (unsigned column = 0; column < image->width; column++)
+        {
+            const sail_rgba32_t rgba32 = {*(scan_input + ri), *(scan_input + gi), *(scan_input + bi), 255};
 
             pixel_consumer(output_context, &scan_output8, &scan_output16, &rgba32, NULL);
             scan_input += 3;
@@ -657,18 +1229,26 @@ static sail_status_t convert_from_bpp24_rgb_kind(const struct sail_image *image,
     return SAIL_OK;
 }
 
-static sail_status_t convert_from_bpp48_rgb_kind(const struct sail_image *image, int ri, int gi, int bi, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
+static sail_status_t convert_from_bpp48_rgb_kind(const struct sail_image* image,
+                                                 int ri,
+                                                 int gi,
+                                                 int bi,
+                                                 pixel_consumer_t pixel_consumer,
+                                                 const struct output_context* output_context)
+{
 
     unsigned row;
 
-    #pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
-    for (row = 0; row < image->height; row++) {
-        const uint16_t *scan_input    = sail_scan_line(image, row);
-              uint8_t  *scan_output8  = sail_scan_line(output_context->image, row);
-              uint16_t *scan_output16 = sail_scan_line(output_context->image, row);
+#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    for (row = 0; row < image->height; row++)
+    {
+        const uint16_t* scan_input = sail_scan_line(image, row);
+        uint8_t* scan_output8      = sail_scan_line(output_context->image, row);
+        uint16_t* scan_output16    = sail_scan_line(output_context->image, row);
 
-        for (unsigned column = 0; column < image->width; column++) {
-            const sail_rgba64_t rgba64 = { *(scan_input+ri), *(scan_input+gi), *(scan_input+bi), 65535 };
+        for (unsigned column = 0; column < image->width; column++)
+        {
+            const sail_rgba64_t rgba64 = {*(scan_input + ri), *(scan_input + gi), *(scan_input + bi), 65535};
 
             pixel_consumer(output_context, &scan_output8, &scan_output16, NULL, &rgba64);
             scan_input += 3;
@@ -678,18 +1258,28 @@ static sail_status_t convert_from_bpp48_rgb_kind(const struct sail_image *image,
     return SAIL_OK;
 }
 
-static sail_status_t convert_from_bpp32_rgba_kind(const struct sail_image *image, int ri, int gi, int bi, int ai, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
+static sail_status_t convert_from_bpp32_rgba_kind(const struct sail_image* image,
+                                                  int ri,
+                                                  int gi,
+                                                  int bi,
+                                                  int ai,
+                                                  pixel_consumer_t pixel_consumer,
+                                                  const struct output_context* output_context)
+{
 
     unsigned row;
 
-    #pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
-    for (row = 0; row < image->height; row++) {
-        const uint8_t  *scan_input    = sail_scan_line(image, row);
-              uint8_t  *scan_output8  = sail_scan_line(output_context->image, row);
-              uint16_t *scan_output16 = sail_scan_line(output_context->image, row);
+#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    for (row = 0; row < image->height; row++)
+    {
+        const uint8_t* scan_input = sail_scan_line(image, row);
+        uint8_t* scan_output8     = sail_scan_line(output_context->image, row);
+        uint16_t* scan_output16   = sail_scan_line(output_context->image, row);
 
-        for (unsigned column = 0; column < image->width; column++) {
-            const sail_rgba32_t rgba32 = { *(scan_input+ri), *(scan_input+gi), *(scan_input+bi), ai >= 0 ? *(scan_input+ai) : 255 };
+        for (unsigned column = 0; column < image->width; column++)
+        {
+            const sail_rgba32_t rgba32 = {*(scan_input + ri), *(scan_input + gi), *(scan_input + bi),
+                                          ai >= 0 ? *(scan_input + ai) : 255};
 
             pixel_consumer(output_context, &scan_output8, &scan_output16, &rgba32, NULL);
             scan_input += 4;
@@ -699,18 +1289,28 @@ static sail_status_t convert_from_bpp32_rgba_kind(const struct sail_image *image
     return SAIL_OK;
 }
 
-static sail_status_t convert_from_bpp64_rgba_kind(const struct sail_image *image, int ri, int gi, int bi, int ai, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
+static sail_status_t convert_from_bpp64_rgba_kind(const struct sail_image* image,
+                                                  int ri,
+                                                  int gi,
+                                                  int bi,
+                                                  int ai,
+                                                  pixel_consumer_t pixel_consumer,
+                                                  const struct output_context* output_context)
+{
 
     unsigned row;
 
-    #pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
-    for (row = 0; row < image->height; row++) {
-        const uint16_t *scan_input    = sail_scan_line(image, row);
-              uint8_t  *scan_output8  = sail_scan_line(output_context->image, row);
-              uint16_t *scan_output16 = sail_scan_line(output_context->image, row);
+#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    for (row = 0; row < image->height; row++)
+    {
+        const uint16_t* scan_input = sail_scan_line(image, row);
+        uint8_t* scan_output8      = sail_scan_line(output_context->image, row);
+        uint16_t* scan_output16    = sail_scan_line(output_context->image, row);
 
-        for (unsigned column = 0; column < image->width; column++) {
-            const sail_rgba64_t rgba64 = { *(scan_input+ri), *(scan_input+gi), *(scan_input+bi), ai >= 0 ? *(scan_input+ai) : 65535 };
+        for (unsigned column = 0; column < image->width; column++)
+        {
+            const sail_rgba64_t rgba64 = {*(scan_input + ri), *(scan_input + gi), *(scan_input + bi),
+                                          ai >= 0 ? *(scan_input + ai) : 65535};
 
             pixel_consumer(output_context, &scan_output8, &scan_output16, NULL, &rgba64);
             scan_input += 4;
@@ -720,19 +1320,25 @@ static sail_status_t convert_from_bpp64_rgba_kind(const struct sail_image *image
     return SAIL_OK;
 }
 
-static sail_status_t convert_from_bpp32_cmyk(const struct sail_image *image, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
+static sail_status_t convert_from_bpp32_cmyk(const struct sail_image* image,
+                                             pixel_consumer_t pixel_consumer,
+                                             const struct output_context* output_context)
+{
 
     unsigned row;
 
-    #pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
-    for (row = 0; row < image->height; row++) {
-        const uint8_t  *scan_input    = sail_scan_line(image, row);
-              uint8_t  *scan_output8  = sail_scan_line(output_context->image, row);
-              uint16_t *scan_output16 = sail_scan_line(output_context->image, row);
+#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    for (row = 0; row < image->height; row++)
+    {
+        const uint8_t* scan_input = sail_scan_line(image, row);
+        uint8_t* scan_output8     = sail_scan_line(output_context->image, row);
+        uint16_t* scan_output16   = sail_scan_line(output_context->image, row);
 
-        for (unsigned column = 0; column < image->width; column++) {
+        for (unsigned column = 0; column < image->width; column++)
+        {
             sail_rgba32_t rgba32;
-            convert_cmyk32_to_rgba32(*(scan_input+0), *(scan_input+1), *(scan_input+2), *(scan_input+3), &rgba32);
+            convert_cmyk32_to_rgba32(*(scan_input + 0), *(scan_input + 1), *(scan_input + 2), *(scan_input + 3),
+                                     &rgba32);
 
             pixel_consumer(output_context, &scan_output8, &scan_output16, &rgba32, NULL);
             scan_input += 4;
@@ -742,19 +1348,25 @@ static sail_status_t convert_from_bpp32_cmyk(const struct sail_image *image, pix
     return SAIL_OK;
 }
 
-static sail_status_t convert_from_bpp64_cmyk(const struct sail_image *image, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
+static sail_status_t convert_from_bpp64_cmyk(const struct sail_image* image,
+                                             pixel_consumer_t pixel_consumer,
+                                             const struct output_context* output_context)
+{
 
     unsigned row;
 
-    #pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
-    for (row = 0; row < image->height; row++) {
-        const uint16_t *scan_input    = sail_scan_line(image, row);
-              uint8_t  *scan_output8  = sail_scan_line(output_context->image, row);
-              uint16_t *scan_output16 = sail_scan_line(output_context->image, row);
+#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    for (row = 0; row < image->height; row++)
+    {
+        const uint16_t* scan_input = sail_scan_line(image, row);
+        uint8_t* scan_output8      = sail_scan_line(output_context->image, row);
+        uint16_t* scan_output16    = sail_scan_line(output_context->image, row);
 
-        for (unsigned column = 0; column < image->width; column++) {
+        for (unsigned column = 0; column < image->width; column++)
+        {
             sail_rgba64_t rgba64;
-            convert_cmyk64_to_rgba64(*(scan_input+0), *(scan_input+1), *(scan_input+2), *(scan_input+3), &rgba64);
+            convert_cmyk64_to_rgba64(*(scan_input + 0), *(scan_input + 1), *(scan_input + 2), *(scan_input + 3),
+                                     &rgba64);
 
             pixel_consumer(output_context, &scan_output8, &scan_output16, NULL, &rgba64);
             scan_input += 4;
@@ -764,19 +1376,25 @@ static sail_status_t convert_from_bpp64_cmyk(const struct sail_image *image, pix
     return SAIL_OK;
 }
 
-static sail_status_t convert_from_bpp40_cmyka(const struct sail_image *image, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
+static sail_status_t convert_from_bpp40_cmyka(const struct sail_image* image,
+                                              pixel_consumer_t pixel_consumer,
+                                              const struct output_context* output_context)
+{
 
     unsigned row;
 
-    #pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
-    for (row = 0; row < image->height; row++) {
-        const uint8_t *scan_input    = sail_scan_line(image, row);
-              uint8_t  *scan_output8  = sail_scan_line(output_context->image, row);
-              uint16_t *scan_output16 = sail_scan_line(output_context->image, row);
+#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    for (row = 0; row < image->height; row++)
+    {
+        const uint8_t* scan_input = sail_scan_line(image, row);
+        uint8_t* scan_output8     = sail_scan_line(output_context->image, row);
+        uint16_t* scan_output16   = sail_scan_line(output_context->image, row);
 
-        for (unsigned column = 0; column < image->width; column++) {
+        for (unsigned column = 0; column < image->width; column++)
+        {
             sail_rgba32_t rgba32;
-            convert_cmyka40_to_rgba32(*(scan_input+0), *(scan_input+1), *(scan_input+2), *(scan_input+3), *(scan_input+4), &rgba32);
+            convert_cmyka40_to_rgba32(*(scan_input + 0), *(scan_input + 1), *(scan_input + 2), *(scan_input + 3),
+                                      *(scan_input + 4), &rgba32);
 
             pixel_consumer(output_context, &scan_output8, &scan_output16, &rgba32, NULL);
             scan_input += 5;
@@ -786,19 +1404,25 @@ static sail_status_t convert_from_bpp40_cmyka(const struct sail_image *image, pi
     return SAIL_OK;
 }
 
-static sail_status_t convert_from_bpp80_cmyka(const struct sail_image *image, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
+static sail_status_t convert_from_bpp80_cmyka(const struct sail_image* image,
+                                              pixel_consumer_t pixel_consumer,
+                                              const struct output_context* output_context)
+{
 
     unsigned row;
 
-    #pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
-    for (row = 0; row < image->height; row++) {
-        const uint16_t *scan_input    = sail_scan_line(image, row);
-              uint8_t  *scan_output8  = sail_scan_line(output_context->image, row);
-              uint16_t *scan_output16 = sail_scan_line(output_context->image, row);
+#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    for (row = 0; row < image->height; row++)
+    {
+        const uint16_t* scan_input = sail_scan_line(image, row);
+        uint8_t* scan_output8      = sail_scan_line(output_context->image, row);
+        uint16_t* scan_output16    = sail_scan_line(output_context->image, row);
 
-        for (unsigned column = 0; column < image->width; column++) {
+        for (unsigned column = 0; column < image->width; column++)
+        {
             sail_rgba64_t rgba64;
-            convert_cmyka80_to_rgba64(*(scan_input+0), *(scan_input+1), *(scan_input+2), *(scan_input+3), *(scan_input+4), &rgba64);
+            convert_cmyka80_to_rgba64(*(scan_input + 0), *(scan_input + 1), *(scan_input + 2), *(scan_input + 3),
+                                      *(scan_input + 4), &rgba64);
 
             pixel_consumer(output_context, &scan_output8, &scan_output16, NULL, &rgba64);
             scan_input += 5;
@@ -808,19 +1432,24 @@ static sail_status_t convert_from_bpp80_cmyka(const struct sail_image *image, pi
     return SAIL_OK;
 }
 
-static sail_status_t convert_from_bpp24_ycbcr(const struct sail_image *image, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
+static sail_status_t convert_from_bpp24_ycbcr(const struct sail_image* image,
+                                              pixel_consumer_t pixel_consumer,
+                                              const struct output_context* output_context)
+{
 
     unsigned row;
 
-    #pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
-    for (row = 0; row < image->height; row++) {
-        const uint8_t  *scan_input    = sail_scan_line(image, row);
-              uint8_t  *scan_output8  = sail_scan_line(output_context->image, row);
-              uint16_t *scan_output16 = sail_scan_line(output_context->image, row);
+#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    for (row = 0; row < image->height; row++)
+    {
+        const uint8_t* scan_input = sail_scan_line(image, row);
+        uint8_t* scan_output8     = sail_scan_line(output_context->image, row);
+        uint16_t* scan_output16   = sail_scan_line(output_context->image, row);
 
-        for (unsigned column = 0; column < image->width; column++) {
+        for (unsigned column = 0; column < image->width; column++)
+        {
             sail_rgba32_t rgba32;
-            convert_ycbcr24_to_rgba32(*(scan_input+0), *(scan_input+1), *(scan_input+2), &rgba32);
+            convert_ycbcr24_to_rgba32(*(scan_input + 0), *(scan_input + 1), *(scan_input + 2), &rgba32);
 
             pixel_consumer(output_context, &scan_output8, &scan_output16, &rgba32, NULL);
             scan_input += 3;
@@ -830,19 +1459,25 @@ static sail_status_t convert_from_bpp24_ycbcr(const struct sail_image *image, pi
     return SAIL_OK;
 }
 
-static sail_status_t convert_from_bpp32_ycck(const struct sail_image *image, pixel_consumer_t pixel_consumer, const struct output_context *output_context) {
+static sail_status_t convert_from_bpp32_ycck(const struct sail_image* image,
+                                             pixel_consumer_t pixel_consumer,
+                                             const struct output_context* output_context)
+{
 
     unsigned row;
 
-    #pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
-    for (row = 0; row < image->height; row++) {
-        const uint8_t  *scan_input    = sail_scan_line(image, row);
-              uint8_t  *scan_output8  = sail_scan_line(output_context->image, row);
-              uint16_t *scan_output16 = sail_scan_line(output_context->image, row);
+#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    for (row = 0; row < image->height; row++)
+    {
+        const uint8_t* scan_input = sail_scan_line(image, row);
+        uint8_t* scan_output8     = sail_scan_line(output_context->image, row);
+        uint16_t* scan_output16   = sail_scan_line(output_context->image, row);
 
-        for (unsigned column = 0; column < image->width; column++) {
+        for (unsigned column = 0; column < image->width; column++)
+        {
             sail_rgba32_t rgba32;
-            convert_ycck32_to_rgba32(*(scan_input+0), *(scan_input+1), *(scan_input+2), *(scan_input+3), &rgba32);
+            convert_ycck32_to_rgba32(*(scan_input + 0), *(scan_input + 1), *(scan_input + 2), *(scan_input + 3),
+                                     &rgba32);
 
             pixel_consumer(output_context, &scan_output8, &scan_output16, &rgba32, NULL);
             scan_input += 4;
@@ -852,188 +1487,232 @@ static sail_status_t convert_from_bpp32_ycck(const struct sail_image *image, pix
     return SAIL_OK;
 }
 
-static sail_status_t conversion_impl(
-    const struct sail_image *image,
-    struct sail_image *image_output,
-    pixel_consumer_t pixel_consumer,
-    int r, /* Index of the RED component.   */
-    int g, /* Index of the GREEN component. */
-    int b, /* Index of the BLUE component.  */
-    int a, /* Index of the ALPHA component. */
-    const struct sail_conversion_options *options) {
+static sail_status_t conversion_impl(const struct sail_image* image,
+                                     struct sail_image* image_output,
+                                     pixel_consumer_t pixel_consumer,
+                                     int r, /* Index of the RED component.   */
+                                     int g, /* Index of the GREEN component. */
+                                     int b, /* Index of the BLUE component.  */
+                                     int a, /* Index of the ALPHA component. */
+                                     const struct sail_conversion_options* options)
+{
 
-    const struct output_context output_context = { image_output, r, g, b, a, options };
+    const struct output_context output_context = {image_output, r, g, b, a, options};
 
     /* After adding a new input pixel format, also update the switch in sail_can_convert(). */
-    switch (image->pixel_format) {
-        case SAIL_PIXEL_FORMAT_BPP1_INDEXED: {
-            SAIL_TRY(convert_from_bpp1_indexed(image, pixel_consumer, &output_context));
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP2_INDEXED: {
-            SAIL_TRY(convert_from_bpp2_indexed(image, pixel_consumer, &output_context));
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP4_INDEXED: {
-            SAIL_TRY(convert_from_bpp4_indexed(image, pixel_consumer, &output_context));
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP8_INDEXED: {
-            SAIL_TRY(convert_from_bpp8_indexed(image, pixel_consumer, &output_context));
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP1_GRAYSCALE: {
-            SAIL_TRY(convert_from_bpp1_grayscale(image, pixel_consumer, &output_context));
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP2_GRAYSCALE: {
-            SAIL_TRY(convert_from_bpp2_grayscale(image, pixel_consumer, &output_context));
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE: {
-            SAIL_TRY(convert_from_bpp4_grayscale(image, pixel_consumer, &output_context));
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE: {
-            SAIL_TRY(convert_from_bpp8_grayscale(image, pixel_consumer, &output_context));
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE: {
-            SAIL_TRY(convert_from_bpp16_grayscale(image, pixel_consumer, &output_context));
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA: {
-            SAIL_TRY(convert_from_bpp16_grayscale_alpha(image, pixel_consumer, &output_context));
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA: {
-            SAIL_TRY(convert_from_bpp32_grayscale_alpha(image, pixel_consumer, &output_context));
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP16_RGB555: {
-            SAIL_TRY(convert_from_bpp16_rgb555(image, pixel_consumer, &output_context));
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP16_BGR555: {
-            SAIL_TRY(convert_from_bpp16_bgr555(image, pixel_consumer, &output_context));
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP16_RGB565: {
-            SAIL_TRY(convert_from_bpp16_rgb565(image, pixel_consumer, &output_context));
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP16_BGR565: {
-            SAIL_TRY(convert_from_bpp16_bgr565(image, pixel_consumer, &output_context));
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP24_RGB: {
-            SAIL_TRY(convert_from_bpp24_rgb_kind(image, 0, 1, 2, pixel_consumer, &output_context));
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP24_BGR: {
-            SAIL_TRY(convert_from_bpp24_rgb_kind(image, 2, 1, 0, pixel_consumer, &output_context));
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP48_RGB: {
-            SAIL_TRY(convert_from_bpp48_rgb_kind(image, 0, 1, 2, pixel_consumer, &output_context));
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP48_BGR: {
-            SAIL_TRY(convert_from_bpp48_rgb_kind(image, 2, 1, 0, pixel_consumer, &output_context));
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP32_RGBX: {
-            SAIL_TRY(convert_from_bpp32_rgba_kind(image, 0, 1, 2, -1, pixel_consumer, &output_context));
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP32_BGRX: {
-            SAIL_TRY(convert_from_bpp32_rgba_kind(image, 2, 1, 0, -1, pixel_consumer, &output_context));
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP32_XRGB: {
-            SAIL_TRY(convert_from_bpp32_rgba_kind(image, 1, 2, 3, -1, pixel_consumer, &output_context));
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP32_XBGR: {
-            SAIL_TRY(convert_from_bpp32_rgba_kind(image, 3, 2, 1, -1, pixel_consumer, &output_context));
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP32_RGBA: {
-            SAIL_TRY(convert_from_bpp32_rgba_kind(image, 0, 1, 2, 3, pixel_consumer, &output_context));
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP32_BGRA: {
-            SAIL_TRY(convert_from_bpp32_rgba_kind(image, 2, 1, 0, 3, pixel_consumer, &output_context));
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP32_ARGB: {
-            SAIL_TRY(convert_from_bpp32_rgba_kind(image, 1, 2, 3, 0, pixel_consumer, &output_context));
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP32_ABGR: {
-            SAIL_TRY(convert_from_bpp32_rgba_kind(image, 3, 2, 1, 0, pixel_consumer, &output_context));
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP64_RGBX: {
-            SAIL_TRY(convert_from_bpp64_rgba_kind(image, 0, 1, 2, -1, pixel_consumer, &output_context));
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP64_BGRX: {
-            SAIL_TRY(convert_from_bpp64_rgba_kind(image, 2, 1, 0, -1, pixel_consumer, &output_context));
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP64_XRGB: {
-            SAIL_TRY(convert_from_bpp64_rgba_kind(image, 1, 2, 3, -1, pixel_consumer, &output_context));
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP64_XBGR: {
-            SAIL_TRY(convert_from_bpp64_rgba_kind(image, 3, 2, 1, -1, pixel_consumer, &output_context));
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP64_RGBA: {
-            SAIL_TRY(convert_from_bpp64_rgba_kind(image, 0, 1, 2, 3, pixel_consumer, &output_context));
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP64_BGRA: {
-            SAIL_TRY(convert_from_bpp64_rgba_kind(image, 2, 1, 0, 3, pixel_consumer, &output_context));
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP64_ARGB: {
-            SAIL_TRY(convert_from_bpp64_rgba_kind(image, 1, 2, 3, 0, pixel_consumer, &output_context));
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP64_ABGR: {
-            SAIL_TRY(convert_from_bpp64_rgba_kind(image, 3, 2, 1, 0, pixel_consumer, &output_context));
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP32_CMYK: {
-            SAIL_TRY(convert_from_bpp32_cmyk(image, pixel_consumer, &output_context));
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP64_CMYK: {
-            SAIL_TRY(convert_from_bpp64_cmyk(image, pixel_consumer, &output_context));
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP40_CMYKA: {
-            SAIL_TRY(convert_from_bpp40_cmyka(image, pixel_consumer, &output_context));
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP80_CMYKA: {
-            SAIL_TRY(convert_from_bpp80_cmyka(image, pixel_consumer, &output_context));
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP24_YCBCR: {
-            SAIL_TRY(convert_from_bpp24_ycbcr(image, pixel_consumer, &output_context));
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP32_YCCK: {
-            SAIL_TRY(convert_from_bpp32_ycck(image, pixel_consumer, &output_context));
-            break;
-        }
-        default: {
-            SAIL_LOG_ERROR("Conversion from %s is not currently supported", sail_pixel_format_to_string(image->pixel_format));
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
-        }
+    switch (image->pixel_format)
+    {
+    case SAIL_PIXEL_FORMAT_BPP1_INDEXED:
+    {
+        SAIL_TRY(convert_from_bpp1_indexed(image, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP2_INDEXED:
+    {
+        SAIL_TRY(convert_from_bpp2_indexed(image, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP4_INDEXED:
+    {
+        SAIL_TRY(convert_from_bpp4_indexed(image, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP8_INDEXED:
+    {
+        SAIL_TRY(convert_from_bpp8_indexed(image, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP1_GRAYSCALE:
+    {
+        SAIL_TRY(convert_from_bpp1_grayscale(image, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP2_GRAYSCALE:
+    {
+        SAIL_TRY(convert_from_bpp2_grayscale(image, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE:
+    {
+        SAIL_TRY(convert_from_bpp4_grayscale(image, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE:
+    {
+        SAIL_TRY(convert_from_bpp8_grayscale(image, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE:
+    {
+        SAIL_TRY(convert_from_bpp16_grayscale(image, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA:
+    {
+        SAIL_TRY(convert_from_bpp16_grayscale_alpha(image, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA:
+    {
+        SAIL_TRY(convert_from_bpp32_grayscale_alpha(image, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP16_RGB555:
+    {
+        SAIL_TRY(convert_from_bpp16_rgb555(image, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP16_BGR555:
+    {
+        SAIL_TRY(convert_from_bpp16_bgr555(image, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP16_RGB565:
+    {
+        SAIL_TRY(convert_from_bpp16_rgb565(image, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP16_BGR565:
+    {
+        SAIL_TRY(convert_from_bpp16_bgr565(image, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP24_RGB:
+    {
+        SAIL_TRY(convert_from_bpp24_rgb_kind(image, 0, 1, 2, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP24_BGR:
+    {
+        SAIL_TRY(convert_from_bpp24_rgb_kind(image, 2, 1, 0, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP48_RGB:
+    {
+        SAIL_TRY(convert_from_bpp48_rgb_kind(image, 0, 1, 2, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP48_BGR:
+    {
+        SAIL_TRY(convert_from_bpp48_rgb_kind(image, 2, 1, 0, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP32_RGBX:
+    {
+        SAIL_TRY(convert_from_bpp32_rgba_kind(image, 0, 1, 2, -1, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP32_BGRX:
+    {
+        SAIL_TRY(convert_from_bpp32_rgba_kind(image, 2, 1, 0, -1, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP32_XRGB:
+    {
+        SAIL_TRY(convert_from_bpp32_rgba_kind(image, 1, 2, 3, -1, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP32_XBGR:
+    {
+        SAIL_TRY(convert_from_bpp32_rgba_kind(image, 3, 2, 1, -1, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP32_RGBA:
+    {
+        SAIL_TRY(convert_from_bpp32_rgba_kind(image, 0, 1, 2, 3, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP32_BGRA:
+    {
+        SAIL_TRY(convert_from_bpp32_rgba_kind(image, 2, 1, 0, 3, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP32_ARGB:
+    {
+        SAIL_TRY(convert_from_bpp32_rgba_kind(image, 1, 2, 3, 0, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP32_ABGR:
+    {
+        SAIL_TRY(convert_from_bpp32_rgba_kind(image, 3, 2, 1, 0, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP64_RGBX:
+    {
+        SAIL_TRY(convert_from_bpp64_rgba_kind(image, 0, 1, 2, -1, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP64_BGRX:
+    {
+        SAIL_TRY(convert_from_bpp64_rgba_kind(image, 2, 1, 0, -1, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP64_XRGB:
+    {
+        SAIL_TRY(convert_from_bpp64_rgba_kind(image, 1, 2, 3, -1, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP64_XBGR:
+    {
+        SAIL_TRY(convert_from_bpp64_rgba_kind(image, 3, 2, 1, -1, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP64_RGBA:
+    {
+        SAIL_TRY(convert_from_bpp64_rgba_kind(image, 0, 1, 2, 3, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP64_BGRA:
+    {
+        SAIL_TRY(convert_from_bpp64_rgba_kind(image, 2, 1, 0, 3, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP64_ARGB:
+    {
+        SAIL_TRY(convert_from_bpp64_rgba_kind(image, 1, 2, 3, 0, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP64_ABGR:
+    {
+        SAIL_TRY(convert_from_bpp64_rgba_kind(image, 3, 2, 1, 0, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP32_CMYK:
+    {
+        SAIL_TRY(convert_from_bpp32_cmyk(image, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP64_CMYK:
+    {
+        SAIL_TRY(convert_from_bpp64_cmyk(image, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP40_CMYKA:
+    {
+        SAIL_TRY(convert_from_bpp40_cmyka(image, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP80_CMYKA:
+    {
+        SAIL_TRY(convert_from_bpp80_cmyka(image, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP24_YCBCR:
+    {
+        SAIL_TRY(convert_from_bpp24_ycbcr(image, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP32_YCCK:
+    {
+        SAIL_TRY(convert_from_bpp32_ycck(image, pixel_consumer, &output_context));
+        break;
+    }
+    default:
+    {
+        SAIL_LOG_ERROR("Conversion from %s is not currently supported",
+                       sail_pixel_format_to_string(image->pixel_format));
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+    }
     }
 
     return SAIL_OK;
@@ -1043,48 +1722,58 @@ static sail_status_t conversion_impl(
  * Public functions.
  */
 
-sail_status_t sail_convert_image(const struct sail_image *image,
+sail_status_t sail_convert_image(const struct sail_image* image,
                                  enum SailPixelFormat output_pixel_format,
-                                 struct sail_image **image_output) {
+                                 struct sail_image** image_output)
+{
 
     SAIL_TRY(sail_convert_image_with_options(image, output_pixel_format, NULL /* options */, image_output));
 
     return SAIL_OK;
 }
 
-sail_status_t sail_convert_image_with_options(const struct sail_image *image,
+sail_status_t sail_convert_image_with_options(const struct sail_image* image,
                                               enum SailPixelFormat output_pixel_format,
-                                              const struct sail_conversion_options *options,
-                                              struct sail_image **image_output) {
+                                              const struct sail_conversion_options* options,
+                                              struct sail_image** image_output)
+{
 
     SAIL_TRY(sail_check_image_valid(image));
     SAIL_CHECK_PTR(image_output);
 
     /* Handle conversion to indexed formats using quantization. */
-    if (sail_is_indexed(output_pixel_format)) {
+    if (sail_is_indexed(output_pixel_format))
+    {
 
         /* Determine max colors based on target format. */
         unsigned max_colors;
-        if (output_pixel_format == SAIL_PIXEL_FORMAT_BPP1_INDEXED) {
+        if (output_pixel_format == SAIL_PIXEL_FORMAT_BPP1_INDEXED)
+        {
             max_colors = 2;
-        } else if (output_pixel_format == SAIL_PIXEL_FORMAT_BPP4_INDEXED) {
+        }
+        else if (output_pixel_format == SAIL_PIXEL_FORMAT_BPP4_INDEXED)
+        {
             max_colors = 16;
-        } else {
+        }
+        else
+        {
             max_colors = 256;
         }
 
         /* For indexed formats, first convert to RGB if needed. */
-        struct sail_image *rgb_image = NULL;
+        struct sail_image* rgb_image = NULL;
 
-        if (image->pixel_format != SAIL_PIXEL_FORMAT_BPP24_RGB &&
-            image->pixel_format != SAIL_PIXEL_FORMAT_BPP24_BGR &&
-            image->pixel_format != SAIL_PIXEL_FORMAT_BPP32_RGBA &&
-            image->pixel_format != SAIL_PIXEL_FORMAT_BPP32_BGRA &&
-            image->pixel_format != SAIL_PIXEL_FORMAT_BPP32_RGBX &&
-            image->pixel_format != SAIL_PIXEL_FORMAT_BPP32_BGRX) {
+        if (image->pixel_format != SAIL_PIXEL_FORMAT_BPP24_RGB && image->pixel_format != SAIL_PIXEL_FORMAT_BPP24_BGR
+            && image->pixel_format != SAIL_PIXEL_FORMAT_BPP32_RGBA
+            && image->pixel_format != SAIL_PIXEL_FORMAT_BPP32_BGRA
+            && image->pixel_format != SAIL_PIXEL_FORMAT_BPP32_RGBX
+            && image->pixel_format != SAIL_PIXEL_FORMAT_BPP32_BGRX)
+        {
 
             SAIL_TRY(sail_convert_image_with_options(image, SAIL_PIXEL_FORMAT_BPP24_RGB, options, &rgb_image));
-        } else {
+        }
+        else
+        {
             SAIL_TRY(sail_copy_image(image, &rgb_image));
         }
 
@@ -1101,10 +1790,10 @@ sail_status_t sail_convert_image_with_options(const struct sail_image *image,
     pixel_consumer_t pixel_consumer;
     SAIL_TRY(verify_and_construct_rgba_indexes_verbose(output_pixel_format, &pixel_consumer, &r, &g, &b, &a));
 
-    struct sail_image *image_local;
+    struct sail_image* image_local;
     SAIL_TRY(sail_copy_image_skeleton(image, &image_local));
 
-    image_local->pixel_format = output_pixel_format;
+    image_local->pixel_format   = output_pixel_format;
     image_local->bytes_per_line = sail_bytes_per_line(image_local->width, image_local->pixel_format);
 
     /* Clear ICC profile if changing color space (RGB <-> Grayscale, CMYK <-> RGB, etc). */
@@ -1119,11 +1808,9 @@ sail_status_t sail_convert_image_with_options(const struct sail_image *image,
     bool input_is_ycck   = sail_is_ycck(image->pixel_format);
     bool output_is_ycck  = sail_is_ycck(output_pixel_format);
 
-    if (input_is_rgb != output_is_rgb         ||
-            input_is_gray  != output_is_gray  ||
-            input_is_cmyk  != output_is_cmyk  ||
-            input_is_ycbcr != output_is_ycbcr ||
-            input_is_ycck  != output_is_ycck) {
+    if (input_is_rgb != output_is_rgb || input_is_gray != output_is_gray || input_is_cmyk != output_is_cmyk
+        || input_is_ycbcr != output_is_ycbcr || input_is_ycck != output_is_ycck)
+    {
         SAIL_LOG_DEBUG("Color space conversion detected, clearing ICC profile");
         sail_destroy_iccp(image_local->iccp);
         image_local->iccp = NULL;
@@ -1141,16 +1828,18 @@ sail_status_t sail_convert_image_with_options(const struct sail_image *image,
     return SAIL_OK;
 }
 
-sail_status_t sail_update_image(struct sail_image *image, enum SailPixelFormat output_pixel_format) {
+sail_status_t sail_update_image(struct sail_image* image, enum SailPixelFormat output_pixel_format)
+{
 
     SAIL_TRY(sail_update_image_with_options(image, output_pixel_format, NULL /* options */));
 
     return SAIL_OK;
 }
 
-sail_status_t sail_update_image_with_options(struct sail_image *image,
+sail_status_t sail_update_image_with_options(struct sail_image* image,
                                              enum SailPixelFormat output_pixel_format,
-                                             const struct sail_conversion_options *options) {
+                                             const struct sail_conversion_options* options)
+{
 
     SAIL_TRY(sail_check_image_valid(image));
 
@@ -1158,15 +1847,19 @@ sail_status_t sail_update_image_with_options(struct sail_image *image,
     pixel_consumer_t pixel_consumer;
     SAIL_TRY(verify_and_construct_rgba_indexes_verbose(output_pixel_format, &pixel_consumer, &r, &g, &b, &a));
 
-    if (image->pixel_format == output_pixel_format) {
+    if (image->pixel_format == output_pixel_format)
+    {
         return SAIL_OK;
     }
 
-    const bool new_image_fits_into_existing = sail_greater_equal_bits_per_pixel(image->pixel_format, output_pixel_format);
+    const bool new_image_fits_into_existing =
+        sail_greater_equal_bits_per_pixel(image->pixel_format, output_pixel_format);
 
-    if (!new_image_fits_into_existing) {
+    if (!new_image_fits_into_existing)
+    {
         SAIL_LOG_ERROR("Updating from %s to %s cannot be done as the output is larger than the input",
-                        sail_pixel_format_to_string(image->pixel_format), sail_pixel_format_to_string(output_pixel_format));
+                       sail_pixel_format_to_string(image->pixel_format),
+                       sail_pixel_format_to_string(output_pixel_format));
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
     }
 
@@ -1177,63 +1870,68 @@ sail_status_t sail_update_image_with_options(struct sail_image *image,
     return SAIL_OK;
 }
 
-bool sail_can_convert(enum SailPixelFormat input_pixel_format, enum SailPixelFormat output_pixel_format) {
+bool sail_can_convert(enum SailPixelFormat input_pixel_format, enum SailPixelFormat output_pixel_format)
+{
 
     /* Special handling for indexed output formats (using quantization). */
-    if (sail_is_indexed(output_pixel_format)) {
+    if (sail_is_indexed(output_pixel_format))
+    {
         /* Any format that can convert to RGB can convert to indexed. */
         return sail_can_convert(input_pixel_format, SAIL_PIXEL_FORMAT_BPP24_RGB);
     }
 
     /* After adding a new input pixel format, also update the switch in conversion_impl(). */
-    switch (input_pixel_format) {
-        case SAIL_PIXEL_FORMAT_BPP1_INDEXED:
-        case SAIL_PIXEL_FORMAT_BPP1_GRAYSCALE:
-        case SAIL_PIXEL_FORMAT_BPP2_INDEXED:
-        case SAIL_PIXEL_FORMAT_BPP2_GRAYSCALE:
-        case SAIL_PIXEL_FORMAT_BPP4_INDEXED:
-        case SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE:
-        case SAIL_PIXEL_FORMAT_BPP8_INDEXED:
-        case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE:
-        case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE:
-        case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA:
-        case SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA:
-        case SAIL_PIXEL_FORMAT_BPP16_RGB555:
-        case SAIL_PIXEL_FORMAT_BPP16_BGR555:
-        case SAIL_PIXEL_FORMAT_BPP16_RGB565:
-        case SAIL_PIXEL_FORMAT_BPP16_BGR565:
-        case SAIL_PIXEL_FORMAT_BPP24_RGB:
-        case SAIL_PIXEL_FORMAT_BPP24_BGR:
-        case SAIL_PIXEL_FORMAT_BPP48_RGB:
-        case SAIL_PIXEL_FORMAT_BPP48_BGR:
-        case SAIL_PIXEL_FORMAT_BPP32_RGBX:
-        case SAIL_PIXEL_FORMAT_BPP32_BGRX:
-        case SAIL_PIXEL_FORMAT_BPP32_XRGB:
-        case SAIL_PIXEL_FORMAT_BPP32_XBGR:
-        case SAIL_PIXEL_FORMAT_BPP32_RGBA:
-        case SAIL_PIXEL_FORMAT_BPP32_BGRA:
-        case SAIL_PIXEL_FORMAT_BPP32_ARGB:
-        case SAIL_PIXEL_FORMAT_BPP32_ABGR:
-        case SAIL_PIXEL_FORMAT_BPP64_RGBX:
-        case SAIL_PIXEL_FORMAT_BPP64_BGRX:
-        case SAIL_PIXEL_FORMAT_BPP64_XRGB:
-        case SAIL_PIXEL_FORMAT_BPP64_XBGR:
-        case SAIL_PIXEL_FORMAT_BPP64_RGBA:
-        case SAIL_PIXEL_FORMAT_BPP64_BGRA:
-        case SAIL_PIXEL_FORMAT_BPP64_ARGB:
-        case SAIL_PIXEL_FORMAT_BPP64_ABGR:
-        case SAIL_PIXEL_FORMAT_BPP32_CMYK:
-        case SAIL_PIXEL_FORMAT_BPP64_CMYK:
-        case SAIL_PIXEL_FORMAT_BPP40_CMYKA:
-        case SAIL_PIXEL_FORMAT_BPP80_CMYKA:
-        case SAIL_PIXEL_FORMAT_BPP24_YCBCR: {
-            int r, g, b, a;
-            pixel_consumer_t pixel_consumer;
-            return verify_and_construct_rgba_indexes_silent(output_pixel_format, &pixel_consumer, &r, &g, &b, &a);
-        }
-        default: {
-            return false;
-        }
+    switch (input_pixel_format)
+    {
+    case SAIL_PIXEL_FORMAT_BPP1_INDEXED:
+    case SAIL_PIXEL_FORMAT_BPP1_GRAYSCALE:
+    case SAIL_PIXEL_FORMAT_BPP2_INDEXED:
+    case SAIL_PIXEL_FORMAT_BPP2_GRAYSCALE:
+    case SAIL_PIXEL_FORMAT_BPP4_INDEXED:
+    case SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE:
+    case SAIL_PIXEL_FORMAT_BPP8_INDEXED:
+    case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE:
+    case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE:
+    case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA:
+    case SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA:
+    case SAIL_PIXEL_FORMAT_BPP16_RGB555:
+    case SAIL_PIXEL_FORMAT_BPP16_BGR555:
+    case SAIL_PIXEL_FORMAT_BPP16_RGB565:
+    case SAIL_PIXEL_FORMAT_BPP16_BGR565:
+    case SAIL_PIXEL_FORMAT_BPP24_RGB:
+    case SAIL_PIXEL_FORMAT_BPP24_BGR:
+    case SAIL_PIXEL_FORMAT_BPP48_RGB:
+    case SAIL_PIXEL_FORMAT_BPP48_BGR:
+    case SAIL_PIXEL_FORMAT_BPP32_RGBX:
+    case SAIL_PIXEL_FORMAT_BPP32_BGRX:
+    case SAIL_PIXEL_FORMAT_BPP32_XRGB:
+    case SAIL_PIXEL_FORMAT_BPP32_XBGR:
+    case SAIL_PIXEL_FORMAT_BPP32_RGBA:
+    case SAIL_PIXEL_FORMAT_BPP32_BGRA:
+    case SAIL_PIXEL_FORMAT_BPP32_ARGB:
+    case SAIL_PIXEL_FORMAT_BPP32_ABGR:
+    case SAIL_PIXEL_FORMAT_BPP64_RGBX:
+    case SAIL_PIXEL_FORMAT_BPP64_BGRX:
+    case SAIL_PIXEL_FORMAT_BPP64_XRGB:
+    case SAIL_PIXEL_FORMAT_BPP64_XBGR:
+    case SAIL_PIXEL_FORMAT_BPP64_RGBA:
+    case SAIL_PIXEL_FORMAT_BPP64_BGRA:
+    case SAIL_PIXEL_FORMAT_BPP64_ARGB:
+    case SAIL_PIXEL_FORMAT_BPP64_ABGR:
+    case SAIL_PIXEL_FORMAT_BPP32_CMYK:
+    case SAIL_PIXEL_FORMAT_BPP64_CMYK:
+    case SAIL_PIXEL_FORMAT_BPP40_CMYKA:
+    case SAIL_PIXEL_FORMAT_BPP80_CMYKA:
+    case SAIL_PIXEL_FORMAT_BPP24_YCBCR:
+    {
+        int r, g, b, a;
+        pixel_consumer_t pixel_consumer;
+        return verify_and_construct_rgba_indexes_silent(output_pixel_format, &pixel_consumer, &r, &g, &b, &a);
+    }
+    default:
+    {
+        return false;
+    }
     }
 }
 
@@ -1348,39 +2046,49 @@ static const enum SailPixelFormat INDEXED_OR_FULL_COLOR_CANDIDATES[] = {
     SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA,
 };
 
-static const size_t INDEXED_OR_FULL_COLOR_CANDIDATES_LENGTH = sizeof(INDEXED_OR_FULL_COLOR_CANDIDATES) / sizeof(INDEXED_OR_FULL_COLOR_CANDIDATES[0]);
+static const size_t INDEXED_OR_FULL_COLOR_CANDIDATES_LENGTH =
+    sizeof(INDEXED_OR_FULL_COLOR_CANDIDATES) / sizeof(INDEXED_OR_FULL_COLOR_CANDIDATES[0]);
 
 enum SailPixelFormat sail_closest_pixel_format(enum SailPixelFormat input_pixel_format,
                                                const enum SailPixelFormat pixel_formats[],
-                                               size_t pixel_formats_length) {
+                                               size_t pixel_formats_length)
+{
 
-    if (input_pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN) {
+    if (input_pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN)
+    {
         return SAIL_PIXEL_FORMAT_UNKNOWN;
     }
 
-    const enum SailPixelFormat *candidates;
+    const enum SailPixelFormat* candidates;
     size_t candidates_length;
 
-    if (sail_is_grayscale(input_pixel_format)) {
-        candidates = GRAYSCALE_CANDIDATES;
+    if (sail_is_grayscale(input_pixel_format))
+    {
+        candidates        = GRAYSCALE_CANDIDATES;
         candidates_length = GRAYSCALE_CANDIDATES_LENGTH;
-    } else {
-        candidates = INDEXED_OR_FULL_COLOR_CANDIDATES;
+    }
+    else
+    {
+        candidates        = INDEXED_OR_FULL_COLOR_CANDIDATES;
         candidates_length = INDEXED_OR_FULL_COLOR_CANDIDATES_LENGTH;
     }
 
     size_t best_index_candidate = UINT_MAX;
-    size_t best_index_result = 0;
-    bool found = false;
+    size_t best_index_result    = 0;
+    bool found                  = false;
 
     /* O(n^2) (sic!). */
-    for (size_t i = 0; i < pixel_formats_length; i++) {
-        for (size_t k = 0; k < candidates_length; k++) {
-            if (pixel_formats[i] == candidates[k]) {
-                if (k < best_index_candidate) {
+    for (size_t i = 0; i < pixel_formats_length; i++)
+    {
+        for (size_t k = 0; k < candidates_length; k++)
+        {
+            if (pixel_formats[i] == candidates[k])
+            {
+                if (k < best_index_candidate)
+                {
                     best_index_candidate = k;
-                    best_index_result = i;
-                    found = true;
+                    best_index_result    = i;
+                    found                = true;
                     break;
                 }
             }
@@ -1390,39 +2098,50 @@ enum SailPixelFormat sail_closest_pixel_format(enum SailPixelFormat input_pixel_
     return found ? pixel_formats[best_index_result] : SAIL_PIXEL_FORMAT_UNKNOWN;
 }
 
-enum SailPixelFormat sail_closest_pixel_format_from_save_features(enum SailPixelFormat input_pixel_format, const struct sail_save_features *save_features) {
+enum SailPixelFormat sail_closest_pixel_format_from_save_features(enum SailPixelFormat input_pixel_format,
+                                                                  const struct sail_save_features* save_features)
+{
 
-    return sail_closest_pixel_format(input_pixel_format, save_features->pixel_formats, save_features->pixel_formats_length);
+    return sail_closest_pixel_format(input_pixel_format, save_features->pixel_formats,
+                                     save_features->pixel_formats_length);
 }
 
-sail_status_t sail_convert_image_for_saving(const struct sail_image *image,
-                                            const struct sail_save_features *save_features,
-                                            struct sail_image **image_output) {
+sail_status_t sail_convert_image_for_saving(const struct sail_image* image,
+                                            const struct sail_save_features* save_features,
+                                            struct sail_image** image_output)
+{
 
     SAIL_TRY(sail_convert_image_for_saving_with_options(image, save_features, NULL, image_output));
 
     return SAIL_OK;
 }
 
-sail_status_t sail_convert_image_for_saving_with_options(const struct sail_image *image,
-                                                         const struct sail_save_features *save_features,
-                                                         const struct sail_conversion_options *options,
-                                                         struct sail_image **image_output) {
+sail_status_t sail_convert_image_for_saving_with_options(const struct sail_image* image,
+                                                         const struct sail_save_features* save_features,
+                                                         const struct sail_conversion_options* options,
+                                                         struct sail_image** image_output)
+{
 
     SAIL_TRY(sail_check_image_valid(image));
     SAIL_CHECK_PTR(save_features);
     SAIL_CHECK_PTR(image_output);
 
-    enum SailPixelFormat best_pixel_format = sail_closest_pixel_format_from_save_features(image->pixel_format, save_features);
+    enum SailPixelFormat best_pixel_format =
+        sail_closest_pixel_format_from_save_features(image->pixel_format, save_features);
 
-    if (best_pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN) {
-        SAIL_LOG_ERROR("Failed to find the best output format for saving %s image", sail_pixel_format_to_string(image->pixel_format));
+    if (best_pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN)
+    {
+        SAIL_LOG_ERROR("Failed to find the best output format for saving %s image",
+                       sail_pixel_format_to_string(image->pixel_format));
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
     }
 
-    if (best_pixel_format == image->pixel_format) {
+    if (best_pixel_format == image->pixel_format)
+    {
         SAIL_TRY(sail_copy_image(image, image_output));
-    } else {
+    }
+    else
+    {
         SAIL_TRY(sail_convert_image_with_options(image, best_pixel_format, options, image_output));
     }
 

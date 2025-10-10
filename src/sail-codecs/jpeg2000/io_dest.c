@@ -27,50 +27,58 @@
 
 #include "io_dest.h"
 
-static OPJ_SIZE_T jpeg2000_private_stream_write(void *buffer, OPJ_SIZE_T bytes, void *user_data) {
+static OPJ_SIZE_T jpeg2000_private_stream_write(void* buffer, OPJ_SIZE_T bytes, void* user_data)
+{
 
-    struct sail_io *io = user_data;
+    struct sail_io* io = user_data;
 
     const sail_status_t err = io->strict_write(io->stream, buffer, bytes);
 
-    if (err != SAIL_OK) {
+    if (err != SAIL_OK)
+    {
         return (OPJ_SIZE_T)-1;
     }
 
     return bytes;
 }
 
-static OPJ_OFF_T jpeg2000_private_stream_skip_write(OPJ_OFF_T bytes, void *user_data) {
+static OPJ_OFF_T jpeg2000_private_stream_skip_write(OPJ_OFF_T bytes, void* user_data)
+{
 
-    struct sail_io *io = user_data;
+    struct sail_io* io = user_data;
 
     const sail_status_t err = io->seek(io->stream, (long)bytes, SEEK_CUR);
 
-    if (err != SAIL_OK) {
+    if (err != SAIL_OK)
+    {
         return -1;
     }
 
     return bytes;
 }
 
-static OPJ_BOOL jpeg2000_private_stream_seek_write(OPJ_OFF_T bytes, void *user_data) {
+static OPJ_BOOL jpeg2000_private_stream_seek_write(OPJ_OFF_T bytes, void* user_data)
+{
 
-    struct sail_io *io = user_data;
+    struct sail_io* io = user_data;
 
     const sail_status_t err = io->seek(io->stream, (long)bytes, SEEK_SET);
 
-    if (err != SAIL_OK) {
+    if (err != SAIL_OK)
+    {
         return OPJ_FALSE;
     }
 
     return OPJ_TRUE;
 }
 
-opj_stream_t *jpeg2000_private_sail_io_dest(struct sail_io *io) {
+opj_stream_t* jpeg2000_private_sail_io_dest(struct sail_io* io)
+{
 
-    opj_stream_t *stream = opj_stream_create(OPJ_J2K_STREAM_CHUNK_SIZE, OPJ_FALSE);
+    opj_stream_t* stream = opj_stream_create(OPJ_J2K_STREAM_CHUNK_SIZE, OPJ_FALSE);
 
-    if (stream == NULL) {
+    if (stream == NULL)
+    {
         return NULL;
     }
 

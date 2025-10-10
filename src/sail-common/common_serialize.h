@@ -29,7 +29,8 @@
 #include <sail-common/export.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 /*
@@ -46,7 +47,7 @@ SAIL_EXPORT const char* sail_pixel_format_to_string(enum SailPixelFormat pixel_f
  *
  * Returns SAIL_PIXEL_FORMAT_UNKNOWN if the pixel format is not known.
  */
-SAIL_EXPORT enum SailPixelFormat sail_pixel_format_from_string(const char *str);
+SAIL_EXPORT enum SailPixelFormat sail_pixel_format_from_string(const char* str);
 
 /*
  * Returns a string representation of the specified chroma subsampling.
@@ -62,7 +63,7 @@ SAIL_EXPORT const char* sail_chroma_subsampling_to_string(enum SailChromaSubsamp
  *
  * Returns SAIL_CHROMA_SUBSAMPLING_UNKNOWN if the chroma subsampling is not known.
  */
-SAIL_EXPORT enum SailChromaSubsampling sail_chroma_subsampling_from_string(const char *str);
+SAIL_EXPORT enum SailChromaSubsampling sail_chroma_subsampling_from_string(const char* str);
 
 /*
  * Returns a string representation of the specified image property. See SailOrientation.
@@ -78,7 +79,7 @@ SAIL_EXPORT const char* sail_orientation_to_string(enum SailOrientation orientat
  *
  * Returns SAIL_ORIENTATION_NORMAL if the orientation is not known.
  */
-SAIL_EXPORT enum SailOrientation sail_orientation_from_string(const char *str);
+SAIL_EXPORT enum SailOrientation sail_orientation_from_string(const char* str);
 
 /*
  * Returns string representation of the specified compression type. See SailCompression.
@@ -94,7 +95,7 @@ SAIL_EXPORT const char* sail_compression_to_string(enum SailCompression compress
  *
  * Returns SAIL_COMPRESSION_UNKNOWN if the compression is not known.
  */
-SAIL_EXPORT enum SailCompression sail_compression_from_string(const char *str);
+SAIL_EXPORT enum SailCompression sail_compression_from_string(const char* str);
 
 /*
  * Returns a string representation of the specified meta data key. See SailMetaData.
@@ -110,7 +111,7 @@ SAIL_EXPORT const char* sail_meta_data_to_string(enum SailMetaData meta_data);
  *
  * Returns SAIL_META_DATA_UNKNOWN if the meta data key is not known.
  */
-SAIL_EXPORT enum SailMetaData sail_meta_data_from_string(const char *str);
+SAIL_EXPORT enum SailMetaData sail_meta_data_from_string(const char* str);
 
 /*
  * Returns a string representation of the specified resolution unit. See SailResolutionUnit.
@@ -126,7 +127,7 @@ SAIL_EXPORT const char* sail_resolution_unit_to_string(enum SailResolutionUnit r
  *
  * Returns SAIL_RESOLUTION_UNIT_UNKNOWN if the resolution unit is not known.
  */
-SAIL_EXPORT enum SailResolutionUnit sail_resolution_unit_from_string(const char *str);
+SAIL_EXPORT enum SailResolutionUnit sail_resolution_unit_from_string(const char* str);
 
 /*
  * Returns a string representation of the specified codec feature. See SailCodecFeature.
@@ -142,7 +143,7 @@ SAIL_EXPORT const char* sail_codec_feature_to_string(enum SailCodecFeature codec
  *
  * Returns SAIL_CODEC_FEATURE_UNKNOWN if the codec feature is not known.
  */
-SAIL_EXPORT enum SailCodecFeature sail_codec_feature_from_string(const char *str);
+SAIL_EXPORT enum SailCodecFeature sail_codec_feature_from_string(const char* str);
 
 /* extern "C" */
 #ifdef __cplusplus

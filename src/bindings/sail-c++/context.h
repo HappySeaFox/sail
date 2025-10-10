@@ -48,8 +48,8 @@ namespace sail
 class SAIL_EXPORT context
 {
 public:
-    context() = delete;
-    context(const context&) = delete;
+    context()                          = delete;
+    context(const context&)            = delete;
     context& operator=(const context&) = delete;
 
     /*
@@ -133,4 +133,4 @@ public:
     static void finish();
 };
 
-}
+} // namespace sail

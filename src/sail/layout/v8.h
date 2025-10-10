@@ -37,7 +37,8 @@
 #include <sail-common/status.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #ifndef SAIL_CODEC_NAME
@@ -53,31 +54,33 @@ Please define SAIL_CODEC_NAME before including this header.
 #endif
 
 #define SAIL_CONSTRUCT_CODEC_FUNC_CONCAT2_IMPL(a, b) a##_##b
-#define SAIL_CONSTRUCT_CODEC_FUNC_CONCAT2(a, b)      SAIL_CONSTRUCT_CODEC_FUNC_CONCAT2_IMPL(a, b)
-#define SAIL_CONSTRUCT_CODEC_FUNC(name)              SAIL_CONSTRUCT_CODEC_FUNC_CONCAT2(name, SAIL_CODEC_NAME)
+#define SAIL_CONSTRUCT_CODEC_FUNC_CONCAT2(a, b) SAIL_CONSTRUCT_CODEC_FUNC_CONCAT2_IMPL(a, b)
+#define SAIL_CONSTRUCT_CODEC_FUNC(name) SAIL_CONSTRUCT_CODEC_FUNC_CONCAT2(name, SAIL_CODEC_NAME)
 
-/*
- * Decoding functions.
- */
+    /*
+     * Decoding functions.
+     */
 
-/*
- * Starts decoding the specified io stream using the specified options.
- *
- * libsail, the caller of this function, guarantees the following:
- *   - The IO is valid and open.
- *   - The load options is not NULL.
- *
- * This function MUST:
- *   - Allocate an internal state object with internal data structures necessary to decode a file,
- *     and assign its value to the state.
- *
- * STATE explanation: Pass the address of a local void* pointer. Codecs will store an internal state
- * in it and destroy it in sail_codec_load_finish_v8(). States must be used per image. DO NOT use the same state
- * to load multiple images in the same time.
- *
- * Returns SAIL_OK on success.
- */
-sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_load_init_v8)(struct sail_io *io, const struct sail_load_options *load_options, void **state);
+    /*
+     * Starts decoding the specified io stream using the specified options.
+     *
+     * libsail, the caller of this function, guarantees the following:
+     *   - The IO is valid and open.
+     *   - The load options is not NULL.
+     *
+     * This function MUST:
+     *   - Allocate an internal state object with internal data structures necessary to decode a file,
+     *     and assign its value to the state.
+     *
+     * STATE explanation: Pass the address of a local void* pointer. Codecs will store an internal state
+     * in it and destroy it in sail_codec_load_finish_v8(). States must be used per image. DO NOT use the same state
+     * to load multiple images in the same time.
+     *
+     * Returns SAIL_OK on success.
+     */
+    sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_load_init_v8)(struct sail_io* io,
+                                                                     const struct sail_load_options* load_options,
+                                                                     void** state);
 
 /*
  * Seeks to the next frame. The frame is NOT immediately loaded or decoded by most SAIL codecs.
@@ -101,7 +104,7 @@ sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_load_init_v8)(struct sail_io 
  * Returns SAIL_OK on success.
  * Returns SAIL_ERROR_NO_MORE_FRAMES when no more frames are available.
  */
-sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_load_seek_next_frame_v8)(void *state, struct sail_image **image);
+sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_load_seek_next_frame_v8)(void* state, struct sail_image** image);
 
 /*
  * Reads the next frame of the current image. The image pixels are pre-allocated by libsail.
@@ -118,7 +121,7 @@ sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_load_seek_next_frame_v8)(void
  *
  * Returns SAIL_OK on success.
  */
-sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_load_frame_v8)(void *state, struct sail_image *image);
+sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_load_frame_v8)(void* state, struct sail_image* image);
 
 /*
  * Finilizes loading operation. No more loadings are possible after calling this function.
@@ -136,7 +139,7 @@ sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_load_frame_v8)(void *state, s
  *
  * Returns SAIL_OK on success.
  */
-sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_load_finish_v8)(void **state);
+sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_load_finish_v8)(void** state);
 
 /*
  * Encoding functions.
@@ -160,7 +163,9 @@ sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_load_finish_v8)(void **state)
  *
  * Returns SAIL_OK on success.
  */
-sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_save_init_v8)(struct sail_io *io, const struct sail_save_options *save_options, void **state);
+sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_save_init_v8)(struct sail_io* io,
+                                                                 const struct sail_save_options* save_options,
+                                                                 void** state);
 
 /*
  * Seeks to a next frame before saving it. The frame is NOT immediately written. Use sail_codec_save_frame_v8()
@@ -175,7 +180,8 @@ sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_save_init_v8)(struct sail_io 
  *
  * Returns SAIL_OK on success.
  */
-sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_save_seek_next_frame_v8)(void *state, const struct sail_image *image);
+sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_save_seek_next_frame_v8)(void* state,
+                                                                            const struct sail_image* image);
 
 /*
  * Writes a next frame of the current image.
@@ -189,7 +195,7 @@ sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_save_seek_next_frame_v8)(void
  *
  * Returns SAIL_OK on success.
  */
-sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_save_frame_v8)(void *state, const struct sail_image *image);
+sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_save_frame_v8)(void* state, const struct sail_image* image);
 
 /*
  * Finilizes saving operation. No more savings are possible after calling this function.
@@ -207,7 +213,7 @@ sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_save_frame_v8)(void *state, c
  *
  * Returns SAIL_OK on success.
  */
-sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_save_finish_v8)(void **state);
+sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_save_finish_v8)(void** state);
 
 /* extern "C" */
 #ifdef __cplusplus

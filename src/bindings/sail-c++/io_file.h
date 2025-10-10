@@ -42,12 +42,12 @@ public:
     /*
      * Opens the specified file for reading.
      */
-    explicit io_file(const std::string &path);
+    explicit io_file(const std::string& path);
 
     /*
      * Opens the specified memory buffer for the specified I/O operations.
      */
-    io_file(const std::string &path, Operation operation);
+    io_file(const std::string& path, Operation operation);
 
     /*
      * Destroys the file I/O stream.
@@ -67,4 +67,4 @@ private:
     const std::unique_ptr<io_file_pimpl> file_d;
 };
 
-}
+} // namespace sail

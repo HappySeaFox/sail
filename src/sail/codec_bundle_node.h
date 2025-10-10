@@ -28,7 +28,8 @@
 #include <sail-common/export.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 struct sail_codec_bundle;
@@ -36,12 +37,13 @@ struct sail_codec_bundle;
 /*
  * A structure representing a codec information linked list.
  */
-struct sail_codec_bundle_node {
+struct sail_codec_bundle_node
+{
 
     /* Codec bundle. */
-    struct sail_codec_bundle *codec_bundle;
+    struct sail_codec_bundle* codec_bundle;
 
-    struct sail_codec_bundle_node *next;
+    struct sail_codec_bundle_node* next;
 };
 
 typedef struct sail_codec_bundle_node sail_codec_bundle_node_t;

@@ -30,7 +30,8 @@
 #include <sail-common/sail-common.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 struct sail_image;
@@ -62,10 +63,10 @@ struct sail_image;
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_quantize_image(const struct sail_image *source_image,
-                                                unsigned max_colors,
-                                                bool dither,
-                                                struct sail_image **target_image);
+SAIL_EXPORT sail_status_t sail_quantize_image(const struct sail_image* source_image,
+                                              unsigned max_colors,
+                                              bool dither,
+                                              struct sail_image** target_image);
 
 #ifdef __cplusplus
 }

@@ -32,7 +32,8 @@
 #include <sail-common/status.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 struct sail_hash_map;
@@ -43,7 +44,8 @@ struct sail_hash_map;
  * For example, one might want to know the source image pixel format.
  * It's ignored in saving operations.
  */
-struct sail_source_image {
+struct sail_source_image
+{
 
     /*
      * Source image pixel format. See SailPixelFormat.
@@ -93,20 +95,21 @@ typedef struct sail_source_image sail_source_image_t;
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_source_image(struct sail_source_image **source_image);
+SAIL_EXPORT sail_status_t sail_alloc_source_image(struct sail_source_image** source_image);
 
 /*
- * Destroys the specified source image and all its internal allocated memory buffers. The source image MUST NOT be used
- * anymore after calling this function. Does nothing if the source image is NULL.
+ * Destroys the specified source image and all its internal allocated memory buffers. The source image MUST NOT be
+ * used anymore after calling this function. Does nothing if the source image is NULL.
  */
-SAIL_EXPORT void sail_destroy_source_image(struct sail_source_image *source_image);
+SAIL_EXPORT void sail_destroy_source_image(struct sail_source_image* source_image);
 
 /*
  * Makes a deep copy of the specified source image.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_copy_source_image(const struct sail_source_image *source, struct sail_source_image **target);
+SAIL_EXPORT sail_status_t sail_copy_source_image(const struct sail_source_image* source,
+                                                 struct sail_source_image** target);
 
 /* extern "C" */
 #ifdef __cplusplus

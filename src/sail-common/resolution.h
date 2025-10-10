@@ -30,13 +30,15 @@
 #include <sail-common/status.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 /*
  * Image resolution unit and values.
  */
-struct sail_resolution {
+struct sail_resolution
+{
 
     enum SailResolutionUnit unit;
 
@@ -49,26 +51,29 @@ struct sail_resolution {
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_resolution(struct sail_resolution **resolution);
+SAIL_EXPORT sail_status_t sail_alloc_resolution(struct sail_resolution** resolution);
 
 /*
  * Allocates a new resolution and initializes its fields with the specified values.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_resolution_from_data(enum SailResolutionUnit unit, double x, double y, struct sail_resolution **resolution);
+SAIL_EXPORT sail_status_t sail_alloc_resolution_from_data(enum SailResolutionUnit unit,
+                                                          double x,
+                                                          double y,
+                                                          struct sail_resolution** resolution);
 
 /*
  * Destroys the specified resolution.
  */
-SAIL_EXPORT void sail_destroy_resolution(struct sail_resolution *resolution);
+SAIL_EXPORT void sail_destroy_resolution(struct sail_resolution* resolution);
 
 /*
  * Makes a deep copy of the specified resolution.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_copy_resolution(struct sail_resolution *source, struct sail_resolution **target);
+SAIL_EXPORT sail_status_t sail_copy_resolution(struct sail_resolution* source, struct sail_resolution** target);
 
 /* extern "C" */
 #ifdef __cplusplus

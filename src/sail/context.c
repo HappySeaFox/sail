@@ -29,29 +29,33 @@
 
 #include <sail/sail.h>
 
-sail_status_t sail_init(void) {
+sail_status_t sail_init(void)
+{
 
     SAIL_TRY(sail_init_with_flags(0));
 
     return SAIL_OK;
 }
 
-sail_status_t sail_init_with_flags(int flags) {
+sail_status_t sail_init_with_flags(int flags)
+{
 
-    struct sail_context *context;
+    struct sail_context* context;
     SAIL_TRY(fetch_global_context_guarded_with_flags(&context, flags));
 
     return SAIL_OK;
 }
 
-sail_status_t sail_unload_codecs(void) {
+sail_status_t sail_unload_codecs(void)
+{
 
     SAIL_TRY(sail_unload_codecs_private());
 
     return SAIL_OK;
 }
 
-void sail_finish(void) {
+void sail_finish(void)
+{
 
     destroy_global_context();
 }

@@ -47,7 +47,7 @@ struct SailIcoDirEntry
     uint8_t height;
     uint8_t color_count; /* 0 when full color. */
     uint8_t reserved;
-    uint16_t planes; /* CUR: x hotspot. */
+    uint16_t planes;    /* CUR: x hotspot. */
     uint16_t bit_count; /* CUR: y hotspot. */
     uint32_t image_size;
     uint32_t image_offset;
@@ -59,16 +59,19 @@ enum SailIcoImageType
     SAIL_ICO_IMAGE_PNG,
 };
 
-SAIL_HIDDEN sail_status_t ico_private_read_header(struct sail_io *io, struct SailIcoHeader *header);
+SAIL_HIDDEN sail_status_t ico_private_read_header(struct sail_io* io, struct SailIcoHeader* header);
 
-SAIL_HIDDEN sail_status_t ico_private_read_dir_entry(struct sail_io *io, struct SailIcoDirEntry *dir_entry);
+SAIL_HIDDEN sail_status_t ico_private_read_dir_entry(struct sail_io* io, struct SailIcoDirEntry* dir_entry);
 
-SAIL_HIDDEN sail_status_t ico_private_probe_image_type(struct sail_io *io, enum SailIcoImageType *ico_image_type);
+SAIL_HIDDEN sail_status_t ico_private_probe_image_type(struct sail_io* io, enum SailIcoImageType* ico_image_type);
 
-SAIL_HIDDEN sail_status_t ico_private_store_cur_hotspot(const struct SailIcoDirEntry *ico_dir_entry, struct sail_hash_map *special_properties);
+SAIL_HIDDEN sail_status_t ico_private_store_cur_hotspot(const struct SailIcoDirEntry* ico_dir_entry,
+                                                        struct sail_hash_map* special_properties);
 
-SAIL_HIDDEN sail_status_t ico_private_write_header(struct sail_io *io, const struct SailIcoHeader *header);
+SAIL_HIDDEN sail_status_t ico_private_write_header(struct sail_io* io, const struct SailIcoHeader* header);
 
-SAIL_HIDDEN sail_status_t ico_private_write_dir_entry(struct sail_io *io, const struct SailIcoDirEntry *dir_entry);
+SAIL_HIDDEN sail_status_t ico_private_write_dir_entry(struct sail_io* io, const struct SailIcoDirEntry* dir_entry);
 
-SAIL_HIDDEN sail_status_t ico_private_fetch_cur_hotspot(const struct sail_hash_map *special_properties, uint16_t *hotspot_x, uint16_t *hotspot_y);
+SAIL_HIDDEN sail_status_t ico_private_fetch_cur_hotspot(const struct sail_hash_map* special_properties,
+                                                        uint16_t* hotspot_x,
+                                                        uint16_t* hotspot_y);

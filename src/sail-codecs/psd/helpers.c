@@ -27,7 +27,7 @@
 
 #include "helpers.h"
 
-sail_status_t psd_private_get_big_endian_uint16_t(struct sail_io *io, uint16_t *v)
+sail_status_t psd_private_get_big_endian_uint16_t(struct sail_io* io, uint16_t* v)
 {
     SAIL_TRY(io->strict_read(io->stream, v, sizeof(*v)));
 
@@ -36,7 +36,7 @@ sail_status_t psd_private_get_big_endian_uint16_t(struct sail_io *io, uint16_t *
     return SAIL_OK;
 }
 
-sail_status_t psd_private_get_big_endian_uint32_t(struct sail_io *io, uint32_t *v)
+sail_status_t psd_private_get_big_endian_uint32_t(struct sail_io* io, uint32_t* v)
 {
     SAIL_TRY(io->strict_read(io->stream, v, sizeof(*v)));
 
@@ -45,100 +45,134 @@ sail_status_t psd_private_get_big_endian_uint32_t(struct sail_io *io, uint32_t *
     return SAIL_OK;
 }
 
-sail_status_t psd_private_sail_pixel_format(enum SailPsdMode mode, uint16_t channels, uint16_t depth, enum SailPixelFormat *result) {
+sail_status_t psd_private_sail_pixel_format(enum SailPsdMode mode,
+                                            uint16_t channels,
+                                            uint16_t depth,
+                                            enum SailPixelFormat* result)
+{
 
-    switch (mode) {
-        case SAIL_PSD_MODE_BITMAP: {
-            switch (channels) {
-                case 1: *result = SAIL_PIXEL_FORMAT_BPP1_INDEXED; return SAIL_OK;
+    switch (mode)
+    {
+    case SAIL_PSD_MODE_BITMAP:
+    {
+        switch (channels)
+        {
+        case 1: *result = SAIL_PIXEL_FORMAT_BPP1_INDEXED; return SAIL_OK;
+        }
+        break;
+    }
+    case SAIL_PSD_MODE_INDEXED:
+    {
+        switch (channels)
+        {
+        case 1: *result = SAIL_PIXEL_FORMAT_BPP8_INDEXED; return SAIL_OK;
+        }
+        break;
+    }
+    case SAIL_PSD_MODE_GRAYSCALE:
+    {
+        switch (channels)
+        {
+        case 1:
+        {
+            switch (depth)
+            {
+            case 8: *result = SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE; return SAIL_OK;
+            case 16: *result = SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE; return SAIL_OK;
             }
             break;
         }
-        case SAIL_PSD_MODE_INDEXED: {
-            switch (channels) {
-                case 1: *result = SAIL_PIXEL_FORMAT_BPP8_INDEXED; return SAIL_OK;
+        case 2:
+        {
+            switch (depth)
+            {
+            case 8: *result = SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA; return SAIL_OK;
+            case 16: *result = SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA; return SAIL_OK;
             }
             break;
         }
-        case SAIL_PSD_MODE_GRAYSCALE: {
-            switch (channels) {
-                case 1: {
-                    switch (depth) {
-                        case 8:  *result = SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE;  return SAIL_OK;
-                        case 16: *result = SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE; return SAIL_OK;
-                    }
-                    break;
-                }
-                case 2: {
-                    switch (depth) {
-                        case 8:  *result = SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA; return SAIL_OK;
-                        case 16: *result = SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA; return SAIL_OK;
-                    }
-                    break;
-                }
+        }
+        break;
+    }
+    case SAIL_PSD_MODE_RGB:
+    {
+        switch (channels)
+        {
+        case 3:
+        {
+            switch (depth)
+            {
+            case 8: *result = SAIL_PIXEL_FORMAT_BPP24_RGB; return SAIL_OK;
+            case 16: *result = SAIL_PIXEL_FORMAT_BPP48_RGB; return SAIL_OK;
             }
             break;
         }
-        case SAIL_PSD_MODE_RGB: {
-            switch (channels) {
-                case 3: {
-                    switch(depth) {
-                        case 8:  *result = SAIL_PIXEL_FORMAT_BPP24_RGB; return SAIL_OK;
-                        case 16: *result = SAIL_PIXEL_FORMAT_BPP48_RGB; return SAIL_OK;
-                    }
-                    break;
-                }
-                case 4: {
-                    switch (depth) {
-                        case 8:  *result = SAIL_PIXEL_FORMAT_BPP32_RGBA; return SAIL_OK;
-                        case 16: *result = SAIL_PIXEL_FORMAT_BPP64_RGBA; return SAIL_OK;
-                    }
-                    break;
-                }
+        case 4:
+        {
+            switch (depth)
+            {
+            case 8: *result = SAIL_PIXEL_FORMAT_BPP32_RGBA; return SAIL_OK;
+            case 16: *result = SAIL_PIXEL_FORMAT_BPP64_RGBA; return SAIL_OK;
             }
             break;
         }
-        case SAIL_PSD_MODE_CMYK: {
-            switch (channels) {
-                case 4: {
-                    switch (depth) {
-                        case 8:  *result = SAIL_PIXEL_FORMAT_BPP32_CMYK; return SAIL_OK;
-                        case 16: *result = SAIL_PIXEL_FORMAT_BPP64_CMYK; return SAIL_OK;
-                    }
-                    break;
-                }
-                case 5: {
-                    switch (depth) {
-                        case 8:  *result = SAIL_PIXEL_FORMAT_BPP40_CMYKA; return SAIL_OK;
-                        case 16: *result = SAIL_PIXEL_FORMAT_BPP80_CMYKA; return SAIL_OK;
-                    }
-                    break;
-                }
+        }
+        break;
+    }
+    case SAIL_PSD_MODE_CMYK:
+    {
+        switch (channels)
+        {
+        case 4:
+        {
+            switch (depth)
+            {
+            case 8: *result = SAIL_PIXEL_FORMAT_BPP32_CMYK; return SAIL_OK;
+            case 16: *result = SAIL_PIXEL_FORMAT_BPP64_CMYK; return SAIL_OK;
             }
             break;
         }
-        case SAIL_PSD_MODE_LAB: {
-            switch (channels) {
-                case 3: {
-                    switch (depth) {
-                        case 8:  *result = SAIL_PIXEL_FORMAT_BPP24_CIE_LAB; return SAIL_OK;
-                        case 16: *result = SAIL_PIXEL_FORMAT_BPP40_CIE_LAB; return SAIL_OK;
-                    }
-                    break;
-                }
-                case 4: {
-                    switch (depth) {
-                        case 8:  *result = SAIL_PIXEL_FORMAT_BPP32_CIE_LABA; return SAIL_OK;
-                        case 16: *result = SAIL_PIXEL_FORMAT_BPP64_CIE_LABA; return SAIL_OK;
-                    }
-                    break;
-                }
+        case 5:
+        {
+            switch (depth)
+            {
+            case 8: *result = SAIL_PIXEL_FORMAT_BPP40_CMYKA; return SAIL_OK;
+            case 16: *result = SAIL_PIXEL_FORMAT_BPP80_CMYKA; return SAIL_OK;
             }
             break;
         }
-        default: {
+        }
+        break;
+    }
+    case SAIL_PSD_MODE_LAB:
+    {
+        switch (channels)
+        {
+        case 3:
+        {
+            switch (depth)
+            {
+            case 8: *result = SAIL_PIXEL_FORMAT_BPP24_CIE_LAB; return SAIL_OK;
+            case 16: *result = SAIL_PIXEL_FORMAT_BPP40_CIE_LAB; return SAIL_OK;
+            }
             break;
         }
+        case 4:
+        {
+            switch (depth)
+            {
+            case 8: *result = SAIL_PIXEL_FORMAT_BPP32_CIE_LABA; return SAIL_OK;
+            case 16: *result = SAIL_PIXEL_FORMAT_BPP64_CIE_LABA; return SAIL_OK;
+            }
+            break;
+        }
+        }
+        break;
+    }
+    default:
+    {
+        break;
+    }
     }
 
     SAIL_LOG_ERROR("PSD: Unsuppored combination of mode(%u) and channels(%u)", mode, channels);
@@ -147,11 +181,12 @@ sail_status_t psd_private_sail_pixel_format(enum SailPsdMode mode, uint16_t chan
 
 enum SailCompression psd_private_sail_compression(enum SailPsdCompression compression)
 {
-    switch (compression) {
-        case SAIL_PSD_COMPRESSION_NONE:                   return SAIL_COMPRESSION_NONE;
-        case SAIL_PSD_COMPRESSION_RLE:                    return SAIL_COMPRESSION_RLE;
-        case SAIL_PSD_COMPRESSION_ZIP_WITHOUT_PREDICTION: return SAIL_COMPRESSION_ZIP;
-        case SAIL_PSD_COMPRESSION_ZIP_WITH_PREDICTION:    return SAIL_COMPRESSION_ZIP;
-        default: return SAIL_COMPRESSION_UNKNOWN;
+    switch (compression)
+    {
+    case SAIL_PSD_COMPRESSION_NONE: return SAIL_COMPRESSION_NONE;
+    case SAIL_PSD_COMPRESSION_RLE: return SAIL_COMPRESSION_RLE;
+    case SAIL_PSD_COMPRESSION_ZIP_WITHOUT_PREDICTION: return SAIL_COMPRESSION_ZIP;
+    case SAIL_PSD_COMPRESSION_ZIP_WITH_PREDICTION: return SAIL_COMPRESSION_ZIP;
+    default: return SAIL_COMPRESSION_UNKNOWN;
     }
 }

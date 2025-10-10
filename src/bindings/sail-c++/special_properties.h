@@ -39,4 +39,4 @@ namespace sail
  */
 using special_properties = std::unordered_map<std::string, variant>;
 
-}
+} // namespace sail

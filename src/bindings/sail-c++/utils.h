@@ -41,7 +41,7 @@ class abstract_io;
 /*
  * Prints the recent errno value with SAIL_LOG_ERROR(). The specified format must include '%s'.
  */
-SAIL_EXPORT void print_errno(const char *format);
+SAIL_EXPORT void print_errno(const char* format);
 
 /*
  * Returns the current number of milliseconds since Epoch or 0 on error.
@@ -51,38 +51,38 @@ SAIL_EXPORT std::uint64_t now();
 /*
  * Returns true if the specified file system path exists.
  */
-SAIL_EXPORT bool path_exists(const std::string &path);
+SAIL_EXPORT bool path_exists(const std::string& path);
 
 /*
  * Returns true if the specified file system path is a directory.
  */
-SAIL_EXPORT bool is_dir(const std::string &path);
+SAIL_EXPORT bool is_dir(const std::string& path);
 
 /*
  * Returns true if the specified file system path is a regular file.
  */
-SAIL_EXPORT bool is_file(const std::string &path);
+SAIL_EXPORT bool is_file(const std::string& path);
 
 /*
  * Retrieves the file size.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t file_size(const std::string &path, size_t *size);
+SAIL_EXPORT sail_status_t file_size(const std::string& path, size_t* size);
 
 /*
  * Reads the specified file into the memory buffer. The memory buffer is resized to fit the contents.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t read_file_contents(const std::string &path, sail::arbitrary_data *contents);
+SAIL_EXPORT sail_status_t read_file_contents(const std::string& path, sail::arbitrary_data* contents);
 
 /*
  * Reads the specified I/O stream into the memory buffer. The memory buffer is resized to fit the contents.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t read_io_contents(sail::abstract_io &abstract_io, sail::arbitrary_data *contents);
+SAIL_EXPORT sail_status_t read_io_contents(sail::abstract_io& abstract_io, sail::arbitrary_data* contents);
 
 /*
  * Reverses the input value byte order. Only std::uint16_t, std::uint32_t, std::uint64_t,
@@ -90,7 +90,6 @@ SAIL_EXPORT sail_status_t read_io_contents(sail::abstract_io &abstract_io, sail:
  *
  * Returns the reversed value.
  */
-template<typename T>
-T reverse_bytes(T v);
+template <typename T> T reverse_bytes(T v);
 
-}
+} // namespace sail

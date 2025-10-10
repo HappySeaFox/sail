@@ -36,12 +36,13 @@ struct sail_io;
 /*
  * Expanded data source object for input.
  */
-struct sail_jpeg_source_mgr {
-    struct jpeg_source_mgr pub;   /* public fields */
+struct sail_jpeg_source_mgr
+{
+    struct jpeg_source_mgr pub; /* public fields */
 
-    struct sail_io *io;           /* source stream */
-    JOCTET *buffer;               /* start of buffer */
-    boolean start_of_file;        /* have we gotten any data yet? */
+    struct sail_io* io;    /* source stream */
+    JOCTET* buffer;        /* start of buffer */
+    boolean start_of_file; /* have we gotten any data yet? */
 };
 
-SAIL_HIDDEN void jpeg_private_sail_io_src(j_decompress_ptr cinfo, struct sail_io *io);
+SAIL_HIDDEN void jpeg_private_sail_io_src(j_decompress_ptr cinfo, struct sail_io* io);

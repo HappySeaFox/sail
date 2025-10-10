@@ -28,11 +28,12 @@
 
 #include "sail-common.h"
 
-sail_status_t sail_alloc_load_options(struct sail_load_options **load_options) {
+sail_status_t sail_alloc_load_options(struct sail_load_options** load_options)
+{
 
     SAIL_CHECK_PTR(load_options);
 
-    void *ptr;
+    void* ptr;
     SAIL_TRY(sail_malloc(sizeof(struct sail_load_options), &ptr));
     *load_options = ptr;
 
@@ -42,9 +43,11 @@ sail_status_t sail_alloc_load_options(struct sail_load_options **load_options) {
     return SAIL_OK;
 }
 
-void sail_destroy_load_options(struct sail_load_options *load_options) {
+void sail_destroy_load_options(struct sail_load_options* load_options)
+{
 
-    if (load_options == NULL) {
+    if (load_options == NULL)
+    {
         return;
     }
 
@@ -52,24 +55,29 @@ void sail_destroy_load_options(struct sail_load_options *load_options) {
     sail_free(load_options);
 }
 
-sail_status_t sail_alloc_load_options_from_features(const struct sail_load_features *load_features, struct sail_load_options **load_options) {
+sail_status_t sail_alloc_load_options_from_features(const struct sail_load_features* load_features,
+                                                    struct sail_load_options** load_options)
+{
 
     SAIL_CHECK_PTR(load_options);
 
-    struct sail_load_options *load_options_local;
+    struct sail_load_options* load_options_local;
     SAIL_TRY(sail_alloc_load_options(&load_options_local));
 
     load_options_local->options = 0;
 
-    if (load_features->features & SAIL_CODEC_FEATURE_META_DATA) {
+    if (load_features->features & SAIL_CODEC_FEATURE_META_DATA)
+    {
         load_options_local->options |= SAIL_OPTION_META_DATA;
     }
 
-    if (load_features->features & SAIL_CODEC_FEATURE_ICCP) {
+    if (load_features->features & SAIL_CODEC_FEATURE_ICCP)
+    {
         load_options_local->options |= SAIL_OPTION_ICCP;
     }
 
-    if (load_features->features & SAIL_CODEC_FEATURE_SOURCE_IMAGE) {
+    if (load_features->features & SAIL_CODEC_FEATURE_SOURCE_IMAGE)
+    {
         load_options_local->options |= SAIL_OPTION_SOURCE_IMAGE;
     }
 
@@ -78,17 +86,19 @@ sail_status_t sail_alloc_load_options_from_features(const struct sail_load_featu
     return SAIL_OK;
 }
 
-sail_status_t sail_copy_load_options(const struct sail_load_options *source, struct sail_load_options **target) {
+sail_status_t sail_copy_load_options(const struct sail_load_options* source, struct sail_load_options** target)
+{
 
     SAIL_CHECK_PTR(source);
     SAIL_CHECK_PTR(target);
 
-    struct sail_load_options *target_local;
+    struct sail_load_options* target_local;
     SAIL_TRY(sail_alloc_load_options(&target_local));
 
     target_local->options = source->options;
 
-    if (source->tuning != NULL) {
+    if (source->tuning != NULL)
+    {
         SAIL_TRY_OR_CLEANUP(sail_copy_hash_map(source->tuning, &target_local->tuning),
                             /* cleanup */ sail_destroy_load_options(target_local));
     }

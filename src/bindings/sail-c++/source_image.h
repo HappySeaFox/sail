@@ -55,22 +55,22 @@ public:
     /*
      * Copies the source image.
      */
-    source_image(const source_image &si);
+    source_image(const source_image& si);
 
     /*
      * Copies the source image.
      */
-    source_image& operator=(const source_image &si);
+    source_image& operator=(const source_image& si);
 
     /*
      * Moves the source image.
      */
-    source_image(source_image &&si) noexcept;
+    source_image(source_image&& si) noexcept;
 
     /*
      * Moves the source image.
      */
-    source_image& operator=(source_image &&si) noexcept;
+    source_image& operator=(source_image&& si) noexcept;
 
     /*
      * Destroys the source image.
@@ -127,13 +127,13 @@ private:
     /*
      * Makes a deep copy of the specified source image.
      */
-    explicit source_image(const sail_source_image *si);
+    explicit source_image(const sail_source_image* si);
 
-    sail_status_t to_sail_source_image(sail_source_image **source_image) const;
+    sail_status_t to_sail_source_image(sail_source_image** source_image) const;
 
 private:
     class pimpl;
     std::unique_ptr<pimpl> d;
 };
 
-}
+} // namespace sail

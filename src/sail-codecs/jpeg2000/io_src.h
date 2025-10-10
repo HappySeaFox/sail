@@ -31,4 +31,4 @@
 
 struct sail_io;
 
-SAIL_HIDDEN opj_stream_t *jpeg2000_private_sail_io_src(struct sail_io *io);
+SAIL_HIDDEN opj_stream_t* jpeg2000_private_sail_io_src(struct sail_io* io);

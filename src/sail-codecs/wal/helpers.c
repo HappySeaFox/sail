@@ -30,267 +30,44 @@
 /* Public domain Quake2 palette. See https://quakewiki.org/wiki/Quake_palette */
 static const unsigned WAL_PALETTE_ELEMENTS = 256;
 
-static const unsigned char WAL_PALETTE[256 * 3] =
-{
-	0, 0, 0,
-	15, 15, 15,
-	31, 31, 31,
-	47, 47, 47,
-	63, 63, 63,
-	75, 75, 75,
-	91, 91, 91,
-	107, 107, 107,
-	123, 123, 123,
-	139, 139, 139,
-	155, 155, 155,
-	171, 171, 171,
-	187, 187, 187,
-	203, 203, 203,
-	219, 219, 219,
-	235, 235, 235,
-	99, 75, 35,
-	91, 67, 31,
-	83, 63, 31,
-	79, 59, 27,
-	71, 55, 27,
-	63, 47, 23,
-	59, 43, 23,
-	51, 39, 19,
-	47, 35, 19,
-	43, 31, 19,
-	39, 27, 15,
-	35, 23, 15,
-	27, 19, 11,
-	23, 15, 11,
-	19, 15, 7,
-	15, 11, 7,
-	95, 95, 111,
-	91, 91, 103,
-	91, 83, 95,
-	87, 79, 91,
-	83, 75, 83,
-	79, 71, 75,
-	71, 63, 67,
-	63, 59, 59,
-	59, 55, 55,
-	51, 47, 47,
-	47, 43, 43,
-	39, 39, 39,
-	35, 35, 35,
-	27, 27, 27,
-	23, 23, 23,
-	19, 19, 19,
-	143, 119, 83,
-	123, 99, 67,
-	115, 91, 59,
-	103, 79, 47,
-	207, 151, 75,
-	167, 123, 59,
-	139, 103, 47,
-	111, 83, 39,
-	235, 159, 39,
-	203, 139, 35,
-	175, 119, 31,
-	147, 99, 27,
-	119, 79, 23,
-	91, 59, 15,
-	63, 39, 11,
-	35, 23, 7,
-	167, 59, 43,
-	159, 47, 35,
-	151, 43, 27,
-	139, 39, 19,
-	127, 31, 15,
-	115, 23, 11,
-	103, 23, 7,
-	87, 19, 0,
-	75, 15, 0,
-	67, 15, 0,
-	59, 15, 0,
-	51, 11, 0,
-	43, 11, 0,
-	35, 11, 0,
-	27, 7, 0,
-	19, 7, 0,
-	123, 95, 75,
-	115, 87, 67,
-	107, 83, 63,
-	103, 79, 59,
-	95, 71, 55,
-	87, 67, 51,
-	83, 63, 47,
-	75, 55, 43,
-	67, 51, 39,
-	63, 47, 35,
-	55, 39, 27,
-	47, 35, 23,
-	39, 27, 19,
-	31, 23, 15,
-	23, 15, 11,
-	15, 11, 7,
-	111, 59, 23,
-	95, 55, 23,
-	83, 47, 23,
-	67, 43, 23,
-	55, 35, 19,
-	39, 27, 15,
-	27, 19, 11,
-	15, 11, 7,
-	179, 91, 79,
-	191, 123, 111,
-	203, 155, 147,
-	215, 187, 183,
-	203, 215, 223,
-	179, 199, 211,
-	159, 183, 195,
-	135, 167, 183,
-	115, 151, 167,
-	91, 135, 155,
-	71, 119, 139,
-	47, 103, 127,
-	23, 83, 111,
-	19, 75, 103,
-	15, 67, 91,
-	11, 63, 83,
-	7, 55, 75,
-	7, 47, 63,
-	7, 39, 51,
-	0, 31, 43,
-	0, 23, 31,
-	0, 15, 19,
-	0, 7, 11,
-	0, 0, 0,
-	139, 87, 87,
-	131, 79, 79,
-	123, 71, 71,
-	115, 67, 67,
-	107, 59, 59,
-	99, 51, 51,
-	91, 47, 47,
-	87, 43, 43,
-	75, 35, 35,
-	63, 31, 31,
-	51, 27, 27,
-	43, 19, 19,
-	31, 15, 15,
-	19, 11, 11,
-	11, 7, 7,
-	0, 0, 0,
-	151, 159, 123,
-	143, 151, 115,
-	135, 139, 107,
-	127, 131, 99,
-	119, 123, 95,
-	115, 115, 87,
-	107, 107, 79,
-	99, 99, 71,
-	91, 91, 67,
-	79, 79, 59,
-	67, 67, 51,
-	55, 55, 43,
-	47, 47, 35,
-	35, 35, 27,
-	23, 23, 19,
-	15, 15, 11,
-	159, 75, 63,
-	147, 67, 55,
-	139, 59, 47,
-	127, 55, 39,
-	119, 47, 35,
-	107, 43, 27,
-	99, 35, 23,
-	87, 31, 19,
-	79, 27, 15,
-	67, 23, 11,
-	55, 19, 11,
-	43, 15, 7,
-	31, 11, 7,
-	23, 7, 0,
-	11, 0, 0,
-	0, 0, 0,
-	119, 123, 207,
-	111, 115, 195,
-	103, 107, 183,
-	99, 99, 167,
-	91, 91, 155,
-	83, 87, 143,
-	75, 79, 127,
-	71, 71, 115,
-	63, 63, 103,
-	55, 55, 87,
-	47, 47, 75,
-	39, 39, 63,
-	35, 31, 47,
-	27, 23, 35,
-	19, 15, 23,
-	11, 7, 7,
-	155, 171, 123,
-	143, 159, 111,
-	135, 151, 99,
-	123, 139, 87,
-	115, 131, 75,
-	103, 119, 67,
-	95, 111, 59,
-	87, 103, 51,
-	75, 91, 39,
-	63, 79, 27,
-	55, 67, 19,
-	47, 59, 11,
-	35, 47, 7,
-	27, 35, 0,
-	19, 23, 0,
-	11, 15, 0,
-	0, 255, 0,
-	35, 231, 15,
-	63, 211, 27,
-	83, 187, 39,
-	95, 167, 47,
-	95, 143, 51,
-	95, 123, 51,
-	255, 255, 255,
-	255, 255, 211,
-	255, 255, 167,
-	255, 255, 127,
-	255, 255, 83,
-	255, 255, 39,
-	255, 235, 31,
-	255, 215, 23,
-	255, 191, 15,
-	255, 171, 7,
-	255, 147, 0,
-	239, 127, 0,
-	227, 107, 0,
-	211, 87, 0,
-	199, 71, 0,
-	183, 59, 0,
-	171, 43, 0,
-	155, 31, 0,
-	143, 23, 0,
-	127, 15, 0,
-	115, 7, 0,
-	95, 0, 0,
-	71, 0, 0,
-	47, 0, 0,
-	27, 0, 0,
-	239, 0, 0,
-	55, 55, 255,
-	255, 0, 0,
-	0, 0, 255,
-	43, 43, 35,
-	27, 27, 23,
-	19, 19, 15,
-	235, 151, 127,
-	195, 115, 83,
-	159, 87, 51,
-	123, 63, 27,
-	235, 211, 199,
-	199, 171, 155,
-	167, 139, 119,
-	135, 107, 87,
-	159, 91, 83
-};
+static const unsigned char WAL_PALETTE[256 * 3] = {
+    0,   0,   0,   15,  15,  15,  31,  31,  31,  47,  47,  47,  63,  63,  63,  75,  75,  75,  91,  91,  91,  107, 107,
+    107, 123, 123, 123, 139, 139, 139, 155, 155, 155, 171, 171, 171, 187, 187, 187, 203, 203, 203, 219, 219, 219, 235,
+    235, 235, 99,  75,  35,  91,  67,  31,  83,  63,  31,  79,  59,  27,  71,  55,  27,  63,  47,  23,  59,  43,  23,
+    51,  39,  19,  47,  35,  19,  43,  31,  19,  39,  27,  15,  35,  23,  15,  27,  19,  11,  23,  15,  11,  19,  15,
+    7,   15,  11,  7,   95,  95,  111, 91,  91,  103, 91,  83,  95,  87,  79,  91,  83,  75,  83,  79,  71,  75,  71,
+    63,  67,  63,  59,  59,  59,  55,  55,  51,  47,  47,  47,  43,  43,  39,  39,  39,  35,  35,  35,  27,  27,  27,
+    23,  23,  23,  19,  19,  19,  143, 119, 83,  123, 99,  67,  115, 91,  59,  103, 79,  47,  207, 151, 75,  167, 123,
+    59,  139, 103, 47,  111, 83,  39,  235, 159, 39,  203, 139, 35,  175, 119, 31,  147, 99,  27,  119, 79,  23,  91,
+    59,  15,  63,  39,  11,  35,  23,  7,   167, 59,  43,  159, 47,  35,  151, 43,  27,  139, 39,  19,  127, 31,  15,
+    115, 23,  11,  103, 23,  7,   87,  19,  0,   75,  15,  0,   67,  15,  0,   59,  15,  0,   51,  11,  0,   43,  11,
+    0,   35,  11,  0,   27,  7,   0,   19,  7,   0,   123, 95,  75,  115, 87,  67,  107, 83,  63,  103, 79,  59,  95,
+    71,  55,  87,  67,  51,  83,  63,  47,  75,  55,  43,  67,  51,  39,  63,  47,  35,  55,  39,  27,  47,  35,  23,
+    39,  27,  19,  31,  23,  15,  23,  15,  11,  15,  11,  7,   111, 59,  23,  95,  55,  23,  83,  47,  23,  67,  43,
+    23,  55,  35,  19,  39,  27,  15,  27,  19,  11,  15,  11,  7,   179, 91,  79,  191, 123, 111, 203, 155, 147, 215,
+    187, 183, 203, 215, 223, 179, 199, 211, 159, 183, 195, 135, 167, 183, 115, 151, 167, 91,  135, 155, 71,  119, 139,
+    47,  103, 127, 23,  83,  111, 19,  75,  103, 15,  67,  91,  11,  63,  83,  7,   55,  75,  7,   47,  63,  7,   39,
+    51,  0,   31,  43,  0,   23,  31,  0,   15,  19,  0,   7,   11,  0,   0,   0,   139, 87,  87,  131, 79,  79,  123,
+    71,  71,  115, 67,  67,  107, 59,  59,  99,  51,  51,  91,  47,  47,  87,  43,  43,  75,  35,  35,  63,  31,  31,
+    51,  27,  27,  43,  19,  19,  31,  15,  15,  19,  11,  11,  11,  7,   7,   0,   0,   0,   151, 159, 123, 143, 151,
+    115, 135, 139, 107, 127, 131, 99,  119, 123, 95,  115, 115, 87,  107, 107, 79,  99,  99,  71,  91,  91,  67,  79,
+    79,  59,  67,  67,  51,  55,  55,  43,  47,  47,  35,  35,  35,  27,  23,  23,  19,  15,  15,  11,  159, 75,  63,
+    147, 67,  55,  139, 59,  47,  127, 55,  39,  119, 47,  35,  107, 43,  27,  99,  35,  23,  87,  31,  19,  79,  27,
+    15,  67,  23,  11,  55,  19,  11,  43,  15,  7,   31,  11,  7,   23,  7,   0,   11,  0,   0,   0,   0,   0,   119,
+    123, 207, 111, 115, 195, 103, 107, 183, 99,  99,  167, 91,  91,  155, 83,  87,  143, 75,  79,  127, 71,  71,  115,
+    63,  63,  103, 55,  55,  87,  47,  47,  75,  39,  39,  63,  35,  31,  47,  27,  23,  35,  19,  15,  23,  11,  7,
+    7,   155, 171, 123, 143, 159, 111, 135, 151, 99,  123, 139, 87,  115, 131, 75,  103, 119, 67,  95,  111, 59,  87,
+    103, 51,  75,  91,  39,  63,  79,  27,  55,  67,  19,  47,  59,  11,  35,  47,  7,   27,  35,  0,   19,  23,  0,
+    11,  15,  0,   0,   255, 0,   35,  231, 15,  63,  211, 27,  83,  187, 39,  95,  167, 47,  95,  143, 51,  95,  123,
+    51,  255, 255, 255, 255, 255, 211, 255, 255, 167, 255, 255, 127, 255, 255, 83,  255, 255, 39,  255, 235, 31,  255,
+    215, 23,  255, 191, 15,  255, 171, 7,   255, 147, 0,   239, 127, 0,   227, 107, 0,   211, 87,  0,   199, 71,  0,
+    183, 59,  0,   171, 43,  0,   155, 31,  0,   143, 23,  0,   127, 15,  0,   115, 7,   0,   95,  0,   0,   71,  0,
+    0,   47,  0,   0,   27,  0,   0,   239, 0,   0,   55,  55,  255, 255, 0,   0,   0,   0,   255, 43,  43,  35,  27,
+    27,  23,  19,  19,  15,  235, 151, 127, 195, 115, 83,  159, 87,  51,  123, 63,  27,  235, 211, 199, 199, 171, 155,
+    167, 139, 119, 135, 107, 87,  159, 91,  83};
 
-sail_status_t wal_private_read_file_header(struct sail_io *io, struct WalFileHeader *wal_header) {
+sail_status_t wal_private_read_file_header(struct sail_io* io, struct WalFileHeader* wal_header)
+{
 
     /* WAL file header structure (100 bytes total):
      * - name (32 bytes): texture name (null-terminated string)
@@ -302,95 +79,104 @@ sail_status_t wal_private_read_file_header(struct sail_io *io, struct WalFileHea
      * - contents (4 bytes): content flags
      * - value (4 bytes): light emission value
      */
-    SAIL_TRY(io->strict_read(io->stream, &wal_header->name,      sizeof(wal_header->name)));
-    SAIL_TRY(io->strict_read(io->stream, &wal_header->width,     sizeof(wal_header->width)));
-    SAIL_TRY(io->strict_read(io->stream, &wal_header->height,    sizeof(wal_header->height)));
-    SAIL_TRY(io->strict_read(io->stream, &wal_header->offset,    sizeof(wal_header->offset)));
+    SAIL_TRY(io->strict_read(io->stream, &wal_header->name, sizeof(wal_header->name)));
+    SAIL_TRY(io->strict_read(io->stream, &wal_header->width, sizeof(wal_header->width)));
+    SAIL_TRY(io->strict_read(io->stream, &wal_header->height, sizeof(wal_header->height)));
+    SAIL_TRY(io->strict_read(io->stream, &wal_header->offset, sizeof(wal_header->offset)));
     SAIL_TRY(io->strict_read(io->stream, &wal_header->next_name, sizeof(wal_header->next_name)));
-    SAIL_TRY(io->strict_read(io->stream, &wal_header->flags,     sizeof(wal_header->flags)));
-    SAIL_TRY(io->strict_read(io->stream, &wal_header->contents,  sizeof(wal_header->contents)));
-    SAIL_TRY(io->strict_read(io->stream, &wal_header->value,     sizeof(wal_header->value)));
+    SAIL_TRY(io->strict_read(io->stream, &wal_header->flags, sizeof(wal_header->flags)));
+    SAIL_TRY(io->strict_read(io->stream, &wal_header->contents, sizeof(wal_header->contents)));
+    SAIL_TRY(io->strict_read(io->stream, &wal_header->value, sizeof(wal_header->value)));
 
     /* Validate dimensions. */
-    if (wal_header->width == 0 || wal_header->height == 0) {
+    if (wal_header->width == 0 || wal_header->height == 0)
+    {
         SAIL_LOG_ERROR("WAL: Invalid dimensions %ux%u", wal_header->width, wal_header->height);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
     }
 
     /* Reasonable size limit to prevent memory exhaustion (16K x 16K). */
-    if (wal_header->width > 16384 || wal_header->height > 16384) {
-        SAIL_LOG_ERROR("WAL: Image dimensions %ux%u exceed maximum allowed (16384x16384)", wal_header->width, wal_header->height);
+    if (wal_header->width > 16384 || wal_header->height > 16384)
+    {
+        SAIL_LOG_ERROR("WAL: Image dimensions %ux%u exceed maximum allowed (16384x16384)", wal_header->width,
+                       wal_header->height);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
     }
 
     /* Validate offsets - they should be positive and in ascending order. */
-    const size_t header_size = sizeof(wal_header->name) +
-                               sizeof(wal_header->width) +
-                               sizeof(wal_header->height) +
-                               sizeof(wal_header->offset) +
-                               sizeof(wal_header->next_name) +
-                               sizeof(wal_header->flags) +
-                               sizeof(wal_header->contents) +
-                               sizeof(wal_header->value);
+    const size_t header_size = sizeof(wal_header->name) + sizeof(wal_header->width) + sizeof(wal_header->height)
+                               + sizeof(wal_header->offset) + sizeof(wal_header->next_name) + sizeof(wal_header->flags)
+                               + sizeof(wal_header->contents) + sizeof(wal_header->value);
 
-    if (wal_header->offset[0] < (int)header_size) {
+    if (wal_header->offset[0] < (int)header_size)
+    {
         SAIL_LOG_ERROR("WAL: First mipmap offset %d is invalid (should be >= %zu)", wal_header->offset[0], header_size);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
     }
 
     /* Validate that offsets are in ascending order and calculate expected sizes. */
-    unsigned current_width = wal_header->width;
+    unsigned current_width  = wal_header->width;
     unsigned current_height = wal_header->height;
 
-    for (int i = 0; i < 4; i++) {
-        if (wal_header->offset[i] <= 0) {
+    for (int i = 0; i < 4; i++)
+    {
+        if (wal_header->offset[i] <= 0)
+        {
             SAIL_LOG_ERROR("WAL: Mipmap offset[%d] = %d is invalid", i, wal_header->offset[i]);
             SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
         }
 
-        if (i > 0) {
+        if (i > 0)
+        {
             /* Check offsets are in ascending order. */
-            if (wal_header->offset[i] <= wal_header->offset[i - 1]) {
+            if (wal_header->offset[i] <= wal_header->offset[i - 1])
+            {
                 SAIL_LOG_ERROR("WAL: Mipmap offsets are not in ascending order");
                 SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
             }
         }
 
         /* Verify expected mipmap size matches offset difference (except for last level). */
-        if (i < 3) {
+        if (i < 3)
+        {
             const size_t expected_size = (size_t)current_width * current_height;
-            const size_t actual_size = wal_header->offset[i + 1] - wal_header->offset[i];
+            const size_t actual_size   = wal_header->offset[i + 1] - wal_header->offset[i];
 
-            if (actual_size != expected_size) {
-                SAIL_LOG_ERROR("WAL: Mipmap level %d size mismatch. Expected %zu bytes, got %zu bytes",
-                              i, expected_size, actual_size);
+            if (actual_size != expected_size)
+            {
+                SAIL_LOG_ERROR("WAL: Mipmap level %d size mismatch. Expected %zu bytes, got %zu bytes", i,
+                               expected_size, actual_size);
                 SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
             }
         }
 
         /* Update dimensions for next level. */
-        current_width /= 2;
+        current_width  /= 2;
         current_height /= 2;
     }
 
     return SAIL_OK;
 }
 
-sail_status_t wal_private_assign_palette(struct sail_image *image) {
+sail_status_t wal_private_assign_palette(struct sail_image* image)
+{
 
-    SAIL_TRY(sail_alloc_palette_from_data(SAIL_PIXEL_FORMAT_BPP24_RGB, WAL_PALETTE, WAL_PALETTE_ELEMENTS, &image->palette));
+    SAIL_TRY(
+        sail_alloc_palette_from_data(SAIL_PIXEL_FORMAT_BPP24_RGB, WAL_PALETTE, WAL_PALETTE_ELEMENTS, &image->palette));
 
     return SAIL_OK;
 }
 
+sail_status_t wal_private_assign_meta_data(const struct WalFileHeader* wal_header,
+                                           struct sail_meta_data_node** meta_data_node)
+{
 
-sail_status_t wal_private_assign_meta_data(const struct WalFileHeader *wal_header, struct sail_meta_data_node **meta_data_node) {
-
-    struct sail_meta_data_node *meta_data_node_local;
+    struct sail_meta_data_node* meta_data_node_local;
     SAIL_TRY(sail_alloc_meta_data_node(&meta_data_node_local));
 
-    SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_and_value_from_known_key(SAIL_META_DATA_NAME, &meta_data_node_local->meta_data),
-                        /* cleanup */ sail_destroy_meta_data_node(meta_data_node_local));
+    SAIL_TRY_OR_CLEANUP(
+        sail_alloc_meta_data_and_value_from_known_key(SAIL_META_DATA_NAME, &meta_data_node_local->meta_data),
+        /* cleanup */ sail_destroy_meta_data_node(meta_data_node_local));
     SAIL_TRY_OR_CLEANUP(sail_set_variant_string(meta_data_node_local->meta_data->value, wal_header->name),
                         /* cleanup */ sail_destroy_meta_data_node(meta_data_node_local));
 
@@ -399,52 +185,61 @@ sail_status_t wal_private_assign_meta_data(const struct WalFileHeader *wal_heade
     return SAIL_OK;
 }
 
-sail_status_t wal_private_write_file_header(struct sail_io *io, const struct WalFileHeader *wal_header) {
+sail_status_t wal_private_write_file_header(struct sail_io* io, const struct WalFileHeader* wal_header)
+{
 
-    SAIL_TRY(io->strict_write(io->stream, &wal_header->name,      sizeof(wal_header->name)));
-    SAIL_TRY(io->strict_write(io->stream, &wal_header->width,     sizeof(wal_header->width)));
-    SAIL_TRY(io->strict_write(io->stream, &wal_header->height,    sizeof(wal_header->height)));
-    SAIL_TRY(io->strict_write(io->stream, &wal_header->offset,    sizeof(wal_header->offset)));
+    SAIL_TRY(io->strict_write(io->stream, &wal_header->name, sizeof(wal_header->name)));
+    SAIL_TRY(io->strict_write(io->stream, &wal_header->width, sizeof(wal_header->width)));
+    SAIL_TRY(io->strict_write(io->stream, &wal_header->height, sizeof(wal_header->height)));
+    SAIL_TRY(io->strict_write(io->stream, &wal_header->offset, sizeof(wal_header->offset)));
     SAIL_TRY(io->strict_write(io->stream, &wal_header->next_name, sizeof(wal_header->next_name)));
-    SAIL_TRY(io->strict_write(io->stream, &wal_header->flags,     sizeof(wal_header->flags)));
-    SAIL_TRY(io->strict_write(io->stream, &wal_header->contents,  sizeof(wal_header->contents)));
-    SAIL_TRY(io->strict_write(io->stream, &wal_header->value,     sizeof(wal_header->value)));
+    SAIL_TRY(io->strict_write(io->stream, &wal_header->flags, sizeof(wal_header->flags)));
+    SAIL_TRY(io->strict_write(io->stream, &wal_header->contents, sizeof(wal_header->contents)));
+    SAIL_TRY(io->strict_write(io->stream, &wal_header->value, sizeof(wal_header->value)));
 
     return SAIL_OK;
 }
 
-sail_status_t wal_private_supported_write_pixel_format(enum SailPixelFormat pixel_format) {
+sail_status_t wal_private_supported_write_pixel_format(enum SailPixelFormat pixel_format)
+{
 
-    switch (pixel_format) {
-        case SAIL_PIXEL_FORMAT_BPP8_INDEXED: {
-            return SAIL_OK;
-        }
-        default: {
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
-        }
+    switch (pixel_format)
+    {
+    case SAIL_PIXEL_FORMAT_BPP8_INDEXED:
+    {
+        return SAIL_OK;
+    }
+    default:
+    {
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+    }
     }
 }
 
-sail_status_t wal_private_downsample_indexed(const void *src, unsigned src_width, unsigned src_height,
-                                              void **dst, unsigned *dst_width, unsigned *dst_height) {
+sail_status_t wal_private_downsample_indexed(
+    const void* src, unsigned src_width, unsigned src_height, void** dst, unsigned* dst_width, unsigned* dst_height)
+{
 
-    *dst_width = src_width / 2;
+    *dst_width  = src_width / 2;
     *dst_height = src_height / 2;
 
-    if (*dst_width == 0 || *dst_height == 0) {
+    if (*dst_width == 0 || *dst_height == 0)
+    {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INCORRECT_IMAGE_DIMENSIONS);
     }
 
     const size_t dst_size = (size_t)(*dst_width) * (*dst_height);
-    void *dst_ptr;
+    void* dst_ptr;
     SAIL_TRY(sail_malloc(dst_size, &dst_ptr));
 
-    const uint8_t *src_pixels = src;
-    uint8_t *dst_pixels = dst_ptr;
+    const uint8_t* src_pixels = src;
+    uint8_t* dst_pixels       = dst_ptr;
 
     /* Simple box filter: take the top-left pixel of each 2x2 block. */
-    for (unsigned y = 0; y < *dst_height; y++) {
-        for (unsigned x = 0; x < *dst_width; x++) {
+    for (unsigned y = 0; y < *dst_height; y++)
+    {
+        for (unsigned x = 0; x < *dst_width; x++)
+        {
             dst_pixels[y * (*dst_width) + x] = src_pixels[(y * 2) * src_width + (x * 2)];
         }
     }

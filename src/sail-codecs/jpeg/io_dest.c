@@ -33,7 +33,7 @@
  * Most of this file was copied from libjpeg-turbo 2.0.4 and adapted to SAIL.
  */
 
-#define OUTPUT_BUF_SIZE  4096   /* choose an efficiently fwrite'able size */
+#define OUTPUT_BUF_SIZE 4096 /* choose an efficiently fwrite'able size */
 
 /*
  * Initialize destination --- called by jpeg_start_compress
@@ -41,12 +41,11 @@
  */
 static void init_destination(j_compress_ptr cinfo)
 {
-    struct sail_jpeg_destination_mgr *dest = (struct sail_jpeg_destination_mgr *)cinfo->dest;
+    struct sail_jpeg_destination_mgr* dest = (struct sail_jpeg_destination_mgr*)cinfo->dest;
 
     /* Allocate the output buffer --- it will be released when done with image */
-    dest->buffer = (JOCTET *)(*cinfo->mem->alloc_small)((j_common_ptr)cinfo,
-                                                        JPOOL_IMAGE,
-                                                        OUTPUT_BUF_SIZE * sizeof(JOCTET));
+    dest->buffer =
+        (JOCTET*)(*cinfo->mem->alloc_small)((j_common_ptr)cinfo, JPOOL_IMAGE, OUTPUT_BUF_SIZE * sizeof(JOCTET));
 
     dest->pub.next_output_byte = dest->buffer;
     dest->pub.free_in_buffer   = OUTPUT_BUF_SIZE;
@@ -76,7 +75,7 @@ static void init_destination(j_compress_ptr cinfo)
  */
 static boolean empty_output_buffer(j_compress_ptr cinfo)
 {
-    struct sail_jpeg_destination_mgr *dest = (struct sail_jpeg_destination_mgr *)cinfo->dest;
+    struct sail_jpeg_destination_mgr* dest = (struct sail_jpeg_destination_mgr*)cinfo->dest;
 
     sail_status_t err = dest->io->strict_write(dest->io->stream, dest->buffer, OUTPUT_BUF_SIZE);
 
@@ -99,11 +98,12 @@ static boolean empty_output_buffer(j_compress_ptr cinfo)
  */
 static void term_destination(j_compress_ptr cinfo)
 {
-    struct sail_jpeg_destination_mgr *dest = (struct sail_jpeg_destination_mgr *)cinfo->dest;
-    size_t datacount = OUTPUT_BUF_SIZE - dest->pub.free_in_buffer;
+    struct sail_jpeg_destination_mgr* dest = (struct sail_jpeg_destination_mgr*)cinfo->dest;
+    size_t datacount                       = OUTPUT_BUF_SIZE - dest->pub.free_in_buffer;
 
     /* Write any data remaining in the buffer */
-    if (datacount > 0) {
+    if (datacount > 0)
+    {
         sail_status_t err = dest->io->strict_write(dest->io->stream, dest->buffer, datacount);
 
         if (err != SAIL_OK)
@@ -122,28 +122,30 @@ static void term_destination(j_compress_ptr cinfo)
  * The caller must have already opened the stream, and is responsible
  * for closing it after finishing compression.
  */
-void jpeg_private_sail_io_dest(j_compress_ptr cinfo, struct sail_io *io)
+void jpeg_private_sail_io_dest(j_compress_ptr cinfo, struct sail_io* io)
 {
-    struct sail_jpeg_destination_mgr *dest;
+    struct sail_jpeg_destination_mgr* dest;
 
     /* The destination object is made permanent so that multiple JPEG images
      * can be written to the same file without re-executing jpeg_stdio_dest.
      */
-    if (cinfo->dest == NULL) {    /* first time for this JPEG object? */
-        cinfo->dest = cinfo->mem->alloc_small((j_common_ptr)cinfo,
-                                                JPOOL_PERMANENT,
-                                                sizeof(struct sail_jpeg_destination_mgr));
-    } else if (cinfo->dest->init_destination != init_destination) {
+    if (cinfo->dest == NULL)
+    { /* first time for this JPEG object? */
+        cinfo->dest =
+            cinfo->mem->alloc_small((j_common_ptr)cinfo, JPOOL_PERMANENT, sizeof(struct sail_jpeg_destination_mgr));
+    }
+    else if (cinfo->dest->init_destination != init_destination)
+    {
         /* It is unsafe to reuse the existing destination manager unless it was
          * created by this function.  Otherwise, there is no guarantee that the
          * opaque structure is the right size.  Note that we could just create a
          * new structure, but the old structure would not be freed until
          * jpeg_destroy_compress() was called.
-        */
+         */
         ERREXIT(cinfo, JERR_BUFFER_SIZE);
     }
 
-    dest = (struct sail_jpeg_destination_mgr *)cinfo->dest;
+    dest = (struct sail_jpeg_destination_mgr*)cinfo->dest;
 
     dest->pub.init_destination    = init_destination;
     dest->pub.empty_output_buffer = empty_output_buffer;

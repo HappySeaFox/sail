@@ -80,7 +80,7 @@ static MunitResult test_hex_string_to_data(const MunitParameter params[], void* 
     {
         /* Odd length. */
         const char* str = "0A4";
-        data = NULL;
+        data            = NULL;
         munit_assert(sail_hex_string_to_data(str, &data, &data_size) == SAIL_OK);
         munit_assert_memory_equal(1, data, "\n");
         sail_free(data);
@@ -105,7 +105,7 @@ static MunitResult test_data_to_hex_string(const MunitParameter params[], void* 
     void* ptr;
 
     {
-        str = NULL;
+        str              = NULL;
         const char* data = "abc";
         munit_assert(sail_data_to_hex_string(data, strlen(data), &str) == SAIL_OK);
         munit_assert_not_null(str);
@@ -115,7 +115,7 @@ static MunitResult test_data_to_hex_string(const MunitParameter params[], void* 
     }
 
     {
-        str = NULL;
+        str              = NULL;
         const char* data = "\nA\n";
         munit_assert(sail_data_to_hex_string(data, strlen(data), &str) == SAIL_OK);
         munit_assert_not_null(str);

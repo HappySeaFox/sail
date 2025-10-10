@@ -36,27 +36,29 @@ struct sail_codec_info;
 struct sail_codec;
 struct sail_save_features;
 
-struct hidden_state {
+struct hidden_state
+{
 
-    struct sail_io *io;
+    struct sail_io* io;
     bool own_io;
 
-    struct sail_load_options *load_options;
-    struct sail_save_options *save_options;
+    struct sail_load_options* load_options;
+    struct sail_save_options* save_options;
 
     /* Local state passed to codec loading and saving functions. */
-    void *state;
+    void* state;
 
     /* Shallow pointers to internal data structures so no need to free these. */
-    const struct sail_codec_info *codec_info;
-    const struct sail_codec *codec;
+    const struct sail_codec_info* codec_info;
+    const struct sail_codec* codec;
 };
 
-SAIL_HIDDEN sail_status_t load_codec_by_codec_info(const struct sail_codec_info *codec_info,
-                                                    const struct sail_codec **codec);
+SAIL_HIDDEN sail_status_t load_codec_by_codec_info(const struct sail_codec_info* codec_info,
+                                                   const struct sail_codec** codec);
 
-SAIL_HIDDEN void destroy_hidden_state(struct hidden_state *state);
+SAIL_HIDDEN void destroy_hidden_state(struct hidden_state* state);
 
-SAIL_HIDDEN sail_status_t stop_saving(void *state, size_t *written);
+SAIL_HIDDEN sail_status_t stop_saving(void* state, size_t* written);
 
-SAIL_HIDDEN sail_status_t allowed_write_output_pixel_format(const struct sail_save_features *save_features, enum SailPixelFormat pixel_format);
+SAIL_HIDDEN sail_status_t allowed_write_output_pixel_format(const struct sail_save_features* save_features,
+                                                            enum SailPixelFormat pixel_format);

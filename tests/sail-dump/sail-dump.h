@@ -31,9 +31,9 @@
 /*
  * Reads a dump file from path + ".dump".
  */
-SAIL_EXPORT sail_status_t sail_read_dump(const char *path, struct sail_image *images[]);
+SAIL_EXPORT sail_status_t sail_read_dump(const char* path, struct sail_image* images[]);
 
 /*
  * Prints the image dump.
  */
-SAIL_EXPORT sail_status_t sail_dump(const struct sail_image *image);
+SAIL_EXPORT sail_status_t sail_dump(const struct sail_image* image);

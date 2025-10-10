@@ -27,14 +27,16 @@
 
 #include "io.h"
 
-int my_read_proc(GifFileType *gif, GifByteType *buffer, int buffer_size) {
+int my_read_proc(GifFileType* gif, GifByteType* buffer, int buffer_size)
+{
 
-    struct sail_io *io = gif->UserData;
+    struct sail_io* io = gif->UserData;
     size_t nbytes;
 
     sail_status_t err = io->tolerant_read(io->stream, buffer, buffer_size, &nbytes);
 
-    if (err != SAIL_OK) {
+    if (err != SAIL_OK)
+    {
         SAIL_LOG_ERROR("GIF: Failed to read from the I/O stream: %d", err);
         return 0;
     }
@@ -42,14 +44,16 @@ int my_read_proc(GifFileType *gif, GifByteType *buffer, int buffer_size) {
     return (int)nbytes;
 }
 
-int my_write_proc(GifFileType *gif, const GifByteType *buffer, int buffer_size) {
+int my_write_proc(GifFileType* gif, const GifByteType* buffer, int buffer_size)
+{
 
-    struct sail_io *io = gif->UserData;
+    struct sail_io* io = gif->UserData;
     size_t nbytes;
 
     sail_status_t err = io->tolerant_write(io->stream, buffer, buffer_size, &nbytes);
 
-    if (err != SAIL_OK) {
+    if (err != SAIL_OK)
+    {
         SAIL_LOG_ERROR("GIF: Failed to write to the I/O stream: %d", err);
         return 0;
     }

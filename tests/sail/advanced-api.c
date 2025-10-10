@@ -123,7 +123,7 @@ static MunitResult test_advanced_load_no_more_frames(const MunitParameter params
     munit_assert(sail_load_next_frame(state, &image) == SAIL_OK);
     sail_destroy_image(image);
 
-    image = NULL;
+    image                = NULL;
     sail_status_t status = sail_load_next_frame(state, &image);
 
     if (status == SAIL_OK)
@@ -186,7 +186,7 @@ static MunitResult test_advanced_save_single_frame_to_file(const MunitParameter 
     }
 
     struct sail_image* image_to_save = NULL;
-    sail_status_t conv_status = sail_convert_image_for_saving(image, codec_info->save_features, &image_to_save);
+    sail_status_t conv_status        = sail_convert_image_for_saving(image, codec_info->save_features, &image_to_save);
 
     if (conv_status != SAIL_OK)
     {
@@ -206,7 +206,7 @@ static MunitResult test_advanced_save_single_frame_to_file(const MunitParameter 
         snprintf(temp_path, sizeof(temp_path), "%s.test", path);
     }
 
-    void* state = NULL;
+    void* state          = NULL;
     sail_status_t status = sail_start_saving_into_file(temp_path, codec_info, &state);
 
     if (status == SAIL_OK)
@@ -254,7 +254,7 @@ static MunitResult test_advanced_save_to_memory(const MunitParameter params[], v
     }
 
     struct sail_image* image_to_save = NULL;
-    sail_status_t conv_status = sail_convert_image_for_saving(image, codec_info->save_features, &image_to_save);
+    sail_status_t conv_status        = sail_convert_image_for_saving(image, codec_info->save_features, &image_to_save);
 
     if (conv_status != SAIL_OK)
     {
@@ -266,7 +266,7 @@ static MunitResult test_advanced_save_to_memory(const MunitParameter params[], v
     void* buffer;
     munit_assert(sail_malloc(buffer_size, &buffer) == SAIL_OK);
 
-    void* state = NULL;
+    void* state          = NULL;
     sail_status_t status = sail_start_saving_into_memory(buffer, buffer_size, codec_info, &state);
 
     if (status == SAIL_OK)
@@ -321,7 +321,7 @@ static MunitResult test_advanced_early_stop_saving(const MunitParameter params[]
         snprintf(temp_path, sizeof(temp_path), "%s.test.early", path);
     }
 
-    void* state = NULL;
+    void* state          = NULL;
     sail_status_t status = sail_start_saving_into_file(temp_path, codec_info, &state);
 
     if (status != SAIL_OK)
@@ -380,7 +380,7 @@ static MunitResult test_advanced_roundtrip(const MunitParameter params[], void* 
     }
 
     struct sail_image* image_to_save = NULL;
-    sail_status_t conv_status = sail_convert_image_for_saving(image1, codec_info->save_features, &image_to_save);
+    sail_status_t conv_status        = sail_convert_image_for_saving(image1, codec_info->save_features, &image_to_save);
 
     if (conv_status != SAIL_OK)
     {
@@ -400,7 +400,7 @@ static MunitResult test_advanced_roundtrip(const MunitParameter params[], void* 
         snprintf(temp_path, sizeof(temp_path), "%s.test.roundtrip", path);
     }
 
-    void* state2 = NULL;
+    void* state2              = NULL;
     sail_status_t save_status = sail_start_saving_into_file(temp_path, codec_info, &state2);
 
     if (save_status == SAIL_OK)

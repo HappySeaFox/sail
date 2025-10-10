@@ -58,22 +58,22 @@ public:
     /*
      * Copies the resolution.
      */
-    resolution(const resolution &res);
+    resolution(const resolution& res);
 
     /*
      * Copies the resolution.
      */
-    resolution& operator=(const resolution &res);
+    resolution& operator=(const resolution& res);
 
     /*
      * Moves the resolution.
      */
-    resolution(resolution &&res) noexcept;
+    resolution(resolution&& res) noexcept;
 
     /*
      * Moves the resolution.
      */
-    resolution& operator=(resolution &&res) noexcept;
+    resolution& operator=(resolution&& res) noexcept;
 
     /*
      * Destroys the resolution.
@@ -129,19 +129,19 @@ public:
      *
      * Returns SAIL_RESOLUTION_UNIT_UNKNOWN if the resolution unit is not known.
      */
-    static SailResolutionUnit resolution_unit_from_string(const std::string &str);
+    static SailResolutionUnit resolution_unit_from_string(const std::string& str);
 
 private:
     /*
      * Makes a deep copy of the specified resolution.
      */
-    explicit resolution(const sail_resolution *res);
+    explicit resolution(const sail_resolution* res);
 
-    sail_status_t to_sail_resolution(sail_resolution **resolution) const;
+    sail_status_t to_sail_resolution(sail_resolution** resolution) const;
 
 private:
     class pimpl;
     std::unique_ptr<pimpl> d;
 };
 
-}
+} // namespace sail

@@ -30,10 +30,12 @@
 #include <sail-common/export.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-enum SailLogLevel {
+enum SailLogLevel
+{
 
     /* Special log level for setting as a barrier to silent all messages. */
     SAIL_LOG_LEVEL_SILENCE,
@@ -47,9 +49,9 @@ enum SailLogLevel {
     SAIL_LOG_LEVEL_TRACE,
 };
 
-typedef void (*sail_logger)(enum SailLogLevel level, const char *file, int line, const char *format, va_list args);
+typedef void (*sail_logger)(enum SailLogLevel level, const char* file, int line, const char* format, va_list args);
 
-SAIL_EXPORT void sail_log(enum SailLogLevel level, const char *file, int line, const char *format, ...);
+SAIL_EXPORT void sail_log(enum SailLogLevel level, const char* file, int line, const char* format, ...);
 
 /*
  * Sets a maximum log level barrier. Only messages of the specified log level or lower will be displayed.

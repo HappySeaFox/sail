@@ -28,11 +28,12 @@
 
 #include "sail-common.h"
 
-sail_status_t sail_alloc_load_features(struct sail_load_features **load_features) {
+sail_status_t sail_alloc_load_features(struct sail_load_features** load_features)
+{
 
     SAIL_CHECK_PTR(load_features);
 
-    void *ptr;
+    void* ptr;
     SAIL_TRY(sail_malloc(sizeof(struct sail_load_features), &ptr));
     *load_features = ptr;
 
@@ -42,9 +43,11 @@ sail_status_t sail_alloc_load_features(struct sail_load_features **load_features
     return SAIL_OK;
 }
 
-void sail_destroy_load_features(struct sail_load_features *load_features) {
+void sail_destroy_load_features(struct sail_load_features* load_features)
+{
 
-    if (load_features == NULL) {
+    if (load_features == NULL)
+    {
         return;
     }
 

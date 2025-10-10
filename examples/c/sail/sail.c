@@ -55,10 +55,19 @@ static void print_invalid_argument(void)
     fprintf(stderr, "Error: Invalid arguments. Run with -h to see command arguments.\n");
 }
 
-static sail_status_t convert_impl(const char** inputs, int input_count, const char* output,
-                                  enum SailPixelFormat pixel_format, int compression, int max_frames, int delay,
-                                  int colors, bool dither, const char* background, bool strip_metadata,
-                                  bool flip_horizontal, bool flip_vertical)
+static sail_status_t convert_impl(const char** inputs,
+                                  int input_count,
+                                  const char* output,
+                                  enum SailPixelFormat pixel_format,
+                                  int compression,
+                                  int max_frames,
+                                  int delay,
+                                  int colors,
+                                  bool dither,
+                                  const char* background,
+                                  bool strip_metadata,
+                                  bool flip_horizontal,
+                                  bool flip_vertical)
 {
     SAIL_CHECK_PTR(inputs);
     SAIL_CHECK_PTR(output);
@@ -215,13 +224,13 @@ static sail_status_t convert_impl(const char** inputs, int input_count, const ch
                         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
                     }
 
-                    conversion_options->options |= SAIL_CONVERSION_OPTION_BLEND_ALPHA;
-                    conversion_options->background24.component1 = (uint8_t)r;
-                    conversion_options->background24.component2 = (uint8_t)g;
-                    conversion_options->background24.component3 = (uint8_t)b;
-                    conversion_options->background48.component1 = (uint16_t)(r * 257);
-                    conversion_options->background48.component2 = (uint16_t)(g * 257);
-                    conversion_options->background48.component3 = (uint16_t)(b * 257);
+                    conversion_options->options                 |= SAIL_CONVERSION_OPTION_BLEND_ALPHA;
+                    conversion_options->background24.component1  = (uint8_t)r;
+                    conversion_options->background24.component2  = (uint8_t)g;
+                    conversion_options->background24.component3  = (uint8_t)b;
+                    conversion_options->background48.component1  = (uint16_t)(r * 257);
+                    conversion_options->background48.component2  = (uint16_t)(g * 257);
+                    conversion_options->background48.component3  = (uint16_t)(b * 257);
                     SAIL_LOG_INFO("Background color: #%02X%02X%02X", r, g, b);
                 }
 
@@ -425,9 +434,16 @@ static sail_status_t convert_impl(const char** inputs, int input_count, const ch
     return SAIL_OK;
 }
 
-static sail_status_t extract_frames_impl(const char* input, const char* output_template,
-                                         enum SailPixelFormat pixel_format, int compression, int max_frames, int colors,
-                                         bool dither, const char* background, bool strip_metadata, bool flip_horizontal,
+static sail_status_t extract_frames_impl(const char* input,
+                                         const char* output_template,
+                                         enum SailPixelFormat pixel_format,
+                                         int compression,
+                                         int max_frames,
+                                         int colors,
+                                         bool dither,
+                                         const char* background,
+                                         bool strip_metadata,
+                                         bool flip_horizontal,
                                          bool flip_vertical)
 {
 
@@ -455,15 +471,15 @@ static sail_status_t extract_frames_impl(const char* input, const char* output_t
     sail_destroy_load_options(load_options);
 
     /* Extract the file extension from output template. */
-    const char* ext = strrchr(output_template, '.');
+    const char* ext           = strrchr(output_template, '.');
     const char* base_name_end = ext ? ext : (output_template + strlen(output_template));
-    const char* dir_sep = strrchr(output_template, '/');
+    const char* dir_sep       = strrchr(output_template, '/');
     if (dir_sep == NULL)
     {
         dir_sep = strrchr(output_template, '\\');
     }
     const char* base_name_start = dir_sep ? (dir_sep + 1) : output_template;
-    int base_name_len = base_name_end - base_name_start;
+    int base_name_len           = base_name_end - base_name_start;
 
     /* Extract all frames. */
     sail_status_t load_status;
@@ -543,13 +559,13 @@ static sail_status_t extract_frames_impl(const char* input, const char* output_t
                     SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
                 }
 
-                conversion_options->options |= SAIL_CONVERSION_OPTION_BLEND_ALPHA;
-                conversion_options->background24.component1 = (uint8_t)r;
-                conversion_options->background24.component2 = (uint8_t)g;
-                conversion_options->background24.component3 = (uint8_t)b;
-                conversion_options->background48.component1 = (uint16_t)(r * 257);
-                conversion_options->background48.component2 = (uint16_t)(g * 257);
-                conversion_options->background48.component3 = (uint16_t)(b * 257);
+                conversion_options->options                 |= SAIL_CONVERSION_OPTION_BLEND_ALPHA;
+                conversion_options->background24.component1  = (uint8_t)r;
+                conversion_options->background24.component2  = (uint8_t)g;
+                conversion_options->background24.component3  = (uint8_t)b;
+                conversion_options->background48.component1  = (uint16_t)(r * 257);
+                conversion_options->background48.component2  = (uint16_t)(g * 257);
+                conversion_options->background48.component3  = (uint16_t)(b * 257);
             }
 
             if (dither)
@@ -738,7 +754,7 @@ static sail_status_t convert(int argc, char* argv[])
     bool strip_metadata = false;
     /* false: no flip (default). */
     bool flip_horizontal = false;
-    bool flip_vertical = false;
+    bool flip_vertical   = false;
 
     /* Collect positional arguments (file paths). */
     const char* files[256];
@@ -760,8 +776,8 @@ static sail_status_t convert(int argc, char* argv[])
                     fprintf(stderr, "Error: Missing compression value.\n");
                     SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
                 }
-                compression = atoi(argv[i + 1]);
-                i += 2;
+                compression  = atoi(argv[i + 1]);
+                i           += 2;
                 continue;
             }
 
@@ -772,8 +788,8 @@ static sail_status_t convert(int argc, char* argv[])
                     fprintf(stderr, "Error: Missing max-frames value.\n");
                     SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
                 }
-                max_frames = atoi(argv[i + 1]);
-                i += 2;
+                max_frames  = atoi(argv[i + 1]);
+                i          += 2;
                 continue;
             }
 
@@ -813,8 +829,8 @@ static sail_status_t convert(int argc, char* argv[])
 
             if (strcmp(argv[i], "-e") == 0 || strcmp(argv[i], "--extract-frames") == 0)
             {
-                extract_frames = true;
-                i += 1;
+                extract_frames  = true;
+                i              += 1;
                 continue;
             }
 
@@ -837,8 +853,8 @@ static sail_status_t convert(int argc, char* argv[])
 
             if (strcmp(argv[i], "-D") == 0 || strcmp(argv[i], "--dither") == 0)
             {
-                dither = true;
-                i += 1;
+                dither  = true;
+                i      += 1;
                 continue;
             }
 
@@ -849,29 +865,29 @@ static sail_status_t convert(int argc, char* argv[])
                     fprintf(stderr, "Error: Missing background value.\n");
                     SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
                 }
-                background = argv[i + 1];
-                i += 2;
+                background  = argv[i + 1];
+                i          += 2;
                 continue;
             }
 
             if (strcmp(argv[i], "-s") == 0 || strcmp(argv[i], "--strip") == 0)
             {
-                strip_metadata = true;
-                i += 1;
+                strip_metadata  = true;
+                i              += 1;
                 continue;
             }
 
             if (strcmp(argv[i], "-H") == 0 || strcmp(argv[i], "--flip-horizontal") == 0)
             {
-                flip_horizontal = true;
-                i += 1;
+                flip_horizontal  = true;
+                i               += 1;
                 continue;
             }
 
             if (strcmp(argv[i], "-V") == 0 || strcmp(argv[i], "--flip-vertical") == 0)
             {
-                flip_vertical = true;
-                i += 1;
+                flip_vertical  = true;
+                i             += 1;
                 continue;
             }
 
@@ -900,7 +916,7 @@ static sail_status_t convert(int argc, char* argv[])
 
     /* Last file is output, all others are inputs. */
     const char* output = files[file_count - 1];
-    int input_count = file_count - 1;
+    int input_count    = file_count - 1;
 
     /* Choose mode: extract frames or compose/convert. */
     if (extract_frames)
@@ -963,10 +979,10 @@ static void print_aligned_image_info(const struct sail_image* image)
         printf("Meta data     :\n");
 
         for (const struct sail_meta_data_node* meta_data_node = image->meta_data_node; meta_data_node != NULL;
-             meta_data_node = meta_data_node->next)
+             meta_data_node                                   = meta_data_node->next)
         {
             const struct sail_meta_data* meta_data = meta_data_node->meta_data;
-            const char* meta_data_str = NULL;
+            const char* meta_data_str              = NULL;
 
             if (meta_data->key == SAIL_META_DATA_UNKNOWN)
             {
@@ -1107,7 +1123,7 @@ static sail_status_t list_impl(bool verbose)
 
                 int tuning_counter = 0;
                 for (const struct sail_string_node* node = codec_info->load_features->tuning; node != NULL;
-                     node = node->next)
+                     node                                = node->next)
                 {
                     if (tuning_counter > 0 && tuning_counter % 2 == 0)
                     {

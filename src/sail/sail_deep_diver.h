@@ -31,7 +31,8 @@
 #include <sail-common/status.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 struct sail_codec_info;
@@ -61,12 +62,14 @@ struct sail_save_options;
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_start_loading_from_file_with_options(const char *path, const struct sail_codec_info *codec_info,
-                                                                    const struct sail_load_options *load_options, void **state);
+SAIL_EXPORT sail_status_t sail_start_loading_from_file_with_options(const char* path,
+                                                                    const struct sail_codec_info* codec_info,
+                                                                    const struct sail_load_options* load_options,
+                                                                    void** state);
 
 /*
- * Starts loading the specified memory buffer with the specified load options. If you do not need specific load options,
- * just pass NULL. Codec-specific defaults will be used in this case.
+ * Starts loading the specified memory buffer with the specified load options. If you do not need specific load
+ * options, just pass NULL. Codec-specific defaults will be used in this case.
  *
  * The load options are deep copied.
  *
@@ -81,9 +84,11 @@ SAIL_EXPORT sail_status_t sail_start_loading_from_file_with_options(const char *
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_start_loading_from_memory_with_options(const void *buffer, size_t buffer_size,
-                                                                      const struct sail_codec_info *codec_info,
-                                                                      const struct sail_load_options *load_options, void **state);
+SAIL_EXPORT sail_status_t sail_start_loading_from_memory_with_options(const void* buffer,
+                                                                      size_t buffer_size,
+                                                                      const struct sail_codec_info* codec_info,
+                                                                      const struct sail_load_options* load_options,
+                                                                      void** state);
 
 /*
  * Starts saving the specified image file with the specified save options. Pass codec info if you would like
@@ -107,9 +112,10 @@ SAIL_EXPORT sail_status_t sail_start_loading_from_memory_with_options(const void
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_start_saving_into_file_with_options(const char *path,
-                                                                   const struct sail_codec_info *codec_info,
-                                                                   const struct sail_save_options *save_options, void **state);
+SAIL_EXPORT sail_status_t sail_start_saving_into_file_with_options(const char* path,
+                                                                   const struct sail_codec_info* codec_info,
+                                                                   const struct sail_save_options* save_options,
+                                                                   void** state);
 
 /*
  * Starts saving the specified memory buffer with the specified save options. If you do not need specific
@@ -128,10 +134,11 @@ SAIL_EXPORT sail_status_t sail_start_saving_into_file_with_options(const char *p
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_start_saving_into_memory_with_options(void *buffer, size_t buffer_size,
-                                                                     const struct sail_codec_info *codec_info,
-                                                                     const struct sail_save_options *save_options, void **state);
-
+SAIL_EXPORT sail_status_t sail_start_saving_into_memory_with_options(void* buffer,
+                                                                     size_t buffer_size,
+                                                                     const struct sail_codec_info* codec_info,
+                                                                     const struct sail_save_options* save_options,
+                                                                     void** state);
 
 /*
  * Stops saving started by sail_start_saving_into_file() and brothers. Closes the underlying I/O target.
@@ -142,7 +149,7 @@ SAIL_EXPORT sail_status_t sail_start_saving_into_memory_with_options(void *buffe
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_stop_saving_with_written(void *state, size_t *written);
+SAIL_EXPORT sail_status_t sail_stop_saving_with_written(void* state, size_t* written);
 
 /* extern "C" */
 #ifdef __cplusplus

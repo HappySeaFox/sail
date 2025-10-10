@@ -35,9 +35,9 @@
 #include <sail-c++/suppress_c4251.h>
 
 #ifdef SAIL_BUILD
-    #include <sail-c++/abstract_io_adapter.h>
-    #include <sail-c++/io_base_private.h>
-    #include <sail-c++/utils_private.h>
+#include <sail-c++/abstract_io_adapter.h>
+#include <sail-c++/io_base_private.h>
+#include <sail-c++/utils_private.h>
 #endif
 
 #include <sail-c++/abstract_io.h>

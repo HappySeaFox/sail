@@ -60,22 +60,22 @@ public:
     /*
      * Copies the codec info object.
      */
-    codec_info(const codec_info &ci);
+    codec_info(const codec_info& ci);
 
     /*
      * Copies the codec info object.
      */
-    codec_info& operator=(const codec_info &ci);
+    codec_info& operator=(const codec_info& ci);
 
     /*
      * Moves the codec info object.
      */
-    codec_info(codec_info &&ci) noexcept;
+    codec_info(codec_info&& ci) noexcept;
 
     /*
      * Moves the codec info object.
      */
-    codec_info& operator=(codec_info &&ci) noexcept;
+    codec_info& operator=(codec_info&& ci) noexcept;
 
     /*
      * Destroys the codec info object.
@@ -142,7 +142,7 @@ public:
      *
      * Returns SAIL_CODEC_FEATURE_UNKNOWN if the codec feature is not known.
      */
-    static SailCodecFeature codec_feature_from_string(const std::string &str);
+    static SailCodecFeature codec_feature_from_string(const std::string& str);
 
     /*
      * Returns a first codec info object that supports the magic number read from the specified file.
@@ -154,7 +154,7 @@ public:
      *                image_input::next_frame()       ->
      *                image_input::stop().
      */
-    static codec_info from_magic_number(const std::string &path);
+    static codec_info from_magic_number(const std::string& path);
 
     /*
      * Returns a first codec info object that supports the magic number read from the specified memory buffer.
@@ -166,7 +166,7 @@ public:
      *                image_input::next_frame()       ->
      *                image_input::stop().
      */
-    static codec_info from_magic_number(const void *buffer, size_t buffer_size);
+    static codec_info from_magic_number(const void* buffer, size_t buffer_size);
 
     /*
      * Returns a first codec info object that supports the magic number read from the specified I/O source.
@@ -178,7 +178,7 @@ public:
      *                image_input::next_frame()       ->
      *                image_input::stop().
      */
-    static codec_info from_magic_number(sail::abstract_io &abstract_io);
+    static codec_info from_magic_number(sail::abstract_io& abstract_io);
 
     /*
      * Returns a first codec info object that supports loading or saving the specified file path by its file extension.
@@ -195,7 +195,7 @@ public:
      *                image_output::next_frame() ->
      *                image_output::stop().
      */
-    static codec_info from_path(const std::string &path);
+    static codec_info from_path(const std::string& path);
 
     /*
      * Returns a first codec info object that supports the specified file extension.
@@ -212,7 +212,7 @@ public:
      *                image_output::next_frame()   ->
      *                image_output::stop().
      */
-    static codec_info from_extension(const std::string &suffix);
+    static codec_info from_extension(const std::string& suffix);
 
     /*
      * Returns a first codec info object that supports the specified mime type.
@@ -229,7 +229,7 @@ public:
      *                image_output::next_frame()   ->
      *                image_output::stop().
      */
-    static codec_info from_mime_type(const std::string &mime_type);
+    static codec_info from_mime_type(const std::string& mime_type);
 
     /*
      * Returns the list of found codec info objects. Use it to determine the list of possible
@@ -242,7 +242,7 @@ private:
      * Makes a deep copy of the specified codec info and stores the pointer for further use.
      * When the SAIL context gets uninitialized, the pointer becomes dangling.
      */
-    explicit codec_info(const sail_codec_info *ci);
+    explicit codec_info(const sail_codec_info* ci);
 
     const sail_codec_info* sail_codec_info_c() const;
 
@@ -251,4 +251,4 @@ private:
     std::unique_ptr<pimpl> d;
 };
 
-}
+} // namespace sail

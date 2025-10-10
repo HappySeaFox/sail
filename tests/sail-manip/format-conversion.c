@@ -139,9 +139,9 @@ static MunitResult test_actual_conversion_grayscale_alpha(const MunitParameter p
     struct sail_image* image;
     munit_assert_int(sail_alloc_image(&image), ==, SAIL_OK);
 
-    image->width = 2;
-    image->height = 2;
-    image->pixel_format = SAIL_PIXEL_FORMAT_BPP32_RGBA;
+    image->width          = 2;
+    image->height         = 2;
+    image->pixel_format   = SAIL_PIXEL_FORMAT_BPP32_RGBA;
     image->bytes_per_line = sail_bytes_per_line(image->width, image->pixel_format);
 
     const size_t pixels_size = (size_t)image->height * image->bytes_per_line;
@@ -149,22 +149,22 @@ static MunitResult test_actual_conversion_grayscale_alpha(const MunitParameter p
 
     /* Fill with test data: RGBA */
     uint8_t* pixels = image->pixels;
-    pixels[0] = 255;
-    pixels[1] = 0;
-    pixels[2] = 0;
-    pixels[3] = 255; /* Red, opaque */
-    pixels[4] = 0;
-    pixels[5] = 255;
-    pixels[6] = 0;
-    pixels[7] = 128; /* Green, semi-transparent */
-    pixels[8] = 0;
-    pixels[9] = 0;
-    pixels[10] = 255;
-    pixels[11] = 255; /* Blue, opaque */
-    pixels[12] = 255;
-    pixels[13] = 255;
-    pixels[14] = 255;
-    pixels[15] = 0; /* White, transparent */
+    pixels[0]       = 255;
+    pixels[1]       = 0;
+    pixels[2]       = 0;
+    pixels[3]       = 255; /* Red, opaque */
+    pixels[4]       = 0;
+    pixels[5]       = 255;
+    pixels[6]       = 0;
+    pixels[7]       = 128; /* Green, semi-transparent */
+    pixels[8]       = 0;
+    pixels[9]       = 0;
+    pixels[10]      = 255;
+    pixels[11]      = 255; /* Blue, opaque */
+    pixels[12]      = 255;
+    pixels[13]      = 255;
+    pixels[14]      = 255;
+    pixels[15]      = 0; /* White, transparent */
 
     /* Convert to BPP16_GRAYSCALE_ALPHA */
     struct sail_image* converted_image;
@@ -197,9 +197,9 @@ static MunitResult test_actual_conversion_rgb555(const MunitParameter params[], 
     struct sail_image* image;
     munit_assert_int(sail_alloc_image(&image), ==, SAIL_OK);
 
-    image->width = 2;
-    image->height = 1;
-    image->pixel_format = SAIL_PIXEL_FORMAT_BPP24_RGB;
+    image->width          = 2;
+    image->height         = 1;
+    image->pixel_format   = SAIL_PIXEL_FORMAT_BPP24_RGB;
     image->bytes_per_line = sail_bytes_per_line(image->width, image->pixel_format);
 
     const size_t pixels_size = (size_t)image->height * image->bytes_per_line;
@@ -207,12 +207,12 @@ static MunitResult test_actual_conversion_rgb555(const MunitParameter params[], 
 
     /* Fill with test data: RGB */
     uint8_t* pixels = image->pixels;
-    pixels[0] = 248;
-    pixels[1] = 0;
-    pixels[2] = 0; /* Red (should be 31 in 5-bit) */
-    pixels[3] = 0;
-    pixels[4] = 252;
-    pixels[5] = 0; /* Green (should be 31 in 5-bit) */
+    pixels[0]       = 248;
+    pixels[1]       = 0;
+    pixels[2]       = 0; /* Red (should be 31 in 5-bit) */
+    pixels[3]       = 0;
+    pixels[4]       = 252;
+    pixels[5]       = 0; /* Green (should be 31 in 5-bit) */
 
     /* Convert to BPP16_RGB555 */
     struct sail_image* converted_image;
@@ -236,9 +236,9 @@ static MunitResult test_actual_conversion_cmyk(const MunitParameter params[], vo
     struct sail_image* image;
     munit_assert_int(sail_alloc_image(&image), ==, SAIL_OK);
 
-    image->width = 2;
-    image->height = 1;
-    image->pixel_format = SAIL_PIXEL_FORMAT_BPP24_RGB;
+    image->width          = 2;
+    image->height         = 1;
+    image->pixel_format   = SAIL_PIXEL_FORMAT_BPP24_RGB;
     image->bytes_per_line = sail_bytes_per_line(image->width, image->pixel_format);
 
     const size_t pixels_size = (size_t)image->height * image->bytes_per_line;
@@ -246,12 +246,12 @@ static MunitResult test_actual_conversion_cmyk(const MunitParameter params[], vo
 
     /* Fill with test data: RGB */
     uint8_t* pixels = image->pixels;
-    pixels[0] = 255;
-    pixels[1] = 0;
-    pixels[2] = 0; /* Pure Red */
-    pixels[3] = 0;
-    pixels[4] = 0;
-    pixels[5] = 0; /* Black */
+    pixels[0]       = 255;
+    pixels[1]       = 0;
+    pixels[2]       = 0; /* Pure Red */
+    pixels[3]       = 0;
+    pixels[4]       = 0;
+    pixels[5]       = 0; /* Black */
 
     /* Convert to BPP32_CMYK */
     struct sail_image* converted_image;

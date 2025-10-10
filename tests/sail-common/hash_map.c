@@ -43,7 +43,7 @@ static MunitResult test_put(const MunitParameter params[], void* user_data)
     munit_assert(sail_alloc_hash_map(&hash_map) == SAIL_OK);
 
     const double reference_value1 = 11.5;
-    const int reference_value2 = 101;
+    const int reference_value2    = 101;
 
     /* Value 1. */
     struct sail_variant* value1;
@@ -157,7 +157,7 @@ static MunitResult test_copy(const MunitParameter params[], void* user_data)
     munit_assert(sail_alloc_hash_map(&hash_map1) == SAIL_OK);
 
     const double reference_value1 = 11.5;
-    const int reference_value2 = 101;
+    const int reference_value2    = 101;
 
     /* Value 1. */
     struct sail_variant* value1;
@@ -262,7 +262,7 @@ static MunitResult test_erase(const MunitParameter params[], void* user_data)
 
     /* Erase non-existing. */
     reference_value = 444;
-    hash_map = generate_specific_hash_map_for_erasing(reference_value);
+    hash_map        = generate_specific_hash_map_for_erasing(reference_value);
 
     sail_erase_hash_map_key(hash_map, "oops");
     munit_assert(sail_hash_map_has_key(hash_map, "z"));
@@ -284,7 +284,7 @@ static MunitResult test_erase(const MunitParameter params[], void* user_data)
 
     /* Erase "z". */
     reference_value = 555;
-    hash_map = generate_specific_hash_map_for_erasing(reference_value);
+    hash_map        = generate_specific_hash_map_for_erasing(reference_value);
 
     sail_erase_hash_map_key(hash_map, "z");
     munit_assert(!sail_hash_map_has_key(hash_map, "z"));
@@ -299,7 +299,7 @@ static MunitResult test_erase(const MunitParameter params[], void* user_data)
 
     /* Erase "i1". */
     reference_value = 666;
-    hash_map = generate_specific_hash_map_for_erasing(reference_value);
+    hash_map        = generate_specific_hash_map_for_erasing(reference_value);
 
     sail_erase_hash_map_key(hash_map, "i1");
     munit_assert(!sail_hash_map_has_key(hash_map, "i1"));
@@ -314,7 +314,7 @@ static MunitResult test_erase(const MunitParameter params[], void* user_data)
 
     /* Erase "h2". */
     reference_value = 777;
-    hash_map = generate_specific_hash_map_for_erasing(reference_value);
+    hash_map        = generate_specific_hash_map_for_erasing(reference_value);
 
     sail_erase_hash_map_key(hash_map, "h2");
     munit_assert(!sail_hash_map_has_key(hash_map, "h2"));

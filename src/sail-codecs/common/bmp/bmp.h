@@ -33,7 +33,8 @@ struct sail_io;
 struct sail_load_options;
 struct sail_save_options;
 
-enum SailBmpReadOptions {
+enum SailBmpReadOptions
+{
 
     /*
      * No specific BMP flags. This will:
@@ -48,7 +49,8 @@ enum SailBmpReadOptions {
     SAIL_READ_BMP_FILE_HEADER = 1 << 0,
 };
 
-enum SailBmpWriteOptions {
+enum SailBmpWriteOptions
+{
 
     /*
      * No specific BMP write flags.
@@ -62,18 +64,26 @@ enum SailBmpWriteOptions {
     SAIL_WRITE_BMP_FILE_HEADER = 1 << 0,
 };
 
-SAIL_HIDDEN sail_status_t bmp_private_read_init(struct sail_io *io, const struct sail_load_options *load_options, void **state, int bmp_load_options);
+SAIL_HIDDEN sail_status_t bmp_private_read_init(struct sail_io* io,
+                                                const struct sail_load_options* load_options,
+                                                void** state,
+                                                int bmp_load_options);
 
-SAIL_HIDDEN sail_status_t bmp_private_read_seek_next_frame(void *state, struct sail_io *io, struct sail_image **image);
+SAIL_HIDDEN sail_status_t bmp_private_read_seek_next_frame(void* state, struct sail_io* io, struct sail_image** image);
 
-SAIL_HIDDEN sail_status_t bmp_private_read_frame(void *state, struct sail_io *io, struct sail_image *image);
+SAIL_HIDDEN sail_status_t bmp_private_read_frame(void* state, struct sail_io* io, struct sail_image* image);
 
-SAIL_HIDDEN sail_status_t bmp_private_read_finish(void **state, struct sail_io *io);
+SAIL_HIDDEN sail_status_t bmp_private_read_finish(void** state, struct sail_io* io);
 
-SAIL_HIDDEN sail_status_t bmp_private_write_init(struct sail_io *io, const struct sail_save_options *save_options, void **state, int bmp_write_options);
+SAIL_HIDDEN sail_status_t bmp_private_write_init(struct sail_io* io,
+                                                 const struct sail_save_options* save_options,
+                                                 void** state,
+                                                 int bmp_write_options);
 
-SAIL_HIDDEN sail_status_t bmp_private_write_seek_next_frame(void *state, struct sail_io *io, const struct sail_image *image);
+SAIL_HIDDEN sail_status_t bmp_private_write_seek_next_frame(void* state,
+                                                            struct sail_io* io,
+                                                            const struct sail_image* image);
 
-SAIL_HIDDEN sail_status_t bmp_private_write_frame(void *state, struct sail_io *io, const struct sail_image *image);
+SAIL_HIDDEN sail_status_t bmp_private_write_frame(void* state, struct sail_io* io, const struct sail_image* image);
 
-SAIL_HIDDEN sail_status_t bmp_private_write_finish(void **state, struct sail_io *io);
+SAIL_HIDDEN sail_status_t bmp_private_write_finish(void** state, struct sail_io* io);

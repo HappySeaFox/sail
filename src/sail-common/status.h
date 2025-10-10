@@ -30,7 +30,8 @@
 /*
  * Common status type to return from all SAIL functions.
  */
-enum SailStatus {
+enum SailStatus
+{
 
     /*
      * Success.
@@ -109,36 +110,43 @@ typedef enum SailStatus sail_status_t;
 /*
  * Log failure and return.
  */
-#define SAIL_LOG_AND_RETURN(code) \
-do {                              \
-    SAIL_LOG_ERROR("%s", #code);  \
-    return code;                  \
-} while(0)
+#define SAIL_LOG_AND_RETURN(code)                                                                                      \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        SAIL_LOG_ERROR("%s", #code);                                                                                   \
+        return code;                                                                                                   \
+    } while (0)
 
 /*
  * Helper macros.
  */
-#define SAIL_CHECK_PTR(ptr)                            \
-do {                                                   \
-    if (SAIL_UNLIKELY(ptr == NULL)) {                  \
-        SAIL_LOG_ERROR("'%s' argument is NULL", #ptr); \
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_NULL_PTR);      \
-    }                                                  \
-} while(0)
+#define SAIL_CHECK_PTR(ptr)                                                                                            \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        if (SAIL_UNLIKELY(ptr == NULL))                                                                                \
+        {                                                                                                              \
+            SAIL_LOG_ERROR("'%s' argument is NULL", #ptr);                                                             \
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_NULL_PTR);                                                                  \
+        }                                                                                                              \
+    } while (0)
 
 /*
  * Tries to execute the specified SAIL function. If it fails, executes the rest of the arguments which
  * can be separated by commas or by semicolons.
  * Use do/while to require ';' at the end of a SAIL_TRY_OR_EXECUTE() expression.
  */
-#define SAIL_TRY_OR_EXECUTE(sail_func, ...)              \
-{                                                        \
-    const sail_status_t __sail_status = sail_func;       \
-                                                         \
-    if (SAIL_UNLIKELY(__sail_status != SAIL_OK)) {       \
-        __VA_ARGS__;                                     \
-    }                                                    \
-} do{} while(0)
+#define SAIL_TRY_OR_EXECUTE(sail_func, ...)                                                                            \
+    {                                                                                                                  \
+        const sail_status_t __sail_status = sail_func;                                                                 \
+                                                                                                                       \
+        if (SAIL_UNLIKELY(__sail_status != SAIL_OK))                                                                   \
+        {                                                                                                              \
+            __VA_ARGS__;                                                                                               \
+        }                                                                                                              \
+    }                                                                                                                  \
+    do                                                                                                                 \
+    {                                                                                                                  \
+    } while (0)
 
 /*
  * Tries to execute the specified SAIL function. If it fails, returns the error code.

@@ -27,23 +27,23 @@
 
 /* Thread local flag used with static variables. */
 #if defined __GNUC__
-    #define SAIL_THREAD_LOCAL __thread
+#define SAIL_THREAD_LOCAL __thread
 #elif defined _MSC_VER
-    #define SAIL_THREAD_LOCAL __declspec(thread)
-#elif defined __STDC_VERSION__  && __STDC_VERSION__ >= 201112L
-    #define SAIL_THREAD_LOCAL _Thread_local
+#define SAIL_THREAD_LOCAL __declspec(thread)
+#elif defined __STDC_VERSION__ && __STDC_VERSION__ >= 201112L
+#define SAIL_THREAD_LOCAL _Thread_local
 #elif defined _Thread_local
-    #define SAIL_THREAD_LOCAL _Thread_local
+#define SAIL_THREAD_LOCAL _Thread_local
 #else
-    /* Syntax error. */
+/* Syntax error. */
     Do not know how to define thread local variables for this compiler.
 #endif
 
 /* Branch predictions. */
 #ifdef __GNUC__
-    #define SAIL_LIKELY(x)   (__builtin_expect((x), 1))
-    #define SAIL_UNLIKELY(x) (__builtin_expect((x), 0))
+#define SAIL_LIKELY(x) (__builtin_expect((x), 1))
+#define SAIL_UNLIKELY(x) (__builtin_expect((x), 0))
 #else
-    #define SAIL_LIKELY(x)   (x)
-    #define SAIL_UNLIKELY(x) (x)
+#define SAIL_LIKELY(x) (x)
+#define SAIL_UNLIKELY(x) (x)
 #endif

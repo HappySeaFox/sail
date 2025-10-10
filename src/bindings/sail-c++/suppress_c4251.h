@@ -31,5 +31,5 @@
  * To fix this warning we need to stop exporting whole classes and start exporting
  * individual methods. Just silence this warning.
  */
-#pragma warning(disable: 4251)
+#pragma warning(disable : 4251)
 #endif

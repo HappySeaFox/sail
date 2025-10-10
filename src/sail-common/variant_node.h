@@ -29,7 +29,8 @@
 #include <sail-common/status.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 struct sail_variant;
@@ -37,17 +38,18 @@ struct sail_variant;
 /*
  * Represents a variant node.
  */
-struct sail_variant_node {
+struct sail_variant_node
+{
 
     /*
      * Variant value.
      */
-    struct sail_variant *variant;
+    struct sail_variant* variant;
 
     /*
      * Pointer to the next node or NULL.
      */
-    struct sail_variant_node *next;
+    struct sail_variant_node* next;
 };
 
 /*
@@ -55,33 +57,33 @@ struct sail_variant_node {
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_variant_node(struct sail_variant_node **node);
+SAIL_EXPORT sail_status_t sail_alloc_variant_node(struct sail_variant_node** node);
 
 /*
  * Allocates a new variant node and the nested value.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_variant_node_and_value(struct sail_variant_node **node);
+SAIL_EXPORT sail_status_t sail_alloc_variant_node_and_value(struct sail_variant_node** node);
 
 /*
  * Destroys the specified variant node.
  */
-SAIL_EXPORT void sail_destroy_variant_node(struct sail_variant_node *node);
+SAIL_EXPORT void sail_destroy_variant_node(struct sail_variant_node* node);
 
 /*
  * Makes a deep copy of the specified variant node.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_copy_variant_node(const struct sail_variant_node *source,
-                                                 struct sail_variant_node **target);
+SAIL_EXPORT sail_status_t sail_copy_variant_node(const struct sail_variant_node* source,
+                                                 struct sail_variant_node** target);
 
 /*
  * Destroys the specified variant node and all its internal allocated memory buffers.
  * Repeats the destruction procedure recursively for the stored next pointer.
  */
-SAIL_EXPORT void sail_destroy_variant_node_chain(struct sail_variant_node *node);
+SAIL_EXPORT void sail_destroy_variant_node_chain(struct sail_variant_node* node);
 
 /*
  * Makes a deep copy of the specified variant node chain. If the source chain is NULL, it assigns NULL
@@ -89,8 +91,8 @@ SAIL_EXPORT void sail_destroy_variant_node_chain(struct sail_variant_node *node)
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_copy_variant_node_chain(const struct sail_variant_node *source,
-                                                       struct sail_variant_node **target);
+SAIL_EXPORT sail_status_t sail_copy_variant_node_chain(const struct sail_variant_node* source,
+                                                       struct sail_variant_node** target);
 
 /* extern "C" */
 #ifdef __cplusplus

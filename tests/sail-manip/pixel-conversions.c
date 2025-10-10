@@ -41,15 +41,17 @@ static MunitResult test_conversions_rgb_to_bgr(const MunitParameter params[], vo
     munit_assert(sail_load_from_file(SAIL_TEST_IMAGES[0], &image) == SAIL_OK);
 
     enum SailPixelFormat original_format = image->pixel_format;
-    struct sail_image* converted = NULL;
+    struct sail_image* converted         = NULL;
 
-    if (original_format == SAIL_PIXEL_FORMAT_BPP24_RGB || original_format == SAIL_PIXEL_FORMAT_BPP24_BGR) {
-        enum SailPixelFormat target = (original_format == SAIL_PIXEL_FORMAT_BPP24_RGB) ?
-                                      SAIL_PIXEL_FORMAT_BPP24_BGR : SAIL_PIXEL_FORMAT_BPP24_RGB;
+    if (original_format == SAIL_PIXEL_FORMAT_BPP24_RGB || original_format == SAIL_PIXEL_FORMAT_BPP24_BGR)
+    {
+        enum SailPixelFormat target = (original_format == SAIL_PIXEL_FORMAT_BPP24_RGB) ? SAIL_PIXEL_FORMAT_BPP24_BGR
+                                                                                       : SAIL_PIXEL_FORMAT_BPP24_RGB;
 
         sail_status_t status = sail_convert_image(image, target, &converted);
 
-        if (status == SAIL_OK) {
+        if (status == SAIL_OK)
+        {
             munit_assert(converted->pixel_format == target);
             munit_assert(converted->width == image->width);
             munit_assert(converted->height == image->height);
@@ -70,13 +72,14 @@ static MunitResult test_conversions_rgba_to_rgb(const MunitParameter params[], v
     struct sail_image* image = NULL;
     munit_assert(sail_load_from_file(SAIL_TEST_IMAGES[0], &image) == SAIL_OK);
 
-    if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP32_RGBA ||
-        image->pixel_format == SAIL_PIXEL_FORMAT_BPP32_BGRA) {
+    if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP32_RGBA || image->pixel_format == SAIL_PIXEL_FORMAT_BPP32_BGRA)
+    {
 
         struct sail_image* converted = NULL;
-        sail_status_t status = sail_convert_image(image, SAIL_PIXEL_FORMAT_BPP24_RGB, &converted);
+        sail_status_t status         = sail_convert_image(image, SAIL_PIXEL_FORMAT_BPP24_RGB, &converted);
 
-        if (status == SAIL_OK) {
+        if (status == SAIL_OK)
+        {
             munit_assert(converted->pixel_format == SAIL_PIXEL_FORMAT_BPP24_RGB);
             munit_assert(converted->width == image->width);
             munit_assert(converted->height == image->height);
@@ -97,13 +100,14 @@ static MunitResult test_conversions_rgb_to_rgba(const MunitParameter params[], v
     struct sail_image* image = NULL;
     munit_assert(sail_load_from_file(SAIL_TEST_IMAGES[0], &image) == SAIL_OK);
 
-    if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP24_RGB ||
-        image->pixel_format == SAIL_PIXEL_FORMAT_BPP24_BGR) {
+    if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP24_RGB || image->pixel_format == SAIL_PIXEL_FORMAT_BPP24_BGR)
+    {
 
         struct sail_image* converted = NULL;
-        sail_status_t status = sail_convert_image(image, SAIL_PIXEL_FORMAT_BPP32_RGBA, &converted);
+        sail_status_t status         = sail_convert_image(image, SAIL_PIXEL_FORMAT_BPP32_RGBA, &converted);
 
-        if (status == SAIL_OK) {
+        if (status == SAIL_OK)
+        {
             munit_assert(converted->pixel_format == SAIL_PIXEL_FORMAT_BPP32_RGBA);
             munit_assert(converted->width == image->width);
             munit_assert(converted->height == image->height);
@@ -124,13 +128,14 @@ static MunitResult test_conversions_rgb_to_grayscale(const MunitParameter params
     struct sail_image* image = NULL;
     munit_assert(sail_load_from_file(SAIL_TEST_IMAGES[0], &image) == SAIL_OK);
 
-    if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP24_RGB ||
-        image->pixel_format == SAIL_PIXEL_FORMAT_BPP24_BGR) {
+    if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP24_RGB || image->pixel_format == SAIL_PIXEL_FORMAT_BPP24_BGR)
+    {
 
         struct sail_image* converted = NULL;
-        sail_status_t status = sail_convert_image(image, SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE, &converted);
+        sail_status_t status         = sail_convert_image(image, SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE, &converted);
 
-        if (status == SAIL_OK) {
+        if (status == SAIL_OK)
+        {
             munit_assert(converted->pixel_format == SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE);
             munit_assert(converted->width == image->width);
             munit_assert(converted->height == image->height);
@@ -151,11 +156,13 @@ static MunitResult test_conversions_grayscale_to_rgb(const MunitParameter params
     struct sail_image* image = NULL;
     munit_assert(sail_load_from_file(SAIL_TEST_IMAGES[0], &image) == SAIL_OK);
 
-    if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE) {
+    if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE)
+    {
         struct sail_image* converted = NULL;
-        sail_status_t status = sail_convert_image(image, SAIL_PIXEL_FORMAT_BPP24_RGB, &converted);
+        sail_status_t status         = sail_convert_image(image, SAIL_PIXEL_FORMAT_BPP24_RGB, &converted);
 
-        if (status == SAIL_OK) {
+        if (status == SAIL_OK)
+        {
             munit_assert(converted->pixel_format == SAIL_PIXEL_FORMAT_BPP24_RGB);
             munit_assert(converted->width == image->width);
             munit_assert(converted->height == image->height);
@@ -176,15 +183,15 @@ static MunitResult test_conversions_rgb_to_indexed(const MunitParameter params[]
     struct sail_image* image = NULL;
     munit_assert(sail_load_from_file(SAIL_TEST_IMAGES[0], &image) == SAIL_OK);
 
-    if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP24_RGB ||
-        image->pixel_format == SAIL_PIXEL_FORMAT_BPP24_BGR ||
-        image->pixel_format == SAIL_PIXEL_FORMAT_BPP32_RGBA ||
-        image->pixel_format == SAIL_PIXEL_FORMAT_BPP32_BGRA) {
+    if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP24_RGB || image->pixel_format == SAIL_PIXEL_FORMAT_BPP24_BGR
+        || image->pixel_format == SAIL_PIXEL_FORMAT_BPP32_RGBA || image->pixel_format == SAIL_PIXEL_FORMAT_BPP32_BGRA)
+    {
 
         struct sail_image* converted = NULL;
-        sail_status_t status = sail_convert_image(image, SAIL_PIXEL_FORMAT_BPP8_INDEXED, &converted);
+        sail_status_t status         = sail_convert_image(image, SAIL_PIXEL_FORMAT_BPP8_INDEXED, &converted);
 
-        if (status == SAIL_OK) {
+        if (status == SAIL_OK)
+        {
             munit_assert(converted->pixel_format == SAIL_PIXEL_FORMAT_BPP8_INDEXED);
             munit_assert(converted->width == image->width);
             munit_assert(converted->height == image->height);
@@ -209,9 +216,10 @@ static MunitResult test_conversions_indexed_to_rgb(const MunitParameter params[]
     struct sail_image* image = NULL;
     munit_assert(sail_load_from_file(path, &image) == SAIL_OK);
 
-    if (sail_is_indexed(image->pixel_format) && image->palette != NULL) {
+    if (sail_is_indexed(image->pixel_format) && image->palette != NULL)
+    {
         struct sail_image* converted = NULL;
-        sail_status_t status = sail_convert_image(image, SAIL_PIXEL_FORMAT_BPP24_RGB, &converted);
+        sail_status_t status         = sail_convert_image(image, SAIL_PIXEL_FORMAT_BPP24_RGB, &converted);
 
         munit_assert(status == SAIL_OK);
         munit_assert(converted->pixel_format == SAIL_PIXEL_FORMAT_BPP24_RGB);
@@ -233,21 +241,26 @@ static MunitResult test_conversions_bit_depth_upscale(const MunitParameter param
     struct sail_image* image = NULL;
     munit_assert(sail_load_from_file(SAIL_TEST_IMAGES[0], &image) == SAIL_OK);
 
-    if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE) {
+    if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE)
+    {
         struct sail_image* converted = NULL;
-        sail_status_t status = sail_convert_image(image, SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE, &converted);
+        sail_status_t status         = sail_convert_image(image, SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE, &converted);
 
-        if (status == SAIL_OK) {
+        if (status == SAIL_OK)
+        {
             munit_assert(converted->pixel_format == SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE);
             munit_assert(converted->width == image->width);
             munit_assert(converted->height == image->height);
             sail_destroy_image(converted);
         }
-    } else if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP24_RGB) {
+    }
+    else if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP24_RGB)
+    {
         struct sail_image* converted = NULL;
-        sail_status_t status = sail_convert_image(image, SAIL_PIXEL_FORMAT_BPP48_RGB, &converted);
+        sail_status_t status         = sail_convert_image(image, SAIL_PIXEL_FORMAT_BPP48_RGB, &converted);
 
-        if (status == SAIL_OK) {
+        if (status == SAIL_OK)
+        {
             munit_assert(converted->pixel_format == SAIL_PIXEL_FORMAT_BPP48_RGB);
             sail_destroy_image(converted);
         }
@@ -266,19 +279,24 @@ static MunitResult test_conversions_bit_depth_downscale(const MunitParameter par
     struct sail_image* image = NULL;
     munit_assert(sail_load_from_file(SAIL_TEST_IMAGES[0], &image) == SAIL_OK);
 
-    if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE) {
+    if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE)
+    {
         struct sail_image* converted = NULL;
-        sail_status_t status = sail_convert_image(image, SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE, &converted);
+        sail_status_t status         = sail_convert_image(image, SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE, &converted);
 
-        if (status == SAIL_OK) {
+        if (status == SAIL_OK)
+        {
             munit_assert(converted->pixel_format == SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE);
             sail_destroy_image(converted);
         }
-    } else if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP48_RGB) {
+    }
+    else if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP48_RGB)
+    {
         struct sail_image* converted = NULL;
-        sail_status_t status = sail_convert_image(image, SAIL_PIXEL_FORMAT_BPP24_RGB, &converted);
+        sail_status_t status         = sail_convert_image(image, SAIL_PIXEL_FORMAT_BPP24_RGB, &converted);
 
-        if (status == SAIL_OK) {
+        if (status == SAIL_OK)
+        {
             munit_assert(converted->pixel_format == SAIL_PIXEL_FORMAT_BPP24_RGB);
             sail_destroy_image(converted);
         }
@@ -297,15 +315,18 @@ static MunitResult test_conversions_roundtrip(const MunitParameter params[], voi
     struct sail_image* image = NULL;
     munit_assert(sail_load_from_file(SAIL_TEST_IMAGES[0], &image) == SAIL_OK);
 
-    if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP24_RGB) {
+    if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP24_RGB)
+    {
         struct sail_image* gray = NULL;
-        sail_status_t status = sail_convert_image(image, SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE, &gray);
+        sail_status_t status    = sail_convert_image(image, SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE, &gray);
 
-        if (status == SAIL_OK) {
+        if (status == SAIL_OK)
+        {
             struct sail_image* back_to_rgb = NULL;
-            status = sail_convert_image(gray, SAIL_PIXEL_FORMAT_BPP24_RGB, &back_to_rgb);
+            status                         = sail_convert_image(gray, SAIL_PIXEL_FORMAT_BPP24_RGB, &back_to_rgb);
 
-            if (status == SAIL_OK) {
+            if (status == SAIL_OK)
+            {
                 munit_assert(back_to_rgb->pixel_format == SAIL_PIXEL_FORMAT_BPP24_RGB);
                 munit_assert(back_to_rgb->width == image->width);
                 munit_assert(back_to_rgb->height == image->height);

@@ -25,21 +25,24 @@
 
 #include <sail/sail.h>
 
-sail_status_t alloc_codec_bundle_node(struct sail_codec_bundle_node **codec_bundle_node) {
+sail_status_t alloc_codec_bundle_node(struct sail_codec_bundle_node** codec_bundle_node)
+{
 
-    SAIL_TRY(sail_private_alloc_linked_list_node((struct linked_list_node **)codec_bundle_node));
+    SAIL_TRY(sail_private_alloc_linked_list_node((struct linked_list_node**)codec_bundle_node));
 
     return SAIL_OK;
 }
 
-void destroy_codec_bundle_node(struct sail_codec_bundle_node *codec_bundle_node) {
+void destroy_codec_bundle_node(struct sail_codec_bundle_node* codec_bundle_node)
+{
 
-    sail_private_destroy_linked_list_node((struct linked_list_node *)codec_bundle_node,
+    sail_private_destroy_linked_list_node((struct linked_list_node*)codec_bundle_node,
                                           (linked_list_value_deallocator_t)&destroy_codec_bundle);
 }
 
-void destroy_codec_bundle_node_chain(struct sail_codec_bundle_node *codec_bundle_node) {
+void destroy_codec_bundle_node_chain(struct sail_codec_bundle_node* codec_bundle_node)
+{
 
-    sail_private_destroy_linked_list_node_chain((struct linked_list_node *)codec_bundle_node,
+    sail_private_destroy_linked_list_node_chain((struct linked_list_node*)codec_bundle_node,
                                                 (linked_list_value_deallocator_t)&destroy_codec_bundle);
 }

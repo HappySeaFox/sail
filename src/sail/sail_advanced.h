@@ -31,7 +31,8 @@
 #include <sail-common/status.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 struct sail_codec_info;
@@ -47,7 +48,9 @@ struct sail_codec_info;
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_probe_io(struct sail_io *io, struct sail_image **image, const struct sail_codec_info **codec_info);
+SAIL_EXPORT sail_status_t sail_probe_io(struct sail_io* io,
+                                        struct sail_image** image,
+                                        const struct sail_codec_info** codec_info);
 
 /*
  * Loads an image from the specified memory buffer and returns its properties without pixels.
@@ -60,8 +63,10 @@ SAIL_EXPORT sail_status_t sail_probe_io(struct sail_io *io, struct sail_image **
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_probe_memory(const void *buffer, size_t buffer_size,
-                                            struct sail_image **image, const struct sail_codec_info **codec_info);
+SAIL_EXPORT sail_status_t sail_probe_memory(const void* buffer,
+                                            size_t buffer_size,
+                                            struct sail_image** image,
+                                            const struct sail_codec_info** codec_info);
 
 /*
  * Starts loading the specified image file. Pass codec info if you would like to start loading
@@ -82,7 +87,9 @@ SAIL_EXPORT sail_status_t sail_probe_memory(const void *buffer, size_t buffer_si
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_start_loading_from_file(const char *path, const struct sail_codec_info *codec_info, void **state);
+SAIL_EXPORT sail_status_t sail_start_loading_from_file(const char* path,
+                                                       const struct sail_codec_info* codec_info,
+                                                       void** state);
 
 /*
  * Starts loading the specified memory buffer.
@@ -98,8 +105,10 @@ SAIL_EXPORT sail_status_t sail_start_loading_from_file(const char *path, const s
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_start_loading_from_memory(const void *buffer, size_t buffer_size,
-                                                         const struct sail_codec_info *codec_info, void **state);
+SAIL_EXPORT sail_status_t sail_start_loading_from_memory(const void* buffer,
+                                                         size_t buffer_size,
+                                                         const struct sail_codec_info* codec_info,
+                                                         void** state);
 
 /*
  * Continues loading the file started by sail_start_loading_from_file() and brothers.
@@ -107,7 +116,7 @@ SAIL_EXPORT sail_status_t sail_start_loading_from_memory(const void *buffer, siz
  * Returns SAIL_OK on success.
  * Returns SAIL_ERROR_NO_MORE_FRAMES when no more frames are available.
  */
-SAIL_EXPORT sail_status_t sail_load_next_frame(void *state, struct sail_image **image);
+SAIL_EXPORT sail_status_t sail_load_next_frame(void* state, struct sail_image** image);
 
 /*
  * Stops loading the file started by sail_start_loading_from_file() and brothers.
@@ -118,7 +127,7 @@ SAIL_EXPORT sail_status_t sail_load_next_frame(void *state, struct sail_image **
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_stop_loading(void *state);
+SAIL_EXPORT sail_status_t sail_stop_loading(void* state);
 
 /*
  * Starts saving into the specified image file. Pass codec info if you'd like to start saving
@@ -139,7 +148,9 @@ SAIL_EXPORT sail_status_t sail_stop_loading(void *state);
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_start_saving_into_file(const char *path, const struct sail_codec_info *codec_info, void **state);
+SAIL_EXPORT sail_status_t sail_start_saving_into_file(const char* path,
+                                                      const struct sail_codec_info* codec_info,
+                                                      void** state);
 
 /*
  * Starts saving the specified memory buffer.
@@ -155,8 +166,10 @@ SAIL_EXPORT sail_status_t sail_start_saving_into_file(const char *path, const st
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_start_saving_into_memory(void *buffer, size_t buffer_size,
-                                                        const struct sail_codec_info *codec_info, void **state);
+SAIL_EXPORT sail_status_t sail_start_saving_into_memory(void* buffer,
+                                                        size_t buffer_size,
+                                                        const struct sail_codec_info* codec_info,
+                                                        void** state);
 
 /*
  * Continues saving started by sail_start_saving_into_file() and brothers. Writes the specified
@@ -168,7 +181,7 @@ SAIL_EXPORT sail_status_t sail_start_saving_into_memory(void *buffer, size_t buf
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_write_next_frame(void *state, const struct sail_image *image);
+SAIL_EXPORT sail_status_t sail_write_next_frame(void* state, const struct sail_image* image);
 
 /*
  * Stops saving started by sail_start_saving_into_file() and brothers. Closes the underlying I/O target.
@@ -179,7 +192,7 @@ SAIL_EXPORT sail_status_t sail_write_next_frame(void *state, const struct sail_i
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_stop_saving(void *state);
+SAIL_EXPORT sail_status_t sail_stop_saving(void* state);
 
 /* extern "C" */
 #ifdef __cplusplus

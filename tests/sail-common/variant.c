@@ -140,7 +140,7 @@ static MunitResult test_from_string(const MunitParameter params[], void* user_da
 
     TEST_VARIANT_FROM_STRING("abc", sail_set_variant_string, SAIL_VARIANT_TYPE_STRING, sail_variant_to_string);
 
-    const char* copy_from = "xyz";
+    const char* copy_from  = "xyz";
     const size_t copy_size = strlen(copy_from) + 1;
     char* str;
     {
@@ -181,7 +181,7 @@ static MunitResult test_from_data(const MunitParameter params[], void* user_data
 
     TEST_VARIANT_FROM_DATA("abc", 3, sail_set_variant_data, SAIL_VARIANT_TYPE_DATA, sail_variant_to_data);
 
-    const char* copy_from = "xyz";
+    const char* copy_from  = "xyz";
     const size_t copy_size = strlen(copy_from) + 1;
     char* str;
     {

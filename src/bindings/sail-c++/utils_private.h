@@ -40,17 +40,18 @@ namespace sail
 class SAIL_HIDDEN utils_private
 {
 public:
-    static tuning to_cpp_tuning(const sail_hash_map *c_tuning);
+    static tuning to_cpp_tuning(const sail_hash_map* c_tuning);
 
-    static sail_status_t to_sail_tuning(const tuning &cpp_tuning, sail_hash_map *c_tuning);
+    static sail_status_t to_sail_tuning(const tuning& cpp_tuning, sail_hash_map* c_tuning);
 
-    static special_properties to_cpp_special_properties(const sail_hash_map *c_special_properties);
+    static special_properties to_cpp_special_properties(const sail_hash_map* c_special_properties);
 
-    static sail_status_t to_sail_special_properties(const special_properties &cpp_special_properties, sail_hash_map *c_special_properties);
+    static sail_status_t to_sail_special_properties(const special_properties& cpp_special_properties,
+                                                    sail_hash_map* c_special_properties);
 
 private:
     // Needs to be in utils_private to allow creating sail:variant from sail_variant
-    static bool sail_key_value_into_tuning(const char *key, const sail_variant *value, void *user_data);
+    static bool sail_key_value_into_tuning(const char* key, const sail_variant* value, void* user_data);
 };
 
-}
+} // namespace sail

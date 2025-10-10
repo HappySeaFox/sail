@@ -32,14 +32,15 @@
  */
 #define SAIL_CODEC_LAYOUT_V8 8
 
-struct sail_codec_layout_v8 {
-    sail_codec_load_init_v8_t            load_init;
+struct sail_codec_layout_v8
+{
+    sail_codec_load_init_v8_t load_init;
     sail_codec_load_seek_next_frame_v8_t load_seek_next_frame;
-    sail_codec_load_frame_v8_t           load_frame;
-    sail_codec_load_finish_v8_t          load_finish;
+    sail_codec_load_frame_v8_t load_frame;
+    sail_codec_load_finish_v8_t load_finish;
 
-    sail_codec_save_init_v8_t            save_init;
+    sail_codec_save_init_v8_t save_init;
     sail_codec_save_seek_next_frame_v8_t save_seek_next_frame;
-    sail_codec_save_frame_v8_t           save_frame;
-    sail_codec_save_finish_v8_t          save_finish;
+    sail_codec_save_frame_v8_t save_frame;
+    sail_codec_save_finish_v8_t save_finish;
 };

@@ -29,7 +29,8 @@
 #include <sail-common/status.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 struct sail_meta_data;
@@ -37,17 +38,18 @@ struct sail_meta_data;
 /*
  * Represents a meta data node.
  */
-struct sail_meta_data_node {
+struct sail_meta_data_node
+{
 
     /*
      * Meta data value.
      */
-    struct sail_meta_data *meta_data;
+    struct sail_meta_data* meta_data;
 
     /*
      * Pointer to the next node or NULL.
      */
-    struct sail_meta_data_node *next;
+    struct sail_meta_data_node* next;
 };
 
 /*
@@ -55,33 +57,33 @@ struct sail_meta_data_node {
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_meta_data_node(struct sail_meta_data_node **node);
+SAIL_EXPORT sail_status_t sail_alloc_meta_data_node(struct sail_meta_data_node** node);
 
 /*
  * Allocates a new meta data node and the nested value.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_meta_data_node_and_value(struct sail_meta_data_node **node);
+SAIL_EXPORT sail_status_t sail_alloc_meta_data_node_and_value(struct sail_meta_data_node** node);
 
 /*
  * Destroys the specified meta data node.
  */
-SAIL_EXPORT void sail_destroy_meta_data_node(struct sail_meta_data_node *node);
+SAIL_EXPORT void sail_destroy_meta_data_node(struct sail_meta_data_node* node);
 
 /*
  * Makes a deep copy of the specified meta data node.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_copy_meta_data_node(const struct sail_meta_data_node *source,
-                                                   struct sail_meta_data_node **target);
+SAIL_EXPORT sail_status_t sail_copy_meta_data_node(const struct sail_meta_data_node* source,
+                                                   struct sail_meta_data_node** target);
 
 /*
  * Destroys the specified meta data node and all its internal allocated memory buffers.
  * Repeats the destruction procedure recursively for the stored next pointer.
  */
-SAIL_EXPORT void sail_destroy_meta_data_node_chain(struct sail_meta_data_node *node);
+SAIL_EXPORT void sail_destroy_meta_data_node_chain(struct sail_meta_data_node* node);
 
 /*
  * Makes a deep copy of the specified meta data node chain. If the source chain is NULL, it assigns NULL
@@ -89,8 +91,8 @@ SAIL_EXPORT void sail_destroy_meta_data_node_chain(struct sail_meta_data_node *n
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_copy_meta_data_node_chain(const struct sail_meta_data_node *source,
-                                                         struct sail_meta_data_node **target);
+SAIL_EXPORT sail_status_t sail_copy_meta_data_node_chain(const struct sail_meta_data_node* source,
+                                                         struct sail_meta_data_node** target);
 
 /* extern "C" */
 #ifdef __cplusplus

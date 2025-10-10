@@ -42,32 +42,32 @@ public:
     /*
      * Opens the specified memory buffer for reading and writing.
      */
-    io_memory(void *buffer, std::size_t buffer_size);
+    io_memory(void* buffer, std::size_t buffer_size);
 
     /*
      * Opens the specified memory buffer for reading.
      */
-    io_memory(const void *buffer, std::size_t buffer_size);
+    io_memory(const void* buffer, std::size_t buffer_size);
 
     /*
      * Opens the specified memory buffer for the specified I/O operations.
      */
-    io_memory(void *buffer, std::size_t buffer_size, Operation operation);
+    io_memory(void* buffer, std::size_t buffer_size, Operation operation);
 
     /*
      * Opens the specified memory buffer for reading and writing.
      */
-    explicit io_memory(sail::arbitrary_data &arbitrary_data);
+    explicit io_memory(sail::arbitrary_data& arbitrary_data);
 
     /*
      * Opens the specified memory buffer for reading.
      */
-    explicit io_memory(const sail::arbitrary_data &arbitrary_data);
+    explicit io_memory(const sail::arbitrary_data& arbitrary_data);
 
     /*
      * Opens the specified memory buffer for the specified I/O operations.
      */
-    io_memory(sail::arbitrary_data &arbitrary_data, Operation operation);
+    io_memory(sail::arbitrary_data& arbitrary_data, Operation operation);
 
     /*
      * Destroys the memory I/O stream.
@@ -87,4 +87,4 @@ public:
     sail::codec_info codec_info() override;
 };
 
-}
+} // namespace sail

@@ -29,7 +29,8 @@
 #include <sail-common/status.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 struct sail_codec_info;
@@ -54,7 +55,9 @@ struct sail_save_options;
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_start_loading_from_io(struct sail_io *io, const struct sail_codec_info *codec_info, void **state);
+SAIL_EXPORT sail_status_t sail_start_loading_from_io(struct sail_io* io,
+                                                     const struct sail_codec_info* codec_info,
+                                                     void** state);
 
 /*
  * Starts loading the specified I/O stream with the specified load options. If you don't need specific load options,
@@ -74,9 +77,10 @@ SAIL_EXPORT sail_status_t sail_start_loading_from_io(struct sail_io *io, const s
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_start_loading_from_io_with_options(struct sail_io *io,
-                                                                  const struct sail_codec_info *codec_info,
-                                                                  const struct sail_load_options *load_options, void **state);
+SAIL_EXPORT sail_status_t sail_start_loading_from_io_with_options(struct sail_io* io,
+                                                                  const struct sail_codec_info* codec_info,
+                                                                  const struct sail_load_options* load_options,
+                                                                  void** state);
 
 /*
  * Starts saving into the specified I/O stream.
@@ -95,7 +99,9 @@ SAIL_EXPORT sail_status_t sail_start_loading_from_io_with_options(struct sail_io
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_start_saving_into_io(struct sail_io *io, const struct sail_codec_info *codec_info, void **state);
+SAIL_EXPORT sail_status_t sail_start_saving_into_io(struct sail_io* io,
+                                                    const struct sail_codec_info* codec_info,
+                                                    void** state);
 
 /*
  * Starts saving the specified I/O stream with the specified save options. If you don't need specific save options,
@@ -115,9 +121,10 @@ SAIL_EXPORT sail_status_t sail_start_saving_into_io(struct sail_io *io, const st
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_start_saving_into_io_with_options(struct sail_io *io,
-                                                                 const struct sail_codec_info *codec_info,
-                                                                 const struct sail_save_options *save_options, void **state);
+SAIL_EXPORT sail_status_t sail_start_saving_into_io_with_options(struct sail_io* io,
+                                                                 const struct sail_codec_info* codec_info,
+                                                                 const struct sail_save_options* save_options,
+                                                                 void** state);
 
 /* extern "C" */
 #ifdef __cplusplus

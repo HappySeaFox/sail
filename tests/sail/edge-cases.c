@@ -39,9 +39,10 @@ static MunitResult test_edge_1x1_image(const MunitParameter params[], void* user
     const char* path = SAIL_TEST_IMAGES_EDGE_CASES_PATH "/1x1.png";
 
     struct sail_image* image = NULL;
-    sail_status_t status = sail_load_from_file(path, &image);
+    sail_status_t status     = sail_load_from_file(path, &image);
 
-    if (status == SAIL_OK) {
+    if (status == SAIL_OK)
+    {
         munit_assert(image->width == 1);
         munit_assert(image->height == 1);
         sail_destroy_image(image);
@@ -61,14 +62,16 @@ static MunitResult test_edge_cleanup_on_error(const MunitParameter params[], voi
     const struct sail_codec_info* codec_info = NULL;
     munit_assert(sail_codec_info_from_extension("jpg", &codec_info) == SAIL_OK);
 
-    void* state = NULL;
+    void* state          = NULL;
     sail_status_t status = sail_start_loading_from_file(path, codec_info, &state);
 
-    if (status == SAIL_OK) {
+    if (status == SAIL_OK)
+    {
         struct sail_image* image = NULL;
-        status = sail_load_next_frame(state, &image);
+        status                   = sail_load_next_frame(state, &image);
 
-        if (image != NULL) {
+        if (image != NULL)
+        {
             sail_destroy_image(image);
         }
 
@@ -87,7 +90,7 @@ static MunitResult test_edge_corrupted_compression(const MunitParameter params[]
     const char* path = SAIL_TEST_IMAGES_EDGE_CASES_PATH "/corrupted-compression.png";
 
     struct sail_image* image = NULL;
-    sail_status_t status = sail_load_from_file(path, &image);
+    sail_status_t status     = sail_load_from_file(path, &image);
 
     munit_assert(status != SAIL_OK);
     munit_assert_null(image);
@@ -106,7 +109,8 @@ static MunitResult test_edge_corrupted_palette(const MunitParameter params[], vo
     struct sail_image* image = NULL;
     sail_load_from_file(path, &image);
 
-    if (image != NULL) {
+    if (image != NULL)
+    {
         sail_destroy_image(image);
     }
 
@@ -154,7 +158,7 @@ static MunitResult test_edge_empty_memory_buffer(const MunitParameter params[], 
     const struct sail_codec_info* codec_info = NULL;
     munit_assert(sail_codec_info_from_extension("bmp", &codec_info) == SAIL_OK);
 
-    void* state = NULL;
+    void* state          = NULL;
     sail_status_t status = sail_start_loading_from_memory(buffer, 0, codec_info, &state);
 
     munit_assert(status != SAIL_OK);
@@ -190,7 +194,7 @@ static MunitResult test_edge_invalid_magic(const MunitParameter params[], void* 
     const char* path = SAIL_TEST_IMAGES_EDGE_CASES_PATH "/invalid-magic.jpg";
 
     struct sail_image* image = NULL;
-    sail_status_t status = sail_load_from_file(path, &image);
+    sail_status_t status     = sail_load_from_file(path, &image);
 
     munit_assert(status != SAIL_OK);
     munit_assert_null(image);
@@ -209,7 +213,8 @@ static MunitResult test_edge_invalid_palette_size(const MunitParameter params[],
     struct sail_image* image = NULL;
     sail_load_from_file(path, &image);
 
-    if (image != NULL) {
+    if (image != NULL)
+    {
         sail_destroy_image(image);
     }
 
@@ -227,14 +232,16 @@ static MunitResult test_edge_memory_boundary(const MunitParameter params[], void
     const struct sail_codec_info* codec_info = NULL;
     munit_assert(sail_codec_info_from_extension("jpg", &codec_info) == SAIL_OK);
 
-    void* state = NULL;
+    void* state          = NULL;
     sail_status_t status = sail_start_loading_from_memory(small_buffer, sizeof(small_buffer), codec_info, &state);
 
-    if (status == SAIL_OK) {
+    if (status == SAIL_OK)
+    {
         struct sail_image* image = NULL;
-        status = sail_load_next_frame(state, &image);
+        status                   = sail_load_next_frame(state, &image);
 
-        if (image != NULL) {
+        if (image != NULL)
+        {
             sail_destroy_image(image);
         }
 
@@ -254,7 +261,7 @@ static MunitResult test_edge_nonexistent_file(const MunitParameter params[], voi
     const char* path = "/tmp/this-file-does-not-exist-sail-test-12345.png";
 
     struct sail_image* image = NULL;
-    sail_status_t status = sail_load_from_file(path, &image);
+    sail_status_t status     = sail_load_from_file(path, &image);
 
     munit_assert(status != SAIL_OK);
     munit_assert_null(image);
@@ -328,7 +335,7 @@ static MunitResult test_edge_readonly_format_save(const MunitParameter params[],
     (void)user_data;
 
     const struct sail_codec_info* codec_info = NULL;
-    sail_status_t status = sail_codec_info_from_extension("svg", &codec_info);
+    sail_status_t status                     = sail_codec_info_from_extension("svg", &codec_info);
 
     munit_assert(status == SAIL_OK);
     munit_assert_not_null(codec_info);
@@ -382,7 +389,7 @@ static MunitResult test_edge_truncated_file(const MunitParameter params[], void*
     const char* path = SAIL_TEST_IMAGES_EDGE_CASES_PATH "/truncated.jpg";
 
     struct sail_image* image = NULL;
-    sail_status_t status = sail_load_from_file(path, &image);
+    sail_status_t status     = sail_load_from_file(path, &image);
 
     munit_assert(status != SAIL_OK);
     munit_assert_null(image);
@@ -407,10 +414,11 @@ static MunitResult test_edge_unsupported_pixel_format(const MunitParameter param
     char temp_path[256];
     snprintf(temp_path, sizeof(temp_path), "%s/bmp/test-unsupported.bmp", SAIL_TEST_IMAGES_ACCEPTANCE_PATH);
 
-    void* state = NULL;
+    void* state          = NULL;
     sail_status_t status = sail_start_saving_into_file(temp_path, codec_info, &state);
 
-    if (status == SAIL_OK) {
+    if (status == SAIL_OK)
+    {
         status = sail_write_next_frame(state, image);
         sail_stop_saving(state);
         munit_assert(status != SAIL_OK);
@@ -431,7 +439,7 @@ static MunitResult test_edge_zero_byte_file(const MunitParameter params[], void*
     const char* path = SAIL_TEST_IMAGES_EDGE_CASES_PATH "/zero-byte.png";
 
     struct sail_image* image = NULL;
-    sail_status_t status = sail_load_from_file(path, &image);
+    sail_status_t status     = sail_load_from_file(path, &image);
 
     munit_assert(status != SAIL_OK);
     munit_assert_null(image);
@@ -448,7 +456,7 @@ static MunitResult test_edge_zero_dimensions(const MunitParameter params[], void
     const char* path = SAIL_TEST_IMAGES_EDGE_CASES_PATH "/zero-dimensions.bmp";
 
     struct sail_image* image = NULL;
-    sail_status_t status = sail_load_from_file(path, &image);
+    sail_status_t status     = sail_load_from_file(path, &image);
 
     munit_assert(status != SAIL_OK);
     munit_assert_null(image);

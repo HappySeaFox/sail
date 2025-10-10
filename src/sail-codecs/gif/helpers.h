@@ -37,18 +37,23 @@ struct sail_meta_data_node;
 struct sail_palette;
 struct sail_variant;
 
-struct gif_tuning_state {
-    int *transparency_index_save;
-    int *loop_count;
-    int *background_color_index;
+struct gif_tuning_state
+{
+    int* transparency_index_save;
+    int* loop_count;
+    int* background_color_index;
 };
 
-SAIL_HIDDEN sail_status_t gif_private_fetch_comment(const GifByteType *extension, struct sail_meta_data_node **meta_data_node);
+SAIL_HIDDEN sail_status_t gif_private_fetch_comment(const GifByteType* extension,
+                                                    struct sail_meta_data_node** meta_data_node);
 
-SAIL_HIDDEN sail_status_t gif_private_fetch_application(const GifByteType *extension, struct sail_meta_data_node **meta_data_node);
+SAIL_HIDDEN sail_status_t gif_private_fetch_application(const GifByteType* extension,
+                                                        struct sail_meta_data_node** meta_data_node);
 
-SAIL_HIDDEN sail_status_t gif_private_pixel_format_to_bpp(enum SailPixelFormat pixel_format, int *bpp);
+SAIL_HIDDEN sail_status_t gif_private_pixel_format_to_bpp(enum SailPixelFormat pixel_format, int* bpp);
 
-SAIL_HIDDEN sail_status_t gif_private_build_color_map(const struct sail_palette *palette, ColorMapObject **color_map);
+SAIL_HIDDEN sail_status_t gif_private_build_color_map(const struct sail_palette* palette, ColorMapObject** color_map);
 
-SAIL_HIDDEN bool gif_private_tuning_key_value_callback(const char *key, const struct sail_variant *value, void *user_data);
+SAIL_HIDDEN bool gif_private_tuning_key_value_callback(const char* key,
+                                                       const struct sail_variant* value,
+                                                       void* user_data);

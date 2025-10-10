@@ -30,7 +30,8 @@
 #include <sail-common/status.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 struct sail_string_node;
@@ -38,12 +39,13 @@ struct sail_string_node;
 /*
  * Save features. Use this structure to determine what a codec can actually save.
  */
-struct sail_save_features {
+struct sail_save_features
+{
 
     /*
      * A list of supported pixel formats that can be written by this codec.
      */
-    enum SailPixelFormat *pixel_formats;
+    enum SailPixelFormat* pixel_formats;
 
     /* The length of pixel_formats. */
     unsigned pixel_formats_length;
@@ -62,7 +64,7 @@ struct sail_save_features {
      *     2. The TIFF codec supports more than two compression types (PACKBITS, JPEG, etc.).
      *        Compression levels are ignored.
      */
-    enum SailCompression *compressions;
+    enum SailCompression* compressions;
 
     /* The length of compressions. */
     unsigned compressions_length;
@@ -74,7 +76,7 @@ struct sail_save_features {
      * Supported compression level range. If compression levels are not supported
      * by the codec, compression_level is NULL.
      */
-    struct sail_compression_level *compression_level;
+    struct sail_compression_level* compression_level;
 
     /*
      * Codec-specific tuning options. For example, a hypothetical ABC image codec
@@ -88,7 +90,7 @@ struct sail_save_features {
      * It's not guaranteed that tuning options and their values are backward
      * or forward compatible.
      */
-    struct sail_string_node *tuning;
+    struct sail_string_node* tuning;
 };
 
 typedef struct sail_save_features sail_save_features_t;
@@ -98,13 +100,13 @@ typedef struct sail_save_features sail_save_features_t;
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_save_features(struct sail_save_features **save_features);
+SAIL_EXPORT sail_status_t sail_alloc_save_features(struct sail_save_features** save_features);
 
 /*
  * Destroys the specified save features object and all its internal allocated memory buffers.
  * The save features MUST NOT be used after calling this function. It does nothing if the save features is NULL.
  */
-SAIL_EXPORT void sail_destroy_save_features(struct sail_save_features *save_features);
+SAIL_EXPORT void sail_destroy_save_features(struct sail_save_features* save_features);
 
 /* extern "C" */
 #ifdef __cplusplus

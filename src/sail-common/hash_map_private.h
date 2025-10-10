@@ -27,17 +27,19 @@
 
 struct sail_variant_node;
 
-enum {
+enum
+{
     SAIL_HASH_MAP_SIZE = 32
 };
 
 /*
  * A pretty limited hash map implementation.
  */
-struct sail_hash_map {
+struct sail_hash_map
+{
 
     /*
      * Values follow keys in the chain, e.g. key1 -> value1 -> key2 -> value2 -> NULL.
      */
-    struct sail_variant_node *buckets[SAIL_HASH_MAP_SIZE];
+    struct sail_variant_node* buckets[SAIL_HASH_MAP_SIZE];
 };

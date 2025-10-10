@@ -60,22 +60,22 @@ public:
     /*
      * Copies the load options.
      */
-    load_options(const load_options &ro);
+    load_options(const load_options& ro);
 
     /*
      * Copies the load options.
      */
-    load_options& operator=(const sail::load_options &load_options);
+    load_options& operator=(const sail::load_options& load_options);
 
     /*
      * Moves the load options.
      */
-    load_options(sail::load_options &&load_options) noexcept;
+    load_options(sail::load_options&& load_options) noexcept;
 
     /*
      * Moves the load options.
      */
-    load_options& operator=(sail::load_options &&load_options) noexcept;
+    load_options& operator=(sail::load_options&& load_options) noexcept;
 
     /*
      * Destroys the load options.
@@ -123,20 +123,20 @@ public:
     /*
      * Sets new codec tuning.
      */
-    void set_tuning(const sail::tuning &tuning);
+    void set_tuning(const sail::tuning& tuning);
 
 private:
     /*
      * Makes a deep copy of the specified load options and stores the pointer for further use.
      * When the SAIL context gets uninitialized, the pointer becomes dangling.
      */
-    explicit load_options(const sail_load_options *ro);
+    explicit load_options(const sail_load_options* ro);
 
-    sail_status_t to_sail_load_options(sail_load_options **load_options) const;
+    sail_status_t to_sail_load_options(sail_load_options** load_options) const;
 
 private:
     class pimpl;
     std::unique_ptr<pimpl> d;
 };
 
-}
+} // namespace sail

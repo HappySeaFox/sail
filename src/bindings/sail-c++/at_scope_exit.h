@@ -31,8 +31,7 @@ namespace sail
 /*
  * Helper class for SAIL_AT_SCOPE_EXIT. Not intended to be used by developers.
  */
-template<typename F>
-class scope_cleanup
+template <typename F> class scope_cleanup
 {
 public:
     explicit scope_cleanup(F f)
@@ -48,7 +47,7 @@ private:
     F m_f;
 };
 
-}
+} // namespace sail
 
 /*
  * Executes the specified code when the scope exits. This macro could be used to perform
@@ -67,12 +66,11 @@ private:
  *        SAIL_TRY(...);
  *    }
  */
-#define SAIL_AT_SCOPE_EXIT(code)                                       \
-    auto sail_local_cleanup_lambda = [&] {                             \
-        code                                                           \
-    };                                                                 \
-    sail::scope_cleanup<decltype(sail_local_cleanup_lambda)>           \
-        sail_local_cleanup_lambda_executor(sail_local_cleanup_lambda); \
-do {                                                                   \
-    (void)sail_local_cleanup_lambda_executor;                          \
-} while(0)
+#define SAIL_AT_SCOPE_EXIT(code)                                                                                       \
+    auto sail_local_cleanup_lambda = [&] { code };                                                                     \
+    sail::scope_cleanup<decltype(sail_local_cleanup_lambda)> sail_local_cleanup_lambda_executor(                       \
+        sail_local_cleanup_lambda);                                                                                    \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        (void)sail_local_cleanup_lambda_executor;                                                                      \
+    } while (0)

@@ -38,24 +38,37 @@ struct sail_iccp;
 struct sail_meta_data_node;
 struct sail_variant;
 
-SAIL_HIDDEN enum SailPixelFormat avif_private_sail_pixel_format(enum avifPixelFormat avif_pixel_format, uint32_t depth, bool has_alpha);
+SAIL_HIDDEN enum SailPixelFormat avif_private_sail_pixel_format(enum avifPixelFormat avif_pixel_format,
+                                                                uint32_t depth,
+                                                                bool has_alpha);
 
 SAIL_HIDDEN enum SailChromaSubsampling avif_private_sail_chroma_subsampling(enum avifPixelFormat avif_pixel_format);
 
-SAIL_HIDDEN enum SailPixelFormat avif_private_rgb_sail_pixel_format(enum avifRGBFormat rgb_pixel_format, uint32_t depth);
+SAIL_HIDDEN enum SailPixelFormat avif_private_rgb_sail_pixel_format(enum avifRGBFormat rgb_pixel_format,
+                                                                    uint32_t depth);
 
 SAIL_HIDDEN uint32_t avif_private_round_depth(uint32_t depth);
 
-SAIL_HIDDEN sail_status_t avif_private_fetch_iccp(const struct avifRWData *avif_iccp, struct sail_iccp **iccp);
+SAIL_HIDDEN sail_status_t avif_private_fetch_iccp(const struct avifRWData* avif_iccp, struct sail_iccp** iccp);
 
-SAIL_HIDDEN sail_status_t avif_private_fetch_meta_data(enum SailMetaData key, const struct avifRWData *avif_rw_data, struct sail_meta_data_node **meta_data_node);
+SAIL_HIDDEN sail_status_t avif_private_fetch_meta_data(enum SailMetaData key,
+                                                       const struct avifRWData* avif_rw_data,
+                                                       struct sail_meta_data_node** meta_data_node);
 
-SAIL_HIDDEN bool avif_private_sail_pixel_format_to_avif_rgb_format(enum SailPixelFormat pixel_format, enum avifRGBFormat *rgb_format, uint32_t *depth);
+SAIL_HIDDEN bool avif_private_sail_pixel_format_to_avif_rgb_format(enum SailPixelFormat pixel_format,
+                                                                   enum avifRGBFormat* rgb_format,
+                                                                   uint32_t* depth);
 
-SAIL_HIDDEN sail_status_t avif_private_write_iccp(struct avifImage *avif_image, const struct sail_iccp *iccp);
+SAIL_HIDDEN sail_status_t avif_private_write_iccp(struct avifImage* avif_image, const struct sail_iccp* iccp);
 
-SAIL_HIDDEN sail_status_t avif_private_write_meta_data(struct avifEncoder *encoder, struct avifImage *avif_image, const struct sail_meta_data_node *meta_data_node);
+SAIL_HIDDEN sail_status_t avif_private_write_meta_data(struct avifEncoder* encoder,
+                                                       struct avifImage* avif_image,
+                                                       const struct sail_meta_data_node* meta_data_node);
 
-SAIL_HIDDEN bool avif_private_tuning_key_value_callback(const char *key, const struct sail_variant *value, void *user_data);
+SAIL_HIDDEN bool avif_private_tuning_key_value_callback(const char* key,
+                                                        const struct sail_variant* value,
+                                                        void* user_data);
 
-SAIL_HIDDEN bool avif_private_load_tuning_key_value_callback(const char *key, const struct sail_variant *value, void *user_data);
+SAIL_HIDDEN bool avif_private_load_tuning_key_value_callback(const char* key,
+                                                             const struct sail_variant* value,
+                                                             void* user_data);

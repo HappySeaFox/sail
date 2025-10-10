@@ -29,7 +29,8 @@
 #include <sail-common/status.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 struct sail_string_node;
@@ -37,7 +38,8 @@ struct sail_string_node;
 /*
  * Load features. Use this structure to determine what a codec can actually load.
  */
-struct sail_load_features {
+struct sail_load_features
+{
 
     /* Supported or-ed features of loading operations. See SailCodecFeature. */
     int features;
@@ -54,7 +56,7 @@ struct sail_load_features {
      * It's not guaranteed that tuning options and their values are backward
      * or forward compatible.
      */
-    struct sail_string_node *tuning;
+    struct sail_string_node* tuning;
 };
 
 typedef struct sail_load_features sail_load_features_t;
@@ -64,13 +66,13 @@ typedef struct sail_load_features sail_load_features_t;
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_load_features(struct sail_load_features **load_features);
+SAIL_EXPORT sail_status_t sail_alloc_load_features(struct sail_load_features** load_features);
 
 /*
  * Destroys the specified load features object and all its internal allocated memory buffers. The load features
  * MUST NOT be used anymore after calling this function. Does nothing if the load features is NULL.
  */
-SAIL_EXPORT void sail_destroy_load_features(struct sail_load_features *load_features);
+SAIL_EXPORT void sail_destroy_load_features(struct sail_load_features* load_features);
 
 /* extern "C" */
 #ifdef __cplusplus

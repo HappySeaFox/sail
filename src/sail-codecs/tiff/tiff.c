@@ -38,11 +38,12 @@
 /*
  * Codec-specific state.
  */
-struct tiff_state {
-    const struct sail_load_options *load_options;
-    const struct sail_save_options *save_options;
+struct tiff_state
+{
+    const struct sail_load_options* load_options;
+    const struct sail_save_options* save_options;
 
-    TIFF *tiff;
+    TIFF* tiff;
     uint16_t current_frame;
     bool libtiff_error;
     int save_compression;
@@ -53,15 +54,16 @@ struct tiff_state {
     int line;
 };
 
-static sail_status_t alloc_tiff_state(const struct sail_load_options *load_options,
-                                        const struct sail_save_options *save_options,
-                                        struct tiff_state **tiff_state) {
+static sail_status_t alloc_tiff_state(const struct sail_load_options* load_options,
+                                      const struct sail_save_options* save_options,
+                                      struct tiff_state** tiff_state)
+{
 
-    void *ptr;
+    void* ptr;
     SAIL_TRY(sail_malloc(sizeof(struct tiff_state), &ptr));
     *tiff_state = ptr;
 
-    **tiff_state = (struct tiff_state) {
+    **tiff_state = (struct tiff_state){
         .load_options = load_options,
         .save_options = save_options,
 
@@ -79,9 +81,11 @@ static sail_status_t alloc_tiff_state(const struct sail_load_options *load_optio
     return SAIL_OK;
 }
 
-static void destroy_tiff_state(struct tiff_state *tiff_state) {
+static void destroy_tiff_state(struct tiff_state* tiff_state)
+{
 
-    if (tiff_state == NULL) {
+    if (tiff_state == NULL)
+    {
         return;
     }
 
@@ -92,7 +96,10 @@ static void destroy_tiff_state(struct tiff_state *tiff_state) {
  * Decoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_load_init_v8_tiff(struct sail_io *io, const struct sail_load_options *load_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_load_init_v8_tiff(struct sail_io* io,
+                                                       const struct sail_load_options* load_options,
+                                                       void** state)
+{
 
     *state = NULL;
 
@@ -100,7 +107,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_tiff(struct sail_io *io, const
     TIFFSetErrorHandler(tiff_private_my_error_fn);
 
     /* Allocate a new state. */
-    struct tiff_state *tiff_state;
+    struct tiff_state* tiff_state;
     SAIL_TRY(alloc_tiff_state(load_options, NULL, &tiff_state));
     *state = tiff_state;
 
@@ -110,18 +117,14 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_tiff(struct sail_io *io, const
      * 'h': read TIFF header only
      * 'm': disable use of memory-mapped files
      */
-    tiff_state->tiff = TIFFClientOpen("sail-codec-tiff",
-                                      "rhm",
-                                      io,
-                                      tiff_private_my_read_proc,
-                                      tiff_private_my_write_proc,
-                                      tiff_private_my_seek_proc,
-                                      tiff_private_my_dummy_close_proc,
-                                      tiff_private_my_dummy_size_proc,
-                                      /* map */ NULL,
-                                      /* unmap */ NULL);
+    tiff_state->tiff =
+        TIFFClientOpen("sail-codec-tiff", "rhm", io, tiff_private_my_read_proc, tiff_private_my_write_proc,
+                       tiff_private_my_seek_proc, tiff_private_my_dummy_close_proc, tiff_private_my_dummy_size_proc,
+                       /* map */ NULL,
+                       /* unmap */ NULL);
 
-    if (tiff_state->tiff == NULL) {
+    if (tiff_state->tiff == NULL)
+    {
         tiff_state->libtiff_error = true;
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
@@ -129,25 +132,30 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_tiff(struct sail_io *io, const
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_tiff(void *state, struct sail_image **image) {
+SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_tiff(void* state, struct sail_image** image)
+{
 
-    struct tiff_state *tiff_state = state;
+    struct tiff_state* tiff_state = state;
 
-    if (tiff_state->libtiff_error) {
+    if (tiff_state->libtiff_error)
+    {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
-    struct sail_image *image_local;
+    struct sail_image* image_local;
     SAIL_TRY(sail_alloc_image(&image_local));
 
     /* Start reading the next directory. */
-    if (!TIFFSetDirectory(tiff_state->tiff, tiff_state->current_frame++)) {
+    if (!TIFFSetDirectory(tiff_state->tiff, tiff_state->current_frame++))
+    {
         sail_destroy_image(image_local);
         return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
     /* Fill the image properties. */
-    if (!TIFFGetField(tiff_state->tiff, TIFFTAG_IMAGEWIDTH,  &image_local->width) || !TIFFGetField(tiff_state->tiff, TIFFTAG_IMAGELENGTH, &image_local->height)) {
+    if (!TIFFGetField(tiff_state->tiff, TIFFTAG_IMAGEWIDTH, &image_local->width)
+        || !TIFFGetField(tiff_state->tiff, TIFFTAG_IMAGELENGTH, &image_local->height))
+    {
         SAIL_LOG_ERROR("TIFF: Failed to get the image dimensions");
         sail_destroy_image(image_local);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
@@ -163,8 +171,9 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_tiff(void *state, s
     TIFFGetField(tiff_state->tiff, TIFFTAG_SAMPLESPERPIXEL, &tiff_state->samples_per_pixel);
 
     /* Fetch meta data. */
-    if (tiff_state->load_options->options & SAIL_OPTION_META_DATA) {
-        struct sail_meta_data_node **last_meta_data_node = &image_local->meta_data_node;
+    if (tiff_state->load_options->options & SAIL_OPTION_META_DATA)
+    {
+        struct sail_meta_data_node** last_meta_data_node = &image_local->meta_data_node;
 
         SAIL_TRY_OR_CLEANUP(tiff_private_fetch_meta_data(tiff_state->tiff, &last_meta_data_node),
                             /* cleanup */ sail_destroy_image(image_local));
@@ -175,38 +184,42 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_tiff(void *state, s
     }
 
     /* Fetch ICC profile. */
-    if (tiff_state->load_options->options & SAIL_OPTION_ICCP) {
+    if (tiff_state->load_options->options & SAIL_OPTION_ICCP)
+    {
         SAIL_TRY_OR_CLEANUP(tiff_private_fetch_iccp(tiff_state->tiff, &image_local->iccp),
                             /* cleanup */ sail_destroy_image(image_local));
     }
 
     /* Fetch resolution. */
     SAIL_TRY_OR_CLEANUP(tiff_private_fetch_resolution(tiff_state->tiff, &image_local->resolution),
-                            /* cleanup */ sail_destroy_image(image_local));
+                        /* cleanup */ sail_destroy_image(image_local));
 
     /* Fetch palette for indexed images. */
-    if (tiff_state->photometric == PHOTOMETRIC_PALETTE) {
-        uint16_t *red_colormap = NULL;
-        uint16_t *green_colormap = NULL;
-        uint16_t *blue_colormap = NULL;
+    if (tiff_state->photometric == PHOTOMETRIC_PALETTE)
+    {
+        uint16_t* red_colormap   = NULL;
+        uint16_t* green_colormap = NULL;
+        uint16_t* blue_colormap  = NULL;
 
-        if (TIFFGetField(tiff_state->tiff, TIFFTAG_COLORMAP, &red_colormap, &green_colormap, &blue_colormap)) {
+        if (TIFFGetField(tiff_state->tiff, TIFFTAG_COLORMAP, &red_colormap, &green_colormap, &blue_colormap))
+        {
             const unsigned palette_count = 1 << tiff_state->bits_per_sample;
 
             SAIL_TRY_OR_CLEANUP(sail_alloc_palette(&image_local->palette),
                                 /* cleanup */ sail_destroy_image(image_local));
 
             image_local->palette->pixel_format = SAIL_PIXEL_FORMAT_BPP24_RGB;
-            image_local->palette->color_count = palette_count;
+            image_local->palette->color_count  = palette_count;
 
-            void *ptr;
+            void* ptr;
             SAIL_TRY_OR_CLEANUP(sail_malloc(palette_count * 3, &ptr),
                                 /* cleanup */ sail_destroy_image(image_local));
             image_local->palette->data = ptr;
 
-            uint8_t *palette_data = image_local->palette->data;
+            uint8_t* palette_data = image_local->palette->data;
 
-            for (unsigned i = 0; i < palette_count; i++) {
+            for (unsigned i = 0; i < palette_count; i++)
+            {
                 /* TIFF palette values are 16-bit, convert to 8-bit. */
                 *palette_data++ = (uint8_t)(red_colormap[i] >> 8);
                 *palette_data++ = (uint8_t)(green_colormap[i] >> 8);
@@ -217,13 +230,15 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_tiff(void *state, s
         }
     }
 
-    image_local->pixel_format = tiff_state->pixel_format;
+    image_local->pixel_format   = tiff_state->pixel_format;
     image_local->bytes_per_line = sail_bytes_per_line(image_local->width, image_local->pixel_format);
 
     /* Source image. */
-    if (tiff_state->load_options->options & SAIL_OPTION_SOURCE_IMAGE) {
+    if (tiff_state->load_options->options & SAIL_OPTION_SOURCE_IMAGE)
+    {
         int compression = COMPRESSION_NONE;
-        if (!TIFFGetField(tiff_state->tiff, TIFFTAG_COMPRESSION, &compression)) {
+        if (!TIFFGetField(tiff_state->tiff, TIFFTAG_COMPRESSION, &compression))
+        {
             SAIL_LOG_ERROR("TIFF: Failed to get the image compression type");
             sail_destroy_image(image_local);
             SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
@@ -241,43 +256,51 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_tiff(void *state, s
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_tiff(void *state, struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_tiff(void* state, struct sail_image* image)
+{
 
-    struct tiff_state *tiff_state = state;
+    struct tiff_state* tiff_state = state;
 
-    if (tiff_state->libtiff_error) {
+    if (tiff_state->libtiff_error)
+    {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
     /* Read scanlines one by one. */
-    for (unsigned row = 0; row < image->height; row++) {
-        uint8_t *scan = sail_scan_line(image, row);
+    for (unsigned row = 0; row < image->height; row++)
+    {
+        uint8_t* scan = sail_scan_line(image, row);
 
-        if (TIFFReadScanline(tiff_state->tiff, scan, row, 0) < 0) {
+        if (TIFFReadScanline(tiff_state->tiff, scan, row, 0) < 0)
+        {
             SAIL_LOG_ERROR("TIFF: Failed to read scanline %u", row);
             SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
         }
     }
 
     /* Handle PHOTOMETRIC_MINISWHITE - invert the values. */
-    if (tiff_state->photometric == PHOTOMETRIC_MINISWHITE) {
+    if (tiff_state->photometric == PHOTOMETRIC_MINISWHITE)
+    {
         const size_t pixels_size = (size_t)image->bytes_per_line * image->height;
 
-        for (size_t i = 0; i < pixels_size; i++) {
-            ((uint8_t *)image->pixels)[i] = ~((uint8_t *)image->pixels)[i];
+        for (size_t i = 0; i < pixels_size; i++)
+        {
+            ((uint8_t*)image->pixels)[i] = ~((uint8_t*)image->pixels)[i];
         }
     }
 
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_tiff(void **state) {
+SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_tiff(void** state)
+{
 
-    struct tiff_state *tiff_state = *state;
+    struct tiff_state* tiff_state = *state;
 
     *state = NULL;
 
-    if (tiff_state->tiff != NULL) {
+    if (tiff_state->tiff != NULL)
+    {
         TIFFCleanup(tiff_state->tiff);
     }
 
@@ -290,18 +313,23 @@ SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_tiff(void **state) {
  * Encoding functions.
  */
 
-SAIL_EXPORT sail_status_t sail_codec_save_init_v8_tiff(struct sail_io *io, const struct sail_save_options *save_options, void **state) {
+SAIL_EXPORT sail_status_t sail_codec_save_init_v8_tiff(struct sail_io* io,
+                                                       const struct sail_save_options* save_options,
+                                                       void** state)
+{
 
     *state = NULL;
 
-    struct tiff_state *tiff_state;
+    struct tiff_state* tiff_state;
     SAIL_TRY(alloc_tiff_state(NULL, save_options, &tiff_state));
     *state = tiff_state;
 
     /* Sanity check. */
-    SAIL_TRY_OR_EXECUTE(tiff_private_sail_compression_to_compression(tiff_state->save_options->compression, &tiff_state->save_compression),
-                        /* cleanup */ SAIL_LOG_ERROR("TIFF: %s compression is not supported for saving", sail_compression_to_string(tiff_state->save_options->compression));
-                                      return __sail_status);
+    SAIL_TRY_OR_EXECUTE(tiff_private_sail_compression_to_compression(tiff_state->save_options->compression,
+                                                                     &tiff_state->save_compression),
+                        /* cleanup */ SAIL_LOG_ERROR("TIFF: %s compression is not supported for saving",
+                                                     sail_compression_to_string(tiff_state->save_options->compression));
+                        return __sail_status);
 
     TIFFSetWarningHandler(tiff_private_my_warning_fn);
     TIFFSetErrorHandler(tiff_private_my_error_fn);
@@ -311,18 +339,14 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_tiff(struct sail_io *io, const
      * 'w': writing operation
      * 'm': disable use of memory-mapped files
      */
-    tiff_state->tiff = TIFFClientOpen("tiff-sail-codec",
-                                      "wm",
-                                      io,
-                                      tiff_private_my_read_proc,
-                                      tiff_private_my_write_proc,
-                                      tiff_private_my_seek_proc,
-                                      /* libsail will close for us. */ tiff_private_my_dummy_close_proc,
-                                      tiff_private_my_dummy_size_proc,
-                                      /* map */ NULL,
-                                      /* unmap */ NULL);
+    tiff_state->tiff = TIFFClientOpen(
+        "tiff-sail-codec", "wm", io, tiff_private_my_read_proc, tiff_private_my_write_proc, tiff_private_my_seek_proc,
+        /* libsail will close for us. */ tiff_private_my_dummy_close_proc, tiff_private_my_dummy_size_proc,
+        /* map */ NULL,
+        /* unmap */ NULL);
 
-    if (tiff_state->tiff == NULL) {
+    if (tiff_state->tiff == NULL)
+    {
         tiff_state->libtiff_error = true;
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
@@ -330,218 +354,251 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_tiff(struct sail_io *io, const
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_tiff(void *state, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_tiff(void* state, const struct sail_image* image)
+{
 
-    struct tiff_state *tiff_state = state;
+    struct tiff_state* tiff_state = state;
 
-    if (tiff_state->libtiff_error) {
+    if (tiff_state->libtiff_error)
+    {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
-    tiff_state->line = 0;
+    tiff_state->line         = 0;
     tiff_state->pixel_format = image->pixel_format;
 
     /* Determine TIFF tags from pixel format. */
-    uint16_t photometric = 0;
-    uint16_t bits_per_sample = 0;
+    uint16_t photometric       = 0;
+    uint16_t bits_per_sample   = 0;
     uint16_t samples_per_pixel = 0;
 
-    switch (image->pixel_format) {
-        /* Grayscale formats. */
-        case SAIL_PIXEL_FORMAT_BPP1_GRAYSCALE: {
-            photometric = PHOTOMETRIC_MINISBLACK;
-            bits_per_sample = 1;
-            samples_per_pixel = 1;
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP2_GRAYSCALE: {
-            photometric = PHOTOMETRIC_MINISBLACK;
-            bits_per_sample = 2;
-            samples_per_pixel = 1;
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE: {
-            photometric = PHOTOMETRIC_MINISBLACK;
-            bits_per_sample = 4;
-            samples_per_pixel = 1;
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE: {
-            photometric = PHOTOMETRIC_MINISBLACK;
-            bits_per_sample = 8;
-            samples_per_pixel = 1;
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE: {
-            photometric = PHOTOMETRIC_MINISBLACK;
-            bits_per_sample = 16;
-            samples_per_pixel = 1;
-            break;
-        }
+    switch (image->pixel_format)
+    {
+    /* Grayscale formats. */
+    case SAIL_PIXEL_FORMAT_BPP1_GRAYSCALE:
+    {
+        photometric       = PHOTOMETRIC_MINISBLACK;
+        bits_per_sample   = 1;
+        samples_per_pixel = 1;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP2_GRAYSCALE:
+    {
+        photometric       = PHOTOMETRIC_MINISBLACK;
+        bits_per_sample   = 2;
+        samples_per_pixel = 1;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE:
+    {
+        photometric       = PHOTOMETRIC_MINISBLACK;
+        bits_per_sample   = 4;
+        samples_per_pixel = 1;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE:
+    {
+        photometric       = PHOTOMETRIC_MINISBLACK;
+        bits_per_sample   = 8;
+        samples_per_pixel = 1;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE:
+    {
+        photometric       = PHOTOMETRIC_MINISBLACK;
+        bits_per_sample   = 16;
+        samples_per_pixel = 1;
+        break;
+    }
 
-        /* Grayscale + alpha. */
-        case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE_ALPHA: {
-            photometric = PHOTOMETRIC_MINISBLACK;
-            bits_per_sample = 4;
-            samples_per_pixel = 2;
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA: {
-            photometric = PHOTOMETRIC_MINISBLACK;
-            bits_per_sample = 8;
-            samples_per_pixel = 2;
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA: {
-            photometric = PHOTOMETRIC_MINISBLACK;
-            bits_per_sample = 16;
-            samples_per_pixel = 2;
-            break;
-        }
+    /* Grayscale + alpha. */
+    case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE_ALPHA:
+    {
+        photometric       = PHOTOMETRIC_MINISBLACK;
+        bits_per_sample   = 4;
+        samples_per_pixel = 2;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA:
+    {
+        photometric       = PHOTOMETRIC_MINISBLACK;
+        bits_per_sample   = 8;
+        samples_per_pixel = 2;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA:
+    {
+        photometric       = PHOTOMETRIC_MINISBLACK;
+        bits_per_sample   = 16;
+        samples_per_pixel = 2;
+        break;
+    }
 
-        /* Indexed formats. */
-        case SAIL_PIXEL_FORMAT_BPP1_INDEXED: {
-            photometric = PHOTOMETRIC_PALETTE;
-            bits_per_sample = 1;
-            samples_per_pixel = 1;
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP2_INDEXED: {
-            photometric = PHOTOMETRIC_PALETTE;
-            bits_per_sample = 2;
-            samples_per_pixel = 1;
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP4_INDEXED: {
-            photometric = PHOTOMETRIC_PALETTE;
-            bits_per_sample = 4;
-            samples_per_pixel = 1;
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP8_INDEXED: {
-            photometric = PHOTOMETRIC_PALETTE;
-            bits_per_sample = 8;
-            samples_per_pixel = 1;
-            break;
-        }
+    /* Indexed formats. */
+    case SAIL_PIXEL_FORMAT_BPP1_INDEXED:
+    {
+        photometric       = PHOTOMETRIC_PALETTE;
+        bits_per_sample   = 1;
+        samples_per_pixel = 1;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP2_INDEXED:
+    {
+        photometric       = PHOTOMETRIC_PALETTE;
+        bits_per_sample   = 2;
+        samples_per_pixel = 1;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP4_INDEXED:
+    {
+        photometric       = PHOTOMETRIC_PALETTE;
+        bits_per_sample   = 4;
+        samples_per_pixel = 1;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP8_INDEXED:
+    {
+        photometric       = PHOTOMETRIC_PALETTE;
+        bits_per_sample   = 8;
+        samples_per_pixel = 1;
+        break;
+    }
 
-        /* RGB formats. */
-        case SAIL_PIXEL_FORMAT_BPP24_RGB: {
-            photometric = PHOTOMETRIC_RGB;
-            bits_per_sample = 8;
-            samples_per_pixel = 3;
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP48_RGB: {
-            photometric = PHOTOMETRIC_RGB;
-            bits_per_sample = 16;
-            samples_per_pixel = 3;
-            break;
-        }
+    /* RGB formats. */
+    case SAIL_PIXEL_FORMAT_BPP24_RGB:
+    {
+        photometric       = PHOTOMETRIC_RGB;
+        bits_per_sample   = 8;
+        samples_per_pixel = 3;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP48_RGB:
+    {
+        photometric       = PHOTOMETRIC_RGB;
+        bits_per_sample   = 16;
+        samples_per_pixel = 3;
+        break;
+    }
 
-        /* RGBA formats. */
-        case SAIL_PIXEL_FORMAT_BPP32_RGBA: {
-            photometric = PHOTOMETRIC_RGB;
-            bits_per_sample = 8;
-            samples_per_pixel = 4;
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP64_RGBA: {
-            photometric = PHOTOMETRIC_RGB;
-            bits_per_sample = 16;
-            samples_per_pixel = 4;
-            break;
-        }
+    /* RGBA formats. */
+    case SAIL_PIXEL_FORMAT_BPP32_RGBA:
+    {
+        photometric       = PHOTOMETRIC_RGB;
+        bits_per_sample   = 8;
+        samples_per_pixel = 4;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP64_RGBA:
+    {
+        photometric       = PHOTOMETRIC_RGB;
+        bits_per_sample   = 16;
+        samples_per_pixel = 4;
+        break;
+    }
 
-        /* CMYK formats for print. */
-        case SAIL_PIXEL_FORMAT_BPP32_CMYK: {
-            photometric = PHOTOMETRIC_SEPARATED;
-            bits_per_sample = 8;
-            samples_per_pixel = 4;
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP64_CMYK: {
-            photometric = PHOTOMETRIC_SEPARATED;
-            bits_per_sample = 16;
-            samples_per_pixel = 4;
-            break;
-        }
+    /* CMYK formats for print. */
+    case SAIL_PIXEL_FORMAT_BPP32_CMYK:
+    {
+        photometric       = PHOTOMETRIC_SEPARATED;
+        bits_per_sample   = 8;
+        samples_per_pixel = 4;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP64_CMYK:
+    {
+        photometric       = PHOTOMETRIC_SEPARATED;
+        bits_per_sample   = 16;
+        samples_per_pixel = 4;
+        break;
+    }
 
-        /* CMYKA formats (CMYK with alpha). */
-        case SAIL_PIXEL_FORMAT_BPP40_CMYKA: {
-            photometric = PHOTOMETRIC_SEPARATED;
-            bits_per_sample = 8;
-            samples_per_pixel = 5;
-            break;
-        }
-        case SAIL_PIXEL_FORMAT_BPP80_CMYKA: {
-            photometric = PHOTOMETRIC_SEPARATED;
-            bits_per_sample = 16;
-            samples_per_pixel = 5;
-            break;
-        }
+    /* CMYKA formats (CMYK with alpha). */
+    case SAIL_PIXEL_FORMAT_BPP40_CMYKA:
+    {
+        photometric       = PHOTOMETRIC_SEPARATED;
+        bits_per_sample   = 8;
+        samples_per_pixel = 5;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP80_CMYKA:
+    {
+        photometric       = PHOTOMETRIC_SEPARATED;
+        bits_per_sample   = 16;
+        samples_per_pixel = 5;
+        break;
+    }
 
-        /* YCbCr format. */
-        case SAIL_PIXEL_FORMAT_BPP24_YCBCR: {
-            photometric = PHOTOMETRIC_YCBCR;
-            bits_per_sample = 8;
-            samples_per_pixel = 3;
-            break;
-        }
+    /* YCbCr format. */
+    case SAIL_PIXEL_FORMAT_BPP24_YCBCR:
+    {
+        photometric       = PHOTOMETRIC_YCBCR;
+        bits_per_sample   = 8;
+        samples_per_pixel = 3;
+        break;
+    }
 
-        /* CIE LAB format. */
-        case SAIL_PIXEL_FORMAT_BPP24_CIE_LAB: {
-            photometric = PHOTOMETRIC_CIELAB;
-            bits_per_sample = 8;
-            samples_per_pixel = 3;
-            break;
-        }
+    /* CIE LAB format. */
+    case SAIL_PIXEL_FORMAT_BPP24_CIE_LAB:
+    {
+        photometric       = PHOTOMETRIC_CIELAB;
+        bits_per_sample   = 8;
+        samples_per_pixel = 3;
+        break;
+    }
 
-        default: {
-            SAIL_LOG_ERROR("TIFF: Unsupported pixel format '%s' for saving", sail_pixel_format_to_string(image->pixel_format));
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
-        }
+    default:
+    {
+        SAIL_LOG_ERROR("TIFF: Unsupported pixel format '%s' for saving",
+                       sail_pixel_format_to_string(image->pixel_format));
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+    }
     }
 
     /* Write TIFF tags. */
-    TIFFSetField(tiff_state->tiff, TIFFTAG_IMAGEWIDTH,       image->width);
-    TIFFSetField(tiff_state->tiff, TIFFTAG_IMAGELENGTH,      image->height);
-    TIFFSetField(tiff_state->tiff, TIFFTAG_ORIENTATION,      ORIENTATION_TOPLEFT);
-    TIFFSetField(tiff_state->tiff, TIFFTAG_SAMPLESPERPIXEL,  samples_per_pixel);
-    TIFFSetField(tiff_state->tiff, TIFFTAG_BITSPERSAMPLE,    bits_per_sample);
-    TIFFSetField(tiff_state->tiff, TIFFTAG_PLANARCONFIG,     PLANARCONFIG_CONTIG);
-    TIFFSetField(tiff_state->tiff, TIFFTAG_PHOTOMETRIC,      photometric);
-    TIFFSetField(tiff_state->tiff, TIFFTAG_COMPRESSION,      tiff_state->save_compression);
-    TIFFSetField(tiff_state->tiff, TIFFTAG_ROWSPERSTRIP,     TIFFDefaultStripSize(tiff_state->tiff, (uint32_t)-1));
+    TIFFSetField(tiff_state->tiff, TIFFTAG_IMAGEWIDTH, image->width);
+    TIFFSetField(tiff_state->tiff, TIFFTAG_IMAGELENGTH, image->height);
+    TIFFSetField(tiff_state->tiff, TIFFTAG_ORIENTATION, ORIENTATION_TOPLEFT);
+    TIFFSetField(tiff_state->tiff, TIFFTAG_SAMPLESPERPIXEL, samples_per_pixel);
+    TIFFSetField(tiff_state->tiff, TIFFTAG_BITSPERSAMPLE, bits_per_sample);
+    TIFFSetField(tiff_state->tiff, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
+    TIFFSetField(tiff_state->tiff, TIFFTAG_PHOTOMETRIC, photometric);
+    TIFFSetField(tiff_state->tiff, TIFFTAG_COMPRESSION, tiff_state->save_compression);
+    TIFFSetField(tiff_state->tiff, TIFFTAG_ROWSPERSTRIP, TIFFDefaultStripSize(tiff_state->tiff, (uint32_t)-1));
 
     /* Handle tuning options. */
-    if (tiff_state->save_options->tuning != NULL) {
-        sail_traverse_hash_map_with_user_data(tiff_state->save_options->tuning, tiff_private_tuning_key_value_callback, tiff_state->tiff);
+    if (tiff_state->save_options->tuning != NULL)
+    {
+        sail_traverse_hash_map_with_user_data(tiff_state->save_options->tuning, tiff_private_tuning_key_value_callback,
+                                              tiff_state->tiff);
     }
 
     /* Save palette for indexed images. */
-    if (photometric == PHOTOMETRIC_PALETTE) {
-        if (image->palette == NULL) {
+    if (photometric == PHOTOMETRIC_PALETTE)
+    {
+        if (image->palette == NULL)
+        {
             SAIL_LOG_ERROR("TIFF: Indexed image must have a palette");
             SAIL_LOG_AND_RETURN(SAIL_ERROR_MISSING_PALETTE);
         }
 
         const unsigned palette_count = 1 << bits_per_sample;
-        uint16_t *red_colormap = NULL;
-        uint16_t *green_colormap = NULL;
-        uint16_t *blue_colormap = NULL;
+        uint16_t* red_colormap       = NULL;
+        uint16_t* green_colormap     = NULL;
+        uint16_t* blue_colormap      = NULL;
 
-        void *ptr;
+        void* ptr;
         SAIL_TRY(sail_malloc(palette_count * sizeof(uint16_t) * 3, &ptr));
 
-        red_colormap = ptr;
+        red_colormap   = ptr;
         green_colormap = red_colormap + palette_count;
-        blue_colormap = green_colormap + palette_count;
+        blue_colormap  = green_colormap + palette_count;
 
-        const uint8_t *palette_data = image->palette->data;
-        const unsigned actual_colors = image->palette->color_count < palette_count ? image->palette->color_count : palette_count;
+        const uint8_t* palette_data = image->palette->data;
+        const unsigned actual_colors =
+            image->palette->color_count < palette_count ? image->palette->color_count : palette_count;
 
-        for (unsigned i = 0; i < actual_colors; i++) {
+        for (unsigned i = 0; i < actual_colors; i++)
+        {
             /* Convert 8-bit palette to 16-bit TIFF palette. */
             red_colormap[i]   = (uint16_t)(palette_data[i * 3 + 0] << 8);
             green_colormap[i] = (uint16_t)(palette_data[i * 3 + 1] << 8);
@@ -549,10 +606,11 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_tiff(void *state, c
         }
 
         /* Fill remaining entries with black if needed. */
-        for (unsigned i = actual_colors; i < palette_count; i++) {
-            red_colormap[i] = 0;
+        for (unsigned i = actual_colors; i < palette_count; i++)
+        {
+            red_colormap[i]   = 0;
             green_colormap[i] = 0;
-            blue_colormap[i] = 0;
+            blue_colormap[i]  = 0;
         }
 
         TIFFSetField(tiff_state->tiff, TIFFTAG_COLORMAP, red_colormap, green_colormap, blue_colormap);
@@ -563,13 +621,15 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_tiff(void *state, c
     }
 
     /* Save ICC profile. */
-    if (tiff_state->save_options->options & SAIL_OPTION_ICCP && image->iccp != NULL) {
+    if (tiff_state->save_options->options & SAIL_OPTION_ICCP && image->iccp != NULL)
+    {
         TIFFSetField(tiff_state->tiff, TIFFTAG_ICCPROFILE, image->iccp->size, image->iccp->data);
         SAIL_LOG_TRACE("TIFF: ICC profile has been saved");
     }
 
     /* Save meta data. */
-    if (tiff_state->save_options->options & SAIL_OPTION_META_DATA && image->meta_data_node != NULL) {
+    if (tiff_state->save_options->options & SAIL_OPTION_META_DATA && image->meta_data_node != NULL)
+    {
         SAIL_LOG_TRACE("TIFF: Saving meta data");
         SAIL_TRY(tiff_private_write_meta_data(tiff_state->tiff, image->meta_data_node));
 
@@ -583,36 +643,43 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_tiff(void *state, c
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_tiff(void *state, const struct sail_image *image) {
+SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_tiff(void* state, const struct sail_image* image)
+{
 
-    struct tiff_state *tiff_state = state;
+    struct tiff_state* tiff_state = state;
 
-    if (tiff_state->libtiff_error) {
+    if (tiff_state->libtiff_error)
+    {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
-    for (unsigned row = 0; row < image->height; row++) {
-        if (TIFFWriteScanline(tiff_state->tiff, sail_scan_line(image, row), tiff_state->line++, 0) < 0) {
+    for (unsigned row = 0; row < image->height; row++)
+    {
+        if (TIFFWriteScanline(tiff_state->tiff, sail_scan_line(image, row), tiff_state->line++, 0) < 0)
+        {
             SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
         }
     }
 
-    if (!TIFFWriteDirectory(tiff_state->tiff)) {
+    if (!TIFFWriteDirectory(tiff_state->tiff))
+    {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
     return SAIL_OK;
 }
 
-SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_tiff(void **state) {
+SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_tiff(void** state)
+{
 
-    struct tiff_state *tiff_state = *state;
+    struct tiff_state* tiff_state = *state;
 
     /* Subsequent calls to finish() will expectedly fail in the above line. */
     *state = NULL;
 
     /* Destroy internal TIFF objects. */
-    if (tiff_state->tiff != NULL) {
+    if (tiff_state->tiff != NULL)
+    {
         TIFFCleanup(tiff_state->tiff);
     }
 

@@ -61,22 +61,22 @@ public:
     /*
      * Copies the save options.
      */
-    save_options(const save_options &wo);
+    save_options(const save_options& wo);
 
     /*
      * Copies the save options.
      */
-    save_options& operator=(const sail::save_options &save_options);
+    save_options& operator=(const sail::save_options& save_options);
 
     /*
      * Moves the save options.
      */
-    save_options(sail::save_options &&save_options) noexcept;
+    save_options(sail::save_options&& save_options) noexcept;
 
     /*
      * Moves the save options.
      */
-    save_options& operator=(sail::save_options &&save_options) noexcept;
+    save_options& operator=(sail::save_options&& save_options) noexcept;
 
     /*
      * Destroys the save options.
@@ -137,20 +137,20 @@ public:
     /*
      * Sets a new codec tuning.
      */
-    void set_tuning(const sail::tuning &tuning);
+    void set_tuning(const sail::tuning& tuning);
 
 private:
     /*
      * Makes a deep copy of the specified save options and stores the pointer for further use.
      * When the SAIL context gets uninitialized, the pointer becomes dangling.
      */
-    explicit save_options(const sail_save_options *wo);
+    explicit save_options(const sail_save_options* wo);
 
-    sail_status_t to_sail_save_options(sail_save_options **save_options) const;
+    sail_status_t to_sail_save_options(sail_save_options** save_options) const;
 
 private:
     class pimpl;
     std::unique_ptr<pimpl> d;
 };
 
-}
+} // namespace sail

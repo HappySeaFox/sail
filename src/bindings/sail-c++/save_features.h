@@ -54,22 +54,22 @@ public:
     /*
      * Copies the save features.
      */
-    save_features(const save_features &wf);
+    save_features(const save_features& wf);
 
     /*
      * Copies the save features.
      */
-    save_features& operator=(const sail::save_features &save_features);
+    save_features& operator=(const sail::save_features& save_features);
 
     /*
      * Moves the save features.
      */
-    save_features(sail::save_features &&save_features) noexcept;
+    save_features(sail::save_features&& save_features) noexcept;
 
     /*
      * Moves the save features.
      */
-    save_features& operator=(sail::save_features &&save_features) noexcept;
+    save_features& operator=(sail::save_features&& save_features) noexcept;
 
     /*
      * Destroys the save features.
@@ -130,7 +130,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t to_options(sail::save_options *save_options) const;
+    sail_status_t to_options(sail::save_options* save_options) const;
 
 private:
     save_features();
@@ -138,7 +138,7 @@ private:
      * Makes a deep copy of the specified save features and stores the pointer for further use.
      * When the SAIL context gets uninitialized, the pointer becomes dangling.
      */
-    explicit save_features(const sail_save_features *wf);
+    explicit save_features(const sail_save_features* wf);
 
     const sail_save_features* sail_save_features_c() const;
 
@@ -147,4 +147,4 @@ private:
     std::unique_ptr<pimpl> d;
 };
 
-}
+} // namespace sail

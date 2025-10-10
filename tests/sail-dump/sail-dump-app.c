@@ -29,21 +29,23 @@
 
 #include "sail-dump.h"
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    if (argc < 2) {
+    if (argc < 2)
+    {
         fprintf(stderr, "Usage: %s <path to image>", argv[0]);
         return 1;
     }
 
-    void *state = NULL;
+    void* state = NULL;
     SAIL_TRY_OR_EXECUTE(sail_start_loading_from_file(argv[1], NULL, &state),
                         /* on error */ return 2);
 
     sail_status_t res;
-    struct sail_image *image;
+    struct sail_image* image;
 
-    while ((res = sail_load_next_frame(state, &image)) == SAIL_OK) {
+    while ((res = sail_load_next_frame(state, &image)) == SAIL_OK)
+    {
 
         SAIL_TRY_OR_EXECUTE(sail_dump(image),
                             /* on error */ return 3);
@@ -51,7 +53,8 @@ int main(int argc, char *argv[])
         sail_destroy_image(image);
     }
 
-    if (res != SAIL_ERROR_NO_MORE_FRAMES) {
+    if (res != SAIL_ERROR_NO_MORE_FRAMES)
+    {
         sail_stop_loading(state);
         return res;
     }

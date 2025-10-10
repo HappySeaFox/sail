@@ -44,4 +44,4 @@ using tuning = std::unordered_map<std::string, variant>;
  */
 using supported_tuning = std::vector<std::string>;
 
-}
+} // namespace sail

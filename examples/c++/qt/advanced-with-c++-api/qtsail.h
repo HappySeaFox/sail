@@ -27,14 +27,15 @@
 
 #include <cstddef>
 
-#include <QWidget>
 #include <QScopedPointer>
 #include <QVector>
+#include <QWidget>
 
 #include <sail-common/status.h>
 
-namespace Ui {
-    class QtSail;
+namespace Ui
+{
+class QtSail;
 }
 
 class QImage;
@@ -50,14 +51,14 @@ class QtSail : public QWidget
     Q_OBJECT
 
 public:
-    QtSail(QWidget *parent = nullptr);
+    QtSail(QWidget* parent = nullptr);
     ~QtSail();
 
 private:
     sail_status_t init();
-    sail_status_t loadImage(const QString &path, QVector<QImage> *qimages, QVector<int> *delays);
-    sail_status_t saveImage(const QString &path, const QImage &qimage);
-    sail_status_t codecInfo(const sail::codec_info &codec_info) const;
+    sail_status_t loadImage(const QString& path, QVector<QImage>* qimages, QVector<int>* delays);
+    sail_status_t saveImage(const QString& path, const QImage& qimage);
+    sail_status_t codecInfo(const sail::codec_info& codec_info) const;
     QStringList filters() const;
     void detectAnimated();
     void updateCurrentFrameLabel();

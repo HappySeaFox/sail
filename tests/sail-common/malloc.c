@@ -51,7 +51,7 @@ static MunitResult test_calloc(const MunitParameter params[], void* user_data)
     (void)params;
     (void)user_data;
 
-    const size_t size = 1;
+    const size_t size    = 1;
     const size_t members = 1024;
 
     void* ptr = NULL;
@@ -75,11 +75,11 @@ static MunitResult test_realloc(const MunitParameter params[], void* user_data)
     (void)params;
     (void)user_data;
 
-    const size_t size = 10 * 1024;
-    size_t current_size = size;
-    const double factor = 1.2;
+    const size_t size    = 10 * 1024;
+    size_t current_size  = size;
+    const double factor  = 1.2;
     const int iterations = 10;
-    int iteration = 0;
+    int iteration        = 0;
 
     void* ptr = NULL;
 

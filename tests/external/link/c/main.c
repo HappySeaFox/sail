@@ -25,11 +25,13 @@
 
 #include <sail/sail.h>
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     unsigned enumerated_codecs = 0;
 
-    for (const struct sail_codec_bundle_node *codec_bundle_node = sail_codec_bundle_list(); codec_bundle_node != NULL; codec_bundle_node = codec_bundle_node->next) {
+    for (const struct sail_codec_bundle_node* codec_bundle_node = sail_codec_bundle_list(); codec_bundle_node != NULL;
+         codec_bundle_node                                      = codec_bundle_node->next)
+    {
         enumerated_codecs++;
     }
 

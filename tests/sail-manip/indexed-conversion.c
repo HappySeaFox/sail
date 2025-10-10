@@ -92,9 +92,9 @@ static MunitResult test_indexed_roundtrip(const MunitParameter params[], void* u
     /* Create a simple test image 16x16 RGB24 */
     struct sail_image* rgb_image = NULL;
     munit_assert_int(sail_alloc_image(&rgb_image), ==, SAIL_OK);
-    rgb_image->width = 16;
-    rgb_image->height = 16;
-    rgb_image->pixel_format = SAIL_PIXEL_FORMAT_BPP24_RGB;
+    rgb_image->width          = 16;
+    rgb_image->height         = 16;
+    rgb_image->pixel_format   = SAIL_PIXEL_FORMAT_BPP24_RGB;
     rgb_image->bytes_per_line = sail_bytes_per_line(rgb_image->width, rgb_image->pixel_format);
 
     munit_assert_int(sail_malloc((size_t)rgb_image->bytes_per_line * rgb_image->height, &rgb_image->pixels), ==,
@@ -106,7 +106,7 @@ static MunitResult test_indexed_roundtrip(const MunitParameter params[], void* u
     {
         for (unsigned x = 0; x < rgb_image->width; x++)
         {
-            unsigned idx = (y * rgb_image->bytes_per_line) + (x * 3);
+            unsigned idx    = (y * rgb_image->bytes_per_line) + (x * 3);
             pixels[idx + 0] = (unsigned char)(x * 16); /* R */
             pixels[idx + 1] = (unsigned char)(y * 16); /* G */
             pixels[idx + 2] = 128;                     /* B */
@@ -152,9 +152,9 @@ static MunitResult test_indexed_color_counts(const MunitParameter params[], void
     /* Create a colorful test image 32x32 RGB24 */
     struct sail_image* rgb_image = NULL;
     munit_assert_int(sail_alloc_image(&rgb_image), ==, SAIL_OK);
-    rgb_image->width = 32;
-    rgb_image->height = 32;
-    rgb_image->pixel_format = SAIL_PIXEL_FORMAT_BPP24_RGB;
+    rgb_image->width          = 32;
+    rgb_image->height         = 32;
+    rgb_image->pixel_format   = SAIL_PIXEL_FORMAT_BPP24_RGB;
     rgb_image->bytes_per_line = sail_bytes_per_line(rgb_image->width, rgb_image->pixel_format);
 
     munit_assert_int(sail_malloc(rgb_image->bytes_per_line * rgb_image->height, &rgb_image->pixels), ==, SAIL_OK);
@@ -165,7 +165,7 @@ static MunitResult test_indexed_color_counts(const MunitParameter params[], void
     {
         for (unsigned x = 0; x < rgb_image->width; x++)
         {
-            unsigned idx = (y * rgb_image->bytes_per_line) + (x * 3);
+            unsigned idx    = (y * rgb_image->bytes_per_line) + (x * 3);
             pixels[idx + 0] = (unsigned char)(x * 8);
             pixels[idx + 1] = (unsigned char)(y * 8);
             pixels[idx + 2] = (unsigned char)((x + y) * 4);
@@ -213,9 +213,9 @@ static MunitResult test_indexed_requantization(const MunitParameter params[], vo
     /* Create RGB image */
     struct sail_image* rgb_image = NULL;
     munit_assert_int(sail_alloc_image(&rgb_image), ==, SAIL_OK);
-    rgb_image->width = 16;
-    rgb_image->height = 16;
-    rgb_image->pixel_format = SAIL_PIXEL_FORMAT_BPP24_RGB;
+    rgb_image->width          = 16;
+    rgb_image->height         = 16;
+    rgb_image->pixel_format   = SAIL_PIXEL_FORMAT_BPP24_RGB;
     rgb_image->bytes_per_line = sail_bytes_per_line(rgb_image->width, rgb_image->pixel_format);
     munit_assert_int(sail_malloc(rgb_image->bytes_per_line * rgb_image->height, &rgb_image->pixels), ==, SAIL_OK);
 
@@ -225,7 +225,7 @@ static MunitResult test_indexed_requantization(const MunitParameter params[], vo
     {
         for (unsigned x = 0; x < rgb_image->width; x++)
         {
-            unsigned idx = (y * rgb_image->bytes_per_line) + (x * 3);
+            unsigned idx    = (y * rgb_image->bytes_per_line) + (x * 3);
             pixels[idx + 0] = (x < 8) ? 255 : 0;        /* R */
             pixels[idx + 1] = (y < 8) ? 255 : 0;        /* G */
             pixels[idx + 2] = ((x + y) < 16) ? 255 : 0; /* B */
@@ -266,9 +266,9 @@ static MunitResult test_floyd_steinberg_dithering(const MunitParameter params[],
     /* Create a gradient test image 64x64 RGB24 */
     struct sail_image* rgb_image = NULL;
     munit_assert_int(sail_alloc_image(&rgb_image), ==, SAIL_OK);
-    rgb_image->width = 64;
-    rgb_image->height = 64;
-    rgb_image->pixel_format = SAIL_PIXEL_FORMAT_BPP24_RGB;
+    rgb_image->width          = 64;
+    rgb_image->height         = 64;
+    rgb_image->pixel_format   = SAIL_PIXEL_FORMAT_BPP24_RGB;
     rgb_image->bytes_per_line = sail_bytes_per_line(rgb_image->width, rgb_image->pixel_format);
     munit_assert_int(sail_malloc(rgb_image->bytes_per_line * rgb_image->height, &rgb_image->pixels), ==, SAIL_OK);
 
@@ -278,7 +278,7 @@ static MunitResult test_floyd_steinberg_dithering(const MunitParameter params[],
     {
         for (unsigned x = 0; x < rgb_image->width; x++)
         {
-            unsigned idx = (y * rgb_image->bytes_per_line) + (x * 3);
+            unsigned idx    = (y * rgb_image->bytes_per_line) + (x * 3);
             pixels[idx + 0] = (unsigned char)(x * 4); /* R: 0-252 gradient */
             pixels[idx + 1] = (unsigned char)(y * 4); /* G: 0-252 gradient */
             pixels[idx + 2] = 128;                    /* B: constant */

@@ -27,14 +27,14 @@
 
 #include "memory.h"
 
-void *jpegxl_private_alloc_func(void *opaque, size_t size)
+void* jpegxl_private_alloc_func(void* opaque, size_t size)
 {
     (void)opaque;
 
     return sail_malloc_std_signature(size);
 }
 
-void jpegxl_private_free_func(void *opaque, void *address)
+void jpegxl_private_free_func(void* opaque, void* address)
 {
     (void)opaque;
 

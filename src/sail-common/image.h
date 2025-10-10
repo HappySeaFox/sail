@@ -32,7 +32,8 @@
 #include <sail-common/status.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 struct sail_iccp;
@@ -45,7 +46,8 @@ struct sail_source_image;
  * sail_image represents an image. Fields set by SAIL when loading images are marked with LOAD.
  * Fields that must be set by a caller when saving images are marked with SAVE.
  */
-struct sail_image {
+struct sail_image
+{
 
     /*
      * Image pixels. The channels are interleaved per pixel. The pixels are
@@ -54,7 +56,7 @@ struct sail_image {
      * LOAD: Set by SAIL to an allocated array of pixels.
      * SAVE: Must be set by a caller to an allocated array of pixels.
      */
-    void *pixels;
+    void* pixels;
 
     /*
      * Image width.
@@ -87,7 +89,7 @@ struct sail_image {
      * LOAD: Set by SAIL to a valid resolution or to NULL if this information is not available.
      * SAVE: Must be set by a caller to a valid image resolution if necessary.
      */
-    struct sail_resolution *resolution;
+    struct sail_resolution* resolution;
 
     /*
      * Image pixel format. See SailPixelFormat.
@@ -129,7 +131,7 @@ struct sail_image {
      *       assumes having a palette. NULL otherwise.
      * SAVE: Must be allocated and set by a caller to a valid palette if the image is indexed.
      */
-    struct sail_palette *palette;
+    struct sail_palette* palette;
 
     /*
      * Image meta data. Codecs guarantee that values are non-NULL.
@@ -138,7 +140,7 @@ struct sail_image {
      * SAVE: Must be allocated and set by a caller to a valid linked list with meta data
      *       (like JPEG comments) if necessary.
      */
-    struct sail_meta_data_node *meta_data_node;
+    struct sail_meta_data_node* meta_data_node;
 
     /*
      * Embedded ICC profile.
@@ -149,7 +151,7 @@ struct sail_image {
      * LOAD: Set by SAIL to a valid ICC profile or to NULL.
      * SAVE: Must be allocated and set by a caller to a valid ICC profile if necessary.
      */
-    struct sail_iccp *iccp;
+    struct sail_iccp* iccp;
 
     /*
      * Source image properties which are usually lost during decoding.
@@ -158,7 +160,7 @@ struct sail_image {
      * LOAD: Set by SAIL to valid source image properties of the original image.
      * SAVE: Ignored.
      */
-    struct sail_source_image *source_image;
+    struct sail_source_image* source_image;
 
     /*
      * Image format-specific properties that cannot be expressed
@@ -172,7 +174,7 @@ struct sail_image {
      * LOAD: Set by SAIL to valid special properties if SAIL_OPTION_META_DATA is enabled.
      * SAVE: Must be set by a caller to valid special properties if desired.
      */
-    struct sail_hash_map *special_properties;
+    struct sail_hash_map* special_properties;
 };
 
 typedef struct sail_image sail_image_t;
@@ -182,20 +184,20 @@ typedef struct sail_image sail_image_t;
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_image(struct sail_image **image);
+SAIL_EXPORT sail_status_t sail_alloc_image(struct sail_image** image);
 
 /*
  * Destroys the specified image and all its internal allocated memory buffers. The image MUST NOT be used anymore
  * after calling this function. Does nothing if the image is NULL.
  */
-SAIL_EXPORT void sail_destroy_image(struct sail_image *image);
+SAIL_EXPORT void sail_destroy_image(struct sail_image* image);
 
 /*
  * Makes a deep copy of the specified image.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_copy_image(const struct sail_image *source, struct sail_image **target);
+SAIL_EXPORT sail_status_t sail_copy_image(const struct sail_image* source, struct sail_image** target);
 
 /*
  * Makes a deep copy of the specified image without its pixels and palette.
@@ -205,28 +207,28 @@ SAIL_EXPORT sail_status_t sail_copy_image(const struct sail_image *source, struc
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_copy_image_skeleton(const struct sail_image *source, struct sail_image **target);
+SAIL_EXPORT sail_status_t sail_copy_image_skeleton(const struct sail_image* source, struct sail_image** target);
 
 /*
  * Returns SAIL_OK if the given image has valid pixel_format, dimensions, and bytes per line.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_check_image_skeleton_valid(const struct sail_image *image);
+SAIL_EXPORT sail_status_t sail_check_image_skeleton_valid(const struct sail_image* image);
 
 /*
  * Returns SAIL_OK if the given image has valid dimensions and pixels.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_check_image_valid(const struct sail_image *image);
+SAIL_EXPORT sail_status_t sail_check_image_valid(const struct sail_image* image);
 
 /*
  * Mirrors the image vertically.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_mirror_vertically(struct sail_image *image);
+SAIL_EXPORT sail_status_t sail_mirror_vertically(struct sail_image* image);
 
 /*
  * Mirrors the image horizontally. The image pixel size must be a multiple of 8,
@@ -234,7 +236,7 @@ SAIL_EXPORT sail_status_t sail_mirror_vertically(struct sail_image *image);
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_mirror_horizontally(struct sail_image *image);
+SAIL_EXPORT sail_status_t sail_mirror_horizontally(struct sail_image* image);
 
 /*
  * Mirrors the image horizontally or vertically.
@@ -245,13 +247,13 @@ SAIL_EXPORT sail_status_t sail_mirror_horizontally(struct sail_image *image);
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_mirror(struct sail_image *image, enum SailOrientation orientation);
+SAIL_EXPORT sail_status_t sail_mirror(struct sail_image* image, enum SailOrientation orientation);
 
 /*
  * Returns the scan line at the given row.
  * Return NULL if the image or its pixels is NULL.
  */
-SAIL_EXPORT void* sail_scan_line(const struct sail_image *image, unsigned row);
+SAIL_EXPORT void* sail_scan_line(const struct sail_image* image, unsigned row);
 
 /* extern "C" */
 #ifdef __cplusplus

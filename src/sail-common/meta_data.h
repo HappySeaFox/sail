@@ -32,7 +32,8 @@
 #include <sail-common/status.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 struct sail_variant;
@@ -45,7 +46,7 @@ struct sail_variant;
  * {
  *     key         = SAIL_META_DATA_UNKNOWN,
  *     key_unknown = "My Data",
- *     value       = { SAIL_VARIANT_TYPE_STRING, "Data" } 
+ *     value       = { SAIL_VARIANT_TYPE_STRING, "Data" }
  * }
  *
  * {
@@ -72,19 +73,20 @@ struct sail_variant;
  * keys to string representations. PNG, for example, uses hardcoded "Raw profile type exif" key name
  * for EXIF tags.
  */
-struct sail_meta_data {
+struct sail_meta_data
+{
 
     /*
      * If the key is SAIL_META_DATA_UNKNOWN, key_unknown contains an actual string key.
      * If the key is other than SAIL_META_DATA_UNKNOWN, key_unknown is NULL.
      */
     enum SailMetaData key;
-    char *key_unknown;
+    char* key_unknown;
 
     /*
      * Meta data value.
      */
-    struct sail_variant *value;
+    struct sail_variant* value;
 };
 
 /*
@@ -92,7 +94,7 @@ struct sail_meta_data {
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_meta_data(struct sail_meta_data **meta_data);
+SAIL_EXPORT sail_status_t sail_alloc_meta_data(struct sail_meta_data** meta_data);
 
 /*
  * Allocates new meta data from the specified known key.
@@ -100,8 +102,7 @@ SAIL_EXPORT sail_status_t sail_alloc_meta_data(struct sail_meta_data **meta_data
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_meta_data_from_known_key(enum SailMetaData key,
-                                                              struct sail_meta_data **meta_data);
+SAIL_EXPORT sail_status_t sail_alloc_meta_data_from_known_key(enum SailMetaData key, struct sail_meta_data** meta_data);
 
 /*
  * Allocates new meta data from the specified unknown key. Makes a deep copy of the key.
@@ -109,8 +110,8 @@ SAIL_EXPORT sail_status_t sail_alloc_meta_data_from_known_key(enum SailMetaData 
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_meta_data_from_unknown_key(const char *key_unknown,
-                                                                struct sail_meta_data **meta_data);
+SAIL_EXPORT sail_status_t sail_alloc_meta_data_from_unknown_key(const char* key_unknown,
+                                                                struct sail_meta_data** meta_data);
 
 /*
  * Allocates new meta data from the specified known key and the nested value.
@@ -119,7 +120,7 @@ SAIL_EXPORT sail_status_t sail_alloc_meta_data_from_unknown_key(const char *key_
  * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_alloc_meta_data_and_value_from_known_key(enum SailMetaData key,
-                                                                        struct sail_meta_data **meta_data);
+                                                                        struct sail_meta_data** meta_data);
 
 /*
  * Allocates new meta data from the specified unknown key and the nested value.
@@ -127,21 +128,20 @@ SAIL_EXPORT sail_status_t sail_alloc_meta_data_and_value_from_known_key(enum Sai
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_alloc_meta_data_and_value_from_unknown_key(const char *key_unknown,
-                                                                          struct sail_meta_data **meta_data);
+SAIL_EXPORT sail_status_t sail_alloc_meta_data_and_value_from_unknown_key(const char* key_unknown,
+                                                                          struct sail_meta_data** meta_data);
 
 /*
  * Destroys the specified meta data.
  */
-SAIL_EXPORT void sail_destroy_meta_data(struct sail_meta_data *meta_data);
+SAIL_EXPORT void sail_destroy_meta_data(struct sail_meta_data* meta_data);
 
 /*
  * Makes a deep copy of the specified meta data.
  *
  * Returns SAIL_OK on success.
  */
-SAIL_EXPORT sail_status_t sail_copy_meta_data(const struct sail_meta_data *source,
-                                              struct sail_meta_data **target);
+SAIL_EXPORT sail_status_t sail_copy_meta_data(const struct sail_meta_data* source, struct sail_meta_data** target);
 
 /* extern "C" */
 #ifdef __cplusplus

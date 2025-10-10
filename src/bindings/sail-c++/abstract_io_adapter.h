@@ -46,7 +46,7 @@ public:
     /*
      * Constructs a new I/O wrapper with the specified abstract I/O stream to wrap.
      */
-    explicit abstract_io_adapter(sail::abstract_io &abstract_io);
+    explicit abstract_io_adapter(sail::abstract_io& abstract_io);
 
     /*
      * Destroys the I/O wrapper.
@@ -63,4 +63,4 @@ private:
     const std::unique_ptr<pimpl> d;
 };
 
-}
+} // namespace sail

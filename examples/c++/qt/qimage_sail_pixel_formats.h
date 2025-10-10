@@ -29,16 +29,18 @@
 
 #include <sail-common/sail-common.h>
 
-inline SailPixelFormat qImageFormatToSailPixelFormat(QImage::Format format) {
-    switch (format) {
-        case QImage::Format_Mono:       return SAIL_PIXEL_FORMAT_BPP1_GRAYSCALE;
-        case QImage::Format_Grayscale8: return SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE;
-        case QImage::Format_Indexed8:   return SAIL_PIXEL_FORMAT_BPP8_INDEXED;
-        case QImage::Format_RGB888:     return SAIL_PIXEL_FORMAT_BPP24_RGB;
-        case QImage::Format_RGBX8888:   return SAIL_PIXEL_FORMAT_BPP32_RGBX;
-        case QImage::Format_RGBA8888:   return SAIL_PIXEL_FORMAT_BPP32_RGBA;
-        case QImage::Format_ARGB32:     return SAIL_PIXEL_FORMAT_BPP32_ARGB;
+inline SailPixelFormat qImageFormatToSailPixelFormat(QImage::Format format)
+{
+    switch (format)
+    {
+    case QImage::Format_Mono: return SAIL_PIXEL_FORMAT_BPP1_GRAYSCALE;
+    case QImage::Format_Grayscale8: return SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE;
+    case QImage::Format_Indexed8: return SAIL_PIXEL_FORMAT_BPP8_INDEXED;
+    case QImage::Format_RGB888: return SAIL_PIXEL_FORMAT_BPP24_RGB;
+    case QImage::Format_RGBX8888: return SAIL_PIXEL_FORMAT_BPP32_RGBX;
+    case QImage::Format_RGBA8888: return SAIL_PIXEL_FORMAT_BPP32_RGBA;
+    case QImage::Format_ARGB32: return SAIL_PIXEL_FORMAT_BPP32_ARGB;
 
-        default: return SAIL_PIXEL_FORMAT_UNKNOWN;
+    default: return SAIL_PIXEL_FORMAT_UNKNOWN;
     }
 }

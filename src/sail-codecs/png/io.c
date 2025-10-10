@@ -32,47 +32,56 @@
 
 #include "io.h"
 
-void png_private_my_read_fn(png_structp png_ptr, png_bytep bytes, png_size_t bytes_size) {
+void png_private_my_read_fn(png_structp png_ptr, png_bytep bytes, png_size_t bytes_size)
+{
 
-    if (png_ptr == NULL) {
+    if (png_ptr == NULL)
+    {
         return;
     }
 
-    struct sail_io *io = png_get_io_ptr(png_ptr);
+    struct sail_io* io = png_get_io_ptr(png_ptr);
 
     sail_status_t err = io->strict_read(io->stream, bytes, bytes_size);
 
-    if (err != SAIL_OK) {
+    if (err != SAIL_OK)
+    {
         png_error(png_ptr, "Failed to read from the I/O stream");
     }
 }
 
-void png_private_my_write_fn(png_structp png_ptr, png_bytep bytes, png_size_t bytes_size) {
+void png_private_my_write_fn(png_structp png_ptr, png_bytep bytes, png_size_t bytes_size)
+{
 
-    if (png_ptr == NULL) {
+    if (png_ptr == NULL)
+    {
         return;
     }
 
-    struct sail_io *io = png_get_io_ptr(png_ptr);
+    struct sail_io* io = png_get_io_ptr(png_ptr);
 
     sail_status_t err = io->strict_write(io->stream, bytes, bytes_size);
 
-    if (err != SAIL_OK) {
+    if (err != SAIL_OK)
+    {
         png_error(png_ptr, "Failed to write to the I/O stream");
     }
 }
 
-void png_private_my_flush_fn(png_structp png_ptr) {
+void png_private_my_flush_fn(png_structp png_ptr)
+{
 
-    if (png_ptr == NULL) {
+    if (png_ptr == NULL)
+    {
         return;
     }
 
-    struct sail_io *io = png_get_io_ptr(png_ptr);
+    struct sail_io* io = png_get_io_ptr(png_ptr);
 
     sail_status_t err = io->flush(io->stream);
 
-    if (err != SAIL_OK) {
+    if (err != SAIL_OK)
+    {
         png_error(png_ptr, "Failed to flush the I/O stream");
     }
 }

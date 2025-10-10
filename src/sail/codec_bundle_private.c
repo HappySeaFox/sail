@@ -25,11 +25,12 @@
 
 #include <sail/sail.h>
 
-sail_status_t alloc_codec_bundle(struct sail_codec_bundle **codec_bundle) {
+sail_status_t alloc_codec_bundle(struct sail_codec_bundle** codec_bundle)
+{
 
     SAIL_CHECK_PTR(codec_bundle);
 
-    void *ptr;
+    void* ptr;
     SAIL_TRY(sail_malloc(sizeof(struct sail_codec_bundle), &ptr));
     *codec_bundle = ptr;
 
@@ -39,9 +40,11 @@ sail_status_t alloc_codec_bundle(struct sail_codec_bundle **codec_bundle) {
     return SAIL_OK;
 }
 
-void destroy_codec_bundle(struct sail_codec_bundle *codec_bundle) {
+void destroy_codec_bundle(struct sail_codec_bundle* codec_bundle)
+{
 
-    if (codec_bundle == NULL) {
+    if (codec_bundle == NULL)
+    {
         return;
     }
 

@@ -30,4 +30,4 @@
 #include <sail-common/export.h>
 #include <sail-common/pixel.h>
 
-SAIL_HIDDEN void convert_ycck32_to_rgba32(uint8_t y, uint8_t cb, uint8_t cr, uint8_t k, sail_rgba32_t *rgba32);
+SAIL_HIDDEN void convert_ycck32_to_rgba32(uint8_t y, uint8_t cb, uint8_t cr, uint8_t k, sail_rgba32_t* rgba32);

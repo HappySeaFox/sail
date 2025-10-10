@@ -25,9 +25,10 @@
 
 #include <sail/sail.h>
 
-const struct sail_codec_bundle_node* sail_codec_bundle_list(void) {
+const struct sail_codec_bundle_node* sail_codec_bundle_list(void)
+{
 
-    struct sail_context *context;
+    struct sail_context* context;
     SAIL_TRY_OR_EXECUTE(fetch_global_context_guarded(&context),
                         /* on error */ return NULL);
 

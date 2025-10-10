@@ -35,4 +35,4 @@ namespace sail
  */
 using arbitrary_data = std::vector<std::uint8_t>;
 
-}
+} // namespace sail

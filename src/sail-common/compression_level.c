@@ -25,11 +25,12 @@
 
 #include "sail-common.h"
 
-sail_status_t sail_alloc_compression_level(struct sail_compression_level **compression_level) {
+sail_status_t sail_alloc_compression_level(struct sail_compression_level** compression_level)
+{
 
     SAIL_CHECK_PTR(compression_level);
 
-    void *ptr;
+    void* ptr;
     SAIL_TRY(sail_malloc(sizeof(struct sail_compression_level), &ptr));
     *compression_level = ptr;
 
@@ -41,9 +42,11 @@ sail_status_t sail_alloc_compression_level(struct sail_compression_level **compr
     return SAIL_OK;
 }
 
-void sail_destroy_compression_level(struct sail_compression_level *compression_level) {
+void sail_destroy_compression_level(struct sail_compression_level* compression_level)
+{
 
-    if (compression_level == NULL) {
+    if (compression_level == NULL)
+    {
         return;
     }
 

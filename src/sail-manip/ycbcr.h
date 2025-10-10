@@ -30,6 +30,6 @@
 #include <sail-common/export.h>
 #include <sail-common/pixel.h>
 
-SAIL_HIDDEN void convert_ycbcr24_to_rgba32(uint8_t y, uint8_t cb, uint8_t cr, sail_rgba32_t *rgba32);
+SAIL_HIDDEN void convert_ycbcr24_to_rgba32(uint8_t y, uint8_t cb, uint8_t cr, sail_rgba32_t* rgba32);
 
-SAIL_HIDDEN void convert_rgba32_to_ycbcr24(const sail_rgba32_t *rgba32, uint8_t *y, uint8_t *cb, uint8_t *cr);
+SAIL_HIDDEN void convert_rgba32_to_ycbcr24(const sail_rgba32_t* rgba32, uint8_t* y, uint8_t* cb, uint8_t* cr);

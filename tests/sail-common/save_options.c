@@ -52,8 +52,8 @@ static MunitResult test_copy_options(const MunitParameter params[], void* user_d
     struct sail_save_options* save_options = NULL;
     munit_assert(sail_alloc_save_options(&save_options) == SAIL_OK);
 
-    save_options->options = SAIL_OPTION_ICCP;
-    save_options->compression = SAIL_COMPRESSION_JPEG;
+    save_options->options           = SAIL_OPTION_ICCP;
+    save_options->compression       = SAIL_COMPRESSION_JPEG;
     save_options->compression_level = 55;
 
     struct sail_save_options* save_options_copy = NULL;
@@ -82,11 +82,11 @@ static MunitResult test_options_from_features(const MunitParameter params[], voi
     munit_assert(sail_alloc_save_features(&save_features) == SAIL_OK);
     munit_assert(sail_alloc_compression_level(&save_features->compression_level) == SAIL_OK);
 
-    save_features->default_compression = SAIL_COMPRESSION_JPEG;
-    save_features->compression_level->min_level = 1;
-    save_features->compression_level->max_level = 100;
+    save_features->default_compression              = SAIL_COMPRESSION_JPEG;
+    save_features->compression_level->min_level     = 1;
+    save_features->compression_level->max_level     = 100;
     save_features->compression_level->default_level = 81;
-    save_features->compression_level->step = 1;
+    save_features->compression_level->step          = 1;
     save_features->features = SAIL_CODEC_FEATURE_META_DATA | SAIL_CODEC_FEATURE_INTERLACED | SAIL_CODEC_FEATURE_ICCP
                               | SAIL_CODEC_FEATURE_SOURCE_IMAGE;
     munit_assert(sail_alloc_save_options_from_features(save_features, &save_options) == SAIL_OK);

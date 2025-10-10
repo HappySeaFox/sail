@@ -35,13 +35,15 @@
 
 #include "helpers.h"
 
-bool jbig_private_is_jbig(const void *data, size_t size) {
+bool jbig_private_is_jbig(const void* data, size_t size)
+{
 
-    if (data == NULL || size < JBIG_MAGIC_SIZE) {
+    if (data == NULL || size < JBIG_MAGIC_SIZE)
+    {
         return false;
     }
 
-    const unsigned char *bytes = data;
+    const unsigned char* bytes = data;
 
     /* Check for JBIG BIH (BIE Header) marker.
      * JBIG files start with a specific header structure.
@@ -57,33 +59,35 @@ bool jbig_private_is_jbig(const void *data, size_t size) {
      */
 
     /* Check if DL <= D (bytes 0 and 1). */
-    if (bytes[0] > bytes[1]) {
+    if (bytes[0] > bytes[1])
+    {
         return false;
     }
 
     /* Check if the number of planes is reasonable (byte 2, should be 1-255). */
-    if (bytes[2] == 0) {
+    if (bytes[2] == 0)
+    {
         return false;
     }
 
     return true;
 }
 
-sail_status_t jbig_private_read_header(struct sail_io *io,
-                                         unsigned long *width,
-                                         unsigned long *height,
-                                         int *planes) {
+sail_status_t jbig_private_read_header(struct sail_io* io, unsigned long* width, unsigned long* height, int* planes)
+{
 
     unsigned char header[JBIG_MAGIC_SIZE];
     size_t bytes_read;
 
     SAIL_TRY(io->tolerant_read(io->stream, header, sizeof(header), &bytes_read));
 
-    if (bytes_read != sizeof(header)) {
+    if (bytes_read != sizeof(header))
+    {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
     }
 
-    if (!jbig_private_is_jbig(header, sizeof(header))) {
+    if (!jbig_private_is_jbig(header, sizeof(header)))
+    {
         SAIL_LOG_ERROR("JBIG: Invalid header");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
     }
@@ -94,10 +98,11 @@ sail_status_t jbig_private_read_header(struct sail_io *io,
     uint32_t width32, height32;
     memcpy(&width32, header + 4, sizeof(uint32_t));
     memcpy(&height32, header + 8, sizeof(uint32_t));
-    *width = sail_reverse_uint32(width32);
+    *width  = sail_reverse_uint32(width32);
     *height = sail_reverse_uint32(height32);
 
-    if (*width == 0 || *height == 0) {
+    if (*width == 0 || *height == 0)
+    {
         SAIL_LOG_ERROR("JBIG: Invalid image dimensions %lux%lu", *width, *height);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
     }

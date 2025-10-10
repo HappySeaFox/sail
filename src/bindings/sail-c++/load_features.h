@@ -52,22 +52,22 @@ public:
     /*
      * Copies the load features.
      */
-    load_features(const load_features &rf);
+    load_features(const load_features& rf);
 
     /*
      * Copies the load features.
      */
-    load_features& operator=(const sail::load_features &load_features);
+    load_features& operator=(const sail::load_features& load_features);
 
     /*
      * Moves the load features.
      */
-    load_features(sail::load_features &&load_features) noexcept;
+    load_features(sail::load_features&& load_features) noexcept;
 
     /*
      * Moves the load features.
      */
-    load_features& operator=(sail::load_features &&load_features) noexcept;
+    load_features& operator=(sail::load_features&& load_features) noexcept;
 
     /*
      * Destroys the load features.
@@ -99,7 +99,7 @@ public:
      *
      * Returns SAIL_OK on success.
      */
-    sail_status_t to_options(sail::load_options *load_options) const;
+    sail_status_t to_options(sail::load_options* load_options) const;
 
 private:
     load_features();
@@ -108,7 +108,7 @@ private:
      * Makes a deep copy of the specified load features and stores the pointer for further use.
      * When the SAIL context gets uninitialized, the pointer becomes dangling.
      */
-    explicit load_features(const sail_load_features *rf);
+    explicit load_features(const sail_load_features* rf);
 
     const sail_load_features* sail_load_features_c() const;
 
@@ -117,4 +117,4 @@ private:
     std::unique_ptr<pimpl> d;
 };
 
-}
+} // namespace sail

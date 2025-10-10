@@ -43,16 +43,16 @@
 #include <sail/sail_technical_diver.h>
 
 #ifdef SAIL_BUILD
-    #include <sail/codec.h>
-    #include <sail/codec_bundle_node_private.h>
-    #include <sail/codec_bundle_private.h>
-    #include <sail/codec_info_private.h>
-    #include <sail/codec_layout.h>
-    #include <sail/context_private.h>
-    #include <sail/ini.h>
-    #include <sail/sail_private.h>
-    #include <sail/sail_technical_diver_private.h>
-    #ifdef SAIL_THREAD_SAFE
-        #include <sail/threading.h>
-    #endif
+#include <sail/codec.h>
+#include <sail/codec_bundle_node_private.h>
+#include <sail/codec_bundle_private.h>
+#include <sail/codec_info_private.h>
+#include <sail/codec_layout.h>
+#include <sail/context_private.h>
+#include <sail/ini.h>
+#include <sail/sail_private.h>
+#include <sail/sail_technical_diver_private.h>
+#ifdef SAIL_THREAD_SAFE
+#include <sail/threading.h>
+#endif
 #endif

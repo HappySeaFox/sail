@@ -45,22 +45,22 @@ public:
     /*
      * Copies the compression level.
      */
-    compression_level(const sail::compression_level &cl);
+    compression_level(const sail::compression_level& cl);
 
     /*
      * Copies the compression level.
      */
-    compression_level& operator=(const sail::compression_level &compression_level);
+    compression_level& operator=(const sail::compression_level& compression_level);
 
     /*
      * Moves the compression level.
      */
-    compression_level(sail::compression_level &&compression_level) noexcept;
+    compression_level(sail::compression_level&& compression_level) noexcept;
 
     /*
      * Moves the compression level.
      */
-    compression_level& operator=(sail::compression_level &&compression_level) noexcept;
+    compression_level& operator=(sail::compression_level&& compression_level) noexcept;
 
     /*
      * Destroys the compression level.
@@ -103,11 +103,11 @@ private:
     /*
      * Makes a deep copy of the specified compression level.
      */
-    explicit compression_level(const sail_compression_level *compression_level);
+    explicit compression_level(const sail_compression_level* compression_level);
 
 private:
     class pimpl;
     std::unique_ptr<pimpl> d;
 };
 
-}
+} // namespace sail

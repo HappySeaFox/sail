@@ -41,7 +41,7 @@
  */
 static void init_source(j_decompress_ptr cinfo)
 {
-    struct sail_jpeg_source_mgr *src = (struct sail_jpeg_source_mgr *)cinfo->src;
+    struct sail_jpeg_source_mgr* src = (struct sail_jpeg_source_mgr*)cinfo->src;
 
     /* We reset the empty-input-file flag for each image,
      * but we don't clear the input buffer.
@@ -84,25 +84,26 @@ static void init_source(j_decompress_ptr cinfo)
  */
 static boolean fill_input_buffer(j_decompress_ptr cinfo)
 {
-    struct sail_jpeg_source_mgr *src = (struct sail_jpeg_source_mgr *)cinfo->src;
+    struct sail_jpeg_source_mgr* src = (struct sail_jpeg_source_mgr*)cinfo->src;
     size_t nbytes;
 
     sail_status_t err = src->io->tolerant_read(src->io->stream, src->buffer, INPUT_BUF_SIZE, &nbytes);
 
-    if (err != SAIL_OK || nbytes == 0) {
-        if (src->start_of_file)     /* Treat empty input file as fatal error */
+    if (err != SAIL_OK || nbytes == 0)
+    {
+        if (src->start_of_file) /* Treat empty input file as fatal error */
             ERREXIT(cinfo, JERR_INPUT_EMPTY);
 
         WARNMS(cinfo, JWRN_JPEG_EOF);
         /* Insert a fake EOI marker */
         src->buffer[0] = (JOCTET)0xFF;
         src->buffer[1] = (JOCTET)JPEG_EOI;
-        nbytes = 2;
+        nbytes         = 2;
     }
 
     src->pub.next_input_byte = src->buffer;
     src->pub.bytes_in_buffer = nbytes;
-    src->start_of_file = FALSE;
+    src->start_of_file       = FALSE;
 
     return TRUE;
 }
@@ -120,19 +121,21 @@ static boolean fill_input_buffer(j_decompress_ptr cinfo)
  */
 static void skip_input_data(j_decompress_ptr cinfo, long num_bytes)
 {
-    struct jpeg_source_mgr *src = cinfo->src;
+    struct jpeg_source_mgr* src = cinfo->src;
 
     /* Just a dumb implementation for now.  Could use fseek() except
      * it doesn't work on pipes. Not clear that being smart is worth
      * any trouble anyway --- large skips are infrequent.
      */
-    if (num_bytes > 0) {
-        while (num_bytes > (long)src->bytes_in_buffer) {
+    if (num_bytes > 0)
+    {
+        while (num_bytes > (long)src->bytes_in_buffer)
+        {
             num_bytes -= (long)src->bytes_in_buffer;
-            (void)(*src->fill_input_buffer) (cinfo);
+            (void)(*src->fill_input_buffer)(cinfo);
             /* note we assume that fill_input_buffer will never return FALSE,
              * so suspension need not be handled.
-            */
+             */
         }
 
         src->next_input_byte += (size_t)num_bytes;
@@ -167,24 +170,25 @@ static void term_source(j_decompress_ptr cinfo)
  * The caller must have already opened the stream, and is responsible
  * for closing it after finishing decompression.
  */
-void jpeg_private_sail_io_src(j_decompress_ptr cinfo, struct sail_io *io) {
+void jpeg_private_sail_io_src(j_decompress_ptr cinfo, struct sail_io* io)
+{
 
-    struct sail_jpeg_source_mgr *src;
+    struct sail_jpeg_source_mgr* src;
 
     /* The source object and input buffer are made permanent so that a series
      * of JPEG images can be read from the same file by calling jpeg_stdio_src
      * only before the first one.  (If we discarded the buffer at the end of
      * one image, we'd likely lose the start of the next one.)
      */
-    if (cinfo->src == NULL) {     /* first time for this JPEG object? */
-        cinfo->src = cinfo->mem->alloc_small((j_common_ptr)cinfo,
-                                                JPOOL_PERMANENT,
-                                                sizeof(struct sail_jpeg_source_mgr));
-        src = (struct sail_jpeg_source_mgr *)cinfo->src;
-        src->buffer = (JOCTET *)(*cinfo->mem->alloc_small)((j_common_ptr)cinfo,
-                                                                            JPOOL_PERMANENT,
-                                                                            INPUT_BUF_SIZE * sizeof(JOCTET));
-    } else if (cinfo->src->init_source != init_source) {
+    if (cinfo->src == NULL)
+    { /* first time for this JPEG object? */
+        cinfo->src = cinfo->mem->alloc_small((j_common_ptr)cinfo, JPOOL_PERMANENT, sizeof(struct sail_jpeg_source_mgr));
+        src        = (struct sail_jpeg_source_mgr*)cinfo->src;
+        src->buffer =
+            (JOCTET*)(*cinfo->mem->alloc_small)((j_common_ptr)cinfo, JPOOL_PERMANENT, INPUT_BUF_SIZE * sizeof(JOCTET));
+    }
+    else if (cinfo->src->init_source != init_source)
+    {
         /* It is unsafe to reuse the existing source manager unless it was created
          * by this function.  Otherwise, there is no guarantee that the opaque
          * structure is the right size.  Note that we could just create a new
@@ -194,7 +198,7 @@ void jpeg_private_sail_io_src(j_decompress_ptr cinfo, struct sail_io *io) {
         ERREXIT(cinfo, JERR_BUFFER_SIZE);
     }
 
-    src = (struct sail_jpeg_source_mgr *)cinfo->src;
+    src = (struct sail_jpeg_source_mgr*)cinfo->src;
 
     src->pub.init_source       = init_source;
     src->pub.fill_input_buffer = fill_input_buffer;

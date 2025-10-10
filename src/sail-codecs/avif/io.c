@@ -29,38 +29,44 @@
 
 #include "io.h"
 
-avifResult avif_private_read_proc(struct avifIO *io, uint32_t read_flags, uint64_t offset, size_t size, avifROData *out) {
+avifResult avif_private_read_proc(struct avifIO* io, uint32_t read_flags, uint64_t offset, size_t size, avifROData* out)
+{
 
-    if (read_flags != 0) {
+    if (read_flags != 0)
+    {
         SAIL_LOG_ERROR("AVIF: Read flags must be #0, but got #%u", read_flags);
         return AVIF_RESULT_IO_ERROR;
     }
 
-    struct sail_avif_context *avif_context = io->data;
+    struct sail_avif_context* avif_context = io->data;
     SAIL_TRY_OR_EXECUTE(avif_context->io->seek(avif_context->io->stream, (long)offset, SEEK_SET),
                         /* on error */ return AVIF_RESULT_IO_ERROR);
 
     /* Realloc internal buffer if necessary. */
-    if (size > avif_context->buffer_size) {
+    if (size > avif_context->buffer_size)
+    {
         SAIL_TRY_OR_EXECUTE(sail_realloc(size, &avif_context->buffer),
                             /* on error */ return AVIF_RESULT_IO_ERROR);
         avif_context->buffer_size = size;
     }
 
     size_t size_read;
-    SAIL_TRY_OR_EXECUTE(avif_context->io->tolerant_read(avif_context->io->stream, avif_context->buffer, size, &size_read),
-                        /* on error */ return AVIF_RESULT_IO_ERROR);
+    SAIL_TRY_OR_EXECUTE(
+        avif_context->io->tolerant_read(avif_context->io->stream, avif_context->buffer, size, &size_read),
+        /* on error */ return AVIF_RESULT_IO_ERROR);
     out->data = avif_context->buffer;
     out->size = size_read;
 
     return AVIF_RESULT_OK;
 }
 
-avifResult avif_private_write_proc(struct avifIO *io, uint32_t write_flags, uint64_t offset, const uint8_t *data, size_t size) {
+avifResult avif_private_write_proc(
+    struct avifIO* io, uint32_t write_flags, uint64_t offset, const uint8_t* data, size_t size)
+{
 
     (void)write_flags;
 
-    struct sail_avif_context *avif_context = io->data;
+    struct sail_avif_context* avif_context = io->data;
 
     SAIL_TRY_OR_EXECUTE(avif_context->io->seek(avif_context->io->stream, (long)offset, SEEK_SET),
                         /* on error */ return AVIF_RESULT_IO_ERROR);

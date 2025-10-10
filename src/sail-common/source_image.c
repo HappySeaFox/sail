@@ -27,11 +27,12 @@
 
 #include "sail-common.h"
 
-sail_status_t sail_alloc_source_image(struct sail_source_image **source_image) {
+sail_status_t sail_alloc_source_image(struct sail_source_image** source_image)
+{
 
     SAIL_CHECK_PTR(source_image);
 
-    void *ptr;
+    void* ptr;
     SAIL_TRY(sail_malloc(sizeof(struct sail_source_image), &ptr));
     *source_image = ptr;
 
@@ -44,21 +45,24 @@ sail_status_t sail_alloc_source_image(struct sail_source_image **source_image) {
     return SAIL_OK;
 }
 
-void sail_destroy_source_image(struct sail_source_image *source_image) {
+void sail_destroy_source_image(struct sail_source_image* source_image)
+{
 
-    if (source_image == NULL) {
+    if (source_image == NULL)
+    {
         return;
     }
 
     sail_free(source_image);
 }
 
-sail_status_t sail_copy_source_image(const struct sail_source_image *source, struct sail_source_image **target) {
+sail_status_t sail_copy_source_image(const struct sail_source_image* source, struct sail_source_image** target)
+{
 
     SAIL_CHECK_PTR(source);
     SAIL_CHECK_PTR(target);
 
-    struct sail_source_image *target_local;
+    struct sail_source_image* target_local;
     SAIL_TRY(sail_alloc_source_image(&target_local));
 
     target_local->pixel_format       = source->pixel_format;
