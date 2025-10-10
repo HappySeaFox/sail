@@ -35,9 +35,6 @@
 
 #include "helpers.h"
 
-/* JBIG BIH (BIE Header) marker. */
-static const size_t JBIG_MAGIC_SIZE = 20;
-
 bool jbig_private_is_jbig(const void *data, size_t size) {
 
     if (data == NULL || size < JBIG_MAGIC_SIZE) {
