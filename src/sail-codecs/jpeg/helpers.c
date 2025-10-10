@@ -235,6 +235,8 @@ bool jpeg_private_tuning_key_value_callback(const char *key, const struct sail_v
                 SAIL_LOG_TRACE("JPEG: Applying FLOAT DCT method");
                 compress_context->dct_method = JDCT_FLOAT;
             }
+        } else {
+            SAIL_LOG_ERROR("JPEG: 'jpeg-dct-method' must be a string");
         }
     } else if (strcmp(key, "jpeg-optimize-coding") == 0) {
         if (value->type == SAIL_VARIANT_TYPE_BOOL) {
@@ -244,11 +246,20 @@ bool jpeg_private_tuning_key_value_callback(const char *key, const struct sail_v
                 SAIL_LOG_TRACE("JPEG: Optimizing coding");
                 compress_context->optimize_coding = optimize_coding;
             }
+        } else {
+            SAIL_LOG_ERROR("JPEG: 'jpeg-optimize-coding' must be a bool");
         }
     } else if (strcmp(key, "jpeg-smoothing-factor") == 0) {
-        if (value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT) {
-            SAIL_LOG_TRACE("JPEG: Smoothing the image");
-            compress_context->smoothing_factor = sail_variant_to_unsigned_int(value);
+        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT) {
+            int smoothing_factor = (value->type == SAIL_VARIANT_TYPE_INT)
+                                    ? sail_variant_to_int(value)
+                                    : (int)sail_variant_to_unsigned_int(value);
+            if (smoothing_factor >= 0 && smoothing_factor <= 100) {
+                compress_context->smoothing_factor = smoothing_factor;
+                SAIL_LOG_TRACE("JPEG: Smoothing the image with factor %d", smoothing_factor);
+            }
+        } else {
+            SAIL_LOG_ERROR("JPEG: 'jpeg-smoothing-factor' must be an integer");
         }
     }
 
