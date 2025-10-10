@@ -274,25 +274,35 @@ bool avif_private_tuning_key_value_callback(const char *key, const struct sail_v
     struct avifEncoder *encoder = user_data;
 
     if (strcmp(key, "avif-speed") == 0) {
-        if (value->type == SAIL_VARIANT_TYPE_INT) {
-            int speed = sail_variant_to_int(value);
+        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT) {
+            int speed = (value->type == SAIL_VARIANT_TYPE_INT)
+                         ? sail_variant_to_int(value)
+                         : (int)sail_variant_to_unsigned_int(value);
             if (speed >= 0 && speed <= 10) {
                 encoder->speed = speed;
                 SAIL_LOG_TRACE("AVIF: Set speed to %d", speed);
             }
+        } else {
+            SAIL_LOG_ERROR("AVIF: 'avif-speed' must be an integer");
         }
     } else if (strcmp(key, "avif-threads") == 0) {
-        if (value->type == SAIL_VARIANT_TYPE_INT) {
-            int threads = sail_variant_to_int(value);
+        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT) {
+            int threads = (value->type == SAIL_VARIANT_TYPE_INT)
+                           ? sail_variant_to_int(value)
+                           : (int)sail_variant_to_unsigned_int(value);
             if (threads > 0) {
                 encoder->maxThreads = threads;
                 SAIL_LOG_TRACE("AVIF: Set max threads to %d", threads);
             }
+        } else {
+            SAIL_LOG_ERROR("AVIF: 'avif-threads' must be an integer");
         }
     } else if (strcmp(key, "avif-auto-tiling") == 0) {
         if (value->type == SAIL_VARIANT_TYPE_BOOL) {
             encoder->autoTiling = sail_variant_to_bool(value) ? AVIF_TRUE : AVIF_FALSE;
             SAIL_LOG_TRACE("AVIF: Set auto tiling to %s", sail_variant_to_bool(value) ? "true" : "false");
+        } else {
+            SAIL_LOG_ERROR("AVIF: 'avif-auto-tiling' must be a bool");
         }
     }
 
@@ -304,12 +314,16 @@ bool avif_private_load_tuning_key_value_callback(const char *key, const struct s
     struct avifDecoder *decoder = user_data;
 
     if (strcmp(key, "avif-threads") == 0) {
-        if (value->type == SAIL_VARIANT_TYPE_INT) {
-            int threads = sail_variant_to_int(value);
+        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT) {
+            int threads = (value->type == SAIL_VARIANT_TYPE_INT)
+                           ? sail_variant_to_int(value)
+                           : (int)sail_variant_to_unsigned_int(value);
             if (threads > 0) {
                 decoder->maxThreads = threads;
                 SAIL_LOG_TRACE("AVIF: Set decoder max threads to %d", threads);
             }
+        } else {
+            SAIL_LOG_ERROR("AVIF: 'avif-threads' must be an integer");
         }
     }
 
