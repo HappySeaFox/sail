@@ -162,6 +162,32 @@
 </tr>
 <tr>
     <td>6</td>
+    <td><a href="https://en.wikipedia.org/wiki/JBIG">JBIG</a></td>
+    <td>
+        <b>Indexed:</b> 1-bit.
+        <br/><br/>
+        <b>Compressions:</b> JBIG.
+        <br/><br/>
+        <b>Content:</b> Static.
+    </td>
+    <td>Multi-plane images.</td>
+    <td>
+        <b>Indexed:</b> 1-bit.
+        <br/><br/>
+        <b>Compressions:</b> JBIG.
+        <br/><br/>
+        <b>Content:</b> Static.
+        <br/><br/>
+        <b>Tuning:</b> Key: <i>"jbig-stripe-height"</i>. Description: Number of lines per stripe for progressive encoding.
+        Possible values: unsigned int (default: 0 = automatic).
+        <br/>Key: <i>"jbig-typical-prediction"</i>. Description: Enable Typical Prediction for better compression.
+        Possible values: 0 (disabled) or 1 (enabled).
+    </td>
+    <td>Multi-plane images.</td>
+    <td>libjbig</td>
+</tr>
+<tr>
+    <td>7</td>
     <td><a href="https://wikipedia.org/wiki/JPEG">JPEG</a></td>
     <td>
         <b>Grayscale:</b> 8-bit.
@@ -204,7 +230,7 @@
     <td>libjpeg or libjpeg-turbo</td>
 </tr>
 <tr>
-    <td>7</td>
+    <td>8</td>
     <td><a href="https://wikipedia.org/wiki/JPEG_2000">JPEG 2000</a></td>
     <td>
         <b>Grayscale:</b> 8-bit, 16-bit.
@@ -259,7 +285,7 @@
     <td>openjpeg</td>
 </tr>
 <tr>
-    <td>8</td>
+    <td>9</td>
     <td><a href="https://wikipedia.org/wiki/JPEG_XL">JPEG XL</a></td>
     <td>
         <b>Grayscale:</b> 8-bit, 16-bit.
@@ -318,7 +344,7 @@
     <td>libjxl</td>
 </tr>
 <tr>
-    <td>9</td>
+    <td>10</td>
     <td><a href="https://wikipedia.org/wiki/PCX">PCX</a></td>
     <td>
         <b>Indexed:</b> 1-bit, 4-bit, 8-bit.
@@ -343,7 +369,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>10</td>
+    <td>11</td>
     <td><a href="https://wikipedia.org/wiki/Portable_Network_Graphics">PNG</a></td>
     <td>
         <b>Grayscale:</b> 1-bit, 2-bit, 4-bit, 8-bit, 16-bit.
@@ -371,7 +397,7 @@
     <td>libpng</td>
 </tr>
 <tr>
-    <td>11</td>
+    <td>12</td>
     <td><a href="https://wikipedia.org/wiki/Portable_anymap">PNM</a></td>
     <td>
         <b>Indexed:</b> 1-bit.
@@ -402,7 +428,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>12</td>
+    <td>13</td>
     <td><a href="https://en.wikipedia.org/wiki/Adobe_Photoshop#File_format">PSD</a></td>
     <td>
         <b>Grayscale:</b> 8-bit, 16-bit.
@@ -433,7 +459,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>13</td>
+    <td>14</td>
     <td><a href="http://qoiformat.org">QOI</a></td>
     <td>
         <b>RGB:</b> 24-bit.
@@ -452,7 +478,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>14</td>
+    <td>15</td>
     <td><a href="https://wikipedia.org/wiki/Scalable_Vector_Graphics">SVG</a></td>
     <td>
         <b>Bit depth:</b> 32-bit.
@@ -471,7 +497,7 @@
     <td>resvg or nanosvg</td>
 </tr>
 <tr>
-    <td>15</td>
+    <td>16</td>
     <td><a href="https://wikipedia.org/wiki/Truevision_TGA">TGA</a></td>
     <td>
         <b>Grayscale:</b> 8-bit.
@@ -502,7 +528,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>16</td>
+    <td>17</td>
     <td><a href="https://wikipedia.org/wiki/TIFF">TIFF</a></td>
     <td>
         <b>Bit depth:</b> 1-bit, 2-bit, 4-bit, 8-bit, 16-bit, 24-bit, 32-bit, 40-bit, 48-bit, 64-bit, 80-bit.
@@ -546,7 +572,7 @@
     <td>libtiff</td>
 </tr>
 <tr>
-    <td>17</td>
+    <td>18</td>
     <td><a href="http://fileformats.archiveteam.org/wiki/Quake_2_Texture">WAL</a></td>
     <td>
         <b>Indexed:</b> 8-bit.
@@ -565,7 +591,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>18</td>
+    <td>19</td>
     <td><a href="https://wikipedia.org/wiki/WebP">WEBP</a></td>
     <td>
         <b>RGBA:</b> 32-bit.
@@ -640,7 +666,7 @@
     <td>libwebp</td>
 </tr>
 <tr>
-    <td>19</td>
+    <td>20</td>
     <td><a href="https://en.wikipedia.org/wiki/X_BitMap">XBM</a></td>
     <td>
         <b>Indexed:</b> 1-bit.
@@ -666,7 +692,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>20</td>
+    <td>21</td>
     <td><a href="https://en.wikipedia.org/wiki/X_PixMap">XPM</a></td>
     <td>
         <b>Indexed:</b> 1-bit, 2-bit, 4-bit, 8-bit.
@@ -693,7 +719,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>21</td>
+    <td>22</td>
     <td><a href="https://en.wikipedia.org/wiki/Xwd">XWD</a></td>
     <td>
         <b>Indexed:</b> 1-bit, 2-bit, 4-bit, 8-bit.

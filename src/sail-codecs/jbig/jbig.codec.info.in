@@ -1,0 +1,27 @@
+# JBIG codec information
+#
+[codec]
+layout=8
+version=0.4.0
+priority=LOW
+name=JBIG
+description=Joint Bi-level Image Group
+magic-numbers=00 00 01 00 00 00 00
+extensions=jbig;jbg;bie
+mime-types=image/jbig;image/x-jbig
+
+[load-features]
+features=STATIC;SOURCE-IMAGE
+tuning=
+
+[save-features]
+features=STATIC
+pixel-formats=BPP1
+compressions=JBIG
+default-compression=JBIG
+compression-level-min=0
+compression-level-max=0
+compression-level-default=0
+compression-level-step=0
+tuning=jbig-stripe-height;jbig-typical-prediction
+
