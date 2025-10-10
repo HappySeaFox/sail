@@ -2,7 +2,7 @@
 #
 [codec]
 layout=8
-version=0.7.0
+version=0.8.0
 priority=LOWEST
 name=XBM
 description=X BitMap
@@ -15,12 +15,12 @@ features=STATIC;SOURCE-IMAGE
 tuning=
 
 [save-features]
-features=
-pixel-formats=
-compressions=
-default-compression=
+features=STATIC
+pixel-formats=BPP1-INDEXED
+compressions=NONE
+default-compression=NONE
 compression-level-min=0
 compression-level-max=0
 compression-level-default=0
 compression-level-step=0
-tuning=
+tuning=xbm-version;xbm-name

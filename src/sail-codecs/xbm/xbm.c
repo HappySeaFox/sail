@@ -34,15 +34,10 @@
 
 static const unsigned char SAIL_XBM_MONO_PALETTE[] = { 255, 255, 255, 0, 0, 0 };
 
-enum SailXbmVersion {
-    SAIL_XBM_VERSION_10 = 10,
-    SAIL_XBM_VERSION_11 = 11,
-};
-
 /*
  * Codec-specific state.
  */
-struct xbm_state {
+struct xbm_codec_state {
     struct sail_io *io;
     const struct sail_load_options *load_options;
     const struct sail_save_options *save_options;
@@ -50,35 +45,40 @@ struct xbm_state {
     bool frame_loaded;
 
     enum SailXbmVersion version;
+    struct xbm_state tuning_state;
 };
 
-static sail_status_t alloc_xbm_state(struct sail_io *io,
+static sail_status_t alloc_xbm_codec_state(struct sail_io *io,
                                         const struct sail_load_options *load_options,
                                         const struct sail_save_options *save_options,
-                                        struct xbm_state **xbm_state) {
+                                        struct xbm_codec_state **xbm_codec_state) {
 
     void *ptr;
-    SAIL_TRY(sail_malloc(sizeof(struct xbm_state), &ptr));
-    *xbm_state = ptr;
+    SAIL_TRY(sail_malloc(sizeof(struct xbm_codec_state), &ptr));
+    *xbm_codec_state = ptr;
 
-    **xbm_state = (struct xbm_state) {
+    **xbm_codec_state = (struct xbm_codec_state) {
         .io           = io,
         .load_options = load_options,
         .save_options = save_options,
 
         .frame_loaded = false,
+        .version      = SAIL_XBM_VERSION_11,
     };
+
+    (*xbm_codec_state)->tuning_state.version = SAIL_XBM_VERSION_11;
+    (*xbm_codec_state)->tuning_state.var_name[0] = '\0';
 
     return SAIL_OK;
 }
 
-static void destroy_xbm_state(struct xbm_state *xbm_state) {
+static void destroy_xbm_codec_state(struct xbm_codec_state *xbm_codec_state) {
 
-    if (xbm_state == NULL) {
+    if (xbm_codec_state == NULL) {
         return;
     }
 
-    sail_free(xbm_state);
+    sail_free(xbm_codec_state);
 }
 
 /*
@@ -90,16 +90,16 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_xbm(struct sail_io *io, const 
     *state = NULL;
 
     /* Allocate a new state. */
-    struct xbm_state *xbm_state;
-    SAIL_TRY(alloc_xbm_state(io, load_options, NULL, &xbm_state));
-    *state = xbm_state;
+    struct xbm_codec_state *xbm_codec_state;
+    SAIL_TRY(alloc_xbm_codec_state(io, load_options, NULL, &xbm_codec_state));
+    *state = xbm_codec_state;
 
     return SAIL_OK;
 }
 
 SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_xbm(void *state, struct sail_image **image) {
 
-    struct xbm_state *xbm_state = state;
+    struct xbm_codec_state *xbm_state = state;
 
     if (xbm_state->frame_loaded) {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
@@ -187,11 +187,11 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_xbm(void *state, st
 
 SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_xbm(void *state, struct sail_image *image) {
 
-    const struct xbm_state *xbm_state = state;
+    const struct xbm_codec_state *xbm_codec_state = state;
 
     unsigned literals_to_read;
 
-    if (SAIL_LIKELY(xbm_state->version == SAIL_XBM_VERSION_11)) {
+    if (SAIL_LIKELY(xbm_codec_state->version == SAIL_XBM_VERSION_11)) {
         literals_to_read = ((image->width + 7) / 8) * image->height;
     } else {
         literals_to_read = (((image->width + 7) / 8 + 1) / 2) * image->height;
@@ -203,7 +203,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_xbm(void *state, struct sail_
     unsigned char *pixels = image->pixels;
 
     for (unsigned literals_read = 0; literals_read < literals_to_read; ) {
-        SAIL_TRY(sail_read_string_from_io(xbm_state->io, buf, sizeof(buf)));
+        SAIL_TRY(sail_read_string_from_io(xbm_codec_state->io, buf, sizeof(buf)));
 
         unsigned buf_offset = 0;
         unsigned holder;
@@ -216,7 +216,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_xbm(void *state, struct sail_
         while (sscanf(buf + buf_offset, "%x %c %n", &holder, &comma, &bytes_consumed) == 2) {
     #endif
 
-            if (SAIL_LIKELY(xbm_state->version == SAIL_XBM_VERSION_11)) {
+            if (SAIL_LIKELY(xbm_codec_state->version == SAIL_XBM_VERSION_11)) {
                 *pixels++ = xbm_private_reverse_byte((unsigned char)holder);
             } else {
                 *pixels++ = xbm_private_reverse_byte((unsigned char)(holder & 0xff));
@@ -233,11 +233,11 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_xbm(void *state, struct sail_
 
 SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_xbm(void **state) {
 
-    struct xbm_state *xbm_state = *state;
+    struct xbm_codec_state *xbm_codec_state = *state;
 
     *state = NULL;
 
-    destroy_xbm_state(xbm_state);
+    destroy_xbm_codec_state(xbm_codec_state);
 
     return SAIL_OK;
 }
@@ -248,32 +248,79 @@ SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_xbm(void **state) {
 
 SAIL_EXPORT sail_status_t sail_codec_save_init_v8_xbm(struct sail_io *io, const struct sail_save_options *save_options, void **state) {
 
-    (void)io;
-    (void)save_options;
-    (void)state;
+    SAIL_CHECK_PTR(io);
+    SAIL_CHECK_PTR(state);
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
+    *state = NULL;
+
+    /* Allocate a new state. */
+    struct xbm_codec_state *xbm_codec_state;
+    SAIL_TRY(alloc_xbm_codec_state(io, NULL, save_options, &xbm_codec_state));
+    *state = xbm_codec_state;
+
+    return SAIL_OK;
 }
 
 SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_xbm(void *state, const struct sail_image *image) {
 
-    (void)state;
-    (void)image;
+    SAIL_CHECK_PTR(state);
+    SAIL_CHECK_PTR(image);
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
+    struct xbm_codec_state *xbm_codec_state = state;
+
+    if (xbm_codec_state->frame_loaded) {
+        SAIL_LOG_ERROR("XBM: Only single frame is supported for saving");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+    }
+
+    /* XBM only supports 1-bit indexed format. */
+    if (image->pixel_format != SAIL_PIXEL_FORMAT_BPP1_INDEXED) {
+        SAIL_LOG_ERROR("XBM: Only BPP1-INDEXED pixel format is supported for saving, got %s",
+                      sail_pixel_format_to_string(image->pixel_format));
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+    }
+
+    /* Process tuning options. */
+    if (xbm_codec_state->save_options->tuning != NULL) {
+        sail_traverse_hash_map_with_user_data(xbm_codec_state->save_options->tuning,
+                                              xbm_private_tuning_key_value_callback,
+                                              &xbm_codec_state->tuning_state);
+    }
+
+    /* Copy tuning results to codec state. */
+    xbm_codec_state->version = xbm_codec_state->tuning_state.version;
+
+    /* Write XBM header. */
+    const char *name = (xbm_codec_state->tuning_state.var_name[0] != '\0') ? xbm_codec_state->tuning_state.var_name : NULL;
+    SAIL_TRY(xbm_private_write_header(xbm_codec_state->io, image->width, image->height, name));
+
+    xbm_codec_state->frame_loaded = true;
+
+    return SAIL_OK;
 }
 
 SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_xbm(void *state, const struct sail_image *image) {
 
-    (void)state;
-    (void)image;
+    SAIL_CHECK_PTR(state);
+    SAIL_CHECK_PTR(image);
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
+    struct xbm_codec_state *xbm_codec_state = state;
+
+    /* Write pixel data. */
+    SAIL_TRY(xbm_private_write_pixels(xbm_codec_state->io, image->pixels, image->width, image->height, xbm_codec_state->version));
+
+    return SAIL_OK;
 }
 
 SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_xbm(void **state) {
 
-    (void)state;
+    SAIL_CHECK_PTR(state);
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
+    struct xbm_codec_state *xbm_codec_state = *state;
+
+    *state = NULL;
+
+    destroy_xbm_codec_state(xbm_codec_state);
+
+    return SAIL_OK;
 }
