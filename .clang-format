@@ -1,8 +1,20 @@
 AccessModifierOffset: -4
+AlignAfterOpenBracket: Align
+AlignConsecutiveAssignments:
+  Enabled: true
+  AcrossEmptyLines: false
+  AcrossComments: false
+  AlignCompound: true
+  PadOperators: true
+AllowShortCaseLabelsOnASingleLine: true
 AllowShortFunctionsOnASingleLine: None
+AlwaysBreakAfterReturnType: None
+BinPackParameters: false
 BreakConstructorInitializers: BeforeComma
+PenaltyReturnTypeOnItsOwnLine: 10000
 ConstructorInitializerIndentWidth: 4
 IndentWidth: 4
+IndentExternBlock: NoIndent
 TabWidth: 4
 UseTab: Never
 BreakBeforeBinaryOperators: NonAssignment
