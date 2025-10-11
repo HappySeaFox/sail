@@ -52,6 +52,10 @@ static const char * const SAIL_TEST_IMAGES[] = {
     "@SAIL_TEST_IMAGES_PATH@/ico/bpp8-indexed.ico",
     "@SAIL_TEST_IMAGES_PATH@/ico/bpp24-bgr.ico",
     "@SAIL_TEST_IMAGES_PATH@/ico/bpp24-bgr-multi.ico",
+    "@SAIL_TEST_IMAGES_PATH@/cur/bpp1-indexed.cur",
+    "@SAIL_TEST_IMAGES_PATH@/cur/bpp8-indexed.cur",
+    "@SAIL_TEST_IMAGES_PATH@/cur/bpp24-bgr.cur",
+    "@SAIL_TEST_IMAGES_PATH@/cur/bpp32-bgra.cur",
 #endif
 
 #ifdef SAIL_HAVE_BUILTIN_JBIG
