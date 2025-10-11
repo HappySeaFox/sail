@@ -29,7 +29,8 @@
 
 #include "munit.h"
 
-static MunitResult test_save_features(const MunitParameter params[], void *user_data) {
+static MunitResult test_save_features(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
@@ -44,15 +45,17 @@ static MunitResult test_save_features(const MunitParameter params[], void *user_
 
         munit_assert(save_features.features() == first_codec.save_features().features());
 
-        munit_assert(save_features.compression_level().is_valid() == first_codec.save_features().compression_level().is_valid());
-        if (save_features.compression_level().is_valid()) {
-            const sail::compression_level &l1 = save_features.compression_level();
-            const sail::compression_level &l2 = first_codec.save_features().compression_level();
+        munit_assert(save_features.compression_level().is_valid()
+                     == first_codec.save_features().compression_level().is_valid());
+        if (save_features.compression_level().is_valid())
+        {
+            const sail::compression_level& l1 = save_features.compression_level();
+            const sail::compression_level& l2 = first_codec.save_features().compression_level();
 
-            munit_assert(l1.min_level()     == l2.min_level());
-            munit_assert(l1.max_level()     == l2.max_level());
+            munit_assert(l1.min_level() == l2.min_level());
+            munit_assert(l1.max_level() == l2.max_level());
             munit_assert(l1.default_level() == l2.default_level());
-            munit_assert(l1.step()          == l2.step());
+            munit_assert(l1.step() == l2.step());
         }
 
         munit_assert(save_features.supported_tuning() == first_codec.save_features().supported_tuning());
@@ -61,19 +64,21 @@ static MunitResult test_save_features(const MunitParameter params[], void *user_
     // Move
     {
         const sail::save_features save_features1 = first_codec.save_features();
-        const sail::save_features save_features = std::move(save_features1);
+        const sail::save_features save_features  = std::move(save_features1);
 
         munit_assert(save_features.features() == first_codec.save_features().features());
 
-        munit_assert(save_features.compression_level().is_valid() == first_codec.save_features().compression_level().is_valid());
-        if (save_features.compression_level().is_valid()) {
-            const sail::compression_level &l1 = save_features.compression_level();
-            const sail::compression_level &l2 = first_codec.save_features().compression_level();
+        munit_assert(save_features.compression_level().is_valid()
+                     == first_codec.save_features().compression_level().is_valid());
+        if (save_features.compression_level().is_valid())
+        {
+            const sail::compression_level& l1 = save_features.compression_level();
+            const sail::compression_level& l2 = first_codec.save_features().compression_level();
 
-            munit_assert(l1.min_level()     == l2.min_level());
-            munit_assert(l1.max_level()     == l2.max_level());
+            munit_assert(l1.min_level() == l2.min_level());
+            munit_assert(l1.max_level() == l2.max_level());
             munit_assert(l1.default_level() == l2.default_level());
-            munit_assert(l1.step()          == l2.step());
+            munit_assert(l1.step() == l2.step());
         }
 
         munit_assert(save_features.supported_tuning() == first_codec.save_features().supported_tuning());
@@ -88,6 +93,7 @@ static MunitResult test_save_features(const MunitParameter params[], void *user_
     return MUNIT_OK;
 }
 
+// clang-format off
 static MunitTest test_suite_tests[] = {
     { (char *)"/save-features", test_save_features, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
@@ -95,13 +101,11 @@ static MunitTest test_suite_tests[] = {
 };
 
 static const MunitSuite test_suite = {
-    (char *)"/bindings/c++",
-    test_suite_tests,
-    NULL,
-    1,
-    MUNIT_SUITE_OPTION_NONE
+    (char *)"/bindings/c++", test_suite_tests, NULL, 1, MUNIT_SUITE_OPTION_NONE
 };
+// clang-format on
 
-int main(int argc, char *argv[MUNIT_ARRAY_PARAM(argc + 1)]) {
+int main(int argc, char* argv[MUNIT_ARRAY_PARAM(argc + 1)])
+{
     return munit_suite_main(&test_suite, NULL, argc, argv);
 }

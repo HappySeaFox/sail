@@ -29,18 +29,21 @@
 
 #include "munit.h"
 
-static sail::arbitrary_data construct_data() {
+static sail::arbitrary_data construct_data()
+{
 
     sail::arbitrary_data data(8092);
 
-    for (std::size_t i = 0; i < data.size(); i++) {
+    for (std::size_t i = 0; i < data.size(); i++)
+    {
         data[i] = 50;
     }
 
     return data;
 }
 
-static MunitResult test_palette_create(const MunitParameter params[], void *user_data) {
+static MunitResult test_palette_create(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
@@ -51,8 +54,8 @@ static MunitResult test_palette_create(const MunitParameter params[], void *user
 
         sail::palette palette(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE, data.data(), color_count);
         munit_assert(palette.pixel_format() == SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE);
-        munit_assert(palette.data()         == data);
-        munit_assert(palette.color_count()  == color_count);
+        munit_assert(palette.data() == data);
+        munit_assert(palette.color_count() == color_count);
         munit_assert(palette.is_valid());
     }
 
@@ -61,8 +64,8 @@ static MunitResult test_palette_create(const MunitParameter params[], void *user
 
         sail::palette palette(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE, data);
         munit_assert(palette.pixel_format() == SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE);
-        munit_assert(palette.data()         == data);
-        munit_assert(palette.color_count()  == (data.size() / 2));
+        munit_assert(palette.data() == data);
+        munit_assert(palette.color_count() == (data.size() / 2));
         munit_assert(palette.is_valid());
     }
 
@@ -78,7 +81,8 @@ static MunitResult test_palette_create(const MunitParameter params[], void *user
     return MUNIT_OK;
 }
 
-static MunitResult test_palette_copy(const MunitParameter params[], void *user_data) {
+static MunitResult test_palette_copy(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
@@ -91,8 +95,8 @@ static MunitResult test_palette_copy(const MunitParameter params[], void *user_d
         munit_assert(palette.is_valid());
 
         sail::palette palette_copy = palette;
-        munit_assert(palette_copy.color_count()  == palette.color_count());
-        munit_assert(palette_copy.data()         == palette.data());
+        munit_assert(palette_copy.color_count() == palette.color_count());
+        munit_assert(palette_copy.data() == palette.data());
         munit_assert(palette_copy.pixel_format() == palette.pixel_format());
         munit_assert(palette_copy.is_valid());
     }
@@ -111,7 +115,8 @@ static MunitResult test_palette_copy(const MunitParameter params[], void *user_d
     return MUNIT_OK;
 }
 
-static MunitResult test_palette_move(const MunitParameter params[], void *user_data) {
+static MunitResult test_palette_move(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
@@ -124,8 +129,8 @@ static MunitResult test_palette_move(const MunitParameter params[], void *user_d
         munit_assert(palette.is_valid());
 
         sail::palette palette_copy = std::move(palette);
-        munit_assert(palette_copy.color_count()  == color_count);
-        munit_assert(palette_copy.data()         == data);
+        munit_assert(palette_copy.color_count() == color_count);
+        munit_assert(palette_copy.data() == data);
         munit_assert(palette_copy.pixel_format() == SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE);
         munit_assert(palette_copy.is_valid());
     }
@@ -141,6 +146,7 @@ static MunitResult test_palette_move(const MunitParameter params[], void *user_d
     return MUNIT_OK;
 }
 
+// clang-format off
 static MunitTest test_suite_tests[] = {
     { (char *)"/create", test_palette_create, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/copy",   test_palette_copy,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
@@ -150,13 +156,11 @@ static MunitTest test_suite_tests[] = {
 };
 
 static const MunitSuite test_suite = {
-    (char *)"/bindings/c++/palette",
-    test_suite_tests,
-    NULL,
-    1,
-    MUNIT_SUITE_OPTION_NONE
+    (char *)"/bindings/c++/palette", test_suite_tests, NULL, 1, MUNIT_SUITE_OPTION_NONE
 };
+// clang-format on
 
-int main(int argc, char *argv[MUNIT_ARRAY_PARAM(argc + 1)]) {
+int main(int argc, char* argv[MUNIT_ARRAY_PARAM(argc + 1)])
+{
     return munit_suite_main(&test_suite, NULL, argc, argv);
 }

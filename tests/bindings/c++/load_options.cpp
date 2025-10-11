@@ -36,7 +36,8 @@
 
 #include "munit.h"
 
-static MunitResult test_load_options_construct(const MunitParameter params[], void *user_data) {
+static MunitResult test_load_options_construct(const MunitParameter params[], void* user_data)
+{
 
     (void)params;
     (void)user_data;
@@ -58,7 +59,8 @@ static MunitResult test_load_options_construct(const MunitParameter params[], vo
     return MUNIT_OK;
 }
 
-static MunitResult test_load_options_copy(const MunitParameter params[], void *user_data) {
+static MunitResult test_load_options_copy(const MunitParameter params[], void* user_data)
+{
 
     (void)params;
     (void)user_data;
@@ -72,7 +74,7 @@ static MunitResult test_load_options_copy(const MunitParameter params[], void *u
 
         const sail::load_options load_options2 = load_options;
         munit_assert(load_options.options() == load_options2.options());
-        munit_assert(load_options.tuning()  == load_options2.tuning());
+        munit_assert(load_options.tuning() == load_options2.tuning());
     }
 
     {
@@ -83,13 +85,14 @@ static MunitResult test_load_options_copy(const MunitParameter params[], void *u
 
         const sail::load_options load_options2 = load_options;
         munit_assert(load_options.options() == load_options2.options());
-        munit_assert(load_options.tuning()  == load_options2.tuning());
+        munit_assert(load_options.tuning() == load_options2.tuning());
     }
 
     return MUNIT_OK;
 }
 
-static MunitResult test_load_options_move(const MunitParameter params[], void *user_data) {
+static MunitResult test_load_options_move(const MunitParameter params[], void* user_data)
+{
 
     (void)params;
     (void)user_data;
@@ -100,10 +103,10 @@ static MunitResult test_load_options_move(const MunitParameter params[], void *u
         sail::load_options load_options;
         munit_assert(first_codec.load_features().to_options(&load_options) == SAIL_OK);
 
-        sail::load_options load_options2 = load_options;
+        sail::load_options load_options2       = load_options;
         const sail::load_options load_options3 = std::move(load_options2);
         munit_assert(load_options.options() == load_options3.options());
-        munit_assert(load_options.tuning()  == load_options3.tuning());
+        munit_assert(load_options.tuning() == load_options3.tuning());
     }
 
     {
@@ -112,15 +115,16 @@ static MunitResult test_load_options_move(const MunitParameter params[], void *u
         load_options.tuning()["key"] = 10.0;
         munit_assert_double(load_options.tuning()["key"].value<double>(), ==, 10.0);
 
-        sail::load_options load_options2 = load_options;
+        sail::load_options load_options2       = load_options;
         const sail::load_options load_options3 = std::move(load_options2);
         munit_assert(load_options.options() == load_options3.options());
-        munit_assert(load_options.tuning()  == load_options3.tuning());
+        munit_assert(load_options.tuning() == load_options3.tuning());
     }
 
     return MUNIT_OK;
 }
 
+// clang-format off
 static MunitTest test_suite_tests[] = {
     { (char *)"/load-options/construct", test_load_options_construct, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/load-options/copy",      test_load_options_copy,      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
@@ -130,13 +134,11 @@ static MunitTest test_suite_tests[] = {
 };
 
 static const MunitSuite test_suite = {
-    (char *)"/bindings/c++",
-    test_suite_tests,
-    NULL,
-    1,
-    MUNIT_SUITE_OPTION_NONE
+    (char *)"/bindings/c++", test_suite_tests, NULL, 1, MUNIT_SUITE_OPTION_NONE
 };
+// clang-format on
 
-int main(int argc, char *argv[MUNIT_ARRAY_PARAM(argc + 1)]) {
+int main(int argc, char* argv[MUNIT_ARRAY_PARAM(argc + 1)])
+{
     return munit_suite_main(&test_suite, NULL, argc, argv);
 }

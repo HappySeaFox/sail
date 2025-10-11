@@ -586,6 +586,52 @@ sail_status_t image::mirror(SailOrientation orientation)
     return SAIL_OK;
 }
 
+sail_status_t image::rotate(SailOrientation angle)
+{
+    sail::image rotated_image;
+    SAIL_TRY(rotate_to(angle, &rotated_image));
+
+    *this = std::move(rotated_image);
+
+    return SAIL_OK;
+}
+
+sail_status_t image::rotate_to(SailOrientation angle, sail::image* image) const
+{
+    SAIL_CHECK_PTR(image);
+
+    if (!is_valid()) {
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+    }
+
+    sail_image *sail_img;
+    SAIL_TRY(to_sail_image(&sail_img));
+
+    SAIL_AT_SCOPE_EXIT(
+        sail_img->pixels = nullptr;
+        sail_destroy_image(sail_img);
+    );
+
+    sail_image *sail_image_output = nullptr;
+    SAIL_TRY(sail_rotate_image(sail_img, angle, &sail_image_output));
+
+    *image = sail::image(sail_image_output);
+
+    sail_image_output->pixels = nullptr;
+    sail_destroy_image(sail_image_output);
+
+    return SAIL_OK;
+}
+
+image image::rotate_to(SailOrientation angle) const
+{
+    sail::image img;
+    SAIL_TRY_OR_EXECUTE(rotate_to(angle, &img),
+                        /* on error */ return img);
+
+    return img;
+}
+
 bool image::can_convert(SailPixelFormat input_pixel_format, SailPixelFormat output_pixel_format)
 {
     return sail_can_convert(input_pixel_format, output_pixel_format);

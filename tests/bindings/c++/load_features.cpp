@@ -36,7 +36,8 @@
 
 #include "munit.h"
 
-static MunitResult test_load_features(const MunitParameter params[], void *user_data) {
+static MunitResult test_load_features(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
@@ -48,15 +49,15 @@ static MunitResult test_load_features(const MunitParameter params[], void *user_
     // Copy
     {
         const sail::load_features load_features = first_codec.load_features();
-        munit_assert(load_features.features()         == first_codec.load_features().features());
+        munit_assert(load_features.features() == first_codec.load_features().features());
         munit_assert(load_features.supported_tuning() == first_codec.load_features().supported_tuning());
     }
 
     // Move
     {
         const sail::load_features load_features1 = first_codec.load_features();
-        const sail::load_features load_features = std::move(load_features1);
-        munit_assert(load_features.features()         == first_codec.load_features().features());
+        const sail::load_features load_features  = std::move(load_features1);
+        munit_assert(load_features.features() == first_codec.load_features().features());
         munit_assert(load_features.supported_tuning() == first_codec.load_features().supported_tuning());
     }
 
@@ -69,6 +70,7 @@ static MunitResult test_load_features(const MunitParameter params[], void *user_
     return MUNIT_OK;
 }
 
+// clang-format off
 static MunitTest test_suite_tests[] = {
     { (char *)"/load-features", test_load_features, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
@@ -76,13 +78,11 @@ static MunitTest test_suite_tests[] = {
 };
 
 static const MunitSuite test_suite = {
-    (char *)"/bindings/c++",
-    test_suite_tests,
-    NULL,
-    1,
-    MUNIT_SUITE_OPTION_NONE
+    (char *)"/bindings/c++", test_suite_tests, NULL, 1, MUNIT_SUITE_OPTION_NONE
 };
+// clang-format on
 
-int main(int argc, char *argv[MUNIT_ARRAY_PARAM(argc + 1)]) {
+int main(int argc, char* argv[MUNIT_ARRAY_PARAM(argc + 1)])
+{
     return munit_suite_main(&test_suite, NULL, argc, argv);
 }

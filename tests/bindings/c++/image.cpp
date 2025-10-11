@@ -29,7 +29,8 @@
 
 #include "munit.h"
 
-static MunitResult test_image_create(const MunitParameter params[], void *user_data) {
+static MunitResult test_image_create(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
@@ -61,7 +62,7 @@ static MunitResult test_image_create(const MunitParameter params[], void *user_d
 
     {
         // Peek a random pointer
-        void *pixels = &user_data;
+        void* pixels = &user_data;
         sail::image image(pixels, SAIL_PIXEL_FORMAT_BPP24_RGB, 16, 16);
         munit_assert(image.pixel_format() == SAIL_PIXEL_FORMAT_BPP24_RGB);
         munit_assert_uint(image.width(), ==, 16);
@@ -72,7 +73,7 @@ static MunitResult test_image_create(const MunitParameter params[], void *user_d
 
     {
         // Peek a random pointer
-        void *pixels = &user_data;
+        void* pixels = &user_data;
         sail::image image(pixels, SAIL_PIXEL_FORMAT_BPP24_RGB, 16, 16, 50);
         munit_assert(image.pixel_format() == SAIL_PIXEL_FORMAT_BPP24_RGB);
         munit_assert_uint(image.width(), ==, 16);
@@ -85,7 +86,8 @@ static MunitResult test_image_create(const MunitParameter params[], void *user_d
     return MUNIT_OK;
 }
 
-static MunitResult test_image_copy(const MunitParameter params[], void *user_data) {
+static MunitResult test_image_copy(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
@@ -103,7 +105,7 @@ static MunitResult test_image_copy(const MunitParameter params[], void *user_dat
     }
 
     {
-        char pixels[16*16*3];
+        char pixels[16 * 16 * 3];
         sail::image image(pixels, SAIL_PIXEL_FORMAT_BPP24_RGB, 16, 16);
         munit_assert_true(image.is_valid());
 
@@ -119,7 +121,8 @@ static MunitResult test_image_copy(const MunitParameter params[], void *user_dat
     return MUNIT_OK;
 }
 
-static MunitResult test_image_move(const MunitParameter params[], void *user_data) {
+static MunitResult test_image_move(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
@@ -136,7 +139,7 @@ static MunitResult test_image_move(const MunitParameter params[], void *user_dat
     }
 
     {
-        char pixels[16*16*3];
+        char pixels[16 * 16 * 3];
         sail::image image(pixels, SAIL_PIXEL_FORMAT_BPP24_RGB, 16, 16);
         munit_assert_true(image.is_valid());
 
@@ -152,7 +155,8 @@ static MunitResult test_image_move(const MunitParameter params[], void *user_dat
     return MUNIT_OK;
 }
 
-static MunitResult test_image_special_properties(const MunitParameter params[], void *user_data) {
+static MunitResult test_image_special_properties(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
@@ -167,13 +171,15 @@ static MunitResult test_image_special_properties(const MunitParameter params[], 
 
         munit_assert_uint(image.source_image().special_properties().size(), ==, 2);
         munit_assert_uint(image.source_image().special_properties()["test-key-1"].value<unsigned>(), ==, 42u);
-        munit_assert_string_equal(image.source_image().special_properties()["test-key-2"].value<std::string>().c_str(), "test-value");
+        munit_assert_string_equal(image.source_image().special_properties()["test-key-2"].value<std::string>().c_str(),
+                                  "test-value");
 
         // Copy and verify special_properties are copied
         sail::image image_copy = image;
         munit_assert_uint(image_copy.source_image().special_properties().size(), ==, 2);
         munit_assert_uint(image_copy.source_image().special_properties()["test-key-1"].value<unsigned>(), ==, 42u);
-        munit_assert_string_equal(image_copy.source_image().special_properties()["test-key-2"].value<std::string>().c_str(), "test-value");
+        munit_assert_string_equal(
+            image_copy.source_image().special_properties()["test-key-2"].value<std::string>().c_str(), "test-value");
 
         // Modify copy and verify original is not affected
         image_copy.source_image().special_properties()["test-key-3"] = sail::variant(100u);
@@ -184,6 +190,7 @@ static MunitResult test_image_special_properties(const MunitParameter params[], 
     return MUNIT_OK;
 }
 
+// clang-format off
 static MunitTest test_suite_tests[] = {
     { (char *)"/create",             test_image_create,             NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/copy",               test_image_copy,               NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
@@ -194,13 +201,11 @@ static MunitTest test_suite_tests[] = {
 };
 
 static const MunitSuite test_suite = {
-    (char *)"/bindings/c++/image",
-    test_suite_tests,
-    NULL,
-    1,
-    MUNIT_SUITE_OPTION_NONE
+    (char *)"/bindings/c++/image", test_suite_tests, NULL, 1, MUNIT_SUITE_OPTION_NONE
 };
+// clang-format on
 
-int main(int argc, char *argv[MUNIT_ARRAY_PARAM(argc + 1)]) {
+int main(int argc, char* argv[MUNIT_ARRAY_PARAM(argc + 1)])
+{
     return munit_suite_main(&test_suite, NULL, argc, argv);
 }

@@ -27,42 +27,46 @@
 
 #include "munit.h"
 
-static MunitResult test_reverse_uint16(const MunitParameter params[], void *user_data) {
+static MunitResult test_reverse_uint16(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
-    munit_assert_uint16(sail::reverse_bytes((std::uint16_t)0),    ==, 0);
-    munit_assert_uint16(sail::reverse_bytes((std::uint16_t)100),  ==, 25600);
+    munit_assert_uint16(sail::reverse_bytes((std::uint16_t)0), ==, 0);
+    munit_assert_uint16(sail::reverse_bytes((std::uint16_t)100), ==, 25600);
     munit_assert_uint16(sail::reverse_bytes((std::uint16_t)1000), ==, 59395);
 
     return MUNIT_OK;
 }
 
-static MunitResult test_reverse_uint32(const MunitParameter params[], void *user_data) {
+static MunitResult test_reverse_uint32(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
-    munit_assert_uint32(sail::reverse_bytes((std::uint32_t)0),      ==, 0);
-    munit_assert_uint32(sail::reverse_bytes((std::uint32_t)100),    ==, 1677721600);
-    munit_assert_uint32(sail::reverse_bytes((std::uint32_t)1000),   ==, 3892510720);
+    munit_assert_uint32(sail::reverse_bytes((std::uint32_t)0), ==, 0);
+    munit_assert_uint32(sail::reverse_bytes((std::uint32_t)100), ==, 1677721600);
+    munit_assert_uint32(sail::reverse_bytes((std::uint32_t)1000), ==, 3892510720);
     munit_assert_uint32(sail::reverse_bytes((std::uint32_t)100000), ==, 2693136640);
 
     return MUNIT_OK;
 }
 
-static MunitResult test_reverse_uint64(const MunitParameter params[], void *user_data) {
+static MunitResult test_reverse_uint64(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
-    munit_assert_uint64(sail::reverse_bytes((std::uint64_t)0ull),           ==, 0ull);
-    munit_assert_uint64(sail::reverse_bytes((std::uint64_t)100ull),         ==, 7205759403792793600ull);
-    munit_assert_uint64(sail::reverse_bytes((std::uint64_t)1000ull),        ==, 16718206241729413120ull);
-    munit_assert_uint64(sail::reverse_bytes((std::uint64_t)100000ull),      ==, 11566933792459325440ull);
+    munit_assert_uint64(sail::reverse_bytes((std::uint64_t)0ull), ==, 0ull);
+    munit_assert_uint64(sail::reverse_bytes((std::uint64_t)100ull), ==, 7205759403792793600ull);
+    munit_assert_uint64(sail::reverse_bytes((std::uint64_t)1000ull), ==, 16718206241729413120ull);
+    munit_assert_uint64(sail::reverse_bytes((std::uint64_t)100000ull), ==, 11566933792459325440ull);
     munit_assert_uint64(sail::reverse_bytes((std::uint64_t)10000000000ull), ==, 64188750128742400ull);
 
     return MUNIT_OK;
 }
 
+// clang-format off
 static MunitTest test_suite_tests[] = {
     { (char *)"/reverse-uint16", test_reverse_uint16, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/reverse-uint32", test_reverse_uint32, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
@@ -72,13 +76,11 @@ static MunitTest test_suite_tests[] = {
 };
 
 static const MunitSuite test_suite = {
-    (char *)"/bindings/c++/utils",
-    test_suite_tests,
-    NULL,
-    1,
-    MUNIT_SUITE_OPTION_NONE
+    (char *)"/bindings/c++/utils", test_suite_tests, NULL, 1, MUNIT_SUITE_OPTION_NONE
 };
+// clang-format on
 
-int main(int argc, char *argv[MUNIT_ARRAY_PARAM(argc + 1)]) {
+int main(int argc, char* argv[MUNIT_ARRAY_PARAM(argc + 1)])
+{
     return munit_suite_main(&test_suite, NULL, argc, argv);
 }

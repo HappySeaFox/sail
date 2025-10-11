@@ -42,11 +42,12 @@
 
 #include "tests/images/acceptance/test-images.h"
 
-static MunitResult test_can_load_path(const MunitParameter params[], void *user_data) {
+static MunitResult test_can_load_path(const MunitParameter params[], void* user_data)
+{
 
     (void)user_data;
 
-    const char *path = munit_parameters_get(params, "path");
+    const char* path = munit_parameters_get(params, "path");
 
     const sail::image image(path);
     munit_assert(image.is_valid());
@@ -54,11 +55,12 @@ static MunitResult test_can_load_path(const MunitParameter params[], void *user_
     return MUNIT_OK;
 }
 
-static MunitResult test_can_load_memory(const MunitParameter params[], void *user_data) {
+static MunitResult test_can_load_memory(const MunitParameter params[], void* user_data)
+{
 
     (void)user_data;
 
-    const char *path = munit_parameters_get(params, "path");
+    const char* path = munit_parameters_get(params, "path");
 
     sail::arbitrary_data arbitrary_data;
     munit_assert(sail::read_file_contents(path, &arbitrary_data) == SAIL_OK);
@@ -76,11 +78,12 @@ static MunitResult test_can_load_memory(const MunitParameter params[], void *use
     return MUNIT_OK;
 }
 
-static MunitResult test_can_load_io_file(const MunitParameter params[], void *user_data) {
+static MunitResult test_can_load_io_file(const MunitParameter params[], void* user_data)
+{
 
     (void)user_data;
 
-    const char *path = munit_parameters_get(params, "path");
+    const char* path = munit_parameters_get(params, "path");
 
     sail::io_file io_file(path);
     sail::image_input input(io_file);
@@ -92,11 +95,12 @@ static MunitResult test_can_load_io_file(const MunitParameter params[], void *us
     return MUNIT_OK;
 }
 
-static MunitResult test_can_load_io_memory1(const MunitParameter params[], void *user_data) {
+static MunitResult test_can_load_io_memory1(const MunitParameter params[], void* user_data)
+{
 
     (void)user_data;
 
-    const char *path = munit_parameters_get(params, "path");
+    const char* path = munit_parameters_get(params, "path");
 
     sail::arbitrary_data arbitrary_data;
     munit_assert(sail::read_file_contents(path, &arbitrary_data) == SAIL_OK);
@@ -115,11 +119,12 @@ static MunitResult test_can_load_io_memory1(const MunitParameter params[], void 
     return MUNIT_OK;
 }
 
-static MunitResult test_can_load_io_memory2(const MunitParameter params[], void *user_data) {
+static MunitResult test_can_load_io_memory2(const MunitParameter params[], void* user_data)
+{
 
     (void)user_data;
 
-    const char *path = munit_parameters_get(params, "path");
+    const char* path = munit_parameters_get(params, "path");
 
     sail::arbitrary_data arbitrary_data;
     munit_assert(sail::read_file_contents(path, &arbitrary_data) == SAIL_OK);
@@ -138,11 +143,12 @@ static MunitResult test_can_load_io_memory2(const MunitParameter params[], void 
     return MUNIT_OK;
 }
 
-static MunitResult test_can_load_io_memory3(const MunitParameter params[], void *user_data) {
+static MunitResult test_can_load_io_memory3(const MunitParameter params[], void* user_data)
+{
 
     (void)user_data;
 
-    const char *path = munit_parameters_get(params, "path");
+    const char* path = munit_parameters_get(params, "path");
 
     sail::arbitrary_data arbitrary_data;
     munit_assert(sail::read_file_contents(path, &arbitrary_data) == SAIL_OK);
@@ -161,11 +167,12 @@ static MunitResult test_can_load_io_memory3(const MunitParameter params[], void 
     return MUNIT_OK;
 }
 
-static MunitResult test_can_load_io_memory4(const MunitParameter params[], void *user_data) {
+static MunitResult test_can_load_io_memory4(const MunitParameter params[], void* user_data)
+{
 
     (void)user_data;
 
-    const char *path = munit_parameters_get(params, "path");
+    const char* path = munit_parameters_get(params, "path");
 
     sail::arbitrary_data arbitrary_data;
     munit_assert(sail::read_file_contents(path, &arbitrary_data) == SAIL_OK);
@@ -183,11 +190,12 @@ static MunitResult test_can_load_io_memory4(const MunitParameter params[], void 
     return MUNIT_OK;
 }
 
-static MunitResult test_can_load_io_memory5(const MunitParameter params[], void *user_data) {
+static MunitResult test_can_load_io_memory5(const MunitParameter params[], void* user_data)
+{
 
     (void)user_data;
 
-    const char *path = munit_parameters_get(params, "path");
+    const char* path = munit_parameters_get(params, "path");
 
     sail::arbitrary_data arbitrary_data;
     munit_assert(sail::read_file_contents(path, &arbitrary_data) == SAIL_OK);
@@ -195,7 +203,7 @@ static MunitResult test_can_load_io_memory5(const MunitParameter params[], void 
     const sail::codec_info codec_info = sail::codec_info::from_path(path);
     munit_assert(codec_info.is_valid());
 
-    std::unique_ptr<sail::abstract_io> io_memory { new sail::io_memory(arbitrary_data, sail::io_memory::Operation::Read) };
+    std::unique_ptr<sail::abstract_io> io_memory{new sail::io_memory(arbitrary_data, sail::io_memory::Operation::Read)};
     sail::image_input input = std::move(sail::image_input(*io_memory).with(codec_info));
     sail::image image;
 
@@ -206,10 +214,11 @@ static MunitResult test_can_load_io_memory5(const MunitParameter params[], void 
 }
 
 static MunitParameterEnum test_params[] = {
-    { (char *)"path", (char **)SAIL_TEST_IMAGES },
-    { NULL, NULL },
+    {(char*)"path", (char**)SAIL_TEST_IMAGES},
+    {NULL, NULL},
 };
 
+// clang-format off
 static MunitTest test_suite_tests[] = {
     { (char *)"/can-load-path",       test_can_load_path,       NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
     { (char *)"/can-load-memory",     test_can_load_memory,     NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
@@ -224,13 +233,11 @@ static MunitTest test_suite_tests[] = {
 };
 
 static const MunitSuite test_suite = {
-    (char *)"/bindings/c++",
-    test_suite_tests,
-    NULL,
-    1,
-    MUNIT_SUITE_OPTION_NONE
+    (char *)"/bindings/c++", test_suite_tests, NULL, 1, MUNIT_SUITE_OPTION_NONE
 };
+// clang-format on
 
-int main(int argc, char *argv[MUNIT_ARRAY_PARAM(argc + 1)]) {
+int main(int argc, char* argv[MUNIT_ARRAY_PARAM(argc + 1)])
+{
     return munit_suite_main(&test_suite, NULL, argc, argv);
 }

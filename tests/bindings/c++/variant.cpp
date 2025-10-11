@@ -30,8 +30,8 @@
 
 #include "munit.h"
 
-template<typename T>
-static MunitResult test_set_type(const T &value) {
+template <typename T> static MunitResult test_set_type(const T& value)
+{
 
     {
         const sail::variant variant(value);
@@ -53,8 +53,8 @@ static MunitResult test_set_type(const T &value) {
     return MUNIT_OK;
 }
 
-template<typename T>
-static MunitResult test_equal(const T &value) {
+template <typename T> static MunitResult test_equal(const T& value)
+{
 
     const sail::variant variant1(value);
     const sail::variant variant2(value);
@@ -65,8 +65,8 @@ static MunitResult test_equal(const T &value) {
     return MUNIT_OK;
 }
 
-template<typename T1, typename T2>
-static MunitResult test_not_equal(const T1 &value1, const T2 &value2) {
+template <typename T1, typename T2> static MunitResult test_not_equal(const T1& value1, const T2& value2)
+{
 
     const sail::variant variant1(value1);
     const sail::variant variant2(value2);
@@ -77,8 +77,8 @@ static MunitResult test_not_equal(const T1 &value1, const T2 &value2) {
     return MUNIT_OK;
 }
 
-template<typename T>
-static MunitResult test_clear_type(const T &value) {
+template <typename T> static MunitResult test_clear_type(const T& value)
+{
 
     sail::variant variant(value);
     variant.clear();
@@ -89,7 +89,8 @@ static MunitResult test_clear_type(const T &value) {
     return MUNIT_OK;
 }
 
-static MunitResult test_set_value(const MunitParameter params[], void *user_data) {
+static MunitResult test_set_value(const MunitParameter params[], void* user_data)
+{
 
     (void)params;
     (void)user_data;
@@ -118,7 +119,8 @@ static MunitResult test_set_value(const MunitParameter params[], void *user_data
     return MUNIT_OK;
 }
 
-static MunitResult test_move(const MunitParameter params[], void *user_data) {
+static MunitResult test_move(const MunitParameter params[], void* user_data)
+{
 
     (void)params;
     (void)user_data;
@@ -137,7 +139,8 @@ static MunitResult test_move(const MunitParameter params[], void *user_data) {
     return MUNIT_OK;
 }
 
-static MunitResult test_compare(const MunitParameter params[], void *user_data) {
+static MunitResult test_compare(const MunitParameter params[], void* user_data)
+{
 
     (void)params;
     (void)user_data;
@@ -210,7 +213,8 @@ static MunitResult test_compare(const MunitParameter params[], void *user_data) 
     return MUNIT_OK;
 }
 
-static MunitResult test_clear(const MunitParameter params[], void *user_data) {
+static MunitResult test_clear(const MunitParameter params[], void* user_data)
+{
 
     (void)params;
     (void)user_data;
@@ -239,6 +243,7 @@ static MunitResult test_clear(const MunitParameter params[], void *user_data) {
     return MUNIT_OK;
 }
 
+// clang-format off
 static MunitTest test_suite_tests[] = {
     { (char *)"/set-value", test_set_value, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/move",      test_move,      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
@@ -249,13 +254,11 @@ static MunitTest test_suite_tests[] = {
 };
 
 static const MunitSuite test_suite = {
-    (char *)"/bindings/c++/variant",
-    test_suite_tests,
-    NULL,
-    1,
-    MUNIT_SUITE_OPTION_NONE
+    (char *)"/bindings/c++/variant", test_suite_tests, NULL, 1, MUNIT_SUITE_OPTION_NONE
 };
+// clang-format on
 
-int main(int argc, char *argv[MUNIT_ARRAY_PARAM(argc + 1)]) {
+int main(int argc, char* argv[MUNIT_ARRAY_PARAM(argc + 1)])
+{
     return munit_suite_main(&test_suite, NULL, argc, argv);
 }

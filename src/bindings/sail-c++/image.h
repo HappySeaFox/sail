@@ -602,6 +602,50 @@ public:
     sail_status_t mirror(SailOrientation orientation);
 
     /*
+     * Rotates the image by 90, 180, or 270 degrees clockwise.
+     *
+     * Updates the image dimensions and pixels.
+     *
+     * All pixel formats with byte-aligned pixels (bits_per_pixel % 8 == 0) are supported.
+     *
+     * Supported angles:
+     *   - SAIL_ORIENTATION_ROTATED_90
+     *   - SAIL_ORIENTATION_ROTATED_180
+     *   - SAIL_ORIENTATION_ROTATED_270
+     *
+     * Returns SAIL_OK on success.
+     */
+    sail_status_t rotate(SailOrientation angle);
+
+    /*
+     * Rotates the image by 90, 180, or 270 degrees clockwise and assigns the result to the 'image' argument.
+     *
+     * All pixel formats with byte-aligned pixels (bits_per_pixel % 8 == 0) are supported.
+     *
+     * Supported angles:
+     *   - SAIL_ORIENTATION_ROTATED_90
+     *   - SAIL_ORIENTATION_ROTATED_180
+     *   - SAIL_ORIENTATION_ROTATED_270
+     *
+     * Returns SAIL_OK on success.
+     */
+    sail_status_t rotate_to(SailOrientation angle, sail::image* image) const;
+
+    /*
+     * Rotates the image by 90, 180, or 270 degrees clockwise and returns the resulting image.
+     *
+     * All pixel formats with byte-aligned pixels (bits_per_pixel % 8 == 0) are supported.
+     *
+     * Supported angles:
+     *   - SAIL_ORIENTATION_ROTATED_90
+     *   - SAIL_ORIENTATION_ROTATED_180
+     *   - SAIL_ORIENTATION_ROTATED_270
+     *
+     * Returns an invalid image on error.
+     */
+    image rotate_to(SailOrientation angle) const;
+
+    /*
      * Returns true if the conversion or updating functions can convert or update from the input
      * pixel format to the output pixel format.
      */

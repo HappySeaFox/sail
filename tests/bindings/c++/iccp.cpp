@@ -35,18 +35,21 @@
 
 #include "munit.h"
 
-static sail::arbitrary_data construct_data() {
+static sail::arbitrary_data construct_data()
+{
 
     sail::arbitrary_data data(8092);
 
-    for (std::size_t i = 0; i < data.size(); i++) {
+    for (std::size_t i = 0; i < data.size(); i++)
+    {
         data[i] = 50;
     }
 
     return data;
 }
 
-static MunitResult test_iccp_create(const MunitParameter params[], void *user_data) {
+static MunitResult test_iccp_create(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
@@ -67,7 +70,8 @@ static MunitResult test_iccp_create(const MunitParameter params[], void *user_da
     return MUNIT_OK;
 }
 
-static MunitResult test_iccp_copy(const MunitParameter params[], void *user_data) {
+static MunitResult test_iccp_copy(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
@@ -93,7 +97,8 @@ static MunitResult test_iccp_copy(const MunitParameter params[], void *user_data
     return MUNIT_OK;
 }
 
-static MunitResult test_iccp_move(const MunitParameter params[], void *user_data) {
+static MunitResult test_iccp_move(const MunitParameter params[], void* user_data)
+{
     (void)params;
     (void)user_data;
 
@@ -117,6 +122,7 @@ static MunitResult test_iccp_move(const MunitParameter params[], void *user_data
     return MUNIT_OK;
 }
 
+// clang-format off
 static MunitTest test_suite_tests[] = {
     { (char *)"/create", test_iccp_create, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/copy",   test_iccp_copy,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
@@ -126,13 +132,11 @@ static MunitTest test_suite_tests[] = {
 };
 
 static const MunitSuite test_suite = {
-    (char *)"/bindings/c++/iccp",
-    test_suite_tests,
-    NULL,
-    1,
-    MUNIT_SUITE_OPTION_NONE
+    (char *)"/bindings/c++/iccp", test_suite_tests, NULL, 1, MUNIT_SUITE_OPTION_NONE
 };
+// clang-format on
 
-int main(int argc, char *argv[MUNIT_ARRAY_PARAM(argc + 1)]) {
+int main(int argc, char* argv[MUNIT_ARRAY_PARAM(argc + 1)])
+{
     return munit_suite_main(&test_suite, NULL, argc, argv);
 }
