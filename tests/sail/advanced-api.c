@@ -363,12 +363,19 @@ static MunitResult test_advanced_roundtrip(const MunitParameter params[], void* 
 
     const char* path = munit_parameters_get(params, "path");
 
+    /* Load with META_DATA option to preserve special properties. */
+    struct sail_load_options* load_options = NULL;
+    munit_assert(sail_alloc_load_options(&load_options) == SAIL_OK);
+    load_options->options |= SAIL_OPTION_META_DATA;
+
     void* state1 = NULL;
-    munit_assert(sail_start_loading_from_file(path, NULL, &state1) == SAIL_OK);
+    munit_assert(sail_start_loading_from_file_with_options(path, NULL, load_options, &state1) == SAIL_OK);
 
     struct sail_image* image1 = NULL;
     munit_assert(sail_load_next_frame(state1, &image1) == SAIL_OK);
     munit_assert(sail_stop_loading(state1) == SAIL_OK);
+
+    sail_destroy_load_options(load_options);
 
     const struct sail_codec_info* codec_info;
     munit_assert(sail_codec_info_from_path(path, &codec_info) == SAIL_OK);
@@ -400,8 +407,18 @@ static MunitResult test_advanced_roundtrip(const MunitParameter params[], void* 
         snprintf(temp_path, sizeof(temp_path), "%s.test.roundtrip", path);
     }
 
+    /* Prepare save options with tuning from special properties. */
+    struct sail_save_options* save_options = NULL;
+    munit_assert(sail_alloc_save_options_from_features(codec_info->save_features, &save_options) == SAIL_OK);
+
+    if (image_to_save->source_image != NULL && image_to_save->source_image->special_properties != NULL)
+    {
+        /* Copy special properties to tuning hash map for roundtrip. */
+        munit_assert(sail_copy_hash_map(image_to_save->source_image->special_properties, &save_options->tuning) == SAIL_OK);
+    }
+
     void* state2              = NULL;
-    sail_status_t save_status = sail_start_saving_into_file(temp_path, codec_info, &state2);
+    sail_status_t save_status = sail_start_saving_into_file_with_options(temp_path, codec_info, save_options, &state2);
 
     if (save_status == SAIL_OK)
     {
@@ -413,6 +430,7 @@ static MunitResult test_advanced_roundtrip(const MunitParameter params[], void* 
         sail_stop_saving(state2);
     }
 
+    sail_destroy_save_options(save_options);
     sail_destroy_image(image_to_save);
 
     if (save_status == SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT || save_status == SAIL_ERROR_UNDERLYING_CODEC)
