@@ -74,19 +74,21 @@ images with the help of [ksquirrel-libs](FAQ.md#how-old-is-sail), the predecesso
 | 3  | [BMP](https://wikipedia.org/wiki/BMP_file_format)                   | RW            |                   |
 | 4  | [GIF](https://wikipedia.org/wiki/GIF)                               | RW            | giflib            |
 | .. | ...                                                                 |               |                   |
-| 6  | [JPEG](https://wikipedia.org/wiki/JPEG)                             | RW            | libjpeg-turbo     |
-| 7  | [JPEG 2000](https://wikipedia.org/wiki/JPEG_2000)                   | RW            | openjpeg          |
-| 8  | [JPEG XL](https://wikipedia.org/wiki/JPEG_XL)                       | RW            | libjxl            |
-| 9  | [PCX](https://wikipedia.org/wiki/PCX)                               | RW            |                   |
-| 10 | [PNG](https://wikipedia.org/wiki/Portable_Network_Graphics)         | RW            | libpng            |
-| 11 | [PNM](https://wikipedia.org/wiki/Portable_anymap)                   | RW            |                   |
-| 12 | [PSD](https://en.wikipedia.org/wiki/Adobe_Photoshop#File_format)    | R             |                   |
-| 13 | [QOI](http://qoiformat.org)                                         | RW            |                   |
-| 14 | [SVG](https://wikipedia.org/wiki/Scalable_Vector_Graphics)          | R             | resvg/nanosvg     |
-| 15 | [TGA](https://wikipedia.org/wiki/Truevision_TGA)                    | RW            |                   |
-| 16 | [TIFF](https://wikipedia.org/wiki/TIFF)                             | RW            | libtiff           |
+| 6  | [HEIF](https://wikipedia.org/wiki/High_Efficiency_Image_File_Format)| RW            | libheif, libheif-plugin-x265 |
 | .. | ...                                                                 |               |                   |
-| 18 | [WEBP](https://wikipedia.org/wiki/WebP)                             | RW            | libwebp           |
+| 9  | [JPEG](https://wikipedia.org/wiki/JPEG)                             | RW            | libjpeg-turbo     |
+| 10 | [JPEG 2000](https://wikipedia.org/wiki/JPEG_2000)                   | RW            | openjpeg          |
+| 11 | [JPEG XL](https://wikipedia.org/wiki/JPEG_XL)                       | RW            | libjxl            |
+| 12 | [PCX](https://wikipedia.org/wiki/PCX)                               | RW            |                   |
+| 13 | [PNG](https://wikipedia.org/wiki/Portable_Network_Graphics)         | RW            | libpng            |
+| 14 | [PNM](https://wikipedia.org/wiki/Portable_anymap)                   | RW            |                   |
+| 15 | [PSD](https://en.wikipedia.org/wiki/Adobe_Photoshop#File_format)    | R             |                   |
+| 16 | [QOI](http://qoiformat.org)                                         | RW            |                   |
+| 17 | [SVG](https://wikipedia.org/wiki/Scalable_Vector_Graphics)          | R             | resvg/nanosvg     |
+| 18 | [TGA](https://wikipedia.org/wiki/Truevision_TGA)                    | RW            |                   |
+| 19 | [TIFF](https://wikipedia.org/wiki/TIFF)                             | RW            | libtiff           |
+| .. | ...                                                                 |               |                   |
+| 21 | [WEBP](https://wikipedia.org/wiki/WebP)                             | RW            | libwebp           |
 | .. | ...                                                                 |               |                   |
 
 See the full list [here](FORMATS.md). Work to add more image formats is ongoing.
