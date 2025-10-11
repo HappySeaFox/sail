@@ -756,6 +756,9 @@
         <b>Content:</b> Static.
         <br/><br/>
         <b>Specifications:</b> X10, X11.
+        <br/><br/>
+        <b>Special properties:</b> Key: <i>"xbm-version"</i>. Description: XBM format version detected during load (X10 or X11).
+        Possible values: "X10", "X11".
     </td>
     <td>
         <b>Content:</b> Multi-paged, C-style /*...*/ comments.
