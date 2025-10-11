@@ -33,6 +33,7 @@
 #include <sail-manip/convert.h>
 #include <sail-manip/manip_common.h>
 #include <sail-manip/quantize.h>
+#include <sail-manip/rotate.h>
 
 #ifdef SAIL_BUILD
 #include <sail-manip/cmyk.h>

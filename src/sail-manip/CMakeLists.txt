@@ -12,6 +12,8 @@ add_library(sail-manip
                 manip_utils.h
                 quantize.c
                 quantize.h
+                rotate.c
+                rotate.h
                 sail-manip.h
                 ycbcr.c
                 ycbcr.h
@@ -24,6 +26,7 @@ set(PUBLIC_HEADERS conversion_options.h
                    convert.h
                    manip_common.h
                    quantize.h
+                   rotate.h
                    sail-manip.h)
 
 set_target_properties(sail-manip PROPERTIES
