@@ -101,7 +101,7 @@ sail_status_t hdr_private_read_header(struct sail_io* io, struct hdr_header* hea
     if (strncmp(line, "#?RADIANCE", 10) != 0 && strncmp(line, "#?RGBE", 6) != 0)
     {
         SAIL_LOG_ERROR("HDR: Invalid signature");
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     /* Read header lines until we find the empty line. */
@@ -165,7 +165,7 @@ sail_status_t hdr_private_read_header(struct sail_io* io, struct hdr_header* hea
             if (header->width <= 0 || header->height <= 0)
             {
                 SAIL_LOG_ERROR("HDR: Invalid dimensions %dx%d", header->width, header->height);
-                SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
             }
 
             return SAIL_OK;
@@ -173,7 +173,7 @@ sail_status_t hdr_private_read_header(struct sail_io* io, struct hdr_header* hea
     }
 
     SAIL_LOG_ERROR("HDR: Invalid resolution line");
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
 }
 
 sail_status_t hdr_private_write_header(struct sail_io* io,
@@ -317,7 +317,7 @@ static sail_status_t read_old_rle_scanline(struct sail_io* io, int width, uint8_
 
         if (bytes_read != 4)
         {
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
         }
 
         if (rgbe[0] == 1 && rgbe[1] == 1 && rgbe[2] == 1)
@@ -326,7 +326,7 @@ static sail_status_t read_old_rle_scanline(struct sail_io* io, int width, uint8_
             int count = ((int)rgbe[3]) << rshift;
             if (pos + count > width)
             {
-                SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
             }
 
             for (int i = 0; i < count; i++)
@@ -362,7 +362,7 @@ static sail_status_t read_new_rle_scanline(struct sail_io* io, int width, uint8_
 
     if (bytes_read != 4)
     {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     /* Check for new RLE format. */
@@ -379,7 +379,7 @@ static sail_status_t read_new_rle_scanline(struct sail_io* io, int width, uint8_
     if (scanline_width != width)
     {
         SAIL_LOG_ERROR("HDR: Scanline width mismatch");
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     /* Read each channel. */
@@ -394,7 +394,7 @@ static sail_status_t read_new_rle_scanline(struct sail_io* io, int width, uint8_
 
             if (bytes_read != 1)
             {
-                SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
             }
 
             if (code > 128)
@@ -406,14 +406,14 @@ static sail_status_t read_new_rle_scanline(struct sail_io* io, int width, uint8_
 
                 if (bytes_read != 1)
                 {
-                    SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+                    SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
                 }
 
                 for (int i = 0; i < count; i++)
                 {
                     if (pos >= width)
                     {
-                        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+                        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
                     }
                     scanline[pos * 4 + channel] = value;
                     pos++;
@@ -427,7 +427,7 @@ static sail_status_t read_new_rle_scanline(struct sail_io* io, int width, uint8_
                 {
                     if (pos >= width)
                     {
-                        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+                        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
                     }
 
                     uint8_t value;
@@ -435,7 +435,7 @@ static sail_status_t read_new_rle_scanline(struct sail_io* io, int width, uint8_
 
                     if (bytes_read != 1)
                     {
-                        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+                        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
                     }
 
                     scanline[pos * 4 + channel] = value;

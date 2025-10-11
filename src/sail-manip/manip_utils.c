@@ -35,7 +35,7 @@ sail_status_t get_palette_rgba32(const struct sail_palette* palette, unsigned in
     if (index >= palette->color_count)
     {
         SAIL_LOG_ERROR("Palette index %u is out of range [0; %u)", index, palette->color_count);
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     switch (palette->pixel_format)

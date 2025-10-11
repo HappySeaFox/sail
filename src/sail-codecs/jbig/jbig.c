@@ -191,7 +191,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_jbig(void* state, struct sail
         {
             jbg_dec_free(&decoder);
             SAIL_LOG_ERROR("JBIG: Decoding error: %s", jbg_strerror(result));
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
         }
     }
 
@@ -212,7 +212,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_jbig(void* state, struct sail
         {
             jbg_dec_free(&decoder);
             SAIL_LOG_ERROR("JBIG: Insufficient decoded data");
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
         }
 
         /* Copy scanlines. */

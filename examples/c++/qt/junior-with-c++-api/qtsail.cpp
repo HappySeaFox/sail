@@ -67,7 +67,7 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
     sail::image image = image_input.load(path.toLocal8Bit().constData());
 
     if (!image.is_valid()) {
-        return SAIL_ERROR_BROKEN_IMAGE;
+        return SAIL_ERROR_INVALID_IMAGE;
     }
 
     // Convert to RGBA

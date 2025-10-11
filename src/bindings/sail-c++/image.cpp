@@ -380,7 +380,7 @@ sail_status_t image::convert(SailPixelFormat pixel_format, const conversion_opti
 
     if (!is_valid()) {
         SAIL_LOG_ERROR("Conversion failed as the input image is invalid");
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     sail_conversion_options *sail_conversion_options = nullptr;
@@ -444,7 +444,7 @@ sail_status_t image::convert(const sail::save_features &save_features) {
 sail_status_t image::convert(const sail::save_features &save_features, const conversion_options &options) {
 
     if (!is_valid()) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     SailPixelFormat best_pixel_format = closest_pixel_format(d->sail_image->pixel_format, save_features);
@@ -475,7 +475,7 @@ sail_status_t image::convert_to(SailPixelFormat pixel_format, const conversion_o
     SAIL_CHECK_PTR(image);
 
     if (!is_valid()) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     sail_conversion_options *sail_conversion_options = nullptr;
@@ -513,7 +513,7 @@ sail_status_t image::convert_to(const sail::save_features &save_features, sail::
 sail_status_t image::convert_to(const sail::save_features &save_features, const conversion_options &options, sail::image *image) const
 {
     if (!is_valid()) {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     SailPixelFormat best_pixel_format = closest_pixel_format(d->sail_image->pixel_format, save_features);

@@ -67,7 +67,7 @@ static sail_status_t parse_color_value(const char* str, unsigned char* r, unsign
         else
         {
             SAIL_LOG_ERROR("XPM: Unsupported color format: %s", str);
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
         }
 
         return SAIL_OK;
@@ -158,7 +158,7 @@ sail_status_t xpm_private_parse_xpm_header(struct sail_io* io,
     if (!found_xpm_marker)
     {
         SAIL_LOG_ERROR("XPM: Missing XPM marker");
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     /* Read until we find the values line (contains width, height, etc.). */
@@ -192,19 +192,19 @@ sail_status_t xpm_private_parse_xpm_header(struct sail_io* io,
     if (!found_values)
     {
         SAIL_LOG_ERROR("XPM: Failed to parse XPM header values");
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     if (*cpp > 7)
     {
         SAIL_LOG_ERROR("XPM: Characters per pixel (%u) exceeds maximum (7)", *cpp);
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     if (*num_colors == 0 || *num_colors > 65536)
     {
         SAIL_LOG_ERROR("XPM: Invalid number of colors: %u", *num_colors);
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     return SAIL_OK;
@@ -230,7 +230,7 @@ sail_status_t xpm_private_parse_colors(
         {
             SAIL_LOG_ERROR("XPM: Failed to parse color line");
             sail_free(*colors);
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
         }
         line++;
 
@@ -239,7 +239,7 @@ sail_status_t xpm_private_parse_colors(
         {
             SAIL_LOG_ERROR("XPM: cpp too large");
             sail_free(*colors);
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
         }
 
         memcpy((*colors)[i].chars, line, cpp);
@@ -361,7 +361,7 @@ sail_status_t xpm_private_read_pixels(struct sail_io* io,
         if (line == NULL)
         {
             SAIL_LOG_ERROR("XPM: Failed to find pixel data on line %u", y);
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
         }
         line++;
 
@@ -416,7 +416,7 @@ sail_status_t xpm_private_read_pixels(struct sail_io* io,
             if (!found)
             {
                 SAIL_LOG_ERROR("XPM: Unknown pixel character '%.*s' at (%u,%u)", cpp, pixel_chars, x, y);
-                SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
             }
         }
     }
@@ -535,7 +535,7 @@ sail_status_t xpm_private_write_pixels(
             {
                 SAIL_LOG_ERROR("XPM: Pixel index %u out of range (max %u)", pixel_index, num_colors - 1);
                 sail_free(line);
-                SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
             }
 
             /* Generate character(s) for this pixel. */

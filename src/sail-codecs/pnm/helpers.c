@@ -103,7 +103,7 @@ sail_status_t pnm_private_read_word(struct sail_io* io, char* str, size_t str_si
     if (i == str_size - 1 && !eof)
     {
         SAIL_LOG_ERROR("PNM: No word delimiter found");
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     *(str + i) = '\0';
@@ -135,7 +135,7 @@ sail_status_t pnm_private_read_pixels(
                 {
 #endif
                     SAIL_LOG_ERROR("PNM: Failed to read color value from '%s'", buffer);
-                    SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+                    SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
                 }
 
                 if (SAIL_LIKELY(bpc == 8))
@@ -248,7 +248,7 @@ sail_status_t pnm_private_read_pam_header(struct sail_io* io,
             if (sscanf(buffer, "%u", width) != 1)
             {
                 SAIL_LOG_ERROR("PAM: Failed to read WIDTH");
-                SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
             }
         }
         else if (strcmp(buffer, "HEIGHT") == 0)
@@ -257,7 +257,7 @@ sail_status_t pnm_private_read_pam_header(struct sail_io* io,
             if (sscanf(buffer, "%u", height) != 1)
             {
                 SAIL_LOG_ERROR("PAM: Failed to read HEIGHT");
-                SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
             }
         }
         else if (strcmp(buffer, "DEPTH") == 0)
@@ -266,7 +266,7 @@ sail_status_t pnm_private_read_pam_header(struct sail_io* io,
             if (sscanf(buffer, "%u", depth) != 1)
             {
                 SAIL_LOG_ERROR("PAM: Failed to read DEPTH");
-                SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
             }
         }
         else if (strcmp(buffer, "MAXVAL") == 0)
@@ -275,7 +275,7 @@ sail_status_t pnm_private_read_pam_header(struct sail_io* io,
             if (sscanf(buffer, "%u", maxval) != 1)
             {
                 SAIL_LOG_ERROR("PAM: Failed to read MAXVAL");
-                SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
             }
         }
         else if (strcmp(buffer, "TUPLTYPE") == 0)
@@ -314,7 +314,7 @@ sail_status_t pnm_private_read_pam_header(struct sail_io* io,
     {
         SAIL_LOG_ERROR("PAM: Missing required header fields (WIDTH=%u, HEIGHT=%u, DEPTH=%u, MAXVAL=%u)", *width,
                        *height, *depth, *maxval);
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     /* Deduce TUPLTYPE from DEPTH if not specified. */

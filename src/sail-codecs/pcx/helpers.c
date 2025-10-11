@@ -135,7 +135,7 @@ sail_status_t pcx_private_build_palette(enum SailPixelFormat pixel_format,
         if (signature != SAIL_PCX_PALETTE_SIGNATURE)
         {
             SAIL_LOG_ERROR("PCX: Palette has invalid signature %u, must be %u", signature, SAIL_PCX_PALETTE_SIGNATURE);
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
         }
 
         struct sail_palette* palette_local;

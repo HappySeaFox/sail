@@ -109,13 +109,13 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_pcx(struct sail_io* io,
     if (pcx_state->pcx_header.id != SAIL_PCX_SIGNATURE)
     {
         SAIL_LOG_ERROR("PCX: ID is %u, but must be %u", pcx_state->pcx_header.id, SAIL_PCX_SIGNATURE);
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     if (pcx_state->pcx_header.bytes_per_line == 0)
     {
         SAIL_LOG_ERROR("PCX: Bytes per line is 0");
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     SAIL_LOG_TRACE("PCX: planes(%u), bytes per line(%u), compressed(%s)", pcx_state->pcx_header.planes,

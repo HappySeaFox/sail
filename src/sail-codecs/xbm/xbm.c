@@ -119,13 +119,13 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_xbm(void* state, st
 
     if (strncmp(buf, "#define ", 8) != 0)
     {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     char* ptr;
     if ((ptr = strstr(buf, "_width ")) == NULL)
     {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     unsigned width = atoi(ptr + 6);
@@ -135,12 +135,12 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_xbm(void* state, st
 
     if (strncmp(buf, "#define ", 8) != 0)
     {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     if ((ptr = strstr(buf, "_height ")) == NULL)
     {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     unsigned height = atoi(ptr + 7);
@@ -154,7 +154,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_xbm(void* state, st
     if ((ptr = strchr(buf, '[')) == NULL || strchr(ptr, '{') == NULL)
     {
         SAIL_LOG_ERROR("XBM: C array declaration is not found");
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     if (strstr(buf, "short") != NULL)
@@ -170,7 +170,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_xbm(void* state, st
     else
     {
         SAIL_LOG_ERROR("XBM: Data format must be [unsigned] char or [unsigned] short");
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     /* Construct image. */

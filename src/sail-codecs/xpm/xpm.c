@@ -292,7 +292,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_xpm(void* state, co
     if (cpp > 7)
     {
         SAIL_LOG_ERROR("XPM: Too many colors (%u) for XPM format", num_colors);
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     /* Process tuning options. */

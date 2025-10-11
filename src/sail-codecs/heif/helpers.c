@@ -735,7 +735,7 @@ sail_status_t heif_private_heif_error_to_sail_status(const struct heif_error* er
     case heif_suberror_Unsupported_parameter:
     case heif_suberror_Unsupported_header_compression_method: return SAIL_ERROR_UNSUPPORTED_FORMAT;
 
-    case heif_suberror_Invalid_image_size: return SAIL_ERROR_INCORRECT_IMAGE_DIMENSIONS;
+    case heif_suberror_Invalid_image_size: return SAIL_ERROR_INVALID_IMAGE_DIMENSIONS;
 
     case heif_suberror_End_of_data: return SAIL_ERROR_NO_MORE_FRAMES;
 
@@ -753,7 +753,7 @@ sail_status_t heif_private_heif_error_to_sail_status(const struct heif_error* er
     case heif_suberror_No_iprp_box:
     case heif_suberror_No_iref_box:
     case heif_suberror_No_pict_handler:
-    case heif_suberror_No_av1C_box: return SAIL_ERROR_BROKEN_IMAGE;
+    case heif_suberror_No_av1C_box: return SAIL_ERROR_INVALID_IMAGE;
 
     default: return SAIL_ERROR_UNDERLYING_CODEC;
     }

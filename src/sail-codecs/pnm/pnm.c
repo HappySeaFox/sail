@@ -192,7 +192,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_pnm(void* state, st
         {
 #endif
             SAIL_LOG_ERROR("PNM: Failed to read image dimensions");
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
         }
 
         SAIL_TRY(pnm_private_read_word(pnm_state->io, buffer, sizeof(buffer)));
@@ -205,7 +205,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_pnm(void* state, st
         {
 #endif
             SAIL_LOG_ERROR("PNM: Failed to read image dimensions");
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
         }
 
         /* Maximum color. */
@@ -223,7 +223,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_pnm(void* state, st
             {
 #endif
                 SAIL_LOG_ERROR("PNM: Failed to read maximum color value");
-                SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
             }
 
             if (max_color <= 255)
@@ -327,7 +327,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_pnm(void* state, struct sail_
                 if (value != 0 && value != 1)
                 {
                     SAIL_LOG_ERROR("PNM: Unexpected character '%c'", first_char);
-                    SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+                    SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
                 }
 
                 if (shift == 8)

@@ -124,7 +124,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_ico(struct sail_io* io,
     if (ico_state->ico_header.images_count == 0)
     {
         SAIL_LOG_ERROR("ICO: No images found");
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     /* Check the image type. */
@@ -135,7 +135,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_ico(struct sail_io* io,
     default:
     {
         SAIL_LOG_ERROR("ICO: Invalid image type %u", ico_state->ico_header.type);
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
     }
 

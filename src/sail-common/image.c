@@ -153,11 +153,11 @@ sail_status_t sail_check_image_skeleton_valid(const struct sail_image* image)
     }
     if (image->width == 0 || image->height == 0)
     {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_INCORRECT_IMAGE_DIMENSIONS);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE_DIMENSIONS);
     }
     if (image->bytes_per_line == 0)
     {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_INCORRECT_BYTES_PER_LINE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_BYTES_PER_LINE);
     }
 
     return SAIL_OK;

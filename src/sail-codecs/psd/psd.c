@@ -117,7 +117,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_psd(struct sail_io* io,
     if (magic != SAIL_PSD_MAGIC)
     {
         SAIL_LOG_ERROR("PSD: Invalid magic 0x%X (expected 0x%X)", magic, SAIL_PSD_MAGIC);
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     uint16_t version;
@@ -126,7 +126,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_psd(struct sail_io* io,
     if (version != 1)
     {
         SAIL_LOG_ERROR("PSD: Invalid version %u", version);
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     return SAIL_OK;
@@ -171,7 +171,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_psd(void* state, st
         if (data_size != 768)
         {
             SAIL_LOG_ERROR("PSD: Invalid palette size %u (expected 768)", data_size);
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
         }
 
         SAIL_TRY(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP24_RGB, 256, &psd_state->palette));

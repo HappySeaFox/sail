@@ -131,7 +131,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_qoi(void* state, st
     if (qoi_state->pixels == NULL)
     {
         SAIL_LOG_ERROR("QOI: Image is broken without any details");
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     if (qoi_state->qoi_desc.colorspace != QOI_SRGB)

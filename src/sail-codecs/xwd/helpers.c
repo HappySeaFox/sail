@@ -62,7 +62,7 @@ sail_status_t xwd_private_read_header(struct sail_io* io, struct XWDFileHeader* 
         else
         {
             SAIL_LOG_ERROR("XWD: Invalid header size %u", buffer[0]);
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
         }
     }
 
@@ -103,7 +103,7 @@ sail_status_t xwd_private_read_header(struct sail_io* io, struct XWDFileHeader* 
     if (header->pixmap_width == 0 || header->pixmap_height == 0)
     {
         SAIL_LOG_ERROR("XWD: Invalid image dimensions %ux%u", header->pixmap_width, header->pixmap_height);
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     return SAIL_OK;

@@ -381,7 +381,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_png(void* state, st
             SAIL_LOG_ERROR("PNG: Frame %u,%u %ux%u doesn't fit into the canvas image %ux%u",
                            png_state->next_frame_x_offset, png_state->next_frame_y_offset, png_state->next_frame_width,
                            png_state->next_frame_height, image_local->width, image_local->height);
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_INCORRECT_IMAGE_DIMENSIONS);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE_DIMENSIONS);
         }
 
         SAIL_LOG_TRACE("PNG: Frame #%u: %u,%u %ux%u, canvas image: %ux%u", png_state->current_frame,

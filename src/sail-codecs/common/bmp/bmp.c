@@ -254,22 +254,22 @@ sail_status_t bmp_private_read_init(struct sail_io* io,
         if (bmp_state->v1.type != 0)
         {
             SAIL_LOG_ERROR("BMP: DDB type must always be 0");
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
         }
         if (bmp_state->v1.planes != 1)
         {
             SAIL_LOG_ERROR("BMP: DDB planes must always be 1");
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
         }
         if (bmp_state->v1.pixels != 0)
         {
             SAIL_LOG_ERROR("BMP: DDB pixels must always be 0");
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
         }
         if (bmp_state->v1.bit_count != 1 && bmp_state->v1.bit_count != 4 && bmp_state->v1.bit_count != 8)
         {
             SAIL_LOG_ERROR("BMP: DDB bpp must be 1, 4, or 8");
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
         }
     }
     else if (bmp_state->version >= SAIL_BMP_V3)
@@ -278,7 +278,7 @@ sail_status_t bmp_private_read_init(struct sail_io* io,
             && bmp_state->v2.bit_count != 32)
         {
             SAIL_LOG_ERROR("BMP: BitFields compression is allowed only for 16 or 32 bpp");
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
         }
         if (bmp_state->v3.compression != SAIL_BI_RGB && bmp_state->v3.compression != SAIL_BI_RLE4
             && bmp_state->v3.compression != SAIL_BI_RLE8)
@@ -289,12 +289,12 @@ sail_status_t bmp_private_read_init(struct sail_io* io,
         if (bmp_state->v3.compression == SAIL_BI_RLE4 && bmp_state->v2.bit_count != 4)
         {
             SAIL_LOG_ERROR("BMP: RLE4 compression must only be used with 4 bpp");
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
         }
         if (bmp_state->v3.compression == SAIL_BI_RLE8 && bmp_state->v2.bit_count != 8)
         {
             SAIL_LOG_ERROR("BMP: RLE8 compression must only be used with 8 bpp");
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
         }
     }
 
@@ -341,7 +341,7 @@ sail_status_t bmp_private_read_init(struct sail_io* io,
         if (bmp_state->palette_count > max_palette_count)
         {
             SAIL_LOG_ERROR("BMP: Indexed image has too large palette");
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
         }
 
         void* ptr;
@@ -500,7 +500,7 @@ sail_status_t bmp_private_read_frame(void* state, struct sail_io* io, struct sai
                     else if (count_or_marker == SAIL_BMP_END_OF_RLE_DATA_MARKER)
                     {
                         SAIL_LOG_ERROR("BMP: Unexpected end-of-rle-data marker");
-                        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+                        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
                     }
                     else if (count_or_marker == SAIL_BMP_DELTA_MARKER)
                     {
@@ -594,7 +594,7 @@ sail_status_t bmp_private_read_frame(void* state, struct sail_io* io, struct sai
                     else if (count_or_marker == SAIL_BMP_END_OF_RLE_DATA_MARKER)
                     {
                         SAIL_LOG_ERROR("BMP: Unexpected end-of-rle-data marker");
-                        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+                        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
                     }
                     else if (count_or_marker == SAIL_BMP_DELTA_MARKER)
                     {

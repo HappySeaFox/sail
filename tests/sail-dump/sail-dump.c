@@ -132,7 +132,7 @@ static sail_status_t read_image(FILE* fptr, struct sail_image* image)
     if (image->pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN)
     {
         SAIL_LOG_ERROR("DUMP: Read image with unknown pixel format: '%s'", pixel_format);
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     SAIL_LOG_DEBUG("DUMP: Image properties: %ux%u bytes_per_line(%u), pixel_format(%s)", image->width, image->height,
@@ -418,7 +418,7 @@ static sail_status_t read_palette(FILE* fptr, struct sail_image* image)
     {
         sail_free(value);
         SAIL_LOG_ERROR("DUMP: Read palette with unknown pixel format: '%s'", pixel_format);
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     SAIL_TRY_OR_CLEANUP(sail_alloc_palette_from_data(pixel_format_enum, value, color_count, &image->palette),

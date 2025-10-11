@@ -264,7 +264,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_gif(void* state, st
                 || gif_state->row + gif_state->height > (unsigned)gif_state->gif->SHeight)
             {
                 sail_destroy_image(image_local);
-                SAIL_LOG_AND_RETURN(SAIL_ERROR_INCORRECT_IMAGE_DIMENSIONS);
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE_DIMENSIONS);
             }
             break;
         }

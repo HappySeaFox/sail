@@ -1074,7 +1074,7 @@ static sail_status_t decode_impl(const char* path)
     {
         sail_stop_loading(state);
         fprintf(stderr, "Error: Decoder error %d.\n", status);
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     SAIL_TRY(sail_stop_loading(state));

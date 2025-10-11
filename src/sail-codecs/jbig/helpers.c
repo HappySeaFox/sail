@@ -81,13 +81,13 @@ sail_status_t jbig_private_read_header(struct sail_io* io, unsigned long* width,
 
     if (bytes_read != sizeof(header))
     {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     if (!jbig_private_is_jbig(header, sizeof(header)))
     {
         SAIL_LOG_ERROR("JBIG: Invalid header");
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     /* Parse width, height and planes from BIH header (big-endian). */
@@ -102,7 +102,7 @@ sail_status_t jbig_private_read_header(struct sail_io* io, unsigned long* width,
     if (*width == 0 || *height == 0)
     {
         SAIL_LOG_ERROR("JBIG: Invalid image dimensions %lux%lu", *width, *height);
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     /* Seek back to start for actual decoding. */

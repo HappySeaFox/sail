@@ -139,7 +139,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_wal(void* state, st
     {
         SAIL_LOG_ERROR("WAL: Invalid mipmap level %u dimensions: %ux%u", wal_state->frame_number, wal_state->width,
                        wal_state->height);
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     /* Check for potential overflow in image size calculation. */
@@ -148,7 +148,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_wal(void* state, st
     {
         SAIL_LOG_ERROR("WAL: Image size calculation overflow for dimensions %ux%u", wal_state->width,
                        wal_state->height);
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     struct sail_image* image_local;
@@ -193,7 +193,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_wal(void* state, struct sail_
     if (bytes_to_read == 0)
     {
         SAIL_LOG_ERROR("WAL: Invalid image size for reading");
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     SAIL_TRY(wal_state->io->strict_read(wal_state->io->stream, image->pixels, bytes_to_read));
@@ -249,13 +249,13 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_wal(void* state, co
         /* Check that dimensions are valid and divisible by 8 for mipmaps. */
         if (image->width == 0 || image->height == 0)
         {
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_INCORRECT_IMAGE_DIMENSIONS);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE_DIMENSIONS);
         }
         if ((image->width % 8) != 0 || (image->height % 8) != 0)
         {
             SAIL_LOG_ERROR("WAL: Image dimensions must be divisible by 8 for mipmap generation. Got %ux%u",
                            image->width, image->height);
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_INCORRECT_IMAGE_DIMENSIONS);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE_DIMENSIONS);
         }
 
         wal_state->width  = image->width;
@@ -299,7 +299,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_wal(void* state, co
         {
             SAIL_LOG_ERROR("WAL: Mipmap level %u has incorrect dimensions. Expected %ux%u, got %ux%u",
                            wal_state->frame_number, expected_width, expected_height, image->width, image->height);
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_INCORRECT_IMAGE_DIMENSIONS);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE_DIMENSIONS);
         }
     }
 

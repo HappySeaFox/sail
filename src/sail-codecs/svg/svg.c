@@ -143,7 +143,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_svg(struct sail_io* io,
     if (result != RESVG_OK)
     {
         SAIL_LOG_ERROR("SVG: Failed to load image");
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 #else
     ((char*)image_data)[image_size] = '\0';
@@ -155,7 +155,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_svg(struct sail_io* io,
     if (svg_state->nsvg_image == NULL)
     {
         SAIL_LOG_ERROR("SVG: Failed to load image");
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     svg_state->nsvg_rasterizer = nsvgCreateRasterizer();
@@ -163,7 +163,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_svg(struct sail_io* io,
     if (svg_state->nsvg_rasterizer == NULL)
     {
         SAIL_LOG_ERROR("SVG: Failed to create NanoSVG rasterizer");
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 #endif
 

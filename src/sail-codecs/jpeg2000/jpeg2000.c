@@ -241,7 +241,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpeg2000(void* stat
     if (opj_image->numcomps == 0)
     {
         SAIL_LOG_ERROR("JPEG2000: Image has no components");
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     const OPJ_UINT32 width  = opj_image->comps[0].w;
@@ -255,32 +255,32 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpeg2000(void* stat
         {
             SAIL_LOG_ERROR("JPEG2000: Component %u dimensions (%ux%u) don't match image dimensions (%ux%u)", i,
                            opj_image->comps[i].w, opj_image->comps[i].h, width, height);
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
         }
 
         if (opj_image->comps[i].prec != prec)
         {
             SAIL_LOG_ERROR("JPEG2000: Component %u precision %u doesn't match expected precision %u", i,
                            opj_image->comps[i].prec, prec);
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
         }
 
         if (opj_image->comps[i].sgnd != 0)
         {
             SAIL_LOG_ERROR("JPEG2000: Component %u has signed data type", i);
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
         }
 
         if (opj_image->comps[i].x0 != 0 || opj_image->comps[i].y0 != 0)
         {
             SAIL_LOG_ERROR("JPEG2000: Component %u has non-zero position", i);
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
         }
 
         if (opj_image->comps[i].dx != 1 || opj_image->comps[i].dy != 1)
         {
             SAIL_LOG_ERROR("JPEG2000: Component %u has subsampling factor not equal to 1", i);
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
         }
     }
 

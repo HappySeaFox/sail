@@ -91,7 +91,7 @@ sail_status_t wal_private_read_file_header(struct sail_io* io, struct WalFileHea
     if (wal_header->width == 0 || wal_header->height == 0)
     {
         SAIL_LOG_ERROR("WAL: Invalid dimensions %ux%u", wal_header->width, wal_header->height);
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     /* Reasonable size limit to prevent memory exhaustion (16K x 16K). */
@@ -99,7 +99,7 @@ sail_status_t wal_private_read_file_header(struct sail_io* io, struct WalFileHea
     {
         SAIL_LOG_ERROR("WAL: Image dimensions %ux%u exceed maximum allowed (16384x16384)", wal_header->width,
                        wal_header->height);
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     /* Validate offsets - they should be positive and in ascending order. */
@@ -110,7 +110,7 @@ sail_status_t wal_private_read_file_header(struct sail_io* io, struct WalFileHea
     if (wal_header->offset[0] < (int)header_size)
     {
         SAIL_LOG_ERROR("WAL: First mipmap offset %d is invalid (should be >= %zu)", wal_header->offset[0], header_size);
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     /* Validate that offsets are in ascending order and calculate expected sizes. */
@@ -122,7 +122,7 @@ sail_status_t wal_private_read_file_header(struct sail_io* io, struct WalFileHea
         if (wal_header->offset[i] <= 0)
         {
             SAIL_LOG_ERROR("WAL: Mipmap offset[%d] = %d is invalid", i, wal_header->offset[i]);
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
         }
 
         if (i > 0)
@@ -131,7 +131,7 @@ sail_status_t wal_private_read_file_header(struct sail_io* io, struct WalFileHea
             if (wal_header->offset[i] <= wal_header->offset[i - 1])
             {
                 SAIL_LOG_ERROR("WAL: Mipmap offsets are not in ascending order");
-                SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
             }
         }
 
@@ -145,7 +145,7 @@ sail_status_t wal_private_read_file_header(struct sail_io* io, struct WalFileHea
             {
                 SAIL_LOG_ERROR("WAL: Mipmap level %d size mismatch. Expected %zu bytes, got %zu bytes", i,
                                expected_size, actual_size);
-                SAIL_LOG_AND_RETURN(SAIL_ERROR_BROKEN_IMAGE);
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
             }
         }
 
@@ -219,7 +219,7 @@ sail_status_t wal_private_downsample_indexed(
 
     if (*dst_width == 0 || *dst_height == 0)
     {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_INCORRECT_IMAGE_DIMENSIONS);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE_DIMENSIONS);
     }
 
     const size_t dst_size = (size_t)(*dst_width) * (*dst_height);
