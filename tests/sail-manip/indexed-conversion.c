@@ -120,7 +120,7 @@ static MunitResult test_indexed_roundtrip(const MunitParameter params[], void* u
     /* Verify indexed image properties */
     munit_assert_int(indexed_image->pixel_format, ==, SAIL_PIXEL_FORMAT_BPP8_INDEXED);
     munit_assert_not_null(indexed_image->palette);
-    munit_assert_int(indexed_image->palette->pixel_format, ==, SAIL_PIXEL_FORMAT_BPP32_RGBA);
+    munit_assert_int(indexed_image->palette->pixel_format, ==, SAIL_PIXEL_FORMAT_BPP24_RGB);
     munit_assert_true(indexed_image->palette->color_count > 0);
     munit_assert_true(indexed_image->palette->color_count <= 256);
 
