@@ -377,7 +377,7 @@ enum SailOption
 {
     /*
      * Instruction to load or save image meta data like JPEG comments or EXIF.
-     * Loading special properties in source images is also affected by this option.
+     * Populating special properties in source images is also affected by this option.
      */
     SAIL_OPTION_META_DATA = 1 << 0,
 
